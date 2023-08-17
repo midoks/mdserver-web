@@ -1436,7 +1436,10 @@ def testRun():
 
     default_site = getServerDir() + "/waf/default.pl"
     url = "http://" + default_site + '/?t=../etc/passwd'
-    returnData = mw.httpGet(url, 10)
+    returnData = mw.httpGet(url, 3)
+
+    url = "https://" + default_site + '/?t=../etc/passwd'
+    returnData = mw.httpGet(url, 3)
     return mw.returnJson(True, '测试运行成功!', returnData)
 
 
