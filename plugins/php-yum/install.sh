@@ -62,10 +62,6 @@ cd ${curPath} && sh -x $curPath/versions/$2/install.sh $1
 
 if [ "${action}" == "install" ] && [ -d ${serverPath}/php-yum/${type} ];then
 
-	#初始化 
-	cd ${rootPath} && python3 ${rootPath}/plugins/php-yum/index.py start ${type}
-	cd ${rootPath} && python3 ${rootPath}/plugins/php-yum/index.py initd_install ${type}
-
 	# 安装通用扩展
 	echo "install PHP-YUM[${type}] extend start"
 	cd ${rootPath}/plugins/php-yum/versions && bash common.sh ${type} install mysqlnd
@@ -81,6 +77,10 @@ if [ "${action}" == "install" ] && [ -d ${serverPath}/php-yum/${type} ];then
 	cd ${rootPath}/plugins/php-yum/versions && bash common.sh ${type} install memcached
 	cd ${rootPath}/plugins/php-yum/versions && bash common.sh ${type} install mbstring
 	echo "install PHP-YUM[${type}] extend end"
+
+	#初始化 
+	cd ${rootPath} && python3 ${rootPath}/plugins/php-yum/index.py start ${type}
+	cd ${rootPath} && python3 ${rootPath}/plugins/php-yum/index.py initd_install ${type}
 
 	if [ ! -f /usr/local/bin/composer ];then
 		cd /tmp
