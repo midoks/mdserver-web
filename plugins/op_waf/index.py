@@ -1434,11 +1434,7 @@ def testRun():
     # if not data[0]:
     #     return data[1]
 
-    conf_json = getServerDir() + "/waf/default.json"
-    data = mw.readFile(conf_json)
-    pdata = json.loads(data)
-    default_site = pdata['default']
-
+    default_site = getServerDir() + "/waf/default.pl"
     url = "http://" + default_site + '/?t=../etc/passwd'
     returnData = mw.httpGet(url, 10)
     return mw.returnJson(True, '测试运行成功!', returnData)
