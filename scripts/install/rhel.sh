@@ -202,7 +202,7 @@ else
         make mysql-devel ncurses ncurses-devel net-tools oniguruma oniguruma-devel openldap openldap-devel \
         openssl openssl-devel patch pcre pcre-devel perl perl-Data-Dumper perl-devel psmisc python-devel \
         python3-devel python3-pip re2c readline-devel rpcgen sqlite-devel tar unzip vim-minimal vixie-cron \
-        wget zip zlib zlib-devel ImageMagick ImageMagick-devel ;
+        wget zip zlib zlib-devel ImageMagick ImageMagick-devel patchelf;
     do
         yum install -y $rpms;
     done
