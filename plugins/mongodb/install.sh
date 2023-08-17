@@ -36,13 +36,27 @@ Install_app()
 	echo '正在安装脚本文件...' > $install_tmp
 	mkdir -p $serverPath/source
 
-	if id mongodb &> /dev/null ;then 
-	    echo "mongodb uid is `id -u mongodb`"
-	    echo "mongodb shell is `grep "^mongodb:" /etc/passwd |cut -d':' -f7 `"
-	else
-	    groupadd mongodb
-		useradd -g mongodb mongodb
+	# if id mongodb &> /dev/null ;then 
+	#     echo "mongodb uid is `id -u mongodb`"
+	#     echo "mongodb shell is `grep "^mongodb:" /etc/passwd |cut -d':' -f7 `"
+	# else
+	#     groupadd mongodb
+	# 	useradd -g mongodb mongodb
+	# fi
+
+	if [ "centos" == "$OSNAME" ];then
+		OSNAME=rhel
 	fi
+
+	if [ "fedora" == "$OSNAME" ];then
+		OSNAME=rhel
+	fi
+
+	if [ "rocky" == "$OSNAME" ];then
+		OSNAME=rhel
+	fi
+
+
 
 	shell_file=${curPath}/versions/${VERSION}/${OSNAME}.sh
 
