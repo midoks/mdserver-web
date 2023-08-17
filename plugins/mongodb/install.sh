@@ -44,19 +44,17 @@ Install_app()
 	# 	useradd -g mongodb mongodb
 	# fi
 
-	if [ "centos" == "$OSNAME" ];then
-		OSNAME=rhel
-	fi
+	# if [ "centos" == "$OSNAME" ];then
+	# 	OSNAME=rhel
+	# fi
 
-	if [ "fedora" == "$OSNAME" ];then
-		OSNAME=rhel
-	fi
+	# if [ "fedora" == "$OSNAME" ];then
+	# 	OSNAME=rhel
+	# fi
 
-	if [ "rocky" == "$OSNAME" ];then
-		OSNAME=rhel
-	fi
-
-
+	# if [ "rocky" == "$OSNAME" ];then
+	# 	OSNAME=rhel
+	# fi
 
 	shell_file=${curPath}/versions/${VERSION}/${OSNAME}.sh
 
