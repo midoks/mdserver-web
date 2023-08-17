@@ -182,7 +182,7 @@ if [ "$VERSION_ID" -ge "8" ];then
         libxml2 libxml2-devel libxslt libxslt-devel libarchive make mysql-devel ncurses ncurses-devel net-tools \
         oniguruma oniguruma-devel patch pcre pcre-devel perl perl-Data-Dumper perl-devel procps psmisc python3-devel \
         openssl openssl-devel \
-        readline-devel rpcgen sqlite-devel tar unzip vim-minimal wget zip zlib zlib-devel ;
+        readline-devel rpcgen sqlite-devel tar unzip vim-minimal wget zip zlib zlib-devel patchelf;
     do
         # dnf --enablerepo=remi,appstream,baseos,epel,extras,powertools install -y oniguruma5php-devel
         dnf $REPOS install -y $rpms;
