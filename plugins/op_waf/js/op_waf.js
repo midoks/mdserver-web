@@ -14,6 +14,19 @@ function owPost(method, args, callback){
     },'json'); 
 }
 
+function owPostN(method, args, callback){
+    $.post('/plugins/run', {name:'op_waf', func:method, args:JSON.stringify(args)}, function(data) {
+        if (!data.status){
+            layer.msg(data.msg,{icon:0,time:2000,shade: [0.3, '#000']});
+            return;
+        }
+
+        if(typeof(callback) == 'function'){
+            callback(data);
+        }
+    },'json'); 
+}
+
 
 function getRuleByName(rule_name, callback){
     owPost('get_rule', {rule_name:rule_name}, function(data){
@@ -1634,6 +1647,221 @@ function wafSite(){
     });
 }
 
+
+function wafAreaLimitRender(){
+    function keyVal(obj){
+        var str = [];
+        $.each(obj, function (index, item) {
+            if (item == 1) {
+                if (index == 'allsite') index = '所有站点';
+                if (index == '海外') index = '中国大陆以外的地区(包括[港,澳,台])';
+                if (index == '中国') index = '中国大陆(不包括[港,澳,台])';
+                str.push(index);
+            }
+        });
+        return str.toString();
+    }
+    owPost('get_area_limit', {}, function(rdata) {
+        var rdata = $.parseJSON(rdata.data);
+        if (!rdata.status) {
+            layer.msg(rdata.msg, { icon: 2, time: 2000 });
+            return;
+        }
+
+        var list = '';
+        var rlist = rdata.data;
+
+        for (var i = 0; i < rlist.length; i++) {
+            var op = '';
+            var type = rlist[i]['types'] === 'refuse' ? '拦截' : '只放行';
+            var region_str = keyVal(rlist[i]['region']);
+            var site_str = keyVal(rlist[i]['site']);
+
+            op += '<a  data-id="'+i+'" href="javascript:;" class="area_limit_del btlink">删除</a>';
+
+            list += '<tr>';
+            list += '<td><span class="overflow_hide" style="width: 303px;" title="'+region_str+'"">' + region_str + '</span></td>';
+            list += '<td>' + site_str + '</td>';
+            list += '<td>' + type + '</td>';
+        
+            list += '<td class="text-right">' + op + '</td>';
+            list += '</tr>';
+        }
+
+        $('#con_list tbody').html(list);
+        $('.area_limit_del').click(function(){
+            var data_id = $(this).data('id');
+
+            var site = [],region = [];
+            $.each(rlist[data_id]['site'], function (index, item) {
+                site.push(index);
+            });
+            $.each(rlist[data_id]['region'], function (index, item) {
+                region.push(index);
+            });
+
+            var type = rlist[data_id]['types'];
+
+            owPost('del_area_limit', {
+                site:site.toString(),
+                region:region.toString(),
+                types:type,
+            }, function(rdata) {
+                var rdata = $.parseJSON(rdata.data);
+                showMsg(rdata.msg, function(){
+                    if (rdata.status){
+                        wafAreaLimit();
+                    }
+                },{ icon: rdata.status ? 1 : 2 });
+            });
+        });
+    });
+}
+
+// 地区限制
+function wafAreaLimit(){
+    var con = '<div class="safe bgw">\
+            <button id="create_area_limit" class="btn btn-success btn-sm" type="button" style="margin-right: 5px;">添加地区限制</button>\
+            <div class="divtable mtb10">\
+                <div class="tablescroll">\
+                    <table id="con_list" class="table table-hover" width="100%" cellspacing="0" cellpadding="0" border="0" style="border: 0 none;">\
+                    <thead><tr>\
+                    <th>地区</th>\
+                    <th>站点</th>\
+                    <th>类型</th>\
+                    <th style="text-align:right;">操作</th></tr></thead>\
+                    <tbody></tbody></table>\
+                </div>\
+            </div>\
+        </div>';
+    $(".soft-man-con").html(con);
+    wafAreaLimitRender();
+
+    $('#create_area_limit').click(function(){
+        var site_list;
+        var area_list;
+        var site_length = 0;
+        layer.open({
+            type: 1,
+            title: '添加地区限制',
+            area: ['450px','280px'],
+            closeBtn: 1,
+            btn: ['添加', '取消'],
+            content: '<div class="waf-form pd20">\
+                <div class="line">\
+                    <span class="tname">类型</span>\
+                    <div class="info-r c4">\
+                        <select name="type" class="bt-input-text" style="width:230px">\
+                            <option value="refuse" selected="">拦截</option>\
+                            <option value="accept">只放行</option>\
+                        </select>\
+                    </div>\
+                </div>\
+                <div class="line">\
+                    <span class="tname">站点</span>\
+                    <div class="info-r">\
+                        <div id="site_list"></div>\
+                    </div>\
+                </div>\
+                <div class="line">\
+                    <span class="tname">地区</span>\
+                    <div class="info-r" id="area_list"></div>\
+                </div>\
+            </div>',
+            success: function (layers, index) {
+                document.getElementById('layui-layer' + index).getElementsByClassName('layui-layer-content')[0].style.overflow = 'unset';
+
+                site_list = xmSelect.render({
+                    el: '#site_list',
+                    language: 'zn',
+                    toolbar: {show: true,},
+                    paging: true,
+                    pageSize: 10,
+                    data: [],
+                });
+
+                owPostN('get_default_site','', function(rdata){
+                    var rdata = $.parseJSON(rdata.data);
+                    var rlist = rdata.data.list;
+
+
+                    var pdata = [];
+                    for (var i = 0; i < rlist.length; i++) {
+                        var tval = rlist[i];
+                        if (tval != 'unset'){
+                            var t = {name:rlist[i],value:rlist[i]};
+                            pdata.push(t);
+                        }
+                    }
+                    site_length = pdata.length;
+                    site_list.update({data:pdata});
+                });
+
+                area_list = xmSelect.render({
+                    el: '#area_list',
+                    language: 'zn',
+                    toolbar: {show: true,},
+                    filterable: true,
+                    data: [],
+                });
+                owPostN('get_country','', function(rdata){
+                    var rdata = $.parseJSON(rdata.data);
+                    var rlist = rdata.data;
+
+                    var pdata = [];
+                    for (var i = 0; i < rlist.length; i++) {
+                        var tval = rlist[i];
+                        if (tval != 'unset'){
+                            var t = {name:tval,value:tval};
+                            pdata.push(t);
+                        }
+                    }
+
+                    area_list.update({data:pdata});
+                });
+            },
+            yes: function (indexs) {
+
+                var reg_type = $('select[name="type"]').val();
+                var site_val = site_list.getValue('value');
+                var area_val = area_list.getValue('value');
+
+                if (area_val.length <1) return layer.msg('地区最少选一个!', { icon: 2 });
+                if (site_val.length <1) return layer.msg('站点最少选一个!', { icon: 2 });
+
+                var site = '';
+                if (site_length === site_val.length) {
+                    site = 'allsite';
+                } else {
+                    site = site_val.join();
+                }
+
+                var area = area_val.join();
+                var region = area.replace('中国大陆以外的地区(包括[中国特别行政区:港,澳,台])', '海外')
+                    .replace('中国大陆(不包括[中国特别行政区:港,澳,台])', '中国')
+                    .replace('中国香港', '香港')
+                    .replace('中国澳门', '澳门')
+                    .replace('中国台湾', '台湾');
+
+                owPost('add_area_limit',{
+                    site:site,
+                    types:reg_type,
+                    region:region,
+                }, function(rdata){
+                    var rdata = $.parseJSON(rdata.data);
+                    showMsg(rdata.msg, function(){
+                        if (rdata.status){
+                            layer.close(indexs);
+                            wafAreaLimit();
+                        }
+                    },{ icon: rdata.status ? 1 : 2 });
+                });
+
+            },
+        });
+    });
+}
+
 function wafLogRequest(page){
     var args = {};   
     args['page'] = page;
@@ -1809,7 +2037,7 @@ function wafLogs(){
         wafLogRequest(1);
     });
 
-    owPost('get_default_site',{},function(rdata){
+    owPostN('get_default_site',{},function(rdata){
         $('select[name="site"]').html('');
 
         var rdata = $.parseJSON(rdata.data);

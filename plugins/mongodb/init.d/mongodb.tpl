@@ -32,6 +32,7 @@ app_start(){
 	echo $EXEC -f $CONF
 	$EXEC -f $CONF >> {$SERVER_PATH}/mongodb/logs.pl 2>&1 &
 }
+
 app_stop(){
 	if [ ! -f $PIDFILE ]
 	then
@@ -42,10 +43,10 @@ app_stop(){
 			kill -9 $PID
 			while [ -x /proc/${PID} ]
 			do
-				echo "Waiting for Redis to shutdown ..."
+				echo "Waiting for mongodb to shutdown ..."
 				sleep 1
 			done
-			echo "Redis stopped"
+			echo "mongodb stopped"
 			rm -rf $PIDFILE
 	fi
 }

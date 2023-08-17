@@ -245,6 +245,7 @@
 			<p onclick="wafScreen();">首页</p>
 			<p onclick="wafGloabl();">全局配置</p>
 			<p onclick="wafSite();">站点配置</p>
+            <p onclick="wafAreaLimit();">地区限制</p>
             <p onclick="wafLogs();">封锁历史</p>
             <!-- <p onclick="wafOpLogs();">操作日志</p> -->
 		</div>
@@ -255,9 +256,13 @@
 	</div>
 
 </div>
+<script src="/plugins/file?name=op_waf&f=js/op_waf.js"></script>
 <script type="text/javascript">
 resetPluginWinWidth(800);
-$.getScript( "/plugins/file?name=op_waf&f=js/op_waf.js", function(){
+
+$.getScript( "/plugins/file?name=op_waf&f=js/op_waf.js", function(data, textStatus, jqxhr){
+    // console.log(data, textStatus, jqxhr);
 	pluginService('op_waf');
 });
+
 </script>

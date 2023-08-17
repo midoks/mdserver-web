@@ -277,6 +277,16 @@ function _M.setParams( self, params )
     self.params = params
 end
 
+function _M.count_size(data)
+    local count=0
+    if type(data)~="table" then return count end 
+    for k,v in pairs(data) 
+    do
+        count=count+1
+    end 
+    return count
+end 
+
 
 function _M.is_min(self, ip1, ip2)
     n = 0
@@ -822,6 +832,5 @@ end
 function _M.t(self)
     ngx.say(',,,')
 end
-
 
 return _M

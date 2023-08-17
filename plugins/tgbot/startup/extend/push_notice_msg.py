@@ -66,7 +66,7 @@ def send_msg(bot, tag='ad', trigger_time=300):
         ],
         [
             types.InlineKeyboardButton(
-                text="❤️干净卫生|就是看片", url='https://www.zzzkan.com/?f=tg')
+                text="❤️干净卫生|就是看片", url='https://www.zzzkan.com/?f=tg_mdserver-web')
         ],
         [
             types.InlineKeyboardButton(
@@ -78,7 +78,7 @@ def send_msg(bot, tag='ad', trigger_time=300):
         ],
         [
             types.InlineKeyboardButton(
-                text="高价收量 👑 集团收量 ❤️ 流量变现", url='https://t.me/maccms_jccms/93')
+                text="高价收量 👑 集团收量 ❤️ 流量变现", url='https://t.me/taohaozhan')
         ],
         [
             types.InlineKeyboardButton(

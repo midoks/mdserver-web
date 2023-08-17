@@ -2450,6 +2450,16 @@ def doFullSyncUser(version=''):
         return data[1]
 
     sync_db = args['db']
+    sync_db_import = args['db']
+
+    if sync_db.lower() == 'all':
+        sync_db_import = ''
+        dbs = findBinlogSlaveDoDb()
+        dbs_str = ''
+        for x in dbs:
+            dbs_str += ' ' + x
+        sync_db = "--databases " + dbs_str.strip()
+
     sync_sign = args['sign']
 
     db = pMysqlDb()
@@ -2488,7 +2498,7 @@ def doFullSyncUser(version=''):
         pwd = pSqliteDb('config').where('id=?', (1,)).getField('mysql_root')
         sock = getSocketFile()
         my_import_cmd = getServerDir() + '/bin/usr/bin/mysql -S ' + sock + ' -uroot -p' + pwd + \
-            ' ' + sync_db + ' < ' + bak_file
+            ' ' + sync_db_import + ' < ' + bak_file
         mw.execShell(my_import_cmd)
 
     if version == '8.0':

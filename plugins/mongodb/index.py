@@ -35,13 +35,8 @@ def getInitDFile():
 
 
 def getConf():
-    if mw.isAppleSystem():
-        path = getServerDir() + "/mongodb.conf"
-        return path
-
-    if os.path.exists("/etc/mongodb.conf"):
-        return "/etc/mongodb.conf"
-    return "/etc/mongod.conf"
+    path = getServerDir() + "/mongodb.conf"
+    return path
 
 
 def getConfTpl():
@@ -90,6 +85,14 @@ def initDreplace():
         os.mkdir(initD_path)
     file_bin = initD_path + '/' + getPluginName()
 
+    logs_dir = getServerDir() + '/logs'
+    if not os.path.exists(logs_dir):
+        os.mkdir(logs_dir)
+
+    data_dir = getServerDir() + '/data'
+    if not os.path.exists(data_dir):
+        os.mkdir(data_dir)
+
     # initd replace
     content = mw.readFile(file_tpl)
     content = content.replace('{$SERVER_PATH}', service_path)
@@ -100,6 +103,17 @@ def initDreplace():
     conf_content = mw.readFile(getConfTpl())
     conf_content = conf_content.replace('{$SERVER_PATH}', service_path)
     mw.writeFile(getServerDir() + '/mongodb.conf', conf_content)
+
+    # systemd
+    systemDir = mw.systemdCfgDir()
+    systemService = systemDir + '/mongodb.service'
+    systemServiceTpl = getPluginDir() + '/init.d/mongodb.service.tpl'
+    if os.path.exists(systemDir) and not os.path.exists(systemService):
+        service_path = mw.getServerDir()
+        se_content = mw.readFile(systemServiceTpl)
+        se_content = se_content.replace('{$SERVER_PATH}', service_path)
+        mw.writeFile(systemService, se_content)
+        mw.execShell('systemctl daemon-reload')
 
     return file_bin
 
@@ -112,14 +126,10 @@ def mgOp(method):
             return 'ok'
         return data[1]
 
-    cmd = 'systemctl ' + method + ' mongod'
-    if os.path.exists("/usr/lib/systemd/system/mongodb.service"):
-        cmd = 'systemctl ' + start + ' mongodb'
-
-    data = mw.execShell(cmd)
+    data = mw.execShell('systemctl ' + method + ' ' + getPluginName())
     if data[1] == '':
         return 'ok'
-    return data[1]
+    return 'fail'
 
 
 def start():
@@ -162,13 +172,7 @@ def runInfo():
     result["version"] = serverStatus['version']
     result["uptime"] = serverStatus['uptime']
 
-    result['db_path'] = '/var/lib/mongo'
-
-    if os.path.exists("/var/lib/mongodb"):
-        result['db_path'] = '/var/lib/mongodb'
-
-    if mw.isAppleSystem():
-        result['db_path'] = getServerDir() + "/data"
+    result['db_path'] = getServerDir() + "/data"
 
     result["connections"] = serverStatus['connections']['current']
     if 'catalogStats' in serverStatus:
@@ -182,11 +186,7 @@ def initdStatus():
     if mw.isAppleSystem():
         return "Apple Computer does not support"
 
-    shell_cmd = 'systemctl status mongod | grep loaded | grep "enabled;"'
-
-    if os.path.exists("/usr/lib/systemd/system/mongodb.service"):
-        shell_cmd = 'systemctl status mongodb | grep loaded | grep "enabled;"'
-
+    shell_cmd = 'systemctl status mongodb | grep loaded | grep "enabled;"'
     data = mw.execShell(shell_cmd)
     if data[0] == '':
         return 'fail'
@@ -197,10 +197,7 @@ def initdInstall():
     if mw.isAppleSystem():
         return "Apple Computer does not support"
 
-    if os.path.exists("/usr/lib/systemd/system/mongodb.service"):
-        mw.execShell('systemctl enable mongodb')
-    else:
-        mw.execShell('systemctl enable mongod')
+    mw.execShell('systemctl enable mongodb')
     return 'ok'
 
 
@@ -208,24 +205,21 @@ def initdUinstall():
     if mw.isAppleSystem():
         return "Apple Computer does not support"
 
-    if os.path.exists("/usr/lib/systemd/system/mongodb.service"):
-        mw.execShell('systemctl disable mongodb')
-    else:
-        mw.execShell('systemctl disable mongod')
+    mw.execShell('systemctl disable mongodb')
     return 'ok'
 
 
 def runLog():
-    if mw.isAppleSystem():
-        return getServerDir() + '/logs/mongodb.log'
-
-    if os.path.exists("/var/log/mongodb/mongodb.log"):
-        return "/var/log/mongodb/mongodb.log"
-
-    return "/var/log/mongodb/mongod.log"
+    f = getServerDir() + '/logs/mongodb.log'
+    if os.path.exists(f):
+        return f
+    return getServerDir() + '/logs.pl'
 
 
 def installPreInspection(version):
+    if mw.isAppleSystem():
+        return 'ok'
+
     sys = mw.execShell(
         "cat /etc/*-release | grep PRETTY_NAME |awk -F = '{print $2}' | awk -F '\"' '{print $2}'| awk '{print $1}'")
 
@@ -238,17 +232,9 @@ def installPreInspection(version):
     sysName = sys[0].strip().lower()
     sysId = sys_id[0].strip()
 
-    if not sysName in ('centos', 'fedora', 'ubuntu', 'debian'):
-        return '暂时仅不支持{}'.format(sysName)
-
-    if sysName == 'debian':
-        if version > 10:
-            return 'mongodb[' + version + ']不支持安装在debian[' + sysId + ']'
-
-    if sysName == 'ubuntu':
-        if version < 16:
-            return 'mongodb[' + version + ']不支持安装在ubuntu[' + sysId + ']'
-
+    supportOs = ['centos', 'ubuntu', 'debian', 'opensuse']
+    if not sysName in supportOs:
+        return '暂时仅支持{}'.format(','.join(supportOs))
     return 'ok'
 
 if __name__ == "__main__":

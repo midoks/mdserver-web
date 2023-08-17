@@ -102,8 +102,10 @@ docker run -itd --name mw-server --privileged=true -p 7200:7200 -p 80:80 -p 443:
 
 ### 版本更新 0.15.4
 
-* OP防火墙-验证优化。
+* OP防火墙-验证优化[cf缓存问题解决]。
+* OP防火墙-加入地区限制(最好卸载重装)。
 * 在aarch64架构下低于PHP70的版本[安装/扩展安装]优化。
+* Mongodb安装优化。
 
 ### JSDelivr安装地址
 
@@ -161,6 +163,8 @@ curl --insecure -fsSL  https://raw.githubusercontent.com/midoks/mdserver-web/dev
 ```
 curl --insecure -fsSL  https://raw.githubusercontent.com/midoks/mdserver-web/dev/scripts/install_dev.sh | bash
 curl --insecure -fsSL  https://raw.githubusercontent.com/midoks/mdserver-web/dev/scripts/update_dev.sh | bash
+
+wget --no-check-certificate -O install.sh https://raw.githubusercontent.com/midoks/mdserver-web/dev/scripts/install.sh && bash install.sh
 
 wget --no-check-certificate -O uninstall.sh https://raw.githubusercontent.com/midoks/mdserver-web/dev/scripts/uninstall.sh && bash uninstall.sh
 

@@ -7,16 +7,18 @@ if grep -Eq "FreeBSD" /etc/*-release && [ ! -f /bin/bash ]; then
     ln -sf /usr/local/bin/bash /bin/bash
 fi
 
-pkg update -y
+# freebsd-update -r 13.0-RELEASE upgrade
+
+echo "y" | pkg update
+# echo "y" | pkg upgrade
+# echo "y" | freebsd-update fetch install
 pkg install -y python3
-python3 -m ensurepip
-pip3 install --upgrade setuptools
-python3 -m pip install --upgrade pip
+# python3 -m ensurepip
+# pip3 install --upgrade setuptools
+# python3 -m pip install --upgrade pip
 pkg install -y lsof
 pkg install -y sqlite3
 pkg install -y py38-sqlite3
-pkg install -y py38-mysqlclient
-pkg install -y py38-cffi
 
 pkg install -y gcc
 pkg install -y autoconf
@@ -34,8 +36,6 @@ pkg install -y freetype
 pkg install -y oniguruma
 pkg install -y brotli
 pkg install -y harfbuzz
-
-# pkg install -y py38-cffi
 
 pkg autoremove -y
 
