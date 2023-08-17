@@ -30,7 +30,7 @@ app_start(){
 	
 	echo "Starting mongodb server..."
 	echo $EXEC -f $CONF
-	$EXEC -f $CONF >> {$SERVER_PATH}/mongodb/logs.pl 2>&1 &
+	$EXEC -f $CONF >> {$SERVER_PATH}/mongodb/logs.pl 1>&1 2>&1 &
 }
 
 app_stop(){
