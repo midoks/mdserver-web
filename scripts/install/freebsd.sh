@@ -10,8 +10,8 @@ fi
 echo "y" | pkg update 
 pkg install -y python3
 # python3 -m ensurepip
-pip3 install --upgrade setuptools
-python3 -m pip install --upgrade pip
+# pip3 install --upgrade setuptools
+# python3 -m pip install --upgrade pip
 pkg install -y lsof
 pkg install -y sqlite3
 pkg install -y py38-sqlite3
