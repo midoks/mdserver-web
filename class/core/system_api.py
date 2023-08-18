@@ -281,7 +281,9 @@ class system_api:
             mac_version = ''
             for x in data_list:
                 mac_version += x.split("\t")[1] + ' '
-            return mac_version
+
+            arch_ver = mw.execShell("arch")
+            return mac_version + "(" + arch_ver[0].strip() + ")"
 
         redhat_series = '/etc/redhat-release'
         if os.path.exists(redhat_series):
