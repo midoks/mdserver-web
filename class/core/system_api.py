@@ -283,7 +283,7 @@ class system_api:
                 mac_version += x.split("\t")[1] + ' '
 
             arch_ver = mw.execShell("arch")
-            return mac_version + "(" + arch_ver[0].strip() + ")"
+            return mac_version + " (" + arch_ver[0].strip() + ")"
 
         redhat_series = '/etc/redhat-release'
         if os.path.exists(redhat_series):
@@ -291,7 +291,7 @@ class system_api:
             version = version.replace('release ', '').strip()
 
             arch_ver = mw.execShell("arch")
-            return version + "(" + arch_ver[0].strip() + ")"
+            return version + " (" + arch_ver[0].strip() + ")"
 
         os_series = '/etc/os-release'
         if os.path.exists(os_series):
@@ -299,7 +299,7 @@ class system_api:
                 "cat /etc/*-release | grep PRETTY_NAME | awk -F = '{print $2}' | awk -F '\"' '{print $2}'")
 
             arch_ver = mw.execShell("arch")
-            return version[0].strip() + "(" + arch_ver[0].strip() + ")"
+            return version[0].strip() + " (" + arch_ver[0].strip() + ")"
 
         return '未识别系统信息'
 
