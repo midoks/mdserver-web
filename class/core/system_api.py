@@ -287,7 +287,9 @@ class system_api:
         if os.path.exists(redhat_series):
             version = mw.readFile('/etc/redhat-release')
             version = version.replace('release ', '').strip()
-            return version
+
+            arch_ver = mw.execShell("arch")
+            return version + "(" + arch_ver[0].strip() + ")"
 
         os_series = '/etc/os-release'
         if os.path.exists(os_series):
