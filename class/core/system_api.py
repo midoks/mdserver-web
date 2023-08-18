@@ -293,7 +293,9 @@ class system_api:
         if os.path.exists(os_series):
             version = mw.execShell(
                 "cat /etc/*-release | grep PRETTY_NAME | awk -F = '{print $2}' | awk -F '\"' '{print $2}'")
-            return version[0].strip()
+
+            arch_ver = mw.execShell("arch")
+            return version[0].strip() + "(" + arch_ver[0].strip() + ")"
 
         return '未识别系统信息'
 
