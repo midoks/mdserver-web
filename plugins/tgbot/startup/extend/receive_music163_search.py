@@ -36,6 +36,23 @@ def getReadCmd(cmd, msg):
     return real_msg
 
 
+def ip2long(ip):
+    import struct
+    import socket
+    return struct.unpack("!L", socket.inet_aton(ip))[0]
+
+
+def long2ip(longip):
+    import struct
+    import socket
+    return socket.inet_ntoa(struct.pack('!L', longip))
+
+
+def mt_rand(a, b):
+    import random
+    return random.randint(a, b)
+
+
 def httpPost(url, data, timeout=10):
     """
     发送POST请求
@@ -51,8 +68,19 @@ def httpPost(url, data, timeout=10):
             ssl._create_default_https_context = ssl._create_unverified_context
         except:
             pass
+
+        headers = {
+            'Referer': 'https://music.163.com/',
+            'Cookie': 'appver=8.2.30; os=iPhone OS; osver=15.0; EVNSM=1.0.0; buildver=2206; channel=distribution; machineid=iPhone13.3',
+            'User-Agent': 'Mozilla/5.0 (iPhone; CPU iPhone OS 15_0 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Mobile/15E148 CloudMusic/0.1.1 NeteaseMusic/8.2.30',
+            'X-Real-IP': long2ip(mt_rand(1884815360, 1884890111)),
+            'Accept': '*/*',
+            'Accept-Language': 'zh-CN,zh;q=0.8,gl;q=0.6,zh-TW;q=0.4',
+            'Connection': 'keep-alive',
+            'Content-Type': 'application/x-www-form-urlencoded',
+        }
         data = urllib.parse.urlencode(data).encode('utf-8')
-        req = urllib.request.Request(url, data)
+        req = urllib.request.Request(url, data, headers=headers)
         response = urllib.request.urlopen(req, timeout=timeout)
         result = response.read()
         if type(result) == bytes:
@@ -107,7 +135,7 @@ def tgSearchMusic_t(cmd_text):
 
     if data['code'] == 200 and len(data['result']['songs']) > 0:
         slist = data['result']['songs']
-        print(s)
+        print(slist)
     else:
         keyboard = [
             [
@@ -137,8 +165,11 @@ def tgSearchMusic(bot, message, cmd_text):
         page_total = math.ceil(data['result']['songCount'] / 5)
 
         for x in slist:
+            author = ''
+            if len(x['ar']) > 0:
+                author = ' - ' + x['ar'][0]['name']
             keyboard.append([types.InlineKeyboardButton(
-                text=x['name'], callback_data='m163:' + str(x['id']))])
+                text=x['name'] + author, callback_data='m163_id:' + str(x['id']) + ":" + x['name'])])
 
         keyboard.append([
             types.InlineKeyboardButton(
@@ -167,14 +198,61 @@ def getFaqKw(cmd):
     return False, ''
 
 
+def cleanMusicFileExpire(dir):
+    pass
+
+
+def downloadAndUpMusic(bot, chat_id, mid, title):
+    import requests
+    murl_data = musicSongDataUrl(int(mid))
+    murl = murl_data['data'][0]['url']
+    def_dir = '/tmp/tgbot_music'
+    if not os.path.exists(def_dir):
+        os.mkdir(def_dir)
+
+    def_abs_path = def_dir + '/' + title + '.mp3'
+    # print('downloadAndUpMusic' + ":" + str(murl))
+    if murl:
+        msg_t = bot.send_message(chat_id, "已经获取资源URL,本地下载中...")
+        response = requests.get(murl)
+
+        with open(def_abs_path, "wb") as f:
+            f.write(response.content)
+
+        bot.edit_message_text(
+            chat_id=chat_id, message_id=msg_t.message_id, text="本地下载完,正在上传中...")
+
+        audio = open(def_abs_path, 'rb')
+        bot.send_audio(chat_id, audio)
+
+        bot.edit_message_text(
+            chat_id=chat_id, message_id=msg_t.message_id, text="上传结束...1s自动删除")
+
+        time.sleep(1)
+        bot.delete_message(chat_id=chat_id, message_id=msg_t.message_id)
+    else:
+        bot.send_message(chat_id, "无效资源")
+
+    cleanMusicFileExpire(def_dir)
+    return True
+
+
 def answer_callback_query(bot, call):
     import math
     keyword = call.data
-    print(keyword)
+    # print(keyword)
     if keyword == 'm163_search_close':
         bot.delete_message(chat_id=call.message.chat.id,
                            message_id=call.message.message_id)
         return
+
+    # 音乐下载
+    if keyword.startswith('m163_id:'):
+        t = keyword.split(":")
+        downloadAndUpMusic(bot, call.message.chat.id, t[1], t[2])
+        bot.delete_message(chat_id=call.message.chat.id,
+                           message_id=call.message.message_id)
+        return True
 
     is_m163_page = False
     p = 1
@@ -200,15 +278,18 @@ def answer_callback_query(bot, call):
 
         keyboard = []
         for x in dlist:
+            author = ''
+            if len(x['ar']) > 0:
+                author = ' - ' + x['ar'][0]['name']
             keyboard.append([types.InlineKeyboardButton(
-                text=x['name'], callback_data='m163:' + str(x['id']))])
+                text=x['name'] + author, callback_data='m163_id:' + str(x['id']) + ":" + x['name'])])
 
         page_nav = []
         if int(p) > 1:
             page_nav.append(types.InlineKeyboardButton(
                 text="上一页", callback_data='m163_pre_page_' + str(int(p) - 1)))
 
-        if p < page_total:
+        if int(p) < page_total:
             page_nav.append(types.InlineKeyboardButton(
                 text="下一页", callback_data='m163_next_page_' + str(int(p) + 1)))
 
@@ -239,7 +320,9 @@ def run(bot, message):
 
 
 if __name__ == '__main__':
-    # tgSearchMusic_t("刀郎")
-    t = musicSongDataUrl(2063487880)
-    print(t['data'][0]['url'])
+    cleanMusicFileExpire("/tmp/tgbot_music")
+    # tgSearchMusic_t("青花瓷")
+    # print(long2ip(mt_rand(1884815360, 1884890111)))
+    # t = musicSongDataUrl(2063487880)
+    # print(t['data'][0]['url'])
     print("111")
