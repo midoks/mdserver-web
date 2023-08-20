@@ -10,9 +10,9 @@ rootPath=$(dirname "$rootPath")
 rootPath=$(dirname "$rootPath")
 serverPath=$(dirname "$rootPath")
 sourcePath=${serverPath}/source/php
-SYS_ARCH=`arch`
+
 LIBNAME=memcache
-LIBV=2.2.7
+LIBV=8.2
 sysName=`uname`
 actionType=$1
 version=$2
@@ -22,7 +22,7 @@ if [ "$version" -gt "56" ] && [ "$version" -lt "80" ];then
 fi
 
 if [ "$version" -gt "74" ];then
-	LIBV=8.0
+	LIBV=8.2
 fi
 
 
@@ -52,21 +52,12 @@ Install_lib()
 		php_lib=$sourcePath/php_lib
 		mkdir -p $php_lib
 
-		if [ ! -d $php_lib/${LIBNAME}-${LIBV} ];then
-			wget -O $php_lib/${LIBNAME}-${LIBV}.tgz http://pecl.php.net/get/${LIBNAME}-${LIBV}.tgz
-			cd $php_lib && tar xvf ${LIBNAME}-${LIBV}.tgz
-		fi
-		cd $php_lib/${LIBNAME}-${LIBV}
+		wget -O $php_lib/${LIBNAME}-${LIBV}.tgz http://pecl.php.net/get/${LIBNAME}-${LIBV}.tgz
 
-		OPTIONS=""
-		if [ "${SYS_ARCH}" == "aarch64" ] && [ "$version" -lt "56" ];then
-			OPTIONS="$OPTIONS --build=aarch64-unknown-linux-gnu --host=aarch64-unknown-linux-gnu"
-		fi
-
+		cd $php_lib && tar xvf ${LIBNAME}-${LIBV}.tgz
+		cd ${LIBNAME}-${LIBV}
 		$serverPath/php/$version/bin/phpize
-		./configure --with-php-config=$serverPath/php/$version/bin/php-config \
-		$OPTIONS \
-		--enable-memcache --with-zlib-dir
+		./configure --with-php-config=$serverPath/php/$version/bin/php-config --enable-memcache --with-zlib-dir
 		make clean && make && make install && make clean
 
 	fi
