@@ -191,24 +191,17 @@ def run(bot, message):
     # print(text_body)
     if isThisCmd('/?:', text_body):
         cmd_text = getReadCmd('/?:', text_body)
+        cmd_text = cmd_text.strip().strip(":")
+        if cmd_text == "":
+            return bot.send_message(message.chat.id, "搜索内容不能为空, 例如:/?: 数据库")
         return searchFaq(bot, message, cmd_text)
 
-    if isThisCmd('/faq:', text_body):
-        cmd_text = getReadCmd('/faq:', text_body)
+    if isThisCmd('/faq', text_body):
+        cmd_text = getReadCmd('/faq', text_body)
+        cmd_text = cmd_text.strip().strip(":")
+        if cmd_text == "":
+            return bot.send_message(message.chat.id, "搜索内容不能为空, 例如:/faq 数据库")
         return searchFaq(bot, message, cmd_text)
-
-    # if text_body.find('?') > -1 or text_body.find('？') > -1:
-    #     return_msg = "你似乎在寻找【" + text_body + "】答案:\n"
-    #     return_msg += "/faq:开始寻找你的问题\n"
-    #     keyboard = [
-    #         [
-    #             types.InlineKeyboardButton(
-    #                 text="如未找到，可以在论坛补充你的提问!", url='https://bbs.midoks.me'),
-    #         ]
-
-    #     ]
-    #     markup = types.InlineKeyboardMarkup(keyboard)
-    #     bot.reply_to(message, return_msg, reply_markup=markup)
 
     return bot
 
