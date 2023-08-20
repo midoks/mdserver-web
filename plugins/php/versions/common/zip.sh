@@ -20,7 +20,7 @@ LIBNAME=zip
 LIBV=0
 
 
-if [ "$version" -lt "73" ];then
+if [ "$version" -gt "73" ];then
 	echo "not need"
 	exit 1
 fi
