@@ -101,6 +101,7 @@ def musicSearch(kw, page=1, page_size=5):
     })
     # data_a = json.loads(data)
     # print(data)
+    # exit()
     return json.loads(data)
 
 
@@ -169,7 +170,7 @@ def tgSearchMusic(bot, message, cmd_text):
             if len(x['ar']) > 0:
                 author = ' - ' + x['ar'][0]['name']
             keyboard.append([types.InlineKeyboardButton(
-                text=x['name'] + author, callback_data='m163_id:' + str(x['id']) + ":" + x['name'])])
+                text=x['name'] + author, callback_data='m163_id:' + str(x['id']))])
 
         keyboard.append([
             types.InlineKeyboardButton(
@@ -252,7 +253,16 @@ def answer_callback_query(bot, call):
     # 音乐下载
     if keyword.startswith('m163_id:'):
         t = keyword.split(":")
-        downloadAndUpMusic(bot, call.message.chat.id, t[1], t[2])
+        inline_keyboard = call.json['message'][
+            "reply_markup"]["inline_keyboard"]
+
+        def_file_name = 'demo'
+        for x in inline_keyboard:
+            # print(x)
+            if x[0]['callback_data'] == keyword:
+                def_file_name = x[0]['text']
+        # print(call.message)
+        downloadAndUpMusic(bot, call.message.chat.id, t[1], def_file_name)
         bot.delete_message(chat_id=call.message.chat.id,
                            message_id=call.message.message_id)
         return True
@@ -285,7 +295,7 @@ def answer_callback_query(bot, call):
             if len(x['ar']) > 0:
                 author = ' - ' + x['ar'][0]['name']
             keyboard.append([types.InlineKeyboardButton(
-                text=x['name'] + author, callback_data='m163_id:' + str(x['id']) + ":" + x['name'])])
+                text=x['name'] + author, callback_data='m163_id:' + str(x['id']))])
 
         page_nav = []
         if int(p) > 1:
@@ -323,9 +333,9 @@ def run(bot, message):
 
 
 if __name__ == '__main__':
-    cleanMusicFileExpire("/tmp/tgbot_music")
-    # tgSearchMusic_t("青花瓷")
+    # cleanMusicFileExpire("/tmp/tgbot_music")
+    # tgSearchMusic_t("一夜泥工")
     # print(long2ip(mt_rand(1884815360, 1884890111)))
-    # t = musicSongDataUrl(2063487880)
-    # print(t['data'][0]['url'])
+    t = musicSongDataUrl(2063487880)
+    print(t['data'])
     print("111")
