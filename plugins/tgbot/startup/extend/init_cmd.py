@@ -22,6 +22,7 @@ def init(bot):
     bot.set_my_commands(
         commands=[
             telebot.types.BotCommand("start", "查看帮助信息"),
-            telebot.types.BotCommand("faq", "查看bbs帖子主题【/faq:】"),
+            telebot.types.BotCommand("faq", ""),
+            telebot.types.BotCommand("music", "搜索网易音乐"),
         ],
     )
