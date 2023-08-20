@@ -9,8 +9,6 @@ import json
 import base64
 import threading
 
-sys.path.append(os.getcwd() + "/class/core")
-import mw
 
 import telebot
 from telebot import types
@@ -65,12 +63,13 @@ def httpPost(url, data, timeout=10):
 
 
 def musicSearch(kw, page=1, page_size=5):
+    m_offset = (int(page) - 1) * int(page_size)
     data = httpPost('http://music.163.com/api/cloudsearch/pc', {
         's': kw,
         'type': '1',
         'total': 'true',
         'limit': page_size,
-        'offset': 0,
+        'offset': m_offset,
     })
     # data_a = json.loads(data)
     # print(data)
@@ -103,9 +102,127 @@ def writeLog(log_str):
     return True
 
 
-def tgSearchMusic(bot, message, cmd_text):
+def tgSearchMusic_t(cmd_text):
     data = musicSearch(cmd_text, 1, 5)
-    print(data)
+
+    if data['code'] == 200 and len(data['result']['songs']) > 0:
+        slist = data['result']['songs']
+        print(s)
+    else:
+        keyboard = [
+            [
+                types.InlineKeyboardButton(
+                    text="论坛", url='https://bbs.midoks.me'),
+                types.InlineKeyboardButton(
+                    text="搜索", url='https://bbs.midoks.me/search.php')
+            ],
+            [
+                types.InlineKeyboardButton(
+                    text="关闭消息", callback_data='bbs_search_close')
+            ]
+
+        ]
+        markup = types.InlineKeyboardMarkup(keyboard)
+        bot.send_message(
+            message.chat.id, "未找到合适内容,请在官方论坛[bbs.midoks.me]提问!", reply_markup=markup)
+    return True
+
+
+def tgSearchMusic(bot, message, cmd_text):
+    import math
+    data = musicSearch(cmd_text, 1, 5)
+    if data['code'] == 200 and len(data['result']['songs']) > 0:
+        keyboard = []
+        slist = data['result']['songs']
+        page_total = math.ceil(data['result']['songCount'] / 5)
+
+        for x in slist:
+            keyboard.append([types.InlineKeyboardButton(
+                text=x['name'], callback_data='m163:' + str(x['id']))])
+
+        keyboard.append([
+            types.InlineKeyboardButton(
+                text="下一页", callback_data='m163_next_page_2'),
+            types.InlineKeyboardButton(
+                text="第1页,共" + str(page_total) + "页", callback_data='m163_page_total')
+        ])
+
+        keyboard.append([types.InlineKeyboardButton(
+            text="关闭消息", callback_data='m163_search_close')])
+
+        # print(keyboard)
+        markup = types.InlineKeyboardMarkup(keyboard)
+        bot.send_message(message.chat.id, "寻找【" +
+                         cmd_text.strip() + "】歌曲如下:", reply_markup=markup)
+    else:
+        bot.send_message(message.chat.id, "未找到合适内容")
+    return True
+
+
+def getFaqKw(cmd):
+    matchObj = re.match(r'寻找【(.*?)】歌曲如下', cmd, re.M | re.I)
+    data = matchObj.groups()
+    if len(data) > 0:
+        return True, data[0]
+    return False, ''
+
+
+def answer_callback_query(bot, call):
+    import math
+    keyword = call.data
+    print(keyword)
+    if keyword == 'm163_search_close':
+        bot.delete_message(chat_id=call.message.chat.id,
+                           message_id=call.message.message_id)
+        return
+
+    is_m163_page = False
+    p = 1
+    if keyword.startswith('m163_next_page'):
+        is_m163_page = True
+        p = keyword.replace('m163_next_page_', '')
+
+    if keyword.startswith('m163_pre_page'):
+        is_m163_page = True
+        p = keyword.replace('m163_pre_page_', '')
+
+    if is_m163_page:
+        is_match, cmd_text = getFaqKw(call.message.text)
+        if not is_match:
+            bot.edit_message_text(
+                chat_id=call.message.chat.id, message_id=call.message.message_id, text="出现错误!")
+            return
+
+        data = musicSearch(cmd_text, p, 5)
+
+        dlist = data['result']['songs']
+        page_total = math.ceil(data['result']['songCount'] / 5)
+
+        keyboard = []
+        for x in dlist:
+            keyboard.append([types.InlineKeyboardButton(
+                text=x['name'], callback_data='m163:' + str(x['id']))])
+
+        page_nav = []
+        if int(p) > 1:
+            page_nav.append(types.InlineKeyboardButton(
+                text="上一页", callback_data='m163_pre_page_' + str(int(p) - 1)))
+
+        if p < page_total:
+            page_nav.append(types.InlineKeyboardButton(
+                text="下一页", callback_data='m163_next_page_' + str(int(p) + 1)))
+
+        page_nav.append(types.InlineKeyboardButton(
+            text="第" + str(p) + "页,共" + str(page_total) + "页", callback_data='m163_page_total'))
+
+        keyboard.append(page_nav)
+
+        keyboard.append([types.InlineKeyboardButton(
+            text="关闭消息", callback_data='m163_search_close')])
+
+        markup = types.InlineKeyboardMarkup(keyboard)
+        bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.message_id,
+                              text=call.message.text, reply_markup=markup)
 
 
 def run(bot, message):
@@ -122,7 +239,7 @@ def run(bot, message):
 
 
 if __name__ == '__main__':
-    # musicSearch("刀郎")
+    # tgSearchMusic_t("刀郎")
     t = musicSongDataUrl(2063487880)
     print(t['data'][0]['url'])
     print("111")
