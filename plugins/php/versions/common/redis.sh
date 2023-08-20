@@ -10,7 +10,7 @@ rootPath=$(dirname "$rootPath")
 rootPath=$(dirname "$rootPath")
 serverPath=$(dirname "$rootPath")
 sourcePath=${serverPath}/source/php
-SYS_ARCH=`arch`
+
 LIBNAME=redis
 LIBV=5.3.7
 sysName=`uname`
@@ -18,9 +18,9 @@ actionType=$1
 version=$2
 
 if [ "$version" == "52" ];then
-	LIBV=2.2.7
+	LIBV=2.2.8
 elif [ "$version" -lt "70" ];then
-	LIBV=4.2.0
+	LIBV=4.3.0
 elif [ "$version" -gt "74" ];then
 	LIBV=5.3.7
 else
@@ -60,14 +60,9 @@ Install_lib()
 			cd $php_lib && tar xvf ${LIBNAME}-${LIBV}.tgz
 		fi 
 		cd $php_lib/${LIBNAME}-${LIBV}
-
-		OPTIONS=""
-		if [ "${SYS_ARCH}" == "aarch64" ] && [ "$version" -lt "56" ];then
-			OPTIONS="$OPTIONS --build=aarch64-unknown-linux-gnu --host=aarch64-unknown-linux-gnu"
-		fi
 		
 		$serverPath/php/$version/bin/phpize
-		./configure --with-php-config=$serverPath/php/$version/bin/php-config $OPTIONS
+		./configure --with-php-config=$serverPath/php/$version/bin/php-config
 		make clean && make && make install && make clean
 
 	fi
