@@ -193,6 +193,10 @@ def run(bot, message):
         cmd_text = getReadCmd('/?:', text_body)
         return searchFaq(bot, message, cmd_text)
 
+    if isThisCmd('/faq:', text_body):
+        cmd_text = getReadCmd('/faq:', text_body)
+        return searchFaq(bot, message, cmd_text)
+
     # if text_body.find('?') > -1 or text_body.find('？') > -1:
     #     return_msg = "你似乎在寻找【" + text_body + "】答案:\n"
     #     return_msg += "/faq:开始寻找你的问题\n"
