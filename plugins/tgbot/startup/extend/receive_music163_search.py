@@ -96,7 +96,7 @@ def run(bot, message):
         cmd_text = getReadCmd('/music', text_body)
         cmd_text = cmd_text.strip().strip(":")
         if cmd_text == "":
-            return bot.send_message(message.chat.id, "搜索内容不能为空, 例如:/faq 数据库")
+            return bot.send_message(message.chat.id, "搜索内容不能为空, 例如:/music 刀郎")
         return tgSearchMusic(bot, message, cmd_text)
 
     return bot
