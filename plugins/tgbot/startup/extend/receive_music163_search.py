@@ -233,7 +233,10 @@ def downloadAndUpMusic(bot, chat_id, mid, title):
     else:
         bot.send_message(chat_id, "无效资源")
 
-    cleanMusicFileExpire(def_dir)
+    if os.path.exists(def_abs_path):
+        os.remove(def_abs_path)
+
+    # cleanMusicFileExpire(def_dir)
     return True
 
 
