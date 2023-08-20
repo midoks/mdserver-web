@@ -9,14 +9,33 @@ import json
 import base64
 import threading
 
-# sys.path.append(os.getcwd() + "/class/core")
-# import mw
+sys.path.append(os.getcwd() + "/class/core")
+import mw
 
-# import telebot
-# from telebot import types
-# from telebot.util import quick_markup
+import telebot
+from telebot import types
+from telebot.util import quick_markup
 
 # 网易音乐搜索
+
+
+def isThisCmd(cmd, msg):
+    clen = len(cmd)
+    msg_len = len(msg)
+    if msg_len < clen:
+        return False
+
+    check_msg = msg[0:clen]
+    if cmd == check_msg:
+        return True
+    return False
+
+
+def getReadCmd(cmd, msg):
+    clen = len(cmd)
+    msg_len = len(msg)
+    real_msg = msg[clen:]
+    return real_msg
 
 
 def httpPost(url, data, timeout=10):
