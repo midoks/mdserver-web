@@ -35,8 +35,22 @@ Install_App()
 	mkdir -p $serverPath/source
 	mkdir -p $serverPath/dynamic-tracking
 
+	cn=$(curl -fsSL -m 10 http://ipinfo.io/json | grep "\"country\": \"CN\"")
+	HTTP_PREFIX="https://"
+	if [ ! -z "$cn" ];then
+	    HTTP_PREFIX="https://ghproxy.com/"
+	fi
+	
+	# FlameGraph start
+	if [ ! -d $serverPath/dynamic-tracking/FlameGraph ];then
+		if [ ! -f $serverPath/source/FlameGraph.zip ]; then
+	    	wget --no-check-certificate -O $serverPath/source/FlameGraph.zip ${HTTP_PREFIX}github.com/brendangregg/FlameGraph/archive/refs/heads/master.zip
+		fi
 
-	echo "开发中..."
+		cd $serverPath/source && unzip $serverPath/source/FlameGraph.zip
+		mv $serverPath/source/FlameGraph-master $serverPath/dynamic-tracking/FlameGraph
+	fi
+	# FlameGraph end
 
 	shell_file=${curPath}/versions/${VERSION}/${OSNAME}.sh
 
