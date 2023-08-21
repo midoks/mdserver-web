@@ -484,7 +484,7 @@ function scanRule() {
         var tmp = $.parseJSON(data.data);
         var rdata = $.parseJSON(tmp.data);
 
-        create_l = ({
+        create_l = layer.open({
             type: 1,
             title: "常用扫描器过滤规则",
             area: '650px',
