@@ -96,7 +96,7 @@ Install_openresty()
 	# --with-debug
 	# 用于调式
 
-	gmake -j${cpuCore} && gmake install && make clean
+	gmake -j${cpuCore} && gmake install && gmake clean
 
 	if [ -d $serverPath/openresty ];then
 		echo "${VERSION}" > $serverPath/openresty/version.pl
