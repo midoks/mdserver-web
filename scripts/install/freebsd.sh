@@ -34,7 +34,8 @@ pkg install -y python3
 pkg install -y lsof
 pkg install -y vim
 pkg install -y sqlite3
-pkg install -y py38-sqlite3
+
+pkg install -y py39-sqlite3
 
 pkg install -y gcc
 pkg install -y autoconf
@@ -58,11 +59,10 @@ pkg install -y rust
 
 pkg autoremove -y
 
-SSH_PORT=`netstat -ntpl|grep sshd|grep -v grep | sed -n "1,1p" | awk '{print $4}' | awk -F : '{print $2}'`
-if [ "$SSH_PORT" == "" ];then
-	SSH_PORT_LINE=`cat /etc/ssh/sshd_config | grep "Port \d*" | tail -1`
-	SSH_PORT=${SSH_PORT_LINE/"Port "/""}
-fi
+
+SSH_PORT_LINE=`cat /etc/ssh/sshd_config | grep -E "Port d*" | tail -1`
+SSH_PORT=${SSH_PORT_LINE/"Port "/""}
+
 echo "SSH PORT:${SSH_PORT}"
 
 # if [ -f /usr/sbin/iptables ];then
