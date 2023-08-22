@@ -2,7 +2,7 @@
 PATH=/bin:/sbin:/usr/bin:/usr/sbin:/usr/local/bin:/usr/local/sbin:~/bin
 export PATH
 
-# cd /www/server/mdserver-web/plugins/openresty && bash install.sh install 1.21.4.1
+# cd /www/server/mdserver-web/plugins/openresty && bash install.sh install 1.21.4.2
 
 curPath=`pwd`
 rootPath=$(dirname "$curPath")
@@ -77,10 +77,14 @@ Install_openresty()
 
 	cd ${openrestyDir} && tar -zxvf openresty-${VERSION}.tar.gz
 
+	OPTIONS=''
+	if [ "$VERSION" != "1.21.4.2" ];then
+		OPTIONS=" ${OPTIONS} --with-ipv6 "
+	fi
 	# --with-openssl=$serverPath/source/lib/openssl-1.0.2q
 	cd ${openrestyDir}/openresty-${VERSION} && ./configure \
 	--prefix=$serverPath/openresty \
-	--with-ipv6 \
+	$OPTIONS \
 	--with-stream \
 	--with-http_v2_module \
 	--with-http_ssl_module  \
