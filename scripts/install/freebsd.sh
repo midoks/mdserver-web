@@ -3,20 +3,36 @@ PATH=/bin:/sbin:/usr/bin:/usr/sbin:/usr/local/bin:/usr/local/sbin:~/bin
 export PATH
 LANG=en_US.UTF-8
 
+# -- debug start --
+
+# https://www.freebsd.org/where/
+
+# 手动升级到,可解决库找不到的问题。
+# freebsd-update -r 13.2-RELEASE upgrade
+# freebsd-update -r 14-RELEASE upgrade
+
+# pkg install -y python39
+# python3 -m ensurepip
+# pip3 install --upgrade setuptools
+# python3 -m pip install --upgrade pip
+
+# echo "y" | pkg upgrade
+
+# -- debug end   --
+
 if grep -Eq "FreeBSD" /etc/*-release && [ ! -f /bin/bash ]; then
     ln -sf /usr/local/bin/bash /bin/bash
 fi
 
-# freebsd-update -r 13.0-RELEASE upgrade
 
 echo "y" | pkg update
-# echo "y" | pkg upgrade
-# echo "y" | freebsd-update fetch install
+echo "y" | pkg bootstrap -f
+echo "y" | freebsd-update install
+
 pkg install -y python3
-# python3 -m ensurepip
-# pip3 install --upgrade setuptools
-# python3 -m pip install --upgrade pip
+
 pkg install -y lsof
+pkg install -y vim
 pkg install -y sqlite3
 pkg install -y py38-sqlite3
 
@@ -36,6 +52,9 @@ pkg install -y freetype
 pkg install -y oniguruma
 pkg install -y brotli
 pkg install -y harfbuzz
+
+# curl https://sh.rustup.rs -sSf | sh
+pkg install -y rust
 
 pkg autoremove -y
 
