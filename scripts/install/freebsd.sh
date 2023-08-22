@@ -30,6 +30,7 @@ echo "y" | pkg bootstrap -f
 echo "y" | freebsd-update install
 
 pkg install -y python3
+pkg install -y py39-pip
 
 pkg install -y lsof
 pkg install -y vim
