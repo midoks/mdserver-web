@@ -118,12 +118,15 @@ def confReplace():
     user = 'www'
     user_group = 'www'
 
-    if mw.getOs() == 'darwin':
+    current_os = mw.getOs()
+    if current_os == 'darwin':
         # macosx do
         user = mw.execShell(
             "who | sed -n '2, 1p' |awk '{print $1}'")[0].strip()
         # user = 'root'
         user_group = 'staff'
+        content = content.replace('{$EVENT_MODEL}', 'kqueue')
+    elif current_os.startswith('freebsd'):
         content = content.replace('{$EVENT_MODEL}', 'kqueue')
     else:
         content = content.replace('{$EVENT_MODEL}', 'epoll')
