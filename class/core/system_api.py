@@ -292,7 +292,8 @@ class system_api:
         if current_os.startswith('freebsd'):
             version = mw.execShell(
                 "cat /etc/*-release | grep PRETTY_NAME | awk -F = '{print $2}' | awk -F '\"' '{print $2}'")
-            arch_ver = mw.execShell("sysctl -a | egrep -i 'hw.machine_arch'")
+            arch_ver = mw.execShell(
+                "sysctl -a | egrep -i 'hw.machine_arch' | awk -F ':' '{print $2}'")
             return version[0].strip() + " (" + arch_ver[0].strip() + ")"
 
         redhat_series = '/etc/redhat-release'
