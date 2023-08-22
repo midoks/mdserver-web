@@ -324,7 +324,7 @@ class system_api:
         cpuCount = psutil.cpu_count()
         cpuLogicalNum = psutil.cpu_count(logical=False)
         used = psutil.cpu_percent(interval=interval)
-
+        cpuLogicalNum = 0
         if os.path.exists('/proc/cpuinfo'):
             c_tmp = mw.readFile('/proc/cpuinfo')
             d_tmp = re.findall("physical id.+", c_tmp)
