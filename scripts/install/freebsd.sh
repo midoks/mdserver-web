@@ -85,6 +85,7 @@ echo "SSH PORT:${SSH_PORT}"
 
 if [ ! -f /usr/sbin/iptables ];then
 	# firewall-cmd --list-all
+	# iptables -nL --line-number
 	pkg install -y firewalld 
 	systemctl enable firewalld
 	systemctl start firewalld
