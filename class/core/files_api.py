@@ -708,10 +708,7 @@ class files_api:
         return not path in nDirs
 
     def getDirSize(self, path):
-        if mw.isAppleSystem():
-            tmp = mw.execShell('du -sh ' + path)
-        else:
-            tmp = mw.execShell('du -sbh ' + path)
+        tmp = mw.execShell('du -sh ' + path)
         return tmp
 
     def checkFileName(self, filename):
