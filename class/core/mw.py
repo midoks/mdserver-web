@@ -1356,8 +1356,8 @@ def getCpuType():
         cpuinfo = execShell(cmd)
         return cpuinfo[0].strip()
 
-    print(getOs())
-    if getOs() == 'freebsd':
+    current_os = getOs()
+    if current_os.startswith('freebsd'):
         cmd = "sysctl -a | egrep -i 'hw.model' | awk -F ':' '{print $2}'"
         cpuinfo = execShell(cmd)
         return cpuinfo[0].strip()
