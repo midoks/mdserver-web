@@ -274,8 +274,11 @@ class system_api:
         return title
 
     def getSystemVersion(self):
+        #
         # 取操作系统版本
-        if mw.getOs() == 'darwin':
+        current_os = mw.getOs()
+        # mac
+        if current_os == 'darwin':
             data = mw.execShell('sw_vers')[0]
             data_list = data.strip().split("\n")
             mac_version = ''
@@ -284,6 +287,13 @@ class system_api:
 
             arch_ver = mw.execShell("arch")
             return mac_version + " (" + arch_ver[0].strip() + ")"
+
+        # freebsd
+        if current_os.startswith('freebsd'):
+            version = mw.execShell(
+                "cat /etc/*-release | grep PRETTY_NAME | awk -F = '{print $2}' | awk -F '\"' '{print $2}'")
+            arch_ver = mw.execShell("sysctl -a | egrep -i 'hw.machine_arch'")
+            return version[0].strip() + " (" + arch_ver[0].strip() + ")"
 
         redhat_series = '/etc/redhat-release'
         if os.path.exists(redhat_series):
