@@ -54,6 +54,7 @@ pkg install -y freetype
 pkg install -y oniguruma
 pkg install -y brotli
 pkg install -y harfbuzz
+pkg install -y libevent
 
 # curl https://sh.rustup.rs -sSf | sh
 pkg install -y rust
