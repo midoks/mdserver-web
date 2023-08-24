@@ -73,7 +73,7 @@ Install_mysql()
 	fi
 
 	if [ ! -f $WHERE_DIR_GPP ];then
-		WHERE_DIR_GCC=`which g++`
+		WHERE_DIR_GPP=`which g++`
 	fi
 
 	if [ ! -d $serverPath/mysql ];then
