@@ -101,7 +101,7 @@ def getInitDTpl():
 def getPidFile():
     file = getConf()
     content = mw.readFile(file)
-    rep = 'pid\s*(.*)'
+    rep = 'pid\s*(.*);'
     tmp = re.search(rep, content)
     return tmp.groups()[0].strip()
 
@@ -306,7 +306,11 @@ def start():
 
 
 def stop():
-    return restyOp('stop')
+    r = restyOp('stop')
+    pid_file = getPidFile()
+    if os.path.exists(pid_file):
+        os.remove(pid_file)
+    return r
 
 
 def restart():

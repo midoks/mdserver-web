@@ -103,6 +103,8 @@ fi
 
 pip3 install --upgrade pip -i $PIPSRC
 pip3 install --upgrade setuptools -i $PIPSRC
+
+# --no-cache-dir
 cd /www/server/mdserver-web && pip3 install -r /www/server/mdserver-web/requirements.txt -i $PIPSRC
 
 
