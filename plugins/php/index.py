@@ -38,8 +38,12 @@ def getServerDir():
 
 
 def getInitDFile(version):
-    if app_debug:
+    current_os = mw.getOs()
+    if getOs() == 'darwin':
         return '/tmp/' + getPluginName()
+
+    if current_os.startswith('freebsd'):
+        return '/etc/rc.d/' + getPluginName()
     return '/etc/init.d/' + getPluginName() + version
 
 
@@ -148,7 +152,7 @@ def contentReplace(content, version):
 
 def makeOpenrestyConf():
     phpversions = ['00', '52', '53', '54', '55', '56',
-                   '70', '71', '72', '73', '74', '80', '81', '82']
+                   '70', '71', '72', '73', '74', '80', '81', '82', '83']
 
     sdir = mw.getServerDir()
 
@@ -278,11 +282,11 @@ def initReplace(version):
     # systemd
     systemDir = mw.systemdCfgDir()
     systemService = systemDir + '/php' + version + '.service'
-    systemServiceTpl = getPluginDir() + '/init.d/php.service.tpl'
-    if version == '52':
-        systemServiceTpl = getPluginDir() + '/init.d/php.service.52.tpl'
 
     if os.path.exists(systemDir) and not os.path.exists(systemService):
+        systemServiceTpl = getPluginDir() + '/init.d/php.service.tpl'
+        if version == '52':
+            systemServiceTpl = getPluginDir() + '/init.d/php.service.52.tpl'
         service_path = mw.getServerDir()
         se_content = mw.readFile(systemServiceTpl)
         se_content = se_content.replace('{$VERSION}', version)
@@ -296,16 +300,23 @@ def initReplace(version):
 def phpOp(version, method):
     file = initReplace(version)
 
-    if not mw.isAppleSystem():
-        if method == 'stop' or method == 'restart':
-            mw.execShell(file + ' ' + 'stop')
-
-        data = mw.execShell('systemctl ' + method + ' php' + version)
+    current_os = mw.getOs()
+    if current_os == "darwin":
+        data = mw.execShell(file + ' ' + method)
         if data[1] == '':
             return 'ok'
         return data[1]
 
-    data = mw.execShell(file + ' ' + method)
+    if current_os.startswith("freebsd"):
+        data = mw.execShell('service php' + version + ' ' + method)
+        if data[1] == '':
+            return 'ok'
+        return data[1]
+
+    if method == 'stop' or method == 'restart':
+        mw.execShell(file + ' ' + 'stop')
+
+    data = mw.execShell('systemctl ' + method + ' php' + version)
     if data[1] == '':
         return 'ok'
     return data[1]
