@@ -343,8 +343,13 @@ def initdInstall():
 
 
 def initdUinstall():
-    if mw.isAppleSystem():
+    current_os = mw.getOs()
+    if getOs() == 'darwin':
         return "Apple Computer does not support"
+
+    if current_os.startswith('freebsd'):
+        initd_bin = getInitDFile()
+        os.remove(initd_bin)
 
     mw.execShell('systemctl disable openresty')
     return 'ok'
