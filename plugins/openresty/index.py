@@ -98,6 +98,14 @@ def getInitDTpl():
     return path
 
 
+def getPidFile():
+    file = getConf()
+    content = mw.readFile(file)
+    rep = 'pid\s*(.*)'
+    tmp = re.search(rep, content)
+    return tmp.groups()[0].strip()
+
+
 def getFileOwner(filename):
     import pwd
     stat = os.lstat(filename)
@@ -239,9 +247,8 @@ def initDreplace():
 
 
 def status():
-    data = mw.execShell(
-        "ps -ef|grep openresty |grep -v grep | grep -v python | awk '{print $2}'")
-    if data[0] == '':
+    pid_file = getPidFile()
+    if not os.path.exists(pid_file):
         return 'stop'
     return 'start'
 
