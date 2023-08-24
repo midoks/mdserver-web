@@ -264,7 +264,7 @@ def restyOp(method):
 
     current_os = mw.getOs()
     if current_os == "darwin":
-        data = mw.execShell('systemctl ' + method + ' openresty')
+        data = mw.execShell(file + ' ' + method)
         if data[1] == '':
             return 'ok'
         return data[1]
@@ -275,7 +275,7 @@ def restyOp(method):
             return 'ok'
         return data[1]
 
-    data = mw.execShell(file + ' ' + method)
+    data = mw.execShell('systemctl ' + method + ' openresty')
     if data[1] == '':
         return 'ok'
     return data[1]
