@@ -14,7 +14,7 @@ fi
 
 echo -e "start mw"
 cd /www/server/mdserver-web && bash cli.sh start
-isStart=`ps -ef|grep 'gunicorn -c setting.py app:app' |grep -v grep|awk '{print $2}'`
+isStart=`ps -aux|grep 'gunicorn -c setting.py app:app' |grep -v grep|awk '{print $2}'`
 n=0
 while [[ ! -f /etc/rc.d/init.d/mw ]];
 do
