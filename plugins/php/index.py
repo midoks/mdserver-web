@@ -890,7 +890,7 @@ def get_php_info(args):
     return getPhpinfo(args['version'])
 
 
-def getLibConf(version):
+def libConfCommon(version):
     fname = getConf(version)
     if not os.path.exists(fname):
         return mw.returnJson(False, '指定PHP版本不存在!')
@@ -919,6 +919,17 @@ def getLibConf(version):
         else:
             lib['status'] = True
         libs.append(lib)
+    return libs
+
+
+def get_lib_conf(data):
+    libs = libConfCommon(data['version'])
+    # print(libs)
+    return mw.returnData(True, 'OK!', libs)
+
+
+def getLibConf(version):
+    libs = libConfCommon(version)
     return mw.returnJson(True, 'OK!', libs)
 
 

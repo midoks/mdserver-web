@@ -34,7 +34,7 @@ function phpPostCallbak(method, version, args,callback){
     req_data['func'] = method;
     args['version'] = version;
  
-    if (typeof(args) == 'string'){
+    if (typeof(args) == 'string' && args == ''){
         req_data['args'] = JSON.stringify(toArrayObject(args));
     } else {
         req_data['args'] = JSON.stringify(args);
@@ -582,9 +582,13 @@ function getPHPInfo(version) {
 
 
 function phpLibConfig(version){
+
+    // phpPost('get_lib_conf', version, {}, function(rdata){
+        // var rdata = $.parseJSON(rdata.data);
+    // });
     
-    phpPost('get_lib_conf', version, '', function(data){
-        var rdata = $.parseJSON(data.data);
+    phpPostCallbak('get_lib_conf', version, {}, function(rdata){
+        var rdata = rdata.data;
 
         if (!rdata.status){
             layer.msg(rdata.msg, { icon: rdata.status ? 1 : 2 });
