@@ -308,9 +308,14 @@ def reload():
 
 
 def initdStatus():
-
-    if mw.isAppleSystem():
+    current_os = mw.getOs()
+    if getOs() == 'darwin':
         return "Apple Computer does not support"
+
+    if current_os.startswith('freebsd'):
+        initd_bin = getInitDFile()
+        if os.path.exists(initd_bin):
+            return 'ok'
 
     shell_cmd = 'systemctl status openresty | grep loaded | grep "enabled;"'
     data = mw.execShell(shell_cmd)
