@@ -45,8 +45,12 @@ def getServerDir():
 
 
 def getInitDFile():
-    if app_debug:
+    current_os = mw.getOs()
+    if current_os == 'darwin':
         return '/tmp/' + getPluginName()
+
+    if current_os.startswith('freebsd'):
+        return '/etc/rc.d/' + getPluginName()
     return '/etc/init.d/' + getPluginName()
 
 
@@ -524,12 +528,26 @@ def initMysql8Pwd():
 def myOp(version, method):
     # import commands
     init_file = initDreplace(version)
+    current_os = mw.getOs()
     try:
         isInited = initMysqlData()
         if not isInited:
-            mw.execShell('systemctl start mysql')
+
+            if current_os.startswith("freebsd"):
+                mw.execShell('service ' + getPluginName() + ' start')
+            else:
+                mw.execShell('systemctl start mysql')
+
             initMysqlPwd()
-            mw.execShell('systemctl stop mysql')
+
+            if current_os.startswith("freebsd"):
+                mw.execShell('service ' + getPluginName() + ' stop')
+            else:
+                mw.execShell('systemctl stop mysql')
+
+        if current_os.startswith("freebsd"):
+            data = mw.execShell('service ' + getPluginName() + ' ' + method)
+            return 'ok'
 
         mw.execShell('systemctl ' + method + ' mysql')
         return 'ok'
@@ -610,8 +628,14 @@ def reload(version=''):
 
 
 def initdStatus():
-    if mw.isAppleSystem():
+    current_os = mw.getOs()
+    if current_os == 'darwin':
         return "Apple Computer does not support"
+
+    if current_os.startswith('freebsd'):
+        initd_bin = getInitDFile()
+        if os.path.exists(initd_bin):
+            return 'ok'
 
     shell_cmd = 'systemctl status mysql | grep loaded | grep "enabled;"'
     data = mw.execShell(shell_cmd)
@@ -621,16 +645,33 @@ def initdStatus():
 
 
 def initdInstall():
-    if mw.isAppleSystem():
+    current_os = mw.getOs()
+    if current_os == 'darwin':
         return "Apple Computer does not support"
+
+    if current_os.startswith('freebsd'):
+        import shutil
+        source_bin = initDreplace()
+        initd_bin = getInitDFile()
+        shutil.copyfile(source_bin, initd_bin)
+        mw.execShell('chmod +x ' + initd_bin)
+        mw.execShell('sysrc ' + getPluginName() + '_enable="YES"')
+        return 'ok'
 
     mw.execShell('systemctl enable mysql')
     return 'ok'
 
 
 def initdUinstall():
-    if mw.isAppleSystem():
+    current_os = mw.getOs()
+    if current_os == 'darwin':
         return "Apple Computer does not support"
+
+    if current_os.startswith('freebsd'):
+        initd_bin = getInitDFile()
+        os.remove(initd_bin)
+        mw.execShell('sysrc ' + getPluginName() + '_enable="NO"')
+        return 'ok'
 
     mw.execShell('systemctl disable mysql')
     return 'ok'
