@@ -613,7 +613,7 @@ echo "--------------------------------------------------------------------------
         if not os.path.exists(file):
             mw.writeFile(file, '')
         conf = mw.readFile(file)
-        conf += str(config) + "\n"
+        conf = conf + str(config) + "\n"
         if mw.writeFile(file, conf):
             if not os.path.exists(u_file):
                 mw.execShell("chmod 600 '" + file +
