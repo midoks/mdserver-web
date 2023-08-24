@@ -306,11 +306,9 @@ def restyOp_restart():
 
     if not mw.isAppleSystem():
         threading.Timer(2, op_submit_systemctl_restart, args=()).start()
-        # submit_restart1()
         return 'ok'
 
     threading.Timer(2, op_submit_init_restart, args=(file,)).start()
-    # submit_restart2(file)
     return 'ok'
 
 
