@@ -331,6 +331,7 @@ def initdInstall():
 
     # freebsd initd install
     if current_os.startswith('freebsd'):
+        import shutil
         source_bin = initDreplace()
         initd_bin = getInitDFile()
         shutil.copyfile(source_bin, initd_bin)
