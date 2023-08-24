@@ -29,9 +29,13 @@ def getServerDir():
 
 
 def getInitDFile():
-    # sysrc openresty_enable=YES
-    if app_debug:
+    current_os = mw.getOs()
+    if getOs() == 'darwin':
         return '/tmp/' + getPluginName()
+
+    if current_os.startswith('freebsd'):
+        return '/etc/rc.d/' + getPluginName()
+
     return '/etc/init.d/' + getPluginName()
 
 
