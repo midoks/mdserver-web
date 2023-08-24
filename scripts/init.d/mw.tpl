@@ -22,6 +22,9 @@ PATH=$PATH:$mw_path/bin
 
 if [ -f $mw_path/bin/activate ];then
     source $mw_path/bin/activate
+    if [ "$?" != "0" ];then
+        echo "load local python env fail!"
+    fi
 fi
 
 mw_start_panel()
