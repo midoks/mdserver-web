@@ -32,7 +32,7 @@ def getServerDir():
 
 def getInitDFile():
     current_os = mw.getOs()
-    if getOs() == 'darwin':
+    if current_os == 'darwin':
         return '/tmp/' + getPluginName()
 
     if current_os.startswith('freebsd'):
