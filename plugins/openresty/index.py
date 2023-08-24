@@ -262,8 +262,15 @@ def restyOp(method):
     if not check_data[1].find('test is successful') > -1:
         return check_data[1]
 
-    if not mw.isAppleSystem():
+    current_os = mw.getOs()
+    if current_os == "darwin":
         data = mw.execShell('systemctl ' + method + ' openresty')
+        if data[1] == '':
+            return 'ok'
+        return data[1]
+
+    if current_os.startswith("freebsd"):
+        data = mw.execShell('service openresty ' + method)
         if data[1] == '':
             return 'ok'
         return data[1]
@@ -275,6 +282,12 @@ def restyOp(method):
 
 
 def op_submit_systemctl_restart():
+
+    current_os = mw.getOs()
+    if current_os.startswith("freebsd"):
+        mw.execShell('service openresty restart')
+        return
+
     mw.execShell('systemctl restart openresty')
 
 
