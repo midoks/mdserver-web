@@ -348,8 +348,14 @@ def reload(version):
 
 
 def initdStatus(version):
-    if mw.isAppleSystem():
+    current_os = mw.getOs()
+    if getOs() == 'darwin':
         return "Apple Computer does not support"
+
+    if current_os.startswith('freebsd'):
+        initd_bin = getInitDFile()
+        if os.path.exists(initd_bin):
+            return 'ok'
 
     shell_cmd = 'systemctl status php' + version + ' | grep loaded | grep "enabled;"'
     data = mw.execShell(shell_cmd)
@@ -359,16 +365,31 @@ def initdStatus(version):
 
 
 def initdInstall(version):
-    if mw.isAppleSystem():
+    current_os = mw.getOs()
+    if getOs() == 'darwin':
         return "Apple Computer does not support"
+
+    if current_os.startswith('freebsd'):
+        import shutil
+        source_bin = initDreplace()
+        initd_bin = getInitDFile()
+        shutil.copyfile(source_bin, initd_bin)
+        mw.execShell('chmod +x ' + initd_bin)
+        return 'ok'
 
     mw.execShell('systemctl enable php' + version)
     return 'ok'
 
 
 def initdUinstall(version):
-    if mw.isAppleSystem():
+    current_os = mw.getOs()
+    if getOs() == 'darwin':
         return "Apple Computer does not support"
+
+    if current_os.startswith('freebsd'):
+        initd_bin = getInitDFile()
+        os.remove(initd_bin)
+        return 'ok'
 
     mw.execShell('systemctl disable php' + version)
     return 'ok'

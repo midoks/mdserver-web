@@ -363,6 +363,7 @@ def initdInstall():
         shutil.copyfile(source_bin, initd_bin)
         mw.execShell('chmod +x ' + initd_bin)
         # mw.execShell('chkconfig --add ' + getPluginName())
+        return 'ok'
 
     mw.execShell('systemctl enable openresty')
     return 'ok'
@@ -376,6 +377,7 @@ def initdUinstall():
     if current_os.startswith('freebsd'):
         initd_bin = getInitDFile()
         os.remove(initd_bin)
+        return 'ok'
 
     mw.execShell('systemctl disable openresty')
     return 'ok'
