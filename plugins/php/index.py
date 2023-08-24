@@ -349,7 +349,7 @@ def reload(version):
 
 def initdStatus(version):
     current_os = mw.getOs()
-    if getOs() == 'darwin':
+    if current_os == 'darwin':
         return "Apple Computer does not support"
 
     if current_os.startswith('freebsd'):
@@ -366,7 +366,7 @@ def initdStatus(version):
 
 def initdInstall(version):
     current_os = mw.getOs()
-    if getOs() == 'darwin':
+    if current_os == 'darwin':
         return "Apple Computer does not support"
 
     if current_os.startswith('freebsd'):
