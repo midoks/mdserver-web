@@ -12,8 +12,6 @@ import shutil
 # sys.setdefaultencoding('utf8')
 
 sys.path.append(os.getcwd() + "/class/core")
-# sys.path.append("/usr/local/lib/python3.6/site-packages")
-
 import mw
 
 if mw.isAppleSystem():

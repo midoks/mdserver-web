@@ -78,7 +78,7 @@ if [ "$FW_ENABLE" == "" ];then
 fi
 
 # ipfw list
-# service ipfw start
+service ipfw stop
 
 
 cd /www/server/mdserver-web/scripts && bash lib.sh

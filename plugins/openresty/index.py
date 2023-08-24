@@ -11,9 +11,7 @@ import re
 sys.path.append(os.getcwd() + "/class/core")
 import mw
 
-
 app_debug = False
-
 if mw.isAppleSystem():
     app_debug = True
 
@@ -31,6 +29,7 @@ def getServerDir():
 
 
 def getInitDFile():
+    # sysrc openresty_enable=YES
     if app_debug:
         return '/tmp/' + getPluginName()
     return '/etc/init.d/' + getPluginName()
@@ -225,8 +224,8 @@ def initDreplace():
     # /usr/lib/systemd/system
     systemDir = mw.systemdCfgDir()
     systemService = systemDir + '/openresty.service'
-    systemServiceTpl = getPluginDir() + '/init.d/openresty.service.tpl'
     if os.path.exists(systemDir) and not os.path.exists(systemService):
+        systemServiceTpl = getPluginDir() + '/init.d/openresty.service.tpl'
         se_content = mw.readFile(systemServiceTpl)
         se_content = se_content.replace('{$SERVER_PATH}', service_path)
         mw.writeFile(systemService, se_content)
@@ -321,8 +320,17 @@ def initdStatus():
 
 
 def initdInstall():
-    if mw.isAppleSystem():
+    current_os = mw.getOs()
+    if getOs() == 'darwin':
         return "Apple Computer does not support"
+
+    # freebsd initd install
+    if current_os.startswith('freebsd'):
+        source_bin = initDreplace()
+        initd_bin = getInitDFile()
+        shutil.copyfile(source_bin, initd_bin)
+        mw.execShell('chmod +x ' + initd_bin)
+        # mw.execShell('chkconfig --add ' + getPluginName())
 
     mw.execShell('systemctl enable openresty')
     return 'ok'
