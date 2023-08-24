@@ -282,13 +282,13 @@ def restyOp(method):
 
 
 def op_submit_systemctl_restart():
-
     current_os = mw.getOs()
     if current_os.startswith("freebsd"):
         mw.execShell('service openresty restart')
-        return
+        return True
 
     mw.execShell('systemctl restart openresty')
+    return True
 
 
 def op_submit_init_restart(file):
