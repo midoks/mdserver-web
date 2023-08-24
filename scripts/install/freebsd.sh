@@ -56,6 +56,7 @@ pkg install -y brotli
 pkg install -y harfbuzz
 pkg install -y libevent
 pkg install -y pidof
+pkg install -y pstree
 
 # curl https://sh.rustup.rs -sSf | sh
 pkg install -y rust
