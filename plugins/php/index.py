@@ -353,7 +353,7 @@ def initdStatus(version):
         return "Apple Computer does not support"
 
     if current_os.startswith('freebsd'):
-        initd_bin = getInitDFile()
+        initd_bin = getInitDFile(version)
         if os.path.exists(initd_bin):
             return 'ok'
 
@@ -372,7 +372,7 @@ def initdInstall(version):
     if current_os.startswith('freebsd'):
         import shutil
         source_bin = initDreplace()
-        initd_bin = getInitDFile()
+        initd_bin = getInitDFile(version)
         shutil.copyfile(source_bin, initd_bin)
         mw.execShell('chmod +x ' + initd_bin)
         return 'ok'
@@ -387,7 +387,7 @@ def initdUinstall(version):
         return "Apple Computer does not support"
 
     if current_os.startswith('freebsd'):
-        initd_bin = getInitDFile()
+        initd_bin = getInitDFile(version)
         os.remove(initd_bin)
         return 'ok'
 
