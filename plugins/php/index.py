@@ -383,7 +383,7 @@ def initdInstall(version):
 
 def initdUinstall(version):
     current_os = mw.getOs()
-    if getOs() == 'darwin':
+    if current_os == 'darwin':
         return "Apple Computer does not support"
 
     if current_os.startswith('freebsd'):
