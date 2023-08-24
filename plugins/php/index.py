@@ -371,7 +371,7 @@ def initdInstall(version):
 
     if current_os.startswith('freebsd'):
         import shutil
-        source_bin = initDreplace()
+        source_bin = initReplace(version)
         initd_bin = getInitDFile(version)
         shutil.copyfile(source_bin, initd_bin)
         mw.execShell('chmod +x ' + initd_bin)
