@@ -789,6 +789,9 @@ def runInfo(version):
 
 
 def myDbStatus(version):
+    if status(version) == 'stop':
+        return mw.returnJson(False, 'MySQL未启动', [])
+
     result = {}
     db = pMysqlDb()
     data = db.query('show variables')
@@ -2409,6 +2412,9 @@ def updateSlaveSSH(version=''):
 
 
 def getSlaveList(version=''):
+    if status(version) == 'stop':
+        return mw.returnJson(False, 'MySQL未启动', [])
+
     db = pMysqlDb()
     dlist = db.query('show slave status')
     data = {}
@@ -2424,6 +2430,9 @@ def getSlaveSyncCmd(version=''):
 
 
 def initSlaveStatus(version=''):
+    if status(version) == 'stop':
+        return mw.returnJson(False, 'MySQL未启动', [])
+
     mode_file = getSyncModeFile()
     if not os.path.exists(mode_file):
         return mw.returnJson(False, '需要先设置同步配置')
