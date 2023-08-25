@@ -9,3 +9,16 @@
 .s-left .panel-default{
 	margin-bottom: 10px;
 }
+
+
+.data-collect {
+    width: 45px;
+    height: 30px;
+    border: 0;
+    cursor: pointer;
+    margin-right: 2px;
+    margin-top: 10px;
+    color: #fff;
+    background-color: #20a53a;
+    border-color: #20a53a;
+}

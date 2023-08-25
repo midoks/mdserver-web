@@ -21,7 +21,7 @@
 </style>
 
 <div class="main-content">
-    <div class="container-fluid" style="padding-bottom: 50px;">
+    <div class="container-fluid">
         <div class="pos-box bgw mtb15">
             <div class="position f14 c9 pull-left">
                 <a class="plr10 c4" href="/">首页</a>/<span class="plr10 c4">动态追踪</span>
@@ -30,21 +30,34 @@
             <div class="search pull-right">
                 <form target="hid" onsubmit='getLogs(1,$("#SearchValue").prop("value"))'>
                     <input type="text" id="SearchValue" class="ser-text pull-left" placeholder="进程ID" />
-                    <button type="button" class="ser-sub pull-left" onclick='getLogs(1,$("#SearchValue").prop("value"))'>采样</button>
+                    <button type="button" class="data-collect pull-left">采样</button>
                 </form>
                 <iframe name='hid' id="hid" style="display:none"></iframe>
             </div>
         </div>
-
         
-        <div class="white-black-ip bgw mtb15">
-            <div class="black-ip">
-                <div class="def-log">
-···
-                    
+        <!-- //// -->
+        <div class="safe bgw pd15 mtb15" id="ff_box">
+            
+            <div id="file_list" style="float:left;width:200px;">
+                <div class="f14 c9 pull-left">
+                    <div class="title c6 plr15">
+                        <h3 class="f16">文件列表</h3>
+                    </div>
                 </div>
             </div>
+
+            <div id="flame_graph" style="float:left;">
+                <div class="f14 c9 pull-left">
+                    <div class="title c6 plr15">
+                        <h3 class="f16">火焰图</h3>
+                    </div>
+                </div>
+            </div>
+         
         </div>
         <!-- //// -->
     </div>
 </div>
+
+

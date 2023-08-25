@@ -1,3 +1,34 @@
+function changeDivH(){
+    var l = $(window).height();
+    var w = $(window).width();
+    $('#ff_box').css('height',l-80-60);
+    $('#file_list').css('height',l-80-60);
+    $('#flame_graph').css('height',l-80-60).css('width',w-200-200-40);
+
+    // $('.tootls_host_list').css('display','block').css('height',l-192);
+    // $('.tootls_commonly_list').css('display','block').css('height',l-192);    
+}
+
+
+$(document).ready(function(){
+   var tag = $.getUrlParam('tag');
+    if(tag == 'dynamic-tracking'){
+        dynamicTrackingLoad();
+    }
+});
+
+function dynamicTrackingLoad(){
+    changeDivH();
+    $(window).resize(function(){
+        changeDivH();
+    });
+}
+
+
+
+
+
+
 function redisPost(method, version, args,callback){
     var loadT = layer.msg('正在获取...', { icon: 16, time: 0, shade: 0.3 });
 
