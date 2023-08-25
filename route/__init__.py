@@ -513,7 +513,7 @@ def index(reqClass=None, reqAction=None, reqData=None):
         if reqClass == None:
             reqClass = 'index'
 
-        pageFile = ('config', 'control', 'crontab', 'files', 'firewall',
+        pageFile = ('config', 'control', 'crontab', 'files', 'logs', 'firewall',
                     'index', 'plugins', 'login', 'system', 'site', 'cert', 'ssl', 'task', 'soft')
 
         if reqClass == 'login':
@@ -553,7 +553,7 @@ def index(reqClass=None, reqAction=None, reqData=None):
         return 'error request!'
 
     # API请求
-    classFile = ('config_api', 'crontab_api', 'files_api', 'firewall_api',
+    classFile = ('config_api', 'crontab_api', 'files_api', 'logs_api', 'firewall_api',
                  'plugins_api', 'system_api', 'site_api', 'task_api', 'vip_api')
     className = reqClass + '_api'
     if not className in classFile:

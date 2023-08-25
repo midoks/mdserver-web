@@ -1,0 +1,61 @@
+{% extends "layout.html" %}
+{% block content %}
+
+<style type="text/css">
+#operationLog thead th:nth-child(1),
+#operationLog tbody tr td:nth-child(1){width:100px;}
+#operationLog thead th:nth-child(2),
+#operationLog tbody tr td:nth-child(2){width:130px;}
+#operationLog thead th:nth-child(4),
+#operationLog tbody tr td:nth-child(4){width:150px;}
+</style>
+
+<div class="main-content" style="min-height: 389px;">
+	<div class="container-fluid" style="padding-bottom: 50px;">
+		<div id="cutTab" class="pos-box bgw mtb15" style="height:45px">
+			<div class="tab-list">
+				<div class="tabs-item active" data-name="panelLogs">面板日志</div>
+				<div class="tabs-item" data-name="logAudit">日志审计</div>
+			</div>
+		</div>
+
+
+		<div class="bgw mtb15 pd15 tab-view-box firewall-tab-view">
+
+			<!-- logs start -->
+			<div class="tab-con show w-full" id="panelLogs" style="padding: 0px;">
+				<div id="operationLog" style="position: relative;">
+					<div class="tootls_group tootls_top">
+						<div class="pull-left">
+							<button type="button" title="刷新日志" class="refresh btn btn-success btn-sm mr5">
+								<span>刷新日志</span>
+							</button>
+							<button type="button" title="清空日志" class="clear btn btn-default btn-sm mr5">
+								<span>清空日志</span>
+							</button>
+						</div>
+					</div>
+					<div class="divtable mtb10">
+						<table class="table table-hover">
+							<thead style="position: relative;z-index: 1;"><tr>
+								<th><span>编号</span></th>
+								<th><span>操作类型</span></th>
+								<th><span>详情</span></th>
+								<th><span>操作时间</span></th>
+							</tr></thead>
+							<tbody></tbody>
+						</table>
+					</div>
+				</div>
+				<div class="dataTables_paginate paging_bootstrap page operationLog">
+					<div><span class="Pcurrent">1</span><span class="Pcount">共1条</span></div>
+				</div>
+			</div>
+			<!-- logs end -->
+
+		</div>
+	
+	</div>
+</div>
+<script src="/static/app/logs.js?v={{config.version}}"></script>
+{% endblock %}
