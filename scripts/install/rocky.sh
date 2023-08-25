@@ -71,6 +71,7 @@ yum install -y libpng libpng-devel libwebp libwebp-devel pcre pcre-devel gd gd-d
 yum install -y net-tools
 yum install -y ncurses ncurses-devel mysql-devel make cmake
 yum install -y sqlite-devel
+yum install -y libargon2-dev
 
 # python-imaging
 # yum install -y MySQL-python

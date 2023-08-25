@@ -172,7 +172,6 @@ if [ "$VERSION_ID" -ge "8" ];then
     # else
     #     REPOS='--enablerepo=remi,appstream,baseos,epel,extras,powertools'
     # fi
-
     for rpms in gcc gcc-c++ lsof autoconf bzip2 bzip2-devel c-ares-devel \
         ca-certificates cairo-devel cmake crontabs curl curl-devel diffutils e2fsprogs e2fsprogs-devel \
         expat-devel expect file flex gd gd-devel gettext gettext-devel glib2 glib2-devel glibc.i686 \
@@ -181,7 +180,7 @@ if [ "$VERSION_ID" -ge "8" ];then
         libpng libpng-devel libstdc++.so.6 libtirpc libtirpc-devel libtool libtool-libs libwebp libwebp-devel \
         libxml2 libxml2-devel libxslt libxslt-devel libarchive make mysql-devel ncurses ncurses-devel net-tools \
         oniguruma oniguruma-devel patch pcre pcre-devel perl perl-Data-Dumper perl-devel procps psmisc python3-devel \
-        openssl openssl-devel patchelf\
+        openssl openssl-devel patchelf libargon2-dev\
         readline-devel rpcgen sqlite-devel tar unzip vim-minimal wget zip zlib zlib-devel;
     do
         # dnf --enablerepo=remi,appstream,baseos,epel,extras,powertools install -y oniguruma5php-devel
@@ -202,7 +201,7 @@ else
         make mysql-devel ncurses ncurses-devel net-tools oniguruma oniguruma-devel openldap openldap-devel \
         openssl openssl-devel patch pcre pcre-devel perl perl-Data-Dumper perl-devel psmisc python-devel \
         python3-devel python3-pip re2c readline-devel rpcgen sqlite-devel tar unzip vim-minimal vixie-cron \
-        wget zip zlib zlib-devel ImageMagick ImageMagick-devel patchelf;
+        wget zip zlib zlib-devel ImageMagick ImageMagick-devel patchelf libargon2-dev;
     do
         yum install -y $rpms;
     done

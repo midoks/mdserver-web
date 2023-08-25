@@ -97,7 +97,10 @@ yum install -y libzip libzip-devel
 yum install -y pcre pcre-devel
 yum install -y icu libicu-devel 
 yum install -y freetype freetype-devel
+
 yum install -y openssl openssl-devel
+yum install -y libargon2-devel
+
 yum install -y graphviz libxml2 libxml2-devel
 yum install -y sqlite-devel
 yum install -y oniguruma oniguruma-devel

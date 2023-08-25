@@ -92,6 +92,7 @@ apt install -y libunwind-dev
 apt install -y libpcre3 libpcre3-dev 
 apt install -y openssl
 apt install -y libssl-dev
+apt install -y libargon2-dev
 
 apt install -y libmemcached-dev
 apt install -y libsasl2-dev

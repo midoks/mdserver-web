@@ -88,6 +88,7 @@ yum install -y openldap openldap-devel
 yum install -y bison re2c
 yum install -y cmake cmake3
 yum install -y autoconf
+yum install -y libargon2-devel
 
 yum install -y libmemcached libmemcached-devel
 yum install -y curl curl-devel
