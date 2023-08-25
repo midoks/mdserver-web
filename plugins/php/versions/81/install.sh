@@ -133,6 +133,7 @@ if [ ! -d $serverPath/php/${PHP_VER} ];then
 	--enable-sysvshm \
 	--disable-intl \
 	--disable-fileinfo \
+	--with-password-argon2 \
 	$OPTIONS \
 	--enable-fpm
 	make clean && make -j${cpuCore} && make install && make clean
