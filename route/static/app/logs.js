@@ -31,7 +31,7 @@ $('#panelLogs .clear').click(function(){
 function getLogs(page,search) {
 	search = search == undefined ? '':search;
 	var loadT = layer.load();
-	$.post('/firewall/get_log_list','limit=10&p=' + page+"&search="+search, function(data) {
+	$.post('/logs/get_log_list','limit=10&p=' + page+"&search="+search, function(data) {
 		layer.close(loadT);
 		var body = '';
 		for (var i = 0; i < data.data.length; i++) {
@@ -50,7 +50,7 @@ function getLogs(page,search) {
 function delLogs(){
 	layer.confirm('即将清空面板日志，继续吗？',{title:'清空日志',closeBtn:2},function(){
 		var loadT = layer.msg('正在清理,请稍候...',{icon:16});
-		$.post('/firewall/del_panel_logs','',function(rdata){
+		$.post('/logs/del_panel_logs','',function(rdata){
 			layer.close(loadT);
 			layer.msg(rdata.msg,{icon:rdata.status?1:2});
 			getLogs(1);
