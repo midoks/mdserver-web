@@ -3,7 +3,11 @@ function changeDivH(){
     var w = $(window).width();
     $('#ff_box').css('height',l-80-60);
     $('#file_list').css('height',l-80-60);
-    $('#flame_graph').css('height',l-80-60).css('width',w-200-200-40);
+
+    $('#file_list .tab-con .list').css('height', l-80-60-70);
+
+
+    $('#flame_graph').css('height',l-80-60).css('width',w-300-200-40);
 
     // $('.tootls_host_list').css('display','block').css('height',l-192);
     // $('.tootls_commonly_list').css('display','block').css('height',l-192);    

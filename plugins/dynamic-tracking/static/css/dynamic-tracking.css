@@ -22,3 +22,20 @@
     background-color: #20a53a;
     border-color: #20a53a;
 }
+
+
+#file_list .list {
+  list-style: none;
+  border-top: none;
+  border: 1px solid #ececec;
+  overflow-y: auto;
+}
+
+#file_list .tab-con{
+	padding: 0px;
+	margin-top: 10px;
+}
+
+/*.tab-con .tab-block.on {
+  display: inline-block;
+}*/
