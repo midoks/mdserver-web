@@ -1,0 +1,11 @@
+
+/* menu start  */
+.menu .current .menu_dynamic-tracking:hover {
+    background-image: url("/plugins/file?name=dynamic-tracking&f=ico.png");
+}
+
+.menu .menu_plugin_dynamic-tracking {
+    background-image: url("/plugins/file?name=dynamic-tracking&f=ico.png");
+}
+
+/* menu end  */

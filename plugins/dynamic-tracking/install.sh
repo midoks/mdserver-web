@@ -52,15 +52,18 @@ Install_App()
 	fi
 	# FlameGraph end
 
-	shell_file=${curPath}/versions/${VERSION}/${OSNAME}.sh
+	
 
-	if [ -f $shell_file ];then
-		bash -x $shell_file
-	else
+	shell_file=${curPath}/versions/${OSNAME}.sh
+	echo $shell_file
+	if [ ! -f $shell_file ];then
 		echo '不支持...' > $install_tmp 
 		exit 1
 	fi
+	
+	bash -x $shell_file
 
+	echo "${VERSION}"
 	echo "${VERSION}" > $serverPath/dynamic-tracking/version.pl
 	echo '安装完成' > $install_tmp
 
@@ -69,7 +72,7 @@ Install_App()
 
 }
 
-Uninstall_Docker()
+Uninstall_App()
 {
 	rm -rf $serverPath/dynamic-tracking
 	echo "Uninstall_App" > $install_tmp

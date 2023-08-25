@@ -1,0 +1,50 @@
+<style>
+.weblog{
+    font-size: 12px;
+    display:inline-block;
+    line-height:30px;
+}
+.weblog em{
+    font-style:normal;
+    color:#666;
+    margin: 0 30px;
+}
+.weblog span{
+    margin-right:5px;
+}
+.weblog a{
+    color:#20a53a;
+}
+.firewall-port-box{
+    margin-bottom:15px;
+}
+</style>
+
+<div class="main-content">
+    <div class="container-fluid" style="padding-bottom: 50px;">
+        <div class="pos-box bgw mtb15">
+            <div class="position f14 c9 pull-left">
+                <a class="plr10 c4" href="/">首页</a>/<span class="plr10 c4">动态追踪</span>
+            </div>
+
+            <div class="search pull-right">
+                <form target="hid" onsubmit='getLogs(1,$("#SearchValue").prop("value"))'>
+                    <input type="text" id="SearchValue" class="ser-text pull-left" placeholder="进程ID" />
+                    <button type="button" class="ser-sub pull-left" onclick='getLogs(1,$("#SearchValue").prop("value"))'>采样</button>
+                </form>
+                <iframe name='hid' id="hid" style="display:none"></iframe>
+            </div>
+        </div>
+
+        
+        <div class="white-black-ip bgw mtb15">
+            <div class="black-ip">
+                <div class="def-log">
+···
+                    
+                </div>
+            </div>
+        </div>
+        <!-- //// -->
+    </div>
+</div>
