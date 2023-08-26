@@ -113,7 +113,7 @@ class App():
 
     def getSshInfo(self, file):
         rdata = mw.readFile(file)
-        destr = mw.enDoubleCrypt('mdserver-web', rdata)
+        destr = mw.deDoubleCrypt('mdserver-web', rdata)
         return json.loads(destr)
 
     def get_server_by_host(self):
