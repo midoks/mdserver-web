@@ -26,7 +26,12 @@ function dynamicTrackingLoad(){
     $(window).resize(function(){
         changeDivH();
     });
+
+    //加载采样数据列表
+    dtFileList();
 }
+
+
 
 
 function dtPost(method, version, args,callback){
@@ -57,21 +62,21 @@ function dtPost(method, version, args,callback){
     },'json'); 
 }
 
-function dtPostCallbak(method, version, args,callback){
+function dtPostCb(method, version, args,callback){
     var loadT = layer.msg('正在获取...', { icon: 16, time: 0, shade: 0.3 });
 
-    var req_data = {};
-    req_data['name'] = 'dynamic-tracking';
-    req_data['func'] = method;
+    var pdata = {};
+    pdata['name'] = 'dynamic-tracking';
+    pdata['func'] = method;
     args['version'] = version;
  
     if (typeof(args) == 'string'){
-        req_data['args'] = JSON.stringify(toArrayObject(args));
+        pdata['args'] = JSON.stringify(toArrayObject(args));
     } else {
-        req_data['args'] = JSON.stringify(args);
+        pdata['args'] = JSON.stringify(args);
     }
 
-    $.post('/plugins/callback', req_data, function(data) {
+    $.post('/plugins/callback', pdata, function(data) {
         layer.close(loadT);
         if (!data.status){
             layer.msg(data.msg,{icon:0,time:2000,shade: [0.3, '#000']});
@@ -82,4 +87,39 @@ function dtPostCallbak(method, version, args,callback){
             callback(data);
         }
     },'json'); 
+}
+
+
+function dtFileList(){
+    dtPost('file_list', '', {}, function(data){
+        var rdata = $.parseJSON(data.data);
+        var alist = rdata.data;
+
+        if (alist.length == 0){
+            var em ='<li class="data-file-list" style="text-align: center;">无数据</li>';
+            $('#file_list .list').html(em);
+            return;
+        }
+
+        var tli = '';
+        for (var i = 0; i < alist.length; i++) {
+            if (i==0){
+                tli +='<li class="data-file-list active" data-index="'+i+'" data-file="'+alist[i]['name']+'">\
+                    <span class="file">'+alist[i]['name']+'</span>\
+                    <span class="tootls">\
+                        <span class="glyphicon glyphicon-trash" aria-hidden="true" title="删除常用命令信息"></span>\
+                    </span>\
+                </li>';
+            } else{
+                tli +='<li class="data-file-list" data-index="'+i+'" data-file="'+alist[i]['name']+'">\
+                    <span class="file">'+alist[i]['name']+'</span>\
+                    <span class="tootls">\
+                        <span class="glyphicon glyphicon-trash" aria-hidden="true" title="删除常用命令信息"></span>\
+                    </span>\
+                </li>';
+            }
+        }
+
+        $('#file_list .list').html(tli);
+    });
 }

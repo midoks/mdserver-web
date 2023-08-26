@@ -57,7 +57,17 @@ def getArgs():
     return tmp
 
 
+def checkArgs(data, ck=[]):
+    for i in range(len(ck)):
+        if not ck[i] in data:
+            return (False, mw.returnJson(False, '参数:(' + ck[i] + ')没有!'))
+    return (True, mw.returnJson(True, 'ok'))
+
+
 def status():
+    dir_path = getServerDir() + '/trace'
+    if not os.path.exists(dir_path):
+        os.mkdir(dir_path)
     return 'start'
 
 
@@ -94,6 +104,29 @@ def initdUinstall():
     return 'ok'
 
 
+def dtFileList():
+    dir_path = getServerDir() + '/trace'
+    if not os.path.exists(dir_path):
+        os.mkdir(dir_path)
+
+    file_info = []
+    for name in os.listdir(dir_path):
+        if name == ".DS_Store":
+            continue
+
+        # print(name)
+        info = {}
+        try:
+            info['name'] = name
+        except Exception as e:
+            return mw.returnJson(False, str(e))
+
+        file_info.append(info)
+
+    file_info = sorted(file_info, key=lambda x: x['name'], reverse=False)
+    return mw.returnJson(True, 'ok!', file_info)
+
+
 if __name__ == "__main__":
     func = sys.argv[1]
     if func == 'status':
@@ -118,5 +151,7 @@ if __name__ == "__main__":
         print(getConf())
     elif func == 'run_log':
         print(runLog())
+    elif func == 'file_list':
+        print(dtFileList())
     else:
         print('error')

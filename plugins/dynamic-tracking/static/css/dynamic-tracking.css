@@ -31,9 +31,43 @@
   overflow-y: auto;
 }
 
+#file_list .list li.active {
+    background-color: #f2f2f2;
+}
+
 #file_list .tab-con{
 	padding: 0px;
 	margin-top: 10px;
+}
+
+#file_list .list li>span {
+    vertical-align: top;
+    display: inline-block;
+}
+
+#file_list .list li {
+  display: inline-block;
+  height: 38px;
+  line-height: 38px;
+  color: #444;
+  border-bottom: 1px solid #ececec;
+  font-size: 13px;
+  cursor: pointer;
+  position: relative;
+  width: 100%;
+}
+
+#file_list .file  {
+  padding-left: 10px;
+}
+
+#file_list .list li .tootls{
+    width: 70px;
+    text-align: right;
+    padding-right: 10px;
+    /* display: none; */
+    position: absolute;
+    right: 5px;
 }
 
 /*.tab-con .tab-block.on {
