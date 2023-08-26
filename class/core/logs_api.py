@@ -224,7 +224,7 @@ class logs_api:
             # tmp['_line'] = _line
             lastlog_list.append(tmp)
         # lastlog_list = sorted(lastlog_list,key=lambda x:x['时间'],reverse=True)
-        return mw.returnJson(True, 'ok!', lastlog_list)
+        return mw.returnData(True, 'ok!', lastlog_list)
 
     def getAuditLastLog(self):
         cmd = '''LANG=en_US.UTF-8 lastlog|grep -v Username'''
