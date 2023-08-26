@@ -139,6 +139,19 @@ def dtGetFilePath():
         return mw.returnJson(False, '无效目录')
 
 
+def dtRemoveFilePath:
+    args = getArgs()
+    data = checkArgs(args, ['file'])
+    if not data[0]:
+        return data[1]
+
+    dir_path = getServerDir() + '/trace'
+    path = dir_path + '/' + args['file']
+    if os.path.exists(path):
+        mw.execShell('rm -rf ' + path)
+    return mw.returnJson(True, '删除成功!')
+
+
 def dtFileList():
     dir_path = getServerDir() + '/trace'
     if not os.path.exists(dir_path):
@@ -191,5 +204,7 @@ if __name__ == "__main__":
         print(dtFileList())
     elif func == 'get_file_path':
         print(dtGetFilePath())
+    elif func == 'remove_file_path':
+        print(dtRemoveFilePath())
     else:
         print('error')

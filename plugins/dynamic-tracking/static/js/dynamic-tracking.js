@@ -107,7 +107,7 @@ function dtFileList(){
         var tli = '';
         for (var i = 0; i < alist.length; i++) {
             if (i==0){
-                tli +='<li class="data-file-list active" data-index="'+i+'" data-file="'+alist[i]['name']+'">\
+                tli +='<li title="双击打开浏览"  class="data-file-list active" data-index="'+i+'" data-file="'+alist[i]['name']+'">\
                     <span class="file">'+alist[i]['name']+'</span>\
                     <span class="tootls">\
                         <span class="glyphicon glyphicon-trash" aria-hidden="true" title="删除常用命令信息"></span>\
