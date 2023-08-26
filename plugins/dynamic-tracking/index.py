@@ -139,7 +139,7 @@ def dtGetFilePath():
         return mw.returnJson(False, '无效目录')
 
 
-def dtRemoveFilePath:
+def dtRemoveFilePath():
     args = getArgs()
     data = checkArgs(args, ['file'])
     if not data[0]:
