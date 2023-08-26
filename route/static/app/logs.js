@@ -57,7 +57,9 @@ $('#panelLogs .clear').click(function(){
 
 
 function getAuditLogsFiles(){
+	var loadT = layer.msg('正在获取日志审计列表...', { icon: 16, time: 0, shade: 0.3 });
 	$.post('/logs/get_audit_logs_files',{}, function(data) {
+		layer.close(loadT);
         var option = '';
         for (var i = 0; i < data.length; i++) {
         	var tip = data[i]['name'] +' - '+data[i]['title'] + '(' + toSize(data[i]['size']) + ')';
@@ -81,7 +83,9 @@ function getAuditLogsFiles(){
 
 
 function getAuditFile(log_name){
+	var loadT = layer.msg('正在获取日志审计内容...', { icon: 16, time: 0, shade: 0.3 });
 	$.post('/logs/get_audit_file',{log_name:log_name}, function(data) {
+		layer.close(loadT);
 		// console.log(data);
 		try{
             if (typeof(data) == 'object'){
