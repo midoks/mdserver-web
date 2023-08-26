@@ -298,21 +298,29 @@ function openFilename(obj){
 	}
 
 	if (inArray(ext,['svg'])){
-
-		$.post("/files/get_body", "path=" + encodeURIComponent(path), function(rdata) {
-			if (rdata.data.status){
-				layer.open({
-					type:1,
-					closeBtn: 1,
-					title:"SVG预览",
-					area: '400px',
-					shadeClose: true,
-					content: '<div class="showpicdiv">'+rdata.data.data+'</div>'
-				});
-			} else {
-				layer.msg("无法预览");
-			}
-		},'json');
+		var url = '/files/download?filename='+path;
+		layer.open({
+			type:1,
+			closeBtn: 1,
+			title:"SVG预览",
+			area: ['600px','500px'],
+			maxmin:true,
+			shadeClose: true,
+			content: '<iframe width="100%" height="100%"\
+                src="'+url+'"\
+                frameborder="0"\
+                border="0"\
+                marginwidth="0"\
+                marginheight="0"\
+                scrolling="yes"\
+                noresize=""\
+                allowfullscreen="allowfullscreen"\
+                mozallowfullscreen="mozallowfullscreen"\
+                msallowfullscreen="msallowfullscreen"\
+                oallowfullscreen="oallowfullscreen"\
+                webkitallowfullscreen="webkitallowfullscreen"\
+                allowfullscreen="true"></iframe>'
+		});
 	}
 }
 
