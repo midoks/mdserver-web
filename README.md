@@ -106,6 +106,7 @@ yum install -y libargon2-devel
 apt install -y libargon2-dev
 
 * 增加PHP83。
+* 面板日志单独为一页并加入日志审计功能。
 
 ### JSDelivr安装地址
 
