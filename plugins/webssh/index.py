@@ -150,9 +150,11 @@ class App():
                 info_file = self.__host_dir + '/' + name + '/info.json'
                 if not os.path.exists(info_file):
                     continue
+
+                host_info = {}
                 try:
                     info_tmp = self.getSshInfo(info_file)
-                    host_info = {}
+
                     host_info['host'] = name
                     host_info['port'] = info_tmp['port']
                     host_info['ps'] = info_tmp['ps']
