@@ -160,7 +160,9 @@ class App():
                     host_info['ps'] = info_tmp['ps']
                     # host_info['sort'] = int(info_tmp['sort'])
                 except Exception as e:
-                    print(e)
+                    # print(e)
+                    return mw.returnJson(False, str(e))
+
                     # if os.path.exists(info_file):
                     #     os.remove(info_file)
                     # continue
