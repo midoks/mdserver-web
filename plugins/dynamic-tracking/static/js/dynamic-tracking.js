@@ -29,13 +29,9 @@ function dynamicTrackingLoad(){
 }
 
 
+function dtPost(method, version, args,callback){
 
-
-
-
-function redisPost(method, version, args,callback){
     var loadT = layer.msg('正在获取...', { icon: 16, time: 0, shade: 0.3 });
-
     var req_data = {};
     req_data['name'] = 'dynamic-tracking';
     req_data['func'] = method;
@@ -61,7 +57,7 @@ function redisPost(method, version, args,callback){
     },'json'); 
 }
 
-function redisPostCallbak(method, version, args,callback){
+function dtPostCallbak(method, version, args,callback){
     var loadT = layer.msg('正在获取...', { icon: 16, time: 0, shade: 0.3 });
 
     var req_data = {};
