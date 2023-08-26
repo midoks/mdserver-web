@@ -119,4 +119,4 @@ endTime=`date +%s`
 ((outTime=($endTime-$startTime)/60))
 echo -e "Time consumed:\033[32m $outTime \033[0mMinute!"
 
-} 1> >(tee /var/logs/mw-update.log) 2>&1
+} 1>/var/logs/mw-update.log >(tee /var/logs/mw-update.log) 2>&1
