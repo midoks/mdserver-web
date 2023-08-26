@@ -1,16 +1,15 @@
 function changeDivH(){
     var l = $(window).height();
     var w = $(window).width();
+    
     $('#ff_box').css('height',l-80-60);
-    $('#file_list').css('height',l-80-60);
 
+    $('#file_list').css('height',l-80-60);
     $('#file_list .tab-con .list').css('height', l-80-60-70);
 
 
     $('#flame_graph').css('height',l-80-60).css('width',w-300-200-40);
-    $('#flame_graph iframe').css('height',l-80-60-70);
-    // $('.tootls_host_list').css('display','block').css('height',l-192);
-    // $('.tootls_commonly_list').css('display','block').css('height',l-192);    
+    $('#flame_graph iframe').css('height',l-80-60-70);  
 }
 
 
@@ -32,6 +31,10 @@ function dynamicTrackingLoad(){
 }
 
 
+$('.data-collect').click(function(){
+    layer.msg('开始采样',{icon:0,time:2000});
+
+});
 
 
 function dtPost(method, version, args,callback){
@@ -122,9 +125,7 @@ function dtFileList(){
 
         $('#file_list .list').html(tli);
 
-
         dtGetFile(alist[0]['name']);
-
 
         $('#file_list li').dblclick(function(){
            var i = $(this).data('index');

@@ -16,6 +16,6 @@ SYS_ARCH=`arch`
 # http://dtrace.org/blogs/brendan/2012/11/14/dtracing-in-anger/
 
 
-# dtrace -x ustackframes=100 -n 'pid$target::mach_msg_trap:entry { @[ustack()] = count(); } tick-30s { exit(0); }' -p 441 -o out.SystemUIServer_stacks
-# ./FlameGraph/stackcollapse.pl out.SystemUIServer_stacks > kernel.cbt
-# ./FlameGraph/flamegraph.pl kernel.cbt > kernel.svg
+# dtrace -x ustackframes=100 -n 'pid$target::mach_msg_trap:entry { @[ustack()] = count(); } tick-30s { exit(0); }' -p 18572 -o out.SystemUIServer_stacks
+# /Users/midoks/Desktop/mwdev/server/dynamic-tracking/FlameGraph/stackcollapse.pl out.SystemUIServer_stacks > kernel.cbt
+# /Users/midoks/Desktop/mwdev/server/dynamic-tracking/FlameGraph/flamegraph.pl kernel.cbt > kernel.svg
