@@ -64,8 +64,13 @@ class files_api:
         filename = request.args.get('filename', '')
         if not os.path.exists(filename):
             return ''
+
+        is_attachment = True
+        if filename.endswith(".svg"):
+            is_attachment = False
+
         response = make_response(send_from_directory(
-            os.path.dirname(filename), os.path.basename(filename), as_attachment=True))
+            os.path.dirname(filename), os.path.basename(filename), as_attachment=is_attachment))
         return response
 
     def zipApi(self):

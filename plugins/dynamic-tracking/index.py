@@ -38,7 +38,7 @@ def getInitDTpl():
 
 
 def getArgs():
-    args = sys.argv[3:]
+    args = sys.argv[2:]
     tmp = {}
     args_len = len(args)
 
@@ -104,6 +104,41 @@ def initdUinstall():
     return 'ok'
 
 
+def get_file(args):
+    dir_path = getServerDir() + '/trace'
+
+    path = dir_path + '/' + args['file'] + '/main.svg'
+
+    if os.path.exists(path):
+        d = mw.readFile(path)
+        return mw.returnData(True, 'ok', d)
+    else:
+        return mw.returnData(False, '无效目录')
+
+
+def get_file_path(args):
+    dir_path = getServerDir() + '/trace'
+    path = dir_path + '/' + args['file'] + '/main.svg'
+    if os.path.exists(path):
+        return mw.returnData(True, 'ok', path)
+    else:
+        return mw.returnData(False, '无效目录')
+
+
+def dtGetFilePath():
+    args = getArgs()
+    data = checkArgs(args, ['file'])
+    if not data[0]:
+        return data[1]
+
+    dir_path = getServerDir() + '/trace'
+    path = dir_path + '/' + args['file'] + '/main.svg'
+    if os.path.exists(path):
+        return mw.returnJson(True, 'ok', path)
+    else:
+        return mw.returnJson(False, '无效目录')
+
+
 def dtFileList():
     dir_path = getServerDir() + '/trace'
     if not os.path.exists(dir_path):
@@ -118,6 +153,7 @@ def dtFileList():
         info = {}
         try:
             info['name'] = name
+            info['abs_path'] = dir_path + '/' + name + '/main.svg'
         except Exception as e:
             return mw.returnJson(False, str(e))
 
@@ -153,5 +189,7 @@ if __name__ == "__main__":
         print(runLog())
     elif func == 'file_list':
         print(dtFileList())
+    elif func == 'get_file_path':
+        print(dtGetFilePath())
     else:
         print('error')

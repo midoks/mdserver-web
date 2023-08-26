@@ -8,7 +8,7 @@ function changeDivH(){
 
 
     $('#flame_graph').css('height',l-80-60).css('width',w-300-200-40);
-
+    $('#flame_graph iframe').css('height',l-80-60-70);
     // $('.tootls_host_list').css('display','block').css('height',l-192);
     // $('.tootls_commonly_list').css('display','block').css('height',l-192);    
 }
@@ -121,5 +121,30 @@ function dtFileList(){
         }
 
         $('#file_list .list').html(tli);
+
+
+        dtGetFile(alist[0]['name']);
+
+
+        $('#file_list li').dblclick(function(){
+           var i = $(this).data('index');
+           var abs_p = alist[i]['abs_path'];
+
+           var durl = '/files/download?filename='+abs_p;
+           window.open(durl);
+        });
+    });
+}
+
+function dtGetFile(file){
+    dtPost('get_file_path', '', {file:file}, function(data){
+        var rdata = $.parseJSON(data.data);
+        console.log(rdata);
+        if (!rdata.status){
+            layer.msg(rdata.msg,{icon:0,time:2000,shade: [2, '#000']});
+            return;
+        }
+        var durl = '/files/download?filename='+rdata.data;
+        $('#flame_graph .tab-con .tab-block').attr('src',durl);
     });
 }
