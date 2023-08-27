@@ -188,7 +188,7 @@ def dtSimpleTrace():
     plugins_shell = getPluginDir() + '/shell/simple_trace.sh'
     cmd = plugins_shell + ' "' + args['pid'] + '"'
 
-    data = mw.execShell("bash " + cmd + "& ")
+    data = mw.execShell("bash " + cmd + " &")
     return mw.returnJson(True, '执行成功!')
 
 
