@@ -116,14 +116,16 @@ function dtFileList(){
                 tli +='<li title="双击打开浏览"  class="data-file-list active" data-index="'+i+'" data-file="'+alist[i]['name']+'">\
                     <span class="file">'+alist[i]['name']+'</span>\
                     <span class="tootls">\
-                        <span class="glyphicon glyphicon-trash" aria-hidden="true" title="删除常用命令信息"></span>\
+                        <span class="glyphicon glyphicon-link" aria-hidden="true" title="外部连接"></span>\
+                        <span class="glyphicon glyphicon-trash" aria-hidden="true" title="删除"></span>\
                     </span>\
                 </li>';
             } else{
                 tli +='<li class="data-file-list" data-index="'+i+'" data-file="'+alist[i]['name']+'">\
                     <span class="file">'+alist[i]['name']+'</span>\
                     <span class="tootls">\
-                        <span class="glyphicon glyphicon-trash" aria-hidden="true" title="删除常用命令信息"></span>\
+                        <span class="glyphicon glyphicon-link" aria-hidden="true" title="外部连接"></span>\
+                        <span class="glyphicon glyphicon-trash" aria-hidden="true" title="删除"></span>\
                     </span>\
                 </li>';
             }
@@ -132,16 +134,16 @@ function dtFileList(){
         $('#file_list .list').html(tli);
 
         dtGetFile(alist[0]['name']);
-        $('#file_list li').click(function(){
+        $('#file_list li .file').click(function(){
             $('#file_list li').removeClass('active');
-            $(this).addClass('active');
-            var i = $(this).data('index');
+            $(this).parent().addClass('active');
+            var i = $(this).parent().data('index');
             dtGetFile(alist[i]['name']);
         });
 
 
-        $('#file_list li').dblclick(function(){
-           var i = $(this).data('index');
+        $('#file_list li .glyphicon-link').click(function(){
+           var i = $(this).parent().parent().data('index');
            var abs_p = alist[i]['abs_path'];
 
            var durl = '/files/download?filename='+abs_p;
