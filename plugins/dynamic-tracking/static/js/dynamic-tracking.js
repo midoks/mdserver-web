@@ -132,6 +132,11 @@ function dtFileList(){
         $('#file_list .list').html(tli);
 
         dtGetFile(alist[0]['name']);
+        $('#file_list li').click(function(){
+            var i = $(this).data('index');
+            dtGetFile(alist[i]['name']);
+        });
+
 
         $('#file_list li').dblclick(function(){
            var i = $(this).data('index');
@@ -158,7 +163,7 @@ function dtFileList(){
 function dtGetFile(file){
     dtPost('get_file_path', '', {file:file}, function(data){
         var rdata = $.parseJSON(data.data);
-        console.log(rdata);
+        // console.log(rdata);
         if (!rdata.status){
             layer.msg(rdata.msg,{icon:0,time:2000,shade: [2, '#000']});
             return;
