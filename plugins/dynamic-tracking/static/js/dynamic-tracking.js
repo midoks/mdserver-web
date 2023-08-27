@@ -133,6 +133,8 @@ function dtFileList(){
 
         dtGetFile(alist[0]['name']);
         $('#file_list li').click(function(){
+            $('#file_list li').removeClass('active');
+            $(this).addClass('active');
             var i = $(this).data('index');
             dtGetFile(alist[i]['name']);
         });
