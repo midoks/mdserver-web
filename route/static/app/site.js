@@ -575,38 +575,33 @@ function allDeleteSite(){
 		if($("#delpath").is(":checked")){
 			path='&path=1';
 		}
-		syncDeleteSite(dataList,0,'',path);
+		syncDeleteSite(dataList, 0,'',path);
 	},thtml);
 }
 
 //模拟同步开始批量删除
 function syncDeleteSite(dataList,successCount,errorMsg,path){
 	if(dataList.length < 1) {
-		layer.msg(lan.get('del_all_site_ok',[successCount]),{icon:1});
+		showMsg(lan.get('del_all_site_ok',[successCount]), function(){
+			// location.reload();
+		},{icon:1});
 		return;
 	}
 	var loadT = layer.msg(lan.get('del_all_task_the',[dataList[0].name]),{icon:16,time:0,shade: [0.3, '#000']});
-	$.ajax({
-			type:'POST',
-			url:'/site?action=DeleteSite',
-			data:'id='+dataList[0].id+'&webname='+dataList[0].name+path,
-			async: true,
-			success:function(frdata){
-				layer.close(loadT);
-				if(frdata.status){
-					successCount++;
-					$("input[title='"+dataList[0].name+"']").parents("tr").remove();
-				}else{
-					if(!errorMsg){
-						errorMsg = '<br><p>'+lan.site.del_err+':</p>';
-					}
-					errorMsg += '<li>'+dataList[0].name+' -> '+frdata.msg+'</li>'
-				}
-				
-				dataList.splice(0,1);
-				syncDeleteSite(dataList,successCount,errorMsg,path);
+	$.post('/site/delete', 'id='+dataList[0].id+'&webname='+dataList[0].name+path , function(rdata){
+		layer.close(loadT);
+		if(rdata.status){
+			successCount++;
+			$("input[title='"+dataList[0].name+"']").parents("tr").remove();
+		} else {
+			if(!errorMsg){
+				errorMsg = '<br><p>'+lan.site.del_err+':</p>';
 			}
-	});
+			errorMsg += '<li>'+dataList[0].name+' -> '+rdata.msg+'</li>'
+		}
+		dataList.splice(0,1);
+		syncDeleteSite(dataList,successCount,errorMsg,path);
+	},'json');
 }
 
 

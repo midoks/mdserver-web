@@ -108,6 +108,7 @@ apt install -y libargon2-dev
 * 增加PHP83。
 * 面板日志单独为一页并加入日志审计功能。
 * 修复webssh服务器读取问题。
+* 站点批量删除修复。
 
 ### JSDelivr安装地址
 
