@@ -24,14 +24,14 @@ mkdir -p $DST_FILE_DIR
 
 # DST_FILE=${DST_FILE_DIR}/main.strace
 
-if [ ! -f $DST_FILE ];then
-	cd ${DST_FILE_DIR}
-	perf record -F 99 -p 2401699 -g -- sleep 30
+# perf record -F 99 -p 335584 -g -- sleep 30
 
-	perf script > out.perf
-	${APP_DIR}/FlameGraph/stackcollapse-perf.pl ${DST_FILE_DIR}/out.perf > ${DST_FILE_DIR}/out.folded
-	${APP_DIR}/FlameGraph/flamegraph.pl ${DST_FILE_DIR}/out.folded > ${DST_FILE_DIR}/main.svg
-fi
+cd ${DST_FILE_DIR}
+perf record -F 99 -p ${PID} -g -- sleep 30
+
+perf script > out.perf
+${APP_DIR}/FlameGraph/stackcollapse-perf.pl ${DST_FILE_DIR}/out.perf > ${DST_FILE_DIR}/out.folded
+${APP_DIR}/FlameGraph/flamegraph.pl ${DST_FILE_DIR}/out.folded > ${DST_FILE_DIR}/main.svg
 
 # perf record -F 99 -p 2401699 -g -- sleep 30
 # perf script > out.perf
