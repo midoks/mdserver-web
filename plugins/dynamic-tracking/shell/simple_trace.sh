@@ -22,7 +22,7 @@ APP_DIR=/www/server/dynamic-tracking
 DST_FILE_DIR=${APP_DIR}/trace/PID_${PID}
 mkdir -p $DST_FILE_DIR
 
-DST_FILE=${DST_FILE_DIR}/out.SystemUIServer_stacks
+DST_FILE=${DST_FILE_DIR}/main.strace
 
 if [ ! -f $DST_FILE ];then
 	strace -p "$PID" -o $DST_FILE
