@@ -5,7 +5,7 @@ export PATH
 
 # debug
 # cd /www/server/mdserver-web
-# /www/server/mdserver-web/plugins/dynamic-tracking/shell/simple_macosx_trace.sh "22431"
+# bash /www/server/mdserver-web/plugins/dynamic-tracking/shell/simple_macosx_trace.sh "22431"
 
 # cd /Users/midoks/Desktop/mwdev/server/mdserver-web
 # bash /Users/midoks/Desktop/mwdev/server/mdserver-web/plugins/dynamic-tracking/shell/simple_macosx_trace.sh "22431"
