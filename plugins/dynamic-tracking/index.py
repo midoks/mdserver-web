@@ -176,6 +176,21 @@ def dtFileList():
     return mw.returnJson(True, 'ok!', file_info)
 
 
+def dtSimpleTrace():
+    args = getArgs()
+    data = checkArgs(args, ['pid'])
+    if not data[0]:
+        return data[1]
+
+    plugins_shell = getPluginDir() + '/shell/simple_trace.sh'
+    cmd = plugins_shell + ' "' + args['pid'] + '"'
+
+    print(cmd)
+    data = mw.execShell("bash " + cmd)
+    print(data)
+    return mw.returnJson(True, '执行成功!')
+
+
 if __name__ == "__main__":
     func = sys.argv[1]
     if func == 'status':
@@ -206,5 +221,7 @@ if __name__ == "__main__":
         print(dtGetFilePath())
     elif func == 'remove_file_path':
         print(dtRemoveFilePath())
+    elif func == 'simple_trace':
+        print(dtSimpleTrace())
     else:
         print('error')

@@ -28,8 +28,8 @@
             </div>
 
             <div class="search pull-right">
-                <form target="hid" onsubmit='getLogs(1,$("#SearchValue").prop("value"))'>
-                    <input type="text" id="SearchValue" class="ser-text pull-left" placeholder="进程ID" />
+                <form target="hid" onsubmit='return false;'>
+                    <input type="text" id="searchValue" class="ser-text pull-left" placeholder="进程ID" />
                     <button type="button" class="data-collect pull-left">采样</button>
                 </form>
             </div>
@@ -70,8 +70,6 @@
                             oallowfullscreen="oallowfullscreen"
                             webkitallowfullscreen="webkitallowfullscreen"
                             allowfullscreen="true"></iframe>
-                    <!-- <iframe class="tab-block on" src=""></iframe> -->
-                    <!-- <div class="tab-block on"></div> -->
                 </div>
             </div>
          

@@ -33,6 +33,11 @@ function dynamicTrackingLoad(){
 
 $('.data-collect').click(function(){
     layer.msg('开始采样',{icon:0,time:2000});
+    var pid = $('#searchValue').val();
+
+    dtPost('simple_trace', '', {pid:pid}, function(rdata){
+        console.log(rdata);
+    });
 
 });
 
