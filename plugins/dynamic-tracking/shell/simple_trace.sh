@@ -22,12 +22,22 @@ APP_DIR=/www/server/dynamic-tracking
 DST_FILE_DIR=${APP_DIR}/trace/PID_${PID}
 mkdir -p $DST_FILE_DIR
 
-DST_FILE=${DST_FILE_DIR}/main.strace
+# DST_FILE=${DST_FILE_DIR}/main.strace
 
 if [ ! -f $DST_FILE ];then
-	strace -p "$PID" -o $DST_FILE
+	cd ${DST_FILE_DIR}
+	perf record -F 99 -p 2401699 -g -- sleep 30
+
+	perf script > out.perf
+	${APP_DIR}/FlameGraph/stackcollapse-perf.pl ${DST_FILE_DIR}/out.perf > ${DST_FILE_DIR}/out.folded
+	${APP_DIR}/FlameGraph/flamegraph.pl ${DST_FILE_DIR}/out.folded > ${DST_FILE_DIR}/main.svg
 fi
 
-${APP_DIR}/FlameGraph/stackcollapse.pl $DST_FILE > ${DST_FILE_DIR}/kernel.cbt
-${APP_DIR}/FlameGraph/flamegraph.pl ${DST_FILE_DIR}/kernel.cbt > ${DST_FILE_DIR}/main.svg
+# perf record -F 99 -p 2401699 -g -- sleep 30
+# perf script > out.perf
+# /www/server/dynamic-tracking/FlameGraph/stackcollapse-perf.pl out.perf > out.folded
+# /www/server/dynamic-tracking/FlameGraph/flamegraph.pl out.folded > php-zend-flame-graph.svg
+
+# ${APP_DIR}/FlameGraph/stackcollapse.pl $DST_FILE > ${DST_FILE_DIR}/kernel.cbt
+# ${APP_DIR}/FlameGraph/flamegraph.pl ${DST_FILE_DIR}/kernel.cbt > ${DST_FILE_DIR}/main.svg
 
