@@ -63,7 +63,9 @@ Install_App()
 	
 	bash -x $shell_file
 
-	echo "${VERSION}"
+	echo "cp -rf ${curPath}/shell $serverPath/dynamic-tracking"
+	cp -rf ${curPath}/shell $serverPath/dynamic-tracking
+
 	echo "${VERSION}" > $serverPath/dynamic-tracking/version.pl
 	echo '安装完成' > $install_tmp
 
