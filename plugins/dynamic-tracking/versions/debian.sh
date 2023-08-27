@@ -14,7 +14,7 @@ SYS_ARCH=`arch`
 # apt-get update -y
 # strace -p $(ps -ef|grep "pool www" | awk '{print $2}' | grep -v grep | tr '\n' ',' )
 
-# perf record -F 99 -p 892 -g -- sleep 30
+# perf record -F 99 -p 2401699 -g -- sleep 30
 # perf script > out.perf
 # /www/server/dynamic-tracking/FlameGraph/stackcollapse-perf.pl out.perf > out.folded
 # /www/server/dynamic-tracking/FlameGraph/flamegraph.pl out.folded > php-zend-flame-graph.svg

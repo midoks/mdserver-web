@@ -36,9 +36,10 @@ $('.data-collect').click(function(){
     var pid = $('#searchValue').val();
 
     dtPost('simple_trace', '', {pid:pid}, function(rdata){
-        console.log(rdata);
+        // console.log(rdata);
+        var rdata = $.parseJSON(rdata.data);
+        layer.msg(rdata['msg'],{icon:rdata['status']?1:2,time:2000,shade: [0.3, '#000']});
     });
-
 });
 
 

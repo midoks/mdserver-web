@@ -177,6 +177,9 @@ def dtFileList():
 
 
 def dtSimpleTrace():
+    if mw.isAppleSystem():
+        return mw.returnJson(False, 'macosx只能手动执行!')
+
     args = getArgs()
     data = checkArgs(args, ['pid'])
     if not data[0]:
