@@ -5,7 +5,7 @@ export PATH
 
 # debug
 # cd /www/server/mdserver-web
-# bash /www/server/mdserver-web/plugins/dynamic-tracking/shell/simple_trace.sh "22431"
+# bash /www/server/mdserver-web/plugins/dynamic-tracking/shell/simple_trace.sh "2401699"
 
 
 curPath=`pwd`
@@ -25,7 +25,7 @@ mkdir -p $DST_FILE_DIR
 DST_FILE=${DST_FILE_DIR}/out.SystemUIServer_stacks
 
 if [ ! -f $DST_FILE ];then
-	sudo dtrace -x ustackframes=100 -n 'pid$target::mach_msg_trap:entry { @[ustack()] = count(); } tick-30s { exit(0); }' -p "$PID" -o $DST_FILE
+	strace -p "$PID" -o $DST_FILE
 fi
 
 ${APP_DIR}/FlameGraph/stackcollapse.pl $DST_FILE > ${DST_FILE_DIR}/kernel.cbt
