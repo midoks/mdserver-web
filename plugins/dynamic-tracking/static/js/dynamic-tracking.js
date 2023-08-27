@@ -140,6 +140,18 @@ function dtFileList(){
            var durl = '/files/download?filename='+abs_p;
            window.open(durl);
         });
+
+        $('#file_list li .glyphicon-trash').click(function(){
+            var i = $(this).parent().parent().data('index');
+            var f = alist[i]['name'];
+            dtPost('remove_file_path', '',{file:f}, function(rdata){
+                var rdata = $.parseJSON(rdata.data);
+                layer.msg(rdata['msg'],{icon:rdata['status']?1:2,time:2000});
+                if (rdata.status){
+                    dtFileList();
+                }
+            });
+        });
     });
 }
 
