@@ -4,6 +4,10 @@ export PATH
 
 
 # debug
+# cd /www/server/mdserver-web
+# /www/server/mdserver-web/plugins/dynamic-tracking/shell/simple_trace.sh "22431"
+
+# cd /Users/midoks/Desktop/mwdev/server/mdserver-web
 # /Users/midoks/Desktop/mwdev/server/mdserver-web/plugins/dynamic-tracking/shell/simple_trace.sh "22431"
 
 # dtrace -x ustackframes=100 -n 'pid$target::mach_msg_trap:entry { @[ustack()] = count(); } tick-30s { exit(0); }' -p 18572 -o out.SystemUIServer_stacks
