@@ -5,10 +5,7 @@ export PATH
 
 # debug
 # cd /www/server/mdserver-web
-# /www/server/mdserver-web/plugins/dynamic-tracking/shell/simple_trace_macosx.sh "22431"
-
-# cd /Users/midoks/Desktop/mwdev/server/mdserver-web
-# /Users/midoks/Desktop/mwdev/server/mdserver-web/plugins/dynamic-tracking/shell/simple_trace_macosx.sh "22431"
+# bash /www/server/mdserver-web/plugins/dynamic-tracking/shell/simple_trace.sh "22431"
 
 
 curPath=`pwd`
@@ -21,7 +18,7 @@ PID=$1
 echo $rootPath # /Users/midoks/Desktop/mwdev/server
 echo $curPath # /Users/midoks/Desktop/mwdev/server/mdserver-web
 
-APP_DIR=${rootPath}/dynamic-tracking
+APP_DIR=/www/server/dynamic-tracking
 DST_FILE_DIR=${APP_DIR}/trace/PID_${PID}
 mkdir -p $DST_FILE_DIR
 
