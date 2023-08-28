@@ -1496,8 +1496,9 @@ fullchain.pem       粘贴到证书输入框
                             'cert_timeout'] = int(time.time())
 
                     if self.__config['orders'][i]['cert_timeout'] > start_time:
-                        writeLog(
-                            "|-本次跳过域名: {}，未过期!".format(self.__config['orders'][i]['domains'][0]))
+                        msg = "|-本次跳过域名: {}，未过期!".format(
+                            self.__config['orders'][i]['domains'][0])
+                        writeLog(msg)
                         continue
 
                     # 已删除的网站直接跳过续签
@@ -1514,8 +1515,9 @@ fullchain.pem       粘贴到证书输入框
                                     break
                                 if not mw.M('domain').where("name=?", (domain,)).count() and not mw.M('binding').where("domain=?", domain).count():
                                     auth_to = None
-                                    writeLog(
-                                        "|-跳过被删除的域名: {}".format(self.__config['orders'][i]['domains']))
+                                    msg = "|-跳过被删除的域名: {}".format(
+                                        self.__config['orders'][i]['domains'])
+                                    writeLog(msg)
                             if not auth_to:
                                 continue
 
@@ -1526,15 +1528,17 @@ fullchain.pem       粘贴到证书输入框
                         timeout = self.__config['orders'][i][
                             'next_retry_time'] - int(time.time())
                         if timeout > 0:
-                            writeLog('|-本次跳过域名:{}，因第上次续签失败，还需要等待{}小时后再重试'.format(
-                                self.__config['orders'][i]['domains'], int(timeout / 60 / 60)))
+                            msg = '|-本次跳过域名:{}，因第上次续签失败，还需要等待{}小时后再重试'.format(
+                                self.__config['orders'][i]['domains'], int(timeout / 60 / 60))
+                            writeLog(msg)
                             continue
 
                     # 是否到了最大重试次数
                     if 'retry_count' in self.__config['orders'][i]:
                         if self.__config['orders'][i]['retry_count'] >= 5:
-                            writeLog('|-本次跳过域名:{}，因连续5次续签失败，不再续签此证书(可尝试手动续签此证书，成功后错误次数将被重置)'.format(
-                                self.__config['orders'][i]['domains']))
+                            msg = '|-本次跳过域名:{}，因连续5次续签失败，不再续签此证书(可尝试手动续签此证书，成功后错误次数将被重置)'.format(
+                                self.__config['orders'][i]['domains'])
+                            writeLog(msg)
                             continue
 
                     # 加入到续签订单
