@@ -105,6 +105,8 @@ docker run -itd --name mw-server --privileged=true -p 7200:7200 -p 80:80 -p 443:
 yum install -y libargon2-devel
 apt install -y libargon2-dev
 
+OP防火墙 - 重载即可
+
 * 增加PHP83。
 * 面板日志单独为一页并加入日志审计功能。
 * 修复webssh服务器读取问题。
