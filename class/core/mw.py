@@ -2106,15 +2106,15 @@ done
 
 
 def echoStart(tag):
-    print("=" * 90)
+    print("=" * 89)
     print("★开始{}[{}]".format(tag, formatDate()))
-    print("=" * 90)
+    print("=" * 89)
 
 
 def echoEnd(tag):
-    print("=" * 90)
+    print("=" * 89)
     print("☆{}完成[{}]".format(tag, formatDate()))
-    print("=" * 90)
+    print("=" * 89)
     print("\n")
 
 
