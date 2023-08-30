@@ -87,7 +87,7 @@ class backupTools:
         pid = mw.M('databases').dbPos(db_path, db_name).where(
             'name=?', (name,)).getField('id')
 
-        mw.M('backup').add('type,name,pid,filename,addtime,size', (1, os.path.basename(
+        mw.M('backup').add('type,name,pid,filename,addtime,size', (3, os.path.basename(
             filename), pid, filename, endDate, os.path.getsize(filename)))
         log = "数据库[" + name + "]备份成功,用时[" + str(round(outTime, 2)) + "]秒"
         mw.writeLog('计划任务', log)
@@ -97,7 +97,7 @@ class backupTools:
 
         # 清理多余备份
         backups = mw.M('backup').where(
-            'type=? and pid=?', ('1', pid)).field('id,filename').select()
+            'type=? and pid=?', ('3', pid)).field('id,filename').select()
 
         num = len(backups) - int(count)
         if num > 0:
