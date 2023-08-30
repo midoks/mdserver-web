@@ -17,6 +17,14 @@
 
 # http://localhost/?code=M.C106_BAY.2.3e12c859-6107-0c5b-9ef4-14b3fb8269ba&state=JzHdzHXmA7x6zl7Be6cJ6uOlf9Bg69
 
+
+# python3 /Users/midoks/Desktop/mwdev/server/mdserver-web/plugins/msonedrive/index.py site t1.cn 3
+# python3 /Users/midoks/Desktop/mwdev/server/mdserver-web/plugins/msonedrive/index.py database t1 3
+# python3
+# /Users/midoks/Desktop/mwdev/server/mdserver-web/plugins/msonedrive/index.py
+# path /Users/midoks/Desktop/dev/python 3
+
+
 import sys
 import io
 import os
