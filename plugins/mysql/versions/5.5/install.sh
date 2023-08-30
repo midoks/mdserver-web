@@ -66,6 +66,15 @@ Install_mysql()
 		 cd ${mysqlDir} && tar -zxvf  ${mysqlDir}/mysql-5.5.62.tar.gz
 	fi
 	
+	WHERE_DIR_GCC=/usr/bin/gcc
+	WHERE_DIR_GPP=/usr/bin/g++
+	if [ ! -f $WHERE_DIR_GCC ];then
+		WHERE_DIR_GCC=`which gcc`
+	fi
+
+	if [ ! -f $WHERE_DIR_GPP ];then
+		WHERE_DIR_GPP=`which g++`
+	fi
 
 	if [ ! -d $serverPath/mysql ];then
 		cd ${mysqlDir}/mysql-5.5.62 && cmake \
@@ -81,8 +90,8 @@ Install_mysql()
 		-DEXTRA_CHARSETS=all \
 		-DDEFAULT_CHARSET=utf8mb4 \
 		-DDEFAULT_COLLATION=utf8mb4_general_ci \
-		-DCMAKE_C_COMPILER=/usr/bin/gcc \
-		-DCMAKE_CXX_COMPILER=/usr/bin/g++
+		-DCMAKE_C_COMPILER=$WHERE_DIR_GCC \
+		-DCMAKE_CXX_COMPILER=$WHERE_DIR_GPP
 		make -j${cpuCore} && make install && make clean
 
 		if [ -d $serverPath/mysql ];then

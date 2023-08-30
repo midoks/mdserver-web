@@ -12,8 +12,6 @@ import shutil
 # sys.setdefaultencoding('utf8')
 
 sys.path.append(os.getcwd() + "/class/core")
-# sys.path.append("/usr/local/lib/python3.6/site-packages")
-
 import mw
 
 if mw.isAppleSystem():
@@ -40,8 +38,12 @@ def getServerDir():
 
 
 def getInitDFile(version):
-    if app_debug:
+    current_os = mw.getOs()
+    if current_os == 'darwin':
         return '/tmp/' + getPluginName()
+
+    if current_os.startswith('freebsd'):
+        return '/etc/rc.d/' + getPluginName()
     return '/etc/init.d/' + getPluginName() + version
 
 
@@ -52,13 +54,16 @@ def getArgs():
 
     if args_len == 1:
         t = args[0].strip('{').strip('}')
-        t = t.split(':')
+        if t.strip() == '':
+            tmp = []
+        else:
+            t = t.split(':', 1)
+            tmp[t[0]] = t[1]
         tmp[t[0]] = t[1]
     elif args_len > 1:
         for i in range(len(args)):
             t = args[i].split(':')
             tmp[t[0]] = t[1]
-
     return tmp
 
 
@@ -80,7 +85,7 @@ def getFpmConfFile(version):
 
 def status_progress(version):
     # ps -ef|grep 'php/81' |grep -v grep | grep -v python | awk '{print $2}
-    cmd = "ps -ef|grep 'php/" + version + \
+    cmd = "ps aux|grep 'php/" + version + \
         "' |grep -v grep | grep -v python | awk '{print $2}'"
     data = mw.execShell(cmd)
     if data[0] == '':
@@ -147,7 +152,7 @@ def contentReplace(content, version):
 
 def makeOpenrestyConf():
     phpversions = ['00', '52', '53', '54', '55', '56',
-                   '70', '71', '72', '73', '74', '80', '81', '82']
+                   '70', '71', '72', '73', '74', '80', '81', '82', '83']
 
     sdir = mw.getServerDir()
 
@@ -277,11 +282,11 @@ def initReplace(version):
     # systemd
     systemDir = mw.systemdCfgDir()
     systemService = systemDir + '/php' + version + '.service'
-    systemServiceTpl = getPluginDir() + '/init.d/php.service.tpl'
-    if version == '52':
-        systemServiceTpl = getPluginDir() + '/init.d/php.service.52.tpl'
 
     if os.path.exists(systemDir) and not os.path.exists(systemService):
+        systemServiceTpl = getPluginDir() + '/init.d/php.service.tpl'
+        if version == '52':
+            systemServiceTpl = getPluginDir() + '/init.d/php.service.52.tpl'
         service_path = mw.getServerDir()
         se_content = mw.readFile(systemServiceTpl)
         se_content = se_content.replace('{$VERSION}', version)
@@ -295,16 +300,23 @@ def initReplace(version):
 def phpOp(version, method):
     file = initReplace(version)
 
-    if not mw.isAppleSystem():
-        if method == 'stop' or method == 'restart':
-            mw.execShell(file + ' ' + 'stop')
-
-        data = mw.execShell('systemctl ' + method + ' php' + version)
+    current_os = mw.getOs()
+    if current_os == "darwin":
+        data = mw.execShell(file + ' ' + method)
         if data[1] == '':
             return 'ok'
         return data[1]
 
-    data = mw.execShell(file + ' ' + method)
+    if current_os.startswith("freebsd"):
+        data = mw.execShell('service php' + version + ' ' + method)
+        if data[1] == '':
+            return 'ok'
+        return data[1]
+
+    if method == 'stop' or method == 'restart':
+        mw.execShell(file + ' ' + 'stop')
+
+    data = mw.execShell('systemctl ' + method + ' php' + version)
     if data[1] == '':
         return 'ok'
     return data[1]
@@ -336,8 +348,14 @@ def reload(version):
 
 
 def initdStatus(version):
-    if mw.isAppleSystem():
+    current_os = mw.getOs()
+    if current_os == 'darwin':
         return "Apple Computer does not support"
+
+    if current_os.startswith('freebsd'):
+        initd_bin = getInitDFile(version)
+        if os.path.exists(initd_bin):
+            return 'ok'
 
     shell_cmd = 'systemctl status php' + version + ' | grep loaded | grep "enabled;"'
     data = mw.execShell(shell_cmd)
@@ -347,16 +365,31 @@ def initdStatus(version):
 
 
 def initdInstall(version):
-    if mw.isAppleSystem():
+    current_os = mw.getOs()
+    if current_os == 'darwin':
         return "Apple Computer does not support"
+
+    if current_os.startswith('freebsd'):
+        import shutil
+        source_bin = initReplace(version)
+        initd_bin = getInitDFile(version)
+        shutil.copyfile(source_bin, initd_bin)
+        mw.execShell('chmod +x ' + initd_bin)
+        return 'ok'
 
     mw.execShell('systemctl enable php' + version)
     return 'ok'
 
 
 def initdUinstall(version):
-    if mw.isAppleSystem():
+    current_os = mw.getOs()
+    if current_os == 'darwin':
         return "Apple Computer does not support"
+
+    if current_os.startswith('freebsd'):
+        initd_bin = getInitDFile(version)
+        os.remove(initd_bin)
+        return 'ok'
 
     mw.execShell('systemctl disable php' + version)
     return 'ok'
@@ -857,7 +890,7 @@ def get_php_info(args):
     return getPhpinfo(args['version'])
 
 
-def getLibConf(version):
+def libConfCommon(version):
     fname = getConf(version)
     if not os.path.exists(fname):
         return mw.returnJson(False, '指定PHP版本不存在!')
@@ -886,6 +919,17 @@ def getLibConf(version):
         else:
             lib['status'] = True
         libs.append(lib)
+    return libs
+
+
+def get_lib_conf(data):
+    libs = libConfCommon(data['version'])
+    # print(libs)
+    return mw.returnData(True, 'OK!', libs)
+
+
+def getLibConf(version):
+    libs = libConfCommon(version)
     return mw.returnJson(True, 'OK!', libs)
 
 

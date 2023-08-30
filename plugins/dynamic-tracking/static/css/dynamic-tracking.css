@@ -1,0 +1,75 @@
+.screen-all {
+	padding: 5px;
+}
+
+.s-right .panel-default{
+	margin-bottom: 10px;
+}
+
+.s-left .panel-default{
+	margin-bottom: 10px;
+}
+
+
+.data-collect {
+    width: 45px;
+    height: 30px;
+    border: 0;
+    cursor: pointer;
+    margin-right: 2px;
+    margin-top: 10px;
+    color: #fff;
+    background-color: #20a53a;
+    border-color: #20a53a;
+}
+
+
+#file_list .list {
+  list-style: none;
+  border-top: none;
+  border: 1px solid #ececec;
+  overflow-y: auto;
+}
+
+#file_list .list li.active {
+    background-color: #f2f2f2;
+}
+
+#file_list .tab-con{
+	padding: 0px;
+	margin-top: 10px;
+}
+
+#file_list .list li>span {
+    vertical-align: top;
+    display: inline-block;
+}
+
+#file_list .list li {
+  display: inline-block;
+  height: 38px;
+  line-height: 38px;
+  color: #444;
+  border-bottom: 1px solid #ececec;
+  font-size: 13px;
+  cursor: pointer;
+  position: relative;
+  width: 100%;
+}
+
+#file_list .file  {
+  padding-left: 10px;
+}
+
+#file_list .list li .tootls{
+    width: 70px;
+    text-align: right;
+    padding-right: 10px;
+    /* display: none; */
+    position: absolute;
+    right: 5px;
+}
+
+/*.tab-con .tab-block.on {
+  display: inline-block;
+}*/

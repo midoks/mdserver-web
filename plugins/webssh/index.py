@@ -113,7 +113,7 @@ class App():
 
     def getSshInfo(self, file):
         rdata = mw.readFile(file)
-        destr = mw.enDoubleCrypt('mdserver-web', rdata)
+        destr = mw.deDoubleCrypt('mdserver-web', rdata)
         return json.loads(destr)
 
     def get_server_by_host(self):
@@ -150,15 +150,19 @@ class App():
                 info_file = self.__host_dir + '/' + name + '/info.json'
                 if not os.path.exists(info_file):
                     continue
+
+                host_info = {}
                 try:
                     info_tmp = self.getSshInfo(info_file)
-                    host_info = {}
+
                     host_info['host'] = name
                     host_info['port'] = info_tmp['port']
                     host_info['ps'] = info_tmp['ps']
                     # host_info['sort'] = int(info_tmp['sort'])
                 except Exception as e:
-                    print(e)
+                    # print(e)
+                    return mw.returnJson(False, str(e))
+
                     # if os.path.exists(info_file):
                     #     os.remove(info_file)
                     # continue

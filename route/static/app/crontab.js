@@ -33,7 +33,7 @@ function getLogs(id){
 
 function getBackupName(hook_data, name){
 	for (var i = 0; i < hook_data.length; i++) {
-		if (hook_data[i]['name'] == 'backup_ftp'){
+		if (hook_data[i]['name'] == name){
 			return hook_data[i]['title'];
 		}
 	}

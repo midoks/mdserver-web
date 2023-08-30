@@ -27,8 +27,13 @@ def getServerDir():
 
 
 def getInitDFile():
-    if app_debug:
+    current_os = mw.getOs()
+    if current_os == 'darwin':
         return '/tmp/' + getPluginName()
+
+    if current_os.startswith('freebsd'):
+        return '/etc/rc.d/' + getPluginName()
+
     return '/etc/init.d/' + getPluginName()
 
 
@@ -69,7 +74,7 @@ def getArgs():
 
 def status():
     data = mw.execShell(
-        "ps -ef|grep redis |grep -v grep | grep -v python | grep -v mdserver-web | awk '{print $2}'")
+        "ps aux|grep redis |grep -v grep | grep -v python | grep -v mdserver-web | awk '{print $2}'")
 
     if data[0] == '':
         return 'stop'
@@ -113,8 +118,8 @@ def initDreplace():
     # systemd
     systemDir = mw.systemdCfgDir()
     systemService = systemDir + '/redis.service'
-    systemServiceTpl = getPluginDir() + '/init.d/redis.service.tpl'
     if os.path.exists(systemDir) and not os.path.exists(systemService):
+        systemServiceTpl = getPluginDir() + '/init.d/redis.service.tpl'
         service_path = mw.getServerDir()
         se_content = mw.readFile(systemServiceTpl)
         se_content = se_content.replace('{$SERVER_PATH}', service_path)
@@ -127,16 +132,23 @@ def initDreplace():
 def redisOp(method):
     file = initDreplace()
 
-    if not mw.isAppleSystem():
-        data = mw.execShell('systemctl ' + method + ' redis')
+    current_os = mw.getOs()
+    if current_os == "darwin":
+        data = mw.execShell(file + ' ' + method)
         if data[1] == '':
             return 'ok'
         return data[1]
 
-    data = mw.execShell(file + ' start')
+    if current_os.startswith("freebsd"):
+        data = mw.execShell('service ' + getPluginName() + ' ' + method)
+        if data[1] == '':
+            return 'ok'
+        return data[1]
+
+    data = mw.execShell('systemctl ' + method + ' redis')
     if data[1] == '':
         return 'ok'
-    return 'fail'
+    return data[1]
 
 
 def start():
@@ -211,8 +223,14 @@ def runInfo():
 
 
 def initdStatus():
-    if mw.isAppleSystem():
+    current_os = mw.getOs()
+    if current_os == 'darwin':
         return "Apple Computer does not support"
+
+    if current_os.startswith('freebsd'):
+        initd_bin = getInitDFile()
+        if os.path.exists(initd_bin):
+            return 'ok'
 
     shell_cmd = 'systemctl status ' + \
         getPluginName() + ' | grep loaded | grep "enabled;"'
@@ -223,16 +241,34 @@ def initdStatus():
 
 
 def initdInstall():
-    if mw.isAppleSystem():
+    current_os = mw.getOs()
+    if current_os == 'darwin':
         return "Apple Computer does not support"
+
+    # freebsd initd install
+    if current_os.startswith('freebsd'):
+        import shutil
+        source_bin = initDreplace()
+        initd_bin = getInitDFile()
+        shutil.copyfile(source_bin, initd_bin)
+        mw.execShell('chmod +x ' + initd_bin)
+        mw.execShell('sysrc ' + getPluginName() + '_enable="YES"')
+        return 'ok'
 
     mw.execShell('systemctl enable ' + getPluginName())
     return 'ok'
 
 
 def initdUinstall():
-    if mw.isAppleSystem():
+    current_os = mw.getOs()
+    if current_os == 'darwin':
         return "Apple Computer does not support"
+
+    if current_os.startswith('freebsd'):
+        initd_bin = getInitDFile()
+        os.remove(initd_bin)
+        mw.execShell('sysrc ' + getPluginName() + '_enable="NO"')
+        return 'ok'
 
     mw.execShell('systemctl disable ' + getPluginName())
     return 'ok'

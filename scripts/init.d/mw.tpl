@@ -22,6 +22,9 @@ PATH=$PATH:$mw_path/bin
 
 if [ -f $mw_path/bin/activate ];then
     source $mw_path/bin/activate
+    if [ "$?" != "0" ];then
+        echo "load local python env fail!"
+    fi
 fi
 
 mw_start_panel()
@@ -106,16 +109,20 @@ mw_stop_task()
 mw_stop_panel()
 {
     echo -e "stopping mw-panel... \c";
+
+    pidfile=${mw_path}/logs/mw.pid
+    if [ -f $pidfile ];then
+        pid=`cat $pidfile`
+        kill -9 $pid > /dev/null 2>&1
+        rm -f $pidfile
+    fi
+
     arr=`ps aux|grep 'gunicorn -c setting.py app:app'|grep -v grep|awk '{print $2}'`
     for p in ${arr[@]}
     do
         kill -9 $p > /dev/null 2>&1
     done
     
-    pidfile=${mw_path}/logs/mw.pid
-    if [ -f $pidfile ];then
-        rm -f $pidfile
-    fi
     echo -e "\033[32mdone\033[0m"
 }
 

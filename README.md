@@ -100,12 +100,20 @@ docker run -itd --name mw-server --privileged=true -p 7200:7200 -p 80:80 -p 443:
 ```
 
 
-### 版本更新 0.15.4
+### 版本更新 0.16.0
 
-* OP防火墙-验证优化[cf缓存问题解决]。
-* OP防火墙-加入地区限制(最好卸载重装)。
-* 在aarch64架构下低于PHP70的版本[安装/扩展安装]优化。
-* Mongodb安装优化。
+yum install -y libargon2-devel
+apt install -y libargon2-dev
+
+OP防火墙 - 重载即可
+
+* 增加PHP83。
+* 面板日志单独为一页并加入日志审计功能。
+* 修复webssh服务器读取问题。
+* 站点批量删除修复。
+* OP防火墙-修复`自动强制验证`关闭不生效。
+* 新增OneDrive备份插件。
+* FTP备份优化。
 
 ### JSDelivr安装地址
 

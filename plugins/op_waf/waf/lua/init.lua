@@ -309,13 +309,15 @@ local function is_open_waf_cc_increase()
     end
 
     -- C:D("waf config:"..json.encode(config))
-    if cpu_percent >= config['safe_verify']['cpu'] then
-        return true
-    end
-
-    if site_config[server_name] and site_config[server_name]['safe_verify']['open'] then
-        if cpu_percent >= site_config[server_name]['safe_verify']['cpu'] then
+    if config['safe_verify']['auto'] then
+        if cpu_percent >= config['safe_verify']['cpu'] then
             return true
+        end
+
+        if site_config[server_name] and site_config[server_name]['safe_verify']['open'] then
+            if cpu_percent >= site_config[server_name]['safe_verify']['cpu'] then
+                return true
+            end
         end
     end
 

@@ -7,6 +7,10 @@ MDIR=$(dirname "$DIR")
 PATH=$PATH:$DIR/bin
 if [ -f bin/activate ];then
 	source bin/activate
+
+	if [ "$?" != "0" ];then
+		echo "load local python env fail!"
+	fi
 fi
 
 export LC_ALL="en_US.UTF-8"

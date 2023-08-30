@@ -178,12 +178,6 @@ class firewall_api:
         limit = request.form.get('limit', '10').strip()
         return self.getList(int(p), int(limit))
 
-    def getLogListApi(self):
-        p = request.form.get('p', '1').strip()
-        limit = request.form.get('limit', '10').strip()
-        search = request.form.get('search', '').strip()
-        return self.getLogList(int(p), int(limit), search)
-
     def getSshInfoApi(self):
         data = {}
 
@@ -389,11 +383,6 @@ class firewall_api:
 
         return mw.returnData(True, '设置成功!')
 
-    def delPanelLogsApi(self):
-        mw.M('logs').where('id>?', (0,)).delete()
-        mw.writeLog('面板设置', '面板操作日志已清空!')
-        return mw.returnJson(True, '面板操作日志已清空!')
-
     ##### ----- start ----- ###
 
     def getList(self, page, limit):
@@ -409,28 +398,6 @@ class firewall_api:
         _page = {}
         _page['count'] = count
         _page['tojs'] = 'showAccept'
-        _page['p'] = page
-
-        data['page'] = mw.getPage(_page)
-        return mw.getJson(data)
-
-    def getLogList(self, page, limit, search=''):
-        find_search = ''
-        if search != '':
-            find_search = "type like '%" + search + "%' or log like '%" + \
-                search + "%' or addtime like '%" + search + "%'"
-
-        start = (page - 1) * limit
-
-        _list = mw.M('logs').where(find_search, ()).field(
-            'id,type,log,addtime').limit(str(start) + ',' + str(limit)).order('id desc').select()
-        data = {}
-        data['data'] = _list
-
-        count = mw.M('logs').where(find_search, ()).count()
-        _page = {}
-        _page['count'] = count
-        _page['tojs'] = 'getLogs'
         _page['p'] = page
 
         data['page'] = mw.getPage(_page)

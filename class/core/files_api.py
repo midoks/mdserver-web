@@ -64,8 +64,13 @@ class files_api:
         filename = request.args.get('filename', '')
         if not os.path.exists(filename):
             return ''
+
+        is_attachment = True
+        if filename.endswith(".svg"):
+            is_attachment = False
+
         response = make_response(send_from_directory(
-            os.path.dirname(filename), os.path.basename(filename), as_attachment=True))
+            os.path.dirname(filename), os.path.basename(filename), as_attachment=is_attachment))
         return response
 
     def zipApi(self):
@@ -708,10 +713,7 @@ class files_api:
         return not path in nDirs
 
     def getDirSize(self, path):
-        if mw.isAppleSystem():
-            tmp = mw.execShell('du -sh ' + path)
-        else:
-            tmp = mw.execShell('du -sbh ' + path)
+        tmp = mw.execShell('du -sh ' + path)
         return tmp
 
     def checkFileName(self, filename):

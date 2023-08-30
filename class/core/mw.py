@@ -1356,6 +1356,12 @@ def getCpuType():
         cpuinfo = execShell(cmd)
         return cpuinfo[0].strip()
 
+    current_os = getOs()
+    if current_os.startswith('freebsd'):
+        cmd = "sysctl -a | egrep -i 'hw.model' | awk -F ':' '{print $2}'"
+        cpuinfo = execShell(cmd)
+        return cpuinfo[0].strip()
+
     # 取CPU类型
     cpuinfo = open('/proc/cpuinfo', 'r').read()
     rep = "model\s+name\s+:\s+(.+)"
@@ -1412,7 +1418,7 @@ def makeConf():
     file = getRunDir() + '/data/json/config.json'
     if not os.path.exists(file):
         c = {}
-        c['title'] = '金灵面板'
+        c['title'] = '老子面板'
         c['home'] = 'http://github/midoks/mdserver-web'
         c['recycle_bin'] = True
         c['template'] = 'default'
@@ -2100,15 +2106,15 @@ done
 
 
 def echoStart(tag):
-    print("=" * 90)
+    print("=" * 89)
     print("★开始{}[{}]".format(tag, formatDate()))
-    print("=" * 90)
+    print("=" * 89)
 
 
 def echoEnd(tag):
-    print("=" * 90)
+    print("=" * 89)
     print("☆{}完成[{}]".format(tag, formatDate()))
-    print("=" * 90)
+    print("=" * 89)
     print("\n")
 
 

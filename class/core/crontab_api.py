@@ -602,20 +602,22 @@ echo "--------------------------------------------------------------------------
 
     # 将Shell脚本写到文件
     def writeShell(self, config):
-        u_file = '/var/spool/cron/crontabs/root'
-        if not os.path.exists(u_file):
+        file = '/var/spool/cron/crontabs/root'
+        current_os = mw.getOs()
+        if current_os == 'darwin':
+            file = '/etc/crontab'
+        elif current_os.startswith("freebsd"):
+            file = '/var/cron/tabs/root'
+
+        if not os.path.exists(file):
             file = '/var/spool/cron/root'
-            if mw.isAppleSystem():
-                file = '/etc/crontab'
-        else:
-            file = u_file
 
         if not os.path.exists(file):
             mw.writeFile(file, '')
         conf = mw.readFile(file)
         conf += str(config) + "\n"
         if mw.writeFile(file, conf):
-            if not os.path.exists(u_file):
+            if not os.path.exists(file):
                 mw.execShell("chmod 600 '" + file +
                              "' && chown root.root " + file)
             else:

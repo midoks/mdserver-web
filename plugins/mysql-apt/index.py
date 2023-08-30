@@ -55,19 +55,20 @@ def is_number(s):
 
 def getArgs():
     args = sys.argv[2:]
-
     tmp = {}
     args_len = len(args)
-
     if args_len == 1:
         t = args[0].strip('{').strip('}')
-        t = t.split(':')
+        if t.strip() == '':
+            tmp = []
+        else:
+            t = t.split(':', 1)
+            tmp[t[0]] = t[1]
         tmp[t[0]] = t[1]
     elif args_len > 1:
         for i in range(len(args)):
-            t = args[i].split(':')
+            t = args[i].split(':', 1)
             tmp[t[0]] = t[1]
-
     return tmp
 
 
@@ -2195,40 +2196,10 @@ def updateSlaveSSH(version=''):
 
 
 def getSlaveList(version=''):
-
     db = pMysqlDb()
     dlist = db.query('show slave status')
-    ret = []
-    for x in range(0, len(dlist)):
-        tmp = {}
-        tmp['Master_User'] = dlist[x]["Master_User"]
-        tmp['Master_Host'] = dlist[x]["Master_Host"]
-        tmp['Master_Port'] = dlist[x]["Master_Port"]
-        tmp['Master_Log_File'] = dlist[x]["Master_Log_File"]
-        tmp['Slave_IO_Running'] = dlist[x]["Slave_IO_Running"]
-        tmp['Slave_SQL_Running'] = dlist[x]["Slave_SQL_Running"]
-        tmp['Last_Error'] = dlist[x]["Last_Error"]
-        tmp['Last_IO_Error'] = dlist[x]["Last_IO_Error"]
-        tmp['Last_SQL_Error'] = dlist[x]["Last_SQL_Error"]
-        tmp['Slave_SQL_Running_State'] = dlist[x]["Slave_SQL_Running_State"]
-
-        tmp['Error'] = ''
-        if tmp['Last_Error'] != '':
-            tmp['Error'] = tmp['Last_Error']
-
-        if tmp['Last_IO_Error'] != '':
-            tmp['Error'] = tmp['Last_IO_Error']
-
-        if tmp['Last_SQL_Error'] != '':
-            tmp['Error'] = tmp['Last_SQL_Error']
-
-        if tmp['Error'] == '':
-            tmp['Error'] = tmp['Slave_SQL_Running_State']
-
-        ret.append(tmp)
     data = {}
-    data['data'] = ret
-
+    data['data'] = dlist
     return mw.getJson(data)
 
 
@@ -2751,8 +2722,8 @@ def installPreInspection(version):
     if not sysName in ('debian', 'ubuntu'):
         return '仅支持debian,ubuntu'
 
-    if (sysName == 'debian' and not sysId in('11', '10')):
-        return 'debian支持10,11'
+    if (sysName == 'debian' and not sysId in('12', '11', '10')):
+        return 'debian支持10,11,12'
 
     if (sysName == 'ubuntu' and version == '5.7' and not sysId in ('18.04')):
         return "Ubuntu Apt MySQL[" + version + "] 仅支持18.04"

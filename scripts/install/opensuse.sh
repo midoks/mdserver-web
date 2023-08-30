@@ -49,6 +49,7 @@ zypper install -y libtomcrypt-devel
 
 zypper install -y libXpm-devel
 zypper install -y freetype2-devel
+zypper install -y libargon2-devel
 
 # zypper install -y  php-config
 

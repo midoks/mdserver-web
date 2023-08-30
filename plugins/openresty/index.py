@@ -11,9 +11,7 @@ import re
 sys.path.append(os.getcwd() + "/class/core")
 import mw
 
-
 app_debug = False
-
 if mw.isAppleSystem():
     app_debug = True
 
@@ -31,8 +29,13 @@ def getServerDir():
 
 
 def getInitDFile():
-    if app_debug:
+    current_os = mw.getOs()
+    if current_os == 'darwin':
         return '/tmp/' + getPluginName()
+
+    if current_os.startswith('freebsd'):
+        return '/etc/rc.d/' + getPluginName()
+
     return '/etc/init.d/' + getPluginName()
 
 
@@ -95,6 +98,14 @@ def getInitDTpl():
     return path
 
 
+def getPidFile():
+    file = getConf()
+    content = mw.readFile(file)
+    rep = 'pid\s*(.*);'
+    tmp = re.search(rep, content)
+    return tmp.groups()[0].strip()
+
+
 def getFileOwner(filename):
     import pwd
     stat = os.lstat(filename)
@@ -118,12 +129,15 @@ def confReplace():
     user = 'www'
     user_group = 'www'
 
-    if mw.getOs() == 'darwin':
+    current_os = mw.getOs()
+    if current_os == 'darwin':
         # macosx do
         user = mw.execShell(
             "who | sed -n '2, 1p' |awk '{print $1}'")[0].strip()
         # user = 'root'
         user_group = 'staff'
+        content = content.replace('{$EVENT_MODEL}', 'kqueue')
+    elif current_os.startswith('freebsd'):
         content = content.replace('{$EVENT_MODEL}', 'kqueue')
     else:
         content = content.replace('{$EVENT_MODEL}', 'epoll')
@@ -222,8 +236,8 @@ def initDreplace():
     # /usr/lib/systemd/system
     systemDir = mw.systemdCfgDir()
     systemService = systemDir + '/openresty.service'
-    systemServiceTpl = getPluginDir() + '/init.d/openresty.service.tpl'
     if os.path.exists(systemDir) and not os.path.exists(systemService):
+        systemServiceTpl = getPluginDir() + '/init.d/openresty.service.tpl'
         se_content = mw.readFile(systemServiceTpl)
         se_content = se_content.replace('{$SERVER_PATH}', service_path)
         mw.writeFile(systemService, se_content)
@@ -233,9 +247,8 @@ def initDreplace():
 
 
 def status():
-    data = mw.execShell(
-        "ps -ef|grep openresty |grep -v grep | grep -v python | awk '{print $2}'")
-    if data[0] == '':
+    pid_file = getPidFile()
+    if not os.path.exists(pid_file):
         return 'stop'
     return 'start'
 
@@ -249,20 +262,33 @@ def restyOp(method):
     if not check_data[1].find('test is successful') > -1:
         return check_data[1]
 
-    if not mw.isAppleSystem():
-        data = mw.execShell('systemctl ' + method + ' openresty')
+    current_os = mw.getOs()
+    if current_os == "darwin":
+        data = mw.execShell(file + ' ' + method)
         if data[1] == '':
             return 'ok'
         return data[1]
 
-    data = mw.execShell(file + ' ' + method)
+    if current_os.startswith("freebsd"):
+        data = mw.execShell('service openresty ' + method)
+        if data[1] == '':
+            return 'ok'
+        return data[1]
+
+    data = mw.execShell('systemctl ' + method + ' openresty')
     if data[1] == '':
         return 'ok'
     return data[1]
 
 
 def op_submit_systemctl_restart():
+    current_os = mw.getOs()
+    if current_os.startswith("freebsd"):
+        mw.execShell('service openresty restart')
+        return True
+
     mw.execShell('systemctl restart openresty')
+    return True
 
 
 def op_submit_init_restart(file):
@@ -280,11 +306,9 @@ def restyOp_restart():
 
     if not mw.isAppleSystem():
         threading.Timer(2, op_submit_systemctl_restart, args=()).start()
-        # submit_restart1()
         return 'ok'
 
     threading.Timer(2, op_submit_init_restart, args=(file,)).start()
-    # submit_restart2(file)
     return 'ok'
 
 
@@ -293,7 +317,11 @@ def start():
 
 
 def stop():
-    return restyOp('stop')
+    r = restyOp('stop')
+    pid_file = getPidFile()
+    if os.path.exists(pid_file):
+        os.remove(pid_file)
+    return r
 
 
 def restart():
@@ -306,9 +334,14 @@ def reload():
 
 
 def initdStatus():
-
-    if mw.isAppleSystem():
+    current_os = mw.getOs()
+    if current_os == 'darwin':
         return "Apple Computer does not support"
+
+    if current_os.startswith('freebsd'):
+        initd_bin = getInitDFile()
+        if os.path.exists(initd_bin):
+            return 'ok'
 
     shell_cmd = 'systemctl status openresty | grep loaded | grep "enabled;"'
     data = mw.execShell(shell_cmd)
@@ -318,16 +351,34 @@ def initdStatus():
 
 
 def initdInstall():
-    if mw.isAppleSystem():
+    current_os = mw.getOs()
+    if current_os == 'darwin':
         return "Apple Computer does not support"
+
+    # freebsd initd install
+    if current_os.startswith('freebsd'):
+        import shutil
+        source_bin = initDreplace()
+        initd_bin = getInitDFile()
+        shutil.copyfile(source_bin, initd_bin)
+        mw.execShell('chmod +x ' + initd_bin)
+        mw.execShell('sysrc ' + getPluginName() + '_enable="YES"')
+        return 'ok'
 
     mw.execShell('systemctl enable openresty')
     return 'ok'
 
 
 def initdUinstall():
-    if mw.isAppleSystem():
+    current_os = mw.getOs()
+    if current_os == 'darwin':
         return "Apple Computer does not support"
+
+    if current_os.startswith('freebsd'):
+        initd_bin = getInitDFile()
+        os.remove(initd_bin)
+        mw.execShell('sysrc ' + getPluginName() + '_enable="NO"')
+        return 'ok'
 
     mw.execShell('systemctl disable openresty')
     return 'ok'

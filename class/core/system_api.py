@@ -274,26 +274,43 @@ class system_api:
         return title
 
     def getSystemVersion(self):
+        #
         # 取操作系统版本
-        if mw.getOs() == 'darwin':
+        current_os = mw.getOs()
+        # mac
+        if current_os == 'darwin':
             data = mw.execShell('sw_vers')[0]
             data_list = data.strip().split("\n")
             mac_version = ''
             for x in data_list:
                 mac_version += x.split("\t")[1] + ' '
-            return mac_version
+
+            arch_ver = mw.execShell("arch")
+            return mac_version + " (" + arch_ver[0].strip() + ")"
+
+        # freebsd
+        if current_os.startswith('freebsd'):
+            version = mw.execShell(
+                "cat /etc/*-release | grep PRETTY_NAME | awk -F = '{print $2}' | awk -F '\"' '{print $2}'")
+            arch_ver = mw.execShell(
+                "sysctl -a | egrep -i 'hw.machine_arch' | awk -F ':' '{print $2}'")
+            return version[0].strip() + " (" + arch_ver[0].strip() + ")"
 
         redhat_series = '/etc/redhat-release'
         if os.path.exists(redhat_series):
             version = mw.readFile('/etc/redhat-release')
             version = version.replace('release ', '').strip()
-            return version
+
+            arch_ver = mw.execShell("arch")
+            return version + " (" + arch_ver[0].strip() + ")"
 
         os_series = '/etc/os-release'
         if os.path.exists(os_series):
             version = mw.execShell(
                 "cat /etc/*-release | grep PRETTY_NAME | awk -F = '{print $2}' | awk -F '\"' '{print $2}'")
-            return version[0].strip()
+
+            arch_ver = mw.execShell("arch")
+            return version[0].strip() + " (" + arch_ver[0].strip() + ")"
 
         return '未识别系统信息'
 
@@ -318,7 +335,7 @@ class system_api:
         cpuCount = psutil.cpu_count()
         cpuLogicalNum = psutil.cpu_count(logical=False)
         used = psutil.cpu_percent(interval=interval)
-
+        cpuLogicalNum = 0
         if os.path.exists('/proc/cpuinfo'):
             c_tmp = mw.readFile('/proc/cpuinfo')
             d_tmp = re.findall("physical id.+", c_tmp)
