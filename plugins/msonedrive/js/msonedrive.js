@@ -114,7 +114,7 @@ function authApi(){
             shadeClose: false,
             content:apicon,
             success:function(layero,index){
-            	console.log(layero,index);
+            	// console.log(layero,index);
             	if (!rdata.status){
             		$('.check_api .step_two_url').val(rdata.data['auth_url']);
             		$('.check_api .open_btlink').attr('href',rdata.data['auth_url']);
