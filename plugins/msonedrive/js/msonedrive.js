@@ -209,7 +209,7 @@ function odList(path){
             }
             pathname += '/' + tmp[i];
             pathname = pathname.replace('//','/');
-            pathLi += '<li><a title="'+pathname+'" onclick="osList(\''+pathname+'\')">'+dirname+'</a></li>';
+            pathLi += '<li><a title="'+pathname+'" onclick="odList(\''+pathname+'\')">'+dirname+'</a></li>';
         }
         var um = 1;
         if(tmp[tmp.length-1] == '') um = 2;
