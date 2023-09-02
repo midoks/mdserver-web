@@ -51,7 +51,6 @@ class gdriveclient():
         self.__plugin_dir = plugin_dir
         self.__server_dir = server_dir
         self.set_creds()
-        # self.set_libList()
 
         # self.get_exclode()
 
@@ -96,7 +95,7 @@ class gdriveclient():
         flow = google_auth_oauthlib.flow.Flow.from_client_secrets_file(
             self.__plugin_dir + '/credentials.json',
             scopes=self.__scpos)
-        flow.redirect_uri = 'https://localhost'
+        # flow.redirect_uri = 'https://localhost'
         auth_url, state = flow.authorization_url(
             access_type='offline',
             prompt='consent',
@@ -112,7 +111,7 @@ class gdriveclient():
             self.__plugin_dir + '/credentials.json',
             scopes=self.__scpos,
             state=url.split('state=')[1].split('&code=')[0])
-        flow.redirect_uri = 'https://localhost'
+        # flow.redirect_uri = 'https://localhost'
         flow.fetch_token(authorization_response=url)
         credentials = flow.credentials
 
@@ -130,55 +129,6 @@ class gdriveclient():
         if not self.set_creds():
             return mw.returnJson(False, "验证失败，请根据页面1 2 3 步骤完成验证")
         return mw.returnJson(True, "验证成功")
-
-    def set_libList(self):
-        libList = public.readFile("/www/server/panel/data/libList.conf")
-        if libList:
-            libList = json.loads(libList)
-        for i in libList:
-            if "gdrive" in i.values():
-                return
-        d = {
-            "name": "Google Drive",
-            "type": "Cron job",
-            "ps": "Back up your website or database to Google Cloud Storage.",
-            "status": False,
-            "opt": "gdrive",
-            "module": "os",
-            "script": "gdrive",
-            "help": "http://forum.aapanel.com",
-            "key": "",
-            "secret": "",
-            "bucket": "",
-            "domain": "",
-            "check": ["/www/server/panel/plugin/gdrive/gdrive_main.py",
-                      "/www/server/panel/script/backup_gdrive.py"]
-        }
-        d1 = {
-            "name": "谷歌硬盘",
-            "type": "计划任务",
-            "ps": "将网站或数据库打包备份到谷歌硬盘.",
-            "status": False,
-            "opt": "gdrive",
-            "module": "os",
-            "script": "gdrive",
-            "help": "http://www.bt.cn/bbs",
-            "key": "",
-            "secret": "",
-            "bucket": "",
-            "domain": "",
-            "check": ["/www/server/panel/plugin/gdrive/gdrive_main.py",
-                      "/www/server/panel/script/backup_gdrive.py"]
-        }
-        language = public.readFile("/www/server/panel/config/config.json")
-        if "English" in language:
-            data = d
-        else:
-            data = d1
-        libList.append(data)
-        public.writeFile("/www/server/panel/data/libList.conf",
-                         json.dumps(libList))
-        return libList
 
     # 获取token
     def get_token(self, get):
@@ -391,7 +341,7 @@ class gdriveclient():
 
     def get_exclode(self, exclude=[]):
         if not exclude:
-            tmp_exclude = os.getenv('BT_EXCLUDE')
+            tmp_exclude = os.getenv('MW_EXCLUDE')
             if tmp_exclude:
                 exclude = tmp_exclude.split(',')
         if not exclude:
