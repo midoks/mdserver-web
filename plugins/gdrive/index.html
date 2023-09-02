@@ -1,0 +1,310 @@
+<style>
+.upyunCon {
+    height: 428px;
+}
+
+.up-place {
+    height: 62px;
+    border-bottom: 1px solid #ddd;
+}
+
+.up-place .btn {
+    border-radius: 0;
+}
+
+.up-place .place-input {
+    background-color: #f3f3f3;
+    border: 1px solid #ccc;
+    height: 30px;
+    line-height: 28px;
+    overflow: hidden;
+    margin: 1px 0 0 -1px;
+    width: 340px;
+}
+
+.place-input ul {
+    display: inline-block;
+    position: relative;
+    width: auto;
+}
+
+.place-input ul li {
+    background: url("/static/img/ico/ico-ltr.png") no-repeat right center;
+    float: left;
+    padding-left: 10px;
+    padding-right: 18px;
+}
+
+.place-input ul li a {
+    height: 28px;
+    cursor: pointer;
+    display: inline-block;
+}
+
+.upyunlist {
+    height: 516px;
+    overflow: auto;
+}
+
+.up-bottom {
+    background-color: #fafafa;
+    border-top: 1px solid #eee;
+    bottom: 0;
+    position: absolute;
+    width: 100%;
+}
+
+.up-use {
+    line-height: 50px
+}
+
+.list-list .cursor span {
+    line-height: 30px;
+}
+
+.btn-title {
+    margin-top: 1px
+}
+
+.tip {
+    font-size: 10px;
+    font-style: oblique;
+    color: green;
+}
+</style>
+<div class="upyunCon">
+    <div class="up-place pd15">
+        <button id="backBtn" class="btn btn-default btn-sm glyphicon glyphicon-arrow-left pull-left" title="后退"></button>
+        <input id="myPath" type="hidden" value="">
+        <input id="curPath" type="hidden" value="">
+        <div class="place-input pull-left">
+            <div style="width:1400px;height:28px"><ul></ul></div>
+        </div>
+        <button class="refreshBtn btn btn-default btn-sm glyphicon glyphicon-refresh pull-left mr20" title="刷新" style="margin-left:-1px;"></button>
+        <button class="btn btn-default btn-sm pull-right btn-title" onclick="authApi()">授权</button>
+        <button class="btn btn-default btn-sm pull-right mr20 btn-title" onclick="createDir()">新建文件夹</button>
+    </div>
+
+    <div class="upyunlist pd15">
+        <div class="divtable" style="margin-bottom:15px">
+            <table class="table table-hover">
+                <thead><tr><th>名称</th><th>大小</th><th>更新时间</th><th class="text-right">操作</th></tr></thead>
+                <tbody class="list-list"></tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<style type="text/css">
+.check_api {
+    padding: 20px;
+}
+
+.up-place {
+    height: 62px;
+    border-bottom: 1px solid #ddd;
+}
+
+.up-place .btn {
+    border-radius: 0;
+}
+
+.up-place .place-input {
+    background-color: #f3f3f3;
+    border: 1px solid #ccc;
+    height: 30px;
+    line-height: 28px;
+    overflow: hidden;
+    margin: 1px 0 0 -1px;
+    width: 340px;
+}
+
+.place-input ul {
+    display: inline-block;
+    position: relative;
+    width: auto;
+}
+
+.place-input ul li {
+    background: url("/static/img/ico/ico-ltr.png") no-repeat right center;
+    float: left;
+    padding-left: 10px;
+    padding-right: 18px;
+}
+
+.place-input ul li a {
+    height: 28px;
+    cursor: pointer;
+    display: inline-block;
+}
+
+.upyunlist {
+    height: 546px;
+    overflow: auto;
+}
+
+.up-bottom {
+    background-color: #fafafa;
+    border-top: 1px solid #eee;
+    bottom: 0;
+    position: absolute;
+    width: 100%;
+}
+
+.up-use {
+    line-height: 50px
+}
+
+.list-list .cursor span {
+    line-height: 30px;
+}
+
+.btn-title {
+    margin-top: 1px
+}
+
+.step_item{
+    clear: both;
+}
+
+.step_item .serial_box{
+    display: inline-block;
+    clear: both;
+}
+
+.step_item .serial{
+    width: 70px;
+    height: 30px;
+    line-height: 30px;
+    text-align: center;
+    display: inline-block;
+    float: left;
+}
+.step_item .serial span{
+    display: inline-block;
+    width: 30px;
+    height: 30px;
+    text-align: center;
+    line-height: 28px;
+    font-size: 11px;
+    border-radius: 50%;
+    color: #20a53a;
+    border: 2px solid #20a53a;
+}
+.step_item .serial_title{
+  margin-bottom: 10px;
+  font-size: 15px;
+  line-height: 30px;
+  color: #666;
+}
+.step_two_url{
+    display: inline-block;
+    overflow: hidden;
+    width: 380px;
+    /*text-overflow: ellipsis;*/
+    white-space: nowrap;
+    height: 35px;
+    line-height: 35px;
+    margin-right: 15px;
+    border-radius: 2px;
+    padding: 0 10px;
+    float: left;
+    width:360px;
+    padding-right: 35px;
+}
+.btn_btlink{
+    display: inline-block;
+    padding: 5px 10px;
+    font-size: 12px;
+    line-height: 1.5;
+    border-radius: 3px;
+    text-align: center;
+    white-space: nowrap;
+    vertical-align: middle;
+    cursor: pointer;
+    border: 1px solid #20a53a;
+    color: #fff;
+    background-color: #20a53a;
+    margin-right:10px;
+}
+.btn_btlink:hover{
+    color: #fff;
+    background-color: #10952a;
+    border-color: #398439;
+}
+.btn_btlink a:visited{
+    color: #fff;
+    background-color: #10952a;
+    border-color: #398439;
+}
+.view_video{
+    margin-bottom: 10px;
+}
+.view_video ul li{
+    line-height: 20px;
+    font-size: 13px;
+}
+.setp_one i{
+  position: absolute;
+  top: 8px;
+  left: 25px;
+  width: 30px;
+  height: 30px;
+}
+.google_drive{  
+    width:465px;
+    height:100px;
+    margin-bottom:10px;
+}
+</style>
+<script type="text/html" id="check_api">
+<div class="check_api">
+    <div class="step_two">
+        <div class="step_item">
+            <div class="serial"><span>1</span></div>
+            <div class="serial_box">
+                <div class="serial_title">阅读简易操作教程：如何获取Google Drive授权？</div>
+                <div class="serial_conter">
+                    <div class="view_video">
+                        <ul>
+                            <li>1. 点击下面第<div class="serial" style="float: none;width: 45px;"><span>2</span></div>步中的 打开授权链接。<li>
+                            <li>2. 在新窗口页面上登录Google Drive账号。阅读授权权限，并同意。<li>
+                            <li>3. 页面跳转后，将浏览器的地址栏地址复制到第<div class="serial" style="float: none;width: 45px;"><span>3</span></div>步的文本框中。<li>
+                            <li>4. 点击 获取授权，随即完成授权。<li>
+                        </ul>
+                    </div>
+                    <hr/>
+                </div>
+            </div>
+        </div>
+        <div class="step_item pb15">
+            <div class="serial"><span>2</span></div>
+            <div class="serial_box">
+                <div class="serial_title">操作1：👇打开授权链接，根据网页提示对插件进行授权。</div>
+                <div class="serial_conter step_two" style="width: 500px;">
+                    <input class="bt-input-text mr5 step_two_url" type="text" disabled>
+                    <span class="ico-copy mr10" data-copy="" style="vertical-align: middle;cursor: pointer;margin-left: -37px;margin-right: 20px;"></span>
+                    <a href="" class="btn_btlink open_btlink" target="_blank" style="padding: 7px 10px;">打开授权链接</a>
+                </div>
+                
+            </div>
+        </div>
+        <div class="step_item">
+            <div class="serial"><span>3</span></div>
+            <div class="serial_box">
+                <div class="serial_title">操作2：复制回浏览器跳转后的地址：</div>
+                <div class="serial_conter">
+                    <textarea row="3" placeholder="验证URL地址" class="bt-input-text google_drive" style="resize: none;"/></br>
+                    <button type="button" class="btn btn-success btn-sm set_auth_btn">获取授权</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+</script>
+<script type="text/javascript" src="/plugins/file?name=gdrive&f=js/gdrive.js"></script>
+<script type="text/javascript">
+$.getScript( "/plugins/file?name=gdrive&f=js/gdrive.js", function(){
+    gdList('');
+});
+</script>

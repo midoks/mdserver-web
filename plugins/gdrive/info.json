@@ -1,0 +1,19 @@
+{
+	"hook":["backup"],
+	"id":998,
+	"title":"谷歌云网盘",
+	"tip":"lib",
+	"name":"gdrive",
+	"type":"扩展",
+	"ps":"备份你的数据到谷歌云网盘",
+	"versions":"2.0",
+	"shell":"install.sh",
+	"checks": "server/gdrive",
+	"path":"server/gdrive",
+	"author":"google",
+	"home":"https://drive.google.com/",
+	"api_doc":"https://developers.google.com/drive/api/guides/about-sdk?hl=zh_CN",
+	"api_doc2":"https://developers.google.cn/drive/api/reference/rest/v3/comments/list?hl=zh-cn",
+	"date":"2022-06-26",
+	"pid":"4"
+}
