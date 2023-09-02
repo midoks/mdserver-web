@@ -123,14 +123,9 @@ def setAuthUrl():
 
 
 def clearAuth():
-    cfg = getServerDir() + "/user.conf"
-    if os.path.exists(cfg):
-        os.remove(cfg)
-
-    token = getServerDir() + "/token.pickle"
+    token = getServerDir() + "/token.json"
     if os.path.exists(token):
         os.remove(token)
-
     return mw.returnJson(True, "清空授权成功!")
 
 
