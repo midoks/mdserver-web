@@ -95,7 +95,8 @@ class gdriveclient():
         flow = google_auth_oauthlib.flow.Flow.from_client_secrets_file(
             self.__plugin_dir + '/credentials.json',
             scopes=self.__scpos)
-        # flow.redirect_uri = 'https://localhost'
+        # flow.redirect_uri = 'https://drive.aapanel.com'
+        flow.redirect_uri = 'https://drive.aapanel.com'
         auth_url, state = flow.authorization_url(
             access_type='offline',
             prompt='consent',
@@ -112,6 +113,7 @@ class gdriveclient():
             scopes=self.__scpos,
             state=url.split('state=')[1].split('&code=')[0])
         # flow.redirect_uri = 'https://localhost'
+        flow.redirect_uri = 'https://drive.aapanel.com'
         flow.fetch_token(authorization_response=url)
         credentials = flow.credentials
 
