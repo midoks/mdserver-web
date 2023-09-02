@@ -26,7 +26,7 @@ Install_App()
         pVersion=${tmp:0:3}
 
         which pip
-        if [ $? -eq 0 ];then
+        if [ "$?" -eq "0" ];then
             tmp=$(pip list|grep google-api-python-client|awk '{print $2}')
             if [ "$tmp" != '2.39.0' ];then
                 pip install --upgrade google-api-python-client
