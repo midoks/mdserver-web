@@ -15,6 +15,10 @@ install_tmp=${rootPath}/tmp/mw_install.pl
 PATH=$PATH:${rootPath}/bin
 export PATH
 
+if [ -f ${rootPath}/bin/activate ];then
+    source ${rootPath}/bin/activate
+fi
+
 VERSION=$2
 
 Install_App()
@@ -24,6 +28,7 @@ Install_App()
     if [ $? -eq 0 ];then
         tmp=`python -V 2>&1|awk '{print $2}'`
         pVersion=${tmp:0:3}
+
 
         which pip
         if [ "$?" -eq "0" ];then
