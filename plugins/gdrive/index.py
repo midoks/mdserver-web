@@ -279,6 +279,7 @@ def backupAllFunc(stype):
 
     mw.echoInfo("准备上传文件 {}".format(filename))
     mw.echoStart('开始上传')
+    # gd.setDebug(False)
     gd.upload_file(filename, stype)
     mw.echoEnd('上传成功')
 
