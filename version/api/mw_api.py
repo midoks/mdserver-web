@@ -115,7 +115,7 @@ class mwApi:
 
 
 if __name__ == '__main__':
-    # 实例化宝塔API对象
+    # 实例化MW-API对象
     api = mwApi()
 
     # 调用get_logs方法
