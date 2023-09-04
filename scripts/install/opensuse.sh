@@ -60,24 +60,6 @@ if [ "$SSH_PORT" == "" ];then
 fi
 echo "SSH PORT:${SSH_PORT}"
 
-# if [ -f /usr/sbin/iptables ];then
-
-# 	iptables -I INPUT -p tcp -m state --state NEW -m tcp --dport 22 -j ACCEPT
-# 	iptables -I INPUT -p tcp -m state --state NEW -m tcp --dport 80 -j ACCEPT
-# 	iptables -I INPUT -p tcp -m state --state NEW -m tcp --dport 443 -j ACCEPT
-# 	iptables -I INPUT -p tcp -m state --state NEW -m tcp --dport 888 -j ACCEPT
-# 	service iptables save
-
-# 	iptables_status=`service iptables status | grep 'not running'`
-# 	if [ "${iptables_status}" == '' ];then
-# 		service iptables restart
-# 	fi
-
-# 	#安装时不开启
-# 	service iptables stop
-# fi
-
-
 if [ ! -f /usr/sbin/firewalld ];then
 	zypper install -y firewalld 
 	systemctl enable firewalld
@@ -99,8 +81,6 @@ if [ ! -f /usr/sbin/firewalld ];then
 	systemctl stop firewalld
 fi
 
-
 cd /www/server/mdserver-web/scripts && bash lib.sh
 chmod 755 /www/server/mdserver-web/data
-
 

@@ -1,5 +1,5 @@
 
-function msodPost(method,args,callback){
+function gdPost(method,args,callback){
     var _args = null; 
     if (typeof(args) == 'string'){
         _args = JSON.stringify(toArrayObject(args));
@@ -8,7 +8,7 @@ function msodPost(method,args,callback){
     }
 
     var loadT = layer.msg('正在获取...', { icon: 16, time: 0, shade: 0.3 });
-    $.post('/plugins/run', {name:'msonedrive', func:method, args:_args}, function(data) {
+    $.post('/plugins/run', {name:'gdrive', func:method, args:_args}, function(data) {
         layer.close(loadT);
         if (!data.status){
             layer.msg(data.msg,{icon:0,time:2000,shade: [0.3, '#000']});
@@ -48,16 +48,25 @@ function createDir(){
                 layer.msg('目录名称不能为空!',{icon:2});
                 return;
             }
-            var path = $("#myPath").val();
+            var parents = $("#myPath").val();
+            var cur_file_id = $('#curPath').val();
+            if (cur_file_id!=''){
+                parents = cur_file_id;
+            }
+
             var dirname = name;
             var loadT = layer.msg('正在创建目录['+dirname+']...',{icon:16,time:0,shade: [0.3, '#000']});
-            msodPost('create_dir', {path:path,name:dirname}, function(data){
+            gdPost('create_dir', {parents:parents,name:dirname}, function(data){
             	layer.close(loadT);
                 var rdata = $.parseJSON(data.data);
                 if(rdata.status) {
                     showMsg(rdata.msg, function(){
                         layer.close(index);
-                        odList(path);
+                        var file_id = $('#myPath').val();
+                        if (cur_file_id!=''){
+                            file_id = cur_file_id;
+                        }
+                        gdList(file_id);
                     } ,{icon:1}, 2000);
                 } else{
                     layer.msg(rdata.msg,{icon:2});
@@ -71,7 +80,7 @@ function createDir(){
 //设置API
 function authApi(){
 
-    msodPost('conf', {}, function(rdata){
+    gdPost('conf', {}, function(rdata){
         var rdata = $.parseJSON(rdata.data);
 
         // console.log(rdata);
@@ -89,11 +98,11 @@ function authApi(){
 		        content:'<div class="change-default pd20">'+html+'</div>',
 		        success: function(){
 		        	$('#clear_auth').click(function(){
-		        		msodPost('clear_auth', {}, function(rdata){
+		        		gdPost('clear_auth', {}, function(rdata){
 							var rdata = $.parseJSON(rdata.data);
 							showMsg(rdata.msg,function(){
 								layer.close(loadOpen);
-					            odList('/');
+					            gdList('');
 					        },{icon:rdata.status?1:2},2000);
 						});  
 		        	});	
@@ -108,7 +117,7 @@ function authApi(){
         var layer_auth = layer.open({
             type: 1,
             area: "620px",
-            title: "OneDrive授权",
+            title: "Google Drive 授权",
             closeBtn: 1,
             shift: 5,
             shadeClose: false,
@@ -125,13 +134,13 @@ function authApi(){
 
             		$('.check_api .set_auth_btn').click(function(){
 
-            			var url = $('.check_api .OneDrive').val();
+            			var url = $('.check_api .google_drive').val();
 						if ( url == ''){
 							layer.msg("验证URL不能为空",{icon:2});
 							return;
 						}
 						// console.log(url);
-						msodPost('set_auth_url', {url:url}, function(rdata){
+						gdPost('set_auth_url', {url:url}, function(rdata){
 							var rdata = $.parseJSON(rdata.data);
 							var show_time = 2000;
 							if (!rdata.status){
@@ -141,7 +150,7 @@ function authApi(){
 							showMsg(rdata.msg,function(){
 								if (rdata.status){
 									layer.close(layer_auth);
-									odList('/');
+									gdList('');
 								}
 					        },{icon:rdata.status?1:2},show_time);
 						});
@@ -168,9 +177,15 @@ function upPathLeft(){
     }
 }
 
-function odList(path){
-    msodPost('get_list', {path:path}, function(rdata){
+function getGDTime(a) {
+    return new Date(a).format("yyyy/MM/dd hh:mm:ss")
+}
+
+function gdList(file_id){
+    $('#curPath').val(file_id);
+    gdPost('get_list', {file_id:file_id}, function(rdata){
         var rdata = $.parseJSON(rdata.data);
+        console.log(rdata);
         if(rdata.status === false){
             showMsg(rdata.msg,function(){
                 authApi();
@@ -179,53 +194,38 @@ function odList(path){
         }
 
         var mlist = rdata.data;
-        var listBody = ''
-        var listFiles = ''
-        for(var i=0;i<mlist.list.length;i++){
-            if(mlist.list[i].type == null){
-                listBody += '<tr><td class="cursor" onclick="odList(\''+(path+'/'+mlist.list[i].name).replace('//','/')+'\')"><span class="ico ico-folder"></span>\<span>'+mlist.list[i].name+'</span></td>\
+        var listBody = '';
+        var listFiles = '';
+        for(var i=0;i<mlist.length;i++){
+            if(mlist[i].size == null){
+                listFiles += '<tr><td class="cursor" onclick="gdList(\''+(mlist[i].id).replace('//','/')+'\')"><span class="ico ico-folder"></span>\<span>'+mlist[i].name+'</span></td>\
                 <td>-</td>\
                 <td>-</td>\
-                <td class="text-right"><a class="btlink" onclick="deleteFile(\''+mlist.list[i].name+'\', true)">删除</a></td></tr>'
+                <td class="text-right"><a class="btlink" onclick="deleteFile(\''+mlist[i].id+'\', true)">删除</a></td></tr>'
             }else{
-                listFiles += '<tr><td class="cursor"><span class="ico ico-file"></span>\<span>'+mlist.list[i].name+'</span></td>\
-                <td>'+toSize(mlist.list[i].size)+'</td>\
-                <td>'+getLocalTime(mlist.list[i].time)+'</td>\
-                <td class="text-right"><a target="_blank" href="'+mlist.list[i].download+'" class="btlink">下载</a> | <a class="btlink" onclick="deleteFile(\''+mlist.list[i].name+'\', false)">删除</a></td></tr>'
+                listFiles += '<tr><td class="cursor"><span class="ico ico-file"></span><span>'+mlist[i].name+'</span></td>\
+                <td>'+toSize(mlist[i].size)+'</td>\
+                <td>'+getGDTime(mlist[i].createdTime)+'</td>\
+                <td class="text-right"><a target="_blank" href="'+mlist[i].webViewLink+'" class="btlink">下载</a> | <a class="btlink" onclick="deleteFile(\''+mlist[i].name+'\', false)">删除</a></td></tr>'
             }
         }
         listBody += listFiles;
-
-        var pathLi='';
-        var tmp = path.split('/')
-        var pathname = '';
-        var n = 0;
-        for(var i=0;i<tmp.length;i++){
-            if(n > 0 && tmp[i] == '') continue;
-            var dirname = tmp[i];
-            if(dirname == '') {
-                dirname = '根目录';
-                n++;
-            }
-            pathname += '/' + tmp[i];
-            pathname = pathname.replace('//','/');
-            pathLi += '<li><a title="'+pathname+'" onclick="odList(\''+pathname+'\')">'+dirname+'</a></li>';
+        var pathLi = '<li><a title="根目录" onclick="gdList(\'\')">根目录</a></li>';
+        
+        if (mlist.length>0){
+            $('#myPath').val(mlist[0]['parents'][0]);
         }
-        var um = 1;
-        if(tmp[tmp.length-1] == '') um = 2;
-        var backPath = tmp.slice(0,tmp.length-um).join('/') || '/';
-        $('#myPath').val(path);
+        
         $(".upyunCon .place-input ul").html(pathLi);
         $(".upyunlist .list-list").html(listBody);
 
-        upPathLeft();
-
         $('#backBtn').unbind().click(function() {
-            odList(backPath);
+            gdList('');
         });
 
         $('.upyunCon .refreshBtn').unbind().click(function(){
-            odList(path);
+            var file_id = $('#myPath').val();
+            gdList(file_id);
         });
     });
 }
@@ -237,20 +237,22 @@ function deleteFile(name, is_dir){
         safeMessage('删除文件','删除后将无法恢复，真的要删除['+name+']吗?',function(){
             var path = $("#myPath").val();
             var filename = name;
-            msodPost('delete_file', {filename:filename,path:path}, function(rdata){
+            gdPost('delete_file', {filename:filename,path:path}, function(rdata){
                 var rdata = $.parseJSON(rdata.data);
                 showMsg(rdata.msg,function(){
-                    odList(path);
+                    var file_id = $('#myPath').val();
+                    gdList(file_id);
                 },{icon:rdata.status?1:2},2000);
             });
         });
     } else {
-        safeMessage('删除文件夹','删除后将无法恢复，真的要删除['+name+']吗?',function(){
+        safeMessage('删除文件夹','删除后将无法恢复，真的要删除文件资源['+name+']吗?',function(){
             var path = $("#myPath").val();
-            msodPost('delete_dir', {dir_name:name,path:path}, function(rdata){
+            gdPost('delete_dir', {dir_name:name,path:path}, function(rdata){
                 var rdata = $.parseJSON(rdata.data);
                 showMsg(rdata.msg,function(){
-                    odList(path);
+                    var file_id = $('#myPath').val();
+                    gdList(file_id);
                 },{icon:rdata.status?1:2},2000);
             });
         });

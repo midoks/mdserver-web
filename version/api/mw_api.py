@@ -18,7 +18,7 @@ import json
 
 
 class mwApi:
-    __MW_KEY = 'j7GQhzNcBV4KU9QKYPXvtjSzCcmfkc0e'
+    __MW_KEY = 'uATE5NrKDWIlZuDcYpvLVhoUo1c7A1Pk'
     __MW_PANEL = 'http://127.0.0.1:7200'
 
     # 如果希望多台面板，可以在实例化对象时，将面板地址与密钥传入
@@ -48,7 +48,7 @@ class mwApi:
     #@timeout 超时时间默认1800秒
     # return string
     def __http_post_cookie(self, url, p_data, timeout=1800):
-        cookie_file = './' + self.__get_md5(self.__MW_PANEL) + '.cookie'
+        cookie_file = '/tmp/' + self.__get_md5(self.__MW_PANEL) + '.cookie'
         if sys.version_info[0] == 2:
             # Python2
             import urllib
@@ -81,8 +81,11 @@ class mwApi:
             import ssl
             import http.cookiejar
             cookie_obj = http.cookiejar.MozillaCookieJar(cookie_file)
-            cookie_obj.load(cookie_file, ignore_discard=True,
-                            ignore_expires=True)
+            # 加载已保存的cookie
+            if os.path.exists(cookie_file):
+                cookie_obj.load(cookie_file, ignore_discard=True,
+                                ignore_expires=True)
+
             handler = urllib.request.HTTPCookieProcessor(cookie_obj)
             data = urllib.parse.urlencode(p_data).encode('utf-8')
             req = urllib.request.Request(url, data)
@@ -97,7 +100,7 @@ class mwApi:
     # 取面板日志
     def getLogs(self):
         # 拼接URL地址
-        url = self.__MW_PANEL + '/api/firewall/get_log_list'
+        url = self.__MW_PANEL + '/api/logs/get_log_list'
 
         # 准备POST数据
         post_data = self.__get_key_data()  # 取签名
@@ -112,7 +115,7 @@ class mwApi:
 
 
 if __name__ == '__main__':
-    # 实例化宝塔API对象
+    # 实例化MW-API对象
     api = mwApi()
 
     # 调用get_logs方法

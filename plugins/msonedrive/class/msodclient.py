@@ -406,6 +406,11 @@ class msodclient:
             "database": "db",
             "path": "path",
         }
+
+        if not prefix_dict.get(data_type):
+            print("data_type 类型错误!!!")
+            exit(1)
+
         file_regx = prefix_dict.get(data_type) + "_(.+)_20\d+_\d+(?:\.|_)"
         sub_search = re.search(file_regx, file_name)
         sub_path_name = ""

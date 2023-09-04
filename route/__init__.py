@@ -481,7 +481,8 @@ def api(reqClass=None, reqAction=None, reqData=None):
         return mw.returnJson(False, '请指定请求方法')
 
     classFile = ('config_api', 'crontab_api', 'files_api', 'firewall_api',
-                 'plugins_api', 'system_api', 'site_api', 'task_api')
+                 'plugins_api', 'system_api', 'site_api', 'task_api',
+                 'logs_api')
     className = reqClass + '_api'
     if not className in classFile:
         return mw.returnJson(False, 'external api request error')

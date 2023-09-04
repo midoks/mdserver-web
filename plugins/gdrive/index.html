@@ -75,7 +75,8 @@
 <div class="upyunCon">
     <div class="up-place pd15">
         <button id="backBtn" class="btn btn-default btn-sm glyphicon glyphicon-arrow-left pull-left" title="后退"></button>
-        <input id="myPath" style="display:none;" type="text" value="">
+        <input id="myPath" type="hidden" value="">
+        <input id="curPath" type="hidden" value="">
         <div class="place-input pull-left">
             <div style="width:1400px;height:28px"><ul></ul></div>
         </div>
@@ -250,7 +251,7 @@
   width: 30px;
   height: 30px;
 }
-.OneDrive{  
+.google_drive{  
     width:465px;
     height:100px;
     margin-bottom:10px;
@@ -262,12 +263,12 @@
         <div class="step_item">
             <div class="serial"><span>1</span></div>
             <div class="serial_box">
-                <div class="serial_title">阅读简易操作教程：如何获取Microsoft OneDrive授权？</div>
+                <div class="serial_title">阅读简易操作教程：如何获取Google Drive授权？</div>
                 <div class="serial_conter">
                     <div class="view_video">
                         <ul>
                             <li>1. 点击下面第<div class="serial" style="float: none;width: 45px;"><span>2</span></div>步中的 打开授权链接。<li>
-                            <li>2. 在新窗口页面上登录Microsoft账号。阅读授权权限，并同意。<li>
+                            <li>2. 在新窗口页面上登录Google Drive账号。阅读授权权限，并同意。<li>
                             <li>3. 页面跳转后，将浏览器的地址栏地址复制到第<div class="serial" style="float: none;width: 45px;"><span>3</span></div>步的文本框中。<li>
                             <li>4. 点击 获取授权，随即完成授权。<li>
                         </ul>
@@ -293,7 +294,7 @@
             <div class="serial_box">
                 <div class="serial_title">操作2：复制回浏览器跳转后的地址：</div>
                 <div class="serial_conter">
-                    <textarea row="3" placeholder="验证URL地址" class="bt-input-text OneDrive" style="resize: none;"/></br>
+                    <textarea row="3" placeholder="验证URL地址" class="bt-input-text google_drive" style="resize: none;"/></br>
                     <button type="button" class="btn btn-success btn-sm set_auth_btn">获取授权</button>
                 </div>
             </div>
@@ -301,10 +302,9 @@
     </div>
 </div>
 </script>
-
-<!-- <script type="text/javascript" src="/plugins/file?name=msonedrive&f=js/msonedrive.js"></script> -->
+<script type="text/javascript" src="/plugins/file?name=gdrive&f=js/gdrive.js"></script>
 <script type="text/javascript">
-$.getScript( "/plugins/file?name=msonedrive&f=js/msonedrive.js", function(){
-    odList('/');
+$.getScript( "/plugins/file?name=gdrive&f=js/gdrive.js", function(){
+    gdList('');
 });
 </script>

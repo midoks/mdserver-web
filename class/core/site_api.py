@@ -1149,8 +1149,9 @@ class site_api:
         domains = request.form.get('domains', '')
         status = request.form.get('status', '')
         name = request.form.get('name', '')
+        none = request.form.get('none', '')
         sid = request.form.get('id', '')
-        return self.setSecurity(sid, name, fix, domains, status)
+        return self.setSecurity(sid, name, fix, domains, status, none)
 
     def getLogsApi(self):
         siteName = request.form.get('siteName', '')
@@ -2430,9 +2431,28 @@ location ^~ {from} {\n\
             tmp = re.search(rep, conf).group()
             data['fix'] = re.search(
                 "\(.+\)\$", tmp).group().replace('(', '').replace(')$', '').replace('|', ',')
-            data['domains'] = ','.join(re.search(
-                "valid_referers\s+none\s+blocked\s+(.+);\n", tmp).groups()[0].split())
-            data['status'] = True
+
+            data['status'] = False
+            data['none'] = False
+
+            valid_referers = re.search(
+                "valid_referers\s+(.+);\n", tmp)
+            valid_referers_none = re.search(
+                "valid_referers\s+none\s+blocked\s+(.+);\n", tmp)
+
+            if valid_referers or valid_referers_none:
+                data['status'] = True
+
+            if valid_referers_none:
+                domain_t = valid_referers_none.groups()[0].split()
+                data['domains'] = ','.join(domain_t)
+                data['none'] = True
+            elif valid_referers:
+                domain_t = valid_referers.groups()[0].split()
+                data['domains'] = ','.join(domain_t)
+                data['none'] = False
+
+            # print(data)
         else:
             data['fix'] = 'jpg,jpeg,gif,png,js,css'
             domains = mw.M('domain').where(
@@ -2442,19 +2462,27 @@ location ^~ {from} {\n\
                 tmp.append(domain['name'])
             data['domains'] = ','.join(tmp)
             data['status'] = False
+            data['none'] = False
         return mw.getJson(data)
 
-    def setSecurity(self, sid, name, fix, domains, status):
+    def setSecurity(self, sid, name, fix, domains, status, none=''):
         if len(fix) < 2:
             return mw.returnJson(False, 'URL后缀不能为空!')
         file = self.getHostConf(name)
         if os.path.exists(file):
             conf = mw.readFile(file)
-            if conf.find('SECURITY-START') != -1:
+            if status == 'false':
                 rep = "\s{0,4}#SECURITY-START(\n|.){1,500}#SECURITY-END\n?"
                 conf = re.sub(rep, '', conf)
                 mw.writeLog('网站管理', '站点[' + name + ']已关闭防盗链设置!')
             else:
+                rep = "\s{0,4}#SECURITY-START(\n|.){1,500}#SECURITY-END\n?"
+                conf = re.sub(rep, '', conf)
+
+                valid_referers = domains.strip().replace(',', ' ')
+                if none == 'true':
+                    valid_referers = 'none blocked ' + valid_referers
+
                 pre_path = self.setupPath + "/php/conf"
                 re_path = "include\s+" + pre_path + "/enable-php-"
                 rconf = '''#SECURITY-START 防盗链配置
@@ -2462,13 +2490,13 @@ location ^~ {from} {\n\
     {
         expires      30d;
         access_log /dev/null;
-        valid_referers none blocked %s;
+        valid_referers %s;
         if ($invalid_referer){
            return 404;
         }
     }
     #SECURITY-END
-    include %s/enable-php-''' % (fix.strip().replace(',', '|'), domains.strip().replace(',', ' '), pre_path)
+    include %s/enable-php-''' % (fix.strip().replace(',', '|'), valid_referers, pre_path)
                 conf = re.sub(re_path, rconf, conf)
                 mw.writeLog('网站管理', '站点[' + name + ']已开启防盗链!')
             mw.writeFile(file, conf)

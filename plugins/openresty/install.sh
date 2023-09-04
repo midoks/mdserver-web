@@ -78,9 +78,10 @@ Install_openresty()
 	cd ${openrestyDir} && tar -zxvf openresty-${VERSION}.tar.gz
 
 	OPTIONS=''
-	if [ "$VERSION" != "1.21.4.2" ];then
+	if [ "$VERSION" == "1.19.3.1" ]; then
 		OPTIONS=" ${OPTIONS} --with-ipv6 "
 	fi
+
 	# --with-openssl=$serverPath/source/lib/openssl-1.0.2q
 	cd ${openrestyDir}/openresty-${VERSION} && ./configure \
 	--prefix=$serverPath/openresty \
@@ -96,7 +97,12 @@ Install_openresty()
 	# --with-debug
 	# 用于调式
 
-	gmake -j${cpuCore} && gmake install && gmake clean
+	CMD_MAKE=`which gmake`
+	if [ "$?" == "0" ];then
+		gmake -j${cpuCore} && gmake install && gmake clean
+	else
+		make -j${cpuCore} && make install && make clean
+	fi
 
 	if [ -d $serverPath/openresty ];then
 		echo "${VERSION}" > $serverPath/openresty/version.pl
