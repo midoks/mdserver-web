@@ -78,9 +78,9 @@ Install_openresty()
 	cd ${openrestyDir} && tar -zxvf openresty-${VERSION}.tar.gz
 
 	OPTIONS=''
-	if [ "$VERSION" != "1.21.4.2" ];then
-		OPTIONS=" ${OPTIONS} --with-ipv6 "
-	fi
+	# if [ "$VERSION" != "1.21.4.2" ];then
+	# 	OPTIONS=" ${OPTIONS} --with-ipv6 "
+	# fi
 	# --with-openssl=$serverPath/source/lib/openssl-1.0.2q
 	cd ${openrestyDir}/openresty-${VERSION} && ./configure \
 	--prefix=$serverPath/openresty \
