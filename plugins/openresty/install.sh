@@ -78,9 +78,7 @@ Install_openresty()
 	cd ${openrestyDir} && tar -zxvf openresty-${VERSION}.tar.gz
 
 	OPTIONS=''
-	if [ "$VERSION" != "1.21.4.2" ]; then
-		OPTIONS=" ${OPTIONS} --with-ipv6 "
-	elif [ "$VERSION" != "1.17.8.2" ]; then
+	if [ "$VERSION" == "1.19.3.1" ]; then
 		OPTIONS=" ${OPTIONS} --with-ipv6 "
 	fi
 
