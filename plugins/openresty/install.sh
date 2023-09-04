@@ -78,7 +78,7 @@ Install_openresty()
 	cd ${openrestyDir} && tar -zxvf openresty-${VERSION}.tar.gz
 
 	OPTIONS=''
-	if [ "$VERSION" != "1.21.4.2" ];then
+	if [ "$VERSION" != "1.21.4.2" ]; then
 		OPTIONS=" ${OPTIONS} --with-ipv6 "
 	elif [ "$VERSION" != "1.17.8.2" ]; then
 		OPTIONS=" ${OPTIONS} --with-ipv6 "
@@ -104,6 +104,7 @@ Install_openresty()
 		gmake -j${cpuCore} && gmake install && gmake clean
 	else
 		make -j${cpuCore} && make install && make clean
+	fi
 
 	if [ -d $serverPath/openresty ];then
 		echo "${VERSION}" > $serverPath/openresty/version.pl
