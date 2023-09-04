@@ -103,6 +103,7 @@ docker run -itd --name mw-server --privileged=true -p 7200:7200 -p 80:80 -p 443:
 ### 版本更新 0.16.1
 
 * 给防盗链增加禁止空来源。
+* OpenResty安装兼容。
 
 ### JSDelivr安装地址
 
