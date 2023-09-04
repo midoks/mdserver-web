@@ -80,9 +80,7 @@ Install_openresty()
 	OPTIONS=''
 	if [ "$VERSION" != "1.21.4.2" ];then
 		OPTIONS=" ${OPTIONS} --with-ipv6 "
-	fi
-
-	if [ "$VERSION" != "1.17.8.2" ];then
+	elif [ "$VERSION" != "1.17.8.2" ]; then
 		OPTIONS=" ${OPTIONS} --with-ipv6 "
 	fi
 
