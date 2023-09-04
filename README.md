@@ -100,20 +100,9 @@ docker run -itd --name mw-server --privileged=true -p 7200:7200 -p 80:80 -p 443:
 ```
 
 
-### 版本更新 0.16.0
+### 版本更新 0.16.1
 
-yum install -y libargon2-devel
-apt install -y libargon2-dev
-
-OP防火墙 - 重载即可
-
-* 增加PHP83。
-* 面板日志单独为一页并加入日志审计功能。
-* 修复webssh服务器读取问题。
-* 站点批量删除修复。
-* OP防火墙-修复`自动强制验证`关闭不生效。
-* 新增OneDrive备份插件。
-* FTP备份优化。
+* 给防盗链增加禁止空来源。
 
 ### JSDelivr安装地址
 

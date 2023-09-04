@@ -1108,11 +1108,13 @@ function getSiteErrorLogs(siteName){
 function security(id,name){
 	var loadT = layer.msg(lan.site.the_msg,{icon:16,time:0,shade: [0.3, '#000']});
 	$.post('/site/get_security',{id:id,name:name},function(rdata){
+		console.log(rdata);
 		layer.close(loadT);
 		var mbody = '<div>'
 					+'<p style="margin-bottom:8px"><span style="display: inline-block; width: 60px;">URL后缀</span><input class="bt-input-text" type="text" name="sec_fix" value="'+rdata.fix+'" style="margin-left: 5px;width: 425px;height: 30px;margin-right:10px;'+(rdata.status?'background-color: #eee;':'')+'" placeholder="多个请用逗号隔开,例：png,jpeg,jpg,gif,zip" '+(rdata.status?'readonly':'')+'></p>'
 					+'<p style="margin-bottom:8px"><span style="display: inline-block; width: 60px;">许可域名</span><input class="bt-input-text" type="text" name="sec_domains" value="'+rdata.domains+'" style="margin-left: 5px;width: 425px;height: 30px;margin-right:10px;'+(rdata.status?'background-color: #eee;':'')+'" placeholder="支持通配符,多个域名请用逗号隔开,例：*.test.com,test.com" '+(rdata.status?'readonly':'')+'></p>'
 					+'<div class="label-input-group ptb10"><label style="font-weight:normal"><input type="checkbox" name="sec_status" onclick="setSecurity(\''+name+'\','+id+')" '+(rdata.status?'checked':'')+'>启用防盗链</label></div>'
+					+'<div class="label-input-group ptb10"><label style="font-weight:normal"><input type="checkbox" name="sec_none_status" onclick="setSecurity(\''+name+'\','+id+')" '+(rdata.none?'checked':'')+'>允许空HTTP_REFERER请求</label></div>'
 					+'<ul class="help-info-text c7 ptb10">'
 						+'<li>默认允许资源被直接访问,即不限制HTTP_REFERER为空的请求</li>'
 						+'<li>多个URL后缀与域名请使用逗号(,)隔开,如: png,jpeg,zip,js</li>'
@@ -1124,20 +1126,23 @@ function security(id,name){
 }
 
 //设置防盗链
-function setSecurity(name,id){
-	var data = {
-		fix:$("input[name='sec_fix']").val(),
-		domains:$("input[name='sec_domains']").val(),
-		status:$("input[name='sec_status']").val(),
-		name:name,
-		id:id
-	}
-	var loadT = layer.msg(lan.site.the_msg,{icon:16,time:0,shade: [0.3, '#000']});
-	$.post('/site/set_security',data,function(rdata){
-		layer.close(loadT);
-		layer.msg(rdata.msg,{icon:rdata.status?1:2});
-		if(rdata.status) setTimeout(function(){security(id,name);},1000);
-	},'json');
+function setSecurity(name,id, none){
+	setTimeout(function(){
+		var data = {
+			fix:$("input[name='sec_fix']").val(),
+			domains:$("input[name='sec_domains']").val(),
+			status:$("input[name='sec_status']").prop("checked"),
+			none:$("input[name='sec_none_status']").prop("checked"),
+			name:name,
+			id:id
+		}
+		var loadT = layer.msg(lan.site.the_msg,{icon:16,time:0,shade: [0.3, '#000']});
+		$.post('/site/set_security',data,function(rdata){
+			layer.close(loadT);
+			layer.msg(rdata.msg,{icon:rdata.status?1:2});
+			if(rdata.status) setTimeout(function(){security(id,name);},1000);
+		},'json');
+	},100);
 }
 
 
