@@ -17,6 +17,11 @@ if [ "$__GET_BIT" == "32" ];then
 	apt install -y rustc
 fi
 
+if [ "$VERSION_ID" == "10" ];then
+	apt install -y rustc
+fi
+
+
 # synchronize time first
 apt-get install ntpdate -y
 NTPHOST='time.nist.gov'
