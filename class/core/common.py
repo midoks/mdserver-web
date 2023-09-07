@@ -145,10 +145,19 @@ def initInitTask():
     api.createCertCron()
 
 
+def initSystemControl():
+    import system_api
+    sapi = system_api.system_api()
+    sapi.setControl(1, 30)
+
+
 def initUserInfo():
 
     data = mw.M('users').where('id=?', (1,)).getField('password')
     if data == '21232f297a57a5a743894a0e4a801fc3':
+        # 默认监控开启
+        initSystemControl()
+
         pwd = mw.getRandomString(8).lower()
         file_pw = mw.getRunDir() + '/data/default.pl'
         mw.writeFile(file_pw, pwd)

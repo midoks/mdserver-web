@@ -105,6 +105,7 @@ docker run -itd --name mw-server --privileged=true -p 7200:7200 -p 80:80 -p 443:
 * 给防盗链增加禁止空来源。
 * OpenResty安装兼容。
 * Debian10安装优化。
+* 安装时默认监控开启。
 
 ### JSDelivr安装地址
 
