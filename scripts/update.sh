@@ -55,13 +55,12 @@ else
 fi
 
 
-# cn=$(curl -fsSL -m 10 http://ipinfo.io/json | grep "\"country\": \"CN\"")
 HTTP_PREFIX="https://"
 LOCAL_ADDR=common
-ping  -c 1 github.com > /dev/null 2>&1
-if [ "$?" != "0" ];then
+cn=$(curl -fsSL -m 10 -s http://ipinfo.io/json | grep "\"country\": \"CN\"")
+if [ ! -z "$cn" ] || [ "$?" != "0" ] ;then
 	LOCAL_ADDR=cn
-	HTTP_PREFIX="https://ghproxy.com/"
+    HTTP_PREFIX="https://ghproxy.com/"
 fi
 
 
