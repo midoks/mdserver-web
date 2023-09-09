@@ -68,9 +68,9 @@ fi
 # 	HTTP_PREFIX="https://ghproxy.com/"
 # fi
 
-cn=$(curl -fsSL -m 10 -s http://ipinfo.io/json | grep "\"country\": \"CN\"")
 HTTP_PREFIX="https://"
 LOCAL_ADDR=common
+cn=$(curl -fsSL -m 10 -s http://ipinfo.io/json | grep "\"country\": \"CN\"")
 if [ ! -z "$cn" ] || [ "$?" != "0" ] ;then
 	LOCAL_ADDR=cn
     HTTP_PREFIX="https://ghproxy.com/"
