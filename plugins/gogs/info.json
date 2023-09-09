@@ -2,7 +2,7 @@
 	"ps": "Gogs是一款极易搭建的自助Git服务",
 	"name": "gogs",
 	"title": "Gogs",
-	"versions": ["0.11.86","0.12.9"],
+	"versions": ["0.11.86","0.12.9","0.13.0"],
 	"tip": "soft",
 	"checks": "server/gogs",
 	"path":"server/gogs",
