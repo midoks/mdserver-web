@@ -69,6 +69,7 @@ if [ ! -z "$cn" ] || [ "$?" != "0" ] ;then
     HTTP_PREFIX="https://ghproxy.com/"
 fi
 
+echo "local:${LOCAL_ADDR}"
 
 CP_CMD=/usr/bin/cp
 if [ -f /bin/cp ];then
