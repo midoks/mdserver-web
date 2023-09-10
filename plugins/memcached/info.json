@@ -5,7 +5,7 @@
 	"title": "Memcached",
 	"shell": "install.sh",
 	"versions":["1.6"],
-	"updates":["1.6.15"],
+	"updates":["1.6.21"],
 	"tip": "soft",
 	"checks": "server/memcached",
 	"path":"server/memcached",
