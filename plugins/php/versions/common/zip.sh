@@ -40,6 +40,10 @@ else
 	BAK=''
 fi
 
+if [ ! -d $serverPath/lib/libzip ];then
+	cd ${rootPath}/plugins/php/lib && /bin/bash libzip.sh
+fi
+
 export PKG_CONFIG_PATH=/www/server/lib/libzip/lib/pkgconfig
 
 Install_lib()
@@ -50,6 +54,7 @@ Install_lib()
 		echo "php-$version 已安装${LIBNAME},请选择其它版本!"
 		return
 	fi
+	
 	
 	if [ ! -f "$extFile" ];then
 
