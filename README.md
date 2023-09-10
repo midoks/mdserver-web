@@ -107,6 +107,7 @@ docker run -itd --name mw-server --privileged=true -p 7200:7200 -p 80:80 -p 443:
 * Debian10安装优化。
 * 安装时默认监控开启。
 * MySQL/MYSQL-YUM/MySQL-APT添加重置master功能。
+* 支持华为欧拉系统。
 
 ### JSDelivr安装地址
 
