@@ -25,7 +25,7 @@ if [ ${_os} == "Darwin" ]; then
 elif grep -Eqi "openSUSE" /etc/*-release; then
 	OSNAME='opensuse'
 	zypper refresh
-elif grep -Eq "EulerOS" /etc/*-release; then
+elif grep -Eq "EulerOS" /etc/*-release || grep -Eq "openEuler" /etc/*-release; then
 	OSNAME='euler'
 elif grep -Eqi "FreeBSD" /etc/*-release; then
 	OSNAME='freebsd'
