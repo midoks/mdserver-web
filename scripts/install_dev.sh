@@ -32,6 +32,8 @@ elif grep -Eq "openSUSE" /etc/*-release; then
 	zypper refresh
 elif grep -Eq "FreeBSD" /etc/*-release; then
 	OSNAME='freebsd'
+elif grep -Eq "EulerOS" /etc/*-release; then
+	OSNAME='euler'
 elif grep -Eqi "CentOS" /etc/issue || grep -Eqi "CentOS" /etc/*-release; then
 	OSNAME='rhel'
 	yum install -y wget zip unzip
