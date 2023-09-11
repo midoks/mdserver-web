@@ -151,10 +151,8 @@ def initSystemControl():
     if os.path.exists(path):
         return False
 
-    import system_api
-    sapi = system_api.system_api()
-    r = sapi.setControl(1, 30)
-    print(r)
+    data_ctl = 'data/control.conf'
+    mw.writeFile(data_ctl, '30')
 
 
 def initUserInfo():
