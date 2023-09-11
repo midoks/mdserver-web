@@ -150,7 +150,6 @@ def initSystemControl():
     path = 'data/default.db'
     if os.path.exists(path):
         return False
-
     data_ctl = 'data/control.conf'
     mw.writeFile(data_ctl, '30')
 
