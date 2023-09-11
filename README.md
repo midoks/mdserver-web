@@ -10,7 +10,7 @@
 简单的Linux面板,感谢BT.CN写出如此好的web管理软件。我一看到，就知道这是我一直想要的页面化管理方式。
 复制了后台管理界面，按照自己想要的方式写了一版。
 
-
+![EulerOS](https://img.shields.io/badge/LINUX-EulerOS-blue?style=for-the-badge&logo=EulerOS)
 ![Debian](https://img.shields.io/badge/LINUX-Debian-blue?style=for-the-badge&logo=Debian)
 ![Ubuntu](https://img.shields.io/badge/LINUX-Ubuntu-blue?style=for-the-badge&logo=Ubuntu)
 ![Fedora](https://img.shields.io/badge/LINUX-Fedora-blue?style=for-the-badge&logo=Fedora)
@@ -103,6 +103,11 @@ docker run -itd --name mw-server --privileged=true -p 7200:7200 -p 80:80 -p 443:
 ### 版本更新 0.16.1
 
 * 给防盗链增加禁止空来源。
+* OpenResty安装兼容。
+* Debian10安装优化。
+* 安装时默认监控开启。
+* MySQL/MYSQL-YUM/MySQL-APT添加重置master功能。
+* 支持华为欧拉系统。
 
 ### JSDelivr安装地址
 

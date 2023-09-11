@@ -33,7 +33,7 @@ if [ ! -d $sourcePath/php/php${PHP_VER} ];then
 	# 中国优化安装
 	cn=$(curl -fsSL -m 10 -s http://ipinfo.io/json | grep "\"country\": \"CN\"")
 	LOCAL_ADDR=common
-	if [ ! -z "$cn" ];then
+	if [ ! -z "$cn" ] || [ "$?" != "0" ] ;then
 		LOCAL_ADDR=cn
 	fi
 
@@ -70,7 +70,7 @@ fi
 
 ZIP_OPTION='--enable-zip'
 libzip_version=`pkg-config libzip --modversion`
-if version_lt "$libzip_version" "0.11.0" ;then
+if [ "$?" != "0" ] || version_lt "$libzip_version" "0.11.0" ;then
 	cd ${rootPath}/plugins/php/lib && /bin/bash libzip.sh
 	export PKG_CONFIG_PATH=$serverPath/lib/libzip/lib/pkgconfig
 	ZIP_OPTION="--with-libzip=$serverPath/lib/libzip"

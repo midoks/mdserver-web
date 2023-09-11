@@ -1577,6 +1577,15 @@ def setDbMasterAccess():
     return mw.returnJson(True, '设置成功!')
 
 
+def resetMaster(version=''):
+    pdb = pMysqlDb()
+    r = pdb.execute('reset master')
+    isError = isSqlError(r)
+    if isError != None:
+        return isError
+    return mw.returnJson(True, '重置成功!')
+
+
 def getMasterDbList(version=''):
     try:
         args = getArgs()
@@ -2827,6 +2836,8 @@ if __name__ == "__main__":
         print(getDbrunMode(version))
     elif func == 'set_dbrun_mode':
         print(setDbrunMode(version))
+    elif func == 'reset_master':
+        print(resetMaster(version))
     elif func == 'get_masterdb_list':
         print(getMasterDbList(version))
     elif func == 'get_master_status':

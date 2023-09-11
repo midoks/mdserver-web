@@ -14,9 +14,9 @@ SERVER_ROOT=$rootPath/lib
 SOURCE_ROOT=$rootPath/source/lib
 
 
-cn=$(curl -fsSL -m 10 http://ipinfo.io/json | grep "\"country\": \"CN\"")
 HTTP_PREFIX="https://"
-if [ ! -z "$cn" ];then
+cn=$(curl -fsSL -m 10 http://ipinfo.io/json | grep "\"country\": \"CN\"")
+if [ ! -z "$cn" ] || [ "$?" != "0" ] ;then
     HTTP_PREFIX="https://ghproxy.com/"
 fi
 

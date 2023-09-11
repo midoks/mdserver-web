@@ -25,6 +25,8 @@ if [ ${_os} == "Darwin" ]; then
 elif grep -Eqi "openSUSE" /etc/*-release; then
 	OSNAME='opensuse'
 	zypper refresh
+elif grep -Eq "EulerOS" /etc/*-release || grep -Eq "openEuler" /etc/*-release; then
+	OSNAME='euler'
 elif grep -Eqi "FreeBSD" /etc/*-release; then
 	OSNAME='freebsd'
 elif grep -Eqi "CentOS" /etc/issue || grep -Eqi "CentOS" /etc/*-release; then
@@ -61,15 +63,15 @@ fi
 # 	LOCAL_ADDR=cn
 # 	HTTP_PREFIX="https://ghproxy.com/"
 # fi
-
-cn=$(curl -fsSL -m 10 -s http://ipinfo.io/json | grep "\"country\": \"CN\"")
 HTTP_PREFIX="https://"
 LOCAL_ADDR=common
-if [ ! -z "$cn" ];then
+cn=$(curl -fsSL -m 10 -s http://ipinfo.io/json | grep "\"country\": \"CN\"")
+if [ ! -z "$cn" ] || [ "$?" != "0" ] ;then
 	LOCAL_ADDR=cn
     HTTP_PREFIX="https://ghproxy.com/"
 fi
 
+echo "local:${LOCAL_ADDR}"
 
 CP_CMD=/usr/bin/cp
 if [ -f /bin/cp ];then

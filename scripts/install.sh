@@ -28,6 +28,9 @@ elif grep -Eqi "openSUSE" /etc/*-release; then
 	zypper install cron wget curl zip unzip
 elif grep -Eqi "FreeBSD" /etc/*-release; then
 	OSNAME='freebsd'
+elif grep -Eq "EulerOS" /etc/*-release || grep -Eq "openEuler" /etc/*-release; then
+	OSNAME='euler'
+	yum install -y wget curl zip unzip tar crontabs
 elif grep -Eqi "CentOS" /etc/issue || grep -Eqi "CentOS" /etc/*-release; then
 	OSNAME='rhel'
 	yum install -y wget curl zip unzip tar crontabs
@@ -64,10 +67,10 @@ fi
 # 	HTTP_PREFIX="https://ghproxy.com/"
 # fi
 
-cn=$(curl -fsSL -m 10 -s http://ipinfo.io/json | grep "\"country\": \"CN\"")
 HTTP_PREFIX="https://"
 LOCAL_ADDR=common
-if [ ! -z "$cn" ];then
+cn=$(curl -fsSL -m 10 -s http://ipinfo.io/json | grep "\"country\": \"CN\"")
+if [ ! -z "$cn" ] || [ "$?" != "0" ] ;then
 	LOCAL_ADDR=cn
     HTTP_PREFIX="https://ghproxy.com/"
 fi
