@@ -32,7 +32,6 @@ from flask import redirect
 
 
 def init():
-    initSystemControl()
     initDB()
     initDBSshPort()
     initUserInfo()
@@ -144,14 +143,6 @@ def initInitTask():
     import cert_api
     api = cert_api.cert_api()
     api.createCertCron()
-
-
-def initSystemControl():
-    path = 'data/default.db'
-    if os.path.exists(path):
-        return False
-    data_ctl = 'data/control.conf'
-    mw.writeFile(data_ctl, '30')
 
 
 def initUserInfo():
