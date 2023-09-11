@@ -110,7 +110,6 @@ tmp/*
 *.zip
 logs/*
 data/*.db
-data/control.conf
 data/iplist.txt
 data/json/index.json
 data/json/config.json
