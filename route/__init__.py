@@ -36,6 +36,9 @@ import db
 import mw
 import config_api
 
+import common
+common.init()
+
 app = Flask(__name__, template_folder='templates/default')
 app.config.version = config_api.config_api().getVersion()
 
@@ -107,11 +110,9 @@ if mw.isDebugMode():
     app.debug = True
     app.config.version = app.config.version + str(time.time())
 
-import common
-common.init()
-
-
 # ----------  error function start -----------------
+
+
 def getErrorNum(key, limit=None):
     key = mw.md5(key)
     num = cache.get(key)
