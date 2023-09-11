@@ -152,7 +152,7 @@ def initSystemControl():
         return False
 
     data_ctl = 'data/control.conf'
-    mw.writeFile(data_ctl, 30)
+    mw.writeFile(data_ctl, '30')
 
 
 def initUserInfo():
