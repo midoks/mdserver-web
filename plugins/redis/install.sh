@@ -25,7 +25,13 @@ Install_redis()
 
 	mkdir -p $serverPath/redis
 	mkdir -p $serverPath/redis/data
-	cd redis-${VERSION} && gmake PREFIX=$serverPath/redis install
+
+	CMD_MAKE=`which gmake`
+	if [ "$?" == "0" ];then
+		cd redis-${VERSION} && gmake PREFIX=$serverPath/redis install
+	else
+		cd redis-${VERSION} && make PREFIX=$serverPath/redis install
+	fi
 	sed '/^ *#/d' redis.conf > $serverPath/redis/redis.conf
 
 	if [ -d $serverPath/redis ];then
