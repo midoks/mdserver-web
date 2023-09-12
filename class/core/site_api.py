@@ -2505,7 +2505,7 @@ location ^~ {from} {\n\
 
     def getPhpVersion(self):
         phpVersions = ('00', '52', '53', '54', '55',
-                       '56', '70', '71', '72', '73', '74', '80', '81', '82')
+                       '56', '70', '71', '72', '73', '74', '80', '81', '82', '83')
         data = []
         for val in phpVersions:
             tmp = {}
