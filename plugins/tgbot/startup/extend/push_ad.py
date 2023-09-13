@@ -46,6 +46,7 @@ def send_msg(bot, tag='ad', trigger_time=300):
     # https://zhaoziyuan.la/ | web | 15/m | 2m | next,7/15
     # 腾云机场 ｜9/m
     # 🚀鲲鹏VPN | 13/m
+    # ✨极品资源采集 ｜ 14/m
     keyboard = [
         [
             types.InlineKeyboardButton(
@@ -54,6 +55,10 @@ def send_msg(bot, tag='ad', trigger_time=300):
         [
             types.InlineKeyboardButton(
                 text="🚀腾云机场|解锁流媒体和ChatGPT", url='https://www.tencloud.net/index.php#/register?code=OGvXSTsc')
+        ],
+        [
+            types.InlineKeyboardButton(
+                text="✨极品资源采集", url='https://jpzy.me')
         ],
         [
             types.InlineKeyboardButton(
