@@ -858,8 +858,8 @@ class files_api:
                     " -C " + dfile + " > " + tmps + " 2>&1 &"
                 mw.execShell(cmd)
             if extension == 'rar':
-                cmd = "cd " + path + " && unrar x t.rar " + \
-                    sfile + " " + dfile + " > " + tmps + " 2>&1 &"
+                cmd = "cd " + path + " && unrar x " + sfile + \
+                    " " + dfile + " > " + tmps + " 2>&1 &"
                 mw.execShell(cmd)
 
             if os.path.exists(dfile):
