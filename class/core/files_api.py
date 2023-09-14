@@ -844,7 +844,13 @@ class files_api:
         extension = os.path.splitext(filename)[-1]
         extension = extension.strip('.')
 
-        if not extension in ['gz', 'zip', 'rar']:
+        tar_gz = 'tar.gz'
+        tar_gz_len = len(tar_gz)
+        suffix_gz = sfile[-tar_gz_len:]
+        if suffix_gz == tar_gz:
+            extension = suffix_gz
+
+        if not extension in ['tar.gz', 'gz', 'zip', 'rar']:
             return mw.returnJson(False, '现在仅支持gz,zip,rar格式解压!')
 
         if mw.isAppleSystem() and extension == 'rar':
@@ -856,9 +862,12 @@ class files_api:
                 cmd = "cd " + path + " && unzip -o -d '" + dfile + \
                     "' '" + sfile + "' > " + tmps + " 2>&1 &"
                 mw.execShell(cmd)
-            if extension == 'gz':
+            if extension == 'tar.gz':
                 cmd = "cd " + path + " && tar -zxvf " + sfile + \
                     " -C " + dfile + " > " + tmps + " 2>&1 &"
+                mw.execShell(cmd)
+            if extension == 'gz':
+                cmd = "cd " + path + " && gunzip -k " + sfile + " > " + tmps + " 2>&1 &"
                 mw.execShell(cmd)
             if extension == 'rar':
                 cmd = "cd " + path + " && unrar x " + sfile + \
