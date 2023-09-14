@@ -54,6 +54,7 @@ fi
 
 apt-get update -y
 apt install -y wget curl lsof unzip tar cron expect locate lrzsz
+apt install -y rar unrar
 apt install -y python3-pip python3-dev python3-venv
 
 

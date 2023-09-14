@@ -71,6 +71,7 @@ yum groupinstall -y "Development Tools"
 yum install -y epel-release
 
 yum install -y libevent libevent-devel zip libmcrypt libmcrypt-devel
+yum install -y rar unrar
 yum install -y gcc libffi-devel python-devel openssl-devel 
 yum install -y libmcrypt libmcrypt-devel python3-devel
 
