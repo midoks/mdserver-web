@@ -9,6 +9,8 @@ echo y | pacman -Sy yaourt
 
 echo y | pacman -Sy gcc make cmake autoconf
 echo y | pacman -Sy pkg-config
+echo y | pacman -Sy unrar
+echo y | pacman -Sy rar
 echo y | pacman -Sy python3
 echo y | pacman -Sy lsof
 echo y | pacman -Sy python-pip

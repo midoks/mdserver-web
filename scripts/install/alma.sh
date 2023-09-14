@@ -9,6 +9,7 @@ setenforce 0
 sed -i 's#SELINUX=enforcing#SELINUX=disabled#g' /etc/selinux/config
 
 dnf install -y wget lsof
+dnf install -y rar unrar
 dnf install -y python3-devel
 dnf install -y python-devel
 dnf install -y crontabs

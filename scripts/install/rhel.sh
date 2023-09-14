@@ -181,7 +181,7 @@ if [ "$VERSION_ID" -ge "8" ];then
         libxml2 libxml2-devel libxslt libxslt-devel libarchive make mysql-devel ncurses ncurses-devel net-tools \
         oniguruma oniguruma-devel patch pcre pcre-devel perl perl-Data-Dumper perl-devel procps psmisc python3-devel \
         openssl openssl-devel patchelf libargon2-dev\
-        readline-devel rpcgen sqlite-devel tar unzip vim-minimal wget zip zlib zlib-devel;
+        readline-devel rpcgen sqlite-devel rar unrar tar unzip vim-minimal wget zip zlib zlib-devel;
     do
         # dnf --enablerepo=remi,appstream,baseos,epel,extras,powertools install -y oniguruma5php-devel
         dnf $REPOS install -y $rpms;
@@ -200,7 +200,7 @@ else
         libwebp libwebp-devel libxml2 libxml2-devel libxslt libxslt-devel libzip libzip-devel libzstd-devel \
         make mysql-devel ncurses ncurses-devel net-tools oniguruma oniguruma-devel openldap openldap-devel \
         openssl openssl-devel patch pcre pcre-devel perl perl-Data-Dumper perl-devel psmisc python-devel \
-        python3-devel python3-pip re2c readline-devel rpcgen sqlite-devel tar unzip vim-minimal vixie-cron \
+        python3-devel python3-pip re2c readline-devel rpcgen sqlite-devel tar unzip rar unrar vim-minimal vixie-cron \
         wget zip zlib zlib-devel ImageMagick ImageMagick-devel patchelf libargon2-dev;
     do
         yum install -y $rpms;

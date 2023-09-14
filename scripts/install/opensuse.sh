@@ -30,6 +30,7 @@ zypper install -y rpcgen
 zypper install -y expect
 
 zypper install -y libzip libzip-devel
+zypper install -y unrar rar
 zypper install -y libmemcached libmemcached-devel
 
 zypper install -y icu libicu-devel

@@ -21,6 +21,7 @@ fi
 echo "SSH PORT:${SSH_PORT}"
 
 yum install -y wget lsof crontabs
+yum install -y rar unrar
 yum install -y python3-devel
 yum install -y python3-pip
 yum install -y python-devel

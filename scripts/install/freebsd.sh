@@ -33,6 +33,8 @@ pkg install -y python3
 pkg install -y py39-pip
 
 pkg install -y lsof
+pkg install -y rar
+pkg install -y unrar
 pkg install -y vim
 pkg install -y sqlite3
 
