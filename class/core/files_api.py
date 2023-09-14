@@ -845,7 +845,10 @@ class files_api:
         extension = extension.strip('.')
 
         if not extension in ['gz', 'zip', 'rar']:
-            return mw.returnJson(False, '现在仅支持gz,zip,rar文件解压!')
+            return mw.returnJson(False, '现在仅支持gz,zip,rar格式解压!')
+
+        if mw.isAppleSystem() and extension == 'rar':
+            return mw.returnJson(False, 'macosx暂时不支持rar格式解压')
 
         try:
             tmps = mw.getRunDir() + '/tmp/panelExec.log'
