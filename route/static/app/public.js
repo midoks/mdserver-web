@@ -362,14 +362,17 @@ function getDiskList(b) {
 		for(var f = 0; f < h.DIR.length; f++) {
 			var g = h.DIR[f].split(";");
 			var e = g[0];
-			if(e.length > 20) {
-				e = e.substring(0, 20) + "..."
-			}
+		
 			if(isChineseChar(e)) {
 				if(e.length > 10) {
-					e = e.substring(0, 10) + "..."
+					e = e.substring(0, 10) + "...";
+				}
+			} else{
+				if(e.length > 20) {
+					e = e.substring(0, 20) + "...";
 				}
 			}
+
 			d += "<tr>\
 				<td onclick=\"getDiskList('" + h.PATH + "/" + g[0] + "')\" title='" + g[0] + "'>\
 					<span class='glyphicon glyphicon-folder-open'></span>" + e + "</td><td>" + getLocalTime(g[2]) + "</td>\
@@ -382,14 +385,16 @@ function getDiskList(b) {
 			for(var f = 0; f < h.FILES.length; f++) {
 				var g = h.FILES[f].split(";");
 				var e = g[0];
-				if(e.length > 20) {
-					e = e.substring(0, 20) + "..."
-				}
 				if(isChineseChar(e)) {
 					if(e.length > 10) {
 						e = e.substring(0, 10) + "..."
 					}
+				} else{
+					if(e.length > 20) {
+						e = e.substring(0, 20) + "..."
+					}
 				}
+
 				d += "<tr>\
 					<td title='" + g[0] + "'><span class='glyphicon glyphicon-file'></span>" + e + "</td>\
 					<td>" + getLocalTime(g[2]) + "</td>\
@@ -403,7 +408,7 @@ function getDiskList(b) {
 		$(".file-list").show();
 		$("#tbody").html(d);
 		if(h.PATH.substr(h.PATH.length - 1, 1) != "/") {
-			h.PATH += "/"
+			h.PATH += "/";
 		}
 		$("#PathPlace").find("span").html(h.PATH);
 		activeDisk();
