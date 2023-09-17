@@ -14,16 +14,10 @@ install_tmp=${rootPath}/tmp/mw_install.pl
 VERSION=$2
 sys_os=`uname`
 
-# cn=$(curl -fsSL -m 10 http://ipinfo.io/json | grep "\"country\": \"CN\"")
-# HTTP_PREFIX="https://"
-# if [ ! -z "$cn" ];then
-#     HTTP_PREFIX="https://ghproxy.com/"
-# fi
-
 HTTP_PREFIX="https://"
 LOCAL_ADDR=common
-ping -c 1 gihub.com > /dev/null 2>&1
-if [ "$?" != "0" ];then
+cn=$(curl -fsSL -m 10 -s http://ipinfo.io/json | grep "\"country\": \"CN\"")
+if [ ! -z "$cn" ] || [ "$?" == "0" ] ;then
     LOCAL_ADDR=cn
     HTTP_PREFIX="https://ghproxy.com/"
 fi
