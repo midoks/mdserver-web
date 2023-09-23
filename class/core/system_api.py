@@ -273,10 +273,26 @@ class system_api:
             title = mw.readFile(titlePl).strip()
         return title
 
+    def getSystemDeviceTemperature(self):
+        if not hasattr(psutil, "sensors_temperatures"):
+            return False, "platform not supported"
+        temps = psutil.sensors_temperatures()
+        if not temps:
+            return False, "can't read any temperature"
+        for name, entries in temps.items():
+            for entry in entries:
+                return entry.label
+                # print("%-20s %s °C (high = %s °C, critical = %s °C)" % (
+                #     entry.label or name, entry.current, entry.high,
+                #     entry.critical))
+        return False, ""
+
     def getSystemVersion(self):
         #
         # 取操作系统版本
         current_os = mw.getOs()
+        sys_temper = self.getSystemDeviceTemperature()
+        print(sys_temper)
         # mac
         if current_os == 'darwin':
             data = mw.execShell('sw_vers')[0]
