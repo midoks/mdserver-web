@@ -281,7 +281,7 @@ class system_api:
             return False, "can't read any temperature"
         for name, entries in temps.items():
             for entry in entries:
-                return entry.label
+                return True, entry.label
                 # print("%-20s %s °C (high = %s °C, critical = %s °C)" % (
                 #     entry.label or name, entry.current, entry.high,
                 #     entry.critical))
