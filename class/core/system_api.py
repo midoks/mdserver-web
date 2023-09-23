@@ -291,8 +291,8 @@ class system_api:
         #
         # 取操作系统版本
         current_os = mw.getOs()
-        sys_temper = self.getSystemDeviceTemperature()
-        print(sys_temper)
+        # sys_temper = self.getSystemDeviceTemperature()
+        # print(sys_temper)
         # mac
         if current_os == 'darwin':
             data = mw.execShell('sw_vers')[0]
