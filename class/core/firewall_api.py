@@ -217,8 +217,6 @@ class firewall_api:
         pass_rep = "^PasswordAuthentication\s+(\w*)\s*\n"
         pass_status = re.search(pass_rep, conf)
         if pass_status:
-            # pass_rep = "PasswordAuthentication\s+(\w*)\s*\n"
-            # pass_status = re.search(pass_rep, conf)
             if pass_status and pass_status.groups(0)[0].strip() == 'no':
                 data['pass_prohibit_status'] = True
         else:
