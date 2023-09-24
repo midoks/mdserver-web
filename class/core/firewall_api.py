@@ -214,16 +214,13 @@ class firewall_api:
 
         data['pass_prohibit_status'] = False
         # 密码登陆配置检查
-        pass_rep = "#PasswordAuthentication\s+(\w*)\s*\n"
+        pass_rep = "PasswordAuthentication\s+(\w*)\s*\n"
         pass_status = re.search(pass_rep, conf)
         if pass_status:
-            data['pass_prohibit_status'] = True
-
-        if not data['pass_prohibit_status']:
-            pass_rep = "PasswordAuthentication\s+(\w*)\s*\n"
-            pass_status = re.search(pass_rep, conf)
             if pass_status and pass_status.groups(0)[0].strip() == 'no':
                 data['pass_prohibit_status'] = True
+        else:
+            data['pass_prohibit_status'] = True
 
         data['port'] = port
         data['status'] = status
@@ -299,11 +296,17 @@ class firewall_api:
 
         conf = mw.readFile(file)
 
-        if status == '1':
+        pass_rep = "PasswordAuthentication\s+(\w*)\s*\n"
+        pass_status = re.search(pass_rep, conf)
+        if not pass_status:
             rep = "(#)?PasswordAuthentication\s+(\w*)\s*\n"
             conf = re.sub(rep, "PasswordAuthentication yes\n", conf)
+
+        if status == '1':
+            rep = "PasswordAuthentication\s+(\w*)\s*\n"
+            conf = re.sub(rep, "PasswordAuthentication yes\n", conf)
         else:
-            rep = "(#)?PasswordAuthentication\s+(\w*)\s*\n"
+            rep = "PasswordAuthentication\s+(\w*)\s*\n"
             conf = re.sub(rep, "PasswordAuthentication no\n", conf)
         mw.writeFile(file, conf)
         mw.execShell("systemctl restart sshd.service")
