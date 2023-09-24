@@ -109,6 +109,7 @@ docker run -itd --name mw-server --privileged=true -p 7200:7200 -p 80:80 -p 443:
 * MySQL/MYSQL-YUM/MySQL-APT添加重置master功能。
 * 支持华为欧拉系统。
 * 支持rar解压。
+* SSH禁止密码登陆优化。
 
 ### JSDelivr安装地址
 
