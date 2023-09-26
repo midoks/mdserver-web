@@ -40,14 +40,17 @@ CREATE TABLE IF NOT EXISTS `crontab` (
 CREATE TABLE IF NOT EXISTS `firewall` (
   `id` INTEGER PRIMARY KEY AUTOINCREMENT,
   `port` TEXT,
+  `protocol` TEXT DEFAULT 'tcp',
   `ps` TEXT,
   `addtime` TEXT
 );
 
-INSERT INTO `firewall` (`id`, `port`, `ps`, `addtime`) VALUES
-(1, '80', '网站默认端口', '0000-00-00 00:00:00'),
-(2, '443', 'HTTPS', '0000-00-00 00:00:00'),
-(3, '888', 'phpMyAdmin默认端口', '0000-00-00 00:00:00');
+ALTER TABLE `port` ADD COLUMN `protocol` INTEGER DEFAULT 'tcp';
+
+INSERT INTO `firewall` (`id`, `port`, `protocol`, `ps`, `addtime`) VALUES
+(1, '80',  'tcp','网站默认端口', '0000-00-00 00:00:00'),
+(2, '443', 'tcp', 'HTTPS', '0000-00-00 00:00:00'),
+(3, '888', 'tcp', 'phpMyAdmin默认端口', '0000-00-00 00:00:00');
 
 
 
@@ -55,7 +58,7 @@ CREATE TABLE IF NOT EXISTS `logs` (
   `id` INTEGER PRIMARY KEY AUTOINCREMENT,
   `type` TEXT,
   `log` TEXT,
-  `uid` TEXT,
+  `uid` INTEGER DEFAULT '1',
   `addtime` TEXT
 );
 ALTER TABLE `logs` ADD COLUMN `uid` INTEGER DEFAULT '1';
