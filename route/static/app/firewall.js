@@ -298,6 +298,7 @@ function showAccept(page,search) {
 			}
 			body += "<tr>\
 						<td><em class='dlt-num'>" + data.data[i].id + "</em></td>\
+						<td>" + data.data[i].protocol + "</td>\
 						<td>" + (data.data[i].port.indexOf('.') == -1?'放行端口'+':['+data.data[i].port+']':'屏蔽IP'+':['+data.data[i].port+']') + "</td>\
 						<td>" + status + "</td>\
 						<td>" + data.data[i].addtime + "</td>\

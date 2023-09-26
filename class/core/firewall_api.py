@@ -392,7 +392,7 @@ class firewall_api:
 
         start = (page - 1) * limit
 
-        _list = mw.M('firewall').field('id,port,ps,addtime').limit(
+        _list = mw.M('firewall').field('id,port,protocol,ps,addtime').limit(
             str(start) + ',' + str(limit)).order('id desc').select()
         data = {}
         data['data'] = _list
