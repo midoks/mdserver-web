@@ -186,6 +186,22 @@ def status():
     return 'stop'
 
 
+def __release_port(port):
+    from collections import namedtuple
+    try:
+        import firewall_api
+        firewall_api.firewall_api().addAcceptPortArgs(port, 'phpMyAdmin默认端口', 'port')
+        return port
+    except Exception as e:
+        return "Release failed {}".format(e)
+
+
+def openPort():
+    for i in ["888"]:
+        __release_port(i)
+    return True
+
+
 def start():
     initCfg()
 
@@ -196,6 +212,7 @@ def start():
         pma_dir_dst = pma_dir + "_" + rand_str
         mw.execShell("mv " + pma_dir + " " + pma_dir_dst)
         setCfg('path', 'phpmyadmin_' + rand_str)
+        openPort()
 
     file_tpl = getPluginDir() + '/conf/phpmyadmin.conf'
     file_run = getConf()
