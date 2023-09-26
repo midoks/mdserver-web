@@ -273,7 +273,7 @@ def stop():
     conf = getConf()
     if os.path.exists(conf):
         os.remove(conf)
-        delPort()
+    delPort()
     mw.restartWeb()
     return 'ok'
 
