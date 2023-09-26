@@ -196,9 +196,25 @@ def __release_port(port):
         return "Release failed {}".format(e)
 
 
+def __delete_port(port):
+    from collections import namedtuple
+    try:
+        import firewall_api
+        firewall_api.firewall_api().delAcceptPortArgs(port, 'tcp')
+        return port
+    except Exception as e:
+        return "Release failed {}".format(e)
+
+
 def openPort():
     for i in ["888"]:
         __release_port(i)
+    return True
+
+
+def delPort():
+    for i in ["888"]:
+        __delete_port(i)
     return True
 
 
@@ -257,6 +273,7 @@ def stop():
     conf = getConf()
     if os.path.exists(conf):
         os.remove(conf)
+        delPort()
     mw.restartWeb()
     return 'ok'
 
