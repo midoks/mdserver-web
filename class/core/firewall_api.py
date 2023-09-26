@@ -89,7 +89,7 @@ class firewall_api:
         return mw.getJson(data)
 
     # 添加放行端口
-    def addAcceptPortArgs(self, port, ps, stype):
+    def addAcceptPortArgs(self, port, ps, stype, protocol='tcp'):
         import re
         import time
 
@@ -106,9 +106,10 @@ class firewall_api:
         msg = mw.getInfo('放行端口[{1}]成功', (port,))
         mw.writeLog("防火墙管理", msg)
         addtime = time.strftime('%Y-%m-%d %X', time.localtime())
-        mw.M('firewall').add('port,ps,addtime', (port, ps, addtime))
+        mw.M('firewall').add('port,protocol,ps,addtime',
+                             (port, protocol, ps, addtime))
 
-        self.addAcceptPort(port)
+        self.addAcceptPort(port, protocol)
         self.firewallReload()
         return mw.returnData(True, '添加放行(' + port + ')端口成功!')
 
@@ -406,7 +407,7 @@ class firewall_api:
         data['page'] = mw.getPage(_page)
         return mw.getJson(data)
 
-    def addAcceptPort(self, port):
+    def addAcceptPort(self, port, protocol='tcp'):
         if self.__isUfw:
             mw.execShell('ufw allow ' + port + '/tcp')
         elif self.__isFirewalld:
