@@ -430,8 +430,17 @@ class firewall_api:
                 cmd = 'firewall-cmd --permanent --zone=public --add-port=' + port + '/udp'
                 mw.execShell(cmd)
         elif self.__isIptables:
-            cmd = 'iptables -I INPUT -p tcp -m state --state NEW -m tcp --dport ' + port + ' -j ACCEPT'
-            mw.execShell(cmd)
+            if protocol == 'tcp':
+                cmd = 'iptables -I INPUT -p tcp -m state --state NEW -m tcp --dport ' + port + ' -j ACCEPT'
+                mw.execShell(cmd)
+            if protocol == 'udp':
+                cmd = 'iptables -I INPUT -p udp -m state --state NEW -m udp --dport ' + port + ' -j ACCEPT'
+                mw.execShell(cmd)
+            if protocol == 'tcp/udp':
+                cmd = 'iptables -I INPUT -p tcp -m state --state NEW -m tcp --dport ' + port + ' -j ACCEPT'
+                mw.execShell(cmd)
+                cmd = 'iptables -I INPUT -p udp -m state --state NEW -m udp --dport ' + port + ' -j ACCEPT'
+                mw.execShell(cmd)
         else:
             pass
         return True
