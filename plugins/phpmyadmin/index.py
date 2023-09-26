@@ -220,6 +220,7 @@ def delPort():
 
 def start():
     initCfg()
+    openPort()
 
     pma_dir = getServerDir() + "/phpmyadmin"
     if os.path.exists(pma_dir):
@@ -228,7 +229,6 @@ def start():
         pma_dir_dst = pma_dir + "_" + rand_str
         mw.execShell("mv " + pma_dir + " " + pma_dir_dst)
         setCfg('path', 'phpmyadmin_' + rand_str)
-        openPort()
 
     file_tpl = getPluginDir() + '/conf/phpmyadmin.conf'
     file_run = getConf()
