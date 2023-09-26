@@ -186,8 +186,41 @@ def status():
     return 'stop'
 
 
+def __release_port(port):
+    from collections import namedtuple
+    try:
+        import firewall_api
+        firewall_api.firewall_api().addAcceptPortArgs(port, 'phpMyAdmin默认端口', 'port')
+        return port
+    except Exception as e:
+        return "Release failed {}".format(e)
+
+
+def __delete_port(port):
+    from collections import namedtuple
+    try:
+        import firewall_api
+        firewall_api.firewall_api().delAcceptPortArgs(port, 'tcp')
+        return port
+    except Exception as e:
+        return "Release failed {}".format(e)
+
+
+def openPort():
+    for i in ["888"]:
+        __release_port(i)
+    return True
+
+
+def delPort():
+    for i in ["888"]:
+        __delete_port(i)
+    return True
+
+
 def start():
     initCfg()
+    openPort()
 
     pma_dir = getServerDir() + "/phpmyadmin"
     if os.path.exists(pma_dir):
@@ -240,6 +273,7 @@ def stop():
     conf = getConf()
     if os.path.exists(conf):
         os.remove(conf)
+    delPort()
     mw.restartWeb()
     return 'ok'
 

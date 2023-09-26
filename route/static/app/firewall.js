@@ -298,11 +298,12 @@ function showAccept(page,search) {
 			}
 			body += "<tr>\
 						<td><em class='dlt-num'>" + data.data[i].id + "</em></td>\
+						<td>" + data.data[i].protocol + "</td>\
 						<td>" + (data.data[i].port.indexOf('.') == -1?'放行端口'+':['+data.data[i].port+']':'屏蔽IP'+':['+data.data[i].port+']') + "</td>\
 						<td>" + status + "</td>\
 						<td>" + data.data[i].addtime + "</td>\
 						<td>" + data.data[i].ps + "</td>\
-						<td class='text-right'><a href='javascript:;' class='btlink' onclick=\"delAcceptPort(" + data.data[i].id + ",'" + data.data[i].port + "')\">删除</a></td>\
+						<td class='text-right'><a href='javascript:;' class='btlink' onclick=\"delAcceptPort(" + data.data[i].id + ",'" + data.data[i].port + "','"+data.data[i].protocol+"')\">删除</a></td>\
 					</tr>";
 		}
 		$("#firewallBody").html(body);
@@ -315,6 +316,7 @@ function addAcceptPort(){
 	var type = $("#firewalldType").val();
 	var port = $("#AcceptPort").val();
 	var ps = $("#Ps").val();
+	var protocol = $('select[name="protocol"]').val();
 	var action = "add_drop_address";
 	if(type == 'port'){
 		ports = port.split(':');
@@ -334,7 +336,7 @@ function addAcceptPort(){
 		return;
 	}
 	var loadT = layer.msg('正在添加,请稍候...',{icon:16,time:0,shade: [0.3, '#000']})
-	$.post('/firewall/'+action,'port='+port+"&ps="+ps+'&type='+type,function(rdata){
+	$.post('/firewall/'+action,'port='+port+"&ps="+ps+'&type='+type+'&protocol='+protocol,function(rdata){
 		layer.close(loadT);
 		if(rdata.status == true || rdata.status == 'true'){
 			layer.msg(rdata.msg,{icon:1});
@@ -351,7 +353,7 @@ function addAcceptPort(){
 }
 
 //删除放行
-function delAcceptPort(id, port) {
+function delAcceptPort(id, port,protocol) {
 	var action = "del_drop_address";
 	if(port.indexOf('.') == -1){
 		action = "del_accept_port";
@@ -359,7 +361,7 @@ function delAcceptPort(id, port) {
 	
 	layer.confirm(lan.get('confirm_del',[port]), {title: '删除防火墙规则',closeBtn:2}, function(index) {
 		var loadT = layer.msg('正在删除,请稍候...',{icon:16,time:0,shade: [0.3, '#000']})
-		$.post("/firewall/"+action, "id=" + id + "&port=" + port, function(ret) {
+		$.post("/firewall/"+action, "id=" + id + "&port=" + port+'&protocol='+protocol, function(ret) {
 			layer.close(loadT);
 			layer.msg(ret.msg,{icon:ret.status?1:2})
 			showAccept(1);

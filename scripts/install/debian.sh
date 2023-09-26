@@ -70,7 +70,7 @@ if [ -f /usr/sbin/ufw ];then
 
 	ufw allow 80/tcp
 	ufw allow 443/tcp
-	ufw allow 888/tcp
+	# ufw allow 888/tcp
 fi
 
 if [ ! -f /usr/sbin/ufw ];then
@@ -91,7 +91,7 @@ if [ ! -f /usr/sbin/ufw ];then
 	fi
 	firewall-cmd --permanent --zone=public --add-port=80/tcp
 	firewall-cmd --permanent --zone=public --add-port=443/tcp
-	firewall-cmd --permanent --zone=public --add-port=888/tcp
+	# firewall-cmd --permanent --zone=public --add-port=888/tcp
 
 	systemctl start firewalld
 

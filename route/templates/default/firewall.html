@@ -94,14 +94,18 @@
 							</select>
 							<input type="text" class="bt-input-text mr5" style="width: 117px;" id="AcceptPort" placeholder="端口">
 							<input type="text" class="bt-input-text mr5" id="Ps" placeholder="备注/说明">
+							<select class="bt-input-text c5 mr5" name="protocol" style="width:80px;">
+								<option value="tcp">tcp</option>
+								<option value="udp">udp</option>
+								<option value="tcp/udp">tcp/udp</option>
+							</select>
 							<button id="toAccept" onclick="addAcceptPort();" class="btn btn-default btn-sm va0" type="button">放行</button>
 							<span id="f-ps" class="c9" style="margin-left: 10px;">说明: 支持放行端口范围，如: 3000:3500</span>
 						</div>
                         <div class="tablescroll">
                             <table id="firewallBody" class="table table-hover" style="min-width: 640px;border: 0 none;"></table>
                         </div>
-                        <div id="firewallPage" class="dataTables_paginate paging_bootstrap page firewallBody" style="margin-bottom:0">            
-                        </div>
+                        <div id="firewallPage" class="dataTables_paginate paging_bootstrap page firewallBody" style="margin-bottom:0"></div>
                     </div>
                 </div>
             </div>
