@@ -178,9 +178,10 @@ class firewall_api:
         else:
             pass
 
+        mw.M('firewall').where("port=?", (port,)).delete()
+
         msg = mw.getInfo('删除防火墙放行端口[{1}][{2}]成功!', (port, protocol,))
         mw.writeLog("防火墙管理", msg)
-        mw.M('firewall').where("port=?", (port,)).delete()
 
         self.firewallReload()
         return True
