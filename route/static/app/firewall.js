@@ -361,7 +361,7 @@ function delAcceptPort(id, port,protocol) {
 	
 	layer.confirm(lan.get('confirm_del',[port]), {title: '删除防火墙规则',closeBtn:2}, function(index) {
 		var loadT = layer.msg('正在删除,请稍候...',{icon:16,time:0,shade: [0.3, '#000']})
-		$.post("/firewall/"+action, "id=" + id + "&port=" + port+'&protocol'+protocol, function(ret) {
+		$.post("/firewall/"+action, "id=" + id + "&port=" + port+'&protocol='+protocol, function(ret) {
 			layer.close(loadT);
 			layer.msg(ret.msg,{icon:ret.status?1:2})
 			showAccept(1);
