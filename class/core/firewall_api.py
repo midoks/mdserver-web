@@ -177,6 +177,11 @@ class firewall_api:
                     'iptables -D INPUT -p udp -m state --state NEW -m udp --dport ' + port + ' -j ACCEPT')
         else:
             pass
+
+        msg = mw.getInfo('删除防火墙放行端口[{1}][{2}]成功!', (port, protocol,))
+        mw.writeLog("防火墙管理", msg)
+
+        self.firewallReload()
         return True
 
     # 删除放行端口
@@ -190,12 +195,8 @@ class firewall_api:
             return mw.returnJson(False, '失败，不能删除当前面板端口!')
         try:
             self.delAcceptPortArgs(port, protocol)
-
-            msg = mw.getInfo('删除防火墙放行端口[{1}][{2}]成功!', (port, protocol,))
-            mw.writeLog("防火墙管理", msg)
             mw.M('firewall').where("id=?", (sid,)).delete()
 
-            self.firewallReload()
             return mw.returnJson(True, '删除成功!')
         except Exception as e:
             return mw.returnJson(False, '删除失败!:' + str(e))
