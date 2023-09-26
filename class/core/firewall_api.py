@@ -409,11 +409,26 @@ class firewall_api:
 
     def addAcceptPort(self, port, protocol='tcp'):
         if self.__isUfw:
-            mw.execShell('ufw allow ' + port + '/tcp')
+            if protocol == 'tcp':
+                mw.execShell('ufw allow ' + port + '/tcp')
+            if protocol == 'udp':
+                mw.execShell('ufw allow ' + port + '/udp')
+            if protocol == 'tcp/udp':
+                mw.execShell('ufw allow ' + port + '/tcp')
+                mw.execShell('ufw allow ' + port + '/udp')
         elif self.__isFirewalld:
             port = port.replace(':', '-')
-            cmd = 'firewall-cmd --permanent --zone=public --add-port=' + port + '/tcp'
-            mw.execShell(cmd)
+            if protocol == 'tcp':
+                cmd = 'firewall-cmd --permanent --zone=public --add-port=' + port + '/tcp'
+                mw.execShell(cmd)
+            if protocol == 'udp':
+                cmd = 'firewall-cmd --permanent --zone=public --add-port=' + port + '/udp'
+                mw.execShell(cmd)
+            if protocol == 'tcp/udp':
+                cmd = 'firewall-cmd --permanent --zone=public --add-port=' + port + '/tcp'
+                mw.execShell(cmd)
+                cmd = 'firewall-cmd --permanent --zone=public --add-port=' + port + '/udp'
+                mw.execShell(cmd)
         elif self.__isIptables:
             cmd = 'iptables -I INPUT -p tcp -m state --state NEW -m tcp --dport ' + port + ' -j ACCEPT'
             mw.execShell(cmd)
