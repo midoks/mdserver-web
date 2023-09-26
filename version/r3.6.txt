@@ -2,3 +2,4 @@ cryptography==36.0.1
 flask==2.0.3
 pyOpenSSL==22.0.0
 requests==2.27.1
+gevent==22.10.2
