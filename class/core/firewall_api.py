@@ -84,8 +84,9 @@ class firewall_api:
         port = request.form.get('port', '').strip()
         ps = request.form.get('ps', '').strip()
         stype = request.form.get('type', '').strip()
+        protocol = request.form.get('protocol', '').strip()
 
-        data = self.addAcceptPortArgs(port, ps, stype)
+        data = self.addAcceptPortArgs(port, ps, stype, protocol)
         return mw.getJson(data)
 
     # 添加放行端口
