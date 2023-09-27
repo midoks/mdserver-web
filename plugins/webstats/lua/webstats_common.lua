@@ -890,7 +890,7 @@ function _M.match_spider(self, ua)
     end
 
     -- Curl|Yahoo|HeadlessChrome|包含bot|Wget|Spider|Crawler|Scrapy|zgrab|python|java|Adsbot|DuckDuckGo
-    find_spider, _ = ngx.re.match(ua, "(Yahoo|Slurp|DuckDuckGo|Semrush|Bot)", "ijo")
+    find_spider, _ = ngx.re.match(ua, "(Yahoo|Slurp|DuckDuckGo|Semrush|Spider|Bot)", "ijo")
     if find_spider then
         spider_match = string.lower(find_spider[0])
         if string.find(spider_match, "yahoo", 1, true) then
@@ -899,7 +899,9 @@ function _M.match_spider(self, ua)
             spider_name = "other"
         elseif string.find(spider_match, "duckduckgo", 1, true) then
             spider_name = "other"
-        elseif string.find(spider_match, "Semrush", 1, true) then
+        elseif string.find(spider_match, "semrush", 1, true) then
+            spider_name = "other"
+        elseif string.find(spider_match, "spider", 1, true) then
             spider_name = "other"
         elseif string.find(spider_match, "bot", 1, true) then
             spider_name = "other"
