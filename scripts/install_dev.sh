@@ -32,7 +32,7 @@ elif grep -Eq "openSUSE" /etc/*-release; then
 	zypper refresh
 elif grep -Eq "FreeBSD" /etc/*-release; then
 	OSNAME='freebsd'
-elif grep -Eq "EulerOS" /etc/*-release || grep -Eq "openEuler" /etc/*-release; then
+elif grep -Eqi "EulerOS" /etc/*-release || grep -Eqi "openEuler" /etc/*-release; then
 	OSNAME='euler'
 	yum install -y wget curl zip unzip tar crontabs
 elif grep -Eqi "CentOS" /etc/issue || grep -Eqi "CentOS" /etc/*-release; then
