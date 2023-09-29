@@ -117,9 +117,9 @@ def initDreplace():
 
     # systemd
     systemDir = mw.systemdCfgDir()
-    systemService = systemDir + '/redis.service'
+    systemService = systemDir + '/' + getPluginName() + '.service'
     if os.path.exists(systemDir) and not os.path.exists(systemService):
-        systemServiceTpl = getPluginDir() + '/init.d/redis.service.tpl'
+        systemServiceTpl = getPluginDir() + '/init.d/' + getPluginName() + '.service.tpl'
         service_path = mw.getServerDir()
         se_content = mw.readFile(systemServiceTpl)
         se_content = se_content.replace('{$SERVER_PATH}', service_path)
