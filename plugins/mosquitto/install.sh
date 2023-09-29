@@ -49,8 +49,9 @@ Install_App()
 	fi
 
 	mkdir -p $serverPath/mosquitto
-	cd mosquitto-${VERSION} && ${INSTALL_CMD} CMakeLists.txt -DCMAKE_INSTALL_PREFIX=$serverPath/mosquitto && make install
-	
+	if  [ ! -d $serverPath/mosquitto/bin ];then
+		cd mosquitto-${VERSION} && ${INSTALL_CMD} CMakeLists.txt -DCMAKE_INSTALL_PREFIX=$serverPath/mosquitto && make install
+	fi
 	
 	if [ -d $serverPath/mosquitto ];then
 		echo "${VERSION}" > $serverPath/mosquitto/version.pl
