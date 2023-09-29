@@ -171,6 +171,18 @@ def reload():
     return redisOp('reload')
 
 
+def getPort():
+    conf = getServerDir() + '/redis.conf'
+    content = mw.readFile(conf)
+
+    rep = "^(" + 'port' + ')\s*([.0-9A-Za-z_& ~]+)'
+    tmp = re.search(rep, content, re.M)
+    if tmp:
+        return tmp.groups()[1]
+
+    return '6379'
+
+
 def runInfo():
     s = status()
     if s == 'stop':
@@ -186,14 +198,18 @@ def runInfo():
         requirepass = tmp.groups()[1]
 
     default_ip = '127.0.0.1'
+    port = getPort()
     # findDebian = mw.execShell('cat /etc/issue |grep Debian')
     # if findDebian[0] != '':
     #     default_ip = mw.getLocalIp()
-    cmd = getServerDir() + "/bin/redis-cli -h " + default_ip + " info"
+    cmd = getServerDir() + "/bin/redis-cli -h " + \
+        default_ip + ' -p ' + port + " info"
+
     if requirepass != "":
         cmd = getServerDir() + '/bin/redis-cli -h ' + default_ip + \
-            ' -a "' + requirepass + '" info'
+            ' -p ' + port + ' -a "' + requirepass + '" info'
 
+    # print(cmd)
     data = mw.execShell(cmd)[0]
     res = [
         'tcp_port',
