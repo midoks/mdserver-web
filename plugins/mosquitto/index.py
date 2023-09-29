@@ -145,7 +145,7 @@ def mqttOp(method):
             return 'ok'
         return data[1]
 
-    data = mw.execShell('systemctl ' + method + ' redis')
+    data = mw.execShell('systemctl ' + method + ' ' + getPluginName())
     if data[1] == '':
         return 'ok'
     return data[1]
