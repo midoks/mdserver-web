@@ -21,6 +21,7 @@ apt install -y expect
 
 apt install -y cron
 
+
 apt install -y locate
 locale-gen en_US.UTF-8
 localedef -v -c -i en_US -f UTF-8 en_US.UTF-8
@@ -111,6 +112,9 @@ apt install -y libfreetype6-dev
 apt install -y libevent-dev libncurses5-dev libldap2-dev
 apt install -y libzip-dev
 apt install -y libicu-dev
+
+# mqtt
+apt install -y xsltproc
 
 apt install -y build-essential
 
