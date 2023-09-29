@@ -19,6 +19,14 @@ VERSION=$2
 
 Install_App()
 {
+	if id mosquitto &> /dev/null ;then 
+	    echo "mosquitto UID is `id -u mosquitto`"
+	    echo "mosquitto Shell is `grep "^mosquitto:" /etc/passwd |cut -d':' -f7 `"
+	else
+	    groupadd mosquitto
+		useradd -g mosquitto mosquitto
+	fi
+	
 	echo '正在安装脚本文件...' > $install_tmp
 	mkdir -p $serverPath/source
 
