@@ -1,10 +1,10 @@
 [Unit]
-Description=Redis In-Memory Data Store
+Description=Mosquitto MQTT Broker
 After=network.target
 
 [Service]
 Type=forking
-ExecStart={$SERVER_PATH}/redis/bin/redis-server {$SERVER_PATH}/redis/redis.conf
+ExecStart={$SERVER_PATH}/mosquitto/bin/mosquitto {$SERVER_PATH}/mosquitto/etc/mosquitto/mosquitto.conf
 ExecReload=/bin/kill -USR2 $MAINPID
 Restart=on-failure
 
