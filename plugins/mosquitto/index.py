@@ -221,10 +221,6 @@ def initdUinstall():
     return 'ok'
 
 
-def runLog():
-    return getServerDir() + '/data/redis.log'
-
-
 if __name__ == "__main__":
     func = sys.argv[1]
     if func == 'status':
@@ -243,11 +239,7 @@ if __name__ == "__main__":
         print(initdInstall())
     elif func == 'initd_uninstall':
         print(initdUinstall())
-    elif func == 'run_info':
-        print(runInfo())
     elif func == 'conf':
         print(getConf())
-    elif func == 'run_log':
-        print(runLog())
     else:
         print('error')
