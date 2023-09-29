@@ -15,7 +15,7 @@ if mw.isAppleSystem():
 
 
 def getPluginName():
-    return 'mosquito'
+    return 'mosquitto'
 
 
 def getPluginDir():
