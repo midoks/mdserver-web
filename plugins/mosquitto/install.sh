@@ -26,12 +26,12 @@ Install_App()
 	    groupadd mosquitto
 		useradd -g mosquitto mosquitto
 	fi
-	
+
 	echo '正在安装脚本文件...' > $install_tmp
 	mkdir -p $serverPath/source
 
 	if [ ! -f $serverPath/source/mosquitto-${VERSION}.tar.gz ];then
-		wget -O $serverPath/source/mosquitto-${VERSION}.tar.gz https://mosquitto.org/files/source/mosquitto-${VERSION}.tar.gz
+		wget --no-check-certificate -O $serverPath/source/mosquitto-${VERSION}.tar.gz https://mosquitto.org/files/source/mosquitto-${VERSION}.tar.gz
 	fi
 	
 	if [ ! -d mosquitto-${VERSION} ];then
