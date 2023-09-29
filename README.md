@@ -111,6 +111,7 @@ docker run -itd --name mw-server --privileged=true -p 7200:7200 -p 80:80 -p 443:
 * 支持rar解压。
 * SSH禁止密码登陆优化。
 * 防火墙支持tcp/udp模式。
+* 增加mosquitto插件。
 
 ### JSDelivr安装地址
 
