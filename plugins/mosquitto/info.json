@@ -1,0 +1,18 @@
+{
+	"sort": 999,
+	"ps": "MQTT是一个消息队列遥测传输软件",
+	"name": "mosquitto",
+	"title": "mosquitto",
+	"shell": "install.sh",
+	"versions":["2.0.18"],
+	"updates":["2.0.18"],
+	"tip": "soft",
+	"checks": "server/mosquitto",
+	"path": "server/mosquitto",
+	"display": 1,
+	"author": "midoks",
+	"date": "2023-09-28",
+	"home": "https://mosquitto.org",
+	"type": "soft",
+	"pid": "4"
+}

@@ -15,7 +15,7 @@ if mw.isAppleSystem():
 
 
 def getPluginName():
-    return 'redis'
+    return 'mosquitto'
 
 
 def getPluginDir():
@@ -38,12 +38,12 @@ def getInitDFile():
 
 
 def getConf():
-    path = getServerDir() + "/redis.conf"
+    path = getServerDir() + "/etc/mosquitto/mosquitto.conf"
     return path
 
 
 def getConfTpl():
-    path = getPluginDir() + "/config/redis.conf"
+    path = getPluginDir() + "/config/mosquitto.conf"
     return path
 
 
@@ -74,7 +74,7 @@ def getArgs():
 
 def status():
     data = mw.execShell(
-        "ps aux|grep redis |grep -v grep | grep -v python | grep -v mdserver-web | awk '{print $2}'")
+        "ps aux|grep mosquitto |grep -v grep | grep -v python | grep -v mdserver-web | awk '{print $2}'")
 
     if data[0] == '':
         return 'stop'
@@ -104,13 +104,11 @@ def initDreplace():
         mw.execShell('chmod +x ' + file_bin)
 
     # config replace
-    dst_conf = getServerDir() + '/redis.conf'
+    dst_conf = getServerDir() + '/etc/mosquitto/' + getPluginName() + '.conf'
     dst_conf_init = getServerDir() + '/init.pl'
     if not os.path.exists(dst_conf_init):
         conf_content = mw.readFile(getConfTpl())
         conf_content = conf_content.replace('{$SERVER_PATH}', service_path)
-        conf_content = conf_content.replace(
-            '{$REDIS_PASS}', mw.getRandomString(10))
 
         mw.writeFile(dst_conf, conf_content)
         mw.writeFile(dst_conf_init, 'ok')
@@ -129,7 +127,7 @@ def initDreplace():
     return file_bin
 
 
-def redisOp(method):
+def mqttOp(method):
     file = initDreplace()
 
     current_os = mw.getOs()
@@ -145,22 +143,22 @@ def redisOp(method):
             return 'ok'
         return data[1]
 
-    data = mw.execShell('systemctl ' + method + ' redis')
+    data = mw.execShell('systemctl ' + method + ' ' + getPluginName())
     if data[1] == '':
         return 'ok'
     return data[1]
 
 
 def start():
-    return redisOp('start')
+    return mqttOp('start')
 
 
 def stop():
-    return redisOp('stop')
+    return mqttOp('stop')
 
 
 def restart():
-    status = redisOp('restart')
+    status = mqttOp('restart')
 
     log_file = runLog()
     mw.execShell("echo '' > " + log_file)
@@ -168,74 +166,7 @@ def restart():
 
 
 def reload():
-    return redisOp('reload')
-
-
-def getPort():
-    conf = getServerDir() + '/redis.conf'
-    content = mw.readFile(conf)
-
-    rep = "^(" + 'port' + ')\s*([.0-9A-Za-z_& ~]+)'
-    tmp = re.search(rep, content, re.M)
-    if tmp:
-        return tmp.groups()[1]
-
-    return '6379'
-
-
-def runInfo():
-    s = status()
-    if s == 'stop':
-        return mw.returnJson(False, '未启动')
-
-    requirepass = ""
-
-    conf = getServerDir() + '/redis.conf'
-    content = mw.readFile(conf)
-    rep = "^(requirepass" + ')\s*([.0-9A-Za-z_& ~]+)'
-    tmp = re.search(rep, content, re.M)
-    if tmp:
-        requirepass = tmp.groups()[1]
-
-    default_ip = '127.0.0.1'
-    port = getPort()
-    # findDebian = mw.execShell('cat /etc/issue |grep Debian')
-    # if findDebian[0] != '':
-    #     default_ip = mw.getLocalIp()
-    cmd = getServerDir() + "/bin/redis-cli -h " + \
-        default_ip + ' -p ' + port + " info"
-
-    if requirepass != "":
-        cmd = getServerDir() + '/bin/redis-cli -h ' + default_ip + \
-            ' -p ' + port + ' -a "' + requirepass + '" info'
-
-    # print(cmd)
-    data = mw.execShell(cmd)[0]
-    res = [
-        'tcp_port',
-        'uptime_in_days',  # 已运行天数
-        'connected_clients',  # 连接的客户端数量
-        'used_memory',  # Redis已分配的内存总量
-        'used_memory_rss',  # Redis占用的系统内存总量
-        'used_memory_peak',  # Redis所用内存的高峰值
-        'mem_fragmentation_ratio',  # 内存碎片比率
-        'total_connections_received',  # 运行以来连接过的客户端的总数量
-        'total_commands_processed',  # 运行以来执行过的命令的总数量
-        'instantaneous_ops_per_sec',  # 服务器每秒钟执行的命令数量
-        'keyspace_hits',  # 查找数据库键成功的次数
-        'keyspace_misses',  # 查找数据库键失败的次数
-        'latest_fork_usec'  # 最近一次 fork() 操作耗费的毫秒数
-    ]
-    data = data.split("\n")
-    result = {}
-    for d in data:
-        if len(d) < 3:
-            continue
-        t = d.strip().split(':')
-        if not t[0] in res:
-            continue
-        result[t[0]] = t[1]
-    return mw.getJson(result)
+    return mqttOp('reload')
 
 
 def initdStatus():
@@ -290,72 +221,6 @@ def initdUinstall():
     return 'ok'
 
 
-def runLog():
-    return getServerDir() + '/data/redis.log'
-
-
-def getRedisConfInfo():
-    conf = getServerDir() + '/redis.conf'
-    content = mw.readFile(conf)
-
-    gets = [
-        {'name': 'bind', 'type': 2, 'ps': '绑定IP(修改绑定IP可能会存在安全隐患)'},
-        {'name': 'port', 'type': 2, 'ps': '绑定端口'},
-        {'name': 'timeout', 'type': 2, 'ps': '空闲链接超时时间,0表示不断开'},
-        {'name': 'maxclients', 'type': 2, 'ps': '最大输入时间'},
-        {'name': 'databases', 'type': 2, 'ps': '数据库数量'},
-        {'name': 'requirepass', 'type': 2, 'ps': 'redis密码,留空代表没有设置密码'},
-        {'name': 'maxmemory', 'type': 2, 'ps': 'MB,最大使用内存,0表示不限制'}
-    ]
-    content = mw.readFile(conf)
-
-    result = []
-    for g in gets:
-        rep = "^(" + g['name'] + ')\s*([.0-9A-Za-z_& ~]+)'
-        tmp = re.search(rep, content, re.M)
-        if not tmp:
-            g['value'] = ''
-            result.append(g)
-            continue
-        g['value'] = tmp.groups()[1]
-        if g['name'] == 'maxmemory':
-            g['value'] = g['value'].strip("mb")
-        result.append(g)
-
-    return result
-
-
-def getRedisConf():
-    data = getRedisConfInfo()
-    return mw.getJson(data)
-
-
-def submitRedisConf():
-    gets = ['bind', 'port', 'timeout', 'maxclients',
-            'databases', 'requirepass', 'maxmemory']
-    args = getArgs()
-    conf = getServerDir() + '/redis.conf'
-    content = mw.readFile(conf)
-    for g in gets:
-        if g in args:
-            rep = g + '\s*([.0-9A-Za-z_& ~]+)'
-            val = g + ' ' + args[g]
-
-            if g == 'maxmemory':
-                val = g + ' ' + args[g] + "mb"
-
-            if g == 'requirepass' and args[g] == '':
-                content = re.sub('requirepass', '#requirepass', content)
-            if g == 'requirepass' and args[g] != '':
-                content = re.sub('#requirepass', 'requirepass', content)
-                content = re.sub(rep, val, content)
-
-            if g != 'requirepass':
-                content = re.sub(rep, val, content)
-    mw.writeFile(conf, content)
-    reload()
-    return mw.returnJson(True, '设置成功')
-
 if __name__ == "__main__":
     func = sys.argv[1]
     if func == 'status':
@@ -374,15 +239,7 @@ if __name__ == "__main__":
         print(initdInstall())
     elif func == 'initd_uninstall':
         print(initdUinstall())
-    elif func == 'run_info':
-        print(runInfo())
     elif func == 'conf':
         print(getConf())
-    elif func == 'run_log':
-        print(runLog())
-    elif func == 'get_redis_conf':
-        print(getRedisConf())
-    elif func == 'submit_redis_conf':
-        print(submitRedisConf())
     else:
         print('error')

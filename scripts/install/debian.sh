@@ -184,6 +184,8 @@ apt install -y libevent-dev libncurses5-dev libldap2-dev
 apt install -y libzip-dev
 apt install -y libicu-dev
 
+apt install -y xsltproc
+
 apt install -y libcurl4-openssl-dev
 apt install -y curl libcurl4-gnutls-dev
 
