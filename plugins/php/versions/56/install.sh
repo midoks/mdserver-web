@@ -30,7 +30,7 @@ if [ ! -d $sourcePath/php/php${PHP_VER} ];then
 	# 中国优化安装
 	cn=$(curl -fsSL -m 10 -s http://ipinfo.io/json | grep "\"country\": \"CN\"")
 	LOCAL_ADDR=common
-	if [ ! -z "$cn" ];then
+	if [ ! -z "$cn" ] || [ "$?" == "0" ] ;then
 		LOCAL_ADDR=cn
 	fi
 
