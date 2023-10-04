@@ -561,7 +561,7 @@ def userProjectList():
     data['data'] = ret_data
     data['args'] = args
     data['list'] = mw.getPage(
-        {'count': dlist_sum, 'p': page, 'row': page_size, 'tojs': 'userProjectList'})
+        {'count': dlist_sum, 'p': page, 'row': page_size, 'tojs': 'userProjectListPage'})
 
     return mw.returnJson(True, 'OK', data)
 
