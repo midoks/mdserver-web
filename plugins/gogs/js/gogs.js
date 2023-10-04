@@ -246,7 +246,7 @@ function userProjectListPage(user, search){
                     <td>'+name+'</td>\
                     <td>\
                         <a class="btlink" target="_blank" href="'+rdata['data']['root_url']+user+'/'+name+'">源码</a> | \
-                        <a class="btlink" onclick="projectScript(\''+user+'\',\''+name+'\','+project_list[i]['has_hook']+');">脚本</a>\
+                        <a class="btlink" onclick="projectScriptPage(\''+user+'\',\''+name+'\','+project_list[i]['has_hook']+');">脚本</a>\
                     </td>\
                 </tr>';
         }
