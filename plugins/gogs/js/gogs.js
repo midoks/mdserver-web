@@ -201,7 +201,6 @@ function userProjectList(user, search){
         req['search'] = search;
     }
 
-    $('.layui-layer-close1').click();
     gogsPost('user_project_list', req, function(data){
         var rdata = [];
         try {
@@ -236,13 +235,15 @@ function userProjectList(user, search){
             area: '500px',
             content:"<div class='bt-form pd20 c6'>\
                     <div>\
-                            <div class='divtable' style='margin-top:5px;'>\
-                                <table class='table table-hover'>\
-                                    <thead><tr><th>项目</th><th>操作</th></tr></thead>\
-                                    <tbody>" + list + "</tbody>\
-                                </table>" + 
-                                page +
-                    "</div></div></div>"
+                        <div class='divtable' style='margin-top:5px;'>\
+                        <table class='table table-hover'>\
+                            <thead><tr><th>项目</th><th>操作</th></tr></thead>\
+                            <tbody>" + list + "</tbody>\
+                        </table>" + 
+                        page +
+                        "</div>\
+                    </div>\
+                </div>"
         });
     });
 }
