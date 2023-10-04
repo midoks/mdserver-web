@@ -185,6 +185,31 @@ function gogsUserList(page, search) {
 }
 
 function userProjectList(user, search){
+    layer.open({
+        type: 1,
+        title: '用户('+user+')项目列表',
+        area: '500px',
+        content:"<div class='bt-form pd20 c6'>\
+                <div>\
+                    <div id='gogs_table' class='divtable' style='margin-top:5px;'>\
+                        <table class='table table-hover'>\
+                            <thead><tr><th>项目</th><th>操作</th></tr></thead>\
+                            <tbody></tbody>\
+                        </table>\
+                        <div class='dataTables_paginate paging_bootstrap pagination' style='margin-top:0px;'>\
+                            <ul class='page'><div class='gogs_page'></div></ul>\
+                        </div>\
+                    </div>\
+                </div>\
+            </div>",
+        success:function(){
+            userProjectListPage(user,search);
+        }
+    });
+}
+
+
+function userProjectListPage(user, search){
     var req = {};
     if (!isNaN(user)){
         req['page'] = user;
@@ -200,7 +225,7 @@ function userProjectList(user, search){
     if(typeof(search) != 'undefined'){
         req['search'] = search;
     }
-
+    
     gogsPost('user_project_list', req, function(data){
         var rdata = [];
         try {
@@ -226,28 +251,13 @@ function userProjectList(user, search){
                 </tr>';
         }
 
-        var page = '<div class="dataTables_paginate paging_bootstrap pagination" style="margin-top:0px;"><ul id="softPage" class="page"><div>';
-        page += rdata['data']['list'];
-        page += '</div></ul></div>';
+        $('#gogs_table tbody').html(list);
 
-        var loadOpen = layer.open({
-            type: 1,
-            title: '用户('+user+')项目列表',
-            area: '500px',
-            content:"<div class='bt-form pd20 c6'>\
-                    <div>\
-                        <div class='divtable' style='margin-top:5px;'>\
-                        <table class='table table-hover'>\
-                            <thead><tr><th>项目</th><th>操作</th></tr></thead>\
-                            <tbody>" + list + "</tbody>\
-                        </table>" + 
-                        page +
-                        "</div>\
-                    </div>\
-                </div>"
-        });
+        var page = rdata['data']['list'];
+        $('#gogs_table .gogs_page').html(page);
     });
 }
+
 
 
 function projectScript(user, name,has_hook){
@@ -290,7 +300,7 @@ function projectScriptLoad(user,name){
 
         layer.msg('加载成功!',{icon:1,time:2000,shade: [0.3, '#000']});
         setTimeout(function(){
-            userProjectList(1);
+            userProjectListPage(1);
         }, 2000);
     });
 }
@@ -304,7 +314,7 @@ function projectScriptUnload(user,name){
 
         layer.msg('卸载成功!',{icon:1,time:2000,shade: [0.3, '#000']});
         setTimeout(function(){
-            userProjectList(1);
+            userProjectListPage(1);
         }, 2000);
     });
 } 
