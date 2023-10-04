@@ -287,6 +287,10 @@ mw_debug(){
     gunicorn -b :$port -k geventwebsocket.gunicorn.workers.GeventWebSocketWorker -w 1  app:app
 }
 
+mw_connect_mysql(){
+    echo 'dev';
+}
+
 case "$1" in
     'start') mw_start;;
     'stop') mw_stop;;
@@ -311,6 +315,7 @@ case "$1" in
     'unbind_domain') mw_unbind_domain;;
     'debug') mw_debug;;
     'mirror') mw_mirror;;
+    'mysql') mw_connect_mysql;;
     'default')
         cd $mw_path
         port=7200
