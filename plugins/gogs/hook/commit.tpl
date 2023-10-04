@@ -16,7 +16,9 @@ git config --global pull.rebase false
 if [ ! -d $GIT_PROJECT_DIR ];then
 	mkdir -p $GIT_USER_DIR && cd $GIT_USER_DIR
 	git clone $GITADDR --branch main
-	# git clone $GITADDR
+	if [ "$?" != "0" ];then 
+		git clone $GITADDR
+	fi
 fi
 
 unset GIT_DIR
