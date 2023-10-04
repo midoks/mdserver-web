@@ -217,7 +217,8 @@ function userProjectList(user, search){
         var project_list = rdata['data']['data'];
         for (i in project_list) {
             var name = project_list[i]['name'];
-            list += '<tr><td>'+name+'</td>\
+            list += '<tr>\
+                    <td>'+name+'</td>\
                     <td>\
                         <a class="btlink" target="_blank" href="'+rdata['data']['root_url']+user+'/'+name+'">源码</a> | \
                         <a class="btlink" onclick="projectScript(\''+user+'\',\''+name+'\','+project_list[i]['has_hook']+');">脚本</a>\
