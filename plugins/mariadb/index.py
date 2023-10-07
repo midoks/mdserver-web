@@ -755,6 +755,11 @@ def importDbBackup():
     return mw.returnJson(True, 'ok')
 
 
+def rootPwd():
+    return pSqliteDb('config').where(
+        'id=?', (1,)).getField('mysql_root')
+
+
 def importDbExternal():
     args = getArgs()
     data = checkArgs(args, ['file', 'name'])
@@ -2740,6 +2745,8 @@ if __name__ == "__main__":
         print(setMyPort())
     elif func == 'init_pwd':
         print(initMysqlPwd())
+    elif func == 'root_pwd':
+        print(rootPwd())
     elif func == 'get_db_list':
         print(getDbList())
     elif func == 'set_db_backup':
