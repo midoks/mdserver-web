@@ -375,6 +375,10 @@ mw_connect_mysql(){
         ${ROOT_PATH}/mariadb/bin/mysql -uroot -p"${pwd}"
     fi
 
+    if [ "$CHOICE_DB" == "mysql-apt" ];then
+        ${ROOT_PATH}/mysql-apt/bin/usr/bin/mysql -uroot -p"${pwd}"
+    fi
+
 }
 
 case "$1" in
