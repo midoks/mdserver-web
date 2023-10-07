@@ -4,7 +4,15 @@
 - 面板相关命令
 
 ```
-/etc/init.d/mw default
+/etc/init.d/mw default		| 显示登录信息
+/etc/init.d/mw db 		| 快捷连接数据库
+----------------------------------------
+
+mw debug			| 开发测试
+mw mirror			| 切换镜像
+mw install_app			| 快捷安装常用软件
+mw update 			| 更新到正式
+mw update_dev			| 更新到开发
 
 service mw [start|stop|reload|restart|status]
 ```
