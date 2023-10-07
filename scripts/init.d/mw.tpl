@@ -366,9 +366,13 @@ mw_connect_mysql(){
     INPUT_KEY=${SOURCE_LIST_KEY[$INPUT]}
     CHOICE_DB=${DB_TYPE[$INPUT_KEY]}
     echo "login to ${CHOICE_DB}:"
-    pwd=$(python3 /www/server/mdserver-web/plugins/${CHOICE_DB}/index.py root_pwd)
+    pwd=$(cd /www/server/mdserver-web && python3 /www/server/mdserver-web/plugins/${CHOICE_DB}/index.py root_pwd)
     if [ "$CHOICE_DB" == "mysql" ];then
         ${ROOT_PATH}/mysql/bin/mysql -uroot -p"${pwd}"
+    fi
+
+    if [ "$CHOICE_DB" == "mariadb" ];then
+        ${ROOT_PATH}/mariadb/bin/mysql -uroot -p"${pwd}"
     fi
 
 }
