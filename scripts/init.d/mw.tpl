@@ -358,8 +358,7 @@ mw_connect_mysql(){
     read -p "${CHOICE_A}" INPUT
 
     if [ "$INPUT" == "" ]; then
-        echo -e "\nDefault not selected!"
-        exit 1
+        INPUT=1
     fi
 
     if [ "$INPUT" -lt "0" ] || [ "$INPUT" -gt "${SOURCE_LIST_LEN}" ]; then
