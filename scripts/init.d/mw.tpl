@@ -371,7 +371,6 @@ mw_connect_mysql(){
         ${ROOT_PATH}/mysql/bin/mysql -uroot -p"${pwd}"
     fi
 
-    
 }
 
 case "$1" in
