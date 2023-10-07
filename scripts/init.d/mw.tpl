@@ -372,11 +372,11 @@ mw_connect_mysql(){
     fi
 
     if [ "$CHOICE_DB" == "mariadb" ];then
-        ${ROOT_PATH}/mariadb/bin/mysql -uroot -p"${pwd}"
+        ${ROOT_PATH}/mariadb/bin/mariadb  -S ${ROOT_PATH}/mariadb/mysql.sock -uroot -p"${pwd}"
     fi
 
     if [ "$CHOICE_DB" == "mysql-apt" ];then
-        ${ROOT_PATH}/mysql-apt/bin/usr/bin/mysql -uroot -p"${pwd}"
+        ${ROOT_PATH}/mysql-apt/bin/usr/bin/mysql -S ${ROOT_PATH}/mysql-apt/mysql.sock -uroot -p"${pwd}"
     fi
 
 }
