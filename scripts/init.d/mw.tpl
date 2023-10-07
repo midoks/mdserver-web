@@ -343,6 +343,11 @@ function AutoSizeStr(){
 }
 
 mw_connect_mysql(){
+    if [ "$SOURCE_LIST_LEN" == "0" ]; then
+        echo -e "no data!"
+        exit 1
+    fi
+
     cm_i=0
     for M in ${SOURCE_LIST_KEY[@]}; do
         num=`expr $cm_i + 1`
