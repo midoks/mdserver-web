@@ -12,11 +12,24 @@
 # Description:       starts the mw
 ### END INIT INFO
 
+RED='\033[31m'
+GREEN='\033[32m'
+YELLOW='\033[33m'
+BLUE='\033[34m'
+PLAIN='\033[0m'
+BOLD='\033[1m'
+SUCCESS='[\033[32mOK\033[0m]'
+COMPLETE='[\033[32mDONE\033[0m]'
+WARN='[\033[33mWARN\033[0m]'
+ERROR='[\033[31mERROR\033[0m]'
+WORKING='[\033[34m*\033[0m]'
+
 
 PATH=/usr/local/bin:/bin:/sbin:/usr/bin:/usr/sbin:/usr/local/bin:/usr/local/sbin:~/bin
 export LANG=en_US.UTF-8
 
 mw_path={$SERVER_PATH}
+ROOT_PATH=$(dirname "$mw_path")
 PATH=$PATH:$mw_path/bin
 
 
@@ -287,8 +300,78 @@ mw_debug(){
     gunicorn -b :$port -k geventwebsocket.gunicorn.workers.GeventWebSocketWorker -w 1  app:app
 }
 
+
+# choose mysql login
+
+declare -A DB_TYPE
+
+if [ -d "${ROOT_PATH}/mysql" ];then
+    DB_TYPE["mysql"]="mysql"
+fi
+
+if [ -d "${ROOT_PATH}/mariadb" ];then
+    DB_TYPE["mariadb"]="mariadb"
+fi
+
+if [ -d "${ROOT_PATH}/mysql-apt" ];then
+    DB_TYPE["mysql-apt"]="mysql-apt"
+fi
+
+if [ -d "${ROOT_PATH}/mysql-apt" ];then
+    DB_TYPE["mysql-yum"]="mysql-yum"
+fi
+
+SOURCE_LIST_KEY_SORT_TMP=$(echo ${!DB_TYPE[@]} | tr ' ' '\n' | sort -n)
+SOURCE_LIST_KEY=(${SOURCE_LIST_KEY_SORT_TMP//'\n'/})
+SOURCE_LIST_LEN=${#DB_TYPE[*]}
+
+function AutoSizeStr(){
+    NAME_STR=$1
+    NAME_NUM=$2
+
+    NAME_STR_LEN=`echo "$NAME_STR" | wc -L`
+    NAME_NUM_LEN=`echo "$NAME_NUM" | wc -L`
+
+    fix_len=35
+    remaining_len=`expr $fix_len - $NAME_STR_LEN - $NAME_NUM_LEN`
+    FIX_SPACE=' '
+    for ((ass_i=1;ass_i<=$remaining_len;ass_i++))
+    do 
+        FIX_SPACE="$FIX_SPACE "
+    done
+    echo -e " ❖   ${1}${FIX_SPACE}${2})"
+}
+
 mw_connect_mysql(){
-    echo 'dev';
+    cm_i=0
+    for M in ${SOURCE_LIST_KEY[@]}; do
+        num=`expr $cm_i + 1`
+        AutoSizeStr "${M}" "$num"
+        cm_i=`expr $cm_i + 1`
+    done
+    CHOICE_A=$(echo -e "\n${BOLD}└─ Please select and enter the database you want to log in to [ 1-${SOURCE_LIST_LEN} ]：${PLAIN}")
+    read -p "${CHOICE_A}" INPUT
+
+    if [ "$INPUT" == "" ]; then
+        echo -e "\nDefault not selected!"
+        exit 1
+    fi
+
+    if [ "$INPUT" -lt "0" ] || [ "$INPUT" -gt "${SOURCE_LIST_LEN}" ]; then
+        echo -e "\nBoundary error not selected!"
+        exit 1
+    fi
+
+    INPUT=`expr $INPUT - 1`
+    INPUT_KEY=${SOURCE_LIST_KEY[$INPUT]}
+    CHOICE_DB=${DB_TYPE[$INPUT_KEY]}
+    echo "login to ${CHOICE_DB}:"
+    pwd=$(python3 /www/server/mdserver-web/plugins/${CHOICE_DB}/index.py root_pwd)
+    if [ "$CHOICE_DB" == "mysql" ];then
+        ${ROOT_PATH}/mysql/bin/mysql -uroot -p"${pwd}"
+    fi
+
+    
 }
 
 case "$1" in
@@ -315,7 +398,7 @@ case "$1" in
     'unbind_domain') mw_unbind_domain;;
     'debug') mw_debug;;
     'mirror') mw_mirror;;
-    'mysql') mw_connect_mysql;;
+    'db') mw_connect_mysql;;
     'default')
         cd $mw_path
         port=7200
