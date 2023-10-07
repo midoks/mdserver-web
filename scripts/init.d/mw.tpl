@@ -379,6 +379,10 @@ mw_connect_mysql(){
         ${ROOT_PATH}/mysql-apt/bin/usr/bin/mysql -S ${ROOT_PATH}/mysql-apt/mysql.sock -uroot -p"${pwd}"
     fi
 
+    if [ "$CHOICE_DB" == "mysql-yum" ];then
+        ${ROOT_PATH}/mysql-yum/bin/usr/bin/mysql -S ${ROOT_PATH}/mysql-yum/mysql.sock -uroot -p"${pwd}"
+    fi
+
 }
 
 case "$1" in
