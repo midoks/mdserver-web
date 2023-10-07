@@ -4,10 +4,10 @@
 - 面板相关命令
 
 ```
-/etc/init.d/mw default	| 显示登录信息
+/etc/init.d/mw default		| 显示登录信息
 /etc/init.d/mw db 		| 快捷连接数据
 
-mw update 				| 更新到正式
+mw update 			| 更新到正式
 mw update_dev			| 更新到开发
 
 service mw [start|stop|reload|restart|status]
