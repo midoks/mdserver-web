@@ -317,7 +317,7 @@ if [ -d "${ROOT_PATH}/mysql-apt" ];then
     DB_TYPE["mysql-apt"]="mysql-apt"
 fi
 
-if [ -d "${ROOT_PATH}/mysql-apt" ];then
+if [ -d "${ROOT_PATH}/mysql-yum" ];then
     DB_TYPE["mysql-yum"]="mysql-yum"
 fi
 
