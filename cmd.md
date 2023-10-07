@@ -10,7 +10,7 @@
 
 mw debug			| 开发测试
 mw mirror			| 切换镜像
-mw install_app		| 快捷安装常用软件
+mw install_app			| 快捷安装常用软件
 mw update 			| 更新到正式
 mw update_dev			| 更新到开发
 
