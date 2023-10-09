@@ -86,6 +86,11 @@ def getOs():
     data = {}
     data['os'] = mw.getOs()
     ng_exe_bin = getServerDir() + "/nginx/sbin/nginx"
+
+    if mw.isAppleSystem():
+        data['auth'] = True
+        return mw.getJson(data)
+
     if checkAuthEq(ng_exe_bin, 'root'):
         data['auth'] = True
     else:
