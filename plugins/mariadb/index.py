@@ -402,6 +402,8 @@ def initMariaDbPwd():
         pwd + ' -e "drop database test";'
     mw.execShell(drop_test_db)
 
+    pSqliteDb('config').where('id=?', (1,)).save('mysql_root', (pwd,))
+
     # 删除冗余账户
     hostname = mw.execShell('hostname')[0].strip()
     if hostname != 'localhost':
@@ -412,8 +414,6 @@ def initMariaDbPwd():
         drop_root_hostname =  serverdir + '/bin/mysql  --defaults-file=' + \
             myconf + ' -uroot -p' + pwd + ' -e "drop user \'root\'@\'' + hostname + '\'";'
         mw.execShell(drop_root_hostname)
-
-    pSqliteDb('config').where('id=?', (1,)).save('mysql_root', (pwd,))
     return True
 
 
