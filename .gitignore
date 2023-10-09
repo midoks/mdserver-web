@@ -158,6 +158,7 @@ data/unauthorized_status.pl
 plugins/vip_*
 plugins/own_*
 plugins/my_*
+plugins/op_auth
 plugins/l2tp
 plugins/openlitespeed
 plugins/tamper_proof
