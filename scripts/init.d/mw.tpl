@@ -418,7 +418,7 @@ case "$1" in
     'debug') mw_debug;;
     'mirror') mw_mirror;;
     'db') mw_connect_mysql;;
-    'venv') mw_venv;
+    'venv') mw_venv;;
     'default')
         cd $mw_path
         port=7200
