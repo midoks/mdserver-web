@@ -77,6 +77,13 @@ PHP[53-72]支持phpMyAdmin[4.4.15]
 PHP[72-82]支持phpMyAdmin[5.2.0]
 ```
 
+# 郑重声明
+
+不卖、不会监控(统计使用除外)、更不会注入病毒,大家使用方便(望大家不吝捐赠)。
+
+- https://www.youtube.com/watch?v=2taa5K-Jmmw
+
+
 # 特别赞助
 
 - [找资源 - 阿里云盘资源搜索引擎](https://zhaoziyuan.pw/)
