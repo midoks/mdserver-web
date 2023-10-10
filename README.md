@@ -77,6 +77,8 @@ PHP[53-72]支持phpMyAdmin[4.4.15]
 PHP[72-82]支持phpMyAdmin[5.2.0]
 ```
 
+<iframe width="560" height="315" src="https://www.youtube.com/embed/2taa5K-Jmmw?si=oLaGEScGsvznUnkZ" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>
+
 # 特别赞助
 
 - [找资源 - 阿里云盘资源搜索引擎](https://zhaoziyuan.pw/)
