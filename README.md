@@ -77,7 +77,11 @@ PHP[53-72]支持phpMyAdmin[4.4.15]
 PHP[72-82]支持phpMyAdmin[5.2.0]
 ```
 
-<iframe width="560" height="315" src="https://www.youtube.com/embed/2taa5K-Jmmw?si=oLaGEScGsvznUnkZ" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>
+# 郑重声明
+
+不卖、不会监控(统计使用除外)、更不会注入病毒,为自由而战。
+- https://www.youtube.com/watch?v=2taa5K-Jmmw
+
 
 # 特别赞助
 
