@@ -389,6 +389,10 @@ mw_connect_mysql(){
 
 }
 
+mw_venv(){
+    cd /www/server/mdserver-web && source bin/activate
+}
+
 case "$1" in
     'start') mw_start;;
     'stop') mw_stop;;
@@ -414,6 +418,7 @@ case "$1" in
     'debug') mw_debug;;
     'mirror') mw_mirror;;
     'db') mw_connect_mysql;;
+    'venv') mw_venv;
     'default')
         cd $mw_path
         port=7200
