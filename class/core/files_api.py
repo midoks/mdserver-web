@@ -876,7 +876,7 @@ class files_api:
 
             if os.path.exists(dfile):
                 self.setFileAccept(dfile)
-            mw.writeLog("文件管理", '文件解压成功!', (sfile, dfile))
+            mw.writeLog("文件管理", '文件[{1}]解压[{2}]成功!', (sfile, dfile))
             return mw.returnJson(True, '文件解压成功!')
         except Exception as e:
             return mw.returnJson(False, '文件解压失败!:' + str(e))
