@@ -807,7 +807,7 @@ class files_api:
             if path.find("web_conf") > 0:
                 mw.restartWeb()
 
-            mw.writeLog('文件管理', '文件保存成功', (path,))
+            mw.writeLog('文件管理', '文件[{1}]保存成功', (path,))
             return mw.returnJson(True, '文件保存成功')
         except Exception as ex:
             return mw.returnJson(False, '文件保存错误:' + str(ex))
