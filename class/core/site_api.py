@@ -2788,7 +2788,7 @@ location ^~ {from} {\n\
 
         self.saveCert(keyPath, certPath)
 
-        msg = mw.getInfo('网站[{}]开启SSL成功!', (siteName,))
+        msg = mw.getInfo('网站[{1}]开启SSL成功!', (siteName,))
         mw.writeLog('网站管理', msg)
 
         mw.restartWeb()
