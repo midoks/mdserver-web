@@ -206,8 +206,9 @@ function _M.D(self, msg)
 
     local _msg = ''
     if type(msg) == 'table' then
+        _msg = _msg.."args->\n"
         for key, val in pairs(msg) do
-            _msg = tostring(key)..':'.."\n"
+            _msg = _msg..tostring(key)..':'..tostring(val).."\n"
         end
     elseif type(msg) == 'string' then
         _msg = msg
@@ -216,7 +217,6 @@ function _M.D(self, msg)
     else
         _msg = msg
     end
-
 
     local fp = io.open(waf_root.."/debug.log", "ab")
     if fp == nil then
