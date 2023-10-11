@@ -831,7 +831,7 @@ class files_api:
                 mw.execShell("cd '" + path + "' && tar -zcvf '" +
                              dfile + "' " + sfiles + " > " + tmps + " 2>&1")
             self.setFileAccept(dfile)
-            mw.writeLog("文件管理", '文件压缩成功!', (sfile, dfile))
+            mw.writeLog("文件管理", '文件[{1}]压缩[{2}]成功!', (sfile, dfile))
             return mw.returnJson(True, '文件压缩成功!')
         except:
             return mw.returnJson(False, '文件压缩失败!')
