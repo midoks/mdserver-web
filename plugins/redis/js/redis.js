@@ -122,7 +122,7 @@ function getRedisConfig(version) {
     });
 }
 
-//提交PHP配置
+//提交配置
 function submitConf(version) {
     var data = {
         version: version,
