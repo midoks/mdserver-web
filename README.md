@@ -91,7 +91,6 @@ PHP[72-82]支持phpMyAdmin[5.2.0]
 # 特别赞助
 
 - [找资源 - 阿里云盘资源搜索引擎](https://zhaoziyuan.pw/)
-- [鲲鹏vpn，免费试用，解锁流媒体和chatGPT](https://down.xbjc888.top/?agent_code=github)
 
 # AD - VPS推荐 - 🙏
 
