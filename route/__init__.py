@@ -256,7 +256,7 @@ def webhook():
         'params': request.args.get('params', '').strip()
     }
 
-    if request.method == 'POST':
+    if request.method == 'POST' and request.args.get('post', ''):
         input_args = {
             'access_key': request.form.get('access_key', '').strip(),
             'params': request.form.get('params', '').strip()
