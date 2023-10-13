@@ -296,7 +296,6 @@ def runLog():
 
 def getRedisConfInfo():
     conf = getServerDir() + '/redis.conf'
-    content = mw.readFile(conf)
 
     gets = [
         {'name': 'bind', 'type': 2, 'ps': '绑定IP(修改绑定IP可能会存在安全隐患)'},

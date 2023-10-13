@@ -66,6 +66,10 @@ Talk is cheap, show me the code.  -- linus
 - 插件地址 - https://github.com/mw-plugin
 - 开发文档 - https://github.com/midoks/mdserver-web/wiki/插件开发
 
+## 其他插件
+
+- OP鉴权 - https://github.com/mw-plugin/op_auth
+
 
 # Note
 

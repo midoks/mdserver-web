@@ -807,7 +807,7 @@ class files_api:
             if path.find("web_conf") > 0:
                 mw.restartWeb()
 
-            mw.writeLog('文件管理', '文件保存成功', (path,))
+            mw.writeLog('文件管理', '文件[{1}]保存成功', (path,))
             return mw.returnJson(True, '文件保存成功')
         except Exception as ex:
             return mw.returnJson(False, '文件保存错误:' + str(ex))
@@ -831,7 +831,7 @@ class files_api:
                 mw.execShell("cd '" + path + "' && tar -zcvf '" +
                              dfile + "' " + sfiles + " > " + tmps + " 2>&1")
             self.setFileAccept(dfile)
-            mw.writeLog("文件管理", '文件压缩成功!', (sfile, dfile))
+            mw.writeLog("文件管理", '文件[{1}]压缩[{2}]成功!', (sfile, dfile))
             return mw.returnJson(True, '文件压缩成功!')
         except:
             return mw.returnJson(False, '文件压缩失败!')
@@ -876,7 +876,7 @@ class files_api:
 
             if os.path.exists(dfile):
                 self.setFileAccept(dfile)
-            mw.writeLog("文件管理", '文件解压成功!', (sfile, dfile))
+            mw.writeLog("文件管理", '文件[{1}]解压[{2}]成功!', (sfile, dfile))
             return mw.returnJson(True, '文件解压成功!')
         except Exception as e:
             return mw.returnJson(False, '文件解压失败!:' + str(e))
@@ -900,7 +900,7 @@ class files_api:
                              " -C " + dfile + " > " + tmps + " 2>&1 &")
 
             self.setFileAccept(dfile)
-            mw.writeLog("文件管理", '文件解压成功!', (sfile, dfile))
+            mw.writeLog("文件管理", '文件[{1}]解压[{2}]成功!', (sfile, dfile))
             return mw.returnJson(True, '文件解压成功!')
         except:
             return mw.returnJson(False, '文件解压失败!')
