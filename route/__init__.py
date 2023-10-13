@@ -251,16 +251,20 @@ def wellknow(val=None):
 @app.route("/hook", methods=['POST', 'GET'])
 def webhook():
     # 仅针对webhook插件
-    input_args = {
-        'access_key': request.args.get('access_key', '').strip(),
-        'params': request.args.get('params', '').strip()
-    }
 
-    if request.method == 'POST' and request.args.get('post', ''):
-        input_args = {
-            'access_key': request.form.get('access_key', '').strip(),
-            'params': request.form.get('params', '').strip()
-        }
+    # 兼容获取关键数据
+    access_key = request.args.get('access_key', '').strip()
+    if access_key == '':
+        access_key = request.form.get('access_key', '').strip()
+
+    params = request.args.get('params', '').strip()
+    if params == '':
+        params = request.form.get('params', '').strip()
+
+    input_args = {
+        'access_key': access_key,
+        'params': params,
+    }
 
     wh_install_path = mw.getServerDir() + '/webhook'
     if not os.path.exists(wh_install_path):
