@@ -555,8 +555,6 @@ end
 
 local geo=nil 
 local waf_country=""
-local geo2=nil 
-
 
 local function initmaxminddb()
     if geo==nil then 
@@ -587,15 +585,16 @@ local function  get_ip_country(ip)
     if not res then
         return "2"
     else
-        C:D("res:"..tostring(res))
+        -- C:D("res:"..tostring(res))
         return res
     end
 end
 
 local function get_country()
     local ip = params['ip']
-    if ngx.shared.waf_limit:get("get_country"..ip) then 
-        return ngx.shared.waf_limit:get("get_country"..ip)
+    local ip_local = ngx.shared.waf_limit:get("get_country"..ip)
+    if ip_local then 
+        return ip_local
     end
     local ip_postion=get_ip_country(ip)
     if ip_postion=="2" then return false end 
@@ -661,9 +660,13 @@ function run_app_waf()
     min_route()
     -- C:D("min_route")
     -- country limit
-    local waf_country = get_country()
-    if area_limit(waf_country, server_name, site_config[server_name]['open']) then return true end
-    
+    if config['area_limit'] then
+        local waf_country = get_country()
+        if waf_country then
+            if area_limit(waf_country, server_name, site_config[server_name]['open']) then return true end
+        end
+    end
+
     if site_config[server_name] and site_config[server_name]['open'] then
         
 
