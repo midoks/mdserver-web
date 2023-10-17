@@ -393,6 +393,12 @@ mw_venv(){
     cd /www/server/mdserver-web && source bin/activate
 }
 
+mw_clean_lib(){
+    cd /www/server/mdserver-web && rm -rf lib
+    cd /www/server/mdserver-web && rm -rf lib64
+    cd /www/server/mdserver-web && rm -rf bin
+}
+
 case "$1" in
     'start') mw_start;;
     'stop') mw_stop;;
@@ -419,6 +425,7 @@ case "$1" in
     'mirror') mw_mirror;;
     'db') mw_connect_mysql;;
     'venv') mw_venv;;
+    'clean_lib') mw_clean_lib;;
     'default')
         cd $mw_path
         port=7200
