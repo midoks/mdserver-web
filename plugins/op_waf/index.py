@@ -1311,6 +1311,30 @@ def getWafConf():
     return mw.readFile(conf)
 
 
+def areaLimitSwitch():
+    args = getArgs()
+    data = checkArgs(args, ['area_limit'])
+    if not data[0]:
+        return data[1]
+
+    path_config = getJsonPath('config')
+
+    config_contents = mw.readFile(path_config)
+    config_contents = json.loads(config_contents)
+
+    msg = '关闭成功!'
+    if args['area_limit'] == 'on':
+        msg = '开启成功!'
+        config_contents['area_limit'] = True
+    else:
+        config_contents['area_limit'] = False
+
+    mw.writeFile(path_config, json.dumps(config_contents))
+
+    autoMakeConfig(True, True)
+    return mw.returnJson(True, msg)
+
+
 def getAreaLimit():
     conf = getJsonPath('area_limit')
     if not os.path.exists(conf):
@@ -1537,6 +1561,8 @@ if __name__ == "__main__":
         print(getWafSrceen())
     elif func == 'waf_conf':
         print(getWafConf())
+    elif func == 'area_limit_switch':
+        print(areaLimitSwitch())
     elif func == 'get_area_limit':
         print(getAreaLimit())
     elif func == 'add_area_limit':

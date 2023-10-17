@@ -660,9 +660,11 @@ function run_app_waf()
     min_route()
     -- C:D("min_route")
     -- country limit
-    local waf_country = get_country()
-    if waf_country then
-        if area_limit(waf_country, server_name, site_config[server_name]['open']) then return true end
+    if config['area_limit'] then
+        local waf_country = get_country()
+        if waf_country then
+            if area_limit(waf_country, server_name, site_config[server_name]['open']) then return true end
+        end
     end
 
     if site_config[server_name] and site_config[server_name]['open'] then

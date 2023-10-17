@@ -1718,10 +1718,36 @@ function wafAreaLimitRender(){
     });
 }
 
+function wafAreaLimitSwitch(){
+    owPostN('waf_conf', {}, function(data){
+        var rdata = $.parseJSON(data.data);
+        if (rdata['area_limit']){
+            $('#area_limit_switch').prop('checked', true);
+        } else{
+            $('#area_limit_switch').prop('checked',false);
+        }
+    });
+}
+
+function setWafAreaLimitSwitch(){
+    var area_limit_switch = $('#area_limit_switch').prop('checked');
+    // console.log(area_limit_switch);
+    var area_limit = 'off';
+    if (!area_limit_switch){
+        area_limit = 'on';
+    }
+    owPostN('area_limit_switch', {'area_limit': area_limit}, function(data){
+        var rdata = $.parseJSON(data.data);
+        layer.msg(rdata.msg, { icon: rdata.status ? 1 : 2 });
+    });
+}
+
 // 地区限制
 function wafAreaLimit(){
     var con = '<div class="safe bgw">\
             <button id="create_area_limit" class="btn btn-success btn-sm" type="button" style="margin-right: 5px;">添加地区限制</button>\
+            <input class="btswitch btswitch-ios" id="area_limit_switch" type="checkbox">\
+            <label class="btswitch-btn" for="area_limit_switch" onclick="setWafAreaLimitSwitch();" style="display: inline-flex;line-height:38px;margin-left: 4px;float: right;"></label>\
             <div class="divtable mtb10">\
                 <div class="tablescroll">\
                     <table id="con_list" class="table table-hover" width="100%" cellspacing="0" cellpadding="0" border="0" style="border: 0 none;">\
@@ -1736,6 +1762,7 @@ function wafAreaLimit(){
         </div>';
     $(".soft-man-con").html(con);
     wafAreaLimitRender();
+    wafAreaLimitSwitch();
 
     $('#create_area_limit').click(function(){
         var site_list;
