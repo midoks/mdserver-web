@@ -62,5 +62,6 @@
         "open": true,
         "reqfile": "post.html"
     },
+    "area_limit":false,
     "open": true
 }
