@@ -397,6 +397,7 @@ mw_clean_lib(){
     cd /www/server/mdserver-web && rm -rf lib
     cd /www/server/mdserver-web && rm -rf lib64
     cd /www/server/mdserver-web && rm -rf bin
+    cd /www/server/mdserver-web && rm -rf include
 }
 
 case "$1" in
