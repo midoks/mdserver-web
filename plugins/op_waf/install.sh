@@ -92,13 +92,13 @@ Install_App(){
 
 	# download GeoLite Data
 	GeoLite2_TAG=`curl -sL "https://api.github.com/repos/P3TERX/GeoLite.mmdb/releases/latest" | grep '"tag_name":' | cut -d'"' -f4`
-	if [ ! -f $serverPath/op_waf/GeoLite2-City.mmdb ];then
-		wget --no-check-certificate -O $serverPath/op_waf/GeoLite2-City.mmdb ${HTTP_PREFIX}github.com/P3TERX/GeoLite.mmdb/releases/download/${GeoLite2_TAG}/GeoLite2-City.mmdb
-	fi
+	#if [ ! -f $serverPath/op_waf/GeoLite2-City.mmdb ];then
+	wget --no-check-certificate -O $serverPath/op_waf/GeoLite2-City.mmdb ${HTTP_PREFIX}github.com/P3TERX/GeoLite.mmdb/releases/download/${GeoLite2_TAG}/GeoLite2-City.mmdb
+	#fi
 
-	if [ ! -f $serverPath/op_waf/GeoLite2-Country.mmdb ];then
-		wget --no-check-certificate -O $serverPath/op_waf/GeoLite2-Country.mmdb ${HTTP_PREFIX}github.com/P3TERX/GeoLite.mmdb/releases/download/${GeoLite2_TAG}/GeoLite2-Country.mmdb
-	fi
+	#if [ ! -f $serverPath/op_waf/GeoLite2-Country.mmdb ];then
+	wget --no-check-certificate -O $serverPath/op_waf/GeoLite2-Country.mmdb ${HTTP_PREFIX}github.com/P3TERX/GeoLite.mmdb/releases/download/${GeoLite2_TAG}/GeoLite2-Country.mmdb
+	#fi
 
 	libmaxminddb_ver='1.7.1'
 	if [ ! -f $serverPath/op_waf/waf/mmdb/lib/libmaxminddb.a ] && [ ! -f $serverPath/op_waf/waf/mmdb/lib/libmaxminddb.so ];then
