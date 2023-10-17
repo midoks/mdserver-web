@@ -585,7 +585,7 @@ local function  get_ip_country(ip)
     if not res then
         return "2"
     else
-        C:D("res:"..tostring(res))
+        -- C:D("res:"..tostring(res))
         return res
     end
 end
