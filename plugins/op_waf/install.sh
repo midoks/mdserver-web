@@ -91,7 +91,7 @@ Install_App(){
 	fi
 
 	# download GeoLite Data
-	GeoLite2_TAG=2023.08.10
+	GeoLite2_TAG=`curl -sL "https://api.github.com/repos/P3TERX/GeoLite.mmdb/releases/latest" | grep '"tag_name":' | cut -d'"' -f4`
 	if [ ! -f $serverPath/op_waf/GeoLite2-City.mmdb ];then
 		wget --no-check-certificate -O $serverPath/op_waf/GeoLite2-City.mmdb ${HTTP_PREFIX}github.com/P3TERX/GeoLite.mmdb/releases/download/${GeoLite2_TAG}/GeoLite2-City.mmdb
 	fi
