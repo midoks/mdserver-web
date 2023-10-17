@@ -1332,6 +1332,7 @@ def areaLimitSwitch():
     mw.writeFile(path_config, json.dumps(config_contents))
 
     autoMakeConfig(True, True)
+    restart()
     return mw.returnJson(True, msg)
 
 
