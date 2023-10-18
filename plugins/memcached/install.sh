@@ -10,7 +10,7 @@ serverPath=$(dirname "$rootPath")
 
 install_tmp=${rootPath}/tmp/mw_install.pl
 
-VERSION=1.6.15
+VERSION=1.6.22
 
 Install_mem(){
 	mkdir -p $serverPath/source
