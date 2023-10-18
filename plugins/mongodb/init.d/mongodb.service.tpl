@@ -9,6 +9,7 @@ User=root
 Group=root
 #EnvironmentFile=-/etc/default/mongod
 Environment="MONGODB_CONFIG_OVERRIDE_NOFORK=1"
+Environment="LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/www/server/lib/openssl11/lib"
 PIDFile={$SERVER_PATH}/mongodb/mongodb.pid
 ExecStart={$SERVER_PATH}/mongodb/bin/mongod -f {$SERVER_PATH}/mongodb/mongodb.conf
 ExecReload=/bin/kill -HUP $MAINPID
