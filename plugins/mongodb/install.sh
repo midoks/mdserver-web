@@ -58,6 +58,8 @@ Install_app()
 	# 	OSNAME=rhel
 	# fi
 
+	cd ${rootPath}/plugins/php/lib && /bin/bash openssl_11.sh
+
 	shell_file=${curPath}/versions/${VERSION}/${OSNAME}.sh
 
 	if [ -f $shell_file ];then
