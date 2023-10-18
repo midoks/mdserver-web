@@ -51,18 +51,18 @@ if [ ! -d $sourcePath/php/php${PHP_VER} ];then
 	fi
 	# ----------------------------------------------------------------------- #
 
+	if [ ! -f $sourcePath/php/php-${version}.tar.xz ];then
+		wget --no-check-certificate -O $sourcePath/php/php-${version}.tar.xz https://www.php.net/distributions/php-${version}.tar.xz
+	fi
+
 	#检测文件是否损坏.
-	md5_file_ok=453206c948d9504b91fcec30fcb59b75
+	md5_file_ok=216ab305737a5d392107112d618a755dc5df42058226f1670e9db90e77d777d9
 	if [ -f $sourcePath/php/php-${version}.tar.xz ];then
-		md5_file=`md5sum $sourcePath/php/php-${version}.tar.xz  | awk '{print $1}'`
+		md5_file=`sha256sum $sourcePath/php/php-${version}.tar.xz  | awk '{print $1}'`
 		if [ "${md5_file}" != "${md5_file_ok}" ]; then
 			echo "PHP${version} 下载文件不完整,重新安装"
 			rm -rf $sourcePath/php/php-${version}.tar.xz
 		fi
-	fi
-
-	if [ ! -f $sourcePath/php/php-${version}.tar.xz ];then
-		wget --no-check-certificate -O $sourcePath/php/php-${version}.tar.xz https://www.php.net/distributions/php-${version}.tar.xz
 	fi
 	
 	cd $sourcePath/php && tar -Jxf $sourcePath/php/php-${version}.tar.xz

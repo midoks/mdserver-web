@@ -16,7 +16,7 @@ function version_lt() { test "$(echo "$@" | tr " " "\n" | sort -rV | head -n 1)"
 function version_ge() { test "$(echo "$@" | tr " " "\n" | sort -rV | head -n 1)" == "$1"; }
 
 
-version=8.1.22
+version=8.1.24
 PHP_VER=81
 Install_php()
 {
@@ -50,22 +50,21 @@ if [ ! -d $sourcePath/php/php${PHP_VER} ];then
 		fi
 	fi
 	# ----------------------------------------------------------------------- #
-	
 
+	if [ ! -f $sourcePath/php/php-${version}.tar.xz ];then
+		wget --no-check-certificate -O $sourcePath/php/php-${version}.tar.xz https://www.php.net/distributions/php-${version}.tar.xz
+	fi
+	
 	#检测文件是否损坏.
-	md5_file_ok=b3a403d00c28d5e33c0c5b7464d27671
+	md5_file_ok=ee61f6232bb29bd2e785daf325d2177f2272bf80d086c295a724594e710bce3d
 	if [ -f $sourcePath/php/php-${version}.tar.xz ];then
-		md5_file=`md5sum $sourcePath/php/php-${version}.tar.xz  | awk '{print $1}'`
+		md5_file=`sha256sum $sourcePath/php/php-${version}.tar.xz  | awk '{print $1}'`
 		if [ "${md5_file}" != "${md5_file_ok}" ]; then
 			echo "PHP${version} 下载文件不完整,重新安装"
 			rm -rf $sourcePath/php/php-${version}.tar.xz
 		fi
 	fi
 
-	if [ ! -f $sourcePath/php/php-${version}.tar.xz ];then
-		wget --no-check-certificate -O $sourcePath/php/php-${version}.tar.xz https://www.php.net/distributions/php-${version}.tar.xz
-	fi
-	
 	cd $sourcePath/php && tar -Jxf $sourcePath/php/php-${version}.tar.xz
 	mv $sourcePath/php/php-${version} $sourcePath/php/php${PHP_VER}
 fi
