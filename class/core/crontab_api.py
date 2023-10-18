@@ -283,6 +283,9 @@ class crontab_api:
             return mw.returnJson(is_check_pass, msg)
 
         addData = self.add(params)
+        if type(addData) == str:
+            return addData
+
         if addData > 0:
             return mw.returnJson(True, '添加成功')
         return mw.returnJson(False, '添加失败')
