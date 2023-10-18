@@ -133,6 +133,8 @@ def mgOp(method):
 
 
 def start():
+    mw.execShell(
+        'export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/www/server/lib/openssl11/lib')
     return mgOp('start')
 
 

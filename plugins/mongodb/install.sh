@@ -4,12 +4,10 @@ export PATH
 
 # https://www.mongodb.com/try/download/community
 
-'''
-cd /Users/midoks/Desktop/mwdev/server/mdserver-web/plugins/mongodb && /bin/bash install.sh install 5.0.4
-cd /www/server/mdserver-web/plugins/mongodb && /bin/bash install.sh install 7.0
+# cd /Users/midoks/Desktop/mwdev/server/mdserver-web/plugins/mongodb && /bin/bash install.sh install 5.0.4
+# cd /www/server/mdserver-web/plugins/mongodb && /bin/bash install.sh install 7.0
+# cd /www/server/mdserver-web && python3 /www/server/mdserver-web/plugins/mongodb/index.py start
 
-cd /www/server/mdserver-web && python3 /www/server/mdserver-web/plugins/mongodb/index.py start
-'''
 
 
 curPath=`pwd`
@@ -57,6 +55,8 @@ Install_app()
 	# if [ "rocky" == "$OSNAME" ];then
 	# 	OSNAME=rhel
 	# fi
+
+	cd ${rootPath}/plugins/php/lib && /bin/bash openssl_11.sh
 
 	shell_file=${curPath}/versions/${VERSION}/${OSNAME}.sh
 
