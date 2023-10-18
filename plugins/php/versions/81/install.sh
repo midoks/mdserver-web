@@ -56,9 +56,9 @@ if [ ! -d $sourcePath/php/php${PHP_VER} ];then
 	fi
 	
 	#检测文件是否损坏.
-	md5_file_ok=b3a403d00c28d5e33c0c5b7464d27671
+	md5_file_ok=ee61f6232bb29bd2e785daf325d2177f2272bf80d086c295a724594e710bce3d
 	if [ -f $sourcePath/php/php-${version}.tar.xz ];then
-		md5_file=`md5sum $sourcePath/php/php-${version}.tar.xz  | awk '{print $1}'`
+		md5_file=`sha256sum $sourcePath/php/php-${version}.tar.xz  | awk '{print $1}'`
 		if [ "${md5_file}" != "${md5_file_ok}" ]; then
 			echo "PHP${version} 下载文件不完整,重新安装"
 			rm -rf $sourcePath/php/php-${version}.tar.xz
