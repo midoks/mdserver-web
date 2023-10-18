@@ -5,6 +5,7 @@ export PATH
 curPath=`pwd`
 rootPath=$(dirname "$curPath")
 rootPath=$(dirname "$rootPath")
+rootPath=$(dirname "$rootPath")
 serverPath=$(dirname "$rootPath")
 
 install_tmp=${rootPath}/tmp/mw_install.pl
@@ -28,7 +29,7 @@ FILE_NAME_TGZ=${FILE_NAME}.tgz
 MG_DIR=$serverPath/source/mongodb
 mkdir -p $MG_DIR
 
-if [ ! -f $MG_DIR/${FILE_NAME_TGZ} ]; then
+if [ ! -f ${MG_DIR}/${FILE_NAME_TGZ} ]; then
 	wget --no-check-certificate -O $MG_DIR/${FILE_NAME_TGZ} https://fastdl.mongodb.org/linux/${FILE_NAME_TGZ}
 	echo "wget --no-check-certificate -O $MG_DIR/${FILE_NAME_TGZ} https://fastdl.mongodb.org/linux/${FILE_NAME_TGZ}"
 fi
