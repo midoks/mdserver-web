@@ -21,6 +21,8 @@ if [ ${OSNAME} == "centos" ] ||
 	yum install -y postgresql-libs unixODBC
 fi
 
+
+VERSION=3.1.1
 Install_sphinx()
 {
 
@@ -30,28 +32,28 @@ Install_sphinx()
 	SPHINX_DIR=${serverPath}/source/sphinx
 	mkdir -p $SPHINX_DIR
 	
-	if [ ! -f ${SPHINX_DIR}/sphinx-3.1.1.tar.gz ];then
+	if [ ! -f ${SPHINX_DIR}/sphinx-${VERSION}.tar.gz ];then
 		if [ $sysName == 'Darwin' ]; then
-			wget -O ${SPHINX_DIR}/sphinx-3.1.1.tar.gz http://sphinxsearch.com/files/sphinx-3.1.1-612d99f-darwin-amd64.tar.gz
+			wget -O ${SPHINX_DIR}/sphinx-${VERSION}.tar.gz http://sphinxsearch.com/files/sphinx-${VERSION}-612d99f-darwin-amd64.tar.gz
 		else
-			curl -sSLo ${SPHINX_DIR}/sphinx-3.1.1.tar.gz http://sphinxsearch.com/files/sphinx-3.1.1-612d99f-linux-amd64.tar.gz
+			curl -sSLo ${SPHINX_DIR}/sphinx-${VERSION}.tar.gz http://sphinxsearch.com/files/sphinx-${VERSION}-612d99f-linux-amd64.tar.gz
 		fi
 	fi
 
-	if [ ! -f ${SPHINX_DIR}/sphinx-3.1.1.tar.gz ];then
-		curl -sSLo ${SPHINX_DIR}/sphinx-3.1.1.tar.gz https://github.com/midoks/mdserver-web/releases/download/init/sphinx-3.1.1.tar.gz
+	if [ ! -f ${SPHINX_DIR}/sphinx-${VERSION}.tar.gz ];then
+		curl -sSLo ${SPHINX_DIR}/sphinx-${VERSION}.tar.gz https://github.com/midoks/mdserver-web/releases/download/init/sphinx-${VERSION}.tar.gz
 	fi
 
 
-	cd ${SPHINX_DIR} && tar -zxvf sphinx-3.1.1.tar.gz
+	cd ${SPHINX_DIR} && tar -zxvf sphinx-${VERSION}.tar.gz
 	
 	if [ "$?" == "0" ];then
 		mkdir -p $SPHINX_DIR
-		cp -rf ${SPHINX_DIR}/sphinx-3.1.1/ $serverPath/sphinx/bin
+		cp -rf ${SPHINX_DIR}/sphinx-${VERSION}/ $serverPath/sphinx/bin
 	fi
 	
 	if [ -d $serverPath/sphinx ];then
-		echo '3.1.1' > $serverPath/sphinx/version.pl
+		echo "${VERSION}" > $serverPath/sphinx/version.pl
 		echo '安装完成' > $install_tmp
 		cd ${rootPath} && python3 ${rootPath}/plugins/sphinx/index.py start
 		cd ${rootPath} && python3 ${rootPath}/plugins/sphinx/index.py initd_install
