@@ -24,7 +24,8 @@ VERSION_ID=`cat /etc/*-release | grep VERSION_ID | awk -F = '{print $2}' | awk -
 
 # 暂时debian12没有标准版,先用11使用
 if [ "$OSNAME" == 'debian' ] && [ "$VERSION_ID" == '12' ] ;then 
-	VERSION_ID='11'
+	echo "暂时不支持该${OSNAME}${VERSION_ID}" > $install_tmp
+	exit 1
 fi
 
 
