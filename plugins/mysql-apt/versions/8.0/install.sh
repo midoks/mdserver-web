@@ -108,6 +108,7 @@ Install_mysql()
 		echo '8.0' > $serverPath/mysql-apt/version.pl
 		echo '安装完成' > $install_tmp
 	else
+		echo '8.0' > $serverPath/mysql-apt/version.pl
 		echo "暂时不支持该系统" > $install_tmp
 	fi
 }
