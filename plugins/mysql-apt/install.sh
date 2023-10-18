@@ -12,6 +12,7 @@ serverPath=$(dirname "$rootPath")
 # cd /www/server/mdserver-web/plugins/mysql-apt && bash install.sh install 8.0
 # cd /www/server/mdserver-web/plugins/mysql-apt && bash install.sh uninstall 8.0
 # cd /www/server/mdserver-web && python3 /www/server/mdserver-web/plugins/mysql-apt/index.py start 8.0
+# cd /www/server/mdserver-web && python3 /www/server/mdserver-web/plugins/mysql-apt/index.py fix_db_access
 
 install_tmp=${rootPath}/tmp/mw_install.pl
 
