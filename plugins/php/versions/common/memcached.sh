@@ -44,6 +44,7 @@ Install_lib()
 		return
 	fi
 
+
 	if [ ! -f "$extFile" ];then
 
 		php_lib=$sourcePath/php_lib
@@ -58,6 +59,11 @@ Install_lib()
 		OPTIONS=""
 		if [ "${SYS_ARCH}" == "aarch64" ] && [ "$version" -lt "56" ];then
 			OPTIONS="$OPTIONS --build=aarch64-unknown-linux-gnu --host=aarch64-unknown-linux-gnu"
+		fi
+
+		if ! pkg-config --exists libmemcached; then
+			cd ${rootPath}/plugins/php/lib && /bin/bash libmemcached.sh
+			OPTIONS="$OPTIONS --with-libmemcached-dir=${serverPath}/lib/libmemcached"
 		fi
 
 		# sed -i '_bak' "3237,3238s#ulong#zend_ulong#g" $php_lib/${LIBNAME}-${LIBV}/php_memcached.c
