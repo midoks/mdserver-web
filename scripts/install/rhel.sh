@@ -17,6 +17,7 @@ isStream=$(grep -o -i 'stream' /etc/redhat-release)
 
 cn=$(curl -fsSL -m 10 http://ipinfo.io/json | grep "\"country\": \"CN\"")
 
+yum -y update
 # CentOS Stream
 if [ ! -z "$stream" ];then
     yum install -y dnf dnf-plugins-core
