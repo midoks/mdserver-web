@@ -404,8 +404,8 @@ class classApi:
         write_log("|-正在解压文件到目录[{}]...".format(dpath))
         self.write_speed('done', '正在解压')
 
-        self.send('/files/unzip', {"sfile": zip_dst, "dfile": dpath,
-                                   "type": "tar", "coding": "UTF-8", "password": "undefined"})
+        self.send('/files/uncompress',
+                  {"sfile": zip_dst, "dfile": dpath, 'path': dpath})
         self.send('/files/exec_shell',
                   {"shell": "rm -f " + zip_dst, "path": "/www"}, 30)
         return True
