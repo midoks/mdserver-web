@@ -182,6 +182,7 @@ if [ "$VERSION_ID" -ge "8" ];then
         libxml2 libxml2-devel libxslt libxslt-devel libarchive make mysql-devel ncurses ncurses-devel net-tools \
         oniguruma oniguruma-devel patch pcre pcre-devel perl perl-Data-Dumper perl-devel procps psmisc python3-devel \
         openssl openssl-devel patchelf libargon2-devel\
+        ImageMagick ImageMagick-devel \
         readline-devel rpcgen sqlite-devel rar unrar tar unzip vim-minimal wget zip zlib zlib-devel;
     do
         # dnf --enablerepo=remi,appstream,baseos,epel,extras,powertools install -y oniguruma5php-devel

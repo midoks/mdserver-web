@@ -54,19 +54,20 @@ Install_lib()
 			wget -O $php_lib/${LIBNAME}-${LIBV}.tgz http://pecl.php.net/get/${LIBNAME}-${LIBV}.tgz
 			cd $php_lib && tar xvf ${LIBNAME}-${LIBV}.tgz
 		fi 
-		cd $php_lib/${LIBNAME}-${LIBV}
-
+		
 		OPTIONS=""
 		if [ "${SYS_ARCH}" == "aarch64" ] && [ "$version" -lt "56" ];then
 			OPTIONS="$OPTIONS --build=aarch64-unknown-linux-gnu --host=aarch64-unknown-linux-gnu"
 		fi
 
-		if ! pkg-config --exists libmemcached; then
+		pkg-config --exists libmemcached
+		if [ "$?" != "0" ]; then
 			cd ${rootPath}/plugins/php/lib && /bin/bash libmemcached.sh
 			OPTIONS="$OPTIONS --with-libmemcached-dir=${serverPath}/lib/libmemcached"
 		fi
 
 		# sed -i '_bak' "3237,3238s#ulong#zend_ulong#g" $php_lib/${LIBNAME}-${LIBV}/php_memcached.c
+		cd $php_lib/${LIBNAME}-${LIBV}
 		$serverPath/php/$version/bin/phpize
 	
 		./configure --with-php-config=$serverPath/php/$version/bin/php-config \
