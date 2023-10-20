@@ -37,6 +37,7 @@ if [ ! -d ${SERVER_ROOT}/libmemcached ];then
 
     # sed -i '_bak' "41,52s#opt_servers == false#opt_servers#g" ${SERVER_ROOT}/libmemcached-1.0.18/clients/memflush.cc
     sed -i "s#opt_servers == false#!opt_servers#g" ${SERVER_ROOT}/libmemcached-1.0.18/clients/memflush.cc
+    sed -i "s#opt_servers == false#!opt_servers#g" /www/server/source/lib/libmemcached-1.0.18/clients/memflush.cc
     ./configure --prefix=${SERVER_ROOT}/libmemcached -with-memcached && make && make install
 fi
 #----------------------------- libmemcached end -------------------------#
