@@ -91,6 +91,13 @@ if [ "$IS_64BIT" == "64" ];then
 	OPTIONS="${OPTIONS} --with-libdir=lib64"
 fi
 
+
+argon_version=`pkg-config libargon2 --modversion`
+if [ "$?" == "0" ];then
+	OPTIONS="${OPTIONS} --with-password-argon2"
+fi
+
+
 ZIP_OPTION='--with-zip'
 libzip_version=`pkg-config libzip --modversion`
 if version_lt "$libzip_version" "0.11.0" ;then
@@ -98,6 +105,7 @@ if version_lt "$libzip_version" "0.11.0" ;then
 	export PKG_CONFIG_PATH=$serverPath/lib/libzip/lib/pkgconfig
 	ZIP_OPTION="--with-zip=$serverPath/lib/libzip"
 fi
+
 
 # ----- cpu start ------
 if [ -z "${cpuCore}" ]; then
@@ -149,7 +157,6 @@ if [ ! -d $serverPath/php/${PHP_VER} ];then
 	--enable-sysvshm \
 	--disable-intl \
 	--disable-fileinfo \
-	--with-password-argon2 \
 	$OPTIONS \
 	--enable-fpm
 	make clean && make -j${cpuCore} && make install && make clean

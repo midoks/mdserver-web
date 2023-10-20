@@ -84,6 +84,11 @@ else
 	OPTIONS="${OPTIONS} --with-curl"
 fi
 
+argon_version=`pkg-config libargon2 --modversion`
+if [ "$?" == "0" ];then
+	OPTIONS="${OPTIONS} --with-password-argon2"
+fi
+
 ZIP_OPTION='--with-zip'
 libzip_version=`pkg-config libzip --modversion`
 if version_lt "$libzip_version" "0.11.0" ;then
@@ -142,7 +147,6 @@ if [ ! -d $serverPath/php/${PHP_VER} ];then
 	--enable-sysvshm \
 	--disable-intl \
 	--disable-fileinfo \
-	--with-password-argon2 \
 	$OPTIONS \
 	--enable-fpm
 	make clean && make -j${cpuCore} && make install && make clean
