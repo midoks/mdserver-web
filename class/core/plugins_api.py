@@ -52,6 +52,7 @@ class plugins_api:
     __plugin_dir = 'plugins'
     __type = 'data/json/type.json'
     __index = 'data/json/index.json'
+    __index_data = None
     setupPath = None
 
     def __init__(self):
@@ -59,6 +60,14 @@ class plugins_api:
         self.__plugin_dir = mw.getRunDir() + '/plugins'
         self.__type = mw.getRunDir() + '/data/json/type.json'
         self.__index = mw.getRunDir() + '/data/json/index.json'
+
+        self.initIndexData()
+
+    def initIndexData(self):
+        if not os.path.exists(self.__index):
+            mw.writeFile(self.__index, '[]')
+
+        self.__index_data = json.loads(mw.readFile(self.__index))
 
     ##### ----- start ----- ###
     def listApi(self):
@@ -615,20 +624,37 @@ class plugins_api:
 
         return plugins_info
 
-    def checkDisplayIndex(self, name, version):
-        if not os.path.exists(self.__index):
-            mw.writeFile(self.__index, '[]')
+    def checkIndexList(self, name, version):
+        indexList = self.__index_data
+        for i in indexList:
+            nv = i.split('-')
+            if nv[0] == name:
+                return True
+        return False
 
-        indexList = json.loads(mw.readFile(self.__index))
-        if type(version) == list:
-            for index in range(len(version)):
-                vname = name + '-' + version[index]
+    def checkDisplayIndex(self, name, version, coexist):
+        # if not os.path.exists(self.__index):
+        #     mw.writeFile(self.__index, '[]')
+        # indexList = json.loads(mw.readFile(self.__index))
+
+        indexList = self.__index_data
+        if coexist:
+            if type(version) == list:
+                for index in range(len(version)):
+                    vname = name + '-' + version[index]
+                    if vname in indexList:
+                        return True
+            else:
+                vname = name + '-' + version
                 if vname in indexList:
                     return True
+
         else:
-            vname = name + '-' + version
-            if vname in indexList:
-                return True
+            if type(version) == list:
+                for index in range(len(version)):
+                    return self.checkIndexList(name, version)
+            else:
+                return self.checkIndexList(name, version)
         return False
 
     def getVersion(self, path):
@@ -695,7 +721,7 @@ class plugins_api:
         pInfo['task'] = self.checkSetupTask(
             pInfo['name'], info['versions'], coexist)
         pInfo['display'] = self.checkDisplayIndex(
-            info['name'], pInfo['versions'])
+            info['name'], pInfo['versions'], coexist)
 
         pInfo['setup'] = os.path.exists(pInfo['install_checks'])
 
@@ -800,10 +826,10 @@ class plugins_api:
                 continue
             path = self.__plugin_dir + '/' + dirinfo
             if os.path.isdir(path):
-                json_file = path + '/info.json'
-                if os.path.exists(json_file):
+                info_file = path + '/info.json'
+                if os.path.exists(info_file):
                     try:
-                        data = json.loads(mw.readFile(json_file))
+                        data = json.loads(mw.readFile(info_file))
                         # 判断是否搜索
                         if kw != '' and not self.searchKey(data, kw):
                             continue
@@ -976,19 +1002,24 @@ class plugins_api:
                 plugin_name = '-'.join(tmpArr)
                 plugin_ver = tmp[tmp_len - 1]
 
-            json_file = self.__plugin_dir + '/' + plugin_name + '/info.json'
-            if os.path.exists(json_file):
-                content = mw.readFile(json_file)
+            read_json_file = self.__plugin_dir + '/' + plugin_name + '/info.json'
+            if os.path.exists(read_json_file):
+                content = mw.readFile(read_json_file)
                 try:
                     data = json.loads(content)
                     data = self.makeList(data)
                     for index in range(len(data)):
-                        if data[index]['versions'] == plugin_ver or plugin_ver in data[index]['versions']:
+                        if data[index]['coexist']:
+                            if data[index]['versions'] == plugin_ver or plugin_ver in data[index]['versions']:
+                                data[index]['display'] = True
+                                plist.append(data[index])
+                                continue
+                        else:
                             data[index]['display'] = True
                             plist.append(data[index])
-                            continue
+
                 except Exception as e:
-                    print('getIndexList:', e)
+                    print('getIndexList:', mw.getTracebackInfo())
 
         # 使用gevent模式时,无法使用多进程
         # plist = self.checkStatusMProcess(plist)

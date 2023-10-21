@@ -95,7 +95,7 @@ function getSList(isdisplay) {
 
             checked = plugin.display ? 'checked' : '';
     
-            if (typeof plugin.versions == "string"){
+            if (typeof(plugin.versions) == "string" ){
                 version_info += plugin.versions + '|';
             } else {
                 for (var j = 0; j < len; j++) {
@@ -105,7 +105,6 @@ function getSList(isdisplay) {
             if (version_info != '') {
                 version_info = version_info.substring(0, version_info.length - 1);
             }
-
 
             var handle = '<a class="btlink" onclick="addVersion(\'' + plugin.name + '\',\'' + version_info + '\',\'' + plugin.tip + '\',this,\'' + plugin.title + '\',' + plugin.install_pre_inspection + ')">安装</a>';
             
@@ -118,9 +117,15 @@ function getSList(isdisplay) {
              
                 softPath = '<span class="glyphicon glyphicon-folder-open" title="' + plugin.path + '" onclick="openPath(\'' + plugin.path + '\')"></span>';
                 if (plugin.coexist){
-                    indexshow = '<div class="index-item"><input class="btswitch btswitch-ios" id="index_' + plugin.name  + plugin.versions + '" type="checkbox" ' + checked + '><label class="btswitch-btn" for="index_' + plugin.name + plugin.versions + '" onclick="toIndexDisplay(\'' + plugin.name + '\',\'' + plugin.versions + '\',\'' + plugin.coexist +'\')"></label></div>';
+                    indexshow = '<div class="index-item">\
+                        <input class="btswitch btswitch-ios" id="index_' + plugin.name  + plugin.versions + '" type="checkbox" ' + checked + '>\
+                        <label class="btswitch-btn" for="index_' + plugin.name + plugin.versions + '" onclick="toIndexDisplay(\'' + plugin.name + '\',\'' + plugin.versions + '\',\'' + plugin.coexist +'\')"></label>\
+                    </div>';
                 } else {
-                    indexshow = '<div class="index-item"><input class="btswitch btswitch-ios" id="index_' + plugin.name + '" type="checkbox" ' + checked + '><label class="btswitch-btn" for="index_' + plugin.name + '" onclick="toIndexDisplay(\'' + plugin.name + '\',\'' + plugin.setup_version + '\')"></label></div>';
+                    indexshow = '<div class="index-item">\
+                        <input class="btswitch btswitch-ios" id="index_' + plugin.name + '" type="checkbox" ' + checked + '>\
+                        <label class="btswitch-btn" for="index_' + plugin.name + '" onclick="toIndexDisplay(\'' + plugin.name + '\',\'' + plugin.setup_version + '\')"></label>\
+                    </div>';
                 }
                 
                 if (plugin.status == true) {
