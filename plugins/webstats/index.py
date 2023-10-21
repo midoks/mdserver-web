@@ -716,6 +716,8 @@ def getLogsList():
     spider_type = args['spider_type']
     query_date = args['query_date']
     search_uri = args['search_uri']
+    referer = args['referer']
+    ip = args['ip']
     setDefaultSite(domain)
 
     limit = str(page_size) + ' offset ' + str(page_size * (page - 1))
@@ -725,6 +727,15 @@ def getLogsList():
     condition = ''
     conn = conn.field(field)
     conn = conn.where("1=1", ())
+
+    if referer != 'all':
+        if referer == '1':
+            conn = conn.andWhere("referer <> ? ", ('',))
+        elif referer == '-1':
+            conn = conn.andWhere("referer is null ", ())
+
+    if ip != '':
+        conn = conn.andWhere("ip=?", (ip,))
 
     if method != "all":
         conn = conn.andWhere("method=?", (method,))
@@ -761,6 +772,7 @@ def getLogsList():
     attacHistoryLogHack(conn, domain, query_date)
 
     clist = conn.limit(limit).order('time desc').inquiry()
+    # print(clist)
     count_key = "count(*) as num"
     count = conn.field(count_key).limit('').order('').inquiry()
     # print(count)

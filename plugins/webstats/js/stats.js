@@ -2170,12 +2170,14 @@ function wsTableLogRequest(page){
 
     var args = {};   
     args['page'] = page;
-    args['page_size'] = 10;
+    args['page_size'] = 9;
 
     args['site'] = $('select[name="site"]').val();
     args['method'] = $('select[name="method"]').val();
     args['status_code'] = $('select[name="status_code"]').val();
     args['spider_type'] = $('select[name="spider_type"]').val();
+    args['referer'] = $('select[name="referer"]').val();
+    args['ip'] = $('input[name="ip"]').val();
 
     var query_date = 'today';
     if ($('#time_choose').attr("data-name") != ''){
@@ -2370,6 +2372,12 @@ var html = '<div>\
                         <option value="404">404</option>\
                         <option value="200">200</option>\
                     </select>\
+                    <span style="margin-left:10px;">来源: </span>\
+                    <select class="bt-input-text" name="referer" style="margin-left:4px">\
+                        <option value="all">所有</option>\
+                        <option value="-1">无</option>\
+                        <option value="1">有</option>\
+                    </select>\
                     <span style="margin-left:10px;">蜘蛛过滤: </span>\
                     <select class="bt-input-text" name="spider_type" style="margin-left:4px">\
                         <option value="normal">不过滤</option>\
@@ -2388,7 +2396,13 @@ var html = '<div>\
                         <option value="11">一搜</option>\
                         <option value="12">其他</option>\
                     </select>\
-                    <span style="margin-left:10px;">URL过滤: </span>\
+                    <span>IP: </span>\
+                    <div class="input-group" style="width:163px;display:inline-flex;">\
+                        <input type="text" name="ip" class="form-control btn-group-sm" autocomplete="off" placeholder="IP地址" style="font-size: 12px;padding: 0 10px;height:30px;">\
+                    </div>\
+                </div>\
+                <div style="padding-bottom:10px;">\
+                    <span>URL过滤: </span>\
                     <div class="input-group" style="width:210px;display:inline-flex;">\
                         <input type="text" name="search_uri" class="form-control btn-group-sm" autocomplete="off" placeholder="URI搜索" style="font-size: 12px;padding: 0 10px;height:30px;">\
                         <div class="input-group-btn btn-group-sm">\
