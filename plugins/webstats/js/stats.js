@@ -2467,6 +2467,10 @@ $('select[name="spider_type"]').change(function(){
     wsTableLogRequest(1);
 });
 
+$('select[name="referer"]').change(function(){
+    wsTableLogRequest(1);
+});
+
 $('#logs_search').click(function(){
     wsTableLogRequest(1);
 });
