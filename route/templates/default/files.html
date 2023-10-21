@@ -64,6 +64,12 @@
 <script src="/static/js/jquery.contextify.min.js?v={{config.version}}"></script>
 <script type="text/javascript">
 
+
+$("#SearchValue").focus().keyup(function(e){
+    if(e.keyCode == 13) searchFile(1);
+});
+
+
 setTimeout(function() {
     getDisk();
 }, 500);
