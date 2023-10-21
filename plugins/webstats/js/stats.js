@@ -2170,7 +2170,7 @@ function wsTableLogRequest(page){
 
     var args = {};   
     args['page'] = page;
-    args['page_size'] = 10;
+    args['page_size'] = 9;
 
     args['site'] = $('select[name="site"]').val();
     args['method'] = $('select[name="method"]').val();
