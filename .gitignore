@@ -165,6 +165,7 @@ plugins/tamper_proof
 plugins/cryptocurrency_trade
 plugins/mtproxy
 plugins/zimg
+plugins/keepalived
 plugins/bk_demo
 plugins/mail
 plugins/fastdfs
