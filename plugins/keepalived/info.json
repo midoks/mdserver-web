@@ -1,0 +1,17 @@
+{
+	"sort": 7,
+	"ps": "优秀的高可用软件",
+	"name": "keepalived",
+	"title": "keepalived",
+	"shell": "install.sh",
+	"versions":["2.2.8"],
+	"tip": "soft",
+	"checks": "server/keepalived",
+	"path": "server/keepalived",
+	"display": 1,
+	"author": "keepalived",
+	"date": "2023-10-22",
+	"home": "https://keepalived.org/download.html",
+	"type": "soft",
+	"pid": "4"
+}
