@@ -8,7 +8,7 @@ rootPath=$(dirname "$rootPath")
 serverPath=$(dirname "$rootPath")
 
 # cd /Users/midoks/Desktop/mwdev/server/mdserver-web/plugins/keepalived && bash install.sh install 2.2.8
-# cd /www/mdserver-web/plugins/keepalived && bash install.sh install 2.2.8
+# cd /www/server/mdserver-web/plugins/keepalived && bash install.sh install 2.2.8
 
 install_tmp=${rootPath}/tmp/mw_install.pl
 
