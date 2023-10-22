@@ -1,73 +1,74 @@
 #!/bin/sh
-# chkconfig: 2345 55 25
-# description: Redis Service
+#
+# Startup script for the Keepalived daemon
+#
+# processname: keepalived
+# pidfile: /var/run/keepalived.pid
+# config: /etc/keepalived/keepalived.conf
+# chkconfig: - 21 79
+# description: Start and stop Keepalived
 
-### BEGIN INIT INFO
-# Provides:          Redis
-# Required-Start:    $all
-# Required-Stop:     $all
-# Default-Start:     2 3 4 5
-# Default-Stop:      0 1 6
-# Short-Description: starts Redis
-# Description:       starts the MDW-Web
-### END INIT INFO
+# Source function library
+. /etc/rc.d/init.d/functions
 
-# Simple Redis init.d script conceived to work on Linux systems
-# as it does use of the /proc filesystem.
+# Source configuration file (we set KEEPALIVED_OPTIONS there)
+. /etc/sysconfig/keepalived
 
-CONF="{$SERVER_PATH}/redis/redis.conf"
-REDISPORT=$(cat $CONF |grep port|grep -v '#'|awk '{print $2}')
-REDISPASS=$(cat $CONF |grep requirepass|grep -v '#'|awk '{print $2}')
-if [ "$REDISPASS" != "" ];then
-	REDISPASS=" -a $REDISPASS"
-fi
-EXEC={$SERVER_PATH}/redis/bin/redis-server
-CLIEXEC="{$SERVER_PATH}/redis/bin/redis-cli -p $REDISPORT$REDISPASS"
-PIDFILE={$SERVER_PATH}/redis/redis_6379.pid
+RETVAL=0
 
-mkdir -p {$SERVER_PATH}/redis/data
+prog="keepalived"
 
-redis_start(){
-	if [ -f $PIDFILE ];then
-		kill -9 `cat $PIDFILE`
-	fi
-	
-	echo "Starting Redis server..."
-	nohup $EXEC $CONF >> {$SERVER_PATH}/redis/logs.pl 2>&1 &
-}
-redis_stop(){
-	if [ ! -f $PIDFILE ]
-	then
-			echo "$PIDFILE does not exist, process is not running"
-	else
-			PID=$(cat $PIDFILE)
-			echo "Stopping ..."
-			$CLIEXEC shutdown
-			while [ -x /proc/${PID} ]
-			do
-				echo "Waiting for Redis to shutdown ..."
-				sleep 1
-			done
-			echo "Redis stopped"
-			rm -rf $PIDFILE
-	fi
+start() {
+    echo -n $"Starting $prog: "
+    daemon keepalived ${KEEPALIVED_OPTIONS}
+    RETVAL=$?
+    echo
+    [ $RETVAL -eq 0 ] && touch /var/lock/subsys/$prog
 }
 
+stop() {
+    echo -n $"Stopping $prog: "
+    killproc keepalived
+    RETVAL=$?
+    echo
+    [ $RETVAL -eq 0 ] && rm -f /var/lock/subsys/$prog
+}
 
+reload() {
+    echo -n $"Reloading $prog: "
+    killproc keepalived -1
+    RETVAL=$?
+    echo
+}
+
+# See how we were called.
 case "$1" in
     start)
-		redis_start
+        start
         ;;
     stop)
-        redis_stop
+        stop
         ;;
-	restart|reload)
-		redis_stop
-		sleep 0.3
-		redis_start
-		;;
+    reload)
+        reload
+        ;;
+    restart)
+        stop
+        start
+        ;;
+    condrestart)
+        if [ -f /var/lock/subsys/$prog ]; then
+            stop
+            start
+        fi
+        ;;
+    status)
+        status keepalived
+        RETVAL=$?
+        ;;
     *)
-        echo "Please use start or stop as first argument"
-        ;;
+        echo "Usage: $0 {start|stop|reload|restart|condrestart|status}"
+        RETVAL=1
 esac
 
+exit $RETVAL
