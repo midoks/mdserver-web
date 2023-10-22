@@ -190,7 +190,7 @@ def runInfo():
 
     requirepass = ""
 
-    conf = getServerDir() + '/redis.conf'
+    conf = getServerDir() + '/keepalived.conf'
     content = mw.readFile(conf)
     rep = "^(requirepass" + ')\s*([.0-9A-Za-z_& ~]+)'
     tmp = re.search(rep, content, re.M)
