@@ -15,7 +15,7 @@ if mw.isAppleSystem():
 
 
 def getPluginName():
-    return 'redis'
+    return 'keepalived'
 
 
 def getPluginDir():
@@ -38,12 +38,12 @@ def getInitDFile():
 
 
 def getConf():
-    path = getServerDir() + "/redis.conf"
+    path = getServerDir() + "/keepalived.conf"
     return path
 
 
 def getConfTpl():
-    path = getPluginDir() + "/config/redis.conf"
+    path = getPluginDir() + "/config/keepalived.conf"
     return path
 
 
@@ -74,7 +74,7 @@ def getArgs():
 
 def status():
     data = mw.execShell(
-        "ps aux|grep redis |grep -v grep | grep -v python | grep -v mdserver-web | awk '{print $2}'")
+        "ps aux|grep keepalived |grep -v grep | grep -v python | grep -v mdserver-web | awk '{print $2}'")
 
     if data[0] == '':
         return 'stop'
@@ -104,7 +104,7 @@ def initDreplace():
         mw.execShell('chmod +x ' + file_bin)
 
     # config replace
-    dst_conf = getServerDir() + '/redis.conf'
+    dst_conf = getServerDir() + '/keepalived.conf'
     dst_conf_init = getServerDir() + '/init.pl'
     if not os.path.exists(dst_conf_init):
         conf_content = mw.readFile(getConfTpl())
@@ -172,7 +172,7 @@ def reload():
 
 
 def getPort():
-    conf = getServerDir() + '/redis.conf'
+    conf = getServerDir() + '/keepalived.conf'
     content = mw.readFile(conf)
 
     rep = "^(" + 'port' + ')\s*([.0-9A-Za-z_& ~]+)'
