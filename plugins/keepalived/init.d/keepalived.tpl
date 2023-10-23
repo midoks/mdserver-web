@@ -24,7 +24,7 @@ prog="keepalived"
 
 start() {
     echo -n $"Starting $prog: "
-    daemon keepalived ${KEEPALIVED_OPTIONS}
+    {$SERVER_PATH}/keepalived/sbin/keepalived ${KEEPALIVED_OPTIONS}
     RETVAL=$?
     echo
     [ $RETVAL -eq 0 ] && touch /var/lock/subsys/$prog
@@ -32,7 +32,7 @@ start() {
 
 stop() {
     echo -n $"Stopping $prog: "
-    killproc keepalived
+    pkill keepalived
     RETVAL=$?
     echo
     [ $RETVAL -eq 0 ] && rm -f /var/lock/subsys/$prog
@@ -40,7 +40,7 @@ stop() {
 
 reload() {
     echo -n $"Reloading $prog: "
-    killproc keepalived -1
+    pkill keepalived -1
     RETVAL=$?
     echo
 }
