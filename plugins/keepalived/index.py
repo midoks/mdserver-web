@@ -38,7 +38,7 @@ def getInitDFile():
 
 
 def getConf():
-    path = getServerDir() + "/keepalived.conf"
+    path = getServerDir() + "/etc/keepalived/keepalived.conf"
     return path
 
 
