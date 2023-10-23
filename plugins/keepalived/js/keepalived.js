@@ -1,4 +1,4 @@
-function redisPost(method, version, args,callback){
+function kpPost(method, version, args,callback){
     var loadT = layer.msg('正在获取...', { icon: 16, time: 0, shade: 0.3 });
 
     var req_data = {};
@@ -26,7 +26,7 @@ function redisPost(method, version, args,callback){
     },'json'); 
 }
 
-function redisPostCallbak(method, version, args,callback){
+function kpPostCallbak(method, version, args,callback){
     var loadT = layer.msg('正在获取...', { icon: 16, time: 0, shade: 0.3 });
 
     var req_data = {};
