@@ -157,15 +157,6 @@ def makeOpenrestyConf():
                 w_content = contentReplace(tpl_content, x)
                 mw.writeFile(dfile, w_content)
 
-    # php-fpm status
-    # for version in phpversions:
-    #     dfile = sdir + '/web_conf/php/status/phpfpm_status_' + version + '.conf'
-    #     tpl = getPluginDir() + '/conf/phpfpm_status.conf'
-    #     if not os.path.exists(dfile):
-    #         content = mw.readFile(tpl)
-    #         content = contentReplace(content, version)
-    #         mw.writeFile(dfile, content)
-
 
 def phpPrependFile(version):
     app_start = getServerDir() + '/app_start.php'
@@ -295,31 +286,27 @@ def phpOp(version, method):
     return data[1]
 
 
-def start(version):
-    mw.execShell(
-        'export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/www/server/lib/icu/lib')
-    return phpOp(version, 'start')
-
-
-def stop(version):
-    status = phpOp(version, 'stop')
-
-    if version == '52':
-        file = initReplace(version)
-        data = mw.execShell(file + ' ' + 'stop')
-        if data[1] == '':
-            return 'ok'
-    return status
-
-
-def restart(version):
-    return phpOp(version, 'restart')
-
-
-def reload(version):
-    if version == '52':
-        return phpOp(version, 'restart')
-    return phpOp(version, 'reload')
+def getFpmAddress(version):
+    fpm_address = '/tmp/php-cgi-{}.sock'.format(version)
+    php_fpm_file = getFpmConfFile(version)
+    try:
+        content = readFile(php_fpm_file)
+        tmp = re.findall(r"listen\s*=\s*(.+)", content)
+        if not tmp:
+            return fpm_address
+        if tmp[0].find('sock') != -1:
+            return fpm_address
+        if tmp[0].find(':') != -1:
+            listen_tmp = tmp[0].split(':')
+            if bind:
+                fpm_address = (listen_tmp[0], int(listen_tmp[1]))
+            else:
+                fpm_address = ('127.0.0.1', int(listen_tmp[1]))
+        else:
+            fpm_address = ('127.0.0.1', int(tmp[0]))
+        return fpm_address
+    except:
+        return fpm_address
 
 
 def getPhpinfo(version):
