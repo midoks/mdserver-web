@@ -9,13 +9,17 @@
 # description: Start and stop Keepalived
 
 # Source function library
-. /etc/rc.d/init.d/functions
+if [ -f /etc/rc.d/init.d/functions ];then
+	. /etc/rc.d/init.d/functions
+fi
 
+SYS_KP_FILE={$SERVER_PATH}/keepalived/etc/sysconfig/keepalived
 # Source configuration file (we set KEEPALIVED_OPTIONS there)
-. /etc/sysconfig/keepalived
+if [ -f $SYS_KP_FILE ];then
+	. SYS_KP_FILE
+fi
 
 RETVAL=0
-
 prog="keepalived"
 
 start() {
