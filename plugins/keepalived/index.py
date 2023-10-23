@@ -104,14 +104,11 @@ def initDreplace():
         mw.execShell('chmod +x ' + file_bin)
 
     # config replace
-    dst_conf = getServerDir() + '/keepalived.conf'
+    dst_conf = getServerDir() + '/etc/keepalived/keepalived.conf'
     dst_conf_init = getServerDir() + '/init.pl'
     if not os.path.exists(dst_conf_init):
         conf_content = mw.readFile(getConfTpl())
         conf_content = conf_content.replace('{$SERVER_PATH}', service_path)
-        conf_content = conf_content.replace(
-            '{$REDIS_PASS}', mw.getRandomString(10))
-
         mw.writeFile(dst_conf, conf_content)
         mw.writeFile(dst_conf_init, 'ok')
 

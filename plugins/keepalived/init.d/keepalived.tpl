@@ -16,7 +16,7 @@ fi
 SYS_KP_FILE={$SERVER_PATH}/keepalived/etc/sysconfig/keepalived
 # Source configuration file (we set KEEPALIVED_OPTIONS there)
 if [ -f $SYS_KP_FILE ];then
-	. SYS_KP_FILE
+	. $SYS_KP_FILE
 fi
 
 RETVAL=0
