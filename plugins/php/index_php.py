@@ -87,42 +87,6 @@ def status(version):
     return 'start'
 
 
-def contentReplace(content, version):
-    service_path = mw.getServerDir()
-    content = content.replace('{$ROOT_PATH}', mw.getRootDir())
-    content = content.replace('{$SERVER_PATH}', service_path)
-    content = content.replace('{$PHP_VERSION}', version)
-    content = content.replace('{$LOCAL_IP}', mw.getLocalIp())
-    content = content.replace('{$SSL_CRT}', mw.getSslCrt())
-
-    if mw.isAppleSystem():
-        # user = mw.execShell(
-        #     "who | sed -n '2, 1p' |awk '{print $1}'")[0].strip()
-        content = content.replace('{$PHP_USER}', 'nobody')
-        content = content.replace('{$PHP_GROUP}', 'nobody')
-
-        rep = 'listen.owner\s*=\s*(.+)\r?\n'
-        val = ';listen.owner = nobody\n'
-        content = re.sub(rep, val, content)
-
-        rep = 'listen.group\s*=\s*(.+)\r?\n'
-        val = ';listen.group = nobody\n'
-        content = re.sub(rep, val, content)
-
-        rep = 'user\s*=\s*(.+)\r?\n'
-        val = ';user = nobody\n'
-        content = re.sub(rep, val, content)
-
-        rep = r'[^\.]group\s*=\s*(.+)\r?\n'
-        val = ';group = nobody\n'
-        content = re.sub(rep, val, content)
-
-    else:
-        content = content.replace('{$PHP_USER}', 'www')
-        content = content.replace('{$PHP_GROUP}', 'www')
-    return content
-
-
 def getFpmAddress(version):
     fpm_address = '/tmp/php-cgi-{}.sock'.format(version)
     php_fpm_file = getFpmConfFile(version)
