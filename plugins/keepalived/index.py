@@ -180,61 +180,6 @@ def getPort():
     return '6379'
 
 
-def runInfo():
-    s = status()
-    if s == 'stop':
-        return mw.returnJson(False, '未启动')
-
-    requirepass = ""
-
-    conf = getServerDir() + '/keepalived.conf'
-    content = mw.readFile(conf)
-    rep = "^(requirepass" + ')\s*([.0-9A-Za-z_& ~]+)'
-    tmp = re.search(rep, content, re.M)
-    if tmp:
-        requirepass = tmp.groups()[1]
-
-    default_ip = '127.0.0.1'
-    port = getPort()
-    # findDebian = mw.execShell('cat /etc/issue |grep Debian')
-    # if findDebian[0] != '':
-    #     default_ip = mw.getLocalIp()
-    cmd = getServerDir() + "/bin/redis-cli -h " + \
-        default_ip + ' -p ' + port + " info"
-
-    if requirepass != "":
-        cmd = getServerDir() + '/bin/redis-cli -h ' + default_ip + \
-            ' -p ' + port + ' -a "' + requirepass + '" info'
-
-    # print(cmd)
-    data = mw.execShell(cmd)[0]
-    res = [
-        'tcp_port',
-        'uptime_in_days',  # 已运行天数
-        'connected_clients',  # 连接的客户端数量
-        'used_memory',  # Redis已分配的内存总量
-        'used_memory_rss',  # Redis占用的系统内存总量
-        'used_memory_peak',  # Redis所用内存的高峰值
-        'mem_fragmentation_ratio',  # 内存碎片比率
-        'total_connections_received',  # 运行以来连接过的客户端的总数量
-        'total_commands_processed',  # 运行以来执行过的命令的总数量
-        'instantaneous_ops_per_sec',  # 服务器每秒钟执行的命令数量
-        'keyspace_hits',  # 查找数据库键成功的次数
-        'keyspace_misses',  # 查找数据库键失败的次数
-        'latest_fork_usec'  # 最近一次 fork() 操作耗费的毫秒数
-    ]
-    data = data.split("\n")
-    result = {}
-    for d in data:
-        if len(d) < 3:
-            continue
-        t = d.strip().split(':')
-        if not t[0] in res:
-            continue
-        result[t[0]] = t[1]
-    return mw.getJson(result)
-
-
 def initdStatus():
     current_os = mw.getOs()
     if current_os == 'darwin':
@@ -290,67 +235,6 @@ def initdUinstall():
 def runLog():
     return getServerDir() + '/' + getPluginName() + '.log'
 
-
-def getRedisConfInfo():
-    conf = getServerDir() + '/redis.conf'
-
-    gets = [
-        {'name': 'bind', 'type': 2, 'ps': '绑定IP(修改绑定IP可能会存在安全隐患)'},
-        {'name': 'port', 'type': 2, 'ps': '绑定端口'},
-        {'name': 'timeout', 'type': 2, 'ps': '空闲链接超时时间,0表示不断开'},
-        {'name': 'maxclients', 'type': 2, 'ps': '最大输入时间'},
-        {'name': 'databases', 'type': 2, 'ps': '数据库数量'},
-        {'name': 'requirepass', 'type': 2, 'ps': 'redis密码,留空代表没有设置密码'},
-        {'name': 'maxmemory', 'type': 2, 'ps': 'MB,最大使用内存,0表示不限制'}
-    ]
-    content = mw.readFile(conf)
-
-    result = []
-    for g in gets:
-        rep = "^(" + g['name'] + ')\s*([.0-9A-Za-z_& ~]+)'
-        tmp = re.search(rep, content, re.M)
-        if not tmp:
-            g['value'] = ''
-            result.append(g)
-            continue
-        g['value'] = tmp.groups()[1]
-        if g['name'] == 'maxmemory':
-            g['value'] = g['value'].strip("mb")
-        result.append(g)
-
-    return result
-
-
-def getRedisConf():
-    data = getRedisConfInfo()
-    return mw.getJson(data)
-
-
-def submitRedisConf():
-    gets = ['bind', 'port', 'timeout', 'maxclients',
-            'databases', 'requirepass', 'maxmemory']
-    args = getArgs()
-    conf = getServerDir() + '/redis.conf'
-    content = mw.readFile(conf)
-    for g in gets:
-        if g in args:
-            rep = g + '\s*([.0-9A-Za-z_& ~]+)'
-            val = g + ' ' + args[g]
-
-            if g == 'maxmemory':
-                val = g + ' ' + args[g] + "mb"
-
-            if g == 'requirepass' and args[g] == '':
-                content = re.sub('requirepass', '#requirepass', content)
-            if g == 'requirepass' and args[g] != '':
-                content = re.sub('#requirepass', 'requirepass', content)
-                content = re.sub(rep, val, content)
-
-            if g != 'requirepass':
-                content = re.sub(rep, val, content)
-    mw.writeFile(conf, content)
-    reload()
-    return mw.returnJson(True, '设置成功')
 
 if __name__ == "__main__":
     func = sys.argv[1]
