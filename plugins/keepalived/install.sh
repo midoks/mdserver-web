@@ -65,6 +65,13 @@ Uninstall_App()
 		systemctl daemon-reload
 	fi
 
+	if [ -f /lib/systemd/system/keepalived.service ];then
+		systemctl stop keepalived
+		systemctl disable keepalived
+		rm -rf /lib/systemd/system/keepalived.service
+		systemctl daemon-reload
+	fi
+
 	if [ -f $serverPath/keepalived/initd/keepalived ];then
 		$serverPath/keepalived/initd/keepalived stop
 	fi
