@@ -53,6 +53,13 @@ Uninstall_App()
 		systemctl daemon-reload
 	fi
 
+	if [ -f /lib/systemd/system/redis.service ];then
+		systemctl stop redis
+		systemctl disable redis
+		rm -rf /lib/systemd/system/redis.service
+		systemctl daemon-reload
+	fi
+
 	if [ -f $serverPath/redis/initd/redis ];then
 		$serverPath/redis/initd/redis stop
 	fi
