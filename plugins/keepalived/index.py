@@ -288,7 +288,7 @@ def initdUinstall():
 
 
 def runLog():
-    return getServerDir() + '/data/redis.log'
+    return getServerDir() + '/' + getPluginName() + '.log'
 
 
 def getRedisConfInfo():
@@ -376,9 +376,5 @@ if __name__ == "__main__":
         print(getConf())
     elif func == 'run_log':
         print(runLog())
-    elif func == 'get_redis_conf':
-        print(getRedisConf())
-    elif func == 'submit_redis_conf':
-        print(submitRedisConf())
     else:
         print('error')
