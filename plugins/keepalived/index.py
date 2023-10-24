@@ -126,7 +126,7 @@ def initDreplace():
     return file_bin
 
 
-def redisOp(method):
+def kpOp(method):
     file = initDreplace()
 
     current_os = mw.getOs()
@@ -149,15 +149,15 @@ def redisOp(method):
 
 
 def start():
-    return redisOp('start')
+    return kpOp('start')
 
 
 def stop():
-    return redisOp('stop')
+    return kpOp('stop')
 
 
 def restart():
-    status = redisOp('restart')
+    status = kpOp('restart')
 
     log_file = runLog()
     mw.execShell("echo '' > " + log_file)
@@ -165,7 +165,7 @@ def restart():
 
 
 def reload():
-    return redisOp('reload')
+    return kpOp('reload')
 
 
 def getPort():
