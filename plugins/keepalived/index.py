@@ -101,7 +101,7 @@ def initDreplace():
     # initd replace
     if not os.path.exists(file_bin):
         content = mw.readFile(file_tpl)
-        content = content.replace('{$SERVER_PATH}', service_path)
+        content = contentReplace(content)
         mw.writeFile(file_bin, content)
         mw.execShell('chmod +x ' + file_bin)
 
