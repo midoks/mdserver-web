@@ -12,6 +12,10 @@ serverPath=$(dirname "$rootPath")
 
 # /www/server/keepalived/init.d/keepalived start
 
+# systemctl status keepalived
+# systemctl restart keepalived
+# ifconfig
+
 install_tmp=${rootPath}/tmp/mw_install.pl
 
 VERSION=$2
