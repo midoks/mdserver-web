@@ -59,7 +59,7 @@ def send_msg(bot, tag='ad', trigger_time=300):
     keyboard = [
         [
             types.InlineKeyboardButton(
-                text="综合包网/NG接口开户", url='https://t.me/NG_Tony')
+                text="🚀 综合包网/NG接口开户", url='https://t.me/NG_Tony')
         ],
         [
             types.InlineKeyboardButton(
