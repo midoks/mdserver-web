@@ -682,7 +682,7 @@ function run_app_waf()
 
         -- country limit
         if config['area_limit'] then
-        local waf_country = get_country()
+            local waf_country = get_country()
             if waf_country then
                 if area_limit(waf_country, server_name, site_config[server_name]['open']) then return true end
             end
