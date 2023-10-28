@@ -248,6 +248,70 @@ function userProjectListPage(user, search){
 }
 
 
+function gogsRepoListPage(page, search){
+    var _data = {};
+    if (typeof(page) =='undefined'){
+        var page = 1;
+    }
+    
+    _data['page'] = page;
+    _data['page_size'] = 10;
+    if(typeof(search) != 'undefined'){
+        _data['search'] = search;
+    }
+
+    gogsPost('repo_list', _data, function(data){
+
+        var rdata = $.parseJSON(data.data);
+        if (!rdata.status){
+            layer.msg(rdata.msg,{icon:0,time:2000,shade: [0.3, '#000']});
+            return;
+        }
+ 
+        var ulist = rdata['data']['data'];
+        var body = ''
+        for (i in ulist){
+            console.log(ulist[i]);
+            body += '<tr><td>'+ulist[i]["id"]+'</td>'+
+                '<td>' + ulist[i]["name"]+'</td>'+
+                '<td>' + ulist[i]["repo"]+'</td>'+
+                '<td>' +
+                    '<a class="btlink" target="_blank" href="'+rdata['data']['root_url']+ulist[i]["name"]+'/'+ulist[i]["repo"]+'">源码</a>' + ' | ' +
+                    '<a class="btlink" onclick="projectScript(\''+ulist[i]["name"]+'\',\''+ulist[i]["repo"]+'\','+ulist[i]['has_hook']+');">脚本</a>' + ' | ' +
+                    '<a class="btlink" onclick="userProjectList(\''+ulist[i]["name"]+'\')">源码</a>' +
+                '</td>' +
+                '</tr>';
+        }
+
+        $('#repo_list tbody').html(body);
+        $('#repo_list_page').html(rdata['data']['list']);
+    });
+}
+function gogsRepoList() {
+    content = '<div class="finduser"><input class="bt-input-text mr5 outline_no" type="text" placeholder="查找项目" id="find_user" style="height: 28px; border-radius: 3px;width: 435px;">';
+    content += '<button class="btn btn-success btn-sm" onclick="userFind();">查找</button></div>';
+
+    content += '<div id="repo_list" class="divtable" style="margin-top:5px;"><table class="table table-hover" width="100%" cellspacing="0" cellpadding="0" border="0">';
+    content += '<thead><tr>';
+    content += '<th style="width:50px;">序号</th>';
+    content += '<th style="width:80px;">用户/组织</th>';
+    content += '<th style="width:80px;">项目名</th>';
+    content += '<th>操作</th>';
+    content += '</tr></thead>';
+
+    content += '<tbody></tbody>';
+    content += '</table></div>';
+
+    var page = '<div class="dataTables_paginate paging_bootstrap pagination" style="margin-top:0px;"><ul id="repo_list_page" class="page"></ul></div>';
+
+    content += page;
+
+    $(".soft-man-con").html(content);
+
+    gogsRepoListPage(1);
+}
+
+
 
 function projectScript(user, name,has_hook){
     // console.log(user,name,has_hook);
@@ -345,7 +409,7 @@ function gogsRead(){
     var readme = '<ul class="help-info-text c7">';
     readme += '<li>默认使用MySQL,第一个启动加载各种配置,并修改成正确的数据库配置</li>';
     readme += '<li>邮件端口使用456,gogs仅支持使用STARTTLS的SMTP协议</li>';
-    readme += '<li>如果使用项目中脚本本地同步,<a target="_blank" href="https://github.com/midoks/mdserver-web/wiki/%E6%8F%92%E4%BB%B6%E7%AE%A1%E7%90%86%5Bgogs%E4%BD%BF%E7%94%A8%E8%AF%B4%E6%98%8E%5D#%E5%90%AF%E5%8A%A8gogs%E5%90%8E%E5%A6%82%E6%9E%9C%E8%A6%81%E4%BD%BF%E7%94%A8hook%E8%84%9A%E6%9C%AC%E5%90%8C%E6%AD%A5%E4%BB%A3%E7%A0%81%E9%9C%80%E8%A6%81%E5%BC%80%E5%90%AFssh%E7%AB%AF%E5%8F%A3">点击查看</></li>';
+    readme += '<li>项目【加载脚本】后,会自动同步到wwwroot目录下</li>';
     readme += '<li><a href="#" onclick="getRsaPublic();">点击查看本机公钥</></li>';
     readme += '</ul>';
 

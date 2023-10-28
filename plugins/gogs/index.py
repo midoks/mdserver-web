@@ -498,6 +498,65 @@ def userList():
     return mw.returnJson(True, 'OK', data)
 
 
+def checkRepoListIsHasScript(data):
+    path = getRootPath()
+    for x in range(len(data)):
+        name = data[x]['name'] + '/' + data[x]['repo'] + '.git'
+        path_tmp = path + '/' + name + '/custom_hooks/post-receive'
+        if os.path.exists(path_tmp):
+            data[x]['has_hook'] = True
+        else:
+            data[x]['has_hook'] = False
+    return data
+
+
+def repoList():
+
+    conf = getConf()
+    if not os.path.exists(conf):
+        return mw.returnJson(False, "请先安装初始化!<br/>默认地址:http://" + mw.getLocalIp() + ":3000")
+
+    conf = getDbConfValue()
+    gtype = getGogsDbType(conf)
+    if gtype != 'mysql':
+        return mw.returnJson(False, "仅支持mysql数据操作!")
+
+    import math
+    args = getArgs()
+
+    data = checkArgs(args, ['page', 'page_size'])
+    if not data[0]:
+        return data[1]
+
+    page = int(args['page'])
+    page_size = int(args['page_size'])
+    search = ''
+    if 'search' in args:
+        search = args['search']
+
+    data = {}
+
+    data['root_url'] = getRootUrl()
+
+    start = (page - 1) * page_size
+    list_count = pQuery('select count(id) as num from repository')
+    count = list_count[0]["num"]
+    sql = 'select r.id,r.owner_id,r.name as repo, u.name from repository r left join user u on r.owner_id=u.id order by r.id desc limit ' + \
+        str(start) + ',' + str(page_size)
+    # print(sql)
+    list_data = pQuery(sql)
+    # print(list_data)
+    list_data = checkRepoListIsHasScript(list_data)
+
+    data['list'] = mw.getPage({'count': count, 'p': page,
+                               'row': page_size, 'tojs': 'gogsUserList'})
+    data['page'] = page
+    data['page_size'] = page_size
+    data['page_count'] = int(math.ceil(count / page_size))
+    data['data'] = list_data
+    return mw.returnJson(True, 'OK', data)
+
+
 def getAllUserProject(user, search=''):
     path = getRootPath() + '/' + user
     dlist = []
@@ -734,6 +793,8 @@ if __name__ == "__main__":
         print(submitGogsConf())
     elif func == 'user_list':
         print(userList())
+    elif func == 'repo_list':
+        print(repoList())
     elif func == 'user_project_list':
         print(userProjectList())
     elif func == 'project_script_edit':
