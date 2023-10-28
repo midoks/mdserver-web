@@ -81,6 +81,13 @@ def status():
     return 'start'
 
 
+def contentReplace(content):
+    service_path = os.path.dirname(os.getcwd())
+    content = content.replace('{$SERVER_PATH}', service_path)
+    content = content.replace('{$PLUGIN_PATH}', getPluginDir())
+    return content
+
+
 def initDreplace():
 
     file_tpl = getInitDTpl()
@@ -108,7 +115,8 @@ def initDreplace():
     dst_conf_init = getServerDir() + '/init.pl'
     if not os.path.exists(dst_conf_init):
         conf_content = mw.readFile(getConfTpl())
-        conf_content = conf_content.replace('{$SERVER_PATH}', service_path)
+
+        conf_content = contentReplace(conf_content)
         mw.writeFile(dst_conf, conf_content)
         mw.writeFile(dst_conf_init, 'ok')
 
@@ -119,7 +127,7 @@ def initDreplace():
         systemServiceTpl = getPluginDir() + '/init.d/' + getPluginName() + '.service.tpl'
         service_path = mw.getServerDir()
         se_content = mw.readFile(systemServiceTpl)
-        se_content = se_content.replace('{$SERVER_PATH}', service_path)
+        se_content = contentReplace(se_content)
         mw.writeFile(systemService, se_content)
         mw.execShell('systemctl daemon-reload')
 
