@@ -764,6 +764,168 @@ def projectScriptSelf():
     user = args['user']
     name = args['name'] + '.git'
 
+    custom_hooks = getRootPath() + '/' + user + '/' + \
+        name + '/custom_hooks'
+    self_path = custom_hooks + '/self'
+
+    if not os.path.exists(self_path):
+        os.mkdir(self_path)
+
+    self_hook_file = custom_hooks + '/self_hook.sh'
+    self_hook_exist = False
+    if os.path.exists(self_hook_file):
+        self_hook_exist = True
+
+    dlist = []
+    if os.path.exists(self_path):
+        for filename in os.listdir(self_path):
+            tmp = {}
+            filePath = self_path + '/' + filename
+            if os.path.isfile(filePath):
+                tmp['path'] = filePath
+                tmp['name'] = os.path.basename(filePath)
+                dlist.append(tmp)
+
+    dlist_sum = len(dlist)
+    # print(dlist)
+    rdata = {}
+    rdata['data'] = dlist
+    rdata['self_hook'] = self_hook_exist
+    rdata['list'] = mw.getPage(
+        {'count': dlist_sum, 'p': 1, 'row': 100, 'tojs': 'self_page'})
+
+    return mw.returnJson(True, 'ok', rdata)
+
+
+def projectScriptSelf_Create():
+    args = getArgs()
+    data = checkArgs(args, ['user', 'name', 'file'])
+    if not data[0]:
+        return data[1]
+
+    user = args['user']
+    name = args['name'] + '.git'
+    file = args['file']
+
+    self_path = path = getRootPath() + '/' + user + '/' + \
+        name + '/custom_hooks/self'
+
+    if not os.path.exists(self_path):
+        os.mkdir(self_path)
+
+    abs_file = self_path + '/' + file + '.sh'
+    if os.path.exists(abs_file):
+        return mw.returnJson(False, '脚本已经存在!')
+
+    mw.writeFile(abs_file, "#!/bin/bash\n")
+
+    rdata = {}
+    rdata['abs_file'] = abs_file
+    return mw.returnJson(True, '创建文件成功!', rdata)
+
+
+def projectScriptSelf_Del():
+    args = getArgs()
+    data = checkArgs(args, ['user', 'name', 'file'])
+    if not data[0]:
+        return data[1]
+
+    user = args['user']
+    name = args['name'] + '.git'
+    file = args['file']
+
+    self_path = path = getRootPath() + '/' + user + '/' + \
+        name + '/custom_hooks/self'
+
+    if not os.path.exists(self_path):
+        os.mkdir(self_path)
+
+    abs_file = self_path + '/' + file
+    # print(abs_file)
+    if not os.path.exists(abs_file):
+        return mw.returnJson(False, '脚本已经删除!')
+
+    os.remove(abs_file)
+    return mw.returnJson(True, '脚本删除成功!')
+
+
+def projectScriptSelf_Logs():
+    args = getArgs()
+    data = checkArgs(args, ['user', 'name', 'file'])
+    if not data[0]:
+        return data[1]
+
+    user = args['user']
+    name = args['name'] + '.git'
+    file = args['file']
+
+    self_path = path = getRootPath() + '/' + user + '/' + \
+        name + '/custom_hooks/self_logs'
+
+    if not os.path.exists(self_path):
+        os.mkdir(self_path)
+
+    logs_file = self_path + '/' + file + '.log'
+    if os.path.exists(logs_file):
+        rdata = {}
+        rdata['path'] = logs_file
+        return mw.returnJson(True, '脚本已经删除!', rdata)
+
+    return mw.returnJson(False, '日志不存在!')
+
+
+def projectScriptSelf_Rename():
+    args = getArgs()
+    data = checkArgs(args, ['user', 'name', 'o_file', 'n_file'])
+    if not data[0]:
+        return data[1]
+
+    user = args['user']
+    name = args['name'] + '.git'
+    o_file = args['o_file']
+    n_file = args['n_file']
+
+    self_path = path = getRootPath() + '/' + user + '/' + \
+        name + '/custom_hooks/self'
+
+    if not os.path.exists(self_path):
+        os.mkdir(self_path)
+
+    o_file_abs = self_path + '/' + o_file + '.sh'
+    if not os.path.exists(o_file_abs):
+        return mw.returnJson(False, '原文件已经不存在了!')
+
+    n_file_abs = self_path + '/' + n_file + '.sh'
+
+    os.rename(o_file_abs, n_file_abs)
+    return mw.returnJson(True, '重命名成功!')
+
+
+def projectScriptSelf_Enable():
+    args = getArgs()
+    data = checkArgs(args, ['user', 'name', 'enable'])
+    if not data[0]:
+        return data[1]
+
+    user = args['user']
+    name = args['name'] + '.git'
+    enable = args['enable']
+
+    custom_path = getRootPath() + '/' + user + '/' + \
+        name + '/custom_hooks'
+    self_file = custom_path + '/self_hook.sh'
+    self_hook_tpl = getPluginDir() + '/hook/self_hook.tpl'
+
+    if enable == '1':
+        content = mw.readFile(self_hook_tpl)
+        mw.writeFile(self_file, content)
+        mw.execShell("chmod 777" + self_file)
+        return mw.returnJson(True, '开启成功!')
+    else:
+        if os.path.exists(self_file):
+            os.remove(self_file)
+        return mw.returnJson(True, '关闭成功!')
+
 
 def getRsaPublic():
     path = getHomeDir()
@@ -842,6 +1004,16 @@ if __name__ == "__main__":
         print(projectScriptRun())
     elif func == 'project_script_self':
         print(projectScriptSelf())
+    elif func == 'project_script_self_create':
+        print(projectScriptSelf_Create())
+    elif func == 'project_script_self_del':
+        print(projectScriptSelf_Del())
+    elif func == 'project_script_self_logs':
+        print(projectScriptSelf_Logs())
+    elif func == 'project_script_self_rename':
+        print(projectScriptSelf_Rename())
+    elif func == 'project_script_self_enable':
+        print(projectScriptSelf_Enable())
     elif func == 'get_rsa_public':
         print(getRsaPublic())
     elif func == 'get_total_statistics':

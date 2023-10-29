@@ -305,7 +305,7 @@ function gogsRepoListPage(page, search){
                 option += '<a class="btlink edit" data-index="'+i+'">编辑</a>' + ' | ';
                 option += '<a class="btlink debug" data-index="'+i+'">日志</a>' + ' | ';
                 option += '<a class="btlink run" data-index="'+i+'">手动</a>' + ' | ';
-                option += '<a class="btlink scripts" data-index="'+i+'" onclick="projectScriptDebug(\''+ulist[i]["name"]+'\',\''+ulist[i]["repo"]+'\')" >自定义</a>';
+                option += '<a class="btlink scripts" data-index="'+i+'" onclick="projectScriptSelf(\''+ulist[i]["name"]+'\',\''+ulist[i]["repo"]+'\')" >自定义</a>';
             } else{
                 option += '<a data-index="'+i+'" class="btlink load">加载脚本</a>';
             }
@@ -320,9 +320,6 @@ function gogsRepoListPage(page, search){
                 '</td>' +
                 '</tr>';
         }
-
-
-
 
         $('#repo_list tbody').html(body);
         $('#repo_list_page').html(rdata['data']['list']);
@@ -402,14 +399,9 @@ function gogsRepoListPage(page, search){
 
             gogsPost('project_script_run', {'user':user,'name':name}, function(data){
                 var data = $.parseJSON(data.data);
-                layer.msg(data.msg,{icon:data.code?2:1,time:2000,shade: [0.3, '#000']});
+                layer.msg(data.msg,{icon:data.status?2:1,time:2000,shade: [0.3, '#000']});
             });
         });
-
-
-
-  
-
         
     //---------
     });
@@ -517,6 +509,199 @@ function projectScriptDebug(user,name){
             layer.msg(rdata.msg,{icon:1,time:2000,shade: [0.3, '#000']});
         }        
     });
+}
+
+
+function projectScriptSelfRender(user, name){
+    gogsPost('project_script_self', {'user':user,'name':name}, function(data){
+        var rdata = $.parseJSON(data.data);
+
+        var data = rdata['data']['data'];
+
+        if (rdata['data']['self_hook']){
+            $('#open_script').prop('checked',true);
+        }
+
+        var body = '';
+        if(data.length == 0 ){
+            body += '<tr><td colspan="3" style="text-align:center;">无脚本数据</td></tr>';
+        } else{
+            for (var i = 0; i < data.length; i++) {
+                body += '<tr>'+
+                '<td>' + data[i]["name"]+'</td>'+
+                '<td>' + '<a class="btlink" target="_blank">已使用</a>'+'</td>'+
+                '<td>' +
+                    '<a class="btlink del" data-index="'+i+'" target="_blank">删除</a>' + ' | ' +
+                    '<a class="btlink edit" data-index="'+i+'" target="_blank">编辑</a>' + ' | ' +
+                    '<a class="btlink logs" data-index="'+i+'" target="_blank">日志</a>' + ' | ' +
+                    '<a class="btlink rename" data-index="'+i+'" target="_blank">重命名</a>' +
+                '</td></tr>';
+            }   
+            
+        }
+
+        $('#gogs_self_table tbody').html(body);
+        $('#gogs_self_table .page').html(rdata['data']['list']);
+
+        $('#gogs_self_table .del').click(function(){
+            var i = $(this).data('index');
+            var file = data[i]["name"];
+            gogsPost('project_script_self_del', {'user':user,'name':name,'file':file}, function(data){
+                var data = $.parseJSON(data.data);
+                showMsg(data.msg ,function(){
+                    projectScriptSelfRender(user, name);
+                },{icon:data.code?2:1,time:2000,shade: [0.3, '#000']},2000);
+            });
+        });
+
+        $('#gogs_self_table .edit').click(function(){
+            var i = $(this).data('index');
+            var path = data[i]["path"];
+            onlineEditFile(0,path);
+        });
+
+        $('#gogs_self_table .logs').click(function(){
+            var i = $(this).data('index');
+            var file = data[i]["name"];
+            gogsPost('project_script_self_logs', {'user':user,'name':name,'file':file}, function(data){
+                var rdata = $.parseJSON(data.data);
+                if (rdata['status']){
+                    onlineEditFile(0, rdata['path']);
+                } else {
+                    layer.msg(rdata.msg,{icon:data.status?2:1,time:2000,shade: [0.3, '#000']});
+                }        
+            });
+        });
+
+
+        $('#gogs_self_table .rename').click(function(){
+            var i = $(this).data('index');
+            var file = data[i]["name"];
+            file = file.split('.sh')[0];
+
+            layer.open({
+                type: 1,
+                shift: 5,
+                closeBtn: 1,
+                area: '320px', 
+                title: '重命名',
+                btn:['设置','关闭'],
+                content: '<div class="bt-form pd20">\
+                            <div class="line">\
+                                <input type="text" class="bt-input-text" name="Name" id="newFileName" value="'+file+'" placeholder="文件名" style="width:100%" />\
+                            </div>\
+                        </div>',
+                success:function(){
+                    $("#newFileName").focus().keyup(function(e){
+                        if(e.keyCode == 13) $(".layui-layer-btn0").click();
+                    });
+                },
+                yes:function(){
+                    var n_file = $("#newFileName").val();
+                    var o_file = file;
+
+                    gogsPost('project_script_self_rename', {'user':user,'name':name,'o_file':o_file,'n_file':n_file}, function(data){
+                        var data = $.parseJSON(data.data);
+                        showMsg(data.msg ,function(){
+                            $(".layui-layer-btn1").click();
+                            projectScriptSelfRender(user, name);
+                        },{icon:data.code?2:1,time:2000,shade: [0.3, '#000']},2000);     
+                    });
+                }
+            });
+        //-----
+        });
+    //------
+    });
+}
+
+//新建文件
+function createScriptFile(type, user, name, file) {
+    if (type == 1) {
+        gogsPost('project_script_self_create', {'user':user,'name':name,'file': file }, function(data){
+            var rdata = $.parseJSON(data.data);
+            if(!rdata['status']){
+                layer.msg(rdata.msg,{icon:2,time:2000,shade: [0.3, '#000']});
+                return;
+            }
+
+            showMsg(rdata.msg, function(){
+                $(".layui-layer-btn1").click();
+                onlineEditFile(0,rdata['data']['abs_file']);
+                projectScriptSelfRender(user, name);
+            }, {icon:1,shade: [0.3, '#000']},2000);
+        });
+        return;
+    }
+    layer.open({
+        type: 1,
+        shift: 5,
+        closeBtn: 1,
+        area: '320px', 
+        title: '新建自定义脚本',
+        btn:['新建','关闭'],
+        content: '<div class="bt-form pd20">\
+                    <div class="line">\
+                        <input type="text" class="bt-input-text" name="Name" id="newFileName" value="" placeholder="文件名" style="width:100%" />\
+                    </div>\
+                </div>',
+        success:function(){
+            $("#newFileName").focus().keyup(function(e){
+                if(e.keyCode == 13) $(".layui-layer-btn0").click();
+            });
+        },
+        yes:function(){
+            var file = $("#newFileName").val();;
+            createScriptFile(1, user, name, file);
+        }
+    });
+}
+
+function projectScriptSelf(user, name){
+    layer.open({
+        type: 1,
+        title: '项目('+user+'/'+name+')自定义脚本',
+        area: '500px',
+        content:"<div class='bt-form pd15'>\
+                <button id='create_script' class='btn btn-success btn-sm' type='button' style='margin-right: 5px;''>添加脚本</button>\
+                <div style='float:right;'>\
+                    <span style='line-height: 23px;'>开启自定义脚本</span>\
+                    <input class='btswitch btswitch-ios' id='open_script' type='checkbox'>\
+                    <label id='script_hook_enable' class='btswitch-btn' for='open_script'  style='display: inline-flex;line-height:38px;margin-left: 4px;float: right;'></label>\
+                </div>\
+                <div id='gogs_self_table' class='divtable' style='margin-top:5px;'>\
+                    <table class='table table-hover'>\
+                        <thead><tr><th style='width:100px;'>脚本文件名</th><th>状态</th><th>操作</th></tr></thead>\
+                        <tbody></tbody>\
+                    </table>\
+                    <div class='dataTables_paginate paging_bootstrap pagination' style='margin-top:0px;'>\
+                        <ul class='page'><div class='gogs_page'></div></ul>\
+                    </div>\
+                </div>\
+            </div>",
+        success:function(){
+            projectScriptSelfRender(user, name);
+
+            $('#create_script').click(function(){
+                createScriptFile(0, user, name);
+            });
+
+            $('#script_hook_enable').click(function(){
+                var enable = $('#open_script').prop('checked');
+                var enable_option = '0';
+                if (!enable){
+                    enable_option = '1';
+                }
+                gogsPost('project_script_self_enable', {'user':user,'name':name,'enable':enable_option}, function(data){
+                    var data = $.parseJSON(data.data);
+                    showMsg(data.msg ,function(){
+                        projectScriptSelfRender(user, name);
+                    },{icon:data.status?1:2,shade: [0.3, '#000']},2000);
+                });
+
+            });
+        }
+    });  
 }
 
 function getRsaPublic(){
