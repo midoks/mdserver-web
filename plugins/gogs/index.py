@@ -456,6 +456,13 @@ def submitGogsConf():
     return mw.returnJson(True, '设置成功')
 
 
+def gogsEditTpl():
+    data = {}
+    data['post_receive'] = getPluginDir() + '/hook/post-receive.tpl'
+    data['commit'] = getPluginDir() + '/hook/commit.tpl'
+    return mw.getJson(data)
+
+
 def userList():
 
     conf = getConf()
@@ -748,11 +755,14 @@ def projectScriptRun():
     return mw.returnJson(True, '脚本文件执行成功,观察日志!')
 
 
-def gogsEditTpl():
-    data = {}
-    data['post_receive'] = getPluginDir() + '/hook/post-receive.tpl'
-    data['commit'] = getPluginDir() + '/hook/commit.tpl'
-    return mw.getJson(data)
+def projectScriptSelf():
+    args = getArgs()
+    data = checkArgs(args, ['user', 'name'])
+    if not data[0]:
+        return data[1]
+
+    user = args['user']
+    name = args['name'] + '.git'
 
 
 def getRsaPublic():
