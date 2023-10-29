@@ -821,7 +821,7 @@ def projectScriptSelf_Create():
     if os.path.exists(abs_file):
         return mw.returnJson(False, '脚本已经存在!')
 
-    mw.writeFile(abs_file, "#!/bin/bash\n")
+    mw.writeFile(abs_file, "#!/bin/bash\necho `date +'%Y-%m-%d %H:%M:%S'`\n")
 
     rdata = {}
     rdata['abs_file'] = abs_file
@@ -883,6 +883,26 @@ def projectScriptSelf_Logs():
         return mw.returnJson(True, 'ok', rdata)
 
     return mw.returnJson(False, '日志不存在!')
+
+
+def projectScriptSelf_Run():
+    args = getArgs()
+    data = checkArgs(args, ['user', 'name', 'file'])
+    if not data[0]:
+        return data[1]
+
+    user = args['user']
+    name = args['name'] + '.git'
+    file = args['file']
+
+    custom_hooks = getRootPath() + '/' + user + '/' + \
+        name + '/custom_hooks'
+    self_path = custom_hooks + '/self/' + file
+    self_logs_path = custom_hooks + '/self_logs/' + file + '.log'
+
+    shell = "sh -x " + self_path + " 2>" + self_logs_path
+    mw.execShell(shell)
+    return mw.returnJson(True, '执行成功!')
 
 
 def projectScriptSelf_Rename():
@@ -1031,6 +1051,8 @@ if __name__ == "__main__":
         print(projectScriptSelf_Del())
     elif func == 'project_script_self_logs':
         print(projectScriptSelf_Logs())
+    elif func == 'project_script_self_run':
+        print(projectScriptSelf_Run())
     elif func == 'project_script_self_rename':
         print(projectScriptSelf_Rename())
     elif func == 'project_script_self_enable':

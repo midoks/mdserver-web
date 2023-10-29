@@ -534,6 +534,7 @@ function projectScriptSelfRender(user, name){
                     '<a class="btlink del" data-index="'+i+'" target="_blank">删除</a>' + ' | ' +
                     '<a class="btlink edit" data-index="'+i+'" target="_blank">编辑</a>' + ' | ' +
                     '<a class="btlink logs" data-index="'+i+'" target="_blank">日志</a>' + ' | ' +
+                    '<a class="btlink run" data-index="'+i+'" target="_blank">手动</a>' + ' | ' +
                     '<a class="btlink rename" data-index="'+i+'" target="_blank">重命名</a>' +
                 '</td></tr>';
             }   
@@ -571,6 +572,15 @@ function projectScriptSelfRender(user, name){
                 } else {
                     layer.msg(rdata.msg,{icon:data.status?2:1,time:2000,shade: [0.3, '#000']});
                 }        
+            });
+        });
+
+        $('#gogs_self_table .run').click(function(){
+            var i = $(this).data('index');
+            var file = data[i]["name"];
+            gogsPost('project_script_self_run', {'user':user,'name':name,'file':file}, function(data){
+                var rdata = $.parseJSON(data.data);
+                layer.msg(rdata.msg,{icon:data.status?1:2,time:2000,shade: [0.3, '#000']});      
             });
         });
 
