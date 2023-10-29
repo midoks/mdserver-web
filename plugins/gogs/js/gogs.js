@@ -399,7 +399,7 @@ function gogsRepoListPage(page, search){
 
             gogsPost('project_script_run', {'user':user,'name':name}, function(data){
                 var data = $.parseJSON(data.data);
-                layer.msg(data.msg,{icon:data.status?2:1,time:2000,shade: [0.3, '#000']});
+                layer.msg(data.msg,{icon:data.status?1:2,time:2000,shade: [0.3, '#000']});
             });
         });
         
@@ -565,8 +565,9 @@ function projectScriptSelfRender(user, name){
             var file = data[i]["name"];
             gogsPost('project_script_self_logs', {'user':user,'name':name,'file':file}, function(data){
                 var rdata = $.parseJSON(data.data);
+                // console.log(rdata);
                 if (rdata['status']){
-                    onlineEditFile(0, rdata['path']);
+                    onlineEditFile(0, rdata['data']['path']);
                 } else {
                     layer.msg(rdata.msg,{icon:data.status?2:1,time:2000,shade: [0.3, '#000']});
                 }        

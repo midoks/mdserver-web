@@ -766,10 +766,14 @@ def projectScriptSelf():
 
     custom_hooks = getRootPath() + '/' + user + '/' + \
         name + '/custom_hooks'
-    self_path = custom_hooks + '/self'
 
+    self_path = custom_hooks + '/self'
     if not os.path.exists(self_path):
         os.mkdir(self_path)
+
+    self_logs_path = custom_hooks + '/self_logs'
+    if not os.path.exists(self_logs_path):
+        os.mkdir(self_logs_path)
 
     self_hook_file = custom_hooks + '/self_hook.sh'
     self_hook_exist = False
@@ -834,8 +838,9 @@ def projectScriptSelf_Del():
     name = args['name'] + '.git'
     file = args['file']
 
-    self_path = path = getRootPath() + '/' + user + '/' + \
-        name + '/custom_hooks/self'
+    custom_hooks = getRootPath() + '/' + user + '/' + \
+        name + '/custom_hooks'
+    self_path = custom_hooks + '/self'
 
     if not os.path.exists(self_path):
         os.mkdir(self_path)
@@ -846,6 +851,12 @@ def projectScriptSelf_Del():
         return mw.returnJson(False, '脚本已经删除!')
 
     os.remove(abs_file)
+
+    # 日志也删除
+    log_file = custom_hooks + '/self_logs/' + file + '.log'
+    if os.path.exists(log_file):
+        os.remove(log_file)
+
     return mw.returnJson(True, '脚本删除成功!')
 
 
@@ -869,7 +880,7 @@ def projectScriptSelf_Logs():
     if os.path.exists(logs_file):
         rdata = {}
         rdata['path'] = logs_file
-        return mw.returnJson(True, '脚本已经删除!', rdata)
+        return mw.returnJson(True, 'ok', rdata)
 
     return mw.returnJson(False, '日志不存在!')
 
@@ -885,8 +896,9 @@ def projectScriptSelf_Rename():
     o_file = args['o_file']
     n_file = args['n_file']
 
-    self_path = path = getRootPath() + '/' + user + '/' + \
-        name + '/custom_hooks/self'
+    custom_hooks = getRootPath() + '/' + user + '/' + \
+        name + '/custom_hooks'
+    self_path = custom_hooks + '/self'
 
     if not os.path.exists(self_path):
         os.mkdir(self_path)
@@ -898,6 +910,12 @@ def projectScriptSelf_Rename():
     n_file_abs = self_path + '/' + n_file + '.sh'
 
     os.rename(o_file_abs, n_file_abs)
+
+    # 日志也删除
+    log_file = custom_hooks + '/self_logs/' + o_file + '.sh.log'
+    if os.path.exists(log_file):
+        os.remove(log_file)
+
     return mw.returnJson(True, '重命名成功!')
 
 
@@ -918,8 +936,11 @@ def projectScriptSelf_Enable():
 
     if enable == '1':
         content = mw.readFile(self_hook_tpl)
+        content = content.replace('{$HOOK_DIR}', custom_path + '/self')
+        content = content.replace(
+            '{$HOOK_LOGS_DIR}', custom_path + '/self_logs')
         mw.writeFile(self_file, content)
-        mw.execShell("chmod 777" + self_file)
+        mw.execShell("chmod 777 " + self_file)
         return mw.returnJson(True, '开启成功!')
     else:
         if os.path.exists(self_file):
