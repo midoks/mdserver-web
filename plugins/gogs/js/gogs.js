@@ -527,9 +527,14 @@ function projectScriptSelfRender(user, name){
             body += '<tr><td colspan="3" style="text-align:center;">无脚本数据</td></tr>';
         } else{
             for (var i = 0; i < data.length; i++) {
+                var b_status = '<a class="btlink status" data-index="'+i+'" target="_blank">已使用</a>';
+                if (data[i]["is_hidden"]){
+                    b_status = '<a class="btlink status" data-index="'+i+'" target="_blank">已隐藏</a>';
+                }
+
                 body += '<tr>'+
                 '<td>' + data[i]["name"]+'</td>'+
-                '<td>' + '<a class="btlink" target="_blank">已使用</a>'+'</td>'+
+                '<td>' + b_status + '</td>'+
                 '<td>' +
                     '<a class="btlink del" data-index="'+i+'" target="_blank">删除</a>' + ' | ' +
                     '<a class="btlink edit" data-index="'+i+'" target="_blank">编辑</a>' + ' | ' +
@@ -543,6 +548,21 @@ function projectScriptSelfRender(user, name){
 
         $('#gogs_self_table tbody').html(body);
         $('#gogs_self_table .page').html(rdata['data']['list']);
+
+        $('#gogs_self_table .status').click(function(){
+            var i = $(this).data('index');
+            var file = data[i]["name"];
+            var status = '1';
+            if (data[i]["is_hidden"]){
+                status = '0';
+            }
+            gogsPost('project_script_self_status', {'user':user,'name':name,'file':file, status:status}, function(data){
+                var data = $.parseJSON(data.data);
+                showMsg(data.msg ,function(){
+                    projectScriptSelfRender(user, name);
+                },{icon:data.code?2:1,time:2000,shade: [0.3, '#000']},2000);
+            });
+        });
 
         $('#gogs_self_table .del').click(function(){
             var i = $(this).data('index');

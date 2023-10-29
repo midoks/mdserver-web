@@ -788,6 +788,10 @@ def projectScriptSelf():
             if os.path.isfile(filePath):
                 tmp['path'] = filePath
                 tmp['name'] = os.path.basename(filePath)
+                tmp['is_hidden'] = False
+                if tmp['name'].endswith('.txt'):
+                    tmp['is_hidden'] = True
+
                 dlist.append(tmp)
 
     dlist_sum = len(dlist)
@@ -968,6 +972,43 @@ def projectScriptSelf_Enable():
         return mw.returnJson(True, '关闭成功!')
 
 
+def projectScriptSelf_Status():
+    args = getArgs()
+    data = checkArgs(args, ['user', 'name', 'file', 'status'])
+    if not data[0]:
+        return data[1]
+
+    user = args['user']
+    name = args['name'] + '.git'
+    file = args['file']
+    status = args['status']
+
+    custom_hooks = getRootPath() + '/' + user + '/' + \
+        name + '/custom_hooks'
+    self_path = custom_hooks + '/self'
+
+    if not os.path.exists(self_path):
+        os.mkdir(self_path)
+
+    # 日志也删除
+    log_file = custom_hooks + '/self_logs/' + file + '.log'
+    if os.path.exists(log_file):
+        os.remove(log_file)
+
+    if status == '1':
+        file_abs = self_path + '/' + file
+        file_text_abs = self_path + '/' + file + '.txt'
+        os.rename(file_abs, file_text_abs)
+        return mw.returnJson(True, '开始禁用成功!')
+    else:
+        file_abs = self_path + '/' + file.strip('.txt')
+        file_text_abs = self_path + '/' + file
+        os.rename(file_text_abs, file_abs)
+        return mw.returnJson(True, '开始使用成功!')
+
+    return mw.returnJson(True, '禁用成功!')
+
+
 def getRsaPublic():
     path = getHomeDir()
     path += '/.ssh/id_rsa.pub'
@@ -1057,6 +1098,8 @@ if __name__ == "__main__":
         print(projectScriptSelf_Rename())
     elif func == 'project_script_self_enable':
         print(projectScriptSelf_Enable())
+    elif func == 'project_script_self_status':
+        print(projectScriptSelf_Status())
     elif func == 'get_rsa_public':
         print(getRsaPublic())
     elif func == 'get_total_statistics':
