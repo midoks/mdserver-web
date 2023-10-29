@@ -748,7 +748,7 @@ def projectScriptRun():
     return mw.returnJson(True, '脚本文件执行成功,观察日志!')
 
 
-def gogsEdit():
+def gogsEditTpl():
     data = {}
     data['post_receive'] = getPluginDir() + '/hook/post-receive.tpl'
     data['commit'] = getPluginDir() + '/hook/commit.tpl'
@@ -812,6 +812,8 @@ if __name__ == "__main__":
         print(getGogsConf())
     elif func == 'submit_gogs_conf':
         print(submitGogsConf())
+    elif func == 'gogs_edit_tpl':
+        print(gogsEditTpl())
     elif func == 'user_list':
         print(userList())
     elif func == 'repo_list':
@@ -828,8 +830,8 @@ if __name__ == "__main__":
         print(projectScriptDebug())
     elif func == 'project_script_run':
         print(projectScriptRun())
-    elif func == 'gogs_edit':
-        print(gogsEdit())
+    elif func == 'project_script_self':
+        print(projectScriptSelf())
     elif func == 'get_rsa_public':
         print(getRsaPublic())
     elif func == 'get_total_statistics':

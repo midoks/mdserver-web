@@ -102,9 +102,8 @@ function submitGogsConf() {
     });
 }
 
-function gogsEdit(){
-
-    gogsPost('gogs_edit',{} , function(data){
+function gogsEditTpl(){
+    gogsPost('gogs_edit_tpl',{} , function(data){
         // console.log(data);
         var rdata = $.parseJSON(data.data);
         var edit = '<p class="status">通用的手动编辑:</p>';
