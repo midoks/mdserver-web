@@ -598,6 +598,10 @@ function projectScriptSelfRender(user, name){
         $('#gogs_self_table .run').click(function(){
             var i = $(this).data('index');
             var file = data[i]["name"];
+            if (data[i]["is_hidden"]){
+                layer.msg("已经禁用,不能执行!",{icon:2,time:2000,shade: [0.3, '#000']});
+                return;
+            }
             gogsPost('project_script_self_run', {'user':user,'name':name,'file':file}, function(data){
                 var rdata = $.parseJSON(data.data);
                 layer.msg(rdata.msg,{icon:data.status?1:2,time:2000,shade: [0.3, '#000']});      
@@ -608,6 +612,12 @@ function projectScriptSelfRender(user, name){
         $('#gogs_self_table .rename').click(function(){
             var i = $(this).data('index');
             var file = data[i]["name"];
+
+            if (data[i]["is_hidden"]){
+                layer.msg("已经禁用,不能执行!",{icon:2,time:2000,shade: [0.3, '#000']});
+                return;
+            }
+            
             file = file.split('.sh')[0];
 
             layer.open({

@@ -4,7 +4,7 @@ H_DIR={$HOOK_DIR}
 HL_DIR={$HOOK_LOGS_DIR}
 
 
-SH_LIST=`cd ${H_DIR} && ls | grep ".sh"`
+SH_LIST=`cd ${H_DIR} && ls | grep ".sh$"`
 
 for sh_f in $SH_LIST; do
 	ABS_FILE=${H_DIR}/${sh_f}
