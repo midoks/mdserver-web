@@ -727,6 +727,27 @@ def projectScriptDebug():
     return mw.getJson(data)
 
 
+def projectScriptRun():
+    args = getArgs()
+    data = checkArgs(args, ['user', 'name'])
+    if not data[0]:
+        return data[1]
+
+    user = args['user']
+    name = args['name'] + '.git'
+
+    path = getRootPath() + '/' + user + '/' + name
+    commit_sh = path + '/custom_hooks/commit'
+    commit_log = path + '/custom_hooks/sh.log'
+    script_run = 'sh -x ' + commit_sh + ' 2>' + commit_log
+
+    if not os.path.exists(commit_sh):
+        return mw.returnJson(False, '脚本文件不存在!')
+
+    mw.execShell(script_run)
+    return mw.returnJson(True, '脚本文件执行成功,观察日志!')
+
+
 def gogsEdit():
     data = {}
     data['post_receive'] = getPluginDir() + '/hook/post-receive.tpl'
@@ -805,6 +826,8 @@ if __name__ == "__main__":
         print(projectScriptUnload())
     elif func == 'project_script_debug':
         print(projectScriptDebug())
+    elif func == 'project_script_run':
+        print(projectScriptRun())
     elif func == 'gogs_edit':
         print(gogsEdit())
     elif func == 'get_rsa_public':

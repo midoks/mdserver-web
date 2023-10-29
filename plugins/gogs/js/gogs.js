@@ -152,11 +152,13 @@ function gogsUserList(page, search) {
 
         ulist = rdata['data']['data'];
         for (i in ulist){
-            email = ulist[i]["email"] == '' ? '无' : ulist[i]["email"];
+
+            var email = ulist[i]["email"] == '' ? '无' : ulist[i]["email"];
+            var user_url = rdata['data']['root_url'] + ulist[i]["name"];
             content += '<tr><td>'+ulist[i]["id"]+'</td>'+
                 '<td>'+ulist[i]["name"]+'</td>'+
                 '<td>'+email+'</td>'+
-                '<td><a class="btlink" onclick="userProjectList(\''+ulist[i]["name"]+'\')">项目管理</a></td>'+
+                '<td><a class="btlink" target="_blank" href="'+user_url+'">项目管理</a></td>'+
                 '</tr>';
         }
 
@@ -174,6 +176,30 @@ function gogsUserList(page, search) {
 }
 
 function userProjectList(user, search){
+    layer.open({
+        type: 1,
+        title: '用户('+user+')项目列表',
+        area: '500px',
+        content:"<div class='bt-form pd20 c6'>\
+                <div>\
+                    <div id='gogs_table' class='divtable' style='margin-top:5px;'>\
+                        <table class='table table-hover'>\
+                            <thead><tr><th>项目</th><th>操作</th></tr></thead>\
+                            <tbody></tbody>\
+                        </table>\
+                        <div class='dataTables_paginate paging_bootstrap pagination' style='margin-top:0px;'>\
+                            <ul class='page'><div class='gogs_page'></div></ul>\
+                        </div>\
+                    </div>\
+                </div>\
+            </div>",
+        success:function(){
+            userProjectListPage(user,search);
+        }
+    });
+}
+
+function userProjectList2(user, search){
     layer.open({
         type: 1,
         title: '用户('+user+')项目列表',
@@ -271,22 +297,126 @@ function gogsRepoListPage(page, search){
         var ulist = rdata['data']['data'];
         var body = ''
         for (i in ulist){
-            console.log(ulist[i]);
+            // console.log(ulist[i]);
+
+            var option = '';
+            if(ulist[i]['has_hook']){
+                option += '<a class="btlink unload" data-index="'+i+'">卸载脚本</a>' + ' | ';
+                option += '<a class="btlink load" data-index="'+i+'">重载</a>' + ' | ';
+                option += '<a class="btlink edit" data-index="'+i+'">编辑</a>' + ' | ';
+                option += '<a class="btlink debug" data-index="'+i+'">日志</a>' + ' | ';
+                option += '<a class="btlink run" data-index="'+i+'">手动</a>' + ' | ';
+                option += '<a class="btlink scripts" data-index="'+i+'" onclick="projectScriptDebug(\''+ulist[i]["name"]+'\',\''+ulist[i]["repo"]+'\')" >自定义</a>';
+            } else{
+                option += '<a data-index="'+i+'" class="btlink load">加载脚本</a>';
+            }
+
+
             body += '<tr><td>'+ulist[i]["id"]+'</td>'+
                 '<td>' + ulist[i]["name"]+'</td>'+
                 '<td>' + ulist[i]["repo"]+'</td>'+
                 '<td>' +
                     '<a class="btlink" target="_blank" href="'+rdata['data']['root_url']+ulist[i]["name"]+'/'+ulist[i]["repo"]+'">源码</a>' + ' | ' +
-                    '<a class="btlink" onclick="projectScript(\''+ulist[i]["name"]+'\',\''+ulist[i]["repo"]+'\','+ulist[i]['has_hook']+');">脚本</a>' + ' | ' +
-                    '<a class="btlink" onclick="userProjectList(\''+ulist[i]["name"]+'\')">源码</a>' +
+                    option + 
                 '</td>' +
                 '</tr>';
         }
 
+
+
+
         $('#repo_list tbody').html(body);
         $('#repo_list_page').html(rdata['data']['list']);
+
+
+        $('#repo_list .load').click(function(){
+            var i = $(this).data('index');
+            var user = ulist[i]["name"];
+            var name = ulist[i]["repo"];
+
+            gogsPost('project_script_load', {'user':user,'name':name}, function(data){
+                if (data.data != 'ok'){
+                    layer.msg(data.data,{icon:0,time:2000,shade: [0.3, '#000']});
+                    return;
+                }
+                layer.msg('加载成功!',{icon:1,time:2000,shade: [0.3, '#000']});
+                setTimeout(function(){
+                    gogsRepoListPage(page, search);
+                }, 2000);
+            });
+        });
+
+        $('#repo_list .unload').click(function(){
+            var i = $(this).data('index');
+            var user = ulist[i]["name"];
+            var name = ulist[i]["repo"];
+
+            gogsPost('project_script_unload', {'user':user,'name':name}, function(data){
+                if (data.data != 'ok'){
+                    layer.msg(data.data,{icon:0,time:2000,shade: [0.3, '#000']});
+                    return;
+                }
+
+                layer.msg('卸载成功!',{icon:1,time:2000,shade: [0.3, '#000']});
+                setTimeout(function(){
+                    gogsRepoListPage(page, search);
+                }, 2000);
+            });
+        });
+
+        $('#repo_list .edit').click(function(){
+            var i = $(this).data('index');
+            var user = ulist[i]["name"];
+            var name = ulist[i]["repo"];
+
+            gogsPost('project_script_edit', {'user':user,'name':name}, function(data){
+                var rdata = $.parseJSON(data.data);
+                if (rdata['status']){
+                    onlineEditFile(0, rdata['data']['path']);
+                } else {
+                    layer.msg(rdata.msg,{icon:1,time:2000,shade: [0.3, '#000']});
+                }        
+            });
+        });
+
+
+        $('#repo_list .debug').click(function(){
+            var i = $(this).data('index');
+            var user = ulist[i]["name"];
+            var name = ulist[i]["repo"];
+
+            gogsPost('project_script_debug', {'user':user,'name':name}, function(data){
+                var rdata = $.parseJSON(data.data);
+                if (rdata['status']){
+                    onlineEditFile(0, rdata['path']);
+                } else {
+                    layer.msg(rdata.msg,{icon:1,time:2000,shade: [0.3, '#000']});
+                }        
+            });
+        });
+
+
+        $('#repo_list .run').click(function(){
+            var i = $(this).data('index');
+            var user = ulist[i]["name"];
+            var name = ulist[i]["repo"];
+
+            gogsPost('project_script_run', {'user':user,'name':name}, function(data){
+                var data = $.parseJSON(data.data);
+                layer.msg(data.msg,{icon:data.code?2:1,time:2000,shade: [0.3, '#000']});
+            });
+        });
+
+
+
+  
+
+        
+    //---------
     });
 }
+
+
 function gogsRepoList() {
     content = '<div class="finduser"><input class="bt-input-text mr5 outline_no" type="text" placeholder="查找项目" id="find_user" style="height: 28px; border-radius: 3px;width: 435px;">';
     content += '<button class="btn btn-success btn-sm" onclick="userFind();">查找</button></div>';
@@ -353,7 +483,7 @@ function projectScriptLoad(user,name){
 
         layer.msg('加载成功!',{icon:1,time:2000,shade: [0.3, '#000']});
         setTimeout(function(){
-            userProjectListPage(1);
+            gogsRepoListPage(1);
         }, 2000);
     });
 }
@@ -367,8 +497,15 @@ function projectScriptUnload(user,name){
 
         layer.msg('卸载成功!',{icon:1,time:2000,shade: [0.3, '#000']});
         setTimeout(function(){
-            userProjectListPage(1);
+            gogsRepoListPage(1);
         }, 2000);
+    });
+} 
+
+function projectScriptRun(user, name){
+    gogsPost('project_script_run', {'user':user,'name':name}, function(data){
+        var data = $.parseJSON(data.data);
+        layer.msg(data.msg,{icon:data.code?2:1,time:2000,shade: [0.3, '#000']});
     });
 } 
 
