@@ -43,3 +43,6 @@ if [ ! -d  $serverPath/mongodb/bin ];then
 	mkdir -p $serverPath/mongodb
 	cd $MG_DIR/${FILE_NAME} && cp -rf ./bin $serverPath/mongodb
 fi
+
+cd ${MG_DIR} && rm -rf ${MG_DIR}/${FILE_NAME}
+
