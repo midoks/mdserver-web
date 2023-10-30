@@ -781,10 +781,12 @@ def projectScriptSelf():
     self_path = custom_hooks + '/self'
     if not os.path.exists(self_path):
         os.mkdir(self_path)
+        mw.execShell("chown -R www:www " + self_path)
 
     self_logs_path = custom_hooks + '/self_logs'
     if not os.path.exists(self_logs_path):
         os.mkdir(self_logs_path)
+        mw.execShell("chown -R www:www " + self_logs_path)
 
     self_hook_file = custom_hooks + '/self_hook.sh'
     self_hook_exist = False
