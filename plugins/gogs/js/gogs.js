@@ -312,8 +312,8 @@ function gogsRepoListPage(page, search){
 
 
             body += '<tr><td>'+ulist[i]["id"]+'</td>'+
-                '<td class="overflow_hide" style="width:80px;">' + ulist[i]["name"]+'</td>'+
-                '<td class="overflow_hide" style="width:80px;">' + ulist[i]["repo"]+'</td>'+
+                '<td class="overflow_hide" style="width:70px;">' + ulist[i]["name"]+'</td>'+
+                '<td class="overflow_hide" style="width:70px;">' + ulist[i]["repo"]+'</td>'+
                 '<td>' +
                     '<a class="btlink" target="_blank" href="'+rdata['data']['root_url']+ulist[i]["name"]+'/'+ulist[i]["repo"]+'">源码</a>' + ' | ' +
                     option + 
