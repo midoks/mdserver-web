@@ -118,6 +118,7 @@ function gogsEdit(){
     
 }
 
+
 function giteaUserList(page, search) {
 
     var _data = {};
@@ -130,7 +131,6 @@ function giteaUserList(page, search) {
     if(typeof(search) != 'undefined'){
         _data['search'] = search;
     }
-    _data['tojs'] = 'giteaUserList';
 
     gogsPost('user_list', _data, function(data){
 
@@ -140,7 +140,7 @@ function giteaUserList(page, search) {
             return;
         }
         content = '<div class="finduser"><input class="bt-input-text mr5 outline_no" type="text" placeholder="查找用户名" id="find_user" style="height: 28px; border-radius: 3px;width: 435px;">';
-        content += '<button class="btn btn-success btn-sm" onclick="userFind();">查找</button></div>';
+        content += '<button class="btn btn-success btn-sm find_user" >查找</button></div>';
 
         content += '<div class="divtable" style="margin-top:5px;"><table class="table table-hover" width="100%" cellspacing="0" cellpadding="0" border="0">';
         content += '<thead><tr>';
@@ -154,24 +154,31 @@ function giteaUserList(page, search) {
 
         ulist = rdata['data']['data'];
         for (i in ulist){
-            email = ulist[i]["email"] == '' ? '无' : ulist[i]["email"];
+
+            var email = ulist[i]["email"] == '' ? '无' : ulist[i]["email"];
+            var user_url = rdata['data']['root_url'] + ulist[i]["name"];
             content += '<tr><td>'+ulist[i]["id"]+'</td>'+
                 '<td>'+ulist[i]["name"]+'</td>'+
                 '<td>'+email+'</td>'+
-                '<td><a class="btlink" onclick="userProjectList(\''+ulist[i]["name"]+'\')">项目管理</a></td>'+
+                '<td><a class="btlink" target="_blank" href="'+user_url+'">项目管理</a></td>'+
                 '</tr>';
         }
 
         content += '</tbody>';
         content += '</table></div>';
 
-        var page = '<div class="dataTables_paginate paging_bootstrap pagination" style="margin-top:0px;"><ul id="softPage" class="page"><div>';
-        page += rdata['data']['list'];
-        page += '</div></ul></div>';
+        var page_html = '<div class="dataTables_paginate paging_bootstrap pagination" style="margin-top:0px;"><ul id="softPage" class="page"><div>';
+        page_html += rdata['data']['list'];
+        page_html += '</div></ul></div>';
 
-        content += page;
+        content += page_html;
 
         $(".soft-man-con").html(content);
+
+        $('.find_user').click(function(){
+            var name = $('#find_user').val();
+            giteaUserList(page, name);
+        });
     });
 }
 
