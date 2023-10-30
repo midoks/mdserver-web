@@ -41,6 +41,8 @@ Install_App()
 
 		cd ${rootPath} && python3 ${rootPath}/plugins/redis/index.py start
 		cd ${rootPath} && python3 ${rootPath}/plugins/redis/index.py initd_install
+
+		rm -rf $serverPath/source/redis-${VERSION}
 	fi
 }
 
