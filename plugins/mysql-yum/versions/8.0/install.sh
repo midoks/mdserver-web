@@ -90,14 +90,15 @@ Install_mysql()
 		useradd -g mysql mysql
 	fi
 
+	mkdir -p $serverPath/mysql-yum
+
 	isYum=`which yum`
 	if [ "$isYum" != "" ];then
 		YUM_INSTALL
 	fi
 
-
+	rm -rf $myDir	
 	
-	mkdir -p $serverPath/mysql-yum
 	echo '8.0' > $serverPath/mysql-yum/version.pl
 	echo '安装完成' > $install_tmp
 }
