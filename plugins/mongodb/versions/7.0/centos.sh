@@ -60,3 +60,4 @@ if [ ! -d  $serverPath/mongodb/bin ];then
 fi
 
 rm -rf ${MG_DIR}/${FILE_NAME}
+
