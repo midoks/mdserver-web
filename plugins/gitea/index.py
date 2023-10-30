@@ -663,11 +663,9 @@ def projectScriptEdit():
 
 def projectScriptLoad():
     args = getArgs()
-    if not 'user' in args:
-        return mw.returnJson(True, 'username missing')
-
-    if not 'name' in args:
-        return mw.returnJson(True, 'project name missing')
+    data = checkArgs(args, ['user', 'name'])
+    if not data[0]:
+        return data[1]
 
     user = args['user']
     name = args['name'] + '.git'
