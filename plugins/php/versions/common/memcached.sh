@@ -76,7 +76,7 @@ Install_lib()
 		--disable-memcached-sasl
 		make clean && make && make install && make clean
 
-		rm -rf $php_lib/${LIBNAME}-${LIBV}
+		cd $php_lib && rm -rf $php_lib/${LIBNAME}-${LIBV}
 	fi
 	
 	if [ ! -f "$extFile" ];then

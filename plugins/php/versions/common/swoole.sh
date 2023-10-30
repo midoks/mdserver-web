@@ -77,7 +77,7 @@ Install_lib()
 		--enable-sockets
 		make clean && make && make install && make clean
 
-		rm -rf $php_lib/${LIBNAME}-${LIBV}
+		cd $php_lib && rm -rf $php_lib/${LIBNAME}-${LIBV}
 	fi
 	
 	while [[ ! -f "$extFile" ]];

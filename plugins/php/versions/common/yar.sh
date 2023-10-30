@@ -66,6 +66,7 @@ Install_lib()
 		--with-curl=$serverPath/lib/curl
 		make clean && make && make install && make clean
 
+		cd $php_lib && rm -rf $php_lib/${LIBNAME}-${LIBV}
 	fi
 	
 	if [ ! -f "$extFile" ];then

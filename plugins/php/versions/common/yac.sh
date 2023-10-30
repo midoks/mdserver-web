@@ -64,7 +64,7 @@ Install_lib()
 		make clean && make && make install && make clean
 		cd ..
 
-		rm -rf $php_lib/${LIBNAME}-${LIBV}
+		cd $php_lib && rm -rf $php_lib/${LIBNAME}-${LIBV}
 	fi
 	
 	if [ ! -f "$extFile" ];then
