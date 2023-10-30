@@ -25,7 +25,7 @@ if [ ! -d ${SERVER_ROOT}/libiconv ];then
     tar zxvf libiconv-1.15.tar.gz
     cd libiconv-1.15
     ./configure --prefix=${SERVER_ROOT}/libiconv --enable-static && make && make install
-    cd $SOURCE_ROOT
+    cd $SOURCE_ROOT && rm -rf $SOURCE_ROOT/libiconv-1.15
     #rm -rf libiconv-1.15
     #rm -rf libiconv-1.15.tar.gz
 fi

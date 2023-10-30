@@ -31,7 +31,7 @@ if [ ! -d ${SERVER_ROOT}/zlib ];then
 
     ./configure --prefix=${SERVER_ROOT}/zlib && make && make install
 
-    #cd $SOURCE_ROOT
+    cd $SOURCE_ROOT && rm -rf $SOURCE_ROOT/zlib-1.2.11
     #rm -rf zlib-1.2.11
     #rm -rf zlib-1.2.11.tar.gz
 fi

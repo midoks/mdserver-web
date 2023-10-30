@@ -28,6 +28,8 @@ if [ ! -d ${SERVER_ROOT}/openssl10 ];then
     cd openssl-1.0.2q
     ./config --openssldir=${SERVER_ROOT}/openssl10 zlib-dynamic shared
     make && make install
+
+    cd $SOURCE_ROOT && rm -rf $SOURCE_ROOT/openssl-${opensslVersion}
 fi
 
 
