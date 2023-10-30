@@ -33,6 +33,8 @@ Install_mem(){
 
 		cd ${rootPath} && python3 ${rootPath}/plugins/memcached/index.py start
 		cd ${rootPath} && python3 ${rootPath}/plugins/memcached/index.py initd_install
+
+		rm -rf $serverPath/source/memcached-${VERSION}
 	fi
 }
 
