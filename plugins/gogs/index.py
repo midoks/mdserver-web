@@ -556,7 +556,7 @@ def repoList():
     list_data = checkRepoListIsHasScript(list_data)
 
     data['list'] = mw.getPage({'count': count, 'p': page,
-                               'row': page_size, 'tojs': 'gogsUserList'})
+                               'row': page_size, 'tojs': 'gogsRepoListPage'})
     data['page'] = page
     data['page_size'] = page_size
     data['page_count'] = int(math.ceil(count / page_size))
