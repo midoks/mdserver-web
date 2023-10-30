@@ -134,7 +134,10 @@ echo -e "\e[0;32mfix libunwind-dev install question end\e[0m"
 apt install -y libvpx-dev
 apt install -y libxpm-dev
 apt install -y libwebp-dev
+apt install -y libfreetype6
 apt install -y libfreetype6-dev
+apt install -y libjpeg-dev 
+apt install -y libpng-dev
 
 localedef -i en_US -f UTF-8 en_US.UTF-8
 
@@ -177,9 +180,7 @@ apt install -y libxml2 libxml2-dev libbz2-dev libmcrypt-dev libpspell-dev librec
 apt install -y libgmp-dev libgmp3-dev libreadline-dev libxpm-dev
 apt install -y dia pkg-config
 apt install -y zlib1g-dev
-apt install -y libjpeg-dev libpng-dev
-apt install -y libfreetype6
-apt install -y libfreetype6-dev
+
 apt install -y libevent-dev libncurses5-dev libldap2-dev
 apt install -y libzip-dev
 apt install -y libicu-dev
