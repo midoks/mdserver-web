@@ -981,6 +981,7 @@ def projectScriptSelf_Enable():
             '{$HOOK_LOGS_DIR}', custom_path + '/self_logs')
         mw.writeFile(self_file, content)
         mw.execShell("chmod 777 " + self_file)
+        mw.execShell("chown -R www:www " + self_file)
 
         commit_content = mw.readFile(commit_path)
         commit_content += "\n\n" + "bash " + self_file + " " + note
