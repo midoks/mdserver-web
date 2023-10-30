@@ -763,6 +763,7 @@ def projectScriptRun():
         return mw.returnJson(False, '脚本文件不存在!')
 
     mw.execShell(script_run)
+    mw.execShell('chown -R www:www ' + commit_log)
     return mw.returnJson(True, '脚本文件执行成功,观察日志!')
 
 
