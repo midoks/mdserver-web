@@ -515,7 +515,7 @@ def repoList():
         return mw.returnJson(False, "请先安装初始化!<br/>默认地址:http://" + mw.getLocalIp() + ":3000")
 
     conf = getDbConfValue()
-    gtype = getGogsDbType(conf)
+    gtype = getGiteaDbType(conf)
     if gtype != 'mysql':
         return mw.returnJson(False, "仅支持mysql数据操作!")
 
