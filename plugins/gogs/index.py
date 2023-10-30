@@ -955,6 +955,11 @@ def projectScriptSelf_Enable():
 
     custom_path = getRootPath() + '/' + user + '/' + \
         name + '/custom_hooks'
+
+    # 替换commit配置
+    commit_path = custom_path + '/commit'
+    note = '#Gogs Script Don`t Remove and Change'
+
     self_file = custom_path + '/self_hook.sh'
     self_hook_tpl = getPluginDir() + '/hook/self_hook.tpl'
 
@@ -965,8 +970,18 @@ def projectScriptSelf_Enable():
             '{$HOOK_LOGS_DIR}', custom_path + '/self_logs')
         mw.writeFile(self_file, content)
         mw.execShell("chmod 777 " + self_file)
+
+        commit_content = mw.readFile(commit_path)
+        commit_content += "\n\n" + "bash " + self_file + " " + note
+        mw.writeFile(commit_path, commit_content)
+
         return mw.returnJson(True, '开启成功!')
     else:
+        commit_content = mw.readFile(commit_path)
+        rep = ".*" + note
+        commit_content = re.sub(rep, '', commit_content, re.M)
+        commit_content = commit_content.strip()
+        mw.writeFile(commit_path, commit_content)
         if os.path.exists(self_file):
             os.remove(self_file)
         return mw.returnJson(True, '关闭成功!')
