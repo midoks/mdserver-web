@@ -156,6 +156,8 @@ if [ ! -d $serverPath/php/${PHP_VER} ];then
 
 
 	make install && make clean
+
+	rm -rf $sourcePath/php/php${PHP_VER}
 fi 
 
 #------------------------ install end ------------------------------------#

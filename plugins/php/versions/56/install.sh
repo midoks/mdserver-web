@@ -136,6 +136,8 @@ if [ ! -d $serverPath/php/56 ];then
 	$OPTIONS \
 	--enable-fpm
 	make clean && make -j${cpuCore} && make install && make clean
+
+	rm -rf $sourcePath/php/php${PHP_VER}
 fi 
 
 #------------------------ install end ------------------------------------#
