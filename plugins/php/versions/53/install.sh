@@ -127,8 +127,6 @@ if [ ! -d $serverPath/php/53/bin ];then
 	--enable-simplexml \
 	--enable-dom \
 	--enable-filter \
-	--enable-pcntl \
-	--enable-bcmath \
 	--enable-xml \
 	--enable-ftp \
 	--enable-soap \
