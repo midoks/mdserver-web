@@ -23,7 +23,14 @@ OSNAME=`cat ${rootPath}/data/osname.pl`
 OSNAME_ID=`cat /etc/*-release | grep VERSION_ID | awk -F = '{print $2}' | awk -F "\"" '{print $2}'`
 
 
-if [ "centos" == "$OSNAME" ] && [ "$OSNAME_ID" != "9" ];then
+if [ "centos" == "$OSNAME" ]; then
+	if [ "$OSNAME_ID" != "9" ];then
+		if [ "$version" -lt "74" ];then
+			bash $curPath/gd_old.sh $1 $2
+			exit 0
+		fi
+	fi
+else
 	if [ "$version" -lt "74" ];then
 		bash $curPath/gd_old.sh $1 $2
 		exit 0
@@ -67,11 +74,12 @@ Install_lib()
 		$serverPath/php/$version/bin/phpize
 		./configure --with-php-config=$serverPath/php/$version/bin/php-config \
 		--enable-gd \
+		--enable-gd-jis-conv \
 		--with-webp \
 		--with-xpm \
 		--with-jpeg \
-		--with-freetype \
-		--enable-gd-jis-conv
+		--with-freetype
+		
 
 		make clean && make && make install && make clean
 		
