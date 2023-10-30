@@ -545,10 +545,17 @@ def repoList():
 
     data['root_url'] = getRootUrl()
 
+    repo_where1 = ''
+    repo_where2 = ''
+    if search != '':
+        repo_where1 = ' where name like "%' + search + '%"'
+        repo_where2 = ' where r.name like "%' + search + '%"'
+
     start = (page - 1) * page_size
-    list_count = pQuery('select count(id) as num from repository')
+    list_count = pQuery(
+        'select count(id) as num from repository' + repo_where1)
     count = list_count[0]["num"]
-    sql = 'select r.id,r.owner_id,r.name as repo, u.name from repository r left join user u on r.owner_id=u.id order by r.id desc limit ' + \
+    sql = 'select r.id,r.owner_id,r.name as repo, u.name from repository r left join user u on r.owner_id=u.id ' + repo_where2 + ' order by r.id desc limit ' + \
         str(start) + ',' + str(page_size)
     # print(sql)
     list_data = pQuery(sql)

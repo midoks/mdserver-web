@@ -137,7 +137,7 @@ function gogsUserList(page, search) {
             return;
         }
         content = '<div class="finduser"><input class="bt-input-text mr5 outline_no" type="text" placeholder="查找用户名" id="find_user" style="height: 28px; border-radius: 3px;width: 435px;">';
-        content += '<button class="btn btn-success btn-sm" onclick="userFind();">查找</button></div>';
+        content += '<button class="btn btn-success btn-sm find_user" >查找</button></div>';
 
         content += '<div class="divtable" style="margin-top:5px;"><table class="table table-hover" width="100%" cellspacing="0" cellpadding="0" border="0">';
         content += '<thead><tr>';
@@ -164,13 +164,18 @@ function gogsUserList(page, search) {
         content += '</tbody>';
         content += '</table></div>';
 
-        var page = '<div class="dataTables_paginate paging_bootstrap pagination" style="margin-top:0px;"><ul id="softPage" class="page"><div>';
-        page += rdata['data']['list'];
-        page += '</div></ul></div>';
+        var page_html = '<div class="dataTables_paginate paging_bootstrap pagination" style="margin-top:0px;"><ul id="softPage" class="page"><div>';
+        page_html += rdata['data']['list'];
+        page_html += '</div></ul></div>';
 
-        content += page;
+        content += page_html;
 
         $(".soft-man-con").html(content);
+
+        $('.find_user').click(function(){
+            var name = $('#find_user').val();
+            gogsUserList(page, name);
+        });
     });
 }
 
@@ -324,6 +329,11 @@ function gogsRepoListPage(page, search){
         $('#repo_list tbody').html(body);
         $('#repo_list_page').html(rdata['data']['list']);
 
+        $('.find_repo').click(function(){
+            var find_repo = $('#find_repo').val();
+            gogsRepoListPage(page, find_repo);
+        });
+
 
         $('#repo_list .load').click(function(){
             var i = $(this).data('index');
@@ -409,8 +419,8 @@ function gogsRepoListPage(page, search){
 
 
 function gogsRepoList() {
-    content = '<div class="finduser"><input class="bt-input-text mr5 outline_no" type="text" placeholder="查找项目" id="find_user" style="height: 28px; border-radius: 3px;width: 435px;">';
-    content += '<button class="btn btn-success btn-sm" onclick="userFind();">查找</button></div>';
+    content = '<div class="finduser"><input class="bt-input-text mr5 outline_no" type="text" placeholder="查找项目" id="find_repo" style="height: 28px; border-radius: 3px;width: 435px;">';
+    content += '<button class="btn btn-success btn-sm find_repo" >查找</button></div>';
 
     content += '<div id="repo_list" class="divtable" style="margin-top:5px;"><table class="table table-hover" width="100%" cellspacing="0" cellpadding="0" border="0">';
     content += '<thead><tr>';
