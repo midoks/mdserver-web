@@ -487,15 +487,21 @@ def userList():
     if 'search' in args:
         search = args['search']
 
+    user_where1 = ''
+    user_where2 = ''
+    if search != '':
+        user_where1 = ' where name like "%' + search + '%"'
+        user_where2 = ' where name like "%' + search + '%"'
+
     data = {}
 
     data['root_url'] = getRootUrl()
 
     start = (page - 1) * page_size
-    list_count = pQuery('select count(id) as num from user')
+    list_count = pQuery('select count(id) as num from user' + user_where1)
     count = list_count[0]["num"]
     list_data = pQuery(
-        'select id,name,email from user order by id desc limit ' + str(start) + ',' + str(page_size))
+        'select id,name,email from user ' + user_where2 + ' order by id desc limit ' + str(start) + ',' + str(page_size))
     data['list'] = mw.getPage({'count': count, 'p': page,
                                'row': page_size, 'tojs': 'gogsUserList'})
     data['page'] = page
