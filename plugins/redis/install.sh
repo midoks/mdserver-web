@@ -12,7 +12,7 @@ install_tmp=${rootPath}/tmp/mw_install.pl
 
 VERSION=$2
 
-Install_redis()
+Install_App()
 {
 	echo '正在安装脚本文件...' > $install_tmp
 	mkdir -p $serverPath/source
@@ -44,12 +44,19 @@ Install_redis()
 	fi
 }
 
-Uninstall_redis()
+Uninstall_App()
 {
 	if [ -f /usr/lib/systemd/system/redis.service ];then
 		systemctl stop redis
 		systemctl disable redis
 		rm -rf /usr/lib/systemd/system/redis.service
+		systemctl daemon-reload
+	fi
+
+	if [ -f /lib/systemd/system/redis.service ];then
+		systemctl stop redis
+		systemctl disable redis
+		rm -rf /lib/systemd/system/redis.service
 		systemctl daemon-reload
 	fi
 
@@ -63,7 +70,7 @@ Uninstall_redis()
 
 action=$1
 if [ "${1}" == 'install' ];then
-	Install_redis
+	Install_App
 else
-	Uninstall_redis
+	Uninstall_App
 fi

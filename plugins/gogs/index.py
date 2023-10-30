@@ -456,7 +456,74 @@ def submitGogsConf():
     return mw.returnJson(True, '设置成功')
 
 
+def gogsEditTpl():
+    data = {}
+    data['post_receive'] = getPluginDir() + '/hook/post-receive.tpl'
+    data['commit'] = getPluginDir() + '/hook/commit.tpl'
+    return mw.getJson(data)
+
+
 def userList():
+
+    conf = getConf()
+    if not os.path.exists(conf):
+        return mw.returnJson(False, "请先安装初始化!<br/>默认地址:http://" + mw.getLocalIp() + ":3000")
+
+    conf = getDbConfValue()
+    gtype = getGogsDbType(conf)
+    if gtype != 'mysql':
+        return mw.returnJson(False, "仅支持mysql数据操作!")
+
+    import math
+    args = getArgs()
+
+    data = checkArgs(args, ['page', 'page_size'])
+    if not data[0]:
+        return data[1]
+
+    page = int(args['page'])
+    page_size = int(args['page_size'])
+    search = ''
+    if 'search' in args:
+        search = args['search']
+
+    user_where1 = ''
+    user_where2 = ''
+    if search != '':
+        user_where1 = ' where name like "%' + search + '%"'
+        user_where2 = ' where name like "%' + search + '%"'
+
+    data = {}
+
+    data['root_url'] = getRootUrl()
+
+    start = (page - 1) * page_size
+    list_count = pQuery('select count(id) as num from user' + user_where1)
+    count = list_count[0]["num"]
+    list_data = pQuery(
+        'select id,name,email from user ' + user_where2 + ' order by id desc limit ' + str(start) + ',' + str(page_size))
+    data['list'] = mw.getPage({'count': count, 'p': page,
+                               'row': page_size, 'tojs': 'gogsUserList'})
+    data['page'] = page
+    data['page_size'] = page_size
+    data['page_count'] = int(math.ceil(count / page_size))
+    data['data'] = list_data
+    return mw.returnJson(True, 'OK', data)
+
+
+def checkRepoListIsHasScript(data):
+    path = getRootPath()
+    for x in range(len(data)):
+        name = data[x]['name'] + '/' + data[x]['repo'] + '.git'
+        path_tmp = path + '/' + name + '/custom_hooks/post-receive'
+        if os.path.exists(path_tmp):
+            data[x]['has_hook'] = True
+        else:
+            data[x]['has_hook'] = False
+    return data
+
+
+def repoList():
 
     conf = getConf()
     if not os.path.exists(conf):
@@ -484,13 +551,25 @@ def userList():
 
     data['root_url'] = getRootUrl()
 
+    repo_where1 = ''
+    repo_where2 = ''
+    if search != '':
+        repo_where1 = ' where name like "%' + search + '%"'
+        repo_where2 = ' where r.name like "%' + search + '%"'
+
     start = (page - 1) * page_size
-    list_count = pQuery('select count(id) as num from user')
+    list_count = pQuery(
+        'select count(id) as num from repository' + repo_where1)
     count = list_count[0]["num"]
-    list_data = pQuery(
-        'select id,name,email from user order by id desc limit ' + str(start) + ',' + str(page_size))
+    sql = 'select r.id,r.owner_id,r.name as repo, u.name from repository r left join user u on r.owner_id=u.id ' + repo_where2 + ' order by r.id desc limit ' + \
+        str(start) + ',' + str(page_size)
+    # print(sql)
+    list_data = pQuery(sql)
+    # print(list_data)
+    list_data = checkRepoListIsHasScript(list_data)
+
     data['list'] = mw.getPage({'count': count, 'p': page,
-                               'row': page_size, 'tojs': 'gogsUserList'})
+                               'row': page_size, 'tojs': 'gogsRepoListPage'})
     data['page'] = page
     data['page_size'] = page_size
     data['page_count'] = int(math.ceil(count / page_size))
@@ -668,11 +747,294 @@ def projectScriptDebug():
     return mw.getJson(data)
 
 
-def gogsEdit():
-    data = {}
-    data['post_receive'] = getPluginDir() + '/hook/post-receive.tpl'
-    data['commit'] = getPluginDir() + '/hook/commit.tpl'
-    return mw.getJson(data)
+def projectScriptRun():
+    args = getArgs()
+    data = checkArgs(args, ['user', 'name'])
+    if not data[0]:
+        return data[1]
+
+    user = args['user']
+    name = args['name'] + '.git'
+
+    path = getRootPath() + '/' + user + '/' + name
+    commit_sh = path + '/custom_hooks/commit'
+    commit_log = path + '/custom_hooks/sh.log'
+    script_run = 'sh -x ' + commit_sh + ' 2>' + commit_log
+
+    if not os.path.exists(commit_sh):
+        return mw.returnJson(False, '脚本文件不存在!')
+
+    mw.execShell(script_run)
+    return mw.returnJson(True, '脚本文件执行成功,观察日志!')
+
+
+def projectScriptSelf():
+    args = getArgs()
+    data = checkArgs(args, ['user', 'name'])
+    if not data[0]:
+        return data[1]
+
+    user = args['user']
+    name = args['name'] + '.git'
+
+    custom_hooks = getRootPath() + '/' + user + '/' + \
+        name + '/custom_hooks'
+
+    self_path = custom_hooks + '/self'
+    if not os.path.exists(self_path):
+        os.mkdir(self_path)
+
+    self_logs_path = custom_hooks + '/self_logs'
+    if not os.path.exists(self_logs_path):
+        os.mkdir(self_logs_path)
+
+    self_hook_file = custom_hooks + '/self_hook.sh'
+    self_hook_exist = False
+    if os.path.exists(self_hook_file):
+        self_hook_exist = True
+
+    dlist = []
+    if os.path.exists(self_path):
+        for filename in os.listdir(self_path):
+            tmp = {}
+            filePath = self_path + '/' + filename
+            if os.path.isfile(filePath):
+                tmp['path'] = filePath
+                tmp['name'] = os.path.basename(filePath)
+                tmp['is_hidden'] = False
+                if tmp['name'].endswith('.txt'):
+                    tmp['is_hidden'] = True
+
+                dlist.append(tmp)
+
+    dlist_sum = len(dlist)
+    # print(dlist)
+    rdata = {}
+    rdata['data'] = dlist
+    rdata['self_hook'] = self_hook_exist
+    rdata['list'] = mw.getPage(
+        {'count': dlist_sum, 'p': 1, 'row': 100, 'tojs': 'self_page'})
+
+    return mw.returnJson(True, 'ok', rdata)
+
+
+def projectScriptSelf_Create():
+    args = getArgs()
+    data = checkArgs(args, ['user', 'name', 'file'])
+    if not data[0]:
+        return data[1]
+
+    user = args['user']
+    name = args['name'] + '.git'
+    file = args['file']
+
+    self_path = path = getRootPath() + '/' + user + '/' + \
+        name + '/custom_hooks/self'
+
+    if not os.path.exists(self_path):
+        os.mkdir(self_path)
+
+    abs_file = self_path + '/' + file + '.sh'
+    if os.path.exists(abs_file):
+        return mw.returnJson(False, '脚本已经存在!')
+
+    mw.writeFile(abs_file, "#!/bin/bash\necho `date +'%Y-%m-%d %H:%M:%S'`\n")
+
+    rdata = {}
+    rdata['abs_file'] = abs_file
+    return mw.returnJson(True, '创建文件成功!', rdata)
+
+
+def projectScriptSelf_Del():
+    args = getArgs()
+    data = checkArgs(args, ['user', 'name', 'file'])
+    if not data[0]:
+        return data[1]
+
+    user = args['user']
+    name = args['name'] + '.git'
+    file = args['file']
+
+    custom_hooks = getRootPath() + '/' + user + '/' + \
+        name + '/custom_hooks'
+    self_path = custom_hooks + '/self'
+
+    if not os.path.exists(self_path):
+        os.mkdir(self_path)
+
+    abs_file = self_path + '/' + file
+    # print(abs_file)
+    if not os.path.exists(abs_file):
+        return mw.returnJson(False, '脚本已经删除!')
+
+    os.remove(abs_file)
+
+    # 日志也删除
+    log_file = custom_hooks + '/self_logs/' + file + '.log'
+    if os.path.exists(log_file):
+        os.remove(log_file)
+
+    return mw.returnJson(True, '脚本删除成功!')
+
+
+def projectScriptSelf_Logs():
+    args = getArgs()
+    data = checkArgs(args, ['user', 'name', 'file'])
+    if not data[0]:
+        return data[1]
+
+    user = args['user']
+    name = args['name'] + '.git'
+    file = args['file']
+
+    self_path = path = getRootPath() + '/' + user + '/' + \
+        name + '/custom_hooks/self_logs'
+
+    if not os.path.exists(self_path):
+        os.mkdir(self_path)
+
+    logs_file = self_path + '/' + file + '.log'
+    if os.path.exists(logs_file):
+        rdata = {}
+        rdata['path'] = logs_file
+        return mw.returnJson(True, 'ok', rdata)
+
+    return mw.returnJson(False, '日志不存在!')
+
+
+def projectScriptSelf_Run():
+    args = getArgs()
+    data = checkArgs(args, ['user', 'name', 'file'])
+    if not data[0]:
+        return data[1]
+
+    user = args['user']
+    name = args['name'] + '.git'
+    file = args['file']
+
+    custom_hooks = getRootPath() + '/' + user + '/' + \
+        name + '/custom_hooks'
+    self_path = custom_hooks + '/self/' + file
+    self_logs_path = custom_hooks + '/self_logs/' + file + '.log'
+
+    shell = "sh -x " + self_path + " 2>" + self_logs_path
+    mw.execShell(shell)
+    return mw.returnJson(True, '执行成功!')
+
+
+def projectScriptSelf_Rename():
+    args = getArgs()
+    data = checkArgs(args, ['user', 'name', 'o_file', 'n_file'])
+    if not data[0]:
+        return data[1]
+
+    user = args['user']
+    name = args['name'] + '.git'
+    o_file = args['o_file']
+    n_file = args['n_file']
+
+    custom_hooks = getRootPath() + '/' + user + '/' + \
+        name + '/custom_hooks'
+    self_path = custom_hooks + '/self'
+
+    if not os.path.exists(self_path):
+        os.mkdir(self_path)
+
+    o_file_abs = self_path + '/' + o_file + '.sh'
+    if not os.path.exists(o_file_abs):
+        return mw.returnJson(False, '原文件已经不存在了!')
+
+    n_file_abs = self_path + '/' + n_file + '.sh'
+
+    os.rename(o_file_abs, n_file_abs)
+
+    # 日志也删除
+    log_file = custom_hooks + '/self_logs/' + o_file + '.sh.log'
+    if os.path.exists(log_file):
+        os.remove(log_file)
+
+    return mw.returnJson(True, '重命名成功!')
+
+
+def projectScriptSelf_Enable():
+    args = getArgs()
+    data = checkArgs(args, ['user', 'name', 'enable'])
+    if not data[0]:
+        return data[1]
+
+    user = args['user']
+    name = args['name'] + '.git'
+    enable = args['enable']
+
+    custom_path = getRootPath() + '/' + user + '/' + \
+        name + '/custom_hooks'
+
+    # 替换commit配置
+    commit_path = custom_path + '/commit'
+    note = '#Gogs Script Don`t Remove and Change'
+
+    self_file = custom_path + '/self_hook.sh'
+    self_hook_tpl = getPluginDir() + '/hook/self_hook.tpl'
+
+    if enable == '1':
+        content = mw.readFile(self_hook_tpl)
+        content = content.replace('{$HOOK_DIR}', custom_path + '/self')
+        content = content.replace(
+            '{$HOOK_LOGS_DIR}', custom_path + '/self_logs')
+        mw.writeFile(self_file, content)
+        mw.execShell("chmod 777 " + self_file)
+
+        commit_content = mw.readFile(commit_path)
+        commit_content += "\n\n" + "bash " + self_file + " " + note
+        mw.writeFile(commit_path, commit_content)
+
+        return mw.returnJson(True, '开启成功!')
+    else:
+        commit_content = mw.readFile(commit_path)
+        rep = ".*" + note
+        commit_content = re.sub(rep, '', commit_content, re.M)
+        commit_content = commit_content.strip()
+        mw.writeFile(commit_path, commit_content)
+        if os.path.exists(self_file):
+            os.remove(self_file)
+        return mw.returnJson(True, '关闭成功!')
+
+
+def projectScriptSelf_Status():
+    args = getArgs()
+    data = checkArgs(args, ['user', 'name', 'file', 'status'])
+    if not data[0]:
+        return data[1]
+
+    user = args['user']
+    name = args['name'] + '.git'
+    file = args['file']
+    status = args['status']
+
+    custom_hooks = getRootPath() + '/' + user + '/' + \
+        name + '/custom_hooks'
+    self_path = custom_hooks + '/self'
+
+    if not os.path.exists(self_path):
+        os.mkdir(self_path)
+
+    # 日志也删除
+    log_file = custom_hooks + '/self_logs/' + file + '.log'
+    if os.path.exists(log_file):
+        os.remove(log_file)
+
+    if status == '1':
+        file_abs = self_path + '/' + file
+        file_text_abs = self_path + '/' + file + '.txt'
+        os.rename(file_abs, file_text_abs)
+        return mw.returnJson(True, '开始禁用成功!')
+    else:
+        file_abs = self_path + '/' + file.strip('.txt')
+        file_text_abs = self_path + '/' + file
+        os.rename(file_text_abs, file_abs)
+        return mw.returnJson(True, '开始使用成功!')
+
+    return mw.returnJson(True, '禁用成功!')
 
 
 def getRsaPublic():
@@ -732,8 +1094,12 @@ if __name__ == "__main__":
         print(getGogsConf())
     elif func == 'submit_gogs_conf':
         print(submitGogsConf())
+    elif func == 'gogs_edit_tpl':
+        print(gogsEditTpl())
     elif func == 'user_list':
         print(userList())
+    elif func == 'repo_list':
+        print(repoList())
     elif func == 'user_project_list':
         print(userProjectList())
     elif func == 'project_script_edit':
@@ -744,8 +1110,24 @@ if __name__ == "__main__":
         print(projectScriptUnload())
     elif func == 'project_script_debug':
         print(projectScriptDebug())
-    elif func == 'gogs_edit':
-        print(gogsEdit())
+    elif func == 'project_script_run':
+        print(projectScriptRun())
+    elif func == 'project_script_self':
+        print(projectScriptSelf())
+    elif func == 'project_script_self_create':
+        print(projectScriptSelf_Create())
+    elif func == 'project_script_self_del':
+        print(projectScriptSelf_Del())
+    elif func == 'project_script_self_logs':
+        print(projectScriptSelf_Logs())
+    elif func == 'project_script_self_run':
+        print(projectScriptSelf_Run())
+    elif func == 'project_script_self_rename':
+        print(projectScriptSelf_Rename())
+    elif func == 'project_script_self_enable':
+        print(projectScriptSelf_Enable())
+    elif func == 'project_script_self_status':
+        print(projectScriptSelf_Status())
     elif func == 'get_rsa_public':
         print(getRsaPublic())
     elif func == 'get_total_statistics':

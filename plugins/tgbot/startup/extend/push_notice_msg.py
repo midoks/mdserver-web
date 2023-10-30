@@ -50,12 +50,17 @@ def send_msg(bot, tag='ad', trigger_time=300):
     mw.writeFile(lock_file, json.dumps(lock_data))
     # 信号只在一个周期内执行一次|end
 
-    # https://t.me/gjgzs2022 ｜ 22/m
-    # 高价收量 👑 集团收量 ❤️ 流量变现/支付宝代付 ❤️ 微信代付/实名认证/过人脸🕵️‍♀️各种账号处理✅ ｜ 28/m
+    # https://t.me/gjgzs2022 ｜ 22/m | @GJ_gzs
+    # 高价收量 👑 集团收量 ❤️ 流量变现/支付宝代付 ❤️ 微信代付/实名认证/过人脸🕵️‍♀️各种账号处理✅ ｜ 28/m | next 12/28 | @laojiaoshou
     # https://zhaoziyuan.pw/ | web | 15/m | 2m | next,11/15 ｜ @baleite
     # 腾云机场 ｜9/m
     # 🚀鲲鹏VPN | 13/m | next,10/13
+    # 综合包网/NG接口开户 | 28/m | 3m | next,1/28 | @aabbcx888
     keyboard = [
+        [
+            types.InlineKeyboardButton(
+                text="🚀 综合包网/NG接口开户", url='https://t.me/NG_Tony')
+        ],
         [
             types.InlineKeyboardButton(
                 text="实卡接码🙎‍♂️代实名/过人脸🅾️开飞机会员", url='https://t.me/gjgzs2022')

@@ -2370,6 +2370,8 @@ var html = '<div>\
                         <option value="502">502</option>\
                         <option value="503">503</option>\
                         <option value="404">404</option>\
+                        <option value="404">301</option>\
+                        <option value="404">302</option>\
                         <option value="200">200</option>\
                     </select>\
                     <span style="margin-left:10px;">来源: </span>\
@@ -2464,6 +2466,10 @@ $('select[name="status_code"]').change(function(){
 });
 
 $('select[name="spider_type"]').change(function(){
+    wsTableLogRequest(1);
+});
+
+$('select[name="referer"]').change(function(){
     wsTableLogRequest(1);
 });
 

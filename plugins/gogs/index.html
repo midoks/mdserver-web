@@ -1,13 +1,22 @@
+<style>
+.overflow_hide {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    vertical-align: middle;
+}
+</style>
 <div class="bt-form">
 	<div class="bt-w-main">
 		<div class="bt-w-menu">
 			<p class="bgw" onclick="pluginService('gogs');">服务</p>
 			<p onclick="pluginInitD('gogs');">自启动</p>
 			<!-- <p onclick="pluginConfig('gogs',null, 'init_conf');">启动配置</p> -->
-			<p onclick="gogsEdit();">手动编辑</p>
+			<p onclick="gogsEditTpl();">手动编辑</p>
 			<p onclick="pluginConfig('gogs',null, 'conf');">配置文件</p>
 			<p onclick="gogsSetConfig();">配置修改</p>
 			<p onclick="gogsUserList();">用户列表</p>
+			<p onclick="gogsRepoList();">项目列表</p>
 			<p onclick="pluginLogs('gogs',null,'run_log');">运行日志</p>
 			<p onclick="pluginLogs('gogs',null,'post_receive_log');" title="提交post-receive日志">提交日志</p>
 			<p onclick="gogsRead();">使用说明</p>
@@ -18,6 +27,8 @@
 	</div>
 </div>
 <script type="text/javascript">
-$.getScript( "/plugins/file?name=gogs&f=js/gogs.js");
-pluginService('gogs');
+resetPluginWinHeight(530);
+$.getScript( "/plugins/file?name=gogs&f=js/gogs.js",function(){
+	pluginService('gogs');
+});
 </script>

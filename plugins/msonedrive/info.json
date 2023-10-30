@@ -4,7 +4,7 @@
   "tip": "lib",
   "name": "msonedrive",
   "type": "sort",
-  "ps": "微软家的云网盘服务。",
+  "ps": "微软家的云网盘服务",
   "versions": "1.0",
   "shell": "install.sh",
   "checks": "server/msonedrive",

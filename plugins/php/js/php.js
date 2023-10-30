@@ -32,7 +32,9 @@ function phpPostCallbak(method, version, args,callback){
     var req_data = {};
     req_data['name'] = 'php';
     req_data['func'] = method;
+    req_data['script']='index_php';
     args['version'] = version;
+
  
     if (typeof(args) == 'string' && args == ''){
         req_data['args'] = JSON.stringify(toArrayObject(args));

@@ -659,13 +659,6 @@ end
 function run_app_waf()
     min_route()
     -- C:D("min_route")
-    -- country limit
-    if config['area_limit'] then
-        local waf_country = get_country()
-        if waf_country then
-            if area_limit(waf_country, server_name, site_config[server_name]['open']) then return true end
-        end
-    end
 
     if site_config[server_name] and site_config[server_name]['open'] then
         
@@ -686,6 +679,14 @@ function run_app_waf()
         -- 封禁ip返回
         if waf_drop_ip() then return true end
         -- C:D("waf_drop_ip")
+
+        -- country limit
+        if config['area_limit'] then
+            local waf_country = get_country()
+            if waf_country then
+                if area_limit(waf_country, server_name, site_config[server_name]['open']) then return true end
+            end
+        end
 
         -- ua check
         if waf_user_agent() then return true end
