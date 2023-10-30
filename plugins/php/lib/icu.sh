@@ -36,7 +36,7 @@ if [ ! -d ${SERVER_ROOT}/icu ];then
 			echo "/www/server/lib/icu/lib" > /etc/ld.so.conf.d/mw-icu.conf
 		elif [[ -f /etc/ld.so.conf ]]; then
 			echo "/www/server/lib/icu/lib" >> /etc/ld.so.conf
-		if
+		fi
 
 		ldconfig
 	fi
