@@ -508,6 +508,18 @@ def userList():
     return mw.returnJson(True, 'OK', data)
 
 
+def checkRepoListIsHasScript(data):
+    path = getRootPath()
+    for x in range(len(data)):
+        name = data[x]['name'] + '/' + data[x]['repo'] + '.git'
+        path_tmp = path + '/' + name + '/custom_hooks/post-receive'
+        if os.path.exists(path_tmp):
+            data[x]['has_hook'] = True
+        else:
+            data[x]['has_hook'] = False
+    return data
+
+
 def repoList():
 
     conf = getConf()
