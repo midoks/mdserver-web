@@ -312,8 +312,8 @@ function gogsRepoListPage(page, search){
 
 
             body += '<tr><td>'+ulist[i]["id"]+'</td>'+
-                '<td>' + ulist[i]["name"]+'</td>'+
-                '<td>' + ulist[i]["repo"]+'</td>'+
+                '<td class="overflow_hide" style="width:80px;">' + ulist[i]["name"]+'</td>'+
+                '<td class="overflow_hide" style="width:80px;">' + ulist[i]["repo"]+'</td>'+
                 '<td>' +
                     '<a class="btlink" target="_blank" href="'+rdata['data']['root_url']+ulist[i]["name"]+'/'+ulist[i]["repo"]+'">源码</a>' + ' | ' +
                     option + 
@@ -617,7 +617,7 @@ function projectScriptSelfRender(user, name){
                 layer.msg("已经禁用,不能执行!",{icon:2,time:2000,shade: [0.3, '#000']});
                 return;
             }
-            
+
             file = file.split('.sh')[0];
 
             layer.open({
