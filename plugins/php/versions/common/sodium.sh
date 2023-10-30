@@ -59,6 +59,7 @@ Install_lib()
 		./configure --with-php-config=$serverPath/php/$version/bin/php-config --with-sodium=$serverPath/lib/libsodium
 		make clean && make && make install && make clean
 
+		cd $php_lib && rm -rf $php_lib/lib${LIBNAME}-${LIBV}
 	fi
 	
 	if [ ! -f "$extFile" ];then

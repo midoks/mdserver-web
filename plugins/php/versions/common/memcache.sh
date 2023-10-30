@@ -69,6 +69,7 @@ Install_lib()
 		--enable-memcache --with-zlib-dir
 		make clean && make && make install && make clean
 
+		cd $php_lib && rm -rf $php_lib/${LIBNAME}-${LIBV}
 	fi
 	
 	if [ ! -f "$extFile" ];then

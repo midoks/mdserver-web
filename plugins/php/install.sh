@@ -75,8 +75,8 @@ if [ "${action}" == "install" ] && [ -d ${serverPath}/php/${type} ];then
 	cd ${rootPath}/plugins/php/versions/common && bash redis.sh install ${type}
 	cd ${rootPath}/plugins/php/versions/common && bash memcached.sh install ${type}
 
-	if [ "${type}" -gt "72" ];then
-		cd ${rootPath}/plugins/php/versions/common && bash zip.sh install ${type}
+	if [ "${type}" -gt "73" ];then
+		cd ${rootPath}/plugins/php/versions/common && bash zlib.sh install ${type}
 	fi
 
 	echo "install PHP${type} extend end"

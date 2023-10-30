@@ -25,5 +25,7 @@ if [ ! -f /usr/local/lib/libsodium.so ];then
     tar -zxvf libsodium-${VERSION}-stable.tar.gz
     cd libsodium-stable
     ./configure  && make && make check && make install
+
+    cd $SOURCE_ROOT && rm -rf $SOURCE_ROOT/libsodium-stable
 fi
 #----------------------------- libsodium end -------------------------#

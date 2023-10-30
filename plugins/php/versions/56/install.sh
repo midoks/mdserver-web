@@ -124,7 +124,6 @@ if [ ! -d $serverPath/php/56 ];then
 	--enable-simplexml \
 	--enable-ftp \
 	--enable-sockets \
-	--enable-pcntl \
 	--enable-shmop \
 	--enable-soap \
 	--enable-posix \
@@ -136,6 +135,8 @@ if [ ! -d $serverPath/php/56 ];then
 	$OPTIONS \
 	--enable-fpm
 	make clean && make -j${cpuCore} && make install && make clean
+
+	rm -rf $sourcePath/php/php${PHP_VER}
 fi 
 
 #------------------------ install end ------------------------------------#

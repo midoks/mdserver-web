@@ -17,7 +17,7 @@ sysName=`uname`
 install_tmp=${rootPath}/tmp/mw_install.pl
 mysqlDir=${serverPath}/source/mysql
 
-
+VERSION=5.6.50
 Install_mysql()
 {
 	mkdir -p ${mysqlDir}
@@ -62,12 +62,12 @@ Install_mysql()
 	# ----- cpu end ------
 	
 
-	if [ ! -f ${mysqlDir}/mysql-5.6.50.tar.gz ];then
-		wget --no-check-certificate -O ${mysqlDir}/mysql-5.6.50.tar.gz --tries=3 https://cdn.mysql.com/Downloads/MySQL-5.6/mysql-5.6.50.tar.gz
+	if [ ! -f ${mysqlDir}/mysql-${VERSION}.tar.gz ];then
+		wget --no-check-certificate -O ${mysqlDir}/mysql-${VERSION}.tar.gz --tries=3 https://cdn.mysql.com/Downloads/MySQL-5.6/mysql-${VERSION}.tar.gz
 	fi
 
-	if [ ! -d ${mysqlDir}/mysql-5.6.50 ];then
-		 cd ${mysqlDir} && tar -zxvf  ${mysqlDir}/mysql-5.6.50.tar.gz
+	if [ ! -d ${mysqlDir}/mysql-${VERSION} ];then
+		 cd ${mysqlDir} && tar -zxvf  ${mysqlDir}/mysql-${VERSION}.tar.gz
 	fi
 
 
@@ -82,7 +82,7 @@ Install_mysql()
 	fi
 
 	if [ ! -d $serverPath/mysql ];then
-		cd ${mysqlDir}/mysql-5.6.50 && cmake \
+		cd ${mysqlDir}/mysql-${VERSION} && cmake \
 		-DCMAKE_INSTALL_PREFIX=$serverPath/mysql \
 		-DMYSQL_USER=mysql \
 		-DMYSQL_TCP_PORT=3306 \

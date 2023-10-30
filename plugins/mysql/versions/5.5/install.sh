@@ -14,6 +14,7 @@ sysName=`uname`
 install_tmp=${rootPath}/tmp/mw_install.pl
 mysqlDir=${serverPath}/source/mysql
 
+VERSION=5.5.62
 
 Install_mysql()
 {
@@ -58,12 +59,12 @@ Install_mysql()
 	fi
 	# ----- cpu end ------
 
-	if [ ! -f ${mysqlDir}/mysql-5.5.62.tar.gz ];then
-		wget --no-check-certificate -O ${mysqlDir}/mysql-5.5.62.tar.gz --tries=3 https://dev.mysql.com/get/Downloads/MySQL-5.5/mysql-5.5.62.tar.gz
+	if [ ! -f ${mysqlDir}/mysql-${VERSION}.tar.gz ];then
+		wget --no-check-certificate -O ${mysqlDir}/mysql-${VERSION}.tar.gz --tries=3 https://dev.mysql.com/get/Downloads/MySQL-5.5/mysql-${VERSION}.tar.gz
 	fi
 
-	if [ ! -d ${mysqlDir}/mysql-5.5.62 ];then
-		 cd ${mysqlDir} && tar -zxvf  ${mysqlDir}/mysql-5.5.62.tar.gz
+	if [ ! -d ${mysqlDir}/mysql-${VERSION} ];then
+		 cd ${mysqlDir} && tar -zxvf  ${mysqlDir}/mysql-${VERSION}.tar.gz
 	fi
 	
 	WHERE_DIR_GCC=/usr/bin/gcc

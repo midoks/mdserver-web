@@ -39,5 +39,8 @@ if [ ! -d ${SERVER_ROOT}/libmemcached ];then
     sed -i "s#opt_servers == false#\!opt_servers#g" ${SERVER_ROOT}/libmemcached-1.0.18/clients/memflush.cc
     # sed -i "s#opt_servers == false#\!opt_servers#g" /www/server/source/lib/libmemcached-1.0.18/clients/memflush.cc
     ./configure --prefix=${SERVER_ROOT}/libmemcached -with-memcached && make && make install
+
+    cd $SOURCE_ROOT && rm -rf $SOURCE_ROOT/libmemcached-1.0.18
+    
 fi
 #----------------------------- libmemcached end -------------------------#

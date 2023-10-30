@@ -127,8 +127,6 @@ if [ ! -d $serverPath/php/53/bin ];then
 	--enable-simplexml \
 	--enable-dom \
 	--enable-filter \
-	--enable-pcntl \
-	--enable-bcmath \
 	--enable-xml \
 	--enable-ftp \
 	--enable-soap \
@@ -142,6 +140,8 @@ if [ ! -d $serverPath/php/53/bin ];then
 	$OPTIONS \
 	--enable-fpm
 	make clean && make -j${cpuCore} && make install && make clean
+
+	rm -rf $sourcePath/php/php${PHP_VER}
 fi
 
 

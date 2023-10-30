@@ -24,8 +24,13 @@ if [ "$?" != "0" ];then
     cd ${SOURCE_ROOT}
     if [ ! -f ${SOURCE_ROOT}/oniguruma-6.9.4.tar.gz ];then
         wget --no-check-certificate -O ${SOURCE_ROOT}/oniguruma-6.9.4.tar.gz ${HTTP_PREFIX}github.com/kkos/oniguruma/archive/v6.9.4.tar.gz
-    fi 
-    cd ${SOURCE_ROOT} && tar -zxvf oniguruma-6.9.4.tar.gz
+    fi
+
+    if [ ! -d  cd ${SOURCE_ROOT}/oniguruma-6.9.4 ];then
+        cd ${SOURCE_ROOT} && tar -zxvf oniguruma-6.9.4.tar.gz
+    fi
+    
     cd ${SOURCE_ROOT}/oniguruma-6.9.4 && ./autogen.sh && ./configure --prefix=/usr && make && make install
+    cd $SOURCE_ROOT && rm -rf $SOURCE_ROOT/oniguruma-6.9.4
 fi
 

@@ -31,6 +31,8 @@ if [ $ISFIND == "0" ];then
     tar -zxvf libmcrypt-2.5.8.tar.gz
     cd libmcrypt-2.5.8
     ./configure && make && make install && make clean
+
+    cd $SOURCE_ROOT && rm -rf $SOURCE_ROOT/libmcrypt-2.5.8
 fi
 
 

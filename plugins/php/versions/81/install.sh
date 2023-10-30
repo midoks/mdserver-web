@@ -150,6 +150,8 @@ if [ ! -d $serverPath/php/${PHP_VER} ];then
 	$OPTIONS \
 	--enable-fpm
 	make clean && make -j${cpuCore} && make install && make clean
+
+	rm -rf $sourcePath/php/php${PHP_VER}
 fi 
 #------------------------ install end ------------------------------------#
 }

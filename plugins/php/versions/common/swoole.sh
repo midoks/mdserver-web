@@ -76,6 +76,8 @@ Install_lib()
 		--with-openssl-dir=$serverPath/lib/openssl \
 		--enable-sockets
 		make clean && make && make install && make clean
+
+		cd $php_lib && rm -rf $php_lib/${LIBNAME}-${LIBV}
 	fi
 	
 	while [[ ! -f "$extFile" ]];

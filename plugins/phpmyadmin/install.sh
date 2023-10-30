@@ -66,8 +66,7 @@ Install_phpmyadmin()
 
 	cp -r $serverPath/source/phpmyadmin/$FDIR $serverPath/phpmyadmin/
 	cd $serverPath/phpmyadmin/ && mv $FDIR phpmyadmin
-
-
+	rm -rf $serverPath/source/phpmyadmin/$FDIR
 	
 	echo '安装完成' > $install_tmp
 
