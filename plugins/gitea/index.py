@@ -837,7 +837,7 @@ def projectScriptSelf_Create():
         return mw.returnJson(False, '脚本已经存在!')
 
     mw.writeFile(abs_file, "#!/bin/bash\necho `date +'%Y-%m-%d %H:%M:%S'`\n")
-
+    mw.execShell('chown -R www:www ' + abs_file)
     rdata = {}
     rdata['abs_file'] = abs_file
     return mw.returnJson(True, '创建文件成功!', rdata)
