@@ -124,7 +124,6 @@ if [ ! -d $serverPath/php/56 ];then
 	--enable-simplexml \
 	--enable-ftp \
 	--enable-sockets \
-	--enable-pcntl \
 	--enable-shmop \
 	--enable-soap \
 	--enable-posix \
