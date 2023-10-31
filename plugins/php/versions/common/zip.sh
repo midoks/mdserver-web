@@ -59,7 +59,7 @@ Install_lib()
 	if [ ! -f "$extFile" ];then
 
 		if [ ! -d $sourcePath/php${version}/ext ];then
-			cd ${rootPath}/plugins/php && /bin/bash install.sh install ${version}
+			cd ${rootPath}/plugins/php && /bin/bash ${rootPath}/plugins/php/versions/${version}/install.sh install 
 		fi
 
 		cd $sourcePath/php${version}/ext/${LIBNAME}
@@ -69,6 +69,10 @@ Install_lib()
 		--with-zip
 
 		make clean && make && make install && make clean
+
+		if [ -d $sourcePath/php${version} ];then
+			cd ${sourcePath} && rm -rf $sourcePath/php${version}
+		fi
 		
 	fi
 
