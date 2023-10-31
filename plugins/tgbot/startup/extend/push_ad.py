@@ -46,7 +46,12 @@ def send_msg(bot, tag='ad', trigger_time=300):
     # https://zhaoziyuan.pw/ | web | 15/m | 2m | next,11/15 ｜ @baleite
     # 腾云机场 ｜9/m
     # 综合包网/NG接口开户 | 28/m | 3m | next,1/28 | @aabbcx888
+    # IKUN网盘 | 31/m | 1m | @rymfader
     keyboard = [
+        [
+            types.InlineKeyboardButton(
+                text="🅾️ IKUN网盘", url='https://www.ikunpan.com/')
+        ],
         [
             types.InlineKeyboardButton(
                 text="👑 综合包网/NG接口开户", url='https://t.me/NG_Tony')
