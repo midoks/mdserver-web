@@ -60,7 +60,7 @@ def send_msg(bot, tag='ad', trigger_time=300):
     keyboard = [
         [
             types.InlineKeyboardButton(
-                text="🅾️ IKUN网盘", url='https://www.ikunpan.com/')
+                text="🅾️ IKUN网盘/不限速/无限容量", url='https://www.ikunpan.com/')
         ],
         [
             types.InlineKeyboardButton(
