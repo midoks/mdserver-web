@@ -58,6 +58,8 @@ Install_lib()
 		--with-icu-dir=${serverPath}/lib/icu
 
 		make && make install && make clean
+
+		cd $php_lib && rm -rf $php_lib/${LIBNAME}-${LIBV}
 		
 	fi
 	

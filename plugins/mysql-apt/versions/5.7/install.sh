@@ -79,7 +79,8 @@ dpkg -X mysql-community-server-core_${SUFFIX_NAME}.deb $serverPath/mysql-apt/bin
 dpkg -X mysql-community-server_${SUFFIX_NAME}.deb $serverPath/mysql-apt/bin
 dpkg -X mysql-server_${SUFFIX_NAME}.deb $serverPath/mysql-apt/bin
 
-# rm -rf $myDir
+# 测试时可关闭
+rm -rf $myDir
 #######
 }
 

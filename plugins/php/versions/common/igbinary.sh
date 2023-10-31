@@ -50,11 +50,12 @@ Install_lib()
 
 		php_lib=$sourcePath/php_lib
 		mkdir -p $php_lib
-		if [ ! -f $php_lib/${LIBNAME}-${LIBV}.tgz ];then
-			wget -O $php_lib/${LIBNAME}-${LIBV}.tgz http://pecl.php.net/get/${LIBNAME}-${LIBV}.tgz
-			cd $php_lib
-			tar xvf ${LIBNAME}-${LIBV}.tgz
-		fi 
+		if [ ! -d $php_lib/${LIBNAME}-${LIBV} ];then
+			if [ ! -f $php_lib/${LIBNAME}-${LIBV}.tgz ];then
+				wget --no-check-certificate -O $php_lib/${LIBNAME}-${LIBV}.tgz http://pecl.php.net/get/${LIBNAME}-${LIBV}.tgz
+			fi
+			cd $php_lib && tar xvf ${LIBNAME}-${LIBV}.tgz
+		fi
 		cd $php_lib/${LIBNAME}-${LIBV}
 
 		$serverPath/php/$version/bin/phpize
