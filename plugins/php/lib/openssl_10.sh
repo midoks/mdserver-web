@@ -8,6 +8,7 @@ rootPath=$(dirname "$rootPath")
 rootPath=$(dirname "$rootPath")
 rootPath=$(dirname "$rootPath")
 
+opensslVersion="1.0.2q"
 # echo $rootPath
 
 SERVER_ROOT=$rootPath/lib
@@ -21,11 +22,11 @@ fi
 
 if [ ! -d ${SERVER_ROOT}/openssl10 ];then
     cd ${SOURCE_ROOT}
-    if [ ! -f ${SOURCE_ROOT}/openssl-1.0.2q.tar.gz ];then
-        wget --no-check-certificate ${HTTP_PREFIX}github.com/midoks/mdserver-web/releases/download/init/openssl-1.0.2q.tar.gz -T 20
+    if [ ! -f ${SOURCE_ROOT}/openssl-${opensslVersion}.tar.gz ];then
+        wget --no-check-certificate ${HTTP_PREFIX}github.com/midoks/mdserver-web/releases/download/init/openssl-${opensslVersion}.tar.gz -T 20
     fi 
-    tar -zxf openssl-1.0.2q.tar.gz
-    cd openssl-1.0.2q
+    tar -zxf openssl-${opensslVersion}.tar.gz
+    cd openssl-${opensslVersion}
     ./config --openssldir=${SERVER_ROOT}/openssl10 zlib-dynamic shared
     make && make install
 

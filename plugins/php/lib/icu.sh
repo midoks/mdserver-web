@@ -40,7 +40,7 @@ if [ ! -d ${SERVER_ROOT}/icu ];then
 
 		ldconfig
 
-		cd $SOURCE_ROOT && rm -rf ${SERVER_ROOT}/icu/52.2
+		cd $SOURCE_ROOT && rm -rf ${SOURCE_ROOT}/icu
 	fi
 
 fi
