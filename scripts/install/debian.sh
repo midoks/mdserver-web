@@ -184,6 +184,7 @@ apt install -y zlib1g-dev
 apt install -y libevent-dev libncurses5-dev libldap2-dev
 apt install -y libzip-dev
 apt install -y libicu-dev
+apt install -y libyaml-dev 
 
 apt install -y xsltproc
 
