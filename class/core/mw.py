@@ -425,13 +425,13 @@ def getFileMd5(filename):
 
 def getRandomString(length):
     # 取随机字符串
-    str = ''
+    rnd_str = ''
     chars = 'AaBbCcDdEeFfGgHhIiJjKkLlMmNnOoPpQqRrSsTtUuVvWwXxYyZz0123456789'
     chrlen = len(chars) - 1
     random = Random()
     for i in range(length):
-        str += chars[random.randint(0, chrlen)]
-    return str
+        rnd_str += chars[random.randint(0, chrlen)]
+    return rnd_str
 
 
 def getUniqueId():

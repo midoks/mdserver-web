@@ -110,8 +110,10 @@ apt install -y libfreetype6
 apt install -y libjpeg62-turbo-dev
 apt install -y libfreetype6-dev
 apt install -y libevent-dev libncurses5-dev libldap2-dev
+
 apt install -y libzip-dev
 apt install -y libicu-dev
+apt install -y libyaml-dev 
 
 # mqtt
 apt install -y xsltproc
