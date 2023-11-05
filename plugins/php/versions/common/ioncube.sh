@@ -21,7 +21,7 @@ version=$2
 IC_VERSION=${version:0:1}.${version:1:2}
 ARCH=`uname -m`
 
-if [ "$version" -gt "55" ];then
+if [ "$version" -gt "82" ];then
 	echo "not need"
 	exit 1
 fi
