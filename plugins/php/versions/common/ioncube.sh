@@ -63,6 +63,10 @@ Install_lib()
 			wget -O $php_lib/ioncube_loaders_lin.tar.gz https://downloads.ioncube.com/loader_downloads/ioncube_loaders_lin_${DEFAULT_ARCH}.tar.gz
 			cd $php_lib && tar -zxvf ioncube_loaders_lin.tar.gz
 		fi 
+
+		if [ ! -d $php_lib/ioncube ];then
+			cd $php_lib && tar -zxvf ioncube_loaders_lin.tar.gz
+		fi
 		cd $php_lib/ioncube
 		
 		cp -rf $php_lib/ioncube/ioncube_loader_lin_${IC_VERSION}.so $extFile
@@ -81,6 +85,10 @@ Install_lib()
 	bash ${rootPath}/plugins/php/versions/lib.sh $version restart
 	echo '==========================================================='
 	echo 'successful!'
+
+	if [ -d $php_lib/ioncube ];then
+		rm -rf $php_lib/ioncube
+	fi
 }
 
 
