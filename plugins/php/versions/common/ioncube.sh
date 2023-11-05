@@ -21,7 +21,7 @@ version=$2
 IC_VERSION=${version:0:1}.${version:1:2}
 ARCH=`uname -m`
 
-if [ "$version" -gt "55" ];then
+if [ "$version" -gt "82" ];then
 	echo "not need"
 	exit 1
 fi
@@ -63,6 +63,10 @@ Install_lib()
 			wget -O $php_lib/ioncube_loaders_lin.tar.gz https://downloads.ioncube.com/loader_downloads/ioncube_loaders_lin_${DEFAULT_ARCH}.tar.gz
 			cd $php_lib && tar -zxvf ioncube_loaders_lin.tar.gz
 		fi 
+
+		if [ ! -d $php_lib/ioncube ];then
+			cd $php_lib && tar -zxvf ioncube_loaders_lin.tar.gz
+		fi
 		cd $php_lib/ioncube
 		
 		cp -rf $php_lib/ioncube/ioncube_loader_lin_${IC_VERSION}.so $extFile
@@ -73,13 +77,18 @@ Install_lib()
 		return
 	fi
 
-	echo "" >> $serverPath/php/$version/etc/php.ini
-	echo "[${LIBNAME}]" >> $serverPath/php/$version/etc/php.ini
-	echo "zend_extension=${LIBNAME}.so" >> $serverPath/php/$version/etc/php.ini
+	sed -i $BAK "1i\[${LIBNAME}]" $serverPath/php/$version/etc/php.ini
+	sed -i $BAK "2i\zend_extension=${LIBNAME}.so" $serverPath/php/$version/etc/php.ini
+	# echo "[${LIBNAME}]" >> $serverPath/php/$version/etc/php.ini
+	# echo "zend_extension=${LIBNAME}.so" >> $serverPath/php/$version/etc/php.ini
 
 	bash ${rootPath}/plugins/php/versions/lib.sh $version restart
 	echo '==========================================================='
 	echo 'successful!'
+
+	if [ -d $php_lib/ioncube ];then
+		rm -rf $php_lib/ioncube
+	fi
 }
 
 
