@@ -73,9 +73,10 @@ Install_lib()
 		return
 	fi
 
-	echo "" >> $serverPath/php/$version/etc/php.ini
-	echo "[${LIBNAME}]" >> $serverPath/php/$version/etc/php.ini
-	echo "zend_extension=${LIBNAME}.so" >> $serverPath/php/$version/etc/php.ini
+	sed -i $BAK "1i\[${LIBNAME}]" $serverPath/php/$version/etc/php.ini
+	sed -i $BAK "2i\zend_extension=${LIBNAME}.so" $serverPath/php/$version/etc/php.ini
+	# echo "[${LIBNAME}]" >> $serverPath/php/$version/etc/php.ini
+	# echo "zend_extension=${LIBNAME}.so" >> $serverPath/php/$version/etc/php.ini
 
 	bash ${rootPath}/plugins/php/versions/lib.sh $version restart
 	echo '==========================================================='
