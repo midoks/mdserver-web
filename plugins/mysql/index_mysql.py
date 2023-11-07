@@ -126,6 +126,7 @@ def binLogListTraceRelay(args):
         if f.startswith(relay_name) and not f.endswith('.index'):
             relay_list.append(f)
 
+    relay_list = sorted(relay_list, reverse=True)
     file = relay_list[0]
 
     my_bin = getServerDir() + '/bin'
@@ -164,6 +165,7 @@ def binLogListTraceBinLog(args):
         rdata['data'] = '无BINLOG'
         return rdata
 
+    log_bin_l = sorted(log_bin_l, reverse=True)
     file = log_bin_l[0]
 
     my_bin = getServerDir() + '/bin'
