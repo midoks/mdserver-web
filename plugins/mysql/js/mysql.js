@@ -1315,14 +1315,14 @@ function myBinLogsRender(page){
         $('#binlog_list .look').click(function(){
             var i = $(this).data('index');
             var file = rdata.data[i]['name'];
-
             myBinRollingLogs('查看','binLogListLook',{'file':file },100);
-            // myPostCallbak('binLogListLook','',{'file':file}, function(rdata){
-            //     console.log(rdata);
-            // });
         });
 
-
+        $('#binlog_list .look_decode').click(function(){
+            var i = $(this).data('index');
+            var file = rdata.data[i]['name'];
+            myBinRollingLogs('查看','binLogListLookDecode',{'file':file },100);
+        });
     });
 }
 

@@ -62,6 +62,27 @@ def binLogListLook(args):
     my_bin = getServerDir() + '/bin'
     my_binlog_cmd = my_bin + '/mysqlbinlog'
 
+    cmd = my_binlog_cmd + ' --no-defaults ' + \
+        data_dir + '/' + file + '|tail -' + str(line)
+
+    data = mw.execShell(cmd)
+
+    rdata = {}
+    rdata['cmd'] = cmd
+    rdata['data'] = data[0]
+
+    return rdata
+
+
+def binLogListLookDecode(args):
+
+    file = args['file']
+    line = args['line']
+
+    data_dir = getDataDir()
+    my_bin = getServerDir() + '/bin'
+    my_binlog_cmd = my_bin + '/mysqlbinlog'
+
     cmd = my_binlog_cmd + ' --no-defaults --base64-output=decode-rows -vvvv ' + \
         data_dir + '/' + file + '|tail -' + str(line)
 
