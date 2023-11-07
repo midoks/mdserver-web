@@ -1232,14 +1232,21 @@ function myBinRollingLogs(_name, func, _args, line){
     function requestLogs(func,file,line){
         myPostCallbakN(func,'',{'file':file,"line":line}, function(rdata){
             var data = rdata.data.data;
+            var cmd = rdata.data.cmd;
             if(data == '') {
                 data = '当前没有日志!';
             }
 
+            $('#my_rolling_cmd').html(cmd);
+
+            $('#my_rolling_copy').click(function(){
+                copyText(cmd);
+            });
+
             var ebody = '<textarea readonly="readonly" style="margin: 0px;width: 100%;height: 360px;background-color: #333;color:#fff; padding:0 5px" id="roll_info_log">'+data+'</textarea>';
             $("#my_rolling_logs").html(ebody);
             var ob = document.getElementById('roll_info_log');
-            ob.scrollTop = ob.scrollHeight; 
+            ob.scrollTop = ob.scrollHeight;
         });
     }
 
@@ -1253,23 +1260,24 @@ function myBinRollingLogs(_name, func, _args, line){
                 clearInterval(reqTimer);
             }
         },
-        content:'\
-            <div class="change-default pd20" id="my_rolling_logs">\
-            <div class="divtable mtb10">\
-                <table class="table table-hover"><tr>\
-                <td>cmd</td>\
-                <td style="width:50px;"><span class="ico-copy cursor btcopy" title="复制密码"></span></td>\
-                <tr>\
-                </table>\
-            </div>\
-            <textarea readonly="readonly" style="margin: 0px;width: 100%;height: 360px;background-color: #333;color:#fff; padding:0 5px" id="roll_info_log"></textarea>\
-        </div>',
+        content:'<div class="change-default" style="padding:0px 20px 0px;">\
+                    <div class="divtable mtb10">\
+                    <table class="table table-hover"><tr>\
+                    <td id="my_rolling_cmd">cmd</td>\
+                    <td id="my_rolling_copy" style="width:35px;"><span class="ico-copy cursor btcopy" title="复制密码"></span></td>\
+                    <tr>\
+                    </table>\
+                    </div>\
+                </div>\
+                <div class="change-default" style="padding:0px 20px 0px;" id="my_rolling_logs">\
+                    <textarea readonly="readonly" style="margin: 0px;width: 100%;height: 360px;background-color: #333;color:#fff; padding:0 5px" id="roll_info_log"></textarea>\
+                </div>',
         success:function(){
             var fileName = _args['file'];
-            // requestLogs(func,fileName,file_line);
-            // reqTimer = setInterval(function(){
-            //     requestLogs(func,fileName,file_line);
-            // },3000);
+            requestLogs(func,fileName,file_line);
+            reqTimer = setInterval(function(){
+                requestLogs(func,fileName,file_line);
+            },3000);
         }
     });
 }
