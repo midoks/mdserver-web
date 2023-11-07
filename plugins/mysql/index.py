@@ -293,6 +293,14 @@ def getDataDir():
     return tmp.groups()[0].strip()
 
 
+def getLogBinName():
+    file = getConf()
+    content = mw.readFile(file)
+    rep = 'log-bin\s*=\s*(.*)'
+    tmp = re.search(rep, content)
+    return tmp.groups()[0].strip()
+
+
 def getPidFile():
     file = getConf()
     content = mw.readFile(file)
@@ -331,6 +339,54 @@ def binLog():
 
     mw.writeFile(conf, con)
     return mw.returnJson(True, '设置成功!')
+
+
+def binLogList():
+    args = getArgs()
+    data = checkArgs(args, ['page', 'page_size', 'tojs'])
+    if not data[0]:
+        return data[1]
+
+    page = int(args['page'])
+    page_size = int(args['page_size'])
+
+    data_dir = getDataDir()
+    log_bin_name = getLogBinName()
+
+    alist = os.listdir(data_dir)
+    log_bin_l = []
+    for x in range(len(alist)):
+        f = alist[x]
+        t = {}
+        if f.startswith(log_bin_name) and not f.endswith('.index'):
+            abspath = data_dir + '/' + f
+            t['name'] = f
+            t['size'] = os.path.getsize(abspath)
+            t['time'] = mw.getDataFromInt(os.path.getctime(abspath))
+            log_bin_l.append(t)
+
+    log_bin_l = sorted(log_bin_l, key=lambda x: x['time'], reverse=True)
+
+    # print(log_bin_l)
+    # print(data_dir, log_bin_name)
+
+    count = len(log_bin_l)
+
+    page_start = (page - 1) * page_size
+    page_end = page_start + page_size
+    if page_end > count:
+        page_end = count
+
+    data = {}
+    page_args = {}
+    page_args['count'] = count
+    page_args['p'] = page
+    page_args['row'] = page_size
+    page_args['tojs'] = args['tojs']
+    data['page'] = mw.getPage(page_args)
+    data['data'] = log_bin_l[page_start:page_end]
+
+    return mw.getJson(data)
 
 
 def cleanBinLog():
@@ -2431,9 +2487,63 @@ def getSlaveList(version=''):
 
     db = pMysqlDb()
     dlist = db.query('show slave status')
+
+    # print(dlist)
     data = {}
     data['data'] = dlist
     return mw.getJson(data)
+
+
+def trySlaveSyncBugfix(version=''):
+    if status(version) == 'stop':
+        return mw.returnJson(False, 'MySQL未启动', [])
+
+    mode_file = getSyncModeFile()
+    if not os.path.exists(mode_file):
+        return mw.returnJson(False, '需要先设置同步配置')
+
+    mode = mw.readFile(mode_file)
+    if mode != 'sync-user':
+        return mw.returnJson(False, '仅支持【同步账户】模式')
+
+    conn = pSqliteDb('slave_sync_user')
+    slave_sync_data = conn.field('ip,port,user,pass,mode,cmd').select()
+    if len(slave_sync_data) < 1:
+        return mw.returnJson(False, '需要先添加【同步用户】配置!')
+
+    # print(slave_sync_data)
+    # 本地从库
+    sdb = pMysqlDb()
+
+    gtid_purged = ''
+
+    for i in range(len(slave_sync_data)):
+        port = slave_sync_data[i]['port']
+        password = slave_sync_data[i]['pass']
+        host = slave_sync_data[i]['ip']
+        user = slave_sync_data[i]['user']
+
+        # print(port, password, host)
+
+        mdb = mw.getMyORM()
+        mdb.setHost(host)
+        mdb.setPort(port)
+        mdb.setUser(user)
+        mdb.setPwd(password)
+        mdb.setSocket('')
+
+        var_gtid = mdb.query('show VARIABLES like "%gtid_purged%"')
+        if len(var_gtid) > 0:
+            gtid_purged += var_gtid[0]['Value'] + ','
+
+    gtid_purged = gtid_purged.strip(',')
+    sql = "set @@global.gtid_purged='" + gtid_purged + "'"
+
+    sdb.query('stop slave')
+    # print(sql)
+    sdb.query(sql)
+    sdb.query('start slave')
+    return mw.returnJson(True, '修复成功!')
 
 
 def getSlaveSyncCmd(version=''):
@@ -3021,6 +3131,10 @@ if __name__ == "__main__":
         print(getConf())
     elif func == 'bin_log':
         print(binLog())
+    elif func == 'binlog_list':
+        print(binLogList())
+    elif func == 'binlog_look':
+        print(binLogListLook())
     elif func == 'clean_bin_log':
         print(cleanBinLog())
     elif func == 'error_log':
@@ -3115,6 +3229,8 @@ if __name__ == "__main__":
         print(getMasterRepSlaveUserCmd(version))
     elif func == 'get_slave_list':
         print(getSlaveList(version))
+    elif func == 'try_slave_sync_bugfix':
+        print(trySlaveSyncBugfix(version))
     elif func == 'get_slave_sync_cmd':
         print(getSlaveSyncCmd(version))
     elif func == 'get_slave_ssh_list':

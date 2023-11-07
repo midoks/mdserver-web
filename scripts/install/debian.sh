@@ -54,7 +54,8 @@ fi
 
 apt-get update -y
 apt install -y wget curl lsof unzip tar cron expect locate lrzsz
-apt install -y rar unrar
+apt install -y rar 
+apt install -y unrar
 apt install -y python3-pip python3-dev python3-venv
 
 
@@ -178,7 +179,9 @@ apt install -y libmagickwand-dev
 
 apt install -y libxml2 libxml2-dev libbz2-dev libmcrypt-dev libpspell-dev librecode-dev
 apt install -y libgmp-dev libgmp3-dev libreadline-dev libxpm-dev
-apt install -y dia pkg-config
+apt install -y dia
+
+apt install -y pkg-config
 apt install -y zlib1g-dev
 
 apt install -y libevent-dev libncurses5-dev libldap2-dev

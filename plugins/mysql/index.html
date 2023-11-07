@@ -12,6 +12,7 @@
 			<p onclick="myPerfOpt();">性能优化</p>
 			<p onclick="myLogs();">日志</p>
 			<p onclick="pluginLogs('mysql',$('.plugin_version').attr('version'),'show_log');">慢日志</p>
+			<p onclick="myBinLogs();">BINLOG</p>
 			<p onclick="dbList()">管理列表</p>
 			<p onclick="masterOrSlaveConf($('.plugin_version').attr('version'))">主从配置</p>
 		</div>
@@ -57,12 +58,14 @@
     text-align: right;
 }
 </style>
+
+<!-- <script type="text/javascript"  src="/plugins/file?name=mysql&f=js/mysql.js"></script> -->
 <script type="text/javascript">
 resetPluginWinWidth(800);
 
-var loading = layer.msg("资源加载中...", { icon: 16, time: 0, shade: 0.3 });
+// var loading = layer.msg("资源加载中...", { icon: 16, time: 0, shade: 0.3 });
 $.getScript( "/plugins/file?name=mysql&f=js/mysql.js", function(){
-	layer.close(loading);
+	// layer.close(loading);
 	pluginService('mysql',$('.plugin_version').attr('version'));
 });
 </script>

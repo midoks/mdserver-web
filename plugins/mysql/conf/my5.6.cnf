@@ -56,7 +56,7 @@ long_query_time=10
 #log_queries_not_using_indexes=on
 #log_slow_admin_statements=1
 #log_slow_slave_statements=1
-expire_logs_days=30
+expire_logs_days=7
 
 relay-log=mdserver
 relay-log-index=mdserver
