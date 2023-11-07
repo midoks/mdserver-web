@@ -365,6 +365,8 @@ def binLogList():
             t['time'] = mw.getDataFromInt(os.path.getctime(abspath))
             log_bin_l.append(t)
 
+    sorted(log_bin_l, key=lambda x: x['name'], reverse=True)
+
     # print(log_bin_l)
     # print(data_dir, log_bin_name)
 
