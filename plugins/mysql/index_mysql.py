@@ -112,7 +112,7 @@ def binLogListLookDecode(args):
 
 
 def binLogListTraceRelay(args):
-
+    rdata = {}
     file = args['file']
     line = args['line']
 
@@ -127,6 +127,11 @@ def binLogListTraceRelay(args):
             relay_list.append(f)
 
     relay_list = sorted(relay_list, reverse=True)
+    if len(relay_list) == 0:
+        rdata['cmd'] = ''
+        rdata['data'] = '无Relay日志'
+        return rdata
+
     file = relay_list[0]
 
     my_bin = getServerDir() + '/bin'
@@ -137,7 +142,6 @@ def binLogListTraceRelay(args):
 
     data = mw.execShell(cmd)
 
-    rdata = {}
     rdata['cmd'] = cmd
     rdata['data'] = data[0]
 
