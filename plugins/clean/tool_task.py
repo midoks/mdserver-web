@@ -52,8 +52,8 @@ def createBgTask():
     removeBgTask()
     args = {
         "period": "day",
-        "hour": "2",
-        "minute": "30",
+        "hour": "0",
+        "minute": "15",
     }
     createBgTaskByName(getPluginName(), args)
 
