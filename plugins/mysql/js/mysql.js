@@ -1243,7 +1243,7 @@ function myBinRollingLogs(_name, func, _args, line){
                 copyText(cmd);
             });
 
-            var ebody = '<textarea readonly="readonly" style="margin: 0px;width: 100%;height: 360px;background-color: #333;color:#fff; padding:0 5px" id="roll_info_log">'+data+'</textarea>';
+            var ebody = '<textarea readonly="readonly" style="margin: 0px;width: 100%;height: 570px;background-color: #333;color:#fff; padding:0 5px" id="roll_info_log">'+data+'</textarea>';
             $("#my_rolling_logs").html(ebody);
             var ob = document.getElementById('roll_info_log');
             ob.scrollTop = ob.scrollHeight;
@@ -1254,7 +1254,7 @@ function myBinRollingLogs(_name, func, _args, line){
     layer.open({
         type: 1,
         title: _name + '日志',
-        area: '640px',
+        area: ['800px','700px'],
         end: function(){
             if (reqTimer){
                 clearInterval(reqTimer);
@@ -1270,14 +1270,14 @@ function myBinRollingLogs(_name, func, _args, line){
                     </div>\
                 </div>\
                 <div class="change-default" style="padding:0px 20px 0px;" id="my_rolling_logs">\
-                    <textarea readonly="readonly" style="margin: 0px;width: 100%;height: 360px;background-color: #333;color:#fff; padding:0 5px" id="roll_info_log"></textarea>\
+                    <textarea readonly="readonly" style="margin: 0px;width: 100%;height: 570px;background-color: #333;color:#fff; padding:0 5px" id="roll_info_log"></textarea>\
                 </div>',
         success:function(){
             var fileName = _args['file'];
             requestLogs(func,fileName,file_line);
             reqTimer = setInterval(function(){
                 requestLogs(func,fileName,file_line);
-            },3000);
+            },1000);
         }
     });
 }
@@ -1315,13 +1315,13 @@ function myBinLogsRender(page){
         $('#binlog_list .look').click(function(){
             var i = $(this).data('index');
             var file = rdata.data[i]['name'];
-            myBinRollingLogs('查看','binLogListLook',{'file':file },100);
+            myBinRollingLogs('查看BINLOG','binLogListLook',{'file':file },100);
         });
 
         $('#binlog_list .look_decode').click(function(){
             var i = $(this).data('index');
             var file = rdata.data[i]['name'];
-            myBinRollingLogs('查看','binLogListLookDecode',{'file':file },100);
+            myBinRollingLogs('查看解码BINLOG','binLogListLookDecode',{'file':file },100);
         });
     });
 }
@@ -1348,11 +1348,11 @@ function myBinLogs(){
     myBinLogsRender(1);
 
     $('.soft-man-con .relay_trace').click(function(){
-
+        myBinRollingLogs('中继日志跟踪','binLogListTraceRelay',{'file':''},100);
     });
 
     $('.soft-man-con .binlog_trace').click(function(){
-
+        myBinRollingLogs('最新BINLOG日志跟踪','binLogListTraceBinLog',{'file':''},100);
     });
 }
 

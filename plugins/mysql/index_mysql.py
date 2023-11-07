@@ -53,6 +53,22 @@ def getDataDir():
     return tmp.groups()[0].strip()
 
 
+def getRelayLogName():
+    file = getConf()
+    content = mw.readFile(file)
+    rep = 'relay-log\s*=\s*(.*)'
+    tmp = re.search(rep, content)
+    return tmp.groups()[0].strip()
+
+
+def getLogBinName():
+    file = getConf()
+    content = mw.readFile(file)
+    rep = 'log-bin\s*=\s*(.*)'
+    tmp = re.search(rep, content)
+    return tmp.groups()[0].strip()
+
+
 def binLogListLook(args):
 
     file = args['file']
@@ -89,6 +105,75 @@ def binLogListLookDecode(args):
     data = mw.execShell(cmd)
 
     rdata = {}
+    rdata['cmd'] = cmd
+    rdata['data'] = data[0]
+
+    return rdata
+
+
+def binLogListTraceRelay(args):
+
+    file = args['file']
+    line = args['line']
+
+    relay_name = getRelayLogName()
+    data_dir = getDataDir()
+    alist = os.listdir(data_dir)
+    relay_list = []
+    for x in range(len(alist)):
+        f = alist[x]
+        t = {}
+        if f.startswith(relay_name) and not f.endswith('.index'):
+            relay_list.append(f)
+
+    file = relay_list[0]
+
+    my_bin = getServerDir() + '/bin'
+    my_binlog_cmd = my_bin + '/mysqlbinlog'
+
+    cmd = my_binlog_cmd + ' --no-defaults --base64-output=decode-rows -vvvv ' + \
+        data_dir + '/' + file + '|tail -' + str(line)
+
+    data = mw.execShell(cmd)
+
+    rdata = {}
+    rdata['cmd'] = cmd
+    rdata['data'] = data[0]
+
+    return rdata
+
+
+def binLogListTraceBinLog(args):
+    rdata = {}
+    file = args['file']
+    line = args['line']
+
+    data_dir = getDataDir()
+    log_bin_name = getLogBinName()
+
+    alist = os.listdir(data_dir)
+    log_bin_l = []
+    for x in range(len(alist)):
+        f = alist[x]
+        t = {}
+        if f.startswith(log_bin_name) and not f.endswith('.index'):
+            log_bin_l.append(f)
+
+    if len(log_bin_l) == 0:
+        rdata['cmd'] = ''
+        rdata['data'] = '无BINLOG'
+        return rdata
+
+    file = log_bin_l[0]
+
+    my_bin = getServerDir() + '/bin'
+    my_binlog_cmd = my_bin + '/mysqlbinlog'
+
+    cmd = my_binlog_cmd + ' --no-defaults --base64-output=decode-rows -vvvv ' + \
+        data_dir + '/' + file + '|tail -' + str(line)
+
+    data = mw.execShell(cmd)
+
     rdata['cmd'] = cmd
     rdata['data'] = data[0]
 

@@ -358,7 +358,7 @@ def binLogList():
     for x in range(len(alist)):
         f = alist[x]
         t = {}
-        if f.startswith(log_bin_name) and f != (log_bin_name + '.index'):
+        if f.startswith(log_bin_name) and not f.endswith('.index'):
             abspath = data_dir + '/' + f
             t['name'] = f
             t['size'] = os.path.getsize(abspath)
@@ -385,22 +385,6 @@ def binLogList():
     data['data'] = log_bin_l[page_start:page_end]
 
     return mw.getJson(data)
-
-
-def binLogListLook():
-    args = getArgs()
-    data = checkArgs(args, ['file'])
-    if not data[0]:
-        return data[1]
-
-    data_dir = getDataDir()
-    my_bin = getServerDir() + '/bin'
-    my_binlog_cmd = my_bin + '/mysqlbinlog'
-
-    cmd = my_binlog_cmd + ' --no-defaults --base64-output=decode-rows -vvvv ' + \
-        data_dir + '/' + args['file'] + '|tail -50'
-
-    print(cmd)
 
 
 def cleanBinLog():
