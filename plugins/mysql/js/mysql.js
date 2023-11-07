@@ -1308,6 +1308,10 @@ function myBinLogsRender(page){
             list += '</td></tr>';
         }
 
+        if (rdata.data.length ==0){
+            list = '<tr><td colspan="4">无数据</td</tr>';
+        }
+
         $("#binlog_list tbody").html(list);
         $('#binlog_page').html(rdata.page);
 
