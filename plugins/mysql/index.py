@@ -2487,7 +2487,7 @@ def trySlaveSyncBugfix(version=''):
     # print(sql)
     sdb.query(sql)
     sdb.query('start slave')
-    return mw.returnJson(True, 'ok')
+    return mw.returnJson(True, '修复成功!')
 
 
 def getSlaveSyncCmd(version=''):

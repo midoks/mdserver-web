@@ -2346,11 +2346,16 @@ function masterOrSlaveConf(version=''){
                     <td>"+(info['Slave_SQL_Running_State'] == '' ? '无':info['Slave_SQL_Running_State']) +"</td>\
                 </tr>";
 
+
+                var btn_list = ['复制错误',"取消"];
+                if (info['Last_IO_Error'].search(/1236/i)>0){
+                    btn_list = ['复制错误',"取消","尝试修复"];
+                }
                 layer.open({
                     type: 1,
                     title: '同步异常信息',
                     area: ['600px','300px'],
-                    btn:['复制错误',"取消"],
+                    btn:btn_list,
                     content:"<form class='bt-form pd15'>\
                         <div class='divtable mtb10'>\
                         <div class='tablescroll'>\
@@ -2385,6 +2390,14 @@ function masterOrSlaveConf(version=''){
                             copyText(info['Slave_SQL_Running_State']);
                             return;
                         }
+                    },
+                    btn3:function(){
+                        myPost('try_slave_sync_bugfix', {}, function(data){
+                            var rdata = $.parseJSON(data.data);
+                            showMsg(rdata.msg, function(){
+                                masterOrSlaveConf();
+                            },{ icon: rdata.status ? 1 : 5 },2000);
+                        });
                     }
                 });
             });
