@@ -1346,6 +1346,14 @@ function myBinLogs(){
         </div>';
     $(".soft-man-con").html(con);
     myBinLogsRender(1);
+
+    $('.soft-man-con .relay_trace').click(function(){
+
+    });
+
+    $('.soft-man-con .binlog_trace').click(function(){
+
+    });
 }
 
 function myLogs(){
