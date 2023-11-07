@@ -1253,9 +1253,15 @@ function myBinRollingLogs(_name, func, _args, line){
                 clearInterval(reqTimer);
             }
         },
-        content:'<div class="change-default pd20" id="my_rolling_logs">\
-            <input class="bt-input-text mr5" type="text" name="password" id="MyPassword" style="width:330px" value="路径">\
-            <span class="ico-copy cursor btcopy" style="margin-left:10px" title="复制密码" onclick=''"></span>\
+        content:'\
+            <div class="change-default pd20" id="my_rolling_logs">\
+            <div class="divtable mtb10">\
+                <table class="table table-hover"><tr>\
+                <td>cmd</td>\
+                <td style="width:50px;"><span class="ico-copy cursor btcopy" title="复制密码"></span></td>\
+                <tr>\
+                </table>\
+            </div>\
             <textarea readonly="readonly" style="margin: 0px;width: 100%;height: 360px;background-color: #333;color:#fff; padding:0 5px" id="roll_info_log"></textarea>\
         </div>',
         success:function(){
