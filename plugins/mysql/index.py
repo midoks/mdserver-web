@@ -293,6 +293,14 @@ def getDataDir():
     return tmp.groups()[0].strip()
 
 
+def getLogBinName():
+    file = getConf()
+    content = mw.readFile(file)
+    rep = 'log-bin\s*=\s*(.*)'
+    tmp = re.search(rep, content)
+    return tmp.groups()[0].strip()
+
+
 def getPidFile():
     file = getConf()
     content = mw.readFile(file)
@@ -331,6 +339,68 @@ def binLog():
 
     mw.writeFile(conf, con)
     return mw.returnJson(True, '设置成功!')
+
+
+def binLogList():
+    args = getArgs()
+    data = checkArgs(args, ['page', 'page_size', 'tojs'])
+    if not data[0]:
+        return data[1]
+
+    page = int(args['page'])
+    page_size = int(args['page_size'])
+
+    data_dir = getDataDir()
+    log_bin_name = getLogBinName()
+
+    alist = os.listdir(data_dir)
+    log_bin_l = []
+    for x in range(len(alist)):
+        f = alist[x]
+        t = {}
+        if f.startswith(log_bin_name) and f != (log_bin_name + '.index'):
+            abspath = data_dir + '/' + f
+            t['name'] = f
+            t['size'] = os.path.getsize(abspath)
+            t['time'] = mw.getDataFromInt(os.path.getctime(abspath))
+            log_bin_l.append(t)
+
+    # print(log_bin_l)
+    # print(data_dir, log_bin_name)
+
+    count = len(log_bin_l)
+
+    page_start = (page - 1) * page_size
+    page_end = page_start + page_size
+    if page_end > count:
+        page_end = count
+
+    data = {}
+    page_args = {}
+    page_args['count'] = count
+    page_args['p'] = page
+    page_args['row'] = page_size
+    page_args['tojs'] = args['tojs']
+    data['page'] = mw.getPage(page_args)
+    data['data'] = log_bin_l[page_start:page_end]
+
+    return mw.getJson(data)
+
+
+def binLogListLook():
+    args = getArgs()
+    data = checkArgs(args, ['file'])
+    if not data[0]:
+        return data[1]
+
+    data_dir = getDataDir()
+    my_bin = getServerDir() + '/bin'
+    my_binlog_cmd = my_bin + '/mysqlbinlog'
+
+    cmd = my_binlog_cmd + ' --no-defaults --base64-output=decode-rows -vvvv ' + \
+        data_dir + '/' + args['file'] + '|tail -50'
+
+    print(cmd)
 
 
 def cleanBinLog():
@@ -3075,6 +3145,10 @@ if __name__ == "__main__":
         print(getConf())
     elif func == 'bin_log':
         print(binLog())
+    elif func == 'binlog_list':
+        print(binLogList())
+    elif func == 'binlog_look':
+        print(binLogListLook())
     elif func == 'clean_bin_log':
         print(cleanBinLog())
     elif func == 'error_log':
