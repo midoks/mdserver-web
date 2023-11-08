@@ -71,14 +71,59 @@ def getArgs():
             tmp[t[0]] = t[1]
     return tmp
 
+def checkArgs(data, ck=[]):
+    for i in range(len(ck)):
+        if not ck[i] in data:
+            return (False, mw.returnJson(False, '参数:(' + ck[i] + ')没有!'))
+    return (True, mw.returnJson(True, 'ok'))
+
+def configTpl():
+    path = getPluginDir() + '/tpl'
+    pathFile = os.listdir(path)
+    tmp = []
+    for one in pathFile:
+        file = path + '/' + one
+        tmp.append(file)
+    return mw.getJson(tmp)
+
+
+def readConfigTpl():
+    args = getArgs()
+    data = checkArgs(args, ['file'])
+    if not data[0]:
+        return data[1]
+
+    content = mw.readFile(args['file'])
+    content = contentReplace(content)
+    return mw.returnJson(True, 'ok', content)
+
+def getPidFile():
+    file = getConf()
+    content = mw.readFile(file)
+    rep = 'pidfile\s*(.*)'
+    tmp = re.search(rep, content)
+    return tmp.groups()[0].strip()
 
 def status():
-    data = mw.execShell(
-        "ps aux|grep redis |grep -v grep | grep -v python | grep -v mdserver-web | awk '{print $2}'")
-
-    if data[0] == '':
+    pid_file = getPidFile()
+    if not os.path.exists(pid_file):
         return 'stop'
+
+    # data = mw.execShell(
+    #     "ps aux|grep redis |grep -v grep | grep -v python | grep -v mdserver-web | awk '{print $2}'")
+
+    # if data[0] == '':
+    #     return 'stop'
     return 'start'
+
+def contentReplace(content):
+    service_path = mw.getServerDir()
+    content = content.replace('{$ROOT_PATH}', mw.getRootDir())
+    content = content.replace('{$SERVER_PATH}', service_path)
+    content = content.replace('{$SERVER_APP}', service_path + '/redis')
+    content = content.replace('{$REDIS_PASS}', mw.getRandomString(10))
+    return content
+
 
 
 def initDreplace():
@@ -298,13 +343,15 @@ def getRedisConfInfo():
     conf = getServerDir() + '/redis.conf'
 
     gets = [
-        {'name': 'bind', 'type': 2, 'ps': '绑定IP(修改绑定IP可能会存在安全隐患)'},
-        {'name': 'port', 'type': 2, 'ps': '绑定端口'},
-        {'name': 'timeout', 'type': 2, 'ps': '空闲链接超时时间,0表示不断开'},
-        {'name': 'maxclients', 'type': 2, 'ps': '最大输入时间'},
-        {'name': 'databases', 'type': 2, 'ps': '数据库数量'},
-        {'name': 'requirepass', 'type': 2, 'ps': 'redis密码,留空代表没有设置密码'},
-        {'name': 'maxmemory', 'type': 2, 'ps': 'MB,最大使用内存,0表示不限制'}
+        {'name': 'bind', 'type': 2, 'ps': '绑定IP(修改绑定IP可能会存在安全隐患)','must_show':1},
+        {'name': 'port', 'type': 2, 'ps': '绑定端口','must_show':1},
+        {'name': 'timeout', 'type': 2, 'ps': '空闲链接超时时间,0表示不断开','must_show':1},
+        {'name': 'maxclients', 'type': 2, 'ps': '最大输入时间','must_show':1},
+        {'name': 'databases', 'type': 2, 'ps': '数据库数量','must_show':1},
+        {'name': 'requirepass', 'type': 2, 'ps': 'redis密码,留空代表没有设置密码','must_show':1},
+        {'name': 'maxmemory', 'type': 2, 'ps': 'MB,最大使用内存,0表示不限制','must_show':1},
+        {'name': 'slaveof', 'type': 2, 'ps': '同步主库地址','must_show':0},
+        {'name': 'masterauth', 'type': 2, 'ps': '同步主库密码', 'must_show':0}
     ]
     content = mw.readFile(conf)
 
@@ -313,6 +360,9 @@ def getRedisConfInfo():
         rep = "^(" + g['name'] + ')\s*([.0-9A-Za-z_& ~]+)'
         tmp = re.search(rep, content, re.M)
         if not tmp:
+            if g['must_show'] == 0:
+                continue
+
             g['value'] = ''
             result.append(g)
             continue
@@ -331,7 +381,7 @@ def getRedisConf():
 
 def submitRedisConf():
     gets = ['bind', 'port', 'timeout', 'maxclients',
-            'databases', 'requirepass', 'maxmemory']
+            'databases', 'requirepass', 'maxmemory','slaveof','masterauth']
     args = getArgs()
     conf = getServerDir() + '/redis.conf'
     content = mw.readFile(conf)
@@ -383,5 +433,9 @@ if __name__ == "__main__":
         print(getRedisConf())
     elif func == 'submit_redis_conf':
         print(submitRedisConf())
+    elif func == 'config_tpl':
+        print(configTpl())
+    elif func == 'read_config_tpl':
+        print(readConfigTpl())
     else:
         print('error')

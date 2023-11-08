@@ -4,6 +4,7 @@
 		<div class="bt-w-menu">
 			<p class="bgw" onclick="pluginService('redis');">服务</p>
 			<p onclick="pluginInitD('redis');">自启动</p>
+			<p onclick="pluginConfigTpl('redis',$('.plugin_version').attr('version'));">配置修改[DEV]</p>
 			<p onclick="pluginConfig('redis');">配置修改</p>
 			<p onclick="getRedisConfig($('.plugin_version').attr('version'));">性能调整</p>
 			<p onclick="redisStatus($('.plugin_version').attr('version'));">负载状态</p>
