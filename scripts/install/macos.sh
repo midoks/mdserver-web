@@ -1,5 +1,5 @@
 #!/bin/bash
-PATH=/bin:/sbin:/usr/bin:/usr/sbin:/usr/local/bin:/usr/local/sbin:~/bin
+PATH=/bin:/sbin:/usr/bin:/usr/sbin:/usr/local/bin:/usr/local/sbin:~/bin:/opt/homebrew/bin
 export PATH
 LANG=en_US.UTF-8
 
@@ -22,6 +22,7 @@ if [ "$?" != "0" ];then
 	brew install mysql
 fi
 
+brew install md5sum libevent pidof bison
 brew install libzip bzip2 gcc openssl re2c cmake
 
 

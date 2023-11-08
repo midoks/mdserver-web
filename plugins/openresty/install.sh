@@ -2,6 +2,7 @@
 PATH=/bin:/sbin:/usr/bin:/usr/sbin:/usr/local/bin:/usr/local/sbin:~/bin:/opt/homebrew/bin
 export PATH
 
+# cd /Users/midoks/Desktop/mwdev/server/mdserver-web/plugins/openresty && bash install.sh install 1.21.4.2
 # cd /www/server/mdserver-web/plugins/openresty && bash install.sh install 1.21.4.2
 
 curPath=`pwd`
@@ -9,7 +10,7 @@ rootPath=$(dirname "$curPath")
 rootPath=$(dirname "$rootPath")
 serverPath=$(dirname "$rootPath")
 
-
+sysName=`uname`
 action=$1
 type=$2
 
@@ -23,6 +24,12 @@ if id www &> /dev/null ;then
 else
     groupadd www
 	useradd -g www -s /bin/bash www
+fi
+
+if [ "$sysName" == "Darwin" ];then
+	BAK='_bak'
+else
+	BAK=''
 fi
 
 Install_openresty()
@@ -57,7 +64,7 @@ Install_openresty()
 	# ----- cpu end ------
 
 	mkdir -p ${openrestyDir}
-	echo '正在安装脚本文件...' > $install_tmp
+	echo '正在安装脚本文件...'
 
 	# wget -O openresty-1.21.4.1.tar.gz https://openresty.org/download/openresty-1.21.4.1.tar.gz
 	if [ ! -f ${openrestyDir}/openresty-${VERSION}.tar.gz ];then
@@ -79,7 +86,39 @@ Install_openresty()
 
 	OPTIONS=''
 	if [ "$VERSION" == "1.19.3.1" ]; then
-		OPTIONS=" ${OPTIONS} --with-ipv6 "
+		OPTIONS="${OPTIONS} --with-ipv6"
+	fi
+
+
+	opensslVersion="1.1.1p"
+	pcreVersion='8.38'
+	if [ "$sysName" == "Darwin" ];then
+
+		if [ ! -f ${openrestyDir}/pcre-${pcreVersion}.tar.gz ];then
+			wget --no-check-certificate -O ${openrestyDir}/pcre-${pcreVersion}.tar.gz https://netix.dl.sourceforge.net/project/pcre/pcre/${pcreVersion}/pcre-${pcreVersion}.tar.gz
+		fi
+
+		if [ ! -d ${openrestyDir}/pcre-${pcreVersion} ];then
+			cd ${openrestyDir} &&  tar -zxvf pcre-${pcreVersion}.tar.gz
+		fi
+		OPTIONS="${OPTIONS} --with-pcre=${openrestyDir}/pcre-${pcreVersion}"
+
+
+		if [ ! -f ${openrestyDir}/openssl-${opensslVersion}.tar.gz ];then
+	        wget --no-check-certificate -O ${openrestyDir}/openssl-${opensslVersion}.tar.gz https://www.openssl.org/source/openssl-${opensslVersion}.tar.gz
+	    fi
+
+	    if [ ! -d ${openrestyDir}/openssl-${opensslVersion} ];then
+			cd ${openrestyDir} &&  tar -zxvf openssl-${opensslVersion}.tar.gz
+		fi
+	    OPTIONS="${OPTIONS} --with-openssl=${openrestyDir}/openssl-${opensslVersion}"
+
+		# BREW_DIR=`which brew`
+		# BREW_DIR=${BREW_DIR/\/bin\/brew/}
+
+		# brew info openssl@1.1 | grep /opt/homebrew/Cellar/openssl@1.1 | cut -d \  -f 1 | awk 'END {print}'
+		# OPENSSL_LIB_DEPEND_DIR=`brew info openssl@1.1 | grep ${BREW_DIR}/Cellar/openssl@1.1 | cut -d \  -f 1 | awk 'END {print}'`
+		# OPTIONS="${OPTIONS} --with-openssl=${OPENSSL_LIB_DEPEND_DIR}"
 	fi
 
 	# --with-openssl=$serverPath/source/lib/openssl-1.0.2q
@@ -113,9 +152,17 @@ Install_openresty()
 		#初始化 
 		cd ${rootPath} && python3 ${rootPath}/plugins/openresty/index.py start
 		cd ${rootPath} && python3 ${rootPath}/plugins/openresty/index.py initd_install
-		rm -rf $openrestyDir
+		rm -rf $openrestyDir/openresty-${VERSION}
     fi
-	echo '安装完成' > $install_tmp
+
+    if [ -d ${openrestyDir}/pcre-${pcreVersion} ];then
+    	rm -rf ${openrestyDir}/pcre-${pcreVersion}
+    fi
+
+    if [ -d ${openrestyDir}/openssl-${opensslVersion} ];then
+    	rm -rf ${openrestyDir}/openssl-${opensslVersion}
+    fi
+	echo '安装完成'
 }
 
 Uninstall_openresty()
@@ -133,7 +180,7 @@ Uninstall_openresty()
 	fi
 
 	rm -rf $serverPath/openresty
-	echo '卸载完成' > $install_tmp
+	echo '卸载完成'
 }
 
 action=$1

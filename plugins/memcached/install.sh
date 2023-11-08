@@ -1,6 +1,5 @@
 #!/bin/bash
-
-PATH=/bin:/sbin:/usr/bin:/usr/sbin:/usr/local/bin:/usr/local/sbin:~/bin
+PATH=/bin:/sbin:/usr/bin:/usr/sbin:/usr/local/bin:/usr/local/sbin:~/bin:/opt/homebrew/bin
 export PATH
 
 curPath=`pwd`
@@ -9,8 +8,10 @@ rootPath=$(dirname "$rootPath")
 serverPath=$(dirname "$rootPath")
 
 install_tmp=${rootPath}/tmp/mw_install.pl
-
+sys_os=`uname`
 VERSION=1.6.22
+
+echo $sys_os
 
 Install_mem(){
 	mkdir -p $serverPath/source
@@ -23,9 +24,18 @@ Install_mem(){
 	
 	cd $serverPath/source && tar -zxvf memcached.tar.gz
 
-	
+	OPTIONS=''
+	if [ ${sys_os} == "Darwin" ]; then
+		LIB_DEPEND_DIR=`brew info libevent | grep /opt/homebrew/Cellar/libevent | cut -d \  -f 1 | awk 'END {print}'`
+		OPTIONS="${OPTIONS} --with-libevent=${LIB_DEPEND_DIR}"
+	fi
+
 	echo "./configure --prefix=${serverPath}/memcached && make && make install"
-	cd $serverPath/source/memcached-${VERSION} && ./configure --prefix=$serverPath/memcached && make && make install
+	cd $serverPath/source/memcached-${VERSION}
+	./configure --prefix=$serverPath/memcached \
+	$OPTIONS
+
+	make && make install
 
 	if [ -d $serverPath/memcached ];then
 		echo '1.6' > $serverPath/memcached/version.pl

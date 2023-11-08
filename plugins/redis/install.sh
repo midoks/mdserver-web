@@ -8,8 +8,10 @@ rootPath=$(dirname "$rootPath")
 serverPath=$(dirname "$rootPath")
 
 
-install_tmp=${rootPath}/tmp/mw_install.pl
+# cd /Users/midoks/Desktop/mwdev/server/mdserver-web/plugins/redis && bash install.sh install 7.2.2
 
+
+install_tmp=${rootPath}/tmp/mw_install.pl
 VERSION=$2
 
 Install_App()
@@ -23,8 +25,7 @@ Install_App()
 	
 	cd $serverPath/source && tar -zxvf redis-${VERSION}.tar.gz
 
-	mkdir -p $serverPath/redis
-	mkdir -p $serverPath/redis/data
+	
 
 	CMD_MAKE=`which gmake`
 	if [ "$?" == "0" ];then
@@ -32,16 +33,22 @@ Install_App()
 	else
 		cd redis-${VERSION} && make PREFIX=$serverPath/redis install
 	fi
-	sed '/^ *#/d' redis.conf > $serverPath/redis/redis.conf
 
 	if [ -d $serverPath/redis ];then
-		echo "${VERSION}" > $serverPath/redis/version.pl
-		echo '安装完成' > $install_tmp
+		mkdir -p $serverPath/redis/data
+		sed '/^ *#/d' redis.conf > $serverPath/redis/redis.conf
 
+		echo "${VERSION}" > $serverPath/redis/version.pl
+		echo '安装完成'
 
 		cd ${rootPath} && python3 ${rootPath}/plugins/redis/index.py start
 		cd ${rootPath} && python3 ${rootPath}/plugins/redis/index.py initd_install
+		
+	else
+		echo '安装失败!'
+	fi
 
+	if [ -d $serverPath/source/redis-${VERSION} ];then
 		rm -rf $serverPath/source/redis-${VERSION}
 	fi
 }

@@ -14,7 +14,7 @@ sysName=`uname`
 install_tmp=${rootPath}/tmp/mw_install.pl
 mariadbDir=${serverPath}/source/mariadb
 
-MY_VER=10.8.7
+MY_VER=11.2.1
 
 Install_app()
 {
@@ -63,6 +63,7 @@ Install_app()
 	# 	wget --no-check-certificate -O ${mariadbDir}/mariadb-${MY_VER}.tar.gz --tries=3 https://mirrors.aliyun.com/mariadb/mariadb-${MY_VER}/source/mariadb-${MY_VER}.tar.gz
 	# fi
 
+	# https://downloads.mariadb.org/interstitial/mariadb-10.9.1/source/mariadb-10.9.1.tar.gz
 	if [ ! -f ${mariadbDir}/mariadb-${MY_VER}.tar.gz ];then
 		wget --no-check-certificate -O ${mariadbDir}/mariadb-${MY_VER}.tar.gz --tries=3 https://archive.mariadb.org/mariadb-${MY_VER}/source/mariadb-${MY_VER}.tar.gz
 	fi
@@ -71,9 +72,17 @@ Install_app()
 		 cd ${mariadbDir} && tar -zxvf  ${mariadbDir}/mariadb-${MY_VER}.tar.gz
 	fi
 	
+	INSTALL_CMD=cmake
+	# check cmake version
+	CMAKE_VERSION=`cmake -version | grep version | awk '{print $3}' | awk -F '.' '{print $1}'`
+	if [ "$CMAKE_VERSION" -eq "2" ];then
+		mkdir -p /var/log/mariadb
+		touch /var/log/mariadb/mariadb.log
+		INSTALL_CMD=cmake3
+	fi
 
 	if [ ! -d $serverPath/mariadb ];then
-		cd ${mariadbDir}/mariadb-${MY_VER} && cmake \
+		cd ${mariadbDir}/mariadb-${MY_VER} && ${INSTALL_CMD} \
 		-DCMAKE_INSTALL_PREFIX=$serverPath/mariadb \
 		-DMYSQL_DATADIR=$serverPath/mariadb/data/ \
 		-DMYSQL_USER=mysql \
@@ -91,7 +100,7 @@ Install_app()
 		make -j${cpuCore} && make install && make clean
 
 		if [ -d $serverPath/mariadb ];then
-			echo '10.8' > $serverPath/mariadb/version.pl
+			echo '10.11' > $serverPath/mariadb/version.pl
 			echo '安装完成'
 		else
 			echo '安装失败'
@@ -103,6 +112,7 @@ Install_app()
 	if [ -d ${mariadbDir}/mariadb-${MY_VER} ];then
 		rm -rf ${mariadbDir}/mariadb-${MY_VER}
 	fi
+
 }
 
 Uninstall_app()
