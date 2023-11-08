@@ -15,11 +15,6 @@ startTime=`date +%s`
 _os=`uname`
 echo "use system: ${_os}"
 
-if [ "$EUID" -ne 0 ]
-  then echo "Please run as root!"
-  exit
-fi
-
 if [ ${_os} == "Darwin" ]; then
 	OSNAME='macos'
 elif grep -Eqi "openSUSE" /etc/*-release; then
@@ -56,6 +51,11 @@ elif grep -Eqi "Ubuntu" /etc/issue || grep -Eqi "Ubuntu" /etc/os-release; then
 	apt install -y wget curl zip unzip tar cron
 else
 	OSNAME='unknow'
+fi
+
+if [ "$EUID" -ne 0 ] && [ "$OSNAME" != "macos" ];then 
+	echo "Please run as root!"
+ 	exit
 fi
 
 
