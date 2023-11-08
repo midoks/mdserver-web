@@ -301,30 +301,6 @@ mw_debug(){
 }
 
 
-# choose mysql login
-
-declare -A DB_TYPE
-
-if [ -d "${ROOT_PATH}/mysql" ];then
-    DB_TYPE["mysql"]="mysql"
-fi
-
-if [ -d "${ROOT_PATH}/mariadb" ];then
-    DB_TYPE["mariadb"]="mariadb"
-fi
-
-if [ -d "${ROOT_PATH}/mysql-apt" ];then
-    DB_TYPE["mysql-apt"]="mysql-apt"
-fi
-
-if [ -d "${ROOT_PATH}/mysql-yum" ];then
-    DB_TYPE["mysql-yum"]="mysql-yum"
-fi
-
-SOURCE_LIST_KEY_SORT_TMP=$(echo ${!DB_TYPE[@]} | tr ' ' '\n' | sort -n)
-SOURCE_LIST_KEY=(${SOURCE_LIST_KEY_SORT_TMP//'\n'/})
-SOURCE_LIST_LEN=${#DB_TYPE[*]}
-
 function AutoSizeStr(){
     NAME_STR=$1
     NAME_NUM=$2
@@ -343,6 +319,30 @@ function AutoSizeStr(){
 }
 
 mw_connect_mysql(){
+    # choose mysql login
+
+    declare -A DB_TYPE
+
+    if [ -d "${ROOT_PATH}/mysql" ];then
+        DB_TYPE["mysql"]="mysql"
+    fi
+
+    if [ -d "${ROOT_PATH}/mariadb" ];then
+        DB_TYPE["mariadb"]="mariadb"
+    fi
+
+    if [ -d "${ROOT_PATH}/mysql-apt" ];then
+        DB_TYPE["mysql-apt"]="mysql-apt"
+    fi
+
+    if [ -d "${ROOT_PATH}/mysql-yum" ];then
+        DB_TYPE["mysql-yum"]="mysql-yum"
+    fi
+
+    SOURCE_LIST_KEY_SORT_TMP=$(echo ${!DB_TYPE[@]} | tr ' ' '\n' | sort -n)
+    SOURCE_LIST_KEY=(${SOURCE_LIST_KEY_SORT_TMP//'\n'/})
+    SOURCE_LIST_LEN=${#DB_TYPE[*]}
+
     if [ "$SOURCE_LIST_LEN" == "0" ]; then
         echo -e "no data!"
         exit 1
