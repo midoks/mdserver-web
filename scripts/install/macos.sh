@@ -15,7 +15,8 @@ mkdir -p $DEV/backup/database
 mkdir -p $DEV/backup/site
 
 # install brew
-if [ ! -f /usr/local/bin/brew ];then
+which brew
+if [ "$?" != "0" ];then
 	/usr/bin/ruby -e "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install)"
 	brew install python@2
 	brew install mysql
