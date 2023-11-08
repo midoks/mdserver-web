@@ -46,6 +46,10 @@ mw_start(){
 
 
 mw_start_debug(){
+	if [ ! -f $DIR/logs/task.log ];then
+		echo '' > $DIR/logs/task.log
+	fi
+
 	python3 task.py >> $DIR/logs/task.log 2>&1 &
 	port=7200    
     if [ -f /www/server/mdserver-web/data/port.pl ];then
