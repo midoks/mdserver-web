@@ -19,11 +19,6 @@ startTime=`date +%s`
 _os=`uname`
 echo "use system: ${_os}"
 
-if [ "$EUID" -ne 0 ]
-  then echo "Please run as root!"
-  exit
-fi
-
 
 if [ ${_os} == "Darwin" ]; then
 	OSNAME='macos'
@@ -62,6 +57,10 @@ else
 	OSNAME='unknow'
 fi
 
+if [ "$EUID" -ne 0 ] && [ "$OSNAME" != "macos" ];then 
+	echo "Please run as root!"
+ 	exit
+fi
 
 # HTTP_PREFIX="https://"
 # LOCAL_ADDR=common
