@@ -103,7 +103,8 @@ def contentReplace(content):
 
 def status():
     data = mw.execShell(
-        "ps -ef|grep sphinx |grep -v grep | grep -v python | awk '{print $2}'")
+        "ps -ef|grep sphinx |grep -v grep | grep -v mdserver-web | awk '{print $2}'")
+    # print(data)
     if data[0] == '':
         return 'stop'
     return 'start'
