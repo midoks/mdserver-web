@@ -354,6 +354,7 @@ def infoReplication():
 
 def clusterInfo():
     #集群信息
+    # https://redis.io/commands/cluster-info/
     s = status()
     if s == 'stop':
         return mw.returnJson(False, '未启动')
