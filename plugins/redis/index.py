@@ -229,7 +229,7 @@ def getPort():
 
 
 def getRedisCmd():
-    equirepass = ""
+    requirepass = ""
     conf = getServerDir() + '/redis.conf'
     content = mw.readFile(conf)
     rep = "^(requirepass" + ')\s*([.0-9A-Za-z_& ~]+)'
@@ -243,7 +243,7 @@ def getRedisCmd():
     # if findDebian[0] != '':
     #     default_ip = mw.getLocalIp()
     cmd = getServerDir() + "/bin/redis-cli -h " + \
-        default_ip + ' -p ' + port + " info"
+        default_ip + ' -p ' + port + " "
 
     if requirepass != "":
         cmd = getServerDir() + '/bin/redis-cli -h ' + default_ip + \
@@ -335,7 +335,7 @@ def infoReplication():
             continue
         result[t[0]] = t[1]
 
-    if result['role'] == 'master':
+    if 'role' in result and result['role'] == 'master':
         connected_slaves = int(result['connected_slaves'])
         slave_l = [] 
         for x in range(connected_slaves):
