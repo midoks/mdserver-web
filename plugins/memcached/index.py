@@ -92,8 +92,10 @@ def checkArgs(data, ck=[]):
 
 
 def status():
-    data = mw.execShell(
-        "ps aux|grep " + getPluginName() + " |grep -v grep | grep -v python | awk '{print $2}'")
+    cmd = "ps aux|grep " + getPluginName() + " |grep -v grep | grep -v mdserver-web | awk '{print $2}'"
+    # print(cmd)
+    data = mw.execShell(cmd)
+    # print(data)
     if data[0] == '':
         return 'stop'
     return 'start'
