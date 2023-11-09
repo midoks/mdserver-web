@@ -118,6 +118,7 @@ function replStatus(version){
             'repl_backlog_first_byte_offset':'第一个字节偏移量',
             'repl_backlog_histlen':'backlog中数据的长度',
             'repl_backlog_active':'开启复制缓冲区',
+            'slave_priority':'同步优先级',
         }
 
         var tbody_text = '';
