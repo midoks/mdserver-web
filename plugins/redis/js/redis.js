@@ -94,30 +94,40 @@ function replStatus(version){
         //     return;
         // }
 
+        var kv = {
+            'role':'角色',
+            'master_host':'连接主库HOST',
+            'master_port':'连接主库PORT',
+            'master_link_status':'连接主库状态',
+            'master_last_io_seconds_ago':'上次同步时间',
+            'master_sync_in_progress':'正在同步中',
+            'slave_read_repl_offset':'从库读取复制位置',
+            'slave_repl_offset':'从库读取复制位置',
+            'slave_read_only':'从库是否仅读',
+            'replica_announced':'已复制副本',
+            'connected_slaves':'连接数量',
+            'master_failover_state':'主库故障状态',
+            'master_replid':'主库复制ID',
+            'master_repl_offset':'主库复制位置',
+            'repl_backlog_size':'主库复制位置时间',
+            'second_repl_offset':'主库复制位置时间',
+            'repl_backlog_first_byte_offset':'第一个字节偏移量',
+            'repl_backlog_histlen':'backlog中数据的长度',
+        }
+
+        var tbody_text = '';
+        for (k in rdata){
+            if (k == 'master_replid'){
+                tbody_text += '<tr><th>'+k+'</th><td class="overflow_hide" style="width:70px;display: inline-block;border: none;">' + rdata[k] + '</td><td>'+kv[k]+'</td></tr>';
+            } else{
+                tbody_text += '<tr><th>'+k+'</th><td>' + rdata[k] + '</td><td>'+kv[k]+'</td></tr>';
+            }   
+        }
+
         var con = '<div class="divtable">\
                         <table class="table table-hover table-bordered" style="width: 490px;">\
                         <thead><th style="width:80px;">字段</th><th style="width:80px;">当前值</th><th>说明</th></thead>\
-                        <tbody>\
-                            <tr><th>role</th><td>' + rdata.role + '</td><td>角色</td></tr>\
-                            <tr><th>master_host</th><td>' + rdata.master_host + '</td><td>连接主库HOST</td></tr>\
-                            <tr><th>master_port</th><td>' + rdata.master_port + '</td><td>连接主库PORT</td></tr>\
-                            <tr><th>master_link_status</th><td>' + rdata.master_link_status + '</td><td>连接主库状态</td></tr>\
-                            <tr><th>master_last_io_seconds_ago</th><td>' + rdata.master_last_io_seconds_ago + '</td><td>上次同步时间</td></tr>\
-                            <tr><th>master_sync_in_progress</th><td>' +rdata.master_sync_in_progress + '</td><td>正在同步中</td></tr>\
-                            <tr><th>slave_read_repl_offset</th><td>' + rdata.slave_read_repl_offset + '</td><td>从库读取复制位置</td></tr>\
-                            <tr><th>slave_repl_offset</th><td>' + rdata.slave_repl_offset + '</td><td>从库复制位置</td></tr>\
-                            <tr><th>slave_priority</th><td>' + rdata.slave_priority + '</td><td>从库同步优先级</td></tr>\
-                            <tr><th>slave_read_only</th><td>' + rdata.slave_read_only + '</td><td>从库是否仅读</td></tr>\
-                            <tr><th>replica_announced</th><td>' + rdata.replica_announced + '</td><td>已复制副本</td></tr>\
-                            <tr><th>connected_slaves</th><td>' + rdata.connected_slaves + '</td><td>连接数量</td></tr>\
-                            <tr><th>master_failover_state</th><td>'+rdata.master_failover_state+'</td><td>主库故障状态</td></tr>\
-                            <tr><td>master_replid</td><td class="overflow_hide" style="width:70px;display: inline-block;border: none;">' + rdata.master_replid + '</td><td>主库复制ID</td></tr>\
-                            <tr><th>master_repl_offset</th><td>'+rdata.master_repl_offset+'</td><td>主库复制位置</td></tr>\
-                            <tr><th>second_repl_offset</th><td>'+rdata.second_repl_offset+'</td><td>主库复制位置时间</td></tr>\
-                            <tr><th>repl_backlog_size</th><td>'+rdata.repl_backlog_size+'</td><td>复制大小</td></tr>\
-                            <tr><th>repl_backlog_first_byte_offset</th><td>'+rdata.repl_backlog_first_byte_offset+'</td><td>第一个字节偏移量</td></tr>\
-                            <tr><th>repl_backlog_histlen</th><td>'+rdata.repl_backlog_histlen+'</td><td>backlog中数据的长度</td></tr>\
-                        <tbody>\
+                        <tbody>'+tbody_text+'<tbody>\
                 </table></div>';
         $(".soft-man-con").html(con);
     });
