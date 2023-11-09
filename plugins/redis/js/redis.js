@@ -59,6 +59,11 @@ function redisStatus(version) {
     redisPost('run_info',version, {},function(data){
         var rdata = $.parseJSON(data.data);
 
+        if (!rdata.status){
+            layer.msg(rdata.msg,{icon:0,time:2000,shade: [0.3, '#000']});
+            return;
+        }
+
         hit = (parseInt(rdata.keyspace_hits) / (parseInt(rdata.keyspace_hits) + parseInt(rdata.keyspace_misses)) * 100).toFixed(2);
         var con = '<div class="divtable">\
                         <table class="table table-hover table-bordered" style="width: 490px;">\
@@ -89,10 +94,10 @@ function replStatus(version){
         var rdata = $.parseJSON(data.data);
 
         console.log(rdata)
-        // if (!rdata.status){
-        //     layer.msg(data.msg,{icon:0,time:2000,shade: [0.3, '#000']});
-        //     return;
-        // }
+        if (!rdata.status){
+            layer.msg(rdata.msg,{icon:0,time:2000,shade: [0.3, '#000']});
+            return;
+        }
 
         var kv = {
             'role':'角色',
@@ -113,20 +118,28 @@ function replStatus(version){
             'second_repl_offset':'主库复制位置时间',
             'repl_backlog_first_byte_offset':'第一个字节偏移量',
             'repl_backlog_histlen':'backlog中数据的长度',
+            'repl_backlog_active':'开启复制缓冲区',
         }
 
         var tbody_text = '';
         for (k in rdata){
             if (k == 'master_replid'){
-                tbody_text += '<tr><th>'+k+'</th><td class="overflow_hide" style="width:70px;display: inline-block;border: none;">' + rdata[k] + '</td><td>'+kv[k]+'</td></tr>';
+                tbody_text += '<tr><th>'+k+'</th><td class="overflow_hide" style="width:155px;display: inline-block;border: none;">' + rdata[k] + '</td><td>'+kv[k]+'</td></tr>';
             } else{
-                tbody_text += '<tr><th>'+k+'</th><td>' + rdata[k] + '</td><td>'+kv[k]+'</td></tr>';
+
+                if (k.substring(0,5) == 'slave'){
+                    tbody_text += '<tr><th>'+k+'</th><td class="overflow_hide" style="width:155px;display: inline-block;border: none;" title="'+rdata[k]+'">' + rdata[k] + '</td><td>从库配置信息</td></tr>';
+                } else{
+                    tbody_text += '<tr><th>'+k+'</th><td>' + rdata[k] + '</td><td>'+kv[k]+'</td></tr>';
+                }
+
+                
             }   
         }
 
         var con = '<div class="divtable">\
                         <table class="table table-hover table-bordered" style="width: 490px;">\
-                        <thead><th style="width:80px;">字段</th><th style="width:80px;">当前值</th><th>说明</th></thead>\
+                        <thead><th style="width:80px;">字段</th><th style="width:90px;">当前值</th><th>说明</th></thead>\
                         <tbody>'+tbody_text+'<tbody>\
                 </table></div>';
         $(".soft-man-con").html(con);
