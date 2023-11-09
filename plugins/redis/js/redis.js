@@ -144,6 +144,53 @@ function replStatus(version){
         $(".soft-man-con").html(con);
     });
 }
+
+function clusterStatus(version){
+    redisPost('cluster_info', version, {},function(data){
+        var rdata = $.parseJSON(data.data);
+
+        if ('status' in rdata && !rdata.status){
+            layer.msg(rdata.msg,{icon:0,time:2000,shade: [0.3, '#000']});
+            return;
+        }
+
+        var kv = {
+            'cluster_state':'集群状态',
+            'cluster_slots_assigned':'被分配的槽',
+            'cluster_slots_ok':'被分配的槽状态',
+            'cluster_known_nodes':'知道的节点',
+            'cluster_size':'大小',
+            'cluster_stats_messages_sent':'发送',
+            'cluster_stats_messages_received':'接收',
+            'cluster_current_epoch':'集群当前epoch',
+            'cluster_my_epoch':'当前我的epoch',
+            'cluster_slots_pfail':'处于PFAIL状态的节点槽数',
+            'cluster_slots_fail':'处于FAIL状态的节点槽数',
+            'total_cluster_links_buffer_limit_exceeded':'超出缓冲区总数',
+        }
+
+        var tbody_text = '';
+        for (k in rdata){
+            var desc = k;
+            if (k in kv){
+                desc = kv[k];
+            }
+
+            if (k == 'master_replid'){
+                tbody_text += '<tr><th>'+k+'</th><td class="overflow_hide" style="width:155px;display: inline-block;border: none;">' + rdata[k] + '</td><td>'+desc+'</td></tr>';
+            } else{
+                tbody_text += '<tr><th>'+k+'</th><td>' + rdata[k] + '</td><td>'+desc+'</td></tr>';
+            }   
+        }
+
+        var con = '<div class="divtable">\
+                        <table class="table table-hover table-bordered" style="width: 490px;">\
+                        <thead><th style="width:80px;">字段</th><th style="width:90px;">当前值</th><th>说明</th></thead>\
+                        <tbody>'+tbody_text+'<tbody>\
+                </table></div>';
+        $(".soft-man-con").html(con);
+    });
+}
 //redis状态 end
 
 //配置修改

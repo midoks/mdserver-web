@@ -352,6 +352,46 @@ def infoReplication():
     return mw.getJson(result)
 
 
+def clusterInfo():
+    #集群信息
+    s = status()
+    if s == 'stop':
+        return mw.returnJson(False, '未启动')
+
+    cmd = getRedisCmd()
+    cmd = cmd + 'cluster info'
+
+    # print(cmd)
+    data = mw.execShell(cmd)[0]
+    # print(data)
+
+    res = [
+        'cluster_state',#状态
+        'cluster_slots_assigned',  # 被分配的槽
+        'cluster_slots_ok',  # 被分配的槽状态
+        'cluster_slots_pfail',  # 连接主库状态
+        'cluster_slots_fail',  # 失败的槽
+        'cluster_known_nodes',  # 知道的节点
+        'cluster_size',  # 大小
+        'cluster_current_epoch',  # 
+        'cluster_my_epoch',  # 
+        'cluster_stats_messages_sent',  # 发送
+        'cluster_stats_messages_received',  # 接受
+        'total_cluster_links_buffer_limit_exceeded',  #
+    ]
+
+    data = data.split("\n")
+    result = {}
+    for d in data:
+        if len(d) < 3:
+            continue
+        t = d.strip().split(':')
+        if not t[0] in res:
+            continue
+        result[t[0]] = t[1]
+
+    return mw.getJson(result)
+
 def initdStatus():
     current_os = mw.getOs()
     if current_os == 'darwin':
@@ -496,6 +536,8 @@ if __name__ == "__main__":
         print(runInfo())
     elif func == 'info_replication':
         print(infoReplication())
+    elif func == 'cluster_info':
+        print(clusterInfo())
     elif func == 'conf':
         print(getConf())
     elif func == 'run_log':
