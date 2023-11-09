@@ -10,6 +10,9 @@ serverPath=$(dirname "$rootPath")
 
 # cd /Users/midoks/Desktop/mwdev/server/mdserver-web/plugins/redis && bash install.sh install 7.2.2
 
+# cmd查看| info replication
+# /Users/midoks/Desktop/mwdev/server/redis/bin/redis-cli -h 127.0.0.1 -p 6399
+# /www/server/redis/bin/redis-cli -h 127.0.0.1 -p 6399
 
 install_tmp=${rootPath}/tmp/mw_install.pl
 VERSION=$2
