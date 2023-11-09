@@ -228,13 +228,8 @@ def getPort():
     return '6379'
 
 
-def runInfo():
-    s = status()
-    if s == 'stop':
-        return mw.returnJson(False, '未启动')
-
-    requirepass = ""
-
+def getRedisCmd():
+    equirepass = ""
     conf = getServerDir() + '/redis.conf'
     content = mw.readFile(conf)
     rep = "^(requirepass" + ')\s*([.0-9A-Za-z_& ~]+)'
@@ -252,10 +247,22 @@ def runInfo():
 
     if requirepass != "":
         cmd = getServerDir() + '/bin/redis-cli -h ' + default_ip + \
-            ' -p ' + port + ' -a "' + requirepass + '" info'
+            ' -p ' + port + ' -a "' + requirepass + '" '
+
+    return cmd
+
+def runInfo():
+    s = status()
+    if s == 'stop':
+        return mw.returnJson(False, '未启动')
+
+    
+    cmd = getRedisCmd()
+    cmd = cmd + 'info'
 
     # print(cmd)
     data = mw.execShell(cmd)[0]
+    # print(data)
     res = [
         'tcp_port',
         'uptime_in_days',  # 已运行天数
@@ -280,6 +287,68 @@ def runInfo():
         if not t[0] in res:
             continue
         result[t[0]] = t[1]
+    return mw.getJson(result)
+
+def infoReplication():
+    # 复制信息
+    s = status()
+    if s == 'stop':
+        return mw.returnJson(False, '未启动')
+
+    cmd = getRedisCmd()
+    cmd = cmd + 'info replication'
+
+    # print(cmd)
+    data = mw.execShell(cmd)[0]
+    # print(data)
+    res = [
+        #slave
+        'role',#角色
+        'master_host',  # 连接主库HOST
+        'master_port',  # 连接主库PORT
+        'master_link_status',  # 连接主库状态
+        'master_last_io_seconds_ago',  # 上次同步时间
+        'master_sync_in_progress',  # 正在同步中
+        'slave_read_repl_offset',  # 从库读取复制位置
+        'slave_repl_offset',  # 从库复制位置
+        'slave_priority',  # 从库同步优先级
+        'slave_read_only',  # 从库是否仅读
+        'replica_announced',  # 已复制副本
+        'connected_slaves',  # 连接从库数量
+        'master_failover_state',  # 主库故障状态
+        'master_replid',  # 主库复制ID
+        'master_repl_offset',  # 主库复制位置
+        'second_repl_offset',  # 主库复制位置时间
+        'repl_backlog_active',  # 复制状态
+        'repl_backlog_size',  # 复制大小
+        'repl_backlog_first_byte_offset',  # 第一个字节偏移量
+        'repl_backlog_histlen',  # backlog中数据的长度
+    ]
+
+    data = data.split("\n")
+    result = {}
+    for d in data:
+        if len(d) < 3:
+            continue
+        t = d.strip().split(':')
+        if not t[0] in res:
+            continue
+        result[t[0]] = t[1]
+
+    if result['role'] == 'master':
+        connected_slaves = int(result['connected_slaves'])
+        slave_l = [] 
+        for x in range(connected_slaves):
+            slave_l.append('slave'+str(x))
+
+        for d in data:
+            if len(d) < 3:
+                continue
+            t = d.strip().split(':')
+            if not t[0] in slave_l:
+                continue
+            result[t[0]] = t[1]
+
     return mw.getJson(result)
 
 
@@ -425,6 +494,8 @@ if __name__ == "__main__":
         print(initdUinstall())
     elif func == 'run_info':
         print(runInfo())
+    elif func == 'info_replication':
+        print(infoReplication())
     elif func == 'conf':
         print(getConf())
     elif func == 'run_log':

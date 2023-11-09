@@ -1,3 +1,12 @@
+<style>
+.overflow_hide {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    vertical-align: middle;
+}
+</style>
+
 <div class="bt-form">
 	<div class='plugin_version'></div>
 	<div class="bt-w-main">
@@ -8,10 +17,11 @@
 			<p onclick="pluginConfig('redis');">配置修改</p>
 			<p onclick="getRedisConfig($('.plugin_version').attr('version'));">性能调整</p>
 			<p onclick="redisStatus($('.plugin_version').attr('version'));">负载状态</p>
+			<p onclick="replStatus($('.plugin_version').attr('version'));">复制状态</p>
 			<p onclick="pluginLogs('redis','','run_log');">日志</p>
 		</div>
 		<div class="bt-w-con pd15">
-			<div class="soft-man-con"></div>
+			<div class="soft-man-con" style="height: 520px; overflow: auto;"></div>
 		</div>
 	</div>
 </div>
