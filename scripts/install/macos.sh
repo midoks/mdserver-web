@@ -22,10 +22,11 @@ if [ "$?" != "0" ];then
 	brew install mysql
 fi
 
+
+brew install libzip bzip2 gcc openssl re2c cmake
+brew install librdkafka
 brew install coreutils libxml2 xml2
 brew install md5sum libevent pidof bison
-brew install libzip bzip2 gcc openssl re2c cmake
-
 
 if [ ! -d $DEV/server/mdserver-web ]; then
 	wget -O /tmp/master.zip https://codeload.github.com/midoks/mdserver-web/zip/master
