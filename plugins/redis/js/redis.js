@@ -183,6 +183,10 @@ function clusterStatus(version){
             }   
         }
 
+        if (tbody_text == ''){
+            tbody_text += '<tr><td colspan="3" style="text-align:center;">无数据/未设置集群</td></tr>';
+        }
+
         var con = '<div class="divtable">\
                         <table class="table table-hover table-bordered" style="width: 490px;">\
                         <thead><th style="width:80px;">字段</th><th style="width:90px;">当前值</th><th>说明</th></thead>\
