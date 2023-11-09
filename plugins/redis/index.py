@@ -393,6 +393,21 @@ def clusterInfo():
 
     return mw.getJson(result)
 
+def clusterNodes():
+    s = status()
+    if s == 'stop':
+        return mw.returnJson(False, '未启动')
+
+    cmd = getRedisCmd()
+    cmd = cmd + 'cluster nodes'
+
+    # print(cmd)
+    data = mw.execShell(cmd)[0]
+    # print(data)
+
+    data = data.strip().split("\n")
+    return mw.getJson(data)
+
 def initdStatus():
     current_os = mw.getOs()
     if current_os == 'darwin':
@@ -539,6 +554,8 @@ if __name__ == "__main__":
         print(infoReplication())
     elif func == 'cluster_info':
         print(clusterInfo())
+    elif func == 'cluster_nodes':
+        print(clusterNodes())
     elif func == 'conf':
         print(getConf())
     elif func == 'run_log':

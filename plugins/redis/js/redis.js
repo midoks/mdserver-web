@@ -165,8 +165,8 @@ function clusterStatus(version){
             'cluster_stats_messages_received':'接收',
             'cluster_current_epoch':'集群当前epoch',
             'cluster_my_epoch':'当前我的epoch',
-            'cluster_slots_pfail':'处于PFAIL状态的节点槽数',
-            'cluster_slots_fail':'处于FAIL状态的节点槽数',
+            'cluster_slots_pfail':'处于PFAIL状态的槽数',
+            'cluster_slots_fail':'处于FAIL状态的槽数',
             'total_cluster_links_buffer_limit_exceeded':'超出缓冲区总数',
         }
 
@@ -196,6 +196,35 @@ function clusterStatus(version){
         $(".soft-man-con").html(con);
     });
 }
+
+function clusterNodes(version){
+    redisPost('cluster_nodes', version, {},function(data){
+        var rdata = $.parseJSON(data.data);
+
+        if ('status' in rdata && !rdata.status){
+            layer.msg(rdata.msg,{icon:0,time:2000,shade: [0.3, '#000']});
+            return;
+        }
+
+        // console.log(rdata);
+        var tbody_text = '';
+        for (k in rdata){
+            tbody_text += '<tr><td>'+ rdata[k] +'</td></tr>';
+        }
+
+        if (tbody_text == ''){
+            tbody_text += '<tr><td style="text-align:center;">无数据/未设置集群</td></tr>';
+        }
+
+        var con = '<div class="divtable">\
+                        <table class="table table-hover table-bordered" style="width: 490px;">\
+                        <thead><th style="width:80px;text-align:center;">节点信息</th></thead>\
+                        <tbody>'+tbody_text+'<tbody>\
+                </table></div>';
+        $(".soft-man-con").html(con);
+    });
+}
+
 //redis状态 end
 
 //配置修改
