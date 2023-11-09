@@ -22,7 +22,7 @@ if [ "$?" != "0" ];then
 	brew install mysql
 fi
 
-brew install coreutils
+brew install coreutils libxml2 xml2
 brew install md5sum libevent pidof bison
 brew install libzip bzip2 gcc openssl re2c cmake
 
