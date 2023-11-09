@@ -7,6 +7,9 @@ rootPath=$(dirname "$curPath")
 rootPath=$(dirname "$rootPath")
 serverPath=$(dirname "$rootPath")
 
+# https://www.cnblogs.com/zlonger/p/16177595.html
+# https://www.cnblogs.com/BNTang/articles/15841688.html
+
 
 # cd /Users/midoks/Desktop/mwdev/server/mdserver-web/plugins/redis && bash install.sh install 7.2.2
 
