@@ -53,7 +53,6 @@ redis_stop(){
 			sleep 1
 		done
 		echo "Redis stopped"
-		kill -9 $PID
 		rm -rf $PIDFILE
 	fi
 }
