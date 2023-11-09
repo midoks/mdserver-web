@@ -59,7 +59,7 @@ function redisStatus(version) {
     redisPost('run_info',version, {},function(data){
         var rdata = $.parseJSON(data.data);
 
-        if (!rdata.status){
+        if ('status' in rdata && !rdata.status){
             layer.msg(rdata.msg,{icon:0,time:2000,shade: [0.3, '#000']});
             return;
         }
@@ -93,8 +93,7 @@ function replStatus(version){
     redisPost('info_replication', version, {},function(data){
         var rdata = $.parseJSON(data.data);
 
-        console.log(rdata)
-        if (!rdata.status){
+        if ('status' in rdata && !rdata.status){
             layer.msg(rdata.msg,{icon:0,time:2000,shade: [0.3, '#000']});
             return;
         }
