@@ -126,7 +126,7 @@ function replStatus(version){
                 tbody_text += '<tr><th>'+k+'</th><td class="overflow_hide" style="width:155px;display: inline-block;border: none;">' + rdata[k] + '</td><td>'+kv[k]+'</td></tr>';
             } else{
 
-                if (k.substring(0,5) == 'slave'){
+                if (k.substring(0,5) == 'slave' && isNaN(k.substring(5))){
                     tbody_text += '<tr><th>'+k+'</th><td class="overflow_hide" style="width:155px;display: inline-block;border: none;" title="'+rdata[k]+'">' + rdata[k] + '</td><td>从库配置信息</td></tr>';
                 } else{
                     tbody_text += '<tr><th>'+k+'</th><td>' + rdata[k] + '</td><td>'+kv[k]+'</td></tr>';
