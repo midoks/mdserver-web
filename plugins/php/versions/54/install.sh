@@ -110,7 +110,7 @@ if [ "${SYS_ARCH}" == "aarch64" ];then
 	OPTIONS="$OPTIONS --build=aarch64-unknown-linux-gnu --host=aarch64-unknown-linux-gnu"
 fi
 
-if [ "${SYS_ARCH}" == "arm64" ];then
+if [ "${SYS_ARCH}" == "arm64" ] && [ "$sysName" == "Darwin" ] ;then
 	# 修复mac arm64架构下php安装
 	# 修复不能识别到sys_icache_invalidate
 	cat ${curPath}/versions/${PHP_VER}/src/ext/pcre/sljitConfigInternal.h > $sourcePath/php/php${PHP_VER}/ext/pcre/pcrelib/sljit/sljitConfigInternal.h
