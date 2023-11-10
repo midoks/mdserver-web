@@ -54,6 +54,11 @@ Install_lib()
 			OPTIONS="$OPTIONS --build=aarch64-unknown-linux-gnu --host=aarch64-unknown-linux-gnu"
 		fi
 
+		if [ "$sysName" == "Darwin" ];then
+			OPTIONS="$OPTIONS --with-gettext=$(brew --prefix gettext)"
+		fi
+
+
 		$serverPath/php/$version/bin/phpize
 		./configure --with-php-config=$serverPath/php/$version/bin/php-config $OPTIONS
 
@@ -65,9 +70,9 @@ Install_lib()
 
 		make clean && make && make install && make clean
 		
-		if [ -d $sourcePath/php${version} ];then
-			cd ${sourcePath} && rm -rf $sourcePath/php${version}
-		fi
+		# if [ -d $sourcePath/php${version} ];then
+		# 	cd ${sourcePath} && rm -rf $sourcePath/php${version}
+		# fi
 	fi
 
 	if [ ! -f "$extFile" ];then

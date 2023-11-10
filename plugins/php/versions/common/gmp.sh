@@ -65,6 +65,10 @@ Install_lib()
 		# 	sed -i $BAK 's/CFLAGS \=/CFLAGS \= -std=c99/g' Makefile
 		# fi
 
+		if [ "$sysName" == "Darwin" ];then
+			OPTIONS="$OPTIONS --with-gmp=$(brew --prefix gmp)"
+		fi
+
 		make clean && make && make install && make clean
 		
 		if [ -d $sourcePath/php${version} ];then
