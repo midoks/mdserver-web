@@ -62,22 +62,6 @@ if [ ! -d $sourcePath/php/php${PHP_VER} ];then
 	mv $sourcePath/php/php-${version} $sourcePath/php/php${PHP_VER}
 fi
 
-OPTIONS=''
-if [ $sysName == 'Darwin' ]; then
-	OPTIONS='--without-iconv'
-	OPTIONS="${OPTIONS} --with-curl"
-	OPTIONS="${OPTIONS} --with-external-pcre=$(brew --prefix pcre2)"
-
-else
-	OPTIONS='--without-iconv'
-	OPTIONS="${OPTIONS} --with-curl"
-fi
-
-IS_64BIT=`getconf LONG_BIT`
-if [ "$IS_64BIT" == "64" ];then
-	OPTIONS="${OPTIONS} --with-libdir=lib64"
-fi
-
 ZIP_OPTION='--enable-zip'
 libzip_version=`pkg-config libzip --modversion`
 if [ "$?" != "0" ] || version_lt "$libzip_version" "0.11.0" ;then
@@ -85,6 +69,30 @@ if [ "$?" != "0" ] || version_lt "$libzip_version" "0.11.0" ;then
 	export PKG_CONFIG_PATH=$serverPath/lib/libzip/lib/pkgconfig
 	ZIP_OPTION="--with-libzip=$serverPath/lib/libzip"
 fi
+
+OPTIONS=''
+if [ $sysName == 'Darwin' ]; then
+	OPTIONS='--without-iconv'
+	OPTIONS="${OPTIONS} --with-curl"
+	# OPTIONS="${OPTIONS} –without-pear"
+	# OPTIONS="${OPTIONS} -disable-phar"
+
+	# OPTIONS="${OPTIONS} --without-pcre-jit"
+	# OPTIONS="${OPTIONS} --with-external-pcre=$(brew --prefix pcre2)"
+
+else
+	OPTIONS='--without-iconv'
+	OPTIONS="${OPTIONS} --with-curl"
+	OPTIONS="${OPTIONS} --with-zlib-dir=$serverPath/lib/zlib"
+	OPTIONS="${OPTIONS} ${ZIP_OPTION}"
+fi
+
+IS_64BIT=`getconf LONG_BIT`
+if [ "$IS_64BIT" == "64" ];then
+	OPTIONS="${OPTIONS} --with-libdir=lib64"
+fi
+
+
 
 # ----- cpu start ------
 if [ -z "${cpuCore}" ]; then
@@ -111,17 +119,15 @@ else
 fi
 # ----- cpu end ------
 
-if [ ! -d $serverPath/php/73 ];then
+if [ ! -d $serverPath/php/${PHP_VER} ];then
 	cd $sourcePath/php/php${PHP_VER} && ./configure \
-	--prefix=$serverPath/php/73 \
-	--exec-prefix=$serverPath/php/73 \
-	--with-config-file-path=$serverPath/php/73/etc \
+	--prefix=$serverPath/php/${PHP_VER} \
+	--exec-prefix=$serverPath/php/${PHP_VER} \
+	--with-config-file-path=$serverPath/php/${PHP_VER}/etc \
 	--enable-mysqlnd \
 	--with-mysqli=mysqlnd \
 	--with-pdo-mysql=mysqlnd \
-	--with-zlib-dir=$serverPath/lib/zlib \
 	--enable-ftp \
-	$ZIP_OPTION\
 	--enable-sockets \
 	--enable-simplexml \
 	--enable-mbstring \
@@ -134,11 +140,11 @@ if [ ! -d $serverPath/php/73 ];then
 	--disable-fileinfo \
 	$OPTIONS \
 	--enable-fpm
-	make clean && make -j${cpuCore} && make install && make clean
+
+	# make clean &&
+	make -j${cpuCore} && make install && make clean
 
 	# rm -rf $sourcePath/php/php${PHP_VER}
-
-	echo "安装php-${version}成功"
 fi
 
 #------------------------ install end ------------------------------------#

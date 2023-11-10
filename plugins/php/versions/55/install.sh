@@ -61,7 +61,7 @@ OPTIONS=''
 if [ $sysName == 'Darwin' ]; then
 	OPTIONS='--without-iconv'
 	OPTIONS="${OPTIONS} --with-freetype-dir=${serverPath}/lib/freetype"
-	OPTIONS="${OPTIONS} --with-curl=${serverPath}/lib/curl"
+	OPTIONS="${OPTIONS} --with-curl=$(brew --prefix curl)"
 else
 	OPTIONS='--without-iconv'
 	# OPTIONS="--with-iconv=${serverPath}/lib/libiconv"
@@ -104,11 +104,11 @@ if [ "${SYS_ARCH}" == "aarch64" ];then
 	cat ${curPath}/versions/${PHP_VER}/src/zend_multiply.h > $sourcePath/php/php${PHP_VER}/Zend/zend_multiply.h
 fi
 
-if [ ! -d $serverPath/php/55  ];then
+if [ ! -d $serverPath/php/${PHP_VER}  ];then
 	cd $sourcePath/php/php${PHP_VER} && ./configure \
-	--prefix=$serverPath/php/55 \
-	--exec-prefix=$serverPath/php/55 \
-	--with-config-file-path=$serverPath/php/55/etc \
+	--prefix=$serverPath/php/${PHP_VER} \
+	--exec-prefix=$serverPath/php/${PHP_VER} \
+	--with-config-file-path=$serverPath/php/${PHP_VER}/etc \
 	--with-zlib-dir=$serverPath/lib/zlib \
 	--enable-mysqlnd \
 	--with-mysql=mysqlnd \

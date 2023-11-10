@@ -64,7 +64,7 @@ if [ $sysName == 'Darwin' ]; then
 	OPTIONS="${OPTIONS} --with-freetype-dir=${serverPath}/lib/freetype"
 	OPTIONS="${OPTIONS} --with-curl=$(brew --prefix curl)"
 	OPTIONS="${OPTIONS} --with-zlib-dir=$(brew --prefix zlib)"
-	OPTIONS="${OPTIONS} --with-external-pcre=$(brew --prefix pcre2)"
+	# OPTIONS="${OPTIONS} --with-external-pcre=$(brew --prefix pcre2)"
 else
 	# OPTIONS="--with-iconv=${serverPath}/lib/libiconv"
 	OPTIONS="${OPTIONS} --with-curl"
@@ -109,10 +109,10 @@ if [ "${SYS_ARCH}" == "aarch64" ];then
 fi
 
 
-if [ ! -d $serverPath/php/56 ];then
+if [ ! -d $serverPath/php/${PHP_VER} ];then
 	cd $sourcePath/php/php${PHP_VER} && ./configure \
-	--prefix=$serverPath/php/56 \
-	--exec-prefix=$serverPath/php/56 \
+	--prefix=$serverPath/php/${PHP_VER} \
+	--exec-prefix=$serverPath/php/${PHP_VER} \
 	--with-config-file-path=$serverPath/php/56/etc \
 	--with-zlib-dir=$serverPath/lib/zlib \
 	--enable-mysqlnd \

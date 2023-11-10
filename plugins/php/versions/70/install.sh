@@ -61,7 +61,7 @@ OPTIONS='--without-iconv'
 if [ $sysName == 'Darwin' ]; then
 	OPTIONS="${OPTIONS} --with-freetype-dir=${serverPath}/lib/freetype"
 	OPTIONS="${OPTIONS} --with-curl"
-	OPTIONS="${OPTIONS} --with-external-pcre=$(brew --prefix pcre2)"
+	# OPTIONS="${OPTIONS} --with-external-pcre=$(brew --prefix pcre2)"
 else
 	# OPTIONS="--with-iconv=${serverPath}/lib/libiconv"
 	OPTIONS="${OPTIONS} --with-curl"
@@ -97,11 +97,11 @@ else
 fi
 # ----- cpu end ------
 
-if [ ! -d $serverPath/php/70 ];then
+if [ ! -d $serverPath/php/${PHP_VER} ];then
 	cd $sourcePath/php/php${PHP_VER} && ./configure \
-	--prefix=$serverPath/php/70 \
-	--exec-prefix=$serverPath/php/70 \
-	--with-config-file-path=$serverPath/php/70/etc \
+	--prefix=$serverPath/php/${PHP_VER} \
+	--exec-prefix=$serverPath/php/${PHP_VER} \
+	--with-config-file-path=$serverPath/php/${PHP_VER}/etc \
 	--with-zlib-dir=$serverPath/lib/zlib \
 	--enable-mysqlnd \
 	--with-mysqli=mysqlnd \

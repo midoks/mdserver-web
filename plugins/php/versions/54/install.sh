@@ -58,13 +58,19 @@ if [ ! -d $sourcePath/php/php${PHP_VER} ];then
 	mv $sourcePath/php/php-${version} $sourcePath/php/php${PHP_VER}
 fi
 
-OPTIONS=''
+OPTIONS='--without-iconv'
 if [ $sysName == 'Darwin' ]; then
-	OPTIONS='--without-iconv'
+	
 	OPTIONS="${OPTIONS} --with-freetype-dir=${serverPath}/lib/freetype"
-	OPTIONS="${OPTIONS} --with-curl=${serverPath}/lib/curl"
+
+	BREW_DIR=`which brew`
+	BREW_DIR=${BREW_DIR/\/bin\/brew/}
+	CURL_DEPEND_DIR=`brew info curl | grep ${BREW_DIR}/Cellar/curl | cut -d \  -f 1 | awk 'END {print}'`
+	OPTIONS="$OPTIONS --with-curl=${CURL_DEPEND_DIR}"
+	# OPTIONS="${OPTIONS} --without-pcre-jit"
+	# OPTIONS="${OPTIONS} --with-external-pcre=$(brew --prefix pcre2)"
+
 else
-	OPTIONS='--without-iconv'
 	# OPTIONS="--with-iconv=${serverPath}/lib/libiconv"
 	OPTIONS="${OPTIONS} --with-curl"
 fi

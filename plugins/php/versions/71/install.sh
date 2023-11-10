@@ -97,11 +97,11 @@ else
 fi
 # ----- cpu end ------
 
-if [ ! -d $serverPath/php/71 ];then
+if [ ! -d $serverPath/php/${PHP_VER} ];then
 	cd $sourcePath/php/php${PHP_VER} && ./configure \
-	--prefix=$serverPath/php/71 \
-	--exec-prefix=$serverPath/php/71 \
-	--with-config-file-path=$serverPath/php/71/etc \
+	--prefix=$serverPath/php/${PHP_VER} \
+	--exec-prefix=$serverPath/php/${PHP_VER} \
+	--with-config-file-path=$serverPath/php/${PHP_VER}/etc \
 	--with-zlib-dir=$serverPath/lib/zlib \
 	--enable-mysqlnd \
 	--with-mysqli=mysqlnd \
