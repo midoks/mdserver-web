@@ -28,7 +28,7 @@ brew install librdkafka
 brew install coreutils libxml2 xml2
 brew install md5sum libevent pidof bison
 brew install pcre2 libxpm libelf
-brew install automake
+brew install automake icu4c
 
 if [ ! -d $DEV/server/mdserver-web ]; then
 	wget -O /tmp/master.zip https://codeload.github.com/midoks/mdserver-web/zip/master
