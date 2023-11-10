@@ -89,13 +89,23 @@ Install_lib()
 			OPTIONS="$OPTIONS --build=aarch64-unknown-linux-gnu --host=aarch64-unknown-linux-gnu"
 		fi
 
+		if [ "$sysName" == "Darwin" ];then
+			BREW_DIR=`which brew`
+			BREW_DIR=${BREW_DIR/\/bin\/brew/}
+			LIB_DEPEND_DIR=`brew info icu4c | grep ${BREW_DIR}/Cellar/icu4c | cut -d \  -f 1 | awk 'END {print}'`
+
+			OPTIONS="$OPTIONS --with-icu-dir=${serverPath}/lib/icu"
+			OPTIONS="$OPTIONS --enable-intl"
+		fi		
+
+
 		$serverPath/php/$version/bin/phpize
 		./configure --with-php-config=$serverPath/php/$version/bin/php-config $OPTIONS
 		make clean && make && make install && make clean
 		
-		if [ -d $sourcePath/php${version} ];then
-			cd ${sourcePath} && rm -rf $sourcePath/php${version}
-		fi
+		# if [ -d $sourcePath/php${version} ];then
+		# 	cd ${sourcePath} && rm -rf $sourcePath/php${version}
+		# fi
 	fi
 
 	if [ ! -f "$extFile" ];then

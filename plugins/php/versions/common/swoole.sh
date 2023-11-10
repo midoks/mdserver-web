@@ -57,6 +57,8 @@ Install_lib()
 		php_lib=$sourcePath/php_lib
 		mkdir -p $php_lib
 
+		cd ${rootPath}/plugins/php/lib && /bin/bash openssl_11.sh
+
 		if [ ! -d $php_lib/${LIBNAME}-${LIBV} ];then
 			if [ ! -f $php_lib/${LIBNAME}-${LIBV}.tgz ];then
 				wget --no-check-certificate -O $php_lib/${LIBNAME}-${LIBV}.tgz http://pecl.php.net/get/${LIBNAME}-${LIBV}.tgz
@@ -74,7 +76,7 @@ Install_lib()
 		./configure --with-php-config=$serverPath/php/$version/bin/php-config \
 		$OPTIONS \
 		--enable-openssl \
-		--with-openssl-dir=$serverPath/lib/openssl \
+		--with-openssl-dir=$serverPath/lib/openssl11 \
 		--enable-sockets
 		make clean && make && make install && make clean
 

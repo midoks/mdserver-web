@@ -50,7 +50,7 @@ PHP_EXT_LIST=(ZendGuardLoader pdo mysqlnd sqlite3 openssl opcache mcrypt fileinf
 for PHP_VER in ${PHP_VER_LIST[@]}; do
 	echo "php${PHP_VER} -- start"
 
-	if [ ! -d /www/server/php/${PHP_VER} ];then
+	if [ ! -d /Users/midoks/Desktop/mwdev/server/php/${PHP_VER} ];then
 		echo "php${PHP_VER} is not install!"
 		continue
 	fi
