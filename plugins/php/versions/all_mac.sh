@@ -1,16 +1,18 @@
 #! /bin/sh
-export PATH=$PATH:/opt/local/bin:/opt/local/sbin:/opt/local/share/man:/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin:/opt/X11/bin
-export PATH=$PATH:/opt/homebrew/bin
-
+export PATH=$PATH:/opt/local/bin:/opt/local/sbin:/opt/local/share/man:/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin:/opt/X11/bin:/opt/homebrew/bin
 DIR=$(cd "$(dirname "$0")"; pwd)
 ROOT_DIR=$(cd "$(dirname "$0")"; pwd)
 
-# cd /www/server/mdserver-web/scripts/quick && bash debug.sh
-# cd /www/server/mdserver-web/plugins/php/versions && /bin/bash all_test.sh
+# cd /Users/midoks/Desktop/mwdev/server/mdserver-web/plugins/php && bash install.sh install 72
+# cd /Users/midoks/Desktop/mwdev/server/mdserver-web/plugins/php/versions/common && bash mcrypt.sh install 82
+# cd /Users/midoks/Desktop/mwdev/server/mdserver-web/plugins/php/lib && bash libmcrypt.sh
 
-# cd /www/server/mdserver-web/plugins/php && bash install.sh install 55
-# cd /www/server/mdserver-web/plugins/php/versions/common && bash gd.sh install 73
-# cd /www/server/mdserver-web/plugins/php/versions/common && bash swoole.sh install 54
+# cd /Users/midoks/Desktop/mwdev/server/mdserver-web/scripts/quick && bash debug.sh
+# cd /Users/midoks/Desktop/mwdev/server/mdserver-web/plugins/php/versions && /bin/bash all_mac.sh
+
+# cd /Users/midoks/Desktop/mwdev/server/mdserver-web/plugins/php && bash install.sh install 55
+# cd /Users/midoks/Desktop/mwdev/server/mdserver-web/plugins/php/versions/common && bash gd.sh install 73
+# cd /Users/midoks/Desktop/mwdev/server/mdserver-web/plugins/php/versions/common && bash swoole.sh install 54
 
 
 # PHP_VER=52
@@ -32,8 +34,8 @@ PHP_VER_LIST=(53 54 55 56 70 71 72 73 74 80 81 82)
 # PHP_VER_LIST=(81)
 for PHP_VER in ${PHP_VER_LIST[@]}; do
 	echo "php${PHP_VER} -- start"
-	if [ ! -d  /www/server/php/${PHP_VER} ];then
-		cd /www/server/mdserver-web/plugins/php && bash install.sh install ${PHP_VER}
+	if [ ! -d  /Users/midoks/Desktop/mwdev/server/php/${PHP_VER} ];then
+		cd /Users/midoks/Desktop/mwdev//server/mdserver-web/plugins/php && bash install.sh install ${PHP_VER}
 	fi
 	echo "php${PHP_VER} -- end"
 done
@@ -53,7 +55,7 @@ for PHP_VER in ${PHP_VER_LIST[@]}; do
 		continue
 	fi
 
-	NON_ZTS_FILENAME=`ls /www/server/php/${PHP_VER}/lib/php/extensions | grep no-debug-non-zts`
+	NON_ZTS_FILENAME=`ls /Users/midoks/Desktop/mwdev/server/php/${PHP_VER}/lib/php/extensions | grep no-debug-non-zts`
 	for EXT in ${PHP_EXT_LIST[@]}; do
 		extFile=/www/server/php/${PHP_VER}/lib/php/extensions/${NON_ZTS_FILENAME}/${EXT}.so
 		echo "${PHP_VER} ${EXT} start"

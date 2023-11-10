@@ -58,6 +58,10 @@ Install_sphinx()
 		cd ${rootPath} && python3 ${rootPath}/plugins/sphinx/index.py start
 		cd ${rootPath} && python3 ${rootPath}/plugins/sphinx/index.py initd_install
 	fi
+
+	if [ -d ${SPHINX_DIR}/sphinx-${VERSION} ];then
+		rm -rf ${SPHINX_DIR}/sphinx-${VERSION}
+	fi
 }
 
 Uninstall_sphinx()

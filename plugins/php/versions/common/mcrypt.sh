@@ -1,6 +1,6 @@
 #!/bin/bash
 PATH=/bin:/sbin:/usr/bin:/usr/sbin:/usr/local/bin:/usr/local/sbin:~/bin:/opt/homebrew/bin
-export PATH
+export PATH=$PATH:/opt/homebrew/bin
 
 curPath=`pwd`
 rootPath=$(dirname "$curPath")
@@ -14,7 +14,7 @@ actionType=$1
 version=$2
 
 LIBNAME=mcrypt
-LIBV=1.0.5
+LIBV=1.0.6
 
 if [ "$version" -lt "72" ];then
 	echo "not need"
@@ -62,6 +62,10 @@ Install_lib()
 		OPTIONS=""
 		if [ "${SYS_ARCH}" == "aarch64" ] && [ "$version" -lt "56" ];then
 			OPTIONS="$OPTIONS --build=aarch64-unknown-linux-gnu --host=aarch64-unknown-linux-gnu"
+		fi
+
+		if [ "$sysName" == "Darwin" ];then
+			OPTIONS="$OPTIONS --with-mcrypt=$(brew --prefix mcrypt)"
 		fi
 
 		$serverPath/php/$version/bin/phpize

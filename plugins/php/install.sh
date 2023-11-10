@@ -6,7 +6,7 @@ curPath=`pwd`
 rootPath=$(dirname "$curPath")
 rootPath=$(dirname "$rootPath")
 serverPath=$(dirname "$rootPath")
-
+sysName=`uname`
 install_tmp=${rootPath}/tmp/mw_install.pl
 
 if id www &> /dev/null ;then 
@@ -81,7 +81,7 @@ if [ "${action}" == "install" ] && [ -d ${serverPath}/php/${type} ];then
 
 	echo "install PHP${type} extend end"
 
-	if [ ! -f /usr/local/bin/composer ];then
+	if [ ! -f /usr/local/bin/composer ] && [ "$sysName" != "Darwin" ] ;then
 		cd /tmp
 		curl -sS https://getcomposer.org/installer | /www/server/php/${type}/bin/php
 		mv composer.phar /usr/local/bin/composer

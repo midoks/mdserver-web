@@ -1,6 +1,6 @@
 #!/bin/bash
 PATH=/bin:/sbin:/usr/bin:/usr/sbin:/usr/local/bin:/usr/local/sbin:~/bin:/opt/homebrew/bin
-export PATH
+export PATH=$PATH:/opt/homebrew/bin
 
 curPath=`pwd`
 rootPath=$(dirname "$curPath")
@@ -131,6 +131,7 @@ if [ ! -d $serverPath/php/55  ];then
 	make clean && make -j${cpuCore} && make install && make clean
 
 	# rm -rf $sourcePath/php/php${PHP_VER}
+	echo "安装php-${version}成功"
 fi
 
 #------------------------ install end ------------------------------------#

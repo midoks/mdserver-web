@@ -1,6 +1,6 @@
 #!/bin/bash
 PATH=/bin:/sbin:/usr/bin:/usr/sbin:/usr/local/bin:/usr/local/sbin:~/bin:/opt/homebrew/bin
-export PATH
+export PATH=$PATH:/opt/homebrew/bin
 
 curPath=`pwd`
 
@@ -62,10 +62,16 @@ Install_lib()
 			OPTIONS="$OPTIONS --build=aarch64-unknown-linux-gnu --host=aarch64-unknown-linux-gnu"
 		fi
 
-		pkg-config --exists libmemcached
-		if [ "$?" != "0" ]; then
-			cd ${rootPath}/plugins/php/lib && /bin/bash libmemcached.sh
-			OPTIONS="$OPTIONS --with-libmemcached-dir=${serverPath}/lib/libmemcached"
+
+		if [ "$sysName" == "Darwin" ];then
+			OPTIONS="$OPTIONS --with-zlib-dir=$(brew --prefix zlib)"
+			OPTIONS="$OPTIONS --with-libmemcached-dir=$(brew --prefix libmemcached)"
+		else
+			pkg-config --exists libmemcached
+			if [ "$?" != "0" ]; then
+				cd ${rootPath}/plugins/php/lib && /bin/bash libmemcached.sh
+				OPTIONS="$OPTIONS --with-libmemcached-dir=${serverPath}/lib/libmemcached"
+			fi
 		fi
 
 		# sed -i '_bak' "3237,3238s#ulong#zend_ulong#g" $php_lib/${LIBNAME}-${LIBV}/php_memcached.c

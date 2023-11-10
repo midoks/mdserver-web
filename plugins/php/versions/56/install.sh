@@ -1,6 +1,6 @@
 #!/bin/bash
 PATH=/bin:/sbin:/usr/bin:/usr/sbin:/usr/local/bin:/usr/local/sbin:~/bin:/opt/homebrew/bin
-export PATH
+export PATH=$PATH:/opt/homebrew/bin
 
 # cd /www/server/mdserver-web/plugins/php && /bin/bash install.sh install 56
 
@@ -59,13 +59,13 @@ if [ ! -d $sourcePath/php/php${PHP_VER} ];then
 	mv $sourcePath/php/php-${version} $sourcePath/php/php${PHP_VER}
 fi
 
-OPTIONS=''
+OPTIONS='--without-iconv'
 if [ $sysName == 'Darwin' ]; then
-	OPTIONS='--without-iconv'
 	OPTIONS="${OPTIONS} --with-freetype-dir=${serverPath}/lib/freetype"
-	OPTIONS="${OPTIONS} --with-curl=${serverPath}/lib/curl"
+	OPTIONS="${OPTIONS} --with-curl=$(brew --prefix curl)"
+	OPTIONS="${OPTIONS} --with-zlib-dir=$(brew --prefix zlib)"
+	OPTIONS="${OPTIONS} --with-external-pcre=$(brew --prefix pcre2)"
 else
-	OPTIONS='--without-iconv'
 	# OPTIONS="--with-iconv=${serverPath}/lib/libiconv"
 	OPTIONS="${OPTIONS} --with-curl"
 fi

@@ -1,6 +1,6 @@
 #!/bin/bash
 PATH=/bin:/sbin:/usr/bin:/usr/sbin:/usr/local/bin:/usr/local/sbin:~/bin:/opt/homebrew/bin
-export PATH
+export PATH=$PATH:/opt/homebrew/bin
 
 curPath=`pwd`
 rootPath=$(dirname "$curPath")
@@ -71,12 +71,10 @@ fi
 
 cd $sourcePath/php/php${PHP_VER}
 
-OPTIONS=''
+OPTIONS='--without-iconv'
 if [ $sysName == 'Darwin' ]; then
-	OPTIONS='--without-iconv'
-	OPTIONS="${OPTIONS} --with-curl=${serverPath}/lib/curl"
+	OPTIONS="${OPTIONS} --with-curl"
 else
-	OPTIONS='--without-iconv'
 	OPTIONS="${OPTIONS} --with-curl"
 fi
 

@@ -1,6 +1,6 @@
 #!/bin/bash
-PATH=/bin:/sbin:/usr/bin:/usr/sbin:/usr/local/bin:/usr/local/sbin:~/bin:/opt/homebrew/bin
-export PATH
+PATH=/bin:/sbin:/usr/bin:/usr/sbin:/usr/local/bin:/usr/local/sbin:~/bin
+export PATH=$PATH:/opt/homebrew/bin
 
 curPath=`pwd`
 rootPath=$(dirname "$curPath")
@@ -20,7 +20,7 @@ PHP_VER=73
 Install_php()
 {
 #------------------------ install start ------------------------------------#
-echo "安装php-${version} ..." > $install_tmp
+echo "安装php-${version} ..."
 mkdir -p $sourcePath/php
 mkdir -p $serverPath/php
 
@@ -65,9 +65,9 @@ fi
 OPTIONS=''
 if [ $sysName == 'Darwin' ]; then
 	OPTIONS='--without-iconv'
-	OPTIONS="${OPTIONS} --with-curl=${serverPath}/lib/curl"
-	# OPTIONS="${OPTIONS} --with-libzip=${serverPath}/lib/libzip"
-	# OPTIONS="${OPTIONS} --enable-zip"
+	OPTIONS="${OPTIONS} --with-curl"
+	OPTIONS="${OPTIONS} --with-external-pcre=$(brew --prefix pcre2)"
+
 else
 	OPTIONS='--without-iconv'
 	OPTIONS="${OPTIONS} --with-curl"
@@ -137,6 +137,8 @@ if [ ! -d $serverPath/php/73 ];then
 	make clean && make -j${cpuCore} && make install && make clean
 
 	# rm -rf $sourcePath/php/php${PHP_VER}
+
+	echo "安装php-${version}成功"
 fi
 
 #------------------------ install end ------------------------------------#
@@ -146,7 +148,7 @@ Uninstall_php()
 {
 	$serverPath/php/init.d/php73 stop
 	rm -rf $serverPath/php/73
-	echo "卸载php-${version}..." > $install_tmp
+	echo "卸载php-${version}..."
 }
 
 action=${1}

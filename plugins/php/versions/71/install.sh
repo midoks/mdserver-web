@@ -1,6 +1,6 @@
 #!/bin/bash
 PATH=/bin:/sbin:/usr/bin:/usr/sbin:/usr/local/bin:/usr/local/sbin:~/bin:/opt/homebrew/bin
-export PATH
+export PATH=$PATH:/opt/homebrew/bin
 
 curPath=`pwd`
 rootPath=$(dirname "$curPath")
@@ -60,7 +60,9 @@ fi
 OPTIONS=''
 OPTIONS='--without-iconv'
 if [ $sysName == 'Darwin' ]; then
-	OPTIONS="${OPTIONS} --with-curl=${serverPath}/lib/curl"
+	OPTIONS="${OPTIONS} --with-freetype-dir=${serverPath}/lib/freetype"
+	OPTIONS="${OPTIONS} --with-curl"
+	OPTIONS="${OPTIONS} --with-external-pcre=$(brew --prefix pcre2)"
 else
 	OPTIONS="${OPTIONS} --with-curl"
 fi

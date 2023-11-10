@@ -1,6 +1,6 @@
 #!/bin/bash
 PATH=/bin:/sbin:/usr/bin:/usr/sbin:/usr/local/bin:/usr/local/sbin:~/bin:/opt/homebrew/bin
-export PATH
+export PATH=$PATH:/opt/homebrew/bin
 
 curPath=`pwd`
 
@@ -47,7 +47,10 @@ Install_lib()
 	fi
 
 	if [ "$sysName" == "Darwin" ] ;then 
-		LIB_DEPEND_DIR=`brew info openssl@1.1 | grep /usr/local/Cellar/openssl | cut -d \  -f 1 | awk 'END {print}'`
+		BREW_DIR=`which brew`
+		BREW_DIR=${BREW_DIR/\/bin\/brew/}
+
+		LIB_DEPEND_DIR=`brew info openssl@1.1 | grep ${BREW_DIR}/Cellar/openssl | cut -d \  -f 1 | awk 'END {print}'`
 		export PKG_CONFIG_PATH=$LIB_DEPEND_DIR/lib/pkgconfig
 	fi
 
@@ -65,7 +68,7 @@ Install_lib()
 		
 		# openssl_version=`pkg-config openssl --modversion`
 		# export PKG_CONFIG_PATH=$serverPath/lib/openssl10/lib/pkgconfig
-		if [ "$version" -lt "81" ];then
+		if [ "$version" -lt "81" ] && [ "$sysName" != "Darwin" ];then
 			export PKG_CONFIG_PATH=$serverPath/lib/openssl10/lib/pkgconfig
 		fi
 

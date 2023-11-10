@@ -1,6 +1,6 @@
 #!/bin/bash
 PATH=/bin:/sbin:/usr/bin:/usr/sbin:/usr/local/bin:/usr/local/sbin:~/bin:/opt/homebrew/bin
-export PATH
+export PATH=$PATH:/opt/homebrew/bin
 
 curPath=`pwd`
 rootPath=$(dirname "$curPath")
@@ -16,7 +16,7 @@ PHP_VER=72
 Install_php()
 {
 #------------------------ install start ------------------------------------#
-echo "安装php-${version} ..." > $install_tmp
+echo "安装php-${version} ..."
 mkdir -p $sourcePath/php
 mkdir -p $serverPath/php
 
@@ -58,12 +58,10 @@ if [ ! -d $sourcePath/php/php${PHP_VER} ];then
 	mv $sourcePath/php/php-${version} $sourcePath/php/php${PHP_VER}
 fi
 
-OPTIONS=''
+OPTIONS='--without-iconv'
 if [ $sysName == 'Darwin' ]; then
-	OPTIONS='--without-iconv'
-	OPTIONS="${OPTIONS} --with-curl=${serverPath}/lib/curl"
+	OPTIONS="${OPTIONS} --with-curl"
 else
-	OPTIONS='--without-iconv'
 	OPTIONS="${OPTIONS} --with-curl"
 fi
 
@@ -96,6 +94,12 @@ else
 	cpuCore="1"
 fi
 # ----- cpu end ------
+
+if [ "${SYS_ARCH}" == "arm64" ];then
+	# 修复arm64架构下安装
+	# /www/server/mdserver-web/plugins/php/versions/72/src/reentrancy.c > /www/server/source/php/php72/main/reentrancy.c
+	cat ${curPath}/versions/${PHP_VER}/src/reentrancy.c > $sourcePath/php/php${PHP_VER}/main/reentrancy.c
+fi
 
 if [ ! -d $serverPath/php/72 ];then
 	cd $sourcePath/php/php${PHP_VER} && ./configure \
@@ -132,7 +136,7 @@ Uninstall_php()
 {
 	$serverPath/php/init.d/php72 stop
 	rm -rf $serverPath/php/72
-	echo "卸载php-${version}..." > $install_tmp
+	echo "卸载php-${version}..."
 }
 
 action=${1}
