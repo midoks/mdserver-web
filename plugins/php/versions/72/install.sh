@@ -8,6 +8,7 @@ rootPath=$(dirname "$rootPath")
 serverPath=$(dirname "$rootPath")
 sourcePath=${serverPath}/source
 sysName=`uname`
+SYS_ARCH=`arch`
 install_tmp=${rootPath}/tmp/mw_install.pl
 
 
@@ -63,6 +64,7 @@ if [ $sysName == 'Darwin' ]; then
 	OPTIONS="${OPTIONS} --with-curl"
 else
 	OPTIONS="${OPTIONS} --with-curl"
+	OPTIONS="${OPTIONS} --with-zlib-dir=$serverPath/lib/zlib"
 fi
 
 IS_64BIT=`getconf LONG_BIT`
@@ -95,18 +97,18 @@ else
 fi
 # ----- cpu end ------
 
+
 if [ "${SYS_ARCH}" == "arm64" ];then
 	# 修复arm64架构下安装
-	# /www/server/mdserver-web/plugins/php/versions/72/src/reentrancy.c > /www/server/source/php/php72/main/reentrancy.c
 	cat ${curPath}/versions/${PHP_VER}/src/reentrancy.c > $sourcePath/php/php${PHP_VER}/main/reentrancy.c
+	echo "cat ${curPath}/versions/${PHP_VER}/src/reentrancy.c > $sourcePath/php/php${PHP_VER}/main/reentrancy.c"
 fi
 
-if [ ! -d $serverPath/php/72 ];then
+if [ ! -d $serverPath/php/${PHP_VER} ];then
 	cd $sourcePath/php/php${PHP_VER} && ./configure \
-	--prefix=$serverPath/php/72 \
-	--exec-prefix=$serverPath/php/72 \
-	--with-config-file-path=$serverPath/php/72/etc \
-	--with-zlib-dir=$serverPath/lib/zlib \
+	--prefix=$serverPath/php/${PHP_VER} \
+	--exec-prefix=$serverPath/php/${PHP_VER} \
+	--with-config-file-path=$serverPath/php/${PHP_VER}/etc \
 	--enable-mysqlnd \
 	--with-mysqli=mysqlnd \
 	--with-pdo-mysql=mysqlnd \
