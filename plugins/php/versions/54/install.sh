@@ -67,12 +67,13 @@ if [ $sysName == 'Darwin' ]; then
 	BREW_DIR=${BREW_DIR/\/bin\/brew/}
 	CURL_DEPEND_DIR=`brew info curl | grep ${BREW_DIR}/Cellar/curl | cut -d \  -f 1 | awk 'END {print}'`
 	OPTIONS="$OPTIONS --with-curl=${CURL_DEPEND_DIR}"
-	# OPTIONS="${OPTIONS} --without-pcre-jit"
-	# OPTIONS="${OPTIONS} --with-external-pcre=$(brew --prefix pcre2)"
+	# OPTIONS="${OPTIONS} --with-pcre-dir=${serverPath}/lib/pcre"
+	# OPTIONS="${OPTIONS} --with-external-pcre=${serverPath}/lib/pcre"
 
 else
 	# OPTIONS="--with-iconv=${serverPath}/lib/libiconv"
 	OPTIONS="${OPTIONS} --with-curl"
+	OPTIONS="${OPTIONS} --enable-mbstring"
 fi
 
 IS_64BIT=`getconf LONG_BIT`
@@ -109,6 +110,13 @@ if [ "${SYS_ARCH}" == "aarch64" ];then
 	OPTIONS="$OPTIONS --build=aarch64-unknown-linux-gnu --host=aarch64-unknown-linux-gnu"
 fi
 
+if [ "${SYS_ARCH}" == "arm64" ];then
+	# 修复mac arm64架构下php安装
+	# 修复不能识别到sys_icache_invalidate
+	cat ${curPath}/versions/${PHP_VER}/src/ext/pcre/sljitConfigInternal.h > $sourcePath/php/php${PHP_VER}/ext/pcre/pcrelib/sljit/sljitConfigInternal.h
+	cat ${curPath}/versions/${PHP_VER}/src/reentrancy.c > $sourcePath/php/php${PHP_VER}/main/reentrancy.c
+fi
+
 if [ ! -d $serverPath/php/${PHP_VER} ];then
 	cd $sourcePath/php/php${PHP_VER} && ./configure \
 	--prefix=$serverPath/php/${PHP_VER} \
@@ -120,7 +128,6 @@ if [ ! -d $serverPath/php/${PHP_VER} ];then
 	--with-pdo-mysql=mysqlnd \
 	--with-mysqli=mysqlnd \
 	--enable-zip \
-	--enable-mbstring \
 	--enable-sockets \
 	--enable-ftp \
 	--enable-simplexml \
