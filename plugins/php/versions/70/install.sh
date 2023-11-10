@@ -8,6 +8,7 @@ rootPath=$(dirname "$rootPath")
 serverPath=$(dirname "$rootPath")
 sourcePath=${serverPath}/source
 sysName=`uname`
+SYS_ARCH=`arch`
 install_tmp=${rootPath}/tmp/mw_install.pl
 
 version=7.0.33
@@ -96,6 +97,14 @@ else
 	cpuCore="1"
 fi
 # ----- cpu end ------
+
+if [ "${SYS_ARCH}" == "arm64" ] && [ "$sysName" == "Darwin" ] ;then
+	# 修复mac arm64架构下php安装
+	# 修复不能识别到sys_icache_invalidate
+	cat ${curPath}/versions/${PHP_VER}/src/ext/pcre/sljitConfigInternal.h > $sourcePath/php/php${PHP_VER}/ext/pcre/pcrelib/sljit/sljitConfigInternal.h
+	cat ${curPath}/versions/${PHP_VER}/src/reentrancy.c > $sourcePath/php/php${PHP_VER}/main/reentrancy.c
+	cat ${curPath}/versions/${PHP_VER}/src/mkstemp.c > $sourcePath/php/php${PHP_VER}/ext/zip/lib/mkstemp.c
+fi
 
 if [ ! -d $serverPath/php/${PHP_VER} ];then
 	cd $sourcePath/php/php${PHP_VER} && ./configure \
