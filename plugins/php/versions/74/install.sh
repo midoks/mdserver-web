@@ -79,9 +79,9 @@ fi
 
 cd $sourcePath/php/php${PHP_VER}
 
-OPTIONS=''
+OPTIONS='--without-iconv'
 if [ $sysName == 'Darwin' ]; then
-	OPTIONS='--without-iconv'
+	
 	OPTIONS="${OPTIONS} --with-curl"
 	OPTIONS="${OPTIONS} --with-external-pcre=$(brew --prefix pcre2)"
 
@@ -92,7 +92,6 @@ if [ $sysName == 'Darwin' ]; then
 	# OPTIONS="${OPTIONS} --with-libxml=${XML_LIB_DEPEND_DIR}"
 
 else
-	OPTIONS='--without-iconv'
 	OPTIONS="${OPTIONS} --with-curl"
 fi
 
