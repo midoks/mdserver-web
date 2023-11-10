@@ -8,6 +8,7 @@ rootPath=$(dirname "$rootPath")
 serverPath=$(dirname "$rootPath")
 sourcePath=${serverPath}/source
 sysName=`uname`
+SYS_ARCH=`arch`
 install_tmp=${rootPath}/tmp/mw_install.pl
 
 function version_gt() { test "$(echo "$@" | tr " " "\n" | sort -V | head -n 1)" != "$1"; }
@@ -37,11 +38,11 @@ if [ ! -d $sourcePath/php/php${PHP_VER} ];then
 		LOCAL_ADDR=cn
 	fi
 
-	if [ "$LOCAL_ADDR" == "cn" ];then
-		if [ ! -f $sourcePath/php/php-${version}.tar.xz ];then
-			wget --no-check-certificate -O $sourcePath/php/php-${version}.tar.xz https://mirrors.sohu.com/php/php-${version}.tar.xz
-		fi
-	fi
+	# if [ "$LOCAL_ADDR" == "cn" ];then
+	# 	if [ ! -f $sourcePath/php/php-${version}.tar.xz ];then
+	# 		wget --no-check-certificate -O $sourcePath/php/php-${version}.tar.xz https://mirrors.sohu.com/php/php-${version}.tar.xz
+	# 	fi
+	# fi
 	# ----------------------------------------------------------------------- #
 	
 	if [ ! -f $sourcePath/php/php-${version}.tar.xz ];then
@@ -70,18 +71,11 @@ if [ "$?" != "0" ] || version_lt "$libzip_version" "0.11.0" ;then
 	ZIP_OPTION="--with-libzip=$serverPath/lib/libzip"
 fi
 
-OPTIONS=''
-if [ $sysName == 'Darwin' ]; then
-	OPTIONS='--without-iconv'
-	OPTIONS="${OPTIONS} --with-curl"
-	# OPTIONS="${OPTIONS} –without-pear"
-	# OPTIONS="${OPTIONS} -disable-phar"
-
-	# OPTIONS="${OPTIONS} --without-pcre-jit"
-	# OPTIONS="${OPTIONS} --with-external-pcre=$(brew --prefix pcre2)"
-
+OPTIONS='--without-iconv'
+if [ $sysName == 'Darwin' ]; then	
+	OPTIONS="${OPTIONS} --with-curl=$(brew --prefix curl)"
+	OPTIONS="${OPTIONS} --with-pcre-dir=$(brew --prefix pcre2)"
 else
-	OPTIONS='--without-iconv'
 	OPTIONS="${OPTIONS} --with-curl"
 	OPTIONS="${OPTIONS} --with-zlib-dir=$serverPath/lib/zlib"
 	OPTIONS="${OPTIONS} ${ZIP_OPTION}"
