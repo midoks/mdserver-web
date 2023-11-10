@@ -10,10 +10,13 @@ rootPath=$(dirname "$rootPath")
 serverPath=$(dirname "$rootPath")
 sourcePath=${serverPath}/source
 sysName=`uname`
-install_tmp=${rootPath}/tmp/mw_install.pl
 SYS_ARCH=`arch`
+
+install_tmp=${rootPath}/tmp/mw_install.pl
+
 version=5.6.40
 PHP_VER=56
+
 Install_php()
 {
 #------------------------ install start ------------------------------------#
@@ -68,6 +71,7 @@ if [ $sysName == 'Darwin' ]; then
 else
 	# OPTIONS="--with-iconv=${serverPath}/lib/libiconv"
 	OPTIONS="${OPTIONS} --with-curl"
+	OPTIONS="${OPTIONS} --enable-mbstring"
 fi
 
 IS_64BIT=`getconf LONG_BIT`
@@ -109,6 +113,15 @@ if [ "${SYS_ARCH}" == "aarch64" ];then
 fi
 
 
+if [ "${SYS_ARCH}" == "arm64" ] && [ "$sysName" == "Darwin" ] ;then
+	# 修复mac arm64架构下php安装
+	# 修复不能识别到sys_icache_invalidate
+	cat ${curPath}/versions/${PHP_VER}/src/ext/pcre/sljitConfigInternal.h > $sourcePath/php/php${PHP_VER}/ext/pcre/pcrelib/sljit/sljitConfigInternal.h
+	cat ${curPath}/versions/${PHP_VER}/src/reentrancy.c > $sourcePath/php/php${PHP_VER}/main/reentrancy.c
+	cat ${curPath}/versions/${PHP_VER}/src/mkstemp.c > $sourcePath/php/php${PHP_VER}/ext/zip/lib/mkstemp.c
+fi
+
+
 if [ ! -d $serverPath/php/${PHP_VER} ];then
 	cd $sourcePath/php/php${PHP_VER} && ./configure \
 	--prefix=$serverPath/php/${PHP_VER} \
@@ -120,7 +133,6 @@ if [ ! -d $serverPath/php/${PHP_VER} ];then
 	--with-pdo-mysql=mysqlnd \
 	--with-mysqli=mysqlnd \
 	--enable-zip \
-	--enable-mbstring \
 	--enable-simplexml \
 	--enable-ftp \
 	--enable-sockets \
