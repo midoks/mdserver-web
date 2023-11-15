@@ -22,7 +22,7 @@ VERSION=$2
 
 Install_App()
 {
-	echo '正在安装脚本文件...' > $install_tmp
+	echo '正在安装keepalived脚本文件...'
 	mkdir -p $serverPath/source/keepalived
 
 	if [ ! -f $serverPath/source/keepalived/keepalived-${VERSION}.tar.gz ];then
