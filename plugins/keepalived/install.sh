@@ -53,7 +53,7 @@ Install_App()
 
 	if [ -d $serverPath/keepalived ];then
 		echo "${VERSION}" > $serverPath/keepalived/version.pl
-		echo '安装完成' > $install_tmp
+		echo 'keepalived安装完成'
 
 		cd ${rootPath} && python3 ${rootPath}/plugins/keepalived/index.py start
 		cd ${rootPath} && python3 ${rootPath}/plugins/keepalived/index.py initd_install
@@ -81,7 +81,7 @@ Uninstall_App()
 	fi
 
 	rm -rf $serverPath/keepalived
-	echo "uninstall_keepalived" > $install_tmp
+	echo "keepalived卸载完成"
 }
 
 action=$1
