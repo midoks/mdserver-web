@@ -326,10 +326,19 @@ function getFpmStatus(version){
             return;
         }
 
+        var php_fpm_status = '动态';
+        if (rdata['process manager'] == 'dynamic'){
+            php_fpm_status = '动态';
+        } else if(rdata['process manager'] == 'static'){
+            php_fpm_status = '静态';
+        } else if(rdata['process manager'] == 'ondemand'){
+            php_fpm_status = '按需';
+        }
+
         var rdata = tmp_data.data;
         var con = "<div style='height:420px;overflow:hidden;'><table class='table table-hover table-bordered GetPHPStatus' style='margin:0;padding:0'>\
                         <tr><th>应用池(pool)</th><td>" + rdata.pool + "</td></tr>\
-                        <tr><th>进程管理方式(process manager)</th><td>" + ((rdata['process manager'] == 'dynamic') ? '动态' : '静态') + "</td></tr>\
+                        <tr><th>进程管理方式(process manager)</th><td>" + php_fpm_status + "</td></tr>\
                         <tr><th>启动日期(start time)</th><td>" + rdata['start time'] + "</td></tr>\
                         <tr><th>请求数(accepted conn)</th><td>" + rdata['accepted conn'] + "</td></tr>\
                         <tr><th>请求队列(listen queue)</th><td>" + rdata['listen queue'] + "</td></tr>\
