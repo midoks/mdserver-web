@@ -58,6 +58,10 @@ expire_logs_days=7
 relay-log=mdserver
 relay-log-index=mdserver
 
+#主主互备设置
+#auto_increment_offset=2
+#auto_increment_increment=2
+
 #master
 #sync_binlog=1
 
