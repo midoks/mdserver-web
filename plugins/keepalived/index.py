@@ -120,6 +120,8 @@ def initDreplace():
         mw.writeFile(dst_conf, conf_content)
         mw.writeFile(dst_conf_init, 'ok')
 
+    # route -n | grep ^0.0.0.0 | awk '{print $8}'
+
     # systemd
     systemDir = mw.systemdCfgDir()
     systemService = systemDir + '/' + getPluginName() + '.service'

@@ -1,6 +1,8 @@
 #!/bin/bash
 PATH=/bin:/sbin:/usr/bin:/usr/sbin:/usr/local/bin:/usr/local/sbin:~/bin
-export PATH
+
+# for mac
+export PATH=$PATH:/opt/homebrew/bin
 
 curPath=`pwd`
 rootPath=$(dirname "$curPath")
@@ -51,12 +53,18 @@ Install_App()
 
 	./configure --prefix=$serverPath/keepalived && make && make install
 
+	# for test
+	# mkdir -p $serverPath/keepalived
 	if [ -d $serverPath/keepalived ];then
 		echo "${VERSION}" > $serverPath/keepalived/version.pl
 		echo 'keepalived安装完成'
 
 		cd ${rootPath} && python3 ${rootPath}/plugins/keepalived/index.py start
 		cd ${rootPath} && python3 ${rootPath}/plugins/keepalived/index.py initd_install
+	fi
+
+	if [ -d $serverPath/source/keepalived/keepalived-${VERSION} ];then
+		rm -rf $serverPath/source/keepalived/keepalived-${VERSION}
 	fi
 }
 

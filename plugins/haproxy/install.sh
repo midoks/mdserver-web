@@ -1,6 +1,8 @@
 #!/bin/bash
 PATH=/bin:/sbin:/usr/bin:/usr/sbin:/usr/local/bin:/usr/local/sbin:~/bin
-export PATH
+
+# for mac
+export PATH=$PATH:/opt/homebrew/bin
 
 curPath=`pwd`
 rootPath=$(dirname "$curPath")
@@ -23,12 +25,12 @@ else
 fi
 
 if [ "${2}" == "" ];then
-	echo '缺少安装脚本...' > $install_tmp
+	echo '缺少安装脚本...'
 	exit 0
 fi 
 
 if [ ! -d $curPath/versions/$2 ];then
-	echo '缺少安装脚本2...' > $install_tmp
+	echo '缺少安装脚本2...'
 	exit 0
 fi
 
