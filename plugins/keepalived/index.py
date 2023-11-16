@@ -113,7 +113,7 @@ def contentReplace(content):
 
     # 网络接口
     ethx = mw.execShell("route -n | grep ^0.0.0.0 | awk '{print $8}'")
-    if data[1]!='':
+    if ethx[1]!='':
         # 未找到
         content = content.replace('{$ETH_XX}', 'eth1')
     else:
