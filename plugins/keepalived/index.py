@@ -97,6 +97,21 @@ def readConfigTpl():
     content = contentReplace(content)
     return mw.returnJson(True, 'ok', content)
 
+
+def defaultScriptsTpl():
+    path = getServerDir() + "/scripts/chk.sh"
+    return path
+
+def configScriptsTpl():
+    path = getServerDir() + '/scripts'
+    pathFile = os.listdir(path)
+    tmp = []
+    for one in pathFile:
+        file = path + '/' + one
+        tmp.append(file)
+    return mw.getJson(tmp)
+
+
 def status():
     data = mw.execShell(
         "ps aux|grep keepalived |grep -v grep | grep -v python | grep -v mdserver-web | awk '{print $2}'")
@@ -117,12 +132,26 @@ def contentReplace(content):
         # 未找到
         content = content.replace('{$ETH_XX}', 'eth1')
     else:
-        #
+        # 已找到
         content = content.replace('{$ETH_XX}', ethx[0])
 
 
     return content
 
+
+def copyScripts():
+    # 复制检查脚本
+    src_scripts_path = getPluginDir() + '/scripts'
+    dst_scripts_path = getServerDir() + '/scripts'
+    if not os.path.exists(dst_scripts_path):
+        cmd = 'cp -rf ' +src_scripts_path+' '+dst_scripts_path
+        t = mw.execShell(cmd)
+        acl_cmd = 'chmod +x '+dst_scripts_path+'/*.sh'
+        # print(acl_cmd)
+        mw.execShell(acl_cmd)
+        # print(t)
+        return True
+    return False
 
 def initDreplace():
 
@@ -150,13 +179,13 @@ def initDreplace():
     dst_conf = getServerDir() + '/etc/keepalived/keepalived.conf'
     dst_conf_init = getServerDir() + '/init.pl'
     if not os.path.exists(dst_conf_init):
-        conf_content = mw.readFile(getConfTpl())
-
-        conf_content = contentReplace(conf_content)
-        mw.writeFile(dst_conf, conf_content)
+        content = mw.readFile(getConfTpl())
+        content = contentReplace(content)
+        mw.writeFile(dst_conf, content)
         mw.writeFile(dst_conf_init, 'ok')
 
-    # route -n | grep ^0.0.0.0 | awk '{print $8}'
+    # 复制检查脚本
+    copyScripts()
 
     # systemd
     systemDir = mw.systemdCfgDir()
@@ -164,9 +193,9 @@ def initDreplace():
     if os.path.exists(systemDir) and not os.path.exists(systemService):
         systemServiceTpl = getPluginDir() + '/init.d/' + getPluginName() + '.service.tpl'
         service_path = mw.getServerDir()
-        se_content = mw.readFile(systemServiceTpl)
-        se_content = contentReplace(se_content)
-        mw.writeFile(systemService, se_content)
+        content = mw.readFile(systemServiceTpl)
+        content = contentReplace(content)
+        mw.writeFile(systemService, content)
         mw.execShell('systemctl daemon-reload')
 
     return file_bin
@@ -308,6 +337,10 @@ if __name__ == "__main__":
         print(runLog())
     elif func == 'config_tpl':
         print(configTpl())
+    elif func == 'default_scripts_tpl':
+        print(defaultScriptsTpl())
+    elif func == 'config_scripts_tpl':
+        print(configScriptsTpl())
     elif func == 'read_config_tpl':
         print(readConfigTpl())
     else:
