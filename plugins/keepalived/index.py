@@ -71,6 +71,31 @@ def getArgs():
             tmp[t[0]] = t[1]
     return tmp
 
+def checkArgs(data, ck=[]):
+    for i in range(len(ck)):
+        if not ck[i] in data:
+            return (False, mw.returnJson(False, '参数:(' + ck[i] + ')没有!'))
+    return (True, mw.returnJson(True, 'ok'))
+
+def configTpl():
+    path = getPluginDir() + '/tpl'
+    pathFile = os.listdir(path)
+    tmp = []
+    for one in pathFile:
+        file = path + '/' + one
+        tmp.append(file)
+    return mw.getJson(tmp)
+
+
+def readConfigTpl():
+    args = getArgs()
+    data = checkArgs(args, ['file'])
+    if not data[0]:
+        return data[1]
+
+    content = mw.readFile(args['file'])
+    content = contentReplace(content)
+    return mw.returnJson(True, 'ok', content)
 
 def status():
     data = mw.execShell(
@@ -85,6 +110,17 @@ def contentReplace(content):
     service_path = os.path.dirname(os.getcwd())
     content = content.replace('{$SERVER_PATH}', service_path)
     content = content.replace('{$PLUGIN_PATH}', getPluginDir())
+
+    # 网络接口
+    ethx = mw.execShell("route -n | grep ^0.0.0.0 | awk '{print $8}'")
+    if data[1]!='':
+        # 未找到
+        content = content.replace('{$ETH_XX}', 'eth1')
+    else:
+        #
+        content = content.replace('{$ETH_XX}', ethx[0])
+
+
     return content
 
 
@@ -270,5 +306,9 @@ if __name__ == "__main__":
         print(getConf())
     elif func == 'run_log':
         print(runLog())
+    elif func == 'config_tpl':
+        print(configTpl())
+    elif func == 'read_config_tpl':
+        print(readConfigTpl())
     else:
         print('error')

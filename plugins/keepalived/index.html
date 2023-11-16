@@ -4,7 +4,8 @@
 		<div class="bt-w-menu">
 			<p class="bgw" onclick="pluginService('keepalived');">服务</p>
 			<p onclick="pluginInitD('keepalived');">自启动</p>
-			<p onclick="pluginConfig('keepalived');">配置修改</p>
+			<!-- <p onclick="pluginConfig('keepalived');">配置修改</p> -->
+			<p onclick="pluginConfigTpl('keepalived',$('.plugin_version').attr('version'));">配置修改</p>
 			<!-- <p onclick="getRedisConfig($('.plugin_version').attr('version'));">性能调整</p> -->
 			<!-- <p onclick="redisStatus($('.plugin_version').attr('version'));">负载状态</p> -->
 			<!-- <p onclick="pluginLogs('keepalived','','run_log');">日志</p> -->
