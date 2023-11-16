@@ -2,7 +2,7 @@
 
 
 # 计划任务,恢复后,可自动拉起keepalived
-# {$SERVER_PATH}/keepalived/scripts/chk.sh mysql
+# bash {$SERVER_PATH}/keepalived/scripts/chk.sh mysql
 
 # check script bash
 curPath=`pwd`

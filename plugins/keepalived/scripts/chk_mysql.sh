@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # 计划任务,恢复后,可自动拉起keepalived
-# {$SERVER_PATH}/keepalived/scripts/chk_mysql.sh
+# bash {$SERVER_PATH}/keepalived/scripts/chk_mysql.sh
 
 counter=$(netstat -na|grep "LISTEN"|grep "3306"|wc -l)
 
