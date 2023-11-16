@@ -2356,6 +2356,125 @@ function pluginConfigTpl(_name, version, func, config_tpl_func, read_config_tpl_
     },'json');
 }
 
+//配置模版列表 --- start
+function pluginConfigListTpl(_name, version, config_tpl_func, read_config_tpl_func){
+	if ( typeof(version) == 'undefined' ){
+		version = '';
+	}
+
+    var _config_tpl_func = 'config_tpl';
+    if ( typeof(config_tpl_func) != 'undefined' ){
+        _config_tpl_func = config_tpl_func;
+    }
+
+    var _read_config_tpl_func = 'read_config_tpl';
+    if ( typeof(read_config_tpl_func) != 'undefined' ){
+        _read_config_tpl_func = read_config_tpl_func;
+    }
+
+
+    var con = '<p style="color: #666; margin-bottom: 7px">提示：Ctrl+F 搜索关键字，Ctrl+G 查找下一个，Ctrl+S 保存，Ctrl+Shift+R 查找替换!</p>\
+    			<select id="config_tpl" class="bt-input-text mr20" style="width:30%;margin-bottom: 3px;"></select>\
+    			<textarea class="bt-input-text" style="height: 320px; line-height:18px;" id="textBody"></textarea>\
+                <button id="onlineEditFileBtn" class="btn btn-success btn-sm" style="margin-top:10px;">保存</button>\
+                <ul class="help-info-text c7 ptb15">\
+                    <li>此处为'+ _name + version +'主配置文件,若您不了解配置规则,请勿随意修改。</li>\
+                </ul>';
+    $(".soft-man-con").html(con);
+
+    function getFileName(file){
+    	var list = file.split('/');
+    	var f = list[list.length-1];
+    	return f 
+    }
+
+    function loadTextBody(fileName){
+        $.post('/files/get_body', 'path=' + fileName, function(rdata) {
+            if (!rdata.status){
+                layer.msg(rdata.msg,{icon:0,time:2000,shade: [0.3, '#000']});
+                return;
+            }
+            $("#textBody").empty().text(rdata.data.data);
+            $(".CodeMirror").remove();
+            var editor = CodeMirror.fromTextArea(document.getElementById("textBody"), {
+                extraKeys: {
+                    "Ctrl-Space": "autocomplete",
+                    "Ctrl-F": "findPersistent",
+                    "Ctrl-H": "replaceAll",
+                    "Ctrl-S": function() {
+                    	$("#textBody").text(editor.getValue());
+                        pluginConfigSave(fileName);
+                    }
+                },
+                lineNumbers: true,
+                matchBrackets:true,
+            });
+            editor.focus();
+            $(".CodeMirror-scroll").css({"height":"300px","margin":0,"padding":0});
+            $("#onlineEditFileBtn").click(function(){
+                $("#textBody").text(editor.getValue());
+                pluginConfigSave(fileName);
+            });
+        },'json');
+    }
+
+
+
+    var fileName = '';
+    $.post('/plugins/run',{name:_name, func:_config_tpl_func,version:version}, function(data){
+    	var rdata = $.parseJSON(data.data);
+    	for (var i = 0; i < rdata.length; i++) {
+    		$('#config_tpl').append('<option value="'+rdata[i]+'">'+getFileName(rdata[i])+'</option>');
+    	}
+
+    	if (rdata.length>0){
+    		loadTextBody(rdata[0]);
+    	}
+
+    	$('#config_tpl').change(function(){
+    		var selected = $(this).val();
+    		fileName = selected;
+    
+			var loadT = layer.msg('配置模版获取中...',{icon:16,time:0,shade: [0.3, '#000']});
+
+			var _args = JSON.stringify({file:selected});
+			$.post('/plugins/run', {name:_name, func:_read_config_tpl_func,version:version,args:_args}, function(data){
+				layer.close(loadT);
+				var rdata = $.parseJSON(data.data);
+				if (!rdata.status){
+	                layer.msg(rdata.msg,{icon:0,time:2000,shade: [0.3, '#000']});
+	                return;
+	            }
+
+				$("#textBody").empty().text(rdata.data);
+				$(".CodeMirror").remove();
+	            var editor = CodeMirror.fromTextArea(document.getElementById("textBody"), {
+	                extraKeys: {
+	                    "Ctrl-Space": "autocomplete",
+	                    "Ctrl-F": "findPersistent",
+	                    "Ctrl-H": "replaceAll",
+	                    "Ctrl-S": function() {
+	                    	$("#textBody").text(editor.getValue());
+	                        pluginConfigSave(fileName);
+	                    }
+	                },
+	                lineNumbers: true,
+	                matchBrackets:true,
+	            });
+	            editor.focus();
+	            $(".CodeMirror-scroll").css({"height":"300px","margin":0,"padding":0});
+	            $("#onlineEditFileBtn").unbind('click');
+	            $("#onlineEditFileBtn").click(function(){
+	                $("#textBody").text(editor.getValue());
+	                pluginConfigSave(fileName);
+	            });
+			},'json');
+    		
+    	});
+
+    },'json');
+}
+
 
 //配置保存
 function pluginConfigSave(fileName) {

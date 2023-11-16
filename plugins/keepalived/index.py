@@ -144,12 +144,18 @@ def copyScripts():
     src_scripts_path = getPluginDir() + '/scripts'
     dst_scripts_path = getServerDir() + '/scripts'
     if not os.path.exists(dst_scripts_path):
-        cmd = 'cp -rf ' +src_scripts_path+' '+dst_scripts_path
-        t = mw.execShell(cmd)
-        acl_cmd = 'chmod +x '+dst_scripts_path+'/*.sh'
-        # print(acl_cmd)
-        mw.execShell(acl_cmd)
-        # print(t)
+        mw.execShell('mkdir -p ' + dst_scripts_path)
+        olist = os.listdir(src_scripts_path)
+        for o in range(len(olist)):
+            src_file = src_scripts_path+'/'+olist[o]
+            dst_file = dst_scripts_path+'/'+olist[o]
+
+            content = mw.readFile(src_file)
+            content = contentReplace(content)
+            mw.writeFile(dst_file, content)
+
+            cmd = 'chmod +x ' + dst_file
+            mw.execShell(cmd)
         return True
     return False
 
