@@ -4,8 +4,9 @@
 # bash {$SERVER_PATH}/keepalived/scripts/chk_mysql.sh
 
 counter=$(netstat -na|grep "LISTEN"|grep "3306"|wc -l)
+data_time=`date +'%Y-%m-%d %H:%M:%S'`
 
-if [ "${counter}" -eq 0 ]; then
+if [ "${counter}" -eq "0" ]; then
     echo "start check mysql status ..."
     date +'%Y-%m-%d %H:%M:%S'
     echo "check mysql is down, stop keepalive"
@@ -17,12 +18,12 @@ fi
 
 # 恢复后，自动拉起
 # systemctl start keepalived
-if [ "${counter}" -gt 0 ]; then
+if [ "${counter}" -gt "0" ]; then
     echo "start check mysql status ..."
     date +'%Y-%m-%d %H:%M:%S'
     echo "check mysql is up, start keepalive"
 
-    keepalived_status=`systemctl status keepalived | grep Active | grep inactive`
+    keepalived_status=`which systemctl && systemctl status keepalived | grep Active | grep inactive`
     if [ "$keepalived_status" != "" ];then
         systemctl start keepalived
     fi

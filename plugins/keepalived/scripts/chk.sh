@@ -11,7 +11,7 @@ rootPath=$(dirname "$curPath")
 SOFT=$1
 
 if [ "$SOFT" == "mysql" ];then
-	bash ${rootPath}/chk_mysql.sh
+	bash ${rootPath}/keepalived/scripts/chk_mysql.sh >> ${rootPath}/keepalived/keepalived.log
 else
 	echo "you should use [chk.sh mysql] exp ."
 fi
