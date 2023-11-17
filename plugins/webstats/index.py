@@ -747,8 +747,7 @@ def getLogsList():
     if request_time != "all":
         request_time_s = request_time.strip().split('-')
         if len(request_time_s) == 2:
-            conn = conn.andWhere("request_time>=?", (request_time[0],))
-            conn = conn.andWhere("request_time<?", (request_time[1],))
+            conn = conn.andWhere("request_time>=? and request_time<?", (request_time[0],request_time[1],))
         if len(request_time_s) == 1:
             conn = conn.andWhere("request_time>=?", (request_time,))
 
