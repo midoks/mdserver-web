@@ -71,7 +71,7 @@ Uninstall_LVS()
 	echo "卸载LVS完成"
 
 	if [ -d $serverPath/lvs ];then
-		rm -rf serverPath/lvs
+		rm -rf $serverPath/lvs
 	fi
 }
 
