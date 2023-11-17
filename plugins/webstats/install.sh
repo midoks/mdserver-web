@@ -150,7 +150,7 @@ Uninstall_App()
 {
 	cd $rootPath && python3 ${rootPath}/plugins/webstats/index.py stop
 	rm -rf $serverPath/webstats
-	echo "卸载完成" > $install_tmp
+	echo "网站统计卸载完成"
 }
 
 action=$1
