@@ -46,7 +46,7 @@ get_latest_release() {
 
 Install_App()
 {
-	echo '正在安装脚本文件...' > $install_tmp
+	echo '正在安装脚本文件...'
 	mkdir -p $serverPath/source/webstats
 	mkdir -p $serverPath/webstats
 	echo "${VERSION}" > $serverPath/webstats/version.pl
@@ -133,11 +133,9 @@ Install_App()
 		cp -rf $serverPath/source/webstats/GeoLite2-City.mmdb $serverPath/webstats/GeoLite2-City.mmdb
 	fi
 
-	
-	echo '安装完成' > $install_tmp
-
 	cd $rootPath && python3 ${rootPath}/plugins/webstats/index.py start
 
+	echo '网站统计安装完成'
 
 	# delete install data
 	if [ -d $serverPath/source/webstats/lsqlite3_fsl09y ];then
