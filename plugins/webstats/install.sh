@@ -4,6 +4,8 @@ export PATH=$PATH:/opt/homebrew/bin
 
 
 ## https://www.yangshuaibin.com/detail/392251
+# cd /www/server/mdserver-web/plugins/webstats && bash install.sh install 0.2.5
+# /Users/midoks/Desktop/mwdev/server/mdserver-web/plugins/webstats && bash install.sh install 0.2.5
 
 curPath=`pwd`
 rootPath=$(dirname "$curPath")
@@ -19,7 +21,7 @@ LOCAL_ADDR=common
 cn=$(curl -fsSL -m 10 -s http://ipinfo.io/json | grep "\"country\": \"CN\"")
 if [ ! -z "$cn" ] || [ "$?" == "0" ] ;then
     LOCAL_ADDR=cn
-    HTTP_PREFIX="https://ghproxy.com/"
+    HTTP_PREFIX="https://"
 fi
 
 PIPSRC="https://pypi.python.org/simple"
@@ -60,21 +62,25 @@ Install_App()
 	if [ ! -f $serverPath/source/webstats/luarocks-3.5.0.tar.gz ];then
 		wget --no-check-certificate -O $serverPath/source/webstats/luarocks-3.5.0.tar.gz http://luarocks.org/releases/luarocks-3.5.0.tar.gz
 	fi
-	
-	# which luarocks
-	# if [ "$?" != "0" ];then
-	if [ ! -d $serverPath/webstats/luarocks ];then
-		cd $serverPath/source/webstats && tar xvf luarocks-3.5.0.tar.gz
-		# cd luarocks-3.9.1 && ./configure && make bootstrap
 
-		cd luarocks-3.5.0 && ./configure --prefix=$serverPath/webstats/luarocks --with-lua-include=$serverPath/openresty/luajit/include/luajit-2.1 --with-lua-bin=$serverPath/openresty/luajit/bin
-		make -I${serverPath}/openresty/luajit/bin
-		make install 
+	if [ ! -d $serverPath/source/webstats/luarocks-3.5.0  ];then
+		cd $serverPath/source/webstats && tar xvf luarocks-3.5.0.tar.gz
 	fi
 
+	cd $serverPath/source/webstats/luarocks-3.5.0 && ./configure --prefix=$serverPath/webstats/luarocks \
+	--with-lua-include=$serverPath/openresty/luajit/include/luajit-2.1 \
+	--with-lua-bin=$serverPath/openresty/luajit/bin
+	make -I${serverPath}/openresty/luajit/bin
+	make install 
 
-	if [ ! -f  $serverPath/source/webstats/lsqlite3_fsl09y.zip ];then
+
+	# lsqlite3_fsl09y
+	if [ ! -f $serverPath/source/webstats/lsqlite3_fsl09y.zip ];then
 		wget --no-check-certificate -O $serverPath/source/webstats/lsqlite3_fsl09y.zip http://lua.sqlite.org/index.cgi/zip/lsqlite3_fsl09y.zip?uuid=fsl_9y
+		
+	fi
+
+	if [ ! -d $serverPath/source/webstats/lsqlite3_fsl09y ];then
 		cd $serverPath/source/webstats && unzip lsqlite3_fsl09y.zip
 	fi
 
@@ -85,9 +91,13 @@ Install_App()
 		if [ "${sys_os}" == "Darwin" ];then
 			cd $serverPath/source/webstats/lsqlite3_fsl09y 
 			# SQLITE_DIR=/usr/local/Cellar/sqlite/3.36.0
+			BREW_DIR=`which brew`
+			BREW_DIR=${BREW_DIR/\/bin\/brew/}
+			echo "BREW_DIR:"${BREW_DIR}
 			find_cfg=`cat Makefile | grep 'SQLITE_DIR'`
 			if [ "$find_cfg" == "" ];then
-				LIB_SQLITE_DIR=`brew info sqlite | grep /usr/local/Cellar/sqlite | cut -d \  -f 1 | awk 'END {print}'`
+				LIB_SQLITE_DIR=`brew info sqlite | grep ${BREW_DIR}/Cellar/sqlite | cut -d \  -f 1 | awk 'END {print}'`
+				echo "LIB_SQLITE_DIR:"${LIB_SQLITE_DIR}
 				sed -i $BAK "s#\$(ROCKSPEC)#\$(ROCKSPEC) SQLITE_DIR=${LIB_SQLITE_DIR}#g"  Makefile
 			fi
 			make
@@ -112,7 +122,11 @@ Install_App()
 	# 缓存数据
 	GEO_VERSION=$(get_latest_release "P3TERX/GeoLite.mmdb")
 	if [ ! -f $serverPath/source/webstats/GeoLite2-City.mmdb ];then
-		wget --no-check-certificate -O $serverPath/source/webstats/GeoLite2-City.mmdb ${HTTP_PREFIX}github.com/P3TERX/GeoLite.mmdb/releases/download/${GEO_VERSION}/GeoLite2-City.mmdb
+		if [ "$LOCAL_ADDR" == "cn" ];then
+			wget --no-check-certificate -O $serverPath/source/webstats/GeoLite2-City.mmdb https://dl.midoks.me/soft/webstats/GeoLite2-City.mmdb
+		else
+			wget --no-check-certificate -O $serverPath/source/webstats/GeoLite2-City.mmdb https://github.com/P3TERX/GeoLite.mmdb/releases/download/${GEO_VERSION}/GeoLite2-City.mmdb
+		fi
 	fi
 
 	if [ -f $serverPath/source/webstats/GeoLite2-City.mmdb ];then
@@ -126,7 +140,12 @@ Install_App()
 
 
 	# delete install data
-	rm -rf $serverPath/source/webstats
+	if [ -d $serverPath/source/webstats/lsqlite3_fsl09y ];then
+		rm -rf $serverPath/source/webstats/lsqlite3_fsl09y
+	fi
+	if [ -d $serverPath/source/webstats/luarocks-3.5.0 ];then
+		rm -rf $serverPath/source/webstats/luarocks-3.5.0
+	fi
 }
 
 Uninstall_App()
