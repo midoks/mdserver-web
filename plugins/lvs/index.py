@@ -19,6 +19,9 @@ if mw.isAppleSystem():
 def getPluginName():
     return 'lvs'
 
+def getIpvsadm():
+    return 'ipvsadm'
+
 
 def getPluginDir():
     return mw.getPluginDir() + '/' + getPluginName()
@@ -57,33 +60,9 @@ def checkArgs(data, ck=[]):
     return (True, mw.returnJson(True, 'ok'))
 
 
-def configTpl():
-    path = getPluginDir() + '/tpl'
-    pathFile = os.listdir(path)
-    tmp = []
-    for one in pathFile:
-        file = path + '/' + one
-        tmp.append(file)
-    return mw.getJson(tmp)
-
-
-def readConfigTpl():
-    args = getArgs()
-    data = checkArgs(args, ['file'])
-    if not data[0]:
-        return data[1]
-
-    content = mw.readFile(args['file'])
-    content = contentReplace(content)
-    return mw.returnJson(True, 'ok', content)
-
-
-def contentReplace(content):
-    service_path = mw.getServerDir()
-    content = content.replace('{$ROOT_PATH}', mw.getRootDir())
-    content = content.replace('{$SERVER_PATH}', service_path)
-    content = content.replace('{$SERVER_APP}', service_path + '/'+getPluginName())
-    return content
+def getConf():
+    path = '/etc/default/ipvsadm'
+    return path
 
 
 def status():
@@ -133,6 +112,40 @@ def restart():
 def reload():
     return haOp('reload')
 
+def initdStatus():
+    current_os = mw.getOs()
+    if current_os == 'darwin':
+        return "Apple Computer does not support"
+
+    if current_os.startswith('freebsd'):
+        initd_bin = getInitDFile()
+        if os.path.exists(initd_bin):
+            return 'ok'
+
+    shell_cmd = 'systemctl status ' + \
+        getPluginName() + ' | grep loaded | grep "enabled;"'
+    data = mw.execShell(shell_cmd)
+    if data[0] == '':
+        return 'fail'
+    return 'ok'
+
+
+def initdInstall():
+    current_os = mw.getOs()
+    if current_os == 'darwin':
+        return "Apple Computer does not support"
+
+    mw.execShell('systemctl enable ' + getIpvsadm())
+    return 'ok'
+
+
+def initdUinstall():
+    current_os = mw.getOs()
+    if current_os == 'darwin':
+        return "Apple Computer does not support"
+
+    mw.execShell('systemctl disable ' + getIpvsadm())
+    return 'ok'
 
 def runLog():
     path = getConf()
@@ -155,5 +168,13 @@ if __name__ == "__main__":
         print(restart())
     elif func == 'reload':
         print(reload())
+    elif func == 'initd_status':
+        print(initdStatus())
+    elif func == 'initd_install':
+        print(initdInstall())
+    elif func == 'initd_uninstall':
+        print(initdUinstall())
+    elif func == 'conf':
+        print(getConf())
     else:
         print('error')
