@@ -34,21 +34,6 @@ def getInitDFile():
     return '/etc/init.d/' + getPluginName()
 
 
-def getConfTpl():
-    path = getPluginDir() + "/conf/haproxy.conf"
-    return path
-
-
-def getConf():
-    path = getServerDir() + "/haproxy.conf"
-    return path
-
-
-def getInitDTpl():
-    path = getPluginDir() + "/init.d/" + getPluginName() + ".tpl"
-    return path
-
-
 def getArgs():
     args = sys.argv[2:]
     tmp = {}
@@ -97,7 +82,7 @@ def contentReplace(content):
     service_path = mw.getServerDir()
     content = content.replace('{$ROOT_PATH}', mw.getRootDir())
     content = content.replace('{$SERVER_PATH}', service_path)
-    content = content.replace('{$SERVER_APP}', service_path + '/haproxy')
+    content = content.replace('{$SERVER_APP}', service_path + '/'+getPluginName())
     return content
 
 
@@ -130,18 +115,7 @@ def initDreplace():
 
 
 def haOp(method):
-    file = initDreplace()
-
-    if not mw.isAppleSystem():
-        data = mw.execShell('systemctl ' + method + ' haproxy')
-        if data[1] == '':
-            return 'ok'
-        return 'fail'
-
-    data = mw.execShell(file + ' ' + method)
-    if data[1] == '':
-        return 'ok'
-    return data[1]
+    return 'ok'
 
 
 def start():
@@ -160,33 +134,6 @@ def reload():
     return haOp('reload')
 
 
-def initdStatus():
-    if mw.isAppleSystem():
-        return "Apple Computer does not support"
-
-    shell_cmd = 'systemctl status haproxy | grep loaded | grep "enabled;"'
-    data = mw.execShell(shell_cmd)
-    if data[0] == '':
-        return 'fail'
-    return 'ok'
-
-
-def initdInstall():
-    if mw.isAppleSystem():
-        return "Apple Computer does not support"
-
-    mw.execShell('systemctl enable haproxy')
-    return 'ok'
-
-
-def initdUinstall():
-    if mw.isAppleSystem():
-        return "Apple Computer does not support"
-
-    mw.execShell('systemctl disable haproxy')
-    return 'ok'
-
-
 def runLog():
     path = getConf()
     content = mw.readFile(path)
@@ -194,13 +141,6 @@ def runLog():
     tmp = re.search(rep, content)
     return tmp.groups()[0]
 
-
-def getPort():
-    path = getConf()
-    content = mw.readFile(path)
-    rep = 'listen\s*=\s*(.*)'
-    tmp = re.search(rep, content)
-    return tmp.groups()[0]
 
 
 if __name__ == "__main__":
@@ -215,21 +155,5 @@ if __name__ == "__main__":
         print(restart())
     elif func == 'reload':
         print(reload())
-    elif func == 'initd_status':
-        print(initdStatus())
-    elif func == 'initd_install':
-        print(initdInstall())
-    elif func == 'initd_uninstall':
-        print(initdUinstall())
-    elif func == 'conf':
-        print(getConf())
-    elif func == 'config_tpl':
-        print(configTpl())
-    elif func == 'read_config_tpl':
-        print(readConfigTpl())
-    elif func == 'run_log':
-        print(runLog())
-    elif func == 'query_log':
-        print(queryLog())
     else:
         print('error')
