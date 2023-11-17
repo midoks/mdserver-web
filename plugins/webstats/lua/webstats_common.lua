@@ -122,7 +122,7 @@ end
 function _M.split(self, str, reps)
     local arr = {}
     -- 修复反向代理代过来的数据
-    if "table" == type(data) then
+    if "table" == type(str) then
         return str
     end
     string.gsub(str,'[^'..reps..']+',function(w) table.insert(arr,w) end)
