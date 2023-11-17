@@ -110,19 +110,17 @@ docker run -itd --name mw-server --privileged=true -p 7200:7200 -p 80:80 -p 443:
 ```
 
 
-### 版本更新 0.16.1
+### 版本更新 0.16.2
 
-* 给防盗链增加禁止空来源。
-* OpenResty安装兼容。
-* Debian10安装优化。
-* 安装时默认监控开启。
-* MySQL/MYSQL-YUM/MySQL-APT添加重置master功能。
-* 支持华为欧拉系统。
-* 支持rar解压。
-* SSH禁止密码登陆优化。
-* 防火墙支持tcp/udp模式。
-* 增加mosquitto插件。
-* redis负载状态读取优化。
+* keepalived插件改造,集成mysql高可用配置。
+* redis(主从/集群)配置识别。
+* MySQL主从同步1236错误,添加修复功能。
+* MySQL二进制日志查看。
+* 源码安装成功后删除解压包,节省体积。
+* 网站统计-增加查询条件。
+* php增加yaml扩展。
+* php-fpm增加【按需】配置。
+* gitea/gogs同步功能改造。
 
 ### JSDelivr安装地址
 
