@@ -17,7 +17,7 @@ VERSION=1.6.22
 
 Install_LVS(){
 	mkdir -p $serverPath/source
-	
+
 	which ipvsadm
 	if [ "$?" == "0" ];then
 		echo '已安装LVS!!'
@@ -58,18 +58,21 @@ Install_LVS(){
 
 Uninstall_LVS()
 {
+	# 检测平台命令
+	which apt
+	if [ "$?" == "0" ];then
+		apt remove -y ipvsadm
+	fi
 
-	# if [ -f /usr/lib/systemd/system/memcached.service ];then
-	# 	systemctl stop memcached
-	# 	systemctl disable memcached
-	# 	rm -rf /usr/lib/systemd/system/memcached.service
-	# 	systemctl daemon-reload
-	# fi
-
-	# if [ -f $serverPath/memcached/initd/memcached ];then
-	# 	$serverPath/memcached/initd/memcached stop
-	# fi
+	which yum
+	if [ "$?" == "0" ];then
+		yum uninstall -y ipvsadm
+	fi
 	echo "卸载LVS完成"
+
+	if [ -d $serverPath/lvs ];then
+		rm -rf serverPath/lvs
+	fi
 }
 
 action=$1
