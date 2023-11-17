@@ -2175,6 +2175,7 @@ function wsTableLogRequest(page){
     args['site'] = $('select[name="site"]').val();
     args['method'] = $('select[name="method"]').val();
     args['status_code'] = $('select[name="status_code"]').val();
+    args['request_time'] = $('select[name="request_time"]').val();
     args['spider_type'] = $('select[name="spider_type"]').val();
     args['referer'] = $('select[name="referer"]').val();
     args['ip'] = $('input[name="ip"]').val();
@@ -2404,7 +2405,16 @@ var html = '<div>\
                     </div>\
                 </div>\
                 <div style="padding-bottom:10px;">\
-                    <span>URL过滤: </span>\
+                    <span>耗时: </span>\
+                    <select class="bt-input-text" name="request_time" style="margin-left:5px;">\
+                        <option value="all">所有</option>\
+                        <option value="0-50">0-50(ms)</option>\
+                        <option value="50-200">50-200(ms)</option>\
+                        <option value="200-500">200-500(ms)</option>\
+                        <option value="500-1000">500ms-1s</option>\
+                        <option value="1000">大于1s</option>\
+                    </select>\
+                    <span style="margin-left:10px;">URL过滤: </span>\
                     <div class="input-group" style="width:210px;display:inline-flex;">\
                         <input type="text" name="search_uri" class="form-control btn-group-sm" autocomplete="off" placeholder="URI搜索" style="font-size: 12px;padding: 0 10px;height:30px;">\
                         <div class="input-group-btn btn-group-sm">\
@@ -2470,6 +2480,10 @@ $('select[name="spider_type"]').change(function(){
 });
 
 $('select[name="referer"]').change(function(){
+    wsTableLogRequest(1);
+});
+
+$('select[name="request_time"]').change(function(){
     wsTableLogRequest(1);
 });
 

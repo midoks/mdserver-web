@@ -702,8 +702,8 @@ def attacHistoryLogHack(conn, site_name, query_date='today'):
 
 def getLogsList():
     args = getArgs()
-    check = checkArgs(args, ['page', 'page_size',
-                             'site', 'method', 'status_code', 'spider_type', 'query_date', 'search_uri'])
+    check = checkArgs(args, ['page', 'page_size','site', 'method', 
+            'status_code', 'spider_type', 'request_time', 'query_date', 'search_uri'])
     if not check[0]:
         return check[1]
 
@@ -713,6 +713,7 @@ def getLogsList():
     tojs = args['tojs']
     method = args['method']
     status_code = args['status_code']
+    request_time = args['request_time']
     spider_type = args['spider_type']
     query_date = args['query_date']
     search_uri = args['search_uri']
@@ -742,6 +743,13 @@ def getLogsList():
 
     if status_code != "all":
         conn = conn.andWhere("status_code=?", (status_code,))
+
+    if request_time != "all":
+        request_time_s = request_time.strip().split('-')
+        if len(request_time_s) == 2:
+            conn = conn.andWhere("request_time>=? and request_time<?", (request_time[0],request_time[1],))
+        if len(request_time_s) == 1:
+            conn = conn.andWhere("request_time>=?", (request_time,))
 
     if spider_type == "normal":
         pass
