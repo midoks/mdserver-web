@@ -17,6 +17,13 @@ VERSION=1.6.22
 
 Install_LVS(){
 	mkdir -p $serverPath/source
+	
+	which ipvsadm
+	if [ "$?" == "0" ];then
+		echo '已安装LVS!!'
+		exit 0
+	fi
+
 	echo '正在安装LVS...'
 
 	# 检测平台命令
