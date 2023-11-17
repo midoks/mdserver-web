@@ -240,6 +240,8 @@ function _M.get_http_origin(self)
 end
 
 function _M.cronPre(self)
+    self:lock_working('cron_init_stat')
+
     local time_key = self:get_store_key()
     local time_key_next = self:get_store_key_with_time(ngx.time()+3600)
 
@@ -271,6 +273,8 @@ function _M.cronPre(self)
             return false
         end
     end
+
+    self:unlock_working('cron_init_stat')
 
     return true
 end
@@ -314,6 +318,11 @@ function _M.cron(self)
             -- self:D("input_sn:"..input_sn)
             -- 迁移合并时不执行
             if self:is_migrating(input_sn) then
+                return true
+            end
+
+            -- 初始化统计表时不执行
+            if self:is_working('cron_init_stat') then
                 return true
             end
 
