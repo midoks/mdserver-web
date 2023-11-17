@@ -102,8 +102,7 @@ def contentReplace(content):
 
 
 def status():
-    data = mw.execShell(
-        "ps -ef|grep haproxy |grep -v grep | grep -v python | awk '{print $2}'")
+    data = mw.execShell("which ipvsadm")
     if data[0] == '':
         return 'stop'
     return 'start'
@@ -126,23 +125,6 @@ def initDreplace():
         mw.writeFile(file_bin, content)
         mw.execShell('chmod +x ' + file_bin)
 
-    # config replace
-    conf_bin = getConf()
-    if not os.path.exists(conf_bin):
-        conf_content = mw.readFile(getConfTpl())
-        conf_content = contentReplace(conf_content)
-        mw.writeFile(getServerDir() + '/haproxy.conf', conf_content)
-
-    # systemd
-    systemDir = mw.systemdCfgDir()
-    systemService = systemDir + '/haproxy.service'
-    systemServiceTpl = getPluginDir() + '/init.d/haproxy.service.tpl'
-    if os.path.exists(systemDir) and not os.path.exists(systemService):
-        service_path = mw.getServerDir()
-        se_content = mw.readFile(systemServiceTpl)
-        se_content = se_content.replace('{$SERVER_PATH}', service_path)
-        mw.writeFile(systemService, se_content)
-        mw.execShell('systemctl daemon-reload')
 
     return file_bin
 
