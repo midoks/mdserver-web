@@ -12,12 +12,11 @@ sys_os=`uname`
 VERSION=1.6.22
 
 # cd /Users/midoks/Desktop/mwdev/server/mdserver-web/plugins/lvs && bash install.sh install 1.0
-# cd /wwww/mdserver-web/plugins/lvs && bash install.sh install 1.0
+# cd /www/server/mdserver-web/plugins/lvs && bash install.sh install 1.0
 
 
 Install_LVS(){
 	mkdir -p $serverPath/source
-	# mkdir -p $serverPath/memcached
 	echo '正在安装LVS...'
 
 	# 检测平台命令
@@ -31,12 +30,22 @@ Install_LVS(){
 		yum install -y ipvsadm
 	fi
 
-	if [ -d $serverPath/lvs ];then
-		echo '1.6' > $serverPath/lvs/version.pl
+	which ipvsadm
+	if [ "$?" == "0" ];then
 		echo '正在安装LVS成功!'
+		mkdir -p $serverPath/lvs
+
+		ipv_version=`ipvsadm -v | awk '{print $2}'`
+		if [ "$ipv_version" != "" ];then
+			echo "$ipv_version" > $serverPath/lvs/version.pl
+		else
+			echo '1.0' > $serverPath/lvs/version.pl
+		fi
 
 		cd ${rootPath} && python3 ${rootPath}/plugins/lvs/index.py start
 		cd ${rootPath} && python3 ${rootPath}/plugins/lvs/index.py initd_install
+	else
+		echo '正在安装LVS失败!'
 	fi
 }
 
