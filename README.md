@@ -119,6 +119,7 @@ docker run -itd --name mw-server --privileged=true -p 7200:7200 -p 80:80 -p 443:
 * 源码安装成功后删除解压包,节省体积。
 * 网站统计-增加查询条件。
 * php增加yaml扩展。
+* php扩展ioncube修复。
 * php-fpm增加【按需】配置。
 * gitea/gogs同步功能改造。
 
