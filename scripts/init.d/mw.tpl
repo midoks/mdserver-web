@@ -217,10 +217,11 @@ error_logs()
 mw_update()
 {
     LOCAL_ADDR=common
-    ping  -c 1 github.com > /dev/null 2>&1
-    if [ "$?" != "0" ];then
+    cn=$(curl -fsSL -m 10 -s http://ipinfo.io/json | grep "\"country\": \"CN\"")
+    if [ ! -z "$cn" ] || [ "$?" == "0" ] ;then
         LOCAL_ADDR=cn
     fi
+    
     if [ "$LOCAL_ADDR" == "common" ];then
         curl --insecure -fsSL https://raw.githubusercontent.com/midoks/mdserver-web/master/scripts/update.sh | bash
     else
@@ -251,7 +252,7 @@ mw_mirror()
     if [ ! -z "$cn" ] || [ "$?" == "0" ] ;then
         LOCAL_ADDR=cn
     fi
-    
+
     if [ "$LOCAL_ADDR" == "common" ];then
         bash <(curl --insecure -sSL https://raw.githubusercontent.com/midoks/change-linux-mirrors/main/change-mirrors.sh)
     else
