@@ -215,19 +215,8 @@ def initdUinstall():
 
 
 def runLog():
-    path = getConf()
-    content = mw.readFile(path)
-    rep = 'log\s*=\s*(.*)'
-    tmp = re.search(rep, content)
-    return tmp.groups()[0]
-
-
-def getPort():
-    path = getConf()
-    content = mw.readFile(path)
-    rep = 'listen\s*=\s*(.*)'
-    tmp = re.search(rep, content)
-    return tmp.groups()[0]
+    path = getServerDir() + "/haproxy.log"
+    return path
 
 
 if __name__ == "__main__":
