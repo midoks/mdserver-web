@@ -19,6 +19,7 @@ listen stats
 	mode http
 	bind *:10800
 	stats enable
+	stats refresh 10
 	stats uri /haproxy
 	stats realm Haproxy\ Statistics
 	stats auth {$HA_USER}:{$HA_PWD}
