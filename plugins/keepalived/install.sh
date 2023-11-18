@@ -27,24 +27,9 @@ Install_App()
 	echo '正在安装keepalived脚本文件...'
 	mkdir -p $serverPath/source/keepalived
 
-	LOCAL_ADDR=common
-    cn=$(curl -fsSL -m 10 -s http://ipinfo.io/json | grep "\"country\": \"CN\"")
-    if [ ! -z "$cn" ] || [ "$?" == "0" ] ;then
-        LOCAL_ADDR=cn
-    fi
-
-
-    if [ "${LOCAL_ADDR}" == "cn" ];then
-    	if [ ! -f $serverPath/source/keepalived/keepalived-${VERSION}.tar.gz ];then
-			wget -O $serverPath/source/keepalived/keepalived-${VERSION}.tar.gz https://dl.midoks.me/soft/keepalived/keepalived-${VERSION}.tar.gz
-		fi
-    fi
-
 	if [ ! -f $serverPath/source/keepalived/keepalived-${VERSION}.tar.gz ];then
 		wget -O $serverPath/source/keepalived/keepalived-${VERSION}.tar.gz https://keepalived.org/software/keepalived-${VERSION}.tar.gz
 	fi
-
-
 
 	#检测文件是否损坏.
 	md5_file_ok=8c26f75a8767e5341d82696e1e717115
