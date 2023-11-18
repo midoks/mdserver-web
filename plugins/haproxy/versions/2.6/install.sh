@@ -20,8 +20,7 @@ VERSION=2.6.4
 MIN_VERSION=2.6
 Install_App()
 {
-
-	echo '正在安装脚本文件...' > $install_tmp
+	echo '正在安装Haproxy软件...'
 	mkdir -p $serverPath/haproxy
 
 	APP_DIR=${serverPath}/source/haproxy
@@ -64,7 +63,22 @@ Install_App()
 	fi
 
 	echo $MIN_VERSION > $serverPath/haproxy/version.pl
-	echo 'Install_HA' > $install_tmp
+	echo '安装Haproxy成功' > $install_tmp
+
+	#Haproxy日志配置
+	if [ -f /etc/rsyslog.conf ];then
+		find_ha=`cat /etc/rsyslog.conf | grep haproxy`
+		if [ $find_ha != "" ];then
+			echo $find_ha
+		else
+			echo "---------------------------------------------"
+			echo "haproxy0.*  ${serverPath}/haproxy/haproxy.log" > /etc/rsyslog.conf
+			systemctl restart syslog
+			echo "syslog默认的haproxy配置"
+			echo "haproxy0.*  ${serverPath}/haproxy/haproxy.log"
+			echo "---------------------------------------------"
+		fi
+	fi
 
 	#删除解压源码
 	if [ -d ${APP_DIR}/haproxy-${VERSION} ];then
@@ -79,7 +93,7 @@ Uninstall_App()
 	fi
 
 	rm -rf $serverPath/haproxy
-	echo "Uninstall_HA" > $install_tmp
+	echo "卸载Haproxy成功"
 }
 
 action=$1
