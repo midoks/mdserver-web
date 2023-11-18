@@ -1,6 +1,6 @@
 {
 	"sort": 7,
-	"ps": "[<span style='color:red;'>内网</span>]LVS超强负载均衡,通过ipvsadm管理",
+	"ps": "[<span style='color:red;'>内网</span>]LVS超强负载均衡,通过ipvsadm管理[<span style='color:red;'>实验中</span>]",
 	"name": "lvs",
 	"title": "LVS",
 	"shell": "install.sh",
