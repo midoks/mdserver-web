@@ -65,6 +65,11 @@ Install_App()
 
 	echo $MIN_VERSION > $serverPath/haproxy/version.pl
 	echo 'Install_HA' > $install_tmp
+
+	#删除解压源码
+	if [ -d ${APP_DIR}/haproxy-${VERSION} ];then
+		rm -rf ${APP_DIR}/haproxy-${VERSION}
+	fi
 }
 
 Uninstall_App()
