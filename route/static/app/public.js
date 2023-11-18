@@ -2152,7 +2152,7 @@ function pluginOpService(a, b, v, _suffix_name='') {
             }
 
             if( g.status && g.data != 'ok' ) {
-                layer.msg(g.data, {icon: 2,time: 3000,shade: 0.3,shadeClose: true});
+                layer.msg(g.data, {icon: 2,time: 6000,shade: 0.3,shadeClose: true});
             }
 
             setTimeout(function(){
