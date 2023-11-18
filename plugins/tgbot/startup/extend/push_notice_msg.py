@@ -70,10 +70,10 @@ def send_msg(bot, tag='ad', trigger_time=300):
             types.InlineKeyboardButton(
                 text="实卡接码🙎‍♂️代实名/过人脸🅾️开飞机会员", url='https://t.me/gjgzs2022')
         ],
-        [
-            types.InlineKeyboardButton(
-                text="🚀腾云机场|解锁流媒体和ChatGPT", url='https://www.tencloud.net/index.php#/register?code=OGvXSTsc')
-        ],
+        # [
+        #     types.InlineKeyboardButton(
+        #         text="🚀腾云机场|解锁流媒体和ChatGPT", url='https://www.tencloud.net/index.php#/register?code=OGvXSTsc')
+        # ],
         [
             types.InlineKeyboardButton(
                 text="实名认证/过人脸🕵️‍♀️各种账号处理✅", url='https://t.me/zhanzhangyewu')
