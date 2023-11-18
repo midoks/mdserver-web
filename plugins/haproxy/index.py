@@ -152,6 +152,13 @@ def initDreplace():
 def haOp(method):
     file = initDreplace()
 
+    # check config
+    sdir = getServerDir()
+    cmd_check = sdir+'/sbin/haproxy -c -f ' + sdir + '/haproxy.conf'
+    chk_data = mw.execShell(cmd_check)
+    if chk_data[1]!= '':
+        return chk_data[1]
+
     if not mw.isAppleSystem():
         data = mw.execShell('systemctl ' + method + ' haproxy')
         if data[1] == '':
