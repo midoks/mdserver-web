@@ -10,7 +10,7 @@ function spPostMin(method, args, callback){
 
     $.post('/plugins/run', req_data, function(data) {
         if (!data.status){
-            layer.msg(data.msg,{icon:0,time:2000,shade: [0.3, '#000']});
+            layer.msg(data.msg,{icon:0,time:10000,shade: [0.3, '#000']});
             return;
         }
 

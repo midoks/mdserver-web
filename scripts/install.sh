@@ -1,5 +1,5 @@
 #!/bin/bash
-PATH=/bin:/sbin:/usr/bin:/usr/sbin:/usr/local/bin:/usr/local/sbin:~/bin
+PATH=/bin:/sbin:/usr/bin:/usr/sbin:/usr/local/bin:/usr/local/sbin:~/bin:/opt/homebrew/bin
 export PATH
 # LANG=en_US.UTF-8
 is64bit=`getconf LONG_BIT`
@@ -14,11 +14,6 @@ startTime=`date +%s`
 
 _os=`uname`
 echo "use system: ${_os}"
-
-if [ "$EUID" -ne 0 ]
-  then echo "Please run as root!"
-  exit
-fi
 
 if [ ${_os} == "Darwin" ]; then
 	OSNAME='macos'
@@ -56,6 +51,11 @@ elif grep -Eqi "Ubuntu" /etc/issue || grep -Eqi "Ubuntu" /etc/os-release; then
 	apt install -y wget curl zip unzip tar cron
 else
 	OSNAME='unknow'
+fi
+
+if [ "$EUID" -ne 0 ] && [ "$OSNAME" != "macos" ];then 
+	echo "Please run as root!"
+ 	exit
 fi
 
 

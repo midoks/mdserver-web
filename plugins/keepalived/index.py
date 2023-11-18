@@ -71,6 +71,46 @@ def getArgs():
             tmp[t[0]] = t[1]
     return tmp
 
+def checkArgs(data, ck=[]):
+    for i in range(len(ck)):
+        if not ck[i] in data:
+            return (False, mw.returnJson(False, '参数:(' + ck[i] + ')没有!'))
+    return (True, mw.returnJson(True, 'ok'))
+
+def configTpl():
+    path = getPluginDir() + '/tpl'
+    pathFile = os.listdir(path)
+    tmp = []
+    for one in pathFile:
+        file = path + '/' + one
+        tmp.append(file)
+    return mw.getJson(tmp)
+
+
+def readConfigTpl():
+    args = getArgs()
+    data = checkArgs(args, ['file'])
+    if not data[0]:
+        return data[1]
+
+    content = mw.readFile(args['file'])
+    content = contentReplace(content)
+    return mw.returnJson(True, 'ok', content)
+
+
+def defaultScriptsTpl():
+    path = getServerDir() + "/scripts/chk.sh"
+    return path
+
+def configScriptsTpl():
+    path = getServerDir() + '/scripts'
+    pathFile = os.listdir(path)
+    tmp = []
+    for one in pathFile:
+        file = path + '/' + one
+        tmp.append(file)
+    return mw.getJson(tmp)
+
 
 def status():
     data = mw.execShell(
@@ -85,8 +125,39 @@ def contentReplace(content):
     service_path = os.path.dirname(os.getcwd())
     content = content.replace('{$SERVER_PATH}', service_path)
     content = content.replace('{$PLUGIN_PATH}', getPluginDir())
+
+    # 网络接口
+    ethx = mw.execShell("route -n | grep ^0.0.0.0 | awk '{print $8}'")
+    if ethx[1]!='':
+        # 未找到
+        content = content.replace('{$ETH_XX}', 'eth1')
+    else:
+        # 已找到
+        content = content.replace('{$ETH_XX}', ethx[0])
+
+
     return content
 
+
+def copyScripts():
+    # 复制检查脚本
+    src_scripts_path = getPluginDir() + '/scripts'
+    dst_scripts_path = getServerDir() + '/scripts'
+    if not os.path.exists(dst_scripts_path):
+        mw.execShell('mkdir -p ' + dst_scripts_path)
+        olist = os.listdir(src_scripts_path)
+        for o in range(len(olist)):
+            src_file = src_scripts_path+'/'+olist[o]
+            dst_file = dst_scripts_path+'/'+olist[o]
+
+            content = mw.readFile(src_file)
+            content = contentReplace(content)
+            mw.writeFile(dst_file, content)
+
+            cmd = 'chmod +x ' + dst_file
+            mw.execShell(cmd)
+        return True
+    return False
 
 def initDreplace():
 
@@ -114,11 +185,13 @@ def initDreplace():
     dst_conf = getServerDir() + '/etc/keepalived/keepalived.conf'
     dst_conf_init = getServerDir() + '/init.pl'
     if not os.path.exists(dst_conf_init):
-        conf_content = mw.readFile(getConfTpl())
-
-        conf_content = contentReplace(conf_content)
-        mw.writeFile(dst_conf, conf_content)
+        content = mw.readFile(getConfTpl())
+        content = contentReplace(content)
+        mw.writeFile(dst_conf, content)
         mw.writeFile(dst_conf_init, 'ok')
+
+    # 复制检查脚本
+    copyScripts()
 
     # systemd
     systemDir = mw.systemdCfgDir()
@@ -126,9 +199,9 @@ def initDreplace():
     if os.path.exists(systemDir) and not os.path.exists(systemService):
         systemServiceTpl = getPluginDir() + '/init.d/' + getPluginName() + '.service.tpl'
         service_path = mw.getServerDir()
-        se_content = mw.readFile(systemServiceTpl)
-        se_content = contentReplace(se_content)
-        mw.writeFile(systemService, se_content)
+        content = mw.readFile(systemServiceTpl)
+        content = contentReplace(content)
+        mw.writeFile(systemService, content)
         mw.execShell('systemctl daemon-reload')
 
     return file_bin
@@ -268,5 +341,13 @@ if __name__ == "__main__":
         print(getConf())
     elif func == 'run_log':
         print(runLog())
+    elif func == 'config_tpl':
+        print(configTpl())
+    elif func == 'default_scripts_tpl':
+        print(defaultScriptsTpl())
+    elif func == 'config_scripts_tpl':
+        print(configScriptsTpl())
+    elif func == 'read_config_tpl':
+        print(readConfigTpl())
     else:
         print('error')

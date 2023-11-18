@@ -97,6 +97,8 @@ def contentReplace(content):
     service_path = mw.getServerDir()
     content = content.replace('{$ROOT_PATH}', mw.getRootDir())
     content = content.replace('{$SERVER_PATH}', service_path)
+    content = content.replace('{$HA_USER}', mw.getRandomString(8))
+    content = content.replace('{$HA_PWD}', mw.getRandomString(10))
     content = content.replace('{$SERVER_APP}', service_path + '/haproxy')
     return content
 
@@ -149,6 +151,13 @@ def initDreplace():
 
 def haOp(method):
     file = initDreplace()
+
+    # check config
+    sdir = getServerDir()
+    cmd_check = sdir+'/sbin/haproxy -c -f ' + sdir + '/haproxy.conf'
+    chk_data = mw.execShell(cmd_check)
+    if chk_data[1]!= '':
+        return chk_data[1]
 
     if not mw.isAppleSystem():
         data = mw.execShell('systemctl ' + method + ' haproxy')
@@ -206,19 +215,8 @@ def initdUinstall():
 
 
 def runLog():
-    path = getConf()
-    content = mw.readFile(path)
-    rep = 'log\s*=\s*(.*)'
-    tmp = re.search(rep, content)
-    return tmp.groups()[0]
-
-
-def getPort():
-    path = getConf()
-    content = mw.readFile(path)
-    rep = 'listen\s*=\s*(.*)'
-    tmp = re.search(rep, content)
-    return tmp.groups()[0]
+    path = getServerDir() + "/haproxy.log"
+    return path
 
 
 if __name__ == "__main__":
@@ -247,7 +245,5 @@ if __name__ == "__main__":
         print(readConfigTpl())
     elif func == 'run_log':
         print(runLog())
-    elif func == 'query_log':
-        print(queryLog())
     else:
         print('error')

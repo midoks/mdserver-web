@@ -1,6 +1,6 @@
 #!/bin/bash
-PATH=/bin:/sbin:/usr/bin:/usr/sbin:/usr/local/bin:/usr/local/sbin:~/bin
-export PATH
+PATH=/bin:/sbin:/usr/bin:/usr/sbin:/usr/local/bin:/usr/local/sbin:~/bin:/opt/homebrew/bin
+export PATH=$PATH:/opt/homebrew/bin
 
 curPath=`pwd`
 rootPath=$(dirname "$curPath")
@@ -8,8 +8,10 @@ rootPath=$(dirname "$rootPath")
 serverPath=$(dirname "$rootPath")
 sourcePath=${serverPath}/source
 sysName=`uname`
-install_tmp=${rootPath}/tmp/mw_install.pl
 SYS_ARCH=`arch`
+
+install_tmp=${rootPath}/tmp/mw_install.pl
+
 version=5.5.38
 PHP_VER=55
 Install_php()
@@ -57,15 +59,15 @@ if [ ! -d $sourcePath/php/php${PHP_VER} ];then
 	mv $sourcePath/php/php-${version} $sourcePath/php/php${PHP_VER}
 fi
 
-OPTIONS=''
+OPTIONS='--without-iconv'
 if [ $sysName == 'Darwin' ]; then
-	OPTIONS='--without-iconv'
+	
 	OPTIONS="${OPTIONS} --with-freetype-dir=${serverPath}/lib/freetype"
-	OPTIONS="${OPTIONS} --with-curl=${serverPath}/lib/curl"
+	OPTIONS="${OPTIONS} --with-curl=$(brew --prefix curl)"
 else
-	OPTIONS='--without-iconv'
 	# OPTIONS="--with-iconv=${serverPath}/lib/libiconv"
 	OPTIONS="${OPTIONS} --with-curl"
+	OPTIONS="${OPTIONS} --enable-mbstring"
 fi
 
 IS_64BIT=`getconf LONG_BIT`
@@ -104,11 +106,18 @@ if [ "${SYS_ARCH}" == "aarch64" ];then
 	cat ${curPath}/versions/${PHP_VER}/src/zend_multiply.h > $sourcePath/php/php${PHP_VER}/Zend/zend_multiply.h
 fi
 
-if [ ! -d $serverPath/php/55  ];then
+if [ "${SYS_ARCH}" == "arm64" ] && [ "$sysName" == "Darwin" ] ;then
+	# 修复mac arm64架构下php安装
+	# 修复不能识别到sys_icache_invalidate
+	cat ${curPath}/versions/${PHP_VER}/src/ext/pcre/sljitConfigInternal.h > $sourcePath/php/php${PHP_VER}/ext/pcre/pcrelib/sljit/sljitConfigInternal.h
+	cat ${curPath}/versions/${PHP_VER}/src/reentrancy.c > $sourcePath/php/php${PHP_VER}/main/reentrancy.c
+fi
+
+if [ ! -d $serverPath/php/${PHP_VER}  ];then
 	cd $sourcePath/php/php${PHP_VER} && ./configure \
-	--prefix=$serverPath/php/55 \
-	--exec-prefix=$serverPath/php/55 \
-	--with-config-file-path=$serverPath/php/55/etc \
+	--prefix=$serverPath/php/${PHP_VER} \
+	--exec-prefix=$serverPath/php/${PHP_VER} \
+	--with-config-file-path=$serverPath/php/${PHP_VER}/etc \
 	--with-zlib-dir=$serverPath/lib/zlib \
 	--enable-mysqlnd \
 	--with-mysql=mysqlnd \
@@ -116,7 +125,6 @@ if [ ! -d $serverPath/php/55  ];then
 	--with-mysqli=mysqlnd \
 	--enable-zip \
 	--enable-simplexml \
-	--enable-mbstring \
 	--enable-sockets \
 	--enable-ftp \
 	--enable-soap \
@@ -131,6 +139,7 @@ if [ ! -d $serverPath/php/55  ];then
 	make clean && make -j${cpuCore} && make install && make clean
 
 	# rm -rf $sourcePath/php/php${PHP_VER}
+	echo "安装php-${version}成功"
 fi
 
 #------------------------ install end ------------------------------------#

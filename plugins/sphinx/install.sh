@@ -1,5 +1,5 @@
 #!/bin/bash
-PATH=/bin:/sbin:/usr/bin:/usr/sbin:/usr/local/bin:/usr/local/sbin:~/bin
+PATH=/bin:/sbin:/usr/bin:/usr/sbin:/usr/local/bin:/usr/local/sbin:~/bin:/opt/homebrew/bin
 export PATH
 
 curPath=`pwd`
@@ -57,6 +57,10 @@ Install_sphinx()
 		echo '安装完成' > $install_tmp
 		cd ${rootPath} && python3 ${rootPath}/plugins/sphinx/index.py start
 		cd ${rootPath} && python3 ${rootPath}/plugins/sphinx/index.py initd_install
+	fi
+
+	if [ -d ${SPHINX_DIR}/sphinx-${VERSION} ];then
+		rm -rf ${SPHINX_DIR}/sphinx-${VERSION}
 	fi
 }
 

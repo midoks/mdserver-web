@@ -1,6 +1,6 @@
 #!/bin/bash
-PATH=/bin:/sbin:/usr/bin:/usr/sbin:/usr/local/bin:/usr/local/sbin:~/bin
-export PATH
+PATH=/bin:/sbin:/usr/bin:/usr/sbin:/usr/local/bin:/usr/local/sbin:~/bin:/opt/homebrew/bin
+export PATH=$PATH:/opt/homebrew/bin
 
 curPath=`pwd`
 rootPath=$(dirname "$curPath")
@@ -8,8 +8,9 @@ rootPath=$(dirname "$rootPath")
 serverPath=$(dirname "$rootPath")
 sourcePath=${serverPath}/source
 sysName=`uname`
-install_tmp=${rootPath}/tmp/mw_install.pl
 SYS_ARCH=`arch`
+
+install_tmp=${rootPath}/tmp/mw_install.pl
 
 version=5.4.45
 PHP_VER=54
@@ -58,15 +59,22 @@ if [ ! -d $sourcePath/php/php${PHP_VER} ];then
 	mv $sourcePath/php/php-${version} $sourcePath/php/php${PHP_VER}
 fi
 
-OPTIONS=''
+OPTIONS='--without-iconv'
 if [ $sysName == 'Darwin' ]; then
-	OPTIONS='--without-iconv'
+	
 	OPTIONS="${OPTIONS} --with-freetype-dir=${serverPath}/lib/freetype"
-	OPTIONS="${OPTIONS} --with-curl=${serverPath}/lib/curl"
+
+	BREW_DIR=`which brew`
+	BREW_DIR=${BREW_DIR/\/bin\/brew/}
+	CURL_DEPEND_DIR=`brew info curl | grep ${BREW_DIR}/Cellar/curl | cut -d \  -f 1 | awk 'END {print}'`
+	OPTIONS="$OPTIONS --with-curl=${CURL_DEPEND_DIR}"
+	# OPTIONS="${OPTIONS} --with-pcre-dir=${serverPath}/lib/pcre"
+	# OPTIONS="${OPTIONS} --with-external-pcre=${serverPath}/lib/pcre"
+
 else
-	OPTIONS='--without-iconv'
 	# OPTIONS="--with-iconv=${serverPath}/lib/libiconv"
 	OPTIONS="${OPTIONS} --with-curl"
+	OPTIONS="${OPTIONS} --enable-mbstring"
 fi
 
 IS_64BIT=`getconf LONG_BIT`
@@ -103,6 +111,13 @@ if [ "${SYS_ARCH}" == "aarch64" ];then
 	OPTIONS="$OPTIONS --build=aarch64-unknown-linux-gnu --host=aarch64-unknown-linux-gnu"
 fi
 
+if [ "${SYS_ARCH}" == "arm64" ] && [ "$sysName" == "Darwin" ] ;then
+	# 修复mac arm64架构下php安装
+	# 修复不能识别到sys_icache_invalidate
+	cat ${curPath}/versions/${PHP_VER}/src/ext/pcre/sljitConfigInternal.h > $sourcePath/php/php${PHP_VER}/ext/pcre/pcrelib/sljit/sljitConfigInternal.h
+	cat ${curPath}/versions/${PHP_VER}/src/reentrancy.c > $sourcePath/php/php${PHP_VER}/main/reentrancy.c
+fi
+
 if [ ! -d $serverPath/php/${PHP_VER} ];then
 	cd $sourcePath/php/php${PHP_VER} && ./configure \
 	--prefix=$serverPath/php/${PHP_VER} \
@@ -114,7 +129,6 @@ if [ ! -d $serverPath/php/${PHP_VER} ];then
 	--with-pdo-mysql=mysqlnd \
 	--with-mysqli=mysqlnd \
 	--enable-zip \
-	--enable-mbstring \
 	--enable-sockets \
 	--enable-ftp \
 	--enable-simplexml \

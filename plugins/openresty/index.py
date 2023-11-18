@@ -87,9 +87,9 @@ def getOs():
     data['os'] = mw.getOs()
     ng_exe_bin = getServerDir() + "/nginx/sbin/nginx"
 
-    if mw.isAppleSystem():
-        data['auth'] = True
-        return mw.getJson(data)
+    # if mw.isAppleSystem():
+    #     data['auth'] = True
+    #     return mw.getJson(data)
 
     if checkAuthEq(ng_exe_bin, 'root'):
         data['auth'] = True
@@ -137,9 +137,9 @@ def confReplace():
     current_os = mw.getOs()
     if current_os == 'darwin':
         # macosx do
-        user = mw.execShell(
-            "who | sed -n '2, 1p' |awk '{print $1}'")[0].strip()
-        # user = 'root'
+        # user = mw.execShell(
+        #     "who | sed -n '2, 1p' |awk '{print $1}'")[0].strip()
+        user = 'midoks'
         user_group = 'staff'
         content = content.replace('{$EVENT_MODEL}', 'kqueue')
     elif current_os.startswith('freebsd'):
@@ -187,18 +187,6 @@ def confReplace():
     if not os.path.exists(static_conf):
         mw.writeFile(static_conf, 'set $PHP_ENV 0;')
 
-    # give nginx root permission
-    ng_exe_bin = getServerDir() + "/nginx/sbin/nginx"
-    if not checkAuthEq(ng_exe_bin, 'root'):
-        args = getArgs()
-        sudoPwd = args['pwd']
-        cmd_own = 'chown -R ' + 'root:' + user_group + ' ' + ng_exe_bin
-        os.system('echo %s|sudo -S %s' % (sudoPwd, cmd_own))
-        cmd_mod = 'chmod 755 ' + ng_exe_bin
-        os.system('echo %s|sudo -S %s' % (sudoPwd, cmd_mod))
-        cmd_s = 'chmod u+s ' + ng_exe_bin
-        os.system('echo %s|sudo -S %s' % (sudoPwd, cmd_s))
-
     # vhost
     vhost_dir = mw.getServerDir() + '/web_conf/nginx/vhost'
     vhost_tpl_dir = getPluginDir() + '/conf/vhost'
@@ -236,6 +224,28 @@ def initDreplace():
 
         # config replace
         confReplace()
+
+    # give nginx root permission
+    ng_exe_bin = getServerDir() + "/nginx/sbin/nginx"
+    if not checkAuthEq(ng_exe_bin, 'root'):
+        user = 'www'
+        user_group = 'www'
+        current_os = mw.getOs()
+        if current_os == 'darwin':
+            user = 'root'
+            user_group = 'staff'
+        args = getArgs()
+        if not 'pwd' in args:
+            print("权限不足，需要认证启动!")
+            exit(0)
+
+        sudoPwd = args['pwd']
+        cmd_own = 'chown -R ' + user+':' + user_group + ' ' + ng_exe_bin
+        mw.execShell('echo %s|sudo -S %s' % (sudoPwd, cmd_own))
+        cmd_mod = 'chmod 755 ' + ng_exe_bin
+        mw.execShell('echo %s|sudo -S %s' % (sudoPwd, cmd_mod))
+        cmd_s = 'chmod u+s ' + ng_exe_bin
+        mw.execShell('echo %s|sudo -S %s' % (sudoPwd, cmd_s))
 
     # systemd
     # /usr/lib/systemd/system

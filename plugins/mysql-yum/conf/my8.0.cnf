@@ -56,6 +56,8 @@ relay-log-index=mdserver
 
 #master
 #binlog-do-db
+#sync_binlog=1
+
 binlog-ignore-db = test
 binlog-ignore-db = mysql
 binlog-ignore-db = information_schema

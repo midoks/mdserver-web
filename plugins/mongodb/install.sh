@@ -1,5 +1,5 @@
 #!/bin/bash
-PATH=/bin:/sbin:/usr/bin:/usr/sbin:/usr/local/bin:/usr/local/sbin:~/bin
+PATH=/bin:/sbin:/usr/bin:/usr/sbin:/usr/local/bin:/usr/local/sbin:~/bin:/opt/homebrew/bin
 export PATH
 
 # https://www.mongodb.com/try/download/community
@@ -70,7 +70,7 @@ Install_app()
 	if [ "$?" == "0" ];then
 		mkdir -p $serverPath/mongodb
 		echo "${VERSION}" > $serverPath/mongodb/version.pl
-		echo '安装完成' > $install_tmp
+		echo 'mongodb安装完成'
 
 		#初始化 
 		cd ${rootPath} && python3 ${rootPath}/plugins/mongodb/index.py start
@@ -92,7 +92,7 @@ Uninstall_app()
 		systemctl daemon-reload
 	fi
 
-	echo "Uninstall_mongodb" > $install_tmp
+	echo 'mongodb卸载完成'
 }
 
 action=$1

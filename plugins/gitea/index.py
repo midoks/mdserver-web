@@ -918,7 +918,7 @@ def projectScriptSelf_Run():
     self_path = custom_hooks + '/self/' + file
     self_logs_path = custom_hooks + '/self_logs/' + file + '.log'
 
-    shell = "sh -x " + self_path + " 2>" + self_logs_path
+    shell = "sh -x " + self_path + " 2>" + self_logs_path + ' &'
     mw.execShell(shell)
     mw.execShell("chown -R www:www " + self_logs_path)
     return mw.returnJson(True, '执行成功!')

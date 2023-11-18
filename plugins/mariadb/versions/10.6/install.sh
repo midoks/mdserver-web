@@ -1,5 +1,5 @@
 #!/bin/bash
-PATH=/bin:/sbin:/usr/bin:/usr/sbin:/usr/local/bin:/usr/local/sbin:~/bin
+PATH=/bin:/sbin:/usr/bin:/usr/sbin:/usr/local/bin:/usr/local/sbin:~/bin:/opt/homebrew/bin
 export PATH
 
 # https://mariadb.org/download/?t=mariadb
@@ -105,16 +105,17 @@ Install_app()
 
 		if [ -d $serverPath/mariadb ];then
 			echo '10.6' > $serverPath/mariadb/version.pl
-			echo '安装完成' > $install_tmp
+			echo '安装完成'
 		else
-			echo '安装失败' > $install_tmp
+			echo '安装失败'
 			echo 'install fail'>&2
 			exit 1
 		fi
 	fi
 
-	rm -rf ${mariadbDir}/mariadb-${MY_VER}
-	rm -rf ${mariadbDir}/mariadb-${MY_VER}.tar.gz
+	if [ -d ${mariadbDir}/mariadb-${MY_VER} ];then
+		rm -rf ${mariadbDir}/mariadb-${MY_VER}
+	fi
 }
 
 Uninstall_app()

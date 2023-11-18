@@ -217,10 +217,11 @@ error_logs()
 mw_update()
 {
     LOCAL_ADDR=common
-    ping  -c 1 github.com > /dev/null 2>&1
-    if [ "$?" != "0" ];then
+    cn=$(curl -fsSL -m 10 -s http://ipinfo.io/json | grep "\"country\": \"CN\"")
+    if [ ! -z "$cn" ] || [ "$?" == "0" ] ;then
         LOCAL_ADDR=cn
     fi
+    
     if [ "$LOCAL_ADDR" == "common" ];then
         curl --insecure -fsSL https://raw.githubusercontent.com/midoks/mdserver-web/master/scripts/update.sh | bash
     else
@@ -231,10 +232,11 @@ mw_update()
 mw_update_dev()
 {
     LOCAL_ADDR=common
-    ping  -c 1 github.com > /dev/null 2>&1
-    if [ "$?" != "0" ];then
+    cn=$(curl -fsSL -m 10 -s http://ipinfo.io/json | grep "\"country\": \"CN\"")
+    if [ ! -z "$cn" ] || [ "$?" == "0" ] ;then
         LOCAL_ADDR=cn
     fi
+    
     if [ "$LOCAL_ADDR" == "common" ];then
         curl --insecure -fsSL https://raw.githubusercontent.com/midoks/mdserver-web/dev/scripts/update_dev.sh | bash
     else
@@ -246,10 +248,11 @@ mw_update_dev()
 mw_mirror()
 {
     LOCAL_ADDR=common
-    ping  -c 1 github.com > /dev/null 2>&1
-    if [ "$?" != "0" ];then
+    cn=$(curl -fsSL -m 10 -s http://ipinfo.io/json | grep "\"country\": \"CN\"")
+    if [ ! -z "$cn" ] || [ "$?" == "0" ] ;then
         LOCAL_ADDR=cn
     fi
+
     if [ "$LOCAL_ADDR" == "common" ];then
         bash <(curl --insecure -sSL https://raw.githubusercontent.com/midoks/change-linux-mirrors/main/change-mirrors.sh)
     else
@@ -301,30 +304,6 @@ mw_debug(){
 }
 
 
-# choose mysql login
-
-declare -A DB_TYPE
-
-if [ -d "${ROOT_PATH}/mysql" ];then
-    DB_TYPE["mysql"]="mysql"
-fi
-
-if [ -d "${ROOT_PATH}/mariadb" ];then
-    DB_TYPE["mariadb"]="mariadb"
-fi
-
-if [ -d "${ROOT_PATH}/mysql-apt" ];then
-    DB_TYPE["mysql-apt"]="mysql-apt"
-fi
-
-if [ -d "${ROOT_PATH}/mysql-yum" ];then
-    DB_TYPE["mysql-yum"]="mysql-yum"
-fi
-
-SOURCE_LIST_KEY_SORT_TMP=$(echo ${!DB_TYPE[@]} | tr ' ' '\n' | sort -n)
-SOURCE_LIST_KEY=(${SOURCE_LIST_KEY_SORT_TMP//'\n'/})
-SOURCE_LIST_LEN=${#DB_TYPE[*]}
-
 function AutoSizeStr(){
     NAME_STR=$1
     NAME_NUM=$2
@@ -343,6 +322,30 @@ function AutoSizeStr(){
 }
 
 mw_connect_mysql(){
+    # choose mysql login
+
+    declare -A DB_TYPE
+
+    if [ -d "${ROOT_PATH}/mysql" ];then
+        DB_TYPE["mysql"]="mysql"
+    fi
+
+    if [ -d "${ROOT_PATH}/mariadb" ];then
+        DB_TYPE["mariadb"]="mariadb"
+    fi
+
+    if [ -d "${ROOT_PATH}/mysql-apt" ];then
+        DB_TYPE["mysql-apt"]="mysql-apt"
+    fi
+
+    if [ -d "${ROOT_PATH}/mysql-yum" ];then
+        DB_TYPE["mysql-yum"]="mysql-yum"
+    fi
+
+    SOURCE_LIST_KEY_SORT_TMP=$(echo ${!DB_TYPE[@]} | tr ' ' '\n' | sort -n)
+    SOURCE_LIST_KEY=(${SOURCE_LIST_KEY_SORT_TMP//'\n'/})
+    SOURCE_LIST_LEN=${#DB_TYPE[*]}
+
     if [ "$SOURCE_LIST_LEN" == "0" ]; then
         echo -e "no data!"
         exit 1

@@ -25,6 +25,10 @@ EXEC={$SERVER_PATH}/redis/bin/redis-server
 CLIEXEC="{$SERVER_PATH}/redis/bin/redis-cli -p $REDISPORT$REDISPASS"
 PIDFILE={$SERVER_PATH}/redis/redis_6379.pid
 
+echo $REDISPASS
+echo $REDISPORT
+echo $CLIEXEC
+
 mkdir -p {$SERVER_PATH}/redis/data
 
 redis_start(){
@@ -38,18 +42,18 @@ redis_start(){
 redis_stop(){
 	if [ ! -f $PIDFILE ]
 	then
-			echo "$PIDFILE does not exist, process is not running"
+		echo "$PIDFILE does not exist, process is not running"
 	else
-			PID=$(cat $PIDFILE)
-			echo "Stopping ..."
-			$CLIEXEC shutdown
-			while [ -x /proc/${PID} ]
-			do
-				echo "Waiting for Redis to shutdown ..."
-				sleep 1
-			done
-			echo "Redis stopped"
-			rm -rf $PIDFILE
+		PID=$(cat $PIDFILE)
+		echo "Stopping ..."
+		$CLIEXEC shutdown save 2>/dev/null
+		while [ -x /proc/${PID} ]
+		do
+			echo "Waiting for Redis to shutdown ..."
+			sleep 1
+		done
+		echo "Redis stopped"
+		rm -rf $PIDFILE
 	fi
 }
 
