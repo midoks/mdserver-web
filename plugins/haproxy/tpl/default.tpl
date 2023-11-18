@@ -27,7 +27,6 @@ frontend http-in
 	bind *:1080
 	default_backend		servers
 	option				forwardfor
-	#option 			httpclose
 	option 				http-keep-alive
 
 backend servers
