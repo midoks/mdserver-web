@@ -36,7 +36,7 @@ Install_App()
 
     if [ "${LOCAL_ADDR}" == "cn" ];then
     	if [ ! -f $serverPath/source/keepalived/keepalived-${VERSION}.tar.gz ];then
-			wget -O $serverPath/source/keepalived/keepalived-${VERSION}.tar.gz https://dl.midoks.me/soft/keepalived/haproxy-${VERSION}.tar.gz
+			wget -O $serverPath/source/keepalived/keepalived-${VERSION}.tar.gz https://dl.midoks.me/soft/keepalived/keepalived-${VERSION}.tar.gz
 		fi
     fi
 
