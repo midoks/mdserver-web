@@ -1,7 +1,7 @@
 function lvsPostMin(method, args, callback){
 
     var req_data = {};
-    req_data['name'] = 'haproxy';
+    req_data['name'] = 'lvs';
     req_data['func'] = method;
  
     if (typeof(args) != 'undefined' && args!=''){
