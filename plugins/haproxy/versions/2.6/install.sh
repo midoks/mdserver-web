@@ -68,7 +68,7 @@ Install_App()
 	#Haproxy日志配置
 	if [ -f /etc/rsyslog.conf ];then
 		find_ha=`cat /etc/rsyslog.conf | grep haproxy`
-		if [ $find_ha != "" ];then
+		if [ "$find_ha" != "" ];then
 			echo $find_ha
 		else
 			echo "---------------------------------------------"
