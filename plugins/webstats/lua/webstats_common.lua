@@ -293,7 +293,7 @@ function _M.cron(self)
         -- self:D("dedebide:cron task is busy!")
         local ready_ok = self:cronPre()
         if not ready_ok then
-            self:D("cron task is busy!")
+            -- self:D("cron task is busy!")
             return true
         end
 
