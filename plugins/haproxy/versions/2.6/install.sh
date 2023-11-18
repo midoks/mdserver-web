@@ -72,6 +72,7 @@ Install_App()
 			echo $find_ha
 		else
 			echo "---------------------------------------------"
+			echo "" > ${serverPath}/haproxy/haproxy.log
 			echo "local0.*  ${serverPath}/haproxy/haproxy.log" >> /etc/rsyslog.conf
 			systemctl restart syslog
 			echo "syslog默认的haproxy配置"
