@@ -245,7 +245,5 @@ if __name__ == "__main__":
         print(readConfigTpl())
     elif func == 'run_log':
         print(runLog())
-    elif func == 'query_log':
-        print(queryLog())
     else:
         print('error')
