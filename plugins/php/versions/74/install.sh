@@ -1,6 +1,6 @@
 #!/bin/bash
-PATH=/bin:/sbin:/usr/bin:/usr/sbin:/usr/local/bin:/usr/local/sbin:~/bin
-export PATH
+PATH=/bin:/sbin:/usr/bin:/usr/sbin:/usr/local/bin:/usr/local/sbin:~/bin:/opt/homebrew/bin
+export PATH=$PATH:/opt/homebrew/bin
 
 curPath=`pwd`
 rootPath=$(dirname "$curPath")
@@ -20,10 +20,12 @@ PHP_VER=74
 Install_php()
 {
 #------------------------ install start ------------------------------------#
-echo "安装php-${version} ..." > $install_tmp
+echo "安装php-${version} ..."
 mkdir -p $sourcePath/php
 mkdir -p $serverPath/php
 
+# cd /Users/midoks/Desktop/mwdev/server/mdserver-web/plugins/php/lib && /bin/bash libzip.sh
+# cd /www/server/mdserver-web/plugins/php/lib && /bin/bash libzip.sh
 cd ${rootPath}/plugins/php/lib && /bin/bash freetype_new.sh
 cd ${rootPath}/plugins/php/lib && /bin/bash zlib.sh
 cd ${rootPath}/plugins/php/lib && /bin/bash libzip.sh
@@ -77,18 +79,19 @@ fi
 
 cd $sourcePath/php/php${PHP_VER}
 
-OPTIONS=''
+OPTIONS='--without-iconv'
 if [ $sysName == 'Darwin' ]; then
-	OPTIONS='--without-iconv'
-	OPTIONS="${OPTIONS} --with-curl=${serverPath}/lib/curl"
-	# OPTIONS="${OPTIONS} --enable-zip"
+	
+	OPTIONS="${OPTIONS} --with-curl"
+	OPTIONS="${OPTIONS} --with-external-pcre=$(brew --prefix pcre2)"
 
-	export PATH="/usr/local/opt/bison/bin:$PATH"
-	export LDFLAGS="-L/usr/local/opt/bison/lib"
-	export PKG_CONFIG_PATH="/usr/local/opt/libxml2/lib/pkgconfig"
-	export LDFLAGS="-L/usr/local/opt/libxml2/lib"
+	# BREW_DIR=`which brew`
+	# BREW_DIR=${BREW_DIR/\/bin\/brew/}
+	# XML_LIB_DEPEND_DIR=`brew info libxml2 | grep /opt/homebrew/Cellar/libxml2 | cut -d \  -f 1 | awk 'END {print}'`
+	# XML_LIB_DEPEND_DIR=`brew info libxml2 | grep ${BREW_DIR}/Cellar/libxml2 | cut -d \  -f 1 | awk 'END {print}'`
+	# OPTIONS="${OPTIONS} --with-libxml=${XML_LIB_DEPEND_DIR}"
+
 else
-	OPTIONS='--without-iconv'
 	OPTIONS="${OPTIONS} --with-curl"
 fi
 
@@ -131,7 +134,6 @@ else
 	cpuCore="1"
 fi
 # ----- cpu end ------
-
 if [ ! -d $serverPath/php/${PHP_VER} ];then
 	cd $sourcePath/php/php${PHP_VER} && make clean
 	# ./buildconf --force
@@ -160,6 +162,8 @@ if [ ! -d $serverPath/php/${PHP_VER} ];then
 	make clean && make -j${cpuCore} && make install && make clean
 
 	# rm -rf $sourcePath/php/php${PHP_VER}
+
+	echo "安装php-${version}成功"
 fi 
 #------------------------ install end ------------------------------------#
 }
@@ -168,7 +172,7 @@ Uninstall_php()
 {
 	$serverPath/php/init.d/php${PHP_VER} stop
 	rm -rf $serverPath/php/${PHP_VER}
-	echo "卸载php-${version}..." > $install_tmp
+	echo "卸载php-${version}..."
 }
 
 action=${1}

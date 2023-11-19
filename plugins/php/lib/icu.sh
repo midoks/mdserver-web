@@ -1,5 +1,5 @@
 #!/bin/bash
-PATH=/bin:/sbin:/usr/bin:/usr/sbin:/usr/local/bin:/usr/local/sbin:~/bin
+PATH=/bin:/sbin:/usr/bin:/usr/sbin:/usr/local/bin:/usr/local/sbin:~/bin:/opt/homebrew/bin
 export PATH
 
 curPath=`pwd`
@@ -14,15 +14,25 @@ SERVER_ROOT=$rootPath/lib
 SOURCE_ROOT=$rootPath/source/lib
 
 HTTP_PREFIX="https://"
+LOCAL_ADDR=common
 cn=$(curl -fsSL -m 10 http://ipinfo.io/json | grep "\"country\": \"CN\"")
 if [ ! -z "$cn" ] || [ "$?" == "0" ] ;then
+    LOCAL_ADDR=cn
     HTTP_PREFIX="https://ghproxy.com/"
 fi
 
 if [ ! -d ${SERVER_ROOT}/icu ];then
+	
+	cd ${SOURCE_ROOT}
+
+	if [ "$LOCAL_ADDR" == 'cn' ];then
+        if [ ! -f ${SOURCE_ROOT}/icu4c-52_2-src.tgz  ];then
+            wget --no-check-certificate -O ${SOURCE_ROOT}/icu4c-52_2-src.tgz https://dl.midoks.me/lib/icu4c-52_2-src.tgz -T 20
+        fi 
+    fi
 
 	if [ ! -f ${SOURCE_ROOT}/icu4c-52_2-src.tgz ];then
-		wget --no-check-certificate -O ${SOURCE_ROOT}/icu4c-52_2-src.tgz ${HTTP_PREFIX}github.com/unicode-org/icu/releases/download/release-52-2/icu4c-52_2-src.tgz
+		wget --no-check-certificate -O ${SOURCE_ROOT}/icu4c-52_2-src.tgz https://github.com/unicode-org/icu/releases/download/release-52-2/icu4c-52_2-src.tgz
 	fi
 
 	if [ ! -d ${SERVER_ROOT}/lib/icu/lib ];then

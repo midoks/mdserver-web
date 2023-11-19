@@ -1,6 +1,6 @@
 #!/bin/bash
-PATH=/bin:/sbin:/usr/bin:/usr/sbin:/usr/local/bin:/usr/local/sbin:~/bin
-export PATH
+PATH=/bin:/sbin:/usr/bin:/usr/sbin:/usr/local/bin:/usr/local/sbin:~/bin:/opt/homebrew/bin
+export PATH=$PATH:/opt/homebrew/bin
 
 curPath=`pwd`
 rootPath=$(dirname "$curPath")
@@ -8,6 +8,7 @@ rootPath=$(dirname "$rootPath")
 serverPath=$(dirname "$rootPath")
 sourcePath=${serverPath}/source
 sysName=`uname`
+SYS_ARCH=`arch`
 install_tmp=${rootPath}/tmp/mw_install.pl
 
 
@@ -16,7 +17,7 @@ PHP_VER=72
 Install_php()
 {
 #------------------------ install start ------------------------------------#
-echo "安装php-${version} ..." > $install_tmp
+echo "安装php-${version} ..."
 mkdir -p $sourcePath/php
 mkdir -p $serverPath/php
 
@@ -58,13 +59,12 @@ if [ ! -d $sourcePath/php/php${PHP_VER} ];then
 	mv $sourcePath/php/php-${version} $sourcePath/php/php${PHP_VER}
 fi
 
-OPTIONS=''
+OPTIONS='--without-iconv'
 if [ $sysName == 'Darwin' ]; then
-	OPTIONS='--without-iconv'
-	OPTIONS="${OPTIONS} --with-curl=${serverPath}/lib/curl"
-else
-	OPTIONS='--without-iconv'
 	OPTIONS="${OPTIONS} --with-curl"
+else
+	OPTIONS="${OPTIONS} --with-curl"
+	OPTIONS="${OPTIONS} --with-zlib-dir=$serverPath/lib/zlib"
 fi
 
 IS_64BIT=`getconf LONG_BIT`
@@ -97,12 +97,18 @@ else
 fi
 # ----- cpu end ------
 
-if [ ! -d $serverPath/php/72 ];then
+
+if [ "${SYS_ARCH}" == "arm64" ];then
+	# 修复arm64架构下安装
+	cat ${curPath}/versions/${PHP_VER}/src/reentrancy.c > $sourcePath/php/php${PHP_VER}/main/reentrancy.c
+	echo "cat ${curPath}/versions/${PHP_VER}/src/reentrancy.c > $sourcePath/php/php${PHP_VER}/main/reentrancy.c"
+fi
+
+if [ ! -d $serverPath/php/${PHP_VER} ];then
 	cd $sourcePath/php/php${PHP_VER} && ./configure \
-	--prefix=$serverPath/php/72 \
-	--exec-prefix=$serverPath/php/72 \
-	--with-config-file-path=$serverPath/php/72/etc \
-	--with-zlib-dir=$serverPath/lib/zlib \
+	--prefix=$serverPath/php/${PHP_VER} \
+	--exec-prefix=$serverPath/php/${PHP_VER} \
+	--with-config-file-path=$serverPath/php/${PHP_VER}/etc \
 	--enable-mysqlnd \
 	--with-mysqli=mysqlnd \
 	--with-pdo-mysql=mysqlnd \
@@ -132,7 +138,7 @@ Uninstall_php()
 {
 	$serverPath/php/init.d/php72 stop
 	rm -rf $serverPath/php/72
-	echo "卸载php-${version}..." > $install_tmp
+	echo "卸载php-${version}..."
 }
 
 action=${1}

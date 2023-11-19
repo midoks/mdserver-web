@@ -1,5 +1,5 @@
 #!/bin/bash
-PATH=/bin:/sbin:/usr/bin:/usr/sbin:/usr/local/bin:/usr/local/sbin:~/bin
+PATH=/bin:/sbin:/usr/bin:/usr/sbin:/usr/local/bin:/usr/local/sbin:~/bin:/opt/homebrew/bin
 export PATH
 
 #https://dev.mysql.com/downloads/mysql/5.5.html#downloads
@@ -98,10 +98,10 @@ Install_mysql()
 		if [ -d $serverPath/mysql ];then
 			rm -rf ${mysqlDir}/mysql-${VERSION}
 			echo '5.5' > $serverPath/mysql/version.pl
-			echo '安装完成' > $install_tmp
+			echo "${VERSION}安装完成"
 		else
 			# rm -rf ${mysqlDir}/mysql-5.5.62
-			echo '安装失败' > $install_tmp
+			echo "${VERSION}安装失败"
 			echo 'install fail'>&2
 			exit 1
 		fi

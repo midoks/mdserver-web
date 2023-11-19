@@ -1,5 +1,5 @@
 #!/bin/bash
-PATH=/bin:/sbin:/usr/bin:/usr/sbin:/usr/local/bin:/usr/local/sbin:~/bin
+PATH=/bin:/sbin:/usr/bin:/usr/sbin:/usr/local/bin:/usr/local/sbin:~/bin:/opt/homebrew/bin
 export PATH
 
 curPath=`pwd`
@@ -7,9 +7,18 @@ rootPath=$(dirname "$curPath")
 rootPath=$(dirname "$rootPath")
 serverPath=$(dirname "$rootPath")
 
+# https://www.cnblogs.com/zlonger/p/16177595.html
+# https://www.cnblogs.com/BNTang/articles/15841688.html
+
+# ps -ef|grep redis |grep -v grep | awk '{print $2}' | xargs kill
+
+# cd /Users/midoks/Desktop/mwdev/server/mdserver-web/plugins/redis && bash install.sh install 7.2.2
+
+# cmd查看| info replication
+# /Users/midoks/Desktop/mwdev/server/redis/bin/redis-cli -h 127.0.0.1 -p 6399
+# /www/server/redis/bin/redis-cli -h 127.0.0.1 -p 6399
 
 install_tmp=${rootPath}/tmp/mw_install.pl
-
 VERSION=$2
 
 Install_App()
@@ -23,8 +32,7 @@ Install_App()
 	
 	cd $serverPath/source && tar -zxvf redis-${VERSION}.tar.gz
 
-	mkdir -p $serverPath/redis
-	mkdir -p $serverPath/redis/data
+	
 
 	CMD_MAKE=`which gmake`
 	if [ "$?" == "0" ];then
@@ -32,16 +40,22 @@ Install_App()
 	else
 		cd redis-${VERSION} && make PREFIX=$serverPath/redis install
 	fi
-	sed '/^ *#/d' redis.conf > $serverPath/redis/redis.conf
 
 	if [ -d $serverPath/redis ];then
-		echo "${VERSION}" > $serverPath/redis/version.pl
-		echo '安装完成' > $install_tmp
+		mkdir -p $serverPath/redis/data
+		sed '/^ *#/d' redis.conf > $serverPath/redis/redis.conf
 
+		echo "${VERSION}" > $serverPath/redis/version.pl
+		echo '安装完成'
 
 		cd ${rootPath} && python3 ${rootPath}/plugins/redis/index.py start
 		cd ${rootPath} && python3 ${rootPath}/plugins/redis/index.py initd_install
+		
+	else
+		echo '安装失败!'
+	fi
 
+	if [ -d $serverPath/source/redis-${VERSION} ];then
 		rm -rf $serverPath/source/redis-${VERSION}
 	fi
 }

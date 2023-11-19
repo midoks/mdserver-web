@@ -1,6 +1,6 @@
 #!/bin/bash
-PATH=/bin:/sbin:/usr/bin:/usr/sbin:/usr/local/bin:/usr/local/sbin:~/bin
-export PATH
+PATH=/bin:/sbin:/usr/bin:/usr/sbin:/usr/local/bin:/usr/local/sbin:~/bin:/opt/homebrew/bin
+export PATH=$PATH:/opt/homebrew/bin
 
 curPath=`pwd`
 rootPath=$(dirname "$curPath")
@@ -71,17 +71,11 @@ fi
 
 cd $sourcePath/php/php${PHP_VER}
 
-OPTIONS=''
+OPTIONS='--without-iconv'
 if [ $sysName == 'Darwin' ]; then
-	OPTIONS='--without-iconv'
-	OPTIONS="${OPTIONS} --with-curl=${serverPath}/lib/curl"
-
-	export PATH="/usr/local/opt/bison/bin:$PATH"
-	export LDFLAGS="-L/usr/local/opt/bison/lib"
-	export PKG_CONFIG_PATH="/usr/local/opt/libxml2/lib/pkgconfig"
-	export LDFLAGS="-L/usr/local/opt/libxml2/lib"
+	OPTIONS="${OPTIONS} --with-curl"
+	OPTIONS="${OPTIONS} --with-external-pcre=$(brew --prefix pcre2)"
 else
-	OPTIONS='--without-iconv'
 	# OPTIONS="--with-iconv=${serverPath}/lib/libiconv"
 	OPTIONS="${OPTIONS} --with-curl"
 fi
@@ -92,10 +86,10 @@ if [ "$IS_64BIT" == "64" ];then
 fi
 
 
-argon_version=`pkg-config libargon2 --modversion`
-if [ "$?" == "0" ];then
-	OPTIONS="${OPTIONS} --with-password-argon2"
-fi
+# argon_version=`pkg-config libargon2 --modversion`
+# if [ "$?" == "0" ];then
+# 	OPTIONS="${OPTIONS} --with-password-argon2"
+# fi
 
 
 ZIP_OPTION='--with-zip'

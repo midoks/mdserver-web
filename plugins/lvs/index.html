@@ -1,0 +1,19 @@
+<div class="bt-form">
+	<div class="bt-w-main">
+		<div class="bt-w-menu">
+			<p class="bgw" onclick="pluginService('lvs');">服务</p>
+			<p onclick="pluginInitD('lvs');">自启动</p>
+			<p onclick="pluginConfig('lvs');">配置修改</p>
+			<!-- <p onclick="pluginLogs('lvs','','run_log',30);">运行日志</p> -->
+		</div>
+		<div class="bt-w-con pd15">
+			<div class="soft-man-con"></div>
+		</div>
+	</div>
+</div>
+<script type="text/javascript">
+resetPluginWinHeight(480);
+$.getScript( "/plugins/file?name=lvs&f=js/lvs.js", function(){
+	pluginService('lvs');
+});
+</script>

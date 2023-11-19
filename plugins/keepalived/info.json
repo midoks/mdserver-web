@@ -1,6 +1,6 @@
 {
 	"sort": 7,
-	"ps": "[<span style='color:red;'>潜龙勿用</span>]优秀的高可用软件",
+	"ps": "[<span style='color:red;'>内网</span>]优秀的高可用软件",
 	"name": "keepalived",
 	"title": "keepalived",
 	"shell": "install.sh",

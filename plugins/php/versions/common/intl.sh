@@ -1,6 +1,6 @@
 #!/bin/bash
-PATH=/bin:/sbin:/usr/bin:/usr/sbin:/usr/local/bin:/usr/local/sbin:~/bin
-export PATH
+PATH=/bin:/sbin:/usr/bin:/usr/sbin:/usr/local/bin:/usr/local/sbin:~/bin:/opt/homebrew/bin
+export PATH=$PATH:/opt/homebrew/bin
 
 curPath=`pwd`
 
@@ -89,6 +89,16 @@ Install_lib()
 			OPTIONS="$OPTIONS --build=aarch64-unknown-linux-gnu --host=aarch64-unknown-linux-gnu"
 		fi
 
+		if [ "$sysName" == "Darwin" ];then
+			BREW_DIR=`which brew`
+			BREW_DIR=${BREW_DIR/\/bin\/brew/}
+			LIB_DEPEND_DIR=`brew info icu4c | grep ${BREW_DIR}/Cellar/icu4c | cut -d \  -f 1 | awk 'END {print}'`
+
+			OPTIONS="$OPTIONS --with-icu-dir=${serverPath}/lib/icu"
+			OPTIONS="$OPTIONS --enable-intl"
+		fi		
+
+
 		$serverPath/php/$version/bin/phpize
 		./configure --with-php-config=$serverPath/php/$version/bin/php-config $OPTIONS
 		make clean && make && make install && make clean
@@ -108,7 +118,7 @@ Install_lib()
 	echo "[${LIBNAME}]" >> $serverPath/php/$version/etc/php.ini
 	echo "extension=${LIBNAME}.so" >> $serverPath/php/$version/etc/php.ini
 	
-	bash ${rootPath}/plugins/php/versions/lib.sh $version restart
+	cd  ${curPath} && bash ${rootPath}/plugins/php/versions/lib.sh $version restart
 	echo '==========================================================='
 	echo 'successful!'
 }
@@ -131,7 +141,7 @@ Uninstall_lib()
 	sed -i $BAK "/${LIBNAME}/d" $serverPath/php/$version/etc/php.ini
 		
 	rm -f $extFile
-	bash ${rootPath}/plugins/php/versions/lib.sh $version restart
+	cd  ${curPath} && bash ${rootPath}/plugins/php/versions/lib.sh $version restart
 	echo '==============================================='
 	echo 'successful!'
 }

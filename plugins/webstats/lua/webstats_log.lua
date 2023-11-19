@@ -325,6 +325,12 @@ log_by_lua_block {
 		end
 
 		local remote_addr = ngx.var.remote_addr
+
+		-- 修复反向代理代过来的数据
+		if "table" == type(ip_list) then
+            ip_list = json.encode(ip_list)
+        end
+
 		if not string.find(ip_list, remote_addr) then
 			if remote_addr then
 				ip_list = ip_list .. "," .. remote_addr

@@ -1,16 +1,31 @@
+<style>
+.overflow_hide {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    vertical-align: middle;
+}
+</style>
+
 <div class="bt-form">
 	<div class='plugin_version'></div>
 	<div class="bt-w-main">
 		<div class="bt-w-menu">
 			<p class="bgw" onclick="pluginService('redis');">服务</p>
 			<p onclick="pluginInitD('redis');">自启动</p>
-			<p onclick="pluginConfig('redis');">配置修改</p>
+			<p onclick="pluginConfigTpl('redis',$('.plugin_version').attr('version'));">配置修改</p>
+			<!-- <p onclick="pluginConfig('redis');">配置修改</p> -->
 			<p onclick="getRedisConfig($('.plugin_version').attr('version'));">性能调整</p>
 			<p onclick="redisStatus($('.plugin_version').attr('version'));">负载状态</p>
-			<p onclick="pluginLogs('redis','','run_log');">日志</p>
+			<p onclick="replStatus($('.plugin_version').attr('version'));">复制状态</p>
+			<p onclick="clusterStatus($('.plugin_version').attr('version'));">集群状态</p>
+			<p onclick="clusterNodes($('.plugin_version').attr('version'));">集群节点</p>
+			<p onclick="pluginLogs('redis','','run_log');">运行日志</p>
+			<p onclick="redisReadme();">相关说明</p>
+			
 		</div>
 		<div class="bt-w-con pd15">
-			<div class="soft-man-con"></div>
+			<div class="soft-man-con" style="height: 520px; overflow: auto;"></div>
 		</div>
 	</div>
 </div>

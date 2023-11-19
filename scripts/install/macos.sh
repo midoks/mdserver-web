@@ -1,5 +1,5 @@
 #!/bin/bash
-PATH=/bin:/sbin:/usr/bin:/usr/sbin:/usr/local/bin:/usr/local/sbin:~/bin
+PATH=/bin:/sbin:/usr/bin:/usr/sbin:/usr/local/bin:/usr/local/sbin:~/bin:/opt/homebrew/bin
 export PATH
 LANG=en_US.UTF-8
 
@@ -15,14 +15,20 @@ mkdir -p $DEV/backup/database
 mkdir -p $DEV/backup/site
 
 # install brew
-if [ ! -f /usr/local/bin/brew ];then
+which brew
+if [ "$?" != "0" ];then
 	/usr/bin/ruby -e "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install)"
 	brew install python@2
 	brew install mysql
 fi
 
-brew install libzip bzip2 gcc openssl re2c cmake
 
+brew install libzip bzip2 gcc openssl re2c cmake
+brew install librdkafka
+brew install coreutils libxml2 xml2
+brew install md5sum libevent pidof bison
+brew install pcre2 libxpm libelf
+brew install automake icu4c libmemcached
 
 if [ ! -d $DEV/server/mdserver-web ]; then
 	wget -O /tmp/master.zip https://codeload.github.com/midoks/mdserver-web/zip/master

@@ -1,6 +1,6 @@
 #!/bin/bash
-PATH=/bin:/sbin:/usr/bin:/usr/sbin:/usr/local/bin:/usr/local/sbin:~/bin
-export PATH
+PATH=/bin:/sbin:/usr/bin:/usr/sbin:/usr/local/bin:/usr/local/sbin:~/bin:/opt/homebrew/bin
+export PATH=$PATH:/opt/homebrew/bin
 
 curPath=`pwd`
 
@@ -54,6 +54,11 @@ Install_lib()
 			OPTIONS="$OPTIONS --build=aarch64-unknown-linux-gnu --host=aarch64-unknown-linux-gnu"
 		fi
 
+		if [ "$sysName" == "Darwin" ];then
+			OPTIONS="$OPTIONS --with-gettext=$(brew --prefix gettext)"
+		fi
+
+
 		$serverPath/php/$version/bin/phpize
 		./configure --with-php-config=$serverPath/php/$version/bin/php-config $OPTIONS
 
@@ -65,9 +70,9 @@ Install_lib()
 
 		make clean && make && make install && make clean
 		
-		if [ -d $sourcePath/php${version} ];then
-			cd ${sourcePath} && rm -rf $sourcePath/php${version}
-		fi
+		# if [ -d $sourcePath/php${version} ];then
+		# 	cd ${sourcePath} && rm -rf $sourcePath/php${version}
+		# fi
 	fi
 
 	if [ ! -f "$extFile" ];then
@@ -80,7 +85,7 @@ Install_lib()
 	echo "[${LIBNAME}]" >> $serverPath/php/$version/etc/php.ini
 	echo "extension=${LIBNAME}.so" >> $serverPath/php/$version/etc/php.ini
 	
-	bash ${rootPath}/plugins/php/versions/lib.sh $version restart
+	cd  ${curPath} && bash ${rootPath}/plugins/php/versions/lib.sh $version restart
 	echo '==========================================================='
 	echo 'successful!'
 }
@@ -103,7 +108,7 @@ Uninstall_lib()
 	sed -i $BAK "/${LIBNAME}/d" $serverPath/php/$version/etc/php.ini
 		
 	rm -f $extFile
-	bash ${rootPath}/plugins/php/versions/lib.sh $version restart
+	cd  ${curPath} && bash ${rootPath}/plugins/php/versions/lib.sh $version restart
 	echo '==============================================='
 	echo 'successful!'
 }

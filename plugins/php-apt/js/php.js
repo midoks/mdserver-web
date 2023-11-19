@@ -194,8 +194,9 @@ function getFpmConfig(version){
             "<option value='3' " + (rdata.max_children == 100 ? 'selected' : '') + ">100并发</option>" +
             "<option value='4' " + (rdata.max_children == 200 ? 'selected' : '') + ">200并发</option>" +
             "<option value='5' " + (rdata.max_children == 300 ? 'selected' : '') + ">300并发</option>" +
-            "<option value='6' " + (rdata.max_children == 500 ? 'selected' : '') + ">500并发</option>"
-        var pms = [{ 'name': 'static', 'title': '静态' }, { 'name': 'dynamic', 'title': '动态' }];
+            "<option value='6' " + (rdata.max_children == 500 ? 'selected' : '') + ">500并发</option>" +
+            "<option value='7' " + (rdata.max_children == 2000 ? 'selected' : '') + ">2000并发</option>";
+        var pms = [{ 'name': 'static', 'title': '静态' }, { 'name': 'dynamic', 'title': '动态' },{ 'name': 'ondemand', 'title': '按需' }];
         var pmList = '';
         for (var i = 0; i < pms.length; i++) {
             pmList += '<option value="' + pms[i].name + '" ' + ((pms[i].name == rdata.pm) ? 'selected' : '') + '>' + pms[i].title + '</option>';
@@ -248,11 +249,11 @@ function getFpmConfig(version){
                     min_spare_servers = 30;
                     max_spare_servers = 180;
                     break;
-                case '6':
-                    max_children = 500;
-                    start_servers = 35;
-                    min_spare_servers = 35;
-                    max_spare_servers = 250;
+                case '7':
+                    max_children = 2000;
+                    start_servers = 40;
+                    min_spare_servers = 40;
+                    max_spare_servers = 255;
                     break;
             }
 
@@ -319,10 +320,19 @@ function getFpmStatus(version){
             return;
         }
 
+        var php_fpm_status = '动态';
+        if (rdata['process manager'] == 'dynamic'){
+            php_fpm_status = '动态';
+        } else if(rdata['process manager'] == 'static'){
+            php_fpm_status = '静态';
+        } else if(rdata['process manager'] == 'ondemand'){
+            php_fpm_status = '按需';
+        }
+
         var rdata = tmp_data.data;
         var con = "<div style='height:420px;overflow:hidden;'><table class='table table-hover table-bordered GetPHPStatus' style='margin:0;padding:0'>\
                         <tr><th>应用池(pool)</th><td>" + rdata.pool + "</td></tr>\
-                        <tr><th>进程管理方式(process manager)</th><td>" + ((rdata['process manager'] == 'dynamic') ? '动态' : '静态') + "</td></tr>\
+                        <tr><th>进程管理方式(process manager)</th><td>" + php_fpm_status + "</td></tr>\
                         <tr><th>启动日期(start time)</th><td>" + rdata['start time'] + "</td></tr>\
                         <tr><th>请求数(accepted conn)</th><td>" + rdata['accepted conn'] + "</td></tr>\
                         <tr><th>请求队列(listen queue)</th><td>" + rdata['listen queue'] + "</td></tr>\

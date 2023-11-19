@@ -1,6 +1,6 @@
 #!/bin/bash
-PATH=/bin:/sbin:/usr/bin:/usr/sbin:/usr/local/bin:/usr/local/sbin:~/bin
-export PATH
+PATH=/bin:/sbin:/usr/bin:/usr/sbin:/usr/local/bin:/usr/local/sbin:~/bin:/opt/homebrew/bin
+export PATH=$PATH:/opt/homebrew/bin
 
 curPath=`pwd`
 rootPath=$(dirname "$curPath")
@@ -65,14 +65,13 @@ fi
 # OPTIONS="${OPTIONS} --with-freetype-dir=${serverPath}/lib/freetype_old"
 # OPTIONS="${OPTIONS} --with-gd --enable-gd-native-ttf"
 # OPTIONS="${OPTIONS} --with-jpeg --with-jpeg-dir=/usr/lib"
-OPTIONS=''
+OPTIONS='--without-iconv'
 if [ $sysName == 'Darwin' ]; then
-	OPTIONS='--without-iconv'
+	
 	OPTIONS="${OPTIONS} --with-freetype-dir=${serverPath}/lib/freetype"
-	OPTIONS="${OPTIONS} --with-curl=${serverPath}/lib/curl"
+	OPTIONS="${OPTIONS} --with-curl=$(brew --prefix curl)"
 else
-	OPTIONS='--without-iconv'
-	# OPTIONS="--with-iconv=${serverPath}/lib/libiconv"
+	# OPTIONS=" --with-iconv=${serverPath}/lib/libiconv"
 	OPTIONS="${OPTIONS} --with-curl"
 fi
 
@@ -110,11 +109,11 @@ if [ "${SYS_ARCH}" == "aarch64" ];then
 	OPTIONS="$OPTIONS --build=aarch64-unknown-linux-gnu --host=aarch64-unknown-linux-gnu"
 fi
 
-if [ ! -d $serverPath/php/53/bin ];then
+if [ ! -d $serverPath/php/${PHP_VER}/bin ];then
 	cd $sourcePath/php/php${PHP_VER} && ./configure \
-	--prefix=$serverPath/php/53 \
-	--exec-prefix=$serverPath/php/53 \
-	--with-config-file-path=$serverPath/php/53/etc \
+	--prefix=$serverPath/php/${PHP_VER} \
+	--exec-prefix=$serverPath/php/${PHP_VER} \
+	--with-config-file-path=$serverPath/php/${PHP_VER}/etc \
 	--with-zlib-dir=$serverPath/lib/zlib \
 	--enable-mysqlnd \
 	--with-mysql=mysqlnd \
@@ -142,6 +141,7 @@ if [ ! -d $serverPath/php/53/bin ];then
 	make clean && make -j${cpuCore} && make install && make clean
 
 	# rm -rf $sourcePath/php/php${PHP_VER}
+	echo "安装php-${version}成功"
 fi
 
 

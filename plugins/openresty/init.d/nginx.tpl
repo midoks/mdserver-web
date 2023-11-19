@@ -15,7 +15,7 @@
 ### END INIT INFO
 
 
-PATH=/usr/local/sbin:/usr/local/bin:/sbin:/bin:/usr/sbin:/usr/bin
+PATH=/usr/local/sbin:/usr/local/bin:/sbin:/bin:/usr/sbin:/usr/bin:/opt/homebrew/bin
 NAME=nginx
 NGINX_BIN={$SERVER_PATH}/openresty/bin/openresty
 CONFIGFILE={$SERVER_PATH}/openresty/nginx/conf/$NAME.conf

@@ -1,6 +1,6 @@
 #!/bin/bash
-PATH=/bin:/sbin:/usr/bin:/usr/sbin:/usr/local/bin:/usr/local/sbin:~/bin
-export PATH
+PATH=/bin:/sbin:/usr/bin:/usr/sbin:/usr/local/bin:/usr/local/sbin:~/bin:/opt/homebrew/bin
+export PATH=$PATH:/opt/homebrew/bin
 
 curPath=`pwd`
 
@@ -45,10 +45,7 @@ Install_lib()
 	
 	if [ ! -f "$extFile" ];then
 		
-		OPTIONS=''
-		if [ $sysName == 'Darwin' ]; then
-			OPTIONS="${OPTIONS} --with-curl=${serverPath}/lib/curl"
-		fi
+		
 
 		php_lib=$sourcePath/php_lib
 		mkdir -p $php_lib
@@ -61,15 +58,26 @@ Install_lib()
 		fi
 		cd  $php_lib/${LIBNAME}-${LIBV}
 
+		OPTIONS=''
 		if [ "${SYS_ARCH}" == "aarch64" ] && [ "$version" -lt "56" ];then
 			OPTIONS="$OPTIONS --build=aarch64-unknown-linux-gnu --host=aarch64-unknown-linux-gnu"
 		fi
+
+		if [ $sysName == 'Darwin' ]; then
+			BREW_DIR=`which brew`
+			BREW_DIR=${BREW_DIR/\/bin\/brew/}
+			LIB_DEPEND_DIR=`brew info curl | grep ${BREW_DIR}/Cellar/curl | cut -d \  -f 1 | awk 'END {print}'`
+			OPTIONS="${OPTIONS} --with-curl=${LIB_DEPEND_DIR}"
+		fi
+
 
 		$serverPath/php/$version/bin/phpize
 		./configure --with-php-config=$serverPath/php/$version/bin/php-config $OPTIONS
 		make clean && make && make install && make clean
 
-		cd $php_lib && rm -rf $php_lib/${LIBNAME}-${LIBV}
+		if [ -d $php_lib/lib${LIBNAME}-${LIBV} ];then
+			cd $php_lib && rm -rf $php_lib/lib${LIBNAME}-${LIBV}
+		fi
 	fi
 	sleep 1
 	if [ ! -f "$extFile" ];then
@@ -81,7 +89,7 @@ Install_lib()
 	echo "[${LIBNAME}]" >> $serverPath/php/$version/etc/php.ini
 	echo "extension=${LIBNAME}.so" >> $serverPath/php/$version/etc/php.ini
 
-	bash ${rootPath}/plugins/php/versions/lib.sh $version restart
+	cd  ${curPath} && bash ${rootPath}/plugins/php/versions/lib.sh $version restart
 	echo '==========================================================='
 	echo 'successful!'
 }
@@ -105,7 +113,7 @@ Uninstall_lib()
 	sed -i $BAK "/${LIBNAME}/d" $serverPath/php/$version/etc/php.ini
 		
 	rm -f $extFile
-	bash ${rootPath}/plugins/php/versions/lib.sh $version restart
+	cd  ${curPath} && bash ${rootPath}/plugins/php/versions/lib.sh $version restart
 	echo '==============================================='
 	echo 'successful!'
 }

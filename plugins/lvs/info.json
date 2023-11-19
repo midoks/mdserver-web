@@ -1,0 +1,18 @@
+{
+	"sort": 7,
+	"ps": "[<span style='color:red;'>内网</span>]LVS超强负载均衡,通过ipvsadm管理[<span style='color:red;'>暂时不可用</span>]",
+	"name": "lvs",
+	"title": "LVS",
+	"shell": "install.sh",
+	"versions":["1.0"],
+	"updates":["1.0"],
+	"tip": "soft",
+	"checks": "server/lvs",
+	"path": "server/lvs",
+	"display": 1,
+	"author": "midoks",
+	"date": "2023-11-17",
+	"home": "http://www.linuxvirtualserver.org/",
+	"type": 0,
+	"pid": "4"
+}

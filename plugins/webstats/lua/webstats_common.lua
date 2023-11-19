@@ -121,6 +121,10 @@ end
 
 function _M.split(self, str, reps)
     local arr = {}
+    -- 修复反向代理代过来的数据
+    if "table" == type(str) then
+        return str
+    end
     string.gsub(str,'[^'..reps..']+',function(w) table.insert(arr,w) end)
     return arr
 end
@@ -236,6 +240,8 @@ function _M.get_http_origin(self)
 end
 
 function _M.cronPre(self)
+    self:lock_working('cron_init_stat')
+
     local time_key = self:get_store_key()
     local time_key_next = self:get_store_key_with_time(ngx.time()+3600)
 
@@ -268,6 +274,8 @@ function _M.cronPre(self)
         end
     end
 
+    self:unlock_working('cron_init_stat')
+
     return true
 end
 
@@ -285,7 +293,7 @@ function _M.cron(self)
         -- self:D("dedebide:cron task is busy!")
         local ready_ok = self:cronPre()
         if not ready_ok then
-            self:D("cron task is busy!")
+            -- self:D("cron task is busy!")
             return true
         end
 
@@ -310,6 +318,11 @@ function _M.cron(self)
             -- self:D("input_sn:"..input_sn)
             -- 迁移合并时不执行
             if self:is_migrating(input_sn) then
+                return true
+            end
+
+            -- 初始化统计表时不执行
+            if self:is_working('cron_init_stat') then
                 return true
             end
 

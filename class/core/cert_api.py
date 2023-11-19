@@ -123,6 +123,11 @@ class cert_api:
         return True
 
     def createCertCron(self):
+
+        if mw.isAppleSystem():
+            print('在Macos上不支持创建证书自动续签任务!')
+            return ''
+
         # 创建证书自动续签任务
         try:
             import crontab_api
