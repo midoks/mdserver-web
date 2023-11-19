@@ -79,6 +79,7 @@ else
 	OPTIONS="${OPTIONS} --with-curl"
 	OPTIONS="${OPTIONS} --with-zlib-dir=$serverPath/lib/zlib"
 	OPTIONS="${OPTIONS} ${ZIP_OPTION}"
+	OPTIONS="${OPTIONS} --with-readline"
 fi
 
 IS_64BIT=`getconf LONG_BIT`

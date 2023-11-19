@@ -72,6 +72,7 @@ else
 	# OPTIONS="--with-iconv=${serverPath}/lib/libiconv"
 	OPTIONS="${OPTIONS} --with-curl"
 	OPTIONS="${OPTIONS} --enable-mbstring"
+	OPTIONS="${OPTIONS} --with-readline"
 fi
 
 IS_64BIT=`getconf LONG_BIT`

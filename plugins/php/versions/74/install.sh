@@ -93,6 +93,7 @@ if [ $sysName == 'Darwin' ]; then
 
 else
 	OPTIONS="${OPTIONS} --with-curl"
+	OPTIONS="${OPTIONS} --with-readline"
 fi
 
 IS_64BIT=`getconf LONG_BIT`

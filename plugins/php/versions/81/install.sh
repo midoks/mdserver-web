@@ -76,6 +76,7 @@ if [ $sysName == 'Darwin' ]; then
 	OPTIONS="${OPTIONS} --with-curl"
 else
 	OPTIONS="${OPTIONS} --with-curl"
+	OPTIONS="${OPTIONS} --with-readline"
 fi
 
 argon_version=`pkg-config libargon2 --modversion`
