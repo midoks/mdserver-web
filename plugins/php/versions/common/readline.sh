@@ -2,6 +2,8 @@
 PATH=/bin:/sbin:/usr/bin:/usr/sbin:/usr/local/bin:/usr/local/sbin:~/bin:/opt/homebrew/bin
 export PATH=$PATH:/opt/homebrew/bin
 
+# cd /www/server/mdserver-web/plugins/php/versions/common && bash readline.sh install 54
+
 curPath=`pwd`
 
 appPath=$(dirname "$curPath")
