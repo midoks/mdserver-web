@@ -26,7 +26,7 @@ VERSION=3.1.1
 Install_sphinx()
 {
 
-	echo '正在安装脚本文件...' > $install_tmp
+	echo '正在安装Sphinx...'
 	mkdir -p $serverPath/sphinx
 
 	SPHINX_DIR=${serverPath}/source/sphinx
@@ -54,7 +54,7 @@ Install_sphinx()
 	
 	if [ -d $serverPath/sphinx ];then
 		echo "${VERSION}" > $serverPath/sphinx/version.pl
-		echo '安装完成' > $install_tmp
+		echo '安装Sphinx完成'
 		cd ${rootPath} && python3 ${rootPath}/plugins/sphinx/index.py start
 		cd ${rootPath} && python3 ${rootPath}/plugins/sphinx/index.py initd_install
 	fi
