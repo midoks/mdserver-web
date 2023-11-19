@@ -22,7 +22,7 @@ SOURCE_ROOT=$rootPath/source/lib
 #     LOCAL_ADDR=cn
 # fi
 
-if [ ! -d ${SERVER_ROOT}/libiconv ];then
+if [ ! -d ${SERVER_ROOT}/libedit ];then
     cd $SOURCE_ROOT
 
     VERSION="20230828-3.1"
