@@ -45,7 +45,7 @@ Install_lib()
 		return
 	fi
 	
-	cd ${rootPath}/plugins/php/lib && /bin/bash libiconv.sh
+	cd ${rootPath}/plugins/php/lib && /bin/bash libedit.sh
 	
 	if [ ! -f "$extFile" ];then
 
@@ -60,7 +60,7 @@ Install_lib()
 			OPTIONS="$OPTIONS --build=aarch64-unknown-linux-gnu --host=aarch64-unknown-linux-gnu"
 		fi
 
-		OPTIONS="$OPTIONS --with-readline"
+		OPTIONS="$OPTIONS  --with-libedit=${serverPath}/lib/libedit"
 
 		$serverPath/php/$version/bin/phpize
 		./configure --with-php-config=$serverPath/php/$version/bin/php-config $OPTIONS
