@@ -152,9 +152,9 @@ def migrateSiteHotLogs(site_name, query_date):
         print(del_hot_log)
         r = hot_db_conn.execute(del_hot_log)
         print("delete:", r)
-        print("deleting statistics over "+str(save_day)+" days...")
+        print("deleting statistics over 180 days...")
         save_time_key = time.strftime(
-            '%Y%m%d00', time.localtime(time.time() - int(save_day) * 86400))
+            '%Y%m%d00', time.localtime(time.time() - 180 * 86400))
 
         del_request_stat_sql = "delete from request_stat where time<={}".format(
             save_time_key)
