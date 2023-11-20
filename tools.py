@@ -58,6 +58,8 @@ def mwcli(mw_input=0):
         print("(13)     显示面板错误日志")
         print("(20)     关闭BasicAuth认证")
         print("(21)     解除域名绑定")
+        print("(22)     开启IPV6支持")
+        print("(23)     关闭IPV6支持")
         print("(100)    开启PHP52显示")
         print("(101)    关闭PHP52显示")
         print("(200)    切换Linux系统软件源")
@@ -71,7 +73,7 @@ def mwcli(mw_input=0):
         except:
             mw_input = 0
 
-    nums = [1, 2, 3, 4, 5, 10, 11, 12, 13, 20, 21, 100, 101, 200, 201]
+    nums = [1, 2, 3, 4, 5, 10, 11, 12, 13, 20, 21, 22, 23, 100, 101, 200, 201]
     if not mw_input in nums:
         print(raw_tip)
         print("已取消!")
@@ -123,6 +125,22 @@ def mwcli(mw_input=0):
             os.remove(bind_domain)
             os.system(INIT_CMD + " unbind_domain")
             print("|-解除域名绑定成功")
+    elif mw_input == 22:
+        listen_ipv6 = 'data/ipv6.pl'
+        if not os.path.exists(listen_ipv6):
+            mw.writeFile(listen_ipv6,'True')
+            os.system(INIT_CMD + " restart")
+            print("|-开启IPv6支持了")
+        else:
+            print("|-已开启IPv6支持!")
+    elif mw_input == 23:
+        listen_ipv6 = 'data/ipv6.pl'
+        if not os.path.exists(listen_ipv6):
+            print("|-已关闭IPv6支持!")
+        else:
+            os.remove(listen_ipv6)
+            os.system(INIT_CMD + " restart")
+            print("|-关闭IPv6支持了")
     elif mw_input == 100:
         php_conf = 'plugins/php/info.json'
         if os.path.exists(php_conf):
