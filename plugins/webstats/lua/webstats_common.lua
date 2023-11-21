@@ -372,7 +372,7 @@ function _M.cron(self)
             end
 
             local input_stmts = stmts[input_sn]["web_logs"]
-            if input_stmts then
+            if not input_stmts then
                 ngx.shared.mw_total:rpush(total_key, data)
                 self:unlock_working(cron_key)
                 break
