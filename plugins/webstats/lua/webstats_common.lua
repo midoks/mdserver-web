@@ -522,7 +522,17 @@ function _M.cron(self)
         ngx.update_time()
         -- self:D("PID:"..tostring(ngx.worker.id()).."--【"..tostring(llen).."】, elapsed: " .. tostring(ngx.now() - begin))
     end
-    ngx.timer.every(0.5, timer_every_get_data)
+
+    
+    function timer_every_get_data_try()
+       local presult, err = pcall( function() timer_every_get_data() end)
+        if not presult then
+            self:D("debug cron error on :"..tostring(err))
+            return true
+        end
+    end
+
+    ngx.timer.every(0.5, timer_every_get_data_try)
 end
 
 
