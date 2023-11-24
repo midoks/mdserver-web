@@ -371,7 +371,14 @@ function _M.cron(self)
                 break
             end
 
-            local insert_ok = self:store_logs_line(db, stmts[input_sn]["web_logs"], input_sn, info)
+            local input_stmts = stmts[input_sn]["web_logs"]
+            if not input_stmts then
+                ngx.shared.mw_total:rpush(total_key, data)
+                self:unlock_working(cron_key)
+                break
+            end
+
+            local insert_ok = self:store_logs_line(db, input_stmts, input_sn, info)
             if not insert_ok then
                 ngx.shared.mw_total:rpush(total_key, data)
                 self:unlock_working(cron_key)
@@ -522,7 +529,17 @@ function _M.cron(self)
         ngx.update_time()
         -- self:D("PID:"..tostring(ngx.worker.id()).."--【"..tostring(llen).."】, elapsed: " .. tostring(ngx.now() - begin))
     end
-    ngx.timer.every(0.5, timer_every_get_data)
+
+    
+    function timer_every_get_data_try()
+       local presult, err = pcall( function() timer_every_get_data() end)
+        if not presult then
+            self:D("debug cron error on :"..tostring(err))
+            return true
+        end
+    end
+
+    ngx.timer.every(0.5, timer_every_get_data_try)
 end
 
 

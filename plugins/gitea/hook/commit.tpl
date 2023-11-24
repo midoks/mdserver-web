@@ -34,7 +34,7 @@ if [ ! -d $WEB_PATH ];then
 	rsync -vauP --delete --exclude=".*" $GIT_PROJECT_DIR/ $WEB_PATH
 else
 	if [ -f $GIT_PROJECT_DIR/exclude.list ];then
-		rsync -vauP --delete --exclude-from="$GIT_PROJECT_DIR/exclude.list" $GIT_PROJECT_DIR/ $WEB_PATH
+		rsync -vauP --exclude-from="$GIT_PROJECT_DIR/exclude.list" $GIT_PROJECT_DIR/ $WEB_PATH
 	else
 		rsync -vauP --exclude=".*" $GIT_PROJECT_DIR/ $WEB_PATH
 	fi
