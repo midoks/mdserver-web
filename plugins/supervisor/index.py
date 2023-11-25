@@ -235,6 +235,44 @@ def getSupList():
     data['data'] = array_list
     return mw.getJson(data)
 
+def confDList():
+    confd_dir = getServerDir() + '/conf.d'
+    clist = os.listdir(confd_dir)
+    array_list = []
+    for x in range(len(clist)):
+        t = {}
+        t['name'] = clist[x]
+        array_list.append(t)
+
+    data = {}
+    data['data'] = array_list
+    return mw.getJson(data)
+
+
+def confDlistTraceLog():
+    args = getArgs()
+    data = checkArgs(args, ['name'])
+    if not data[0]:
+        return data[1]
+
+    confd_dir = getServerDir() + '/conf.d/' + args['name']
+    content = mw.readFile(confd_dir)
+    rep = 'stdout_logfile\s*=\s*(.*)'
+    tmp = re.search(rep, content)
+    return tmp.groups()[0].strip()
+
+
+def confDlistErrorLog():
+    args = getArgs()
+    data = checkArgs(args, ['name'])
+    if not data[0]:
+        return data[1]
+
+    confd_dir = getServerDir() + '/conf.d/' + args['name']
+    content = mw.readFile(confd_dir)
+    rep = 'stderr_logfile\s*=\s*(.*)'
+    tmp = re.search(rep, content)
+    return tmp.groups()[0].strip()
 
 def getUserListData():
     user = getServerDir() + "/user.txt"
@@ -586,6 +624,12 @@ if __name__ == "__main__":
         print(getUserList())
     elif func == 'get_sup_list':
         print(getSupList())
+    elif func == 'confd_list':
+        print(confDList())
+    elif func == 'confd_list_trace_log':
+        print(confDlistTraceLog())
+    elif func == 'confd_list_error_log':
+        print(confDlistErrorLog())
     elif func == 'add_job':
         print(addJob())
     elif func == 'start_job':

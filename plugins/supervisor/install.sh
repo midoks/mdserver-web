@@ -22,7 +22,7 @@ fi
 
 Install_app()
 {
-	echo '正在安装脚本文件...' > $install_tmp
+	echo '正在安装[supervisor]...'
 	mkdir -p $serverPath/source
 	mkdir -p $serverPath/supervisor
 	mkdir -p $serverPath/supervisor/log
@@ -39,10 +39,11 @@ Install_app()
 	fi
 
 	echo "${VERSION}" > $serverPath/supervisor/version.pl
-	echo '安装完成[supervisor]' > $install_tmp
 
 	cd ${rootPath} && python3 ${rootPath}/plugins/supervisor/index.py start
 	cd ${rootPath} && python3 ${rootPath}/plugins/supervisor/index.py initd_install
+	
+	echo '安装完成[supervisor]'
 }
 
 Uninstall_app()
@@ -60,7 +61,7 @@ Uninstall_app()
 
 	rm -rf $serverPath/supervisor
 
-	echo "卸载完成[supervisor]" > $install_tmp
+	echo "卸载完成[supervisor]"
 }
 
 action=$1
