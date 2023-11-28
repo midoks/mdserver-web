@@ -129,7 +129,7 @@ def supOp(method):
         return data[1]
 
     if method in ('reload', 'restart'):
-        return ok
+        return 'ok'
 
     cmd = 'supervisord -c ' + getServerDir() + '/supervisor.conf'
     if method == 'stop':
