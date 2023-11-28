@@ -335,7 +335,7 @@ def addJob():
     w_body += "user=" + user + "\n"
     w_body += "priority=999" + "\n"
     w_body += "numprocs={0}".format(numprocs) + "\n"
-    w_body += "process_name=%(program_name)s"
+    w_body += "process_name=%(program_name)s_%(process_num)02d"
 
     dstFile = getSubConfDir() + "/" + program + '.ini'
 
