@@ -123,7 +123,7 @@ Install_App()
 	GEO_VERSION=$(get_latest_release "P3TERX/GeoLite.mmdb")
 	if [ ! -f $serverPath/source/webstats/GeoLite2-City.mmdb ];then
 		if [ "$LOCAL_ADDR" == "cn" ];then
-			wget --no-check-certificate -O $serverPath/source/webstats/GeoLite2-City.mmdb https://dl.midoks.me/soft/webstats/GeoLite2-City.mmdb
+			wget --no-check-certificate -O $serverPath/source/webstats/GeoLite2-City.mmdb https://dl.midoks.icu/soft/webstats/GeoLite2-City.mmdb
 		else
 			wget --no-check-certificate -O $serverPath/source/webstats/GeoLite2-City.mmdb https://github.com/P3TERX/GeoLite.mmdb/releases/download/${GEO_VERSION}/GeoLite2-City.mmdb
 		fi

@@ -36,7 +36,7 @@ Install_App()
 
     if [ "${LOCAL_ADDR}" == "cn" ];then
     	if [ ! -f ${APP_DIR}/haproxy-${VERSION}.tar.gz ];then
-			wget -O ${APP_DIR}/haproxy-${VERSION}.tar.gz https://dl.midoks.me/soft/haproxy/haproxy-${VERSION}.tar.gz
+			wget -O ${APP_DIR}/haproxy-${VERSION}.tar.gz https://dl.midoks.icu/soft/haproxy/haproxy-${VERSION}.tar.gz
 		fi
     fi
 
