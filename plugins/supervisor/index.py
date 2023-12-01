@@ -129,7 +129,7 @@ def supOp(method):
         return data[1]
 
     if method in ('reload', 'restart'):
-        return ok
+        return 'ok'
 
     cmd = 'supervisord -c ' + getServerDir() + '/supervisor.conf'
     if method == 'stop':
@@ -235,6 +235,44 @@ def getSupList():
     data['data'] = array_list
     return mw.getJson(data)
 
+def confDList():
+    confd_dir = getServerDir() + '/conf.d'
+    clist = os.listdir(confd_dir)
+    array_list = []
+    for x in range(len(clist)):
+        t = {}
+        t['name'] = clist[x]
+        array_list.append(t)
+
+    data = {}
+    data['data'] = array_list
+    return mw.getJson(data)
+
+
+def confDlistTraceLog():
+    args = getArgs()
+    data = checkArgs(args, ['name'])
+    if not data[0]:
+        return data[1]
+
+    confd_dir = getServerDir() + '/conf.d/' + args['name']
+    content = mw.readFile(confd_dir)
+    rep = 'stdout_logfile\s*=\s*(.*)'
+    tmp = re.search(rep, content)
+    return tmp.groups()[0].strip()
+
+
+def confDlistErrorLog():
+    args = getArgs()
+    data = checkArgs(args, ['name'])
+    if not data[0]:
+        return data[1]
+
+    confd_dir = getServerDir() + '/conf.d/' + args['name']
+    content = mw.readFile(confd_dir)
+    rep = 'stderr_logfile\s*=\s*(.*)'
+    tmp = re.search(rep, content)
+    return tmp.groups()[0].strip()
 
 def getUserListData():
     user = getServerDir() + "/user.txt"
@@ -292,12 +330,12 @@ def addJob():
     w_body += "startretries=3" + "\n"
     w_body += "stdout_logfile=" + log_dir + program + ".out.log" + "\n"
     w_body += "stderr_logfile=" + log_dir + program + ".err.log" + "\n"
-    w_body += "stdout_logfile_maxbytes=2MB" + "\n"
-    w_body += "stderr_logfile_maxbytes=2MB" + "\n"
+    w_body += "stdout_logfile_maxbytes=1MB" + "\n"
+    w_body += "stderr_logfile_maxbytes=1MB" + "\n"
     w_body += "user=" + user + "\n"
     w_body += "priority=999" + "\n"
     w_body += "numprocs={0}".format(numprocs) + "\n"
-    w_body += "process_name=%(program_name)s"
+    w_body += "process_name=%(program_name)s_%(process_num)02d"
 
     dstFile = getSubConfDir() + "/" + program + '.ini'
 
@@ -586,6 +624,12 @@ if __name__ == "__main__":
         print(getUserList())
     elif func == 'get_sup_list':
         print(getSupList())
+    elif func == 'confd_list':
+        print(confDList())
+    elif func == 'confd_list_trace_log':
+        print(confDlistTraceLog())
+    elif func == 'confd_list_error_log':
+        print(confDlistErrorLog())
     elif func == 'add_job':
         print(addJob())
     elif func == 'start_job':

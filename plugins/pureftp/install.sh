@@ -74,7 +74,7 @@ Install_pureftp()
 
 	# Last Download Method
 	if [ ! -f $serverPath/source/pureftp/pure-ftpd-${VER}.tar.gz ];then
-		wget --no-check-certificate -O $serverPath/source/pureftp/pure-ftpd-${VER}.tar.gz https://dl.midoks.me/soft/ftp/pure-ftpd-${VER}.tar.gz -T 3
+		wget --no-check-certificate -O $serverPath/source/pureftp/pure-ftpd-${VER}.tar.gz https://dl.midoks.icu/soft/ftp/pure-ftpd-${VER}.tar.gz -T 3
 	fi
 
 	if [ ! -d $serverPath/source/pureftp/pure-ftpd-${VER} ];then

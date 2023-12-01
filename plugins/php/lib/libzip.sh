@@ -30,7 +30,7 @@ if [ ! -d ${SERVER_ROOT}/libzip ];then
 
     if [ "$LOCAL_ADDR" == 'cn' ];then
         if [ ! -f ${SOURCE_ROOT}/libzip-1.3.2.tar.gz ];then
-            wget --no-check-certificate -O libzip-1.3.2.tar.gz https://dl.midoks.me/lib/libzip-1.3.2.tar.gz -T 20
+            wget --no-check-certificate -O libzip-1.3.2.tar.gz https://dl.midoks.icu/lib/libzip-1.3.2.tar.gz -T 20
         fi 
     fi
 
