@@ -78,16 +78,16 @@ def send_msg(bot, tag='ad', trigger_time=300):
 
     yes, info = get_newest_tid()
     if yes:
-        url = 'https://bbs.midoks.me/thread-' + info['tid'] + '-1-1.html'
+        url = 'https://bbs.midoks.icu/thread-' + info['tid'] + '-1-1.html'
         keyboard = [
             [
                 types.InlineKeyboardButton(text=info['subject'], url=url)
             ],
             [
                 types.InlineKeyboardButton(
-                    text="论坛", url='https://bbs.midoks.me'),
+                    text="论坛", url='https://bbs.midoks.icu'),
                 types.InlineKeyboardButton(
-                    text="搜索", url='https://bbs.midoks.me/search.php')
+                    text="搜索", url='https://bbs.midoks.icu/search.php')
             ]
         ]
         markup = types.InlineKeyboardMarkup(keyboard)
