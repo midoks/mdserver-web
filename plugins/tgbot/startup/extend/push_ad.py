@@ -84,9 +84,9 @@ def send_msg(bot, tag='ad', trigger_time=300):
         ],
         [
             types.InlineKeyboardButton(
-                text="论坛", url='https://bbs.midoks.me'),
+                text="论坛", url='https://bbs.midoks.icu'),
             types.InlineKeyboardButton(
-                text="搜索", url='https://bbs.midoks.me/search.php'),
+                text="搜索", url='https://bbs.midoks.icu/search.php'),
             types.InlineKeyboardButton(
                 text="@ME", url='tg://user?id=5568699210'),
             types.InlineKeyboardButton(

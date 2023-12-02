@@ -29,7 +29,7 @@
 基本上可以使用,后续会继续优化!欢迎提供意见！
 
 - 吹水组 - https://t.me/mdserver_web
-- 交流论坛 - https://bbs.midoks.me
+- 交流论坛 - https://bbs.midoks.icu
 
 ```
 如果出现问题，最好私给我面板信息。不要让我猜。如果不提供，不要提出问题，自行解决。  — 座右铭
@@ -42,7 +42,7 @@ Talk is cheap, show me the code.  -- linus
 ### 主要插件介绍
 
 * OpenResty - 轻量级，占有内存少，并发能力强。
-* PHP[53-82] - PHP是世界上最好的编程语言。
+* PHP[53-83] - PHP是世界上最好的编程语言。
 * MySQL - 一种关系数据库管理系统。
 * MariaDB - 是MySQL的一个重要分支。
 * MySQL[APT/YUM] - 一种关系数据库管理系统。
