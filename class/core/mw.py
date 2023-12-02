@@ -914,7 +914,7 @@ def encodeImage(imgsrc, newsrc):
 
     new_fp = open(newsrc,"wb")
     for x in imgFile:
-        value = x ^ 136
+        value = x ^ 86
         value = hex(value)
         s = struct.pack('B',int(value,16))
         new_fp.write(s)
