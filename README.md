@@ -42,7 +42,7 @@ Talk is cheap, show me the code.  -- linus
 ### 主要插件介绍
 
 * OpenResty - 轻量级，占有内存少，并发能力强。
-* PHP[53-82] - PHP是世界上最好的编程语言。
+* PHP[53-83] - PHP是世界上最好的编程语言。
 * MySQL - 一种关系数据库管理系统。
 * MariaDB - 是MySQL的一个重要分支。
 * MySQL[APT/YUM] - 一种关系数据库管理系统。
