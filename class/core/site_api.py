@@ -973,6 +973,9 @@ class site_api:
         siteInfo = mw.M('sites').where(
             'name=?', (siteName,)).field('id,name,path').find()
         path = self.getSitePath(siteName)
+        if path == '':
+            return mw.returnJson(False, '【'+siteName+'】配置文件,异常!')
+
         srcPath = siteInfo['path']
 
         # 检测acme是否安装
@@ -2201,7 +2204,10 @@ location ^~ {from} {\n\
         if os.path.exists(file):
             conf = mw.readFile(file)
             rep = '\s*root\s*(.+);'
-            path = re.search(rep, conf).groups()[0]
+            find_cnf = re.search(rep, conf)
+            if not find_cnf:
+                return ''
+            path = find_cnf.groups()[0]
             return path
         return ''
 
@@ -2300,9 +2306,15 @@ location ^~ {from} {\n\
     def getSitePhpVersion(self, siteName):
         conf = mw.readFile(self.getHostConf(siteName))
         rep = "enable-php-(.*)\.conf"
-        tmp = re.search(rep, conf).groups()
+        find_php_cnf = re.search(rep, conf)
+
+        def_pver = '00'
+        if find_php_cnf:
+            tmp = find_php_cnf.groups()
+            def_pver = tmp[0]
+            
         data = {}
-        data['phpversion'] = tmp[0]
+        data['phpversion'] = def_pver
         return mw.getJson(data)
 
     def getIndex(self, sid):
