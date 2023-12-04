@@ -34,8 +34,8 @@ def writeLog(log_str):
 
 def get_newest_tid():
 
-    api_new = 'https://bbs.midoks.me/plugin.php?id=external_api&f=bbs_newest'
-    api_next = 'https://bbs.midoks.me/plugin.php?id=external_api&f=bbs_next_tid&tid='
+    api_new = 'https://bbs.midoks.icu/plugin.php?id=external_api&f=bbs_newest'
+    api_next = 'https://bbs.midoks.icu/plugin.php?id=external_api&f=bbs_next_tid&tid='
 
     tid_push = mw.getServerDir() + '/tgbot/bbs_newest_push.json'
 

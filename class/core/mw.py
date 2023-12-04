@@ -905,7 +905,22 @@ def aesDecrypt_Crypto(data, key, vi):
     text_decrypted = text_decrypted.decode('utf8').rstrip()  # 去掉补位的右侧空格
     return text_decrypted
 
+def encodeImage(imgsrc, newsrc):
+    # 图片加密
+    import struct
+    old_fp = open(imgsrc, 'rb')
+    imgFile = old_fp.read()
+    old_fp.close()
 
+    new_fp = open(newsrc,"wb")
+    for x in imgFile:
+        value = x ^ 86
+        value = hex(value)
+        s = struct.pack('B',int(value,16))
+        new_fp.write(s)
+    new_fp.close()
+    return True
+    
 def buildSoftLink(src, dst, force=False):
     '''
     建立软连接
