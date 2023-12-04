@@ -149,7 +149,7 @@ wget --no-check-certificate -O uninstall.sh https://cdn.jsdelivr.net/gh/midoks/m
 
 ```
 curl --insecure -fsSL https://raw.githubusercontent.com/midoks/mdserver-web/master/scripts/install.sh | bash
-curl --insecure -fsSL https://code.midoks.me/midoks/mdserver-web/raw/branch/master/scripts/install.sh | bash
+curl --insecure -fsSL https://code.midoks.icu/midoks/mdserver-web/raw/branch/master/scripts/install.sh | bash
 ```
 
 - 直接更新
@@ -186,8 +186,8 @@ wget --no-check-certificate -O uninstall.sh https://raw.githubusercontent.com/mi
 
 curl --insecure -fsSL  https://raw.githubusercontent.com/midoks/mdserver-web/dev/scripts/quick/debug.sh | bash
 
-curl --insecure -fsSL https://code.midoks.me/midoks/mdserver-web/raw/branch/dev/scripts/install_dev.sh | bash
-curl --insecure -fsSL https://code.midoks.me/midoks/mdserver-web/raw/branch/dev/scripts/update_dev.sh | bash
+curl --insecure -fsSL https://code.midoks.icu/midoks/mdserver-web/raw/branch/dev/scripts/install_dev.sh | bash
+curl --insecure -fsSL https://code.midoks.icu/midoks/mdserver-web/raw/branch/dev/scripts/update_dev.sh | bash
 ```
 
 ### 捐赠地址 USDT（TRC20）
