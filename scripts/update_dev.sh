@@ -81,7 +81,7 @@ fi
 echo "update mdserver-web code start"
 
 if [ "$LOCAL_ADDR" != "common" ];then
-	curl --insecure -sSLo /tmp/dev.zip https://code.midoks.me/midoks/mdserver-web/archive/dev.zip
+	curl --insecure -sSLo /tmp/dev.zip https://code.midoks.icu/midoks/mdserver-web/archive/dev.zip
 	cd /tmp && unzip /tmp/dev.zip
 
 	$CP_CMD -rf /tmp/mdserver-web/* /www/server/mdserver-web

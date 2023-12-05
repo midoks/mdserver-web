@@ -72,7 +72,7 @@ if [ -f /bin/cp ];then
 fi
 
 if [ "$LOCAL_ADDR" != "common" ];then
-	curl --insecure -sSLo /tmp/master.zip https://code.midoks.me/midoks/mdserver-web/archive/master.zip
+	curl --insecure -sSLo /tmp/master.zip https://code.midoks.icu/midoks/mdserver-web/archive/master.zip
 	cd /tmp && unzip /tmp/master.zip
 
 	$CP_CMD -rf /tmp/mdserver-web/* /www/server/mdserver-web
