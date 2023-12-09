@@ -7,6 +7,8 @@
 /etc/init.d/mw default		| 显示登录信息
 /etc/init.d/mw db 		| 快捷连接数据库
 ----------------------------------------
+mw open				| 开启面板
+mw close			| 关闭面板
 
 mw debug			| 开发测试
 mw venv				| 进入虚拟环境
