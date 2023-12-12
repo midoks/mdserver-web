@@ -4,6 +4,7 @@ import sys
 import io
 import os
 import time
+import re
 
 sys.path.append(os.getcwd() + "/class/core")
 import mw
@@ -49,6 +50,13 @@ def getInitDTpl():
     return path
 
 
+def getConfPort():
+    file = getConf()
+    content = mw.readFile(file)
+    rep = 'port\s*=\s*(.*)'
+    tmp = re.search(rep, content)
+    return tmp.groups()[0].strip()
+
 def getArgs():
     args = sys.argv[2:]
     tmp = {}
@@ -92,6 +100,11 @@ def initDreplace():
     data_dir = getServerDir() + '/data'
     if not os.path.exists(data_dir):
         os.mkdir(data_dir)
+
+    install_ok = getServerDir() + "/install.lock"
+    if os.path.exists(install_ok):
+        return file_bin
+    mw.writeFile(install_ok, 'ok')
 
     # initd replace
     content = mw.readFile(file_tpl)
@@ -155,7 +168,8 @@ def restart():
 
 def runInfo():
     import pymongo
-    client = pymongo.MongoClient(host='127.0.0.1', port=27017)
+    port = getConfPort()
+    client = pymongo.MongoClient(host='127.0.0.1', port=int(port))
     db = client.admin
     serverStatus = db.command('serverStatus')
 
