@@ -93,6 +93,12 @@ def initDreplace():
     if not os.path.exists(data_dir):
         os.mkdir(data_dir)
 
+    install_ok = getServerDir() + "/install.lock"
+    if not os.path.exists(install_ok):
+        mw.writeFile(install_ok, 'ok')
+    else:
+        return file_bin
+
     # initd replace
     content = mw.readFile(file_tpl)
     content = content.replace('{$SERVER_PATH}', service_path)
