@@ -4,6 +4,7 @@ import sys
 import io
 import os
 import time
+import re
 
 sys.path.append(os.getcwd() + "/class/core")
 import mw
@@ -48,6 +49,13 @@ def getInitDTpl():
     path = getPluginDir() + "/init.d/" + getPluginName() + ".tpl"
     return path
 
+
+def getConfPort():
+    file = getConf()
+    content = mw.readFile(file)
+    rep = 'port\s*=\s*(.*)'
+    tmp = re.search(rep, content)
+    return tmp.groups()[0].strip()
 
 def getArgs():
     args = sys.argv[2:]
@@ -160,7 +168,8 @@ def restart():
 
 def runInfo():
     import pymongo
-    client = pymongo.MongoClient(host='127.0.0.1', port=27017)
+    port = getConfPort()
+    client = pymongo.MongoClient(host='127.0.0.1', port=int(port))
     db = client.admin
     serverStatus = db.command('serverStatus')
 
