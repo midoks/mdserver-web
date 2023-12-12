@@ -94,10 +94,9 @@ def initDreplace():
         os.mkdir(data_dir)
 
     install_ok = getServerDir() + "/install.lock"
-    if not os.path.exists(install_ok):
-        mw.writeFile(install_ok, 'ok')
-    else:
+    if  os.path.exists(install_ok):
         return file_bin
+    mw.writeFile(install_ok, 'ok')
 
     # initd replace
     content = mw.readFile(file_tpl)
