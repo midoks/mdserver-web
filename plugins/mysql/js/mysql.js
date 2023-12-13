@@ -517,12 +517,12 @@ function setRootPwd(type, pwd){
                         </div>\
                     </div>\
                   </form>",
-        yes:function(layer, layero){
+        yes:function(layerIndex){
             var password = $("#MyPassword").val();
             myPost('set_root_pwd', {password:password}, function(data){
                 var rdata = $.parseJSON(data.data);
                 showMsg(rdata.msg,function(){
-                    layer.close(layer);
+                    layer.close(layerIndex);
                     dbList();
                 },{icon: rdata.status ? 1 : 2});   
             });
