@@ -543,7 +543,7 @@ def initMysql8Pwd():
     alter_root_pwd = alter_root_pwd + \
         "alter user 'root'@'localhost' IDENTIFIED by '" + pwd + "';"
     alter_root_pwd = alter_root_pwd + \
-        "alter user 'root'@'localhost' IDENTIFIED WITH caching_sha2_password by '" + pwd + "';"
+        "alter user 'root'@'localhost' IDENTIFIED WITH mysql_native_password by '" + pwd + "';"
     alter_root_pwd = alter_root_pwd + "flush privileges;"
 
     cmd_pass = serverdir + '/bin/mysqladmin --defaults-file=' + \
