@@ -159,7 +159,7 @@ Install_mysql()
 		apt install -y libssl-dev
 		apt install -y libgssglue-dev
 		apt install -y software-properties-common
-		add-apt-repository ppa:ubuntu-toolchain-r/test
+		add-apt-repository -y ppa:ubuntu-toolchain-r/test
 
 		LIBTIRPC_VER=`pkg-config libtirpc --modversion`
 		if [ ! -f ${mysqlDir}/libtirpc_1.3.3.orig.tar.bz2 ];then
