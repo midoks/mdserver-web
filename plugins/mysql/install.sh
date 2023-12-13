@@ -5,6 +5,8 @@ export PATH
 # 手动主从设置
 # https://www.cnblogs.com/whiteY/p/17331882.html
 
+# cd /www/server/mdserver-web/plugins/mysql && bash install.sh install 8.2
+
 curPath=`pwd`
 rootPath=$(dirname "$curPath")
 rootPath=$(dirname "$rootPath")
