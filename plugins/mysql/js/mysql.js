@@ -522,7 +522,7 @@ function setRootPwd(type, pwd){
             myPost('set_root_pwd', {password:password}, function(data){
                 var rdata = $.parseJSON(data.data);
                 showMsg(rdata.msg,function(){
-                    layer.close(layero);
+                    layer.close(layer);
                     dbList();
                 },{icon: rdata.status ? 1 : 2});   
             });
