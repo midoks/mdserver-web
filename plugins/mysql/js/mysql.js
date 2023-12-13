@@ -523,7 +523,6 @@ function setRootPwd(type, pwd){
                 var rdata = $.parseJSON(data.data);
                 showMsg(rdata.msg,function(){
                     layer.close(layerIndex);
-                    dbList();
                 },{icon: rdata.status ? 1 : 2});   
             });
         },
