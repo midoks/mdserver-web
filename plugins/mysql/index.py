@@ -675,7 +675,7 @@ def my8cmd(version, method):
 
 def appCMD(version, action):
     makeInitRsaKey(version)
-    if version == '8.0' or version == '5.7':
+    if float(version) >= 5.7:
         status = my8cmd(version, action)
     else:
         status = myOp(version, action)
