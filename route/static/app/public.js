@@ -164,7 +164,7 @@ $(".menu-icon").click(function() {
 	$(".sidebar-scroll").toggleClass("sidebar-close");
 	$(".main-content").toggleClass("main-content-open");
 	if($(".sidebar-close")) {
-		$(".sub-menu").find(".sub").css("display", "none")
+		$(".sub-menu").find(".sub").css("display", "none");
 	}
 });
 
