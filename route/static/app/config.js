@@ -403,7 +403,7 @@ function setPanelSSL(){
 
 function setNotifyApi(tag, obj){
 	var enable = $(obj).prop("checked");
-	console.log(tag,obj,enable);
+	// console.log(tag,obj,enable);
 	$.post('/config/set_notify_enable', {'tag':tag, 'enable':enable},function(rdata){
 		showMsg(rdata.msg, function(){
 			if (rdata.status){}
