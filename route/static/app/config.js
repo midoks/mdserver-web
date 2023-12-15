@@ -395,8 +395,7 @@ function setPanelSSL(){
 	},function(){
 		if(status == 0){
 			$("#panelSSL").prop("checked",false);
-		}
-		else{
+		}else{
 			$("#panelSSL").prop("checked",true);
 		}
 	});
