@@ -74,7 +74,7 @@ function toUnixTime(txt){
 
 function randomStrPwd(b) {
 	b = b || 32;
-	var c = "AaBbCcDdEeFfGHhiJjKkLMmNnPpRSrTsWtXwYxZyz2345678";
+	var c = "AaBbCcDdEeFfGHhiJjKkLMmNnPpRSrTsWtXwYxZyz2345678&!@%";
 	var a = c.length;
 	var d = "";
 	for(i = 0; i < b; i++) {
@@ -164,7 +164,7 @@ $(".menu-icon").click(function() {
 	$(".sidebar-scroll").toggleClass("sidebar-close");
 	$(".main-content").toggleClass("main-content-open");
 	if($(".sidebar-close")) {
-		$(".sub-menu").find(".sub").css("display", "none")
+		$(".sub-menu").find(".sub").css("display", "none");
 	}
 });
 

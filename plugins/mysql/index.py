@@ -116,6 +116,16 @@ def getErrorLogsFile():
     tmp = re.search(rep, content)
     return tmp.groups()[0].strip()
 
+def getAuthPolicy():
+    file = getConf()
+    content = mw.readFile(file)
+    rep = 'authentication_policy\s*=\s*(.*)'
+    tmp = re.search(rep, content)
+    if tmp:
+        return tmp.groups()[0].strip()
+    # caching_sha2_password
+    return 'mysql_native_password'
+
 
 def getInitdTpl(version=''):
     path = getPluginDir() + '/init.d/mysql' + version + '.tpl'
@@ -530,6 +540,9 @@ def initMysqlPwd():
 def initMysql8Pwd():
     time.sleep(8)
 
+
+    auth_policy = getAuthPolicy()
+
     serverdir = getServerDir()
     myconf = serverdir + "/etc/my.cnf"
 
@@ -543,7 +556,7 @@ def initMysql8Pwd():
     alter_root_pwd = alter_root_pwd + \
         "alter user 'root'@'localhost' IDENTIFIED by '" + pwd + "';"
     alter_root_pwd = alter_root_pwd + \
-        "alter user 'root'@'localhost' IDENTIFIED WITH mysql_native_password by '" + pwd + "';"
+        "alter user 'root'@'localhost' IDENTIFIED WITH "+auth_policy+" by '" + pwd + "';"
     alter_root_pwd = alter_root_pwd + "flush privileges;"
 
     cmd_pass = serverdir + '/bin/mysqladmin --defaults-file=' + \
@@ -620,6 +633,8 @@ def my8cmd(version, method):
             isInited = initMysql57Data()
         elif version == '8.0':
             isInited = initMysql8Data()
+        elif version == '8.2':
+            isInited = initMysql8Data()
 
         if not isInited:
 
@@ -660,7 +675,7 @@ def my8cmd(version, method):
 
 def appCMD(version, action):
     makeInitRsaKey(version)
-    if version == '8.0' or version == '5.7':
+    if float(version) >= 5.7:
         status = my8cmd(version, action)
     else:
         status = myOp(version, action)
@@ -2123,12 +2138,14 @@ def addMasterRepSlaveUser(version=''):
     pdb = pMysqlDb()
     psdb = pSqliteDb('master_replication_user')
 
+    auth_policy = getAuthPolicy()
+
     if psdb.where("username=?", (username)).count() > 0:
         return mw.returnJson(False, '用户已存在!')
 
     if version == "8.0":
         sql = "CREATE USER '" + username + \
-            "'  IDENTIFIED WITH mysql_native_password BY '" + password + "';"
+            "'  IDENTIFIED WITH "+auth_policy+" BY '" + password + "';"
         pdb.execute(sql)
         sql = "grant replication slave on *.* to '" + username + "'@'%';"
         result = pdb.execute(sql)
