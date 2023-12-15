@@ -370,12 +370,7 @@ function setPanelSSL(){
 		<input type="checkbox" id="checkSSL" /><label style="font-weight: 400;margin: 3px 5px 0px;" for="checkSSL">我已了经解详情,并愿意承担风险</label>\
 	</p>';
 	layer.confirm(msg,{title:'设置面板SSL',closeBtn:1,icon:3,area:'550px',cancel:function(){
-		if(status == 0){
-			$("#panelSSL").prop("checked",false);
-		}
-		else{
-			$("#panelSSL").prop("checked",true);
-		}
+		$("#panelSSL").prop("checked", status == 0?false:true);
 	}},function(){
 		if(window.location.protocol.indexOf('https') == -1){
 			if(!$("#checkSSL").prop('checked')){
