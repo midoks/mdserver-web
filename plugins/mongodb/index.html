@@ -17,9 +17,7 @@
 <script type="text/javascript">
 //mongodb  start
 resetPluginWinHeight(530);
-var loading = layer.msg("资源加载中...", { icon: 16, time: 0, shade: 0.3 });
-$.getScript( "/plugins/file?name=mongodb&f=js/mongodb.js", function(){
-	layer.close(loading);
+$.getScript('/plugins/file?name=mongodb&f=js/mongodb.js', function(){
 	pluginService('mongodb');
 });
 //mongodb end
