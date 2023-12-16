@@ -80,14 +80,21 @@ function mongoReplStatus() {
 		var rdata = $.parseJSON(data.data);
 		var rdata = rdata.data;
 
+		var tbody = '';
+		if (rdata.status == '无'){
+			tbody += '<tr><td colspan="3" style="text-align:center;">无数据</td></tr>';
+		} else{
+			tbody += '<tr><th>状态</th><td>' + rdata.status + '</td><td>主/从</td></tr>\
+					<tr><th>同步文档</th><td>' + rdata.setName + '</td><td>文档名</td></tr>\
+					<tr><th>primary</th><td>' + rdata.primary + '</td><td>primary</td></tr>\
+					<tr><th>me</th><td>' + rdata.me + '</td><td>me</td></tr>';
+		}
+
         var con = '<div class="divtable">\
 				<table class="table table-hover table-bordered" style="width: 490px;">\
 					<thead><th>字段</th><th>当前值</th><th>说明</th></thead>\
 					<tbody>\
-						<tr><th>状态</th><td>' + rdata.status + '</td><td>主/从</td></tr>\
-						<tr><th>同步文档</th><td>' + rdata.setName + '</td><td>文档名</td></tr>\
-						<tr><th>primary</th><td>' + rdata.primary + '</td><td>primary</td></tr>\
-						<tr><th>me</th><td>' + rdata.me + '</td><td>me</td></tr>\
+						'+tbody+'\
 					<tbody>\
 				</table>\
 			</div>';
