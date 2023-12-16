@@ -5,6 +5,8 @@ import io
 import os
 import time
 import re
+import json
+import datetime
 
 sys.path.append(os.getcwd() + "/class/core")
 import mw
@@ -168,31 +170,48 @@ def restart():
 
 def runInfo():
     import pymongo
+    
     port = getConfPort()
     client = pymongo.MongoClient(host='127.0.0.1', port=int(port))
     db = client.admin
     serverStatus = db.command('serverStatus')
 
     listDbs = client.list_database_names()
+    
+    result = {}
+    result["host"] = serverStatus['host']
+    result["version"] = serverStatus['version']
+    result["uptime"] = serverStatus['uptime']
+    result['db_path'] = getServerDir() + "/data"
+    result["connections"] = serverStatus['connections']['current']
+    result["collections"] = len(listDbs)
 
+    pf = serverStatus['opcounters']
+    result['pf'] = pf
+    
+    return mw.getJson(result)
+
+
+def runDocInfo():
+    import pymongo
+    
+    port = getConfPort()
+    client = pymongo.MongoClient(host='127.0.0.1', port=int(port))
+    db = client.admin
+    serverStatus = db.command('serverStatus')
+
+    listDbs = client.list_database_names()
     showDbList = []
+    result = {}
     for x in range(len(listDbs)):
         mongd = client[listDbs[x]]
         stats = mongd.command({"dbstats": 1})
+        if 'operationTime' in stats:
+            del stats['operationTime']
+
+        if '$clusterTime' in stats:
+            del stats['$clusterTime']
         showDbList.append(stats)
-    # print(showDbList)
-    # print(serverStatus)
-    # for key, value in serverStatus.items():
-    #     print(key, value)
-    result = {}
-    result["version"] = serverStatus['version']
-    result["uptime"] = serverStatus['uptime']
-
-    result['db_path'] = getServerDir() + "/data"
-
-    result["connections"] = serverStatus['connections']['current']
-    if 'catalogStats' in serverStatus:
-        result["collections"] = serverStatus['catalogStats']['collections']
 
     result["dbs"] = showDbList
     return mw.getJson(result)
@@ -280,6 +299,8 @@ if __name__ == "__main__":
         print(initdUinstall())
     elif func == 'run_info':
         print(runInfo())
+    elif func == 'run_doc_info':
+        print(runDocInfo())
     elif func == 'conf':
         print(getConf())
     elif func == 'run_log':
