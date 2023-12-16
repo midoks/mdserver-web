@@ -177,7 +177,7 @@ def runInfo():
     serverStatus = db.command('serverStatus')
 
     listDbs = client.list_database_names()
-    
+
     result = {}
     result["host"] = serverStatus['host']
     result["version"] = serverStatus['version']
@@ -216,6 +216,31 @@ def runDocInfo():
     result["dbs"] = showDbList
     return mw.getJson(result)
 
+
+def runReplInfo():
+    import pymongo
+    
+    port = getConfPort()
+    client = pymongo.MongoClient(host='127.0.0.1', port=int(port))
+    db = client.admin
+    serverStatus = db.command('serverStatus')
+
+    result = {}
+    result['status'] = '无'
+    result['doc_name'] = '无'
+    if 'repl' in serverStatus:
+        repl = serverStatus['repl']
+        # print(repl)
+        if repl['ismaster']:
+            result['status'] = '主'
+        else:
+            result['status'] = '从'
+
+        result['setName'] = repl['setName']
+        result['primary'] = repl['primary']
+        result['me'] = repl['me']
+    
+    return mw.returnJson(True, 'OK', result)
 
 def initdStatus():
     if mw.isAppleSystem():
@@ -301,6 +326,8 @@ if __name__ == "__main__":
         print(runInfo())
     elif func == 'run_doc_info':
         print(runDocInfo())
+    elif func == 'run_repl_info':
+        print(runReplInfo())
     elif func == 'conf':
         print(getConf())
     elif func == 'run_log':

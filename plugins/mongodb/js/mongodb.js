@@ -67,3 +67,36 @@ function mongoDocStatus() {
         $(".soft-man-con").html(con);
     },'json');
 }
+
+function mongoReplStatus() {
+    var loadT = layer.msg('正在获取...', { icon: 16, time: 0, shade: 0.3 });
+    $.post('/plugins/run', {name:'mongodb', func:'run_repl_info'}, function(data) {
+    	layer.close(loadT);
+    	if (!data.status){
+    		layer.msg(data.msg,{icon:0,time:2000,shade: [0.3, '#000']});
+    		return;
+    	}
+
+		var rdata = $.parseJSON(data.data);
+		var rdata = rdata.data;
+
+        var con = '<div class="divtable">\
+				<table class="table table-hover table-bordered" style="width: 490px;">\
+					<thead><th>字段</th><th>当前值</th><th>说明</th></thead>\
+					<tbody>\
+						<tr><th>状态</th><td>' + rdata.status + '</td><td>主/从</td></tr>\
+						<tr><th>同步文档</th><td>' + rdata.setName + '</td><td>文档名</td></tr>\
+						<tr><th>primary</th><td>' + rdata.primary + '</td><td>primary</td></tr>\
+						<tr><th>me</th><td>' + rdata.me + '</td><td>me</td></tr>\
+					<tbody>\
+				</table>\
+			</div>';
+
+        $(".soft-man-con").html(con);
+    },'json');
+}
+
+
+
+
+
