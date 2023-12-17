@@ -231,7 +231,7 @@ def runReplInfo():
     if 'repl' in serverStatus:
         repl = serverStatus['repl']
         # print(repl)
-        if repl['ismaster']:
+        if 'ismaster' in repl and repl['ismaster']:
             result['status'] = '主'
         else:
             result['status'] = '从'
