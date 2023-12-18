@@ -1359,7 +1359,7 @@ def setRootPwd(version=''):
         if isError != None:
             if force == 1:
                 pSqliteDb('config').where('id=?', (1,)).save('mysql_root', (password,))
-                return mw.returnJson(True, '【强制修改】数据库root密码修改成功!(不意为成功连接数据!)')
+                return mw.returnJson(True, '【强制修改】数据库root密码修改成功(不意为成功连接数据)!')
             return isError
 
         if version.find('5.7') > -1 or version.find('8.0') > -1:
@@ -1378,7 +1378,7 @@ def setRootPwd(version=''):
         msg = ''
         if force == 1:
             msg = ',无须强制!'
-            
+
         return mw.returnJson(True, '数据库root密码修改成功!'+msg)
     except Exception as ex:
         return mw.returnJson(False, '修改错误:' + str(ex))
