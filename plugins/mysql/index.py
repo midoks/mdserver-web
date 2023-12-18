@@ -1347,7 +1347,6 @@ def setRootPwd(version=''):
         return data[1]
 
     password = args['password']
-    pSqliteDb('config').where('id=?', (1,)).save('mysql_root', (password,))
     try:
         pdb = pMysqlDb()
         result = pdb.query("show databases")
@@ -1363,8 +1362,10 @@ def setRootPwd(version=''):
             pdb.execute(
                 "ALTER USER 'root'@'127.0.0.1' IDENTIFIED BY '%s'" % password)
         else:
-            result = pdb.execute("update mysql.user set Password=password('" + password + "') where User='root'")
+            result = pdb.execute(
+                "update mysql.user set Password=password('" + password + "') where User='root'")
         pdb.execute("flush privileges")
+        pSqliteDb('config').where('id=?', (1,)).save('mysql_root', (password,))
         return mw.returnJson(True, '数据库root密码修改成功!')
     except Exception as ex:
         return mw.returnJson(False, '修改错误:' + str(ex))
