@@ -558,9 +558,9 @@ class system_api:
             networkInfo['upTotal'] = networkIo[0]
             networkInfo['downTotal'] = networkIo[1]
             networkInfo['up'] = round(float(
-                networkIo[0] - session['up']) / 1024 / (ntime - session['otime']), 2)
+                networkIo[0] - session['up']) / (ntime - session['otime']), 2)
             networkInfo['down'] = round(
-                float(networkIo[1] - session['down']) / 1024 / (ntime - session['otime']), 2)
+                float(networkIo[1] - session['down']) / (ntime - session['otime']), 2)
             networkInfo['downPackets'] = networkIo[3]
             networkInfo['upPackets'] = networkIo[2]
 

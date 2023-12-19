@@ -12,7 +12,7 @@ function toSize(a) {
 		if(a < e) {
 			return(b == 0 ? a : a.toFixed(2)) + d[b]
 		}
-		a /= e
+		a /= e;
 	}
 }
 

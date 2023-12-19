@@ -29,6 +29,7 @@ $(function() {
         }
     });
 });
+
 //获取负载
 function getLoad(data) {
     $("#LoadList .mask").html("<span id='Load' style='font-size:14px'>获取中..</span>");
@@ -83,19 +84,18 @@ function showCpuTips(rdata){
     $('#cpuChart .mask').unbind();
     $('#cpuChart .mask').hover(function() {
         var cpuText = '';
-
         if (rdata.cpu[2].length == 1){
             var cpuUse = parseFloat(rdata.cpu[2][0] == 0 ? 0 : rdata.cpu[2][0]).toFixed(1);
-            cpuText += 'CPU-1：' + cpuUse + '%'
-        } else{
+            cpuText += 'CPU-1：' + cpuUse + '%';
+        } else {
             for (var i = 1; i < rdata.cpu[2].length + 1; i++) {
-              var cpuUse = parseFloat(rdata.cpu[2][i - 1] == 0 ? 0 : rdata.cpu[2][i - 1]).toFixed(1);
-              if (i % 2 != 0) {
-                cpuText += 'CPU-' + i + '：' + cpuUse + '%&nbsp;|&nbsp;'
-              } else {
-                cpuText += 'CPU-' + i + '：' + cpuUse + '%'
-                cpuText += '\n'
-              }
+                var cpuUse = parseFloat(rdata.cpu[2][i - 1] == 0 ? 0 : rdata.cpu[2][i - 1]).toFixed(1);
+                if (i % 2 != 0) {
+                    cpuText += 'CPU-' + i + '：' + cpuUse + '%&nbsp;|&nbsp;';
+                } else {
+                    cpuText += 'CPU-' + i + '：' + cpuUse + '%';
+                    cpuText += '\n';
+                }
             } 
         }
         layer.tips(rdata.cpu[3] + "</br>" + rdata.cpu[5] + "个物理CPU，" + (rdata.cpu[4]) + "个物理核心，" + rdata.cpu[1] + "个逻辑核心</br>" + cpuText, this, { time: 0, tips: [1, '#999'] });
@@ -109,6 +109,7 @@ function rocket(sum, m) {
     var n = sum - m;
     $(".mem-release").find(".mask span").text(n);
 }
+
 //释放内存
 function reMemory() {
     setTimeout(function() {
@@ -281,8 +282,8 @@ function getNet() {
     var up, down;
     $.get("/system/network", function(net) {
         $("#InterfaceSpeed").html(lan.index.interfacespeed + "： 1.0Gbps");
-        $("#upSpeed").html(net.up + ' KB');
-        $("#downSpeed").html(net.down + ' KB');
+        $("#upSpeed").html(toSize(net.up));
+        $("#downSpeed").html(toSize(net.down));
         $("#downAll").html(toSize(net.downTotal));
         $("#downAll").attr('title', lan.index.package + ':' + net.downPackets)
         $("#upAll").html(toSize(net.upTotal));
@@ -303,7 +304,7 @@ function getNet() {
 
 //网络Io
 function netImg() {
-    var myChartNetwork = echarts.init(document.getElementById('netImg'));
+    var echartsNetImg = echarts.init(document.getElementById('netImg'));
     var xData = [];
     var yData = [];
     var zData = [];
@@ -333,10 +334,27 @@ function netImg() {
         return ts(h) + ':' + ts(mm) + ':' + ts(s);
     }
 
+    var default_unit = 'KB/s';
     function addData(shift) {
         xData.push(getTime());
-        yData.push(getCookie("upNet"));
-        zData.push(getCookie("downNet"));
+
+        if (getCookie("upNet") > getCookie("downNet") ){
+            tmp = getCookie("upNet");
+        } else {
+            tmp = getCookie("downNet");
+        }
+        var tmpSize = toSize(tmp);
+        default_unit = tmpSize.split(' ')[1];
+
+
+        var upNetTmp = toSize(getCookie("upNet"));
+        var downNetTmp = toSize(getCookie("downNet"));
+        
+        var upNetTmpSize = upNetTmp.split(' ')[0];
+        var downNetTmp = downNetTmp.split(' ')[0]
+        
+        yData.push(upNetTmpSize);
+        zData.push(downNetTmp);
         if (shift) {
             xData.shift();
             yData.shift();
@@ -379,7 +397,7 @@ function netImg() {
             }
         },
         yAxis: {
-            name: lan.index.unit + 'KB/s',
+            name:  '单位 '+ default_unit,
             splitLine: {
                 lineStyle: {
                     color: "#eee"
@@ -392,7 +410,7 @@ function netImg() {
             }
         },
         series: [{
-            name: lan.index.net_up,
+            name: '上行',
             type: 'line',
             data: yData,
             smooth: true,
@@ -420,8 +438,9 @@ function netImg() {
                     width: 1
                 }
             }
-        }, {
-            name: lan.index.net_down,
+        },
+        {
+            name: '下行',
             type: 'line',
             data: zData,
             smooth: true,
@@ -432,21 +451,21 @@ function netImg() {
                 normal: {
                     color: new echarts.graphic.LinearGradient(0, 0, 0, 1, [{
                         offset: 0,
-                        color: 'rgba(30, 144, 255,0.5)'
+                        color: 'rgba(30, 144, 255,0.5)',
                     }, {
                         offset: 1,
-                        color: 'rgba(30, 144, 255,0.8)'
+                        color: 'rgba(30, 144, 255,0.8)',
                     }], false)
                 }
             },
             itemStyle: {
                 normal: {
-                    color: '#52a9ff'
+                    color: '#52a9ff',
                 }
             },
             lineStyle: {
                 normal: {
-                    width: 1
+                    width: 1,
                 }
             }
         }]
@@ -454,7 +473,7 @@ function netImg() {
     setInterval(function() {
         getNet();
         addData(true);
-        myChartNetwork.setOption({
+        echartsNetImg.setOption({
             xAxis: {
                 data: xData
             },
@@ -467,10 +486,11 @@ function netImg() {
             }]
         });
     }, 3000);
+
     // 使用刚指定的配置项和数据显示图表。
-    myChartNetwork.setOption(option);
+    echartsNetImg.setOption(option);
     window.addEventListener("resize", function() {
-        myChartNetwork.resize();
+        echartsNetImg.resize();
     });
 }
 
