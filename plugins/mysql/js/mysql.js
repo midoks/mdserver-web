@@ -2595,10 +2595,20 @@ function masterOrSlaveConf(version=''){
                     </div>\
                     </form>",
                     success:function(){
-                        // copyText(v['Error']);
-                        // $('.class-copy-db-err').click(function(){
-                        //     copyText(v['Error']);
-                        // });
+                        if (info['Last_IO_Error'] != ''){
+                            copyText(info['Last_IO_Error']);
+                            return;
+                        }
+
+                        if (info['Last_SQL_Error'] != ''){
+                            copyText(info['Last_SQL_Error']);
+                            return;
+                        }
+
+                        if (info['Slave_SQL_Running_State'] != ''){
+                            copyText(info['Slave_SQL_Running_State']);
+                            return;
+                        }
                     },
                     yes:function(){
                         if (info['Last_IO_Error'] != ''){
