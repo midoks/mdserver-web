@@ -438,13 +438,24 @@ function syncToDatabase(type){
 }
 
 function setRootPwd(type, pwd){
+    if (type==1){
+        var password = $("#MyPassword").val();
+        myPost('set_root_pwd', {password:password}, function(data){
+            var rdata = $.parseJSON(data.data);
+            showMsg(rdata.msg,function(){
+                dbList();
+            },{icon: rdata.status ? 1 : 2});   
+        });
+        return;
+    }
+
     var index = layer.open({
         type: 1,
         area: '500px',
         title: '修改数据库密码',
         closeBtn: 1,
         shift: 5,
-        btn:["提交","关闭"],
+        btn:["提交", "关闭", "复制ROOT密码", "强制修改"],
         shadeClose: true,
         content: "<form class='bt-form pd20' id='mod_pwd'>\
                     <div class='line'>\
@@ -454,16 +465,36 @@ function setRootPwd(type, pwd){
                         </div>\
                     </div>\
                   </form>",
-        yes:function(index,layero){
+        yes:function(layerIndex){
             var password = $("#MyPassword").val();
             myPost('set_root_pwd', {password:password}, function(data){
                 var rdata = $.parseJSON(data.data);
                 showMsg(rdata.msg,function(){
+                    layer.close(layerIndex);
                     dbList();
-                    layer.close(index);
                 },{icon: rdata.status ? 1 : 2});   
             });
-            return;
+        },
+        btn3:function(){
+            var password = $("#MyPassword").val();
+            copyText(password);
+            return false;
+        },
+        btn4:function(layerIndex){
+            layer.confirm('强制修改,是为了在重建时使用,确定强制?', {
+                btn: ['确定', '取消']
+            }, function(index, layero){
+                layer.close(index);
+                var password = $("#MyPassword").val();
+                myPost('set_root_pwd', {password:password,force:'1'}, function(data){
+                    var rdata = $.parseJSON(data.data);
+                    showMsg(rdata.msg,function(){
+                        layer.close(layerIndex);
+                        dbList();
+                    },{icon: rdata.status ? 1 : 2});   
+                });
+            });
+            return false;
         }
     });
 }
