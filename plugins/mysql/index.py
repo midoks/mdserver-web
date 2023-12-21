@@ -3211,8 +3211,6 @@ if __name__ == "__main__":
         print(binLog())
     elif func == 'binlog_list':
         print(binLogList())
-    elif func == 'binlog_look':
-        print(binLogListLook())
     elif func == 'clean_bin_log':
         print(cleanBinLog())
     elif func == 'error_log':
