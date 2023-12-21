@@ -701,7 +701,7 @@ function setDbPass(id, username, password){
                         <span title='随机密码' class='glyphicon glyphicon-repeat cursor' onclick='repeatPwd(16)'></span></div>\
                     </div>\
                     <input type='hidden' name='id' value='"+id+"'>\
-                  </form>",
+                </form>",
         yes:function(index){
             // var data = $("#mod_pwd").serialize();
             var data = {};
