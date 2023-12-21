@@ -1039,12 +1039,21 @@ def setRootPwd(version=''):
     if not data[0]:
         return data[1]
 
+    #强制修改
+    force = 0
+    if 'force' in args and args['force'] == '1':
+        force = 1
+
+
     password = args['password']
     try:
         pdb = pMysqlDb('mysql')
         result = pdb.query("show databases")
         isError = isSqlError(result)
         if isError != None:
+            if force == 1:
+                pSqliteDb('config').where('id=?', (1,)).save('mysql_root', (password,))
+                return mw.returnJson(True, '【强制修改】数据库root密码修改成功(不意为成功连接数据)!')
             return isError
 
         cmd = "ALTER USER 'root'@'localhost' IDENTIFIED BY '" + password + "';"
@@ -1054,7 +1063,12 @@ def setRootPwd(version=''):
         pSqliteDb('config').where('id=?', (1,)).save('mysql_root', (password,))
         orm = pMysqlDb()
         orm.execute("flush privileges")
-        return mw.returnJson(True, '数据库root密码修改成功!')
+
+        msg = ''
+        if force == 1:
+            msg = ',无须强制!'
+
+        return mw.returnJson(True, '数据库root密码修改成功!' + msg)
     except Exception as ex:
         return mw.returnJson(False, '修改错误:' + str(ex))
 
