@@ -2332,12 +2332,12 @@ def trySlaveSyncBugfix(version=''):
             gtid_purged += var_gtid[0]['Value'] + ','
 
     gtid_purged = gtid_purged.strip(',')
-    sql = "set @@global.gtid_purged='" + gtid_purged + "'"
+    sql = "set @@global.gtid_slave_pos='" + gtid_purged + "'"
 
-    sdb.query('stop slave')
+    sdb.query('stop all slaves')
     # print(sql)
     sdb.query(sql)
-    sdb.query('start slave')
+    sdb.query('start all slaves')
     return mw.returnJson(True, '修复成功!')
 
 def getSlaveSyncCmd(version=''):
