@@ -859,7 +859,9 @@ def importDbExternal():
 
     # print(mysql_cmd)
     os.system(mysql_cmd)
-    os.remove(import_sql)
+
+    if ext != 'sql':
+        os.remove(import_sql)
 
     return mw.returnJson(True, 'ok')
 
