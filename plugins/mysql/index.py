@@ -2954,18 +2954,18 @@ def doFullSyncUser(version=''):
 
     if not os.path.exists(bak_file):
         dump_sql_data = getServerDir() + "/bin/mysqldump " + dmp_option + "  --force --opt --default-character-set=utf8 --single-transaction -h" + ip + " -P" + \
-            port + " -u" + user + " -p\"" + apass + \
-            "\" --ssl-mode=DISABLED " + sync_db + " > " + bak_file
-        # print(dump_sql_data)
+            port + " -u" + user + " -p'" + apass + \
+            "' --ssl-mode=DISABLED " + sync_db + " > " + bak_file
+        print(dump_sql_data)
         mw.execShell(dump_sql_data)
 
     writeDbSyncStatus({'code': 2, 'msg': '本地导入数据...', 'progress': 40})
     if os.path.exists(bak_file):
         pwd = pSqliteDb('config').where('id=?', (1,)).getField('mysql_root')
         sock = getSocketFile()
-        my_import_cmd = getServerDir() + '/bin/mysql -S ' + sock + ' -uroot -p' + pwd + \
-            ' ' + sync_db_import + ' < ' + bak_file
-        # print(my_import_cmd)
+        my_import_cmd = getServerDir() + '/bin/mysql -S ' + sock + " -uroot -p'" + pwd + \
+            "' " + sync_db_import + ' < ' + bak_file
+        print(my_import_cmd)
         mw.execShell(my_import_cmd)
 
     if version == '8.0':
