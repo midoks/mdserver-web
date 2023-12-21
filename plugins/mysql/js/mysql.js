@@ -2693,7 +2693,7 @@ function masterOrSlaveConf(version=''){
                 <p class="conf_p">\
                     <span class="f14 c6 mr20">Master[主]配置</span><span class="f14 c6 mr20"></span>\
                     <button class="btn '+(!rdata.status ? 'btn-danger' : 'btn-success')+' btn-xs btn-master">'+(!rdata.status ? '未开启' : '已开启') +'</button>\
-                    <button class="btn btn-success btn-xs" onclick="resetMaster()" >重置</button>\
+                    <button class="btn btn-success btn-xs" onclick="resetMaster()">重置</button>\
                 </p>\
                 <hr/>\
                 <!-- master list -->\
