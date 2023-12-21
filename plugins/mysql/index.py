@@ -192,7 +192,8 @@ def pMysqlDb():
 
 
 def makeInitRsaKey(version=''):
-    datadir = getServerDir() + "/data"
+    # datadir = getServerDir() + "/data"
+    datadir = getDataDir()
     mysql_pem = datadir + "/mysql.pem"
     if not os.path.exists(mysql_pem):
         rdata = mw.execShell(
@@ -1629,7 +1630,7 @@ def fixDbAccess(version):
 
     if not os.path.exists(mdb_ddir):
         return mw.returnJson(False, '数据目录不存在,尝试重启重建!')
-        
+
     try:
         data = pdb.query('show databases')
         isError = isSqlError(data)
