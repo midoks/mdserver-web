@@ -2325,7 +2325,8 @@ def trySlaveSyncBugfix(version=''):
         mdb.setPwd(password)
         mdb.setSocket('')
 
-        var_gtid = mdb.query('show VARIABLES like "%gtid_purged%"')
+        # var_gtid = mdb.query('show VARIABLES like "%gtid_purged%"')
+        var_gtid = mdb.query('select @@global.gtid_current_pos')
         if len(var_gtid) > 0:
             gtid_purged += var_gtid[0]['Value'] + ','
 
