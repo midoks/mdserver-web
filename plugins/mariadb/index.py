@@ -1289,9 +1289,7 @@ def resetDbRootPwd(version):
     cmd_pass = cmd_pass + "flush privileges;\""
 
     data = mw.execShell(cmd_pass)
-    # if data[1].find("ERROR") != -1:
-    #     print("init mariadb password fail:" + data[1])
-    #     exit(1)
+    # print(data)
     return True
 
 def fixDbAccess(version):
@@ -1310,7 +1308,7 @@ def fixDbAccess(version):
             appCMD(version, 'stop')
             openSkipGrantTables()
             appCMD(version, 'start')
-
+            time.sleep(3)
             resetDbRootPwd(version)
 
             appCMD(version, 'stop')
