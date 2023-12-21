@@ -192,8 +192,11 @@ def pMysqlDb():
 
 
 def makeInitRsaKey(version=''):
-    datadir = getServerDir() + "/data"
-    # datadir = getDataDir()
+    try:
+        datadir = getDataDir()
+    except Exception as e:
+        datadir = getServerDir() + "/data"
+        
     mysql_pem = datadir + "/mysql.pem"
     if not os.path.exists(mysql_pem):
         rdata = mw.execShell(
