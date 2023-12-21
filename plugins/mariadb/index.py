@@ -967,7 +967,7 @@ def syncGetDatabases():
                 host = user["Host"]
                 break
 
-        ps = mw.getMsg('INPUT_PS')
+        ps = vdb_name
         if vdb_name == 'test':
             ps = mw.getMsg('DATABASE_TEST')
         addTime = time.strftime('%Y-%m-%d %X', time.localtime())
@@ -1280,6 +1280,7 @@ def resetDbRootPwd(version):
     serverdir = getServerDir()
     myconf = serverdir + "/etc/my.cnf"
     pwd = mw.getRandomString(16)
+    pSqliteDb('config').where('id=?', (1,)).save('mysql_root', (pwd,))
 
     db_option = "-S " + serverdir + "/mysql.sock"
     cmd_pass = serverdir + '/bin/mysql ' + db_option + ' -uroot -e'
