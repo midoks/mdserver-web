@@ -2670,8 +2670,9 @@ def doFullSyncUser(version=''):
     writeDbSyncStatus({'code': 1, 'msg': '远程导出数据...', 'progress': 10})
 
     if not os.path.exists(bak_file):
-        dump_sql_data = getServerDir() + "/bin/mariadb-dump --force --opt --default-character-set=utf8 --single-transaction -h" + ip + " -P" + \
-            port + " -u" + user + " -p" + apass + " " + sync_db + " > " + bak_file
+        # https://mariadb.com/kb/zh-cn/mariadb-dump/
+        dump_sql_data = getServerDir() + "/bin/mariadb-dump -f --opt --default-character-set=utf8 --single-transaction -h" + ip + " -P" + \
+            port + " -u" + user + " -p'" + apass + "' " + sync_db + " > " + bak_file
         print(dump_sql_data)
         mw.execShell(dump_sql_data)
 
@@ -2679,8 +2680,8 @@ def doFullSyncUser(version=''):
     if os.path.exists(bak_file):
         pwd = pSqliteDb('config').where('id=?', (1,)).getField('mysql_root')
         sock = getSocketFile()
-        my_import_cmd = getServerDir() + '/bin/mariadb -S ' + sock + ' -uroot -p' + pwd + \
-            ' ' + sync_db + ' < ' + bak_file
+        my_import_cmd = getServerDir() + '/bin/mariadb -S ' + sock + " -uroot -p'" + pwd + \
+            "' " + sync_db + ' < ' + bak_file
         mw.execShell(my_import_cmd)
 
     pinfo = parseSlaveSyncCmd(data['cmd'])
