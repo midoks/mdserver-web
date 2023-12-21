@@ -1308,6 +1308,7 @@ function myBinRollingLogs(_name, func, _args, line){
         }
     });
 }
+
 function myBinLogsRender(page){
     var _data = {};
     if (typeof(page) =='undefined'){
