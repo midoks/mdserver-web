@@ -798,6 +798,8 @@ def rootPwd():
         'id=?', (1,)).getField('mysql_root')
 
 
+# python3 plugins/mariadb/index.py import_db_external {"file":"xx.sql","name":"demo1"}
+# python3 plugins/mariadb/index.py import_db_external {"file":"db_demo1_20231221_203614 2.sql","name":"demo1"}
 def importDbExternal():
     args = getArgs()
     data = checkArgs(args, ['file', 'name'])
@@ -855,7 +857,7 @@ def importDbExternal():
 
     os.environ["MYSQL_PWD"] = pwd
     mysql_cmd = getServerDir() + '/bin/mariadb -S ' + sock + ' -uroot -p"' + \
-        pwd + '" ' + name + ' < ' + import_sql
+        pwd + '" ' + name + ' < "' + import_sql+'"'
 
     # print(mysql_cmd)
     os.system(mysql_cmd)
