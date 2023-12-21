@@ -2605,8 +2605,7 @@ def fullSync(version=''):
     if args['begin'] == '1':
         cmd = 'cd ' + mw.getRunDir() + ' && python3 ' + \
             getPluginDir() + \
-            '/index.py do_full_sync {"db":"' + \
-            args['db'] + '","sign":"' + sign + '"} &'
+            '/index.py do_full_sync {"db":"' + args['db'] + '","sign":"' + sign + '"} &'
         # print(cmd)
         mw.execShell(cmd)
         return json.dumps({'code': 0, 'msg': '同步数据中!', 'progress': 0})
@@ -2628,6 +2627,7 @@ def fullSync(version=''):
     return json.dumps({'code': 0, 'msg': '点击开始,开始同步!', 'progress': 0})
 
 
+# python3 plugins/mariadb/index.py do_full_sync {"db":"demo1","sign":"","beigin":"1"}
 def doFullSync(version=''):
     mode_file = getSyncModeFile()
     if not os.path.exists(mode_file):
@@ -2670,7 +2670,7 @@ def doFullSyncUser(version=''):
     writeDbSyncStatus({'code': 1, 'msg': '远程导出数据...', 'progress': 10})
 
     if not os.path.exists(bak_file):
-        dump_sql_data = getServerDir() + "/bin/mysqldump --force --opt --default-character-set=utf8 --single-transaction -h" + ip + " -P" + \
+        dump_sql_data = getServerDir() + "/bin/mariadb-dump --force --opt --default-character-set=utf8 --single-transaction -h" + ip + " -P" + \
             port + " -u" + user + " -p" + apass + " " + sync_db + " > " + bak_file
         print(dump_sql_data)
         mw.execShell(dump_sql_data)
