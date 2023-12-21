@@ -302,21 +302,6 @@ def cleanBinLog():
     return mw.returnJson(True, '清理BINLOG成功!')
 
 
-def setSkipGrantTables(v):
-    '''
-    设置是否密码验证
-    '''
-    conf = getConf()
-    con = mw.readFile(conf)
-    if v:
-        if con.find('#skip-grant-tables') != -1:
-            con = con.replace('#skip-grant-tables', 'skip-grant-tables')
-    else:
-        con = con.replace('skip-grant-tables', '#skip-grant-tables')
-    mw.writeFile(conf, con)
-    return True
-
-
 def getErrorLog():
     args = getArgs()
     path = getDataDir()
@@ -1276,16 +1261,59 @@ def setDbAccess():
     psdb.where('username=?', (name,)).save('accept,rw', (access, 'rw',))
     return mw.returnJson(True, '设置成功!')
 
+def openSkipGrantTables():
+    mycnf = getConf()
+    content = mw.readFile(mycnf)
+    content = content.replace('#skip-grant-tables','skip-grant-tables')
+    mw.writeFile(mycnf, content)
+    return True
+
+def closeSkipGrantTables():
+    mycnf = getConf()
+    content = mw.readFile(mycnf)
+    content = content.replace('skip-grant-tables','#skip-grant-tables')
+    mw.writeFile(mycnf, content)
+    return True
+
+
+def resetDbRootPwd(version):
+    serverdir = getServerDir()
+    myconf = serverdir + "/etc/my.cnf"
+    pwd = mw.getRandomString(16)
+
+    db_option = "-S " + serverdir + "/mysql.sock"
+    cmd_pass = serverdir + '/bin/mysql ' + db_option + ' -uroot -e'
+    cmd_pass = cmd_pass + \
+        "\"flush privileges;use mysql;grant all privileges on *.* to 'root'@'localhost' identified by '" + pwd + "';"
+    cmd_pass = cmd_pass + "flush privileges;\""
+
+    data = mw.execShell(cmd_pass)
+    # if data[1].find("ERROR") != -1:
+    #     print("init mariadb password fail:" + data[1])
+    #     exit(1)
+    return True
 
 def fixDbAccess(version):
+
+    pdb = pMysqlDb()
+    mdb_ddir = getDataDir()
+    if not os.path.exists(mdb_ddir):
+        return mw.returnJson(False, '数据目录不存在,尝试重启重建!')
+
     try:
-        pdb = pMysqlDb()
         psdb = pSqliteDb('databases')
         data = pdb.query('show databases')
         isError = isSqlError(data)
         if isError != None:
+            # 重置密码
             appCMD(version, 'stop')
-            mw.execShell("rm -rf " + getServerDir() + "/data")
+            openSkipGrantTables()
+            appCMD(version, 'start')
+
+            resetDbRootPwd(version)
+
+            appCMD(version, 'stop')
+            closeSkipGrantTables()
             appCMD(version, 'start')
             return mw.returnJson(True, '修复成功!')
         return mw.returnJson(True, '正常无需修复!')

@@ -1627,7 +1627,6 @@ def fixDbAccess(version):
 
     pdb = pMysqlDb()
     mdb_ddir = getDataDir()
-
     if not os.path.exists(mdb_ddir):
         return mw.returnJson(False, '数据目录不存在,尝试重启重建!')
 
