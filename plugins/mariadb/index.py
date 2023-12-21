@@ -2679,7 +2679,7 @@ def doFullSyncUser(version=''):
     if os.path.exists(bak_file):
         pwd = pSqliteDb('config').where('id=?', (1,)).getField('mysql_root')
         sock = getSocketFile()
-        my_import_cmd = getServerDir() + '/bin/mysql -S ' + sock + ' -uroot -p' + pwd + \
+        my_import_cmd = getServerDir() + '/bin/mariadb -S ' + sock + ' -uroot -p' + pwd + \
             ' ' + sync_db + ' < ' + bak_file
         mw.execShell(my_import_cmd)
 
