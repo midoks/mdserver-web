@@ -1051,7 +1051,7 @@ def importDbExternal():
 
     myPass(True, pwd)
     mysql_cmd = getServerDir() + '/bin/mysql --defaults-file=' + my_cnf + \
-        ' -uroot -p\"' + pwd + '\" -f ' + name + ' < ' + import_sql
+        ' -uroot -p"' + pwd + '" -f ' + name + ' < ' + import_sql
 
     # print(mysql_cmd)
     rdata = mw.execShell(mysql_cmd)
@@ -1089,8 +1089,8 @@ def importDbBackup():
 
     pwd = pSqliteDb('config').where('id=?', (1,)).getField('mysql_root')
     sock = getSocketFile()
-    mysql_cmd = getServerDir() + '/bin/mysql -S ' + sock + ' -uroot -p' + pwd + \
-        ' ' + name + ' < ' + file_path_sql
+    mysql_cmd = getServerDir() + '/bin/mysql -S ' + sock + ' -uroot -p"' + pwd + \
+        '" ' + name + ' < ' + file_path_sql
 
     # print(mysql_cmd)
     # os.system(mysql_cmd)
