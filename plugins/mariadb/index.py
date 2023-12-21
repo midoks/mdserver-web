@@ -854,8 +854,8 @@ def importDbExternal():
     sock = getSocketFile()
 
     os.environ["MYSQL_PWD"] = pwd
-    mysql_cmd = getServerDir() + '/bin/mariadb -S ' + sock + ' -uroot -p' + \
-        pwd + ' ' + name + ' < ' + import_sql
+    mysql_cmd = getServerDir() + '/bin/mariadb -S ' + sock + ' -uroot -p"' + \
+        pwd + '" ' + name + ' < ' + import_sql
 
     # print(mysql_cmd)
     os.system(mysql_cmd)
