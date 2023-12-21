@@ -1283,7 +1283,7 @@ def resetDbRootPwd(version):
     pSqliteDb('config').where('id=?', (1,)).save('mysql_root', (pwd,))
 
     db_option = "-S " + serverdir + "/mysql.sock"
-    cmd_pass = serverdir + '/bin/mysql ' + db_option + ' -uroot -e'
+    cmd_pass = serverdir + '/bin/mariadb ' + db_option + ' -uroot -e'
     cmd_pass = cmd_pass + \
         "\"flush privileges;use mysql;grant all privileges on *.* to 'root'@'localhost' identified by '" + pwd + "';"
     cmd_pass = cmd_pass + "flush privileges;\""
