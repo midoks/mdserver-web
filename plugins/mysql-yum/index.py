@@ -428,7 +428,7 @@ def getLib64Pos(name=''):
 
 def makeLib64SoftLink(name=''):
     pos = getLib64Pos(name)
-    dst_file = '/usr/lib64/'name+'.so.5'
+    dst_file = '/usr/lib64/'+name+'.so.5'
     if os.path.exists(dst_file):
         return True
 
