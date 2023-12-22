@@ -1362,6 +1362,20 @@ def resetDbRootPwd(version):
         os.remove(tmp_file)
     return True
 
+def fixDbAccess2(version):
+    try:
+        pdb = pMysqlDb()
+        data = pdb.query('show databases')
+        isError = isSqlError(data)
+        if isError != None:
+            appCMD(version, 'stop')
+            mw.execShell("rm -rf " + getServerDir() + "/data")
+            appCMD(version, 'start')
+            return mw.returnJson(True, '修复成功!')
+        return mw.returnJson(True, '正常无需修复!')
+    except Exception as e:
+        return mw.returnJson(False, '修复失败请重试!')
+        
 def fixDbAccess(version):
 
     pdb = pMysqlDb()
@@ -2988,6 +3002,8 @@ if __name__ == "__main__":
         print(setDbAccess())
     elif func == 'fix_db_access':
         print(fixDbAccess(version))
+    elif func == 'fix_db_access2':
+        print(fixDbAccess2(version))
     elif func == 'set_db_rw':
         print(setDbRw(version))
     elif func == 'set_db_ps':
