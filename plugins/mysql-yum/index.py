@@ -129,6 +129,15 @@ def getErrorLogsFile():
     tmp = re.search(rep, content)
     return tmp.groups()[0].strip()
 
+def getAuthPolicy():
+    file = getConf()
+    content = mw.readFile(file)
+    rep = 'authentication_policy\s*=\s*(.*)'
+    tmp = re.search(rep, content)
+    if tmp:
+        return tmp.groups()[0].strip()
+    # caching_sha2_password
+    return 'mysql_native_password'
 
 def contentReplace(content):
     service_path = mw.getServerDir()
@@ -1270,6 +1279,55 @@ def setDbAccess():
     psdb.where('username=?', (name,)).save('accept,rw', (access, 'rw',))
     return mw.returnJson(True, '设置成功!')
 
+def openSkipGrantTables():
+    mycnf = getConf()
+    content = mw.readFile(mycnf)
+    content = content.replace('#skip-grant-tables','skip-grant-tables')
+    mw.writeFile(mycnf, content)
+    return True
+
+def closeSkipGrantTables():
+    mycnf = getConf()
+    content = mw.readFile(mycnf)
+    content = content.replace('skip-grant-tables','#skip-grant-tables')
+    mw.writeFile(mycnf, content)
+    return True
+
+
+def resetDbRootPwd(version):
+    serverdir = getServerDir()
+    myconf = serverdir + "/etc/my.cnf"
+    pwd = mw.getRandomString(16)
+
+    pSqliteDb('config').where('id=?', (1,)).save('mysql_root', (pwd,))
+
+    if float(version) < 5.7:
+        cmd_pass = serverdir + '/bin/mysql --defaults-file=' + myconf + ' -uroot -e'
+        cmd_pass = cmd_pass + '"UPDATE mysql.user SET password=PASSWORD(\'' + pwd + "') WHERE user='root';"
+        cmd_pass = cmd_pass + 'flush privileges;"'
+        data = mw.execShell(cmd_pass)
+        # print(data)
+    else:
+        auth_policy = getAuthPolicy()
+
+        reset_pwd = 'flush privileges;'
+        reset_pwd = reset_pwd + \
+            "UPDATE mysql.user SET authentication_string='' WHERE user='root';"
+        reset_pwd = reset_pwd + "flush privileges;"
+        reset_pwd = reset_pwd + \
+            "alter user 'root'@'localhost' IDENTIFIED by '" + pwd + "';"
+        reset_pwd = reset_pwd + \
+            "alter user 'root'@'localhost' IDENTIFIED WITH "+auth_policy+" by '" + pwd + "';"
+        reset_pwd = reset_pwd + "flush privileges;"
+
+        tmp_file = "/tmp/mysql_init_tmp.log"
+        mw.writeFile(tmp_file, reset_pwd)
+        cmd_pass = serverdir + '/bin/mysql --defaults-file=' + myconf + ' -uroot -proot < ' + tmp_file
+
+        data = mw.execShell(cmd_pass)
+        # print(data)
+        os.remove(tmp_file)
+    return True
 
 def fixDbAccess(version):
     try:
@@ -1832,12 +1890,14 @@ def addMasterRepSlaveUser(version=''):
     pdb = pMysqlDb()
     psdb = pSqliteDb('master_replication_user')
 
+    auth_policy = getAuthPolicy()
+
     if psdb.where("username=?", (username)).count() > 0:
         return mw.returnJson(False, '用户已存在!')
 
     if version == "8.0":
         sql = "CREATE USER '" + username + \
-            "'  IDENTIFIED WITH mysql_native_password BY '" + password + "';"
+            "'  IDENTIFIED WITH "+auth_policy+" BY '" + password + "';"
         pdb.execute(sql)
         sql = "grant replication slave on *.* to '" + username + "'@'%';"
         result = pdb.execute(sql)
