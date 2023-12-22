@@ -1302,7 +1302,7 @@ def resetDbRootPwd(version):
     pSqliteDb('config').where('id=?', (1,)).save('mysql_root', (pwd,))
 
     if float(version) < 5.7:
-        cmd_pass = serverdir + '/bin/mysql --defaults-file=' + myconf + ' -uroot -e'
+        cmd_pass = serverdir + '/bin/usr/sbin/mysqld --defaults-file=' + myconf + ' -uroot -e'
         cmd_pass = cmd_pass + '"UPDATE mysql.user SET password=PASSWORD(\'' + pwd + "') WHERE user='root';"
         cmd_pass = cmd_pass + 'flush privileges;"'
         data = mw.execShell(cmd_pass)
@@ -1322,7 +1322,7 @@ def resetDbRootPwd(version):
 
         tmp_file = "/tmp/mysql_init_tmp.log"
         mw.writeFile(tmp_file, reset_pwd)
-        cmd_pass = serverdir + '/bin/mysql --defaults-file=' + myconf + ' -uroot -proot < ' + tmp_file
+        cmd_pass = serverdir + '/bin/usr/sbin/mysqld --defaults-file=' + myconf + ' -uroot -proot < ' + tmp_file
 
         data = mw.execShell(cmd_pass)
         # print(data)
