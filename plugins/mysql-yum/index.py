@@ -2335,6 +2335,56 @@ def getSlaveList(version=''):
     data['data'] = dlist
     return mw.getJson(data)
 
+def trySlaveSyncBugfix(version=''):
+    if status(version) == 'stop':
+        return mw.returnJson(False, 'MySQL未启动', [])
+
+    mode_file = getSyncModeFile()
+    if not os.path.exists(mode_file):
+        return mw.returnJson(False, '需要先设置同步配置')
+
+    mode = mw.readFile(mode_file)
+    if mode != 'sync-user':
+        return mw.returnJson(False, '仅支持【同步账户】模式')
+
+    conn = pSqliteDb('slave_sync_user')
+    slave_sync_data = conn.field('ip,port,user,pass,mode,cmd').select()
+    if len(slave_sync_data) < 1:
+        return mw.returnJson(False, '需要先添加【同步用户】配置!')
+
+    # print(slave_sync_data)
+    # 本地从库
+    sdb = pMysqlDb()
+
+    gtid_purged = ''
+
+    for i in range(len(slave_sync_data)):
+        port = slave_sync_data[i]['port']
+        password = slave_sync_data[i]['pass']
+        host = slave_sync_data[i]['ip']
+        user = slave_sync_data[i]['user']
+
+        # print(port, password, host)
+
+        mdb = mw.getMyORM()
+        mdb.setHost(host)
+        mdb.setPort(port)
+        mdb.setUser(user)
+        mdb.setPwd(password)
+        mdb.setSocket('')
+
+        var_gtid = mdb.query('show VARIABLES like "%gtid_purged%"')
+        if len(var_gtid) > 0:
+            gtid_purged += var_gtid[0]['Value'] + ','
+
+    gtid_purged = gtid_purged.strip(',')
+    sql = "set @@global.gtid_purged='" + gtid_purged + "'"
+
+    sdb.query('stop slave')
+    # print(sql)
+    sdb.query(sql)
+    sdb.query('start slave')
+    return mw.returnJson(True, '修复成功!')
 
 def getSlaveSyncCmd(version=''):
 
@@ -3009,6 +3059,8 @@ if __name__ == "__main__":
         print(getMasterRepSlaveUserCmd(version))
     elif func == 'get_slave_list':
         print(getSlaveList(version))
+    elif func == 'try_slave_sync_bugfix':
+        print(trySlaveSyncBugfix(version))
     elif func == 'get_slave_sync_cmd':
         print(getSlaveSyncCmd(version))
     elif func == 'get_slave_ssh_list':
