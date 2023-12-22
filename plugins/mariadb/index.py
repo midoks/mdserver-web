@@ -617,7 +617,7 @@ def setMyPort():
     restart()
     return mw.returnJson(True, '编辑成功!')
 
-
+# python3 plugins/mariadb/index.py run_info  {}
 def runInfo(version):
 
     if status(version) == 'stop':
