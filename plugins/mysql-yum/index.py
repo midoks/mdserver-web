@@ -432,6 +432,7 @@ def initMysql8Pwd():
     serverdir = getServerDir()
     myconf = serverdir + "/etc/my.cnf"
     pwd = mw.getRandomString(16)
+    auth_policy = getAuthPolicy()
 
     cmd_my = serverdir + '/bin/usr/bin/mysql'
 
@@ -439,7 +440,7 @@ def initMysql8Pwd():
     cmd_pass = cmd_pass + \
         '"alter user \'root\'@\'localhost\' identified by \'' + pwd + '\';'
     cmd_pass = cmd_pass + \
-        "alter user 'root'@'localhost' IDENTIFIED WITH mysql_native_password by '" + pwd + "';"
+        "alter user 'root'@'localhost' IDENTIFIED WITH "+auth_policy+" by '" + pwd + "';"
     cmd_pass = cmd_pass + 'flush privileges;"'
     # print(cmd_pass)
     data = mw.execShell(cmd_pass)
