@@ -251,6 +251,12 @@ def getDataDir():
     tmp = re.search(rep, content)
     return tmp.groups()[0].strip()
 
+def getLogBinName():
+    file = getConf()
+    content = mw.readFile(file)
+    rep = 'log-bin\s*=\s*(.*)'
+    tmp = re.search(rep, content)
+    return tmp.groups()[0].strip()
 
 def getPidFile():
     file = getConf()
