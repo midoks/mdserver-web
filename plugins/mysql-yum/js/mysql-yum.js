@@ -496,7 +496,6 @@ function setRootPwd(type, pwd){
             var rdata = $.parseJSON(data.data);
             showMsg(rdata.msg,function(){
                 dbList();
-                $('.layui-layer-close1').click();
             },{icon: rdata.status ? 1 : 2});   
         });
         return;
@@ -508,7 +507,7 @@ function setRootPwd(type, pwd){
         title: '修改数据库密码',
         closeBtn: 1,
         shift: 5,
-        btn:["提交","关闭"],
+        btn:["提交", "关闭", "复制ROOT密码", "强制修改"],
         shadeClose: true,
         content: "<form class='bt-form pd20' id='mod_pwd'>\
                     <div class='line'>\
@@ -518,8 +517,36 @@ function setRootPwd(type, pwd){
                         </div>\
                     </div>\
                   </form>",
-        yes:function(){
-            setRootPwd(1);
+        yes:function(layerIndex){
+            var password = $("#MyPassword").val();
+            myPost('set_root_pwd', {password:password}, function(data){
+                var rdata = $.parseJSON(data.data);
+                showMsg(rdata.msg,function(){
+                    layer.close(layerIndex);
+                    dbList();
+                },{icon: rdata.status ? 1 : 2});   
+            });
+        },
+        btn3:function(){
+            var password = $("#MyPassword").val();
+            copyText(password);
+            return false;
+        },
+        btn4:function(layerIndex){
+            layer.confirm('强制修改,是为了在重建时使用,确定强制?', {
+                btn: ['确定', '取消']
+            }, function(index, layero){
+                layer.close(index);
+                var password = $("#MyPassword").val();
+                myPost('set_root_pwd', {password:password,force:'1'}, function(data){
+                    var rdata = $.parseJSON(data.data);
+                    showMsg(rdata.msg,function(){
+                        layer.close(layerIndex);
+                        dbList();
+                    },{icon: rdata.status ? 1 : 2});   
+                });
+            });
+            return false;
         }
     });
 }
