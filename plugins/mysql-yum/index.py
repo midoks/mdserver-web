@@ -421,6 +421,9 @@ def initMysql8Data():
         return False
     return True
 
+def yumLibFix():
+    pass
+
 
 def initMysql8Pwd():
     '''
