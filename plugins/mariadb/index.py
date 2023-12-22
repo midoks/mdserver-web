@@ -2427,7 +2427,7 @@ def initSlaveStatusSyncUser(version=''):
         try:
             pinfo = parseSlaveSyncCmd(cmd_sql)
         except Exception as e:
-            return mw.returnJson(False, base_t + '->CMD同步命令不合规范!')
+            return mw.returnJson(False, base_t + '->CMD同步命令不合规范:'+str(e))
 
         pdb.query(cmd_sql)
 
