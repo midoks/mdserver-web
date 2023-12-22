@@ -75,7 +75,7 @@ def binLogListLook(args):
     line = args['line']
 
     data_dir = getDataDir()
-    my_bin = getServerDir() + '/bin'
+    my_bin = getServerDir() + '/bin/usr/bin'
     my_binlog_cmd = my_bin + '/mysqlbinlog'
 
     cmd = my_binlog_cmd + ' --no-defaults ' + \
@@ -96,7 +96,7 @@ def binLogListLookDecode(args):
     line = args['line']
 
     data_dir = getDataDir()
-    my_bin = getServerDir() + '/bin'
+    my_bin = getServerDir() + '/bin/usr/bin'
     my_binlog_cmd = my_bin + '/mysqlbinlog'
 
     cmd = my_binlog_cmd + ' --no-defaults --base64-output=decode-rows -vvvv ' + \
@@ -134,7 +134,7 @@ def binLogListTraceRelay(args):
 
     file = relay_list[0]
 
-    my_bin = getServerDir() + '/bin'
+    my_bin = getServerDir() + '/bin/usr/bin'
     my_binlog_cmd = my_bin + '/mysqlbinlog'
 
     cmd = my_binlog_cmd + ' --no-defaults --base64-output=decode-rows -vvvv ' + \
@@ -172,7 +172,7 @@ def binLogListTraceBinLog(args):
     log_bin_l = sorted(log_bin_l, reverse=True)
     file = log_bin_l[0]
 
-    my_bin = getServerDir() + '/bin'
+    my_bin = getServerDir() + '/bin/usr/bin'
     my_binlog_cmd = my_bin + '/mysqlbinlog'
 
     cmd = my_binlog_cmd + ' --no-defaults --base64-output=decode-rows -vvvv ' + \
