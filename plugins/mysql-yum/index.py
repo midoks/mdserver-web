@@ -446,9 +446,9 @@ def initMysql8Pwd():
     # print(data)
 
     # 删除空账户
-    drop_empty_user = cmd_my + ' --defaults-file=' + myconf + ' -uroot -p' + \
-        pwd + ' -e "use mysql;delete from user where USER=\'\'"'
-    mw.execShell(drop_empty_user)
+    # drop_empty_user = cmd_my + ' --defaults-file=' + myconf + ' -uroot -p' + \
+    #     pwd + ' -e "use mysql;delete from user where USER=\'\'"'
+    # mw.execShell(drop_empty_user)
 
     # 删除测试数据库
     drop_test_db = cmd_my + ' --defaults-file=' + myconf + ' -uroot -p' + \
@@ -458,15 +458,15 @@ def initMysql8Pwd():
     pSqliteDb('config').where('id=?', (1,)).save('mysql_root', (pwd,))
 
     # 删除冗余账户
-    hostname = mw.execShell('hostname')[0].strip()
-    if hostname != 'localhost':
-        drop_hostname =  cmd_my + ' --defaults-file=' + \
-            myconf + ' -uroot -p' + pwd + ' -e "drop user \'\'@\'' + hostname + '\'";'
-        mw.execShell(drop_hostname)
+    # hostname = mw.execShell('hostname')[0].strip()
+    # if hostname != 'localhost':
+    #     drop_hostname =  cmd_my + ' --defaults-file=' + \
+    #         myconf + ' -uroot -p' + pwd + ' -e "drop user \'\'@\'' + hostname + '\'";'
+    #     mw.execShell(drop_hostname)
 
-        drop_root_hostname =  cmd_my + ' --defaults-file=' + \
-            myconf + ' -uroot -p' + pwd + ' -e "drop user \'root\'@\'' + hostname + '\'";'
-        mw.execShell(drop_root_hostname)
+    #     drop_root_hostname =  cmd_my + ' --defaults-file=' + \
+    #         myconf + ' -uroot -p' + pwd + ' -e "drop user \'root\'@\'' + hostname + '\'";'
+    #     mw.execShell(drop_root_hostname)
     return True
 
 
