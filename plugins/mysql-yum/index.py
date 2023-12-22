@@ -1330,14 +1330,28 @@ def resetDbRootPwd(version):
     return True
 
 def fixDbAccess(version):
+
+    pdb = pMysqlDb()
+    mdb_ddir = getDataDir()
+    if not os.path.exists(mdb_ddir):
+        return mw.returnJson(False, '数据目录不存在,尝试重启重建!')
+
     try:
-        pdb = pMysqlDb()
         data = pdb.query('show databases')
         isError = isSqlError(data)
         if isError != None:
+       
+            # 重置密码
             appCMD(version, 'stop')
-            mw.execShell("rm -rf " + getServerDir() + "/data")
+            openSkipGrantTables()
             appCMD(version, 'start')
+
+            resetDbRootPwd(version)
+
+            appCMD(version, 'stop')
+            closeSkipGrantTables()
+            appCMD(version, 'start')
+
             return mw.returnJson(True, '修复成功!')
         return mw.returnJson(True, '正常无需修复!')
     except Exception as e:
