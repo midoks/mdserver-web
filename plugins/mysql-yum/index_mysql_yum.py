@@ -25,7 +25,7 @@ if mw.isAppleSystem():
 
 
 def getPluginName():
-    return 'mysql-apt'
+    return 'mysql-yum'
 
 
 def getPluginDir():
