@@ -196,7 +196,7 @@ def makeInitRsaKey(version=''):
         datadir = getDataDir()
     except Exception as e:
         datadir = getServerDir() + "/data"
-        
+
     mysql_pem = datadir + "/mysql.pem"
     if not os.path.exists(mysql_pem):
         rdata = mw.execShell(
@@ -2946,6 +2946,8 @@ def doFullSyncUser(version=''):
     ip = data['ip']
 
     bak_file = '/tmp/tmp.sql'
+    if os.path.exists(bak_file):
+        os.system("rm -rf " + bak_file)
 
     writeDbSyncStatus({'code': 0, 'msg': '开始同步...', 'progress': 0})
     dmp_option = ''

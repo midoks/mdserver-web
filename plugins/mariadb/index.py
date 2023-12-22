@@ -2672,6 +2672,8 @@ def doFullSyncUser(version=''):
     ip = data['ip']
 
     bak_file = '/tmp/tmp.sql'
+    if os.path.exists(bak_file):
+        os.system("rm -rf " + bak_file)
 
     writeDbSyncStatus({'code': 0, 'msg': '开始同步...', 'progress': 0})
     writeDbSyncStatus({'code': 1, 'msg': '远程导出数据...', 'progress': 10})
