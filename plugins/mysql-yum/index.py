@@ -421,11 +421,28 @@ def initMysql8Data():
         return False
     return True
 
-def yumLibFix():
-    pass
+def getLib64Pos(name=''):
+    cmd = "ls /usr/lib64 | grep "+name+".so | cut -d \  -f 1 | awk 'END {print}'"
+    d = mw.execShell(cmd)
+    return '/usr/lib64/'+d[0]
 
+def makeLib64SoftLink(name=''):
+    pos = getLib64Pos(name)
+    dst_file = '/usr/lib64/'name+'.so.5'
+    if os.path.exists(dst_file):
+        return True
+
+    if os.path.exists(pos):
+        cmd = 'ln -s '+pos+' '+dst_file
+        mw.execShell(cmd)
+        return True
+
+def yumLibFix():
+    makeLib64SoftLink('libncurses')
+    makeLib64SoftLink('libtinfo')
 
 def initMysql8Pwd():
+    yumLibFix()
     '''
     /usr/bin/mysql --defaults-file=/www/server/mysql-apt/etc/my.cnf -uroot -e"UPDATE mysql.user SET password=PASSWORD('BhIroUczczNVaKvw') WHERE user='root';flush privileges;"
     /usr/bin/mysql --defaults-file=/www/server/mysql-apt/etc/my.cnf -uroot -e"alter user 'root'@'localhost' identified by '123456';"
@@ -447,7 +464,9 @@ def initMysql8Pwd():
     cmd_pass = cmd_pass + 'flush privileges;"'
     # print(cmd_pass)
     data = mw.execShell(cmd_pass)
-    # print(data)
+    if data[1] != '':
+        print(data[1])
+        exit(-1)
 
     # 删除空账户
     # drop_empty_user = cmd_my + ' --defaults-file=' + myconf + ' -uroot -p' + \
