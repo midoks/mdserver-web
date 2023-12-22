@@ -2007,8 +2007,7 @@ def getMasterRepSlaveUserCmd(version):
     if mode == "gtid":
         sql = "CHANGE MASTER " + connection_name + "TO MASTER_HOST='" + ip + "', MASTER_PORT=" + port + ", MASTER_USER='" + \
             clist[0]['username'] + "', MASTER_PASSWORD='" + \
-            clist[0]['password'] + "', " + "MASTER_LOG_FILE='" + mstatus[0]["File"] + \
-            "',MASTER_USE_GTID=no,MASTER_CONNECT_RETRY=10;"
+            clist[0]['password'] + "',MASTER_USE_GTID=no,MASTER_CONNECT_RETRY=10;"
     else:
         sql = "CHANGE MASTER " + connection_name + "TO MASTER_HOST='" + ip + "', MASTER_PORT=" + port + ", MASTER_USER='" + \
             clist[0]['username']  + "', MASTER_PASSWORD='" + \
@@ -2386,7 +2385,7 @@ def parseSlaveSyncCmd(cmd):
         a[kv[0]] = kv[1].replace("'", '').replace("'", '').replace(";", '')
     return a
 
-
+# python3 plugins/mariadb/index.py init_slave_status  {} 
 def initSlaveStatusSyncUser(version=''):
     conn = pSqliteDb('slave_sync_user')
 
