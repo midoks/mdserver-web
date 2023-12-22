@@ -562,7 +562,7 @@ def initMysql8Pwd():
 
     # 删除测试数据库
     drop_test_db = serverdir + '/bin/mysql  --defaults-file=' + \
-        myconf + ' -uroot -p' + pwd + ' -e "drop database test";'
+        myconf + ' -uroot -p"' + pwd + '" -e "drop database test";'
     mw.execShell(drop_test_db)
 
     pSqliteDb('config').where('id=?', (1,)).save('mysql_root', (pwd,))
@@ -571,11 +571,11 @@ def initMysql8Pwd():
     hostname = mw.execShell('hostname')[0].strip()
     if hostname != 'localhost':
         drop_hostname =  serverdir + '/bin/mysql  --defaults-file=' + \
-            myconf + ' -uroot -p' + pwd + ' -e "drop user \'\'@\'' + hostname + '\'";'
+            myconf + ' -uroot -p"' + pwd + '" -e "drop user \'\'@\'' + hostname + '\'";'
         mw.execShell(drop_hostname)
 
         drop_root_hostname =  serverdir + '/bin/mysql  --defaults-file=' + \
-            myconf + ' -uroot -p' + pwd + ' -e "drop user \'root\'@\'' + hostname + '\'";'
+            myconf + ' -uroot -p"' + pwd + '" -e "drop user \'root\'@\'' + hostname + '\'";'
         mw.execShell(drop_root_hostname)
 
     return True
