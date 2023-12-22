@@ -100,7 +100,7 @@ Install_mysql()
 	rm -rf $myDir	
 	
 	echo '8.0' > $serverPath/mysql-yum/version.pl
-	echo '安装完成' > $install_tmp
+	echo '安装完成'
 }
 
 Uninstall_mysql()
@@ -110,7 +110,7 @@ Uninstall_mysql()
 		YUM_UNINSTALL
 	fi
 	rm -rf $serverPath/mysql-yum
-	echo '卸载完成' > $install_tmp
+	echo '卸载完成'
 }
 
 action=$1
