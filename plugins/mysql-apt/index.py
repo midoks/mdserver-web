@@ -1302,19 +1302,85 @@ def setDbAccess():
     return mw.returnJson(True, '设置成功!')
 
 
+
+def openSkipGrantTables():
+    mycnf = getConf()
+    content = mw.readFile(mycnf)
+    content = content.replace('#skip-grant-tables','skip-grant-tables')
+    mw.writeFile(mycnf, content)
+    return True
+
+def closeSkipGrantTables():
+    mycnf = getConf()
+    content = mw.readFile(mycnf)
+    content = content.replace('skip-grant-tables','#skip-grant-tables')
+    mw.writeFile(mycnf, content)
+    return True
+
+
+def resetDbRootPwd(version):
+    serverdir = getServerDir()
+    myconf = serverdir + "/etc/my.cnf"
+    pwd = mw.getRandomString(16)
+
+    pSqliteDb('config').where('id=?', (1,)).save('mysql_root', (pwd,))
+
+    if float(version) < 5.7:
+        cmd_pass = serverdir + '/bin/usr/bin/mysql --defaults-file=' + myconf + ' -uroot -e'
+        cmd_pass = cmd_pass + '"UPDATE mysql.user SET password=PASSWORD(\'' + pwd + "') WHERE user='root';"
+        cmd_pass = cmd_pass + 'flush privileges;"'
+        data = mw.execShell(cmd_pass)
+        # print(data)
+    else:
+        auth_policy = getAuthPolicy()
+
+        reset_pwd = 'flush privileges;'
+        reset_pwd = reset_pwd + \
+            "UPDATE mysql.user SET authentication_string='' WHERE user='root';"
+        reset_pwd = reset_pwd + "flush privileges;"
+        reset_pwd = reset_pwd + \
+            "alter user 'root'@'localhost' IDENTIFIED by '" + pwd + "';"
+        reset_pwd = reset_pwd + \
+            "alter user 'root'@'localhost' IDENTIFIED WITH "+auth_policy+" by '" + pwd + "';"
+        reset_pwd = reset_pwd + "flush privileges;"
+
+        tmp_file = "/tmp/mysql_init_tmp.log"
+        mw.writeFile(tmp_file, reset_pwd)
+        cmd_pass = serverdir + '/bin/usr/bin/mysql --defaults-file=' + myconf + ' -uroot -proot < ' + tmp_file
+
+        data = mw.execShell(cmd_pass)
+        # print(data)
+        os.remove(tmp_file)
+    return True
+
 def fixDbAccess(version):
+
+    pdb = pMysqlDb()
+    mdb_ddir = getDataDir()
+    if not os.path.exists(mdb_ddir):
+        return mw.returnJson(False, '数据目录不存在,尝试重启重建!')
+
     try:
-        pdb = pMysqlDb()
         data = pdb.query('show databases')
         isError = isSqlError(data)
         if isError != None:
+       
+            # 重置密码
             appCMD(version, 'stop')
-            mw.execShell("rm -rf " + getServerDir() + "/data")
+            openSkipGrantTables()
             appCMD(version, 'start')
+
+            resetDbRootPwd(version)
+
+            appCMD(version, 'stop')
+            closeSkipGrantTables()
+            appCMD(version, 'start')
+
             return mw.returnJson(True, '修复成功!')
         return mw.returnJson(True, '正常无需修复!')
     except Exception as e:
         return mw.returnJson(False, '修复失败请重试!')
+
 
 
 def setDbRw(version=''):
