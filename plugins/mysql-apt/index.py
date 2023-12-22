@@ -114,7 +114,16 @@ def getErrorLogsFile():
     tmp = re.search(rep, content)
     return tmp.groups()[0].strip()
 
-
+def getAuthPolicy():
+    file = getConf()
+    content = mw.readFile(file)
+    rep = 'authentication_policy\s*=\s*(.*)'
+    tmp = re.search(rep, content)
+    if tmp:
+        return tmp.groups()[0].strip()
+    # caching_sha2_password
+    return 'mysql_native_password'
+    
 def contentReplace(content):
     service_path = mw.getServerDir()
     content = content.replace('{$ROOT_PATH}', mw.getRootDir())
