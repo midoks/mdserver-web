@@ -299,7 +299,8 @@ class system_api:
             data_list = data.strip().split("\n")
             mac_version = ''
             for x in data_list:
-                mac_version += x.split("\t")[1] + ' '
+                xlist = x.split("\t")
+                mac_version += xlist[len(xlist)-1] + ' '
 
             arch_ver = mw.execShell("arch")
             return mac_version + " (" + arch_ver[0].strip() + ")"
@@ -366,15 +367,15 @@ class system_api:
         mem = psutil.virtual_memory()
         if mw.getOs() == 'darwin':
             memInfo = {
-                'memTotal': mem.total / 1024 / 1024
+                'memTotal': mem.total,
             }
             memInfo['memRealUsed'] = memInfo['memTotal'] * (mem.percent / 100)
         else:
             memInfo = {
-                'memTotal': mem.total / 1024 / 1024,
-                'memFree': mem.free / 1024 / 1024,
-                'memBuffers': mem.buffers / 1024 / 1024,
-                'memCached': mem.cached / 1024 / 1024
+                'memTotal': mem.total,
+                'memFree': mem.free,
+                'memBuffers': mem.buffers,
+                'memCached': mem.cached
             }
 
             memInfo['memRealUsed'] = memInfo['memTotal'] - \
@@ -558,9 +559,9 @@ class system_api:
             networkInfo['upTotal'] = networkIo[0]
             networkInfo['downTotal'] = networkIo[1]
             networkInfo['up'] = round(float(
-                networkIo[0] - session['up']) / 1024 / (ntime - session['otime']), 2)
+                networkIo[0] - session['up']) / (ntime - session['otime']), 2)
             networkInfo['down'] = round(
-                float(networkIo[1] - session['down']) / 1024 / (ntime - session['otime']), 2)
+                float(networkIo[1] - session['down']) / (ntime - session['otime']), 2)
             networkInfo['downPackets'] = networkIo[3]
             networkInfo['upPackets'] = networkIo[2]
 

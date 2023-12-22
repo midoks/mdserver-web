@@ -58,6 +58,62 @@ function myAsyncPost(method,args){
     return syncPost('/plugins/run', {name:'mysql', func:method, args:_args}); 
 }
 
+function myPostCallbak(method, version, args,callback){
+    var loadT = layer.msg('正在获取...', { icon: 16, time: 0, shade: 0.3 });
+
+    var req_data = {};
+    req_data['name'] = 'mariadb';
+    req_data['func'] = method;
+    req_data['script']='index_mariadb';
+    args['version'] = version;
+
+ 
+    if (typeof(args) == 'string' && args == ''){
+        req_data['args'] = JSON.stringify(toArrayObject(args));
+    } else {
+        req_data['args'] = JSON.stringify(args);
+    }
+
+    $.post('/plugins/callback', req_data, function(data) {
+        layer.close(loadT);
+        if (!data.status){
+            layer.msg(data.msg,{icon:0,time:2000,shade: [0.3, '#000']});
+            return;
+        }
+
+        if(typeof(callback) == 'function'){
+            callback(data);
+        }
+    },'json'); 
+}
+
+function myPostCallbakN(method, version, args,callback){
+
+    var req_data = {};
+    req_data['name'] = 'mariadb';
+    req_data['func'] = method;
+    req_data['script']='index_mariadb';
+    args['version'] = version;
+
+ 
+    if (typeof(args) == 'string' && args == ''){
+        req_data['args'] = JSON.stringify(toArrayObject(args));
+    } else {
+        req_data['args'] = JSON.stringify(args);
+    }
+
+    $.post('/plugins/callback', req_data, function(data) {
+        if (!data.status){
+            layer.msg(data.msg,{icon:0,time:2000,shade: [0.3, '#000']});
+            return;
+        }
+
+        if(typeof(callback) == 'function'){
+            callback(data);
+        }
+    },'json'); 
+}
+
 function runInfo(){
     myPost('run_info','',function(data){
 
@@ -83,7 +139,7 @@ function runInfo(){
                         <tr><th>活动/峰值连接数</th><td>' + rdata.Threads_running + '/' + rdata.Max_used_connections + '</td><td colspan="2">若值过大,增加max_connections</td></tr>\
                         <tr><th>线程缓存命中率</th><td>' + ((1 - rdata.Threads_created / rdata.Connections) * 100).toFixed(2) + '%</td><td colspan="2">若过低,增加thread_cache_size</td></tr>\
                         <tr><th>索引命中率</th><td>' + ((1 - rdata.Key_reads / rdata.Key_read_requests) * 100).toFixed(2) + '%</td><td colspan="2">若过低,增加key_buffer_size</td></tr>\
-                        <tr><th>Innodb索引命中率</th><td>' + ((1 - rdata.Innodb_buffer_pool_reads / rdata.Innodb_buffer_pool_read_requests) * 100).toFixed(2) + '%</td><td colspan="2">若过低,增加innodb_buffer_pool_size</td></tr>\
+                        <tr><th>Innodb索引命中率</th><td>' + (rdata.Innodb_buffer_pool_read_requests / (rdata.Innodb_buffer_pool_read_requests+rdata.Innodb_buffer_pool_reads)).toFixed(2) + '%</td><td colspan="2">若过低,增加innodb_buffer_pool_size</td></tr>\
                         <tr><th>查询缓存命中率</th><td>' + cache_size + '</td><td colspan="2">' + lan.soft.mysql_status_ps5 + '</td></tr>\
                         <tr><th>创建临时表到磁盘</th><td>' + ((rdata.Created_tmp_disk_tables / rdata.Created_tmp_tables) * 100).toFixed(2) + '%</td><td colspan="2">若过大,尝试增加tmp_table_size</td></tr>\
                         <tr><th>已打开的表</th><td>' + rdata.Open_tables + '</td><td colspan="2">若过大,增加table_cache_size</td></tr>\
@@ -438,13 +494,24 @@ function syncToDatabase(type){
 }
 
 function setRootPwd(type, pwd){
+    if (type==1){
+        var password = $("#MyPassword").val();
+        myPost('set_root_pwd', {password:password}, function(data){
+            var rdata = $.parseJSON(data.data);
+            showMsg(rdata.msg,function(){
+                dbList();
+            },{icon: rdata.status ? 1 : 2});   
+        });
+        return;
+    }
+
     var index = layer.open({
         type: 1,
         area: '500px',
         title: '修改数据库密码',
         closeBtn: 1,
         shift: 5,
-        btn:["提交","关闭"],
+        btn:["提交", "关闭", "复制ROOT密码", "强制修改"],
         shadeClose: true,
         content: "<form class='bt-form pd20' id='mod_pwd'>\
                     <div class='line'>\
@@ -454,16 +521,36 @@ function setRootPwd(type, pwd){
                         </div>\
                     </div>\
                   </form>",
-        yes:function(index,layero){
+        yes:function(layerIndex){
             var password = $("#MyPassword").val();
             myPost('set_root_pwd', {password:password}, function(data){
                 var rdata = $.parseJSON(data.data);
                 showMsg(rdata.msg,function(){
+                    layer.close(layerIndex);
                     dbList();
-                    layer.close(index);
                 },{icon: rdata.status ? 1 : 2});   
             });
-            return;
+        },
+        btn3:function(){
+            var password = $("#MyPassword").val();
+            copyText(password);
+            return false;
+        },
+        btn4:function(layerIndex){
+            layer.confirm('强制修改,是为了在重建时使用,确定强制?', {
+                btn: ['确定', '取消']
+            }, function(index, layero){
+                layer.close(index);
+                var password = $("#MyPassword").val();
+                myPost('set_root_pwd', {password:password,force:'1'}, function(data){
+                    var rdata = $.parseJSON(data.data);
+                    showMsg(rdata.msg,function(){
+                        layer.close(layerIndex);
+                        dbList();
+                    },{icon: rdata.status ? 1 : 2});   
+                });
+            });
+            return false;
         }
     });
 }
@@ -1160,6 +1247,146 @@ function dbList(page, search){
     });
 }
 
+function myBinRollingLogs(_name, func, _args, line){
+
+    var file_line = 100;
+    if ( typeof(line) != 'undefined' ){
+        file_line = line;
+    }
+
+    var reqTimer = null;
+
+    function requestLogs(func,file,line){
+        myPostCallbakN(func,'',{'file':file,"line":line}, function(rdata){
+            var data = rdata.data.data;
+            var cmd = rdata.data.cmd;
+            if(data == '') {
+                data = '当前没有日志!';
+            }
+
+            $('#my_rolling_cmd').html(cmd);
+
+            $('#my_rolling_copy').click(function(){
+                copyText(cmd);
+            });
+
+            var ebody = '<textarea readonly="readonly" style="margin: 0px;width: 100%;height: 570px;background-color: #333;color:#fff; padding:0 5px" id="roll_info_log">'+data+'</textarea>';
+            $("#my_rolling_logs").html(ebody);
+            var ob = document.getElementById('roll_info_log');
+            ob.scrollTop = ob.scrollHeight;
+        });
+    }
+
+
+    layer.open({
+        type: 1,
+        title: _name + '日志',
+        area: ['800px','700px'],
+        end: function(){
+            if (reqTimer){
+                clearInterval(reqTimer);
+            }
+        },
+        content:'<div class="change-default" style="padding:0px 20px 0px;">\
+                    <div class="divtable mtb10">\
+                    <table class="table table-hover"><tr>\
+                    <td id="my_rolling_cmd">cmd</td>\
+                    <td id="my_rolling_copy" style="width:35px;"><span class="ico-copy cursor btcopy" title="复制密码"></span></td>\
+                    <tr>\
+                    </table>\
+                    </div>\
+                </div>\
+                <div class="change-default" style="padding:0px 20px 0px;" id="my_rolling_logs">\
+                    <textarea readonly="readonly" style="margin: 0px;width: 100%;height: 570px;background-color: #333;color:#fff; padding:0 5px" id="roll_info_log"></textarea>\
+                </div>',
+        success:function(){
+            var fileName = _args['file'];
+            requestLogs(func,fileName,file_line);
+            reqTimer = setInterval(function(){
+                requestLogs(func,fileName,file_line);
+            },1000);
+        }
+    });
+}
+
+function myBinLogsRender(page){
+    var _data = {};
+    if (typeof(page) =='undefined'){
+        var page = 1;
+    }
+    
+    _data['page'] = page;
+    _data['page_size'] = 10;
+    _data['tojs'] = 'myBinLogsRender';
+    myPost('binlog_list', _data, function(data){
+        var rdata = $.parseJSON(data.data);
+        // console.log(rdata);
+        var list = '';
+        for(i in rdata.data){
+            list += '<tr>';
+
+            list += '<td>' + rdata.data[i]['name'] +'</td>';
+            list += '<td>' + toSize(rdata.data[i]['size'])+'</td>';
+            list += '<td>' + rdata.data[i]['time'] +'</td>';
+            
+
+            list += '<td style="text-align:right">';
+            list += '<a href="javascript:;" data-index="'+i+'" class="btlink look" class="btlink">查看</a> | ';
+            list += '<a href="javascript:;" data-index="'+i+'" class="btlink look_decode" class="btlink">解码查看</a>';
+            list += '</td></tr>';
+        }
+
+        if (rdata.data.length ==0){
+            list = '<tr><td colspan="4">无数据</td</tr>';
+        }
+
+        $("#binlog_list tbody").html(list);
+        $('#binlog_page').html(rdata.page);
+
+
+        $('#binlog_list .look').click(function(){
+            var i = $(this).data('index');
+            var file = rdata.data[i]['name'];
+            myBinRollingLogs('查看BINLOG','binLogListLook',{'file':file },100);
+        });
+
+        $('#binlog_list .look_decode').click(function(){
+            var i = $(this).data('index');
+            var file = rdata.data[i]['name'];
+            myBinRollingLogs('查看解码BINLOG','binLogListLookDecode',{'file':file },100);
+        });
+    });
+}
+
+function myBinLogs(){
+    var con = '<div class="safe bgw">\
+            <button class="btn btn-success btn-sm relay_trace" type="button" style="margin-right: 5px;">中继日志跟踪</button>\
+            <button class="btn btn-default btn-sm binlog_trace" type="button" style="margin-right: 5px;">最新BINLOG日志跟踪</button>\
+            <div id="binlog_list" class="divtable mtb10">\
+                <div class="tablescroll">\
+                    <table class="table table-hover" width="100%" cellspacing="0" cellpadding="0" border="0" style="border: 0 none;">\
+                    <thead><tr>\
+                    <th>文件名称</th>\
+                    <th>大小</th>\
+                    <th>时间</th>\
+                    <th style="text-align:right;">操作</th>\
+                    </tr></thead>\
+                    <tbody></tbody></table>\
+                </div>\
+                <div id="binlog_page" class="dataTables_paginate paging_bootstrap page"></div>\
+            </div>\
+        </div>';
+    $(".soft-man-con").html(con);
+    myBinLogsRender(1);
+
+    $('.soft-man-con .relay_trace').click(function(){
+        myBinRollingLogs('中继日志跟踪','binLogListTraceRelay',{'file':''},100);
+    });
+
+    $('.soft-man-con .binlog_trace').click(function(){
+        myBinRollingLogs('最新BINLOG日志跟踪','binLogListTraceBinLog',{'file':''},100);
+    });
+}
 
 function myLogs(){
     
@@ -1601,6 +1828,14 @@ function setDbMasterAccess(username){
         });
 
     });
+}
+
+function resetMaster(){
+    myPost('reset_master', '', function(data){
+        var rdata = $.parseJSON(data.data);
+        showMsg(rdata.msg,function(){
+        },{icon: rdata.status ? 1 : 2});   
+    },'正在执行重置master命令[reset master]');
 }
 
 function getMasterRepSlaveList(){
@@ -2329,11 +2564,16 @@ function masterOrSlaveConf(version=''){
                     <td>"+(info['Slave_SQL_Running_State'] == '' ? '无':info['Slave_SQL_Running_State']) +"</td>\
                 </tr>";
 
+                var btn_list = ['复制错误',"取消"];
+                if (info['Last_IO_Error'].search(/1236/i)>0){
+                    btn_list = ['复制错误',"取消","尝试修复"];
+                }
+
                 layer.open({
                     type: 1,
                     title: '同步异常信息',
                     area: ['600px','300px'],
-                    btn:['复制错误',"取消"],
+                    btn:btn_list,
                     content:"<form class='bt-form pd15'>\
                         <div class='divtable mtb10'>\
                         <div class='tablescroll'>\
@@ -2348,10 +2588,20 @@ function masterOrSlaveConf(version=''){
                     </div>\
                     </form>",
                     success:function(){
-                        // copyText(v['Error']);
-                        // $('.class-copy-db-err').click(function(){
-                        //     copyText(v['Error']);
-                        // });
+                        if (info['Last_IO_Error'] != ''){
+                            copyText(info['Last_IO_Error']);
+                            return;
+                        }
+
+                        if (info['Last_SQL_Error'] != ''){
+                            copyText(info['Last_SQL_Error']);
+                            return;
+                        }
+
+                        if (info['Slave_SQL_Running_State'] != ''){
+                            copyText(info['Slave_SQL_Running_State']);
+                            return;
+                        }
                     },
                     yes:function(){
                         if (info['Last_IO_Error'] != ''){
@@ -2368,6 +2618,14 @@ function masterOrSlaveConf(version=''){
                             copyText(info['Slave_SQL_Running_State']);
                             return;
                         }
+                    },
+                    btn3:function(){
+                        myPost('try_slave_sync_bugfix', {}, function(data){
+                            var rdata = $.parseJSON(data.data);
+                            showMsg(rdata.msg, function(){
+                                masterOrSlaveConf();
+                            },{ icon: rdata.status ? 1 : 5 },2000);
+                        });
                     }
                 });
             });
@@ -2437,6 +2695,7 @@ function masterOrSlaveConf(version=''){
                 <p class="conf_p">\
                     <span class="f14 c6 mr20">Master[主]配置</span><span class="f14 c6 mr20"></span>\
                     <button class="btn '+(!rdata.status ? 'btn-danger' : 'btn-success')+' btn-xs btn-master">'+(!rdata.status ? '未开启' : '已开启') +'</button>\
+                    <button class="btn btn-success btn-xs" onclick="resetMaster()">重置</button>\
                 </p>\
                 <hr/>\
                 <!-- master list -->\

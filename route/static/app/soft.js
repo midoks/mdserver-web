@@ -403,7 +403,12 @@ function indexListHtml(callback){
 //首页软件列表
 function indexSoft() {
     indexListHtml(function(){
-        $("#indexsoft").dragsort({ dragSelector: ".spanmove", dragBetween: true, dragEnd: saveOrder, placeHolderTemplate: "<div class='col-sm-3 col-md-3 col-lg-3 dashed-border'></div>" });
+        $("#indexsoft").dragsort({ 
+            dragSelector: ".spanmove", 
+            dragBetween: true, 
+            dragEnd: saveOrder, 
+            placeHolderTemplate: "<div class='col-sm-3 col-md-3 col-lg-3 dashed-border'></div>"
+        });
     });
     
     function saveOrder() {

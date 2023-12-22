@@ -6,7 +6,7 @@ $(function() {
             $(this).find(".mask").css({ "color": "#d2edd8" });
             $(this).find(".mem-re-con").css({ "display": "block" });
             $(this).find(".mem-re-con").animate({ "top": "0", opacity: 1 });
-            $("#memory").text(lan.index.memre);
+            $("#memory").text('内存释放');
         }
     }, function() {
         $(this).removeClass("shine_green");
@@ -29,6 +29,7 @@ $(function() {
         }
     });
 });
+
 //获取负载
 function getLoad(data) {
     $("#LoadList .mask").html("<span id='Load' style='font-size:14px'>获取中..</span>");
@@ -83,19 +84,18 @@ function showCpuTips(rdata){
     $('#cpuChart .mask').unbind();
     $('#cpuChart .mask').hover(function() {
         var cpuText = '';
-
         if (rdata.cpu[2].length == 1){
             var cpuUse = parseFloat(rdata.cpu[2][0] == 0 ? 0 : rdata.cpu[2][0]).toFixed(1);
-            cpuText += 'CPU-1：' + cpuUse + '%'
-        } else{
+            cpuText += 'CPU-1：' + cpuUse + '%';
+        } else {
             for (var i = 1; i < rdata.cpu[2].length + 1; i++) {
-              var cpuUse = parseFloat(rdata.cpu[2][i - 1] == 0 ? 0 : rdata.cpu[2][i - 1]).toFixed(1);
-              if (i % 2 != 0) {
-                cpuText += 'CPU-' + i + '：' + cpuUse + '%&nbsp;|&nbsp;'
-              } else {
-                cpuText += 'CPU-' + i + '：' + cpuUse + '%'
-                cpuText += '\n'
-              }
+                var cpuUse = parseFloat(rdata.cpu[2][i - 1] == 0 ? 0 : rdata.cpu[2][i - 1]).toFixed(1);
+                if (i % 2 != 0) {
+                    cpuText += 'CPU-' + i + '：' + cpuUse + '%&nbsp;|&nbsp;';
+                } else {
+                    cpuText += 'CPU-' + i + '：' + cpuUse + '%';
+                    cpuText += '\n';
+                }
             } 
         }
         layer.tips(rdata.cpu[3] + "</br>" + rdata.cpu[5] + "个物理CPU，" + (rdata.cpu[4]) + "个物理核心，" + rdata.cpu[1] + "个逻辑核心</br>" + cpuText, this, { time: 0, tips: [1, '#999'] });
@@ -109,6 +109,7 @@ function rocket(sum, m) {
     var n = sum - m;
     $(".mem-release").find(".mask span").text(n);
 }
+
 //释放内存
 function reMemory() {
     setTimeout(function() {
@@ -199,27 +200,34 @@ function clearSystem() {
 }
 
 function setMemImg(info){
-    setCookie("memRealUsed", parseInt(info.memRealUsed));
-    $("#memory").html(parseInt(info.memRealUsed) + '/' + parseInt(info.memTotal) + ' (MB)');
-    setCookie("mem-before", $("#memory").text());
-    if (!getCookie('memSize')) setCookie('memSize', parseInt(info.memTotal));
+
+    var memRealUsed = toSize(info.memRealUsed);
+    var memTotal = toSize(info.memTotal);
+
+    var memRealUsedVal = memRealUsed.split(' ')[0];
+    var memTotalVal = memTotal.split(' ')[0];
+    var unit = memTotal.split(' ')[1];
+
+    var mem_txt = memRealUsedVal + '/' + memTotalVal + ' ('+ unit +')';
+    setCookie("mem-before", mem_txt);
+    $("#memory").html(mem_txt);
+
     var memPre = Math.floor(info.memRealUsed / (info.memTotal / 100));
     $("#left").html(memPre);
     setcolor(memPre, "#left", 75, 90, 95);
-    $("#state").html(info.cpuRealUsed);
-    setcolor(memPre, "#state", 30, 70, 90);
-    setImg();
+
+    var memFree = info.memTotal - info.memRealUsed;
+    if (memFree/(1024*1024) < 64) {
+        $("#messageError").show();
+        $("#messageError").append('<p><span class="glyphicon glyphicon-alert" style="color: #ff4040; margin-right: 10px;">当前可用物理内存小于64M，这可能导致MySQL自动停止，站点502等错误，请尝试释放内存！</span></p>')
+    }
 }
 
 function getInfo() {
     $.get("/system/system_total", function(info) {
-        setCookie("memRealUsed", parseInt(info.memRealUsed));
-        $("#memory").html(parseInt(info.memRealUsed) + '/' + parseInt(info.memTotal) + ' (MB)');
-        setCookie("mem-before", $("#memory").text());
-        if (!getCookie('memSize')) setCookie('memSize', parseInt(info.memTotal));
-        var memPre = Math.floor(info.memRealUsed / (info.memTotal / 100));
-        $("#left").html(memPre);
-        setcolor(memPre, "#left", 75, 90, 95);
+
+        setMemImg(info);
+
         $("#info").html(info.system);
         $("#running").html(info.time);
         var _system = info.system;
@@ -240,13 +248,8 @@ function getInfo() {
         }
         $("#core").html(info.cpuNum + ' 核心');
         $("#state").html(info.cpuRealUsed);
-        setcolor(memPre, "#state", 30, 70, 90);
-        var memFree = info.memTotal - info.memRealUsed;
-
-        if (memFree < 64) {
-            $("#messageError").show();
-            $("#messageError").append('<p><span class="glyphicon glyphicon-alert" style="color: #ff4040; margin-right: 10px;">' + lan.index.mem_warning + '</span> </p>')
-        }
+        setcolor(info.cpuRealUsed, "#state", 30, 70, 90);
+       
 
         // if (info.isuser > 0) {
         //     $("#messageError").show();
@@ -280,9 +283,10 @@ function setcolor(pre, s, s1, s2, s3) {
 function getNet() {
     var up, down;
     $.get("/system/network", function(net) {
+
         $("#InterfaceSpeed").html(lan.index.interfacespeed + "： 1.0Gbps");
-        $("#upSpeed").html(net.up + ' KB');
-        $("#downSpeed").html(net.down + ' KB');
+        $("#upSpeed").html(toSize(net.up));
+        $("#downSpeed").html(toSize(net.down));
         $("#downAll").html(toSize(net.downTotal));
         $("#downAll").attr('title', lan.index.package + ':' + net.downPackets)
         $("#upAll").html(toSize(net.upTotal));
@@ -292,18 +296,23 @@ function getNet() {
         setcolor(net.cpu[0], "#state", 30, 70, 90);
         setCookie("upNet", net.up);
         setCookie("downNet", net.down);
-        getLoad(net.load);
-    
-        // setMemImg(net.mem);
-        setImg();
 
+        //负载
+        getLoad(net.load);
+
+        //内存
+        setMemImg(net.mem);
+
+        //绑定hover事件
+        setImg();
         showCpuTips(net);
+
     },'json');
 }
 
 //网络Io
 function netImg() {
-    var myChartNetwork = echarts.init(document.getElementById('netImg'));
+    var echartsNetImg = echarts.init(document.getElementById('netImg'));
     var xData = [];
     var yData = [];
     var zData = [];
@@ -333,10 +342,27 @@ function netImg() {
         return ts(h) + ':' + ts(mm) + ':' + ts(s);
     }
 
+    var default_unit = 'KB/s';
     function addData(shift) {
         xData.push(getTime());
-        yData.push(getCookie("upNet"));
-        zData.push(getCookie("downNet"));
+
+        if (getCookie("upNet") > getCookie("downNet") ){
+            tmp = getCookie("upNet");
+        } else {
+            tmp = getCookie("downNet");
+        }
+        var tmpSize = toSize(tmp);
+        default_unit = tmpSize.split(' ')[1] + '/s';
+
+
+        var upNetTmp = toSize(getCookie("upNet"));
+        var downNetTmp = toSize(getCookie("downNet"));
+        
+        var upNetTmpSize = upNetTmp.split(' ')[0];
+        var downNetTmp = downNetTmp.split(' ')[0]
+        
+        yData.push(upNetTmpSize);
+        zData.push(downNetTmp);
         if (shift) {
             xData.shift();
             yData.shift();
@@ -379,20 +405,16 @@ function netImg() {
             }
         },
         yAxis: {
-            name: lan.index.unit + 'KB/s',
+            name:  '单位 '+ default_unit,
             splitLine: {
-                lineStyle: {
-                    color: "#eee"
-                }
+                lineStyle: { color: "#eee" }
             },
             axisLine: {
-                lineStyle: {
-                    color: "#666"
-                }
+                lineStyle: { color: "#666" }
             }
         },
         series: [{
-            name: lan.index.net_up,
+            name: '上行',
             type: 'line',
             data: yData,
             smooth: true,
@@ -420,8 +442,9 @@ function netImg() {
                     width: 1
                 }
             }
-        }, {
-            name: lan.index.net_down,
+        },
+        {
+            name: '下行',
             type: 'line',
             data: zData,
             smooth: true,
@@ -432,21 +455,21 @@ function netImg() {
                 normal: {
                     color: new echarts.graphic.LinearGradient(0, 0, 0, 1, [{
                         offset: 0,
-                        color: 'rgba(30, 144, 255,0.5)'
+                        color: 'rgba(30, 144, 255,0.5)',
                     }, {
                         offset: 1,
-                        color: 'rgba(30, 144, 255,0.8)'
+                        color: 'rgba(30, 144, 255,0.8)',
                     }], false)
                 }
             },
             itemStyle: {
                 normal: {
-                    color: '#52a9ff'
+                    color: '#52a9ff',
                 }
             },
             lineStyle: {
                 normal: {
-                    width: 1
+                    width: 1,
                 }
             }
         }]
@@ -454,7 +477,12 @@ function netImg() {
     setInterval(function() {
         getNet();
         addData(true);
-        myChartNetwork.setOption({
+        echartsNetImg.setOption({
+            yAxis: {
+                name:  '单位 '+ default_unit,
+                splitLine: { lineStyle: { color: "#eee" } },
+                axisLine: { lineStyle: { color: "#666" } }
+            },
             xAxis: {
                 data: xData
             },
@@ -467,10 +495,11 @@ function netImg() {
             }]
         });
     }, 3000);
+
     // 使用刚指定的配置项和数据显示图表。
-    myChartNetwork.setOption(option);
+    echartsNetImg.setOption(option);
     window.addEventListener("resize", function() {
-        myChartNetwork.resize();
+        echartsNetImg.resize();
     });
 }
 
@@ -612,7 +641,6 @@ function reBoot() {
         content: '<div class="rebt-con"><div class="rebt-li"><a data-id="server" href="javascript:;">重启服务器</a></div><div class="rebt-li"><a data-id="panel" href="javascript:;">重启面板</a></div></div>'
     });
 
-
     $('.rebt-con a').click(function () {
         var type = $(this).attr('data-id');
         switch (type) {
@@ -737,6 +765,7 @@ function setSafeHide() {
     setCookie('safeMsg', '1');
     $("#safeMsg").remove();
 }
+
 //查看报告
 function showDanger(num, port) {
     var atxt = "因未使用安全隔离登录，所有IP都可以尝试连接，存在较高风险，请立即处理。";
@@ -750,15 +779,15 @@ function showDanger(num, port) {
         closeBtn: 1,
         shift: 5,
         content: '<div class="pd20">\
-				<table class="f14 showDanger"><tbody>\
-				<tr><td class="text-right" width="150">风险类型：</td><td class="f16" style="color:red">暴力破解 <a href="https://www.bt.cn/bbs/thread-9562-1-1.html" class="btlink f14" style="margin-left:10px" target="_blank">说明</a></td></tr>\
-				<tr><td class="text-right">累计遭遇攻击总数：</td><td class="f16" style="color:red">' + num + ' <a href="javascript:showDangerIP();" class="btlink f14" style="margin-left:10px">详细</a><span class="c9 f12" style="margin-left:10px">（数据直接来源本服务器日志）</span></td></tr>\
-				<tr><td class="text-right">风险等级：</td><td class="f16" style="color:red">较高风险</td></tr>\
-				<tr><td class="text-right" style="vertical-align:top">风险描述：</td><td style="line-height:20px">' + atxt + '</td></tr>\
-				<tr><td class="text-right" style="vertical-align:top">可参考解决方案：</td><td><p style="margin-bottom:8px">方案一：修改SSH默认端口，修改SSH验证方式为数字证书，清除近期登陆日志。</p><p>方案二：购买宝塔企业运维版，一键部署安全隔离服务，高效且方便。</p></td></tr>\
-				</tbody></table>\
-				<div class="mtb20 text-center"><a href="https://www.bt.cn/admin/index.html" target="_blank" class="btn btn-success">立即部署隔离防护</a></div>\
-				</div>'
+                <table class="f14 showDanger"><tbody>\
+                <tr><td class="text-right" width="150">风险类型：</td><td class="f16" style="color:red">暴力破解 <a href="https://www.bt.cn/bbs/thread-9562-1-1.html" class="btlink f14" style="margin-left:10px" target="_blank">说明</a></td></tr>\
+                <tr><td class="text-right">累计遭遇攻击总数：</td><td class="f16" style="color:red">' + num + ' <a href="javascript:showDangerIP();" class="btlink f14" style="margin-left:10px">详细</a><span class="c9 f12" style="margin-left:10px">（数据直接来源本服务器日志）</span></td></tr>\
+                <tr><td class="text-right">风险等级：</td><td class="f16" style="color:red">较高风险</td></tr>\
+                <tr><td class="text-right" style="vertical-align:top">风险描述：</td><td style="line-height:20px">' + atxt + '</td></tr>\
+                <tr><td class="text-right" style="vertical-align:top">可参考解决方案：</td><td><p style="margin-bottom:8px">方案一：修改SSH默认端口，修改SSH验证方式为数字证书，清除近期登陆日志。</p><p>方案二：购买宝塔企业运维版，一键部署安全隔离服务，高效且方便。</p></td></tr>\
+                </tbody></table>\
+                <div class="mtb20 text-center"><a href="https://www.bt.cn/admin/index.html" target="_blank" class="btn btn-success">立即部署隔离防护</a></div>\
+                </div>'
     });
     $(".showDanger td").css("padding", "8px")
 }
