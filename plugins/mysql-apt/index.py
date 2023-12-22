@@ -1378,7 +1378,7 @@ def fixDbAccess(version):
             appCMD(version, 'stop')
             openSkipGrantTables()
             appCMD(version, 'start')
-
+            time.sleep(3)
             resetDbRootPwd(version)
 
             appCMD(version, 'stop')
