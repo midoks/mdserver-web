@@ -1113,7 +1113,8 @@ def setRootPwd(version=''):
         result = pdb.query("show databases")
         isError = isSqlError(result)
         if isError != None:
-            pSqliteDb('config').where('id=?', (1,)).save('mysql_root', (password,))
+            if force == 1:
+                pSqliteDb('config').where('id=?', (1,)).save('mysql_root', (password,))
                 return mw.returnJson(True, '【强制修改】数据库root密码修改成功(不意为成功连接数据)!')
             return isError
 
