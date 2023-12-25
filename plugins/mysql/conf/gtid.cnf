@@ -2,3 +2,4 @@
 # SHOW GLOBAL VARIABLES LIKE '%gtid%'
 gtid_mode=ON
 enforce_gtid_consistency=ON
+binlog_checksum=NONE
