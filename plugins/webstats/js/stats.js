@@ -401,7 +401,7 @@ function wsOverviewRequest(page){
                     var realtime_name = select_option == 'realtime_traffic' ? '实时流量':'每秒请求';
                     var val = realtime_request;
                     if (select_option == 'realtime_traffic'){
-                        val = realtime_traffic_calc;
+                        val = realtime_traffic_calc.split(' ')[0];
                         realtime_name = realtime_traffic_calc;
                     }
 
