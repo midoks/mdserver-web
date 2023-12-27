@@ -391,10 +391,10 @@ function wsOverviewRequest(page){
                     var realtime_traffic = rdata.data['realtime_traffic'];
                     var realtime_request = rdata.data['realtime_request'];
 
-                    realtime_traffic_calc = (realtime_traffic/1024).toFixed()
+                    realtime_traffic_calc = toSize(realtime_traffic);
 
 
-                    $('.overview_list .overview_box:eq(5) .ov_num').text(realtime_traffic_calc+"kb");
+                    $('.overview_list .overview_box:eq(5) .ov_num').text(realtime_traffic_calc);
                     $('.overview_list .overview_box:eq(6) .ov_num').text(realtime_request);
 
                     
@@ -402,7 +402,7 @@ function wsOverviewRequest(page){
                     var val = realtime_request;
                     if (select_option == 'realtime_traffic'){
                         val = realtime_traffic_calc;
-                        realtime_name = realtime_name + " "+ realtime_traffic_calc + "kb";
+                        realtime_name = realtime_traffic_calc;
                     }
 
                     xData.push(getTime());
