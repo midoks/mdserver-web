@@ -59,18 +59,18 @@ def send_msg(bot, tag='ad', trigger_time=300):
         #     types.InlineKeyboardButton(
         #         text="🚀腾云机场|解锁流媒体和ChatGPT", url='https://www.tencloud.net/index.php#/register?code=OGvXSTsc')
         # ],
-        [
-            types.InlineKeyboardButton(
-                text="实名认证/过人脸🕵️‍♀️各种账号处理✅", url='https://t.me/zhanzhangyewu')
-        ],
-        [
-            types.InlineKeyboardButton(
-                text="支付宝代付 ❤️ 微信代付", url='https://t.me/Uxuanzhenpin')
-        ],
-        [
-            types.InlineKeyboardButton(
-                text="高价收量 👑 集团收量 ❤️ 流量变现", url='https://t.me/taohaozhan')
-        ],
+        # [
+        #     types.InlineKeyboardButton(
+        #         text="实名认证/过人脸🕵️‍♀️各种账号处理✅", url='https://t.me/zhanzhangyewu')
+        # ],
+        # [
+        #     types.InlineKeyboardButton(
+        #         text="支付宝代付 ❤️ 微信代付", url='https://t.me/Uxuanzhenpin')
+        # ],
+        # [
+        #     types.InlineKeyboardButton(
+        #         text="高价收量 👑 集团收量 ❤️ 流量变现", url='https://t.me/taohaozhan')
+        # ],
         [
             types.InlineKeyboardButton(
                 text="官网", url='https://github.com/midoks/mdserver-web'),
