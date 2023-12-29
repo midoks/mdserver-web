@@ -17,7 +17,7 @@ if mw.isAppleSystem():
 
 
 def getPluginName():
-    return 'phpmyadmin'
+    return 'phpredisadmin'
 
 
 def getPluginDir():
@@ -53,11 +53,11 @@ def checkArgs(data, ck=[]):
 
 
 def getConf():
-    return mw.getServerDir() + '/web_conf/nginx/vhost/phpmyadmin.conf'
+    return mw.getServerDir() + '/web_conf/nginx/vhost/phpredisadmin.conf'
 
 
 def getConfInc():
-    return getServerDir() + "/" + getCfg()['path'] + '/config.inc.php'
+    return getServerDir() + "/" + getCfg()['path'] + '/includes/config.inc.php'
 
 
 def getPort():
@@ -110,6 +110,18 @@ def getCachePhpVer():
     return v
 
 
+def getRedisPass():
+    requirepass = ""
+    conf = mw.getServerDir() + '/redis/redis.conf'
+    if os.path.exists(conf):
+        content = mw.readFile(conf)
+        rep = "^(requirepass" + ')\s*([.0-9A-Za-z_& ~]+)'
+        tmp = re.search(rep, content, re.M)
+        if tmp:
+            requirepass = tmp.groups()[1]
+
+    return requirepass
+
 def contentReplace(content):
     service_path = mw.getServerDir()
     php_ver = getCachePhpVer()
@@ -123,6 +135,10 @@ def contentReplace(content):
     content = content.replace('{$PHP_CONF_PATH}', php_conf_dir)
     content = content.replace('{$PHP_VER}', php_ver)
     content = content.replace('{$BLOWFISH_SECRET}', blowfish_secret)
+
+    # REDIS_PASS
+    rd_pass = getRedisPass()
+    content = content.replace('{$REDIS_PASS}', rd_pass)
 
     cfg = getCfg()
 
@@ -151,7 +167,7 @@ def initCfg():
     cfg = getServerDir() + "/cfg.json"
     if not os.path.exists(cfg):
         data = {}
-        data['port'] = '888'
+        data['port'] = '6390'
         data['choose'] = 'mysql'
         data['path'] = ''
         data['username'] = 'admin'
@@ -182,7 +198,7 @@ def returnCfg():
 
 def status():
     conf = getConf()
-    conf_inc = getServerDir() + "/" + getCfg()["path"] + '/config.inc.php'
+    conf_inc = getConfInc()
     # 两个文件都在，才算启动成功
     if os.path.exists(conf) and os.path.exists(conf_inc):
         return 'start'
@@ -193,7 +209,7 @@ def __release_port(port):
     from collections import namedtuple
     try:
         import firewall_api
-        firewall_api.firewall_api().addAcceptPortArgs(port, 'phpMyAdmin默认端口', 'port')
+        firewall_api.firewall_api().addAcceptPortArgs(port, 'phpRedisAdmin默认端口', 'port')
         return port
     except Exception as e:
         return "Release failed {}".format(e)
@@ -210,37 +226,42 @@ def __delete_port(port):
 
 
 def openPort():
-    for i in ["888"]:
+    for i in ["6390"]:
         __release_port(i)
     return True
 
 
 def delPort():
-    for i in ["888"]:
+    for i in ["6390"]:
         __delete_port(i)
     return True
+
+
+def opRestart():
+    mw.opWeb('stop')
+    mw.opWeb('start')
 
 
 def start():
     initCfg()
     openPort()
 
-    pma_dir = getServerDir() + "/phpmyadmin"
-    if os.path.exists(pma_dir):
+    pra_dir = getServerDir() + "/phpredisadmin"
+    if os.path.exists(pra_dir):
         rand_str = mw.getRandomString(6)
         rand_str = rand_str.lower()
-        pma_dir_dst = pma_dir + "_" + rand_str
-        mw.execShell("mv " + pma_dir + " " + pma_dir_dst)
-        setCfg('path', 'phpmyadmin_' + rand_str)
+        pma_dir_dst = pra_dir + "_" + rand_str
+        mw.execShell("mv " + pra_dir + " " + pma_dir_dst)
+        setCfg('path', 'phpredisadmin_' + rand_str)
 
-    file_tpl = getPluginDir() + '/conf/phpmyadmin.conf'
+    file_tpl = getPluginDir() + '/conf/phpredisadmin.conf'
     file_run = getConf()
     if not os.path.exists(file_run):
         centent = mw.readFile(file_tpl)
         centent = contentReplace(centent)
         mw.writeFile(file_run, centent)
 
-    pma_path = getServerDir() + '/pma.pass'
+    pma_path = getServerDir() + '/app.pass'
     if not os.path.exists(pma_path):
         username = mw.getRandomString(8)
         password = mw.getRandomString(10)
@@ -254,7 +275,7 @@ def start():
         os.mkdir(tmp)
         mw.execShell("chown -R www:www " + tmp)
 
-    conf_run = getServerDir() + "/" + getCfg()["path"] + '/config.inc.php'
+    conf_run = getConfInc()
     if not os.path.exists(conf_run):
         conf_tpl = getPluginDir() + '/conf/config.inc.php'
         centent = mw.readFile(conf_tpl)
@@ -269,7 +290,7 @@ def start():
             cmd = "echo '' > " + i
             mw.execShell(cmd)
 
-    mw.restartWeb()
+    opRestart()
     return 'ok'
 
 
@@ -278,7 +299,8 @@ def stop():
     if os.path.exists(conf):
         os.remove(conf)
     delPort()
-    mw.restartWeb()
+
+    opRestart()
     return 'ok'
 
 
@@ -287,7 +309,7 @@ def restart():
 
 
 def reload():
-    file_tpl = getPluginDir() + '/conf/phpmyadmin.conf'
+    file_tpl = getPluginDir() + '/conf/phpredisadmin.conf'
     file_run = getConf()
     if os.path.exists(file_run):
         centent = mw.readFile(file_tpl)
@@ -305,14 +327,14 @@ def setPhpVer():
     cacheFile = getServerDir() + '/php.pl'
     mw.writeFile(cacheFile, args['phpver'])
 
-    file_tpl = getPluginDir() + '/conf/phpmyadmin.conf'
+    file_tpl = getPluginDir() + '/conf/phpredisadmin.conf'
     file_run = getConf()
 
     content = mw.readFile(file_tpl)
     content = contentReplace(content)
     mw.writeFile(file_run, content)
 
-    mw.restartWeb()
+    opRestart()
     return 'ok'
 
 
@@ -377,7 +399,7 @@ def setPmaChoose():
     content = contentReplace(content)
     mw.writeFile(conf_run, content)
 
-    mw.restartWeb()
+    opRestart()
     return mw.returnJson(True, '修改成功!')
 
 
@@ -391,12 +413,12 @@ def setPmaUsername():
     setCfg('username', username)
 
     cfg = getCfg()
-    pma_path = getServerDir() + '/pma.pass'
+    pma_path = getServerDir() + '/app.pass'
     username = mw.getRandomString(10)
     pass_cmd = cfg['username'] + ':' + mw.hasPwd(cfg['password'])
     mw.writeFile(pma_path, pass_cmd)
 
-    mw.restartWeb()
+    opRestart()
     return mw.returnJson(True, '修改成功!')
 
 
@@ -410,12 +432,12 @@ def setPmaPassword():
     setCfg('password', password)
 
     cfg = getCfg()
-    pma_path = getServerDir() + '/pma.pass'
+    pma_path = getServerDir() + '/app.pass'
     username = mw.getRandomString(10)
     pass_cmd = cfg['username'] + ':' + mw.hasPwd(cfg['password'])
     mw.writeFile(pma_path, pass_cmd)
 
-    mw.restartWeb()
+    opRestart()
     return mw.returnJson(True, '修改成功!')
 
 

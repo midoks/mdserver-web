@@ -904,7 +904,7 @@ function openPhpmyadmin(name,username,password){
 
         setTimeout(function(){
             $("#toPHPMyAdmin").submit();
-        },3000);
+        },2000);
         layer.msg('phpMyAdmin['+data.data+']需要手动登录😭',{icon:16,shade: [0.3, '#000'],time:4000});
         
     } else{
@@ -917,7 +917,7 @@ function openPhpmyadmin(name,username,password){
 
         setTimeout(function(){
             $("#toPHPMyAdmin").submit();
-        },3000);
+        },2000);
     }    
 }
 
