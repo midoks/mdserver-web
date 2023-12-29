@@ -68,7 +68,7 @@ Install_phpmyadmin()
 	cd $serverPath/phpmyadmin/ && mv $FDIR phpmyadmin
 	rm -rf $serverPath/source/phpmyadmin/$FDIR
 	
-	echo '安装完成' > $install_tmp
+	echo '安装完成'
 
 	cd ${rootPath} && python3 ${rootPath}/plugins/phpmyadmin/index.py start
 		
@@ -79,7 +79,7 @@ Uninstall_phpmyadmin()
 	cd ${rootPath} && python3 ${rootPath}/plugins/phpmyadmin/index.py stop
 	
 	rm -rf ${serverPath}/phpmyadmin
-	echo '卸载完成' > $install_tmp
+	echo '卸载完成'
 }
 
 action=$1
