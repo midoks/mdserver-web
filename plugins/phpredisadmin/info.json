@@ -1,7 +1,7 @@
 {
 	"title":"phpRedisAdmin",
 	"tip":"soft",
-	"name":"phpRedisAdmin",
+	"name":"phpredisadmin",
 	"type":"运行环境",
 	"ps":"常用的Redis后台管理",
 	"versions":["1.19.0"],
