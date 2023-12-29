@@ -122,6 +122,18 @@ def getRedisPass():
 
     return requirepass
 
+
+def getRedisPort():
+    port = "6379"
+    conf = mw.getServerDir() + '/redis/redis.conf'
+    if os.path.exists(conf):
+        content = mw.readFile(conf)
+        rep = "^(" + 'port' + ')\s*([.0-9A-Za-z_& ~]+)'
+        tmp = re.search(rep, content, re.M)
+        if tmp:
+            port = tmp.groups()[1]
+    return port
+
 def contentReplace(content):
     service_path = mw.getServerDir()
     php_ver = getCachePhpVer()
@@ -138,7 +150,9 @@ def contentReplace(content):
 
     # REDIS_PASS
     rd_pass = getRedisPass()
+    rd_port = getRedisPort()
     content = content.replace('{$REDIS_PASS}', rd_pass)
+    content = content.replace('{$REDIS_PORT}', rd_port)
 
     cfg = getCfg()
 
