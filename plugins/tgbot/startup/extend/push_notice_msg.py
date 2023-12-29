@@ -51,11 +51,11 @@ def send_msg(bot, tag='ad', trigger_time=300):
     # 信号只在一个周期内执行一次|end
 
     # https://t.me/gjgzs2022 ｜ 22/m | @GJ_gzs
-    # 高价收量 👑 集团收量 ❤️ 流量变现/支付宝代付 ❤️ 微信代付/实名认证/过人脸🕵️‍♀️各种账号处理✅ ｜ 28/m | next 12/28 | @laojiaoshou
     # https://zhaoziyuan.pw/ | web | 15/m | 2m | next,1/15 ｜ @baleite
     # 腾云机场 ｜9/m
     # 🚀鲲鹏VPN | 13/m | next,10/13
     # 综合包网/NG接口开户 | 28/m | 3m | next,1/28 | @aabbcx888
+    # 实名认证/过人脸🕵️‍♀️各种账号处理✅ | 30/m| next,6/30 | @nngzs
     keyboard = [
         [
             types.InlineKeyboardButton(
@@ -69,18 +69,10 @@ def send_msg(bot, tag='ad', trigger_time=300):
         #     types.InlineKeyboardButton(
         #         text="🚀腾云机场|解锁流媒体和ChatGPT", url='https://www.tencloud.net/index.php#/register?code=OGvXSTsc')
         # ],
-        # [
-        #     types.InlineKeyboardButton(
-        #         text="实名认证/过人脸🕵️‍♀️各种账号处理✅", url='https://t.me/zhanzhangyewu')
-        # ],
-        # [
-        #     types.InlineKeyboardButton(
-        #         text="支付宝代付 ❤️ 微信代付", url='https://t.me/Uxuanzhenpin')
-        # ],
-        # [
-        #     types.InlineKeyboardButton(
-        #         text="高价收量 👑 集团收量 ❤️ 流量变现", url='https://t.me/taohaozhan')
-        # ],
+        [
+            types.InlineKeyboardButton(
+                text="实名认证/过人脸🕵️‍♀️各种账号处理✅", url='https://t.me/niuniu234')
+        ],
         [
             types.InlineKeyboardButton(
                 text="官网", url='https://github.com/midoks/mdserver-web'),
