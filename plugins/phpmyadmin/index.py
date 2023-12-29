@@ -239,10 +239,11 @@ def start():
 
     pma_path = getServerDir() + '/pma.pass'
     if not os.path.exists(pma_path):
-        username = mw.getRandomString(10)
-        pass_cmd = username + ':' + mw.hasPwd(username)
+        username = mw.getRandomString(8)
+        password = mw.getRandomString(10)
+        pass_cmd = username + ':' + mw.hasPwd(password)
         setCfg('username', username)
-        setCfg('password', username)
+        setCfg('password', password)
         mw.writeFile(pma_path, pass_cmd)
 
     tmp = getServerDir() + "/" + getCfg()["path"] + '/tmp'
