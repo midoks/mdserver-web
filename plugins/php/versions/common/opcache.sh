@@ -51,7 +51,7 @@ Install_lib()
 	echo "opcache.enable_cli=1" >> $serverPath/php/$version/etc/php.ini
 	echo "opcache.jit=1205" >> $serverPath/php/$version/etc/php.ini
 	echo "opcache.jit_buffer_size=64M" >> $serverPath/php/$version/etc/php.ini
-
+	echo "opcache.save_comments=0" >> $serverPath/php/$version/etc/php.ini
 
 	cd  ${curPath} && bash ${rootPath}/plugins/php/versions/lib.sh $version restart
 	echo '==========================================================='
