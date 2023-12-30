@@ -1,0 +1,17 @@
+{
+	"title":"rockmongo",
+	"tip":"soft",
+	"name":"rockmongo",
+	"type":"运行环境",
+	"ps":"常用的Mongo后台管理(PHP5)",
+	"icon":"mongo.ico",
+	"versions":["1.1.7"],
+	"updates":["1.1.7"],
+	"shell":"install.sh",
+	"checks":"server/rockmongo",
+	"path": "server/rockmongo",
+	"author":"rockmongo",
+	"home":"https://github.com/iwind/rockmongo",
+	"date":"2023-12-30",
+	"pid": "2"
+}

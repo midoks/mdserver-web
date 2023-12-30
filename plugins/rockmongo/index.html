@@ -1,0 +1,24 @@
+<div class="bt-form">
+	<div class="bt-w-main">
+		<div class="bt-w-menu">
+			<p class="bgw" onclick="pluginService('rockmongo');">服务</p>
+			<p onclick="pluginConfig('rockmongo');">重写模版</p>
+			<p onclick="homePage()">主页</p>
+			<p onclick="phpVer(56)">PHP版本</p>
+			<p onclick="safeConf();">安全设置</p>
+			<p onclick="pluginLogs('rockmongo','','access_log');">访问日志</p>
+			<p onclick="pluginLogs('rockmongo','','error_log');">错误日志</p>
+			<p onclick="pluginConfig('rockmongo','','config_inc');" title="config.inc.php">配置</p>
+		</div>
+		<div class="bt-w-con pd15">
+			<div class="soft-man-con"></div>
+		</div>
+	</div>
+
+</div>
+<script type="text/javascript">
+resetPluginWinHeight(500);
+$.getScript( "/plugins/file?name=rockmongo&f=js/rockmongo.js", function(){
+	pluginService('rockmongo');
+});
+</script>
