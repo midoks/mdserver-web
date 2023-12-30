@@ -223,6 +223,7 @@ def start():
         mw.execShell("mv " + pra_dir + " " + pma_dir_dst)
         setCfg('path', 'rockmongo_' + rand_str)
 
+
     file_tpl = getPluginDir() + '/conf/phpmongoadmin.conf'
     file_run = getConf()
     if not os.path.exists(file_run):
@@ -239,10 +240,10 @@ def start():
         setCfg('password', password)
         mw.writeFile(pma_path, pass_cmd)
 
-    tmp = getServerDir() + "/" + getCfg()["path"] + '/tmp'
-    if not os.path.exists(tmp):
-        os.mkdir(tmp)
-        mw.execShell("chown -R www:www " + tmp)
+    log_dir = getServerDir() + "/" + getCfg()["path"] + '/logs'
+    if not os.path.exists(log_dir):
+        os.mkdir(log_dir)
+        mw.execShell("chown -R www:www " + log_dir)
 
     conf_run = getConfInc()
     if not os.path.exists(conf_run):
