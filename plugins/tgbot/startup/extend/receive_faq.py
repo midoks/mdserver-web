@@ -47,7 +47,7 @@ def searchHttpPage(kw='', p=1, size=1):
     kw = kw.strip()
     kw = urllib.parse.quote_plus(kw)
 
-    api = 'https://bbs.midoks.me/plugin.php?id=external_api&f=bbs_search&q=' + kw + \
+    api = 'https://bbs.midoks.icu/plugin.php?id=external_api&f=bbs_search&q=' + kw + \
         '&size=' + str(size) + '&p=' + str(p)
 
     # print('url', api)
@@ -63,7 +63,7 @@ def searchHttpPage(kw='', p=1, size=1):
             tmp = {}
             tmp['tid'] = x['tid']
             tmp['subject'] = x['subject']
-            tmp['url'] = 'https://bbs.midoks.me/thread-' + \
+            tmp['url'] = 'https://bbs.midoks.icu/thread-' + \
                 x['tid'] + '-1-1.html'
             r.append(tmp)
         data['data']['list'] = r
@@ -99,9 +99,9 @@ def searchFaq(bot, message, cmd_text):
         keyboard = [
             [
                 types.InlineKeyboardButton(
-                    text="论坛", url='https://bbs.midoks.me'),
+                    text="论坛", url='https://bbs.midoks.icu'),
                 types.InlineKeyboardButton(
-                    text="搜索", url='https://bbs.midoks.me/search.php')
+                    text="搜索", url='https://bbs.midoks.icu/search.php')
             ],
             [
                 types.InlineKeyboardButton(
@@ -111,7 +111,7 @@ def searchFaq(bot, message, cmd_text):
         ]
         markup = types.InlineKeyboardMarkup(keyboard)
         bot.send_message(
-            message.chat.id, "未找到合适内容,请在官方论坛[bbs.midoks.me]提问!", reply_markup=markup)
+            message.chat.id, "未找到合适内容,请在官方论坛[bbs.midoks.icu]提问!", reply_markup=markup)
 
     return True
 
