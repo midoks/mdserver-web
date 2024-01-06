@@ -54,7 +54,7 @@ def getConf(version):
 
 def getFpmConfFile(version):
     return getServerDir() + '/' + version + '/fpm/pool.d/mw.conf'
-    
+
 
 def status_progress(version):
     # ps -ef|grep 'php/81' |grep -v grep | grep -v python | awk '{print $2}
@@ -160,7 +160,9 @@ def libConfCommon(version):
 
 
 def get_php_info(args):
-    return getPhpinfo(args['version'])
+    version = args['version']
+    apt_ver = version[0:1]+'.'+version[1:2]
+    return getPhpinfo(apt_ver)
 
 
 def get_lib_conf(data):
