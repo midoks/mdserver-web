@@ -53,6 +53,7 @@ def getConf(version):
 
 
 def getFpmConfFile(version):
+    apt_ver = version[0:1]+'.'+version[1:2]
     return getServerDir() + '/' + version + '/fpm/pool.d/mw.conf'
 
 
@@ -161,8 +162,7 @@ def libConfCommon(version):
 
 def get_php_info(args):
     version = args['version']
-    apt_ver = version[0:1]+'.'+version[1:2]
-    return getPhpinfo(apt_ver)
+    return getPhpinfo(version)
 
 
 def get_lib_conf(data):
