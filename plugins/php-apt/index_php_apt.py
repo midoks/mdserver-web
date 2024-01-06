@@ -53,7 +53,6 @@ def getConf(version):
 
 
 def getFpmConfFile(version):
-    apt_ver = version[0:1]+'.'+version[1:2]
     return getServerDir() + '/' + version + '/fpm/pool.d/mw.conf'
 
 
@@ -89,7 +88,7 @@ def status(version):
 
 
 def getFpmAddress(version):
-    fpm_address = '/tmp/php-cgi-{}.sock'.format(version)
+    fpm_address = '/run/php/php{}-fpm.sock'.format(version)
     php_fpm_file = getFpmConfFile(version)
     try:
         content = readFile(php_fpm_file)
@@ -117,6 +116,7 @@ def getPhpinfo(version):
         return 'PHP[' + version + ']未启动,不可访问!!!'
 
     sock_file = getFpmAddress(version)
+    print(sock_file)
     root_dir = mw.getRootDir() + '/phpinfo'
 
     mw.execShell("rm -rf " + root_dir)
@@ -162,7 +162,8 @@ def libConfCommon(version):
 
 def get_php_info(args):
     version = args['version']
-    return getPhpinfo(version)
+    apt_ver = version[0:1]+'.'+version[1:2]
+    return getPhpinfo(apt_ver)
 
 
 def get_lib_conf(data):
