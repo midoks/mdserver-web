@@ -32,6 +32,7 @@ function phpPostCallbak(method, version, args,callback){
     var req_data = {};
     req_data['name'] = 'php-apt';
     req_data['func'] = method;
+    req_data['script']='index_php_apt';
     args['version'] = version;
  
     if (typeof(args) == 'string'){

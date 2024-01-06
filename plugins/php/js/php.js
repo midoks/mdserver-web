@@ -563,10 +563,10 @@ function setDisableFunc(version, act, fs) {
 
 
 //phpinfo
-function getPhpinfo(version) {
-    var con = '<button class="btn btn-default btn-sm" onclick="getPHPInfo(\'' + version + '\')">查看phpinfo()</button>';
-    $(".soft-man-con").html(con);
-}
+// function getPhpinfo(version) {
+//     var con = '<button class="btn btn-default btn-sm" onclick="getPHPInfo(\'' + version + '\')">查看phpinfo()</button>';
+//     $(".soft-man-con").html(con);
+// }
 
 //获取PHPInfo
 function getPHPInfo_old(version) {
