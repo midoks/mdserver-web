@@ -123,34 +123,29 @@ function submitConf(version) {
 }
 
 
-
-//php上传限制
-function phpUploadLimitReq(version){
-    phpPost('get_limit_conf', version, '', function(ret_data){
-        var rdata = $.parseJSON(ret_data.data);
-        phpUploadLimit(version,rdata['max']);
-    });
-}
-
-function phpUploadLimit(version,max){
-    var LimitCon = '<p class="conf_p"><input class="phpUploadLimit bt-input-text mr5" type="number" value="'+
-    max+'" name="max">MB<button class="btn btn-success btn-sm" onclick="setPHPMaxSize(\''+
-    version+'\')" style="margin-left:20px">保存</button></p>';
-    $(".soft-man-con").html(LimitCon);
-}
-
-
 //php超时限制
-function phpTimeLimitReq(version){
+function phpCommonFunc(version){
     phpPost('get_limit_conf', version, '', function(ret_data){
         var rdata = $.parseJSON(ret_data.data);
-        phpTimeLimit(version,rdata['maxTime']);
-    });
-}
+        var con = '<p class="conf_p">\
+            <span>超时限制</span>\
+            <input class="phpTimeLimit bt-input-text mr5" type="number" value="' + rdata['maxTime'] + '">, 秒\
+            <button class="btn btn-success btn-sm" onclick="setPHPMaxTime(\'' + version + '\')" style="margin-left:20px">保存</button>\
+            </p>';
 
-function phpTimeLimit(version, max) {
-    var LimitCon = '<p class="conf_p"><input class="phpTimeLimit bt-input-text mr5" type="number" value="' + max + '">秒<button class="btn btn-success btn-sm" onclick="setPHPMaxTime(\'' + version + '\')" style="margin-left:20px">保存</button></p>';
-    $(".soft-man-con").html(LimitCon);
+        con += '<p class="conf_p">\
+            <span>上传限制</span>\
+            <input class="phpUploadLimit bt-input-text mr5" type="number" value="' + rdata['max']+'" name="max">,MB\
+            <button class="btn btn-success btn-sm" onclick="setPHPMaxSize(\''+ version+'\')" style="margin-left:20px">保存</button>\
+        </p>';
+
+        con += '<hr/><p class="conf_p" style="text-align:center;">\
+            <button class="btn btn-default btn-sm" onclick="getPHPInfo(\'' + version + '\')">查看phpinfo()</button>  \
+            <button class="btn btn-default btn-sm" onclick="phpPreload(\'' + version + '\')">预加载脚本</button>\
+        </p>';
+
+        $(".soft-man-con").html(con);
+    });
 }
 
 //设置超时限制
@@ -158,7 +153,10 @@ function setPHPMaxTime(version) {
     var max = $(".phpTimeLimit").val();
     phpPost('set_max_time',version,{'time':max},function(data){
         var rdata = $.parseJSON(data.data);
-        layer.msg(rdata.msg, { icon: rdata.status ? 1 : 2 });
+        showMsg(rdata.msg,function(){
+            phpCommonFunc(version);
+        },{ icon: rdata.status ? 1 : 2 });
+
     });
 }
 //设置PHP上传限制
@@ -173,6 +171,12 @@ function setPHPMaxSize(version) {
     phpPost('set_max_size',version,{'max':max},function(data){
         var rdata = $.parseJSON(data.data);
         layer.msg(rdata.msg, { icon: rdata.status ? 1 : 2 });
+    });
+}
+
+function phpPreload(version){
+    phpPost('app_start',version,{},function(data){
+        onlineEditFile(0, data['data']);
     });
 }
 
