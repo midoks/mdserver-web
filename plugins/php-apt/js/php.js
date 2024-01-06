@@ -134,9 +134,9 @@ function phpCommonFunc(version){
             <button class="btn btn-success btn-sm" onclick="setPHPMaxSize(\''+ version+'\')" style="margin-left:20px">保存</button>\
         </p>';
 
+        // <button class="btn btn-default btn-sm" onclick="phpPreload(\'' + version + '\')">预加载脚本</button>\
         con += '<hr/><p class="conf_p" style="text-align:center;">\
             <button class="btn btn-default btn-sm" onclick="getPHPInfo(\'' + version + '\')">查看phpinfo()</button>  \
-            <button class="btn btn-default btn-sm" onclick="phpPreload(\'' + version + '\')">预加载脚本</button>\
         </p>';
 
         $(".soft-man-con").html(con);
