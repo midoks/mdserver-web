@@ -48,13 +48,13 @@ def getInitDFile(version):
 
 
 def getConf(version):
-    path = getServerDir() + '/' + version + '/etc/php.ini'
+    path = getServerDir() + '/' + version + '/fpm/php.ini'
     return path
 
 
 def getFpmConfFile(version):
-    return getServerDir() + '/' + version + '/etc/php-fpm.d/www.conf'
-
+    return getServerDir() + '/' + version + '/fpm/pool.d/mw.conf'
+    
 
 def status_progress(version):
     # ps -ef|grep 'php/81' |grep -v grep | grep -v python | awk '{print $2}
