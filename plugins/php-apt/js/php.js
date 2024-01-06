@@ -35,7 +35,7 @@ function phpPostCallbak(method, version, args,callback){
     args['version'] = version;
  
     if (typeof(args) == 'string'){
-        req_data['args'] = JSON.stringify(str2Obj(args));
+        req_data['args'] = JSON.stringify(toArrayObject(args));
     } else {
         req_data['args'] = JSON.stringify(args);
     }
