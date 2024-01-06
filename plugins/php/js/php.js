@@ -142,6 +142,7 @@ function phpCommonFunc(version){
         con += '<hr/><p class="conf_p" style="text-align:center;">\
             <button class="btn btn-default btn-sm" onclick="getPHPInfo(\'' + version + '\')">查看phpinfo()</button>  \
             <button class="btn btn-default btn-sm" onclick="phpPreload(\'' + version + '\')">预加载脚本</button>\
+            <button class="btn btn-default btn-sm" onclick="phpFpmRoot(\'' + version + '\')">PHP-FPM(root)</button>\
         </p>';
 
         $(".soft-man-con").html(con);
@@ -176,6 +177,13 @@ function setPHPMaxSize(version) {
 
 function phpPreload(version){
     phpPost('app_start',version,{},function(data){
+        onlineEditFile(0, data['data']);
+    });
+}
+
+
+function phpFpmRoot(version){
+    phpPost('get_fpm_file',version,{},function(data){
         onlineEditFile(0, data['data']);
     });
 }
