@@ -60,6 +60,7 @@ def mwcli(mw_input=0):
         print("(21)     解除域名绑定")
         print("(22)     开启IPV6支持")
         print("(23)     关闭IPV6支持")
+        print("(24)     开启防火墙SSH端口")
         print("(100)    开启PHP52显示")
         print("(101)    关闭PHP52显示")
         print("(200)    切换Linux系统软件源")
@@ -73,7 +74,7 @@ def mwcli(mw_input=0):
         except:
             mw_input = 0
 
-    nums = [1, 2, 3, 4, 5, 10, 11, 12, 13, 20, 21, 22, 23, 100, 101, 200, 201]
+    nums = [1, 2, 3, 4, 5, 10, 11, 12, 13, 20, 21, 22, 23, 24, 100, 101, 200, 201]
     if not mw_input in nums:
         print(raw_tip)
         print("已取消!")
@@ -141,6 +142,9 @@ def mwcli(mw_input=0):
             os.remove(listen_ipv6)
             os.system(INIT_CMD + " restart")
             print("|-关闭IPv6支持了")
+    elif mw_input == 24:
+        open_ssh_port()
+        print("|-已开启!")
     elif mw_input == 100:
         php_conf = 'plugins/php/info.json'
         if os.path.exists(php_conf):
@@ -161,6 +165,17 @@ def mwcli(mw_input=0):
         os.system(INIT_CMD + " mirror")
     elif mw_input == 201:
         os.system('curl -Lso- bench.sh | bash')
+
+
+def open_ssh_port():
+    import firewall_api
+    find_ssh_port_cmd = "cat /etc/ssh/sshd_config | grep '^Port \d*' | tail -1"
+    cmd_data = mw.execShell(find_ssh_port_cmd)
+    ssh_port = cmd_data[0].replace("Port ", '').strip()
+    if ssh_port == '':
+        ssh_port = '22'
+    firewall_api.firewall_api().addAcceptPortArgs(ssh_port, 'SSH远程管理服务', 'port')
+    return True
 
 
 def set_panel_pwd(password, ncli=False):
