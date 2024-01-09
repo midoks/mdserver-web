@@ -110,18 +110,12 @@ docker run -itd --name mw-server --privileged=true -p 7200:7200 -p 80:80 -p 443:
 ```
 
 
-### 版本更新 0.16.2
+### 版本更新 0.16.3
 
-* keepalived插件改造,集成mysql高可用配置。
-* redis(主从/集群)配置识别。
-* MySQL主从同步1236错误,添加修复功能。
-* MySQL二进制日志查看。
-* 源码安装成功后删除解压包,节省体积。
-* 网站统计-增加查询条件。
-* php增加yaml扩展。
-* php扩展ioncube修复。
-* php-fpm增加【按需】配置。
-* gitea/gogs同步功能改造。
+* 配置-可以配置时区。
+* PHP(GD)扩展安装优化。
+* PHP界面调整。
+* MySQL(apt/yum)调整优化。
 
 ### JSDelivr安装地址
 
