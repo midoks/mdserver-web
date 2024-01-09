@@ -77,6 +77,7 @@ Install_lib()
 		--with-webp \
 		--with-xpm \
 		--with-jpeg \
+		--with-png-dir \
 		--with-freetype
 		#--enable-gd-jis-conv
 
