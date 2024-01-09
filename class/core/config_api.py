@@ -20,6 +20,7 @@ import mw
 import re
 import json
 import pwd
+import pytz
 
 from flask import session
 from flask import request
@@ -911,6 +912,21 @@ class config_api:
             data['status_code_msg'] = "默认-安全入口错误提示"
         return data
 
+
+    def getTimezoneListApi(self):
+        # 获取时区列表
+        # pytz.all_timezones | 所有
+        # pytz.common_timezones
+        return pytz.all_timezones
+
+    def setTimezoneApi(self):
+        # 设置时区列表
+        timezone = request.form.get('timezone', '').strip()
+        cmd = 'timedatectl set-timezone "'+timezone+'"'
+        mw.execShell(cmd)
+        return mw.returnJson(True, '设置成功!')
+
+
     def get(self):
 
         data = {}
@@ -919,6 +935,13 @@ class config_api:
         data['backup_path'] = mw.getBackupDir()
         sformat = 'date +"%Y-%m-%d %H:%M:%S %Z %z"'
         data['systemdate'] = mw.execShell(sformat)[0].strip()
+
+        # 获取时区
+        import datetime
+        import pytz
+        now = datetime.datetime.now()
+        tz_name = now.astimezone().tzinfo
+        data['systemdatezone'] = tz_name
 
         data['port'] = mw.getHostPort()
         data['ip'] = mw.getHostAddr()

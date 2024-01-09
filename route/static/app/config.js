@@ -348,6 +348,58 @@ function syncDate(){
 	},'json');
 }
 
+function setTimezone(){
+	layer.open({
+		type: 1,
+		area: ["400px","200px"],
+		title: '设置服务器时区',
+		closeBtn: 1,
+		shift: 5,
+		shadeClose: false,
+		btn:["确定","取消"],
+		content: "<div class='bt-form pd20'>\
+			<div class='line'>\
+				<span class='tname'>时区</span>\
+				<div class='info-r'>\
+					<select class='bt-input-text mr5' name='timezone' style='width: 250px;'></select>\
+				</div>\
+			</div>\
+		</div>",
+		success:function(){
+
+			var tbody = '';
+			$.post('/config/get_timezone_list', {}, function (rdata) {
+
+		        for (var i = 0; i < rdata.length; i++) {
+		        	tbody += '<option value="'+rdata[i]+'">'+rdata[i]+'</option>';
+		        }
+		        $('select[name="timezone"]').append(tbody);
+
+		    },'json');
+
+        	// for(i in msg_list){
+        	// 	if (msg_list[i]['code'] == ''){
+        	// 		tbody += '<option value="'+msg_list[i]['code']+'" selected>'+msg_list[i]['msg']+'</option>';
+        	// 	} else{
+        	// 		tbody += '<option value="'+msg_list[i]['code']+'">'+msg_list[i]['msg']+'</option>';
+        	// 	}
+        	// }
+        	
+        },
+        yes:function(index){
+		    var loadT = layer.msg("正在设置时区...", { icon: 16, time: 0, shade: [0.3, '#000'] });
+		    var timezone = $('select[name="timezone"]').val();
+		    $.post('/config/set_timezone', { timezone: timezone }, function (rdata) {
+		    	showMsg(rdata.msg, function(){
+		    		layer.close(index);
+		    		layer.close(loadT);
+		    		location.reload();
+		    	},{ icon: rdata.status ? 1 : 2 }, 2000);
+		    },'json');
+        }
+	})
+}
+
 
 function setIPv6() {
     var loadT = layer.msg('正在配置,请稍候...', { icon: 16, time: 0, shade: [0.3, '#000'] });
