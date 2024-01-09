@@ -117,8 +117,8 @@ yum install -y libevent libevent-devel unzip zip
 yum install -y libicu-devel  bzip2-devel  pcre pcre-devel
 
 yum install -y gd gd-devel
+yum install -y libwebp-tools
 yum install -y libjpeg-devel libpng-devel libwebp libwebp-devel
-
 yum install -y net-tools
 yum install -y ncurses-devel
 yum install -y libXpm-devel
