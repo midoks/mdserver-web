@@ -338,16 +338,6 @@ function setUserName(a) {
 	})
 }
 
-
-function syncDate(){
-	var loadT = layer.msg('正在同步时间...',{icon:16,time:0,shade: [0.3, '#000']});
-	$.post('/config/sync_date','',function(rdata){
-		layer.close(loadT);
-		layer.msg(rdata.msg,{icon:rdata.status?1:2});
-		setTimeout(function(){window.location.reload();},1500);
-	},'json');
-}
-
 function setTimezone(){
 	layer.open({
 		type: 1,
@@ -356,7 +346,7 @@ function setTimezone(){
 		closeBtn: 1,
 		shift: 5,
 		shadeClose: false,
-		btn:["确定","取消"],
+		btn:["确定","取消","同步"],
 		content: "<div class='bt-form pd20'>\
 			<div class='line'>\
 				<span class='tname'>时区</span>\
@@ -366,26 +356,14 @@ function setTimezone(){
 			</div>\
 		</div>",
 		success:function(){
-
 			var tbody = '';
 			$.post('/config/get_timezone_list', {}, function (rdata) {
-
 		        for (var i = 0; i < rdata.length; i++) {
 		        	tbody += '<option value="'+rdata[i]+'">'+rdata[i]+'</option>';
 		        }
 		        $('select[name="timezone"]').append(tbody);
-
 		    },'json');
-
-        	// for(i in msg_list){
-        	// 	if (msg_list[i]['code'] == ''){
-        	// 		tbody += '<option value="'+msg_list[i]['code']+'" selected>'+msg_list[i]['msg']+'</option>';
-        	// 	} else{
-        	// 		tbody += '<option value="'+msg_list[i]['code']+'">'+msg_list[i]['msg']+'</option>';
-        	// 	}
-        	// }
-        	
-        },
+	    },
         yes:function(index){
 		    var loadT = layer.msg("正在设置时区...", { icon: 16, time: 0, shade: [0.3, '#000'] });
 		    var timezone = $('select[name="timezone"]').val();
@@ -396,6 +374,14 @@ function setTimezone(){
 		    		location.reload();
 		    	},{ icon: rdata.status ? 1 : 2 }, 2000);
 		    },'json');
+        },
+        btn3:function(){
+        	var loadT = layer.msg('正在同步时间...',{icon:16,time:0,shade: [0.3, '#000']});
+			$.post('/config/sync_date','',function(rdata){
+				layer.close(loadT);
+				layer.msg(rdata.msg,{icon:rdata.status?1:2});
+				setTimeout(function(){window.location.reload();},1500);
+			},'json');
         }
 	})
 }

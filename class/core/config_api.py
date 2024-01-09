@@ -28,7 +28,7 @@ from flask import request
 
 class config_api:
 
-    __version = '0.16.2.3'
+    __version = '0.16.2.4'
     __api_addr = 'data/api.json'
 
     def __init__(self):
@@ -935,13 +935,6 @@ class config_api:
         data['backup_path'] = mw.getBackupDir()
         sformat = 'date +"%Y-%m-%d %H:%M:%S %Z %z"'
         data['systemdate'] = mw.execShell(sformat)[0].strip()
-
-        # 获取时区
-        import datetime
-        import pytz
-        now = datetime.datetime.now()
-        tz_name = now.astimezone().tzinfo
-        data['systemdatezone'] = tz_name
 
         data['port'] = mw.getHostPort()
         data['ip'] = mw.getHostAddr()
