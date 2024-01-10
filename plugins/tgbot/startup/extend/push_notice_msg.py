@@ -51,7 +51,7 @@ def send_msg(bot, tag='ad', trigger_time=300):
     # 信号只在一个周期内执行一次|end
 
     # https://t.me/gjgzs2022 ｜ 22/m | @GJ_gzs
-    # https://zhaoziyuan.pw/ | web | 15/m | 2m | next,1/15 ｜ @baleite
+    # https://zhaoziyuan.pw/ | web | 15/m | 2m | next,3/15 ｜ @baleite
     # 腾云机场 ｜9/m
     # 🚀鲲鹏VPN | 13/m | next,10/13
     # 综合包网/NG接口开户 | 28/m | 3m | next,1/28 | @aabbcx888
