@@ -79,8 +79,8 @@ def getConf(version):
     return path
 
 
-def getFpmConfFile(version):
-    return getServerDir() + '/' + version + '/etc/php-fpm.d/www.conf'
+def getFpmConfFile(version, pool='www'):
+    return getServerDir() + '/' + version + '/etc/php-fpm.d/'+www+'.conf'
 
 def getFpmFile(version):
     return getServerDir() + '/' + version + '/etc/php-fpm.conf'
