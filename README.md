@@ -114,8 +114,10 @@ docker run -itd --name mw-server --privileged=true -p 7200:7200 -p 80:80 -p 443:
 
 * 配置-可以配置时区。
 * PHP(GD)扩展安装优化。
-* PHP界面调整。
+* PHP界面功能调整。
 * MySQL(apt/yum)调整优化。
+* phpRedisAdmin。
+* rockmongo。
 
 ### JSDelivr安装地址
 
