@@ -360,8 +360,9 @@ def startJob():
     if status == 'stop':
         action = "停止"
         cmd = supCtl + " stop " + name
-
+    # print(cmd)
     data = mw.execShell(cmd)
+    # print(data)
 
     if data[1] != '':
         return mw.returnJson(False, action + '[' + name + ']失败!')
