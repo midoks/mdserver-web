@@ -358,7 +358,7 @@ def startJob():
 
     action = "启动"
     cmd = supCtl + " start " + name
-    if status == 'stop':
+    if status == 'start':
         action = "停止"
         cmd = supCtl + " stop " + name
     # print(cmd)
