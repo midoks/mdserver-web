@@ -57,7 +57,7 @@ if [ ! -d $sourcePath/php/php${PHP_VER} ];then
 	fi
 
 	#检测文件是否损坏.
-	md5_file_ok=29af82e4f7509831490552918aad502697453f0869a579ee1b80b08f9112c5b8
+	md5_file_ok=4c1fbb55a10ece7f4532feba9f3f88b9b211c11320742977588738374c03255f
 	if [ -f $sourcePath/php/php-${version}.tar.xz ];then
 		md5_file=`sha256sum $sourcePath/php/php-${version}.tar.xz  | awk '{print $1}'`
 		if [ "${md5_file}" != "${md5_file_ok}" ]; then
