@@ -8,9 +8,9 @@ GIT_SDIR="{$CODE_DIR}"
 GIT_USER_DIR="${GIT_SDIR}/{$USERNAME}"
 GIT_PROJECT_DIR="${GIT_USER_DIR}/{$PROJECT}"
 
-if [ ! -d $GIT_PROJECT_DIR ];then
-	mkdir -p $GIT_PROJECT_DIR
-	chown -R www:www $GIT_PROJECT_DIR
+if [ ! -d $GIT_USER_DIR ];then
+	mkdir -p $GIT_USER_DIR
+	chown -R www:www $GIT_USER_DIR
 fi
 
 git config --global credential.helper store
