@@ -359,7 +359,13 @@ function setTimezone(){
 			var tbody = '';
 			$.post('/config/get_timezone_list', {}, function (rdata) {
 		        for (var i = 0; i < rdata.length; i++) {
-		        	tbody += '<option value="'+rdata[i]+'">'+rdata[i]+'</option>';
+
+		        	if (rdata[i] == 'Asia/Shanghai'){
+		        		tbody += '<option value="'+rdata[i]+'" selected="selected">'+rdata[i]+'</option>';
+		        	} else {
+		        		tbody += '<option value="'+rdata[i]+'">'+rdata[i]+'</option>';
+		        	}
+		        	
 		        }
 		        $('select[name="timezone"]').append(tbody);
 		    },'json');
