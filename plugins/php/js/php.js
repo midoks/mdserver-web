@@ -188,9 +188,89 @@ function phpFpmRoot(version){
     });
 }
 
+function phpFpmConfigFile(version, func, pool = 'www'){
+    var _name = 'php';
+    if ( typeof(version) == 'undefined' ){
+        version = '';
+    }
 
-function getFpmConfig(version){
-    phpPost('get_fpm_conf', version, {}, function(data){
+    var func_name = 'conf';
+    if ( typeof(func) != 'undefined' ){
+        func_name = func;
+    }
+
+    var poolSelect = "<select class='bt-input-text' name='pool' style='width:100px;'>\
+                <option value='www' " + (pool == 'www' ? 'selected' : '') + ">www</option>\
+                <option value='backup' " + (pool == 'backup' ? 'selected' : '') + ">backup</option>\
+            </select>";
+
+    var con = '<p style="color: #666; margin-bottom: 7px">提示：Ctrl+F 搜索关键字，Ctrl+G 查找下一个，Ctrl+S 保存，Ctrl+Shift+R 查找替换!</p>\
+                <textarea class="bt-input-text" style="height: 320px; line-height:18px;" id="textBody"></textarea>\
+                <button id="onlineEditFileBtn" class="btn btn-success btn-sm" style="margin-top:10px;">保存</button>\
+                '+poolSelect+'\
+                <ul class="help-info-text c7 ptb15">\
+                    <li>此处为'+ _name + version +'应用池配置文件,若您不了解配置规则,请勿随意修改。</li>\
+                </ul>';
+    
+
+    var loadT = layer.msg('配置文件路径获取中...',{icon:16,time:0,shade: [0.3, '#000']});
+
+    var request_data = {name:_name, func:func_name,version:version};
+    request_data['args'] = JSON.stringify({'pool':pool});
+
+    $.post('/plugins/run', request_data, function (data) {
+        layer.close(loadT);
+
+        try{
+            var jdata = $.parseJSON(data.data);
+            if (!jdata['status']){
+                layer.msg(jdata.msg,{icon:0,time:2000,shade: [0.3, '#000']});
+                return;
+            }
+        }catch(err){/*console.log(err);*/}
+
+        $(".soft-man-con").html(con);
+        
+        var loadT2 = layer.msg('文件内容获取中...',{icon:16,time:0,shade: [0.3, '#000']});
+        var fileName = data.data;
+        $.post('/files/get_body', 'path=' + fileName, function(rdata) {
+            layer.close(loadT2);
+            if (!rdata.status){
+                layer.msg(rdata.msg,{icon:0,time:2000,shade: [0.3, '#000']});
+                return;
+            }
+            $("#textBody").empty().text(rdata.data.data);
+            $(".CodeMirror").remove();
+            var editor = CodeMirror.fromTextArea(document.getElementById("textBody"), {
+                extraKeys: {
+                    "Ctrl-Space": "autocomplete",
+                    "Ctrl-F": "findPersistent",
+                    "Ctrl-H": "replaceAll",
+                    "Ctrl-S": function() {
+                        $("#textBody").text(editor.getValue());
+                        pluginConfigSave(fileName);
+                    }
+                },
+                lineNumbers: true,
+                matchBrackets:true,
+            });
+            editor.focus();
+            $(".CodeMirror-scroll").css({"height":"300px","margin":0,"padding":0});
+            $("#onlineEditFileBtn").click(function(){
+                $("#textBody").text(editor.getValue());
+                pluginConfigSave(fileName);
+            });
+        },'json');
+
+        $('select[name="pool"]').change(function(){
+            var pool = $(this).val();
+            phpFpmConfigFile(version, func, pool);
+        });
+    },'json');
+}
+
+function getFpmConfig(version, pool = 'www'){
+    phpPost('get_fpm_conf', version, {'pool':pool}, function(data){
         // console.log(data);
         var rdata = $.parseJSON(data.data);
         // console.log(rdata);
@@ -207,7 +287,12 @@ function getFpmConfig(version){
         for (var i = 0; i < pms.length; i++) {
             pmList += '<option value="' + pms[i].name + '" ' + ((pms[i].name == rdata.pm) ? 'selected' : '') + '>' + pms[i].title + '</option>';
         }
+
+        var poolHtml = "<option value='www' " + (pool == 'www' ? 'selected' : '') + ">www</option>" +
+            "<option value='backup' " + (pool == 'backup' ? 'selected' : '') + ">backup</option>";
+
         var body = "<div class='bingfa'>" +
+            "<p class='line'><span class='span_tit'>应用池[pool]：</span><select class='bt-input-text' name='pool' style='width:100px;'>" + poolHtml + "</select></p>" +
             "<p class='line'><span class='span_tit'>并发方案：</span><select class='bt-input-text' name='limit' style='width:100px;'>" + limitList + "</select></p>" +
             "<p class='line'><span class='span_tit'>运行模式：</span><select class='bt-input-text' name='pm' style='width:100px;'>" + pmList + "</select><span class='c9'>*PHP-FPM运行模式</span></p>" +
             "<p class='line'><span class='span_tit'>max_children：</span><input class='bt-input-text' type='number' name='max_children' value='" + rdata.max_children + "' /><span class='c9'>*允许创建的最大子进程数</span></p>" +
@@ -273,11 +358,17 @@ function getFpmConfig(version){
             $("input[name='min_spare_servers']").val(min_spare_servers);
             $("input[name='max_spare_servers']").val(max_spare_servers);
         });
+
+        $('select[name="pool"]').change(function(){
+            var pool = $(this).val();
+            getFpmConfig(version, pool);
+        });
     });
 }
 
 function setFpmConfig(version){
     var max_children = Number($("input[name='max_children']").val());
+    var pool = $("select[name='pool']").val();
     var start_servers = Number($("input[name='start_servers']").val());
     var min_spare_servers = Number($("input[name='min_spare_servers']").val());
     var max_spare_servers = Number($("input[name='max_spare_servers']").val());
@@ -315,6 +406,7 @@ function setFpmConfig(version){
         min_spare_servers:min_spare_servers,
         max_spare_servers:max_spare_servers,
         pm:pm,
+        pool:pool,
     };
     phpPost('set_fpm_conf', version, data, function(ret_data){
         var rdata = $.parseJSON(ret_data.data);
@@ -323,8 +415,8 @@ function setFpmConfig(version){
 }
 
 
-function getFpmStatus(version){
-    phpPost('get_fpm_status', version, '', function(ret_data){
+function getFpmStatus(version, pool = 'www'){
+    phpPost('get_fpm_status', version, {'pool':pool}, function(ret_data){
         var tmp_data = $.parseJSON(ret_data.data);
         if(!tmp_data.status){
             layer.msg(tmp_data.msg, { icon: tmp_data.status ? 1 : 2 });
@@ -340,8 +432,24 @@ function getFpmStatus(version){
         } else if(rdata['process manager'] == 'ondemand'){
             php_fpm_status = '按需';
         }
-        
-        var con = "<div style='height:420px;overflow:hidden;'><table class='table table-hover table-bordered GetPHPStatus' style='margin:0;padding:0'>\
+
+        var select_pool_www = '';
+        var select_pool_backup = '';
+        if (pool == 'www'){
+            select_pool_www = 'selected';
+        }
+        if (pool == 'backup'){
+            select_pool_backup = 'selected';
+        }
+
+        var con = "<div style='height:430px;'>\
+                    <p style='text-align:center;padding-bottom:10px;'>\
+                        <select class='bt-input-text' name='pool' style='width:200px;'>\
+                            <option value='www' "+select_pool_www+">www</option>\
+                            <option value='backup' "+select_pool_backup+">backup</option>\
+                        </select>\
+                    </p>\
+                    <table class='table table-hover table-bordered get_fpm_status' style='margin:0;padding:0'>\
                         <tr><th>应用池(pool)</th><td>" + rdata.pool + "</td></tr>\
                         <tr><th>进程管理方式(process manager)</th><td>" + php_fpm_status + "</td></tr>\
                         <tr><th>启动日期(start time)</th><td>" + rdata['start time'] + "</td></tr>\
@@ -355,9 +463,16 @@ function getFpmStatus(version){
                         <tr><th>最大活跃进程数量(max active processes)</th><td>" + rdata['max active processes'] + "</td></tr>\
                         <tr><th>到达进程上限次数(max children reached)</th><td>" + rdata['max children reached'] + "</td></tr>\
                         <tr><th>慢请求数量(slow requests)</th><td>" + rdata['slow requests'] + "</td></tr>\
-                     </table></div>";
+                    </table>\
+                </div>";
         $(".soft-man-con").html(con);
-        $(".GetPHPStatus td,.GetPHPStatus th").css("padding", "7px");
+        $(".get_fpm_status td,.get_fpm_status th").css("padding", "7px");
+
+
+        $('select[name="pool"]').change(function(){
+            var pool = $(this).val();
+            getFpmStatus(version, pool);
+        });
     });
 }
 

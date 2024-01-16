@@ -59,7 +59,6 @@ def getArgs():
         else:
             t = t.split(':', 1)
             tmp[t[0]] = t[1]
-        tmp[t[0]] = t[1]
     elif args_len > 1:
         for i in range(len(args)):
             t = args[i].split(':')
@@ -80,6 +79,9 @@ def getConf(version):
 
 
 def getFpmConfFile(version, pool='www'):
+    args = getArgs()
+    if 'pool' in args:
+        pool = args['pool']
     return getServerDir() + '/' + version + '/etc/php-fpm.d/'+pool+'.conf'
 
 def getFpmFile(version):
@@ -220,15 +222,16 @@ def phpFpmReplace(version):
             mw.writeFile(desc_php_fpm, content)
 
 
-def phpFpmWwwReplace(version):
+
+def phpFpmPoolReplace(version, pool = 'www'):
     service_php_fpm_dir = getServerDir() + '/' + version + '/etc/php-fpm.d/'
 
     if not os.path.exists(service_php_fpm_dir):
         os.mkdir(service_php_fpm_dir)
 
-    service_php_fpmwww = service_php_fpm_dir + '/www.conf'
+    service_php_fpmwww = service_php_fpm_dir + '/'+pool+'.conf'
     if not os.path.exists(service_php_fpmwww):
-        tpl_php_fpmwww = getPluginDir() + '/conf/www.conf'
+        tpl_php_fpmwww = getPluginDir() + '/conf/'+pool+'.conf'
         content = mw.readFile(tpl_php_fpmwww)
         content = contentReplace(content, version)
         mw.writeFile(service_php_fpmwww, content)
@@ -269,7 +272,8 @@ def initReplace(version):
         mw.execShell('chmod +x ' + file_bin)
 
     phpPrependFile(version)
-    phpFpmWwwReplace(version)
+    phpFpmPoolReplace(version, 'www')
+    phpFpmPoolReplace(version, 'backup')
     phpFpmReplace(version)
 
     session_path = getServerDir() + '/tmp/session'
@@ -542,9 +546,13 @@ def setMaxSize(version):
     return mw.returnJson(True, '设置成功!')
 
 
-def getFpmConfig(version):
+def getFpmConfig(version, pool = 'www'):
+    args = getArgs()
+    pool = 'www'
+    if 'pool' in args:
+        pool = args['pool']
 
-    filefpm = getServerDir() + '/' + version + '/etc/php-fpm.d/www.conf'
+    filefpm = getServerDir() + '/' + version + '/etc/php-fpm.d/'+pool+'.conf'
     conf = mw.readFile(filefpm)
     data = {}
     rep = "\s*pm.max_children\s*=\s*([0-9]+)\s*"
@@ -580,8 +588,10 @@ def setFpmConfig(version):
     min_spare_servers = args['min_spare_servers']
     max_spare_servers = args['max_spare_servers']
     pm = args['pm']
+    pool = args['pool']
 
-    file = getServerDir() + '/' + version + '/etc/php-fpm.d/www.conf'
+
+    file = getServerDir() + '/' + version + '/etc/php-fpm.d/'+pool+'.conf'
     conf = mw.readFile(file)
 
     rep = "\s*pm.max_children\s*=\s*([0-9]+)\s*"
@@ -624,8 +634,10 @@ def setFpmConfig(version):
 #     return True
 
 
-def getFpmAddress(version):
+def getFpmAddress(version, pool='www'):
     fpm_address = '/tmp/php-cgi-{}.sock'.format(version)
+    if pool != 'www':
+        fpm_address = '/tmp/php-cgi-{}.{}.sock'.format(version,pool)
     php_fpm_file = getFpmConfFile(version)
     try:
         content = readFile(php_fpm_file)
@@ -656,14 +668,21 @@ def getFpmStatus(version):
     if stat == 'stop':
         return mw.returnJson(False, 'PHP[' + version + ']未启动!!!')
 
-    sock_file = getFpmAddress(version)
+    args = getArgs()
+    pool = 'www'
+    if 'pool' in args:
+        pool = args['pool']
+
+    sock_file = getFpmAddress(version, pool)
+    uri = '/phpfpm_status_' + version + '?json'
+    if pool != 'www':
+        uri = '/phpfpm_status_' + version + '_'+pool+'?json'
     try:
-        sock_data = mw.requestFcgiPHP(
-            sock_file, '/phpfpm_status_' + version + '?json')
+        sock_data = mw.requestFcgiPHP(sock_file, uri)
     except Exception as e:
         return mw.returnJson(False, str(e))
 
-    # print(data)
+    
     result = str(sock_data, encoding='utf-8')
     data = json.loads(result)
     fTime = time.localtime(int(data['start time']))
