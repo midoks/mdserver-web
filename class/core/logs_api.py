@@ -77,6 +77,8 @@ class logs_api:
         if log_name in ['dmesg'] or log_name.find('dmesg') == 0:
             return '内核缓冲区日志'
         if log_name in ['syslog'] or log_name.find('syslog') == 0:
+            return '系统日志'
+        if log_name in ['rsyncd.log']:
             return '远程同步日志'
         if log_name in ['btmp']:
             return '失败的登录记录'
