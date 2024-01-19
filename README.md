@@ -115,7 +115,7 @@ docker run -itd --name mw-server --privileged=true -p 7200:7200 -p 80:80 -p 443:
 * 配置-可以配置时区。
 * PHP(GD)扩展安装优化。
 * PHP界面功能调整。
-* PHP-FPM设置多个应用池。
+* PHP-FPM设置多个应用池(提高高并发稳定性)。
 * MySQL(apt/yum)调整优化。
 * phpRedisAdmin。
 * rockmongo。
