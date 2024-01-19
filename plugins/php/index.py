@@ -162,17 +162,21 @@ def makeOpenrestyConf():
     sdir = mw.getServerDir()
 
     dst_dir = sdir + '/web_conf/php'
-    dst_dir_conf = sdir + '/web_conf/php/conf'
     if not os.path.exists(dst_dir):
         mw.execShell('mkdir -p ' + dst_dir)
 
+    dst_dir_conf = sdir + '/web_conf/php/conf'
     if not os.path.exists(dst_dir_conf):
         mw.execShell('mkdir -p ' + dst_dir_conf)
 
-    d_pathinfo = sdir + '/web_conf/php/pathinfo.conf'
-    if not os.path.exists(d_pathinfo):
-        s_pathinfo = getPluginDir() + '/conf/pathinfo.conf'
-        shutil.copyfile(s_pathinfo, d_pathinfo)
+    dst_dir_upstream = sdir + '/web_conf/php/upstream'
+    if not os.path.exists(dst_dir_upstream):
+        mw.execShell('mkdir -p ' + dst_dir_upstream)
+
+    dst_pathinfo = sdir + '/web_conf/php/pathinfo.conf'
+    if not os.path.exists(dst_pathinfo):
+        src_pathinfo = getPluginDir() + '/conf/pathinfo.conf'
+        shutil.copyfile(src_pathinfo, dst_pathinfo)
 
     info = getPluginDir() + '/info.json'
     content = mw.readFile(info)
@@ -184,19 +188,31 @@ def makeOpenrestyConf():
         dfile = sdir + '/web_conf/php/conf/enable-php-' + x + '.conf'
         if not os.path.exists(dfile):
             if x == '00':
-                mw.writeFile(dfile, 'set $PHP_ENV 0;')
+                mw.writeFile(dfile, '')
             else:
-                w_content = contentReplace(tpl_content, x)
-                mw.writeFile(dfile, w_content)
+                content = contentReplace(tpl_content, x)
+                mw.writeFile(dfile, content)
 
-    # php-fpm status
-    # for version in phpversions:
-    #     dfile = sdir + '/web_conf/php/status/phpfpm_status_' + version + '.conf'
-    #     tpl = getPluginDir() + '/conf/phpfpm_status.conf'
-    #     if not os.path.exists(dfile):
-    #         content = mw.readFile(tpl)
-    #         content = contentReplace(content, version)
-    #         mw.writeFile(dfile, content)
+    upstream_tpl = getPluginDir() + '/conf/enable-php-upstream.conf'
+    upstream_tpl_content = mw.readFile(upstream_tpl)
+    for x in phpversions:
+        dfile = sdir + '/web_conf/php/upstream/enable-php-' + x + '.conf'
+        if not os.path.exists(dfile):
+            if x == '00':
+                mw.writeFile(dfile, '')
+            else:
+                content = contentReplace(upstream_tpl_content, x)
+                mw.writeFile(dfile, content)
+
+    vhost_dir = mw.getServerDir() + '/web_conf/nginx/vhost'
+    write_php_upstream_conf = mw.getServerDir()+'/web_conf/php/upstream/*.conf;'
+    if not os.path.exists(vhost_dir):
+        mw.execShell('mkdir -p ' + vhost_dir)
+
+    vhost_php_upstream = vhost_dir+'/0.php_upstream.conf'
+    if not os.path.exists(vhost_php_upstream):
+        mw.writeFile(vhost_php_upstream,'include '+write_php_upstream_conf)
+
 
 
 def phpPrependFile(version):
