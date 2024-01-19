@@ -280,8 +280,8 @@ function getFpmConfig(version, pool = 'www'){
             "<option value='3' " + (rdata.max_children == 100 ? 'selected' : '') + ">100并发</option>" +
             "<option value='4' " + (rdata.max_children == 200 ? 'selected' : '') + ">200并发</option>" +
             "<option value='5' " + (rdata.max_children == 300 ? 'selected' : '') + ">300并发</option>" +
-            "<option value='5' " + (rdata.max_children == 500 ? 'selected' : '') + ">500并发</option>" +
-            "<option value='6' " + (rdata.max_children == 2000 ? 'selected' : '') + ">2000并发</option>";
+            "<option value='6' " + (rdata.max_children == 500 ? 'selected' : '') + ">500并发</option>" +
+            "<option value='7' " + (rdata.max_children == 2000 ? 'selected' : '') + ">2000并发</option>";
         var pms = [{ 'name': 'static', 'title': '静态' }, { 'name': 'dynamic', 'title': '动态' },{ 'name': 'ondemand', 'title': '按需' }];
         var pmList = '';
         for (var i = 0; i < pms.length; i++) {
@@ -345,6 +345,7 @@ function getFpmConfig(version, pool = 'www'){
                     start_servers = 35;
                     min_spare_servers = 35;
                     max_spare_servers = 250;
+                    break;
                 case '7':
                     max_children = 2000;
                     start_servers = 40;
