@@ -1,6 +1,6 @@
 {
-	"NAME":"宝塔Linux面板",
-	"BRAND":"宝塔",
+	"NAME":"Linux面板",
+	"BRAND":"MW",
 	"PRODUCT":"Linux面板",
 	"PAGE_ERR_TITLE":"拒绝访问",
 	"PAGE_ERR_DOMAIN_H1":"抱歉,您没有访问权限",
