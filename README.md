@@ -119,6 +119,7 @@ docker run -itd --name mw-server --privileged=true -p 7200:7200 -p 80:80 -p 443:
 * MySQL(apt/yum)调整优化。
 * phpRedisAdmin。
 * rockmongo。
+* 网站类型优化。
 
 ### JSDelivr安装地址
 
