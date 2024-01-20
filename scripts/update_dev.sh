@@ -81,7 +81,7 @@ fi
 echo "update mdserver-web code start"
 
 if [ "$LOCAL_ADDR" != "common" ];then
-	wget --no-check-certificate /tmp/dev.zip https://code.midoks.icu/midoks/mdserver-web/archive/dev.zip
+	wget --no-check-certificate -O /tmp/dev.zip https://code.midoks.icu/midoks/mdserver-web/archive/dev.zip
 	# curl --insecure -sSLo /tmp/dev.zip https://code.midoks.icu/midoks/mdserver-web/archive/dev.zip
 	cd /tmp && unzip /tmp/dev.zip
 
