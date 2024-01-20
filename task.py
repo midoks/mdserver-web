@@ -413,7 +413,6 @@ def check502():
 def startPHPVersion(version):
     sdir = mw.getServerDir()
     try:
-
         # system
         phpService = mw.systemdCfgDir() + '/php' + version + '.service'
         if os.path.exists(phpService):
@@ -440,11 +439,9 @@ def startPHPVersion(version):
         # 尝试重启服务
         cgi = '/tmp/php-cgi-' + version + '.sock'
         pid = sdir + '/php/' + version + '/var/run/php-fpm.pid'
-        data = mw.execShell("ps -ef | grep php/" + version +
-                            " | grep -v grep|grep -v python |awk '{print $2}'")
+        data = mw.execShell("ps -ef | grep php/" + version +" | grep -v grep|grep -v python |awk '{print $2}'")
         if data[0] != '':
-            os.system("ps -ef | grep php/" + version +
-                      " | grep -v grep|grep -v python |awk '{print $2}' | xargs kill ")
+            os.system("ps -ef | grep php/" + version + " | grep -v grep|grep -v python |awk '{print $2}' | xargs kill ")
         time.sleep(0.5)
         if not os.path.exists(cgi):
             os.system('rm -f ' + cgi)
