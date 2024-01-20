@@ -1031,15 +1031,15 @@ function setTempAccess(){
 							title: '创建临时授权',
 							shift: 0,
 							type: 1,
-							content: "<div class=\"bt-form create_temp_view pd15\">\
-									<div class=\"line\">\
-										<span class=\"tname\">临时授权地址</span>\
+							content: "<div class='bt-form create_temp_view pd15'>\
+									<div class='line'>\
+										<span class='tname'>临时授权地址</span>\
 										<div>\
-											<textarea id=\"temp_link\" class=\"bt-input-text mr20\" style=\"margin: 0px;width: 500px;height: 50px;line-height: 19px;\"></textarea>\
+											<textarea id='temp_link' class='bt-input-text mr20' style='margin: 0px;width: 500px;height: 50px;line-height: 19px;'></textarea>\
 										</div>\
 									</div>\
-									<div class=\"line\"><button type=\"submit\" class=\"btn btn-success btn-sm btn-copy-temp-link\" data-clipboard-text=\"\">复制地址</button></div>\
-									<ul class=\"help-info-text c7 ptb15\">\
+									<div class='line'><button type='submit' class='btn btn-success btn-sm btn-copy-temp-link' data-clipboard-text=''>复制地址</button></div>\
+									<ul class='help-info-text c7 ptb15'>\
 										<li>临时授权生成后1小时内使用有效，为一次性授权，使用后立即失效</li>\
 										<li>使用临时授权登录面板后1小时内拥有面板所有权限，请勿在公共场合发布临时授权连接</li>\
 										<li>授权连接信息仅在此处显示一次，若在使用前忘记，请重新生成</li>\
