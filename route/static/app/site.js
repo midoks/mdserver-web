@@ -1,10 +1,25 @@
+
+
+$("#site_search_input").keyup(function(event){
+	if(event.keyCode == 13) {
+		getWeb(1, -1, $(this).val());
+	}
+});
+
+$('#site_search').click(function(){
+	getWeb(1, -1, $('#site_search_input').val());
+});
+
 /**
  * 取回网站数据列表
  * @param {Number} page   当前页
  * @param {String} search 搜索条件
  */
- function getWeb(page, search, type_id) {
-	var search = $("#SearchValue").prop("value");
+ function getWeb(page, type_id, search) {
+ 	if ( typeof(search) == 'undefined' ){
+		search = $('#site_search_input').val();
+	}
+	
 	var page = page == undefined ? '1':page;
 	var order = getCookie('order');
 	if(order){
@@ -117,6 +132,7 @@
 		},function(){
 			$(this).removeClass("open");
 		});
+		
 		//输出分页
 		$("#webPage").html(data.page);
 		// $("#webPage").html('<div class="site_type"><span>站点分类:</span><select class="bt-input-text mr5" style="width:100px"><option value="-1">全部分类</option><option value="0">默认分类</option></select></div>');
@@ -2704,8 +2720,7 @@ function getClassType(){
 
 		$(select).bind('change',function(){
 			var select_id = $(this).val();
-			// console.log(select_id);
-			getWeb(1,'',select_id);
+			getWeb(1,select_id, '');
 		})
 	},'json');
 }

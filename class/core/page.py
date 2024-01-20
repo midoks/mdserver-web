@@ -39,6 +39,7 @@ class Page():
     __RTURN_JS = False  # 是否返回JS回调
     __START_NUM = None  # 起始行
     __END_NUM = None  # 结束行
+    __ARGS_TPL = ''
 
     def __init__(self):
         if False:
@@ -51,12 +52,19 @@ class Page():
             self.__FO = tmp['FO']
             self.__LINE = tmp['LINE']
 
+    def getPageNum(self, num):
+        return str(num) + self.__ARGS_TPL
+
     def GetPage(self, pageInfo, limit='1,2,3,4,5,6,7,8'):
         # 取分页信息
         # @param pageInfo 传入分页参数字典
         # @param limit 返回系列
         self.__RTURN_JS = pageInfo['return_js']
         self.__COUNT_ROW = pageInfo['count']
+
+        if 'args_tpl' in pageInfo:
+            self.__ARGS_TPL = pageInfo['args_tpl']
+
         self.ROW = pageInfo['row']
         self.__C_PAGE = self.__GetCpage(pageInfo['p'])
         self.__START_NUM = self.__StartRow()
@@ -111,7 +119,7 @@ class Page():
                     str(self.__COUNT_PAGE) + "'>" + str(self.__END) + "</a>"
             else:
                 endStr = "<a class='Pend' onclick='" + self.__RTURN_JS + \
-                    "(" + str(self.__COUNT_PAGE) + ")'>" + \
+                    "(" + self.getPageNum(self.__COUNT_PAGE) + ")'>" + \
                     str(self.__END) + "</a>"
         return endStr
 
@@ -126,7 +134,7 @@ class Page():
                     str(self.__C_PAGE + 1) + "'>" + str(self.__NEXT) + "</a>"
             else:
                 nextStr = "<a class='Pnext' onclick='" + self.__RTURN_JS + \
-                    "(" + str(self.__C_PAGE + 1) + ")'>" + \
+                    "(" +   self.getPageNum(self.__C_PAGE + 1) + ")'>" + \
                     str(self.__NEXT) + "</a>"
 
         return nextStr
@@ -151,7 +159,7 @@ class Page():
                         "p=" + str(page) + "'>" + str(page) + "</a>"
                 else:
                     pages += "<a class='Pnum' onclick='" + self.__RTURN_JS + \
-                        "(" + str(page) + ")'>" + str(page) + "</a>"
+                        "(" + self.getPageNum(page) + ")'>" + str(page) + "</a>"
 
         # 当前页
         if self.__C_PAGE > 0:
@@ -174,7 +182,7 @@ class Page():
                     "p=" + str(page) + "'>" + str(page) + "</a>"
             else:
                 pages += "<a class='Pnum' onclick='" + self.__RTURN_JS + \
-                    "(" + str(page) + ")'>" + str(page) + "</a>"
+                    "(" + self.getPageNum(page) + ")'>" + str(page) + "</a>"
 
         return pages
 
@@ -189,7 +197,7 @@ class Page():
                     str(self.__C_PAGE - 1) + "'>" + str(self.__PREV) + "</a>"
             else:
                 startStr = "<a class='Ppren' onclick='" + self.__RTURN_JS + \
-                    "(" + str(self.__C_PAGE - 1) + ")'>" + \
+                    "(" + self.getPageNum(self.__C_PAGE - 1) + ")'>" + \
                     str(self.__PREV) + "</a>"
         return startStr
 
@@ -204,7 +212,7 @@ class Page():
                     self.__URI + "p=1'>" + str(self.__START) + "</a>"
             else:
                 startStr = "<a class='Pstart' onclick='" + \
-                    self.__RTURN_JS + "(1)'>" + str(self.__START) + "</a>"
+                    self.__RTURN_JS + "("+self.getPageNum(1)+")'>" + str(self.__START) + "</a>"
         return startStr
 
     def __GetCpage(self, p):

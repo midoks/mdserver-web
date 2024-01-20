@@ -394,6 +394,9 @@ def getPageObject(args, result='1,2,3,4,5,8'):
     if 'tojs' in args:
         info['return_js'] = args['tojs']
 
+    if 'args_tpl' in args:
+        info['args_tpl'] = args['args_tpl']
+
     return (page.GetPage(info, result), page)
 
 
