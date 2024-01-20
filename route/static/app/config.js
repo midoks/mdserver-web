@@ -865,14 +865,14 @@ function getTempAccessLogs(id){
 		closeBtn:1,
 		shift: 0,
 		type: 1,
-		content: "<div class=\"pd20\">\
-					<button class=\"btn btn-success btn-sm refresh_log\">刷新日志</button>\
-					<div class=\"divtable mt10\">\
-						<table class=\"table table-hover\">\
+		content: "<div class='pd20'>\
+					<button class='btn btn-success btn-sm refresh_log'>刷新日志</button>\
+					<div class='divtable mt10'>\
+						<table class='table table-hover'>\
 							<thead>\
 								<tr><th>操作类型</th><th>操作时间</th><th>日志</th></tr>\
 							</thead>\
-							<tbody id=\"logs_list\"></tbody>\
+							<tbody id='logs_list'></tbody>\
 						</table>\
 					</div>\
 				</div>",
