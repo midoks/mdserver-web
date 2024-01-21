@@ -38,9 +38,11 @@ Install_lib()
 		echo "php-$version 已安装${LIBNAME},请选择其它版本!"
 		return
 	fi
-		
+	
+	# OPcache 黑名单文件位置。 
+	# 黑名单文件为文本文件，包含了不进行预编译优化的文件名，每行一个文件名。 
+	# 黑名单中的文件名可以使用通配符，也可以使用前缀。 此文件中以分号（;）开头的行将被视为注释。
 	OP_BL=${serverPath}/php/opcache-blacklist.txt
-	# OPCACHE白名单
 	if [ ! -f $OP_BL ];then
 		touch $OP_BL
 	fi
