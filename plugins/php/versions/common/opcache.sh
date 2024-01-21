@@ -38,7 +38,13 @@ Install_lib()
 		echo "php-$version 已安装${LIBNAME},请选择其它版本!"
 		return
 	fi
-	
+		
+	OP_BL=${serverPath}/php/opcache-blacklist.txt
+	# OPCACHE白名单
+	if [ ! -f $OP_BL ];then
+		touch $OP_BL
+	fi
+
 	echo "" >> $serverPath/php/$version/etc/php.ini
 	echo "[opcache]" >> $serverPath/php/$version/etc/php.ini
 	echo "zend_extension=${LIBNAME}.so" >> $serverPath/php/$version/etc/php.ini
@@ -52,6 +58,7 @@ Install_lib()
 	echo "opcache.jit=1205" >> $serverPath/php/$version/etc/php.ini
 	echo "opcache.jit_buffer_size=64M" >> $serverPath/php/$version/etc/php.ini
 	echo "opcache.save_comments=0" >> $serverPath/php/$version/etc/php.ini
+	echo "opcache.blacklist_filename=${OP_BL}" >> $serverPath/php/$version/etc/php.ini
 
 	cd  ${curPath} && bash ${rootPath}/plugins/php/versions/lib.sh $version restart
 	echo '==========================================================='
