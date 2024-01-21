@@ -268,7 +268,7 @@ def test():
 
     # rsStatus = client.admin.command("replSetInitiate", config)
 
-
+    # 需要通过命令行操作
     # -> rs.initiate({
     #     _id: 'test',
     #     members: [{
