@@ -78,7 +78,7 @@ def getArgs():
 
 def status():
     data = mw.execShell(
-        "ps -ef|grep mongod |grep -v grep | grep -v python | grep -v mdserver-web | awk '{print $2}'")
+        "ps -ef|grep mongod |grep -v grep | grep -v /Applications | grep -v python | grep -v mdserver-web | awk '{print $2}'")
 
     if data[0] == '':
         return 'stop'
@@ -137,6 +137,7 @@ def mgOp(method):
     file = initDreplace()
     if mw.isAppleSystem():
         data = mw.execShell(file + ' ' + method)
+        # print(data)
         if data[1] == '':
             return 'ok'
         return data[1]
@@ -239,8 +240,64 @@ def runReplInfo():
         result['setName'] = repl['setName']
         result['primary'] = repl['primary']
         result['me'] = repl['me']
+
+        hosts = repl['hosts']
+        result['hosts'] = ','.join(hosts)
+
     
     return mw.returnJson(True, 'OK', result)
+
+def test():
+    # https://pymongo.readthedocs.io/en/stable/examples/high_availability.html
+    import pymongo
+    from pymongo import ReadPreference
+    
+    port = getConfPort()
+    client = pymongo.MongoClient(host='127.0.0.1', port=int(port))
+    db = client.admin
+
+    # config = {
+    #     '_id': 'test',
+    #     'members': [
+    #         {'_id': 1, 'host': '127.0.0.1:27018','priority': 10 },
+    #         {'_id': 2, 'host': '127.0.0.1:27019','priority': 1 },
+    #         {'_id': 3, 'host': '127.0.0.1:27020','priority': 0 },
+    #         # {'_id': 2, 'host': 'localhost:27019'}
+    #     ]
+    # }
+
+    # rsStatus = client.admin.command("replSetInitiate", config)
+
+
+    # -> rs.initiate({
+    #     _id: 'test',
+    #     members: [{
+    #         _id: 1,
+    #         host: '127.0.0.1:27018',
+    #         priority: 2 // 这个priority不设置为1，值越高，当主库故障的时候会优先被选举成主库
+    #     }, {
+    #         _id: 2,
+    #         host: '127.0.0.1:27019',
+    #         priority: 0  //设置为0则不能成为主库
+    #     }, {
+    #         _id: 3,
+    #         host: '127.0.0.1:27020',
+    #         priority: 1
+    #     }]
+    # });
+
+    # > rs.status();  // 查询状态
+    # // "stateStr" : "PRIMARY", 主节点
+    # // "stateStr" : "SECONDARY", 副本节点
+
+    # > rs.add({"_id":3, "host":"127.0.0.1:27318","priority":0,"votes":0});
+
+
+    serverStatus = db.command('serverStatus')
+    print(serverStatus)
+    
+    # return mw.returnJson(True, 'OK', result)
+    
 
 def initdStatus():
     if mw.isAppleSystem():
@@ -332,5 +389,7 @@ if __name__ == "__main__":
         print(getConf())
     elif func == 'run_log':
         print(runLog())
+    elif func == 'test':
+        print(test())
     else:
         print('error')
