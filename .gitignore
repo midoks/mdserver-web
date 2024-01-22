@@ -172,6 +172,7 @@ plugins/v2ray
 plugins/frp
 plugins/file_search
 plugins/proxysql
+plugins/data_query
 debug.out
 
 
