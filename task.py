@@ -393,8 +393,11 @@ def check502Task():
 
 def check502():
     try:
-        verlist = ['52', '53', '54', '55', '56', '70',
-                   '71', '72', '73', '74', '80', '81', '82', '83']
+        verlist = [
+            '52', '53', '54', '55', '56', '70',
+            '71', '72', '73', '74', '80', '81', 
+            '82', '83'
+        ]
         for ver in verlist:
             sdir = mw.getServerDir()
             php_path = sdir + '/php/' + ver + '/sbin/php-fpm'
