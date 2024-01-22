@@ -1006,7 +1006,7 @@ html .menu .menu_exit:hover {
 }
 
 .search {
-    width: 306px
+    width: 306px;
 }
 
 .ser-text {
@@ -1014,7 +1014,16 @@ html .menu .menu_exit:hover {
     height: 30px;
     width: 250px;
     padding: 0 8px;
-    margin-top: 10px
+    margin-top: 10px;
+    outline: none;
+}
+
+.ser-text:focus {
+    border-color: #20a53a;
+}
+
+.ser-text:focus + span.glyphicon-search {
+    color: #20a53a;
 }
 
 .ser-sub {
@@ -4946,7 +4955,137 @@ select[disabled]{
 .radius2 {
   border-radius: 2px;
 }
+
+
 .tootls_group {
     height: 30px;
     line-height: 30px;
+}
+
+.tootls_group .search {
+    display: inline-block;
+    height: 30px;
+    line-height: 30px;
+    position: relative;
+    width: 230px;
+}
+
+.tootls_group .search .search_input {
+    height: 30px;
+    line-height: 30px;
+    border-radius: 2px;
+    border: 1px solid #ccc;
+    outline: none;
+    padding-left: 8px;
+    vertical-align: top;
+    width: 230px;
+}
+
+.tootls_group .search .search_input:focus {
+    border-color: #20a53a;
+}
+
+.tootls_group .search .search_input:focus + span.glyphicon-search {
+    color: #20a53a;
+}
+
+.tootls_group .search .glyphicon-remove-sign {
+    position: absolute;
+    top: 8px;
+    right: 30px;
+    font-size: 15px;
+    cursor: pointer;
+}
+
+.tootls_group .search .glyphicon-search {
+    height: 28px;
+    line-height: 28px;
+    padding: 0 10px;
+    color: #888;
+    position: absolute;
+    right: 0;
+    font-size: 14px;
+    cursor: pointer;
+    float: left;
+}
+
+.tootls_group .page .page_jump_group .page_jump_btn:hover {
+    background-color: #10952a;
+    border-color: #398439;
+}
+
+.tootls_group .search .search-btn span {
+    font-size: 15px;
+    vertical-align: middle;
+    position: relative;
+    top: -1px;
+}
+
+.tootls_group .page {
+    padding: 0;
+    height: 30px;
+}
+
+.tootls_group .page .page_select_number,
+.tootls_group .page .page_jump_group {
+    height: 28px;
+    line-height: 26px;
+    margin-left: 8px;
+    vertical-align: top;
+    float: left;
+}
+
+.tootls_group .page .page_jump_group span {
+    border: none;
+    padding: 0 8px;
+}
+
+.tootls_group .page .page_select_number {
+    border: 1px solid #ececec;
+    border-radius: 0;
+    padding: 0 5px;
+    border-left: 0;
+    margin-left: 0;
+}
+
+.tootls_group .page .page_jump_group input {
+    height: 28px;
+    line-height: 28px;
+    width: 30px;
+    max-width: 50px;
+    vertical-align: top;
+    border: 1px solid #ececec;
+    outline: none;
+    text-align: center;
+    float: left;
+}
+
+.tootls_group .page .page_jump_group input:focus {
+    border-color: #20a53a;
+}
+
+.tootls_group .page .page_jump_group .page-jump-title {
+    height: 28px;
+    line-height: 28px;
+    color: #555;
+    border: none;
+    padding: 0 5px;
+}
+
+.tootls_group .page .page_jump_group .page_jump_btn {
+    height: 28px;
+    line-height: 24px;
+    border-radius: 0;
+    outline: none;
+    margin-left: 8px;
+    border-radius: 2px;
+    color: #555;
+    background-color: #fff;
+    border: 1px solid #ccc;
+}
+
+.tootls_group .page .page_jump_group .page_jump_btn:hover {
+    color: #fff;
+    background-color: #20a53a;
+    border-color: #20a53a;
 }
