@@ -503,22 +503,22 @@ def checkPHPVersion(version):
         return False
 
     # 检查Web服务是否启动
-    if result.find('Connection refused') != -1:
-        global isTask
-        if os.path.exists(isTask):
-            isStatus = mw.readFile(isTask)
-            if isStatus == 'True':
-                return True
+    # if result.find('Connection refused') != -1:
+    #     global isTask
+    #     if os.path.exists(isTask):
+    #         isStatus = mw.readFile(isTask)
+    #         if isStatus == 'True':
+    #             return True
 
-        # systemd
-        systemd = mw.systemdCfgDir() + '/openresty.service'
-        if os.path.exists(systemd):
-            execShell('systemctl reload openresty')
-            return True
-        # initd
-        initd = '/etc/init.d/openresty'
-        if os.path.exists(initd):
-            os.system(initd + ' reload')
+    #     # systemd
+    #     systemd = mw.systemdCfgDir() + '/openresty.service'
+    #     if os.path.exists(systemd):
+    #         execShell('systemctl reload openresty')
+    #         return True
+    #     # initd
+    #     initd = '/etc/init.d/openresty'
+    #     if os.path.exists(initd):
+    #         os.system(initd + ' reload')
     return True
 
 # --------------------------------------PHP监控 end--------------------------------------------- #
@@ -536,7 +536,7 @@ def openrestyAutoRestart():
                 continue
 
             # systemd
-            systemd = '/lib/systemd/system/openresty.service'
+            systemd = mw.systemdCfgDir()+'/openresty.service'
             initd = '/etc/init.d/openresty'
             if os.path.exists(systemd):
                 execShell('systemctl reload openresty')
