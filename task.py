@@ -506,7 +506,8 @@ def checkPHPVersion(version):
         return False
 
     # 检查Web服务是否启动
-    # if result.find('Connection refused') != -1:
+    if result.find('Connection refused') != -1:
+        return False
     #     global isTask
     #     if os.path.exists(isTask):
     #         isStatus = mw.readFile(isTask)
