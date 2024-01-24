@@ -254,31 +254,31 @@ function webAddPage(type) {
 			shift: 0,
 			shadeClose: false,
 			content: "<form class='bt-form pd20 pb70' id='addweb'>\
-						<div class='line'>\
-		                    <span class='tname'>"+lan.site.domain+"</span>\
-		                    <div class='info-r c4'>\
-								<textarea id='mainDomain' class='bt-input-text' name='webname' style='width:458px;height:100px;line-height:22px' /></textarea>\
-							</div>\
-						</div>\
-	                    <div class='line'>\
-	                    <span class='tname'>备注</span>\
-	                    <div class='info-r c4'>\
-	                    	<input id='Wbeizhu' class='bt-input-text' type='text' name='ps' placeholder='网站备注' style='width:458px' />\
-	                    </div>\
-	                    </div>\
-	                    <div class='line'>\
-	                    <span class='tname'>根目录</span>\
-	                    <div class='info-r c4'>\
-	                    	<input id='inputPath' class='bt-input-text mr5' type='text' name='path' value='"+www['dir']+"/' placeholder='"+www['dir']+"' style='width:458px' />\
-	                    	<span class='glyphicon glyphicon-folder-open cursor' onclick='changePath(\"inputPath\")'></span>\
-	                    </div>\
-	                    </div>\
-						"+php_version+"\
-	                    <div class='bt-form-submit-btn'>\
-							<button type='button' class='btn btn-danger btn-sm btn-title' onclick='layer.closeAll()'>取消</button>\
-							<button type='button' class='btn btn-success btn-sm btn-title' onclick=\"webAdd(1)\">提交</button>\
-						</div>\
-	                  </form>",
+				<div class='line'>\
+                    <span class='tname'>"+lan.site.domain+"</span>\
+                    <div class='info-r c4'>\
+						<textarea id='mainDomain' class='bt-input-text' name='webname' style='width:458px;height:100px;line-height:22px' /></textarea>\
+					</div>\
+				</div>\
+                <div class='line'>\
+                <span class='tname'>备注</span>\
+                <div class='info-r c4'>\
+                	<input id='Wbeizhu' class='bt-input-text' type='text' name='ps' placeholder='网站备注' style='width:458px' />\
+                </div>\
+                </div>\
+                <div class='line'>\
+                <span class='tname'>根目录</span>\
+                <div class='info-r c4'>\
+                	<input id='inputPath' class='bt-input-text mr5' type='text' name='path' value='"+www['dir']+"/' placeholder='"+www['dir']+"' style='width:458px' />\
+                	<span class='glyphicon glyphicon-folder-open cursor' onclick='changePath(\"inputPath\")'></span>\
+                </div>\
+                </div>\
+				"+php_version+"\
+                <div class='bt-form-submit-btn'>\
+					<button type='button' class='btn btn-danger btn-sm btn-title' onclick='layer.closeAll()'>取消</button>\
+					<button type='button' class='btn btn-success btn-sm btn-title' onclick=\"webAdd(1)\">提交</button>\
+				</div>\
+            </form>",
 		});
 
 		$(function() {
