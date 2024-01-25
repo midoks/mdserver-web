@@ -794,7 +794,7 @@ def getMyPort():
     return tmp.groups()[0].strip()
 
 
-def setMyPort():
+def setMyPort(version):
     args = getArgs()
     data = checkArgs(args, ['port'])
     if not data[0]:
@@ -806,7 +806,7 @@ def setMyPort():
     rep = "port\s*=\s*([0-9]+)\s*\n"
     content = re.sub(rep, 'port = ' + port + '\n', content)
     mw.writeFile(file, content)
-    restart()
+    restart(version)
     return mw.returnJson(True, '编辑成功!')
 
 
@@ -3229,7 +3229,7 @@ if __name__ == "__main__":
     elif func == 'my_port':
         print(getMyPort())
     elif func == 'set_my_port':
-        print(setMyPort())
+        print(setMyPort(version))
     elif func == 'init_pwd':
         print(initMysqlPwd())
     elif func == 'root_pwd':

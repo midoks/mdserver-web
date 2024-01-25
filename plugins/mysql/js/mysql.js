@@ -200,7 +200,7 @@ function myPort(){
     myPost('my_port','',function(data){
         var con = '<div class="line ">\
             <div class="info-r  ml0">\
-            <input name="port" class="bt-input-text mr5 port" type="text" style="width:100px" value="'+data.data+'">\
+            <input name="port" class="bt-input-text mr5 port" type="number" style="width:100px" value="'+data.data+'">\
             <button id="btn_change_port" name="btn_change_port" class="btn btn-success btn-sm mr5 ml5 btn_change_port">修改</button>\
             </div></div>';
         $(".soft-man-con").html(con);
