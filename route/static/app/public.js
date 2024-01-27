@@ -74,7 +74,7 @@ function toUnixTime(txt){
 
 function randomStrPwd(b) {
 	b = b || 32;
-	var c = "AaBbCcDdEeFfGHhiJjKkLMmNnPpRSrTsWtXwYxZyz2345678&!@%";
+	var c = "AaBbCcDdEeFfGHhiJjKkLMmNnPpRSrTsWtXwYxZyz2345678";
 	var a = c.length;
 	var d = "";
 	for(i = 0; i < b; i++) {
