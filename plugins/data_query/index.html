@@ -1,0 +1,25 @@
+<style>
+.overflow_hide {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    vertical-align: middle;
+}
+</style>
+
+<div class="bt-form">
+	<div class='plugin_version'></div>
+	<div class="bt-w-main">
+		<div class="bt-w-menu">
+			<p class="bgw" onclick="pluginService('data_query');">服务</p>		
+		</div>
+		<div class="bt-w-con pd15">
+			<div class="soft-man-con"></div>
+		</div>
+	</div>
+</div>
+<script type="text/javascript">
+resetPluginWinHeight(300);
+resetPluginWinWidth(380);
+pluginService('data_query', $('.plugin_version').attr('version'));
+</script>

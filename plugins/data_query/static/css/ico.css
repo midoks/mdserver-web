@@ -1,0 +1,11 @@
+
+/* menu start  */
+.menu .current .menu_plugin_data_query:hover {
+    background-image: url("/plugins/file?name=data_query&f=ico.png");
+}
+
+.menu .menu_plugin_data_query {
+    background-image: url("/plugins/file?name=data_query&f=ico.png");
+}
+
+/* menu end  */
