@@ -57,7 +57,7 @@ class nosqlRedis():
         except redis.exceptions.ConnectionError:
             return False
         except Exception:
-            self.__DB_ERR = public.get_error_info()
+            self.__DB_ERR = mw.getTracebackInfo()
         return False
 
     # 获取配置项

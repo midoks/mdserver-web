@@ -33,6 +33,34 @@ function redisPostCB(method, args, callback){
     },'json'); 
 }
 
+function mgdbPostCB(method, args, callback){
+    var loadT = layer.msg('正在获取...', { icon: 16, time: 0, shade: 0.3 });
+
+    var req_data = {};
+    req_data['name'] = 'data_query';
+    req_data['func'] = method;
+    req_data['script']='nosql_mongodb';
+    args['version'] = '';
+ 
+    if (typeof(args) == 'string' && args == ''){
+        req_data['args'] = JSON.stringify(toArrayObject(args));
+    } else {
+        req_data['args'] = JSON.stringify(args);
+    }
+
+    $.post('/plugins/callback', req_data, function(data) {
+        layer.close(loadT);
+        if (!data.status){
+            layer.msg(data.msg,{icon:0,time:2000,shade: [0.3, '#000']});
+            return;
+        }
+
+        if(typeof(callback) == 'function'){
+            callback(data);
+        }
+    },'json'); 
+}
+
 
 function selectTab(tab = 'redis'){
     $('.tab-view-box .tab-con').addClass('hide').removeClass('show').removeClass('w-full');
@@ -50,10 +78,9 @@ function closeInstallLayer(){
 function initTabFunc(tab){
     switch(tab){
         case 'redis':initTabRedis();break;
+        case 'mongodb':initTabMongodb();break;
     }
 }
-
-
 
 function initDataQuery(){
     var tab = $('#cutTab .tabs-item.active').data('name');
@@ -109,6 +136,46 @@ function initTabRedis(){
     readerTableChecked();
 }
 
+function initTabMongodb(){
+    //渲染数据
+    mongodbGetList();
+}
+
+// ------------------------- mongodb start ---------------------------------
+function mongodbGetSid(){
+    return 0;
+}
+
+
+function mongodbGetList(){
+    var sid = mongodbGetSid();
+    mgdbPostCB('get_db_list',{'sid':sid} ,function(rdata){
+        if (rdata.data.status){
+            var list = rdata.data.data;
+            var content = '';
+            for (var i = 0; i < list.length; i++) {
+                if (i == 0){
+                    content += '<span data-id="'+i+'" class="on">'+list[i]['name'] + '('+ list[i]['keynum'] +')</span>'; 
+                } else {
+                    content += '<span data-id="'+i+'">'+list[i]['name'] + '('+ list[i]['keynum'] +')</span>'; 
+                }
+            }
+            $('#redis_list_tab .tab-nav').html(content);
+
+            $('#redis_list_tab .tab-nav span').click(function(){
+                $('#redis_list_tab .tab-nav span').removeClass('on');
+                $(this).addClass('on');
+                redisGetKeyList(1);
+            });
+            // redisGetKeyList(1);
+        } else {
+            showInstallLayer();
+        }
+    });
+}
+// ------------------------- mongodb end ---------------------------------
+
+// ------------------------- redis start ---------------------------------
 function redisGetSid(){
     return 0;
 }
@@ -453,13 +520,5 @@ function redisBatchClear(){
         }
     });
 }
-
-
-
-
-
-
-
-
-
+// ------------------------- redis end ---------------------------------
 
