@@ -1049,7 +1049,7 @@ function flySlow(a) {
 };
 
 function readerTableChecked(){
-    $('thead').find('input').bind('click',function(){
+    $('thead').find('input').unbind('click').bind('click',function(){
         $('tbody').find('tr').each(function(i,obj){
         	var fin = $(this).find('td')[0];
         	checked = $(fin).find('input').prop('checked');

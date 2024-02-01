@@ -71,12 +71,12 @@ function initTabRedis(){
     //渲染数据
     redisGetList();
 
-    $('#redis_add_key').click(function(){
+    $('#redis_add_key').unbind('click').click(function(){
         redisAdd();
     });
 
     //搜索
-    $('#redis_ksearch').keyup(function(e){
+    $('#redis_ksearch').unbind('click').keyup(function(e){
         if (e.keyCode == 13){
             var val = $(this).val();
             if (val == ''){
@@ -87,7 +87,7 @@ function initTabRedis(){
         }
     });
 
-    $('#redis_ksearch_span').click(function(){
+    $('#redis_ksearch_span').unbind('click').click(function(){
         var val = $('#redis_ksearch').val();
         if (val == ''){
             layer.msg('搜索不能为空!',{icon:7});
@@ -97,12 +97,12 @@ function initTabRedis(){
     });
 
     //批量删除
-    $('#redis_batch_del').click(function(){
+    $('#redis_batch_del').unbind('click').click(function(){
         redisBatchDel();
     });
 
     //清空所有
-    $('#redis_clear_all').click(function(){
+    $('#redis_clear_all').unbind('click').click(function(){
         redisBatchClear();
     });
 

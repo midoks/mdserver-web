@@ -2,8 +2,8 @@
     <div class="container-fluid" style="padding-bottom: 50px;">
         <div id="cutTab" class="pos-box bgw mtb15" style="height:45px">
             <div class="tab-list">
-                <!-- <div class="tabs-item active" data-name="mongodb">Mongodb</div> -->
                 <div class="tabs-item active" data-name="redis">Redis</div>
+                <div class="tabs-item" data-name="mongodb">Mongodb</div>
                 <!-- <div class="tabs-item" data-name="memcached">Memcached</div> -->
             </div>
         </div>
@@ -20,17 +20,15 @@
                 <div id="operationLog" style="position: relative;">
                     <div class="tootls_group tootls_top">
                         <div class="pull-left">
-                            <button type="button" title="刷新日志" class="refresh btn btn-success btn-sm mr5">
-                                <span>刷新日志</span>
-                            </button>
-                            <button type="button" title="清空日志" class="clear btn btn-default btn-sm mr5">
-                                <span>清空日志</span>
+                            <button type="button" title="刷新" class="refresh btn btn-success btn-sm mr5">
+                                <span>刷新</span>
                             </button>
                         </div>
                     </div>
                     <div class="divtable mtb10">
                         <table class="table table-hover">
-                            <thead style="position: relative;z-index: 1;"><tr>
+                            <thead style="position: relative;z-index: 1;">
+                            <tr>
                                 <th><span>编号</span></th>
                                 <th><span>操作类型</span></th>
                                 <th><span>详情</span></th>
@@ -40,7 +38,7 @@
                         </table>
                     </div>
                 </div>
-                <div class="dataTables_paginate paging_bootstrap page operationLog">
+                <div class="dataTables_paginate paging_bootstrap page">
                     <div><span class="Pcurrent">1</span><span class="Pcount">共1条</span></div>
                 </div>
             </div>
@@ -104,8 +102,7 @@
                             <div><span class="Pcurrent">1</span><span class="Pcount">共1条</span></div>
                         </div>
                     </div>
-                </div>
-                
+                </div> 
             </div>
             <!-- reids end -->
 
@@ -113,11 +110,6 @@
             <div class="tab-con hide" id="memcached" style="height: auto;">
                 <div class="logAuditTabContent">
                     <div class="logAuditTab" style="width: 300px;overflow: hidden;overflow-y: auto;">
-                    <!--    
-                        <div class="logAuditItem active" title="wtmp - 登录和重启记录" data-file="/wtmp">
-                            wtmp - 登录和重启记录(4.88 KB)
-                        </div>
-                    -->
                     </div>
                     <div class="logAuditContent" style="overflow: hidden;overflow-y: auto;">
                         <div id="logAuditTable" class="bt_table" style="display: block;">

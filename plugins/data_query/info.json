@@ -7,7 +7,7 @@
 				"name":"data_query",
 				"path":"static/html/index.html",
 				"css_path":"static/css/data.css",
-				"js_path":"static/js/data_query.js"
+				"js_path":"static/js/app.js"
 			}
 		},
 		{
