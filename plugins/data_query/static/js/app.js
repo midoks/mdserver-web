@@ -152,7 +152,13 @@ function mongodbGetDbName(){
 
 var mogodb_db_list;
 function mongodbCollectionName(){
-    return mogodb_db_list.getValue('value')[0];
+    // console.log(mogodb_db_list);
+    var v = mogodb_db_list.getValue('value');
+    if (v.length == 0){
+        console.log($('#mongodb').data('collection'));
+        return $('#mongodb').data('collection');
+    }
+    return v[0];
 }
 
 function mongodbGetList(){
@@ -214,6 +220,7 @@ function mongodbGetCollections(name){
                     //isAdd, 此次操作是新增还是删除
                     var isAdd = data.isAdd;
                     if (isAdd){
+                        $('#mongodb').data('collection',change[0].value);
                         mongodbDataList(1);
                     }
                 },
@@ -243,7 +250,7 @@ function mongodbDataList(p){
     var sid = mongodbGetSid();
     var db = mongodbGetDbName();
     var collection = mongodbCollectionName();
-    console.log({'sid':sid,'db':db,'collection':collection,"p":p});
+    // console.log({'sid':sid,'db':db,'collection':collection,"p":p});
     mgdbPostCB('get_data_list',{'sid':sid,'db':db,'collection':collection,"p":p} ,function(rdata){
         if (rdata.data.status){
             var data = rdata.data.data;
@@ -257,7 +264,7 @@ function mongodbDataList(p){
             for (var i =0 ; i<fields.length ; i++) {
                 header_field += '<th>'+fields[i]+'</th>';
             }
-            header_field += '<th width="200" class="text-right">操作</th>';
+            header_field += '<th class="text-right">操作</th>';
 
             $('.mongodb_table thead tr').html(header_field);
 
@@ -278,8 +285,7 @@ function mongodbDataList(p){
                     }
                 }
 
-                tbody += '<td style="width:200px;text-align:right;">\
-                        <a href="javascript:;" data-index="'+i+'" class="btlink edit" title="编辑">编辑</a> | \
+                tbody += '<td style="text-align:right;">\
                         <a href="javascript:;" data-index="'+i+'" class="btlink" title="删除">删除</a>\
                         </td>';
 
@@ -287,8 +293,8 @@ function mongodbDataList(p){
             }
 
             // console.log($(window).width()-230);
-            $('#mongodb_table').css('width', $(window).width()+80).parent().css('width', $(window).width()-240).css('overflow','scroll');
-            $('#mongodb').css('width',$(window).width()-240).css('overflow','hidden');
+            $('#mongodb_table').css('width', $(document).width()+240).parent().css('width', $(document).width()-240).css('overflow','scroll');
+            $('#mongodb').css('width',$(document).width()-240).css('overflow','hidden');
             $('.mongodb_table tbody').html(tbody);
             $('.mongodb_list_page').html(data.page);
         }
@@ -360,15 +366,13 @@ function redisGetKeyList(page,search = ''){
                 tbody += '<td>'+data[i].type+'</td>';
                 tbody += '<td>'+data[i].len+'</td>';
 
-
                 if (data[i].endtime == -1){
                     tbody += '<td>永久</td>';
                 } else {
                     tbody += '<td>'+data[i].endtime+'</td>';
                 }
-                
 
-                tbody += '<td style="text-align:right; color:#bbb">\
+                tbody += '<td style="width:200px;text-align:right; color:#bbb">\
                         <a href="javascript:;" data-index="'+i+'" class="btlink edit" title="编辑">编辑</a> | \
                         <a href="javascript:;" class="btlink" onclick="redisDeleteKey(\''+data[i].name+'\')">删除</a>\
                         </td>';

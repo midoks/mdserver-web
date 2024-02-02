@@ -38,3 +38,11 @@
     height: 20px;
     line-height: 20px;
 }
+
+#mongodb td:last-child, th:last-child {
+    width: 44px;
+    position:sticky;
+    right:0; /* 首行永远固定在左侧 */
+    z-index:1;
+    background-color:white;
+}
