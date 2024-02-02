@@ -16,56 +16,60 @@
             </div>
 
             <!-- mongodb start -->
-            <div class="tab-con hide" id="mongodb" style="padding: 0px;">
-                <div id="operationLog" style="position: relative;">
-                    <div class="tootls_group tootls_top">
-                        <div class="pull-left">
-                            <button type="button" title="刷新" class="refresh btn btn-success btn-sm mr5">
-                                <span>刷新</span>
-                            </button>
-                        </div>
-
-                        <div class="pull-right" style="padding-top: 5px;">
-                            <div class="server_list" style="float:left;">
-                                <select name="sid" class="bt-input-text c5 mr5">
-                                    <option value="0">本地服务器</option>
-                                </select>
-                            </div>
-
-                            <div class="db_list" style="float:left;">
-                                <select name="db" class="bt-input-text c5 mr5">
-                                    <option value="0">空</option>
-                                </select>
-                            </div>
-
-                            <div class="search">
-                                <input id="mongodb_ksearch" type="text" class="search_input" placeholder="选择表名">
-                                <span id="mongodb_ksearch_span" class="glyphicon glyphicon-search" aria-hidden="true"></span>
-                            </div>
-                        </div>
+            <div class="tab-con show w-full" id="mongodb" style="padding: 0px;">
+                <div class="tootls_group tootls_top">
+                    <div class="pull-left">
+                        <button type="button" title="刷新" class="refresh btn btn-success btn-sm mr5">
+                            <span>刷新</span>
+                        </button>
                     </div>
-                    <div class="divtable mtb10">
+
+                    <div class="pull-right" style="padding-top: 5px;">
+                        <div class="server_list" style="float:left;">
+                            <select name="sid" class="bt-input-text c5 mr5">
+                                <option value="0">本地服务器</option>
+                            </select>
+                        </div>
+
+                        <div class="db_list" style="float:left;">
+                            <select name="db" class="bt-input-text c5 mr5">
+                                <option value="0">空</option>
+                            </select>
+                        </div>
+
+                        <div class="search" id="mongodb_search"></div>
+                        <button type="button" title="刷新" class="refresh btn btn-success btn-sm mr5 ml5" style="float:right;">
+                            <span>查找</span>
+                        </button>
+                    </div>
+                </div>
+
+                
+                <div style="position: relative;">
+                    
+                    <div id="mongodb_table" class="mongodb_table divtable mtb10">
                         <table class="table table-hover">
                             <thead style="position: relative;z-index: 1;">
                                 <tr>
                                     <th><span>编号</span></th>
                                     <th><span>操作类型</span></th>
                                     <th><span>详情</span></th>
-                                    <th><span>操作时间</span></th>
+                                    <th style="text-align:right;"><span>操作</span></th>
                                 </tr>
                             </thead>
                             <tbody></tbody>
                         </table>
                     </div>
                 </div>
-                <div class="dataTables_paginate paging_bootstrap page">
-                    <div><span class="Pcurrent">1</span><span class="Pcount">共1条</span></div>
+          
+                <div class="mongodb_list_page page">
+                    <div><span class="Pcurrent">0</span><span class="Pcount">共0条</span></div>
                 </div>
             </div>
             <!-- mongodb end -->
 
             <!-- reids start -->
-            <div class="tab-con show w-full" id="redis" style="padding: 0px;">
+            <div class="tab-con hide" id="redis" style="padding: 0px;">
                 <div id="redis_ctr" style="position: relative;">
                     <div class="tootls_group tootls_top">
                         <div class="pull-left">

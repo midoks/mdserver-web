@@ -146,33 +146,155 @@ function mongodbGetSid(){
     return 0;
 }
 
+function mongodbGetDbName(){
+    return $('.db_list select[name="db"]').val();
+}
+
+var mogodb_db_list;
+function mongodbCollectionName(){
+    return mogodb_db_list.getValue('value')[0];
+}
 
 function mongodbGetList(){
     var sid = mongodbGetSid();
     mgdbPostCB('get_db_list',{'sid':sid} ,function(rdata){
         if (rdata.data.status){
-            var list = rdata.data.data;
+            var list = rdata.data.data['list'];
             var content = '';
             for (var i = 0; i < list.length; i++) {
+                var name = list[i];
                 if (i == 0){
-                    content += '<span data-id="'+i+'" class="on">'+list[i]['name'] + '('+ list[i]['keynum'] +')</span>'; 
+                    content += '<option value="'+name+'" selected>'+name+'</option>';
                 } else {
-                    content += '<span data-id="'+i+'">'+list[i]['name'] + '('+ list[i]['keynum'] +')</span>'; 
+                    content += '<option value="'+name+'">'+name+'</option>';
                 }
             }
-            $('#redis_list_tab .tab-nav').html(content);
+            $('.db_list select').html(content);
 
-            $('#redis_list_tab .tab-nav span').click(function(){
-                $('#redis_list_tab .tab-nav span').removeClass('on');
-                $(this).addClass('on');
-                redisGetKeyList(1);
-            });
-            // redisGetKeyList(1);
+            if (list.length > 0) {
+                mongodbGetCollections(list[0]);
+            }
         } else {
             showInstallLayer();
         }
     });
 }
+
+
+function mongodbGetCollections(name){
+    var sid = mongodbGetSid();
+    
+    mgdbPostCB('get_collections_list',{'sid':sid,'name':name} ,function(rdata){
+        if (rdata.data.status){
+            var list = rdata.data.data['collections'];
+
+            var select_list = [];
+            for (var i = 0; i < list.length; i++) {
+                var t = {};
+                t['name'] = list[i];
+                t['value'] = list[i];
+
+                if (i == 0){
+                    t['selected'] = true;
+                }
+
+                select_list.push(t);
+            }
+
+            mogodb_db_list = xmSelect.render({
+                el: '#mongodb_search', 
+                radio: true,
+                toolbar: {show: true},
+                data: select_list,
+                on: function(data){
+                    //arr:  当前多选已选中的数据
+                    var arr = data.arr;
+                    //change, 此次选择变化的数据,数组
+                    var change = data.change;
+                    //isAdd, 此次操作是新增还是删除
+                    var isAdd = data.isAdd;
+                    if (isAdd){
+                        mongodbDataList(1);
+                    }
+                },
+            });
+
+            if (select_list.length > 0){
+                mongodbDataList(1);
+            } 
+        }
+    });
+}
+
+function mongodbGetDataFields(data){
+    var fields = [];
+    for (var i = 0; i < data.length; i++) {    
+        var d = data[i];
+        for (var j in d) {
+            if (fields.indexOf(j) == -1 ){
+                fields.push(j);              
+            }
+        }
+    }
+    return fields;
+}
+
+function mongodbDataList(p){
+    var sid = mongodbGetSid();
+    var db = mongodbGetDbName();
+    var collection = mongodbCollectionName();
+    console.log({'sid':sid,'db':db,'collection':collection,"p":p});
+    mgdbPostCB('get_data_list',{'sid':sid,'db':db,'collection':collection,"p":p} ,function(rdata){
+        if (rdata.data.status){
+            var data = rdata.data.data;
+            var dlist = data['list'];
+            // console.log(dlist);
+
+            var fields = mongodbGetDataFields(dlist);
+            // console.log(fields);
+
+            var header_field = '';
+            for (var i =0 ; i<fields.length ; i++) {
+                header_field += '<th>'+fields[i]+'</th>';
+            }
+            header_field += '<th width="200" class="text-right">操作</th>';
+
+            $('.mongodb_table thead tr').html(header_field);
+
+            var tbody = '';
+            for (var i = 0; i < dlist.length; i++) {
+                tbody += '<tr>';
+                for (var j = 0; j < fields.length; j++) {
+                    var f = fields[j];
+
+                    if (f in dlist[i]) {
+                        if (f == '_id' ){
+                            tbody += '<td>'+dlist[i]['_id']['$oid']+'</td>';
+                        } else {
+                            tbody += '<td>'+dlist[i][f]+'</td>';
+                        }
+                    } else {
+                        tbody += '<td>undefined</td>';
+                    }
+                }
+
+                tbody += '<td style="width:200px;text-align:right;">\
+                        <a href="javascript:;" data-index="'+i+'" class="btlink edit" title="编辑">编辑</a> | \
+                        <a href="javascript:;" data-index="'+i+'" class="btlink" title="删除">删除</a>\
+                        </td>';
+
+                tbody += '</tr>';
+            }
+
+            // console.log($(window).width()-230);
+            $('#mongodb_table').css('width', $(window).width()+80).parent().css('width', $(window).width()-240).css('overflow','scroll');
+            $('#mongodb').css('width',$(window).width()-240).css('overflow','hidden');
+            $('.mongodb_table tbody').html(tbody);
+            $('.mongodb_list_page').html(data.page);
+        }
+    });
+}
+
 // ------------------------- mongodb end ---------------------------------
 
 // ------------------------- redis start ---------------------------------

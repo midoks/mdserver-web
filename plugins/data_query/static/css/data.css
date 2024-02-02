@@ -28,3 +28,13 @@
     border-radius: 2px;
     font-size: 13px;
 }
+
+#mongodb_search xm-select {
+    min-height: 30px;
+    line-height: 30px;
+}
+
+#mongodb_search xm-select .xm-label .xm-label-block{
+    height: 20px;
+    line-height: 20px;
+}

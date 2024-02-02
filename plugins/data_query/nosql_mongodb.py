@@ -99,15 +99,81 @@ class nosqlMongodbCtr():
         return instance
 
     def getDbList(self, args):
-
         sid = args['sid']
         mgdb_instance = self.getInstanceBySid(sid).mgdb_conn()
         if mgdb_instance is False:
             return mw.returnData(False,'无法链接')
 
         result = {}
-        result["dbs"] = mgdb_instance.list_database_names()
+        doc_list = mgdb_instance.list_database_names()
+        rlist = []
+        for x in doc_list:
+            if not x in ['admin', 'config', 'local']:
+                rlist.append(x)
+        result['list'] = rlist
         return mw.returnData(True,'ok', result)
+
+    def getCollectionsList(self, args):
+        sid = args['sid']
+        name = args['name']
+
+        mgdb_instance = self.getInstanceBySid(sid).mgdb_conn()
+        if mgdb_instance is False:
+            return mw.returnData(False,'无法链接')
+
+        result = {}
+        collections = mgdb_instance[name].list_collection_names()
+        result['collections'] = collections
+        return mw.returnData(True,'ok', result)
+
+    def getDataList(self, args):
+        from bson.json_util import dumps
+        import json
+        sid = args['sid']
+        db = args['db']
+        collection = args['collection']
+        p = 1
+        size = 10
+        if 'p' in args:
+            p = args['p']
+
+        if 'size' in args:
+            size = args['size']
+
+        mgdb_instance = self.getInstanceBySid(sid).mgdb_conn()
+        if mgdb_instance is False:
+            return mw.returnData(False,'无法链接')
+
+        db_instance = mgdb_instance[db]
+        collection_instance = db_instance[collection]
+
+        start_index = (p - 1) * size
+        end_index = p * size
+        where = {}
+
+
+        result = collection_instance.find(where).skip(start_index).limit(size).sort({'_id':-1})
+        count = collection_instance.count_documents(where)
+        d = []
+        for document in result:
+            d.append(document)
+
+        doc_str_json = dumps(d)
+        result = json.loads(doc_str_json)
+
+
+        page_args = {}
+        page_args['count'] = count
+        page_args['tojs'] = 'mongodbDataList'
+        page_args['p'] = p
+        page_args['row'] = size
+
+        rdata = {}
+        rdata['page'] = mw.getPage(page_args)
+        rdata['list'] = result
+        rdata['count'] = count
+
+        return mw.returnData(True,'ok', rdata)
 
 # ---------------------------------- run ----------------------------------
 # 获取 mongodb databases 列表
@@ -115,11 +181,14 @@ def get_db_list(args):
     t = nosqlMongodbCtr()
     return t.getDbList(args)
 
-# 获取 redis key 列表
-def get_dbkey_list(args):
+# 获取 mongodb collections 列表
+def get_collections_list(args):
     t = nosqlMongodbCtr()
-    return t.getDbKeyList(args)
+    return t.getCollectionsList(args)
 
+def get_data_list(args):
+    t = nosqlMongodbCtr()
+    return t.getDataList(args)
 
 def set_kv(args):
     t = nosqlMongodbCtr()
