@@ -580,13 +580,11 @@ function redisBatchDel(){
         data['sid'] = redisGetSid();
         data['keys'] = keys;
         redisPostCB('batch_del_val', data, function(rdata){
-            if (rdata.data.status){
             showMsg(rdata.data.msg,function(){
                 if (rdata.data.status){
                    redisGetList(); 
                 }
             },{icon: rdata.data.status ? 1 : 2}, 2000);
-        }
         });
     });
 }
