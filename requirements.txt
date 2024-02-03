@@ -26,6 +26,7 @@ zmq==0.0.0
 paramiko>=2.8.0
 pymongo
 redis
+python-memcached
 pillow
 Jinja2>=2.11.2
 PyMySQL==1.0.2
