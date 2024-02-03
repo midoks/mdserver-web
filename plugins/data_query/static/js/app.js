@@ -409,11 +409,11 @@ function redisDeleteKey(name){
         data['sid'] = redisGetSid();
         data['name'] = name;
         redisPostCB('del_val', data, function(rdata){
-            if (rdata.data.status){
             showMsg(rdata.data.msg,function(){
-                redisGetList();
+                if (rdata.data.status){
+                    redisGetList();
+                }
             },{icon: rdata.data.status ? 1 : 2}, 2000);
-        }
         });
     });
 }
@@ -552,14 +552,13 @@ function redisEditKv(name, val, endtime){
             data['name'] = $('input[name="key"]').val();
             data['val'] = $('textarea[name="val"]').val();
             data['endtime'] = $('input[name="endtime"]').val();
-
             redisPostCB('set_kv', data ,function(rdata){
-                if (rdata.data.status){
-                    showMsg(rdata.data.msg,function(){
+                showMsg(rdata.data.msg,function(){
+                    if (rdata.data.status){
                         layer.close(index);
                         redisGetList();
-                    },{icon: rdata.data.status ? 1 : 2}, 1000);
-                }
+                    }
+                },{icon: rdata.data.status ? 1 : 2}, 1000);
             });
         }
     });
