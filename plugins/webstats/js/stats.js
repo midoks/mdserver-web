@@ -2430,8 +2430,10 @@ $(".soft-man-con").html(html);
 laydate.render({
     elem: '#time_choose',
     value:'',
-    range:true,
+    range:'~',
+    type:'datetime',
     done:function(value, startDate, endDate){
+        console.log(value, startDate, endDate);
         if(!value){
             return false;
         }
@@ -2440,10 +2442,10 @@ laydate.render({
             $(this).removeClass('cur');
         });
 
-        var timeA  = value.split('-')
-        var start = $.trim(timeA[0]+'-'+timeA[1]+'-'+timeA[2])
-        var end = $.trim(timeA[3]+'-'+timeA[4]+'-'+timeA[5])
-        query_txt = toUnixTime(start + " 00:00:00") + "-"+ toUnixTime(end + " 00:00:00")
+        var timeArr  = value.split('~');
+        var start = $.trim(timeArr[0]);
+        var end = $.trim(timeArr[1]);
+        query_txt = toUnixTime(start) + "-"+ toUnixTime(end);
 
         $('#time_choose').attr("data-name",query_txt);
         $('#time_choose').addClass("cur");
