@@ -479,12 +479,10 @@ function redisAdd(){
             data['endtime'] = $('input[name="endtime"]').val();
 
             redisPostCB('set_kv', data ,function(rdata){
-                if (rdata.data.status){
-                    showMsg(rdata.data.msg,function(){
-                        layer.close(index);
-                        redisGetList();
-                    },{icon: rdata.data.status ? 1 : 2}, 1000);
-                }
+                showMsg(rdata.data.msg,function(){
+                    layer.close(index);
+                    redisGetList();
+                },{icon: rdata.data.status ? 1 : 2}, 1000); 
             });
         }
     });
