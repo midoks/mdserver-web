@@ -180,6 +180,8 @@ function mongodbGetList(){
             if (list.length > 0) {
                 mongodbGetCollections(list[0]);
             }
+
+            closeInstallLayer();
         } else {
             showInstallLayer();
         }
@@ -333,6 +335,7 @@ function redisGetList(){
                 redisGetKeyList(1);
             });
             redisGetKeyList(1);
+            closeInstallLayer();
         } else {
             showInstallLayer();
         }
