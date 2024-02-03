@@ -2,8 +2,8 @@
     <div class="container-fluid" style="padding-bottom: 50px;">
         <div id="cutTab" class="pos-box bgw mtb15" style="height:45px">
             <div class="tab-list">
-                <div class="tabs-item" data-name="redis">Redis</div>
-                <div class="tabs-item active" data-name="mongodb">Mongodb</div>
+                <div class="tabs-item active" data-name="redis">Redis</div>
+                <div class="tabs-item" data-name="mongodb">Mongodb</div>
                 <!-- <div class="tabs-item" data-name="memcached">Memcached</div> -->
             </div>
         </div>
@@ -17,7 +17,7 @@
 
             <!-- mongodb start -->
             <!-- show w-full -->
-            <div class="tab-con show w-full" id="mongodb" style="padding: 0px;">
+            <div class="tab-con hide" id="mongodb" style="padding: 0px;">
                 <div class="tootls_group tootls_top">
                     <div class="pull-left">
                         <button type="button" title="刷新" class="refresh btn btn-success btn-sm mr5">
@@ -70,7 +70,7 @@
             <!-- mongodb end -->
 
             <!-- reids start -->
-            <div class="tab-con hide" id="redis" style="padding: 0px;">
+            <div class="tab-con show w-full" id="redis" style="padding: 0px;">
                 <div id="redis_ctr" style="position: relative;">
                     <div class="tootls_group tootls_top">
                         <div class="pull-left">
