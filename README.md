@@ -102,8 +102,8 @@ PHP[72-82]支持phpMyAdmin[5.2.0]
 
 # Docker
 
-- 由[DDSRem](https://github.com/DDSRem)开发维护。
-- https://hub.docker.com/r/ddsderek/mw
+- 由[DDS-Derek](https://github.com/DDS-Derek)开发维护。
+- https://github.com/DDS-Derek/mdserver-web-Docker
 
 ```
 docker run -itd --name mw-server --privileged=true -p 7200:7200 -p 80:80 -p 443:443 -p 888:888 ddsderek/mw-server:latest
@@ -120,6 +120,7 @@ docker run -itd --name mw-server --privileged=true -p 7200:7200 -p 80:80 -p 443:
 * phpRedisAdmin。
 * rockmongo。
 * 网站类型优化。
+* 增加数据管理插件。
 
 ### JSDelivr安装地址
 
