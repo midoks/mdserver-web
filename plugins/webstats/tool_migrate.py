@@ -136,9 +136,8 @@ def migrateSiteHotLogs(site_name, query_date):
         save_day = gcfg['global']["save_day"]
         print("delete historical data {} days ago...".format(save_day))
         time_now = time.localtime()
-        save_timestamp = time.mktime(
-            (time_now.tm_year, time_now.tm_mon, time_now.tm_mday - save_day, 0, 0, 0, 0, 0, 0))
-        delete_sql = "delete from site_logs where time <= {}".format(
+        save_timestamp = time.mktime((time_now.tm_year, time_now.tm_mon, time_now.tm_mday - save_day, 0, 0, 0, 0, 0, 0))
+        delete_sql = "delete from web_logs where time <= {}".format(
             save_timestamp)
         history_logs_conn.execute(delete_sql)
         history_logs_conn.commit()
