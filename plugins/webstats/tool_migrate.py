@@ -139,6 +139,7 @@ def migrateSiteHotLogs(site_name, query_date):
         save_timestamp = time.mktime((time_now.tm_year, time_now.tm_mon, time_now.tm_mday - save_day, 0, 0, 0, 0, 0, 0))
         delete_sql = "delete from web_logs where time <= {}".format(
             save_timestamp)
+        print('delete history_logs')
         print(delete_sql)
         history_logs_conn.execute(delete_sql)
         history_logs_conn.commit()
