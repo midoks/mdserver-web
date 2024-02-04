@@ -2955,11 +2955,14 @@ def doFullSyncUser(version=''):
     if mode == 'gtid':
         dmp_option = ' --set-gtid-purged=off '
 
+    time.sleep(1)
     writeDbSyncStatus({'code': 1, 'msg': '正在停止从库...', 'progress': 15})
     if version == '8.0':
         db.query("stop slave user='{}' password='{}';".format(user, apass))
     else:
         db.query("stop slave")
+        
+    time.sleep(2)
 
     writeDbSyncStatus({'code': 2, 'msg': '远程导出数据...', 'progress': 20})
 
