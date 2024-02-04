@@ -2955,7 +2955,13 @@ def doFullSyncUser(version=''):
     if mode == 'gtid':
         dmp_option = ' --set-gtid-purged=off '
 
-    writeDbSyncStatus({'code': 1, 'msg': '远程导出数据...', 'progress': 20})
+    writeDbSyncStatus({'code': 1, 'msg': '正在停止从库...', 'progress': 15})
+    if version == '8.0':
+        db.query("stop slave user='{}' password='{}';".format(user, apass))
+    else:
+        db.query("stop slave")
+
+    writeDbSyncStatus({'code': 2, 'msg': '远程导出数据...', 'progress': 20})
 
     if not os.path.exists(bak_file):
         dump_sql_data = getServerDir() + "/bin/mysqldump " + dmp_option + "  --force --opt --default-character-set=utf8 --single-transaction -h" + ip + " -P" + \
@@ -2964,11 +2970,6 @@ def doFullSyncUser(version=''):
         print(dump_sql_data)
         mw.execShell(dump_sql_data)
 
-    writeDbSyncStatus({'code': 2, 'msg': '正在停止从库...', 'progress': 30})
-    if version == '8.0':
-        db.query("stop slave user='{}' password='{}';".format(user, apass))
-    else:
-        db.query("stop slave")
     
     writeDbSyncStatus({'code': 3, 'msg': '正在到本地导入数据中...', 'progress': 40})
     if os.path.exists(bak_file):
