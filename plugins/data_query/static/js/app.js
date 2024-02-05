@@ -495,7 +495,7 @@ function mongodbDataList(p){
                 }
 
                 tbody += '<td style="text-align:right;">\
-                        <a href="javascript:;" data-index="'+i+'" class="btlink" title="删除">删除</a>\
+                        <a href="javascript:;" data-index="'+i+'" class="btlink del" title="删除">删除</a>\
                         </td>';
 
                 tbody += '</tr>';
@@ -506,7 +506,26 @@ function mongodbDataList(p){
             $('#mongodb').css('width',$(document).width()-240).css('overflow','hidden');
             $('.mongodb_table tbody').html(tbody);
             $('.mongodb_list_page').html(data.page);
+
+            $('.del').click(function(){
+                var i = $(this).data('index');
+                mongodbDel(dlist[i]['_id']['$oid']);
+            });
         }
+    });
+}
+
+function mongodbDel(mgdb_id){
+    console.log(mgdb_id);
+    var sid = mongodbGetSid();
+    var db = mongodbGetDbName();
+    var collection = mongodbCollectionName();
+    mgdbPostCB('del_by_id',{'sid':sid,'db':db,'collection':collection,"_id":mgdb_id} ,function(rdata){
+        showMsg(rdata.data.msg,function(){
+            if (rdata.data.status){
+                mongodbDataList(1);
+            }
+        },{icon: rdata.data.status ? 1 : 2}, 2000);
     });
 }
 

@@ -7,6 +7,8 @@ import time
 import re
 import pymongo
 
+from bson.objectid import ObjectId
+
 sys.path.append(os.getcwd() + "/class/core")
 import mw
 
@@ -174,6 +176,23 @@ class nosqlMongodbCtr():
 
         return mw.returnData(True,'ok', rdata)
 
+    def delById(self,args):
+        sid = args['sid']
+        db = args['db']
+        collection = args['collection']
+
+        mgdb_instance = self.getInstanceBySid(sid).mgdb_conn()
+        if mgdb_instance is False:
+            return mw.returnData(False,'无法链接')
+
+        db_instance = mgdb_instance[db]
+        collection_instance = db_instance[collection]
+
+        _id = args['_id']
+        result = collection_instance.delete_one({"_id": ObjectId(_id)})
+
+        return mw.returnData(True,'文档删除【%d】个成功!' % result.deleted_count)
+
 # ---------------------------------- run ----------------------------------
 # 获取 mongodb databases 列表
 def get_db_list(args):
@@ -205,6 +224,10 @@ def batch_del_val(args):
 def clear_flushdb(args):
     t = nosqlMongodbCtr()
     return t.clearFlushDB(args)
+
+def del_by_id(args):
+    t = nosqlMongodbCtr()
+    return t.delById(args)
 
 # 测试
 def test(args):
