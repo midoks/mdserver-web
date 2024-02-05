@@ -173,6 +173,22 @@ function initTabMongodb(){
 
 function initTabMemcached(){
     memcachedGetList();
+
+    $('#memcached_add_key').unbind('click').click(function(){
+        memcachedAdd();
+    });
+
+    $('#memcached_clear_all').unbind('click').click(function(){
+        var sid = memcachedGetSid();
+        memPostCB('clear',{'sid':sid} ,function(rdata){
+            console.log(rdata);
+            showMsg(rdata.data.msg,function(){
+                if (rdata.data.status){
+                    memcachedGetList();
+                }
+            },{icon: rdata.data.status ? 1 : 2}, 2000);
+        });
+    });
 }
 
 // ------------------------- memcached start -------------------------------
@@ -203,12 +219,11 @@ function memcachedGetList(){
             $('#memcached .item_list select').change(function(){
                 memcachedGetKeyList(1);
             });
-
-            memcachedGetKeyList(1);
             closeInstallLayer();
         } else {
             showInstallLayer();
         }
+        memcachedGetKeyList(1);
     });
 }
 
@@ -256,6 +271,8 @@ function memcachedGetKeyList(p){
                 var i = $(this).data('index');
                 copyText(dlist[i]['v']);
             });
+        } else {
+            $('.memcached_table_content tbody').html('');
         }
     });
 }
@@ -272,6 +289,60 @@ function memcachedDeleteKey(key){
                 }
             },{icon: rdata.data.status ? 1 : 2}, 2000);
         });
+    });
+}
+
+
+function memcachedAdd(){
+    layer.open({
+        type: 1,
+        area: '480px',
+        title: '添加Key至服务器',
+        closeBtn: 1,
+        shift: 0,
+        shadeClose: false,
+        btn:['确定','取消'],
+        content: "<form class='bt-form pd20'>\
+            <div class='line'>\
+                <span class='tname'>键</span>\
+                <div class='info-r c4'>\
+                    <input class='bt-input-text' type='text' name='key' placeholder='键' style='width:260px;'/>\
+                </div>\
+            </div>\
+            <div class='line'>\
+                <span class='tname'>值</span>\
+                <div class='info-r c4'>\
+                    <textarea class='bt-input-text' name='val' style='width:260px;height:100px;'/></textarea>\
+                </div>\
+            </div>\
+            <div class='line'>\
+                <span class='tname'>有效期</span>\
+                <div class='info-r c4'>\
+                    <input class='bt-input-text mr5' type='number' name='endtime' value='60' style='width:260px;'/>\
+                </div>\
+            </div>\
+            <div class='line'>\
+                <div>\
+                    <ul class='help-info-text c7' style='margin-left:30px;'><li>有效期为0表示永久</li>\
+                </div>\
+            </div>\
+        </form>",
+        success:function(){
+        },
+        yes: function(index){
+            var data = {};
+            data['sid'] = memcachedGetSid();
+            data['key'] = $('input[name="key"]').val();
+            data['val'] = $('textarea[name="val"]').val();
+            data['endtime'] = $('input[name="endtime"]').val();
+
+            memPostCB('set_kv', data ,function(rdata){
+                showMsg(rdata.data.msg,function(){
+                    layer.close(index);
+                    memcachedGetList();
+                },{icon: rdata.data.status ? 1 : 2}, 1000); 
+            });
+        }
     });
 }
 

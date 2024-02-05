@@ -108,6 +108,10 @@ class nosqlMemcachedCtr():
                 v_str = v.decode()
                 if not v_str in item_no:
                     item_no.append(v_str)
+
+        if len(item_no) == 0:
+            item_no = [0]
+
         result['items'] = item_no
         return mw.returnData(True,'ok', result)
 
@@ -127,6 +131,9 @@ class nosqlMemcachedCtr():
             size = args['size']
 
         item_id = args['item_id']
+        if item_id == '0':
+            return mw.returnData(False,'ok')
+
         m_items = mem_instance.stats('items')
 
         item_key = 'items:%s:number' % item_id
@@ -143,13 +150,19 @@ class nosqlMemcachedCtr():
         all_key = mem_instance.stats('cachedump', str(item_id) , str(0))
         # print(all_key)
         all_key_list = []
+        cur_time_t = time.time()
         for k in all_key:
             t = {}
             t['k'] = k.decode("utf-8")
             v = all_key[k].decode("utf-8")
             v = v.strip('[').strip(']').split(';')
             t['s'] = v[0]
-            t['t'] = v[1].strip().split(' ')[0]
+            cur_time = v[1].strip().split(' ')[0]
+
+            if int(cur_time) != 0 :
+                t['t'] =  int(cur_time) - int(cur_time_t)
+            else:
+                t['t'] = 0
             all_key_list.append(t)
 
         # print(len(all_key_list))
@@ -184,6 +197,27 @@ class nosqlMemcachedCtr():
         mem_instance.delete(key)
         return mw.returnData(True,'删除成功!')
 
+    def setKv(self, args):
+
+        sid = args['sid']
+        mem_instance = self.getInstanceBySid(sid).conn()
+        if mem_instance is False:
+            return mw.returnData(False,'无法链接')
+
+        key = args['key']
+        val = args['val']
+        endtime = args['endtime']
+        mem_instance.set(key, val, int(endtime))
+        return mw.returnData(True,'设置成功!')
+
+    def clear(self, args):
+        sid = args['sid']
+        mem_instance = self.getInstanceBySid(sid).conn()
+        if mem_instance is False:
+            return mw.returnData(False,'无法链接')
+
+        mem_instance.flush_all()
+        return mw.returnData(True,'清空成功!')
 
 # ---------------------------------- run ----------------------------------
 # 获取 memcached 列表
@@ -198,6 +232,14 @@ def get_key_list(args):
 def del_val(args):
     t = nosqlMemcachedCtr()
     return t.delVal(args)
+
+def set_kv(args):
+    t = nosqlMemcachedCtr()
+    return t.setKv(args)
+
+def clear(args):
+    t = nosqlMemcachedCtr()
+    return t.clear(args)
 
 # 测试
 def test(args):
