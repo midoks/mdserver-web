@@ -357,6 +357,15 @@ function mongodbGetDbName(){
     return $('.db_list select[name="db"]').val();
 }
 
+function mongodbInitField(f){
+    var option_html = '<option value="0">无字段</option>';
+    for (var i = 0; i < f.length; i++) {
+        option_html+= '<option value="'+f[i]+'">'+f[i]+'</option>';
+    }
+    
+    $('select[name="mongodb_field_key"]').html(option_html);
+}
+
 var mogodb_db_list;
 function mongodbCollectionName(){
     // console.log(mogodb_db_list);
@@ -467,6 +476,7 @@ function mongodbDataList(p){
             // console.log(dlist);
 
             var fields = mongodbGetDataFields(dlist);
+            mongodbInitField(fields);
             // console.log(fields);
 
             var header_field = '';

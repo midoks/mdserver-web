@@ -20,8 +20,20 @@
             <div class="tab-con hide" id="mongodb" style="padding: 0px;">
                 <div class="tootls_group tootls_top">
                     <div class="pull-left">
-                        <button type="button" title="刷新" class="refresh btn btn-success btn-sm mr5">
-                            <span>刷新</span>
+                      
+                        <div class="field" style="float:left;">
+                            <select name="mongodb_field_key" class="bt-input-text c5 mr5" style="width:80px;">
+                                <option value="0">无字段</option>
+                            </select>
+                        </div>
+
+                        <div class="value" style="float:left;">
+                            <input name="mongodb_field_value" type="text" class="bt-input-text" placeholder="请输入查找内容">
+                        </div>
+
+
+                        <button type="button" class="find btn btn-success btn-sm mr5 ml5" style="float:right;">
+                            <span>查找</span>
                         </button>
                     </div>
 
@@ -39,11 +51,6 @@
                         </div>
 
                         <div class="search" id="mongodb_search"></div>
-                        <!-- 
-                        <button type="button" title="刷新" class="refresh btn btn-success btn-sm mr5 ml5" style="float:right;">
-                            <span>查找</span>
-                        </button>
-                        -->
                     </div>
                 </div>
 
@@ -126,7 +133,7 @@
                     </div>
                     <div class="pull-right">
                         <div class="page memcached_list_page">
-                            <div><span class="Pcurrent">1</span><span class="Pcount">共1条</span></div>
+                            <div><span class="Pcurrent">0</span><span class="Pcount">共0条</span></div>
                         </div>
                     </div>
                 </div> 
