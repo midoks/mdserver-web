@@ -4,7 +4,7 @@
             <div class="tab-list">
                 <div class="tabs-item active" data-name="redis">Redis</div>
                 <div class="tabs-item" data-name="mongodb">Mongodb</div>
-                <!-- <div class="tabs-item" data-name="memcached">Memcached</div> -->
+                <div class="tabs-item" data-name="memcached">Memcached</div>
             </div>
         </div>
 
@@ -104,7 +104,7 @@
                         <table class="table table-hover">
                             <thead style="position: relative;z-index: 1;">
                                 <tr>
-                                    <th width="30"><input type="checkbox" onclick="checkSelect();" id="setBox"></th>
+                                    <th width="30"><input type="checkbox" onclick="checkSelect();"></th>
                                     <th><span>键</span></th>
                                     <th><span>值</span></th>
                                     <th><span>数据类型</span></th>
@@ -123,7 +123,7 @@
                         <button id="redis_batch_del" type="button" class="btn btn-sm set_batch_option bt-disabled btn-default">批量删除</button>
                     </div>
                     <div class="pull-right">
-                        <div class="page redis_list_page">
+                        <div class="page memcached_list_page">
                             <div><span class="Pcurrent">1</span><span class="Pcount">共1条</span></div>
                         </div>
                     </div>
@@ -132,51 +132,61 @@
             <!-- reids end -->
 
             <!-- memcached start -->
-            <div class="tab-con hide" id="memcached" style="height: auto;">
-                <div class="logAuditTabContent">
-                    <div class="logAuditTab" style="width: 300px;overflow: hidden;overflow-y: auto;">
-                    </div>
-                    <div class="logAuditContent" style="overflow: hidden;overflow-y: auto;">
-                        <div id="logAuditTable" class="bt_table" style="display: block;">
-                            <div class="tootls_group tootls_top">
-                                <div class="pull-left">
-                                    <button type="button" title="刷新列表" class="btn btn-success btn-sm mr5"><span>刷新列表</span></button>
-                                </div>
-                                <div class="pull-right">
-                                    <div class="logs_search" style="position: relative;">
-                                        <input type="text" class="search_input" style="" placeholder="请输入来源/端口/角色/事件">
-                                        <span class="glyphicon glyphicon-search" aria-hidden="true"></span>
-                                    </div>
-                                </div>
+            <div class="tab-con hide" id="memcached" style="padding: 0px;">
+                
+                <div id="memcached_ctr" style="position: relative;">
+                    <div class="tootls_group tootls_top">
+                        <div class="pull-left">
+                            <button id="memcached_add_key" type="button" class="refresh btn btn-success btn-sm mr5">
+                                <span>添加key</span>
+                            </button>
+                            <button id="memcached_clear_all" type="button" class="clear btn btn-default btn-sm mr5" style="border-right: 1px solid #ccc;padding-right: 20px;">
+                                <span>清空</span>
+                            </button>
+                        </div>
+
+                        
+
+                        <div class="pull-right" style="padding-top: 5px;">
+                            <div class="item_list" style="float:left;">
+                                <select name="item" class="bt-input-text c5 mr5">
+                                    <option value="0">空</option>
+                                </select>
                             </div>
-                            <div class="divtable mtb10" style="max-height: 83px;">
-                                <table class="table table-hover">
-                                    <thead style="position: relative;z-index: 1;">
-                                        <tr>
-                                            <th><span data-index="0"><span>用户</span></span></th>
-                                            <th><span data-index="1"><span>来源</span></span></th>
-                                            <th><span data-index="2"><span>端口</span></span></th>
-                                            <th><span data-index="3"><span>时间</span></span></th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        <!-- <tr><td><span>root</span></td>
-                                            <td><span>117.139.193.29</span></td>
-                                            <td><span>pts/0</span></td>
-                                            <td><span>2023-08-25 13:27 still logged in</span></td>
-                                        </tr> -->
-                                    </tbody>
-                                </table>
-                            </div>
-                            <div class="tootls_group tootls_bottom">
-                                <div class="pull-left"></div>
-                                <div class="pull-right">
-                                    <div class="page"><span class="Pcount">第 1 页</span></div>
-                                </div>
+
+                            <div class="search">
+                                <input id="memcached_ksearch" type="text" class="search_input" placeholder="请输入键名称">
+                                <span id="memcached_ksearch_span" class="glyphicon glyphicon-search" aria-hidden="true"></span>
                             </div>
                         </div>
-                        <div id="logAuditPages" class="page" style="display: flex; justify-content: flex-end;"></div>
-                        <div id="logAuditPre" style="display: none;"><pre style="height: 188px; background-color: rgb(51, 51, 51); color: rgb(255, 255, 255); overflow-x: hidden; overflow-wrap: break-word; white-space: pre-wrap;"><code></code></pre></div>
+
+                    </div>
+
+                    <div class="divtable mtb10 memcached_table_content">
+                        <table class="table table-hover">
+                            <thead style="position: relative;z-index: 1;">
+                                <tr>
+                                    <th width="30"><input type="checkbox" onclick="checkSelect();"></th>
+                                    <th><span>键</span></th>
+                                    <th><span>值</span></th>
+                                    <th><span>数据长度</span></th>
+                                    <th><span>有效期</span></th>
+                                    <th style="text-align:right;"><span>操作</span></th>
+                                </tr>
+                            </thead>
+                            <tbody></tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <div class="tootls_group tootls_bottom">
+                    <div class="pull-left">
+                        <button id="redis_batch_del" type="button" class="btn btn-sm set_batch_option bt-disabled btn-default">批量删除</button>
+                    </div>
+                    <div class="pull-right">
+                        <div class="page memcached_list_page">
+                            <div><span class="Pcurrent">0</span><span class="Pcount">共0条</span></div>
+                        </div>
                     </div>
                 </div>
             </div>

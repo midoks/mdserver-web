@@ -61,6 +61,34 @@ function mgdbPostCB(method, args, callback){
     },'json'); 
 }
 
+function memPostCB(method, args, callback){
+    var loadT = layer.msg('正在获取...', { icon: 16, time: 0, shade: 0.3 });
+
+    var req_data = {};
+    req_data['name'] = 'data_query';
+    req_data['func'] = method;
+    req_data['script']='nosql_memcached';
+    args['version'] = '';
+ 
+    if (typeof(args) == 'string' && args == ''){
+        req_data['args'] = JSON.stringify(toArrayObject(args));
+    } else {
+        req_data['args'] = JSON.stringify(args);
+    }
+
+    $.post('/plugins/callback', req_data, function(data) {
+        layer.close(loadT);
+        if (!data.status){
+            layer.msg(data.msg,{icon:0,time:2000,shade: [0.3, '#000']});
+            return;
+        }
+
+        if(typeof(callback) == 'function'){
+            callback(data);
+        }
+    },'json'); 
+}
+
 
 function selectTab(tab = 'redis'){
     $('.tab-view-box .tab-con').addClass('hide').removeClass('show').removeClass('w-full');
@@ -79,6 +107,8 @@ function initTabFunc(tab){
     switch(tab){
         case 'redis':initTabRedis();break;
         case 'mongodb':initTabMongodb();break;
+        case 'memcached':initTabMemcached();break;
+        case 'default:':initTabRedis();break;
     }
 }
 
@@ -141,6 +171,112 @@ function initTabMongodb(){
     mongodbGetList();
 }
 
+function initTabMemcached(){
+    memcachedGetList();
+}
+
+// ------------------------- memcached start -------------------------------
+function memcachedGetSid(){
+    return 0;
+}
+
+function memcachedGetItem(){
+    return $('#memcached .item_list select').val();
+}
+
+function memcachedGetList(){
+    var sid = memcachedGetSid();
+    memPostCB('get_items',{'sid':sid} ,function(rdata){
+        if (rdata.data.status){
+
+            var items = rdata.data.data['items'];
+            var content = '';
+            for (var i = 0; i < items.length; i++) {
+                var name = items[i];
+                if (i == 0){
+                    content += '<option value="'+name+'" selected>items['+name+']</option>';
+                } else {
+                    content += '<option value="'+name+'">items['+name+']</option>';
+                }
+            }
+            $('#memcached .item_list select').html(content);
+            $('#memcached .item_list select').change(function(){
+                memcachedGetKeyList(1);
+            });
+
+            memcachedGetKeyList(1);
+            closeInstallLayer();
+        } else {
+            showInstallLayer();
+        }
+    });
+}
+
+function memcachedGetKeyList(p){
+    var item_id = memcachedGetItem();
+    var sid = memcachedGetSid();
+    memPostCB('get_key_list',{'sid':sid,'item_id':item_id,'p':p} ,function(rdata){
+        if (rdata.data.status){
+            var data = rdata.data.data;
+            var dlist = data['list'];
+
+            var tbody = '';
+            for (var i = 0; i < dlist.length; i++) {
+                tbody += '<tr>';
+
+                tbody += "<td><input type='checkbox' class='check' name='id' onclick='checkSelect();'></td>";
+
+                tbody += '<td>'+ dlist[i]['k'] +'</td>';
+                tbody += '<td><span style="width:100px;" class="size_ellipsis">'+dlist[i]['v']+'</span><span data-index="'+i+'" class="ico-copy cursor copy ml5" title="复制值"></span></td>';
+                tbody += '<td>'+ dlist[i]['s'] +'</td>';
+
+                if (dlist[i]['t'] == '0'){
+                    tbody += '<td>永久</td>';
+                } else {
+                    tbody += '<td>'+ dlist[i]['t'] +'</td>';
+                }
+
+                tbody += '<td style="text-align:right;">\
+                        <a href="javascript:;" data-index="'+i+'" class="btlink del" title="删除">删除</a>\
+                        </td>';
+
+                tbody += '</tr>';
+            }
+
+            $('.memcached_table_content tbody').html(tbody);
+            $('.memcached_list_page').html(data.page);
+
+
+            $('.del').click(function(){
+                var i = $(this).data('index');
+                memcachedDeleteKey(dlist[i]['k']);
+            });
+
+            $('.copy').click(function(){
+                var i = $(this).data('index');
+                copyText(dlist[i]['v']);
+            });
+        }
+    });
+}
+
+function memcachedDeleteKey(key){
+    layer.confirm('确定要删除?', {btn: ['确定', '取消']}, function(){
+        var data = {};
+        data['sid'] = memcachedGetSid();
+        data['key'] = key;
+        memPostCB('del_val', data, function(rdata){
+            showMsg(rdata.data.msg,function(){
+                if (rdata.data.status){
+                    memcachedGetKeyList(1);
+                }
+            },{icon: rdata.data.status ? 1 : 2}, 2000);
+        });
+    });
+}
+
+// ------------------------- memcached end ---------------------------------
+
 // ------------------------- mongodb start ---------------------------------
 function mongodbGetSid(){
     return 0;
@@ -155,7 +291,7 @@ function mongodbCollectionName(){
     // console.log(mogodb_db_list);
     var v = mogodb_db_list.getValue('value');
     if (v.length == 0){
-        console.log($('#mongodb').data('collection'));
+        // console.log($('#mongodb').data('collection'));
         return $('#mongodb').data('collection');
     }
     return v[0];
