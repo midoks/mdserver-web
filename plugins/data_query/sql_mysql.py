@@ -233,6 +233,32 @@ class nosqlMySQLCtr():
         rdata['list'] = result
         return mw.returnData(True,'ok', rdata)
 
+    def showStatusList(self,args):
+        sql = 'show status';
+        sid = args['sid']
+
+        my_instance = self.getInstanceBySid(sid).conn()
+        if my_instance is False:
+            return mw.returnData(False,'无法链接')
+
+        result = my_instance.query(sql)
+        rdata = {}
+        rdata['list'] = result
+        return mw.returnData(True,'ok', rdata)
+
+    def showStatsList(self, args):
+        sql = "show status like 'Com_%'";
+        sid = args['sid']
+
+        my_instance = self.getInstanceBySid(sid).conn()
+        if my_instance is False:
+            return mw.returnData(False,'无法链接')
+
+        result = my_instance.query(sql)
+        rdata = {}
+        rdata['list'] = result
+        return mw.returnData(True,'ok', rdata)
+
 # ---------------------------------- run ----------------------------------
 # 获取 mysql 列表
 def get_db_list(args):
@@ -251,6 +277,15 @@ def get_data_list(args):
 def get_proccess_list(args):
     t = nosqlMySQLCtr()
     return t.showProcessList(args)
+
+def get_status_list(args):
+    t = nosqlMySQLCtr()
+    return t.showStatusList(args)
+
+def get_stats_list(args):
+    t = nosqlMySQLCtr()
+    return t.showStatsList(args)
+
 
 # 测试
 def test(args):

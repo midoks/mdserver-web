@@ -252,9 +252,30 @@ function initTabMySQL(){
     mysqlGetDbList();
 
     mysqlProcessList();
-    setInterval(function(){
-        mysqlProcessList();
+    var mysql_timer = setInterval(function(){
+        var name = $('#mysql_list_tab .tab-nav span.on').data('name');
+        mysqlRunMysqlTab(name);
+
+        var fname = $('#cutTab .tab-list .active').data('name');
+        if (fname != 'mysql'){
+            clearInterval(mysql_timer);
+        }
     },2000);
+
+    $('#mysql_list_tab .tab-nav span').click(function(){
+        $('#mysql_list_tab .tab-nav span').removeClass('on');
+        $(this).addClass('on');
+        var name = $(this).data('name');
+        mysqlRunMysqlTab(name);
+    });
+}
+
+function mysqlRunMysqlTab(name){
+    switch(name){
+        case 'proccess':mysqlProcessList();break;
+        case 'status':mysqlStatusList();break;
+        case 'stats':mysqlStatsList();break;
+    }
 }
 
 // ------------------------- mysql start -------------------------------
@@ -421,6 +442,42 @@ function mysqlProcessList(){
     var request_data = {};
     request_data['sid'] = sid;
     myPostCBN('get_proccess_list',request_data ,function(rdata){
+        if (rdata.data.status){
+            var data = rdata.data.data;
+            var dlist = data['list'];
+
+            var fields = mongodbGetDataFields(dlist);
+        
+            var header_field = '';
+            for (var i =0 ; i<fields.length ; i++) {
+                header_field += '<th>'+fields[i]+'</th>';
+            }
+            $('#mysql_ot_table thead tr').html(header_field);
+
+            var tbody = '';
+            for (var i = 0; i < dlist.length; i++) {
+                tbody += '<tr>';
+                for (var j = 0; j < fields.length; j++) {
+                    var f = fields[j];
+                    if (f in dlist[i]) {
+                        tbody += '<td>'+dlist[i][f]+'</td>';
+                    } else {
+                        tbody += '<td>undefined</td>';
+                    }
+                }
+                tbody += '</tr>';
+            }
+
+            $('#mysql_ot_table tbody').html(tbody);
+        }
+    });
+}
+
+function mysqlStatusList(){
+    var sid = mysqlGetSid();
+    var request_data = {};
+    request_data['sid'] = sid;
+    myPostCBN('get_status_list',request_data ,function(rdata){
         console.log(rdata);
         if (rdata.data.status){
             var data = rdata.data.data;
@@ -449,7 +506,43 @@ function mysqlProcessList(){
             }
 
             $('#mysql_ot_table tbody').html(tbody);
-            
+        }
+    });
+}
+
+function mysqlStatsList(){
+    var sid = mysqlGetSid();
+    var request_data = {};
+    request_data['sid'] = sid;
+    myPostCBN('get_stats_list',request_data ,function(rdata){
+        console.log(rdata);
+        if (rdata.data.status){
+            var data = rdata.data.data;
+            var dlist = data['list'];
+
+            var fields = mongodbGetDataFields(dlist);
+        
+            var header_field = '';
+            for (var i =0 ; i<fields.length ; i++) {
+                header_field += '<th>'+fields[i]+'</th>';
+            }
+            $('#mysql_ot_table thead tr').html(header_field);
+
+            var tbody = '';
+            for (var i = 0; i < dlist.length; i++) {
+                tbody += '<tr>';
+                for (var j = 0; j < fields.length; j++) {
+                    var f = fields[j];
+                    if (f in dlist[i]) {
+                        tbody += '<td>'+dlist[i][f]+'</td>';
+                    } else {
+                        tbody += '<td>undefined</td>';
+                    }
+                }
+                tbody += '</tr>';
+            }
+
+            $('#mysql_ot_table tbody').html(tbody);
         }
     });
 }
