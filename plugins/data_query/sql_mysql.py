@@ -27,10 +27,11 @@ class nosqlMySQL():
 
     __DB_PASS = None
     __DB_USER = None
-    __DB_PORT = 6379
+    __DB_PORT = 3306
     __DB_HOST = '127.0.0.1'
     __DB_CONN = None
     __DB_ERR = None
+    __DB_SOCKET = None
 
     __DB_LOCAL = None
 
@@ -38,41 +39,69 @@ class nosqlMySQL():
         self.__config = self.get_options(None)
 
 
-    def mgdb_conn(self):
+    def conn(self):
 
         if self.__DB_HOST in ['127.0.0.1', 'localhost']:
             my_path = "{}/mysql".format(mw.getServerDir())
             if not os.path.exists(my_path): return False
 
         if not self.__DB_LOCAL:
+            # print(self.__config)
             self.__DB_PORT = int(self.__config['port'])
+            self.__DB_USER = self.__config['username']
+            self.__DB_PASS = self.__config['password']
+            self.__DB_SOCKET = self.__config['socket']
 
-        # print(self.__DB_HOST,self.__DB_PORT, self.__DB_PASS)
         try:
-            self.__DB_CONN = pymongo.MongoClient(host=self.__DB_HOST, port=self.__DB_PORT, maxPoolSize=10)
-            self.__DB_CONN.admin.command('ping')
-            return self.__DB_CONN
-        except pymongo.errors.ConnectionFailure:
-            return False
+
+            db = mw.getMyORM()
+            db.setPort(self.__DB_PORT)
+            db.setPwd(self.__DB_PASS)
+            db.setUser(self.__DB_USER)
+            if self.__DB_SOCKET != '':
+                db.setSocket(self.__DB_SOCKET)
+
+            return db
         except Exception:
             self.__DB_ERR = mw.get_error_info()
         return False
 
+    def sqliteDb(self,dbname='databases'):
+        my_root_path = mw.getServerDir() +'/mysql'
+        name = 'mysql'
+        conn = mw.M(dbname).dbPos(my_root_path, name)
+        return conn
+
     # 获取配置项
     def get_options(self, get=None):
         result = {}
-        mgdb_content = mw.readFile("{}/mysql/my.conf".format(mw.getServerDir()))
-        if not mgdb_content: return False
 
+
+        my_cnf_path = "{}/mysql/etc/my.cnf".format(mw.getServerDir())
+        my_content = mw.readFile(my_cnf_path)
+        if not my_content: return False
+
+        mysql_pass = self.sqliteDb('config').where('id=?', (1,)).getField('mysql_root')
+        result['password'] = mysql_pass
+        result['username'] = 'root'
         keys = ["bind_ip", "port"]
 
         result['host'] = '127.0.0.1'
         rep = 'port\s*=\s*(.*)'
-        ip_re = re.search(rep, mgdb_content)
-        if ip_re:
-            result['port'] = int(ip_re.groups()[0].strip())
+
+        port_re = re.search(rep, my_content)
+        if port_re:
+            result['port'] = int(port_re.groups()[0].strip())
         else:
-            result['port'] = 27017
+            result['port'] = 3306
+
+        socket_rep = 'socket\s*=\s*(.*)'
+        socket_re = re.search(socket_rep, my_content)
+        if socket_re:
+            result['socket'] = socket_re.groups()[0].strip()
+        else:
+            result['socket'] = ''
+
         return result
 
     def set_host(self, host, port, name, username, password, prefix=''):
@@ -101,36 +130,43 @@ class nosqlMySQLCtr():
 
     def getDbList(self, args):
         sid = args['sid']
-        mgdb_instance = self.getInstanceBySid(sid).mgdb_conn()
-        if mgdb_instance is False:
+        my_instance = self.getInstanceBySid(sid).conn()
+        if my_instance is False:
             return mw.returnData(False,'无法链接')
 
         result = {}
-        doc_list = mgdb_instance.list_database_names()
+        db_list = my_instance.query('show databases')
         rlist = []
-        for x in doc_list:
-            if not x in ['admin', 'config', 'local']:
-                rlist.append(x)
+        for x in db_list:
+            if not x['Database'] in ['information_schema', 'mysql', 'performance_schema','sys']:
+                rlist.append(x['Database'])
         result['list'] = rlist
         return mw.returnData(True,'ok', result)
 
-    def getCollectionsList(self, args):
+    def getTableList(self, args):
         sid = args['sid']
-        name = args['name']
+        db = args['db']
 
-        mgdb_instance = self.getInstanceBySid(sid).mgdb_conn()
-        if mgdb_instance is False:
+        my_instance = self.getInstanceBySid(sid).conn()
+        if my_instance is False:
             return mw.returnData(False,'无法链接')
 
+        sql = "select * from information_schema.tables where table_schema = '"+db+"'"
+        table_list = my_instance.query(sql)
+        # print(table_list)
+
+        rlist = []
+        for x in table_list:
+            # print(x['TABLE_NAME'])
+            rlist.append(x['TABLE_NAME'])
         result = {}
-        collections = mgdb_instance[name].list_collection_names()
-        result['collections'] = collections
+        result['list'] = rlist
         return mw.returnData(True,'ok', result)
 
     def getDataList(self, args):
         sid = args['sid']
         db = args['db']
-        collection = args['collection']
+        table = args['table']
         p = 1
         size = 10
         if 'p' in args:
@@ -139,42 +175,32 @@ class nosqlMySQLCtr():
         if 'size' in args:
             size = args['size']
 
-        mgdb_instance = self.getInstanceBySid(sid).mgdb_conn()
-        if mgdb_instance is False:
+        start_index = (p - 1) * size
+
+
+        args_where = {}
+        if 'where' in args:
+            args_where = args['where']
+
+        my_instance = self.getInstanceBySid(sid).conn()
+        if my_instance is False:
             return mw.returnData(False,'无法链接')
 
-        db_instance = mgdb_instance[db]
-        collection_instance = db_instance[collection]
+        my_instance.setDbName(db)
+        sql = 'select count(*) as num from ' + table
+        count_result = my_instance.query(sql)
+        count = count_result[0]['num']
 
-        start_index = (p - 1) * size
-        end_index = p * size
-        args_where = args['where']
 
-        where = {}
-        if 'field' in args_where:
-            mg_field = args_where['field']
+        sql = 'select * from ' + table + ' limit '+str(start_index)+',10';
 
-            if mg_field == '_id':
-                mg_value = ObjectId(args_where['value'])
-                where[mg_field] = mg_value
-            else:
-                mg_value = args_where['value']
-                where[mg_field] = re.compile(mg_value)
-
-        # print(where)
-        result = collection_instance.find(where).skip(start_index).limit(size).sort({'_id':-1})
-        count = collection_instance.count_documents(where)
-        d = []
-        for document in result:
-            d.append(document)
-
-        doc_str_json = dumps(d)
-        result = json.loads(doc_str_json)
-
+        # print(sql)
+        result = my_instance.query(sql)
+        # print(result)
 
         page_args = {}
         page_args['count'] = count
-        page_args['tojs'] = 'mongodbDataList'
+        page_args['tojs'] = 'mysqlGetDataList'
         page_args['p'] = p
         page_args['row'] = size
 
@@ -198,9 +224,9 @@ def get_db_list(args):
     return t.getDbList(args)
 
 # 获取 mysql 列表
-def get_collections_list(args):
+def get_table_list(args):
     t = nosqlMySQLCtr()
-    return t.getCollectionsList(args)
+    return t.getTableList(args)
 
 def get_data_list(args):
     t = nosqlMySQLCtr()

@@ -231,35 +231,143 @@ function mysqlGetSid(){
     return 0;
 }
 
+function mysqlGetDbName(){
+    return $('#mysql .mysql_db_list select[name=mysql_db]').val();
+}
+
+function mysqlGetTableName(){
+    return $('#mysql .mysql_table_list select[name=mysql_table]').val();
+}
+
+function mysqlInitField(f, data){
+    var option_html = '<option value="0">无字段</option>';
+    for (var i = 0; i < f.length; i++) {
+        if (data['soso_field'] == f[i]){
+            option_html+= '<option value="'+f[i]+'" selected>'+f[i]+'</option>';
+        } else {
+            option_html+= '<option value="'+f[i]+'">'+f[i]+'</option>';
+        }
+
+        
+    }
+
+    $('select[name="mysql_field_key"]').html(option_html);
+
+    $('#mysql .mysql_find').unbind('click').click(function(){
+        var val = $('input[name="mysql_field_value"]').val();
+        if (val == ''){
+            layer.msg('搜索不能为空!',{icon:7});
+            return;
+        }
+        mysqlDataList(1);
+    });
+}
+
+
 function mysqlGetDbList(){
     var sid = mysqlGetSid();
     myPostCB('get_db_list',{'sid':sid} ,function(rdata){
         if (rdata.data.status){
 
-            var items = rdata.data.data['items'];
+            var items = rdata.data.data['list'];
             var content = '';
             for (var i = 0; i < items.length; i++) {
                 var name = items[i];
                 if (i == 0){
-                    content += '<option value="'+name+'" selected>items['+name+']</option>';
+                    content += '<option value="'+name+'" selected>database['+name+']</option>';
                 } else {
-                    content += '<option value="'+name+'">items['+name+']</option>';
+                    content += '<option value="'+name+'">database['+name+']</option>';
                 }
             }
-            $('#memcached .item_list select').html(content);
-            $('#memcached .item_list select').change(function(){
-                memcachedGetKeyList(1);
+            // console.log(content);
+            $('#mysql .mysql_db_list select[name=mysql_db]').html(content);
+            $('#mysql .mysql_db_list select[name=mysql_db]').change(function(){
+                mysqlGetTableList(1);
             });
+
+            mysqlGetTableList(1);
+
             closeInstallLayer();
         } else {
             showInstallLayer();
         }
-        mysqlGetTableList(1);
     });
 }
 
 function mysqlGetTableList(p){
-    console.log('mysqlGetTableList',p);
+    // console.log('mysqlGetTableList',p);
+    var sid = mysqlGetSid();
+    var db = mysqlGetDbName();
+    myPostCB('get_table_list',{'sid':sid,'db':db} ,function(rdata){
+        if (rdata.data.status){
+
+            var items = rdata.data.data['list'];
+            var content = '';
+            for (var i = 0; i < items.length; i++) {
+                var name = items[i];
+                if (i == 0){
+                    content += '<option value="'+name+'" selected>table['+name+']</option>';
+                } else {
+                    content += '<option value="'+name+'">table['+name+']</option>';
+                }
+            }
+            // console.log(content);
+            $('#mysql .mysql_table_list select[name=mysql_table]').html(content);
+            $('#mysql .mysql_table_list select[name=mysql_table]').change(function(){
+                mysqlGetDataList(1);
+            });
+
+            mysqlGetDataList(1);
+        }
+    });
+}
+
+function mysqlGetDataList(p){
+    var sid = mysqlGetSid();
+    var db = mysqlGetDbName();
+    var table = mysqlGetTableName();
+    myPostCB('get_data_list',{'sid':sid,'db':db,'table':table,'p':p} ,function(rdata){
+        console.log(rdata);
+        if (rdata.data.status){
+
+            if (rdata.data.status){
+                var data = rdata.data.data;
+                var dlist = data['list'];
+                // console.log(dlist);
+
+                var fields = mongodbGetDataFields(dlist);
+                if (fields.length != 0 ){
+                    mysqlInitField(fields,data);
+                }
+            
+                var header_field = '';
+                for (var i =0 ; i<fields.length ; i++) {
+                    header_field += '<th>'+fields[i]+'</th>';
+                }
+                $('#mysql_table thead tr').html(header_field);
+
+                var tbody = '';
+                for (var i = 0; i < dlist.length; i++) {
+                    tbody += '<tr>';
+                    for (var j = 0; j < fields.length; j++) {
+                        var f = fields[j];
+                        if (f in dlist[i]) {
+                            tbody += '<td style="white-space: nowrap;text-overflow: ellipsis;overflow: hidden;">'+dlist[i][f]+'</td>';
+                        } else {
+                            tbody += '<td>undefined</td>';
+                        }
+                    }
+                    tbody += '</tr>';
+                }
+
+                // $('#mysql_table').css('width', $('.col-md-9').width()).parent().css('width', $(document).width()).css('overflow','scroll');
+                // $('#mysql').css('width',$(document).width()-240).css('overflow','hidden');
+                $('#mysql_table table').css('table-layout','fixed');
+                $('#mysql_table tbody').html(tbody);
+                $('#mysql .mysql_list_page').html(data.page);
+            }
+        }
+    });
 }
 
 
