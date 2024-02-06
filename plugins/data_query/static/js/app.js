@@ -410,7 +410,7 @@ function mysqlProcessList(){
                 for (var j = 0; j < fields.length; j++) {
                     var f = fields[j];
                     if (f in dlist[i]) {
-                        tbody += '<td style="word-wrap:break-word;word-break:break-all;">'+dlist[i][f]+'</td>';
+                        tbody += '<td>'+dlist[i][f]+'</td>';
                     } else {
                         tbody += '<td>undefined</td>';
                     }
