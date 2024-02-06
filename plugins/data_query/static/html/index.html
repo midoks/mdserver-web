@@ -5,6 +5,7 @@
                 <div class="tabs-item active" data-name="redis">Redis</div>
                 <div class="tabs-item" data-name="mongodb">Mongodb</div>
                 <div class="tabs-item" data-name="memcached">Memcached</div>
+                <div class="tabs-item" data-name="mysql">MySQL</div>
             </div>
         </div>
 
@@ -14,6 +15,70 @@
             <div class="mask_layer" style="display:none;">
                 <div class="prompt_description">当前未安装本地服务器,<a class="btlink install_server" href="/soft">点击安装</a></div>
             </div>
+
+            <!-- mysql start -->
+            <!-- show w-full -->
+            <div class="tab-con hide" id="mysql" style="padding: 0px;">
+
+                <div class="col-md-9" style="padding: 0px;">
+                    <div class="tootls_group tootls_top">
+                        <div class="pull-left">
+                            <div class="server_list" style="float:left;">
+                                <select name="sid" class="bt-input-text c5 mr5">
+                                    <option value="0">本地服务器</option>
+                                </select>
+                            </div>
+
+                            <div class="db_list" style="float:left;">
+                                <select name="db" class="bt-input-text c5 mr5">
+                                    <option value="0">空</option>
+                                </select>
+                            </div>
+
+                            <div class="field" style="float:left;">
+                                <select name="mysql_field_key" class="bt-input-text c5 mr5" style="width:80px;">
+                                    <option value="0">无字段</option>
+                                </select>
+                            </div>
+
+                            <div class="value" style="float:left;">
+                                <input name="mysql_field_value" type="text" class="bt-input-text" placeholder="请输入查找内容">
+                            </div>
+
+                            <button type="button" class="mysql_find btn btn-success btn-sm mr5 ml5" style="float:right;">
+                                <span>查找</span>
+                            </button>
+                        </div>
+                        
+                    </div>
+
+                    
+                    <div style="position: relative;">
+                        
+                        <div id="mongodb_table" class="mongodb_table divtable mtb10">
+                            <table class="table table-hover">
+                                <thead style="position: relative;z-index: 1;">
+                                    <tr>
+                                        <th><span>编号</span></th>
+                                        <th><span>操作类型</span></th>
+                                        <th><span>详情</span></th>
+                                        <th style="text-align:right;"><span>操作</span></th>
+                                    </tr>
+                                </thead>
+                                <tbody></tbody>
+                            </table>
+                        </div>
+                    </div>
+              
+                    <div class="mysql_list_page page">
+                        <div><span class="Pcurrent">0</span><span class="Pcount">共0条</span></div>
+                    </div>
+                </div>
+
+                <div class="col-md-3" style="padding: 0px;"></div>
+                
+            </div>
+            <!-- mysql end -->
 
             <!-- mongodb start -->
             <!-- show w-full -->
