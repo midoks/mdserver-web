@@ -89,6 +89,34 @@ function memPostCB(method, args, callback){
     },'json'); 
 }
 
+function myPostCB(method, args, callback){
+    var loadT = layer.msg('正在获取...', { icon: 16, time: 0, shade: 0.3 });
+
+    var req_data = {};
+    req_data['name'] = 'data_query';
+    req_data['func'] = method;
+    req_data['script']='sql_mysql';
+    args['version'] = '';
+ 
+    if (typeof(args) == 'string' && args == ''){
+        req_data['args'] = JSON.stringify(toArrayObject(args));
+    } else {
+        req_data['args'] = JSON.stringify(args);
+    }
+
+    $.post('/plugins/callback', req_data, function(data) {
+        layer.close(loadT);
+        if (!data.status){
+            layer.msg(data.msg,{icon:0,time:2000,shade: [0.3, '#000']});
+            return;
+        }
+
+        if(typeof(callback) == 'function'){
+            callback(data);
+        }
+    },'json'); 
+}
+
 
 function selectTab(tab = 'redis'){
     $('.tab-view-box .tab-con').addClass('hide').removeClass('show').removeClass('w-full');
@@ -108,6 +136,7 @@ function initTabFunc(tab){
         case 'redis':initTabRedis();break;
         case 'mongodb':initTabMongodb();break;
         case 'memcached':initTabMemcached();break;
+        case 'mysql':initTabMySQL();break;
         case 'default:':initTabRedis();break;
     }
 }
@@ -171,6 +200,8 @@ function initTabMongodb(){
     mongodbGetList();
 }
 
+
+
 function initTabMemcached(){
     memcachedGetList();
 
@@ -181,7 +212,7 @@ function initTabMemcached(){
     $('#memcached_clear_all').unbind('click').click(function(){
         var sid = memcachedGetSid();
         memPostCB('clear',{'sid':sid} ,function(rdata){
-            console.log(rdata);
+            // console.log(rdata);
             showMsg(rdata.data.msg,function(){
                 if (rdata.data.status){
                     memcachedGetList();
@@ -190,6 +221,49 @@ function initTabMemcached(){
         });
     });
 }
+
+function initTabMySQL(){
+    mysqlGetDbList();
+}
+
+// ------------------------- mysql start -------------------------------
+function mysqlGetSid(){
+    return 0;
+}
+
+function mysqlGetDbList(){
+    var sid = mysqlGetSid();
+    myPostCB('get_db_list',{'sid':sid} ,function(rdata){
+        if (rdata.data.status){
+
+            var items = rdata.data.data['items'];
+            var content = '';
+            for (var i = 0; i < items.length; i++) {
+                var name = items[i];
+                if (i == 0){
+                    content += '<option value="'+name+'" selected>items['+name+']</option>';
+                } else {
+                    content += '<option value="'+name+'">items['+name+']</option>';
+                }
+            }
+            $('#memcached .item_list select').html(content);
+            $('#memcached .item_list select').change(function(){
+                memcachedGetKeyList(1);
+            });
+            closeInstallLayer();
+        } else {
+            showInstallLayer();
+        }
+        mysqlGetTableList(1);
+    });
+}
+
+function mysqlGetTableList(p){
+    console.log('mysqlGetTableList',p);
+}
+
+
+// ------------------------- mysql start -------------------------------
 
 // ------------------------- memcached start -------------------------------
 function memcachedGetSid(){
@@ -523,7 +597,7 @@ function mongodbDataList(p){
             }
             header_field += '<th class="text-right">操作</th>';
 
-            $('.mongodb_table thead tr').html(header_field);
+            $('#mongodb .mongodb_table thead tr').html(header_field);
 
             var tbody = '';
             for (var i = 0; i < dlist.length; i++) {
@@ -552,10 +626,10 @@ function mongodbDataList(p){
             // console.log($(window).width()-230);
             $('#mongodb_table').css('width', $(document).width()+240).parent().css('width', $(document).width()-240).css('overflow','scroll');
             $('#mongodb').css('width',$(document).width()-240).css('overflow','hidden');
-            $('.mongodb_table tbody').html(tbody);
-            $('.mongodb_list_page').html(data.page);
+            $('#mongodb .mongodb_table tbody').html(tbody);
+            $('#mongodb .mongodb_list_page').html(data.page);
 
-            $('.del').click(function(){
+            $('#mongodb .del').click(function(){
                 var i = $(this).data('index');
                 mongodbDel(dlist[i]['_id']['$oid']);
             });
@@ -564,7 +638,7 @@ function mongodbDataList(p){
 }
 
 function mongodbDel(mgdb_id){
-    console.log(mgdb_id);
+    // console.log(mgdb_id);
     var sid = mongodbGetSid();
     var db = mongodbGetDbName();
     var collection = mongodbCollectionName();

@@ -29,9 +29,15 @@
                                 </select>
                             </div>
 
-                            <div class="db_list" style="float:left;">
-                                <select name="db" class="bt-input-text c5 mr5">
-                                    <option value="0">空</option>
+                            <div class="mysql_db_list" style="float:left;">
+                                <select name="mysql_db" class="bt-input-text c5 mr5">
+                                    <option value="0">数据库空</option>
+                                </select>
+                            </div>
+
+                            <div class="mysql_table_list" style="float:left;">
+                                <select name="mysql_table" class="bt-input-text c5 mr5">
+                                    <option value="0">数据表空</option>
                                 </select>
                             </div>
 
@@ -60,7 +66,6 @@
                                         <th><span>编号</span></th>
                                         <th><span>操作类型</span></th>
                                         <th><span>详情</span></th>
-                                        <th style="text-align:right;"><span>操作</span></th>
                                     </tr>
                                 </thead>
                                 <tbody></tbody>
@@ -73,7 +78,16 @@
                     </div>
                 </div>
 
-                <div class="col-md-3" style="padding: 0px;"></div>
+                <div class="col-md-3" style="padding-left: 3px;">
+                    <div id="mysql_list_tab" style="padding-top:10px;">
+                        <div class="tab-nav">
+                            <span data-id="0" class="on">进程</span>
+                            <span data-id="1" class="">变量</span>
+                            <span data-id="2" class="">状态</span>
+                            <span data-id="3" class="">统计</span>
+                        </div>
+                    </div>
+                </div>
                 
             </div>
             <!-- mysql end -->
@@ -194,7 +208,7 @@
                         <button id="redis_batch_del" type="button" class="btn btn-sm set_batch_option bt-disabled btn-default">批量删除</button>
                     </div>
                     <div class="pull-right">
-                        <div class="page memcached_list_page">
+                        <div class="page redis_list_page">
                             <div><span class="Pcurrent">0</span><span class="Pcount">共0条</span></div>
                         </div>
                     </div>
@@ -250,7 +264,7 @@
 
                 <div class="tootls_group tootls_bottom">
                     <div class="pull-left">
-                        <button id="redis_batch_del" type="button" class="btn btn-sm set_batch_option bt-disabled btn-default">批量删除</button>
+                        <button id="memcached_batch_del" type="button" class="btn btn-sm set_batch_option bt-disabled btn-default">批量删除</button>
                     </div>
                     <div class="pull-right">
                         <div class="page memcached_list_page">
