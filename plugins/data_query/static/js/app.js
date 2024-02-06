@@ -327,13 +327,11 @@ function mysqlGetDataList(p){
     var db = mysqlGetDbName();
     var table = mysqlGetTableName();
     myPostCB('get_data_list',{'sid':sid,'db':db,'table':table,'p':p} ,function(rdata){
-        console.log(rdata);
         if (rdata.data.status){
 
             if (rdata.data.status){
                 var data = rdata.data.data;
                 var dlist = data['list'];
-                // console.log(dlist);
 
                 var fields = mongodbGetDataFields(dlist);
                 if (fields.length != 0 ){
