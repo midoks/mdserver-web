@@ -357,13 +357,28 @@ function mongodbGetDbName(){
     return $('.db_list select[name="db"]').val();
 }
 
-function mongodbInitField(f){
+function mongodbInitField(f, data){
     var option_html = '<option value="0">无字段</option>';
     for (var i = 0; i < f.length; i++) {
-        option_html+= '<option value="'+f[i]+'">'+f[i]+'</option>';
+        if (data['soso_field'] == f[i]){
+            option_html+= '<option value="'+f[i]+'" selected>'+f[i]+'</option>';
+        } else {
+            option_html+= '<option value="'+f[i]+'">'+f[i]+'</option>';
+        }
+
+        
     }
-    
+
     $('select[name="mongodb_field_key"]').html(option_html);
+
+    $('#mongodb .mongodb_find').unbind('click').click(function(){
+        var val = $('input[name="mongodb_field_value"]').val();
+        if (val == ''){
+            layer.msg('搜索不能为空!',{icon:7});
+            return;
+        }
+        mongodbDataList(1);
+    });
 }
 
 var mogodb_db_list;
@@ -468,15 +483,38 @@ function mongodbDataList(p){
     var sid = mongodbGetSid();
     var db = mongodbGetDbName();
     var collection = mongodbCollectionName();
+
+    var mongodb_field = $('select[name="mongodb_field_key"]').val();
+    var mongodb_value = $('input[name="mongodb_field_value"]').val();
+
+    var request_data = {
+        'sid':sid,
+        'db':db,
+        'collection':collection,
+        "p":p,
+    };
+
+    if (mongodb_field != '0'){
+        request_data['where'] = {
+            field : mongodb_field,
+            value : mongodb_value
+        };
+    } else {
+        request_data['where'] = {};
+    }
+
     // console.log({'sid':sid,'db':db,'collection':collection,"p":p});
-    mgdbPostCB('get_data_list',{'sid':sid,'db':db,'collection':collection,"p":p} ,function(rdata){
+    mgdbPostCB('get_data_list', request_data, function(rdata){
         if (rdata.data.status){
             var data = rdata.data.data;
             var dlist = data['list'];
             // console.log(dlist);
 
             var fields = mongodbGetDataFields(dlist);
-            mongodbInitField(fields);
+            if (fields.length != 0 ){
+                mongodbInitField(fields,data);
+            }
+            
             // console.log(fields);
 
             var header_field = '';

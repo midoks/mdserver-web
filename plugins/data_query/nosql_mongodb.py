@@ -150,9 +150,20 @@ class nosqlMongodbCtr():
 
         start_index = (p - 1) * size
         end_index = p * size
+        args_where = args['where']
+
         where = {}
+        if 'field' in args_where:
+            mg_field = args_where['field']
 
+            if mg_field == '_id':
+                mg_value = ObjectId(args_where['value'])
+                where[mg_field] = mg_value
+            else:
+                mg_value = args_where['value']
+                where[mg_field] = re.compile(mg_value)
 
+        # print(where)
         result = collection_instance.find(where).skip(start_index).limit(size).sort({'_id':-1})
         count = collection_instance.count_documents(where)
         d = []
@@ -173,6 +184,11 @@ class nosqlMongodbCtr():
         rdata['page'] = mw.getPage(page_args)
         rdata['list'] = result
         rdata['count'] = count
+
+        rdata['soso_field'] = ''
+        if 'field' in args_where:
+            rdata['soso_field'] = args_where['field']
+
 
         return mw.returnData(True,'ok', rdata)
 
