@@ -117,7 +117,6 @@ docker run -itd --name mw-server --privileged=true -p 7200:7200 -p 80:80 -p 443:
 * PHP界面功能调整。
 * PHP-FPM设置多个应用池(提高高并发稳定性)。
 * MySQL(apt/yum)调整优化。
-* rockmongo。
 * 网站类型优化。
 * 增加数据管理插件。
 
