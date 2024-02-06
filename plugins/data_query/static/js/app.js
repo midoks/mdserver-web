@@ -224,7 +224,11 @@ function initTabMemcached(){
 
 function initTabMySQL(){
     mysqlGetDbList();
+
     mysqlProcessList();
+    setInterval(function(){
+        mysqlProcessList();
+    },2000);
 }
 
 // ------------------------- mysql start -------------------------------
