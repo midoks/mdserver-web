@@ -6,8 +6,10 @@ import os
 import time
 import re
 import pymongo
+import json
 
 from bson.objectid import ObjectId
+from bson.json_util import dumps
 
 sys.path.append(os.getcwd() + "/class/core")
 import mw
@@ -128,8 +130,6 @@ class nosqlMongodbCtr():
         return mw.returnData(True,'ok', result)
 
     def getDataList(self, args):
-        from bson.json_util import dumps
-        import json
         sid = args['sid']
         db = args['db']
         collection = args['collection']
