@@ -118,6 +118,32 @@ function myPostCB(method, args, callback){
 }
 
 
+function myPostCBN(method, args, callback){
+    var req_data = {};
+    req_data['name'] = 'data_query';
+    req_data['func'] = method;
+    req_data['script']='sql_mysql';
+    args['version'] = '';
+ 
+    if (typeof(args) == 'string' && args == ''){
+        req_data['args'] = JSON.stringify(toArrayObject(args));
+    } else {
+        req_data['args'] = JSON.stringify(args);
+    }
+
+    $.post('/plugins/callback', req_data, function(data) {
+        if (!data.status){
+            layer.msg(data.msg,{icon:0,time:2000,shade: [0.3, '#000']});
+            return;
+        }
+
+        if(typeof(callback) == 'function'){
+            callback(data);
+        }
+    },'json'); 
+}
+
+
 function selectTab(tab = 'redis'){
     $('.tab-view-box .tab-con').addClass('hide').removeClass('show').removeClass('w-full');
     $('#'+tab).removeClass('hide').addClass('w-full');
@@ -394,7 +420,7 @@ function mysqlProcessList(){
     var sid = mysqlGetSid();
     var request_data = {};
     request_data['sid'] = sid;
-    myPostCB('get_proccess_list',request_data ,function(rdata){
+    myPostCBN('get_proccess_list',request_data ,function(rdata){
         console.log(rdata);
         if (rdata.data.status){
             var data = rdata.data.data;
