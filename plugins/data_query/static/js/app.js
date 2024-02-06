@@ -360,9 +360,6 @@ function mysqlGetDataList(p){
                     tbody += '</tr>';
                 }
 
-                // $('#mysql_table').css('width', $('.col-md-9').width()).parent().css('width', $(document).width()).css('overflow','scroll');
-                // $('#mysql').css('width',$(document).width()-240).css('overflow','hidden');
-                // $('#mysql_table table').css('table-layout','fixed');
                 $('#mysql_table tbody').html(tbody);
                 $('#mysql .mysql_list_page').html(data.page);
             }
