@@ -202,6 +202,11 @@ class nosqlMySQLCtr():
         sql = 'select * from ' + table + where_sql + ' limit '+str(start_index)+',10';
         # print(sql)
         result = my_instance.query(sql)
+
+        for i in range(len(result)):
+            for f in result[i]:
+                result[i][f] = str(result[i][f])
+
         # print(result)
 
         page_args = {}
