@@ -478,7 +478,7 @@ function mysqlStatusList(){
     var request_data = {};
     request_data['sid'] = sid;
     myPostCBN('get_status_list',request_data ,function(rdata){
-        console.log(rdata);
+        // console.log(rdata);
         if (rdata.data.status){
             var data = rdata.data.data;
             var dlist = data['list'];
@@ -515,7 +515,7 @@ function mysqlStatsList(){
     var request_data = {};
     request_data['sid'] = sid;
     myPostCBN('get_stats_list',request_data ,function(rdata){
-        console.log(rdata);
+        // console.log(rdata);
         if (rdata.data.status){
             var data = rdata.data.data;
             var dlist = data['list'];
