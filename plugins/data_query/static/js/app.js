@@ -224,6 +224,7 @@ function initTabMemcached(){
 
 function initTabMySQL(){
     mysqlGetDbList();
+    mysqlProcessList();
 }
 
 // ------------------------- mysql start -------------------------------
@@ -259,7 +260,7 @@ function mysqlInitField(f, data){
             layer.msg('搜索不能为空!',{icon:7});
             return;
         }
-        mysqlDataList(1);
+        mysqlGetDataList(1);
     });
 }
 
@@ -326,41 +327,99 @@ function mysqlGetDataList(p){
     var sid = mysqlGetSid();
     var db = mysqlGetDbName();
     var table = mysqlGetTableName();
-    myPostCB('get_data_list',{'sid':sid,'db':db,'table':table,'p':p} ,function(rdata){
+
+    var mysql_field = $('select[name="mysql_field_key"]').val();
+    var mysql_value = $('input[name="mysql_field_value"]').val();
+
+    var request_data = {
+        'sid':sid,
+        'db':db,
+        'table':table,
+        'p':p
+    };
+
+    if (mysql_field != '0'){
+        request_data['where'] = {
+            field : mysql_field,
+            value : mysql_value
+        };
+    } else {
+        request_data['where'] = {};
+    }
+    // console.log(request_data);
+    myPostCB('get_data_list',request_data ,function(rdata){
+
         if (rdata.data.status){
+            var data = rdata.data.data;
+            var dlist = data['list'];
 
-            if (rdata.data.status){
-                var data = rdata.data.data;
-                var dlist = data['list'];
-
-                var fields = mongodbGetDataFields(dlist);
-                if (fields.length != 0 ){
-                    mysqlInitField(fields,data);
-                }
-            
-                var header_field = '';
-                for (var i =0 ; i<fields.length ; i++) {
-                    header_field += '<th>'+fields[i]+'</th>';
-                }
-                $('#mysql_table thead tr').html(header_field);
-
-                var tbody = '';
-                for (var i = 0; i < dlist.length; i++) {
-                    tbody += '<tr>';
-                    for (var j = 0; j < fields.length; j++) {
-                        var f = fields[j];
-                        if (f in dlist[i]) {
-                            tbody += '<td style="word-wrap:break-word;word-break:break-all;">'+dlist[i][f]+'</td>';
-                        } else {
-                            tbody += '<td>undefined</td>';
-                        }
-                    }
-                    tbody += '</tr>';
-                }
-
-                $('#mysql_table tbody').html(tbody);
-                $('#mysql .mysql_list_page').html(data.page);
+            var fields = mongodbGetDataFields(dlist);
+            if (fields.length != 0 ){
+                mysqlInitField(fields,data);
             }
+        
+            var header_field = '';
+            for (var i =0 ; i<fields.length ; i++) {
+                header_field += '<th>'+fields[i]+'</th>';
+            }
+            $('#mysql_table thead tr').html(header_field);
+
+            var tbody = '';
+            for (var i = 0; i < dlist.length; i++) {
+                tbody += '<tr>';
+                for (var j = 0; j < fields.length; j++) {
+                    var f = fields[j];
+                    if (f in dlist[i]) {
+                        tbody += '<td style="word-wrap:break-word;word-break:break-all;">'+dlist[i][f]+'</td>';
+                    } else {
+                        tbody += '<td>undefined</td>';
+                    }
+                }
+                tbody += '</tr>';
+            }
+
+            $('#mysql_table tbody').html(tbody);
+            $('#mysql .mysql_list_page').html(data.page);
+        }
+        // 
+    });
+}
+
+
+function mysqlProcessList(){
+    var sid = mysqlGetSid();
+    var request_data = {};
+    request_data['sid'] = sid;
+    myPostCB('get_proccess_list',request_data ,function(rdata){
+        console.log(rdata);
+        if (rdata.data.status){
+            var data = rdata.data.data;
+            var dlist = data['list'];
+
+            var fields = mongodbGetDataFields(dlist);
+        
+            var header_field = '';
+            for (var i =0 ; i<fields.length ; i++) {
+                header_field += '<th>'+fields[i]+'</th>';
+            }
+            $('#mysql_ot_table thead tr').html(header_field);
+
+            var tbody = '';
+            for (var i = 0; i < dlist.length; i++) {
+                tbody += '<tr>';
+                for (var j = 0; j < fields.length; j++) {
+                    var f = fields[j];
+                    if (f in dlist[i]) {
+                        tbody += '<td style="word-wrap:break-word;word-break:break-all;">'+dlist[i][f]+'</td>';
+                    } else {
+                        tbody += '<td>undefined</td>';
+                    }
+                }
+                tbody += '</tr>';
+            }
+
+            $('#mysql_ot_table tbody').html(tbody);
+            
         }
     });
 }

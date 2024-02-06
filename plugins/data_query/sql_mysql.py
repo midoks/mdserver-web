@@ -179,21 +179,27 @@ class nosqlMySQLCtr():
 
 
         args_where = {}
+        where_sql = ''
         if 'where' in args:
             args_where = args['where']
+            if 'field' in args_where:
+                if args_where['field'] == 'id' or args_where['field'].find('id')>-1:
+                    where_sql = ' where '+args_where['field'] + " = '"+args_where['value']+"' "
+                else:
+                    where_sql = ' where '+args_where['field'] + " like '%"+args_where['value']+"%' "
 
         my_instance = self.getInstanceBySid(sid).conn()
         if my_instance is False:
             return mw.returnData(False,'无法链接')
 
         my_instance.setDbName(db)
-        sql = 'select count(*) as num from ' + table
+        sql = 'select count(*) as num from ' + table + where_sql
+        # print(sql)
         count_result = my_instance.query(sql)
         count = count_result[0]['num']
 
 
-        sql = 'select * from ' + table + ' limit '+str(start_index)+',10';
-
+        sql = 'select * from ' + table + where_sql + ' limit '+str(start_index)+',10';
         # print(sql)
         result = my_instance.query(sql)
         # print(result)
@@ -212,10 +218,20 @@ class nosqlMySQLCtr():
         rdata['soso_field'] = ''
         if 'field' in args_where:
             rdata['soso_field'] = args_where['field']
-
-
         return mw.returnData(True,'ok', rdata)
 
+    def showProcessList(self,args):
+        sql = 'show processlist';
+        sid = args['sid']
+
+        my_instance = self.getInstanceBySid(sid).conn()
+        if my_instance is False:
+            return mw.returnData(False,'无法链接')
+
+        result = my_instance.query(sql)
+        rdata = {}
+        rdata['list'] = result
+        return mw.returnData(True,'ok', rdata)
 
 # ---------------------------------- run ----------------------------------
 # 获取 mysql 列表
@@ -231,6 +247,10 @@ def get_table_list(args):
 def get_data_list(args):
     t = nosqlMySQLCtr()
     return t.getDataList(args)
+
+def get_proccess_list(args):
+    t = nosqlMySQLCtr()
+    return t.showProcessList(args)
 
 # 测试
 def test(args):
