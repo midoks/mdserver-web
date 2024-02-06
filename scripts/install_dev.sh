@@ -96,7 +96,8 @@ if [ $OSNAME != "macos" ];then
 			rm -rf /tmp/dev.zip
 			rm -rf /tmp/mdserver-web-dev
 		else
-			curl --insecure -sSLo /tmp/dev.zip https://code.midoks.icu/midoks/mdserver-web/archive/dev.zip
+			# curl --insecure -sSLo /tmp/dev.zip https://code.midoks.icu/midoks/mdserver-web/archive/dev.zip
+			wget --no-check-certificate -O /tmp/dev.zip https://code.midoks.icu/midoks/mdserver-web/archive/dev.zip
 			cd /tmp && unzip /tmp/dev.zip
 			mv -f /tmp/mdserver-web /www/server/mdserver-web
 			rm -rf /tmp/dev.zip

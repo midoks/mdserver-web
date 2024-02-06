@@ -122,10 +122,9 @@ function supList(page, search){
 function startOrStop(name,status){
 	myPost('start_job',{'name':name,'status':status}, function(data){
 		var rdata = $.parseJSON(data.data);
-		layer.msg(rdata.msg,{icon:rdata.status?1:2});
-		setTimeout(function(){
+		showMsg(rdata.msg, function(){
 			supList(1,10);
-		},2000);
+		},{icon:rdata.status?1:2}, rdata.status ? 2000 : 10000);
 	});
 }
 

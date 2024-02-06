@@ -11,6 +11,7 @@ install_tmp=${rootPath}/tmp/mw_install.pl
 VERSION=$2
 
 # /www/server/mdserver-web/bin/supervisorctl  -c /www/server/supervisor/supervisor.conf
+# cmd | status
 
 bash ${rootPath}/scripts/getos.sh
 OSNAME=`cat ${rootPath}/data/osname.pl`

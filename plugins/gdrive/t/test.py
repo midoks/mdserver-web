@@ -20,7 +20,7 @@
 # http://localhost/?code=M.C106_BAY.2.3e12c859-6107-0c5b-9ef4-14b3fb8269ba&state=JzHdzHXmA7x6zl7Be6cJ6uOlf9Bg69
 
 
-# python3 /www/mdserver-web/plugins/gdrive/index.py site bbs.midoks.me 3
+# python3 /www/mdserver-web/plugins/gdrive/index.py site bbs.midoks.icu 3
 # python3 /www/mdserver-web/plugins/gdrive/index.py database t1 3
 # python3 /www/server/mdserver-web/plugins/msonedrive/index.py path
 # /Users/midoks/Desktop/dev/python 3

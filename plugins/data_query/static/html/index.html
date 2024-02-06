@@ -1,0 +1,294 @@
+<div class="main-content" style="min-height: 389px;">
+    <div class="container-fluid" style="padding-bottom: 50px;">
+        <div id="cutTab" class="pos-box bgw mtb15" style="height:45px">
+            <div class="tab-list">
+                <div class="tabs-item active" data-name="redis">Redis</div>
+                <div class="tabs-item" data-name="mongodb">Mongodb</div>
+                <div class="tabs-item" data-name="memcached">Memcached</div>
+                <div class="tabs-item" data-name="mysql">MySQL</div>
+            </div>
+        </div>
+
+
+        <div class="bgw mtb15 pd15 tab-view-box firewall-tab-view safe" style="overflow: hidden;">
+
+            <div class="mask_layer" style="display:none;">
+                <div class="prompt_description">当前未安装本地服务器,<a class="btlink install_server" href="/soft">点击安装</a></div>
+            </div>
+
+            <!-- mysql start -->
+            <!-- show w-full -->
+            <div class="tab-con hide" id="mysql" style="padding: 0px;">
+
+                <div class="col-md-12" style="padding: 0px;overflow: hidden;">
+                    <div class="tootls_group tootls_top">
+                        <div class="pull-left">
+                            <div class="server_list" style="float:left;">
+                                <select name="sid" class="bt-input-text c5 mr5">
+                                    <option value="0">本地服务器</option>
+                                </select>
+                            </div>
+
+                            <div class="mysql_db_list" style="float:left;">
+                                <select name="mysql_db" class="bt-input-text c5 mr5">
+                                    <option value="0">数据库空</option>
+                                </select>
+                            </div>
+
+                            <div class="mysql_table_list" style="float:left;">
+                                <select name="mysql_table" class="bt-input-text c5 mr5">
+                                    <option value="0">数据表空</option>
+                                </select>
+                            </div>
+
+                            <div class="field" style="float:left;">
+                                <select name="mysql_field_key" class="bt-input-text c5 mr5" style="width:80px;">
+                                    <option value="0">无字段</option>
+                                </select>
+                            </div>
+
+                            <div class="value" style="float:left;">
+                                <input name="mysql_field_value" type="text" class="bt-input-text" placeholder="请输入查找内容">
+                            </div>
+
+                            <button type="button" class="mysql_find btn btn-success btn-sm mr5 ml5" style="float:right;">
+                                <span>查找</span>
+                            </button>
+                        </div>
+
+                    </div>
+
+                    <div style="position: relative;">
+                        <div id="mysql_table" class="mysql_table divtable mtb10">
+                            <table class="table table-hover">
+                                <thead style="position: relative;z-index: 1;">
+                                    <tr>
+                                        <th><span>编号</span></th>
+                                        <th><span>操作类型</span></th>
+                                        <th><span>详情</span></th>
+                                    </tr>
+                                </thead>
+                                <tbody></tbody>
+                            </table>
+                        </div>
+                    </div>
+              
+                    <div class="mysql_list_page page">
+                        <div><span class="Pcurrent">0</span><span class="Pcount">共0条</span></div>
+                    </div>
+                </div>
+
+                <div class="col-md-12" style="padding-left: 3px;">
+                    <div id="mysql_list_tab" style="padding-top:0px;">
+                        <div class="tab-nav">
+                            <span data-name="proccess" class="on">进程</span>
+                            <span data-name="status" class="">状态</span>
+                            <span data-name="stats" class="">统计</span>
+                        </div>
+                    </div>
+
+                    <div style="position: relative;">
+                        <div id="mysql_ot_table" class="divtable">
+                            <table class="table table-hover">
+                                <thead style="position: relative;z-index: 1;">
+                                    <tr>
+                                        <th><span>编号</span></th>
+                                        <th><span>操作类型</span></th>
+                                        <th><span>详情</span></th>
+                                    </tr>
+                                </thead>
+                                <tbody></tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                </div>
+                
+            </div>
+            <!-- mysql end -->
+
+            <!-- mongodb start -->
+            <!-- show w-full -->
+            <div class="tab-con hide" id="mongodb" style="padding: 0px;">
+                <div class="tootls_group tootls_top">
+                    <div class="pull-left">
+                      
+                        <div class="field" style="float:left;">
+                            <select name="mongodb_field_key" class="bt-input-text c5 mr5" style="width:80px;">
+                                <option value="0">无字段</option>
+                            </select>
+                        </div>
+
+                        <div class="value" style="float:left;">
+                            <input name="mongodb_field_value" type="text" class="bt-input-text" placeholder="请输入查找内容">
+                        </div>
+
+                        <button type="button" class="mongodb_find btn btn-success btn-sm mr5 ml5" style="float:right;">
+                            <span>查找</span>
+                        </button>
+                    </div>
+
+                    <div class="pull-right" style="padding-top: 5px;">
+                        <div class="server_list" style="float:left;">
+                            <select name="sid" class="bt-input-text c5 mr5">
+                                <option value="0">本地服务器</option>
+                            </select>
+                        </div>
+
+                        <div class="db_list" style="float:left;">
+                            <select name="db" class="bt-input-text c5 mr5">
+                                <option value="0">空</option>
+                            </select>
+                        </div>
+
+                        <div class="search" id="mongodb_search"></div>
+                    </div>
+                </div>
+
+                
+                <div style="position: relative;">
+                    
+                    <div id="mongodb_table" class="mongodb_table divtable mtb10">
+                        <table class="table table-hover">
+                            <thead style="position: relative;z-index: 1;">
+                                <tr>
+                                    <th><span>编号</span></th>
+                                    <th><span>操作类型</span></th>
+                                    <th><span>详情</span></th>
+                                    <th style="text-align:right;"><span>操作</span></th>
+                                </tr>
+                            </thead>
+                            <tbody></tbody>
+                        </table>
+                    </div>
+                </div>
+          
+                <div class="mongodb_list_page page">
+                    <div><span class="Pcurrent">0</span><span class="Pcount">共0条</span></div>
+                </div>
+            </div>
+            <!-- mongodb end -->
+
+            <!-- redis start -->
+            <div class="tab-con show w-full" id="redis" style="padding: 0px;">
+                <div id="redis_ctr" style="position: relative;">
+                    <div class="tootls_group tootls_top">
+                        <div class="pull-left">
+                            <button id="redis_add_key" type="button" class="refresh btn btn-success btn-sm mr5">
+                                <span>添加key</span>
+                            </button>
+                            <button id="redis_clear_all" type="button" class="clear btn btn-default btn-sm mr5" style="border-right: 1px solid #ccc;padding-right: 20px;">
+                                <span>清空数据库</span>
+                            </button>
+                        </div>
+
+                    </div>
+
+                    <div id="redis_list_tab" style="padding-top:10px;">
+                        <div class="tab-nav">
+                            <!-- <span data-id="0" class="on">DB0(0)</span> -->
+                        </div>
+                    </div>
+
+                    <div class="tootls_group tootls_top">
+                        <div class="pull-left"></div>
+                        <div class="pull-right" style="padding-top: 5px;">
+                            <div class="search">
+                                <input id="redis_ksearch" type="text" class="search_input" placeholder="请输入键名称">
+                                <span id="redis_ksearch_span" class="glyphicon glyphicon-search" aria-hidden="true"></span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="divtable mtb10 redis_table_content">
+                        <table class="table table-hover">
+                            <thead style="position: relative;z-index: 1;">
+                                <tr>
+                                    <th width="30"><input type="checkbox" onclick="checkSelect();"></th>
+                                    <th><span>键</span></th>
+                                    <th><span>值</span></th>
+                                    <th><span>数据类型</span></th>
+                                    <th><span>数据长度</span></th>
+                                    <th><span>有效期</span></th>
+                                    <th style="text-align:right;"><span>操作</span></th>
+                                </tr>
+                            </thead>
+                            <tbody></tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <div class="tootls_group tootls_bottom">
+                    <div class="pull-left">
+                        <button id="redis_batch_del" type="button" class="btn btn-sm set_batch_option bt-disabled btn-default">批量删除</button>
+                    </div>
+                    <div class="pull-right">
+                        <div class="page redis_list_page">
+                            <div><span class="Pcurrent">0</span><span class="Pcount">共0条</span></div>
+                        </div>
+                    </div>
+                </div> 
+            </div>
+            <!-- redis end -->
+
+            <!-- memcached start -->
+            <div class="tab-con hide" id="memcached" style="padding: 0px;">
+                
+                <div id="memcached_ctr" style="position: relative;">
+                    <div class="tootls_group tootls_top">
+                        <div class="pull-left">
+                            <button id="memcached_add_key" type="button" class="refresh btn btn-success btn-sm mr5">
+                                <span>添加key</span>
+                            </button>
+                            <button id="memcached_clear_all" type="button" class="clear btn btn-default btn-sm mr5" style="border-right: 1px solid #ccc;padding-right: 20px;">
+                                <span>清空</span>
+                            </button>
+                        </div>
+
+                        <div class="pull-right" style="padding-top: 5px;">
+                            <div class="item_list" style="float:left;">
+                                <select name="item" class="bt-input-text c5 mr5">
+                                    <option value="0">空</option>
+                                </select>
+                            </div>
+
+                            <div class="search">
+                                <input id="memcached_ksearch" type="text" class="search_input" placeholder="请输入键名称">
+                                <span id="memcached_ksearch_span" class="glyphicon glyphicon-search" aria-hidden="true"></span>
+                            </div>
+                        </div>
+
+                    </div>
+
+                    <div class="divtable mtb10 memcached_table_content">
+                        <table class="table table-hover">
+                            <thead style="position: relative;z-index: 1;">
+                                <tr>
+                                    <th width="30"><input type="checkbox" onclick="checkSelect();"></th>
+                                    <th><span>键</span></th>
+                                    <th><span>值</span></th>
+                                    <th><span>数据长度</span></th>
+                                    <th><span>有效期</span></th>
+                                    <th style="text-align:right;"><span>操作</span></th>
+                                </tr>
+                            </thead>
+                            <tbody></tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <div class="tootls_group tootls_bottom">
+                    <div class="pull-left">
+                        <button id="memcached_batch_del" type="button" class="btn btn-sm set_batch_option bt-disabled btn-default">批量删除</button>
+                    </div>
+                    <div class="pull-right">
+                        <div class="page memcached_list_page">
+                            <div><span class="Pcurrent">0</span><span class="Pcount">共0条</span></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!-- memcached end -->
+        </div>
+    </div>
+</div>

@@ -1,10 +1,25 @@
+
+
+$("#site_search_input").keyup(function(event){
+	if(event.keyCode == 13) {
+		getWeb(1, -1, $(this).val());
+	}
+});
+
+$('#site_search').click(function(){
+	getWeb(1, -1, $('#site_search_input').val());
+});
+
 /**
  * 取回网站数据列表
  * @param {Number} page   当前页
  * @param {String} search 搜索条件
  */
- function getWeb(page, search, type_id) {
-	var search = $("#SearchValue").prop("value");
+ function getWeb(page, type_id, search) {
+ 	if ( typeof(search) == 'undefined' ){
+		search = $('#site_search_input').val();
+	}
+	
 	var page = page == undefined ? '1':page;
 	var order = getCookie('order');
 	if(order){
@@ -117,6 +132,7 @@
 		},function(){
 			$(this).removeClass("open");
 		});
+		
 		//输出分页
 		$("#webPage").html(data.page);
 		// $("#webPage").html('<div class="site_type"><span>站点分类:</span><select class="bt-input-text mr5" style="width:100px"><option value="-1">全部分类</option><option value="0">默认分类</option></select></div>');
@@ -238,31 +254,31 @@ function webAddPage(type) {
 			shift: 0,
 			shadeClose: false,
 			content: "<form class='bt-form pd20 pb70' id='addweb'>\
-						<div class='line'>\
-		                    <span class='tname'>"+lan.site.domain+"</span>\
-		                    <div class='info-r c4'>\
-								<textarea id='mainDomain' class='bt-input-text' name='webname' style='width:458px;height:100px;line-height:22px' /></textarea>\
-							</div>\
-						</div>\
-	                    <div class='line'>\
-	                    <span class='tname'>备注</span>\
-	                    <div class='info-r c4'>\
-	                    	<input id='Wbeizhu' class='bt-input-text' type='text' name='ps' placeholder='网站备注' style='width:458px' />\
-	                    </div>\
-	                    </div>\
-	                    <div class='line'>\
-	                    <span class='tname'>根目录</span>\
-	                    <div class='info-r c4'>\
-	                    	<input id='inputPath' class='bt-input-text mr5' type='text' name='path' value='"+www['dir']+"/' placeholder='"+www['dir']+"' style='width:458px' />\
-	                    	<span class='glyphicon glyphicon-folder-open cursor' onclick='changePath(\"inputPath\")'></span>\
-	                    </div>\
-	                    </div>\
-						"+php_version+"\
-	                    <div class='bt-form-submit-btn'>\
-							<button type='button' class='btn btn-danger btn-sm btn-title' onclick='layer.closeAll()'>取消</button>\
-							<button type='button' class='btn btn-success btn-sm btn-title' onclick=\"webAdd(1)\">提交</button>\
-						</div>\
-	                  </form>",
+				<div class='line'>\
+                    <span class='tname'>"+lan.site.domain+"</span>\
+                    <div class='info-r c4'>\
+						<textarea id='mainDomain' class='bt-input-text' name='webname' style='width:458px;height:100px;line-height:22px' /></textarea>\
+					</div>\
+				</div>\
+                <div class='line'>\
+                <span class='tname'>备注</span>\
+                <div class='info-r c4'>\
+                	<input id='Wbeizhu' class='bt-input-text' type='text' name='ps' placeholder='网站备注' style='width:458px' />\
+                </div>\
+                </div>\
+                <div class='line'>\
+                <span class='tname'>根目录</span>\
+                <div class='info-r c4'>\
+                	<input id='inputPath' class='bt-input-text mr5' type='text' name='path' value='"+www['dir']+"/' placeholder='"+www['dir']+"' style='width:458px' />\
+                	<span class='glyphicon glyphicon-folder-open cursor' onclick='changePath(\"inputPath\")'></span>\
+                </div>\
+                </div>\
+				"+php_version+"\
+                <div class='bt-form-submit-btn'>\
+					<button type='button' class='btn btn-danger btn-sm btn-title' onclick='layer.closeAll()'>取消</button>\
+					<button type='button' class='btn btn-success btn-sm btn-title' onclick=\"webAdd(1)\">提交</button>\
+				</div>\
+            </form>",
 		});
 
 		$(function() {
@@ -2704,8 +2720,7 @@ function getClassType(){
 
 		$(select).bind('change',function(){
 			var select_id = $(this).val();
-			// console.log(select_id);
-			getWeb(1,'',select_id);
+			getWeb(1,select_id, '');
 		})
 	},'json');
 }

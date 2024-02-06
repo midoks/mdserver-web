@@ -135,7 +135,7 @@ wsPost('get_global_conf', '' ,{}, function(rdata){
 	            _text += '<tr>\
 	                <td>\
 	                    <select name="url_type_'+i+'">\
-	                        <option  value="normal" '+(_tmp[i].mode == 'normal'?'selected':'')+'>完整匹配</option>\
+	                        <option value="normal" '+(_tmp[i].mode == 'normal'?'selected':'')+'>完整匹配</option>\
 	                        <option value="regular" '+(_tmp[i].mode == 'regular'?'selected':'')+'>模糊匹配</option>\
 	                    </select>\
 	                </td>\

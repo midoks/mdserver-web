@@ -391,18 +391,18 @@ function wsOverviewRequest(page){
                     var realtime_traffic = rdata.data['realtime_traffic'];
                     var realtime_request = rdata.data['realtime_request'];
 
-                    realtime_traffic_calc = (realtime_traffic/1024).toFixed()
+                    realtime_traffic_calc = toSize(realtime_traffic);
 
 
-                    $('.overview_list .overview_box:eq(5) .ov_num').text(realtime_traffic_calc+"kb");
+                    $('.overview_list .overview_box:eq(5) .ov_num').text(realtime_traffic_calc);
                     $('.overview_list .overview_box:eq(6) .ov_num').text(realtime_request);
 
                     
                     var realtime_name = select_option == 'realtime_traffic' ? '实时流量':'每秒请求';
                     var val = realtime_request;
                     if (select_option == 'realtime_traffic'){
-                        val = realtime_traffic_calc;
-                        realtime_name = realtime_name + " "+ realtime_traffic_calc + "kb";
+                        val = realtime_traffic_calc.split(' ')[0];
+                        realtime_name = realtime_traffic_calc;
                     }
 
                     xData.push(getTime());
@@ -2430,8 +2430,10 @@ $(".soft-man-con").html(html);
 laydate.render({
     elem: '#time_choose',
     value:'',
-    range:true,
+    range:'~',
+    type:'datetime',
     done:function(value, startDate, endDate){
+        console.log(value, startDate, endDate);
         if(!value){
             return false;
         }
@@ -2440,10 +2442,10 @@ laydate.render({
             $(this).removeClass('cur');
         });
 
-        var timeA  = value.split('-')
-        var start = $.trim(timeA[0]+'-'+timeA[1]+'-'+timeA[2])
-        var end = $.trim(timeA[3]+'-'+timeA[4]+'-'+timeA[5])
-        query_txt = toUnixTime(start + " 00:00:00") + "-"+ toUnixTime(end + " 00:00:00")
+        var timeArr  = value.split('~');
+        var start = $.trim(timeArr[0]);
+        var end = $.trim(timeArr[1]);
+        query_txt = toUnixTime(start) + "-"+ toUnixTime(end);
 
         $('#time_choose').attr("data-name",query_txt);
         $('#time_choose').addClass("cur");

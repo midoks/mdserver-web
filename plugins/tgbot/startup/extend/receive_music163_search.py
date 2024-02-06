@@ -141,9 +141,9 @@ def tgSearchMusic_t(cmd_text):
         keyboard = [
             [
                 types.InlineKeyboardButton(
-                    text="论坛", url='https://bbs.midoks.me'),
+                    text="论坛", url='https://bbs.midoks.icu'),
                 types.InlineKeyboardButton(
-                    text="搜索", url='https://bbs.midoks.me/search.php')
+                    text="搜索", url='https://bbs.midoks.icu/search.php')
             ],
             [
                 types.InlineKeyboardButton(
@@ -153,7 +153,7 @@ def tgSearchMusic_t(cmd_text):
         ]
         markup = types.InlineKeyboardMarkup(keyboard)
         bot.send_message(
-            message.chat.id, "未找到合适内容,请在官方论坛[bbs.midoks.me]提问!", reply_markup=markup)
+            message.chat.id, "未找到合适内容,请在官方论坛[bbs.midoks.icu]提问!", reply_markup=markup)
     return True
 
 

@@ -59,7 +59,6 @@ def getArgs():
         else:
             t = t.split(':', 1)
             tmp[t[0]] = t[1]
-        tmp[t[0]] = t[1]
     elif args_len > 1:
         for i in range(len(args)):
             t = args[i].split(':')
@@ -79,8 +78,14 @@ def getConf(version):
     return path
 
 
-def getFpmConfFile(version):
-    return getServerDir() + '/' + version + '/etc/php-fpm.d/www.conf'
+def getFpmConfFile(version, pool='www'):
+    args = getArgs()
+    if 'pool' in args:
+        pool = args['pool']
+    return getServerDir() + '/' + version + '/etc/php-fpm.d/'+pool+'.conf'
+
+def getFpmFile(version):
+    return getServerDir() + '/' + version + '/etc/php-fpm.conf'
 
 
 def status_progress(version):
@@ -157,17 +162,21 @@ def makeOpenrestyConf():
     sdir = mw.getServerDir()
 
     dst_dir = sdir + '/web_conf/php'
-    dst_dir_conf = sdir + '/web_conf/php/conf'
     if not os.path.exists(dst_dir):
         mw.execShell('mkdir -p ' + dst_dir)
 
+    dst_dir_conf = sdir + '/web_conf/php/conf'
     if not os.path.exists(dst_dir_conf):
         mw.execShell('mkdir -p ' + dst_dir_conf)
 
-    d_pathinfo = sdir + '/web_conf/php/pathinfo.conf'
-    if not os.path.exists(d_pathinfo):
-        s_pathinfo = getPluginDir() + '/conf/pathinfo.conf'
-        shutil.copyfile(s_pathinfo, d_pathinfo)
+    dst_dir_upstream = sdir + '/web_conf/php/upstream'
+    if not os.path.exists(dst_dir_upstream):
+        mw.execShell('mkdir -p ' + dst_dir_upstream)
+
+    dst_pathinfo = sdir + '/web_conf/php/pathinfo.conf'
+    if not os.path.exists(dst_pathinfo):
+        src_pathinfo = getPluginDir() + '/conf/pathinfo.conf'
+        shutil.copyfile(src_pathinfo, dst_pathinfo)
 
     info = getPluginDir() + '/info.json'
     content = mw.readFile(info)
@@ -179,19 +188,31 @@ def makeOpenrestyConf():
         dfile = sdir + '/web_conf/php/conf/enable-php-' + x + '.conf'
         if not os.path.exists(dfile):
             if x == '00':
-                mw.writeFile(dfile, 'set $PHP_ENV 0;')
+                mw.writeFile(dfile, '')
             else:
-                w_content = contentReplace(tpl_content, x)
-                mw.writeFile(dfile, w_content)
+                content = contentReplace(tpl_content, x)
+                mw.writeFile(dfile, content)
 
-    # php-fpm status
-    # for version in phpversions:
-    #     dfile = sdir + '/web_conf/php/status/phpfpm_status_' + version + '.conf'
-    #     tpl = getPluginDir() + '/conf/phpfpm_status.conf'
-    #     if not os.path.exists(dfile):
-    #         content = mw.readFile(tpl)
-    #         content = contentReplace(content, version)
-    #         mw.writeFile(dfile, content)
+    upstream_tpl = getPluginDir() + '/conf/enable-php-upstream.conf'
+    upstream_tpl_content = mw.readFile(upstream_tpl)
+    for x in phpversions:
+        dfile = sdir + '/web_conf/php/upstream/enable-php-' + x + '.conf'
+        if not os.path.exists(dfile):
+            if x == '00':
+                mw.writeFile(dfile, '')
+            else:
+                content = contentReplace(upstream_tpl_content, x)
+                mw.writeFile(dfile, content)
+
+    vhost_dir = mw.getServerDir() + '/web_conf/nginx/vhost'
+    write_php_upstream_conf = mw.getServerDir()+'/web_conf/php/upstream/*.conf;'
+    if not os.path.exists(vhost_dir):
+        mw.execShell('mkdir -p ' + vhost_dir)
+
+    vhost_php_upstream = vhost_dir+'/0.php_upstream.conf'
+    if not os.path.exists(vhost_php_upstream):
+        mw.writeFile(vhost_php_upstream,'include '+write_php_upstream_conf)
+
 
 
 def phpPrependFile(version):
@@ -217,15 +238,16 @@ def phpFpmReplace(version):
             mw.writeFile(desc_php_fpm, content)
 
 
-def phpFpmWwwReplace(version):
+
+def phpFpmPoolReplace(version, pool = 'www'):
     service_php_fpm_dir = getServerDir() + '/' + version + '/etc/php-fpm.d/'
 
     if not os.path.exists(service_php_fpm_dir):
         os.mkdir(service_php_fpm_dir)
 
-    service_php_fpmwww = service_php_fpm_dir + '/www.conf'
+    service_php_fpmwww = service_php_fpm_dir + '/'+pool+'.conf'
     if not os.path.exists(service_php_fpmwww):
-        tpl_php_fpmwww = getPluginDir() + '/conf/www.conf'
+        tpl_php_fpmwww = getPluginDir() + '/conf/'+pool+'.conf'
         content = mw.readFile(tpl_php_fpmwww)
         content = contentReplace(content, version)
         mw.writeFile(service_php_fpmwww, content)
@@ -266,7 +288,8 @@ def initReplace(version):
         mw.execShell('chmod +x ' + file_bin)
 
     phpPrependFile(version)
-    phpFpmWwwReplace(version)
+    phpFpmPoolReplace(version, 'www')
+    phpFpmPoolReplace(version, 'backup')
     phpFpmReplace(version)
 
     session_path = getServerDir() + '/tmp/session'
@@ -539,9 +562,13 @@ def setMaxSize(version):
     return mw.returnJson(True, '设置成功!')
 
 
-def getFpmConfig(version):
+def getFpmConfig(version, pool = 'www'):
+    args = getArgs()
+    pool = 'www'
+    if 'pool' in args:
+        pool = args['pool']
 
-    filefpm = getServerDir() + '/' + version + '/etc/php-fpm.d/www.conf'
+    filefpm = getServerDir() + '/' + version + '/etc/php-fpm.d/'+pool+'.conf'
     conf = mw.readFile(filefpm)
     data = {}
     rep = "\s*pm.max_children\s*=\s*([0-9]+)\s*"
@@ -577,8 +604,10 @@ def setFpmConfig(version):
     min_spare_servers = args['min_spare_servers']
     max_spare_servers = args['max_spare_servers']
     pm = args['pm']
+    pool = args['pool']
 
-    file = getServerDir() + '/' + version + '/etc/php-fpm.d/www.conf'
+
+    file = getServerDir() + '/' + version + '/etc/php-fpm.d/'+pool+'.conf'
     conf = mw.readFile(file)
 
     rep = "\s*pm.max_children\s*=\s*([0-9]+)\s*"
@@ -621,8 +650,10 @@ def setFpmConfig(version):
 #     return True
 
 
-def getFpmAddress(version):
+def getFpmAddress(version, pool='www'):
     fpm_address = '/tmp/php-cgi-{}.sock'.format(version)
+    if pool != 'www':
+        fpm_address = '/tmp/php-cgi-{}.{}.sock'.format(version,pool)
     php_fpm_file = getFpmConfFile(version)
     try:
         content = readFile(php_fpm_file)
@@ -653,14 +684,21 @@ def getFpmStatus(version):
     if stat == 'stop':
         return mw.returnJson(False, 'PHP[' + version + ']未启动!!!')
 
-    sock_file = getFpmAddress(version)
+    args = getArgs()
+    pool = 'www'
+    if 'pool' in args:
+        pool = args['pool']
+
+    sock_file = getFpmAddress(version, pool)
+    uri = '/phpfpm_status_' + version + '?json'
+    if pool != 'www':
+        uri = '/phpfpm_status_' + version + '_'+pool+'?json'
     try:
-        sock_data = mw.requestFcgiPHP(
-            sock_file, '/phpfpm_status_' + version + '?json')
+        sock_data = mw.requestFcgiPHP(sock_file, uri)
     except Exception as e:
         return mw.returnJson(False, str(e))
 
-    # print(data)
+    
     result = str(sock_data, encoding='utf-8')
     data = json.loads(result)
     fTime = time.localtime(int(data['start time']))
@@ -976,6 +1014,10 @@ def getConfAppStart():
     pstart = mw.getServerDir() + '/php/app_start.php'
     return pstart
 
+def opcacheBlacklistFile():
+    op_bl = mw.getServerDir() + '/php/opcache-blacklist.txt'
+    return op_bl
+
 
 def installPreInspection(version):
     # 仅对PHP52检查
@@ -1047,10 +1089,14 @@ if __name__ == "__main__":
         print(getConf(version))
     elif func == 'app_start':
         print(getConfAppStart())
+    elif func == 'opcache_blacklist_file':
+        print(opcacheBlacklistFile())
     elif func == 'get_php_conf':
         print(getPhpConf(version))
     elif func == 'get_fpm_conf_file':
         print(getFpmConfFile(version))
+    elif func == 'get_fpm_file':
+        print(getFpmFile(version))
     elif func == 'submit_php_conf':
         print(submitPhpConf(version))
     elif func == 'get_limit_conf':

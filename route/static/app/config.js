@@ -338,14 +338,58 @@ function setUserName(a) {
 	})
 }
 
+function setTimezone(){
+	layer.open({
+		type: 1,
+		area: ["400px","200px"],
+		title: '设置服务器时区',
+		closeBtn: 1,
+		shift: 5,
+		shadeClose: false,
+		btn:["确定","取消","同步"],
+		content: "<div class='bt-form pd20'>\
+			<div class='line'>\
+				<span class='tname'>时区</span>\
+				<div class='info-r'>\
+					<select class='bt-input-text mr5' name='timezone' style='width: 250px;'></select>\
+				</div>\
+			</div>\
+		</div>",
+		success:function(){
+			var tbody = '';
+			$.post('/config/get_timezone_list', {}, function (rdata) {
+		        for (var i = 0; i < rdata.length; i++) {
 
-function syncDate(){
-	var loadT = layer.msg('正在同步时间...',{icon:16,time:0,shade: [0.3, '#000']});
-	$.post('/config/sync_date','',function(rdata){
-		layer.close(loadT);
-		layer.msg(rdata.msg,{icon:rdata.status?1:2});
-		setTimeout(function(){window.location.reload();},1500);
-	},'json');
+		        	if (rdata[i] == 'Asia/Shanghai'){
+		        		tbody += '<option value="'+rdata[i]+'" selected="selected">'+rdata[i]+'</option>';
+		        	} else {
+		        		tbody += '<option value="'+rdata[i]+'">'+rdata[i]+'</option>';
+		        	}
+		        	
+		        }
+		        $('select[name="timezone"]').append(tbody);
+		    },'json');
+	    },
+        yes:function(index){
+		    var loadT = layer.msg("正在设置时区...", { icon: 16, time: 0, shade: [0.3, '#000'] });
+		    var timezone = $('select[name="timezone"]').val();
+		    $.post('/config/set_timezone', { timezone: timezone }, function (rdata) {
+		    	showMsg(rdata.msg, function(){
+		    		layer.close(index);
+		    		layer.close(loadT);
+		    		location.reload();
+		    	},{ icon: rdata.status ? 1 : 2 }, 2000);
+		    },'json');
+        },
+        btn3:function(){
+        	var loadT = layer.msg('正在同步时间...',{icon:16,time:0,shade: [0.3, '#000']});
+			$.post('/config/sync_date','',function(rdata){
+				layer.close(loadT);
+				layer.msg(rdata.msg,{icon:rdata.status?1:2});
+				setTimeout(function(){window.location.reload();},1500);
+			},'json');
+        }
+	})
 }
 
 
@@ -821,14 +865,14 @@ function getTempAccessLogs(id){
 		closeBtn:1,
 		shift: 0,
 		type: 1,
-		content: "<div class=\"pd20\">\
-					<button class=\"btn btn-success btn-sm refresh_log\">刷新日志</button>\
-					<div class=\"divtable mt10\">\
-						<table class=\"table table-hover\">\
+		content: "<div class='pd20'>\
+					<button class='btn btn-success btn-sm refresh_log'>刷新日志</button>\
+					<div class='divtable mt10'>\
+						<table class='table table-hover'>\
 							<thead>\
 								<tr><th>操作类型</th><th>操作时间</th><th>日志</th></tr>\
 							</thead>\
-							<tbody id=\"logs_list\"></tbody>\
+							<tbody id='logs_list'></tbody>\
 						</table>\
 					</div>\
 				</div>",
@@ -987,15 +1031,15 @@ function setTempAccess(){
 							title: '创建临时授权',
 							shift: 0,
 							type: 1,
-							content: "<div class=\"bt-form create_temp_view pd15\">\
-									<div class=\"line\">\
-										<span class=\"tname\">临时授权地址</span>\
+							content: "<div class='bt-form create_temp_view pd15'>\
+									<div class='line'>\
+										<span class='tname'>临时授权地址</span>\
 										<div>\
-											<textarea id=\"temp_link\" class=\"bt-input-text mr20\" style=\"margin: 0px;width: 500px;height: 50px;line-height: 19px;\"></textarea>\
+											<textarea id='temp_link' class='bt-input-text mr20' style='margin: 0px;width: 500px;height: 50px;line-height: 19px;'></textarea>\
 										</div>\
 									</div>\
-									<div class=\"line\"><button type=\"submit\" class=\"btn btn-success btn-sm btn-copy-temp-link\" data-clipboard-text=\"\">复制地址</button></div>\
-									<ul class=\"help-info-text c7 ptb15\">\
+									<div class='line'><button type='submit' class='btn btn-success btn-sm btn-copy-temp-link' data-clipboard-text=''>复制地址</button></div>\
+									<ul class='help-info-text c7 ptb15'>\
 										<li>临时授权生成后1小时内使用有效，为一次性授权，使用后立即失效</li>\
 										<li>使用临时授权登录面板后1小时内拥有面板所有权限，请勿在公共场合发布临时授权连接</li>\
 										<li>授权连接信息仅在此处显示一次，若在使用前忘记，请重新生成</li>\

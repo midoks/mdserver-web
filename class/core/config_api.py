@@ -20,6 +20,7 @@ import mw
 import re
 import json
 import pwd
+import pytz
 
 from flask import session
 from flask import request
@@ -27,7 +28,7 @@ from flask import request
 
 class config_api:
 
-    __version = '0.16.2.2'
+    __version = '0.16.3'
     __api_addr = 'data/api.json'
 
     def __init__(self):
@@ -910,6 +911,21 @@ class config_api:
             data['status_code'] = '0'
             data['status_code_msg'] = "默认-安全入口错误提示"
         return data
+
+
+    def getTimezoneListApi(self):
+        # 获取时区列表
+        # pytz.all_timezones | 所有
+        # pytz.common_timezones
+        return pytz.all_timezones
+
+    def setTimezoneApi(self):
+        # 设置时区列表
+        timezone = request.form.get('timezone', '').strip()
+        cmd = 'timedatectl set-timezone "'+timezone+'"'
+        mw.execShell(cmd)
+        return mw.returnJson(True, '设置成功!')
+
 
     def get(self):
 

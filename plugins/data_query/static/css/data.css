@@ -1,0 +1,48 @@
+.main-content .safe {
+    position: relative;
+}
+
+.mask_layer {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgb(255 255 255 / 60%);
+    z-index: 9998;
+}
+
+.mask_layer .prompt_description {
+    width: 350px;
+    height: 60px;
+    line-height: 60px;
+    text-align: center;
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    margin-top: -25px;
+    margin-left: -175px;
+    background: #fff;
+    box-shadow: 1px 1px 50px rgb(0 0 0 / 30%);
+    border: 1px solid #eee;
+    border-radius: 2px;
+    font-size: 13px;
+}
+
+#mongodb_search xm-select {
+    min-height: 30px;
+    line-height: 30px;
+}
+
+#mongodb_search xm-select .xm-label .xm-label-block{
+    height: 20px;
+    line-height: 20px;
+}
+
+#mongodb td:last-child, th:last-child {
+    width: 44px;
+    position:sticky;
+    right:0; /* 首行永远固定在左侧 */
+    z-index:1;
+    background-color:white;
+}

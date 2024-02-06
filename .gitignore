@@ -171,6 +171,7 @@ plugins/fastdfs
 plugins/v2ray
 plugins/frp
 plugins/file_search
+plugins/proxysql
 debug.out
 
 

@@ -74,7 +74,8 @@ function toUnixTime(txt){
 
 function randomStrPwd(b) {
 	b = b || 32;
-	var c = "AaBbCcDdEeFfGHhiJjKkLMmNnPpRSrTsWtXwYxZyz2345678&!@%";
+	// &!@%
+	var c = "AaBbCcDdEeFfGHhiJjKkLMmNnPpRSrTsWtXwYxZyz2345678";
 	var a = c.length;
 	var d = "";
 	for(i = 0; i < b; i++) {
@@ -1048,7 +1049,7 @@ function flySlow(a) {
 };
 
 function readerTableChecked(){
-    $('thead').find('input').bind('click',function(){
+    $('thead').find('input').unbind('click').bind('click',function(){
         $('tbody').find('tr').each(function(i,obj){
         	var fin = $(this).find('td')[0];
         	checked = $(fin).find('input').prop('checked');

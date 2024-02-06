@@ -25,9 +25,12 @@ flask_sockets==0.2.1
 zmq==0.0.0
 paramiko>=2.8.0
 pymongo
+pymemcache
+redis
 pillow
 Jinja2>=2.11.2
 PyMySQL==1.0.2
 whitenoise==5.3.0
+pytz
 pyTelegramBotAPI
 telebot

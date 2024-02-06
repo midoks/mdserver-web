@@ -1,0 +1,36 @@
+{
+	"hook":[
+		{
+			"tag":"menu",
+			"menu": {
+				"title":"数据管理",
+				"name":"data_query",
+				"path":"static/html/index.html",
+				"css_path":"static/css/data.css",
+				"js_path":"static/js/app.js"
+			}
+		},
+		{
+			"tag":"global_static",
+			"global_static": {
+				"title":"数据管理",
+				"name":"data_query",
+				"css_path":"static/css/ico.css"
+			}
+		}
+	],
+	"sort": 7,
+	"ps": "数据简单管理(memcached,redis,mongodb)",
+	"name": "data_query",
+	"title": "数据管理",
+	"shell": "install.sh",
+	"versions":"1.0",
+	"tip": "soft",
+	"checks": "server/data_query",
+	"path": "server/data_query",
+	"display": 1,
+	"author": "midoks",
+	"date": "2024-01-22",
+	"type": 0,
+	"pid": "2"
+}

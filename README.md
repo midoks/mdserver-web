@@ -78,7 +78,7 @@ phpMyAdmin[4.4.15]支持MySQL[5.5-5.7]
 phpMyAdmin[5.2.0]支持MySQL[8.0]
 
 PHP[53-72]支持phpMyAdmin[4.4.15]
-PHP[72-82]支持phpMyAdmin[5.2.0]
+PHP[72-83]支持phpMyAdmin[5.2.0]
 ```
 
 # 郑重声明
@@ -102,26 +102,23 @@ PHP[72-82]支持phpMyAdmin[5.2.0]
 
 # Docker
 
-- 由[DDSRem](https://github.com/DDSRem)开发维护。
-- https://hub.docker.com/r/ddsderek/mw
+- 由[DDS-Derek](https://github.com/DDS-Derek)开发维护。
+- https://github.com/DDS-Derek/mdserver-web-Docker
 
 ```
 docker run -itd --name mw-server --privileged=true -p 7200:7200 -p 80:80 -p 443:443 -p 888:888 ddsderek/mw-server:latest
 ```
 
 
-### 版本更新 0.16.2
+### 版本更新 0.16.3
 
-* keepalived插件改造,集成mysql高可用配置。
-* redis(主从/集群)配置识别。
-* MySQL主从同步1236错误,添加修复功能。
-* MySQL二进制日志查看。
-* 源码安装成功后删除解压包,节省体积。
-* 网站统计-增加查询条件。
-* php增加yaml扩展。
-* php扩展ioncube修复。
-* php-fpm增加【按需】配置。
-* gitea/gogs同步功能改造。
+* 面板配置-可以配置时区。
+* PHP(GD)扩展安装优化。
+* PHP界面功能调整。
+* PHP-FPM设置多个应用池(提高高并发稳定性)。
+* MySQL(apt/yum)调整优化。
+* 网站类型优化。
+* 增加数据管理插件。
 
 ### JSDelivr安装地址
 

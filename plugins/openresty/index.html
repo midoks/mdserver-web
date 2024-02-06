@@ -1,8 +1,9 @@
 <div class="bt-form">
+	<div class='plugin_version'></div>
 	<div class="bt-w-main">
 		<div class="bt-w-menu">
-			<p class="bgw" onclick="orPluginService('openresty');">服务</p>
-			<p onclick="pluginInitD('openresty');">自启动</p>
+			<p class="bgw" onclick="orPluginService('openresty',$('.plugin_version').attr('version'));">服务</p>
+			<p onclick="pluginInitD('openresty', $('.plugin_version').attr('version'));">自启动</p>
 			<p onclick="pluginConfig('openresty');">配置修改</p>
 			<p onclick="getOpStatus();">负载状态</p>
 			<p onclick="setOpCfg();">性能调整</p>

@@ -794,7 +794,7 @@ def getMyPort():
     return tmp.groups()[0].strip()
 
 
-def setMyPort():
+def setMyPort(version):
     args = getArgs()
     data = checkArgs(args, ['port'])
     if not data[0]:
@@ -806,7 +806,7 @@ def setMyPort():
     rep = "port\s*=\s*([0-9]+)\s*\n"
     content = re.sub(rep, 'port = ' + port + '\n', content)
     mw.writeFile(file, content)
-    restart()
+    restart(version)
     return mw.returnJson(True, '编辑成功!')
 
 
@@ -2955,7 +2955,16 @@ def doFullSyncUser(version=''):
     if mode == 'gtid':
         dmp_option = ' --set-gtid-purged=off '
 
-    writeDbSyncStatus({'code': 1, 'msg': '远程导出数据...', 'progress': 20})
+    time.sleep(1)
+    writeDbSyncStatus({'code': 1, 'msg': '正在停止从库...', 'progress': 15})
+    if version == '8.0':
+        db.query("stop slave user='{}' password='{}';".format(user, apass))
+    else:
+        db.query("stop slave")
+        
+    time.sleep(2)
+
+    writeDbSyncStatus({'code': 2, 'msg': '远程导出数据...', 'progress': 20})
 
     if not os.path.exists(bak_file):
         dump_sql_data = getServerDir() + "/bin/mysqldump " + dmp_option + "  --force --opt --default-character-set=utf8 --single-transaction -h" + ip + " -P" + \
@@ -2964,7 +2973,8 @@ def doFullSyncUser(version=''):
         print(dump_sql_data)
         mw.execShell(dump_sql_data)
 
-    writeDbSyncStatus({'code': 2, 'msg': '本地导入数据...', 'progress': 40})
+    
+    writeDbSyncStatus({'code': 3, 'msg': '正在到本地导入数据中...', 'progress': 40})
     if os.path.exists(bak_file):
         pwd = pSqliteDb('config').where('id=?', (1,)).getField('mysql_root')
         sock = getSocketFile()
@@ -3229,7 +3239,7 @@ if __name__ == "__main__":
     elif func == 'my_port':
         print(getMyPort())
     elif func == 'set_my_port':
-        print(setMyPort())
+        print(setMyPort(version))
     elif func == 'init_pwd':
         print(initMysqlPwd())
     elif func == 'root_pwd':

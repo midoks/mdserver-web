@@ -20,7 +20,7 @@ import requests
 
 class vip_api:
 
-    api_url = 'https://wo.midoks.me/api/wp-json/vip'
+    api_url = 'https://wo.midoks.icu/api/wp-json/vip'
 
     def __init__(self):
         pass

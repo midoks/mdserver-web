@@ -471,7 +471,7 @@ def getRedisConfInfo():
         {'name': 'bind', 'type': 2, 'ps': '绑定IP(修改绑定IP可能会存在安全隐患)','must_show':1},
         {'name': 'port', 'type': 2, 'ps': '绑定端口','must_show':1},
         {'name': 'timeout', 'type': 2, 'ps': '空闲链接超时时间,0表示不断开','must_show':1},
-        {'name': 'maxclients', 'type': 2, 'ps': '最大输入时间','must_show':1},
+        {'name': 'maxclients', 'type': 2, 'ps': '最大连接数','must_show':1},
         {'name': 'databases', 'type': 2, 'ps': '数据库数量','must_show':1},
         {'name': 'requirepass', 'type': 2, 'ps': 'redis密码,留空代表没有设置密码','must_show':1},
         {'name': 'maxmemory', 'type': 2, 'ps': 'MB,最大使用内存,0表示不限制','must_show':1},

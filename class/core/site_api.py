@@ -105,7 +105,7 @@ class site_api:
 
         start = (int(p) - 1) * (int(limit))
 
-        siteM = mw.M('sites').field('id,name,path,status,ps,addtime,edate')
+        siteM = siteC = mw.M('sites').field('id,name,path,status,ps,addtime,edate,type_id')
 
         sql_where = ''
         if search != '':
@@ -113,29 +113,36 @@ class site_api:
 
         if type_id != '' and int(type_id) >= 0 and search != '':
             sql_where = sql_where + " and type_id=" + type_id + ""
-        elif type_id != '' and int(type_id) >= 0:
+        if type_id != '' and int(type_id) >= 0:
             sql_where = " type_id=" + type_id
 
         if sql_where != '':
             siteM.where(sql_where)
 
-        _list = siteM.limit((str(start)) + ',' +
-                            limit).order('id desc').select()
-
+        _list = siteM.limit((str(start)) + ',' +limit).order('id desc').select()
         if _list != None:
             for i in range(len(_list)):
-                _list[i]['backup_count'] = mw.M('backup').where(
-                    "pid=? AND type=?", (_list[i]['id'], 0)).count()
+                _list[i]['backup_count'] = mw.M('backup').where("pid=? AND type=?", (_list[i]['id'], 0)).count()
 
         _ret = {}
         _ret['data'] = _list
 
-        count = siteM.count()
+        if sql_where != '':
+            count = siteC.where(sql_where).count()
+        else:
+            count = siteC.count()
+
         _page = {}
         _page['count'] = count
         _page['tojs'] = 'getWeb'
         _page['p'] = p
         _page['row'] = limit
+
+        page_args_tpl = ''
+        page_args_tpl += ','+type_id+''
+        if search != '':
+            page_args_tpl += ',"'+search+'"'
+        _page['args_tpl'] = page_args_tpl
 
         _ret['page'] = mw.getPage(_page)
         return mw.getJson(_ret)

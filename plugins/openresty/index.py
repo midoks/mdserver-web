@@ -320,7 +320,7 @@ def restyOp_restart():
         return 'ERROR: 配置出错<br><a style="color:red;">' + check_data[1].replace("\n", '<br>') + '</a>'
 
     if not mw.isAppleSystem():
-        threading.Timer(2, op_submit_systemctl_restart, args=()).start()
+        threading.Timer(2, op_submit_systemctl_restart).start()
         return 'ok'
 
     threading.Timer(2, op_submit_init_restart, args=(file,)).start()
@@ -339,7 +339,7 @@ def stop():
     return r
 
 
-def restart():
+def restart(version=()):
     return restyOp_restart()
 
 

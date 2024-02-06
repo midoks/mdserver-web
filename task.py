@@ -393,8 +393,11 @@ def check502Task():
 
 def check502():
     try:
-        verlist = ['52', '53', '54', '55', '56', '70',
-                   '71', '72', '73', '74', '80', '81', '82']
+        verlist = [
+            '52', '53', '54', '55', '56', '70',
+            '71', '72', '73', '74', '80', '81', 
+            '82', '83'
+        ]
         for ver in verlist:
             sdir = mw.getServerDir()
             php_path = sdir + '/php/' + ver + '/sbin/php-fpm'
@@ -413,7 +416,6 @@ def check502():
 def startPHPVersion(version):
     sdir = mw.getServerDir()
     try:
-
         # system
         phpService = mw.systemdCfgDir() + '/php' + version + '.service'
         if os.path.exists(phpService):
@@ -440,11 +442,9 @@ def startPHPVersion(version):
         # 尝试重启服务
         cgi = '/tmp/php-cgi-' + version + '.sock'
         pid = sdir + '/php/' + version + '/var/run/php-fpm.pid'
-        data = mw.execShell("ps -ef | grep php/" + version +
-                            " | grep -v grep|grep -v python |awk '{print $2}'")
+        data = mw.execShell("ps -ef | grep php/" + version +" | grep -v grep|grep -v python |awk '{print $2}'")
         if data[0] != '':
-            os.system("ps -ef | grep php/" + version +
-                      " | grep -v grep|grep -v python |awk '{print $2}' | xargs kill ")
+            os.system("ps -ef | grep php/" + version + " | grep -v grep|grep -v python |awk '{print $2}' | xargs kill ")
         time.sleep(0.5)
         if not os.path.exists(cgi):
             os.system('rm -f ' + cgi)
@@ -507,21 +507,22 @@ def checkPHPVersion(version):
 
     # 检查Web服务是否启动
     if result.find('Connection refused') != -1:
-        global isTask
-        if os.path.exists(isTask):
-            isStatus = mw.readFile(isTask)
-            if isStatus == 'True':
-                return True
+        return False
+    #     global isTask
+    #     if os.path.exists(isTask):
+    #         isStatus = mw.readFile(isTask)
+    #         if isStatus == 'True':
+    #             return True
 
-        # systemd
-        systemd = mw.systemdCfgDir() + '/openresty.service'
-        if os.path.exists(systemd):
-            execShell('systemctl reload openresty')
-            return True
-        # initd
-        initd = '/etc/init.d/openresty'
-        if os.path.exists(initd):
-            os.system(initd + ' reload')
+    #     # systemd
+    #     systemd = mw.systemdCfgDir() + '/openresty.service'
+    #     if os.path.exists(systemd):
+    #         execShell('systemctl reload openresty')
+    #         return True
+    #     # initd
+    #     initd = '/etc/init.d/openresty'
+    #     if os.path.exists(initd):
+    #         os.system(initd + ' reload')
     return True
 
 # --------------------------------------PHP监控 end--------------------------------------------- #
@@ -539,7 +540,7 @@ def openrestyAutoRestart():
                 continue
 
             # systemd
-            systemd = '/lib/systemd/system/openresty.service'
+            systemd = mw.systemdCfgDir()+'/openresty.service'
             initd = '/etc/init.d/openresty'
             if os.path.exists(systemd):
                 execShell('systemctl reload openresty')

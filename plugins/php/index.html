@@ -1,7 +1,7 @@
 
 <style type="text/css">
 .bt-w-main{
-	height: 642px;
+	height: 552px;
 }
 
 .session_clear_list {
@@ -43,18 +43,15 @@
 			<p onclick="pluginInitD('php', $('.plugin_version').attr('version'));">自启动</p>
 			<p onclick="phpLibConfig($('.plugin_version').attr('version'));">安装扩展</p>
 			<p onclick="phpSetConfig($('.plugin_version').attr('version'));">配置修改</p>
-			<p onclick="phpUploadLimitReq($('.plugin_version').attr('version'));">上传限制</p>
-			<p onclick="phpTimeLimitReq($('.plugin_version').attr('version'));">超时限制</p>
+			<p onclick="phpCommonFunc($('.plugin_version').attr('version'));">常用功能</p>
 			<p onclick="pluginConfig('php', $('.plugin_version').attr('version'));">配置文件</p>
-			<p onclick="pluginConfig('php', $('.plugin_version').attr('version'),'get_fpm_conf_file');">FPM配置</p>
 			<p onclick="disableFunc($('.plugin_version').attr('version'));">禁用函数</p>
+			<p onclick="phpFpmConfigFile($('.plugin_version').attr('version'),'get_fpm_conf_file');">FPM配置</p>
 			<p onclick="getFpmConfig($('.plugin_version').attr('version'));">性能调整</p>
 			<p onclick="getFpmStatus($('.plugin_version').attr('version'));">负载状况</p>
 			<p onclick="getSessionConfig($('.plugin_version').attr('version'));" title="session管理">会话管理</p>
 			<p onclick="pluginLogs('php',$('.plugin_version').attr('version'),'fpm_log');">FPM日志</p>
 			<p onclick="pluginLogs('php',$('.plugin_version').attr('version'),'fpm_slow_log');">慢日志</p>
-			<p onclick="getPhpinfo($('.plugin_version').attr('version'));">PHPIFNO</p>
-			<p onclick="pluginConfig('php',$('.plugin_version').attr('version'),'app_start');">预加载脚本</p>
 		</div>
 		<div class="bt-w-con pd15">
 			<div class="soft-man-con"></div>

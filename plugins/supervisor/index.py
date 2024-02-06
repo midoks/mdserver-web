@@ -335,7 +335,8 @@ def addJob():
     w_body += "user=" + user + "\n"
     w_body += "priority=999" + "\n"
     w_body += "numprocs={0}".format(numprocs) + "\n"
-    w_body += "process_name=%(program_name)s_%(process_num)02d"
+    w_body += "process_name=%(program_name)s"
+    # _%(process_num)02d
 
     dstFile = getSubConfDir() + "/" + program + '.ini'
 
@@ -360,8 +361,9 @@ def startJob():
     if status == 'start':
         action = "停止"
         cmd = supCtl + " stop " + name
-
+    # print(cmd)
     data = mw.execShell(cmd)
+    # print(data)
 
     if data[1] != '':
         return mw.returnJson(False, action + '[' + name + ']失败!')

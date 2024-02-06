@@ -15,7 +15,7 @@ function version_le() { test "$(echo "$@" | tr " " "\n" | sort -V | head -n 1)" 
 function version_lt() { test "$(echo "$@" | tr " " "\n" | sort -rV | head -n 1)" != "$1"; }
 function version_ge() { test "$(echo "$@" | tr " " "\n" | sort -rV | head -n 1)" == "$1"; }
 
-version=8.3.0
+version=8.3.2
 PHP_VER=83
 Install_php()
 {
@@ -56,14 +56,14 @@ if [ ! -d $sourcePath/php/php${PHP_VER} ];then
 	fi
 
 	#检测文件是否损坏.
-	# md5_file_ok=1db84fec57125aa93638b51bb2b15103e12ac196e2f960f0d124275b2687ea54
-	# if [ -f $sourcePath/php/php-${version}.tar.xz ];then
-	# 	md5_file=`sha256sum $sourcePath/php/php-${version}.tar.xz  | awk '{print $1}'`
-	# 	if [ "${md5_file}" != "${md5_file_ok}" ]; then
-	# 		echo "PHP${version} 下载文件不完整,重新安装"
-	# 		rm -rf $sourcePath/php/php-${version}.tar.xz
-	# 	fi
-	# fi
+	md5_file_ok=4ffa3e44afc9c590e28dc0d2d31fc61f0139f8b335f11880a121b9f9b9f0634e
+	if [ -f $sourcePath/php/php-${version}.tar.xz ];then
+		md5_file=`sha256sum $sourcePath/php/php-${version}.tar.xz  | awk '{print $1}'`
+		if [ "${md5_file}" != "${md5_file_ok}" ]; then
+			echo "PHP${version} 下载文件不完整,重新安装"
+			rm -rf $sourcePath/php/php-${version}.tar.xz
+		fi
+	fi
 	
 	cd $sourcePath/php && tar -Jxf $sourcePath/php/php-${version}.tar.xz
 	mv $sourcePath/php/php-${version} $sourcePath/php/php${PHP_VER}

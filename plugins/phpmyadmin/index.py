@@ -74,8 +74,11 @@ def getHomePage():
         ip = '127.0.0.1'
         if not mw.isAppleSystem():
             ip = mw.getLocalIp()
-        url = 'http://' + ip + ':' + port + \
-            '/' + getCfg()['path'] + '/index.php'
+
+        cfg = getCfg()
+        auth = cfg['username']+':'+cfg['password']
+        rand_path = cfg['path']
+        url = 'http://' + auth + '@' + ip + ':' + port + '/' + rand_path + '/index.php'
         return mw.returnJson(True, 'OK', url)
     except Exception as e:
         return mw.returnJson(False, '插件未启动!')
@@ -239,10 +242,11 @@ def start():
 
     pma_path = getServerDir() + '/pma.pass'
     if not os.path.exists(pma_path):
-        username = mw.getRandomString(10)
-        pass_cmd = username + ':' + mw.hasPwd(username)
+        username = mw.getRandomString(8)
+        password = mw.getRandomString(10)
+        pass_cmd = username + ':' + mw.hasPwd(password)
         setCfg('username', username)
-        setCfg('password', username)
+        setCfg('password', password)
         mw.writeFile(pma_path, pass_cmd)
 
     tmp = getServerDir() + "/" + getCfg()["path"] + '/tmp'
