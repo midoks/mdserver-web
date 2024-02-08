@@ -20,7 +20,7 @@ LOCAL_ADDR=common
 cn=$(curl -fsSL -m 10 http://ipinfo.io/json | grep "\"country\": \"CN\"")
 if [ ! -z "$cn" ] || [ "$?" == "0" ] ;then
     LOCAL_ADDR=cn
-    HTTP_PREFIX="https://ghproxy.com/"
+    HTTP_PREFIX="https://mirror.ghproxy.com/"
 fi
 
 if [ ! -d ${SERVER_ROOT}/libiconv ];then
