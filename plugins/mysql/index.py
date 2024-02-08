@@ -2598,6 +2598,10 @@ def trySlaveSyncBugfix(version=''):
 
     gtid_purged = ''
 
+    var_slave_gtid = sdb.query('show VARIABLES like "%gtid_purged%"')
+    if len(var_slave_gtid) > 0:
+            gtid_purged += var_slave_gtid[0]['Value'] + ','
+
     for i in range(len(slave_sync_data)):
         port = slave_sync_data[i]['port']
         password = slave_sync_data[i]['pass']
@@ -2616,6 +2620,8 @@ def trySlaveSyncBugfix(version=''):
         var_gtid = mdb.query('show VARIABLES like "%gtid_purged%"')
         if len(var_gtid) > 0:
             gtid_purged += var_gtid[0]['Value'] + ','
+
+
 
     gtid_purged = gtid_purged.strip(',')
     sql = "set @@global.gtid_purged='" + gtid_purged + "'"

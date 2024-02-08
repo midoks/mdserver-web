@@ -38,7 +38,7 @@ Install_App()
 	cn=$(curl -fsSL -m 10 http://ipinfo.io/json | grep "\"country\": \"CN\"")
 	HTTP_PREFIX="https://"
 	if [ ! -z "$cn" ];then
-	    HTTP_PREFIX="https://ghproxy.com/"
+	    HTTP_PREFIX="https://mirror.ghproxy.com/"
 	fi
 	
 	# FlameGraph start
