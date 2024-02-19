@@ -55,7 +55,12 @@ def send_msg(bot, tag='ad', trigger_time=300):
     # 腾云机场 ｜9/m
     # 综合包网/NG接口开户 | 28/m | 3m | next,4/28 | @aabbcx888
     # 实名认证/过人脸🕵️‍♀️各种账号处理✅ | 30/m| next,6/30 | @nngzs
+    # 海外服务器 高防CDN 解决移动屏蔽 ｜ 19/m | next,2/19 | @YYCDNFW
     keyboard = [
+        [
+            types.InlineKeyboardButton(
+                text="海外服务器 高防CDN 解决移动屏蔽", url='https://t.me/kltfuwuqi')
+        ],
         [
             types.InlineKeyboardButton(
                 text="🚀 综合包网/NG接口开户", url='https://t.me/NG_Tony')
