@@ -187,8 +187,7 @@ def requestAfter(response):
 
 def isLogined():
     if 'login' in session and 'username' in session and session['login'] == True:
-        userInfo = mw.M('users').where(
-            "id=?", (1,)).field('id,username,password').find()
+        userInfo = mw.M('users').where("id=?", (1,)).field('id,username,password').find()
         # print(userInfo)
         if userInfo['username'] != session['username']:
             return False
@@ -312,6 +311,29 @@ def checkLogin():
     return "false"
 
 
+@app.route("/verify_login", methods=['POST'])
+def verifyLogin():
+    username = request.form.get('username', '').strip()
+    auth = request.form.get('auth', '').strip()
+
+    import pyotp
+    auth_file = 'data/auth_secret.pl'
+    if os.path.exists(auth_file):
+        content = mw.readFile(auth_file)
+        sec = mw.deDoubleCrypt('mdserver-web', content)
+
+        print(sec)
+        totp = pyotp.TOTP(sec)
+        if totp.verify(auth):
+            userInfo = mw.M('users').where("id=?", (1,)).field('id,username,password').find()
+            session['login'] = True
+            session['username'] = userInfo['username']
+            session['overdue'] = int(time.time()) + 7 * 24 * 60 * 60
+            return mw.returnJson(1, '二次验证成功!')
+
+    return mw.returnJson(-1, '二次验证失败!')
+    
+
 @app.route("/do_login", methods=['POST'])
 def doLogin():
     login_cache_count = 5
@@ -343,8 +365,7 @@ def doLogin():
             mw.writeLog('用户登录', code_msg)
             return mw.returnJson(False, code_msg)
 
-    userInfo = mw.M('users').where(
-        "id=?", (1,)).field('id,username,password').find()
+    userInfo = mw.M('users').where("id=?", (1,)).field('id,username,password').find()
 
     # print(userInfo)
     # print(password)
@@ -367,9 +388,16 @@ def doLogin():
         cache.set('login_cache_limit', login_cache_limit, timeout=10000)
         login_cache_limit = cache.get('login_cache_limit')
         mw.writeLog('用户登录', mw.getInfo(msg))
-        return mw.returnJson(False, mw.getInfo("用户名或密码错误,您还可以尝试[{1}]次!", (str(login_cache_count - login_cache_limit))))
+        return mw.returnJson(-1, mw.getInfo("用户名或密码错误,您还可以尝试[{1}]次!", (str(login_cache_count - login_cache_limit))))
+
+
 
     cache.delete('login_cache_limit')
+    # 二次验证密钥
+    auth_secret = 'data/auth_secret.pl'                   
+    if os.path.exists(auth_secret):
+        return mw.returnJson(2, '绑定二次验证了...')
+    
     session['login'] = True
     session['username'] = userInfo['username']
     session['overdue'] = int(time.time()) + 7 * 24 * 60 * 60
@@ -377,7 +405,7 @@ def doLogin():
 
     # fix 跳转时,数据消失，可能是跨域问题
     # mw.writeFile('data/api_login.txt', userInfo['username'])
-    return mw.returnJson(True, '登录成功,正在跳转...')
+    return mw.returnJson(1, '登录成功,正在跳转...')
 
 
 @app.errorhandler(404)
@@ -419,8 +447,7 @@ def login_temp_user(token):
         return '连续10次验证失败，禁止1小时'
 
     stime = int(time.time())
-    data = mw.M('temp_login').where('state=? and expire>?',
-                                    (0, stime)).field('id,token,salt,expire,addtime').find()
+    data = mw.M('temp_login').where('state=? and expire>?',(0, stime)).field('id,token,salt,expire,addtime').find()
     if not data:
         setErrorNum(skey)
         return '验证失败!'
@@ -434,8 +461,7 @@ def login_temp_user(token):
         setErrorNum(skey)
         return '验证失败!'
 
-    userInfo = mw.M('users').where(
-        "id=?", (1,)).field('id,username').find()
+    userInfo = mw.M('users').where("id=?", (1,)).field('id,username').find()
     session['login'] = True
     session['username'] = userInfo['username']
     session['tmp_login'] = True

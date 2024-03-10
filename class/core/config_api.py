@@ -31,6 +31,23 @@ class config_api:
     __version = '0.16.3'
     __api_addr = 'data/api.json'
 
+    # 统一默认配置文件
+    __file = {
+        'api' : 'data/api.json',                                # API文件
+        'debug' : 'data/debug.pl',                              # DEBUG文件
+        'close' : 'data/close.pl',                              # 识别关闭面板文件
+        'basic_auth' : 'data/basic_auth.json',                  # 面板Basic验证
+        'admin_path' : 'data/admin_path.pl',                    # 面板后缀路径设置
+        'ipv6' : 'data/ipv6.pl',                                # ipv6识别文件
+        'bind_domain' : 'data/bind_domain.pl',                  # 面板域名绑定
+        'unauth_status' : 'data/unauthorized_status.pl',        # URL路径未成功显示状态
+        'auth_secret': 'data/auth_secret.pl',                   # 二次验证密钥
+        'ssl':'data/ssl.pl',                                    # ssl设置
+        'hook_database' : 'data/hook_database.json',            # 数据库钩子
+        'hook_menu' : 'data/hook_menu.json',                    # 菜单钩子
+        'hook_global_static' : 'data/hook_global_static.json',  # 静态文件钩子
+    }
+
     def __init__(self):
         pass
 
@@ -179,7 +196,7 @@ class config_api:
         basic_open = request.form.get('is_open', '').strip()
 
         salt = '_md_salt'
-        path = 'data/basic_auth.json'
+        path = self.__file['basic_auth']
         is_open = True
 
         if basic_open == 'false':
@@ -300,7 +317,7 @@ class config_api:
         # '警告，关闭安全入口等于直接暴露你的后台地址在外网，十分危险，至少开启以下一种安全方式才能关闭：<a
         # style="color:red;"><br>1、绑定访问域名<br>2、绑定授权IP</a>')
 
-        admin_path_file = 'data/admin_path.pl'
+        admin_path_file = self.__file['admin_path']
         admin_path_old = '/'
         if os.path.exists(admin_path_file):
             admin_path_old = mw.readFile(admin_path_file).strip()
@@ -311,7 +328,7 @@ class config_api:
         return mw.returnJson(True, '修改成功!')
 
     def closePanelApi(self):
-        filename = 'data/close.pl'
+        filename = self.__file['close']
         if os.path.exists(filename):
             os.remove(filename)
             return mw.returnJson(True, '开启成功')
@@ -329,8 +346,8 @@ class config_api:
         return mw.returnJson(True, '开发模式开启!')
 
     def setIpv6StatusApi(self):
-        ipv6_file = 'data/ipv6.pl'
-        if os.path.exists('data/ipv6.pl'):
+        ipv6_file = self.__file['ipv6']
+        if os.path.exists(ipv6_file):
             os.remove(ipv6_file)
             mw.writeLog('面板设置', '关闭面板IPv6兼容!')
         else:
@@ -400,7 +417,7 @@ class config_api:
     # 设置面板SSL证书设置
     def setPanelHttpToHttpsApi(self):
 
-        bind_domain = 'data/bind_domain.pl'
+        bind_domain = self.__file['bind_domain']
         if not os.path.exists(bind_domain):
             return mw.returnJson(False, '先要绑定域名!')
 
@@ -445,7 +462,7 @@ class config_api:
 
     # 删除面板证书
     def delPanelSslApi(self):
-        bind_domain = 'data/bind_domain.pl'
+        bind_domain = self.__file['bind_domain']
         if not os.path.exists(bind_domain):
             return mw.returnJson(False, '未绑定域名!')
 
@@ -474,7 +491,7 @@ class config_api:
     def applyPanelLetSslApi(self):
 
         # check domain is bind?
-        bind_domain = 'data/bind_domain.pl'
+        bind_domain = self.__file['bind_domain']
         if not os.path.exists(bind_domain):
             return mw.returnJson(False, '先要绑定域名!')
 
@@ -531,7 +548,7 @@ class config_api:
         panel_tpl = mw.getRunDir() + "/data/tpl/nginx_panel.conf"
         dst_panel_path = mw.getServerDir() + "/web_conf/nginx/vhost/panel.conf"
 
-        cfg_domain = 'data/bind_domain.pl'
+        cfg_domain = self.__file['bind_domain']
         if domain == '':
             os.remove(cfg_domain)
             os.remove(dst_panel_path)
@@ -560,7 +577,7 @@ class config_api:
 
      # 设置面板SSL
     def setPanelSslApi(self):
-        sslConf = mw.getRunDir() + '/data/ssl.pl'
+        sslConf = mw.getRunDir() + '/' + self.__file['ssl']
 
         panel_tpl = mw.getRunDir() + "/data/tpl/nginx_panel.conf"
         dst_panel_path = mw.getServerDir() + "/web_conf/nginx/vhost/panel.conf"
@@ -751,8 +768,8 @@ class config_api:
                     return mw.returnJson(False, '状态码范围错误!')
         else:
             return mw.returnJson(False, '状态码范围错误!')
-
-        mw.writeFile('data/unauthorized_status.pl', str(status_code))
+        unauthorized_status = self.__file['unauth_status']
+        mw.writeFile(unauthorized_status, str(status_code))
         mw.writeLog('面板设置', '将未授权响应状态码设置为:{}'.format(status_code))
         return mw.returnJson(True, '设置成功!')
 
@@ -871,8 +888,7 @@ class config_api:
             if not 'token_crypt' in data:
                 token = mw.getRandomString(32)
                 data['token'] = mw.md5(token)
-                data['token_crypt'] = mw.enCrypt(
-                    data['token'], token).decode('utf-8')
+                data['token_crypt'] = mw.enCrypt(data['token'], token).decode('utf-8')
 
             token = stats[data['open']] + '成功!'
             mw.writeLog('API配置', '%sAPI接口' % stats[data['open']])
@@ -888,7 +904,7 @@ class config_api:
             return mw.returnJson(True, '保存成功!')
 
     def renderUnauthorizedStatus(self, data):
-        cfg_unauth_status = 'data/unauthorized_status.pl'
+        cfg_unauth_status = self.__file['unauth_status']
         if os.path.exists(cfg_unauth_status):
             status_code = mw.readFile(cfg_unauth_status)
             data['status_code'] = status_code
@@ -927,6 +943,37 @@ class config_api:
         return mw.returnJson(True, '设置成功!')
 
 
+    def getAuthSecretApi(self):
+        reset = request.form.get('reset', '')
+
+        import pyotp
+        auth = self.__file['auth_secret']
+        tag = 'mdserver-web'
+        if os.path.exists(auth) and reset != '1':
+            content = mw.readFile(auth)
+            sec = mw.deDoubleCrypt(tag,content)
+        else:
+            sec = pyotp.random_base32()
+            crypt_data = mw.enDoubleCrypt(tag, sec)
+            mw.writeFile(auth, crypt_data)
+
+        ip = mw.getHostAddr()
+        url = pyotp.totp.TOTP(sec).provisioning_uri(name=ip, issuer_name='mdserver-web')
+
+        rdata = {}
+        rdata['secret'] = sec
+        rdata['url'] = url
+        return mw.returnJson(True, '设置成功!', rdata)
+
+    def setAuthSecretApi(self):
+        auth = self.__file['auth_secret']
+        if os.path.exists(auth):
+            os.remove(auth)
+            return mw.returnJson(True, '关闭成功!', 0)
+        else:
+            return mw.returnJson(True, '开启成功!', 1)
+
+
     def get(self):
 
         data = {}
@@ -939,31 +986,38 @@ class config_api:
         data['port'] = mw.getHostPort()
         data['ip'] = mw.getHostAddr()
 
-        admin_path_file = 'data/admin_path.pl'
+        admin_path_file = self.__file['admin_path']
         if not os.path.exists(admin_path_file):
             data['admin_path'] = '/'
         else:
             data['admin_path'] = mw.readFile(admin_path_file)
 
-        ipv6_file = 'data/ipv6.pl'
+        ipv6_file = self.__file['ipv6']
         if os.path.exists(ipv6_file):
             data['ipv6'] = 'checked'
         else:
             data['ipv6'] = ''
 
-        debug_file = 'data/debug.pl'
+        debug_file = self.__file['debug']
         if os.path.exists(debug_file):
             data['debug'] = 'checked'
         else:
             data['debug'] = ''
 
-        ssl_file = 'data/ssl.pl'
-        if os.path.exists('data/ssl.pl'):
+        ssl_file = self.__file['ssl']
+        if os.path.exists(ssl_file):
             data['ssl'] = 'checked'
         else:
             data['ssl'] = ''
 
-        basic_auth = 'data/basic_auth.json'
+
+        auth_secret = self.__file['auth_secret']
+        if os.path.exists(auth_secret):
+            data['auth_secret'] = 'checked'
+        else:
+            data['auth_secret'] = ''
+
+        basic_auth = self.__file['basic_auth']
         if os.path.exists(basic_auth):
             bac = mw.readFile(basic_auth)
             bac = json.loads(bac)
@@ -972,7 +1026,7 @@ class config_api:
         else:
             data['basic_auth'] = ''
 
-        cfg_domain = 'data/bind_domain.pl'
+        cfg_domain = self.__file['bind_domain']
         if os.path.exists(cfg_domain):
             domain = mw.readFile(cfg_domain)
             data['bind_domain'] = domain.strip()
@@ -981,6 +1035,7 @@ class config_api:
 
         data = self.renderUnauthorizedStatus(data)
 
+        #api
         api_token = self.__api_addr
         if os.path.exists(api_token):
             bac = mw.readFile(api_token)
@@ -990,6 +1045,9 @@ class config_api:
         else:
             data['api_token'] = ''
 
+        #auth
+
+
         data['site_count'] = mw.M('sites').count()
 
         data['username'] = mw.M('users').where(
@@ -998,7 +1056,7 @@ class config_api:
         data['hook_tag'] = request.args.get('tag', '')
 
         # databases hook
-        database_hook_file = 'data/hook_database.json'
+        database_hook_file = self.__file['hook_database']
         if os.path.exists(database_hook_file):
             df = mw.readFile(database_hook_file)
             df = json.loads(df)
@@ -1007,7 +1065,7 @@ class config_api:
             data['hook_database'] = []
 
         # menu hook
-        menu_hook_file = 'data/hook_menu.json'
+        menu_hook_file = self.__file['hook_menu']
         if os.path.exists(menu_hook_file):
             df = mw.readFile(menu_hook_file)
             df = json.loads(df)
@@ -1016,7 +1074,7 @@ class config_api:
             data['hook_menu'] = []
 
         # global_static hook
-        global_static_hook_file = 'data/hook_global_static.json'
+        global_static_hook_file = self.__file['hook_global_static']
         if os.path.exists(global_static_hook_file):
             df = mw.readFile(global_static_hook_file)
             df = json.loads(df)
