@@ -321,8 +321,6 @@ def verifyLogin():
     if os.path.exists(auth_file):
         content = mw.readFile(auth_file)
         sec = mw.deDoubleCrypt('mdserver-web', content)
-
-        print(sec)
         totp = pyotp.TOTP(sec)
         if totp.verify(auth):
             userInfo = mw.M('users').where("id=?", (1,)).field('id,username,password').find()
