@@ -364,11 +364,7 @@ def doLogin():
             return mw.returnJson(False, code_msg)
 
     userInfo = mw.M('users').where("id=?", (1,)).field('id,username,password').find()
-
-    # print(userInfo)
-    # print(password)
     password = mw.md5(password)
-    # print('md5-pass', password)
 
     if userInfo['username'] != username or userInfo['password'] != password:
         msg = "<a style='color: red'>密码错误</a>,帐号:{1},密码:{2},登录IP:{3}", ((
@@ -399,7 +395,6 @@ def doLogin():
     session['login'] = True
     session['username'] = userInfo['username']
     session['overdue'] = int(time.time()) + 7 * 24 * 60 * 60
-    # session['overdue'] = int(time.time()) + 7
 
     # fix 跳转时,数据消失，可能是跨域问题
     # mw.writeFile('data/api_login.txt', userInfo['username'])
