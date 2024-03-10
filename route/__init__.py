@@ -315,10 +315,9 @@ def checkLogin():
 def verifyLogin():
     username = request.form.get('username', '').strip()
     password = request.form.get('password', '').strip()
-
-    userInfo = mw.M('users').where("id=?", (1,)).field('id,username,password').find()
     password = mw.md5(password)
 
+    userInfo = mw.M('users').where("id=?", (1,)).field('id,username,password').find()
     if userInfo['username'] != username or userInfo['password'] != password:
         return mw.returnJson(-1, "密码错误?")
 
