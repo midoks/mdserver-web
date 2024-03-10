@@ -314,6 +314,14 @@ def checkLogin():
 @app.route("/verify_login", methods=['POST'])
 def verifyLogin():
     username = request.form.get('username', '').strip()
+    password = request.form.get('password', '').strip()
+
+    userInfo = mw.M('users').where("id=?", (1,)).field('id,username,password').find()
+    password = mw.md5(password)
+
+    if userInfo['username'] != username or userInfo['password'] != password:
+        return mw.returnJson(-1, "密码错误?")
+
     auth = request.form.get('auth', '').strip()
 
     import pyotp
