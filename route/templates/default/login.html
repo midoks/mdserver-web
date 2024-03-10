@@ -233,7 +233,7 @@ $('#login-button').click(function(){
 			 	value: '',
 			 	title: '二次验证',
 			}, function(value, index, elem){
-			 	$.post('/verify_login',{'auth':value,'username':username},function(vdata){
+			 	$.post('/verify_login',{'auth':value,'username':username,'password':password},function(vdata){
 			 		if (vdata.status < 0){
 			 			layer.msg(vdata.msg,{icon:2,time:5000});
 			 			return;
