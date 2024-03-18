@@ -51,11 +51,15 @@ def send_msg(bot, tag='ad', trigger_time=300):
     # 信号只在一个周期内执行一次|end
 
     # https://t.me/gjgzs2022 ｜ 22/m | @GJ_gzs
-    # https://zhaoziyuan.pw/ | web | 15/m | 2m | next,3/15 ｜ @baleite
-    # 腾云机场 ｜9/m
+    # zhaoziyuan1.cc | web | 15/m | 2m | next,5/15 ｜ @baleite
     # 综合包网/NG接口开户 | 28/m | 3m | next,4/28 | @aabbcx888
     # 实名认证/过人脸🕵️‍♀️各种账号处理✅ | 30/m| next,6/30 | @nngzs
+    # 海外服务器 高防CDN 解决移动屏蔽 ｜ 19/m | next,2/19 | @YYCDNFW
     keyboard = [
+        [
+            types.InlineKeyboardButton(
+                text="海外服务器 高防CDN 解决移动屏蔽", url='https://t.me/kltfuwuqi')
+        ],
         [
             types.InlineKeyboardButton(
                 text="🚀 综合包网/NG接口开户", url='https://t.me/NG_Tony')

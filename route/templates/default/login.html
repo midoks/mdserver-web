@@ -8,6 +8,7 @@
 <link rel="icon" href="/static/favicon.ico" type="image/x-icon" />
 <link rel="shortcut icon" href="/static/favicon.ico" type="image/x-icon" />
 <title>{{data['title']}}</title>
+<link rel="stylesheet" type="text/css" href="/static/layer/skin/default/layer.css?v={{config.version}}">
 <link rel="stylesheet" type="text/css" href="/static/css/site.css?v={{config.version}}">
 <link rel="stylesheet" type="text/css" href="/static/css/login.css?v={{config.version}}">
 <style type="text/css">
@@ -29,6 +30,7 @@
 .bg_img.pc:hover{
 	background-position: -60px -60px;
 }
+
 .qrCode{
 	text-align: center;
 	padding-top: 20px;
@@ -70,9 +72,11 @@
 	padding: 20px;
 	background-color: #fff;
 }
+
 .list_scan .weChatSamll img{
 	width: 100%;
 }
+
 .list_scan .weChatSamll em{
 	position: absolute;
 	border: 7px solid #ececec;
@@ -83,6 +87,7 @@
 	bottom: -14px;
 	margin-left: -6px;
 }
+
 .tips{
 	width: 115px;
 	position: absolute;
@@ -94,6 +99,7 @@
 	text-align: center;
 	border-radius: 4px;
 }
+
 .tips em{
 	position: absolute;
 	border: 6px solid #dff0d8;
@@ -104,6 +110,7 @@
 	top: 8px;
 	margin-left: -6px;
 }
+
 .tips img{
 	height: 16px;
 	width: 16px;
@@ -115,6 +122,10 @@
 	margin-top: 15px;
 	margin-bottom: 25px;
 }
+
+.layui-layer .layui-layer-btn{
+	width: 235px;
+}
 </style>
 </head>
 <body>
@@ -123,11 +134,14 @@
 		<div class="account">
 			<form class="loginform" method="post" action="/login" onsubmit="return false;">
 			<div class="rlogo">{{data['title']}}</div>
-			<div class="line"><input class="inputtxt" value="" name="username" datatype="*" nullmsg="请填写账户" errormsg="请填写账户" placeholder="账户" type="text"><div class="Validform_checktip"></div></div>
+			<div class="line">
+				<input class="inputtxt" value="" name="username" datatype="*" nullmsg="请填写账户" errormsg="请填写账户" placeholder="账户" type="text">
+				<div class="Validform_checktip"></div>
+			</div>
 			<div class="line"><input class="inputtxt" name="password" value="" datatype="*" nullmsg="请填写密码" errormsg="请填写密码" placeholder="密码" type="password">
 				<div class="Validform_checktip"></div>
 			</div>
-			<div style="color: red;position: relative;top: -14px;" id="errorStr"></div>
+			<div style="color: red;position: relative;top: -14px;" id="error"></div>
 			<div class="line yzm" style="top: -5px;{% if not session['code'] %}display:none;{% endif %}">
 				<input type="text" class="inputtxt" name="code" nullmsg="请填写4位验证码" errormsg="验证码" datatype="*" placeholder="验证码">
 				<div class="Validform_checktip"></div>
@@ -150,6 +164,7 @@
 $(function(){
 	wreset();
 })
+
 window.onresize=function(){
 	wreset();
 }
@@ -188,25 +203,47 @@ $('#login-button').click(function(){
 	}
 			
 	var data = 'username='+username+'&password='+password+'&code='+code;
-	var loadT = layer.msg("正在登录中",{icon:16,time:0,shade: [0.3, '#000']});
+	var loadT = layer.msg("正在登录中...",{icon:16,time:0,shade: [0.3, '#000']});
 	$.post('/do_login',data,function(rdata){
+		console.log(rdata);
 		layer.close(loadT);
-		if(!rdata.status){
+		if(status < 0){
 			if(username == 'admin' && rdata.msg.indexOf('用户名') != -1){
 				rdata.msg += ', <br>获取默认用户和密码命令： mw default';
 			}
-			$("#errorStr").html(rdata.msg);
+			$("#error").html(rdata.msg);
 			$("input[name='password']").val('');
 			num = rdata.msg.substring(rdata.msg.indexOf('[')+1,rdata.msg.indexOf(']'))
 			if(num < 5){
-				$('#mw_yzm').html('<img width="100" height="40" class="passcode" onClick="this.src=this.src.split(\'?\')[0] + \'?\'+new Date().getTime()" src="/code" style="border: 1px solid #ccc; float: right;" title="" >');
-				$(".login").css("height","332px");
+				var code_html = '<img width="100" height="40" class="passcode" onClick="this.src=this.src.split(\'?\')[0] + \'?\'+new Date().getTime()" src="/code" style="border: 1px solid #ccc; float: right;">';
+				$('#mw_yzm').html(code_html);
+				// $(".login").css("height","332px");
 				$("input[name='code']").val('');
 				$(".passcode").click();
 			}
 			$(".yzm").show();
 			wreset();
 			layer.msg(rdata.msg,{icon:2,time:5000});
+			return;
+		}
+
+		if (rdata.status == 2){
+			layer.prompt({
+			 	formType: 3,
+			 	value: '',
+			 	title: '二次验证',
+			}, function(value, index, elem){
+			 	$.post('/verify_login',{'auth':value,'username':username,'password':password},function(vdata){
+			 		if (vdata.status < 0){
+			 			layer.msg(vdata.msg,{icon:2,time:5000});
+			 			return;
+			 		}
+
+			 		layer.close(index);
+			 		window.location.href = '/';	
+			 	},'json');
+			  	
+			});
 			return;
 		}
 		

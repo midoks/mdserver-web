@@ -1002,7 +1002,7 @@ function setTempAccess(){
 		shift: 0,
 		type: 1,
 		content: "<div class=\"login_view_table pd20\">\
-					<button class=\"btn btn-success btn-sm create_temp_login\" >临时访问授权</button>\
+					<button class=\"btn btn-success btn-sm create_temp_login\">临时访问授权</button>\
 					<div class=\"divtable mt10\">\
 						<table class=\"table table-hover\">\
 							<thead>\
@@ -1060,6 +1060,64 @@ function setTempAccess(){
 			});
 		}
 	});
+}
+
+//二次验证
+function setAuthBind(){
+	$.post('/config/get_auth_secret', {}, function(rdata){
+		console.log(rdata);
+		var tip = layer.open({
+			area: ['500px', '355px'],
+			title: '二次验证设置',
+			closeBtn:1,
+			shift: 0,
+			type: 1,
+			content: '<div class="bt-form pd20">\
+		<div class="line">\
+			<span class="tname">绑定密钥</span>\
+			<div class="info-r">\
+				<input class="bt-input-text mr5" name="secret" type="text" style="width: 310px;" disabled>\
+				<button class="btn btn-success btn-xs reset_secret" style="margin-left: -50px;">重置</button>\
+			</div>\
+		</div>\
+		<div class="line">\
+			<span class="tname" style="width: 90px; overflow: initial; height: 20px; line-height: 20px;">二维码</span>\
+			<div class="info-r"><div class="qrcode"></div></div>\
+		</div>\
+		<ul class="help-info-text c7">\
+		</ul>\
+	</div>',
+			success:function(layero,index){
+
+				$('input[name="secret"]').val(rdata.data['secret']);
+				$('.qrcode').qrcode({ text: rdata.data['url']});
+
+				$('.reset_secret').click(function(){
+					layer.confirm('您确定要重置当前密钥吗？<br/><span style="color: red; ">重置密钥后，已关联密钥产品，将失效，请重新添加新密钥至产品。</span>',{title:'重置密钥',closeBtn:2,icon:13,cancel:function(){
+					}}, function() {
+						$.post('/config/get_auth_secret', {'reset':"1"},function(rdata){
+							showMsg("接口密钥已生成，重置密钥后，已关联密钥产品，将失效，请重新添加新密钥至产品。", function(){
+								$('input[name="secret"]').val(rdata.data['secret']);
+								$('.qrcode').html('').qrcode({ text: rdata.data['url']});
+							} ,{icon:1}, 2000);
+						},'json');
+					});
+				});
+			},
+		});
+
+	},'json');
+}
+
+function setAuthSecretApi(){
+	var cfg_panel_auth = $('#cfg_panel_auth').prop("checked");
+	$.post('/config/set_auth_secret', {'op_type':"2"},function(rdata){
+		showMsg(rdata.msg, function(){
+			if (rdata.data == 1){
+				setAuthBind();
+			}
+		} ,{icon:rdata.status?1:2}, 1000);
+	},'json');
 }
 
 function setBasicAuthTip(callback){

@@ -90,7 +90,7 @@ PHP[72-83]支持phpMyAdmin[5.2.0]
 
 # 特别赞助
 
-- [找资源 - 阿里云盘资源搜索引擎](https://zhaoziyuan.pw/)
+- [找资源 - 阿里云盘资源搜索引擎](https://zhaoziyuan1.cc)
 
 # AD - VPS推荐 - 🙏
 
