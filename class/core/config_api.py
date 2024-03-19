@@ -586,35 +586,35 @@ class config_api:
 
             conf = mw.readFile(dst_panel_path)
             if conf:
-                rep = "\s+ssl_certificate\s+.+;\s+ssl_certificate_key\s+.+;"
+                rep = "\\s+ssl_certificate\\s+.+;\\s+ssl_certificate_key\\s+.+;"
                 conf = re.sub(rep, '', conf)
-                rep = "\s+ssl_protocols\s+.+;\n"
+                rep = "\\s+ssl_protocols\\s+.+;\n"
                 conf = re.sub(rep, '', conf)
-                rep = "\s+ssl_ciphers\s+.+;\n"
+                rep = "\\s+ssl_ciphers\\s+.+;\n"
                 conf = re.sub(rep, '', conf)
-                rep = "\s+ssl_prefer_server_ciphers\s+.+;\n"
+                rep = "\\s+ssl_prefer_server_ciphers\\s+.+;\n"
                 conf = re.sub(rep, '', conf)
-                rep = "\s+ssl_session_cache\s+.+;\n"
+                rep = "\\s+ssl_session_cache\\s+.+;\n"
                 conf = re.sub(rep, '', conf)
-                rep = "\s+ssl_session_timeout\s+.+;\n"
+                rep = "\\s+ssl_session_timeout\\s+.+;\n"
                 conf = re.sub(rep, '', conf)
-                rep = "\s+ssl_ecdh_curve\s+.+;\n"
+                rep = "\\s+ssl_ecdh_curve\\s+.+;\n"
                 conf = re.sub(rep, '', conf)
-                rep = "\s+ssl_session_tickets\s+.+;\n"
+                rep = "\\s+ssl_session_tickets\\s+.+;\n"
                 conf = re.sub(rep, '', conf)
-                rep = "\s+ssl_stapling\s+.+;\n"
+                rep = "\\s+ssl_stapling\\s+.+;\n"
                 conf = re.sub(rep, '', conf)
-                rep = "\s+ssl_stapling_verify\s+.+;\n"
+                rep = "\\s+ssl_stapling_verify\\s+.+;\n"
                 conf = re.sub(rep, '', conf)
-                rep = "\s+ssl\s+on;"
+                rep = "\\s+ssl\\s+on;"
                 conf = re.sub(rep, '', conf)
-                rep = "\s+error_page\s497.+;"
+                rep = "\\s+error_page\\s497.+;"
                 conf = re.sub(rep, '', conf)
-                rep = "\s+if.+server_port.+\n.+\n\s+\s*}"
+                rep = "\\s+if.+server_port.+\n.+\n\\s+\\s*}"
                 conf = re.sub(rep, '', conf)
-                rep = "\s+listen\s+443.*;"
+                rep = "\\s+listen\\s+443.*;"
                 conf = re.sub(rep, '', conf)
-                rep = "\s+listen\s+\[\:\:\]\:443.*;"
+                rep = "\\s+listen\\s+\\[\\:\\:\\]\\:443.*;"
                 conf = re.sub(rep, '', conf)
                 mw.writeFile(dst_panel_path, conf)
 
@@ -645,7 +645,7 @@ class config_api:
 
                     conf = conf.replace('#error_page 404/404.html;', sslStr)
 
-                    rep = "listen\s+([0-9]+)\s*[default_server]*;"
+                    rep = "listen\\s+([0-9]+)\\s*[default_server]*;"
                     tmp = re.findall(rep, conf)
                     if not mw.inArray(tmp, '443'):
                         listen = re.search(rep, conf).group()
@@ -761,7 +761,7 @@ class config_api:
 
     def setStatusCodeApi(self):
         status_code = request.form.get('status_code', '').strip()
-        if re.match("^\d+$", status_code):
+        if re.match("^\\d+$", status_code):
             status_code = int(status_code)
             if status_code != 0:
                 if status_code < 100 or status_code > 999:
