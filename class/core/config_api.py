@@ -241,7 +241,7 @@ class config_api:
         backup_path = request.form.get('backup_path', '')
 
         if domain != '':
-            reg = "^([\w\-\*]{1,100}\.){1,4}(\w{1,10}|\w{1,10}\.\w{1,10})$"
+            reg = "^([\\w\\-\\*]{1,100}\\.){1,4}(\\w{1,10}|\\w{1,10}\\.\\w{1,10})$"
             if not re.match(reg, domain):
                 return mw.returnJson(False, '主域名格式不正确')
 
@@ -303,7 +303,7 @@ class config_api:
                 return mw.returnJson(False, '安全入口地址长度不能小于6位!')
             if admin_path in admin_path_checks:
                 return mw.returnJson(False, '该入口已被面板占用,请使用其它入口!')
-            if not re.match("^/[\w\./-_]+$", admin_path):
+            if not re.match("^/[\\w\\./-_]+$", admin_path):
                 return mw.returnJson(False, '入口地址格式不正确,示例: /mw_rand')
         # else:
         #     domain = mw.readFile('data/bind_domain.pl')
@@ -447,9 +447,9 @@ class config_api:
         else:
             conf = mw.readFile(panel_ssl)
             if conf:
-                rep = "\n\s*#HTTP_TO_HTTPS_START(.|\n){1,300}#HTTP_TO_HTTPS_END"
+                rep = "\n\\s*#HTTP_TO_HTTPS_START(.|\n){1,300}#HTTP_TO_HTTPS_END"
                 conf = re.sub(rep, '', conf)
-                rep = "\s+if.+server_port.+\n.+\n\s+\s*}"
+                rep = "\\s+if.+server_port.+\n.+\n\\s+\\s*}"
                 conf = re.sub(rep, '', conf)
                 mw.writeFile(panel_ssl, conf)
 
