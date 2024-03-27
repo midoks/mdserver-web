@@ -15,7 +15,9 @@ if [ ! -d $GIT_PROJECT_DIR ];then
 fi
 
 unset GIT_DIR
-git config pull.rebase false
+
+git config pull.rebase true
+git config credential.helper store
 
 cd $GIT_PROJECT_DIR && git pull
 
