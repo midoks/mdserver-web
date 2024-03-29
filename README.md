@@ -30,7 +30,7 @@
 
 - 吹水组 - https://t.me/mdserver_web
 - 交流论坛 - https://bbs.midoks.icu
-- WhatApp - https://chat.whatsapp.com/LmlwFSzah8EAIHbnVT4aWV
+- WhatsApp - https://chat.whatsapp.com/LmlwFSzah8EAIHbnVT4aWV
 - discord - https://discord.gg/3zXk4mES
 ```
 如果出现问题，最好私给我面板信息。不要让我猜。如果不提供，不要提出问题，自行解决。  — 座右铭
