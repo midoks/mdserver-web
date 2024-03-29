@@ -241,7 +241,7 @@ class config_api:
         backup_path = request.form.get('backup_path', '')
 
         if domain != '':
-            reg = "^([\w\-\*]{1,100}\.){1,4}(\w{1,10}|\w{1,10}\.\w{1,10})$"
+            reg = "^([\\w\\-\\*]{1,100}\\.){1,4}(\\w{1,10}|\\w{1,10}\\.\\w{1,10})$"
             if not re.match(reg, domain):
                 return mw.returnJson(False, '主域名格式不正确')
 
@@ -303,7 +303,7 @@ class config_api:
                 return mw.returnJson(False, '安全入口地址长度不能小于6位!')
             if admin_path in admin_path_checks:
                 return mw.returnJson(False, '该入口已被面板占用,请使用其它入口!')
-            if not re.match("^/[\w\./-_]+$", admin_path):
+            if not re.match("^/[\\w\\./-_]+$", admin_path):
                 return mw.returnJson(False, '入口地址格式不正确,示例: /mw_rand')
         # else:
         #     domain = mw.readFile('data/bind_domain.pl')
@@ -447,9 +447,9 @@ class config_api:
         else:
             conf = mw.readFile(panel_ssl)
             if conf:
-                rep = "\n\s*#HTTP_TO_HTTPS_START(.|\n){1,300}#HTTP_TO_HTTPS_END"
+                rep = "\n\\s*#HTTP_TO_HTTPS_START(.|\n){1,300}#HTTP_TO_HTTPS_END"
                 conf = re.sub(rep, '', conf)
-                rep = "\s+if.+server_port.+\n.+\n\s+\s*}"
+                rep = "\\s+if.+server_port.+\n.+\n\\s+\\s*}"
                 conf = re.sub(rep, '', conf)
                 mw.writeFile(panel_ssl, conf)
 
@@ -586,35 +586,35 @@ class config_api:
 
             conf = mw.readFile(dst_panel_path)
             if conf:
-                rep = "\s+ssl_certificate\s+.+;\s+ssl_certificate_key\s+.+;"
+                rep = "\\s+ssl_certificate\\s+.+;\\s+ssl_certificate_key\\s+.+;"
                 conf = re.sub(rep, '', conf)
-                rep = "\s+ssl_protocols\s+.+;\n"
+                rep = "\\s+ssl_protocols\\s+.+;\n"
                 conf = re.sub(rep, '', conf)
-                rep = "\s+ssl_ciphers\s+.+;\n"
+                rep = "\\s+ssl_ciphers\\s+.+;\n"
                 conf = re.sub(rep, '', conf)
-                rep = "\s+ssl_prefer_server_ciphers\s+.+;\n"
+                rep = "\\s+ssl_prefer_server_ciphers\\s+.+;\n"
                 conf = re.sub(rep, '', conf)
-                rep = "\s+ssl_session_cache\s+.+;\n"
+                rep = "\\s+ssl_session_cache\\s+.+;\n"
                 conf = re.sub(rep, '', conf)
-                rep = "\s+ssl_session_timeout\s+.+;\n"
+                rep = "\\s+ssl_session_timeout\\s+.+;\n"
                 conf = re.sub(rep, '', conf)
-                rep = "\s+ssl_ecdh_curve\s+.+;\n"
+                rep = "\\s+ssl_ecdh_curve\\s+.+;\n"
                 conf = re.sub(rep, '', conf)
-                rep = "\s+ssl_session_tickets\s+.+;\n"
+                rep = "\\s+ssl_session_tickets\\s+.+;\n"
                 conf = re.sub(rep, '', conf)
-                rep = "\s+ssl_stapling\s+.+;\n"
+                rep = "\\s+ssl_stapling\\s+.+;\n"
                 conf = re.sub(rep, '', conf)
-                rep = "\s+ssl_stapling_verify\s+.+;\n"
+                rep = "\\s+ssl_stapling_verify\\s+.+;\n"
                 conf = re.sub(rep, '', conf)
-                rep = "\s+ssl\s+on;"
+                rep = "\\s+ssl\\s+on;"
                 conf = re.sub(rep, '', conf)
-                rep = "\s+error_page\s497.+;"
+                rep = "\\s+error_page\\s497.+;"
                 conf = re.sub(rep, '', conf)
-                rep = "\s+if.+server_port.+\n.+\n\s+\s*}"
+                rep = "\\s+if.+server_port.+\n.+\n\\s+\\s*}"
                 conf = re.sub(rep, '', conf)
-                rep = "\s+listen\s+443.*;"
+                rep = "\\s+listen\\s+443.*;"
                 conf = re.sub(rep, '', conf)
-                rep = "\s+listen\s+\[\:\:\]\:443.*;"
+                rep = "\\s+listen\\s+\\[\\:\\:\\]\\:443.*;"
                 conf = re.sub(rep, '', conf)
                 mw.writeFile(dst_panel_path, conf)
 
@@ -645,7 +645,7 @@ class config_api:
 
                     conf = conf.replace('#error_page 404/404.html;', sslStr)
 
-                    rep = "listen\s+([0-9]+)\s*[default_server]*;"
+                    rep = "listen\\s+([0-9]+)\\s*[default_server]*;"
                     tmp = re.findall(rep, conf)
                     if not mw.inArray(tmp, '443'):
                         listen = re.search(rep, conf).group()
@@ -761,7 +761,7 @@ class config_api:
 
     def setStatusCodeApi(self):
         status_code = request.form.get('status_code', '').strip()
-        if re.match("^\d+$", status_code):
+        if re.match("^\\d+$", status_code):
             status_code = int(status_code)
             if status_code != 0:
                 if status_code < 100 or status_code > 999:

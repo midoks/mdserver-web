@@ -177,7 +177,7 @@ def mwcli(mw_input=0):
 
 def open_ssh_port():
     import firewall_api
-    find_ssh_port_cmd = "cat /etc/ssh/sshd_config | grep '^Port \d*' | tail -1"
+    find_ssh_port_cmd = "cat /etc/ssh/sshd_config | grep '^Port \\d*' | tail -1"
     cmd_data = mw.execShell(find_ssh_port_cmd)
     ssh_port = cmd_data[0].replace("Port ", '').strip()
     if ssh_port == '':
