@@ -449,7 +449,7 @@ def errorLog():
 def installVersion():
     return mw.readFile(getServerDir() + '/version.pl')
 
-def pluginsDBSupport():
+def pluginsDbSupport():
     data = {}
     data['status'] = status()
     if (data['status'] == 'stop'):
