@@ -63,7 +63,9 @@ function getLogs(id){
         },
 
 		yes:function(index){
+			clearInterval(reqTimer);
 			closeLogs(id);
+			layer.close(index);
 		},
 	});
 }
@@ -157,7 +159,6 @@ function startTask(id){
 	var data='id='+id;
 	$.post('/crontab/start_task',data,function(rdata){
 		showMsg(rdata.msg, function(){
-			layer.closeAll();
 		},{icon:rdata.status?1:2,time:2000});
 	},'json');
 }
@@ -169,7 +170,7 @@ function closeLogs(id){
 	var data='id='+id;
 	$.post('/crontab/del_logs',data,function(rdata){
 		showMsg(rdata.msg, function(){
-			layer.closeAll();
+			// layer.closeAll();
 		},{icon:rdata.status?1:2,time:2000});
 	},'json');
 }

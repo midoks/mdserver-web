@@ -860,11 +860,14 @@ function openPhpmyadmin(name,username,password){
 
     data = syncPost('/plugins/check',{'name':'phpmyadmin'});
 
-
     if (!data.status){
         layer.msg(data.msg,{icon:2,shade: [0.3, '#000']});
         return;
     }
+
+    data = syncPost('/plugins/run',{'name':'phpmyadmin','func':'plugins_db_support'});
+
+    console.log(data);
 
     data = syncPost('/plugins/run',{'name':'phpmyadmin','func':'status'});
     if (data.data != 'start'){

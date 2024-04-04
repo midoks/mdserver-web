@@ -446,9 +446,28 @@ def errorLog():
     return getServerDir() + '/error.log'
 
 
-def Version():
+def installVersion():
     return mw.readFile(getServerDir() + '/version.pl')
 
+def pluginsDBSupport():
+    data = {}
+    data['status'] = status()
+    data['cfg'] = getCfg()
+
+    port = getPort()
+    ip = '127.0.0.1'
+    if not mw.isAppleSystem():
+        ip = mw.getLocalIp()
+
+    cfg = data['cfg']
+    auth = cfg['username']+':'+cfg['password']
+    rand_path = cfg['path']
+    home_page = 'http://' + auth + '@' + ip + ':' + port + '/' + rand_path + '/index.php'
+
+    data['home_page'] = home_page
+    data['version'] = installVersion()
+
+    return mw.returnJson(True, 'ok', data)
 
 if __name__ == "__main__":
     func = sys.argv[1]
@@ -465,7 +484,7 @@ if __name__ == "__main__":
     elif func == 'conf':
         print(getConf())
     elif func == 'version':
-        print(Version())
+        print(installVersion())
     elif func == 'get_cfg':
         print(returnCfg())
     elif func == 'config_inc':
@@ -494,5 +513,7 @@ if __name__ == "__main__":
         print(accessLog())
     elif func == 'error_log':
         print(errorLog())
+    elif func == 'plugins_db_support':
+        print(pluginsDbSupport())
     else:
         print('error')
