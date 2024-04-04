@@ -452,7 +452,6 @@ def installVersion():
 def pluginsDBSupport():
     data = {}
     data['status'] = status()
-
     if (data['status'] == 'stop'):
         return mw.returnJson(True, 'ok', data)
 
