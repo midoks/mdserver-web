@@ -866,8 +866,8 @@ function openPhpmyadmin(name,username,password){
     }
 
     data = syncPost('/plugins/run',{'name':'phpmyadmin','func':'plugins_db_support'});
-
-    console.log(data);
+    var rdata = $.parseJSON(data.data);
+    console.log(rdata);
 
     data = syncPost('/plugins/run',{'name':'phpmyadmin','func':'status'});
     if (data.data != 'start'){
