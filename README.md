@@ -189,7 +189,7 @@ TVbNgrpeGBGZVm5gTLa21ADP7RpnPFhjya
 日行一善，以后必定大富大贵
 
 
-### 微信赞助
+### 支付宝赞助
 
 [![截图](https://cdn.jsdelivr.net/gh/midoks/mdserver-web@latest/route/static/img/alipay_zz.jpg)](https://cdn.jsdelivr.net/gh/midoks/mdserver-web@latest/route/static/img/alipay_zz.jpg)
 
