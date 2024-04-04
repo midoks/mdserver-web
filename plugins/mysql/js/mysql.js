@@ -888,6 +888,7 @@ function openPhpmyadmin(name,username,password){
 
     //检查版本
     bigVer = rdata.data['version'];
+    console.log(bigVer);
     if (bigVer>=4.5){
 
         setTimeout(function(){
