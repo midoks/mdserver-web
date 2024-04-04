@@ -858,56 +858,58 @@ function setDbPs(id, name, obj) {
 
 function openPhpmyadmin(name,username,password){
 
-    data = syncPost('/plugins/check',{'name':'phpmyadmin'});
+    $.post('/plugins/run', {'name':'phpmyadmin','func':'plugins_db_support'}, function(data){
 
-    if (!data.status){
-        layer.msg(data.msg,{icon:2,shade: [0.3, '#000']});
-        return;
-    }
+        // data = syncPost('/plugins/run',{'name':'phpmyadmin','func':'plugins_db_support'});
+        var rdata = $.parseJSON(data.data);
+        console.log(rdata);
 
-    data = syncPost('/plugins/run',{'name':'phpmyadmin','func':'plugins_db_support'});
-    var rdata = $.parseJSON(data.data);
-    console.log(rdata);
+        if (!rdata.data['status'] != 'start'){
+            layer.msg('phpMyAdmin未安装!',{icon:2,shade: [0.3, '#000']});
+            return;
+        }
 
-    if (rdata.data['status'] != 'start'){
-        layer.msg('phpMyAdmin未启动',{icon:2,shade: [0.3, '#000']});
-        return;
-    }
+        if (rdata.data['status'] != 'start'){
+            layer.msg('phpMyAdmin未启动',{icon:2,shade: [0.3, '#000']});
+            return;
+        }
 
-    if (rdata.data['cfg']['choose'] != 'mysql'){
-        layer.msg('当前为['+rdata.choose+']模式,若要使用请修改phpMyAdmin访问切换.',{icon:2,shade: [0.3, '#000']});
-        return;
-    }
-    var home_page = rdata.data['home_page'];
-    $("#toPHPMyAdmin").attr('action',home_page);
-    if($("#toPHPMyAdmin").attr('action').indexOf('phpmyadmin') == -1){
-        layer.msg('请先安装phpMyAdmin',{icon:2,shade: [0.3, '#000']});
-        setTimeout(function(){ window.location.href = '/soft'; },3000);
-        return;
-    }
+        if (rdata.data['cfg']['choose'] != 'mysql'){
+            layer.msg('当前为['+rdata.choose+']模式,若要使用请修改phpMyAdmin访问切换.',{icon:2,shade: [0.3, '#000']});
+            return;
+        }
+        var home_page = rdata.data['home_page'];
+        $("#toPHPMyAdmin").attr('action',home_page);
+        if($("#toPHPMyAdmin").attr('action').indexOf('phpmyadmin') == -1){
+            layer.msg('请先安装phpMyAdmin',{icon:2,shade: [0.3, '#000']});
+            setTimeout(function(){ window.location.href = '/soft'; },3000);
+            return;
+        }
 
-    //检查版本
-    bigVer = rdata.data['version'];
-    console.log(bigVer);
-    if (bigVer>=4.5){
+        //检查版本
+        bigVer = rdata.data['version'];
+        console.log(bigVer);
+        if (bigVer>=4.5){
 
-        setTimeout(function(){
-            $("#toPHPMyAdmin").submit();
-        },2000);
-        layer.msg('phpMyAdmin['+data.data+']需要手动登录😭',{icon:16,shade: [0.3, '#000'],time:4000});
-        
-    } else{
-        var murl = $("#toPHPMyAdmin").attr('action');
-        $("#pma_username").val(username);
-        $("#pma_password").val(password);
-        $("#db").val(name);
+            setTimeout(function(){
+                $("#toPHPMyAdmin").submit();
+            },2000);
+            layer.msg('phpMyAdmin['+data.data+']需要手动登录😭',{icon:16,shade: [0.3, '#000'],time:4000});
+            
+        } else{
+            var murl = $("#toPHPMyAdmin").attr('action');
+            $("#pma_username").val(username);
+            $("#pma_password").val(password);
+            $("#db").val(name);
 
-        layer.msg('正在打开phpMyAdmin',{icon:16,shade: [0.3, '#000'],time:2000});
+            layer.msg('正在打开phpMyAdmin',{icon:16,shade: [0.3, '#000'],time:2000});
 
-        setTimeout(function(){
-            $("#toPHPMyAdmin").submit();
-        },2000);
-    }    
+            setTimeout(function(){
+                $("#toPHPMyAdmin").submit();
+            },2000);
+        }
+
+    },'json');
 }
 
 function delBackup(filename, name, path){

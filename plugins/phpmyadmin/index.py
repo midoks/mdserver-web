@@ -451,6 +451,13 @@ def installVersion():
 
 def pluginsDbSupport():
     data = {}
+
+    data['installed'] = 'no'
+    install_path = getServerDir()
+    if not os.path.exists(install_path):
+        return mw.returnJson(True, 'ok', data) 
+
+    data['installed'] = 'ok'
     data['status'] = status()
     if (data['status'] == 'stop'):
         return mw.returnJson(True, 'ok', data)
