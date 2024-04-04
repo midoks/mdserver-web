@@ -7,7 +7,7 @@ function getLogs(id){
 
 	var tips = layer.msg('正在获取,请稍候...',{icon:16,time:0,shade: [0.3, '#000']});
 	var req_log_args = 'id='+id;
-	function requestLogs(){
+	function requestLogs(layerIndex){
     	
 		$.post('/crontab/logs', req_log_args, function(rdata){
 
@@ -16,10 +16,15 @@ function getLogs(id){
 			}
 			
 			if(!rdata.status) {
+				layer.close(layerIndex);
 				layer.msg(rdata.msg,{icon:2, time:2000});
 				clearInterval(reqTimer);
 				return;
 			};
+
+			if (rdata.msg == ''){
+				rdata.msg = '暂无数据!';
+			}
 
 			$("#crontab_log").html(rdata.msg);
 			//滚动到最低
@@ -36,7 +41,7 @@ function getLogs(id){
 		title:"任务执行日志",
 		area: ['60%','500px'], 
 		shadeClose:false,
-		btn:["关闭","清空"],
+		btn:["清空","关闭"],
 		closeBtn:1,
 		end: function(){
         	if (reqTimer){
@@ -50,10 +55,10 @@ function getLogs(id){
 			// +'<button type="button" class="btn btn-danger btn-sm" onclick="layer.closeAll()">关闭</button>'
 		    // +'</div>'
 		+'</div>',
-		success:function(){
-	    	requestLogs();
+		success:function(index,layer_index){
+	    	requestLogs(layer_index);
 	    	reqTimer = setInterval(function(){
-	    		requestLogs();
+	    		requestLogs(layer_index);
 	    	},3000);
         },
 
