@@ -452,8 +452,11 @@ def installVersion():
 def pluginsDBSupport():
     data = {}
     data['status'] = status()
-    data['cfg'] = getCfg()
 
+    if (data['status'] == 'stop'):
+        return mw.returnJson(True, 'ok', data)
+
+    data['cfg'] = getCfg()
     port = getPort()
     ip = '127.0.0.1'
     if not mw.isAppleSystem():
