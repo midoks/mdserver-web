@@ -869,30 +869,16 @@ function openPhpmyadmin(name,username,password){
     var rdata = $.parseJSON(data.data);
     console.log(rdata);
 
-    data = syncPost('/plugins/run',{'name':'phpmyadmin','func':'status'});
-    if (data.data != 'start'){
+    if (rdata.data['status'] != 'start'){
         layer.msg('phpMyAdmin未启动',{icon:2,shade: [0.3, '#000']});
         return;
     }
 
-    data = syncPost('/plugins/run',{'name':'phpmyadmin','func':'get_cfg'});
-    var rdata = $.parseJSON(data.data);
-    if (rdata.choose != 'mysql'){
+    if (rdata.data['cfg']['choose'] != 'mysql'){
         layer.msg('当前为['+rdata.choose+']模式,若要使用请修改phpMyAdmin访问切换.',{icon:2,shade: [0.3, '#000']});
         return;
     }
-
-    var phpmyadmin_cfg = rdata;
-    data = syncPost('/plugins/run',{'name':'phpmyadmin','func':'get_home_page'});
-    var rdata = $.parseJSON(data.data);
-    if (!rdata.status){
-        layer.msg(rdata.msg,{icon:2,shade: [0.3, '#000']});
-        return;
-    }
-    var home_page = rdata.data;
-
-    home_page = home_page.replace("http://","http://"+phpmyadmin_cfg['username']+":"+phpmyadmin_cfg['password']+"@")
-
+    var home_page = rdata.data['home_page'];
     $("#toPHPMyAdmin").attr('action',home_page);
     if($("#toPHPMyAdmin").attr('action').indexOf('phpmyadmin') == -1){
         layer.msg('请先安装phpMyAdmin',{icon:2,shade: [0.3, '#000']});
@@ -901,8 +887,7 @@ function openPhpmyadmin(name,username,password){
     }
 
     //检查版本
-    data = syncPost('/plugins/run',{'name':'phpmyadmin','func':'version'});
-    bigVer = data.data.split('.')[0];
+    bigVer = rdata.data['version'];
     if (bigVer>=4.5){
 
         setTimeout(function(){

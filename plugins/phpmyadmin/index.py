@@ -467,7 +467,7 @@ def pluginsDbSupport():
     home_page = 'http://' + auth + '@' + ip + ':' + port + '/' + rand_path + '/index.php'
 
     data['home_page'] = home_page
-    data['version'] = installVersion()
+    data['version'] = installVersion().strip()
 
     return mw.returnJson(True, 'ok', data)
 
