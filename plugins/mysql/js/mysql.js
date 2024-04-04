@@ -857,12 +857,8 @@ function setDbPs(id, name, obj) {
 }
 
 function openPhpmyadmin(name,username,password){
-
     $.post('/plugins/run', {'name':'phpmyadmin','func':'plugins_db_support'}, function(data){
-
-        // data = syncPost('/plugins/run',{'name':'phpmyadmin','func':'plugins_db_support'});
         var rdata = $.parseJSON(data.data);
-        console.log(rdata);
 
         if (rdata.data['installed'] != 'ok'){
             layer.msg('phpMyAdmin未安装!',{icon:2,shade: [0.3, '#000']});
@@ -885,10 +881,8 @@ function openPhpmyadmin(name,username,password){
             setTimeout(function(){ window.location.href = '/soft'; },3000);
             return;
         }
-
         //检查版本
         bigVer = rdata.data['version'];
-        console.log(bigVer);
         if (bigVer>=4.5){
 
             setTimeout(function(){
