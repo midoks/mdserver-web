@@ -114,6 +114,8 @@ docker run -itd --name mw-server --privileged=true -p 7200:7200 -p 80:80 -p 443:
 
 * 二次验证。
 * OP防火墙修复。
+* 任务日志查看优化。
+* 优化MySQL打开phpMyAdmin速度。
 
 ### JSDelivr安装地址
 
