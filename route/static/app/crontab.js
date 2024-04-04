@@ -1,33 +1,73 @@
 var num = 0;
 //查看任务日志
 function getLogs(id){
-	layer.msg('正在获取,请稍候...',{icon:16,time:0,shade: [0.3, '#000']});
-	var data='&id='+id;
-	$.post('/crontab/logs', data, function(rdata){
-		layer.closeAll();
-		if(!rdata.status) {
-			layer.msg(rdata.msg,{icon:2, time:2000});
-			return;
-		};
-		layer.open({
-			type:1,
-			title:lan.crontab.task_log_title,
-			area: ['60%','500px'], 
-			shadeClose:false,
-			closeBtn:1,
-			content:'<div class="setchmod bt-form pd20 pb70">'
-				+'<pre id="crontab-log" style="overflow: auto; border: 0px none; line-height:23px;padding: 15px; margin: 0px; white-space: pre-wrap; height: 405px; background-color: rgb(51,51,51);color:#f1f1f1;border-radius:0px;font-family:"></pre>'
-				+'<div class="bt-form-submit-btn" style="margin-top: 0px;">'
-				+'<button type="button" class="btn btn-success btn-sm" onclick="closeLogs('+id+')">清空</button>'
-				+'<button type="button" class="btn btn-danger btn-sm" onclick="layer.closeAll()">关闭</button>'
-			    +'</div>'
-			+'</div>'
-		});
 
-		setTimeout(function(){
-			$("#crontab-log").html(rdata.msg);
-		},200);
-	},'json');
+	var reqTimer = null;
+	var reqCount = 0;
+
+	var tips = layer.msg('正在获取,请稍候...',{icon:16,time:0,shade: [0.3, '#000']});
+	var req_log_args = 'id='+id;
+	function requestLogs(layerIndex){
+    	
+		$.post('/crontab/logs', req_log_args, function(rdata){
+
+			if (reqCount == 0){
+				layer.close(tips);
+			}
+			
+			if(!rdata.status) {
+				layer.close(layerIndex);
+				layer.msg(rdata.msg,{icon:2, time:2000});
+				clearInterval(reqTimer);
+				return;
+			};
+
+			if (rdata.msg == ''){
+				rdata.msg = '暂无数据!';
+			}
+
+			$("#crontab_log").html(rdata.msg);
+			//滚动到最低
+			var ob = document.getElementById('crontab_log');
+            ob.scrollTop = ob.scrollHeight; 
+			reqCount++;
+		},'json');
+
+    }
+
+
+	layer.open({
+		type:1,
+		title:"任务执行日志",
+		area: ['60%','500px'], 
+		shadeClose:false,
+		btn:["清空","关闭"],
+		closeBtn:1,
+		end: function(){
+        	if (reqTimer){
+        		clearInterval(reqTimer);
+        	}
+        },
+		content:'<div class="setchmod bt-form" style="padding:5px;">'
+			+'<pre id="crontab_log" style="overflow: auto; border: 0px none; line-height:23px;padding: 5px; margin: 0px; white-space: pre-wrap; height: 395px; background-color: rgb(51,51,51);color:#f1f1f1;border-radius:0px;font-family:"></pre>'
+			// +'<div class="bt-form-submit-btn" style="margin-top: 0px;">'
+			// +'<button type="button" class="btn btn-success btn-sm" onclick="closeLogs('+id+')">清空</button>'
+			// +'<button type="button" class="btn btn-danger btn-sm" onclick="layer.closeAll()">关闭</button>'
+		    // +'</div>'
+		+'</div>',
+		success:function(index,layer_index){
+	    	requestLogs(layer_index);
+	    	reqTimer = setInterval(function(){
+	    		requestLogs(layer_index);
+	    	},3000);
+        },
+
+		yes:function(index){
+			clearInterval(reqTimer);
+			closeLogs(id);
+			layer.close(index);
+		},
+	});
 }
 
 
@@ -119,7 +159,6 @@ function startTask(id){
 	var data='id='+id;
 	$.post('/crontab/start_task',data,function(rdata){
 		showMsg(rdata.msg, function(){
-			layer.closeAll();
 		},{icon:rdata.status?1:2,time:2000});
 	},'json');
 }
@@ -131,7 +170,7 @@ function closeLogs(id){
 	var data='id='+id;
 	$.post('/crontab/del_logs',data,function(rdata){
 		showMsg(rdata.msg, function(){
-			layer.closeAll();
+			// layer.closeAll();
 		},{icon:rdata.status?1:2,time:2000});
 	},'json');
 }

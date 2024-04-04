@@ -121,6 +121,12 @@ Install_openresty()
 		# OPTIONS="${OPTIONS} --with-openssl=${OPENSSL_LIB_DEPEND_DIR}"
 	fi
 
+	if [ "$VERSION" == "1.25.3.1" ]; then
+		OPTIONS="${OPTIONS} --with-http_v3_module"
+	fi
+
+
+
 	# --with-openssl=$serverPath/source/lib/openssl-1.0.2q
 	cd ${openrestyDir}/openresty-${VERSION} && ./configure \
 	--prefix=$serverPath/openresty \

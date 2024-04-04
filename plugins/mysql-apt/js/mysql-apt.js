@@ -856,68 +856,53 @@ function setDbPs(id, name, obj) {
 }
 
 function openPhpmyadmin(name,username,password){
+    $.post('/plugins/run', {'name':'phpmyadmin','func':'plugins_db_support'}, function(data){
+        var rdata = $.parseJSON(data.data);
 
-    data = syncPost('/plugins/check',{'name':'phpmyadmin'});
+        if (rdata.data['installed'] != 'ok'){
+            layer.msg('phpMyAdmin未安装!',{icon:2,shade: [0.3, '#000']});
+            return;
+        }
 
+        if (rdata.data['status'] != 'start'){
+            layer.msg('phpMyAdmin未启动',{icon:2,shade: [0.3, '#000']});
+            return;
+        }
 
-    if (!data.status){
-        layer.msg(data.msg,{icon:2,shade: [0.3, '#000']});
-        return;
-    }
+        if (rdata.data['cfg']['choose'] != 'mysql-apt'){
+            layer.msg('当前为['+rdata.choose+']模式,若要使用请修改phpMyAdmin访问切换.',{icon:2,shade: [0.3, '#000']});
+            return;
+        }
+        var home_page = rdata.data['home_page'];
+        $("#toPHPMyAdmin").attr('action',home_page);
+        if($("#toPHPMyAdmin").attr('action').indexOf('phpmyadmin') == -1){
+            layer.msg('请先安装phpMyAdmin',{icon:2,shade: [0.3, '#000']});
+            setTimeout(function(){ window.location.href = '/soft'; },3000);
+            return;
+        }
+        //检查版本
+        bigVer = rdata.data['version'];
+        if (bigVer>=4.5){
 
-    data = syncPost('/plugins/run',{'name':'phpmyadmin','func':'status'});
-    if (data.data != 'start'){
-        layer.msg('phpMyAdmin未启动',{icon:2,shade: [0.3, '#000']});
-        return;
-    }
+            setTimeout(function(){
+                $("#toPHPMyAdmin").submit();
+            },2000);
+            layer.msg('phpMyAdmin['+data.data+']需要手动登录😭',{icon:16,shade: [0.3, '#000'],time:4000});
+            
+        } else{
+            var murl = $("#toPHPMyAdmin").attr('action');
+            $("#pma_username").val(username);
+            $("#pma_password").val(password);
+            $("#db").val(name);
 
-    data = syncPost('/plugins/run',{'name':'phpmyadmin','func':'get_cfg'});
-    var rdata = $.parseJSON(data.data);
-    if (rdata.choose != 'mysql-apt'){
-        layer.msg('当前为['+rdata.choose+']模式,若要使用请修改phpMyAdmin访问切换.',{icon:2,shade: [0.3, '#000']});
-        return;
-    }
+            layer.msg('正在打开phpMyAdmin',{icon:16,shade: [0.3, '#000'],time:2000});
 
-    var phpmyadmin_cfg = rdata;
-    data = syncPost('/plugins/run',{'name':'phpmyadmin','func':'get_home_page'});
-    var rdata = $.parseJSON(data.data);
-    if (!rdata.status){
-        layer.msg(rdata.msg,{icon:2,shade: [0.3, '#000']});
-        return;
-    }
-    var home_page = rdata.data;
+            setTimeout(function(){
+                $("#toPHPMyAdmin").submit();
+            },2000);
+        }
 
-    home_page = home_page.replace("http://","http://"+phpmyadmin_cfg['username']+":"+phpmyadmin_cfg['password']+"@")
-
-    $("#toPHPMyAdmin").attr('action',home_page);
-    if($("#toPHPMyAdmin").attr('action').indexOf('phpmyadmin') == -1){
-        layer.msg('请先安装phpMyAdmin',{icon:2,shade: [0.3, '#000']});
-        setTimeout(function(){ window.location.href = '/soft'; },3000);
-        return;
-    }
-
-    //检查版本
-    data = syncPost('/plugins/run',{'name':'phpmyadmin','func':'version'});
-    bigVer = data.data.split('.')[0];
-    if (bigVer>=4.5){
-
-        setTimeout(function(){
-            $("#toPHPMyAdmin").submit();
-        },3000);
-        layer.msg('phpMyAdmin['+data.data+']需要手动登录😭',{icon:16,shade: [0.3, '#000'],time:4000});
-        
-    } else{
-        var murl = $("#toPHPMyAdmin").attr('action');
-        $("#pma_username").val(username);
-        $("#pma_password").val(password);
-        $("#db").val(name);
-
-        layer.msg('正在打开phpMyAdmin',{icon:16,shade: [0.3, '#000'],time:2000});
-
-        setTimeout(function(){
-            $("#toPHPMyAdmin").submit();
-        },3000);
-    }    
+    },'json');
 }
 
 function delBackup(filename, name, path){

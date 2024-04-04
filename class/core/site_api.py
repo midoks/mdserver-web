@@ -2779,7 +2779,7 @@ location ^~ {from} {\n\
                 sslStr = """#error_page 404/404.html;
     ssl_certificate    %s;
     ssl_certificate_key  %s;
-    ssl_protocols TLSv1 TLSv1.1 TLSv1.2;
+    ssl_protocols TLSv1 TLSv1.1 TLSv1.2 TLSv1.3;
     ssl_ciphers ECDHE-RSA-AES128-GCM-SHA256:HIGH:!aNULL:!MD5:!RC4:!DHE;
     ssl_prefer_server_ciphers on;
     ssl_session_cache shared:SSL:10m;
