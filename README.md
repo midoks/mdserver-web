@@ -191,7 +191,7 @@ TVbNgrpeGBGZVm5gTLa21ADP7RpnPFhjya
 
 ### 支付宝赞助
 
-[![截图](https://cdn.jsdelivr.net/gh/midoks/mdserver-web@latest/route/static/img/alipay_zz.jpg)](https://cdn.jsdelivr.net/gh/midoks/mdserver-web@latest/route/static/img/alipay_zz.jpg)
+[![截图](https://cdn.jsdelivr.net/gh/midoks/mdserver-web@latest/route/static/img/alipay_zz.png)](https://cdn.jsdelivr.net/gh/midoks/mdserver-web@latest/route/static/img/alipay_zz.png)
 
 
 ### 无图不真相
