@@ -110,15 +110,10 @@ docker run -itd --name mw-server --privileged=true -p 7200:7200 -p 80:80 -p 443:
 ```
 
 
-### 版本更新 0.16.3
+### 版本更新 0.16.4
 
-* 面板配置-可以配置时区。
-* PHP(GD)扩展安装优化。
-* PHP界面功能调整。
-* PHP-FPM设置多个应用池(提高高并发稳定性)。
-* MySQL(apt/yum)调整优化。
-* 网站类型优化。
-* 增加数据管理插件。
+* 二次验证。
+* OP防火墙修复。
 
 ### JSDelivr安装地址
 
@@ -196,7 +191,7 @@ TVbNgrpeGBGZVm5gTLa21ADP7RpnPFhjya
 
 ### 微信赞助
 
-[![截图](https://cdn.jsdelivr.net/gh/midoks/mdserver-web@latest/route/static/img/weixin_zz.jpg)](https://cdn.jsdelivr.net/gh/midoks/mdserver-web@latest/route/static/img/alipay_zz.jpg)
+[![截图](https://cdn.jsdelivr.net/gh/midoks/mdserver-web@latest/route/static/img/alipay_zz.jpg)](https://cdn.jsdelivr.net/gh/midoks/mdserver-web@latest/route/static/img/alipay_zz.jpg)
 
 
 ### 无图不真相

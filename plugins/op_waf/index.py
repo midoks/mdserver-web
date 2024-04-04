@@ -579,6 +579,12 @@ def reload():
     mw.opWeb('start')
     return 'ok'
 
+def reload_hook():
+    s = status()
+    if s == 'start':
+        return reload()
+    return 'ok'
+
 
 def getJsonPath(name):
     path = getServerDir() + "/waf/" + name + ".json"
