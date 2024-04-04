@@ -1614,8 +1614,9 @@ function wafSite(){
                             <label class="btswitch-btn" for="closeget_'+ i + '" onclick="setSiteObjState(\'' + k + '\',\'open\')"></label>\
                         </div>\
                     </td>\
-                    <td class="text-right"><a onclick="wafLogs(\''+ k + '\')" class="btlink ' + (v.log_size > 0 ? 'dot' : '') + '">日志</a> | <a onclick="siteWafConfig(\'' + k + '\')" class="btlink">设置</a></td>\
+                    <td class="text-right"><a onclick="wafLogs(\''+ k + '\')" class="btlink ' + (v.log_size > 0 ? 'dot' : '') + '">日志</a> </td>\
                 </tr>';
+            //| <a onclick="siteWafConfig(\'' + k + '\')" class="btlink">设置</a>
         });
 
         var con = '<div class="lib-box">\
