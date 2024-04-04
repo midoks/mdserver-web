@@ -864,7 +864,7 @@ function openPhpmyadmin(name,username,password){
         var rdata = $.parseJSON(data.data);
         console.log(rdata);
 
-        if (!rdata.data['status'] != 'start'){
+        if (!rdata.data['installed'] != 'ok'){
             layer.msg('phpMyAdmin未安装!',{icon:2,shade: [0.3, '#000']});
             return;
         }
