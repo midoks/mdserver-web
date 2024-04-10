@@ -1293,18 +1293,18 @@ fullchain.pem       粘贴到证书输入框
         import panelSite
         args = mw.dict_obj()
         args.siteName = ''
-        for c_name in os.listdir(cert_paths):
-            skey_file = '{}/{}/privkey.pem'.format(cert_paths, c_name)
+        for cert_name in os.listdir(cert_paths):
+            skey_file = '{}/{}/privkey.pem'.format(cert_paths, cert_name)
             skey = mw.readFile(skey_file)
             if not skey:
                 continue
             if skey == pkey:
-                args.siteName = c_name
+                args.siteName = cert_name
                 run_path = panelSite.panelSite().GetRunPath(args)
                 if not run_path:
                     continue
                 sitePath = mw.M('sites').where(
-                    'name=?', c_name).getField('path')
+                    'name=?', cert_name).getField('path')
                 if not sitePath:
                     continue
                 to_path = "{}/{}".format(sitePath, run_path)
@@ -1509,8 +1509,7 @@ fullchain.pem       粘贴到证书输入框
                     # 已删除的网站直接跳过续签
                     if self.__config['orders'][i]['auth_to'].find('|') == -1 and self.__config['orders'][i]['auth_to'].find('/') != -1:
                         if not os.path.exists(self.__config['orders'][i]['auth_to']):
-                            auth_to = self.getSslUsedSite(
-                                self.__config['orders'][i]['save_path'])
+                            auth_to = self.getSslUsedSite(self.__config['orders'][i]['save_path'])
                             if not auth_to:
                                 continue
 
