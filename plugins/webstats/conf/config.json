@@ -1,7 +1,7 @@
 {
     "global": {
         "monitor": true,
-        "save_day": 180,
+        "save_day": 1,
         "autorefresh": false,
         "refresh_interval": 3,
         "cdn": true,
