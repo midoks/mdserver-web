@@ -242,7 +242,7 @@ class cert_request:
     # 注册acme帐户
     def register(self, existing=False):
         if not 'email' in self.__config:
-            self.__config['email'] = 'mdioks@163.com'
+            self.__config['email'] = 'xxxx.xxxx@gmail.com'
         if existing:
             payload = {"onlyReturnExisting": True}
         elif self.__config['email']:
