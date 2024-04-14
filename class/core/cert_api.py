@@ -434,6 +434,40 @@ fi
             OpenSSL.crypto.FILETYPE_PEM, self.getAccountKey().encode())
         return OpenSSL.crypto.sign(pk, message.encode("utf8"), self.__digest)
 
+    def getSiteRunPathByid(self, site_id):
+        if mw.M('sites').where('id=?', (site_id,)).count() >= 1:
+            site_path = mw.M('sites').where('id=?', site_id).getField('path')
+            if not site_path:
+                return None
+            if not os.path.exists(site_path):
+                return None
+            args = mw.dict_obj()
+            args.id = site_id
+            import panelSite
+            run_path = panelSite.panelSite().GetRunPath(args)
+            if run_path in ['/']:
+                run_path = ''
+            if run_path:
+                if run_path[0] == '/':
+                    run_path = run_path[1:]
+            site_run_path = os.path.join(site_path, run_path)
+            if not os.path.exists(site_run_path):
+                return site_path
+            return site_run_path
+        else:
+            return False
+
+    def getSiteRunPath(self, domains):
+        site_id = 0
+        for domain in domains:
+            site_id = mw.M('domain').where("name=?", domain).getField('pid')
+            if site_id:
+                break
+
+        if not site_id:
+            return None
+        return self.getSiteRunPathByid(site_id)
+
     # 清理验证文件
     def clearAuthFile(self, index):
         if not self.__config['orders'][index]['auth_type'] in ['http', 'tls']:
@@ -1435,7 +1469,6 @@ fullchain.pem       粘贴到证书输入框
                     # 加入到续签订单
                     order_index.append(i)
                 if not order_index:
-                    writeLog("|-没有找到30天内到期的SSL证书，正在尝试去寻找其它可续签证书!")
                     writeLog("|-所有任务已处理完成!")
                     return
             writeLog("|-共需要续签 {} 张证书".format(len(order_index)))
