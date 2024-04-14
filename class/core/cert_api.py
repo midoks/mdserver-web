@@ -441,19 +441,7 @@ fi
                 return None
             if not os.path.exists(site_path):
                 return None
-            args = mw.dict_obj()
-            args.id = site_id
-            import panelSite
-            run_path = panelSite.panelSite().GetRunPath(args)
-            if run_path in ['/']:
-                run_path = ''
-            if run_path:
-                if run_path[0] == '/':
-                    run_path = run_path[1:]
-            site_run_path = os.path.join(site_path, run_path)
-            if not os.path.exists(site_run_path):
-                return site_path
-            return site_run_path
+            return site_path
         else:
             return False
 
