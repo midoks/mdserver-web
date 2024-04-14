@@ -434,40 +434,6 @@ fi
             OpenSSL.crypto.FILETYPE_PEM, self.getAccountKey().encode())
         return OpenSSL.crypto.sign(pk, message.encode("utf8"), self.__digest)
 
-    def getSiteRunPathByid(self, site_id):
-        if mw.M('sites').where('id=?', (site_id,)).count() >= 1:
-            site_path = mw.M('sites').where('id=?', site_id).getField('path')
-            if not site_path:
-                return None
-            if not os.path.exists(site_path):
-                return None
-            args = mw.dict_obj()
-            args.id = site_id
-            import panelSite
-            run_path = panelSite.panelSite().GetRunPath(args)
-            if run_path in ['/']:
-                run_path = ''
-            if run_path:
-                if run_path[0] == '/':
-                    run_path = run_path[1:]
-            site_run_path = os.path.join(site_path, run_path)
-            if not os.path.exists(site_run_path):
-                return site_path
-            return site_run_path
-        else:
-            return False
-
-    def getSiteRunPath(self, domains):
-        site_id = 0
-        for domain in domains:
-            site_id = mw.M('domain').where("name=?", domain).getField('pid')
-            if site_id:
-                break
-
-        if not site_id:
-            return None
-        return self.getSiteRunPathByid(site_id)
-
     # 清理验证文件
     def clearAuthFile(self, index):
         if not self.__config['orders'][index]['auth_type'] in ['http', 'tls']:
@@ -1283,85 +1249,6 @@ fullchain.pem       粘贴到证书输入框
             root = old_domain_name
         return root, zone
 
-    # 获取当前正在使用此证书的网站目录
-    def getSslUsedSite(self, save_path):
-        pkey_file = '{}/privkey.pem'.format(save_path)
-        pkey = mw.readFile(pkey_file)
-        if not pkey:
-            return False
-        cert_paths = 'vhost/cert'
-        import panelSite
-        args = mw.dict_obj()
-        args.siteName = ''
-        for cert_name in os.listdir(cert_paths):
-            skey_file = '{}/{}/privkey.pem'.format(cert_paths, cert_name)
-            skey = mw.readFile(skey_file)
-            if not skey:
-                continue
-            if skey == pkey:
-                args.siteName = cert_name
-                run_path = panelSite.panelSite().GetRunPath(args)
-                if not run_path:
-                    continue
-                sitePath = mw.M('sites').where(
-                    'name=?', cert_name).getField('path')
-                if not sitePath:
-                    continue
-                to_path = "{}/{}".format(sitePath, run_path)
-                return to_path
-        return False
-
-    def renewCertOther(self):
-        cert_path = "{}/vhost/cert".format(mw.getRunDir())
-        if not os.path.exists(cert_path):
-            return
-        new_time = time.time() + (86400 * 30)
-        n = 0
-        if not 'orders' in self.__config:
-            self.__config['orders'] = {}
-        import panelSite
-        siteObj = panelSite.panelSite()
-        args = mw.dict_obj()
-        for siteName in os.listdir(cert_path):
-            try:
-                cert_file = '{}/{}/fullchain.pem'.format(cert_path, siteName)
-                if not os.path.exists(cert_file):
-                    continue  # 无证书文件
-                siteInfo = mw.M('sites').where('name=?', siteName).find()
-                if not siteInfo:
-                    continue  # 无网站信息
-                cert_init = self.getCertInit(cert_file)
-                if not cert_init:
-                    continue  # 无法获取证书
-                end_time = time.mktime(time.strptime(
-                    cert_init['notAfter'], '%Y-%m-%d'))
-                if end_time > new_time:
-                    continue  # 未到期
-                try:
-                    if not cert_init['issuer'] in ['R3', "Let's Encrypt"] and cert_init['issuer'].find("Let's Encrypt") == -1:
-                        continue  # 非同品牌证书
-                except:
-                    continue
-
-                if isinstance(cert_init['dns'], str):
-                    cert_init['dns'] = [cert_init['dns']]
-                index = self.getIndex(cert_init['dns'])
-                if index in self.__config['orders'].keys():
-                    continue  # 已在订单列表
-
-                n += 1
-                writeLog(
-                    "|-正在续签第 {} 张其它证书，域名: {}..".format(n, cert_init['subject']))
-                writeLog("|-正在创建订单..")
-                args.id = siteInfo['id']
-                runPath = siteObj.GetRunPath(args)
-                if runPath and not runPath in ['/']:
-                    path = siteInfo['path'] + '/' + runPath
-                else:
-                    path = siteInfo['path']
-            except:
-                writeLog("|-[{}]续签失败".format(siteName))
-
     # 外部API - START ----------------------------------------------------------
     def getHostConf(self, siteName):
         return mw.getServerDir() + '/web_conf/nginx/vhost/' + siteName + '.conf'
@@ -1509,7 +1396,7 @@ fullchain.pem       粘贴到证书输入框
                     # 已删除的网站直接跳过续签
                     if self.__config['orders'][i]['auth_to'].find('|') == -1 and self.__config['orders'][i]['auth_to'].find('/') != -1:
                         if not os.path.exists(self.__config['orders'][i]['auth_to']):
-                            auth_to = self.getSslUsedSite(self.__config['orders'][i]['save_path'])
+                            auth_to = self.__config['orders'][i]['auth_to']
                             if not auth_to:
                                 continue
 
@@ -1549,8 +1436,6 @@ fullchain.pem       粘贴到证书输入框
                     order_index.append(i)
                 if not order_index:
                     writeLog("|-没有找到30天内到期的SSL证书，正在尝试去寻找其它可续签证书!")
-                    # self.getApis()
-                    # self.renewCertOther()
                     writeLog("|-所有任务已处理完成!")
                     return
             writeLog("|-共需要续签 {} 张证书".format(len(order_index)))
