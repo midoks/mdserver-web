@@ -825,6 +825,7 @@ function isAction() {
 	}
 	$("#memuA" + name).addClass("current")
 }
+
 var W_window = $(window).width();
 if(W_window <= 980) {
 	$(window).scroll(function() {
@@ -1867,6 +1868,10 @@ function showSpeedWindow(msg, speed_log_func_name, callback){
 
 
 /*** 其中功能,针对插件通过库使用 start ***/
+
+function toUrlParam(json) {
+    return Object.keys(json).map(key => key + '=' + json[key]).join('&');
+}
 
 //字符串转数组对象
 function toArrayObject(str){

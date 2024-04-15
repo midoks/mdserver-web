@@ -161,15 +161,12 @@ class files_api:
         search = request.args.get('search', '').strip().lower()
         search_all = request.args.get('all', '').strip().lower()
         page = request.args.get('p', '1').strip().lower()
-        row = request.args.get('showRow', '10')
-        disk = request.form.get('disk', '')
-        if disk == 'True':
-            row = 1000
+        row = request.args.get('row', '10')
+        order = request.form.get('order', '')
 
-        # return self.getAllDir(path, int(page), int(row), "wp-inlcude")
         if search_all == 'yes' and search != '':
-            return self.getAllDir(path, int(page), int(row), search)
-        return self.getDir(path, int(page), int(row), search)
+            return self.getAllDir(path, int(page), int(row), order, search)
+        return self.getDir(path, int(page), int(row), order, search)
 
     def createFileApi(self):
         file = request.form.get('path', '')
@@ -948,16 +945,64 @@ class files_api:
             i += 1
         return i
 
-    def getAllDir(self, path, page=1, page_size=10, search=None):
+    def getAllDir(self, path, page=1, page_size=10, order='', search=None):
         # print("search:", search)
+        data = {}
+        dirnames = []
+        filenames = []
+
+        info = {}
+        
+        i = 0
+        n = 0
+        count = 0
+        max_limit = 3000
+        order_arr = order.split(' ')
+        if len(order_arr) < 2:
+            plist = mw.sortAllFileList(path, order_arr[0],'',search, max_limit)
+        else:
+            plist = mw.sortAllFileList(path, order_arr[0], order_arr[1], search,max_limit)
+
+        info['count'] = len(plist)
+        info['row'] = page_size
+        info['p'] = page
+        info['tojs'] = 'getFiles'
+        pageObj = mw.getPageObject(info, '1,2,3,4,5,6,7,8')
+        data['PAGE'] = pageObj[0]
+
+        for dst_file in plist:
+
+            if not os.path.exists(dst_file):
+                continue
+
+            i += 1
+            if n >= pageObj[1].ROW:
+                break
+            if i < pageObj[1].SHIFT:
+                continue
+
+            if os.path.isdir(dst_file):
+                dirnames.append(self.__get_stats(dst_file, path))
+            else:
+                filenames.append(self.__get_stats(dst_file, path))
+            n += 1
+
+        data['DIR'] = dirnames
+        data['FILES'] = filenames
+        data['PATH'] = path.replace('//', '/')
+
+        return mw.getJson(data)
+
+    #备份
+    def getAllDirBk(self, path, page=1, page_size=10, order='', search=None):
         data = {}
         dirnames = []
         filenames = []
 
         count = 0
         max_limit = 3000
-
         for d_list in os.walk(path):
+
             if count >= max_limit:
                 break
 
@@ -996,7 +1041,7 @@ class files_api:
 
         return mw.getJson(data)
 
-    def getDir(self, path, page=1, page_size=10, search=None):
+    def getDir(self, path, page=1, page_size=10, order = '', search=None):
         data = {}
         dirnames = []
         filenames = []
@@ -1011,7 +1056,14 @@ class files_api:
 
         i = 0
         n = 0
-        for filename in os.listdir(path):
+
+        order_arr = order.split(' ')
+        if len(order_arr) < 2:
+            plist = mw.sortFileList(path, order_arr[0],'')
+        else:
+            plist = mw.sortFileList(path, order_arr[0],order_arr[1])
+        
+        for filename in plist:
             if search:
                 if filename.lower().find(search) == -1:
                     continue
@@ -1033,8 +1085,8 @@ class files_api:
                 n += 1
             except Exception as e:
                 continue
-        data['DIR'] = sorted(dirnames)
-        data['FILES'] = sorted(filenames)
+        data['DIR'] = dirnames
+        data['FILES'] = filenames
         data['PATH'] = path.replace('//', '/')
 
         return mw.getJson(data)
@@ -1067,6 +1119,7 @@ cd %s
         return mw.returnJson(status, mw.getNumLines(fileName, 200))
 
     def __get_stats(self, filename, path=None):
+        # print(filename,path)
         filename = filename.replace('//', '/')
         try:
             stat = os.stat(filename)

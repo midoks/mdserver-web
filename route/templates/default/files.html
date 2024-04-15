@@ -16,7 +16,7 @@
                         <div class="pull-left mlr15" style="line-height:26px"><span id='dir_info'></span></div>
                         <div class="search pull-right" style="position: absolute; top: 6px; right: 5px;">
                             <form target="hid">
-                                <input type="text" id="SearchValue" class="ser-text pull-left" placeholder="搜索文件/目录" />
+                                <input type="text" id="search_file" class="ser-text pull-left" placeholder="搜索文件/目录" />
                                 <button type="button" class="ser-sub pull-left" onclick='searchFile(1)'></button>
                                 <div class="file_search" draggable="false">
                                     <div id="search_all" class="file_search_checked"></div>
@@ -66,7 +66,7 @@
 <script type="text/javascript">
 
 
-$("#SearchValue").focus().keyup(function(e){
+$("#search_file").focus().keyup(function(e){
     if(e.keyCode == 13) searchFile(1);
 });
 
