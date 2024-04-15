@@ -1598,6 +1598,63 @@ def checkCert(certPath='ssl/certificate.pem'):
     return True
 
 
+def sortFileList(path, ftype = 'mtime', sort = 'desc'):
+    flist = os.listdir(path)
+    if ftype == 'mtime':
+        if sort == 'desc':
+            flist = sorted(flist, key=lambda f: os.path.getmtime(os.path.join(path,f)), reverse=True)
+        if sort == 'asc':
+            flist = sorted(flist, key=lambda f: os.path.getmtime(os.path.join(path,f)), reverse=False)
+
+    if ftype == 'size':
+        if sort == 'desc':
+            flist = sorted(flist, key=lambda f: os.path.getsize(os.path.join(path,f)), reverse=True)
+        if sort == 'asc':
+            flist = sorted(flist, key=lambda f: os.path.getsize(os.path.join(path,f)), reverse=False)
+    return flist
+
+
+def sortAllFileList(path, ftype = 'mtime', sort = 'desc', search = '',limit = 3000):
+    count = 0
+    flist = []
+    for d_list in os.walk(path):
+        if count >= limit:
+            break
+
+        for d in d_list[1]:
+            if count >= limit:
+                break
+            if d.lower().find(search) != -1:
+                filename = d_list[0] + '/' + d
+                if not os.path.exists(filename):
+                    continue
+                count += 1
+                flist.append(filename)
+
+        for f in d_list[2]:
+            if count >= limit:
+                break
+
+            if f.lower().find(search) != -1:
+                filename = d_list[0] + '/' + f
+                if not os.path.exists(filename):
+                    continue
+                count += 1
+                flist.append(filename)
+
+    if ftype == 'mtime':
+        if sort == 'desc':
+            flist = sorted(flist, key=lambda f: os.path.getmtime(f), reverse=True)
+        if sort == 'asc':
+            flist = sorted(flist, key=lambda f: os.path.getmtime(f), reverse=False)
+
+    if ftype == 'size':
+        if sort == 'desc':
+            flist = sorted(flist, key=lambda f: os.path.getsize(f), reverse=True)
+        if sort == 'asc':
+            flist = sorted(flist, key=lambda f: os.path.getsize(f), reverse=False)
+    return flist
+
 def getPathSize(path):
     # 取文件或目录大小
     if not os.path.exists(path):

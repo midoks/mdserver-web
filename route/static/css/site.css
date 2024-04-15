@@ -1094,20 +1094,21 @@ html .menu .menu_exit:hover {
 }
 
 .table .btlinkbed:hover {
-    border: #ddd 1px solid
+    border: #ddd 1px solid;
 }
 
 .dataTables_paginate {
     display: block;
-    height: 30px;
+    height: 35px;
     margin-bottom: 0px;
-    margin-top: 0px;
+    margin-top: 5px;
     position:relative;
 }
 
 #filePage{
     margin-bottom: 10px;
 }
+
 .page {
     /* line-height: 16px; */
     text-align: right;

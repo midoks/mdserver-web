@@ -8,7 +8,7 @@
 	"install_pre_inspection":true,
 	"checks":"server/openresty",
 	"path":"server/openresty",
-	"author":"agentzh",
+	"author":"nginx/agentzh",
 	"home":"http://openresty.org",
 	"date":"2017-11-24",
 	"pid": "1",
