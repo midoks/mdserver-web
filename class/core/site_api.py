@@ -2767,10 +2767,16 @@ location ^~ {from} {\n\
         mw.writeLog('TYPE_SITE', '设置成功,站点到期后将自动停止!', (siteName, edate))
         return mw.returnJson(True, '设置成功,站点到期后将自动停止!')
 
-# ssl相关方法 start
+    # ssl相关方法 start
     def setSslConf(self, siteName):
         file = self.getHostConf(siteName)
         conf = mw.readFile(file)
+
+        version = ''
+        version_file_pl = mw.getServerDir() + '/openresty/version.pl'
+        if os.path.exists(version_file_pl):
+            version = mw.readFile(version_file_pl)
+
 
         keyPath = self.sslDir + '/' + siteName + '/privkey.pem'
         certPath = self.sslDir + '/' + siteName + '/fullchain.pem'
@@ -2799,6 +2805,10 @@ location ^~ {from} {\n\
                 listen = re.search(rep, conf).group()
                 http_ssl = "\n\tlisten 443 ssl http2;"
                 http_ssl = http_ssl + "\n\tlisten [::]:443 ssl http2;"
+
+                if version == '1.25.3.1':
+                    http_ssl = http_ssl + "\n\tlisten 443 quic;"
+
                 conf = conf.replace(listen, listen + http_ssl)
 
             mw.backFile(file)
