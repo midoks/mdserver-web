@@ -91,7 +91,7 @@ Install_openresty()
 
 
 	opensslVersion="1.1.1p"
-	libresslVersion="1.1.1p"
+	libresslVersion="3.9.1"
 	pcreVersion='8.38'
 	if [ "$sysName" == "Darwin" ];then
 
