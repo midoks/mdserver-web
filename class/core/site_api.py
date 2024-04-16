@@ -2784,6 +2784,14 @@ location ^~ {from} {\n\
         if conf:
             if conf.find('ssl_certificate') == -1:
                 #ssl_ciphers ECDHE-RSA-AES128-GCM-SHA256:HIGH:!aNULL:!MD5:!RC4:!DHE;
+
+                http3Header = """
+    add_header Strict-Transport-Security "max-age=63072000";
+    add_header Alt-Svc 'h3=":443"; ma=2592000';
+"""
+                if version != '1.25.3.1':
+                    http3Header = '';
+
                 sslStr = """#error_page 404/404.html;
     ssl_certificate    %s;
     ssl_certificate_key  %s;
@@ -2792,9 +2800,8 @@ location ^~ {from} {\n\
     ssl_prefer_server_ciphers on;
     ssl_session_cache shared:SSL:10m;
     ssl_session_timeout 10m;
-    add_header Strict-Transport-Security "max-age=63072000";
-    add_header Alt-Svc 'h3=":443"; ma=2592000';
-    error_page 497  https://$host$request_uri;""" % (certPath, keyPath)
+    %s
+    error_page 497  https://$host$request_uri;""" % (certPath, keyPath, http3Header)
             if(conf.find('ssl_certificate') != -1):
                 return mw.returnData(True, 'SSL开启成功!')
 
