@@ -49,7 +49,7 @@ ALTER TABLE `firewall` ADD COLUMN `protocol` TEXT DEFAULT 'tcp';
 
 INSERT INTO `firewall` (`id`, `port`, `protocol`, `ps`, `addtime`) VALUES
 (1, '80',  'tcp','网站默认端口', '0000-00-00 00:00:00'),
-(2, '443', 'tcp', 'HTTPS', '0000-00-00 00:00:00');
+(2, '443', 'tcp/udp', 'HTTPS', '0000-00-00 00:00:00');
 
 
 

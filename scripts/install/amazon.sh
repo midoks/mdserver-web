@@ -62,6 +62,7 @@ if [ ! -f /usr/sbin/firewalld ];then
 
 	firewall-cmd --permanent --zone=public --add-port=80/tcp
 	firewall-cmd --permanent --zone=public --add-port=443/tcp
+	firewall-cmd --permanent --zone=public --add-port=443/udp
 	# firewall-cmd --permanent --zone=public --add-port=888/tcp
 
 	sed -i 's#AllowZoneDrifting=yes#AllowZoneDrifting=no#g' /etc/firewalld/firewalld.conf
