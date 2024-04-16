@@ -119,12 +119,20 @@ Install_openresty()
 		# brew info openssl@1.1 | grep /opt/homebrew/Cellar/openssl@1.1 | cut -d \  -f 1 | awk 'END {print}'
 		# OPENSSL_LIB_DEPEND_DIR=`brew info openssl@1.1 | grep ${BREW_DIR}/Cellar/openssl@1.1 | cut -d \  -f 1 | awk 'END {print}'`
 		# OPTIONS="${OPTIONS} --with-openssl=${OPENSSL_LIB_DEPEND_DIR}"
-	fi
+	else
+		if [ "$VERSION" == "1.25.3.1" ]; then
+			OPTIONS="${OPTIONS} --with-http_v3_module"
 
-	if [ "$VERSION" == "1.25.3.1" ]; then
-		OPTIONS="${OPTIONS} --with-http_v3_module"
-	fi
+			if [ ! -f ${openrestyDir}/openssl-${opensslVersion}.tar.gz ];then
+		        wget --no-check-certificate -O ${openrestyDir}/openssl-${opensslVersion}.tar.gz https://www.openssl.org/source/openssl-${opensslVersion}.tar.gz
+		    fi
 
+		    if [ ! -d ${openrestyDir}/openssl-${opensslVersion} ];then
+				cd ${openrestyDir} &&  tar -zxvf openssl-${opensslVersion}.tar.gz
+			fi
+		    OPTIONS="${OPTIONS} --with-openssl=${openrestyDir}/openssl-${opensslVersion}"
+		fi
+	fi
 
 
 	# --with-openssl=$serverPath/source/lib/openssl-1.0.2q
