@@ -384,12 +384,11 @@ function getFiles(Path) {
 	var post = {};
 	post['path'] = Path;
 
-
 	var file_row = $.cookie('file_row');
 	if(!file_row) {
 		file_row = '100';
-		args['row'] = file_row;
 	}
+	args['row'] = file_row;
 
 	var body = '';
 	var totalSize = 0;

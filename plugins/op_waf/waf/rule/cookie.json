@@ -1,1 +1,21 @@
-[[1, "\\.\\./\\.\\./", "\u76ee\u5f55\u4fdd\u62a41", 0], [1, "(?:etc\\/\\W*passwd)", "\u76ee\u5f55\u4fdd\u62a43", 0], [1, "(gopher|doc|php|glob|file|phar|zlib|ftp|ldap|dict|ogg|data)\\:\\/", "PHP\u6d41\u534f\u8bae\u8fc7\u6ee41", 0], [1, "\\:\\$", "\u4e00\u53e5\u8bdd\u6728\u9a6c\u8fc7\u6ee41", 0], [1, "\\$\\{", "\u4e00\u53e5\u8bdd\u6728\u9a6c\u8fc7\u6ee42", 0], [1, "base64_decode\\(", "\u4e00\u53e5\u8bdd\u6728\u9a6c\u8fc7\u6ee43", 0], [1, "\\$_(GET|post|cookie|files|session|env|phplib|GLOBALS|SERVER)\\[", "\u4e00\u53e5\u8bdd\u6728\u9a6c\u8fc7\u6ee45", 0], [1, "\\b(or|xor|and)\\b.*(=|<|>|'|\")", "SQL\u6ce8\u5165\u8fc7\u6ee41", 0], [1, "select.+(from|limit)", "SQL\u6ce8\u5165\u8fc7\u6ee42", 0], [1, "(?:(union(.*?)select))", "SQL\u6ce8\u5165\u8fc7\u6ee43", 0], [0, "having|load_file", "SQL\u6ce8\u5165\u8fc7\u6ee44", 0], [1, "sleep\\((\\s*)(\\d*)(\\s*)\\)", "SQL\u6ce8\u5165\u8fc7\u6ee45", 0], [1, "benchmark\\((.*)\\,(.*)\\)", "SQL\u6ce8\u5165\u8fc7\u6ee46", 0], [1, "(?:from\\W+information_schema\\W)", "SQL\u6ce8\u5165\u8fc7\u6ee47", 0], [1, "(?:(?:current_)user|database|schema|connection_id)\\s*\\(", "SQL\u6ce8\u5165\u8fc7\u6ee48", 0], [1, "into(\\s+)+(?:dump|out)file\\s*", "SQL\u6ce8\u5165\u8fc7\u6ee49", 0], [1, "group\\s+by.+\\(", "SQL\u6ce8\u5165\u8fc7\u6ee410", 0], [0, "\\<(iframe|script|body|img|layer|div|meta|style|base|object|input)", "XSS\u8fc7\u6ee41", 0], [1, "(onmouseover|onerror|onload)\\=", "XSS\u8fc7\u6ee42", 0]]
+[
+	[1, "\\.\\./\\.\\./", "\u76ee\u5f55\u4fdd\u62a41", 0],
+	[1, "(?:etc\\/\\W*passwd)", "\u76ee\u5f55\u4fdd\u62a43", 0],
+	[1, "(gopher|doc|php|glob|file|phar|zlib|ftp|ldap|dict|ogg|data)\\:\\/", "PHP\u6d41\u534f\u8bae\u8fc7\u6ee41", 0],
+	[1, "\\:\\$", "\u4e00\u53e5\u8bdd\u6728\u9a6c\u8fc7\u6ee41", 0],
+	[1, "\\$\\{", "\u4e00\u53e5\u8bdd\u6728\u9a6c\u8fc7\u6ee42", 0],
+	[1, "base64_decode\\(", "\u4e00\u53e5\u8bdd\u6728\u9a6c\u8fc7\u6ee43", 0],
+	[1, "\\$_(GET|post|cookie|files|session|env|phplib|GLOBALS|SERVER)\\[", "\u4e00\u53e5\u8bdd\u6728\u9a6c\u8fc7\u6ee45", 0],
+	[1, "\\b(or|xor|and)\\b.*(=|<|>|'|\")", "SQL\u6ce8\u5165\u8fc7\u6ee41", 0],
+	[1, "select.+(from|limit)", "SQL\u6ce8\u5165\u8fc7\u6ee42", 0],
+	[1, "(?:(union(.*?)select))", "SQL\u6ce8\u5165\u8fc7\u6ee43", 0],
+	[0, "having|load_file", "SQL\u6ce8\u5165\u8fc7\u6ee44", 0],
+	[1, "sleep\\((\\s*)(\\d*)(\\s*)\\)", "SQL\u6ce8\u5165\u8fc7\u6ee45", 0],
+	[1, "benchmark\\((.*)\\,(.*)\\)", "SQL\u6ce8\u5165\u8fc7\u6ee46", 0],
+	[1, "(?:from\\W+information_schema\\W)", "SQL\u6ce8\u5165\u8fc7\u6ee47", 0],
+	[1, "(?:(?:current_)user|database|schema|connection_id)\\s*\\(", "SQL\u6ce8\u5165\u8fc7\u6ee48", 0],
+	[1, "into(\\s+)+(?:dump|out)file\\s*", "SQL\u6ce8\u5165\u8fc7\u6ee49", 0],
+	[1, "group\\s+by.+\\(", "SQL\u6ce8\u5165\u8fc7\u6ee410", 0],
+	[0, "\\<(iframe|script|body|img|layer|div|meta|style|base|object|input)", "XSS\u8fc7\u6ee41", 0],
+	[1, "(onmouseover|onerror|onload)\\=", "XSS\u8fc7\u6ee42", 0]
+]
