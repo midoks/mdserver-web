@@ -143,8 +143,8 @@ Install_openresty()
 			fi
 
 		    # OPTIONS="${OPTIONS} --with-openssl=${openrestyDir}/openssl-${opensslVersion}"
-		    OPTIONS="${OPTIONS} --with-cc-opt=-I${openrestyDir}-${libresslVersion}/libressl/build/include"
-		    OPTIONS="${OPTIONS} --with-cc-opt=-I${openrestyDir}-${libresslVersion}/libressl/build/lib"
+		    OPTIONS="${OPTIONS} --with-cc-opt=-I${openrestyDir}/libressl-${libresslVersion}/libressl/build/include"
+		    OPTIONS="${OPTIONS} --with-cc-opt=-I${openrestyDir}/libressl-${libresslVersion}/libressl/build/lib"
 
 		    # --with-cc-opt="-I../libressl/build/include"
     		# --with-ld-opt="-L../libressl/build/lib"
