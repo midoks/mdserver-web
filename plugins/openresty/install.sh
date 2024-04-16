@@ -193,6 +193,10 @@ Install_openresty()
     if [ -d ${openrestyDir}/openssl-${opensslVersion} ];then
     	rm -rf ${openrestyDir}/openssl-${opensslVersion}
     fi
+
+    if [ -d ${openrestyDir}/libressl-${libresslVersion} ];then
+    	rm -rf ${openrestyDir}/libressl-${libresslVersion}
+    fi
 	echo '安装完成'
 }
 
