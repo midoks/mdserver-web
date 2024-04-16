@@ -91,6 +91,7 @@ Install_openresty()
 
 
 	opensslVersion="1.1.1p"
+	libresslVersion="3.9.1"
 	pcreVersion='8.38'
 	if [ "$sysName" == "Darwin" ];then
 
@@ -119,12 +120,36 @@ Install_openresty()
 		# brew info openssl@1.1 | grep /opt/homebrew/Cellar/openssl@1.1 | cut -d \  -f 1 | awk 'END {print}'
 		# OPENSSL_LIB_DEPEND_DIR=`brew info openssl@1.1 | grep ${BREW_DIR}/Cellar/openssl@1.1 | cut -d \  -f 1 | awk 'END {print}'`
 		# OPTIONS="${OPTIONS} --with-openssl=${OPENSSL_LIB_DEPEND_DIR}"
-	fi
+	else
+		if [ "$VERSION" == "1.25.3.1" ]; then
+			OPTIONS="${OPTIONS} --with-http_v3_module"
 
-	if [ "$VERSION" == "1.25.3.1" ]; then
-		OPTIONS="${OPTIONS} --with-http_v3_module"
-	fi
+			
 
+			if [ ! -f ${openrestyDir}/libressl-${libresslVersion}.tar.gz ];then
+		        wget --no-check-certificate -O ${openrestyDir}/libressl-${libresslVersion}.tar.gz https://ftp.openbsd.org/pub/OpenBSD/LibreSSL/libressl-${libresslVersion}.tar.gz
+		    fi
+
+		    if [ ! -d ${openrestyDir}/libressl-${libresslVersion} ];then
+				cd ${openrestyDir} &&  tar -zxvf libressl-${libresslVersion}.tar.gz
+			fi
+
+			if [ ! -f ${openrestyDir}/openssl-${opensslVersion}.tar.gz ];then
+		        wget --no-check-certificate -O ${openrestyDir}/openssl-${opensslVersion}.tar.gz https://www.openssl.org/source/openssl-${opensslVersion}.tar.gz
+		    fi
+
+		    if [ ! -d ${openrestyDir}/openssl-${opensslVersion} ];then
+				cd ${openrestyDir} &&  tar -zxvf openssl-${opensslVersion}.tar.gz
+			fi
+
+		    OPTIONS="${OPTIONS} --with-openssl=${openrestyDir}/openssl-${opensslVersion}"
+		    OPTIONS="${OPTIONS} --with-cc-opt=-I${openrestyDir}/libressl-${libresslVersion}/libressl/build/include"
+		    OPTIONS="${OPTIONS} --with-cc-opt=-I${openrestyDir}/libressl-${libresslVersion}/libressl/build/lib"
+
+		    # --with-cc-opt="-I../libressl/build/include"
+    		# --with-ld-opt="-L../libressl/build/lib"
+		fi
+	fi
 
 
 	# --with-openssl=$serverPath/source/lib/openssl-1.0.2q
@@ -167,6 +192,10 @@ Install_openresty()
 
     if [ -d ${openrestyDir}/openssl-${opensslVersion} ];then
     	rm -rf ${openrestyDir}/openssl-${opensslVersion}
+    fi
+
+    if [ -d ${openrestyDir}/libressl-${libresslVersion} ];then
+    	rm -rf ${openrestyDir}/libressl-${libresslVersion}
     fi
 	echo '安装完成'
 }

@@ -92,6 +92,7 @@ if [ ! -f /usr/sbin/ufw ];then
 	fi
 	firewall-cmd --permanent --zone=public --add-port=80/tcp
 	firewall-cmd --permanent --zone=public --add-port=443/tcp
+	firewall-cmd --permanent --zone=public --add-port=443/udp
 	# firewall-cmd --permanent --zone=public --add-port=888/tcp
 
 	systemctl start firewalld

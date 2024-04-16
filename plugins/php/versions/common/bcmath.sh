@@ -60,8 +60,13 @@ Install_lib()
 		fi
 
 		$serverPath/php/$version/bin/phpize
-		./configure --with-php-config=$serverPath/php/$version/bin/php-config $OPTIONS
 
+		if [ "$version" == "83" ];then
+			CFLAGS="-std=c99" ./configure --with-php-config=$serverPath/php/$version/bin/php-config $OPTIONS
+		else
+			./configure --with-php-config=$serverPath/php/$version/bin/php-config $OPTIONS
+		fi
+		
 		make clean && make && make install && make clean
 		
 		if [ -d $sourcePath/php${version} ];then

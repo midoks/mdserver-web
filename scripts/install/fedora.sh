@@ -58,6 +58,7 @@ if [ ! -f /usr/sbin/iptables ];then
 	
 	firewall-cmd --permanent --zone=public --add-port=80/tcp
 	firewall-cmd --permanent --zone=public --add-port=443/tcp
+	firewall-cmd --permanent --zone=public --add-port=443/udp
 	# firewall-cmd --permanent --zone=public --add-port=888/tcp
 	firewall-cmd --reload
 fi

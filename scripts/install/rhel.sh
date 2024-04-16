@@ -125,6 +125,7 @@ if [ -f /usr/sbin/firewalld ];then
     fi
     firewall-cmd --permanent --zone=public --add-port=80/tcp
     firewall-cmd --permanent --zone=public --add-port=443/tcp
+    firewall-cmd --permanent --zone=public --add-port=443/udp
     # firewall-cmd --permanent --zone=public --add-port=888/tcp
     # firewall-cmd --permanent --zone=public --add-port=7200/tcp
     # firewall-cmd --permanent --zone=public --add-port=3306/tcp

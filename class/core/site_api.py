@@ -2767,24 +2767,41 @@ location ^~ {from} {\n\
         mw.writeLog('TYPE_SITE', '设置成功,站点到期后将自动停止!', (siteName, edate))
         return mw.returnJson(True, '设置成功,站点到期后将自动停止!')
 
-# ssl相关方法 start
+    # ssl相关方法 start
     def setSslConf(self, siteName):
         file = self.getHostConf(siteName)
         conf = mw.readFile(file)
+
+        version = ''
+        version_file_pl = mw.getServerDir() + '/openresty/version.pl'
+        if os.path.exists(version_file_pl):
+            version = mw.readFile(version_file_pl)
+            version = version.strip()
+
 
         keyPath = self.sslDir + '/' + siteName + '/privkey.pem'
         certPath = self.sslDir + '/' + siteName + '/fullchain.pem'
         if conf:
             if conf.find('ssl_certificate') == -1:
+                #ssl_ciphers ECDHE-RSA-AES128-GCM-SHA256:HIGH:!aNULL:!MD5:!RC4:!DHE;
+
+                http3Header = """
+    add_header Strict-Transport-Security "max-age=63072000";
+    add_header Alt-Svc 'h3=":443";ma=86400,h3-29=":443";ma=86400';
+"""
+                if version != '1.25.3.1':
+                    http3Header = '';
+
                 sslStr = """#error_page 404/404.html;
     ssl_certificate    %s;
     ssl_certificate_key  %s;
     ssl_protocols TLSv1 TLSv1.1 TLSv1.2 TLSv1.3;
-    ssl_ciphers ECDHE-RSA-AES128-GCM-SHA256:HIGH:!aNULL:!MD5:!RC4:!DHE;
+    ssl_ciphers ECDHE-ECDSA-AES128-GCM-SHA256:ECDHE-RSA-AES128-GCM-SHA256:ECDHE-ECDSA-AES256-GCM-SHA384:ECDHE-RSA-AES256-GCM-SHA384:ECDHE-ECDSA-CHACHA20-POLY1305:ECDHE-RSA-CHACHA20-POLY1305:DHE-RSA-AES128-GCM-SHA256:DHE-RSA-AES256-GCM-SHA384:DHE-RSA-CHACHA20-POLY1305;
     ssl_prefer_server_ciphers on;
     ssl_session_cache shared:SSL:10m;
     ssl_session_timeout 10m;
-    error_page 497  https://$host$request_uri;""" % (certPath, keyPath)
+    %s
+    error_page 497  https://$host$request_uri;""" % (certPath, keyPath, http3Header)
             if(conf.find('ssl_certificate') != -1):
                 return mw.returnData(True, 'SSL开启成功!')
 
@@ -2796,6 +2813,10 @@ location ^~ {from} {\n\
                 listen = re.search(rep, conf).group()
                 http_ssl = "\n\tlisten 443 ssl http2;"
                 http_ssl = http_ssl + "\n\tlisten [::]:443 ssl http2;"
+
+                if version == '1.25.3.1':
+                    http_ssl = http_ssl + "\n\tlisten 443 quic;"
+
                 conf = conf.replace(listen, listen + http_ssl)
 
             mw.backFile(file)
