@@ -2787,7 +2787,7 @@ location ^~ {from} {\n\
 
                 http3Header = """
     add_header Strict-Transport-Security "max-age=63072000";
-    add_header Alt-Svc 'h3=":443"; ma=2592000';
+    add_header Alt-Svc 'h3=":443";ma=86400,h3-29=":443";ma=86400';
 """
                 if version != '1.25.3.1':
                     http3Header = '';
