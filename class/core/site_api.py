@@ -2776,6 +2776,7 @@ location ^~ {from} {\n\
         version_file_pl = mw.getServerDir() + '/openresty/version.pl'
         if os.path.exists(version_file_pl):
             version = mw.readFile(version_file_pl)
+            version = version.strip()
 
 
         keyPath = self.sslDir + '/' + siteName + '/privkey.pem'
