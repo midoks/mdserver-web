@@ -2785,6 +2785,7 @@ location ^~ {from} {\n\
     ssl_prefer_server_ciphers on;
     ssl_session_cache shared:SSL:10m;
     ssl_session_timeout 10m;
+    add_header Strict-Transport-Security "max-age=63072000" always;
     error_page 497  https://$host$request_uri;""" % (certPath, keyPath)
             if(conf.find('ssl_certificate') != -1):
                 return mw.returnData(True, 'SSL开启成功!')

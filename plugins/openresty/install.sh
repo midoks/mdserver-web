@@ -91,6 +91,7 @@ Install_openresty()
 
 
 	opensslVersion="1.1.1p"
+	libresslVersion="1.1.1p"
 	pcreVersion='8.38'
 	if [ "$sysName" == "Darwin" ];then
 
@@ -123,6 +124,16 @@ Install_openresty()
 		if [ "$VERSION" == "1.25.3.1" ]; then
 			OPTIONS="${OPTIONS} --with-http_v3_module"
 
+			
+
+			if [ ! -f ${openrestyDir}/libressl-${libresslVersion}.tar.gz ];then
+		        wget --no-check-certificate -O ${openrestyDir}/libressl-${libresslVersion}.tar.gz https://ftp.openbsd.org/pub/OpenBSD/LibreSSL/libressl-${libresslVersion}.tar.gz
+		    fi
+
+		    if [ ! -d ${openrestyDir}/libressl-${libresslVersion} ];then
+				cd ${openrestyDir} &&  tar -zxvf libressl-${libresslVersion}.tar.gz
+			fi
+
 			if [ ! -f ${openrestyDir}/openssl-${opensslVersion}.tar.gz ];then
 		        wget --no-check-certificate -O ${openrestyDir}/openssl-${opensslVersion}.tar.gz https://www.openssl.org/source/openssl-${opensslVersion}.tar.gz
 		    fi
@@ -130,7 +141,13 @@ Install_openresty()
 		    if [ ! -d ${openrestyDir}/openssl-${opensslVersion} ];then
 				cd ${openrestyDir} &&  tar -zxvf openssl-${opensslVersion}.tar.gz
 			fi
-		    OPTIONS="${OPTIONS} --with-openssl=${openrestyDir}/openssl-${opensslVersion}"
+
+		    # OPTIONS="${OPTIONS} --with-openssl=${openrestyDir}/openssl-${opensslVersion}"
+		    OPTIONS="${OPTIONS} --with-cc-opt=-I${openrestyDir}-${libresslVersion}/libressl/build/include"
+		    OPTIONS="${OPTIONS} --with-cc-opt=-I${openrestyDir}-${libresslVersion}/libressl/build/lib"
+
+		    # --with-cc-opt="-I../libressl/build/include"
+    		# --with-ld-opt="-L../libressl/build/lib"
 		fi
 	fi
 
