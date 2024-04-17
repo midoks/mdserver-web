@@ -2811,11 +2811,11 @@ location ^~ {from} {\n\
             tmp = re.findall(rep, conf)
             if not mw.inArray(tmp, '443'):
                 listen = re.search(rep, conf).group()
-                http_ssl = "\n\tlisten 443 ssl http2;"
-                http_ssl = http_ssl + "\n\tlisten [::]:443 ssl http2;"
-
+                http_ssl = "\n\tlisten 443 ssl reuseport;"
+                http_ssl = http_ssl + "\n\tlisten [::]:443 ssl reuseport;"
                 if version == '1.25.3.1':
-                    http_ssl = http_ssl + "\n\tlisten 443 quic;"
+                    http_ssl = http_ssl + "\n\tlisten 443 quic reuseport;"
+                    http_ssl = http_ssl + "\n\thttp2 on;"
 
                 conf = conf.replace(listen, listen + http_ssl)
 
