@@ -73,6 +73,12 @@ Install_lib()
 			OPTIONS="$OPTIONS --build=aarch64-unknown-linux-gnu --host=aarch64-unknown-linux-gnu"
 		fi
 
+		if [ "$version" -lt "55" ];then
+			echo "not need xmp"
+		else
+			OPTIONS="$OPTIONS --with-xpm-dir"
+		fi
+
 		#--with-xpm
 		# =${serverPath}/lib/freetype_old
 		# =/usr/lib
@@ -80,9 +86,7 @@ Install_lib()
 		$OPTIONS \
 		--with-gd \
 		--with-jpeg-dir \
-		--with-webp-dir \
 		--with-png-dir \
-		--with-xpm-dir \
 		--with-freetype-dir=${serverPath}/lib/freetype_old
 		# --enable-gd-jis-conv
 		# --enable-gd-native-ttf

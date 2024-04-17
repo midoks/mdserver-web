@@ -24,9 +24,10 @@ elif [ "$version" == "70" ];then
 elif [ "$version" == "71" ];then
 	LIBV=4.5.2
 elif [ "$version" -gt "74" ];then
-	LIBV=5.0.3
+	LIBV=5.1.1
 else
 	echo 'other?'
+	exit 0
 fi
 
 LIB_PATH_NAME=lib/php

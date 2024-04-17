@@ -25,8 +25,8 @@ if [ "$version" -eq "70" ] || [ "$version" -eq "71" ];then
 	LIBV=2.7.0
 fi
 
-if [ "$version" -eq "82" ];then
-	LIBV=3.2.2
+if [ "$version" -gt "80" ];then
+	LIBV=3.3.2
 fi
 
 LIB_PATH_NAME=lib/php
