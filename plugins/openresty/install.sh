@@ -121,10 +121,17 @@ Install_openresty()
 		# OPENSSL_LIB_DEPEND_DIR=`brew info openssl@1.1 | grep ${BREW_DIR}/Cellar/openssl@1.1 | cut -d \  -f 1 | awk 'END {print}'`
 		# OPTIONS="${OPTIONS} --with-openssl=${OPENSSL_LIB_DEPEND_DIR}"
 	else
+		if [ ! -f ${openrestyDir}/openssl-${opensslVersion}.tar.gz ];then
+	        wget --no-check-certificate -O ${openrestyDir}/openssl-${opensslVersion}.tar.gz https://www.openssl.org/source/openssl-${opensslVersion}.tar.gz
+	    fi
+
+	    if [ ! -d ${openrestyDir}/openssl-${opensslVersion} ];then
+			cd ${openrestyDir} &&  tar -zxvf openssl-${opensslVersion}.tar.gz
+		fi
+		OPTIONS="${OPTIONS} --with-openssl=${openrestyDir}/openssl-${opensslVersion}"
+
 		if [ "$VERSION" == "1.25.3.1" ]; then
 			OPTIONS="${OPTIONS} --with-http_v3_module"
-
-			
 
 			if [ ! -f ${openrestyDir}/libressl-${libresslVersion}.tar.gz ];then
 		        wget --no-check-certificate -O ${openrestyDir}/libressl-${libresslVersion}.tar.gz https://ftp.openbsd.org/pub/OpenBSD/LibreSSL/libressl-${libresslVersion}.tar.gz
@@ -133,16 +140,7 @@ Install_openresty()
 		    if [ ! -d ${openrestyDir}/libressl-${libresslVersion} ];then
 				cd ${openrestyDir} &&  tar -zxvf libressl-${libresslVersion}.tar.gz
 			fi
-
-			if [ ! -f ${openrestyDir}/openssl-${opensslVersion}.tar.gz ];then
-		        wget --no-check-certificate -O ${openrestyDir}/openssl-${opensslVersion}.tar.gz https://www.openssl.org/source/openssl-${opensslVersion}.tar.gz
-		    fi
-
-		    if [ ! -d ${openrestyDir}/openssl-${opensslVersion} ];then
-				cd ${openrestyDir} &&  tar -zxvf openssl-${opensslVersion}.tar.gz
-			fi
-
-		    OPTIONS="${OPTIONS} --with-openssl=${openrestyDir}/openssl-${opensslVersion}"
+		    
 		    OPTIONS="${OPTIONS} --with-cc-opt=-I${openrestyDir}/libressl-${libresslVersion}/libressl/build/include"
 		    OPTIONS="${OPTIONS} --with-cc-opt=-I${openrestyDir}/libressl-${libresslVersion}/libressl/build/lib"
 
