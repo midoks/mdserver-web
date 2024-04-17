@@ -86,7 +86,6 @@ Install_lib()
 		$OPTIONS \
 		--with-gd \
 		--with-jpeg-dir \
-		--with-webp-dir \
 		--with-png-dir \
 		--with-freetype-dir=${serverPath}/lib/freetype_old
 		# --enable-gd-jis-conv
