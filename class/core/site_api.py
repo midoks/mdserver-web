@@ -2815,8 +2815,8 @@ location ^~ {from} {\n\
                 listen = re.search(rep, conf).group()
                 
                 if version == '1.25.3.1':
-                    http_ssl = "\n\tlisten 443 ssl;"
-                    http_ssl = http_ssl + "\n\tlisten [::]:443 ssl;"
+                    http_ssl = "\n\tlisten 443 ssl;#reuseport"
+                    http_ssl = http_ssl + "\n\tlisten [::]:443 ssl;#reuseport"
                     http_ssl = http_ssl + "\n\tlisten 443 quic;#reuseport"
                     http_ssl = http_ssl + "\n\tlisten [::]:443 quic;#reuseport"
                     http_ssl = http_ssl + "\n\thttp2 on;"
