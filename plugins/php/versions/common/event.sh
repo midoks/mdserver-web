@@ -15,7 +15,7 @@ actionType=$1
 version=$2
 
 LIBNAME=event
-LIBV=3.1.0RC1
+LIBV=3.1.3
 
 if [ "$version" -lt "83" ];then
 	LIBV=3.0.8
