@@ -17,6 +17,12 @@ version=$2
 LIBNAME=event
 LIBV=3.1.3
 
+
+if [ "$version" -lt "55" ];then
+	echo 'not need'
+	exit 0
+fi
+
 if [ "$version" -lt "83" ];then
 	LIBV=3.0.8
 fi
