@@ -73,7 +73,7 @@ Install_lib()
 			OPTIONS="$OPTIONS --build=aarch64-unknown-linux-gnu --host=aarch64-unknown-linux-gnu"
 		fi
 
-		if [ "$version" == "53" ];then
+		if [ "$version" -lt "55" ];then
 			echo "not need xmp"
 		else
 			OPTIONS="$OPTIONS --with-xpm-dir"
