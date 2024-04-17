@@ -37,6 +37,8 @@ else
 	BAK=''
 fi
 
+OSNAME=`cat ${rootPath}/data/osname.pl`
+
 Install_lib()
 {
 
@@ -59,6 +61,7 @@ Install_lib()
 			OPTIONS="$OPTIONS --build=aarch64-unknown-linux-gnu --host=aarch64-unknown-linux-gnu"
 		fi
 
+		
 		$serverPath/php/$version/bin/phpize
 		./configure --with-php-config=$serverPath/php/$version/bin/php-config $OPTIONS
 
@@ -66,7 +69,6 @@ Install_lib()
 		# It is considered as a temporary bug
 		if [ "$version" == "81" ] || [ "$version" == "82" ];then
 			bash ${rootPath}/scripts/getos.sh
-			OSNAME=`cat ${rootPath}/data/osname.pl`
 			if [ "$OSNAME" == 'centos' ];then
 				FILE_softmagic=$sourcePath/php${version}/ext/${LIBNAME}/libmagic/softmagic.c
 				FIND_UNDEF_STRNDUP=`cat $FILE_softmagic|grep '#undef strndup'`
@@ -80,6 +82,11 @@ Install_lib()
 		if [ "$version" -gt "74" ] && [ "$FIND_C99" == "" ];then
 			sed -i $BAK 's/CFLAGS \=/CFLAGS \= -std=gnu99/g' Makefile
 		fi
+
+		if [ "$version" -gt "80" ] && [ "$OSNAME" == 'centos' ];then
+			sed -i $BAK "s#CFLAGS = -g -O2#CFLAGS = -std=c99 -g#g" $sourcePath/php${version}/ext/${LIBNAME}/Makefile
+		fi
+
 
 		make clean && make && make install && make clean
 		

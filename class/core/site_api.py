@@ -763,6 +763,8 @@ class site_api:
             conf = re.sub(rep, '', conf)
             rep = "\s+listen\s+\[\:\:\]\:443.*;"
             conf = re.sub(rep, '', conf)
+            rep = "\s+http2\s+on;"
+            conf = re.sub(rep, '', conf)
             mw.writeFile(file, conf)
 
         msg = mw.getInfo('网站[{1}]关闭SSL成功!', (siteName,))
@@ -2784,10 +2786,10 @@ location ^~ {from} {\n\
         if conf:
             if conf.find('ssl_certificate') == -1:
                 #ssl_ciphers ECDHE-RSA-AES128-GCM-SHA256:HIGH:!aNULL:!MD5:!RC4:!DHE;
-
+                # add_header Alt-Svc 'h3=":443";ma=86400,h3-29=":443";ma=86400';
                 http3Header = """
     add_header Strict-Transport-Security "max-age=63072000";
-    add_header Alt-Svc 'h3=":443";ma=86400,h3-29=":443";ma=86400';
+    add_header Alt-Svc 'h3=":443";ma=86400';
 """
                 if version != '1.25.3.1':
                     http3Header = '';
@@ -2811,11 +2813,17 @@ location ^~ {from} {\n\
             tmp = re.findall(rep, conf)
             if not mw.inArray(tmp, '443'):
                 listen = re.search(rep, conf).group()
-                http_ssl = "\n\tlisten 443 ssl http2;"
-                http_ssl = http_ssl + "\n\tlisten [::]:443 ssl http2;"
-
+                
                 if version == '1.25.3.1':
+                    http_ssl = "\n\tlisten 443 ssl;"
+                    http_ssl = http_ssl + "\n\tlisten [::]:443 ssl;#reuseport"
                     http_ssl = http_ssl + "\n\tlisten 443 quic;"
+                    http_ssl = http_ssl + "\n\tlisten [::]:443 quic;"
+                    http_ssl = http_ssl + "\n\thttp2 on;"
+                else:
+                    http_ssl = "\n\tlisten 443 ssl http2;"
+                    http_ssl = http_ssl + "\n\tlisten [::]:443 ssl http2;"
+
 
                 conf = conf.replace(listen, listen + http_ssl)
 
