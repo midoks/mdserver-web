@@ -2785,7 +2785,7 @@ location ^~ {from} {\n\
         certPath = self.sslDir + '/' + siteName + '/fullchain.pem'
         if conf:
             if conf.find('ssl_certificate') == -1:
-                #ssl_ciphers ECDHE-RSA-AES128-GCM-SHA256:HIGH:!aNULL:!MD5:!RC4:!DHE;
+                # ssl_ciphers ECDHE-RSA-AES128-GCM-SHA256:HIGH:!aNULL:!MD5:!RC4:!DHE;
                 # add_header Alt-Svc 'h3=":443";ma=86400,h3-29=":443";ma=86400';
                 http3Header = """
     add_header Strict-Transport-Security "max-age=63072000";
