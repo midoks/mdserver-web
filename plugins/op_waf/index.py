@@ -971,9 +971,14 @@ def setRetry():
     conf = getJsonPath('config')
     content = mw.readFile(conf)
     cobj = json.loads(content)
-
-    cobj['retry'] = args
-
+    
+    ## 修复数据类型错误
+    tmp = args
+    tmp['retry'] = int(tmp['retry'])
+    tmp['retry_time'] = int(tmp['retry_time'])
+    tmp['retry_cycle'] = int(tmp['retry_cycle'])
+    
+    cobj['retry'] = tmp
     cjson = mw.getJson(cobj)
     mw.writeFile(conf, cjson)
 
