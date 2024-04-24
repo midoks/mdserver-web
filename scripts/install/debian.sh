@@ -71,6 +71,7 @@ if [ -f /usr/sbin/ufw ];then
 
 	ufw allow 80/tcp
 	ufw allow 443/tcp
+	ufw allow 443/udp
 	# ufw allow 888/tcp
 fi
 
