@@ -2,5 +2,7 @@
 	[1,"(HTTrack|Apache-HttpClient|harvest|audit|dirbuster|pangolin|nmap|sqln|hydra|Parser|libwww|BBBike|sqlmap|w3af|owasp|Nikto|fimap|havij|zmeu|BabyKrokodil|netsparker|httperf| SF/)","关键词过滤1",0],
 	[1,"(ApacheBench)","AB测试",0],
 	[1,"(Amazonbot)","Amazon爬虫",0],
-	[1,"(SemrushBot)","Semrush爬虫",0]
+	[1,"(SemrushBot)","Semrush爬虫",0],
+	[1,"(^$|Apache-HttpClient|colly|curl|okhttp|Go-http-client|python-requests|Python-urllib|python-httpx|Scrapy|aiohttp|Nmap Scripting Engine|Java|fasthttp|Wget)","非法脚本",0],
+	[1,"(CensysInspect|intelx\\.io_bot|InternetMeasurement|ips-agent|MJ12Bot|NetcraftSurveyAgent|SemrushBot|l9scan|SEOlyt|kirkland-signature|ZoominfoBot|Expanse|CheckMarkNetwork|dotbot|Pandalytics|Screaming Frog SEO Spider|W3C_CSS_Validator_JFouffa)","非法扫描器",0]
 ]
