@@ -43,11 +43,14 @@ function wsPost(method, version, args,callback){
     });
 }
 
+
+
 function wsPostCallbak(method, version, args,callback){
     var loadT = layer.msg('正在获取...', { icon: 16, time: 0, shade: 0.3 });
 
     var req_data = {};
     req_data['name'] = 'webstats';
+    req_data['script']='webstats_index';
     req_data['func'] = method;
     args['version'] = version;
  
@@ -180,7 +183,7 @@ function wsOverviewRequest(page){
 
     var select_option = $('.indicators-container input:checked').parent().attr('data-name');
 
-    console.log($('.indicators-container input:checked').parent().find('span').text());
+    // console.log($('.indicators-container input:checked').parent().find('span').text());
     // console.log(select_option);
 
     wsPost('get_overview_list', '' ,args, function(rdata){
@@ -2211,7 +2214,7 @@ function wsTableLogRequest(page){
     }
 
 
-    wsPost('get_logs_list', '' ,args, function(rdata){
+    wsPostCallbak('get_logs_list', '' ,args, function(rdata){
         var rdata = $.parseJSON(rdata.data);
         var list = '';
         var data = rdata.data.data;
@@ -2264,6 +2267,21 @@ function wsTableLogRequest(page){
         $('#ws_table').html(table);
         $('#wsPage').html(rdata.data.page);
 
+        $('input[name="ip"]').bind('focus', function(e){
+            $(this).keyup(function(e){
+                if(e.keyCode == 13) {
+                    wsTableLogRequest(1);
+                }
+            });
+        });
+
+        $('input[name="search_uri"]').bind('focus', function(e){
+            $(this).keyup(function(e){
+                if(e.keyCode == 13) {
+                    wsTableLogRequest(1);
+                }
+            });
+        });
 
         $(".tablescroll .details").click(function(){
             var index = $(this).attr('data-id');
