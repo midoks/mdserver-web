@@ -151,7 +151,9 @@ class Sql():
         try:
             sql = "SELECT " + self.__OPT_FIELD + " FROM " + self.__DB_TABLE + \
                 self.__OPT_WHERE + self.__OPT_GROUP + self.__OPT_ORDER + self.__OPT_LIMIT
-            # print(sql, self.__OPT_PARAM)
+
+            if os.path.exists('data/debug.pl'):
+                print(sql, self.__OPT_PARAM)
             result = self.__DB_CONN.execute(sql, self.__OPT_PARAM)
             data = result.fetchall()
             # 构造字曲系列

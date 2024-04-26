@@ -701,6 +701,9 @@ def attacHistoryLogHack(conn, site_name, query_date='today'):
 
 
 def get_logs_list(args):
+
+    start_time = time.time()
+
     check = checkArgs(args, ['page', 'page_size','site', 'method', 
             'status_code', 'spider_type', 'request_time', 'query_date', 'search_uri'])
     if not check[0]:
@@ -728,11 +731,19 @@ def get_logs_list(args):
     conn = conn.field(field)
     conn = conn.where("1=1", ())
 
-    if referer != 'all':
-        if referer == '1':
-            conn = conn.andWhere("referer <> ? ", ('',))
-        elif referer == '-1':
-            conn = conn.andWhere("referer is null ", ())
+    todayTime = time.strftime('%Y-%m-%d 00:00:00', time.localtime())
+    todayUt = int(time.mktime(time.strptime(todayTime, "%Y-%m-%d %H:%M:%S")))
+    if query_date == 'today':
+        conn = conn.andWhere("time>=?", (todayUt,))
+    elif query_date == "yesterday":
+        conn = conn.andWhere("time>=? and time<=?", (todayUt - 86400, todayUt))
+    elif query_date == "l7":
+        conn = conn.andWhere("time>=?", (todayUt - 7 * 86400,))
+    elif query_date == "l30":
+        conn = conn.andWhere("time>=?", (todayUt - 30 * 86400,))
+    else:
+        exlist = query_date.split("-")
+        conn = conn.andWhere("time>=? and time<=?", (exlist[0], exlist[1]))
 
     if ip != '':
         conn = conn.andWhere("ip=?", (ip,))
@@ -760,19 +771,11 @@ def get_logs_list(args):
     elif int(spider_type) > 0:
         conn = conn.andWhere("is_spider=?", (spider_type,))
 
-    todayTime = time.strftime('%Y-%m-%d 00:00:00', time.localtime())
-    todayUt = int(time.mktime(time.strptime(todayTime, "%Y-%m-%d %H:%M:%S")))
-    if query_date == 'today':
-        conn = conn.andWhere("time>=?", (todayUt,))
-    elif query_date == "yesterday":
-        conn = conn.andWhere("time>=? and time<=?", (todayUt - 86400, todayUt))
-    elif query_date == "l7":
-        conn = conn.andWhere("time>=?", (todayUt - 7 * 86400,))
-    elif query_date == "l30":
-        conn = conn.andWhere("time>=?", (todayUt - 30 * 86400,))
-    else:
-        exlist = query_date.split("-")
-        conn = conn.andWhere("time>=? and time<=?", (exlist[0], exlist[1]))
+    if referer != 'all':
+        if referer == '1':
+            conn = conn.andWhere("referer <> ? ", ('',))
+        elif referer == '-1':
+            conn = conn.andWhere("referer is null ", ())
 
     if search_uri != "":
         conn = conn.andWhere("uri like '%" + search_uri + "%'", ())
@@ -786,7 +789,11 @@ def get_logs_list(args):
     # print(count)
     count = count[0][count_key]
 
+    end_time = time.time()
+    cos_time = end_time-start_time
+
     data = {}
+    data['cos_time'] = cos_time
     _page = {}
     _page['count'] = count
     _page['p'] = page
@@ -794,6 +801,7 @@ def get_logs_list(args):
     _page['tojs'] = tojs
     data['page'] = mw.getPage(_page)
     data['data'] = clist
+    
 
     return mw.returnJson(True, 'ok', data)
 
