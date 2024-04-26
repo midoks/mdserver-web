@@ -2267,20 +2267,21 @@ function wsTableLogRequest(page){
         $('#ws_table').html(table);
         $('#wsPage').html(rdata.data.page);
 
-        $('input[name="ip"]').focus().keyup(function(e){
-            if(e.keyCode == 13) {
-                wsTableLogRequest(1);
-            }
-        });
-        
-        $('input[name="search_uri"]').focus().keyup(function(e){
-            if(e.keyCode == 13) {
-                wsTableLogRequest(1);
-            }
+        $('input[name="ip"]').bind('focus', function(e){
+            $(this).keyup(function(e){
+                if(e.keyCode == 13) {
+                    wsTableLogRequest(1);
+                }
+            });
         });
 
-
-
+        $('input[name="search_uri"]').bind('focus', function(e){
+            $(this).keyup(function(e){
+                if(e.keyCode == 13) {
+                    wsTableLogRequest(1);
+                }
+            });
+        });
 
         $(".tablescroll .details").click(function(){
             var index = $(this).attr('data-id');
