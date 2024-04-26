@@ -28,7 +28,6 @@ from flask_caching import Cache
 from flask_session import Session
 
 from flask_compress import Compress
-from flask_json_minify import FlaskJSONMinify
 
 
 from whitenoise import WhiteNoise
