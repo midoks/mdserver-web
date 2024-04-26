@@ -790,8 +790,10 @@ def get_logs_list(args):
     count = count[0][count_key]
 
     end_time = time.time()
+    cos_time = end_time-start_time
 
     data = {}
+    data['cos_time'] = cos_time
     _page = {}
     _page['count'] = count
     _page['p'] = page
@@ -799,9 +801,9 @@ def get_logs_list(args):
     _page['tojs'] = tojs
     data['page'] = mw.getPage(_page)
     data['data'] = clist
-    cos_time = end_time-start_time
+    
 
-    return mw.returnJson(True, 'ok:'+cos_time, data)
+    return mw.returnJson(True, 'ok', data)
 
 
 def getLogsErrorList():
