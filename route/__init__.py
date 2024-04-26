@@ -27,6 +27,9 @@ from flask import render_template_string, abort
 from flask_caching import Cache
 from flask_session import Session
 
+from flask_compress import Compress
+from flask_json_minify import FlaskJSONMinify
+
 
 from whitenoise import WhiteNoise
 
@@ -41,6 +44,9 @@ common.init()
 
 app = Flask(__name__, template_folder='templates/default')
 app.config.version = config_api.config_api().getVersion()
+
+Compress(app)
+FlaskJSONMinify(app)
 
 app.wsgi_app = WhiteNoise(
     app.wsgi_app, root="route/static/", prefix="static/", max_age=604800)
