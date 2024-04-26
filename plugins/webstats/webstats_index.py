@@ -701,6 +701,9 @@ def attacHistoryLogHack(conn, site_name, query_date='today'):
 
 
 def get_logs_list(args):
+
+    start_time = time.time()
+
     check = checkArgs(args, ['page', 'page_size','site', 'method', 
             'status_code', 'spider_type', 'request_time', 'query_date', 'search_uri'])
     if not check[0]:
@@ -786,6 +789,8 @@ def get_logs_list(args):
     # print(count)
     count = count[0][count_key]
 
+    end_time = time.time()
+
     data = {}
     _page = {}
     _page['count'] = count
@@ -794,6 +799,7 @@ def get_logs_list(args):
     _page['tojs'] = tojs
     data['page'] = mw.getPage(_page)
     data['data'] = clist
+    data['cos_time'] = end_time-start_time
 
     return mw.returnJson(True, 'ok', data)
 
