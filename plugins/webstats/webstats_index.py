@@ -731,11 +731,19 @@ def get_logs_list(args):
     conn = conn.field(field)
     conn = conn.where("1=1", ())
 
-    if referer != 'all':
-        if referer == '1':
-            conn = conn.andWhere("referer <> ? ", ('',))
-        elif referer == '-1':
-            conn = conn.andWhere("referer is null ", ())
+    todayTime = time.strftime('%Y-%m-%d 00:00:00', time.localtime())
+    todayUt = int(time.mktime(time.strptime(todayTime, "%Y-%m-%d %H:%M:%S")))
+    if query_date == 'today':
+        conn = conn.andWhere("time>=?", (todayUt,))
+    elif query_date == "yesterday":
+        conn = conn.andWhere("time>=? and time<=?", (todayUt - 86400, todayUt))
+    elif query_date == "l7":
+        conn = conn.andWhere("time>=?", (todayUt - 7 * 86400,))
+    elif query_date == "l30":
+        conn = conn.andWhere("time>=?", (todayUt - 30 * 86400,))
+    else:
+        exlist = query_date.split("-")
+        conn = conn.andWhere("time>=? and time<=?", (exlist[0], exlist[1]))
 
     if ip != '':
         conn = conn.andWhere("ip=?", (ip,))
@@ -763,19 +771,11 @@ def get_logs_list(args):
     elif int(spider_type) > 0:
         conn = conn.andWhere("is_spider=?", (spider_type,))
 
-    todayTime = time.strftime('%Y-%m-%d 00:00:00', time.localtime())
-    todayUt = int(time.mktime(time.strptime(todayTime, "%Y-%m-%d %H:%M:%S")))
-    if query_date == 'today':
-        conn = conn.andWhere("time>=?", (todayUt,))
-    elif query_date == "yesterday":
-        conn = conn.andWhere("time>=? and time<=?", (todayUt - 86400, todayUt))
-    elif query_date == "l7":
-        conn = conn.andWhere("time>=?", (todayUt - 7 * 86400,))
-    elif query_date == "l30":
-        conn = conn.andWhere("time>=?", (todayUt - 30 * 86400,))
-    else:
-        exlist = query_date.split("-")
-        conn = conn.andWhere("time>=? and time<=?", (exlist[0], exlist[1]))
+    if referer != 'all':
+        if referer == '1':
+            conn = conn.andWhere("referer <> ? ", ('',))
+        elif referer == '-1':
+            conn = conn.andWhere("referer is null ", ())
 
     if search_uri != "":
         conn = conn.andWhere("uri like '%" + search_uri + "%'", ())

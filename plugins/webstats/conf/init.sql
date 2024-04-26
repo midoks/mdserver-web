@@ -23,7 +23,15 @@ CREATE TABLE IF NOT EXISTS `web_logs` (
     `client_port` INTEGER DEFAULT -1
 );
 
-CREATE INDEX time_inx ON web_logs(`time`);
+CREATE INDEX time_idx ON web_logs(`time`);
+CREATE INDEX uri_idx ON web_logs (`uri`);
+CREATE INDEX ip_idx ON web_logs (`ip`);
+CREATE INDEX referer_idx ON web_logs (`referer`);
+CREATE INDEX method_idx ON web_logs (`method`);
+CREATE INDEX status_code_idx ON web_logs (`status_code`);
+CREATE INDEX request_time_idx ON web_logs (`request_time`);
+CREATE INDEX is_spider_idx ON web_logs (`is_spider`);
+CREATE INDEX all_union_idx ON web_logs (`time`,`ip`,`method`,`status_code`,`request_time`,`is_spider`);
 
 
 CREATE TABLE IF NOT EXISTS `client_stat`(
