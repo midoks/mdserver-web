@@ -46,7 +46,6 @@ app = Flask(__name__, template_folder='templates/default')
 app.config.version = config_api.config_api().getVersion()
 
 Compress(app)
-FlaskJSONMinify(app)
 
 app.wsgi_app = WhiteNoise(
     app.wsgi_app, root="route/static/", prefix="static/", max_age=604800)

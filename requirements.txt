@@ -36,4 +36,3 @@ pytz
 pyTelegramBotAPI
 telebot
 Flask-Compress
-Flask-JSONMinify
