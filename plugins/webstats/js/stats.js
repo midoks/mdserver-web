@@ -48,6 +48,7 @@ function wsPostCallbak(method, version, args,callback){
 
     var req_data = {};
     req_data['name'] = 'webstats';
+    req_data['script']='webstats_index';
     req_data['func'] = method;
     args['version'] = version;
  
@@ -2211,7 +2212,7 @@ function wsTableLogRequest(page){
     }
 
 
-    wsPost('get_logs_list', '' ,args, function(rdata){
+    wsPostCallbak('get_logs_list', '' ,args, function(rdata){
         var rdata = $.parseJSON(rdata.data);
         var list = '';
         var data = rdata.data.data;
