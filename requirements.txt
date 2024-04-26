@@ -35,4 +35,3 @@ pyotp
 pytz
 pyTelegramBotAPI
 telebot
-Flask-Compress
