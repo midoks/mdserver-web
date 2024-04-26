@@ -43,6 +43,8 @@ function wsPost(method, version, args,callback){
     });
 }
 
+
+
 function wsPostCallbak(method, version, args,callback){
     var loadT = layer.msg('正在获取...', { icon: 16, time: 0, shade: 0.3 });
 
@@ -181,7 +183,7 @@ function wsOverviewRequest(page){
 
     var select_option = $('.indicators-container input:checked').parent().attr('data-name');
 
-    console.log($('.indicators-container input:checked').parent().find('span').text());
+    // console.log($('.indicators-container input:checked').parent().find('span').text());
     // console.log(select_option);
 
     wsPost('get_overview_list', '' ,args, function(rdata){
@@ -2264,6 +2266,20 @@ function wsTableLogRequest(page){
                         <div id="wsPage" class="dataTables_paginate paging_bootstrap page"></div>';
         $('#ws_table').html(table);
         $('#wsPage').html(rdata.data.page);
+
+        $('input[name="ip"]').focus().keyup(function(e){
+            if(e.keyCode == 13) {
+                wsTableLogRequest(1);
+            }
+        });
+        
+        $('input[name="search_uri"]').focus().keyup(function(e){
+            if(e.keyCode == 13) {
+                wsTableLogRequest(1);
+            }
+        });
+
+
 
 
         $(".tablescroll .details").click(function(){
