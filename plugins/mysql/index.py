@@ -622,6 +622,8 @@ def my8cmd(version, method):
             isInited = initMysql8Data()
         elif version == '8.2':
             isInited = initMysql8Data()
+        elif version == '8.3':
+            isInited = initMysql8Data()
 
         if not isInited:
 
