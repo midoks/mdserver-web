@@ -164,7 +164,8 @@ class nosqlMongodbCtr():
                 where[mg_field] = re.compile(mg_value)
 
         # print(where)
-        result = collection_instance.find(where).skip(start_index).limit(size).sort({'_id':-1})
+        # .sort({'_id':-1})
+        result = collection_instance.find(where).skip(start_index).limit(size)
         count = collection_instance.count_documents(where)
         d = []
         for document in result:
