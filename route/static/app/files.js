@@ -566,17 +566,22 @@ function getFiles(Path) {
 				mtime_icon = '<span class="glyphicon glyphicon-option-horizontal" style="top:3px;margin-left:5px;color:#bbb">';
 			}
 
+			var fname_icon = '<span class="glyphicon glyphicon-triangle-top" style="margin-left:5px;color:#bbb">';
+			if (post['order'] == 'fname desc'){
+				fname_icon = '<span class="glyphicon glyphicon-triangle-bottom" style="margin-left:5px;color:#bbb">';
+			} else if (post['order'] == 'fname asc'){
+				fname_icon = '<span class="glyphicon glyphicon-triangle-top" style="margin-left:5px;color:#bbb">';
+			} else {
+				fname_icon = '<span class="glyphicon glyphicon-option-horizontal" style="top:3px;margin-left:5px;color:#bbb">';
+			}
+
 			var tablehtml = '<table width="100%" border="0" cellpadding="0" cellspacing="0" class="table table-hover">\
 				<thead>\
 					<tr>\
 						<th width="30"><input type="checkbox" id="setBox" placeholder=""></th>\
-						<th>文件名</th>\
-						<th onclick="listFileOrder(\'size\',this)" style="cursor: pointer;">大小\
-							'+size_icon+'\
-						</th>\
-						<th onclick="listFileOrder(\'mtime\',this)" style="cursor: pointer;">修改时间\
-							'+mtime_icon+'\
-						</th>\
+						<th onclick="listFileOrder(\'fname\',this)" style="cursor: pointer;">文件名'+fname_icon+'</th>\
+						<th onclick="listFileOrder(\'size\',this)" style="cursor: pointer;">大小'+size_icon+'</th>\
+						<th onclick="listFileOrder(\'mtime\',this)" style="cursor: pointer;">修改时间'+mtime_icon+'</th>\
 						<th>权限</th>\
 						<th>所有者</th>\
 						<th style="text-align: right;" width="330">操作</th>\
