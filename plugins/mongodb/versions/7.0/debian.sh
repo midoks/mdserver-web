@@ -61,3 +61,6 @@ if [ ! -d $MG_DIR/${TOOL_FILE_NAME_TGZ} ];then
 	cd $MG_DIR && tar -zxvf ${TOOL_FILE_NAME_TGZ}
 fi
 
+cd ${MG_DIR}/${TOOL_FILE_NAME} && cp -rf ./bin $serverPath/mongodb
+cd ${MG_DIR} && rm -rf ${MG_DIR}/${TOOL_FILE_NAME}
+
