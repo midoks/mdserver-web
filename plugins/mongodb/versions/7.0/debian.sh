@@ -47,9 +47,17 @@ cd ${MG_DIR} && rm -rf ${MG_DIR}/${FILE_NAME}
 
 
 TOOL_VERSION=2.2.5
-
+TOOL_FILE_NAME=mongosh-${TOOL_VERSION}-linux-x64
+if [ "aarch64" == ${SYS_ARCH} ];then
+	TOOL_FILE_NAME=mongosh-${TOOL_VERSION}-linux-arm64
+fi
+TOOL_FILE_NAME_TGZ=${FILE_NAME}.tgz
 if [ ! -f $MG_DIR/mongosh-${TOOL_VERSION}-darwin-arm64.zip ]; then
 	wget --no-check-certificate -O $MG_DIR/mongosh-${TOOL_VERSION}-linux-x64.tgz https://downloads.mongodb.com/compass/mongosh-${TOOL_VERSION}-linux-x64.tgz
 	echo "wget --no-check-certificate -O $MG_DIR/mongosh-${TOOL_VERSION}-linux-x64.tgz https://downloads.mongodb.com/compass/mongosh-${TOOL_VERSION}-linux-x64.tgz"
+fi
+
+if [ ! -d $MG_DIR/${TOOL_FILE_NAME_TGZ} ];then 
+	cd $MG_DIR && tar -zxvf ${TOOL_FILE_NAME_TGZ}
 fi
 
