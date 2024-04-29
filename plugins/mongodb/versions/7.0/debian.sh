@@ -53,8 +53,8 @@ if [ "aarch64" == ${SYS_ARCH} ];then
 fi
 TOOL_FILE_NAME_TGZ=${FILE_NAME}.tgz
 if [ ! -f $MG_DIR/${TOOL_FILE_NAME_TGZ} ]; then
-	wget --no-check-certificate -O $MG_DIR/mongosh-${TOOL_VERSION}-linux-x64.tgz https://downloads.mongodb.com/compass/mongosh-${TOOL_VERSION}-linux-x64.tgz
-	echo "wget --no-check-certificate -O $MG_DIR/mongosh-${TOOL_VERSION}-linux-x64.tgz https://downloads.mongodb.com/compass/mongosh-${TOOL_VERSION}-linux-x64.tgz"
+	wget --no-check-certificate -O $MG_DIR/${TOOL_FILE_NAME_TGZ} https://downloads.mongodb.com/compass/${TOOL_FILE_NAME_TGZ}
+	echo "wget --no-check-certificate -O $MG_DIR/${TOOL_FILE_NAME_TGZ} https://downloads.mongodb.com/compass/${TOOL_FILE_NAME_TGZ}"
 fi
 
 if [ ! -d $MG_DIR/${TOOL_FILE_NAME_TGZ} ];then 
