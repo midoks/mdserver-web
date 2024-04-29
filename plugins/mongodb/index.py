@@ -250,6 +250,9 @@ def runReplInfo():
     return mw.returnJson(True, 'OK', result)
 
 def testData:
+    '''
+    cd /www/server/mdserver-web && source bin/activate && python3 /www/server/mdserver-web/plugins/mongodb/index.py test_data
+    '''
     import pymongo
     from pymongo import ReadPreference
     
@@ -259,8 +262,8 @@ def testData:
     col = db["demo"]
 
     rndStr = mw.getRandString()
-    mydict = { "name": "v1", "value": rndStr}
-    x = col.insert_one(mydict)
+    insert_dict = { "name": "v1", "value": rndStr}
+    x = col.insert_one(insert_dict)
     print(x)
 
 
