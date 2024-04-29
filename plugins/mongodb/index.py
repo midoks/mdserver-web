@@ -249,7 +249,7 @@ def runReplInfo():
     
     return mw.returnJson(True, 'OK', result)
 
-def testData:
+def testData():
     '''
     cd /www/server/mdserver-web && source bin/activate && python3 /www/server/mdserver-web/plugins/mongodb/index.py test_data
     '''
