@@ -236,7 +236,7 @@ def runReplInfo():
         if 'ismaster' in repl and repl['ismaster']:
             result['status'] = '主'
 
-        if 'secondary' in repl and repl['secondary']:
+        if 'secondary' in repl and not repl['secondary']:
             result['status'] = '主'
 
         result['setName'] = repl['setName']
