@@ -249,6 +249,21 @@ def runReplInfo():
     
     return mw.returnJson(True, 'OK', result)
 
+def testData:
+    import pymongo
+    from pymongo import ReadPreference
+    
+    port = getConfPort()
+    client = pymongo.MongoClient(host='127.0.0.1', port=int(port), directConnection=True)
+    db = client.test
+    col = db["demo"]
+
+    rndStr = mw.getRandString()
+    mydict = { "name": "v1", "value": rndStr}
+    x = col.insert_one(mydict)
+    print(x)
+
+
 def test():
     # https://pymongo.readthedocs.io/en/stable/examples/high_availability.html
     import pymongo
@@ -393,5 +408,7 @@ if __name__ == "__main__":
         print(runLog())
     elif func == 'test':
         print(test())
+    elif func == 'test_data':
+        print(testData())
     else:
         print('error')
