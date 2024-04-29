@@ -27,3 +27,11 @@ if [ ! -d $serverPath/mongodb/bin ];then
 	mkdir -p $serverPath/mongodb
 	cd $MG_DIR/mongodb-macos-x86_64-${VERSION} && cp -rf ./bin $serverPath/mongodb
 fi
+
+TOOL_VERSION=2.2.5
+
+if [ ! -f $MG_DIR/mongosh-${TOOL_VERSION}-darwin-arm64.zip ]; then
+	wget --no-check-certificate -O $MG_DIR/mongosh-${TOOL_VERSION}-darwin-arm64.zip https://downloads.mongodb.com/compass/mongosh-${TOOL_VERSION}-darwin-arm64.zip
+	echo "wget --no-check-certificate -O $MG_DIR/mongosh-${TOOL_VERSION}-darwin-arm64.zip https://downloads.mongodb.com/compass/mongosh-${TOOL_VERSION}-darwin-arm64.zip"
+fi
+

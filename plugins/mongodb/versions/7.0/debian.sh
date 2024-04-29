@@ -45,3 +45,11 @@ fi
 
 cd ${MG_DIR} && rm -rf ${MG_DIR}/${FILE_NAME}
 
+
+TOOL_VERSION=2.2.5
+
+if [ ! -f $MG_DIR/mongosh-${TOOL_VERSION}-darwin-arm64.zip ]; then
+	wget --no-check-certificate -O $MG_DIR/mongosh-${TOOL_VERSION}-linux-x64.tgz https://downloads.mongodb.com/compass/mongosh-${TOOL_VERSION}-linux-x64.tgz
+	echo "wget --no-check-certificate -O $MG_DIR/mongosh-${TOOL_VERSION}-linux-x64.tgz https://downloads.mongodb.com/compass/mongosh-${TOOL_VERSION}-linux-x64.tgz"
+fi
+

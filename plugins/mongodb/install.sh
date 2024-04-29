@@ -4,7 +4,7 @@ export PATH
 
 # https://www.mongodb.com/try/download/community
 
-# cd /Users/midoks/Desktop/mwdev/server/mdserver-web/plugins/mongodb && /bin/bash install.sh install 5.0.4
+# cd /Users/midoks/Desktop/mwdev/server/mdserver-web/plugins/mongodb && /bin/bash install.sh install 7.0
 # cd /www/server/mdserver-web/plugins/mongodb && /bin/bash install.sh install 7.0
 # cd /www/server/mdserver-web && python3 /www/server/mdserver-web/plugins/mongodb/index.py start
 
