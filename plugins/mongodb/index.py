@@ -295,22 +295,22 @@ def test():
     print(rsStatus)
 
     # 需要通过命令行操作
-    rs.initiate({
-        _id: 'test',
-        members: [
-        {
-            _id: 1,
-            host: '154.21.203.138:27017',
-            priority: 2 // 这个priority不设置为1，值越高，当主库故障的时候会优先被选举成主库
-        }, 
-        {
-            _id: 2,
-            host: '154.12.53.216:27017',
-            priority: 1  //设置为0则不能成为主库
-        }
+    # rs.initiate({
+    #     _id: 'test',
+    #     members: [
+    #     {
+    #         _id: 1,
+    #         host: '154.21.203.138:27017',
+    #         priority: 2
+    #     }, 
+    #     {
+    #         _id: 2,
+    #         host: '154.12.53.216:27017',
+    #         priority: 1
+    #     }
 
-        ]
-    });
+    #     ]
+    # });
 
     # > rs.status();  // 查询状态
     # // "stateStr" : "PRIMARY", 主节点
