@@ -173,7 +173,7 @@ def runInfo():
     import pymongo
     
     port = getConfPort()
-    client = pymongo.MongoClient(host='127.0.0.1', port=int(port))
+    client = pymongo.MongoClient(host='127.0.0.1', port=int(port), directConnection=True)
     db = client.admin
     serverStatus = db.command('serverStatus')
 
@@ -197,7 +197,7 @@ def runDocInfo():
     import pymongo
     
     port = getConfPort()
-    client = pymongo.MongoClient(host='127.0.0.1', port=int(port))
+    client = pymongo.MongoClient(host='127.0.0.1', port=int(port), directConnection=True)
     db = client.admin
     serverStatus = db.command('serverStatus')
 
@@ -222,7 +222,7 @@ def runReplInfo():
     import pymongo
     
     port = getConfPort()
-    client = pymongo.MongoClient(host='127.0.0.1', port=int(port))
+    client = pymongo.MongoClient(host='127.0.0.1', port=int(port), directConnection=True)
     db = client.admin
     serverStatus = db.command('serverStatus')
 
@@ -232,10 +232,12 @@ def runReplInfo():
     if 'repl' in serverStatus:
         repl = serverStatus['repl']
         # print(repl)
+        result['status'] = '从'
         if 'ismaster' in repl and repl['ismaster']:
             result['status'] = '主'
-        else:
-            result['status'] = '从'
+
+        if 'secondary' in repl and not repl['secondary']:
+            result['status'] = '主'
 
         result['setName'] = repl['setName']
         result['primary'] = repl['primary']
@@ -253,7 +255,7 @@ def test():
     from pymongo import ReadPreference
     
     port = getConfPort()
-    client = pymongo.MongoClient(host='127.0.0.1', port=int(port))
+    client = pymongo.MongoClient(host='127.0.0.1', port=int(port), directConnection=True)
     db = client.admin
 
     # config = {

@@ -1611,6 +1611,12 @@ def sortFileList(path, ftype = 'mtime', sort = 'desc'):
             flist = sorted(flist, key=lambda f: os.path.getsize(os.path.join(path,f)), reverse=True)
         if sort == 'asc':
             flist = sorted(flist, key=lambda f: os.path.getsize(os.path.join(path,f)), reverse=False)
+
+    if ftype == 'fname':
+        if sort == 'desc':
+            flist = sorted(flist, key=lambda f: os.path.join(path,f), reverse=True)
+        if sort == 'asc':
+            flist = sorted(flist, key=lambda f: os.path.join(path,f), reverse=False)
     return flist
 
 
