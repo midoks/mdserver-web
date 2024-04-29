@@ -173,7 +173,7 @@ def runInfo():
     import pymongo
     
     port = getConfPort()
-    client = pymongo.MongoClient(host='127.0.0.1', port=int(port))
+    client = pymongo.MongoClient(host='127.0.0.1', port=int(port), directConnection=True)
     db = client.admin
     serverStatus = db.command('serverStatus')
 
