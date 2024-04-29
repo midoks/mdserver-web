@@ -197,7 +197,7 @@ def runDocInfo():
     import pymongo
     
     port = getConfPort()
-    client = pymongo.MongoClient(host='127.0.0.1', port=int(port))
+    client = pymongo.MongoClient(host='127.0.0.1', port=int(port), directConnection=True)
     db = client.admin
     serverStatus = db.command('serverStatus')
 
@@ -222,7 +222,7 @@ def runReplInfo():
     import pymongo
     
     port = getConfPort()
-    client = pymongo.MongoClient(host='127.0.0.1', port=int(port))
+    client = pymongo.MongoClient(host='127.0.0.1', port=int(port), directConnection=True)
     db = client.admin
     serverStatus = db.command('serverStatus')
 
@@ -253,7 +253,7 @@ def test():
     from pymongo import ReadPreference
     
     port = getConfPort()
-    client = pymongo.MongoClient(host='127.0.0.1', port=int(port))
+    client = pymongo.MongoClient(host='127.0.0.1', port=int(port), directConnection=True)
     db = client.admin
 
     # config = {
