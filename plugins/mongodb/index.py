@@ -170,6 +170,9 @@ def restart():
 
 
 def runInfo():
+    '''
+    cd /www/server/mdserver-web && source bin/activate && python3 /www/server/mdserver-web/plugins/mongodb/index.py run_info
+    '''
     import pymongo
     
     port = getConfPort()
@@ -268,6 +271,9 @@ def testData():
 
 
 def test():
+    '''
+    cd /www/server/mdserver-web && source bin/activate && python3 /www/server/mdserver-web/plugins/mongodb/index.py test
+    '''
     # https://pymongo.readthedocs.io/en/stable/examples/high_availability.html
     import pymongo
     from pymongo import ReadPreference
@@ -276,17 +282,17 @@ def test():
     client = pymongo.MongoClient(host='127.0.0.1', port=int(port), directConnection=True)
     db = client.admin
 
-    # config = {
-    #     '_id': 'test',
-    #     'members': [
-    #         {'_id': 1, 'host': '127.0.0.1:27018','priority': 10 },
-    #         {'_id': 2, 'host': '127.0.0.1:27019','priority': 1 },
-    #         {'_id': 3, 'host': '127.0.0.1:27020','priority': 0 },
-    #         # {'_id': 2, 'host': 'localhost:27019'}
-    #     ]
-    # }
+    config = {
+        '_id': 'test',
+        'members': [
+            # 'priority': 10 
+            {'_id': 0, 'host': '154.21.203.138:27014'},
+            {'_id': 1, 'host': '154.12.53.216:27019'},
+        ]
+    }
 
-    # rsStatus = client.admin.command("replSetInitiate", config)
+    rsStatus = client.admin.command('replSetInitiate',config)
+    print(rsStatus)
 
     # 需要通过命令行操作
     # -> rs.initiate({
@@ -313,8 +319,8 @@ def test():
     # > rs.add({"_id":3, "host":"127.0.0.1:27318","priority":0,"votes":0});
 
 
-    serverStatus = db.command('serverStatus')
-    print(serverStatus)
+    # serverStatus = db.command('serverStatus')
+    # print(serverStatus)
     
     # return mw.returnJson(True, 'OK', result)
     
