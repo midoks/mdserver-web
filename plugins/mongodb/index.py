@@ -261,7 +261,7 @@ def testData():
     db = client.test
     col = db["demo"]
 
-    rndStr = mw.getRandString()
+    rndStr = mw.getRandomString()
     insert_dict = { "name": "v1", "value": rndStr}
     x = col.insert_one(insert_dict)
     print(x)
