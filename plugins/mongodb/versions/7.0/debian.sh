@@ -46,6 +46,7 @@ fi
 cd ${MG_DIR} && rm -rf ${MG_DIR}/${FILE_NAME}
 
 
+#--------------- mongosh tool install ------------------ #
 TOOL_VERSION=2.2.5
 TOOL_FILE_NAME=mongosh-${TOOL_VERSION}-linux-x64
 if [ "aarch64" == ${SYS_ARCH} ];then
