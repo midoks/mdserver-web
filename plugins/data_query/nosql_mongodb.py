@@ -51,7 +51,7 @@ class nosqlMongodb():
 
         # print(self.__DB_HOST,self.__DB_PORT, self.__DB_PASS)
         try:
-            self.__DB_CONN = pymongo.MongoClient(host=self.__DB_HOST, port=self.__DB_PORT, maxPoolSize=10)
+            self.__DB_CONN = pymongo.MongoClient(host=self.__DB_HOST, port=self.__DB_PORT, maxPoolSize=10,directConnection=True)
             self.__DB_CONN.admin.command('ping')
             return self.__DB_CONN
         except pymongo.errors.ConnectionFailure:
