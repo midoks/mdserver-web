@@ -232,10 +232,12 @@ def runReplInfo():
     if 'repl' in serverStatus:
         repl = serverStatus['repl']
         # print(repl)
+        result['status'] = '从'
         if 'ismaster' in repl and repl['ismaster']:
             result['status'] = '主'
-        else:
-            result['status'] = '从'
+
+        if 'secondary' in repl and repl['secondary']:
+            result['status'] = '主'
 
         result['setName'] = repl['setName']
         result['primary'] = repl['primary']
