@@ -220,7 +220,6 @@ def runDocInfo():
     result["dbs"] = showDbList
     return mw.getJson(result)
 
-
 def runReplInfo():
     import pymongo
     
@@ -242,11 +241,11 @@ def runReplInfo():
         if 'secondary' in repl and not repl['secondary']:
             result['status'] = '主'
 
-        result['setName'] = repl['setName']
-        result['primary'] = repl['primary']
-        result['me'] = repl['me']
+        result['setName'] = mw.getDefault(repl,'setName', '') 
+        result['primary'] = mw.getDefault(repl,'primary', '') 
+        result['me'] = mw.getDefault(repl,'me', '') 
 
-        hosts = repl['hosts']
+        hosts = mw.getDefault(repl,'hosts', '') 
         result['hosts'] = ','.join(hosts)
 
     
