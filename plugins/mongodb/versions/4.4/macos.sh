@@ -27,3 +27,26 @@ if [ ! -d  $serverPath/mongodb/bin ];then
 	mkdir -p $serverPath/mongodb
 	cd $MG_DIR/mongodb-macos-x86_64-${VERSION} && cp -rf ./bin $serverPath/mongodb
 fi
+
+#--------------- mongosh tool install ------------------ #
+TOOL_VERSION=2.2.5
+TOOL_FILE_NAME=mongosh-${TOOL_VERSION}-darwin-x64
+if [ "aarch64" == ${SYS_ARCH} ];then
+	TOOL_FILE_NAME=mongosh-${TOOL_VERSION}-darwin-arm64
+fi
+
+if [ "arm64" == ${SYS_ARCH} ];then
+	TOOL_FILE_NAME=mongosh-${TOOL_VERSION}-darwin-arm64
+fi
+TOOL_FILE_NAME_TGZ=${TOOL_FILE_NAME}.zip
+if [ ! -f $MG_DIR/${TOOL_FILE_NAME_TGZ} ]; then
+	wget --no-check-certificate -O $MG_DIR/${TOOL_FILE_NAME_TGZ} https://downloads.mongodb.com/compass/${TOOL_FILE_NAME_TGZ}
+	echo "wget --no-check-certificate -O $MG_DIR/${TOOL_FILE_NAME_TGZ} https://downloads.mongodb.com/compass/${TOOL_FILE_NAME_TGZ}"
+fi
+
+if [ ! -d $MG_DIR/${TOOL_FILE_NAME_TGZ} ];then 
+	cd $MG_DIR && unzip ${TOOL_FILE_NAME_TGZ}
+fi
+
+cd ${MG_DIR}/${TOOL_FILE_NAME} && cp -rf ./bin $serverPath/mongodb
+cd ${MG_DIR} && rm -rf ${MG_DIR}/${TOOL_FILE_NAME}
