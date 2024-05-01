@@ -119,15 +119,20 @@ def getArgs():
 
     if args_len == 1:
         t = args[0].strip('{').strip('}')
-        t = t.split(':')
+        t = t.split(':', 1)
         tmp[t[0]] = t[1]
     elif args_len > 1:
         for i in range(len(args)):
-            t = args[i].split(':')
+            t = args[i].split(':', 1)
             tmp[t[0]] = t[1]
 
     return tmp
 
+def checkArgs(data, ck=[]):
+    for i in range(len(ck)):
+        if not ck[i] in data:
+            return (False, mw.returnJson(False, '参数:(' + ck[i] + ')没有!'))
+    return (True, mw.returnJson(True, 'ok'))
 
 def status():
     data = mw.execShell(
@@ -318,7 +323,21 @@ def getConfig():
 
 def saveConfig():
     d = getConfigData()
-    return mw.returnJson(True,'保持成功')
+
+    args = getArgs()
+    data = checkArgs(args, ['bind_ip','port','data_path','log','pid_file_path'])
+    if not data[0]:
+        return data[1]
+
+    d['net']['bindIp'] = args['bind_ip']
+    d['net']['port'] = args['port']
+
+    d['storage']['dbPath'] = args['data_path']
+    d['systemLog']['path'] = args['log']
+    d['processManagement']['pidFilePath'] = args['pid_file_path']
+    setConfig(d)
+    reload()
+    return mw.returnJson(True,'设置成功')
 
 def runInfo():
     '''
@@ -572,6 +591,8 @@ if __name__ == "__main__":
         print(getConf())
     elif func == 'get_config':
         print(getConfig())
+    elif func == 'set_config':
+        print(saveConfig())
     elif func == 'run_log':
         print(runLog())
     elif func == 'test':

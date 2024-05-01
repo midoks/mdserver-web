@@ -159,7 +159,17 @@ function mongoSetConfig() {
 }
 
 function mongoConfigSave(){
-	mgPost('set_config', '','',function(data){
+	var data = {};
+	data['bind_ip'] = $('input[name="bind_ip"]').val();
+	data['port'] = $('input[name="port"]').val();
+	data['data_path'] = $('input[name="data_path"]').val();
+	data['log'] = $('input[name="log"]').val();
+	data['pid_file_path'] = $('input[name="pid_file_path"]').val();
+
+	mgPost('set_config', '',data,function(rdata){
+		// console.log(rdata);
+		var rdata = $.parseJSON(rdata.data);
+		layer.msg(rdata.msg, { icon: rdata.status ? 1 : 2 });
     });
 }
 
