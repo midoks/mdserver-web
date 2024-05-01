@@ -7,6 +7,7 @@ import time
 import re
 import json
 import datetime
+import yaml
 
 sys.path.append(os.getcwd() + "/class/core")
 import mw
@@ -46,6 +47,47 @@ def getConfTpl():
     path = getPluginDir() + "/config/mongodb.conf"
     return path
 
+def getConfigData():
+    cfg = getConf()
+    config_data = mw.readFile(cfg)
+    try:
+        config = yaml.safe_load(config_data)
+    except:
+        config = {
+            "systemLog": {
+                "destination": "file",
+                "logAppend": True,
+                "path": mw.getServerDir()+"/mongodb/log/mongodb.log"
+            },
+            "storage": {
+                "dbPath": mw.getServerDir()+"/mongodb/data",
+                "directoryPerDB": True,
+                "journal": {
+                    "enabled": True
+                }
+            },
+            "processManagement": {
+                "fork": True,
+                "pidFilePath": mw.getServerDir()+"/mongodb/log/mongodb.pid"
+            },
+            "net": {
+                "port": 27017,
+                "bindIp": "0.0.0.0"
+            },
+            "security": {
+                "authorization": "enabled",
+                "javascriptEnabled": False
+            }
+        }
+    return config
+
+def setConfig(config_data):
+    cfg = getConf()
+    try:
+        mw.writeFile(cfg, yaml.safe_dump(config_data))
+    except:
+        return False
+    return True
 
 def getInitDTpl():
     path = getPluginDir() + "/init.d/" + getPluginName() + ".tpl"
@@ -53,11 +95,22 @@ def getInitDTpl():
 
 
 def getConfPort():
-    file = getConf()
-    content = mw.readFile(file)
-    rep = 'port\s*=\s*(.*)'
-    tmp = re.search(rep, content)
-    return tmp.groups()[0].strip()
+    data = getConfigData()
+    return data['net']['port']
+    # file = getConf()
+    # content = mw.readFile(file)
+    # rep = 'port\s*=\s*(.*)'
+    # tmp = re.search(rep, content)
+    # return tmp.groups()[0].strip()
+
+def getConfAuth():
+    data = getConfigData()
+    return data['security']['authorization']
+    # file = getConf()
+    # content = mw.readFile(file)
+    # rep = 'auth\s*=\s*(.*)'
+    # tmp = re.search(rep, content)
+    # return tmp.groups()[0].strip()
 
 def getArgs():
     args = sys.argv[2:]
@@ -83,6 +136,61 @@ def status():
     if data[0] == '':
         return 'stop'
     return 'start'
+
+def pSqliteDb(dbname='users'):
+    file = getServerDir() + '/mongodb.db'
+    name = 'mongodb'
+
+    sql_file = getPluginDir() + '/config/mongodb.sql'
+    import_sql = mw.readFile(sql_file)
+    # print(sql_file,import_sql)
+    md5_sql = mw.md5(import_sql)
+
+    import_sign = False
+    save_md5_file = getServerDir() + '/import_mongodb.md5'
+    if os.path.exists(save_md5_file):
+        save_md5_sql = mw.readFile(save_md5_file)
+        if save_md5_sql != md5_sql:
+            import_sign = True
+            mw.writeFile(save_md5_file, md5_sql)
+    else:
+        mw.writeFile(save_md5_file, md5_sql)
+
+    if not os.path.exists(file) or import_sql:
+        conn = mw.M(dbname).dbPos(getServerDir(), name)
+        csql_list = import_sql.split(';')
+        for index in range(len(csql_list)):
+            conn.execute(csql_list[index], ())
+
+    conn = mw.M(dbname).dbPos(getServerDir(), name)
+    return conn
+
+def mongdbClient():
+    import pymongo
+    port = getConfPort()
+    auth = getConfAuth()
+    mg_root = pSqliteDb('config').where('id=?', (1,)).getField('mg_root')
+
+    # print(auth)
+    if auth == 'disabled':
+        client = pymongo.MongoClient(host='127.0.0.1', port=int(port), directConnection=True)
+    else:
+        client = pymongo.MongoClient(host='127.0.0.1', port=int(port), directConnection=True,username='root',password=mg_root)
+    return client
+
+def mongdbClientWithPass():
+    import pymongo
+    port = getConfPort()
+    auth = getConfAuth()
+    # print(auth)
+    mg_root = pSqliteDb('config').where('id=?', (1,)).getField('mg_root')
+    if auth == 'disabled':
+        client = pymongo.MongoClient(host='127.0.0.1', port=int(port), directConnection=True)
+    else:
+        uri = "mongodb://root:"+mg_root+"@127.0.0.1:"+str(port)
+        # print(uri)
+        client = pymongo.MongoClient(uri)
+    return client
 
 
 def initDreplace():
@@ -132,6 +240,40 @@ def initDreplace():
 
     return file_bin
 
+def initUserRoot():
+    # client = mongdbClient()
+    # db = client.admin
+
+    client_pass = mongdbClientWithPass()
+    listDbs = client_pass.admin.command({"listDatabases": 1})
+    print(listDbs)
+
+    print(client_pass.list_database_names());
+    exit(0)
+
+    # db.command("updateUser", "root", pwd=mg_pass, roles=db_all_rules)
+    # db_all_rules = [
+    #     {'role': 'root', 'db': 'admin'},
+    #     {'role': 'clusterAdmin', 'db': 'admin'},
+    #     {'role': 'readAnyDatabase', 'db': 'admin'},
+    #     {'role': 'readWriteAnyDatabase', 'db': 'admin'},
+    #     {'role': 'userAdminAnyDatabase', 'db': 'admin'},
+    #     {'role': 'dbAdminAnyDatabase', 'db': 'admin'},
+    #     {'role': 'userAdmin', 'db': 'admin'},
+    #     {'role': 'dbAdmin', 'db': 'admin'}
+    # ]
+
+    # mg_pass = mw.getRandomString(10)
+    # print(mg_pass)
+    # try:
+    #     db.command("createUser", "root", pwd=mg_pass, roles=db_all_rules)
+    # except Exception as e:
+    #     db.command('dropUser','root')
+    #     db.command("createUser", "root", pwd=mg_pass, roles=db_all_rules)
+        
+    # pSqliteDb('config').where('id=?', (1,)).save('mg_root',(mg_pass,))
+    return True
+
 
 def mgOp(method):
     file = initDreplace()
@@ -144,6 +286,7 @@ def mgOp(method):
 
     data = mw.execShell('systemctl ' + method + ' ' + getPluginName())
     if data[1] == '':
+        initUserRoot()
         return 'ok'
     return 'fail'
 
@@ -169,14 +312,19 @@ def restart():
     return mgOp('restart')
 
 
+def getConfig():
+    d = getConfigData()
+    return mw.returnJson(True,'ok',d)
+
+def saveConfig():
+    d = getConfigData()
+    return mw.returnJson(True,'保持成功')
+
 def runInfo():
     '''
     cd /www/server/mdserver-web && source bin/activate && python3 /www/server/mdserver-web/plugins/mongodb/index.py run_info
     '''
-    import pymongo
-    
-    port = getConfPort()
-    client = pymongo.MongoClient(host='127.0.0.1', port=int(port), directConnection=True)
+    client = mongdbClient()
     db = client.admin
     serverStatus = db.command('serverStatus')
 
@@ -196,11 +344,8 @@ def runInfo():
     return mw.getJson(result)
 
 
-def runDocInfo():
-    import pymongo
-    
-    port = getConfPort()
-    client = pymongo.MongoClient(host='127.0.0.1', port=int(port), directConnection=True)
+def runDocInfo():    
+    client = mongdbClient()
     db = client.admin
     serverStatus = db.command('serverStatus')
 
@@ -221,10 +366,7 @@ def runDocInfo():
     return mw.getJson(result)
 
 def runReplInfo():
-    import pymongo
-    
-    port = getConfPort()
-    client = pymongo.MongoClient(host='127.0.0.1', port=int(port), directConnection=True)
+    client = mongdbClient()
     db = client.admin
     serverStatus = db.command('serverStatus')
 
@@ -251,6 +393,7 @@ def runReplInfo():
     
     return mw.returnJson(True, 'OK', result)
 
+
 def testData():
     '''
     cd /www/server/mdserver-web && source bin/activate && python3 /www/server/mdserver-web/plugins/mongodb/index.py test_data
@@ -258,8 +401,8 @@ def testData():
     import pymongo
     from pymongo import ReadPreference
     
-    port = getConfPort()
-    client = pymongo.MongoClient(host='127.0.0.1', port=int(port), directConnection=True)
+    client = mongdbClient()
+
     db = client.test
     col = db["demo"]
 
@@ -269,29 +412,43 @@ def testData():
     print(x)
 
 
+
 def test():
+    initUserRoot()
     '''
+
     cd /www/server/mdserver-web && source bin/activate && python3 /www/server/mdserver-web/plugins/mongodb/index.py test
+    python3 plugins/mongodb/index.py test
     '''
     # https://pymongo.readthedocs.io/en/stable/examples/high_availability.html
     import pymongo
     from pymongo import ReadPreference
     
-    port = getConfPort()
-    client = pymongo.MongoClient(host='127.0.0.1', port=int(port), directConnection=True)
-    db = client.admin
+    # client = mongdbClient()
 
-    config = {
-        '_id': 'test',
-        'members': [
-            # 'priority': 10 
-            {'_id': 0, 'host': '154.21.203.138:27017'},
-            {'_id': 1, 'host': '154.12.53.216:27017'},
-        ]
-    }
+    # db = client.admin
 
-    rsStatus = client.admin.command('replSetInitiate',config)
-    print(rsStatus)
+    # print(db['users'])
+    # r = db.command("grantRolesToUser", "root",
+    #                  roles=["root"])
+    # print(r)
+    # users_collection = db['users']
+    # print(users_collection)
+
+    # mg_pass = mw.getRandomString(10)
+    # r = db.command("createUser", "root1", pwd=mg_pass, roles=["root"])
+    # print(r)
+    # config = {
+    #     '_id': 'test',
+    #     'members': [
+    #         # 'priority': 10 
+    #         {'_id': 0, 'host': '154.21.203.138:27017'},
+    #         {'_id': 1, 'host': '154.12.53.216:27017'},
+    #     ]
+    # }
+
+    # rsStatus = client.admin.command('replSetInitiate',config)
+    # print(rsStatus)
 
     # 需要通过命令行操作
     # rs.initiate({
@@ -321,7 +478,8 @@ def test():
     # serverStatus = db.command('serverStatus')
     # print(serverStatus)
     
-    # return mw.returnJson(True, 'OK', result)
+    return mw.returnJson(True, 'OK')
+
     
 
 def initdStatus():
@@ -412,6 +570,8 @@ if __name__ == "__main__":
         print(runReplInfo())
     elif func == 'conf':
         print(getConf())
+    elif func == 'get_config':
+        print(getConfig())
     elif func == 'run_log':
         print(runLog())
     elif func == 'test':

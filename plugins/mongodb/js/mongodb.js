@@ -1,3 +1,32 @@
+function mgPost(method, version, args,callback){
+    var loadT = layer.msg('正在获取...', { icon: 16, time: 0, shade: 0.3 });
+
+    var req_data = {};
+    req_data['name'] = 'mongodb';
+    req_data['func'] = method;
+    req_data['version'] = version;
+ 
+    if (typeof(args) == 'string'){
+        req_data['args'] = JSON.stringify(toArrayObject(args));
+    } else {
+        req_data['args'] = JSON.stringify(args);
+    }
+
+    $.post('/plugins/run', req_data, function(data) {
+        layer.close(loadT);
+        if (!data.status){
+            //错误展示10S
+            layer.msg(data.msg,{icon:0,time:2000,shade: [10, '#000']});
+            return;
+        }
+
+        if(typeof(callback) == 'function'){
+            callback(data);
+        }
+    },'json'); 
+}
+
+
 function mongoStatus() {
     var loadT = layer.msg('正在获取...', { icon: 16, time: 0, shade: 0.3 });
     $.post('/plugins/run', {name:'mongodb', func:'run_info'}, function(data) {
@@ -102,6 +131,36 @@ function mongoReplStatus() {
 
         $(".soft-man-con").html(con);
     },'json');
+}
+
+//配置修改
+function mongoSetConfig() {
+    mgPost('get_config', '','',function(data){
+        var rdata = $.parseJSON(data.data);
+        rdata = rdata.data;
+  
+     	var body_auth = '<input class="btswitch btswitch-ios" id="auth" type="checkbox"><label  style="float: left;top: -3px;" class="btswitch-btn" for="auth" onclick=""></label>';
+       
+        var body = "<div class='bingfa'>" +
+            "<p class='line'><span class='span_tit'>IP：</span><input class='bt-input-text' type='text' name='bind_ip' value='" + rdata['net']['bindIp'] + "' />，<font>监听IP请勿随意修改</font></p>" +
+            "<p class='line'><span class='span_tit'>port： </span><input class='bt-input-text' type='text' name='port' value='" + rdata['net']['port'] + "' />，<font>监听端口,一般无需修改</font></p>" +
+            "<p class='line'><span class='span_tit'>dbPath：</span><input class='bt-input-text' type='text' name='data_path' value='" + rdata['storage']['dbPath'] + "' />，<font>数据存储位置</font></p>" +
+            "<p class='line'><span class='span_tit'>path：</span><input class='bt-input-text' type='text' name='log' value='" + rdata['systemLog']['path'] + "' />，<font>日志文件位置</font></p>" +
+            "<p class='line'><span class='span_tit'>pidFilePath：</span><input class='bt-input-text' type='text' name='pid_file_path' value='" + rdata['processManagement']['pidFilePath'] + "' />，<font>PID保存路径</font></p>" +
+            "<p class='line'><span class='span_tit' style='float:left;'>安全认证：</span>"+body_auth+"</p>" +
+            "<div class='mtb15' style='padding-top: 10px;text-align: center;'>\
+            	<button class='btn btn-success btn-sm mr5' onclick='mongoSetConfig();'>刷新</button>\
+            	<button class='btn btn-success btn-sm' onclick='mongoConfigSave();'>保存</button>" +
+            "</div></div>";
+
+        // console.log(body);
+        $(".soft-man-con").html(body);
+    });
+}
+
+function mongoConfigSave(){
+	mgPost('set_config', '','',function(data){
+    });
 }
 
 
