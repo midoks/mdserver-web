@@ -339,6 +339,10 @@ def saveConfig():
     reload()
     return mw.returnJson(True,'设置成功')
 
+def setConfigAuth():
+    
+    return mw.returnJson(True,'设置成功')
+
 def runInfo():
     '''
     cd /www/server/mdserver-web && source bin/activate && python3 /www/server/mdserver-web/plugins/mongodb/index.py run_info
@@ -593,6 +597,8 @@ if __name__ == "__main__":
         print(getConfig())
     elif func == 'set_config':
         print(saveConfig())
+    elif func == 'set_config_auth':
+        print(setConfigAuth())
     elif func == 'run_log':
         print(runLog())
     elif func == 'test':
