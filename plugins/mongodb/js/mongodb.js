@@ -143,7 +143,7 @@ function mongoSetConfig() {
        
         var body = "<div class='bingfa'>" +
             "<p class='line'><span class='span_tit'>IP：</span><input class='bt-input-text' type='text' name='bind_ip' value='" + rdata['net']['bindIp'] + "' />，<font>监听IP请勿随意修改</font></p>" +
-            "<p class='line'><span class='span_tit'>port： </span><input class='bt-input-text' type='text' name='port' value='" + rdata['net']['port'] + "' />，<font>监听端口,一般无需修改</font></p>" +
+            "<p class='line'><span class='span_tit'>port： </span><input class='bt-input-text' type='number' name='port' value='" + rdata['net']['port'] + "' />，<font>监听端口,一般无需修改</font></p>" +
             "<p class='line'><span class='span_tit'>dbPath：</span><input class='bt-input-text' type='text' name='data_path' value='" + rdata['storage']['dbPath'] + "' />，<font>数据存储位置</font></p>" +
             "<p class='line'><span class='span_tit'>path：</span><input class='bt-input-text' type='text' name='log' value='" + rdata['systemLog']['path'] + "' />，<font>日志文件位置</font></p>" +
             "<p class='line'><span class='span_tit'>pidFilePath：</span><input class='bt-input-text' type='text' name='pid_file_path' value='" + rdata['processManagement']['pidFilePath'] + "' />，<font>PID保存路径</font></p>" +
