@@ -330,7 +330,7 @@ def saveConfig():
         return data[1]
 
     d['net']['bindIp'] = args['bind_ip']
-    d['net']['port'] = args['port']
+    d['net']['port'] = int(args['port'])
 
     d['storage']['dbPath'] = args['data_path']
     d['systemLog']['path'] = args['log']
@@ -340,7 +340,7 @@ def saveConfig():
     return mw.returnJson(True,'设置成功')
 
 def setConfigAuth():
-    
+
     return mw.returnJson(True,'设置成功')
 
 def runInfo():
