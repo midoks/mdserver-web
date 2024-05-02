@@ -566,16 +566,13 @@ def addDb():
         username = data_name
 
 
-    client['data_name'].insert_one({})
-    # print(data_name)
-
+    client[data_name].chat.insert_one({})
     user_roles = [{'role': 'dbOwner', 'db': data_name}, {'role': 'userAdmin', 'db': data_name}]
     if auth_status:
         db.command("dropUser", username)
         db.command("createUser", username, pwd=password, roles=user_roles)
 
     ps = args['ps']
-
     if ps == '': 
         ps = data_name
 
