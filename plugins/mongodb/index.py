@@ -82,6 +82,9 @@ def getConfigData():
     return config
 
 def setConfig(config_data):
+    t = status()
+
+
     cfg = getConf()
     try:
         mw.writeFile(cfg, yaml.safe_dump(config_data))
@@ -136,8 +139,7 @@ def checkArgs(data, ck=[]):
 
 def status():
     data = mw.execShell(
-        "ps -ef|grep mongod |grep -v grep | grep -v /Applications | grep -v python | grep -v mdserver-web | awk '{print $2}'")
-
+        "ps -ef|grep mongod |grep -v mongosh|grep -v grep | grep -v /Applications | grep -v python | grep -v mdserver-web | awk '{print $2}'")
     if data[0] == '':
         return 'stop'
     return 'start'
@@ -170,31 +172,34 @@ def pSqliteDb(dbname='users'):
     conn = mw.M(dbname).dbPos(getServerDir(), name)
     return conn
 
+def mongdbClientS():
+    import pymongo
+    port = getConfPort()
+    auth = getConfAuth()
+    mg_root = pSqliteDb('config').where('id=?', (1,)).getField('mg_root')
+
+    if auth == 'disabled':
+        client = pymongo.MongoClient(host='127.0.0.1', port=int(port), directConnection=True)
+    else:
+        # print(auth,mg_root)
+        client = pymongo.MongoClient(host='127.0.0.1', port=int(port), directConnection=True, username='root',password=mg_root)
+    return client
+
 def mongdbClient():
     import pymongo
     port = getConfPort()
     auth = getConfAuth()
     mg_root = pSqliteDb('config').where('id=?', (1,)).getField('mg_root')
 
-    # print(auth)
+    
     if auth == 'disabled':
         client = pymongo.MongoClient(host='127.0.0.1', port=int(port), directConnection=True)
     else:
-        client = pymongo.MongoClient(host='127.0.0.1', port=int(port), directConnection=True,username='root',password=mg_root)
-    return client
-
-def mongdbClientWithPass():
-    import pymongo
-    port = getConfPort()
-    auth = getConfAuth()
-    # print(auth)
-    mg_root = pSqliteDb('config').where('id=?', (1,)).getField('mg_root')
-    if auth == 'disabled':
-        client = pymongo.MongoClient(host='127.0.0.1', port=int(port), directConnection=True)
-    else:
-        uri = "mongodb://root:"+mg_root+"@127.0.0.1:"+str(port)
+        # print(auth,mg_root)
+        # uri = "mongodb://root:"+mg_root+"@127.0.0.1:"+str(port)
         # print(uri)
-        client = pymongo.MongoClient(uri)
+        # client = pymongo.MongoClient(uri)
+        client = pymongo.MongoClient(host='127.0.0.1', port=int(port), directConnection=True, username='root',password=mg_root)
     return client
 
 
@@ -245,40 +250,6 @@ def initDreplace():
 
     return file_bin
 
-def initUserRoot():
-    # client = mongdbClient()
-    # db = client.admin
-
-    client_pass = mongdbClientWithPass()
-    listDbs = client_pass.admin.command({"listDatabases": 1})
-    print(listDbs)
-
-    print(client_pass.list_database_names());
-    exit(0)
-
-    # db.command("updateUser", "root", pwd=mg_pass, roles=db_all_rules)
-    # db_all_rules = [
-    #     {'role': 'root', 'db': 'admin'},
-    #     {'role': 'clusterAdmin', 'db': 'admin'},
-    #     {'role': 'readAnyDatabase', 'db': 'admin'},
-    #     {'role': 'readWriteAnyDatabase', 'db': 'admin'},
-    #     {'role': 'userAdminAnyDatabase', 'db': 'admin'},
-    #     {'role': 'dbAdminAnyDatabase', 'db': 'admin'},
-    #     {'role': 'userAdmin', 'db': 'admin'},
-    #     {'role': 'dbAdmin', 'db': 'admin'}
-    # ]
-
-    # mg_pass = mw.getRandomString(10)
-    # print(mg_pass)
-    # try:
-    #     db.command("createUser", "root", pwd=mg_pass, roles=db_all_rules)
-    # except Exception as e:
-    #     db.command('dropUser','root')
-    #     db.command("createUser", "root", pwd=mg_pass, roles=db_all_rules)
-        
-    # pSqliteDb('config').where('id=?', (1,)).save('mg_root',(mg_pass,))
-    return True
-
 
 def mgOp(method):
     file = initDreplace()
@@ -291,7 +262,6 @@ def mgOp(method):
 
     data = mw.execShell('systemctl ' + method + ' ' + getPluginName())
     if data[1] == '':
-        initUserRoot()
         return 'ok'
     return 'fail'
 
@@ -318,12 +288,15 @@ def restart():
 
 
 def getConfig():
+    t = status()
+    if t == 'stop':
+        return mw.returnJson(False,'未启动!')
+        
     d = getConfigData()
     return mw.returnJson(True,'ok',d)
 
 def saveConfig():
     d = getConfigData()
-
     args = getArgs()
     data = checkArgs(args, ['bind_ip','port','data_path','log','pid_file_path'])
     if not data[0]:
@@ -339,9 +312,66 @@ def saveConfig():
     reload()
     return mw.returnJson(True,'设置成功')
 
-def setConfigAuth():
+def initUserRoot():
+    d = getConfigData()
+    auth_t = d['security']['authorization']
+    d['security']['authorization'] = 'disabled'
+    setConfig(d)
+    reload()
 
-    return mw.returnJson(True,'设置成功')
+    client = mongdbClient()
+    db = client.admin
+    
+    db_all_rules = [
+        {'role': 'root', 'db': 'admin'},
+        {'role': 'clusterAdmin', 'db': 'admin'},
+        {'role': 'readAnyDatabase', 'db': 'admin'},
+        {'role': 'readWriteAnyDatabase', 'db': 'admin'},
+        {'role': 'userAdminAnyDatabase', 'db': 'admin'},
+        {'role': 'dbAdminAnyDatabase', 'db': 'admin'},
+        {'role': 'userAdmin', 'db': 'admin'},
+        {'role': 'dbAdmin', 'db': 'admin'}
+    ]
+    # db.command("updateUser", "root", pwd=mg_pass, roles=db_all_rules)
+    mg_pass = mw.getRandomString(8)
+    try:
+        r1 = db.command("createUser", "root", pwd=mg_pass, roles=db_all_rules)
+        # print(r1)
+    except Exception as e:
+        # print(e)
+        r1 = db.command('dropUser','root')
+        r2 = db.command("createUser", "root", pwd=mg_pass, roles=db_all_rules)
+        # print(r1, r2)
+        
+    r = pSqliteDb('config').where('id=?', (1,)).save('mg_root',(mg_pass,))
+    # print(r)
+    # print(mg_pass)
+    # listDbs = client.admin.command({"listDatabases": 1})
+    # print(listDbs)
+    # print(client_pass.list_database_names());
+
+    d['security']['authorization'] = auth_t
+    setConfig(d)
+    reload()
+    return True
+
+def setConfigAuth():
+    init_db_root = getServerDir() + '/init_db_root.lock'
+    if not os.path.exists(init_db_root):
+        initUserRoot()
+        mw.writeFile(init_db_root,'ok')
+
+    d = getConfigData()
+    if d['security']['authorization'] == 'enabled':
+        d['security']['authorization'] = 'disabled'
+        setConfig(d)
+        reload()
+        return mw.returnJson(True,'关闭成功')
+    else:
+        d['security']['authorization'] = 'enabled'
+        setConfig(d)
+        reload()
+        return mw.returnJson(True,'开启成功')
 
 def runInfo():
     '''
@@ -370,6 +400,7 @@ def runInfo():
 def runDocInfo():    
     client = mongdbClient()
     db = client.admin
+    # print(db)
     serverStatus = db.command('serverStatus')
 
     listDbs = client.list_database_names()

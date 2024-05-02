@@ -137,10 +137,17 @@ function mongoReplStatus() {
 function mongoSetConfig() {
     mgPost('get_config', '','',function(data){
         var rdata = $.parseJSON(data.data);
+        if (!rdata['status']){
+        	layer.msg(rdata['msg']);
+        	return;
+        }
         rdata = rdata.data;
-  
-     	var body_auth = '<input class="btswitch btswitch-ios" id="auth" type="checkbox"><label  style="float: left;top: -3px;" class="btswitch-btn" for="auth" onclick=""></label>';
-       
+        if (rdata['security']['authorization'] == 'enabled'){
+        	var body_auth = '<input class="btswitch btswitch-ios" id="auth" type="checkbox" checked><label  style="float: left;top: -3px;" class="btswitch-btn" for="auth" onclick="mongoConfigAuth();"></label>';
+        } else {
+        	var body_auth = '<input class="btswitch btswitch-ios" id="auth" type="checkbox"><label  style="float: left;top: -3px;" class="btswitch-btn" for="auth" onclick="mongoConfigAuth();"></label>';
+        }
+
         var body = "<div class='bingfa'>" +
             "<p class='line'><span class='span_tit'>IP：</span><input class='bt-input-text' type='text' name='bind_ip' value='" + rdata['net']['bindIp'] + "' />，<font>监听IP请勿随意修改</font></p>" +
             "<p class='line'><span class='span_tit'>port： </span><input class='bt-input-text' type='number' name='port' value='" + rdata['net']['port'] + "' />，<font>监听端口,一般无需修改</font></p>" +
@@ -155,6 +162,13 @@ function mongoSetConfig() {
 
         // console.log(body);
         $(".soft-man-con").html(body);
+    });
+}
+
+function mongoConfigAuth(){
+	mgPost('set_config_auth', '','',function(rdata){
+		var rdata = $.parseJSON(rdata.data);
+		layer.msg(rdata.msg, { icon: rdata.status ? 1 : 2 });
     });
 }
 
