@@ -197,7 +197,6 @@ def mongdbClient():
     else:
         # print(auth,mg_root)
         # uri = "mongodb://root:"+mg_root+"@127.0.0.1:"+str(port)
-        # print(uri)
         # client = pymongo.MongoClient(uri)
         client = pymongo.MongoClient(host='127.0.0.1', port=int(port), directConnection=True, username='root',password=mg_root)
     return client
@@ -291,7 +290,6 @@ def getConfig():
     t = status()
     if t == 'stop':
         return mw.returnJson(False,'未启动!')
-        
     d = getConfigData()
     return mw.returnJson(True,'ok',d)
 
