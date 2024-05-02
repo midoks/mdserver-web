@@ -187,7 +187,7 @@ function mongoConfigSave(){
     });
 }
 
-function docList(page, search){
+function dbList(page, search){
     var _data = {};
     if (typeof(page) =='undefined'){
         var page = 1;
@@ -200,7 +200,7 @@ function docList(page, search){
     _data['page'] = page;
     _data['page_size'] = 10;
    	console.log(_data);
-    mgPost('get_doc_list', '',_data, function(data){
+    mgPost('get_db_list', '',_data, function(data){
     	console.log(data);
         var rdata = $.parseJSON(data.data);
         console.log(rdata);
@@ -252,9 +252,8 @@ function docList(page, search){
         //<button onclick="" id="dataRecycle" title="删除选中项" class="btn btn-default btn-sm" style="margin-left: 5px;"><span class="glyphicon glyphicon-trash" style="margin-right: 5px;"></span>回收站</button>
         var con = '<div class="safe bgw">\
             <button onclick="addDatabase()" title="添加数据库" class="btn btn-success btn-sm" type="button" style="margin-right: 5px;">添加数据库</button>\
-            <button onclick="setRootPwd(0,\''+rdata.info['root_pwd']+'\')" title="设置MySQL管理员密码" class="btn btn-default btn-sm" type="button" style="margin-right: 5px;">root密码</button>\
+            <button onclick="setRootPwd(0,\''+rdata.info['root_pwd']+'\')" title="设置Mongodb管理员密码" class="btn btn-default btn-sm" type="button" style="margin-right: 5px;">root密码</button>\
             <button onclick="setDbAccess(\'root\')" title="ROOT权限" class="btn btn-default btn-sm" type="button" style="margin-right: 5px;">ROOT权限</button>\
-            <button onclick="fixDbAccess(\'root\')" title="修复" class="btn btn-default btn-sm" type="button" style="margin-right: 5px;">修复</button>\
             <span style="float:right">              \
                 <button batch="true" style="float: right;display: none;margin-left:10px;" onclick="delDbBatch();" title="删除选中项" class="btn btn-default btn-sm">删除选中</button>\
             </span>\
@@ -286,6 +285,136 @@ function docList(page, search){
         $('#databasePage').html(rdata.page);
 
         readerTableChecked();
+    });
+}
+
+function addDatabase(type){
+    layer.open({
+        type: 1,
+        area: '500px',
+        title: '添加数据库',
+        closeBtn: 1,
+        shift: 5,
+        shadeClose: true,
+        btn:["提交","关闭"],
+        content: "<form class='bt-form pd20' id='add_db'>\
+                    <div class='line'>\
+                        <span class='tname'>数据库名</span>\
+                        <div class='info-r'><input name='name' class='bt-input-text mr5' placeholder='新的数据库名称' type='text' style='width:65%' value=''>\
+                        </div>\
+                    </div>\
+                    <div class='line'><span class='tname'>用户名</span><div class='info-r'><input name='db_user' class='bt-input-text mr5' placeholder='数据库用户' type='text' style='width:65%' value=''></div></div>\
+                    <div class='line'>\
+                    <span class='tname'>密码</span>\
+                    <div class='info-r'><input class='bt-input-text mr5' type='text' name='password' id='MyPassword' style='width:330px' value='"+(randomStrPwd(16))+"' /><span title='随机密码' class='glyphicon glyphicon-repeat cursor' onclick='repeatPwd(16)'></span></div>\
+                    </div>\
+                    <div class='line'>\
+                        <span class='tname'>访问权限</span>\
+                        <div class='info-r '>\
+                            <select class='bt-input-text mr5' name='dataAccess' style='width:100px'>\
+                            <option value='127.0.0.1'>本地服务器</option>\
+                            <option value=\"%\">所有人</option>\
+                            <option value='ip'>指定IP</option>\
+                            </select>\
+                        </div>\
+                    </div>\
+                    <input type='hidden' name='ps' value='' />\
+                  </form>",
+        success:function(){
+            $("input[name='name']").keyup(function(){
+                var v = $(this).val();
+                $("input[name='db_user']").val(v);
+                $("input[name='ps']").val(v);
+            });
+
+            $('select[name="dataAccess"]').change(function(){
+                var v = $(this).val();
+                if (v == 'ip'){
+                    $(this).after("<input id='dataAccess_subid' class='bt-input-text mr5' type='text' name='address' placeholder='多个IP使用逗号(,)分隔' style='width: 230px; display: inline-block;'>");
+                } else {
+                    $('#dataAccess_subid').remove();
+                }
+            });
+        },
+        yes:function(index) {
+            var data = $("#add_db").serialize();
+            data = decodeURIComponent(data);
+            var dataObj = toArrayObject(data);
+            if(!dataObj['address']){
+                dataObj['address'] = dataObj['dataAccess'];
+            }
+            mgPost('add_db', '',dataObj, function(data){
+                var rdata = $.parseJSON(data.data);
+                showMsg(rdata.msg,function(){
+                    if (rdata.status){
+                        layer.close(index);
+                        dbList();
+                    }
+                },{icon: rdata.status ? 1 : 2}, 2000);
+            });
+        }
+    });
+}
+
+function setRootPwd(type, pwd){
+    if (type==1){
+        var password = $("#MyPassword").val();
+        mgPost('set_root_pwd', '',{password:password}, function(data){
+            var rdata = $.parseJSON(data.data);
+            showMsg(rdata.msg,function(){
+                dbList();
+            },{icon: rdata.status ? 1 : 2});   
+        });
+        return;
+    }
+
+    var index = layer.open({
+        type: 1,
+        area: '500px',
+        title: '修改数据库密码',
+        closeBtn: 1,
+        shift: 5,
+        btn:["提交", "关闭", "复制ROOT密码", "强制修改"],
+        shadeClose: true,
+        content: "<form class='bt-form pd20' id='mod_pwd'>\
+                    <div class='line'>\
+                        <span class='tname'>root密码</span>\
+                        <div class='info-r'><input class='bt-input-text mr5' type='text' name='password' id='MyPassword' style='width:330px' value='"+pwd+"' />\
+                            <span title='随机密码' class='glyphicon glyphicon-repeat cursor' onclick='repeatPwd(16)'></span>\
+                        </div>\
+                    </div>\
+                  </form>",
+        yes:function(layerIndex){
+            var password = $("#MyPassword").val();
+            mgPost('set_root_pwd', '',{password:password}, function(data){
+                var rdata = $.parseJSON(data.data);
+                showMsg(rdata.msg,function(){
+                    layer.close(layerIndex);
+                    dbList();
+                },{icon: rdata.status ? 1 : 2});   
+            });
+        },
+        btn3:function(){
+            var password = $("#MyPassword").val();
+            copyText(password);
+            return false;
+        },
+        btn4:function(layerIndex){
+            layer.confirm('强制修改,是为了在重建时使用,确定强制?', {
+                btn: ['确定', '取消']
+            }, function(index, layero){
+                layer.close(index);
+                var password = $("#MyPassword").val();
+                mgPost('set_root_pwd', '',{password:password,force:'1'}, function(data){
+                    var rdata = $.parseJSON(data.data);
+                    showMsg(rdata.msg,function(){
+                        layer.close(layerIndex);
+                        dbList();
+                    },{icon: rdata.status ? 1 : 2});   
+                });
+            });
+            return false;
+        }
     });
 }
 

@@ -310,6 +310,54 @@ def saveConfig():
     reload()
     return mw.returnJson(True,'设置成功')
 
+# print(mg_pass)
+# listDbs = client.admin.command({"listDatabases": 1})
+# print(listDbs)
+# print(client_pass.list_database_names());
+def initMgRoot(password='',force=0):
+
+    if force == 1:
+        d = getConfigData()
+        auth_t = d['security']['authorization']
+        d['security']['authorization'] = 'disabled'
+        setConfig(d)
+        reload()
+
+    client = mongdbClient()
+    db = client.admin
+    
+    db_all_rules = [
+        {'role': 'root', 'db': 'admin'},
+        {'role': 'clusterAdmin', 'db': 'admin'},
+        {'role': 'readAnyDatabase', 'db': 'admin'},
+        {'role': 'readWriteAnyDatabase', 'db': 'admin'},
+        {'role': 'userAdminAnyDatabase', 'db': 'admin'},
+        {'role': 'dbAdminAnyDatabase', 'db': 'admin'},
+        {'role': 'userAdmin', 'db': 'admin'},
+        {'role': 'dbAdmin', 'db': 'admin'}
+    ]
+
+    if password =='':
+        mg_pass = mw.getRandomString(8)
+    else:
+        mg_pass = password
+
+    try:
+        db.command("createUser", "root", pwd=mg_pass, roles=db_all_rules)
+    except Exception as e:
+        if force == 0:
+            db.command("updateUser", "root", pwd=mg_pass, roles=db_all_rules)
+        else:
+            db.command('dropUser','root')
+            db.command("createUser", "root", pwd=mg_pass, roles=db_all_rules)
+    r = pSqliteDb('config').where('id=?', (1,)).save('mg_root',(mg_pass,))
+
+    if force == 1:
+        d['security']['authorization'] = auth_t
+        setConfig(d)
+        reload()
+    return True
+
 def initUserRoot():
     d = getConfigData()
     auth_t = d['security']['authorization']
@@ -342,11 +390,6 @@ def initUserRoot():
         # print(r1, r2)
         
     r = pSqliteDb('config').where('id=?', (1,)).save('mg_root',(mg_pass,))
-    # print(r)
-    # print(mg_pass)
-    # listDbs = client.admin.command({"listDatabases": 1})
-    # print(listDbs)
-    # print(client_pass.list_database_names());
 
     d['security']['authorization'] = auth_t
     setConfig(d)
@@ -445,7 +488,7 @@ def runReplInfo():
     
     return mw.returnJson(True, 'OK', result)
 
-def getDocList():
+def getDbList():
     args = getArgs()
     page = 1
     page_size = 10
@@ -482,7 +525,7 @@ def getDocList():
     _page['count'] = count
     _page['p'] = page
     _page['row'] = page_size
-    _page['tojs'] = 'docList'
+    _page['tojs'] = 'dbList'
     data['page'] = mw.getPage(_page)
     data['data'] = clist
 
@@ -491,6 +534,76 @@ def getDocList():
     data['info'] = info
     return mw.getJson(data)
     # return mw.returnJson(True,'ok',data)
+
+def addDb():
+    t = status()
+    if t == 'stop':
+        return mw.returnJson(False,'未启动!')
+
+    client = mongdbClient()
+    db = client.admin
+
+    args = getArgs()
+    data = checkArgs(args, ['ps','name','db_user','password'])
+    if not data[0]:
+        return data[1]
+
+    data_name = args['name'].strip()
+    if not data_name:
+        return mw.returnJson(False, "数据库名不能为空！")
+
+    addTime = time.strftime('%Y-%m-%d %X', time.localtime())
+    username = ''
+    password = ''
+    # auth为true时如果__DB_USER为空则将它赋值为 root，用于开启本地认证后数据库用户为空的情况
+    auth_status = getConfAuth() == "enabled"  
+    
+    if auth_status:
+        data_name = args['name']
+        username = args['db_user']
+        password = args['password']
+    else:
+        username = data_name
+
+
+    client['data_name'].insert_one({})
+    # print(data_name)
+
+    user_roles = [{'role': 'dbOwner', 'db': data_name}, {'role': 'userAdmin', 'db': data_name}]
+    if auth_status:
+        db.command("dropUser", username)
+        db.command("createUser", username, pwd=password, roles=user_roles)
+
+    ps = args['ps']
+
+    if ps == '': 
+        ps = data_name
+
+    # 添加入SQLITE
+    pSqliteDb('databases').add('name,username,password,accept,ps,addtime', (data_name, username, password, '127.0.0.1', ps, addTime))
+    return mw.returnJson(True, '添加成功')
+
+
+def setRootPwd(version=''):
+    args = getArgs()
+    data = checkArgs(args, ['password'])
+    if not data[0]:
+        return data[1]
+
+    #强制修改
+    force = 0
+    if 'force' in args and args['force'] == '1':
+        force = 1
+
+    password = args['password']
+    try:
+        msg = ''
+        if force == 1:
+            msg = ',无须强制!'
+        initMgRoot(password, force)
+        return mw.returnJson(True, '数据库root密码修改成功!'+msg)
+    except Exception as ex:
+        return mw.returnJson(False, '修改错误:' + str(ex))
 
 def testData():
     '''
@@ -674,8 +787,12 @@ if __name__ == "__main__":
         print(saveConfig())
     elif func == 'set_config_auth':
         print(setConfigAuth())
-    elif func == 'get_doc_list':
-        print(getDocList())
+    elif func == 'get_db_list':
+        print(getDbList())
+    elif func == 'add_db':
+        print(addDb())
+    elif func == 'set_root_pwd':
+        print(setRootPwd())
     elif func == 'run_log':
         print(runLog())
     elif func == 'test':
