@@ -187,3 +187,105 @@ function mongoConfigSave(){
     });
 }
 
+function docList(page, search){
+    var _data = {};
+    if (typeof(page) =='undefined'){
+        var page = 1;
+    }
+
+    if(typeof(search) != 'undefined'){
+        _data['search'] = search;
+    }
+    
+    _data['page'] = page;
+    _data['page_size'] = 10;
+   	console.log(_data);
+    mgPost('get_doc_list', '',_data, function(data){
+    	console.log(data);
+        var rdata = $.parseJSON(data.data);
+        console.log(rdata);
+        var list = '';
+        for(i in rdata.data){
+            list += '<tr>';
+            list +='<td><input value="'+rdata.data[i]['id']+'" class="check" onclick="checkSelect();" type="checkbox"></td>';
+            list += '<td>' + rdata.data[i]['name'] +'</td>';
+            list += '<td>' + rdata.data[i]['username'] +'</td>';
+            list += '<td>' + 
+                        '<span class="password" data-pw="'+rdata.data[i]['password']+'">***</span>' +
+                        '<span onclick="showHidePass(this)" class="glyphicon glyphicon-eye-open cursor pw-ico" style="margin-left:10px"></span>'+
+                        '<span class="ico-copy cursor btcopy" style="margin-left:10px" title="复制密码" onclick="copyPass(\''+rdata.data[i]['password']+'\')"></span>'+
+                    '</td>';
+        
+
+            list += '<td><span class="c9 input-edit" onclick="setDbPs(\''+rdata.data[i]['id']+'\',\''+rdata.data[i]['name']+'\',this)" style="display: inline-block;">'+rdata.data[i]['ps']+'</span></td>';
+            list += '<td style="text-align:right">';
+
+            list += '<a href="javascript:;" class="btlink" class="btlink" onclick="setBackup(\''+rdata.data[i]['name']+'\',this)" title="数据库备份">'+(rdata.data[i]['is_backup']?'备份':'未备份') +'</a> | ';
+
+            var rw = '';
+            var rw_change = 'all';
+            if (typeof(rdata.data[i]['rw'])!='undefined'){
+                var rw_val = '读写';
+                if (rdata.data[i]['rw'] == 'all'){
+                    rw_val = "所有";
+                    rw_change = 'rw';
+                } else if (rdata.data[i]['rw'] == 'rw'){
+                    rw_val = "读写";
+                    rw_change = 'r';
+                } else if (rdata.data[i]['rw'] == 'r'){
+                    rw_val = "只读";
+                    rw_change = 'all';
+                }
+                rw = '<a href="javascript:;" class="btlink" onclick="setDbRw(\''+rdata.data[i]['id']+'\',\''+rdata.data[i]['name']+'\',\''+rw_change+'\')" title="设置读写">'+rw_val+'</a> | ';
+            }
+
+
+            list += '<a href="javascript:;" class="btlink" onclick="repTools(\''+rdata.data[i]['name']+'\')" title="MySQL优化修复工具">工具</a> | ' +
+                        '<a href="javascript:;" class="btlink" onclick="setDbAccess(\''+rdata.data[i]['username']+'\')" title="设置数据库权限">权限</a> | ' +
+                        rw +
+                        '<a href="javascript:;" class="btlink" onclick="setDbPass('+rdata.data[i]['id']+',\''+ rdata.data[i]['username'] +'\',\'' + rdata.data[i]['password'] + '\')">改密</a> | ' +
+                        '<a href="javascript:;" class="btlink" onclick="delDb(\''+rdata.data[i]['id']+'\',\''+rdata.data[i]['name']+'\')" title="删除数据库">删除</a>' +
+                    '</td>';
+            list += '</tr>';
+        }
+
+        //<button onclick="" id="dataRecycle" title="删除选中项" class="btn btn-default btn-sm" style="margin-left: 5px;"><span class="glyphicon glyphicon-trash" style="margin-right: 5px;"></span>回收站</button>
+        var con = '<div class="safe bgw">\
+            <button onclick="addDatabase()" title="添加数据库" class="btn btn-success btn-sm" type="button" style="margin-right: 5px;">添加数据库</button>\
+            <button onclick="setRootPwd(0,\''+rdata.info['root_pwd']+'\')" title="设置MySQL管理员密码" class="btn btn-default btn-sm" type="button" style="margin-right: 5px;">root密码</button>\
+            <button onclick="setDbAccess(\'root\')" title="ROOT权限" class="btn btn-default btn-sm" type="button" style="margin-right: 5px;">ROOT权限</button>\
+            <button onclick="fixDbAccess(\'root\')" title="修复" class="btn btn-default btn-sm" type="button" style="margin-right: 5px;">修复</button>\
+            <span style="float:right">              \
+                <button batch="true" style="float: right;display: none;margin-left:10px;" onclick="delDbBatch();" title="删除选中项" class="btn btn-default btn-sm">删除选中</button>\
+            </span>\
+            <div class="divtable mtb10">\
+                <div class="tablescroll">\
+                    <table id="DataBody" class="table table-hover" width="100%" cellspacing="0" cellpadding="0" border="0" style="border: 0 none;">\
+                    <thead><tr><th width="30"><input class="check" onclick="checkSelect();" type="checkbox"></th>\
+                    <th>数据库名</th>\
+                    <th>用户名</th>\
+                    <th>密码</th>\
+                    '+
+                    // '<th>备份</th>'+
+                    '<th>备注</th>\
+                    <th style="text-align:right;">操作</th></tr></thead>\
+                    <tbody>\
+                    '+ list +'\
+                    </tbody></table>\
+                </div>\
+                <div id="databasePage" class="dataTables_paginate paging_bootstrap page"></div>\
+                <div class="table_toolbar" style="left:0px;">\
+                    <span class="sync btn btn-default btn-sm" style="margin-right:5px" onclick="syncToDatabase(1)" title="将选中数据库信息同步到服务器">同步选中</span>\
+                    <span class="sync btn btn-default btn-sm" style="margin-right:5px" onclick="syncToDatabase(0)" title="将所有数据库信息同步到服务器">同步所有</span>\
+                    <span class="sync btn btn-default btn-sm" onclick="syncGetDatabase()" title="从服务器获取数据库列表">从服务器获取</span>\
+                </div>\
+            </div>\
+        </div>';
+
+        $(".soft-man-con").html(con);
+        $('#databasePage').html(rdata.page);
+
+        readerTableChecked();
+    });
+}
+

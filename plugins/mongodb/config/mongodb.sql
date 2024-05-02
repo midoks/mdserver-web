@@ -14,3 +14,14 @@ CREATE TABLE IF NOT EXISTS `users` (
   `addtime` TEXT
 );
 
+CREATE TABLE IF NOT EXISTS `databases` (
+  `id` INTEGER PRIMARY KEY AUTOINCREMENT,
+  `name` TEXT,
+  `username` TEXT,
+  `password` TEXT,
+  `accept` TEXT,
+  `rw` TEXT DEFAULT 'rw',
+  `ps` TEXT,
+  `addtime` TEXT
+);
+

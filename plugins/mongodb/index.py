@@ -445,6 +445,52 @@ def runReplInfo():
     
     return mw.returnJson(True, 'OK', result)
 
+def getDocList():
+    args = getArgs()
+    page = 1
+    page_size = 10
+    search = ''
+    data = {}
+    if 'page' in args:
+        page = int(args['page'])
+
+    if 'page_size' in args:
+        page_size = int(args['page_size'])
+
+    if 'search' in args:
+        search = args['search']
+
+    conn = pSqliteDb('databases')
+    limit = str((page - 1) * page_size) + ',' + str(page_size)
+    condition = ''
+    if not search == '':
+        condition = "name like '%" + search + "%'"
+    field = 'id,name,username,password,accept,rw,ps,addtime'
+    clist = conn.where(condition, ()).field(
+        field).limit(limit).order('id desc').select()
+
+    # for x in range(0, len(clist)):
+    #     dbname = clist[x]['name']
+    #     # blist = getDbBackupListFunc(dbname)
+    #     # # print(blist)
+    #     clist[x]['is_backup'] = False
+    #     if len(blist) > 0:
+    #         clist[x]['is_backup'] = True
+
+    count = conn.where(condition, ()).count()
+    _page = {}
+    _page['count'] = count
+    _page['p'] = page
+    _page['row'] = page_size
+    _page['tojs'] = 'docList'
+    data['page'] = mw.getPage(_page)
+    data['data'] = clist
+
+    info = {}
+    info['root_pwd'] = pSqliteDb('config').where('id=?', (1,)).getField('mg_root')
+    data['info'] = info
+    return mw.getJson(data)
+    # return mw.returnJson(True,'ok',data)
 
 def testData():
     '''
@@ -473,8 +519,8 @@ def test():
     python3 plugins/mongodb/index.py test
     '''
     # https://pymongo.readthedocs.io/en/stable/examples/high_availability.html
-    import pymongo
-    from pymongo import ReadPreference
+    # import pymongo
+    # from pymongo import ReadPreference
     
     # client = mongdbClient()
 
@@ -628,6 +674,8 @@ if __name__ == "__main__":
         print(saveConfig())
     elif func == 'set_config_auth':
         print(setConfigAuth())
+    elif func == 'get_doc_list':
+        print(getDocList())
     elif func == 'run_log':
         print(runLog())
     elif func == 'test':
