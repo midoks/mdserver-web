@@ -358,7 +358,8 @@ def initUserRoot():
     auth_t = d['security']['authorization']
     d['security']['authorization'] = 'disabled'
     setConfig(d)
-    reload()
+    restart()
+    time.sleep(1)
 
     client = mongdbClient()
     db = client.admin
@@ -388,7 +389,7 @@ def initUserRoot():
 
     d['security']['authorization'] = auth_t
     setConfig(d)
-    reload()
+    restart()
     return True
 
 def setConfigAuth():
@@ -945,7 +946,7 @@ def testData():
 
 def test():
     '''
-
+    python3 /www/server/mdserver-web/plugins/mongodb/index.py set_config_auth  {}
     cd /www/server/mdserver-web && source bin/activate && python3 /www/server/mdserver-web/plugins/mongodb/index.py test
     python3 plugins/mongodb/index.py test
     '''
