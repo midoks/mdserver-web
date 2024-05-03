@@ -190,8 +190,6 @@ def mongdbClient():
     port = getConfPort()
     auth = getConfAuth()
     mg_root = pSqliteDb('config').where('id=?', (1,)).getField('mg_root')
-
-    # print(auth)
     if auth == 'disabled':
         client = pymongo.MongoClient(host='127.0.0.1', port=int(port), directConnection=True)
     else:
@@ -406,11 +404,13 @@ def setConfigAuth():
     d = getConfigData()
     if d['security']['authorization'] == 'enabled':
         d['security']['authorization'] = 'disabled'
+        del d['security']['keyFile']
         setConfig(d)
         restart()
         return mw.returnJson(True,'关闭成功')
     else:
         d['security']['authorization'] = 'enabled'
+        d['security']['keyFile'] = getServerDir()+'/mongodb.key'
         setConfig(d)
         restart()
         return mw.returnJson(True,'开启成功')
