@@ -191,7 +191,7 @@ def mongdbClient():
     auth = getConfAuth()
     mg_root = pSqliteDb('config').where('id=?', (1,)).getField('mg_root')
 
-    
+    # print(auth)
     if auth == 'disabled':
         client = pymongo.MongoClient(host='127.0.0.1', port=int(port), directConnection=True)
     else:
@@ -203,6 +203,11 @@ def mongdbClient():
 
 
 def initDreplace():
+
+    mg_key = getServerDir() + "/mongodb.key"
+    if not os.path.exists(mg_key):
+        mw.execShell("openssl rand -base64 741 >> "+mg_key)
+        mw.execShell("chmod 600 "+mg_key)
 
     file_tpl = getInitDTpl()
     service_path = os.path.dirname(os.getcwd())
@@ -307,7 +312,7 @@ def saveConfig():
     d['systemLog']['path'] = args['log']
     d['processManagement']['pidFilePath'] = args['pid_file_path']
     setConfig(d)
-    reload()
+    restart()
     return mw.returnJson(True,'设置成功')
 
 def initMgRoot(password='',force=0):
@@ -896,17 +901,6 @@ def setDbAccess():
 
     mg_pass = pSqliteDb('config').where('id=?', (1,)).getField('mg_root')
 
-    # user_rules = [
-    #     {'role': 'root', 'db': 'admin'},
-    #     {'role': 'clusterAdmin', 'db': 'admin'},
-    #     {'role': 'readAnyDatabase', 'db': 'admin'},
-    #     {'role': 'readWriteAnyDatabase', 'db': 'admin'},
-    #     {'role': 'userAdminAnyDatabase', 'db': 'admin'},
-    #     {'role': 'dbAdminAnyDatabase', 'db': 'admin'},
-    #     {'role': 'userAdmin', 'db': 'admin'},
-    #     {'role': 'dbAdmin', 'db': 'admin'}
-    # ]
-
     user_roles = []
     select_role = select.split(',')
     for role in select_role:
@@ -954,31 +948,20 @@ def test():
     # import pymongo
     # from pymongo import ReadPreference
     
-    # client = mongdbClient()
+    client = mongdbClient()
+    db = client.admin
 
-    # db = client.admin
+    mg_pass = mw.getRandomString(10)
+    config = {
+        '_id': 'test',
+        'members': [
+            {'_id': 0, 'host': '127.0.0.1:27019'},
+            {'_id': 1, 'host': '127.0.0.1:27017'},
+        ]
+    }
 
-    # print(db['users'])
-    # r = db.command("grantRolesToUser", "root",
-    #                  roles=["root"])
-    # print(r)
-    # users_collection = db['users']
-    # print(users_collection)
-
-    # mg_pass = mw.getRandomString(10)
-    # r = db.command("createUser", "root1", pwd=mg_pass, roles=["root"])
-    # print(r)
-    # config = {
-    #     '_id': 'test',
-    #     'members': [
-    #         # 'priority': 10 
-    #         {'_id': 0, 'host': '154.21.203.138:27017'},
-    #         {'_id': 1, 'host': '154.12.53.216:27017'},
-    #     ]
-    # }
-
-    # rsStatus = client.admin.command('replSetInitiate',config)
-    # print(rsStatus)
+    rsStatus = client.admin.command('replSetInitiate',config)
+    print(rsStatus)
 
     # 需要通过命令行操作
     # rs.initiate({
@@ -986,12 +969,12 @@ def test():
     #     members: [
     #     {
     #         _id: 1,
-    #         host: '154.21.203.138:27017',
+    #         host: '127.0.0.1:27019',
     #         priority: 2
     #     }, 
     #     {
     #         _id: 2,
-    #         host: '154.12.53.216:27017',
+    #         host: '127.0.0.1:27017',
     #         priority: 1
     #     }
 
