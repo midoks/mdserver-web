@@ -97,6 +97,10 @@ def getInitDTpl():
     return path
 
 
+def getConfIp():
+    data = getConfigData()
+    return data['net']['bindIp']
+
 def getConfPort():
     data = getConfigData()
     return data['net']['port']
@@ -176,27 +180,29 @@ def mongdbClientS():
     import pymongo
     port = getConfPort()
     auth = getConfAuth()
+    ip = getConfIp()
     mg_root = pSqliteDb('config').where('id=?', (1,)).getField('mg_root')
 
     if auth == 'disabled':
-        client = pymongo.MongoClient(host='127.0.0.1', port=int(port), directConnection=True)
+        client = pymongo.MongoClient(host=ip, port=int(port), directConnection=True)
     else:
         # print(auth,mg_root)
-        client = pymongo.MongoClient(host='127.0.0.1', port=int(port), directConnection=True, username='root',password=mg_root)
+        client = pymongo.MongoClient(host=ip, port=int(port), directConnection=True, username='root',password=mg_root)
     return client
 
 def mongdbClient():
     import pymongo
     port = getConfPort()
     auth = getConfAuth()
+    ip = getConfIp()
     mg_root = pSqliteDb('config').where('id=?', (1,)).getField('mg_root')
     if auth == 'disabled':
-        client = pymongo.MongoClient(host='127.0.0.1', port=int(port), directConnection=True)
+        client = pymongo.MongoClient(host=ip, port=int(port), directConnection=True)
     else:
         # print(auth,mg_root)
         # uri = "mongodb://root:"+mg_root+"@127.0.0.1:"+str(port)
         # client = pymongo.MongoClient(uri)
-        client = pymongo.MongoClient(host='127.0.0.1', port=int(port), directConnection=True, username='root',password=mg_root)
+        client = pymongo.MongoClient(host=ip, port=int(port), directConnection=True, username='root',password=mg_root)
     return client
 
 
