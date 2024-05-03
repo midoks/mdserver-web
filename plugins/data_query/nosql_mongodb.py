@@ -151,7 +151,7 @@ class nosqlMongodb():
         except pymongo.errors.ConnectionFailure:
             return False
         except Exception:
-            self.__DB_ERR = mw.get_error_info()
+            self.__DB_ERR = mw.getTracebackInfo()
         return False
 
     # 获取配置项

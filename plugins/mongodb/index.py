@@ -944,7 +944,6 @@ def testData():
 
 
 def test():
-    initUserRoot()
     '''
 
     cd /www/server/mdserver-web && source bin/activate && python3 /www/server/mdserver-web/plugins/mongodb/index.py test
