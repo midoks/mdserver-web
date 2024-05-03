@@ -31,6 +31,9 @@ if [ "macos" != "$OSNAME" ];then
 	SYS_VERSION_ID=`cat /etc/*-release | grep VERSION_ID | awk -F = '{print $2}' | awk -F "\"" '{print $2}'`
 fi
 
+if [ -f ${rootPath}/bin/activate ];then
+	source ${rootPath}/bin/activate
+fi
 Install_app()
 {
 	echo '正在安装脚本文件...' > $install_tmp
