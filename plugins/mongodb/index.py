@@ -736,6 +736,195 @@ def getDbInfo():
     
     return mw.returnJson(True,'ok', result)
 
+def toDbBase(find):
+    client = mongdbClient()
+    db_admin = client.admin
+    data_name = find['name']
+    db = client[data_name]
+
+    db.chat.insert_one({})
+    user_roles = [{'role': 'dbOwner', 'db': data_name}, {'role': 'userAdmin', 'db': data_name}]
+    try:
+        db_admin.command("createUser", find['username'], pwd=find['password'], roles=user_roles)
+    except Exception as e:
+        db_admin.command("updateUser", find['username'], pwd=find['password'], roles=user_roles)
+    return 1
+
+def syncToDatabases():
+    args = getArgs()
+    data = checkArgs(args, ['type', 'ids'])
+    if not data[0]:
+        return data[1]
+
+    stype = int(args['type'])
+    sqlite_db = pSqliteDb('databases')
+    n = 0
+
+    if stype == 0:
+        data = sqlite_db.field('id,name,username,password,accept').select()
+        for value in data:
+            result = toDbBase(value)
+            if result == 1:
+                n += 1
+    else:
+        data = json.loads(args['ids'])
+        for value in data:
+            find = sqlite_db.where("id=?", (value,)).field(
+                'id,name,username,password,accept').find()
+            # print find
+            result = toDbBase(find)
+            if result == 1:
+                n += 1
+    msg = mw.getInfo('本次共同步了{1}个数据库!', (str(n),))
+    return mw.returnJson(True, msg)
+
+
+def getAllRole():
+    mongo_role = {
+        # 数据库用户角色
+        "read": "读取数据(read)",
+        "readWrite": "读取和写入数据(readWrite)",
+        # 数据库管理角色
+        # "dbAdmin": "数据库管理员",
+        "dbOwner": "数据库所有者(dbOwner)",
+        "userAdmin": "用户管理员(userAdmin)",
+        # 集群管理角色
+        # "clusterAdmin": "集群管理员",
+        # "clusterManager": "集群管理器",
+        # "clusterMonitor": "集群监视器",
+        # "hostManager": "主机管理员",
+        # 备份和恢复角色
+        # "backup": "备份数据",
+        # "restore": "还原数据",
+        # 所有数据库角色
+        # "readAnyDatabase": "任意数据库读取",
+        # "readWriteAnyDatabase": "任意数据库读取和写入",
+        # "userAdminAnyDatabase": "任意数据库用户管理员",
+        # "dbAdminAnyDatabase": "任意数据库管理员",
+        # 超级用户角色
+        # "root": "超级管理员",
+        # 内部角色
+        # "__queryableBackup": "可查询备份",
+        # "__system": "系统角色",
+        # "enableSharding": "启用分片",
+    }
+
+    client = mongdbClient()
+    db = client.admin
+
+    # 获取所有角色
+    role_data = db.command('rolesInfo', showBuiltinRoles=True)
+    result = []
+    for role in role_data["roles"]:
+        if mongo_role.get(role["role"]) is not None:
+            role["name"] = mongo_role.get(role["role"])
+            result.append(role)
+    return mw.returnJson(True, 'ok', result)
+
+def getDbAccess():
+    args = getArgs()
+    data = checkArgs(args, ['username'])
+    if not data[0]:
+        return data[1]
+
+    client = mongdbClient()
+    db = client.admin
+    username = args['username']
+
+    mongo_role = {
+        # 数据库用户角色
+        "read": "读取数据(read)",
+        "readWrite": "读取和写入数据(readWrite)",
+        # 数据库管理角色
+        # "dbAdmin": "数据库管理员",
+        "dbOwner": "数据库所有者(dbOwner)",
+        "userAdmin": "用户管理员(userAdmin)",
+        # 集群管理角色
+        # "clusterAdmin": "集群管理员",
+        # "clusterManager": "集群管理器",
+        # "clusterMonitor": "集群监视器",
+        # "hostManager": "主机管理员",
+        # 备份和恢复角色
+        # "backup": "备份数据",
+        # "restore": "还原数据",
+        # 所有数据库角色
+        # "readAnyDatabase": "任意数据库读取",
+        # "readWriteAnyDatabase": "任意数据库读取和写入",
+        # "userAdminAnyDatabase": "任意数据库用户管理员",
+        # "dbAdminAnyDatabase": "任意数据库管理员",
+        # 超级用户角色
+        # "root": "超级管理员",
+        # 内部角色
+        # "__queryableBackup": "可查询备份",
+        # "__system": "系统角色",
+        # "enableSharding": "启用分片",
+    }
+
+    role_data = db.command('rolesInfo', showBuiltinRoles=True)
+    all_role_list = []
+    for role in role_data["roles"]:
+        if mongo_role.get(role["role"]) is not None:
+            role["name"] = mongo_role.get(role["role"])
+            all_role_list.append(role)
+
+    result = {
+        "user": username,
+        "db": username,
+        "roles": [],
+        "all_roles":all_role_list,
+    }
+
+    user_data = db.command('usersInfo', username)
+    if user_data:
+        if len(user_data["users"]) != 0:
+            user = user_data["users"][0]
+            result["user"] = user.get("user", username)
+            result["db"] = user.get("db", username)
+            result["roles"] = user.get("roles", [])
+
+    return mw.returnJson(True, 'ok', result)
+
+def setDbAccess():
+    args = getArgs()
+    data = checkArgs(args, ['username', 'select','name'])
+    if not data[0]:
+        return data[1]
+    username = args['username']
+    select = args['select']
+    name = args['name']
+
+    mg_pass = pSqliteDb('config').where('id=?', (1,)).getField('mg_root')
+
+    # user_rules = [
+    #     {'role': 'root', 'db': 'admin'},
+    #     {'role': 'clusterAdmin', 'db': 'admin'},
+    #     {'role': 'readAnyDatabase', 'db': 'admin'},
+    #     {'role': 'readWriteAnyDatabase', 'db': 'admin'},
+    #     {'role': 'userAdminAnyDatabase', 'db': 'admin'},
+    #     {'role': 'dbAdminAnyDatabase', 'db': 'admin'},
+    #     {'role': 'userAdmin', 'db': 'admin'},
+    #     {'role': 'dbAdmin', 'db': 'admin'}
+    # ]
+
+    user_roles = []
+    select_role = select.split(',')
+    for role in select_role:
+        t = {}
+        t['role'] = role
+        t['db'] = name
+        user_roles.append(t)
+
+    client = mongdbClient()
+    db = client.admin
+
+    try:
+        db.command("updateUser", username, pwd=mg_pass, roles=user_roles)
+    except Exception as e:
+        db.command('dropUser',username)
+        db.command("createUser", username, pwd=mg_pass, roles=user_roles)
+
+    return mw.returnJson(True, '设置成功!')
+
 def testData():
     '''
     cd /www/server/mdserver-web && source bin/activate && python3 /www/server/mdserver-web/plugins/mongodb/index.py test_data
@@ -752,7 +941,6 @@ def testData():
     insert_dict = { "name": "v1", "value": rndStr}
     x = col.insert_one(insert_dict)
     print(x)
-
 
 
 def test():
@@ -930,10 +1118,18 @@ if __name__ == "__main__":
         print(setUserPwd())
     elif func == 'sync_get_databases':
         print(syncGetDatabases())
+    elif func == 'sync_to_databases':
+        print(syncToDatabases())
     elif func == 'set_db_ps':
         print(setDbPs())
     elif func == 'get_db_info':
         print(getDbInfo())
+    elif func == 'get_all_role':
+        print(getAllRole())
+    elif func == 'get_db_access':
+        print(getDbAccess())
+    elif func == 'set_db_access':
+        print(setDbAccess())
     elif func == 'run_log':
         print(runLog())
     elif func == 'test':

@@ -26,6 +26,33 @@ function mgPost(method, version, args,callback){
     },'json'); 
 }
 
+
+function mgPostN(method, version, args,callback){
+
+    var req_data = {};
+    req_data['name'] = 'mongodb';
+    req_data['func'] = method;
+    req_data['version'] = version;
+ 
+    if (typeof(args) == 'string'){
+        req_data['args'] = JSON.stringify(toArrayObject(args));
+    } else {
+        req_data['args'] = JSON.stringify(args);
+    }
+
+    $.post('/plugins/run', req_data, function(data) {
+        if (!data.status){
+            //错误展示10S
+            layer.msg(data.msg,{icon:0,time:2000,shade: [10, '#000']});
+            return;
+        }
+
+        if(typeof(callback) == 'function'){
+            callback(data);
+        }
+    },'json'); 
+}
+
 function mgAsyncPost(method,args){
     var _args = null; 
     if (typeof(args) == 'string'){
@@ -211,11 +238,11 @@ function dbList(page, search){
     
     _data['page'] = page;
     _data['page_size'] = 10;
-   	console.log(_data);
+   	// console.log(_data);
     mgPost('get_db_list', '',_data, function(data){
-    	console.log(data);
+    	// console.log(data);
         var rdata = $.parseJSON(data.data);
-        console.log(rdata);
+        // console.log(rdata);
         var list = '';
         for(i in rdata.data){
             list += '<tr>';
@@ -235,7 +262,7 @@ function dbList(page, search){
             list += '<a href="javascript:;" class="btlink" class="btlink" onclick="setBackup(\''+rdata.data[i]['name']+'\',this)" title="数据库备份">'+(rdata.data[i]['is_backup']?'备份':'未备份') +'</a> | ';
 
             list += '<a href="javascript:;" class="btlink" onclick="repTools(\''+rdata.data[i]['name']+'\')" title="MySQL优化修复工具">工具</a> | ' +
-                        '<a href="javascript:;" class="btlink" onclick="setDbAccess(\''+rdata.data[i]['username']+'\')" title="设置数据库权限">权限</a> | ' +
+                        '<a href="javascript:;" class="btlink" onclick="setDbAccess(\''+rdata.data[i]['username']+'\',\''+rdata.data[i]['name']+'\')" title="设置数据库权限">权限</a> | ' +
                         '<a href="javascript:;" class="btlink" onclick="setDbPass('+rdata.data[i]['id']+',\''+ rdata.data[i]['username'] +'\',\'' + rdata.data[i]['password'] + '\')">改密</a> | ' +
                         '<a href="javascript:;" class="btlink" onclick="delDb(\''+rdata.data[i]['id']+'\',\''+rdata.data[i]['name']+'\')" title="删除数据库">删除</a>' +
                     '</td>';
@@ -539,8 +566,7 @@ function repTools(db_name, res){
     mgPost('get_db_info', '', {name:db_name}, function(data){
         var rdata = $.parseJSON(data.data);
         var rdata = rdata.data;
-
-        console.log(rdata.collection_list);
+        // console.log(rdata.collection_list);
         var tbody = '';
         for (var i = 0; i < rdata.collection_list.length; i++) {
             tbody += '<tr>\
@@ -552,14 +578,6 @@ function repTools(db_name, res){
                     <td>' + rdata.collection_list[i].nindexes + '</td>\
                     <td>' + toSize(rdata.collection_list[i].total_index_size) + '</td>\
                 </tr> '
-        }
-
-        if (res) {
-            $(".gztr").html(tbody);
-            $("#db_tools").html('');
-            $("input[type='checkbox']").attr("checked", false);
-            $(".tools_size").html('大小：' + rdata.data_size);
-            return;
         }
 
         layer.open({
@@ -598,5 +616,104 @@ function repTools(db_name, res){
                     </div>'
         });
         tableFixed('database_fix');
+    });
+}
+
+function syncToDatabase(type){
+    var data = [];
+    $('input[type="checkbox"].check:checked').each(function () {
+        if (!isNaN($(this).val())) data.push($(this).val());
+    });
+    var postData = 'type='+type+'&ids='+JSON.stringify(data); 
+    mgPost('sync_to_databases', '',postData, function(data){
+        var rdata = $.parseJSON(data.data);
+        // console.log(rdata);
+        showMsg(rdata.msg,function(){
+            dbList();
+        },{ icon: rdata.status ? 1 : 2 });
+    });
+}
+
+function setDbAccess(username,name){
+    mgPost('get_db_access','','username='+username, function(data){
+        var rdata = $.parseJSON(data.data);
+        if (!rdata.status){
+            layer.msg(rdata.msg,{icon:2,shade: [0.3, '#000']});
+            return;
+        }
+        var db_roles = rdata.data.roles;
+        var all_roles = rdata.data.all_roles;
+        // console.log(all_roles);
+        var role_list;
+        var index = layer.open({
+            type: 1,
+            area: '500px',
+            title: '设置数据库权限',
+            closeBtn: 1,
+            shift: 5,
+            btn:["提交","取消"],
+            shadeClose: true,
+            content: "<form class='bt-form pd20' id='set_db_access'>\
+                        <div class='line'>\
+                            <span class='tname'>访问权限</span>\
+                            <div class='info-r'>\
+                                <div id='role_list'></div>\
+                            </div>\
+                        </div>\
+                      </form>",
+            success:function(layers, index){
+            	document.getElementById('layui-layer' + index).getElementsByClassName('layui-layer-content')[0].style.overflow = 'unset';
+
+            	var role_data = [];
+            	for (var i = 0; i < db_roles.length; i++) {
+            		var t = {};
+            		t['name'] = db_roles[i]['role'];
+            		t['value'] = db_roles[i]['role'];
+            		role_data.push(t);	
+            	}
+
+                role_list = xmSelect.render({
+                    el: '#role_list',
+                    language: 'zn',
+                    toolbar: {show: true,},
+                    paging: false,
+                    data: role_data,
+                });
+
+                var pdata = [];
+                for (var i = 0; i < all_roles.length; i++) {
+                    var tval = all_roles[i];
+                    var isSelected = false;
+                    for (var db_i = 0; db_i < db_roles.length; db_i++) {
+	            		var db_name = db_roles[db_i]['role'];
+	            		if (db_name == tval['role']){
+	            			isSelected = true;
+	            		}
+	            	}
+
+	            	var t = {name:tval['name'],value:tval['role']};
+	            	if (isSelected){
+	            		t = {name:tval['name'],value:tval['role'], selected: true};
+	            	}  
+                    pdata.push(t);
+                }
+                role_list.update({data:pdata});
+            },
+            yes:function(index){
+                var data = $("#set_db_access").serialize();
+                data = decodeURIComponent(data);
+                var dataObj = toArrayObject(data);
+                dataObj['username'] = username;
+                dataObj['name'] = name;
+                mgPost('set_db_access', '',dataObj, function(data){
+                    var rdata = $.parseJSON(data.data);
+                    showMsg(rdata.msg,function(){
+                        layer.close(index);
+                        dbList();
+                    },{icon: rdata.status ? 1 : 2});   
+                });
+            }
+        });
+
     });
 }

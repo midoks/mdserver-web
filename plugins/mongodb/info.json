@@ -1,6 +1,6 @@
 {
 	"sort": 7,
-	"ps": "一个高性能的NOSQL数据库",
+	"ps": "一个高性能的NOSQL数据库【社区版】",
 	"name": "mongodb",
 	"title": "Mongodb",
 	"shell": "install.sh",
