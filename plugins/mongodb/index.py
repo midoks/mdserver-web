@@ -310,12 +310,7 @@ def saveConfig():
     reload()
     return mw.returnJson(True,'设置成功')
 
-# print(mg_pass)
-# listDbs = client.admin.command({"listDatabases": 1})
-# print(listDbs)
-# print(client_pass.list_database_names());
 def initMgRoot(password='',force=0):
-
     if force == 1:
         d = getConfigData()
         auth_t = d['security']['authorization']
@@ -552,6 +547,10 @@ def addDb():
     if not data_name:
         return mw.returnJson(False, "数据库名不能为空！")
 
+    nameArr = ['admin', 'config', 'local']
+    if data_name in nameArr:
+        return mw.returnJson(False, "数据库名是保留名称!")
+
     addTime = time.strftime('%Y-%m-%d %X', time.localtime())
     username = ''
     password = ''
@@ -569,7 +568,7 @@ def addDb():
     client[data_name].chat.insert_one({})
     user_roles = [{'role': 'dbOwner', 'db': data_name}, {'role': 'userAdmin', 'db': data_name}]
     if auth_status:
-        db.command("dropUser", username)
+        # db.command("dropUser", username)
         db.command("createUser", username, pwd=password, roles=user_roles)
 
     ps = args['ps']
@@ -580,6 +579,35 @@ def addDb():
     pSqliteDb('databases').add('name,username,password,accept,ps,addtime', (data_name, username, password, '127.0.0.1', ps, addTime))
     return mw.returnJson(True, '添加成功')
 
+
+def delDb():
+    client = mongdbClient()
+    db = client.admin
+    sqlite_db = pSqliteDb('databases')
+
+    args = getArgs()
+    data = checkArgs(args, ['id', 'name'])
+    if not data[0]:
+        return data[1]
+    try:
+        sid = args['id']
+        name = args['name']
+        find = sqlite_db.where("id=?", (sid,)).field('id,name,username,password,accept,ps,addtime').find()
+        accept = find['accept']
+        username = find['username']
+
+        client.drop_database(name)
+
+        try:
+            db.command('dropUser',username)
+        except Exception as e:
+            pass
+
+        # 删除SQLITE
+        sqlite_db.where("id=?", (sid,)).delete()
+        return mw.returnJson(True, '删除成功!')
+    except Exception as ex:
+        return mw.returnJson(False, '删除失败!' + str(ex))
 
 def setRootPwd(version=''):
     args = getArgs()
@@ -601,6 +629,112 @@ def setRootPwd(version=''):
         return mw.returnJson(True, '数据库root密码修改成功!'+msg)
     except Exception as ex:
         return mw.returnJson(False, '修改错误:' + str(ex))
+
+def setUserPwd(version=''):
+
+    client = mongdbClient()
+    db = client.admin
+    sqlite_db = pSqliteDb('databases')
+
+    args = getArgs()
+    data = checkArgs(args, ['password', 'name'])
+    if not data[0]:
+        return data[1]
+
+    newpassword = args['password']
+    username = args['name']
+    uid = args['id']
+    try:
+        name = sqlite_db.where('id=?', (uid,)).getField('name')
+        user_roles = [{'role': 'dbOwner', 'db': name}, {'role': 'userAdmin', 'db': name}]
+
+        try:
+            db.command("updateUser", username, pwd=newpassword, roles=user_roles)
+        except Exception as e:
+            db.command("createUser", username, pwd=newpassword, roles=user_roles)
+
+        sqlite_db.where("id=?", (uid,)).setField('password', newpassword)
+        return mw.returnJson(True, mw.getInfo('修改数据库[{1}]密码成功!', (name,)))
+    except Exception as ex:
+        return mw.returnJson(False, mw.getInfo('修改数据库[{1}]密码失败[{2}]!', (name, str(ex),)))
+
+
+def syncGetDatabases():
+    client = mongdbClient()
+    sqlite_db = pSqliteDb('databases')
+    db = client.admin
+    data = client.admin.command({"listDatabases": 1})
+    nameArr = ['admin', 'config', 'local']
+    n = 0
+
+    for value in data['databases']:
+        vdb_name = value["name"]
+        b = False
+        for key in nameArr:
+            if vdb_name == key:
+                b = True
+                break
+        if b:
+            continue
+        if sqlite_db.where("name=?", (vdb_name,)).count() > 0:
+            continue
+
+        host = '127.0.0.1'
+        ps = vdb_name
+        addTime = time.strftime('%Y-%m-%d %X', time.localtime())
+        if sqlite_db.add('name,username,password,accept,ps,addtime', (vdb_name, vdb_name, '', host, ps, addTime)):
+            n += 1
+
+    msg = mw.getInfo('本次共从服务器获取了{1}个数据库!', (str(n),))
+    return mw.returnJson(True, msg)
+
+def setDbPs():
+    args = getArgs()
+    data = checkArgs(args, ['id', 'name', 'ps'])
+    if not data[0]:
+        return data[1]
+
+    ps = args['ps']
+    sid = args['id']
+    name = args['name']
+    try:
+        psdb = pSqliteDb('databases')
+        psdb.where("id=?", (sid,)).setField('ps', ps)
+        return mw.returnJson(True, mw.getInfo('修改数据库[{1}]备注成功!', (name,)))
+    except Exception as e:
+        return mw.returnJson(True, mw.getInfo('修改数据库[{1}]备注失败!', (name,)))
+
+
+def getDbInfo():
+    args = getArgs()
+    data = checkArgs(args, ['name'])
+    if not data[0]:
+        return data[1]
+
+    ret = {}
+
+    client = mongdbClient()
+
+    db_name = args['name']
+    db = client[db_name]
+
+    result = db.command("dbStats")
+    result["collection_list"] = []
+    for collection_name in db.list_collection_names():
+        collection = db.command("collStats", collection_name)
+        data = {
+            "collection_name": collection_name,
+            "count": collection.get("count"),  # 文档数
+            "size": collection.get("size"),  # 内存中的大小
+            "avg_obj_size": collection.get("avgObjSize"),  # 对象平均大小
+            "storage_size": collection.get("storageSize"),  # 存储大小
+            "capped": collection.get("capped"),
+            "nindexes": collection.get("nindexes"),  # 索引数
+            "total_index_size": collection.get("totalIndexSize"),  # 索引大小
+        }
+        result["collection_list"].append(data)
+    
+    return mw.returnJson(True,'ok', result)
 
 def testData():
     '''
@@ -788,8 +922,18 @@ if __name__ == "__main__":
         print(getDbList())
     elif func == 'add_db':
         print(addDb())
+    elif func == 'del_db':
+        print(delDb())
     elif func == 'set_root_pwd':
         print(setRootPwd())
+    elif func == 'set_user_pwd':
+        print(setUserPwd())
+    elif func == 'sync_get_databases':
+        print(syncGetDatabases())
+    elif func == 'set_db_ps':
+        print(setDbPs())
+    elif func == 'get_db_info':
+        print(getDbInfo())
     elif func == 'run_log':
         print(runLog())
     elif func == 'test':

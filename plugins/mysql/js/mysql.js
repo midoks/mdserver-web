@@ -795,7 +795,7 @@ function addDatabase(type){
 
 function delDb(id, name){
     safeMessage('删除['+name+']','您真的要删除['+name+']吗？',function(){
-        var data='id='+id+'&name='+name
+        var data='id='+id+'&name='+name;
         myPost('del_db', data, function(data){
             var rdata = $.parseJSON(data.data);
             showMsg(rdata.msg,function(){

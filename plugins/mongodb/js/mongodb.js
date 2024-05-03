@@ -26,6 +26,18 @@ function mgPost(method, version, args,callback){
     },'json'); 
 }
 
+function mgAsyncPost(method,args){
+    var _args = null; 
+    if (typeof(args) == 'string'){
+        _args = JSON.stringify(toArrayObject(args));
+    } else {
+        _args = JSON.stringify(args);
+    }
+
+    var loadT = layer.msg('正在获取...', { icon: 16, time: 0, shade: 0.3 });
+    return syncPost('/plugins/run', {name:'mongodb', func:method, args:_args}); 
+}
+
 
 function mongoStatus() {
     var loadT = layer.msg('正在获取...', { icon: 16, time: 0, shade: 0.3 });
@@ -38,7 +50,7 @@ function mongoStatus() {
 
     	var rdata = $.parseJSON(data.data);
         var con = '<div class="divtable">\
-						<table class="table table-hover table-bordered" style="width: 490px;">\
+						<table class="table table-hover table-bordered" style="width: 660px;">\
 						<thead><th>字段</th><th>当前值</th><th>说明</th></thead>\
 						<tbody>\
 							<tr><th>host</th><td>' + rdata.host + '</td><td>服务器</td></tr>\
@@ -87,7 +99,7 @@ function mongoDocStatus() {
 		// console.log(t);
 
 		var con = '<div class="divtable">\
-						<table class="table table-hover table-bordered" style="width: 490px;">\
+						<table class="table table-hover table-bordered" style="width: 660px;">\
 						<thead><th>库名</th><th>大小</th><th>存储大小</th><th>数据</th><th>索引</th><th>文档数据</th><th>对象</th></thead>\
 						<tbody>'+t+'<tbody>\
 				</table></div>';
@@ -121,7 +133,7 @@ function mongoReplStatus() {
 		}
 
         var con = '<div class="divtable">\
-				<table class="table table-hover table-bordered" style="width: 490px;">\
+				<table class="table table-hover table-bordered" style="width: 660px;">\
 					<thead><th>字段</th><th>当前值</th><th>说明</th></thead>\
 					<tbody>\
 						'+tbody+'\
@@ -222,27 +234,8 @@ function dbList(page, search){
 
             list += '<a href="javascript:;" class="btlink" class="btlink" onclick="setBackup(\''+rdata.data[i]['name']+'\',this)" title="数据库备份">'+(rdata.data[i]['is_backup']?'备份':'未备份') +'</a> | ';
 
-            var rw = '';
-            var rw_change = 'all';
-            if (typeof(rdata.data[i]['rw'])!='undefined'){
-                var rw_val = '读写';
-                if (rdata.data[i]['rw'] == 'all'){
-                    rw_val = "所有";
-                    rw_change = 'rw';
-                } else if (rdata.data[i]['rw'] == 'rw'){
-                    rw_val = "读写";
-                    rw_change = 'r';
-                } else if (rdata.data[i]['rw'] == 'r'){
-                    rw_val = "只读";
-                    rw_change = 'all';
-                }
-                rw = '<a href="javascript:;" class="btlink" onclick="setDbRw(\''+rdata.data[i]['id']+'\',\''+rdata.data[i]['name']+'\',\''+rw_change+'\')" title="设置读写">'+rw_val+'</a> | ';
-            }
-
-
             list += '<a href="javascript:;" class="btlink" onclick="repTools(\''+rdata.data[i]['name']+'\')" title="MySQL优化修复工具">工具</a> | ' +
                         '<a href="javascript:;" class="btlink" onclick="setDbAccess(\''+rdata.data[i]['username']+'\')" title="设置数据库权限">权限</a> | ' +
-                        rw +
                         '<a href="javascript:;" class="btlink" onclick="setDbPass('+rdata.data[i]['id']+',\''+ rdata.data[i]['username'] +'\',\'' + rdata.data[i]['password'] + '\')">改密</a> | ' +
                         '<a href="javascript:;" class="btlink" onclick="delDb(\''+rdata.data[i]['id']+'\',\''+rdata.data[i]['name']+'\')" title="删除数据库">删除</a>' +
                     '</td>';
@@ -250,10 +243,10 @@ function dbList(page, search){
         }
 
         //<button onclick="" id="dataRecycle" title="删除选中项" class="btn btn-default btn-sm" style="margin-left: 5px;"><span class="glyphicon glyphicon-trash" style="margin-right: 5px;"></span>回收站</button>
+        // <button onclick="setDbAccess(\'root\')" title="ROOT权限" class="btn btn-default btn-sm" type="button" style="margin-right: 5px;">ROOT权限</button>\
         var con = '<div class="safe bgw">\
             <button onclick="addDatabase()" title="添加数据库" class="btn btn-success btn-sm" type="button" style="margin-right: 5px;">添加数据库</button>\
             <button onclick="setRootPwd(0,\''+rdata.info['root_pwd']+'\')" title="设置Mongodb管理员密码" class="btn btn-default btn-sm" type="button" style="margin-right: 5px;">root密码</button>\
-            <button onclick="setDbAccess(\'root\')" title="ROOT权限" class="btn btn-default btn-sm" type="button" style="margin-right: 5px;">ROOT权限</button>\
             <span style="float:right">              \
                 <button batch="true" style="float: right;display: none;margin-left:10px;" onclick="delDbBatch();" title="删除选中项" class="btn btn-default btn-sm">删除选中</button>\
             </span>\
@@ -418,3 +411,192 @@ function setRootPwd(type, pwd){
     });
 }
 
+function syncGetDatabase(){
+    mgPost('sync_get_databases', '', '', function(data){
+        var rdata = $.parseJSON(data.data);
+        showMsg(rdata.msg,function(){
+            dbList();
+        },{ icon: rdata.status ? 1 : 2 });
+    });
+}
+
+function showHidePass(obj){
+    var a = "glyphicon-eye-open";
+    var b = "glyphicon-eye-close";
+    
+    if($(obj).hasClass(a)){
+        $(obj).removeClass(a).addClass(b);
+        $(obj).prev().text($(obj).prev().attr('data-pw'))
+    }
+    else{
+        $(obj).removeClass(b).addClass(a);
+        $(obj).prev().text('***');
+    }
+}
+
+function setDbPs(id, name, obj) {
+    var _span = $(obj);
+    var _input = $("<input class='baktext' value=\""+_span.text()+"\" type='text' placeholder='备注信息' />");
+    _span.hide().after(_input);
+    _input.focus();
+    _input.blur(function(){
+        $(this).remove();
+        var ps = _input.val();
+        _span.text(ps).show();
+        var data = {name:name,id:id,ps:ps};
+        mgPost('set_db_ps', '',data, function(data){
+            var rdata = $.parseJSON(data.data);
+            layer.msg(rdata.msg, { icon: rdata.status ? 1 : 2 });
+        });
+    });
+    _input.keyup(function(){
+        if(event.keyCode == 13){
+            _input.trigger('blur');
+        }
+    });
+}
+
+function delDb(id, name){
+    safeMessage('删除['+name+']','您真的要删除['+name+']吗？',function(){
+        var data='id='+id+'&name='+name;
+        mgPost('del_db', '', data, function(data){
+            var rdata = $.parseJSON(data.data);
+            showMsg(rdata.msg,function(){
+                dbList();
+            },{icon: rdata.status ? 1 : 2}, 600);
+        });
+    });
+}
+
+function delDbBatch(){
+    var arr = [];
+    $('input[type="checkbox"].check:checked').each(function () {
+        var _val = $(this).val();
+        var _name = $(this).parent().next().text();
+        if (!isNaN(_val)) {
+            arr.push({'id':_val,'name':_name});
+        }
+    });
+
+    safeMessage('批量删除数据库','<a style="color:red;">您共选择了[2]个数据库,删除后将无法恢复,真的要删除吗?</a>',function(){
+        var i = 0;
+        $(arr).each(function(){
+            var data  = mgAsyncPost('del_db', this);
+            var rdata = $.parseJSON(data.data);
+            if (!rdata.status){
+                layer.msg(rdata.msg,{icon:2,time:2000,shade: [0.3, '#000']});
+            }
+            i++;
+        });
+        
+        var msg = '成功删除['+i+']个数据库!';
+        showMsg(msg,function(){
+            dbList();
+        },{icon: 1}, 600);
+    });
+}
+
+function setDbPass(id, username, password){
+    layer.open({
+        type: 1,
+        area: '500px',
+        title: '修改数据库密码',
+        closeBtn: 1,
+        shift: 5,
+        shadeClose: true,
+        btn:["提交","关闭"],
+        content: "<form class='bt-form pd20' id='mod_pwd'>\
+                    <div class='line'>\
+                        <span class='tname'>用户名</span>\
+                        <div class='info-r'><input readonly='readonly' name=\"name\" class='bt-input-text mr5' type='text' style='width:330px;outline:none;' value='"+username+"' /></div>\
+                    </div>\
+                    <div class='line'>\
+                    <span class='tname'>密码</span>\
+                    <div class='info-r'>\
+                        <input class='bt-input-text mr5' type='text' name='password' id='MyPassword' style='width:330px' value='"+password+"' />\
+                        <span title='随机密码' class='glyphicon glyphicon-repeat cursor' onclick='repeatPwd(16)'></span></div>\
+                    </div>\
+                    <input type='hidden' name='id' value='"+id+"'>\
+                </form>",
+        yes:function(index){
+            // var data = $("#mod_pwd").serialize();
+            var data = {};
+            data['name'] = $('input[name=name]').val();
+            data['password'] = $('#MyPassword').val();
+            data['id'] = $('input[name=id]').val();
+            mgPost('set_user_pwd', '',data, function(data){
+                var rdata = $.parseJSON(data.data);
+                showMsg(rdata.msg,function(){
+                    layer.close(index);
+                    dbList();
+                },{icon: rdata.status ? 1 : 2});   
+            });
+        }
+    });
+}
+
+function repTools(db_name, res){
+    mgPost('get_db_info', '', {name:db_name}, function(data){
+        var rdata = $.parseJSON(data.data);
+        var rdata = rdata.data;
+
+        console.log(rdata.collection_list);
+        var tbody = '';
+        for (var i = 0; i < rdata.collection_list.length; i++) {
+            tbody += '<tr>\
+                    <td><span style="width:220px;"> ' + rdata.collection_list[i].collection_name + '</span></td>\
+                    <td><span style="width:220px;"> ' + rdata.collection_list[i].count + '</span></td>\
+                    <td>' + toSize(rdata.collection_list[i].size) + '</td>\
+                    <td><span style="width:90px;"> ' + toSize(rdata.collection_list[i].avg_obj_size) + '</span></td>\
+                    <td>' + toSize(rdata.collection_list[i].storage_size) + '</td>\
+                    <td>' + rdata.collection_list[i].nindexes + '</td>\
+                    <td>' + toSize(rdata.collection_list[i].total_index_size) + '</td>\
+                </tr> '
+        }
+
+        if (res) {
+            $(".gztr").html(tbody);
+            $("#db_tools").html('');
+            $("input[type='checkbox']").attr("checked", false);
+            $(".tools_size").html('大小：' + rdata.data_size);
+            return;
+        }
+
+        layer.open({
+            type: 1,
+            title: "MongoDB工具箱【" + db_name + "】",
+            area: ['780px', '480px'],
+            closeBtn: 1,
+            shadeClose: false,
+            content: '<div class="pd15">\
+                            <div class="db_list">\
+                                <span><a>数据库名称：'+ db_name + '</a>\
+                                <a>集合：'+ rdata.collections + '</a>\
+                                <a class="tools_size">存储大小：'+ toSize(rdata.storageSize) + '</a>\
+                                <a class="tools_size">索引大小：'+ toSize(rdata.indexSize) + '</a>\
+                                </span>\
+                                <span id="db_tools" style="float: right;"></span>\
+                            </div >\
+                            <div class="divtable">\
+                            <div  id="database_fix"  style="height:360px;overflow:auto;border:#ddd 1px solid">\
+                            <table class="table table-hover "style="border:none">\
+                                <thead>\
+                                    <tr>\
+                                        <th>集合名称</th>\
+                                        <th>文档数量</th>\
+                                        <th>内存中的大小</th>\
+                                        <th>对象平均大小</th>\
+                                        <th>存储大小</th>\
+                                        <th>索引数量</th>\
+                                        <th>索引大小</th>\
+                                    </tr>\
+                                </thead>\
+                                <tbody class="gztr">' + tbody + '</tbody>\
+                            </table>\
+                            </div>\
+                        </div>\
+                    </div>'
+        });
+        tableFixed('database_fix');
+    });
+}
