@@ -402,12 +402,12 @@ def setConfigAuth():
     if d['security']['authorization'] == 'enabled':
         d['security']['authorization'] = 'disabled'
         setConfig(d)
-        reload()
+        restart()
         return mw.returnJson(True,'关闭成功')
     else:
         d['security']['authorization'] = 'enabled'
         setConfig(d)
-        reload()
+        restart()
         return mw.returnJson(True,'开启成功')
 
 def runInfo():
