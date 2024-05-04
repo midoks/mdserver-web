@@ -732,7 +732,15 @@ def getDbInfo():
     db_name = args['name']
     db = client[db_name]
 
-    result = db.command("dbStats")
+    result = {}
+    t = db.command("dbStats")
+    # print(result)
+    result['collections'] = t['collections']
+    result['avgObjSize'] = t['avgObjSize']
+    result['dataSize'] = t['dataSize']
+    result['storageSize'] = t['storageSize']
+    result['indexSize'] = t['indexSize']
+
     result["collection_list"] = []
     for collection_name in db.list_collection_names():
         collection = db.command("collStats", collection_name)
