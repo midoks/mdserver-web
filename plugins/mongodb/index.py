@@ -1070,13 +1070,18 @@ def replClose():
         ]
     }
 
-    # client = mongdbClient()
-    # try:
-    #     # {force:True}
-    #     rsStatus = client.admin.command('replSetReconfig',config)
-    # except Exception as e:
-    #     info = str(e).split(',')
-    #     return mw.returnJson(False, str(info[0]))
+    client = mongdbClient()
+    try:
+        # {force:True}
+        # repl_info = client.admin.command('replSetGetStatus')
+        # repl_info['members'] = []
+        # del repl_info['set']
+        
+        # print(repl_info)
+        rsStatus = client.admin.command('replSetReconfig',config)
+    except Exception as e:
+        info = str(e).split(',')
+        return mw.returnJson(False, str(info[0]))
 
     d = getConfigData()
     if 'replSetName' in d['replication']:
