@@ -1019,6 +1019,7 @@ def replInit():
 
     c['security']['replSetName'] = name
     setReplConfigData(c)
+    restart()
 
     if len(nodes) == 0:
         return mw.returnJson(False, '节点不能为空!')
