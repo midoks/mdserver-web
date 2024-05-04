@@ -470,7 +470,11 @@ def runReplInfo():
     db = client.admin
     serverStatus = db.command('serverStatus')
 
+    d = getConfigData()
     result = {}
+    if 'replSetName' in d['replication']:
+        result['repl_name'] = d['replication']['replSetName']
+
     result['status'] = '无'
     result['doc_name'] = '无'
     if 'repl' in serverStatus:

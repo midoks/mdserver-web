@@ -159,9 +159,16 @@ function mongoReplStatus() {
 					<tr><th>me</th><td>' + rdata.me + '</td><td>本机</td></tr>';
 		}
 
+		var repl_on = 'btn-danger';
+		var repl_on_title = '未开启';
+		if (rdata['repl_name'] != ''){
+			repl_on = '';
+			repl_on_title = '已开启';
+		}
+
 		var con = "<p class='conf_p'>\
                     <span class='f14 c6 mr20'>Mongodb副本配置</span><span class='f14 c6 mr20'></span>\
-                    <button class='btn btn-success btn-xs btn-danger'>未开启</button>\
+                    <button class='btn btn-success btn-xs "+repl_on+"'>"+repl_on_title+"</button>\
                     <button class='btn btn-success btn-xs' onclick='mongoReplCfg()'>配置</button>\
                 </p><hr/>";
 
