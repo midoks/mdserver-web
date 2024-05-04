@@ -82,9 +82,7 @@ def getConfigData():
     return config
 
 def setConfig(config_data):
-    t = status()
-
-
+    # t = status()
     cfg = getConf()
     try:
         mw.writeFile(cfg, yaml.safe_dump(config_data))
@@ -1018,7 +1016,7 @@ def replInit():
         return mw.returnJson(False, '副本名不能为空!')
     d = getConfigData()
     d['replication']['replSetName'] = name
-    setReplConfigData(d)
+    setConfig(d)
     restart()
 
     if len(nodes) == 0:
