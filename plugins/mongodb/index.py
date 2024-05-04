@@ -1010,6 +1010,40 @@ def delReplNode():
 
 def replInit():
     c = getReplConfigData()
+
+    name = c['name']
+    nodes = c['nodes']
+
+    if name == '':
+        return mw.returnJson(False, '副本名不能为空!')
+
+    if len(nodes) == 0:
+        return mw.returnJson(False, '节点不能为空!')
+
+    cfg_node = []
+
+    for x in range(len(nodes)):
+        n = nodes[x]
+        t = {}
+        t['_id'] = x
+        t['host'] = n['host']
+        cfg_node.append(t)
+
+    # print(cfg_node)
+    # return mw.returnJson(False, '设置副本成功!')
+
+    config = {
+        '_id': name,
+        'members': cfg_node
+    }
+
+    client = mongdbClient()
+    try:
+        rsStatus = client.admin.command('replSetInitiate',config)
+    except Exception as e:
+        info = str(e).split(',')
+        return mw.returnJson(False, str(info[0]))
+
     return mw.returnJson(True, '设置副本成功!')
 
 def testData():
@@ -1085,7 +1119,6 @@ def test():
     
     return mw.returnJson(True, 'OK')
 
-    
 
 def initdStatus():
     if mw.isAppleSystem():
