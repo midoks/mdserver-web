@@ -159,9 +159,10 @@ function mongoReplStatus() {
 					<tr><th>me</th><td>' + rdata.me + '</td><td>本机</td></tr>';
 		}
 
+		// console.log(rdata);
 		var repl_on = 'btn-danger';
 		var repl_on_title = '未开启';
-		if (rdata['repl_name'] != ''){
+		if ('repl_name' in rdata && rdata['repl_name'] != ''){
 			repl_on = '';
 			repl_on_title = '已开启';
 		}
@@ -322,7 +323,7 @@ function mongoReplCfg(){
         area: ['580px', '380px'],
         closeBtn: 1,
         shadeClose: false,
-        btn: ["初始化","取消","添加节点","设置同步副本"],
+        btn: ["初始化","取消","添加节点","设置同步副本","关闭副本同步"],
         content: '<div class="pd15">\
                 <div class="db_list">\
                     <span>\
@@ -350,9 +351,9 @@ function mongoReplCfg(){
         	mgPost('repl_init', '', '', function(data){
         		var rdata = $.parseJSON(data.data);
 				showMsg(rdata.msg,function(){
-					if (rdata['status']){
-						mongoReplStatus();
-					}
+
+					mongoReplStatus();
+					
 		        },{icon: rdata.status ? 1 : 2});
 			});
         	return false;
@@ -364,6 +365,17 @@ function mongoReplCfg(){
         btn4:function(){
         	mongoReplCfgReplSetName();
             return false;
+        },
+        btn5:function(){
+        	mgPost('repl_close', '', '', function(data){
+        		var rdata = $.parseJSON(data.data);
+				showMsg(rdata.msg,function(){
+					if (rdata['status']){
+						mongoReplStatus();
+					}
+		        },{icon: rdata.status ? 1 : 2});
+			});
+        	return false;
         }
     });
 }

@@ -1052,6 +1052,14 @@ def replInit():
 
     return mw.returnJson(True, '设置副本成功!')
 
+def replClose():
+    d = getConfigData()
+    if 'replSetName' in d['replication']:
+        del d['replication']['replSetName']
+        setConfig(d)
+        restart()
+    return mw.returnJson(True, '关闭副本同步成功!')
+
 def testData():
     '''
     cd /www/server/mdserver-web && source bin/activate && python3 /www/server/mdserver-web/plugins/mongodb/index.py test_data
@@ -1254,6 +1262,8 @@ if __name__ == "__main__":
         print(delReplNode())
     elif func == 'repl_init':
         print(replInit())
+    elif func == 'repl_close':
+        print(replClose())
     elif func == 'run_log':
         print(runLog())
     elif func == 'test':
