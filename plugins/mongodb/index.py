@@ -1016,9 +1016,9 @@ def replInit():
 
     if name == '':
         return mw.returnJson(False, '副本名不能为空!')
-
-    c['replication']['replSetName'] = name
-    setReplConfigData(c)
+    d = getConfigData()
+    d['replication']['replSetName'] = name
+    setReplConfigData(d)
     restart()
 
     if len(nodes) == 0:
