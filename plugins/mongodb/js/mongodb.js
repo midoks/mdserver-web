@@ -159,7 +159,13 @@ function mongoReplStatus() {
 					<tr><th>me</th><td>' + rdata.me + '</td><td>me</td></tr>';
 		}
 
-        var con = '<div class="divtable">\
+		var con = "<p class='conf_p'>\
+                    <span class='f14 c6 mr20'>Mongodb副本配置</span><span class='f14 c6 mr20'></span>\
+                    <button class='btn btn-success btn-xs btn-danger'>未开启</button>\
+                    <button class='btn btn-success btn-xs' onclick='mongoReplCfg()'>配置</button>\
+                </p><hr/>";
+
+        con += '<div class="divtable">\
 				<table class="table table-hover table-bordered" style="width: 660px;">\
 					<thead><th>字段</th><th>当前值</th><th>说明</th></thead>\
 					<tbody>\
@@ -170,6 +176,186 @@ function mongoReplStatus() {
 
         $(".soft-man-con").html(con);
     },'json');
+}
+
+//设置副本名称
+function mongoReplCfgReplSetName(){
+	mgPost('run_doc_info', '', '', function(rdata){
+		var rdata = $.parseJSON(rdata.data);
+
+	    layer.open({
+	        type: 1,
+	        area: '300px',
+	        title: '设置副本名称',
+	        closeBtn: 1,
+	        shift: 5,
+	        shadeClose: false,
+	        btn:["提交","关闭"],
+	        content: "<form class='bt-form pd20' id='mod_pwd'>\
+	                    <div class='line'>\
+	                    <span class='tname'>同步副本</span>\
+	                    <div class='info-r'>\
+	                        <select class='bt-input-text mr5' name='replSetName' style='width:100px'>\
+	                            <option value=''></option>\
+	                        </select>\
+	                    </div>\
+	                    </div>\
+	                </form>",
+
+	        success: function(){
+        		// console.log(rdata);
+        		var rlist = rdata['dbs'];
+        		var dbs = [];
+        		var selectHtml = '';
+        		for (var i = 0; i < rlist.length; i++) {
+        			// console.log(rlist[i]['db']);
+        			var dbname = rlist[i]['db'];
+
+        			if (['admin','local','config'].includes(dbname)){
+        			} else {
+        				dbs.push(dbname);
+        			}
+        		}
+
+        		if (dbs.length == 0 ){
+        			selectHtml += "<option value=''>无</option>";
+        		}
+
+        		for (index in dbs) {
+        			selectHtml += "<option value='"+dbs[index]+"'>"+dbs[index]+"</option>";
+        		}
+
+        		$('select[name="replSetName"]').html(selectHtml);
+	        },
+	        yes:function(index){
+	        	var data = {};
+	            data['name'] = $('select[name=replSetName]').val();
+	            mgPost('repl_set_name', '',data, function(data){
+	                var rdata = $.parseJSON(data.data);
+	                showMsg(rdata.msg,function(){
+	                    if (rdata['status']){
+	                		layer.close(index);
+	                		mongoReplCfgInit();
+	                	}
+	                },{icon: rdata.status ? 1 : 2});   
+	            });
+	        }
+	    });
+    });
+}
+
+function mongoReplCfgNodes(){
+
+	var def_node = '127.0.0.1:2017';
+	layer.open({
+        type: 1,
+        area: '500px',
+        title: '添加节点',
+        closeBtn: 1,
+        shift: 5,
+        shadeClose: true,
+        btn:["提交","关闭"],
+        content: "<form class='bt-form pd20' id='mod_pwd'>\
+                    <div class='line'>\
+                    <span class='tname'>节点服务</span>\
+                    <div class='info-r'>\
+                        <input class='bt-input-text mr5' type='text' name='node' style='width:330px' value='"+def_node+"'/>\
+                    </div>\
+                    </div>\
+                </form>",
+        yes:function(index){
+            // var data = $("#mod_pwd").serialize();
+            var data = {};
+            data['node'] = $('input[name=node]').val();
+            mgPost('repl_set_node', '',data, function(data){
+                var rdata = $.parseJSON(data.data);
+                showMsg(rdata.msg,function(){
+                	if (rdata['status']){
+                		layer.close(index);
+                		mongoReplCfgInit();
+                	}
+                },{icon: rdata.status ? 1 : 2});
+            });
+        }
+    });
+}
+
+function mongoReplCfgDelNode(host){
+	mgPost('del_repl_node', '', {"node":host}, function(data){
+		var rdata = $.parseJSON(data.data);
+		// console.log(rdata['status']);
+        showMsg(rdata.msg,function(){
+        	if (rdata['status']){
+        		mongoReplCfgInit();
+        	}
+        },{icon: rdata.status ? 1 : 2});
+	});
+}
+
+function mongoReplCfgInit(){
+	mgPostN('get_repl_config', '', '', function(data){
+		var rdata = $.parseJSON(data.data);
+		$('#repl_name').html("同步副本："+rdata.data['name']);
+
+		var node = '';
+		for (var i = 0; i < rdata.data['nodes'].length; i++) {
+			var t = rdata.data['nodes'][i];
+
+			var op = '<a href="javascript:;" class="btlink" onclick="mongoReplCfgDelNode(\''+t['host']+'\');" title="删除节点">删除</a>';
+			node += '<tr><td>'+t['host']+'</td><td>'+op+'</td></tr>';
+		}
+		$('#repl_node tbody').html(node);
+	});
+}
+
+function mongoReplCfg(){
+	layer.open({
+        type: 1,
+        title: "副本设置",
+        area: ['580px', '380px'],
+        closeBtn: 1,
+        shadeClose: false,
+        btn: ["初始化","取消","添加节点","设置同步副本"],
+        content: '<div class="pd15">\
+                <div class="db_list">\
+                    <span>\
+                    	<a id="repl_name">同步副本：</a>\
+                    </span>\
+                </div>\
+                <div class="divtable" id="repl_node">\
+	                <div id="database_fix"  style="height:210px;overflow:auto;border:#ddd 1px solid">\
+	                <table class="table table-hover "style="border:none">\
+	                    <thead>\
+	                        <tr>\
+	                            <th>节点</th>\
+	                            <th>操作</th>\
+	                        </tr>\
+	                    </thead>\
+	                    <tbody class="gztr"></tbody>\
+	                </table>\
+                </div>\
+            </div>\
+        </div>',
+        success:function(){
+        	mongoReplCfgInit();
+        },
+        yes:function(){
+        	mgPost('repl_init', '', '', function(data){
+        		var rdata = $.parseJSON(data.data);
+				showMsg(rdata.msg,function(){
+		        },{icon: rdata.status ? 1 : 2});
+			});
+        	return false;
+        },
+        btn3:function(){
+        	mongoReplCfgNodes();
+            return false;
+        },
+        btn4:function(){
+        	mongoReplCfgReplSetName();
+            return false;
+        }
+    });
 }
 
 //配置修改

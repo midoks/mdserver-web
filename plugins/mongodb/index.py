@@ -926,6 +926,92 @@ def setDbAccess():
 
     return mw.returnJson(True, '设置成功!')
 
+def getReplConfigData():
+    import json
+    f = getServerDir()+'/repl.json'
+    if os.path.exists(f):
+        c = mw.readFile(f)
+        return json.loads(c)
+    else:
+        t = {}
+        t['name'] =  ''
+        t['nodes'] = []
+        mw.writeFile(f, mw.getJson(t))
+        return t
+
+def setReplConfigData(c):
+    import json
+    f = getServerDir()+'/repl.json'
+    mw.writeFile(f, mw.getJson(c))
+    return c
+
+def getReplConfig():
+    c = getReplConfigData()
+    return mw.returnJson(True, 'ok!', c)
+
+def replSetName():
+    args = getArgs()
+    data = checkArgs(args, ['name'])
+    if not data[0]:
+        return data[1]
+
+    c = getReplConfigData()
+    c['name'] =  args['name']
+    setReplConfigData(c)
+    return mw.returnJson(True, '设置成功!')
+
+def replSetNode():
+    args = getArgs()
+    data = checkArgs(args, ['node'])
+    if not data[0]:
+        return data[1]
+
+    c = getReplConfigData()
+    nodes = c['nodes']
+    add_node = args['node'].strip()
+
+    is_have = False
+    for x in nodes:
+        if x['host'] == add_node:
+            is_have = True
+
+    if is_have:
+        return mw.returnJson(False, add_node+',节点已经存在!')
+
+    t = {}
+    t['host'] = add_node
+    nodes.append(t)
+    c['nodes'] = nodes
+    setReplConfigData(c)
+
+    return mw.returnJson(True, '设置成功!')
+
+
+def delReplNode():
+    args = getArgs()
+    data = checkArgs(args, ['node'])
+    if not data[0]:
+        return data[1]
+
+    c = getReplConfigData()
+    nodes = c['nodes']
+    del_node = args['node'].strip()
+
+    filter_nodes = []; 
+    for x in nodes:
+        if x['host'] != del_node:
+            filter_nodes.append(x)
+    
+    c['nodes'] = filter_nodes
+    setReplConfigData(c)
+
+    return mw.returnJson(True, '删除节点'+args['node']+'成功!')
+
+
+def replInit():
+    c = getReplConfigData()
+    return mw.returnJson(True, '设置副本成功!')
+
 def testData():
     '''
     cd /www/server/mdserver-web && source bin/activate && python3 /www/server/mdserver-web/plugins/mongodb/index.py test_data
@@ -1119,6 +1205,16 @@ if __name__ == "__main__":
         print(getDbAccess())
     elif func == 'set_db_access':
         print(setDbAccess())
+    elif func == 'repl_set_name':
+        print(replSetName())
+    elif func == 'repl_set_node':
+        print(replSetNode())
+    elif func == 'get_repl_config':
+        print(getReplConfig())
+    elif func == 'del_repl_node':
+        print(delReplNode())
+    elif func == 'repl_init':
+        print(replInit())
     elif func == 'run_log':
         print(runLog())
     elif func == 'test':
