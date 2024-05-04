@@ -343,6 +343,9 @@ function mongoReplCfg(){
         	mgPost('repl_init', '', '', function(data){
         		var rdata = $.parseJSON(data.data);
 				showMsg(rdata.msg,function(){
+					if (rdata['status']){
+						mongoReplStatus();
+					}
 		        },{icon: rdata.status ? 1 : 2});
 			});
         	return false;
