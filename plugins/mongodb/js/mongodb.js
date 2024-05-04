@@ -246,7 +246,7 @@ function mongoReplCfgReplSetName(){
 
 function mongoReplCfgNodes(){
 
-	var def_node = '127.0.0.1:2017';
+	var def_node = '127.0.0.1:27017';
 	layer.open({
         type: 1,
         area: '500px',
