@@ -1017,7 +1017,7 @@ def replInit():
     if name == '':
         return mw.returnJson(False, '副本名不能为空!')
 
-    c['security']['replSetName'] = name
+    c['replication']['replSetName'] = name
     setReplConfigData(c)
     restart()
 
