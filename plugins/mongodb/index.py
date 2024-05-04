@@ -1061,11 +1061,29 @@ def replInit():
     return mw.returnJson(True, '设置副本成功!')
 
 def replClose():
+
+    config = {
+        '_id': 'test',
+        'members': [
+            # {'_id': 0, 'host': '127.0.0.1:27019'},
+            # {'_id': 1, 'host': '127.0.0.1:27017'},
+        ]
+    }
+
+    # client = mongdbClient()
+    # try:
+    #     # {force:True}
+    #     rsStatus = client.admin.command('replSetReconfig',config)
+    # except Exception as e:
+    #     info = str(e).split(',')
+    #     return mw.returnJson(False, str(info[0]))
+
     d = getConfigData()
     if 'replSetName' in d['replication']:
         del d['replication']['replSetName']
         setConfig(d)
         restart()
+
     return mw.returnJson(True, '关闭副本同步成功!')
 
 def testData():
