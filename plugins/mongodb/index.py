@@ -973,6 +973,13 @@ def replSetName():
     c = getReplConfigData()
     c['name'] =  args['name']
     setReplConfigData(c)
+
+
+    d = getConfigData()
+    d['replication']['replSetName'] = args['name']
+    setConfig(d)
+    restart()
+    
     return mw.returnJson(True, '设置成功!')
 
 def replSetNode():
