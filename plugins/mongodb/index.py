@@ -521,13 +521,12 @@ def getDbList():
     clist = conn.where(condition, ()).field(
         field).limit(limit).order('id desc').select()
 
-    # for x in range(0, len(clist)):
-    #     dbname = clist[x]['name']
-    #     # blist = getDbBackupListFunc(dbname)
-    #     # # print(blist)
-    #     clist[x]['is_backup'] = False
-    #     if len(blist) > 0:
-    #         clist[x]['is_backup'] = True
+    for x in range(0, len(clist)):
+        dbname = clist[x]['name']
+        blist = getDbBackupListFunc(dbname)
+        clist[x]['is_backup'] = False
+        if len(blist) > 0:
+            clist[x]['is_backup'] = True
 
     count = conn.where(condition, ()).count()
     _page = {}
