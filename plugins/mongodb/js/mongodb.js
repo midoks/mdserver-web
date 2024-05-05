@@ -278,6 +278,13 @@ function mongoReplCfgNodes(){
 	                    </div>\
                     </div>\
                     <div class='line'>\
+	                    <span class='tname'>votes:</span>\
+	                    <div class='info-r'>\
+	                        <input class='bt-input-text mr5' type='number' name='votes' style='width:220px' value='1'/>\
+	                        <span class='c9'>一般是0或者1</span>\
+	                    </div>\
+                    </div>\
+                    <div class='line'>\
 	                    <span class='tname'>仲裁员:</span>\
 	                    <div class='info-r'>\
 	                        <select class='bt-input-text mr5' name='arbiterOnly'>\
