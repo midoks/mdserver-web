@@ -85,6 +85,33 @@ def getConfAuth():
     data = getConfigData()
     return data['security']['authorization']
 
+def pSqliteDb(dbname='users'):
+    file = getServerDir() + '/mongodb.db'
+    name = 'mongodb'
+
+    sql_file = getPluginDir() + '/config/mongodb.sql'
+    import_sql = mw.readFile(sql_file)
+    # print(sql_file,import_sql)
+    md5_sql = mw.md5(import_sql)
+
+    import_sign = False
+    save_md5_file = getServerDir() + '/import_mongodb.md5'
+    if os.path.exists(save_md5_file):
+        save_md5_sql = mw.readFile(save_md5_file)
+        if save_md5_sql != md5_sql:
+            import_sign = True
+            mw.writeFile(save_md5_file, md5_sql)
+    else:
+        mw.writeFile(save_md5_file, md5_sql)
+
+    if not os.path.exists(file) or import_sql:
+        conn = mw.M(dbname).dbPos(getServerDir(), name)
+        csql_list = import_sql.split(';')
+        for index in range(len(csql_list)):
+            conn.execute(csql_list[index], ())
+
+    conn = mw.M(dbname).dbPos(getServerDir(), name)
+    return conn
 def mongdbClient():
     import pymongo
     port = getConfPort()
