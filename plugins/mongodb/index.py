@@ -20,6 +20,8 @@ if mw.isAppleSystem():
 # /usr/lib/systemd/system/mongod.service
 # /var/lib/mongo
 
+# python3 /Users/midoks/Desktop/mwdev/server/mdserver-web/plugins/mongodb/index.py repl_init 
+
 def getPluginName():
     return 'mongodb'
 
