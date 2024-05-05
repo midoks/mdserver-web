@@ -214,8 +214,8 @@ def initDreplace():
 
     mg_key = getServerDir() + "/mongodb.key"
     if not os.path.exists(mg_key):
-        mw.execShell("openssl rand -base64 741 >> "+mg_key)
-        mw.execShell("chmod 600 "+mg_key)
+        mw.execShell("openssl rand -base64 756 >> "+mg_key)
+        mw.execShell("chmod 400 "+mg_key)
 
     file_tpl = getInitDTpl()
     service_path = os.path.dirname(os.getcwd())
