@@ -197,10 +197,10 @@ def mongdbClient():
     auth = getConfAuth()
     ip = getConfIp()
     mg_root = pSqliteDb('config').where('id=?', (1,)).getField('mg_root')
+    # print(ip,port,auth,mg_root)
     if auth == 'disabled':
         client = pymongo.MongoClient(host=ip, port=int(port), directConnection=True)
     else:
-        # print(auth,mg_root)
         # uri = "mongodb://root:"+mg_root+"@127.0.0.1:"+str(port)
         # client = pymongo.MongoClient(uri)
         client = pymongo.MongoClient(host=ip, port=int(port), directConnection=True, username='root',password=mg_root)
