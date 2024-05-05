@@ -17,7 +17,6 @@ sys.path.append(chdir + '/class/core')
 # reload(sys)
 # sys.setdefaultencoding('utf-8')
 
-
 import mw
 import db
 import time
