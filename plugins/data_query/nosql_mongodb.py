@@ -72,6 +72,7 @@ def pSqliteDb(dbname='users'):
 
 def getConfigData():
     cfg = getConf()
+    # print(cfg)
     config_data = mw.readFile(cfg)
     try:
         config = yaml.safe_load(config_data)
@@ -98,7 +99,7 @@ def getConfigData():
                 "bindIp": "0.0.0.0"
             },
             "security": {
-                "authorization": "enabled",
+                "authorization": "disabled",
                 "javascriptEnabled": False
             }
         }
@@ -138,8 +139,9 @@ class nosqlMongodb():
             self.__DB_PORT = int(self.__config['port'])
 
         auth = getConfAuth()
+        self.__DB_PORT = getConfPort()
         mg_root = pSqliteDb('config').where('id=?', (1,)).getField('mg_root')
-        # print(self.__DB_HOST,self.__DB_PORT, self.__DB_PASS)
+        # print(auth,self.__DB_HOST,self.__DB_PORT, self.__DB_PASS)
         try:
             if auth == 'disabled':
                 self.__DB_CONN = pymongo.MongoClient(host=self.__DB_HOST, port=self.__DB_PORT, directConnection=True)
@@ -150,7 +152,8 @@ class nosqlMongodb():
             return self.__DB_CONN
         except pymongo.errors.ConnectionFailure:
             return False
-        except Exception:
+        except Exception as e:
+            # print(e)
             self.__DB_ERR = mw.getTracebackInfo()
         return False
 
@@ -216,7 +219,7 @@ class nosqlMongodbCtr():
 
         mgdb_instance = self.getInstanceBySid(sid).mgdb_conn()
         if mgdb_instance is False:
-            return mw.returnData(False,'无法链接')
+            return mw.returnData(False,'无法链接.')
 
         result = {}
         collections = mgdb_instance[name].list_collection_names()

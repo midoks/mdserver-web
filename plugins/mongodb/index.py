@@ -1076,7 +1076,7 @@ def replClose():
         # repl_info = client.admin.command('replSetGetStatus')
         # repl_info['members'] = []
         # del repl_info['set']
-        
+
         # print(repl_info)
         rsStatus = client.admin.command('replSetReconfig',config)
     except Exception as e:
@@ -1090,6 +1090,111 @@ def replClose():
         restart()
 
     return mw.returnJson(True, '关闭副本同步成功!')
+
+def getDbBackupListFunc(dbname=''):
+    bkDir = mw.getRootDir() + '/backup/database'
+    blist = os.listdir(bkDir)
+    r = []
+
+    bname = 'mongodb_' + dbname
+    blen = len(bname)
+    for x in blist:
+        fbstr = x[0:blen]
+        if fbstr == bname:
+            r.append(x)
+    return r
+
+def getDbBackupList():
+    args = getArgs()
+    data = checkArgs(args, ['name'])
+    if not data[0]:
+        return data[1]
+
+    r = getDbBackupListFunc(args['name'])
+    bkDir = mw.getRootDir() + '/backup/database'
+    rr = []
+    for x in range(0, len(r)):
+        p = bkDir + '/' + r[x]
+        data = {}
+        data['name'] = r[x]
+
+        rsize = os.path.getsize(p)
+        data['size'] = mw.toSize(rsize)
+
+        t = os.path.getctime(p)
+        t = time.localtime(t)
+
+        data['time'] = time.strftime('%Y-%m-%d %H:%M:%S', t)
+        rr.append(data)
+
+        data['file'] = p
+
+    return mw.returnJson(True, 'ok', rr)
+
+
+def deleteDbBackup():
+    args = getArgs()
+    data = checkArgs(args, ['filename', 'path'])
+    if not data[0]:
+        return data[1]
+
+    path = args['path']
+    full_file = ""
+    bkDir = mw.getRootDir() + '/backup/database'
+    full_file = bkDir + '/' + args['filename']
+    if path != "":
+        full_file = path + "/" + args['filename']
+    os.remove(full_file)
+    return mw.returnJson(True, 'ok')
+
+def setDbBackup():
+    args = getArgs()
+    data = checkArgs(args, ['name'])
+    if not data[0]:
+        return data[1]
+
+    scDir = getPluginDir() + '/scripts/backup.py'
+    cmd = 'python3 ' + scDir + ' db ' + args['name'] + ' 3'
+    os.system(cmd)
+    return mw.returnJson(True, 'ok')
+
+def importDbBackup():
+    args = getArgs()
+    data = checkArgs(args, ['file', 'name'])
+    if not data[0]:
+        return data[1]
+
+    file = args['file']
+    name = args['name']
+
+    file_tgz = mw.getRootDir() + '/backup/database/' + file
+    file_dir = mw.getRootDir() + '/backup/database/' + file.replace('.tar.gz','')
+
+    if not os.path.exists(file_dir):
+        mw.execShell("mkdir -p "+file_dir)
+
+    # print(os.path.exists(file_tgz))
+    if os.path.exists(file_tgz):
+        cmd = 'cd ' + mw.getRootDir() + '/backup/database && tar -xzvf ' + file + " -C "+file_dir
+        # print(cmd)
+        mw.execShell(cmd)
+
+
+    cmd = getServerDir() + "/bin/mongorestore --port 27017 --oplogReplay --dir "+file_dir
+    print(cmd)
+    # mw.execShell(cmd)
+
+    
+    # pwd = pSqliteDb('config').where('id=?', (1,)).getField('mg_root')
+
+    # print(mysql_cmd)
+    # os.system(mysql_cmd)
+
+    # rdata = mw.execShell(mysql_cmd)
+    # if rdata[1].lower().find('error') > -1:
+    #     return mw.returnJson(False, rdata[1])
+
+    return mw.returnJson(True, 'ok')
 
 def testData():
     '''
@@ -1295,6 +1400,14 @@ if __name__ == "__main__":
         print(replInit())
     elif func == 'repl_close':
         print(replClose())
+    elif func == 'get_db_backup_list':
+        print(getDbBackupList())
+    elif func == 'delete_db_backup':
+        print(deleteDbBackup())
+    elif func == 'set_db_backup':
+        print(setDbBackup())
+    elif func == 'import_db_backup':
+        print(importDbBackup())
     elif func == 'run_log':
         print(runLog())
     elif func == 'test':
