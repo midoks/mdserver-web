@@ -42,6 +42,9 @@ def getConf():
     path = getServerDir() + "/mongodb.conf"
     return path
 
+def getConfKey():
+    key = getServerDir() + "/mongodb.key"
+    return key
 
 def getConfTpl():
     path = getPluginDir() + "/config/mongodb.conf"
@@ -1451,6 +1454,8 @@ if __name__ == "__main__":
         print(runReplInfo())
     elif func == 'conf':
         print(getConf())
+    elif func == 'config_key':
+        print(getConfKey())
     elif func == 'get_config':
         print(getConfig())
     elif func == 'set_config':
