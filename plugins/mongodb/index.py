@@ -987,13 +987,14 @@ def replSetNode():
     priority = -1
     if 'priority' in  args:
         priority = args['priority'].strip()
+
     priority = int(priority)
     if priority<0 or priority>100:
         return mw.returnJson(False, 'priority应该在[0-100]之间!')
 
     arbiterOnly = 0
     if 'arbiterOnly' in  args:
-        priority = args['arbiterOnly'].strip()
+        arbiterOnly = args['arbiterOnly'].strip()
     arbiterOnly = int(arbiterOnly)
 
     is_have = False
@@ -1012,7 +1013,6 @@ def replSetNode():
     nodes.append(t)
     c['nodes'] = nodes
     setReplConfigData(c)
-
     return mw.returnJson(True, '设置成功!')
 
 
