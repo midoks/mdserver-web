@@ -37,7 +37,7 @@ def getServerDir():
 def getConf():
     path = getServerDir() + "/mongodb.conf"
     return path
-    
+
 def getConfigData():
     cfg = getConf()
     config_data = mw.readFile(cfg)
@@ -137,8 +137,14 @@ class backupTools:
         backup_name = "mongodb_" + name + "_" + time_now + ".tar.gz"
         filename = backup_path + "/"+backup_name
 
+        port = getConfPort()
+        auth = getConfAuth()
+        mg_root = pSqliteDb('config').where('id=?', (1,)).getField('mg_root')
+        uoption = ''
+        if auth != 'disabled':
+            uoption =' -u root -p '+mg_root
     
-        cmd = db_path + "/bin/mongodump --port 27017 -d test -o "+backup_path 
+        cmd = db_path + "/bin/mongodump "+uoption+" --port "+str(port)+" -d test -o "+backup_path 
         mw.execShell(cmd)
         cmd_gz = "cd "+backup_path+"/"+name+" && tar -zcvf "+filename + " ./"
         mw.execShell(cmd_gz)

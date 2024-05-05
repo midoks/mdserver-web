@@ -1260,6 +1260,11 @@ def importDbExternal():
 
     # print(file,name)
     # print(import_dir,name)
+    auth = getConfAuth()
+    mg_root = pSqliteDb('config').where('id=?', (1,)).getField('mg_root')
+    uoption = ''
+    if auth != 'disabled':
+        uoption =' -u root -p '+mg_root
 
     file_dir = import_dir+name
     if not os.path.exists(file_dir):
@@ -1274,7 +1279,7 @@ def importDbExternal():
         bson_list = getListBson(name)
         # print(bson_list)
         for x in bson_list:
-            cmd = getServerDir() + "/bin/mongorestore --port "+str(port)+" --dir "+file_dir+'/'+x
+            cmd = getServerDir() + "/bin/mongorestore "+uoption+" --port "+str(port)+" --dir "+file_dir+'/'+x
             # print(cmd)
             rdata = mw.execShell(cmd)
             # print(data)
@@ -1312,7 +1317,13 @@ def importDbBackup():
         # print(cmd)
         mw.execShell(cmd)
 
-    cmd = getServerDir() + "/bin/mongorestore --port "+str(port)+" --dir "+file_dir
+    auth = getConfAuth()
+    mg_root = pSqliteDb('config').where('id=?', (1,)).getField('mg_root')
+    uoption = ''
+    if auth != 'disabled':
+        uoption =' -u root -p '+mg_root
+
+    cmd = getServerDir() + "/bin/mongorestore "+uoption+" --port "+str(port)+" --dir "+file_dir
     # print(cmd)
     mw.execShell(cmd)
 
