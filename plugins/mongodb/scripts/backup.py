@@ -112,7 +112,7 @@ def pSqliteDb(dbname='users'):
 
     conn = mw.M(dbname).dbPos(getServerDir(), name)
     return conn
-    
+
 def mongdbClient():
     import pymongo
     port = getConfPort()
@@ -170,9 +170,10 @@ class backupTools:
         mg_root = pSqliteDb('config').where('id=?', (1,)).getField('mg_root')
         uoption = ''
         if auth != 'disabled':
-            uoption =' -u root -p '+mg_root
+            uoption =' --authenticationDatabase admin -u root -p '+mg_root
     
         cmd = db_path + "/bin/mongodump "+uoption+" --port "+str(port)+" -d test -o "+backup_path 
+        # print(cmd)
         mw.execShell(cmd)
         cmd_gz = "cd "+backup_path+"/"+name+" && tar -zcvf "+filename + " ./"
         mw.execShell(cmd_gz)
