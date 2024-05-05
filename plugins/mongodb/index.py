@@ -22,6 +22,7 @@ if mw.isAppleSystem():
 
 # python3 /www/server/mdserver-web/plugins/mongodb/index.py repl_init 
 # python3 /www/server/mdserver-web/plugins/mongodb/index.py run_repl_info
+# python3 /www/server/mdserver-web/plugins/mongodb/index.py test_data
 
 def getPluginName():
     return 'mongodb'
@@ -979,7 +980,7 @@ def replSetName():
     d['replication']['replSetName'] = args['name']
     setConfig(d)
     restart()
-    
+
     return mw.returnJson(True, '设置成功!')
 
 def replSetNode():
