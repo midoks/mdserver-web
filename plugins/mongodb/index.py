@@ -982,6 +982,18 @@ def replSetNode():
     nodes = c['nodes']
     add_node = args['node'].strip()
 
+    priority = -1
+    if 'priority' in  args:
+        priority = args['priority'].strip()
+    priority = int(priority)
+    if priority<0 or priority>100:
+        return mw.returnJson(False, 'priority应该在[0-100]之间!')
+
+    arbiterOnly = 0
+    if 'arbiterOnly' in  args:
+        priority = args['arbiterOnly'].strip()
+    arbiterOnly = int(arbiterOnly)
+
     is_have = False
     for x in nodes:
         if x['host'] == add_node:
@@ -992,6 +1004,9 @@ def replSetNode():
 
     t = {}
     t['host'] = add_node
+    t['priority'] = priority
+    t['arbiterOnly'] = arbiterOnly
+
     nodes.append(t)
     c['nodes'] = nodes
     setReplConfigData(c)

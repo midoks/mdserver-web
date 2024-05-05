@@ -265,16 +265,34 @@ function mongoReplCfgNodes(){
         btn:["提交","关闭"],
         content: "<form class='bt-form pd20' id='mod_pwd'>\
                     <div class='line'>\
-                    <span class='tname'>节点服务</span>\
-                    <div class='info-r'>\
-                        <input class='bt-input-text mr5' type='text' name='node' style='width:330px' value='"+def_node+"'/>\
+	                    <span class='tname'>节点服务:</span>\
+	                    <div class='info-r'>\
+	                        <input class='bt-input-text mr5' type='text' name='node' style='width:330px' value='"+def_node+"'/>\
+	                    </div>\
                     </div>\
+                    <div class='line'>\
+	                    <span class='tname'>priority:</span>\
+	                    <div class='info-r'>\
+	                        <input class='bt-input-text mr5' type='number' name='priority' style='width:220px' value='0'/>\
+	                        <span class='c9'>值越大，优先权越高</span>\
+	                    </div>\
+                    </div>\
+                    <div class='line'>\
+	                    <span class='tname'>仲裁员:</span>\
+	                    <div class='info-r'>\
+	                        <select class='bt-input-text mr5' name='arbiterOnly'>\
+	                        	<option value='0'>否</option>\
+	                        	<option value='1'>是</option>\
+	                        </select>\
+	                    </div>\
                     </div>\
                 </form>",
         yes:function(index){
             // var data = $("#mod_pwd").serialize();
             var data = {};
             data['node'] = $('input[name=node]').val();
+            data['priority'] = $('input[name=priority]').val();
+            data['arbiterOnly'] = $('select[name=arbiterOnly]').val();
             mgPost('repl_set_node', '',data, function(data){
                 var rdata = $.parseJSON(data.data);
                 showMsg(rdata.msg,function(){
