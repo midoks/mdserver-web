@@ -112,6 +112,7 @@ def pSqliteDb(dbname='users'):
 
     conn = mw.M(dbname).dbPos(getServerDir(), name)
     return conn
+    
 def mongdbClient():
     import pymongo
     port = getConfPort()
