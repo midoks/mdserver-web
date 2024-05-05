@@ -1270,7 +1270,7 @@ def importDbExternal():
     mg_root = pSqliteDb('config').where('id=?', (1,)).getField('mg_root')
     uoption = ''
     if auth != 'disabled':
-        uoption =' -u root -p '+mg_root
+        uoption =' --authenticationDatabase admin -u root -p '+mg_root
 
     file_dir = import_dir+name
     if not os.path.exists(file_dir):
