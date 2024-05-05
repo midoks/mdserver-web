@@ -1167,6 +1167,8 @@ def importDbBackup():
     file = args['file']
     name = args['name']
 
+    port = getConfPort()
+
     file_tgz = mw.getRootDir() + '/backup/database/' + file
     file_dir = mw.getRootDir() + '/backup/database/' + file.replace('.tar.gz','')
 
@@ -1179,20 +1181,14 @@ def importDbBackup():
         # print(cmd)
         mw.execShell(cmd)
 
+    cmd = getServerDir() + "/bin/mongorestore --port "+str(port)+" --dir "+file_dir
+    # print(cmd)
+    mw.execShell(cmd)
 
-    cmd = getServerDir() + "/bin/mongorestore --port 27017 --oplogReplay --dir "+file_dir
-    print(cmd)
-    # mw.execShell(cmd)
 
-    
-    # pwd = pSqliteDb('config').where('id=?', (1,)).getField('mg_root')
-
-    # print(mysql_cmd)
-    # os.system(mysql_cmd)
-
-    # rdata = mw.execShell(mysql_cmd)
-    # if rdata[1].lower().find('error') > -1:
-    #     return mw.returnJson(False, rdata[1])
+    # 删除文件
+    del_cmd = "rm -rf "+file_dir
+    mw.execShell(del_cmd)
 
     return mw.returnJson(True, 'ok')
 
