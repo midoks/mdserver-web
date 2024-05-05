@@ -21,6 +21,7 @@ if mw.isAppleSystem():
 # /var/lib/mongo
 
 # python3 /www/server/mdserver-web/plugins/mongodb/index.py repl_init 
+# python3 /www/server/mdserver-web/plugins/mongodb/index.py run_repl_info
 
 def getPluginName():
     return 'mongodb'
@@ -328,7 +329,7 @@ def initMgRoot(password='',force=0):
         auth_t = d['security']['authorization']
         d['security']['authorization'] = 'disabled'
         setConfig(d)
-        reload()
+        restart()
 
     client = mongdbClient()
     db = client.admin
@@ -362,7 +363,7 @@ def initMgRoot(password='',force=0):
     if force == 1:
         d['security']['authorization'] = auth_t
         setConfig(d)
-        reload()
+        restart()
     return True
 
 def initUserRoot():
