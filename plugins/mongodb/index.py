@@ -1070,20 +1070,25 @@ def replInit():
 
     cfg_node = []
 
+    now_time_t = int(time.time())
+
     for x in range(len(nodes)):
         n = nodes[x]
         t = {}
-        t['_id'] = x
+        t['_id'] = now_time_t+x
         t['host'] = n['host']
         if 'priority' in n:
             t['priority'] = int(n['priority'])
+
+        if 'votes' in n:
+            t['votes'] = int(n['votes'])
 
         if 'arbiterOnly' in n and n['arbiterOnly'] == 1:
             t['arbiterOnly'] = True
 
         cfg_node.append(t)
 
-    # print(cfg_node)
+    print(cfg_node)
     # return mw.returnJson(False, '设置副本成功!')
 
     config = {
@@ -1095,18 +1100,28 @@ def replInit():
     try:
         rsStatus = client.admin.command('replSetInitiate',config)
     except Exception as e:
-        # info = str(e).split(',')
+        info = str(e).split(',')
+
+        if info[0] == 'already initialized':
+            config['version'] = int(now_time_t)
+            client.admin.command('replSetReconfig',config,force=True)
+            return mw.returnJson(True, '重置副本同步成功!')
         return mw.returnJson(False, str(e))
 
-    return mw.returnJson(True, '设置副本成功!')
+    return mw.returnJson(True, '设置副本初始化成功!')
 
 def replClose():
 
+    ip = getConfIp()
+    port = getConfPort()
+
+    host = ip+':'+str(port)
     config = {
         '_id': 'test',
+        "version":1,
         'members': [
-            # {'_id': 0, 'host': '127.0.0.1:27019'},
-            # {'_id': 1, 'host': '127.0.0.1:27017'},
+            # {'_id': 1, 'host': host, 'votes':1},
+            # {'_id': 1, 'host': '127.0.0.1:27017','votes':1},
         ]
     }
 
@@ -1115,14 +1130,17 @@ def replClose():
     try:
         # {force:True}
         # repl_info = client.admin.command('replSetGetStatus')
+        # print(repl_info)
         # repl_info['members'] = []
         # del repl_info['set']
 
         # print(repl_info)
-        rsStatus = db.command('replSetReconfig',config)
+        rsStatus = db.command('replSetGetConfig',config,force=True)
+
+        # db.command('replSetStepDown',replSetStepDown=0,secondaryCatchUpPeriodSecs=0,force=True)
     except Exception as e:
-        info = str(e).split(',')
-        return mw.returnJson(False, str(info[0]))
+        # info = str(e).split(',')
+        return mw.returnJson(False, str(e))
 
     d = getConfigData()
     if 'replSetName' in d['replication']:
