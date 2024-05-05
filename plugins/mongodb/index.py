@@ -1061,7 +1061,7 @@ def replInit():
         t['_id'] = x
         t['host'] = n['host']
         if 'priority' in n:
-            t['priority'] = n['priority']
+            t['priority'] = int(n['priority'])
 
         if 'arbiterOnly' in n and n['arbiterOnly'] == 1:
             t['arbiterOnly'] = True
@@ -1080,8 +1080,8 @@ def replInit():
     try:
         rsStatus = client.admin.command('replSetInitiate',config)
     except Exception as e:
-        info = str(e).split(',')
-        return mw.returnJson(False, str(info[0]))
+        # info = str(e).split(',')
+        return mw.returnJson(False, str(e))
 
     return mw.returnJson(True, '设置副本成功!')
 

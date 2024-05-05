@@ -273,7 +273,7 @@ function mongoReplCfgNodes(){
                     <div class='line'>\
 	                    <span class='tname'>priority:</span>\
 	                    <div class='info-r'>\
-	                        <input class='bt-input-text mr5' type='number' name='priority' style='width:220px' value='0'/>\
+	                        <input class='bt-input-text mr5' type='number' name='priority' style='width:220px' value='1'/>\
 	                        <span class='c9'>值越大，优先权越高</span>\
 	                    </div>\
                     </div>\
