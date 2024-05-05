@@ -1006,6 +1006,11 @@ def replSetNode():
         arbiterOnly = args['arbiterOnly'].strip()
     arbiterOnly = int(arbiterOnly)
 
+    votes = 1
+    if 'votes' in  args:
+        votes = args['votes']
+    votes = int(votes)
+
     is_have = False
     for x in nodes:
         if x['host'] == add_node:
@@ -1017,6 +1022,7 @@ def replSetNode():
     t = {}
     t['host'] = add_node
     t['priority'] = priority
+    t['votes'] = votes
     t['arbiterOnly'] = arbiterOnly
 
     nodes.append(t)
