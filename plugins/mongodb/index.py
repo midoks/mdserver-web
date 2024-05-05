@@ -1111,6 +1111,7 @@ def replClose():
     }
 
     client = mongdbClient()
+    db = client.admin
     try:
         # {force:True}
         # repl_info = client.admin.command('replSetGetStatus')
@@ -1118,7 +1119,7 @@ def replClose():
         # del repl_info['set']
 
         # print(repl_info)
-        rsStatus = client.admin.command('replSetReconfig',config)
+        rsStatus = db.command('replSetReconfig',config)
     except Exception as e:
         info = str(e).split(',')
         return mw.returnJson(False, str(info[0]))
