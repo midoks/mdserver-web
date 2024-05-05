@@ -1103,8 +1103,11 @@ def replInit():
         info = str(e).split(',')
 
         if info[0] == 'already initialized':
-            config['version'] = int(now_time_t)
-            client.admin.command('replSetReconfig',config,force=True)
+            # tt = client.admin.command('add',{"host":"127.0.0.1:27017"})
+            # print(tt)
+
+            # config['version'] = int(now_time_t)
+            # client.admin.command('replSetReconfig',config,force=True)
             return mw.returnJson(True, '重置副本同步成功!')
         return mw.returnJson(False, str(e))
 
@@ -1120,7 +1123,7 @@ def replClose():
         '_id': 'test',
         "version":1,
         'members': [
-            # {'_id': 1, 'host': host, 'votes':1},
+            {'_id': 1, 'host': host, 'votes':1},
             # {'_id': 1, 'host': '127.0.0.1:27017','votes':1},
         ]
     }
@@ -1136,8 +1139,8 @@ def replClose():
 
         # print(repl_info)
         rstatus = db.command('replSetReconfig',config,force=True)
-        print(rstatus)
-        # db.command('replSetStepDown',replSetStepDown=0,secondaryCatchUpPeriodSecs=0,force=True)
+
+
     except Exception as e:
         # info = str(e).split(',')
         return mw.returnJson(False, str(e))
