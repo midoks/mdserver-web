@@ -1131,6 +1131,37 @@ def getDbBackupList():
 
     return mw.returnJson(True, 'ok', rr)
 
+def getDbBackupImportList():
+
+    bkImportDir = mw.getRootDir() + '/backup/mongodb_import'
+    if not os.path.exists(bkImportDir):
+        os.mkdir(bkImportDir)
+
+    blist = os.listdir(bkImportDir)
+
+    rr = []
+    for x in range(0, len(blist)):
+        name = blist[x]
+        p = bkImportDir + '/' + name
+        data = {}
+        data['name'] = name
+
+        rsize = os.path.getsize(p)
+        data['size'] = mw.toSize(rsize)
+
+        t = os.path.getctime(p)
+        t = time.localtime(t)
+
+        data['time'] = time.strftime('%Y-%m-%d %H:%M:%S', t)
+        rr.append(data)
+
+        data['file'] = p
+
+    rdata = {
+        "list": rr,
+        "upload_dir": bkImportDir,
+    }
+    return mw.returnJson(True, 'ok', rdata)
 
 def deleteDbBackup():
     args = getArgs()
@@ -1157,6 +1188,57 @@ def setDbBackup():
     cmd = 'python3 ' + scDir + ' db ' + args['name'] + ' 3'
     os.system(cmd)
     return mw.returnJson(True, 'ok')
+
+def importDbExternal():
+    args = getArgs()
+    data = checkArgs(args, ['file', 'name'])
+    if not data[0]:
+        return data[1]
+
+    file = args['file']
+    name = args['name']
+
+    import_dir = mw.getRootDir() + '/backup/mongodb_import/'
+    mg_root = pSqliteDb('config').where('id=?', (1,)).getField('mg_root')
+    port = getConfPort()
+
+    file_path = import_dir + file
+    if not os.path.exists(file_path):
+        return mw.returnJson(False, '文件突然消失?')
+
+    exts = ['gz', 'zip']
+    ext = mw.getFileSuffix(file)
+    if ext not in exts:
+        return mw.returnJson(False, '导入数据库格式不对!')
+
+    # print(file,name)
+    # print(import_dir,name)
+
+    file_dir = import_dir+name
+    if not os.path.exists(file_dir):
+        mw.execShell("mkdir -p "+file_dir)
+
+    file_tgz = import_dir+file
+    if os.path.exists(file_tgz):
+        cmd = 'cd ' + file_dir + ' && tar -xzvf ' + file_tgz + " -C "+file_dir
+        # print(cmd)
+        r = mw.execShell(cmd)
+        # print(r)
+
+        cmd = getServerDir() + "/bin/mongorestore --port "+str(port)+" --dir "+file_dir
+        print(cmd)
+        rdata = mw.execShell(cmd)
+
+    # 删除文件
+    if os.path.exists(file_dir):
+        del_cmd = "rm -rf "+file_dir
+        mw.execShell(del_cmd)
+
+    # if rdata[1].lower().find('error') > -1:
+    #     return mw.returnJson(False, rdata[1])
+
+    return mw.returnJson(True, 'ok')
+
 
 def importDbBackup():
     args = getArgs()
@@ -1187,8 +1269,9 @@ def importDbBackup():
 
 
     # 删除文件
-    del_cmd = "rm -rf "+file_dir
-    mw.execShell(del_cmd)
+    if os.path.exists(file_dir):
+        del_cmd = "rm -rf "+file_dir
+        mw.execShell(del_cmd)
 
     return mw.returnJson(True, 'ok')
 
@@ -1398,10 +1481,14 @@ if __name__ == "__main__":
         print(replClose())
     elif func == 'get_db_backup_list':
         print(getDbBackupList())
+    elif func == 'get_db_backup_import_list':
+        print(getDbBackupImportList())
     elif func == 'delete_db_backup':
         print(deleteDbBackup())
     elif func == 'set_db_backup':
         print(setDbBackup())
+    elif func == 'import_db_external':
+        print(importDbExternal())
     elif func == 'import_db_backup':
         print(importDbBackup())
     elif func == 'run_log':

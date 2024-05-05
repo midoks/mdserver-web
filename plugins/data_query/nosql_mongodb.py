@@ -7,6 +7,7 @@ import time
 import re
 import pymongo
 import json
+import yaml
 
 from bson.objectid import ObjectId
 from bson.json_util import dumps
@@ -139,15 +140,14 @@ class nosqlMongodb():
             self.__DB_PORT = int(self.__config['port'])
 
         auth = getConfAuth()
-        self.__DB_PORT = getConfPort()
+        port = getConfPort()
         mg_root = pSqliteDb('config').where('id=?', (1,)).getField('mg_root')
-        # print(auth,self.__DB_HOST,self.__DB_PORT, self.__DB_PASS)
+        # print(auth,self.__DB_HOST,port, self.__DB_PASS)
         try:
             if auth == 'disabled':
-                self.__DB_CONN = pymongo.MongoClient(host=self.__DB_HOST, port=self.__DB_PORT, directConnection=True)
+                self.__DB_CONN = pymongo.MongoClient(host=self.__DB_HOST, port=port, directConnection=True)
             else:
-                self.__DB_CONN = pymongo.MongoClient(host=self.__DB_HOST, port=self.__DB_PORT, directConnection=True, username='root',password=mg_root)
-            # self.__DB_CONN = pymongo.MongoClient(host=self.__DB_HOST, port=self.__DB_PORT, maxPoolSize=10,directConnection=True)
+                self.__DB_CONN = pymongo.MongoClient(host=self.__DB_HOST, port=port, directConnection=True, username='root',password=mg_root)
             self.__DB_CONN.admin.command('ping')
             return self.__DB_CONN
         except pymongo.errors.ConnectionFailure:

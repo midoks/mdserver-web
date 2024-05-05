@@ -1015,3 +1015,127 @@ function importBackup(file,name){
     });
 }
 
+function setLocalImport(db_name){
+
+    //上传文件
+    function uploadDbFiles(upload_dir){
+        var up_db = layer.open({
+            type:1,
+            closeBtn: 1,
+            title:"上传导入文件["+upload_dir+']',
+            area: ['500px','300px'],
+            shadeClose:false,
+            content:'<div class="fileUploadDiv">\
+                    <input type="hidden" id="input-val" value="'+upload_dir+'" />\
+                    <input type="file" id="file_input"  multiple="true" autocomplete="off" />\
+                    <button type="button"  id="opt" autocomplete="off">添加文件</button>\
+                    <button type="button" id="up" autocomplete="off" >开始上传</button>\
+                    <span id="totalProgress" style="position: absolute;top: 7px;right: 147px;"></span>\
+                    <span style="float:right;margin-top: 9px;">\
+                    <font>文件编码:</font>\
+                    <select id="fileCodeing" >\
+                        <option value="byte">二进制</option>\
+                        <option value="utf-8">UTF-8</option>\
+                        <option value="gb18030">GB2312</option>\
+                    </select>\
+                    </span>\
+                    <button type="button" id="filesClose" autocomplete="off">关闭</button>\
+                    <ul id="up_box"></ul>\
+                </div>',
+            success:function(){
+                $('#filesClose').click(function(){
+                    layer.close(up_db);
+                });
+            }
+
+        });
+        uploadStart(function(){
+            getList();
+            layer.close(up_db);
+        });
+    }
+
+    function getList(){
+        mgPost('get_db_backup_import_list','',{}, function(data){
+            var rdata = $.parseJSON(data.data);
+
+            var file_list = rdata.data.list;
+            var upload_dir = rdata.data.upload_dir;
+
+            var tbody = '';
+            for (var i = 0; i < file_list.length; i++) {
+                tbody += '<tr>\
+                        <td><span> ' + file_list[i]['name'] + '</span></td>\
+                        <td><span> ' + file_list[i]['size'] + '</span></td>\
+                        <td><span> ' + file_list[i]['time'] + '</span></td>\
+                        <td style="text-align: right;">\
+                            <a class="btlink" onclick="importDbExternal(\'' + file_list[i]['name'] + '\',\'' +db_name+ '\')">导入</a> | \
+                            <a class="btlink del" index="'+i+'">删除</a>\
+                        </td>\
+                    </tr>';
+            }
+
+            $('#import_db_file_list').html(tbody);
+            $('input[name="upload_dir"]').val(upload_dir);
+
+            $("#import_db_file_list .del").on('click',function(){
+                var index = $(this).attr('index');
+                var filename = file_list[index]["name"];
+                mgPost('delete_db_backup','',{filename:filename,path:upload_dir},function(){
+                    showMsg('执行成功!', function(){
+                        getList();
+                    },{icon:1},2000);
+                });
+            });
+        });
+    }
+
+    var layerIndex = layer.open({
+        type: 1,
+        title: "从文件导入数据",
+        area: ['600px', '380px'],
+        closeBtn: 1,
+        shadeClose: false,
+        content: '<div class="pd15">\
+                    <div class="db_list">\
+                        <button id="btn_file_upload" class="btn btn-success btn-sm" type="button">从本地上传</button>\
+                    </div >\
+                    <div class="divtable">\
+                    <input type="hidden" name="upload_dir" value=""> \
+                    <div id="database_fix"  style="height:150px;overflow:auto;border:#ddd 1px solid">\
+                    <table class="table table-hover "style="border:none">\
+                        <thead>\
+                            <tr>\
+                                <th>文件名称</th>\
+                                <th>文件大小</th>\
+                                <th>备份时间</th>\
+                                <th style="text-align: right;">操作</th>\
+                            </tr>\
+                        </thead>\
+                        <tbody  id="import_db_file_list" class="gztr"></tbody>\
+                    </table>\
+                    </div>\
+                    <ul class="help-info-text c7">\
+                        <li>仅支持sql、zip、sql.gz、(tar.gz|gz|tgz)</li>\
+                        <li>zip、tar.gz压缩包结构：test.zip或test.tar.gz压缩包内，必需包含test.sql</li>\
+                        <li>若文件过大，您还可以使用SFTP工具，将数据库文件上传到/www/backup/import</li>\
+                    </ul>\
+                </div>\
+        </div>',
+        success:function(index){
+            $('#btn_file_upload').click(function(){
+                var upload_dir = $('input[name="upload_dir"]').val();
+                uploadDbFiles(upload_dir);
+            });
+
+            getList();
+        },
+    });  
+}
+
+function importDbExternal(file,name){
+    mgPost('import_db_external','',{file:file,name:name}, function(data){
+        layer.msg('执行成功!');
+    });
+}
+
