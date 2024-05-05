@@ -1135,8 +1135,8 @@ def replClose():
         # del repl_info['set']
 
         # print(repl_info)
-        rsStatus = db.command('replSetGetConfig',config,force=True)
-
+        rstatus = db.command('replSetReconfig',config,force=True)
+        print(rstatus)
         # db.command('replSetStepDown',replSetStepDown=0,secondaryCatchUpPeriodSecs=0,force=True)
     except Exception as e:
         # info = str(e).split(',')
