@@ -1189,6 +1189,19 @@ def setDbBackup():
     os.system(cmd)
     return mw.returnJson(True, 'ok')
 
+
+def getListBson(dbname=''):
+    bkDir = mw.getRootDir() + '/backup/mongodb_import/'+dbname
+    blist = os.listdir(bkDir)
+    r = []
+
+    bname = 'bson' 
+    blen = len(bname)
+    for x in blist:
+        if x.endswith(bname):
+            r.append(x)
+    return r
+
 def importDbExternal():
     args = getArgs()
     data = checkArgs(args, ['file', 'name'])
@@ -1224,18 +1237,20 @@ def importDbExternal():
         # print(cmd)
         r = mw.execShell(cmd)
         # print(r)
-
-        cmd = getServerDir() + "/bin/mongorestore --port "+str(port)+" --dir "+file_dir
-        print(cmd)
-        rdata = mw.execShell(cmd)
+        bson_list = getListBson(name)
+        # print(bson_list)
+        for x in bson_list:
+            cmd = getServerDir() + "/bin/mongorestore --port "+str(port)+" --dir "+file_dir+'/'+x
+            # print(cmd)
+            rdata = mw.execShell(cmd)
+            # print(data)
+            if rdata[1].lower().find('error') > -1:
+                return mw.returnJson(False, rdata[1])
 
     # 删除文件
     if os.path.exists(file_dir):
         del_cmd = "rm -rf "+file_dir
         mw.execShell(del_cmd)
-
-    # if rdata[1].lower().find('error') > -1:
-    #     return mw.returnJson(False, rdata[1])
 
     return mw.returnJson(True, 'ok')
 
