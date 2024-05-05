@@ -396,14 +396,16 @@ class crontab_api:
                 if soft_name == 'postgresql':
                     sqlite3_name = 'pgsql'
 
+                if soft_name == 'mongodb':
+                    sqlite3_name = 'mongodb'
+
             db_list = {}
             db_list['orderOpt'] = bak_data
 
             if not os.path.exists(path + '/' + sqlite3_name + '.db'):
                 db_list['data'] = []
             else:
-                db_list['data'] = mw.M('databases').dbPos(
-                    path, sqlite3_name).field('name,ps').select()
+                db_list['data'] = mw.M('databases').dbPos(path, sqlite3_name).field('name,ps').select()
             return mw.getJson(db_list)
 
         if stype == 'path':

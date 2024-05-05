@@ -116,5 +116,5 @@ if __name__ == "__main__":
     stype = sys.argv[1]
     if stype == 'all':
         backup.backupDatabaseAll(sys.argv[2])
-    if stype == 'db':
+    if stype == 'database':
         backup.backupDatabase(sys.argv[2], sys.argv[3])
