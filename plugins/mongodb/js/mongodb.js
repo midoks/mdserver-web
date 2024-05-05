@@ -300,7 +300,7 @@ function mongoReplCfgNodes(){
                 		layer.close(index);
                 		mongoReplCfgInit();
                 	}
-                },{icon: rdata.status ? 1 : 2});
+                },{icon: rdata.status ? 1 : 2},5000);
             });
         }
     });
