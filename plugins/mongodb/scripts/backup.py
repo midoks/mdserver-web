@@ -20,6 +20,85 @@ sys.path.append(chdir + '/class/core')
 import mw
 import db
 import time
+import yaml
+
+def getPluginName():
+    return 'mongodb'
+
+
+def getPluginDir():
+    return mw.getPluginDir() + '/' + getPluginName()
+
+
+def getServerDir():
+    return mw.getServerDir() + '/' + getPluginName()
+
+
+def getConf():
+    path = getServerDir() + "/mongodb.conf"
+    return path
+    
+def getConfigData():
+    cfg = getConf()
+    config_data = mw.readFile(cfg)
+    try:
+        config = yaml.safe_load(config_data)
+    except:
+        config = {
+            "systemLog": {
+                "destination": "file",
+                "logAppend": True,
+                "path": mw.getServerDir()+"/mongodb/log/mongodb.log"
+            },
+            "storage": {
+                "dbPath": mw.getServerDir()+"/mongodb/data",
+                "directoryPerDB": True,
+                "journal": {
+                    "enabled": True
+                }
+            },
+            "processManagement": {
+                "fork": True,
+                "pidFilePath": mw.getServerDir()+"/mongodb/log/mongodb.pid"
+            },
+            "net": {
+                "port": 27017,
+                "bindIp": "0.0.0.0"
+            },
+            "security": {
+                "authorization": "enabled",
+                "javascriptEnabled": False
+            }
+        }
+    return config
+
+
+def getConfIp():
+    data = getConfigData()
+    return data['net']['bindIp']
+
+def getConfPort():
+    data = getConfigData()
+    return data['net']['port']
+
+def getConfAuth():
+    data = getConfigData()
+    return data['security']['authorization']
+
+def mongdbClient():
+    import pymongo
+    port = getConfPort()
+    auth = getConfAuth()
+    ip = getConfIp()
+    mg_root = pSqliteDb('config').where('id=?', (1,)).getField('mg_root')
+    # print(ip,port,auth,mg_root)
+    if auth == 'disabled':
+        client = pymongo.MongoClient(host=ip, port=int(port), directConnection=True)
+    else:
+        # uri = "mongodb://root:"+mg_root+"@127.0.0.1:"+str(port)
+        # client = pymongo.MongoClient(uri)
+        client = pymongo.MongoClient(host=ip, port=int(port), directConnection=True, username='root',password=mg_root)
+    return client
 
 class backupTools:
 
