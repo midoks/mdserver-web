@@ -1058,6 +1058,12 @@ def replInit():
         t = {}
         t['_id'] = x
         t['host'] = n['host']
+        if 'priority' in n:
+            t['priority'] = n['priority']
+
+        if 'arbiterOnly' in n and n['arbiterOnly'] == 1:
+            t['arbiterOnly'] = True
+
         cfg_node.append(t)
 
     # print(cfg_node)
