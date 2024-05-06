@@ -432,7 +432,12 @@ def runInfo():
     '''
     client = mongdbClient()
     db = client.admin
-    serverStatus = db.command('serverStatus')
+
+    try:
+        serverStatus = db.command('serverStatus')
+    except Exception as e:
+        return mw.returnJson(False, str(e))
+    
 
     listDbs = client.list_database_names()
 
