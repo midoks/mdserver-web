@@ -1122,28 +1122,11 @@ def replClose():
         setConfig(d)
         restart()
 
-    ip = getConfIp()
-    port = getConfPort()
-
-    host = ip+':'+str(port)
-    config = {
-        '_id': 'test',
-        "version":1,
-        'members': [
-            {'_id': 1, 'host': host, 'votes':1},
-            # {'_id': 1, 'host': '127.0.0.1:27017','votes':1},
-        ]
-    }
-
     client = mongdbClient()
     db = client.admin
     try:
-        # client.drop_database('local')
-        # print(repl_info)
-        # rstatus = db.command('replSetReconfig',config,force=True)
         restart()
     except Exception as e:
-        # info = str(e).split(',')
         return mw.returnJson(False, str(e))
     
     return mw.returnJson(True, '关闭副本同步成功!')
