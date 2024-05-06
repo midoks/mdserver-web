@@ -252,9 +252,24 @@ function mongoReplCfgReplSetName(){
     });
 }
 
-function mongoReplCfgNodes(){
+function mongoReplCfgNodes(host, priority, votes, arbiterOnly){
 
-	var def_node = '127.0.0.1:27017';
+	if (typeof(host) == 'undefined'){
+		host = '127.0.0.1:27017';
+	}
+
+	if (typeof(priority) == 'undefined'){
+		priority = '1';
+	}
+
+	if (typeof(votes) == 'undefined'){
+		votes = '1';
+	}
+
+	if (typeof(arbiterOnly) == 'undefined'){
+		arbiterOnly = '1';
+	}
+
 	layer.open({
         type: 1,
         area: '500px',
@@ -267,20 +282,20 @@ function mongoReplCfgNodes(){
                     <div class='line'>\
 	                    <span class='tname'>节点服务:</span>\
 	                    <div class='info-r'>\
-	                        <input class='bt-input-text mr5' type='text' name='node' style='width:330px' value='"+def_node+"'/>\
+	                        <input class='bt-input-text mr5' type='text' name='node' style='width:330px' value='"+host+"'/>\
 	                    </div>\
                     </div>\
                     <div class='line'>\
 	                    <span class='tname'>priority:</span>\
 	                    <div class='info-r'>\
-	                        <input class='bt-input-text mr5' type='number' name='priority' style='width:220px' value='1'/>\
+	                        <input class='bt-input-text mr5' type='number' name='priority' style='width:220px' value='"+priority+"'/>\
 	                        <span class='c9'>值越大，优先权越高</span>\
 	                    </div>\
                     </div>\
                     <div class='line'>\
 	                    <span class='tname'>votes:</span>\
 	                    <div class='info-r'>\
-	                        <input class='bt-input-text mr5' type='number' name='votes' style='width:220px' value='1'/>\
+	                        <input class='bt-input-text mr5' type='number' name='votes' style='width:220px' value='"+votes+"'/>\
 	                        <span class='c9'>一般是0或者1</span>\
 	                    </div>\
                     </div>\
@@ -288,8 +303,8 @@ function mongoReplCfgNodes(){
 	                    <span class='tname'>仲裁员:</span>\
 	                    <div class='info-r'>\
 	                        <select class='bt-input-text mr5' name='arbiterOnly'>\
-	                        	<option value='0'>否</option>\
-	                        	<option value='1'>是</option>\
+	                        	<option value='0' "+(arbiterOnly == "0" ? 'checked':'')+">否</option>\
+	                        	<option value='1' "+(arbiterOnly == "1" ? 'checked':'')+">是</option>\
 	                        </select>\
 	                    </div>\
                     </div>\
@@ -299,6 +314,7 @@ function mongoReplCfgNodes(){
             var data = {};
             data['node'] = $('input[name=node]').val();
             data['priority'] = $('input[name=priority]').val();
+            data['votes'] = $('input[name=votes]').val();
             data['arbiterOnly'] = $('select[name=arbiterOnly]').val();
             mgPost('repl_set_node', '',data, function(data){
                 var rdata = $.parseJSON(data.data);
@@ -334,8 +350,14 @@ function mongoReplCfgInit(){
 		for (var i = 0; i < rdata.data['nodes'].length; i++) {
 			var t = rdata.data['nodes'][i];
 
-			var op = '<a href="javascript:;" class="btlink" onclick="mongoReplCfgDelNode(\''+t['host']+'\');" title="删除节点">删除</a>';
-			node += '<tr><td>'+t['host']+'</td><td>'+op+'</td></tr>';
+			var arbiterOnly = '否';
+			if(t['arbiterOnly']==1){
+				arbiterOnly = '是';
+			}
+
+			var op = '<a href="javascript:;" class="btlink" onclick="mongoReplCfgDelNode(\''+t['host']+'\');" title="删除">删除</a>';
+			op += ' | <a href="javascript:;" class="btlink" onclick="mongoReplCfgNodes(\''+t['host']+'\',\''+t['priority']+'\',\''+t['votes']+'\',\''+t['arbiterOnly']+'\');" title="编辑">编辑</a>';
+			node += '<tr><td>'+t['host']+'</td><td>'+t['priority']+'</td><td>'+t['votes']+'</td><td>'+arbiterOnly+'</td><td>'+op+'</td></tr>';
 		}
 		$('#repl_node tbody').html(node);
 	});
@@ -361,6 +383,9 @@ function mongoReplCfg(){
 	                    <thead>\
 	                        <tr>\
 	                            <th>节点</th>\
+	                            <th>优先级</th>\
+	                            <th>投票</th>\
+	                            <th>仲裁者</th>\
 	                            <th>操作</th>\
 	                        </tr>\
 	                    </thead>\
@@ -376,9 +401,7 @@ function mongoReplCfg(){
         	mgPost('repl_init', '', '', function(data){
         		var rdata = $.parseJSON(data.data);
 				showMsg(rdata.msg,function(){
-
 					mongoReplStatus();
-					
 		        },{icon: rdata.status ? 1 : 2});
 			});
         	return false;
