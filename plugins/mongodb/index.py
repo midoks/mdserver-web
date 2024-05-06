@@ -1106,7 +1106,7 @@ def replInit():
             # tt = client.admin.command('add',{"host":"127.0.0.1:27017"})
             # print(tt)
 
-            # config['version'] = int(now_time_t)
+            config['version'] = int(now_time_t)
             try:
                 client.admin.command('replSetReconfig',config,force=True)
             except Exception as e:
