@@ -1075,7 +1075,7 @@ def replInit():
     for x in range(len(nodes)):
         n = nodes[x]
         t = {}
-        t['_id'] = now_time_t+x
+        t['_id'] = x
         t['host'] = n['host']
         if 'priority' in n:
             t['priority'] = int(n['priority'])
@@ -1098,17 +1098,14 @@ def replInit():
 
     client = mongdbClient()
     try:
-        rsStatus = client.admin.command('replSetInitiate',config)
+        client.admin.command('replSetInitiate',config)
     except Exception as e:
         info = str(e).split(',')
-
+        # print(info)
         if info[0] == 'already initialized':
-            # tt = client.admin.command('add',{"host":"127.0.0.1:27017"})
-            # print(tt)
-
             config['version'] = int(now_time_t)
             try:
-                client.admin.command('replSetReconfig',config,force=True)
+                client.admin.command('replSetReconfig',config,force=True,maxTimeMS=10)
             except Exception as e:
                 return mw.returnJson(False, str(e))
             
@@ -1118,6 +1115,12 @@ def replInit():
     return mw.returnJson(True, '设置副本初始化成功!')
 
 def replClose():
+
+    d = getConfigData()
+    if 'replSetName' in d['replication']:
+        del d['replication']['replSetName']
+        setConfig(d)
+        restart()
 
     ip = getConfIp()
     port = getConfPort()
@@ -1135,26 +1138,14 @@ def replClose():
     client = mongdbClient()
     db = client.admin
     try:
-        # {force:True}
-        # repl_info = client.admin.command('replSetGetStatus')
+        client.drop_database('local')
         # print(repl_info)
-        # repl_info['members'] = []
-        # del repl_info['set']
-
-        # print(repl_info)
-        rstatus = db.command('replSetReconfig',config,force=True)
-
-
+        # rstatus = db.command('replSetReconfig',config,force=True)
+        restart()
     except Exception as e:
         # info = str(e).split(',')
         return mw.returnJson(False, str(e))
-
-    d = getConfigData()
-    if 'replSetName' in d['replication']:
-        del d['replication']['replSetName']
-        setConfig(d)
-        restart()
-
+    
     return mw.returnJson(True, '关闭副本同步成功!')
 
 def getDbBackupListFunc(dbname=''):
