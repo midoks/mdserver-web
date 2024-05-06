@@ -1088,7 +1088,7 @@ def replInit():
 
         cfg_node.append(t)
 
-    print(cfg_node)
+    # print(cfg_node)
     # return mw.returnJson(False, '设置副本成功!')
 
     config = {
@@ -1107,7 +1107,11 @@ def replInit():
             # print(tt)
 
             # config['version'] = int(now_time_t)
-            # client.admin.command('replSetReconfig',config,force=True)
+            try:
+                client.admin.command('replSetReconfig',config,force=True)
+            except Exception as e:
+                return mw.returnJson(False, str(e))
+            
             return mw.returnJson(True, '重置副本同步成功!')
         return mw.returnJson(False, str(e))
 
