@@ -454,6 +454,13 @@ def runDocInfo():
     client = mongdbClient()
     db = client.admin
     # print(db)
+
+    try:
+        serverStatus = db.command('serverStatus')
+    except Exception as e:
+        return mw.returnJson(False, str(e))
+
+
     serverStatus = db.command('serverStatus')
 
     listDbs = client.list_database_names()
@@ -1060,7 +1067,7 @@ def replInit():
 
     if name == '':
         return mw.returnJson(False, '副本名不能为空!')
-        
+
     # d = getConfigData()
     # d['replication']['replSetName'] = name
     # setConfig(d)
