@@ -1002,13 +1002,18 @@ def replSetName():
 
 def replSetNode():
     args = getArgs()
-    data = checkArgs(args, ['node'])
+    data = checkArgs(args, ['node','priority','arbiterOnly','votes','idx'])
     if not data[0]:
         return data[1]
 
     c = getReplConfigData()
     nodes = c['nodes']
     add_node = args['node'].strip()
+    idx = int(args['idx'])
+
+
+
+
 
     priority = -1
     if 'priority' in  args:
@@ -1028,6 +1033,18 @@ def replSetNode():
         votes = args['votes']
     votes = int(votes)
 
+    # 编辑状态
+    if idx>-1:
+        for i in range(len(nodes)):
+            if i == idx:
+                nodes[i]['host'] = add_node
+                nodes[i]['priority'] = priority
+                nodes[i]['votes'] = votes
+                nodes[i]['arbiterOnly'] = arbiterOnly
+        c['nodes'] = nodes
+        setReplConfigData(c)
+        return mw.returnJson(True, '编辑成功!')
+
     is_have = False
     for x in nodes:
         if x['host'] == add_node:
@@ -1045,7 +1062,7 @@ def replSetNode():
     nodes.append(t)
     c['nodes'] = nodes
     setReplConfigData(c)
-    return mw.returnJson(True, '设置成功!')
+    return mw.returnJson(True, '添加成功!')
 
 
 def delReplNode():

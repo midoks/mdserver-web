@@ -252,7 +252,7 @@ function mongoReplCfgReplSetName(){
     });
 }
 
-function mongoReplCfgNodes(host, priority, votes, arbiterOnly){
+function mongoReplCfgNodes(idx,host, priority, votes, arbiterOnly){
 
 	if (typeof(host) == 'undefined'){
 		host = '127.0.0.1:27017';
@@ -270,6 +270,11 @@ function mongoReplCfgNodes(host, priority, votes, arbiterOnly){
 		arbiterOnly = '1';
 	}
 
+	var title_name = '添加节点';
+	if (idx>-1){
+		title_name = '编辑节点';
+	}
+
 	layer.open({
         type: 1,
         area: '500px',
@@ -278,7 +283,7 @@ function mongoReplCfgNodes(host, priority, votes, arbiterOnly){
         shift: 5,
         shadeClose: true,
         btn:["提交","关闭"],
-        content: "<form class='bt-form pd20' id='mod_pwd'>\
+        content: "<form class='bt-form pd20'>\
                     <div class='line'>\
 	                    <span class='tname'>节点服务:</span>\
 	                    <div class='info-r'>\
@@ -316,6 +321,7 @@ function mongoReplCfgNodes(host, priority, votes, arbiterOnly){
             data['priority'] = $('input[name=priority]').val();
             data['votes'] = $('input[name=votes]').val();
             data['arbiterOnly'] = $('select[name=arbiterOnly]').val();
+            data['idx'] = idx;
             mgPost('repl_set_node', '',data, function(data){
                 var rdata = $.parseJSON(data.data);
                 showMsg(rdata.msg,function(){
@@ -323,7 +329,7 @@ function mongoReplCfgNodes(host, priority, votes, arbiterOnly){
                 		layer.close(index);
                 		mongoReplCfgInit();
                 	}
-                },{icon: rdata.status ? 1 : 2},5000);
+                },{icon: rdata.status ? 1 : 2},rdata['status']?2000:10000);
             });
         }
     });
@@ -356,7 +362,7 @@ function mongoReplCfgInit(){
 			}
 
 			var op = '<a href="javascript:;" class="btlink" onclick="mongoReplCfgDelNode(\''+t['host']+'\');" title="删除">删除</a>';
-			op += ' | <a href="javascript:;" class="btlink" onclick="mongoReplCfgNodes(\''+t['host']+'\',\''+t['priority']+'\',\''+t['votes']+'\',\''+t['arbiterOnly']+'\');" title="编辑">编辑</a>';
+			op += ' | <a href="javascript:;" class="btlink" onclick="mongoReplCfgNodes(\''+i+'\',\''+t['host']+'\',\''+t['priority']+'\',\''+t['votes']+'\',\''+t['arbiterOnly']+'\');" title="编辑">编辑</a>';
 			node += '<tr><td>'+t['host']+'</td><td>'+t['priority']+'</td><td>'+t['votes']+'</td><td>'+arbiterOnly+'</td><td>'+op+'</td></tr>';
 		}
 		$('#repl_node tbody').html(node);
@@ -407,7 +413,7 @@ function mongoReplCfg(){
         	return false;
         },
         btn3:function(){
-        	mongoReplCfgNodes();
+        	mongoReplCfgNodes(-1);
             return false;
         },
         btn4:function(){
