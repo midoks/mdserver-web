@@ -482,7 +482,11 @@ def runDocInfo():
 def runReplInfo():
     client = mongdbClient()
     db = client.admin
-    serverStatus = db.command('serverStatus')
+
+    try:
+        serverStatus = db.command('serverStatus')
+    except Exception as e:
+        return mw.returnJson(False, str(e))
 
     d = getConfigData()
     result = {}
