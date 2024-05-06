@@ -23,6 +23,7 @@ if mw.isAppleSystem():
 # python3 /www/server/mdserver-web/plugins/mongodb/index.py repl_init 
 # python3 /www/server/mdserver-web/plugins/mongodb/index.py run_repl_info
 # python3 /www/server/mdserver-web/plugins/mongodb/index.py test_data
+# python3 /www/server/mdserver-web/plugins/mongodb/index.py run_info
 
 def getPluginName():
     return 'mongodb'
