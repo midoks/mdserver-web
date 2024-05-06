@@ -1138,7 +1138,7 @@ def replClose():
     client = mongdbClient()
     db = client.admin
     try:
-        client.drop_database('local')
+        # client.drop_database('local')
         # print(repl_info)
         # rstatus = db.command('replSetReconfig',config,force=True)
         restart()
