@@ -37,29 +37,22 @@ def getConfigData():
         return json.loads(mw.readFile(getTaskConf()))
     except:
         pass
-    return []
-
-
-def getConfigTpl():
-    tpl = {
-        "name": "",
+    return{
         "task_id": -1,
+        "period": "day-n",
+        "where1": "3",
+        "hour": "0",
+        "minute": "15",
     }
-    return tpl
 
 
 def createBgTask():
     removeBgTask()
-    args = {
-        "period": "day",
-        "hour": "0",
-        "minute": "15",
-    }
-    createBgTaskByName(getPluginName(), args)
+    createBgTaskByName(getPluginName())
 
 
-def createBgTaskByName(name, args):
-    cfg = getConfigTpl()
+def createBgTaskByName(name):
+    args = getConfigData()
     _name = "[勿删]日志清理[" + name + "]"
     res = mw.M("crontab").field("id, name").where("name=?", (_name,)).find()
     if res:
@@ -105,11 +98,11 @@ logs_file=$plugin_path/${rname}.log
 
     params = {
         'name': _name,
-        'type': _type_day,
+        'type': args['period'],
         'week': "",
-        'where1': _where1,
-        'hour': _hour,
-        'minute': _minute,
+        'where1': args['where1'],
+        'hour': args['hour'],
+        'minute': args['minute'],
         'save': "",
         'backup_to': "",
         'stype': "toShell",
