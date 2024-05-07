@@ -6,6 +6,7 @@
 	"title": "MongoDB",
 	"shell": "install.sh",
 	"install_pre_inspection":true,
+	"uninstall_pre_inspection":true,
 	"versions":["4.4","5.0","6.0","7.0"],
 	"tip": "soft",
 	"checks": "server/mongodb",

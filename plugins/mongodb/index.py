@@ -1505,6 +1505,14 @@ def installPreInspection(version):
         return '暂时仅支持{}'.format(','.join(supportOs))
     return 'ok'
 
+def uninstallPreInspection(version):
+    stop()
+
+    import plugins_api
+    plugins_api.plugins_api().removeIndex(getPluginName(), version)
+
+    return "请手动删除MongoDB[{}]<br/> rm -rf {}".format(version, getServerDir())
+
 if __name__ == "__main__":
     func = sys.argv[1]
 
@@ -1524,6 +1532,8 @@ if __name__ == "__main__":
         print(reload())
     elif func == 'install_pre_inspection':
         print(installPreInspection(version))
+    elif func == 'uninstall_pre_inspection':
+        print(uninstallPreInspection(version))
     elif func == 'initd_status':
         print(initdStatus())
     elif func == 'initd_install':
