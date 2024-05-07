@@ -117,6 +117,7 @@ def initConf():
             "/www/server/php/83/var/log",
             "/www/server/php/84/var/log",
             "/www/server/phpmyadmin",
+            "/www/server/redis/data",
             "/www/server/cron",
         ]
         for i in clogcom:
