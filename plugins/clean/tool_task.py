@@ -37,7 +37,7 @@ def getConfigData():
         return json.loads(mw.readFile(getTaskConf()))
     except:
         pass
-    return{
+    return {
         "task_id": -1,
         "period": "day-n",
         "where1": "3",
@@ -58,28 +58,14 @@ def createBgTaskByName(name):
     if res:
         return True
 
-    if "task_id" in cfg.keys() and cfg["task_id"] > 0:
+    if "task_id" in args and args["task_id"] > 0:
         res = mw.M("crontab").field("id, name").where(
-            "id=?", (cfg["task_id"],)).find()
-        if res and res["id"] == cfg["task_id"]:
+            "id=?", (args["task_id"],)).find()
+        if res and res["id"] == args["task_id"]:
             print("计划任务已经存在!")
             return True
     import crontab_api
     api = crontab_api.crontab_api()
-
-    period = args['period']
-    _hour = ''
-    _minute = ''
-    _where1 = ''
-    _type_day = "day"
-    if period == 'day':
-        _type_day = 'day'
-        _hour = args['hour']
-        _minute = args['minute']
-    elif period == 'minute-n':
-        _type_day = 'minute-n'
-        _where1 = args['minute-n']
-        _minute = ''
 
     mw_dir = mw.getRunDir()
     cmd = '''
@@ -113,30 +99,24 @@ logs_file=$plugin_path/${rname}.log
 
     task_id = api.add(params)
     if task_id > 0:
-        cfg["task_id"] = task_id
-        cfg["name"] = name
-
-        _dd = getConfigData()
-        _dd.append(cfg)
-        mw.writeFile(getTaskConf(), json.dumps(_dd))
+        args["task_id"] = task_id
+        args["name"] = name
+        mw.writeFile(getTaskConf(), json.dumps(args))
 
 
 def removeBgTask():
-    cfg_list = getConfigData()
-    for x in range(len(cfg_list)):
-        cfg = cfg_list[x]
-        if "task_id" in cfg.keys() and cfg["task_id"] > 0:
-            res = mw.M("crontab").field("id, name").where(
-                "id=?", (cfg["task_id"],)).find()
-            if res and res["id"] == cfg["task_id"]:
-                import crontab_api
-                api = crontab_api.crontab_api()
-                data = api.delete(cfg["task_id"])
-                if data[0]:
-                    cfg["task_id"] = -1
-                    cfg_list[x] = cfg
-                    mw.writeFile(getTaskConf(), '[]')
-                    return True
+    cfg = getConfigData()
+    if "task_id" in cfg and cfg["task_id"] > 0:
+        res = mw.M("crontab").field("id, name").where(
+            "id=?", (cfg["task_id"],)).find()
+        if res and res["id"] == cfg["task_id"]:
+            import crontab_api
+            api = crontab_api.crontab_api()
+            data = api.delete(cfg["task_id"])
+            if data[0]:
+                cfg["task_id"] = -1
+                mw.writeFile(getTaskConf(), json.loads(cfg))
+                return True
     return False
 
 
