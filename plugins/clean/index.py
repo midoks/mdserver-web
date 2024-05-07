@@ -99,7 +99,26 @@ def initConf():
             "/var/log/secure",
             "/var/log/lastlog",
             "/var/log/cron",
-            "/www/server/cron"
+            "/www/server/rsyncd",
+            "/www/server/sphinx/index",
+            "/www/server/mongodb/logs",
+            "/www/server/php/53/var/log",
+            "/www/server/php/54/var/log",
+            "/www/server/php/55/var/log",
+            "/www/server/php/56/var/log",
+            "/www/server/php/70/var/log",
+            "/www/server/php/71/var/log",
+            "/www/server/php/72/var/log",
+            "/www/server/php/73/var/log",
+            "/www/server/php/74/var/log",
+            "/www/server/php/80/var/log",
+            "/www/server/php/81/var/log",
+            "/www/server/php/82/var/log",
+            "/www/server/php/83/var/log",
+            "/www/server/php/84/var/log",
+            "/www/server/phpmyadmin",
+            "/www/server/redis/data",
+            "/www/server/cron",
         ]
         for i in clogcom:
             if os.path.exists(i):
