@@ -496,7 +496,7 @@ def runReplInfo():
 
     d = getConfigData()
     result = {}
-    if 'replSetName' in d['replication']:
+    if 'replication' in d and 'replSetName' in d['replication']:
         result['repl_name'] = d['replication']['replSetName']
 
     result['status'] = '无'
