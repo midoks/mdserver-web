@@ -795,7 +795,7 @@ function addDatabase(type){
 
 function delDb(id, name){
     safeMessage('删除['+name+']','您真的要删除['+name+']吗？',function(){
-        var data='id='+id+'&name='+name
+        var data='id='+id+'&name='+name;
         myPost('del_db', data, function(data){
             var rdata = $.parseJSON(data.data);
             showMsg(rdata.msg,function(){
@@ -1152,7 +1152,7 @@ function dbList(page, search){
             list += '<td><span class="c9 input-edit" onclick="setDbPs(\''+rdata.data[i]['id']+'\',\''+rdata.data[i]['name']+'\',this)" style="display: inline-block;">'+rdata.data[i]['ps']+'</span></td>';
             list += '<td style="text-align:right">';
 
-            list += '<a href="javascript:;" class="btlink" class="btlink" onclick="setBackup(\''+rdata.data[i]['name']+'\',this)" title="数据库备份">'+(rdata.data[i]['is_backup']?'备份':'未备份') +'</a> | ';
+            list += '<a href="javascript:;" class="btlink" class="btlink" onclick="setBackup(\''+rdata.data[i]['name']+'\',this)" title="数据库备份">'+(rdata.data[i]['is_backup']?'已备份':'未备份') +'</a> | ';
 
             var rw = '';
             var rw_change = 'all';

@@ -7,6 +7,7 @@ import time
 import re
 import pymongo
 import json
+import yaml
 
 from bson.objectid import ObjectId
 from bson.json_util import dumps
@@ -23,6 +24,95 @@ def singleton(cls):
         return _instance[cls]
     return inner
 
+def getPluginName():
+    return 'mongodb'
+    
+def getPluginDir():
+    return mw.getPluginDir() + '/' + getPluginName()
+
+
+def getServerDir():
+    return mw.getServerDir() + '/' + getPluginName()
+
+def getConf():
+    path = getServerDir() + "/mongodb.conf"
+    return path
+
+
+def getConfTpl():
+    path = getPluginDir() + "/config/mongodb.conf"
+    return path
+
+def pSqliteDb(dbname='users'):
+    file = getServerDir() + '/mongodb.db'
+    name = 'mongodb'
+
+    sql_file = getPluginDir() + '/config/mongodb.sql'
+    import_sql = mw.readFile(sql_file)
+    # print(sql_file,import_sql)
+    md5_sql = mw.md5(import_sql)
+
+    import_sign = False
+    save_md5_file = getServerDir() + '/import_mongodb.md5'
+    if os.path.exists(save_md5_file):
+        save_md5_sql = mw.readFile(save_md5_file)
+        if save_md5_sql != md5_sql:
+            import_sign = True
+            mw.writeFile(save_md5_file, md5_sql)
+    else:
+        mw.writeFile(save_md5_file, md5_sql)
+
+    if not os.path.exists(file) or import_sql:
+        conn = mw.M(dbname).dbPos(getServerDir(), name)
+        csql_list = import_sql.split(';')
+        for index in range(len(csql_list)):
+            conn.execute(csql_list[index], ())
+
+    conn = mw.M(dbname).dbPos(getServerDir(), name)
+    return conn
+
+def getConfigData():
+    cfg = getConf()
+    # print(cfg)
+    config_data = mw.readFile(cfg)
+    try:
+        config = yaml.safe_load(config_data)
+    except:
+        config = {
+            "systemLog": {
+                "destination": "file",
+                "logAppend": True,
+                "path": mw.getServerDir()+"/mongodb/log/mongodb.log"
+            },
+            "storage": {
+                "dbPath": mw.getServerDir()+"/mongodb/data",
+                "directoryPerDB": True,
+                "journal": {
+                    "enabled": True
+                }
+            },
+            "processManagement": {
+                "fork": True,
+                "pidFilePath": mw.getServerDir()+"/mongodb/log/mongodb.pid"
+            },
+            "net": {
+                "port": 27017,
+                "bindIp": "0.0.0.0"
+            },
+            "security": {
+                "authorization": "disabled",
+                "javascriptEnabled": False
+            }
+        }
+    return config
+
+def getConfPort():
+    data = getConfigData()
+    return data['net']['port']
+
+def getConfAuth():
+    data = getConfigData()
+    return data['security']['authorization']
 
 @singleton
 class nosqlMongodb():
@@ -49,15 +139,22 @@ class nosqlMongodb():
         if not self.__DB_LOCAL:
             self.__DB_PORT = int(self.__config['port'])
 
-        # print(self.__DB_HOST,self.__DB_PORT, self.__DB_PASS)
+        auth = getConfAuth()
+        port = getConfPort()
+        mg_root = pSqliteDb('config').where('id=?', (1,)).getField('mg_root')
+        # print(auth,self.__DB_HOST,port, self.__DB_PASS)
         try:
-            self.__DB_CONN = pymongo.MongoClient(host=self.__DB_HOST, port=self.__DB_PORT, maxPoolSize=10)
+            if auth == 'disabled':
+                self.__DB_CONN = pymongo.MongoClient(host=self.__DB_HOST, port=port, directConnection=True)
+            else:
+                self.__DB_CONN = pymongo.MongoClient(host=self.__DB_HOST, port=port, directConnection=True, username='root',password=mg_root)
             self.__DB_CONN.admin.command('ping')
             return self.__DB_CONN
         except pymongo.errors.ConnectionFailure:
             return False
-        except Exception:
-            self.__DB_ERR = mw.get_error_info()
+        except Exception as e:
+            # print(e)
+            self.__DB_ERR = mw.getTracebackInfo()
         return False
 
     # 获取配置项
@@ -122,7 +219,7 @@ class nosqlMongodbCtr():
 
         mgdb_instance = self.getInstanceBySid(sid).mgdb_conn()
         if mgdb_instance is False:
-            return mw.returnData(False,'无法链接')
+            return mw.returnData(False,'无法链接.')
 
         result = {}
         collections = mgdb_instance[name].list_collection_names()
@@ -164,7 +261,7 @@ class nosqlMongodbCtr():
                 where[mg_field] = re.compile(mg_value)
 
         # print(where)
-        result = collection_instance.find(where).skip(start_index).limit(size).sort({'_id':-1})
+        result = collection_instance.find(where).skip(start_index).limit(size).sort('_id',-1)
         count = collection_instance.count_documents(where)
         d = []
         for document in result:

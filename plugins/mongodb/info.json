@@ -1,8 +1,9 @@
 {
 	"sort": 7,
-	"ps": "一个高性能的NOSQL数据库",
+	"hook":["database"],
+	"ps": "一个高性能的NOSQL数据库【社区版】",
 	"name": "mongodb",
-	"title": "Mongodb",
+	"title": "MongoDB",
 	"shell": "install.sh",
 	"install_pre_inspection":true,
 	"versions":["4.4","5.0","6.0","7.0"],

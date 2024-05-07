@@ -110,10 +110,9 @@ docker run -itd --name mw-server --privileged=true -p 7200:7200 -p 80:80 -p 443:
 ```
 
 
-### 版本更新 0.16.6
+### 版本更新 0.16.7
 
-- openresty【1.25.3.1】配置更新，支持h3; 
-- 修复php83的扩展bcmath在centos7安装出错。
+- mongodb副本设置/备份/认证。
 
 ### JSDelivr安装地址
 

@@ -908,6 +908,11 @@ def aesDecrypt_Crypto(data, key, vi):
     text_decrypted = text_decrypted.decode('utf8').rstrip()  # 去掉补位的右侧空格
     return text_decrypted
 
+def getDefault(data,val,def_val=''):
+    if val in data:
+        return data[val]
+    return def_val
+
 def encodeImage(imgsrc, newsrc):
     # 图片加密
     import struct

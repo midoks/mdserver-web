@@ -761,6 +761,10 @@ function copyText(value) {
 }
 
 function copyPass(value){
+	if (value == ''){
+		layer.msg('空,不能复制',{icon:2,time:2000});
+		return;
+	}
 	copyText(value);
 }
 

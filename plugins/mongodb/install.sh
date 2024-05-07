@@ -4,7 +4,7 @@ export PATH
 
 # https://www.mongodb.com/try/download/community
 
-# cd /Users/midoks/Desktop/mwdev/server/mdserver-web/plugins/mongodb && /bin/bash install.sh install 5.0.4
+# cd /Users/midoks/Desktop/mwdev/server/mdserver-web/plugins/mongodb && /bin/bash install.sh install 7.0
 # cd /www/server/mdserver-web/plugins/mongodb && /bin/bash install.sh install 7.0
 # cd /www/server/mdserver-web && python3 /www/server/mdserver-web/plugins/mongodb/index.py start
 
@@ -31,6 +31,9 @@ if [ "macos" != "$OSNAME" ];then
 	SYS_VERSION_ID=`cat /etc/*-release | grep VERSION_ID | awk -F = '{print $2}' | awk -F "\"" '{print $2}'`
 fi
 
+if [ -f ${rootPath}/bin/activate ];then
+	source ${rootPath}/bin/activate
+fi
 Install_app()
 {
 	echo '正在安装脚本文件...' > $install_tmp

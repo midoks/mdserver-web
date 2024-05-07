@@ -9,7 +9,7 @@ rootPath=$(dirname "$rootPath")
 serverPath=$(dirname "$rootPath")
 
 install_tmp=${rootPath}/tmp/mw_install.pl
-VERSION=7.0.0
+VERSION=7.0.9
 SYS_ARCH=`arch`
 
 SYS_VERSION_ID=`cat /etc/*-release | grep VERSION_ID | awk -F = '{print $2}' | awk -F "\"" '{print $2}'`
@@ -60,4 +60,49 @@ if [ ! -d  $serverPath/mongodb/bin ];then
 fi
 
 cd ${MG_DIR} && rm -rf ${MG_DIR}/${FILE_NAME}
+
+#--------------- mongosh tool install ------------------ #
+TOOL_VERSION=2.2.5
+TOOL_FILE_NAME=mongosh-${TOOL_VERSION}-linux-x64
+if [ "aarch64" == ${SYS_ARCH} ];then
+	TOOL_FILE_NAME=mongosh-${TOOL_VERSION}-linux-arm64
+fi
+TOOL_FILE_NAME_TGZ=${TOOL_FILE_NAME}.tgz
+if [ ! -f $MG_DIR/${TOOL_FILE_NAME_TGZ} ]; then
+	wget --no-check-certificate -O $MG_DIR/${TOOL_FILE_NAME_TGZ} https://downloads.mongodb.com/compass/${TOOL_FILE_NAME_TGZ}
+	echo "wget --no-check-certificate -O $MG_DIR/${TOOL_FILE_NAME_TGZ} https://downloads.mongodb.com/compass/${TOOL_FILE_NAME_TGZ}"
+fi
+
+if [ ! -d $MG_DIR/${TOOL_FILE_NAME_TGZ} ];then 
+	cd $MG_DIR && tar -zxvf ${TOOL_FILE_NAME_TGZ}
+fi
+
+cd ${MG_DIR}/${TOOL_FILE_NAME} && cp -rf ./bin $serverPath/mongodb
+cd ${MG_DIR} && rm -rf ${MG_DIR}/${TOOL_FILE_NAME}
+
+# https://fastdl.mongodb.org/tools/db/mongodb-database-tools-rhel90-aarch64-100.9.4.tgz
+# https://fastdl.mongodb.org/tools/db/mongodb-database-tools-rhel90-x86_64-100.9.4.tgz
+# https://fastdl.mongodb.org/tools/db/mongodb-database-tools-rhel83-s390x-100.9.4.tgz
+#--------------- mongodb database install ------------------ #
+TOOL_VERSION=100.9.4
+TOOL_FILE_NAME=mongodb-database-tools-rhel${SYS_NAME}-x86_64-${TOOL_VERSION}
+if [ "aarch64" == ${SYS_ARCH} ];then
+	TOOL_FILE_NAME=mongodb-database-tools-rhel${SYS_NAME}-aarch64-${TOOL_VERSION}
+fi
+
+if [ "arm64" == ${SYS_ARCH} ];then
+	TOOL_FILE_NAME=mongodb-database-tools-rhel${SYS_NAME}-arm64-${TOOL_VERSION}
+fi
+
+TOOL_FILE_NAME_TGZ=${TOOL_FILE_NAME}.tgz
+if [ ! -f $MG_DIR/${TOOL_FILE_NAME_TGZ} ]; then
+	wget --no-check-certificate -O $MG_DIR/${TOOL_FILE_NAME_TGZ} https://fastdl.mongodb.org/tools/db/${TOOL_FILE_NAME_TGZ}
+fi
+
+if [ ! -d $MG_DIR/${TOOL_FILE_NAME_TGZ} ];then 
+	cd $MG_DIR && tar -zxvf ${TOOL_FILE_NAME_TGZ}
+fi
+
+cd ${MG_DIR}/${TOOL_FILE_NAME} && cp -rf ./bin $serverPath/mongodb
+cd ${MG_DIR} && rm -rf ${MG_DIR}/${TOOL_FILE_NAME}
 
