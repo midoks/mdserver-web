@@ -154,7 +154,7 @@ function mongoReplStatus() {
 		} else{
 			tbody += '<tr><th>状态</th><td>' + rdata.status + '</td><td>主/从</td></tr>\
 					<tr><th>同步文档</th><td>' + rdata.setName + '</td><td>文档名</td></tr>\
-					<tr><th>hosts</th><td><span class="overflow_hide" style="width:260px;word-wrap: break-word;white-space:pre-wrap;" title="'+rdata.hosts+'">' + rdata.hosts + '</span></td><td>服务器所有节点</td></tr>\
+					<tr><th>hosts</th><td><span class="overflow_hide" style="width:300px;word-wrap: break-word;white-space:pre-wrap;" title="'+rdata.hosts+'">' + rdata.hosts + '</span></td><td>服务器所有节点</td></tr>\
 					<tr><th>primary</th><td>' + rdata.primary + '</td><td>主节点</td></tr>\
 					<tr><th>me</th><td>' + rdata.me + '</td><td>本机</td></tr>';
 		}
