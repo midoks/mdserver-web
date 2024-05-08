@@ -40,6 +40,8 @@ echo y | pacman -Sy rpcsvc-proto
 echo y | pacman -Sy lemon
 echo y | pacman -Sy which
 echo y | pacman -Sy expect
+echo y | pacman -Sy pv
+
 
 ## gd start
 echo y | pacman -Sy gd

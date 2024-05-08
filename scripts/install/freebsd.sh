@@ -60,6 +60,7 @@ pkg install -y harfbuzz
 pkg install -y libevent
 pkg install -y pidof
 pkg install -y pstree
+pkg install -y pv
 
 # curl https://sh.rustup.rs -sSf | sh
 pkg install -y rust

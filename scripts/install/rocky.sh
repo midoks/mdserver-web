@@ -15,6 +15,7 @@ sed -i 's#SELINUX=enforcing#SELINUX=disabled#g' /etc/selinux/config
 
 yum install -y wget lsof
 yum install -y unrar rar
+yum install -y pv
 yum install -y python3-devel
 yum install -y crontabs
 yum install -y expect
