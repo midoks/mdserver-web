@@ -21,6 +21,7 @@ yum install -y python-devel
 yum install -y curl-devel libmcrypt libmcrypt-devel
 yum install -y mysql-devel
 yum install -y expect
+yum install -y pv
 
 SSH_PORT=`netstat -ntpl|grep sshd|grep -v grep | sed -n "1,1p" | awk '{print $4}' | awk -F : '{print $2}'`
 if [ "$SSH_PORT" == "" ];then
