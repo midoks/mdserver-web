@@ -627,8 +627,8 @@ class system_api:
 
             netio_group_t[name] = io_data
 
-            netInfo[name]['up'] = round(float(io_data[0] - netio_cache[name][0] / stime), 2)
-            netInfo[name]['down'] = round(float(io_data[1] - netio_cache[name][1] / stime), 2)
+            netInfo[name]['up'] = round(float((io_data[0] - netio_cache[name][0]) / stime), 2)
+            netInfo[name]['down'] = round(float((io_data[1] - netio_cache[name][1])/ stime), 2)
 
             netInfo[name]['upTotal'] = io_data[0]
             netInfo[name]['downTotal'] = io_data[1]
@@ -639,8 +639,8 @@ class system_api:
         if not allio_cache:
             allio_cache = all_io
         
-        netInfo['ALL']['up'] = round(float(all_io[0] - allio_cache[0] / stime), 2)
-        netInfo['ALL']['down'] = round(float(all_io[1] - allio_cache[1] / stime), 2)
+        netInfo['ALL']['up'] = round(float((all_io[0] - allio_cache[0]) /stime), 2)
+        netInfo['ALL']['down'] = round(float((all_io[1] - allio_cache[1]) /stime), 2)
         netInfo['ALL']['upTotal'] = all_io[0]
         netInfo['ALL']['downTotal'] = all_io[1]
         netInfo['ALL']['upPackets'] = all_io[2]
