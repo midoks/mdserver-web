@@ -5097,3 +5097,43 @@ select[disabled]{
     overflow: hidden;
     text-overflow: ellipsis;
 }
+
+
+.title.tabs-nav {
+    padding: 0;
+    position: relative;
+}
+
+.title.tabs-nav span {
+    display: inline-block;
+    height: 50px;
+    min-width: 100px;
+    padding: 0 20px;
+    line-height: 50px;
+    font-size: 15px;
+    cursor: pointer;
+    position: relative;
+    text-align: center;
+}
+
+.title.tabs-nav span.active {
+    color: #20a53a;
+    background: #20a53a08;
+}
+
+
+.title.tabs-nav select {
+    position: absolute;
+    right: 5px;
+    top: 50%;
+    margin-top: -12px;
+}
+
+select[name="network-io"], select[name="disk-io"] {
+    font-size: 13px;
+    height: 24px;
+    line-height: 24px;
+    padding: 2px;
+    border-radius: 0;
+    border-color: #ececec;
+}
