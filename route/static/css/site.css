@@ -5137,3 +5137,14 @@ select[name="network-io"], select[name="disk-io"] {
     border-radius: 0;
     border-color: #ececec;
 }
+
+.tabs-content .tabs-item {
+    display: none;
+    height: 100%;
+    width: 100%;
+    background-color: #fff;
+}
+
+.tabs-content .tabs-active.tabs-item {
+    display: inline-block;
+}
