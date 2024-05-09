@@ -556,8 +556,7 @@ class system_api:
 
             ntime = time.time()
 
-            print("source",ntime - session['otime'])
-
+            # print("source",ntime - session['otime'])
             networkInfo = {}
             networkInfo['upTotal'] = networkIo[0]
             networkInfo['downTotal'] = networkIo[1]
@@ -587,7 +586,6 @@ class system_api:
     def getNetWorkIostat(self):
         netInfo = {}
 
-
         netInfo['ALL'] = {}
         netInfo['ALL']['up'] = 0
         netInfo['ALL']['down'] = 0
@@ -611,8 +609,7 @@ class system_api:
         stime = mtime - netio['time']
         if not stime: stime = 1
 
-        print("new:",stime)
-
+        # print("new:",stime)
         netio_group = psutil.net_io_counters(pernic=True).keys()
 
         netio_cache = netio['info']
