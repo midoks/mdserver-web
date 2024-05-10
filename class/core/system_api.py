@@ -547,30 +547,30 @@ class system_api:
     def getNetWork(self):
         # 取网络流量信息
         try:
-            # 取网络流量信息
-            networkIo = self.psutilNetIoCounters()
-            if not "otime" in session:
-                session['up'] = networkIo[0]
-                session['down'] = networkIo[1]
-                session['otime'] = time.time()
-
-            ntime = time.time()
-
-            # print("source",ntime - session['otime'])
             networkInfo = {}
-            networkInfo['upTotal'] = networkIo[0]
-            networkInfo['downTotal'] = networkIo[1]
-            networkInfo['up'] = round(float(
-                networkIo[0] - session['up']) / (ntime - session['otime']), 2)
-            networkInfo['down'] = round(
-                float(networkIo[1] - session['down']) / (ntime - session['otime']), 2)
-            networkInfo['downPackets'] = networkIo[3]
-            networkInfo['upPackets'] = networkIo[2]
+            # 取网络流量信息
+            # networkIo = self.psutilNetIoCounters()
+            # if not "otime" in session:
+            #     session['up'] = networkIo[0]
+            #     session['down'] = networkIo[1]
+            #     session['otime'] = time.time()
 
-            # print networkIo[1], session['down'], ntime, session['otime']
-            session['up'] = networkIo[0]
-            session['down'] = networkIo[1]
-            session['otime'] = time.time()
+            # ntime = time.time()
+            # print("source",ntime - session['otime'])
+            
+            # networkInfo['upTotal'] = networkIo[0]
+            # networkInfo['downTotal'] = networkIo[1]
+            # networkInfo['up'] = round(float(
+            #     networkIo[0] - session['up']) / (ntime - session['otime']), 2)
+            # networkInfo['down'] = round(
+            #     float(networkIo[1] - session['down']) / (ntime - session['otime']), 2)
+            # networkInfo['downPackets'] = networkIo[3]
+            # networkInfo['upPackets'] = networkIo[2]
+
+            # # print networkIo[1], session['down'], ntime, session['otime']
+            # session['up'] = networkIo[0]
+            # session['down'] = networkIo[1]
+            # session['otime'] = time.time()
 
             networkInfo['cpu'] = self.getCpuInfo()
             networkInfo['load'] = self.getLoadAverage()
