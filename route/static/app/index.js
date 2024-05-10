@@ -1364,7 +1364,7 @@ var index = {
             var network_io_key = getCookie('network_io_key');
             var network_data = net.network;
             var network_select = network_data['ALL'];
-            if (network_io_key != ''){
+            if (network_io_key && network_io_key != ''){
                 network_select = network_data[network_io_key];
             }
 
@@ -1387,7 +1387,7 @@ var index = {
             var disk_io_key = getCookie('disk_io_key');
             var iostat_data = net.iostat;
             var iostat_select = iostat_data['ALL'];
-            if (disk_io_key != ''){
+            if (disk_io_key && disk_io_key != ''){
                 iostat_select = iostat_data[disk_io_key];
             }
 
