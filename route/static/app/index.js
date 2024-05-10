@@ -1409,7 +1409,7 @@ var index = {
             $("#readBytes").html(toSize(iostat_select.read_bytes));
             $("#writeBytes").html(toSize(iostat_select.write_bytes));
             $("#diskIops").html(iostat_select.read_count);
-            $("#diskTime").html(iostat_select.write_time);
+            $("#diskTime").html(iostat_select.write_time +" ms");
 
 
             $("#core").html(net.cpu[1] + " " + lan.index.cpu_core);
