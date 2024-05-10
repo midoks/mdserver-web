@@ -99,15 +99,45 @@
 
         <div class="col-xs-12 col-sm-12 col-md-6 pull-left pd0">
             <div class="pl7">
-                <div class="bgw" style="height:491px">
-                    <div class="title c6 f16 plr15">流量</div>
-                    <div class="bw-info">
-                        <div class="col-sm-6 col-md-3"><p class="c9"><span class="ico-up"></span>上行</p><a id="upSpeed">0</a></div>
-                        <div class="col-sm-6 col-md-3"><p class="c9"><span class="ico-down"></span>下行</p><a id="downSpeed">0</a></div>
-                        <div class="col-sm-6 col-md-3"><p class="c9">总发送</p><a id="upAll">0</a></div>
-                        <div class="col-sm-6 col-md-3"><p class="c9">总接收</p><a id="downAll">0</a></div>
+                <div class="bgw radius4" style="height:491px">
+                    <div class="title c6 f16 plr15 tabs-nav">
+                        <div class="tab-list">
+                            <span class="tabs-item active">流量</span>
+                            <span class="tabs-item">磁盘IO</span>
+                        </div>
+
+                        <div class="tabs-down">
+                            <select class="bt-input-text" name="network-io" style="font-size: 12px;">
+                                <option value="ALL">全部</option>
+                            </select>
+                            <select class="bt-input-text hide" name="disk-io" style="font-size: 12px;">
+                                <option value="ALL">全部</option>
+                            </select>
+                        </div>
                     </div>
-                    <div id="netImg" style="width:100%;height:330px;"></div>
+
+                    <div class="tabs-content">
+                        <div class="tabs-active radius4 tabs-item">
+                            <div class="bw-info">
+                                <div class="col-sm-6 col-md-3"><p class="c9"><span class="ico-up"></span>上行</p><a id="upSpeed">0</a></div>
+                                <div class="col-sm-6 col-md-3"><p class="c9"><span class="ico-down"></span>下行</p><a id="downSpeed">0</a></div>
+                                <div class="col-sm-6 col-md-3"><p class="c9">总发送</p><a id="upAll">0</a></div>
+                                <div class="col-sm-6 col-md-3"><p class="c9">总接收</p><a id="downAll">0</a></div>
+                            </div>
+                            <div id="netImg" style="width:100%;height:330px;"></div>
+                        </div>
+
+                        <div class="radius4 tabs-item">
+                            <div class="bw-info">
+                                <div class="col-sm-6 col-md-3"><p class="c9"><span class="ico-read"></span>读取</p><a id="readBytes">0</a></div>
+                                <div class="col-sm-6 col-md-3"><p class="c9"><span class="ico-write"></span>写入</p><a id="writeBytes">0</a></div>
+                                <div class="col-sm-6 col-md-3"><p class="c9">每秒读写</p><a id="diskIops">0</a></div>
+                                <div class="col-sm-6 col-md-3"><p class="c9">IO延迟</p><a id="diskTime" style="color: rgb(32, 165, 58);">0</a></div>
+                            </div>
+                            <div id="ioStat" style="width:100%;height:330px;"></div>
+                        </div>
+                    </div>
+                    
                 </div>
             </div>
         </div>
@@ -119,8 +149,8 @@
 <script type="text/javascript" src="/static/app/index.js?v={{config.version}}"></script>
 <script type="text/javascript">
 
-netImg();
-setImg();
+index.init();
+
 pluginInit();
 //加载关键数据总数
 loadKeyDataCount();

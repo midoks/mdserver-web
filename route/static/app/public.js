@@ -16,6 +16,17 @@ function toSize(a) {
 	}
 }
 
+function toSizeMB(a) {
+	var d = [" KB", " MB"];
+	var e = 1024;
+	var i = 0;
+	for(var b = 0; b < d.length; b++) {
+		a /= e;
+		i = b;
+	}
+	return a.toFixed(2) + d[i]
+}
+
 function toTrim(x) {
     return x.replace(/^\s+|\s+$/gm,'');
 }
