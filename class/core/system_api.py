@@ -686,8 +686,8 @@ class system_api:
             for disk_name in diskio_group.keys():
                 diskInfo[disk_name] = {}
                 # print('disk_name',disk_name)
-                # print('diskio_group',diskio_group[disk_name])
-                # print('diskio_cache',diskio_cache[disk_name])
+                # print(diskio_group[disk_name].write_time , diskio_cache[disk_name].write_time)
+                # print(diskio_group[disk_name].write_count , diskio_cache[disk_name].write_count)
 
                 diskInfo[disk_name]['read_count']   = int((diskio_group[disk_name].read_count - diskio_cache[disk_name].read_count) / stime)
                 diskInfo[disk_name]['write_count']  = int((diskio_group[disk_name].write_count - diskio_cache[disk_name].write_count) / stime)

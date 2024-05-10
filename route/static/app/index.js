@@ -1408,8 +1408,8 @@ var index = {
 
             $("#readBytes").html(toSize(iostat_select.read_bytes));
             $("#writeBytes").html(toSize(iostat_select.write_bytes));
-            $("#diskIops").html(iostat_select.read_count);
-            $("#diskTime").html(iostat_select.write_time);
+            $("#diskIops").html(iostat_select.read_count+":"+iostat_select.write_count+ " 次");
+            $("#diskTime").html(iostat_select.read_time+":"+iostat_select.write_time +" ms");
 
 
             $("#core").html(net.cpu[1] + " " + lan.index.cpu_core);
