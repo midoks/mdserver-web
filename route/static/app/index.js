@@ -1362,8 +1362,6 @@ var index = {
             var readTmpSize = toSizeMB(read).split(' ')[0];
             var writeTmpSize = toSizeMB(write).split(' ')[0];
 
-            // console.log(readTmpSize,writeTmpSize);
-
             _iostat.data.zData.push(writeTmpSize);
             _iostat.data.yData.push(readTmpSize);
             _iostat.data.tipsData.push(data);
