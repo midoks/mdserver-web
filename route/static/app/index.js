@@ -1171,15 +1171,18 @@ var index = {
         data: {
           xData: [],
           yData: [],
-          zData: []
+          zData: [],
+          tipsData: []
         },
         init_select:false,
+        default_unit : 'MB/s',
         init:function(){
             for (var i = 8; i >= 0; i--) {
                 var time = (new Date()).getTime();
                 index.iostat.data.xData.push(index.common.format(time - (i * 3 * 1000)));
                 index.iostat.data.yData.push(0);
                 index.iostat.data.zData.push(0);
+                index.iostat.data.tipsData.push({});
             }
 
             index.iostat.table = echarts.init(document.getElementById('ioStat'));
@@ -1195,7 +1198,31 @@ var index = {
             index.iostat.table.setOption({
                 tooltip: {
                     trigger: 'axis',
-                    // formatter :function (config) {}
+                    formatter :function (config) {
+                        var _config = config, _tips = "时间：" + _config[0].axisValue + "<br />", options = {
+                            read_bytes: '读取字节数',
+                            read_count: '读取次数 ',
+                            read_merged_count: '合并读取次数',
+                            read_time: '读取延迟',
+                            write_bytes: '写入字节数',
+                            write_count: '写入次数',
+                            write_merged_count: '合并写入次数',
+                            write_time: '写入延迟',
+                        }, data = index.iostat.data.tipsData[config[0].dataIndex], list = ['read_count', 'write_count', 'read_merged_count', 'write_merged_count', 'read_time', 'write_time',];
+                        for (var i = 0; i < config.length; i++) {
+                            if (typeof config[i].data == "undefined") {
+                                return false;
+                            }
+                            _tips += '<span style="display: inline-block;width: 10px;height: 10px;border-radius: 50%;background: ' + config[i].color + ';"></span>&nbsp;&nbsp;<span>' + config[i].seriesName + '：' + config[i].data + ' MB/s' + '</span><br />'
+                        }
+                        $.each(list, function (index, item) {
+
+                            if (typeof data[item] != 'undefined'){
+                                _tips += '<span style="display: inline-block;width: 10px;height: 10px;"></span>&nbsp;&nbsp;<span style="' + (item.indexOf('time') > -1 ? ('color:' + ((data[item] > 100 && data[item] < 1000) ? '#ff9900' : (data[item] >= 1000 ? 'red' : '#20a53a'))) : '') + '">' + options[item] + '：' + data[item] + (item.indexOf('time') > -1 ? ' ms' : ' 次/秒') + '</span><br />';
+                            }
+                        })
+                        return _tips;
+                    }
                 },
                 yAxis: {
                     name:  '单位 '+ index.iostat.default_unit,
@@ -1322,26 +1349,24 @@ var index = {
                 index.iostat.init_select = true;
             }
         },
-        add: function (up, down) {
+        add: function (read, write, data) {
             var _iostat = this;
             var limit = 8;
             var d = new Date()
             if (_iostat.data.xData.length >= limit) _iostat.data.xData.splice(0, 1);
             if (_iostat.data.yData.length >= limit) _iostat.data.yData.splice(0, 1);
             if (_iostat.data.zData.length >= limit) _iostat.data.zData.splice(0, 1);
+            if (_iostat.data.tipsData.length >= limit) _iostat.data.tipsData.splice(0, 1);
 
 
-            var upTmpSize = toSize(up).split(' ')[0];
-            var downTmpSize = toSize(down).split(' ')[0];
+            var readTmpSize = toSizeMB(read).split(' ')[0];
+            var writeTmpSize = toSizeMB(write).split(' ')[0];
 
-            var tmp = up;
-            if (down>up){
-                tmp = down;
-            }
-            index.iostat.default_unit = toSize(tmp).split(' ')[1] + '/s';
+            // console.log(readTmpSize,writeTmpSize);
 
-            _iostat.data.zData.push(downTmpSize);
-            _iostat.data.yData.push(upTmpSize);
+            _iostat.data.zData.push(writeTmpSize);
+            _iostat.data.yData.push(readTmpSize);
+            _iostat.data.tipsData.push(data);
             _iostat.data.xData.push(d.getHours() + ':' + d.getMinutes() + ':' + d.getSeconds());
         },
 
@@ -1379,7 +1404,7 @@ var index = {
                 iostat_select = iostat_data[disk_io_key];
             }
 
-            index.iostat.add(iostat_select.read_bytes,iostat_select.write_bytes);
+            index.iostat.add(iostat_select.read_bytes,iostat_select.write_bytes, iostat_select);
             index.iostat.render();
             index.iostat.renderSelect(net);
 
