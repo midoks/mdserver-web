@@ -110,9 +110,9 @@ docker run -itd --name mw-server --privileged=true -p 7200:7200 -p 80:80 -p 443:
 ```
 
 
-### 版本更新 0.16.7
+### 版本更新 0.16.8
 
-- mongodb副本设置/备份/认证。
+- 首页对网络/磁盘IO进行更细致的展示。
 
 ### JSDelivr安装地址
 
