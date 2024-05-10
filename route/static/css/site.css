@@ -5148,3 +5148,58 @@ select[name="network-io"], select[name="disk-io"] {
 .tabs-content .tabs-active.tabs-item {
     display: inline-block;
 }
+
+.bw-info {
+  height: 80px;
+}
+
+.bw-info>div {
+  float: left;
+  padding-top: 35px;
+  text-align: center;
+}
+
+.bw-info>div p {
+  margin-bottom: 7px;
+}
+
+.bw-info>div a {
+  font-size: 14px;
+  color: #666;
+}
+
+.bw-info .ico-down,
+.bw-info .ico-up,
+.bw-info .ico-write,
+.bw-info .ico-read {
+  width: 10px;
+  height: 10px;
+  display: inline-block;
+  margin-right: 3px;
+  border-radius: 5px;
+}
+
+.bw-info .ico-down {
+  background-color: #52a9ff;
+}
+
+.bw-info .ico-up {
+  background-color: #f7b851;
+}
+
+.bw-info .ico-write {
+  background-color: #6CC0CF;
+}
+
+.bw-info .ico-read {
+  background-color: #FF4683;
+}
+
+.bw-info ul li {
+  height: 56px;
+  line-height: 56px;
+}
+
+.bw-info ul li.bi-line {
+  border-bottom: #ddd solid 1px;
+}

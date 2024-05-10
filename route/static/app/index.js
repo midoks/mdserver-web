@@ -939,7 +939,6 @@ $(function() {
         $(this).addClass('active').siblings().removeClass('active');
         $('.tabs-content .tabs-item:eq(' + indexs + ')').addClass('tabs-active').siblings().removeClass('tabs-active');
         $('.tabs-down select:eq(' + indexs + ')').removeClass('hide').siblings().addClass('hide');
-        console.log(indexs);
         switch (indexs) {
         case 0:
           index.net.table.resize();
@@ -1194,6 +1193,10 @@ var index = {
 
         render:function(){
             index.iostat.table.setOption({
+                tooltip: {
+                    trigger: 'axis',
+                    // formatter :function (config) {}
+                },
                 yAxis: {
                     name:  '单位 '+ index.iostat.default_unit,
                     splitLine: { lineStyle: { color: "#eee" } },
@@ -1256,26 +1259,19 @@ var index = {
                     smooth: true,
                     showSymbol: false,
                     symbol: 'circle',
-                    symbolSize: 6,
                     areaStyle: {
                         normal: {
-                            color: new echarts.graphic.LinearGradient(0, 0, 0, 1, [{
-                                offset: 0,
-                                color: 'rgba(255, 140, 0,0.5)'
-                            }, {
-                                offset: 1,
-                                color: 'rgba(255, 140, 0,0.8)'
-                            }], false)
+                            color: 'rgb(255, 70, 131)'
                         }
                     },
                     itemStyle: {
                         normal: {
-                            color: '#f7b851'
+                            color: 'rgb(255, 70, 131)'
                         }
                     },
                     lineStyle: {
                         normal: {
-                            width: 1
+                            width: 1,
                         }
                     }
                 },
@@ -1289,18 +1285,12 @@ var index = {
                     symbolSize: 6,
                     areaStyle: {
                         normal: {
-                            color: new echarts.graphic.LinearGradient(0, 0, 0, 1, [{
-                                offset: 0,
-                                color: 'rgba(30, 144, 255,0.5)',
-                            }, {
-                                offset: 1,
-                                color: 'rgba(30, 144, 255,0.8)',
-                            }], false)
+                            color: 'rgba(46, 165, 186, .7)'
                         }
                     },
                     itemStyle: {
                         normal: {
-                            color: '#52a9ff',
+                            color: 'rgba(46, 165, 186, .7)'
                         }
                     },
                     lineStyle: {
@@ -1368,11 +1358,9 @@ var index = {
                 network_select = network_data[network_io_key];
             }
 
-
             index.net.add(network_select.up,network_select.down);
             index.net.render();
             index.net.renderSelect(net);
-
 
             $("#upSpeed").html(toSize(network_select.up));
             $("#downSpeed").html(toSize(network_select.down));
