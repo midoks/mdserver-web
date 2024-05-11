@@ -1592,6 +1592,22 @@ function setChmod(action,fileName){
 	var toExec = fileName == lan.files.all?'batch(3,1)':'setChmod(1,\''+fileName+'\')';
 	$.post('/files/file_access','filename='+encodeURIComponent(fileName),function(rdata){
 		// console.log(rdata);
+		var sys_users = rdata.sys_users;
+		var own_html = '';
+		var is_find_own_option = false;
+		for (var i = 0; i < sys_users.length; i++) {
+			var own = sys_users[i];
+			if (rdata.chown==own){
+				is_find_own_option = true;
+				own_html += '<option value="'+own+'" selected="selected">'+own+'</option>';
+			} else {
+				own_html += '<option value="'+own+'">'+own+'</option>';
+			}
+		}
+		if (!is_find_own_option){
+			own_html += '<option value="'+rdata.chown+'" selected="selected">'+rdata.chown+'</option>';
+		}
+
 		layer.open({
 			type:1,
 			closeBtn: 1,
@@ -1619,10 +1635,8 @@ function setChmod(action,fileName){
 						</fieldset>\
 						<div class="setchmodnum"><input class="bt-input-text" type="text" id="access" maxlength="3" value="'+rdata.chmod+'">权限，\
 						<span>所有者\
-						<select id="chown" class="bt-input-text">\
-							<option value="www" '+(rdata.chown=='www'?'selected="selected"':'')+'>www</option>\
-							<option value="mysql" '+(rdata.chown=='mysql'?'selected="selected"':'')+'>mysql</option>\
-							<option value="root" '+(rdata.chown=='root'?'selected="selected"':'')+'>root</option>\
+						<select id="chown" class="bt-input-text" style="width:100px;">\
+							'+own_html+'\
 						</select></span></div>\
 						<div class="bt-form-submit-btn">\
 							<button type="button" class="btn btn-danger btn-sm btn-title" onclick="layer.closeAll()">关闭</button>\
