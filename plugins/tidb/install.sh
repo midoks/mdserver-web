@@ -20,7 +20,7 @@ install_tmp=${rootPath}/tmp/mw_install.pl
 VERSION=$2
 TIDB_ARCH=arm64
 if [ "$sysArch" == "x86_64" ];then
-	TIDB_ARCH=amd
+	TIDB_ARCH=amd64
 fi
 
 if [ "$sysArch" == "aarch64" ];then
