@@ -44,11 +44,11 @@ Install_App()
 	fi
 
 
-	if [ !-d  $serverPath/source/tidb/${tidb_name} ];then
+	if [ ! -d  $serverPath/source/tidb/${tidb_name} ];then
 		cd $serverPath/source/tidb && tar -zxvf $serverPath/source/tidb/${tgz_name}
 	fi
 
-	if [ !-d $serverPath/tidb/mirror ];then
+	if [ ! -d $serverPath/tidb/mirror ];then
 		mkdir -p $serverPath/tidb/mirror
 		cp -rf $serverPath/source/tidb/${tidb_name}/* $serverPath/tidb/mirror
 	fi
