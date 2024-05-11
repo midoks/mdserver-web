@@ -15,7 +15,7 @@ echo "use system: ${sysName}"
 # https://docs.pingcap.com/zh/tidb/stable/quick-start-with-tidb
 
 # cd /Users/midoks/Desktop/mwdev/server/mdserver-web/plugins/tidb && bash install.sh install v7.5.1
-# cd /www/server/mdserver-web/plugins/tidb && bash install.sh install v7.5.1
+# mw update_dev && cd /www/server/mdserver-web/plugins/tidb && bash install.sh install v7.5.1
 
 # cd /www/server/source/tidb/tidb-community-server-v7.5.1-linux-amd64 && ./local_install.sh
 
@@ -59,7 +59,7 @@ Install_App()
 		echo "${VERSION}" > $serverPath/tidb/version.pl
 		
 		cd ${rootPath} && python3 ${rootPath}/plugins/tidb/index.py start
-		cd ${rootPath} && python3 ${rootPath}/plugins/tidb/index.py initd_install
+		# cd ${rootPath} && python3 ${rootPath}/plugins/tidb/index.py initd_install
 		echo '安装完成'
 	else
 		echo '安装失败!'
