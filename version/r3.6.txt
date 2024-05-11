@@ -36,3 +36,4 @@ pyotp
 pytz
 pyTelegramBotAPI
 telebot
+pyyaml
