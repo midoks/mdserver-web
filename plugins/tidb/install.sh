@@ -11,6 +11,7 @@ sysName=`uname`
 sysArch=`arch`
 echo "use system: ${sysName}"
 
+# https://cn.pingcap.com/product-community/
 # https://docs.pingcap.com/zh/tidb/stable/quick-start-with-tidb
 
 # cd /Users/midoks/Desktop/mwdev/server/mdserver-web/plugins/tidb && bash install.sh install v7.5.1
