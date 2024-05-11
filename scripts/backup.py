@@ -144,6 +144,7 @@ class backupTools:
         # cmd = db_path + "/bin/mysqldump --defaults-file=" + my_cnf + "  --force --opt --default-character-set=utf8 " + \
         #     name + " | gzip > " + filename
 
+        # skip-opt 不会lock表
         cmd = db_path + "/bin/mysqldump --defaults-file=" + my_cnf + " --skip-opt --create-options --default-character-set=utf8 " + \
             name + " | gzip > " + filename
         # print(cmd)
