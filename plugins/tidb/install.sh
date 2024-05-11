@@ -34,13 +34,18 @@ Install_App()
 	mkdir -p $serverPath/source
 	mkdir -p $serverPath/source/tidb
 
-	app_name=tidb-community-server-${VERSION}-linux-${TIDB_ARCH}.tar.gz
+	tidb_name=tidb-community-server-${VERSION}-linux-${TIDB_ARCH}
+	tgz_name=${tidb_name}.tar.gz
 
-	if [ ! -f $serverPath/source/tidb/${app_name} ];then
-		wget -O $serverPath/source/tidb/${app_name} https://download.pingcap.org/${app_name}
+	if [ ! -f $serverPath/source/tidb/${tgz_name} ];then
+		wget -O $serverPath/source/tidb/${tgz_name} https://download.pingcap.org/${tgz_name}
+	fi
+
+
+	if [ !-d  $serverPath/source/tidb/${tidb_name} ];then
+		cd $serverPath/source/tidb && tar -zxvf $serverPath/source/tidb/${tgz_name}
 	fi
 	
-	cd $serverPath/source/tidb && tar -zxvf $serverPath/source/tidb/${app_name}
 
 	if [ -d $serverPath/tidb ];then
 		echo "${VERSION}" > $serverPath/tidb/version.pl
