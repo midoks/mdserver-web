@@ -43,7 +43,7 @@ def getConf():
 
 
 def getConfTpl():
-    path = getPluginDir() + "/config/redis.conf"
+    path = getPluginDir() + "/config/tidb.conf"
     return path
 
 
