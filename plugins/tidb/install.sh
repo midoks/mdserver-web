@@ -19,6 +19,9 @@ echo "use system: ${sysName}"
 
 # cd /www/server/source/tidb/tidb-community-server-v7.5.1-linux-amd64 && ./local_install.sh
 
+# tiup cluster deploy tidb v7.5.1 /www/server/tidb/tidb.yaml --user root -p -i /root/.ssh/id_rsa
+# ssh 192.168.4.1 -l root
+
 install_tmp=${rootPath}/tmp/mw_install.pl
 VERSION=$2
 TIDB_ARCH=arm64
@@ -37,7 +40,10 @@ Install_App()
 	mkdir -p $serverPath/source/tidb
 
 	tidb_name=tidb-community-server-${VERSION}-linux-${TIDB_ARCH}
+	tidb_toolkit_name=tidb-community-toolkit-${VERSION}-linux-${TIDB_ARCH}
 	tgz_name=${tidb_name}.tar.gz
+	tgz_toolkit_name=${tidb_toolkit_name}.tar.gz
+
 
 	if [ ! -f $serverPath/source/tidb/${tgz_name} ];then
 		wget -O $serverPath/source/tidb/${tgz_name} https://download.pingcap.org/${tgz_name}
@@ -46,6 +52,14 @@ Install_App()
 
 	if [ ! -d  $serverPath/source/tidb/${tidb_name} ];then
 		cd $serverPath/source/tidb && tar -zxvf $serverPath/source/tidb/${tgz_name}
+	fi
+
+	if [ ! -f $serverPath/source/tidb/${tgz_toolkit_name} ];then
+		wget -O $serverPath/source/tidb/${tgz_name} https://download.pingcap.org/${tgz_toolkit_name}
+	fi
+
+	if [ ! -d  $serverPath/source/tidb/${tgz_toolkit_name} ];then
+		cd $serverPath/source/tidb && tar -zxvf $serverPath/source/tidb/${tgz_toolkit_name}
 	fi
 
 	if [ ! -d $serverPath/tidb/mirror ];then
