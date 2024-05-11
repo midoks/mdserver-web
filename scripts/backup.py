@@ -134,9 +134,6 @@ class backupTools:
         # mw.execShell(db_path + "/bin/mysqldump --opt --default-character-set=utf8 " +
         #              name + " | gzip > " + filename)
 
-        # mw.execShell(db_path + "/bin/mysqldump --skip-lock-tables --default-character-set=utf8 " +
-        #              name + " | gzip > " + filename)
-
         # mw.execShell(db_path + "/bin/mysqldump  --single-transaction --quick --default-character-set=utf8 " +
         #              name + " | gzip > " + filename)
 
