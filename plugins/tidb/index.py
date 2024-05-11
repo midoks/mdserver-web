@@ -38,7 +38,7 @@ def getInitDFile():
 
 
 def getConf():
-    path = getServerDir() + "/redis.conf"
+    path = getServerDir() + "/tidb.conf"
     return path
 
 
