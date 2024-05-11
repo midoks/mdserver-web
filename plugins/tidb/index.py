@@ -163,7 +163,7 @@ def initDreplace():
         mw.execShell('chmod +x ' + file_bin)
 
     # config replace
-    dst_conf = getServerDir() + '/redis.conf'
+    dst_conf = getServerDir() + '/tidb.conf'
     dst_conf_init = getServerDir() + '/init.pl'
     if not os.path.exists(dst_conf_init):
         conf_content = mw.readFile(getConfTpl())
@@ -188,7 +188,7 @@ def initDreplace():
     return file_bin
 
 
-def redisOp(method):
+def tiOp(method):
     file = initDreplace()
 
     current_os = mw.getOs()
@@ -211,23 +211,20 @@ def redisOp(method):
 
 
 def start():
-    return redisOp('start')
+    return tiOp('start')
 
 
 def stop():
-    return redisOp('stop')
+    return tiOp('stop')
 
 
 def restart():
-    status = redisOp('restart')
-
-    log_file = runLog()
-    mw.execShell("echo '' > " + log_file)
+    status = tiOp('restart')
     return status
 
 
 def reload():
-    return redisOp('reload')
+    return tiOp('reload')
 
 
 def getPort():
