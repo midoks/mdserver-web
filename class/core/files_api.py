@@ -121,6 +121,7 @@ class files_api:
     def fileAccessApi(self):
         filename = request.form.get('filename', '')
         data = self.getAccess(filename)
+        data['sys_users'] = self.getSysUserList()
         return mw.getJson(data)
 
     def setFileAccessApi(self):
@@ -932,6 +933,20 @@ class files_api:
             data['chmod'] = 755
             data['chown'] = 'www'
         return data
+
+    def getSysUserList(self):
+        pwd_file = '/etc/passwd'
+        if os.path.exists(pwd_file):
+            content = mw.readFile(pwd_file)
+            clist = content.split('\n')
+            sys_users = []
+            for line in clist:
+                if line.find(":")<0:
+                    continue
+                lines = line.split(":",1)
+                sys_users.append(lines[0])
+            return sys_users
+        return ['root','mysql','www']
 
         # 计算文件数量
     def getCount(self, path, search):
