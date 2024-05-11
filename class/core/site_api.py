@@ -1960,6 +1960,19 @@ class site_api:
             proxy_site_path) if os.path.exists(proxy_site_path) else ""
         data = json.loads(data_content) if data_content != "" else []
 
+        proxy_action = 'add'
+        if _id == "":
+            _id = mw.md5("{}".format(_name))
+        else:
+            proxy_action = 'edit'
+
+        if proxy_action == "add":
+            for item in data:
+                if item["name"] == _name:
+                    return mw.returnJson(False, "名称重复!!")
+                if item["from"] == _from:
+                    return mw.returnJson(False, "代理目录已存在!!")
+
         tpl = "#PROXY-START\n\
 location ^~ {from} {\n\
     proxy_pass {to};\n\
@@ -2016,15 +2029,11 @@ location ^~ {from} {\n\
         else:
             tpl = tpl.replace("{proxy_cache}", tpl_proxy_nocache, 999)
 
-        proxy_action = 'add'
-        if _id == "":
-            _id = mw.md5("{}".format(_name))
-        else:
-            proxy_action = 'edit'
 
         conf_proxy = "{}/{}.conf".format(self.getProxyPath(_siteName), _id)
         conf_bk = "{}/{}.conf.txt".format(self.getProxyPath(_siteName), _id)
 
+        print(tpl)
         mw.writeFile(conf_proxy, tpl)
 
         rule_test = mw.checkWebConfig()
