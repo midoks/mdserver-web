@@ -55,7 +55,7 @@ Install_App()
 	fi
 
 	if [ ! -f $serverPath/source/tidb/${tgz_toolkit_name} ];then
-		wget -O $serverPath/source/tidb/${tgz_name} https://download.pingcap.org/${tgz_toolkit_name}
+		wget -O $serverPath/source/tidb/${tgz_toolkit_name} https://download.pingcap.org/${tgz_toolkit_name}
 	fi
 
 	if [ ! -d  $serverPath/source/tidb/${tgz_toolkit_name} ];then
