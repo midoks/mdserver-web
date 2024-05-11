@@ -43,7 +43,7 @@ def getConf():
 
 
 def getConfTpl():
-    path = getPluginDir() + "/config/tidb.conf"
+    path = getPluginDir() + "/conf/tidb.conf"
     return path
 
 
