@@ -17,6 +17,8 @@ echo "use system: ${sysName}"
 # cd /Users/midoks/Desktop/mwdev/server/mdserver-web/plugins/tidb && bash install.sh install v7.5.1
 # cd /www/server/mdserver-web/plugins/tidb && bash install.sh install v7.5.1
 
+# cd /www/server/source/tidb/tidb-community-server-v7.5.1-linux-amd64 && ./local_install.sh
+
 install_tmp=${rootPath}/tmp/mw_install.pl
 VERSION=$2
 TIDB_ARCH=arm64
@@ -45,7 +47,13 @@ Install_App()
 	if [ !-d  $serverPath/source/tidb/${tidb_name} ];then
 		cd $serverPath/source/tidb && tar -zxvf $serverPath/source/tidb/${tgz_name}
 	fi
-	
+
+	if [ !-d $serverPath/tidb/mirror ];then
+		mkdir -p $serverPath/tidb/mirror
+		cp -rf $serverPath/source/tidb/${tidb_name}/* $serverPath/tidb/mirror
+	fi
+
+	cd $serverPath/tidb/mirror && ./local_install.sh
 
 	if [ -d $serverPath/tidb ];then
 		echo "${VERSION}" > $serverPath/tidb/version.pl
