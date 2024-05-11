@@ -2032,8 +2032,6 @@ location ^~ {from} {\n\
 
         conf_proxy = "{}/{}.conf".format(self.getProxyPath(_siteName), _id)
         conf_bk = "{}/{}.conf.txt".format(self.getProxyPath(_siteName), _id)
-
-        print(tpl)
         mw.writeFile(conf_proxy, tpl)
 
         rule_test = mw.checkWebConfig()
