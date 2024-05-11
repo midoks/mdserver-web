@@ -2655,6 +2655,10 @@ location ^~ {from} {\n\
         mw.writeFile(rewrite_file, '')
 
     def add(self, webname, port, ps, path, version):
+        site_root_dir = mw.getWwwDir()
+        if site_root_dir == path.rstrip('/'):
+            return mw.returnJson(False, '不要以网站根目录创建站点!')
+
         siteMenu = json.loads(webname)
         self.siteName = self.toPunycode(
             siteMenu['domain'].strip().split(':')[0]).strip()
