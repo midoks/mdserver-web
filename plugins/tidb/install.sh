@@ -7,10 +7,25 @@ rootPath=$(dirname "$curPath")
 rootPath=$(dirname "$rootPath")
 serverPath=$(dirname "$rootPath")
 
+sysName=`uname`
+sysArch=`arch`
+echo "use system: ${sysName}"
+
 # https://docs.pingcap.com/zh/tidb/stable/quick-start-with-tidb
+
+# cd /Users/midoks/Desktop/mwdev/server/mdserver-web/plugins/tidb && bash install.sh install v7.5.1
+# cd /www/server/mdserver-web/plugins/tidb && bash install.sh install v7.5.1
 
 install_tmp=${rootPath}/tmp/mw_install.pl
 VERSION=$2
+TIDB_ARCH=arm64
+if [ "$sysArch" == "x86_64" ];then
+	TIDB_ARCH=amd
+fi
+
+if [ "$sysArch" == "aarch64" ];then
+	TIDB_ARCH=arm64
+fi
 
 Install_App()
 {
@@ -18,7 +33,7 @@ Install_App()
 	mkdir -p $serverPath/source
 	mkdir -p $serverPath/source/tidb
 
-	app_name=tidb-community-server-${VERSION}-linux-arm64.tar.gz
+	app_name=tidb-community-server-${VERSION}-linux-${TIDB_ARCH}.tar.gz
 
 	if [ ! -f $serverPath/source/tidb/${app_name} ];then
 		wget -O $serverPath/source/tidb/${app_name} https://download.pingcap.org/${app_name}
