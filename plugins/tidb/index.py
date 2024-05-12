@@ -162,16 +162,17 @@ def initDreplace():
     if not os.path.exists(dataLog):
         mw.execShell('chmod +x ' + file_bin)
 
-    # config replace
-    dst_conf = getServerDir() + '/tidb.conf'
-    dst_conf_init = getServerDir() + '/init.pl'
-    if not os.path.exists(dst_conf_init):
-        conf_content = mw.readFile(getConfTpl())
-        conf_content = conf_content.replace('{$SERVER_PATH}', service_path)
-        conf_content = conf_content.replace(
-            '{$REDIS_PASS}', mw.getRandomString(10))
 
-        mw.writeFile(dst_conf, conf_content)
+    conf_list = ['tidb.conf', 'tidb.yaml']
+    dst_conf_init = getServerDir() + '/init.pl'
+    if os.path.exists(dst_conf_init):
+        for conf in conf_list:
+            dst_conf = getServerDir() + '/'+ conf
+            src_conf = getPluginDir() + '/conf/'+ conf
+            if not os.path.exists(dst_conf):
+                content = mw.readFile(src_conf)
+                content = content.replace('{$SERVER_PATH}', service_path)
+                mw.writeFile(dst_conf, content)
         mw.writeFile(dst_conf_init, 'ok')
 
     # systemd
