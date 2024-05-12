@@ -21,6 +21,8 @@ echo "use system: ${sysName}"
 
 # tiup cluster deploy tidb v7.5.1 /www/server/tidb/tidb.yaml --user root -i /root/.ssh/id_rsa
 # tiup cluster deploy tidb v7.5.1 /www/server/tidb/tidb.yaml --user root -p
+# source /root/.bashrc
+
 # ssh 192.168.4.1 -l root
 # useradd -d /home/tidb1 tidb1 && passwd tidb1
 
