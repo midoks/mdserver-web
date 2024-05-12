@@ -119,16 +119,16 @@ def getPidFile():
     return tmp.groups()[0].strip()
 
 def status():
-    pid_file = getPidFile()
-    if not os.path.exists(pid_file):
-        return 'stop'
+    # pid_file = getPidFile()
+    # if not os.path.exists(pid_file):
+    #     return 'stop'
 
     # data = mw.execShell(
     #     "ps aux|grep redis |grep -v grep | grep -v python | grep -v mdserver-web | awk '{print $2}'")
 
     # if data[0] == '':
     #     return 'stop'
-    return 'start'
+    return 'stop'
 
 def contentReplace(content):
     service_path = mw.getServerDir()

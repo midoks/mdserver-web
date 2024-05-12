@@ -19,8 +19,10 @@ echo "use system: ${sysName}"
 
 # cd /www/server/source/tidb/tidb-community-server-v7.5.1-linux-amd64 && ./local_install.sh
 
-# tiup cluster deploy tidb v7.5.1 /www/server/tidb/tidb.yaml --user root -p -i /root/.ssh/id_rsa
+# tiup cluster deploy tidb v7.5.1 /www/server/tidb/tidb.yaml --user root -i /root/.ssh/id_rsa
+# tiup cluster deploy tidb v7.5.1 /www/server/tidb/tidb.yaml --user root -p
 # ssh 192.168.4.1 -l root
+# useradd -d /home/tidb1 tidb1 && passwd tidb1
 
 install_tmp=${rootPath}/tmp/mw_install.pl
 VERSION=$2
