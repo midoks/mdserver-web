@@ -2213,8 +2213,18 @@ function wsTableLogRequest(page){
         "12":"其他",
     }
 
+    var req_status = $('#logs_search').attr('req');
+    // console.log(req_status);
+    if (typeof(req_status) != 'undefined'){
+        if (req_status == 'start'){
+            layer.msg("正在请求中,请稍候!");
+            return;
+        }
+    }
 
+    $('#logs_search').attr('req','start');
     wsPostCallbak('get_logs_list', '' ,args, function(rdata){
+        $('#logs_search').attr('req','end');
         var rdata = $.parseJSON(rdata.data);
         var list = '';
         var data = rdata.data.data;
@@ -2266,22 +2276,6 @@ function wsTableLogRequest(page){
                         <div id="wsPage" class="dataTables_paginate paging_bootstrap page"></div>';
         $('#ws_table').html(table);
         $('#wsPage').html(rdata.data.page);
-
-        $('input[name="ip"]').bind('focus', function(e){
-            $(this).keyup(function(e){
-                if(e.keyCode == 13) {
-                    wsTableLogRequest(1);
-                }
-            });
-        });
-
-        $('input[name="search_uri"]').bind('focus', function(e){
-            $(this).keyup(function(e){
-                if(e.keyCode == 13) {
-                    wsTableLogRequest(1);
-                }
-            });
-        });
 
         $(".tablescroll .details").click(function(){
             var index = $(this).attr('data-id');
@@ -2443,6 +2437,22 @@ var html = '<div>\
                 <div class="divtable mtb10" id="ws_table"></div>\
             </div>';
 $(".soft-man-con").html(html);
+
+$('input[name="ip"]').bind('focus', function(e){
+    $(this).keyup(function(e){
+        if(e.keyCode == 13) {
+            wsTableLogRequest(1);
+        }
+    });
+});
+
+$('input[name="search_uri"]').bind('focus', function(e){
+    $(this).keyup(function(e){
+        if(e.keyCode == 13) {
+            wsTableLogRequest(1);
+        }
+    });
+});
 
 //日期范围
 laydate.render({
