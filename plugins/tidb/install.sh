@@ -18,13 +18,35 @@ echo "use system: ${sysName}"
 # mw update_dev && cd /www/server/mdserver-web/plugins/tidb && bash install.sh install v7.5.1
 # python3 /www/server/mdserver-web/plugins/tidb/index.py start
 # cd /www/server/source/tidb/tidb-community-server-v7.5.1-linux-amd64 && ./local_install.sh
-
-# tiup cluster deploy tidb v7.5.1 /www/server/tidb/tidb.yaml --user root -i /root/.ssh/id_rsa
-# tiup cluster deploy tidb v7.5.1 /www/server/tidb/tidb.yaml --user root -p
+# cd /www/server/tidb/mirror && ./local_install.sh
 # source /root/.bashrc
 
 # ssh 192.168.4.1 -l root
 # useradd -d /home/tidb1 tidb1 && passwd tidb1
+
+# tidb ssh
+# /root/.tiup/storage/cluster/clusters/tidb/ssh
+
+# ssh-copy-id -p 2022 root@154.21.203.138
+# ssh -p 2022 root@154.21.203.138 -i /root/.tiup/storage/cluster/clusters/tidb/ssh/id_rsa
+
+# grafana
+# http://154.21.203.138:3000
+
+# grafana
+# http://154.21.203.138:3000
+
+# rm -rf /root/.tiup
+# tiup cluster deploy tidb v7.5.1 /www/server/tidb/tidb.yaml --user root -p
+# tiup cluster deploy mw v7.5.1 /www/server/tidb/tidb.yaml --user root -p
+
+# tiup cluster clean tidb --all
+# tiup cluster display tidb
+# tiup cluster destroy tidb
+
+# tiup cluster clean tidb --all --ignore-role prometheus grafana
+
+
 
 install_tmp=${rootPath}/tmp/mw_install.pl
 VERSION=$2
