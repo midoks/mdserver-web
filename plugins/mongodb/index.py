@@ -487,19 +487,13 @@ def runDocInfo():
 def runReplInfo():
     client = mongdbClient()
     db = client.admin
-
+    result = {}
     try:
         serverStatus = db.command('serverStatus')
     except Exception as e:
         return mw.returnJson(False, str(e))
 
-    try:
-        replStatus = db.command('replSetGetStatus')
-    except Exception as e:
-        return mw.returnJson(False, str(e))
-
     d = getConfigData()
-    result = {}
     if 'replication' in d and 'replSetName' in d['replication']:
         result['repl_name'] = d['replication']['replSetName']
 
@@ -522,17 +516,21 @@ def runReplInfo():
         hosts = mw.getDefault(repl,'hosts', '') 
         result['hosts'] = ','.join(hosts)
 
-    members_list = []
-    if 'members' in replStatus:
-        members = replStatus['members']
-        for m in members:
-            t = {}
-            t['name'] = m['name']
-            t['stateStr'] = m['stateStr']
-            t['uptime'] = m['uptime']
-            members_list.append(t)
-    result['members'] = members_list
-    
+    result['members'] = []
+    try:
+        replStatus = db.command('replSetGetStatus')
+        if 'members' in replStatus:
+            members = replStatus['members']
+            for m in members:
+                t = {}
+                t['name'] = m['name']
+                t['stateStr'] = m['stateStr']
+                t['uptime'] = m['uptime']
+                members_list.append(t)
+        result['members'] = members_list
+    except Exception as e:
+        pass
+        
     return mw.returnJson(True, 'OK', result)
 
 def getDbList():
