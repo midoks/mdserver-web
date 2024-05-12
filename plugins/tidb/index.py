@@ -165,7 +165,7 @@ def initDreplace():
 
     conf_list = ['tidb.conf', 'tidb.yaml']
     dst_conf_init = getServerDir() + '/init.pl'
-    if os.path.exists(dst_conf_init):
+    if not os.path.exists(dst_conf_init):
         for conf in conf_list:
             dst_conf = getServerDir() + '/'+ conf
             src_conf = getPluginDir() + '/conf/'+ conf

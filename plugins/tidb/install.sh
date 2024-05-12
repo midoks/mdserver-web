@@ -16,7 +16,7 @@ echo "use system: ${sysName}"
 
 # cd /Users/midoks/Desktop/mwdev/server/mdserver-web/plugins/tidb && bash install.sh install v7.5.1
 # mw update_dev && cd /www/server/mdserver-web/plugins/tidb && bash install.sh install v7.5.1
-
+# python3 /www/server/mdserver-web/plugins/tidb/index.py start
 # cd /www/server/source/tidb/tidb-community-server-v7.5.1-linux-amd64 && ./local_install.sh
 
 # tiup cluster deploy tidb v7.5.1 /www/server/tidb/tidb.yaml --user root -i /root/.ssh/id_rsa
