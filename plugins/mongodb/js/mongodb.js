@@ -162,7 +162,7 @@ function mongoReplStatus() {
 		var tbody_members = '';
 		var member_list = rdata['members'];
 		for (var i = 0; i < member_list.length; i++) {
-			tbody_members += '<tr><th>'+member_list['name']+'</th><td>' + member_list[i]['stateStr'] + '</td><td>'+member_list[i]['uptime']+'</td></tr>';
+			tbody_members += '<tr><th>'+member_list[i]['name']+'</th><td>' + member_list[i]['stateStr'] + '</td><td>'+member_list[i]['uptime']+'</td></tr>';
 		}
 
 		// console.log(rdata);
@@ -186,7 +186,7 @@ function mongoReplStatus() {
 				</table>\
 			</div>';
 
-		con += '<div class="divtable">\
+		con += '<div class="divtable" style="margin-top:5px;">\
 				<table class="table table-hover table-bordered" style="width: 660px;">\
 					<thead><th>IP</th><th>状态</th><th>在线</th></thead>\
 					<tbody>'+tbody_members+'<tbody>\
