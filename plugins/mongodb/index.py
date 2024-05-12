@@ -518,6 +518,7 @@ def runReplInfo():
 
     result['members'] = []
     try:
+        members_list = []
         replStatus = db.command('replSetGetStatus')
         if 'members' in replStatus:
             members = replStatus['members']
