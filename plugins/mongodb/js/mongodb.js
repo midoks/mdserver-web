@@ -1204,3 +1204,12 @@ function importDbExternal(file,name){
     });
 }
 
+function mgdbReadme(){
+    var readme = '<ul class="help-info-text c7">';
+    readme += '<li>认证同步说明</li>';
+    readme += '<li>root/用户,配置Key完全一致才能同步。</li>';
+    readme += '</ul>';
+
+    $('.soft-man-con').html(readme);   
+}
+
