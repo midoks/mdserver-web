@@ -18,7 +18,6 @@ if mw.isAppleSystem():
 
 
 # /usr/lib/systemd/system/mongod.service
-# /var/lib/mongo
 
 # python3 /www/server/mdserver-web/plugins/mongodb/index.py repl_init 
 # python3 /www/server/mdserver-web/plugins/mongodb/index.py run_repl_info
@@ -494,6 +493,11 @@ def runReplInfo():
     except Exception as e:
         return mw.returnJson(False, str(e))
 
+    try:
+        replStatus = db.command('replSetGetStatus')
+    except Exception as e:
+        return mw.returnJson(False, str(e))
+
     d = getConfigData()
     result = {}
     if 'replication' in d and 'replSetName' in d['replication']:
@@ -518,6 +522,16 @@ def runReplInfo():
         hosts = mw.getDefault(repl,'hosts', '') 
         result['hosts'] = ','.join(hosts)
 
+    members_list = []
+    if 'members' in replStatus:
+        members = replStatus['members']
+        for m in members:
+            t = {}
+            t['name'] = m['name']
+            t['stateStr'] = m['stateStr']
+            t['uptime'] = m['uptime']
+            members_list.append(t)
+    result['members'] = members_list
     
     return mw.returnJson(True, 'OK', result)
 
@@ -1010,10 +1024,6 @@ def replSetNode():
     nodes = c['nodes']
     add_node = args['node'].strip()
     idx = int(args['idx'])
-
-
-
-
 
     priority = -1
     if 'priority' in  args:

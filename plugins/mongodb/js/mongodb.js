@@ -159,6 +159,12 @@ function mongoReplStatus() {
 					<tr><th>me</th><td>' + rdata.me + '</td><td>本机</td></tr>';
 		}
 
+		var tbody_members = '';
+		var member_list = rdata['members'];
+		for (var i = 0; i < member_list.length; i++) {
+			tbody_members += '<tr><th>'+member_list['name']+'</th><td>' + member_list[i]['stateStr'] + '</td><td>'+member_list[i]['uptime']+'</td></tr>';
+		}
+
 		// console.log(rdata);
 		var repl_on = 'btn-danger';
 		var repl_on_title = '未开启';
@@ -176,9 +182,14 @@ function mongoReplStatus() {
         con += '<div class="divtable">\
 				<table class="table table-hover table-bordered" style="width: 660px;">\
 					<thead><th>字段</th><th>当前值</th><th>说明</th></thead>\
-					<tbody>\
-						'+tbody+'\
-					<tbody>\
+					<tbody>'+tbody+'<tbody>\
+				</table>\
+			</div>';
+
+		con += '<div class="divtable">\
+				<table class="table table-hover table-bordered" style="width: 660px;">\
+					<thead><th>IP</th><th>状态</th><th>在线</th></thead>\
+					<tbody>'+tbody_members+'<tbody>\
 				</table>\
 			</div>';
 
