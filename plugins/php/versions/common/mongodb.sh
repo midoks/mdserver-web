@@ -18,7 +18,7 @@ actionType=$1
 version=$2
 
 if [ "$version" -ge '74' ];then
-	LIBV=1.18.1
+	LIBV=1.19.0
 fi
 
 if [ "$version" == '71' ];then
