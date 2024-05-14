@@ -3088,13 +3088,16 @@ def syncDatabaseRepair(version=''):
             primary_key_sql = "SHOW INDEX FROM "+table_name+" WHERE Key_name = 'PRIMARY';";
             primary_key_data = local_db.query(primary_key_sql)
             pkey_name = primary_key_data[0]['Column_name']
+
+            if os.path.exists(table_name_pos_file):
+                table_name_pos = mw.readFile(table_name_pos_file)
         
-            data_select_sql = 'select * from '+table_name + ' where '+pkey_name+' > '+str(table_name_pos)+' limit 1'
+            data_select_sql = 'select * from '+table_name + ' where '+pkey_name+' > '+str(table_name_pos)+' limit 1000'
             local_select_data = local_db.query(data_select_sql)
             sync_select_data = sync_db.query(data_select_sql)
 
-            print(local_select_data)
-            print(sync_select_data)
+            # print(local_select_data)
+            # print(sync_select_data)
             print(local_select_data == sync_select_data)
 
             if local_select_data == sync_select_data:
@@ -3103,6 +3106,9 @@ def syncDatabaseRepair(version=''):
                 pkey_val = local_select_data[data_count-1][pkey_name]
                 print(pkey_val)
                 mw.writeFile(table_name_pos_file, str(pkey_val))
+            else:
+                print(local_select_data)
+                print(sync_select_data)
 
             time.sleep(1)
 
