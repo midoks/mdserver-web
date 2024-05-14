@@ -3083,8 +3083,8 @@ def syncDatabaseRepair(version=''):
 
     # inconsistent_table = ['99cms.mc_order']
     # 数据对齐
-    while True:
-        for table_name in inconsistent_table:
+    for table_name in inconsistent_table:
+        while True:
             print("正在校验表,"+table_name)
             table_name_pos = 0
             table_name_pos_file = tmp_dir+'/'+table_name+'.pos.txt'
@@ -3101,14 +3101,27 @@ def syncDatabaseRepair(version=''):
 
             # print(local_select_data)
             # print(sync_select_data)
-            # print(local_select_data == sync_select_data)
+            
+            is_break = False
+            # print(len(local_select_data))
+            # print(len(sync_select_data))
+            print(local_select_data == sync_select_data)
 
             if local_select_data == sync_select_data:
                 data_count = len(local_select_data)
                 if data_count == 0:
                     print(table_name+"完全一致..")
+                    is_break = True
                     break
-                # print(data_count)
+
+                cmd_count_sql = 'select count(*) as num from '+table_name
+                local_count_data = local_db.query(cmd_count_sql)
+                sync_count_data = sync_db.query(cmd_count_sql)
+
+                if local_count_data[0]['num'] == sync_count_data[0]['num']:
+                    is_break = True
+                    break
+                print(table_name,data_count)
                 print(table_name,local_select_data[data_count-1][pkey_name])
                 pkey_val = local_select_data[data_count-1][pkey_name]
                 # print(pkey_val)
@@ -3137,12 +3150,11 @@ def syncDatabaseRepair(version=''):
 
                 # print(local_select_data)
                 # print(sync_select_data)
-                print(len(local_select_data))
-                print(len(sync_select_data))
+                
 
+            if is_break:
+                break
             time.sleep(1)
-
-
 
     print(inconsistent_table)
     return True
