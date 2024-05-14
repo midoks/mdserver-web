@@ -3070,6 +3070,7 @@ def doFullSyncUser(version=''):
     else:
         data = conn.field('ip,port,user,pass,mode,cmd').find()
 
+    # print(data)
     user = data['user']
     apass = data['pass']
     port = data['port']
@@ -3098,18 +3099,25 @@ def doFullSyncUser(version=''):
 
     # --force --opt --single-transaction
     if not os.path.exists(bak_file):
-        dump_sql_data = getServerDir() + "/bin/mysqldump " + dmp_option + "  --skip-opt --create-options --default-character-set=utf8 -h" + ip + " -P" + \
-            port + " -u" + user + " -p'" + apass + \
-            "' --ssl-mode=DISABLED " + sync_db + " > " + bak_file
+        # 不锁表导出
+        dump_sql_data = getServerDir() + "/bin/mysqldump " + dmp_option + " --skip-opt --create-options --default-character-set=utf8 -h" + ip + " -P" + \
+            port + " -u" + user + " -p'" + apass + "' --ssl-mode=DISABLED " + sync_db + " > " + bak_file
         print(dump_sql_data)
         mw.execShell(dump_sql_data)
-
-
     
     writeDbSyncStatus({'code': 3, 'msg': '正在到本地导入数据中...', 'progress': 40})
+
     if os.path.exists(bak_file):
         # 重置 
         db.execute('reset master')
+
+        # 不锁表，需要删除数据表
+        tables = db.query('show tables from `%s`' % sync_db_import)
+        table_key = "Tables_in_" + sync_db_import
+        for tname in tables:
+            drop_db_cmd = 'drop table if exists '+sync_db_import+'.'+tname[table_key]
+            # print(drop_db_cmd)
+            db.query(drop_db_cmd)
 
         pwd = pSqliteDb('config').where('id=?', (1,)).getField('mysql_root')
         sock = getSocketFile()
