@@ -3097,7 +3097,7 @@ def doFullSyncUser(version=''):
     writeDbSyncStatus({'code': 2, 'msg': '远程导出数据...', 'progress': 20})
 
     if not os.path.exists(bak_file):
-        dump_sql_data = getServerDir() + "/bin/mysqldump " + dmp_option + "  --force --opt --default-character-set=utf8 --single-transaction -h" + ip + " -P" + \
+        dump_sql_data = getServerDir() + "/bin/mysqldump " + dmp_option + "  --skip-opt --create-options --default-character-set=utf8 --single-transaction -h" + ip + " -P" + \
             port + " -u" + user + " -p'" + apass + \
             "' --ssl-mode=DISABLED " + sync_db + " > " + bak_file
         print(dump_sql_data)
