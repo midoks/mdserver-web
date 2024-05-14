@@ -3084,7 +3084,10 @@ def syncDatabaseRepair(version=''):
     # inconsistent_table = ['99cms.mc_order']
     # 数据对齐
     for table_name in inconsistent_table:
-        while True:
+        is_break = False
+        if table_name == '99cms.mc_guest':
+            continue
+        while not is_break:
             print("正在校验表,"+table_name)
             table_name_pos = 0
             table_name_pos_file = tmp_dir+'/'+table_name+'.pos.txt'
@@ -3102,7 +3105,6 @@ def syncDatabaseRepair(version=''):
             # print(local_select_data)
             # print(sync_select_data)
             
-            is_break = False
             # print(len(local_select_data))
             # print(len(sync_select_data))
             print(local_select_data == sync_select_data)
@@ -3117,12 +3119,12 @@ def syncDatabaseRepair(version=''):
                 cmd_count_sql = 'select count(*) as num from '+table_name
                 local_count_data = local_db.query(cmd_count_sql)
                 sync_count_data = sync_db.query(cmd_count_sql)
-
+                print(local_count_data,sync_count_data)
                 if local_count_data[0]['num'] == sync_count_data[0]['num']:
                     is_break = True
                     break
-                print(table_name,data_count)
-                print(table_name,local_select_data[data_count-1][pkey_name])
+                # print(table_name,data_count)
+                print('pos',local_select_data[data_count-1][pkey_name])
                 pkey_val = local_select_data[data_count-1][pkey_name]
                 # print(pkey_val)
                 mw.writeFile(table_name_pos_file, str(pkey_val))
@@ -3153,6 +3155,7 @@ def syncDatabaseRepair(version=''):
                 
 
             if is_break:
+                print("break all")
                 break
             time.sleep(1)
 
