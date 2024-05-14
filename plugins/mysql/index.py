@@ -3018,6 +3018,58 @@ def dumpMysqlData(version=''):
     return 'fail'
 
 
+############### --- 重要 数据补足同步 ---- ###########
+
+def syncDatabaseRepair(version=''):
+    args = getArgs()
+    data = checkArgs(args, ['db','sign'])
+    if not data[0]:
+        return data[1]
+
+    sync_args_db = args['db']
+    sync_args_sign = args['sign']
+    conn = pSqliteDb('slave_sync_user')
+    if sync_args_sign != '':
+        data = conn.field('ip,port,user,pass,mode,cmd').where('ip=?', (sync_sign,)).find()
+    else:
+        data = conn.field('ip,port,user,pass,mode,cmd').find()
+
+    # print(data)
+    user = data['user']
+    apass = data['pass']
+    port = data['port']
+    ip = data['ip']
+
+    # 本地数据
+    local_db = pMysqlDb()
+
+    # 远程数据
+    sync_db = mw.getMyORM()
+    # MySQLdb |
+    sync_db.setPort(port)
+    sync_db.setHost(ip)
+    sync_db.setUser(user)
+    sync_db.setPwd(apass)
+    sync_db.setDbName(sync_args_db)
+
+    tables = local_db.query('show tables from `%s`' % sync_args_db)
+    table_key = "Tables_in_" + sync_args_db
+    for tb in tables:
+        table_name = sync_args_db+'.'+tb[table_key]
+
+        # 比较总数
+        cmd_count_sql = 'select count(*) as num from '+table_name
+        local_count_data = local_db.query(cmd_count_sql)
+        sync_count_data = sync_db.query(cmd_count_sql)
+
+        print(local_count_data,sync_count_data)
+
+
+
+    data = sync_db.query("select version()")
+    print(data)
+    return True
+
 ############### --- 重要 同步---- ###########
 
 def asyncTmpfile():
@@ -3028,6 +3080,7 @@ def asyncTmpfile():
 def writeDbSyncStatus(data):
     path = asyncTmpfile()
     mw.writeFile(path, json.dumps(data))
+    return True
 
 
 def doFullSync(version=''):
@@ -3516,5 +3569,7 @@ if __name__ == "__main__":
         print(doFullSync(version))
     elif func == 'dump_mysql_data':
         print(dumpMysqlData(version))
+    elif func == 'sync_database_repair':
+        print(syncDatabaseRepair())
     else:
         print('error')

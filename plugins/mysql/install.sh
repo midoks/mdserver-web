@@ -6,8 +6,9 @@ export PATH
 # https://www.cnblogs.com/whiteY/p/17331882.html
 
 # cd /www/server/mdserver-web/plugins/mysql && bash install.sh install 8.2
-# cd /www/server/mdserver-web && source bin/activate && python3 /www/server/mdserver-web/plugins/mysql/index.py try_slave_sync_bugfix {}
-# cd /www/server/mdserver-web && python3 /www/server/mdserver-web/plugins/mysql/index.py do_full_sync  {"db":"xxx","sign":"","begin":1}
+# cd /www/server/mdserver-web && source bin/activate && python3 plugins/mysql/index.py try_slave_sync_bugfix {}
+# cd /www/server/mdserver-web && python3 plugins/mysql/index.py do_full_sync  {"db":"xxx","sign":"","begin":1}
+# cd /www/server/mdserver-web && python3 plugins/mysql/index.py sync_database_repair  {"db":"xxx","sign":""} 
 curPath=`pwd`
 rootPath=$(dirname "$curPath")
 rootPath=$(dirname "$rootPath")
