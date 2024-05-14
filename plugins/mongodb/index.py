@@ -106,6 +106,9 @@ def getConfIp():
     data = getConfigData()
     return data['net']['bindIp']
 
+def getConfLocalIp():
+    return '127.0.0.1'
+
 def getConfPort():
     data = getConfigData()
     return data['net']['port']
@@ -185,7 +188,7 @@ def mongdbClientS():
     import pymongo
     port = getConfPort()
     auth = getConfAuth()
-    ip = getConfIp()
+    ip = getConfLocalIp()
     mg_root = pSqliteDb('config').where('id=?', (1,)).getField('mg_root')
 
     if auth == 'disabled':
@@ -199,7 +202,7 @@ def mongdbClient():
     import pymongo
     port = getConfPort()
     auth = getConfAuth()
-    ip = getConfIp()
+    ip = getConfLocalIp()
     mg_root = pSqliteDb('config').where('id=?', (1,)).getField('mg_root')
     # print(ip,port,auth,mg_root)
     if auth == 'disabled':
