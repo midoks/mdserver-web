@@ -3097,6 +3097,12 @@ def doFullSyncUser(version=''):
 
     writeDbSyncStatus({'code': 2, 'msg': '远程导出数据...', 'progress': 20})
 
+    # --master-data=2表示在dump过程中记录主库的binlog和pos点，并在dump文件中注释掉这一行
+    # --master-data=1表示在dump过程中记录主库的binlog和pos点，并在dump文件中不注释掉这一行，即恢复时会执行
+
+    # --dump-slave=2表示在dump过程中，在从库dump，mysqldump进程也要在从库执行，记录当时主库的binlog和pos点，并在dump文件中注释掉这一行
+    # --dump-slave=1表示在dump过程中，在从库dump，mysqldump进程也要在从库执行，记录当时主库的binlog和pos点，并在dump文件中不注释掉这一行
+
     # --force --opt --single-transaction
     if not os.path.exists(bak_file):
         # 不锁表导出
