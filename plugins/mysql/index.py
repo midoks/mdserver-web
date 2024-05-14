@@ -3117,7 +3117,7 @@ def doFullSyncUser(version=''):
         # 重置 
         # db.execute('reset master')
 
-        # 不锁表，需要删除数据表
+        # 不锁表，需要删除原来数据表
         tables = db.query('show tables from `%s`' % sync_db_import)
         table_key = "Tables_in_" + sync_db_import
         for tname in tables:
