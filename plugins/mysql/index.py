@@ -3109,7 +3109,7 @@ def doFullSyncUser(version=''):
 
     if os.path.exists(bak_file):
         # 重置 
-        db.execute('reset master')
+        # db.execute('reset master')
 
         # 不锁表，需要删除数据表
         tables = db.query('show tables from `%s`' % sync_db_import)
