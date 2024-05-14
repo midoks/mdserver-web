@@ -22,6 +22,7 @@ class ORM:
     __DB_CHARSET = "utf8"
 
     def __Conn(self):
+        # print(self.__DB_HOST, self.__DB_USER)
         '''连接数据库'''
         try:
 
@@ -37,7 +38,7 @@ class ORM:
                                                     database=self.__DB_NAME,
                                                     port=int(self.__DB_PORT), charset=self.__DB_CHARSET, connect_timeout=1,
                                                     cursorclass=pymysql.cursors.DictCursor)
-            else if os.path.exists(self.__DB_SOCKET):
+            elif os.path.exists(self.__DB_SOCKET):
                 try:
                     self.__DB_CONN = pymysql.connect(host=self.__DB_HOST, user=self.__DB_USER, passwd=self.__DB_PASS,
                                                      database=self.__DB_NAME,

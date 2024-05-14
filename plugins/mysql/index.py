@@ -3054,6 +3054,7 @@ def syncDatabaseRepair(version=''):
 
     tables = local_db.query('show tables from `%s`' % sync_args_db)
     table_key = "Tables_in_" + sync_args_db
+    inconsistent_table = []
     for tb in tables:
         table_name = sync_args_db+'.'+tb[table_key]
 
@@ -3062,9 +3063,11 @@ def syncDatabaseRepair(version=''):
         local_count_data = local_db.query(cmd_count_sql)
         sync_count_data = sync_db.query(cmd_count_sql)
 
-        print(local_count_data,sync_count_data)
-
-
+        if local_count_data[0]['num'] != local_count_data[0]['num']:
+            inconsistent_table.append(table_name)
+        else:
+            print(table_name+', 正常OK')
+    print(inconsistent_table)
 
     data = sync_db.query("select version()")
     print(data)
