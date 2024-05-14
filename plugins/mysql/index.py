@@ -3065,6 +3065,7 @@ def syncDatabaseRepair(version=''):
 
         if local_count_data[0]['num'] != sync_count_data[0]['num']:
             inconsistent_table.append(table_name)
+            print(table_name+', 需要同步。')
         else:
             print(table_name+', 正常OK')
     print(inconsistent_table)
