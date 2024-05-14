@@ -3126,7 +3126,7 @@ def syncDatabaseRepair(version=''):
                         value_str = ''
                         for field in insert_data:
                             field_str += '`'+field+'`,'
-                            value_str += '\''+escape_string(insert_data[field])+'\','
+                            value_str += '\''+escape_string(str(insert_data[field]))+'\','
                         field_str = '(' +field_str.strip(',')+')'
                         value_str = '(' +value_str.strip(',')+')'
                         insert_sql = insert_sql+' '+field_str+' values'+value_str+';'
@@ -3143,15 +3143,7 @@ def syncDatabaseRepair(version=''):
 
 
 
-        
-
-
-
-
     print(inconsistent_table)
-
-    data = sync_db.query("select version()")
-    print(data)
     return True
 
 ############### --- 重要 同步---- ###########
