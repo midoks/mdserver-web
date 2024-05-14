@@ -3081,7 +3081,7 @@ def syncDatabaseRepair(version=''):
 
     # 数据对齐
     for table_name in inconsistent_table:
-        data_select_sql = 'select * from '+table_name + ' id > 0 limit 1'
+        data_select_sql = 'select * from '+table_name + ' where id > 0 limit 1'
         local_select_data = local_db.query(data_select_sql)
         sync_select_data = sync_db.query(data_select_sql)
 
