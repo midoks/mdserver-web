@@ -3080,6 +3080,7 @@ def syncDatabaseRepair(version=''):
             print(table_name+', 正常OK')
             mw.execShell("echo 'ok' > "+table_check_file)
 
+    # inconsistent_table = ['99cms.mc_telcode']
     # 数据对齐
     while True:
         for table_name in inconsistent_table:
@@ -3099,15 +3100,39 @@ def syncDatabaseRepair(version=''):
 
             # print(local_select_data)
             # print(sync_select_data)
-            print(local_select_data == sync_select_data)
+            # print(local_select_data == sync_select_data)
 
             if local_select_data == sync_select_data:
                 data_count = len(local_select_data)
+                if data_count == 0:
+                    break
+                print(data_count)
                 print(local_select_data[data_count-1][pkey_name])
                 pkey_val = local_select_data[data_count-1][pkey_name]
                 print(pkey_val)
                 mw.writeFile(table_name_pos_file, str(pkey_val))
             else:
+
+                for insert_data in sync_select_data:
+                    # print(insert_data)
+                    local_inquery_sql = 'select id from ' + table_name+ ' where ' +pkey_name+' = '+ str(insert_data[pkey_name])
+                    # print(local_inquery_sql)
+                    tdata = local_db.query(local_inquery_sql)
+                    if len(tdata) == 0:
+                        print("id:"+ str(insert_data[pkey_name])+ " 不存在,插入中")
+                        insert_sql = 'insert into ' + table_name
+                        field_str = ''
+                        value_str = ''
+                        for field in insert_data:
+                            field_str += '`'+field+'`,'
+                            value_str += '\''+str(insert_data[field])+'\','
+                        field_str = '(' +field_str.strip(',')+')'
+                        value_str = '(' +value_str.strip(',')+')'
+                        insert_sql = insert_sql+' '+field_str+' values'+value_str+';'
+                        print(insert_sql)
+                        r = local_db.query(insert_sql)
+                        print(r)
+
                 # print(local_select_data)
                 # print(sync_select_data)
                 print(len(local_select_data))
