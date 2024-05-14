@@ -3107,8 +3107,10 @@ def syncDatabaseRepair(version=''):
                 print(pkey_val)
                 mw.writeFile(table_name_pos_file, str(pkey_val))
             else:
-                print(local_select_data)
-                print(sync_select_data)
+                # print(local_select_data)
+                # print(sync_select_data)
+                print(len(local_select_data))
+                print(len(sync_select_data))
 
             time.sleep(1)
 
