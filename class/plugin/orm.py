@@ -25,7 +25,19 @@ class ORM:
         '''连接数据库'''
         try:
 
-            if os.path.exists(self.__DB_SOCKET):
+            if self.__DB_HOST != 'localhost':
+                try:
+                    self.__DB_CONN = pymysql.connect(host=self.__DB_HOST, user=self.__DB_USER, passwd=self.__DB_PASS,
+                                                    database=self.__DB_NAME,
+                                                    port=int(self.__DB_PORT), charset=self.__DB_CHARSET, connect_timeout=1,
+                                                    cursorclass=pymysql.cursors.DictCursor)
+                except Exception as e:
+                    self.__DB_HOST = '127.0.0.1'
+                    self.__DB_CONN = pymysql.connect(host=self.__DB_HOST, user=self.__DB_USER, passwd=self.__DB_PASS,
+                                                    database=self.__DB_NAME,
+                                                    port=int(self.__DB_PORT), charset=self.__DB_CHARSET, connect_timeout=1,
+                                                    cursorclass=pymysql.cursors.DictCursor)
+            else if os.path.exists(self.__DB_SOCKET):
                 try:
                     self.__DB_CONN = pymysql.connect(host=self.__DB_HOST, user=self.__DB_USER, passwd=self.__DB_PASS,
                                                      database=self.__DB_NAME,
