@@ -199,67 +199,66 @@ function mongoReplStatus() {
 
 //设置副本名称
 function mongoReplCfgReplSetName(){
-	mgPost('run_doc_info', '', '', function(rdata){
-		var rdata = $.parseJSON(rdata.data);
+	// <select class='bt-input-text mr5' name='replSetName' style='width:100px'><option value=''></option></select>
+    layer.open({
+        type: 1,
+        area: '300px',
+        title: '设置副本名称',
+        closeBtn: 1,
+        shift: 5,
+        shadeClose: false,
+        btn:["提交","关闭"],
+        content: "<form class='bt-form pd20' id='mod_pwd'>\
+                    <div class='line'>\
+                    <span class='tname'>同步副本名称</span>\
+                    <div class='info-r'>\
+                        <input class='bt-input-text mr5' name='replSetName' style='width:100px' />\
+                    </div>\
+                    </div>\
+                </form>",
 
-	    layer.open({
-	        type: 1,
-	        area: '300px',
-	        title: '设置副本名称',
-	        closeBtn: 1,
-	        shift: 5,
-	        shadeClose: false,
-	        btn:["提交","关闭"],
-	        content: "<form class='bt-form pd20' id='mod_pwd'>\
-	                    <div class='line'>\
-	                    <span class='tname'>同步副本</span>\
-	                    <div class='info-r'>\
-	                        <select class='bt-input-text mr5' name='replSetName' style='width:100px'>\
-	                            <option value=''></option>\
-	                        </select>\
-	                    </div>\
-	                    </div>\
-	                </form>",
+        success: function(){
+    		// // console.log(rdata);
+    		// var rlist = rdata['dbs'];
+    		// var dbs = [];
+    		// var selectHtml = '';
+    		// for (var i = 0; i < rlist.length; i++) {
+    		// 	// console.log(rlist[i]['db']);
+    		// 	var dbname = rlist[i]['db'];
 
-	        success: function(){
-        		// console.log(rdata);
-        		var rlist = rdata['dbs'];
-        		var dbs = [];
-        		var selectHtml = '';
-        		for (var i = 0; i < rlist.length; i++) {
-        			// console.log(rlist[i]['db']);
-        			var dbname = rlist[i]['db'];
+    		// 	if (['admin','local','config'].includes(dbname)){
+    		// 	} else {
+    		// 		dbs.push(dbname);
+    		// 	}
+    		// }
 
-        			if (['admin','local','config'].includes(dbname)){
-        			} else {
-        				dbs.push(dbname);
-        			}
-        		}
+    		// if (dbs.length == 0 ){
+    		// 	selectHtml += "<option value=''>无</option>";
+    		// }
 
-        		if (dbs.length == 0 ){
-        			selectHtml += "<option value=''>无</option>";
-        		}
+    		// for (index in dbs) {
+    		// 	selectHtml += "<option value='"+dbs[index]+"'>"+dbs[index]+"</option>";
+    		// }
 
-        		for (index in dbs) {
-        			selectHtml += "<option value='"+dbs[index]+"'>"+dbs[index]+"</option>";
-        		}
-
-        		$('select[name="replSetName"]').html(selectHtml);
-	        },
-	        yes:function(index){
-	        	var data = {};
-	            data['name'] = $('select[name=replSetName]').val();
-	            mgPost('repl_set_name', '',data, function(data){
-	                var rdata = $.parseJSON(data.data);
-	                showMsg(rdata.msg,function(){
-	                    if (rdata['status']){
-	                		layer.close(index);
-	                		mongoReplCfgInit();
-	                	}
-	                },{icon: rdata.status ? 1 : 2});   
-	            });
-	        }
-	    });
+    		// $('select[name="replSetName"]').html(selectHtml);
+        },
+        yes:function(index){
+        	var data = {};
+            data['name'] = $('input[name=replSetName]').val();
+            if (data['name'] == ''){
+            	layer.msg("副本名称不能为空");
+            	return;
+            }
+            mgPost('repl_set_name', '',data, function(data){
+                var rdata = $.parseJSON(data.data);
+                showMsg(rdata.msg,function(){
+                    if (rdata['status']){
+                		layer.close(index);
+                		mongoReplCfgInit();
+                	}
+                },{icon: rdata.status ? 1 : 2});   
+            });
+        }
     });
 }
 
