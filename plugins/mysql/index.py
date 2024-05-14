@@ -3081,7 +3081,7 @@ def syncDatabaseRepair(version=''):
             print(table_name+', 正常OK')
             mw.execShell("echo 'ok' > "+table_check_file)
 
-    # inconsistent_table = ['99cms.mc_telcode']
+    # inconsistent_table = ['99cms.mc_order']
     # 数据对齐
     while True:
         for table_name in inconsistent_table:
@@ -3106,11 +3106,12 @@ def syncDatabaseRepair(version=''):
             if local_select_data == sync_select_data:
                 data_count = len(local_select_data)
                 if data_count == 0:
+                    print(table_name+"完全一致..")
                     break
-                print(data_count)
-                print(local_select_data[data_count-1][pkey_name])
+                # print(data_count)
+                print(table_name,local_select_data[data_count-1][pkey_name])
                 pkey_val = local_select_data[data_count-1][pkey_name]
-                print(pkey_val)
+                # print(pkey_val)
                 mw.writeFile(table_name_pos_file, str(pkey_val))
             else:
 
@@ -3131,7 +3132,7 @@ def syncDatabaseRepair(version=''):
                         value_str = '(' +value_str.strip(',')+')'
                         insert_sql = insert_sql+' '+field_str+' values'+value_str+';'
                         print(insert_sql)
-                        r = local_db.query(insert_sql)
+                        r = local_db.execute(insert_sql)
                         print(r)
 
                 # print(local_select_data)
