@@ -63,12 +63,12 @@ def getArgs():
         if t.strip() == '':
             tmp = []
         else:
-            t = t.split(':', 1)
+            t = t.split(':',1)
             tmp[t[0]] = t[1]
         tmp[t[0]] = t[1]
     elif args_len > 1:
         for i in range(len(args)):
-            t = args[i].split(':', 1)
+            t = args[i].split(':',1)
             tmp[t[0]] = t[1]
     return tmp
 
@@ -3104,9 +3104,10 @@ def doFullSyncUser(version=''):
     # --dump-slave=1表示在dump过程中，在从库dump，mysqldump进程也要在从库执行，记录当时主库的binlog和pos点，并在dump文件中不注释掉这一行
 
     # --force --opt --single-transaction
+    # --skip-opt --create-options
     if not os.path.exists(bak_file):
         # 不锁表导出
-        dump_sql_data = getServerDir() + "/bin/mysqldump " + dmp_option + " --single-transaction -q -R --skip-opt --create-options --default-character-set=utf8mb4 -h" + ip + " -P" + \
+        dump_sql_data = getServerDir() + "/bin/mysqldump " + dmp_option + " --single-transaction --default-character-set=utf8mb4 -h" + ip + " -P" + \
             port + " -u" + user + " -p'" + apass + "' --ssl-mode=DISABLED " + sync_db + " > " + bak_file
         print(dump_sql_data)
         mw.execShell(dump_sql_data)
