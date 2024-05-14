@@ -3068,6 +3068,19 @@ def syncDatabaseRepair(version=''):
             print(table_name+', 需要同步。')
         else:
             print(table_name+', 正常OK')
+
+    # 数据对齐
+    for table_name in inconsistent_table:
+        data_select_sql = 'select * from '+table_name + ' id > 0 limit 1'
+        local_select_data = local_db.query(data_select_sql)
+        sync_select_data = sync_db.query(data_select_sql)
+
+        print(local_select_data)
+        print(sync_select_data)
+
+
+
+
     print(inconsistent_table)
 
     data = sync_db.query("select version()")
