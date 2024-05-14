@@ -3055,8 +3055,17 @@ def syncDatabaseRepair(version=''):
     tables = local_db.query('show tables from `%s`' % sync_args_db)
     table_key = "Tables_in_" + sync_args_db
     inconsistent_table = []
+
+    tmp_dir = '/tmp/sync_db_repair'
+    mw.execShell('mkdir -p '+tmp_dir)
+
     for tb in tables:
         table_name = sync_args_db+'.'+tb[table_key]
+        table_check_file = tmp_dir+'/'+table_name+'.txt'
+
+        if os.path.exists(table_check_file):
+            print(table_name+', 已检查OK')
+            continue
 
         # 比较总数
         cmd_count_sql = 'select count(*) as num from '+table_name
@@ -3068,6 +3077,7 @@ def syncDatabaseRepair(version=''):
             print(table_name+', 需要同步。')
         else:
             print(table_name+', 正常OK')
+            mw.execShell("echo 'ok' > "+table_check_file)
 
     # 数据对齐
     for table_name in inconsistent_table:
