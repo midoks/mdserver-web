@@ -3081,7 +3081,11 @@ def syncDatabaseRepair(version=''):
 
     # 数据对齐
     for table_name in inconsistent_table:
-        data_select_sql = 'select * from '+table_name + ' where id > 0 limit 1'
+        primary_key_sql = "SHOW INDEX FROM "+table_name+" WHERE Key_name = 'PRIMARY';";
+        primary_key_data = local_db.query(primary_key_sql)
+        pkey_name = primary_key_data[0]['Column_name']
+        data_select_sql = 'select * from '+table_name + ' where '+pkey_name+' > 0 limit 1'
+        print(data_select_sql)
         local_select_data = local_db.query(data_select_sql)
         sync_select_data = sync_db.query(data_select_sql)
 
