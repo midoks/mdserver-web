@@ -3063,7 +3063,7 @@ def syncDatabaseRepair(version=''):
         local_count_data = local_db.query(cmd_count_sql)
         sync_count_data = sync_db.query(cmd_count_sql)
 
-        if local_count_data[0]['num'] != local_count_data[0]['num']:
+        if local_count_data[0]['num'] != sync_count_data[0]['num']:
             inconsistent_table.append(table_name)
         else:
             print(table_name+', 正常OK')
