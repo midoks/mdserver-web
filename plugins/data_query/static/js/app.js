@@ -738,6 +738,10 @@ function mongodbInitField(f, data){
         }
         mongodbDataList(1);
     });
+
+    $('#mongodb .mongodb_refresh').unbind('click').click(function(){
+        mongodbDataList(1);
+    });
 }
 
 var mogodb_db_list;
