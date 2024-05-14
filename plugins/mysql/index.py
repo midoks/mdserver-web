@@ -3104,9 +3104,12 @@ def doFullSyncUser(version=''):
         print(dump_sql_data)
         mw.execShell(dump_sql_data)
 
+    # 重置 
+    db.execute('reset master')
     
     writeDbSyncStatus({'code': 3, 'msg': '正在到本地导入数据中...', 'progress': 40})
     if os.path.exists(bak_file):
+
         pwd = pSqliteDb('config').where('id=?', (1,)).getField('mysql_root')
         sock = getSocketFile()
         my_import_cmd = getServerDir() + '/bin/mysql -S ' + sock + " -uroot -p'" + pwd + \
