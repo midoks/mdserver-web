@@ -3021,6 +3021,7 @@ def dumpMysqlData(version=''):
 ############### --- 重要 数据补足同步 ---- ###########
 
 def syncDatabaseRepair(version=''):
+    import pymysql
     args = getArgs()
     data = checkArgs(args, ['db','sign'])
     if not data[0]:
@@ -3125,7 +3126,7 @@ def syncDatabaseRepair(version=''):
                         value_str = ''
                         for field in insert_data:
                             field_str += '`'+field+'`,'
-                            value_str += '\''+str(insert_data[field])+'\','
+                            value_str += '\''+pymysql.escape_string(insert_data[field])+'\','
                         field_str = '(' +field_str.strip(',')+')'
                         value_str = '(' +value_str.strip(',')+')'
                         insert_sql = insert_sql+' '+field_str+' values'+value_str+';'
