@@ -3079,7 +3079,7 @@ def syncDatabaseRepair(version=''):
             diff = sync_count_data[0]['num'] - local_count_data[0]['num']
             print(table_name+', need sync. diff,'+str(diff))
         else:
-            print(table_name+', OK')
+            # print(table_name+', OK')
             mw.execShell("echo 'ok' > "+table_check_file)
 
     # inconsistent_table = ['xx.xx']
