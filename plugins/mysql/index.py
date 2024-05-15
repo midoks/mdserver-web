@@ -3326,10 +3326,10 @@ def doFullSyncUser(version=''):
 
     time.sleep(1)
     writeDbSyncStatus({'code': 1, 'msg': '正在停止从库...', 'progress': 15})
-    if version == '8.0':
-        db.query("stop slave user='{}' password='{}';".format(user, apass))
-    else:
-        db.query("stop slave")
+    # if version == '8.0':
+    #     db.query("stop slave user='{}' password='{}';".format(user, apass))
+    # else:
+    #     db.query("stop slave")
         
     time.sleep(2)
 
