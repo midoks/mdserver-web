@@ -3127,9 +3127,9 @@ def syncDatabaseRepair(version=''):
             sync_count_data = sync_db.query(cmd_count_sql)
             print(f'sync count data cos:{time.time() - time_s:.4f}s')
             print(local_count_data,sync_count_data)
-            # if local_count_data[0]['num'] == sync_count_data[0]['num']:
-            #     is_break = True
-            #     break
+            if local_count_data[0]['num'] == sync_count_data[0]['num']:
+                is_break = True
+                break
 
             diff = sync_count_data[0]['num'] - local_count_data[0]['num']
             print("diff," + str(diff)+' line data!')
@@ -3149,45 +3149,44 @@ def syncDatabaseRepair(version=''):
                 print('progress,%.2f' % progress+'%')
                 mw.writeFile(table_name_pos_file, str(pos))
             else:
-                if len(sync_select_data) == 0:
-                    continue
-                for idx in range(len(sync_select_data)):
-                    insert_data = sync_select_data[idx]
-                    # print(insert_data)
-                    local_inquery_sql = 'select '+pkey_name+' from ' + table_name+ ' where ' +pkey_name+' = '+ str(insert_data[pkey_name])
-                    # print(local_inquery_sql)
-                    tdata = local_db.query(local_inquery_sql)
-                    # print(tdata)
-                    if len(tdata) == 0:
-                        print("id:"+ str(insert_data[pkey_name])+ " no exists, insert")
-                        insert_sql = 'insert into ' + table_name
-                        field_str = ''
-                        value_str = ''
-                        for field in insert_data:
-                            field_str += '`'+field+'`,'
-                            value_str += '\''+escape_string(str(insert_data[field]))+'\','
-                        field_str = '(' +field_str.strip(',')+')'
-                        value_str = '(' +value_str.strip(',')+')'
-                        insert_sql = insert_sql+' '+field_str+' values'+value_str+';'
-                        print(insert_sql)
-                        r = local_db.execute(insert_sql)
-                        print(r)
-                    else:
-                        if sync_select_data[idx] == local_select_data[idx]:
-                            continue
-                        print("id:"+ str(insert_data[pkey_name])+ " data is not equal, update")
-                        update_sql = 'update ' + table_name
-                        field_str = ''
-                        value_str = ''
-                        for field in insert_data:
-                            if field == pkey_name:
+                if len(sync_select_data) != 0:
+                    for idx in range(len(sync_select_data)):
+                        insert_data = sync_select_data[idx]
+                        # print(insert_data)
+                        local_inquery_sql = 'select '+pkey_name+' from ' + table_name+ ' where ' +pkey_name+' = '+ str(insert_data[pkey_name])
+                        # print(local_inquery_sql)
+                        tdata = local_db.query(local_inquery_sql)
+                        # print(tdata)
+                        if len(tdata) == 0:
+                            print("id:"+ str(insert_data[pkey_name])+ " no exists, insert")
+                            insert_sql = 'insert into ' + table_name
+                            field_str = ''
+                            value_str = ''
+                            for field in insert_data:
+                                field_str += '`'+field+'`,'
+                                value_str += '\''+escape_string(str(insert_data[field]))+'\','
+                            field_str = '(' +field_str.strip(',')+')'
+                            value_str = '(' +value_str.strip(',')+')'
+                            insert_sql = insert_sql+' '+field_str+' values'+value_str+';'
+                            # print(insert_sql)
+                            r = local_db.execute(insert_sql)
+                            print(r)
+                        else:
+                            if sync_select_data[idx] == local_select_data[idx]:
                                 continue
-                            field_str += '`'+field+'`=\''+escape_string(str(insert_data[field]))+'\','
-                        field_str = field_str.strip(',')
-                        update_sql = update_sql+' set '+field_str+' where '+pkey_name+'=\''+str(insert_data[pkey_name])+'\';'
-                        print(update_sql)
-                        r = local_db.execute(update_sql)
-                        print(r)
+                            print("id:"+ str(insert_data[pkey_name])+ " data is not equal, update")
+                            update_sql = 'update ' + table_name
+                            field_str = ''
+                            value_str = ''
+                            for field in insert_data:
+                                if field == pkey_name:
+                                    continue
+                                field_str += '`'+field+'`=\''+escape_string(str(insert_data[field]))+'\','
+                            field_str = field_str.strip(',')
+                            update_sql = update_sql+' set '+field_str+' where '+pkey_name+'=\''+str(insert_data[pkey_name])+'\';'
+                            # print(update_sql)
+                            r = local_db.execute(update_sql)
+                            print(r)
             if is_break:
                 print("break all")
                 break
