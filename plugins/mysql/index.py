@@ -3087,6 +3087,7 @@ def syncDatabaseRepair(version=''):
     for table_name in inconsistent_table:
         is_break = False
         while not is_break:
+            local_db = pMysqlDb()
             print("check table:"+table_name)
             table_name_pos = 0
             table_name_pos_file = tmp_dir+'/'+table_name+'.pos.txt'
