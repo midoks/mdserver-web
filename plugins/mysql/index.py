@@ -3331,7 +3331,7 @@ def doFullSyncUser(version=''):
     # else:
     #     db.query("stop slave")
         
-    time.sleep(2)
+    time.sleep(1)
 
     writeDbSyncStatus({'code': 2, 'msg': '远程导出数据...', 'progress': 20})
 
@@ -3384,7 +3384,7 @@ def doFullSyncUser(version=''):
         #     print(r)
     r = db.query(cmd)
     print(r)
-    
+
     if version == '8.0':
         db.query("start slave user='{}' password='{}';".format(user, apass))
     else:
