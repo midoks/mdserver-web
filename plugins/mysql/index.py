@@ -3042,7 +3042,7 @@ def getSyncMysqlDB(dbname,sign = ''):
     return sync_db
 
 def syncDatabaseRepairTempFile():
-    tmp_log = '/tmp/t.log'
+    tmp_log = mw.getMWLogs()+ '/mysql-check.log'
     return tmp_log
 
 def syncDatabaseRepairLog(version=''):
@@ -3069,7 +3069,7 @@ def syncDatabaseRepairLog(version=''):
     if op == 'do':
         os.system(' echo "开始执行" > '+ tmp_log)
         subprocess.Popen(cmd +' >> '+ tmp_log +' &')
-        time.sleep(10)
+        # time.sleep(10)
         # mw.execShell('rm -rf '+tmp_log)
         return mw.returnJson(True, 'ok')
 
@@ -3119,6 +3119,7 @@ def syncDatabaseRepair(version=''):
             inconsistent_table.append(table_name)
             diff = sync_count_data[0]['num'] - local_count_data[0]['num']
             print(table_name+', need sync. diff,'+str(diff))
+            mw.writeFile(tmp_log, table_name+', need sync. diff,'+str(diff)+'\n','a+')
         else:
             print(table_name+' check ok.')
             mw.writeFile(tmp_log, table_name+' check ok.\n','a+')
@@ -3135,6 +3136,7 @@ def syncDatabaseRepair(version=''):
             sync_db.ping()
 
             print("check table:"+table_name)
+            mw.writeFile(tmp_log, "check table:"+table_name+'\n','a+')
             table_name_pos = 0
             table_name_pos_file = tmp_dir+'/'+table_name+'.pos.txt'
             primary_key_sql = "SHOW INDEX FROM "+table_name+" WHERE Key_name = 'PRIMARY';";
@@ -3152,6 +3154,7 @@ def syncDatabaseRepair(version=''):
             time_s = time.time()
             sync_select_data = sync_db.query(data_select_sql)
             print(f'sync query cos:{time.time() - time_s:.4f}s')
+            mw.writeFile(tmp_log, f'sync query cos:{time.time() - time_s:.4f}s\n','a+')
 
             # print(local_select_data)
             # print(sync_select_data)

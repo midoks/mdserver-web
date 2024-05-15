@@ -79,10 +79,11 @@ def getRootDir():
 def getPluginDir():
     return getRunDir() + '/plugins'
 
-
 def getPanelDataDir():
     return getRunDir() + '/data'
 
+def getMWLogs():
+    return getRunDir() + '/logs'
 
 def getPanelTmp():
     return getRunDir() + '/tmp'
