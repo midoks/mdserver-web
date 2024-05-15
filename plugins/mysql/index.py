@@ -2777,6 +2777,7 @@ def initSlaveStatus(version=''):
         return mw.returnJson(False, 'MySQL未启动', [])
 
     mode_file = getSyncModeFile()
+    # print(mode_file)
     if not os.path.exists(mode_file):
         return mw.returnJson(False, '需要先设置同步配置')
 
@@ -2864,8 +2865,9 @@ def initSlaveStatusSyncUser(version=''):
             pinfo = parseSlaveSyncCmd(cmd_sql)
         except Exception as e:
             return mw.returnJson(False, base_t + '->CMD同步命令不合规范!')
-        # print(u['cmd'])
+        # print(cmd_sql)
         t = pdb.query(cmd_sql)
+        # print(t)
         isError = isSqlError(t)
         if isError:
             return isError
