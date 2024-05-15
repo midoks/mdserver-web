@@ -3105,8 +3105,8 @@ def syncDatabaseRepair(version=''):
             # print(local_select_data)
             # print(sync_select_data)
             
-            # print(len(local_select_data))
-            # print(len(sync_select_data))
+            print(len(local_select_data))
+            print(len(sync_select_data))
             print(local_select_data == sync_select_data)
 
             if local_select_data == sync_select_data:
