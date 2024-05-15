@@ -3026,7 +3026,6 @@ def getSyncMysqlDB(dbname,sign = ''):
         data = conn.field('ip,port,user,pass,mode,cmd').where('ip=?', (sign,)).find()
     else:
         data = conn.field('ip,port,user,pass,mode,cmd').find()
-    print(data)
     user = data['user']
     apass = data['pass']
     port = data['port']
