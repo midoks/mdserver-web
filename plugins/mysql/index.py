@@ -3127,6 +3127,7 @@ def syncDatabaseRepair(version=''):
             sync_count_data = sync_db.query(cmd_count_sql)
             print(f'sync count data cos:{time.time() - time_s:.4f}s')
             print(local_count_data,sync_count_data)
+            # 数据同步有延迟，相等即任务数据补足完成
             if local_count_data[0]['num'] == sync_count_data[0]['num']:
                 is_break = True
                 break
