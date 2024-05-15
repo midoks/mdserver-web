@@ -3182,17 +3182,11 @@ def syncDatabaseRepair(version=''):
                         print(update_sql)
                         r = local_db.execute(update_sql)
                         print(r)
-                        
-
-
-                # print(local_select_data)
-                # print(sync_select_data)
-
             if is_break:
                 print("break all")
                 break
             time.sleep(3)
-    print(inconsistent_table)
+    print("data supplementation completed")
     mw.execShell('rm -rf  '+tmp_dir)
     return True
 
