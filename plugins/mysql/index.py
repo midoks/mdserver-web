@@ -3334,7 +3334,7 @@ def doFullSyncUser(version=''):
         dump_sql_data = getServerDir() + "/bin/mysqldump " + dmp_option + " --single-transaction --default-character-set=utf8mb4 -h" + ip + " -P" + \
             port + " -u" + user + " -p'" + apass + "' --ssl-mode=DISABLED " + sync_db + " > " + bak_file
         print(dump_sql_data)
-        mw.execShell(dump_sql_data)
+        # mw.execShell(dump_sql_data)
     
     writeDbSyncStatus({'code': 3, 'msg': '正在到本地导入数据中...', 'progress': 40})
 
@@ -3355,13 +3355,16 @@ def doFullSyncUser(version=''):
         my_import_cmd = getServerDir() + '/bin/mysql -S ' + sock + " -uroot -p'" + pwd + \
             "' " + sync_db_import + ' < ' + bak_file
         print(my_import_cmd)
-        mw.execShell(my_import_cmd)
+        # mw.execShell(my_import_cmd)
 
-        # 重设同步信息
+        # 修改同步位置
         master_info = sync_mdb.query('show master status')
-        print(master_info)
+        slave_info = db.query('show slave status')
+        # print(master_info)
+        # print(slave_info)
         if len(master_info)>0:
-            change_cmd = "CHANGE MASTER TO  MASTER_LOG_FILE='"+master_info[0]['File']+"', MASTER_LOG_POS="+str(master_info[0]['Position'])+" channel 'r1711438835';"
+            channel_name = slave_info[0]['Channel_Name']
+            change_cmd = "CHANGE MASTER TO  MASTER_LOG_FILE='"+master_info[0]['File']+"', MASTER_LOG_POS="+str(master_info[0]['Position'])+" for channel '"+channel_name+"';"
             print(change_cmd)
             r = db.execute(change_cmd)
             print(r)
