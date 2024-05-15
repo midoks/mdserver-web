@@ -30,7 +30,7 @@ class ORM:
                 try:
                     self.__DB_CONN = pymysql.connect(host=self.__DB_HOST, user=self.__DB_USER, passwd=self.__DB_PASS,
                                                     database=self.__DB_NAME,
-                                                    port=int(self.__DB_PORT), charset=self.__DB_CHARSET, connect_timeout=1,
+                                                    port=int(self.__DB_PORT), charset=self.__DB_CHARSET, connect_timeout=5,
                                                     cursorclass=pymysql.cursors.DictCursor)
                 except Exception as e:
                     self.__DB_HOST = '127.0.0.1'
