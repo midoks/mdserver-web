@@ -3039,8 +3039,8 @@ def getSyncMysqlDB(dbname,sign = ''):
     sync_db.setUser(user)
     sync_db.setPwd(apass)
     sync_db.setDbName(dbname)
+    sync_db.setTimeout(60)
     return sync_db
-
 
 def syncDatabaseRepair(version=''):
     from pymysql.converters import escape_string
