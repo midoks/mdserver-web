@@ -3083,7 +3083,7 @@ def syncDatabaseRepair(version=''):
             diff = sync_count_data[0]['num'] - local_count_data[0]['num']
             print(table_name+', need sync. diff,'+str(diff))
         else:
-            # print(table_name+', OK')
+            print('.')
             mw.execShell("echo 'ok' > "+table_check_file)
 
     # inconsistent_table = ['xx.xx']
@@ -3094,7 +3094,7 @@ def syncDatabaseRepair(version=''):
             local_db.ping()
             # 远程数据
             sync_db.ping()
-            
+
             print("check table:"+table_name)
             table_name_pos = 0
             table_name_pos_file = tmp_dir+'/'+table_name+'.pos.txt'
