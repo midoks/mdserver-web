@@ -3082,7 +3082,7 @@ def syncDatabaseRepair(version=''):
             print(table_name+', OK')
             mw.execShell("echo 'ok' > "+table_check_file)
 
-    # inconsistent_table = ['99cms.mc_read']
+    # inconsistent_table = ['xx.xx']
     # 数据对齐
     for table_name in inconsistent_table:
         is_break = False
