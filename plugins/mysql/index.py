@@ -3079,7 +3079,7 @@ def syncDatabaseRepair(version=''):
             diff = sync_count_data[0]['num'] - local_count_data[0]['num']
             print(table_name+', need sync. diff,'+str(diff))
         else:
-            # print(table_name+', 正常OK')
+            print(table_name+', OK')
             mw.execShell("echo 'ok' > "+table_check_file)
 
     # inconsistent_table = ['99cms.mc_read']
@@ -3179,14 +3179,13 @@ def syncDatabaseRepair(version=''):
 
                 # print(local_select_data)
                 # print(sync_select_data)
-                
 
             if is_break:
                 print("break all")
                 break
-            time.sleep(1)
-
+            time.sleep(3)
     print(inconsistent_table)
+    mw.execShell('rm -rf  '+tmp_dir)
     return True
 
 ############### --- 重要 同步---- ###########
