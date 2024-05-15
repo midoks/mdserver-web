@@ -3020,6 +3020,28 @@ def dumpMysqlData(version=''):
 
 ############### --- 重要 数据补足同步 ---- ###########
 
+def getSyncMysqlDB(dbname,sign = ''):
+    conn = pSqliteDb('slave_sync_user')
+    if sign != '':
+        data = conn.field('ip,port,user,pass,mode,cmd').where('ip=?', (sync_sign,)).find()
+    else:
+        data = conn.field('ip,port,user,pass,mode,cmd').find()
+    # print(data)
+    user = data['user']
+    apass = data['pass']
+    port = data['port']
+    ip = data['ip']
+    # 远程数据
+    sync_db = mw.getMyORM()
+    # MySQLdb |
+    sync_db.setPort(port)
+    sync_db.setHost(ip)
+    sync_db.setUser(user)
+    sync_db.setPwd(apass)
+    sync_db.setDbName(dbname)
+    return sync_db
+
+
 def syncDatabaseRepair(version=''):
     from pymysql.converters import escape_string
     args = getArgs()
@@ -3029,29 +3051,11 @@ def syncDatabaseRepair(version=''):
 
     sync_args_db = args['db']
     sync_args_sign = args['sign']
-    conn = pSqliteDb('slave_sync_user')
-    if sync_args_sign != '':
-        data = conn.field('ip,port,user,pass,mode,cmd').where('ip=?', (sync_sign,)).find()
-    else:
-        data = conn.field('ip,port,user,pass,mode,cmd').find()
-
-    # print(data)
-    user = data['user']
-    apass = data['pass']
-    port = data['port']
-    ip = data['ip']
-
+    
     # 本地数据
     local_db = pMysqlDb()
-
     # 远程数据
-    sync_db = mw.getMyORM()
-    # MySQLdb |
-    sync_db.setPort(port)
-    sync_db.setHost(ip)
-    sync_db.setUser(user)
-    sync_db.setPwd(apass)
-    sync_db.setDbName(sync_args_db)
+    sync_db = getSyncMysqlDB(sync_args_db,sync_args_sign)
 
     tables = local_db.query('show tables from `%s`' % sync_args_db)
     table_key = "Tables_in_" + sync_args_db
@@ -3088,6 +3092,8 @@ def syncDatabaseRepair(version=''):
         is_break = False
         while not is_break:
             local_db = pMysqlDb()
+            # 远程数据
+            sync_db = getSyncMysqlDB(sync_args_db,sync_args_sign)
             print("check table:"+table_name)
             table_name_pos = 0
             table_name_pos_file = tmp_dir+'/'+table_name+'.pos.txt'
