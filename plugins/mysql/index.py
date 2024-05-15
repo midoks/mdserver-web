@@ -3361,16 +3361,14 @@ def doFullSyncUser(version=''):
         print("export cos:", time_e - time_s)
 
         # 修改同步位置
-        master_info = sync_mdb.query('show master status')
-        slave_info = db.query('show slave status')
-        # print(master_info)
-        # print(slave_info)
-        if len(master_info)>0:
-            channel_name = slave_info[0]['Channel_Name']
-            change_cmd = "CHANGE MASTER TO  MASTER_LOG_FILE='"+master_info[0]['File']+"', MASTER_LOG_POS="+str(master_info[0]['Position'])+" for channel '"+channel_name+"';"
-            print(change_cmd)
-            r = db.execute(change_cmd)
-            print(r)
+        # master_info = sync_mdb.query('show master status')
+        # slave_info = db.query('show slave status')
+        # if len(master_info)>0:
+        #     channel_name = slave_info[0]['Channel_Name']
+        #     change_cmd = "CHANGE MASTER TO  MASTER_LOG_FILE='"+master_info[0]['File']+"', MASTER_LOG_POS="+str(master_info[0]['Position'])+" for channel '"+channel_name+"';"
+        #     print(change_cmd)
+        #     r = db.execute(change_cmd)
+        #     print(r)
 
     if version == '8.0':
         db.query("start slave user='{}' password='{}';".format(user, apass))
