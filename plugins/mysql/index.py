@@ -2395,9 +2395,15 @@ def getMasterRepSlaveUserCmd(version):
         channel_name = " for channel 'r{}';".format(sid)
 
     if mode == "gtid":
+        # sql = "CHANGE MASTER TO MASTER_HOST='" + ip + "', MASTER_PORT=" + port + ", MASTER_USER='" + \
+        #     clist[0]['username'] + "', MASTER_PASSWORD='" + \
+        #     clist[0]['password'] + "', MASTER_AUTO_POSITION=1" + channel_name
         sql = "CHANGE MASTER TO MASTER_HOST='" + ip + "', MASTER_PORT=" + port + ", MASTER_USER='" + \
-            clist[0]['username'] + "', MASTER_PASSWORD='" + \
-            clist[0]['password'] + "', MASTER_AUTO_POSITION=1" + channel_name
+            clist[0]['username']  + "', MASTER_PASSWORD='" + \
+            clist[0]['password'] + \
+            "', MASTER_LOG_FILE='" + mstatus[0]["File"] + \
+            "',MASTER_LOG_POS=" + str(mstatus[0]["Position"]) + channel_name
+            
         if version == '8.0':
             sql = "CHANGE REPLICATION SOURCE TO SOURCE_HOST='" + ip + "', SOURCE_PORT=" + port + ", SOURCE_USER='" + \
                 clist[0]['username']  + "', SOURCE_PASSWORD='" + \
