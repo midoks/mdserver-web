@@ -3357,6 +3357,8 @@ def doFullSyncUser(version=''):
             "' " + sync_db_import + ' < ' + bak_file
         print(my_import_cmd)
         mw.execShell(my_import_cmd)
+        time_e = time.time()
+        print("export cos:", time_e - time_s)
 
         # 修改同步位置
         master_info = sync_mdb.query('show master status')
