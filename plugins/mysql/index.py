@@ -3123,7 +3123,9 @@ def syncDatabaseRepair(version=''):
             
             cmd_count_sql = 'select count(*) as num from '+table_name
             local_count_data = local_db.query(cmd_count_sql)
+            time_s = time.time()
             sync_count_data = sync_db.query(cmd_count_sql)
+            print(f'sync count data cos:{time.time() - time_s:.4f}s')
             print(local_count_data,sync_count_data)
             # if local_count_data[0]['num'] == sync_count_data[0]['num']:
             #     is_break = True
