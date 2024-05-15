@@ -2979,18 +2979,21 @@ def setSlaveStatus(version=''):
 
     return mw.returnJson(True, '设置成功!')
 
-
-def deleteSlave(version=''):
-    args = getArgs()
+def deleteSlaveFunc(sign = ''):
     db = pMysqlDb()
-    if 'sign' in args:
-        sign = args['sign']
+    if sign !=  '':
         db.query("stop slave for channel '{}'".format(sign))
         db.query("reset slave all for channel '{}'".format(sign))
     else:
         db.query('stop slave')
         db.query('reset slave all')
 
+def deleteSlave(version=''):
+    args = getArgs()
+    sign = ''
+    if 'sign' in args:
+        sign = args['sign']
+    deleteSlaveFunc(sign)
     return mw.returnJson(True, '删除成功!')
 
 
@@ -3292,6 +3295,8 @@ def doFullSyncUser(version=''):
     sync_sign = args['sign']
 
     db = pMysqlDb()
+    # 重置
+    deleteSlaveFunc(sign)
 
     conn = pSqliteDb('slave_sync_user')
     if sync_sign != '':
@@ -3305,6 +3310,7 @@ def doFullSyncUser(version=''):
     apass = data['pass']
     port = data['port']
     ip = data['ip']
+    cmd = data['cmd']
 
     sync_mdb = getSyncMysqlDB(sync_db,sync_sign)
 
@@ -3376,12 +3382,16 @@ def doFullSyncUser(version=''):
         #     print(change_cmd)
         #     r = db.execute(change_cmd)
         #     print(r)
-
+    r = db.query(cmd)
+    print(r)
+    
     if version == '8.0':
         db.query("start slave user='{}' password='{}';".format(user, apass))
     else:
         db.query("start slave")
 
+
+    db.query("start all slaves")
     writeDbSyncStatus({'code': 6, 'msg': '从库重启完成...', 'progress': 100})
 
     if os.path.exists(bak_file):
