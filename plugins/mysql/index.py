@@ -3074,7 +3074,7 @@ def syncDatabaseRepair(version=''):
         sync_count_data = sync_db.query(cmd_count_sql)
 
         if local_count_data != sync_count_data:
-            print("总数据比较: ",local_count_data, sync_count_data)
+            print("all data compare: ",local_count_data, sync_count_data)
             inconsistent_table.append(table_name)
             diff = sync_count_data[0]['num'] - local_count_data[0]['num']
             print(table_name+', need sync. diff,'+str(diff))
@@ -3082,14 +3082,12 @@ def syncDatabaseRepair(version=''):
             # print(table_name+', 正常OK')
             mw.execShell("echo 'ok' > "+table_check_file)
 
-    # inconsistent_table = ['99cms.mc_order']
+    # inconsistent_table = ['99cms.mc_read']
     # 数据对齐
     for table_name in inconsistent_table:
         is_break = False
-        if table_name == '99cms.mc_guest':
-            continue
         while not is_break:
-            print("正在校验表,"+table_name)
+            print("check table:"+table_name)
             table_name_pos = 0
             table_name_pos_file = tmp_dir+'/'+table_name+'.pos.txt'
             primary_key_sql = "SHOW INDEX FROM "+table_name+" WHERE Key_name = 'PRIMARY';";
@@ -3099,7 +3097,8 @@ def syncDatabaseRepair(version=''):
             if os.path.exists(table_name_pos_file):
                 table_name_pos = mw.readFile(table_name_pos_file)
         
-            data_select_sql = 'select * from '+table_name + ' where '+pkey_name+' > '+str(table_name_pos)+' limit 1000'
+            data_select_sql = 'select * from '+table_name + ' where '+pkey_name+' > '+str(table_name_pos)+' limit 10000'
+            print(data_select_sql)
             local_select_data = local_db.query(data_select_sql)
             sync_select_data = sync_db.query(data_select_sql)
 
@@ -3110,40 +3109,43 @@ def syncDatabaseRepair(version=''):
             # print(len(sync_select_data))
             print('local compare sync,',local_select_data == sync_select_data)
             
+            cmd_count_sql = 'select count(*) as num from '+table_name
+            local_count_data = local_db.query(cmd_count_sql)
+            sync_count_data = sync_db.query(cmd_count_sql)
+            print(local_count_data,sync_count_data)
+            # if local_count_data[0]['num'] == sync_count_data[0]['num']:
+            #     is_break = True
+            #     break
+
+            diff = sync_count_data[0]['num'] - local_count_data[0]['num']
+            print("diff," + str(diff)+' line data!')
 
             if local_select_data == sync_select_data:
                 data_count = len(local_select_data)
                 if data_count == 0:
-                    print(table_name+",完全一致..")
+                    # mw.writeFile(table_name_pos_file, '0')
+                    print(table_name+",data is equal ok..")
                     is_break = True
                     break
 
-                cmd_count_sql = 'select count(*) as num from '+table_name
-                local_count_data = local_db.query(cmd_count_sql)
-                sync_count_data = sync_db.query(cmd_count_sql)
-                print(local_count_data,sync_count_data)
-                # if local_count_data[0]['num'] == sync_count_data[0]['num']:
-                #     is_break = True
-                #     break
-
-                diff = sync_count_data[0]['num'] - local_count_data[0]['num']
-                print("diff," + str(diff)+' line data!')
-
                 # print(table_name,data_count)
-                print('pos',local_select_data[data_count-1][pkey_name])
-                pkey_val = local_select_data[data_count-1][pkey_name]
-                # print(pkey_val)
-                mw.writeFile(table_name_pos_file, str(pkey_val))
+                pos = local_select_data[data_count-1][pkey_name]
+                print('pos',pos)
+                progress = pos/sync_count_data[0]['num']
+                print('progress,%.2f' % progress+'%')
+                mw.writeFile(table_name_pos_file, str(pos))
             else:
+                if len(sync_select_data) == 0:
+                    continue
                 for idx in range(len(sync_select_data)):
                     insert_data = sync_select_data[idx]
                     # print(insert_data)
-                    local_inquery_sql = 'select id from ' + table_name+ ' where ' +pkey_name+' = '+ str(insert_data[pkey_name])
+                    local_inquery_sql = 'select '+pkey_name+' from ' + table_name+ ' where ' +pkey_name+' = '+ str(insert_data[pkey_name])
                     # print(local_inquery_sql)
                     tdata = local_db.query(local_inquery_sql)
                     # print(tdata)
                     if len(tdata) == 0:
-                        print("id:"+ str(insert_data[pkey_name])+ " 不存在,插入中")
+                        print("id:"+ str(insert_data[pkey_name])+ " no exists, insert")
                         insert_sql = 'insert into ' + table_name
                         field_str = ''
                         value_str = ''
@@ -3159,7 +3161,7 @@ def syncDatabaseRepair(version=''):
                     else:
                         if sync_select_data[idx] == local_select_data[idx]:
                             continue
-                        print("id:"+ str(insert_data[pkey_name])+ " 数据不一致,更新中")
+                        print("id:"+ str(insert_data[pkey_name])+ " data is not equal, update")
                         update_sql = 'update ' + table_name
                         field_str = ''
                         value_str = ''
