@@ -3321,9 +3321,9 @@ def doFullSyncUser(version=''):
 
     writeDbSyncStatus({'code': 0, 'msg': '开始同步...', 'progress': 0})
     dmp_option = ''
-    mode = recognizeDbMode()
-    if mode == 'gtid':
-        dmp_option = ' --set-gtid-purged=off '
+    # mode = recognizeDbMode()
+    # if mode == 'gtid':
+    #     dmp_option = ' --set-gtid-purged=off '
 
     time.sleep(1)
     writeDbSyncStatus({'code': 1, 'msg': '正在停止从库...', 'progress': 15})
