@@ -3334,7 +3334,7 @@ def doFullSyncUser(version=''):
         dump_sql_data = getServerDir() + "/bin/mysqldump " + dmp_option + " --single-transaction --default-character-set=utf8mb4 -h" + ip + " -P" + \
             port + " -u" + user + " -p'" + apass + "' --ssl-mode=DISABLED " + sync_db + " > " + bak_file
         print(dump_sql_data)
-        # mw.execShell(dump_sql_data)
+        mw.execShell(dump_sql_data)
     
     writeDbSyncStatus({'code': 3, 'msg': '正在到本地导入数据中...', 'progress': 40})
 
@@ -3355,7 +3355,7 @@ def doFullSyncUser(version=''):
         my_import_cmd = getServerDir() + '/bin/mysql -S ' + sock + " -uroot -p'" + pwd + \
             "' " + sync_db_import + ' < ' + bak_file
         print(my_import_cmd)
-        # mw.execShell(my_import_cmd)
+        mw.execShell(my_import_cmd)
 
         # 修改同步位置
         master_info = sync_mdb.query('show master status')
