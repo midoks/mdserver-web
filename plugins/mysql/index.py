@@ -3105,9 +3105,11 @@ def syncDatabaseRepair(version=''):
             # print(local_select_data)
             # print(sync_select_data)
             
-            print(len(local_select_data))
-            print(len(sync_select_data))
-            print(local_select_data == sync_select_data)
+            # print(len(local_select_data))
+            # print(len(sync_select_data))
+            print('local compare sync,',local_select_data == sync_select_data)
+            diff = sync_count_data[0]['num'] - local_count_data[0]['num']
+            print("diff," + str(diff)+' line data!')
 
             if local_select_data == sync_select_data:
                 data_count = len(local_select_data)
@@ -3130,11 +3132,13 @@ def syncDatabaseRepair(version=''):
                 mw.writeFile(table_name_pos_file, str(pkey_val))
             else:
 
+
                 for insert_data in sync_select_data:
                     # print(insert_data)
                     local_inquery_sql = 'select id from ' + table_name+ ' where ' +pkey_name+' = '+ str(insert_data[pkey_name])
-                    # print(local_inquery_sql)
+                    print(local_inquery_sql)
                     tdata = local_db.query(local_inquery_sql)
+                    print(tdata)
                     if len(tdata) == 0:
                         print("id:"+ str(insert_data[pkey_name])+ " 不存在,插入中")
                         insert_sql = 'insert into ' + table_name
@@ -3149,6 +3153,9 @@ def syncDatabaseRepair(version=''):
                         print(insert_sql)
                         r = local_db.execute(insert_sql)
                         print(r)
+                    else:
+                        mw.writeFile(table_name_pos_file, str(insert_data[pkey_name]))
+
 
                 # print(local_select_data)
                 # print(sync_select_data)
