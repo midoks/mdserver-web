@@ -3383,6 +3383,8 @@ def doFullSyncUser(version=''):
         #     print(change_cmd)
         #     r = db.execute(change_cmd)
         #     print(r)
+
+    print(cmd)
     r = db.query(cmd)
     print(r)
 
