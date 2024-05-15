@@ -3041,7 +3041,12 @@ def getSyncMysqlDB(dbname,sign = ''):
     sync_db.setTimeout(60)
     return sync_db
 
+def syncDatabaseRepairTempFile():
+    tmp_log = '/tmp/t.log'
+    return tmp_log
+
 def syncDatabaseRepairLog(version=''):
+    import subprocess
     args = getArgs()
     data = checkArgs(args, ['db','sign','op'])
     if not data[0]:
@@ -3050,12 +3055,12 @@ def syncDatabaseRepairLog(version=''):
     sync_args_db = args['db']
     sync_args_sign = args['sign']
     op = args['op']
-    tmp_log = '/tmp/t.log'
+    tmp_log = syncDatabaseRepairTempFile()
     cmd = 'cd '+mw.getServerDir()+'/mdserver-web && source bin/activate && python3 plugins/mysql/index.py sync_database_repair  {"db":"'+sync_args_db+'","sign":"'+sync_args_sign+'"}'
     # print(cmd)
 
     if op == 'get':
-        log = mw.getLastLine(tmp_log, 16)
+        log = mw.getLastLine(tmp_log, 15)
         return mw.returnJson(True, log)
 
     if op == 'cmd':
@@ -3063,7 +3068,7 @@ def syncDatabaseRepairLog(version=''):
 
     if op == 'do':
         os.system(' echo "开始执行" > '+ tmp_log)
-        os.system(cmd +' >> '+ tmp_log +' &')
+        subprocess.Popen(cmd +' >> '+ tmp_log +' &')
         time.sleep(10)
         # mw.execShell('rm -rf '+tmp_log)
         return mw.returnJson(True, 'ok')
@@ -3073,6 +3078,8 @@ def syncDatabaseRepairLog(version=''):
 
 def syncDatabaseRepair(version=''):
     time_stats_s = time.time()
+    tmp_log = syncDatabaseRepairTempFile()
+
     from pymysql.converters import escape_string
     args = getArgs()
     data = checkArgs(args, ['db','sign'])
@@ -3114,7 +3121,9 @@ def syncDatabaseRepair(version=''):
             print(table_name+', need sync. diff,'+str(diff))
         else:
             print(table_name+' check ok.')
+            mw.writeFile(tmp_log, table_name+' check ok.\n','a+')
             mw.execShell("echo 'ok' > "+table_check_file)
+
 
     # inconsistent_table = ['xx.xx']
     # 数据对齐
