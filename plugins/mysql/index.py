@@ -2349,7 +2349,7 @@ def addMasterRepSlaveUser(version=''):
         if isError != None:
             return isError
 
-    sql_select = "grant select,lock tables,PROCESS on *.* to " + username + "@'%';"
+    sql_select = "grant select,REPLICATION CLIENT,PROCESS on *.* to " + username + "@'%';"
     pdb.execute(sql_select)
     pdb.execute('FLUSH PRIVILEGES;')
 
@@ -3298,6 +3298,8 @@ def doFullSyncUser(version=''):
     port = data['port']
     ip = data['ip']
 
+    sync_mdb = getSyncMysqlDB(sync_db,sync_sign)
+
     bak_file = '/tmp/tmp.sql'
     if os.path.exists(bak_file):
         os.system("rm -rf " + bak_file)
@@ -3354,6 +3356,15 @@ def doFullSyncUser(version=''):
             "' " + sync_db_import + ' < ' + bak_file
         print(my_import_cmd)
         mw.execShell(my_import_cmd)
+
+        # 重设同步信息
+        master_info = sync_mdb.query('show master status')
+        print(master_info)
+        if len(master_info)>0:
+            change_cmd = "CHANGE MASTER TO  MASTER_LOG_FILE='"+master_info[0]['File']+"', MASTER_LOG_POS="+str(master_info[0]['Position'])+" channel 'r1711438835';"
+            print(change_cmd)
+            r = db.execute(change_cmd)
+            print(r)
 
     if version == '8.0':
         db.query("start slave user='{}' password='{}';".format(user, apass))
