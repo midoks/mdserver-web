@@ -3296,7 +3296,7 @@ def doFullSyncUser(version=''):
 
     db = pMysqlDb()
     # 重置
-    deleteSlaveFunc(sign)
+    deleteSlaveFunc(sync_sign)
 
     conn = pSqliteDb('slave_sync_user')
     if sync_sign != '':
