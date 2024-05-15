@@ -3104,11 +3104,15 @@ def syncDatabaseRepair(version=''):
 
             if os.path.exists(table_name_pos_file):
                 table_name_pos = mw.readFile(table_name_pos_file)
-        
+            
+
             data_select_sql = 'select * from '+table_name + ' where '+pkey_name+' > '+str(table_name_pos)+' limit 10000'
             print(data_select_sql)
             local_select_data = local_db.query(data_select_sql)
+
+            time_s = time.time()
             sync_select_data = sync_db.query(data_select_sql)
+            print(f'sync query cos:{time.time() - time_s:.4f}s')
 
             # print(local_select_data)
             # print(sync_select_data)
