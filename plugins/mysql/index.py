@@ -3023,10 +3023,10 @@ def dumpMysqlData(version=''):
 def getSyncMysqlDB(dbname,sign = ''):
     conn = pSqliteDb('slave_sync_user')
     if sign != '':
-        data = conn.field('ip,port,user,pass,mode,cmd').where('ip=?', (sync_sign,)).find()
+        data = conn.field('ip,port,user,pass,mode,cmd').where('ip=?', (sign,)).find()
     else:
         data = conn.field('ip,port,user,pass,mode,cmd').find()
-    # print(data)
+    print(data)
     user = data['user']
     apass = data['pass']
     port = data['port']
@@ -3091,9 +3091,10 @@ def syncDatabaseRepair(version=''):
     for table_name in inconsistent_table:
         is_break = False
         while not is_break:
-            local_db = pMysqlDb()
+            local_db.ping()
             # 远程数据
-            sync_db = getSyncMysqlDB(sync_args_db,sync_args_sign)
+            sync_db.ping()
+            
             print("check table:"+table_name)
             table_name_pos = 0
             table_name_pos_file = tmp_dir+'/'+table_name+'.pos.txt'

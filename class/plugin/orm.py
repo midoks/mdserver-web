@@ -108,6 +108,13 @@ class ORM:
         except Exception as ex:
             return ex
 
+    def ping(self):
+        try:
+            self.__DB_CONN.ping()
+        except Exception as e:
+            print(e)
+        return True
+
     def query(self, sql):
         # 执行SQL语句返回数据集
         if not self.__Conn():
