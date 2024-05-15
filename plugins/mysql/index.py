@@ -3041,7 +3041,38 @@ def getSyncMysqlDB(dbname,sign = ''):
     sync_db.setTimeout(60)
     return sync_db
 
+def syncDatabaseRepairLog(version=''):
+    args = getArgs()
+    data = checkArgs(args, ['db','sign','op'])
+    if not data[0]:
+        return data[1]
+
+    sync_args_db = args['db']
+    sync_args_sign = args['sign']
+    op = args['op']
+    tmp_log = '/tmp/t.log'
+    cmd = 'cd '+mw.getServerDir()+'/mdserver-web && source bin/activate && python3 plugins/mysql/index.py sync_database_repair  {"db":"'+sync_args_db+'","sign":"'+sync_args_sign+'"}'
+    # print(cmd)
+
+    if op == 'get':
+        log = mw.getLastLine(tmp_log, 50)
+        return mw.returnJson(True, log)
+
+    if op == 'cmd':
+        return mw.returnJson(True, 'ok', cmd)
+
+    if op == 'do':
+        os.system(' echo "开始执行" > '+ tmp_log)
+        os.system(cmd +' >> '+ tmp_log +' &')
+        time.sleep(10)
+        # mw.execShell('rm -rf '+tmp_log)
+        return mw.returnJson(True, 'ok')
+
+    return mw.returnJson(False, '无效请求!')
+
+
 def syncDatabaseRepair(version=''):
+    time_stats_s = time.time()
     from pymysql.converters import escape_string
     args = getArgs()
     data = checkArgs(args, ['db','sign'])
@@ -3082,7 +3113,7 @@ def syncDatabaseRepair(version=''):
             diff = sync_count_data[0]['num'] - local_count_data[0]['num']
             print(table_name+', need sync. diff,'+str(diff))
         else:
-            print('.')
+            print(table_name+' check ok.')
             mw.execShell("echo 'ok' > "+table_check_file)
 
     # inconsistent_table = ['xx.xx']
@@ -3191,9 +3222,10 @@ def syncDatabaseRepair(version=''):
                 print("break all")
                 break
             time.sleep(3)
+    print(f'data check cos:{time.time() - time_stats_s:.4f}s')
     print("data supplementation completed")
     mw.execShell('rm -rf  '+tmp_dir)
-    return True
+    return 'ok'
 
 ############### --- 重要 同步---- ###########
 
@@ -3696,5 +3728,7 @@ if __name__ == "__main__":
         print(dumpMysqlData(version))
     elif func == 'sync_database_repair':
         print(syncDatabaseRepair())
+    elif func == 'sync_database_repair_log':
+        print(syncDatabaseRepairLog())
     else:
         print('error')
