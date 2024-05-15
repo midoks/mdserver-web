@@ -2394,6 +2394,7 @@ def getMasterRepSlaveUserCmd(version):
     if sid != '':
         channel_name = " for channel 'r{}';".format(sid)
 
+    mdb8 = ['8.0','8.1','8.2','8.3']
     if mode == "gtid":
         # sql = "CHANGE MASTER TO MASTER_HOST='" + ip + "', MASTER_PORT=" + port + ", MASTER_USER='" + \
         #     clist[0]['username'] + "', MASTER_PASSWORD='" + \
@@ -2404,7 +2405,7 @@ def getMasterRepSlaveUserCmd(version):
             "', MASTER_LOG_FILE='" + mstatus[0]["File"] + \
             "',MASTER_LOG_POS=" + str(mstatus[0]["Position"]) + channel_name
 
-        if version == '8.0' or version == '8.1' or version == '8.2' or version == '8.3':
+        if mw.inArray(mdb8,version):
             sql = "CHANGE REPLICATION SOURCE TO SOURCE_HOST='" + ip + "', SOURCE_PORT=" + port + ", SOURCE_USER='" + \
                 clist[0]['username']  + "', SOURCE_PASSWORD='" + \
                 clist[0]['password'] + \
@@ -2416,7 +2417,7 @@ def getMasterRepSlaveUserCmd(version):
             "', MASTER_LOG_FILE='" + mstatus[0]["File"] + \
             "',MASTER_LOG_POS=" + str(mstatus[0]["Position"]) + channel_name
 
-        if version == '8.0' or version == '8.1' or version == '8.2' or version == '8.3':
+        if mw.inArray(mdb8,version):
             sql = "CHANGE REPLICATION SOURCE TO SOURCE_HOST='" + ip + "', SOURCE_PORT=" + port + ", SOURCE_USER='" + \
                 clist[0]['username']  + "', SOURCE_PASSWORD='" + \
                 clist[0]['password'] + \
