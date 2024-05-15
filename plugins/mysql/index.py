@@ -3108,8 +3108,7 @@ def syncDatabaseRepair(version=''):
             # print(len(local_select_data))
             # print(len(sync_select_data))
             print('local compare sync,',local_select_data == sync_select_data)
-            diff = sync_count_data[0]['num'] - local_count_data[0]['num']
-            print("diff," + str(diff)+' line data!')
+            
 
             if local_select_data == sync_select_data:
                 data_count = len(local_select_data)
@@ -3125,6 +3124,10 @@ def syncDatabaseRepair(version=''):
                 if local_count_data[0]['num'] == sync_count_data[0]['num']:
                     is_break = True
                     break
+
+                diff = sync_count_data[0]['num'] - local_count_data[0]['num']
+                print("diff," + str(diff)+' line data!')
+                
                 # print(table_name,data_count)
                 print('pos',local_select_data[data_count-1][pkey_name])
                 pkey_val = local_select_data[data_count-1][pkey_name]
@@ -3136,7 +3139,7 @@ def syncDatabaseRepair(version=''):
                 for insert_data in sync_select_data:
                     # print(insert_data)
                     local_inquery_sql = 'select id from ' + table_name+ ' where ' +pkey_name+' = '+ str(insert_data[pkey_name])
-                    print(local_inquery_sql)
+                    # print(local_inquery_sql)
                     tdata = local_db.query(local_inquery_sql)
                     print(tdata)
                     if len(tdata) == 0:
