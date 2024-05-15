@@ -3265,6 +3265,7 @@ def doFullSync(version=''):
 
 
 def doFullSyncUser(version=''):
+    time_s = time.time()
     args = getArgs()
     data = checkArgs(args, ['db', 'sign'])
     if not data[0]:
@@ -3378,6 +3379,9 @@ def doFullSyncUser(version=''):
 
     if os.path.exists(bak_file):
         os.system("rm -rf " + bak_file)
+
+    time_e = time.time()
+    print("cos:", time_e - time_s)
     return True
 
 
