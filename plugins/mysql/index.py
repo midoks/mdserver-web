@@ -3055,7 +3055,7 @@ def syncDatabaseRepairLog(version=''):
     # print(cmd)
 
     if op == 'get':
-        log = mw.getLastLine(tmp_log, 50)
+        log = mw.getLastLine(tmp_log, 17)
         return mw.returnJson(True, log)
 
     if op == 'cmd':
