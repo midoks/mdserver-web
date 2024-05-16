@@ -3199,9 +3199,9 @@ def syncDatabaseRepair(version=''):
             else:
                 if len(sync_select_data) != 0:
                     for idx in range(len(sync_select_data)):
-                        insert_data = sync_select_data[idx]
+                        sync_insert_data = sync_select_data[idx]
                         # print(insert_data)
-                        local_inquery_sql = 'select * from ' + table_name+ ' where ' +pkey_name+' = '+ str(insert_data[pkey_name])
+                        local_inquery_sql = 'select * from ' + table_name+ ' where ' +pkey_name+' = '+ str(sync_insert_data[pkey_name])
                         # print(local_inquery_sql)
                         ldata = local_db.query(local_inquery_sql)
                         print('ldata:',ldata)
@@ -3221,7 +3221,7 @@ def syncDatabaseRepair(version=''):
                             print(r)
                         else:
                             print("compare: ",sync_select_data[idx], local_select_data[idx])
-                            if sync_select_data[idx] == local_select_data[idx]:
+                            if ldata[0] == sync_insert_data:
                                 continue
                             print("id:"+ str(insert_data[pkey_name])+ " data is not equal, update")
                             update_sql = 'update ' + table_name
