@@ -3310,6 +3310,37 @@ def isSimpleSyncCmd(sql):
         return False
     return True
 
+def getChannelNameForCmd(cmd):
+    cmd = cmd.lower()
+    cmd_arr = cmd.split('channel')
+    if len(cmd_arr) == 2:
+        cmd_channel_info = cmd_arr[1]
+        channel_name = cmd_channel_info.strip()
+        channel_name = channel_name.strip(';')
+        channel_name = channel_name.strip("'")
+        return channel_name
+    return ''
+
+
+def doFullSyncUserImportContentForChannel(file, channel_name):
+    # print(file, channel_name)
+    content = mw.readFile(file)
+
+    content = content.replace('STOP SLAVE;', "STOP SLAVE for channel '{}';".format(channel_name))
+    content = content.replace('START SLAVE;', "START SLAVE for channel '{}';".format(channel_name))
+
+    find_head = "CHANGE MASTER TO "
+    find_re = find_head+"(.*?);"
+    find_r = re.search(find_re, content, re.I|re.M)
+    if find_r:
+        find_rg = find_r.groups()
+        if len(find_rg)>0:
+            find_str = find_head+find_rg[0]
+            if find_str.lower().find('channel')==-1:
+                content = content.replace(find_str+';', find_str+" for channel '{}';".format(channel_name))
+
+    mw.writeFile(file,content)
+    return True
 
 
 def doFullSyncUser(version=''):
@@ -3350,12 +3381,13 @@ def doFullSyncUser(version=''):
     port = data['port']
     ip = data['ip']
     cmd = data['cmd']
+    channel_name = getChannelNameForCmd(cmd)
 
     sync_mdb = getSyncMysqlDB(sync_db,sync_sign)
 
     bak_file = '/tmp/tmp.sql'
-    if os.path.exists(bak_file):
-        os.system("rm -rf " + bak_file)
+    # if os.path.exists(bak_file):
+    #     os.system("rm -rf " + bak_file)
 
     writeDbSyncStatus({'code': 0, 'msg': '开始同步...', 'progress': 0})
     dmp_option = ''
@@ -3383,15 +3415,15 @@ def doFullSyncUser(version=''):
     # --force --opt --single-transaction
     # --skip-opt --create-options
     # --master-data=1
+
     time_s = time.time()
     if not os.path.exists(bak_file):
-        # 不锁表导出
         if isSimpleSyncCmd(cmd):
             dmp_option += " --master-data=1 --apply-slave-statements --include-master-host-port "
         else:
-            dmp_option += ' '
+            dmp_option += ' --master-data=1 --apply-slave-statements --include-master-host-port '
 
-        dump_sql_data = getServerDir() + "/bin/mysqldump --single-transaction --default-character-set=utf8mb4 --compress -q" + dmp_option + " -h" + ip + " -P" + \
+        dump_sql_data = getServerDir() + "/bin/mysqldump --single-transaction --default-character-set=utf8mb4 --compress -q " + dmp_option + " -h" + ip + " -P" + \
             port + " -u" + user + " -p'" + apass + "' --ssl-mode=DISABLED " + sync_db + " > " + bak_file
         print(dump_sql_data)
         time_s = time.time()
@@ -3408,13 +3440,8 @@ def doFullSyncUser(version=''):
         # 重置 
         db.execute('reset master')
 
-        # 不锁表，需要删除原来数据表
-        # tables = db.query('show tables from `%s`' % sync_db_import)
-        # table_key = "Tables_in_" + sync_db_import
-        # for tname in tables:
-        #     drop_db_cmd = 'drop table if exists '+sync_db_import+'.'+tname[table_key]
-        #     # print(drop_db_cmd)
-        #     db.query(drop_db_cmd)
+        doFullSyncUserImportContentForChannel(bak_file, channel_name)
+
 
         pwd = pSqliteDb('config').where('id=?', (1,)).getField('mysql_root')
         sock = getSocketFile()
@@ -3453,8 +3480,8 @@ def doFullSyncUser(version=''):
     cos = time_all_e - time_all_s
     writeDbSyncStatus({'code': 6, 'msg': '总耗时:'+str(int(cos))+'秒,从库重启完成...', 'progress': 100})
 
-    if os.path.exists(bak_file):
-        os.system("rm -rf " + bak_file)
+    # if os.path.exists(bak_file):
+    #     os.system("rm -rf " + bak_file)
 
     return True
 
