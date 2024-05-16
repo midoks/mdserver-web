@@ -3221,9 +3221,9 @@ def syncDatabaseRepair(version=''):
                             print(r)
                         else:
                             print("compare: ",sync_select_data[idx], local_select_data[idx])
-                            if ldata[0] == sync_insert_data:
+                            if ldata[0] == sync_idx_data:
                                 continue
-                            print("id:"+ str(insert_data[pkey_name])+ " data is not equal, update")
+                            print("id:"+ str(sync_idx_data[pkey_name])+ " data is not equal, update")
                             update_sql = 'update ' + table_name
                             field_str = ''
                             value_str = ''
