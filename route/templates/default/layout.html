@@ -179,14 +179,28 @@ if (thisPath.indexOf('?')>-1){
 {% endif %}
 {% endfor %}
 
+
 <!-- 统计一下用户量,让我的开发更有激情 -->
+<script type="text/javascript">
+$(document).ready(function(){
+    $.getScript('https://www.googletagmanager.com/gtag/js?id=G-FC74BB2RGD', function(){
+        console.log("load google ad!");
+        window.dataLayer = window.dataLayer || [];
+        function gtag(){dataLayer.push(arguments);}
+        gtag('js', new Date());
+        gtag('config', 'G-FC74BB2RGD');
+    });
+});
+
+</script>
+
 <!-- Google tag (gtag.js) -->
-<script async src="https://www.googletagmanager.com/gtag/js?id=G-FC74BB2RGD"></script>
+<!-- <script async src="https://www.googletagmanager.com/gtag/js?id=G-FC74BB2RGD"></script>
 <script>
   window.dataLayer = window.dataLayer || [];
   function gtag(){dataLayer.push(arguments);}
   gtag('js', new Date());
   gtag('config', 'G-FC74BB2RGD');
-</script>
+</script> -->
 
 </html>
