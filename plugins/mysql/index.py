@@ -3354,7 +3354,7 @@ def doFullSyncUser(version=''):
         else:
             dmp_option += ''
 
-        dump_sql_data = getServerDir() + "/bin/mysqldump --single-transaction --default-character-set=utf8mb4 --compress -q --no-autocommit -e" + dmp_option + " -h" + ip + " -P" + \
+        dump_sql_data = getServerDir() + "/bin/mysqldump --single-transaction --default-character-set=utf8mb4 --compress -q" + dmp_option + " -h" + ip + " -P" + \
             port + " -u" + user + " -p'" + apass + "' --ssl-mode=DISABLED " + sync_db + " > " + bak_file
         print(dump_sql_data)
         time_s = time.time()
