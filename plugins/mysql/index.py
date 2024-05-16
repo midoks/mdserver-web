@@ -3216,7 +3216,7 @@ def syncDatabaseRepair(version=''):
                             field_str = '(' +field_str.strip(',')+')'
                             value_str = '(' +value_str.strip(',')+')'
                             insert_sql = insert_sql+' '+field_str+' values'+value_str+';'
-                            # print(insert_sql)
+                            print(insert_sql)
                             r = local_db.execute(insert_sql)
                             print(r)
                         else:
@@ -3232,7 +3232,7 @@ def syncDatabaseRepair(version=''):
                                 field_str += '`'+field+'`=\''+escape_string(str(insert_data[field]))+'\','
                             field_str = field_str.strip(',')
                             update_sql = update_sql+' set '+field_str+' where '+pkey_name+'=\''+str(insert_data[pkey_name])+'\';'
-                            # print(update_sql)
+                            print(update_sql)
                             r = local_db.execute(update_sql)
                             print(r)
             if is_break:
