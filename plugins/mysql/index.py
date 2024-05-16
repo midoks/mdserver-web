@@ -3280,7 +3280,6 @@ def doFullSync(version=''):
 
 
 def doFullSyncUser(version=''):
-    time_s = time.time()
     args = getArgs()
     data = checkArgs(args, ['db', 'sign'])
     if not data[0]:
@@ -3300,8 +3299,9 @@ def doFullSyncUser(version=''):
     sync_sign = args['sign']
 
     db = pMysqlDb()
+
     # 重置
-    deleteSlaveFunc(sync_sign)
+    # deleteSlaveFunc(sync_sign)
 
     conn = pSqliteDb('slave_sync_user')
     if sync_sign != '':
@@ -3331,10 +3331,10 @@ def doFullSyncUser(version=''):
 
     time.sleep(1)
     writeDbSyncStatus({'code': 1, 'msg': '正在停止从库...', 'progress': 15})
-    # if version == '8.0':
-    #     db.query("stop slave user='{}' password='{}';".format(user, apass))
-    # else:
-    #     db.query("stop slave")
+    if version == '8.0':
+        db.query("stop slave user='{}' password='{}';".format(user, apass))
+    else:
+        db.query("stop slave")
         
     time.sleep(1)
 
@@ -3350,10 +3350,14 @@ def doFullSyncUser(version=''):
     # --skip-opt --create-options
     if not os.path.exists(bak_file):
         # 不锁表导出
-        dump_sql_data = getServerDir() + "/bin/mysqldump " + dmp_option + " --single-transaction --master-data=2 --default-character-set=utf8mb4 -h" + ip + " -P" + \
+        dump_sql_data = getServerDir() + "/bin/mysqldump " + dmp_option + " --single-transaction --master-data=1 --compress --include-master-host-port --default-character-set=utf8mb4 -h" + ip + " -P" + \
             port + " -u" + user + " -p'" + apass + "' --ssl-mode=DISABLED " + sync_db + " > " + bak_file
         print(dump_sql_data)
-        mw.execShell(dump_sql_data)
+        time_s = time.time()
+        r = mw.execShell(dump_sql_data)
+        print(r)
+        time_e = time.time()
+        print("export cos:", time_e - time_s)
     
     writeDbSyncStatus({'code': 3, 'msg': '正在到本地导入数据中...', 'progress': 40})
 
@@ -3374,9 +3378,11 @@ def doFullSyncUser(version=''):
         my_import_cmd = getServerDir() + '/bin/mysql -S ' + sock + " -uroot -p'" + pwd + \
             "' " + sync_db_import + ' < ' + bak_file
         print(my_import_cmd)
-        mw.execShell(my_import_cmd)
+        time_s = time.time()
+        r = mw.execShell(my_import_cmd)
+        print(r)
         time_e = time.time()
-        print("export cos:", time_e - time_s)
+        print("import cos:", time_e - time_s)
 
         # 修改同步位置
         # master_info = sync_mdb.query('show master status')
@@ -3401,8 +3407,8 @@ def doFullSyncUser(version=''):
     db.query("start all slaves")
     writeDbSyncStatus({'code': 6, 'msg': '从库重启完成...', 'progress': 100})
 
-    if os.path.exists(bak_file):
-        os.system("rm -rf " + bak_file)
+    # if os.path.exists(bak_file):
+        # os.system("rm -rf " + bak_file)
 
     time_e = time.time()
     print("cos:", time_e - time_s)
