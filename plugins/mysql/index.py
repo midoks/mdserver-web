@@ -2395,44 +2395,28 @@ def getMasterRepSlaveUserCmd(version):
         channel_name = " for channel 'r{}';".format(sid)
 
     mdb8 = ['8.0','8.1','8.2','8.3','8.4']
-    if mode == "gtid":
-        sql = "CHANGE MASTER TO MASTER_HOST='" + ip + "', MASTER_PORT=" + port + ", MASTER_USER='" + \
-            clist[0]['username'] + "', MASTER_PASSWORD='" + \
-            clist[0]['password'] + "'"
-            
+    sql = ''
+    if not mw.inArray(mdb8,version):
+        base_sql = "CHANGE MASTER TO MASTER_HOST='" + ip + "', MASTER_PORT=" + port + ", MASTER_USER='" + \
+                clist[0]['username'] + "', MASTER_PASSWORD='" + \
+                clist[0]['password'] + "'"
+
+        sql += base_sql +';'
+        sql += "<br/><hr/>"
+        sql += base_sql + ", MASTER_AUTO_POSITION=1" + channel_name
         sql += "<br/><hr/>"
 
-        sql += "CHANGE MASTER TO MASTER_HOST='" + ip + "', MASTER_PORT=" + port + ", MASTER_USER='" + \
-            clist[0]['username'] + "', MASTER_PASSWORD='" + \
-            clist[0]['password'] + "', MASTER_AUTO_POSITION=1" + channel_name
-
-        sql += "<br/><hr/>"
-
-        sql += "CHANGE MASTER TO MASTER_HOST='" + ip + "', MASTER_PORT=" + port + ", MASTER_USER='" + \
-            clist[0]['username']  + "', MASTER_PASSWORD='" + \
-            clist[0]['password'] + \
-            "', MASTER_LOG_FILE='" + mstatus[0]["File"] + \
-            "',MASTER_LOG_POS=0" + channel_name
-
-        if mw.inArray(mdb8,version):
-            sql = "CHANGE REPLICATION SOURCE TO SOURCE_HOST='" + ip + "', SOURCE_PORT=" + port + ", SOURCE_USER='" + \
-                clist[0]['username']  + "', SOURCE_PASSWORD='" + \
-                clist[0]['password'] + \
-                "', MASTER_AUTO_POSITION=1" + channel_name
+        sql += base_sql + "', MASTER_LOG_FILE='" + mstatus[0]["File"] + "',MASTER_LOG_POS=" + str(mstatus[0]["Position"]) + channel_name
     else:
-        sql = "CHANGE MASTER TO MASTER_HOST='" + ip + "', MASTER_PORT=" + port + ", MASTER_USER='" + \
-            clist[0]['username']  + "', MASTER_PASSWORD='" + \
-            clist[0]['password'] + \
-            "', MASTER_LOG_FILE='" + mstatus[0]["File"] + \
-            "',MASTER_LOG_POS=" + str(mstatus[0]["Position"]) + channel_name
-
-        if mw.inArray(mdb8,version):
-            sql = "CHANGE REPLICATION SOURCE TO SOURCE_HOST='" + ip + "', SOURCE_PORT=" + port + ", SOURCE_USER='" + \
+        base_sql = "CHANGE REPLICATION SOURCE TO SOURCE_HOST='" + ip + "', SOURCE_PORT=" + port + ", SOURCE_USER='" + \
                 clist[0]['username']  + "', SOURCE_PASSWORD='" + \
-                clist[0]['password'] + \
-                "', SOURCE_LOG_FILE='" + mstatus[0]["File"] + \
-                "',SOURCE_LOG_POS=" + \
-                str(mstatus[0]["Position"]) + channel_name
+                clist[0]['password']+"'"
+        sql += base_sql +';'
+        sql += "<br/><hr/>"
+        sql += base_sql + ", MASTER_AUTO_POSITION=1" + channel_name
+        sql += "<br/><hr/>"
+        sql += base_sql + "', SOURCE_LOG_FILE='" + mstatus[0]["File"] + "',SOURCE_LOG_POS=" + str(mstatus[0]["Position"]) + channel_name
+
 
     data = {}
     data['cmd'] = sql
