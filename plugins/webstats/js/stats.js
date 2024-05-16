@@ -2076,6 +2076,7 @@ var html = '<div>\
                         <option value="50x">50x</option>\
                         <option value="40x">40x</option>\
                         <option value="500">500</option>\
+                        <option value="499">499</option>\
                         <option value="501">501</option>\
                         <option value="502">502</option>\
                         <option value="503">503</option>\
