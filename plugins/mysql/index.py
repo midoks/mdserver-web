@@ -2394,7 +2394,7 @@ def getMasterRepSlaveUserCmd(version):
     if sid != '':
         channel_name = " for channel 'r{}';".format(sid)
 
-    mdb8 = ['8.0','8.1','8.2','8.3']
+    mdb8 = ['8.0','8.1','8.2','8.3','8.4']
     if mode == "gtid":
         sql = "CHANGE MASTER TO MASTER_HOST='" + ip + "', MASTER_PORT=" + port + ", MASTER_USER='" + \
             clist[0]['username'] + "', MASTER_PASSWORD='" + \
