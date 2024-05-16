@@ -3220,6 +3220,7 @@ def syncDatabaseRepair(version=''):
                             r = local_db.execute(insert_sql)
                             print(r)
                         else:
+                            print("compare: ",sync_select_data[idx], local_select_data[idx])
                             if sync_select_data[idx] == local_select_data[idx]:
                                 continue
                             print("id:"+ str(insert_data[pkey_name])+ " data is not equal, update")
