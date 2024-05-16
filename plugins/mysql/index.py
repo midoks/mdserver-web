@@ -3199,20 +3199,20 @@ def syncDatabaseRepair(version=''):
             else:
                 if len(sync_select_data) != 0:
                     for idx in range(len(sync_select_data)):
-                        sync_insert_data = sync_select_data[idx]
+                        sync_idx_data = sync_select_data[idx]
                         # print(insert_data)
-                        local_inquery_sql = 'select * from ' + table_name+ ' where ' +pkey_name+' = '+ str(sync_insert_data[pkey_name])
+                        local_inquery_sql = 'select * from ' + table_name+ ' where ' +pkey_name+' = '+ str(sync_idx_data[pkey_name])
                         # print(local_inquery_sql)
                         ldata = local_db.query(local_inquery_sql)
                         print('ldata:',ldata)
                         if len(ldata) == 0:
-                            print("id:"+ str(sync_insert_data[pkey_name])+ " no exists, insert")
+                            print("id:"+ str(sync_idx_data[pkey_name])+ " no exists, insert")
                             insert_sql = 'insert into ' + table_name
                             field_str = ''
                             value_str = ''
-                            for field in sync_insert_data:
+                            for field in sync_idx_data:
                                 field_str += '`'+field+'`,'
-                                value_str += '\''+escape_string(str(sync_insert_data[field]))+'\','
+                                value_str += '\''+escape_string(str(sync_idx_data[field]))+'\','
                             field_str = '(' +field_str.strip(',')+')'
                             value_str = '(' +value_str.strip(',')+')'
                             insert_sql = insert_sql+' '+field_str+' values'+value_str+';'
@@ -3227,12 +3227,12 @@ def syncDatabaseRepair(version=''):
                             update_sql = 'update ' + table_name
                             field_str = ''
                             value_str = ''
-                            for field in sync_insert_data:
+                            for field in sync_idx_data:
                                 if field == pkey_name:
                                     continue
-                                field_str += '`'+field+'`=\''+escape_string(str(sync_insert_data[field]))+'\','
+                                field_str += '`'+field+'`=\''+escape_string(str(sync_idx_data[field]))+'\','
                             field_str = field_str.strip(',')
-                            update_sql = update_sql+' set '+field_str+' where '+pkey_name+'=\''+str(sync_insert_data[pkey_name])+'\';'
+                            update_sql = update_sql+' set '+field_str+' where '+pkey_name+'=\''+str(sync_idx_data[pkey_name])+'\';'
                             print(update_sql)
                             r = local_db.execute(update_sql)
                             print(r)
