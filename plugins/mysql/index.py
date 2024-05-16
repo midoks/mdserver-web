@@ -3388,8 +3388,8 @@ def doFullSyncUser(version=''):
     sync_mdb = getSyncMysqlDB(sync_db,sync_sign)
 
     bak_file = '/tmp/tmp.sql'
-    # if os.path.exists(bak_file):
-    #     os.system("rm -rf " + bak_file)
+    if os.path.exists(bak_file):
+        os.system("rm -rf " + bak_file)
 
     writeDbSyncStatus({'code': 0, 'msg': '开始同步...', 'progress': 0})
     dmp_option = ''
@@ -3482,8 +3482,8 @@ def doFullSyncUser(version=''):
     cos = time_all_e - time_all_s
     writeDbSyncStatus({'code': 6, 'msg': '总耗时:'+str(int(cos))+'秒,从库重启完成...', 'progress': 100})
 
-    # if os.path.exists(bak_file):
-    #     os.system("rm -rf " + bak_file)
+    if os.path.exists(bak_file):
+        os.system("rm -rf " + bak_file)
 
     return True
 
