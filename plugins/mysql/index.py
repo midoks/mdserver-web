@@ -3350,11 +3350,11 @@ def doFullSyncUser(version=''):
     if not os.path.exists(bak_file):
         # 不锁表导出
         if isSimpleSyncCmd(cmd):
-            dmp_option += " --master-data=1 --apply-slave-statements --include-master-host-port -E -R -q -c "
+            dmp_option += " --master-data=1 --apply-slave-statements --include-master-host-port "
         else:
             dmp_option = ''
 
-        dump_sql_data = getServerDir() + "/bin/mysqldump --single-transaction --default-character-set=utf8mb4 --compress " + dmp_option + " -h" + ip + " -P" + \
+        dump_sql_data = getServerDir() + "/bin/mysqldump --single-transaction --default-character-set=utf8mb4 --compress -q " + dmp_option + " -h" + ip + " -P" + \
             port + " -u" + user + " -p'" + apass + "' --ssl-mode=DISABLED " + sync_db + " > " + bak_file
         print(dump_sql_data)
         time_s = time.time()
