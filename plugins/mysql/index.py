@@ -3201,7 +3201,7 @@ def syncDatabaseRepair(version=''):
                     for idx in range(len(sync_select_data)):
                         insert_data = sync_select_data[idx]
                         # print(insert_data)
-                        local_inquery_sql = 'select '+pkey_name+' from ' + table_name+ ' where ' +pkey_name+' = '+ str(insert_data[pkey_name])
+                        local_inquery_sql = 'select * from ' + table_name+ ' where ' +pkey_name+' = '+ str(insert_data[pkey_name])
                         # print(local_inquery_sql)
                         ldata = local_db.query(local_inquery_sql)
                         print('ldata:',ldata)
