@@ -3205,7 +3205,7 @@ def syncDatabaseRepair(version=''):
                         # print(local_inquery_sql)
                         ldata = local_db.query(local_inquery_sql)
                         print('ldata:',ldata)
-                        if len(tdata) == 0:
+                        if len(ldata) == 0:
                             print("id:"+ str(insert_data[pkey_name])+ " no exists, insert")
                             insert_sql = 'insert into ' + table_name
                             field_str = ''
