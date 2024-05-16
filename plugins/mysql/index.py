@@ -3349,8 +3349,9 @@ def doFullSyncUser(version=''):
     # --master-data=1
     if not os.path.exists(bak_file):
         # 不锁表导出
-        dmp_option += "--master-data=1 --apply-slave-statements --include-master-host-port -E -R -q -c "
-        if not isSimpleSyncCmd(cmd):
+        if isSimpleSyncCmd(cmd):
+            dmp_option += " --master-data=1 --apply-slave-statements --include-master-host-port -E -R -q -c "
+        else:
             dmp_option = ''
 
         dump_sql_data = getServerDir() + "/bin/mysqldump --single-transaction --default-character-set=utf8mb4 --compress " + dmp_option + " -h" + ip + " -P" + \
