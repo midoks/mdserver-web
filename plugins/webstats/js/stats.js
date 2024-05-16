@@ -2076,12 +2076,12 @@ var html = '<div>\
                         <option value="50x">50x</option>\
                         <option value="40x">40x</option>\
                         <option value="500">500</option>\
-                        <option value="499">499</option>\
                         <option value="501">501</option>\
                         <option value="502">502</option>\
                         <option value="503">503</option>\
                         <option value="403">403</option>\
                         <option value="404">404</option>\
+                        <option value="499">499</option>\
                     </select>\
                     <span style="margin-left:10px">时间: </span>\
                     <div class="input-group" style="margin-left:10px;width:350px;display: inline-table;vertical-align: top;">\

@@ -2843,7 +2843,7 @@ def initSlaveStatusSyncUser(version=''):
 
         if slave_t['mode'] == '1':
             mode_name = 'gtid'
-
+        print(local_mode, mode_name)
         if local_mode != mode_name:
             msg += base_t + '->同步模式不一致'
             continue

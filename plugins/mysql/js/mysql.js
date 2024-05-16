@@ -2310,9 +2310,11 @@ function addSlaveSyncUser(ip=''){
                     $('input[name="pass"]').val(a['MASTER_PASSWORD']);
 
                     // console.log(a['MASTER_AUTO_POSITION'],typeof(a['MASTER_AUTO_POSITION']));
-                    // if (typeof(a['MASTER_AUTO_POSITION']) != 'undefined' ){
-                    //     $('input[name="mode"]').val('1');
-                    // }
+                    if (typeof(a['MASTER_AUTO_POSITION']) != 'undefined' ){
+                        $('input[name="mode"]').val('1');
+                    } else{
+                        $('input[name="mode"]').val('0');
+                    }
                 });
             },
             yes:function(index){
