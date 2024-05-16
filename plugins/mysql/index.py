@@ -3350,7 +3350,7 @@ def doFullSyncUser(version=''):
     # --skip-opt --create-options
     if not os.path.exists(bak_file):
         # 不锁表导出
-        dump_sql_data = getServerDir() + "/bin/mysqldump " + dmp_option + " --single-transaction --default-character-set=utf8mb4 -h" + ip + " -P" + \
+        dump_sql_data = getServerDir() + "/bin/mysqldump " + dmp_option + " --single-transaction --master-data=2 --default-character-set=utf8mb4 -h" + ip + " -P" + \
             port + " -u" + user + " -p'" + apass + "' --ssl-mode=DISABLED " + sync_db + " > " + bak_file
         print(dump_sql_data)
         mw.execShell(dump_sql_data)
@@ -3388,9 +3388,9 @@ def doFullSyncUser(version=''):
         #     r = db.execute(change_cmd)
         #     print(r)
 
-    print(cmd)
-    r = db.query(cmd)
-    print(r)
+    # print(cmd)
+    # r = db.query(cmd)
+    # print(r)
 
     if version == '8.0':
         db.query("start slave user='{}' password='{}';".format(user, apass))
