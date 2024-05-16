@@ -3449,13 +3449,13 @@ def doFullSyncUser(version=''):
 
 
     db.query("start all slaves")
-    writeDbSyncStatus({'code': 6, 'msg': '从库重启完成...', 'progress': 100})
-
-    # if os.path.exists(bak_file):
-        # os.system("rm -rf " + bak_file)
-
     time_all_e = time.time()
-    print("cos:", time_all_e - time_all_s)
+    cos = time_all_e - time_all_s
+    writeDbSyncStatus({'code': 6, 'msg': '总耗时'+str(int(cos))+'从库重启完成...', 'progress': 100})
+
+    if os.path.exists(bak_file):
+        os.system("rm -rf " + bak_file)
+        
     return True
 
 
