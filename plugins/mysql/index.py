@@ -3269,6 +3269,14 @@ def doFullSync(version=''):
         return doFullSyncUser(version)
 
 
+def isSimpleSyncCmd(sql):
+    new_sql = sql.lower()
+    if new_sql.find('master_auto_position') > 0 and sql.find('channel') > 0:
+        return False
+    return True
+
+
+
 def doFullSyncUser(version=''):
     args = getArgs()
     data = checkArgs(args, ['db', 'sign'])
@@ -3342,6 +3350,8 @@ def doFullSyncUser(version=''):
     if not os.path.exists(bak_file):
         # 不锁表导出
         dmp_option += "--master-data=1 --apply-slave-statements --include-master-host-port --compress -E -R -q -c "
+        if not isSimpleSyncCmd(cmd):
+            dmp_option = ''
 
         dump_sql_data = getServerDir() + "/bin/mysqldump --single-transaction --default-character-set=utf8mb4 " + dmp_option + " -h" + ip + " -P" + \
             port + " -u" + user + " -p'" + apass + "' --ssl-mode=DISABLED " + sync_db + " > " + bak_file
