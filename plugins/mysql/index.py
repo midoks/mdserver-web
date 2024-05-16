@@ -3389,7 +3389,7 @@ def doFullSyncUser(version=''):
         if isSimpleSyncCmd(cmd):
             dmp_option += " --master-data=1 --apply-slave-statements --include-master-host-port "
         else:
-            dmp_option += ' --master-data=1 '
+            dmp_option += ' '
 
         dump_sql_data = getServerDir() + "/bin/mysqldump --single-transaction --default-character-set=utf8mb4 --compress -q" + dmp_option + " -h" + ip + " -P" + \
             port + " -u" + user + " -p'" + apass + "' --ssl-mode=DISABLED " + sync_db + " > " + bak_file
