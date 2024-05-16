@@ -2396,11 +2396,13 @@ def getMasterRepSlaveUserCmd(version):
 
     mdb8 = ['8.0','8.1','8.2','8.3']
     if mode == "gtid":
-        # sql = "CHANGE MASTER TO MASTER_HOST='" + ip + "', MASTER_PORT=" + port + ", MASTER_USER='" + \
-        #     clist[0]['username'] + "', MASTER_PASSWORD='" + \
-        #     clist[0]['password'] + "', MASTER_AUTO_POSITION=1" + channel_name
-
         sql = "CHANGE MASTER TO MASTER_HOST='" + ip + "', MASTER_PORT=" + port + ", MASTER_USER='" + \
+            clist[0]['username'] + "', MASTER_PASSWORD='" + \
+            clist[0]['password'] + "', MASTER_AUTO_POSITION=1" + channel_name
+
+        sql += "<br/>"
+        
+        sql += "CHANGE MASTER TO MASTER_HOST='" + ip + "', MASTER_PORT=" + port + ", MASTER_USER='" + \
             clist[0]['username']  + "', MASTER_PASSWORD='" + \
             clist[0]['password'] + \
             "', MASTER_LOG_FILE='" + mstatus[0]["File"] + \
