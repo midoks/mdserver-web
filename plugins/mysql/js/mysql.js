@@ -2261,7 +2261,7 @@ function addSlaveSyncUser(ip=''){
 
         var index = layer.open({
             type: 1,
-            area: ['500px','470px'],
+            area: ['500px','510px'],
             title: '同步账户',
             closeBtn: 1,
             shift: 5,
@@ -2272,6 +2272,15 @@ function addSlaveSyncUser(ip=''){
                 <div class='line'><span class='tname'>端口</span><div class='info-r'><input name='port' class='bt-input-text mr5' type='number' style='width:330px;' value='"+port+"'></div></div>\
                 <div class='line'><span class='tname'>同步账户</span><div class='info-r'><input name='user' class='bt-input-text mr5' type='text' style='width:330px;' value='"+user+"'></div></div>\
                 <div class='line'><span class='tname'>同步密码</span><div class='info-r'><input name='pass' class='bt-input-text mr5' type='text' style='width:330px;' value='"+pass+"'></div></div>\
+                <div class='line'>\
+                    <span class='tname'>同步模式</span>\
+                    <div class='info-r'>\
+                        <select class='bt-input-text mr5' name='mode'>\
+                            <option value='0' "+( mode == '0' ? 'selected="selected"' : '')+">经典</option>\
+                            <option value='1' "+( mode == '1' ? 'selected="selected"' : '')+">GTID</option>\
+                        </select>\
+                    </div>\
+                </div>\
                 <div class='line'>\
                 <span class='tname'>CMD[必须填写]</span>\
                 <div class='info-r'><textarea class='bt-input-text mr5' row='20' cols='30' name='cmd' style='width:330px;height:150px;'></textarea></div>\
@@ -2308,13 +2317,6 @@ function addSlaveSyncUser(ip=''){
                     $('input[name="port"]').val(a['MASTER_PORT']);
                     $('input[name="user"]').val(a['MASTER_USER']);
                     $('input[name="pass"]').val(a['MASTER_PASSWORD']);
-
-                    // console.log(a['MASTER_AUTO_POSITION'],typeof(a['MASTER_AUTO_POSITION']));
-                    if (typeof(a['MASTER_AUTO_POSITION']) != 'undefined' ){
-                        $('input[name="mode"]').val('1');
-                    } else{
-                        $('input[name="mode"]').val('0');
-                    }
                 });
             },
             yes:function(index){
@@ -2323,7 +2325,7 @@ function addSlaveSyncUser(ip=''){
                 var user = $('input[name="user"]').val();
                 var pass = $('input[name="pass"]').val();
                 var cmd = $('textarea[name="cmd"]').val();
-                var mode = $('input[name="mode"]').val();
+                var mode = $('select[name="mode"]').val();
 
                 var data = {ip:ip,port:port,cmd:cmd,user:user,pass:pass,mode:mode};
                 myPost('add_slave_sync_user', data, function(ret_data){
