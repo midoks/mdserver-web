@@ -2400,8 +2400,8 @@ def getMasterRepSlaveUserCmd(version):
             clist[0]['username'] + "', MASTER_PASSWORD='" + \
             clist[0]['password'] + "', MASTER_AUTO_POSITION=1" + channel_name
 
-        sql += "<br/>"
-        
+        sql += "<br/><hr/>"
+
         sql += "CHANGE MASTER TO MASTER_HOST='" + ip + "', MASTER_PORT=" + port + ", MASTER_USER='" + \
             clist[0]['username']  + "', MASTER_PASSWORD='" + \
             clist[0]['password'] + \
