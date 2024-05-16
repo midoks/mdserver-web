@@ -3347,6 +3347,7 @@ def doFullSyncUser(version=''):
     # --force --opt --single-transaction
     # --skip-opt --create-options
     # --master-data=1
+    time_s = time.time()
     if not os.path.exists(bak_file):
         # 不锁表导出
         if isSimpleSyncCmd(cmd):
@@ -3360,10 +3361,11 @@ def doFullSyncUser(version=''):
         time_s = time.time()
         r = mw.execShell(dump_sql_data)
         print(r)
-        time_e = time.time()
-        print("export cos:", time_e - time_s)
+    time_e = time.time()
+    export_cos = time_e - time_s
+    print("export cos:", export_cos)
     
-    writeDbSyncStatus({'code': 3, 'msg': '正在到本地导入数据中...', 'progress': 40})
+    writeDbSyncStatus({'code': 3, 'msg': '导出耗时:'+str(export_cos)+',正在到本地导入数据中...', 'progress': 40})
 
     if os.path.exists(bak_file):
         # 重置 
