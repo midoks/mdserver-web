@@ -2599,7 +2599,7 @@ function masterOrSlaveConf(version=''){
             for(i in rdata.data){
 
                 var v = rdata.data[i];
-                if ('Channel_Name' in v){
+                if ('Channel_Name' in v && v['Channel_Name'] !=''){
                     isHasSign = true;
                 }
 
@@ -2618,8 +2618,6 @@ function masterOrSlaveConf(version=''){
 
                 if (isHasSign){
                     list += '<td>' + v['Channel_Name'] +'</td>';
-                } else {
-                    list += '<td>无</td>';
                 }
 
                 list += '<td>' + status +'</td>';
