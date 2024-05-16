@@ -3166,7 +3166,7 @@ def syncDatabaseRepair(version=''):
             
             # print(len(local_select_data))
             # print(len(sync_select_data))
-            print('local compare sync,',local_select_data == sync_select_data)
+            print('pos:',str(table_name_pos),'local compare sync,',local_select_data == sync_select_data)
             
             cmd_count_sql = 'select count(*) as num from '+table_name
             local_count_data = local_db.query(cmd_count_sql)
@@ -3197,14 +3197,25 @@ def syncDatabaseRepair(version=''):
                 print('progress,%.2f' % progress+'%')
                 mw.writeFile(table_name_pos_file, str(pos))
             else:
-                if len(sync_select_data) != 0:
-                    for idx in range(len(sync_select_data)):
+                sync_select_data_len = len(sync_select_data)
+                skip_idx = 0
+                # 主库PK -> 查询本地 | 保证一致
+                if sync_select_data_len > 0:
+                    for idx in range(sync_select_data_len):
                         sync_idx_data = sync_select_data[idx]
+                        local_idx_data = None
+                        if idx in local_select_data:
+                            local_idx_data = local_select_data[idx]
+                        if sync_select_data[idx] == local_idx_data:
+                            skip_idx = idx
+                            pos = local_select_data[idx][pkey_name]
+                            mw.writeFile(table_name_pos_file, str(pos))
+
                         # print(insert_data)
                         local_inquery_sql = 'select * from ' + table_name+ ' where ' +pkey_name+' = '+ str(sync_idx_data[pkey_name])
                         # print(local_inquery_sql)
                         ldata = local_db.query(local_inquery_sql)
-                        print('ldata:',ldata)
+                        # print('ldata:',ldata)
                         if len(ldata) == 0:
                             print("id:"+ str(sync_idx_data[pkey_name])+ " no exists, insert")
                             insert_sql = 'insert into ' + table_name
@@ -3220,9 +3231,10 @@ def syncDatabaseRepair(version=''):
                             r = local_db.execute(insert_sql)
                             print(r)
                         else:
-                            print("compare: ",sync_select_data[idx], local_select_data[idx])
+                            # print('compare sync->local:',sync_idx_data ==  ldata[0] )
                             if ldata[0] == sync_idx_data:
                                 continue
+
                             print("id:"+ str(sync_idx_data[pkey_name])+ " data is not equal, update")
                             update_sql = 'update ' + table_name
                             field_str = ''
@@ -3236,6 +3248,28 @@ def syncDatabaseRepair(version=''):
                             print(update_sql)
                             r = local_db.execute(update_sql)
                             print(r)
+
+                # 本地PK -> 查询主库 | 保证一致
+                # local_select_data_len = len(local_select_data)
+                # if local_select_data_len > 0:
+                #     for idx in range(local_select_data_len):
+                #         if idx < skip_idx:
+                #             continue
+                #         local_idx_data = local_select_data[idx]
+                #         print('local idx check', idx, skip_idx)
+                #         local_inquery_sql = 'select * from ' + table_name+ ' where ' +pkey_name+' = '+ str(local_idx_data[pkey_name])
+                #         print(local_inquery_sql)
+                #         sdata = sync_db.query(local_inquery_sql)
+                #         sdata_len = len(sdata)
+                #         print('sdata:',sdata,sdata_len)
+                #         if sdata_len == 0:
+                #             delete_sql = 'delete from ' + table_name + ' where ' +pkey_name+' = '+ str(local_idx_data[pkey_name])
+                #             print(delete_sql)
+                #             r = local_db.execute(delete_sql)
+                #             print(r)
+                #             break
+                    
+
             if is_break:
                 print("break all")
                 break
@@ -3367,8 +3401,9 @@ def doFullSyncUser(version=''):
     export_cos = time_e - time_s
     print("export cos:", export_cos)
     
-    writeDbSyncStatus({'code': 3, 'msg': '导出耗时:'+str(export_cos)+',正在到本地导入数据中...', 'progress': 40})
+    writeDbSyncStatus({'code': 3, 'msg': '导出耗时:'+str(int(export_cos))+'秒,正在到本地导入数据中...', 'progress': 40})
 
+    time_s = time.time()
     if os.path.exists(bak_file):
         # 重置 
         db.execute('reset master')
@@ -3386,12 +3421,8 @@ def doFullSyncUser(version=''):
         my_import_cmd = getServerDir() + '/bin/mysql -S ' + sock + " -uroot -p'" + pwd + \
             "' " + sync_db_import + ' < ' + bak_file
         print(my_import_cmd)
-        time_s = time.time()
         r = mw.execShell(my_import_cmd)
         print(r)
-        time_e = time.time()
-        print("import cos:", time_e - time_s)
-
         # 修改同步位置
         # master_info = sync_mdb.query('show master status')
         # slave_info = db.query('show slave status')
@@ -3401,7 +3432,12 @@ def doFullSyncUser(version=''):
         #     print(change_cmd)
         #     r = db.execute(change_cmd)
         #     print(r)
+    time_e = time.time()
+    import_cos = time_e - time_s
+    print("import cos:", import_cos)
+    writeDbSyncStatus({'code': 4, 'msg': '导入耗时:'+str(int(import_cos))+'秒', 'progress': 60})
 
+    time.sleep(3)
     # print(cmd)
     # r = db.query(cmd)
     # print(r)
