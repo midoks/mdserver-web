@@ -2618,6 +2618,8 @@ function masterOrSlaveConf(version=''){
 
                 if (isHasSign){
                     list += '<td>' + v['Channel_Name'] +'</td>';
+                } else {
+                    list += '<td>无</td>';
                 }
 
                 list += '<td>' + status +'</td>';
