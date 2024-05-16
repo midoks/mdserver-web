@@ -3325,9 +3325,9 @@ def doFullSyncUser(version=''):
 
     writeDbSyncStatus({'code': 0, 'msg': '开始同步...', 'progress': 0})
     dmp_option = ''
-    # mode = recognizeDbMode()
-    # if mode == 'gtid':
-    #     dmp_option = ' --set-gtid-purged=off '
+    mode = recognizeDbMode()
+    if mode == 'gtid':
+        dmp_option = ' --set-gtid-purged=off '
 
     time.sleep(1)
     writeDbSyncStatus({'code': 1, 'msg': '正在停止从库...', 'progress': 15})
@@ -3348,9 +3348,10 @@ def doFullSyncUser(version=''):
 
     # --force --opt --single-transaction
     # --skip-opt --create-options
+    # --master-data=1
     if not os.path.exists(bak_file):
         # 不锁表导出
-        dump_sql_data = getServerDir() + "/bin/mysqldump " + dmp_option + " --single-transaction --master-data=1 --compress --include-master-host-port --default-character-set=utf8mb4 -h" + ip + " -P" + \
+        dump_sql_data = getServerDir() + "/bin/mysqldump " + dmp_option + " --single-transaction --master-data=1 --apply-slave-statements --compress --default-character-set=utf8mb4 -h" + ip + " -P" + \
             port + " -u" + user + " -p'" + apass + "' --ssl-mode=DISABLED " + sync_db + " > " + bak_file
         print(dump_sql_data)
         time_s = time.time()
