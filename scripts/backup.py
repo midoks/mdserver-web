@@ -159,7 +159,7 @@ class backupTools:
 
         # skip-opt 不会lock表
         # --skip-opt --create-options
-        cmd = db_path + "/bin/mysqldump --defaults-file=" + my_cnf +" " + option +" --single-transaction --compress -q --default-character-set=utf8mb4 " + \
+        cmd = db_path + "/bin/mysqldump --defaults-file=" + my_cnf +" " + option +" --single-transaction -q --default-character-set=utf8mb4 " + \
             name + " | gzip > " + filename
         # print(cmd)
         mw.execShell(cmd)
