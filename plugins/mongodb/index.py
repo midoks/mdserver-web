@@ -618,7 +618,7 @@ def addDb():
         username = data_name
 
 
-    client[data_name].chat.insert_one({})
+    client[data_name].zchat.insert_one({})
     user_roles = [{'role': 'dbOwner', 'db': data_name}, {'role': 'userAdmin', 'db': data_name}]
     if auth_status:
         # db.command("dropUser", username)
@@ -803,7 +803,7 @@ def toDbBase(find):
     data_name = find['name']
     db = client[data_name]
 
-    db.chat.insert_one({})
+    db.zchat.insert_one({})
     user_roles = [{'role': 'dbOwner', 'db': data_name}, {'role': 'userAdmin', 'db': data_name}]
     try:
         db_admin.command("createUser", find['username'], pwd=find['password'], roles=user_roles)
