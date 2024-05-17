@@ -3117,8 +3117,8 @@ def syncDatabaseRepair(version=''):
             continue
 
         # 比较总数
-        local_count_data = local_db.query(cmd_count_sql)
         cmd_count_sql = 'select count(*) as num from '+table_name
+        local_count_data = local_db.query(cmd_count_sql)
         sync_count_data = sync_db.query(cmd_count_sql)
 
         if local_count_data != sync_count_data:
