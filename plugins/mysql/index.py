@@ -3172,7 +3172,7 @@ def syncDatabaseRepair(version=''):
                 
 
             local_count_data = local_db.query(cmd_count_sql)
-            cmd_count_sql = 'select count(*) as num from '+table_name
+            cmd_count_sql = 'select count('+pkey_name+') as num from '+table_name
             time_s = time.time()
             sync_count_data = sync_db.query(cmd_count_sql)
             print(f'sync count data cos:{time.time() - time_s:.4f}s')
