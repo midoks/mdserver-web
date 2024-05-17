@@ -3360,6 +3360,11 @@ def doFullSyncUserImportContentForChannel(file, channel_name):
 
 
 def doFullSyncUser(version=''):
+    which_pv = mw.execShell('which pv')
+    is_exist_pv = False
+    if not os.path.exists(which_pv[0]):
+        is_exist_pv = True
+
     time_all_s = time.time()
     args = getArgs()
     data = checkArgs(args, ['db', 'sign'])
@@ -3465,15 +3470,15 @@ def doFullSyncUser(version=''):
 
         pwd = pSqliteDb('config').where('id=?', (1,)).getField('mysql_root')
         sock = getSocketFile()
-        # my_import_cmd = getServerDir() + '/bin/mysql -S ' + sock + " -uroot -p'" + pwd + \
-        #     "' " + sync_db_import + ' < ' + bak_file
-        # print(my_import_cmd)
 
-        my_import_cmd = getServerDir() + '/bin/mysql -S ' + sock + " -uroot -p'" + pwd + \
-            "' " + sync_db_import
-        my_import_cmd = "pv -t -p " + bak_file + '|' + my_import_cmd
-        print(my_import_cmd)
-        os.system(my_import_cmd)
+        if is_exist_pv:
+            my_import_cmd = getServerDir() + '/bin/mysql -S ' + sock + " -uroot -p'" + pwd + "' " + sync_db_import
+            my_import_cmd = "pv -t -p " + bak_file + '|' + my_import_cmd
+            print(my_import_cmd)
+            os.system(my_import_cmd)
+        else:
+            my_import_cmd = getServerDir() + '/bin/mysql -S ' + sock + " -uroot -p'" + pwd + "' " + sync_db_import + ' < ' + bak_file
+            print(my_import_cmd)
 
         # 加快导入 - 结束
         # db.execute('set global innodb_flush_log_at_trx_commit = 1')
