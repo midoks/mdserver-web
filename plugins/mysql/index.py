@@ -3117,9 +3117,9 @@ def syncDatabaseRepair(version=''):
             continue
 
         # 比较总数
+        local_count_data = local_db.query(cmd_count_sql)
         cmd_count_sql = 'select count(*) as num from '+table_name
         sync_count_data = sync_db.query(cmd_count_sql)
-        local_count_data = local_db.query(cmd_count_sql)
 
         if local_count_data != sync_count_data:
             print("all data compare: ",local_count_data, sync_count_data)
@@ -3169,11 +3169,12 @@ def syncDatabaseRepair(version=''):
             # print(len(local_select_data))
             # print(len(sync_select_data))
             print('pos:',str(table_name_pos),'local compare sync,',local_select_data == sync_select_data)
-            
+                
+
+            local_count_data = local_db.query(cmd_count_sql)
             cmd_count_sql = 'select count(*) as num from '+table_name
             time_s = time.time()
             sync_count_data = sync_db.query(cmd_count_sql)
-            local_count_data = local_db.query(cmd_count_sql)
             print(f'sync count data cos:{time.time() - time_s:.4f}s')
             print(local_count_data,sync_count_data)
             # 数据同步有延迟，相等即任务数据补足完成
