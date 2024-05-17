@@ -3479,6 +3479,7 @@ def doFullSyncUser(version=''):
         else:
             my_import_cmd = getServerDir() + '/bin/mysql -S ' + sock + " -uroot -p'" + pwd + "' " + sync_db_import + ' < ' + bak_file
             print(my_import_cmd)
+            mw.execShell(my_import_cmd)
 
         # 加快导入 - 结束
         # db.execute('set global innodb_flush_log_at_trx_commit = 1')
