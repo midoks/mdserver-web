@@ -3442,6 +3442,10 @@ def doFullSyncUser(version=''):
         # 重置 
         db.execute('reset master')
 
+        # 加快导入 - 开始
+        db.execute('set global innodb_flush_log_at_trx_commit = 2')
+        db.execute('set global sync_binlog = 2000')
+
         doFullSyncUserImportContentForChannel(bak_file, channel_name)
 
 
@@ -3452,6 +3456,11 @@ def doFullSyncUser(version=''):
         print(my_import_cmd)
         r = mw.execShell(my_import_cmd)
         print(r)
+
+        # 加快导入 - 结束
+        db.execute('set global innodb_flush_log_at_trx_commit = 1')
+        db.execute('set global sync_binlog = 1')
+
         # 修改同步位置
         # master_info = sync_mdb.query('show master status')
         # slave_info = db.query('show slave status')
