@@ -2004,6 +2004,7 @@ function getFullSyncStatus(db){
                             fullSync(db,sign,0);
                         }, 1000);
                         $(this).data('status','starting');
+                        $('#begin_full_sync').text("同步中");
                     } else {
                         layer.msg("正在同步中..",{icon:0});
                     }
@@ -2048,6 +2049,7 @@ function getFullSyncStatus(db){
             if (rdata['code']==6 ||rdata['code']<0){
                 layer.msg(rdata['msg']);
                 clearInterval(timeId);
+                $('#begin_full_sync').text("同步结束,再次同步?");
                 $("#begin_full_sync").attr('data-status','init');
             }
         });
