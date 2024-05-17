@@ -13,3 +13,15 @@ show global  variables like 'server_uuid';
 #     # print(drop_db_cmd)
 #     db.query(drop_db_cmd)
 ```
+
+```
+# 修改同步位置
+# master_info = sync_mdb.query('show master status')
+# slave_info = db.query('show slave status')
+# if len(master_info)>0:
+#     channel_name = slave_info[0]['Channel_Name']
+#     change_cmd = "CHANGE MASTER TO  MASTER_LOG_FILE='"+master_info[0]['File']+"', MASTER_LOG_POS="+str(master_info[0]['Position'])+" for channel '"+channel_name+"';"
+#     print(change_cmd)
+#     r = db.execute(change_cmd)
+#     print(r)
+```

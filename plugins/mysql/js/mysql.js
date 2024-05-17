@@ -1985,6 +1985,7 @@ function getFullSyncStatus(db){
                     </div>\
                     <div class='table_toolbar' style='left:0px;'>\
                         <span data-status='init' class='sync btn btn-default btn-sm' id='begin_full_sync'>开始</span>\
+                        <span data-status='init' class='btn btn-default btn-sm' id='full_sync_cmd'>手动命令</span>\
                     </div>\
                 </div>",
             cancel: function(){ 
@@ -2006,6 +2007,31 @@ function getFullSyncStatus(db){
                     } else {
                         layer.msg("正在同步中..",{icon:0});
                     }
+                });
+
+                $('#full_sync_cmd').click(function(){
+                    myPostN('full_sync_cmd', {'db':db,'sign':''}, function(rdata){
+                        var rdata = $.parseJSON(rdata.data);
+                        layer.open({
+                        title: "手动执行命令CMD",
+                            area: ['600px', '180px'],
+                            type:1,
+                            closeBtn: 1,
+                            shadeClose: false,
+                            btn:["复制","取消"],
+                            content: '<div class="pd15">\
+                                        <div class="divtable">\
+                                            <pre class="layui-code">'+rdata.data+'</pre>\
+                                        </div>\
+                                    </div>',
+                            success:function(){
+                                copyText(rdata.data);
+                            },
+                            yes:function(){
+                                copyText(rdata.data);
+                            }
+                        });
+                    });
                 });
             }
         });

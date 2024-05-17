@@ -3293,6 +3293,18 @@ def writeDbSyncStatus(data):
     mw.writeFile(path, json.dumps(data))
     return True
 
+def fullSyncCmd():
+    time_all_s = time.time()
+    args = getArgs()
+    data = checkArgs(args, ['db', 'sign'])
+    if not data[0]:
+        return data[1]
+
+    db = args['db']
+    sign = args['sign']
+
+    cmd = 'cd '+mw.getServerDir()+'/mdserver-web && source bin/activate && python3 plugins/mysql/index.py do_full_sync  {"db":"'+db+'","sign":"'+sign+'"}'
+    return mw.returnJson(True,'ok',cmd)
 
 def doFullSync(version=''):
     mode_file = getSyncModeFile()
@@ -3322,6 +3334,7 @@ def getChannelNameForCmd(cmd):
         channel_name = channel_name.strip("'")
         return channel_name
     return ''
+
 
 
 def doFullSyncUserImportContentForChannel(file, channel_name):
@@ -3443,33 +3456,28 @@ def doFullSyncUser(version=''):
         db.execute('reset master')
 
         # 加快导入 - 开始
-        db.execute('set global innodb_flush_log_at_trx_commit = 2')
-        db.execute('set global sync_binlog = 2000')
+        # db.execute('set global innodb_flush_log_at_trx_commit = 2')
+        # db.execute('set global sync_binlog = 2000')
 
         doFullSyncUserImportContentForChannel(bak_file, channel_name)
 
 
         pwd = pSqliteDb('config').where('id=?', (1,)).getField('mysql_root')
         sock = getSocketFile()
+        # my_import_cmd = getServerDir() + '/bin/mysql -S ' + sock + " -uroot -p'" + pwd + \
+        #     "' " + sync_db_import + ' < ' + bak_file
+        # print(my_import_cmd)
+
         my_import_cmd = getServerDir() + '/bin/mysql -S ' + sock + " -uroot -p'" + pwd + \
-            "' " + sync_db_import + ' < ' + bak_file
+            "' " + sync_db_import
+        my_import_cmd = "pv -t -p " + bak_file + '|' + my_import_cmd
         print(my_import_cmd)
-        r = mw.execShell(my_import_cmd)
-        print(r)
+        os.system(my_import_cmd)
 
         # 加快导入 - 结束
-        db.execute('set global innodb_flush_log_at_trx_commit = 1')
-        db.execute('set global sync_binlog = 1')
+        # db.execute('set global innodb_flush_log_at_trx_commit = 1')
+        # db.execute('set global sync_binlog = 1')
 
-        # 修改同步位置
-        # master_info = sync_mdb.query('show master status')
-        # slave_info = db.query('show slave status')
-        # if len(master_info)>0:
-        #     channel_name = slave_info[0]['Channel_Name']
-        #     change_cmd = "CHANGE MASTER TO  MASTER_LOG_FILE='"+master_info[0]['File']+"', MASTER_LOG_POS="+str(master_info[0]['Position'])+" for channel '"+channel_name+"';"
-        #     print(change_cmd)
-        #     r = db.execute(change_cmd)
-        #     print(r)
     time_e = time.time()
     import_cos = time_e - time_s
     print("import cos:", import_cos)
@@ -3866,6 +3874,8 @@ if __name__ == "__main__":
         print(fullSync(version))
     elif func == 'do_full_sync':
         print(doFullSync(version))
+    elif func == 'full_sync_cmd':
+        print(fullSyncCmd())
     elif func == 'dump_mysql_data':
         print(dumpMysqlData(version))
     elif func == 'sync_database_repair':
