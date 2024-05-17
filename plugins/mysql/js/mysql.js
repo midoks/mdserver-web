@@ -2291,6 +2291,7 @@ function addSlaveSyncUser(ip=''){
                 $('textarea[name="cmd"]').html(cmd);
                 $('textarea[name="cmd"]').change(function(){
                     var val = $(this).val();
+                    val = val.replace(';','');
                     var a = {};
                     if (val.toLowerCase().indexOf('for')>0){
                         cmd_tmp = val.split('for');
