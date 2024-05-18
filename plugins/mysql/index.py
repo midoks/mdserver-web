@@ -3470,7 +3470,7 @@ def doFullSyncUser(version=''):
     find_run_dump = mw.execShell('ps -ef | grep mysqldump | grep -v grep')
     if find_run_dump[0] != "":
         print("正在远程导出数据中,别着急...")
-        writeDbSyncStatus({'code': 3.1, 'msg': '正在远程导出数据中,别着急...', 'progress': 21})
+        writeDbSyncStatus({'code': 3.1, 'msg': '正在远程导出数据中,别着急...', 'progress': 19})
         return False
     time_s = time.time()
     if not os.path.exists(bak_file):
@@ -3494,7 +3494,7 @@ def doFullSyncUser(version=''):
     find_run_sync = mw.execShell('ps -ef | grep do_full_sync | grep -v grep')
     if find_run_sync[0] != "":
         print("正在导入数据中,别着急...")
-        writeDbSyncStatus({'code': 4.1, 'msg': '正在导入数据中,别着急...', 'progress': 41})
+        writeDbSyncStatus({'code': 4.1, 'msg': '正在导入数据中,别着急...', 'progress': 39})
         return False
 
     time_s = time.time()
