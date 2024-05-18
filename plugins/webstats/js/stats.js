@@ -192,7 +192,7 @@ function wsOverviewRequest(page){
         var data = rdata.data.data;
         var statData = rdata.data.stat_list;
 
-        console.log(statData, data);
+        // console.log(statData, data);
 
         var stat_pv = statData['pv'] == null?0:statData['pv'];
         var stat_uv = statData['uv'] == null?0:statData['uv'];
@@ -383,11 +383,13 @@ function wsOverviewRequest(page){
                 var select_option = $('.indicators-container input:checked').parent().attr('data-name');
                 if (select_option != "realtime_traffic" && select_option != 'realtime_request' ){
                     clearInterval(ovTimer);
-                    console.log("get_logs_realtime_info over:"+select_option);
+                    // console.log("get_logs_realtime_info over:"+select_option);
                     return;
                 }
 
-                wsOriginPost("get_logs_realtime_info",'',{"site":args["site"], "type":select_option} , function(rdata){    
+                var second = $('#check_realtime_second').val();
+
+                wsOriginPost("get_logs_realtime_info",'',{"site":args["site"], "type":select_option,'second':second} , function(rdata){    
                     
                     var rdata = $.parseJSON(rdata.data);
 
@@ -488,11 +490,11 @@ var html = '<div>\
                         <p class="ov_num">0</p>\
                     </div>\
                     <div class="overview_box">\
-                        <p class="ov_title">实时流量<i class="tips" data-toggle="tooltip" data-placement="top" title="当前10秒内您网站的实时流量大小。包括已排除的请求。">?</i></p>\
+                        <p class="ov_title">实时流量<i class="tips" data-toggle="tooltip" data-placement="top" title="当前X秒内您网站的实时流量大小。包括已排除的请求。">?</i></p>\
                         <p class="ov_num">0</p>\
                     </div>\
                     <div class="overview_box">\
-                        <p class="ov_title">每秒请求<i class="tips" data-toggle="tooltip" data-placement="top" title="当前10秒内您网站的实时请求数量。包括已排除的请求。">?</i></p>\
+                        <p class="ov_title"><span id="ov_title_req_second">每秒请求<span><i class="tips" data-toggle="tooltip" data-placement="top" title="当前1-10秒内您网站的实时请求数量。包括已排除的请求。">?</i></p>\
                         <p class="ov_num">0</p>\
                     </div>\
                 </div>\
@@ -525,7 +527,11 @@ var html = '<div>\
                         </div>\
                         <div class="indicators-label" bt-event-click="indicatorsType" data-name="realtime_request">\
                             <input type="radio" id="check_realtime_request" name="check_realtime_request">\
-                            <span class="check_realtime_request" style="font-weight:normal">每秒请求</span>\
+                            <span class="check_realtime_request" style="font-weight:normal">每X秒请求</span>\
+                        </div>\
+                        <div class="indicators-label" bt-event-click="indicatorsType">\
+                            <input class="bt-input-text mr5" type="number" id="check_realtime_second" name="check_realtime_second" value="1" style="width:40px;outline:none;height:23px;border-radius:3px;">\
+                            <span style="font-weight:normal">秒</span>\
                         </div>\
                     </div>\
                 </div>\
@@ -592,8 +598,35 @@ $('#search_time button').click(function(){
 });
 
 
-$('.indicators-container input').click(function(){
-    $('.indicators-container input').each(function(){
+function initRealtimeTraffic(){
+    var check_realtime_second = $('#check_realtime_second').val();
+    if (check_realtime_second<1){
+        check_realtime_second = 1;
+        $('#check_realtime_second').val(check_realtime_second);
+    }
+
+    if (check_realtime_second>10){
+        check_realtime_second = 10;
+        $('#check_realtime_second').val(check_realtime_second);
+    }
+    var title = "每秒请求";
+    if (check_realtime_second > 1){
+        title = '每'+check_realtime_second+'秒请求'
+    }
+
+    $('#ov_title_req_second').text(title)
+    $('.check_realtime_request').text(title);
+}
+
+
+initRealtimeTraffic();
+$('#check_realtime_second').change(function(){
+    initRealtimeTraffic();
+    wsOverviewRequest(1);
+});
+
+$('.indicators-container input[type=radio]').click(function(){
+    $('.indicators-container input[type=radio]').each(function(){
         $(this).removeAttr('checked');
     });
     $(this).prop({'checked':true});

@@ -654,17 +654,19 @@ def getLogsRealtimeInfo():
     '''
     import datetime
     args = getArgs()
-    check = checkArgs(args, ['site', 'type'])
+    check = checkArgs(args, ['site', 'type','second'])
     if not check[0]:
         return check[1]
 
     domain = args['site']
     dtype = args['type']
+    second = int(args['second'])
+
 
     conn = pSqliteDb('web_logs', domain)
     timeInt = time.mktime(datetime.datetime.now().timetuple())
 
-    conn = conn.where("time>=?", (int(timeInt) - 10,))
+    conn = conn.where("time>=?", (int(timeInt) - second,))
 
     field = 'time,body_length'
     field_sum = toSumField(field.replace("time,", ""))
