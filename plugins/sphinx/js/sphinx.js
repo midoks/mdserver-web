@@ -40,10 +40,18 @@ function rebuildIndex(){
         if (data.data == 'ok'){
             layer.msg('重建成功!',{icon:1,time:2000,shade: [0.3, '#000']});
         } else {
-            layer.msg(data.data,{icon:2,time:2000,shade: [0.3, '#000']});
+            layer.msg(data.data,{icon:2,time:10000,shade: [0.3, '#000']});
         }
     });
 }
+
+
+function tryRebuildIndex(){
+    layer.confirm("修改配置后，是否尝试重建索引。", {icon:3,closeBtn: 1} , function(){
+        rebuildIndex();
+    });
+}
+
 
 function secToTime(s) {
     var t;

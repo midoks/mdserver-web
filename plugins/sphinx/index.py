@@ -212,8 +212,8 @@ def rebuild():
     file = initDreplace()
     cmd = file + ' rebuild &'
     data = mw.execShell(cmd)
-    if data[1] != '':
-        return data[0]
+    if data[0].find('successfully'):
+        return data[0].replace("\n","<br/>")
     return 'ok'
 
 

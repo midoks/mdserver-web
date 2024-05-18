@@ -2255,7 +2255,7 @@ function pluginConfig(_name, version, func){
 
 
 //配置修改模版 --- start
-function pluginConfigTpl(_name, version, func, config_tpl_func, read_config_tpl_func){
+function pluginConfigTpl(_name, version, func, config_tpl_func, read_config_tpl_func, save_callback_func){
 	if ( typeof(version) == 'undefined' ){
 		version = '';
 	}
@@ -2281,7 +2281,7 @@ function pluginConfigTpl(_name, version, func, config_tpl_func, read_config_tpl_
     			<textarea class="bt-input-text" style="height: 320px; line-height:18px;" id="textBody"></textarea>\
                 <button id="onlineEditFileBtn" class="btn btn-success btn-sm" style="margin-top:10px;">保存</button>\
                 <ul class="help-info-text c7 ptb15">\
-                    <li>此处为'+ _name + version +'主配置文件,若您不了解配置规则,请勿随意修改。</li>\
+                    <li>此处为【'+ _name + version +'】主配置文件,若您不了解配置规则,请勿随意修改。</li>\
                 </ul>';
     $(".soft-man-con").html(con);
 
@@ -2321,7 +2321,7 @@ function pluginConfigTpl(_name, version, func, config_tpl_func, read_config_tpl_
 		                    "Ctrl-H": "replaceAll",
 		                    "Ctrl-S": function() {
 		                    	$("#textBody").text(editor.getValue());
-		                        pluginConfigSave(fileName);
+		                        pluginConfigSave(fileName,save_callback_func);
 		                    }
 		                },
 		                lineNumbers: true,
@@ -2332,7 +2332,7 @@ function pluginConfigTpl(_name, version, func, config_tpl_func, read_config_tpl_
 		            $("#onlineEditFileBtn").unbind('click');
 		            $("#onlineEditFileBtn").click(function(){
 		                $("#textBody").text(editor.getValue());
-		                pluginConfigSave(fileName);
+		                pluginConfigSave(fileName, save_callback_func);
 		            });
     			},'json');
     		}
@@ -2361,7 +2361,7 @@ function pluginConfigTpl(_name, version, func, config_tpl_func, read_config_tpl_
                     "Ctrl-H": "replaceAll",
                     "Ctrl-S": function() {
                     	$("#textBody").text(editor.getValue());
-                        pluginConfigSave(fileName);
+                        pluginConfigSave(fileName,save_callback_func);
                     }
                 },
                 lineNumbers: true,
@@ -2371,7 +2371,7 @@ function pluginConfigTpl(_name, version, func, config_tpl_func, read_config_tpl_
             $(".CodeMirror-scroll").css({"height":"300px","margin":0,"padding":0});
             $("#onlineEditFileBtn").click(function(){
                 $("#textBody").text(editor.getValue());
-                pluginConfigSave(fileName);
+                pluginConfigSave(fileName,save_callback_func);
             });
         },'json');
     },'json');
@@ -2498,13 +2498,19 @@ function pluginConfigListTpl(_name, version, config_tpl_func, read_config_tpl_fu
 
 
 //配置保存
-function pluginConfigSave(fileName) {
+function pluginConfigSave(fileName, callback) {
     var data = encodeURIComponent($("#textBody").val());
     var encoding = 'utf-8';
     var loadT = layer.msg('保存中...', {icon: 16,time: 0});
     $.post('/files/save_body', 'data=' + data + '&path=' + fileName + '&encoding=' + encoding, function(rdata) {
         layer.close(loadT);
-        layer.msg(rdata.msg, {icon: rdata.status ? 1 : 2});
+
+        showMsg(rdata.msg, function(){
+        	if ( rdata.status && typeof(callback) == 'function'){
+	        	callback();
+	        }
+        },{icon: rdata.status ? 1 : 2});
+     
     },'json');
 }
 
