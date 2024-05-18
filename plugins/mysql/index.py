@@ -3109,9 +3109,6 @@ def syncDatabaseRepair(version=''):
     mw.execShell('mkdir -p '+tmp_dir)
 
     for tb in tables:
-        primary_key_sql = "SHOW INDEX FROM "+tb+" WHERE Key_name = 'PRIMARY';";
-        primary_key_data = local_db.query(primary_key_sql)
-        pkey_name = primary_key_data[0]['Column_name']
 
         table_name = sync_args_db+'.'+tb[table_key]
         table_check_file = tmp_dir+'/'+table_name+'.txt'
@@ -3119,6 +3116,10 @@ def syncDatabaseRepair(version=''):
         if os.path.exists(table_check_file):
             # print(table_name+', 已检查OK')
             continue
+
+        primary_key_sql = "SHOW INDEX FROM "+table_name+" WHERE Key_name = 'PRIMARY';";
+        primary_key_data = local_db.query(primary_key_sql)
+        pkey_name = primary_key_data[0]['Column_name']
 
         # 比较总数
         cmd_count_sql = 'select count('+pkey_name+') as num from '+table_name
