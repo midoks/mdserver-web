@@ -121,6 +121,7 @@ function readme(){
         var con = '<ul class="help-info-text c7">';
 
         con += '<li style="color:red;">如果数据量比较大,第一次启动会失败!(可通过手动建立索引)</li>';
+        con += '<li style="color:red;">以下内容,需手动加入计划任务。</li>';
         //主索引
         for (var i = 0; i < rdata['data']['index'].length; i++) {
             var index_t = rdata['data']['index'][i];
