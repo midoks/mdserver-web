@@ -33,7 +33,7 @@ start () {
 }
 
 rebuild () {
-    ${APP_PATH}/bin/bin/indexer -c ${APP_CONF} --all --rotate & 
+    ${APP_PATH}/bin/bin/indexer -c ${APP_CONF} --all --rotate
 }
 
 

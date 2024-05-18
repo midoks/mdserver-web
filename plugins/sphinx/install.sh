@@ -10,6 +10,8 @@ sysName=`uname`
 
 install_tmp=${rootPath}/tmp/mw_install.pl
 
+# cd /www/server/mdserver-web && source bin/activate && python3 plugins/sphinx/index.py rebuild
+
 
 bash ${rootPath}/scripts/getos.sh
 OSNAME=`cat ${rootPath}/data/osname.pl`

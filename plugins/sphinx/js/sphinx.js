@@ -38,7 +38,7 @@ function rebuild(){
 function rebuildIndex(){
     spPost('rebuild', '', function(data){
         if (data.data == 'ok'){
-            layer.msg('在重建中..',{icon:1,time:2000,shade: [0.3, '#000']});
+            layer.msg('重建成功!',{icon:1,time:2000,shade: [0.3, '#000']});
         } else {
             layer.msg(data.data,{icon:2,time:2000,shade: [0.3, '#000']});
         }

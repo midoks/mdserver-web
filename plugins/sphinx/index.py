@@ -210,9 +210,10 @@ def reload():
 
 def rebuild():
     file = initDreplace()
-    subprocess.Popen(file + ' rebuild &',
-                     stdout=subprocess.PIPE, shell=True)
-    # data = mw.execShell(file + ' rebuild')
+    cmd = file + ' rebuild &'
+    data = mw.execShell(cmd)
+    if data[1] != '':
+        return data[0]
     return 'ok'
 
 
