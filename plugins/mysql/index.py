@@ -3472,6 +3472,7 @@ def doFullSyncUser(version=''):
         print("正在远程导出数据中,别着急...")
         writeDbSyncStatus({'code': 3.1, 'msg': '正在远程导出数据中,别着急...', 'progress': 19})
         return False
+
     time_s = time.time()
     if not os.path.exists(bak_file):
         if isSimpleSyncCmd(cmd):
@@ -3491,8 +3492,8 @@ def doFullSyncUser(version=''):
     
     writeDbSyncStatus({'code': 3, 'msg': '导出耗时:'+str(int(export_cos))+'秒,正在到本地导入数据中...', 'progress': 40})
 
-    find_run_sync = mw.execShell('ps -ef | grep do_full_sync | grep -v grep')
-    if find_run_sync[0] != "":
+    find_run_import = mw.execShell('ps -ef | grep mysql| grep '+ bak_file +' | grep -v grep')
+    if find_run_import[0] != "":
         print("正在导入数据中,别着急...")
         writeDbSyncStatus({'code': 4.1, 'msg': '正在导入数据中,别着急...', 'progress': 39})
         return False
