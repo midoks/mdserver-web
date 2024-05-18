@@ -3119,7 +3119,32 @@ def syncDatabaseRepair(version=''):
 
         primary_key_sql = "SHOW INDEX FROM "+table_name+" WHERE Key_name = 'PRIMARY';";
         primary_key_data = local_db.query(primary_key_sql)
-        pkey_name = primary_key_data[0]['Column_name']
+        # print(primary_key_sql,primary_key_data)
+        pkey_name = '*'
+        if len(primary_key_data) == 1:
+            pkey_name = primary_key_data[0]['Column_name']
+        # print(pkey_name)
+        if pkey_name != '*' :
+            # 智能校验(由于服务器同步可能会慢,比较总数总是对不上)
+            cmd_local_newpk_sql = 'select ' + pkey_name + ' from ' + table_name + " order by " + pkey_name + " desc limit 1"
+            cmd_local_newpk_data = local_db.query(cmd_local_newpk_sql)
+            # print(cmd_local_newpk_data)
+            if len(cmd_local_newpk_data) == 1:
+                # 比较总数
+                cmd_count_sql = 'select count('+pkey_name+') as num from '+table_name + ' where '+pkey_name + ' < '+ str(cmd_local_newpk_data[0][pkey_name])
+                local_count_data = local_db.query(cmd_count_sql)
+                sync_count_data = sync_db.query(cmd_count_sql)
+
+                if local_count_data != sync_count_data:
+                    print(cmd_count_sql)
+                    print("all data compare: ",local_count_data, sync_count_data)
+                else:
+                    print(table_name+' smart compare check ok.')
+                    mw.writeFile(tmp_log, table_name+' smart compare check ok.\n','a+')
+                    mw.execShell("echo 'ok' > "+table_check_file)
+                    continue
+
+
 
         # 比较总数
         cmd_count_sql = 'select count('+pkey_name+') as num from '+table_name
