@@ -622,7 +622,6 @@ function initRealtimeTraffic(){
 initRealtimeTraffic();
 $('#check_realtime_second').change(function(){
     initRealtimeTraffic();
-    wsOverviewRequest(1);
 });
 
 $('.indicators-container input[type=radio]').click(function(){
