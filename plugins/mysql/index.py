@@ -3131,7 +3131,7 @@ def syncDatabaseRepair(version=''):
             # print(cmd_local_newpk_data)
             if len(cmd_local_newpk_data) == 1:
                 # 比较总数
-                cmd_count_sql = 'select count('+pkey_name+') as num from '+table_name + ' where '+pkey_name + ' < '+ str(cmd_local_newpk_data[0][pkey_name])
+                cmd_count_sql = 'select count('+pkey_name+') as num from '+table_name + ' where '+pkey_name + ' <= '+ str(cmd_local_newpk_data[0][pkey_name])
                 local_count_data = local_db.query(cmd_count_sql)
                 sync_count_data = sync_db.query(cmd_count_sql)
 
