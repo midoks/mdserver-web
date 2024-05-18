@@ -3494,9 +3494,9 @@ def doFullSyncUser(version=''):
         # 加快导入 - 开始
         # db.execute('set global innodb_flush_log_at_trx_commit = 2')
         # db.execute('set global sync_binlog = 2000')
-
-        doFullSyncUserImportContentForChannel(bak_file, channel_name)
-
+        
+        if channel_name != '':
+            doFullSyncUserImportContentForChannel(bak_file, channel_name)
 
         pwd = pSqliteDb('config').where('id=?', (1,)).getField('mysql_root')
         sock = getSocketFile()
