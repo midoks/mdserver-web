@@ -212,7 +212,7 @@ def rebuild():
     file = initDreplace()
     cmd = file + ' rebuild &'
     data = mw.execShell(cmd)
-    if data[0].find('successfully'):
+    if data[0].find('successfully')<0:
         return data[0].replace("\n","<br/>")
     return 'ok'
 
