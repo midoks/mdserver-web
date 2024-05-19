@@ -125,11 +125,10 @@ def makeSphinxDbSourceQuerySql(pdb, db, table,pkey_name):
 		sql = "SELECT "+pkey_name+' as id,' + field_str + " FROM " + table + " where id >= $start AND id <= $end"
 	return sql
 
-def makeSphinxDbSource(pdb, db, table):
+def makeSphinxDbSource(pdb, db, table, pkey_name):
 
 	db_info = pSqliteDb('databases').field('username,password').where('name=?', (db,)).find()
 	port = getDbPort()
-	pkey_name = getTablePk(pdb, db, table)
 
 
 	conf = '''
@@ -172,10 +171,10 @@ index {$DB_NAME}_{$TABLE_NAME}
 	range_sql = makeSphinxDbSourceRangeSql(pdb, db, table)
 	conf = conf.replace("{$DB_RANGE_SQL}", range_sql)
 
-	query_sql = makeSphinxDbSourceQuerySql(pdb, db,table,pkey_name)
+	query_sql = makeSphinxDbSourceQuerySql(pdb, db, table, pkey_name)
 	conf = conf.replace("{$DB_QUERY_SQL}", query_sql)
 
-	sph_field = makeSqlToSphinxTable(pdb, db,table,pkey_name)
+	sph_field = makeSqlToSphinxTable(pdb, db, table, pkey_name)
 	conf = conf.replace("{$SPH_FIELD}", sph_field)
 
 	return conf
@@ -210,7 +209,7 @@ def makeSqlToSphinxDb(pdb, db, table = []):
 		if pkey_name == '':
 			continue
 
-		conf += makeSphinxDbSource(pdb, db, table_name)
+		conf += makeSphinxDbSource(pdb, db, table_name, pkey_name)
 		# print(conf)
 		# print(table_name+':'+pkey_name)
 		# db_field_str = makeSqlToSphinxTable(db,table_name)
