@@ -10,6 +10,7 @@ export PATH
 # cd /www/server/mdserver-web && source bin/activate && python3 plugins/mysql/index.py do_full_sync  {"db":"xxx","sign":"","begin":1}
 # cd /www/server/mdserver-web && source bin/activate && python3 plugins/mysql/index.py sync_database_repair  {"db":"xxx","sign":""}
 # cd /www/server/mdserver-web && source bin/activate && python3 plugins/mysql/index.py init_slave_status
+# cd /www/server/mdserver-web && source bin/activate && python3 plugins/mysql/index.py install_pre_inspection
 curPath=`pwd`
 rootPath=$(dirname "$curPath")
 rootPath=$(dirname "$rootPath")

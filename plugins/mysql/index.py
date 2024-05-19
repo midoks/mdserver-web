@@ -3734,9 +3734,16 @@ def fullSync(version=''):
 
 
 def installPreInspection(version):
+    import psutil
+    mem = psutil.virtual_memory()
+    memTotal = mem.total
+    memG = memTotal/1024/1024/1024
+    if memG > 2:
+        return 'ok'
+
     swap_path = mw.getServerDir() + "/swap"
     if not os.path.exists(swap_path):
-        return "为了稳定安装MySQL,先安装swap插件!"
+        return "内存小,为了稳定安装MySQL,先安装swap插件!"
     return 'ok'
 
 
