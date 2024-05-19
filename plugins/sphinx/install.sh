@@ -12,7 +12,7 @@ sysArch=`arch`
 install_tmp=${rootPath}/tmp/mw_install.pl
 
 # cd /www/server/mdserver-web && source bin/activate && python3 plugins/sphinx/index.py rebuild
-# cd /www/server/mdserver-web/plugins/sphinx && bash install.sh install 3.1.1
+# cd /www/server/mdserver-web/plugins/sphinx && bash install.sh install 3.6.1
 # cd /www/server/mdserver-web && source bin/activate && python3 plugins/sphinx/index.py db_to_sphinx
 # cd /www/server/mdserver-web && source bin/activate && python3 plugins/sphinx/index.py start
 # /www/server/sphinx/bin/bin/indexer -c /www/server/sphinx/sphinx.conf --all --rotate
@@ -87,10 +87,10 @@ Install_sphinx()
 
 	if [ "$SPH_SYSNAME" == "linux" ];then
 		glibc_ver=`ldd  --version | grep libc | awk -F ')' '{print $2}'|awk '{gsub(/^\s+|\s+$/, "");print}'`
-		if [ "$VERSION" == "3.7.1" ] && [ "$glibc_ver" -lt "2.29" ];then
+		if [ "$VERSION" == "3.7.1" ] && [ `echo "2.29 > $glibc_ver " | bc` -eq 1 ];then
 			SPH_NAME=${SPH_NAME}-glibc2.17
 		fi
-		if [ "$VERSION" == "3.6.1" ] && [ "$glibc_ver" -lt "2.29" ];then
+		if [ "$VERSION" == "3.6.1" ] && [ `echo "2.29 > $glibc_ver " | bc` -eq 1 ];then
 			SPH_NAME=${SPH_NAME}-glibc2.17
 		fi
 	fi
