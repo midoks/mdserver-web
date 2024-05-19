@@ -116,8 +116,7 @@ def makeSphinxDbSourceRangeSql(pdb, db, table):
 	sql = "SELECT min("+pkey_name+"), max("+pkey_name+") FROM "+table
 	return sql
 
-def makeSphinxDbSourceQuerySql(pdb, db, table):
-	pkey_name = getTablePk(pdb, db, table)
+def makeSphinxDbSourceQuerySql(pdb, db, table,pkey_name):
 	field_str = getTableFieldStr(pdb, db,table)
 	# print(field_str)
 	if pkey_name == 'id':
@@ -130,6 +129,8 @@ def makeSphinxDbSource(pdb, db, table):
 
 	db_info = pSqliteDb('databases').field('username,password').where('name=?', (db,)).find()
 	port = getDbPort()
+	pkey_name = getTablePk(pdb, db, table)
+
 
 	conf = '''
 
@@ -171,10 +172,10 @@ index {$DB_NAME}_{$TABLE_NAME}
 	range_sql = makeSphinxDbSourceRangeSql(pdb, db, table)
 	conf = conf.replace("{$DB_RANGE_SQL}", range_sql)
 
-	query_sql = makeSphinxDbSourceQuerySql(pdb, db,table)
+	query_sql = makeSphinxDbSourceQuerySql(pdb, db,table,pkey_name)
 	conf = conf.replace("{$DB_QUERY_SQL}", query_sql)
 
-	sph_field = makeSqlToSphinxTable(pdb, db,table)
+	sph_field = makeSqlToSphinxTable(pdb, db,table,pkey_name)
 	conf = conf.replace("{$SPH_FIELD}", sph_field)
 
 	return conf
@@ -216,8 +217,7 @@ def makeSqlToSphinxDb(pdb, db, table = []):
 		# print(db_field_str)
 	return conf
 
-def makeSqlToSphinxTable(pdb,db,table):
-	pkey_name = getTablePk(pdb, db, table)
+def makeSqlToSphinxTable(pdb,db,table,pk):
 
 	sql = "select COLUMN_NAME,DATA_TYPE from information_schema.COLUMNS where `TABLE_SCHEMA`='{}' and `TABLE_NAME` = '{}';"
 	sql = sql.format(db,table,)
@@ -233,7 +233,7 @@ def makeSqlToSphinxTable(pdb,db,table):
 		# if mw.inArray(['tinyint'], data_type):
 		# 	conf += 'sql_attr_bool = '+ column_name + "\n"
 
-		if pkey_name == column_name:
+		if pk == column_name:
 			run_pos += 1
 			if pkey_name == 'id':
 				conf += '\tsql_attr_bigint = '+column_name+"\n"
