@@ -18,8 +18,7 @@ install_tmp=${rootPath}/tmp/mw_install.pl
 # /Users/midoks/Desktop/mwdev/server/sphinx/bin/bin/indexer /Users/midoks/Desktop/mwdev/server/sphinx/sphinx.conf 99cms_mc_comic --rotate
 
 bash ${rootPath}/scripts/getos.sh
-echo "bash ${rootPath}/scripts/getos.sh"
-
+# echo "bash ${rootPath}/scripts/getos.sh"
 OSNAME="macos"
 if [ -f ${rootPath}/data/osname.pl ];then
 	OSNAME=`cat ${rootPath}/data/osname.pl`	
@@ -139,12 +138,12 @@ Uninstall_sphinx()
 		systemctl daemon-reload
 	fi
 
-	echo "$serverPath/sphinx/initd/sphinx"
 	if [ -f $serverPath/sphinx/initd/sphinx ];then
 		$serverPath/sphinx/initd/sphinx stop
 	fi
 
-	if [ -f $serverPath/sphinx ];then
+	if [ -d $serverPath/sphinx ];then
+		echo "rm -rf $serverPath/sphinx"
 		rm -rf $serverPath/sphinx
 	fi
 

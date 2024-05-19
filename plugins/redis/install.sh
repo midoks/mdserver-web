@@ -25,14 +25,16 @@ Install_App()
 {
 	echo '正在安装脚本文件...' > $install_tmp
 	mkdir -p $serverPath/source
+	mkdir -p $serverPath/source/redis
 
-	if [ ! -f $serverPath/source/redis-${VERSION}.tar.gz ];then
-		wget -O $serverPath/source/redis-${VERSION}.tar.gz http://download.redis.io/releases/redis-${VERSION}.tar.gz
+	FILE_TGZ=redis-${VERSION}.tar.gz
+	REDIS_DIR=$serverPath/source/redis
+
+	if [ ! -f $REDIS_DIR/${FILE_TGZ} ];then
+		wget -O $REDIS_DIR/${FILE_TGZ} http://download.redis.io/releases/${FILE_TGZ}
 	fi
 	
-	cd $serverPath/source && tar -zxvf redis-${VERSION}.tar.gz
-
-	
+	cd $REDIS_DIR && tar -zxvf ${FILE_TGZ}
 
 	CMD_MAKE=`which gmake`
 	if [ "$?" == "0" ];then
@@ -55,8 +57,8 @@ Install_App()
 		echo '安装失败!'
 	fi
 
-	if [ -d $serverPath/source/redis-${VERSION} ];then
-		rm -rf $serverPath/source/redis-${VERSION}
+	if [ -d ${REDIS_DIR}/redis-${VERSION} ];then
+		rm -rf ${REDIS_DIR}/redis-${VERSION}
 	fi
 }
 
@@ -80,8 +82,11 @@ Uninstall_App()
 		$serverPath/redis/initd/redis stop
 	fi
 
-	rm -rf $serverPath/redis
-	echo "Uninstall_redis" > $install_tmp
+	if [ -d $serverPath/redis ];then
+		rm -rf $serverPath/redis
+	fi
+	
+	echo "卸载redis成功"
 }
 
 action=$1
