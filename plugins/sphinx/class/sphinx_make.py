@@ -192,14 +192,13 @@ def makeSqlToSphinxAll():
     conf = ''
     conf += makeSphinxHeader()
 
-    conf += makeSqlToSphinxDb(pdb, 'bbs')
+    # conf += makeSqlToSphinxDb(pdb, 'bbs')
 
-
-    # for x in range(len(dblist)):
-    #     dbname = dblist[x]['Database']
-    #     if mw.inArray(filter_db, dbname):
-    #         continue
-    #     conf += makeSqlToSphinxDb(pdb, dbname)
+    for x in range(len(dblist)):
+        dbname = dblist[x]['Database']
+        if mw.inArray(filter_db, dbname):
+            continue
+        conf += makeSqlToSphinxDb(pdb, dbname)
     return conf
 
 
