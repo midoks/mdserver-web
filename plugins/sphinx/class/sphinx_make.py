@@ -72,7 +72,7 @@ def getTableFieldStr(db, table):
 
 	field_str = ''
 	for x in range(len(fields)):
-		field_str += fields[x]['COLUMN_NAME']+','
+		field_str += '`'+fields[x]['COLUMN_NAME']+'`,'
 
 	field_str = field_str.strip(',')
 	return field_str
