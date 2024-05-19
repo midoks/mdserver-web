@@ -210,6 +210,7 @@ def reload():
 def rebuild():
     file = initDreplace()
     cmd = file + ' rebuild &'
+    # print(cmd)
     data = mw.execShell(cmd)
     if data[0].find('successfully')<0:
         return data[0].replace("\n","<br/>")
@@ -319,25 +320,16 @@ def sphinxCmd():
 
 def makeDbToSphinx():
 
+    sphinx_file = getConf()
+
 
     import  sphinx_make
-    pdb = sphinx_make.pMysqlDb()
+    conf = sphinx_make.makeSqlToSphinxAll()
 
-    filter_db = ['information_schema','performance_schema','sys','mysql']
+    mw.writeFile(sphinx_file,conf)
+    print(conf)
 
-    db_list = pdb.query('show databases')
-    print(db_list)
-
-    for x in range(len(db_list)):
-        dbname = db_list[x]['Database']
-        if mw.inArray(filter_db, dbname):
-            continue
-
-        sphinx_make.makeSqlToSphinxDb(dbname)
-
-        print(dbname)
-
-        # makeSqlToSphinxTable()
+    # makeSqlToSphinxTable()
 
 
 

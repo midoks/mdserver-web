@@ -11,7 +11,7 @@ sysName=`uname`
 install_tmp=${rootPath}/tmp/mw_install.pl
 
 # cd /www/server/mdserver-web && source bin/activate && python3 plugins/sphinx/index.py rebuild
-# /www/server/sphinx/bin/bin/indexer -c /www/server/sphinx/sphinx.conf --rotate
+# /www/server/sphinx/bin/bin/indexer -c /www/server/sphinx/sphinx.conf --all --rotate
 # cd /www/server/mdserver-web && source bin/activate && python3 plugins/sphinx/index.py db_to_sphinx
 
 

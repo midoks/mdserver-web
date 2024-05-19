@@ -54,25 +54,6 @@ def pMysqlDb():
     db.setPwd(pSqliteDb('config').where('id=?', (1,)).getField('mysql_root'))
     return db
 
-def makeSqlToSphinx():
-	pass
-
-def makeSqlToSphinxDb(db, table = []):
-	pdb = pMysqlDb()
-
-	tables = pdb.query("show tables in "+ db)
-	for x in range(len(tables)):
-		key = 'Tables_in_'+db
-		table_name = tables[x][key]
-		pkey_name = getTablePk(db,table_name)
-
-		if pkey_name == '':
-			continue
-
-		# print(table_name+':'+pkey_name)
-		makeSqlToSphinxTable(db,table_name)
-
-
 def getTablePk(db, table):
 	pdb = pMysqlDb()
 	pkey_sql = "SHOW INDEX FROM {}.{} WHERE Key_name = 'PRIMARY';".format(db,table,);
@@ -82,6 +63,157 @@ def getTablePk(db, table):
 		return pkey_data[0]['Column_name']
 
 	return ''
+
+def getTableFieldStr(db, table):
+	pdb = pMysqlDb()
+	sql = "select COLUMN_NAME,DATA_TYPE from information_schema.COLUMNS where `TABLE_SCHEMA`='{}' and `TABLE_NAME` = '{}';"
+	sql = sql.format(db,table,)
+	fields = pdb.query(sql)
+
+	field_str = ''
+	for x in range(len(fields)):
+		field_str += fields[x]['COLUMN_NAME']+','
+
+	field_str = field_str.strip(',')
+	return field_str
+
+
+def makeSqlToSphinx():
+	pass
+
+def makeSphinxHeader():
+	conf = '''
+indexer
+{
+	mem_limit		= 128M
+}
+
+	searchd
+{
+	listen			= 9312
+	listen			= 9306:mysql41
+	log				= {$server_dir}/sphinx/index/searchd.log
+	query_log		= {$server_dir}/sphinx/index/query.log
+	read_timeout	= 5
+	max_children	= 0
+	pid_file		= {$server_dir}/sphinx/index/searchd.pid
+	seamless_rotate	= 1
+	preopen_indexes	= 1
+	unlink_old		= 1
+	#workers		= threads # for RT to work
+	binlog_path		= {$server_dir}/sphinx/index/binlog
+}
+	'''
+	conf = conf.replace("{$server_dir}", mw.getServerDir())
+	return conf
+
+def makeSphinxDbSourceRangeSql(db, table):
+	pdb = pMysqlDb()
+	pkey_name = getTablePk(db, table)
+	sql = "SELECT min("+pkey_name+"), max("+pkey_name+") FROM "+table
+	return sql
+
+def makeSphinxDbSourceQuerySql(db, table):
+	pdb = pMysqlDb()
+	pkey_name = getTablePk(db, table)
+	field_str = getTableFieldStr(db,table)
+	# print(field_str)
+	sql = "SELECT "+field_str+" FROM "+table+ " where "+pkey_name+" >= $start AND "+pkey_name+" <= $end"
+	return sql
+
+def makeSphinxDbSource(db, table):
+
+	db_info = pSqliteDb('databases').field('username,password').where('name=?', (db,)).find()
+	port = getDbPort()
+
+	conf = '''
+
+source {$DB_NAME}_{$TABLE_NAME}
+{
+	type			= mysql
+	sql_host		= 127.0.0.1
+	sql_user		= {$DB_USER}
+	sql_pass		= {$DB_PASS}
+	sql_db			= {$DB_NAME}
+	sql_port		= {$DB_PORT}
+
+	sql_query_range 	= {$DB_RANGE_SQL}
+	sql_range_step 		= 1000
+
+	sql_query_pre   	= SET NAMES utf8bm4
+	sql_query 		= {$DB_QUERY_SQL}
+
+{$SPH_FIELD}
+}
+
+index {$DB_NAME}_{$TABLE_NAME}
+{
+    source	= {$DB_NAME}_{$TABLE_NAME}
+    path	= {$server_dir}/sphinx/index/db/{$DB_NAME}.{$TABLE_NAME}/index
+
+    ngram_len	= 1
+    ngram_chars	= U+3000..U+2FA1F
+}
+'''
+	conf = conf.replace("{$server_dir}", mw.getServerDir())
+
+	conf = conf.replace("{$DB_NAME}", db)
+	conf = conf.replace("{$TABLE_NAME}", table)
+	conf = conf.replace("{$DB_USER}", db_info['username'])
+	conf = conf.replace("{$DB_PASS}", db_info['password'])
+	conf = conf.replace("{$DB_PORT}", port)
+
+	range_sql = makeSphinxDbSourceRangeSql(db,table)
+	conf = conf.replace("{$DB_RANGE_SQL}", range_sql)
+
+	query_sql = makeSphinxDbSourceQuerySql(db,table)
+	conf = conf.replace("{$DB_QUERY_SQL}", query_sql)
+
+	sph_field = makeSqlToSphinxTable(db,table)
+	conf = conf.replace("{$SPH_FIELD}", sph_field)
+
+
+
+	return conf
+
+
+def makeSqlToSphinxAll():
+
+    filter_db = ['information_schema','performance_schema','sys','mysql']
+
+    pdb = pMysqlDb()
+    dblist = pdb.query('show databases')
+
+    conf = ''
+    conf += makeSphinxHeader()
+    for x in range(len(dblist)):
+        dbname = dblist[x]['Database']
+        if mw.inArray(filter_db, dbname):
+            continue
+        conf += makeSqlToSphinxDb(dbname)
+    return conf
+
+
+
+def makeSqlToSphinxDb(db, table = []):
+	conf = ''
+
+	pdb = pMysqlDb()
+	tables = pdb.query("show tables in "+ db)
+	for x in range(len(tables)):
+		key = 'Tables_in_'+db
+		table_name = tables[x][key]
+		pkey_name = getTablePk(db,table_name)
+
+		if pkey_name == '':
+			continue
+
+		conf += makeSphinxDbSource(db,table_name)
+		# print(conf)
+		# print(table_name+':'+pkey_name)
+		# db_field_str = makeSqlToSphinxTable(db,table_name)
+		# print(db_field_str)
+	return conf
 
 def makeSqlToSphinxTable(db,table):
 	pdb = pMysqlDb()
@@ -95,46 +227,43 @@ def makeSqlToSphinxTable(db,table):
 	for x in range(cols_len):
 		data_type = cols[x]['DATA_TYPE']
 		column_name = cols[x]['COLUMN_NAME']
-		print(column_name+":"+data_type)
+		# print(column_name+":"+data_type)
 
 		# if mw.inArray(['tinyint'], data_type):
 		# 	conf += 'sql_attr_bool = '+ column_name + "\n"
 
 		if mw.inArray(['enum'], data_type):
 			run_pos += 1
-			conf += 'sql_attr_string = '+ column_name + "\n"
+			conf += '\tsql_attr_string = '+ column_name + "\n"
 
 		if mw.inArray(['decimal'], data_type):
 			run_pos += 1
-			conf += 'sql_attr_float = '+ column_name + "\n"
+			conf += '\tsql_attr_float = '+ column_name + "\n"
 
 		if mw.inArray(['bigint','smallint','tinyint','int','mediumint'], data_type):
 			run_pos += 1
-			conf += 'sql_attr_bigint = '+ column_name + "\n"
+			conf += '\tsql_attr_bigint = '+ column_name + "\n"
 
 
 		if mw.inArray(['float'], data_type):
 			run_pos += 1
-			conf += 'sql_attr_float = '+ column_name + "\n"
+			conf += '\tsql_attr_float = '+ column_name + "\n"
 
 		if mw.inArray(['varchar','char'], data_type):
 			run_pos += 1
-			conf += 'sql_attr_string = '+ column_name + "\n"
+			conf += '\tsql_attr_string = '+ column_name + "\n"
 
 		if mw.inArray(['text','mediumtext','tinytext','longtext'], data_type):
 			run_pos += 1
-			conf += 'sql_field_string = '+ column_name + "\n"
+			conf += '\tsql_field_string = '+ column_name + "\n"
 
 		if mw.inArray(['datetime','date'], data_type):
 			run_pos += 1
-			conf += 'sql_attr_timestamp = '+ column_name + "\n"
+			conf += '\tsql_attr_timestamp = '+ column_name + "\n"
 
-	if cols_len != run_pos:
-		print(db,table)
-
-	print(cols_len,run_pos)
-
-
+	# if cols_len != run_pos:
+	# 	print(db,table)
+	# print(cols_len,run_pos)
 	# print(conf)
 	return conf
 
