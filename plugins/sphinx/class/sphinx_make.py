@@ -77,10 +77,6 @@ def getTableFieldStr(db, table):
 	field_str = field_str.strip(',')
 	return field_str
 
-
-def makeSqlToSphinx():
-	pass
-
 def makeSphinxHeader():
 	conf = '''
 indexer
@@ -140,7 +136,7 @@ source {$DB_NAME}_{$TABLE_NAME}
 	sql_query_range 	= {$DB_RANGE_SQL}
 	sql_range_step 		= 1000
 
-	sql_query_pre   	= SET NAMES utf8bm4
+	sql_query_pre   	= SET NAMES utf8
 	sql_query 		= {$DB_QUERY_SQL}
 
 {$SPH_FIELD}
@@ -171,8 +167,6 @@ index {$DB_NAME}_{$TABLE_NAME}
 
 	sph_field = makeSqlToSphinxTable(db,table)
 	conf = conf.replace("{$SPH_FIELD}", sph_field)
-
-
 
 	return conf
 
