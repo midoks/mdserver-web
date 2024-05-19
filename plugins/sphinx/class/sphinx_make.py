@@ -56,11 +56,21 @@ def pMysqlDb():
 
 def getTablePk(db, table):
 	pdb = pMysqlDb()
+	# SHOW INDEX FROM bbs.bbs_ucenter_vars WHERE Key_name = 'PRIMARY'
 	pkey_sql = "SHOW INDEX FROM {}.{} WHERE Key_name = 'PRIMARY';".format(db,table,);
 	pkey_data = pdb.query(pkey_sql)
 
 	if len(pkey_data) == 1:
-		return pkey_data[0]['Column_name']
+		pkey_name = pkey_data[0]['Column_name']
+		sql = "select COLUMN_NAME,DATA_TYPE from information_schema.COLUMNS where `TABLE_SCHEMA`='{}' and `TABLE_NAME` = '{}' and `COLUMN_NAME`='{}';"
+		sql = sql.format(db,table,pkey_name,)
+		# print(sql)
+		fields = pdb.query(sql)
+
+		if len(fields) == 1:
+			# print(fields[0]['DATA_TYPE'])
+			if mw.inArray(['bigint','smallint','tinyint','int','mediumint'], fields[0]['DATA_TYPE']):
+				return pkey_name
 
 	return ''
 
