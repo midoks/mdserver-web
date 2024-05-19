@@ -235,7 +235,7 @@ def makeSqlToSphinxTable(pdb,db,table,pkey_name):
 
 		if pkey_name == column_name:
 			run_pos += 1
-			if pkey_name == 'id':
+			if column_name == 'id':
 				conf += '\tsql_attr_bigint = '+column_name+"\n"
 			else:
 				conf += '\tsql_attr_bigint = '+"id\n"
