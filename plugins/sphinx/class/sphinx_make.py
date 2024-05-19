@@ -267,9 +267,13 @@ def makeSqlToSphinxTable(pdb,db,table,pkey_name):
 			conf += '\tsql_attr_float = '+ column_name + "\n"
 			continue
 
-		if mw.inArray(['varchar','char'], data_type):
-			run_pos += 1
+		if mw.inArray(['char'], data_type):
 			conf += '\tsql_attr_string = '+ column_name + "\n"
+			continue
+
+		if mw.inArray(['varchar'], data_type):
+			run_pos += 1
+			conf += '\tsql_field_string = '+ column_name + "\n"
 			continue
 
 		if mw.inArray(['text','mediumtext','tinytext','longtext'], data_type):
