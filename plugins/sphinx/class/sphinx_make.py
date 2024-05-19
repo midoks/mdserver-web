@@ -168,7 +168,7 @@ index {$DB_NAME}_{$TABLE_NAME}
 	conf = conf.replace("{$DB_PASS}", db_info['password'])
 	conf = conf.replace("{$DB_PORT}", port)
 
-	range_sql = makeSphinxDbSourceRangeSql(pdb, db, table)
+	range_sql = makeSphinxDbSourceRangeSql(pdb, db, table,pkey_name)
 	conf = conf.replace("{$DB_RANGE_SQL}", range_sql)
 
 	query_sql = makeSphinxDbSourceQuerySql(pdb, db, table, pkey_name)
