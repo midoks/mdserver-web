@@ -91,9 +91,9 @@ Install_sphinx()
 	echo "${SPHINX_DIR}/${FILE_TGZ}"
 	if [ ! -f ${SPHINX_DIR}/${FILE_TGZ} ];then
 		if [ $sysName == 'Darwin' ]; then
-			wget -O ${SPHINX_DIR}/sphinx-${VERSION}.tar.gz http://sphinxsearch.com/files/${FILE_TGZ}
+			wget -O ${SPHINX_DIR}/${FILE_TGZ} http://sphinxsearch.com/files/${FILE_TGZ}
 		else
-			curl -sSLo ${SPHINX_DIR}/sphinx-${VERSION}.tar.gz http://sphinxsearch.com/files/${FILE_TGZ}
+			curl -sSLo ${SPHINX_DIR}/${FILE_TGZ} http://sphinxsearch.com/files/${FILE_TGZ}
 		fi
 	fi
 
@@ -136,6 +136,7 @@ Uninstall_sphinx()
 		systemctl daemon-reload
 	fi
 
+	echo "$serverPath/sphinx/initd/sphinx"
 	if [ -f $serverPath/sphinx/initd/sphinx ];then
 		$serverPath/sphinx/initd/sphinx stop
 	fi
