@@ -193,7 +193,6 @@ def makeSqlToSphinxAll():
     conf += makeSphinxHeader()
 
     # conf += makeSqlToSphinxDb(pdb, 'bbs')
-
     for x in range(len(dblist)):
         dbname = dblist[x]['Database']
         if mw.inArray(filter_db, dbname):
@@ -242,8 +241,8 @@ def makeSqlToSphinxTable(pdb,db,table,pkey_name):
 		# 	conf += 'sql_attr_bool = '+ column_name + "\n"
 
 		if pkey_name == column_name:
-			run_pos += 1
-			conf += '\tsql_attr_bigint = '+column_name+"\n"
+			# run_pos += 1
+			# conf += '\tsql_attr_bigint = '+column_name+"\n"
 			continue
 
 		if mw.inArray(['enum'], data_type):
