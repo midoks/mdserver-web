@@ -89,11 +89,7 @@ Install_sphinx()
 		
 	echo "${SPHINX_DIR}/${FILE_TGZ}"
 	if [ ! -f ${SPHINX_DIR}/${FILE_TGZ} ];then
-		if [ $sysName == 'Darwin' ]; then
-			wget -O ${SPHINX_DIR}/${FILE_TGZ} http://sphinxsearch.com/files/${FILE_TGZ}
-		else
-			curl -sSLo ${SPHINX_DIR}/${FILE_TGZ} http://sphinxsearch.com/files/${FILE_TGZ}
-		fi
+		wget --no-check-certificate -O ${SPHINX_DIR}/${FILE_TGZ} http://sphinxsearch.com/files/${FILE_TGZ}
 	fi
 
 	# if [ ! -f ${SPHINX_DIR}/sphinx-${VERSION}.tar.gz ];then
