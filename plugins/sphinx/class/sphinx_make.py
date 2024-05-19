@@ -188,11 +188,15 @@ def makeSqlToSphinxAll():
 
     conf = ''
     conf += makeSphinxHeader()
-    for x in range(len(dblist)):
-        dbname = dblist[x]['Database']
-        if mw.inArray(filter_db, dbname):
-            continue
-        conf += makeSqlToSphinxDb(pdb, dbname)
+
+    conf += makeSqlToSphinxDb(pdb, 'bbs', ['bbs_bbs_ucenter_pm_messages_9'])
+
+
+    # for x in range(len(dblist)):
+    #     dbname = dblist[x]['Database']
+    #     if mw.inArray(filter_db, dbname):
+    #         continue
+    #     conf += makeSqlToSphinxDb(pdb, dbname)
     return conf
 
 
@@ -200,20 +204,23 @@ def makeSqlToSphinxAll():
 def makeSqlToSphinxDb(pdb, db, table = []):
 	conf = ''
 
-	tables = pdb.query("show tables in "+ db)
-	for x in range(len(tables)):
-		key = 'Tables_in_'+db
-		table_name = tables[x][key]
+	for t in table:
 		pkey_name = getTablePk(pdb, db, table_name)
-
 		if pkey_name == '':
 			continue
-
 		conf += makeSphinxDbSource(pdb, db, table_name, pkey_name)
-		# print(conf)
-		# print(table_name+':'+pkey_name)
-		# db_field_str = makeSqlToSphinxTable(db,table_name)
-		# print(db_field_str)
+
+	if len(table) == 0:
+		tables = pdb.query("show tables in "+ db)
+		for x in range(len(tables)):
+			key = 'Tables_in_'+db
+			table_name = tables[x][key]
+			pkey_name = getTablePk(pdb, db, table_name)
+
+			if pkey_name == '':
+				continue
+
+			conf += makeSphinxDbSource(pdb, db, table_name, pkey_name)
 	return conf
 
 def makeSqlToSphinxTable(pdb,db,table,pkey_name):
