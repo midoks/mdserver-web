@@ -111,8 +111,8 @@ indexer
 	conf = conf.replace("{$server_dir}", mw.getServerDir())
 	return conf
 
-def makeSphinxDbSourceRangeSql(pdb, db, table):
-	pkey_name = getTablePk(pdb, db, table)
+def makeSphinxDbSourceRangeSql(pdb, db, table, pkey_name):
+	# pkey_name = getTablePk(pdb, db, table)
 	sql = "SELECT min("+pkey_name+"), max("+pkey_name+") FROM "+table
 	return sql
 
