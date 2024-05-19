@@ -54,8 +54,7 @@ def pMysqlDb():
     db.setPwd(pSqliteDb('config').where('id=?', (1,)).getField('mysql_root'))
     return db
 
-def getTablePk(db, table):
-	pdb = pMysqlDb()
+def getTablePk(pdb, db, table):
 	# SHOW INDEX FROM bbs.bbs_ucenter_vars WHERE Key_name = 'PRIMARY'
 	pkey_sql = "SHOW INDEX FROM {}.{} WHERE Key_name = 'PRIMARY';".format(db,table,);
 	pkey_data = pdb.query(pkey_sql)
@@ -74,8 +73,7 @@ def getTablePk(db, table):
 
 	return ''
 
-def getTableFieldStr(db, table):
-	pdb = pMysqlDb()
+def getTableFieldStr(pdb, db, table):
 	sql = "select COLUMN_NAME,DATA_TYPE from information_schema.COLUMNS where `TABLE_SCHEMA`='{}' and `TABLE_NAME` = '{}';"
 	sql = sql.format(db,table,)
 	fields = pdb.query(sql)
@@ -113,16 +111,14 @@ indexer
 	conf = conf.replace("{$server_dir}", mw.getServerDir())
 	return conf
 
-def makeSphinxDbSourceRangeSql(db, table):
-	pdb = pMysqlDb()
-	pkey_name = getTablePk(db, table)
+def makeSphinxDbSourceRangeSql(pdb, db, table):
+	pkey_name = getTablePk(pdb, db, table)
 	sql = "SELECT min("+pkey_name+"), max("+pkey_name+") FROM "+table
 	return sql
 
-def makeSphinxDbSourceQuerySql(db, table):
-	pdb = pMysqlDb()
-	pkey_name = getTablePk(db, table)
-	field_str = getTableFieldStr(db,table)
+def makeSphinxDbSourceQuerySql(pdb, db, table):
+	pkey_name = getTablePk(pdb, db, table)
+	field_str = getTableFieldStr(pdb, db,table)
 	# print(field_str)
 	if pkey_name == 'id':
 		sql = "SELECT " + field_str + " FROM " + table + " where id >= $start AND id <= $end"
@@ -130,7 +126,7 @@ def makeSphinxDbSourceQuerySql(db, table):
 		sql = "SELECT "+pkey_name+' as id,' + field_str + " FROM " + table + " where id >= $start AND id <= $end"
 	return sql
 
-def makeSphinxDbSource(db, table):
+def makeSphinxDbSource(pdb, db, table):
 
 	db_info = pSqliteDb('databases').field('username,password').where('name=?', (db,)).find()
 	port = getDbPort()
@@ -172,13 +168,13 @@ index {$DB_NAME}_{$TABLE_NAME}
 	conf = conf.replace("{$DB_PASS}", db_info['password'])
 	conf = conf.replace("{$DB_PORT}", port)
 
-	range_sql = makeSphinxDbSourceRangeSql(db,table)
+	range_sql = makeSphinxDbSourceRangeSql(pdb, db, table)
 	conf = conf.replace("{$DB_RANGE_SQL}", range_sql)
 
-	query_sql = makeSphinxDbSourceQuerySql(db,table)
+	query_sql = makeSphinxDbSourceQuerySql(pdb, db,table)
 	conf = conf.replace("{$DB_QUERY_SQL}", query_sql)
 
-	sph_field = makeSqlToSphinxTable(db,table)
+	sph_field = makeSqlToSphinxTable(pdb, db,table)
 	conf = conf.replace("{$SPH_FIELD}", sph_field)
 
 	return conf
@@ -196,33 +192,31 @@ def makeSqlToSphinxAll():
         dbname = dblist[x]['Database']
         if mw.inArray(filter_db, dbname):
             continue
-        conf += makeSqlToSphinxDb(dbname)
+        conf += makeSqlToSphinxDb(pdb, dbname)
     return conf
 
 
 
-def makeSqlToSphinxDb(db, table = []):
+def makeSqlToSphinxDb(pdb, db, table = []):
 	conf = ''
 
-	pdb = pMysqlDb()
 	tables = pdb.query("show tables in "+ db)
 	for x in range(len(tables)):
 		key = 'Tables_in_'+db
 		table_name = tables[x][key]
-		pkey_name = getTablePk(db,table_name)
+		pkey_name = getTablePk(pdb, db, table_name)
 
 		if pkey_name == '':
 			continue
 
-		conf += makeSphinxDbSource(db,table_name)
+		conf += makeSphinxDbSource(pdb, db, table_name)
 		# print(conf)
 		# print(table_name+':'+pkey_name)
 		# db_field_str = makeSqlToSphinxTable(db,table_name)
 		# print(db_field_str)
 	return conf
 
-def makeSqlToSphinxTable(db,table):
-	pdb = pMysqlDb()
+def makeSqlToSphinxTable(pdb,db,table):
 
 	sql = "select COLUMN_NAME,DATA_TYPE from information_schema.COLUMNS where `TABLE_SCHEMA`='{}' and `TABLE_NAME` = '{}';"
 	sql = sql.format(db,table,)
