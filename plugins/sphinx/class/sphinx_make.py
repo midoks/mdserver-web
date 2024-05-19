@@ -217,7 +217,7 @@ def makeSqlToSphinxDb(pdb, db, table = []):
 		# print(db_field_str)
 	return conf
 
-def makeSqlToSphinxTable(pdb,db,table,pk):
+def makeSqlToSphinxTable(pdb,db,table,pkey_name):
 
 	sql = "select COLUMN_NAME,DATA_TYPE from information_schema.COLUMNS where `TABLE_SCHEMA`='{}' and `TABLE_NAME` = '{}';"
 	sql = sql.format(db,table,)
@@ -233,7 +233,7 @@ def makeSqlToSphinxTable(pdb,db,table,pk):
 		# if mw.inArray(['tinyint'], data_type):
 		# 	conf += 'sql_attr_bool = '+ column_name + "\n"
 
-		if pk == column_name:
+		if pkey_name == column_name:
 			run_pos += 1
 			if pkey_name == 'id':
 				conf += '\tsql_attr_bigint = '+column_name+"\n"
