@@ -125,7 +125,7 @@ def makeSphinxDbSourceQuerySql(pdb, db, table,pkey_name):
 	if pkey_name == 'id':
 		sql = "SELECT " + field_str + " FROM " + table + " where id >= $start AND id <= $end"
 	else:
-		sql = "SELECT "+pkey_name+' as id,' + field_str + " FROM " + table + " where "+pkey_name+" >= $start AND "+pkey_name+" <= $end"
+		sql = "SELECT `"+pkey_name+'` as `id`,' + field_str + " FROM " + table + " where "+pkey_name+" >= $start AND "+pkey_name+" <= $end"
 	return sql
 
 def makeSphinxDbSource(pdb, db, table, pkey_name):
