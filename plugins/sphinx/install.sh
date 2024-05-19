@@ -11,9 +11,10 @@ sysName=`uname`
 install_tmp=${rootPath}/tmp/mw_install.pl
 
 # cd /www/server/mdserver-web && source bin/activate && python3 plugins/sphinx/index.py rebuild
-# /www/server/sphinx/bin/bin/indexer -c /www/server/sphinx/sphinx.conf --all --rotate
-# cd /www/server/mdserver-web && source bin/activate && python3 plugins/sphinx/index.py db_to_sphinx
 
+# cd /www/server/mdserver-web && source bin/activate && python3 plugins/sphinx/index.py db_to_sphinx
+# /www/server/sphinx/bin/bin/indexer -c /www/server/sphinx/sphinx.conf --all --rotate
+# /Users/midoks/Desktop/mwdev/server/sphinx/bin/bin/indexer /Users/midoks/Desktop/mwdev/server/sphinx/sphinx.conf --all --rotate
 
 bash ${rootPath}/scripts/getos.sh
 OSNAME=`cat ${rootPath}/data/osname.pl`

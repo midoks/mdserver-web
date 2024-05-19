@@ -124,7 +124,10 @@ def makeSphinxDbSourceQuerySql(db, table):
 	pkey_name = getTablePk(db, table)
 	field_str = getTableFieldStr(db,table)
 	# print(field_str)
-	sql = "SELECT "+field_str+" FROM "+table+ " where "+pkey_name+" >= $start AND "+pkey_name+" <= $end"
+	if pkey_name == 'id':
+		sql = "SELECT " + field_str + " FROM " + table + " where id >= $start AND id <= $end"
+	else:
+		sql = "SELECT "+pkey_name+' as id,' + field_str + " FROM " + table + " where id >= $start AND id <= $end"
 	return sql
 
 def makeSphinxDbSource(db, table):
@@ -182,7 +185,6 @@ index {$DB_NAME}_{$TABLE_NAME}
 
 
 def makeSqlToSphinxAll():
-
     filter_db = ['information_schema','performance_schema','sys','mysql']
 
     pdb = pMysqlDb()
