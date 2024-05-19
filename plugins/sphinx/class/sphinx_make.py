@@ -182,6 +182,23 @@ index {$DB_NAME}_{$TABLE_NAME}
 
 	return conf
 
+def makeSqlToSphinxTableIsHaveFulltext(pdb, db, table):
+	sql = "select COLUMN_NAME,DATA_TYPE from information_schema.COLUMNS where `TABLE_SCHEMA`='{}' and `TABLE_NAME` = '{}';"
+	sql = sql.format(db,table,)
+	cols = pdb.query(sql)
+	cols_len = len(cols)
+
+	for x in range(cols_len):
+		data_type = cols[x]['DATA_TYPE']
+		column_name = cols[x]['COLUMN_NAME']
+
+		if mw.inArray(['varchar'], data_type):
+			return True
+
+		if mw.inArray(['text','mediumtext','tinytext','longtext'], data_type):
+			return True
+
+	return False
 
 def makeSqlToSphinxAll():
     filter_db = ['information_schema','performance_schema','sys','mysql']
@@ -221,7 +238,8 @@ def makeSqlToSphinxDb(pdb, db, table = []):
 			if pkey_name == '':
 				continue
 
-			conf += makeSphinxDbSource(pdb, db, table_name, pkey_name)
+			if makeSqlToSphinxTableIsHaveFulltext(pdb, db, table_name):
+				conf += makeSphinxDbSource(pdb, db, table_name, pkey_name)
 	return conf
 
 def makeSqlToSphinxTable(pdb,db,table,pkey_name):
