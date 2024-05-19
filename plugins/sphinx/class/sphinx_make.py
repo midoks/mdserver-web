@@ -59,6 +59,9 @@ def getTablePk(pdb, db, table):
 	pkey_sql = "SHOW INDEX FROM {}.{} WHERE Key_name = 'PRIMARY';".format(db,table,);
 	pkey_data = pdb.query(pkey_sql)
 
+	# print(db, table)
+	# print(pkey_data)
+
 	if len(pkey_data) == 1:
 		pkey_name = pkey_data[0]['Column_name']
 		sql = "select COLUMN_NAME,DATA_TYPE from information_schema.COLUMNS where `TABLE_SCHEMA`='{}' and `TABLE_NAME` = '{}' and `COLUMN_NAME`='{}';"
@@ -92,7 +95,7 @@ indexer
 	mem_limit		= 128M
 }
 
-	searchd
+searchd
 {
 	listen			= 9312
 	listen			= 9306:mysql41
@@ -122,7 +125,7 @@ def makeSphinxDbSourceQuerySql(pdb, db, table,pkey_name):
 	if pkey_name == 'id':
 		sql = "SELECT " + field_str + " FROM " + table + " where id >= $start AND id <= $end"
 	else:
-		sql = "SELECT "+pkey_name+' as id,' + field_str + " FROM " + table + " where id >= $start AND id <= $end"
+		sql = "SELECT "+pkey_name+' as id,' + field_str + " FROM " + table + " where "+pkey_name+" >= $start AND "+pkey_name+" <= $end"
 	return sql
 
 def makeSphinxDbSource(pdb, db, table, pkey_name):
@@ -189,7 +192,7 @@ def makeSqlToSphinxAll():
     conf = ''
     conf += makeSphinxHeader()
 
-    conf += makeSqlToSphinxDb(pdb, 'bbs', ['bbs_bbs_ucenter_pm_messages_9'])
+    conf += makeSqlToSphinxDb(pdb, 'bbs', ['bbs_ucenter_admins'])
 
 
     # for x in range(len(dblist)):
