@@ -15,14 +15,13 @@ app_debug = False
 if mw.isAppleSystem():
     app_debug = True
 
-
 def getPluginName():
     return 'sphinx'
-
 
 def getPluginDir():
     return mw.getPluginDir() + '/' + getPluginName()
 
+sys.path.append(getPluginDir() +"/class")
 
 def getServerDir():
     return mw.getServerDir() + '/' + getPluginName()
@@ -318,6 +317,29 @@ def sphinxCmd():
     else:
         return mw.returnJson(False, 'no index')
 
+def makeDbToSphinx():
+
+
+    import  sphinx_make
+    pdb = sphinx_make.pMysqlDb()
+
+    filter_db = ['information_schema','performance_schema','sys','mysql']
+
+    db_list = pdb.query('show databases')
+    print(db_list)
+
+    for x in range(len(db_list)):
+        dbname = db_list[x]['Database']
+        if mw.inArray(filter_db, dbname):
+            continue
+
+        sphinx_make.makeSqlToSphinxDb(dbname)
+
+        print(dbname)
+
+        # makeSqlToSphinxTable()
+
+
 
 if __name__ == "__main__":
     func = sys.argv[1]
@@ -353,5 +375,7 @@ if __name__ == "__main__":
         print(runStatus())
     elif func == 'sphinx_cmd':
         print(sphinxCmd())
+    elif func == 'db_to_sphinx':
+        print(makeDbToSphinx())
     else:
         print('error')

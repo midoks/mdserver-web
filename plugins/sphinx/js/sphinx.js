@@ -30,7 +30,7 @@ function spPost(method, args, callback){
     });
 }
 
-function rebuild(){
+function commonFunc(){
     var con = '<button class="btn btn-default btn-sm" onclick="rebuildIndex();">重建索引</button>';
     $(".soft-man-con").html(con);
 }

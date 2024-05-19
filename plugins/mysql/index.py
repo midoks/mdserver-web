@@ -3448,7 +3448,9 @@ def doFullSyncUser(version=''):
 
     time.sleep(1)
     writeDbSyncStatus({'code': 1, 'msg': '正在停止从库...', 'progress': 15})
-    if version == '8.0':
+
+    mdb8 = ['8.0','8.1','8.2','8.3','8.4']
+    if mw.inArray(mdb8,version):
         db.query("stop slave user='{}' password='{}';".format(user, apass))
     else:
         db.query("stop slave")
@@ -3537,11 +3539,11 @@ def doFullSyncUser(version=''):
     # r = db.query(cmd)
     # print(r)
 
-    if version == '8.0':
+    mdb8 = ['8.0','8.1','8.2','8.3','8.4']
+    if mw.inArray(mdb8,version):
         db.query("start slave user='{}' password='{}';".format(user, apass))
     else:
         db.query("start slave")
-
 
     db.query("start all slaves")
     time_all_e = time.time()
@@ -3681,10 +3683,13 @@ def doFullSyncSSH(version=''):
         print(import_data[0])
         writeDbSyncStatus({'code': 5, 'msg': '导入数据失败...', 'progress': 100})
         return 'fail'
-
-    # "start slave user='{}' password='{}';".format(uinfo['username'], uinfo['password'])
-
-    db.query("start slave")
+    
+    mdb8 = ['8.0','8.1','8.2','8.3','8.4']
+    if mw.inArray(mdb8,version):
+        db.query("start slave user='{}' password='{}';".format(uinfo['username'], uinfo['password']))
+    else:
+        db.query("start slave")
+    
     writeDbSyncStatus({'code': 6, 'msg': '从库重启完成...', 'progress': 100})
 
     os.system("rm -rf " + SSH_PRIVATE_KEY)
