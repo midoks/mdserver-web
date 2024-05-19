@@ -217,6 +217,7 @@ def makeSqlToSphinxDb(pdb, db, table = []):
 	return conf
 
 def makeSqlToSphinxTable(pdb,db,table):
+	pkey_name = getTablePk(pdb, db, table)
 
 	sql = "select COLUMN_NAME,DATA_TYPE from information_schema.COLUMNS where `TABLE_SCHEMA`='{}' and `TABLE_NAME` = '{}';"
 	sql = sql.format(db,table,)
@@ -232,9 +233,19 @@ def makeSqlToSphinxTable(pdb,db,table):
 		# if mw.inArray(['tinyint'], data_type):
 		# 	conf += 'sql_attr_bool = '+ column_name + "\n"
 
+		if pkey_name == column_name:
+			run_pos += 1
+			if pkey_name == 'id':
+				conf += '\tsql_attr_bigint = '+column_name+"\n"
+			else:
+				conf += '\tsql_attr_bigint = '+"id\n"
+				conf += '\tsql_attr_bigint = '+column_name+"\n"
+			continue
+
 		if mw.inArray(['enum'], data_type):
 			run_pos += 1
 			conf += '\tsql_attr_string = '+ column_name + "\n"
+			continue
 
 		if mw.inArray(['decimal'], data_type):
 			run_pos += 1
@@ -243,23 +254,28 @@ def makeSqlToSphinxTable(pdb,db,table):
 		if mw.inArray(['bigint','smallint','tinyint','int','mediumint'], data_type):
 			run_pos += 1
 			conf += '\tsql_attr_bigint = '+ column_name + "\n"
+			continue
 
 
 		if mw.inArray(['float'], data_type):
 			run_pos += 1
 			conf += '\tsql_attr_float = '+ column_name + "\n"
+			continue
 
 		if mw.inArray(['varchar','char'], data_type):
 			run_pos += 1
 			conf += '\tsql_attr_string = '+ column_name + "\n"
+			continue
 
 		if mw.inArray(['text','mediumtext','tinytext','longtext'], data_type):
 			run_pos += 1
 			conf += '\tsql_field_string = '+ column_name + "\n"
+			continue
 
 		if mw.inArray(['datetime','date'], data_type):
 			run_pos += 1
 			conf += '\tsql_attr_timestamp = '+ column_name + "\n"
+			continue
 
 	# if cols_len != run_pos:
 	# 	print(db,table)
