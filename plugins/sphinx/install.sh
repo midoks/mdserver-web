@@ -112,7 +112,10 @@ Install_sphinx()
 		echo "${VERSION}" > $serverPath/sphinx/version.pl
 		echo '安装Sphinx完成'
 		cd ${rootPath} && python3 ${rootPath}/plugins/sphinx/index.py start
-		cd ${rootPath} && python3 ${rootPath}/plugins/sphinx/index.py initd_install
+
+		if [ $sysName != 'Darwin' ]; then
+			cd ${rootPath} && python3 ${rootPath}/plugins/sphinx/index.py initd_install
+		fi
 	fi
 
 	if [ -d ${SPHINX_DIR}/sphinx-${VERSION} ];then
