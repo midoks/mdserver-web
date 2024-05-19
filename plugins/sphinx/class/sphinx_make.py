@@ -192,7 +192,7 @@ def makeSqlToSphinxAll():
     conf = ''
     conf += makeSphinxHeader()
 
-    conf += makeSqlToSphinxDb(pdb, 'bbs', ['bbs_ucenter_admins'])
+    conf += makeSqlToSphinxDb(pdb, 'bbs')
 
 
     # for x in range(len(dblist)):
