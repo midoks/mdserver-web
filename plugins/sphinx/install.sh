@@ -87,13 +87,13 @@ Install_sphinx()
 	FILE_NAME=sphinx-${VERSION_NUM}-${SPH_SYSNAME}-${SPH_NAME}
 	FILE_TGZ=${FILE_NAME}.tar.gz
 		
-	echo "${SPHINX_DIR}/${FILE_TGZ}"
+	# curl -sSLo ${SPHINX_DIR}/${FILE_TGZ} http://sphinxsearch.com/files/${FILE_TGZ}
 	if [ ! -f ${SPHINX_DIR}/${FILE_TGZ} ];then
 		wget --no-check-certificate -O ${SPHINX_DIR}/${FILE_TGZ} http://sphinxsearch.com/files/${FILE_TGZ}
 	fi
 
 	# if [ ! -f ${SPHINX_DIR}/sphinx-${VERSION}.tar.gz ];then
-	# 	curl -sSLo ${SPHINX_DIR}/sphinx-${VERSION}.tar.gz https://github.com/midoks/mdserver-web/releases/download/init/sphinx-${VERSION}.tar.gz
+	# 	wget --no-check-certificate -O ${SPHINX_DIR}/sphinx-${VERSION}.tar.gz https://github.com/midoks/mdserver-web/releases/download/init/sphinx-${VERSION}.tar.gz
 	# fi
 
 	cd ${SPHINX_DIR} && tar -zxvf ${FILE_TGZ}
