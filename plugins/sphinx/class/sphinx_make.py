@@ -205,10 +205,10 @@ def makeSqlToSphinxDb(pdb, db, table = []):
 	conf = ''
 
 	for t in table:
-		pkey_name = getTablePk(pdb, db, table_name)
+		pkey_name = getTablePk(pdb, db, t)
 		if pkey_name == '':
 			continue
-		conf += makeSphinxDbSource(pdb, db, table_name, pkey_name)
+		conf += makeSphinxDbSource(pdb, db, t, pkey_name)
 
 	if len(table) == 0:
 		tables = pdb.query("show tables in "+ db)
