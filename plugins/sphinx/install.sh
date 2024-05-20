@@ -13,13 +13,14 @@ install_tmp=${rootPath}/tmp/mw_install.pl
 
 # cd /www/server/mdserver-web && source bin/activate && python3 plugins/sphinx/index.py rebuild
 # cd /www/server/mdserver-web/plugins/sphinx && bash install.sh install 3.6.1
-# cd /www/server/mdserver-web && source bin/activate && python3 plugins/sphinx/index.py db_to_sphinx
+# cd /www/server/mdserver-web && source bin/activate && python3 plugins/sphinx/index.py db_to_sphinx && /www/server/sphinx/bin/bin/indexer -c /www/server/sphinx/sphinx.conf --all --rotate
+# /Users/midoks/Desktop/mwdev/server/sphinx/bin/bin/indexer /Users/midoks/Desktop/mwdev/server/sphinx/sphinx.conf --all --rotate
+
+# cd /www/server/mdserver-web && source bin/activate && python3 plugins/sphinx/index.py sphinx_cmd
+
+# /Users/midoks/Desktop/mwdev/server/sphinx/bin/bin/indexer /Users/midoks/Desktop/mwdev/server/sphinx/sphinx.conf --all --rotate
+
 # cd /www/server/mdserver-web && source bin/activate && python3 plugins/sphinx/index.py start
-# /www/server/sphinx/bin/bin/indexer -c /www/server/sphinx/sphinx.conf --all --rotate
-# /Users/midoks/Desktop/mwdev/server/sphinx/bin/bin/indexer /Users/midoks/Desktop/mwdev/server/sphinx/sphinx.conf --all --rotate
-
-# /Users/midoks/Desktop/mwdev/server/sphinx/bin/bin/indexer /Users/midoks/Desktop/mwdev/server/sphinx/sphinx.conf --all --rotate
-
 bash ${rootPath}/scripts/getos.sh
 # echo "bash ${rootPath}/scripts/getos.sh"
 OSNAME="macos"
