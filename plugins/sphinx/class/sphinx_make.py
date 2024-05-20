@@ -398,11 +398,3 @@ index {$DB_NAME}_{$TABLE_NAME}
 	    return conf
 
 
-
-
-
-
-
-
-
-
