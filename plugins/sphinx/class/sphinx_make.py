@@ -382,6 +382,7 @@ index {$DB_NAME}_{$TABLE_NAME}
 
 	def makeSqlToSphinxAll(self):
 	    filter_db = ['information_schema','performance_schema','sys','mysql']
+	    filter_db.append(self.delta)
 
 	    dblist = self.pdb.query('show databases')
 
