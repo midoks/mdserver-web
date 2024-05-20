@@ -9,7 +9,8 @@ input,
 textarea,
 select {
     font-size: 100%;
-    font-family: inherit
+    font-family: inherit;
+    outline: none;
 }
 
 body,
