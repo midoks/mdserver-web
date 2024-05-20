@@ -74,7 +74,7 @@ class sphinxMake():
 CREATE TABLE IF NOT EXISTS `{$DB_NAME}`.`{$TABLE_NAME}` (
   `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
   `table` varchar(200) NOT NULL,
-  `max_id` bigint(20) unsigned NOT NULL DEFAULT '0',
+  `max_id` bigint(20) unsigned DEFAULT '0',
   PRIMARY KEY (`id`),
   KEY `table` (`table`)
 ) ENGINE=InnoDB CHARSET=utf8mb4;
