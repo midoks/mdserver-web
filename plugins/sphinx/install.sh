@@ -18,6 +18,8 @@ install_tmp=${rootPath}/tmp/mw_install.pl
 # /www/server/sphinx/bin/bin/indexer -c /www/server/sphinx/sphinx.conf --all --rotate
 # /Users/midoks/Desktop/mwdev/server/sphinx/bin/bin/indexer /Users/midoks/Desktop/mwdev/server/sphinx/sphinx.conf --all --rotate
 
+# /Users/midoks/Desktop/mwdev/server/sphinx/bin/bin/indexer /Users/midoks/Desktop/mwdev/server/sphinx/sphinx.conf --all --rotate
+
 bash ${rootPath}/scripts/getos.sh
 # echo "bash ${rootPath}/scripts/getos.sh"
 OSNAME="macos"

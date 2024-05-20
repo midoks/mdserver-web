@@ -54,42 +54,51 @@ def pMysqlDb():
     db.setPwd(pSqliteDb('config').where('id=?', (1,)).getField('mysql_root'))
     return db
 
-def getTablePk(pdb, db, table):
-	# SHOW INDEX FROM bbs.bbs_ucenter_vars WHERE Key_name = 'PRIMARY'
-	pkey_sql = "SHOW INDEX FROM {}.{} WHERE Key_name = 'PRIMARY';".format(db,table,);
-	pkey_data = pdb.query(pkey_sql)
+class sphinxMake():
 
-	# print(db, table)
-	# print(pkey_data)
+	pdb = None
+	psdb = None
+	def __init__(self):
+		self.pdb = pMysqlDb()
 
-	if len(pkey_data) == 1:
-		pkey_name = pkey_data[0]['Column_name']
-		sql = "select COLUMN_NAME,DATA_TYPE from information_schema.COLUMNS where `TABLE_SCHEMA`='{}' and `TABLE_NAME` = '{}' and `COLUMN_NAME`='{}';"
-		sql = sql.format(db,table,pkey_name,)
-		# print(sql)
-		fields = pdb.query(sql)
 
-		if len(fields) == 1:
-			# print(fields[0]['DATA_TYPE'])
-			if mw.inArray(['bigint','smallint','tinyint','int','mediumint'], fields[0]['DATA_TYPE']):
-				return pkey_name
+	def  getTablePk(self, db, table):
 
-	return ''
+		# SHOW INDEX FROM bbs.bbs_ucenter_vars WHERE Key_name = 'PRIMARY'
+		pkey_sql = "SHOW INDEX FROM {}.{} WHERE Key_name = 'PRIMARY';".format(db,table,);
+		pkey_data = self.pdb.query(pkey_sql)
 
-def getTableFieldStr(pdb, db, table):
-	sql = "select COLUMN_NAME,DATA_TYPE from information_schema.COLUMNS where `TABLE_SCHEMA`='{}' and `TABLE_NAME` = '{}';"
-	sql = sql.format(db,table,)
-	fields = pdb.query(sql)
+		# print(db, table)
+		# print(pkey_data)
 
-	field_str = ''
-	for x in range(len(fields)):
-		field_str += '`'+fields[x]['COLUMN_NAME']+'`,'
+		if len(pkey_data) == 1:
+			pkey_name = pkey_data[0]['Column_name']
+			sql = "select COLUMN_NAME,DATA_TYPE from information_schema.COLUMNS where `TABLE_SCHEMA`='{}' and `TABLE_NAME` = '{}' and `COLUMN_NAME`='{}';"
+			sql = sql.format(db,table,pkey_name,)
+			# print(sql)
+			fields = self.pdb.query(sql)
 
-	field_str = field_str.strip(',')
-	return field_str
+			if len(fields) == 1:
+				# print(fields[0]['DATA_TYPE'])
+				if mw.inArray(['bigint','smallint','tinyint','int','mediumint'], fields[0]['DATA_TYPE']):
+					return pkey_name
+		return ''
 
-def makeSphinxHeader():
-	conf = '''
+
+	def getTableFieldStr(self, db, table):
+		sql = "select COLUMN_NAME,DATA_TYPE from information_schema.COLUMNS where `TABLE_SCHEMA`='{}' and `TABLE_NAME` = '{}';"
+		sql = sql.format(db,table,)
+		fields = self.pdb.query(sql)
+
+		field_str = ''
+		for x in range(len(fields)):
+			field_str += '`'+fields[x]['COLUMN_NAME']+'`,'
+
+		field_str = field_str.strip(',')
+		return field_str
+
+	def makeSphinxHeader(self):
+		conf = '''
 indexer
 {
 	mem_limit		= 128M
@@ -110,32 +119,28 @@ searchd
 	#workers		= threads # for RT to work
 	binlog_path		= {$server_dir}/sphinx/index/binlog
 }
-	'''
-	conf = conf.replace("{$server_dir}", mw.getServerDir())
-	return conf
+		'''
+		conf = conf.replace("{$server_dir}", mw.getServerDir())
+		return conf
 
-def makeSphinxDbSourceRangeSql(pdb, db, table, pkey_name):
-	# pkey_name = getTablePk(pdb, db, table)
-	sql = "SELECT min("+pkey_name+"), max("+pkey_name+") FROM "+table
-	return sql
+	def makeSphinxDbSourceRangeSql(self, db, table, pkey_name):
+		sql = "SELECT min("+pkey_name+"), max("+pkey_name+") FROM "+table
+		return sql
 
-def makeSphinxDbSourceQuerySql(pdb, db, table,pkey_name):
-	field_str = getTableFieldStr(pdb, db,table)
-	# print(field_str)
-	if pkey_name == 'id':
-		sql = "SELECT " + field_str + " FROM " + table + " where id >= $start AND id <= $end"
-	else:
-		sql = "SELECT `"+pkey_name+'` as `id`,' + field_str + " FROM " + table + " where "+pkey_name+" >= $start AND "+pkey_name+" <= $end"
-	return sql
+	def makeSphinxDbSourceQuerySql(self, db, table,pkey_name):
+		field_str = self.getTableFieldStr(db,table)
+		# print(field_str)
+		if pkey_name == 'id':
+			sql = "SELECT " + field_str + " FROM " + table + " where id >= $start AND id <= $end"
+		else:
+			sql = "SELECT `"+pkey_name+'` as `id`,' + field_str + " FROM " + table + " where "+pkey_name+" >= $start AND "+pkey_name+" <= $end"
+		return sql
 
-def makeSphinxDbSource(pdb, db, table, pkey_name):
+	def makeSphinxDbSource(self, db, table, pkey_name):
+		db_info = pSqliteDb('databases').field('username,password').where('name=?', (db,)).find()
+		port = getDbPort()
 
-	db_info = pSqliteDb('databases').field('username,password').where('name=?', (db,)).find()
-	port = getDbPort()
-
-
-	conf = '''
-
+		conf = '''
 source {$DB_NAME}_{$TABLE_NAME}
 {
 	type			= mysql
@@ -162,153 +167,144 @@ index {$DB_NAME}_{$TABLE_NAME}
     ngram_len	= 1
     ngram_chars	= U+3000..U+2FA1F
 }
-'''
-	conf = conf.replace("{$server_dir}", mw.getServerDir())
+	'''
+		conf = conf.replace("{$server_dir}", mw.getServerDir())
 
-	conf = conf.replace("{$DB_NAME}", db)
-	conf = conf.replace("{$TABLE_NAME}", table)
-	conf = conf.replace("{$DB_USER}", db_info['username'])
-	conf = conf.replace("{$DB_PASS}", db_info['password'])
-	conf = conf.replace("{$DB_PORT}", port)
+		conf = conf.replace("{$DB_NAME}", db)
+		conf = conf.replace("{$TABLE_NAME}", table)
+		conf = conf.replace("{$DB_USER}", db_info['username'])
+		conf = conf.replace("{$DB_PASS}", db_info['password'])
+		conf = conf.replace("{$DB_PORT}", port)
 
-	range_sql = makeSphinxDbSourceRangeSql(pdb, db, table,pkey_name)
-	conf = conf.replace("{$DB_RANGE_SQL}", range_sql)
+		range_sql = self.makeSphinxDbSourceRangeSql(db, table,pkey_name)
+		conf = conf.replace("{$DB_RANGE_SQL}", range_sql)
 
-	query_sql = makeSphinxDbSourceQuerySql(pdb, db, table, pkey_name)
-	conf = conf.replace("{$DB_QUERY_SQL}", query_sql)
+		query_sql = self.makeSphinxDbSourceQuerySql(db, table, pkey_name)
+		conf = conf.replace("{$DB_QUERY_SQL}", query_sql)
 
-	sph_field = makeSqlToSphinxTable(pdb, db, table, pkey_name)
-	conf = conf.replace("{$SPH_FIELD}", sph_field)
+		sph_field = self.makeSqlToSphinxTable(db, table, pkey_name)
+		conf = conf.replace("{$SPH_FIELD}", sph_field)
 
-	return conf
+		return conf
 
-def makeSqlToSphinxTableIsHaveFulltext(pdb, db, table):
-	sql = "select COLUMN_NAME,DATA_TYPE from information_schema.COLUMNS where `TABLE_SCHEMA`='{}' and `TABLE_NAME` = '{}';"
-	sql = sql.format(db,table,)
-	cols = pdb.query(sql)
-	cols_len = len(cols)
+	def makeSqlToSphinxDb(self, db, table = []):
+		conf = ''
 
-	for x in range(cols_len):
-		data_type = cols[x]['DATA_TYPE']
-		column_name = cols[x]['COLUMN_NAME']
-
-		if mw.inArray(['varchar'], data_type):
-			return True
-
-		if mw.inArray(['text','mediumtext','tinytext','longtext'], data_type):
-			return True
-
-	return False
-
-def makeSqlToSphinxAll():
-    filter_db = ['information_schema','performance_schema','sys','mysql']
-
-    pdb = pMysqlDb()
-    dblist = pdb.query('show databases')
-
-    conf = ''
-    conf += makeSphinxHeader()
-
-    # conf += makeSqlToSphinxDb(pdb, 'bbs')
-    for x in range(len(dblist)):
-        dbname = dblist[x]['Database']
-        if mw.inArray(filter_db, dbname):
-            continue
-        conf += makeSqlToSphinxDb(pdb, dbname)
-    return conf
-
-
-
-def makeSqlToSphinxDb(pdb, db, table = []):
-	conf = ''
-
-	for t in table:
-		pkey_name = getTablePk(pdb, db, t)
-		if pkey_name == '':
-			continue
-		conf += makeSphinxDbSource(pdb, db, t, pkey_name)
-
-	if len(table) == 0:
-		tables = pdb.query("show tables in "+ db)
-		for x in range(len(tables)):
-			key = 'Tables_in_'+db
-			table_name = tables[x][key]
-			pkey_name = getTablePk(pdb, db, table_name)
-
+		for t in table:
+			pkey_name = self.pdb.getTablePk(db, t)
 			if pkey_name == '':
 				continue
+			conf += self.makeSphinxDbSource(db, t, pkey_name)
 
-			if makeSqlToSphinxTableIsHaveFulltext(pdb, db, table_name):
-				conf += makeSphinxDbSource(pdb, db, table_name, pkey_name)
-	return conf
+		if len(table) == 0:
+			tables = self.pdb.query("show tables in "+ db)
+			for x in range(len(tables)):
+				key = 'Tables_in_'+db
+				table_name = tables[x][key]
+				pkey_name = self.getTablePk(db, table_name)
 
-def makeSqlToSphinxTable(pdb,db,table,pkey_name):
+				if pkey_name == '':
+					continue
 
-	sql = "select COLUMN_NAME,DATA_TYPE from information_schema.COLUMNS where `TABLE_SCHEMA`='{}' and `TABLE_NAME` = '{}';"
-	sql = sql.format(db,table,)
-	cols = pdb.query(sql)
-	cols_len = len(cols)
-	conf = ''
-	run_pos = 0
-	for x in range(cols_len):
-		data_type = cols[x]['DATA_TYPE']
-		column_name = cols[x]['COLUMN_NAME']
-		# print(column_name+":"+data_type)
+				if self.makeSqlToSphinxTableIsHaveFulltext(db, table_name):
+					conf += self.makeSphinxDbSource(db, table_name, pkey_name)
+		return conf
 
-		# if mw.inArray(['tinyint'], data_type):
-		# 	conf += 'sql_attr_bool = '+ column_name + "\n"
+	def makeSqlToSphinxTableIsHaveFulltext(self, db, table):
+		sql = "select COLUMN_NAME,DATA_TYPE from information_schema.COLUMNS where `TABLE_SCHEMA`='{}' and `TABLE_NAME` = '{}';"
+		sql = sql.format(db,table,)
+		cols = self.pdb.query(sql)
+		cols_len = len(cols)
 
-		if pkey_name == column_name:
-			# run_pos += 1
-			# conf += '\tsql_attr_bigint = '+column_name+"\n"
-			continue
+		for x in range(cols_len):
+			data_type = cols[x]['DATA_TYPE']
+			column_name = cols[x]['COLUMN_NAME']
 
-		if mw.inArray(['enum'], data_type):
-			run_pos += 1
-			conf += '\tsql_attr_string = '+ column_name + "\n"
-			continue
+			if mw.inArray(['varchar'], data_type):
+				return True
+			if mw.inArray(['text','mediumtext','tinytext','longtext'], data_type):
+				return True
+		return False
 
-		if mw.inArray(['decimal'], data_type):
-			run_pos += 1
-			conf += '\tsql_attr_float = '+ column_name + "\n"
+	def makeSqlToSphinxTable(self,db,table,pkey_name):
+		sql = "select COLUMN_NAME,DATA_TYPE from information_schema.COLUMNS where `TABLE_SCHEMA`='{}' and `TABLE_NAME` = '{}';"
+		sql = sql.format(db,table,)
+		cols = self.pdb.query(sql)
+		cols_len = len(cols)
+		conf = ''
+		run_pos = 0
+		for x in range(cols_len):
+			data_type = cols[x]['DATA_TYPE']
+			column_name = cols[x]['COLUMN_NAME']
+			# print(column_name+":"+data_type)
 
-		if mw.inArray(['bigint','smallint','tinyint','int','mediumint'], data_type):
-			run_pos += 1
-			conf += '\tsql_attr_bigint = '+ column_name + "\n"
-			continue
+			# if mw.inArray(['tinyint'], data_type):
+			# 	conf += 'sql_attr_bool = '+ column_name + "\n"
+
+			if pkey_name == column_name:
+				# run_pos += 1
+				# conf += '\tsql_attr_bigint = '+column_name+"\n"
+				continue
+
+			if mw.inArray(['enum'], data_type):
+				run_pos += 1
+				conf += '\tsql_attr_string = '+ column_name + "\n"
+				continue
+
+			if mw.inArray(['decimal'], data_type):
+				run_pos += 1
+				conf += '\tsql_attr_float = '+ column_name + "\n"
+
+			if mw.inArray(['bigint','smallint','tinyint','int','mediumint'], data_type):
+				run_pos += 1
+				conf += '\tsql_attr_bigint = '+ column_name + "\n"
+				continue
 
 
-		if mw.inArray(['float'], data_type):
-			run_pos += 1
-			conf += '\tsql_attr_float = '+ column_name + "\n"
-			continue
+			if mw.inArray(['float'], data_type):
+				run_pos += 1
+				conf += '\tsql_attr_float = '+ column_name + "\n"
+				continue
 
-		if mw.inArray(['char'], data_type):
-			conf += '\tsql_attr_string = '+ column_name + "\n"
-			continue
+			if mw.inArray(['char'], data_type):
+				conf += '\tsql_attr_string = '+ column_name + "\n"
+				continue
 
-		if mw.inArray(['varchar'], data_type):
-			run_pos += 1
-			conf += '\tsql_field_string = '+ column_name + "\n"
-			continue
+			if mw.inArray(['varchar'], data_type):
+				run_pos += 1
+				conf += '\tsql_field_string = '+ column_name + "\n"
+				continue
 
-		if mw.inArray(['text','mediumtext','tinytext','longtext'], data_type):
-			run_pos += 1
-			conf += '\tsql_field_string = '+ column_name + "\n"
-			continue
+			if mw.inArray(['text','mediumtext','tinytext','longtext'], data_type):
+				run_pos += 1
+				conf += '\tsql_field_string = '+ column_name + "\n"
+				continue
 
-		if mw.inArray(['datetime','date'], data_type):
-			run_pos += 1
-			conf += '\tsql_attr_timestamp = '+ column_name + "\n"
-			continue
+			if mw.inArray(['datetime','date'], data_type):
+				run_pos += 1
+				conf += '\tsql_attr_timestamp = '+ column_name + "\n"
+				continue
 
-	# if cols_len != run_pos:
-	# 	print(db,table)
-	# print(cols_len,run_pos)
-	# print(conf)
-	return conf
+		return conf
 
-	
+
+	def makeSqlToSphinxAll(self):
+	    filter_db = ['information_schema','performance_schema','sys','mysql']
+
+	    dblist = self.pdb.query('show databases')
+
+	    conf = ''
+	    conf += self.makeSphinxHeader()
+
+	    # conf += makeSqlToSphinxDb(pdb, 'bbs')
+	    for x in range(len(dblist)):
+	        dbname = dblist[x]['Database']
+	        if mw.inArray(filter_db, dbname):
+	            continue
+	        conf += self.makeSqlToSphinxDb(dbname)
+	    return conf
+
+
 
 
 

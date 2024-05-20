@@ -319,12 +319,14 @@ def sphinxCmd():
         return mw.returnJson(False, 'no index')
 
 def makeDbToSphinx():
-    sphinx_file = getConf()
+    conf_file = getConf()
 
     import  sphinx_make
-    conf = sphinx_make.makeSqlToSphinxAll()
 
-    mw.writeFile(sphinx_file,conf)
+    sph_make = sphinx_make.sphinxMake()
+    conf = sph_make.makeSqlToSphinxAll()
+
+    mw.writeFile(conf_file,conf)
     print(conf)
     # makeSqlToSphinxTable()
     return True
