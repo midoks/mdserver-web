@@ -160,8 +160,20 @@ def mwcli(mw_input=0):
         else:
             print("|-二次验证已关闭!")
     elif mw_input == 26:
-        cmd = 'firewall-cmd --list-all'
-        os.system(cmd)
+        cmd = 'which ufw'
+        run_cmd = False
+        find_cmd =  mw.execShell(cmd)
+        if find_cmd[0].strip() != '':
+            run_cmd = True
+            os.system('ufw status')
+
+        cmd = 'which firewall-cmd'
+        find_cmd =  mw.execShell(cmd)
+        if find_cmd[0].strip() != '':
+            run_cmd = True
+            os.system('firewall-cmd --list-all')
+        if not run_cmd:
+            mw.echoInfo("未检测到防火墙!")
     elif mw_input == 100:
         php_conf = 'plugins/php/info.json'
         if os.path.exists(php_conf):
