@@ -58,11 +58,35 @@ class sphinxMake():
 
 	pdb = None
 	psdb = None
+
+	pkey_name_cache = {}
+	delta = 'sph_counter'
+
 	def __init__(self):
 		self.pdb = pMysqlDb()
 
+	def setDeltaName(self, name):
+		self.delta = name
+		return True
 
-	def  getTablePk(self, db, table):
+	def createSql(self):
+		conf = '''
+CREATE TABLE `{$TABLE_NAME}` (
+  `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
+  `table` varchar(200) NOT NULL,
+  `max_id` bigint(20) unsigned NOT NULL DEFAULT '0',
+  PRIMARY KEY (`id`),
+  KEY `table` (`table`)
+) ENGINE=InnoDB CHARSET=utf8mb4;
+'''
+		conf.replace("{$TABLE_NAME}", self.delta)
+		return conf
+
+
+	def getTablePk(self, db, table):
+		key = db+'_'+table
+		if key in self.pkey_name_cache:
+			return self.pkey_name_cache[key]
 
 		# SHOW INDEX FROM bbs.bbs_ucenter_vars WHERE Key_name = 'PRIMARY'
 		pkey_sql = "SHOW INDEX FROM {}.{} WHERE Key_name = 'PRIMARY';".format(db,table,);
@@ -70,7 +94,7 @@ class sphinxMake():
 
 		# print(db, table)
 		# print(pkey_data)
-
+		key = ''
 		if len(pkey_data) == 1:
 			pkey_name = pkey_data[0]['Column_name']
 			sql = "select COLUMN_NAME,DATA_TYPE from information_schema.COLUMNS where `TABLE_SCHEMA`='{}' and `TABLE_NAME` = '{}' and `COLUMN_NAME`='{}';"
@@ -81,8 +105,8 @@ class sphinxMake():
 			if len(fields) == 1:
 				# print(fields[0]['DATA_TYPE'])
 				if mw.inArray(['bigint','smallint','tinyint','int','mediumint'], fields[0]['DATA_TYPE']):
-					return pkey_name
-		return ''
+					key = pkey_name
+		return key
 
 
 	def getTableFieldStr(self, db, table):
@@ -123,11 +147,13 @@ searchd
 		conf = conf.replace("{$server_dir}", mw.getServerDir())
 		return conf
 
-	def makeSphinxDbSourceRangeSql(self, db, table, pkey_name):
+	def makeSphinxDbSourceRangeSql(self, db, table):
+		pkey_name = self.getTablePk(db,table)
 		sql = "SELECT min("+pkey_name+"), max("+pkey_name+") FROM "+table
 		return sql
 
-	def makeSphinxDbSourceQuerySql(self, db, table,pkey_name):
+	def makeSphinxDbSourceQuerySql(self, db, table):
+		pkey_name = self.getTablePk(db,table)
 		field_str = self.getTableFieldStr(db,table)
 		# print(field_str)
 		if pkey_name == 'id':
@@ -136,7 +162,61 @@ searchd
 			sql = "SELECT `"+pkey_name+'` as `id`,' + field_str + " FROM " + table + " where "+pkey_name+" >= $start AND "+pkey_name+" <= $end"
 		return sql
 
-	def makeSphinxDbSource(self, db, table, pkey_name):
+
+	def makeSphinxDbSourceDeltaRange(self, db, table):
+		pkey_name = self.getTablePk(db,table)
+		conf = "SELECT (SELECT max_id FROM `{$SPH_TABLE}` where `table`='{$TABLE_NAME}') as min, (SELECT max({$PK_NAME}) FROM {$TABLE_NAME}) as max"
+		conf = conf.replace("{$DB_NAME}", db)
+		conf = conf.replace("{$TABLE_NAME}", table)
+		conf = conf.replace("{$SPH_TABLE}", self.delta)
+		conf = conf.replace("{$PK_NAME}", pkey_name)
+		return conf
+
+	def makeSphinxDbSourceDeltaPost(self, db, table):
+		pkey_name = self.getTablePk(db,table)
+		conf = "UPDATE {$SPH_TABLE} SET max_id=(SELECT MAX({$PK_NAME}) FROM {$TABLE_NAME}) where `table`='{$TABLE_NAME}'"
+		conf = conf.replace("{$DB_NAME}", db)
+		conf = conf.replace("{$TABLE_NAME}", table)
+		conf = conf.replace("{$SPH_TABLE}", self.delta)
+		conf = conf.replace("{$PK_NAME}", pkey_name)
+		return conf
+
+	def makeSphinxDbSourceDelta(self, db, table):
+		conf = '''
+source {$DB_NAME}_{$TABLE_NAME}_delta:{$DB_NAME}_{$TABLE_NAME}
+{
+    sql_query_pre	=	SET NAMES utf8
+    sql_query_range	=	{$DELTA_RANGE}
+    sql_query 		=	{$DELTA_QUERY}
+    sql_query_post	=	{$DELTA_UPDATE}
+}
+
+index {$DB_NAME}_{$TABLE_NAME}_delta:{$DB_NAME}_{$TABLE_NAME}
+{
+    source 	= {$DB_NAME}_{$TABLE_NAME}_delta
+    path 	= {$server_dir}/sphinx/index/db/{$DB_NAME}.{$TABLE_NAME}_delta/index
+
+    html_strip	= 1
+    ngram_len	= 1
+    ngram_chars	= U+3000..U+2FA1F
+}
+''';
+		conf = conf.replace("{$server_dir}", mw.getServerDir())
+		conf = conf.replace("{$DB_NAME}", db)
+		conf = conf.replace("{$TABLE_NAME}", table)
+
+		delta_range = self.makeSphinxDbSourceDeltaRange(db, table)
+		conf = conf.replace("{$DELTA_RANGE}", delta_range)
+
+		delta_query = self.makeSphinxDbSourceQuerySql(db, table)
+		conf = conf.replace("{$DELTA_QUERY}", delta_query)
+
+		delta_update = self.makeSphinxDbSourceDeltaPost(db, table)
+		conf = conf.replace("{$DELTA_UPDATE}", delta_update)
+		
+		return conf;
+
+	def makeSphinxDbSource(self, db, table):
 		db_info = pSqliteDb('databases').field('username,password').where('name=?', (db,)).find()
 		port = getDbPort()
 
@@ -176,25 +256,26 @@ index {$DB_NAME}_{$TABLE_NAME}
 		conf = conf.replace("{$DB_PASS}", db_info['password'])
 		conf = conf.replace("{$DB_PORT}", port)
 
-		range_sql = self.makeSphinxDbSourceRangeSql(db, table,pkey_name)
+		range_sql = self.makeSphinxDbSourceRangeSql(db, table)
 		conf = conf.replace("{$DB_RANGE_SQL}", range_sql)
 
-		query_sql = self.makeSphinxDbSourceQuerySql(db, table, pkey_name)
+		query_sql = self.makeSphinxDbSourceQuerySql(db, table)
 		conf = conf.replace("{$DB_QUERY_SQL}", query_sql)
 
-		sph_field = self.makeSqlToSphinxTable(db, table, pkey_name)
+		sph_field = self.makeSqlToSphinxTable(db, table)
 		conf = conf.replace("{$SPH_FIELD}", sph_field)
+
+		conf += self.makeSphinxDbSourceDelta(db,table)
 
 		return conf
 
 	def makeSqlToSphinxDb(self, db, table = []):
 		conf = ''
 
-		for t in table:
-			pkey_name = self.pdb.getTablePk(db, t)
+		for tn in table:
 			if pkey_name == '':
 				continue
-			conf += self.makeSphinxDbSource(db, t, pkey_name)
+			conf += self.makeSphinxDbSource(db, tn)
 
 		if len(table) == 0:
 			tables = self.pdb.query("show tables in "+ db)
@@ -202,12 +283,11 @@ index {$DB_NAME}_{$TABLE_NAME}
 				key = 'Tables_in_'+db
 				table_name = tables[x][key]
 				pkey_name = self.getTablePk(db, table_name)
-
 				if pkey_name == '':
 					continue
 
 				if self.makeSqlToSphinxTableIsHaveFulltext(db, table_name):
-					conf += self.makeSphinxDbSource(db, table_name, pkey_name)
+					conf += self.makeSphinxDbSource(db, table_name)
 		return conf
 
 	def makeSqlToSphinxTableIsHaveFulltext(self, db, table):
@@ -226,7 +306,8 @@ index {$DB_NAME}_{$TABLE_NAME}
 				return True
 		return False
 
-	def makeSqlToSphinxTable(self,db,table,pkey_name):
+	def makeSqlToSphinxTable(self,db,table):
+		pkey_name = self.getTablePk(db,table)
 		sql = "select COLUMN_NAME,DATA_TYPE from information_schema.COLUMNS where `TABLE_SCHEMA`='{}' and `TABLE_NAME` = '{}';"
 		sql = sql.format(db,table,)
 		cols = self.pdb.query(sql)
