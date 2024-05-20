@@ -69,9 +69,9 @@ class sphinxMake():
 		self.delta = name
 		return True
 
-	def createSql(self):
+	def createSql(self, db):
 		conf = '''
-CREATE TABLE `{$TABLE_NAME}` (
+CREATE TABLE IF NOT EXISTS `{$DB_NAME}`.`{$TABLE_NAME}` (
   `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
   `table` varchar(200) NOT NULL,
   `max_id` bigint(20) unsigned NOT NULL DEFAULT '0',
@@ -79,7 +79,8 @@ CREATE TABLE `{$TABLE_NAME}` (
   KEY `table` (`table`)
 ) ENGINE=InnoDB CHARSET=utf8mb4;
 '''
-		conf.replace("{$TABLE_NAME}", self.delta)
+		conf = conf.replace("{$TABLE_NAME}", self.delta)
+		conf = conf.replace("{$DB_NAME}", db)
 		return conf
 
 
@@ -174,7 +175,8 @@ searchd
 
 	def makeSphinxDbSourceDeltaPost(self, db, table):
 		pkey_name = self.getTablePk(db,table)
-		conf = "UPDATE {$SPH_TABLE} SET max_id=(SELECT MAX({$PK_NAME}) FROM {$TABLE_NAME}) where `table`='{$TABLE_NAME}'"
+		# conf = "UPDATE {$SPH_TABLE} SET max_id=(SELECT MAX({$PK_NAME}) FROM {$TABLE_NAME}) where `table`='{$TABLE_NAME}'"
+		conf = "REPLACE INTO {$SPH_TABLE} (`table`,`max_id`) VALUES ('{$TABLE_NAME}',(SELECT MAX({$PK_NAME}) FROM {$TABLE_NAME}))"
 		conf = conf.replace("{$DB_NAME}", db)
 		conf = conf.replace("{$TABLE_NAME}", table)
 		conf = conf.replace("{$SPH_TABLE}", self.delta)
@@ -216,7 +218,7 @@ index {$DB_NAME}_{$TABLE_NAME}_delta:{$DB_NAME}_{$TABLE_NAME}
 		
 		return conf;
 
-	def makeSphinxDbSource(self, db, table):
+	def makeSphinxDbSource(self, db, table, create_sphinx_table = True):
 		db_info = pSqliteDb('databases').field('username,password').where('name=?', (db,)).find()
 		port = getDbPort()
 
@@ -265,7 +267,11 @@ index {$DB_NAME}_{$TABLE_NAME}
 		sph_field = self.makeSqlToSphinxTable(db, table)
 		conf = conf.replace("{$SPH_FIELD}", sph_field)
 
-		conf += self.makeSphinxDbSourceDelta(db,table)
+
+		if create_sphinx_table:
+			sph_sql = self.createSql(db)
+			r = self.pdb.query(sph_sql)
+			conf += self.makeSphinxDbSourceDelta(db,table)
 
 		return conf
 
