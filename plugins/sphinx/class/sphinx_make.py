@@ -191,6 +191,8 @@ source {$DB_NAME}_{$TABLE_NAME}_delta:{$DB_NAME}_{$TABLE_NAME}
     sql_query_range	=	{$DELTA_RANGE}
     sql_query 		=	{$DELTA_QUERY}
     sql_query_post	=	{$DELTA_UPDATE}
+
+{$SPH_FIELD}
 }
 
 index {$DB_NAME}_{$TABLE_NAME}_delta:{$DB_NAME}_{$TABLE_NAME}
@@ -215,6 +217,9 @@ index {$DB_NAME}_{$TABLE_NAME}_delta:{$DB_NAME}_{$TABLE_NAME}
 
 		delta_update = self.makeSphinxDbSourceDeltaPost(db, table)
 		conf = conf.replace("{$DELTA_UPDATE}", delta_update)
+
+		sph_field = self.makeSqlToSphinxTable(db, table)
+		conf = conf.replace("{$SPH_FIELD}", sph_field)
 		
 		return conf;
 
