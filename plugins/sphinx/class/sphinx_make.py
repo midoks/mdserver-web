@@ -253,13 +253,7 @@ index {$DB_NAME}_{$TABLE_NAME}_delta:{$DB_NAME}_{$TABLE_NAME}
 
 
 		sph_field = self.makeSqlToSphinxTable(db, table)
-		ver = self.ver.replace(".1",'')
-		if float(ver) >= 3.6:
-			conf = conf.replace("{$SPH_FIELD}", '')
-			conf = conf.replace("{$SPH_FIELD_INDEX}", sph_field)
-		else:
-			conf = conf.replace("{$SPH_FIELD}", sph_field)
-			conf = conf.replace("{$SPH_FIELD_INDEX}", '')
+		conf = self.makeSphinxDbFieldRepalce(conf, sph_field)
 		
 		return conf;
 
@@ -316,13 +310,8 @@ index {$DB_NAME}_{$TABLE_NAME}
 		sph_field = self.makeSqlToSphinxTable(db, table)
 		# conf = conf.replace("{$SPH_FIELD}", sph_field)
 
-		ver = self.ver.replace(".1",'')
-		if float(ver) >= 3.6:
-			conf = conf.replace("{$SPH_FIELD}", '')
-			conf = conf.replace("{$SPH_FIELD_INDEX}", sph_field)
-		else:
-			conf = conf.replace("{$SPH_FIELD}", sph_field)
-			conf = conf.replace("{$SPH_FIELD_INDEX}", '')
+
+		conf = self.makeSphinxDbFieldRepalce(conf, sph_field)
 
 
 		if create_sphinx_table:
@@ -334,6 +323,21 @@ index {$DB_NAME}_{$TABLE_NAME}
 		# print(conf)
 
 		return conf
+
+	def makeSphinxDbFieldRepalce(self, content, sph_field):
+		ver = self.ver.replace(".1",'')
+		if ver >= 3.7:
+			content = content.replace("{$SPH_FIELD}", '')
+			content = content.replace("{$SPH_FIELD_INDEX}", '')
+		elif float(ver) >= 3.6:
+			content = content.replace("{$SPH_FIELD}", '')
+			content = content.replace("{$SPH_FIELD_INDEX}", sph_field)
+		else:
+			content = content.replace("{$SPH_FIELD}", sph_field)
+			content = content.replace("{$SPH_FIELD_INDEX}", '')
+
+		return content
+
 
 	def makeSqlToSphinxDb(self, db, table = [], is_delta = False):
 		conf = ''
