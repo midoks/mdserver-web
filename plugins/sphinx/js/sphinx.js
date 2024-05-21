@@ -297,7 +297,7 @@ function readme(){
             // console.log(index,delta);
             con += '<li>主索引 :' + rdata['data']['cmd'] + ' '+ index +' --rotate</li>';
             con += '<li>增量索引 :' + rdata['data']['cmd'] + ' '+ delta +' --rotate</li>';
-            con += '<li>合并索引 :' + rdata['data']['cmd'] + ' --merge '+ delta + ' ' + index +' --rotate</li>';
+            con += '<li>合并索引 :' + rdata['data']['cmd'] + ' --merge '+ index  + ' ' + delta +' --rotate</li>';
         }
         con += '</ul>';
 
