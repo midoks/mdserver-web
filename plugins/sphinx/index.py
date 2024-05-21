@@ -295,18 +295,35 @@ def sphinxConfParse():
     sindex = re.findall(rep, content)
     indexlen = len(sindex)
     cmd = {}
-    if indexlen > 0:
-        cmd_index = []
-        cmd_delta = []
-        for x in range(indexlen):
-            if sindex[x].find(':') != -1:
-                cmd_delta.append(sindex[x])
-            else:
-                cmd_index.append(sindex[x])
+    cmd['cmd'] = bin_dir + '/bin/bin/indexer -c ' + bin_dir + '/sphinx.conf'
 
-        cmd['index'] = cmd_index
-        cmd['delta'] = cmd_delta
-        cmd['cmd'] = bin_dir + '/bin/bin/indexer -c ' + bin_dir + '/sphinx.conf'
+    cmd['index'] = []
+    cmd_index = []
+    cmd_delta = []
+    if indexlen > 0:
+        for x in range(indexlen):
+            name = sindex[x].strip()
+            if name == '':
+                continue
+            if  name.find(':') != -1:
+                cmd_delta.append(name.strip())
+            else:
+                cmd_index.append(name.strip())
+
+    # print(cmd_index)
+    # print(cmd_delta)
+
+    for ci in cmd_index:
+        val = {}
+        val['index'] = ci
+
+        for cd in cmd_delta:
+            cd = cd.replace(" ", '')
+            if cd.find(":"+ci) > -1:
+                val['delta'] = cd.split(":")[0].strip()
+                break
+
+        cmd['index'].append(val)
     return cmd
 
 

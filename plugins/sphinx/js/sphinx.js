@@ -280,22 +280,24 @@ function readme(){
             return;
         }
 
+        // console.log(rdata['data']);
         var con = '<ul class="help-info-text c7">';
 
         con += '<li style="color:red;">如果数据量比较大,第一次启动会失败!(可通过手动建立索引)</li>';
         con += '<li style="color:red;">以下内容,需手动加入计划任务。</li>';
+            
+
+        con += '<li>全量:' + rdata['data']['cmd'] + ' --all --rotate</li>';
+
         //主索引
         for (var i = 0; i < rdata['data']['index'].length; i++) {
-            var index_t = rdata['data']['index'][i];
-            con += '<li>主索引:' + rdata['data']['cmd'] + ' '+ index_t +' --rotate</li>';
-        }
-
-        for (var i = 0; i < rdata['data']['delta'].length; i++) {
-            var delta_t = rdata['data']['delta'][i];
-            var list = delta_t.split(':');
-            // console.log(list);
-            con += '<li>增量索引:' + rdata['data']['cmd'] + ' '+ list[0] +' --rotate</li>';
-            con += '<li>合并索引:' + rdata['data']['cmd'] + ' --merge '+ list[1] + ' ' + list[0] +' --rotate</li>';
+            var index_kv = rdata['data']['index'][i];
+            var index = index_kv['index'];
+            var delta = index_kv['delta'];
+            // console.log(index,delta);
+            con += '<li>主索引 :' + rdata['data']['cmd'] + ' '+ index +' --rotate</li>';
+            con += '<li>增量索引 :' + rdata['data']['cmd'] + ' '+ delta +' --rotate</li>';
+            con += '<li>合并索引 :' + rdata['data']['cmd'] + ' --merge '+ delta + ' ' + index +' --rotate</li>';
         }
         con += '</ul>';
 
