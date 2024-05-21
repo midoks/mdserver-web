@@ -361,6 +361,11 @@ def makeDbToSphinx():
     import  sphinx_make
     sph_make = sphinx_make.sphinxMake()
 
+    version_pl = getServerDir() + "/version.pl"
+    if os.path.exists(version_pl):
+        version = mw.readFile(version_pl).strip()
+        sph_make.setVersion(version)
+
     if not sph_make.checkDbName(db):
         return mw.returnJson(False,'保留数据库名称,不可用!')
     is_delta_bool = False

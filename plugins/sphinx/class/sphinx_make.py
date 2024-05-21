@@ -61,6 +61,8 @@ class sphinxMake():
 
 	pkey_name_cache = {}
 	delta = 'sph_counter'
+	ver = ''
+
 
 	def __init__(self):
 		self.pdb = pMysqlDb()
@@ -68,6 +70,9 @@ class sphinxMake():
 	def setDeltaName(self, name):
 		self.delta = name
 		return True
+
+	def setVersion(self, ver):
+		self.ver = ver
 
 	def createSql(self, db):
 		conf = '''
@@ -80,6 +85,13 @@ CREATE TABLE IF NOT EXISTS `{$DB_NAME}`.`{$TABLE_NAME}` (
 		conf = conf.replace("{$TABLE_NAME}", self.delta)
 		conf = conf.replace("{$DB_NAME}", db)
 		return conf
+	def eqVerField(self, field):
+		ver = self.ver.replace(".1",'')
+		if float(ver) >= 3.3:
+			if field == 'sql_attr_timestamp':
+				return 'sql_attr_bigint'
+
+		return field
 
 
 	def getTablePk(self, db, table):
@@ -374,7 +386,7 @@ index {$DB_NAME}_{$TABLE_NAME}
 
 			if mw.inArray(['datetime','date'], data_type):
 				run_pos += 1
-				conf += '\tsql_attr_timestamp = '+ column_name + "\n"
+				conf += '\t'+self.eqVerField('sql_attr_timestamp')+' = '+ column_name + "\n"
 				continue
 
 		return conf
