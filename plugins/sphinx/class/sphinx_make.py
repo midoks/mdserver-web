@@ -77,10 +77,13 @@ class sphinxMake():
 	def createSql(self, db):
 		conf = '''
 CREATE TABLE IF NOT EXISTS `{$DB_NAME}`.`{$TABLE_NAME}` (
-  `table` varchar(200) NOT NULL,
-  `max_id` bigint(20) unsigned  NOT NULL DEFAULT '0',
-  KEY `table` (`table`)
-) ENGINE=InnoDB CHARSET=utf8mb4;
+	`id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
+	`table` varchar(200) NOT NULL,
+	`max_id` bigint(20) unsigned  NOT NULL DEFAULT '0',
+	PRIMARY KEY (`id`),
+	UNIQUE KEY `table_uniq` (`table`),
+	KEY `table` (`table`)
+) ENGINE=InnoDB AUTO_INCREMENT=1 CHARSET=utf8mb4;
 '''
 		conf = conf.replace("{$TABLE_NAME}", self.delta)
 		conf = conf.replace("{$DB_NAME}", db)
@@ -316,7 +319,13 @@ index {$DB_NAME}_{$TABLE_NAME}
 
 		if create_sphinx_table:
 			sph_sql = self.createSql(db)
-			r = self.pdb.query(sph_sql)
+			self.pdb.query(sph_sql)
+			sql_find = "select * from {}.{} where `table`='{}'".format(db,self.delta,table)
+			find_data = self.pdb.query(sql_find)
+			if len(find_data) == 0:
+				insert_sql = "insert into `{}`.`{}`(`table`,`max_id`) values ('{}',{}) ".format(db,self.delta,db,0)
+				# print(insert_sql)
+				self.pdb.execute(insert_sql)
 			conf += self.makeSphinxDbSourceDelta(db,table)
 
 		# print(ver)
