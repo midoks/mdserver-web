@@ -95,6 +95,9 @@ CREATE TABLE IF NOT EXISTS `{$DB_NAME}`.`{$TABLE_NAME}` (
 			if field == 'sql_attr_bigint':
 				return 'attr_bigint'
 
+			if field == 'sql_attr_float':
+				return 'attr_float'
+
 			if field == 'sql_field_string':
 				return 'field_string'
 
