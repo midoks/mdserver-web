@@ -81,9 +81,7 @@ function autoMakeConf(){
                         <span class='tname'>选择数据库</span>\
                         <div class='info-r'>\
                             <select class='bt-input-text mr5' name='dbname' style='width:100%'>\
-                                <option value='all'>全部</option>\
-                                <option value='one'>单指定</option>\
-                                <option value='some'>多指定</option>\
+                                <option value=''>无</option>\
                             </select>\
                         </div>\
                     </div>\
@@ -170,6 +168,9 @@ function autoMakeConf(){
     });
 
     function initDbSelect(db){
+        if (db == ''){
+            return;
+        }
         getDbInfo(db, function(rdata){
             var rdata = $.parseJSON(rdata.data);
             var tables = rdata.tables;
