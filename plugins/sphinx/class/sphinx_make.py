@@ -277,10 +277,11 @@ source {$DB_NAME}_{$TABLE_NAME}
 	sql_db			= {$DB_NAME}
 	sql_port		= {$DB_PORT}
 
+	sql_query_pre   	= SET NAMES utf8
+	
 	sql_query_range 	= {$DB_RANGE_SQL}
 	sql_range_step 		= 1000
 
-	sql_query_pre   	= SET NAMES utf8
 	sql_query 		= {$DB_QUERY_SQL}
 
 {$SPH_FIELD}
