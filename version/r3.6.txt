@@ -30,7 +30,7 @@ pymemcache
 redis
 pillow
 Jinja2>=2.11.2
-PyMySQL==1.0.2
+PyMySQL==1.1.1
 whitenoise==5.3.0
 pyotp
 pytz
