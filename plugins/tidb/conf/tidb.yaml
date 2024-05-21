@@ -30,7 +30,6 @@ tidb_servers:
  - host: 192.168.4.1
 
 tikv_servers:
- - host: 192.168.4.1
    port: 20160
    status_port: 20180
    config:
