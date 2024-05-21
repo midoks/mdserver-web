@@ -356,6 +356,9 @@ def makeDbToSphinx():
     is_delta = args['is_delta']
     is_cover = args['is_cover']
 
+    if is_cover != 'yes':
+        return mw.returnJson(False,'暂时仅支持覆盖!')
+
     sph_file = getConf()
 
     import  sphinx_make
