@@ -85,14 +85,30 @@ CREATE TABLE IF NOT EXISTS `{$DB_NAME}`.`{$TABLE_NAME}` (
 		conf = conf.replace("{$TABLE_NAME}", self.delta)
 		conf = conf.replace("{$DB_NAME}", db)
 		return conf
+
 	def eqVerField(self, field):
 		ver = self.ver.replace(".1",'')
+		if float(ver) >= 3.6:
+			if field == 'sql_attr_timestamp':
+				return 'attr_bigint'
+
+			if field == 'sql_attr_bigint':
+				return 'attr_bigint'
+
+			if field == 'sql_field_string':
+				return 'field_string'
+
 		if float(ver) >= 3.3:
 			if field == 'sql_attr_timestamp':
 				return 'sql_attr_bigint'
 
 		return field
 
+	def pathVerName(self):
+		ver = self.ver.replace(".1",'')
+		if float(ver) >= 3.6:
+			return 'datadir'
+		return 'path'
 
 	def getTablePk(self, db, table):
 		key = db+'_'+table
@@ -208,7 +224,7 @@ source {$DB_NAME}_{$TABLE_NAME}_delta:{$DB_NAME}_{$TABLE_NAME}
 index {$DB_NAME}_{$TABLE_NAME}_delta:{$DB_NAME}_{$TABLE_NAME}
 {
     source 	= {$DB_NAME}_{$TABLE_NAME}_delta
-    path 	= {$server_dir}/sphinx/index/db/{$DB_NAME}.{$TABLE_NAME}/delta
+    {$PATH_NAME} 	= {$server_dir}/sphinx/index/db/{$DB_NAME}.{$TABLE_NAME}/delta
 
     html_strip	= 1
     ngram_len	= 1
@@ -216,6 +232,8 @@ index {$DB_NAME}_{$TABLE_NAME}_delta:{$DB_NAME}_{$TABLE_NAME}
 }
 ''';
 		conf = conf.replace("{$server_dir}", mw.getServerDir())
+		conf = conf.replace("{$PATH_NAME}", self.pathVerName())
+		
 		conf = conf.replace("{$DB_NAME}", db)
 		conf = conf.replace("{$TABLE_NAME}", table)
 
@@ -259,14 +277,15 @@ source {$DB_NAME}_{$TABLE_NAME}
 index {$DB_NAME}_{$TABLE_NAME}
 {
     source	= {$DB_NAME}_{$TABLE_NAME}
-    path	= {$server_dir}/sphinx/index/db/{$DB_NAME}.{$TABLE_NAME}/index
+    {$PATH_NAME}	= {$server_dir}/sphinx/index/db/{$DB_NAME}.{$TABLE_NAME}/index
 
     ngram_len	= 1
     ngram_chars	= U+3000..U+2FA1F
 }
 	'''
 		conf = conf.replace("{$server_dir}", mw.getServerDir())
-
+		conf = conf.replace("{$PATH_NAME}", self.pathVerName())
+		
 		conf = conf.replace("{$DB_NAME}", db)
 		conf = conf.replace("{$TABLE_NAME}", table)
 		conf = conf.replace("{$DB_USER}", db_info['username'])
