@@ -109,8 +109,8 @@ CREATE TABLE IF NOT EXISTS `{$DB_NAME}`.`{$TABLE_NAME}` (
 
 	def pathVerName(self):
 		ver = self.ver.replace(".1",'')
-		if float(ver) >= 3.6:
-			return 'datadir'
+		# if float(ver) >= 3.6:
+		# 	return 'datadir'
 		return 'path'
 
 	def getTablePk(self, db, table):
