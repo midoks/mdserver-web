@@ -232,6 +232,8 @@ index {$DB_NAME}_{$TABLE_NAME}_delta:{$DB_NAME}_{$TABLE_NAME}
     html_strip	= 1
     ngram_len	= 1
     ngram_chars	= U+3000..U+2FA1F
+
+{$SPH_FIELD_INDEX}
 }
 ''';
 		conf = conf.replace("{$server_dir}", mw.getServerDir())
@@ -249,8 +251,13 @@ index {$DB_NAME}_{$TABLE_NAME}_delta:{$DB_NAME}_{$TABLE_NAME}
 		delta_update = self.makeSphinxDbSourceDeltaPost(db, table)
 		conf = conf.replace("{$DELTA_UPDATE}", delta_update)
 
+
 		sph_field = self.makeSqlToSphinxTable(db, table)
-		conf = conf.replace("{$SPH_FIELD}", sph_field)
+		ver = self.ver.replace(".1",'')
+		if float(ver) >= 3.6:
+			conf = conf.replace("{$SPH_FIELD}", sph_field)
+		else:
+			conf = conf.replace("{$SPH_FIELD_INDEX}", sph_field)
 		
 		return conf;
 
@@ -284,6 +291,8 @@ index {$DB_NAME}_{$TABLE_NAME}
 
     ngram_len	= 1
     ngram_chars	= U+3000..U+2FA1F
+
+{$SPH_FIELD_INDEX}
 }
 	'''
 		conf = conf.replace("{$server_dir}", mw.getServerDir())
@@ -302,7 +311,13 @@ index {$DB_NAME}_{$TABLE_NAME}
 		conf = conf.replace("{$DB_QUERY_SQL}", query_sql)
 
 		sph_field = self.makeSqlToSphinxTable(db, table)
-		conf = conf.replace("{$SPH_FIELD}", sph_field)
+		# conf = conf.replace("{$SPH_FIELD}", sph_field)
+
+		ver = self.ver.replace(".1",'')
+		if float(ver) >= 3.6:
+			conf = conf.replace("{$SPH_FIELD}", sph_field)
+		else:
+			conf = conf.replace("{$SPH_FIELD_INDEX}", sph_field)
 
 
 		if create_sphinx_table:
