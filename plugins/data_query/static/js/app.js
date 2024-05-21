@@ -1256,7 +1256,7 @@ function redisBatchClear(){
 
             xm_db_list = xmSelect.render({
                 el: '#select_db', 
-                repeat: true,
+                repeat: false,
                 toolbar: {show: true},
                 data: idx_db,
             });
