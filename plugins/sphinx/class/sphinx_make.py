@@ -323,7 +323,7 @@ index {$DB_NAME}_{$TABLE_NAME}
 			sql_find = "select * from {}.{} where `table`='{}'".format(db,self.delta,table)
 			find_data = self.pdb.query(sql_find)
 			if len(find_data) == 0:
-				insert_sql = "insert into `{}`.`{}`(`table`,`max_id`) values ('{}',{}) ".format(db,self.delta,db,0)
+				insert_sql = "insert into `{}`.`{}`(`table`,`max_id`) values ('{}',{}) ".format(db,self.delta,table,0)
 				# print(insert_sql)
 				self.pdb.execute(insert_sql)
 			conf += self.makeSphinxDbSourceDelta(db,table)
