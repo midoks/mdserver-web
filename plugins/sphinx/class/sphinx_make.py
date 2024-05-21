@@ -205,9 +205,9 @@ searchd
 		conf = conf.replace("{$PK_NAME}", pkey_name)
 		return conf
 
-	def makeSphinxDbSourceDeltaPost(self, db, table):
+	def makeSphinxDbSourcePost(self, db, table):
 		pkey_name = self.getTablePk(db,table)
-		conf = "UPDATE {$SPH_TABLE} SET max_id=(SELECT MAX({$PK_NAME}) FROM {$TABLE_NAME}) where `table`='{$TABLE_NAME}'"
+		conf = "sql_query_post	=	UPDATE {$SPH_TABLE} SET max_id=(SELECT MAX({$PK_NAME}) FROM {$TABLE_NAME}) where `table`='{$TABLE_NAME}'"
 		# conf = "REPLACE INTO {$SPH_TABLE} (`table`,`max_id`) VALUES ('{$TABLE_NAME}',(SELECT MAX({$PK_NAME}) FROM {$TABLE_NAME}))"
 		conf = conf.replace("{$DB_NAME}", db)
 		conf = conf.replace("{$TABLE_NAME}", table)
@@ -222,7 +222,7 @@ source {$DB_NAME}_{$TABLE_NAME}_delta:{$DB_NAME}_{$TABLE_NAME}
     sql_query_pre	=	SET NAMES utf8
     sql_query_range	=	{$DELTA_RANGE}
     sql_query 		=	{$DELTA_QUERY}
-    sql_query_post	=	{$DELTA_UPDATE}
+    {$DELTA_UPDATE}
 
 {$SPH_FIELD}
 }
@@ -251,7 +251,7 @@ index {$DB_NAME}_{$TABLE_NAME}_delta:{$DB_NAME}_{$TABLE_NAME}
 		delta_query = self.makeSphinxDbSourceQuerySql(db, table)
 		conf = conf.replace("{$DELTA_QUERY}", delta_query)
 
-		delta_update = self.makeSphinxDbSourceDeltaPost(db, table)
+		delta_update = self.makeSphinxDbSourcePost(db, table)
 		conf = conf.replace("{$DELTA_UPDATE}", delta_update)
 
 
@@ -275,6 +275,8 @@ source {$DB_NAME}_{$TABLE_NAME}
 	sql_port		= {$DB_PORT}
 
 	sql_query_pre   	= SET NAMES utf8
+	
+	{$UPDATE}
 
 	sql_query_range 	= {$DB_RANGE_SQL}
 	sql_range_step 		= 1000
@@ -315,6 +317,11 @@ index {$DB_NAME}_{$TABLE_NAME}
 
 
 		conf = self.makeSphinxDbFieldRepalce(conf, sph_field)
+
+
+		if create_sphinx_table:
+			update = self.makeSphinxDbSourcePost(db, table)
+			conf = conf.replace("{$UPDATE}", update)
 
 
 		if create_sphinx_table:
