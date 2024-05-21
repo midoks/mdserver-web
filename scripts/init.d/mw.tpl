@@ -393,6 +393,19 @@ mw_connect_mysql(){
 
 }
 
+
+mw_redis(){
+    CONF="${ROOT_PATH}/redis/redis.conf"
+    REDISPORT=$(cat $CONF |grep port|grep -v '#'|awk '{print $2}')
+    REDISPASS=$(cat $CONF |grep requirepass|grep -v '#'|awk '{print $2}')
+    if [ "$REDISPASS" != "" ];then
+        REDISPASS=" -a $REDISPASS"
+    fi
+    CLIEXEC="${ROOT_PATH}/redis/bin/redis-cli -p $REDISPORT$REDISPASS"
+    echo $CLIEXEC
+    ${CLIEXEC}
+}
+
 mw_venv(){
     cd ${ROOT_PATH}/mdserver-web && source bin/activate
 }
@@ -429,6 +442,7 @@ case "$1" in
     'debug') mw_debug;;
     'mirror') mw_mirror;;
     'db') mw_connect_mysql;;
+    'redis') mw_redis;;
     'venv') mw_venv;;
     'clean_lib') mw_clean_lib;;
     'default')
