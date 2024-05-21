@@ -209,8 +209,7 @@ def reload():
 
 def rebuild():
     file = initDreplace()
-    cmd = file + ' rebuild &'
-    # print(cmd)
+    cmd = file + ' rebuild'
     data = mw.execShell(cmd)
     if data[0].find('successfully')<0:
         return data[0].replace("\n","<br/>")
@@ -318,11 +317,9 @@ def sphinxCmd():
     else:
         return mw.returnJson(False, 'no index')
 
-def makeDbToSphinx():
+def makeDbToSphinxTest():        
     conf_file = getConf()
-
     import  sphinx_make
-
     sph_make = sphinx_make.sphinxMake()
     conf = sph_make.makeSqlToSphinxAll()
 
@@ -330,6 +327,33 @@ def makeDbToSphinx():
     print(conf)
     # makeSqlToSphinxTable()
     return True
+
+def makeDbToSphinx():
+    args = getArgs()
+    check = checkArgs(args, ['db','tables','is_delta','is_cover'])
+    if not check[0]:
+        return check[1]
+
+    db = args['db']
+    tables = args['tables']
+    is_delta = args['is_delta']
+    is_cover = args['is_cover']
+
+    sph_file = getConf()
+
+    import  sphinx_make
+    sph_make = sphinx_make.sphinxMake()
+
+    if not sph_make.checkDbName(db):
+        return mw.returnJson(False,'保留数据库名称,不可用!')
+
+    if is_cover == 'yes':
+        tables = tables.split(',')
+        content = sph_make.makeSqlToSphinx(db, tables)
+        mw.writeFile(sph_file,content)
+        return mw.returnJson(True,'设置成功!')
+
+    return mw.returnJson(True,'测试中')
 
 
 

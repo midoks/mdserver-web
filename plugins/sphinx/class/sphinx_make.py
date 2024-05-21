@@ -281,7 +281,9 @@ index {$DB_NAME}_{$TABLE_NAME}
 	def makeSqlToSphinxDb(self, db, table = []):
 		conf = ''
 
+
 		for tn in table:
+			pkey_name = self.getTablePk(db,tn)
 			if pkey_name == '':
 				continue
 			conf += self.makeSphinxDbSource(db, tn)
@@ -377,10 +379,20 @@ index {$DB_NAME}_{$TABLE_NAME}
 
 		return conf
 
+	def checkDbName(self, db):
+	    filter_db = ['information_schema','performance_schema','sys','mysql']
+	    if db in filter_db:
+	        return False
+	    return True
+
+	def makeSqlToSphinx(self, db, tables = []):
+	    conf = ''
+	    conf += self.makeSphinxHeader()
+	    conf += self.makeSqlToSphinxDb(db, tables)
+	    return conf
 
 	def makeSqlToSphinxAll(self):
 	    filter_db = ['information_schema','performance_schema','sys','mysql']
-	    filter_db.append(self.delta)
 
 	    dblist = self.pdb.query('show databases')
 
