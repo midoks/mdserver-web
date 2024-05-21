@@ -346,10 +346,12 @@ def makeDbToSphinx():
 
     if not sph_make.checkDbName(db):
         return mw.returnJson(False,'保留数据库名称,不可用!')
-
+    is_delta_bool = False
+    if is_delta == 'yes':
+        is_delta_bool = True
     if is_cover == 'yes':
         tables = tables.split(',')
-        content = sph_make.makeSqlToSphinx(db, tables)
+        content = sph_make.makeSqlToSphinx(db, tables, is_delta_bool)
         mw.writeFile(sph_file,content)
         return mw.returnJson(True,'设置成功!')
 

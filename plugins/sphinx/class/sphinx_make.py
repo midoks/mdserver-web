@@ -221,7 +221,7 @@ index {$DB_NAME}_{$TABLE_NAME}_delta:{$DB_NAME}_{$TABLE_NAME}
 		
 		return conf;
 
-	def makeSphinxDbSource(self, db, table, create_sphinx_table = True):
+	def makeSphinxDbSource(self, db, table, create_sphinx_table = False):
 		db_info = pSqliteDb('databases').field('username,password').where('name=?', (db,)).find()
 		port = getDbPort()
 
@@ -278,7 +278,7 @@ index {$DB_NAME}_{$TABLE_NAME}
 
 		return conf
 
-	def makeSqlToSphinxDb(self, db, table = []):
+	def makeSqlToSphinxDb(self, db, table = [], is_delta = False):
 		conf = ''
 
 
@@ -286,14 +286,14 @@ index {$DB_NAME}_{$TABLE_NAME}
 			pkey_name = self.getTablePk(db,tn)
 			if pkey_name == '':
 				continue
-			conf += self.makeSphinxDbSource(db, tn)
+			conf += self.makeSphinxDbSource(db, tn,is_delta)
 
 		if len(table) == 0:
 			tables = self.pdb.query("show tables in "+ db)
 			for x in range(len(tables)):
 				key = 'Tables_in_'+db
 				table_name = tables[x][key]
-				pkey_name = self.getTablePk(db, table_name)
+				pkey_name = self.getTablePk(db, table_name, is_delta)
 				if pkey_name == '':
 					continue
 
@@ -385,10 +385,10 @@ index {$DB_NAME}_{$TABLE_NAME}
 	        return False
 	    return True
 
-	def makeSqlToSphinx(self, db, tables = []):
+	def makeSqlToSphinx(self, db, tables = [], is_delta = False):
 	    conf = ''
 	    conf += self.makeSphinxHeader()
-	    conf += self.makeSqlToSphinxDb(db, tables)
+	    conf += self.makeSqlToSphinxDb(db, tables, is_delta)
 	    return conf
 
 	def makeSqlToSphinxAll(self):

@@ -97,8 +97,8 @@ function autoMakeConf(){
                         <span class='tname'>是否增量</span>\
                         <div class='info-r'>\
                             <select class='bt-input-text mr5' name='is_delta' style='width:100px'>\
-                                <option value='yes'>是</option>\
                                 <option value='no'>否</option>\
+                                <option value='yes'>是</option>\
                             </select>\
                         </div>\
                     </div>\
