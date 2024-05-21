@@ -278,7 +278,7 @@ source {$DB_NAME}_{$TABLE_NAME}
 	sql_port		= {$DB_PORT}
 
 	sql_query_pre   	= SET NAMES utf8
-	
+
 	sql_query_range 	= {$DB_RANGE_SQL}
 	sql_range_step 		= 1000
 
@@ -318,17 +318,20 @@ index {$DB_NAME}_{$TABLE_NAME}
 
 		ver = self.ver.replace(".1",'')
 		if float(ver) >= 3.6:
-			conf = conf.replace("{$SPH_FIELD}", sph_field)
-			conf = conf.replace("{$SPH_FIELD_INDEX}", '')
-		else:
 			conf = conf.replace("{$SPH_FIELD}", '')
 			conf = conf.replace("{$SPH_FIELD_INDEX}", sph_field)
+		else:
+			conf = conf.replace("{$SPH_FIELD}", sph_field)
+			conf = conf.replace("{$SPH_FIELD_INDEX}", '')
 
 
 		if create_sphinx_table:
 			sph_sql = self.createSql(db)
 			r = self.pdb.query(sph_sql)
 			conf += self.makeSphinxDbSourceDelta(db,table)
+
+		# print(ver)
+		# print(conf)
 
 		return conf
 
