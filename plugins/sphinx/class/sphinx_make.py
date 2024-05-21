@@ -275,7 +275,7 @@ source {$DB_NAME}_{$TABLE_NAME}
 	sql_port		= {$DB_PORT}
 
 	sql_query_pre   	= SET NAMES utf8
-	
+
 	{$UPDATE}
 
 	sql_query_range 	= {$DB_RANGE_SQL}
@@ -318,11 +318,9 @@ index {$DB_NAME}_{$TABLE_NAME}
 
 		conf = self.makeSphinxDbFieldRepalce(conf, sph_field)
 
-
 		if create_sphinx_table:
 			update = self.makeSphinxDbSourcePost(db, table)
 			conf = conf.replace("{$UPDATE}", update)
-
 
 		if create_sphinx_table:
 			sph_sql = self.createSql(db)
