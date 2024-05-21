@@ -255,11 +255,11 @@ index {$DB_NAME}_{$TABLE_NAME}_delta:{$DB_NAME}_{$TABLE_NAME}
 		sph_field = self.makeSqlToSphinxTable(db, table)
 		ver = self.ver.replace(".1",'')
 		if float(ver) >= 3.6:
-			conf = conf.replace("{$SPH_FIELD}", sph_field)
-			conf = conf.replace("{$SPH_FIELD_INDEX}", '')
-		else:
 			conf = conf.replace("{$SPH_FIELD}", '')
 			conf = conf.replace("{$SPH_FIELD_INDEX}", sph_field)
+		else:
+			conf = conf.replace("{$SPH_FIELD}", sph_field)
+			conf = conf.replace("{$SPH_FIELD_INDEX}", '')
 		
 		return conf;
 
