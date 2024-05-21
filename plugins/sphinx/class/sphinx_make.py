@@ -207,8 +207,8 @@ searchd
 
 	def makeSphinxDbSourceDeltaPost(self, db, table):
 		pkey_name = self.getTablePk(db,table)
-		# conf = "UPDATE {$SPH_TABLE} SET max_id=(SELECT MAX({$PK_NAME}) FROM {$TABLE_NAME}) where `table`='{$TABLE_NAME}'"
-		conf = "REPLACE INTO {$SPH_TABLE} (`table`,`max_id`) VALUES ('{$TABLE_NAME}',(SELECT MAX({$PK_NAME}) FROM {$TABLE_NAME}))"
+		conf = "UPDATE {$SPH_TABLE} SET max_id=(SELECT MAX({$PK_NAME}) FROM {$TABLE_NAME} where='{$DB_NAME}') where `table`='{$TABLE_NAME}'"
+		# conf = "REPLACE INTO {$SPH_TABLE} (`table`,`max_id`) VALUES ('{$TABLE_NAME}',(SELECT MAX({$PK_NAME}) FROM {$TABLE_NAME}))"
 		conf = conf.replace("{$DB_NAME}", db)
 		conf = conf.replace("{$TABLE_NAME}", table)
 		conf = conf.replace("{$SPH_TABLE}", self.delta)
