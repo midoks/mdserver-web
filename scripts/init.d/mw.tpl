@@ -396,6 +396,12 @@ mw_connect_mysql(){
 
 mw_redis(){
     CONF="${ROOT_PATH}/redis/redis.conf"
+
+    if [ ! -f "$CONF" ]; then
+        echo -e "not install redis!"
+        exit 1
+    fi
+
     REDISPORT=$(cat $CONF |grep port|grep -v '#'|awk '{print $2}')
     REDISPASS=$(cat $CONF |grep requirepass|grep -v '#'|awk '{print $2}')
     if [ "$REDISPASS" != "" ];then
