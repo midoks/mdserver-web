@@ -285,7 +285,7 @@ index {$DB_NAME}_{$TABLE_NAME}
 	'''
 		conf = conf.replace("{$server_dir}", mw.getServerDir())
 		conf = conf.replace("{$PATH_NAME}", self.pathVerName())
-		
+
 		conf = conf.replace("{$DB_NAME}", db)
 		conf = conf.replace("{$TABLE_NAME}", table)
 		conf = conf.replace("{$DB_USER}", db_info['username'])
@@ -371,36 +371,37 @@ index {$DB_NAME}_{$TABLE_NAME}
 
 			if mw.inArray(['enum'], data_type):
 				run_pos += 1
-				conf += '\tsql_attr_string = '+ column_name + "\n"
+				conf += '\t'+self.eqVerField('sql_attr_string')+' = '+ column_name + "\n"
 				continue
 
 			if mw.inArray(['decimal'], data_type):
 				run_pos += 1
-				conf += '\tsql_attr_float = '+ column_name + "\n"
+				conf += '\t'+self.eqVerField('sql_attr_float')+' = '+ column_name + "\n"
+				continue
 
 			if mw.inArray(['bigint','smallint','tinyint','int','mediumint'], data_type):
 				run_pos += 1
-				conf += '\tsql_attr_bigint = '+ column_name + "\n"
+				conf += '\t'+self.eqVerField('sql_attr_bigint')+' = '+ column_name + "\n"
 				continue
 
 
 			if mw.inArray(['float'], data_type):
 				run_pos += 1
-				conf += '\tsql_attr_float = '+ column_name + "\n"
+				conf += '\t'+self.eqVerField('sql_attr_float')+' = '+ column_name + "\n"
 				continue
 
 			if mw.inArray(['char'], data_type):
-				conf += '\tsql_attr_string = '+ column_name + "\n"
+				conf += '\t'+self.eqVerField('sql_attr_string')+' = '+ column_name + "\n"
 				continue
 
 			if mw.inArray(['varchar'], data_type):
 				run_pos += 1
-				conf += '\tsql_field_string = '+ column_name + "\n"
+				conf += '\t'+self.eqVerField('sql_field_string')+' = '+ column_name + "\n"
 				continue
 
 			if mw.inArray(['text','mediumtext','tinytext','longtext'], data_type):
 				run_pos += 1
-				conf += '\tsql_field_string = '+ column_name + "\n"
+				conf += '\t'+self.eqVerField('sql_field_string')+' = '+ column_name + "\n"
 				continue
 
 			if mw.inArray(['datetime','date'], data_type):
