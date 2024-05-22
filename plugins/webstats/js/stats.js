@@ -192,7 +192,7 @@ function wsOverviewRequest(page){
         var data = rdata.data.data;
         var statData = rdata.data.stat_list;
 
-        console.log(statData, data);
+        // console.log(statData, data);
 
         var stat_pv = statData['pv'] == null?0:statData['pv'];
         var stat_uv = statData['uv'] == null?0:statData['uv'];
@@ -383,11 +383,13 @@ function wsOverviewRequest(page){
                 var select_option = $('.indicators-container input:checked').parent().attr('data-name');
                 if (select_option != "realtime_traffic" && select_option != 'realtime_request' ){
                     clearInterval(ovTimer);
-                    console.log("get_logs_realtime_info over:"+select_option);
+                    // console.log("get_logs_realtime_info over:"+select_option);
                     return;
                 }
 
-                wsOriginPost("get_logs_realtime_info",'',{"site":args["site"], "type":select_option} , function(rdata){    
+                var second = $('#check_realtime_second').val();
+
+                wsOriginPost("get_logs_realtime_info",'',{"site":args["site"], "type":select_option,'second':second} , function(rdata){    
                     
                     var rdata = $.parseJSON(rdata.data);
 
@@ -488,11 +490,11 @@ var html = '<div>\
                         <p class="ov_num">0</p>\
                     </div>\
                     <div class="overview_box">\
-                        <p class="ov_title">实时流量<i class="tips" data-toggle="tooltip" data-placement="top" title="当前10秒内您网站的实时流量大小。包括已排除的请求。">?</i></p>\
+                        <p class="ov_title">实时流量<i class="tips" data-toggle="tooltip" data-placement="top" title="当前X秒内您网站的实时流量大小。包括已排除的请求。">?</i></p>\
                         <p class="ov_num">0</p>\
                     </div>\
                     <div class="overview_box">\
-                        <p class="ov_title">每秒请求<i class="tips" data-toggle="tooltip" data-placement="top" title="当前10秒内您网站的实时请求数量。包括已排除的请求。">?</i></p>\
+                        <p class="ov_title"><span id="ov_title_req_second">每秒请求<span><i class="tips" data-toggle="tooltip" data-placement="top" title="当前1-10秒内您网站的实时请求数量。包括已排除的请求。">?</i></p>\
                         <p class="ov_num">0</p>\
                     </div>\
                 </div>\
@@ -525,7 +527,11 @@ var html = '<div>\
                         </div>\
                         <div class="indicators-label" bt-event-click="indicatorsType" data-name="realtime_request">\
                             <input type="radio" id="check_realtime_request" name="check_realtime_request">\
-                            <span class="check_realtime_request" style="font-weight:normal">每秒请求</span>\
+                            <span class="check_realtime_request" style="font-weight:normal">每X秒请求</span>\
+                        </div>\
+                        <div class="indicators-label" bt-event-click="indicatorsType">\
+                            <input class="bt-input-text mr5" type="number" id="check_realtime_second" name="check_realtime_second" value="1" style="width:40px;outline:none;height:23px;border-radius:3px;">\
+                            <span style="font-weight:normal">秒</span>\
                         </div>\
                     </div>\
                 </div>\
@@ -592,8 +598,34 @@ $('#search_time button').click(function(){
 });
 
 
-$('.indicators-container input').click(function(){
-    $('.indicators-container input').each(function(){
+function initRealtimeTraffic(){
+    var check_realtime_second = $('#check_realtime_second').val();
+    if (check_realtime_second<1){
+        check_realtime_second = 1;
+        $('#check_realtime_second').val(check_realtime_second);
+    }
+
+    if (check_realtime_second>10){
+        check_realtime_second = 10;
+        $('#check_realtime_second').val(check_realtime_second);
+    }
+    var title = "每秒请求";
+    if (check_realtime_second > 1){
+        title = '每'+check_realtime_second+'秒请求'
+    }
+
+    $('#ov_title_req_second').text(title)
+    $('.check_realtime_request').text(title);
+}
+
+
+initRealtimeTraffic();
+$('#check_realtime_second').change(function(){
+    initRealtimeTraffic();
+});
+
+$('.indicators-container input[type=radio]').click(function(){
+    $('.indicators-container input[type=radio]').each(function(){
         $(this).removeAttr('checked');
     });
     $(this).prop({'checked':true});
@@ -2081,6 +2113,7 @@ var html = '<div>\
                         <option value="503">503</option>\
                         <option value="403">403</option>\
                         <option value="404">404</option>\
+                        <option value="499">499</option>\
                     </select>\
                     <span style="margin-left:10px">时间: </span>\
                     <div class="input-group" style="margin-left:10px;width:350px;display: inline-table;vertical-align: top;">\
@@ -2179,6 +2212,7 @@ function wsTableLogRequest(page){
     args['method'] = $('select[name="method"]').val();
     args['status_code'] = $('select[name="status_code"]').val();
     args['request_time'] = $('select[name="request_time"]').val();
+    args['request_size'] = $('select[name="request_size"]').val();
     args['spider_type'] = $('select[name="spider_type"]').val();
     args['referer'] = $('select[name="referer"]').val();
     args['ip'] = $('input[name="ip"]').val();
@@ -2213,8 +2247,18 @@ function wsTableLogRequest(page){
         "12":"其他",
     }
 
+    var req_status = $('#logs_search').attr('req');
+    // console.log(req_status);
+    if (typeof(req_status) != 'undefined'){
+        if (req_status == 'start'){
+            layer.msg("正在请求中,请稍候!");
+            return;
+        }
+    }
 
+    $('#logs_search').attr('req','start');
     wsPostCallbak('get_logs_list', '' ,args, function(rdata){
+        $('#logs_search').attr('req','end');
         var rdata = $.parseJSON(rdata.data);
         var list = '';
         var data = rdata.data.data;
@@ -2266,22 +2310,6 @@ function wsTableLogRequest(page){
                         <div id="wsPage" class="dataTables_paginate paging_bootstrap page"></div>';
         $('#ws_table').html(table);
         $('#wsPage').html(rdata.data.page);
-
-        $('input[name="ip"]').bind('focus', function(e){
-            $(this).keyup(function(e){
-                if(e.keyCode == 13) {
-                    wsTableLogRequest(1);
-                }
-            });
-        });
-
-        $('input[name="search_uri"]').bind('focus', function(e){
-            $(this).keyup(function(e){
-                if(e.keyCode == 13) {
-                    wsTableLogRequest(1);
-                }
-            });
-        });
 
         $(".tablescroll .details").click(function(){
             var index = $(this).attr('data-id');
@@ -2388,6 +2416,7 @@ var html = '<div>\
                         <option value="500">500</option>\
                         <option value="502">502</option>\
                         <option value="503">503</option>\
+                        <option value="499">499</option>\
                         <option value="404">404</option>\
                         <option value="301">301</option>\
                         <option value="302">302</option>\
@@ -2432,6 +2461,15 @@ var html = '<div>\
                         <option value="500-1000">500ms-1s</option>\
                         <option value="1000">大于1s</option>\
                     </select>\
+                    <span style="margin-left:10px;">大小: </span>\
+                    <select class="bt-input-text" name="request_size" style="margin-left:5px;">\
+                        <option value="all">所有</option>\
+                        <option value="0-1">0-1(kb)</option>\
+                        <option value="1-20">1-20(kb)</option>\
+                        <option value="20-50">20-50(kb)</option>\
+                        <option value="50-100">50-100(kb)</option>\
+                        <option value="100">大于100kb</option>\
+                    </select>\
                     <span style="margin-left:10px;">URL过滤: </span>\
                     <div class="input-group" style="width:210px;display:inline-flex;">\
                         <input type="text" name="search_uri" class="form-control btn-group-sm" autocomplete="off" placeholder="URI搜索" style="font-size: 12px;padding: 0 10px;height:30px;">\
@@ -2443,6 +2481,22 @@ var html = '<div>\
                 <div class="divtable mtb10" id="ws_table"></div>\
             </div>';
 $(".soft-man-con").html(html);
+
+$('input[name="ip"]').bind('focus', function(e){
+    $(this).keyup(function(e){
+        if(e.keyCode == 13) {
+            wsTableLogRequest(1);
+        }
+    });
+});
+
+$('input[name="search_uri"]').bind('focus', function(e){
+    $(this).keyup(function(e){
+        if(e.keyCode == 13) {
+            wsTableLogRequest(1);
+        }
+    });
+});
 
 //日期范围
 laydate.render({
@@ -2504,6 +2558,10 @@ $('select[name="referer"]').change(function(){
 });
 
 $('select[name="request_time"]').change(function(){
+    wsTableLogRequest(1);
+});
+
+$('select[name="request_size"]').change(function(){
     wsTableLogRequest(1);
 });
 

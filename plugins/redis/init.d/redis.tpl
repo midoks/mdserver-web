@@ -23,7 +23,7 @@ if [ "$REDISPASS" != "" ];then
 fi
 EXEC={$SERVER_PATH}/redis/bin/redis-server
 CLIEXEC="{$SERVER_PATH}/redis/bin/redis-cli -p $REDISPORT$REDISPASS"
-PIDFILE={$SERVER_PATH}/redis/redis_6379.pid
+PIDFILE={$SERVER_PATH}/redis/redis.pid
 
 echo $REDISPASS
 echo $REDISPORT

@@ -61,6 +61,7 @@ pkg install -y libevent
 pkg install -y pidof
 pkg install -y pstree
 pkg install -y pv
+pkg install -y bc
 
 # curl https://sh.rustup.rs -sSf | sh
 pkg install -y rust

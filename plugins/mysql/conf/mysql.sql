@@ -50,7 +50,9 @@ CREATE TABLE IF NOT EXISTS `slave_sync_user` (
   `pass` TEXT,
   `mode` TEXT,
   `cmd` TEXT,
+  `db` TEXT,
   `addtime` TEXT
 );
+ALTER TABLE `slave_sync_user` ADD COLUMN `db` TEXT DEFAULT '';
 
 

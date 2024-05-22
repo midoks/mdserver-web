@@ -654,17 +654,19 @@ def getLogsRealtimeInfo():
     '''
     import datetime
     args = getArgs()
-    check = checkArgs(args, ['site', 'type'])
+    check = checkArgs(args, ['site', 'type','second'])
     if not check[0]:
         return check[1]
 
     domain = args['site']
     dtype = args['type']
+    second = int(args['second'])
+
 
     conn = pSqliteDb('web_logs', domain)
     timeInt = time.mktime(datetime.datetime.now().timetuple())
 
-    conn = conn.where("time>=?", (int(timeInt) - 10,))
+    conn = conn.where("time>=?", (int(timeInt) - second,))
 
     field = 'time,body_length'
     field_sum = toSumField(field.replace("time,", ""))
@@ -714,6 +716,7 @@ def getLogsList():
     method = args['method']
     status_code = args['status_code']
     request_time = args['request_time']
+    request_size = args['request_size']
     spider_type = args['spider_type']
     query_date = args['query_date']
     search_uri = args['search_uri']
@@ -751,6 +754,14 @@ def getLogsList():
             conn = conn.andWhere("request_time>=? and request_time<?", (request_time_s[0],request_time_s[1],))
         if len(request_time_s) == 1:
             conn = conn.andWhere("request_time>=?", (request_time,))
+
+    if request_size != "all":
+        request_size_s = request_size.strip().split('-')
+        # print(int(request_size_s[0])*1024)
+        if len(request_size_s) == 2:
+            conn = conn.andWhere("body_length>=? and body_length<?", (int(request_size_s[0])*1024,int(request_size_s[1])*1024,))
+        if len(request_size_s) == 1:
+            conn = conn.andWhere("body_length>=?", (int(request_size_s[0])*1024,))
 
     if spider_type == "normal":
         pass

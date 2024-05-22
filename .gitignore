@@ -173,6 +173,7 @@ plugins/v2ray
 plugins/frp
 plugins/file_search
 plugins/proxysql
+plugins/tidb
 debug.out
 
 

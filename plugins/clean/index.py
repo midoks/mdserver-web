@@ -116,6 +116,7 @@ def initConf():
             "/www/server/php/82/var/log",
             "/www/server/php/83/var/log",
             "/www/server/php/84/var/log",
+            "/www/server/openresty/nginx/logs",
             "/www/server/phpmyadmin",
             "/www/server/redis/data",
             "/www/server/cron",

@@ -65,7 +65,7 @@ class backupTools:
         if len(content) > 100:
             mw.writeFile(my_cnf, content)
 
-        cmd = db_path + "/bin/usr/bin/mysqldump --defaults-file=" + my_cnf + "  --single-transaction --quick --default-character-set=utf8 " + \
+        cmd = db_path + "/bin/usr/bin/mysqldump --defaults-file=" + my_cnf + "  --single-transaction -q --default-character-set=utf8 " + \
             name + " | gzip > " + filename
         mw.execShell(cmd)
 

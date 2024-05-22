@@ -87,6 +87,18 @@ class backupTools:
         path = mw.getServerDir() + '/' + mtype + '/etc/my.cnf'
         return path
 
+    def recognizeDbMode(self, mtype='mysql'):
+        conf = self.getConf(mtype)
+        con = mw.readFile(conf)
+        rep = r"!include %s/(.*)?\.cnf" % (mw.getServerDir() +'/'+ mtype +"/etc/mode",)
+        mode = 'none'
+        try:
+            data = re.findall(rep, con, re.M)
+            mode = data[0]
+        except Exception as e:
+            pass
+        return mode
+
      # 数据库密码处理
     def mypass(self, act, root):
         conf_file = self.getConf('mysql')
@@ -140,9 +152,14 @@ class backupTools:
         # 开启一致性事务 会lock表
         # cmd = db_path + "/bin/mysqldump --defaults-file=" + my_cnf + "  --force --opt --default-character-set=utf8 " + \
         #     name + " | gzip > " + filename
+        option = ''
+        mode = self.recognizeDbMode('mysql')
+        if mode == 'gtid':
+            option = ' --set-gtid-purged=off '
 
         # skip-opt 不会lock表
-        cmd = db_path + "/bin/mysqldump --defaults-file=" + my_cnf + " --skip-opt --create-options --default-character-set=utf8 " + \
+        # --skip-opt --create-options
+        cmd = db_path + "/bin/mysqldump --defaults-file=" + my_cnf +" " + option +" --single-transaction -q --default-character-set=utf8mb4 " + \
             name + " | gzip > " + filename
         # print(cmd)
         mw.execShell(cmd)

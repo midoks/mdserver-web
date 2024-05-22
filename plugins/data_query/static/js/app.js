@@ -738,6 +738,10 @@ function mongodbInitField(f, data){
         }
         mongodbDataList(1);
     });
+
+    $('#mongodb .mongodb_refresh').unbind('click').click(function(){
+        mongodbDataList(1);
+    });
 }
 
 var mogodb_db_list;
@@ -1252,7 +1256,7 @@ function redisBatchClear(){
 
             xm_db_list = xmSelect.render({
                 el: '#select_db', 
-                repeat: true,
+                repeat: false,
                 toolbar: {show: true},
                 data: idx_db,
             });

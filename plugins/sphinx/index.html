@@ -1,21 +1,35 @@
+
+<style>
+
+#table xm-select{
+	min-height: 30px;
+    line-height: 30px;
+}
+
+#table xm-select *{
+    font-size: 12px;
+}
+
+</style>
 <div class="bt-form">
 	<div class="bt-w-main">
 		<div class="bt-w-menu">
 			<p class="bgw" onclick="pluginService('sphinx');">服务</p>
 			<p onclick="pluginInitD('sphinx');">自启动</p>
-			<p onclick="pluginConfigTpl('sphinx');">配置修改</p>
+			<p onclick="pluginConfigTpl('sphinx','', 'conf','config_tpl','read_config_tpl',tryRebuildIndex);">配置修改</p>
 			<p onclick="pluginLogs('sphinx','','run_log',30);">运行日志</p>
 			<p onclick="pluginLogs('sphinx','','query_log', 30);">查询日志</p>
 			<p onclick="runStatus();">运行状态</p>
-			<p onclick="rebuild();">重建索引</p>
+			<p onclick="commonFunc();">常用功能</p>
 			<p onclick="readme();">说明</p>
 		</div>
 		<div class="bt-w-con pd15">
-			<div class="soft-man-con"></div>
+			<div class="soft-man-con" style="height:425px;overflow: auto;"></div>
 		</div>
 	</div>
 </div>
 <script type="text/javascript">
+resetPluginWinHeight(500);
 $.getScript( "/plugins/file?name=sphinx&f=js/sphinx.js", function(){
 	pluginService('sphinx');
 });

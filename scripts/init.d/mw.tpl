@@ -258,7 +258,7 @@ mw_mirror()
     else
         bash <(curl --insecure -sSL https://gitee.com/SuperManito/LinuxMirrors/raw/main/ChangeMirrors.sh)
     fi
-    cd /www/server/mdserver-web
+    cd ${ROOT_PATH}/mdserver-web
 }
 
 mw_install_app()
@@ -297,8 +297,8 @@ mw_debug(){
         port=$(cat $mw_path/data/port.pl)
     fi
 
-    if [ -d /www/server/mdserver-web ];then
-        cd /www/server/mdserver-web
+    if [ -d ${ROOT_PATH}/mdserver-web ];then
+        cd ${ROOT_PATH}/mdserver-web
     fi
     gunicorn -b :$port -k geventwebsocket.gunicorn.workers.GeventWebSocketWorker -w 1  app:app
 }
@@ -373,7 +373,8 @@ mw_connect_mysql(){
     INPUT_KEY=${SOURCE_LIST_KEY[$INPUT]}
     CHOICE_DB=${DB_TYPE[$INPUT_KEY]}
     echo "login to ${CHOICE_DB}:"
-    pwd=$(cd /www/server/mdserver-web && python3 /www/server/mdserver-web/plugins/${CHOICE_DB}/index.py root_pwd)
+
+    pwd=$(cd ${ROOT_PATH}/mdserver-web && python3 ${ROOT_PATH}/mdserver-web/plugins/${CHOICE_DB}/index.py root_pwd)
     if [ "$CHOICE_DB" == "mysql" ];then
         ${ROOT_PATH}/mysql/bin/mysql -uroot -p"${pwd}"
     fi
@@ -392,15 +393,34 @@ mw_connect_mysql(){
 
 }
 
+
+mw_redis(){
+    CONF="${ROOT_PATH}/redis/redis.conf"
+
+    if [ ! -f "$CONF" ]; then
+        echo -e "not install redis!"
+        exit 1
+    fi
+
+    REDISPORT=$(cat $CONF |grep port|grep -v '#'|awk '{print $2}')
+    REDISPASS=$(cat $CONF |grep requirepass|grep -v '#'|awk '{print $2}')
+    if [ "$REDISPASS" != "" ];then
+        REDISPASS=" -a $REDISPASS"
+    fi
+    CLIEXEC="${ROOT_PATH}/redis/bin/redis-cli -p $REDISPORT$REDISPASS"
+    echo $CLIEXEC
+    ${CLIEXEC}
+}
+
 mw_venv(){
-    cd /www/server/mdserver-web && source bin/activate
+    cd ${ROOT_PATH}/mdserver-web && source bin/activate
 }
 
 mw_clean_lib(){
-    cd /www/server/mdserver-web && rm -rf lib
-    cd /www/server/mdserver-web && rm -rf lib64
-    cd /www/server/mdserver-web && rm -rf bin
-    cd /www/server/mdserver-web && rm -rf include
+    cd ${ROOT_PATH}/mdserver-web && rm -rf lib
+    cd ${ROOT_PATH}/mdserver-web && rm -rf lib64
+    cd ${ROOT_PATH}/mdserver-web && rm -rf bin
+    cd ${ROOT_PATH}/mdserver-web && rm -rf include
 }
 
 case "$1" in
@@ -428,6 +448,7 @@ case "$1" in
     'debug') mw_debug;;
     'mirror') mw_mirror;;
     'db') mw_connect_mysql;;
+    'redis') mw_redis;;
     'venv') mw_venv;;
     'clean_lib') mw_clean_lib;;
     'default')

@@ -1427,7 +1427,7 @@ var index = {
         },'json');
     },
     task:function(){
-        index.getData();
+        // index.getData();
         setInterval(function() {
             index.getData();
         }, 3000);

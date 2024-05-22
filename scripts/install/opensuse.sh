@@ -29,6 +29,7 @@ zypper install -y libtirpc-devel
 zypper install -y rpcgen
 zypper install -y expect
 zypper install -y pv
+zypper install -y bc
 
 zypper install -y libzip libzip-devel
 zypper install -y unrar rar

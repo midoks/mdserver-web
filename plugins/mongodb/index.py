@@ -18,7 +18,6 @@ if mw.isAppleSystem():
 
 
 # /usr/lib/systemd/system/mongod.service
-# /var/lib/mongo
 
 # python3 /www/server/mdserver-web/plugins/mongodb/index.py repl_init 
 # python3 /www/server/mdserver-web/plugins/mongodb/index.py run_repl_info
@@ -107,6 +106,9 @@ def getConfIp():
     data = getConfigData()
     return data['net']['bindIp']
 
+def getConfLocalIp():
+    return '127.0.0.1'
+
 def getConfPort():
     data = getConfigData()
     return data['net']['port']
@@ -186,7 +188,7 @@ def mongdbClientS():
     import pymongo
     port = getConfPort()
     auth = getConfAuth()
-    ip = getConfIp()
+    ip = getConfLocalIp()
     mg_root = pSqliteDb('config').where('id=?', (1,)).getField('mg_root')
 
     if auth == 'disabled':
@@ -200,7 +202,7 @@ def mongdbClient():
     import pymongo
     port = getConfPort()
     auth = getConfAuth()
-    ip = getConfIp()
+    ip = getConfLocalIp()
     mg_root = pSqliteDb('config').where('id=?', (1,)).getField('mg_root')
     # print(ip,port,auth,mg_root)
     if auth == 'disabled':
@@ -488,14 +490,13 @@ def runDocInfo():
 def runReplInfo():
     client = mongdbClient()
     db = client.admin
-
+    result = {}
     try:
         serverStatus = db.command('serverStatus')
     except Exception as e:
         return mw.returnJson(False, str(e))
 
     d = getConfigData()
-    result = {}
     if 'replication' in d and 'replSetName' in d['replication']:
         result['repl_name'] = d['replication']['replSetName']
 
@@ -518,7 +519,22 @@ def runReplInfo():
         hosts = mw.getDefault(repl,'hosts', '') 
         result['hosts'] = ','.join(hosts)
 
-    
+    result['members'] = []
+    try:
+        members_list = []
+        replStatus = db.command('replSetGetStatus')
+        if 'members' in replStatus:
+            members = replStatus['members']
+            for m in members:
+                t = {}
+                t['name'] = m['name']
+                t['stateStr'] = m['stateStr']
+                t['uptime'] = m['uptime']
+                members_list.append(t)
+        result['members'] = members_list
+    except Exception as e:
+        pass
+        
     return mw.returnJson(True, 'OK', result)
 
 def getDbList():
@@ -602,7 +618,7 @@ def addDb():
         username = data_name
 
 
-    client[data_name].chat.insert_one({})
+    client[data_name].zchat.insert_one({})
     user_roles = [{'role': 'dbOwner', 'db': data_name}, {'role': 'userAdmin', 'db': data_name}]
     if auth_status:
         # db.command("dropUser", username)
@@ -787,7 +803,7 @@ def toDbBase(find):
     data_name = find['name']
     db = client[data_name]
 
-    db.chat.insert_one({})
+    db.zchat.insert_one({})
     user_roles = [{'role': 'dbOwner', 'db': data_name}, {'role': 'userAdmin', 'db': data_name}]
     try:
         db_admin.command("createUser", find['username'], pwd=find['password'], roles=user_roles)
@@ -1010,10 +1026,6 @@ def replSetNode():
     nodes = c['nodes']
     add_node = args['node'].strip()
     idx = int(args['idx'])
-
-
-
-
 
     priority = -1
     if 'priority' in  args:

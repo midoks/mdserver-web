@@ -705,7 +705,7 @@ def get_logs_list(args):
     start_time = time.time()
 
     check = checkArgs(args, ['page', 'page_size','site', 'method', 
-            'status_code', 'spider_type', 'request_time', 'query_date', 'search_uri'])
+            'status_code', 'spider_type', 'request_time', 'request_size', 'query_date', 'search_uri'])
     if not check[0]:
         return check[1]
 
@@ -716,6 +716,7 @@ def get_logs_list(args):
     method = args['method']
     status_code = args['status_code']
     request_time = args['request_time']
+    request_size = args['request_size']
     spider_type = args['spider_type']
     query_date = args['query_date']
     search_uri = args['search_uri']
@@ -726,7 +727,7 @@ def get_logs_list(args):
     limit = str(page_size) + ' offset ' + str(page_size * (page - 1))
     conn = pSqliteDb('web_logs', domain)
 
-    field = 'time,ip,domain,server_name,method,is_spider,protocol,status_code,request_headers,ip_list,client_port,body_length,user_agent,referer,request_time,uri,body_length'
+    field = 'time,ip,domain,server_name,method,is_spider,protocol,status_code,request_headers,ip_list,client_port,body_length,user_agent,referer,request_time,uri'
     condition = ''
     conn = conn.field(field)
     conn = conn.where("1=1", ())
@@ -761,6 +762,14 @@ def get_logs_list(args):
             conn = conn.andWhere("request_time>=? and request_time<?", (request_time_s[0],request_time_s[1],))
         if len(request_time_s) == 1:
             conn = conn.andWhere("request_time>=?", (request_time,))
+
+    if request_size != "all":
+        request_size_s = request_size.strip().split('-')
+        # print(int(request_size_s[0])*1024)
+        if len(request_size_s) == 2:
+            conn = conn.andWhere("body_length>=? and body_length<?", (int(request_size_s[0])*1024,int(request_size_s[1])*1024,))
+        if len(request_size_s) == 1:
+            conn = conn.andWhere("body_length>=?", (int(request_size_s[0])*1024,))
 
     if spider_type == "normal":
         pass
@@ -824,7 +833,7 @@ def getLogsErrorList():
     limit = str(page_size) + ' offset ' + str(page_size * (page - 1))
     conn = pSqliteDb('web_logs', domain)
 
-    field = 'time,ip,domain,server_name,method,protocol,status_code,ip_list,client_port,body_length,user_agent,referer,request_time,uri,body_length'
+    field = 'time,ip,domain,server_name,method,protocol,status_code,ip_list,client_port,body_length,user_agent,referer,request_time,uri'
     conn = conn.field(field)
     conn = conn.where("1=1", ())
 

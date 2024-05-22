@@ -14,15 +14,6 @@
 <!--[if lte IE 9]>
 	<script src="/static/js/requestAnimationFrame.js"></script>
 <![endif]-->
-<!-- 统计一下用户量,让我的开发更有激情 -->
-<!-- Google tag (gtag.js) -->
-<script async src="https://www.googletagmanager.com/gtag/js?id=G-FC74BB2RGD"></script>
-<script>
-  window.dataLayer = window.dataLayer || [];
-  function gtag(){dataLayer.push(arguments);}
-  gtag('js', new Date());
-  gtag('config', 'G-FC74BB2RGD');
-</script>
 
 
 {% for menu in data['hook_menu'] %}
@@ -187,5 +178,31 @@ if (thisPath.indexOf('?')>-1){
 <script src="/plugins/file?name={{menu['name']}}&f={{menu['js_path']}}&v={{config.version}}"></script>
 {% endif %}
 {% endfor %}
+
+
+<!-- 统计一下用户量,让我的开发更有激情 -->
+<script type="text/javascript">
+$(document).ready(function(){
+    setTimeout(function(){
+        $.getScript('https://www.googletagmanager.com/gtag/js?id=G-FC74BB2RGD', function(){
+            console.log("load google ad!");
+            window.dataLayer = window.dataLayer || [];
+            function gtag(){dataLayer.push(arguments);}
+            gtag('js', new Date());
+            gtag('config', 'G-FC74BB2RGD');
+        });
+    },3000);
+});
+
+</script>
+
+<!-- Google tag (gtag.js) -->
+<!-- <script async src="https://www.googletagmanager.com/gtag/js?id=G-FC74BB2RGD"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+  gtag('config', 'G-FC74BB2RGD');
+</script> -->
 
 </html>

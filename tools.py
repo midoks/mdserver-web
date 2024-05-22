@@ -62,6 +62,7 @@ def mwcli(mw_input=0):
         print("(23)     关闭IPV6支持")
         print("(24)     开启防火墙SSH端口")
         print("(25)     关闭二次验证")
+        print("(26)     查看防火墙信息")
         print("(100)    开启PHP52显示")
         print("(101)    关闭PHP52显示")
         print("(200)    切换Linux系统软件源")
@@ -75,7 +76,12 @@ def mwcli(mw_input=0):
         except:
             mw_input = 0
 
-    nums = [1, 2, 3, 4, 5, 10, 11, 12, 13, 20, 21, 22, 23, 24, 25, 100, 101, 200, 201]
+    nums = [
+        1, 2, 3, 4, 5, 10, 11, 12, 13, 
+        20, 21, 22, 23, 24, 25, 26,
+        100, 101, 
+        200, 201
+    ]
     if not mw_input in nums:
         print(raw_tip)
         print("已取消!")
@@ -153,6 +159,21 @@ def mwcli(mw_input=0):
             print("|-关闭二次验证成功!")
         else:
             print("|-二次验证已关闭!")
+    elif mw_input == 26:
+        cmd = 'which ufw'
+        run_cmd = False
+        find_cmd =  mw.execShell(cmd)
+        if find_cmd[0].strip() != '':
+            run_cmd = True
+            os.system('ufw status')
+
+        cmd = 'which firewall-cmd'
+        find_cmd =  mw.execShell(cmd)
+        if find_cmd[0].strip() != '':
+            run_cmd = True
+            os.system('firewall-cmd --list-all')
+        if not run_cmd:
+            mw.echoInfo("未检测到防火墙!")
     elif mw_input == 100:
         php_conf = 'plugins/php/info.json'
         if os.path.exists(php_conf):

@@ -15,14 +15,13 @@ app_debug = False
 if mw.isAppleSystem():
     app_debug = True
 
-
 def getPluginName():
     return 'sphinx'
-
 
 def getPluginDir():
     return mw.getPluginDir() + '/' + getPluginName()
 
+sys.path.append(getPluginDir() +"/class")
 
 def getServerDir():
     return mw.getServerDir() + '/' + getPluginName()
@@ -210,9 +209,10 @@ def reload():
 
 def rebuild():
     file = initDreplace()
-    subprocess.Popen(file + ' rebuild &',
-                     stdout=subprocess.PIPE, shell=True)
-    # data = mw.execShell(file + ' rebuild')
+    cmd = file + ' rebuild'
+    data = mw.execShell(cmd)
+    if data[0].find('successfully')<0:
+        return data[0].replace("\n","<br/>")
     return 'ok'
 
 
@@ -295,18 +295,35 @@ def sphinxConfParse():
     sindex = re.findall(rep, content)
     indexlen = len(sindex)
     cmd = {}
-    if indexlen > 0:
-        cmd_index = []
-        cmd_delta = []
-        for x in range(indexlen):
-            if sindex[x].find(':') != -1:
-                cmd_delta.append(sindex[x])
-            else:
-                cmd_index.append(sindex[x])
+    cmd['cmd'] = bin_dir + '/bin/bin/indexer -c ' + bin_dir + '/sphinx.conf'
 
-        cmd['index'] = cmd_index
-        cmd['delta'] = cmd_delta
-        cmd['cmd'] = bin_dir + '/bin/bin/indexer -c ' + bin_dir + '/sphinx.conf'
+    cmd['index'] = []
+    cmd_index = []
+    cmd_delta = []
+    if indexlen > 0:
+        for x in range(indexlen):
+            name = sindex[x].strip()
+            if name == '':
+                continue
+            if  name.find(':') != -1:
+                cmd_delta.append(name.strip())
+            else:
+                cmd_index.append(name.strip())
+
+    # print(cmd_index)
+    # print(cmd_delta)
+
+    for ci in cmd_index:
+        val = {}
+        val['index'] = ci
+
+        for cd in cmd_delta:
+            cd = cd.replace(" ", '')
+            if cd.find(":"+ci) > -1:
+                val['delta'] = cd.split(":")[0].strip()
+                break
+
+        cmd['index'].append(val)
     return cmd
 
 
@@ -316,6 +333,55 @@ def sphinxCmd():
         return mw.returnJson(True, 'ok', data)
     else:
         return mw.returnJson(False, 'no index')
+
+def makeDbToSphinxTest():        
+    conf_file = getConf()
+    import  sphinx_make
+    sph_make = sphinx_make.sphinxMake()
+    conf = sph_make.makeSqlToSphinxAll()
+
+    mw.writeFile(conf_file,conf)
+    print(conf)
+    # makeSqlToSphinxTable()
+    return True
+
+def makeDbToSphinx():
+    args = getArgs()
+    check = checkArgs(args, ['db','tables','is_delta','is_cover'])
+    if not check[0]:
+        return check[1]
+
+    db = args['db']
+    tables = args['tables']
+    is_delta = args['is_delta']
+    is_cover = args['is_cover']
+
+    if is_cover != 'yes':
+        return mw.returnJson(False,'暂时仅支持覆盖!')
+
+    sph_file = getConf()
+
+    import  sphinx_make
+    sph_make = sphinx_make.sphinxMake()
+
+    version_pl = getServerDir() + "/version.pl"
+    if os.path.exists(version_pl):
+        version = mw.readFile(version_pl).strip()
+        sph_make.setVersion(version)
+
+    if not sph_make.checkDbName(db):
+        return mw.returnJson(False,'保留数据库名称,不可用!')
+    is_delta_bool = False
+    if is_delta == 'yes':
+        is_delta_bool = True
+    if is_cover == 'yes':
+        tables = tables.split(',')
+        content = sph_make.makeSqlToSphinx(db, tables, is_delta_bool)
+        mw.writeFile(sph_file,content)
+        return mw.returnJson(True,'设置成功!')
+
+    return mw.returnJson(True,'测试中')
+
 
 
 if __name__ == "__main__":
@@ -352,5 +418,7 @@ if __name__ == "__main__":
         print(runStatus())
     elif func == 'sphinx_cmd':
         print(sphinxCmd())
+    elif func == 'db_to_sphinx':
+        print(makeDbToSphinx())
     else:
         print('error')
