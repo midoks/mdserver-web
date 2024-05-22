@@ -1375,7 +1375,7 @@ function remind(a){
 						<td>\
 							<div class="titlename c3">'+g.data[d].name+'</span>\
 								<span class="rs-status">【'+lan.bt.task_ok+'】<span>\
-								<span class="rs-time">耗时['+ getSFM(g.data[d].end - g.data[d].start) +']</span>\
+								<span class="rs-time">安装等待中...</span>\
 							</div>\
 						</td>\
 						<td class="text-right c3">'+g.data[d].addtime+'</td>\
