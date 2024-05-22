@@ -113,7 +113,8 @@ docker run -itd --name mw-server --privileged=true -p 7200:7200 -p 80:80 -p 443:
 ### 版本更新 0.16.8.x
 
 - mysql同步优化，享受丝滑般感觉。
-- 网站统计实时-可调节1-10s。
+- 网站统计 - 实时-可调节1-10s。
+- 网站统计 - 加入大小条件。
 - Sphinx优化。
 
 ### JSDelivr安装地址
