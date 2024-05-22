@@ -2679,7 +2679,7 @@ def doFullSyncUser(version=''):
 
     if not os.path.exists(bak_file):
         # https://mariadb.com/kb/zh-cn/mariadb-dump/
-        dump_sql_data = getServerDir() + "/bin/mariadb-dump -f --opt --default-character-set=utf8 --single-transaction -h" + ip + " -P" + \
+        dump_sql_data = getServerDir() + "/bin/mariadb-dump -f --default-character-set=utf8 --single-transaction -h" + ip + " -P" + \
             port + " -u" + user + " -p'" + apass + "' " + sync_db + ">" + bak_file
         print(dump_sql_data)
         mw.execShell(dump_sql_data)
