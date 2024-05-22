@@ -321,6 +321,8 @@ index {$DB_NAME}_{$TABLE_NAME}
 		if create_sphinx_table:
 			update = self.makeSphinxDbSourcePost(db, table)
 			conf = conf.replace("{$UPDATE}", update)
+		else:
+			conf = conf.replace("{$UPDATE}", '')
 
 		if create_sphinx_table:
 			sph_sql = self.createSql(db)
