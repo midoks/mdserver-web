@@ -2212,6 +2212,7 @@ function wsTableLogRequest(page){
     args['method'] = $('select[name="method"]').val();
     args['status_code'] = $('select[name="status_code"]').val();
     args['request_time'] = $('select[name="request_time"]').val();
+    args['request_size'] = $('select[name="request_size"]').val();
     args['spider_type'] = $('select[name="spider_type"]').val();
     args['referer'] = $('select[name="referer"]').val();
     args['ip'] = $('input[name="ip"]').val();
@@ -2460,6 +2461,15 @@ var html = '<div>\
                         <option value="500-1000">500ms-1s</option>\
                         <option value="1000">大于1s</option>\
                     </select>\
+                    <span style="margin-left:10px;">大小: </span>\
+                    <select class="bt-input-text" name="request_size" style="margin-left:5px;">\
+                        <option value="all">所有</option>\
+                        <option value="0-1">0-1(kb)</option>\
+                        <option value="1-20">1-20(kb)</option>\
+                        <option value="20-50">20-50(kb)</option>\
+                        <option value="50-100">50-100(kb)</option>\
+                        <option value="100">大于100kb</option>\
+                    </select>\
                     <span style="margin-left:10px;">URL过滤: </span>\
                     <div class="input-group" style="width:210px;display:inline-flex;">\
                         <input type="text" name="search_uri" class="form-control btn-group-sm" autocomplete="off" placeholder="URI搜索" style="font-size: 12px;padding: 0 10px;height:30px;">\
@@ -2548,6 +2558,10 @@ $('select[name="referer"]').change(function(){
 });
 
 $('select[name="request_time"]').change(function(){
+    wsTableLogRequest(1);
+});
+
+$('select[name="request_size"]').change(function(){
     wsTableLogRequest(1);
 });
 
