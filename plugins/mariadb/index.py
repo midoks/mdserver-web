@@ -2633,7 +2633,7 @@ def syncDatabaseRepairLog(version=''):
 
     if op == 'do':
         os.system(' echo "开始执行" > '+ tmp_log)
-        subprocess.Popen(cmd +' >> '+ tmp_log +' &')
+        os.system(cmd +' >> '+ tmp_log +' &')
         # time.sleep(10)
         # mw.execShell('rm -rf '+tmp_log)
         return mw.returnJson(True, 'ok')
