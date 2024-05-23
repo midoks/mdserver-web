@@ -3364,5 +3364,9 @@ if __name__ == "__main__":
         print(doFullSync(version))
     elif func == 'dump_mysql_data':
         print(dumpMysqlData(version))
+    elif func == 'sync_database_repair':
+        print(syncDatabaseRepair())
+    elif func == 'sync_database_repair_log':
+        print(syncDatabaseRepairLog())
     else:
         print('error')
