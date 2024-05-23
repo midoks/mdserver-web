@@ -2685,8 +2685,8 @@ def doFullSyncUser(version=''):
     
     dmp_option = ''
     mode = recognizeDbMode()
-    if mode == 'gtid':
-        dmp_option = ' --set-gtid-purged=off '
+    # if mode == 'gtid':
+    #     dmp_option = ' --set-gtid-purged=off '
 
     writeDbSyncStatus({'code': 1, 'msg': '远程导出数据...', 'progress': 10})
 
