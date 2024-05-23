@@ -65,7 +65,7 @@ class backupTools:
         # mw.execShell(db_path + "/bin/mysqldump --defaults-file=" + my_conf_path + " --skip-lock-tables --default-character-set=utf8 " +
         #              name + " | gzip > " + filename)
 
-        cmd = db_path + "/bin/mysqldump --defaults-file=" + my_conf_path + "  --single-transaction --quick --default-character-set=utf8 " + \
+        cmd = db_path + "/bin/mariadb-dump --defaults-file=" + my_conf_path + "  --single-transaction --quick --default-character-set=utf8 " + \
             name + " | gzip > " + filename
         mw.execShell(cmd)
 

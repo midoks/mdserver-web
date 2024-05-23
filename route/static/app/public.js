@@ -1000,7 +1000,7 @@ function setSelectChecked(c, d) {
 
 function jump() {
 	layer.closeAll();
-	window.location.href = "/soft"
+	window.location.href = "/soft";
 }
 
 function installTips() {
@@ -1134,15 +1134,15 @@ function getPanelList(){
 			var user = $(this).attr("data-user");
 			var pw = $(this).attr("data-pw");
 			layer.open({
-			  type: 2,
-			  title: false,
-			  closeBtn: 0, //不显示关闭按钮
-			  shade: [0],
-			  area: ['340px', '215px'],
-			  offset: 'rb', //右下角弹出
-			  time: 5, //2秒后自动关闭
-			  anim: 2,
-			  content: [murl+'/login', 'no']
+				type: 2,
+				title: false,
+			 	closeBtn: 0, //不显示关闭按钮
+				shade: [0],
+				area: ['340px', '215px'],
+				offset: 'rb', //右下角弹出
+				time: 5, //2秒后自动关闭
+				anim: 2,
+				content: [murl+'/login', 'no']
 			});
 			var loginForm ='<div id="btpanelform" style="display:none"><form id="toBtpanel" action="'+murl+'/do_login" method="post" target="btpfrom">\
 				<input name="username" id="btp_username" value="'+user+'" type="text">\
@@ -1375,7 +1375,7 @@ function remind(a){
 						<td>\
 							<div class="titlename c3">'+g.data[d].name+'</span>\
 								<span class="rs-status">【'+lan.bt.task_ok+'】<span>\
-								<span class="rs-time">耗时['+ getSFM(g.data[d].end - g.data[d].start) +']</span>\
+								<span class="rs-time">安装等待中...</span>\
 							</div>\
 						</td>\
 						<td class="text-right c3">'+g.data[d].addtime+'</td>\
