@@ -7,6 +7,12 @@ rootPath=$(dirname "$curPath")
 rootPath=$(dirname "$rootPath")
 serverPath=$(dirname "$rootPath")
 
+# cd /www/server/mdserver-web/plugins/maridb && bash install.sh install 8.2
+# cd /www/server/mdserver-web && source bin/activate && python3 plugins/maridb/index.py try_slave_sync_bugfix {}
+# cd /www/server/mdserver-web && source bin/activate && python3 plugins/maridb/index.py do_full_sync  {"db":"xxx","sign":"","begin":1}
+# cd /www/server/mdserver-web && source bin/activate && python3 plugins/maridb/index.py sync_database_repair  {"db":"xxx","sign":""}
+# cd /www/server/mdserver-web && source bin/activate && python3 plugins/maridb/index.py init_slave_status
+# cd /www/server/mdserver-web && source bin/activate && python3 plugins/maridb/index.py install_pre_inspection
 
 install_tmp=${rootPath}/tmp/mw_install.pl
 

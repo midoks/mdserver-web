@@ -2677,12 +2677,24 @@ def doFullSyncUser(version=''):
     writeDbSyncStatus({'code': 0, 'msg': '开始同步...', 'progress': 0})
     writeDbSyncStatus({'code': 1, 'msg': '远程导出数据...', 'progress': 10})
 
+    find_run_dump = mw.execShell('ps -ef | grep mariadb-dump | grep -v grep')
+    if find_run_dump[0] != "":
+        print("正在远程导出数据中,别着急...")
+        writeDbSyncStatus({'code': 3.1, 'msg': '正在远程导出数据中,别着急...', 'progress': 39})
+        return False
+
     if not os.path.exists(bak_file):
         # https://mariadb.com/kb/zh-cn/mariadb-dump/
-        dump_sql_data = getServerDir() + "/bin/mariadb-dump -f --default-character-set=utf8 --single-transaction -h" + ip + " -P" + \
+        dump_sql_data = getServerDir() + "/bin/mariadb-dump -f --default-character-set=utf8 --single-transaction --compress -q -h" + ip + " -P" + \
             port + " -u" + user + " -p'" + apass + "' " + sync_db + ">" + bak_file
         print(dump_sql_data)
         mw.execShell(dump_sql_data)
+
+    find_run_import = mw.execShell('ps -ef | grep mariadb| grep '+ bak_file +' | grep -v grep')
+    if find_run_import[0] != "":
+        print("正在导入数据中,别着急...")
+        writeDbSyncStatus({'code': 4.1, 'msg': '正在导入数据中,别着急...', 'progress': 99})
+        return False
 
     writeDbSyncStatus({'code': 2, 'msg': '本地导入数据...', 'progress': 40})
     if os.path.exists(bak_file):
