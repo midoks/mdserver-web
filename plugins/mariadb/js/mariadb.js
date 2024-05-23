@@ -1978,6 +1978,84 @@ function getFullSyncStatus(db){
     
 }
 
+function dataSyncVerify(db){
+    var reqTimer = null;
+
+    function requestLogs(layerIndex){
+        myPostN('sync_database_repair_log', {db:db, sign:'',op:'get'}, function(rdata){
+            var rdata = $.parseJSON(rdata.data);
+
+            if(!rdata.status) {
+                layer.close(layerIndex);
+                layer.msg(rdata.msg,{icon:2, time:2000});
+                clearInterval(reqTimer);
+                return;
+            };
+
+            if (rdata.msg == ''){
+                rdata.msg = '暂无数据!';
+            }
+
+            $("#data_verify_log").html(rdata.msg);
+            //滚动到最低
+            var ob = document.getElementById('data_verify_log');
+            ob.scrollTop = ob.scrollHeight; 
+        });
+    }
+
+    layer.open({
+        type: 1,
+        title: '同步数据库['+db+']数据校验',
+        area: '500px',
+        btn:[ "开始","取消","手动"],
+        content:"<div class='bt-form'>\
+                "+'<pre id="data_verify_log" style="overflow: auto; border: 0px none; line-height:23px;padding: 5px; margin: 0px; white-space: pre-wrap; height: 395px; background-color: rgb(51,51,51);color:#f1f1f1;border-radius:0px;font-family:"></pre>'+"\
+            </div>",
+        cancel: function(){
+            if (reqTimer){
+                clearInterval(reqTimer);
+            }
+        },
+        yes:function(index,layer_index){
+            myPostN('sync_database_repair_log', {db:db, sign:'',op:'do'}, function(data){});
+            layer.msg("执行成功");
+
+            requestLogs(layer_index);
+            reqTimer = setInterval(function(){
+                requestLogs(layer_index);
+            },3000);
+        },
+        success:function(){
+        },
+        btn3: function(){
+            myPostN('sync_database_repair_log', {db:db, sign:'',op:'cmd'}, function(rdata){
+                var rdata = $.parseJSON(rdata.data);
+                layer.open({
+                title: "手动执行命令CMD",
+                    area: ['600px', '180px'],
+                    type:1,
+                    closeBtn: 1,
+                    shadeClose: false,
+                    btn:["复制","取消"],
+                    content: '<div class="pd15">\
+                                <div class="divtable">\
+                                    <pre class="layui-code">'+rdata.data+'</pre>\
+                                </div>\
+                            </div>',
+                    success:function(){
+                        copyText(rdata.data);
+                    },
+                    yes:function(){
+                        copyText(rdata.data);
+                    }
+                });
+            });
+            return false;
+        }
+
+    });
+}
+
 function addSlaveSSH(ip=''){
 
     myPost('get_slave_ssh_by_ip', {ip:ip}, function(rdata){
@@ -2634,6 +2712,7 @@ function masterOrSlaveConf(version=''){
                 list += '<td style="text-align:right">' + 
                     '<a href="javascript:;" class="btlink" onclick="setDbSlave(\''+rdata.data[i]['name']+'\')"  title="加入|退出">'+(rdata.data[i]['slave']?'退出':'加入')+'</a> | ' +
                     '<a href="javascript:;" class="btlink" onclick="getFullSyncStatus(\''+rdata.data[i]['name']+'\')" title="同步">同步</a>' +
+                    '<a href="javascript:;" class="btlink" onclick="dataSyncVerify(\''+rdata.data[i]['name']+'\')" title="数据校验">数据校验</a>' +
                 '</td>';
                 list += '</tr>';
             }
