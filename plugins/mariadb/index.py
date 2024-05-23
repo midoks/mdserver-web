@@ -2647,6 +2647,12 @@ def doFullSync(version=''):
 
 
 def doFullSyncUser(version=''):
+    which_pv = mw.execShell('which pv')
+    is_exist_pv = False
+    if not os.path.exists(which_pv[0]):
+        is_exist_pv = True
+
+
     args = getArgs()
     data = checkArgs(args, ['db', 'sign'])
     if not data[0]:
@@ -2708,15 +2714,22 @@ def doFullSyncUser(version=''):
     if os.path.exists(bak_file):
         pwd = pSqliteDb('config').where('id=?', (1,)).getField('mysql_root')
         sock = getSocketFile()
-        my_import_cmd = getServerDir() + '/bin/mariadb -S ' + sock + " -uroot -p'" + pwd + \
-            "' " + sync_db + '<' + bak_file
+
+        if is_exist_pv:
+            my_import_cmd = getServerDir() + '/bin/mariadb -S ' + sock + " -uroot -p'" + pwd + "' " + sync_db
+            my_import_cmd = "pv -t -p " + bak_file + '|' + my_import_cmd
+            print(my_import_cmd)
+            os.system(my_import_cmd)
+        else:
+            my_import_cmd = getServerDir() + '/bin/mariadb -S ' + sock + " -uroot -p'" + pwd + \
+                "' " + sync_db + '<' + bak_file
         print(my_import_cmd)
         mw.execShell(my_import_cmd)
     time_e = time.time()
     import_cos = time_e - time_s
     print("import cos:", import_cos)
     writeDbSyncStatus({'code': 4, 'msg': '导入耗时:'+str(int(import_cos))+'秒', 'progress': 60})
-    
+
     time.sleep(3)
 
     pinfo = parseSlaveSyncCmd(data['cmd'])
