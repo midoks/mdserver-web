@@ -2652,6 +2652,7 @@ def doFullSyncUser(version=''):
     if not data[0]:
         return data[1]
 
+    time_all_s = time.time()
     sync_db = args['db']
     sync_sign = args['sign']
 
@@ -2683,6 +2684,7 @@ def doFullSyncUser(version=''):
         writeDbSyncStatus({'code': 3.1, 'msg': '正在远程导出数据中,别着急...', 'progress': 39})
         return False
 
+    time_s = time.time()
     if not os.path.exists(bak_file):
         # https://mariadb.com/kb/zh-cn/mariadb-dump/
         dump_sql_data = getServerDir() + "/bin/mariadb-dump -f --default-character-set=utf8 --single-transaction --compress -q -h" + ip + " -P" + \
@@ -2690,13 +2692,19 @@ def doFullSyncUser(version=''):
         print(dump_sql_data)
         mw.execShell(dump_sql_data)
 
+    time_e = time.time()
+    export_cos = time_e - time_s
+    print("export cos:", export_cos)
+    writeDbSyncStatus({'code': 3, 'msg': '导出耗时:'+str(int(export_cos))+'秒,正在到本地导入数据中...', 'progress': 40})
+
+
     find_run_import = mw.execShell('ps -ef | grep mariadb| grep '+ bak_file +' | grep -v grep')
     if find_run_import[0] != "":
         print("正在导入数据中,别着急...")
-        writeDbSyncStatus({'code': 4.1, 'msg': '正在导入数据中,别着急...', 'progress': 99})
+        writeDbSyncStatus({'code': 4.1, 'msg': '正在导入数据中,别着急...', 'progress': 59})
         return False
 
-    writeDbSyncStatus({'code': 2, 'msg': '本地导入数据...', 'progress': 40})
+    time_s = time.time()
     if os.path.exists(bak_file):
         pwd = pSqliteDb('config').where('id=?', (1,)).getField('mysql_root')
         sock = getSocketFile()
@@ -2704,6 +2712,12 @@ def doFullSyncUser(version=''):
             "' " + sync_db + '<' + bak_file
         print(my_import_cmd)
         mw.execShell(my_import_cmd)
+    time_e = time.time()
+    import_cos = time_e - time_s
+    print("import cos:", import_cos)
+    writeDbSyncStatus({'code': 4, 'msg': '导入耗时:'+str(int(import_cos))+'秒', 'progress': 60})
+    
+    time.sleep(3)
 
     pinfo = parseSlaveSyncCmd(data['cmd'])
     # print(pinfo)
