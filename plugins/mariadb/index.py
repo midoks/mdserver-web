@@ -2718,8 +2718,8 @@ def doFullSyncUser(version=''):
         writeDbSyncStatus({'code': 4.1, 'msg': '正在导入数据中,别着急...', 'progress': 59})
         return False
 
-    if os.path.exists(bak_file):
-        db.execute('reset master')
+    # if os.path.exists(bak_file):
+    #     db.execute('reset master')
 
     time_s = time.time()
     if os.path.exists(bak_file):
