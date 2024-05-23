@@ -210,13 +210,17 @@ def __delete_port(port):
 
 
 def openPort():
-    for i in ["888"]:
+    conf = getCfg()
+    port = conf['port']
+    for i in [port]:
         __release_port(i)
     return True
 
 
 def delPort():
-    for i in ["888"]:
+    conf = getCfg()
+    port = conf['port']
+    for i in [port]:
         __delete_port(i)
     return True
 
