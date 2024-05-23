@@ -2711,7 +2711,7 @@ function masterOrSlaveConf(version=''){
                 list += '<td>' + rdata.data[i]['name'] +'</td>';
                 list += '<td style="text-align:right">' + 
                     '<a href="javascript:;" class="btlink" onclick="setDbSlave(\''+rdata.data[i]['name']+'\')"  title="加入|退出">'+(rdata.data[i]['slave']?'退出':'加入')+'</a> | ' +
-                    '<a href="javascript:;" class="btlink" onclick="getFullSyncStatus(\''+rdata.data[i]['name']+'\')" title="同步">同步</a>' +
+                    '<a href="javascript:;" class="btlink" onclick="getFullSyncStatus(\''+rdata.data[i]['name']+'\')" title="同步">同步</a> | ' +
                     '<a href="javascript:;" class="btlink" onclick="dataSyncVerify(\''+rdata.data[i]['name']+'\')" title="数据校验">数据校验</a>' +
                 '</td>';
                 list += '</tr>';
