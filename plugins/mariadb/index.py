@@ -2710,6 +2710,9 @@ def doFullSyncUser(version=''):
         writeDbSyncStatus({'code': 4.1, 'msg': '正在导入数据中,别着急...', 'progress': 59})
         return False
 
+    if os.path.exists(bak_file):
+        db.execute('reset master')
+
     time_s = time.time()
     if os.path.exists(bak_file):
         pwd = pSqliteDb('config').where('id=?', (1,)).getField('mysql_root')
@@ -2725,7 +2728,7 @@ def doFullSyncUser(version=''):
                 "' " + sync_db + '<' + bak_file
             print(my_import_cmd)
             mw.execShell(my_import_cmd)
-            
+
     time_e = time.time()
     import_cos = time_e - time_s
     print("import cos:", import_cos)
