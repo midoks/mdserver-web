@@ -2723,8 +2723,9 @@ def doFullSyncUser(version=''):
         else:
             my_import_cmd = getServerDir() + '/bin/mariadb -S ' + sock + " -uroot -p'" + pwd + \
                 "' " + sync_db + '<' + bak_file
-        print(my_import_cmd)
-        mw.execShell(my_import_cmd)
+            print(my_import_cmd)
+            mw.execShell(my_import_cmd)
+            
     time_e = time.time()
     import_cos = time_e - time_s
     print("import cos:", import_cos)
