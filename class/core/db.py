@@ -42,7 +42,12 @@ class Sql():
                 self.__DB_CONN = sqlite3.connect(self.__DB_FILE)
                 self.__DB_CONN.text_factory = str
         except Exception as ex:
+            # print(mw.getTracebackInfo())
             return "error: " + str(ex)
+
+    def changeTextFactoryToBytes(self):
+        self.__DB_CONN.text_factory = bytes
+        return True
 
     def autoTextFactory(self):
         if sys.version_info[0] == 3:
