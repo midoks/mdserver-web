@@ -2257,11 +2257,13 @@ function wsTableLogRequest(page){
     }
 
     $('#logs_search').attr('req','start');
+    // wsPost('get_logs_list', '' ,args, function(rdata){
     wsPostCallbak('get_logs_list', '' ,args, function(rdata){
         $('#logs_search').attr('req','end');
         var rdata = $.parseJSON(rdata.data);
         var list = '';
         var data = rdata.data.data;
+        console.log(data);
 
         if (data.length > 0){
             for(i in data){
@@ -2346,19 +2348,22 @@ function wsTableLogRequest(page){
             var index = $(this).attr('data-id');
             var res = data[index];
             var request_headers = res.request_headers;
-            var req_data = $.parseJSON(request_headers);
 
             var req_data_html = res.method +' ' + res.uri + '<br/>';
-            for (var d in req_data) {
 
-                if (d == 'payload'){
-                    req_data_html += '<b style="color:red;">'+d +"</b>:"+req_data[d]+"<br/>";
-                } else{
-                    req_data_html += d+":"+req_data[d]+"<br/>";
+            try {
+                var req_data = $.parseJSON(request_headers);
+                for (var d in req_data) {
+                    if (d == 'payload'){
+                        req_data_html += '<b style="color:red;">'+d +"</b>:"+req_data[d]+"<br/>";
+                    } else{
+                        req_data_html += d+":"+req_data[d]+"<br/>";
+                    }
                 }
-
-                
+            } catch (error) {
+                req_data_html += request_headers;
             }
+
 
             layer.open({
                 type: 1,

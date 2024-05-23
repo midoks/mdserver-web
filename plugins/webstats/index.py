@@ -791,7 +791,23 @@ def getLogsList():
 
     attacHistoryLogHack(conn, domain, query_date)
 
+    conn.changeTextFactoryToBytes()
     clist = conn.limit(limit).order('time desc').inquiry()
+
+    for x in range(len(clist)):
+        req_line = clist[x]
+        for cx in req_line:
+            v = req_line[cx]
+            if type(v) == bytes:
+                try:
+                    clist[x][cx] = v.decode('utf-8')
+                except Exception as e:
+                    v = str(v)
+                    v = v.replace("b'",'').strip("'")
+                    clist[x][cx] = v
+            else:
+                clist[x][cx] = v
+
     # print(clist)
     count_key = "count(*) as num"
     count = conn.field(count_key).limit('').order('').inquiry()
