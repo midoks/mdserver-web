@@ -2263,7 +2263,7 @@ function wsTableLogRequest(page){
         var rdata = $.parseJSON(rdata.data);
         var list = '';
         var data = rdata.data.data;
-        console.log(data);
+        // console.log(data);
 
         if (data.length > 0){
             for(i in data){
