@@ -2682,6 +2682,12 @@ def doFullSyncUser(version=''):
         os.system("rm -rf " + bak_file)
 
     writeDbSyncStatus({'code': 0, 'msg': '开始同步...', 'progress': 0})
+    
+    dmp_option = ''
+    mode = recognizeDbMode()
+    if mode == 'gtid':
+        dmp_option = ' --set-gtid-purged=off '
+
     writeDbSyncStatus({'code': 1, 'msg': '远程导出数据...', 'progress': 10})
 
     find_run_dump = mw.execShell('ps -ef | grep mariadb-dump | grep -v grep')
