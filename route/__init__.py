@@ -60,8 +60,7 @@ try:
     sdb.create_all()
 except:
     app.config['SESSION_TYPE'] = 'filesystem'
-    app.config['SESSION_FILE_DIR'] = '/tmp/py_mw_session_' + \
-        str(sys.version_info[0])
+    app.config['SESSION_FILE_DIR'] = '/tmp/py_mw_session_' + str(sys.version_info[0])
     app.config['SESSION_FILE_THRESHOLD'] = 1024
     app.config['SESSION_FILE_MODE'] = 384
 
