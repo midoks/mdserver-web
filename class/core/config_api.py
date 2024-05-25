@@ -958,7 +958,7 @@ class config_api:
             mw.writeFile(auth, crypt_data)
 
         ip = mw.getHostAddr()
-        url = pyotp.totp.TOTP(sec).provisioning_uri(name=ip, issuer_name='mdserver-web')
+        url = pyotp.totp.TOTP(sec).provisioning_uri(name=ip, issuer_name=tag)
 
         rdata = {}
         rdata['secret'] = sec
