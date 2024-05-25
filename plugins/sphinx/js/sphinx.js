@@ -111,6 +111,7 @@ function autoMakeConf(){
                     </div>\
                     <ul class='help-info-text c7'>\
                         <li style='color:red;'>具体配置，仍须手动修改!!!</li>'\
+                        <li style='color:red;'>增量索引,需要有更新权限,主从分离时,需要主库配置</li>'\
                     </ul>\
                 </form>\
             ",
