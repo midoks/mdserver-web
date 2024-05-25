@@ -616,7 +616,32 @@ function _M.statistics_request(self, ip, is_spider, body_length)
     -- 计算pv uv
     local pvc = 0
     local uvc = 0
+    local request_header = ngx.req.get_headers()
+    if not is_spider and ngx.status == 200 and body_length > 0 then
+        local ua = ''
+        if request_header['user-agent'] then
+            ua = string.lower(request_header['user-agent'])
+        end
 
+        pvc = 1
+        if ua then
+            local today = ngx.today()
+            local uv_token = ngx.md5(ip .. ua .. today)
+            if not cache:get(uv_token) then
+                uvc = 1
+                cache:set(uv_token,1, self:get_end_time())
+            end
+        end
+    end
+    return pvc, uvc
+end
+
+-- 仅计算GET
+function _M.statistics_request_old(self, ip, is_spider, body_length)
+    -- 计算pv uv
+    local pvc = 0
+    local uvc = 0
+    local method = ngx.req.get_method()
     if not is_spider and method == 'GET' and ngx.status == 200 and body_length > 512 then
         local ua = ''
         if request_header['user-agent'] then
