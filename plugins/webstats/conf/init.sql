@@ -85,6 +85,7 @@ CREATE TABLE `request_stat`(
     `status_402` INTEGER DEFAULT 0,
     `status_403` INTEGER DEFAULT 0,
     `status_404` INTEGER DEFAULT 0,
+    `status_499` INTEGER DEFAULT 0,
     `http_get` INTEGER DEFAULT 0,
     `http_post` INTEGER DEFAULT 0,
     `http_put` INTEGER DEFAULT 0,
