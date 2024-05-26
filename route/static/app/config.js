@@ -840,7 +840,7 @@ function getPanelSSL(){
 				<div class="ssl-btn pull-left mtb15" style="width:100%">\
 					<button class="btn btn-success btn-sm save-panel-ssl">保存</button>\
 					<button class="btn btn-success btn-sm del-panel-ssl">删除</button>\
-					<button class="btn btn-success btn-sm apply-lets-ssl">申请Lets证书</button>\
+					<button class="btn btn-success btn-sm apply-lets-ssl">申请ACME证书</button>\
 				</div>\
 			</div>\
 			<ul class="help-info-text c7 pull-left">\
