@@ -174,13 +174,7 @@ $('input[name="bind_ssl"]').click(function(){
 			}
 		});
 	}
-
 	
-	// $.post('/config/set_panel_ssl',{}, function(rdata){
-	// 	showMsg(rdata.msg,function(){
-	// 		window.location.reload();
-	// 	},{icon:rdata.status?1:2},2000);
-	// },'json');
 });
 
 /** op **/
