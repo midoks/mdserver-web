@@ -409,6 +409,8 @@ class config_api:
         choose_file = self.__file['ssl']
         if os.path.exists(choose_file):
             os.remove(choose_file)
+
+        mw.writeFile('data/restart.pl', 'True')
         return mw.returnJson(True, '关闭SSL成功')
 
     # 保存面板证书
