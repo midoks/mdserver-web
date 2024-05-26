@@ -1288,6 +1288,8 @@ def checkDomainPanel():
     domain = readFile('data/bind_domain.pl')
     port = readFile('data/port.pl').strip()
 
+    print(port)
+
     npid = getServerDir() + "/openresty/nginx/logs/nginx.pid"
     if not os.path.exists(npid):
         return False
@@ -1296,14 +1298,19 @@ def checkDomainPanel():
     if os.path.exists(nconf):
         port = "80"
 
+
+
     if domain:
         client_ip = getClientIp()
-        if client_ip in ['127.0.0.1', 'localhost', '::1']:
-            return False
+        # if client_ip in ['127.0.0.1', 'localhost', '::1']:
+        #     return False
+
         if tmp.strip().lower() != domain.strip().lower():
             from flask import Flask, redirect, request, url_for
             to = "http://" + domain + ":" + str(port)
-            return redirect(to, code=302)
+            print(to)
+            return False
+            # return redirect(to, code=302)
     return False
 
 
@@ -1811,28 +1818,38 @@ def getCertName(certPath):
         return None
 
 
-def createSSL():
+def createLocalSSL():
+    if not os.path.exists('ssl/local'):
+        execShell('mkdir -p ssl/local')
+
+
     # 自签证书
-    if os.path.exists('ssl/input.pl'):
-        return True
+    # if os.path.exists('ssl/local/input.pl'):
+    #     return True
+
+    client_ip = getClientIp()
+
     import OpenSSL
     key = OpenSSL.crypto.PKey()
     key.generate_key(OpenSSL.crypto.TYPE_RSA, 2048)
     cert = OpenSSL.crypto.X509()
     cert.set_serial_number(0)
-    cert.get_subject().CN = getLocalIp()
+    
+    if client_ip == '127.0.0.1':
+        cert.get_subject().CN = '127.0.0.1'
+    else:
+        cert.get_subject().CN = getLocalIp()
+    
     cert.set_issuer(cert.get_subject())
     cert.gmtime_adj_notBefore(0)
     cert.gmtime_adj_notAfter(86400 * 3650)
     cert.set_pubkey(key)
     cert.sign(key, 'md5')
-    cert_ca = OpenSSL.crypto.dump_certificate(
-        OpenSSL.crypto.FILETYPE_PEM, cert)
-    private_key = OpenSSL.crypto.dump_privatekey(
-        OpenSSL.crypto.FILETYPE_PEM, key)
+    cert_ca = OpenSSL.crypto.dump_certificate(OpenSSL.crypto.FILETYPE_PEM, cert)
+    private_key = OpenSSL.crypto.dump_privatekey(OpenSSL.crypto.FILETYPE_PEM, key)
     if len(cert_ca) > 100 and len(private_key) > 100:
-        writeFile('ssl/cert.pem', cert_ca, 'wb+')
-        writeFile('ssl/private.pem', private_key, 'wb+')
+        writeFile('ssl/local/cert.pem', cert_ca, 'wb+')
+        writeFile('ssl/local/private.pem', private_key, 'wb+')
         return True
     return False
 
