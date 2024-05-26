@@ -465,6 +465,11 @@ class config_api:
         if not os.path.exists(bind_domain):
             return mw.returnJson(False, '先要绑定域名!')
 
+        choose_file = self.__file['ssl']
+        choose = mw.readFile(choose_file)
+        if choose == 'local':
+            return mw.returnJson(False, '本地SSL无法使用!')
+
         keyPath = 'ssl/nginx/private.pem'
         if not os.path.exists(keyPath):
             return mw.returnJson(False, '未申请SSL证书!')
