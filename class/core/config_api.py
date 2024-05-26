@@ -570,17 +570,20 @@ class config_api:
         return mw.returnJson(True, '申请成功!', data)
 
     def setPanelDomainApi(self):
+        import system_api
         domain = request.form.get('domain', '')
+
+        cfg_domain = self.__file['bind_domain']
+        if domain == '':
+            
+            system_api.system_api().restartMw()
+            return mw.returnJson(True, '清空域名成功!')
+
 
         # panel_tpl = mw.getRunDir() + "/data/tpl/nginx_panel.conf"
         # dst_panel_path = mw.getServerDir() + "/web_conf/nginx/vhost/panel.conf"
 
-        # cfg_domain = self.__file['bind_domain']
-        # if domain == '':
-        #     os.remove(cfg_domain)
-        #     os.remove(dst_panel_path)
-        #     mw.restartWeb()
-        #     return mw.returnJson(True, '清空域名成功!')
+        
 
         # reg = r"^([\w\-\*]{1,100}\.){1,4}(\w{1,10}|\w{1,10}\.\w{1,10})$"
         # if not re.match(reg, domain):
@@ -597,9 +600,10 @@ class config_api:
         # content = content.replace("{$LOGPATH}", mw.getRunDir() + '/logs')
         # content = content.replace("{$PANAL_ADDR}", mw.getRunDir())
         # mw.writeFile(dst_panel_path, content)
-        mw.restartWeb()
 
         mw.writeFile(cfg_domain, domain)
+        
+        system_api.system_api().restartMw()
         return mw.returnJson(True, '设置域名成功!')
 
      # 设置面板SSL

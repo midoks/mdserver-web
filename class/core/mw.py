@@ -1288,8 +1288,7 @@ def checkDomainPanel():
     domain = readFile('data/bind_domain.pl')
     port = readFile('data/port.pl').strip()
 
-    print(port)
-
+    # print(port)
     npid = getServerDir() + "/openresty/nginx/logs/nginx.pid"
     if not os.path.exists(npid):
         return False
@@ -1298,19 +1297,16 @@ def checkDomainPanel():
     if os.path.exists(nconf):
         port = "80"
 
-
-
     if domain:
         client_ip = getClientIp()
-        # if client_ip in ['127.0.0.1', 'localhost', '::1']:
-        #     return False
+        if client_ip in ['127.0.0.1', 'localhost', '::1']:
+            return False
 
         if tmp.strip().lower() != domain.strip().lower():
             from flask import Flask, redirect, request, url_for
             to = "http://" + domain + ":" + str(port)
-            print(to)
-            return False
-            # return redirect(to, code=302)
+            # print(to)
+            return redirect(to, code=302)
     return False
 
 

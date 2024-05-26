@@ -295,9 +295,6 @@ def code():
 
     out = io.BytesIO()
     codeImage[0].save(out, "png")
-
-    # print(codeImage[1])
-
     session['code'] = mw.md5(''.join(codeImage[1]).lower())
 
     img = Response(out.getvalue(), headers={'Content-Type': 'image/png'})
