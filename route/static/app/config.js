@@ -128,8 +128,9 @@ $('input[name="bind_ssl"]').click(function(){
 				if ( cert_type == 0 ){
 					$.post('/config/set_panel_local_ssl',{'cert_type':cert_type}, function(rdata){
 						console.log(rdata);
+						var to_https = window.location.href.replace('http','https');
 						showMsg(rdata.msg,function(){
-							// window.location.reload();
+							window.location.href = to_https;
 						},{icon:rdata.status?1:2},5000);
 					},'json');
 
@@ -161,7 +162,7 @@ $('input[name="bind_ssl"]').click(function(){
 					layer.msg("关闭SSL失败!");
 					return;
 				}
-				
+
 				$.post('/config/close_panel_ssl',{}, function(rdata){
 					var to_http = window.location.href.replace('https','http');
 					showMsg(rdata.msg,function(){
