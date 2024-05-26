@@ -402,6 +402,9 @@ class config_api:
 
         choose_file = self.__file['ssl']
         mw.writeFile(choose_file, 'local')
+
+        import system_api
+        system_api.system_api().restartMw()
         return mw.returnJson(True, '设置成功')
 
     # 关闭SSL
@@ -410,7 +413,8 @@ class config_api:
         if os.path.exists(choose_file):
             os.remove(choose_file)
 
-        mw.writeFile('data/restart.pl', 'True')
+        import system_api
+        system_api.system_api().restartMw()
         return mw.returnJson(True, '关闭SSL成功')
 
     # 保存面板证书
