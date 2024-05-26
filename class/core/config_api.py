@@ -645,7 +645,7 @@ class config_api:
 
         mw.buildSoftLink(src_csrpath, dst_csrpath, True)
         mw.buildSoftLink(src_keypath, dst_keypath, True)
-        mw.execShell('echo "lets" > "' + dst_letpath + '/README"')
+        mw.execShell('echo "lets" > "' + dst_path + '/README"')
 
         data = self.getPanelSslData()
 
