@@ -123,6 +123,7 @@ $('input[name="bind_ssl"]').click(function(){
 				</div>\
 			</div>',
 			yes: function(){
+				
 				var cert_type = $('select[name=cert_type]').val();
 				if ( cert_type == 0 ){
 					$.post('/config/set_panel_local_ssl',{'cert_type':cert_type}, function(rdata){
@@ -134,6 +135,9 @@ $('input[name="bind_ssl"]').click(function(){
 							}
 						},{icon:rdata.status?1:2},5000);
 					},'json');
+				} else if (cert_type == 1){
+					
+
 				}
 
 			}
@@ -174,7 +178,7 @@ $('input[name="bind_ssl"]').click(function(){
 			}
 		});
 	}
-	
+
 });
 
 /** op **/
