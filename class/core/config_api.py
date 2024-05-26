@@ -584,13 +584,13 @@ class config_api:
 
         siteName = mw.readFile(bind_domain).strip()
 
-        src_letpath = mw.getServerDir() + '/web_conf/letsencrypt/' + siteName
+        src_path = mw.getServerDir() + '/web_conf/letsencrypt/' + siteName
 
-        dst_letpath = mw.getRunDir() + '/ssl'
-        dst_csrpath = dst_letpath + '/cert.pem'
-        dst_keypath = dst_letpath + '/private.pem'
+        dst_path = mw.getRunDir() + '/ssl/nginx'
+        dst_csrpath = dst_path + '/cert.pem'
+        dst_keypath = dst_path + '/private.pem'
 
-        if os.path.exists(src_letpath) or os.path.exists(dst_csrpath):
+        if os.path.exists(src_path) or os.path.exists(dst_path):
             if os.path.exists(src_letpath):
                 mw.execShell('rm -rf ' + src_letpath)
             if os.path.exists(dst_csrpath):
