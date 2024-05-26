@@ -42,7 +42,7 @@ class config_api:
         'bind_domain' : 'data/bind_domain.pl',                  # 面板域名绑定
         'unauth_status' : 'data/unauthorized_status.pl',        # URL路径未成功显示状态
         'auth_secret': 'data/auth_secret.pl',                   # 二次验证密钥
-        'ssl':'data/ssl.pl',                                    # ssl设置
+        'ssl':'ssl/choose.pl',                                    # ssl设置
         'hook_database' : 'data/hook_database.json',            # 数据库钩子
         'hook_menu' : 'data/hook_menu.json',                    # 菜单钩子
         'hook_global_static' : 'data/hook_global_static.json',  # 静态文件钩子
@@ -363,17 +363,18 @@ class config_api:
 
     def getPanelSslData(self):
         cert = {}
-        keyPath = 'ssl/private.pem'
-        certPath = 'ssl/cert.pem'
+        keyPath = 'ssl/local/private.pem'
+        certPath = 'ssl/local/cert.pem'
+
         if not os.path.exists(certPath):
             # 不再自动生成证书
-            # mw.createSSL()
+            mw.createLocalSSL()
             cert['privateKey'] = ''
             cert['is_https'] = ''
             cert['certPem'] = ''
-            cert['rep'] = os.path.exists('ssl/input.pl')
-            cert['info'] = {'endtime': 0, 'subject': '无',
-                            'notAfter': '无', 'notBefore': '无', 'issuer': '无'}
+            cert['rep'] = os.path.exists('ssl/local/input.pl')
+            cert['info'] = mw.getCertName(certPath)
+            # cert['info'] = {'endtime': 0, 'subject': '无','notAfter': '无', 'notBefore': '无', 'issuer': '无'}
             return cert
 
         panel_ssl = mw.getServerDir() + "/web_conf/nginx/vhost/panel.conf"
@@ -389,6 +390,26 @@ class config_api:
         cert['rep'] = os.path.exists('ssl/input.pl')
         cert['info'] = mw.getCertName(certPath)
         return cert
+
+    # 面板本地SSL设置
+    def setPanelLocalSslApi(self):
+        cert = {}
+        keyPath = 'ssl/local/private.pem'
+        certPath = 'ssl/local/cert.pem'
+
+        if not os.path.exists(certPath):
+            mw.createLocalSSL()
+
+        choose_file = self.__file['ssl']
+        mw.writeFile(choose_file, 'local')
+        return mw.returnJson(True, '设置成功')
+
+    # 关闭SSL
+    def closePanelSslApi(self):
+        choose_file = self.__file['ssl']
+        if os.path.exists(choose_file):
+            os.remove(choose_file)
+        return mw.returnJson(True, '关闭SSL成功')
 
     # 保存面板证书
     def savePanelSslApi(self):
