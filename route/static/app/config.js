@@ -901,7 +901,7 @@ function getPanelSSL(){
 				//申请Lets证书
 				$('.apply-lets-ssl').click(function(){
 					showSpeedWindow('正在申请...', 'site.get_let_logs', function(layers,index){
-						$.post('/config/apply_panel_let_ssl',{},function(rdata){
+						$.post('/config/apply_panel_acme_ssl',{},function(rdata){
 							layer.close(loadT);
 							if(rdata.status){
 								layer.close(index);
