@@ -75,7 +75,9 @@ $('input[name="bind_domain"]').change(function(){
 	$('.btn_bind_domain').removeAttr('disabled');
 	$('.btn_bind_domain').unbind().click(function(){
 		$.post('/config/set_panel_domain','domain='+domain, function(rdata){
-			showMsg(rdata.msg,function(){window.location.reload();},{icon:rdata.status?1:2},2000);
+			showMsg(rdata.msg,function(){
+				window.location.href = rdata.data;
+			},{icon:rdata.status?1:2},2000);
 		},'json');
 	});
 });
@@ -123,7 +125,7 @@ $('input[name="bind_ssl"]').click(function(){
 				</div>\
 			</div>',
 			yes: function(){
-				
+
 				var cert_type = $('select[name=cert_type]').val();
 				if ( cert_type == 0 ){
 					$.post('/config/set_panel_local_ssl',{'cert_type':cert_type}, function(rdata){
@@ -136,7 +138,7 @@ $('input[name="bind_ssl"]').click(function(){
 						},{icon:rdata.status?1:2},5000);
 					},'json');
 				} else if (cert_type == 1){
-					
+
 
 				}
 

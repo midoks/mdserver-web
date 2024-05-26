@@ -575,9 +575,17 @@ class config_api:
 
         cfg_domain = self.__file['bind_domain']
         if domain == '':
+
+            if os.path.exists(cfg_domain):
+                os.remove(cfg_domain)
+
+            ip = mw.getLocalIp()
+            port = mw.readFile('data/port.pl').strip()
+
+            to_panel_url = 'http://'+ip+":"+port+'/config'
             
             system_api.system_api().restartMw()
-            return mw.returnJson(True, '清空域名成功!')
+            return mw.returnJson(True, '清空域名成功!', to_panel_url)
 
 
         # panel_tpl = mw.getRunDir() + "/data/tpl/nginx_panel.conf"
@@ -602,9 +610,12 @@ class config_api:
         # mw.writeFile(dst_panel_path, content)
 
         mw.writeFile(cfg_domain, domain)
-        
+
+        port = mw.readFile('data/port.pl').strip()
+        to_panel_url = 'http://'+domain+":"+port+'/config'
+
         system_api.system_api().restartMw()
-        return mw.returnJson(True, '设置域名成功!')
+        return mw.returnJson(True, '设置域名成功!',to_panel_url)
 
      # 设置面板SSL
     def setPanelSslApi(self):
