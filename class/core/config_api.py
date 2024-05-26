@@ -530,17 +530,17 @@ class config_api:
             'auth_to': auth_to,
         }
 
-        src_letpath = mw.getServerDir() + '/web_conf/letsencrypt/' + siteName
-        src_csrpath = src_letpath + "/fullchain.pem"  # 生成证书路径
-        src_keypath = src_letpath + "/privkey.pem"  # 密钥文件路径
+        src_path = mw.getServerDir() + '/web_conf/letsencrypt/' + siteName
+        src_csrpath = src_path + "/fullchain.pem"  # 生成证书路径
+        src_keypath = src_path + "/privkey.pem"  # 密钥文件路径
 
-        dst_letpath = mw.getRunDir() + '/ssl'
-        dst_csrpath = dst_letpath + '/cert.pem'
-        dst_keypath = dst_letpath + '/private.pem'
+        dst_path = mw.getRunDir() + '/domain/ssl'
+        dst_csrpath = dst_path + '/cert.pem'
+        dst_keypath = dst_path + '/private.pem'
 
         is_already_apply = False
 
-        if not os.path.exists(src_letpath):
+        if not os.path.exists(src_path):
             import cert_api
             data = cert_api.cert_api().applyCertApi(to_args)
             if not data['status']:
