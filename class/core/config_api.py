@@ -362,20 +362,23 @@ class config_api:
         return mw.getJson(cert)
 
     def getPanelSslData(self):
-        cert = {}
+        rdata = {}
+        choose_file = self.__file['ssl']
+        rdata['choose'] = mw.readFile(choose_file)
+
+
         keyPath = 'ssl/local/private.pem'
         certPath = 'ssl/local/cert.pem'
 
         if not os.path.exists(certPath):
-            # 不再自动生成证书
             mw.createLocalSSL()
-            cert['privateKey'] = ''
-            cert['is_https'] = ''
-            cert['certPem'] = ''
-            cert['rep'] = os.path.exists('ssl/local/input.pl')
-            cert['info'] = mw.getCertName(certPath)
-            # cert['info'] = {'endtime': 0, 'subject': '无','notAfter': '无', 'notBefore': '无', 'issuer': '无'}
-            return cert
+
+        cert = {}
+        cert['privateKey'] = mw.readFile(keyPath)
+        cert['is_https'] = ''
+        cert['certPem'] = mw.readFile(certPath)
+        cert['info'] = mw.getCertName(certPath)
+        rdata['local'] = cert
 
         panel_ssl = mw.getServerDir() + "/web_conf/nginx/vhost/panel.conf"
         if not os.path.exists(panel_ssl):
@@ -385,11 +388,17 @@ class config_api:
             if ssl_data.find('$server_port !~ 443') != -1:
                 cert['is_https'] = 'checked'
 
+        keyPath = 'ssl/nginx/private.pem'
+        certPath = 'ssl/nginx/cert.pem'
+
+        cert = {}
         cert['privateKey'] = mw.readFile(keyPath)
         cert['certPem'] = mw.readFile(certPath)
-        cert['rep'] = os.path.exists('ssl/input.pl')
         cert['info'] = mw.getCertName(certPath)
-        return cert
+
+        rdata['nginx'] = cert
+
+        return rdata
 
     # 面板本地SSL设置
     def setPanelLocalSslApi(self):

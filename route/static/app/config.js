@@ -804,6 +804,19 @@ function getPanelSSL(){
 	$.post('/config/get_panel_ssl',{},function(cert){
 		layer.close(loadT);
 
+		console.log(cert);
+
+		var choose = cert['choose'];
+
+		if (choose == 'local'){
+			cert = cert['local'];
+		} else if (choose == 'nginx') {
+			cert = cert['nginx'];
+		} else {
+			layer.msg("无效配置");
+			return;
+		}
+
 
 		var cert_data = '';
 		if (cert['info']){
