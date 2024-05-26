@@ -407,11 +407,100 @@ class config_api:
         system_api.system_api().restartMw()
         return mw.returnJson(True, '设置成功')
 
+    def setPanelAcmeSslApi(self):
+
+        bind_domain = self.__file['bind_domain']
+        if not os.path.exists(bind_domain):
+            return mw.returnJson(False, '先要绑定域名!')
+
+        # 生成nginx配置
+        domain = mw.readFile(bind_domain)
+        panel_tpl = mw.getRunDir() + "/data/tpl/nginx_panel.conf"
+        dst_panel_path = mw.getServerDir() + "/web_conf/nginx/vhost/panel.conf"
+        if not os.path.exists(dst_panel_path):
+            reg = r"^([\w\-\*]{1,100}\.){1,4}(\w{1,10}|\w{1,10}\.\w{1,10})$"
+            if not re.match(reg, domain):
+                return mw.returnJson(False, '主域名格式不正确')
+
+            op_dir = mw.getServerDir() + "/openresty"
+            if not os.path.exists(op_dir):
+                return mw.returnJson(False, '依赖OpenResty,先安装启动它!')
+
+            content = mw.readFile(panel_tpl)
+            content = content.replace("{$PORT}", "80")
+            content = content.replace("{$SERVER_NAME}", domain)
+            content = content.replace("{$PANAL_PORT}", mw.readFile('data/port.pl'))
+            content = content.replace("{$LOGPATH}", mw.getRunDir() + '/logs')
+            content = content.replace("{$PANAL_ADDR}", mw.getRunDir())
+            mw.writeFile(dst_panel_path, content)
+            mw.restartWeb()
+
+
+        siteName = mw.readFile(bind_domain).strip()
+        auth_to = mw.getRunDir() + "/tmp"
+        to_args = {
+            'domains': [siteName],
+            'auth_type': 'http',
+            'auth_to': auth_to,
+        }
+
+        src_path = mw.getServerDir() + '/web_conf/letsencrypt/' + siteName
+        src_csrpath = src_path + "/fullchain.pem"  # 生成证书路径
+        src_keypath = src_path + "/privkey.pem"  # 密钥文件路径
+
+        dst_path = mw.getRunDir() + '/ssl/nginx'
+        if not os.path.exists(dst_path):
+            mw.execShell('mkdir -p ' + dst_path)
+
+        dst_csrpath = dst_path + '/cert.pem'
+        dst_keypath = dst_path + '/private.pem'
+
+        is_already_apply = False
+
+        if not os.path.exists(src_path):
+            import cert_api
+            data = cert_api.cert_api().applyCertApi(to_args)
+            if not data['status']:
+                msg = data['msg']
+                if type(data['msg']) != str:
+                    msg = data['msg'][0]
+                    emsg = data['msg'][1]['challenges'][0]['error']
+                    msg = msg + '<p><span>响应状态:</span>' + str(emsg['status']) + '</p><p><span>错误类型:</span>' + emsg[
+                        'type'] + '</p><p><span>错误代码:</span>' + emsg['detail'] + '</p>'
+                return mw.returnJson(data['status'], msg, data['msg'])
+        else:
+            is_already_apply = True
+
+        mw.buildSoftLink(src_csrpath, dst_csrpath, True)
+        mw.buildSoftLink(src_keypath, dst_keypath, True)
+        mw.execShell('echo "lets" > "' + dst_letpath + '/README"')
+
+        data = self.getPanelSslData()
+
+        tmp_well_know = auth_to + '/.well-known'
+        if os.path.exists(tmp_well_know):
+            mw.execShell('rm -rf ' + tmp_well_know)
+
+        if is_already_apply:
+            return mw.returnJson(True, '重复申请!', data)
+
+        choose_file = self.__file['ssl']
+        mw.writeFile(choose_file, 'local')
+        return mw.returnJson(True, '设置成功!', data)
+
     # 关闭SSL
     def closePanelSslApi(self):
         choose_file = self.__file['ssl']
         if os.path.exists(choose_file):
             os.remove(choose_file)
+
+        local_ssl = 'ssl/local'
+        if os.path.exists(local_ssl):
+            mw.execShell('rm -rf '+ local_ssl)
+
+        nginx_ssl = 'ssl/nginx'
+        if os.path.exists(nginx_ssl):
+            mw.execShell('rm -rf '+ nginx_ssl)
 
         import system_api
         system_api.system_api().restartMw()
@@ -448,7 +537,7 @@ class config_api:
         if not os.path.exists(bind_domain):
             return mw.returnJson(False, '先要绑定域名!')
 
-        keyPath = 'ssl/private.pem'
+        keyPath = 'ssl/nginx/private.pem'
         if not os.path.exists(keyPath):
             return mw.returnJson(False, '未申请SSL证书!')
 
@@ -515,7 +604,7 @@ class config_api:
         return mw.returnJson(False, '已经不存在SSL!')
 
     # 申请面板let证书
-    def applyPanelLetSslApi(self):
+    def applyPanelAcmeSslApi(self):
 
         # check domain is bind?
         bind_domain = self.__file['bind_domain']
@@ -534,7 +623,7 @@ class config_api:
         src_csrpath = src_path + "/fullchain.pem"  # 生成证书路径
         src_keypath = src_path + "/privkey.pem"  # 密钥文件路径
 
-        dst_path = mw.getRunDir() + '/domain/ssl'
+        dst_path = mw.getRunDir() + '/ssl/nginx'
         dst_csrpath = dst_path + '/cert.pem'
         dst_keypath = dst_path + '/private.pem'
 
@@ -586,28 +675,6 @@ class config_api:
             
             system_api.system_api().restartMw()
             return mw.returnJson(True, '清空域名成功!', to_panel_url)
-
-
-        # panel_tpl = mw.getRunDir() + "/data/tpl/nginx_panel.conf"
-        # dst_panel_path = mw.getServerDir() + "/web_conf/nginx/vhost/panel.conf"
-
-        
-
-        # reg = r"^([\w\-\*]{1,100}\.){1,4}(\w{1,10}|\w{1,10}\.\w{1,10})$"
-        # if not re.match(reg, domain):
-        #     return mw.returnJson(False, '主域名格式不正确')
-
-        # op_dir = mw.getServerDir() + "/openresty"
-        # if not os.path.exists(op_dir):
-        #     return mw.returnJson(False, '依赖OpenResty,先安装启动它!')
-
-        # content = mw.readFile(panel_tpl)
-        # content = content.replace("{$PORT}", "80")
-        # content = content.replace("{$SERVER_NAME}", domain)
-        # content = content.replace("{$PANAL_PORT}", mw.readFile('data/port.pl'))
-        # content = content.replace("{$LOGPATH}", mw.getRunDir() + '/logs')
-        # content = content.replace("{$PANAL_ADDR}", mw.getRunDir())
-        # mw.writeFile(dst_panel_path, content)
 
         mw.writeFile(cfg_domain, domain)
 
