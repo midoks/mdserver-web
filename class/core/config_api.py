@@ -412,8 +412,7 @@ class config_api:
         choose_file = self.__file['ssl']
         mw.writeFile(choose_file, 'local')
 
-        import system_api
-        system_api.system_api().restartMw()
+        mw.restartMw()
         return mw.returnJson(True, '设置成功')
 
     # 关闭SSL
@@ -430,12 +429,13 @@ class config_api:
         if os.path.exists(nginx_ssl):
             mw.execShell('rm -rf '+ nginx_ssl)
 
-        import system_api
-        system_api.system_api().restartMw()
+        mw.restartMw()
         return mw.returnJson(True, '关闭SSL成功')
 
     # 保存面板证书
     def savePanelSslApi(self):
+
+
         keyPath = 'ssl/private.pem'
         certPath = 'ssl/cert.pem'
         checkCert = '/tmp/cert.pl'
@@ -455,7 +455,6 @@ class config_api:
             mw.writeFile(certPath, certPem)
         if not mw.checkCert(checkCert):
             return mw.returnJson(False, '证书错误,请检查!')
-        mw.writeFile('ssl/input.pl', 'True')
         return mw.returnJson(True, '证书已保存!')
 
     # 设置面板SSL证书设置
@@ -502,7 +501,7 @@ class config_api:
                 conf = re.sub(rep, '', conf)
                 mw.writeFile(panel_ssl, conf)
 
-        mw.restartWeb()
+        mw.restartNginx()
 
         action = '开启'
         if is_https == 'true':
@@ -530,10 +529,10 @@ class config_api:
                 mw.execShell('rm -rf ' + dst_csrpath)
             if os.path.exists(dst_keypath):
                 mw.execShell('rm -rf ' + dst_keypath)
-            # mw.restartWeb()
+            mw.restartNginx()
             return mw.returnJson(True, '已经删除SSL!')
 
-        # mw.restartWeb()
+        mw.restartNginx()
         return mw.returnJson(False, '已经不存在SSL!')
 
     # 申请面板let证书
@@ -564,7 +563,7 @@ class config_api:
             content = content.replace("{$LOGPATH}", mw.getRunDir() + '/logs')
             content = content.replace("{$PANAL_ADDR}", mw.getRunDir())
             mw.writeFile(dst_panel_path, content)
-            mw.restartWeb()
+            mw.restartNginx()
 
         siteName = mw.readFile(bind_domain).strip()
         auth_to = mw.getRunDir() + "/tmp"

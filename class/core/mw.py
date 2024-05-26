@@ -347,6 +347,9 @@ def restartMw():
     import system_api
     system_api.system_api().restartMw()
 
+def restartNginx(self):
+    writeFile('data/restart_nginx.pl', 'True')
+    return True
 
 def checkWebConfig():
     op_dir = getServerDir() + '/openresty/nginx'
