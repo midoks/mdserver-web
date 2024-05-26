@@ -813,10 +813,8 @@ function getPanelSSL(){
 		} else if (choose == 'nginx') {
 			cert = cert['nginx'];
 		} else {
-			layer.msg("无效配置");
-			return;
+			cert = cert['local'];
 		}
-
 
 		var cert_data = '';
 		if (cert['info']){
