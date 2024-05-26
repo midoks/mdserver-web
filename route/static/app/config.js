@@ -77,7 +77,7 @@ $('input[name="bind_domain"]').change(function(){
 		$.post('/config/set_panel_domain','domain='+domain, function(rdata){
 			showMsg(rdata.msg,function(){
 				window.location.href = rdata.data;
-			},{icon:rdata.status?1:2},2000);
+			},{icon:rdata.status?1:2},5000);
 		},'json');
 	});
 });
