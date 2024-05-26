@@ -611,6 +611,28 @@ class config_api:
         if not os.path.exists(bind_domain):
             return mw.returnJson(False, '先要绑定域名!')
 
+        # 生成nginx配置
+        domain = mw.readFile(bind_domain)
+        panel_tpl = mw.getRunDir() + "/data/tpl/nginx_panel.conf"
+        dst_panel_path = mw.getServerDir() + "/web_conf/nginx/vhost/panel.conf"
+        if not os.path.exists(dst_panel_path):
+            reg = r"^([\w\-\*]{1,100}\.){1,4}(\w{1,10}|\w{1,10}\.\w{1,10})$"
+            if not re.match(reg, domain):
+                return mw.returnJson(False, '主域名格式不正确')
+
+            op_dir = mw.getServerDir() + "/openresty"
+            if not os.path.exists(op_dir):
+                return mw.returnJson(False, '依赖OpenResty,先安装启动它!')
+
+            content = mw.readFile(panel_tpl)
+            content = content.replace("{$PORT}", "80")
+            content = content.replace("{$SERVER_NAME}", domain)
+            content = content.replace("{$PANAL_PORT}", mw.readFile('data/port.pl'))
+            content = content.replace("{$LOGPATH}", mw.getRunDir() + '/logs')
+            content = content.replace("{$PANAL_ADDR}", mw.getRunDir())
+            mw.writeFile(dst_panel_path, content)
+            mw.restartWeb()
+
         siteName = mw.readFile(bind_domain).strip()
         auth_to = mw.getRunDir() + "/tmp"
         to_args = {
