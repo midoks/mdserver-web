@@ -129,7 +129,9 @@ $('input[name="bind_ssl"]').click(function(){
 						console.log(rdata);
 						var to_https = window.location.href.replace('http','https');
 						showMsg(rdata.msg,function(){
-							window.location.href = to_https;
+							if (rdata.status){
+								window.location.href = to_https;
+							}
 						},{icon:rdata.status?1:2},5000);
 					},'json');
 				}
@@ -164,7 +166,9 @@ $('input[name="bind_ssl"]').click(function(){
 				$.post('/config/close_panel_ssl',{}, function(rdata){
 					var to_http = window.location.href.replace('https','http');
 					showMsg(rdata.msg,function(){
-						window.location.href = to_http;
+						if (rdata.status){
+							window.location.href = to_http;
+						}
 					},{icon:rdata.status?1:2},5000);
 				},'json');
 			}
