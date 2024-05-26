@@ -572,31 +572,31 @@ class config_api:
     def setPanelDomainApi(self):
         domain = request.form.get('domain', '')
 
-        panel_tpl = mw.getRunDir() + "/data/tpl/nginx_panel.conf"
-        dst_panel_path = mw.getServerDir() + "/web_conf/nginx/vhost/panel.conf"
+        # panel_tpl = mw.getRunDir() + "/data/tpl/nginx_panel.conf"
+        # dst_panel_path = mw.getServerDir() + "/web_conf/nginx/vhost/panel.conf"
 
-        cfg_domain = self.__file['bind_domain']
-        if domain == '':
-            os.remove(cfg_domain)
-            os.remove(dst_panel_path)
-            mw.restartWeb()
-            return mw.returnJson(True, '清空域名成功!')
+        # cfg_domain = self.__file['bind_domain']
+        # if domain == '':
+        #     os.remove(cfg_domain)
+        #     os.remove(dst_panel_path)
+        #     mw.restartWeb()
+        #     return mw.returnJson(True, '清空域名成功!')
 
-        reg = r"^([\w\-\*]{1,100}\.){1,4}(\w{1,10}|\w{1,10}\.\w{1,10})$"
-        if not re.match(reg, domain):
-            return mw.returnJson(False, '主域名格式不正确')
+        # reg = r"^([\w\-\*]{1,100}\.){1,4}(\w{1,10}|\w{1,10}\.\w{1,10})$"
+        # if not re.match(reg, domain):
+        #     return mw.returnJson(False, '主域名格式不正确')
 
-        op_dir = mw.getServerDir() + "/openresty"
-        if not os.path.exists(op_dir):
-            return mw.returnJson(False, '依赖OpenResty,先安装启动它!')
+        # op_dir = mw.getServerDir() + "/openresty"
+        # if not os.path.exists(op_dir):
+        #     return mw.returnJson(False, '依赖OpenResty,先安装启动它!')
 
-        content = mw.readFile(panel_tpl)
-        content = content.replace("{$PORT}", "80")
-        content = content.replace("{$SERVER_NAME}", domain)
-        content = content.replace("{$PANAL_PORT}", mw.readFile('data/port.pl'))
-        content = content.replace("{$LOGPATH}", mw.getRunDir() + '/logs')
-        content = content.replace("{$PANAL_ADDR}", mw.getRunDir())
-        mw.writeFile(dst_panel_path, content)
+        # content = mw.readFile(panel_tpl)
+        # content = content.replace("{$PORT}", "80")
+        # content = content.replace("{$SERVER_NAME}", domain)
+        # content = content.replace("{$PANAL_PORT}", mw.readFile('data/port.pl'))
+        # content = content.replace("{$LOGPATH}", mw.getRunDir() + '/logs')
+        # content = content.replace("{$PANAL_ADDR}", mw.getRunDir())
+        # mw.writeFile(dst_panel_path, content)
         mw.restartWeb()
 
         mw.writeFile(cfg_domain, domain)
