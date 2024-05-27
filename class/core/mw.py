@@ -1292,7 +1292,7 @@ def checkDomainPanel():
     port = readFile('data/port.pl').strip()
 
     scheme = 'http'
-    
+
     choose_file = getRunDir()+'/ssl/choose.pl'
     if os.path.exists(choose_file):
         choose = readFile(choose_file).strip()
@@ -1312,19 +1312,21 @@ def checkDomainPanel():
         nconf = getServerDir() + "/web_conf/nginx/vhost/panel.conf"
         if os.path.exists(nconf):
             port = "80"
+    if not domain:
+        return False
 
+    client_ip = getClientIp()
+    if client_ip in ['127.0.0.1', 'localhost', '::1']:
+        return False
 
-    if domain:
-        client_ip = getClientIp()
-        if client_ip in ['127.0.0.1', 'localhost', '::1']:
-            return False
+    if tmp.strip().lower() != domain.strip().lower():
+        from flask import Flask, redirect, request, url_for
+        to = scheme + "://" + domain + ":" + str(port)
+        # print(to)
+        return redirect(to, code=302)
 
-        if tmp.strip().lower() != domain.strip().lower():
-            from flask import Flask, redirect, request, url_for
-            to = scheme + "://" + domain + ":" + str(port)
-            # print(to)
-            return redirect(to, code=302)
     return False
+
 
 
 def createLinuxUser(user, group):
