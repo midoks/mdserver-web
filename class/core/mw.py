@@ -1293,8 +1293,8 @@ def checkDomainPanel():
 
     scheme = 'http'
 
-    local_ssl = mw.getRunDir()+'/ssl/local'
-    choose_file = mw.getRunDir()+'/ssl/choose.pl'
+    local_ssl = getRunDir()+'/ssl/local'
+    choose_file = getRunDir()+'/ssl/choose.pl'
     if os.path.exists(choose_file):
         choose = readFile(choose_file).strip()
         if choose == 'local':
@@ -1309,7 +1309,7 @@ def checkDomainPanel():
             nconf = getServerDir() + "/web_conf/nginx/vhost/panel.conf"
             if os.path.exists(nconf):
                 port = "80"
-            
+
 
     if domain:
         client_ip = getClientIp()
