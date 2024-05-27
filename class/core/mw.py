@@ -1298,7 +1298,7 @@ def checkDomainPanel():
 
     if os.path.exists(choose_file):
         choose = readFile(choose_file).strip()
-        if not mw.inArray(['local','nginx'], choose):
+        if not inArray(['local','nginx'], choose):
             return False
 
     if choose == 'local':
