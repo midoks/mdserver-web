@@ -21,7 +21,6 @@ function toSizePos(a,pos=0) {
 	var e = 1024;
 	var r = {};
 	for(var b = 0; b < d.length; b++) {
-
 		if( pos > 0 &&  b == pos && a < e) {
 			r['name'] = (b == 0 ? a : a.toFixed(2)) + d[b]
 			r['pos'] = b;
