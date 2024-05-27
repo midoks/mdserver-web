@@ -1298,6 +1298,8 @@ def checkDomainPanel():
         choose = readFile(choose_file).strip()
         if not inArray(['local','nginx'], choose):
             return False
+    else:
+        return False
 
     local_ssl = getRunDir()+'/ssl/local'
     if choose == 'local':
