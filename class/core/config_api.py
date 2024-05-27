@@ -636,8 +636,10 @@ class config_api:
         if os.path.exists(tmp_well_know):
             mw.execShell('rm -rf ' + tmp_well_know)
 
-        choose_file = self.__file['ssl']
-        mw.writeFile(choose_file, 'nginx')
+        if os.path.exists(dst_path):
+            choose_file = self.__file['ssl']
+            mw.writeFile(choose_file, 'nginx')
+            
         if is_already_apply:
             return mw.returnJson(True, '重复申请!', data)
         return mw.returnJson(True, '申请成功!', data)
