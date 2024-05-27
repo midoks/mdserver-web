@@ -683,8 +683,7 @@ function wsSitesListRequest(page){
         var stat_length = 0;
         var stat_req = 0;
 
-        console.log(rdata, data);
-
+        // console.log(rdata, data);
          var list = '';
         if (data.length > 0){
             for(i in data){
