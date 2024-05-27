@@ -1293,6 +1293,14 @@ def checkDomainPanel():
 
     scheme = 'http'
 
+    local_ssl = mw.getRunDir()+'/ssl/local'
+    choose_file = mw.getRunDir()+'/ssl/choose.pl'
+    if os.path.exists(choose_file):
+        choose = readFile(choose_file).strip()
+        if choose == 'local':
+            scheme == 'https'
+
+
     # print(port)
     npid = getServerDir() + "/openresty/nginx/logs/nginx.pid"
     if not os.path.exists(npid):
