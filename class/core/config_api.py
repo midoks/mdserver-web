@@ -435,13 +435,20 @@ class config_api:
     # 保存面板证书
     def savePanelSslApi(self):
 
-
+        choose = request.form.get('choose', '').strip()
         certPem = request.form.get('certPem', '').strip()
         privateKey = request.form.get('privateKey', '').strip()
 
-        keyPath = 'ssl/private.pem'
-        certPath = 'ssl/cert.pem'
+        if not mw.inArray(['local','nginx'], choose):
+            return mw.returnJson(True, '保存错误面板SSL类型!')
+
+
+        keyPath = 'ssl/'+choose+'/private.pem'
+        certPath = 'ssl/'+choose+'/cert.pem'
         checkCert = '/tmp/cert.pl'
+
+        if not os.path.exists(keyPath):
+            return mw.returnJson(False, '【'+choose+'】SSL类型不存在,先申请!')
 
         if(privateKey.find('KEY') == -1):
             return mw.returnJson(False, '秘钥错误，请检查!')
@@ -510,30 +517,52 @@ class config_api:
 
     # 删除面板证书
     def delPanelSslApi(self):
-        bind_domain = self.__file['bind_domain']
-        if not os.path.exists(bind_domain):
-            return mw.returnJson(False, '未绑定域名!')
 
-        siteName = mw.readFile(bind_domain).strip()
+        choose = request.form.get('choose', '').strip()
 
-        src_path = mw.getServerDir() + '/web_conf/letsencrypt/' + siteName
+        if not mw.inArray(['local','nginx'], choose):
+            return mw.returnJson(True, '删除错误面板SSL类型!')
 
-        dst_path = mw.getRunDir() + '/ssl/nginx'
-        dst_csrpath = dst_path + '/cert.pem'
-        dst_keypath = dst_path + '/private.pem'
 
-        if os.path.exists(src_path) or os.path.exists(dst_path):
-            if os.path.exists(src_letpath):
-                mw.execShell('rm -rf ' + src_letpath)
-            if os.path.exists(dst_csrpath):
-                mw.execShell('rm -rf ' + dst_csrpath)
-            if os.path.exists(dst_keypath):
-                mw.execShell('rm -rf ' + dst_keypath)
+        if choose == 'local':
+            dst_path = mw.getRunDir() + '/ssl/local'
+            ssl_file = self.__file['ssl']
+            if os.path.exists(dst_path):
+                mw.execShell('rm -rf ' + dst_path)
+                mw.execShell('rm -rf ' + ssl_file)
+                mw.restartMw();
+                return mw.returnJson(True, '删除本地面板SSL成功!')
+            else:
+                return mw.returnJson(True, '已经删除本地面板SSL!')
+
+        if choose == 'nginx':
+
+            bind_domain = self.__file['bind_domain']
+            if not os.path.exists(bind_domain):
+                return mw.returnJson(False, '未绑定域名!')
+
+            siteName = mw.readFile(bind_domain).strip()
+
+            src_path = mw.getServerDir() + '/web_conf/letsencrypt/' + siteName
+
+            dst_path = mw.getRunDir() + '/ssl/nginx'
+            dst_csrpath = dst_path + '/cert.pem'
+            dst_keypath = dst_path + '/private.pem'
+
+            if os.path.exists(src_path) or os.path.exists(dst_path):
+                if os.path.exists(src_letpath):
+                    mw.execShell('rm -rf ' + src_letpath)
+                if os.path.exists(dst_csrpath):
+                    mw.execShell('rm -rf ' + dst_csrpath)
+                if os.path.exists(dst_keypath):
+                    mw.execShell('rm -rf ' + dst_keypath)
+                mw.restartNginx()
+                return mw.returnJson(True, '删除面板SSL成功!')
+
             mw.restartNginx()
-            return mw.returnJson(True, '已经删除SSL!')
-
-        mw.restartNginx()
-        return mw.returnJson(False, '已经不存在SSL!')
+            mw.restartMw()
+            return mw.returnJson(False, '已经删除面板SSL!')
+        return  mw.returnJson(False, '未知类型!')
 
     # 申请面板let证书
     def applyPanelAcmeSslApi(self):

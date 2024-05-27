@@ -877,7 +877,7 @@ function getPanelSSL(){
 			success:function(layero, layer_id){
 
 				$('select[name="choose"]').change(function(){
-					
+
 				});
 
 				//保存SSL
@@ -886,26 +886,78 @@ function getPanelSSL(){
 						privateKey:$("#key").val(),
 						certPem:$("#csr").val()
 					}
-					var loadT = layer.msg('正在安装并设置SSL组件,这需要几分钟时间...',{icon:16,time:0,shade: [0.3, '#000']});
-					$.post('/config/save_panel_ssl',data,function(rdata){
-						layer.close(loadT);
-						if(rdata.status){
-							layer.closeAll();
-						}
-						layer.msg(rdata.msg,{icon:rdata.status?1:2});
-					},'json');
+
+					layer.confirm('选择保存面板SSL方式?', 
+					{
+						title:'提示', 
+						shade:0.001,
+						btn: ['本地SSL', '取消', 'OpenResty'],
+						btn3:function(){
+							data['choose'] = 'nginx';
+							var loadT = layer.msg('正在安装并设置SSL组件,这需要几分钟时间...',{icon:16,time:0,shade: [0.3, '#000']});
+							$.post('/config/save_panel_ssl',data,function(rdata){
+								layer.close(loadT);
+								if(rdata.status){
+									layer.closeAll();
+								}
+								layer.msg(rdata.msg,{icon:rdata.status?1:2});
+							},'json');
+						},
+					},
+					function(index) {
+						data['choose'] = 'local';
+				    	var loadT = layer.msg('正在安装并设置SSL组件,这需要几分钟时间...',{icon:16,time:0,shade: [0.3, '#000']});
+						$.post('/config/save_panel_ssl',data,function(rdata){
+							layer.close(loadT);
+							if(rdata.status){
+								layer.closeAll();
+							}
+							layer.msg(rdata.msg,{icon:rdata.status?1:2});
+						},'json');
+				    },
+				    function(index) {
+				        layer.close(index);
+				    });
 				});
 
 				//删除SSL
 				$('.del-panel-ssl').click(function(){
-					var loadT = layer.msg('正在删除SSL...',{icon:16,time:0,shade: [0.3, '#000']});
-					$.post('/config/del_panel_ssl',data,function(rdata){
-						layer.close(loadT);
-						if(rdata.status){
-							layer.closeAll();
-						}
-						layer.msg(rdata.msg,{icon:rdata.status?1:2});
-					},'json');
+
+					layer.confirm('选择删除面板SSL方式?', 
+					{
+						title:'提示', 
+						shade:0.001,
+						btn: ['本地SSL', '取消', 'OpenResty'],
+						btn3:function(){
+							var data = {};
+							data['choose'] = 'nginx';
+							var loadT = layer.msg('正在删除面板SSL【nginx】...',{icon:16,time:0,shade: [0.3, '#000']});
+							$.post('/config/del_panel_ssl',data,function(rdata){
+								layer.close(loadT);
+								if(rdata.status){
+									layer.closeAll();
+								}
+								layer.msg(rdata.msg,{icon:rdata.status?1:2});
+							},'json');
+						},
+					},
+					function(index) {
+						var data = {};
+						data['choose'] = 'local';
+						var loadT = layer.msg('正在删除面板SSL【本地】...',{icon:16,time:0,shade: [0.3, '#000']});
+						$.post('/config/del_panel_ssl',data,function(rdata){
+							layer.close(loadT);
+							if(rdata.status){
+								layer.closeAll();
+							}
+							layer.msg(rdata.msg,{icon:rdata.status?1:2});
+						},'json');
+				    },
+				    function(index) {
+				        layer.close(index);
+				    });
+
+					
 				});
 
 				// 设置面板SSL的Http
