@@ -28,7 +28,7 @@ from flask import request
 
 class config_api:
 
-    __version = '0.16.9.6'
+    __version = '0.17.0'
     __api_addr = 'data/api.json'
 
     # 统一默认配置文件
