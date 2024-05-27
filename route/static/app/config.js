@@ -960,37 +960,37 @@ function getPanelSSL(){
 					
 				});
 
-				// 设置面板SSL的Http
-				$('.set_panel_http_to_https').click(function(){
-					var https = $('#toHttps').prop('checked');
-					$.post('/config/set_panel_http_to_https',{'https':https},function(rdata){
-						layer.close(loadT);
-						if(rdata.status){
-							layer.closeAll();
-						}
-						layer.msg(rdata.msg,{icon:rdata.status?1:2});
-					},'json');
-				});
+				// // 设置面板SSL的Http
+				// $('.set_panel_http_to_https').click(function(){
+				// 	var https = $('#toHttps').prop('checked');
+				// 	$.post('/config/set_panel_http_to_https',{'https':https},function(rdata){
+				// 		layer.close(loadT);
+				// 		if(rdata.status){
+				// 			layer.closeAll();
+				// 		}
+				// 		layer.msg(rdata.msg,{icon:rdata.status?1:2});
+				// 	},'json');
+				// });
 
-				//申请Lets证书
-				$('.apply-lets-ssl').click(function(){
-					showSpeedWindow('正在申请...', 'site.get_let_logs', function(layers,index){
-						$.post('/config/apply_panel_acme_ssl',{},function(rdata){
-							layer.close(loadT);
-							if(rdata.status){
-								layer.close(index);
-								var tdata = rdata['data'];
-								$('.ssl_issue').text(tdata['info']['issuer']);
-								$('.ssl_endtime').text("剩余"+tdata['info']['endtime']+"天到期");
-								$('.ssl_subject').text(tdata['info']['subject']);
+				// //申请Lets证书
+				// $('.apply-lets-ssl').click(function(){
+				// 	showSpeedWindow('正在申请...', 'site.get_let_logs', function(layers,index){
+				// 		$.post('/config/apply_panel_acme_ssl',{},function(rdata){
+				// 			layer.close(loadT);
+				// 			if(rdata.status){
+				// 				layer.close(index);
+				// 				var tdata = rdata['data'];
+				// 				$('.ssl_issue').text(tdata['info']['issuer']);
+				// 				$('.ssl_endtime').text("剩余"+tdata['info']['endtime']+"天到期");
+				// 				$('.ssl_subject').text(tdata['info']['subject']);
 
-								$('textarea[name="key"]').val(tdata['info']['privateKey']);
-								$('textarea[name="csr"]').val(tdata['info']['certPem']);
-							}
-							layer.msg(rdata.msg,{icon:rdata.status?1:2});
-						},'json');
-					});
-				});
+				// 				$('textarea[name="key"]').val(tdata['info']['privateKey']);
+				// 				$('textarea[name="csr"]').val(tdata['info']['certPem']);
+				// 			}
+				// 			layer.msg(rdata.msg,{icon:rdata.status?1:2});
+				// 		},'json');
+				// 	});
+				// });
 			}
 		});
 	},'json');
