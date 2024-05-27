@@ -1149,7 +1149,7 @@ var index = {
                 index.net.default_unit = upTmp['name'].split(' ')[1] + '/s';
 
                 var downTmpSize = toSizePos(down,upTmp[1])['name'].split(' ')[0];
-                console.log(toSizePos(up, upTmp[1]),downTmpSize);
+                console.log(toSizePos(down, upTmp[1]),downTmpSize);
 
                 _net.data.zData.push(downTmpSize);
                 _net.data.yData.push(upTmpSize);
