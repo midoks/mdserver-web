@@ -613,29 +613,25 @@ class config_api:
         return mw.returnJson(True, '申请成功!', data)
 
     def setPanelDomainApi(self):
-        import system_api
         domain = request.form.get('domain', '')
 
         cfg_domain = self.__file['bind_domain']
-        if domain == '':
 
+        port = mw.readFile('data/port.pl').strip()
+        ip = mw.getLocalIp()
+
+        if domain == '':
             if os.path.exists(cfg_domain):
                 os.remove(cfg_domain)
 
-            ip = mw.getLocalIp()
-            port = mw.readFile('data/port.pl').strip()
-
             to_panel_url = 'http://'+ip+":"+port+'/config'
             
-            system_api.system_api().restartMw()
+            mw.restartMw()
             return mw.returnJson(True, '清空域名成功!', to_panel_url)
 
         mw.writeFile(cfg_domain, domain)
-
-        port = mw.readFile('data/port.pl').strip()
         to_panel_url = 'http://'+domain+":"+port+'/config'
-
-        system_api.system_api().restartMw()
+        mw.restartMw()
         return mw.returnJson(True, '设置域名成功!',to_panel_url)
 
      # 设置面板SSL
