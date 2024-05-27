@@ -1300,15 +1300,16 @@ def checkDomainPanel():
         if choose == 'local':
             scheme == 'https'
 
+        if choose == 'nginx':
+            # print(port)
+            npid = getServerDir() + "/openresty/nginx/logs/nginx.pid"
+            if not os.path.exists(npid):
+                return False
 
-    # print(port)
-    npid = getServerDir() + "/openresty/nginx/logs/nginx.pid"
-    if not os.path.exists(npid):
-        return False
-
-    nconf = getServerDir() + "/web_conf/nginx/vhost/panel.conf"
-    if os.path.exists(nconf):
-        port = "80"
+            nconf = getServerDir() + "/web_conf/nginx/vhost/panel.conf"
+            if os.path.exists(nconf):
+                port = "80"
+            
 
     if domain:
         client_ip = getClientIp()
