@@ -472,7 +472,7 @@ case "$1" in
         port=7200
         scheme=http
 
-        if [ -f $mw_path/ssl/choose.pl ];
+        if [ -f $mw_path/ssl/choose.pl ];then
             scheme=https
         fi
         
