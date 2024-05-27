@@ -88,6 +88,7 @@ $('input[name="bind_ssl"]').click(function(){
 
 	//开启证书
 	if (panel_ssl){
+		// <option value="1">ACME</option>
 		layer.open({
 			type:1,
 			closeBtn: 1,
@@ -113,7 +114,6 @@ $('input[name="bind_ssl"]').click(function(){
 						<div class="info-r" style="margin-left: 78px;">\
 							<select class="bt-input-text mr5" name="cert_type" style="width: 440px;">\
 								<option value="0">自签证书 (推荐，浏览器会提示不安全。可忽略，请放心开启)</option>\
-								<option value="1">ACME</option>\
 							</select>\
 						</div>\
 					</div>\
