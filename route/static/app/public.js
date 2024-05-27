@@ -34,7 +34,6 @@ function toSizePos(a, pos = 0) {
 				return r
 			}
 		}
-		
 		a /= e;
 	}
 }
