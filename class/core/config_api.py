@@ -630,8 +630,6 @@ class config_api:
         mw.buildSoftLink(src_keypath, dst_keypath, True)
         mw.execShell('echo "acme" > "' + dst_path + '/README"')
 
-        data = self.getPanelSslData()
-
         tmp_well_know = auth_to + '/.well-known'
         if os.path.exists(tmp_well_know):
             mw.execShell('rm -rf ' + tmp_well_know)
@@ -639,7 +637,9 @@ class config_api:
         if os.path.exists(dst_path):
             choose_file = self.__file['ssl']
             mw.writeFile(choose_file, 'nginx')
-            
+
+        data = self.getPanelSslData()
+
         if is_already_apply:
             return mw.returnJson(True, '重复申请!', data)
         return mw.returnJson(True, '申请成功!', data)
