@@ -1287,7 +1287,7 @@ def getClientIp():
 
 
 def checkDomainPanel():
-    tmp = getHost()
+    # tmp = getHost()
     domain = readFile('data/bind_domain.pl')
     port = readFile('data/port.pl').strip()
 
