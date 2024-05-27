@@ -23,13 +23,13 @@ function toSizePos(a, pos = 0) {
 	for(var b = 0; b < d.length; b++) {
 		if (pos > 0){
 			if (b == pos){
-				r['name'] = (b == 0 ? a : a.toFixed(2)) + d[b]
+				r['name'] = (b == 0 ? a : a.toFixed(2)) + d[b];
 				r['pos'] = b;
 				return r
 			}
 		} else {
 			if( a < e) {
-				r['name'] = (b == 0 ? a : a.toFixed(2)) + d[b]
+				r['name'] = (b == 0 ? a : a.toFixed(2)) + d[b];
 				r['pos'] = b;
 				return r
 			}
