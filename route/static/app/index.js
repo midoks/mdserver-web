@@ -1148,8 +1148,8 @@ var index = {
                 var upTmpSize = upTmp['name'].split(' ')[0];
                 index.net.default_unit = upTmp['name'].split(' ')[1] + '/s';
 
-                var downTmpSize = toSizePos(down,upTmp[1])['name'].split(' ')[0];
-                console.log('up',upTmp[1],toSizePos(down, upTmp[1]),downTmpSize);
+                var downTmpSize = toSizePos(down,upTmp['pos'])['name'].split(' ')[0];
+                console.log('up',upTmp[1],toSizePos(down, upTmp['pos']),downTmpSize);
 
                 _net.data.zData.push(downTmpSize);
                 _net.data.yData.push(upTmpSize);
@@ -1159,8 +1159,8 @@ var index = {
                 var downTmpSize = downTmp['name'].split(' ')[0];
                 index.net.default_unit = downTmp['name'].split(' ')[1] + '/s';
 
-                var upTmpSize = toSizePos(up, downTmp[1])['name'].split(' ')[0];
-                console.log('down',downTmp[1],toSizePos(up, downTmp[1]),upTmpSize);
+                var upTmpSize = toSizePos(up, downTmp['pos'])['name'].split(' ')[0];
+                console.log('down',downTmp[1],toSizePos(up, downTmp['pos']),upTmpSize);
 
                 _net.data.zData.push(downTmpSize);
                 _net.data.yData.push(upTmpSize);
