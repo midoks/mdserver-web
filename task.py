@@ -576,8 +576,8 @@ def openrestyAutoRestart():
 def openrestyRestartAtOnce():
     restart_nginx_tip = 'data/restart_nginx.pl'
     while True:
-        if os.path.exists(restartTip):
-            os.remove(restartTip)
+        if os.path.exists(restart_nginx_tip):
+            os.remove(restart_nginx_tip)
             openresty_cmd('reload')
         time.sleep(1)
 # -----------------------------------   OpenResty Restart At Once End   ------------------------------------------ #
