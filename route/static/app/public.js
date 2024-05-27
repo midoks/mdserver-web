@@ -27,7 +27,7 @@ function toSizePos(a,pos=0) {
 			return r
 		}
 
-		if(a < e) {
+		if( pos > 0 &&  b == pos && a < e) {
 			r['name'] = (b == 0 ? a : a.toFixed(2)) + d[b]
 			r['pos'] = b;
 			return r
