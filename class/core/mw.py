@@ -1295,20 +1295,24 @@ def checkDomainPanel():
 
     local_ssl = getRunDir()+'/ssl/local'
     choose_file = getRunDir()+'/ssl/choose.pl'
+
     if os.path.exists(choose_file):
         choose = readFile(choose_file).strip()
-        if choose == 'local':
-            scheme == 'https'
+        if not mw.inArray(['local','nginx'], choose):
+            return False
 
-        if choose == 'nginx':
-            # print(port)
-            npid = getServerDir() + "/openresty/nginx/logs/nginx.pid"
-            if not os.path.exists(npid):
-                return False
+    if choose == 'local':
+        scheme = 'https'
 
-            nconf = getServerDir() + "/web_conf/nginx/vhost/panel.conf"
-            if os.path.exists(nconf):
-                port = "80"
+    if choose == 'nginx':
+        # print(port)
+        npid = getServerDir() + "/openresty/nginx/logs/nginx.pid"
+        if not os.path.exists(npid):
+            return False
+
+        nconf = getServerDir() + "/web_conf/nginx/vhost/panel.conf"
+        if os.path.exists(nconf):
+            port = "80"
 
 
     if domain:
