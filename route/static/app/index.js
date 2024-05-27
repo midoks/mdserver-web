@@ -1149,9 +1149,8 @@ var index = {
                 index.net.default_unit = upTmp['name'].split(' ')[1] + '/s';
 
                 var downTmpSize = toSizePos(down,upTmp[1])['name'].split(' ')[0];
+                console.log(toSizePos(up, upTmp[1]),downTmpSize);
 
-                console.log(toSizePos(up, upTmp[1]));
-                
                 _net.data.zData.push(downTmpSize);
                 _net.data.yData.push(upTmpSize);
             } else {
@@ -1160,9 +1159,9 @@ var index = {
                 var downTmpSize = downTmp['name'].split(' ')[0];
                 index.net.default_unit = downTmp['name'].split(' ')[1] + '/s';
 
-                console.log(toSizePos(up, downTmp[1]));
                 var upTmpSize = toSizePos(up, downTmp[1])['name'].split(' ')[0];
-                
+                console.log(toSizePos(up, downTmp[1]),upTmpSize);
+
                 _net.data.zData.push(downTmpSize);
                 _net.data.yData.push(upTmpSize);
             }
