@@ -820,6 +820,14 @@ function getPanelSSL(){
 		}
 
 		var cert_data = '';
+
+		// <div class='state_item'>\
+		// 	<span>强制HTTPS：</span>\
+		// 	<span class='switch'>\
+		// 		<input class='btswitch btswitch-ios' id='toHttps' type='checkbox' "+cert['is_https']+">\
+		// 		<label class='btswitch-btn set_panel_http_to_https' for='toHttps'></label>\
+		// 	</span>\
+		// </div>\
 		if (cert['info']){
 			cert_data = "<div class='ssl_state_info'><div class='state_info_flex'>\
 				<div class='state_item'><span>证书品牌：</span>\
@@ -830,16 +838,11 @@ function getPanelSSL(){
 			<div class='state_info_flex'>\
 				<div class='state_item'><span>认证域名：</span>\
 				<span class='ellipsis_text ssl_subject'>"+cert['info']['subject']+"</span></div>\
-				<div class='state_item'>\
-					<span>强制HTTPS：</span>\
-					<span class='switch'>\
-						<input class='btswitch btswitch-ios' id='toHttps' type='checkbox' "+cert['is_https']+">\
-						<label class='btswitch-btn set_panel_http_to_https' for='toHttps'></label>\
-					</span>\
-				</div>\
 			</div></div>";
 		}
 
+		// <button class="btn btn-success btn-sm apply-lets-ssl">申请ACME证书</button>\
+		// <option value="nginx" '+choose_nginx+'>OpenResty</option>\
 		var certBody = '<div class="tab-con">\
 			<div class="myKeyCon ptb15">\
 				'+cert_data+'\
@@ -854,10 +857,8 @@ function getPanelSSL(){
 				<div class="ssl-btn pull-left mtb15" style="width:100%">\
 					<button class="btn btn-success btn-sm save-panel-ssl">保存</button>\
 					<button class="btn btn-success btn-sm del-panel-ssl">删除</button>\
-					<button class="btn btn-success btn-sm apply-lets-ssl">申请ACME证书</button>\
 					<select class="bt-input-text" name="choose" style="width:100px;">\
 						<option value="local" '+choose_local+'>本地</option>\
-						<option value="nginx" '+choose_nginx+'>OpenResty</option>\
 					</select>\
 				</div>\
 			</div>\
@@ -876,9 +877,6 @@ function getPanelSSL(){
 			content:certBody,
 			success:function(layero, layer_id){
 
-				$('select[name="choose"]').change(function(){
-
-				});
 
 				//保存SSL
 				$('.save-panel-ssl').click(function(){
@@ -891,7 +889,7 @@ function getPanelSSL(){
 					{
 						title:'提示', 
 						shade:0.001,
-						btn: ['本地SSL', '取消', 'OpenResty'],
+						btn: ['本地SSL', '取消'],//'OpenResty'
 						btn3:function(){
 							data['choose'] = 'nginx';
 							var loadT = layer.msg('正在安装并设置SSL组件,这需要几分钟时间...',{icon:16,time:0,shade: [0.3, '#000']});
@@ -927,7 +925,7 @@ function getPanelSSL(){
 					{
 						title:'提示', 
 						shade:0.001,
-						btn: ['本地SSL', '取消', 'OpenResty'],
+						btn: ['本地SSL', '取消'],//, 'OpenResty'
 						btn3:function(){
 							var data = {};
 							data['choose'] = 'nginx';
@@ -946,11 +944,13 @@ function getPanelSSL(){
 						data['choose'] = 'local';
 						var loadT = layer.msg('正在删除面板SSL【本地】...',{icon:16,time:0,shade: [0.3, '#000']});
 						$.post('/config/del_panel_ssl',data,function(rdata){
+							console.log(rdata);
 							layer.close(loadT);
-							if(rdata.status){
-								layer.closeAll();
-							}
-							layer.msg(rdata.msg,{icon:rdata.status?1:2});
+							showMsg(rdata.msg, function(){
+								if(rdata.status){
+									location.href = rdata.data;
+								}
+							},{icon:rdata.status?1:2},3000);
 						},'json');
 				    },
 				    function(index) {

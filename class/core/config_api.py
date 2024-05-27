@@ -517,12 +517,18 @@ class config_api:
 
     # 删除面板证书
     def delPanelSslApi(self):
+        ip = mw.getLocalIp()
+        if mw.isAppleSystem():
+            ip = '127.0.0.1'
+
+        port = mw.readFile('data/port.pl').strip()
 
         choose = request.form.get('choose', '').strip()
 
         if not mw.inArray(['local','nginx'], choose):
             return mw.returnJson(True, '删除错误面板SSL类型!')
 
+        to_panel_url = 'http://'+ip+":"+port+'/config'
 
         if choose == 'local':
             dst_path = mw.getRunDir() + '/ssl/local'
@@ -531,9 +537,9 @@ class config_api:
                 mw.execShell('rm -rf ' + dst_path)
                 mw.execShell('rm -rf ' + ssl_file)
                 mw.restartMw();
-                return mw.returnJson(True, '删除本地面板SSL成功!')
+                return mw.returnJson(True, '删除本地面板SSL成功!',to_panel_url)
             else:
-                return mw.returnJson(True, '已经删除本地面板SSL!')
+                return mw.returnJson(True, '已经删除本地面板SSL!',to_panel_url)
 
         if choose == 'nginx':
 
