@@ -1149,7 +1149,7 @@ var index = {
                 index.net.default_unit = upTmp['name'].split(' ')[1] + '/s';
 
                 var downTmpSize = toSizePos(down,upTmp[1])['name'].split(' ')[0];
-                console.log(upTmp[1],toSizePos(down, upTmp[1]),downTmpSize);
+                console.log('up',upTmp[1],toSizePos(down, upTmp[1]),downTmpSize);
 
                 _net.data.zData.push(downTmpSize);
                 _net.data.yData.push(upTmpSize);
@@ -1160,7 +1160,7 @@ var index = {
                 index.net.default_unit = downTmp['name'].split(' ')[1] + '/s';
 
                 var upTmpSize = toSizePos(up, downTmp[1])['name'].split(' ')[0];
-                console.log(downTmp[1],toSizePos(up, downTmp[1]),upTmpSize);
+                console.log('down',downTmp[1],toSizePos(up, downTmp[1]),upTmpSize);
 
                 _net.data.zData.push(downTmpSize);
                 _net.data.yData.push(upTmpSize);
