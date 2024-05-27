@@ -16,16 +16,25 @@ function toSize(a) {
 	}
 }
 
-function toSizePos(a,pos=0) {
+function toSizePos(a, pos = 0) {
 	var d = [" B", " KB", " MB", " GB", " TB", " PB"];
 	var e = 1024;
 	var r = {};
 	for(var b = 0; b < d.length; b++) {
-		if( pos > 0 &&  b == pos && a < e) {
-			r['name'] = (b == 0 ? a : a.toFixed(2)) + d[b]
-			r['pos'] = b;
-			return r
+		if (pos > 0){
+			if (b == pos){
+				r['name'] = (b == 0 ? a : a.toFixed(2)) + d[b]
+				r['pos'] = b;
+				return r
+			}
+		} else {
+			if( a < e) {
+				r['name'] = (b == 0 ? a : a.toFixed(2)) + d[b]
+				r['pos'] = b;
+				return r
+			}
 		}
+		
 		a /= e;
 	}
 }
