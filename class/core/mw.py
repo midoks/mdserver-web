@@ -1292,15 +1292,14 @@ def checkDomainPanel():
     port = readFile('data/port.pl').strip()
 
     scheme = 'http'
-
-    local_ssl = getRunDir()+'/ssl/local'
+    
     choose_file = getRunDir()+'/ssl/choose.pl'
-
     if os.path.exists(choose_file):
         choose = readFile(choose_file).strip()
         if not inArray(['local','nginx'], choose):
             return False
 
+    local_ssl = getRunDir()+'/ssl/local'
     if choose == 'local':
         scheme = 'https'
 
