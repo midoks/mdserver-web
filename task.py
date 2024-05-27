@@ -64,6 +64,29 @@ def service_cmd(method):
         return
 
 
+def openresty_cmd(method = 'reload'):
+    # 检查是否安装
+    odir = mw.getServerDir() + '/openresty'
+    if not os.path.exists(odir):
+        return False
+
+    # systemd
+    systemd = mw.systemdCfgDir()+'/openresty.service'
+    if os.path.exists(systemd):
+        execShell('systemctl ' + method + ' openresty')
+        return True
+
+    sys_initd = '/etc/init.d/openresty'
+    if os.path.exists(install_initd):
+        os.system(sys_initd + ' ' + method)
+        return True
+
+    install_initd = mw.getServerDir()+'/openresty/init.d/openresty'
+    if os.path.exists(install_initd):
+        os.system(install_initd + ' ' + method)
+        return True
+    return False
+
 def mw_async(f):
     def wrapper(*args, **kwargs):
         thr = threading.Thread(target=f, args=args, kwargs=kwargs)
@@ -539,19 +562,25 @@ def openrestyAutoRestart():
                 time.sleep(86400)
                 continue
 
-            # systemd
-            systemd = mw.systemdCfgDir()+'/openresty.service'
-            initd = '/etc/init.d/openresty'
-            if os.path.exists(systemd):
-                execShell('systemctl reload openresty')
-            elif os.path.exists(initd):
-                os.system(initd + ' reload')
+            openresty_cmd('reload')
             time.sleep(86400)
     except Exception as e:
         print(str(e))
         time.sleep(86400)
 
 # --------------------------------------OpenResty Auto Restart End   --------------------------------------------- #
+
+# ------------------------------------  OpenResty Restart At Once Start ------------------------------------------ #
+
+
+def openrestyRestartAtOnce():
+    restart_nginx_tip = 'data/restart_nginx.pl'
+    while True:
+        if os.path.exists(restart_nginx_tip):
+            os.remove(restart_nginx_tip)
+            openresty_cmd('reload')
+        time.sleep(1)
+# -----------------------------------   OpenResty Restart At Once End   ------------------------------------------ #
 
 
 # --------------------------------------Panel Restart Start   --------------------------------------------- #
@@ -584,10 +613,17 @@ if __name__ == "__main__":
     php502 = setDaemon(php502)
     php502.start()
 
+    # OpenResty Restart At Once Start
+    oraos = threading.Thread(target=openrestyRestartAtOnce)
+    oraos = setDaemon(oraos)
+    oraos.start()
+
+
     # OpenResty Auto Restart Start
     oar = threading.Thread(target=openrestyAutoRestart)
     oar = setDaemon(oar)
     oar.start()
+
 
     # Panel Restart Start
     rps = threading.Thread(target=restartPanelService)

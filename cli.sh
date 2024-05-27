@@ -64,6 +64,11 @@ mw_start_debug2(){
 	gunicorn -b :7200 -k geventwebsocket.gunicorn.workers.GeventWebSocketWorker -w 1  app:app
 }
 
+mw_start_debug3(){
+	gunicorn -c setting.py app:app
+	python3 task.py
+}
+
 
 mw_stop()
 {
@@ -95,5 +100,9 @@ case "$1" in
 	'debug2') 
 		mw_stop 
 		mw_start_debug2
+		;;
+	'debug3') 
+		mw_stop 
+		mw_start_debug3
 		;;
 esac

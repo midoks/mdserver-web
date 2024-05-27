@@ -58,11 +58,12 @@ def mwcli(mw_input=0):
         print("(13)     显示面板错误日志")
         print("(20)     关闭BasicAuth认证")
         print("(21)     解除域名绑定")
-        print("(22)     开启IPV6支持")
-        print("(23)     关闭IPV6支持")
-        print("(24)     开启防火墙SSH端口")
-        print("(25)     关闭二次验证")
-        print("(26)     查看防火墙信息")
+        print("(22)     解除面板SSL绑定")
+        print("(23)     开启IPV6支持")
+        print("(24)     关闭IPV6支持")
+        print("(25)     开启防火墙SSH端口")
+        print("(26)     关闭二次验证")
+        print("(27)     查看防火墙信息")
         print("(100)    开启PHP52显示")
         print("(101)    关闭PHP52显示")
         print("(200)    切换Linux系统软件源")
@@ -77,8 +78,8 @@ def mwcli(mw_input=0):
             mw_input = 0
 
     nums = [
-        1, 2, 3, 4, 5, 10, 11, 12, 13, 
-        20, 21, 22, 23, 24, 25, 26,
+        1, 2, 3, 4, 5, 10, 11, 12, 13,
+        20, 21, 22, 23, 24, 25, 26, 27,
         100, 101, 
         200, 201
     ]
@@ -134,6 +135,12 @@ def mwcli(mw_input=0):
             os.system(INIT_CMD + " unbind_domain")
             print("|-解除域名绑定成功")
     elif mw_input == 22:
+        ssl_choose = 'ssl/choose.pl'
+        if os.path.exists(ssl_choose):
+            os.remove(ssl_choose)
+            os.system(INIT_CMD + " unbind_ssl")
+            print("|-解除面板SSL绑定成功")
+    elif mw_input == 23:
         listen_ipv6 = 'data/ipv6.pl'
         if not os.path.exists(listen_ipv6):
             mw.writeFile(listen_ipv6,'True')
@@ -141,7 +148,7 @@ def mwcli(mw_input=0):
             print("|-开启IPv6支持了")
         else:
             print("|-已开启IPv6支持!")
-    elif mw_input == 23:
+    elif mw_input == 24:
         listen_ipv6 = 'data/ipv6.pl'
         if not os.path.exists(listen_ipv6):
             print("|-已关闭IPv6支持!")
@@ -149,17 +156,17 @@ def mwcli(mw_input=0):
             os.remove(listen_ipv6)
             os.system(INIT_CMD + " restart")
             print("|-关闭IPv6支持了")
-    elif mw_input == 24:
+    elif mw_input == 25:
         open_ssh_port()
         print("|-已开启!")
-    elif mw_input == 25:
+    elif mw_input == 26:
         auth_secret = 'data/auth_secret.pl'
         if os.path.exists(auth_secret):
             os.remove(auth_secret)
             print("|-关闭二次验证成功!")
         else:
             print("|-二次验证已关闭!")
-    elif mw_input == 26:
+    elif mw_input == 27:
         cmd = 'which ufw'
         run_cmd = False
         find_cmd =  mw.execShell(cmd)

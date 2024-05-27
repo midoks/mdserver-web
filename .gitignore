@@ -87,6 +87,7 @@ venv/
 ENV/
 env.bak/
 venv.bak/
+lib/python*
 
 # Spyder project settings
 .spyderproject
@@ -97,6 +98,12 @@ venv.bak/
 
 # mkdocs documentation
 /site
+
+bin
+pyvenv.cfg
+include
+share
+pip-selfcheck.json
 
 # mypy
 .mypy_cache/
@@ -122,27 +129,17 @@ data/default.pl
 data/backup.pl
 data/debug.pl
 data/default_site.pl
-
-ssl/input.pl
-
-lib/python*
-
-bin
-pyvenv.cfg
-include
-share
-pip-selfcheck.json
+data/ssl.pl
 
 scripts/init.d/mw
 scripts/mdserver-web
 
 data/api_login.txt
 data/sessions
-data/ssl.pl
+
 data/port.pl
 data/ipv6.pl
 data/restart.pl
-data/ssl.pl
 data/edate.pl
 data/osname.pl
 data/only_netio_counters.pl
@@ -155,6 +152,10 @@ data/api.json
 data/bind_domain.pl
 data/unauthorized_status.pl
 data/auth_secret.pl
+
+ssl/local
+ssl/nginx
+ssl/choose.pl
 
 plugins/vip_*
 plugins/own_*

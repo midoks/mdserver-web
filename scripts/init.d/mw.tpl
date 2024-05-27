@@ -209,6 +209,21 @@ mw_unbind_domain()
     fi
 }
 
+mw_unbind_ssl()
+{
+    if [ -f $mw_path/local ];then
+        rm -rf $mw_path/local
+    fi
+
+    if [ -f $mw_path/nginx ];then
+        rm -rf $mw_path/nginx
+    fi
+
+    if [ -f $mw_path/ssl/choose.pl ];then
+        rm -rf $mw_path/ssl/choose.pl
+    fi
+}
+
 error_logs()
 {
 	tail -n 100 $mw_path/logs/error.log
@@ -445,6 +460,7 @@ case "$1" in
     'install_app') mw_install_app;;
     'close_admin_path') mw_close_admin_path;;
     'unbind_domain') mw_unbind_domain;;
+    'unbind_ssl') mw_unbind_domain;;
     'debug') mw_debug;;
     'mirror') mw_mirror;;
     'db') mw_connect_mysql;;
@@ -454,6 +470,11 @@ case "$1" in
     'default')
         cd $mw_path
         port=7200
+        scheme=http
+
+        if [ -f $mw_path/ssl/choose.pl ];then
+            scheme=https
+        fi
         
         if [ -f $mw_path/data/port.pl ];then
             port=$(cat $mw_path/data/port.pl)
@@ -484,9 +505,9 @@ case "$1" in
                     mw_start
                 fi
 
-                address="MW-Panel-Url-Ipv4: http://$v4:$port$auth_path \nMW-Panel-Url-Ipv6: http://[$v6]:$port$auth_path"
+                address="MW-Panel-Url-Ipv4: ${scheme}://$v4:$port$auth_path \nMW-Panel-Url-Ipv6: ${scheme}://[$v6]:$port$auth_path"
             elif [ "$v4" != "" ]; then
-                address="MW-Panel-Url: http://$v4:$port$auth_path"
+                address="MW-Panel-Url: ${scheme}://$v4:$port$auth_path"
             elif [ "$v6" != "" ]; then
 
                 if [ ! -f $mw_path/data/ipv6.pl ];then
@@ -495,12 +516,12 @@ case "$1" in
                     mw_stop
                     mw_start
                 fi
-                address="MW-Panel-Url: http://[$v6]:$port$auth_path"
+                address="MW-Panel-Url: ${scheme}://[$v6]:$port$auth_path"
             else
-                address="MW-Panel-Url: http://you-network-ip:$port$auth_path"
+                address="MW-Panel-Url: ${scheme}://you-network-ip:$port$auth_path"
             fi
         else
-            address="MW-Panel-Url: http://$address:$port$auth_path"
+            address="MW-Panel-Url: ${scheme}://$address:$port$auth_path"
         fi
 
         show_panel_ip="$port|"

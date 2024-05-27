@@ -636,7 +636,7 @@ function _M.statistics_request(self, ip, is_spider, body_length)
     return pvc, uvc
 end
 
--- 仅计算GET
+-- 仅计算GET/HTML
 function _M.statistics_request_old(self, ip, is_spider, body_length)
     -- 计算pv uv
     local pvc = 0

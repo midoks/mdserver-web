@@ -111,6 +111,7 @@ function autoMakeConf(){
                     </div>\
                     <ul class='help-info-text c7'>\
                         <li style='color:red;'>具体配置，仍须手动修改!!!</li>'\
+                        <li style='color:red;'>增量索引,需要有更新权限,主从分离时,需要主库配置</li>'\
                     </ul>\
                 </form>\
             ",
@@ -286,7 +287,6 @@ function readme(){
 
         con += '<li style="color:red;">如果数据量比较大,第一次启动会失败!(可通过手动建立索引)</li>';
         con += '<li style="color:red;">以下内容,需手动加入计划任务。</li>';
-            
 
         con += '<li>全量:' + rdata['data']['cmd'] + ' --all --rotate</li>';
 
@@ -294,11 +294,13 @@ function readme(){
         for (var i = 0; i < rdata['data']['index'].length; i++) {
             var index_kv = rdata['data']['index'][i];
             var index = index_kv['index'];
-            var delta = index_kv['delta'];
-            // console.log(index,delta);
+            // console.log(index);
             con += '<li>主索引 :' + rdata['data']['cmd'] + ' '+ index +' --rotate</li>';
-            con += '<li>增量索引 :' + rdata['data']['cmd'] + ' '+ delta +' --rotate</li>';
-            con += '<li>合并索引 :' + rdata['data']['cmd'] + ' --merge '+ index  + ' ' + delta +' --rotate</li>';
+            if (typeof(index_kv['delta']) != 'undefined'){
+                var delta = index_kv['delta'];
+                con += '<li>增量索引 :' + rdata['data']['cmd'] + ' '+ delta +' --rotate</li>';
+                con += '<li>合并索引 :' + rdata['data']['cmd'] + ' --merge '+ index  + ' ' + delta +' --rotate</li>';
+            }
         }
         con += '</ul>';
 

@@ -75,16 +75,106 @@ $('input[name="bind_domain"]').change(function(){
 	$('.btn_bind_domain').removeAttr('disabled');
 	$('.btn_bind_domain').unbind().click(function(){
 		$.post('/config/set_panel_domain','domain='+domain, function(rdata){
-			showMsg(rdata.msg,function(){window.location.reload();},{icon:rdata.status?1:2},2000);
+			showMsg(rdata.msg,function(){
+				window.location.href = rdata.data;
+			},{icon:rdata.status?1:2},5000);
 		},'json');
 	});
 });
 
 $('input[name="bind_ssl"]').click(function(){
-	var open_ssl = $(this).prop("checked");
-	$.post('/config/set_panel_ssl',{}, function(rdata){
-		showMsg(rdata.msg,function(){window.location.reload();},{icon:rdata.status?1:2},2000);
-	},'json');
+	var panel_ssl = $(this).prop("checked");
+	$(this).prop("checked",!panel_ssl);
+
+	//开启证书
+	if (panel_ssl){
+		// <option value="1">ACME</option>
+		layer.open({
+			type:1,
+			closeBtn: 1,
+			title:"开启SSL证书",
+			area: ['600px','440px'],
+			btn: ["开启SSL证书访问"],
+			maxmin:false,
+			shadeClose: true,
+			content: '<div class="bt-form" style="padding: 25px 40px;">\
+				<div style="text-align: center;">\
+					<h3 style="font-size: 20px;color: #333;margin-left: 5px;">【开启SSL证书】保护面板访问安全</h3>\
+				</div>\
+				<ul class="help-info-text c7 pd15" style="color: #333;font-size: 14px;background: #F5F7FA;margin-top: 24px;padding: 10px 20px 10px 20px;border-radius: 2px;">\
+					<li>自签证书访问步骤：</li>\
+					<li>1. 部署SSL证书</li>\
+					<li>2. 浏览器地址栏修改为https://访问</li>\
+					<li>3. 如提醒风险（正常现象）点击【高级】或【详情】</li>\
+					<li>4.【继续访问】或【接收风险并继续】</li>\
+				</ul>\
+				<div class="pt10" style="margin-top: 20px;">\
+					<div class="line" style="font-size: 14px;">\
+						<span class="tname" style="width: 78px;">类型</span>\
+						<div class="info-r" style="margin-left: 78px;">\
+							<select class="bt-input-text mr5" name="cert_type" style="width: 440px;">\
+								<option value="0">自签证书 (推荐，浏览器会提示不安全。可忽略，请放心开启)</option>\
+							</select>\
+						</div>\
+					</div>\
+					<ul class="help-info-text c7 sslSafeTips">\
+						<li><span>开启后导致面板不能访问，可以点击查看</span></li>\
+						<li>自签证书不被浏览器信任，显示不安全是正常现象</li>\
+					</ul>\
+				</div>\
+			</div>',
+			yes: function(){
+
+				var cert_type = $('select[name=cert_type]').val();
+				$.post('/config/set_panel_local_ssl',{'cert_type':cert_type}, function(rdata){
+					// console.log(rdata);
+					var to_https = window.location.href.replace('http','https');
+					showMsg(rdata.msg,function(){
+						if (rdata.status){
+							window.location.href = to_https;
+						}
+					},{icon:rdata.status?1:2},5000);
+				},'json');
+	
+			}
+		});
+	} else { 
+		//关闭SSL
+		layer.open({
+			type:1,
+			closeBtn: 1,
+			title:"关闭SSL证书",
+			area: ['480px','280px'],
+			btn: ["确定","取消"],
+			shadeClose: true,
+			content: '<div class="bt-form" style="padding: 25px 40px;">\
+				<div class="hint_title" style="font-size: 15px;color: #111;text-align:center;">\
+					<div class="hint_con">关闭SSL极易被抓包攻击导致账号密码泄露，请勿关闭</div>\
+				</div>\
+				<div class="confirm-info-box" style="background-color: #f0f0f0;clear: both;font-size: 14px;height: 105px;line-height: 26px;padding: 20px 20px;margin-top: 20px;">\
+					<div>请手动输入【<span style="color: #fc6d26;">我要关闭</span>】，完成验证</div>\
+					<input onpaste="return false;" id="prompt_input_box" style="height: 30px;line-height: 30px;margin-top: 5px;width: 360px;color: #444;outline: none;border: 1px solid #ccc;padding: 0 5px;" type="text" value="" autocomplete="off">\
+				</div>\
+			</div>',
+			yes: function(index){
+				var val = $('#prompt_input_box').val();
+				if (val != '我要关闭'){
+					layer.msg("关闭SSL失败!");
+					return;
+				}
+
+				$.post('/config/close_panel_ssl',{}, function(rdata){
+					var to_http = window.location.href.replace('https','http');
+					showMsg(rdata.msg,function(){
+						if (rdata.status){
+							window.location.href = to_http;
+						}
+					},{icon:rdata.status?1:2},5000);
+				},'json');
+			}
+		});
+	}
+
 });
 
 /** op **/
@@ -714,8 +804,30 @@ function getPanelSSL(){
 	$.post('/config/get_panel_ssl',{},function(cert){
 		layer.close(loadT);
 
+		// console.log(cert);
+		var choose = cert['choose'];
+		var choose_local = '';
+		var choose_nginx = '';
+
+		if (choose == 'local'){
+			cert = cert['local'];
+			choose_local = 'selected="selected"';
+		} else if (choose == 'nginx') {
+			cert = cert['nginx'];
+			choose_nginx = 'selected="selected"';
+		} else {
+			cert = cert['local'];
+		}
 
 		var cert_data = '';
+
+		// <div class='state_item'>\
+		// 	<span>强制HTTPS：</span>\
+		// 	<span class='switch'>\
+		// 		<input class='btswitch btswitch-ios' id='toHttps' type='checkbox' "+cert['is_https']+">\
+		// 		<label class='btswitch-btn set_panel_http_to_https' for='toHttps'></label>\
+		// 	</span>\
+		// </div>\
 		if (cert['info']){
 			cert_data = "<div class='ssl_state_info'><div class='state_info_flex'>\
 				<div class='state_item'><span>证书品牌：</span>\
@@ -726,16 +838,11 @@ function getPanelSSL(){
 			<div class='state_info_flex'>\
 				<div class='state_item'><span>认证域名：</span>\
 				<span class='ellipsis_text ssl_subject'>"+cert['info']['subject']+"</span></div>\
-				<div class='state_item'>\
-					<span>强制HTTPS：</span>\
-					<span class='switch'>\
-						<input class='btswitch btswitch-ios' id='toHttps' type='checkbox' "+cert['is_https']+">\
-						<label class='btswitch-btn set_panel_http_to_https' for='toHttps'></label>\
-					</span>\
-				</div>\
 			</div></div>";
 		}
 
+		// <button class="btn btn-success btn-sm apply-lets-ssl">申请ACME证书</button>\
+		// <option value="nginx" '+choose_nginx+'>OpenResty</option>\
 		var certBody = '<div class="tab-con">\
 			<div class="myKeyCon ptb15">\
 				'+cert_data+'\
@@ -750,7 +857,9 @@ function getPanelSSL(){
 				<div class="ssl-btn pull-left mtb15" style="width:100%">\
 					<button class="btn btn-success btn-sm save-panel-ssl">保存</button>\
 					<button class="btn btn-success btn-sm del-panel-ssl">删除</button>\
-					<button class="btn btn-success btn-sm apply-lets-ssl">申请Lets证书</button>\
+					<select class="bt-input-text" name="choose" style="width:100px;">\
+						<option value="local" '+choose_local+'>本地</option>\
+					</select>\
 				</div>\
 			</div>\
 			<ul class="help-info-text c7 pull-left">\
@@ -768,65 +877,120 @@ function getPanelSSL(){
 			content:certBody,
 			success:function(layero, layer_id){
 
+
 				//保存SSL
 				$('.save-panel-ssl').click(function(){
 					var data = {
 						privateKey:$("#key").val(),
 						certPem:$("#csr").val()
 					}
-					var loadT = layer.msg('正在安装并设置SSL组件,这需要几分钟时间...',{icon:16,time:0,shade: [0.3, '#000']});
-					$.post('/config/save_panel_ssl',data,function(rdata){
-						layer.close(loadT);
-						if(rdata.status){
-							layer.closeAll();
-						}
-						layer.msg(rdata.msg,{icon:rdata.status?1:2});
-					},'json');
+
+					layer.confirm('选择保存面板SSL方式?', 
+					{
+						title:'提示', 
+						shade:0.001,
+						btn: ['本地SSL', '取消'],//'OpenResty'
+						btn3:function(){
+							data['choose'] = 'nginx';
+							var loadT = layer.msg('正在安装并设置SSL组件,这需要几分钟时间...',{icon:16,time:0,shade: [0.3, '#000']});
+							$.post('/config/save_panel_ssl',data,function(rdata){
+								layer.close(loadT);
+								if(rdata.status){
+									layer.closeAll();
+								}
+								layer.msg(rdata.msg,{icon:rdata.status?1:2});
+							},'json');
+						},
+					},
+					function(index) {
+						data['choose'] = 'local';
+				    	var loadT = layer.msg('正在安装并设置SSL组件,这需要几分钟时间...',{icon:16,time:0,shade: [0.3, '#000']});
+						$.post('/config/save_panel_ssl',data,function(rdata){
+							layer.close(loadT);
+							if(rdata.status){
+								layer.closeAll();
+							}
+							layer.msg(rdata.msg,{icon:rdata.status?1:2});
+						},'json');
+				    },
+				    function(index) {
+				        layer.close(index);
+				    });
 				});
 
 				//删除SSL
 				$('.del-panel-ssl').click(function(){
-					var loadT = layer.msg('正在删除SSL...',{icon:16,time:0,shade: [0.3, '#000']});
-					$.post('/config/del_panel_ssl',data,function(rdata){
-						layer.close(loadT);
-						if(rdata.status){
-							layer.closeAll();
-						}
-						layer.msg(rdata.msg,{icon:rdata.status?1:2});
-					},'json');
-				});
 
-				// 设置面板SSL的Http
-				$('.set_panel_http_to_https').click(function(){
-					var https = $('#toHttps').prop('checked');
-					$.post('/config/set_panel_http_to_https',{'https':https},function(rdata){
-						layer.close(loadT);
-						if(rdata.status){
-							layer.closeAll();
-						}
-						layer.msg(rdata.msg,{icon:rdata.status?1:2});
-					},'json');
-				});
-
-				//申请Lets证书
-				$('.apply-lets-ssl').click(function(){
-					showSpeedWindow('正在申请...', 'site.get_let_logs', function(layers,index){
-						$.post('/config/apply_panel_let_ssl',{},function(rdata){
+					layer.confirm('选择删除面板SSL方式?', 
+					{
+						title:'提示', 
+						shade:0.001,
+						btn: ['本地SSL', '取消'],//, 'OpenResty'
+						btn3:function(){
+							var data = {};
+							data['choose'] = 'nginx';
+							var loadT = layer.msg('正在删除面板SSL【nginx】...',{icon:16,time:0,shade: [0.3, '#000']});
+							$.post('/config/del_panel_ssl',data,function(rdata){
+								layer.close(loadT);
+								if(rdata.status){
+									layer.closeAll();
+								}
+								layer.msg(rdata.msg,{icon:rdata.status?1:2});
+							},'json');
+						},
+					},
+					function(index) {
+						var data = {};
+						data['choose'] = 'local';
+						var loadT = layer.msg('正在删除面板SSL【本地】...',{icon:16,time:0,shade: [0.3, '#000']});
+						$.post('/config/del_panel_ssl',data,function(rdata){
+							console.log(rdata);
 							layer.close(loadT);
-							if(rdata.status){
-								layer.close(index);
-								var tdata = rdata['data'];
-								$('.ssl_issue').text(tdata['info']['issuer']);
-								$('.ssl_endtime').text("剩余"+tdata['info']['endtime']+"天到期");
-								$('.ssl_subject').text(tdata['info']['subject']);
-
-								$('textarea[name="key"]').val(tdata['info']['privateKey']);
-								$('textarea[name="csr"]').val(tdata['info']['certPem']);
-							}
-							layer.msg(rdata.msg,{icon:rdata.status?1:2});
+							showMsg(rdata.msg, function(){
+								if(rdata.status){
+									location.href = rdata.data;
+								}
+							},{icon:rdata.status?1:2},3000);
 						},'json');
-					});
+				    },
+				    function(index) {
+				        layer.close(index);
+				    });
+
+					
 				});
+
+				// // 设置面板SSL的Http
+				// $('.set_panel_http_to_https').click(function(){
+				// 	var https = $('#toHttps').prop('checked');
+				// 	$.post('/config/set_panel_http_to_https',{'https':https},function(rdata){
+				// 		layer.close(loadT);
+				// 		if(rdata.status){
+				// 			layer.closeAll();
+				// 		}
+				// 		layer.msg(rdata.msg,{icon:rdata.status?1:2});
+				// 	},'json');
+				// });
+
+				// //申请Lets证书
+				// $('.apply-lets-ssl').click(function(){
+				// 	showSpeedWindow('正在申请...', 'site.get_let_logs', function(layers,index){
+				// 		$.post('/config/apply_panel_acme_ssl',{},function(rdata){
+				// 			layer.close(loadT);
+				// 			if(rdata.status){
+				// 				layer.close(index);
+				// 				var tdata = rdata['data'];
+				// 				$('.ssl_issue').text(tdata['info']['issuer']);
+				// 				$('.ssl_endtime').text("剩余"+tdata['info']['endtime']+"天到期");
+				// 				$('.ssl_subject').text(tdata['info']['subject']);
+
+				// 				$('textarea[name="key"]').val(tdata['info']['privateKey']);
+				// 				$('textarea[name="csr"]').val(tdata['info']['certPem']);
+				// 			}
+				// 			layer.msg(rdata.msg,{icon:rdata.status?1:2});
+				// 		},'json');
+				// 	});
+				// });
 			}
 		});
 	},'json');
