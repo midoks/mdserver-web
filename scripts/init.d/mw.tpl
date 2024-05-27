@@ -209,6 +209,21 @@ mw_unbind_domain()
     fi
 }
 
+mw_unbind_ssl()
+{
+    if [ -f $mw_path/local ];then
+        rm -rf $mw_path/local
+    fi
+
+    if [ -f $mw_path/nginx ];then
+        rm -rf $mw_path/nginx
+    fi
+
+    if [ -f $mw_path/ssl/choose.pl ];then
+        rm -rf $mw_path/ssl/choose.pl
+    fi
+}
+
 error_logs()
 {
 	tail -n 100 $mw_path/logs/error.log
@@ -445,6 +460,7 @@ case "$1" in
     'install_app') mw_install_app;;
     'close_admin_path') mw_close_admin_path;;
     'unbind_domain') mw_unbind_domain;;
+    'unbind_ssl') mw_unbind_domain;;
     'debug') mw_debug;;
     'mirror') mw_mirror;;
     'db') mw_connect_mysql;;

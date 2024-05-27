@@ -436,12 +436,12 @@ class config_api:
     def savePanelSslApi(self):
 
 
+        certPem = request.form.get('certPem', '').strip()
+        privateKey = request.form.get('privateKey', '').strip()
+
         keyPath = 'ssl/private.pem'
         certPath = 'ssl/cert.pem'
         checkCert = '/tmp/cert.pl'
-
-        certPem = request.form.get('certPem', '').strip()
-        privateKey = request.form.get('privateKey', '').strip()
 
         if(privateKey.find('KEY') == -1):
             return mw.returnJson(False, '秘钥错误，请检查!')

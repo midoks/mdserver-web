@@ -56,6 +56,7 @@ def mwcli(mw_input=0):
         print("(11)     修改面板密码")
         print("(12)     修改面板用户名")
         print("(13)     显示面板错误日志")
+        print("(19)     关闭面板SSL绑定")
         print("(20)     关闭BasicAuth认证")
         print("(21)     解除域名绑定")
         print("(22)     开启IPV6支持")
@@ -77,7 +78,7 @@ def mwcli(mw_input=0):
             mw_input = 0
 
     nums = [
-        1, 2, 3, 4, 5, 10, 11, 12, 13, 
+        1, 2, 3, 4, 5, 10, 11, 12, 13, 19
         20, 21, 22, 23, 24, 25, 26,
         100, 101, 
         200, 201
@@ -121,6 +122,12 @@ def mwcli(mw_input=0):
         set_panel_username(input_user.strip())
     elif mw_input == 13:
         os.system('tail -100 ' + mw.getRunDir() + '/logs/error.log')
+    elif mw_input == 19:
+        ssl_choose = 'ssl/choose.pl'
+        if os.path.exists(ssl_choose):
+            os.remove(ssl_choose)
+            os.system(INIT_CMD + " unbind_ssl")
+            print("|-解除面板SSL绑定成功")
     elif mw_input == 20:
         basic_auth = 'data/basic_auth.json'
         if os.path.exists(basic_auth):

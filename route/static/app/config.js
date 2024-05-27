@@ -804,14 +804,17 @@ function getPanelSSL(){
 	$.post('/config/get_panel_ssl',{},function(cert){
 		layer.close(loadT);
 
-		console.log(cert);
-
+		// console.log(cert);
 		var choose = cert['choose'];
+		var choose_local = '';
+		var choose_nginx = '';
 
 		if (choose == 'local'){
 			cert = cert['local'];
+			choose_local = 'selected="selected"';
 		} else if (choose == 'nginx') {
 			cert = cert['nginx'];
+			choose_nginx = 'selected="selected"';
 		} else {
 			cert = cert['local'];
 		}
@@ -852,6 +855,10 @@ function getPanelSSL(){
 					<button class="btn btn-success btn-sm save-panel-ssl">保存</button>\
 					<button class="btn btn-success btn-sm del-panel-ssl">删除</button>\
 					<button class="btn btn-success btn-sm apply-lets-ssl">申请ACME证书</button>\
+					<select class="bt-input-text" name="choose" style="width:100px;">\
+						<option value="local" '+choose_local+'>本地</option>\
+						<option value="nginx" '+choose_nginx+'>OpenResty</option>\
+					</select>\
 				</div>\
 			</div>\
 			<ul class="help-info-text c7 pull-left">\
@@ -868,6 +875,10 @@ function getPanelSSL(){
 			shadeClose: false,
 			content:certBody,
 			success:function(layero, layer_id){
+
+				$('select[name="choose"]').change(function(){
+					
+				});
 
 				//保存SSL
 				$('.save-panel-ssl').click(function(){
