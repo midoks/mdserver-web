@@ -1032,7 +1032,18 @@ var index = {
                     }
                 },
                 tooltip: {
-                    trigger: 'axis'
+                    trigger: 'axis',
+                    formatter :function (config) {
+                        var _config = config, _tips = "时间：" + _config[0].axisValue + "<br />";
+                        for (var i = 0; i < config.length; i++) {
+                            if (typeof config[i].data == "undefined") {
+                                return false;
+                            }
+                            _tips += '<span style="display: inline-block;width: 10px;height: 10px;border-radius: 50%;background: ' + config[i].color + ';"></span>&nbsp;&nbsp;<span>' + config[i].seriesName + '：' + config[i].data + ' '+ index.net.default_unit + '</span><br />'
+                        }
+                        return _tips;
+                    }
+
                 },
                 legend: {
                     data: [lan.index.net_up, lan.index.net_down],
@@ -1130,19 +1141,31 @@ var index = {
             if (_net.data.yData.length >= limit) _net.data.yData.splice(0, 1);
             if (_net.data.zData.length >= limit) _net.data.zData.splice(0, 1);
 
-
-            var upTmpSize = toSize(up).split(' ')[0];
-            var downTmpSize = toSize(down).split(' ')[0];
-
-            var tmp = up;
-            if (down>up){
-                tmp = down;
-            }
-            index.net.default_unit = toSize(tmp).split(' ')[1] + '/s';
-
-            _net.data.zData.push(downTmpSize);
-            _net.data.yData.push(upTmpSize);
             _net.data.xData.push(d.getHours() + ':' + d.getMinutes() + ':' + d.getSeconds());
+
+            if (up>down){
+                var upTmp = toSizePos(up);
+                var upTmpSize = upTmp['name'].split(' ')[0];
+                index.net.default_unit = upTmp['name'].split(' ')[1] + '/s';
+
+                var downTmpSize = toSizePos(down,upTmp['pos'])['name'].split(' ')[0];
+                // console.log('up',upTmp['pos'],toSizePos(down, upTmp['pos']),downTmpSize);
+
+                _net.data.zData.push(downTmpSize);
+                _net.data.yData.push(upTmpSize);
+            } else {
+
+                var downTmp = toSizePos(down);
+                var downTmpSize = downTmp['name'].split(' ')[0];
+                index.net.default_unit = downTmp['name'].split(' ')[1] + '/s';
+
+                var upTmpSize = toSizePos(up, downTmp['pos'])['name'].split(' ')[0];
+                // console.log('down',downTmp['pos'],toSizePos(up, downTmp['pos']),upTmpSize);
+
+                _net.data.zData.push(downTmpSize);
+                _net.data.yData.push(upTmpSize);
+            }
+            
         },
         renderSelect:function(net){
             // console.log(net);
