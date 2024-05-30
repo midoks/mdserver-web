@@ -2936,7 +2936,7 @@ def doFullSync(version=''):
 def doFullSyncUser(version=''):
     which_pv = mw.execShell('which pv')
     is_exist_pv = False
-    if not os.path.exists(which_pv[0]):
+    if os.path.exists(which_pv[0]):
         is_exist_pv = True
 
 
