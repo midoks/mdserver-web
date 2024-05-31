@@ -66,13 +66,13 @@ class ssh_local(object):
         mw.createSshInfo()
         ssh.set_missing_host_key_policy(paramiko.AutoAddPolicy())
 
-        port = getSSHPort()
+        port = mw.getSSHPort()
         try:
             ssh.connect('127.0.0.1', port, timeout=5)
         except Exception as e:
             ssh.connect('localhost', port, timeout=5)
         except Exception as e:
-            ssh.connect(getHostAddr(), port, timeout=30)
+            ssh.connect(mw.getHostAddr(), port, timeout=30)
         except Exception as e:
             return False
 
