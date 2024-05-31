@@ -55,6 +55,9 @@ class ssh_terminal(object):
     __ssh_list = {}
     __ssh_last_request_time = {}
 
+    # lock
+    _instance_lock = threading.Lock()
+
     def __init__(self):
         ht = threading.Thread(target=self.heartbeat)
         ht.start()
