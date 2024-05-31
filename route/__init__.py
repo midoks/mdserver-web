@@ -604,7 +604,7 @@ def webssh_websocketio(data):
         return
 
     import ssh_terminal
-    shell_client = ssh_terminal.instance()
+    shell_client = ssh_terminal.ssh_terminal.instance()
     shell_client.run(request.sid, data)
     return
 
