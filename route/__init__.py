@@ -617,5 +617,6 @@ def webssh(data):
     import ssh_local
     shell = ssh_local.ssh_local.instance()
     shell.run(data)
+    return
 
 ##################### ssh  end ###########################
