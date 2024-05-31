@@ -596,8 +596,6 @@ def index(reqClass=None, reqAction=None, reqData=None):
 
 ##################### ssh  start ###########################
 shell = None
-shell_client = None
-
 
 @socketio.on('webssh_websocketio')
 def webssh_websocketio(data):
@@ -605,11 +603,8 @@ def webssh_websocketio(data):
         emit('server_response', {'data': '会话丢失，请重新登陆面板!\r\n'})
         return
 
-    global shell_client
-    if not shell_client:
-        import ssh_terminal
-        shell_client = ssh_terminal.ssh_terminal()
-
+    import ssh_terminal
+    shell_client = ssh_terminal.instance()
     shell_client.run(request.sid, data)
     return
 
