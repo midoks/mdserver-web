@@ -43,11 +43,11 @@ class ssh_local(object):
 
     @classmethod
     def instance(cls, *args, **kwargs):
-        if not hasattr(ssh_terminal, "_instance"):
-            with ssh_terminal._instance_lock:
-                if not hasattr(ssh_terminal, "_instance"):
-                    ssh_terminal._instance = ssh_local(*args, **kwargs)
-        return ssh_terminal._instance
+        if not hasattr(ssh_local, "_instance"):
+            with ssh_local._instance_lock:
+                if not hasattr(ssh_local, "_instance"):
+                    ssh_local._instance = ssh_local(*args, **kwargs)
+        return ssh_local._instance
 
     def debug(self, msg):
         msg = "{} - {}:{} => {} \n".format(mw.formatDate(),
