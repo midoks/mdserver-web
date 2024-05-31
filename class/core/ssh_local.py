@@ -46,7 +46,7 @@ class ssh_local(object):
         if not hasattr(ssh_terminal, "_instance"):
             with ssh_terminal._instance_lock:
                 if not hasattr(ssh_terminal, "_instance"):
-                    ssh_terminal._instance = ssh_terminal(*args, **kwargs)
+                    ssh_terminal._instance = ssh_local(*args, **kwargs)
         return ssh_terminal._instance
 
     def debug(self, msg):
