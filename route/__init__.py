@@ -595,7 +595,6 @@ def index(reqClass=None, reqAction=None, reqData=None):
 
 
 ##################### ssh  start ###########################
-shell = None
 
 @socketio.on('webssh_websocketio')
 def webssh_websocketio(data):
@@ -610,25 +609,13 @@ def webssh_websocketio(data):
 
 
 @socketio.on('webssh')
-def webssh(msg):
-    global shell
+def webssh(data):
     if not isLogined():
         emit('server_response', {'data': '会话丢失，请重新登陆面板!\r\n'})
         return None
 
-    if not shell:
-        shell = mw.connectSsh()
-
-    if shell.exit_status_ready():
-        shell = mw.connectSsh()
-
-    if shell:
-        shell.send(msg)
-        try:
-            time.sleep(0.005)
-            recv = shell.recv(4096)
-            emit('server_response', {'data': recv.decode("utf-8")})
-        except Exception as ex:
-            emit('server_response', {'data': str(ex)})
+    import ssh_local
+    shell = ssh_local.ssh_local.instance()
+    shell.run(data)
 
 ##################### ssh  end ###########################
