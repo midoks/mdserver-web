@@ -30,7 +30,7 @@ from flask_socketio import SocketIO, emit, send
 
 class ssh_terminal(object):
 
-    __debug_file = 'logs/terminal.log'
+    __debug_file = 'logs/ssh_terminal.log'
     __log_type = 'SSH终端'
 
     # websocketio 唯一标识
