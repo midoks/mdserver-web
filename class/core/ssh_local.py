@@ -63,7 +63,7 @@ class ssh_local(object):
     def connectSsh(self):
         import paramiko
         ssh = paramiko.SSHClient()
-        createSshInfo()
+        mw.createSshInfo()
         ssh.set_missing_host_key_policy(paramiko.AutoAddPolicy())
 
         port = getSSHPort()
