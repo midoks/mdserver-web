@@ -28,9 +28,9 @@ import paramiko
 from flask_socketio import SocketIO, emit, send
 
 
-class ssh_terminal:
+class ssh_terminal(object):
 
-    __debug_file = 'logs/terminal.log'
+    __debug_file = 'logs/ssh_terminal.log'
     __log_type = 'SSH终端'
 
     # websocketio 唯一标识
@@ -55,9 +55,20 @@ class ssh_terminal:
     __ssh_list = {}
     __ssh_last_request_time = {}
 
+    # lock
+    _instance_lock = threading.Lock()
+
     def __init__(self):
         ht = threading.Thread(target=self.heartbeat)
         ht.start()
+
+    @classmethod
+    def instance(cls, *args, **kwargs):
+        if not hasattr(ssh_terminal, "_instance"):
+            with ssh_terminal._instance_lock:
+                if not hasattr(ssh_terminal, "_instance"):
+                    ssh_terminal._instance = ssh_terminal(*args, **kwargs)
+        return ssh_terminal._instance
 
     def debug(self, msg):
         msg = "{} - {}:{} => {} \n".format(mw.formatDate(),
