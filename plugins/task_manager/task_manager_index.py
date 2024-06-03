@@ -724,7 +724,6 @@ class mainClass(object):
             except:
                 continue
 
-        cache.set(self.old_path, self.new_info, 600)
         processList = self.__pro_s_s(processList)
         res = True
         if get.sortx == 'status': res = False
