@@ -939,6 +939,8 @@ function pkill_session(pts) {
         var loadT = layer.msg('正在断开会话..', {icon: 16, time: 0, shade: [0.3, '#000']});
         tmPostCallback('pkill_session', {pts:pts}, function(data){
             layer.close(loadT);
+            
+            var rdata = data.data;
             layer.msg(rdata.msg, {icon: rdata.status ? 1 : 2});
             if (rdata.status){
                 get_who_list();
