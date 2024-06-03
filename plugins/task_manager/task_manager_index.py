@@ -1176,8 +1176,8 @@ def remove_user(args = {}):
     return mc_instance.remove_user(args)
 
 if __name__ == "__main__":
-    # mc_instance.get_process_list()
-    print(mc_instance.get_process_info({'pid':66647}))
+    print(mc_instance.get_process_list())
+    # print(mc_instance.get_process_info({'pid':66647}))
     # for x in range(10):
     #     mc_instance.test_cpu()
     #     time.sleep(1)
