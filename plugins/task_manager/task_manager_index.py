@@ -717,12 +717,14 @@ class mainClass(object):
         self.new_info['time'] = time.time()
         self.get_process_net_list()
 
-        sortx = 'all'
-        if 'sortx' in get: sortx = get['sortx']
 
         if not 'sortx' in get:
-            get['sortx'] = 'status'
-        if  get['sortx'] == 'status': res = False
+            get['sortx'] = 'all'
+
+        res = True
+        if  get['sortx'] == 'status': 
+            res = False
+            
         if 'reverse' in get:
             if get['reverse'] in ['undefined', 'null']:
                 get['reverse'] = 'True'
@@ -784,8 +786,8 @@ class mainClass(object):
                 continue
 
         processList = self.__pro_s_s(processList)
-        res = True
-        if sortx not in ['all']:
+        
+        if get['sortx'] not in ['all']:
             processList = sorted(processList, key=lambda x: x[get['sortx']], reverse=res)
         else:
             processList = sorted(processList, key=lambda x: [x['cpu_percent'], x['up'], x['down'], x['io_write_speed'],
