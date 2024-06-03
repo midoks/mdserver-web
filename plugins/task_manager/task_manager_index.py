@@ -671,7 +671,7 @@ class mainClass(object):
      # 获取进程信息
     def get_process_list_linux(self, get = {}):
         self.check_process_net_total()
-        self.Pids = psutil.pids()
+        self.pids = psutil.pids()
         processList = []
         if type(self.new_info) != dict: self.new_info = {}
         self.new_info['cpu_time'] = self.get_cpu_time()
@@ -684,7 +684,7 @@ class mainClass(object):
         info['mem'] = 0
         info['disk'] = 0
         status_ps = {'sleeping': '睡眠', 'running': '活动'}
-        for pid in self.Pids:
+        for pid in self.pids:
             tmp = {}
             try:
                 p = psutil.Process(pid)
