@@ -679,23 +679,23 @@ class mainClass(object):
         self.get_process_net_list()
 
         sortx = 'all'
-        if 'sortx' in args: sortx = args['sortx']
+        if 'sortx' in get: sortx = get['sortx']
 
-        if not 'sortx' in args:
-            args['sortx'] = 'status'
-        if  args['sortx'] == 'status': res = False
-        if 'reverse' in args:
-            if args['reverse'] in ['undefined', 'null']:
-                args['reverse'] = 'True'
-                args['sortx'] = 'all'
-            if not args['reverse'] in ['True', 'False']: args['reverse'] = 'True'
+        if not 'sortx' in get:
+            get['sortx'] = 'status'
+        if  get['sortx'] == 'status': res = False
+        if 'reverse' in get:
+            if get['reverse'] in ['undefined', 'null']:
+                get['reverse'] = 'True'
+                get['sortx'] = 'all'
+            if not get['reverse'] in ['True', 'False']: get['reverse'] = 'True'
             res_list = {'True': True, 'False': False}
-            res = res_list[args['reverse']]
+            res = res_list[get['reverse']]
         else:
-            args['reverse'] = True
-        if args['reverse'] in ['undefined', 'null']:
-            args['reverse'] = 'True'
-            args['sortx'] = 'all'
+            get['reverse'] = True
+        if get['reverse'] in ['undefined', 'null']:
+            get['reverse'] = 'True'
+            get['sortx'] = 'all'
 
         info = {}
         info['activity'] = 0
@@ -759,7 +759,7 @@ class mainClass(object):
         data['info'] = info
         if 'search' in get:
             if get['search'] != '':
-                data['process_list'] = self.search_pro(data['process_list'], get.search)
+                data['process_list'] = self.search_pro(data['process_list'], get['search'])
         self.get_meter_head()
         data['meter_head'] = self.meter_head
         return data
