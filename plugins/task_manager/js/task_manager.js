@@ -937,10 +937,12 @@ function remove_cron(index) {
 function pkill_session(pts) {
     safeMessage('强制断开会话[' + pts + ']', '强制断开此会话吗？', function () {
         var loadT = layer.msg('正在断开会话..', {icon: 16, time: 0, shade: [0.3, '#000']});
-        $.post('/plugin?action=a&name=task_manager&s=pkill_session', {pts: pts}, function (rdata) {
+        tmPostCallback('pkill_session', {pts:pts}, function(data){
             layer.close(loadT);
             layer.msg(rdata.msg, {icon: rdata.status ? 1 : 2});
-            if (rdata.status) get_who_list();
+            if (rdata.status){
+                get_who_list();
+            }
         });
     });
 }
