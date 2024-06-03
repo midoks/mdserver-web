@@ -180,4 +180,3 @@ plugins/frp
 plugins/file_search
 plugins/proxysql
 plugins/tidb
-plugins/task_manager
