@@ -1186,6 +1186,13 @@ class mainClass(object):
                 cronList = self.search_cron(cronList, get.search)
         return cronList
 
+    # 外部接口 强制结束会话
+    def pkill_session(self, get= {}):
+        if not 'pts' in get:
+            return mw.returnData(False, '缺少参数!')
+        mw.execShell("pkill -kill -t " + get['pts'])
+        return mw.returnData(True, '已强行结束会话[' + get['pts'] + ']')
+
     # 获取当前会话
     def get_who(self, get = {}):
         whoTmp = mw.execShell('who')[0]
@@ -1238,6 +1245,9 @@ def get_run_list(args = {}):
 
 def get_cron_list(args = {}):
     return mc_instance.get_cron_list(args)
+
+def pkill_session(args = {}):
+    return mc_instance.pkill_session(args)
 
 def get_who(args = {}):
     return mc_instance.get_who(args)
