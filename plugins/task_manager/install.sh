@@ -10,6 +10,8 @@ serverPath=$(dirname "$rootPath")
 install_tmp=${rootPath}/tmp/mw_install.pl
 VERSION=$2
 
+# python3 plugins/task_manager/task_manager_index.py
+
 Install_App()
 {
 	echo '正在安装脚本文件...' > $install_tmp
