@@ -424,8 +424,6 @@ function buildRealProcess() {
 
 // 生成进程表格内容
 function createProcessTable(getboday, data) {
-    console.log('createProcessTable',getboday, data);
-    console.log('realProcess',realProcess);
     var tbody_tr = '';
     for (var i = 0; i < realProcess.length; i++) {
         if (realProcess[i].status == '活动') realProcess[i].status = '<span style="color:green;">活动</span>';
@@ -454,13 +452,12 @@ function createProcessTable(getboday, data) {
 
         var tbody_td = '';
         if ('io_read_bytes' in realProcess[i]){
-            tbody_td =+ '<td style="' + (data?(data.meter_head.io_read_bytes ? '' : 'display:none;'):'') + '">' + toSize(realProcess[i].io_read_speed).replace(' ', '') + '</td>';
-            tbody_td =+ '<td style="' + (data?(data.meter_head.io_write_bytes ? '' : 'display:none;'):'') + '">' + toSize(realProcess[i].io_write_speed).replace(' ', '') + '</td>';
+            tbody_td += '<td style="' + (data?(data.meter_head.io_read_bytes ? '' : 'display:none;'):'') + '">' + toSize(realProcess[i].io_read_speed).replace(' ', '') + '</td>';
+            tbody_td += '<td style="' + (data?(data.meter_head.io_write_bytes ? '' : 'display:none;'):'') + '">' + toSize(realProcess[i].io_write_speed).replace(' ', '') + '</td>';
 
-            tbody_td =+ '<td style="' + (data?(data.meter_head.up ? '' : 'display:none;'):'') + '" title="上行速度：' + toSize(realProcess[i].up) + '/秒\n发包速度：' + realProcess[i].up_package + '个/秒">' + toSize(realProcess[i].up).replace(' ', '') + '</td>';
-            tbody_td =+ '<td style="' + (data?(data.meter_head.down ? '' : 'display:none;'):'') + '" title="下行速度：' + toSize(realProcess[i].down) + '/秒\n收包速度：' + realProcess[i].down_package + '个/秒">' + toSize(realProcess[i].down).replace(' ', '') + '</td>';
+            tbody_td += '<td style="' + (data?(data.meter_head.up ? '' : 'display:none;'):'') + '" title="上行速度：' + toSize(realProcess[i].up) + '/秒\n发包速度：' + realProcess[i].up_package + '个/秒">' + toSize(realProcess[i].up).replace(' ', '') + '</td>';
+            tbody_td += '<td style="' + (data?(data.meter_head.down ? '' : 'display:none;'):'') + '" title="下行速度：' + toSize(realProcess[i].down) + '/秒\n收包速度：' + realProcess[i].down_package + '个/秒">' + toSize(realProcess[i].down).replace(' ', '') + '</td>';
         }
-
         
         tbody_tr += '<tr ' + selected + selected_one + ' onclick="click_process_tr(event,' + realProcess[i].pid + ',' + realProcess[i].fpid + ')" >\
 			<td class="td-pid" style="' + (data?(data.meter_head.ps ? '' : 'display:none;'):'') + '">\
