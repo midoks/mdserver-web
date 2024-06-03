@@ -677,7 +677,10 @@ class mainClass(object):
         self.new_info['cpu_time'] = self.get_cpu_time()
         self.new_info['time'] = time.time()
         self.get_process_net_list()
-        if not 'sortx' in get: get.sortx = 'all'
+        
+        if not 'sortx' in get: 
+            get['sortx'] = 'all'
+
         info = {}
         info['activity'] = 0
         info['cpu'] = 0.00
