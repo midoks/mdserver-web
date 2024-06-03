@@ -766,6 +766,8 @@ function get_service_list() {
             return;
         }
 
+        var rdata = rdata.data;
+
         var tbody_tr = '';
         for (var i = 0; i < rdata.serviceList.length; i++) {
         tbody_tr += '<tr>\
