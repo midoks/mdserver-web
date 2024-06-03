@@ -710,7 +710,7 @@ function get_run_list() {
             return;
         }
 
-
+        var rdata = rdata.data;
         var tbody_tr = '';
         for (var i = 0; i < rdata.run_list.length; i++) {
             tbody_tr += '<tr>\

@@ -134,33 +134,40 @@ class mainClass(object):
 
     # 获取进程io写
     def get_io_write(self, pid, io_write):
-        # self.get_old()
         disk_io_write = 0
         if not self.old_info: self.old_info = {}
         if not pid in self.old_info:
-            self.new_info[pid]['io_write'] = io_write
+            self.old_info[pid] = {}
+            self.old_info[pid]['io_write'] = io_write
             return disk_io_write
-        if not 'time' in self.old_info: self.old_info['time'] = self.new_info['time']
+
+        if not 'io_write' in self.old_info[pid]:
+            self.old_info[pid]['io_write'] = io_write
+            return disk_io_write
+
         io_end = (io_write - self.old_info[pid]['io_write'])
         if io_end > 0:
             disk_io_write = io_end / (time.time() - self.old_info['time'])
-        self.new_info[pid]['io_write'] = io_write
+        self.old_info[pid]['io_write'] = io_write
         if disk_io_write > 0: return int(disk_io_write)
         return 0
 
     # 获取io读
     def get_io_read(self, pid, io_read):
-        # self.get_old()
         disk_io_read = 0
-        if not self.old_info: self.old_info = {}
         if not pid in self.old_info:
-            self.new_info[pid]['io_read'] = io_read
+            self.old_info[pid] = {} 
+            self.old_info[pid]['io_read'] = io_read
             return disk_io_read
-        if not 'time' in self.old_info: self.old_info['time'] = self.new_info['time']
+
+        if not 'io_read' in self.old_info[pid]:
+            self.old_info[pid]['io_read'] = io_read
+            return disk_io_read
+
         io_end = (io_read - self.old_info[pid]['io_read'])
         if io_end > 0:
             disk_io_read = io_end / (time.time() - self.old_info['time'])
-        self.new_info[pid]['io_read'] = io_read
+        self.old_info[pid]['io_read'] = io_read
         if disk_io_read > 0: return int(disk_io_read)
         return 0
 
@@ -773,6 +780,7 @@ class mainClass(object):
                 del (p)
                 del (tmp)
             except Exception as e:
+                print(mw.getTracebackInfo())
                 continue
 
         processList = self.__pro_s_s(processList)
