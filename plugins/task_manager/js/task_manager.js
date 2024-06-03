@@ -456,10 +456,12 @@ function createProcessTable(getboday, data) {
         if ('io_read_bytes' in realProcess[i]){
             tbody_td =+ '<td style="' + (data?(data.meter_head.io_read_bytes ? '' : 'display:none;'):'') + '">' + toSize(realProcess[i].io_read_speed).replace(' ', '') + '</td>';
             tbody_td =+ '<td style="' + (data?(data.meter_head.io_write_bytes ? '' : 'display:none;'):'') + '">' + toSize(realProcess[i].io_write_speed).replace(' ', '') + '</td>';
+
+            tbody_td =+ '<td style="' + (data?(data.meter_head.up ? '' : 'display:none;'):'') + '" title="上行速度：' + toSize(realProcess[i].up) + '/秒\n发包速度：' + realProcess[i].up_package + '个/秒">' + toSize(realProcess[i].up).replace(' ', '') + '</td>';
+            tbody_td =+ '<td style="' + (data?(data.meter_head.down ? '' : 'display:none;'):'') + '" title="下行速度：' + toSize(realProcess[i].down) + '/秒\n收包速度：' + realProcess[i].down_package + '个/秒">' + toSize(realProcess[i].down).replace(' ', '') + '</td>';
         }
 
-        // <td style="' + (data?(data.meter_head.up ? '' : 'display:none;'):'') + '" title="上行速度：' + toSize(realProcess[i].up) + '/秒\n发包速度：' + realProcess[i].up_package + '个/秒">' + ToSize(realProcess[i].up).replace(' ', '') + '</td>\
-        // <td style="' + (data?(data.meter_head.down ? '' : 'display:none;'):'') + '" title="下行速度：' + toSize(realProcess[i].down) + '/秒\n收包速度：' + realProcess[i].down_package + '个/秒">' + ToSize(realProcess[i].down).replace(' ', '') + '</td>\
+        
         tbody_tr += '<tr ' + selected + selected_one + ' onclick="click_process_tr(event,' + realProcess[i].pid + ',' + realProcess[i].fpid + ')" >\
 			<td class="td-pid" style="' + (data?(data.meter_head.ps ? '' : 'display:none;'):'') + '">\
 				' + colp + '\
@@ -510,7 +512,7 @@ function get_resource_list() {
       // console.log('realllll');
 
       buildRealProcess()
-      var tbody_tr = createProcessTable(true)
+      var tbody_tr = createProcessTable(true);
       var tbody = '<thead>\
 					<tr style="cursor: pointer;">\
 						<th style="width:120px;" class="pro_name pro_ps" onclick="get_process_list(\'ps\',\'' + res_list[reverse] + '\')">应用名称</th>\
