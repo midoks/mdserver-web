@@ -1189,6 +1189,16 @@ class mainClass(object):
                 data['serviceList'] = self.search_service(data['serviceList'], get['search'])
         return data
 
+    def search_service(self, data, search):
+        try:
+            ldata = []
+            for i in data:
+                if search in i['name'] or search in i['ps']:
+                    ldata.append(i)
+            return ldata
+        except:
+            return data
+
     # 获取存放计划任务的路径
     def get_cron_file(self):
         filename = '/var/spool/cron/crontabs/root'
