@@ -677,9 +677,25 @@ class mainClass(object):
         self.new_info['cpu_time'] = self.get_cpu_time()
         self.new_info['time'] = time.time()
         self.get_process_net_list()
-        
-        if not 'sortx' in get: 
-            get['sortx'] = 'all'
+
+        sortx = 'all'
+        if 'sortx' in args: sortx = args['sortx']
+
+        if not 'sortx' in args:
+            args['sortx'] = 'status'
+        if  args['sortx'] == 'status': res = False
+        if 'reverse' in args:
+            if args['reverse'] in ['undefined', 'null']:
+                args['reverse'] = 'True'
+                args['sortx'] = 'all'
+            if not args['reverse'] in ['True', 'False']: args['reverse'] = 'True'
+            res_list = {'True': True, 'False': False}
+            res = res_list[args['reverse']]
+        else:
+            args['reverse'] = True
+        if args['reverse'] in ['undefined', 'null']:
+            args['reverse'] = 'True'
+            args['sortx'] = 'all'
 
         info = {}
         info['activity'] = 0
@@ -729,21 +745,8 @@ class mainClass(object):
 
         processList = self.__pro_s_s(processList)
         res = True
-        if get.sortx == 'status': res = False
-        if 'reverse' in get:
-            if get.reverse in ['undefined', 'null']:
-                get.reverse = 'True'
-                get.sortx = 'all'
-            if not get.reverse in ['True', 'False']: get.reverse = 'True'
-            res_list = {'True': True, 'False': False}
-            res = res_list[get.reverse]
-        else:
-            get.reverse = True
-        if get.reverse in ['undefined', 'null']:
-            get.reverse = 'True'
-            get.sortx = 'all'
-        if get.sortx not in ['all']:
-            processList = sorted(processList, key=lambda x: x[get.sortx], reverse=res)
+        if sortx not in ['all']:
+            processList = sorted(processList, key=lambda x: x[get['sortx']], reverse=res)
         else:
             processList = sorted(processList, key=lambda x: [x['cpu_percent'], x['up'], x['down'], x['io_write_speed'],
                                                              x['io_read_speed'], x['connects'], x['threads'],
