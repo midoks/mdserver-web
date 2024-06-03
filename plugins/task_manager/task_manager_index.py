@@ -1117,6 +1117,42 @@ class mainClass(object):
                 data['run_list'] = self.search_run(data['run_list'], get['search'])
         return data
 
+    # 检查服务是否为系统服务get_systemctl_list——>引用cont_systemctl
+    def cont_systemctl(self, name):
+        conts = ['systemd', 'rhel', 'plymouth', 'rc-', '@', 'init', 'ipr', 'dbus', '-local']
+        for c in conts:
+            if name.find(c) != -1: return False
+        return True
+
+    # 获取系统服务运行级别   get_service_list——>引用get_systemctl_list
+    def get_systemctl_list(self, serviceList, runlevel):
+        systemctl_user_path = '/usr/lib/systemd/system/'
+        systemctl_run_path = '/etc/systemd/system/multi-user.target.wants/'
+        if not os.path.exists(systemctl_user_path) or not os.path.exists(systemctl_run_path): return serviceList
+        r = '.service'
+        for d in os.listdir(systemctl_user_path):
+            if d.find(r) == -1: continue;
+            if not self.cont_systemctl(d): continue;
+            isrun = '<span style="color:red;" title="点击开启">关闭</span>'
+            serviceInfo = {}
+            serviceInfo['name'] = d.replace(r, '')
+            serviceInfo['runlevel_0'] = isrun
+            serviceInfo['runlevel_1'] = isrun
+            serviceInfo['runlevel_2'] = isrun
+            serviceInfo['runlevel_3'] = isrun
+            serviceInfo['runlevel_4'] = isrun
+            serviceInfo['runlevel_5'] = isrun
+            serviceInfo['runlevel_6'] = isrun
+            if os.path.exists(systemctl_run_path + d):
+                isrun = '<span style="color:green;" title="点击关闭">开启</span>'
+                serviceInfo['runlevel_' + runlevel] = isrun
+                serviceInfo['runlevel_3'] = isrun
+                serviceInfo['runlevel_5'] = isrun
+
+            serviceInfo['ps'] = self.get_run_ps(serviceInfo['name'])
+            serviceList.append(serviceInfo)
+        return serviceList
+
     # 外部接口 查询服务启动级别 /etc/init.d/
     def get_service_list(self, get = {}):
         data = {}
@@ -1148,9 +1184,9 @@ class mainClass(object):
         data['runlevel'] = self.get_my_runlevel()
         data['serviceList'] = sorted(serviceList, key=lambda x: x['name'], reverse=False)
         data['serviceList'] = self.get_systemctl_list(data['serviceList'], data['runlevel'])
-        if hasattr(get, 'search'):
-            if get.search != '':
-                data['serviceList'] = self.search_service(data['serviceList'], get.search)
+        if 'search' in get:
+            if get['search'] != '':
+                data['serviceList'] = self.search_service(data['serviceList'], get['search'])
         return data
 
     # 获取存放计划任务的路径
