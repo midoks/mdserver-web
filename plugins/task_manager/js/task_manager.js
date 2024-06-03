@@ -966,7 +966,7 @@ function set_runlevel_state(runlevel, serviceName) {
 function get_process_info(pid) {
     var loadT = layer.msg('正在获取进程信息[' + pid + ']..', {icon: 16, time: 0, shade: [0.3, '#000']});
     tmPostCallback('get_process_info', {pid:pid}, function(data){
-        console.log('get_process_info',data);
+        // console.log('get_process_info',data);
         layer.close(loadT);
         var rdata = data.data;
         fileBody = '';
