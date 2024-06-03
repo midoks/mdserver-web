@@ -821,7 +821,7 @@ class mainClass(object):
 
     # 用户名注释：ps   get_user_list——>引用get_user_ps
     def get_user_ps(self, name, ps):
-        userPs = {'www': '宝塔面板', 'root': '超级管理员', 'mysql': '用于运行MySQL的用户',
+        userPs = {'www': '面板', 'root': '超级管理员', 'mysql': '用于运行MySQL的用户',
                   'mongo': '用于运行MongoDB的用户',
                   'git': 'git用户', 'mail': 'mail', 'nginx': '第三方nginx用户', 'postfix': 'postfix邮局用户',
                   'lp': '打印服务帐号',
