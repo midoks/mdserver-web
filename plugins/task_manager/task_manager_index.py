@@ -700,7 +700,7 @@ class mainClass(object):
                     tmp['name'] = p.name()
                     tmp['pid'] = pid
                     tmp['ppid'] = p.ppid()
-                    # tmp['create_time'] = int(p.create_time())
+                    tmp['create_time'] = int(p.create_time())
                     tmp['status'] = p_state
                     tmp['user'] = p.username()
                     tmp['memory_used'] = p_mem.uss
