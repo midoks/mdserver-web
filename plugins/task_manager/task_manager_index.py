@@ -934,6 +934,42 @@ class mainClass(object):
                 userList = self.search_user(userList, get['search'])
         return userList
 
+    # get_network_list ——>引用get_network
+    def get_network(self):
+        try:
+            self.get_net_old()
+            networkIo = psutil.net_io_counters()[:4]
+            self.new_net_info['upTotal'] = networkIo[0]
+            self.new_net_info['downTotal'] = networkIo[1]
+            self.new_net_info['upPackets'] = networkIo[2]
+            self.new_net_info['downPackets'] = networkIo[3]
+            self.new_net_info['time'] = time.time()
+
+            if not self.old_net_info: self.old_net_info = {}
+            if not 'upTotal' in self.old_net_info:
+                time.sleep(0.1)
+                networkIo = psutil.net_io_counters()[:4]
+                self.old_net_info['upTotal'] = networkIo[0]
+                self.old_net_info['downTotal'] = networkIo[1]
+                self.old_net_info['upPackets'] = networkIo[2]
+                self.old_net_info['downPackets'] = networkIo[3]
+                self.old_net_info['time'] = time.time()
+
+            s = self.new_net_info['time'] - self.old_net_info['time']
+            networkInfo = {}
+            networkInfo['upTotal'] = networkIo[0]
+            networkInfo['downTotal'] = networkIo[1]
+            networkInfo['up'] = round((float(networkIo[0]) - self.old_net_info['upTotal']) / s, 2)
+            networkInfo['down'] = round((float(networkIo[1]) - self.old_net_info['downTotal']) / s, 2)
+            networkInfo['downPackets'] = networkIo[3]
+            networkInfo['upPackets'] = networkIo[2]
+            networkInfo['downPackets_s'] = int((networkIo[3] - self.old_net_info['downPackets']) / s)
+            networkInfo['upPackets_s'] = int((networkIo[2] - self.old_net_info['upPackets']) / s)
+            cache.set(self.old_net_path, self.new_net_info, 600)
+            return networkInfo
+        except:
+            return None
+
 
     # 获取当前网络连接信息
     def get_network_list(self, get = {}):

@@ -591,8 +591,8 @@ function get_network_list(rflush) {
             return;
         }
 
-        console.log(rdata);
-
+        var rdata = rdata.data;
+        
         var tbody_tr = "";
         for (var i = 0; i < rdata.list.length; i++) {
             tbody_tr += "<tr>"
