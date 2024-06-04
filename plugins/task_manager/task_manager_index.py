@@ -1470,7 +1470,10 @@ class mainClass(object):
 
     # 外部接口，删除计划任务
     def remove_cron(self, get):
-        index = int(get.index)
+        if not 'index' in get:
+            return mw.returnData(False, '参数不存在[index]!')
+
+        index = int(get['index'])
         cronList = self.get_cron_list({})
         if index > len(cronList) + 1: return mw.returnData(False, '指定任务不存在!')
         toCron = []

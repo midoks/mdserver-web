@@ -540,7 +540,7 @@ function get_cron_list() {
     var loadT = layer.msg('获取计划任务列表..', {icon: 16, time: 0, shade: [0.3, '#000']});
     tmPostCallback('get_cron_list', {search:search_val}, function(rdata){
         layer.close(loadT);
-        
+
         var rdata = rdata.data;
         var tbody_tr = '';
         for (var i = 0; i < rdata.length; i++) {
@@ -937,12 +937,16 @@ function online_edit_file(fileName) {
 //删除计划任务
 function remove_cron(index) {
     safeMessage('删除计划任务[' + index + ']', '删除后将无法恢复,继续吗？', function () {
-      var loadT = layer.msg('正在删除计划任务..', {icon: 16, time: 0, shade: [0.3, '#000']});
-      $.post('/plugin?action=a&name=task_manager&s=remove_cron', {index: index}, function (rdata) {
-        layer.close(loadT);
-        layer.msg(rdata.msg, {icon: rdata.status ? 1 : 2});
-        if (rdata.status) get_cron_list();
-      });
+        var loadT = layer.msg('正在删除计划任务..', {icon: 16, time: 0, shade: [0.3, '#000']});
+        tmPostCallback('remove_cron', {index:index}, function(rdata){
+            layer.close(loadT);
+            var rdata = data.data;
+            showMsg(rdata.msg, function(){
+                if (rdata.status) {
+                    get_cron_list();
+                }
+            },{icon: rdata.status ? 1 : 2});
+        });
     });
 }
 
