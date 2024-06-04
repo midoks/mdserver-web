@@ -823,7 +823,10 @@ class mainClass(object):
         for pid in self.pids:
             tmp = {}
             try:
-                p = psutil.Process(pid)
+                try:
+                    p = psutil.Process(pid)
+                except Exception as e:
+                    continue
                 with p.oneshot():
                     p_mem = p.memory_full_info()
                     if p_mem.rss == 0: continue
