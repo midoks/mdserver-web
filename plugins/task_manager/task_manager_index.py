@@ -998,10 +998,22 @@ class mainClass(object):
                 userList = self.search_user(userList, get['search'])
         return userList
 
+    # 查询用户
+    def search_user(self, data, search):
+        try:
+            ldata = []
+            for i in data:
+                if search in i['username'] or search in i['ps'] or search in i['login_shell'] or search in i[
+                    'home'] or search in i['group']:
+                    ldata.append(i)
+            return ldata
+        except:
+            mw.writeLog('任务管理', traceback.format_exc())
+            return data
+
     # get_network_list ——>引用get_network
     def get_network(self):
         try:
-            self.get_net_old()
             networkIo = psutil.net_io_counters()[:4]
             self.new_net_info['upTotal'] = networkIo[0]
             self.new_net_info['downTotal'] = networkIo[1]
@@ -1029,7 +1041,6 @@ class mainClass(object):
             networkInfo['upPackets'] = networkIo[2]
             networkInfo['downPackets_s'] = int((networkIo[3] - self.old_net_info['downPackets']) / s)
             networkInfo['upPackets_s'] = int((networkIo[2] - self.old_net_info['upPackets']) / s)
-            cache.set(self.old_net_path, self.new_net_info, 600)
             return networkInfo
         except:
             return None
@@ -1037,15 +1048,14 @@ class mainClass(object):
 
     # 获取当前网络连接信息
     def get_network_list(self, get = {}):
+        netstats = psutil.net_connections()
         data = {}
         data['is_mac'] = False
         if self.is_mac:
             data['is_mac'] = self.is_mac
             return data
             
-
         netstats = psutil.net_connections()
-
         networkList = []
         for netstat in netstats:
             tmp = {}
@@ -1059,7 +1069,7 @@ class mainClass(object):
             tmp['status'] = netstat.status
             p = psutil.Process(netstat.pid)
             tmp['process'] = p.name()
-            if tmp['process'] in ['BT-Panel', 'gunicorn', 'baota_coll', 'baota_client']: continue
+            if tmp['process'] in ['gunicorn']: continue
             tmp['pid'] = netstat.pid
             networkList.append(tmp)
             del (p)
@@ -1068,10 +1078,28 @@ class mainClass(object):
 
         data['list'] = networkList
         data['state'] = self.get_network()
-        if hasattr(get, 'search'):
-            if get.search != '':
-                data['list'] = self.search_network(data['list'], get.search)
+        if 'search' in get:
+            if get['search'] != '':
+                data['list'] = self.search_network(data['list'], get['search'])
         return data
+
+    # 查询网络
+    def search_network(self, data, search):
+        try:
+            ldata = []
+            for i in data:
+                if search in i['process'] or search in i['status'] or search in str(i['pid']) or search in i['laddr'][
+                    0] or search in str(
+                    i['laddr'][1]):
+                    ldata.append(i)
+                    continue
+                if i['raddr'] != 'NONE':
+                    for j in i['raddr']:
+                        if search in str(j):
+                            ldata.append(i)
+            return ldata
+        except:
+            return data
 
     # 获取当前运行级别  get_service_list ——> 引用get_my_runlevel
     def get_my_runlevel(self):
@@ -1452,7 +1480,8 @@ def remove_user(args = {}):
     return mc_instance.remove_user(args)
 
 if __name__ == "__main__":
-    print(mc_instance.get_process_list())
+    # print(mc_instance.get_process_list())
+    print(mc_instance.get_network_list())
     # print(mc_instance.get_process_info({'pid':66647}))
     # for x in range(10):
     #     mc_instance.test_cpu()
