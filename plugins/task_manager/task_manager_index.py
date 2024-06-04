@@ -321,7 +321,10 @@ class mainClass(object):
         if p_exe:
             if name == 'php-fpm':
                 try:
-                    php_version = p_exe.split('/')[-3][3:]
+                    if self.is_mac:
+                        php_version = p_exe.split('/')[-3][3:]
+                    else:
+                        php_version = p_exe.split('/')[-3]
                     return 'PHP' + php_version + '进程'
                 except:
                     pass
