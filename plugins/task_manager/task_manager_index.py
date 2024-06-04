@@ -330,7 +330,7 @@ class mainClass(object):
                 except:
                     pass
             elif name.lower() == 'python' or name.lower() == 'python3':
-                print(name.lower(), pid, p_exe)
+                # print(name.lower(), pid, p_exe)
                 p_exe_arr = p_exe.split('/')
                 if p_exe_arr[-1] in ['BT-Task', 'task.py']:
                     return '面板-后台任务进程'
@@ -366,10 +366,11 @@ class mainClass(object):
                     elif cmdline.find('mdserver-web') != -1 and cmdline.find('gunicorn -c setting.py app:app') != -1:
                         return 'MW面板'
             elif name.lower() == 'gunicorn':
-                print(name.lower(), pid, p_exe)
+                # print(name.lower(), pid, p_exe)
                 if p:
                     cmdline = ' '.join(p.cmdline()).strip()
-                    print(cmdline)
+                    if cmdline.find('mdserver-web') != -1 and cmdline.find('gunicorn -c setting.py app:app') != -1:
+                        return 'MW面板'
             elif name == 'nginx':
                 default_name = 'Nginx'
                 if p_exe.find('openresty/nginx') != -1:
@@ -379,6 +380,12 @@ class mainClass(object):
                     return default_name+'子进程'
                 else:
                     return default_name+'主进程'
+            elif name == 'openresty':
+                if p.username() == 'www':
+                    return 'OpenResty子进程'
+                return 'OpenResty主进程'
+            elif name == 'mw':
+                return 'MW面板-命令'
             elif p_exe == '/usr/bin/bash':
                 cmdline = ' '.join(p.cmdline()).strip()
                 if cmdline.find('/www/server/cron/') != -1:
