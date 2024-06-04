@@ -1370,15 +1370,14 @@ class mainClass(object):
     def toWeek(self, num):
         if num > 6: return ''
         wheres = {
-            0: mw.getMsg('CRONTAB_SUNDAY'),
-            1: mw.getMsg('CRONTAB_MONDAY'),
-            2: mw.getMsg('CRONTAB_TUESDAY'),
-            3: mw.getMsg('CRONTAB_WEDNESDAY'),
-            4: mw.getMsg('CRONTAB_THURSDAY'),
-            5: mw.getMsg('CRONTAB_FRIDAY'),
-            6: mw.getMsg('CRONTAB_SATURDAY')
+            0: '周日',
+            1: '周一',
+            2: '周二',
+            3: '周三',
+            4: '周四',
+            5: '周五',
+            6: '周六',
         }
-
         return wheres[num]
 
     # 解析计划任务执行周期
