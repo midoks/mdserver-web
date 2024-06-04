@@ -832,7 +832,7 @@ function get_user_list() {
 				<th width="140">用户组</th>\
 				<th width="50">uid</th>\
 				<th width="50">gid</th>\
-				<th width="150">登陆脚本<a class="bt-ico-ask" target="_blank" href="https://www.bt.cn/bbs/thread-12682-1-1.html" title="查看说明">?</a></th>\
+				<th width="150">登陆脚本</th>\
 				<th style="overflow:hidden">描述</th>\
 				<th width="50">操作</th>\
 			</tr>\
