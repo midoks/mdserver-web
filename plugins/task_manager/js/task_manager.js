@@ -940,7 +940,7 @@ function remove_cron(index) {
         var loadT = layer.msg('正在删除计划任务..', {icon: 16, time: 0, shade: [0.3, '#000']});
         tmPostCallback('remove_cron', {index:index}, function(rdata){
             layer.close(loadT);
-            var rdata = data.data;
+            var rdata = rdata.data;
             showMsg(rdata.msg, function(){
                 if (rdata.status) {
                     get_cron_list();
