@@ -960,14 +960,17 @@ function pkill_session(pts) {
     });
 }
 
-
 //设置服务启动级别状态
 function set_runlevel_state(runlevel, serviceName) {
     var loadT = layer.msg('正在设置服务[' + serviceName + ']..', {icon: 16, time: 0, shade: [0.3, '#000']});
-    $.post('/plugin?action=a&name=task_manager&s=set_runlevel_state', {runlevel: runlevel,serviceName: serviceName}, function (rdata) {
+    tmPostCallback('set_runlevel_state', {runlevel: runlevel,serviceName: serviceName}, function(data){
         layer.close(loadT);
-        layer.msg(rdata.msg, {icon: rdata.status ? 1 : 2});
-        if (rdata.status) get_service_list();
+        var rdata = data.data;
+        showMsg(rdata.msg, function(){
+            if (rdata.status) {
+                get_service_list();
+            }
+        },{icon: rdata.status ? 1 : 2});
     });
 }
 
@@ -975,7 +978,6 @@ function set_runlevel_state(runlevel, serviceName) {
 function get_process_info(pid) {
     var loadT = layer.msg('正在获取进程信息[' + pid + ']..', {icon: 16, time: 0, shade: [0.3, '#000']});
     tmPostCallback('get_process_info', {pid:pid}, function(data){
-        // console.log('get_process_info',data);
         layer.close(loadT);
         var rdata = data.data;
         fileBody = '';
