@@ -852,10 +852,15 @@ function get_user_list() {
 function userdel(user) {
     safeMessage('删除用户【' + user + '】', '删除后可能导致您的环境无法正常运行,继续吗？', function () {
         var loadT = layer.msg('正在删除用户[' + user + ']..', {icon: 16, time: 0, shade: [0.3, '#000']});
-        $.post('/plugin?action=a&name=task_manager&s=remove_user', {user: user}, function (rdata) {
+        tmPostCallback('remove_user', {user:user}, function(rdata){
             layer.close(loadT);
-            layer.msg(rdata.msg, {icon: rdata.status ? 1 : 2});
-            if (rdata.status) get_user_list();
+
+            var rdata = data.data;
+            showMsg(rdata.msg, function(){
+                if (rdata.status) {
+                    get_user_list();
+                }
+            },{icon: rdata.status ? 1 : 2});
         });
     });
 }
