@@ -610,7 +610,7 @@ function showMsg(msg, callback ,icon, time){
 
 function openPath(a) {
 	setCookie("open_dir_path", a);
-	window.location.href = "/files/"
+	window.location.href = "/files/";
 }
 
 function onlineEditFile(k, f, callback) {
