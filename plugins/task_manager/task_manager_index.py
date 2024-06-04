@@ -528,10 +528,10 @@ class mainClass(object):
     # 获取python的路径
     def get_python_bin(self):
         mw_dir = mw.getServerDir() + '/mdserver-web'
-        bin_file = mw_dir + '/bin/python'
+        bin_file = mw_dir + '/bin/python3'
         if os.path.exists(bin_file):
             return bin_file
-        return '/usr/bin/python'
+        return '/usr/bin/python3'
 
     # 检查process_network_total.py是否运行
     def check_process_net_total(self):
