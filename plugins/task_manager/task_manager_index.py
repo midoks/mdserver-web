@@ -365,6 +365,11 @@ class mainClass(object):
                         return '面板计划任务'
                     elif cmdline.find('mdserver-web') != -1 and cmdline.find('gunicorn -c setting.py app:app') != -1:
                         return 'MW面板'
+            elif name.lower() == 'gunicorn':
+                print(name.lower(), pid, p_exe)
+                if p:
+                    cmdline = ' '.join(p.cmdline()).strip()
+                    print(cmdline)
             elif name == 'nginx':
                 default_name = 'Nginx'
                 if p_exe.find('openresty/nginx') != -1:
