@@ -1221,7 +1221,7 @@ class mainClass(object):
     def remove_service(self, get):
         if not 'serviceName' in get:
             return mw.returnData(False,'缺少参数');
-            
+
         serviceName = get['serviceName']
         if serviceName == 'mw': return mw.returnData(False, '不能通过面板结束面板服务!')
         systemctl_user_path = '/usr/lib/systemd/system/'
@@ -1244,6 +1244,44 @@ class mainClass(object):
         filename = '/etc/init.d/' + serviceName
         if os.path.exists(filename): os.remove(filename)
         return mw.returnData(True, '删除成功!')
+
+    # 外部接口，设置软件运行环境，不能设置0，6
+    def set_runlevel_state(self, get):
+        if not 'runlevel' in get:
+            return mw.returnData(False,'缺少参数[runlevel]')
+
+        if not 'serviceName' in get:
+            return mw.returnData(False,'缺少参数[serviceName]')
+
+        runlevel = get['runlevel']
+        serviceName = get['serviceName']
+        if runlevel == '0' or runlevel == '6': 
+            return mw.returnData(False,'为安全考虑,不能通过面板直接修改此运行级别')
+
+        systemctl_user_path = '/usr/lib/systemd/system/'
+        systemctl_run_path = '/etc/systemd/system/multi-user.target.wants/'
+        if os.path.exists(systemctl_user_path + get.serviceName + '.service'):
+            runlevel = mw.execShell('runlevel')[0].split()[1]
+            if get.runlevel != runlevel: 
+                return mw.returnData(False,'Systemctl托管的服务不能设置非当前运行级别的状态')
+            action = 'enable'
+            if os.path.exists(systemctl_run_path + serviceName + '.service'): 
+                action = 'disable'
+            mw.execShell('systemctl ' + action + ' ' + serviceName + '.service')
+            return mw.returnData(True, '设置成功!')
+
+        rc_d = '/etc/rc' + runlevel + '.d/'
+        import shutil
+        for d in os.listdir(rc_d):
+            if d[3:] != serviceName: continue
+            sfile = rc_d + d
+            c = 'S'
+            if d[:1] == 'S': c = 'K'
+            dfile = rc_d + c + d[1:]
+            shutil.move(sfile, dfile)
+            return mw.returnData(True, '设置成功!')
+        return mw.returnData(False, '设置失败!')
+
 
     # 外部接口 查询服务启动级别 /etc/init.d/
     def get_service_list(self, get = {}):
@@ -1385,6 +1423,9 @@ def kill_process_all(args = {}):
 
 def remove_service(args = {}):
     return mc_instance.remove_service(args)
+
+def set_runlevel_state(args = {}):
+    return mc_instance.set_runlevel_state(args)
 
 def get_service_list(args = {}):
     return mc_instance.get_service_list(args)
