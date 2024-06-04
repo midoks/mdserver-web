@@ -584,6 +584,68 @@ class mainClass(object):
         except:
             return []
 
+    # 外部接口，结束进程，pid30以上
+    def kill_process(self, get):
+        pid = int(get['pid'])
+        if pid < 30: return mw.returnData(False, '不能结束系统关键进程!')
+        if not pid in psutil.pids(): return mw.returnData(False, '指定进程不存在!')
+        if not 'killall' in get:
+            p = psutil.Process(pid)
+            if self.is_panel_process(pid): return mw.returnData(False, '不能结束面板服务进程')
+            p.kill()
+            return mw.returnData(True, '进程已结束')
+        return self.kill_process_all(pid)
+
+    # 是否为面板进程
+    def is_panel_process(self, pid):
+        if not self.panel_pid:
+            self.panel_pid = os.getpid()
+        if pid == self.panel_pid: return True
+        if not self.task_pid:
+            try:
+                self.task_pid = int(mw.execShell("ps aux | grep 'python3 task.py' |grep -v grep|head -n1|awk '{print $2}'")[0])
+            except:
+                self.task_pid = -1
+        if pid == self.task_pid: return True
+        return False
+
+    # 遍历结束pid的子进程 kill_process_all——>引用kill_process_lower
+    def kill_process_lower(self, pid):
+        pids = psutil.pids()
+        for lpid in pids:
+            if lpid < 30: continue
+            if self.is_panel_process(lpid): continue
+            p = psutil.Process(lpid)
+            ppid = p.ppid()
+            if ppid == pid:
+                p.kill()
+                return self.kill_process_lower(lpid)
+        return True
+
+    # 结束进程树 kill_process——>引用kill_process_all
+    def kill_process_all(self, pid):
+        # public.print_log(pid)
+        if pid < 30: return mw.returnData(True, '已结束此进程树!')
+        if self.is_panel_process(pid): return mw.returnData(False, '不能结束面板服务进程')
+        try:
+            if not pid in psutil.pids(): mw.returnData(True, '已结束此进程树!')
+            p = psutil.Process(pid)
+            ppid = p.ppid()
+            name = p.name()
+            p.kill()
+            mw.execShell('pkill -9 ' + name)
+            if name.find('php-') != -1:
+                mw.execShell("rm -f /tmp/php-cgi-*.sock")
+            elif name.find('mysql') != -1:
+                mw.execShell("rm -f /tmp/mysql.sock")
+            elif name.find('nginx') != -1:
+                mw.execShell("rm -f /tmp/mysql.sock")
+            self.kill_process_lower(pid)
+            if ppid: return self.kill_process_all(ppid)
+        except:
+            pass
+        return public.returnMsg(True, '已结束此进程树!')
+
     def get_process_list(self, args = {}):
         # https://hellowac.github.io/psutil-doc-zh/processes/process_class/oneshot.html
         if self.is_mac:
@@ -724,7 +786,7 @@ class mainClass(object):
         res = True
         if  get['sortx'] == 'status': 
             res = False
-            
+
         if 'reverse' in get:
             if get['reverse'] in ['undefined', 'null']:
                 get['reverse'] = 'True'
@@ -1284,6 +1346,16 @@ def get_network_list(args = {}):
 
 def get_process_list(args = {}):
     return mc_instance.get_process_list(args)
+
+def kill_process(args = {}):
+    return mc_instance.kill_process(args)
+
+def kill_process_all(args = {}):
+    if not 'pid' in args:
+            return mw.returnData(False, '缺少参数!')
+    return mc_instance.kill_process_all(int(args['pid']))
+
+    
 
 def get_service_list(args = {}):
     return mc_instance.get_service_list(args)

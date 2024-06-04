@@ -2110,6 +2110,15 @@ def notifyMessage(msg, stype='common', trigger_time=300, is_write_log=True):
 ##################### notify  end #########################################
 
 
+def getGlibcVersion():
+    try:
+        cmd_result = execShell("ldd --version")[0]
+        if not cmd_result: return ''
+        glibc_version = cmd_result.split("\n")[0].split()[-1]
+    except:
+        return ''
+    return glibc_version
+
 ##################### ssh  start #########################################
 def getSshDir():
     if isAppleSystem():

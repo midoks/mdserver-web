@@ -861,47 +861,53 @@ function userdel(user) {
 //结束进程
 function kill_process(pid, fpid) {
     if (fpid) {
-      select_pid = fpid;
+        select_pid = fpid;
     }
     var w = layer.confirm('您是否要结束 (' + pid + ') 进程？', {
-      btn: ['结束', '取消'], //按钮
-      title: '结束' + pid,
-      closeBtn: 2
+        btn: ['结束', '取消'], //按钮
+        title: '结束' + pid,
+        closeBtn: 2
     }, function () {
-      var loadT = layer.msg('正在结束进程[' + pid + ']..', {icon: 16, time: 0, shade: [0.3, '#000']});
-      $.post('/plugin?action=a&name=task_manager&s=kill_process', {pid: pid}, function (rdata) {
-        layer.close(loadT);
-        layer.msg(rdata.msg, {icon: rdata.status ? 1 : 2});
-        if (rdata.status) get_process_list();
-      })
+        var loadT = layer.msg('正在结束进程[' + pid + ']..', {icon: 16, time: 0, shade: [0.3, '#000']});
+        tmPostCallback('kill_process', {pid:pid}, function(data){
+            layer.close(loadT);
+            layer.msg(rdata.msg, {icon: rdata.status ? 1 : 2});
+            if (rdata.status) {
+                get_process_list();
+            }
+        });
     }, function () {
-      layer.close(w)
+        layer.close(w);
     })
 }
 
 //结束进程树
 function kill_process_all(pid) {
     var w = layer.confirm('您是否要结束 (' + pid + ') 进程？', {
-      btn: ['结束', '取消'], //按钮
-      title: '结束' + pid,
-      closeBtn: 2
+        btn: ['结束', '取消'], //按钮
+        title: '结束' + pid,
+        closeBtn: 2
     }, function () {
-      var loadT = layer.msg('正在结束父进程[' + pid + ']..', {icon: 16, time: 0, shade: [0.3, '#000']});
-      $.post('/plugin?action=a&name=task_manager&s=kill_process_all', {pid: pid}, function (rdata) {
-        layer.close(loadT);
-        layer.msg(rdata.msg, {icon: rdata.status ? 1 : 2});
-        if (rdata.status) get_process_list();
-      })
+        var loadT = layer.msg('正在结束父进程[' + pid + ']..', {icon: 16, time: 0, shade: [0.3, '#000']});
+        tmPostCallback('kill_process_all', {pid:pid}, function(data){
+            layer.close(loadT);
+            var rdata = data.data;
+            showMsg(rdata.msg, function(){
+                if (rdata.status) {
+                    get_process_list();
+                }
+            },{icon: rdata.status ? 1 : 2});            
+        });
     }, function () {
-      layer.close(w)
-    })
+        layer.close(w);
+    });
 }
 
 //打开文件所在位置
 function open_path(path) {
-    tmp = path.split('/')
+    var tmp = path.split('/');
     tmp[tmp.length - 1] = '';
-    path = '/' + tmp.join('/');
+    var path = '/' + tmp.join('/');
     openPath(path);
 }
 
