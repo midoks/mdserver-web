@@ -916,6 +916,7 @@ function remove_service(serviceName) {
     safeMessage('删除服务【' + serviceName + '】', '删除后可能导致您的环境无法正常运行,继续吗？', function () {
         var loadT = layer.msg('正在删除服务[' + serviceName + ']..', {icon: 16, time: 0, shade: [0.3, '#000']});
         tmPostCallback('remove_service', {serviceName:serviceName}, function(data){
+            var rdata = data.data;
             layer.close(loadT);
             showMsg(rdata.msg, function(){
                 if (rdata.status){
@@ -959,16 +960,14 @@ function pkill_session(pts) {
     });
 }
 
+
 //设置服务启动级别状态
 function set_runlevel_state(runlevel, serviceName) {
     var loadT = layer.msg('正在设置服务[' + serviceName + ']..', {icon: 16, time: 0, shade: [0.3, '#000']});
-    $.post('/plugin?action=a&name=task_manager&s=set_runlevel_state', {
-      runlevel: runlevel,
-      serviceName: serviceName
-    }, function (rdata) {
-      layer.close(loadT);
-      layer.msg(rdata.msg, {icon: rdata.status ? 1 : 2});
-      if (rdata.status) get_service_list();
+    $.post('/plugin?action=a&name=task_manager&s=set_runlevel_state', {runlevel: runlevel,serviceName: serviceName}, function (rdata) {
+        layer.close(loadT);
+        layer.msg(rdata.msg, {icon: rdata.status ? 1 : 2});
+        if (rdata.status) get_service_list();
     });
 }
 
