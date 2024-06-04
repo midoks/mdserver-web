@@ -491,7 +491,7 @@ class mainClass(object):
                 if search in i['name'] or search in i['exe'] or search in i['ps'] or search in i[
                     'user'] or search in str(i['pid']) or search in i['status']:
                     ldata.append(i)
-                elif hasattr(i, 'children'):
+                elif 'children' in i:
                     for k in i['children']:
                         if search in k['name'] or search in k['exe'] or search in k['ps'] or search in k[
                             'user'] or search in str(k['pid']):
@@ -767,9 +767,9 @@ class mainClass(object):
         info['cpu'] = round(info['cpu'], 3)
         info['mem'] = self.get_mem_info()
         data['info'] = info
-        if hasattr(args, 'search'):
-            if args.search != '':
-                data['process_list'] = self.search_pro(data['process_list'], args.search)
+        if 'search' in  args:
+            if args['search'] != '':
+                data['process_list'] = self.search_pro(data['process_list'], args['search'])
         self.get_meter_head()
         data['meter_head'] = self.meter_head
 
