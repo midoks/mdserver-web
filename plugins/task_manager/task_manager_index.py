@@ -1366,6 +1366,49 @@ class mainClass(object):
             mw.writeFile(filename, "")
         return filename
 
+    # 解析计划任务执行周期
+    def decode_cron_cycle(self, tmp):
+        if not tmp[4]: tmp[4] = '*'
+        if tmp[4] != '*':
+            cycle = '每周' + self.toWeek(int(tmp[4])) + '的' + tmp[1] + '时' + tmp[0] + '分'
+        elif tmp[2] != '*':
+            if tmp[2].find('*') == -1:
+                cycle = '每月的' + tmp[2] + '日,' + tmp[1] + '时' + tmp[0] + '分'
+            else:
+                cycle = '每隔' + tmp[2].split('/')[1] + '天' + tmp[1] + '时' + tmp[0] + '分'
+        elif tmp[1] != '*':
+            if tmp[1].find('*') == -1:
+                cycle = '每天的' + tmp[1] + '时' + tmp[0] + '分'
+            else:
+                cycle = '每隔' + tmp[1].split('/')[1] + '小时' + tmp[0] + '分钟'
+        elif tmp[0] != '*':
+            if tmp[0].find('*') == -1:
+                cycle = '每小时的第' + tmp[0] + '分钟'
+            else:
+                cycle = '每隔' + tmp[0].split('/')[1] + '分钟'
+        else:
+            return None
+        return cycle
+
+    # 添加计划任务备注
+    def decode_cron_connand(self, tmp):
+        command = ''
+        for i in range(len(tmp)):
+            if i < 5: continue
+            command += tmp[i] + ' '
+        ps = '未知任务'
+        if command.find('/www/server/cron') != -1:
+            ps = '通过面板添加的计划任务'
+        elif command.find('.acme.sh') != -1:
+            ps = '基于acme.sh的证书续签任务'
+        elif command.find('certbot-auto renew') != -1:
+            ps = '基于certbot的证书续签任务'
+
+        tmpScript = command.split('>')[0].strip()
+        filename = tmpScript.replace('"', '').split()[0]
+        # if not os.path.exists(filename): filename = '';
+        return command.strip(), ps, filename
+
     # 外部接口，获取计划任务列表
     def get_cron_list(self, get = {}):
         filename = self.get_cron_file()
