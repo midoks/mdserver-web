@@ -1428,7 +1428,7 @@ class mainClass(object):
             cronInfo['exe'] = ctmp[2]
             cronInfo['test'] = ctmp[0]
             cronList.append(cronInfo)
-        if 'search' in get, 'search':
+        if 'search' in get:
             if get['search'] != '':
                 cronList = self.search_cron(cronList, get['search'])
         return cronList
