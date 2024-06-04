@@ -1217,6 +1217,34 @@ class mainClass(object):
             serviceList.append(serviceInfo)
         return serviceList
 
+    # 外部接口，删除服务。不能删除mw
+    def remove_service(self, get):
+        if not 'serviceName' in get:
+            return mw.returnData(False,'缺少参数');
+            
+        serviceName = get['serviceName']
+        if serviceName == 'mw': return mw.returnData(False, '不能通过面板结束面板服务!')
+        systemctl_user_path = '/usr/lib/systemd/system/'
+        if os.path.exists(systemctl_user_path + serviceName + '.service'):  
+            return mw.returnData(False,'Systemctl托管的服务不能通过面板删除');
+
+        mw.execShell('service ' + serviceName + ' stop')
+        if os.path.exists('/usr/sbin/update-rc.d'):
+            mw.execShell('update-rc.d ' + serviceName + ' remove')
+        elif os.path.exists('/usr/sbin/chkconfig'):
+            mw.execShell('chkconfig --del ' + serviceName)
+        else:
+            mw.execShell("rm -f /etc/rc0.d/*" + serviceName)
+            mw.execShell("rm -f /etc/rc1.d/*" + serviceName)
+            mw.execShell("rm -f /etc/rc2.d/*" + serviceName)
+            mw.execShell("rm -f /etc/rc3.d/*" + serviceName)
+            mw.execShell("rm -f /etc/rc4.d/*" + serviceName)
+            mw.execShell("rm -f /etc/rc5.d/*" + serviceName)
+            mw.execShell("rm -f /etc/rc6.d/*" + serviceName)
+        filename = '/etc/init.d/' + serviceName
+        if os.path.exists(filename): os.remove(filename)
+        return mw.returnData(True, '删除成功!')
+
     # 外部接口 查询服务启动级别 /etc/init.d/
     def get_service_list(self, get = {}):
         data = {}
@@ -1355,7 +1383,8 @@ def kill_process_all(args = {}):
             return mw.returnData(False, '缺少参数!')
     return mc_instance.kill_process_all(int(args['pid']))
 
-    
+def remove_service(args = {}):
+    return mc_instance.remove_service(args)
 
 def get_service_list(args = {}):
     return mc_instance.get_service_list(args)

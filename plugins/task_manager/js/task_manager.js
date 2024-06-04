@@ -913,13 +913,16 @@ function open_path(path) {
 
 //删除服务
 function remove_service(serviceName) {
-    SafeMessage('删除服务【' + serviceName + '】', '删除后可能导致您的环境无法正常运行,继续吗？', function () {
-      var loadT = layer.msg('正在删除服务[' + serviceName + ']..', {icon: 16, time: 0, shade: [0.3, '#000']});
-      $.post('/plugin?action=a&name=task_manager&s=remove_service', {serviceName: serviceName}, function (rdata) {
-        layer.close(loadT);
-        layer.msg(rdata.msg, {icon: rdata.status ? 1 : 2});
-        if (rdata.status) get_service_list();
-      });
+    safeMessage('删除服务【' + serviceName + '】', '删除后可能导致您的环境无法正常运行,继续吗？', function () {
+        var loadT = layer.msg('正在删除服务[' + serviceName + ']..', {icon: 16, time: 0, shade: [0.3, '#000']});
+        tmPostCallback('remove_service', {serviceName:serviceName}, function(data){
+            layer.close(loadT);
+            showMsg(rdata.msg, function(){
+                if (rdata.status){
+                    get_service_list();
+                }
+            },{icon: rdata.status ? 1 : 2})
+        });
     });
 }
 
