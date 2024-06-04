@@ -878,6 +878,7 @@ function kill_process(pid, fpid) {
         var loadT = layer.msg('正在结束进程[' + pid + ']..', {icon: 16, time: 0, shade: [0.3, '#000']});
         tmPostCallback('kill_process', {pid:pid}, function(data){
             layer.close(loadT);
+            var rdata = data.data;
             layer.msg(rdata.msg, {icon: rdata.status ? 1 : 2});
             if (rdata.status) {
                 get_process_list();
