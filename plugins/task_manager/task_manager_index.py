@@ -1369,7 +1369,7 @@ class mainClass(object):
     # 外部接口，获取计划任务列表
     def get_cron_list(self, get = {}):
         filename = self.get_cron_file()
-        tmpList = public.readFile(filename).split("\n")
+        tmpList = mw.readFile(filename).split("\n")
         cronList = []
         for c in tmpList:
             c = c.strip()
@@ -1385,10 +1385,20 @@ class mainClass(object):
             cronInfo['exe'] = ctmp[2]
             cronInfo['test'] = ctmp[0]
             cronList.append(cronInfo)
-        if hasattr(get, 'search'):
-            if get.search != '':
-                cronList = self.search_cron(cronList, get.search)
+        if 'search' in get, 'search':
+            if get['search'] != '':
+                cronList = self.search_cron(cronList, get['search'])
         return cronList
+
+    def search_cron(self, data, search):
+        try:
+            ldata = []
+            for i in data:
+                if search in i['command'] or search in i['cycle'] or search in i['ps']:
+                    ldata.append(i)
+            return ldata
+        except:
+            return data
 
     # 外部接口 强制结束会话
     def pkill_session(self, get= {}):
