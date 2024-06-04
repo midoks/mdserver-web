@@ -735,7 +735,7 @@ function get_run_list() {
 				</thead>\
 				<tbody>' + tbody_tr + '</tbody>';
         $("#TaskManagement").html(tbody);
-        var topMsg = '<div class="mini-level">当前运行级别： level-' + rdata.run_level + '<a class="bt-ico-ask" target="_blank" href="https://www.bt.cn/bbs/thread-12682-1-1.html" title="查看说明">?</a></div>';
+        var topMsg = '<div class="mini-level">当前运行级别： level-' + rdata.run_level + '</div>';
         $("#load_average").html(topMsg).show();
         $(".table-cont").css("height", "500px");
         show_task();
