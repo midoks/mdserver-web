@@ -1260,7 +1260,7 @@ class mainClass(object):
 
         systemctl_user_path = '/usr/lib/systemd/system/'
         systemctl_run_path = '/etc/systemd/system/multi-user.target.wants/'
-        if os.path.exists(systemctl_user_path + get.serviceName + '.service'):
+        if os.path.exists(systemctl_user_path + serviceName + '.service'):
             runlevel = mw.execShell('runlevel')[0].split()[1]
             if get.runlevel != runlevel: 
                 return mw.returnData(False,'Systemctl托管的服务不能设置非当前运行级别的状态')
