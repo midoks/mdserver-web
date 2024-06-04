@@ -99,7 +99,7 @@ class mainClass(object):
         if not os.path.exists(w_file): return
         self.last_net_process = cache.get('net_process')
         self.last_net_process_time = cache.get('last_net_process')
-        net_process_body = public.readFile(w_file)
+        net_process_body = mw.readFile(w_file)
         if not net_process_body: return
         net_process = net_process_body.split('\n')
         for np in net_process:
@@ -515,7 +515,7 @@ class mainClass(object):
         mw_dir = mw.getServerDir() + '/mdserver-web'
         _pid_file = mw_dir+'/logs/process_network_total.pid'
         if os.path.exists(_pid_file):
-            pid = public.readFile(_pid_file)
+            pid = mw.readFile(_pid_file)
             if os.path.exists('/proc/' + pid): return True
 
         cmd_file = getServerDir()+'/process_network_total.py'
@@ -624,7 +624,6 @@ class mainClass(object):
 
     # 结束进程树 kill_process——>引用kill_process_all
     def kill_process_all(self, pid):
-        # public.print_log(pid)
         if pid < 30: return mw.returnData(True, '已结束此进程树!')
         if self.is_panel_process(pid): return mw.returnData(False, '不能结束面板服务进程')
         try:
@@ -644,7 +643,7 @@ class mainClass(object):
             if ppid: return self.kill_process_all(ppid)
         except:
             pass
-        return public.returnMsg(True, '已结束此进程树!')
+        return mw.returnData(True, '已结束此进程树!')
 
     def get_process_list(self, args = {}):
         # https://hellowac.github.io/psutil-doc-zh/processes/process_class/oneshot.html
@@ -1462,11 +1461,11 @@ class mainClass(object):
      # 重启cron服务
     def crondReload(self):
         if os.path.exists('/etc/init.d/crond'):
-            public.ExecShell('/etc/init.d/crond reload')
+            mw.execShell('/etc/init.d/crond reload')
         elif os.path.exists('/etc/init.d/cron'):
-            public.ExecShell('service cron restart')
+            mw.execShell('service cron restart')
         else:
-            public.ExecShell("systemctl reload crond")
+            mw.execShell("systemctl reload crond")
 
     # 外部接口，删除计划任务
     def remove_cron(self, get):
