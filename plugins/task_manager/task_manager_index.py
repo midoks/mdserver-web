@@ -207,8 +207,6 @@ class mainClass(object):
             's3fs': '对象存储挂载服务',
             'bosfs': '百度云对象存储挂载服务',
             'jsvc': 'tomcat服务',
-            'oneavd': '微步木马检测服务',
-            'btsync': '宝塔文件同步服务',
             'mysqld': 'MySQL服务',
             'php-fpm': 'PHP子进程',
             'php-cgi': 'PHP-CGI进程',
@@ -323,11 +321,12 @@ class mainClass(object):
         if p_exe:
             if name == 'php-fpm':
                 try:
-                    php_version = '.'.join(p_exe.split('/')[-3])
+                    php_version = p_exe.split('/')[-3][3:]
                     return 'PHP' + php_version + '进程'
                 except:
                     pass
-            elif name == 'python':
+            elif name == 'python' or name == 'python3':
+                # print(name, pid, p_exe, p)
                 p_exe_arr = p_exe.split('/')
                 if p_exe_arr[-1] in ['BT-Task', 'task.py']:
                     return '面板-后台任务进程'
@@ -338,6 +337,8 @@ class mainClass(object):
                 if p:
                     cmdline = ' '.join(p.cmdline()).strip()
                     cmdline_arr = cmdline.split('/')
+                    # print(cmdline)
+                    # print(cmdline_arr)
                     if cmdline.find('process_network_total') != -1:
                         return '进程网络监控'
                     if cmdline_arr[-1] in ['BT-Task', 'task.py']:
@@ -356,20 +357,26 @@ class mainClass(object):
                         return 'SSL证书签发'
                     elif cmdline.find('psync') != -1:
                         return '面板一键迁移'
-                    elif cmdline.find('/panel/plugin') != -1:
+                    elif cmdline.find('mdserver-web/plugins') != -1:
                         return '面板插件进程'
                     elif cmdline.find('/www/server/cron/') != -1:
                         return '面板计划任务'
+                    # elif cmdline.find('') != -1:
+                    #     return '面板计划任务'
             elif name == 'nginx':
+                default_name = 'Nginx'
+                if p_exe.find('openresty/nginx') != -1:
+                    default_name = 'OpenResty'
+
                 if p.username() == 'www':
-                    return 'Nginx子进程'
+                    return default_name+'子进程'
                 else:
-                    return 'Nginx主进程'
+                    return default_name+'主进程'
             elif p_exe == '/usr/bin/bash':
                 cmdline = ' '.join(p.cmdline()).strip()
                 if cmdline.find('/www/server/cron/') != -1:
                     return '面板计划任务'
-                elif cmdline.find('/www/server/mdserver-web/plugins') != -1:
+                elif cmdline.find('mdserver-web/plugins') != -1:
                     return '面板插件进程'
 
         if name in processPs: return processPs[name]
@@ -685,7 +692,11 @@ class mainClass(object):
         for pid in ppids:
             tmp = {}
             try:
-                p = psutil.Process(pid)
+                try:
+                    p = psutil.Process(pid)
+                except Exception as e:
+                    continue
+        
                 with p.oneshot():
                     p_state = p.status()
                     try:
