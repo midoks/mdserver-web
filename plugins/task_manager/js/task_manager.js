@@ -854,8 +854,7 @@ function userdel(user) {
         var loadT = layer.msg('正在删除用户[' + user + ']..', {icon: 16, time: 0, shade: [0.3, '#000']});
         tmPostCallback('remove_user', {user:user}, function(rdata){
             layer.close(loadT);
-
-            var rdata = data.data;
+            var rdata = rdata.data;
             showMsg(rdata.msg, function(){
                 if (rdata.status) {
                     get_user_list();
