@@ -1426,8 +1426,10 @@ class mainClass(object):
     # 外部接口，获取计划任务列表
     def get_cron_list(self, get = {}):
         filename = self.get_cron_file()
-        tmpList = mw.readFile(filename).split("\n")
         cronList = []
+        if not os.path.exists(filename):
+            return cronList
+        tmpList = mw.readFile(filename).split("\n")
         for c in tmpList:
             c = c.strip()
             if c.startswith('#'): continue
@@ -1456,6 +1458,31 @@ class mainClass(object):
             return ldata
         except:
             return data
+
+     # 重启cron服务
+    def crondReload(self):
+        if os.path.exists('/etc/init.d/crond'):
+            public.ExecShell('/etc/init.d/crond reload')
+        elif os.path.exists('/etc/init.d/cron'):
+            public.ExecShell('service cron restart')
+        else:
+            public.ExecShell("systemctl reload crond")
+
+    # 外部接口，删除计划任务
+    def remove_cron(self, get):
+        index = int(get.index)
+        cronList = self.get_cron_list({})
+        if index > len(cronList) + 1: return mw.returnData(False, '指定任务不存在!')
+        toCron = []
+        for i in range(len(cronList)):
+            if i == index: continue
+            toCron.append(cronList[i]['command'])
+        cronStr = "\n".join(toCron) + "\n\n"
+        filename = self.get_cron_file()
+        mw.writeFile(filename, cronStr)
+        mw.execShell("chmod 600 " + filename)
+        self.crondReload()
+        return mw.returnData(True, '删除成功!')
 
     # 外部接口 强制结束会话
     def pkill_session(self, get= {}):
@@ -1530,6 +1557,9 @@ def get_run_list(args = {}):
 
 def get_cron_list(args = {}):
     return mc_instance.get_cron_list(args)
+
+def remove_cron(args = {}):
+    return mc_instance.remove_cron(args)
 
 def pkill_session(args = {}):
     return mc_instance.pkill_session(args)
