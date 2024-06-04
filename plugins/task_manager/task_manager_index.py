@@ -1366,6 +1366,21 @@ class mainClass(object):
             mw.writeFile(filename, "")
         return filename
 
+    # 数转周
+    def toWeek(self, num):
+        if num > 6: return ''
+        wheres = {
+            0: mw.getMsg('CRONTAB_SUNDAY'),
+            1: mw.getMsg('CRONTAB_MONDAY'),
+            2: mw.getMsg('CRONTAB_TUESDAY'),
+            3: mw.getMsg('CRONTAB_WEDNESDAY'),
+            4: mw.getMsg('CRONTAB_THURSDAY'),
+            5: mw.getMsg('CRONTAB_FRIDAY'),
+            6: mw.getMsg('CRONTAB_SATURDAY')
+        }
+
+        return wheres[num]
+
     # 解析计划任务执行周期
     def decode_cron_cycle(self, tmp):
         if not tmp[4]: tmp[4] = '*'
