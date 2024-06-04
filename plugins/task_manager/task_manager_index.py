@@ -184,6 +184,7 @@ class mainClass(object):
 
     # 进程备注，name,pid,启动命令
     def get_process_ps(self, name, pid, p_exe=None, p=None):
+        # print(name, pid, p_exe, p)
         processPs = {
             'irqbalance': '系统进程-优化系统性能服务',
             'containerd': 'docker管理服务',
@@ -328,8 +329,8 @@ class mainClass(object):
                     return 'PHP' + php_version + '进程'
                 except:
                     pass
-            elif name == 'python' or name == 'python3':
-                # print(name, pid, p_exe, p)
+            elif name.lower() == 'python' or name.lower() == 'python3':
+                print(name.lower(), pid, p_exe)
                 p_exe_arr = p_exe.split('/')
                 if p_exe_arr[-1] in ['BT-Task', 'task.py']:
                     return '面板-后台任务进程'
@@ -340,8 +341,6 @@ class mainClass(object):
                 if p:
                     cmdline = ' '.join(p.cmdline()).strip()
                     cmdline_arr = cmdline.split('/')
-                    # print(cmdline)
-                    # print(cmdline_arr)
                     if cmdline.find('process_network_total') != -1:
                         return '进程网络监控'
                     if cmdline_arr[-1] in ['BT-Task', 'task.py']:
@@ -364,8 +363,8 @@ class mainClass(object):
                         return '面板插件进程'
                     elif cmdline.find('/www/server/cron/') != -1:
                         return '面板计划任务'
-                    # elif cmdline.find('') != -1:
-                    #     return '面板计划任务'
+                    elif cmdline.find('mdserver-web') != -1 and cmdline.find('gunicorn -c setting.py app:app') != -1:
+                        return 'MW面板'
             elif name == 'nginx':
                 default_name = 'Nginx'
                 if p_exe.find('openresty/nginx') != -1:
@@ -383,6 +382,8 @@ class mainClass(object):
                     return '面板插件进程'
 
         if name in processPs: return processPs[name]
+
+        
         if name == 'python':
             if self.is_panel_process(pid): return 'MW面板'
 
