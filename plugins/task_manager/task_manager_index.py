@@ -828,7 +828,12 @@ class mainClass(object):
                 except Exception as e:
                     continue
                 with p.oneshot():
-                    p_mem = p.memory_full_info()
+
+                    try:
+                        p_mem = p.memory_full_info()
+                    except Exception as e:
+                        continue
+
                     if p_mem.rss == 0: continue
                     pio = p.io_counters()
                     p_cpus = p.cpu_times()
