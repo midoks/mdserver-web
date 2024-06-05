@@ -536,7 +536,7 @@ class mainClass(object):
 
         cmd_file = mw_dir+'/plugins/task_manager/process_network_total.py'
         python_bin = self.get_python_bin()
-        _cmd = 'nohup {} {} 600 &> /tmp/net.log &'.format(python_bin, cmd_file)
+        _cmd = 'nohup {} {} &> /tmp/net.log &'.format(python_bin, cmd_file)
         mw.execShell(_cmd)
 
     # 进程折叠，将子进程折叠到父进程下，并将使用资源累加。
