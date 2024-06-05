@@ -74,8 +74,8 @@ class mainClass(object):
     def get_process_net_list(self):
         w_file = '/dev/shm/mw_net_process'
         if not os.path.exists(w_file): return
-        self.last_net_process = cache.get('net_process')
-        self.last_net_process_time = cache.get('last_net_process')
+        # self.last_net_process = cache.get('net_process')
+        # self.last_net_process_time = cache.get('last_net_process')
         net_process_body = mw.readFile(w_file)
         if not net_process_body: return
         net_process = net_process_body.split('\n')
