@@ -369,8 +369,11 @@ class mainClass(object):
                 # print(name.lower(), pid, p_exe)
                 if p:
                     cmdline = ' '.join(p.cmdline()).strip()
+                    if cmdline.find('task.py') != -1:
+                        return 'MW面板-后台任务'
                     if cmdline.find('mdserver-web') != -1 and cmdline.find('gunicorn -c setting.py app:app') != -1:
                         return 'MW面板'
+
             elif name == 'nginx':
                 default_name = 'Nginx'
                 if p_exe.find('openresty/nginx') != -1:
