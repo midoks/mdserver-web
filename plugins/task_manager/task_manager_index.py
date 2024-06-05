@@ -341,7 +341,7 @@ class mainClass(object):
                     return '面板-主进程'
                 elif p_exe.find('process_network_total') != -1:
                     return '面板-进程网络监控'
-                if self.is_panel_process(pid): return 'MW面板'
+                
                 if p:
                     cmdline = ' '.join(p.cmdline()).strip()
                     cmdline_arr = cmdline.split('/')
@@ -404,7 +404,8 @@ class mainClass(object):
 
         if name in processPs: return processPs[name]
 
-
+        # if self.is_panel_process(pid): return 'MW面板'
+        
         if p_exe:
             exe_keys = {
                 '/www/server/mdserver-web/plugins/': '面板插件',
