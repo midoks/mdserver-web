@@ -11,6 +11,7 @@ install_tmp=${rootPath}/tmp/mw_install.pl
 VERSION=$2
 
 # python3 plugins/task_manager/task_manager_index.py
+# /www/server/mdserver-web/bin/python3 /www/server/mdserver-web/plugins/task_manager/process_network_total.py
 
 Install_App()
 {
