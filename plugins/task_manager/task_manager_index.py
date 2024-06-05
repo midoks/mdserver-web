@@ -88,8 +88,10 @@ class mainClass(object):
             tmp['down_package'] = int(np_list[3])
             tmp['up_package'] = int(np_list[4])
             self.__process_net_list[tmp['pid']] = tmp
-        self.last_net_process = self.__process_net_list
-        self.last_net_process_time = time.time()
+
+        if time.time() - self.last_net_process_time > 3:
+            self.last_net_process = self.__process_net_list
+            self.last_net_process_time = time.time()
 
     # 获取进程连接数
     def get_connects(self, pid):
