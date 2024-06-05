@@ -1085,7 +1085,7 @@ function get_process_info(pid) {
 function dropAddress(address) {
     layer.confirm(lan.index.net_doup_ip_msg, {icon: 3, closeBtn: 2}, function () {
         loadT = layer.msg(lan.index.net_doup_ip_to, {icon: 16, time: 0, shade: [0.3, '#000']});
-        $.post('/firewall?action=AddDropAddress', 'port=' + address + '&ps=' + lan.index.net_doup_ip_ps, function (rdata) {
+        $.post('/firewall/add_drop_address', 'type=address&protocol=tcp&port=' + address + '&ps=手动屏蔽', function (rdata) {
             layer.close(loadT);
             layer.msg(rdata.msg, {icon: rdata.status ? 1 : 2});
         });
