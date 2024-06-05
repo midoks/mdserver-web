@@ -341,6 +341,7 @@ class mainClass(object):
                     return '面板-主进程'
                 elif p_exe.find('process_network_total') != -1:
                     return '面板-进程网络监控'
+                if self.is_panel_process(pid): return 'MW面板'
                 if p:
                     cmdline = ' '.join(p.cmdline()).strip()
                     cmdline_arr = cmdline.split('/')
@@ -371,7 +372,6 @@ class mainClass(object):
                     elif cmdline.find('mdserver-web') != -1 and cmdline.find('gunicorn -c setting.py app:app') != -1:
                         return 'MW面板'
             elif name.lower() == 'gunicorn':
-                # print(name.lower(), pid, p_exe)
                 if p:
                     cmdline = ' '.join(p.cmdline()).strip()
                     if cmdline.find('mdserver-web') != -1 and cmdline.find('gunicorn -c setting.py app:app') != -1:
@@ -400,12 +400,10 @@ class mainClass(object):
                     return '面板计划任务'
                 elif cmdline.find('mdserver-web/plugins') != -1:
                     return '面板插件进程'
+            
 
         if name in processPs: return processPs[name]
 
-        
-        if name == 'python':
-            if self.is_panel_process(pid): return 'MW面板'
 
         if p_exe:
             exe_keys = {
