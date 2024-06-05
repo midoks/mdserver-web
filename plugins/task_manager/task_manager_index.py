@@ -1013,7 +1013,7 @@ class mainClass(object):
                 pname = p.name()
                 p.kill()
                 mw.execShell("pkill -9 " + pname)
-                r = mw.execShell("userdel " + .user)
+                r = mw.execShell("userdel " + user)
             except:
                 pass
         if r[1].find('userdel:') != -1: return mw.returnData(False, r[1]);
