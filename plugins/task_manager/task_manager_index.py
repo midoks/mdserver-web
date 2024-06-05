@@ -363,6 +363,8 @@ class mainClass(object):
                         return '面板插件进程'
                     elif cmdline.find('/www/server/cron/') != -1:
                         return '面板计划任务'
+                    elif cmdline.find('mdserver-web') != -1 and cmdline.find('task.py') != -1:
+                        return 'MW面板-后台任务'
                     elif cmdline.find('mdserver-web') != -1 and cmdline.find('gunicorn -c setting.py app:app') != -1:
                         return 'MW面板'
             elif name.lower() == 'gunicorn':
