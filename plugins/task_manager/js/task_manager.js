@@ -178,59 +178,59 @@ var isProcessing = false; // 设置标志
     }, 3000);
   }
 
-  function get_list_bytab(isblur) {
+function get_list_bytab(isblur) {
     if (isblur && $('.search-bar .search_input').val() === search_val) {
-      return;
+        return;
     }
     search_val = $('.search-bar .search_input').val();
     get_process_list();
 
     switch (tab_name) {
-      case 'p_list':
-        $('.table_config').show();
-        $('.search-bar span').addClass('r56');
-        select_pid = ''
-        wrapPid = {}
-        canScroll2TaskMangerPossess = true
-        get_process_list();
-        break;
-      case 'p_resource':
-        $('.table_config').hide();
-        $('.search-bar span').removeClass('r56');
-        get_resource_list();
-        break;
-      case 'p_run':
-        $('.table_config').hide();
-        $('.search-bar span').removeClass('r56');
-        get_run_list();
-        break;
-      case 'p_service':
-        $('.table_config').hide();
-        $('.search-bar span').removeClass('r56');
-        get_service_list();
-        break;
-      case 'p_network':
-        $('.table_config').hide();
-        $('.search-bar span').removeClass('r56');
-        get_network_list();
-        break;
-      case 'p_user':
-        $('.table_config').hide();
-        $('.search-bar span').removeClass('r56');
-        get_user_list();
-        break;
-      case 'p_cron':
-        $('.table_config').hide();
-        $('.search-bar span').removeClass('r56');
-        get_cron_list();
-        break;
-      case 'p_session':
-        $('.table_config').hide();
-        $('.search-bar span').removeClass('r56');
-        get_who_list();
-        break;
+        case 'p_list':
+            $('.table_config').show();
+            $('.search-bar span').addClass('r56');
+            select_pid = '';
+            wrapPid = {};
+            canScroll2TaskMangerPossess = true;
+            get_process_list();
+            break;
+        case 'p_resource':
+            $('.table_config').hide();
+            $('.search-bar span').removeClass('r56');
+            get_resource_list();
+            break;
+        case 'p_run':
+            $('.table_config').hide();
+            $('.search-bar span').removeClass('r56');
+            get_run_list();
+            break;
+        case 'p_service':
+            $('.table_config').hide();
+            $('.search-bar span').removeClass('r56');
+            get_service_list();
+            break;
+        case 'p_network':
+            $('.table_config').hide();
+            $('.search-bar span').removeClass('r56');
+            get_network_list();
+            break;
+        case 'p_user':
+            $('.table_config').hide();
+            $('.search-bar span').removeClass('r56');
+            get_user_list();
+            break;
+        case 'p_cron':
+            $('.table_config').hide();
+            $('.search-bar span').removeClass('r56');
+            get_cron_list();
+            break;
+        case 'p_session':
+            $('.table_config').hide();
+            $('.search-bar span').removeClass('r56');
+            get_who_list();
+            break;
     }
-  }
+}
 
 function get_process_list(sortx, reverse, rx) {
     if ($('.t-mana .man-menu-sub .on').attr('class') != 'p_list on') return;
@@ -246,17 +246,14 @@ function get_process_list(sortx, reverse, rx) {
         }
     }
 
-    res_list = {
-        True: 'False',
-        False: 'True'
-    };
+    res_list = {True: 'False',False: 'True'};
     setCookie(cookie_key, sortx + '|' + reverse);
     if (!rx) {
       var loadT = layer.msg('正在获取进程列表..', {icon: 16, time: 0, shade: [0.3, '#000']})
     }
 
     tmPostCallback('get_process_list', {sortx: sortx,reverse: reverse,search:search_val}, function(rdata){
-        console.log(rdata);
+        // console.log(rdata);
         if (!rx) layer.close(loadT);
         if ($('.t-mana .man-menu-sub .on').attr('class') != 'p_list on') return;
         if (rdata.status === false) {
