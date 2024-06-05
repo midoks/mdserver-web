@@ -408,6 +408,7 @@ class mainClass(object):
             return self.__process_net_list[pid]['up'], self.__process_net_list[pid]['up_package'], \
                 self.__process_net_list[pid]['down'], self.__process_net_list[pid]['down_package']
 
+        # print(pid, self.__process_net_list[pid]['up'], self.last_net_process[pid]['up'],time.time(),self.last_net_process_time)
         up = int((self.__process_net_list[pid]['up'] - self.last_net_process[pid]['up']) / (
                 time.time() - self.last_net_process_time))
         down = int((self.__process_net_list[pid]['down'] - self.last_net_process[pid]['down']) / (
