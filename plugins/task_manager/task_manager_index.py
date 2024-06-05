@@ -95,7 +95,7 @@ class mainClass(object):
         return True
 
     def get_process_net_list(self):
-        w_file = '/dev/shm/bt_net_process'
+        w_file = '/dev/shm/mw_net_process'
         if not os.path.exists(w_file): return
         self.last_net_process = cache.get('net_process')
         self.last_net_process_time = cache.get('last_net_process')
@@ -113,8 +113,8 @@ class mainClass(object):
             tmp['down_package'] = int(np_list[3])
             tmp['up_package'] = int(np_list[4])
             self.__process_net_list[tmp['pid']] = tmp
-        cache.set('net_process', self.__process_net_list, 600)
-        cache.set('last_net_process', time.time(), 600)
+        # cache.set('net_process', self.__process_net_list, 600)
+        # cache.set('last_net_process', time.time(), 600)
 
     # 获取进程连接数
     def get_connects(self, pid):
