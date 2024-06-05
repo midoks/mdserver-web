@@ -320,6 +320,10 @@ class mainClass(object):
             'sleep': '延迟进程'
         }
         if p_exe:
+            # print(name.lower(), pid, p_exe)
+            # if p:
+            #     cmdline = ' '.join(p.cmdline()).strip()
+            #     print(cmdline)
             if name == 'php-fpm':
                 try:
                     if self.is_mac:
