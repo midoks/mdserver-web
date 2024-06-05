@@ -1115,9 +1115,3 @@ function scrollHandle(e) {
     var scrollTop = this.scrollTop;
     this.querySelector('thead').style.transform = 'translateY(' + scrollTop + 'px)';
 }
-
-var masterPluginTitle = $('.TaskManView').parents('.layui-layer');
-// masterPluginTitle.append('<div class="bt-desired ml10" style="font-size:14px; background-size:contain;position: absolute; top: 10px; right: 30px;"><a href="javascript:;" class="btlink ml5 npsFeedback" style="margin-left: 10px;">需求反馈</a></div>');
-masterPluginTitle.on('click', '.bt-desired', function(){
-	bt_tools.nps({name:'任务管理器',type:26})
-})
