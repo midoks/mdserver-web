@@ -483,6 +483,24 @@ class mainClass(object):
         data['15'] = round(float(c[2]), 3)  # float(c[2])
         return data
 
+    def set_meter_head(self, get):
+        if not 'meter_head_name' in get:
+            return  False
+            
+        meter_head_name = get['meter_head_name']
+        meter_head_file = getServerDir()+'/meter_head.json'
+        try:
+            self.get_meter_head()
+            if meter_head_name not in self.meter_head.keys():
+                return False
+            if meter_head_name in ['ps', 'memory_used', 'cpu_percent', 'name']:
+                return False
+            self.meter_head[meter_head_name] = not self.meter_head[meter_head_name]
+            mw.writeFile(meter_head_file, json.dumps(self.meter_head))
+            return True
+        except:
+            return False
+
     def get_meter_head(self, get=None):
         meter_head_file = getServerDir()+'/meter_head.json'
         if os.path.exists(meter_head_file):
@@ -674,6 +692,8 @@ class mainClass(object):
         except:
             pass
         return mw.returnData(True, '已结束此进程树!')
+
+    
 
     def get_process_list(self, args = {}):
         # https://hellowac.github.io/psutil-doc-zh/processes/process_class/oneshot.html
@@ -1590,6 +1610,9 @@ def kill_process_all(args = {}):
     if not 'pid' in args:
             return mw.returnData(False, '缺少参数!')
     return mc_instance.kill_process_all(int(args['pid']))
+
+def set_meter_head(args = {}):
+    return mc_instance.set_meter_head(args)
 
 def remove_service(args = {}):
     return mc_instance.remove_service(args)

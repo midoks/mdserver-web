@@ -116,67 +116,66 @@ $('.layui-layer').not($('.setting_ul_li')).click(function () {
 });
 var isProcessing = false; // 设置标志
 
-  $('.setting_ul_li').off('click').click(function (e) {
-    var that = $(this)
+$('.setting_ul_li').off('click').click(function (e) {
+    var that = $(this);
     e.stopPropagation()
     // 检查标志
     if (isProcessing) {
-      return;
+        return;
     }
     if (!$(this).hasClass('disabled')) {
-      isProcessing = true; // 点击事件被触发，设置标志
-      var name = $(this).attr("name")
-      clearInterval(process_list_s);
-      bt_tools.send({
-        url: 'plugin?action=a&name=task_manager&s=set_meter_head',
-        data: {meter_head_name: name}
-      }, function (data) {
-        isProcessing = false; // 操作完成，清除标志
-        if (!data) {
-          layer.msg('设置失败');
-        }
-        that.toggleClass('active')
-        get_process_list(null, null, false);
+        isProcessing = true; // 点击事件被触发，设置标志
+        var name = $(this).attr("name");
         clearInterval(process_list_s);
-        process_list_s = setInterval(function () {
-          if ($(".t-mana").length == 0) {
-            clearInterval(process_list_s);
-            process_list_s = 0;
-            console.log('进程列表轮询任务已停止');
-          }
-          get_process_list(null, null, true);
-        }, 3000);
-      })
-    }
-  })
 
-  $('.setting_btn').on('click',function (e) {
-    e.stopPropagation()
+        tmPostCallback('set_meter_head',{meter_head_name: name}, function(data){
+            console.log(data);
+            isProcessing = false; // 操作完成，清除标志
+            if (!data) {
+                layer.msg('设置失败');
+            }
+            that.toggleClass('active');
+            get_process_list(null, null, false);
+            clearInterval(process_list_s);
+            process_list_s = setInterval(function () {
+            if ($(".t-mana").length == 0) {
+                    clearInterval(process_list_s);
+                    process_list_s = 0;
+                    console.log('进程列表轮询任务已停止');
+                }
+                get_process_list(null, null, true);
+            }, 3000);
+        });
+    }
+});
+
+$('.setting_btn').on('click',function (e) {
+    e.stopPropagation();
     var offset = $('.man-menu-sub').offset();
     var x = e.pageX - offset.left;
     var y = e.pageY - offset.top;
     var width = $('.man-menu-sub').outerWidth();
     if ($('.man-menu-sub').width() - x < width) {
-      $(".plug_menu").css({
-        position: 'absolute',
-        right: "14.5px",
-        top:"40px",
-      }).toggle();
-      $('.setting_ul').addClass('undisplay')
+        $(".plug_menu").css({
+            position: 'absolute',
+            right: "14.5px",
+            top:"40px",
+        }).toggle();
+        $('.setting_ul').addClass('undisplay')
     }
     $(".setting_ul").toggle();
-  })
+});
 
-  if (process_list_s === 0) {
+if (process_list_s === 0) {
     process_list_s = setInterval(function () {
-      if ($(".t-mana").length == 0) {
-        clearInterval(process_list_s);
-        process_list_s = 0;
-        console.log('进程列表轮询任务已停止')
-      }
-      get_process_list(null, null, true);
+        if ($(".t-mana").length == 0) {
+            clearInterval(process_list_s);
+            process_list_s = 0;
+            console.log('进程列表轮询任务已停止')
+        }
+    get_process_list(null, null, true);
     }, 3000);
-  }
+}
 
 function get_list_bytab(isblur) {
     if (isblur && $('.search-bar .search_input').val() === search_val) {
