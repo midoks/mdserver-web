@@ -369,8 +369,6 @@ class mainClass(object):
                 # print(name.lower(), pid, p_exe)
                 if p:
                     cmdline = ' '.join(p.cmdline()).strip()
-                    if cmdline.find('task.py') != -1:
-                        return 'MW面板-后台任务'
                     if cmdline.find('mdserver-web') != -1 and cmdline.find('gunicorn -c setting.py app:app') != -1:
                         return 'MW面板'
 
@@ -391,6 +389,8 @@ class mainClass(object):
                 return 'MW面板-命令'
             elif p_exe == '/usr/bin/bash':
                 cmdline = ' '.join(p.cmdline()).strip()
+                if cmdline.find('task.py') != -1:
+                    return 'MW面板-后台任务'
                 if cmdline.find('/www/server/cron/') != -1:
                     return '面板计划任务'
                 elif cmdline.find('mdserver-web/plugins') != -1:
