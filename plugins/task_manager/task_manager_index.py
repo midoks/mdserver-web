@@ -334,7 +334,6 @@ class mainClass(object):
                 except:
                     pass
             elif name.lower() == 'python' or name.lower() == 'python3':
-                # print(name.lower(), pid, p_exe)
                 p_exe_arr = p_exe.split('/')
                 if p_exe_arr[-1] in ['BT-Task', 'task.py']:
                     return '面板-后台任务进程'
@@ -367,7 +366,7 @@ class mainClass(object):
                         return '面板插件进程'
                     elif cmdline.find('/www/server/cron/') != -1:
                         return '面板计划任务'
-                    elif cmdline.find('mdserver-web') != -1 and cmdline.find('task.py') != -1:
+                    elif cmdline.find('task.py') != -1:
                         return 'MW面板-后台任务'
                     elif cmdline.find('mdserver-web') != -1 and cmdline.find('gunicorn -c setting.py app:app') != -1:
                         return 'MW面板'
