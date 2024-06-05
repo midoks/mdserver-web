@@ -39,8 +39,6 @@ class mainClass(object):
     old_info = {}
     new_net_info = {}
     old_net_info = {}
-    old_path = '/www/server/task_manager/task_old.json'
-    old_net_path = '/www/server/task_manager/network_old.json'
     panel_pid = None
     task_pid = None
     __process_net_list = {}
@@ -72,27 +70,6 @@ class mainClass(object):
                     mainClass._instance = mainClass(*args, **kwargs)
         return mainClass._instance
 
-    def get_old(self):
-        if self.old_info: return True
-        # if not os.path.exists(self.old_path): return False
-        data = cache.get(self.old_path)
-        if not data: return False
-        # data = json.loads(data)
-        if not data: return False
-        self.old_info = data
-        del (data)
-        return True
-
-    def get_net_old(self):
-        if self.old_net_info: return True
-        # if not os.path.exists(self.old_net_path): return False
-        data = cache.get(self.old_net_path)
-        if not data: return False
-        # data = json.loads(data)
-        if not data: return False
-        self.old_net_info = data
-        del (data)
-        return True
 
     def get_process_net_list(self):
         w_file = '/dev/shm/mw_net_process'
