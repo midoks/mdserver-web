@@ -40,7 +40,7 @@ except ImportError:
     elif os.path.exists('/usr/bin/yum'):
         os.system("yum install libpcap-devel -y")
         
-    os.system("btpip install pypcap")
+    os.system("pip install pypcap")
     try:
         import pcap
     except ImportError:
