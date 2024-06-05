@@ -118,7 +118,7 @@ var isProcessing = false; // 设置标志
 
 $('.setting_ul_li').off('click').click(function (e) {
     var that = $(this);
-    e.stopPropagation()
+    e.stopPropagation();
     // 检查标志
     if (isProcessing) {
         return;
@@ -170,7 +170,7 @@ if (process_list_s === 0) {
         if ($(".t-mana").length == 0) {
             clearInterval(process_list_s);
             process_list_s = 0;
-            console.log('进程列表轮询任务已停止')
+            console.log('进程列表轮询任务已停止');
         }
         get_process_list(null, null, true);
     }, 3000);
