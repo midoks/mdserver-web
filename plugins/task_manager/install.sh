@@ -14,6 +14,10 @@ VERSION=$2
 # /www/server/mdserver-web/bin/python3 /www/server/mdserver-web/plugins/task_manager/process_network_total.py
 # ps -ef|grep process_network_total| grep -v grep | awk '{print $2}' | xargs kill -9
 
+if [ -f ${rootPath}/bin/activate ];then
+	source ${rootPath}/bin/activate
+fi
+
 Install_App()
 {
 	echo '正在安装脚本文件...' > $install_tmp
@@ -30,6 +34,8 @@ Install_App()
 	if [ -f /usr/bin/dnf ]; then
 		dnf install libpcap-devel -y
 	fi
+
+	pip3 install pypcap
 
 	echo "$VERSION" > $serverPath/task_manager/version.pl
 	echo "安装任务管理器成功"
