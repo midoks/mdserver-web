@@ -321,29 +321,29 @@ function get_process_list(sortx, reverse, rx) {
 
 function task_manager_possess_scroll() {
     var timer = null;
-    var set2selected = null
+    var set2selected = null;
     // 滚动节流
     return function () {
-      if (timer !== null) return
-      timer = setTimeout(function () {
-        timer = null
-        canScroll2TaskMangerPossess = false
-        if (set2selected !== null) clearTimeout(set2selected)
-        // 最后一次滚动后2秒内不再滚动，才能滚动到选中的行
-        set2selected = setTimeout(function () {
-          canScroll2TaskMangerPossess = true
-        }, 2000)
-      }, 500)
+        if (timer !== null) return;
+        timer = setTimeout(function () {
+            timer = null;
+            canScroll2TaskMangerPossess = false;
+            if (set2selected !== null) clearTimeout(set2selected)
+            // 最后一次滚动后2秒内不再滚动，才能滚动到选中的行
+            set2selected = setTimeout(function () {
+                canScroll2TaskMangerPossess = true;
+            }, 2000);
+        }, 500);
     }
 }
 
 function scropll2selectPossess(selectline) {
     if (canScroll2TaskMangerPossess && selectline !== -1) {
-      var top = $('#table-cont')[0].scrollTop;
-      // if(selectline > 2)
-      if (selectline * 38 > top + 500 || selectline * 38 < top) {
-        $('#table-cont')[0].scrollTo(0, (selectline - 2) * 38, 'smooth');
-      }
+        var top = $('#table-cont')[0].scrollTop;
+        // if(selectline > 2)
+        if (selectline * 38 > top + 500 || selectline * 38 < top) {
+            $('#table-cont')[0].scrollTo(0, (selectline - 2) * 38, 'smooth');
+        }
     }
 }
 
