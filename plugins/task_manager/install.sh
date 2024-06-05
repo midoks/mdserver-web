@@ -19,12 +19,16 @@ Install_App()
 	echo '正在安装脚本文件...' > $install_tmp
 	mkdir -p $serverPath/task_manager
 
-	if [ -d /usr/bin/apt ]; then
+	if [ -f /usr/bin/apt ]; then
 		apt install libpcap-dev -y
 	fi
 
-	if [ -d /usr/bin/yum ]; then
+	if [ -f /usr/bin/yum ]; then
 		yum install libpcap-devel -y
+	fi
+
+	if [ -f /usr/bin/dnf ]; then
+		dnf install libpcap-devel -y
 	fi
 
 	echo "$VERSION" > $serverPath/task_manager/version.pl
