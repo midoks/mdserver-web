@@ -184,7 +184,6 @@ class mainClass(object):
 
     # 进程备注，name,pid,启动命令
     def get_process_ps(self, name, pid, p_exe=None, p=None):
-        # print(name, pid, p_exe, p)
         processPs = {
             'irqbalance': '系统进程-优化系统性能服务',
             'containerd': 'docker管理服务',
