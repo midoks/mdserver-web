@@ -335,8 +335,8 @@ class mainClass(object):
                     pass
             elif name.lower() == 'python' or name.lower() == 'python3':
                 p_exe_arr = p_exe.split('/')
-                if p_exe_arr[-1] in ['BT-Task', 'task.py']:
-                    return '面板-后台任务进程'
+                if p_exe_arr[-1] in ['task.py']:
+                    return 'MW面板-后台任务进程'
                 elif p_exe_arr[-1] in ['BT-Panel', 'runserver.py']:
                     return '面板-主进程'
                 elif p_exe.find('process_network_total') != -1:
