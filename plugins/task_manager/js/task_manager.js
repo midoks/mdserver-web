@@ -129,7 +129,6 @@ $('.setting_ul_li').off('click').click(function (e) {
         clearInterval(process_list_s);
 
         tmPostCallback('set_meter_head',{meter_head_name: name}, function(data){
-            console.log(data);
             isProcessing = false; // 操作完成，清除标志
             if (!data) {
                 layer.msg('设置失败');
@@ -173,7 +172,7 @@ if (process_list_s === 0) {
             process_list_s = 0;
             console.log('进程列表轮询任务已停止')
         }
-    get_process_list(null, null, true);
+        get_process_list(null, null, true);
     }, 3000);
 }
 
