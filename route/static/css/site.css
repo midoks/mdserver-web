@@ -276,6 +276,10 @@ html {
     margin-left: 5px;
 }
 
+.ml10 {
+    margin-left: 10px;
+}
+
 .mr5 {
     margin-right: 5px;
 }
@@ -283,6 +287,7 @@ html {
 .mr20 {
     margin-right: 20px;
 }
+
 .ml0{
     margin-left: 0;
 }
