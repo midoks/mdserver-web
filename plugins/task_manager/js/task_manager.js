@@ -313,9 +313,9 @@ function get_process_list(sortx, reverse, rx) {
             setCookie('table_config_tip',true);
         }
         // 清除掉之前绑定的滚动事件
-        $("#table-cont").unbind('scroll');
+        // $("#table-cont").unbind('scroll');
         // 重新绑定滚动事件
-        $('#table-cont').scroll(task_manager_possess_scroll());
+        // $('#table-cont').scroll(task_manager_possess_scroll());
     });
 }
 
