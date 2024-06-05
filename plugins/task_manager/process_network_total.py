@@ -56,13 +56,7 @@ class process_network_total:
     __last_write_time = 0
     __end_time = 0
 
-    def start(self,timeout = 0):
-        '''
-            @name 启动进程网络监控
-            @author hwliang<2021-09-13>
-            @param timeout<int> 结束时间(秒)，0表示持久运行，默认为0
-            @return void
-        '''        
+    def start(self,timeout = 0):    
         stime = time.time()
         self.__end_time = timeout + stime
         self.__last_stat = stime
@@ -80,12 +74,6 @@ class process_network_total:
             self.rm_pid_file()
         
     def handle_packet(self, pcap_data):
-        '''
-            @name 处理pcap数据包
-            @author hwliang<2021-09-12>
-            @param pcap_data<bytes> pcap数据包
-            @return void
-        '''
         # 获取IP协议头
         ip_header = pcap_data[14:34]
         # 解析src/dst地址
@@ -103,14 +91,6 @@ class process_network_total:
         self.total_net_process(dst,src,pack_size)
 
     def total_net_process(self,dst,src,pack_size):
-        '''
-            @name 统计进程流量
-            @author hwliang<2021-09-13>
-            @param dst<bytes> 目标地址
-            @param src<bytes> 源地址
-            @param pack_size<int> 数据包长度
-            @return void
-        '''
         self.get_tcp_stat()
         direction = None
         mtime = time.time()
@@ -149,12 +129,7 @@ class process_network_total:
             self.write_net_process()
 
     def write_net_process(self):
-        '''
-            @name 写入进程流量
-            @author hwliang<2021-09-13>
-            @return void
-        '''
-        w_file = '/dev/shm/bt_net_process'
+        w_file = '/dev/shm/mw_net_process'
         process_size = copy.deepcopy(self.__net_process_size)
         net_process = []
         for pid in process_size.keys():
@@ -165,24 +140,12 @@ class process_network_total:
         f.close()
 
     def hex_to_ip(self, hex_ip):
-        '''
-            @name 将16进制的IP地址转换为字符串IP地址
-            @author hwliang<2021-09-13>
-            @param hex_ip<string> 16进制的IP地址:16进程端口
-            @return tuple(ip<str>,port<int>) IP地址,端口
-        '''
         hex_ip,hex_port = hex_ip.split(':')
         ip = '.'.join([str(int(hex_ip[i:i+2], 16)) for i in range(0, len(hex_ip), 2)][::-1])
         port = int(hex_port, 16)
         return ip,port
 
     def get_tcp_stat(self,force = False):
-        '''
-            @name 获取当前TCP连接状态表
-            @author hwliang<2021-09-13>
-            @param force<bool> 是否强制刷新
-            @return dict
-        '''
         if not force and self.__net_process_list: return self.__net_process_list
         self.__net_process_list = {}
         tcp_stat_file = '/proc/net/tcp'
@@ -211,21 +174,9 @@ class process_network_total:
             
     
     def get_port_pack(self,port):
-        '''
-            @name 将端口转换为字节流
-            @author hwliang<2021-09-13>
-            @param port<int> 端口
-            @return bytes
-        '''
         return struct.pack('H',int(port))[::-1]
     
     def get_ip_pack(self,ip):
-        '''
-            @name 将IP地址转换为字节流
-            @author hwliang<2021-09-13>
-            @param ip<str> IP地址
-            @return bytes
-        '''
         ip_arr = ip.split('.')
         ip_pack = b''
         for i in ip_arr:
@@ -233,25 +184,12 @@ class process_network_total:
         return ip_pack
 
     def inode_to_pid(self,inode,force = False):
-        '''
-            @name 将inode转换为进程ID
-            @author hwliang<2021-09-13>
-            @param inode<string> inode
-            @param force<bool> 是否强制刷新
-            @return int
-        '''
         inode_list = self.get_process_inodes()
         if inode in inode_list:
             return inode_list[inode]
         return None
 
     def get_process_inodes(self,force = False):
-        '''
-            @name 获取进程inode列表
-            @author hwliang<2021-09-13>
-            @param force<bool> 是否强制刷新
-            @return dict
-        '''
         if not force and self.__inode_list: return self.__inode_list
         proc_path = '/proc'
         inode_list = {}
@@ -274,12 +212,6 @@ class process_network_total:
         return inode_list
 
     def get_process_name(self,pid):
-        '''
-            @name 获取进程名称
-            @author hwliang<2021-09-13>
-            @param pid<str> 进程ID
-            @return str
-        '''
         pid_path = '/proc/' + pid + '/comm'
         if not os.path.exists(pid_path): return ''
         pid_file = open(pid_path, 'rb')
@@ -289,22 +221,12 @@ class process_network_total:
 
 
     def write_pid(self):
-        '''
-            @name 写入进程ID到PID文件
-            @author hwliang<2021-09-13>
-            @return void
-        '''
         self_pid = os.getpid()
         pid_file = open(self.__pid_file,'w')
         pid_file.write(str(self_pid))
         pid_file.close()
 
     def rm_pid_file(self):
-        '''
-            @name 删除进程pid文件
-            @author hwliang<2021-09-13>
-            @return void
-        '''
         if os.path.exists(self.__pid_file):
             os.remove(self.__pid_file)
 
