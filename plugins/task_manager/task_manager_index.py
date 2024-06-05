@@ -89,7 +89,7 @@ class mainClass(object):
             tmp['up_package'] = int(np_list[4])
             self.__process_net_list[tmp['pid']] = tmp
 
-        if time.time() - self.last_net_process_time > 10:
+        if time.time() - self.last_net_process_time > 7:
             self.last_net_process = self.__process_net_list
             self.last_net_process_time = time.time()
 
