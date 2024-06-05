@@ -559,7 +559,7 @@ class mainClass(object):
             pid = mw.readFile(_pid_file)
             if os.path.exists('/proc/' + pid): return True
 
-        cmd_file = getServerDir()+'/process_network_total.py'
+        cmd_file = mw_dir+'/plugins/task_manager/process_network_total.py'
         python_bin = self.get_python_bin()
         _cmd = 'nohup {} {} 600 &> /tmp/net.log &'.format(python_bin, cmd_file)
         mw.execShell(_cmd)

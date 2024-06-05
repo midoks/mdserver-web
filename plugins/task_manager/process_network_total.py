@@ -12,7 +12,7 @@ import time
 import os
 import struct
 
-os.chdir('/www/server/panel')
+os.chdir('/www/server/mdserver-web')
 if 'class/' in sys.path: sys.path.insert(0,"class/")
 import copy
 try:
