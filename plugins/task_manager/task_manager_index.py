@@ -423,12 +423,6 @@ class mainClass(object):
         return name
 
     def get_process_network(self, pid):
-        '''
-            @name 获取进程网络流量
-            @author hwliang<2021-09-13>
-            @param pid<int> 进程ID
-            @return tuple
-        '''
         if not self.__process_net_list:
             self.get_process_net_list()
         if not self.last_net_process_time: return 0, 0, 0, 0
@@ -486,7 +480,7 @@ class mainClass(object):
     def set_meter_head(self, get):
         if not 'meter_head_name' in get:
             return  False
-            
+
         meter_head_name = get['meter_head_name']
         meter_head_file = getServerDir()+'/meter_head.json'
         try:
