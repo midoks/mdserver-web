@@ -1,0 +1,17 @@
+{
+	"sort": 7,
+	"ps": "轻松管理进程、流量监控、启动项、用户、服务、计划任务、会话",
+	"name": "task_manager",
+	"title": "任务管理器",
+	"shell": "install.sh",
+	"versions":"1.0",
+	"tip": "soft",
+	"checks": "server/task_manager",
+	"path": "server/task_manager",
+	"display": 1,
+	"author": "task_manager",
+	"date": "2024-06-01",
+	"home": "task_manager",
+	"type": 0,
+	"pid": "4"
+}

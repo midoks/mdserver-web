@@ -115,7 +115,22 @@ tmp/*
 *.swp
 *.pem
 *.zip
+debug.out
+mdioks.session-journal
+*.session
+
 logs/*
+
+ssl/local
+ssl/nginx
+ssl/choose.pl
+
+scripts/init.d/mw
+scripts/mdserver-web
+
+data/api_login.txt
+data/sessions
+
 data/*.db
 data/iplist.txt
 data/json/index.json
@@ -130,12 +145,6 @@ data/backup.pl
 data/debug.pl
 data/default_site.pl
 data/ssl.pl
-
-scripts/init.d/mw
-scripts/mdserver-web
-
-data/api_login.txt
-data/sessions
 
 data/port.pl
 data/ipv6.pl
@@ -152,10 +161,6 @@ data/api.json
 data/bind_domain.pl
 data/unauthorized_status.pl
 data/auth_secret.pl
-
-ssl/local
-ssl/nginx
-ssl/choose.pl
 
 plugins/vip_*
 plugins/own_*
@@ -175,8 +180,3 @@ plugins/frp
 plugins/file_search
 plugins/proxysql
 plugins/tidb
-debug.out
-
-
-mdioks.session-journal
-*.session

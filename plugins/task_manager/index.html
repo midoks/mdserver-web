@@ -1,0 +1,553 @@
+<style>
+/*任务管理器*/
+.man-menu-sub {
+    background-color: #fff;
+    border-bottom: 1px solid #ccc;
+    height: 50px;
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    flex-wrap: nowrap;
+    align-items: center;
+}
+
+.t-mana .table > tbody > tr.active td {
+    background-color: #E4EEE0;
+}
+
+.search-bar {
+}
+
+.search-bar .search_input {
+    height: 30px;
+    line-height: 30px;
+    border-radius: 2px;
+    border: 1px solid #ccc;
+    outline: none;
+    padding-left: 8px;
+    vertical-align: top;
+    width: 230px;
+}
+
+.search-bar .search_input:focus {
+    border-color: #20a53a;
+
+    span.glyphicon-search {
+        color: #20a53a;
+    }
+}
+
+.search-bar .glyphicon {
+    position: relative;
+    top: 1px;
+    display: inline-block;
+    font-family: 'Glyphicons Halflings';
+    font-style: normal;
+    font-weight: 400;
+    line-height: 1;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+}
+
+.search-bar .glyphicon-search {
+    height: 28px;
+    line-height: 28px;
+    padding: 0 10px;
+    color: #888;
+    position: absolute;
+    right: 14px;
+    top: 11px;
+    font-size: 14px;
+    cursor: pointer;
+}
+.r56 {
+  right: 56px !important;
+}
+
+.man-menu-sub {
+    background-color: #fff;
+    border-bottom: 1px solid #ccc;
+    height: 50px;
+}
+
+.man-menu-sub span {
+    padding: 14px 15px;
+    cursor: pointer;
+    display: inline-block;
+    font-size: 14px;
+}
+
+.man-menu-sub .on {
+    border-bottom: 2px solid #20a53a;
+    color: #20a53a;
+    font-weight: bold;
+}
+
+.soft-ico-min {
+    display: inline-block;
+    width: 16px;
+    margin-right: 5px;
+}
+
+.soft-ico-min img {
+    width: 16px;
+}
+
+.table-cont {
+    height: 500px;
+    overflow: auto;
+    border: #ddd 1px solid;
+    position: relative;
+}
+
+.ts-line {
+    position: absolute;
+    top: 99px;
+    height: 1px;
+    background-color: #ddd;
+    left: 16px;
+    z-index: 2;
+}
+
+.t-mana .bt-ico-ask {
+    height: 14px;
+    width: 14px;
+    line-height: 14px;
+}
+
+.mini-info {
+    width: 100%;
+    border-top: #DBDBEA 1px solid;
+    background-color: #f6f6f6;
+    padding: 15px;
+}
+
+.mini-info-box {
+    width: 500px;
+    margin: 0 auto;
+    background-color: #fff;
+    border: #DBDBEA 1px solid;
+    border-radius: 6px;
+    height: 66px;
+    box-shadow: 0 0 40px #eee;
+}
+
+.mini-info-con {
+    float: left;
+    height: 100%;
+    width: 33%;
+    line-height: 26px;
+    padding: 6px 16px;
+}
+
+.mini-info-con:nth-of-type(2) {
+    border-left: #DBDBEA 1px solid;
+    border-right: #DBDBEA 1px solid;
+    width: 34%;
+}
+
+.mini-info-con p {
+    text-align: right;
+    position: relative;
+}
+
+.mini-info-con .tname {
+    display: inline-block;
+    position: absolute;
+    left: 0;
+}
+
+.mini-level {
+    border: #ddd 1px solid;
+    width: 166px;
+    background-color: #fff;
+    border-radius: 6px;
+    margin: 0 auto;
+    height: 66px;
+    line-height: 66px;
+    text-align: center;
+}
+
+.jc-detail .tname {
+    font-size: 12px;
+    font-weight: bold;
+    margin-right: 10px;
+}
+
+.jc-detail h3.tname {
+    margin-bottom: 10px;
+    margin-top: 15px;
+    color: #999;
+}
+
+.jc-detail .jc-info {
+    margin: 10px 0;
+    border-bottom: #ddd 1px solid;
+    padding-bottom: 10px;
+}
+
+#TaskManagement .td-pid {
+    /* display: flex; */
+    /* border-top: #ddd 2px solid; */
+    /* height: 38px; */
+    /* height: 100%; */
+    /* margin-top: 1px; */
+}
+
+.td-pid img {
+    /* margin-right: 8px; */
+    /* display: inline-block; */
+    float: left;
+    cursor: pointer;
+    /* position: relative;
+    left: -80px;
+    filter: drop-shadow(#fff 80px 0); */
+    /* position: relative;
+    left: -80px;
+    filter: drop-shadow(#238B37 0 80px); */
+}
+
+.td-pid svg {
+    float: left;
+    cursor: pointer;
+}
+
+.td-pid .colp {
+    transform: rotate(-90deg);
+    -moz-transform: rotate(-90deg);
+    -webkit-transform: rotate(-90deg);
+}
+
+.td-pid .arrow:hover {
+    filter: drop-shadow(#999999 0 0)
+}
+
+.td-pid .process-child {
+    margin-left: 50px;
+    /* display: none; */
+}
+
+.td-pid span {
+    display: inline-block;
+    float: right;
+}
+
+.td-pid a {
+    display: block;
+    margin-left: 30px;
+}
+
+#TaskManagement th: {
+    height: 34px;
+}
+
+#TaskManagement tr: {
+    height: 38px;
+}
+
+#TaskManagement tr:hover {
+    /* background-color: rgb(245, 247, 250,0.6); */
+    background-color: rgb(246, 246, 246, 0.65);
+}
+
+#TaskManagement .process-select {
+    /* background-color: rgb(242, 242, 242); */
+    /* background-color: rgb(245, 247, 250,0.6); */
+    background-color: rgb(246, 246, 246, 0.6);
+    /* background-color: rgb(246, 246, 246,0.65); */
+}
+
+#taskResourceTable .process-select {
+    /* background-color: rgb(242, 242, 242); */
+    background-color: #F1F9F3;
+}
+
+#TaskManagement .process-select:hover {
+    /* background-color: rgb(211, 210, 210); */
+    /* background-color: rgb(245, 247, 250); */
+    background-color: rgb(246, 246, 246);
+    /* border: 1px solid #ddd;
+    box-sizing: border-box; */
+}
+
+#taskResourceTable .process-select:hover {
+    /* background-color: rgb(211, 210, 210); */
+    background-color: #BCE4C4;
+}
+
+.resource-panel {
+    display: none;
+    width: 100%;
+    height: 700px;
+    /* height: 300px; */
+}
+
+.resource-tab {
+    float: left;
+    width: 100px;
+    height: 300px;
+    background-color: thistle;
+}
+
+.resource-right {
+    margin-left: 100px;
+    /* width: 100%; */
+    /* background-color: gray; */
+    /* height: 600px; */
+}
+
+.resource-panel-show {
+    display: block;
+}
+
+.divtable-hide {
+    display: none;
+    /* visibility: hidden; */
+}
+
+.resource-tab span {
+    display: block;
+    height: 30px;
+    line-height: 30px;
+    text-align: center;
+    cursor: pointer;
+}
+
+.resource-tab span:hover {
+    background-color: #ccc;
+}
+
+.plug_menu {
+    display: none;
+}
+.plug_menu .setting_ul::after{
+    display: none;
+}
+.plug_menu .setting_ul.undisplay::after {
+        content: '';
+        position: absolute;
+        color: #fff;
+        width: 12px;
+        height: 12px;
+        font-size: 14px;
+        top: -7px;
+        right: 8px;
+        display: inline-block;
+        background: #fff;
+        transform: rotate(-45deg);
+        border-top: 1px solid rgba(0, 0, 0, 0.25);
+        border-right: 1px solid rgba(0, 0, 0, 0.25);
+}
+
+.set_list_fid_dropdown {
+  display: inline-block;
+  line-height: 30px;
+  margin-left: 10px;
+  position: relative;
+  vertical-align: bottom;
+}
+.set_list_fid_dropdown .setting_btn {
+  border: 1px solid #ccc;
+  height: 30px;
+  width: 30px;
+  border-radius: 4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+}
+.set_list_fid_dropdown .setting_btn:hover{
+  background: #e9f6eb;
+  border-color: #bce4c4;
+}
+.set_list_fid_dropdown .icon-setting {
+  color: rgb(102, 102, 102);
+}
+.set_list_fid_dropdown .setting_btn:hover .icon-setting {
+  color: #20a53a;
+}
+.set_list_fid_dropdown .setting_ul {
+  position: absolute;
+  z-index: 99;
+  background: #fff;
+  width: 150px;
+  right: 0;
+  border-radius: 4px;
+  box-shadow: 0px 0px 4px rgba(0, 0, 0, 0.25);
+  padding: 10px 0;
+  margin-top: 10px;
+  display: none;
+}
+.set_list_fid_dropdown .setting_ul::after {
+  content: '';
+  position: absolute;
+  color: #fff;
+  width: 12px;
+  height: 12px;
+  font-size: 14px;
+  top: -7px;
+  right: 8px;
+  display: inline-block;
+  background: #fff;
+  transform: rotate(-45deg);
+  border-top: 1px solid rgba(0, 0, 0, 0.25);
+  border-right: 1px solid rgba(0, 0, 0, 0.25);
+}
+.setting_ul .setting_ul_li{
+  display: flex;
+  align-items: center;
+  line-height: 27px;
+  padding: 0 16px;
+  cursor: pointer;
+}
+.setting_ul .setting_ul_li:hover{
+  background: #e9f6eb;
+}
+.setting_ul .setting_ul_li.disabled {
+  cursor: not-allowed;
+}
+
+.setting_ul .setting_ul_li i {
+  display: inline-block;
+  width: 16px;
+  height: 16px;
+  border: 1px solid #ccc;
+  background-color: #fff;
+  vertical-align: top;
+  position: relative;
+  border-radius: 2px;
+}
+.setting_ul .setting_ul_li.active i {
+  background-color: #20a53a;
+  border-color: #20a53a;
+}
+.setting_ul .setting_ul_li.disabled i {
+  background-color: #edf2fc;
+  border-color: #dcdfe6;
+}
+.setting_ul .setting_ul_li.active.disabled i {
+  background-color: #f2f6fc;
+  border-color: #dcdfe6;
+}
+.setting_ul .setting_ul_li.active.disabled i::after{
+  border: solid #dcdfe6;
+  border-width: 0 2px 2px 0;
+}
+.setting_ul .setting_ul_li.active i::after{
+  content: '';
+  position: absolute;
+  display: block;
+  left: 50%;
+  top: 50%;
+  margin-left: -2px;
+  margin-top: -6px;
+  width: 5px;
+  height: 10px;
+  border: solid #fff;
+  border-width: 0 2px 2px 0;
+  transform: rotate(45deg);
+}
+</style>
+
+<div class="t-mana TaskManView">
+	<div class="man-menu-sub mlr15">
+		<div>
+			<span class="p_list on">进程</span>
+			<span class="p_run">启动项</span>
+			<span class="p_service">服务</span>
+			<span class="p_network">网络</span>
+			<span class="p_user">用户</span>
+			<span class="p_cron">计划任务</span>
+			<span class="p_session">会话</span>
+		</div>
+		<div style="display: flex;flex-direction: row;align-items: center;justify-content: flex-end;">
+		 	<div class="search-bar ">
+		    	<input type="text" class="search_input " style="" placeholder="支持名称、字段模糊搜索">
+		    	<span class="glyphicon glyphicon-search r56" aria-hidden="true"></span>
+		  	</div>
+		  	<div class="table_config set_list_fid_dropdown" title="设置表头">
+		    	<div class="setting_btn"><i class="glyphicon glyphicon-cog icon-setting"></i></div>
+		  	</div>
+		</div>
+	</div>
+	<div class="ts-line"></div>
+
+	<div class="divtable taskdivtable pd15">
+		<div id="table-cont" class="table-cont">
+		 	<table id="TaskManagement" class="table table-hover" width="100%" style="border:none"></table>
+		</div>
+	</div>
+
+	<div class="resource-panel pd15">
+		<div class="resource-tab">
+			<span>CPU</span>
+			<span>内存</span>
+			<span>磁盘</span>
+		</div>
+
+		<div class="resource-right">
+	  		<div class="resource-top"></div>
+	  		<div class="resource-middle divtable">
+		    	<div id="table-cont" class="table-cont" style="height:100px;">
+		      		<table id="taskResourceTable" class="table table-hover" width="100%" style="border:none">
+		      		</table>
+		    	</div>
+	  		</div>
+	  		<div class="resource-bottom"></div>
+		</div>
+	</div>
+
+	<div class="mini-info" id="load_average"></div>
+	<div class="plug_menu set_list_fid_dropdown">
+		<ul class="setting_ul" style="display: none;">
+			<li class="setting_ul_li ps active disabled" name="ps">
+				<i></i><span class="ml10">应用名称</span>
+			</li>
+			<li class="setting_ul_li pid active disabled" name="pid">
+				<i></i> <span class="ml10">PID</span>
+			</li>
+			<li class="setting_ul_li threads active" name="threads">
+				<i></i> <span class="ml10">线程</span>
+			</li>
+			<li class="setting_ul_li user active" name="user">
+				<i></i> <span class="ml10">用户</span>
+			</li>
+			<li class="setting_ul_li cpu_percent active disabled" name="cpu_percent">
+				<i></i> <span class="ml10">CPU</span>
+			</li>
+			<li class="setting_ul_li memory_used active disabled" name="memory_used">
+				<i></i> <span class="ml10">内存</span>
+			</li>
+			<li class="setting_ul_li io_read_bytes active" name="io_read_bytes">
+				<i></i> <span class="ml10">io读</span>
+			</li>
+			<li class="setting_ul_li io_write_bytes active" name="io_write_bytes">
+				<i></i> <span class="ml10">io写</span>
+			</li>
+			<li class="setting_ul_li up active" name="up">
+				<i></i> <span class="ml10">上行</span>
+			</li>
+			<li class="setting_ul_li down active" name="down">
+				<i></i> <span class="ml10">下行</span>
+			</li>
+			<li class="setting_ul_li connects active" name="connects">
+				<i></i> <span class="ml10">连接</span>
+			</li>
+			<li class="setting_ul_li status active" name="status">
+				<i></i> <span class="ml10">状态</span>
+			</li>
+			<li class="setting_ul_li  active disabled" name="">
+				<i></i> <span class="ml10">操作</span>
+			</li>
+		</ul>
+	</div>
+</div>
+
+
+<script type="text/javascript">
+$('.layui-layer-page').css({'width': '1000px'});
+$.getScript( "/plugins/file?name=task_manager&f=js/task_manager.js", function(){
+	console.log("load js ok!");
+});
+</script>
+
