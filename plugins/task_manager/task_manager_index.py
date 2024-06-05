@@ -72,6 +72,7 @@ class mainClass(object):
 
 
     def get_process_net_list(self):
+        import copy
         w_file = '/dev/shm/mw_net_process'
         if not os.path.exists(w_file): return
         net_process_body = mw.readFile(w_file)
@@ -90,7 +91,7 @@ class mainClass(object):
             self.__process_net_list[tmp['pid']] = tmp
 
         if time.time() - self.last_net_process_time > 60 or self.last_net_process_time == 0:
-            self.last_net_process = self.__process_net_list
+            self.last_net_process = copy.deepcopy(self.__process_net_list)
             self.last_net_process_time = time.time()
 
     # 获取进程连接数
