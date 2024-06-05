@@ -1095,8 +1095,8 @@ function dropAddress(address) {
 function show_task() {
     $(".ts-line").width($("#TaskManagement").width());
     $("#TaskManagement tbody td").click(function () {
-      // console.log('---');
-      $(this).parents("tr").addClass("active").siblings().removeClass("active");
+        // console.log('---');
+        $(this).parents("tr").addClass("active").siblings().removeClass("active");
     });
     var tableCont = document.querySelector('#table-cont');
     //表格固定
