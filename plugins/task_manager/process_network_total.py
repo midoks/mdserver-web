@@ -63,6 +63,7 @@ class process_network_total:
                     if p_time > self.__end_time:
                         self.rm_pid_file()
                         break
+
         except:
             self.rm_pid_file()
         
@@ -224,10 +225,6 @@ class process_network_total:
             os.remove(self.__pid_file)
 
 if __name__ == '__main__':
-    if len(sys.argv) > 1:
-        timeout = int(sys.argv[-1])
-    else:
-        timeout = 0
     p = process_network_total()
     p.write_pid()
-    p.start(timeout)
+    p.start(600)
