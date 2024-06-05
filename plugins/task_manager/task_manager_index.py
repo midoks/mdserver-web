@@ -405,7 +405,7 @@ class mainClass(object):
         if name in processPs: return processPs[name]
 
         # if self.is_panel_process(pid): return 'MW面板'
-        
+
         if p_exe:
             exe_keys = {
                 '/www/server/mdserver-web/plugins/': '面板插件',
@@ -1001,7 +1001,9 @@ class mainClass(object):
 
         if get['user'] in users: return mw.returnData(False, '不能删除系统和环境关键用户!')
 
-        r = mw.execShell("userdel " + get['user'])
+        user = get['user']
+
+        r = mw.execShell("userdel " + user)
         if r[1].find('process') != -1:
             try:
                 pid = r[1].split()[-1]
@@ -1009,7 +1011,7 @@ class mainClass(object):
                 pname = p.name()
                 p.kill()
                 mw.execShell("pkill -9 " + pname)
-                r = mw.execShell("userdel " + get.user)
+                r = mw.execShell("userdel " + .user)
             except:
                 pass
         if r[1].find('userdel:') != -1: return mw.returnData(False, r[1]);
