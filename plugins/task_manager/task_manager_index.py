@@ -866,6 +866,7 @@ class mainClass(object):
                     tmp['threads'] = p.num_threads()
                     tmp['ps'] = self.get_process_ps(tmp['name'], pid, tmp['exe'], p)
                     tmp['up'], tmp['up_package'], tmp['down'], tmp['down_package'] = self.get_process_network(pid)
+                    # print(pid,tmp['up'], tmp['up_package'], tmp['down'], tmp['down_package'])
                     if tmp['cpu_percent'] > 100: tmp['cpu_percent'] = 0.1
                     info['cpu'] += tmp['cpu_percent']
                     info['disk'] += tmp['io_write_speed'] + tmp['io_read_speed']
