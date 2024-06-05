@@ -110,9 +110,9 @@ docker run -itd --name mw-server --privileged=true -p 7200:7200 -p 80:80 -p 443:
 ```
 
 
-### 版本更新 0.17.0
+### 版本更新 0.17.1
 
-- 面板SSL调整。
+- 任务管理器-插件。
 
 ### JSDelivr安装地址
 
