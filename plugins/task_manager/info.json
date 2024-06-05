@@ -1,6 +1,6 @@
 {
 	"sort": 7,
-	"ps": "轻松管理进程、流量监控、启动项、用户、服务、计划任务、会话[<span style='color:red;'>开发中</span>]",
+	"ps": "轻松管理进程、流量监控、启动项、用户、服务、计划任务、会话",
 	"name": "task_manager",
 	"title": "任务管理器",
 	"shell": "install.sh",
