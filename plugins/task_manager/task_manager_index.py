@@ -418,6 +418,7 @@ class mainClass(object):
         down_package = int(
             (self.__process_net_list[pid]['down_package'] - self.last_net_process[pid]['down_package']) / (
                     time.time() - self.last_net_process_time))
+        # print(up, up_package, down, down_package)
         return up, up_package, down, down_package
 
     def get_process_cpu_time(self, cpu_times):
