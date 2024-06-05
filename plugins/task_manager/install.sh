@@ -12,6 +12,7 @@ VERSION=$2
 
 # python3 plugins/task_manager/task_manager_index.py
 # /www/server/mdserver-web/bin/python3 /www/server/mdserver-web/plugins/task_manager/process_network_total.py
+# ps -ef|grep process_network_total| grep -v grep | awk '{print $2}' | xargs kill -9
 
 Install_App()
 {
