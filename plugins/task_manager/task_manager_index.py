@@ -993,8 +993,10 @@ class mainClass(object):
     def remove_user(self, get):
         if self.is_mac:
             return mw.returnData(False, '无法操作!')
-        users = ['www', 'root', 'mysql', 'shutdown', 'postfix', 'smmsp', 'sshd', 'systemd-network', 'systemd-bus-proxy',
-                 'avahi-autoipd', 'mail', 'sync', 'lp', 'adm', 'bin', 'mailnull', 'ntp', 'daemon', 'sys'];
+        users = ['www', 'root', 'mysql', 'shutdown', 'postfix', 
+                'smmsp', 'sshd', 'systemd-network', 'systemd-bus-proxy',
+                'avahi-autoipd', 'mail', 'sync', 'lp', 
+                'adm', 'bin', 'mailnull', 'ntp', 'daemon', 'sys'];
 
         if 'user' in get:
             return mw.returnData(False, '缺少参数!') 
