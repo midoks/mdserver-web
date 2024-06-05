@@ -998,7 +998,7 @@ class mainClass(object):
                 'avahi-autoipd', 'mail', 'sync', 'lp', 
                 'adm', 'bin', 'mailnull', 'ntp', 'daemon', 'sys'];
 
-        if 'user' in get:
+        if not 'user' in get:
             return mw.returnData(False, '缺少参数!') 
 
         if get['user'] in users: return mw.returnData(False, '不能删除系统和环境关键用户!')
