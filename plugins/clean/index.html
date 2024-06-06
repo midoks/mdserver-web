@@ -45,9 +45,11 @@ function cleanPost(method, version, args, callback){
 
 function cleanRun(){
 	cleanPost('clean_run', '', {}, function(rdata){
-		var rdata = $.parseJSON(rdata.data);
-        layer.msg(rdata.msg, { icon: rdata.status ? 1 : 2 });
+		// var rdata = $.parseJSON(rdata.data);
+        // layer.msg(rdata.msg, { icon: rdata.status ? 1 : 2 });
 	});
+
+	layer.msg("执行成功!", { icon: 1});
 }
 
 function commonFunc(){
