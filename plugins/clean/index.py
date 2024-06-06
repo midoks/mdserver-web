@@ -88,10 +88,12 @@ def initConf():
             "/var/log/syslog.*",
             "/var/log/dpkg.log.*",
             "/var/log/alternatives.log.*",
+
             "/var/log/user.log.*",
             "/var/log/kern.log.*",
             "/var/log/daemon.log.*",
             "/var/log/audit/audit.log.*",
+            "/var/log/apt/*.gz",
             "/var/log/rhsm/rhsm.log-*",
             "/var/log/rhsm/rhsmcertd.log-*",
             "/tmp/yum_save_*",
