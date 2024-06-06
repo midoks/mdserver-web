@@ -98,9 +98,10 @@ def initConf():
             "/var/log/apt/*.xz",
             "/var/log/rhsm/rhsm.log-*",
             "/var/log/rhsm/rhsmcertd.log-*",
-
-            "/var/spool/clientmqueue/*",
+            "/var/log/exim4/*.gz",
             "/var/log/journal/*",
+            "/var/spool/clientmqueue/*",
+           
             "/tmp/yum_save_*",
             "/tmp/tmp.*",
         ]
