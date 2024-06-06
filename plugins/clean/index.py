@@ -74,7 +74,6 @@ def initConf():
         content = ""
 
         clog = [
-            "/var/spool/clientmqueue/*",
             "/var/log/cron-*",
             "/var/log/maillog-*",
             "/var/log/secure-*",
@@ -82,9 +81,31 @@ def initConf():
             "/var/log/yum.log-*",
             "/var/log/messages-*",
             "/var/log/btmp-*",
+            "/var/log/auth.*",
+            "/var/log/messages.*",
+            "/var/log/debug.*",
+            "/var/log/syslog.*",
+            "/var/log/btmp.*",
+
+            "/var/log/dpkg.log.*",
+            "/var/log/alternatives.log.*",
+            "/var/log/user.log.*",
+            "/var/log/kern.log.*",
+            "/var/log/daemon.log.*",
+
+            "/var/log/*.gz",
+            "/var/log/*.xz",
+            "/var/log/*.log.*",
+
             "/var/log/audit/audit.log.*",
+            "/var/log/apt/*.gz",
+            "/var/log/apt/*.xz",
             "/var/log/rhsm/rhsm.log-*",
             "/var/log/rhsm/rhsmcertd.log-*",
+            "/var/log/exim4/*.gz",
+            "/var/log/journal/*",
+            "/var/spool/clientmqueue/*",
+           
             "/tmp/yum_save_*",
             "/tmp/tmp.*",
         ]
@@ -201,6 +222,13 @@ def cleanDirLog(path):
             cleanDirLog(abspath)
 
 
+def cleanRun():
+    plugin_dir = getPluginDir()
+    log_file = getServerDir()+'/clean.log'
+    cmd = 'python3 '+plugin_dir+'/index.py clean > '+log_file
+    os.system(cmd)
+    return mw.returnJson(True, '执行成功!')
+
 def cleanLog():
     conf = getConf()
     clist = mw.readFile(conf).strip()
@@ -243,5 +271,7 @@ if __name__ == "__main__":
         print(runLog())
     elif func == 'clean':
         cleanLog()
+    elif func == 'clean_run':
+        print(cleanRun())
     else:
         print('error')
