@@ -95,6 +95,7 @@ def initConf():
 
             "/var/log/*.gz",
             "/var/log/*.xz",
+            "/var/log/*.log.*",
 
             "/var/log/audit/audit.log.*",
             "/var/log/apt/*.gz",
