@@ -206,12 +206,9 @@ def cleanDirLog(path):
 
 
 def cleanRun():
-    # cleanLog()
     plugin_dir = getPluginDir()
-    # print(plugin_dir)
     log_file = getServerDir()+'/clean.log'
     cmd = 'python3 '+plugin_dir+'/index.py clean > '+log_file
-    # print(cmd)
     os.system(cmd)
     return mw.returnJson(True, '执行成功!')
 
