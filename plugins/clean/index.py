@@ -205,6 +205,16 @@ def cleanDirLog(path):
             cleanDirLog(abspath)
 
 
+def cleanRun():
+    # cleanLog()
+    plugin_dir = getPluginDir()
+    # print(plugin_dir)
+    log_file = getServerDir()+'/clean.log'
+    cmd = 'python3 '+plugin_dir+'/index.py clean > '+log_file
+    # print(cmd)
+    os.system(cmd)
+    return mw.returnJson(True, '执行成功!')
+
 def cleanLog():
     conf = getConf()
     clist = mw.readFile(conf).strip()
@@ -247,5 +257,7 @@ if __name__ == "__main__":
         print(runLog())
     elif func == 'clean':
         cleanLog()
+    elif func == 'clean_run':
+        print(cleanRun())
     else:
         print('error')
