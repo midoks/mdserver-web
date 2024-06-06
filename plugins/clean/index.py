@@ -74,7 +74,6 @@ def initConf():
         content = ""
 
         clog = [
-            "/var/spool/clientmqueue/*",
             "/var/log/cron-*",
             "/var/log/maillog-*",
             "/var/log/secure-*",
@@ -86,16 +85,22 @@ def initConf():
             "/var/log/messages.*",
             "/var/log/debug.*",
             "/var/log/syslog.*",
+            "/var/log/btmp.*",
+
             "/var/log/dpkg.log.*",
             "/var/log/alternatives.log.*",
-
             "/var/log/user.log.*",
             "/var/log/kern.log.*",
             "/var/log/daemon.log.*",
+
             "/var/log/audit/audit.log.*",
             "/var/log/apt/*.gz",
+            "/var/log/apt/*.xz",
             "/var/log/rhsm/rhsm.log-*",
             "/var/log/rhsm/rhsmcertd.log-*",
+
+            "/var/spool/clientmqueue/*",
+            "/var/log/journal/*",
             "/tmp/yum_save_*",
             "/tmp/tmp.*",
         ]
