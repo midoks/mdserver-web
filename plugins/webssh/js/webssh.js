@@ -482,6 +482,7 @@ function webShell_addServer(info=[]){
                         // $('input[name="pkey_passwd"]').val(jdata['pkey_passwd']);
                     }
                     $('input[name="ps"]').val(jdata['ps']);
+                    $('input[name="port"]').val(jdata['port']);
                     $('.auth_type_checkbox').each(function(){
                         if ($(this).data('ctype') == jdata['type']){
                             $(this).addClass('btn-success');
