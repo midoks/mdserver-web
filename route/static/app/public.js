@@ -1351,23 +1351,23 @@ function execLog(){
  * @param {String} dateFormat 返回的日期格式，默认为'H:i:s'
  */
 function getSFM(seconds, dateFormat = 'H:i:s') {
-  var obj = {};
-  obj.H = Number.parseInt(seconds / 3600);
-  obj.i = Number.parseInt((seconds - obj.H * 3600) / 60);
-  obj.s = Number.parseInt(seconds - obj.H * 3600 - obj.i * 60);
-  if (obj.H < 10) {
-    obj.H = '0' + obj.H;
-  }
-  if (obj.i < 10) {
-    obj.i = '0' + obj.i;
-  }
-  if (obj.s < 10) {
-    obj.s = '0' + obj.s;
-  }
+	var obj = {};
+ 	obj.H = Number.parseInt(seconds / 3600);
+ 	obj.i = Number.parseInt((seconds - obj.H * 3600) / 60);
+ 	obj.s = Number.parseInt(seconds - obj.H * 3600 - obj.i * 60);
+ 	if (obj.H < 10) {
+    	obj.H = '0' + obj.H;
+  	}
+  	if (obj.i < 10) {
+    	obj.i = '0' + obj.i;
+  	}
+  	if (obj.s < 10) {
+    	obj.s = '0' + obj.s;
+  	}
  
-  // 3.解析
-  var rs = dateFormat.replace('H', obj.H).replace('i', obj.i).replace('s', obj.s);
-  return rs;
+  	// 3.解析
+  	var rs = dateFormat.replace('H', obj.H).replace('i', obj.i).replace('s', obj.s);
+  	return rs;
 }
 
 function remind(a){
