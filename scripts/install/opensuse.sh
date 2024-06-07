@@ -54,6 +54,8 @@ zypper install -y libXpm-devel
 zypper install -y freetype2-devel
 zypper install -y libargon2-devel
 
+zypper install -y net-tools-deprecated
+
 # zypper install -y  php-config
 
 SSH_PORT=`netstat -ntpl|grep sshd|grep -v grep | sed -n "1,1p" | awk '{print $4}' | awk -F : '{print $2}'`
