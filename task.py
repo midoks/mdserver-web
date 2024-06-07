@@ -77,7 +77,7 @@ def openresty_cmd(method = 'reload'):
         return True
 
     sys_initd = '/etc/init.d/openresty'
-    if os.path.exists(install_initd):
+    if os.path.exists(sys_initd):
         os.system(sys_initd + ' ' + method)
         return True
 

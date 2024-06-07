@@ -1351,58 +1351,57 @@ function execLog(){
  * @param {String} dateFormat 返回的日期格式，默认为'H:i:s'
  */
 function getSFM(seconds, dateFormat = 'H:i:s') {
-  var obj = {};
-  obj.H = Number.parseInt(seconds / 3600);
-  obj.i = Number.parseInt((seconds - obj.H * 3600) / 60);
-  obj.s = Number.parseInt(seconds - obj.H * 3600 - obj.i * 60);
-  if (obj.H < 10) {
-    obj.H = '0' + obj.H;
-  }
-  if (obj.i < 10) {
-    obj.i = '0' + obj.i;
-  }
-  if (obj.s < 10) {
-    obj.s = '0' + obj.s;
-  }
+
+	var obj = {};
+ 	obj.H = Number.parseInt(seconds / 3600);
+ 	obj.i = Number.parseInt((seconds - obj.H * 3600) / 60);
+ 	obj.s = Number.parseInt(seconds - obj.H * 3600 - obj.i * 60);
+ 	if (obj.H < 10) {
+    	obj.H = '0' + obj.H;
+  	}
+  	if (obj.i < 10) {
+    	obj.i = '0' + obj.i;
+  	}
+  	if (obj.s < 10) {
+    	obj.s = '0' + obj.s;
+  	}
  
-  // 3.解析
-  var rs = dateFormat.replace('H', obj.H).replace('i', obj.i).replace('s', obj.s);
-  return rs;
+  	// 3.解析
+  	var rs = dateFormat.replace('H', obj.H).replace('i', obj.i).replace('s', obj.s);
+  	return rs;
 }
 
 function remind(a){
 	a = a == undefined ? 1 : a;
 	$.post("/task/list", "table=tasks&result=2,4,6,8&limit=10&p=" + a, function(g) {
-		// console.log(g);
-		var e = "";
+		var e = '';
 		var f = false;
 		var task_count = 0;
 		for(var d = 0; d < g.data.length; d++) {
-			if(g.data[d].status != '1'){
-				task_count++;
-				e += '<tr>\
-						<td><input type="checkbox"></td>\
-						<td>\
-							<div class="titlename c3">\
-								<span>'+g.data[d].name+'</span>\
-								<span class="rs-status">【'+lan.bt.task_the+'】<span>\
-								<span class="rs-time">耗时['+ getSFM(g.data[d].end - g.data[d].start) +']</span>\
-							</div>\
-						</td>\
-						<td class="text-right c3">'+g.data[d].addtime+'</td>\
-					</tr>';
-			} else{
-				e += '<tr>\
-						<td><input type="checkbox"></td>\
-						<td>\
-							<div class="titlename c3">'+g.data[d].name+'</span>\
-								<span class="rs-status">【'+lan.bt.task_ok+'】<span>\
-								<span class="rs-time">安装等待中...</span>\
-							</div>\
-						</td>\
-						<td class="text-right c3">'+g.data[d].addtime+'</td>\
-					</tr>';
+			var status = g.data[d].status;
+			var status_text = '已经完成';
+			var cos_text = '';
+			if (status == '1'){
+				status_text = '完成';
+				cos_text = '耗时['+getSFM(g.data[d].end - g.data[d].start)+']'
+			} else if (status == '0'){
+				status_text = '正在处理';
+				cos_text = '等待中..';
+			} else if (status == '-1'){
+				status_text = '安装中';
+				cos_text = '..';
 			}
+
+			e += '<tr>\
+				<td><input type="checkbox"></td>\
+				<td>\
+					<div class="titlename c3">'+g.data[d].name+'</span>\
+						<span class="rs-status">【'+status_text+'】<span>\
+						<span class="rs-time">'+cos_text+'</span>\
+					</div>\
+				</td>\
+				<td class="text-right c3">'+g.data[d].addtime+'</td>\
+			</tr>';
 		}
 		var con = '<div class="divtable"><table class="table table-hover">\
 					<thead>\
@@ -1412,15 +1411,16 @@ function remind(a){
 						</tr>\
 					</thead>\
 					<tbody id="remind">'+e+'</tbody>\
-					</table></div>\
-					<div class="mtb15" style="height:32px">\
-						<div class="pull-left buttongroup" style="display:none;">\
-							<button class="btn btn-default btn-sm mr5 rs-del" disabled="disabled">'+lan.public.del+'</button>\
-							<button class="btn btn-default btn-sm mr5 rs-read" disabled="disabled">'+lan.bt.task_tip_read+'</button>\
-							<button class="btn btn-default btn-sm">'+lan.bt.task_tip_all+'</button>\
-						</div>\
-						<div id="taskPage" class="page"></div>\
-					</div>';
+					</table>\
+				</div>\
+				<div class="mtb15" style="height:32px">\
+					<div class="pull-left buttongroup" style="display:none;">\
+						<button class="btn btn-default btn-sm mr5 rs-del" disabled="disabled">'+lan.public.del+'</button>\
+						<button class="btn btn-default btn-sm mr5 rs-read" disabled="disabled">'+lan.bt.task_tip_read+'</button>\
+						<button class="btn btn-default btn-sm">'+lan.bt.task_tip_all+'</button>\
+					</div>\
+					<div id="taskPage" class="page"></div>\
+				</div>';
 		
 		$(".task_count").text(task_count);
 		$(".msg_count").text(g.count);
@@ -1429,9 +1429,9 @@ function remind(a){
 
 		$("#Rs-checkAll").click(function(){
 			if($(this).prop("checked")){
-				$("#remind").find("input").prop("checked",true)
+				$("#remind").find("input").prop("checked",true);
 			} else {
-				$("#remind").find("input").prop("checked",false)
+				$("#remind").find("input").prop("checked",false);
 			}
 		});
 	},'json');
