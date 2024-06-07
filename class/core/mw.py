@@ -204,6 +204,9 @@ def isAppleSystem():
         return True
     return False
 
+def isDocker():
+    return os.path.exists('/.dockerenv')
+
 
 def isDebugMode():
     if isAppleSystem():
