@@ -30,6 +30,8 @@ if [ ! -z "$cn" ];then
 fi
 ntpdate $NTPHOST | logger -t NTP
 
+apt install -y net-tools
+
 SSH_PORT=`netstat -ntpl|grep sshd|grep -v grep | sed -n "1,1p" | awk '{print $4}' | awk -F : '{print $2}'`
 if [ "$SSH_PORT" == "" ];then
 	SSH_PORT_LINE=`cat /etc/ssh/sshd_config | grep "Port \d*" | tail -1`
@@ -158,7 +160,6 @@ fi
 apt install -y build-essential
 apt install -y devscripts
 
-apt install -y net-tools
 apt install -y autoconf
 apt install -y gcc
 apt install -y patchelf
