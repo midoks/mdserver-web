@@ -199,6 +199,7 @@ def getFileSuffix(file):
     return ext
 
 
+
 def isAppleSystem():
     if getOs() == 'darwin':
         return True
@@ -206,6 +207,18 @@ def isAppleSystem():
 
 def isDocker():
     return os.path.exists('/.dockerenv')
+
+
+def isSupportSystemctl():
+    if isAppleSystem():
+        return False
+    if isDocker():
+        return False
+
+    current_os = getOs()
+    if current_os.startswith("freebsd"):
+        return False
+    return True
 
 
 def isDebugMode():

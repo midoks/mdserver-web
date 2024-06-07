@@ -589,23 +589,22 @@ def myOp(version, method):
         isInited = initMysqlData()
         if not isInited:
 
-            if current_os.startswith("freebsd"):
+            if not mw.isSupportSystemctl():
                 mw.execShell('service ' + getPluginName() + ' start')
             else:
                 mw.execShell('systemctl start mysql')
 
             initMysqlPwd()
 
-            if current_os.startswith("freebsd"):
+            if not mw.isSupportSystemctl():
                 mw.execShell('service ' + getPluginName() + ' stop')
             else:
                 mw.execShell('systemctl stop mysql')
 
-        if current_os.startswith("freebsd"):
-            data = mw.execShell('service ' + getPluginName() + ' ' + method)
-            return 'ok'
-
-        mw.execShell('systemctl ' + method + ' mysql')
+        if not mw.isSupportSystemctl():
+            mw.execShell('service ' + getPluginName() + ' ' + method)
+        else:
+            mw.execShell('systemctl ' + method + ' mysql')
         return 'ok'
     except Exception as e:
         return str(e)
@@ -627,7 +626,7 @@ def my8cmd(version, method):
 
         if not isInited:
 
-            if mw.isAppleSystem():
+            if not mw.isSupportSystemctl():
                 cmd_init_start = init_file + ' start'
                 subprocess.Popen(cmd_init_start, stdout=subprocess.PIPE, shell=True,
                                  bufsize=4096, stderr=subprocess.PIPE)
@@ -643,7 +642,7 @@ def my8cmd(version, method):
                     break
                 time.sleep(1)
 
-            if mw.isAppleSystem():
+            if not mw.isSupportSystemctl():
                 cmd_init_stop = init_file + ' stop'
                 subprocess.Popen(cmd_init_stop, stdout=subprocess.PIPE, shell=True,
                                  bufsize=4096, stderr=subprocess.PIPE)
@@ -651,7 +650,7 @@ def my8cmd(version, method):
             else:
                 mw.execShell('systemctl stop mysql')
 
-        if mw.isAppleSystem():
+        if not mw.isSupportSystemctl():
             sub = subprocess.Popen(cmd, stdout=subprocess.PIPE, shell=True,
                                    bufsize=4096, stderr=subprocess.PIPE)
             sub.wait(5)
