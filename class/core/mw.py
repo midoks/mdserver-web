@@ -1305,7 +1305,10 @@ def getClientIp():
 def checkDomainPanel():
     tmp = getHost()
     domain = readFile('data/bind_domain.pl')
-    port = readFile('data/port.pl').strip()
+
+    port = 7200
+    if os.path.exists('data/port.pl'):
+        port = readFile('data/port.pl').strip()
 
     scheme = 'http'
 
