@@ -21,7 +21,7 @@ apt install -y expect
 apt install -y pv
 apt install -y bc
 apt install -y cron
-
+apt install -y net-tools
 
 apt install -y locate
 locale-gen en_US.UTF-8
@@ -80,7 +80,6 @@ if [ ! -f /usr/sbin/ufw ];then
 fi
 
 apt install -y devscripts
-apt install -y net-tools
 apt install -y python3-dev
 apt install -y autoconf
 apt install -y gcc
