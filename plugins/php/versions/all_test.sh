@@ -8,7 +8,7 @@ ROOT_DIR=$(cd "$(dirname "$0")"; pwd)
 # cd /www/server/mdserver-web/scripts/quick && bash debug.sh
 # cd /www/server/mdserver-web/plugins/php/versions && /bin/bash all_test.sh
 
-# cd /www/server/mdserver-web/plugins/php && bash install.sh install 55
+# cd /www/server/mdserver-web/plugins/php && bash install.sh install 82
 # cd /www/server/mdserver-web/plugins/php/versions/common && bash gd.sh install 73
 # cd /www/server/mdserver-web/plugins/php/versions/common && bash swoole.sh install 54
 
@@ -28,7 +28,7 @@ ROOT_DIR=$(cd "$(dirname "$0")"; pwd)
 # echo "php${PHP_VER} -- end"
 
 
-PHP_VER_LIST=(53 54 55 56 70 71 72 73 74 80 81 82)
+PHP_VER_LIST=(53 54 55 56 70 71 72 73 74 80 81 82 83)
 # PHP_VER_LIST=(81)
 for PHP_VER in ${PHP_VER_LIST[@]}; do
 	echo "php${PHP_VER} -- start"
