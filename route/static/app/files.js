@@ -366,7 +366,7 @@ function makeFilePage(showRow, page = ''){
 	
 	//分页
 	$("#filePage").html(page);
-	$("#filePage div").append("<span class='Pcount-item'>每页<select style='margin-left: 3px;margin-right: 3px;border:#ddd 1px solid' class='showRow'>"+rowOption+"</select>条</span>");
+	$("#filePage div").append("<span class='Pcount-item'>每页<select name='file_page' style='margin-left: 3px;margin-right: 3px;border:#ddd 1px solid;' class='showRow'>"+rowOption+"</select>条</span>");
 	$("#filePage .Pcount").css("left","16px"); 
 }
 

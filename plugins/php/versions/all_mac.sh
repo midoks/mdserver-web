@@ -30,7 +30,7 @@ ROOT_DIR=$(cd "$(dirname "$0")"; pwd)
 # echo "php${PHP_VER} -- end"
 
 
-PHP_VER_LIST=(54 55 56 70 71 72 73 74 80 81 82)
+PHP_VER_LIST=(54 55 56 70 71 72 73 74 80 81 82 83)
 # PHP_VER_LIST=(81)
 for PHP_VER in ${PHP_VER_LIST[@]}; do
 	echo "php${PHP_VER} -- start"

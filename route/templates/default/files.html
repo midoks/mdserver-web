@@ -16,11 +16,11 @@
                         <div class="pull-left mlr15" style="line-height:26px"><span id='dir_info'></span></div>
                         <div class="search pull-right" style="position: absolute; top: 6px; right: 5px;">
                             <form target="hid">
-                                <input type="text" id="search_file" class="ser-text pull-left" placeholder="搜索文件/目录" />
+                                <input type="text" id="search_file" class="ser-text pull-left" placeholder="搜索文件/目录" autocomplete="false" />
                                 <button type="button" class="ser-sub pull-left" onclick='searchFile(1)'></button>
                                 <div class="file_search" draggable="false">
+                                    <label for="search_file">包含子目录</label>
                                     <div id="search_all" class="file_search_checked"></div>
-                                    <label for="search_all">包含子目录</label>
                                 </div>
                             </form>
                             <iframe name='hid' id="hid" style="display:none"></iframe>
