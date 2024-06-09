@@ -9,6 +9,7 @@
 	"versions":["5.7","8.0","8.2","8.3"],
 	"shell":"install.sh",
 	"install_pre_inspection":true,
+	"uninstall_pre_inspection":true,
 	"checks":"server/mysql-apt",
 	"path":"server/mysql-apt",
 	"author":"mysql",
