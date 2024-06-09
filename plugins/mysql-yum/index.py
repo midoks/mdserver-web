@@ -3361,7 +3361,7 @@ def uninstallPreInspection(version):
 if __name__ == "__main__":
     func = sys.argv[1]
 
-    version = "5.6"
+    version = '5.6'
     version_pl = getServerDir() + "/version.pl"
     if os.path.exists(version_pl):
         version = mw.readFile(version_pl).strip()
