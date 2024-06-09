@@ -5,13 +5,7 @@ export LANG=en_US.UTF-8
 
 sed -i 's#SELINUX=enforcing#SELINUX=disabled#g' /etc/selinux/config
 
-VERSION_ID=`grep -o -i 'release *[[:digit:]]\+\.*' /etc/redhat-release | grep -o '[[:digit:]]\+' `
 
-if [ $VERSION_ID == '7' ]; then
-    yum install -y curl-devel libmcrypt libmcrypt-devel python3-devel
-elif [ $VERSION_ID == '8' ]; then
-    dnf install -y curl-devel libmcrypt libmcrypt-devel python36-devel
-fi
 
 cd /www/server/mdserver-web/scripts && bash lib.sh
 chmod 755 /www/server/mdserver-web/data

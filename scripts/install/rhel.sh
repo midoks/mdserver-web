@@ -13,6 +13,13 @@ setenforce 0
 sed -i 's#SELINUX=enforcing#SELINUX=disabled#g' /etc/selinux/config
 
 VERSION_ID=`grep -o -i 'release *[[:digit:]]\+\.*' /etc/redhat-release | grep -o '[[:digit:]]\+' `
+
+if [ $VERSION_ID == '7' ]; then
+    yum install -y curl-devel libmcrypt libmcrypt-devel python3-devel
+elif [ $VERSION_ID == '8' ]; then
+    dnf install -y curl-devel libmcrypt libmcrypt-devel python36-devel
+fi
+
 isStream=$(grep -o -i 'stream' /etc/redhat-release)
 
 cn=$(curl -fsSL -m 10 http://ipinfo.io/json | grep "\"country\": \"CN\"")
