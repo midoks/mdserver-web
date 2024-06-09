@@ -942,9 +942,14 @@ def importDbExternalProgressBar():
     pwd = pSqliteDb('config').where('id=?', (1,)).getField('mysql_root')
     sock = getSocketFile()
 
+    option = ''
+    mode = recognizeDbMode()
+    if mode == 'gtid':
+        option = ' --set-gtid-purged=off '
+
     my_cnf = getConf()
     mysql_cmd = getServerDir() + '/bin/usr/bin/mysql --defaults-file=' + my_cnf + \
-        ' -uroot -p"' + pwd + '" -f ' + name
+        ' -uroot -p"' + pwd + '" -f ' + name + option
     mysql_cmd_progress_bar = "pv -t -p " + import_sql + '|'+ mysql_cmd
     print(mysql_cmd_progress_bar)
     rdata = os.system(mysql_cmd_progress_bar)
