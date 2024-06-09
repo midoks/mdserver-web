@@ -3536,7 +3536,6 @@ def doFullSyncUser(version=''):
     # r = db.query(cmd)
     # print(r)
 
-    mdb8 = ['8.0','8.1','8.2','8.3','8.4']
     if mw.inArray(mdb8,version):
         db.query("start slave user='{}' password='{}';".format(user, apass))
     else:
