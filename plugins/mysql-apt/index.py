@@ -2708,7 +2708,7 @@ def syncDatabaseRepairLog(version=''):
     sync_args_sign = args['sign']
     op = args['op']
     tmp_log = syncDatabaseRepairTempFile()
-    cmd = 'cd '+mw.getServerDir()+'/mdserver-web && source bin/activate && python3 plugins/mysql/index.py sync_database_repair  {"db":"'+sync_args_db+'","sign":"'+sync_args_sign+'"}'
+    cmd = 'cd '+mw.getServerDir()+'/mdserver-web && source bin/activate && python3 plugins/mysql-apt/index.py sync_database_repair  {"db":"'+sync_args_db+'","sign":"'+sync_args_sign+'"}'
     # print(cmd)
 
     if op == 'get':
@@ -3032,7 +3032,7 @@ def doFullSyncUser(version=''):
     is_exist_pv = False
     if os.path.exists(which_pv[0]):
         is_exist_pv = True
-        
+
     args = getArgs()
     data = checkArgs(args, ['db', 'sign'])
     if not data[0]:
