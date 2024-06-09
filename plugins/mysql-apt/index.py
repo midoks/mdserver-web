@@ -1247,7 +1247,7 @@ def addDb():
     reg = "^[\w-]+$"
     if not re.match(reg, args['name']):
         return mw.returnJson(False, '数据库名称不能带有特殊符号!')
-    checks = ['root', 'mysql', 'test', 'sys', 'panel_logs']
+    checks = ['root', 'mysql', 'test', 'sys', 'performance_schema','information_schema']
     if dbuser in checks or len(dbuser) < 1:
         return mw.returnJson(False, '数据库用户名不合法!')
     if dbname in checks or len(dbname) < 1:
