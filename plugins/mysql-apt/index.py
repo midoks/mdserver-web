@@ -98,6 +98,12 @@ def getDbPort():
     tmp = re.search(rep, content)
     return tmp.groups()[0].strip()
 
+def getDbServerId():
+    file = getConf()
+    content = mw.readFile(file)
+    rep = 'server-id\s*=\s*(.*)'
+    tmp = re.search(rep, content)
+    return tmp.groups()[0].strip()
 
 def getSocketFile():
     file = getConf()
