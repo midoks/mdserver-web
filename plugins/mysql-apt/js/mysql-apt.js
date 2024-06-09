@@ -1825,7 +1825,7 @@ function getMasterRepSlaveList(){
         try {
             rdata = $.parseJSON(data.data);
         } catch(e){
-            console.log(e);
+            // console.log(e);
         }
         var list = '';
         // console.log(rdata['data']);
