@@ -2079,7 +2079,7 @@ def getMasterRepSlaveUserCmd(version):
     sid = getDbServerId()
     channel_name = ""
     if sid != '':
-        channel_name = " for channel 'r{}';".format(sid)
+        channel_name = " for channel 'r{}'".format(sid)
 
     mdb8 = ['8.0','8.1','8.2','8.3','8.4']
     sql = ''
