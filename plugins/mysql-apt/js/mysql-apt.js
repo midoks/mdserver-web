@@ -56,8 +56,9 @@ function myAsyncPost(method,args){
     }
 
     var loadT = layer.msg('正在获取...', { icon: 16, time: 0, shade: 0.3 });
-    return syncPost('/plugins/run', {name:'mysql-apt', func:method, args:_args}); 
+    return syncPost('/plugins/run', {name:'mysql', func:method, args:_args}); 
 }
+
 
 function myPostCallbak(method, version, args,callback){
     var loadT = layer.msg('正在获取...', { icon: 16, time: 0, shade: 0.3 });
@@ -65,7 +66,7 @@ function myPostCallbak(method, version, args,callback){
     var req_data = {};
     req_data['name'] = 'mysql';
     req_data['func'] = method;
-    req_data['script']='index_mysql_apt';
+    req_data['script']='index_mysql';
     args['version'] = version;
 
  
@@ -93,7 +94,7 @@ function myPostCallbakN(method, version, args,callback){
     var req_data = {};
     req_data['name'] = 'mysql';
     req_data['func'] = method;
-    req_data['script']='index_mysql_apt';
+    req_data['script']='index_mysql';
     args['version'] = version;
 
  
@@ -160,7 +161,7 @@ function runInfo(){
                         <tr><th>活动/峰值连接数</th><td>' + rdata.Threads_running + '/' + rdata.Max_used_connections + '</td><td colspan="2">若值过大,增加max_connections</td></tr>\
                         <tr><th>线程缓存命中率</th><td>' + ((1 - rdata.Threads_created / rdata.Connections) * 100).toFixed(2) + '%</td><td colspan="2">若过低,增加thread_cache_size</td></tr>\
                         <tr><th>索引命中率</th><td>' + ((1 - rdata.Key_reads / rdata.Key_read_requests) * 100).toFixed(2) + '%</td><td colspan="2">若过低,增加key_buffer_size</td></tr>\
-                        <tr><th>Innodb索引命中率</th><td>' + ((1 - rdata.Innodb_buffer_pool_reads / rdata.Innodb_buffer_pool_read_requests) * 100).toFixed(2) + '%</td><td colspan="2">若过低,增加innodb_buffer_pool_size</td></tr>\
+                        <tr><th>Innodb索引命中率</th><td>' + (rdata.Innodb_buffer_pool_read_requests / (rdata.Innodb_buffer_pool_read_requests+rdata.Innodb_buffer_pool_reads)).toFixed(2) + '%</td><td colspan="2">若过低,增加innodb_buffer_pool_size</td></tr>\
                         <tr><th>查询缓存命中率</th><td>' + cache_size + '</td><td colspan="2">' + lan.soft.mysql_status_ps5 + '</td></tr>\
                         <tr><th>创建临时表到磁盘</th><td>' + ((rdata.Created_tmp_disk_tables / rdata.Created_tmp_tables) * 100).toFixed(2) + '%</td><td colspan="2">若过大,尝试增加tmp_table_size</td></tr>\
                         <tr><th>已打开的表</th><td>' + rdata.Open_tables + '</td><td colspan="2">若过大,增加table_cache_size</td></tr>\
@@ -199,7 +200,7 @@ function myPort(){
     myPost('my_port','',function(data){
         var con = '<div class="line ">\
             <div class="info-r  ml0">\
-            <input name="port" class="bt-input-text mr5 port" type="text" style="width:100px" value="'+data.data+'">\
+            <input name="port" class="bt-input-text mr5 port" type="number" style="width:100px" value="'+data.data+'">\
             <button id="btn_change_port" name="btn_change_port" class="btn btn-success btn-sm mr5 ml5 btn_change_port">修改</button>\
             </div></div>';
         $(".soft-man-con").html(con);
@@ -293,7 +294,7 @@ function myPerfOpt() {
 }
 
 function reBootMySqld(){
-    pluginOpService('mysql-apt','restart','');
+    pluginOpService('mysql','restart','');
 }
 
 
@@ -700,7 +701,7 @@ function setDbPass(id, username, password){
                         <span title='随机密码' class='glyphicon glyphicon-repeat cursor' onclick='repeatPwd(16)'></span></div>\
                     </div>\
                     <input type='hidden' name='id' value='"+id+"'>\
-                  </form>",
+                </form>",
         yes:function(index){
             // var data = $("#mod_pwd").serialize();
             var data = {};
@@ -794,7 +795,7 @@ function addDatabase(type){
 
 function delDb(id, name){
     safeMessage('删除['+name+']','您真的要删除['+name+']吗？',function(){
-        var data='id='+id+'&name='+name
+        var data='id='+id+'&name='+name;
         myPost('del_db', data, function(data){
             var rdata = $.parseJSON(data.data);
             showMsg(rdata.msg,function(){
@@ -869,7 +870,7 @@ function openPhpmyadmin(name,username,password){
             return;
         }
 
-        if (rdata.data['cfg']['choose'] != 'mysql-apt'){
+        if (rdata.data['cfg']['choose'] != 'mysql'){
             layer.msg('当前为['+rdata.data['cfg']['choose'] + ']模式,若要使用请修改phpMyAdmin访问切换.',{icon:2,shade: [0.3, '#000']});
             return;
         }
@@ -928,10 +929,60 @@ function importBackup(file,name){
     });
 }
 
+function importBackupProgress(file,name){
+    myPost('import_db_backup_progress',{file:file,name:name}, function(data){
+        var rdata = $.parseJSON(data.data);
+        layer.open({
+            title: "手动导入命令CMD【显示进度】",
+            area: ['600px', '180px'],
+            type:1,
+            closeBtn: 1,
+            shadeClose: false,
+            btn:["复制","取消"],
+            content: '<div class="pd15">\
+                        <div class="divtable">\
+                            <pre class="layui-code">'+rdata.data+'</pre>\
+                        </div>\
+                    </div>',
+            success:function(){
+                copyText(rdata.data);
+            },
+            yes:function(){
+                copyText(rdata.data);
+            }
+        });
+    });
+}
+
 
 function importDbExternal(file,name){
     myPost('import_db_external',{file:file,name:name}, function(data){
         layer.msg('执行成功!');
+    });
+}
+
+function importDbExternalProgress(file,name){
+    myPost('import_db_external_progress',{file:file,name:name}, function(data){
+        var rdata = $.parseJSON(data.data);
+        layer.open({
+            title: "手动导入命令CMD【显示进度】",
+            area: ['600px', '180px'],
+            type:1,
+            closeBtn: 1,
+            shadeClose: false,
+            btn:["复制","取消"],
+            content: '<div class="pd15">\
+                        <div class="divtable">\
+                            <pre class="layui-code">'+rdata.data+'</pre>\
+                        </div>\
+                    </div>',
+            success:function(){
+                copyText(rdata.data);
+            },
+            yes:function(){
+                copyText(rdata.data);
+            }
+        });
     });
 }
 
@@ -990,6 +1041,7 @@ function setLocalImport(db_name){
                         <td><span> ' + file_list[i]['time'] + '</span></td>\
                         <td style="text-align: right;">\
                             <a class="btlink" onclick="importDbExternal(\'' + file_list[i]['name'] + '\',\'' +db_name+ '\')">导入</a> | \
+                            <a class="btlink" onclick="importDbExternalProgress(\'' + file_list[i]['name'] + '\',\'' +db_name+ '\')">导入进度</a> | \
                             <a class="btlink del" index="'+i+'">删除</a>\
                         </td>\
                     </tr>';
@@ -1013,7 +1065,7 @@ function setLocalImport(db_name){
     var layerIndex = layer.open({
         type: 1,
         title: "从文件导入数据",
-        area: ['600px', '380px'],
+        area: ['700px', '380px'],
         closeBtn: 1,
         shadeClose: false,
         content: '<div class="pd15">\
@@ -1059,7 +1111,7 @@ function setBackup(db_name){
     var layerIndex = layer.open({
         type: 1,
         title: "数据库备份详情",
-        area: ['600px', '280px'],
+        area: ['700px', '280px'],
         closeBtn: 1,
         shadeClose: false,
         content: '<div class="pd15">\
@@ -1113,6 +1165,7 @@ function setBackupReq(db_name, obj){
                     <td><span> ' + rdata.data[i]['time'] + '</span></td>\
                     <td style="text-align: right;">\
                         <a class="btlink" onclick="importBackup(\'' + rdata.data[i]['name'] + '\',\'' +db_name+ '\')">导入</a> | \
+                        <a class="btlink" onclick="importBackupProgress(\'' + rdata.data[i]['name'] + '\',\'' +db_name+ '\')">导入进度</a> | \
                         <a class="btlink" onclick="downloadBackup(\'' + rdata.data[i]['file'] + '\')">下载</a> | \
                         <a class="btlink" onclick="delBackup(\'' + rdata.data[i]['name'] + '\',\'' +db_name+ '\')">删除</a>\
                     </td>\
@@ -1229,6 +1282,7 @@ function dbList(page, search){
         readerTableChecked();
     });
 }
+
 
 function myBinRollingLogs(_name, func, _args, line){
 
@@ -1803,6 +1857,7 @@ function setDbMasterAccess(username){
     });
 }
 
+
 function resetMaster(){
     myPost('reset_master', '', function(data){
         var rdata = $.parseJSON(data.data);
@@ -1825,7 +1880,7 @@ function getMasterRepSlaveList(){
         try {
             rdata = $.parseJSON(data.data);
         } catch(e){
-            // console.log(e);
+            console.log(e);
         }
         var list = '';
         // console.log(rdata['data']);
@@ -2571,7 +2626,7 @@ function masterOrSlaveConf(version=''){
             for(i in rdata.data){
 
                 var v = rdata.data[i];
-                if ('Channel_Name' in v){
+                if ('Channel_Name' in v && v['Channel_Name'] !=''){
                     isHasSign = true;
                 }
 
@@ -2657,6 +2712,7 @@ function masterOrSlaveConf(version=''){
                     <td>状态</td>\
                     <td>"+(info['Slave_SQL_Running_State'] == '' ? '无':info['Slave_SQL_Running_State']) +"</td>\
                 </tr>";
+
 
                 var btn_list = ['复制错误',"取消"];
                 if (info['Last_IO_Error'].search(/1236/i)>0){
@@ -2790,7 +2846,7 @@ function masterOrSlaveConf(version=''){
                 <p class="conf_p">\
                     <span class="f14 c6 mr20">Master[主]配置</span><span class="f14 c6 mr20"></span>\
                     <button class="btn '+(!rdata.status ? 'btn-danger' : 'btn-success')+' btn-xs btn-master">'+(!rdata.status ? '未开启' : '已开启') +'</button>\
-                    <button class="btn btn-success btn-xs" onclick="resetMaster()" >重置</button>\
+                    <button class="btn btn-success btn-xs" onclick="resetMaster()">重置</button>\
                 </p>\
                 <hr/>\
                 <!-- master list -->\
@@ -2858,7 +2914,7 @@ function masterOrSlaveConf(version=''){
                         return false;
                     },
                     change:function(index,mode,reload){
-                        // console.log(index,mode,reload);
+                        console.log(index,mode,reload);
                         myPost('set_dbrun_mode',{'mode':mode,'reload':reload},function(data){
                             layer.close(index);
                             var rdata = $.parseJSON(data.data);
