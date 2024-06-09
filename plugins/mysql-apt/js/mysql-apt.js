@@ -2752,7 +2752,7 @@ function masterOrSlaveConf(version=''){
                         return false;
                     },
                     change:function(index,mode,reload){
-                        console.log(index,mode,reload);
+                        // console.log(index,mode,reload);
                         myPost('set_dbrun_mode',{'mode':mode,'reload':reload},function(data){
                             layer.close(index);
                             var rdata = $.parseJSON(data.data);

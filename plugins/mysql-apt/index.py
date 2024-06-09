@@ -2013,7 +2013,8 @@ def addMasterRepSlaveUser(version=''):
     if psdb.where("username=?", (username)).count() > 0:
         return mw.returnJson(False, '用户已存在!')
 
-    if version == "8.0":
+    mdb8 = ['8.0','8.1','8.2','8.3','8.4']
+    if mw.inArray(mdb8,version):
         sql = "CREATE USER '" + username + \
             "'  IDENTIFIED WITH mysql_native_password BY '" + password + "';"
         pdb.execute(sql)
@@ -2031,13 +2032,12 @@ def addMasterRepSlaveUser(version=''):
         if isError != None:
             return isError
 
-    sql_select = "grant select,lock tables,PROCESS on *.* to " + username + "@'%';"
+    sql_select = "grant select,reload,REPLICATION CLIENT,PROCESS on *.* to " + username + "@'%';"
     pdb.execute(sql_select)
     pdb.execute('FLUSH PRIVILEGES;')
 
     addTime = time.strftime('%Y-%m-%d %X', time.localtime())
-    psdb.add('username,password,accept,ps,addtime',
-             (username, password, '%', '', addTime))
+    psdb.add('username,password,accept,ps,addtime',(username, password, '%', '', addTime))
     return mw.returnJson(True, '添加成功!')
 
 
@@ -2076,29 +2076,31 @@ def getMasterRepSlaveUserCmd(version):
     if sid != '':
         channel_name = " for channel 'r{}';".format(sid)
 
-    if mode == "gtid":
-        sql = "CHANGE MASTER TO MASTER_HOST='" + ip + "', MASTER_PORT=" + port + ", MASTER_USER='" + \
-            clist[0]['username'] + "', MASTER_PASSWORD='" + \
-            clist[0]['password'] + "', MASTER_AUTO_POSITION=1" + channel_name
-        if version == '8.0':
-            sql = "CHANGE REPLICATION SOURCE TO SOURCE_HOST='" + ip + "', SOURCE_PORT=" + port + ", SOURCE_USER='" + \
-                clist[0]['username']  + "', SOURCE_PASSWORD='" + \
-                clist[0]['password'] + \
-                "', MASTER_AUTO_POSITION=1" + channel_name
-    else:
-        sql = "CHANGE MASTER TO MASTER_HOST='" + ip + "', MASTER_PORT=" + port + ", MASTER_USER='" + \
-            clist[0]['username']  + "', MASTER_PASSWORD='" + \
-            clist[0]['password'] + \
-            "', MASTER_LOG_FILE='" + mstatus[0]["File"] + \
-            "',MASTER_LOG_POS=" + str(mstatus[0]["Position"]) + channel_name
+    mdb8 = ['8.0','8.1','8.2','8.3','8.4']
+    sql = ''
+    if not mw.inArray(mdb8,version):
+        base_sql = "CHANGE MASTER TO MASTER_HOST='" + ip + "', MASTER_PORT=" + port + ", MASTER_USER='" + \
+                clist[0]['username'] + "', MASTER_PASSWORD='" + \
+                clist[0]['password'] + "'"
 
-        if version == "8.0":
-            sql = "CHANGE REPLICATION SOURCE TO SOURCE_HOST='" + ip + "', SOURCE_PORT=" + port + ", SOURCE_USER='" + \
+        sql += base_sql;
+        sql += "<br/><hr/>";
+        # sql += base_sql + ", MASTER_AUTO_POSITION=1" + channel_name
+        sql += base_sql + channel_name
+        sql += "<br/><hr/>";
+
+        sql += base_sql + "', MASTER_LOG_FILE='" + mstatus[0]["File"] + "',MASTER_LOG_POS=" + str(mstatus[0]["Position"]) + channel_name
+    else:
+        base_sql = "CHANGE REPLICATION SOURCE TO SOURCE_HOST='" + ip + "', SOURCE_PORT=" + port + ", SOURCE_USER='" + \
                 clist[0]['username']  + "', SOURCE_PASSWORD='" + \
-                clist[0]['password'] + \
-                "', SOURCE_LOG_FILE='" + mstatus[0]["File"] + \
-                "',SOURCE_LOG_POS=" + \
-                str(mstatus[0]["Position"]) + channel_name
+                clist[0]['password']+"'"
+        sql += base_sql;
+        sql += "<br/><hr/>";
+        # sql += base_sql + ", MASTER_AUTO_POSITION=1" + channel_name
+        sql += base_sql + channel_name
+        sql += "<br/><hr/>";
+        sql += base_sql + "', SOURCE_LOG_FILE='" + mstatus[0]["File"] + "',SOURCE_LOG_POS=" + str(mstatus[0]["Position"]) + channel_name
+
 
     data = {}
     data['cmd'] = sql

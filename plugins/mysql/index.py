@@ -2313,7 +2313,7 @@ def addMasterRepSlaveUser(version=''):
     reg = "^[\w-]+$"
     if not re.match(reg, username):
         return mw.returnJson(False, '用户名不能带有特殊符号!')
-    checks = ['root', 'mysql', 'test', 'sys', 'panel_logs']
+    checks = ['root', 'mysql', 'test', 'sys', ]
     if username in checks or len(username) < 1:
         return mw.returnJson(False, '用户名不合法!')
     if password in checks or len(password) < 1:
@@ -2330,7 +2330,8 @@ def addMasterRepSlaveUser(version=''):
     if psdb.where("username=?", (username)).count() > 0:
         return mw.returnJson(False, '用户已存在!')
 
-    if version == "8.0":
+    mdb8 = ['8.0','8.1','8.2','8.3','8.4']
+    if mw.inArray(mdb8,version):
         sql = "CREATE USER '" + username + \
             "'  IDENTIFIED WITH "+auth_policy+" BY '" + password + "';"
         pdb.execute(sql)
@@ -2339,7 +2340,6 @@ def addMasterRepSlaveUser(version=''):
         isError = isSqlError(result)
         if isError != None:
             return isError
-
     else:
         sql = "grant replication SLAVE ON *.* TO  '" + username + \
             "'@'%' identified by '" + password + "';"
