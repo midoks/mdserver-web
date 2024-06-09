@@ -55,8 +55,7 @@ class backupTools:
         if not os.path.exists(filename):
             log = "网站[" + name + "]备份失败!"
             print("★[" + endDate + "] " + log)
-            print(
-                "----------------------------------------------------------------------------")
+            print("----------------------------------------------------------------------------")
             return
 
         outTime = time.time() - startTime
@@ -259,7 +258,7 @@ class backupTools:
             for backup in backups:
                 abspath_bk = backup_path + "/" + backup
                 mw.execShell("rm -f " + abspath_bk)
-                mw.echoInfo("|---已清理过期备份文件：" + abspath_bk)
+                mw.echoInfo("已清理过期备份文件：" + abspath_bk)
                 num -= 1
                 if num < 1:
                     break
