@@ -2003,7 +2003,7 @@ def addMasterRepSlaveUser(version=''):
     reg = "^[\w-]+$"
     if not re.match(reg, username):
         return mw.returnJson(False, '用户名不能带有特殊符号!')
-    checks = ['root', 'mysql', 'test', 'sys', 'panel_logs']
+    checks = ['root', 'mysql', 'test', 'sys', 'performance_schema','information_schema']
     if username in checks or len(username) < 1:
         return mw.returnJson(False, '用户名不合法!')
     if password in checks or len(password) < 1:
