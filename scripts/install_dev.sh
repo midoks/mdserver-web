@@ -32,27 +32,27 @@ elif grep -Eqi "EulerOS" /etc/*-release || grep -Eqi "openEuler" /etc/*-release;
 	yum install -y wget curl zip unzip tar crontabs
 elif grep -Eqi "CentOS" /etc/issue || grep -Eqi "CentOS" /etc/*-release; then
 	OSNAME='rhel'
-	yum install -y wget zip unzip
+	yum install -y wget zip unzip tar
 elif grep -Eqi "Fedora" /etc/issue || grep -Eqi "Fedora" /etc/*-release; then
 	OSNAME='rhel'
-	yum install -y wget zip unzip
+	yum install -y wget zip unzip tar
 elif grep -Eqi "Rocky" /etc/issue || grep -Eqi "Rocky" /etc/*-release; then
 	OSNAME='rhel'
 	yum install -y wget zip unzip
 elif grep -Eqi "AlmaLinux" /etc/issue || grep -Eqi "AlmaLinux" /etc/*-release; then
 	OSNAME='rhel'
-	yum install -y wget zip unzip
+	yum install -y wget zip unzip tar 
 elif grep -Eqi "Amazon Linux" /etc/issue || grep -Eqi "Amazon Linux" /etc/*-release; then
 	OSNAME='amazon'
-	yum install -y wget zip unzip
+	yum install -y wget zip unzip tar
 elif grep -Eqi "Debian" /etc/issue || grep -Eqi "Debian" /etc/*-release; then
 	OSNAME='debian'
 	apt update -y
 	apt install -y devscripts
-	apt install -y wget zip unzip
+	apt install -y wget zip unzip tar
 elif grep -Eqi "Ubuntu" /etc/issue || grep -Eqi "Ubuntu" /etc/*-release; then
 	OSNAME='ubuntu'
-	apt install -y wget zip unzip
+	apt install -y wget zip unzip tar
 else
 	OSNAME='unknow'
 fi
