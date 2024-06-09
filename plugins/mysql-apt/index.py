@@ -1984,9 +1984,8 @@ def addMasterRepSlaveUser(version=''):
     if not data[0]:
         return data[1]
 
-    if not 'address' in args:
-        address = ''
-    else:
+    address = ''
+    if 'address' in args:
         address = args['address'].strip()
 
     username = args['username'].strip()
@@ -2978,9 +2977,6 @@ if __name__ == "__main__":
     version_pl = getServerDir() + "/version.pl"
     if os.path.exists(version_pl):
         version = mw.readFile(version_pl).strip()
-
-    if (len(sys.argv) > 2):
-        version = sys.argv[2]
 
     if func == 'status':
         print(status(version))
