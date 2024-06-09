@@ -202,6 +202,7 @@ def backupAllFunc(stype):
         backups = sql.table('backup').where(
             'type=? and pid=?', ('1', pid)).field('id,filename').select()
     if stype == 'path':
+        backup_dir = mw.getBackupDir()
         backup_path = backup_dir + '/path'
         _name = 'path_{}'.format(os.path.basename(name))
         backups = findPathName(backup_path, _name)
