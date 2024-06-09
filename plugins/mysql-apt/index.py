@@ -3028,6 +3028,11 @@ def doFullSyncUserImportContentForChannel(file, channel_name):
     return True
 
 def doFullSyncUser(version=''):
+    which_pv = mw.execShell('which pv')
+    is_exist_pv = False
+    if os.path.exists(which_pv[0]):
+        is_exist_pv = True
+        
     args = getArgs()
     data = checkArgs(args, ['db', 'sign'])
     if not data[0]:
