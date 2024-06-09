@@ -173,7 +173,16 @@ def deleteFile():
         return mw.returnJson(True, "删除成功")
     return mw.returnJson(False, "删除失败")
 
-
+def findPathName(path, filename):
+    f = os.scandir(path)
+    l = []
+    for ff in f:
+        t = {}
+        if ff.name.find(filename) > -1:
+            t['filename'] = path + '/' + ff.name
+            l.append(t)
+    return l
+    
 def backupAllFunc(stype):
     os.chdir(mw.getRunDir())
 
