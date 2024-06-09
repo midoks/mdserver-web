@@ -25,8 +25,10 @@ if [ ${_os} == "Darwin" ]; then
 elif grep -Eq "openSUSE" /etc/*-release; then
 	OSNAME='opensuse'
 	zypper refresh
+	zypper install -y  wget curl zip unzip unrar rar
 elif grep -Eq "FreeBSD" /etc/*-release; then
 	OSNAME='freebsd'
+	pkg install -y wget curl zip unzip unrar rar
 elif grep -Eqi "EulerOS" /etc/*-release || grep -Eqi "openEuler" /etc/*-release; then
 	OSNAME='euler'
 	yum install -y wget curl zip unzip tar crontabs
