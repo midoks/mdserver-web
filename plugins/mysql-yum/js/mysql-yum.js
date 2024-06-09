@@ -56,16 +56,16 @@ function myAsyncPost(method,args){
     }
 
     var loadT = layer.msg('正在获取...', { icon: 16, time: 0, shade: 0.3 });
-    return syncPost('/plugins/run', {name:'mysql-yum', func:method, args:_args}); 
+    return syncPost('/plugins/run', {name:'mysql-apt', func:method, args:_args}); 
 }
 
 function myPostCallbak(method, version, args,callback){
     var loadT = layer.msg('正在获取...', { icon: 16, time: 0, shade: 0.3 });
 
     var req_data = {};
-    req_data['name'] = 'mysql-yum';
+    req_data['name'] = 'mysql';
     req_data['func'] = method;
-    req_data['script']='index_mysql_yum';
+    req_data['script']='index_mysql_apt';
     args['version'] = version;
 
  
@@ -91,9 +91,9 @@ function myPostCallbak(method, version, args,callback){
 function myPostCallbakN(method, version, args,callback){
 
     var req_data = {};
-    req_data['name'] = 'mysql-yum';
+    req_data['name'] = 'mysql';
     req_data['func'] = method;
-    req_data['script']='index_mysql_yum';
+    req_data['script']='index_mysql_apt';
     args['version'] = version;
 
  
@@ -114,7 +114,6 @@ function myPostCallbakN(method, version, args,callback){
         }
     },'json'); 
 }
-
 
 function vaildPhpmyadmin(url,username,password){
     // console.log("Authorization: Basic " + btoa(username + ":" + password));
@@ -294,7 +293,7 @@ function myPerfOpt() {
 }
 
 function reBootMySqld(){
-    pluginOpService('mysql-yum','restart','');
+    pluginOpService('mysql-apt','restart','');
 }
 
 
@@ -870,8 +869,8 @@ function openPhpmyadmin(name,username,password){
             return;
         }
 
-        if (rdata.data['cfg']['choose'] != 'mysql-yum'){
-            layer.msg('当前为['+rdata.choose+']模式,若要使用请修改phpMyAdmin访问切换.',{icon:2,shade: [0.3, '#000']});
+        if (rdata.data['cfg']['choose'] != 'mysql-apt'){
+            layer.msg('当前为['+rdata.data['cfg']['choose'] + ']模式,若要使用请修改phpMyAdmin访问切换.',{icon:2,shade: [0.3, '#000']});
             return;
         }
         var home_page = rdata.data['home_page'];
@@ -1709,16 +1708,10 @@ function getMasterRepSlaveUserCmd(username, db=''){
             area: '500px',
             content:"<form class='bt-form pd20 pb70' id='add_master'>\
             <div class='line'>"+cmd+"</div>\
-            <div class='bt-form-submit-btn'>\
-                <button type='button' class='btn btn-success btn-sm btn-title class-copy-cmd'>复制</button>\
+            <div class='bt-form-submit-btn' style='text-align:center;'>\
+                <button type='button' class='btn btn-success btn-sm btn-title'>选择其中一个复制</button>\
             </div>\
           </form>",
-        });
-
-       
-        copyPass(cmd);
-        $('.class-copy-cmd').click(function(){
-            copyPass(cmd);
         });
     });
 }
@@ -1832,7 +1825,7 @@ function getMasterRepSlaveList(){
         try {
             rdata = $.parseJSON(data.data);
         } catch(e){
-            console.log(e);
+            // console.log(e);
         }
         var list = '';
         // console.log(rdata['data']);
@@ -1931,6 +1924,7 @@ function getFullSyncStatus(db){
                     </div>\
                     <div class='table_toolbar' style='left:0px;'>\
                         <span data-status='init' class='sync btn btn-default btn-sm' id='begin_full_sync'>开始</span>\
+                        <span data-status='init' class='btn btn-default btn-sm' id='full_sync_cmd'>手动命令</span>\
                     </div>\
                 </div>",
             cancel: function(){ 
@@ -1949,9 +1943,35 @@ function getFullSyncStatus(db){
                             fullSync(db,sign,0);
                         }, 1000);
                         $(this).data('status','starting');
+                        $('#begin_full_sync').text("同步中");
                     } else {
                         layer.msg("正在同步中..",{icon:0});
                     }
+                });
+
+                $('#full_sync_cmd').click(function(){
+                    myPostN('full_sync_cmd', {'db':db,'sign':''}, function(rdata){
+                        var rdata = $.parseJSON(rdata.data);
+                        layer.open({
+                        title: "手动执行命令CMD",
+                            area: ['600px', '180px'],
+                            type:1,
+                            closeBtn: 1,
+                            shadeClose: false,
+                            btn:["复制","取消"],
+                            content: '<div class="pd15">\
+                                        <div class="divtable">\
+                                            <pre class="layui-code">'+rdata.data+'</pre>\
+                                        </div>\
+                                    </div>',
+                            success:function(){
+                                copyText(rdata.data);
+                            },
+                            yes:function(){
+                                copyText(rdata.data);
+                            }
+                        });
+                    });
                 });
             }
         });
@@ -1968,10 +1988,89 @@ function getFullSyncStatus(db){
             if (rdata['code']==6 ||rdata['code']<0){
                 layer.msg(rdata['msg']);
                 clearInterval(timeId);
+                $('#begin_full_sync').text("同步结束,再次同步?");
                 $("#begin_full_sync").attr('data-status','init');
             }
         });
     }
+}
+
+function dataSyncVerify(db){
+    var reqTimer = null;
+
+    function requestLogs(layerIndex){
+        myPostN('sync_database_repair_log', {db:db, sign:'',op:'get'}, function(rdata){
+            var rdata = $.parseJSON(rdata.data);
+
+            if(!rdata.status) {
+                layer.close(layerIndex);
+                layer.msg(rdata.msg,{icon:2, time:2000});
+                clearInterval(reqTimer);
+                return;
+            };
+
+            if (rdata.msg == ''){
+                rdata.msg = '暂无数据!';
+            }
+
+            $("#data_verify_log").html(rdata.msg);
+            //滚动到最低
+            var ob = document.getElementById('data_verify_log');
+            ob.scrollTop = ob.scrollHeight; 
+        });
+    }
+
+    layer.open({
+        type: 1,
+        title: '同步数据库['+db+']数据校验',
+        area: '500px',
+        btn:[ "开始","取消","手动"],
+        content:"<div class='bt-form'>\
+                "+'<pre id="data_verify_log" style="overflow: auto; border: 0px none; line-height:23px;padding: 5px; margin: 0px; white-space: pre-wrap; height: 395px; background-color: rgb(51,51,51);color:#f1f1f1;border-radius:0px;font-family:"></pre>'+"\
+            </div>",
+        cancel: function(){
+            if (reqTimer){
+                clearInterval(reqTimer);
+            }
+        },
+        yes:function(index,layer_index){
+            myPostN('sync_database_repair_log', {db:db, sign:'',op:'do'}, function(data){});
+            layer.msg("执行成功");
+
+            requestLogs(layer_index);
+            reqTimer = setInterval(function(){
+                requestLogs(layer_index);
+            },3000);
+        },
+        success:function(){
+        },
+        btn3: function(){
+            myPostN('sync_database_repair_log', {db:db, sign:'',op:'cmd'}, function(rdata){
+                var rdata = $.parseJSON(rdata.data);
+                layer.open({
+                title: "手动执行命令CMD",
+                    area: ['600px', '180px'],
+                    type:1,
+                    closeBtn: 1,
+                    shadeClose: false,
+                    btn:["复制","取消"],
+                    content: '<div class="pd15">\
+                                <div class="divtable">\
+                                    <pre class="layui-code">'+rdata.data+'</pre>\
+                                </div>\
+                            </div>',
+                    success:function(){
+                        copyText(rdata.data);
+                    },
+                    yes:function(){
+                        copyText(rdata.data);
+                    }
+                });
+            });
+            return false;
+        }
+
+    });
 }
 
 function addSlaveSSH(ip=''){
@@ -2129,7 +2228,7 @@ function addSlaveSyncUser(ip=''){
 
         var index = layer.open({
             type: 1,
-            area: ['500px','470px'],
+            area: ['500px','510px'],
             title: '同步账户',
             closeBtn: 1,
             shift: 5,
@@ -2141,6 +2240,15 @@ function addSlaveSyncUser(ip=''){
                 <div class='line'><span class='tname'>同步账户</span><div class='info-r'><input name='user' class='bt-input-text mr5' type='text' style='width:330px;' value='"+user+"'></div></div>\
                 <div class='line'><span class='tname'>同步密码</span><div class='info-r'><input name='pass' class='bt-input-text mr5' type='text' style='width:330px;' value='"+pass+"'></div></div>\
                 <div class='line'>\
+                    <span class='tname'>同步模式</span>\
+                    <div class='info-r'>\
+                        <select class='bt-input-text mr5' name='mode'>\
+                            <option value='0' "+( mode == '0' ? 'selected="selected"' : '')+">经典</option>\
+                            <option value='1' "+( mode == '1' ? 'selected="selected"' : '')+">GTID</option>\
+                        </select>\
+                    </div>\
+                </div>\
+                <div class='line'>\
                 <span class='tname'>CMD[必须填写]</span>\
                 <div class='info-r'><textarea class='bt-input-text mr5' row='20' cols='30' name='cmd' style='width:330px;height:150px;'></textarea></div>\
                 </div>\
@@ -2150,6 +2258,7 @@ function addSlaveSyncUser(ip=''){
                 $('textarea[name="cmd"]').html(cmd);
                 $('textarea[name="cmd"]').change(function(){
                     var val = $(this).val();
+                    val = val.replace(';','');
                     var a = {};
                     if (val.toLowerCase().indexOf('for')>0){
                         cmd_tmp = val.split('for');
@@ -2176,11 +2285,6 @@ function addSlaveSyncUser(ip=''){
                     $('input[name="port"]').val(a['MASTER_PORT']);
                     $('input[name="user"]').val(a['MASTER_USER']);
                     $('input[name="pass"]').val(a['MASTER_PASSWORD']);
-
-                    console.log(a['MASTER_AUTO_POSITION'],typeof(a['MASTER_AUTO_POSITION']));
-                    if (typeof(a['MASTER_AUTO_POSITION']) != 'undefined' ){
-                        $('input[name="mode"]').val('1');
-                    }
                 });
             },
             yes:function(index){
@@ -2189,7 +2293,7 @@ function addSlaveSyncUser(ip=''){
                 var user = $('input[name="user"]').val();
                 var pass = $('input[name="pass"]').val();
                 var cmd = $('textarea[name="cmd"]').val();
-                var mode = $('input[name="mode"]').val();
+                var mode = $('select[name="mode"]').val();
 
                 var data = {ip:ip,port:port,cmd:cmd,user:user,pass:pass,mode:mode};
                 myPost('add_slave_sync_user', data, function(ret_data){
@@ -2637,7 +2741,8 @@ function masterOrSlaveConf(version=''){
                 list += '<td>' + rdata.data[i]['name'] +'</td>';
                 list += '<td style="text-align:right">' + 
                     '<a href="javascript:;" class="btlink" onclick="setDbSlave(\''+rdata.data[i]['name']+'\')"  title="加入|退出">'+(rdata.data[i]['slave']?'退出':'加入')+'</a> | ' +
-                    '<a href="javascript:;" class="btlink" onclick="getFullSyncStatus(\''+rdata.data[i]['name']+'\')" title="同步">同步</a>' +
+                    '<a href="javascript:;" class="btlink" onclick="getFullSyncStatus(\''+rdata.data[i]['name']+'\')" title="同步">同步</a> | ' +
+                    '<a href="javascript:;" class="btlink" onclick="dataSyncVerify(\''+rdata.data[i]['name']+'\')" title="数据校验">数据校验</a>' +
                 '</td>';
                 list += '</tr>';
             }
@@ -2753,7 +2858,7 @@ function masterOrSlaveConf(version=''){
                         return false;
                     },
                     change:function(index,mode,reload){
-                        console.log(index,mode,reload);
+                        // console.log(index,mode,reload);
                         myPost('set_dbrun_mode',{'mode':mode,'reload':reload},function(data){
                             layer.close(index);
                             var rdata = $.parseJSON(data.data);
