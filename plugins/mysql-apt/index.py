@@ -2966,6 +2966,18 @@ def writeDbSyncStatus(data):
     path = asyncTmpfile()
     mw.writeFile(path, json.dumps(data))
 
+def fullSyncCmd():
+    time_all_s = time.time()
+    args = getArgs()
+    data = checkArgs(args, ['db', 'sign'])
+    if not data[0]:
+        return data[1]
+
+    db = args['db']
+    sign = args['sign']
+
+    cmd = 'cd '+mw.getServerDir()+'/mdserver-web && source bin/activate && python3 plugins/mysql-apt/index.py do_full_sync  {"db":"'+db+'","sign":"'+sign+'"}'
+    return mw.returnJson(True,'ok',cmd)
 
 def doFullSync(version=''):
     mode_file = getSyncModeFile()
@@ -3529,6 +3541,8 @@ if __name__ == "__main__":
         print(fullSync(version))
     elif func == 'do_full_sync':
         print(doFullSync(version))
+    elif func == 'full_sync_cmd':
+        print(fullSyncCmd())
     elif func == 'dump_mysql_data':
         print(dumpMysqlData(version))
     elif func == 'sync_database_repair':
