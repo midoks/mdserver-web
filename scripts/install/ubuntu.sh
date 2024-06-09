@@ -22,6 +22,8 @@ apt install -y pv
 apt install -y bc
 apt install -y cron
 apt install -y net-tools
+apt install -y libncurses5
+apt install -y libncurses5-dev
 
 apt install -y locate
 locale-gen en_US.UTF-8
@@ -114,7 +116,7 @@ apt install -y libjpeg-dev libpng-dev
 apt install -y libfreetype6
 apt install -y libjpeg62-turbo-dev
 apt install -y libfreetype6-dev
-apt install -y libevent-dev libncurses5-dev libldap2-dev
+apt install -y libevent-dev libldap2-dev
 
 apt install -y libzip-dev
 apt install -y libicu-dev
