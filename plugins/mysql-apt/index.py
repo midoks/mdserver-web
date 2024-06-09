@@ -885,7 +885,7 @@ def importDbExternalProgress():
     name = args['name']
 
     cmd = 'cd '+mw.getServerDir()+'/mdserver-web && source bin/activate && '
-    cmd += 'python3 '+mw.getServerDir()+'/mdserver-web/plugins/mysql/index.py import_db_external_progress_bar  {"file":"'+file+'","name":"'+name+'"}'
+    cmd += 'python3 '+mw.getServerDir()+'/mdserver-web/plugins/mysql-apt/index.py import_db_external_progress_bar  {"file":"'+file+'","name":"'+name+'"}'
     return mw.returnJson(True, 'ok',cmd)
 
 def importDbExternalProgressBar():
@@ -943,13 +943,13 @@ def importDbExternalProgressBar():
     sock = getSocketFile()
 
     my_cnf = getConf()
-    mysql_cmd = getServerDir() + '/bin/mysql --defaults-file=' + my_cnf + \
+    mysql_cmd = getServerDir() + '/bin/usr/bin/mysql --defaults-file=' + my_cnf + \
         ' -uroot -p"' + pwd + '" -f ' + name
     mysql_cmd_progress_bar = "pv -t -p " + import_sql + '|'+ mysql_cmd
     print(mysql_cmd_progress_bar)
     rdata = os.system(mysql_cmd_progress_bar)
     return ""
-    
+
 def importDbBackup():
     args = getArgs()
     data = checkArgs(args, ['file', 'name'])
