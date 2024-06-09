@@ -2953,7 +2953,6 @@ def writeDbSyncStatus(data):
     return True
 
 def fullSyncCmd():
-    time_all_s = time.time()
     args = getArgs()
     data = checkArgs(args, ['db', 'sign'])
     if not data[0]:
@@ -3021,6 +3020,7 @@ def doFullSyncUser(version=''):
     if os.path.exists(which_pv[0]):
         is_exist_pv = True
 
+    time_all_s = time.time()
     args = getArgs()
     data = checkArgs(args, ['db', 'sign'])
     if not data[0]:
