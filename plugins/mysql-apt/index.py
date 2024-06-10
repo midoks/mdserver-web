@@ -3496,7 +3496,7 @@ def installPreInspection(version):
 
 def uninstallPreInspection(version):
 
-    data_dir = getServerDir()+'/data/mysql'
+    data_dir = getDataDir()
     if os.path.exists(data_dir):
         stop(version)
         
