@@ -14,13 +14,6 @@ sed -i 's#SELINUX=enforcing#SELINUX=disabled#g' /etc/selinux/config
 
 VERSION_ID=`grep -o -i 'release *[[:digit:]]\+\.*' /etc/redhat-release | grep -o '[[:digit:]]\+' `
 
-if [ $VERSION_ID == '7' ]; then
-    yum install -y curl-devel libmcrypt libmcrypt-devel python3-devel
-    yum install -y libncurses*
-else
-    dnf install -y curl-devel libmcrypt libmcrypt-devel python36-devel
-    dnf install -y libncurses*
-fi
 
 isStream=$(grep -o -i 'stream' /etc/redhat-release)
 
@@ -33,11 +26,13 @@ if [ ! -z "$stream" ];then
     dnf upgrade -y libmodulemd
 fi
 
-
 PKGMGR='yum'
 if [ $VERSION_ID -ge 8 ];then
     PKGMGR='dnf'
 fi
+
+$PKGMGR install -y curl-devel libmcrypt libmcrypt-devel python3-devel
+$PKGMGR install -y libncurses*
 
 echo "install remi source"
 if [ "$VERSION_ID" == "9" ];then
