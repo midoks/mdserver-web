@@ -507,11 +507,12 @@ def initMysql8Pwd():
 def my8cmd(version, method):
     initDreplace(version)
     # mysql 8.0  and 5.7
+    mdb8 = getMdb8Ver()
     try:
         isInited = True
         if version == '5.7':
             isInited = initMysql57Data()
-        elif mw.inArray(['8.0','8.1','8.2','8.3','8.4'], version):
+        elif mw.inArray(mdb8, version):
             isInited = initMysql8Data()
 
         if not isInited:
