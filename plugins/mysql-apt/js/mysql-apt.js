@@ -66,7 +66,7 @@ function myPostCallbak(method, version, args,callback){
     var req_data = {};
     req_data['name'] = 'mysql';
     req_data['func'] = method;
-    req_data['script']='index_mysql';
+    req_data['script']='index_mysql_apt';
     args['version'] = version;
 
  
@@ -94,7 +94,7 @@ function myPostCallbakN(method, version, args,callback){
     var req_data = {};
     req_data['name'] = 'mysql';
     req_data['func'] = method;
-    req_data['script']='index_mysql';
+    req_data['script']='index_mysql_apt';
     args['version'] = version;
 
  
