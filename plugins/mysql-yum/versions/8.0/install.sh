@@ -92,8 +92,8 @@ Install_mysql()
 
 	mkdir -p $serverPath/mysql-yum
 
-	mkdir -p /var/lib/mysql
-	chown mysql -R /var/lib/mysql
+	mkdir -p /var/run/mysqld
+	chown mysql -R /var/run/mysqld
 
 	isYum=`which yum`
 	if [ "$isYum" != "" ];then
