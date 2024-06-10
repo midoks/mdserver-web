@@ -2196,6 +2196,11 @@ def setDbSlave(version):
 
 def getMasterStatus(version=''):
 
+    query_status_cmd = 'show slave status'
+    mdb8 = ['8.0','8.1','8.2','8.3','8.4']
+    if mw.inArray(mdb8, version):
+        query_status_cmd = 'show replica status'
+
     try:
         if status(version) == 'stop':
             return mw.returnJson(False, 'MySQL未启动,或正在启动中...!', [])
@@ -2214,7 +2219,7 @@ def getMasterStatus(version=''):
         data['slave_status'] = False
 
         db = pMysqlDb()
-        dlist = db.query('show slave status')
+        dlist = db.query(query_status_cmd)
 
         for v in dlist:
             if v["Slave_IO_Running"] == 'Yes' or v["Slave_SQL_Running"] == 'Yes':
