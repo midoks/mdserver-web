@@ -425,10 +425,7 @@ def initMysql8Data():
             datadir + ' --initialize-insecure --lower-case-table-names=1'
         data = mw.execShell(cmd)
         # print(data)
-        if data[1] != '':
-            print(data[1])
-            exit(-1)
-
+        
         if not mw.isAppleSystem():
             mw.execShell('chown -R mysql:mysql ' + datadir)
             mw.execShell('chmod -R 755 ' + datadir)
