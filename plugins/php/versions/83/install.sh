@@ -15,7 +15,7 @@ function version_le() { test "$(echo "$@" | tr " " "\n" | sort -V | head -n 1)" 
 function version_lt() { test "$(echo "$@" | tr " " "\n" | sort -rV | head -n 1)" != "$1"; }
 function version_ge() { test "$(echo "$@" | tr " " "\n" | sort -rV | head -n 1)" == "$1"; }
 
-version=8.3.6
+version=8.3.8
 PHP_VER=83
 Install_php()
 {
@@ -56,7 +56,7 @@ if [ ! -d $sourcePath/php/php${PHP_VER} ];then
 	fi
 
 	#检测文件是否损坏.
-	md5_file_ok=53c8386b2123af97626d3438b3e4058e0c5914cb74b048a6676c57ac647f5eae
+	md5_file_ok=aea358b56186f943c2bbd350c9005b9359133d47e954cfc561385319ae5bb8d7
 	if [ -f $sourcePath/php/php-${version}.tar.xz ];then
 		md5_file=`sha256sum $sourcePath/php/php-${version}.tar.xz  | awk '{print $1}'`
 		if [ "${md5_file}" != "${md5_file_ok}" ]; then
