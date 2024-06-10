@@ -501,7 +501,7 @@ def my8cmd(version, method):
         isInited = True
         if version == '5.7':
             isInited = initMysql57Data()
-        elif mw.inArray(['8.0','8.1','8.2','8.3'], version):
+        elif mw.inArray(['8.0','8.1','8.2','8.3','8.4'], version):
             isInited = initMysql8Data()
 
         if not isInited:
