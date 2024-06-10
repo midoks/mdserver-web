@@ -16,6 +16,7 @@ VERSION_ID=`grep -o -i 'release *[[:digit:]]\+\.*' /etc/redhat-release | grep -o
 
 if [ $VERSION_ID == '7' ]; then
     yum install -y curl-devel libmcrypt libmcrypt-devel python3-devel
+    yum install -y libncurses*
 elif [ $VERSION_ID == '8' ]; then
     dnf install -y curl-devel libmcrypt libmcrypt-devel python36-devel
 fi
