@@ -112,11 +112,6 @@ def getSocketFile():
     tmp = re.search(rep, content)
 
     socket = tmp.groups()[0].strip()
-
-    _socket = socket+'.sock'
-    if os.path.exists(_socket):
-        return _socket
-
     return socket
 
 

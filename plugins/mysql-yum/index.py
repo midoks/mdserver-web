@@ -125,7 +125,12 @@ def getSocketFile():
     content = mw.readFile(file)
     rep = 'socket\s*=\s*(.*)'
     tmp = re.search(rep, content)
-    return tmp.groups()[0].strip()
+    socket = tmp.groups()[0].strip()
+
+    _socket = socket+'.sock'
+    if os.path.exists(_socket):
+        return _socket
+    return socket
 
 
 def getErrorLogsFile():
@@ -149,8 +154,7 @@ def contentReplace(content):
     service_path = mw.getServerDir()
     content = content.replace('{$ROOT_PATH}', mw.getRootDir())
     content = content.replace('{$SERVER_PATH}', service_path)
-    content = content.replace('{$SERVER_APP_PATH}',
-                              service_path + '/' + getPluginName())
+    content = content.replace('{$SERVER_APP_PATH}',service_path + '/' + getPluginName())
 
     server_id = int(time.time())
     content = content.replace('{$SERVER_ID}', str(server_id))
