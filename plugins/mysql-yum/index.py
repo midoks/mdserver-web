@@ -3424,7 +3424,10 @@ def installPreInspection(version):
 
 
 def uninstallPreInspection(version):
-    stop(version)
+    try:
+        stop(version)
+    except Exception as e:
+        pass
     if mw.isDebugMode():
         return 'ok'
 
