@@ -48,7 +48,11 @@ YUM_INSTALL()
 #######
 mkdir -p $myDir
 
-wget  --no-check-certificate -O $myDir/mysql-${SUFFIX_NAME}.rpm-bundle.tar https://cdn.mysql.com/archives/mysql-8.4/mysql-${SUFFIX_NAME}.rpm-bundle.tar
+# https://dev.mysql.com/get/Downloads/MySQL-8.4/mysql-${SUFFIX_NAME}.rpm-bundle.tar
+
+# https://cdn.mysql.com/archives/mysql-8.4/mysql-${SUFFIX_NAME}.rpm-bundle.tar
+
+wget --no-check-certificate -O $myDir/mysql-${SUFFIX_NAME}.rpm-bundle.tar https://dev.mysql.com/get/Downloads/MySQL-8.4/mysql-${SUFFIX_NAME}.rpm-bundle.tar
 cd ${myDir} && tar vxf mysql-${SUFFIX_NAME}.rpm-bundle.tar
 
 mkdir -p ${serverPath}/mysql-yum/bin && cd ${serverPath}/mysql-yum/bin
