@@ -39,7 +39,7 @@ elif [ "$OSNAME" == "suse" ]; then
 	OS_SIGN=1.sl${VERSION_ID}
 fi
 
-MYSQL_VER=8.0.30
+MYSQL_VER=8.3.0
 SUFFIX_NAME=${MYSQL_VER}-${OS_SIGN}.${ARCH}
 
 YUM_INSTALL()

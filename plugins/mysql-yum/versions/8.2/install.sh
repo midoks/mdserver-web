@@ -39,7 +39,7 @@ elif [ "$OSNAME" == "suse" ]; then
 	OS_SIGN=1.sl${VERSION_ID}
 fi
 
-MYSQL_VER=8.0.30
+MYSQL_VER=8.2.0
 SUFFIX_NAME=${MYSQL_VER}-${OS_SIGN}.${ARCH}
 
 YUM_INSTALL()
@@ -99,7 +99,7 @@ Install_mysql()
 
 	rm -rf $myDir	
 	
-	echo '8.0' > $serverPath/mysql-yum/version.pl
+	echo '8.2' > $serverPath/mysql-yum/version.pl
 	echo '安装完成'
 }
 
