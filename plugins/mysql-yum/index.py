@@ -2481,7 +2481,6 @@ def getSlaveList(version=''):
     if status(version) == 'stop':
         return mw.returnJson(False, 'MySQL未启动', [])
 
-
     query_status_cmd = 'show slave status'
     mdb8 = ['8.0','8.1','8.2','8.3','8.4']
     if mw.inArray(mdb8, version):
