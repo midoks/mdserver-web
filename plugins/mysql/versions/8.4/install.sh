@@ -57,6 +57,8 @@ VERSION_ID=`cat /etc/*-release | grep VERSION_ID | awk -F = '{print $2}' | awk -
 
 
 VERSION=8.4.0
+# https://dev.mysql.com/get/Downloads/MySQL-8.4/mysql-${VERSION}.tar.gz
+# https://cdn.mysql.com//Downloads/MySQL-8.4/mysql-boost-${VERSION}.tar.gz
 Install_mysql()
 {
 	mkdir -p ${mysqlDir}
@@ -108,7 +110,7 @@ Install_mysql()
 	fi
 
 	if [ ! -f ${mysqlDir}/mysql-boost-${VERSION}.tar.gz ];then
-         wget --no-check-certificate -O ${mysqlDir}/mysql-boost-${VERSION}.tar.gz --tries=3 https://cdn.mysql.com//Downloads/MySQL-8.4/mysql-boost-${VERSION}.tar.gz
+         wget --no-check-certificate -O ${mysqlDir}/mysql-boost-${VERSION}.tar.gz --tries=3 https://dev.mysql.com/get/Downloads/MySQL-8.4/mysql-${VERSION}.tar.gz
 	fi
 
 	#检测文件是否损坏.
@@ -120,7 +122,7 @@ Install_mysql()
 		else
 			# 重新下载
 			rm -rf ${mysqlDir}/mysql-${VERSION}
-			wget --no-check-certificate -O ${mysqlDir}/mysql-boost-${VERSION}.tar.gz --tries=3 https://dev.mysql.com/get/Downloads/MySQL-8.4/mysql-boost-${VERSION}.tar.gz
+			wget --no-check-certificate -O ${mysqlDir}/mysql-boost-${VERSION}.tar.gz --tries=3 https://dev.mysql.com/get/Downloads/MySQL-8.4/mysql-${VERSION}.tar.gz
 		fi
 	fi
 
