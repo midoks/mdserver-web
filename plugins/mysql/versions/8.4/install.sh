@@ -109,25 +109,25 @@ Install_mysql()
 		INSTALL_CMD=cmake3
 	fi
 
-	if [ ! -f ${mysqlDir}/mysql-boost-${VERSION}.tar.gz ];then
-         wget --no-check-certificate -O ${mysqlDir}/mysql-boost-${VERSION}.tar.gz --tries=3 https://dev.mysql.com/get/Downloads/MySQL-8.4/mysql-${VERSION}.tar.gz
+	if [ ! -f ${mysqlDir}/mysql-${VERSION}.tar.gz ];then
+         wget --no-check-certificate -O ${mysqlDir}/mysql-${VERSION}.tar.gz --tries=3 https://dev.mysql.com/get/Downloads/MySQL-8.4/mysql-${VERSION}.tar.gz
 	fi
 
 	#检测文件是否损坏.
 	md5_mysql_ok=8c2399782217f5391322751c66ea261b
-	if [ -f ${mysqlDir}/mysql-boost-${VERSION}.tar.gz ];then
-		md5_mysql=`md5sum ${mysqlDir}/mysql-boost-${VERSION}.tar.gz  | awk '{print $1}'`
+	if [ -f ${mysqlDir}/mysql-${VERSION}.tar.gz ];then
+		md5_mysql=`md5sum ${mysqlDir}/mysql-${VERSION}.tar.gz  | awk '{print $1}'`
 		if [ "${md5_mysql_ok}" == "${md5_mysql}" ]; then
 			echo "mysql8.3 file  check ok"
 		else
 			# 重新下载
 			rm -rf ${mysqlDir}/mysql-${VERSION}
-			wget --no-check-certificate -O ${mysqlDir}/mysql-boost-${VERSION}.tar.gz --tries=3 https://dev.mysql.com/get/Downloads/MySQL-8.4/mysql-${VERSION}.tar.gz
+			wget --no-check-certificate -O ${mysqlDir}/mysql-${VERSION}.tar.gz --tries=3 https://dev.mysql.com/get/Downloads/MySQL-8.4/mysql-${VERSION}.tar.gz
 		fi
 	fi
 
 	if [ ! -d ${mysqlDir}/mysql-${VERSION} ];then
-		 cd ${mysqlDir} && tar -zxvf  ${mysqlDir}/mysql-boost-${VERSION}.tar.gz
+		 cd ${mysqlDir} && tar -zxvf  ${mysqlDir}/mysql-${VERSION}.tar.gz
 	fi
 
 	OPTIONS=''
