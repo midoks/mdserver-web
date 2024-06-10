@@ -99,7 +99,7 @@ Install_mysql()
 
 	rm -rf $myDir	
 	
-	echo '8.0' > $serverPath/mysql-yum/version.pl
+	echo '8.3' > $serverPath/mysql-yum/version.pl
 	echo '安装完成'
 }
 
