@@ -429,6 +429,9 @@ def getShowLogFile():
     return tmp.groups()[0].strip()
 
 
+def getMdb8Ver():
+    return ['8.0','8.1','8.2','8.3','8.4']
+
 def pGetDbUser():
     if mw.isAppleSystem():
         user = mw.execShell(
@@ -614,14 +617,11 @@ def my8cmd(version, method):
     # mysql 8.0  and 5.7
     init_file = initDreplace(version)
     cmd = init_file + ' ' + method
+    mdb8 = getMdb8Ver()
     try:
         if version == '5.7':
             isInited = initMysql57Data()
-        elif version == '8.0':
-            isInited = initMysql8Data()
-        elif version == '8.2':
-            isInited = initMysql8Data()
-        elif version == '8.3':
+        elif mw.inArray(mdb8, version):
             isInited = initMysql8Data()
 
         if not isInited:
@@ -1571,7 +1571,7 @@ def addDb():
     reg = "^[\w-]+$"
     if not re.match(reg, args['name']):
         return mw.returnJson(False, '数据库名称不能带有特殊符号!')
-    checks = ['root', 'mysql', 'test', 'sys', 'panel_logs']
+    checks = ['root', 'mysql', 'test', 'sys', 'performance_schema','information_schema']
     if dbuser in checks or len(dbuser) < 1:
         return mw.returnJson(False, '数据库用户名不合法!')
     if dbname in checks or len(dbname) < 1:
@@ -2200,6 +2200,11 @@ def setDbSlave(version):
 
 def getMasterStatus(version=''):
 
+    query_status_cmd = 'show slave status'
+    mdb8 = getMdb8Ver()
+    if mw.inArray(mdb8, version):
+        query_status_cmd = 'show replica status'
+
     try:
         if status(version) == 'stop':
             return mw.returnJson(False, 'MySQL未启动,或正在启动中...!', [])
@@ -2218,7 +2223,7 @@ def getMasterStatus(version=''):
         data['slave_status'] = False
 
         db = pMysqlDb()
-        dlist = db.query('show slave status')
+        dlist = db.query(query_status_cmd)
 
         for v in dlist:
             if v["Slave_IO_Running"] == 'Yes' or v["Slave_SQL_Running"] == 'Yes':
@@ -2226,7 +2231,7 @@ def getMasterStatus(version=''):
 
         return mw.returnJson(master_status, '设置成功', data)
     except Exception as e:
-        return mw.returnJson(False, "数据库密码错误,在管理列表-点击【修复】!", 'pwd')
+        return mw.returnJson(False, "数据库密码错误,在管理列表-点击【修复】,"+str(e), 'pwd')
 
 
 def setMasterStatus(version=''):
@@ -2313,7 +2318,7 @@ def addMasterRepSlaveUser(version=''):
     reg = "^[\w-]+$"
     if not re.match(reg, username):
         return mw.returnJson(False, '用户名不能带有特殊符号!')
-    checks = ['root', 'mysql', 'test', 'sys', 'panel_logs']
+    checks = ['root', 'mysql', 'test', 'sys', 'performance_schema','information_schema']
     if username in checks or len(username) < 1:
         return mw.returnJson(False, '用户名不合法!')
     if password in checks or len(password) < 1:
@@ -2330,7 +2335,8 @@ def addMasterRepSlaveUser(version=''):
     if psdb.where("username=?", (username)).count() > 0:
         return mw.returnJson(False, '用户已存在!')
 
-    if version == "8.0":
+    mdb8 = getMdb8Ver()
+    if mw.inArray(mdb8,version):
         sql = "CREATE USER '" + username + \
             "'  IDENTIFIED WITH "+auth_policy+" BY '" + password + "';"
         pdb.execute(sql)
@@ -2339,7 +2345,6 @@ def addMasterRepSlaveUser(version=''):
         isError = isSqlError(result)
         if isError != None:
             return isError
-
     else:
         sql = "grant replication SLAVE ON *.* TO  '" + username + \
             "'@'%' identified by '" + password + "';"
@@ -2393,7 +2398,7 @@ def getMasterRepSlaveUserCmd(version):
     if sid != '':
         channel_name = " for channel 'r{}'".format(sid)
 
-    mdb8 = ['8.0','8.1','8.2','8.3','8.4']
+    mdb8 = getMdb8Ver()
     sql = ''
     if not mw.inArray(mdb8,version):
         base_sql = "CHANGE MASTER TO MASTER_HOST='" + ip + "', MASTER_PORT=" + port + ", MASTER_USER='" + \
@@ -2688,11 +2693,17 @@ def updateSlaveSSH(version=''):
 
 
 def getSlaveList(version=''):
+
+    query_status_cmd = 'show slave status'
+    mdb8 = getMdb8Ver()
+    if mw.inArray(mdb8, version):
+        query_status_cmd = 'show replica status'
+
     if status(version) == 'stop':
         return mw.returnJson(False, 'MySQL未启动', [])
 
     db = pMysqlDb()
-    dlist = db.query('show slave status')
+    dlist = db.query(query_status_cmd)
 
     # print(dlist)
     data = {}
@@ -3446,7 +3457,7 @@ def doFullSyncUser(version=''):
     time.sleep(1)
     writeDbSyncStatus({'code': 1, 'msg': '正在停止从库...', 'progress': 15})
 
-    mdb8 = ['8.0','8.1','8.2','8.3','8.4']
+    mdb8 = getMdb8Ver()
     if mw.inArray(mdb8,version):
         db.query("stop slave user='{}' password='{}';".format(user, apass))
     else:
@@ -3536,7 +3547,6 @@ def doFullSyncUser(version=''):
     # r = db.query(cmd)
     # print(r)
 
-    mdb8 = ['8.0','8.1','8.2','8.3','8.4']
     if mw.inArray(mdb8,version):
         db.query("start slave user='{}' password='{}';".format(user, apass))
     else:
@@ -3681,7 +3691,7 @@ def doFullSyncSSH(version=''):
         writeDbSyncStatus({'code': 5, 'msg': '导入数据失败...', 'progress': 100})
         return 'fail'
     
-    mdb8 = ['8.0','8.1','8.2','8.3','8.4']
+    mdb8 = getMdb8Ver()
     if mw.inArray(mdb8,version):
         db.query("start slave user='{}' password='{}';".format(uinfo['username'], uinfo['password']))
     else:
@@ -3745,7 +3755,10 @@ def installPreInspection(version):
 
 
 def uninstallPreInspection(version):
-    stop(version)
+    data_dir = getDataDir()
+    if os.path.exists(data_dir):
+        stop(version)
+
     if mw.isDebugMode():
         return 'ok'
 

@@ -13,6 +13,8 @@ setenforce 0
 sed -i 's#SELINUX=enforcing#SELINUX=disabled#g' /etc/selinux/config
 
 VERSION_ID=`grep -o -i 'release *[[:digit:]]\+\.*' /etc/redhat-release | grep -o '[[:digit:]]\+' `
+
+
 isStream=$(grep -o -i 'stream' /etc/redhat-release)
 
 cn=$(curl -fsSL -m 10 http://ipinfo.io/json | grep "\"country\": \"CN\"")
@@ -24,11 +26,15 @@ if [ ! -z "$stream" ];then
     dnf upgrade -y libmodulemd
 fi
 
-
 PKGMGR='yum'
 if [ $VERSION_ID -ge 8 ];then
     PKGMGR='dnf'
 fi
+
+$PKGMGR install -y curl-devel libmcrypt libmcrypt-devel python3-devel
+$PKGMGR install -y net-tools
+
+$PKGMGR install -y libncurses*
 
 echo "install remi source"
 if [ "$VERSION_ID" == "9" ];then
@@ -47,6 +53,8 @@ fi
 if [ ! -d /root/.acme.sh ];then
     curl https://get.acme.sh | sh
 fi
+
+
 
 SSH_PORT=`netstat -ntpl|grep sshd|grep -v grep | sed -n "1,1p" | awk '{print $4}' | awk -F : '{print $2}'`
 if [ "$SSH_PORT" == "" ];then

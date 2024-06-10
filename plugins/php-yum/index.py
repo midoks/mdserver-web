@@ -489,8 +489,7 @@ def getFpmStatus(version):
 
     sock_file = getFpmAddress(version)
     try:
-        sock_data = mw.requestFcgiPHP(
-            sock_file, '/phpfpm_status_yum' + version + '?json')
+        sock_data = mw.requestFcgiPHP(sock_file, '/phpfpm_status_yum' + version + '?json')
 
         result = str(sock_data, encoding='utf-8')
         data = json.loads(result)

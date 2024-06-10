@@ -17,6 +17,7 @@ socket		= {$SERVER_APP_PATH}/mysql.sock
 datadir = {$SERVER_APP_PATH}/data
 log-error =  {$SERVER_APP_PATH}/data/error.log
 server-id	= {$SERVER_ID}
+sql-mode=NO_ENGINE_SUBSTITUTION,STRICT_TRANS_TABLES
 
 default_storage_engine = InnoDB
 
@@ -53,9 +54,9 @@ relay-log=mdserver
 relay-log-index=mdserver
 
 #master
+#binlog-do-db
 #sync_binlog=1
 
-#binlog-do-db
 binlog-ignore-db = test
 binlog-ignore-db = mysql
 binlog-ignore-db = information_schema
@@ -69,6 +70,7 @@ replicate-ignore-db = information_schema
 replicate-ignore-db = performance_schema
 replicate-ignore-db = mysql
 replicate-ignore-db = test
+
 
 default_storage_engine = InnoDB
 innodb_data_home_dir = {$SERVER_APP_PATH}/data

@@ -7,12 +7,12 @@ default-character-set = UTF8MB4
 
 [mysqld]
 !include {$SERVER_APP_PATH}/etc/mode/classic.cnf
-
+#mysql_native_password=ON
 authentication_policy=caching_sha2_password
 pid-file = {$SERVER_APP_PATH}/data/mysql.pid
 user = mysql
 port		= 33206
-mysqlx_port = 33260
+#mysqlx_port = 33260
 socket		= {$SERVER_APP_PATH}/mysql.sock
 datadir = {$SERVER_APP_PATH}/data
 log-error =  {$SERVER_APP_PATH}/data/error.log
@@ -53,9 +53,9 @@ relay-log=mdserver
 relay-log-index=mdserver
 
 #master
+#binlog-do-db
 #sync_binlog=1
 
-#binlog-do-db
 binlog-ignore-db = test
 binlog-ignore-db = mysql
 binlog-ignore-db = information_schema
@@ -69,6 +69,7 @@ replicate-ignore-db = information_schema
 replicate-ignore-db = performance_schema
 replicate-ignore-db = mysql
 replicate-ignore-db = test
+
 
 default_storage_engine = InnoDB
 innodb_data_home_dir = {$SERVER_APP_PATH}/data

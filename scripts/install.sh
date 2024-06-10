@@ -23,6 +23,7 @@ elif grep -Eqi "openSUSE" /etc/*-release; then
 	zypper install cron wget curl zip unzip
 elif grep -Eqi "FreeBSD" /etc/*-release; then
 	OSNAME='freebsd'
+	pkg install -y wget curl zip unzip unrar rar
 elif grep -Eqi "EulerOS" /etc/*-release || grep -Eqi "openEuler" /etc/*-release; then
 	OSNAME='euler'
 	yum install -y wget curl zip unzip tar crontabs

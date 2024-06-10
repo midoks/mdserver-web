@@ -39,7 +39,7 @@ elif [ "$OSNAME" == "suse" ]; then
 	OS_SIGN=1.sl${VERSION_ID}
 fi
 
-MYSQL_VER=8.0.30
+MYSQL_VER=8.3.0
 SUFFIX_NAME=${MYSQL_VER}-${OS_SIGN}.${ARCH}
 
 YUM_INSTALL()
@@ -48,7 +48,7 @@ YUM_INSTALL()
 #######
 mkdir -p $myDir
 
-wget  --no-check-certificate -O $myDir/mysql-${SUFFIX_NAME}.rpm-bundle.tar https://cdn.mysql.com/archives/mysql-8.0/mysql-${SUFFIX_NAME}.rpm-bundle.tar
+wget  --no-check-certificate -O $myDir/mysql-${SUFFIX_NAME}.rpm-bundle.tar https://cdn.mysql.com/archives/mysql-8.3/mysql-${SUFFIX_NAME}.rpm-bundle.tar
 cd ${myDir} && tar vxf mysql-${SUFFIX_NAME}.rpm-bundle.tar
 
 mkdir -p ${serverPath}/mysql-yum/bin && cd ${serverPath}/mysql-yum/bin
@@ -92,9 +92,9 @@ Install_mysql()
 
 	mkdir -p $serverPath/mysql-yum
 
-	mkdir -p /var/run/mysqld
-	chown mysql -R /var/run/mysqld
-
+	mkdir -p /var/lib/mysql
+	chown mysql -R /var/lib/mysql
+	
 	isYum=`which yum`
 	if [ "$isYum" != "" ];then
 		YUM_INSTALL
@@ -102,7 +102,7 @@ Install_mysql()
 
 	rm -rf $myDir	
 	
-	echo '8.0' > $serverPath/mysql-yum/version.pl
+	echo '8.3' > $serverPath/mysql-yum/version.pl
 	echo '安装完成'
 }
 

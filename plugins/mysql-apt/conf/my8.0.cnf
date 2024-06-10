@@ -17,7 +17,6 @@ socket		= {$SERVER_APP_PATH}/mysql.sock
 datadir = {$SERVER_APP_PATH}/data
 log-error =  {$SERVER_APP_PATH}/data/error.log
 server-id	= {$SERVER_ID}
-sql-mode=NO_ENGINE_SUBSTITUTION,STRICT_TRANS_TABLES
 
 default_storage_engine = InnoDB
 
@@ -66,14 +65,11 @@ binlog-ignore-db = performance_schema
 #slave
 log_replica_updates
 #replicate-do-db
-slave_skip_errors=1062,1396
+replica_skip_errors=1062,1396
 replicate-ignore-db = information_schema
 replicate-ignore-db = performance_schema
 replicate-ignore-db = mysql
 replicate-ignore-db = test
-
-master_info_repository = table
-relay_log_info_repository = table
 
 default_storage_engine = InnoDB
 innodb_data_home_dir = {$SERVER_APP_PATH}/data

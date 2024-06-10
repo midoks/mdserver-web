@@ -1,4 +1,3 @@
-
 # -*- coding: utf-8 -*-
 #!/bin/bash
 
@@ -22,7 +21,6 @@ OSNAME=`cat ${rootPath}/data/osname.pl`
 VERSION_ID=`cat /etc/*-release | grep VERSION_ID | awk -F = '{print $2}' | awk -F "\"" '{print $2}'`
 
 # cd /www/server/mdserver-web/plugins/mysql-apt && bash install.sh install 8.0
-# cd /www/server/mdserver-web && source bin/activate && python3 plugins/mysql-apt/index.py start
 
 # 暂时debian12没有标准版,先用11使用
 if [ "$OSNAME" == 'debian' ] && [ "$VERSION_ID" == '12' ] ;then 
@@ -47,7 +45,7 @@ if [ "$ARCH" != "amd64" ];then
 fi
 
 
-MYSQL_VER=8.2.0
+MYSQL_VER=8.4.0
 SUFFIX_NAME=${MYSQL_VER}-1${OSNAME}${VERSION_ID}_${ARCH}
 
 
@@ -63,7 +61,10 @@ mkdir -p $serverPath/mysql-apt/bin
 mkdir -p /var/run/mysqld
 chown mysql -R /var/run/mysqld
 
-wget  --no-check-certificate -O ${myDir}/mysql-server_${SUFFIX_NAME}.deb-bundle.tar https://cdn.mysql.com/archives/mysql-8.2/mysql-server_${SUFFIX_NAME}.deb-bundle.tar
+# https://cdn.mysql.com/archives/mysql-8.4/mysql-server_${SUFFIX_NAME}.deb-bundle.tar
+# https://dev.mysql.com/get/Downloads/MySQL-8.4/mysql-server_${SUFFIX_NAME}.deb-bundle.tar
+
+wget  --no-check-certificate -O ${myDir}/mysql-server_${SUFFIX_NAME}.deb-bundle.tar https://dev.mysql.com/get/Downloads/MySQL-8.4/mysql-server_${SUFFIX_NAME}.deb-bundle.tar
 chmod +x ${myDir}/mysql-server_${SUFFIX_NAME}.deb-bundle.tar
 cd ${myDir} && tar vxf ${myDir}/mysql-server_${SUFFIX_NAME}.deb-bundle.tar
 
@@ -117,10 +118,10 @@ Install_mysql()
 
 	if [ "$?" == "0" ];then
 		mkdir -p $serverPath/mysql-apt
-		echo '8.2' > $serverPath/mysql-apt/version.pl
+		echo '8.4' > $serverPath/mysql-apt/version.pl
 		echo '安装完成' > $install_tmp
 	else
-		echo '8.2' > $serverPath/mysql-apt/version.pl
+		echo '8.4' > $serverPath/mysql-apt/version.pl
 		echo "暂时不支持该系统" > $install_tmp
 	fi
 }
