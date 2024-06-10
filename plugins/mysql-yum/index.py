@@ -3155,7 +3155,8 @@ def doFullSyncUser(version=''):
     find_run_dump = mw.execShell('ps -ef | grep mysqldump | grep -v grep')
     if find_run_dump[0] != "":
         print("正在远程导出数据中,别着急...")
-        writeDbSyncStatu
+        writeDbSyncStatus({'code': 3.1, 'msg': '正在远程导出数据中,别着急...', 'progress': 19})
+        return False
 
     if not os.path.exists(bak_file):
 
