@@ -3400,6 +3400,8 @@ def fullSync(version=''):
 
 def installPreInspection(version):
 
+
+
     sys = mw.execShell(
         "cat /etc/*-release | grep PRETTY_NAME |awk -F = '{print $2}' | awk -F '\"' '{print $2}'| awk '{print $1}'")
 
@@ -3418,7 +3420,8 @@ def installPreInspection(version):
     if (sysName == 'centos' and version == '5.7' and not sysId in('7',)):
         return 'mysql5.7 仅支持centos7'
 
-    if (sysName == 'centos' and version == '8.0' and not sysId in ('7', '8', '9',)):
+    mdb8 = ['8.0','8.1','8.2','8.3','8.4']
+    if (sysName == 'centos' and mw.inArray(mdb8, version) and not sysId in ('7', '8', '9',)):
         return 'mysql8.0 仅支持centos7,8,9'
     return 'ok'
 
