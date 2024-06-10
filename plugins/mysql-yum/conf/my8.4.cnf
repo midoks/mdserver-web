@@ -8,11 +8,11 @@ default-character-set = UTF8MB4
 [mysqld]
 !include {$SERVER_APP_PATH}/etc/mode/classic.cnf
 
-authentication_policy=mysql_native_password
+#authentication_policy=mysql_native_password
 pid-file = {$SERVER_APP_PATH}/data/mysql.pid
 user = mysql
 port		= 33206
-mysqlx_port = 33260
+#mysqlx_port = 33260
 socket		= {$SERVER_APP_PATH}/mysql.sock
 datadir = {$SERVER_APP_PATH}/data
 log-error =  {$SERVER_APP_PATH}/data/error.log

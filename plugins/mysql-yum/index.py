@@ -258,7 +258,7 @@ def process_status():
     if data[0] == '':
         return 'stop'
     return 'start'
-    
+
 def status(version=''):
     pid = getPidFile()
     if not os.path.exists(pid):
@@ -448,7 +448,6 @@ def yumLibFix():
     makeLib64SoftLink('libtinfo')
 
 def initMysql8Pwd():
-    yumLibFix()
     '''
     /usr/bin/mysql --defaults-file=/www/server/mysql-apt/etc/my.cnf -uroot -e"UPDATE mysql.user SET password=PASSWORD('BhIroUczczNVaKvw') WHERE user='root';flush privileges;"
     /usr/bin/mysql --defaults-file=/www/server/mysql-apt/etc/my.cnf -uroot -e"alter user 'root'@'localhost' identified by '123456';"
