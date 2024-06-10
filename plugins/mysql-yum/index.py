@@ -245,12 +245,12 @@ def initDreplace(version=''):
     systemDir = mw.systemdCfgDir()
     systemService = systemDir + '/mysql-yum.service'
     systemServiceTpl = getPluginDir() + '/init.d/mysql' + version + '.service.tpl'
-    if os.path.exists(systemDir) and not os.path.exists(systemService):
-        service_path = mw.getServerDir()
-        se_content = mw.readFile(systemServiceTpl)
-        se_content = se_content.replace('{$SERVER_PATH}', service_path)
-        mw.writeFile(systemService, se_content)
-        mw.execShell('systemctl daemon-reload')
+    # if os.path.exists(systemDir) and not os.path.exists(systemService):
+    service_path = mw.getServerDir()
+    content = mw.readFile(systemServiceTpl)
+    content = content.replace('{$SERVER_PATH}', service_path)
+    mw.writeFile(systemService, content)
+    mw.execShell('systemctl daemon-reload')
 
     if mw.getOs() != 'darwin':
         mw.execShell('chown -R mysql mysql ' + getServerDir())
