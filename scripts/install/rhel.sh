@@ -19,6 +19,7 @@ if [ $VERSION_ID == '7' ]; then
     yum install -y libncurses*
 elif [ $VERSION_ID == '8' ]; then
     dnf install -y curl-devel libmcrypt libmcrypt-devel python36-devel
+    dnf install -y libncurses*
 fi
 
 isStream=$(grep -o -i 'stream' /etc/redhat-release)
