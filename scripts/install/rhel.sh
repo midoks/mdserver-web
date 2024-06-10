@@ -32,6 +32,8 @@ if [ $VERSION_ID -ge 8 ];then
 fi
 
 $PKGMGR install -y curl-devel libmcrypt libmcrypt-devel python3-devel
+$PKGMGR install -y net-tools
+
 $PKGMGR install -y libncurses*
 
 echo "install remi source"
@@ -52,7 +54,7 @@ if [ ! -d /root/.acme.sh ];then
     curl https://get.acme.sh | sh
 fi
 
-yum install -y net-tools
+
 
 SSH_PORT=`netstat -ntpl|grep sshd|grep -v grep | sed -n "1,1p" | awk '{print $4}' | awk -F : '{print $2}'`
 if [ "$SSH_PORT" == "" ];then
