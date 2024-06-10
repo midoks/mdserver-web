@@ -870,7 +870,7 @@ function openPhpmyadmin(name,username,password){
             return;
         }
 
-        if (rdata.data['cfg']['choose'] != 'mysql'){
+        if (rdata.data['cfg']['choose'] != 'mysql-yum'){
             layer.msg('当前为['+rdata.data['cfg']['choose'] + ']模式,若要使用请修改phpMyAdmin访问切换.',{icon:2,shade: [0.3, '#000']});
             return;
         }
