@@ -2006,6 +2006,11 @@ def setDbSlave(version):
 
 def getMasterStatus(version=''):
 
+    query_status_cmd = 'show slave status'
+    mdb8 = getMdb8Ver()
+    if mw.inArray(mdb8, version):
+        query_status_cmd = 'show replica status'
+
     try:
         if status(version) == 'stop':
             return mw.returnJson(False, 'MySQL未启动,或正在启动中...!', [])
@@ -2023,7 +2028,7 @@ def getMasterStatus(version=''):
         data['status'] = master_status
 
         db = pMysqlDb()
-        dlist = db.query('show slave status')
+        dlist = db.query(query_status_cmd)
 
         # print(dlist[0])
         if len(dlist) > 0 and (dlist[0]["Slave_IO_Running"] == 'Yes' or dlist[0]["Slave_SQL_Running"] == 'Yes'):
@@ -3499,7 +3504,7 @@ def uninstallPreInspection(version):
     data_dir = getDataDir()
     if os.path.exists(data_dir):
         stop(version)
-        
+
     if mw.isDebugMode():
         return 'ok'
 
