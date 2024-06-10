@@ -58,6 +58,10 @@ APT_INSTALL()
 mkdir -p $myDir
 mkdir -p $serverPath/mysql-apt/bin
 
+
+mkdir -p /var/run/mysqld
+chown mysql -R /var/run/mysqld
+
 wget  --no-check-certificate -O ${myDir}/mysql-server_${SUFFIX_NAME}.deb-bundle.tar https://cdn.mysql.com/archives/mysql-8.0/mysql-server_${SUFFIX_NAME}.deb-bundle.tar
 chmod +x ${myDir}/mysql-server_${SUFFIX_NAME}.deb-bundle.tar
 cd ${myDir} && tar vxf ${myDir}/mysql-server_${SUFFIX_NAME}.deb-bundle.tar
