@@ -242,6 +242,12 @@ def initDreplace(version=''):
         mw.execShell('chown -R mysql mysql ' + getServerDir())
     return 'ok'
 
+def process_status():
+    cmd = "ps -ef|grep mysql |grep -v grep | grep -v python | awk '{print $2}'"
+    data = mw.execShell(cmd)
+    if data[0] == '':
+        return 'stop'
+    return 'start'
 
 def status(version=''):
     pid = getPidFile()
