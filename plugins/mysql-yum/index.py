@@ -253,7 +253,7 @@ def initDreplace(version=''):
     return 'ok'
 
 def process_status():
-    cmd = "ps -ef|grep mysql |grep -v grep | grep -v python | awk '{print $2}'"
+    cmd = "ps -ef|grep mysql-yum | grep mysql |grep -v grep | grep -v python | awk '{print $2}'"
     data = mw.execShell(cmd)
     if data[0] == '':
         return 'stop'
