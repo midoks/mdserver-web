@@ -2689,11 +2689,17 @@ def updateSlaveSSH(version=''):
 
 
 def getSlaveList(version=''):
+
+    query_status_cmd = 'show slave status'
+    mdb8 = ['8.0','8.1','8.2','8.3','8.4']
+    if mw.inArray(mdb8, version):
+        query_status_cmd = 'show replica status'
+
     if status(version) == 'stop':
         return mw.returnJson(False, 'MySQL未启动', [])
 
     db = pMysqlDb()
-    dlist = db.query('show slave status')
+    dlist = db.query(query_status_cmd)
 
     # print(dlist)
     data = {}
