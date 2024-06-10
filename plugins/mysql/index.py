@@ -429,6 +429,9 @@ def getShowLogFile():
     return tmp.groups()[0].strip()
 
 
+def getMdb8Ver():
+    return ['8.0','8.1','8.2','8.3','8.4']
+
 def pGetDbUser():
     if mw.isAppleSystem():
         user = mw.execShell(
@@ -614,10 +617,11 @@ def my8cmd(version, method):
     # mysql 8.0  and 5.7
     init_file = initDreplace(version)
     cmd = init_file + ' ' + method
+    mdb8 = getMdb8Ver()
     try:
         if version == '5.7':
             isInited = initMysql57Data()
-        elif mw.inArray(['8.0','8.1','8.2','8.3','8.4'], version):
+        elif mw.inArray(mdb8, version):
             isInited = initMysql8Data()
 
         if not isInited:
@@ -2197,7 +2201,7 @@ def setDbSlave(version):
 def getMasterStatus(version=''):
 
     query_status_cmd = 'show slave status'
-    mdb8 = ['8.0','8.1','8.2','8.3','8.4']
+    mdb8 = getMdb8Ver()
     if mw.inArray(mdb8, version):
         query_status_cmd = 'show replica status'
 
@@ -2331,7 +2335,7 @@ def addMasterRepSlaveUser(version=''):
     if psdb.where("username=?", (username)).count() > 0:
         return mw.returnJson(False, '用户已存在!')
 
-    mdb8 = ['8.0','8.1','8.2','8.3','8.4']
+    mdb8 = getMdb8Ver()
     if mw.inArray(mdb8,version):
         sql = "CREATE USER '" + username + \
             "'  IDENTIFIED WITH "+auth_policy+" BY '" + password + "';"
@@ -2394,7 +2398,7 @@ def getMasterRepSlaveUserCmd(version):
     if sid != '':
         channel_name = " for channel 'r{}'".format(sid)
 
-    mdb8 = ['8.0','8.1','8.2','8.3','8.4']
+    mdb8 = getMdb8Ver()
     sql = ''
     if not mw.inArray(mdb8,version):
         base_sql = "CHANGE MASTER TO MASTER_HOST='" + ip + "', MASTER_PORT=" + port + ", MASTER_USER='" + \
@@ -2691,7 +2695,7 @@ def updateSlaveSSH(version=''):
 def getSlaveList(version=''):
 
     query_status_cmd = 'show slave status'
-    mdb8 = ['8.0','8.1','8.2','8.3','8.4']
+    mdb8 = getMdb8Ver()
     if mw.inArray(mdb8, version):
         query_status_cmd = 'show replica status'
 
@@ -3453,7 +3457,7 @@ def doFullSyncUser(version=''):
     time.sleep(1)
     writeDbSyncStatus({'code': 1, 'msg': '正在停止从库...', 'progress': 15})
 
-    mdb8 = ['8.0','8.1','8.2','8.3','8.4']
+    mdb8 = getMdb8Ver()
     if mw.inArray(mdb8,version):
         db.query("stop slave user='{}' password='{}';".format(user, apass))
     else:
@@ -3687,7 +3691,7 @@ def doFullSyncSSH(version=''):
         writeDbSyncStatus({'code': 5, 'msg': '导入数据失败...', 'progress': 100})
         return 'fail'
     
-    mdb8 = ['8.0','8.1','8.2','8.3','8.4']
+    mdb8 = getMdb8Ver()
     if mw.inArray(mdb8,version):
         db.query("start slave user='{}' password='{}';".format(uinfo['username'], uinfo['password']))
     else:
