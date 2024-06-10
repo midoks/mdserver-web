@@ -424,7 +424,7 @@ def initMysql8Data():
         cmd = serverdir + '/bin/usr/sbin/mysqld --basedir=' + serverdir + '/bin/usr --datadir=' + \
             datadir + ' --initialize-insecure --lower-case-table-names=1'
         data = mw.execShell(cmd)
-
+        # print(data)
         if data[1] != '':
             print(data[1])
             exit(-1)
