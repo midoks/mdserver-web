@@ -398,6 +398,8 @@ def getShowLogFile():
     tmp = re.search(rep, content)
     return tmp.groups()[0].strip()
 
+def getMdb8Ver():
+    return ['8.0','8.1','8.2','8.3','8.4']
 
 def pGetDbUser():
     if mw.isAppleSystem():
@@ -3463,6 +3465,7 @@ def fullSync(version=''):
 
 def installPreInspection(version):
 
+
     cmd = "cat /etc/*-release | grep PRETTY_NAME |awk -F = '{print $2}' | awk -F '\"' '{print $2}'| awk '{print $1}'"
     sys = mw.execShell(cmd)
 
@@ -3474,6 +3477,7 @@ def installPreInspection(version):
 
     sysName = sys[0].strip().lower()
     sysId = sys_id[0].strip()
+    mdb8 = getMdb8Ver()
 
     if not sysName in ('debian', 'ubuntu'):
         return '仅支持debian,ubuntu'
