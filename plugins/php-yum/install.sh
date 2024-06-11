@@ -89,6 +89,8 @@ if [ "${action}" == "install" ] && [ -d ${serverPath}/php-yum/${type} ];then
 		curl -sS https://getcomposer.org/installer | /opt/remi/php${type}/root/usr/bin/php
 		mv composer.phar /usr/local/bin/composer
 	fi
+
+	systemctl start php${type}-php-fpm
 fi
 
 
