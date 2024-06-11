@@ -48,6 +48,9 @@ YUM_INSTALL()
 #######
 mkdir -p $myDir
 
+mkdir -p /var/run/mysqld
+chown mysql -R /var/run/mysqld
+
 # https://dev.mysql.com/get/Downloads/MySQL-8.4/mysql-${SUFFIX_NAME}.rpm-bundle.tar
 
 # https://cdn.mysql.com/archives/mysql-8.4/mysql-${SUFFIX_NAME}.rpm-bundle.tar
