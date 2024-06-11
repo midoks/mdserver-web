@@ -76,6 +76,8 @@ if [ "${action}" == "install" ] && [ -d ${serverPath}/php-yum/${type} ];then
 	cd ${rootPath}/plugins/php-yum/versions && bash common.sh ${type} install redis
 	cd ${rootPath}/plugins/php-yum/versions && bash common.sh ${type} install memcached
 	cd ${rootPath}/plugins/php-yum/versions && bash common.sh ${type} install mbstring
+	cd ${rootPath}/plugins/php-yum/versions && bash common.sh ${type} install mongodb
+	cd ${rootPath}/plugins/php-yum/versions && bash common.sh ${type} install zip
 	echo "install PHP-YUM[${type}] extend end"
 
 	#初始化 
