@@ -40,7 +40,7 @@ Uninstall_php()
 #------------------------ uninstall start ------------------------------------#
 apt -y remove php${version} php${version}-*
 rm -rf $serverPath/php-apt/${PHP_VER}
-echo "卸载php-${version}..." > $install_tmp
+echo "卸载php-${version}..."
 #------------------------ uninstall start ------------------------------------#
 }
 
