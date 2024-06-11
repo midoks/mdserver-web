@@ -76,6 +76,8 @@ if [ "${action}" == "install" ] && [ -d ${serverPath}/php-yum/${type} ];then
 	cd ${rootPath}/plugins/php-yum/versions && bash common.sh ${type} install redis
 	cd ${rootPath}/plugins/php-yum/versions && bash common.sh ${type} install memcached
 	cd ${rootPath}/plugins/php-yum/versions && bash common.sh ${type} install mbstring
+	cd ${rootPath}/plugins/php-yum/versions && bash common.sh ${type} install mongodb
+	cd ${rootPath}/plugins/php-yum/versions && bash common.sh ${type} install zip
 	echo "install PHP-YUM[${type}] extend end"
 
 	#初始化 
@@ -87,6 +89,10 @@ if [ "${action}" == "install" ] && [ -d ${serverPath}/php-yum/${type} ];then
 		curl -sS https://getcomposer.org/installer | /opt/remi/php${type}/root/usr/bin/php
 		mv composer.phar /usr/local/bin/composer
 	fi
+
+	echo "PHP-YUM[${type}] start ..."
+	systemctl restart php${type}-php-fpm
+	echo "PHP-YUM[${type}] start ok"
 fi
 
 

@@ -31,6 +31,7 @@ fi
 
 action=$1
 type=$2
+apt_ver=${type:0:1}.${type:1:2}
 
 if [ "${2}" == "" ];then
 	echo '缺少安装脚本...' > $install_tmp
@@ -75,7 +76,6 @@ fi
 cd ${curPath} && sh -x $curPath/versions/$2/install.sh $1
 
 if [ "${action}" == "install" ] && [ -d ${serverPath}/php-apt/${type} ];then
-
 	#初始化 
 	cd ${rootPath} && python3 ${rootPath}/plugins/php-apt/index.py start ${type}
 	cd ${rootPath} && python3 ${rootPath}/plugins/php-apt/index.py restart ${type}
@@ -83,26 +83,30 @@ if [ "${action}" == "install" ] && [ -d ${serverPath}/php-apt/${type} ];then
 
 	# 安装通用扩展
 	echo "install PHP-APT[${type}] extend start"
-	cd ${rootPath}/plugins/php-apt/versions && bash common.sh ${type:0:1}.${type:1:2} install curl
-	cd ${rootPath}/plugins/php-apt/versions && bash common.sh ${type:0:1}.${type:1:2} install gd
-	cd ${rootPath}/plugins/php-apt/versions && bash common.sh ${type:0:1}.${type:1:2} install iconv
-	cd ${rootPath}/plugins/php-apt/versions && bash common.sh ${type:0:1}.${type:1:2} install exif
-	cd ${rootPath}/plugins/php-apt/versions && bash common.sh ${type:0:1}.${type:1:2} install intl
-	cd ${rootPath}/plugins/php-apt/versions && bash common.sh ${type:0:1}.${type:1:2} install xml
-	cd ${rootPath}/plugins/php-apt/versions && bash common.sh ${type:0:1}.${type:1:2} install mcrypt
-	cd ${rootPath}/plugins/php-apt/versions && bash common.sh ${type:0:1}.${type:1:2} install mysqlnd
-	cd ${rootPath}/plugins/php-apt/versions && bash common.sh ${type:0:1}.${type:1:2} install mysql
-	cd ${rootPath}/plugins/php-apt/versions && bash common.sh ${type:0:1}.${type:1:2} install gettext
-	cd ${rootPath}/plugins/php-apt/versions && bash common.sh ${type:0:1}.${type:1:2} install redis
-	cd ${rootPath}/plugins/php-apt/versions && bash common.sh ${type:0:1}.${type:1:2} install memcached
-	cd ${rootPath}/plugins/php-apt/versions && bash common.sh ${type:0:1}.${type:1:2} install mbstring
+	cd ${rootPath}/plugins/php-apt/versions && bash common.sh ${apt_ver} install curl
+	cd ${rootPath}/plugins/php-apt/versions && bash common.sh ${apt_ver} install gd
+	cd ${rootPath}/plugins/php-apt/versions && bash common.sh ${apt_ver} install iconv
+	cd ${rootPath}/plugins/php-apt/versions && bash common.sh ${apt_ver} install exif
+	cd ${rootPath}/plugins/php-apt/versions && bash common.sh ${apt_ver} install intl
+	cd ${rootPath}/plugins/php-apt/versions && bash common.sh ${apt_ver} install xml
+	cd ${rootPath}/plugins/php-apt/versions && bash common.sh ${apt_ver} install mcrypt
+	cd ${rootPath}/plugins/php-apt/versions && bash common.sh ${apt_ver} install mysqlnd
+	cd ${rootPath}/plugins/php-apt/versions && bash common.sh ${apt_ver} install mysql
+	cd ${rootPath}/plugins/php-apt/versions && bash common.sh ${apt_ver} install gettext
+	cd ${rootPath}/plugins/php-apt/versions && bash common.sh ${apt_ver} install redis
+	cd ${rootPath}/plugins/php-apt/versions && bash common.sh ${apt_ver} install memcached
+	cd ${rootPath}/plugins/php-apt/versions && bash common.sh ${apt_ver} install mbstring
+	cd ${rootPath}/plugins/php-apt/versions && bash common.sh ${apt_ver} install zip
+	cd ${rootPath}/plugins/php-apt/versions && bash common.sh ${apt_ver} install mongodb
 	echo "install PHP-APT[${type}] extend end"
 
 	if [ ! -f /usr/local/bin/composer ];then
 		cd /tmp
-		curl -sS https://getcomposer.org/installer | /usr/bin/php${type:0:1}.${type:1:2}
+		curl -sS https://getcomposer.org/installer | /usr/bin/php${apt_ver}
 		mv composer.phar /usr/local/bin/composer
 	fi
+
+	systemctl restart php${apt_ver}-fpm
 fi
 
 

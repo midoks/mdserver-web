@@ -64,7 +64,7 @@ function myPostCallbak(method, version, args,callback){
     var loadT = layer.msg('正在获取...', { icon: 16, time: 0, shade: 0.3 });
 
     var req_data = {};
-    req_data['name'] = 'mysql';
+    req_data['name'] = 'mysql-yum';
     req_data['func'] = method;
     req_data['script']='index_mysql_yum';
     args['version'] = version;
@@ -92,7 +92,7 @@ function myPostCallbak(method, version, args,callback){
 function myPostCallbakN(method, version, args,callback){
 
     var req_data = {};
-    req_data['name'] = 'mysql';
+    req_data['name'] = 'mysql-yum';
     req_data['func'] = method;
     req_data['script']='index_mysql_yum';
     args['version'] = version;

@@ -56,7 +56,7 @@ function myAsyncPost(method,args){
     }
 
     var loadT = layer.msg('正在获取...', { icon: 16, time: 0, shade: 0.3 });
-    return syncPost('/plugins/run', {name:'mysql', func:method, args:_args}); 
+    return syncPost('/plugins/run', {name:'mysql-apt', func:method, args:_args}); 
 }
 
 
@@ -64,7 +64,7 @@ function myPostCallbak(method, version, args,callback){
     var loadT = layer.msg('正在获取...', { icon: 16, time: 0, shade: 0.3 });
 
     var req_data = {};
-    req_data['name'] = 'mysql';
+    req_data['name'] = 'mysql-apt';
     req_data['func'] = method;
     req_data['script']='index_mysql_apt';
     args['version'] = version;
@@ -92,7 +92,7 @@ function myPostCallbak(method, version, args,callback){
 function myPostCallbakN(method, version, args,callback){
 
     var req_data = {};
-    req_data['name'] = 'mysql';
+    req_data['name'] = 'mysql-apt';
     req_data['func'] = method;
     req_data['script']='index_mysql_apt';
     args['version'] = version;

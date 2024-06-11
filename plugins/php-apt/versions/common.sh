@@ -57,4 +57,8 @@ fi
 echo "apt install -y php${version}-${extName}"
 echo "apt remove -y php${version}-${extName}"
 
-systemctl restart php${version}-fpm
+php_status=`systemctl status php${version}-fpm | grep inactive`
+echo "status:$php_status"
+if [ "$php_status" != "" ];then
+	systemctl restart php${version}-fpm
+fi

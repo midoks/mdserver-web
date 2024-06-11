@@ -45,6 +45,8 @@ SUFFIX_NAME=${MYSQL_VER}-${OS_SIGN}.${ARCH}
 YUM_INSTALL()
 {
 
+mkdir -p /var/run/mysqld
+chown mysql -R /var/run/mysqld
 #######
 mkdir -p $myDir
 

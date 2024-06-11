@@ -33,6 +33,8 @@ fi
 
 $PKGMGR install -y curl-devel libmcrypt libmcrypt-devel python3-devel
 $PKGMGR install -y net-tools
+$PKGMGR install -y unixODBC-devel
+
 
 $PKGMGR install -y libncurses*
 

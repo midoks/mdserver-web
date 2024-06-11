@@ -67,6 +67,8 @@ def getConf(version):
 def getFpmConfFile(version):
     return getServerDir() + '/' + version + '/fpm/pool.d/mw.conf'
 
+def getFpmFile(version):
+    return getServerDir() + '/' + version + '/fpm/php-fpm.conf'
 
 def status(version):
     # ps -ef|grep 'php/81' |grep -v grep | grep -v python | awk '{print $2}
@@ -488,8 +490,7 @@ def getFpmStatus(version):
 
     sock_file = getFpmAddress(version)
     try:
-        sock_data = mw.requestFcgiPHP(
-            sock_file, '/phpfpm_status_apt' + version + '?json')
+        sock_data = mw.requestFcgiPHP(sock_file, '/phpfpm_status_apt' + version + '?json')
 
         result = str(sock_data, encoding='utf-8')
         data = json.loads(result)
@@ -860,6 +861,8 @@ if __name__ == "__main__":
         print(getPhpConf(version))
     elif func == 'get_fpm_conf_file':
         print(getFpmConfFile(version))
+    elif func == 'get_fpm_file':
+        print(getFpmFile(version))
     elif func == 'submit_php_conf':
         print(submitPhpConf(version))
     elif func == 'get_limit_conf':

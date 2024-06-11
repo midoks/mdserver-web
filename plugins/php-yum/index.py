@@ -112,10 +112,6 @@ def contentReplace(content, version):
 def makeOpenrestyConf(version):
 
     sdir = mw.getServerDir()
-    d_pathinfo = sdir + '/web_conf/php/pathinfo.conf'
-    if not os.path.exists(d_pathinfo):
-        s_pathinfo = getPluginDir() + '/conf/pathinfo.conf'
-        shutil.copyfile(s_pathinfo, d_pathinfo)
 
     dst_dir = sdir + '/web_conf/php'
     dst_dir_conf = sdir + '/web_conf/php/conf'
@@ -125,6 +121,11 @@ def makeOpenrestyConf(version):
 
     if not os.path.exists(dst_dir_conf):
         mw.execShell('mkdir -p ' + dst_dir_conf)
+
+    d_pathinfo = sdir + '/web_conf/php/pathinfo.conf'
+    if not os.path.exists(d_pathinfo):
+        s_pathinfo = getPluginDir() + '/conf/pathinfo.conf'
+        shutil.copyfile(s_pathinfo, d_pathinfo)
 
     info = getPluginDir() + '/info.json'
     content = mw.readFile(info)
