@@ -389,6 +389,8 @@ def getShowLogFile():
     tmp = re.search(rep, content)
     return tmp.groups()[0].strip()
 
+def getMdb8Ver():
+    return ['8.0','8.1','8.2','8.3','8.4']
 
 def pGetDbUser():
     if mw.isAppleSystem():
@@ -506,11 +508,13 @@ def initMysql8Pwd():
 def my8cmd(version, method):
     initDreplace(version)
     # mysql 8.0  and 5.7
+
+    mdb8 = getMdb8Ver()
     try:
         isInited = True
         if version == '5.7':
             isInited = initMysql57Data()
-        elif mw.inArray(['8.0','8.1','8.2','8.3','8.4'], version):
+        elif mw.inArray(mdb8, version):
             isInited = initMysql8Data()
 
         if not isInited:
@@ -545,7 +549,7 @@ def my8cmd(version, method):
                                    bufsize=4096, stderr=subprocess.PIPE)
             sub.wait(5)
         else:
-            mw.execShell('systemctl ' + method + ' '+getPluginName())
+            mw.execShell('systemctl ' + method + ' ' + getPluginName())
         return 'ok'
     except Exception as e:
         return str(e)
