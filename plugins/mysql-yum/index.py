@@ -534,8 +534,6 @@ def my8cmd(version, method):
                     break
                 time.sleep(1)
 
-            initMysql8Pwd()
-
             if not mw.isSupportSystemctl():
                 cmd_init_stop = init_file + ' stop'
                 subprocess.Popen(cmd_init_stop, stdout=subprocess.PIPE, shell=True,
