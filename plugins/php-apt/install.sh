@@ -96,6 +96,7 @@ if [ "${action}" == "install" ] && [ -d ${serverPath}/php-apt/${type} ];then
 	cd ${rootPath}/plugins/php-apt/versions && bash common.sh ${apt_ver} install redis
 	cd ${rootPath}/plugins/php-apt/versions && bash common.sh ${apt_ver} install memcached
 	cd ${rootPath}/plugins/php-apt/versions && bash common.sh ${apt_ver} install mbstring
+	cd ${rootPath}/plugins/php-apt/versions && bash common.sh ${apt_ver} install zip
 	echo "install PHP-APT[${type}] extend end"
 
 	if [ ! -f /usr/local/bin/composer ];then
