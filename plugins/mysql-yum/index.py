@@ -642,8 +642,8 @@ def setMyDbPos(version=''):
     mw.writeFile(myfile, mycnf)
     restart(version)
 
-    result = mw.execShell(
-        'ps aux|grep "mysql-apt/bin/usr/sbin/mysqld"| grep -v grep|grep -v python')
+    cmd = 'ps aux|grep "mysql-yum/bin/usr/sbin/mysqld"| grep -v grep|grep -v python'
+    result = mw.execShell(cmd)
     if len(result[0]) > 10:
         mw.writeFile('data/datadir.pl', t_datadir)
         return mw.returnJson(True, '存储目录迁移成功!')
@@ -1997,7 +1997,7 @@ def setDbSlave(version):
 def getMasterStatus(version=''):
 
     query_status_cmd = 'show slave status'
-    mdb8 = ['8.0','8.1','8.2','8.3','8.4']
+    mdb8 = getMdb8Ver()
     if mw.inArray(mdb8, version):
         query_status_cmd = 'show replica status'
     try:
@@ -2187,7 +2187,7 @@ def getMasterRepSlaveUserCmd(version):
     if sid != '':
         channel_name = " for channel 'r{}'".format(sid)
 
-    mdb8 = ['8.0','8.1','8.2','8.3','8.4']
+    mdb8 = getMdb8Ver()
     sql = ''
     if not mw.inArray(mdb8,version):
         base_sql = "CHANGE MASTER TO MASTER_HOST='" + ip + "', MASTER_PORT=" + port + ", MASTER_USER='" + \
@@ -2486,7 +2486,7 @@ def getSlaveList(version=''):
         return mw.returnJson(False, 'MySQL未启动', [])
 
     query_status_cmd = 'show slave status'
-    mdb8 = ['8.0','8.1','8.2','8.3','8.4']
+    mdb8 = getMdb8Ver()
     if mw.inArray(mdb8, version):
         query_status_cmd = 'show replica status'
 
@@ -3197,7 +3197,7 @@ def doFullSyncUser(version=''):
 
     writeDbSyncStatus({'code': 1, 'msg': '远程导出数据...', 'progress': 15})
 
-    mdb8 = ['8.0','8.1','8.2','8.3','8.4']
+    mdb8 = getMdb8Ver()
     if mw.inArray(mdb8,version):
         db.query("stop slave user='{}' password='{}';".format(user, apass))
     else:
@@ -3474,7 +3474,7 @@ def installPreInspection(version):
     if (sysName == 'centos' and version == '5.7' and not sysId in('7',)):
         return 'mysql5.7 仅支持centos7'
 
-    mdb8 = ['8.0','8.1','8.2','8.3','8.4']
+    mdb8 = getMdb8Ver()
     if (sysName == 'centos' and mw.inArray(mdb8, version) and not sysId in ('7', '8', '9',)):
         return 'mysql8.0 仅支持centos7,8,9'
     return 'ok'
