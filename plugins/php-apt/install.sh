@@ -46,15 +46,17 @@ fi
 
 
 if [ "$OSNAME" == "ubuntu" ];then
-	echo "y" | LC_ALL=C.UTF-8 add-apt-repository ppa:ondrej/php && apt update -y
+	find_source=`ls /etc/apt/sources.list.d | grep ondrej-ubuntu-php`
+	if [ "$find_source" == "" ];then
+		echo "y" | LC_ALL=C.UTF-8 add-apt-repository ppa:ondrej/php && apt update -y
+	fi
 fi
 # apt install $(grep-aptavail -S PHP-defaults -s Package -n)
 
 
 if [ ! -f /etc/apt/sources.list.d/php.list ] && [ "$OSNAME" == "debian" ];then
 	# install php source
-	apt update -y
-	apt -y install apt-transport-https lsb-release ca-certificates curl
+	apt install -y apt-transport-https lsb-release ca-certificates curl
 	cn=$(curl -fsSL -m 10 http://ipinfo.io/json | grep "\"country\": \"CN\"")
 	if [ ! -z "$cn" ];then
 		curl -sSLo /usr/share/keyrings/deb.sury.org-php.gpg https://mirror.sjtu.edu.cn/sury/php/apt.gpg

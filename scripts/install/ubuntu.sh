@@ -24,6 +24,7 @@ apt install -y cron
 apt install -y net-tools
 apt install -y libncurses5
 apt install -y libncurses5-dev
+apt install -y software-properties-common
 
 apt install -y locate
 locale-gen en_US.UTF-8
