@@ -90,7 +90,7 @@ if [ "${action}" == "install" ] && [ -d ${serverPath}/php-yum/${type} ];then
 		mv composer.phar /usr/local/bin/composer
 	fi
 
-	systemctl start php${type}-php-fpm
+	systemctl restart php${type}-php-fpm
 fi
 
 
