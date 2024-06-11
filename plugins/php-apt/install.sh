@@ -31,6 +31,7 @@ fi
 
 action=$1
 type=$2
+apt_ver=${type:0:1}.${type:1:2}
 
 if [ "${2}" == "" ];then
 	echo '缺少安装脚本...' > $install_tmp
@@ -75,7 +76,6 @@ fi
 cd ${curPath} && sh -x $curPath/versions/$2/install.sh $1
 
 if [ "${action}" == "install" ] && [ -d ${serverPath}/php-apt/${type} ];then
-	apt_ver=${type:0:1}.${type:1:2}
 	#初始化 
 	cd ${rootPath} && python3 ${rootPath}/plugins/php-apt/index.py start ${type}
 	cd ${rootPath} && python3 ${rootPath}/plugins/php-apt/index.py restart ${type}
