@@ -45,11 +45,11 @@ SUFFIX_NAME=${MYSQL_VER}-${OS_SIGN}.${ARCH}
 YUM_INSTALL()
 {
 
-#######
-mkdir -p $myDir
-
 mkdir -p /var/run/mysqld
 chown mysql -R /var/run/mysqld
+
+#######
+mkdir -p $myDir
 
 # https://dev.mysql.com/get/Downloads/MySQL-8.4/mysql-${SUFFIX_NAME}.rpm-bundle.tar
 
