@@ -100,7 +100,7 @@ if [ "${action}" == "install" ] && [ -d ${serverPath}/php-apt/${type} ];then
 
 	if [ ! -f /usr/local/bin/composer ];then
 		cd /tmp
-		curl -sS https://getcomposer.org/installer | /usr/bin/php${type:0:1}.${type:1:2}
+		curl -sS https://getcomposer.org/installer | /usr/bin/php${apt_ver}
 		mv composer.phar /usr/local/bin/composer
 	fi
 
