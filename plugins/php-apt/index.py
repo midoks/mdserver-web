@@ -175,6 +175,14 @@ def deleteConfList(version):
     if os.path.exists(enable_conf):
         os.remove(enable_conf)
 
+def phpPrependFile(version):
+    app_start = getAppDir() + '/app_start.php'
+    if not os.path.exists(app_start):
+        tpl = getPluginDir() + '/conf/app_start.php'
+        content = mw.readFile(tpl)
+        content = contentReplace(content, version)
+        mw.writeFile(app_start, content)
+
 def phpFpmReplace(version):
     desc_php_fpm = getServerDir() + '/' + version + '/fpm/php-fpm.conf'
 
@@ -202,6 +210,8 @@ def initReplace(version):
         mw.execShell(cmd_curl)
 
         mw.writeFile(install_ok, 'ok')
+
+    phpPrependFile(version)
     # systemd
     # mw.execShell('systemctl daemon-reload')
     return 'ok'
