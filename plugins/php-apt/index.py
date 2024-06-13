@@ -27,6 +27,9 @@ def getPluginName():
     return 'php-apt'
 
 
+def getAppDir():
+    return mw.getServerDir()+'/'+getPluginName()
+
 def getServerDir():
     return '/etc/php'
 
@@ -181,13 +184,12 @@ def phpFpmReplace(version):
 
 def initReplace(version):
     makeOpConf(version)
-
     phpFpmWwwReplace(version)
 
-    install_ok = getServerDir() + "/" + version + "/install.ok"
+    install_ok = getAppDir() + "/" + version + "/install.ok"
     if not os.path.exists(install_ok):
         phpFpmReplace(version)
-        
+
         phpini = getConf(version)
         ssl_crt = mw.getSslCrt()
 
