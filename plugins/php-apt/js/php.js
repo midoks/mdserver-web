@@ -178,12 +178,17 @@ function phpPreload(version){
     });
 }
 
+function phpOpcacheBlacklist(version){
+    phpPost('opcache_blacklist_file',version,{},function(data){
+        onlineEditFile(0, data['data']);
+    });
+}
+
 function phpFpmRoot(version){
     phpPost('get_fpm_file',version,{},function(data){
         onlineEditFile(0, data['data']);
     });
 }
-
 
 
 function getFpmConfig(version){
