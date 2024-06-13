@@ -27,6 +27,9 @@ def getPluginName():
     return 'php-yum'
 
 
+def getAppDir():
+    return mw.getServerDir()+'/'+getPluginName()
+
 def getServerDir():
     return '/etc/opt/remi'
 
@@ -157,9 +160,20 @@ def phpFpmWwwReplace(version):
         content = contentReplace(content, version)
         mw.writeFile(service_php_fpm_mw, content)
 
+def phpPrependFile(version):
+    app_start = getAppDir() + '/app_start.php'
+    if not os.path.exists(app_start):
+        tpl = getPluginDir() + '/conf/app_start.php'
+        content = mw.readFile(tpl)
+        content = contentReplace(content, version)
+        mw.writeFile(app_start, content)
 
 def getFpmConfFile(version):
     return getServerDir() + '/php' + version + '/php-fpm.d/mw.conf'
+
+
+def getFpmFile(version):
+    return getServerDir() + '/php' + version + '/php-fpm.conf'
 
 
 def deleteConfList(version):
@@ -176,7 +190,7 @@ def initReplace(version):
     makeOpenrestyConf(version)
     phpFpmWwwReplace(version)
 
-    install_ok = getServerDir() + "/" + version + "/install.ok"
+    install_ok = getAppDir() + "/" + version + "/install.ok"
     if not os.path.exists(install_ok):
         phpini = getConf(version)
         ssl_crt = mw.getSslCrt()
@@ -187,6 +201,7 @@ def initReplace(version):
         mw.execShell(cmd_curl)
         mw.writeFile(install_ok, 'ok')
 
+    phpPrependFile(version)
     # systemd
     # mw.execShell('systemctl daemon-reload')
     return 'ok'
@@ -227,8 +242,7 @@ def initdStatus(version):
     if mw.isAppleSystem():
         return "Apple Computer does not support"
 
-    shell_cmd = 'systemctl status php' + version + \
-        '-php-fpm | grep loaded | grep "enabled;"'
+    shell_cmd = 'systemctl status php' + version + '-php-fpm | grep loaded | grep "enabled;"'
     data = mw.execShell(shell_cmd)
     if data[0] == '':
         return 'fail'

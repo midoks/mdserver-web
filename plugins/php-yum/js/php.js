@@ -184,6 +184,12 @@ function phpOpcacheBlacklist(version){
     });
 }
 
+function phpFpmRoot(version){
+    phpPost('get_fpm_file',version,{},function(data){
+        onlineEditFile(0, data['data']);
+    });
+}
+
 
 function getFpmConfig(version){
     phpPost('get_fpm_conf', version, {}, function(data){
