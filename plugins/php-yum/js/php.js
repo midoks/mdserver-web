@@ -139,7 +139,7 @@ function phpCommonFunc(version){
             <button class="btn btn-default btn-sm" onclick="getPHPInfo(\'' + version + '\')">查看phpinfo()</button>\
             <button class="btn btn-default btn-sm" onclick="phpPreload(\'' + version + '\')">预加载脚本</button>\
             <button class="btn btn-default btn-sm" onclick="phpOpcacheBlacklist(\'' + version + '\')">OPCACHE黑名单</button>\
-            <button class="btn btn-default btn-sm" onclick="phpPreload(\'' + version + '\')">预加载脚本</button>\
+            <button class="btn btn-default btn-sm" onclick="phpFpmRoot(\'' + version + '\')">PHP-FPM(global)</button>\
         </p>';
 
         $(".soft-man-con").html(con);
