@@ -72,8 +72,7 @@ def getFpmFile(version):
 
 def status(version):
     # ps -ef|grep 'php/81' |grep -v grep | grep -v python | awk '{print $2}
-    cmd = "ps -ef|grep 'php/" + version + \
-        "' |grep -v grep | grep -v python | awk '{print $2}'"
+    cmd = "ps -ef|grep 'php/" + version + "' |grep -v grep | grep -v python | awk '{print $2}'"
     data = mw.execShell(cmd)
     if data[0] == '':
         return 'stop'
@@ -169,6 +168,15 @@ def deleteConfList(version):
     enable_conf = getDstEnablePHP(version)
     if os.path.exists(enable_conf):
         os.remove(enable_conf)
+
+def phpFpmReplace(version):
+    desc_php_fpm = getServerDir() + '/' + version + '/fpm/php-fpm.conf'
+    if not os.path.exists(desc_php_fpm):
+        tpl_php_fpm = getPluginDir() + '/conf/php-fpm.conf'
+        content = mw.readFile(tpl_php_fpm)
+        content = contentReplace(content, version)
+        mw.writeFile(desc_php_fpm, content)
+    return True
 
 
 def initReplace(version):
