@@ -176,13 +176,15 @@ def getFpmFile(version):
     return getServerDir() + '/php' + version + '/php-fpm.conf'
 
 
-def deleteConfList(version):
+def getDstEnablePHP(version):
     sdir = mw.getServerDir()
-    enable_conf = sdir + '/web_conf/php/conf/enable-php-yum' + version + '.conf'
-    clist = (enable_conf)
-    for f in clist:
-        if os.path.exists(f):
-            os.remove(f)
+    dfile = sdir + '/web_conf/php/conf/enable-php-yum' + version + '.conf'
+    return dfile
+
+def deleteConfList(version):
+    enable_conf = getDstEnablePHP(version)
+    if os.path.exists(enable_conf):
+        os.remove(enable_conf)
 
 
 def phpFpmReplace(version):
