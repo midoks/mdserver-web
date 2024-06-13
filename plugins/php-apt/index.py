@@ -23,6 +23,9 @@ if mw.isAppleSystem():
     app_debug = True
 
 
+def localVersion(v):
+    return v[0:1]+v[2:3]
+
 def getPluginName():
     return 'php-apt'
 
@@ -186,7 +189,7 @@ def initReplace(version):
     makeOpConf(version)
     phpFpmWwwReplace(version)
 
-    install_ok = getAppDir() + "/" + version + "/install.ok"
+    install_ok = getAppDir() + "/" + localVersion(version) + "/install.ok"
     if not os.path.exists(install_ok):
         phpFpmReplace(version)
 
