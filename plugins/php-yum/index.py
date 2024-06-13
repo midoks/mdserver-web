@@ -179,8 +179,7 @@ def getFpmFile(version):
 def deleteConfList(version):
     sdir = mw.getServerDir()
     enable_conf = sdir + '/web_conf/php/conf/enable-php-yum' + version + '.conf'
-
-    clist = (status_conf, enable_conf)
+    clist = (enable_conf)
     for f in clist:
         if os.path.exists(f):
             os.remove(f)
@@ -202,7 +201,7 @@ def initReplace(version):
     install_ok = getAppDir() + "/" + version + "/install.ok"
     if not os.path.exists(install_ok):
         phpFpmReplace(version)
-        
+
         phpini = getConf(version)
         ssl_crt = mw.getSslCrt()
 
