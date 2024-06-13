@@ -23,9 +23,15 @@ if mw.isAppleSystem():
     app_debug = True
 
 
+def localVersion(v):
+    return v[0:1]+v[2:3]
+
 def getPluginName():
     return 'php-apt'
 
+
+def getAppDir():
+    return mw.getServerDir()+'/'+getPluginName()
 
 def getServerDir():
     return '/etc/php'
@@ -72,8 +78,7 @@ def getFpmFile(version):
 
 def status(version):
     # ps -ef|grep 'php/81' |grep -v grep | grep -v python | awk '{print $2}
-    cmd = "ps -ef|grep 'php/" + version + \
-        "' |grep -v grep | grep -v python | awk '{print $2}'"
+    cmd = "ps -ef|grep 'php/" + version + "' |grep -v grep | grep -v python | awk '{print $2}'"
     data = mw.execShell(cmd)
     if data[0] == '':
         return 'stop'
@@ -170,13 +175,32 @@ def deleteConfList(version):
     if os.path.exists(enable_conf):
         os.remove(enable_conf)
 
+def phpPrependFile(version):
+    app_start = getAppDir() + '/app_start.php'
+    if not os.path.exists(app_start):
+        tpl = getPluginDir() + '/conf/app_start.php'
+        content = mw.readFile(tpl)
+        content = contentReplace(content, version)
+        mw.writeFile(app_start, content)
+
+def phpFpmReplace(version):
+    desc_php_fpm = getServerDir() + '/' + version + '/fpm/php-fpm.conf'
+
+    tpl_php_fpm = getPluginDir() + '/conf/php-fpm.conf'
+    content = mw.readFile(tpl_php_fpm)
+    content = contentReplace(content, version)
+    mw.writeFile(desc_php_fpm, content)
+    return True
+
 
 def initReplace(version):
     makeOpConf(version)
     phpFpmWwwReplace(version)
 
-    install_ok = getServerDir() + "/" + version + "/install.ok"
+    install_ok = getAppDir() + "/" + localVersion(version) + "/install.ok"
     if not os.path.exists(install_ok):
+        phpFpmReplace(version)
+
         phpini = getConf(version)
         ssl_crt = mw.getSslCrt()
 
@@ -186,6 +210,8 @@ def initReplace(version):
         mw.execShell(cmd_curl)
 
         mw.writeFile(install_ok, 'ok')
+
+    phpPrependFile(version)
     # systemd
     # mw.execShell('systemctl daemon-reload')
     return 'ok'
@@ -197,8 +223,8 @@ def phpOp(version, method):
 
     if mw.isAppleSystem():
         return 'fail'
-    data = mw.execShell('systemctl ' + method + ' ' +
-                        'php' + version + '-fpm')
+    
+    data = mw.execShell('systemctl ' + method + ' ' +'php' + version + '-fpm')
     if data[1] == '':
         return 'ok'
     return data[1]
@@ -803,6 +829,13 @@ def uninstallLib(version):
     else:
         return mw.returnJson(False, '卸载错误信息!:' + data[1])
 
+def getConfAppStart():
+    pstart = mw.getServerDir() + '/php-apt/app_start.php'
+    return pstart
+
+def opcacheBlacklistFile():
+    op_bl = mw.getServerDir() + '/php-apt/opcache-blacklist.txt'
+    return op_bl
 
 def installPreInspection(version):
     sys = mw.execShell(
@@ -857,6 +890,10 @@ if __name__ == "__main__":
         print(fpmSlowLog(version))
     elif func == 'conf':
         print(getConf(version))
+    elif func == 'app_start':
+        print(getConfAppStart())
+    elif func == 'opcache_blacklist_file':
+        print(opcacheBlacklistFile())
     elif func == 'get_php_conf':
         print(getPhpConf(version))
     elif func == 'get_fpm_conf_file':

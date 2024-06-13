@@ -27,6 +27,9 @@ def getPluginName():
     return 'php-yum'
 
 
+def getAppDir():
+    return mw.getServerDir()+'/'+getPluginName()
+
 def getServerDir():
     return '/etc/opt/remi'
 
@@ -157,27 +160,50 @@ def phpFpmWwwReplace(version):
         content = contentReplace(content, version)
         mw.writeFile(service_php_fpm_mw, content)
 
+def phpPrependFile(version):
+    app_start = getAppDir() + '/app_start.php'
+    if not os.path.exists(app_start):
+        tpl = getPluginDir() + '/conf/app_start.php'
+        content = mw.readFile(tpl)
+        content = contentReplace(content, version)
+        mw.writeFile(app_start, content)
 
 def getFpmConfFile(version):
     return getServerDir() + '/php' + version + '/php-fpm.d/mw.conf'
 
 
-def deleteConfList(version):
-    sdir = mw.getServerDir()
-    enable_conf = sdir + '/web_conf/php/conf/enable-php-yum' + version + '.conf'
+def getFpmFile(version):
+    return getServerDir() + '/php' + version + '/php-fpm.conf'
 
-    clist = (status_conf, enable_conf)
-    for f in clist:
-        if os.path.exists(f):
-            os.remove(f)
+
+def getDstEnablePHP(version):
+    sdir = mw.getServerDir()
+    dfile = sdir + '/web_conf/php/conf/enable-php-yum' + version + '.conf'
+    return dfile
+
+def deleteConfList(version):
+    enable_conf = getDstEnablePHP(version)
+    if os.path.exists(enable_conf):
+        os.remove(enable_conf)
+
+
+def phpFpmReplace(version):
+    desc_php_fpm = getFpmFile(version)
+    tpl_php_fpm = getPluginDir() + '/conf/php-fpm.conf'
+    content = mw.readFile(tpl_php_fpm)
+    content = contentReplace(content, version)
+    mw.writeFile(desc_php_fpm, content)
+    return True
 
 
 def initReplace(version):
     makeOpenrestyConf(version)
     phpFpmWwwReplace(version)
 
-    install_ok = getServerDir() + "/" + version + "/install.ok"
+    install_ok = getAppDir() + "/" + version + "/install.ok"
     if not os.path.exists(install_ok):
+        phpFpmReplace(version)
+
         phpini = getConf(version)
         ssl_crt = mw.getSslCrt()
 
@@ -187,6 +213,7 @@ def initReplace(version):
         mw.execShell(cmd_curl)
         mw.writeFile(install_ok, 'ok')
 
+    phpPrependFile(version)
     # systemd
     # mw.execShell('systemctl daemon-reload')
     return 'ok'
@@ -227,8 +254,7 @@ def initdStatus(version):
     if mw.isAppleSystem():
         return "Apple Computer does not support"
 
-    shell_cmd = 'systemctl status php' + version + \
-        '-php-fpm | grep loaded | grep "enabled;"'
+    shell_cmd = 'systemctl status php' + version + '-php-fpm | grep loaded | grep "enabled;"'
     data = mw.execShell(shell_cmd)
     if data[0] == '':
         return 'fail'
@@ -700,8 +726,7 @@ def setDisableFunc(version):
 
     phpini = mw.readFile(filename)
     rep = "disable_functions\s*=\s*.*\n"
-    phpini = re.sub(rep, 'disable_functions = ' +
-                    disable_functions + "\n", phpini)
+    phpini = re.sub(rep, 'disable_functions = ' + disable_functions + "\n", phpini)
 
     msg = mw.getInfo('修改PHP-{1}的禁用函数为[{2}]', (version, disable_functions,))
     mw.writeLog('插件管理[PHP-YUM]', msg)
@@ -737,8 +762,8 @@ def getLibConf(version):
         return mw.returnJson(False, '指定PHP版本不存在!')
 
     # phpini = mw.readFile(fname)
-    content = mw.execShell('cat /etc/opt/remi/php' +
-                           version + "/php.d/* | grep -v '^;' |tr -s '\n'")
+    cmd = 'cat /etc/opt/remi/php' +version + "/php.d/* | grep -v '^;' |tr -s '\n'"
+    content = mw.execShell(cmd)
     content = content[0]
 
     libpath = getPluginDir() + '/versions/phplib.conf'
@@ -802,16 +827,23 @@ def uninstallLib(version):
     else:
         return mw.returnJson(False, '卸载错误信息!:' + data[1])
 
+def getConfAppStart():
+    pstart = mw.getServerDir() + '/php-yum/app_start.php'
+    return pstart
+
+def opcacheBlacklistFile():
+    op_bl = mw.getServerDir() + '/php-yum/opcache-blacklist.txt'
+    return op_bl
 
 def installPreInspection(version):
     try:
-        sys = mw.execShell(
-            "cat /etc/*-release | grep PRETTY_NAME |awk -F = '{print $2}' | awk -F '\"' '{print $2}'| awk '{print $1}'")
+        cmd = "cat /etc/*-release | grep PRETTY_NAME |awk -F = '{print $2}' | awk -F '\"' '{print $2}'| awk '{print $1}'"
+        sys = mw.execShell(cmd)
         if sys[1] != '':
             return '不支持该系统'
 
-        sys_id = mw.execShell(
-            "cat /etc/*-release | grep VERSION_ID | awk -F = '{print $2}' | awk -F '\"' '{print $2}'")
+        cmd = "cat /etc/*-release | grep VERSION_ID | awk -F = '{print $2}' | awk -F '\"' '{print $2}'"
+        sys_id = mw.execShell(cmd)
 
         sysName = sys[0].strip().lower()
         sysId = sys_id[0].strip()
@@ -820,7 +852,7 @@ def installPreInspection(version):
             return '暂时仅支持centos'
         return 'ok'
     except Exception as e:
-        return (str(e))
+        return str(e)
 
 
 if __name__ == "__main__":
@@ -856,10 +888,16 @@ if __name__ == "__main__":
         print(fpmSlowLog(version))
     elif func == 'conf':
         print(getConf(version))
+    elif func == 'app_start':
+        print(getConfAppStart())
+    elif func == 'opcache_blacklist_file':
+        print(opcacheBlacklistFile())
     elif func == 'get_php_conf':
         print(getPhpConf(version))
     elif func == 'get_fpm_conf_file':
         print(getFpmConfFile(version))
+    elif func == 'get_fpm_file':
+        print(getFpmFile(version))
     elif func == 'submit_php_conf':
         print(submitPhpConf(version))
     elif func == 'get_limit_conf':

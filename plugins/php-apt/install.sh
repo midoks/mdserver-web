@@ -73,6 +73,16 @@ if [ "${action}" == "uninstall" ] && [ -d ${serverPath}/php-apt/${type} ];then
 	#初始化 
 	cd ${rootPath} && python3 ${rootPath}/plugins/php-apt/index.py stop ${type}
 	cd ${rootPath} && python3 ${rootPath}/plugins/php-apt/index.py initd_uninstall ${type}
+
+	if [ -f /lib/systemd/system/php${apt_ver}-fpm.service ];then
+		rm -rf /lib/systemd/system/php${apt_ver}-fpm.service
+	fi
+
+	if [ -f /lib/systemd/system/system/php${apt_ver}-fpm.service ];then
+		rm -rf /lib/systemd/system/php${apt_ver}-fpm.service
+	fi
+
+	systemctl daemon-reload
 fi
 
 cd ${curPath} && sh -x $curPath/versions/$2/install.sh $1
