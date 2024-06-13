@@ -181,10 +181,13 @@ def phpFpmReplace(version):
 
 def initReplace(version):
     makeOpConf(version)
+
     phpFpmWwwReplace(version)
 
     install_ok = getServerDir() + "/" + version + "/install.ok"
     if not os.path.exists(install_ok):
+        phpFpmReplace(version)
+        
         phpini = getConf(version)
         ssl_crt = mw.getSslCrt()
 
