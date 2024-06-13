@@ -186,12 +186,23 @@ def deleteConfList(version):
             os.remove(f)
 
 
+def phpFpmReplace(version):
+    desc_php_fpm = getFpmFile(version)
+    tpl_php_fpm = getPluginDir() + '/conf/php-fpm.conf'
+    content = mw.readFile(tpl_php_fpm)
+    content = contentReplace(content, version)
+    mw.writeFile(desc_php_fpm, content)
+    return True
+
+
 def initReplace(version):
     makeOpenrestyConf(version)
     phpFpmWwwReplace(version)
 
     install_ok = getAppDir() + "/" + version + "/install.ok"
     if not os.path.exists(install_ok):
+        phpFpmReplace(version)
+        
         phpini = getConf(version)
         ssl_crt = mw.getSslCrt()
 
