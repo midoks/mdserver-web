@@ -177,11 +177,11 @@ def deleteConfList(version):
 
 def phpFpmReplace(version):
     desc_php_fpm = getServerDir() + '/' + version + '/fpm/php-fpm.conf'
-    if not os.path.exists(desc_php_fpm):
-        tpl_php_fpm = getPluginDir() + '/conf/php-fpm.conf'
-        content = mw.readFile(tpl_php_fpm)
-        content = contentReplace(content, version)
-        mw.writeFile(desc_php_fpm, content)
+
+    tpl_php_fpm = getPluginDir() + '/conf/php-fpm.conf'
+    content = mw.readFile(tpl_php_fpm)
+    content = contentReplace(content, version)
+    mw.writeFile(desc_php_fpm, content)
     return True
 
 
