@@ -714,8 +714,7 @@ def setDisableFunc(version):
 
     phpini = mw.readFile(filename)
     rep = "disable_functions\s*=\s*.*\n"
-    phpini = re.sub(rep, 'disable_functions = ' +
-                    disable_functions + "\n", phpini)
+    phpini = re.sub(rep, 'disable_functions = ' + disable_functions + "\n", phpini)
 
     msg = mw.getInfo('修改PHP-{1}的禁用函数为[{2}]', (version, disable_functions,))
     mw.writeLog('插件管理[PHP-YUM]', msg)
