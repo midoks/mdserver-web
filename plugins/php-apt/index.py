@@ -830,11 +830,11 @@ def uninstallLib(version):
         return mw.returnJson(False, '卸载错误信息!:' + data[1])
 
 def getConfAppStart():
-    pstart = mw.getServerDir() + '/php/app_start.php'
+    pstart = mw.getServerDir() + '/php-apt/app_start.php'
     return pstart
 
 def opcacheBlacklistFile():
-    op_bl = mw.getServerDir() + '/php/opcache-blacklist.txt'
+    op_bl = mw.getServerDir() + '/php-apt/opcache-blacklist.txt'
     return op_bl
 
 def installPreInspection(version):
