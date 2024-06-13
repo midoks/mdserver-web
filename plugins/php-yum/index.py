@@ -841,7 +841,7 @@ def installPreInspection(version):
             return '暂时仅支持centos'
         return 'ok'
     except Exception as e:
-        return (str(e))
+        return str(e)
 
 
 if __name__ == "__main__":
