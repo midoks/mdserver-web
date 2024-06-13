@@ -280,7 +280,7 @@ def getPidFile():
     return tmp.groups()[0].strip()
 
 
-def binLog():
+def binLog(version=''):
     args = getArgs()
     conf = getConf()
     con = mw.readFile(conf)
@@ -291,7 +291,7 @@ def binLog():
         con = con.replace('#log-bin=mysql-bin', 'log-bin=mysql-bin')
         con = con.replace('#binlog_format=mixed', 'binlog_format=mixed')
         mw.execShell('sync')
-        restart()
+        restart(version)
     else:
         path = getDataDir()
         if 'status' in args:
@@ -305,7 +305,7 @@ def binLog():
         con = con.replace('log-bin=mysql-bin', '#log-bin=mysql-bin')
         con = con.replace('binlog_format=mixed', '#binlog_format=mixed')
         mw.execShell('sync')
-        restart()
+        restart(version)
         mw.execShell('rm -f ' + path + '/mysql-bin.*')
 
     mw.writeFile(conf, con)
@@ -3549,7 +3549,7 @@ if __name__ == "__main__":
     elif func == 'conf':
         print(getConf())
     elif func == 'bin_log':
-        print(binLog())
+        print(binLog(version))
     elif func == 'binlog_list':
         print(binLogList())
     elif func == 'clean_bin_log':
