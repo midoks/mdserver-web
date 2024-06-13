@@ -803,6 +803,13 @@ def uninstallLib(version):
     else:
         return mw.returnJson(False, '卸载错误信息!:' + data[1])
 
+def getConfAppStart():
+    pstart = mw.getServerDir() + '/php/app_start.php'
+    return pstart
+
+def opcacheBlacklistFile():
+    op_bl = mw.getServerDir() + '/php/opcache-blacklist.txt'
+    return op_bl
 
 def installPreInspection(version):
     sys = mw.execShell(
@@ -857,6 +864,10 @@ if __name__ == "__main__":
         print(fpmSlowLog(version))
     elif func == 'conf':
         print(getConf(version))
+    elif func == 'app_start':
+        print(getConfAppStart())
+    elif func == 'opcache_blacklist_file':
+        print(opcacheBlacklistFile())
     elif func == 'get_php_conf':
         print(getPhpConf(version))
     elif func == 'get_fpm_conf_file':
