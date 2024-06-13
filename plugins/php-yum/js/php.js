@@ -136,7 +136,9 @@ function phpCommonFunc(version){
         </p>';
 
         con += '<hr/><p class="conf_p" style="text-align:center;">\
-            <button class="btn btn-default btn-sm" onclick="getPHPInfo(\'' + version + '\')">查看phpinfo()</button>  \
+            <button class="btn btn-default btn-sm" onclick="getPHPInfo(\'' + version + '\')">查看phpinfo()</button>\
+            <button class="btn btn-default btn-sm" onclick="phpPreload(\'' + version + '\')">预加载脚本</button>\
+            <button class="btn btn-default btn-sm" onclick="phpOpcacheBlacklist(\'' + version + '\')">OPCACHE黑名单</button>\
             <button class="btn btn-default btn-sm" onclick="phpPreload(\'' + version + '\')">预加载脚本</button>\
         </p>';
 
@@ -172,6 +174,12 @@ function setPHPMaxSize(version) {
 
 function phpPreload(version){
     phpPost('app_start',version,{},function(data){
+        onlineEditFile(0, data['data']);
+    });
+}
+
+function phpOpcacheBlacklist(version){
+    phpPost('opcache_blacklist_file',version,{},function(data){
         onlineEditFile(0, data['data']);
     });
 }
