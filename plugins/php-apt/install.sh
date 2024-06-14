@@ -110,6 +110,7 @@ if [ "${action}" == "install" ] && [ -d ${serverPath}/php-apt/${type} ];then
 	cd ${rootPath}/plugins/php-apt/versions && bash common.sh ${apt_ver} install mbstring
 	cd ${rootPath}/plugins/php-apt/versions && bash common.sh ${apt_ver} install zip
 	cd ${rootPath}/plugins/php-apt/versions && bash common.sh ${apt_ver} install mongodb
+	cd ${rootPath}/plugins/php-apt/versions && bash common.sh ${apt_ver} install opcache
 	echo "install PHP-APT[${type}] extend end"
 
 	if [ ! -f /usr/local/bin/composer ];then
