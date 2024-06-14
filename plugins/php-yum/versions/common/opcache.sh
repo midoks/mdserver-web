@@ -18,7 +18,7 @@ LIBNAME=opcache
 
 cfgDir=/etc/opt/remi
 
-OP_BL=${serverPath}/php-yum/opcache-blacklist.txt
+OP_BL=${serverPath}/server/php-yum/opcache-blacklist.txt
 if [ ! -f $OP_BL ];then
 	touch $OP_BL
 fi
