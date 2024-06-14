@@ -50,7 +50,6 @@ elif [ "$actionType" == 'uninstall' ];then
 	yum remove -y php${version}-php-${LIBNAME}
 	rm -rf $ext_file
 	echo 'cannot uninstall'
-	exit 1
 fi
 
 php_status=`systemctl status php${version}-php-fpm | grep inactive`
