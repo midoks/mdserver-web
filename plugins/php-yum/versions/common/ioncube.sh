@@ -58,8 +58,8 @@ Install_lib()
 
 	fi
 
-	echo "$extFile checking ..."
-	if [ ! -f "$extFile" ];then
+	echo "$extSoFile checking ..."
+	if [ ! -f "$extSoFile" ];then
 		echo "ERROR!"
 		return;
 	fi
