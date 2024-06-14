@@ -25,7 +25,7 @@ fi
 SORT_LIBNAME="10-${LIBNAME}"
 extVer=`bash $curPath/lib.sh $version`
 extFile=/opt/remi/php${version}/root/usr/lib64/php
-extSoFile=$extFile/${LIBNAME}.so
+extSoFile=$extFile/modules/${LIBNAME}.so
 cfgDir=/etc/opt/remi/php${version}/php.d
 extIni=${cfgDir}/10-${LIBNAME}.ini
 
