@@ -47,7 +47,7 @@ if [ "$actionType" == 'install' ];then
 	echo "opcache.save_comments=0" >> $ext_file
 	echo "opcache.blacklist_filename=${OP_BL}" >> $ext_file
 elif [ "$actionType" == 'uninstall' ];then
-	yum remove -y php${version}-php*-${extName}
+	yum remove -y php${version}-php-${LIBNAME}
 	rm -rf $ext_file
 	echo 'cannot uninstall'
 	exit 1
