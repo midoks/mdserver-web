@@ -43,11 +43,7 @@ min_ver=${version:0:1}.${version:1:2}
 
 Install_lib()
 {
-	if [ -f $extSoFile ];then
-		echo "php-$version 已安装${LIBNAME},请选择其它版本!"
-		return
-	fi
-	
+
 	if [ ! -f "$extFile" ];then
 
 		php_lib=$sourcePath/php_lib
