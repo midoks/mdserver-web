@@ -47,7 +47,7 @@ if [ "$action" == 'uninstall' ];then
 	elif [ -f $FILE_COMMON ];then
 		bash ${FILE_COMMON} uninstall ${version}
 	else
-		yum remove -y php${version}-php*-${extName}
+		yum remove -y php${version}-php-${extName}
 	fi
 fi
 
