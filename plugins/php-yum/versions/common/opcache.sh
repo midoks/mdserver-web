@@ -18,12 +18,34 @@ LIBNAME=opcache
 
 cfgDir=/etc/opt/remi
 
+OP_BL=${serverPath}/php-yum/opcache-blacklist.txt
+if [ ! -f $OP_BL ];then
+	touch $OP_BL
+fi
+ext_dir=${cfgDir}/php${version}/php.d
+ext_file=${ext_dir}/10-opcache.ini
+
 if [ "$actionType" == 'install' ];then
 	yum install -y php${version}-${LIBNAME}
 	echo "ls ${cfgDir}/php${version}/php.d | grep "${LIBNAME}""
 	find_opcache=`ls ${cfgDir}/php${version}/php.d | grep "${LIBNAME}"`
-	echo $find_opcache
+	if [ "$find_opcache" == "" ];then
+		echo "" >> $ext_file
+		echo "zend_extension=${LIBNAME}.so" >> $ext_file
+		echo "opcache.enable=1" >> $ext_file
+		echo "opcache.memory_consumption=128" >> $ext_file
+		echo "opcache.interned_strings_buffer=8" >> $ext_file
+		echo "opcache.max_accelerated_files=4000" >> $ext_file
+		echo "opcache.revalidate_freq=60" >> $ext_file
+		echo "opcache.fast_shutdown=1" >> $ext_file
+		echo "opcache.enable_cli=1" >> $ext_file
+		echo "opcache.jit=1205" >> $ext_file
+		echo "opcache.jit_buffer_size=64M" >> $ext_file
+		echo "opcache.save_comments=0" >> $ext_file
+		echo "opcache.blacklist_filename=${OP_BL}" >> $ext_file
+	fi
 elif [ "$actionType" == 'uninstall' ];then
+	rm -rf $ext_file
 	echo 'cannot uninstall'
 	exit 1
 fi
