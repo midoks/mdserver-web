@@ -4,7 +4,7 @@ export PATH
 export DEBIAN_FRONTEND=noninteractive
 
 apt install -y locate
-if [ -d /usr/share/locale/locale.alias ];then
+if [ ! -d /usr/share/locale/locale.alias ];then
     mkdir -p /usr/share/locale/locale.alias
 fi
 locale-gen en_US.UTF-8
