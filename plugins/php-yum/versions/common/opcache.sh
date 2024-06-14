@@ -25,6 +25,10 @@ fi
 ext_dir=${cfgDir}/php${version}/php.d
 ext_file=${ext_dir}/10-opcache.ini
 
+if [ -f ${ext_dir}/10-opcache.ini.rpmsave ];then
+	ext_file=${ext_dir}/10-opcache.ini.rpmsave
+fi
+
 echo $ext_file
 
 if [ "$actionType" == 'install' ];then
@@ -49,6 +53,7 @@ if [ "$actionType" == 'install' ];then
 	echo "opcache.save_comments=0" >> $ext_file
 	echo "opcache.blacklist_filename=${OP_BL}" >> $ext_file
 elif [ "$actionType" == 'uninstall' ];then
+	# yum remove -y php83-php-opcache
 	yum remove -y php${version}-php-${LIBNAME}
 	rm -rf $ext_file
 	echo 'cannot uninstall'
