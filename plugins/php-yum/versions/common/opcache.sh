@@ -29,21 +29,23 @@ if [ "$actionType" == 'install' ];then
 	yum install -y php${version}-php-${LIBNAME}
 	echo "ls ${cfgDir}/php${version}/php.d | grep "${LIBNAME}""
 	find_opcache=`ls ${cfgDir}/php${version}/php.d | grep "${LIBNAME}"`
-	if [ "$find_opcache" == "" ];then
-		echo "" >> $ext_file
-		echo "zend_extension=${LIBNAME}.so" >> $ext_file
-		echo "opcache.enable=1" >> $ext_file
-		echo "opcache.memory_consumption=128" >> $ext_file
-		echo "opcache.interned_strings_buffer=8" >> $ext_file
-		echo "opcache.max_accelerated_files=4000" >> $ext_file
-		echo "opcache.revalidate_freq=60" >> $ext_file
-		echo "opcache.fast_shutdown=1" >> $ext_file
-		echo "opcache.enable_cli=1" >> $ext_file
-		echo "opcache.jit=1205" >> $ext_file
-		echo "opcache.jit_buffer_size=64M" >> $ext_file
-		echo "opcache.save_comments=0" >> $ext_file
-		echo "opcache.blacklist_filename=${OP_BL}" >> $ext_file
+	echo $find_opcache
+	if [ "$find_opcache" != "" ];then
+		ext_file=${find_opcache}
 	fi
+	echo $ext_file
+	echo "zend_extension=${LIBNAME}.so" >> $ext_file
+	echo "opcache.enable=1" >> $ext_file
+	echo "opcache.memory_consumption=128" >> $ext_file
+	echo "opcache.interned_strings_buffer=8" >> $ext_file
+	echo "opcache.max_accelerated_files=4000" >> $ext_file
+	echo "opcache.revalidate_freq=60" >> $ext_file
+	echo "opcache.fast_shutdown=1" >> $ext_file
+	echo "opcache.enable_cli=1" >> $ext_file
+	echo "opcache.jit=1205" >> $ext_file
+	echo "opcache.jit_buffer_size=64M" >> $ext_file
+	echo "opcache.save_comments=0" >> $ext_file
+	echo "opcache.blacklist_filename=${OP_BL}" >> $ext_file
 elif [ "$actionType" == 'uninstall' ];then
 	yum remove -y php${version}-php*-${extName}
 	rm -rf $ext_file
