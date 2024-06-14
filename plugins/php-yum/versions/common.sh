@@ -31,7 +31,7 @@ if [ "$action" == 'install' ];then
 	elif [ -f $FILE_COMMON ];then
 		bash ${FILE_COMMON} install ${version}
 	else
-		yum install -y php${version}-php*-${extName}
+		yum install -y php${version}-php-${extName}
 	fi
 
 	# if [ "${extName}" == "mysql" ];then
