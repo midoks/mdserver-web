@@ -54,7 +54,7 @@ Install_lib()
 		fi 
 		cd $php_lib/ioncube
 		
-		cp -rf $php_lib/ioncube/ioncube_loader_lin_${version}.so $extFile
+		cp -rf $php_lib/ioncube/ioncube_loader_lin_${version}.so $extSoFile
 
 	fi
 
