@@ -17,7 +17,7 @@ sysName=`uname`
 LIBNAME=ioncube
 LIBV=0
 
-if [ `echo "$version > 8.2"|bc` -eq 1 ];then
+if [ `echo "$version > 82"|bc` -eq 1 ];then
 	echo "I won't support it"
 	exit 0
 fi
