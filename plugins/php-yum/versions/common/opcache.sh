@@ -25,6 +25,8 @@ fi
 ext_dir=${cfgDir}/php${version}/php.d
 ext_file=${ext_dir}/10-opcache.ini
 
+echo $ext_file
+
 if [ "$actionType" == 'install' ];then
 	yum install -y php${version}-php-${LIBNAME}
 	echo "ls ${cfgDir}/php${version}/php.d | grep "${LIBNAME}.ini"| cut -d \  -f 1"
@@ -54,6 +56,6 @@ fi
 echo "systemctl restart php${version}-php-fpm"
 php_status=`systemctl status php${version}-php-fpm | grep inactive`
 echo "php_status:${php_status}"
-if [ "$php_status" != "" ];then
+if [ "$php_status" == "" ];then
 	systemctl restart php${version}-php-fpm
 fi
