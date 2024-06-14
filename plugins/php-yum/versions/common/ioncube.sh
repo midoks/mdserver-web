@@ -22,7 +22,7 @@ if [ `echo "$version > 82"|bc` -eq 1 ];then
 	exit 0
 fi
 
-
+SORT_LIBNAME="10-${LIBNAME}"
 extVer=`bash $curPath/lib.sh $version`
 extFile=/opt/remi/php${version}/root/usr/lib64/php
 extSoFile=$extFile/${LIBNAME}.so
@@ -35,7 +35,8 @@ else
 	BAK=''
 fi
 
-SORT_LIBNAME="10-${LIBNAME}"
+
+min_ver=${version:0:1}.${version:1:2}
 
 Install_lib()
 {
@@ -54,7 +55,7 @@ Install_lib()
 		fi 
 		cd $php_lib/ioncube
 		
-		cp -rf $php_lib/ioncube/ioncube_loader_lin_${version}.so $extSoFile
+		cp -rf $php_lib/ioncube/ioncube_loader_lin_${min_ver}.so $extSoFile
 
 	fi
 
