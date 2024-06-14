@@ -33,7 +33,7 @@ if [ "$actionType" == 'install' ];then
 	find_opcache=`ls ${cfgDir}/php${version}/php.d | grep "${LIBNAME}.ini"| cut -d \  -f 1`
 	echo $find_opcache
 	if [ "$find_opcache" != "" ];then
-		ext_file=${find_opcache}
+		ext_file=${ext_dir}/${find_opcache}
 	fi
 	echo $ext_file
 	echo "zend_extension=${LIBNAME}" >> $ext_file
