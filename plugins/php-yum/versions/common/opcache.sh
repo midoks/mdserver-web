@@ -52,3 +52,5 @@ elif [ "$actionType" == 'uninstall' ];then
 	echo 'cannot uninstall'
 	exit 1
 fi
+
+systemctl restart php${version}-php-fpm
