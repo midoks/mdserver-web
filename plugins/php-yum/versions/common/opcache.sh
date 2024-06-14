@@ -19,7 +19,7 @@ LIBNAME=opcache
 cfgDir=/etc/opt/remi
 
 if [ "$actionType" == 'install' ];then
-	apt install -y php${version}-${LIBNAME}
+	yum install -y php${version}-${LIBNAME}
 	echo "ls ${cfgDir}/php${version}/php.d | grep "${LIBNAME}""
 	find_opcache=`ls ${cfgDir}/php${version}/php.d | grep "${LIBNAME}"`
 	echo $find_opcache
