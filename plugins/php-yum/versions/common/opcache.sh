@@ -51,8 +51,8 @@ elif [ "$actionType" == 'uninstall' ];then
 	rm -rf $ext_file
 	echo 'cannot uninstall'
 fi
-
+echo "systemctl restart php${version}-php-fpm"
 php_status=`systemctl status php${version}-php-fpm | grep inactive`
 if [ "$php_status" != "" ];then
-	systemctl ${action} php${version}-php-fpm
+	systemctl restart php${version}-php-fpm
 fi
