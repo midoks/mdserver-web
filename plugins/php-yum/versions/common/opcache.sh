@@ -34,7 +34,7 @@ if [ "$actionType" == 'install' ];then
 		ext_file=${find_opcache}
 	fi
 	echo $ext_file
-	echo "zend_extension=${LIBNAME}.so" >> $ext_file
+	echo "zend_extension=${LIBNAME}" >> $ext_file
 	echo "opcache.enable=1" >> $ext_file
 	echo "opcache.memory_consumption=128" >> $ext_file
 	echo "opcache.interned_strings_buffer=8" >> $ext_file
