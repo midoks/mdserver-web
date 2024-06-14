@@ -29,6 +29,9 @@ extSoFile=$extFile/modules/${LIBNAME}.so
 cfgDir=/etc/opt/remi/php${version}/php.d
 extIni=${cfgDir}/10-${LIBNAME}.ini
 
+echo $extSoFile
+echo $extIni
+
 if [ "$sysName" == "Darwin" ];then
 	BAK='_bak'
 else
