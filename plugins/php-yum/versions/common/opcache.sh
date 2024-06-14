@@ -16,27 +16,27 @@ version=$2
 sysName=`uname`
 LIBNAME=opcache
 
-ext_dir=/etc/php/${version}/fpm/conf.d
+cfgDir=/etc/opt/remi
+
+OP_BL=${serverPath}/server/php-yum/opcache-blacklist.txt
+if [ ! -f $OP_BL ];then
+	touch $OP_BL
+fi
+ext_dir=${cfgDir}/php${version}/php.d
 ext_file=${ext_dir}/10-opcache.ini
 
 echo $ext_file
 
-OP_BL=${serverPath}/server/php-apt/opcache-blacklist.txt
-if [ ! -f $OP_BL ];then
-	touch $OP_BL
-fi
-
 if [ "$actionType" == 'install' ];then
-	apt install -y php${version}-${LIBNAME}
-
-	echo "ls ${ext_dir} | grep "${LIBNAME}.ini"| cut -d \  -f 1"
-	find_opcache=`ls ${ext_dir} | grep "${LIBNAME}.ini"| cut -d \  -f 1`
+	yum install -y php${version}-php-${LIBNAME}
+	echo "ls ${cfgDir}/php${version}/php.d | grep "${LIBNAME}.ini"| cut -d \  -f 1"
+	find_opcache=`ls ${cfgDir}/php${version}/php.d | grep "${LIBNAME}.ini"| cut -d \  -f 1`
 	echo $find_opcache
 	if [ "$find_opcache" != "" ];then
 		ext_file=${ext_dir}/${find_opcache}
 	fi
 	echo $ext_file
-	echo "zend_extension=${LIBNAME}.so" >> $ext_file
+	echo "zend_extension=${LIBNAME}" >> $ext_file
 	echo "opcache.enable=1" >> $ext_file
 	echo "opcache.memory_consumption=128" >> $ext_file
 	echo "opcache.interned_strings_buffer=8" >> $ext_file
@@ -48,8 +48,13 @@ if [ "$actionType" == 'install' ];then
 	echo "opcache.jit_buffer_size=64M" >> $ext_file
 	echo "opcache.save_comments=0" >> $ext_file
 	echo "opcache.blacklist_filename=${OP_BL}" >> $ext_file
-
 elif [ "$actionType" == 'uninstall' ];then
+	if [ -f ${ext_dir}/10-opcache.ini.rpmsave ];then
+		ext_file=${ext_dir}/10-opcache.ini.rpmsave
+	fi
+
+	# yum remove -y php83-php-opcache
+	yum remove -y php${version}-php-${LIBNAME}
 	rm -rf $ext_file
 	echo 'cannot uninstall'
 fi

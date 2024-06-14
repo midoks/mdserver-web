@@ -290,7 +290,7 @@ function openFilename(obj){
 	var ext = getSuffixName(path);
 
 	// console.log(path,ext);
-	if (inArray(ext,['html','htm','php','txt','md','js','css','scss','json','c','h','pl','py','java','log','conf','sh','json'])){
+	if (inArray(ext,['html','htm','php','txt','md','js','css','scss','json','c','h','pl','py','java','log','conf','sh','json','ini'])){
 		onlineEditFile(0, path);
 	}
 

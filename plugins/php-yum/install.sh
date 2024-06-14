@@ -31,10 +31,11 @@ if [ ! -d $curPath/versions/$2 ];then
 	exit 0
 fi
 
+# cd /www/server/mdserver-web/plugins/php-yum/versions && bash common.sh 83 install opcache
 
 
 #获取信息和版本
-# bash /www/server/mdsever-web/scripts/getos.sh
+# bash /www/server/mdserver-web/scripts/getos.sh
 bash ${rootPath}/scripts/getos.sh
 OSNAME=`cat ${rootPath}/data/osname.pl`
 VERSION_ID=`cat /etc/*-release | grep VERSION_ID | awk -F = '{print $2}' | awk -F "\"" '{print $2}'`
