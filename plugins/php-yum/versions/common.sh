@@ -19,7 +19,7 @@ extName=$3
 # echo $serverPath
 
 FILE=${curPath}/${version}/${extName}.sh
-
+FILE_COMMON=${curPath}/common/${extName}.sh
 # yum install -y php81-php-yar
 # yum install -y php74-php-pecl-mysql
 
@@ -28,6 +28,8 @@ if [ "$action" == 'install' ];then
 	
 	if [ -f $FILE ];then
 		bash ${curPath}/${version}/${extName}.sh install
+	elif [ -f $FILE_COMMON ];then
+		bash ${FILE_COMMON} install ${version}
 	else
 		yum install -y php${version}-php*-${extName}
 	fi
@@ -37,12 +39,13 @@ if [ "$action" == 'install' ];then
 	# fi
 fi
 
-
 # yum remove -y php81-php-yar
 if [ "$action" == 'uninstall' ];then
 
 	if [ -f $FILE ];then
 		bash ${curPath}/${version}/${extName}.sh uninstall
+	elif [ -f $FILE_COMMON ];then
+		bash ${FILE_COMMON} uninstall ${version}
 	else
 		yum remove -y php${version}-php*-${extName}
 	fi
