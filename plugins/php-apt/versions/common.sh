@@ -28,9 +28,6 @@ FILE=${curPath}/${version}/${extName}.sh
 FILE_COMMON=${curPath}/common/${extName}.sh
 
 # apt install -y php81-php-yar
-
-
-
 if [ "$action" == 'install' ];then
 	
 	if [ -f $FILE ];then
@@ -41,7 +38,6 @@ if [ "$action" == 'install' ];then
 		apt install -y php${version}-${extName}
 	fi
 fi
-
 
 # apt remove -y php81-php-yar
 if [ "$action" == 'uninstall' ];then
