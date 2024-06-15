@@ -54,14 +54,17 @@ else
 	localedef -v -c -i en_US -f UTF-8 en_US.UTF-8 > /dev/null 2>&1
 fi
 
-apt-get update -y
+apt update -y
+apt autoremove -y
+
 apt install -y wget curl lsof unzip tar cron expect locate lrzsz
 apt install -y rar 
 apt install -y unrar
 apt install -y pv
 apt install -y bc
 apt install -y python3-pip python3-dev python3-venv
-
+apt install -y libncurses5
+apt install -y libncurses5-dev
 
 if [ -f /usr/sbin/ufw ];then
 	# look
@@ -189,7 +192,7 @@ apt install -y dia
 apt install -y pkg-config
 apt install -y zlib1g-dev
 
-apt install -y libevent-dev libncurses5-dev libldap2-dev
+apt install -y libevent-dev libldap2-dev
 apt install -y libzip-dev
 apt install -y libicu-dev
 apt install -y libyaml-dev 
