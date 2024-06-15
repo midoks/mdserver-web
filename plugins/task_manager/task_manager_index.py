@@ -1621,8 +1621,8 @@ def get_user_list(args = {}):
 def remove_user(args = {}):
     return mc_instance.remove_user(args)
 
-if __name__ == "__main__":
-    print(mc_instance.get_process_list())
+# if __name__ == "__main__":
+    # print(mc_instance.get_process_list())
     # print(mc_instance.get_network_list())
     # print(mc_instance.get_process_info({'pid':66647}))
     # for x in range(10):
