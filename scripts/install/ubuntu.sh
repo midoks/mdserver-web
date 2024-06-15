@@ -10,7 +10,6 @@ if grep -Eq "Ubuntu" /etc/*-release; then
 fi
 
 apt update -y
-apt-get update -y 
 
 apt install -y wget curl lsof unzip
 apt install -y rar unrar
