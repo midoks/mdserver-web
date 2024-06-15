@@ -83,6 +83,14 @@ fi
 echo "local:${LOCAL_ADDR}"
 
 if [ $OSNAME != "macos" ];then
+
+	if id www &> /dev/null ;then 
+	    echo ""
+	else
+	    groupadd www
+		useradd -g www -s /usr/sbin/nologin www
+	fi
+	
 	mkdir -p /www/server
 	mkdir -p /www/wwwroot
 	mkdir -p /www/wwwlogs
