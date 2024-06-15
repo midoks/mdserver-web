@@ -21,14 +21,6 @@ Install_app()
 	mkdir -p ${mariadbDir}
 	echo '正在安装脚本文件...' > $install_tmp
 
-	if id mysql &> /dev/null ;then 
-	    echo "mysql uid is `id -u www`"
-	    echo "mysql shell is `grep "^www:" /etc/passwd |cut -d':' -f7 `"
-	else
-	    groupadd mysql
-		useradd -g mysql mysql
-	fi
-
 	if [ "$sysName" != "Darwin" ];then
 		mkdir -p /var/log/mariadb
 		touch /var/log/mariadb/mariadb.log

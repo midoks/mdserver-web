@@ -23,6 +23,14 @@ install_tmp=${rootPath}/tmp/mw_install.pl
 action=$1
 type=$2
 
+if id mysql &> /dev/null ;then 
+    echo "mysql UID is `id -u mysql`"
+    echo "mysql Shell is `grep "^mysql:" /etc/passwd |cut -d':' -f7 `"
+else
+    groupadd mysql
+	useradd -g mysql -s /usr/sbin/nologin mysql
+fi
+
 if [ "${2}" == "" ];then
 	echo '缺少安装脚本...' > $install_tmp
 	exit 0
