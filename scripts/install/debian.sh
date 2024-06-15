@@ -55,6 +55,8 @@ else
 fi
 
 apt update -y
+apt autoremove -y
+
 apt install -y wget curl lsof unzip tar cron expect locate lrzsz
 apt install -y rar 
 apt install -y unrar
