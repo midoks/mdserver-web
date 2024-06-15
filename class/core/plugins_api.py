@@ -1093,7 +1093,7 @@ class plugins_api:
         if not package in sys.path:
             sys.path.append(package)
         eval_str = "__import__('" + script + "')." + func + '(' + args + ')'
-
+        newRet = None
         try:
             newRet = eval(eval_str)
         except Exception as e:
