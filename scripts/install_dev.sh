@@ -47,13 +47,13 @@ elif grep -Eqi "AlmaLinux" /etc/issue || grep -Eqi "AlmaLinux" /etc/*-release; t
 elif grep -Eqi "Amazon Linux" /etc/issue || grep -Eqi "Amazon Linux" /etc/*-release; then
 	OSNAME='amazon'
 	yum install -y wget zip unzip tar
+elif grep -Eqi "Ubuntu" /etc/issue || grep -Eqi "Ubuntu" /etc/*-release; then
+	OSNAME='ubuntu'
+	apt install -y wget zip unzip tar
 elif grep -Eqi "Debian" /etc/issue || grep -Eqi "Debian" /etc/*-release; then
 	OSNAME='debian'
 	apt update -y
 	apt install -y devscripts
-	apt install -y wget zip unzip tar
-elif grep -Eqi "Ubuntu" /etc/issue || grep -Eqi "Ubuntu" /etc/*-release; then
-	OSNAME='ubuntu'
 	apt install -y wget zip unzip tar
 else
 	OSNAME='unknow'
