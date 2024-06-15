@@ -849,7 +849,11 @@ class mainClass(object):
                     if p_state == 'running': info['activity'] += 1
                     if p_state in status_ps: p_state = status_ps[p_state]
                     tmp['exe'] = p.exe()
-                    tmp['name'] = p.name()
+
+                    try:
+                        tmp['name'] = p.name()
+                    except Exception as e:
+                        continue
                     tmp['pid'] = pid
                     tmp['ppid'] = p.ppid()
                     tmp['create_time'] = int(p.create_time())
