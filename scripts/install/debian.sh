@@ -54,7 +54,7 @@ else
 	localedef -v -c -i en_US -f UTF-8 en_US.UTF-8 > /dev/null 2>&1
 fi
 
-apt-get update -y
+apt update -y
 apt install -y wget curl lsof unzip tar cron expect locate lrzsz
 apt install -y rar 
 apt install -y unrar
