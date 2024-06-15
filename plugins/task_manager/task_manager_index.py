@@ -1569,57 +1569,59 @@ class mainClass(object):
             print(tmp['cpu_percent'])
 
 
-mc_instance = mainClass.instance()
-
 def get_network_list(args = {}):
-    return mc_instance.get_network_list(args)
+    return mainClass.instance().get_network_list(args)
 
 def get_process_list(args = {}):
-    return mc_instance.get_process_list(args)
+    try:
+        return mainClass.instance().get_process_list(args)
+    except Exception as e:
+        return str(e)
+    
 
 def kill_process(args = {}):
-    return mc_instance.kill_process(args)
+    return mainClass.instance().kill_process(args)
 
 def kill_process_all(args = {}):
     if not 'pid' in args:
             return mw.returnData(False, '缺少参数!')
-    return mc_instance.kill_process_all(int(args['pid']))
+    return mainClass.instance().kill_process_all(int(args['pid']))
 
 def set_meter_head(args = {}):
-    return mc_instance.set_meter_head(args)
+    return mainClass.instance().set_meter_head(args)
 
 def remove_service(args = {}):
-    return mc_instance.remove_service(args)
+    return mainClass.instance().remove_service(args)
 
 def set_runlevel_state(args = {}):
-    return mc_instance.set_runlevel_state(args)
+    return mainClass.instance().set_runlevel_state(args)
 
 def get_service_list(args = {}):
-    return mc_instance.get_service_list(args)
+    return mainClass.instance().get_service_list(args)
 
 def get_run_list(args = {}):
-    return mc_instance.get_run_list(args)
+    return mainClass.instance().get_run_list(args)
 
 def get_cron_list(args = {}):
-    return mc_instance.get_cron_list(args)
+    return mainClass.instance().get_cron_list(args)
 
 def remove_cron(args = {}):
-    return mc_instance.remove_cron(args)
+    return mainClass.instance().remove_cron(args)
 
 def pkill_session(args = {}):
-    return mc_instance.pkill_session(args)
+    return mainClass.instance().pkill_session(args)
 
 def get_who(args = {}):
-    return mc_instance.get_who(args)
+    return mainClass.instance().get_who(args)
 
 def get_process_info(args = {}):
-    return mc_instance.get_process_info(args)
+    return mainClass.instance().get_process_info(args)
 
 def get_user_list(args = {}):
-    return mc_instance.get_user_list(args)
+    return mainClass.instance().get_user_list(args)
 
 def remove_user(args = {}):
-    return mc_instance.remove_user(args)
+    return mainClass.instance().remove_user(args)
 
 # if __name__ == "__main__":
     # print(mc_instance.get_process_list())
