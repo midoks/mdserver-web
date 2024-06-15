@@ -81,6 +81,7 @@ if [ ! -z "$cn" ] || [ "$?" == "0" ] ;then
 fi
 
 echo "local:${LOCAL_ADDR}"
+echo "OSNAME:${OSNAME}"
 
 if [ $OSNAME != "macos" ];then
 
