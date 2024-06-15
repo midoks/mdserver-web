@@ -102,13 +102,6 @@ rm -rf $myDir
 Install_mysql()
 {
 	echo '正在安装脚本文件...' > $install_tmp
-	if id mysql &> /dev/null ;then 
-	    echo "mysql uid is `id -u mysql`"
-	    echo "mysql shell is `grep "^mysql:" /etc/passwd |cut -d':' -f7 `"
-	else
-	    groupadd mysql
-		useradd -g mysql mysql
-	fi
 
 	isApt=`which apt`
 	if [ "$isApt" != "" ];then

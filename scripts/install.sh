@@ -83,7 +83,7 @@ if [ $OSNAME != "macos" ];then
 	    echo ""
 	else
 	    groupadd www
-		useradd -g www -s /bin/bash www
+		useradd -g www -s /usr/sbin/nologin www
 	fi
 
 	mkdir -p /www/server
