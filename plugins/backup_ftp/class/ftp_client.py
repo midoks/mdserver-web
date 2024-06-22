@@ -58,7 +58,7 @@ class FtpPSClient:
     default_backup_path = "/backup/"
     config_file = "cfg.json"
 
-    def __init__(self, load_config=True, timeout=10):
+    def __init__(self, load_config=True, timeout=600):
         self.timeout = timeout
         if load_config:
             data = self.get_config()
