@@ -389,14 +389,12 @@ def makeDbToSphinx():
 
 def updateAll():
     data = sphinxConfParse()
-    print(data)
-
+    # print(data)
     cmd = data['cmd']
     index = data['index']
 
     for x in range(len(index)):
         cmd_index = cmd + ' ' + index[x]['index'] + ' --rotate'
-        print(cmd_index)
         os.system(cmd_index)
     return True
 
