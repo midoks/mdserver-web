@@ -395,7 +395,8 @@ def updateAll():
     index = data['index']
 
     for x in index:
-        print(index[x])
+        cmd_index = cmd + ' ' + index[x]['index']
+        print(cmd_index)
         # os.system()
 
 if __name__ == "__main__":
