@@ -394,10 +394,11 @@ def updateAll():
     cmd = data['cmd']
     index = data['index']
 
-    for x in index:
-        cmd_index = cmd + ' ' + index[x]['index']
+    for x in range(len(index)):
+        cmd_index = cmd + ' ' + index[x]['index'] + ' --rotate'
         print(cmd_index)
-        # os.system()
+        os.system(cmd_index)
+    return True
 
 if __name__ == "__main__":
     func = sys.argv[1]
