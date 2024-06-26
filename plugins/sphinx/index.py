@@ -388,7 +388,8 @@ def makeDbToSphinx():
 
 
 def updateAll():
-    pass
+    data = sphinxConfParse()
+    print(data)
 
 if __name__ == "__main__":
     func = sys.argv[1]
