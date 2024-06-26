@@ -253,9 +253,6 @@ def cleanLog():
                 cleanDirLog(abspath)
                 continue
 
-def updateAll():
-    pass
-
     
 if __name__ == "__main__":
     func = sys.argv[1]
@@ -277,7 +274,5 @@ if __name__ == "__main__":
         cleanLog()
     elif func == 'clean_run':
         print(cleanRun())
-    elif func == 'update_all':
-        print(updateAll())
     else:
         print('error')
