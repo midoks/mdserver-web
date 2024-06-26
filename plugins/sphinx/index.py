@@ -192,10 +192,14 @@ def sphOp(method):
 
 
 def start():
+    import tool_cron
+    tool_cron.createBgTask()
     return sphOp('start')
 
 
 def stop():
+    import tool_cron
+    tool_cron.removeBgTask()
     return sphOp('stop')
 
 
@@ -383,6 +387,41 @@ def makeDbToSphinx():
     return mw.returnJson(True,'测试中')
 
 
+# 全量更新
+def updateAll():
+    data = sphinxConfParse()
+    cmd = data['cmd']
+    if not 'index' in data:
+        return '无更新'
+    index = data['index']
+
+    for x in range(len(index)):
+        cmd_index = cmd + ' ' + index[x]['index'] + ' --rotate'
+        print(cmd_index)
+        os.system(cmd_index)
+    return ''
+
+#增量更新
+def updateDelta():
+    data = sphinxConfParse()
+    cmd = data['cmd']
+    if not 'index' in data:
+        return '无更新'
+    index = data['index']
+
+    for x in range(len(index)):
+        if 'delta' in index[x]:
+            cmd_index = cmd + ' ' + index[x]['delta'] + ' --rotate'
+            print(cmd_index)
+            os.system(cmd_index)
+
+            cmd_index_merge = cmd + ' --merge ' + index[x]['index'] + ' ' + index[x]['delta'] + ' --rotate'
+            print(cmd_index_merge)
+            os.system(cmd_index_merge)
+        else:
+            print(index[x]['index'],'no delta')
+
+    return ''
 
 if __name__ == "__main__":
     func = sys.argv[1]
@@ -420,5 +459,9 @@ if __name__ == "__main__":
         print(sphinxCmd())
     elif func == 'db_to_sphinx':
         print(makeDbToSphinx())
+    elif func == 'update_all':
+        print(updateAll())
+    elif func == 'update_delta':
+        print(updateDelta())
     else:
         print('error')

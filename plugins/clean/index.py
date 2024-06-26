@@ -253,6 +253,7 @@ def cleanLog():
                 cleanDirLog(abspath)
                 continue
 
+    
 if __name__ == "__main__":
     func = sys.argv[1]
     if func == 'status':
