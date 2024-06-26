@@ -387,6 +387,8 @@ def makeDbToSphinx():
     return mw.returnJson(True,'测试中')
 
 
+def updateAll():
+    pass
 
 if __name__ == "__main__":
     func = sys.argv[1]
@@ -424,5 +426,7 @@ if __name__ == "__main__":
         print(sphinxCmd())
     elif func == 'db_to_sphinx':
         print(makeDbToSphinx())
+    elif func == 'update_all':
+        print(updateAll())
     else:
         print('error')
