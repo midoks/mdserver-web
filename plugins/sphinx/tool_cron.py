@@ -40,7 +40,7 @@ def getConfigData():
     return {
         "task_id": -1,
         "period": "day-n",
-        "where1": "7",
+        "where1": "1",
         "hour": "0",
         "minute": "15",
     }
