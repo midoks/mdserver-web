@@ -391,6 +391,13 @@ def updateAll():
     data = sphinxConfParse()
     print(data)
 
+    cmd = data['cmd']
+    index = data['index']
+
+    for x in index:
+        print(index[x])
+        # os.system()
+
 if __name__ == "__main__":
     func = sys.argv[1]
     if func == 'status':
