@@ -125,7 +125,7 @@ logs_file=$plugin_path/${rname}.log
         mw.writeFile(getTaskConf(), json.dumps(args))
 
 def createBgTaskDeltaByName(name):
-    args = getConfigData()
+    args = getConfigDeltaData()
     _name = "[勿删]Sphinx增量更新[" + name + "]"
     res = mw.M("crontab").field("id, name").where("name=?", (_name,)).find()
     if res:
