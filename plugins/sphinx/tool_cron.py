@@ -28,7 +28,7 @@ def getServerDir():
 
 
 def getTaskConf():
-    conf = getServerDir() + "/task_config.json"
+    conf = getServerDir() + "/cron_config.json"
     return conf
 
 
