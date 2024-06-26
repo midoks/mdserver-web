@@ -414,6 +414,13 @@ def updateDelta():
             cmd_index = cmd + ' ' + index[x]['delta'] + ' --rotate'
             print(cmd_index)
             os.system(cmd_index)
+
+            cmd_index_merge = cmd + ' --merge ' + index[x]['index'] + ' ' + index[x]['delta'] + ' --rotate'
+            print(cmd_index_merge)
+            os.system(cmd_index_merge)
+        else:
+            pass
+
     return ''
 
 if __name__ == "__main__":
