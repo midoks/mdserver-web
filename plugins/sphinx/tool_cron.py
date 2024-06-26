@@ -53,7 +53,7 @@ def createBgTask():
 
 def createBgTaskByName(name):
     args = getConfigData()
-    _name = "[勿删]SPHINX全量更新[" + name + "]"
+    _name = "[勿删]Sphinx全量更新[" + name + "]"
     res = mw.M("crontab").field("id, name").where("name=?", (_name,)).find()
     if res:
         return True
@@ -115,7 +115,7 @@ def removeBgTask():
             data = api.delete(cfg["task_id"])
             if data[0]:
                 cfg["task_id"] = -1
-                mw.writeFile(getTaskConf(), json.loads(cfg))
+                mw.writeFile(getTaskConf(), json.dumps(cfg))
                 return True
     return False
 

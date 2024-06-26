@@ -115,7 +115,7 @@ def removeBgTask():
             data = api.delete(cfg["task_id"])
             if data[0]:
                 cfg["task_id"] = -1
-                mw.writeFile(getTaskConf(), json.loads(cfg))
+                mw.writeFile(getTaskConf(), json.dumps(cfg))
                 return True
     return False
 
