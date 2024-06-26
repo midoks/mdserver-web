@@ -387,16 +387,35 @@ def makeDbToSphinx():
     return mw.returnJson(True,'测试中')
 
 
+# 全量更新
 def updateAll():
     data = sphinxConfParse()
-    # print(data)
     cmd = data['cmd']
+    if not 'index' in data:
+        return '无更新'
     index = data['index']
 
     for x in range(len(index)):
         cmd_index = cmd + ' ' + index[x]['index'] + ' --rotate'
         os.system(cmd_index)
-    return True
+    return ''
+
+#增量更新
+def updateDelta():
+    data = sphinxConfParse()
+    cmd = data['cmd']
+
+    if not 'index' in data:
+        return '无更新'
+    index = data['index']
+    if not 'delta' in data:
+        return '无增量更新'
+    delta = data['delta']
+
+    for x in range(len(index)):
+        cmd_index = cmd + ' ' + index[x]['delta'] + ' --rotate'
+        os.system(cmd_index)
+    return ''
 
 if __name__ == "__main__":
     func = sys.argv[1]
@@ -436,5 +455,7 @@ if __name__ == "__main__":
         print(makeDbToSphinx())
     elif func == 'update_all':
         print(updateAll())
+    elif func == 'update_delta':
+        print(updateDelta())
     else:
         print('error')
