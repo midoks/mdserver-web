@@ -397,6 +397,7 @@ def updateAll():
 
     for x in range(len(index)):
         cmd_index = cmd + ' ' + index[x]['index'] + ' --rotate'
+        print(cmd_index)
         os.system(cmd_index)
     return ''
 
@@ -404,17 +405,15 @@ def updateAll():
 def updateDelta():
     data = sphinxConfParse()
     cmd = data['cmd']
-
     if not 'index' in data:
         return '无更新'
     index = data['index']
-    if not 'delta' in data:
-        return '无增量更新'
-    delta = data['delta']
 
     for x in range(len(index)):
-        cmd_index = cmd + ' ' + index[x]['delta'] + ' --rotate'
-        os.system(cmd_index)
+        if 'delta' in index[x]:
+            cmd_index = cmd + ' ' + index[x]['delta'] + ' --rotate'
+            print(cmd_index)
+            os.system(cmd_index)
     return ''
 
 if __name__ == "__main__":
