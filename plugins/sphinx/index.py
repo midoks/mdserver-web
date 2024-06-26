@@ -192,6 +192,8 @@ def sphOp(method):
 
 
 def start():
+    import tool_cron
+    tool_cron.createBgTask()
     return sphOp('start')
 
 
