@@ -198,6 +198,8 @@ def start():
 
 
 def stop():
+    import tool_cron
+    tool_cron.removeBgTask()
     return sphOp('stop')
 
 
