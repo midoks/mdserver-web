@@ -86,6 +86,7 @@ def initConf():
             "/var/log/debug.*",
             "/var/log/syslog.*",
             "/var/log/btmp.*",
+            "/var/log/sa/sa*",
 
             "/var/log/dpkg.log.*",
             "/var/log/alternatives.log.*",
