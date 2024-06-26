@@ -419,7 +419,7 @@ def updateDelta():
             print(cmd_index_merge)
             os.system(cmd_index_merge)
         else:
-            pass
+            print(index[x]['index'],'no delta')
 
     return ''
 
