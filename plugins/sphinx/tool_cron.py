@@ -64,9 +64,12 @@ def getConfigDeltaData():
 
 
 def createBgTask():
-    # removeBgTask()
+    removeBgTask()
+    removeDeltaBgTask()
+
     createBgTaskByName(getPluginName())
     createBgTaskDeltaByName(getPluginName())
+    return True
 
 
 def createBgTaskByName(name):
