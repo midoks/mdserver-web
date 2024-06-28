@@ -539,6 +539,10 @@ fi''' % (mw.getRunDir(),)
             head = head + start_head + source_bin_activate + "\n"
             log = '.log'
 
+            #所有
+            if param['sname'] == 'ALL':
+                log = ''
+
             script_dir = mw.getRunDir() + "/scripts"
             source_stype = 'database'
             if stype.find('database_') > -1:
