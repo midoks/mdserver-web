@@ -358,49 +358,49 @@ function planAdd(){
 }
 
 //批量添加任务
-function allAddCrontab(dataList,successCount,errorMsg){
-	if(dataList.length < 1) {
-		layer.msg(lan.get('add_all_task_ok',[successCount]),{icon:1});
-		return;
-	}
-	var loadT = layer.msg(lan.get('add',[dataList[0]]),{icon:16,time:0,shade: [0.3, '#000']});
-	var sType = $(".planjs").find("b").attr("val");
-	var minute = parseInt($("#cronConfig input[name='minute']").val());
-	var hour = parseInt($("#cronConfig input[name='hour']").val());
-	var sTitle = (sType == 'site')?lan.crontab.backup_site:lan.crontab.backup_database;
-	if(sType == 'logs') sTitle = lan.crontab.backup_log;
-	minute += 5;
-	if(hour !== '' && minute > 59){
-		if(hour >= 23) hour = 0;
-		$("#cronConfig input[name='hour']").val(hour+1);
-		minute = 5;
-	}
-	$("#cronConfig input[name='minute']").val(minute);
-	$("#cronConfig input[name='name']").val(sTitle + '['+dataList[0]+']');
-	$("#cronConfig input[name='sName']").val(dataList[0]);
-	var pdata = $("#cronConfig").serialize() + '&sBody=&urladdress=';
-	$.ajax({
-		type:'POST',
-		url:'/crontab/add',
-		data:pdata,
-		async: true,
-		success:function(frdata){
-			layer.close(loadT);
-			if(frdata.status){
-				successCount++;
-				getCronData(1);
-			}else{
-				if(!errorMsg){
-					errorMsg = '<br><p>'+lan.crontab.backup_all_err+'</p>';
-				}
-				errorMsg += '<li>'+dataList[0]+' -> '+frdata.msg+'</li>'
-			}
+// function allAddCrontab(dataList,successCount,errorMsg){
+// 	if(dataList.length < 1) {
+// 		layer.msg(lan.get('add_all_task_ok',[successCount]),{icon:1});
+// 		return;
+// 	}
+// 	var loadT = layer.msg(lan.get('add',[dataList[0]]),{icon:16,time:0,shade: [0.3, '#000']});
+// 	var sType = $(".planjs").find("b").attr("val");
+// 	var minute = parseInt($("#cronConfig input[name='minute']").val());
+// 	var hour = parseInt($("#cronConfig input[name='hour']").val());
+// 	var sTitle = (sType == 'site')?lan.crontab.backup_site:lan.crontab.backup_database;
+// 	if(sType == 'logs') sTitle = lan.crontab.backup_log;
+// 	minute += 5;
+// 	if(hour !== '' && minute > 59){
+// 		if(hour >= 23) hour = 0;
+// 		$("#cronConfig input[name='hour']").val(hour+1);
+// 		minute = 5;
+// 	}
+// 	$("#cronConfig input[name='minute']").val(minute);
+// 	$("#cronConfig input[name='name']").val(sTitle + '['+dataList[0]+']');
+// 	$("#cronConfig input[name='sName']").val(dataList[0]);
+// 	var pdata = $("#cronConfig").serialize() + '&sBody=&urladdress=';
+// 	$.ajax({
+// 		type:'POST',
+// 		url:'/crontab/add',
+// 		data:pdata,
+// 		async: true,
+// 		success:function(frdata){
+// 			layer.close(loadT);
+// 			if(frdata.status){
+// 				successCount++;
+// 				getCronData(1);
+// 			}else{
+// 				if(!errorMsg){
+// 					errorMsg = '<br><p>'+lan.crontab.backup_all_err+'</p>';
+// 				}
+// 				errorMsg += '<li>'+dataList[0]+' -> '+frdata.msg+'</li>'
+// 			}
 			
-			dataList.splice(0,1);
-			allAddCrontab(dataList,successCount,errorMsg);
-		}
-	});
-}
+// 			dataList.splice(0,1);
+// 			allAddCrontab(dataList,successCount,errorMsg);
+// 		}
+// 	});
+// }
 
 initDropdownMenu();
 function initDropdownMenu(){
