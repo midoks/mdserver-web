@@ -86,6 +86,8 @@ def initConf():
             "/var/log/debug.*",
             "/var/log/syslog.*",
             "/var/log/btmp.*",
+            "/var/log/sa/sa*",
+            "/var/log/anaconda/*.log",
 
             "/var/log/dpkg.log.*",
             "/var/log/alternatives.log.*",
@@ -98,6 +100,7 @@ def initConf():
             "/var/log/*.log.*",
 
             "/var/log/audit/audit.log.*",
+            "/var/log/hawkey.log-*",
             "/var/log/apt/*.gz",
             "/var/log/apt/*.xz",
             "/var/log/rhsm/rhsm.log-*",
