@@ -124,10 +124,13 @@ class logs_api:
             if log_suffix[0] in ['gz', 'xz', 'bz2', 'asl']:
                 continue
 
-            if log_file in ['.', '..', 'faillog', 'fontconfig.log', 'unattended-upgrades', 'tallylog']:
+            if log_file in ['.', '..']:
                 continue
 
             filename = os.path.join(log_dir, log_file)
+            if not os.path.exists(filename):
+                continue
+
             if os.path.isfile(filename):
                 file_size = os.path.getsize(filename)
                 if not file_size:
