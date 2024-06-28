@@ -539,6 +539,10 @@ fi''' % (mw.getRunDir(),)
             head = head + start_head + source_bin_activate + "\n"
             log = '.log'
 
+            #所有
+            if param['sname'] == 'ALL':
+                log = ''
+
             script_dir = mw.getRunDir() + "/scripts"
             source_stype = 'database'
             if stype.find('database_') > -1:
@@ -575,7 +579,7 @@ fi''' % (mw.getRunDir(),)
                 else:
                     shell = head + param['sbody'].replace("\r\n", "\n")
 
-                shell += '''
+            shell += '''
 echo "----------------------------------------------------------------------------"
 endDate=`date +"%Y-%m-%d %H:%M:%S"`
 END_MW_SHELL_TIME=`date +"%s"`

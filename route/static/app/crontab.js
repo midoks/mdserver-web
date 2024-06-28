@@ -209,10 +209,10 @@ function planAdd(){
 		layer.msg('任务名称不能为空!',{icon:2});
 		return;
 	}
-	$("#set-Config input[name='name']").val(name);
+	$("#cronConfig input[name='name']").val(name);
 	
 	var type = $(".plancycle").find("b").attr("val");
-	$("#set-Config input[name='type']").val(type);
+	$("#cronConfig input[name='type']").val(type);
 
 	
 	var is1;
@@ -233,7 +233,7 @@ function planAdd(){
 	}
 	
 	var where1 = $('#excode_week b').attr('val');
-	$("#set-Config input[name='where1']").val(where1);
+	$("#cronConfig input[name='where1']").val(where1);
 
 	if(where1 > is1 || where1 < is2){
 		$("#ptime input[name='where1']").focus();
@@ -247,14 +247,14 @@ function planAdd(){
 		layer.msg('小时值不合法!',{icon:2});
 		return;
 	}
-	$("#set-Config input[name='hour']").val(hour);
+	$("#cronConfig input[name='hour']").val(hour);
 	var minute = $("#ptime input[name='minute']").val();
 	if(minute > 59 || minute < 0){
 		$("#ptime input[name='minute']").focus();
 		layer.msg('分钟值不合法!',{icon:2});
 		return;
 	}
-	$("#set-Config input[name='minute']").val(minute);
+	$("#cronConfig input[name='minute']").val(minute);
 	
 	var save = $("#save").val();
 	if(save < 0){
@@ -262,8 +262,8 @@ function planAdd(){
 		return;
 	}
 	
-	$("#set-Config input[name='save']").val(save);
-	$("#set-Config input[name='week']").val($(".planweek").find("b").attr("val"));
+	$("#cronConfig input[name='save']").val(save);
+	$("#cronConfig input[name='week']").val($(".planweek").find("b").attr("val"));
 
 	var sType = $(".planjs").find("b").attr("val");
 	var sBody = encodeURIComponent($("#implement textarea[name='sBody']").val());
@@ -292,9 +292,9 @@ function planAdd(){
 		}
 	}
 	// urladdress = encodeURIComponent(urladdress);
-	$("#set-Config input[name='urladdress']").val(urladdress);
-	$("#set-Config input[name='sType']").val(sType);
-	$("#set-Config textarea[name='sBody']").val(decodeURIComponent(sBody));
+	$("#cronConfig input[name='urladdress']").val(urladdress);
+	$("#cronConfig input[name='sType']").val(sType);
+	$("#cronConfig textarea[name='sBody']").val(decodeURIComponent(sBody));
 	
 	if(sType == 'site' || sType == 'database' || sType == 'path'){
 		var backupTo = $(".planBackupTo").find("b").attr("val");
@@ -303,45 +303,45 @@ function planAdd(){
 	
 	var sName = $("#sName").attr("val");
 	
-	if(sName == 'backupAll'){
-		var alist = $("ul[aria-labelledby='backdata'] li a");
-		var dataList = new Array();
-		for(var i=1;i<alist.length;i++){
-			var tmp = alist[i].getAttribute('value');
-			dataList.push(tmp);
-		}
-		if(dataList.length < 1){
-			layer.msg('对象列表为空，无法继续!',{icon:5});
-			return;
-		}
-		allAddCrontab(dataList,0,'');
-		return;
-	}
+	// if(sName == 'backupAll'){
+	// 	var alist = $("ul[aria-labelledby='backdata'] li a");
+	// 	var dataList = new Array();
+	// 	for(var i=1;i<alist.length;i++){
+	// 		var tmp = alist[i].getAttribute('value');
+	// 		dataList.push(tmp);
+	// 	}
+	// 	if(dataList.length < 1){
+	// 		layer.msg('对象列表为空，无法继续!',{icon:5});
+	// 		return;
+	// 	}
+	// 	allAddCrontab(dataList,0,'');
+	// 	return;
+	// }
 
 	if (type == 'minute-n'){
 		var where1 = $("#ptime input[name='where1']").val();
-		$("#set-Config input[name='where1']").val(where1);
+		$("#cronConfig input[name='where1']").val(where1);
 	}
 
 	if (type == 'day-n'){
 		var where1 = $("#ptime input[name='where1']").val();
-		$("#set-Config input[name='where1']").val(where1);
+		$("#cronConfig input[name='where1']").val(where1);
 	}
 
 	if (type == 'hour-n'){
 		var where1 = $("#ptime input[name='where1']").val();
-		$("#set-Config input[name='where1']").val(where1);
+		$("#cronConfig input[name='where1']").val(where1);
 	}
 
 	if (type == 'month'){
 		var where1 = $("#ptime input[name='where1']").val();
-		$("#set-Config input[name='where1']").val(where1);
+		$("#cronConfig input[name='where1']").val(where1);
 	}
 	
 	
-	$("#set-Config input[name='sName']").val(sName);
+	$("#cronConfig input[name='sName']").val(sName);
 	layer.msg('正在添加,请稍候...!',{icon:16,time:0,shade: [0.3, '#000']});
-	var data = $("#set-Config").serialize() + '&sBody='+sBody + '&urladdress=' + urladdress;
+	var data = $("#cronConfig").serialize() + '&sBody='+sBody + '&urladdress=' + urladdress;
 	// console.log(data);
 	$.post('/crontab/add',data,function(rdata){
 		if(!rdata.status) {
@@ -365,20 +365,20 @@ function allAddCrontab(dataList,successCount,errorMsg){
 	}
 	var loadT = layer.msg(lan.get('add',[dataList[0]]),{icon:16,time:0,shade: [0.3, '#000']});
 	var sType = $(".planjs").find("b").attr("val");
-	var minute = parseInt($("#set-Config input[name='minute']").val());
-	var hour = parseInt($("#set-Config input[name='hour']").val());
+	var minute = parseInt($("#cronConfig input[name='minute']").val());
+	var hour = parseInt($("#cronConfig input[name='hour']").val());
 	var sTitle = (sType == 'site')?lan.crontab.backup_site:lan.crontab.backup_database;
 	if(sType == 'logs') sTitle = lan.crontab.backup_log;
 	minute += 5;
 	if(hour !== '' && minute > 59){
 		if(hour >= 23) hour = 0;
-		$("#set-Config input[name='hour']").val(hour+1);
+		$("#cronConfig input[name='hour']").val(hour+1);
 		minute = 5;
 	}
-	$("#set-Config input[name='minute']").val(minute);
-	$("#set-Config input[name='name']").val(sTitle + '['+dataList[0]+']');
-	$("#set-Config input[name='sName']").val(dataList[0]);
-	var pdata = $("#set-Config").serialize() + '&sBody=&urladdress=';
+	$("#cronConfig input[name='minute']").val(minute);
+	$("#cronConfig input[name='name']").val(sTitle + '['+dataList[0]+']');
+	$("#cronConfig input[name='sName']").val(dataList[0]);
+	var pdata = $("#cronConfig").serialize() + '&sBody=&urladdress=';
 	$.ajax({
 		type:'POST',
 		url:'/crontab/add',
@@ -536,7 +536,7 @@ function toBackup(type){
 
 		
 		if (sType != 'path'){
-			sOpt = '<li><a role="menuitem" tabindex="-1" href="javascript:;" value="backupAll">所有</a></li>' + sOpt;
+			sOpt = '<li><a role="menuitem" tabindex="-1" href="javascript:;" value="ALL">所有</a></li>' + sOpt;
 		}
 		
 		var orderOpt = '';

@@ -52,8 +52,10 @@ def split_logs(oldFileName, num):
 def split_all(save):
     sites = mw.M('sites').field('name').select()
     for site in sites:
-        oldFileName = logsPath + site['name'] + px
+        oldFileName = logsPath + '/' +site['name'] + px
         split_logs(oldFileName, save)
+        errOldFileName = logsPath + '/' + site['name'] + ".error.log"
+        split_logs(errOldFileName, save)
 
 if __name__ == '__main__':
     num = int(sys.argv[2])
