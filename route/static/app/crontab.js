@@ -474,7 +474,7 @@ function initDropdownMenu(){
 				$(".controls").html('备份目录');
 				break;
 			case 'logs':
-				toBackup('logs');
+				// toBackup('logs');
 				$(".controls").html('切割网站');
 				break;
 			case 'toUrl':
