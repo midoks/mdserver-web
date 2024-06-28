@@ -61,8 +61,6 @@ if __name__ == '__main__':
     num = int(sys.argv[2])
     if sys.argv[1].find('ALL') == 0:
         split_all(num)
-        path = mw.getServerDir()
-        os.system("kill -USR1 `cat " + path + "/openresty/nginx/logs/nginx.pid`")
     else:
         siteName = sys.argv[1]
         if siteName[-4:] == '.log':
