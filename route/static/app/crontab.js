@@ -303,20 +303,20 @@ function planAdd(){
 	
 	var sName = $("#sName").attr("val");
 	
-	if(sName == 'backupAll'){
-		var alist = $("ul[aria-labelledby='backdata'] li a");
-		var dataList = new Array();
-		for(var i=1;i<alist.length;i++){
-			var tmp = alist[i].getAttribute('value');
-			dataList.push(tmp);
-		}
-		if(dataList.length < 1){
-			layer.msg('对象列表为空，无法继续!',{icon:5});
-			return;
-		}
-		allAddCrontab(dataList,0,'');
-		return;
-	}
+	// if(sName == 'backupAll'){
+	// 	var alist = $("ul[aria-labelledby='backdata'] li a");
+	// 	var dataList = new Array();
+	// 	for(var i=1;i<alist.length;i++){
+	// 		var tmp = alist[i].getAttribute('value');
+	// 		dataList.push(tmp);
+	// 	}
+	// 	if(dataList.length < 1){
+	// 		layer.msg('对象列表为空，无法继续!',{icon:5});
+	// 		return;
+	// 	}
+	// 	allAddCrontab(dataList,0,'');
+	// 	return;
+	// }
 
 	if (type == 'minute-n'){
 		var where1 = $("#ptime input[name='where1']").val();
