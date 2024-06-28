@@ -579,7 +579,7 @@ fi''' % (mw.getRunDir(),)
                 else:
                     shell = head + param['sbody'].replace("\r\n", "\n")
 
-                shell += '''
+            shell += '''
 echo "----------------------------------------------------------------------------"
 endDate=`date +"%Y-%m-%d %H:%M:%S"`
 END_MW_SHELL_TIME=`date +"%s"`
