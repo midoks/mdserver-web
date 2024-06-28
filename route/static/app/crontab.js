@@ -101,7 +101,7 @@ function getCronData(page){
 				}
 
 				var cron_backupto = '-';
-				if (rdata.data[i]['stype'] == 'site' || rdata.data[i]['stype']=='logs' || rdata.data[i]['stype']=='path' ||  rdata.data[i]['stype']=='database' || rdata.data[i]['stype'].indexOf('database_')>-1 ){
+				if (rdata.data[i]['stype'] == 'site' || rdata.data[i]['stype']=='path' ||  rdata.data[i]['stype']=='database' || rdata.data[i]['stype'].indexOf('database_')>-1 ){
 					cron_backupto = '本地磁盘';
 					if (rdata.data[i]['backup_to'] != 'localhost'){
 						cron_backupto = getBackupName(rdata['backup_hook'],rdata.data[i]['backup_to']);
