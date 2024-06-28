@@ -474,7 +474,7 @@ function initDropdownMenu(){
 				$(".controls").html('备份目录');
 				break;
 			case 'logs':
-				// toBackup('logs');
+				toLogsHtml('logs');
 				$(".controls").html('切割网站');
 				break;
 			case 'toUrl':
@@ -485,6 +485,102 @@ function initDropdownMenu(){
 	});
 }
 
+
+//备份
+function toLogsHtml(type){
+	var sMsg = "";
+	switch(type){
+		case 'sites':
+			sMsg = '备份网站';
+			sType = "sites";
+			break;
+		case 'database_mariadb':
+		case 'database_mongodb':
+		case 'database_postgresql':
+		case 'database_mysql-apt':
+		case 'database_mysql-yum':
+		case 'database':
+			sMsg = '备份数据库';
+			suffix = type.replace('database','')
+			if (suffix != ''){
+				suffix = suffix.replace('_','')
+				sMsg = '备份数据库['+suffix+']';
+			}
+			sType = type;
+			break;
+		case 'logs':
+			sMsg = '切割日志';
+			sType = "logs";
+			break;
+		case 'path':
+			sMsg = '备份目录';
+			sType = "path";
+			break;
+	}
+	var data = 'type='+sType;
+
+	$.post('/crontab/get_data_list',data,function(rdata){
+		$(".planname input[name='name']").attr('readonly','true').css({"background-color":"#f6f6f6","color":"#666"});
+		var sOpt = "";
+		if(rdata.data.length == 0){
+			layer.msg(lan.public.list_empty,{icon:2})
+			return;
+		}
+
+		for(var i=0;i<rdata.data.length;i++){
+			if(i==0){
+				$(".planname input[name='name']").val(sMsg+'['+rdata.data[i].name+']');
+			}
+			sOpt += '<li><a role="menuitem" tabindex="-1" href="javascript:;" value="'+rdata.data[i].name+'">'+rdata.data[i].name+'['+rdata.data[i].ps+']</a></li>';			
+		}
+
+		
+		if (sType != 'path'){
+			sOpt = '<li><a role="menuitem" tabindex="-1" href="javascript:;" value="ALL">所有</a></li>' + sOpt;
+		}
+		
+		var orderOpt = '';
+		for (var i=0;i<rdata.orderOpt.length;i++){
+			orderOpt += '<li><a role="menuitem" tabindex="-1" href="javascript:;" value="'+rdata.orderOpt[i].name+'">'+rdata.orderOpt[i].title+'</a></li>'
+		}
+		
+		
+		var changeDir = '';
+		if (sType == 'path'){
+			changeDir = '<span class="glyphicon glyphicon-folder-open cursor mr20 changePathDir" style="float:left;line-height: 30px;"></span>';
+		}
+
+		var sBody = '<div class="dropdown pull-left mr20 check">\
+					  <button class="btn btn-default dropdown-toggle sname" type="button" id="backdata" data-toggle="dropdown" style="width:auto">\
+						<b id="sName" val="'+rdata.data[0].name+'">'+rdata.data[0].name+'['+rdata.data[0].ps+']</b> <span class="caret"></span>\
+					  </button>\
+					  <ul class="dropdown-menu" role="menu" aria-labelledby="backdata">'+sOpt+'</ul>\
+					</div>\
+					'+ changeDir +'\
+					</div>\
+					<div class="textname pull-left mr20">保留最新</div><div class="plan_hms pull-left mr20 bt-input-text">\
+					<span><input type="number" name="save" id="save" value="3" maxlength="4" max="100" min="1"></span>\
+					<span class="name">份</span>\
+					</div>';
+		$("#implement").html(sBody);
+		getselectname();
+
+		$('.changePathDir').click(function(){
+			changePathCallback($('#sName').val(),function(select_dir){
+				$(".planname input[name='name']").val('备份目录['+select_dir+']');
+				$('#implement .sname b').attr('val',select_dir).text(select_dir);
+			});
+		});
+
+
+		$(".dropdown ul li a").click(function(){
+			var sName = $("#sName").attr("val");
+			if(!sName) return;
+			$(".planname input[name='name']").val(sMsg+'['+sName+']');
+		});
+	},'json');
+
+}
 
 //备份
 function toBackup(type){
