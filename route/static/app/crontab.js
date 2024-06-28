@@ -101,7 +101,7 @@ function getCronData(page){
 				}
 
 				var cron_backupto = '-';
-				if (rdata.data[i]['stype'] == 'site' || rdata.data[i]['stype']=='logs' || rdata.data[i]['stype']=='path' ||  rdata.data[i]['stype']=='database' || rdata.data[i]['stype'].indexOf('database_')>-1 ){
+				if (rdata.data[i]['stype'] == 'site' || rdata.data[i]['stype']=='path' ||  rdata.data[i]['stype']=='database' || rdata.data[i]['stype'].indexOf('database_')>-1 ){
 					cron_backupto = '本地磁盘';
 					if (rdata.data[i]['backup_to'] != 'localhost'){
 						cron_backupto = getBackupName(rdata['backup_hook'],rdata.data[i]['backup_to']);
@@ -358,49 +358,49 @@ function planAdd(){
 }
 
 //批量添加任务
-function allAddCrontab(dataList,successCount,errorMsg){
-	if(dataList.length < 1) {
-		layer.msg(lan.get('add_all_task_ok',[successCount]),{icon:1});
-		return;
-	}
-	var loadT = layer.msg(lan.get('add',[dataList[0]]),{icon:16,time:0,shade: [0.3, '#000']});
-	var sType = $(".planjs").find("b").attr("val");
-	var minute = parseInt($("#cronConfig input[name='minute']").val());
-	var hour = parseInt($("#cronConfig input[name='hour']").val());
-	var sTitle = (sType == 'site')?lan.crontab.backup_site:lan.crontab.backup_database;
-	if(sType == 'logs') sTitle = lan.crontab.backup_log;
-	minute += 5;
-	if(hour !== '' && minute > 59){
-		if(hour >= 23) hour = 0;
-		$("#cronConfig input[name='hour']").val(hour+1);
-		minute = 5;
-	}
-	$("#cronConfig input[name='minute']").val(minute);
-	$("#cronConfig input[name='name']").val(sTitle + '['+dataList[0]+']');
-	$("#cronConfig input[name='sName']").val(dataList[0]);
-	var pdata = $("#cronConfig").serialize() + '&sBody=&urladdress=';
-	$.ajax({
-		type:'POST',
-		url:'/crontab/add',
-		data:pdata,
-		async: true,
-		success:function(frdata){
-			layer.close(loadT);
-			if(frdata.status){
-				successCount++;
-				getCronData(1);
-			}else{
-				if(!errorMsg){
-					errorMsg = '<br><p>'+lan.crontab.backup_all_err+'</p>';
-				}
-				errorMsg += '<li>'+dataList[0]+' -> '+frdata.msg+'</li>'
-			}
+// function allAddCrontab(dataList,successCount,errorMsg){
+// 	if(dataList.length < 1) {
+// 		layer.msg(lan.get('add_all_task_ok',[successCount]),{icon:1});
+// 		return;
+// 	}
+// 	var loadT = layer.msg(lan.get('add',[dataList[0]]),{icon:16,time:0,shade: [0.3, '#000']});
+// 	var sType = $(".planjs").find("b").attr("val");
+// 	var minute = parseInt($("#cronConfig input[name='minute']").val());
+// 	var hour = parseInt($("#cronConfig input[name='hour']").val());
+// 	var sTitle = (sType == 'site')?lan.crontab.backup_site:lan.crontab.backup_database;
+// 	if(sType == 'logs') sTitle = lan.crontab.backup_log;
+// 	minute += 5;
+// 	if(hour !== '' && minute > 59){
+// 		if(hour >= 23) hour = 0;
+// 		$("#cronConfig input[name='hour']").val(hour+1);
+// 		minute = 5;
+// 	}
+// 	$("#cronConfig input[name='minute']").val(minute);
+// 	$("#cronConfig input[name='name']").val(sTitle + '['+dataList[0]+']');
+// 	$("#cronConfig input[name='sName']").val(dataList[0]);
+// 	var pdata = $("#cronConfig").serialize() + '&sBody=&urladdress=';
+// 	$.ajax({
+// 		type:'POST',
+// 		url:'/crontab/add',
+// 		data:pdata,
+// 		async: true,
+// 		success:function(frdata){
+// 			layer.close(loadT);
+// 			if(frdata.status){
+// 				successCount++;
+// 				getCronData(1);
+// 			}else{
+// 				if(!errorMsg){
+// 					errorMsg = '<br><p>'+lan.crontab.backup_all_err+'</p>';
+// 				}
+// 				errorMsg += '<li>'+dataList[0]+' -> '+frdata.msg+'</li>'
+// 			}
 			
-			dataList.splice(0,1);
-			allAddCrontab(dataList,successCount,errorMsg);
-		}
-	});
-}
+// 			dataList.splice(0,1);
+// 			allAddCrontab(dataList,successCount,errorMsg);
+// 		}
+// 	});
+// }
 
 initDropdownMenu();
 function initDropdownMenu(){
@@ -474,7 +474,7 @@ function initDropdownMenu(){
 				$(".controls").html('备份目录');
 				break;
 			case 'logs':
-				toBackup('logs');
+				toLogsHtml('logs');
 				$(".controls").html('切割网站');
 				break;
 			case 'toUrl':
@@ -485,6 +485,102 @@ function initDropdownMenu(){
 	});
 }
 
+
+//备份
+function toLogsHtml(type){
+	var sMsg = "";
+	switch(type){
+		case 'sites':
+			sMsg = '备份网站';
+			sType = "sites";
+			break;
+		case 'database_mariadb':
+		case 'database_mongodb':
+		case 'database_postgresql':
+		case 'database_mysql-apt':
+		case 'database_mysql-yum':
+		case 'database':
+			sMsg = '备份数据库';
+			suffix = type.replace('database','')
+			if (suffix != ''){
+				suffix = suffix.replace('_','')
+				sMsg = '备份数据库['+suffix+']';
+			}
+			sType = type;
+			break;
+		case 'logs':
+			sMsg = '切割日志';
+			sType = "logs";
+			break;
+		case 'path':
+			sMsg = '备份目录';
+			sType = "path";
+			break;
+	}
+	var data = 'type='+sType;
+
+	$.post('/crontab/get_data_list',data,function(rdata){
+		$(".planname input[name='name']").attr('readonly','true').css({"background-color":"#f6f6f6","color":"#666"});
+		var sOpt = "";
+		if(rdata.data.length == 0){
+			layer.msg(lan.public.list_empty,{icon:2})
+			return;
+		}
+
+		for(var i=0;i<rdata.data.length;i++){
+			if(i==0){
+				$(".planname input[name='name']").val(sMsg+'['+rdata.data[i].name+']');
+			}
+			sOpt += '<li><a role="menuitem" tabindex="-1" href="javascript:;" value="'+rdata.data[i].name+'">'+rdata.data[i].name+'['+rdata.data[i].ps+']</a></li>';			
+		}
+
+		
+		if (sType != 'path'){
+			sOpt = '<li><a role="menuitem" tabindex="-1" href="javascript:;" value="ALL">所有</a></li>' + sOpt;
+		}
+		
+		var orderOpt = '';
+		for (var i=0;i<rdata.orderOpt.length;i++){
+			orderOpt += '<li><a role="menuitem" tabindex="-1" href="javascript:;" value="'+rdata.orderOpt[i].name+'">'+rdata.orderOpt[i].title+'</a></li>'
+		}
+		
+		
+		var changeDir = '';
+		if (sType == 'path'){
+			changeDir = '<span class="glyphicon glyphicon-folder-open cursor mr20 changePathDir" style="float:left;line-height: 30px;"></span>';
+		}
+
+		var sBody = '<div class="dropdown pull-left mr20 check">\
+					  <button class="btn btn-default dropdown-toggle sname" type="button" id="backdata" data-toggle="dropdown" style="width:auto">\
+						<b id="sName" val="'+rdata.data[0].name+'">'+rdata.data[0].name+'['+rdata.data[0].ps+']</b> <span class="caret"></span>\
+					  </button>\
+					  <ul class="dropdown-menu" role="menu" aria-labelledby="backdata">'+sOpt+'</ul>\
+					</div>\
+					'+ changeDir +'\
+					</div>\
+					<div class="textname pull-left mr20">保留最新</div><div class="plan_hms pull-left mr20 bt-input-text">\
+					<span><input type="number" name="save" id="save" value="3" maxlength="4" max="100" min="1"></span>\
+					<span class="name">份</span>\
+					</div>';
+		$("#implement").html(sBody);
+		getselectname();
+
+		$('.changePathDir').click(function(){
+			changePathCallback($('#sName').val(),function(select_dir){
+				$(".planname input[name='name']").val('备份目录['+select_dir+']');
+				$('#implement .sname b').attr('val',select_dir).text(select_dir);
+			});
+		});
+
+
+		$(".dropdown ul li a").click(function(){
+			var sName = $("#sName").attr("val");
+			if(!sName) return;
+			$(".planname input[name='name']").val(sMsg+'['+sName+']');
+		});
+	},'json');
+
+}
 
 //备份
 function toBackup(type){
@@ -954,19 +1050,19 @@ function closeOpt(){
 //星期
 function toWeek(){
 	var mBody = '<div class="dropdown planweek pull-left mr20">\
-				  <button class="btn btn-default dropdown-toggle" type="button" id="excode_week" data-toggle="dropdown">\
-					<b val="1">周一</b> <span class="caret"></span>\
-				  </button>\
-				  <ul class="dropdown-menu" role="menu" aria-labelledby="excode_week">\
-					<li><a role="menuitem" tabindex="-1" href="javascript:;" value="1">周一</a></li>\
-					<li><a role="menuitem" tabindex="-1" href="javascript:;" value="2">周二</a></li>\
-					<li><a role="menuitem" tabindex="-1" href="javascript:;" value="3">周三</a></li>\
-					<li><a role="menuitem" tabindex="-1" href="javascript:;" value="4">周四</a></li>\
-					<li><a role="menuitem" tabindex="-1" href="javascript:;" value="5">周五</a></li>\
-					<li><a role="menuitem" tabindex="-1" href="javascript:;" value="6">周六</a></li>\
-					<li><a role="menuitem" tabindex="-1" href="javascript:;" value="0">周日</a></li>\
-				  </ul>\
-				</div>';
+	 	<button class="btn btn-default dropdown-toggle" type="button" id="excode_week" data-toggle="dropdown">\
+			<b val="1">周一</b> <span class="caret"></span>\
+	  	</button>\
+	  	<ul class="dropdown-menu" role="menu" aria-labelledby="excode_week">\
+			<li><a role="menuitem" tabindex="-1" href="javascript:;" value="1">周一</a></li>\
+			<li><a role="menuitem" tabindex="-1" href="javascript:;" value="2">周二</a></li>\
+			<li><a role="menuitem" tabindex="-1" href="javascript:;" value="3">周三</a></li>\
+			<li><a role="menuitem" tabindex="-1" href="javascript:;" value="4">周四</a></li>\
+			<li><a role="menuitem" tabindex="-1" href="javascript:;" value="5">周五</a></li>\
+			<li><a role="menuitem" tabindex="-1" href="javascript:;" value="6">周六</a></li>\
+			<li><a role="menuitem" tabindex="-1" href="javascript:;" value="0">周日</a></li>\
+	 	</ul>\
+	</div>';
 	$("#ptime").html(mBody);
 	getselectname();
 }
