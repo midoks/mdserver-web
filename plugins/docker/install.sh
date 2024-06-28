@@ -17,6 +17,27 @@ if [ -f ${rootPath}/bin/activate ];then
 	source ${rootPath}/bin/activate
 fi
 
+# {
+#     "registry-mirrors": [
+#         "http://hub-mirror.c.163.com",
+#         "https://docker.mirrors.ustc.edu.cn",
+#         "https://registry.docker-cn.com"
+#     ]
+# }
+
+# sudo mkdir -p /etc/docker
+# sudo tee /etc/docker/daemon.json <<-'EOF'
+# {
+#     "registry-mirrors": [
+#         "http://hub-mirror.c.163.com",
+#         "https://docker.mirrors.ustc.edu.cn",
+#         "https://registry.docker-cn.com"
+#     ]
+# }
+# EOF
+# sudo systemctl daemon-reload
+# sudo systemctl restart docker
+
 Install_Docker()
 {
 	# which docker
