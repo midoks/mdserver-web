@@ -536,7 +536,7 @@ function toBackup(type){
 
 		
 		if (sType != 'path'){
-			sOpt = '<li><a role="menuitem" tabindex="-1" href="javascript:;" value="backupAll">所有</a></li>' + sOpt;
+			sOpt = '<li><a role="menuitem" tabindex="-1" href="javascript:;" value="ALL">所有</a></li>' + sOpt;
 		}
 		
 		var orderOpt = '';
