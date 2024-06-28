@@ -954,19 +954,19 @@ function closeOpt(){
 //星期
 function toWeek(){
 	var mBody = '<div class="dropdown planweek pull-left mr20">\
-				  <button class="btn btn-default dropdown-toggle" type="button" id="excode_week" data-toggle="dropdown">\
-					<b val="1">周一</b> <span class="caret"></span>\
-				  </button>\
-				  <ul class="dropdown-menu" role="menu" aria-labelledby="excode_week">\
-					<li><a role="menuitem" tabindex="-1" href="javascript:;" value="1">周一</a></li>\
-					<li><a role="menuitem" tabindex="-1" href="javascript:;" value="2">周二</a></li>\
-					<li><a role="menuitem" tabindex="-1" href="javascript:;" value="3">周三</a></li>\
-					<li><a role="menuitem" tabindex="-1" href="javascript:;" value="4">周四</a></li>\
-					<li><a role="menuitem" tabindex="-1" href="javascript:;" value="5">周五</a></li>\
-					<li><a role="menuitem" tabindex="-1" href="javascript:;" value="6">周六</a></li>\
-					<li><a role="menuitem" tabindex="-1" href="javascript:;" value="0">周日</a></li>\
-				  </ul>\
-				</div>';
+	 	<button class="btn btn-default dropdown-toggle" type="button" id="excode_week" data-toggle="dropdown">\
+			<b val="1">周一</b> <span class="caret"></span>\
+	  	</button>\
+	  	<ul class="dropdown-menu" role="menu" aria-labelledby="excode_week">\
+			<li><a role="menuitem" tabindex="-1" href="javascript:;" value="1">周一</a></li>\
+			<li><a role="menuitem" tabindex="-1" href="javascript:;" value="2">周二</a></li>\
+			<li><a role="menuitem" tabindex="-1" href="javascript:;" value="3">周三</a></li>\
+			<li><a role="menuitem" tabindex="-1" href="javascript:;" value="4">周四</a></li>\
+			<li><a role="menuitem" tabindex="-1" href="javascript:;" value="5">周五</a></li>\
+			<li><a role="menuitem" tabindex="-1" href="javascript:;" value="6">周六</a></li>\
+			<li><a role="menuitem" tabindex="-1" href="javascript:;" value="0">周日</a></li>\
+	 	</ul>\
+	</div>';
 	$("#ptime").html(mBody);
 	getselectname();
 }
