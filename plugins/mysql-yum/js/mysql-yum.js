@@ -1707,7 +1707,7 @@ function addMasterRepSlaveUser(){
 
 
 
-function updateMasterRepSlaveUser(username){
+function updateMasterRepSlaveUser(username, password){
   
     var index = layer.open({
         type: 1,
@@ -1720,7 +1720,7 @@ function updateMasterRepSlaveUser(username){
             <div class='line'><span class='tname'>用户名</span><div class='info-r'><input name='username' readonly='readonly' class='bt-input-text mr5' placeholder='用户名' type='text' style='width:330px;' value='"+username+"'></div></div>\
             <div class='line'>\
             <span class='tname'>密码</span>\
-            <div class='info-r'><input class='bt-input-text mr5' type='text' name='password' id='MyPassword' style='width:330px' value='"+(randomStrPwd(16))+"' /><span title='随机密码' class='glyphicon glyphicon-repeat cursor' onclick='repeatPwd(16)'></span></div>\
+            <div class='info-r'><input class='bt-input-text mr5' type='text' name='password' id='MyPassword' style='width:330px' value='"+password+"' /><span title='随机密码' class='glyphicon glyphicon-repeat cursor' onclick='repeatPwd(16)'></span></div>\
             </div>\
             <input type='hidden' name='ps' value='' />\
             <div class='bt-form-submit-btn'>\
@@ -1888,10 +1888,11 @@ function getMasterRepSlaveList(){
         for (i in user_list) {
             // console.log(i);
             var name = user_list[i]['username'];
+            var password = user_list[i]['password'];
             list += '<tr><td>'+name+'</td>\
-                <td>'+user_list[i]['password']+'</td>\
+                <td>'+password+'</td>\
                 <td>\
-                    <a class="btlink" onclick="updateMasterRepSlaveUser(\''+name+'\');">修改</a> | \
+                    <a class="btlink" onclick="updateMasterRepSlaveUser(\''+name+'\',\''+password+'\');">修改</a> | \
                     <a class="btlink" onclick="delMasterRepSlaveUser(\''+name+'\');">删除</a> | \
                     <a class="btlink" onclick="setDbMasterAccess(\''+name+'\');">权限</a> | \
                     <a class="btlink" onclick="getMasterRepSlaveUserCmd(\''+name+'\');">从库同步命令</a>\

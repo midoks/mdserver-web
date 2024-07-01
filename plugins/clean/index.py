@@ -88,6 +88,7 @@ def initConf():
             "/var/log/btmp.*",
             "/var/log/sa/sa*",
             "/var/log/sysstat/sa*",
+            "/var/log/atop/atop*",
             "/var/log/anaconda/*.log",
 
             "/var/log/dpkg.log.*",
