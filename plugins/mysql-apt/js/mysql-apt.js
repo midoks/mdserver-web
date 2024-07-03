@@ -2627,6 +2627,8 @@ function masterOrSlaveConf(version=''){
         _data['page'] = page;
         _data['page_size'] = 10;
 
+        var mdb_ver = $('.plugin_version').attr('version');
+
         myPost('get_slave_list', _data, function(data){
             var rdata = $.parseJSON(data.data);
             var list = '';
@@ -2639,18 +2641,37 @@ function masterOrSlaveConf(version=''){
                     isHasSign = true;
                 }
 
-                var status = "<a data-id="+i+"  class='btlink db_error'>异常</>";
-                if (v['Slave_SQL_Running'] == 'Yes' && v['Slave_IO_Running'] == 'Yes'){
-                    status = "正常";
-                }
+                
+                if (mdb_ver >= 8){
 
-                list += '<tr>';
-                list += '<td>' + rdata.data[i]['Master_Host'] +'</td>';
-                list += '<td>' + rdata.data[i]['Master_Port'] +'</td>';
-                list += '<td>' + rdata.data[i]['Master_User'] +'</td>';
-                list += '<td>' + rdata.data[i]['Master_Log_File'] +'</td>';
-                list += '<td>' + rdata.data[i]['Slave_IO_Running'] +'</td>';
-                list += '<td>' + rdata.data[i]['Slave_SQL_Running'] +'</td>';
+                    var status = "<a data-id="+i+"  class='btlink db_error'>异常</>";
+                    if (v['Slave_SQL_Running'] == 'Yes' && v['Slave_IO_Running'] == 'Yes'){
+                        status = "正常";
+                    }
+
+                    list += '<tr>';
+                    list += '<td>' + rdata.data[i]['Source_Host'] +'</td>';
+                    list += '<td>' + rdata.data[i]['Source_Port'] +'</td>';
+                    list += '<td>' + rdata.data[i]['Source_User'] +'</td>';
+                    list += '<td>' + rdata.data[i]['Relay_Source_Log_File'] +'</td>';
+                    list += '<td>' + rdata.data[i]['Replica_IO_Running'] +'</td>';
+                    list += '<td>' + rdata.data[i]['Replica_SQL_Running'] +'</td>';
+
+                } else {
+                    var status = "<a data-id="+i+"  class='btlink db_error'>异常</>";
+                    if (v['Slave_SQL_Running'] == 'Yes' && v['Slave_IO_Running'] == 'Yes'){
+                        status = "正常";
+                    }
+
+                    list += '<tr>';
+                    list += '<td>' + rdata.data[i]['Master_Host'] +'</td>';
+                    list += '<td>' + rdata.data[i]['Master_Port'] +'</td>';
+                    list += '<td>' + rdata.data[i]['Master_User'] +'</td>';
+                    list += '<td>' + rdata.data[i]['Master_Log_File'] +'</td>';
+                    list += '<td>' + rdata.data[i]['Slave_IO_Running'] +'</td>';
+                    list += '<td>' + rdata.data[i]['Slave_SQL_Running'] +'</td>';
+                }
+                
 
                 if (isHasSign){
                     list += '<td>' + v['Channel_Name'] +'</td>';
