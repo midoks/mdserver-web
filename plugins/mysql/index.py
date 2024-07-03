@@ -2203,8 +2203,10 @@ def getMasterStatus(version=''):
         return mw.returnJson(False, 'MySQL未启动,或正在启动中...!', [])
 
     query_status_cmd = 'show slave status'
+    is_mdb8 = False
     mdb8 = getMdb8Ver()
     if mw.inArray(mdb8, version):
+        is_mdb8 = True
         query_status_cmd = 'show replica status'
 
     try:
@@ -2226,8 +2228,13 @@ def getMasterStatus(version=''):
         dlist = db.query(query_status_cmd)
 
         for v in dlist:
-            if v["Slave_IO_Running"] == 'Yes' or v["Slave_SQL_Running"] == 'Yes':
-                data['slave_status'] = True
+
+            if is_mdb8:
+                if (v["Replica_IO_Running"] == 'Yes' or v["Replica_SQL_Running"] == 'Yes'):
+                    data['slave_status'] = True
+            else:
+                if (v["Slave_IO_Running"] == 'Yes' or v["Slave_SQL_Running"] == 'Yes'):
+                    data['slave_status'] = True
 
         return mw.returnJson(master_status, '设置成功', data)
     except Exception as e:
