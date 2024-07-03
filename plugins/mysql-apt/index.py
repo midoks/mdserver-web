@@ -2011,7 +2011,9 @@ def getMasterStatus(version=''):
 
     query_status_cmd = 'show slave status'
     mdb8 = getMdb8Ver()
+    is_mdb8 = False
     if mw.inArray(mdb8, version):
+        is_mdb8 = True
         query_status_cmd = 'show replica status'
 
     try:
@@ -2031,6 +2033,9 @@ def getMasterStatus(version=''):
         dlist = db.query(query_status_cmd)
 
         # print(dlist[0])
+        if len(dlist) > 0 and is_mdb8 and (dlist[0]["Replica_IO_Running"] == 'Yes' or dlist[0]["Replica_SQL_Running"] == 'Yes'):
+            data['slave_status'] = True
+
         if len(dlist) > 0 and (dlist[0]["Slave_IO_Running"] == 'Yes' or dlist[0]["Slave_SQL_Running"] == 'Yes'):
             data['slave_status'] = True
 
