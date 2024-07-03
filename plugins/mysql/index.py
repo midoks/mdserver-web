@@ -3492,12 +3492,14 @@ def doFullSyncUser(version=''):
 
     time_s = time.time()
     if not os.path.exists(bak_file):
-        if isSimpleSyncCmd(cmd):
-            dmp_option += " --master-data=1 --apply-slave-statements --include-master-host-port "
-        else:
-            dmp_option += ' '
+        dmp_option = ' '
+        if mw.inArray(mdb8,version):
+                # --compression-algorithms
+                dmp_option += " --source-data=1 --apply-replica-statements --include-source-host-port "
+            else:
+                dmp_option += " --master-data=1 --apply-slave-statements --include-master-host-port --compress "
 
-        dump_sql_data = getServerDir() + "/bin/mysqldump --single-transaction --default-character-set=utf8mb4 --compress -q " + dmp_option + " -h" + ip + " -P" + \
+        dump_sql_data = getServerDir() + "/bin/mysqldump --single-transaction --default-character-set=utf8mb4 -q " + dmp_option + " -h" + ip + " -P" + \
             port + " -u" + user + " -p'" + apass + "' --ssl-mode=DISABLED " + sync_db + " > " + bak_file
         print(dump_sql_data)
         time_s = time.time()
