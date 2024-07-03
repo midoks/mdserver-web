@@ -2305,7 +2305,7 @@ function addSlaveSyncUser(ip=''){
                     </div>\
                 </div>\
                 <div class='line'>\
-                <span class='tname'>CMD[必须填写]</span>\
+                <span class='tname'>CMD[必填]</span>\
                 <div class='info-r'><textarea class='bt-input-text mr5' row='20' cols='30' name='cmd' style='width:330px;height:150px;'></textarea></div>\
                 </div>\
                 <input type='hidden' name='mode' value='"+mode+"' />\
@@ -2337,10 +2337,17 @@ function addSlaveSyncUser(ip=''){
                         a[kv[0]] = kv[1].replace("'",'').replace("'",'');
                     }
 
-                    $('input[name="ip"]').val(a['MASTER_HOST']);
-                    $('input[name="port"]').val(a['MASTER_PORT']);
-                    $('input[name="user"]').val(a['MASTER_USER']);
-                    $('input[name="pass"]').val(a['MASTER_PASSWORD']);
+                    if ('MASTER_HOST' in a){
+                        $('input[name="ip"]').val(a['MASTER_HOST']);
+                        $('input[name="port"]').val(a['MASTER_PORT']);
+                        $('input[name="user"]').val(a['MASTER_USER']);
+                        $('input[name="pass"]').val(a['MASTER_PASSWORD']);
+                    } else {
+                        $('input[name="ip"]').val(a['SOURCE_HOST']);
+                        $('input[name="port"]').val(a['SOURCE_PORT']);
+                        $('input[name="user"]').val(a['SOURCE_USER']);
+                        $('input[name="pass"]').val(a['SOURCE_PASSWORD']);
+                    }
                 });
             },
             yes:function(index){
@@ -2619,6 +2626,8 @@ function masterOrSlaveConf(version=''){
         _data['page'] = page;
         _data['page_size'] = 10;
 
+        var mdb_ver = $('.plugin_version').attr('version');
+
         myPost('get_slave_list', _data, function(data){
             var rdata = $.parseJSON(data.data);
             var list = '';
@@ -2632,17 +2641,33 @@ function masterOrSlaveConf(version=''){
                 }
 
                 var status = "<a data-id="+i+"  class='btlink db_error'>异常</>";
-                if (v['Slave_SQL_Running'] == 'Yes' && v['Slave_IO_Running'] == 'Yes'){
-                    status = "正常";
-                }
+                if (mdb_ver >= 8){                    
+                    if (v['Replica_SQL_Running'] == 'Yes' && v['Replica_IO_Running'] == 'Yes'){
+                        status = "正常";
+                    }
 
-                list += '<tr>';
-                list += '<td>' + rdata.data[i]['Master_Host'] +'</td>';
-                list += '<td>' + rdata.data[i]['Master_Port'] +'</td>';
-                list += '<td>' + rdata.data[i]['Master_User'] +'</td>';
-                list += '<td>' + rdata.data[i]['Master_Log_File'] +'</td>';
-                list += '<td>' + rdata.data[i]['Slave_IO_Running'] +'</td>';
-                list += '<td>' + rdata.data[i]['Slave_SQL_Running'] +'</td>';
+                    list += '<tr>';
+                    list += '<td>' + rdata.data[i]['Source_Host'] +'</td>';
+                    list += '<td>' + rdata.data[i]['Source_Port'] +'</td>';
+                    list += '<td>' + rdata.data[i]['Source_User'] +'</td>';
+                    list += '<td>' + rdata.data[i]['Relay_Source_Log_File'] +'</td>';
+                    list += '<td>' + rdata.data[i]['Replica_IO_Running'] +'</td>';
+                    list += '<td>' + rdata.data[i]['Replica_SQL_Running'] +'</td>';
+
+                } else {
+                    if (v['Slave_SQL_Running'] == 'Yes' && v['Slave_IO_Running'] == 'Yes'){
+                        status = "正常";
+                    }
+
+                    list += '<tr>';
+                    list += '<td>' + rdata.data[i]['Master_Host'] +'</td>';
+                    list += '<td>' + rdata.data[i]['Master_Port'] +'</td>';
+                    list += '<td>' + rdata.data[i]['Master_User'] +'</td>';
+                    list += '<td>' + rdata.data[i]['Master_Log_File'] +'</td>';
+                    list += '<td>' + rdata.data[i]['Slave_IO_Running'] +'</td>';
+                    list += '<td>' + rdata.data[i]['Slave_SQL_Running'] +'</td>';
+                }
+                
 
                 if (isHasSign){
                     list += '<td>' + v['Channel_Name'] +'</td>';

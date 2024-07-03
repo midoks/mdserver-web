@@ -90,8 +90,10 @@ fi
 
 if [ ! -f /www/server/mdserver-web/bin/activate ];then
     if version_ge "$P_VER" "3.11.0" ;then
+        echo "python3 > 3.11"
         cd /www/server/mdserver-web && python3 -m venv /www/server/mdserver-web
     else
+        echo "python3 < 3.10"
         cd /www/server/mdserver-web && pip3 install -r /www/server/mdserver-web/requirements.txt -i $PIPSRC
         cd /www/server/mdserver-web && python3 -m venv .
     fi

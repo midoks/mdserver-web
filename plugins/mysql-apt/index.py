@@ -509,10 +509,10 @@ def my8cmd(version, method):
     mdb8 = getMdb8Ver()
     try:
         isInited = True
-        if version == '5.7':
-            isInited = initMysql57Data()
-        elif mw.inArray(mdb8, version):
+        if mw.inArray(mdb8, version):
             isInited = initMysql8Data()
+        else:
+            isInited = initMysql57Data()
 
         if not isInited:
             if not mw.isSupportSystemctl():
@@ -1511,8 +1511,8 @@ def resetDbRootPwd(version):
     pwd = mw.getRandomString(16)
 
     pSqliteDb('config').where('id=?', (1,)).save('mysql_root', (pwd,))
-
-    if float(version) < 5.7:
+    mdb8 = getMdb8Ver()
+    if not mw.inArray(mdb8, version):
         cmd_pass = serverdir + '/bin/usr/bin/mysql --defaults-file=' + myconf + ' -uroot -e'
         cmd_pass = cmd_pass + '"UPDATE mysql.user SET password=PASSWORD(\'' + pwd + "') WHERE user='root';"
         cmd_pass = cmd_pass + 'flush privileges;"'
@@ -2006,15 +2006,17 @@ def setDbSlave(version):
 
 def getMasterStatus(version=''):
 
+    if status(version) == 'stop':
+        return mw.returnJson(False, 'MySQL未启动,或正在启动中...!', [])
+
     query_status_cmd = 'show slave status'
     mdb8 = getMdb8Ver()
+    is_mdb8 = False
     if mw.inArray(mdb8, version):
+        is_mdb8 = True
         query_status_cmd = 'show replica status'
 
     try:
-        if status(version) == 'stop':
-            return mw.returnJson(False, 'MySQL未启动,或正在启动中...!', [])
-
         conf = getConf()
         content = mw.readFile(conf)
         master_status = False
@@ -2031,8 +2033,12 @@ def getMasterStatus(version=''):
         dlist = db.query(query_status_cmd)
 
         # print(dlist[0])
-        if len(dlist) > 0 and (dlist[0]["Slave_IO_Running"] == 'Yes' or dlist[0]["Slave_SQL_Running"] == 'Yes'):
-            data['slave_status'] = True
+        if is_mdb8:
+            if len(dlist) > 0 and (dlist[0]["Replica_IO_Running"] == 'Yes' or dlist[0]["Replica_SQL_Running"] == 'Yes'):
+                data['slave_status'] = True
+        else:
+            if len(dlist) > 0 and (dlist[0]["Slave_IO_Running"] == 'Yes' or dlist[0]["Slave_SQL_Running"] == 'Yes'):
+                data['slave_status'] = True
 
         return mw.returnJson(master_status, '设置成功', data)
     except Exception as e:
@@ -2204,8 +2210,7 @@ def getMasterRepSlaveUserCmd(version):
     sql = ''
     if not mw.inArray(mdb8,version):
         base_sql = "CHANGE MASTER TO MASTER_HOST='" + ip + "', MASTER_PORT=" + port + ", MASTER_USER='" + \
-                clist[0]['username'] + "', MASTER_PASSWORD='" + \
-                clist[0]['password'] + "'"
+                clist[0]['username'] + "', MASTER_PASSWORD='" + clist[0]['password'] + "'"
 
         sql += base_sql;
         sql += "<br/><hr/>";
@@ -2213,17 +2218,16 @@ def getMasterRepSlaveUserCmd(version):
         sql += base_sql + channel_name
         sql += "<br/><hr/>";
 
-        sql += base_sql + "', MASTER_LOG_FILE='" + mstatus[0]["File"] + "',MASTER_LOG_POS=" + str(mstatus[0]["Position"]) + channel_name
+        sql += base_sql + ", MASTER_LOG_FILE='" + mstatus[0]["File"] + "',MASTER_LOG_POS=" + str(mstatus[0]["Position"]) + channel_name
     else:
         base_sql = "CHANGE REPLICATION SOURCE TO SOURCE_HOST='" + ip + "', SOURCE_PORT=" + port + ", SOURCE_USER='" + \
-                clist[0]['username']  + "', SOURCE_PASSWORD='" + \
-                clist[0]['password']+"'"
+                clist[0]['username']  + "', SOURCE_PASSWORD='" + clist[0]['password']+"'"
         sql += base_sql;
         sql += "<br/><hr/>";
         # sql += base_sql + ", MASTER_AUTO_POSITION=1" + channel_name
         sql += base_sql + channel_name
         sql += "<br/><hr/>";
-        sql += base_sql + "', SOURCE_LOG_FILE='" + mstatus[0]["File"] + "',SOURCE_LOG_POS=" + str(mstatus[0]["Position"]) + channel_name
+        sql += base_sql + ", SOURCE_LOG_FILE='" + mstatus[0]["File"] + "',SOURCE_LOG_POS=" + str(mstatus[0]["Position"]) + channel_name
 
 
     data = {}
@@ -3214,7 +3218,7 @@ def doFullSyncUser(version=''):
     time.sleep(1)
     writeDbSyncStatus({'code': 1, 'msg': '正在停止从库...', 'progress': 15})
 
-    mdb8 = ['8.0','8.1','8.2','8.3','8.4']
+    mdb8 = getMdb8Ver()
     if mw.inArray(mdb8,version):
         db.query("stop slave user='{}' password='{}';".format(user, apass))
     else:
@@ -3231,12 +3235,16 @@ def doFullSyncUser(version=''):
 
     time_s = time.time()
     if not os.path.exists(bak_file):
+        dmp_option += ' '
         if isSimpleSyncCmd(cmd):
-            dmp_option += " --master-data=1 --apply-slave-statements --include-master-host-port "
-        else:
-            dmp_option += ' '
+            if mw.inArray(mdb8,version):
+                # --compression-algorithms
+                dmp_option += " --source-data=1 --apply-replica-statements --include-source-host-port "
+            else:
+                dmp_option += " --master-data=1 --apply-slave-statements --include-master-host-port --compress "
+            
 
-        dump_sql_data = getServerDir() + "/bin/usr/bin/mysqldump --single-transaction --default-character-set=utf8mb4 --compress -q " + dmp_option + " -h" + \
+        dump_sql_data = getServerDir() + "/bin/usr/bin/mysqldump --single-transaction --default-character-set=utf8mb4  -q " + dmp_option + " -h" + \
             ip + " -P" + port + " -u" + user + ' -p"' + apass + '" --ssl-mode=DISABLED ' + sync_db + " > " + bak_file
         print(dump_sql_data)
         time_s = time.time()
@@ -3281,7 +3289,7 @@ def doFullSyncUser(version=''):
         mw.execShell(my_import_cmd)
 
     if mw.inArray(mdb8, version):
-        db.query("start slave user='{}' password='{}';".format(user, apass))
+        db.query("start replica user='{}' password='{}';".format(user, apass))
     else:
         db.query("start slave")
 
