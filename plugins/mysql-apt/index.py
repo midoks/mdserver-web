@@ -3238,7 +3238,8 @@ def doFullSyncUser(version=''):
         dmp_option += ' '
         if isSimpleSyncCmd(cmd):
             if mw.inArray(mdb8,version):
-                dmp_option += " --source-data=1 --apply-replica-statements --include-source-host-port --compression-algorithms  "
+                # --compression-algorithms
+                dmp_option += " --source-data=1 --apply-replica-statements --include-source-host-port "
             else:
                 dmp_option += " --master-data=1 --apply-slave-statements --include-master-host-port --compress "
             
