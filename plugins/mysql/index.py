@@ -3492,7 +3492,7 @@ def doFullSyncUser(version=''):
 
     time_s = time.time()
     if not os.path.exists(bak_file):
-        dmp_option = ' '
+        dmp_option += ' '
         if mw.inArray(mdb8,version):
                 # --compression-algorithms
                 dmp_option += " --source-data=1 --apply-replica-statements --include-source-host-port "
