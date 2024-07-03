@@ -2305,7 +2305,7 @@ function addSlaveSyncUser(ip=''){
                     </div>\
                 </div>\
                 <div class='line'>\
-                <span class='tname'>CMD[必须填写]</span>\
+                <span class='tname'>CMD[必填]</span>\
                 <div class='info-r'><textarea class='bt-input-text mr5' row='20' cols='30' name='cmd' style='width:330px;height:150px;'></textarea></div>\
                 </div>\
                 <input type='hidden' name='mode' value='"+mode+"' />\
