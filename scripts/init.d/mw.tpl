@@ -246,6 +246,8 @@ mw_update()
 
 mw_update_dev()
 {
+    rm -rf /www/server/mdserver-web/bin
+
     LOCAL_ADDR=common
     cn=$(curl -fsSL -m 10 -s http://ipinfo.io/json | grep "\"country\": \"CN\"")
     if [ ! -z "$cn" ] || [ "$?" == "0" ] ;then
