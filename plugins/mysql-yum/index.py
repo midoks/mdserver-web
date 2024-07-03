@@ -1994,13 +1994,14 @@ def setDbSlave(version):
 
 def getMasterStatus(version=''):
 
+    if status(version) == 'stop':
+        return mw.returnJson(False, 'MySQL未启动,或正在启动中...!', [])
+
     query_status_cmd = 'show slave status'
     mdb8 = getMdb8Ver()
     if mw.inArray(mdb8, version):
         query_status_cmd = 'show replica status'
     try:
-        if status(version) == 'stop':
-            return mw.returnJson(False, 'MySQL未启动,或正在启动中...!', [])
 
         conf = getConf()
         content = mw.readFile(conf)
