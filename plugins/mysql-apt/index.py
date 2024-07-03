@@ -3218,7 +3218,7 @@ def doFullSyncUser(version=''):
     time.sleep(1)
     writeDbSyncStatus({'code': 1, 'msg': '正在停止从库...', 'progress': 15})
 
-    mdb8 = ['8.0','8.1','8.2','8.3','8.4']
+    mdb8 = getMdb8Ver()
     if mw.inArray(mdb8,version):
         db.query("stop slave user='{}' password='{}';".format(user, apass))
     else:
@@ -3235,12 +3235,15 @@ def doFullSyncUser(version=''):
 
     time_s = time.time()
     if not os.path.exists(bak_file):
+        dmp_option += ' '
         if isSimpleSyncCmd(cmd):
-            dmp_option += " --master-data=1 --apply-slave-statements --include-master-host-port "
-        else:
-            dmp_option += ' '
+            if mw.inArray(mdb8,version):
+                dmp_option += " --source-data=1 --apply-replica-statements --include-source-host-port --compression-algorithms  "
+            else:
+                dmp_option += " --master-data=1 --apply-slave-statements --include-master-host-port --compress "
+            
 
-        dump_sql_data = getServerDir() + "/bin/usr/bin/mysqldump --single-transaction --default-character-set=utf8mb4 --compress -q " + dmp_option + " -h" + \
+        dump_sql_data = getServerDir() + "/bin/usr/bin/mysqldump --single-transaction --default-character-set=utf8mb4  -q " + dmp_option + " -h" + \
             ip + " -P" + port + " -u" + user + ' -p"' + apass + '" --ssl-mode=DISABLED ' + sync_db + " > " + bak_file
         print(dump_sql_data)
         time_s = time.time()
