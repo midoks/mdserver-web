@@ -2337,10 +2337,17 @@ function addSlaveSyncUser(ip=''){
                         a[kv[0]] = kv[1].replace("'",'').replace("'",'');
                     }
 
-                    $('input[name="ip"]').val(a['MASTER_HOST']);
-                    $('input[name="port"]').val(a['MASTER_PORT']);
-                    $('input[name="user"]').val(a['MASTER_USER']);
-                    $('input[name="pass"]').val(a['MASTER_PASSWORD']);
+                    if ('MASTER_HOST' in a){
+                        $('input[name="ip"]').val(a['MASTER_HOST']);
+                        $('input[name="port"]').val(a['MASTER_PORT']);
+                        $('input[name="user"]').val(a['MASTER_USER']);
+                        $('input[name="pass"]').val(a['MASTER_PASSWORD']);
+                    } else {
+                        $('input[name="ip"]').val(a['SOURCE_HOST']);
+                        $('input[name="port"]').val(a['SOURCE_PORT']);
+                        $('input[name="user"]').val(a['SOURCE_USER']);
+                        $('input[name="pass"]').val(a['SOURCE_PASSWORD']);
+                    }
                 });
             },
             yes:function(index){
