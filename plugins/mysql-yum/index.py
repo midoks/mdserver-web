@@ -1501,7 +1501,8 @@ def resetDbRootPwd(version):
 
     pSqliteDb('config').where('id=?', (1,)).save('mysql_root', (pwd,))
 
-    if float(version) < 5.7:
+    mdb8 = getMdb8Ver()
+    if not mw.inArray(mdb8, version):
         cmd_pass = serverdir + '/bin/usr/bin/mysql --defaults-file=' + myconf + ' -uroot -e'
         cmd_pass = cmd_pass + '"UPDATE mysql.user SET password=PASSWORD(\'' + pwd + "') WHERE user='root';"
         cmd_pass = cmd_pass + 'flush privileges;"'
