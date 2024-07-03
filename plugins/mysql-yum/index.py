@@ -512,10 +512,10 @@ def my8cmd(version, method):
     mdb8 = getMdb8Ver()
     try:
         isInited = True
-        if version == '5.7':
-            isInited = initMysql57Data()
-        elif mw.inArray(mdb8, version):
+        if mw.inArray(mdb8, version):
             isInited = initMysql8Data()
+        else:
+            isInited = initMysql57Data()
 
         if not isInited:
             if not mw.isSupportSystemctl():
