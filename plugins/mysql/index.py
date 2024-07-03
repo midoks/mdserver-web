@@ -2410,7 +2410,7 @@ def getMasterRepSlaveUserCmd(version):
         sql += base_sql + channel_name
         sql += "<br/><hr/>";
 
-        sql += base_sql + "', MASTER_LOG_FILE='" + mstatus[0]["File"] + "',MASTER_LOG_POS=" + str(mstatus[0]["Position"]) + channel_name
+        sql += base_sql + ", MASTER_LOG_FILE='" + mstatus[0]["File"] + "',MASTER_LOG_POS=" + str(mstatus[0]["Position"]) + channel_name
     else:
         base_sql = "CHANGE REPLICATION SOURCE TO SOURCE_HOST='" + ip + "', SOURCE_PORT=" + port + ", SOURCE_USER='" + \
                 clist[0]['username']  + "', SOURCE_PASSWORD='" + clist[0]['password']+"'"
@@ -2419,7 +2419,7 @@ def getMasterRepSlaveUserCmd(version):
         # sql += base_sql + ", MASTER_AUTO_POSITION=1" + channel_name
         sql += base_sql + channel_name
         sql += "<br/><hr/>";
-        sql += base_sql + "', SOURCE_LOG_FILE='" + mstatus[0]["File"] + "',SOURCE_LOG_POS=" + str(mstatus[0]["Position"]) + channel_name
+        sql += base_sql + ", SOURCE_LOG_FILE='" + mstatus[0]["File"] + "',SOURCE_LOG_POS=" + str(mstatus[0]["Position"]) + channel_name
 
 
     data = {}
