@@ -2645,7 +2645,7 @@ function masterOrSlaveConf(version=''){
                 if (mdb_ver >= 8){
 
                     var status = "<a data-id="+i+"  class='btlink db_error'>异常</>";
-                    if (v['Slave_SQL_Running'] == 'Yes' && v['Slave_IO_Running'] == 'Yes'){
+                    if (v['Replica_SQL_Running'] == 'Yes' && v['Replica_IO_Running'] == 'Yes'){
                         status = "正常";
                     }
 
