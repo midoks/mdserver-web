@@ -619,10 +619,10 @@ def my8cmd(version, method):
     cmd = init_file + ' ' + method
     mdb8 = getMdb8Ver()
     try:
-        if version == '5.7':
-            isInited = initMysql57Data()
-        elif mw.inArray(mdb8, version):
+        if mw.inArray(mdb8, version):
             isInited = initMysql8Data()
+        else:
+            isInited = initMysql57Data()
 
         if not isInited:
 
