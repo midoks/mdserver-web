@@ -3272,7 +3272,7 @@ def doFullSyncUser(version=''):
 
 
     if mw.inArray(mdb8, version):
-        db.query("start slave user='{}' password='{}';".format(user, apass))
+        db.query("start replica user='{}' password='{}';".format(user, apass))
     else:
         db.query("start slave")
 
