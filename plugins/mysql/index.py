@@ -663,7 +663,7 @@ def my8cmd(version, method):
 
 def appCMD(version, action):
     makeInitRsaKey(version)
-    if float(version) >= 5.7:
+    if mw.inArray(mdb8, version):
         status = my8cmd(version, action)
     else:
         status = myOp(version, action)
