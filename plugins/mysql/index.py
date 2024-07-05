@@ -3494,10 +3494,10 @@ def doFullSyncUser(version=''):
     if not os.path.exists(bak_file):
         dmp_option += ' '
         if mw.inArray(mdb8,version):
-                # --compression-algorithms
-                dmp_option += " --source-data=1 --apply-replica-statements --include-source-host-port "
-            else:
-                dmp_option += " --master-data=1 --apply-slave-statements --include-master-host-port --compress "
+            # --compression-algorithms
+            dmp_option += " --source-data=1 --apply-replica-statements --include-source-host-port "
+        else:
+            dmp_option += " --master-data=1 --apply-slave-statements --include-master-host-port --compress "
 
         dump_sql_data = getServerDir() + "/bin/mysqldump --single-transaction --default-character-set=utf8mb4 -q " + dmp_option + " -h" + ip + " -P" + \
             port + " -u" + user + " -p'" + apass + "' --ssl-mode=DISABLED " + sync_db + " > " + bak_file
