@@ -9,3 +9,7 @@ serverPath=$(dirname "$rootPath")
 
 install_tmp=${rootPath}/tmp/mw_install.pl
 SYS_ARCH=`arch`
+
+
+apt -y install build-essential git make libelf-dev strace tar bpfcc-tools libbpf-dev
+
