@@ -664,6 +664,7 @@ def my8cmd(version, method):
 
 def appCMD(version, action):
     makeInitRsaKey(version)
+    mdb8 = getMdb8Ver()
     if mw.inArray(mdb8, version):
         status = my8cmd(version, action)
     else:
