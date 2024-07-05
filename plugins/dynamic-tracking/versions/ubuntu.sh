@@ -10,6 +10,13 @@ serverPath=$(dirname "$rootPath")
 install_tmp=${rootPath}/tmp/mw_install.pl
 SYS_ARCH=`arch`
 
+# export GOPROXY=https://goproxy.io
+# export GO111MODULE=on
+
 
 apt -y install build-essential git make libelf-dev strace tar bpfcc-tools libbpf-dev
+
+# clang -v
 apt -y install clang llvm
+
+apt -y install golang
