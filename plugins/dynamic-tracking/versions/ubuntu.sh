@@ -12,4 +12,4 @@ SYS_ARCH=`arch`
 
 
 apt -y install build-essential git make libelf-dev strace tar bpfcc-tools libbpf-dev
-
+apt -y install clang llvm
