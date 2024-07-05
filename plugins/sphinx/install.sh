@@ -11,6 +11,10 @@ sysArch=`arch`
 
 install_tmp=${rootPath}/tmp/mw_install.pl
 
+if [ -f ${rootPath}/bin/activate ];then
+	source ${rootPath}/bin/activate
+fi
+
 # cd /www/server/mdserver-web && source bin/activate && python3 plugins/sphinx/index.py rebuild
 # cd /www/server/mdserver-web/plugins/sphinx && bash install.sh install 3.6.1
 # cd /www/server/mdserver-web && source bin/activate && python3 plugins/sphinx/index.py db_to_sphinx && /www/server/sphinx/bin/bin/indexer -c /www/server/sphinx/sphinx.conf --all --rotate
