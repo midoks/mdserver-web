@@ -53,7 +53,7 @@ def send_msg(bot, tag='ad', trigger_time=300):
     # https://t.me/gjgzs2022 ｜ 22/m | @GJ_gzs
     # https://zhaoziyuan1.cc | web | 15/m | 2m | next,7/15 ｜ @baleite
     # 综合包网/NG接口开户 | 28/m | 6m | next,10/28 | @aabbcx888
-    # 实名认证/过人脸🕵️‍♀️各种账号处理✅ | 30/m| next,6/30 | @nngzs
+    # 实名认证/过人脸🕵️‍♀️各种账号处理✅ | 30/m| next,12/30 | @nngzs
     keyboard = [
         [
             types.InlineKeyboardButton(
