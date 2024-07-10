@@ -25,7 +25,7 @@ Install_App()
 	fi
 
 	if [ "$ARCH" == "x86_64" ];then
-		name="amd64"
+		ARCH="amd64"
 	fi
 
 	FILE_TGZ=simpleping_${name}_${ARCH}.tar.gz
