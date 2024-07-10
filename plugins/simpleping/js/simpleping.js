@@ -101,7 +101,13 @@ function getBeforeDate(n){
     return s;
 }
 
-function pingDataGraphRender(day){
+
+function pingDataGraphPosData(){
+    console.log(chartPingData.length);
+}
+
+
+function pingDataGraphData(day){
     var now = (new Date().getTime())/1000;
     if(day==0){
         var start = (new Date(getToday() + " 00:00:01").getTime())/1000;
@@ -121,54 +127,63 @@ function pingDataGraphRender(day){
 
     // console.log(start,end);
     pingPostCallbak('pingData', {'type':'range', 'start':start, 'end':end}, function(data){
-        var xData = [];
-        var yData = [];
+        chartPingData = data.data;
+        pingDataGraphRender();
 
-        var rdata = data.data;
-        
-        for(var i = 0; i < rdata.length; i++){
-            xData.push(toCommonTime(rdata[i].created_unix));
-            yData.push(rdata[i].speed/1000000);
-        }
-        var option = {
-            tooltip: {
-                trigger: 'axis',
-                axisPointer: { type: 'cross' },
-                formatter: '{b}<br />{a}: {c}'
-            },
-            xAxis: {
-                type: 'category',
-                boundaryGap: false,
-                data: xData,
-                axisLine:{ lineStyle:{ color:"#666"} } 
-            },
-            yAxis: {
-                type: 'value',
-                name: "PING延迟(ms)",
-                // boundaryGap: [0, '100%'],
-                // min:0,
-                // max: 100,
-                splitLine:{ lineStyle:{ color:"#ddd" } },
-                axisLine:{ lineStyle:{ color:"#666" } }
-            },
-            series: [
-                {
-                    name:'PING',
-                    type:'line',
-                    smooth:true,
-                    symbol: 'none',
-                    sampling: 'average',
-                    itemStyle: { normal: { color: 'rgb(0, 153, 238)' } },
-                    data: yData
-                }
-            ]
-        };
-        chartPing.setOption(option);
+        setInterval(function() {
+            pingDataGraphPosData();
+        }, 3000);
     });
+}
+
+function pingDataGraphRender(){
+    var xData = [];
+    var yData = [];
+    var rdata = chartPingData;
+    for(var i = 0; i < rdata.length; i++){
+        xData.push(toCommonTime(rdata[i].created_unix));
+        yData.push(rdata[i].speed/1000000);
+    }
+    var option = {
+        tooltip: {
+            trigger: 'axis',
+            axisPointer: { type: 'cross' },
+            formatter: '{b}<br />{a}: {c}'
+        },
+        xAxis: {
+            type: 'category',
+            boundaryGap: false,
+            data: xData,
+            axisLine:{ lineStyle:{ color:"#666"} } 
+        },
+        yAxis: {
+            type: 'value',
+            name: "PING延迟(ms)",
+            // boundaryGap: [0, '100%'],
+            // min:0,
+            // max: 100,
+            splitLine:{ lineStyle:{ color:"#ddd" } },
+            axisLine:{ lineStyle:{ color:"#666" } }
+        },
+        series: [
+            {
+                name:'PING',
+                type:'line',
+                smooth:true,
+                symbol: 'none',
+                sampling: 'average',
+                itemStyle: { normal: { color: 'rgb(0, 153, 238)' } },
+                data: yData
+            }
+        ]
+    };
+    chartPing.setOption(option);
+
 }
 
 // console.log('pingDataGraph');
 var chartPing;
+var chartPingData = [];
 function pingDataGraph(){
     var tpl = '\
     <div class="col-xs-12 col-sm-12 col-md-12 pull-left pd0 view1">\
@@ -178,9 +193,9 @@ function pingDataGraph(){
                     <h3 class="c-tit f16">连通性</h3>\
                     <div class="searcTime pull-right">\
                         <span class="tit">区间检索：</span>\
-                        <span class="gt" onclick="pingDataGraphRender(1)">昨天</span>\
-                        <span class="gt on" onclick="pingDataGraphRender(0)">今天</span>\
-                        <span class="gt" onclick="pingDataGraphRender(7)">最近7天</span>\
+                        <span class="gt" onclick="pingDataGraphData(1)">昨天</span>\
+                        <span class="gt on" onclick="pingDataGraphData(0)">今天</span>\
+                        <span class="gt" onclick="pingDataGraphData(7)">最近7天</span>\
                     </div>\
                 </div>\
                 <div id="pingview" style="width:100%; height:330px"></div>\
@@ -244,7 +259,7 @@ function pingDataGraph(){
         chartPing.resize();
     });
 
-    pingDataGraphRender(0);
+    pingDataGraphData(0);
 }
 
 
