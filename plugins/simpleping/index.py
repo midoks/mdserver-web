@@ -64,11 +64,6 @@ def getConf():
     return path
 
 
-def getConfTpl():
-    path = getPluginDir() + "/config/redis.conf"
-    return path
-
-
 def getInitDTpl():
     path = getPluginDir() + "/init.d/" + getPluginName() + ".tpl"
     return path
@@ -162,6 +157,7 @@ def initDreplace():
         mw.execShell('chmod +x ' + file_bin)
 
     # systemd
+    # systemctl status simpleping.service
     systemDir = mw.systemdCfgDir()
     systemService = systemDir + '/' + getPluginName() + '.service'
     if os.path.exists(systemDir) and not os.path.exists(systemService):
