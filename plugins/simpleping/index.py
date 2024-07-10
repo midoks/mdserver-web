@@ -157,7 +157,7 @@ def initDreplace():
         mw.execShell('chmod +x ' + file_bin)
 
     # systemd
-    # systemctl status simpleping.service
+    # systemctl start simpleping.service
     systemDir = mw.systemdCfgDir()
     systemService = systemDir + '/' + getPluginName() + '.service'
     if os.path.exists(systemDir) and not os.path.exists(systemService):
