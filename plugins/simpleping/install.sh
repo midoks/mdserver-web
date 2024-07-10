@@ -11,6 +11,9 @@ ARCH=`uname -m`
 sysName=`uname`
 VERSION=$2
 
+# 开启可以PING
+# sysctl -w net.ipv4.ping_group_range="0 2147483647"
+
 install_tmp=${rootPath}/tmp/mw_install.pl
 
 Install_App()
