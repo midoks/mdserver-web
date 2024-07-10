@@ -122,6 +122,15 @@ function getBeforeDate(n){
 
 
 function pingDataGraphPosData(){
+
+    var isOk = document.getElementById('pingview');
+    if (!isOk){
+        clearInterval(posTimer);
+    }
+
+    console.log('run');
+
+
     if (chartPingData.length>0){
         var dlen = chartPingData.length;
         last_pos = chartPingData[dlen-1];
@@ -164,7 +173,7 @@ function pingDataGraphData(day){
         clearInterval(posTimer);
         posTimer = clearInterval(function() {
             pingDataGraphPosData();
-        }, 2000);
+        }, 3000);
     });
 }
 
