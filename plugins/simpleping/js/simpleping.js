@@ -172,10 +172,12 @@ function pingDataGraphData(day){
         chartPingData = data.data;
         pingDataGraphRender();
 
-        clearInterval(posTimer);
-        posTimer = setInterval(function() {
-            pingDataGraphPosData();
-        }, 2000);
+        if (day!=1){
+            clearInterval(posTimer);
+            posTimer = setInterval(function() {
+                pingDataGraphPosData();
+            }, 2000);
+        }
     });
 }
 
