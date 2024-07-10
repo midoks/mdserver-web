@@ -162,7 +162,7 @@ function pingDataGraphData(day){
         pingDataGraphRender();
 
         clearInterval(posTimer);
-        posTimer = setTimeout(function() {
+        posTimer = clearInterval(function() {
             pingDataGraphPosData();
         }, 2000);
     });
