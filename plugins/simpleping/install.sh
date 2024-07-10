@@ -24,6 +24,10 @@ Install_App()
 		name="darwin"
 	fi
 
+	if [ "$ARCH" == "x86_64" ];then
+		name="amd64"
+	fi
+
 	FILE_TGZ=simpleping_${name}_${ARCH}.tar.gz
 	APP_DIR=$serverPath/source/simpleping
 
