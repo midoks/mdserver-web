@@ -53,6 +53,25 @@ function pingPostCallbak(method, args, callback){
     },'json'); 
 }
 
+function pingPostCallbakN(method, args, callback){
+    var req_data = {};
+    req_data['name'] = 'simpleping';
+    req_data['script'] = 'simpleping_index';
+    req_data['func'] = method;
+ 
+    if (typeof(args) == 'string'){
+        req_data['args'] = JSON.stringify(toArrayObject(args));
+    } else {
+        req_data['args'] = JSON.stringify(args);
+    }
+
+    $.post('/plugins/callback', req_data, function(data) {
+        if(typeof(callback) == 'function'){
+            callback(data);
+        }
+    },'json'); 
+}
+
 
 function appReadme(){
 
@@ -103,7 +122,19 @@ function getBeforeDate(n){
 
 
 function pingDataGraphPosData(){
-    console.log(chartPingData.length);
+    if (chartPingData.length>0){
+        var dlen = chartPingData.length;
+        last_pos = chartPingData[dlen-1];
+        // console.log(start,end);
+        pingPostCallbakN('pingData', {'type':'pos', 'pos':last_pos['created_unix']}, function(data){
+            var tmp_data = data.data;
+            for (x in tmp_data){
+                chartPingData.push(tmp_data[x]);
+            }
+            pingDataGraphRender();
+        });
+
+    }
 }
 
 
@@ -130,9 +161,10 @@ function pingDataGraphData(day){
         chartPingData = data.data;
         pingDataGraphRender();
 
-        setInterval(function() {
+        clearInterval(posTimer);
+        posTimer = setTimeout(function() {
             pingDataGraphPosData();
-        }, 3000);
+        }, 2000);
     });
 }
 
@@ -184,6 +216,7 @@ function pingDataGraphRender(){
 // console.log('pingDataGraph');
 var chartPing;
 var chartPingData = [];
+var posTimer;
 function pingDataGraph(){
     var tpl = '\
     <div class="col-xs-12 col-sm-12 col-md-12 pull-left pd0 view1">\
