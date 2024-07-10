@@ -82,6 +82,10 @@ function appReadme(){
     $('.soft-man-con').html(readme);
 }
 
+var chartPing;
+var chartPingData = [];
+var posTimer;
+
 // 把Unix时间戳转化成普通日期
 function toCommonTime(unix_time){
     var unixTimestamp = new Date(unix_time*1000);
@@ -128,9 +132,6 @@ function pingDataGraphPosData(){
         clearInterval(posTimer);
     }
 
-    console.log('run');
-
-
     if (chartPingData.length>0){
         var dlen = chartPingData.length;
         last_pos = chartPingData[dlen-1];
@@ -148,6 +149,7 @@ function pingDataGraphPosData(){
 
 
 function pingDataGraphData(day){
+    
     var now = (new Date().getTime())/1000;
     if(day==0){
         var start = (new Date(getToday() + " 00:00:01").getTime())/1000;
@@ -171,9 +173,9 @@ function pingDataGraphData(day){
         pingDataGraphRender();
 
         clearInterval(posTimer);
-        posTimer = clearInterval(function() {
+        posTimer = setInterval(function() {
             pingDataGraphPosData();
-        }, 3000);
+        }, 2000);
     });
 }
 
@@ -223,9 +225,7 @@ function pingDataGraphRender(){
 }
 
 // console.log('pingDataGraph');
-var chartPing;
-var chartPingData = [];
-var posTimer;
+
 function pingDataGraph(){
     var tpl = '\
     <div class="col-xs-12 col-sm-12 col-md-12 pull-left pd0 view1">\
