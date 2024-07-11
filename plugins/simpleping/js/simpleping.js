@@ -136,7 +136,8 @@ function pingDataGraphPosData(){
         var dlen = chartPingData.length;
         last_pos = chartPingData[dlen-1];
         // console.log(start,end);
-        pingPostCallbakN('pingData', {'type':'pos', 'pos':last_pos['created_unix']}, function(data){
+        var cur_ip = $('select[name="ip_list"]').val();
+        pingPostCallbakN('pingData', {'type':'pos', 'pos':last_pos['created_unix'],"ip":cur_ip}, function(data){
             var tmp_data = data.data;
             for (x in tmp_data){
                 chartPingData.push(tmp_data[x]);
@@ -167,8 +168,9 @@ function pingDataGraphData(day){
         var end = Math.round(now);
     }
 
+    var cur_ip = $('select[name="ip_list"]').val();
     // console.log(start,end);
-    pingPostCallbak('pingData', {'type':'range', 'start':start, 'end':end}, function(data){
+    pingPostCallbak('pingData', {'type':'range', 'start':start, 'end':end, 'ip':cur_ip}, function(data){
         chartPingData = data.data;
         pingDataGraphRender();
 
@@ -223,11 +225,33 @@ function pingDataGraphRender(){
         ]
     };
     chartPing.setOption(option);
+}
+
+function pingIpList(){
+    pingPost('ip_list', {}, function(data){
+        var rdata = $.parseJSON(data.data);
+        var ips = rdata.data;
+
+        var option = '';
+        option += '<option value="all">所有</option>';
+
+        for (var i = 0; i < ips.length; i++) {
+            option += '<option value="'+ips[i]+'">'+ips[i]+'</option>';
+        }
+        $('select[name="ip_list"]').html(option);
+
+
+        $('select[name="ip_list"]').change(function(){
+            chartPingData = [];
+            pingDataGraphData(0);
+        });
+
+        pingDataGraphData(0);
+    });
 
 }
 
 // console.log('pingDataGraph');
-
 function pingDataGraph(){
     var tpl = '\
     <div class="col-xs-12 col-sm-12 col-md-12 pull-left pd0 view1">\
@@ -236,7 +260,9 @@ function pingDataGraph(){
                 <div class="title c6 plr15">\
                     <h3 class="c-tit f16">连通性</h3>\
                     <div class="searcTime pull-right">\
-                        <span class="tit">区间检索：</span>\
+                        <select class="bt-input-text gt" name="ip_list" style="height:28px;margin-left:0px;">\
+                            <option value="all">所有</option>\
+                        </select>\
                         <span class="gt" onclick="pingDataGraphData(1)">昨天</span>\
                         <span class="gt on" onclick="pingDataGraphData(0)">今天</span>\
                         <span class="gt" onclick="pingDataGraphData(7)">最近7天</span>\
@@ -247,6 +273,11 @@ function pingDataGraph(){
         </div>\
     </div>';
     $('.soft-man-con').html(tpl);
+
+    $('.searcTime span').click(function(e){
+        $('.searcTime span').removeClass('on');
+        $(this).addClass('on');
+    });
 
     chartPing = echarts.init(document.getElementById('pingview'));
 
@@ -303,7 +334,8 @@ function pingDataGraph(){
         chartPing.resize();
     });
 
-    pingDataGraphData(0);
+    pingIpList();
+    
 }
 
 

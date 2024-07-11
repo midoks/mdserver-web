@@ -31,6 +31,10 @@ def pingData(args = ()):
     conn = conn.field(field)
     data = []
     atype = args['type']
+    ip = args['ip']
+    if ip != 'all':
+        conn = conn.where('ip=?',(ip,))
+        
     if atype == 'pos':
         pos = args['pos']
         data = conn.where('created_unix>?',(pos,)).limit("3000").select()
