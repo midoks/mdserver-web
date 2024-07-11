@@ -176,7 +176,7 @@ function pingDataGraphData(day){
             clearInterval(posTimer);
             posTimer = setInterval(function() {
                 pingDataGraphPosData();
-            }, 2000);
+            }, 3000);
         }
     });
 }
