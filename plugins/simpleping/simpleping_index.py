@@ -31,7 +31,11 @@ def pingData(args = ()):
     conn = conn.field(field)
     data = []
     atype = args['type']
-    ip = args['ip']
+
+    if not 'ip' in args:
+        ip = 'all'
+    else:
+        ip = args['ip']
     if ip != 'all':
         conn = conn.where('ip=?',(ip,))
         
