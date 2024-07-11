@@ -33,10 +33,10 @@ def pingData(args = ()):
     atype = args['type']
     if atype == 'pos':
         pos = args['pos']
-        data = conn.where('created_unix>?',(pos,)).select()
+        data = conn.where('created_unix>?',(pos,)).limit("1000").select()
     elif atype == 'range':
         start = args['start']
         end = args['end']
-        data = conn.where('created_unix>=? and created_unix<=?',(start,end)).select()
+        data = conn.where('created_unix>=? and created_unix<=?',(start,end)).limit("1000").select()
     return data
 
