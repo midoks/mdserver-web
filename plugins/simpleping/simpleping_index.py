@@ -48,3 +48,19 @@ def pingData(args = ()):
         data = conn.where('created_unix>=? and created_unix<=?',(start,end)).limit("1000").select()
     return data
 
+
+def pingMySQLData(args = ()):
+    conn = mw.M('sp_mysql_ping').dbPos(getServerDir()+'/data', 'simpleping', 'db3')
+    field = 'id,value,created_unix'
+    conn = conn.field(field)
+    data = []
+    atype = args['type']
+    if atype == 'pos':
+        pos = args['pos']
+        data = conn.where('created_unix>?',(pos,)).limit("3000").select()
+    elif atype == 'range':
+        start = args['start']
+        end = args['end']
+        data = conn.where('created_unix>=? and created_unix<=?',(start,end)).limit("1000").select()
+    return data
+
