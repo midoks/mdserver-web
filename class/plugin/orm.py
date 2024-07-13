@@ -23,7 +23,7 @@ class ORM:
     __DB_CHARSET = "utf8"
 
     def __Conn(self):
-        # print(self.__DB_HOST, self.__DB_USER)
+        # print(self.__DB_HOST, self.__DB_USER, self.__DB_PASS, self.__DB_SOCKET)
         '''连接数据库'''
         try:
 
