@@ -399,7 +399,7 @@ function pingDataMySQLGraphRender(){
         },
         series: [
             {
-                name:'PING',
+                name:'同步延迟',
                 type:'line',
                 smooth:true,
                 symbol: 'none',
