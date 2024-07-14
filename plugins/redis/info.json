@@ -10,7 +10,7 @@
 	"checks": "server/redis",
 	"path": "server/redis",
 	"display": 1,
-	"author": "Zend",
+	"author": "redis",
 	"date": "2017-04-01",
 	"home": "https://redis.io",
 	"type": 0,
