@@ -938,6 +938,31 @@ function importDbExternal(file,name){
     });
 }
 
+function importDbExternalProgress(file,name){
+    myPost('import_db_external_progress',{file:file,name:name}, function(data){
+        var rdata = $.parseJSON(data.data);
+        layer.open({
+            title: "手动导入命令CMD【显示进度】",
+            area: ['600px', '180px'],
+            type:1,
+            closeBtn: 1,
+            shadeClose: false,
+            btn:["复制","取消"],
+            content: '<div class="pd15">\
+                        <div class="divtable">\
+                            <pre class="layui-code">'+rdata.data+'</pre>\
+                        </div>\
+                    </div>',
+            success:function(){
+                copyText(rdata.data);
+            },
+            yes:function(){
+                copyText(rdata.data);
+            }
+        });
+    });
+}
+
 function setLocalImport(db_name){
 
     //上传文件
@@ -993,6 +1018,7 @@ function setLocalImport(db_name){
                         <td><span> ' + file_list[i]['time'] + '</span></td>\
                         <td style="text-align: right;">\
                             <a class="btlink" onclick="importDbExternal(\'' + file_list[i]['name'] + '\',\'' +db_name+ '\')">导入</a> | \
+                            <a class="btlink" onclick="importDbExternalProgress(\'' + file_list[i]['name'] + '\',\'' +db_name+ '\')">导入进度</a> | \
                             <a class="btlink del" index="'+i+'">删除</a>\
                         </td>\
                     </tr>';
@@ -1016,7 +1042,7 @@ function setLocalImport(db_name){
     var layerIndex = layer.open({
         type: 1,
         title: "从文件导入数据",
-        area: ['600px', '380px'],
+        area: ['700px', '380px'],
         closeBtn: 1,
         shadeClose: false,
         content: '<div class="pd15">\
