@@ -1,6 +1,6 @@
 {
 	"sort": 7,
-	"ps": "Zabbix是一个成熟、易用的企业级开源监控解决方案，适用于百万级指标的网络监控和应用监控",
+	"ps": "Zabbix是一个成熟、易用的企业级开源监控解决方案，适用于百万级指标的网络监控和应用监控[<span style='color:red;'>开发中</span>]",
 	"name": "zabbix",
 	"title": "Zabbix",
 	"shell": "install.sh",
