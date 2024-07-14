@@ -35,11 +35,12 @@ fi
 if [ -f ${rootPath}/bin/activate ];then
 	source ${rootPath}/bin/activate
 fi
-Install_app()
+
+Install_App()
 {
 	echo '正在安装脚本文件...'
 	mkdir -p $serverPath/source/zabbix
-	shell_file=${curPath}/versions/${VERSION}/${OSNAME}.sh
+	shell_file=${curPath}/versions/${VERSION}/${OSNAME}.sh install
 
 	if [ -f $shell_file ];then
 		bash -x $shell_file
@@ -60,7 +61,7 @@ Install_app()
 	echo 'Zabbix安装完成'
 }
 
-Uninstall_app()
+Uninstall_App()
 {
 	rm -rf $serverPath/zabbix
 	echo 'Zabbix卸载完成'
@@ -68,7 +69,7 @@ Uninstall_app()
 
 action=$1
 if [ "${1}" == 'install' ];then
-	Install_app
+	Install_App
 else
-	Uninstall_app
+	Uninstall_App
 fi
