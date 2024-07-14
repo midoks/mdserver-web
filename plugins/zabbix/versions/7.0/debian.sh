@@ -14,6 +14,10 @@ SYS_VERSION_ID=`cat /etc/*-release | grep VERSION_ID | awk -F = '{print $2}' | a
 
 Install_App()
 {
+	mkdir -p $serverPath/source/zabbix
+	wget -O $serverPath/source/zabbix https://repo.zabbix.com/zabbix/7.0/debian/pool/main/z/zabbix-release/zabbix-release_7.0-2+debian12_all.deb
+	cd $serverPath/source/zabbix && dpkg -i zabbix-release_7.0-2+debian12_all.deb
+	apt update -y 
 }
 
 Uninstall_App()
