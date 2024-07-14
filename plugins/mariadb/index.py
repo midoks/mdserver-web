@@ -2144,7 +2144,7 @@ def getMasterRepSlaveUserCmd(version):
     sql += base_sql + "', MASTER_LOG_FILE='" + mstatus[0]["File"] + \
             "',MASTER_LOG_POS=" + str(mstatus[0]["Position"])
     sql += "<br/><hr/>";
-    sql += base_sql + "',MASTER_USE_GTID=no,MASTER_CONNECT_RETRY=10;";    
+    sql += base_sql + "',MASTER_USE_GTID=slave_pos,MASTER_CONNECT_RETRY=10;";    
     sql += "<br/>";
 
     data = {}
