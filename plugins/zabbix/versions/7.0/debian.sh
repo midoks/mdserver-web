@@ -22,7 +22,7 @@ Install_App()
 
 Uninstall_App()
 {
-	echo "卸载"
+	echo "卸载成功"
 }
 
 action=${1}
