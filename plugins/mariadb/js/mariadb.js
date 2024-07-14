@@ -1736,17 +1736,12 @@ function getMasterRepSlaveUserCmd(username, db=''){
             area: '500px',
             content:"<form class='bt-form pd20 pb70' id='add_master'>\
             <div class='line' style='word-wrap: break-word;word-break: normal;'>"+cmd+"</div>\
-            <div class='bt-form-submit-btn'>\
-                <button type='button' class='btn btn-success btn-sm btn-title class-copy-cmd'>复制</button>\
+            <div class='bt-form-submit-btn' style='text-align:center;'>\
+                <button type='button' class='btn btn-success btn-sm btn-title'>选择其中一个复制</button>\
             </div>\
           </form>",
         });
 
-       
-        copyPass(cmd);
-        $('.class-copy-cmd').click(function(){
-            copyPass(cmd);
-        });
     });
 }
 

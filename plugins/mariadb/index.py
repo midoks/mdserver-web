@@ -2079,16 +2079,15 @@ def getMasterRepSlaveUserCmd(version):
     # slave_pos  依赖-> select @@global.gtid_slave_pos;
     # no -> 啥都不依赖,保证多主同步成功。同步出现问题,根据日志查找问题。
 
-    if mode == "gtid":
-        sql = "CHANGE MASTER " + connection_name + "TO MASTER_HOST='" + ip + "', MASTER_PORT=" + port + ", MASTER_USER='" + \
-            clist[0]['username'] + "', MASTER_PASSWORD='" + \
-            clist[0]['password'] + "',MASTER_USE_GTID=no,MASTER_CONNECT_RETRY=10;"
-    else:
-        sql = "CHANGE MASTER " + connection_name + "TO MASTER_HOST='" + ip + "', MASTER_PORT=" + port + ", MASTER_USER='" + \
+    base_sql = "CHANGE MASTER " + connection_name + "TO MASTER_HOST='" + ip + "', MASTER_PORT=" + port + ", MASTER_USER='" + \
             clist[0]['username']  + "', MASTER_PASSWORD='" + \
-            clist[0]['password'] + \
-            "', MASTER_LOG_FILE='" + mstatus[0]["File"] + \
+            clist[0]['password'];
+
+    sql += base_sql + "',MASTER_USE_GTID=no,MASTER_CONNECT_RETRY=10;";
+    sql += "<br/><hr/>";
+    sql += base_sql + "', MASTER_LOG_FILE='" + mstatus[0]["File"] + \
             "',MASTER_LOG_POS=" + str(mstatus[0]["Position"])
+    sql += "<br/>";
 
     data = {}
     data['cmd'] = sql
