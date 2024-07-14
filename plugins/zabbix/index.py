@@ -120,22 +120,30 @@ def contentReplace(content):
     service_path = mw.getServerDir()
     content = content.replace('{$ROOT_PATH}', mw.getRootDir())
     content = content.replace('{$SERVER_PATH}', service_path)
-    content = content.replace('{$SERVER_APP}', service_path + '/redis')
-    content = content.replace('{$REDIS_PASS}', mw.getRandomString(10))
+    content = content.replace('{$ZABBIX_ROOT}', '/usr/share/zabbix')
+    content = content.replace('{$ZABBIX_PORT}', '18888')
     return content
 
 
 
 def initDreplace():
+    nginx_src_tpl = getPluginDir()+'/conf/zabbix.nginx.conf'
+    nginx_dst_tpl = mw.getServerDir()+'/web_conf/nginx/vhost/zabbix.conf'
 
-    file_tpl = getInitDTpl()
-    service_path = os.path.dirname(os.getcwd())
+    if not os.path.exists(nginx_dst_tpl):
+        content = mw.readFile(nginx_src_tpl)
+        content = contentReplace(content)
+        mw.writeFile(nginx_dst_tpl, content)
 
+    # zcat /usr/share/zabbix-sql-scripts/mysql/server.sql.gz | /www/server/mysql/bin/mysql --default-character-set=utf8mb4 -uzabbix -p"yWBMNWcFTzjh3trM" zabbix
 
-    return file_bin
+    # service zabbix-server start
+    return True
 
 
 def zOp(method):
+
+    initDreplace()
 
     current_os = mw.getOs()
     if current_os.startswith("freebsd"):
