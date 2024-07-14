@@ -2033,6 +2033,64 @@ def addMasterRepSlaveUser(version=''):
     return mw.returnJson(True, '添加成功!')
 
 
+def getMasterRepSlaveUserCmdSsh(version):
+
+    args = getArgs()
+    data = checkArgs(args, ['username', 'db'])
+    if not data[0]:
+        return data[1]
+
+    psdb = pSqliteDb('master_replication_user')
+    f = 'username,password'
+    username = args['username']
+    if username == '':
+        count = psdb.count()
+        if count == 0:
+            return mw.returnJson(False, '请添加同步账户!')
+
+        clist = psdb.field(f).limit('1').order('id desc').select()
+    else:
+        clist = psdb.field(f).where("username=?", (username,)).limit(
+            '1').order('id desc').select()
+
+    if len(clist) == 0:
+        return mw.returnJson(False, '错误同步账户!')
+
+    ip = mw.getLocalIp()
+    port = getMyPort()
+    db = pMysqlDb()
+
+    mstatus = db.query('show master status')
+    if len(mstatus) == 0:
+        return mw.returnJson(False, '未开启!')
+
+    mode = recognizeDbMode()
+
+    # 查找同步点
+    # SELECT BINLOG_GTID_POS('master1-bin.000002', 561866201);
+
+    sid = getDbServerId()
+    connection_name = ""
+    if sid != '':
+        connection_name = "'r{}' ".format(sid)
+
+    # MASTER_USE_GTID={current_pos|slave_pos|no}
+    # current_pos  依赖-> select @@global.gtid_current_pos;
+    # slave_pos  依赖-> select @@global.gtid_slave_pos;
+    # no -> 啥都不依赖,保证多主同步成功。同步出现问题,根据日志查找问题。
+
+    base_sql = "CHANGE MASTER " + connection_name + "TO MASTER_HOST='" + ip + "', MASTER_PORT=" + port + ", MASTER_USER='" + \
+            clist[0]['username']  + "', MASTER_PASSWORD='" + \
+            clist[0]['password'];
+    sql = ''
+    sql += base_sql + "', MASTER_LOG_FILE='" + mstatus[0]["File"] + \
+            "',MASTER_LOG_POS=" + str(mstatus[0]["Position"])
+    data = {}
+    data['cmd'] = sql
+    data["info"] = clist[0]
+    data['mode'] = mode
+    return mw.returnJson(True, 'ok!', data)
+
 def getMasterRepSlaveUserCmd(version):
 
     args = getArgs()
@@ -2543,7 +2601,7 @@ def initSlaveStatusSSH(version=''):
                         username='root', pkey=key)
 
             db_user = data['db_user']
-            cmd = 'cd /www/server/mdserver-web && source bin/activate && python3 plugins/mariadb/index.py get_master_rep_slave_user_cmd {"username":"' + db_user + '","db":""}'
+            cmd = 'cd /www/server/mdserver-web && source bin/activate && python3 plugins/mariadb/index.py get_master_rep_slave_user_cmd_ssh {"username":"' + db_user + '","db":""}'
             stdin, stdout, stderr = ssh.exec_command(cmd)
             result = stdout.read()
             result = result.decode('utf-8')
@@ -3413,6 +3471,8 @@ if __name__ == "__main__":
         print(delMasterRepSlaveUser(version))
     elif func == 'update_master_rep_slave_user':
         print(updateMasterRepSlaveUser(version))
+    elif func == 'get_master_rep_slave_user_cmd_ssh':
+        print(getMasterRepSlaveUserCmdSsh(version))
     elif func == 'get_master_rep_slave_user_cmd':
         print(getMasterRepSlaveUserCmd(version))
     elif func == 'get_slave_list':
