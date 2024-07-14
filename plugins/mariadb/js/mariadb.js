@@ -938,6 +938,31 @@ function importDbExternal(file,name){
     });
 }
 
+function importDbExternalProgress(file,name){
+    myPost('import_db_external_progress',{file:file,name:name}, function(data){
+        var rdata = $.parseJSON(data.data);
+        layer.open({
+            title: "手动导入命令CMD【显示进度】",
+            area: ['600px', '180px'],
+            type:1,
+            closeBtn: 1,
+            shadeClose: false,
+            btn:["复制","取消"],
+            content: '<div class="pd15">\
+                        <div class="divtable">\
+                            <pre class="layui-code">'+rdata.data+'</pre>\
+                        </div>\
+                    </div>',
+            success:function(){
+                copyText(rdata.data);
+            },
+            yes:function(){
+                copyText(rdata.data);
+            }
+        });
+    });
+}
+
 function setLocalImport(db_name){
 
     //上传文件
@@ -993,6 +1018,7 @@ function setLocalImport(db_name){
                         <td><span> ' + file_list[i]['time'] + '</span></td>\
                         <td style="text-align: right;">\
                             <a class="btlink" onclick="importDbExternal(\'' + file_list[i]['name'] + '\',\'' +db_name+ '\')">导入</a> | \
+                            <a class="btlink" onclick="importDbExternalProgress(\'' + file_list[i]['name'] + '\',\'' +db_name+ '\')">导入进度</a> | \
                             <a class="btlink del" index="'+i+'">删除</a>\
                         </td>\
                     </tr>';
@@ -1016,7 +1042,7 @@ function setLocalImport(db_name){
     var layerIndex = layer.open({
         type: 1,
         title: "从文件导入数据",
-        area: ['600px', '380px'],
+        area: ['700px', '380px'],
         closeBtn: 1,
         shadeClose: false,
         content: '<div class="pd15">\
@@ -1710,17 +1736,12 @@ function getMasterRepSlaveUserCmd(username, db=''){
             area: '500px',
             content:"<form class='bt-form pd20 pb70' id='add_master'>\
             <div class='line' style='word-wrap: break-word;word-break: normal;'>"+cmd+"</div>\
-            <div class='bt-form-submit-btn'>\
-                <button type='button' class='btn btn-success btn-sm btn-title class-copy-cmd'>复制</button>\
+            <div class='bt-form-submit-btn' style='text-align:center;'>\
+                <button type='button' class='btn btn-success btn-sm btn-title'>选择其中一个复制</button>\
             </div>\
           </form>",
         });
 
-       
-        copyPass(cmd);
-        $('.class-copy-cmd').click(function(){
-            copyPass(cmd);
-        });
     });
 }
 
@@ -1936,6 +1957,7 @@ function getFullSyncStatus(db){
                     </div>\
                     <div class='table_toolbar' style='left:0px;'>\
                         <span data-status='init' class='sync btn btn-default btn-sm' id='begin_full_sync'>开始</span>\
+                        <span data-status='init' class='btn btn-default btn-sm' id='full_sync_cmd'>手动命令</span>\
                     </div>\
                 </div>",
             cancel: function(){ 
@@ -1957,6 +1979,31 @@ function getFullSyncStatus(db){
                     } else {
                         layer.msg("正在同步中..",{icon:0});
                     }
+                });
+
+                $('#full_sync_cmd').click(function(){
+                    myPostN('full_sync_cmd', {'db':db,'sign':''}, function(rdata){
+                        var rdata = $.parseJSON(rdata.data);
+                        layer.open({
+                        title: "手动执行命令CMD",
+                            area: ['600px', '180px'],
+                            type:1,
+                            closeBtn: 1,
+                            shadeClose: false,
+                            btn:["复制","取消"],
+                            content: '<div class="pd15">\
+                                        <div class="divtable">\
+                                            <pre class="layui-code">'+rdata.data+'</pre>\
+                                        </div>\
+                                    </div>',
+                            success:function(){
+                                copyText(rdata.data);
+                            },
+                            yes:function(){
+                                copyText(rdata.data);
+                            }
+                        });
+                    });
                 });
             }
         });
@@ -2211,7 +2258,7 @@ function addSlaveSyncUser(ip=''){
 
         var index = layer.open({
             type: 1,
-            area: ['500px','470px'],
+            area: ['500px','510px'],
             title: '同步账户',
             closeBtn: 1,
             shift: 5,
@@ -2222,6 +2269,15 @@ function addSlaveSyncUser(ip=''){
                 <div class='line'><span class='tname'>端口</span><div class='info-r'><input name='port' class='bt-input-text mr5' type='number' style='width:330px;' value='"+port+"'></div></div>\
                 <div class='line'><span class='tname'>同步账户</span><div class='info-r'><input name='user' class='bt-input-text mr5' type='text' style='width:330px;' value='"+user+"'></div></div>\
                 <div class='line'><span class='tname'>同步密码</span><div class='info-r'><input name='pass' class='bt-input-text mr5' type='text' style='width:330px;' value='"+pass+"'></div></div>\
+                <div class='line'>\
+                    <span class='tname'>同步模式</span>\
+                    <div class='info-r'>\
+                        <select class='bt-input-text mr5' name='mode'>\
+                            <option value='0' "+( mode == '0' ? 'selected="selected"' : '')+">经典</option>\
+                            <option value='1' "+( mode == '1' ? 'selected="selected"' : '')+">GTID</option>\
+                        </select>\
+                    </div>\
+                </div>\
                 <div class='line'>\
                 <span class='tname'>CMD[必填]</span>\
                 <div class='info-r'><textarea class='bt-input-text mr5' row='20' cols='30' name='cmd' style='width:330px;height:150px;'></textarea></div>\

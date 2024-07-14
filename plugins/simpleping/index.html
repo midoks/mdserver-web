@@ -1,0 +1,25 @@
+<div class="bt-form">
+	<div class='plugin_version'></div>
+	<div class="bt-w-main">
+		<div class="bt-w-menu">
+			<p class="bgw" onclick="pluginService('simpleping');">服务</p>
+			<p onclick="pluginInitD('simpleping');">自启动</p>
+			<p onclick="pluginConfig('simpleping',$('.plugin_version').attr('version'));">配置修改</p>
+			<p onclick="pingDataGraph()">连通性</p>
+			<p onclick="pingMySQLDataGraph()">MySQL</p>
+			<p onclick="appReadme();">相关说明</p>
+			
+		</div>
+		<div class="bt-w-con pd15">
+			<div class="soft-man-con" style="height: 520px; overflow: auto;"></div>
+		</div>
+	</div>
+</div>
+
+<script type="text/javascript">
+resetPluginWinHeight(595);
+$.getScript("/plugins/file?name=simpleping&f=js/simpleping.js", function(){
+	console.log('load simpleping');
+	pluginService('simpleping', $('.plugin_version').attr('version'));
+});
+</script>

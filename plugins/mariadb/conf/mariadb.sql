@@ -50,6 +50,7 @@ CREATE TABLE IF NOT EXISTS `slave_sync_user` (
   `pass` TEXT,
   `mode` TEXT,
   `cmd` TEXT,
+  `db` TEXT,
   `addtime` TEXT
 );
 

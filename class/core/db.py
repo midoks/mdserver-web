@@ -61,8 +61,8 @@ class Sql():
         self.__DB_FILE = 'data/' + name + '.db'
         return self
 
-    def dbPos(self, path, name):
-        self.__DB_FILE = path + '/' + name + '.db'
+    def dbPos(self, path, name, suffix_name = 'db'):
+        self.__DB_FILE = path + '/' + name + '.' + suffix_name
         return self
 
     def table(self, table):

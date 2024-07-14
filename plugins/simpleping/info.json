@@ -1,0 +1,17 @@
+{
+	"sort": 999,
+	"ps": "简单Ping服务,检查连通性",
+	"name": "simpleping",
+	"title": "SimplePing",
+	"shell": "install.sh",
+	"versions":["1.0"],
+	"tip": "soft",
+	"checks": "server/simpleping",
+	"path": "server/simpleping",
+	"display": 1,
+	"author": "midoks",
+	"date": "2024-07-10",
+	"home": "https://github.com/midoks/simpleping",
+	"type": 0,
+	"pid": "5"
+}

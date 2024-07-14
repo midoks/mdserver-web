@@ -183,7 +183,7 @@ def pMysqlDb():
     db = mw.getMyORM()
     # MySQLdb |
     # db = mw.getMyORMDb()
-
+    # print(getDbPort())
     db.setPort(getDbPort())
     db.setSocket(getSocketFile())
     # db.setCharset("utf8")
@@ -665,6 +665,8 @@ def my8cmd(version, method):
 def appCMD(version, action):
     makeInitRsaKey(version)
     mdb8 = getMdb8Ver()
+    mdb8.append('5.7')
+    # print(mdb8)
     if mw.inArray(mdb8, version):
         status = my8cmd(version, action)
     else:
@@ -777,8 +779,7 @@ def setMyDbPos(version):
     mw.writeFile(myfile, mycnf)
     start(version)
 
-    result = mw.execShell(
-        'ps aux|grep mysqld| grep -v grep|grep -v python')
+    result = mw.execShell('ps aux|grep mysqld| grep -v grep|grep -v python')
     if len(result[0]) > 10:
         mw.writeFile('data/datadir.pl', t_datadir)
         return mw.returnJson(True, '存储目录迁移成功!')

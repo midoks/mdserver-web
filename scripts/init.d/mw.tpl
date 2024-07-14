@@ -246,6 +246,22 @@ mw_update()
 
 mw_update_dev()
 {
+    LOCAL_ADDR=common
+    cn=$(curl -fsSL -m 10 -s http://ipinfo.io/json | grep "\"country\": \"CN\"")
+    if [ ! -z "$cn" ] || [ "$?" == "0" ] ;then
+        LOCAL_ADDR=cn
+    fi
+    
+    if [ "$LOCAL_ADDR" == "common" ];then
+        curl --insecure -fsSL https://raw.githubusercontent.com/midoks/mdserver-web/dev/scripts/update_dev.sh | bash
+    else
+        curl --insecure -fsSL https://code.midoks.icu/midoks/mdserver-web/raw/branch/dev/scripts/update_dev.sh | bash
+    fi
+    cd /www/server/mdserver-web
+}
+
+mw_update_venv()
+{
     rm -rf /www/server/mdserver-web/bin
     rm -rf /www/server/mdserver-web/lib64
     rm -rf /www/server/mdserver-web/lib
@@ -469,7 +485,7 @@ case "$1" in
     'mirror') mw_mirror;;
     'db') mw_connect_mysql;;
     'redis') mw_redis;;
-    'venv') mw_venv;;
+    'venv') mw_update_venv;;
     'clean_lib') mw_clean_lib;;
     'default')
         cd $mw_path
