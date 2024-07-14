@@ -40,10 +40,10 @@ Install_App()
 {
 	echo '正在安装脚本文件...'
 	mkdir -p $serverPath/source/zabbix
-	shell_file=${curPath}/versions/${VERSION}/${OSNAME}.sh install
+	shell_file=${curPath}/versions/${VERSION}/${OSNAME}.sh
 
 	if [ -f $shell_file ];then
-		bash -x $shell_file
+		bash -x $shell_file install
 	else
 		echo '不支持...'
 		exit 1
