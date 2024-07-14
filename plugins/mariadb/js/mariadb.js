@@ -2263,7 +2263,7 @@ function addSlaveSyncUser(ip=''){
 
         var index = layer.open({
             type: 1,
-            area: ['500px','470px'],
+            area: ['500px','510px'],
             title: '同步账户',
             closeBtn: 1,
             shift: 5,
