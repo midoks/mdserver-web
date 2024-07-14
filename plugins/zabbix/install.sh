@@ -62,7 +62,7 @@ Install_app()
 
 Uninstall_app()
 {
-
+	rm -rf $serverPath/zabbix
 	echo 'Zabbix卸载完成'
 }
 
