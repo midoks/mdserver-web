@@ -264,39 +264,20 @@ def runLog():
     return getServerDir() + '/data/redis.log'
 
 
-def getRedisConfInfo():
-    conf = getServerDir() + '/redis.conf'
+def installPreInspection():
+    openresty_dir = mw.getServerDir() + "/openresty"
+    if not os.path.exists(openresty_dir):
+        return '需要安装Openresty插件'
 
-    gets = [
-        {'name': 'bind', 'type': 2, 'ps': '绑定IP(修改绑定IP可能会存在安全隐患)','must_show':1},
-        {'name': 'port', 'type': 2, 'ps': '绑定端口','must_show':1},
-        {'name': 'timeout', 'type': 2, 'ps': '空闲链接超时时间,0表示不断开','must_show':1},
-        {'name': 'maxclients', 'type': 2, 'ps': '最大连接数','must_show':1},
-        {'name': 'databases', 'type': 2, 'ps': '数据库数量','must_show':1},
-        {'name': 'requirepass', 'type': 2, 'ps': 'redis密码,留空代表没有设置密码','must_show':1},
-        {'name': 'maxmemory', 'type': 2, 'ps': 'MB,最大使用内存,0表示不限制','must_show':1},
-        {'name': 'slaveof', 'type': 2, 'ps': '同步主库地址','must_show':0},
-        {'name': 'masterauth', 'type': 2, 'ps': '同步主库密码', 'must_show':0}
-    ]
-    content = mw.readFile(conf)
+    mysql_dir = mw.getServerDir() + "/mysql"
+    if not os.path.exists(mysql_dir):
+        return '需要安装MySQL插件,至少8.0!'
 
-    result = []
-    for g in gets:
-        rep = "^(" + g['name'] + ')\s*([.0-9A-Za-z_& ~]+)'
-        tmp = re.search(rep, content, re.M)
-        if not tmp:
-            if g['must_show'] == 0:
-                continue
+    return 'ok'
 
-            g['value'] = ''
-            result.append(g)
-            continue
-        g['value'] = tmp.groups()[1]
-        if g['name'] == 'maxmemory':
-            g['value'] = g['value'].strip("mb")
-        result.append(g)
 
-    return result
+def uninstallPreInspection():
+    return 'ok'
 
 
 if __name__ == "__main__":
@@ -317,6 +298,10 @@ if __name__ == "__main__":
         print(initdInstall())
     elif func == 'initd_uninstall':
         print(initdUinstall())
+    elif func == 'install_pre_inspection':
+        print(installPreInspection())
+    elif func == 'uninstall_pre_inspection':
+        print(uninstallPreInspection())
     elif func == 'conf':
         print(getConf())
     elif func == 'run_log':

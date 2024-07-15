@@ -18,7 +18,10 @@ Install_App()
 
 	ZABBIX_NAME=zabbix-release_7.0-2+debian12_all.deb
 	echo "wget -O $serverPath/source/zabbix/${ZABBIX_NAME} https://repo.zabbix.com/zabbix/7.0/debian/pool/main/z/zabbix-release/${ZABBIX_NAME}"
-	wget -O $serverPath/source/zabbix/${ZABBIX_NAME} https://repo.zabbix.com/zabbix/7.0/debian/pool/main/z/zabbix-release/${ZABBIX_NAME}
+	if [ ! -f  $serverPath/source/zabbix/${ZABBIX_NAME} ];then
+		wget -O $serverPath/source/zabbix/${ZABBIX_NAME} https://repo.zabbix.com/zabbix/7.0/debian/pool/main/z/zabbix-release/${ZABBIX_NAME}
+	fi
+	
 	cd $serverPath/source/zabbix && dpkg -i zabbix-release_7.0-2+debian12_all.deb
 	apt update -y 
 }
