@@ -105,15 +105,10 @@ def getPidFile():
     return tmp.groups()[0].strip()
 
 def status():
-    pid_file = getPidFile()
-    if not os.path.exists(pid_file):
+    cmd = "ps aux|grep zabbix-server |grep -v grep | grep -v python | grep -v mdserver-web | awk '{print $2}'"
+    data = mw.execShell(cmd)
+    if data[0] == '':
         return 'stop'
-
-    # data = mw.execShell(
-    #     "ps aux|grep redis |grep -v grep | grep -v python | grep -v mdserver-web | awk '{print $2}'")
-
-    # if data[0] == '':
-    #     return 'stop'
     return 'start'
 
 def contentReplace(content):
@@ -125,7 +120,6 @@ def contentReplace(content):
     return content
 
 
-
 def initDreplace():
     nginx_src_tpl = getPluginDir()+'/conf/zabbix.nginx.conf'
     nginx_dst_tpl = mw.getServerDir()+'/web_conf/nginx/vhost/zabbix.conf'
@@ -135,7 +129,7 @@ def initDreplace():
         content = contentReplace(content)
         mw.writeFile(nginx_dst_tpl, content)
 
-    # zcat /usr/share/zabbix-sql-scripts/mysql/server.sql.gz | /www/server/mysql/bin/mysql --default-character-set=utf8mb4 -uzabbix -p"yWBMNWcFTzjh3trM" zabbix
+    # zcat /usr/share/zabbix-sql-scripts/mysql/server.sql.gz | /www/server/mysql/bin/mysql --default-character-set=utf8mb4 -uzabbix -p"4sPhWWwL7zcDyLX5" zabbix
 
     # service zabbix-server start
     return True
@@ -213,162 +207,6 @@ def getRedisCmd():
 
     return cmd
 
-def runInfo():
-    s = status()
-    if s == 'stop':
-        return mw.returnJson(False, '未启动')
-
-    
-    cmd = getRedisCmd()
-    cmd = cmd + 'info'
-
-    # print(cmd)
-    data = mw.execShell(cmd)[0]
-    # print(data)
-    res = [
-        'tcp_port',
-        'uptime_in_days',  # 已运行天数
-        'connected_clients',  # 连接的客户端数量
-        'used_memory',  # Redis已分配的内存总量
-        'used_memory_rss',  # Redis占用的系统内存总量
-        'used_memory_peak',  # Redis所用内存的高峰值
-        'mem_fragmentation_ratio',  # 内存碎片比率
-        'total_connections_received',  # 运行以来连接过的客户端的总数量
-        'total_commands_processed',  # 运行以来执行过的命令的总数量
-        'instantaneous_ops_per_sec',  # 服务器每秒钟执行的命令数量
-        'keyspace_hits',  # 查找数据库键成功的次数
-        'keyspace_misses',  # 查找数据库键失败的次数
-        'latest_fork_usec'  # 最近一次 fork() 操作耗费的毫秒数
-    ]
-    data = data.split("\n")
-    result = {}
-    for d in data:
-        if len(d) < 3:
-            continue
-        t = d.strip().split(':')
-        if not t[0] in res:
-            continue
-        result[t[0]] = t[1]
-    return mw.getJson(result)
-
-def infoReplication():
-    # 复制信息
-    s = status()
-    if s == 'stop':
-        return mw.returnJson(False, '未启动')
-
-    cmd = getRedisCmd()
-    cmd = cmd + 'info replication'
-
-    # print(cmd)
-    data = mw.execShell(cmd)[0]
-    # print(data)
-    res = [
-        #slave
-        'role',#角色
-        'master_host',  # 连接主库HOST
-        'master_port',  # 连接主库PORT
-        'master_link_status',  # 连接主库状态
-        'master_last_io_seconds_ago',  # 上次同步时间
-        'master_sync_in_progress',  # 正在同步中
-        'slave_read_repl_offset',  # 从库读取复制位置
-        'slave_repl_offset',  # 从库复制位置
-        'slave_priority',  # 从库同步优先级
-        'slave_read_only',  # 从库是否仅读
-        'replica_announced',  # 已复制副本
-        'connected_slaves',  # 连接从库数量
-        'master_failover_state',  # 主库故障状态
-        'master_replid',  # 主库复制ID
-        'master_repl_offset',  # 主库复制位置
-        'second_repl_offset',  # 主库复制位置时间
-        'repl_backlog_active',  # 复制状态
-        'repl_backlog_size',  # 复制大小
-        'repl_backlog_first_byte_offset',  # 第一个字节偏移量
-        'repl_backlog_histlen',  # backlog中数据的长度
-    ]
-
-    data = data.split("\n")
-    result = {}
-    for d in data:
-        if len(d) < 3:
-            continue
-        t = d.strip().split(':')
-        if not t[0] in res:
-            continue
-        result[t[0]] = t[1]
-
-    if 'role' in result and result['role'] == 'master':
-        connected_slaves = int(result['connected_slaves'])
-        slave_l = [] 
-        for x in range(connected_slaves):
-            slave_l.append('slave'+str(x))
-
-        for d in data:
-            if len(d) < 3:
-                continue
-            t = d.strip().split(':')
-            if not t[0] in slave_l:
-                continue
-            result[t[0]] = t[1]
-
-    return mw.getJson(result)
-
-
-def clusterInfo():
-    #集群信息
-    # https://redis.io/commands/cluster-info/
-    s = status()
-    if s == 'stop':
-        return mw.returnJson(False, '未启动')
-
-    cmd = getRedisCmd()
-    cmd = cmd + 'cluster info'
-
-    # print(cmd)
-    data = mw.execShell(cmd)[0]
-    # print(data)
-
-    res = [
-        'cluster_state',#状态
-        'cluster_slots_assigned',  # 被分配的槽
-        'cluster_slots_ok',  # 被分配的槽状态
-        'cluster_slots_pfail',  # 连接主库状态
-        'cluster_slots_fail',  # 失败的槽
-        'cluster_known_nodes',  # 知道的节点
-        'cluster_size',  # 大小
-        'cluster_current_epoch',  # 
-        'cluster_my_epoch',  # 
-        'cluster_stats_messages_sent',  # 发送
-        'cluster_stats_messages_received',  # 接受
-        'total_cluster_links_buffer_limit_exceeded',  #
-    ]
-
-    data = data.split("\n")
-    result = {}
-    for d in data:
-        if len(d) < 3:
-            continue
-        t = d.strip().split(':')
-        if not t[0] in res:
-            continue
-        result[t[0]] = t[1]
-
-    return mw.getJson(result)
-
-def clusterNodes():
-    s = status()
-    if s == 'stop':
-        return mw.returnJson(False, '未启动')
-
-    cmd = getRedisCmd()
-    cmd = cmd + 'cluster nodes'
-
-    # print(cmd)
-    data = mw.execShell(cmd)[0]
-    # print(data)
-
-    data = data.strip().split("\n")
-    return mw.getJson(data)
 
 def initdStatus():
     current_os = mw.getOs()
@@ -510,14 +348,6 @@ if __name__ == "__main__":
         print(initdInstall())
     elif func == 'initd_uninstall':
         print(initdUinstall())
-    elif func == 'run_info':
-        print(runInfo())
-    elif func == 'info_replication':
-        print(infoReplication())
-    elif func == 'cluster_info':
-        print(clusterInfo())
-    elif func == 'cluster_nodes':
-        print(clusterNodes())
     elif func == 'conf':
         print(getConf())
     elif func == 'run_log':
