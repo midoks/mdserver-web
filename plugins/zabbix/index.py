@@ -172,7 +172,6 @@ def zabbixImportMySQLData():
 
     db_pass = psdb.where('name = ?', ('zabbix',)).getField('password')
     find_my_version = db.query("show tables like 'dbversion'")
-
     if len(find_my_version) == 0:
         # 初始化导入数据
         import_data_cmd = 'zcat /usr/share/zabbix-sql-scripts/mysql/server.sql.gz | /www/server/mysql/bin/mysql --default-character-set=utf8mb4 -uzabbix -p"'+db_pass+'" zabbix'
