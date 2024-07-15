@@ -299,37 +299,6 @@ def getRedisConfInfo():
     return result
 
 
-def getRedisConf():
-    data = getRedisConfInfo()
-    return mw.getJson(data)
-
-
-def submitRedisConf():
-    gets = ['bind', 'port', 'timeout', 'maxclients',
-            'databases', 'requirepass', 'maxmemory','slaveof','masterauth']
-    args = getArgs()
-    conf = getServerDir() + '/redis.conf'
-    content = mw.readFile(conf)
-    for g in gets:
-        if g in args:
-            rep = g + '\s*([.0-9A-Za-z_& ~]+)'
-            val = g + ' ' + args[g]
-
-            if g == 'maxmemory':
-                val = g + ' ' + args[g] + "mb"
-
-            if g == 'requirepass' and args[g] == '':
-                content = re.sub('requirepass', '#requirepass', content)
-            if g == 'requirepass' and args[g] != '':
-                content = re.sub('#requirepass', 'requirepass', content)
-                content = re.sub(rep, val, content)
-
-            if g != 'requirepass':
-                content = re.sub(rep, val, content)
-    mw.writeFile(conf, content)
-    reload()
-    return mw.returnJson(True, '设置成功')
-
 if __name__ == "__main__":
     func = sys.argv[1]
     if func == 'status':
@@ -352,13 +321,7 @@ if __name__ == "__main__":
         print(getConf())
     elif func == 'run_log':
         print(runLog())
-    elif func == 'get_redis_conf':
-        print(getRedisConf())
-    elif func == 'submit_redis_conf':
-        print(submitRedisConf())
     elif func == 'config_tpl':
         print(configTpl())
-    elif func == 'read_config_tpl':
-        print(readConfigTpl())
     else:
         print('error')
