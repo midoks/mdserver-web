@@ -120,20 +120,20 @@ def contentReplace(content):
     return content
 
 
-def getConf():
+def getMySQLConf():
     path = mw.getServerDir() + '/mysql/etc/my.cnf'
     return path
 
 
-def getDbPort():
-    file = getConf()
+def getMySQLPort():
+    file = getMySQLConf()
     content = mw.readFile(file)
     rep = 'port\s*=\s*(.*)'
     tmp = re.search(rep, content)
     return tmp.groups()[0].strip()
 
-def getSocketFile():
-    file = getConf()
+def getMySQLSocketFile():
+    file = getMySQLConf()
     content = mw.readFile(file)
     rep = 'socket\s*=\s*(.*)'
     tmp = re.search(rep, content)
@@ -149,8 +149,8 @@ def pSqliteDb(dbname='databases'):
 def pMysqlDb():
     # pymysql
     db = mw.getMyORM()
-    db.setPort(getDbPort())
-    db.setSocket(getSocketFile())
+    db.setPort(getMySQLPort())
+    db.setSocket(getMySQLSocketFile())
     db.setPwd(pSqliteDb('config').where('id=?', (1,)).getField('mysql_root'))
     return db
 
