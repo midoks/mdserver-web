@@ -186,7 +186,7 @@ def zabbixImportMySQLData():
     # php配置
     if not os.path.exists(php_dst_path):
         content = mw.readFile(php_src_tpl)
-        content = contentReplace(content)
+        content = content.replace('{$ZABBIX_PORT}', getMySQLPort())
         content = content.replace('{$ZABBIX_PASS}', db_pass)
         mw.writeFile(php_dst_path, content)
 
