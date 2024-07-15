@@ -159,26 +159,24 @@ def zabbixNginxConf():
 
 
 def zabbixImportMySQLData():
-
+    pmdb = pMysqlDb()
     psdb = pSqliteDb('databases')
     find_ps_zabbix = psdb.field('id').where('name = ?', ('zabbix',)).select()
-    if len(find_ps_zabbix) > 0:
-        return True
+    if len(find_ps_zabbix) < 1:
+        db_pass = mw.getRandomString(16)
+        # 创建数据
+        cmd = 'python3 plugins/mysql/index.py add_db  {"name":"zabbix","codeing":"utf8mb4","db_user":"zabbix","password":"'+db_pass+'","dataAccess":"127.0.0.1","ps":"zabbix","address":"127.0.0.1"}'
+        # print(cmd)
+        mw.execShell(cmd)
 
-    db_pass = mw.getRandomString(16)
-
-    # 创建数据
-    cmd = 'python3 plugins/mysql/index.py add_db  {"name":"zabbix","codeing":"utf8mb4","db_user":"zabbix","password":"'+db_pass+'","dataAccess":"127.0.0.1","ps":"zabbix","address":"127.0.0.1"}'
-    # print(cmd)
-    mw.execShell(cmd)
 
     db_pass = psdb.where('name = ?', ('zabbix',)).getField('password')
+    find_my_version = db.query("show tables like 'dbversion'")
 
-    # 初始化导入数据
-    import_data_cmd = 'zcat /usr/share/zabbix-sql-scripts/mysql/server.sql.gz | /www/server/mysql/bin/mysql --default-character-set=utf8mb4 -uzabbix -p"'+db_pass+'" zabbix'
-    mw.execShell(import_data_cmd)
-
-
+    if len(find_my_version) == 0:
+        # 初始化导入数据
+        import_data_cmd = 'zcat /usr/share/zabbix-sql-scripts/mysql/server.sql.gz | /www/server/mysql/bin/mysql --default-character-set=utf8mb4 -uzabbix -p"'+db_pass+'" zabbix'
+        mw.execShell(import_data_cmd)
 
     return True
 
