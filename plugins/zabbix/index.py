@@ -123,7 +123,7 @@ def zabbixNginxConf():
     return mw.getServerDir()+'/web_conf/nginx/vhost/zabbix.conf'
 
 
-def importMySQLData():
+def zabbixImportMySQLData():
     # zcat /usr/share/zabbix-sql-scripts/mysql/server.sql.gz | /www/server/mysql/bin/mysql --default-character-set=utf8mb4 -uzabbix -p"4sPhWWwL7zcDyLX5" zabbix
     # service zabbix-server start
     pass
@@ -138,7 +138,7 @@ def initDreplace():
         content = contentReplace(content)
         mw.writeFile(nginx_dst_vhost, content)
     # 导入MySQL配置
-    importMySQLData()
+    zabbixImportMySQLData()
     return True
 
 
