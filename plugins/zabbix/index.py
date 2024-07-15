@@ -166,6 +166,7 @@ def zabbixImportMySQLData():
         cmd = 'python3 plugins/mysql/index.py add_db  {"name":"zabbix","codeing":"utf8mb4","db_user":"zabbix","password":"'+db_pass+'","dataAccess":"127.0.0.1","ps":"zabbix","address":"127.0.0.1"}'
         # print(cmd)
         mw.execShell(cmd)
+        pmdb.query("ALTER DATABASE `zabbix` DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_bin")
 
 
     db_pass = psdb.where('name = ?', ('zabbix',)).getField('password')
