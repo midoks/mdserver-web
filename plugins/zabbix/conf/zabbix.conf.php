@@ -3,10 +3,10 @@
 
 $DB['TYPE']				= 'MYSQL';
 $DB['SERVER']			= '127.0.0.1';
-$DB['PORT']				= '{$ZABBIX_PORT}';
+$DB['PORT']				= '{$ZABBIX_DB_PORT}';
 $DB['DATABASE']			= 'zabbix';
 $DB['USER']				= 'zabbix';
-$DB['PASSWORD']			= '{$ZABBIX_PASS}';
+$DB['PASSWORD']			= '{$ZABBIX_DB_PASS}';
 
 // Schema name. Used for PostgreSQL.
 $DB['SCHEMA']			= '';

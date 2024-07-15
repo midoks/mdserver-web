@@ -112,6 +112,11 @@ def contentReplace(content):
     content = content.replace('{$SERVER_PATH}', service_path)
     content = content.replace('{$ZABBIX_ROOT}', '/usr/share/zabbix')
     content = content.replace('{$ZABBIX_PORT}', '18888')
+
+    psdb = pSqliteDb('databases')
+    db_pass = psdb.where('name = ?', ('zabbix',)).getField('password')
+    content = content.replace('{$ZABBIX_DB_PORT}', getMySQLPort())
+    content = content.replace('{$ZABBIX_DB_PASS}', db_pass)
     return content
 
 
@@ -189,8 +194,7 @@ def zabbixImportMySQLData():
     # php配置
     if not os.path.exists(php_dst_path):
         content = mw.readFile(php_src_tpl)
-        content = content.replace('{$ZABBIX_PORT}', getMySQLPort())
-        content = content.replace('{$ZABBIX_PASS}', db_pass)
+        content = contentReplace(content)
         mw.writeFile(php_dst_path, content)
 
     return True
@@ -209,12 +213,9 @@ def initZsConf():
     zs_src_tpl = getPluginDir()+'/conf/zabbix_server.conf'
     zs_dst_path = zabbixServerConf()
 
-    psdb = pSqliteDb('databases')
-    db_pass = psdb.where('name = ?', ('zabbix',)).getField('password')
-    # nginx配置
+    # zabbix_server配置
     content = mw.readFile(zs_src_tpl)
-    content = content.replace('{$ZABBIX_PORT}', getMySQLPort())
-    content = content.replace('{$ZABBIX_PASS}', db_pass)
+    content = contentReplace(content)
     mw.writeFile(zs_dst_path, content)
 
 def initDreplace():
