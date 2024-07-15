@@ -125,6 +125,7 @@ def initConf():
             "/var/log/secure",
             "/var/log/lastlog",
             "/var/log/cron",
+            "/www/wwwlogs",
             "/www/server/rsyncd",
             "/www/server/sphinx/index",
             "/www/server/mongodb/logs",
