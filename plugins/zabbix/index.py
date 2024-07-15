@@ -168,7 +168,7 @@ def zabbixImportMySQLData():
     db_pass = mw.getRandomString(16)
 
     # 创建数据
-    cmd = 'python3 plugins/mysql/index.py add_db  {"name":"zabbix","codeing":"utf8mb4","db_user":"zabbix","password":"'+getRandomString+'","dataAccess":"127.0.0.1","ps":"zabbix","address":"127.0.0.1"}'
+    cmd = 'python3 plugins/mysql/index.py add_db  {"name":"zabbix","codeing":"utf8mb4","db_user":"zabbix","password":"'+db_pass+'","dataAccess":"127.0.0.1","ps":"zabbix","address":"127.0.0.1"}'
     mw.execShell(cmd)
 
     # 初始化导入数据
