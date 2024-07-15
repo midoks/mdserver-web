@@ -56,7 +56,7 @@ function zabbixPostCallbak(method, version, args,callback){
 
 function zabbixReadme(){
     var readme = '<ul class="help-info-text c7">';
-    readme += '<li>默认安装源码初始化</li>';
+    readme += '<li>默认配置OpenResty端口:18888</li>';
     readme += '</ul>';
 
     $('.soft-man-con').html(readme);   
