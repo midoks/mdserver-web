@@ -207,12 +207,12 @@ def zOp(method):
 
     current_os = mw.getOs()
     if current_os.startswith("freebsd"):
-        data = mw.execShell('service ' + getPluginName() + ' ' + method)
+        data = mw.execShell('service zabbix-server ' + method)
         if data[1] == '':
             return 'ok'
         return data[1]
 
-    data = mw.execShell('systemctl ' + method + ' ' + getPluginName())
+    data = mw.execShell('systemctl ' + method + ' zabbix-server')
     if data[1] == '':
         return 'ok'
     return data[1]
