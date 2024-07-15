@@ -119,6 +119,41 @@ def contentReplace(content):
     content = content.replace('{$ZABBIX_PORT}', '18888')
     return content
 
+
+def getConf():
+    path = mw.getServerDir() + '/mysql/etc/my.cnf'
+    return path
+
+
+def getDbPort():
+    file = getConf()
+    content = mw.readFile(file)
+    rep = 'port\s*=\s*(.*)'
+    tmp = re.search(rep, content)
+    return tmp.groups()[0].strip()
+
+def getSocketFile():
+    file = getConf()
+    content = mw.readFile(file)
+    rep = 'socket\s*=\s*(.*)'
+    tmp = re.search(rep, content)
+    return tmp.groups()[0].strip()
+
+
+def pSqliteDb(dbname='databases'):
+    mysql_dir = mw.getServerDir() + '/mysql'
+    conn = mw.M(dbname).dbPos(mysql_dir, 'mysql')
+    return conn
+
+
+def pMysqlDb():
+    # pymysql
+    db = mw.getMyORM()
+    db.setPort(getDbPort())
+    db.setSocket(getSocketFile())
+    db.setPwd(pSqliteDb('config').where('id=?', (1,)).getField('mysql_root'))
+    return db
+
 def zabbixNginxConf():
     return mw.getServerDir()+'/web_conf/nginx/vhost/zabbix.conf'
 
