@@ -128,7 +128,7 @@ DBUser=zabbix
 #
 # Mandatory: no
 # Default:
-DBPassword=LGhb1f7QG6SDL5CX
+DBPassword=XXX
 
 ### Option: DBSocket
 #	Path to MySQL socket.
