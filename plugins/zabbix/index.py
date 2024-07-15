@@ -119,19 +119,26 @@ def contentReplace(content):
     content = content.replace('{$ZABBIX_PORT}', '18888')
     return content
 
+def zabbixNginxConf():
+    return mw.getServerDir()+'/web_conf/nginx/vhost/zabbix.conf'
+
+
+def importMySQLData():
+    # zcat /usr/share/zabbix-sql-scripts/mysql/server.sql.gz | /www/server/mysql/bin/mysql --default-character-set=utf8mb4 -uzabbix -p"4sPhWWwL7zcDyLX5" zabbix
+    # service zabbix-server start
+    pass
 
 def initDreplace():
     nginx_src_tpl = getPluginDir()+'/conf/zabbix.nginx.conf'
-    nginx_dst_tpl = mw.getServerDir()+'/web_conf/nginx/vhost/zabbix.conf'
+    nginx_dst_vhost = zabbixNginxConf()
 
-    if not os.path.exists(nginx_dst_tpl):
+    # nginx配置
+    if not os.path.exists(nginx_dst_vhost):
         content = mw.readFile(nginx_src_tpl)
         content = contentReplace(content)
-        mw.writeFile(nginx_dst_tpl, content)
-
-    # zcat /usr/share/zabbix-sql-scripts/mysql/server.sql.gz | /www/server/mysql/bin/mysql --default-character-set=utf8mb4 -uzabbix -p"4sPhWWwL7zcDyLX5" zabbix
-
-    # service zabbix-server start
+        mw.writeFile(nginx_dst_vhost, content)
+    # 导入MySQL配置
+    importMySQLData()
     return True
 
 
@@ -157,56 +164,15 @@ def start():
 
 
 def stop():
-    return zOp('stop')
-
+    val = zOp('stop')
+    return val
 
 def restart():
     status = zOp('restart')
-
-    log_file = runLog()
-    mw.execShell("echo '' > " + log_file)
     return status
-
 
 def reload():
     return zOp('reload')
-
-
-def getPort():
-    conf = getServerDir() + '/redis.conf'
-    content = mw.readFile(conf)
-
-    rep = "^(" + 'port' + ')\s*([.0-9A-Za-z_& ~]+)'
-    tmp = re.search(rep, content, re.M)
-    if tmp:
-        return tmp.groups()[1]
-
-    return '6379'
-
-
-def getRedisCmd():
-    requirepass = ""
-    conf = getServerDir() + '/redis.conf'
-    content = mw.readFile(conf)
-    rep = "^(requirepass" + ')\s*([.0-9A-Za-z_& ~]+)'
-    tmp = re.search(rep, content, re.M)
-    if tmp:
-        requirepass = tmp.groups()[1]
-
-    default_ip = '127.0.0.1'
-    port = getPort()
-    # findDebian = mw.execShell('cat /etc/issue |grep Debian')
-    # if findDebian[0] != '':
-    #     default_ip = mw.getLocalIp()
-    cmd = getServerDir() + "/bin/redis-cli -h " + \
-        default_ip + ' -p ' + port + " "
-
-    if requirepass != "":
-        cmd = getServerDir() + '/bin/redis-cli -h ' + default_ip + \
-            ' -p ' + port + ' -a "' + requirepass + '" '
-
-    return cmd
-
 
 def initdStatus():
     current_os = mw.getOs()
@@ -258,10 +224,6 @@ def initdUinstall():
 
     mw.execShell('systemctl disable ' + getPluginName())
     return 'ok'
-
-
-def runLog():
-    return getServerDir() + '/data/redis.log'
 
 
 def installPreInspection():
