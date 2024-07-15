@@ -5,8 +5,8 @@ export DEBIAN_FRONTEND=noninteractive
 
 apt autoremove -y
 apt install -y locate
-if [ ! -d /usr/share/locale/locale.alias ];then
-    mkdir -p /usr/share/locale/locale.alias
+if [ ! -d /usr/share/locale ];then
+    mkdir -d /usr/share/locale
 fi
 locale-gen en_US.UTF-8
 localedef -v -c -i en_US -f UTF-8 en_US.UTF-8 > /dev/null 2>&1
