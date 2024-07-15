@@ -25,7 +25,7 @@ Install_App()
 	cd $serverPath/source/zabbix && dpkg -i zabbix-release_7.0-2+debian12_all.deb
 	apt update -y 
 
-	apt install -y zabbix-sql-scripts zabbix-agent
+	apt install -y zabbix-frontend-php zabbix-sql-scripts zabbix-agent
 }
 
 Uninstall_App()
