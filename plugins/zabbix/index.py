@@ -156,6 +156,9 @@ def zabbixNginxConf():
 def zabbixPhpConf():
     return '/etc/zabbix/web/zabbix.conf.php'
 
+def zabbixServerConf():
+    return '/etc/zabbix/zabbix_server.conf'
+
 def zabbixImportMySQLData():
     pmdb = pMysqlDb()
     psdb = pSqliteDb('databases')
@@ -306,6 +309,8 @@ if __name__ == "__main__":
         print(zabbixNginxConf())
     elif func == 'php_conf':
         print(zabbixPhpConf())
+    elif func == 'zabbix_server_conf':
+        print(zabbixServerConf())
     elif func == 'run_log':
         print(runLog())
     elif func == 'config_tpl':
