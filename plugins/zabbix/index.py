@@ -170,12 +170,14 @@ def zabbixImportMySQLData():
         # print(cmd)
         mw.execShell(cmd)
         pmdb.query("ALTER DATABASE `zabbix` DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_bin")
+        pmdb.query("grant all privileges on zabbix.* to zabbix@127.0.0.1")
 
 
     db_pass = psdb.where('name = ?', ('zabbix',)).getField('password')
     find_zabbix_version = pmdb.query("show tables like 'dbversion'")
     if len(find_zabbix_version) == 0:
         # 初始化导入数据
+        # zcat /usr/share/zabbix-sql-scripts/mysql/server.sql.gz | /www/server/mysql/bin/mysql --default-character-set=utf8mb4 -uzabbix -p"LGhb1f7QG6SDL5CX" zabbix
         import_data_cmd = 'zcat /usr/share/zabbix-sql-scripts/mysql/server.sql.gz | /www/server/mysql/bin/mysql --default-character-set=utf8mb4 -uzabbix -p"'+db_pass+'" zabbix'
         mw.execShell(import_data_cmd)
 
