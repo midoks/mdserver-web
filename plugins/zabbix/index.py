@@ -324,7 +324,9 @@ if __name__ == "__main__":
     elif func == 'uninstall_pre_inspection':
         print(uninstallPreInspection())
     elif func == 'conf':
-        print(getConf())
+        print(zabbixNginxConf())
+    elif func == 'php_conf':
+        print(zabbixPhpConf())
     elif func == 'run_log':
         print(runLog())
     elif func == 'config_tpl':
