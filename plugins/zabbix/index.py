@@ -159,9 +159,25 @@ def zabbixNginxConf():
 
 
 def zabbixImportMySQLData():
+
+    psdb = pSqliteDb('databases')
+    find_ps_zabbix = psdb.field('id').where('name = ?', ('zabbix',)).select()
+    if len(find_ps_zabbix) > 0:
+        return True
+
+    db_pass = mw.getRandomString(16)
+
+    # 创建数据
+    cmd = 'python3 plugins/mysql/index.py add_db  {"name":"zabbix","codeing":"utf8mb4","db_user":"zabbix","password":"'+getRandomString+'","dataAccess":"127.0.0.1","ps":"zabbix","address":"127.0.0.1"}'
+    mw.execShell(cmd)
+
+    # 初始化导入数据
     # zcat /usr/share/zabbix-sql-scripts/mysql/server.sql.gz | /www/server/mysql/bin/mysql --default-character-set=utf8mb4 -uzabbix -p"4sPhWWwL7zcDyLX5" zabbix
     # service zabbix-server start
-    pass
+
+
+
+    return True
 
 def initDreplace():
     nginx_src_tpl = getPluginDir()+'/conf/zabbix.nginx.conf'
