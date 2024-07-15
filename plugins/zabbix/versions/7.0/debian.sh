@@ -21,9 +21,11 @@ Install_App()
 	if [ ! -f  $serverPath/source/zabbix/${ZABBIX_NAME} ];then
 		wget -O $serverPath/source/zabbix/${ZABBIX_NAME} https://repo.zabbix.com/zabbix/7.0/debian/pool/main/z/zabbix-release/${ZABBIX_NAME}
 	fi
-	
+
 	cd $serverPath/source/zabbix && dpkg -i zabbix-release_7.0-2+debian12_all.deb
 	apt update -y 
+
+	apt install -y zabbix-sql-scripts zabbix-agent
 }
 
 Uninstall_App()
