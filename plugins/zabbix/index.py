@@ -209,6 +209,7 @@ def initZsConf():
     zs_src_tpl = getPluginDir()+'/conf/zabbix_server.conf'
     zs_dst_path = zabbixServerConf()
 
+    psdb = pSqliteDb('databases')
     db_pass = psdb.where('name = ?', ('zabbix',)).getField('password')
     # nginx配置
     content = mw.readFile(zs_src_tpl)
