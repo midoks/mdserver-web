@@ -63,7 +63,11 @@ Install_App()
 
 Uninstall_App()
 {
+	cd ${rootPath} && python3 ${rootPath}/plugins/zabbix/index.py stop
+	cd ${rootPath} && python3 ${rootPath}/plugins/zabbix/index.py initd_uninstall
+
 	rm -rf $serverPath/zabbix
+	rm -rf $serverPath/source/zabbix
 	echo 'Zabbix卸载完成'
 }
 
