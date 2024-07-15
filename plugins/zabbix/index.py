@@ -38,12 +38,7 @@ def getInitDFile():
 
 
 def getConf():
-    path = getServerDir() + "/redis.conf"
-    return path
-
-
-def getConfTpl():
-    path = getPluginDir() + "/config/redis.conf"
+    path = getServerDir() + "/web_conf/nginx/vhost/zabbix.conf"
     return path
 
 
