@@ -9,6 +9,7 @@ if [ ! -d /usr/share/locale ];then
     mkdir -d /usr/share/locale
 fi
 locale-gen en_US.UTF-8
+locale-gen zh_CN.UTF-8
 localedef -v -c -i en_US -f UTF-8 en_US.UTF-8 > /dev/null 2>&1
 export LC_CTYPE=en_US.UTF-8
 export LC_ALL=en_US.UTF-8
