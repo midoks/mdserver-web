@@ -149,6 +149,7 @@ def pSqliteDb(dbname='databases'):
 def pMysqlDb():
     # pymysql
     db = mw.getMyORM()
+    db.setDbName('zabbix')
     db.setPort(getMySQLPort())
     db.setSocket(getMySQLSocketFile())
     db.setPwd(pSqliteDb('config').where('id=?', (1,)).getField('mysql_root'))
@@ -173,8 +174,8 @@ def zabbixImportMySQLData():
 
 
     db_pass = psdb.where('name = ?', ('zabbix',)).getField('password')
-    find_my_version = pmdb.query("show tables like 'dbversion'")
-    if len(find_my_version) == 0:
+    find_zabbix_version = pmdb.query("show tables like 'dbversion'")
+    if len(find_zabbix_version) == 0:
         # 初始化导入数据
         import_data_cmd = 'zcat /usr/share/zabbix-sql-scripts/mysql/server.sql.gz | /www/server/mysql/bin/mysql --default-character-set=utf8mb4 -uzabbix -p"'+db_pass+'" zabbix'
         mw.execShell(import_data_cmd)
