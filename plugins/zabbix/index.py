@@ -157,6 +157,8 @@ def pMysqlDb():
 def zabbixNginxConf():
     return mw.getServerDir()+'/web_conf/nginx/vhost/zabbix.conf'
 
+def zabbixPhpConf():
+    return '/etc/zabbix/web/zabbix.conf.php'
 
 def zabbixImportMySQLData():
     pmdb = pMysqlDb()
@@ -176,6 +178,17 @@ def zabbixImportMySQLData():
         # 初始化导入数据
         import_data_cmd = 'zcat /usr/share/zabbix-sql-scripts/mysql/server.sql.gz | /www/server/mysql/bin/mysql --default-character-set=utf8mb4 -uzabbix -p"'+db_pass+'" zabbix'
         mw.execShell(import_data_cmd)
+
+
+    php_src_tpl = getPluginDir()+'/conf/zabbix.conf.php'
+    php_dst_path = zabbixPhpConf()
+
+    # php配置
+    if not os.path.exists(php_dst_path):
+        content = mw.readFile(php_src_tpl)
+        content = contentReplace(content)
+        content = content.replace('{$ZABBIX_PASS}', db_pass)
+        mw.writeFile(php_dst_path, content)
 
     return True
 
