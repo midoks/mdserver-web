@@ -262,6 +262,17 @@ def initdUinstall():
     mw.execShell('systemctl disable zabbix_server')
     return 'ok'
 
+def runLog():
+    zs_conf = zabbixServerConf()
+    content = mw.readFile(zs_conf)
+
+    rep = 'LogFile=\s*(.*)'
+    tmp = re.search(rep, content)
+
+    if tmp.groups() == 0:
+        return tmp.groups()[0].strip()
+    return '/var/log/zabbix/zabbix_server.log'
+
 
 def installPreInspection():
     openresty_dir = mw.getServerDir() + "/openresty"
