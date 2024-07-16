@@ -212,7 +212,7 @@ def zOp(method):
 
     initDreplace()
 
-    data = mw.execShell('systemctl ' + method + ' zabbix_server')
+    data = mw.execShell('systemctl ' + method + ' zabbix-server')
     if data[1] == '':
         return 'ok'
     return data[1]
@@ -246,7 +246,7 @@ def initdStatus():
     if current_os == 'darwin':
         return "Apple Computer does not support"
 
-    shell_cmd = 'systemctl status zabbix_server | grep loaded | grep "enabled;"'
+    shell_cmd = 'systemctl status zabbix-server | grep loaded | grep "enabled;"'
     data = mw.execShell(shell_cmd)
     if data[0] == '':
         return 'fail'
@@ -258,7 +258,7 @@ def initdInstall():
     if current_os == 'darwin':
         return "Apple Computer does not support"
 
-    mw.execShell('systemctl enable zabbix_server')
+    mw.execShell('systemctl enable zabbix-server')
     return 'ok'
 
 
@@ -267,7 +267,7 @@ def initdUinstall():
     if current_os == 'darwin':
         return "Apple Computer does not support"
 
-    mw.execShell('systemctl disable zabbix_server')
+    mw.execShell('systemctl disable zabbix-server')
     return 'ok'
 
 def runLog():
