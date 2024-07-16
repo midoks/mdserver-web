@@ -219,7 +219,9 @@ def zOp(method):
 
 
 def start():
-    return zOp('start')
+    val = zOp('start')
+    mw.restartWeb()
+    return val
 
 
 def stop():
