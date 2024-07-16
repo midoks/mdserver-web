@@ -177,8 +177,6 @@ def zabbixImportMySQLData():
         pmdb.query("set global log_bin_trust_function_creators=0")
 
 
-    
-
     ver = getInstallVerion()
     if ver == '6.0':
         pmdb.query("update dbversion set mandatory=6000000")
