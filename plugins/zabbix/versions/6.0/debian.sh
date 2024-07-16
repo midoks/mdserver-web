@@ -28,6 +28,7 @@ Install_App()
 	cd $serverPath/source/zabbix && dpkg -i ${ZABBIX_NAME}
 	apt update -y 
 	rm -rf /etc/zabbix/zabbix_server.conf.dpkg-new
+	rm -rf /etc/zabbix/zabbix_server.conf
 	apt install -y zabbix-server-mysql zabbix-frontend-php zabbix-sql-scripts zabbix-agent zabbix-get
 }
 
