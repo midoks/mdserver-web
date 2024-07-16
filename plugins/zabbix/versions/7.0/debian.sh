@@ -12,6 +12,7 @@ install_tmp=${rootPath}/tmp/mw_install.pl
 
 SYS_VERSION_ID=`cat /etc/*-release | grep VERSION_ID | awk -F = '{print $2}' | awk -F "\"" '{print $2}'`
 
+# zabbix_get -s 154.12.53.216 -k agent.ping
 Install_App()
 {
 	mkdir -p $serverPath/source/zabbix
@@ -25,7 +26,7 @@ Install_App()
 	cd $serverPath/source/zabbix && dpkg -i ${ZABBIX_NAME}
 	apt update -y 
 
-	apt install -y zabbix-frontend-php zabbix-sql-scripts zabbix-agent
+	apt install -y zabbix-frontend-php zabbix-sql-scripts zabbix-agent zabbix-get
 }
 
 Uninstall_App()
