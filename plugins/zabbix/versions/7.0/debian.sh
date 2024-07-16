@@ -12,7 +12,8 @@ install_tmp=${rootPath}/tmp/mw_install.pl
 
 SYS_VERSION_ID=`cat /etc/*-release | grep VERSION_ID | awk -F = '{print $2}' | awk -F "\"" '{print $2}'`
 
-# zabbix_get -s 154.12.53.216 -k agent.ping
+# 检查是否通
+# zabbix_get -s 127.0.0.1 -k agent.ping
 Install_App()
 {
 	mkdir -p $serverPath/source/zabbix
