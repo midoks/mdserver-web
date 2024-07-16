@@ -86,6 +86,11 @@ def status():
         return 'stop'
     return 'start'
 
+def getInstallVerion():
+    version_pl = getServerDir() + "/version.pl"
+    version = mw.readFile(version_pl).strip()
+    return version
+
 def contentReplace(content):
     service_path = mw.getServerDir()
     content = content.replace('{$ROOT_PATH}', mw.getRootDir())
@@ -176,6 +181,11 @@ def zabbixImportMySQLData():
         content = mw.readFile(php_src_tpl)
         content = contentReplace(content)
         mw.writeFile(php_dst_path, content)
+
+
+    ver = getInstallVerion()
+    if ver == '6.0':
+        pmdb.query("update dbversion set mandatory=6000000")
 
     return True
 
