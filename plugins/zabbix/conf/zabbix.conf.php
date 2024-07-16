@@ -34,7 +34,7 @@ $DB['VAULT_KEY_FILE']		= '';
 // $ZBX_SERVER			= '';
 // $ZBX_SERVER_PORT		= '';
 
-$ZBX_SERVER_NAME		= 'MW';
+$ZBX_SERVER_NAME		= 'mdserver-web';
 
 $IMAGE_FORMAT_DEFAULT	= IMAGE_FORMAT_PNG;
 
