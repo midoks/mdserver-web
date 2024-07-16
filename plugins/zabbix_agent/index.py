@@ -86,15 +86,25 @@ def contentReplace(content):
 def zabbixAgentConf():
     return '/etc/zabbix/zabbix_agentd.conf'
 
+def runLog():
+    za_conf = zabbixAgentConf()
+    content = mw.readFile(za_conf)
+
+    rep = 'LogFile=\s*(.*)'
+    tmp = re.search(rep, content)
+
+    if tmp.groups() == 0:
+        return tmp.groups()[0].strip()
+    return '/var/log/zabbix/zabbix_agentd.log'
 
 def initAgentConf():
-    zs_src_tpl = getPluginDir()+'/conf/zabbix_server.conf'
-    zs_dst_path = zabbixServerConf()
+    za_src_tpl = getPluginDir()+'/conf/zabbix_agentd.conf'
+    za_dst_path = zabbixAgentConf()
 
-    # zabbix_server配置
-    content = mw.readFile(zs_src_tpl)
+    # zabbix_agent配置
+    content = mw.readFile(za_src_tpl)
     content = contentReplace(content)
-    mw.writeFile(zs_dst_path, content)
+    mw.writeFile(za_dst_path, content)
 
 def initDreplace():
 
@@ -197,10 +207,8 @@ if __name__ == "__main__":
         print(uninstallPreInspection())
     elif func == 'conf':
         print(zabbixNginxConf())
-    elif func == 'php_conf':
-        print(zabbixPhpConf())
-    elif func == 'zabbix_server_conf':
-        print(zabbixServerConf())
+    elif func == 'zabbix_server_agent':
+        print(zabbixAgentConf())
     elif func == 'run_log':
         print(runLog())
     else:
