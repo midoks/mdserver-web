@@ -110,6 +110,7 @@ def initDreplace():
     init_file = getServerDir() + '/init.pl'
     if not os.path.exists(init_file):
         initAgentConf()
+        
         mw.writeFile(init_file, 'ok')
     return True
 
