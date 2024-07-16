@@ -37,6 +37,9 @@ fi
 
 Install_App()
 {
+	mkdir -p $serverPath/zabbix
+	echo "${VERSION}" > $serverPath/zabbix/version.pl
+
 	echo '正在安装脚本文件...'
 	mkdir -p $serverPath/source/zabbix
 	shell_file=${curPath}/versions/${VERSION}/${OSNAME}.sh
@@ -47,9 +50,6 @@ Install_App()
 		echo '不支持...'
 		exit 1
 	fi
-
-	mkdir -p $serverPath/zabbix
-	echo "${VERSION}" > $serverPath/zabbix/version.pl
 
 	#初始化 
 	cd ${rootPath} && python3 ${rootPath}/plugins/zabbix/index.py start
