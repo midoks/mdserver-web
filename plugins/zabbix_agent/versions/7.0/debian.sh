@@ -22,7 +22,7 @@ Install_App()
 		wget -O $serverPath/source/zabbix/${ZABBIX_NAME} https://repo.zabbix.com/zabbix/7.0/debian/pool/main/z/zabbix-release/${ZABBIX_NAME}
 	fi
 
-	cd $serverPath/source/zabbix && dpkg -i zabbix-release_7.0-2+debian${SYS_VERSION_ID}_all.deb
+	cd $serverPath/source/zabbix && dpkg -i ${ZABBIX_NAME}
 	apt update -y 
 
 	apt install -y zabbix-agent

@@ -16,13 +16,13 @@ Install_App()
 {
 	mkdir -p $serverPath/source/zabbix
 
-	ZABBIX_NAME=zabbix-release_7.0-2+debian12_all.deb
+	ZABBIX_NAME=zabbix-release_7.0-2+debian${SYS_VERSION_ID}_all.deb
 	echo "wget -O $serverPath/source/zabbix/${ZABBIX_NAME} https://repo.zabbix.com/zabbix/7.0/debian/pool/main/z/zabbix-release/${ZABBIX_NAME}"
 	if [ ! -f  $serverPath/source/zabbix/${ZABBIX_NAME} ];then
 		wget -O $serverPath/source/zabbix/${ZABBIX_NAME} https://repo.zabbix.com/zabbix/7.0/debian/pool/main/z/zabbix-release/${ZABBIX_NAME}
 	fi
 
-	cd $serverPath/source/zabbix && dpkg -i zabbix-release_7.0-2+debian12_all.deb
+	cd $serverPath/source/zabbix && dpkg -i ${ZABBIX_NAME}
 	apt update -y 
 
 	apt install -y zabbix-frontend-php zabbix-sql-scripts zabbix-agent
