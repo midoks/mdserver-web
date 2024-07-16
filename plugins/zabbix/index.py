@@ -177,13 +177,7 @@ def zabbixImportMySQLData():
         pmdb.query("set global log_bin_trust_function_creators=0")
 
 
-    php_src_tpl = getPluginDir()+'/conf/zabbix.conf.php'
-    php_dst_path = zabbixPhpConf()
-    # php配置
-    if not os.path.exists(php_dst_path):
-        content = mw.readFile(php_src_tpl)
-        content = contentReplace(content)
-        mw.writeFile(php_dst_path, content)
+    
 
     ver = getInstallVerion()
     if ver == '6.0':
@@ -210,12 +204,22 @@ def initZsConf():
     content = contentReplace(content)
     mw.writeFile(zs_dst_path, content)
 
+def initPhpConf():
+    php_src_tpl = getPluginDir()+'/conf/zabbix.conf.php'
+    php_dst_path = zabbixPhpConf()
+    # php配置
+    if not os.path.exists(php_dst_path):
+        content = mw.readFile(php_src_tpl)
+        content = contentReplace(content)
+        mw.writeFile(php_dst_path, content)
+
 def initDreplace():
     # 导入MySQL配置
     zabbixImportMySQLData()
 
     # 初始化OP配置
     initOpConf()
+    initPhpConf()
 
     init_file = getServerDir() + '/init.pl'
     if not os.path.exists(init_file):
