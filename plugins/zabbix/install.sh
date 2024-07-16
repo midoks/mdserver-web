@@ -37,11 +37,14 @@ fi
 
 Install_App()
 {
-	mkdir -p $serverPath/zabbix
-	echo "${VERSION}" > $serverPath/zabbix/version.pl
+	
 
 	echo '正在安装脚本文件...'
 	mkdir -p $serverPath/source/zabbix
+
+	mkdir -p $serverPath/zabbix
+	echo "${VERSION}" > $serverPath/zabbix/version.pl
+
 	shell_file=${curPath}/versions/${VERSION}/${OSNAME}.sh
 
 	if [ -f $shell_file ];then
