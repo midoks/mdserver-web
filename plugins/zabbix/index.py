@@ -144,6 +144,9 @@ def zabbixNginxConf():
     return mw.getServerDir()+'/web_conf/nginx/vhost/zabbix.conf'
 
 def zabbixPhpConf():
+    ver = getInstallVerion()
+    if ver == '6.0':
+        return '/usr/share/zabbix/conf/zabbix.conf.php'
     return '/etc/zabbix/web/zabbix.conf.php'
 
 def zabbixServerConf():
@@ -181,7 +184,6 @@ def zabbixImportMySQLData():
         content = mw.readFile(php_src_tpl)
         content = contentReplace(content)
         mw.writeFile(php_dst_path, content)
-
 
     ver = getInstallVerion()
     if ver == '6.0':
