@@ -23,9 +23,8 @@ Install_App()
 	if [ ! -f  $serverPath/source/zabbix/${ZABBIX_NAME} ];then
 		wget -O $serverPath/source/zabbix/${ZABBIX_NAME} https://repo.zabbix.com/zabbix/6.0/debian/pool/main/z/zabbix-release/${ZABBIX_NAME}
 	fi
-	
-	dpkg --configure -a
 
+	dpkg --configure -a
 	cd $serverPath/source/zabbix && dpkg -i ${ZABBIX_NAME}
 	apt update -y 
 
@@ -36,6 +35,7 @@ Uninstall_App()
 {
 	apt remove -y zabbix-server-mysql zabbix-frontend-php zabbix-sql-scripts zabbix-agent zabbix-get
 	rm -rf /etc/zabbix
+	dpkg --configure -a
 	echo "卸载成功"
 }
 
