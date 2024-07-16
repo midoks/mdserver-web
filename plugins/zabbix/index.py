@@ -224,6 +224,14 @@ def start():
 
 def stop():
     val = zOp('stop')
+
+    # 删除nginx配置
+    nginx_dst_vhost = zabbixNginxConf()
+    if os.path.exists(nginx_dst_vhost):
+        os.remove(nginx_dst_vhost)
+
+    mw.restartWeb()
+
     return val
 
 def restart():
