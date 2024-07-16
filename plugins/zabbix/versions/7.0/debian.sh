@@ -32,6 +32,7 @@ Install_App()
 
 Uninstall_App()
 {
+	rm -rf /etc/zabbix
 	echo "卸载成功"
 }
 
