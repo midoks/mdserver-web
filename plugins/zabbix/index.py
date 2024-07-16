@@ -199,10 +199,11 @@ def initZsConf():
     mw.writeFile(zs_dst_path, content)
 
 def initDreplace():
-    # 初始化OP配置
-    initOpConf()
     # 导入MySQL配置
     zabbixImportMySQLData()
+
+    # 初始化OP配置
+    initOpConf()
 
     init_file = getServerDir() + '/init.pl'
     if not os.path.exists(init_file):
