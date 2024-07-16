@@ -62,6 +62,11 @@ Install_App()
 
 Uninstall_App()
 {
+	shell_file=${curPath}/versions/${VERSION}/${OSNAME}.sh
+	if [ -f $shell_file ];then
+		bash -x $shell_file uninstall
+	fi
+
 	cd ${rootPath} && python3 ${rootPath}/plugins/zabbix/index.py stop
 	cd ${rootPath} && python3 ${rootPath}/plugins/zabbix/index.py initd_uninstall
 
