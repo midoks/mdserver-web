@@ -168,14 +168,6 @@ def initdUinstall():
 
 
 def installPreInspection():
-    openresty_dir = mw.getServerDir() + "/openresty"
-    if not os.path.exists(openresty_dir):
-        return '需要安装Openresty插件'
-
-    mysql_dir = mw.getServerDir() + "/mysql"
-    if not os.path.exists(mysql_dir):
-        return '需要安装MySQL插件,至少8.0!'
-
     return 'ok'
 
 
