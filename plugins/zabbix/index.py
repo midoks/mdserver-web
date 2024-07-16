@@ -204,7 +204,10 @@ def initDreplace():
     # 导入MySQL配置
     zabbixImportMySQLData()
 
-    initZsConf()
+    init_file = getServerDir() + '/init.pl'
+    if not os.path.exists(init_file):
+        initZsConf()
+        mw.writeFile(init_file, 'ok')
     return True
 
 
