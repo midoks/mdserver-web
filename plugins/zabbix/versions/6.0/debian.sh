@@ -33,6 +33,7 @@ Install_App()
 Uninstall_App()
 {
 	apt remove -y zabbix-frontend-php zabbix-sql-scripts zabbix-agent zabbix-get
+	rm -rf /etc/zabbix
 	echo "卸载成功"
 }
 
