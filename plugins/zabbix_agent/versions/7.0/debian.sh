@@ -16,7 +16,7 @@ Install_App()
 {
 	mkdir -p $serverPath/source/zabbix
 
-	ZABBIX_NAME=zabbix-release_7.0-2+debian12_all.deb
+	ZABBIX_NAME=zabbix-release_7.0-2+debian${SYS_VERSION_ID}_all.deb
 	echo "wget -O $serverPath/source/zabbix/${ZABBIX_NAME} https://repo.zabbix.com/zabbix/7.0/debian/pool/main/z/zabbix-release/${ZABBIX_NAME}"
 	if [ ! -f  $serverPath/source/zabbix/${ZABBIX_NAME} ];then
 		wget -O $serverPath/source/zabbix/${ZABBIX_NAME} https://repo.zabbix.com/zabbix/7.0/debian/pool/main/z/zabbix-release/${ZABBIX_NAME}
