@@ -206,8 +206,8 @@ if __name__ == "__main__":
     elif func == 'uninstall_pre_inspection':
         print(uninstallPreInspection())
     elif func == 'conf':
-        print(zabbixNginxConf())
-    elif func == 'zabbix_server_agent':
+        print(zabbixAgentConf())
+    elif func == 'zabbix_agent_conf':
         print(zabbixAgentConf())
     elif func == 'run_log':
         print(runLog())
