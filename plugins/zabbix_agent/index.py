@@ -84,20 +84,10 @@ def contentReplace(content):
     return content
 
 def zabbixAgentConf():
-    return '/etc/zabbix/zabbix_server.conf'
+    return '/etc/zabbix/zabbix_agentd.conf'
 
 
-def initOpConf():
-    nginx_src_tpl = getPluginDir()+'/conf/zabbix.nginx.conf'
-    nginx_dst_vhost = zabbixNginxConf()
-
-    # nginx配置
-    if not os.path.exists(nginx_dst_vhost):
-        content = mw.readFile(nginx_src_tpl)
-        content = contentReplace(content)
-        mw.writeFile(nginx_dst_vhost, content)
-
-def initZsConf():
+def initAgentConf():
     zs_src_tpl = getPluginDir()+'/conf/zabbix_server.conf'
     zs_dst_path = zabbixServerConf()
 
@@ -108,7 +98,7 @@ def initZsConf():
 
 def initDreplace():
 
-    # initZsConf()
+    initAgentConf()
     return True
 
 
