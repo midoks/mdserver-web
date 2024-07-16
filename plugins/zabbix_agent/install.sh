@@ -4,9 +4,8 @@ export PATH
 
 # https://www.zabbix.com
 
-# cd /www/server/mdserver-web/plugins/zabbix && /bin/bash install.sh install 7.0
-# cd /www/server/mdserver-web && python3 /www/server/mdserver-web/plugins/zabbix/index.py start
-
+# cd /www/server/mdserver-web/plugins/zabbix_agent && /bin/bash install.sh install 7.0
+# cd /www/server/mdserver-web && python3 /www/server/mdserver-web/plugins/zabbix_agent/index.py start
 
 
 curPath=`pwd`
@@ -38,7 +37,7 @@ fi
 Install_App()
 {
 	echo '正在安装脚本文件...'
-	mkdir -p $serverPath/source/zabbix
+	mkdir -p $serverPath/source/zabbix_agent
 	shell_file=${curPath}/versions/${VERSION}/${OSNAME}.sh
 
 	if [ -f $shell_file ];then
@@ -49,12 +48,12 @@ Install_App()
 	fi
 
 	if [ "$?" == "0" ];then
-		mkdir -p $serverPath/zabbix
-		echo "${VERSION}" > $serverPath/zabbix/version.pl
+		mkdir -p $serverPath/zabbix_agent
+		echo "${VERSION}" > $serverPath/zabbix_agent/version.pl
 
 		#初始化 
-		cd ${rootPath} && python3 ${rootPath}/plugins/zabbix/index.py start
-		cd ${rootPath} && python3 ${rootPath}/plugins/zabbix/index.py initd_install
+		cd ${rootPath} && python3 ${rootPath}/plugins/zabbix_agent/index.py start
+		cd ${rootPath} && python3 ${rootPath}/plugins/zabbix_agent/index.py initd_install
 	fi
 
 	echo 'Zabbix安装完成'
@@ -62,11 +61,11 @@ Install_App()
 
 Uninstall_App()
 {
-	cd ${rootPath} && python3 ${rootPath}/plugins/zabbix/index.py stop
-	cd ${rootPath} && python3 ${rootPath}/plugins/zabbix/index.py initd_uninstall
+	cd ${rootPath} && python3 ${rootPath}/plugins/zabbix_agent/index.py stop
+	cd ${rootPath} && python3 ${rootPath}/plugins/zabbix_agent/index.py initd_uninstall
 
-	rm -rf $serverPath/zabbix
-	rm -rf $serverPath/source/zabbix
+	rm -rf $serverPath/zabbix_agent
+	rm -rf $serverPath/source/zabbix_agent
 	echo 'Zabbix卸载完成'
 }
 

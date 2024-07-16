@@ -15,7 +15,7 @@ if mw.isAppleSystem():
 
 
 def getPluginName():
-    return 'zabbix'
+    return 'zabbix_agent'
 
 
 def getPluginDir():
@@ -30,16 +30,7 @@ def getInitDFile():
     current_os = mw.getOs()
     if current_os == 'darwin':
         return '/tmp/' + getPluginName()
-
-    if current_os.startswith('freebsd'):
-        return '/etc/rc.d/' + getPluginName()
-
     return '/etc/init.d/' + getPluginName()
-
-
-def getConf():
-    path = getServerDir() + "/web_conf/nginx/vhost/zabbix.conf"
-    return path
 
 
 def getInitDTpl():
@@ -80,7 +71,7 @@ def getPidFile():
     return tmp.groups()[0].strip()
 
 def status():
-    cmd = "ps aux|grep zabbix_server |grep -v grep | grep -v python | grep -v mdserver-web | awk '{print $2}'"
+    cmd = "ps aux|grep zabbix-agent |grep -v grep | grep -v python | grep -v mdserver-web | awk '{print $2}'"
     data = mw.execShell(cmd)
     if data[0] == '':
         return 'stop'
@@ -90,94 +81,11 @@ def contentReplace(content):
     service_path = mw.getServerDir()
     content = content.replace('{$ROOT_PATH}', mw.getRootDir())
     content = content.replace('{$SERVER_PATH}', service_path)
-    content = content.replace('{$ZABBIX_ROOT}', '/usr/share/zabbix')
-    content = content.replace('{$ZABBIX_PORT}', '18888')
-
-    psdb = pSqliteDb('databases')
-    db_pass = psdb.where('name = ?', ('zabbix',)).getField('password')
-    content = content.replace('{$ZABBIX_DB_PORT}', getMySQLPort())
-    content = content.replace('{$ZABBIX_DB_PASS}', db_pass)
     return content
 
-
-def getMySQLConf():
-    path = mw.getServerDir() + '/mysql/etc/my.cnf'
-    return path
-
-
-def getMySQLPort():
-    file = getMySQLConf()
-    content = mw.readFile(file)
-    rep = 'port\s*=\s*(.*)'
-    tmp = re.search(rep, content)
-    return tmp.groups()[0].strip()
-
-def getMySQLSocketFile():
-    file = getMySQLConf()
-    content = mw.readFile(file)
-    rep = 'socket\s*=\s*(.*)'
-    tmp = re.search(rep, content)
-    return tmp.groups()[0].strip()
-
-
-def pSqliteDb(dbname='databases'):
-    mysql_dir = mw.getServerDir() + '/mysql'
-    conn = mw.M(dbname).dbPos(mysql_dir, 'mysql')
-    return conn
-
-
-def pMysqlDb():
-    # pymysql
-    db = mw.getMyORM()
-    db.setDbName('zabbix')
-    db.setPort(getMySQLPort())
-    db.setSocket(getMySQLSocketFile())
-    db.setPwd(pSqliteDb('config').where('id=?', (1,)).getField('mysql_root'))
-    return db
-
-def zabbixNginxConf():
-    return mw.getServerDir()+'/web_conf/nginx/vhost/zabbix.conf'
-
-def zabbixPhpConf():
-    return '/etc/zabbix/web/zabbix.conf.php'
-
-def zabbixServerConf():
+def zabbixAgentConf():
     return '/etc/zabbix/zabbix_server.conf'
 
-def zabbixImportMySQLData():
-    pmdb = pMysqlDb()
-    psdb = pSqliteDb('databases')
-    find_ps_zabbix = psdb.field('id').where('name = ?', ('zabbix',)).select()
-    if len(find_ps_zabbix) < 1:
-        db_pass = mw.getRandomString(16)
-        # 创建数据
-        cmd = 'python3 plugins/mysql/index.py add_db  {"name":"zabbix","codeing":"utf8mb4","db_user":"zabbix","password":"'+db_pass+'","dataAccess":"127.0.0.1","ps":"zabbix","address":"127.0.0.1"}'
-        # print(cmd)
-        mw.execShell(cmd)
-        pmdb.query("ALTER DATABASE `zabbix` DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_bin")
-        pmdb.query("grant all privileges on zabbix.* to zabbix@127.0.0.1")
-
-
-    db_pass = psdb.where('name = ?', ('zabbix',)).getField('password')
-    find_zabbix_version = pmdb.query("show tables like 'dbversion'")
-    if len(find_zabbix_version) == 0:
-        # 初始化导入数据
-        pmdb.query("set global log_bin_trust_function_creators=1")
-        # zcat /usr/share/zabbix-sql-scripts/mysql/server.sql.gz | /www/server/mysql/bin/mysql --default-character-set=utf8mb4 -uzabbix -p"LGhb1f7QG6SDL5CX" zabbix
-        import_data_cmd = 'zcat /usr/share/zabbix-sql-scripts/mysql/server.sql.gz | /www/server/mysql/bin/mysql --default-character-set=utf8mb4 -uzabbix -p"'+db_pass+'" zabbix'
-        mw.execShell(import_data_cmd)
-        pmdb.query("set global log_bin_trust_function_creators=0")
-
-
-    php_src_tpl = getPluginDir()+'/conf/zabbix.conf.php'
-    php_dst_path = zabbixPhpConf()
-    # php配置
-    if not os.path.exists(php_dst_path):
-        content = mw.readFile(php_src_tpl)
-        content = contentReplace(content)
-        mw.writeFile(php_dst_path, content)
-
-    return True
 
 def initOpConf():
     nginx_src_tpl = getPluginDir()+'/conf/zabbix.nginx.conf'
@@ -199,12 +107,8 @@ def initZsConf():
     mw.writeFile(zs_dst_path, content)
 
 def initDreplace():
-    # 初始化OP配置
-    initOpConf()
-    # 导入MySQL配置
-    zabbixImportMySQLData()
 
-    initZsConf()
+    # initZsConf()
     return True
 
 
@@ -212,7 +116,7 @@ def zOp(method):
 
     initDreplace()
 
-    data = mw.execShell('systemctl ' + method + ' zabbix_server')
+    data = mw.execShell('systemctl ' + method + ' zabbix-agent')
     if data[1] == '':
         return 'ok'
     return data[1]
@@ -238,7 +142,7 @@ def initdStatus():
     if current_os == 'darwin':
         return "Apple Computer does not support"
 
-    shell_cmd = 'systemctl status zabbix_server | grep loaded | grep "enabled;"'
+    shell_cmd = 'systemctl status zabbix-agent | grep loaded | grep "enabled;"'
     data = mw.execShell(shell_cmd)
     if data[0] == '':
         return 'fail'
@@ -250,7 +154,7 @@ def initdInstall():
     if current_os == 'darwin':
         return "Apple Computer does not support"
 
-    mw.execShell('systemctl enable zabbix_server')
+    mw.execShell('systemctl enable zabbix-agent')
     return 'ok'
 
 
@@ -259,7 +163,7 @@ def initdUinstall():
     if current_os == 'darwin':
         return "Apple Computer does not support"
 
-    mw.execShell('systemctl disable zabbix_server')
+    mw.execShell('systemctl disable zabbix-agent')
     return 'ok'
 
 
