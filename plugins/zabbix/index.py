@@ -315,7 +315,7 @@ def installPreInspection():
     sysName = sys[0].strip().lower()
     sysId = sys_id[0].strip()
 
-    if not sysName in ['debain']:
+    if not sysName in ['debain','centos']:
         return '不支持该系统'
 
     if sysName == 'debain' and not sysId in ['12']:
