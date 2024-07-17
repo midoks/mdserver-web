@@ -303,6 +303,22 @@ def runLog():
 
 
 def installPreInspection():
+    cmd = "cat /etc/*-release | grep PRETTY_NAME |awk -F = '{print $2}' | awk -F '\"' '{print $2}'| awk '{print $1}'"
+    sys = mw.execShell(cmd)
+
+    if sys[1] != '':
+        return '不支持该系统'
+
+    cmd = "cat /etc/*-release | grep VERSION_ID | awk -F = '{print $2}' | awk -F '\"' '{print $2}'"
+    sys_id = mw.execShell(cmd)
+
+    sysName = sys[0].strip().lower()
+    sysId = sys_id[0].strip()
+
+    if not sysName in ['debain']:
+        return '不支持该系统'
+
+
     openresty_dir = mw.getServerDir() + "/openresty"
     if not os.path.exists(openresty_dir):
         return '需要安装Openresty插件'
