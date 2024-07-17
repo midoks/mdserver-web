@@ -4,7 +4,7 @@
 	"name": "zabbix",
 	"title": "Zabbix",
 	"shell": "install.sh",
-	"versions":["6.0","7.0"],
+	"versions":["7.0"],
 	"tip": "soft",
 	"checks": "server/zabbix",
 	"path": "server/zabbix",

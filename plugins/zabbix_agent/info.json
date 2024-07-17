@@ -4,7 +4,7 @@
 	"name": "zabbix_agent",
 	"title": "Zabbix Agent",
 	"shell": "install.sh",
-	"versions":["6.0","7.0"],
+	"versions":["7.0"],
 	"tip": "soft",
 	"checks": "server/zabbix_agent",
 	"path": "server/zabbix_agent",
