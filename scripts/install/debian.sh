@@ -43,6 +43,7 @@ echo "SSH PORT:${SSH_PORT}"
 
 # choose lang cmd
 # dpkg-reconfigure --frontend=noninteractive locales
+# dpkg-reconfigure locales
 if [ ! -f /usr/sbin/locale-gen ];then
 	apt install -y locales
 	sed -i '/en_US.UTF-8/s/^# //g' /etc/locale.gen
