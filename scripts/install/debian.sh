@@ -47,10 +47,12 @@ if [ ! -f /usr/sbin/locale-gen ];then
 	apt install -y locales
 	sed -i '/en_US.UTF-8/s/^# //g' /etc/locale.gen
 	locale-gen en_US.UTF-8
+	locale-gen zh_CN.UTF-8
 	localedef -v -c -i en_US -f UTF-8 en_US.UTF-8 > /dev/null 2>&1
 	update-locale LANG=en_US.UTF-8
 else
 	locale-gen en_US.UTF-8
+	locale-gen zh_CN.UTF-8
 	localedef -v -c -i en_US -f UTF-8 en_US.UTF-8 > /dev/null 2>&1
 fi
 
