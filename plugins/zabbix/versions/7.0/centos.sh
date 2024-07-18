@@ -27,6 +27,7 @@ Install_App()
 	cd $serverPath/source/zabbix && rpm -Uvh ${ZABBIX_NAME}
 	dnf install -y zabbix-server-mysql zabbix-web-mysql zabbix-sql-scripts zabbix-selinux-policy zabbix-agent
 
+	# dnf module switch-to zabbix-web-1:7.0.4
 }
 
 Uninstall_App()
