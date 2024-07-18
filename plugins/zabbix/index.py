@@ -215,6 +215,8 @@ def openPort():
     try:
         import firewall_api
         firewall_api.firewall_api().addAcceptPortArgs('18888', 'zabbix-web', 'port')
+        firewall_api.firewall_api().addAcceptPortArgs('10051', 'zabbix-server', 'port')
+        firewall_api.firewall_api().addAcceptPortArgs('10050', 'zabbix-agent', 'port')
         return port
     except Exception as e:
         return "Release failed {}".format(e)
