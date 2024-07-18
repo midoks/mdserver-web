@@ -16,6 +16,8 @@ SYS_VERSION_ID=`cat /etc/*-release | grep VERSION_ID | awk -F = '{print $2}' | a
 # zabbix_get -s 127.0.0.1 -k agent.ping
 Install_App()
 {
+	yum install -y glibc-langpack-zh
+
 	mkdir -p $serverPath/source/zabbix
 
 	ZABBIX_NAME=zabbix-release-7.0-4.el${SYS_VERSION_ID}.noarch.rpm
@@ -28,6 +30,7 @@ Install_App()
 
 	cd $serverPath/source/zabbix && rpm -Uvh ${ZABBIX_NAME}
 	dnf install zabbix-server-mysql zabbix-web-mysql zabbix-sql-scripts zabbix-selinux-policy zabbix-agent -y
+
 }
 
 Uninstall_App()
