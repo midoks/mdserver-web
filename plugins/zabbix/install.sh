@@ -59,6 +59,9 @@ Install_App()
 	cd ${rootPath} && python3 ${rootPath}/plugins/zabbix/index.py initd_install
 
 
+	if [ -d /etc/zabbix/web ];then
+		chown -R www:www /etc/zabbix/web
+	fi
 	echo 'Zabbix安装完成'
 }
 

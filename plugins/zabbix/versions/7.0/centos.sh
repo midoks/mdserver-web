@@ -29,13 +29,13 @@ Install_App()
 	fi
 
 	cd $serverPath/source/zabbix && rpm -Uvh ${ZABBIX_NAME}
-	dnf install zabbix-server-mysql zabbix-web-mysql zabbix-sql-scripts zabbix-selinux-policy zabbix-agent -y
+	dnf install -y zabbix-server-mysql zabbix-web-mysql zabbix-sql-scripts zabbix-selinux-policy zabbix-agent
 
 }
 
 Uninstall_App()
 {
-	dnf remove -y zabbix-server-mysql zabbix-web-mysql zabbix-sql-scripts zabbix-selinux-policy zabbix-agent -y
+	dnf remove -y zabbix-server-mysql zabbix-web-mysql zabbix-sql-scripts zabbix-selinux-policy zabbix-agent
 	rm -rf /etc/zabbix
 	echo "卸载成功"
 }
