@@ -211,6 +211,15 @@ def initPhpConf():
         content = contentReplace(content)
         mw.writeFile(php_dst_path, content)
 
+def openPort():
+    try:
+        import firewall_api
+        firewall_api.firewall_api().addAcceptPortArgs('18888', 'zabbix-web', 'port')
+        return port
+    except Exception as e:
+        return "Release failed {}".format(e)
+    return True
+
 def initDreplace():
     # 导入MySQL配置
     zabbixImportMySQLData()
@@ -222,6 +231,7 @@ def initDreplace():
     init_file = getServerDir() + '/init.pl'
     if not os.path.exists(init_file):
         initZsConf()
+        openPort()
         mw.writeFile(init_file, 'ok')
     return True
 
