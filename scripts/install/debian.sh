@@ -171,7 +171,8 @@ apt install -y gcc
 apt install -y patchelf
 
 apt install -y libffi-dev
-apt install -y cmake automake make
+apt install -y cmake 
+apt install -y automake make 
 
 apt install -y webp scons
 apt install -y libwebp-dev
