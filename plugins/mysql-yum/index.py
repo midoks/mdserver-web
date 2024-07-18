@@ -3476,7 +3476,7 @@ def installPreInspection(version):
     sysName = sys[0].strip().lower()
     sysId = sys_id[0].strip()
 
-    if not sysName in ('centos',):
+    if not sysName in ['centos']:
         return '仅支持centos'
 
     if (sysName == 'centos' and version == '5.7' and not sysId in('7',)):
