@@ -280,7 +280,7 @@ def initZsConf():
     zs_src_tpl = getPluginDir()+'/conf/zabbix_server.conf'
     if ver == '6.0':
         zs_src_tpl = getPluginDir()+'/conf/zabbix_server6.conf'
-        
+
     zs_dst_path = zabbixServerConf()
 
     # zabbix_server配置
@@ -411,7 +411,7 @@ def runLog():
     rep = 'LogFile=\s*(.*)'
     tmp = re.search(rep, content)
 
-    if tmp.groups() == 0:
+    if tmp.groups():
         return tmp.groups()[0].strip()
     return '/var/log/zabbix/zabbix_server.log'
 
