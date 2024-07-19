@@ -308,12 +308,13 @@ def initDreplace():
 
     # 初始化OP配置
     initOpConf()
-    initPhpConf()
+    
 
     init_file = getServerDir() + '/init.pl'
     if not os.path.exists(init_file):
         initZsConf()
         initAgentConf()
+        initPhpConf()
         openPort()
         mw.writeFile(init_file, 'ok')
     return True
@@ -353,6 +354,9 @@ def restart():
     return status
 
 def reload():
+    initZsConf()
+    initAgentConf()
+    initPhpConf()
     return zOp('reload')
 
 def initdStatus():
