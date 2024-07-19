@@ -212,6 +212,7 @@ def zabbixImportMySQLData():
         mysql_bin = getMySQLBin()
         # zcat /usr/share/zabbix-sql-scripts/mysql/server.sql.gz | /www/server/mysql/bin/mysql --default-character-set=utf8mb4 -uzabbix -p"LGhb1f7QG6SDL5CX" zabbix
         import_data_cmd = 'zcat /usr/share/zabbix-sql-scripts/mysql/server.sql.gz | '+mysql_bin+' --default-character-set=utf8mb4 -uzabbix -p"'+db_pass+'" zabbix'
+        # print(import_data_cmd)
         mw.execShell(import_data_cmd)
         # pmdb.query("set global log_bin_trust_function_creators=0")
 
