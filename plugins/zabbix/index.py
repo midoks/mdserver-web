@@ -213,7 +213,7 @@ def isInstalledMySQL():
 
     for mt in mysql_type:
         for ver in mysql_ver:
-            mysql_install_dir = mw.getServerDir() + '/'+ mt+'/'+ver
+            mysql_install_dir = mw.getServerDir() + '/'+ mt
             if os.path.exists(mysql_install_dir):
                 return True
     return False
