@@ -375,6 +375,17 @@ def runLog():
         return tmp.groups()[0].strip()
     return '/var/log/zabbix/zabbix_server.log'
 
+def zabbixAgentLog():
+    za_conf = zabbixAgentConf()
+    content = mw.readFile(za_conf)
+
+    rep = 'LogFile=\s*(.*)'
+    tmp = re.search(rep, content)
+
+    if tmp.groups() == 0:
+        return tmp.groups()[0].strip()
+    return '/var/log/zabbix/zabbix_agentd.log'
+
 
 def installPreInspection():
     cmd = "cat /etc/*-release | grep PRETTY_NAME |awk -F = '{print $2}' | awk -F '\"' '{print $2}'| awk '{print $1}'"
@@ -442,5 +453,7 @@ if __name__ == "__main__":
         print(zabbixAgentConf())
     elif func == 'run_log':
         print(runLog())
+    elif func == 'zabbix_agent_log':
+        print(zabbixAgentLog())
     else:
         print('error')
