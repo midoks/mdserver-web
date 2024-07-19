@@ -254,10 +254,13 @@ def initOpConf():
     nginx_src_tpl = getPluginDir()+'/conf/zabbix.nginx.conf'
     nginx_dst_vhost = zabbixNginxConf()
 
+    phpver = getInstalledPhpConfDir()
+
     # nginx配置
     if not os.path.exists(nginx_dst_vhost):
         content = mw.readFile(nginx_src_tpl)
         content = contentReplace(content)
+        content = content.replace('{$PHP_VER}',phpver)
         mw.writeFile(nginx_dst_vhost, content)
 
 def initZsConf():
@@ -270,15 +273,12 @@ def initZsConf():
     mw.writeFile(zs_dst_path, content)
 
 def initPhpConf():
-
-    phpver = getInstalledPhpConfDir()
     php_src_tpl = getPluginDir()+'/conf/zabbix.conf.php'
     php_dst_path = zabbixPhpConf()
     # php配置
     if not os.path.exists(php_dst_path):
         content = mw.readFile(php_src_tpl)
         content = contentReplace(content)
-        content = content.replace('{$PHP_VER}',phpver)
         mw.writeFile(php_dst_path, content)
 
 def initAgentConf():
