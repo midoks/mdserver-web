@@ -47,14 +47,14 @@ Install_App()
 		exit 1
 	fi
 
-	if [ "$?" == "0" ];then
-		mkdir -p $serverPath/zabbix_agent
-		echo "${VERSION}" > $serverPath/zabbix_agent/version.pl
 
-		#初始化 
-		cd ${rootPath} && python3 ${rootPath}/plugins/zabbix_agent/index.py start
-		cd ${rootPath} && python3 ${rootPath}/plugins/zabbix_agent/index.py initd_install
-	fi
+	mkdir -p $serverPath/zabbix_agent
+	echo "${VERSION}" > $serverPath/zabbix_agent/version.pl
+
+	#初始化 
+	cd ${rootPath} && python3 ${rootPath}/plugins/zabbix_agent/index.py start
+	cd ${rootPath} && python3 ${rootPath}/plugins/zabbix_agent/index.py initd_install
+
 
 	echo 'Zabbix安装完成'
 }
