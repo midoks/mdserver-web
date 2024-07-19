@@ -184,7 +184,7 @@ def pMysqlDb():
 
 
 def getInstalledPhpConfDir():
-    phpver = [80,81,82,83,84]
+    phpver = ["80","81","82","83","84"]
     php_type = ['php-apt','php-yum', 'php'];
 
     for pt in php_type:
