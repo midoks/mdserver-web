@@ -304,6 +304,7 @@ def zOp(method):
     initDreplace()
 
     data = mw.execShell('systemctl ' + method + ' zabbix-server')
+    mw.execShell('systemctl ' + method + ' zabbix-agent')
     if data[1] == '':
         return 'ok'
     return data[1]
