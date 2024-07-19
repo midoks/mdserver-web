@@ -278,6 +278,9 @@ def initdUinstall(version):
 
 
 def fpmLog(version):
+    f = '/var/opt/remi/php' + version + '/log/php-fpm.log'
+    if os.path.exists(f):
+        return f
     return '/var/opt/remi/php' + version + '/log/php-fpm/error.log'
 
 
