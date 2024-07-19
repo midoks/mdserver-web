@@ -43,6 +43,10 @@ if [ "$OSNAME" == "alma" ];then
 	rpm -Uvh http://rpms.remirepo.net/enterprise/remi-release-${VERSION_ID}.rpm
 fi
 
+if [ "$OSNAME" == "rocky" ];then
+	rpm -Uvh http://rpms.remirepo.net/enterprise/remi-release-${VERSION_ID}.rpm
+fi
+
 if [ "$OSNAME" == "centos" ];then
 	rpm -Uvh http://rpms.remirepo.net/enterprise/remi-release-${VERSION_ID}.rpm
 fi
