@@ -278,7 +278,7 @@ def initPhpConf():
     if not os.path.exists(php_dst_path):
         content = mw.readFile(php_src_tpl)
         content = contentReplace(content)
-        content = content.replace('{$PHP_VER}',phpver,content)
+        content = content.replace('{$PHP_VER}',phpver)
         mw.writeFile(php_dst_path, content)
 
 def initAgentConf():
