@@ -422,7 +422,7 @@ def zabbixAgentLog():
     rep = 'LogFile=\s*(.*)'
     tmp = re.search(rep, content)
 
-    if tmp.groups() == 0:
+    if tmp.groups():
         return tmp.groups()[0].strip()
     return '/var/log/zabbix/zabbix_agentd.log'
 
