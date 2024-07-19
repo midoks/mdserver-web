@@ -102,6 +102,7 @@ if [ "${action}" == "install" ] && [ -d ${serverPath}/php-apt/${type} ];then
 	cd ${rootPath}/plugins/php-apt/versions && bash common.sh ${apt_ver} install intl
 	cd ${rootPath}/plugins/php-apt/versions && bash common.sh ${apt_ver} install xml
 	cd ${rootPath}/plugins/php-apt/versions && bash common.sh ${apt_ver} install mcrypt
+	cd ${rootPath}/plugins/php-apt/versions && bash common.sh ${apt_ver} install bcmath
 	cd ${rootPath}/plugins/php-apt/versions && bash common.sh ${apt_ver} install mysqlnd
 	cd ${rootPath}/plugins/php-apt/versions && bash common.sh ${apt_ver} install mysql
 	cd ${rootPath}/plugins/php-apt/versions && bash common.sh ${apt_ver} install gettext
