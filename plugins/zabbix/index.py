@@ -198,6 +198,7 @@ def zabbixAgentConf():
     return '/etc/zabbix/zabbix_agentd.conf'
 
 def zabbixImportMySQLData():
+    getMySQLConf()
     choose_mysql = getServerDir()+'/mysql.pl'
     ver = mw.readFile(choose_mysql)
 
