@@ -480,7 +480,7 @@ def installPreInspection():
 
 
     is_installed_mysql = isInstalledMySQL()
-    if not os.path.exists(mysql_dir):
+    if not is_installed_mysql:
         return '需要安装MySQL/MySQL-APT/MySQL-YUM插件,至少8.0!'
 
     return 'ok'
