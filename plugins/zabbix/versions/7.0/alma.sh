@@ -25,12 +25,14 @@ Install_App()
 	rpm -Uvh https://repo.zabbix.com/zabbix/7.0/alma/${SYS_VERSION_ID:0:1}/x86_64/${ZABBIX_NAME}
 
 	cd $serverPath/source/zabbix && rpm -Uvh ${ZABBIX_NAME}
-	dnf install -y zabbix-server-mysql zabbix-web-mysql zabbix-sql-scripts zabbix-selinux-policy zabbix-agent
+	dnf install -y zabbix-server-mysql zabbix-web-mysql zabbix-sql-scripts zabbix-selinux-policy
+	dnf install -y zabbix-agent
 }
 
 Uninstall_App()
 {
-	dnf remove -y zabbix-server-mysql zabbix-web-mysql zabbix-sql-scripts zabbix-selinux-policy zabbix-agent
+	dnf remove -y zabbix-server-mysql zabbix-web-mysql zabbix-sql-scripts zabbix-selinux-policy
+	dnf install -y zabbix-agent
 	rm -rf /etc/zabbix
 	echo "卸载成功"
 }
