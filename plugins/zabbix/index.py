@@ -393,6 +393,8 @@ def initdInstall():
         return "Apple Computer does not support"
 
     mw.execShell('systemctl enable zabbix-server')
+    if data[1] != '':
+        return data[1]
     return 'ok'
 
 
