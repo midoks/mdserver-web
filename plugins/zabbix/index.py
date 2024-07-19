@@ -192,7 +192,7 @@ def getInstalledPhpConfDir():
             php_install_dir = mw.getServerDir() + '/'+ pt+'/'+ver
             if os.path.exists(php_install_dir):
                 if pt == 'php-apt':
-                    return pt + ver[0:1]+'.'.ver[1:2]
+                    return pt + ver[0:1]+'.'+ver[1:2]
                 return pt + ver
     return 'php-80'
 
