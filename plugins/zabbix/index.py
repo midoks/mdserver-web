@@ -196,6 +196,28 @@ def getInstalledPhpConfDir():
                 return pt + ver
     return 'php-80'
 
+def isInstalledPhp():
+    phpver = ["80","81","82","83","84"]
+    php_type = ['php-apt','php-yum', 'php'];
+
+    for pt in php_type:
+        for ver in phpver:
+            php_install_dir = mw.getServerDir() + '/'+ pt+'/'+ver
+            if os.path.exists(php_install_dir):
+                return True
+    return False
+
+def isInstalledMySQL():
+    mysql_ver = ["80","81","82","83","84"]
+    mysql_type = ['mysql-apt','mysql-yum', 'mysql'];
+
+    for pt in mysql_type:
+        for ver in mysql_ver:
+            mysql_install_dir = mw.getServerDir() + '/'+ pt+'/'+ver
+            if os.path.exists(mysql_install_dir):
+                return True
+    return False
+
 
 def zabbixNginxConf():
     return mw.getServerDir()+'/web_conf/nginx/vhost/zabbix.conf'
@@ -452,13 +474,14 @@ def installPreInspection():
     if not os.path.exists(openresty_dir):
         return '需要安装Openresty插件'
 
-    php_dir = mw.getServerDir() + "/php"
-    if not os.path.exists(php_dir):
-        return '需要安装PHP插件,至少8.0!'
+    is_installed_php = isInstalledPhp()
+    if not is_installed_php:
+        return '需要安装PHP/PHP-APT/PHP-YUM插件,至少8.0!'
 
-    # mysql_dir = mw.getServerDir() + "/mysql"
-    # if not os.path.exists(mysql_dir):
-    #     return '需要安装MySQL插件,至少8.0!'
+
+    is_installed_mysql = isInstalledMySQL()
+    if not os.path.exists(mysql_dir):
+        return '需要安装MySQL/MySQL-APT/MySQL-YUM插件,至少8.0!'
 
     return 'ok'
 
