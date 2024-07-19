@@ -383,7 +383,7 @@ def initdStatus():
     shell_cmd = 'systemctl status zabbix-server | grep loaded | grep "enabled;"'
     data = mw.execShell(shell_cmd)
     if data[0] == '':
-        return 'ok'
+        return 'fail'
     return 'ok'
 
 
