@@ -106,7 +106,25 @@ def contentReplace(content):
 
 
 def getMySQLConf():
+
+    choose_mysql = getServerDir()+'/mysql.pl'
+    if os.path.exists(choose_mysql):
+        return mw.readFile(choose_mysql)
+
+    apt_path = mw.getServerDir() + '/mysql-apt/etc/my.cnf'
+    if os.path.exists(apt_path):
+        mw.writeFile(choose_mysql, 'mysql-apt')
+        return apt_path
+
+    yum_path = mw.getServerDir() + '/mysql-yum/etc/my.cnf'
+    if os.path.exists(yum_path):
+        mw.writeFile(choose_mysql, 'mysql-yum')
+        return yum_path
+
     path = mw.getServerDir() + '/mysql/etc/my.cnf'
+    if os.path.exists(path):
+        mw.writeFile(choose_mysql, 'mysql')
+        return path
     return path
 
 
@@ -124,9 +142,22 @@ def getMySQLSocketFile():
     tmp = re.search(rep, content)
     return tmp.groups()[0].strip()
 
+def getMySQLBin():
+    choose_mysql = getServerDir()+'/mysql.pl'
+    ver = mw.readFile(choose_mysql)
+    mysql_dir = mw.getServerDir() + '/'+ver
+
+    if ver == 'mysql-apt':
+        return '/www/server/mysql-apt/bin/usr/bin/mysql'
+    if ver == 'mysql-yum':
+        return '/www/server/mysql-yum/bin/usr/bin/mysql'
+    return '/www/server/mysql/bin/mysql'
 
 def pSqliteDb(dbname='databases'):
-    mysql_dir = mw.getServerDir() + '/mysql'
+    choose_mysql = getServerDir()+'/mysql.pl'
+    ver = mw.readFile(choose_mysql)
+
+    mysql_dir = mw.getServerDir() + '/'+ver
     conn = mw.M(dbname).dbPos(mysql_dir, 'mysql')
     return conn
 
@@ -174,8 +205,10 @@ def zabbixImportMySQLData():
     if len(find_zabbix_version) == 0:
         # 初始化导入数据
         pmdb.query("set global log_bin_trust_function_creators=1")
+
+        mysql_bin = getMySQLBin()
         # zcat /usr/share/zabbix-sql-scripts/mysql/server.sql.gz | /www/server/mysql/bin/mysql --default-character-set=utf8mb4 -uzabbix -p"LGhb1f7QG6SDL5CX" zabbix
-        import_data_cmd = 'zcat /usr/share/zabbix-sql-scripts/mysql/server.sql.gz | /www/server/mysql/bin/mysql --default-character-set=utf8mb4 -uzabbix -p"'+db_pass+'" zabbix'
+        import_data_cmd = 'zcat /usr/share/zabbix-sql-scripts/mysql/server.sql.gz | '+mysql_bin+' --default-character-set=utf8mb4 -uzabbix -p"'+db_pass+'" zabbix'
         mw.execShell(import_data_cmd)
         # pmdb.query("set global log_bin_trust_function_creators=0")
 
