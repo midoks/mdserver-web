@@ -848,8 +848,8 @@ def installPreInspection(version):
         sysName = sys[0].strip().lower()
         sysId = sys_id[0].strip()
 
-        if not sysName in ('centos'):
-            return '暂时仅支持centos'
+        if not sysName in ['centos','almalinux']:
+            return '暂时仅支持centos,almalinux'
         return 'ok'
     except Exception as e:
         return str(e)
