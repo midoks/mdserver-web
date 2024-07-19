@@ -207,6 +207,9 @@ def zabbixPhpConf():
     return '/etc/zabbix/web/zabbix.conf.php'
 
 def zabbixServerConf():
+    ver = getInstallVerion()
+    if ver == '6.0':
+        return '/etc/zabbix_server.conf'
     return '/etc/zabbix/zabbix_server.conf'
 
 def zabbixAgentConf():
@@ -273,7 +276,11 @@ def initOpConf():
         mw.writeFile(nginx_dst_vhost, content)
 
 def initZsConf():
+    ver = getInstallVerion()
     zs_src_tpl = getPluginDir()+'/conf/zabbix_server.conf'
+    if ver == '6.0':
+        zs_src_tpl = getPluginDir()+'/conf/zabbix_server6.conf'
+        
     zs_dst_path = zabbixServerConf()
 
     # zabbix_server配置
