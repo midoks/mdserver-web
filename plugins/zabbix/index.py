@@ -182,6 +182,21 @@ def pMysqlDb():
     db.setPwd(pSqliteDb('config').where('id=?', (1,)).getField('mysql_root'))
     return db
 
+
+def getInstalledPhpConfDir():
+    phpver = [80,81,82,83,84]
+    php_type = ['php-apt','php-yum', 'php'];
+
+    for pt in php_type:
+        for ver in phpver:
+            php_install_dir = mw.getServerDir() + '/'+ pt+'/'+ver
+            if os.path.exists(php_install_dir):
+                if pt == 'php-apt':
+                    return pt + ver[0:1]+'.'.ver[1:2]
+                return pt + ver
+    return 'php-80'
+
+
 def zabbixNginxConf():
     return mw.getServerDir()+'/web_conf/nginx/vhost/zabbix.conf'
 
@@ -255,6 +270,8 @@ def initZsConf():
     mw.writeFile(zs_dst_path, content)
 
 def initPhpConf():
+
+
     php_src_tpl = getPluginDir()+'/conf/zabbix.conf.php'
     php_dst_path = zabbixPhpConf()
     # php配置
