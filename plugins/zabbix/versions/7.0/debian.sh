@@ -29,12 +29,14 @@ Install_App()
 	cd $serverPath/source/zabbix && dpkg -i ${ZABBIX_NAME}
 	apt update -y 
 
-	apt install -y zabbix-server-mysql zabbix-frontend-php zabbix-sql-scripts zabbix-agent zabbix-get
+	apt install -y zabbix-server-mysql zabbix-frontend-php zabbix-sql-scripts zabbix-get
+	apt install -y zabbix-agent
 }
 
 Uninstall_App()
 {
-	apt remove -y zabbix-server-mysql zabbix-frontend-php zabbix-sql-scripts zabbix-agent zabbix-get
+	apt remove -y zabbix-server-mysql zabbix-frontend-php zabbix-sql-scripts zabbix-get
+	apt remove -y zabbix-agent
 	rm -rf /etc/zabbix
 	dpkg --configure -a
 	echo "卸载成功"

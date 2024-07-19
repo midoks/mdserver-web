@@ -152,6 +152,9 @@ def zabbixPhpConf():
 def zabbixServerConf():
     return '/etc/zabbix/zabbix_server.conf'
 
+def zabbixAgentConf():
+    return '/etc/zabbix/zabbix_agentd.conf'
+
 def zabbixImportMySQLData():
     pmdb = pMysqlDb()
     psdb = pSqliteDb('databases')
@@ -211,6 +214,15 @@ def initPhpConf():
         content = contentReplace(content)
         mw.writeFile(php_dst_path, content)
 
+def initAgentConf():
+    za_src_tpl = getPluginDir()+'/conf/zabbix_agentd.conf'
+    za_dst_path = zabbixAgentConf()
+
+    # zabbix_agent配置
+    content = mw.readFile(za_src_tpl)
+    content = contentReplace(content)
+    mw.writeFile(za_dst_path, content)
+
 def openPort():
     try:
         import firewall_api
@@ -221,6 +233,7 @@ def openPort():
     except Exception as e:
         return "Release failed {}".format(e)
     return True
+
 
 def initDreplace():
     # 导入MySQL配置
@@ -233,6 +246,7 @@ def initDreplace():
     init_file = getServerDir() + '/init.pl'
     if not os.path.exists(init_file):
         initZsConf()
+        initAgentConf()
         openPort()
         mw.writeFile(init_file, 'ok')
     return True
@@ -376,6 +390,8 @@ if __name__ == "__main__":
         print(zabbixPhpConf())
     elif func == 'zabbix_server_conf':
         print(zabbixServerConf())
+    elif func == 'zabbix_agent_conf':
+        print(zabbixAgentConf())
     elif func == 'run_log':
         print(runLog())
     else:
