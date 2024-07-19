@@ -40,6 +40,9 @@ bash ${rootPath}/scripts/getos.sh
 OSNAME=`cat ${rootPath}/data/osname.pl`
 VERSION_ID=`cat /etc/*-release | grep VERSION_ID | awk -F = '{print $2}' | awk -F "\"" '{print $2}'`
 
+if [ "$OSNAME" == "alma" ];then
+	rpm -Uvh http://rpms.remirepo.net/enterprise/remi-release-${VERSION_ID}.rpm
+fi
 
 if [ "$OSNAME" == "centos" ];then
 	rpm -Uvh http://rpms.remirepo.net/enterprise/remi-release-${VERSION_ID}.rpm
@@ -82,6 +85,7 @@ if [ "${action}" == "install" ] && [ -d ${serverPath}/php-yum/${type} ];then
 	cd ${rootPath}/plugins/php-yum/versions && bash common.sh ${type} install exif
 	cd ${rootPath}/plugins/php-yum/versions && bash common.sh ${type} install intl
 	cd ${rootPath}/plugins/php-yum/versions && bash common.sh ${type} install mcrypt
+	cd ${rootPath}/plugins/php-yum/versions && bash common.sh ${type} install bcmath
 	cd ${rootPath}/plugins/php-yum/versions && bash common.sh ${type} install openssl
 	cd ${rootPath}/plugins/php-yum/versions && bash common.sh ${type} install gettext
 	cd ${rootPath}/plugins/php-yum/versions && bash common.sh ${type} install redis
