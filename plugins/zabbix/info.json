@@ -4,7 +4,7 @@
 	"name": "zabbix",
 	"title": "Zabbix",
 	"shell": "install.sh",
-	"versions":["7.0"],
+	"versions":["6.0","7.0"],
 	"tip": "soft",
 	"install_pre_inspection":true,
 	"uninstall_pre_inspection":true,
