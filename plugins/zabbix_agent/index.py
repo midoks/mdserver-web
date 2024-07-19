@@ -110,10 +110,18 @@ def initDreplace():
     init_file = getServerDir() + '/init.pl'
     if not os.path.exists(init_file):
         initAgentConf()
-        
+        openPort()
         mw.writeFile(init_file, 'ok')
     return True
 
+def openPort():
+    try:
+        import firewall_api
+        firewall_api.firewall_api().addAcceptPortArgs('10050', 'zabbix-agent', 'port')
+        return port
+    except Exception as e:
+        return "Release failed {}".format(e)
+    return True
 
 def zOp(method):
 
@@ -126,6 +134,7 @@ def zOp(method):
 
 
 def start():
+    
     return zOp('start')
 
 
