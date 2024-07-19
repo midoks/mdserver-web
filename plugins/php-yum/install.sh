@@ -22,17 +22,16 @@ action=$1
 type=$2
 
 if [ "${2}" == "" ];then
-	echo '缺少安装脚本...' > $install_tmp
+	echo '缺少安装脚本...' >
 	exit 0
 fi 
 
 if [ ! -d $curPath/versions/$2 ];then
-	echo '缺少安装脚本2...' > $install_tmp
+	echo '缺少安装脚本2...'
 	exit 0
 fi
 
 # cd /www/server/mdserver-web/plugins/php-yum/versions && bash common.sh 83 install opcache
-
 
 #获取信息和版本
 # bash /www/server/mdserver-web/scripts/getos.sh
