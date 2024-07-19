@@ -392,7 +392,7 @@ def initdInstall():
     if current_os == 'darwin':
         return "Apple Computer does not support"
 
-    mw.execShell('systemctl enable zabbix-server')
+    data = mw.execShell('systemctl enable zabbix-server')
     if data[1] != '':
         return data[1]
     return 'ok'
@@ -403,7 +403,9 @@ def initdUinstall():
     if current_os == 'darwin':
         return "Apple Computer does not support"
 
-    mw.execShell('systemctl disable zabbix-server')
+    data = mw.execShell('systemctl disable zabbix-server')
+    if data[1] != '':
+        return data[1]
     return 'ok'
 
 def runLog():
