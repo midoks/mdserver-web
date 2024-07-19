@@ -153,6 +153,16 @@ def getMySQLBin():
         return '/www/server/mysql-yum/bin/usr/bin/mysql'
     return '/www/server/mysql/bin/mysql'
 
+def getMySQLBinLink():
+    ver = mw.readFile(choose_mysql)
+    mysql_dir = mw.getServerDir() + '/'+ver
+
+    if ver == 'mysql-apt':
+        return '/www/server/mysql-apt/bin/usr/bin/mysql -S /www/server/mysql-apt/mysql.sock'
+    if ver == 'mysql-yum':
+        return '/www/server/mysql-yum/bin/usr/bin/mysql -S /www/server/mysql-yum/mysql.sock'
+    return '/www/server/mysql/bin/mysql -S /www/server/mysql/mysql.sock'
+
 def pSqliteDb(dbname='databases'):
     choose_mysql = getServerDir()+'/mysql.pl'
     ver = mw.readFile(choose_mysql)
@@ -209,7 +219,7 @@ def zabbixImportMySQLData():
         # 初始化导入数据
         pmdb.query("set global log_bin_trust_function_creators=1")
 
-        mysql_bin = getMySQLBin()
+        mysql_bin = getMySQLBinLink()
         # zcat /usr/share/zabbix-sql-scripts/mysql/server.sql.gz | /www/server/mysql/bin/mysql --default-character-set=utf8mb4 -uzabbix -p"LGhb1f7QG6SDL5CX" zabbix
         import_data_cmd = 'zcat /usr/share/zabbix-sql-scripts/mysql/server.sql.gz | '+mysql_bin+' --default-character-set=utf8mb4 -uzabbix -p"'+db_pass+'" zabbix'
         # print(import_data_cmd)
