@@ -187,13 +187,16 @@ def zabbixAgentConf():
     return '/etc/zabbix/zabbix_agentd.conf'
 
 def zabbixImportMySQLData():
+    choose_mysql = getServerDir()+'/mysql.pl'
+    ver = mw.readFile(choose_mysql)
+
     pmdb = pMysqlDb()
     psdb = pSqliteDb('databases')
     find_ps_zabbix = psdb.field('id').where('name = ?', ('zabbix',)).select()
     if len(find_ps_zabbix) < 1:
         db_pass = mw.getRandomString(16)
         # 创建数据
-        cmd = 'python3 plugins/mysql/index.py add_db  {"name":"zabbix","codeing":"utf8mb4","db_user":"zabbix","password":"'+db_pass+'","dataAccess":"127.0.0.1","ps":"zabbix","address":"127.0.0.1"}'
+        cmd = 'python3 plugins/'+ver+'/index.py add_db  {"name":"zabbix","codeing":"utf8mb4","db_user":"zabbix","password":"'+db_pass+'","dataAccess":"127.0.0.1","ps":"zabbix","address":"127.0.0.1"}'
         # print(cmd)
         mw.execShell(cmd)
         pmdb.query("ALTER DATABASE `zabbix` DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_bin")
