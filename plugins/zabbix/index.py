@@ -397,9 +397,7 @@ def installPreInspection():
 
     cmd = "cat /etc/*-release | grep VERSION_ID | awk -F = '{print $2}' | awk -F '\"' '{print $2}'"
     sys_id = mw.execShell(cmd)
-
-    
-    sysId = sys_id[0].strip()
+    sysId = sys_id[0].strip().lower()
 
     if not sysName in ['debain','centos']:
         return '不支持该系统'
