@@ -271,13 +271,14 @@ def initZsConf():
 
 def initPhpConf():
 
-
+    phpver = getInstalledPhpConfDir()
     php_src_tpl = getPluginDir()+'/conf/zabbix.conf.php'
     php_dst_path = zabbixPhpConf()
     # php配置
     if not os.path.exists(php_dst_path):
         content = mw.readFile(php_src_tpl)
         content = contentReplace(content)
+        content = content.replace('{$PHP_VER}',phpver,content)
         mw.writeFile(php_dst_path, content)
 
 def initAgentConf():
