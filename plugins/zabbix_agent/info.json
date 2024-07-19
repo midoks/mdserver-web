@@ -6,6 +6,8 @@
 	"shell": "install.sh",
 	"versions":["7.0"],
 	"tip": "soft",
+	"install_pre_inspection":true,
+	"uninstall_pre_inspection":true,
 	"checks": "server/zabbix_agent",
 	"path": "server/zabbix_agent",
 	"display": 1,
