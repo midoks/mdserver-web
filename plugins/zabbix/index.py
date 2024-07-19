@@ -154,6 +154,7 @@ def getMySQLBin():
     return '/www/server/mysql/bin/mysql'
 
 def getMySQLBinLink():
+    choose_mysql = getServerDir()+'/mysql.pl'
     ver = mw.readFile(choose_mysql)
     mysql_dir = mw.getServerDir() + '/'+ver
 
