@@ -391,7 +391,6 @@ def installPreInspection():
     cmd = "cat /etc/*-release | grep PRETTY_NAME |awk -F = '{print $2}' | awk -F '\"' '{print $2}'| awk '{print $1}'"
     sys = mw.execShell(cmd)
 
-    
 
     cmd = "cat /etc/*-release | grep VERSION_ID | awk -F = '{print $2}' | awk -F '\"' '{print $2}'"
     sys_id = mw.execShell(cmd)
