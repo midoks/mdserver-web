@@ -345,7 +345,7 @@ def installPreInspection():
         return '不支持该系统'
 
     if sysName == 'debain' and not sysId in ['12']:
-        return '不支持,'+sysName+'['+sysId+']'
+        return '不支持,'+sysName+'['+sysId+'],仅支持debian12!'
 
     openresty_dir = mw.getServerDir() + "/openresty"
     if not os.path.exists(openresty_dir):

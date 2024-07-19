@@ -171,6 +171,9 @@ def initdUinstall():
 
 
 def installPreInspection():
+    zabbix_dir = mw.getServerDir()+'/zabbix'
+    if os.path.exists(zabbix_dir):
+        return '已经安装zabbix插件'
     return 'ok'
 
 
