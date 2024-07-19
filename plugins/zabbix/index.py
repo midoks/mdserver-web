@@ -106,10 +106,10 @@ def contentReplace(content):
 
 
 def getMySQLConf():
-
     choose_mysql = getServerDir()+'/mysql.pl'
     if os.path.exists(choose_mysql):
-        return mw.readFile(choose_mysql)
+        ver = mw.readFile(choose_mysql)
+        return mw.getServerDir() + '/'+ver+'/etc/my.cnf'
 
     apt_path = mw.getServerDir() + '/mysql-apt/etc/my.cnf'
     if os.path.exists(apt_path):
