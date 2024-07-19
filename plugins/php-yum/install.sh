@@ -22,7 +22,7 @@ action=$1
 type=$2
 
 if [ "${2}" == "" ];then
-	echo '缺少安装脚本...' >
+	echo '缺少安装脚本...'
 	exit 0
 fi 
 
