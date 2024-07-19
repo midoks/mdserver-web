@@ -208,14 +208,11 @@ def isInstalledPhp():
     return False
 
 def isInstalledMySQL():
-    mysql_ver = ["80","81","82","83","84"]
     mysql_type = ['mysql-apt','mysql-yum', 'mysql'];
-
     for mt in mysql_type:
-        for ver in mysql_ver:
-            mysql_install_dir = mw.getServerDir() + '/'+ mt
-            if os.path.exists(mysql_install_dir):
-                return True
+        mysql_install_dir = mw.getServerDir() + '/'+ mt
+        if os.path.exists(mysql_install_dir):
+            return True
     return False
 
 
