@@ -22,7 +22,7 @@ Install_App()
 
 	ZABBIX_NAME=zabbix-release-7.0-4.el${SYS_VERSION_ID}.noarch.rpm
 
-	rpm -Uvh https://repo.zabbix.com/zabbix/7.0/centos/${SYS_VERSION_ID}/x86_64/${ZABBIX_NAME}
+	rpm -Uvh https://repo.zabbix.com/zabbix/7.0/rhel/${SYS_VERSION_ID}/x86_64/${ZABBIX_NAME}
 
 	cd $serverPath/source/zabbix && rpm -Uvh ${ZABBIX_NAME}
 	dnf install -y zabbix-server-mysql zabbix-web-mysql zabbix-sql-scripts zabbix-selinux-policy zabbix-agent
