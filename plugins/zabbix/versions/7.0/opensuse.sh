@@ -27,7 +27,15 @@ Install_App()
 	rpm -Uvh https://repo.zabbix.com/zabbix/7.0/sles/${SYS_VERSION_ID:0:2}/x86_64/${ZABBIX_NAME}
 	echo "rpm -Uvh https://repo.zabbix.com/zabbix/7.0/sles/${SYS_VERSION_ID:0:2}/x86_64/${ZABBIX_NAME}"
 
-	# zypper install -y net-snmp
+
+	# debug
+	# symbol lookup error: /usr/sbin/zabbix_server: undefined symbol: usmAES256CiscoPrivProtocol
+	# /usr/sbin/zabbix_server -c /etc/zabbix/zabbix_server.conf
+
+	# zypper update -y net-snmp
+	# zypper update -y net-snmp-utils
+	# zypper install -y net-snmp-devel
+	
 	zypper install -y zabbix-server-mysql
 	zypper install -y zabbix-web-mysql 
 	zypper install -y zabbix-sql-scripts
