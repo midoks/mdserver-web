@@ -27,6 +27,7 @@ zypper install -y libjpeg-devel libpng-devel
 zypper install -y libevent-devel
 zypper install -y libtirpc-devel
 zypper install -y rpcgen
+zypper install -y libstdc++6
 zypper install -y expect
 zypper install -y pv
 zypper install -y bc

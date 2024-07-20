@@ -1,0 +1,30 @@
+<style>
+.overflow_hide {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    vertical-align: middle;
+}
+</style>
+
+<div class="bt-form">
+	<div class='plugin_version'></div>
+	<div class="bt-w-main">
+		<div class="bt-w-menu">
+			<p class="bgw" onclick="pluginService('zabbix_agent');">服务</p>
+			<p onclick="pluginInitD('zabbix_agent');">自启动</p>
+			<p onclick="pluginConfig('zabbix_agent',$('.plugin_version').attr('version'),'zabbix_agent_conf');">默认配置</p>
+			<p onclick="pluginLogs('zabbix_agent','','run_log');">运行日志</p>
+			<p onclick="zabbixReadme();">相关说明</p>
+			
+		</div>
+		<div class="bt-w-con pd15">
+			<div class="soft-man-con" style="height: 520px; overflow: auto;"></div>
+		</div>
+	</div>
+</div>
+<script type="text/javascript">
+$.getScript( "/plugins/file?name=zabbix_agent&f=js/zabbix.js", function(){
+	pluginService('zabbix_agent', $('.plugin_version').attr('version'));
+});
+</script>

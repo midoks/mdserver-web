@@ -1,0 +1,34 @@
+<style>
+.overflow_hide {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    vertical-align: middle;
+}
+</style>
+
+<div class="bt-form">
+	<div class='plugin_version'></div>
+	<div class="bt-w-main">
+		<div class="bt-w-menu">
+			<p class="bgw" onclick="pluginService('zabbix');">服务</p>
+			<p onclick="pluginInitD('zabbix');">自启动</p>
+			<p onclick="pluginConfig('zabbix',$('.plugin_version').attr('version'));">OP配置</p>
+			<p onclick="pluginConfig('zabbix',$('.plugin_version').attr('version'),'php_conf');">PHP配置</p>
+			<p onclick="pluginConfig('zabbix',$('.plugin_version').attr('version'),'zabbix_server_conf');">ZS配置</p>
+			<p onclick="pluginLogs('zabbix','','run_log');">ZS运行日志</p>
+			<p onclick="pluginConfig('zabbix',$('.plugin_version').attr('version'),'zabbix_agent_conf');">ZA配置</p>
+			<p onclick="pluginLogs('zabbix','','zabbix_agent_log');">ZA运行日志</p>
+			<p onclick="zabbixReadme();">相关说明</p>
+			
+		</div>
+		<div class="bt-w-con pd15">
+			<div class="soft-man-con" style="height: 520px; overflow: auto;"></div>
+		</div>
+	</div>
+</div>
+<script type="text/javascript">
+$.getScript( "/plugins/file?name=zabbix&f=js/zabbix.js", function(){
+	pluginService('zabbix', $('.plugin_version').attr('version'));
+});
+</script>

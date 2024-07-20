@@ -1,0 +1,19 @@
+{
+	"sort": 7,
+	"ps": "Zabbix被控服务器[<span style='color:red;'>开发中</span>]",
+	"name": "zabbix_agent",
+	"title": "Zabbix Agent",
+	"shell": "install.sh",
+	"versions":["7.0"],
+	"tip": "soft",
+	"install_pre_inspection":true,
+	"uninstall_pre_inspection":true,
+	"checks": "server/zabbix_agent",
+	"path": "server/zabbix_agent",
+	"display": 1,
+	"author": "midoks",
+	"date": "2022-07-14",
+	"home": "https://www.zabbix.com",
+	"type": 0,
+	"pid": "5"
+}

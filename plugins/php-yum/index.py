@@ -278,6 +278,9 @@ def initdUinstall(version):
 
 
 def fpmLog(version):
+    f = '/var/opt/remi/php' + version + '/log/php-fpm.log'
+    if os.path.exists(f):
+        return f
     return '/var/opt/remi/php' + version + '/log/php-fpm/error.log'
 
 
@@ -836,23 +839,22 @@ def opcacheBlacklistFile():
     return op_bl
 
 def installPreInspection(version):
-    try:
-        cmd = "cat /etc/*-release | grep PRETTY_NAME |awk -F = '{print $2}' | awk -F '\"' '{print $2}'| awk '{print $1}'"
-        sys = mw.execShell(cmd)
-        if sys[1] != '':
-            return '不支持该系统'
+    
+    cmd = "cat /etc/*-release | grep PRETTY_NAME |awk -F = '{print $2}' | awk -F '\"' '{print $2}'| awk '{print $1}'"
+    sys = mw.execShell(cmd)
+    if sys[1] != '':
+        return '不支持该系统'
 
-        cmd = "cat /etc/*-release | grep VERSION_ID | awk -F = '{print $2}' | awk -F '\"' '{print $2}'"
-        sys_id = mw.execShell(cmd)
+    cmd = "cat /etc/*-release | grep VERSION_ID | awk -F = '{print $2}' | awk -F '\"' '{print $2}'"
+    sys_id = mw.execShell(cmd)
 
-        sysName = sys[0].strip().lower()
-        sysId = sys_id[0].strip()
+    sysName = sys[0].strip().lower()
+    sysId = sys_id[0].strip()
 
-        if not sysName in ('centos'):
-            return '暂时仅支持centos'
-        return 'ok'
-    except Exception as e:
-        return str(e)
+    if not sysName in ['centos','almalinux','fedora','rocky']:
+        return '暂时仅支持centos,almalinux,fedora,rocky'
+    return 'ok'
+
 
 
 if __name__ == "__main__":

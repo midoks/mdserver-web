@@ -1,0 +1,19 @@
+{
+	"sort": 7,
+	"ps": "Zabbix是一个成熟、易用的企业级开源监控解决方案，适用于百万级指标的网络监控和应用监控[<span style='color:red;'>开发中</span>]",
+	"name": "zabbix",
+	"title": "Zabbix",
+	"shell": "install.sh",
+	"versions":["6.0","7.0"],
+	"tip": "soft",
+	"install_pre_inspection":true,
+	"uninstall_pre_inspection":true,
+	"checks": "server/zabbix",
+	"path": "server/zabbix",
+	"display": 1,
+	"author": "midoks",
+	"date": "2022-07-14",
+	"home": "https://www.zabbix.com/",
+	"type": 0,
+	"pid": "5"
+}

@@ -22,17 +22,16 @@ action=$1
 type=$2
 
 if [ "${2}" == "" ];then
-	echo '缺少安装脚本...' > $install_tmp
+	echo '缺少安装脚本...'
 	exit 0
 fi 
 
 if [ ! -d $curPath/versions/$2 ];then
-	echo '缺少安装脚本2...' > $install_tmp
+	echo '缺少安装脚本2...'
 	exit 0
 fi
 
 # cd /www/server/mdserver-web/plugins/php-yum/versions && bash common.sh 83 install opcache
-
 
 #获取信息和版本
 # bash /www/server/mdserver-web/scripts/getos.sh
@@ -40,6 +39,13 @@ bash ${rootPath}/scripts/getos.sh
 OSNAME=`cat ${rootPath}/data/osname.pl`
 VERSION_ID=`cat /etc/*-release | grep VERSION_ID | awk -F = '{print $2}' | awk -F "\"" '{print $2}'`
 
+if [ "$OSNAME" == "alma" ];then
+	rpm -Uvh http://rpms.remirepo.net/enterprise/remi-release-${VERSION_ID}.rpm
+fi
+
+if [ "$OSNAME" == "rocky" ];then
+	rpm -Uvh http://rpms.remirepo.net/enterprise/remi-release-${VERSION_ID}.rpm
+fi
 
 if [ "$OSNAME" == "centos" ];then
 	rpm -Uvh http://rpms.remirepo.net/enterprise/remi-release-${VERSION_ID}.rpm
@@ -82,6 +88,7 @@ if [ "${action}" == "install" ] && [ -d ${serverPath}/php-yum/${type} ];then
 	cd ${rootPath}/plugins/php-yum/versions && bash common.sh ${type} install exif
 	cd ${rootPath}/plugins/php-yum/versions && bash common.sh ${type} install intl
 	cd ${rootPath}/plugins/php-yum/versions && bash common.sh ${type} install mcrypt
+	cd ${rootPath}/plugins/php-yum/versions && bash common.sh ${type} install bcmath
 	cd ${rootPath}/plugins/php-yum/versions && bash common.sh ${type} install openssl
 	cd ${rootPath}/plugins/php-yum/versions && bash common.sh ${type} install gettext
 	cd ${rootPath}/plugins/php-yum/versions && bash common.sh ${type} install redis
@@ -89,6 +96,8 @@ if [ "${action}" == "install" ] && [ -d ${serverPath}/php-yum/${type} ];then
 	cd ${rootPath}/plugins/php-yum/versions && bash common.sh ${type} install mbstring
 	cd ${rootPath}/plugins/php-yum/versions && bash common.sh ${type} install mongodb
 	cd ${rootPath}/plugins/php-yum/versions && bash common.sh ${type} install zip
+	cd ${rootPath}/plugins/php-yum/versions && bash common.sh ${type} install simplexml
+	
 	echo "install PHP-YUM[${type}] extend end"
 
 	#初始化 

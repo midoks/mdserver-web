@@ -3461,23 +3461,17 @@ def fullSync(version=''):
 
 
 def installPreInspection(version):
+    cmd = "cat /etc/*-release | grep PRETTY_NAME |awk -F = '{print $2}' | awk -F '\"' '{print $2}'| awk '{print $1}'"
+    sys = mw.execShell(cmd)
 
-
-
-    sys = mw.execShell(
-        "cat /etc/*-release | grep PRETTY_NAME |awk -F = '{print $2}' | awk -F '\"' '{print $2}'| awk '{print $1}'")
-
-    if sys[1] != '':
-        return '不支持改系统'
-
-    sys_id = mw.execShell(
-        "cat /etc/*-release | grep VERSION_ID | awk -F = '{print $2}' | awk -F '\"' '{print $2}'")
+    cmd = "cat /etc/*-release | grep VERSION_ID | awk -F = '{print $2}' | awk -F '\"' '{print $2}'"
+    sys_id = mw.execShell(cmd)
 
     sysName = sys[0].strip().lower()
     sysId = sys_id[0].strip()
 
-    if not sysName in ('centos',):
-        return '仅支持centos'
+    if not sysName in ['centos','almalinux','rocky','opensuse']:
+        return '仅支持centos,almalinux,rocky,opensuse'
 
     if (sysName == 'centos' and version == '5.7' and not sysId in('7',)):
         return 'mysql5.7 仅支持centos7'

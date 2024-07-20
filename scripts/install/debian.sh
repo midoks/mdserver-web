@@ -43,14 +43,17 @@ echo "SSH PORT:${SSH_PORT}"
 
 # choose lang cmd
 # dpkg-reconfigure --frontend=noninteractive locales
+# dpkg-reconfigure locales
 if [ ! -f /usr/sbin/locale-gen ];then
 	apt install -y locales
 	sed -i '/en_US.UTF-8/s/^# //g' /etc/locale.gen
 	locale-gen en_US.UTF-8
+	locale-gen zh_CN.UTF-8
 	localedef -v -c -i en_US -f UTF-8 en_US.UTF-8 > /dev/null 2>&1
 	update-locale LANG=en_US.UTF-8
 else
 	locale-gen en_US.UTF-8
+	locale-gen zh_CN.UTF-8
 	localedef -v -c -i en_US -f UTF-8 en_US.UTF-8 > /dev/null 2>&1
 fi
 
@@ -168,7 +171,8 @@ apt install -y gcc
 apt install -y patchelf
 
 apt install -y libffi-dev
-apt install -y cmake automake make
+apt install -y cmake 
+apt install -y automake make 
 
 apt install -y webp scons
 apt install -y libwebp-dev

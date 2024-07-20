@@ -2533,7 +2533,9 @@ location ^~ {from} {\n\
 
     def getPhpVersion(self):
         phpVersions = ('00', '52', '53', '54', '55',
-                       '56', '70', '71', '72', '73', '74', '80', '81', '82', '83')
+                       '56', '70', '71', '72', '73',
+                       '74', '80', '81', '82', '83',
+                       '84')
         data = []
         for val in phpVersions:
             tmp = {}
@@ -2667,10 +2669,8 @@ location ^~ {from} {\n\
             return mw.returnJson(False, '不要以网站根目录创建站点!')
 
         siteMenu = json.loads(webname)
-        self.siteName = self.toPunycode(
-            siteMenu['domain'].strip().split(':')[0]).strip()
-        self.sitePath = self.toPunycodePath(
-            self.getPath(path.replace(' ', '')))
+        self.siteName = self.toPunycode(siteMenu['domain'].strip().split(':')[0]).strip()
+        self.sitePath = self.toPunycodePath(self.getPath(path.replace(' ', '')))
         self.sitePort = port.strip().replace(' ', '')
         self.phpVersion = version
 
