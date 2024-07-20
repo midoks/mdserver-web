@@ -94,6 +94,11 @@ Install_mysql()
 		YUM_INSTALL
 	fi
 
+	isZypper=`which zypper`
+	if [ "$isZypper" != "" ];then
+		YUM_INSTALL
+	fi
+
 	rm -rf $myDir	
 	
 	echo '8.0' > $serverPath/mysql-yum/version.pl
