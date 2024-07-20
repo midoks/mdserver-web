@@ -43,7 +43,7 @@ elif [ "$OSNAME" == "opensuse" ]; then
 	OS_SIGN=1.sl${VERSION_ID}
 fi
 
-MYSQL_VER=5.7.39
+MYSQL_VER=5.7.44
 SUFFIX_NAME=${MYSQL_VER}-${OS_SIGN}.${ARCH}
 
 YUM_INSTALL()
