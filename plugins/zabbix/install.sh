@@ -37,8 +37,6 @@ fi
 
 Install_App()
 {
-	
-
 	echo '正在安装脚本文件...'
 	mkdir -p $serverPath/source/zabbix
 
