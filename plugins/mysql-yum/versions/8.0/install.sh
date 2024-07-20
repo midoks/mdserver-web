@@ -36,7 +36,7 @@ if [ "$OSNAME" == "centos" ];then
 elif [ "$OSNAME" == "fedora" ]; then
 	OS_SIGN=10.fc${VERSION_ID}
 elif [ "$OSNAME" == "opensuse" ]; then
-	OS_SIGN=1.sl${VERSION_ID}
+	OS_SIGN=1.sl${VERSION_ID:0:2}
 fi
 
 MYSQL_VER=8.0.37
