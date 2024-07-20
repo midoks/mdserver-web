@@ -106,7 +106,18 @@ def initAgentConf():
     content = contentReplace(content)
     mw.writeFile(za_dst_path, content)
 
+def initAgentDConf():
+    clist = ['userparameter_mysql.conf', 'userparameter_examples.conf']
+    dst_dir = '/etc/zabbix/zabbix_agentd.d'
+    for c in clist:
+        za_src_tpl = getPluginDir()+'/conf/zabbix_agentd/'+c
+        dst_path = dst_dir+'/'+c
+        if not os.path.exists(dst_path):
+            content = mw.readFile(za_src_tpl)
+            mw.writeFile(dst_path,content)
+
 def initDreplace():
+    initAgentDConf()
     init_file = getServerDir() + '/init.pl'
     if not os.path.exists(init_file):
         initAgentConf()
