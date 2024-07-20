@@ -117,9 +117,10 @@ def initAgentDConf():
             mw.writeFile(dst_path,content)
 
 def initDreplace():
-    initAgentDConf()
+
     init_file = getServerDir() + '/init.pl'
     if not os.path.exists(init_file):
+        initAgentDConf()
         initAgentConf()
         openPort()
         mw.writeFile(init_file, 'ok')
