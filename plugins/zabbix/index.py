@@ -193,6 +193,8 @@ def getInstalledPhpConfDir():
             if os.path.exists(php_install_dir):
                 if pt == 'php-apt':
                     return pt + ver[0:1]+'.'+ver[1:2]
+                if pt == 'php':
+                    return pt + '-' + ver
                 return pt + ver
     return 'php-80'
 
