@@ -3470,8 +3470,8 @@ def installPreInspection(version):
     sysName = sys[0].strip().lower()
     sysId = sys_id[0].strip()
 
-    if not sysName in ['centos','almalinux','rocky']:
-        return '仅支持centos,almalinux,rocky'
+    if not sysName in ['centos','almalinux','rocky','opensuse']:
+        return '仅支持centos,almalinux,rocky,opensuse'
 
     if (sysName == 'centos' and version == '5.7' and not sysId in('7',)):
         return 'mysql5.7 仅支持centos7'
