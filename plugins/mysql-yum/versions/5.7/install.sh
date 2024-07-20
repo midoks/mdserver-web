@@ -39,7 +39,7 @@ if [ "$OSNAME" == "centos" ];then
 	OS_SIGN=1.el${VERSION_ID}
 elif [ "$OSNAME" == "fedora" ]; then
 	OS_SIGN=10.fc${VERSION_ID}
-elif [ "$OSNAME" == "suse" ]; then
+elif [ "$OSNAME" == "opensuse" ]; then
 	OS_SIGN=1.sl${VERSION_ID}
 fi
 
