@@ -71,6 +71,35 @@ rpm2cpio ${myDir}/mysql-community-test-${SUFFIX_NAME}.rpm | cpio -div
 #######
 }
 
+ZYPPER_INSTALL()
+{
+
+mkdir -p /var/run/mysqld
+chown mysql -R /var/run/mysqld
+#######
+mkdir -p $myDir
+
+wget  --no-check-certificate -O $myDir/mysql-${SUFFIX_NAME}.rpm-bundle.tar https://cdn.mysql.com/archives/mysql-8.0/mysql-${SUFFIX_NAME}.rpm-bundle.tar
+cd ${myDir} && tar vxf mysql-${SUFFIX_NAME}.rpm-bundle.tar
+
+mkdir -p ${serverPath}/mysql-yum/bin && cd ${serverPath}/mysql-yum/bin
+
+rpm2cpio ${myDir}/mysql-community-client-${SUFFIX_NAME}.rpm | cpio -div
+rpm2cpio ${myDir}/mysql-community-client-${SUFFIX_NAME}.x86_64.rpm | cpio -div
+rpm2cpio ${myDir}/mysql-community-common-${SUFFIX_NAME}.rpm | cpio -div
+rpm2cpio ${myDir}/mysql-community-debuginfo-${SUFFIX_NAME}.rpm | cpio -div
+rpm2cpio ${myDir}/mysql-community-devel-${SUFFIX_NAME}.rpm | cpio -div
+rpm2cpio ${myDir}/mysql-community-embedded-compat-${SUFFIX_NAME}.rpm | cpio -div
+rpm2cpio ${myDir}/mysql-community-icu-data-files-${SUFFIX_NAME}.rpm | cpio -div
+rpm2cpio ${myDir}/mysql-community-libs-${SUFFIX_NAME}.rpm | cpio -div
+rpm2cpio ${myDir}/mysql-community-libs-compat-${SUFFIX_NAME}.rpm | cpio -div
+rpm2cpio ${myDir}/mysql-community-server-${SUFFIX_NAME}.rpm | cpio -div
+rpm2cpio ${myDir}/mysql-community-server-debug-${SUFFIX_NAME}.rpm | cpio -div
+rpm2cpio ${myDir}/mysql-community-test-${SUFFIX_NAME}.rpm | cpio -div
+
+#######
+}
+
 YUM_UNINSTALL()
 {
 ### YUM卸载 START ########
@@ -96,7 +125,7 @@ Install_mysql()
 
 	isZypper=`which zypper`
 	if [ "$isZypper" != "" ];then
-		YUM_INSTALL
+		ZYPPER_INSTALL
 	fi
 
 	rm -rf $myDir	
