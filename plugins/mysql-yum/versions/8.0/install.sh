@@ -107,6 +107,7 @@ Install_mysql()
 
 Uninstall_mysql()
 {
+	YUM_UNINSTALL
 	rm -rf $serverPath/mysql-yum
 	echo '卸载完成'
 }
