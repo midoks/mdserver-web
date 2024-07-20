@@ -242,7 +242,10 @@ def zabbixImportMySQLDataFile():
     return '/usr/share/zabbix-sql-scripts/mysql/server.sql.gz'
 
 def zabbixImportMySQLData():
-    getMySQLConf()
+    mysql_conf = getMySQLConf()
+    if os.path.exists(mysql_conf):
+        exit("需要安装MySQL")
+
     choose_mysql = getServerDir()+'/mysql.pl'
     ver = mw.readFile(choose_mysql)
 

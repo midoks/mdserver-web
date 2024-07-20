@@ -26,13 +26,13 @@ Install_App()
 	echo "rpm -Uvh https://repo.zabbix.com/zabbix/7.0/sles/${SYS_VERSION_ID:0:2}/x86_64/${ZABBIX_NAME}"
 
 	# cd $serverPath/source/zabbix && rpm -Uvh ${ZABBIX_NAME}
-	zypper install -y zabbix-server-mysql zabbix-web-mysql zabbix-sql-scripts zabbix-selinux-policy
+	zypper install -y zabbix-server-mysql zabbix-web-mysql zabbix-sql-scripts
 	zypper install -y zabbix-agent
 }
 
 Uninstall_App()
 {
-	zypper remove -y zabbix-server-mysql zabbix-web-mysql zabbix-sql-scripts zabbix-selinux-policy
+	zypper remove -y zabbix-server-mysql zabbix-web-mysql zabbix-sql-scripts
 	zypper remove -y zabbix-agent
 	rm -rf /etc/zabbix
 	echo "卸载成功"
