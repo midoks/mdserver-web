@@ -79,24 +79,24 @@ chown mysql -R /var/run/mysqld
 #######
 mkdir -p $myDir
 
-wget --no-check-certificate -O $myDir/mysql-${SUFFIX_NAME:0:2}.rpm-bundle.tar https://cdn.mysql.com/archives/mysql-8.0/mysql-${SUFFIX_NAME:0:2}.rpm-bundle.tar
-echo "wget --no-check-certificate -O $myDir/mysql-${SUFFIX_NAME:0:2}.rpm-bundle.tar https://cdn.mysql.com/archives/mysql-8.0/mysql-${SUFFIX_NAME:0:2}.rpm-bundle.tar"
-cd ${myDir} && tar vxf mysql-${SUFFIX_NAME:0:2}.rpm-bundle.tar
+wget --no-check-certificate -O $myDir/mysql-${SUFFIX_NAME}.rpm-bundle.tar https://cdn.mysql.com/archives/mysql-8.0/mysql-${SUFFIX_NAME}.rpm-bundle.tar
+echo "wget --no-check-certificate -O $myDir/mysql-${SUFFIX_NAME}.rpm-bundle.tar https://cdn.mysql.com/archives/mysql-8.0/mysql-${SUFFIX_NAME}.rpm-bundle.tar"
+cd ${myDir} && tar vxf mysql-${SUFFIX_NAME}.rpm-bundle.tar
 
 mkdir -p ${serverPath}/mysql-yum/bin && cd ${serverPath}/mysql-yum/bin
 
-rpm2cpio ${myDir}/mysql-community-client-${SUFFIX_NAME:0:2}.rpm | cpio -div
-rpm2cpio ${myDir}/mysql-community-client-${SUFFIX_NAME:0:2}.x86_64.rpm | cpio -div
-rpm2cpio ${myDir}/mysql-community-common-${SUFFIX_NAME:0:2}.rpm | cpio -div
-rpm2cpio ${myDir}/mysql-community-debuginfo-${SUFFIX_NAME:0:2}.rpm | cpio -div
-rpm2cpio ${myDir}/mysql-community-devel-${SUFFIX_NAME:0:2}.rpm | cpio -div
-rpm2cpio ${myDir}/mysql-community-embedded-compat-${SUFFIX_NAME:0:2}.rpm | cpio -div
-rpm2cpio ${myDir}/mysql-community-icu-data-files-${SUFFIX_NAME:0:2}.rpm | cpio -div
-rpm2cpio ${myDir}/mysql-community-libs-${SUFFIX_NAME:0:2}.rpm | cpio -div
-rpm2cpio ${myDir}/mysql-community-libs-compat-${SUFFIX_NAME:0:2}.rpm | cpio -div
-rpm2cpio ${myDir}/mysql-community-server-${SUFFIX_NAME:0:2}.rpm | cpio -div
-rpm2cpio ${myDir}/mysql-community-server-debug-${SUFFIX_NAME:0:2}.rpm | cpio -div
-rpm2cpio ${myDir}/mysql-community-test-${SUFFIX_NAME:0:2}.rpm | cpio -div
+rpm2cpio ${myDir}/mysql-community-client-${SUFFIX_NAME}.rpm | cpio -div
+rpm2cpio ${myDir}/mysql-community-client-${SUFFIX_NAME}.x86_64.rpm | cpio -div
+rpm2cpio ${myDir}/mysql-community-common-${SUFFIX_NAME}.rpm | cpio -div
+rpm2cpio ${myDir}/mysql-community-debuginfo-${SUFFIX_NAME}.rpm | cpio -div
+rpm2cpio ${myDir}/mysql-community-devel-${SUFFIX_NAME}.rpm | cpio -div
+rpm2cpio ${myDir}/mysql-community-embedded-compat-${SUFFIX_NAME}.rpm | cpio -div
+rpm2cpio ${myDir}/mysql-community-icu-data-files-${SUFFIX_NAME}.rpm | cpio -div
+rpm2cpio ${myDir}/mysql-community-libs-${SUFFIX_NAME}.rpm | cpio -div
+rpm2cpio ${myDir}/mysql-community-libs-compat-${SUFFIX_NAME}.rpm | cpio -div
+rpm2cpio ${myDir}/mysql-community-server-${SUFFIX_NAME}.rpm | cpio -div
+rpm2cpio ${myDir}/mysql-community-server-debug-${SUFFIX_NAME}.rpm | cpio -div
+rpm2cpio ${myDir}/mysql-community-test-${SUFFIX_NAME}.rpm | cpio -div
 
 #######
 }
