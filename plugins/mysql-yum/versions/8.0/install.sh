@@ -107,10 +107,6 @@ Install_mysql()
 
 Uninstall_mysql()
 {
-	isYum=`which yum`
-	if [ "$isYum" != "" ];then
-		YUM_UNINSTALL
-	fi
 	rm -rf $serverPath/mysql-yum
 	echo '卸载完成'
 }
