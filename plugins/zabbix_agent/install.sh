@@ -8,6 +8,8 @@ export PATH
 # cd /www/server/mdserver-web && python3 /www/server/mdserver-web/plugins/zabbix_agent/index.py start
 
 
+# /usr/sbin/zabbix_agentd -c /etc/zabbix/zabbix_agentd.conf
+
 curPath=`pwd`
 rootPath=$(dirname "$curPath")
 rootPath=$(dirname "$rootPath")
