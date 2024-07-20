@@ -20,12 +20,14 @@ Install_App()
 
 	mkdir -p $serverPath/source/zabbix
 
+
+
 	ZABBIX_NAME=zabbix-release-7.0-2.sles${SYS_VERSION_ID:0:2}.noarch.rpm
 
 	rpm -Uvh https://repo.zabbix.com/zabbix/7.0/sles/${SYS_VERSION_ID:0:2}/x86_64/${ZABBIX_NAME}
 	echo "rpm -Uvh https://repo.zabbix.com/zabbix/7.0/sles/${SYS_VERSION_ID:0:2}/x86_64/${ZABBIX_NAME}"
 
-	# cd $serverPath/source/zabbix && rpm -Uvh ${ZABBIX_NAME}
+	# zypper install -y net-snmp
 	zypper install -y zabbix-server-mysql
 	zypper install -y zabbix-web-mysql 
 	zypper install -y zabbix-sql-scripts
