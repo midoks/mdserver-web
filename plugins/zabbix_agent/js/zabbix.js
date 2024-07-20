@@ -107,10 +107,10 @@ function zagentDConfigTpl(_name, version, func, config_tpl_func, read_config_tpl
         }
 
         $('#config_tpl').change(function(){
-            var fileName = $(this).val();
-            if (fileName != '0'){
+            var selected = $(this).val();
+            if (selected != '0'){
                 var loadT = layer.msg('配置模版获取中...',{icon:16,time:0,shade: [0.3, '#000']});
-
+                fileName = selected;
                 var _args = JSON.stringify({file:selected});
                 $.post('/plugins/run', {name:_name, func:_read_config_tpl_func,version:version,args:_args}, function(data){
                     layer.close(loadT);
