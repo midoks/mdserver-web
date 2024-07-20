@@ -243,7 +243,7 @@ def zabbixImportMySQLDataFile():
 
 def zabbixImportMySQLData():
     mysql_conf = getMySQLConf()
-    if os.path.exists(mysql_conf):
+    if not os.path.exists(mysql_conf):
         exit("需要安装MySQL")
 
     choose_mysql = getServerDir()+'/mysql.pl'
