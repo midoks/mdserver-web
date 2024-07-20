@@ -58,6 +58,7 @@ function zabbixReadme(){
     var readme = '<ul class="help-info-text c7">';
     readme += '<li>默认配置OpenResty端口:18888</li>';
     readme += '<li>初始化账户:Admin/zabbix</li>';
+    readme += '<li>https://www.zabbix.com/download</li>';
     readme += '</ul>';
 
     $('.soft-man-con').html(readme);   
