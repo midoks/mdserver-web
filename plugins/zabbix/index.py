@@ -468,7 +468,8 @@ def installPreInspection():
     sysName = sys[0].strip().lower()
     sysId = sys_id[0].strip().lower()
 
-    if not sysName in ['debian','centos','ubuntu','almalinux','rocky', 'opensuse']:
+    # opensuse
+    if not sysName in ['debian','centos','ubuntu','almalinux','rocky']:
         return '不支持该系统'
 
     if sysName == 'debian' and not sysId in ['12']:
