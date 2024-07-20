@@ -73,6 +73,7 @@ rpm2cpio ${myDir}/mysql-community-test-${SUFFIX_NAME}.rpm | cpio -div
 
 ZYPPER_INSTALL()
 {
+zypper install -y libstdc++6
 
 mkdir -p /var/run/mysqld
 chown mysql -R /var/run/mysqld
