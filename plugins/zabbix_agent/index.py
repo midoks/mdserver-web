@@ -202,6 +202,27 @@ def uninstallPreInspection():
     return 'ok'
 
 
+def agentdConf():
+    path = '/etc/zabbix/zabbix_agentd.d'
+    pathFile = os.listdir(path)
+    tmp = []
+    for one in pathFile:
+        file = path + '/' + one
+        tmp.append(file)
+    return mw.getJson(tmp)
+
+def agentdReadConf():
+    args = getArgs()
+    data = checkArgs(args, ['file'])
+    if not data[0]:
+        return data[1]
+
+    content = mw.readFile(args['file'])
+    content = contentReplace(content)
+    return mw.returnJson(True, 'ok', content)
+
+
+
 if __name__ == "__main__":
     func = sys.argv[1]
     if func == 'status':
@@ -230,5 +251,9 @@ if __name__ == "__main__":
         print(zabbixAgentConf())
     elif func == 'run_log':
         print(runLog())
+    elif func == 'agentd_conf':
+        print(agentdConf())
+    elif func == 'agentd_read_conf':
+        print(agentdReadConf())
     else:
         print('error')
