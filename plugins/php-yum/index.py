@@ -852,7 +852,7 @@ def installPreInspection(version):
     sysId = sys_id[0].strip()
 
     if not sysName in ['centos','almalinux','fedora','rocky']:
-        return '暂时仅支持centos,almalinux,fedora'
+        return '暂时仅支持centos,almalinux,fedora,rocky'
     return 'ok'
 
 
