@@ -14,6 +14,7 @@
 			<p class="bgw" onclick="pluginService('zabbix_agent');">服务</p>
 			<p onclick="pluginInitD('zabbix_agent');">自启动</p>
 			<p onclick="pluginConfig('zabbix_agent',$('.plugin_version').attr('version'),'zabbix_agent_conf');">默认配置</p>
+			<p onclick="zagentDConfigTpl('zabbix_agent',$('.plugin_version').attr('version'),'agentd_default_conf','agentd_conf','agentd_read_conf');">子配置</p>
 			<p onclick="pluginLogs('zabbix_agent','','run_log');">运行日志</p>
 			<p onclick="zabbixReadme();">相关说明</p>
 			

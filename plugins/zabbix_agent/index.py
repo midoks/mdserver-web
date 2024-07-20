@@ -106,9 +106,21 @@ def initAgentConf():
     content = contentReplace(content)
     mw.writeFile(za_dst_path, content)
 
+def initAgentDConf():
+    clist = ['userparameter_mysql.conf', 'userparameter_examples.conf']
+    dst_dir = '/etc/zabbix/zabbix_agentd.d'
+    for c in clist:
+        za_src_tpl = getPluginDir()+'/conf/zabbix_agentd/'+c
+        dst_path = dst_dir+'/'+c
+        if not os.path.exists(dst_path):
+            content = mw.readFile(za_src_tpl)
+            mw.writeFile(dst_path,content)
+
 def initDreplace():
+
     init_file = getServerDir() + '/init.pl'
     if not os.path.exists(init_file):
+        initAgentDConf()
         initAgentConf()
         openPort()
         mw.writeFile(init_file, 'ok')
@@ -190,6 +202,31 @@ def uninstallPreInspection():
     return 'ok'
 
 
+def agentdDefaultConf():
+    return '/etc/zabbix/zabbix_agentd.d/userparameter_mysql.conf'
+    
+
+def agentdConf():
+    path = '/etc/zabbix/zabbix_agentd.d'
+    pathFile = os.listdir(path)
+    tmp = []
+    for one in pathFile:
+        file = path + '/' + one
+        tmp.append(file)
+    return mw.getJson(tmp)
+
+def agentdReadConf():
+    args = getArgs()
+    data = checkArgs(args, ['file'])
+    if not data[0]:
+        return data[1]
+
+    content = mw.readFile(args['file'])
+    content = contentReplace(content)
+    return mw.returnJson(True, 'ok', content)
+
+
+
 if __name__ == "__main__":
     func = sys.argv[1]
     if func == 'status':
@@ -218,5 +255,11 @@ if __name__ == "__main__":
         print(zabbixAgentConf())
     elif func == 'run_log':
         print(runLog())
+    elif func == 'agentd_default_conf':
+        print(agentdDefaultConf())
+    elif func == 'agentd_conf':
+        print(agentdConf())
+    elif func == 'agentd_read_conf':
+        print(agentdReadConf())
     else:
         print('error')
