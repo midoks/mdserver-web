@@ -2820,7 +2820,7 @@ location ^~ {from} {\n\
 
             conf = conf.replace('#error_page 404/404.html;', sslStr)
 
-            rep = "listen\s+([0-9]+)\s*[default_server]*;"
+            rep = "listen\s+([0-9]+)\s*[default_server|reuseport]*;"
             tmp = re.findall(rep, conf)
             if not mw.inArray(tmp, '443'):
                 listen = re.search(rep, conf).group()
