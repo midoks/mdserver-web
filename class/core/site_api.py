@@ -2802,7 +2802,7 @@ location ^~ {from} {\n\
     add_header Strict-Transport-Security "max-age=63072000";
     add_header Alt-Svc 'h3=":443";ma=86400';
 """
-                if version != '1.25.3.1':
+                if not version.startswith('1.25'):
                     http3Header = '';
 
                 sslStr = """#error_page 404/404.html;
