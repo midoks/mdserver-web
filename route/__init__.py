@@ -226,7 +226,7 @@ def publicObject(toObject, func, action=None, get=None):
         # API发生错误记录
         if mw.isDebugMode():
             print(traceback.print_exc())
-        data = {'msg': '访问异常:' + str(e) + '!', "status": False}
+        data = {'msg': '访问异常:' + str(mw.getTracebackInfo()) + '!', "status": False}
         return mw.getJson(data)
 
 
