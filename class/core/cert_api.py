@@ -1391,7 +1391,7 @@ fullchain.pem       粘贴到证书输入框
                     raise Exception("指定订单号不存在，无法续签!")
                 order_index.append(index)
             else:
-                start_time = time.time() + (30 * 86400)
+                start_time = time.time() - 60 * 86400
                 # print(self.__config)
                 if not 'orders' in self.__config:
                     self.__config['orders'] = {}
