@@ -9,6 +9,10 @@ serverPath=$(dirname "$rootPath")
 sourcePath=${serverPath}/source
 sysName=`uname`
 install_tmp=${rootPath}/tmp/mw_install.pl
+debian_suffix=
+if [ "$SYS_ARCH" == "aarch64" ];then
+	debian_suffix="-arm64"
+fi
 
 SYS_VERSION_ID=`cat /etc/*-release | grep VERSION_ID | awk -F = '{print $2}' | awk -F "\"" '{print $2}'`
 
@@ -19,9 +23,9 @@ Install_App()
 	mkdir -p $serverPath/source/zabbix
 
 	ZABBIX_NAME=zabbix-release_7.0-2+debian${SYS_VERSION_ID}_all.deb
-	echo "wget -O $serverPath/source/zabbix/${ZABBIX_NAME} https://repo.zabbix.com/zabbix/7.0/debian/pool/main/z/zabbix-release/${ZABBIX_NAME}"
+	echo "wget -O $serverPath/source/zabbix/${ZABBIX_NAME} https://repo.zabbix.com/zabbix/7.0/debian${debian_suffix}/pool/main/z/zabbix-release/${ZABBIX_NAME}"
 	if [ ! -f  $serverPath/source/zabbix/${ZABBIX_NAME} ];then
-		wget -O $serverPath/source/zabbix/${ZABBIX_NAME} https://repo.zabbix.com/zabbix/7.0/debian/pool/main/z/zabbix-release/${ZABBIX_NAME}
+		wget -O $serverPath/source/zabbix/${ZABBIX_NAME} https://repo.zabbix.com/zabbix/7.0/debian${debian_suffix}/pool/main/z/zabbix-release/${ZABBIX_NAME}
 	fi
 
 	# apt-get -f install
