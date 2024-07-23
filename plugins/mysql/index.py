@@ -430,7 +430,7 @@ def getShowLogFile():
 
 
 def getMdb8Ver():
-    return ['8.0','8.1','8.2','8.3','8.4']
+    return ['8.0','8.1','8.2','8.3','8.4','9.0']
 
 def pGetDbUser():
     if mw.isAppleSystem():
