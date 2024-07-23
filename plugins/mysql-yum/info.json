@@ -5,7 +5,7 @@
 	"name":"mysql-yum",
 	"type":"运行环境",
 	"ps":"一种关系数据库管理系统[centos](极速安装)",
-	"versions":["5.7","8.0","8.2","8.3", "8.4"],
+	"versions":["5.7","8.0","8.2","8.3", "8.4", "9.0"],
 	"shell":"install.sh",
 	"install_pre_inspection":true,
 	"uninstall_pre_inspection":true,
