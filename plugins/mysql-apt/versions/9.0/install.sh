@@ -45,7 +45,7 @@ if [ "$ARCH" != "amd64" ];then
 fi
 
 
-MYSQL_VER=8.4.2
+MYSQL_VER=9.0.1
 SUFFIX_NAME=${MYSQL_VER}-1${OSNAME}${VERSION_ID}_${ARCH}
 
 
@@ -111,10 +111,10 @@ Install_mysql()
 
 	if [ "$?" == "0" ];then
 		mkdir -p $serverPath/mysql-apt
-		echo '8.4' > $serverPath/mysql-apt/version.pl
-		echo '安装完成' >
+		echo '9.0' > $serverPath/mysql-apt/version.pl
+		echo '安装完成'
 	else
-		echo '8.4' > $serverPath/mysql-apt/version.pl
+		echo '9.0' > $serverPath/mysql-apt/version.pl
 		echo "暂时不支持该系统"
 	fi
 }
@@ -128,7 +128,7 @@ Uninstall_mysql()
 	fi
 
 	rm -rf $serverPath/mysql-apt
-	echo '卸载完成' > $install_tmp
+	echo '卸载完成'
 }
 
 action=$1

@@ -204,7 +204,7 @@ Install_mysql()
 
 		if [ -d $serverPath/mysql ];then
 			rm -rf ${mysqlDir}/mysql-${VERSION}
-			echo '8.4' > $serverPath/mysql/version.pl
+			echo '9.0' > $serverPath/mysql/version.pl
 			echo "${VERSION}安装完成"
 		else
 			# rm -rf ${mysqlDir}/mysql-${VERSION}
