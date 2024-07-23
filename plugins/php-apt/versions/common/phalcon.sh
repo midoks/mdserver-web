@@ -18,10 +18,10 @@ LIBNAME=phalcon
 LIBV=0
 
 
-if [ `echo "$version > 7.4"|bc` -eq 1 ];then
-	echo "I won't support it"
-	exit 0
-fi
+# if [ `echo "$version > 7.4"|bc` -eq 1 ];then
+# 	echo "I won't support it"
+# 	exit 0
+# fi
 
 CMD='apt '
 if [ "$actionType" == 'install' ];then
@@ -45,6 +45,10 @@ elif [[ "$version" == '7.4' ]]; then
 elif [[ "$version" == '8.0' ]]; then
 	CMD="${CMD}phalcon4"
 elif [[ "$version" == '8.1' ]]; then
+	CMD="${CMD}phalcon4"
+elif [[ "$version" == '8.2' ]]; then
+	CMD="${CMD}phalcon4"
+elif [[ "$version" == '8.3' ]]; then
 	CMD="${CMD}phalcon4"
 fi
 
