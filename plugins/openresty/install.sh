@@ -26,12 +26,6 @@ else
 	useradd -g www -s /bin/bash www
 fi
 
-if [ "$sysName" == "Darwin" ];then
-	BAK='_bak'
-else
-	BAK=''
-fi
-
 if [ "${2}" == "" ];then
 	echo '缺少安装脚本版本...'
 	exit 0
