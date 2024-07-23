@@ -35,7 +35,6 @@ WantedBy=multi-user.target
 User=mysql
 Group=mysql
 Type=notify
-#ExecStartPre=+/usr/share/mysql-8.0/mysql-systemd-start pre
 ExecStart={$SERVER_PATH}/mysql-apt/bin/usr/sbin/mysqld --defaults-file={$SERVER_PATH}/mysql-apt/etc/my.cnf
 TimeoutSec=0
 LimitNOFILE = 10000
