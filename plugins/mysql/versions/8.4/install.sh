@@ -106,11 +106,11 @@ Install_mysql()
 	fi
 
 	#检测文件是否损坏.
-	md5_mysql_ok=8c2399782217f5391322751c66ea261b
+	md5_mysql_ok=a632063fdb1c7de2c5db47e1f66191cd
 	if [ -f ${mysqlDir}/mysql-${VERSION}.tar.gz ];then
 		md5_mysql=`md5sum ${mysqlDir}/mysql-${VERSION}.tar.gz  | awk '{print $1}'`
 		if [ "${md5_mysql_ok}" == "${md5_mysql}" ]; then
-			echo "mysql8.3 file  check ok"
+			echo "mysql8.4 file check ok"
 		else
 			# 重新下载
 			rm -rf ${mysqlDir}/mysql-${VERSION}
