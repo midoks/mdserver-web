@@ -18,7 +18,7 @@ PHP_VER=84
 Install_php()
 {
 #------------------------ install start ------------------------------------#
-yum install -y php83 php83-php-fpm
+yum install -y php84 php84-php-fpm
 if [ "$?" == "0" ];then
 	mkdir -p $serverPath/php-yum/${PHP_VER}
 fi
