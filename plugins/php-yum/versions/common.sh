@@ -60,14 +60,10 @@ echo "yum remove -y php${version}-php-${extName}"
 echo "yum remove -y php${version}-php-pecl-${extName}"
 
 
-
-
 echo "systemctl restart php${version}-php-fpm"
 php_status=`systemctl status php${version}-php-fpm | grep inactive`
 echo "php_status:${php_status}"
 if [ "$php_status" == "" ];then
 	systemctl restart php${version}-php-fpm
 fi
-
-
 
