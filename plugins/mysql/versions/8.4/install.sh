@@ -56,7 +56,7 @@ fi
 VERSION_ID=`cat /etc/*-release | grep VERSION_ID | awk -F = '{print $2}' | awk -F "\"" '{print $2}'`
 
 
-VERSION=8.4.0
+VERSION=8.4.2
 # https://dev.mysql.com/get/Downloads/MySQL-8.4/mysql-${VERSION}.tar.gz
 # https://cdn.mysql.com//Downloads/MySQL-8.4/mysql-boost-${VERSION}.tar.gz
 Install_mysql()
