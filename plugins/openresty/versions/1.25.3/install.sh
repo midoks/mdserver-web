@@ -112,7 +112,7 @@ Install_openresty()
 			cd ${openrestyDir} &&  tar -zxvf openssl-${opensslVersion}.tar.gz
 		fi
 		OPTIONS="${OPTIONS} --with-openssl=${openrestyDir}/openssl-${opensslVersion}"
-		
+
 	fi
 
 	if [[ "$VERSION" =~ "1.25.3" ]]; then
@@ -131,7 +131,6 @@ Install_openresty()
 	fi
 
 
-	# --with-openssl=$serverPath/source/lib/openssl-1.0.2q
 	cd ${openrestyDir}/openresty-${VERSION} && ./configure \
 	--prefix=$serverPath/openresty \
 	$OPTIONS \
