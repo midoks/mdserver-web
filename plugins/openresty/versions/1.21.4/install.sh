@@ -112,24 +112,6 @@ Install_openresty()
 			cd ${openrestyDir} &&  tar -zxvf openssl-${opensslVersion}.tar.gz
 		fi
 		OPTIONS="${OPTIONS} --with-openssl=${openrestyDir}/openssl-${opensslVersion}"
-
-		if [[ "$VERSION" =~ "1.25.3" ]]; then
-			OPTIONS="${OPTIONS} --with-http_v3_module"
-
-			if [ ! -f ${openrestyDir}/libressl-${libresslVersion}.tar.gz ];then
-		        wget --no-check-certificate -O ${openrestyDir}/libressl-${libresslVersion}.tar.gz https://ftp.openbsd.org/pub/OpenBSD/LibreSSL/libressl-${libresslVersion}.tar.gz
-		    fi
-
-		    if [ ! -d ${openrestyDir}/libressl-${libresslVersion} ];then
-				cd ${openrestyDir} &&  tar -zxvf libressl-${libresslVersion}.tar.gz
-			fi
-		    
-		    OPTIONS="${OPTIONS} --with-cc-opt=-I${openrestyDir}/libressl-${libresslVersion}/libressl/build/include"
-		    OPTIONS="${OPTIONS} --with-cc-opt=-I${openrestyDir}/libressl-${libresslVersion}/libressl/build/lib"
-
-		    # --with-cc-opt="-I../libressl/build/include"
-    		# --with-ld-opt="-L../libressl/build/lib"
-		fi
 	fi
 
 
