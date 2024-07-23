@@ -104,14 +104,15 @@ Install_openresty()
 		# OPENSSL_LIB_DEPEND_DIR=`brew info openssl@1.1 | grep ${BREW_DIR}/Cellar/openssl@1.1 | cut -d \  -f 1 | awk 'END {print}'`
 		# OPTIONS="${OPTIONS} --with-openssl=${OPENSSL_LIB_DEPEND_DIR}"
 	else
-		if [ ! -f ${openrestyDir}/openssl-${opensslVersion}.tar.gz ];then
-	        wget --no-check-certificate -O ${openrestyDir}/openssl-${opensslVersion}.tar.gz https://www.openssl.org/source/openssl-${opensslVersion}.tar.gz
-	    fi
+		echo "openssl"
+		# if [ ! -f ${openrestyDir}/openssl-${opensslVersion}.tar.gz ];then
+	    #    wget --no-check-certificate -O ${openrestyDir}/openssl-${opensslVersion}.tar.gz https://www.openssl.org/source/openssl-${opensslVersion}.tar.gz
+	    # fi
 
-	    if [ ! -d ${openrestyDir}/openssl-${opensslVersion} ];then
-			cd ${openrestyDir} &&  tar -zxvf openssl-${opensslVersion}.tar.gz
-		fi
-		OPTIONS="${OPTIONS} --with-openssl=${openrestyDir}/openssl-${opensslVersion}"
+	    # if [ ! -d ${openrestyDir}/openssl-${opensslVersion} ];then
+		# 	cd ${openrestyDir} &&  tar -zxvf openssl-${opensslVersion}.tar.gz
+		# fi
+		# OPTIONS="${OPTIONS} --with-openssl=${openrestyDir}/openssl-${opensslVersion}"
 	fi
 
 
