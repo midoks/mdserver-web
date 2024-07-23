@@ -43,13 +43,13 @@ elif [[ "$version" == '7.3' ]]; then
 elif [[ "$version" == '7.4' ]]; then
 	CMD="${CMD}phalcon4"
 elif [[ "$version" == '8.0' ]]; then
-	CMD="${CMD}phalcon4"
+	CMD="${CMD}phalcon5"
 elif [[ "$version" == '8.1' ]]; then
-	CMD="${CMD}phalcon4"
+	CMD="${CMD}phalcon5"
 elif [[ "$version" == '8.2' ]]; then
-	CMD="${CMD}phalcon4"
+	CMD="${CMD}phalcon5"
 elif [[ "$version" == '8.3' ]]; then
-	CMD="${CMD}phalcon4"
+	CMD="${CMD}phalcon5"
 fi
 
 $CMD
