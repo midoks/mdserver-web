@@ -15,13 +15,11 @@ version=$2
 
 sysName=`uname`
 LIBNAME=yaf
-LIBV=3.3.5
-
+LIBV=3.3.6
 
 if [ `echo "$version < 7.0"|bc` -eq 1 ];then
 	LIBV=2.3.5
 fi
-
 
 extVer=`bash $curPath/lib.sh $version`
 extFile=/usr/lib/php/${extVer}/${LIBNAME}.so
