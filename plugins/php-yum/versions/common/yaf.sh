@@ -72,10 +72,6 @@ Install_lib()
 
 Uninstall_lib()
 {
-	if [ ! -f "/usr/bin/php-config${version}" ];then
-		echo "php-$version 未安装,请选择其它版本!"
-		return
-	fi
 	
 	if [ -f $ext_file ];then
 		rm -rf $ext_file
