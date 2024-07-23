@@ -2501,7 +2501,7 @@ def updateSlaveSSH(version=''):
 def getSlaveList(version=''):
 
     query_status_cmd = 'show slave status'
-    mdb8 = mw.getMdb8Ver()
+    mdb8 = getMdb8Ver()
     if mw.inArray(mdb8, version):
         query_status_cmd = 'show replica status'
 
