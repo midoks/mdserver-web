@@ -72,10 +72,6 @@ Install_openresty()
 	cd ${openrestyDir} && tar -zxvf openresty-${VERSION}.tar.gz
 
 	OPTIONS=''
-	if [ "$VERSION" == "1.19.3.1" ]; then
-		OPTIONS="${OPTIONS} --with-ipv6"
-	fi
-
 
 	opensslVersion="1.1.1p"
 	libresslVersion="3.9.1"
