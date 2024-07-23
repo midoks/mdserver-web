@@ -24,7 +24,7 @@ if [ `echo "$version < 7.0"|bc` -eq 1 ];then
 fi
 
 extVer=`bash $curPath/lib.sh $version`
-extFile=/usr/lib/php/${extVer}/${LIBNAME}.so
+extFile=/opt/remi/php${version}/root/usr/lib64/php/modules/yaf.so
 
 ext_dir=${cfgDir}/php${version}/php.d
 ext_file=${ext_dir}/30-yaf.ini
@@ -79,6 +79,7 @@ Uninstall_lib()
 	
 	if [ -f $ext_file ];then
 		rm -rf $ext_file
+		rm -rf $extFile
 	fi
 
 	systemctl restart php${version}-php-fpm
