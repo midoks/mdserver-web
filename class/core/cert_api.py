@@ -1403,12 +1403,10 @@ fullchain.pem       粘贴到证书输入框
                         continue
 
                     if 'cert' in self.__config['orders'][i]:
-                        self.__config['orders'][i]['cert_timeout'] = self.__config[
-                            'orders'][i]['cert']['cert_timeout']
+                        self.__config['orders'][i]['cert_timeout'] = self.__config['orders'][i]['cert']['cert_timeout']
 
                     if not 'cert_timeout' in self.__config['orders'][i]:
-                        self.__config['orders'][i][
-                            'cert_timeout'] = int(time.time())
+                        self.__config['orders'][i]['cert_timeout'] = int(time.time())
 
                     # print(self.__config['orders'][i]['domains'][0], self.__config['orders'][i]['cert_timeout'], start_time)
                     if self.__config['orders'][i]['cert_timeout'] > start_time:
