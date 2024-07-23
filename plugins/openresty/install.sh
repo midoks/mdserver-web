@@ -31,11 +31,6 @@ if [ "${2}" == "" ];then
 	exit 0
 fi 
 
-if [ ! -d $curPath/versions/$2 ];then
-	echo '缺少安装版本SHELL...'
-	exit 0
-fi
-
 if [ "${action}" == "uninstall" ];then
 	if [ -f /usr/lib/systemd/system/openresty.service ] || [ -f /lib/systemd/system/openresty.service ];then
 		systemctl stop openresty
