@@ -13,7 +13,7 @@ sysName=`uname`
 install_tmp=${rootPath}/tmp/mw_install.pl
 postgreDir=${serverPath}/source/postgresql
 
-VERSION=14.4
+VERSION=14.12
 
 # su - postgres -c "/www/server/postgresql/bin/pg_ctl start -D /www/server/postgresql/data"
 
