@@ -17,8 +17,8 @@ bash ${rootPath}/scripts/getos.sh
 OSNAME=`cat ${rootPath}/data/osname.pl`
 VERSION_ID=`cat /etc/*-release | grep VERSION_ID | awk -F = '{print $2}' | awk -F "\"" '{print $2}'`
 
-version=8.3
-PHP_VER=83
+version=8.4
+PHP_VER=84
 
 
 Install_php()
