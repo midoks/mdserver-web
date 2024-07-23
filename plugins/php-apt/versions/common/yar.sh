@@ -15,18 +15,14 @@ version=$2
 
 sysName=`uname`
 LIBNAME=yar
-LIBV=2.3.2
-
-if [[  "$version" =~ "8.0" ]];then
-	LIBV=3.3.6
-fi
+LIBV=2.3.3
 
 if [[  "$version" =~ "5.0" ]];then
 	LIBV=1.2.5
 fi
 
 if [[  "$version" =~ "7.0" ]];then
-	LIBV=2.3.2
+	LIBV=2.3.3
 fi
 
 extVer=`bash $curPath/lib.sh $version`
