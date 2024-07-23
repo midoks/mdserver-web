@@ -4,7 +4,7 @@
 	"tip":"soft",
 	"name":"postgresql",
 	"type":"运行环境",
-	"ps":"[DEV]功能强大的开源数据库",
+	"ps":"功能强大的开源数据库",
 	"coexist": false,
 	"install_pre_inspection":true,
 	"uninstall_pre_inspection":true,
