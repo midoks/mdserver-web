@@ -3500,7 +3500,7 @@ def installPreInspection(version):
         return 'debian12,暂时不支持8.0'
 
     if version == '9.0':
-        if sysName == 'debian' and sysId != '12'
+        if sysName == 'debian' and sysId != '12':
             return '9.0 仅支持debian12'
 
     if (sysName == 'ubuntu' and version == '5.7' and not sysId in ('18.04')):
