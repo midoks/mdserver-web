@@ -16,7 +16,7 @@ sysName=`uname`
 install_tmp=${rootPath}/tmp/mw_install.pl
 mysqlDir=${serverPath}/source/mysql
 
-VERSION=5.7.39
+VERSION=5.7.44
 
 _os=`uname`
 echo "use system: ${_os}"
@@ -100,7 +100,7 @@ Install_mysql()
 	fi
 
 	#检测文件是否损坏.
-	md5_mysql_ok=d949b0ef81c3f52f7ef0874066244221
+	md5_mysql_ok=1a637fce4599d9bf5f1c81699f086274
 	if [ -f ${mysqlDir}/mysql-boost-${VERSION}.tar.gz ];then
 		md5_mysql=`md5sum ${mysqlDir}/mysql-boost-${VERSION}.tar.gz  | awk '{print $1}'`
 		if [ "${md5_mysql_ok}" == "${md5_mysql}" ]; then
