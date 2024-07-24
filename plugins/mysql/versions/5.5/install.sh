@@ -69,6 +69,20 @@ Install_mysql()
 		WHERE_DIR_GPP=`which g++`
 	fi
 
+	if [ "$OSNAME" == "ubuntu" ];then
+		apt install -y libudev-dev
+		apt install -y libtirpc-dev
+		apt install -y libssl-dev
+		apt install -y libgssglue-dev
+		apt install -y software-properties-common
+		add-apt-repository -y ppa:ubuntu-toolchain-r/test
+
+		export PKG_CONFIG_PATH=/usr/lib/pkgconfig
+		apt install -y gcc-11 g++-11
+		WHERE_DIR_GCC=/usr/bin/gcc-13
+		WHERE_DIR_GPP=/usr/bin/g++-13
+	fi
+
 	if [ ! -d $serverPath/mysql ];then
 		cd ${mysqlDir}/mysql-5.5.62 && cmake \
 		-DCMAKE_INSTALL_PREFIX=$serverPath/mysql \
