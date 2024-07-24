@@ -482,7 +482,7 @@ def getRedisConfInfo():
 
     result = []
     for g in gets:
-        rep = "^(" + g['name'] + r')\s*([.0-9A-Za-z_& ~]+)'
+        rep = r"^(" + g['name'] + r')\s*([.0-9A-Za-z_& ~]+)'
         tmp = re.search(rep, content, re.M)
         if not tmp:
             if g['must_show'] == 0:
