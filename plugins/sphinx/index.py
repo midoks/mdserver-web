@@ -111,7 +111,7 @@ def status():
 
 def mkdirAll():
     content = mw.readFile(getConf())
-    rep = 'path\s*=\s*(.*)'
+    rep = r'path\s*=\s*(.*)'
     p = re.compile(rep)
     tmp = p.findall(content)
 
@@ -163,7 +163,7 @@ def initDreplace():
 
 def checkIndexSph():
     content = mw.readFile(getConf())
-    rep = 'path\s*=\s*(.*)'
+    rep = r'path\s*=\s*(.*)'
     p = re.compile(rep)
     tmp = p.findall(content)
     for x in tmp:
@@ -250,7 +250,7 @@ def initdUinstall():
 def runLog():
     path = getConf()
     content = mw.readFile(path)
-    rep = 'log\s*=\s*(.*)'
+    rep = r'log\s*=\s*(.*)'
     tmp = re.search(rep, content)
     return tmp.groups()[0]
 
@@ -258,7 +258,7 @@ def runLog():
 def getPort():
     path = getConf()
     content = mw.readFile(path)
-    rep = 'listen\s*=\s*(.*)'
+    rep = r'listen\s*=\s*(.*)'
     tmp = re.search(rep, content)
     return tmp.groups()[0]
 
@@ -266,7 +266,7 @@ def getPort():
 def queryLog():
     path = getConf()
     content = mw.readFile(path)
-    rep = 'query_log\s*=\s*(.*)'
+    rep = r'query_log\s*=\s*(.*)'
     tmp = re.search(rep, content)
     return tmp.groups()[0]
 
