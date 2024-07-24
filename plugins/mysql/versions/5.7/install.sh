@@ -77,6 +77,30 @@ Install_mysql()
 		 cd ${mysqlDir} && tar -zxvf  ${mysqlDir}/mysql-boost-${VERSION}.tar.gz
 	fi
 
+	WHERE_DIR_GCC=/usr/bin/gcc
+	WHERE_DIR_GPP=/usr/bin/g++
+	if [ ! -f $WHERE_DIR_GCC ];then
+		WHERE_DIR_GCC=`which gcc`
+	fi
+
+	if [ ! -f $WHERE_DIR_GPP ];then
+		WHERE_DIR_GPP=`which g++`
+	fi
+
+	if [ "$OSNAME" == "ubuntu" ];then
+		apt install -y libudev-dev
+		apt install -y libtirpc-dev
+		apt install -y libssl-dev
+		apt install -y libgssglue-dev
+		apt install -y software-properties-common
+		add-apt-repository -y ppa:ubuntu-toolchain-r/test
+
+		export PKG_CONFIG_PATH=/usr/lib/pkgconfig
+		apt install -y gcc-11 g++-11
+		WHERE_DIR_GCC=/usr/bin/gcc-11
+		WHERE_DIR_GPP=/usr/bin/g++-11
+	fi
+
 	OPTIONS=''
 	##check openssl version
 	OPENSSL_VERSION=`openssl version|awk '{print $2}'|awk -F '.' '{print $1}'`
@@ -103,8 +127,8 @@ Install_mysql()
 		-DDEFAULT_COLLATION=utf8mb4_general_ci \
 		-DDOWNLOAD_BOOST=1 \
 		$OPTIONS \
-		-DCMAKE_C_COMPILER=/usr/bin/gcc \
-		-DCMAKE_CXX_COMPILER=/usr/bin/g++ \
+		-DCMAKE_C_COMPILER=${WHERE_DIR_GCC} \
+		-DCMAKE_CXX_COMPILER=${WHERE_DIR_GPP} \
 		-DWITH_BOOST=${mysqlDir}/mysql-${VERSION}/boost/
 		make -j${cpuCore} && make install && make clean
 
@@ -115,7 +139,6 @@ Install_mysql()
 		else
 			# rm -rf ${mysqlDir}/mysql-${VERSION}
 			echo "${VERSION}安装失败"
-			echo 'install fail'>&2
 			exit 1
 		fi
 	fi
@@ -124,7 +147,7 @@ Install_mysql()
 Uninstall_mysql()
 {
 	rm -rf $serverPath/mysql
-	echo '卸载完成' > $install_tmp
+	echo '卸载完成'
 }
 
 action=$1
