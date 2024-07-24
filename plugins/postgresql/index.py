@@ -1337,7 +1337,7 @@ def addMasterRepSlaveUser(version=''):
     if len(password) < 1:
         password = mw.md5(time.time())[0:8]
 
-    if not re.match("^[\w\.-]+$", username):
+    if not re.match(r"^[\w\.-]+$", username):
         return mw.returnJson(False, '用户名不能带有特殊符号!')
     checks = ['root', 'mysql', 'test', 'sys', 'panel_logs']
     if username in checks or len(username) < 1:
