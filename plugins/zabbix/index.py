@@ -75,7 +75,7 @@ def checkArgs(data, ck=[]):
 def getPidFile():
     file = getConf()
     content = mw.readFile(file)
-    rep = 'pidfile\s*(.*)'
+    rep = r'pidfile\s*(.*)'
     tmp = re.search(rep, content)
     return tmp.groups()[0].strip()
 
@@ -131,14 +131,14 @@ def getMySQLConf():
 def getMySQLPort():
     file = getMySQLConf()
     content = mw.readFile(file)
-    rep = 'port\s*=\s*(.*)'
+    rep = r'port\s*=\s*(.*)'
     tmp = re.search(rep, content)
     return tmp.groups()[0].strip()
 
 def getMySQLSocketFile():
     file = getMySQLConf()
     content = mw.readFile(file)
-    rep = 'socket\s*=\s*(.*)'
+    rep = r'socket\s*=\s*(.*)'
     tmp = re.search(rep, content)
     return tmp.groups()[0].strip()
 
@@ -201,7 +201,7 @@ def getInstalledPhpConfDir():
     return 'php-80'
 
 def isInstalledPhp():
-    phpver = ["80","81","82","83","84"]
+    phpver = ["80","81","82","83","84","85"]
     php_type = ['php-apt','php-yum', 'php'];
 
     for pt in php_type:
@@ -438,7 +438,7 @@ def runLog():
     zs_conf = zabbixServerConf()
     content = mw.readFile(zs_conf)
 
-    rep = 'LogFile=\s*(.*)'
+    rep = r'LogFile=\s*(.*)'
     tmp = re.search(rep, content)
 
     if tmp.groups():
@@ -449,7 +449,7 @@ def zabbixAgentLog():
     za_conf = zabbixAgentConf()
     content = mw.readFile(za_conf)
 
-    rep = 'LogFile=\s*(.*)'
+    rep = r'LogFile=\s*(.*)'
     tmp = re.search(rep, content)
 
     if tmp.groups():

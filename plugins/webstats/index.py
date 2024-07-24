@@ -331,7 +331,7 @@ def getGlobalConf():
 def openLuaNeedRequestBody():
     conf = luaConf()
     content = mw.readFile(conf)
-    content = re.sub("lua_need_request_body (.*);",
+    content = re.sub(r"lua_need_request_body (.*);",
                      'lua_need_request_body on;', content)
     mw.writeFile(conf, content)
 
@@ -339,7 +339,7 @@ def openLuaNeedRequestBody():
 def closeLuaNeedRequestBody():
     conf = luaConf()
     content = mw.readFile(conf)
-    content = re.sub("lua_need_request_body (.*);",
+    content = re.sub(r"lua_need_request_body (.*);",
                      'lua_need_request_body off;', content)
     mw.writeFile(conf, content)
 

@@ -66,7 +66,7 @@ def checkArgs(data, ck=[]):
 def getPidFile():
     file = getConf()
     content = mw.readFile(file)
-    rep = 'pidfile\s*(.*)'
+    rep = r'pidfile\s*(.*)'
     tmp = re.search(rep, content)
     return tmp.groups()[0].strip()
 
@@ -90,7 +90,7 @@ def runLog():
     za_conf = zabbixAgentConf()
     content = mw.readFile(za_conf)
 
-    rep = 'LogFile=\s*(.*)'
+    rep = r'LogFile=\s*(.*)'
     tmp = re.search(rep, content)
 
     if tmp.groups() == 0:

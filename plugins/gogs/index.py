@@ -173,12 +173,12 @@ def initDreplace():
 
 def getRootUrl():
     content = mw.readFile(getConf())
-    rep = 'ROOT_URL\s*=\s*(.*)'
+    rep = r'ROOT_URL\s*=\s*(.*)'
     tmp = re.search(rep, content)
     if tmp:
         return tmp.groups()[0]
 
-    rep = 'EXTERNAL_URL\s*=\s*(.*)'
+    rep = r'EXTERNAL_URL\s*=\s*(.*)'
     tmp = re.search(rep, content)
     if tmp:
         return tmp.groups()[0]
@@ -187,7 +187,7 @@ def getRootUrl():
 
 def getSshPort():
     content = mw.readFile(getConf())
-    rep = 'SSH_PORT\s*=\s*(.*)'
+    rep = r'SSH_PORT\s*=\s*(.*)'
     tmp = re.search(rep, content)
     if not tmp:
         return ''
@@ -196,7 +196,7 @@ def getSshPort():
 
 def getHttpPort():
     content = mw.readFile(getConf())
-    rep = 'HTTP_PORT\s*=\s*(.*)'
+    rep = r'HTTP_PORT\s*=\s*(.*)'
     tmp = re.search(rep, content)
     if not tmp:
         return ''
@@ -205,7 +205,7 @@ def getHttpPort():
 
 def getRootPath():
     content = mw.readFile(getConf())
-    rep = 'ROOT\s*=\s*(.*)'
+    rep = r'ROOT\s*=\s*(.*)'
     tmp = re.search(rep, content)
     if not tmp:
         return ''
@@ -218,10 +218,10 @@ def getDbConfValue():
         return {}
 
     content = mw.readFile(conf)
-    rep_scope = "\[database\](.*?)\["
+    rep_scope = r"\[database\](.*?)\["
     tmp = re.findall(rep_scope, content, re.S)
 
-    rep = '(\w*)\s*=\s*(.*)'
+    rep = r'(\w*)\s*=\s*(.*)'
     tmp = re.findall(rep, tmp[0])
     r = {}
     for x in range(len(tmp)):

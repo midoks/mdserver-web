@@ -253,7 +253,7 @@ def getPort():
     conf = getServerDir() + '/keepalived.conf'
     content = mw.readFile(conf)
 
-    rep = "^(" + 'port' + ')\s*([.0-9A-Za-z_& ~]+)'
+    rep = r"^(" + 'port' + r')\s*([.0-9A-Za-z_& ~]+)'
     tmp = re.search(rep, content, re.M)
     if tmp:
         return tmp.groups()[1]
