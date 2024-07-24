@@ -1279,7 +1279,7 @@ fullchain.pem       粘贴到证书输入框
         file = self.getHostConf(siteName)
         if os.path.exists(file):
             conf = mw.readFile(file)
-            rep = '\s*root\s*(.+);'
+            rep = r'\s*root\s*(.+);'
             path = re.search(rep, conf).groups()[0]
             return path
         return ''
