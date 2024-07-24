@@ -423,13 +423,18 @@ def updateDelta():
 
     return ''
 
-def installPreInspection():
+def installPreInspection(version):
     data = mw.execShell('arch')
     if data[0].strip().startswith('aarch'):
         return '不支持aarch架构'
     return 'ok'
 
 if __name__ == "__main__":
+    version = "3.1.1"
+    version_pl = getServerDir() + "/version.pl"
+    if os.path.exists(version_pl):
+        version = mw.readFile(version_pl).strip()
+
     func = sys.argv[1]
     if func == 'status':
         print(status())
