@@ -120,9 +120,9 @@ Install_mysql()
 		add-apt-repository -y ppa:ubuntu-toolchain-r/test
 
 		export PKG_CONFIG_PATH=/usr/lib/pkgconfig
-		apt install -y gcc-10 g++-10
-		WHERE_DIR_GCC=/usr/bin/gcc-10
-		WHERE_DIR_GPP=/usr/bin/g++-10
+		apt install -y gcc-11 g++-11
+		WHERE_DIR_GCC=/usr/bin/gcc-11
+		WHERE_DIR_GPP=/usr/bin/g++-11
 	fi
 
 	OPTIONS=''
