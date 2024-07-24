@@ -165,7 +165,6 @@ Install_mysql()
 		else
 			# rm -rf ${mysqlDir}/mysql-5.6.*
 			echo "${VERSION}安装失败"
-			echo 'install fail'>&2
 			exit 1
 		fi
 	fi
@@ -174,7 +173,7 @@ Install_mysql()
 Uninstall_mysql()
 {
 	rm -rf $serverPath/mysql
-	echo '卸载完成' > $install_tmp
+	echo '卸载完成'
 }
 
 action=$1
