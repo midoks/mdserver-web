@@ -518,7 +518,7 @@ def setCfg():
         # print(k, v)
         rep = r"%s\s+[^kKmMgG\;\n]+" % k
         if k == "worker_processes" or k == "gzip":
-            if not re.search("auto|on|off|\d+", v):
+            if not re.search(r"auto|on|off|\d+", v):
                 return mw.returnJson(False, '参数值错误')
         else:
             if not re.search(r"\d+", v):
