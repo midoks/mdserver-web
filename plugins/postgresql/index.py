@@ -866,7 +866,7 @@ def addDb():
     if listen_ip not in ["127.0.0.1/32", "localhost", "127.0.0.1"]:
         sedConf("listen_addresses", "'*'")
 
-    reg = "^[\w\.-]+$"
+    reg = r"^[\w\.-]+$"
     if not re.match(reg, dbname):
         return mw.returnJson(False, '数据库名称不能带有特殊符号!')
 
