@@ -94,21 +94,21 @@ def getConf():
 def getDbPort():
     file = getConf()
     content = mw.readFile(file)
-    rep = 'port\s*=\s*(.*)'
+    rep = r'port\s*=\s*(.*)'
     tmp = re.search(rep, content)
     return tmp.groups()[0].strip()
 
 def getDbServerId():
     file = getConf()
     content = mw.readFile(file)
-    rep = 'server-id\s*=\s*(.*)'
+    rep = r'server-id\s*=\s*(.*)'
     tmp = re.search(rep, content)
     return tmp.groups()[0].strip()
 
 def getSocketFile():
     file = getConf()
     content = mw.readFile(file)
-    rep = 'socket\s*=\s*(.*)'
+    rep = r'socket\s*=\s*(.*)'
     tmp = re.search(rep, content)
 
     socket = tmp.groups()[0].strip()
@@ -118,14 +118,14 @@ def getSocketFile():
 def getErrorLogsFile():
     file = getConf()
     content = mw.readFile(file)
-    rep = 'log-error\s*=\s*(.*)'
+    rep = r'log-error\s*=\s*(.*)'
     tmp = re.search(rep, content)
     return tmp.groups()[0].strip()
 
 def getAuthPolicy():
     file = getConf()
     content = mw.readFile(file)
-    rep = 'authentication_policy\s*=\s*(.*)'
+    rep = r'authentication_policy\s*=\s*(.*)'
     tmp = re.search(rep, content)
     if tmp:
         return tmp.groups()[0].strip()
@@ -261,21 +261,21 @@ def status(version=''):
 def getDataDir():
     file = getConf()
     content = mw.readFile(file)
-    rep = 'datadir\s*=\s*(.*)'
+    rep = r'datadir\s*=\s*(.*)'
     tmp = re.search(rep, content)
     return tmp.groups()[0].strip()
 
 def getLogBinName():
     file = getConf()
     content = mw.readFile(file)
-    rep = 'log-bin\s*=\s*(.*)'
+    rep = r'log-bin\s*=\s*(.*)'
     tmp = re.search(rep, content)
     return tmp.groups()[0].strip()
 
 def getPidFile():
     file = getConf()
     content = mw.readFile(file)
-    rep = 'pid-file\s*=\s*(.*)'
+    rep = r'pid-file\s*=\s*(.*)'
     tmp = re.search(rep, content)
     return tmp.groups()[0].strip()
 
@@ -394,7 +394,7 @@ def getErrorLog():
 def getShowLogFile():
     file = getConf()
     content = mw.readFile(file)
-    rep = 'slow-query-log-file\s*=\s*(.*)'
+    rep = r'slow-query-log-file\s*=\s*(.*)'
     tmp = re.search(rep, content)
     return tmp.groups()[0].strip()
 
@@ -403,8 +403,7 @@ def getMdb8Ver():
 
 def pGetDbUser():
     if mw.isAppleSystem():
-        user = mw.execShell(
-            "who | sed -n '2, 1p' |awk '{print $1}'")[0].strip()
+        user = mw.execShell("who | sed -n '2, 1p' |awk '{print $1}'")[0].strip()
         return user
     return 'mysql'
 
@@ -601,7 +600,7 @@ def initdUinstall():
 def getMyDbPos():
     file = getConf()
     content = mw.readFile(file)
-    rep = 'datadir\s*=\s*(.*)'
+    rep = r'datadir\s*=\s*(.*)'
     tmp = re.search(rep, content)
     return tmp.groups()[0].strip()
 
@@ -652,7 +651,7 @@ def setMyDbPos(version=''):
 def getMyPort():
     file = getConf()
     content = mw.readFile(file)
-    rep = 'port\s*=\s*(.*)'
+    rep = r'port\s*=\s*(.*)'
     tmp = re.search(rep, content)
     return tmp.groups()[0].strip()
 
@@ -666,7 +665,7 @@ def setMyPort():
     port = args['port']
     file = getConf()
     content = mw.readFile(file)
-    rep = "port\s*=\s*([0-9]+)\s*\n"
+    rep = r"port\s*=\s*([0-9]+)\s*\n"
     content = re.sub(rep, 'port = ' + port + '\n', content)
     mw.writeFile(file, content)
     restart()
@@ -1358,7 +1357,7 @@ def addDb():
     dataAccess = args['dataAccess'].strip()
     ps = args['ps'].strip()
 
-    reg = "^[\w-]+$"
+    reg = r"^[\w-]+$"
     if not re.match(reg, args['name']):
         return mw.returnJson(False, '数据库名称不能带有特殊符号!')
     checks = ['root', 'mysql', 'test', 'sys', 'performance_schema','information_schema']
@@ -3508,8 +3507,8 @@ def installPreInspection(version):
     if (sysName == 'ubuntu' and version == '5.7' and not sysId in ('18.04')):
         return "Ubuntu Apt MySQL[" + version + "] 仅支持18.04"
 
-    if (sysName == 'ubuntu' and version == '8.0' and not sysId in ('18.04', '20.04', '22.04')):
-        return 'Ubuntu Apt MySQL[' + version + '] 仅支持18.04,20.04,22.04'
+    if (sysName == 'ubuntu' and version == '8.0' and not sysId in ('18.04', '20.04', '22.04','24.04')):
+        return 'Ubuntu Apt MySQL[' + version + '] 仅支持18.04,20.04,22.04,24.04'
     return 'ok'
 
 
