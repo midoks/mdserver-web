@@ -220,7 +220,7 @@ def getPort():
     conf = getServerDir() + '/redis.conf'
     content = mw.readFile(conf)
 
-    rep = r"^(" + 'port' + ')\s*([.0-9A-Za-z_& ~]+)'
+    rep = r"^(" + r'port' + r')\s*([.0-9A-Za-z_& ~]+)'
     tmp = re.search(rep, content, re.M)
     if tmp:
         return tmp.groups()[1]
@@ -232,7 +232,7 @@ def getRedisCmd():
     requirepass = ""
     conf = getServerDir() + '/redis.conf'
     content = mw.readFile(conf)
-    rep = r"^(requirepass" + ')\s*([.0-9A-Za-z_& ~]+)'
+    rep = r"^(requirepass" + r')\s*([.0-9A-Za-z_& ~]+)'
     tmp = re.search(rep, content, re.M)
     if tmp:
         requirepass = tmp.groups()[1]
