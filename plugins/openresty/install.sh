@@ -48,7 +48,7 @@ fi
 
 sh -x $curPath/versions/$2/install.sh $1
 
-if [ "${action}" == "install" ] && [ -d $serverPath/postgresql ];then
+if [ "${action}" == "install" ] && [ -d $serverPath/openresty ];then
 	echo "${VERSION}" > $serverPath/openresty/version.pl
 
 	mkdir -p $serverPath/web_conf/php/conf
