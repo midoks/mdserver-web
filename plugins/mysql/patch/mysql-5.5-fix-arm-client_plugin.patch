@@ -1,0 +1,37 @@
+diff -ruN mysql-5.5.42.orig/sql-common/client_plugin.c mysql-5.5.42/sql-common/client_plugin.c
+--- mysql-5.5.42.orig/sql-common/client_plugin.c	2015-01-07 04:39:40.000000000 +0800
++++ mysql-5.5.42/sql-common/client_plugin.c	2015-03-24 10:36:45.682700014 +0800
+@@ -233,6 +233,7 @@
+ {
+   MYSQL mysql;
+   struct st_mysql_client_plugin **builtin;
++  va_list dummy;
+ 
+   if (initialized)
+     return 0;
+@@ -249,7 +250,7 @@
+   pthread_mutex_lock(&LOCK_load_client_plugin);
+ 
+   for (builtin= mysql_client_builtins; *builtin; builtin++)
+-    add_plugin(&mysql, *builtin, 0, 0, 0);
++    add_plugin(&mysql, *builtin, 0, 0, dummy);
+ 
+   pthread_mutex_unlock(&LOCK_load_client_plugin);
+ 
+@@ -293,6 +294,7 @@
+ mysql_client_register_plugin(MYSQL *mysql,
+                              struct st_mysql_client_plugin *plugin)
+ {
++  va_list dummy;
+   if (is_not_initialized(mysql, plugin->name))
+     return NULL;
+ 
+@@ -307,7 +309,7 @@
+     plugin= NULL;
+   }
+   else
+-    plugin= add_plugin(mysql, plugin, 0, 0, 0);
++    plugin= add_plugin(mysql, plugin, 0, 0, dummy);
+ 
+   pthread_mutex_unlock(&LOCK_load_client_plugin);
+   return plugin;

@@ -10,11 +10,52 @@ rootPath=$(dirname "$curPath")
 rootPath=$(dirname "$rootPath")
 serverPath=$(dirname "$rootPath")
 sysName=`uname`
+sysArch=`arch`
 
 install_tmp=${rootPath}/tmp/mw_install.pl
 mysqlDir=${serverPath}/source/mysql
 
 VERSION=5.5.62
+
+_os=`uname`
+echo "use system: ${_os}"
+if [ ${_os} == "Darwin" ]; then
+	OSNAME='macos'
+elif grep -Eq "openSUSE" /etc/*-release; then
+	OSNAME='opensuse'
+	zypper refresh
+elif grep -Eq "FreeBSD" /etc/*-release; then
+	OSNAME='freebsd'
+	pkg install -y wget unzip
+elif grep -Eqi "Arch" /etc/issue || grep -Eq "Arch" /etc/*-release; then
+	OSNAME='arch'
+	echo y | pacman -Sy unzip
+elif grep -Eqi "CentOS" /etc/issue || grep -Eq "CentOS" /etc/*-release; then
+	OSNAME='centos'
+	yum install -y wget zip unzip
+elif grep -Eqi "Fedora" /etc/issue || grep -Eq "Fedora" /etc/*-release; then
+	OSNAME='fedora'
+	yum install -y wget zip unzip
+elif grep -Eqi "Rocky" /etc/issue || grep -Eq "Rocky" /etc/*-release; then
+	OSNAME='rocky'
+	yum install -y wget zip unzip
+elif grep -Eqi "AlmaLinux" /etc/issue || grep -Eq "AlmaLinux" /etc/*-release; then
+	OSNAME='alma'
+	yum install -y wget zip unzip
+elif grep -Eqi "Debian" /etc/issue || grep -Eq "Debian" /etc/*-release; then
+	OSNAME='debian'
+	apt update -y
+	apt install -y devscripts
+	apt install -y wget zip unzip
+elif grep -Eqi "Ubuntu" /etc/issue || grep -Eq "Ubuntu" /etc/*-release; then
+	OSNAME='ubuntu'
+	apt install -y wget zip unzip
+else
+	OSNAME='unknow'
+fi
+
+VERSION_ID=`cat /etc/*-release | grep VERSION_ID | awk -F = '{print $2}' | awk -F "\"" '{print $2}'`
+
 
 Install_mysql()
 {
@@ -67,6 +108,13 @@ Install_mysql()
 
 	if [ ! -f $WHERE_DIR_GPP ];then
 		WHERE_DIR_GPP=`which g++`
+	fi
+
+	# https://blog.whsir.com/post-7748.html
+	# arm架构编译MySQL5.5报错
+	if [[ "$sysArch" =~  "aarch" ]];then
+		# wget --no-check-certificate -O ${mysqlDir}/mysql-5.5-fix-arm-client_plugin.patch https://down.whsir.com/downloads/mysql-5.5-fix-arm-client_plugin.patch
+		cd ${mysqlDir}/mysql-5.5.62 && patch -p1 < ${rootPath}/plugins/mysql/patch/mysql-5.5-fix-arm-client_plugin.patch
 	fi
 
 	if [ "$OSNAME" == "ubuntu" ];then
