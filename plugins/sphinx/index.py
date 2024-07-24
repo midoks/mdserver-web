@@ -423,6 +423,12 @@ def updateDelta():
 
     return ''
 
+def installPreInspection():
+    data = mw.execShell('arch')
+    if data[0].strip().startswith('aarch'):
+        return '不支持aarch架构'
+    return 'ok'
+
 if __name__ == "__main__":
     func = sys.argv[1]
     if func == 'status':
@@ -443,6 +449,8 @@ if __name__ == "__main__":
         print(initdInstall())
     elif func == 'initd_uninstall':
         print(initdUinstall())
+    elif func == 'install_pre_inspection':
+        print(installPreInspection(version))
     elif func == 'conf':
         print(getConf())
     elif func == 'config_tpl':

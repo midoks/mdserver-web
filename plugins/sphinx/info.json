@@ -6,6 +6,7 @@
 	"shell": "install.sh",
 	"versions":["3.1.1","3.2.1","3.3.1","3.4.1","3.5.1","3.6.1","3.7.1"],
 	"tip": "soft",
+	"install_pre_inspection":true,
 	"checks": "server/sphinx",
 	"path": "server/sphinx",
 	"display": 1,
