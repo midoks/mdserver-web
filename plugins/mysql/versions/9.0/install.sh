@@ -162,7 +162,7 @@ Install_mysql()
 		fi
 
 		export PKG_CONFIG_PATH=/usr/lib/pkgconfig
-		apt install -y gcc-11 g++-11
+		apt install -y gcc-13 g++-13
 		WHERE_DIR_GCC=/usr/bin/gcc-13
 		WHERE_DIR_GPP=/usr/bin/g++-13
 	fi
@@ -173,8 +173,8 @@ Install_mysql()
 		zypper install -y gcc11-c++
 
 
-		WHERE_DIR_GCC=/usr/bin/gcc-13
-		WHERE_DIR_GPP=/usr/bin/g++-13
+		WHERE_DIR_GCC=/usr/bin/gcc-11
+		WHERE_DIR_GPP=/usr/bin/g++-11
 	fi
 
 	if [ ! -d $serverPath/mysql ];then
