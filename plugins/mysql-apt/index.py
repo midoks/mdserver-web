@@ -753,7 +753,7 @@ def setDbStatus(version):
             s = 'K'
         if g in emptys:
             s = ''
-        rep = '\s*' + g + '\s*=\s*\d+(M|K|k|m|G)?\n'
+        rep = r'\s*' + g + .r'\s*=\s*\d+(M|K|k|m|G)?\n'
         c = g + ' = ' + args[g] + s + '\n'
         if content.find(g) != -1:
             content = re.sub(rep, '\n' + c, content, 1)
