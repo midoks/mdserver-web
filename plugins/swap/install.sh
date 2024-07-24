@@ -12,6 +12,8 @@ install_tmp=${rootPath}/tmp/mw_install.pl
 
 VERSION=$2
 
+# cd /www/server/mdserver-web/plugins/swap && /bin/bash install.sh install 1.1
+
 Install_swap()
 {
 	if [ -d $serverPath/swap ];then
