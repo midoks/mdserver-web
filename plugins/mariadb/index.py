@@ -86,21 +86,21 @@ def getConf():
 def getDataDir():
     file = getConf()
     content = mw.readFile(file)
-    rep = 'datadir\s*=\s*(.*)'
+    rep = r'datadir\s*=\s*(.*)'
     tmp = re.search(rep, content)
     return tmp.groups()[0].strip()
 
 def getLogBinName():
     file = getConf()
     content = mw.readFile(file)
-    rep = 'log-bin\s*=\s*(.*)'
+    rep = r'log-bin\s*=\s*(.*)'
     tmp = re.search(rep, content)
     return tmp.groups()[0].strip()
 
 def getPidFile():
     file = getConf()
     content = mw.readFile(file)
-    rep = 'pid-file\s*=\s*(.*)'
+    rep = r'pid-file\s*=\s*(.*)'
     tmp = re.search(rep, content)
     return tmp.groups()[0].strip()
 
@@ -108,7 +108,7 @@ def getPidFile():
 def getDbPort():
     file = getConf()
     content = mw.readFile(file)
-    rep = 'port\s*=\s*(.*)'
+    rep = r'port\s*=\s*(.*)'
     tmp = re.search(rep, content)
     return tmp.groups()[0].strip()
 
@@ -116,7 +116,7 @@ def getDbPort():
 def getDbServerId():
     file = getConf()
     content = mw.readFile(file)
-    rep = 'server-id\s*=\s*(.*)'
+    rep = r'server-id\s*=\s*(.*)'
     tmp = re.search(rep, content)
     return tmp.groups()[0].strip()
 
@@ -124,7 +124,7 @@ def getDbServerId():
 def getSocketFile():
     file = getConf()
     content = mw.readFile(file)
-    rep = 'socket\s*=\s*(.*)'
+    rep = r'socket\s*=\s*(.*)'
     tmp = re.search(rep, content)
     return tmp.groups()[0].strip()
 
@@ -378,7 +378,7 @@ def getErrorLog():
 def getShowLogFile():
     file = getConf()
     content = mw.readFile(file)
-    rep = 'slow-query-log-file\s*=\s*(.*)'
+    rep = r'slow-query-log-file\s*=\s*(.*)'
     tmp = re.search(rep, content)
     return tmp.groups()[0].strip()
 
@@ -547,7 +547,7 @@ def initdUinstall():
 def getMyDbPos():
     file = getConf()
     content = mw.readFile(file)
-    rep = 'datadir\s*=\s*(.*)'
+    rep = r'datadir\s*=\s*(.*)'
     tmp = re.search(rep, content)
     return tmp.groups()[0].strip()
 
@@ -597,7 +597,7 @@ def setMyDbPos():
 def getMyPort():
     file = getConf()
     content = mw.readFile(file)
-    rep = 'port\s*=\s*(.*)'
+    rep = r'port\s*=\s*(.*)'
     tmp = re.search(rep, content)
     return tmp.groups()[0].strip()
 
@@ -611,7 +611,7 @@ def setMyPort():
     port = args['port']
     file = getConf()
     content = mw.readFile(file)
-    rep = "port\s*=\s*([0-9]+)\s*\n"
+    rep = r"port\s*=\s*([0-9]+)\s*\n"
     content = re.sub(rep, 'port = ' + port + '\n', content)
     mw.writeFile(file, content)
     restart()
@@ -688,7 +688,7 @@ def setDbStatus():
             s = 'K'
         if g in emptys:
             s = ''
-        rep = '\s*' + g + '\s*=\s*\d+(M|K|k|m|G)?\n'
+        rep = r'\s*' + g + r'\s*=\s*\d+(M|K|k|m|G)?\n'
         c = g + ' = ' + args[g] + s + '\n'
         if content.find(g) != -1:
             content = re.sub(rep, '\n' + c, content, 1)
@@ -1280,7 +1280,7 @@ def addDb():
     dataAccess = args['dataAccess'].strip()
     ps = args['ps'].strip()
 
-    reg = "^[\w\.-]+$"
+    reg = r"^[\w\.-]+$"
     if not re.match(reg, args['name']):
         return mw.returnJson(False, '数据库名称不能带有特殊符号!')
     checks = ['root', 'mysql', 'test', 'sys', 'panel_logs']
@@ -1846,8 +1846,7 @@ def setDbMaster(version):
 
     if not isHas:
         prefix = '#binlog-do-db'
-        con = con.replace(
-            prefix, prefix + "\nbinlog-do-db=" + args['name'])
+        con = con.replace(prefix, prefix + "\nbinlog-do-db=" + args['name'])
         mw.writeFile(conf, con)
 
     restart(version)
@@ -1876,8 +1875,7 @@ def setDbSlave(version):
 
     if not isHas:
         prefix = '#replicate-do-db'
-        con = con.replace(
-            prefix, prefix + "\nreplicate-do-db=" + args['name'])
+        con = con.replace(prefix, prefix + "\nreplicate-do-db=" + args['name'])
         mw.writeFile(conf, con)
 
     restart(version)
