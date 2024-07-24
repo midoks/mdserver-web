@@ -512,7 +512,7 @@ def submitRedisConf():
     content = mw.readFile(conf)
     for g in gets:
         if g in args:
-            rep = g + '\s*([.0-9A-Za-z_& ~]+)'
+            rep = g + r'\s*([.0-9A-Za-z_& ~]+)'
             val = g + ' ' + args[g]
 
             if g == 'maxmemory':
