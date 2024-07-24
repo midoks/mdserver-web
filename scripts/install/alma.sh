@@ -15,6 +15,8 @@ dnf install -y python-devel
 dnf install -y crontabs
 dnf install -y mysql-devel
 dnf install -y pv
+yum install -y bzip2
+yum install -y bzip2-devel
 
 SSH_PORT=`netstat -ntpl|grep sshd|grep -v grep | sed -n "1,1p" | awk '{print $4}' | awk -F : '{print $2}'`
 if [ "$SSH_PORT" == "" ];then

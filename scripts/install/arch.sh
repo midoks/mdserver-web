@@ -20,6 +20,7 @@ echo y | pacman -Sy libevent
 echo y | pacman -Sy libzip
 echo y | pacman -Sy libxml2
 echo y | pacman -Sy libtirpc
+echo y | pacman -Sy bzip2
 
 echo y | pacman -Sy cronie
 echo y | pacman -Sy vi

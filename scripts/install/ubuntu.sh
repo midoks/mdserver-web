@@ -25,6 +25,7 @@ apt install -y net-tools
 apt install -y libncurses5
 apt install -y libncurses5-dev
 apt install -y software-properties-common
+apt install -y bzip2
 
 # choose lang cmd
 # dpkg-reconfigure --frontend=noninteractive locales
