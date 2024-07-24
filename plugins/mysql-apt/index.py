@@ -3474,7 +3474,9 @@ def fullSync(version=''):
 
 
 def installPreInspection(version):
-
+    arch_data = mw.execShell('arch')
+    if arch_data[0].strip().startswith('aarch'):
+        return '不支持aarch架构'
 
     cmd = "cat /etc/*-release | grep PRETTY_NAME |awk -F = '{print $2}' | awk -F '\"' '{print $2}'| awk '{print $1}'"
     sys = mw.execShell(cmd)
