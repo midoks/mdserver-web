@@ -295,7 +295,7 @@ def sphinxConfParse():
     file = getConf()
     bin_dir = getServerDir()
     content = mw.readFile(file)
-    rep = 'index\s(.*)'
+    rep = r'index\s(.*)'
     sindex = re.findall(rep, content)
     indexlen = len(sindex)
     cmd = {}
