@@ -116,7 +116,7 @@ def readConfigTpl():
 def getDbPort():
     file = getConf()
     content = mw.readFile(file)
-    rep = 'port\s*=\s*(\d*)?'
+    rep = r'port\s*=\s*(\d*)?'
     tmp = re.search(rep, content)
     return tmp.groups()[0].strip()
 
@@ -400,7 +400,7 @@ def initdUinstall():
 def getMyDbPos():
     file = getConf()
     content = mw.readFile(file)
-    rep = 'datadir\s*=\s*(.*)'
+    rep = r'datadir\s*=\s*(.*)'
     tmp = re.search(rep, content)
     return tmp.groups()[0].strip()
 
@@ -408,7 +408,7 @@ def getMyDbPos():
 def getPgPort():
     file = getConf()
     content = mw.readFile(file)
-    rep = 'port\s*=\s*(.*)'
+    rep = r'port\s*=\s*(.*)'
     tmp = re.search(rep, content)
     return tmp.groups()[0].strip()
 
@@ -422,7 +422,7 @@ def setPgPort():
     port = args['port']
     file = getConf()
     content = mw.readFile(file)
-    rep = "port\s*=\s*([0-9]+)\s*\n"
+    rep = r"port\s*=\s*([0-9]+)\s*\n"
     content = re.sub(rep, 'port = ' + port + '\n', content)
     mw.writeFile(file, content)
     restart()

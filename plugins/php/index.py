@@ -101,7 +101,7 @@ def status_progress(version):
 def getPhpSocket(version):
     path = getFpmConfFile(version)
     content = mw.readFile(path)
-    rep = 'listen\s*=\s*(.*)'
+    rep = r'listen\s*=\s*(.*)'
     tmp = re.search(rep, content)
     return tmp.groups()[0].strip()
 
@@ -133,15 +133,15 @@ def contentReplace(content, version):
         content = content.replace('{$PHP_USER}', 'nobody')
         content = content.replace('{$PHP_GROUP}', 'nobody')
 
-        rep = 'listen.owner\s*=\s*(.+)\r?\n'
+        rep = r'listen.owner\s*=\s*(.+)\r?\n'
         val = ';listen.owner = nobody\n'
         content = re.sub(rep, val, content)
 
-        rep = 'listen.group\s*=\s*(.+)\r?\n'
+        rep = r'listen.group\s*=\s*(.+)\r?\n'
         val = ';listen.group = nobody\n'
         content = re.sub(rep, val, content)
 
-        rep = 'user\s*=\s*(.+)\r?\n'
+        rep = r'user\s*=\s*(.+)\r?\n'
         val = ';user = nobody\n'
         content = re.sub(rep, val, content)
 
@@ -449,7 +449,7 @@ def getPhpConf(version):
     phpini = mw.readFile(getConf(version))
     result = []
     for g in gets:
-        rep = g['name'] + '\s*=\s*([0-9A-Za-z_& ~]+)(\s*;?|\r?\n)'
+        rep = g['name'] + r'\s*=\s*([0-9A-Za-z_& ~]+)(\s*;?|\r?\n)'
         tmp = re.search(rep, phpini)
         if not tmp:
             continue
@@ -468,7 +468,7 @@ def submitPhpConf(version):
     phpini = mw.readFile(filename)
     for g in gets:
         if g in args:
-            rep = g + '\s*=\s*(.+)\r?\n'
+            rep = g + r'\s*=\s*(.+)\r?\n'
             val = g + ' = ' + args[g] + '\n'
             phpini = re.sub(rep, val, phpini)
     mw.writeFile(filename, phpini)
@@ -486,14 +486,14 @@ def getLimitConf(version):
     # print fileini, filefpm
     data = {}
     try:
-        rep = "upload_max_filesize\s*=\s*([0-9]+)M"
+        rep = r"upload_max_filesize\s*=\s*([0-9]+)M"
         tmp = re.search(rep, phpini).groups()
         data['max'] = tmp[0]
     except:
         data['max'] = '50'
 
     try:
-        rep = "request_terminate_timeout\s*=\s*([0-9]+)\n"
+        rep = r"request_terminate_timeout\s*=\s*([0-9]+)\n"
         tmp = re.search(rep, phpfpm).groups()
         data['maxTime'] = tmp[0]
     except:
@@ -525,15 +525,15 @@ def setMaxTime(version):
 
     filefpm = getFpmConfFile(version)
     conf = mw.readFile(filefpm)
-    rep = "request_terminate_timeout\s*=\s*([0-9]+)\n"
+    rep = r"request_terminate_timeout\s*=\s*([0-9]+)\n"
     conf = re.sub(rep, "request_terminate_timeout = " + time + "\n", conf)
     mw.writeFile(filefpm, conf)
 
     fileini = getServerDir() + "/" + version + "/etc/php.ini"
     phpini = mw.readFile(fileini)
-    rep = "max_execution_time\s*=\s*([0-9]+)\r?\n"
+    rep = r"max_execution_time\s*=\s*([0-9]+)\r?\n"
     phpini = re.sub(rep, "max_execution_time = " + time + "\n", phpini)
-    rep = "max_input_time\s*=\s*([0-9]+)\r?\n"
+    rep = r"max_input_time\s*=\s*([0-9]+)\r?\n"
     phpini = re.sub(rep, "max_input_time = " + time + "\n", phpini)
     mw.writeFile(fileini, phpini)
     return mw.returnJson(True, '设置成功!')
@@ -551,9 +551,9 @@ def setMaxSize(version):
 
     path = getConf(version)
     conf = mw.readFile(path)
-    rep = u"\nupload_max_filesize\s*=\s*[0-9]+M"
+    rep = r"\nupload_max_filesize\s*=\s*[0-9]+M"
     conf = re.sub(rep, u'\nupload_max_filesize = ' + maxVal + 'M', conf)
-    rep = u"\npost_max_size\s*=\s*[0-9]+M"
+    rep = r"\npost_max_size\s*=\s*[0-9]+M"
     conf = re.sub(rep, u'\npost_max_size = ' + maxVal + 'M', conf)
     mw.writeFile(path, conf)
 
@@ -571,23 +571,23 @@ def getFpmConfig(version, pool = 'www'):
     filefpm = getServerDir() + '/' + version + '/etc/php-fpm.d/'+pool+'.conf'
     conf = mw.readFile(filefpm)
     data = {}
-    rep = "\s*pm.max_children\s*=\s*([0-9]+)\s*"
+    rep = r"\s*pm.max_children\s*=\s*([0-9]+)\s*"
     tmp = re.search(rep, conf).groups()
     data['max_children'] = tmp[0]
 
-    rep = "\s*pm.start_servers\s*=\s*([0-9]+)\s*"
+    rep = r"\s*pm.start_servers\s*=\s*([0-9]+)\s*"
     tmp = re.search(rep, conf).groups()
     data['start_servers'] = tmp[0]
 
-    rep = "\s*pm.min_spare_servers\s*=\s*([0-9]+)\s*"
+    rep = r"\s*pm.min_spare_servers\s*=\s*([0-9]+)\s*"
     tmp = re.search(rep, conf).groups()
     data['min_spare_servers'] = tmp[0]
 
-    rep = "\s*pm.max_spare_servers \s*=\s*([0-9]+)\s*"
+    rep = r"\s*pm.max_spare_servers \s*=\s*([0-9]+)\s*"
     tmp = re.search(rep, conf).groups()
     data['max_spare_servers'] = tmp[0]
 
-    rep = "\s*pm\s*=\s*(\w+)\s*"
+    rep = r"\s*pm\s*=\s*(\w+)\s*"
     tmp = re.search(rep, conf).groups()
     data['pm'] = tmp[0]
     return mw.getJson(data)
@@ -610,21 +610,21 @@ def setFpmConfig(version):
     file = getServerDir() + '/' + version + '/etc/php-fpm.d/'+pool+'.conf'
     conf = mw.readFile(file)
 
-    rep = "\s*pm.max_children\s*=\s*([0-9]+)\s*"
+    rep = r"\s*pm.max_children\s*=\s*([0-9]+)\s*"
     conf = re.sub(rep, "\npm.max_children = " + max_children, conf)
 
-    rep = "\s*pm.start_servers\s*=\s*([0-9]+)\s*"
+    rep = r"\s*pm.start_servers\s*=\s*([0-9]+)\s*"
     conf = re.sub(rep, "\npm.start_servers = " + start_servers, conf)
 
-    rep = "\s*pm.min_spare_servers\s*=\s*([0-9]+)\s*"
+    rep = r"\s*pm.min_spare_servers\s*=\s*([0-9]+)\s*"
     conf = re.sub(rep, "\npm.min_spare_servers = " +
                   min_spare_servers, conf)
 
-    rep = "\s*pm.max_spare_servers \s*=\s*([0-9]+)\s*"
+    rep = r"\s*pm.max_spare_servers \s*=\s*([0-9]+)\s*"
     conf = re.sub(rep, "\npm.max_spare_servers = " +
                   max_spare_servers + "\n", conf)
 
-    rep = "\s*pm\s*=\s*(\w+)\s*"
+    rep = r"\s*pm\s*=\s*(\w+)\s*"
     conf = re.sub(rep, "\npm = " + pm + "\n", conf)
 
     mw.writeFile(file, conf)
@@ -883,7 +883,7 @@ def getDisableFunc(version):
 
     phpini = mw.readFile(filename)
     data = {}
-    rep = "disable_functions\s*=\s{0,1}(.*)\n"
+    rep = r"disable_functions\s*=\s{0,1}(.*)\n"
     tmp = re.search(rep, phpini).groups()
     data['disable_functions'] = tmp[0]
     return mw.getJson(data)
@@ -898,7 +898,7 @@ def setDisableFunc(version):
     disable_functions = args['disable_functions']
 
     phpini = mw.readFile(filename)
-    rep = "disable_functions\s*=\s*.*\n"
+    rep = r"disable_functions\s*=\s*.*\n"
     phpini = re.sub(rep, 'disable_functions = ' +
                     disable_functions + "\n", phpini)
 

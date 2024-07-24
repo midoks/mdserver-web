@@ -96,7 +96,7 @@ def appAuthPwd(name):
 def getLog():
     conf_path = appConf()
     conf = mw.readFile(conf_path)
-    rep = 'log file\s*=\s*(.*)'
+    rep = r'log file\s*=\s*(.*)'
     tmp = re.search(rep, conf)
     if not tmp:
         return ''
@@ -106,7 +106,7 @@ def getLog():
 def getLsyncdLog():
     path = getServerDir() + "/lsyncd.conf"
     conf = mw.readFile(path)
-    rep = 'logfile\s*=\s*\"(.*)\"'
+    rep = r'logfile\s*=\s*\"(.*)\"'
     tmp = re.search(rep, conf)
     if not tmp:
         return ''

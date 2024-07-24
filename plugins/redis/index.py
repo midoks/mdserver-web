@@ -100,7 +100,7 @@ def readConfigTpl():
 def getPidFile():
     file = getConf()
     content = mw.readFile(file)
-    rep = 'pidfile\s*(.*)'
+    rep = r'pidfile\s*(.*)'
     tmp = re.search(rep, content)
     return tmp.groups()[0].strip()
 
@@ -220,7 +220,7 @@ def getPort():
     conf = getServerDir() + '/redis.conf'
     content = mw.readFile(conf)
 
-    rep = "^(" + 'port' + ')\s*([.0-9A-Za-z_& ~]+)'
+    rep = r"^(" + 'port' + ')\s*([.0-9A-Za-z_& ~]+)'
     tmp = re.search(rep, content, re.M)
     if tmp:
         return tmp.groups()[1]
@@ -232,7 +232,7 @@ def getRedisCmd():
     requirepass = ""
     conf = getServerDir() + '/redis.conf'
     content = mw.readFile(conf)
-    rep = "^(requirepass" + ')\s*([.0-9A-Za-z_& ~]+)'
+    rep = r"^(requirepass" + ')\s*([.0-9A-Za-z_& ~]+)'
     tmp = re.search(rep, content, re.M)
     if tmp:
         requirepass = tmp.groups()[1]
