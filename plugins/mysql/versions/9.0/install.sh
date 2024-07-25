@@ -162,9 +162,12 @@ Install_mysql()
 		fi
 
 		export PKG_CONFIG_PATH=/usr/lib/pkgconfig
-		apt install -y gcc-13 g++-13
-		WHERE_DIR_GCC=/usr/bin/gcc-13
-		WHERE_DIR_GPP=/usr/bin/g++-13
+		apt install -y gcc-11 g++-11
+		WHERE_DIR_GCC=/usr/bin/gcc-11
+		WHERE_DIR_GPP=/usr/bin/g++-11
+		
+
+		OPTIONS="${OPTIONS} -DFORCE_INSOURCE_BUILD=1"
 	fi
 
 
