@@ -168,6 +168,7 @@ Install_mysql()
 		
 
 		OPTIONS="${OPTIONS} -DFORCE_INSOURCE_BUILD=1"
+		OPTIONS="${OPTIONS} -D_FORTIFY_SOURCE=2"
 	fi
 
 
