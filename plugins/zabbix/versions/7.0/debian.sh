@@ -8,9 +8,12 @@ rootPath=$(dirname "$rootPath")
 serverPath=$(dirname "$rootPath")
 sourcePath=${serverPath}/source
 sysName=`uname`
+sysArch=`arch`
+
 install_tmp=${rootPath}/tmp/mw_install.pl
+
 debian_suffix=
-if [ "$SYS_ARCH" == "aarch64" ];then
+if [ "$sysArch" == "aarch64" ];then
 	debian_suffix="-arm64"
 fi
 
