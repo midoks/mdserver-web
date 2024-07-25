@@ -9,9 +9,10 @@ rootPath=$(dirname "$rootPath")
 serverPath=$(dirname "$rootPath")
 sourcePath=${serverPath}/source
 sysName=`uname`
+sysArch=`arch`
 install_tmp=${rootPath}/tmp/mw_install.pl
 ubuntu_suffix=
-if [ "$SYS_ARCH" == "aarch64" ];then
+if [ "$sysArch" == "aarch64" ];then
 	ubuntu_suffix="-arm64"
 fi
 SYS_VERSION_ID=`cat /etc/*-release | grep VERSION_ID | awk -F = '{print $2}' | awk -F "\"" '{print $2}'`
