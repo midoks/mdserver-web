@@ -377,7 +377,7 @@ fi
             return response
         except Exception as ex:
             # self.getError()
-            raise Exception("requestsPost: {}".format(self.getError(str(ex))))
+            raise Exception("异常: {}".format(self.getError(str(ex))))
 
     def getRequestJson(self, response):
         try:
