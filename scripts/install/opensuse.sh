@@ -31,6 +31,7 @@ zypper install -y libstdc++6
 zypper install -y expect
 zypper install -y pv
 zypper install -y bc
+zypper install -y bzip2
 
 zypper install -y libzip libzip-devel
 zypper install -y unrar rar

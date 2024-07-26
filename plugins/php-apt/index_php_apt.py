@@ -69,7 +69,7 @@ def status_progress(version):
 def getPhpSocket(version):
     path = getFpmConfFile(version)
     content = mw.readFile(path)
-    rep = 'listen\s*=\s*(.*)'
+    rep = r'listen\s*=\s*(.*)'
     tmp = re.search(rep, content)
     return tmp.groups()[0].strip()
 
@@ -116,7 +116,7 @@ def getPhpinfo(version):
         return 'PHP[' + version + ']未启动,不可访问!!!'
 
     sock_file = getFpmAddress(version)
-    print(sock_file)
+    # print(sock_file)
     root_dir = mw.getRootDir() + '/phpinfo'
 
     mw.execShell("rm -rf " + root_dir)

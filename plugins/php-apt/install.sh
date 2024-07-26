@@ -44,7 +44,6 @@ if [ ! -d $curPath/versions/$2 ];then
 fi
 
 
-
 if [ "$OSNAME" == "ubuntu" ];then
 	find_source=`ls /etc/apt/sources.list.d | grep ondrej-ubuntu-php`
 	if [ "$find_source" == "" ];then

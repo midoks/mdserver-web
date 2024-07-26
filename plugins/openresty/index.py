@@ -106,7 +106,7 @@ def getInitDTpl():
 def getPidFile():
     file = getConf()
     content = mw.readFile(file)
-    rep = 'pid\s*(.*);'
+    rep = r'pid\s*(.*);'
     tmp = re.search(rep, content)
     return tmp.groups()[0].strip()
 
@@ -457,7 +457,7 @@ def getCfg():
     # {"name": "client_body_buffer_size", "ps": "请求主体缓冲区"}
     rdata = []
     for i in cfg_args:
-        rep = "(%s)\s+(\w+)" % i["name"]
+        rep = r"(%s)\s+(\w+)" % i["name"]
         k = re.search(rep, content)
         if not k:
             return mw.returnJson(False, "获取 key {} 失败".format(k))
@@ -516,12 +516,12 @@ def setCfg():
     # print(args)
     for k, v in args.items():
         # print(k, v)
-        rep = "%s\s+[^kKmMgG\;\n]+" % k
+        rep = r"%s\s+[^kKmMgG\;\n]+" % k
         if k == "worker_processes" or k == "gzip":
-            if not re.search("auto|on|off|\d+", v):
+            if not re.search(r"auto|on|off|\d+", v):
                 return mw.returnJson(False, '参数值错误')
         else:
-            if not re.search("\d+", v):
+            if not re.search(r"\d+", v):
                 return mw.returnJson(False, '参数值错误,请输入数字整数')
 
         if re.search(rep, content):

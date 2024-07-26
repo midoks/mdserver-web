@@ -8,10 +8,10 @@
 	"install_pre_inspection":true,
 	"checks":"server/openresty",
 	"path":"server/openresty",
-	"author":"nginx/agentzh",
+	"author":"agentzh",
 	"home":"http://openresty.org",
 	"date":"2017-11-24",
 	"pid": "1",
-	"versions": ["1.17.8.2","1.19.3.1","1.21.4.2","1.21.4.3","1.25.3.1"],
-	"updates": ["1.17.8.2","1.19.3.1","1.21.4.2","1.21.4.3","1.25.3.1"]
+	"versions": ["1.17.8","1.19.3","1.21.4","1.25.3"],
+	"updates": ["1.17.8.2","1.19.3.1","1.21.4.2","1.25.3.2"]
 }

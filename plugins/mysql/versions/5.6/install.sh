@@ -11,12 +11,52 @@ rootPath=$(dirname "$curPath")
 rootPath=$(dirname "$rootPath")
 serverPath=$(dirname "$rootPath")
 sysName=`uname`
+sysArch=`arch`
+
+_os=`uname`
+echo "use system: ${_os}"
+if [ ${_os} == "Darwin" ]; then
+	OSNAME='macos'
+elif grep -Eq "openSUSE" /etc/*-release; then
+	OSNAME='opensuse'
+	zypper refresh
+elif grep -Eq "FreeBSD" /etc/*-release; then
+	OSNAME='freebsd'
+	pkg install -y wget unzip
+elif grep -Eqi "Arch" /etc/issue || grep -Eq "Arch" /etc/*-release; then
+	OSNAME='arch'
+	echo y | pacman -Sy unzip
+elif grep -Eqi "CentOS" /etc/issue || grep -Eq "CentOS" /etc/*-release; then
+	OSNAME='centos'
+	yum install -y wget zip unzip
+elif grep -Eqi "Fedora" /etc/issue || grep -Eq "Fedora" /etc/*-release; then
+	OSNAME='fedora'
+	yum install -y wget zip unzip
+elif grep -Eqi "Rocky" /etc/issue || grep -Eq "Rocky" /etc/*-release; then
+	OSNAME='rocky'
+	yum install -y wget zip unzip
+elif grep -Eqi "AlmaLinux" /etc/issue || grep -Eq "AlmaLinux" /etc/*-release; then
+	OSNAME='alma'
+	yum install -y wget zip unzip
+elif grep -Eqi "Debian" /etc/issue || grep -Eq "Debian" /etc/*-release; then
+	OSNAME='debian'
+	apt update -y
+	apt install -y devscripts
+	apt install -y wget zip unzip
+elif grep -Eqi "Ubuntu" /etc/issue || grep -Eq "Ubuntu" /etc/*-release; then
+	OSNAME='ubuntu'
+	apt install -y wget zip unzip
+else
+	OSNAME='unknow'
+fi
+
+VERSION_ID=`cat /etc/*-release | grep VERSION_ID | awk -F = '{print $2}' | awk -F "\"" '{print $2}'`
 
 
 install_tmp=${rootPath}/tmp/mw_install.pl
 mysqlDir=${serverPath}/source/mysql
 
-VERSION=5.6.50
+VERSION=5.6.51
 Install_mysql()
 {
 	mkdir -p ${mysqlDir}
@@ -61,6 +101,29 @@ Install_mysql()
 		 cd ${mysqlDir} && tar -zxvf  ${mysqlDir}/mysql-${VERSION}.tar.gz
 	fi
 
+	WHERE_DIR_GCC=/usr/bin/gcc
+	WHERE_DIR_GPP=/usr/bin/g++
+	if [ ! -f $WHERE_DIR_GCC ];then
+		WHERE_DIR_GCC=`which gcc`
+	fi
+
+	if [ ! -f $WHERE_DIR_GPP ];then
+		WHERE_DIR_GPP=`which g++`
+	fi
+
+	if [ "$OSNAME" == "ubuntu" ];then
+		apt install -y libudev-dev
+		apt install -y libtirpc-dev
+		apt install -y libssl-dev
+		apt install -y libgssglue-dev
+		apt install -y software-properties-common
+		add-apt-repository -y ppa:ubuntu-toolchain-r/test
+
+		export PKG_CONFIG_PATH=/usr/lib/pkgconfig
+		apt install -y gcc-11 g++-11
+		WHERE_DIR_GCC=/usr/bin/gcc-11
+		WHERE_DIR_GPP=/usr/bin/g++-11
+	fi
 
 	OPTIONS=''
 	##check openssl version
@@ -68,8 +131,8 @@ Install_mysql()
 	if [ "${OPENSSL_VERSION}" -ge "3" ];then
 		#openssl version to high
 		cd ${rootPath}/plugins/php/lib && /bin/bash openssl10.sh
-		export PKG_CONFIG_PATH=$serverPath/lib/openssl10/lib/pkgconfig
-		OPTIONS="-DWITH_SSL=${serverPath}/lib/openssl10"
+		export PKG_CONFIG_PATH=$serverPath/lib/openssl11/lib/pkgconfig
+		OPTIONS="-DWITH_SSL=${serverPath}/lib/openssl11"
 	fi
 
 	if [ ! -d $serverPath/mysql ];then
@@ -88,8 +151,8 @@ Install_mysql()
 		-DDEFAULT_CHARSET=utf8mb4 \
 		-DDEFAULT_COLLATION=utf8mb4_general_ci \
 		$OPTIONS \
-		-DCMAKE_C_COMPILER=/usr/bin/gcc \
-		-DCMAKE_CXX_COMPILER=/usr/bin/g++ \
+		-DCMAKE_C_COMPILER=$WHERE_DIR_GCC \
+		-DCMAKE_CXX_COMPILER=$WHERE_DIR_GPP \
 		-DCMAKE_CXX_STANDARD=11
 		
 		make -j${cpuCore} && make install && make clean
@@ -100,9 +163,8 @@ Install_mysql()
 			echo '5.6' > $serverPath/mysql/version.pl
 			echo "${VERSION}安装完成"
 		else
-			# rm -rf ${mysqlDir}/mysql-5.6.50
+			# rm -rf ${mysqlDir}/mysql-5.6.*
 			echo "${VERSION}安装失败"
-			echo 'install fail'>&2
 			exit 1
 		fi
 	fi
@@ -111,7 +173,7 @@ Install_mysql()
 Uninstall_mysql()
 {
 	rm -rf $serverPath/mysql
-	echo '卸载完成' > $install_tmp
+	echo '卸载完成'
 }
 
 action=$1

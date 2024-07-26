@@ -32,6 +32,7 @@ if [ "$action" == 'install' ];then
 		bash ${FILE_COMMON} install ${version}
 	else
 		yum install -y php${version}-php-${extName}
+		yum install -y php${version}-php-pecl-${extName}
 	fi
 
 	# if [ "${extName}" == "mysql" ];then
@@ -48,11 +49,15 @@ if [ "$action" == 'uninstall' ];then
 		bash ${FILE_COMMON} uninstall ${version}
 	else
 		yum remove -y php${version}-php-${extName}
+		yum remove -y php${version}-php-pecl-${extName}
 	fi
 fi
 
 echo "yum install -y php${version}-php-${extName}"
+echo "yum install -y php${version}-php-pecl-${extName}"
+echo "-----------------------------------------------"
 echo "yum remove -y php${version}-php-${extName}"
+echo "yum remove -y php${version}-php-pecl-${extName}"
 
 
 echo "systemctl restart php${version}-php-fpm"
@@ -61,6 +66,4 @@ echo "php_status:${php_status}"
 if [ "$php_status" == "" ];then
 	systemctl restart php${version}-php-fpm
 fi
-
-
 

@@ -10,13 +10,15 @@ _os=`uname`
 echo "use system: ${_os}"
 
 if [ "$EUID" -ne 0 ]
-  then echo "Please run as root!"
-  exit
+	then echo "Please run as root!"
+	exit
 fi
 
 if [ ${_os} != "Darwin" ] && [ ! -d /www/server/mdserver-web/logs ]; then
 	mkdir -p /www/server/mdserver-web/logs
 fi
+
+LOG_FILE=/var/log/mw-update.log
 
 {
 
@@ -122,4 +124,4 @@ endTime=`date +%s`
 ((outTime=($endTime-$startTime)/60))
 echo -e "Time consumed:\033[32m $outTime \033[0mMinute!"
 
-} 1> >(tee mw-update.log) 2>&1
+} 1> >(tee $LOG_FILE) 2>&1

@@ -10,8 +10,13 @@ serverPath=$(dirname "$rootPath")
 sourcePath=${serverPath}/source
 sysName=`uname`
 install_tmp=${rootPath}/tmp/mw_install.pl
-
+SYS_ARCH=`arch`
 SYS_VERSION_ID=`cat /etc/*-release | grep VERSION_ID | awk -F = '{print $2}' | awk -F "\"" '{print $2}'`
+
+ubuntu_suffix=
+if [ "$SYS_ARCH" == "aarch64" ];then
+	ubuntu_suffix="-arm64"
+fi
 
 # 检查是否通
 # zabbix_get -s 127.0.0.1 -k agent.ping
@@ -19,10 +24,10 @@ Install_App()
 {
 	mkdir -p $serverPath/source/zabbix
 
-	ZABBIX_NAME=zabbix-release_7.0-2+ubuntu${SYS_VERSION_ID}_all.deb
-	echo "wget -O $serverPath/source/zabbix/${ZABBIX_NAME} https://repo.zabbix.com/zabbix/7.0/ubuntu/pool/main/z/zabbix-release/${ZABBIX_NAME}"
+	ZABBIX_NAME=zabbix-release_6.0-5+ubuntu${SYS_VERSION_ID}_all.deb
+	echo "wget -O $serverPath/source/zabbix/${ZABBIX_NAME} https://repo.zabbix.com/zabbix/6.0/ubuntu${ubuntu_suffix}/pool/main/z/zabbix-release/${ZABBIX_NAME}"
 	if [ ! -f  $serverPath/source/zabbix/${ZABBIX_NAME} ];then
-		wget -O $serverPath/source/zabbix/${ZABBIX_NAME} https://repo.zabbix.com/zabbix/7.0/ubuntu/pool/main/z/zabbix-release/${ZABBIX_NAME}
+		wget -O $serverPath/source/zabbix/${ZABBIX_NAME} https://repo.zabbix.com/zabbix/6.0/ubuntu${ubuntu_suffix}/pool/main/z/zabbix-release/${ZABBIX_NAME}
 	fi
 
 	# apt-get -f install

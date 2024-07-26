@@ -117,7 +117,7 @@ def readConfigTpl():
 def getPidFile():
     file = getConf()
     content = mw.readFile(file)
-    rep = 'pidfile\s*(.*)'
+    rep = r'pidfile\s*(.*)'
     tmp = re.search(rep, content)
     return tmp.groups()[0].strip()
 

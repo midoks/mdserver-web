@@ -116,7 +116,7 @@ def readConfigTpl():
 def getDbPort():
     file = getConf()
     content = mw.readFile(file)
-    rep = 'port\s*=\s*(\d*)?'
+    rep = r'port\s*=\s*(\d*)?'
     tmp = re.search(rep, content)
     return tmp.groups()[0].strip()
 
@@ -400,7 +400,7 @@ def initdUinstall():
 def getMyDbPos():
     file = getConf()
     content = mw.readFile(file)
-    rep = 'datadir\s*=\s*(.*)'
+    rep = r'datadir\s*=\s*(.*)'
     tmp = re.search(rep, content)
     return tmp.groups()[0].strip()
 
@@ -408,7 +408,7 @@ def getMyDbPos():
 def getPgPort():
     file = getConf()
     content = mw.readFile(file)
-    rep = 'port\s*=\s*(.*)'
+    rep = r'port\s*=\s*(.*)'
     tmp = re.search(rep, content)
     return tmp.groups()[0].strip()
 
@@ -422,7 +422,7 @@ def setPgPort():
     port = args['port']
     file = getConf()
     content = mw.readFile(file)
-    rep = "port\s*=\s*([0-9]+)\s*\n"
+    rep = r"port\s*=\s*([0-9]+)\s*\n"
     content = re.sub(rep, 'port = ' + port + '\n', content)
     mw.writeFile(file, content)
     restart()
@@ -866,7 +866,7 @@ def addDb():
     if listen_ip not in ["127.0.0.1/32", "localhost", "127.0.0.1"]:
         sedConf("listen_addresses", "'*'")
 
-    reg = "^[\w\.-]+$"
+    reg = r"^[\w\.-]+$"
     if not re.match(reg, dbname):
         return mw.returnJson(False, '数据库名称不能带有特殊符号!')
 
@@ -1337,7 +1337,7 @@ def addMasterRepSlaveUser(version=''):
     if len(password) < 1:
         password = mw.md5(time.time())[0:8]
 
-    if not re.match("^[\w\.-]+$", username):
+    if not re.match(r"^[\w\.-]+$", username):
         return mw.returnJson(False, '用户名不能带有特殊符号!')
     checks = ['root', 'mysql', 'test', 'sys', 'panel_logs']
     if username in checks or len(username) < 1:

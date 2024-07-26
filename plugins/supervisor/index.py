@@ -257,7 +257,7 @@ def confDlistTraceLog():
 
     confd_dir = getServerDir() + '/conf.d/' + args['name']
     content = mw.readFile(confd_dir)
-    rep = 'stdout_logfile\s*=\s*(.*)'
+    rep = r'stdout_logfile\s*=\s*(.*)'
     tmp = re.search(rep, content)
     return tmp.groups()[0].strip()
 
@@ -270,7 +270,7 @@ def confDlistErrorLog():
 
     confd_dir = getServerDir() + '/conf.d/' + args['name']
     content = mw.readFile(confd_dir)
-    rep = 'stderr_logfile\s*=\s*(.*)'
+    rep = r'stderr_logfile\s*=\s*(.*)'
     tmp = re.search(rep, content)
     return tmp.groups()[0].strip()
 

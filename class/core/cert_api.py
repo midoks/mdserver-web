@@ -377,7 +377,7 @@ fi
             return response
         except Exception as ex:
             # self.getError()
-            raise Exception("requestsPost: {}".format(self.getError(str(ex))))
+            raise Exception("异常: {}".format(self.getError(str(ex))))
 
     def getRequestJson(self, response):
         try:
@@ -1279,7 +1279,7 @@ fullchain.pem       粘贴到证书输入框
         file = self.getHostConf(siteName)
         if os.path.exists(file):
             conf = mw.readFile(file)
-            rep = '\s*root\s*(.+);'
+            rep = r'\s*root\s*(.+);'
             path = re.search(rep, conf).groups()[0]
             return path
         return ''
@@ -1391,7 +1391,8 @@ fullchain.pem       粘贴到证书输入框
                     raise Exception("指定订单号不存在，无法续签!")
                 order_index.append(index)
             else:
-                start_time = time.time() + (30 * 86400)
+                # 测试一天过期
+                now_time = time.time()
                 # print(self.__config)
                 if not 'orders' in self.__config:
                     self.__config['orders'] = {}
@@ -1402,16 +1403,14 @@ fullchain.pem       粘贴到证书输入框
                         continue
 
                     if 'cert' in self.__config['orders'][i]:
-                        self.__config['orders'][i]['cert_timeout'] = self.__config[
-                            'orders'][i]['cert']['cert_timeout']
+                        self.__config['orders'][i]['cert_timeout'] = self.__config['orders'][i]['cert']['cert_timeout']
 
                     if not 'cert_timeout' in self.__config['orders'][i]:
-                        self.__config['orders'][i][
-                            'cert_timeout'] = int(time.time())
+                        self.__config['orders'][i]['cert_timeout'] = int(time.time())
 
-                    if self.__config['orders'][i]['cert_timeout'] > start_time:
-                        msg = "|-本次跳过域名: {}，未过期!".format(
-                            self.__config['orders'][i]['domains'][0])
+                    # print(self.__config['orders'][i]['domains'][0], (self.__config['orders'][i]['cert_timeout'] - now_time)/86400, now_time)
+                    if self.__config['orders'][i]['cert_timeout'] - now_time > 83*86400:
+                        msg = "|-本次跳过域名: {}，未过期!".format(self.__config['orders'][i]['domains'][0])
                         writeLog(msg)
                         continue
 

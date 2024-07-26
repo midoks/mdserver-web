@@ -51,7 +51,7 @@ def getConf():
 def getPort():
     file = getConf()
     content = mw.readFile(file)
-    rep = 'listen\s*(.*);'
+    rep = r'listen\s*(.*);'
     tmp = re.search(rep, content)
     return tmp.groups()[0].strip()
 
@@ -193,7 +193,7 @@ def setXhPort():
     if not os.path.exists(file):
         return mw.returnJson(False, '插件未启动!')
     content = mw.readFile(file)
-    rep = 'listen\s*(.*);'
+    rep = r'listen\s*(.*);'
     content = re.sub(rep, "listen " + port + ';', content)
     mw.writeFile(file, content)
     mw.restartWeb()

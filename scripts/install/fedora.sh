@@ -78,13 +78,16 @@ yum install -y bc
 yum install -y gcc libffi-devel python-devel openssl-devel 
 yum install -y libmcrypt libmcrypt-devel python3-devel
 
-yum install -y wget python-devel python-imaging libicu-devel unzip bzip2-devel gcc libxml2 libxml2-devel libjpeg-devel libpng-devel libwebp libwebp-devel pcre pcre-devel crontabs
+yum install -y wget python-devel python-imaging libicu-devel unzip gcc libxml2 libxml2-devel libjpeg-devel libpng-devel libwebp libwebp-devel pcre pcre-devel crontabs
 yum install -y net-tools
 yum install -y ncurses-devel 
 yum install -y python-devel
 yum install -y MySQL-python
 yum install -y python3-devel
 yum install -y mysql-devel
+
+yum install -y  bzip2
+yum install -y  bzip2-devel
 
 yum install -y libtirpc libtirpc-devel
 yum install -y rpcgen

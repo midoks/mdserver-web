@@ -42,7 +42,7 @@ Talk is cheap, show me the code.  -- linus
 ### 主要插件介绍
 
 * OpenResty - 轻量级，占有内存少，并发能力强。
-* PHP[53-83] - PHP是世界上最好的编程语言。
+* PHP[53-84] - PHP是世界上最好的编程语言。
 * MySQL - 一种关系数据库管理系统。
 * MariaDB - 是MySQL的一个重要分支。
 * MySQL[APT/YUM] - 一种关系数据库管理系统。
@@ -75,10 +75,10 @@ Talk is cheap, show me the code.  -- linus
 
 ```
 phpMyAdmin[4.4.15]支持MySQL[5.5-5.7]
-phpMyAdmin[5.2.0]支持MySQL[8.0]
+phpMyAdmin[5.2.1]支持MySQL[8.0+]
 
 PHP[53-72]支持phpMyAdmin[4.4.15]
-PHP[72-83]支持phpMyAdmin[5.2.0]
+PHP[72-84]支持phpMyAdmin[5.2.1]
 ```
 
 # 郑重声明
@@ -110,9 +110,12 @@ docker run -itd --name mw-server --privileged=true -p 7200:7200 -p 80:80 -p 443:
 ```
 
 
-### 版本更新 0.17.1
+### 版本更新 0.17.2
 
-- 任务管理器-插件。
+- MySQL9.0。
+- zabbix,zabbix-agent测试。
+- 正则匹配修复(兼容)。
+- 常规更新。
 
 ### JSDelivr安装地址
 

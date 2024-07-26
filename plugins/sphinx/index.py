@@ -111,7 +111,7 @@ def status():
 
 def mkdirAll():
     content = mw.readFile(getConf())
-    rep = 'path\s*=\s*(.*)'
+    rep = r'path\s*=\s*(.*)'
     p = re.compile(rep)
     tmp = p.findall(content)
 
@@ -163,7 +163,7 @@ def initDreplace():
 
 def checkIndexSph():
     content = mw.readFile(getConf())
-    rep = 'path\s*=\s*(.*)'
+    rep = r'path\s*=\s*(.*)'
     p = re.compile(rep)
     tmp = p.findall(content)
     for x in tmp:
@@ -250,7 +250,7 @@ def initdUinstall():
 def runLog():
     path = getConf()
     content = mw.readFile(path)
-    rep = 'log\s*=\s*(.*)'
+    rep = r'log\s*=\s*(.*)'
     tmp = re.search(rep, content)
     return tmp.groups()[0]
 
@@ -258,7 +258,7 @@ def runLog():
 def getPort():
     path = getConf()
     content = mw.readFile(path)
-    rep = 'listen\s*=\s*(.*)'
+    rep = r'listen\s*=\s*(.*)'
     tmp = re.search(rep, content)
     return tmp.groups()[0]
 
@@ -266,7 +266,7 @@ def getPort():
 def queryLog():
     path = getConf()
     content = mw.readFile(path)
-    rep = 'query_log\s*=\s*(.*)'
+    rep = r'query_log\s*=\s*(.*)'
     tmp = re.search(rep, content)
     return tmp.groups()[0]
 
@@ -295,7 +295,7 @@ def sphinxConfParse():
     file = getConf()
     bin_dir = getServerDir()
     content = mw.readFile(file)
-    rep = 'index\s(.*)'
+    rep = r'index\s(.*)'
     sindex = re.findall(rep, content)
     indexlen = len(sindex)
     cmd = {}
@@ -423,7 +423,18 @@ def updateDelta():
 
     return ''
 
+def installPreInspection(version):
+    data = mw.execShell('arch')
+    if data[0].strip().startswith('aarch'):
+        return '不支持aarch架构'
+    return 'ok'
+
 if __name__ == "__main__":
+    version = "3.1.1"
+    version_pl = getServerDir() + "/version.pl"
+    if os.path.exists(version_pl):
+        version = mw.readFile(version_pl).strip()
+
     func = sys.argv[1]
     if func == 'status':
         print(status())
@@ -443,6 +454,8 @@ if __name__ == "__main__":
         print(initdInstall())
     elif func == 'initd_uninstall':
         print(initdUinstall())
+    elif func == 'install_pre_inspection':
+        print(installPreInspection(version))
     elif func == 'conf':
         print(getConf())
     elif func == 'config_tpl':

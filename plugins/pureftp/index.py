@@ -277,7 +277,7 @@ def getFtpPort():
     try:
         file = getServerDir() + '/etc/pure-ftpd.conf'
         conf = mw.readFile(file)
-        rep = "\n#?\s*Bind\s+[0-9]+\.[0-9]+\.[0-9]+\.+[0-9]+,([0-9]+)"
+        rep = r"\n#?\s*Bind\s+[0-9]+\.[0-9]+\.[0-9]+\.+[0-9]+,([0-9]+)"
         port = re.search(rep, conf).groups()[0]
     except:
         port = '21'

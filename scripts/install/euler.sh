@@ -33,6 +33,8 @@ yum install -y mysql-devel
 yum install -y expect
 yum install -y pv
 yum install -y bc
+yum install -y bzip2
+yum install -y bzip2-devel
 
 
 # if [ -f /usr/sbin/iptables ];then

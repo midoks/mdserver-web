@@ -68,6 +68,7 @@ apt install -y bc
 apt install -y python3-pip python3-dev python3-venv
 apt install -y libncurses5
 apt install -y libncurses5-dev
+apt install -y bzip2
 
 if [ -f /usr/sbin/ufw ];then
 	# look

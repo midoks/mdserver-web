@@ -62,6 +62,8 @@ pkg install -y pidof
 pkg install -y pstree
 pkg install -y pv
 pkg install -y bc
+pkg install -y bzip2
+pkg install -y bzip2-devel
 
 # curl https://sh.rustup.rs -sSf | sh
 pkg install -y rust

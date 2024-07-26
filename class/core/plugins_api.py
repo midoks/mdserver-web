@@ -480,7 +480,7 @@ class plugins_api:
         plugin_path = mw.getPluginDir() + '/' + plugin_name
         if not os.path.exists(plugin_path):
             print(mw.execShell('mkdir -p ' + plugin_path))
-        mw.execShell("\cp -rf " + tmp_path + '/* ' + plugin_path + '/')
+        mw.execShell("cp -rf " + tmp_path + '/* ' + plugin_path + '/')
         mw.execShell('chmod -R 755 ' + plugin_path)
         p_info = mw.readFile(plugin_path + '/info.json')
         if p_info:

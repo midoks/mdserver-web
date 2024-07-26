@@ -9,8 +9,13 @@ rootPath=$(dirname "$rootPath")
 serverPath=$(dirname "$rootPath")
 sourcePath=${serverPath}/source
 sysName=`uname`
-install_tmp=${rootPath}/tmp/mw_install.pl
+sysArch=`arch`
 
+install_tmp=${rootPath}/tmp/mw_install.pl
+ubuntu_suffix=
+if [ "$sysArch" == "aarch64" ];then
+	ubuntu_suffix="-arm64"
+fi
 SYS_VERSION_ID=`cat /etc/*-release | grep VERSION_ID | awk -F = '{print $2}' | awk -F "\"" '{print $2}'`
 
 # 检查是否通
@@ -20,9 +25,9 @@ Install_App()
 	mkdir -p $serverPath/source/zabbix
 
 	ZABBIX_NAME=zabbix-release_7.0-2+ubuntu${SYS_VERSION_ID}_all.deb
-	echo "wget -O $serverPath/source/zabbix/${ZABBIX_NAME} https://repo.zabbix.com/zabbix/7.0/ubuntu/pool/main/z/zabbix-release/${ZABBIX_NAME}"
+	echo "wget -O $serverPath/source/zabbix/${ZABBIX_NAME} https://repo.zabbix.com/zabbix/7.0/ubuntu${ubuntu_suffix}/pool/main/z/zabbix-release/${ZABBIX_NAME}"
 	if [ ! -f  $serverPath/source/zabbix/${ZABBIX_NAME} ];then
-		wget -O $serverPath/source/zabbix/${ZABBIX_NAME} https://repo.zabbix.com/zabbix/7.0/ubuntu/pool/main/z/zabbix-release/${ZABBIX_NAME}
+		wget -O $serverPath/source/zabbix/${ZABBIX_NAME} https://repo.zabbix.com/zabbix/7.0/ubuntu${ubuntu_suffix}/pool/main/z/zabbix-release/${ZABBIX_NAME}
 	fi
 
 	# apt-get -f install
@@ -31,13 +36,15 @@ Install_App()
 	cd $serverPath/source/zabbix && dpkg -i ${ZABBIX_NAME}
 	apt update -y 
 
-	apt install -y zabbix-server-mysql zabbix-frontend-php zabbix-sql-scripts zabbix-get
+	apt install -y zabbix-server-mysql
+	apt install -y zabbix-frontend-php zabbix-sql-scripts
 	apt install -y zabbix-agent
 }
 
 Uninstall_App()
 {
-	apt remove -y zabbix-server-mysql zabbix-frontend-php zabbix-sql-scripts zabbix-get
+	apt remove -y zabbix-server-mysql
+	apt remove -y zabbix-frontend-php zabbix-sql-scripts
 	apt remove -y zabbix-agent
 	rm -rf /etc/zabbix
 	
