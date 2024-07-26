@@ -1409,7 +1409,7 @@ fullchain.pem       粘贴到证书输入框
                         self.__config['orders'][i]['cert_timeout'] = int(time.time())
 
                     # print(self.__config['orders'][i]['domains'][0], (self.__config['orders'][i]['cert_timeout'] - now_time)/86400, now_time)
-                    if self.__config['orders'][i]['cert_timeout'] - now_time < 1*86400:
+                    if self.__config['orders'][i]['cert_timeout'] - now_time > 1*86400:
                         msg = "|-本次跳过域名: {}，未过期!".format(self.__config['orders'][i]['domains'][0])
                         writeLog(msg)
                         continue
