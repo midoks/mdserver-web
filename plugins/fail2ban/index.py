@@ -132,11 +132,11 @@ def initDreplace():
     file_bin = initD_path + '/' + getPluginName()
 
     # initd replace
-    if not os.path.exists(file_bin):
-        content = mw.readFile(file_tpl)
-        content = content.replace('{$SERVER_PATH}', service_path)
-        mw.writeFile(file_bin, content)
-        mw.execShell('chmod +x ' + file_bin)
+    # if not os.path.exists(file_bin):
+    #     content = mw.readFile(file_tpl)
+    #     content = content.replace('{$SERVER_PATH}', service_path)
+    #     mw.writeFile(file_bin, content)
+    #     mw.execShell('chmod +x ' + file_bin)
 
     # systemd
     systemDir = mw.systemdCfgDir()
