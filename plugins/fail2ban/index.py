@@ -96,6 +96,9 @@ def readConfigTpl():
     content = mw.readFile(args['file'])
     content = contentReplace(content)
     return mw.returnJson(True, 'ok', content)
+    
+def runLog():
+    return '/var/log/fail2ban.log'
 
 def f2bDir():
     return '/run/fail2ban'
@@ -191,18 +194,6 @@ def reload():
     return f2bOp('reload')
 
 
-def getPort():
-    conf = getServerDir() + '/redis.conf'
-    content = mw.readFile(conf)
-
-    rep = r"^(" + r'port' + r')\s*([.0-9A-Za-z_& ~]+)'
-    tmp = re.search(rep, content, re.M)
-    if tmp:
-        return tmp.groups()[1]
-
-    return '6379'
-
-
 def initdStatus():
     current_os = mw.getOs()
     if current_os == 'darwin':
@@ -255,8 +246,7 @@ def initdUinstall():
     return 'ok'
 
 
-def runLog():
-    return '/var/log/fail2ban.log'
+
 
 
 if __name__ == "__main__":
