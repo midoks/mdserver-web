@@ -17,6 +17,11 @@ if mw.isAppleSystem():
 def getPluginName():
     return 'fail2ban'
 
+def f2bDir():
+    return '/run/fail2ban'
+
+def f2bEtcDir():
+    return '/etc/fail2ban'
 
 def getPluginDir():
     return mw.getPluginDir() + '/' + getPluginName()
@@ -38,7 +43,7 @@ def getInitDFile():
 
 
 def getConf():
-    path = getServerDir() + "/redis.conf"
+    path = f2bEtcDir() + "/fail2ban.conf"
     return path
 
 
@@ -96,12 +101,9 @@ def readConfigTpl():
     content = mw.readFile(args['file'])
     content = contentReplace(content)
     return mw.returnJson(True, 'ok', content)
-    
+
 def runLog():
     return '/var/log/fail2ban.log'
-
-def f2bDir():
-    return '/run/fail2ban'
 
 def getPidFile():
     f2dir = f2bDir()
