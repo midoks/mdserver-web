@@ -20,15 +20,11 @@ Install_App()
 	apt install -y fail2ban
 
 	mkdir -p $serverPath/fail2ban
-	sed '/^ *#/d' fail2ban.conf > $serverPath/fail2ban/redis.conf
-
 	echo "${VERSION}" > $serverPath/fail2ban/version.pl
 	echo '安装fail2ban完成'
 
 	cd ${rootPath} && python3 ${rootPath}/plugins/fail2ban/index.py start
 	cd ${rootPath} && python3 ${rootPath}/plugins/fail2ban/index.py initd_install
-		
-
 }
 
 Uninstall_App()
