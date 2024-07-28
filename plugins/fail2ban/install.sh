@@ -10,10 +10,14 @@ serverPath=$(dirname "$rootPath")
 install_tmp=${rootPath}/tmp/mw_install.pl
 VERSION=$2
 
+# cd /www/server/mdserver-web/plugins/redis && bash install.sh install 1.1.0
+
 Install_App()
 {
 	echo '正在安装脚本文件...' > $install_tmp
 	mkdir -p $serverPath/source
+
+	apt install -y fail2ban
 
 	mkdir -p $serverPath/fail2ban
 	sed '/^ *#/d' fail2ban.conf > $serverPath/fail2ban/redis.conf
