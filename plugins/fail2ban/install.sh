@@ -33,6 +33,9 @@ Install_App()
 
 Uninstall_App()
 {
+	apt remove -y fail2ban
+
+
 	if [ -f /usr/lib/systemd/system/fail2ban.service ];then
 		systemctl stop fail2ban
 		systemctl disable fail2ban
