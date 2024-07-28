@@ -10,7 +10,7 @@ serverPath=$(dirname "$rootPath")
 install_tmp=${rootPath}/tmp/mw_install.pl
 VERSION=$2
 
-# cd /www/server/mdserver-web/plugins/redis && bash install.sh install 1.1.0
+# cd /www/server/mdserver-web/plugins/fail2ban && bash install.sh install 1.1.0
 
 Install_App()
 {
