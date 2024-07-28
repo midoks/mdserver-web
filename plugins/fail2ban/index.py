@@ -256,7 +256,7 @@ def initdUinstall():
 
 
 def runLog():
-    return getServerDir() + '/data/redis.log'
+    return '/var/log/fail2ban.log'
 
 
 if __name__ == "__main__":
