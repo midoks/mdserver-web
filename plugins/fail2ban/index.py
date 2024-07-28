@@ -87,7 +87,8 @@ def configTpl():
     pathFile = os.listdir(path)
     tmp = []
     for one in pathFile:
-        file = path + '/' + one
+        if one.endswith("conf"):
+            file = path + '/' + one
         tmp.append(file)
     return mw.getJson(tmp)
 
