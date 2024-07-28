@@ -97,23 +97,17 @@ def readConfigTpl():
     content = contentReplace(content)
     return mw.returnJson(True, 'ok', content)
 
+def f2bDir():
+    return '/run/fail2ban'
+
 def getPidFile():
-    file = getConf()
-    content = mw.readFile(file)
-    rep = r'pidfile\s*(.*)'
-    tmp = re.search(rep, content)
-    return tmp.groups()[0].strip()
+    f2dir = f2bDir()
+    return f2dir+'/fail2ban.pid'
 
 def status():
     pid_file = getPidFile()
     if not os.path.exists(pid_file):
         return 'stop'
-
-    # data = mw.execShell(
-    #     "ps aux|grep redis |grep -v grep | grep -v python | grep -v mdserver-web | awk '{print $2}'")
-
-    # if data[0] == '':
-    #     return 'stop'
     return 'start'
 
 def contentReplace(content):
