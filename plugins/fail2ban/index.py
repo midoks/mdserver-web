@@ -83,7 +83,7 @@ def checkArgs(data, ck=[]):
     return (True, mw.returnJson(True, 'ok'))
 
 def configTpl():
-    path = getPluginDir() + '/tpl'
+    path = f2bEtcDir()
     pathFile = os.listdir(path)
     tmp = []
     for one in pathFile:
