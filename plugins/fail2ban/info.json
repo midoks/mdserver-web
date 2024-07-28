@@ -1,0 +1,18 @@
+{
+	"sort": 7,
+	"ps": "防止恶意IP地址暴力破解服务、站点，禁止导致多个身份验证错误的主机",
+	"name": "fail2ban",
+	"title": "fail2ban",
+	"shell": "install.sh",
+	"versions":["1.1.0"],
+	"updates":["1.1.0"],
+	"tip": "soft",
+	"checks": "server/fail2ban",
+	"path": "server/fail2ban",
+	"display": 1,
+	"author": "fail2ban",
+	"date": "2025-07-28",
+	"home": "https://www.fail2ban.org",
+	"type": 0,
+	"pid": "2"
+}
