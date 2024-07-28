@@ -195,15 +195,15 @@ def f2bOp(method):
 
 
 def start():
-    return redisOp('start')
+    return f2bOp('start')
 
 
 def stop():
-    return redisOp('stop')
+    return f2bOp('stop')
 
 
 def restart():
-    status = redisOp('restart')
+    status = f2bOp('restart')
 
     log_file = runLog()
     mw.execShell("echo '' > " + log_file)
@@ -211,7 +211,7 @@ def restart():
 
 
 def reload():
-    return redisOp('reload')
+    return f2bOp('reload')
 
 
 def getPort():
