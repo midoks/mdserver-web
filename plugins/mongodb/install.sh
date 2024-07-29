@@ -66,7 +66,7 @@ Install_app()
 	if [ -f $shell_file ];then
 		bash -x $shell_file
 	else
-		echo '不支持...' > $install_tmp 
+		echo '不支持...'
 		exit 1
 	fi
 
