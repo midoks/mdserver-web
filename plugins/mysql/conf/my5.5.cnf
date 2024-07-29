@@ -103,7 +103,7 @@ secure-file-priv={$SERVER_APP_PATH}/tmp
 
 [mysqldump]
 quick
-max_allowed_packet = 16M
+max_allowed_packet = 32M
 
 [mysql]
 no-auto-rehash
