@@ -36,7 +36,7 @@ if [ -f ${rootPath}/bin/activate ];then
 fi
 Install_app()
 {
-	echo '正在安装脚本文件...' > $install_tmp
+	echo '正在安装脚本文件...'
 	mkdir -p $serverPath/source
 
 	# if id mongodb &> /dev/null ;then 
