@@ -15,7 +15,7 @@ echo $sys_os
 
 Install_mem(){
 	mkdir -p $serverPath/source
-	mkdir -p $serverPath/memcached
+	mkdir -p $serverPath/source/memcached
 	echo '正在安装脚本文件...' > $install_tmp
 
 	if [ ! -f $serverPath/source/memcached.tar.gz ];then
