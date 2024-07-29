@@ -34,10 +34,10 @@ Install_App()
 		mkdir -p /home/postgres
 	fi
 
-	if [ "$sysName" != "Darwin" ];then
-		mkdir -p /var/log/mariadb
-		touch /var/log/mariadb/mariadb.log
-	fi
+	# if [ "$sysName" != "Darwin" ];then
+	# 	mkdir -p /var/log/mariadb
+	# 	touch /var/log/mariadb/mariadb.log
+	# fi
 
 	# ----- cpu start ------
 	if [ -z "${cpuCore}" ]; then
