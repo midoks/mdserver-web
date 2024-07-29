@@ -10,6 +10,8 @@ elif grep -Eq "openSUSE" /etc/*-release; then
     OSNAME='opensuse'
 elif grep -Eq "FreeBSD" /etc/*-release; then
     OSNAME='freebsd'
+elif grep -Eqi "EulerOS" /etc/*-release || grep -Eqi "openEuler" /etc/*-release; then
+    OSNAME='euler'
 elif grep -Eqi "Arch" /etc/issue || grep -Eq "Arch" /etc/*-release; then
     OSNAME='arch'
 elif grep -Eqi "CentOS" /etc/issue || grep -Eq "CentOS" /etc/*-release; then
