@@ -87,9 +87,10 @@ Install_App()
 
 	if [ -d $serverPath/postgresql ];then
 		echo "${VERSION}" > $serverPath/postgresql/version.pl
-		echo '安装成功'
+		echo '安装postgresql成功'
 	else
-		echo '安装失败'
+		echo '安装postgresql失败'
+		rm -rf ${postgreDir}/postgresql-${VERSION}.tar.bz2
 	fi
 }
 
