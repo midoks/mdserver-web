@@ -39,7 +39,7 @@ Install_mem(){
 
 	if [ -d $serverPath/memcached ];then
 		echo '1.6' > $serverPath/memcached/version.pl
-		echo 'install ok' > $install_tmp
+		echo '安装memcached成功'
 
 		cd ${rootPath} && python3 ${rootPath}/plugins/memcached/index.py start
 		cd ${rootPath} && python3 ${rootPath}/plugins/memcached/index.py initd_install
@@ -62,6 +62,7 @@ Uninstall_mem()
 		$serverPath/memcached/initd/memcached stop
 	fi
 	rm -rf $serverPath/memcached
+	echo '卸载memcached成功'
 }
 
 
