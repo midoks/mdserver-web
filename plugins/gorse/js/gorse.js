@@ -60,6 +60,7 @@ function gorseReadme(){
     var readme = '<ul class="help-info-text c7">';
     readme += '<li>参考官方</li>';
     readme += '<li><a target="_blank" href="https://gorse.io">https://gorse.io</a></li>';
+    readme += '<li>mongodb初始化,是无认证的</li>';
     readme += '</ul>';
 
     $('.soft-man-con').html(readme);   
