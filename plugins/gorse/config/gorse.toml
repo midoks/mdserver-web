@@ -1,6 +1,8 @@
 [database]
 cache_store = "{$CONFIG_REDIS}"
 data_store = "mongodb://127.0.0.1:27017/gorse"
+#data_store = "mysql://gorse:gorse@tcp(127.0.0.1:33206)/gorse"
+
 
 table_prefix = "gorse_"
 cache_table_prefix = "gorse_"
