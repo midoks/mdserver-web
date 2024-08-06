@@ -429,6 +429,19 @@ mw_connect_mysql(){
 }
 
 
+mw_mongodb(){
+    CONF="${ROOT_PATH}/mongodb/mongodb.conf"
+    if [ ! -f "$CONF" ]; then
+        echo -e "not install mongodb!"
+        exit 1
+    fi
+
+    MGDB_PORT=$(cat $CONF |grep port|grep -v '#'|awk '{print $2}')
+
+    echo ${MGDB_PORT}
+}
+
+
 mw_redis(){
     CONF="${ROOT_PATH}/redis/redis.conf"
 
