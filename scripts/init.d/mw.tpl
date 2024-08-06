@@ -437,8 +437,9 @@ mw_mongodb(){
     fi
 
     MGDB_PORT=$(cat $CONF |grep port|grep -v '#'|awk '{print $2}')
-
-    echo ${MGDB_PORT}
+    CLIEXEC="${ROOT_PATH}/mongodb/bin/mongosh --port ${MGDB_PORT}"
+    echo $CLIEXEC
+    ${CLIEXEC}
 }
 
 
