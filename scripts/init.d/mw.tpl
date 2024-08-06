@@ -498,6 +498,7 @@ case "$1" in
     'mirror') mw_mirror;;
     'db') mw_connect_mysql;;
     'redis') mw_redis;;
+    'mongodb') mw_mongodb;;
     'venv') mw_update_venv;;
     'clean_lib') mw_clean_lib;;
     'default')
