@@ -1289,6 +1289,10 @@ def getListBson(dbname=''):
             r.append(x)
     return r
 
+def rootPwd():
+    return pSqliteDb('config').where(
+        'id=?', (1,)).getField('mg_root')
+
 def importDbExternal():
     args = getArgs()
     data = checkArgs(args, ['file', 'name'])
@@ -1568,6 +1572,8 @@ if __name__ == "__main__":
         print(saveConfig())
     elif func == 'set_config_auth':
         print(setConfigAuth())
+    elif func == 'root_pwd':
+        print(rootPwd())
     elif func == 'get_db_list':
         print(getDbList())
     elif func == 'add_db':

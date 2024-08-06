@@ -437,7 +437,15 @@ mw_mongodb(){
     fi
 
     MGDB_PORT=$(cat $CONF |grep port|grep -v '#'|awk '{print $2}')
-    CLIEXEC="${ROOT_PATH}/mongodb/bin/mongosh --port ${MGDB_PORT}"
+    MGDB_AUTH=$(cat $CONF |grep authorization | grep -v '#'|awk '{print $2}')
+
+    AUTH_STR=""
+    if [[ "$MGDB_AUTH" == "enabled" ]];then
+        pwd=$(cd ${ROOT_PATH}/mdserver-web && python3 ${ROOT_PATH}/mdserver-web/plugins/mongodb/index.py root_pwd)
+        AUTH_STR="-u root -p ${pwd}"
+    fi
+
+    CLIEXEC="${ROOT_PATH}/mongodb/bin/mongosh --port ${MGDB_PORT} ${AUTH_STR}"
     echo $CLIEXEC
     ${CLIEXEC}
 }
