@@ -62,7 +62,7 @@ Install_App()
 		fi
 	fi
 
-	echo '正在安装脚本文件...' > $install_tmp
+	echo '正在安装脚本文件...'
 	version=$1
 	
 
@@ -97,7 +97,7 @@ Install_App()
 		cd ${rootPath} && python3 plugins/gitea/index.py initd_install
 	fi
 
-	echo 'install success' > $install_tmp
+	echo 'install success'
 }
 
 Uninstall_App()
