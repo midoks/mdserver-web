@@ -227,7 +227,6 @@ function initTabMongodb(){
 }
 
 
-
 function initTabMemcached(){
     memcachedGetList();
 
@@ -288,7 +287,11 @@ function mysqlGetDbName(){
 }
 
 function mysqlGetTableName(){
-    return $('#mysql .mysql_table_list select[name=mysql_table]').val();
+    var table = $('#mysql .mysql_table_list select[name=mysql_table]').val();
+    if (!table){
+        return '';
+    }
+    return table;
 }
 
 function mysqlInitField(f, data){
@@ -397,7 +400,7 @@ function mysqlGetDataList(p){
     } else {
         request_data['where'] = {};
     }
-    // console.log(request_data);
+
     myPostCB('get_data_list',request_data ,function(rdata){
 
         if (rdata.data.status){
@@ -758,6 +761,7 @@ function mongodbCollectionName(){
 function mongodbGetList(){
     var sid = mongodbGetSid();
     mgdbPostCB('get_db_list',{'sid':sid} ,function(rdata){
+        console.log(rdata);
         if (rdata.data.status){
             var list = rdata.data.data['list'];
             var content = '';
@@ -772,8 +776,14 @@ function mongodbGetList(){
             $('.db_list select').html(content);
 
             if (list.length > 0) {
+                console.log('mongodbGetCollections:'+list[0]);
                 mongodbGetCollections(list[0]);
             }
+
+            $('#mongodb_select .db_list select[name="db"]').change(function(){
+                var collection_name = $(this).val();
+                mongodbGetCollections(collection_name);
+            });
 
             closeInstallLayer();
         } else {
@@ -787,6 +797,8 @@ function mongodbGetCollections(name){
     var sid = mongodbGetSid();
     
     mgdbPostCB('get_collections_list',{'sid':sid,'name':name} ,function(rdata){
+
+        console.log(rdata);
         if (rdata.data.status){
             var list = rdata.data.data['collections'];
 

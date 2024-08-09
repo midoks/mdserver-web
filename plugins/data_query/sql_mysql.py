@@ -167,6 +167,19 @@ class nosqlMySQLCtr():
         sid = args['sid']
         db = args['db']
         table = args['table']
+        if table == '':
+            page_args = {}
+            page_args['count'] = 0
+            page_args['tojs'] = 'mysqlGetDataList'
+            page_args['p'] = 1
+            page_args['row'] = 10
+
+            rdata = {}
+            rdata['page'] = mw.getPage(page_args)
+            rdata['list'] = []
+            rdata['count'] = 0
+            return mw.returnData(True,'ok', rdata)
+
         p = 1
         size = 10
         if 'p' in args:
@@ -223,6 +236,7 @@ class nosqlMySQLCtr():
         rdata['soso_field'] = ''
         if 'field' in args_where:
             rdata['soso_field'] = args_where['field']
+
         return mw.returnData(True,'ok', rdata)
 
     def showProcessList(self,args):
