@@ -761,7 +761,7 @@ function mongodbCollectionName(){
 function mongodbGetList(){
     var sid = mongodbGetSid();
     mgdbPostCB('get_db_list',{'sid':sid} ,function(rdata){
-        console.log(rdata);
+        // console.log(rdata);
         if (rdata.data.status){
             var list = rdata.data.data['list'];
             var content = '';
@@ -776,7 +776,6 @@ function mongodbGetList(){
             $('.db_list select').html(content);
 
             if (list.length > 0) {
-                console.log('mongodbGetCollections:'+list[0]);
                 mongodbGetCollections(list[0]);
             }
 
@@ -797,8 +796,7 @@ function mongodbGetCollections(name){
     var sid = mongodbGetSid();
     
     mgdbPostCB('get_collections_list',{'sid':sid,'name':name} ,function(rdata){
-
-        console.log(rdata);
+        // console.log(rdata);
         if (rdata.data.status){
             var list = rdata.data.data['collections'];
 
@@ -829,13 +827,19 @@ function mongodbGetCollections(name){
                     var isAdd = data.isAdd;
                     if (isAdd){
                         $('#mongodb').data('collection',change[0].value);
-                        mongodbDataList(1);
+
+                        setTimeout(function(){
+                            mongodbDataList(1);
+                        },200);
                     }
                 },
             });
 
             if (select_list.length > 0){
-                mongodbDataList(1);
+
+                setTimeout(function(){
+                    mongodbDataList(1);
+                },200);
             } 
         }
     });
