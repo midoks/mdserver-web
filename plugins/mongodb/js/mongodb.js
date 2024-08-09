@@ -849,6 +849,7 @@ function repTools(db_name, res){
                     <td>' + toSize(rdata.collection_list[i].storage_size) + '</td>\
                     <td>' + rdata.collection_list[i].nindexes + '</td>\
                     <td>' + toSize(rdata.collection_list[i].total_index_size) + '</td>\
+                    <td>'+"删除"+'</td>\
                 </tr> '
         }
 
@@ -879,6 +880,7 @@ function repTools(db_name, res){
                                         <th>存储大小</th>\
                                         <th>索引数量</th>\
                                         <th>索引大小</th>\
+                                        <th>操作</th>\
                                     </tr>\
                                 </thead>\
                                 <tbody class="gztr">' + tbody + '</tbody>\
