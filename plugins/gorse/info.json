@@ -1,0 +1,18 @@
+{
+	"sort": 7,
+	"ps": "一款高效简单的推荐系统【单机】",
+	"name": "gorse",
+	"title": "Gorse",
+	"shell": "install.sh",
+	"versions":["0.4.15"],
+	"tip": "soft",
+	"install_pre_inspection":true,
+	"checks": "server/gorse",
+	"path": "server/gorse",
+	"display": 1,
+	"author": "midoks",
+	"date": "2024-06-12",
+	"home": "https://gorse.io/zh/docs/master/deploy/binary.html",
+	"type": 0,
+	"pid": "5"
+}

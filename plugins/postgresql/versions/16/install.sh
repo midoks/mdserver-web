@@ -34,10 +34,10 @@ Install_App()
 		mkdir -p /home/postgres
 	fi
 
-	if [ "$sysName" != "Darwin" ];then
-		mkdir -p /var/log/mariadb
-		touch /var/log/mariadb/mariadb.log
-	fi
+	# if [ "$sysName" != "Darwin" ];then
+	# 	mkdir -p /var/log/mariadb
+	# 	touch /var/log/mariadb/mariadb.log
+	# fi
 
 	# ----- cpu start ------
 	if [ -z "${cpuCore}" ]; then
@@ -87,9 +87,10 @@ Install_App()
 
 	if [ -d $serverPath/postgresql ];then
 		echo "${VERSION}" > $serverPath/postgresql/version.pl
-		echo '安装成功'
+		echo '安装postgresql成功'
 	else
-		echo '安装失败'
+		echo '安装postgresql失败'
+		rm -rf ${postgreDir}/postgresql-${VERSION}.tar.bz2
 	fi
 }
 

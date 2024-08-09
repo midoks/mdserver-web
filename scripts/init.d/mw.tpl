@@ -429,6 +429,28 @@ mw_connect_mysql(){
 }
 
 
+mw_mongodb(){
+    CONF="${ROOT_PATH}/mongodb/mongodb.conf"
+    if [ ! -f "$CONF" ]; then
+        echo -e "not install mongodb!"
+        exit 1
+    fi
+
+    MGDB_PORT=$(cat $CONF |grep port|grep -v '#'|awk '{print $2}')
+    MGDB_AUTH=$(cat $CONF |grep authorization | grep -v '#'|awk '{print $2}')
+
+    AUTH_STR=""
+    if [[ "$MGDB_AUTH" == "enabled" ]];then
+        pwd=$(cd ${ROOT_PATH}/mdserver-web && python3 ${ROOT_PATH}/mdserver-web/plugins/mongodb/index.py root_pwd)
+        AUTH_STR="-u root -p ${pwd}"
+    fi
+
+    CLIEXEC="${ROOT_PATH}/mongodb/bin/mongosh --port ${MGDB_PORT} ${AUTH_STR}"
+    echo $CLIEXEC
+    ${CLIEXEC}
+}
+
+
 mw_redis(){
     CONF="${ROOT_PATH}/redis/redis.conf"
 
@@ -485,6 +507,7 @@ case "$1" in
     'mirror') mw_mirror;;
     'db') mw_connect_mysql;;
     'redis') mw_redis;;
+    'mongodb') mw_mongodb;;
     'venv') mw_update_venv;;
     'clean_lib') mw_clean_lib;;
     'default')

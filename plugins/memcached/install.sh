@@ -15,14 +15,14 @@ echo $sys_os
 
 Install_mem(){
 	mkdir -p $serverPath/source
-	# mkdir -p $serverPath/memcached
+	mkdir -p $serverPath/source/memcached
 	echo '正在安装脚本文件...' > $install_tmp
 
 	if [ ! -f $serverPath/source/memcached.tar.gz ];then
-		wget  --no-check-certificate -O $serverPath/source/memcached.tar.gz http://www.memcached.org/files/memcached-${VERSION}.tar.gz
+		wget  --no-check-certificate -O $serverPath/source/memcached/memcached.tar.gz https://www.memcached.org/files/memcached-${VERSION}.tar.gz
 	fi
 	
-	cd $serverPath/source && tar -zxvf memcached.tar.gz
+	cd $serverPath/source/memcached && tar -zxvf memcached.tar.gz
 
 	OPTIONS=''
 	if [ ${sys_os} == "Darwin" ]; then
@@ -31,7 +31,7 @@ Install_mem(){
 	fi
 
 	echo "./configure --prefix=${serverPath}/memcached && make && make install"
-	cd $serverPath/source/memcached-${VERSION}
+	cd $serverPath/source/memcached/memcached-${VERSION}
 	./configure --prefix=$serverPath/memcached \
 	$OPTIONS
 
@@ -39,12 +39,12 @@ Install_mem(){
 
 	if [ -d $serverPath/memcached ];then
 		echo '1.6' > $serverPath/memcached/version.pl
-		echo 'install ok' > $install_tmp
+		echo '安装memcached成功'
 
 		cd ${rootPath} && python3 ${rootPath}/plugins/memcached/index.py start
 		cd ${rootPath} && python3 ${rootPath}/plugins/memcached/index.py initd_install
 
-		rm -rf $serverPath/source/memcached-${VERSION}
+		rm -rf $serverPath/source/memcached/memcached-${VERSION}
 	fi
 }
 
@@ -62,6 +62,7 @@ Uninstall_mem()
 		$serverPath/memcached/initd/memcached stop
 	fi
 	rm -rf $serverPath/memcached
+	echo '卸载memcached成功'
 }
 
 

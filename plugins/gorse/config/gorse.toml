@@ -1,0 +1,92 @@
+[database]
+cache_store = "{$CONFIG_REDIS}"
+data_store = "mongodb://127.0.0.1:27017/gorse"
+#data_store = "mysql://gorse:gorse@tcp(127.0.0.1:33206)/gorse"
+
+
+table_prefix = "gorse_"
+cache_table_prefix = "gorse_"
+data_table_prefix = "gorse_"
+
+[master]
+port = 8086
+host = "0.0.0.0"
+http_port = 8088
+http_host = "0.0.0.0"
+http_cors_domains = []
+http_cors_methods = []
+n_jobs = 1
+meta_timeout = "10s"
+dashboard_user_name = "{$CONFIG_ADMIN}"
+dashboard_password = "{$CONFIG_PASS}"
+admin_api_key = ""
+
+[server]
+default_n = 10
+api_key = ""
+clock_error = "5s"
+auto_insert_user = true
+auto_insert_item = true
+cache_expire = "10s"
+
+[recommend]
+cache_size = 100
+cache_expire = "72h"
+
+[recommend.data_source]
+positive_feedback_types = ["star","like"]
+read_feedback_types = ["read"]
+positive_feedback_ttl = 0
+item_ttl = 0
+
+[recommend.popular]
+popular_window = "720h"
+
+[recommend.user_neighbors]
+neighbor_type = "similar"
+enable_index = true
+index_recall = 0.8
+index_fit_epoch = 3
+
+[recommend.item_neighbors]
+neighbor_type = "similar"
+enable_index = true
+index_recall = 0.8
+index_fit_epoch = 3
+
+[recommend.collaborative]
+enable_index = true
+index_recall = 0.9
+index_fit_epoch = 3
+model_fit_period = "60m"
+model_search_period = "360m"
+model_search_epoch = 100
+model_search_trials = 10
+enable_model_size_search = false
+
+[recommend.replacement]
+enable_replacement = false
+positive_replacement_decay = 0.8
+read_replacement_decay = 0.6
+
+[recommend.offline]
+check_recommend_period = "1m"
+refresh_recommend_period = "24h"
+enable_latest_recommend = true
+enable_popular_recommend = false
+enable_user_based_recommend = true
+enable_item_based_recommend = false
+enable_collaborative_recommend = true
+enable_click_through_prediction = true
+explore_recommend = { popular = 0.1, latest = 0.2 }
+
+[recommend.online]
+fallback_recommend = ["item_based", "latest"]
+num_feedback_fallback_item_based = 10
+
+[tracing]
+enable_tracing = false
+exporter = "jaeger"
+collector_endpoint = "http://localhost:14268/api/traces"
+sampler = "always"
+ratio = 1

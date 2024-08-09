@@ -36,7 +36,7 @@ if [ -f ${rootPath}/bin/activate ];then
 fi
 Install_app()
 {
-	echo '正在安装脚本文件...' > $install_tmp
+	echo '正在安装脚本文件...'
 	mkdir -p $serverPath/source
 
 	# if id mongodb &> /dev/null ;then 
@@ -66,7 +66,7 @@ Install_app()
 	if [ -f $shell_file ];then
 		bash -x $shell_file
 	else
-		echo '不支持...' > $install_tmp 
+		echo '不支持...'
 		exit 1
 	fi
 
