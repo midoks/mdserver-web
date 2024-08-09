@@ -662,6 +662,27 @@ def delDb():
     except Exception as ex:
         return mw.returnJson(False, '删除失败!' + str(ex))
 
+
+def delDbTable():
+    client = mongdbClient()
+    db = client.admin
+    sqlite_db = pSqliteDb('databases')
+
+    args = getArgs()
+    data = checkArgs(args, ['table_name', 'name'])
+    if not data[0]:
+        return data[1]
+
+    name = args['name']
+    table_name = args['table_name']
+
+    try:
+        cur_db = client[name]
+        cur_db[table_name].drop()
+        return mw.returnJson(True, '删除成功!')
+    except Exception as ex:
+        return mw.returnJson(False, '删除失败!' + str(ex))
+
 def setRootPwd(version=''):
     args = getArgs()
     data = checkArgs(args, ['password'])
@@ -1580,6 +1601,8 @@ if __name__ == "__main__":
         print(addDb())
     elif func == 'del_db':
         print(delDb())
+    elif func == 'del_db_table':
+        print(delDbTable())
     elif func == 'set_root_pwd':
         print(setRootPwd())
     elif func == 'set_user_pwd':
