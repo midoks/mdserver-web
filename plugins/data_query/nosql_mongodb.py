@@ -262,7 +262,12 @@ class nosqlMongodbCtr():
 
         # print(where)
         result = collection_instance.find(where).skip(start_index).limit(size).sort('_id',-1)
-        count = collection_instance.count_documents(where)
+        if where:
+            count = collection_instance.count_documents(where)
+        else:
+            collection_stats = db_instance.command("collStats", collection)
+            count = collection_stats.get("count")
+
         d = []
         for document in result:
             d.append(document)
