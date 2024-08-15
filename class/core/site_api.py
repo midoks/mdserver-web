@@ -1977,6 +1977,7 @@ class site_api:
 location ^~ {from} {\n\
     proxy_pass {to};\n\
     proxy_set_header Host {host};\n\
+    proxy_ssl_server_name on;\n\
     proxy_set_header X-Real-IP $remote_addr;\n\
     proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;\n\
     proxy_set_header REMOTE-HOST $remote_addr;\n\
