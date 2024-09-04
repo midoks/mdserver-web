@@ -5,7 +5,7 @@ import time
 import os
 import sys
 import re
-
+import subprocess
 
 sys.path.append(os.getcwd() + "/class/core")
 import mw
@@ -766,9 +766,11 @@ def projectScriptRun():
 
     repo_dir = mw.getServerDir()+'/git/'+ args['name']
 
-    mw.execShell(script_run)
-    mw.execShell('chown -R www:www ' + commit_log)
-    mw.execShell('chown -R www:www ' + repo_dir)
+    # mw.execShell(script_run)
+    subprocess.Popen(script_run, stdout=subprocess.PIPE, shell=True,
+                                 bufsize=4096, stderr=subprocess.PIPE)
+    subprocess.Popen('chown -R www:www ' + repo_dir, stdout=subprocess.PIPE, shell=True,
+                                 bufsize=4096, stderr=subprocess.PIPE)
     return mw.returnJson(True, '脚本文件执行成功,观察日志!')
 
 
