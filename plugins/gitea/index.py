@@ -764,8 +764,11 @@ def projectScriptRun():
     if not os.path.exists(commit_sh):
         return mw.returnJson(False, '脚本文件不存在!')
 
+    repo_dir = mw.getServerDir()+'/git/'+ args['name']
+
     mw.execShell(script_run)
     mw.execShell('chown -R www:www ' + commit_log)
+    mw.execShell('chown -R www:www ' + repo_dir)
     return mw.returnJson(True, '脚本文件执行成功,观察日志!')
 
 
