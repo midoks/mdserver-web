@@ -117,7 +117,7 @@ function getOpStatus() {
         layer.close(loadT); 
         try {
             var rdata = $.parseJSON(data.data);
-            if (!data.status){
+            if (!rdata.status){
                 showMsg(data.msg, function(){}, null,3000);
                 return;
             }
