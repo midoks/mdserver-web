@@ -118,7 +118,7 @@ function getOpStatus() {
         try {
             var rdata = $.parseJSON(data.data);
             if (!rdata.status){
-                showMsg(data.msg, function(){}, null,3000);
+                showMsg(rdata.msg, function(){}, null,3000);
                 return;
             }
 
