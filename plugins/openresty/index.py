@@ -433,7 +433,7 @@ def runInfo():
         data['Waiting'] = tmp[15]
         return mw.getJson(data)
     except Exception as e:
-        return 'oprenresty not started'
+        return mw.returnJson(False, "oprenresty not started!")
 
 
 def errorLogPath():
