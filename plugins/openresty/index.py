@@ -400,6 +400,10 @@ def initdUinstall():
 
 
 def runInfo():
+    op_status = status()
+    if op_status == 'stop':
+        return mw.returnJson(False, "未启动!")
+
     # 取Openresty负载状态
     try:
         url = 'http://127.0.0.1/nginx_status'
