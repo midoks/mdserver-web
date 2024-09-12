@@ -1,0 +1,33 @@
+<style>
+.overflow_hide {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    vertical-align: middle;
+}
+</style>
+
+<div class="bt-form">
+	<div class='plugin_version'></div>
+	<div class="bt-w-main">
+		<div class="bt-w-menu">
+			<p class="bgw" onclick="pluginService('acme_pandominassl_apply');">服务</p>
+			<p onclick="getRedisConfig($('.plugin_version').attr('version'));">DNSAPI</p>
+			<p onclick="redisStatus($('.plugin_version').attr('version'));">邮件地址</p>
+			<p onclick="replStatus($('.plugin_version').attr('version'));">域名SSL</p>
+			<p onclick="pluginLogs('acme_pandominassl_apply','','run_log');">HOOK脚本</p>
+			<p onclick="pluginLogs('acme_pandominassl_apply','','run_log');">日志</p>
+			<p onclick="apaReadme();">相关说明</p>
+			
+		</div>
+		<div class="bt-w-con pd15">
+			<div class="soft-man-con" style="height: 520px; overflow: auto;"></div>
+		</div>
+	</div>
+</div>
+<script type="text/javascript">
+resetPluginWinHeight(400);
+$.getScript( "/plugins/file?name=acme_pandominassl_apply&f=js/common.js", function(){
+	pluginService('acme_pandominassl_apply', $('.plugin_version').attr('version'));
+});
+</script>
