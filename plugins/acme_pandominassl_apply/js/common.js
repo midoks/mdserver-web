@@ -266,7 +266,7 @@ function getDnsapiTitle(name){
 
 
 function dnsapiAdd(row){
-    console.log(row);
+    // console.log(row);
     var option_name = '';
     var option_remark = '';
     var option_type = 'cf';
@@ -494,6 +494,20 @@ function domainDel(id, name){
 }
 
 function domainAdd(row){
+
+    var option_domian = '';
+    var option_remark = '';
+    var option_email = '';
+    var option_id = 0;
+    var option_dnsapi_id = 0;
+    if (typeof(row) != 'undefined'){
+        option_domian = row['domain'];
+        option_remark = row['remark'];
+        option_email = row['email'];
+        option_id = row['id'];
+        option_dnsapi_id = row['dnsapi_id'];
+    }
+
     layer.open({
         type: 1,
         area: '500px',
@@ -505,7 +519,7 @@ function domainAdd(row){
         content: "<form class='bt-form pd20' id='domain_add'>\
                     <div class='line'>\
                         <span class='tname'>域名</span>\
-                        <div class='info-r'><input name='domain' class='bt-input-text mr5' style='width:100%;' placeholder='域名' type='text'></div>\
+                        <div class='info-r'><input name='domain' class='bt-input-text mr5' style='width:100%;' value='"+option_domian+"' placeholder='域名' type='text'></div>\
                     </div>\
                     <div class='line'>\
                         <span class='tname'>DNSAPI</span>\
@@ -517,12 +531,13 @@ function domainAdd(row){
                     </div>\
                     <div class='line'>\
                         <span class='tname'>邮件</span>\
-                        <div class='info-r'><input name='email' class='bt-input-text mr5' style='width:100%;' placeholder='邮件' type='text'></div>\
+                        <div class='info-r'><input name='email' class='bt-input-text mr5' style='width:100%;' value='"+option_email+"' placeholder='邮件' type='text'></div>\
                     </div>\
                     <div class='line'>\
                         <span class='tname'>备注</span>\
-                        <div class='info-r'><input name='remark' class='bt-input-text mr5' style='width:100%;' placeholder='备注' type='text'></div>\
+                        <div class='info-r'><input name='remark' class='bt-input-text mr5' style='width:100%;' value='"+option_remark+"' placeholder='备注' type='text'></div>\
                     </div>\
+                    <input name='id' value='"+option_id+"' type='hidden'>\
                   </form>",
         success:function(){
             $("input[name='domain']").keyup(function(){
@@ -533,9 +548,12 @@ function domainAdd(row){
             var dnsapi_id_html = "<option value='0'>无设置</option>";
             apaPostN('dnsapi_list_all', {}, function(data){
                 var rdata = $.parseJSON(data.data);
-                // console.log(rdata);
                 for (var i = 0; i < rdata.length; i++) {
-                    dnsapi_id_html += "<option value='"+rdata[i]['id']+"'>"+rdata[i]['name']+"</option>";
+                    if (option_dnsapi_id == rdata[i]['id']){
+                        dnsapi_id_html += "<option value='"+rdata[i]['id']+"' selected>"+rdata[i]['name']+"</option>";
+                    } else {
+                        dnsapi_id_html += "<option value='"+rdata[i]['id']+"'>"+rdata[i]['name']+"</option>";
+                    }
                 }
                 $('select[name="dnsapi_id"]').html(dnsapi_id_html);
             });

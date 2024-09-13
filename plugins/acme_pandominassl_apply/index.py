@@ -372,10 +372,11 @@ def emailDel():
 
 def domainAdd():
     args = getArgs()
-    data = checkArgs(args,['domain', 'email','remark'])
+    data = checkArgs(args,['id','domain', 'dnsapi_id','email','remark'])
     if not data[0]:
         return data[1]
 
+    sid = args['id'].strip()
     domain = args['domain'].strip()
     remark = args['remark'].strip()
     email = args['email'].strip()
@@ -387,6 +388,20 @@ def domainAdd():
         return mw.returnJson(False, '邮件不能为空!')
 
     conn = pSqliteDb('domain')
+
+    if sid != '0' : #修改操作
+        conn.where("id=?", (sid,)).update({
+            'domain':domain,
+            'dnsapi_id':dnsapi_id,
+            'email':email,
+            'remark':remark,
+        })
+        return mw.returnJson(True, '修改成功!')
+
+    if conn.where("domain=?", (domain,)).count():
+        return mw.returnJson(False, domain+'已存在!')
+
+    
 
     addTime = time.strftime('%Y-%m-%d %X', time.localtime())
     conn.add('domain,dnsapi_id,email,remark,addtime', (domain, dnsapi_id,email,remark, addTime))
