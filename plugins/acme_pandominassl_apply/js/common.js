@@ -26,6 +26,33 @@ function apaPost(method, args,callback){
     },'json'); 
 }
 
+
+function apaPostN(method, args,callback){
+
+    var req_data = {};
+    req_data['name'] = 'acme_pandominassl_apply';
+    req_data['func'] = method;
+    req_data['version'] = $('.plugin_version').attr('version');
+ 
+    if (typeof(args) == 'string'){
+        req_data['args'] = JSON.stringify(toArrayObject(args));
+    } else {
+        req_data['args'] = JSON.stringify(args);
+    }
+
+    $.post('/plugins/run', req_data, function(data) {
+        if (!data.status){
+            //错误展示10S
+            layer.msg(data.msg,{icon:0,time:2000,shade: [10, '#000']});
+            return;
+        }
+
+        if(typeof(callback) == 'function'){
+            callback(data);
+        }
+    },'json'); 
+}
+
 function apaPostCallbak(method, version, args,callback){
     var loadT = layer.msg('正在获取...', { icon: 16, time: 0, shade: 0.3 });
 
@@ -466,7 +493,7 @@ function domainDel(id, name){
     });
 }
 
-function domainAdd(type){
+function domainAdd(row){
     layer.open({
         type: 1,
         area: '500px',
@@ -504,7 +531,7 @@ function domainAdd(type){
             });
 
             var dnsapi_id_html = "<option value='0'>无设置</option>";
-            apaPost('dnsapi_list_all', {}, function(data){
+            apaPostN('dnsapi_list_all', {}, function(data){
                 var rdata = $.parseJSON(data.data);
                 // console.log(rdata);
                 for (var i = 0; i < rdata.length; i++) {
@@ -553,16 +580,14 @@ function domainList(page, search){
             list += '<td>' + rdata.data[i]['email'] +'</td>';
             list += '<td>' + rdata.data[i]['remark'] +'</td>';
             list += '<td style="text-align:right">';
-            list += '<a href="javascript:;" class="btlink" onclick="domainDel(\''+rdata.data[i]['id']+'\',\''+rdata.data[i]['domain']+'\')" title="删除">删除</a>' +
-                    '</td>';
-            list += '</tr>';
+
+            list += '<a href="javascript:;" index="'+i+'" class="btlink edit" title="编辑">编辑</a> | ';
+            list += '<a href="javascript:;" class="btlink" onclick="domainDel(\''+rdata.data[i]['id']+'\',\''+rdata.data[i]['domain']+'\')" title="删除">删除</a>';
+            list += '</td></tr>';
         }
 
         var con = '<div class="safe bgw">\
             <button onclick="domainAdd()" title="添加顶级域名" class="btn btn-success btn-sm" type="button" style="margin-right: 5px;">添加域名</button>\
-            <span style="float:right"> \
-                <button batch="true" style="float: right;display: none;margin-left:10px;" onclick="delDbBatch();" title="删除选中项" class="btn btn-default btn-sm">删除选中</button>\
-            </span>\
             <div class="divtable mtb10">\
                 <div class="tablescroll">\
                     <table id="DataBody" class="table table-hover" width="100%" cellspacing="0" cellpadding="0" border="0" style="border: 0 none;">\
@@ -581,6 +606,12 @@ function domainList(page, search){
 
         $(".soft-man-con").html(con);
         $('.dataTables_paginate').html(rdata.page);
+
+        $('.edit').click(function(){
+            var idx = $(this).attr('index');
+            var row = rdata.data[idx];
+            domainAdd(row);
+        })
 
         readerTableChecked();
     });
