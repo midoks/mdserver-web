@@ -17,8 +17,8 @@ CREATE TABLE IF NOT EXISTS `email` (
 CREATE TABLE IF NOT EXISTS `domain` (
   `id` INTEGER PRIMARY KEY AUTOINCREMENT,
   `domain` TEXT,
-  `email` TEXT,
   `dnsapi_id` TEXT,
+  `email` TEXT,
   `remark` TEXT,
   `addtime` TEXT
 );
