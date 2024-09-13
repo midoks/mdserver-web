@@ -16,6 +16,8 @@ Install_App()
 	mkdir -p $serverPath/source
 	mkdir -p $serverPath/acme_pandominassl_apply
 	echo "${VERSION}" > $serverPath/acme_pandominassl_apply/version.pl
+
+	cd ${rootPath} && python3 ${rootPath}/plugins/acme_pandominassl_apply/index.py start
 	echo '安装[ACME泛域名SSL]完成'
 }
 
