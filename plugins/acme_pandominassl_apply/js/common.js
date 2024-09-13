@@ -503,7 +503,15 @@ function domainAdd(type){
                 $("input[name='remark']").val(v);
             });
 
-
+            var dnsapi_id_html = "<option value='0'>无设置</option>";
+            apaPost('dnsapi_list_all', {}, function(data){
+                var rdata = $.parseJSON(data.data);
+                // console.log(rdata);
+                for (var i = 0; i < rdata.length; i++) {
+                    dnsapi_id_html += "<option value='"+rdata[i]['id']+"'>"+rdata[i]['name']+"</option>";
+                }
+                $('select[name="dnsapi_id"]').html(dnsapi_id_html);
+            });
         },
         yes:function(index) {
             var data = $("#domain_add").serialize();
@@ -541,6 +549,7 @@ function domainList(page, search){
             list += '<tr>';
             list +='<td><input value="'+rdata.data[i]['id']+'" class="check" onclick="checkSelect();" type="checkbox"></td>';
             list += '<td>' + rdata.data[i]['domain'] +'</td>';
+            list += '<td>' + rdata.data[i]['dnsapi_id'] +'</td>';
             list += '<td>' + rdata.data[i]['email'] +'</td>';
             list += '<td>' + rdata.data[i]['remark'] +'</td>';
             list += '<td style="text-align:right">';
@@ -559,6 +568,7 @@ function domainList(page, search){
                     <table id="DataBody" class="table table-hover" width="100%" cellspacing="0" cellpadding="0" border="0" style="border: 0 none;">\
                     <thead><tr><th width="30"><input class="check" onclick="checkSelect();" type="checkbox"></th>\
                     <th>域名</th>\
+                    <th>DNSAPI</th>\
                     <th>邮件</th>\
                     <th>备注</th>\
                     <th style="text-align:right;">操作</th></tr></thead>\

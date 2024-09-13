@@ -296,6 +296,12 @@ def dnsapiList():
 
     return mw.getJson(data)
 
+def dnsapiListAll():
+    conn = pSqliteDb('dnsapi')
+    field = 'id,name,type,val,remark,addtime'
+    data = conn.field(field).limit('1000').select()
+    return mw.getJson(data)
+
 def emailList():
     args = getArgs()
     page = 1
@@ -463,6 +469,8 @@ if __name__ == "__main__":
         print(readConfigTpl())
     elif func == 'dnsapi_list':
         print(dnsapiList())
+    elif func == 'dnsapi_list_all':
+        print(dnsapiListAll())
     elif func == 'dnsapi_add':
         print(dnsapiAdd())
     elif func == 'dnsapi_del':
