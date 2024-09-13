@@ -594,7 +594,7 @@ function domainList(page, search){
             list += '<tr>';
             list +='<td><input value="'+rdata.data[i]['id']+'" class="check" onclick="checkSelect();" type="checkbox"></td>';
             list += '<td>' + rdata.data[i]['domain'] +'</td>';
-            list += '<td>' + rdata.data[i]['dnsapi_id'] +'</td>';
+            list += '<td>' + rdata.data[i]['dnsapi_id_alias'] +'</td>';
             list += '<td>' + rdata.data[i]['email'] +'</td>';
             list += '<td>' + rdata.data[i]['remark'] +'</td>';
             list += '<td style="text-align:right">';

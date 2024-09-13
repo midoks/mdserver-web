@@ -438,6 +438,7 @@ def domainList():
         search = args['search']
 
     conn = pSqliteDb('domain')
+    conn_dnsapi = pSqliteDb('dnsapi')
     limit = str((page - 1) * page_size) + ',' + str(page_size)
     condition = ''
     if not search == '':
@@ -445,6 +446,14 @@ def domainList():
     field = 'id,domain,dnsapi_id,email,remark,addtime'
     clist = conn.where(condition, ()).field(
         field).limit(limit).order('id desc').select()
+
+    for i in range(len(clist)):
+        tdata = conn_dnsapi.field('id,name').where('id=?',(clist[i]['dnsapi_id'],)).select()
+        if len(tdata) > 0:
+            # print(tdata[0]['name'])
+            clist[i]['dnsapi_id_alias'] = clist[i]['dnsapi_id']+'('+ tdata[0]['name'] +')'
+        else:
+            clist[i]['dnsapi_id_alias'] = clist[i]['dnsapi_id']+' (无)'
 
     count = conn.where(condition, ()).count()
     _page = {}
