@@ -58,7 +58,7 @@ def createBgTask():
 
 def createBgTaskByName(name):
     args = getConfigData()
-    _name = "[勿删]ACME泛域名SSL[" + name + "]"
+    _name = "[勿删]ACME泛域名SSL[APA]"
     res = mw.M("crontab").field("id, name").where("name=?", (_name,)).find()
     if res:
         return True
