@@ -21,6 +21,7 @@ Install_App()
 
 Uninstall_App()
 {
+	rm -rf $serverPath/acme_pandominassl_apply
 	echo "卸载[ACME泛域名SSL]成功"
 }
 
