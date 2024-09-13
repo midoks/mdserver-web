@@ -16,12 +16,11 @@ Install_App()
 	mkdir -p $serverPath/source
 	mkdir -p $serverPath/acme_pandominassl_apply
 	echo "${VERSION}" > $serverPath/acme_pandominassl_apply/version.pl
-	echo '安装完成'
+	echo '安装[ACME泛域名SSL]完成'
 }
 
 Uninstall_App()
 {
-	
 	echo "卸载[ACME泛域名SSL]成功"
 }
 

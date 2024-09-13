@@ -1,14 +1,16 @@
 CREATE TABLE IF NOT EXISTS `dnsapi` (
   `id` INTEGER PRIMARY KEY AUTOINCREMENT,
+  `name` TEXT,
+  `type` TEXT,
   `val` TEXT,
-  `mark` TEXT,
+  `remark` TEXT,
   `addtime` TEXT
 );
 
 CREATE TABLE IF NOT EXISTS `email` (
   `id` INTEGER PRIMARY KEY AUTOINCREMENT,
   `addr` TEXT,
-  `mark` TEXT,
+  `remark` TEXT,
   `addtime` TEXT
 );
 
@@ -17,7 +19,7 @@ CREATE TABLE IF NOT EXISTS `domain` (
   `domain` TEXT,
   `email` TEXT,
   `dnsapi_id` TEXT,
-  `mark` TEXT,
+  `remark` TEXT,
   `addtime` TEXT
 );
 
