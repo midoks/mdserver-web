@@ -118,7 +118,7 @@ Uninstall_App()
 		rm -rf $serverPath/postgresql
 	fi
 
-	echo '卸载完成' > $install_tmp
+	echo '卸载[postgresql]完成'
 }
 
 action=$1
