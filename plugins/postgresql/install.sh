@@ -28,7 +28,7 @@ if [ "${2}" == "" ];then
 	exit 0
 fi 
 
-if [ ! -d $curPath/versions/$2 ];then
+if [ ! -d $curPath/versions/$VERSION ];then
 	echo '缺少安装脚本2...'
 	exit 0
 fi
