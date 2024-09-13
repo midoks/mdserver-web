@@ -23,6 +23,7 @@ Install_App()
 
 Uninstall_App()
 {
+	cd ${rootPath} && python3 ${rootPath}/plugins/acme_pandominassl_apply/index.py stop
 	rm -rf $serverPath/acme_pandominassl_apply
 	echo "卸载[ACME泛域名SSL]成功"
 }
