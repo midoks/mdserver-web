@@ -38,7 +38,7 @@ def getInitDFile():
 
 
 def getConf():
-    path = getServerDir() + "/redis.conf"
+    path = getServerDir() + "/hook.py"
     return path
 
 
@@ -78,7 +78,7 @@ def checkArgs(data, ck=[]):
     return (True, mw.returnJson(True, 'ok'))
 
 def configTpl():
-    path = getPluginDir() + '/tpl'
+    path = getPluginDir() + '/hooks'
     pathFile = os.listdir(path)
     tmp = []
     for one in pathFile:
