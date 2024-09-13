@@ -226,7 +226,10 @@ def dnsapiAdd():
     val = args['val'].strip()
     sid = args['id'].strip()
 
-    if sid != 0 : #修改操作
+    if name == '':
+        return mw.returnJson(False, '名称不能为空!')
+
+    if sid != '0' : #修改操作
         conn.where("id=?", (sid,)).update({
             'name':name,
             'type':stype,
@@ -337,6 +340,9 @@ def emailAdd():
     addr = args['addr'].strip()
     remark = args['remark'].strip()
 
+    if addr == '':
+        return mw.returnJson(False, '邮件地址不能为空!')
+
     conn = pSqliteDb('email')
 
     addTime = time.strftime('%Y-%m-%d %X', time.localtime())
@@ -360,17 +366,24 @@ def emailDel():
 
 def domainAdd():
     args = getArgs()
-    data = checkArgs(args,['domain', 'remark'])
+    data = checkArgs(args,['domain', 'email','remark'])
     if not data[0]:
         return data[1]
 
     domain = args['domain'].strip()
     remark = args['remark'].strip()
+    email = args['email'].strip()
+    dnsapi_id = args['dnsapi_id'].strip()
+
+    if domain == '':
+        return mw.returnJson(False, '域名不能为空!')
+    if email == '':
+        return mw.returnJson(False, '邮件不能为空!')
 
     conn = pSqliteDb('domain')
 
     addTime = time.strftime('%Y-%m-%d %X', time.localtime())
-    conn.add('domain,remark,addtime', (domain, remark, addTime))
+    conn.add('domain,dnsapi_id,email,remark,addtime', (domain, dnsapi_id,email,remark, addTime))
     return mw.returnJson(True, '添加成功!')
 
 def domainDel():
@@ -408,7 +421,7 @@ def domainList():
     condition = ''
     if not search == '':
         condition = "domain like '%" + search + "%'"
-    field = 'id,domain,email,dnsapi_id,remark,addtime'
+    field = 'id,domain,dnsapi_id,email,remark,addtime'
     clist = conn.where(condition, ()).field(
         field).limit(limit).order('id desc').select()
 
