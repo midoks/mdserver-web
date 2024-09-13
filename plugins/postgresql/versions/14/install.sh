@@ -96,7 +96,27 @@ Install_App()
 
 Uninstall_App()
 {
-	rm -rf $serverPath/postgresql
+	if [ -f /usr/lib/systemd/system/postgresql.service ];then
+		systemctl stop postgresql
+		systemctl disable postgresql
+		rm -rf /usr/lib/systemd/system/postgresql.service
+		systemctl daemon-reload
+	fi
+
+	if [ -f /lib/systemd/system/postgresql.service ];then
+		systemctl stop postgresql
+		systemctl disable postgresql
+		rm -rf /lib/systemd/system/postgresql.service
+		systemctl daemon-reload
+	fi
+
+	if [ -f $serverPath/postgresql/initd/postgresql ];then
+		$serverPath/postgresql/initd/postgresql stop
+	fi
+
+	if [ -d $serverPath/postgresql ];then
+		rm -rf $serverPath/postgresql
+	fi
 	echo '卸载完成' > $install_tmp
 }
 
