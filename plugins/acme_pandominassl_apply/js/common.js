@@ -174,16 +174,84 @@ function emailList(page, search){
 function dnsapiDel(id, name){
     safeMessage('删除['+name+']','您真的要删除['+name+']吗？',function(){
         var data='id='+id+'&name='+name;
-        apaPost('email_del', data, function(data){
+        apaPost('dnsapi_del', data, function(data){
             var rdata = $.parseJSON(data.data);
             showMsg(rdata.msg,function(){
-                emailList();
+                dnsapiList();
             },{icon: rdata.status ? 1 : 2}, 600);
         });
     });
 }
 
-function dnsapiAdd(type){
+var dnsapi_option = [
+    {"name":"cf", "title":'cloudflare', 'key':'CF_Key:CF_Email'},
+    {"name":"dp", "title":'dnspod【国内版】', 'key':'DP_Id:DP_Key'},
+    {"name":"dpi", "title":'dnspod【国际版】', 'key':'DPI_Id:DPI_Key'},
+];
+
+function getDnsapiKey(name){
+    for (var i = 0; i < dnsapi_option.length; i++) {
+        if (dnsapi_option[i]['name'] == name){
+            return dnsapi_option[i]['key'];
+        }
+    }
+    return '';
+}
+
+
+
+function dnsapiAdd(row){
+    console.log(row);
+    var option_name = '';
+    var option_remark = '';
+    var option_type = 'cf';
+    var option_val = '';
+    var option_id = 0;
+    if (typeof(row) != 'undefined'){
+        option_name = row['name'];
+        option_remark = row['remark'];
+        option_type = row['type'];
+        option_val = row['val'];
+        option_id = row['id'];
+        
+    }
+
+    // console.log(option_name);
+    function renderDnsapiOption(name, val){
+        var vlist = {};
+        if (val != ''){
+            var t = val.split('~');
+            for (var i = 0; i < t.length; i++) {
+                var kv = t[i].split('|');
+                if (kv.length == 2){
+                    vlist[kv[0]] = kv[1];
+                } else {
+                    vlist[kv[0]] = '';
+                }
+            }
+            // console.log(vlist);
+        }
+
+
+        var key = getDnsapiKey(name);
+        var klist = key.split(':');
+        // console.log(klist);
+        var option_html = '';
+        for (var i = 0; i < klist.length; i++) {
+            var klist_val = '';
+            if (klist[i] in vlist){
+                klist_val = vlist[klist[i]];
+            }
+
+            option_html += "\
+                <span class='tname'>"+klist[i]+"</span>\
+                <div class='info-r'>\
+                    <input name='"+klist[i]+"' class='bt-input-text mr5' style='width:100%;' value='"+klist_val+"' placeholder='请输入对应值' type='text'>\
+                </div>";
+        }
+        $('#dnsapi_option').html(option_html);
+    }
+
     layer.open({
         type: 1,
         area: '500px',
@@ -195,23 +263,80 @@ function dnsapiAdd(type){
         content: "<form class='bt-form pd20' id='dnsapi_add'>\
                     <div class='line'>\
                         <span class='tname'>名称</span>\
-                        <div class='info-r'><input name='name' class='bt-input-text mr5' style='width:100%;' placeholder='名称' type='text'></div>\
+                        <div class='info-r'><input name='name' class='bt-input-text mr5' style='width:100%;' placeholder='名称' value='"+option_name+"' type='text'></div>\
+                    </div>\
+                    <div class='line'>\
+                        <span class='tname'>DNSAPI类型</span>\
+                        <div class='info-r'>\
+                            <select class='bt-input-text mr5' name='type'>\
+                                <option name='cf'>cloudflare</option>\
+                            </select>\
+                        </div>\
+                    </div>\
+                    <div class='line' id='dnsapi_option'>\
+                        <span class='tname'>CF_Key</span>\
+                        <div class='info-r'>\
+                            <input name='v1' class='bt-input-text mr5' style='width:100%;' placeholder='请输入对应值' type='text'>\
+                        </div>\
+                        <span class='tname'>CF_Email</span>\
+                        <div class='info-r'>\
+                            <input name='v2' class='bt-input-text mr5' style='width:100%;' placeholder='请输入对应值' type='text'>\
+                        </div>\
                     </div>\
                     <div class='line'>\
                         <span class='tname'>备注</span>\
-                        <div class='info-r'><input name='remark' class='bt-input-text mr5' style='width:100%;' placeholder='备注' type='text'></div>\
+                        <div class='info-r'><input name='remark' class='bt-input-text mr5' style='width:100%;' placeholder='备注' value='"+option_remark+"' type='text'></div>\
                     </div>\
+                    <input name='id' value='"+option_id+"' type='hidden'>\
                   </form>",
         success:function(){
             $("input[name='name']").keyup(function(){
                 var v = $(this).val();
                 $("input[name='remark']").val(v);
             });
+
+            var option = '';
+            for (var i = 0; i<dnsapi_option.length; i++) {
+
+                if (dnsapi_option[i]['name'] == option_type){
+                    option += "<option value='"+dnsapi_option[i]['name']+"' key='"+dnsapi_option[i]['key']+"' selected>"+dnsapi_option[i]['title']+"</option>";
+                } else {
+                    option += "<option value='"+dnsapi_option[i]['name']+"' key='"+dnsapi_option[i]['key']+"'>"+dnsapi_option[i]['title']+"</option>";
+                }
+            }
+
+            renderDnsapiOption(option_type, option_val);
+            $('select[name="type"]').html(option);
+            $('select[name="type"]').change(function(){
+                var name = $(this).val();
+
+                if (option_type == name){
+                    renderDnsapiOption(name, option_val);
+                } else {
+                    renderDnsapiOption(name,'');
+                }
+                
+            });
         },
         yes:function(index) {
             var data = $("#dnsapi_add").serialize();
             data = decodeURIComponent(data);
-            // data = toArrayObject(data);
+            data = toArrayObject(data);
+
+            var key = getDnsapiKey(data['type']);
+            var klist = key.split(':');
+            var val = '';
+            for (var i = 0; i < klist.length; i++) {
+                var k = klist[i];
+                if (k in data){
+                    if (klist.length - 1 == i){
+                        val += k + '|' + data[k];
+                    } else {
+                        val += k + '|' + data[k]+'~';
+                    }
+                }
+            }
+            data['val'] = val;
             apaPost('dnsapi_add', data, function(data){
                 var rdata = $.parseJSON(data.data);
                 showMsg(rdata.msg,function(){
@@ -245,11 +370,14 @@ function dnsapiList(page, search){
             list += '<tr>';
             list +='<td><input value="'+rdata.data[i]['id']+'" class="check" onclick="checkSelect();" type="checkbox"></td>';
             list += '<td>' + rdata.data[i]['name'] +'</td>';
+            list += '<td>' + rdata.data[i]['type'] +'</td>';
+            list += '<td>' + rdata.data[i]['val'].split('~').join("<br/>") +'</td>';
             list += '<td>' + rdata.data[i]['remark'] +'</td>';
+
             list += '<td style="text-align:right">';
-            list += '<a href="javascript:;" class="btlink" onclick="dnsapiDel(\''+rdata.data[i]['id']+'\',\''+rdata.data[i]['name']+'\')" title="删除">删除</a>' +
-                    '</td>';
-            list += '</tr>';
+            list += '<a href="javascript:;" index="'+i+'" class="btlink edit" title="编辑">编辑</a> | ';
+            list += '<a href="javascript:;" class="btlink" onclick="dnsapiDel(\''+rdata.data[i]['id']+'\',\''+rdata.data[i]['name']+'\')" title="删除">删除</a>';
+            list += '</td></tr>';
         }
 
         var con = '<div class="safe bgw">\
@@ -262,6 +390,8 @@ function dnsapiList(page, search){
                     <table id="DataBody" class="table table-hover" width="100%" cellspacing="0" cellpadding="0" border="0" style="border: 0 none;">\
                     <thead><tr><th width="30"><input class="check" onclick="checkSelect();" type="checkbox"></th>\
                     <th>名称</th>\
+                    <th>类型</th>\
+                    <th>值</th>\
                     <th>备注</th>\
                     <th style="text-align:right;">操作</th></tr></thead>\
                     <tbody>'+ list +'</tbody>\
@@ -273,6 +403,13 @@ function dnsapiList(page, search){
 
         $(".soft-man-con").html(con);
         $('.dataTables_paginate').html(rdata.page);
+
+        $('.edit').click(function(){
+            var idx = $(this).attr('index');
+            var row = rdata.data[idx];
+            // console.log(row);
+            dnsapiAdd(row);
+        })
 
         readerTableChecked();
     });

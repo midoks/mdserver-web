@@ -214,18 +214,33 @@ def reload():
 
 
 def dnsapiAdd():
+    conn = pSqliteDb('dnsapi')
     args = getArgs()
-    data = checkArgs(args,['name', 'remark'])
+    data = checkArgs(args,['id','name', 'type', 'remark'])
     if not data[0]:
         return data[1]
 
     name = args['name'].strip()
     remark = args['remark'].strip()
+    stype = args['type'].strip()
+    val = args['val'].strip()
+    sid = args['id'].strip()
 
-    conn = pSqliteDb('dnsapi')
+    if sid != 0 : #修改操作
+        conn.where("id=?", (sid,)).update({
+            'name':name,
+            'type':stype,
+            'val':val,
+            'remark':remark,
+        })
+        return mw.returnJson(True, '修改成功!')
+
+    if conn.where("name=?", (name,)).count():
+        return mw.returnJson(False, name+'已存在!')
 
     addTime = time.strftime('%Y-%m-%d %X', time.localtime())
-    conn.add('name,remark,addtime', (name, remark, addTime))
+    err = conn.add('name,type,val,remark,addtime', (name, stype, val,remark, addTime))
+    # print(err)
     return mw.returnJson(True, '添加成功!')
 
 def dnsapiDel():
@@ -263,7 +278,7 @@ def dnsapiList():
     condition = ''
     if not search == '':
         condition = "name like '%" + search + "%'"
-    field = 'id,name,val,remark,addtime'
+    field = 'id,name,type,val,remark,addtime'
     clist = conn.where(condition, ()).field(
         field).limit(limit).order('id desc').select()
 
