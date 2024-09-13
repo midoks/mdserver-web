@@ -185,8 +185,8 @@ function dnsapiDel(id, name){
 
 var dnsapi_option = [
     {"name":"cf", "title":'cloudflare', 'key':'CF_Key:CF_Email'},
-    {"name":"dp", "title":'dnspod【国内版】', 'key':'DP_Id:DP_Key'},
-    {"name":"dpi", "title":'dnspod【国际版】', 'key':'DPI_Id:DPI_Key'},
+    {"name":"dp", "title":'dnspod/国内', 'key':'DP_Id:DP_Key'},
+    {"name":"dpi", "title":'dnspod/国际', 'key':'DPI_Id:DPI_Key'},
     {"name":"dns_gd", "title":'GoDaddy', 'key':'GD_Key:GD_Secret'},
     {"name":"dns_pdns", "title":'PowerDNS', 'key':'PDNS_Url:PDNS_ServerId:PDNS_Token:PDNS_Ttl'},
     {"name":"dns_lua", "title":'LuaDNS', 'key':'LUA_Key:LUA_Email'},
@@ -225,6 +225,15 @@ function getDnsapiKey(name){
         }
     }
     return '';
+}
+
+function getDnsapiTitle(name){
+    for (var i = 0; i < dnsapi_option.length; i++) {
+        if (dnsapi_option[i]['name'] == name){
+            return dnsapi_option[i]['title'];
+        }
+    }
+    return '其他';
 }
 
 
@@ -399,7 +408,7 @@ function dnsapiList(page, search){
             list += '<tr>';
             list +='<td><input value="'+rdata.data[i]['id']+'" class="check" onclick="checkSelect();" type="checkbox"></td>';
             list += '<td>' + rdata.data[i]['name'] +'</td>';
-            list += '<td>' + rdata.data[i]['type'] +'</td>';
+            list += '<td>' + getDnsapiTitle(rdata.data[i]['type']) +'</td>';
             list += '<td>' + rdata.data[i]['val'].split('~').join("<br/>") +'</td>';
             list += '<td>' + rdata.data[i]['remark'] +'</td>';
 
@@ -472,6 +481,18 @@ function domainAdd(type){
                         <div class='info-r'><input name='domain' class='bt-input-text mr5' style='width:100%;' placeholder='域名' type='text'></div>\
                     </div>\
                     <div class='line'>\
+                        <span class='tname'>DNSAPI</span>\
+                        <div class='info-r'>\
+                            <select class='bt-input-text mr5' name='dnsapi_id'>\
+                                <option name='0'>无设置</option>\
+                            </select>\
+                        </div>\
+                    </div>\
+                    <div class='line'>\
+                        <span class='tname'>邮件</span>\
+                        <div class='info-r'><input name='email' class='bt-input-text mr5' style='width:100%;' placeholder='邮件' type='text'></div>\
+                    </div>\
+                    <div class='line'>\
                         <span class='tname'>备注</span>\
                         <div class='info-r'><input name='remark' class='bt-input-text mr5' style='width:100%;' placeholder='备注' type='text'></div>\
                     </div>\
@@ -481,6 +502,8 @@ function domainAdd(type){
                 var v = $(this).val();
                 $("input[name='remark']").val(v);
             });
+
+            
         },
         yes:function(index) {
             var data = $("#domain_add").serialize();
