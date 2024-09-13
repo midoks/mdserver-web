@@ -197,10 +197,15 @@ def apaOp(method):
 
 
 def start():
+    import tool_cron
+    tool_cron.createBgTask()
+
     return apaOp('start')
 
 
 def stop():
+    import tool_cron
+    tool_cron.removeBgTask()
     return apaOp('stop')
 
 
