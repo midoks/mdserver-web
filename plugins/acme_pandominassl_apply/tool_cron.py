@@ -82,8 +82,8 @@ logs_file=$plugin_path/${rname}.log
 ''' % (mw_dir, name, getServerDir(), getPluginDir())
     cmd += 'echo "★【`date +"%Y-%m-%d %H:%M:%S"`】 STSRT★" >> $logs_file' + "\n"
     cmd += 'echo ">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>" >> $logs_file' + "\n"
-    cmd += 'echo "python3 $script_path/index.py update_all"' + "\n"
-    cmd += 'cd $mw_dir && python3 $script_path/index.py update_all' + "\n"
+    cmd += 'echo "python3 $script_path/index.py run_hook"' + "\n"
+    cmd += 'cd $mw_dir && python3 $script_path/index.py run_hook' + "\n"
     cmd += 'echo "【`date +"%Y-%m-%d %H:%M:%S"`】 END★" >> $logs_file' + "\n"
     cmd += 'echo "<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<" >> $logs_file' + "\n"
 

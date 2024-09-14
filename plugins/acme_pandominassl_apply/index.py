@@ -471,8 +471,11 @@ def domainList():
 
     return mw.getJson(data)
 
+def runHook():
+    return 'run hook'
+
 def runLog():
-    return getServerDir() + '/data/redis.log'
+    return getServerDir() + '/data/hook.log'
 
 if __name__ == "__main__":
     func = sys.argv[1]
@@ -516,5 +519,7 @@ if __name__ == "__main__":
         print(domainAdd())
     elif func == 'domain_del':
         print(domainDel())
+    elif func == 'run_hook':
+        print(runHook())
     else:
         print('error')
