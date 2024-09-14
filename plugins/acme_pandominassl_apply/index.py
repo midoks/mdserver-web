@@ -479,7 +479,7 @@ def runHook():
     return 'run hook'
 
 def runLog():
-    return getServerDir() + '/data/hook.log'
+    return getServerDir() + '/hook.log'
 
 if __name__ == "__main__":
     func = sys.argv[1]
