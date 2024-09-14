@@ -559,6 +559,31 @@ function domainHookCmd(){
     });
 }
 
+function syncCfCmd(){
+    apaPost('run_sync_cf_cmd', {}, function(data){
+        var rdata = $.parseJSON(data.data);
+        layer.open({
+            title: "手动同步CloudFlare全部命令",
+            area: ['600px', '180px'],
+            type:1,
+            closeBtn: 1,
+            shadeClose: false,
+            btn:["复制","取消"],
+            content: '<div class="pd15">\
+                        <div class="divtable">\
+                            <pre class="layui-code">'+rdata.data+'</pre>\
+                        </div>\
+                    </div>',
+            success:function(){
+                copyText(rdata.data);
+            },
+            yes:function(){
+                copyText(rdata.data);
+            }
+        });
+    });
+}
+
 function domainAdd(row){
 
     var option_domian = '';
@@ -693,7 +718,8 @@ function domainList(page, search){
 
         var con = '<div class="safe bgw">\
             <button onclick="domainAdd()" title="添加顶级域名" class="btn btn-success btn-sm" type="button" style="margin-right: 5px;">添加域名</button>\
-            <button onclick="domainHookCmd()" title="添加顶级域名" class="btn btn-success btn-sm" type="button" style="margin-right: 5px;">全部同步命令</button>\
+            <button onclick="domainHookCmd()" title="全部同步命令" class="btn btn-success btn-sm" type="button" style="margin-right: 5px;">全部同步命令</button>\
+            <button onclick="syncCfCmd()" title="cloudflare同步命令" class="btn btn-success btn-sm" type="button" style="margin-right: 5px;">cloudflare同步命令</button>\
             <div class="divtable mtb10">\
                 <div class="tablescroll">\
                     <table id="DataBody" class="table table-hover" width="100%" cellspacing="0" cellpadding="0" border="0" style="border: 0 none;">\

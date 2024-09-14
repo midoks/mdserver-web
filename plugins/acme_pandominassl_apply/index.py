@@ -5,6 +5,8 @@ import io
 import os
 import time
 import re
+import requests
+import json
 
 sys.path.append(os.getcwd() + "/class/core")
 import mw
@@ -508,13 +510,24 @@ def getDnsapiData(dnsapi_id):
         return tdata[0]
     return {}
 
-def getCmdExportVar(val):
+def getDnsapiExportVar(val):
     cmd_list =  val.split('~')
     def_var = ''
     for x in range(len(cmd_list)):
         v = cmd_list[x]
         vlist = v.split('|')
         def_var += 'export '+vlist[0]+'="'+vlist[1]+'"\n'
+    return def_var
+
+def getDnsapiKv(val):
+    cmd_list =  val.split('~')
+    def_var = {}
+    for x in range(len(cmd_list)):
+        v = cmd_list[x]
+        vlist = v.split('|')
+        kk = vlist[0]
+        vv = vlist[1]
+        def_var[kk] = vv
     return def_var
 
 def domainApplyPathJudge(domain):
@@ -589,7 +602,7 @@ def runHookDstDomain(row):
 
     cmd_data = getDnsapiData(row['dnsapi_id'])
     # print(cmd_data)
-    export_val =  getCmdExportVar(cmd_data['val'])
+    export_val =  getDnsapiExportVar(cmd_data['val'])
     cmd += export_val
 
     # acme.sh --register-account -m my@example.com
@@ -631,12 +644,6 @@ def runHookId():
         return data[1]
 
     conn = pSqliteDb('domain')
-
-    field = 'id,status'
-    fdata = conn.field(field).where('id=?',(args['id'],)).find()
-
-    conn = pSqliteDb('domain')
-
     field = 'id,domain,dnsapi_id,email,effective_date,expiration_date,remark'
     row = conn.field(field).where('id=?',(args['id'],)).find()
     runHookDstDomain(row)
@@ -649,7 +656,6 @@ def runHookCmd():
 
 def runHook():
     conn = pSqliteDb('domain')
-    conn_dnsapi = pSqliteDb('dnsapi')
 
     field = 'id,domain,dnsapi_id,email,effective_date,expiration_date,remark'
     clist = conn.field(field).where('status=?',(1,)).limit('1000').order('id desc').select()
@@ -661,6 +667,75 @@ def runHook():
         time.sleep(1)
     return 'run hook end'
 
+def autoSyncDomain(domain, dnsapi_id, email):
+    conn = pSqliteDb('domain')
+
+    field = 'id,domain,dnsapi_id,email,effective_date,expiration_date,remark'
+    fdata = conn.field(field).where('domain=?',(domain,)).select()
+    # print(fdata)
+    mdate = time.strftime('%Y-%m-%d %X', time.localtime())
+    if len(fdata) == 0:
+        conn.add('domain,dnsapi_id,email,remark,addtime', (domain, dnsapi_id, email,"备注", mdate))
+        print(domain+" 同步成功!")
+    return True
+
+def runSyncCfDataRow(row, page = 1):
+    # print(row, page)
+
+    cf_key = row['kv']['CF_Key']
+    cf_mail = row['kv']['CF_Email']
+    header = {
+        'X-Auth-Email': cf_mail,
+        'X-Auth-Key': cf_key,
+        'Content-Type': 'application/json'
+    }
+    url = "https://api.cloudflare.com/client/v4/zones?status=active&page="+str(page)+"&per_page=20&order=status&direction=desc&match=all"
+    try:
+        r = requests.get(url, timeout=30, headers=header)
+        r.raise_for_status()
+        r.encoding = r.apparent_encoding
+        # print(r.text)
+        jdata = json.loads(r.text)
+        result = jdata['result']
+        result_info = jdata['result_info']
+
+        # print(len(result))
+        for i in result:
+            autoSyncDomain(i['name'], row['id'], cf_mail)
+
+        if result_info['total_pages'] > page:
+            page += 1
+            runSyncCfDataRow(row, page)
+        # print(result)
+    except Exception as e:
+        print(e)
+
+# 同步CloudFlare数据
+def runSyncCfData():
+    print("同步CloudFlare数据开始")
+    conn_dnsapi = pSqliteDb('dnsapi')
+    field = "id,name,type,val"
+    fdata = conn_dnsapi.field(field).where('type=?', ('dns_cf',)).limit('10').select()
+
+    for x in range(len(fdata)):
+        row = fdata[x]
+        dnsapi_kv = getDnsapiKv(row['val'])
+        row['kv'] = dnsapi_kv
+        runSyncCfDataRow(row)
+
+    print("同步CloudFlare数据结束")
+    return ''
+
+def runSyncCfCmd():
+    cmd = "cd "+mw.getRunDir()+" "
+    cmd += '&& python3 plugins/acme_pandominassl_apply/index.py run_sync_cf_data'
+    return mw.returnJson(True, 'ok',cmd)
+
+# 同步DnsPod数据
+def runSyncDnsPodData():
+    print("同步DnsPod数据开始")
+    print("同步DnsPod数据结束")
+    return ''
 
 if __name__ == "__main__":
     func = sys.argv[1]
@@ -715,5 +790,11 @@ if __name__ == "__main__":
         print(getHookIdCmd())
     elif func == 'run_hook_id':
         print(runHookId())
+    elif func == 'run_sync_cf_data':
+        print(runSyncCfData())
+    elif func == 'run_sync_cf_cmd':
+        print(runSyncCfCmd())
+    elif func == 'run_sync_dnspod_data':
+        print(runSyncDnsPodData())
     else:
         print('error')
