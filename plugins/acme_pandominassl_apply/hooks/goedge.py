@@ -73,7 +73,8 @@ def createSSLCert(domain):
     	"serverName":domain,
     	"certData":cer_data,
     	'keyData':key_data,
-    	'dnsNames':[domain,"*."+domain]
+    	'dnsNames':[domain,"*."+domain],
+    	'commonNames':[domain,"*."+domain]
     }
     print(request_data)
     response_data = commonReq('/SSLCertService/createSSLCert', request_data)
