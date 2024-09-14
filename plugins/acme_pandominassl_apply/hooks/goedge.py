@@ -94,11 +94,11 @@ def createSSLCert(domain, did=0):
         "description":domain,
         "serverName":domain,
         "certData":cer_data,
-        'keyData':key_data,
+        "keyData":key_data,
         "timeBeginAt":timeBeginAt,
         "timeEndAt": timeEndAt,
-        'dnsNames':[domain,"*."+domain],
-        'commonNames':[ssl_info['issuer']]
+        "dnsNames":[domain,"*."+domain],
+        "commonNames":[ssl_info['issuer']]
     }
     
     if did>0:
