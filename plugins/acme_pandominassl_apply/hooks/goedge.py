@@ -101,7 +101,6 @@ def createSSLCert(domain, did=0):
         'commonNames':[ssl_info['issuer']]
     }
     
-
     if did>0:
         request_data['sslCertId'] = did
         # print(request_data)
