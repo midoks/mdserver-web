@@ -42,11 +42,6 @@ def getConf():
     return path
 
 
-def getConfTpl():
-    path = getPluginDir() + "/config/redis.conf"
-    return path
-
-
 def getInitDTpl():
     path = getPluginDir() + "/init.d/" + getPluginName() + ".tpl"
     return path
@@ -155,6 +150,10 @@ def initDreplace():
     run_log_file = runLog()
     if not os.path.exists(run_log_file):
         mw.writeFile(run_log_file,'')
+
+    hook_file = getConf()
+    if not os.path.exists(hook_file):
+        mw.writeFile(hook_file,'')
 
     # initd replace
     if not os.path.exists(file_bin):
