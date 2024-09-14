@@ -46,9 +46,12 @@ def getInitDTpl():
     path = getPluginDir() + "/init.d/" + getPluginName() + ".tpl"
     return path
 
+def runLog():
+    return getServerDir() + '/hook.log'
 
 def getArgs():
     args = sys.argv[3:]
+    # print(args)
     tmp = {}
     args_len = len(args)
 
@@ -429,6 +432,28 @@ def domainDel():
     except Exception as ex:
         return mw.returnJson(False, '删除失败!' + str(ex))
 
+def domainStatusToggle():
+    args = getArgs()
+    data = checkArgs(args, ['id'])
+    if not data[0]:
+        return data[1]
+
+    conn = pSqliteDb('domain')
+
+    field = 'id,status'
+    fdata = conn.field(field).where('id=?',(args['id'],)).find()
+
+    fstatus = fdata['status']
+    if fstatus == 0:
+        fstatus = 1
+    else:
+        fstatus = 0
+    # print(fdata['status'],fstatus)
+    conn.where("id=?", (args['id'],)).update({
+        'status':fstatus,
+    })
+    return mw.returnJson(True, '切换成功!')
+
 def domainList():
     args = getArgs()
     page = 1
@@ -450,7 +475,7 @@ def domainList():
     condition = ''
     if not search == '':
         condition = "domain like '%" + search + "%'"
-    field = 'id,domain,dnsapi_id,email,remark,addtime'
+    field = 'id,domain,dnsapi_id,email,status,effective_date,expiration_date,remark,addtime'
     clist = conn.where(condition, ()).field(
         field).limit(limit).order('id desc').select()
 
@@ -526,57 +551,111 @@ def runHookPy(domain,path):
     print(cmd)
     return mw.execShell(cmd)
 
+def autoUpdateSslData(domain, path):
+    ssl_cer_file = path + '/'+domain+'.cer'
+    ssl_info = mw.getCertName(ssl_cer_file)
+
+    time_begin = int(time.mktime(time.strptime(ssl_info['notBefore'], "%Y-%m-%d")))
+    time_end = int(time.mktime(time.strptime(ssl_info['notAfter'], "%Y-%m-%d")))
+    # print(ssl_info)
+    # print(time_begin,time_end)
+    conn = pSqliteDb('domain')
+    conn.where('domain=?', (domain,)).update({
+        'effective_date':str(time_begin),
+        'expiration_date':str(time_end),
+    })
+
+    return True
+
+def runHookDstDomain(row):
+    domain = row['domain']
+    email = str(row['email'])
+    hookWriteLog('开始申请【'+domain+'】SSL证书')
+    cmd = "#!/bin/bash\n"
+
+    if mw.isAppleSystem():
+        user = getRunUser()
+        cmd += "source /Users/"+user+"/.zshrc\n"
+
+    cmd_data = getDnsapiData(row['dnsapi_id'])
+    # print(cmd_data)
+    export_val =  getCmdExportVar(cmd_data['val'])
+    cmd += export_val
+
+    # acme.sh --register-account -m my@example.com
+    cmd_register = 'acme.sh --register-account -m '+ email + '\n'
+    cmd += cmd_register
+
+    
+    # acme.sh --issue -d "example.com" -d "*.example.com" --dns dns_cf
+    cmd_apply = 'acme.sh --issue --dns '+str(cmd_data['type'])+' -d '+domain+' -d "*.'+domain+'"'
+    cmd += cmd_apply
+
+    run_log = runLog()
+    cmd += ' >> '+ run_log
+    print(cmd)
+    os.system(cmd)
+    hookWriteLog('结束申请【'+domain+'】SSL证书')
+    isok, path = domainApplyPathJudge(domain)
+    # print(isok,path)
+    if isok:
+        autoUpdateSslData(domain, path)
+        hookWriteLog('开始执行【'+domain+'】Hook脚本')
+        runHookPy(domain,path)
+        hookWriteLog('结束执行【'+domain+'】Hook脚本')
+
+def getHookIdCmd():
+    args = getArgs()
+    data = checkArgs(args, ['id'])
+    if not data[0]:
+        return data[1]
+
+    cmd = "cd "+mw.getRunDir()+" "
+    cmd += '&& python3 plugins/acme_pandominassl_apply/index.py run_hook_id 1.0 {"id":"'+args['id']+'"}'
+    return mw.returnJson(True, 'ok',cmd)
+
+def runHookId():
+    args = getArgs()
+    data = checkArgs(args, ['id'])
+    if not data[0]:
+        return data[1]
+
+    conn = pSqliteDb('domain')
+
+    field = 'id,status'
+    fdata = conn.field(field).where('id=?',(args['id'],)).find()
+
+    conn = pSqliteDb('domain')
+
+    field = 'id,domain,dnsapi_id,email,effective_date,expiration_date,remark'
+    row = conn.field(field).where('id=?',(args['id'],)).find()
+    runHookDstDomain(row)
+    return 'run hook '+args['id']+' end'
+
+def runHookCmd():
+    cmd = "cd "+mw.getRunDir()+" "
+    cmd += '&& python3 plugins/acme_pandominassl_apply/index.py run_hook'
+    return mw.returnJson(True, 'ok',cmd)
+    
 def runHook():
     conn = pSqliteDb('domain')
     conn_dnsapi = pSqliteDb('dnsapi')
 
-    field = 'id,domain,dnsapi_id,email,remark'
-    clist = conn.field(field).limit('1000').order('id desc').select()
+    field = 'id,domain,dnsapi_id,email,effective_date,expiration_date,remark'
+    clist = conn.field(field).where('status=?',(1,)).limit('1000').order('id desc').select()
 
     for idx in range(len(clist)):
-        domain = clist[idx]['domain']
-        email = str(clist[idx]['email'])
-        hookWriteLog('开始申请【'+domain+'】SSL证书')
-        cmd = "#!/bin/bash\n"
-
-        if mw.isAppleSystem():
-            user = getRunUser()
-            cmd += "source /Users/"+user+"/.zshrc\n"
-
-        cmd_data = getDnsapiData(clist[idx]['dnsapi_id'])
-        # print(cmd_data)
-        export_val =  getCmdExportVar(cmd_data['val'])
-        cmd += export_val
-
-        # acme.sh --register-account -m my@example.com
-        cmd_register = 'acme.sh --register-account -m '+ email + '\n'
-        cmd += cmd_register
-
-        
-        # acme.sh --issue -d "example.com" -d "*.example.com" --dns dns_cf
-        cmd_apply = 'acme.sh --issue --dns '+str(cmd_data['type'])+' -d '+domain+' -d "*.'+domain+'"'
-        cmd += cmd_apply
-
-        run_log = runLog()
-        cmd += ' >> '+ run_log
-        print(cmd)
-        os.system(cmd)
-        hookWriteLog('结束申请【'+domain+'】SSL证书')
-        isok, path = domainApplyPathJudge(domain)
-        # print(isok,path)
-        if isok:
-            hookWriteLog('开始执行【'+domain+'】Hook脚本')
-            runHookPy(domain,path)
-            hookWriteLog('结束执行【'+domain+'】Hook脚本')
+        # print(clist)
+        row = clist[idx]
+        print(row['expiration_date'])
+        runHookDstDomain(row)
         time.sleep(1)
-
     return 'run hook end'
 
-def runLog():
-    return getServerDir() + '/hook.log'
 
 if __name__ == "__main__":
     func = sys.argv[1]
+    # print(func)
     if func == 'status':
         print(status())
     elif func == 'start':
@@ -617,7 +696,15 @@ if __name__ == "__main__":
         print(domainAdd())
     elif func == 'domain_del':
         print(domainDel())
+    elif func == 'domain_status_toggle':
+        print(domainStatusToggle())
     elif func == 'run_hook':
         print(runHook())
+    elif func == 'run_hook_cmd':
+        print(runHookCmd())
+    elif func == 'get_run_hook_id_cmd':
+        print(getHookIdCmd())
+    elif func == 'run_hook_id':
+        print(runHookId())
     else:
         print('error')

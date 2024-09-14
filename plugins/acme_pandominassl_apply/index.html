@@ -16,7 +16,6 @@
 			<p onclick="emailList();">邮件地址 </p>
 			<p onclick="domainList()">域名SSL *</p>
 			<p onclick="pluginConfigTpl('acme_pandominassl_apply',$('.plugin_version').attr('version'));">HOOK</p>
-			<!-- <p onclick="pluginLogs('acme_pandominassl_apply','','run_log');">HOOK</p> -->
 			<p onclick="pluginLogs('acme_pandominassl_apply','','run_log');">日志</p>
 			<p onclick="apaReadme();">相关说明</p>
 			
@@ -27,7 +26,7 @@
 	</div>
 </div>
 <script type="text/javascript">
-resetPluginWinWidth(850);
+resetPluginWinWidth(900);
 resetPluginWinHeight(550);
 $.getScript( "/plugins/file?name=acme_pandominassl_apply&f=js/common.js", function(){
 	pluginService('acme_pandominassl_apply', $('.plugin_version').attr('version'));

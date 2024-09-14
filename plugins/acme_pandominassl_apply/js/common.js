@@ -497,10 +497,72 @@ function domainDel(id, name){
     });
 }
 
+function domainStatusToggle(id){
+    var data='id='+id;
+    apaPost('domain_status_toggle', data, function(data){
+        var rdata = $.parseJSON(data.data);
+        showMsg(rdata.msg,function(){
+            domainList();
+        },{icon: rdata.status ? 1 : 2}, 600);
+    });
+}
+
+function domainIdCmd(id){
+    var data='id='+id;
+    apaPost('get_run_hook_id_cmd', data, function(data){
+        var rdata = $.parseJSON(data.data);
+        // console.log(rdata);
+        layer.open({
+            title: "手动同步命令",
+            area: ['600px', '180px'],
+            type:1,
+            closeBtn: 1,
+            shadeClose: false,
+            btn:["复制","取消"],
+            content: '<div class="pd15">\
+                        <div class="divtable">\
+                            <pre class="layui-code">'+rdata.data+'</pre>\
+                        </div>\
+                    </div>',
+            success:function(){
+                copyText(rdata.data);
+            },
+            yes:function(){
+                copyText(rdata.data);
+            }
+        });
+    });
+}
+
+function domainHookCmd(){
+    apaPost('run_hook_cmd', {}, function(data){
+        var rdata = $.parseJSON(data.data);
+        layer.open({
+            title: "手动同步全部命令",
+            area: ['600px', '180px'],
+            type:1,
+            closeBtn: 1,
+            shadeClose: false,
+            btn:["复制","取消"],
+            content: '<div class="pd15">\
+                        <div class="divtable">\
+                            <pre class="layui-code">'+rdata.data+'</pre>\
+                        </div>\
+                    </div>',
+            success:function(){
+                copyText(rdata.data);
+            },
+            yes:function(){
+                copyText(rdata.data);
+            }
+        });
+    });
+}
+
 function domainAdd(row){
 
     var option_domian = '';
-    var option_remark = '';
+    var option_remark = '备注';
     var option_email = '';
     var option_id = 0;
     var option_dnsapi_id = 0;
@@ -544,10 +606,10 @@ function domainAdd(row){
                     <input name='id' value='"+option_id+"' type='hidden'>\
                   </form>",
         success:function(){
-            $("input[name='domain']").keyup(function(){
-                var v = $(this).val();
-                $("input[name='remark']").val(v);
-            });
+            // $("input[name='domain']").keyup(function(){
+            //     var v = $(this).val();
+            //     $("input[name='remark']").val(v);
+            // });
 
             var dnsapi_id_html = "<option value='0'>无设置</option>";
             apaPostN('dnsapi_list_all', {}, function(data){
@@ -601,8 +663,29 @@ function domainList(page, search){
             list += '<td>' + rdata.data[i]['dnsapi_id_alias'] +'</td>';
             list += '<td>' + rdata.data[i]['email'] +'</td>';
             list += '<td>' + rdata.data[i]['remark'] +'</td>';
-            list += '<td style="text-align:right">';
 
+            
+
+            if (rdata.data[i]['effective_date'] == ''){
+                list += '<td>空/未申请</td>';
+            } else {
+                list += '<td>'+getFormatTime(rdata.data[i]['effective_date'],'yyyy/MM/dd')+'</td>';
+            }
+
+            if (rdata.data[i]['expiration_date'] == ''){
+                list += '<td>空/未申请</td>';
+            } else {
+                list += '<td>'+getFormatTime(rdata.data[i]['expiration_date'],'yyyy/MM/dd')+'</td>';
+            }
+
+            if (rdata.data[i]['status'] == '0'){
+                list += '<td><a href="javascript:;" index="'+i+'" class="btlink status">否</a></td>';
+            } else {
+                list += '<td><a href="javascript:;" index="'+i+'" class="btlink status">是</a></td>';
+            }
+
+            list += '<td style="text-align:right">';
+            list += '<a href="javascript:;" index="'+i+'" class="btlink cmd" title="命令">命令</a> | ';
             list += '<a href="javascript:;" index="'+i+'" class="btlink edit" title="编辑">编辑</a> | ';
             list += '<a href="javascript:;" class="btlink" onclick="domainDel(\''+rdata.data[i]['id']+'\',\''+rdata.data[i]['domain']+'\')" title="删除">删除</a>';
             list += '</td></tr>';
@@ -610,6 +693,7 @@ function domainList(page, search){
 
         var con = '<div class="safe bgw">\
             <button onclick="domainAdd()" title="添加顶级域名" class="btn btn-success btn-sm" type="button" style="margin-right: 5px;">添加域名</button>\
+            <button onclick="domainHookCmd()" title="添加顶级域名" class="btn btn-success btn-sm" type="button" style="margin-right: 5px;">全部同步命令</button>\
             <div class="divtable mtb10">\
                 <div class="tablescroll">\
                     <table id="DataBody" class="table table-hover" width="100%" cellspacing="0" cellpadding="0" border="0" style="border: 0 none;">\
@@ -618,6 +702,9 @@ function domainList(page, search){
                     <th>DNSAPI</th>\
                     <th>邮件</th>\
                     <th>备注</th>\
+                    <th>开始</th>\
+                    <th>结束</th>\
+                    <th>同步</th>\
                     <th style="text-align:right;">操作</th></tr></thead>\
                     <tbody>'+ list +'</tbody>\
                     </table>\
@@ -633,7 +720,19 @@ function domainList(page, search){
             var idx = $(this).attr('index');
             var row = rdata.data[idx];
             domainAdd(row);
-        })
+        });
+
+        $('.status').click(function(){
+            var idx = $(this).attr('index');
+            var row = rdata.data[idx];
+            domainStatusToggle(row['id']);
+        });
+
+        $('.cmd').click(function(){
+            var idx = $(this).attr('index');
+            var row = rdata.data[idx];
+            domainIdCmd(row['id']);
+        });
 
         readerTableChecked();
     });
