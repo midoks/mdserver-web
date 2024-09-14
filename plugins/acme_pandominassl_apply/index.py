@@ -570,6 +570,16 @@ def autoUpdateSslData(domain, path):
 def runHookDstDomain(row):
     domain = row['domain']
     email = str(row['email'])
+
+    effective_date = int(row['effective_date'])
+    now_int = int(time.time())
+
+    day = (now_int - effective_date)/86400
+    # print(effective_date,now_int,day)
+    if int(day) < 8:
+        hookWriteLog('【'+domain+'】未过期')
+        return
+
     hookWriteLog('开始申请【'+domain+'】SSL证书')
     cmd = "#!/bin/bash\n"
 
@@ -597,7 +607,7 @@ def runHookDstDomain(row):
     os.system(cmd)
     hookWriteLog('结束申请【'+domain+'】SSL证书')
     isok, path = domainApplyPathJudge(domain)
-    # print(isok,path)
+    print(isok,path)
     if isok:
         autoUpdateSslData(domain, path)
         hookWriteLog('开始执行【'+domain+'】Hook脚本')
@@ -636,7 +646,7 @@ def runHookCmd():
     cmd = "cd "+mw.getRunDir()+" "
     cmd += '&& python3 plugins/acme_pandominassl_apply/index.py run_hook'
     return mw.returnJson(True, 'ok',cmd)
-    
+
 def runHook():
     conn = pSqliteDb('domain')
     conn_dnsapi = pSqliteDb('dnsapi')
@@ -647,7 +657,6 @@ def runHook():
     for idx in range(len(clist)):
         # print(clist)
         row = clist[idx]
-        print(row['expiration_date'])
         runHookDstDomain(row)
         time.sleep(1)
     return 'run hook end'

@@ -127,6 +127,7 @@ def initConf():
             "/var/log/cron",
             "/www/wwwlogs",
             "/www/server/rsyncd",
+            "/www/server/acme_pandominassl_apply",
             "/www/server/sphinx/index",
             "/www/server/mongodb/logs",
             "/www/server/php/53/var/log",
