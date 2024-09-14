@@ -534,7 +534,7 @@ def runHook():
         cmd += export_val
 
         # acme.sh --register-account -m my@example.com
-        cmd_register = 'acme.sh --register-account -m '+str(clist[idx]['email'])
+        cmd_register = 'acme.sh --register-account -m '+str(clist[idx]['email']) + '\n'
         cmd += cmd_register
 
         # acme.sh --issue -d "example.com" -d "*.example.com" --dns dns_cf
