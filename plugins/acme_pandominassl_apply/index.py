@@ -72,6 +72,24 @@ def checkArgs(data, ck=[]):
             return (False, mw.returnJson(False, '参数:(' + ck[i] + ')没有!'))
     return (True, mw.returnJson(True, 'ok'))
 
+
+def getHomeDir():
+    if mw.isAppleSystem():
+        user = mw.execShell(
+            "who | sed -n '2, 1p' |awk '{print $1}'")[0].strip()
+        return '/Users/' + user
+    else:
+        return '/root'
+
+
+def getRunUser():
+    if mw.isAppleSystem():
+        user = mw.execShell(
+            "who | sed -n '2, 1p' |awk '{print $1}'")[0].strip()
+        return user
+    else:
+        return 'root'
+
 def configTpl():
     path = getPluginDir() + '/hooks'
     pathFile = os.listdir(path)
@@ -474,7 +492,63 @@ def domainList():
 
     return mw.getJson(data)
 
+def getDnsapiData(dnsapi_id):
+    if dnsapi_id == '0':
+        return {}
+    conn_dnsapi = pSqliteDb('dnsapi')
+    tdata = conn_dnsapi.field('id,name,type,val').where('id=?',(dnsapi_id,)).select()
+
+    if len(tdata)>0:
+        return tdata[0]
+    return {}
+
+def getCmdExportVar(val):
+    cmd_list =  val.split('~')
+    def_var = ''
+    for x in range(len(cmd_list)):
+        v = cmd_list[x]
+        vlist = v.split('|')
+        def_var += 'export '+vlist[0]+'="'+vlist[1]+'"\n'
+    return def_var
+
+def runHookDst():
+    pass
+
 def runHook():
+    conn = pSqliteDb('domain')
+    conn_dnsapi = pSqliteDb('dnsapi')
+
+    field = 'id,domain,dnsapi_id,email,remark'
+    clist = conn.field(field).limit('1000').order('id desc').select()
+
+    for idx in range(len(clist)):
+        cmd = "#!/bin/bash\n"
+
+        if mw.isAppleSystem():
+            user = getRunUser()
+            cmd += "source /Users/"+user+"/.zshrc\n"
+
+        cmd_data = getDnsapiData(clist[idx]['dnsapi_id'])
+        print(cmd_data)
+        export_val =  getCmdExportVar(cmd_data['val'])
+        cmd += export_val
+
+        # acme.sh --register-account -m my@example.com
+        cmd_register = 'acme.sh --register-account -m '+str(clist[idx]['email'])
+        cmd += cmd_register
+
+        # acme.sh --issue -d "example.com" -d "*.example.com" --dns dns_cf
+        cmd_apply = 'acme.sh --issue --dns '+str(cmd_data['type'])+' -d '+clist[idx]['domain']+' -d "*.'+clist[idx]['domain']+'"'
+        cmd += cmd_apply
+
+        run_log = runLog()
+        cmd += ' >> '+ run_log
+        print(cmd)
+        os.system(cmd)
+        # r = mw.execShell(cmd)
+        # print(r)
+        time.sleep(1)
+
     return 'run hook'
 
 def runLog():

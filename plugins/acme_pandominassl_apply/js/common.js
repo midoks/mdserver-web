@@ -211,9 +211,9 @@ function dnsapiDel(id, name){
 }
 
 var dnsapi_option = [
-    {"name":"cf", "title":'cloudflare', 'key':'CF_Key:CF_Email'},
-    {"name":"dp", "title":'dnspod/国内', 'key':'DP_Id:DP_Key'},
-    {"name":"dpi", "title":'dnspod/国际', 'key':'DPI_Id:DPI_Key'},
+    {"name":"dns_cf", "title":'cloudflare', 'key':'CF_Key:CF_Email'},
+    {"name":"dns_dp", "title":'dnspod/国内', 'key':'DP_Id:DP_Key'},
+    {"name":"dns_dpi", "title":'dnspod/国际', 'key':'DPI_Id:DPI_Key'},
     {"name":"dns_gd", "title":'GoDaddy', 'key':'GD_Key:GD_Secret'},
     {"name":"dns_pdns", "title":'PowerDNS', 'key':'PDNS_Url:PDNS_ServerId:PDNS_Token:PDNS_Ttl'},
     {"name":"dns_lua", "title":'LuaDNS', 'key':'LUA_Key:LUA_Email'},
