@@ -10,6 +10,8 @@ serverPath=$(dirname "$rootPath")
 install_tmp=${rootPath}/tmp/mw_install.pl
 VERSION=$2
 
+# cd /www/server/mdserver-web && python3 plugins/acme_pandominassl_apply/index.py run_hook
+
 Install_App()
 {
 	echo '正在安装脚本文件...' > $install_tmp
