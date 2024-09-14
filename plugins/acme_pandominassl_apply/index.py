@@ -538,7 +538,8 @@ def hookWriteLog(line):
 def runHookPy(domain,path):
     # print(domain,path)
     hook_file = getConf()
-    cmd = 'python3 '+hook_file + ' ' + domain + ' ' + path
+    cmd = 'cd '+mw.getRunDir()
+    cmd += ' && python3 '+hook_file + ' ' + domain + ' ' + path
     print(cmd)
     return mw.execShell(cmd)
 
