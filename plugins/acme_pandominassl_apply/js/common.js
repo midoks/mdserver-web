@@ -86,6 +86,9 @@ function apaReadme(){
     readme += '<li>通过DNS验证获取SSL证书!</li>';
     readme += '<li>HOOK: ssl发生变动时调用!</li>';
     readme += '<li>暂时仅支持1000个域名管理!</li>';
+    readme += '<li>DNSAPI文档: https://github.com/acmesh-official/acme.sh/wiki/dnsapi</li>';
+
+    
     readme += '</ul>';
     $('.soft-man-con').html(readme);   
 }
