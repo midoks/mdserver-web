@@ -549,7 +549,7 @@ def runHook():
         # print(r)
         time.sleep(1)
 
-    return 'run hook'
+    return 'run hook end'
 
 def runLog():
     return getServerDir() + '/hook.log'
