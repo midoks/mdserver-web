@@ -26,15 +26,11 @@ ssl_path = sys.argv[2]
 
 def getToken():
     api_url = goedge_addr+'/APIAccessTokenService/getAPIAccessToken'
-    # print(api_url)
-
     post_data = {
         "type": "admin",
         "accessKeyId": access_keyid,
         "accessKey": access_key
     }
-    # json_data = mw.getJson(post_data)
-    # print(json_data)
     data = requests.post(api_url,json=post_data)
     data_obj = data.json()
 
@@ -58,7 +54,6 @@ def listSSLCerts(domain):
         "domains":[domain,"*."+domain],
         "size":1
     }
-    # print(request_data)
     response_data = commonReq('/SSLCertService/listSSLCerts', request_data)
 
     data = response_data['data']['sslCertsJSON']
@@ -111,12 +106,12 @@ def createSSLCert(domain, did=0):
         request_data['sslCertId'] = did
         # print(request_data)
         response_data = commonReq('/SSLCertService/updateSSLCert', request_data)
-        print('更新成功',response_data)
+        print('更新成功',domain,response_data)
         return response_data
     else:
         # print(request_data)
         response_data = commonReq('/SSLCertService/createSSLCert', request_data)
-        print('创建成功',response_data)
+        print('创建成功',domain,response_data)
         return response_data
     return response_data
 
