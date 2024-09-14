@@ -557,7 +557,7 @@ def runHook():
 
         run_log = runLog()
         cmd += ' >> '+ run_log
-        # print(cmd)
+        print(cmd)
         os.system(cmd)
         hookWriteLog('结束申请【'+domain+'】SSL证书')
         isok, path = domainApplyPathJudge(domain)

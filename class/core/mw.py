@@ -472,6 +472,9 @@ def getJson(data):
     import json
     return json.dumps(data)
 
+def getObjectByJson(data):
+    import json
+    return json.loads(data)
 
 def returnData(status, msg, data=None):
     return {'status': status, 'msg': msg, 'data': data}
