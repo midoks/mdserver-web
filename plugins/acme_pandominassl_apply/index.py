@@ -152,6 +152,10 @@ def initDreplace():
         os.mkdir(initD_path)
     file_bin = initD_path + '/' + getPluginName()
 
+    run_log_file = runLog()
+    if not os.path.exists(run_log_file):
+        mw.writeFile(run_log_file,'')
+
     # initd replace
     if not os.path.exists(file_bin):
         content = mw.readFile(file_tpl)
