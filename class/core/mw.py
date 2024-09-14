@@ -687,6 +687,15 @@ def restoreFile(file, act=None):
         file_type = "_def"
     execShell("cp -p {1} {0}".format(file, file + file_type))
 
+def base64StrEncode(content):
+    content = bytes(content,'utf-8')
+    content = base64.b64encode(content)
+    return content.decode('utf8')
+
+def base64StrDecode(content):
+    content = bytes(content,'utf-8')
+    content = base64.urlsafe_b64decode(content)
+    return content.decode('utf8')
 
 def enPunycode(domain):
     if sys.version_info[0] == 2:
