@@ -511,8 +511,36 @@ def getCmdExportVar(val):
         def_var += 'export '+vlist[0]+'="'+vlist[1]+'"\n'
     return def_var
 
-def runHookDst():
-    pass
+def domainApplyPathJudge(domain):
+    acme_dir = "/root/.acme.sh"
+    if mw.isAppleSystem():
+        user = getRunUser()
+        acme_dir = "/Users/"+user+"/.acme.sh"
+
+    abs_domain_path = acme_dir+'/'+domain+'_ecc'
+    # print(abs_domain_path)
+    if os.path.exists(abs_domain_path):
+        return True, abs_domain_path
+
+    abs_domain_path = acme_dir+'/'+domain
+    # print(abs_domain_path)
+    if os.path.exists(abs_domain_path):
+        return True, abs_domain_path
+
+    return False,''
+
+
+def hookWriteLog(line):
+    hook_log = runLog()
+    mdate = time.strftime('%Y-%m-%d %X', time.localtime())
+    return mw.writeFile(hook_log,"["+mdate+"]:"+line+"\n",'a+')
+
+def runHookPy(domain,path):
+    # print(domain,path)
+    hook_file = getConf()
+    cmd = 'python3 '+hook_file + ' ' + domain + ' ' + path
+    print(cmd)
+    return mw.execShell(cmd)
 
 def runHook():
     conn = pSqliteDb('domain')
@@ -522,6 +550,9 @@ def runHook():
     clist = conn.field(field).limit('1000').order('id desc').select()
 
     for idx in range(len(clist)):
+        domain = clist[idx]['domain']
+        email = str(clist[idx]['email'])
+        hookWriteLog('开始申请【'+domain+'】SSL证书')
         cmd = "#!/bin/bash\n"
 
         if mw.isAppleSystem():
@@ -529,24 +560,30 @@ def runHook():
             cmd += "source /Users/"+user+"/.zshrc\n"
 
         cmd_data = getDnsapiData(clist[idx]['dnsapi_id'])
-        print(cmd_data)
+        # print(cmd_data)
         export_val =  getCmdExportVar(cmd_data['val'])
         cmd += export_val
 
         # acme.sh --register-account -m my@example.com
-        cmd_register = 'acme.sh --register-account -m '+str(clist[idx]['email']) + '\n'
+        cmd_register = 'acme.sh --register-account -m '+ email + '\n'
         cmd += cmd_register
 
+        
         # acme.sh --issue -d "example.com" -d "*.example.com" --dns dns_cf
-        cmd_apply = 'acme.sh --issue --dns '+str(cmd_data['type'])+' -d '+clist[idx]['domain']+' -d "*.'+clist[idx]['domain']+'"'
+        cmd_apply = 'acme.sh --issue --dns '+str(cmd_data['type'])+' -d '+domain+' -d "*.'+domain+'"'
         cmd += cmd_apply
 
         run_log = runLog()
         cmd += ' >> '+ run_log
-        print(cmd)
+        # print(cmd)
         os.system(cmd)
-        # r = mw.execShell(cmd)
-        # print(r)
+        hookWriteLog('结束申请【'+domain+'】SSL证书')
+        isok, path = domainApplyPathJudge(domain)
+        # print(isok,path)
+        if isok:
+            hookWriteLog('开始执行【'+domain+'】Hook脚本')
+            runHookPy(domain,path)
+            hookWriteLog('结束执行【'+domain+'】Hook脚本')
         time.sleep(1)
 
     return 'run hook end'
