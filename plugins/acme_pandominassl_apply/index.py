@@ -589,9 +589,7 @@ def runHookDstDomain(row):
     if row['effective_date'] != '':
         effective_date = int(row['effective_date'])
         now_int = int(time.time())
-
         day = (now_int - effective_date)/86400
-        # print(effective_date,now_int,day)
         if int(day) < 8:
             common_log = '【'+domain+'】未过期'
             hookWriteLog(common_log)
@@ -616,6 +614,12 @@ def runHookDstDomain(row):
     
     # acme.sh --issue -d "example.com" -d "*.example.com" --dns dns_cf
     cmd_apply = 'acme.sh --issue --dns '+str(cmd_data['type'])+' -d '+domain+' -d "*.'+domain+'"'
+    if row['effective_date'] != '':
+        effective_date = int(row['effective_date'])
+        now_int = int(time.time())
+        day = (now_int - effective_date)/86400
+        if int(day) > 7:
+            cmd_apply = 'acme.sh --issue --dns '+str(cmd_data['type'])+' -d '+domain+' -d "*.'+domain+'" --force'
     cmd += cmd_apply
 
     run_log = runLog()
