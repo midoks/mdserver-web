@@ -1040,20 +1040,20 @@ function webEdit(id,website,endTime,addtime){
 		shift: 0,
 		content: "<div class='bt-form'>\
 			<div class='bt-w-menu pull-left' style='height: 565px;'>\
-				<p class='bgw'  onclick=\"domainEdit(" + id + ",'" + website + "')\">"+lan.site.domain_man+"</p>\
-				<p onclick='dirBinding("+id+")' title='子目录绑定'>子目录绑定</p>\
-				<p onclick='webPathEdit("+id+")' title='网站目录'>网站目录</p>\
-				<p onclick='limitNet("+id+")' title='流量限制'>流量限制</p>\
-				<p onclick=\"rewrite('"+website+"')\" title='伪静态'>伪静态</p>\
-				<p onclick='setIndexEdit("+id+")' title='默认文档'>默认文档</p>\
-				<p onclick=\"configFile('"+website+"')\" title='配置文件'>配置文件</p>\
-				<p onclick=\"setSSL("+id+",'"+website+"')\" title='SSL'>SSL</p>\
-				<p onclick=\"phpVersion('"+website+"')\" title='PHP版本'>PHP版本</p>\
-				<p onclick=\"to301('"+website+"')\" title='重定向'>重定向</p>\
-				<p onclick=\"toProxy('"+website+"')\" title='反向代理'>反向代理</p>\
-				<p id='site_"+id+"' onclick=\"security('"+id+"','"+website+"')\" title='防盗链'>防盗链</p>\
-				<p id='site_"+id+"' onclick=\"getSiteLogs('"+website+"')\" title='查看站点请求日志'>响应日志</p>\
-				<p id='site_"+id+"' onclick=\"getSiteErrorLogs('"+website+"')\" title='查看站点错误日志'>错误日志</p>\
+				<p class='bgw' onclick=\"domainEdit(" + id + ",'" + website + "')\">域名管理</p>\
+				<p onclick='dirBinding("+id+")'>子目录绑定</p>\
+				<p onclick='webPathEdit("+id+")'>网站目录</p>\
+				<p onclick='limitNet("+id+")'>流量限制</p>\
+				<p onclick=\"rewrite('"+website+"')\">伪静态</p>\
+				<p onclick='setIndexEdit("+id+")'>默认文档</p>\
+				<p onclick=\"configFile('"+website+"')\">配置文件</p>\
+				<p onclick=\"setSSL("+id+",'"+website+"')\">SSL</p>\
+				<p onclick=\"phpVersion('"+website+"')\">PHP版本</p>\
+				<p onclick=\"to301('"+website+"')\">重定向</p>\
+				<p onclick=\"toProxy('"+website+"')\">反向代理</p>\
+				<p id='site_"+id+"' onclick=\"security('"+id+"','"+website+"')\">防盗链</p>\
+				<p id='site_"+id+"' onclick=\"getSiteLogs('"+website+"')\">响应日志</p>\
+				<p id='site_"+id+"' onclick=\"getSiteErrorLogs('"+website+"')\">错误日志</p>\
 			</div>\
 			<div id='webedit-con' class='bt-w-con webedit-con pd15' style='height: 565px;overflow: scroll;'></div>\
 		</div>",
@@ -1983,7 +1983,9 @@ function setCertSsl(certName,siteName){
 
 //ssl
 function setSSL(id,siteName){
-	var sslHtml = '<div class="warning_info mb10" style="display:none;"><p class="">温馨提示：当前站点未开启SSL证书访问，站点访问可能存在风险。<button class="btn btn-success btn-xs ml10 cutTabView">申请证书</button></p></div>\
+	var sslHtml = '<div class="warning_info mb10" style="display:none;">\
+					<p>温馨提示：当前站点未开启SSL证书访问，站点访问可能存在风险。<button class="btn btn-success btn-xs ml10 cutTabView">申请证书</button></p>\
+				</div>\
 				<div class="tab-nav" style="margin-top: 10px;">\
 					<span class="on" id="now_ssl" onclick="opSSL(\'now\','+id+',\''+siteName+'\')">当前证书 - <i class="error">[未部署SSL]</i></span>\
 					<span onclick="opSSL(\'lets\','+id+',\''+siteName+'\')">Let\'s Encrypt</span>\
@@ -2049,98 +2051,110 @@ function renewSSL(type,id,siteName){
 	});	
 }
 
+function fileCheck(){
+
+}
+
+function dnsCheck(){
+
+}
+
 //SSL
 function opSSL(type, id, siteName, callback){
 
 	var now = '<div class="myKeyCon ptb15">\
-	 				<div class="ssl_state_info" style="display:none;"></div>\
-					<div class="custom_certificate_info">\
-						<div class="ssl-con-key pull-left mr20">密钥(KEY)<br><textarea id="key" class="bt-input-text"></textarea></div>\
-						<div class="ssl-con-key pull-left">证书(PEM格式)<br><textarea id="csr" class="bt-input-text"></textarea></div>\
-					</div>\
-					<div class="ssl-btn pull-left mtb15" style="width:100%">\
-						<button class="btn btn-success btn-sm" onclick="saveSSL(\''+siteName+'\')">保存</button>\
-					</div>\
-				</div>\
-				<ul class="help-info-text c7 pull-left">\
-					<li>粘贴您的*.key以及*.pem内容，然后保存即可。</li>\
-					<li>如果浏览器提示证书链不完整,请检查是否正确拼接PEM证书</li><li>PEM格式证书 = 域名证书.crt + 根证书(root_bundle).crt</li>\
-					<li>在未指定SSL默认站点时,未开启SSL的站点使用HTTPS会直接访问到已开启SSL的站点</li>\
-				</ul>';	
+			<div class="ssl_state_info" style="display:none;"></div>\
+		<div class="custom_certificate_info">\
+			<div class="ssl-con-key pull-left mr20">密钥(KEY)<br><textarea id="key" class="bt-input-text"></textarea></div>\
+			<div class="ssl-con-key pull-left">证书(PEM格式)<br><textarea id="csr" class="bt-input-text"></textarea></div>\
+		</div>\
+		<div class="ssl-btn pull-left mtb15" style="width:100%">\
+			<button class="btn btn-success btn-sm" onclick="saveSSL(\''+siteName+'\')">保存</button>\
+		</div>\
+	</div>\
+	<ul class="help-info-text c7 pull-left">\
+		<li>粘贴您的*.key以及*.pem内容，然后保存即可。</li>\
+		<li>如果浏览器提示证书链不完整,请检查是否正确拼接PEM证书</li><li>PEM格式证书 = 域名证书.crt + 根证书(root_bundle).crt</li>\
+		<li>在未指定SSL默认站点时,未开启SSL的站点使用HTTPS会直接访问到已开启SSL的站点</li>\
+	</ul>';	
 
+	// 	<input type="radio" name="c_type" onclick="dnsCheck()" id="check_dns"/>\
+	// <label class="mr20" for="check_dns" style="font-weight:normal">DNS验证</label></label>\
 	var lets =  '<div class="apply_ssl">\
-					<div class="label-input-group">\
-						<div class="line mtb10">\
-							<form>\
-								<span class="tname text-center">验证方式</span>\
-								<div style="margin-top:7px;display:inline-block">\
-									<input type="radio" name="c_type" onclick="file_check()" id="check_file" checked="checked" />\
-				  					<label class="mr20" for="check_file" style="font-weight:normal">文件验证</label></label>\
-				  				</div>\
-				  			</form>\
-				  		</div>\
-			  			<div class="check_message line">\
-			  				<div style="margin-left:100px">\
-			  					<input type="checkbox" name="checkDomain" id="checkDomain" checked="">\
-			  					<label class="mr20" for="checkDomain" style="font-weight:normal">提前校验域名(提前发现问题,减少失败率)</label>\
-			  				</div>\
-			  			</div>\
-			  		</div>\
-			  		<div class="line mtb10">\
-			  			<span class="tname text-center">管理员邮箱</span>\
-			  			<input class="bt-input-text" style="width:240px;" type="text" name="admin_email" />\
-			  		</div>\
-			  		<div class="line mtb10">\
-			  			<span class="tname text-center">域名</span>\
-			  			<ul id="ymlist" style="padding: 5px 10px;max-height:180px;overflow:auto; width:240px;border:#ccc 1px solid;border-radius:3px"></ul>\
-			  		</div>\
-			  		<div class="line mtb10" style="margin-left:100px">\
-			  			<button class="btn btn-success btn-sm letsApply">申请</button>\
-			  		</div>\
-				  	<ul class="help-info-text c7" id="lets_help">\
-				  		<li>申请之前，请确保域名已解析，如未解析会导致审核失败</li>\
-				  		<li>Let\'s Encrypt免费证书，有效期3个月，支持多域名。默认会自动续签</li>\
-				  		<li>若您的站点使用了CDN或301重定向会导致续签失败</li>\
-				  		<li>在未指定SSL默认站点时,未开启SSL的站点使用HTTPS会直接访问到已开启SSL的站点</li>\
-				  	</ul>\
-			  </div>';
+		<div class="label-input-group">\
+			<div class="line mtb10">\
+				<form>\
+					<span class="tname text-center">验证方式</span>\
+					<div style="margin-top:7px;display:inline-block">\
+						<input type="radio" name="c_type" onclick="fileCheck()" id="check_file" checked="checked" />\
+	  					<label class="mr20" for="check_file" style="font-weight:normal">文件验证</label></label>\
+	  				</div>\
+	  			</form>\
+	  		</div>\
+  			<div class="check_message line">\
+  				<div style="margin-left:100px">\
+  					<input type="checkbox" name="checkDomain" id="checkDomain" checked="">\
+  					<label class="mr20" for="checkDomain" style="font-weight:normal">提前校验域名(提前发现问题,减少失败率)</label>\
+  				</div>\
+  			</div>\
+  		</div>\
+  		<div class="line mtb10">\
+  			<span class="tname text-center">管理员邮箱</span>\
+  			<input class="bt-input-text" style="width:240px;" type="text" name="admin_email" />\
+  		</div>\
+  		<div class="line mtb10">\
+  			<span class="tname text-center">域名</span>\
+  			<ul id="ymlist" style="padding: 5px 10px;max-height:180px;overflow:auto; width:240px;border:#ccc 1px solid;border-radius:3px"></ul>\
+  		</div>\
+  		<div class="line mtb10" style="margin-left:100px">\
+  			<button class="btn btn-success btn-sm letsApply">申请</button>\
+  		</div>\
+	  	<ul class="help-info-text c7" id="lets_help">\
+	  		<li>申请之前，请确保域名已解析，如未解析会导致审核失败</li>\
+	  		<li>Let\'s Encrypt免费证书，有效期3个月，支持多域名。默认会自动续签</li>\
+	  		<li>若您的站点使用了CDN或301重定向会导致续签失败</li>\
+	  		<li>在未指定SSL默认站点时,未开启SSL的站点使用HTTPS会直接访问到已开启SSL的站点</li>\
+	  	</ul>\
+  	</div>';
 
+  	// <input type="radio" name="c_type" onclick="dnsCheck()" id="check_dns"/>\
+	// <label class="mr20" for="check_dns" style="font-weight:normal">DNS验证</label></label>\
 	var acme =  '<div class="apply_ssl">\
-					<div class="label-input-group">\
-						<div class="line mtb10">\
-							<form>\
-								<span class="tname text-center">验证方式</span>\
-								<div style="margin-top:7px;display:inline-block">\
-									<input type="radio" name="c_type" onclick="file_check()" id="check_file" checked="checked" />\
-				  					<label class="mr20" for="check_file" style="font-weight:normal">文件验证</label></label>\
-				  				</div>\
-				  			</form>\
-				  		</div>\
-			  			<div class="check_message line">\
-			  				<div style="margin-left:100px">\
-			  					<input type="checkbox" name="checkDomain" id="checkDomain" checked="">\
-			  					<label class="mr20" for="checkDomain" style="font-weight:normal">提前校验域名(提前发现问题,减少失败率)</label>\
-			  				</div>\
-			  			</div>\
-			  		</div>\
-			  		<div class="line mtb10">\
-			  			<span class="tname text-center">管理员邮箱</span>\
-			  			<input class="bt-input-text" style="width:240px;" type="text" name="admin_email" />\
-			  		</div>\
-			  		<div class="line mtb10">\
-			  			<span class="tname text-center">域名</span>\
-			  			<ul id="ymlist" style="padding: 5px 10px;max-height:180px;overflow:auto; width:240px;border:#ccc 1px solid;border-radius:3px"></ul>\
-			  		</div>\
-			  		<div class="line mtb10" style="margin-left:100px">\
-			  			<button class="btn btn-success btn-sm letsApply">申请</button>\
-			  		</div>\
-				  	<ul class="help-info-text c7" id="lets_help">\
-				  		<li>申请之前，请确保域名已解析，如未解析会导致审核失败</li>\
-			  			<li>由ACME免费申请证书，有效期3个月，支持多域名。默认会自动续签</li>\
-			  			<li>若您的站点使用了CDN或301重定向会导致续签失败</li>\
-			  			<li>在未指定SSL默认站点时,未开启SSL的站点使用HTTPS会直接访问到已开启SSL的站点</li></ul>\
-				  	</ul>\
-			  </div>';
+		<div class="label-input-group">\
+			<div class="line mtb10">\
+				<form>\
+					<span class="tname text-center">验证方式</span>\
+					<div style="margin-top:7px;display:inline-block">\
+						<input type="radio" name="c_type" onclick="fileCheck()" id="check_file" checked="checked" />\
+	  					<label class="mr20" for="check_file" style="font-weight:normal">文件验证</label></label>\
+	  				</div>\
+	  			</form>\
+	  		</div>\
+  			<div class="check_message line">\
+  				<div style="margin-left:100px">\
+  					<input type="checkbox" name="checkDomain" id="checkDomain" checked="">\
+  					<label class="mr20" for="checkDomain" style="font-weight:normal">提前校验域名(提前发现问题,减少失败率)</label>\
+  				</div>\
+  			</div>\
+  		</div>\
+  		<div class="line mtb10">\
+  			<span class="tname text-center">管理员邮箱</span>\
+  			<input class="bt-input-text" style="width:240px;" type="text" name="admin_email" />\
+  		</div>\
+  		<div class="line mtb10">\
+  			<span class="tname text-center">域名</span>\
+  			<ul id="ymlist" style="padding: 5px 10px;max-height:180px;overflow:auto; width:240px;border:#ccc 1px solid;border-radius:3px"></ul>\
+  		</div>\
+  		<div class="line mtb10" style="margin-left:100px">\
+  			<button class="btn btn-success btn-sm letsApply">申请</button>\
+  		</div>\
+		<ul class="help-info-text c7" id="lets_help">\
+			<li>申请之前，请确保域名已解析，如未解析会导致审核失败</li>\
+			<li>由ACME免费申请证书，有效期3个月，支持多域名。默认会自动续签</li>\
+			<li>若您的站点使用了CDN或301重定向会导致续签失败</li>\
+			<li>在未指定SSL默认站点时,未开启SSL的站点使用HTTPS会直接访问到已开启SSL的站点</li></ul>\
+	 	</ul>\
+	</div>';
 
 			
 	switch(type){
