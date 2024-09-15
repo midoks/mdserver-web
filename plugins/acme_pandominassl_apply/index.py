@@ -732,34 +732,6 @@ def runSyncCfCmd():
     cmd += '&& python3 plugins/acme_pandominassl_apply/index.py run_sync_cf_data'
     return mw.returnJson(True, 'ok',cmd)
 
-
-def getDnsPodToken():
-    DPI_Id = row['kv']['DPI_Id']
-    DPI_Key = row['kv']['DPI_Key']
-    data = {
-        'user_token': DPI_Id+','+DPI_Key,
-        'format':'json',
-    }
-    url = "https://api.dnspod.com/Domain.List"
-    try:
-        r = requests.post(url, timeout=30, data=data)
-        r.raise_for_status()
-        r.encoding = r.apparent_encoding
-
-        jdata = json.loads(r.text)
-        # result = jdata['result']
-        # result_info = jdata['result_info']
-
-        print(jdata)
-        # for i in result:
-            # autoSyncDomain(i['name'], row['id'], cf_mail)
-
-        # if result_info['total_pages'] > page:
-        #     page += 1
-        #     runSyncDnspodDataRow(row, page)
-    except Exception as e:
-        print(e)
-
 def runSyncDnspodDataRow(row, page = 1):
     # print(row, page)
 
@@ -786,7 +758,7 @@ def runSyncDnspodDataRow(row, page = 1):
             autoSyncDomain(i['name'], row['id'], i['owner'])
 
         page_total = int(info['domain_total']/data['length'])
-        if rpage_total > page:
+        if page_total > page:
             page += 1
             runSyncDnspodDataRow(row, page)
     except Exception as e:
@@ -807,6 +779,11 @@ def runSyncDnsPodData():
     print(fdata)
     print("同步DnsPod数据结束")
     return ''
+
+def runSyncDnsPodCmd():
+    cmd = "cd "+mw.getRunDir()+" "
+    cmd += '&& python3 plugins/acme_pandominassl_apply/index.py run_sync_dnspod_data'
+    return mw.returnJson(True, 'ok',cmd)
 
 if __name__ == "__main__":
     func = sys.argv[1]
@@ -867,5 +844,7 @@ if __name__ == "__main__":
         print(runSyncCfCmd())
     elif func == 'run_sync_dnspod_data':
         print(runSyncDnsPodData())
+    elif func == 'run_sync_dnspod_cmd':
+        print(runSyncDnsPodCmd())
     else:
         print('error')
