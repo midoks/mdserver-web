@@ -563,7 +563,7 @@ function syncCfCmd(){
     apaPost('run_sync_cf_cmd', {}, function(data){
         var rdata = $.parseJSON(data.data);
         layer.open({
-            title: "手动同步CloudFlare全部命令",
+            title: "手动同步CloudFlare域名全部命令",
             area: ['600px', '180px'],
             type:1,
             closeBtn: 1,
