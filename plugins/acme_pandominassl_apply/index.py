@@ -550,9 +550,11 @@ def domainApplyPathJudge(domain):
 
 
 def hookWriteLog(line):
-    hook_log = runLog()
+    hook_file = runLog()
     mdate = time.strftime('%Y-%m-%d %X', time.localtime())
-    return mw.writeFile(hook_log,"["+mdate+"]:"+line+"\n",'a+')
+    log = "["+mdate+"]:"+line
+    print(log)
+    return mw.writeFile(hook_file,log+"\n",'a+')
 
 def runHookPy(domain,path):
     # print(domain,path)
@@ -591,7 +593,8 @@ def runHookDstDomain(row):
         day = (now_int - effective_date)/86400
         # print(effective_date,now_int,day)
         if int(day) < 8:
-            hookWriteLog('【'+domain+'】未过期')
+            common_log = '【'+domain+'】未过期'
+            hookWriteLog(common_log)
             return
 
     hookWriteLog('开始申请【'+domain+'】SSL证书')
@@ -662,8 +665,8 @@ def runHook():
     clist = conn.field(field).where('status=?',(1,)).limit('1000').order('id desc').select()
 
     for idx in range(len(clist)):
-        # print(clist)
         row = clist[idx]
+        # print(row)
         runHookDstDomain(row)
         time.sleep(1)
     return 'run hook end'
