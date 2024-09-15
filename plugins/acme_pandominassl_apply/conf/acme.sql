@@ -28,7 +28,7 @@ CREATE TABLE IF NOT EXISTS `domain` (
   `addtime` TEXT
 );
 
-ALTER TABLE `domain` ADD COLUMN `effective_date` TEXT DEFAULT '';
-ALTER TABLE `domain` ADD COLUMN `expiration_date` TEXT DEFAULT '';
-ALTER TABLE `domain` ADD COLUMN `error` TEXT DEFAULT '';
-ALTER TABLE `domain` ADD COLUMN `status` INTEGER DEFAULT '0';
+-- ALTER TABLE `domain` ADD COLUMN `effective_date` TEXT DEFAULT '';
+-- ALTER TABLE `domain` ADD COLUMN `expiration_date` TEXT DEFAULT '';
+-- ALTER TABLE `domain` ADD COLUMN `error` TEXT DEFAULT '';
+-- ALTER TABLE `domain` ADD COLUMN `status` INTEGER DEFAULT '0';
