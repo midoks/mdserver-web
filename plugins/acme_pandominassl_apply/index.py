@@ -584,14 +584,15 @@ def runHookDstDomain(row):
     domain = row['domain']
     email = str(row['email'])
 
-    effective_date = int(row['effective_date'])
-    now_int = int(time.time())
+    if row['effective_date'] != '':
+        effective_date = int(row['effective_date'])
+        now_int = int(time.time())
 
-    day = (now_int - effective_date)/86400
-    # print(effective_date,now_int,day)
-    if int(day) < 8:
-        hookWriteLog('【'+domain+'】未过期')
-        return
+        day = (now_int - effective_date)/86400
+        # print(effective_date,now_int,day)
+        if int(day) < 8:
+            hookWriteLog('【'+domain+'】未过期')
+            return
 
     hookWriteLog('开始申请【'+domain+'】SSL证书')
     cmd = "#!/bin/bash\n"
@@ -731,9 +732,79 @@ def runSyncCfCmd():
     cmd += '&& python3 plugins/acme_pandominassl_apply/index.py run_sync_cf_data'
     return mw.returnJson(True, 'ok',cmd)
 
+
+def getDnsPodToken():
+    DPI_Id = row['kv']['DPI_Id']
+    DPI_Key = row['kv']['DPI_Key']
+    data = {
+        'user_token': DPI_Id+','+DPI_Key,
+        'format':'json',
+    }
+    url = "https://api.dnspod.com/Domain.List"
+    try:
+        r = requests.post(url, timeout=30, data=data)
+        r.raise_for_status()
+        r.encoding = r.apparent_encoding
+
+        jdata = json.loads(r.text)
+        # result = jdata['result']
+        # result_info = jdata['result_info']
+
+        print(jdata)
+        # for i in result:
+            # autoSyncDomain(i['name'], row['id'], cf_mail)
+
+        # if result_info['total_pages'] > page:
+        #     page += 1
+        #     runSyncDnspodDataRow(row, page)
+    except Exception as e:
+        print(e)
+
+def runSyncDnspodDataRow(row, page = 1):
+    # print(row, page)
+
+    DPI_Id = row['kv']['DPI_Id']
+    DPI_Key = row['kv']['DPI_Key']
+    data = {
+        'login_token': DPI_Id+','+DPI_Key,
+        'length':5,
+        'format':'json',
+    }
+    url = "https://api.dnspod.com/Domain.List"
+    try:
+        r = requests.post(url, timeout=30, data=data)
+        r.raise_for_status()
+        r.encoding = r.apparent_encoding
+
+        # print(r.text)
+        jdata = json.loads(r.text)
+        info = jdata['info']
+        domains = jdata['domains']
+
+        # print(jdata)
+        for i in domains:
+            autoSyncDomain(i['name'], row['id'], i['owner'])
+
+        page_total = int(info['domain_total']/data['length'])
+        if rpage_total > page:
+            page += 1
+            runSyncDnspodDataRow(row, page)
+    except Exception as e:
+        print(e)
+
 # 同步DnsPod数据
 def runSyncDnsPodData():
     print("同步DnsPod数据开始")
+    conn_dnsapi = pSqliteDb('dnsapi')
+    field = "id,name,type,val"
+    fdata = conn_dnsapi.field(field).where('type=?', ('dns_dpi',)).limit('10').select()
+    for x in range(len(fdata)):
+        row = fdata[x]
+        dnsapi_kv = getDnsapiKv(row['val'])
+        row['kv'] = dnsapi_kv
+        runSyncDnspodDataRow(row)
+
+    print(fdata)
     print("同步DnsPod数据结束")
     return ''
 
