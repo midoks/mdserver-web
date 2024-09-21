@@ -225,8 +225,7 @@ fi
                     86400  # 24小时后过期
                 self.saveConfig()
             except Exception as e:
-                raise Exception(
-                    '服务因维护而关闭或发生内部错误，查看 <a href="https://letsencrypt.status.io/" target="_blank" class="btlink">https://letsencrypt.status.io/</a> 了解更多详细信息。')
+                raise Exception('服务因维护而关闭或发生内部错误，查看 <a href="https://letsencrypt.status.io/" target="_blank" class="btlink">https://letsencrypt.status.io/</a> 了解更多详细信息。')
         return self.__apis
 
     # 系列化payload
