@@ -48,7 +48,7 @@ def getInitDFile(version):
 
 
 def getConf(version):
-    path = getServerDir() + '/' + version + '/etc/php.ini'
+    path = getServerDir() + '/php' + version + '/php.ini'
     return path
 
 
