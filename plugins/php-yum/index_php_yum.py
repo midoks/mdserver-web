@@ -53,7 +53,7 @@ def getConf(version):
 
 
 def getFpmConfFile(version):
-    return getServerDir() + '/' + version + '/etc/php-fpm.d/www.conf'
+    return getServerDir() + '/php' + version + '/php-fpm.d/mw.conf'
 
 
 def status_progress(version):
