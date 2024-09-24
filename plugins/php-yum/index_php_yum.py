@@ -34,7 +34,7 @@ def getPluginDir():
 
 
 def getServerDir():
-    return mw.getServerDir() + '/' + getPluginName()
+    return '/etc/opt/remi'
 
 
 def getInitDFile(version):
