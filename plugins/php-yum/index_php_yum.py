@@ -56,16 +56,6 @@ def getFpmConfFile(version):
     return getServerDir() + '/php' + version + '/php-fpm.d/mw.conf'
 
 
-def status_progress(version):
-    # ps -ef|grep 'php/81' |grep -v grep | grep -v python | awk '{print $2}
-    cmd = "ps aux|grep 'php/" + version + \
-        "' |grep -v grep | grep -v python | awk '{print $2}'"
-    data = mw.execShell(cmd)
-    if data[0] == '':
-        return 'stop'
-    return 'start'
-
-
 def getPhpSocket(version):
     path = getFpmConfFile(version)
     content = mw.readFile(path)
