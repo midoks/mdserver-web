@@ -66,8 +66,7 @@ def getPhpSocket(version):
 
 def status(version):
     # ps -ef|grep 'php/81' |grep -v grep | grep -v python | awk '{print $2}
-    cmd = "ps -ef|grep 'remi/php" + version + \
-        "' |grep -v grep | grep -v python | awk '{print $2}'"
+    cmd = "ps -ef|grep 'remi/php" + version + "' |grep -v grep | grep -v python | awk '{print $2}'"
     data = mw.execShell(cmd)
     if data[0] == '':
         return 'stop'
