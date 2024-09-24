@@ -75,14 +75,11 @@ def getPhpSocket(version):
 
 
 def status(version):
-    '''
-    sock文件判断是否启动
-    '''
-    sock = getPhpSocket(version)
-    if sock.find(':'):
-        return status_progress(version)
-
-    if not os.path.exists(sock):
+    # ps -ef|grep 'php/81' |grep -v grep | grep -v python | awk '{print $2}
+    cmd = "ps -ef|grep 'remi/php" + version + \
+        "' |grep -v grep | grep -v python | awk '{print $2}'"
+    data = mw.execShell(cmd)
+    if data[0] == '':
         return 'stop'
     return 'start'
 
