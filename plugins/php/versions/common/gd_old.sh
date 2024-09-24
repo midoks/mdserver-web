@@ -88,6 +88,7 @@ Install_lib()
 		--with-jpeg-dir \
 		--with-png-dir \
 		--with-webp-dir \
+		--with-zlib-dir \
 		--with-freetype-dir=${serverPath}/lib/freetype_old
 		# --enable-gd-jis-conv
 		# --enable-gd-native-ttf
