@@ -74,7 +74,7 @@ def status(version):
 
 
 def getFpmAddress(version):
-    fpm_address = '/tmp/php-cgi-{}.sock'.format(version)
+    fpm_address = '/var/opt/remi/php{}/run/php-fpm/www.sock'.format(version)
     php_fpm_file = getFpmConfFile(version)
     try:
         content = readFile(php_fpm_file)
