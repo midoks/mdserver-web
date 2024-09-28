@@ -271,8 +271,8 @@ def webhook():
 
     try:
         sys.path.append(os.getcwd() + "/plugins/webhook")
-        import index
-        return index.runShellArgs(input_args)
+        import webhook_index
+        return webhook_index.runShellArgs(input_args)
     except Exception as e:
         return 'error'
 
