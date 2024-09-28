@@ -274,7 +274,7 @@ def webhook():
         import webhook_index
         return webhook_index.runShellArgs(input_args)
     except Exception as e:
-        return 'error'
+        return str(e)
 
 
 @app.route('/close')
