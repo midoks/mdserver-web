@@ -4,6 +4,11 @@ export PATH
 export LANG=en_US.UTF-8
 export DEBIAN_FRONTEND=noninteractive
 
+function version_gt() { test "$(echo "$@" | tr " " "\n" | sort -V | head -n 1)" != "$1"; }
+function version_le() { test "$(echo "$@" | tr " " "\n" | sort -V | head -n 1)" == "$1"; }
+function version_lt() { test "$(echo "$@" | tr " " "\n" | sort -rV | head -n 1)" != "$1"; }
+function version_ge() { test "$(echo "$@" | tr " " "\n" | sort -rV | head -n 1)" == "$1"; }
+
 VERSION_ID=`cat /etc/*-release | grep VERSION_ID | awk -F = '{print $2}' | awk -F "\"" '{print $2}'`
 
 cn=$(curl -fsSL -m 10 http://ipinfo.io/json | grep "\"country\": \"CN\"")
@@ -69,6 +74,13 @@ apt install -y python3-pip python3-dev python3-venv
 apt install -y libncurses5
 apt install -y libncurses5-dev
 apt install -y bzip2
+
+P_VER=`python3 -V | awk '{print $2}'`
+if version_ge "$P_VER" "3.11.0" ;then
+    echo -e "\e[1;31mapt install python3.12-venv\e[0m"
+    apt install python3.12-venv
+fi
+
 
 if [ -f /usr/sbin/ufw ];then
 	# look
