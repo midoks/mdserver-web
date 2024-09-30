@@ -248,6 +248,7 @@ def wellknow(val=None):
 
 
 @app.route("/hook", methods=['POST', 'GET'])
+sys.path.append(os.getcwd() + "/plugins/webhook")
 def webhook():
     # 仅针对webhook插件
 
@@ -270,7 +271,7 @@ def webhook():
         return mw.returnJson(False, '请先安装WebHook插件!')
 
     try:
-        sys.path.append(os.getcwd() + "/plugins/webhook")
+        
         import webhook_index
         return webhook_index.runShellArgs(input_args)
     except Exception as e:
