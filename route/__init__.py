@@ -272,7 +272,7 @@ def webhook():
     package = os.getcwd() + "/plugins/webhook"
     if not package in sys.path:
         sys.path.append(package)
-
+        
     try:
         import webhook_index
         return webhook_index.runShellArgs(input_args)
