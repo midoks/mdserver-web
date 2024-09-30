@@ -269,9 +269,7 @@ def webhook():
     wh_install_path = mw.getServerDir() + '/webhook'
     if not os.path.exists(wh_install_path):
         return mw.returnJson(False, '请先安装WebHook插件!')
-
     try:
-        
         import webhook_index
         return webhook_index.runShellArgs(input_args)
     except Exception as e:
