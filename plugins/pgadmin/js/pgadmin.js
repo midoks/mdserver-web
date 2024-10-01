@@ -80,12 +80,6 @@ function safeConf() {
                     <span class="tname">密码</span>\
                     <input style="width:110px" class="bt-input-text mr20" name="password" id="pmport" value="' + cfg['password'] + '" placeholder="密码" type="text">\
                     <button class="btn btn-success btn-sm" onclick="setPmaPassword()">保存</button>\
-                </div>\
-                <hr/>\
-                <div class="ver line">\
-                    <span class="tname">路径名</span>\
-                    <input style="width:180px" class="bt-input-text mr20" name="path" id="pmport" value="' + cfg['path'] + '" placeholder="" type="text">\
-                    <button class="btn btn-success btn-sm" onclick="setPmaPath()">保存</button>\
                 </div>';
         $(".soft-man-con").html(con);
     });
