@@ -75,7 +75,7 @@ function safeConf() {
     });
 }
 
-function setPmaUsername(){
+function setPgUsername(){
     var username = $("input[name=username]").val();
     pgPost('set_pg_username',{'username':username}, function(data){
         var rdata = $.parseJSON(data.data);
@@ -83,7 +83,7 @@ function setPmaUsername(){
     });
 }
 
-function setPmaPassword(){
+function setPgPassword(){
     var password = $("input[name=password]").val();
     pgPost('set_pg_password',{'password':password}, function(data){
         var rdata = $.parseJSON(data.data);
@@ -92,7 +92,7 @@ function setPmaPassword(){
 }
 
 //修改phpmyadmin端口
-function setPamPort() {
+function setPgPort() {
     var pmport = $("#pmport").val();
     if (pmport < 80 || pmport > 65535) {
         layer.msg('端口范围不合法!', { icon: 2 });
