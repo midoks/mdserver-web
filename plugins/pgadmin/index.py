@@ -209,7 +209,6 @@ def initReplace():
         systemServiceTpl = getPluginDir() + '/init.d/pgadmin.service.tpl'
         service_path = mw.getServerDir()
         content = mw.readFile(systemServiceTpl)
-        content = content.replace('{$VERSION}', version)
         content = content.replace('{$SERVER_PATH}', service_path)
         mw.writeFile(systemService, se_content)
         mw.execShell('systemctl daemon-reload')
