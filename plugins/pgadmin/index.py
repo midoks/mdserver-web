@@ -74,7 +74,7 @@ def getHomePage():
         cfg = getCfg()
         auth = cfg['username']+':'+cfg['password']
         rand_path = cfg['path']
-        url = 'http://' + auth + '@' + ip + ':' + port + '/' + rand_path + '/index.php'
+        url = 'http://' + auth + '@' + ip + ':' + port + '/'
         return mw.returnJson(True, 'OK', url)
     except Exception as e:
         return mw.returnJson(False, '插件未启动!')
