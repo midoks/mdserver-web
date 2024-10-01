@@ -250,7 +250,7 @@ def start():
 
     pgOp('start')
 
-    
+    mw.restartWeb()
     return 'ok'
 
 
