@@ -15,3 +15,10 @@ expect {
 }
 expect eof
 EOF
+
+pids=$(ps aux | grep 'pgAdmin4:app' | grep -v grep | awk '{print $2}')
+arr=($pids)
+for p in ${arr[@]}
+do
+    kill -9 $p  > /dev/null 2>&1
+done
