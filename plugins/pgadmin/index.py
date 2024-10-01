@@ -200,7 +200,10 @@ def initReplace():
         setCfg('password', password)
         mw.writeFile(pma_path, pass_cmd)
 
-    #mw.execShell("python /www/server/pgadmin/run/lib/python3.10/site-packages/pgadmin4/setup.py add-user mw@gmail.com 123123")
+    judge_file = getServerDir()+'/data/pgadmin4/pgadmin4.db'
+    if not os.path.exists(judge_file):
+        pg_init_bash = getPluginDir()+'/pg_init.sh'
+        mw.execShell("bash "+pg_init_bash)
 
     # systemd
     systemDir = mw.systemdCfgDir()
