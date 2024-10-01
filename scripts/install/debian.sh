@@ -27,13 +27,17 @@ if [ "$VERSION_ID" == "10" ];then
 fi
 
 
+# synchronize server
+apt install chrony -y
+
 # synchronize time first
-apt-get install ntpdate -y
-NTPHOST='time.nist.gov'
-if [ ! -z "$cn" ];then
-    NTPHOST='ntp1.aliyun.com'
-fi
-ntpdate $NTPHOST | logger -t NTP
+apt install ntpdate -y
+# NTPHOST='time.nist.gov'
+# if [ ! -z "$cn" ];then
+#     NTPHOST='ntp1.aliyun.com'
+# fi
+# ntpdate ntp1.aliyun.com | logger -t NTP
+# ntpdate $NTPHOST | logger -t NTP
 
 apt install -y net-tools
 

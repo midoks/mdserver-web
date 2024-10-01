@@ -15,6 +15,10 @@ if grep -Eq "Ubuntu" /etc/*-release; then
     #sudo dpkg-reconfigure dash
 fi
 
+# synchronize server
+apt install chrony -y
+apt install ntpdate -y
+
 apt update -y
 apt autoremove -y
 
