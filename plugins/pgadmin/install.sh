@@ -7,6 +7,9 @@ rootPath=$(dirname "$curPath")
 rootPath=$(dirname "$rootPath")
 serverPath=$(dirname "$rootPath")
 
+# cd /Users/midoks/Desktop/mwdev/server/mdserver-web/plugins/pgadmin && bash install.sh install 4
+cd /www/server/mdserver-web/plugins/pgadmin && bash install.sh install 4
+
 install_tmp=${rootPath}/tmp/mw_install.pl
 
 if [ "$sys_os" == "Darwin" ];then
