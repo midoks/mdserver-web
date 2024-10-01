@@ -225,10 +225,7 @@ def pgOp(method):
 
     current_os = mw.getOs()
     if current_os == "darwin":
-        data = mw.execShell(file + ' ' + method)
-        if data[1] == '':
-            return 'ok'
-        return data[1]
+        return 'ok'
 
     if current_os.startswith("freebsd"):
         data = mw.execShell('service' + getPluginName() + ' ' + method)
