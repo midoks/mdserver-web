@@ -84,35 +84,9 @@ def getHomePage():
         return mw.returnJson(False, '插件未启动!')
 
 
-def getPhpVer(expect=55):
-    v = site_api.site_api().getPhpVersion()
-    is_find = False
-    for i in range(len(v)):
-        t = str(v[i]['version'])
-        if (t == expect):
-            is_find = True
-            return str(t)
-    if not is_find:
-        if len(v) > 1:
-            return v[1]['version']
-        return v[0]['version']
-    return str(expect)
-
-
-def getCachePhpVer():
-    cacheFile = getServerDir() + '/php.pl'
-    v = ''
-    if os.path.exists(cacheFile):
-        v = mw.readFile(cacheFile)
-    else:
-        v = getPhpVer()
-        mw.writeFile(cacheFile, v)
-    return v
-
 
 def contentReplace(content):
     service_path = mw.getServerDir()
-    php_ver = getCachePhpVer()
     tmp = mw.execShell(
         'cat /dev/urandom | head -n 32 | md5sum | head -c 16')
     blowfish_secret = tmp[0].strip()
@@ -120,26 +94,7 @@ def contentReplace(content):
     php_conf_dir = mw.getServerDir() + '/web_conf/php/conf'
     content = content.replace('{$ROOT_PATH}', mw.getRootDir())
     content = content.replace('{$SERVER_PATH}', service_path)
-    content = content.replace('{$PHP_CONF_PATH}', php_conf_dir)
-    content = content.replace('{$PHP_VER}', php_ver)
     content = content.replace('{$BLOWFISH_SECRET}', blowfish_secret)
-
-    cfg = getCfg()
-
-    if cfg['choose'] == "mysql":
-        content = content.replace('{$CHOOSE_DB}', 'mysql')
-        content = content.replace('{$CHOOSE_DB_DIR}', 'mysql')
-    elif cfg['choose'] == "mysql-apt":
-        content = content.replace('{$CHOOSE_DB}', 'mysql')
-        content = content.replace('{$CHOOSE_DB_DIR}', 'mysql-apt')
-    elif cfg['choose'] == "mysql-yum":
-        content = content.replace('{$CHOOSE_DB}', 'mysql')
-        content = content.replace('{$CHOOSE_DB_DIR}', 'mysql-yum')
-    else:
-        content = content.replace('{$CHOOSE_DB}', 'MariaDB')
-        content = content.replace('{$CHOOSE_DB_DIR}', 'mariadb')
-
-    content = content.replace('{$PMA_PATH}', cfg['path'])
 
     port = cfg["port"]
     rep = 'listen\s*(.*);'
@@ -181,11 +136,6 @@ def returnCfg():
 
 
 def status():
-    conf = getConf()
-    conf_inc = getServerDir() + "/" + getCfg()["path"] + '/config.inc.php'
-    # 两个文件都在，才算启动成功
-    if os.path.exists(conf) and os.path.exists(conf_inc):
-        return 'start'
     return 'stop'
 
 
@@ -193,7 +143,7 @@ def __release_port(port):
     from collections import namedtuple
     try:
         import firewall_api
-        firewall_api.firewall_api().addAcceptPortArgs(port, 'phpMyAdmin默认端口', 'port')
+        firewall_api.firewall_api().addAcceptPortArgs(port, 'pgAdmin默认端口', 'port')
         return port
     except Exception as e:
         return "Release failed {}".format(e)

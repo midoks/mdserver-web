@@ -20,6 +20,7 @@ echo "python:$P_VER"
 
 # source /www/server/pgadmin/bin/activate
 # python /www/server/pgadmin/lib/python3.10/site-packages/pgadmin4/setup.py
+# cd /www/server/mdserver-web && python3 plugins/pgadmin/index.py start
 
 install_tmp=${rootPath}/tmp/mw_install.pl
 
@@ -83,7 +84,7 @@ Install_pgadmin()
 	pip install https://ftp.postgresql.org/pub/pgadmin/pgadmin4/v8.10/pip/pgadmin4-8.10-py3-none-any.whl
 	
 
-	
+
 	VER=$1
 	
 	echo '安装完成'
