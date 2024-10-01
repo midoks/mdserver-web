@@ -72,9 +72,7 @@ function safeConf() {
                     <button class="btn btn-success btn-sm" onclick="setPgPassword()">保存</button>\
                 </div>\
                 <hr/>\
-                <div class="ver line">\
-                    <span>pgadmin登录信息</span>\
-                </div>\
+                <div class="ver line">pgadmin登录信息</div>\
                 <div class="ver line">\
                     <span class="tname">PG登录用户名</span>\
                     <input style="width:110px" class="bt-input-text mr20" name="username" id="pmport" value="' + cfg['web_pg_username'] + '" placeholder="PG登录用户名" type="text">\
