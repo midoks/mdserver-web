@@ -175,6 +175,16 @@ def delPort():
     return True
 
 
+def cleanNginxLog():
+    log_a = accessLog()
+    log_e = errorLog()
+
+    for i in [log_a, log_e]:
+        if os.path.exists(i):
+            cmd = "echo '' > " + i
+            mw.execShell(cmd)
+
+
 def initReplace():
 
     pma_dir = getServerDir() + "/pgadmin"
@@ -213,20 +223,14 @@ def initReplace():
         mw.writeFile(systemService, content)
         mw.execShell('systemctl daemon-reload')
 
+
 def start():
     initCfg()
     openPort()
 
     initReplace()
-
-    log_a = accessLog()
-    log_e = errorLog()
-
-    for i in [log_a, log_e]:
-        if os.path.exists(i):
-            cmd = "echo '' > " + i
-            mw.execShell(cmd)
-
+    
+    cleanNginxLog()
     mw.restartWeb()
     return 'ok'
 
