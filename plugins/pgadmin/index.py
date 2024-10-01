@@ -175,8 +175,9 @@ def initPgConfFile():
     file_tpl = getPluginDir() + '/conf/config_local.conf'
     dst_file = getServerDir()+'/run/lib/python3.10/site-packages/pgadmin4/config_local.py'
     if not os.path.exists(dst_file):
+        service_path = mw.getServerDir()
         content = mw.readFile(file_tpl)
-        content = contentReplace(content)
+        content = content.replace('{$SERVER_PATH}', service_path+'/'+getPluginName()+'/data')
         mw.writeFile(dst_file, content)
 
 
@@ -207,7 +208,7 @@ def initReplace():
         systemServiceTpl = getPluginDir() + '/init.d/pgadmin.service.tpl'
         service_path = mw.getServerDir()
         content = mw.readFile(systemServiceTpl)
-        content = content.replace('{$SERVER_PATH}', service_path)
+        content = content.replace('{$APP_PATH}', service_path)
         mw.writeFile(systemService, content)
         mw.execShell('systemctl daemon-reload')
 
