@@ -73,15 +73,15 @@ function safeConf() {
                 </div>\
                 <hr/>\
                 <div class="ver line">\
-                    <span class="tname">pgadmin登录信息</span>\
+                    <span>pgadmin登录信息</span>\
                 </div>\
                 <div class="ver line">\
-                    <span class="tname">用户名</span>\
+                    <span class="tname">PG登录用户名</span>\
                     <input style="width:110px" class="bt-input-text mr20" name="username" id="pmport" value="' + cfg['username'] + '" placeholder="PG登录用户名" type="text">\
                     <button class="btn btn-success btn-sm" onclick="setPgUsername()">保存</button>\
                 </div>\
                 <div class="ver line">\
-                    <span class="tname">密码</span>\
+                    <span class="tname">PG登录密码</span>\
                     <input style="width:110px" class="bt-input-text mr20" name="password" id="pmport" value="' + cfg['password'] + '" placeholder="PG登录密码" type="text">\
                     <button class="btn btn-success btn-sm" onclick="setPgPassword()">保存</button>\
                 </div>';
