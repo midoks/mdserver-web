@@ -58,7 +58,7 @@ function safeConf() {
         var cfg = rdata.data;
         var con = '<div class="ver line">\
                     <span class="tname">访问端口</span>\
-                    <input style="width:110px" class="bt-input-text phpmyadmindk mr20" name="Name" id="pmport" value="' + cfg['port'] + '" placeholder="phpmyadmin访问端口" maxlength="5" type="number">\
+                    <input style="width:110px" class="bt-input-text phpmyadmindk mr20" name="Name" id="pmport" value="' + cfg['port'] + '" placeholder="pgadmin访问端口" maxlength="5" type="number">\
                     <button class="btn btn-success btn-sm" onclick="setPgPort()">保存</button>\
                 </div>\
                 <div class="ver line">\
