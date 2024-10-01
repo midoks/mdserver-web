@@ -20,7 +20,7 @@ echo "python:$P_VER"
 
 # source /www/server/pgadmin/run/bin/activate
 # python /www/server/pgadmin/run/lib/python3.10/site-packages/pgadmin4/setup.py
-# python /www/server/pgadmin/run/lib/python3.10/site-packages/pgadmin4/setup.py add-user xxx@gmail.com 123123
+# python /www/server/pgadmin/run/lib/python3.10/site-packages/pgadmin4/setup.py add-user mdserver-web@gmail.com 123123
 # cd /www/server/mdserver-web && python3 plugins/pgadmin/index.py start
 # cd /www/server/mdserver-web && python3 plugins/pgadmin/index.py stop
 
