@@ -9,7 +9,7 @@
 	"checks":"server/pgadmin",
 	"path": "server/pgadmin",
 	"author":"pgadmin",
-	"home":"https://www.pgadmin.org/",
+	"home":"https://www.pgadmin.org/download/pgadmin-4-python/",
 	"date":"2024-10-1",
 	"pid": "2"
 }
