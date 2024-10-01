@@ -31,6 +31,9 @@ if [ $VERSION_ID -ge 8 ];then
     PKGMGR='dnf'
 fi
 
+# systemctl status chronyd -l
+$PKGMGR install -y chrony
+
 $PKGMGR install -y curl-devel libmcrypt libmcrypt-devel python3-devel
 $PKGMGR install -y net-tools
 $PKGMGR install -y unixODBC-devel

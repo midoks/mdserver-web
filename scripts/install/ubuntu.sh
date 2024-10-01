@@ -16,6 +16,7 @@ if grep -Eq "Ubuntu" /etc/*-release; then
 fi
 
 # synchronize server
+# systemctl status chronyd -l
 apt install chrony -y
 apt install ntpdate -y
 
