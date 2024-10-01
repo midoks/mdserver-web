@@ -305,33 +305,6 @@ def reload():
     return start()
 
 
-def setPhpVer():
-    args = getArgs()
-
-    if not 'phpver' in args:
-        return 'phpver missing'
-
-    cacheFile = getServerDir() + '/php.pl'
-    mw.writeFile(cacheFile, args['phpver'])
-
-    file_tpl = getPluginDir() + '/conf/phpmyadmin.conf'
-    file_run = getConf()
-
-    content = mw.readFile(file_tpl)
-    content = contentReplace(content)
-    mw.writeFile(file_run, content)
-
-    mw.restartWeb()
-    return 'ok'
-
-
-def getSetPhpVer():
-    cacheFile = getServerDir() + '/php.pl'
-    if os.path.exists(cacheFile):
-        return mw.readFile(cacheFile).strip()
-    return ''
-
-
 def getPmaOption():
     data = getCfg()
     return mw.returnJson(True, 'ok', data)
@@ -509,10 +482,6 @@ if __name__ == "__main__":
         print(getConfInc())
     elif func == 'get_home_page':
         print(getHomePage())
-    elif func == 'set_php_ver':
-        print(setPhpVer())
-    elif func == 'get_set_php_ver':
-        print(getSetPhpVer())
     elif func == 'get_pma_port':
         print(getPmaPort())
     elif func == 'set_pma_port':
