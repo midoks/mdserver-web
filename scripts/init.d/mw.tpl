@@ -429,7 +429,6 @@ mw_connect_mysql(){
 
 
 mw_connect_pgdb(){
-
     if [ ! -d "${ROOT_PATH}/postgresql" ];then
         echo -e "postgresql not install!"
         exit 1

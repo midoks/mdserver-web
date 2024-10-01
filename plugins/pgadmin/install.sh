@@ -59,7 +59,7 @@ Install_pgadmin()
 	if version_lt "$P_VER" "3.8.0" ;then
 		echo 'Python版本太低,无法安装'
 	fi
-	PG_DIR=${serverPath}/pgadmin
+	PG_DIR=${serverPath}/pgadmin/run
 	mkdir -p $PG_DIR
 	echo "${1}" > ${serverPath}/pgadmin/version.pl
 
@@ -89,6 +89,21 @@ Install_pgadmin()
 Uninstall_pgadmin()
 {
 	cd ${rootPath} && python3 ${rootPath}/plugins/pgadmin/index.py stop
+
+	if [ -f /usr/lib/systemd/system/pgadmin.service ];then
+		systemctl stop pgadmin
+		systemctl disable pgadmin
+		rm -rf /usr/lib/systemd/system/pgadmin.service
+		systemctl daemon-reload
+	fi
+
+	if [ -f /lib/systemd/system/pgadmin.service ];then
+		systemctl stop pgadmin
+		systemctl disable pgadmin
+		rm -rf /lib/systemd/system/pgadmin.service
+		systemctl daemon-reload
+	fi
+	
 	rm -rf ${serverPath}/pgadmin
 	echo '卸载完成'
 }
