@@ -18,6 +18,9 @@ echo "python:$P_VER"
 # cd /Users/midoks/Desktop/mwdev/server/mdserver-web/plugins/pgadmin && bash install.sh install 4
 # cd /www/server/mdserver-web/plugins/pgadmin && bash install.sh install 4
 
+# source /www/server/pgadmin/bin/activate
+# python /www/server/pgadmin/lib/python3.10/site-packages/pgadmin4/setup.py
+
 install_tmp=${rootPath}/tmp/mw_install.pl
 
 if [ "$sys_os" == "Darwin" ];then
@@ -77,7 +80,9 @@ Install_pgadmin()
 		source ${PG_DIR}/bin/activate
 	fi
 
-	pip install pgadmin
+	pip install https://ftp.postgresql.org/pub/pgadmin/pgadmin4/v8.10/pip/pgadmin4-8.10-py3-none-any.whl
+	
+
 	
 	VER=$1
 	

@@ -53,7 +53,7 @@ def checkArgs(data, ck=[]):
 
 
 def getConf():
-    return mw.getServerDir() + '/web_conf/nginx/vhost/phpmyadmin.conf'
+    return mw.getServerDir() + '/web_conf/nginx/vhost/pgadmin.conf'
 
 
 def getConfInc():
@@ -225,19 +225,17 @@ def delPort():
     return True
 
 
-def start():
-    initCfg()
-    openPort()
+def initReplace():
 
-    pma_dir = getServerDir() + "/phpmyadmin"
+    pma_dir = getServerDir() + "/pgadmin"
     if os.path.exists(pma_dir):
         rand_str = mw.getRandomString(6)
         rand_str = rand_str.lower()
         pma_dir_dst = pma_dir + "_" + rand_str
         mw.execShell("mv " + pma_dir + " " + pma_dir_dst)
-        setCfg('path', 'phpmyadmin_' + rand_str)
+        setCfg('path', 'pgadmin_' + rand_str)
 
-    file_tpl = getPluginDir() + '/conf/phpmyadmin.conf'
+    file_tpl = getPluginDir() + '/conf/pgadmin.conf'
     file_run = getConf()
     if not os.path.exists(file_run):
         centent = mw.readFile(file_tpl)
@@ -253,17 +251,24 @@ def start():
         setCfg('password', password)
         mw.writeFile(pma_path, pass_cmd)
 
-    tmp = getServerDir() + "/" + getCfg()["path"] + '/tmp'
-    if not os.path.exists(tmp):
-        os.mkdir(tmp)
-        mw.execShell("chown -R www:www " + tmp)
+    # systemd
+    systemDir = mw.systemdCfgDir()
+    systemService = systemDir + '/pgadmin.service'
 
-    conf_run = getServerDir() + "/" + getCfg()["path"] + '/config.inc.php'
-    if not os.path.exists(conf_run):
-        conf_tpl = getPluginDir() + '/conf/config.inc.php'
-        centent = mw.readFile(conf_tpl)
-        centent = contentReplace(centent)
-        mw.writeFile(conf_run, centent)
+    if os.path.exists(systemDir) and not os.path.exists(systemService):
+        systemServiceTpl = getPluginDir() + '/init.d/pgadmin.service.tpl'
+        service_path = mw.getServerDir()
+        content = mw.readFile(systemServiceTpl)
+        content = content.replace('{$VERSION}', version)
+        content = content.replace('{$SERVER_PATH}', service_path)
+        mw.writeFile(systemService, se_content)
+        mw.execShell('systemctl daemon-reload')
+
+def start():
+    initCfg()
+    openPort()
+
+    initReplace()
 
     log_a = accessLog()
     log_e = errorLog()
