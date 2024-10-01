@@ -73,7 +73,6 @@ def getHomePage():
 
         cfg = getCfg()
         auth = cfg['username']+':'+cfg['password']
-        rand_path = cfg['path']
         url = 'http://' + auth + '@' + ip + ':' + port + '/'
         return mw.returnJson(True, 'OK', url)
     except Exception as e:
