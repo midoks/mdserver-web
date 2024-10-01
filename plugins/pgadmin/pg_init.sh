@@ -2,6 +2,9 @@
 
 python_ver=`ls /www/server/pgadmin/run/lib/ | grep python | cut -d \  -f 1 | awk 'END {print}'`
 
+email=$1
+email_pwd=$2
+
 expect <<-EOF
 set time 10
 spawn gunicorn --bind unix:/tmp/pgadmin4.sock \
@@ -9,9 +12,9 @@ spawn gunicorn --bind unix:/tmp/pgadmin4.sock \
 --threads=25 \
 --chdir /www/server/pgadmin/run/lib/${python_ver}/site-packages/pgadmin4 pgAdmin4:app
 expect {
-    "Email address:" {  send "mdserver-web@gmail.com\r"; exp_continue }
-    "Password" {  send "123123\r"; exp_continue  }
-    "Retype password" {  send "123123\r"  }
+    "Email address:" {  send "${email}\r"; exp_continue }
+    "Password" {  send "${email_pwd}\r"; exp_continue  }
+    "Retype password" {  send "${email_pwd}\r"  }
 }
 expect eof
 EOF

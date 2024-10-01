@@ -203,10 +203,16 @@ def initReplace():
         setCfg('password', password)
         mw.writeFile(pass_path, pass_cmd)
 
+    # pg_conf = getCfg()
     judge_file = getServerDir()+'/data/pgadmin4/pgadmin4.db'
     if not os.path.exists(judge_file):
         pg_init_bash = getPluginDir()+'/pg_init.sh'
-        t = mw.execShell("bash "+pg_init_bash)
+        pg_rand = mw.getRandomString(8)
+        pg_username = "mw."+pg_rand+"@gmail.com"
+        setCfg('web_pg_password', pg_username)
+        pg_password = mw.getRandomString(10)
+        setCfg('web_pg_password', pg_password)
+        t = mw.execShell("bash "+ pg_init_bash + " " + pg_username + " " + pg_password)
         # print(t)
 
     # systemd
