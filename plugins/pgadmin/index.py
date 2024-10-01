@@ -177,7 +177,7 @@ def initPgConfFile():
     if not os.path.exists(dst_file):
         service_path = mw.getServerDir()
         content = mw.readFile(file_tpl)
-        content = content.replace('{$SERVER_PATH}', service_path+'/'+getPluginName()+'/data')
+        content = content.replace('{$DATA_PATH}', service_path+'/'+getPluginName()+'/data')
         mw.writeFile(dst_file, content)
 
 
