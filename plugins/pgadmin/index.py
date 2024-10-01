@@ -269,7 +269,7 @@ def getPmaOption():
     return mw.returnJson(True, 'ok', data)
 
 
-def getPmaPort():
+def getPgPort():
     try:
         port = getPort()
         return mw.returnJson(True, 'OK', port)
@@ -278,7 +278,7 @@ def getPmaPort():
         return mw.returnJson(False, '插件未启动!')
 
 
-def setPmaPort():
+def setPgPort():
     args = getArgs()
     data = checkArgs(args, ['port'])
     if not data[0]:
@@ -301,7 +301,7 @@ def setPmaPort():
     return mw.returnJson(True, '修改成功!')
 
 
-def setPmaUsername():
+def setPgUsername():
     args = getArgs()
     data = checkArgs(args, ['username'])
     if not data[0]:
@@ -320,7 +320,7 @@ def setPmaUsername():
     return mw.returnJson(True, '修改成功!')
 
 
-def setPmaPassword():
+def setPgPassword():
     args = getArgs()
     data = checkArgs(args, ['password'])
     if not data[0]:
@@ -339,10 +339,8 @@ def setPmaPassword():
     return mw.returnJson(True, '修改成功!')
 
 
-
 def accessLog():
     return getServerDir() + '/access.log'
-
 
 def errorLog():
     return getServerDir() + '/error.log'
@@ -371,16 +369,16 @@ if __name__ == "__main__":
         print(returnCfg())
     elif func == 'get_home_page':
         print(getHomePage())
-    elif func == 'get_pma_port':
-        print(getPmaPort())
-    elif func == 'set_pma_port':
-        print(setPmaPort())
-    elif func == 'get_pma_option':
-        print(getPmaOption())
-    elif func == 'set_pma_username':
-        print(setPmaUsername())
-    elif func == 'set_pma_password':
-        print(setPmaPassword())
+    elif func == 'get_pg_port':
+        print(getPgPort())
+    elif func == 'set_pg_port':
+        print(setPgPort())
+    elif func == 'get_pg_option':
+        print(getPgOption())
+    elif func == 'set_pg_username':
+        print(setPgUsername())
+    elif func == 'set_pg_password':
+        print(setPgPassword())
     elif func == 'access_log':
         print(accessLog())
     elif func == 'error_log':

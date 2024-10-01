@@ -48,7 +48,7 @@ function homePage(){
 
 //phpmyadmin安全设置
 function safeConf() {
-    pgPost('get_pma_option', {}, function(rdata){
+    pgPost('get_pg_option', {}, function(rdata){
         var rdata = $.parseJSON(rdata.data);
         if (!rdata.status){
             layer.msg(rdata.msg,{icon:2,time:2000,shade: [0.3, '#000']});
@@ -77,7 +77,7 @@ function safeConf() {
 
 function setPmaUsername(){
     var username = $("input[name=username]").val();
-    pgPost('set_pma_username',{'username':username}, function(data){
+    pgPost('set_pg_username',{'username':username}, function(data){
         var rdata = $.parseJSON(data.data);
         layer.msg(rdata.msg, { icon: rdata.status ? 1 : 2 });
     });
@@ -85,7 +85,7 @@ function setPmaUsername(){
 
 function setPmaPassword(){
     var password = $("input[name=password]").val();
-    pgPost('set_pma_password',{'password':password}, function(data){
+    pgPost('set_pg_password',{'password':password}, function(data){
         var rdata = $.parseJSON(data.data);
         layer.msg(rdata.msg, { icon: rdata.status ? 1 : 2 });
     });
@@ -100,7 +100,7 @@ function setPamPort() {
     }
     var data = 'port=' + pmport;
     
-    pgPost('set_pma_port',data, function(data){
+    pgPost('set_pg_port',data, function(data){
         var rdata = $.parseJSON(data.data);
         layer.msg(rdata.msg, { icon: rdata.status ? 1 : 2 });
     });
