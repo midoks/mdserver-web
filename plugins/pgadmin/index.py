@@ -263,7 +263,9 @@ def stop():
 
 
 def restart():
-    return pgOp('restart')
+    state = pgOp('restart')
+    mw.restartWeb()
+    return state
 
 
 def reload():
