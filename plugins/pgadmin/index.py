@@ -56,10 +56,6 @@ def getConf():
     return mw.getServerDir() + '/web_conf/nginx/vhost/pgadmin.conf'
 
 
-def getConfInc():
-    return getServerDir() + "/" + getCfg()['path'] + '/config.inc.php'
-
-
 def getPort():
     file = getConf()
     content = mw.readFile(file)
@@ -90,7 +86,7 @@ def contentReplace(content):
     tmp = mw.execShell(
         'cat /dev/urandom | head -n 32 | md5sum | head -c 16')
     blowfish_secret = tmp[0].strip()
-    
+
     content = content.replace('{$ROOT_PATH}', mw.getRootDir())
     content = content.replace('{$SERVER_PATH}', service_path)
     content = content.replace('{$BLOWFISH_SECRET}', blowfish_secret)
@@ -196,7 +192,7 @@ def initReplace():
         centent = contentReplace(centent)
         mw.writeFile(file_run, centent)
 
-    pma_path = getServerDir() + '/pma.pass'
+    pma_path = getServerDir() + '/pg.pass'
     if not os.path.exists(pma_path):
         username = mw.getRandomString(8)
         password = mw.getRandomString(10)
@@ -306,27 +302,6 @@ def setPmaPort():
     return mw.returnJson(True, '修改成功!')
 
 
-def setPmaChoose():
-    args = getArgs()
-    data = checkArgs(args, ['choose'])
-    if not data[0]:
-        return data[1]
-
-    choose = args['choose']
-    setCfg('choose', choose)
-
-    pma_path = getCfg()['path']
-    conf_run = getServerDir() + "/" + pma_path + '/config.inc.php'
-
-    conf_tpl = getPluginDir() + '/conf/config.inc.php'
-    content = mw.readFile(conf_tpl)
-    content = contentReplace(content)
-    mw.writeFile(conf_run, content)
-
-    mw.restartWeb()
-    return mw.returnJson(True, '修改成功!')
-
-
 def setPmaUsername():
     args = getArgs()
     data = checkArgs(args, ['username'])
@@ -337,7 +312,7 @@ def setPmaUsername():
     setCfg('username', username)
 
     cfg = getCfg()
-    pma_path = getServerDir() + '/pma.pass'
+    pma_path = getServerDir() + '/pg.pass'
     username = mw.getRandomString(10)
     pass_cmd = cfg['username'] + ':' + mw.hasPwd(cfg['password'])
     mw.writeFile(pma_path, pass_cmd)
@@ -356,7 +331,7 @@ def setPmaPassword():
     setCfg('password', password)
 
     cfg = getCfg()
-    pma_path = getServerDir() + '/pma.pass'
+    pma_path = getServerDir() + '/pg.pass'
     username = mw.getRandomString(10)
     pass_cmd = cfg['username'] + ':' + mw.hasPwd(cfg['password'])
     mw.writeFile(pma_path, pass_cmd)
@@ -442,8 +417,6 @@ if __name__ == "__main__":
         print(installVersion())
     elif func == 'get_cfg':
         print(returnCfg())
-    elif func == 'config_inc':
-        print(getConfInc())
     elif func == 'get_home_page':
         print(getHomePage())
     elif func == 'get_pma_port':
@@ -452,8 +425,6 @@ if __name__ == "__main__":
         print(setPmaPort())
     elif func == 'get_pma_option':
         print(getPmaOption())
-    elif func == 'set_pma_choose':
-        print(setPmaChoose())
     elif func == 'set_pma_username':
         print(setPmaUsername())
     elif func == 'set_pma_password':
