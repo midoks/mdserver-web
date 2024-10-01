@@ -8,7 +8,7 @@ function str2Obj(str){
     return data;
 }
 
-function pmaPost(method,args,callback){
+function pgPost(method,args,callback){
 
     var _args = null; 
     if (typeof(args) == 'string'){
@@ -85,18 +85,9 @@ function safeConf() {
     });
 }
 
-
-function setPmaChoose(){
-    var choose = $("#access_choose").val();
-    pmaPost('set_pma_choose',{'choose':choose}, function(data){
-        var rdata = $.parseJSON(data.data);
-        layer.msg(rdata.msg, { icon: rdata.status ? 1 : 2 });
-    });
-}
-
 function setPmaUsername(){
     var username = $("input[name=username]").val();
-    pmaPost('set_pma_username',{'username':username}, function(data){
+    pgPost('set_pma_username',{'username':username}, function(data){
         var rdata = $.parseJSON(data.data);
         layer.msg(rdata.msg, { icon: rdata.status ? 1 : 2 });
     });
@@ -104,15 +95,7 @@ function setPmaUsername(){
 
 function setPmaPassword(){
     var password = $("input[name=password]").val();
-    pmaPost('set_pma_password',{'password':password}, function(data){
-        var rdata = $.parseJSON(data.data);
-        layer.msg(rdata.msg, { icon: rdata.status ? 1 : 2 });
-    });
-}
-
-function setPmaPath(){
-    var path = $("input[name=path]").val();
-    pmaPost('set_pma_path',{'path':path}, function(data){
+    pgPost('set_pma_password',{'password':password}, function(data){
         var rdata = $.parseJSON(data.data);
         layer.msg(rdata.msg, { icon: rdata.status ? 1 : 2 });
     });
@@ -127,7 +110,7 @@ function setPamPort() {
     }
     var data = 'port=' + pmport;
     
-    pmaPost('set_pma_port',data, function(data){
+    pgPost('set_pma_port',data, function(data){
         var rdata = $.parseJSON(data.data);
         layer.msg(rdata.msg, { icon: rdata.status ? 1 : 2 });
     });
