@@ -77,12 +77,12 @@ function safeConf() {
                 </div>\
                 <div class="ver line">\
                     <span class="tname">PG登录用户名</span>\
-                    <input style="width:110px" class="bt-input-text mr20" name="username" id="pmport" value="' + cfg['username'] + '" placeholder="PG登录用户名" type="text">\
+                    <input style="width:110px" class="bt-input-text mr20" name="username" id="pmport" value="' + cfg['web_pg_username'] + '" placeholder="PG登录用户名" type="text">\
                     <button class="btn btn-success btn-sm" onclick="setPgUsername()">保存</button>\
                 </div>\
                 <div class="ver line">\
                     <span class="tname">PG登录密码</span>\
-                    <input style="width:110px" class="bt-input-text mr20" name="password" id="pmport" value="' + cfg['password'] + '" placeholder="PG登录密码" type="text">\
+                    <input style="width:110px" class="bt-input-text mr20" name="password" id="pmport" value="' + cfg['web_pg_password'] + '" placeholder="PG登录密码" type="text">\
                     <button class="btn btn-success btn-sm" onclick="setPgPassword()">保存</button>\
                 </div>';
         $(".soft-man-con").html(con);
