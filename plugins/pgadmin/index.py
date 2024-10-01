@@ -264,7 +264,7 @@ def restart():
 def reload():
     return pgOp('reload')
 
-def getPmaOption():
+def getPgOption():
     data = getCfg()
     return mw.returnJson(True, 'ok', data)
 
