@@ -8,7 +8,7 @@ Description=pgadmin service
 After=network.target
 
 [Service]
-ExecStart=gunicorn --bind unix:/tmp/pgadmin4.sock --workers=1 --threads=25 --chdir {$SERVER_PATH}/pgadmin/lib/python3.10/dist-packages/pgadmin4 pgAdmin4:app
+ExecStart=gunicorn --bind unix:/tmp/pgadmin4.sock --workers=1 --threads=25 --chdir {$SERVER_PATH}/pgadmin/lib/python3.10/site-packages/pgadmin4 pgAdmin4:app
 ExecReload=/bin/kill -USR2 $MAINPID
 PrivateTmp=false
 
