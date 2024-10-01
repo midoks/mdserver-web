@@ -83,12 +83,10 @@ def getHomePage():
 def contentReplace(content):
     cfg = getCfg()
     service_path = mw.getServerDir()
-    tmp = mw.execShell('cat /dev/urandom | head -n 32 | md5sum | head -c 16')
-    blowfish_secret = tmp[0].strip()
 
     content = content.replace('{$ROOT_PATH}', mw.getRootDir())
     content = content.replace('{$SERVER_PATH}', service_path)
-    content = content.replace('{$BLOWFISH_SECRET}', blowfish_secret)
+    content = content.replace('{$APP_PATH}', service_path+'/'+getPluginName()+'/data')
 
     port = cfg["port"]
     rep = 'listen\s*(.*);'
@@ -174,26 +172,23 @@ def cleanNginxLog():
             mw.execShell(cmd)
 
 def initPgConfFile():
-    pass
+    file_tpl = getPluginDir() + '/conf/config_local.conf'
+    dst_file = getServerDir()+'/run/lib/python3.10/site-packages/pgadmin4/config_local.py'
+    if not os.path.exists(dst_file):
+        content = mw.readFile(file_tpl)
+        content = contentReplace(content)
+        mw.writeFile(dst_file, content)
 
 
 def initReplace():
     initPgConfFile()
 
-    pma_dir = getServerDir() + "/pgadmin"
-    if os.path.exists(pma_dir):
-        rand_str = mw.getRandomString(6)
-        rand_str = rand_str.lower()
-        pma_dir_dst = pma_dir + "_" + rand_str
-        mw.execShell("mv " + pma_dir + " " + pma_dir_dst)
-        setCfg('path', 'pgadmin_' + rand_str)
-
     file_tpl = getPluginDir() + '/conf/pgadmin.conf'
     file_run = getConf()
     if not os.path.exists(file_run):
-        centent = mw.readFile(file_tpl)
-        centent = contentReplace(centent)
-        mw.writeFile(file_run, centent)
+        content = mw.readFile(file_tpl)
+        content = contentReplace(content)
+        mw.writeFile(file_run, content)
 
     pma_path = getServerDir() + '/pg.pass'
     if not os.path.exists(pma_path):
