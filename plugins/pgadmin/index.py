@@ -224,39 +224,54 @@ def initReplace():
         mw.execShell('systemctl daemon-reload')
 
 
+def pgOp(method):
+    file = initReplace()
+
+    current_os = mw.getOs()
+    if current_os == "darwin":
+        data = mw.execShell(file + ' ' + method)
+        if data[1] == '':
+            return 'ok'
+        return data[1]
+
+    if current_os.startswith("freebsd"):
+        data = mw.execShell('service' + getPluginName() + ' ' + method)
+        if data[1] == '':
+            return 'ok'
+        return data[1]
+
+    if method == 'stop' or method == 'restart':
+        mw.execShell(file + ' ' + 'stop')
+
+    data = mw.execShell('systemctl ' + method+ '' + getPluginName())
+    if data[1] == '':
+        return 'ok'
+
+    return data[1]
+
 def start():
     initCfg()
     openPort()
 
-    initReplace()
-    
+    pgOp('start')
+
     cleanNginxLog()
-    mw.restartWeb()
     return 'ok'
 
 
 def stop():
-    conf = getConf()
-    if os.path.exists(conf):
-        os.remove(conf)
+    pgOp('stop')
     delPort()
     mw.restartWeb()
     return 'ok'
 
 
 def restart():
-    return start()
+    return pgOp('restart')
 
 
 def reload():
-    file_tpl = getPluginDir() + '/conf/phpmyadmin.conf'
-    file_run = getConf()
-    if os.path.exists(file_run):
-        centent = mw.readFile(file_tpl)
-        centent = contentReplace(centent)
-        mw.writeFile(file_run, centent)
-    return start()
-
+    return pgOp('reload')
 
 def getPmaOption():
     data = getCfg()

@@ -49,10 +49,6 @@ else
 	OSNAME='unknow'
 fi
 
-# if [ -f ${rootPath}/bin/activate ];then
-# 	source ${rootPath}/bin/activate
-# fi
-
 Install_pgadmin()
 {
 	# if [ -d $serverPath/pgadmin ];then
@@ -83,20 +79,15 @@ Install_pgadmin()
 
 	pip install https://ftp.postgresql.org/pub/pgadmin/pgadmin4/v8.10/pip/pgadmin4-8.10-py3-none-any.whl
 	
-
-
 	VER=$1
-	
-	echo '安装完成'
-
 	cd ${rootPath} && python3 ${rootPath}/plugins/pgadmin/index.py start
-		
+
+	echo '安装完成'
 }
 
 Uninstall_pgadmin()
 {
 	cd ${rootPath} && python3 ${rootPath}/plugins/pgadmin/index.py stop
-	
 	rm -rf ${serverPath}/pgadmin
 	echo '卸载完成'
 }
