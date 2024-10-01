@@ -103,8 +103,10 @@ Uninstall_pgadmin()
 		rm -rf /lib/systemd/system/pgadmin.service
 		systemctl daemon-reload
 	fi
-	
+
 	rm -rf ${serverPath}/pgadmin
+	# rm -rf /var/lib/pgadmin
+	# rm -rf /var/log/pgadmin
 	echo '卸载完成'
 }
 
