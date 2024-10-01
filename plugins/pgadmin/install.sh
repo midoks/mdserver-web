@@ -71,6 +71,11 @@ Install_pgadmin()
 	        cd $PG_DIR && python3 -m venv .
 	    fi
 	fi
+
+
+	if [ -f ${PG_DIR}/bin/activate ];then
+		source ${PG_DIR}/bin/activate
+	fi
 	
 	VER=$1
 	
