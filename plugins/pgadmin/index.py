@@ -173,8 +173,12 @@ def cleanNginxLog():
             cmd = "echo '' > " + i
             mw.execShell(cmd)
 
+def initPgConfFile():
+    pass
+
 
 def initReplace():
+    initPgConfFile()
 
     pma_dir = getServerDir() + "/pgadmin"
     if os.path.exists(pma_dir):

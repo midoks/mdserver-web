@@ -18,8 +18,8 @@ echo "python:$P_VER"
 # cd /Users/midoks/Desktop/mwdev/server/mdserver-web/plugins/pgadmin && bash install.sh install 4
 # cd /www/server/mdserver-web/plugins/pgadmin && bash install.sh install 4
 
-# source /www/server/pgadmin/bin/activate
-# python /www/server/pgadmin/lib/python3.10/site-packages/pgadmin4/setup.py
+# source /www/server/pgadmin/run/bin/activate
+# python /www/server/pgadmin/run/lib/python3.10/site-packages/pgadmin4/setup.py
 # cd /www/server/mdserver-web && python3 plugins/pgadmin/index.py start
 # cd /www/server/mdserver-web && python3 plugins/pgadmin/index.py stop
 
@@ -60,7 +60,9 @@ Install_pgadmin()
 		echo 'Python版本太低,无法安装'
 	fi
 	PG_DIR=${serverPath}/pgadmin/run
+	PG_DATA_DIR=${serverPath}/pgadmin/data
 	mkdir -p $PG_DIR
+	mkdir -p $PG_DATA_DIR
 	echo "${1}" > ${serverPath}/pgadmin/version.pl
 
 	if [ ! -f $PG_DIR/bin/activate ];then
@@ -80,9 +82,7 @@ Install_pgadmin()
 
 	pip install https://ftp.postgresql.org/pub/pgadmin/pgadmin4/v8.10/pip/pgadmin4-8.10-py3-none-any.whl
 	
-	VER=$1
 	cd ${rootPath} && python3 ${rootPath}/plugins/pgadmin/index.py start
-
 	echo '安装完成'
 }
 
