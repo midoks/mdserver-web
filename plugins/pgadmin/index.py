@@ -233,9 +233,6 @@ def pgOp(method):
             return 'ok'
         return data[1]
 
-    if method == 'stop' or method == 'restart':
-        mw.execShell(file + ' ' + 'stop')
-
     data = mw.execShell('systemctl ' + method+ '' + getPluginName())
     if data[1] == '':
         return 'ok'
