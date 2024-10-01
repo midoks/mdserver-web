@@ -106,7 +106,7 @@ def initCfg():
     cfg = getServerDir() + "/cfg.json"
     if not os.path.exists(cfg):
         data = {}
-        data['port'] = '888'
+        data['port'] = '5051'
         data['choose'] = 'mysql'
         data['path'] = ''
         data['username'] = 'admin'
@@ -233,10 +233,9 @@ def pgOp(method):
             return 'ok'
         return data[1]
 
-    data = mw.execShell('systemctl ' + method+ '' + getPluginName())
+    data = mw.execShell('systemctl ' + method+ ' ' + getPluginName())
     if data[1] == '':
         return 'ok'
-
     return data[1]
 
 def status():
