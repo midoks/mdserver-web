@@ -21,6 +21,7 @@ echo "python:$P_VER"
 # source /www/server/pgadmin/bin/activate
 # python /www/server/pgadmin/lib/python3.10/site-packages/pgadmin4/setup.py
 # cd /www/server/mdserver-web && python3 plugins/pgadmin/index.py start
+# cd /www/server/mdserver-web && python3 plugins/pgadmin/index.py stop
 
 install_tmp=${rootPath}/tmp/mw_install.pl
 
