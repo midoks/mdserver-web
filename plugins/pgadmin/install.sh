@@ -76,6 +76,8 @@ Install_pgadmin()
 	if [ -f ${PG_DIR}/bin/activate ];then
 		source ${PG_DIR}/bin/activate
 	fi
+
+	pip install pgadmin
 	
 	VER=$1
 	
