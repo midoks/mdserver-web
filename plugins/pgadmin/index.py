@@ -204,7 +204,7 @@ def initReplace():
     if not os.path.exists(judge_file):
         pg_init_bash = getPluginDir()+'/pg_init.sh'
         t = mw.execShell("bash "+pg_init_bash)
-        print(t)
+        # print(t)
 
     # systemd
     systemDir = mw.systemdCfgDir()

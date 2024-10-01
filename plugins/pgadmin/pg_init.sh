@@ -22,3 +22,5 @@ for p in ${arr[@]}
 do
     kill -9 $p  > /dev/null 2>&1
 done
+
+
