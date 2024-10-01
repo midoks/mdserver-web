@@ -64,6 +64,7 @@ def getPort():
     return tmp.groups()[0].strip()
 
 
+
 def getHomePage():
     try:
         port = getPort()
@@ -209,7 +210,7 @@ def initReplace():
         pg_init_bash = getPluginDir()+'/pg_init.sh'
         pg_rand = mw.getRandomString(8)
         pg_username = "mw."+pg_rand+"@gmail.com"
-        setCfg('web_pg_password', pg_username)
+        setCfg('web_pg_username', pg_username)
         pg_password = mw.getRandomString(10)
         setCfg('web_pg_password', pg_password)
         t = mw.execShell("bash "+ pg_init_bash + " " + pg_username + " " + pg_password)
