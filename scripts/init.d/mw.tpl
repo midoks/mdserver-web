@@ -511,6 +511,7 @@ case "$1" in
     'close') mw_close;;
     'open') mw_open;;
     'update') mw_update;;
+    'dev') mw_update_dev;;
     'update_dev') mw_update_dev;;
     'install_app') mw_install_app;;
     'close_admin_path') mw_close_admin_path;;
