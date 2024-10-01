@@ -1,18 +1,8 @@
-function str2Obj(str){
-    var data = {};
-    kv = str.split('&');
-    for(i in kv){
-        v = kv[i].split('=');
-        data[v[0]] = v[1];
-    }
-    return data;
-}
-
 function pgPost(method,args,callback){
 
     var _args = null; 
     if (typeof(args) == 'string'){
-        _args = JSON.stringify(str2Obj(args));
+        _args = JSON.stringify(toArrayObject(args));
     } else {
         _args = JSON.stringify(args);
     }
@@ -32,11 +22,11 @@ function pgPost(method,args,callback){
 }
 
 
-function pmaAsyncPost(method,args){
+function pgAsyncPost(method,args){
 
     var _args = null; 
     if (typeof(args) == 'string'){
-        _args = JSON.stringify(str2Obj(args));
+        _args = JSON.stringify(toArrayObject(args));
     } else {
         _args = JSON.stringify(args);
     }
@@ -44,7 +34,7 @@ function pmaAsyncPost(method,args){
 }
 
 function homePage(){
-    pmaPost('get_home_page', '', function(data){
+    pgPost('get_home_page', '', function(data){
         var rdata = $.parseJSON(data.data);
         if (!rdata.status){
             layer.msg(rdata.msg,{icon:0,time:2000,shade: [0.3, '#000']});
@@ -58,7 +48,7 @@ function homePage(){
 
 //phpmyadmin安全设置
 function safeConf() {
-    pmaPost('get_pma_option', {}, function(rdata){
+    pgPost('get_pma_option', {}, function(rdata){
         var rdata = $.parseJSON(rdata.data);
         if (!rdata.status){
             layer.msg(rdata.msg,{icon:2,time:2000,shade: [0.3, '#000']});
