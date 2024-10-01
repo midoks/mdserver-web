@@ -15,6 +15,8 @@ serverPath=$(dirname "$rootPath")
 P_VER=`python3 -V | awk '{print $2}'`
 echo "python:$P_VER"
 
+# https://cn.linux-console.net/?p=6560
+
 # cd /Users/midoks/Desktop/mwdev/server/mdserver-web/plugins/pgadmin && bash install.sh install 4
 # cd /www/server/mdserver-web/plugins/pgadmin && bash install.sh install 4
 
