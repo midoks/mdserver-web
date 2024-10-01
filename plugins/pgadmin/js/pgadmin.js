@@ -55,38 +55,6 @@ function homePage(){
     });
 }
 
-//phpmyadmin切换php版本
-function phpVer(version) {
-
-    var _version = pmaAsyncPost('get_set_php_ver','')
-    if (_version['data'] != ''){
-        version = _version['data'];
-    }
-
-    $.post('/site/get_php_version', function(rdata) {
-        // console.log(rdata);
-        var body = "<div class='ver line'><span class='tname'>PHP版本</span><select id='phpver' class='bt-input-text mr20' name='phpVersion' style='width:110px'>";
-        var optionSelect = '';
-        for (var i = 0; i < rdata.length; i++) {
-            optionSelect = rdata[i].version == version ? 'selected' : '';
-            body += "<option value='" + rdata[i].version + "' " + optionSelect + ">" + rdata[i].name + "</option>"
-        }
-        body += '</select><button class="btn btn-success btn-sm" onclick="phpVerChange(\'phpversion\',\'get\')">保存</button></div>';
-        $(".soft-man-con").html(body);
-    },'json');
-}
-
-function phpVerChange(type, msg) {
-    var phpver = $("#phpver").val();
-    pmaPost('set_php_ver', 'phpver='+phpver, function(data){
-        if ( data.data == 'ok' ){
-            layer.msg('设置成功!',{icon:1,time:2000,shade: [0.3, '#000']});
-        } else {
-            layer.msg('设置失败!',{icon:2,time:2000,shade: [0.3, '#000']});
-        }
-    });
-}
-
 
 //phpmyadmin安全设置
 function safeConf() {
