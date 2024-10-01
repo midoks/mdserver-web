@@ -61,6 +61,7 @@ Install_pgadmin()
 
 	if version_lt "$P_VER" "3.8.0" ;then
 		echo 'Python版本太低,无法安装'
+		exit 0
 	fi
 	PG_DIR=${serverPath}/pgadmin/run
 	PG_DATA_DIR=${serverPath}/pgadmin/data
