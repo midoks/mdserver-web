@@ -244,7 +244,7 @@ def start():
 
     pgOp('start')
 
-    cleanNginxLog()
+    
     return 'ok'
 
 
@@ -256,12 +256,14 @@ def stop():
 
 
 def restart():
+    cleanNginxLog()
     state = pgOp('restart')
     mw.restartWeb()
     return state
 
 
 def reload():
+    cleanNginxLog()
     return pgOp('reload')
 
 def getPgOption():
