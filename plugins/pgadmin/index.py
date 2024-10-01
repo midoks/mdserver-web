@@ -339,24 +339,6 @@ def setPmaPassword():
     return mw.returnJson(True, '修改成功!')
 
 
-def setPmaPath():
-    args = getArgs()
-    data = checkArgs(args, ['path'])
-    if not data[0]:
-        return data[1]
-
-    path = args['path']
-
-    if len(path) < 5:
-        return mw.returnJson(False, '不能小于5位!')
-
-    old_path = getServerDir() + "/" + getCfg()['path']
-    new_path = getServerDir() + "/" + path
-
-    mw.execShell("mv " + old_path + " " + new_path)
-    setCfg('path', path)
-    return mw.returnJson(True, '修改成功!')
-
 
 def accessLog():
     return getServerDir() + '/access.log'
@@ -428,8 +410,6 @@ if __name__ == "__main__":
         print(setPmaUsername())
     elif func == 'set_pma_password':
         print(setPmaPassword())
-    elif func == 'set_pma_path':
-        print(setPmaPath())
     elif func == 'access_log':
         print(accessLog())
     elif func == 'error_log':
