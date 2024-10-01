@@ -135,10 +135,6 @@ def returnCfg():
     return data
 
 
-def status():
-    return 'stop'
-
-
 def __release_port(port):
     from collections import namedtuple
     try:
@@ -248,6 +244,13 @@ def pgOp(method):
         return 'ok'
 
     return data[1]
+
+def status():
+    sock = '/tmp/pgadmin4.sock'
+    if os.path.exists(sock):
+        return 'start'
+    return 'stop'
+
 
 def start():
     initCfg()
