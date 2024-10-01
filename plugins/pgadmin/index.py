@@ -250,6 +250,11 @@ def start():
 
 def stop():
     pgOp('stop')
+
+    conf = getConf()
+    if os.path.exists(conf):
+        os.remove(conf)
+        
     delPort()
     mw.restartWeb()
     return 'ok'
