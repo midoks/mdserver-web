@@ -102,6 +102,9 @@ def initCfg():
         data['path'] = ''
         data['username'] = 'admin'
         data['password'] = 'admin'
+
+        data['web_pg_username'] = 'mdserver-web@gmail.com'
+        data['web_pg_password'] = 'admin'
         mw.writeFile(cfg, json.dumps(data))
 
 
