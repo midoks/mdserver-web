@@ -172,7 +172,7 @@ def cleanNginxLog():
             mw.execShell(cmd)
 
 def initPgConfFile():
-    file_tpl = getPluginDir() + '/conf/config_local.conf'
+    file_tpl = getPluginDir() + '/conf/config_local.py'
     dst_file = getServerDir()+'/run/lib/python3.10/site-packages/pgadmin4/config_local.py'
     if not os.path.exists(dst_file):
         service_path = mw.getServerDir()
