@@ -72,16 +72,6 @@ function safeConf() {
                     <button class="btn btn-success btn-sm" onclick="setPamPort()">保存</button>\
                 </div>\
                 <div class="ver line">\
-                    <span class="tname">访问切换</span>\
-                    <select id="access_choose" class="bt-input-text mr20" name="choose" style="width:110px">\
-                        <option value="mariadb" '+(cfg['choose']=="mariadb"?"selected='selected'":"")+'>MariaDB</option>\
-                        <option value="mysql" '+ (cfg['choose']=="mysql"?"selected='selected'":"")+'>MySQL</option>\
-                        <option value="mysql-apt" '+ (cfg['choose']=="mysql-apt"?"selected='selected'":"")+'>MySQL[APT]</option>\
-                        <option value="mysql-yum" '+ (cfg['choose']=="mysql-yum"?"selected='selected'":"")+'>MySQL[YUM]</option>\
-                    </select>\
-                    <button class="btn btn-success btn-sm" onclick="setPmaChoose()">保存</button>\
-                </div>\
-                <div class="ver line">\
                     <span class="tname">用户名</span>\
                     <input style="width:110px" class="bt-input-text mr20" name="username" id="pmport" value="' + cfg['username'] + '" placeholder="认证用户名" type="text">\
                     <button class="btn btn-success btn-sm" onclick="setPmaUsername()">保存</button>\

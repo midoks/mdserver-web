@@ -90,8 +90,7 @@ def contentReplace(content):
     tmp = mw.execShell(
         'cat /dev/urandom | head -n 32 | md5sum | head -c 16')
     blowfish_secret = tmp[0].strip()
-    # print php_ver
-    php_conf_dir = mw.getServerDir() + '/web_conf/php/conf'
+    
     content = content.replace('{$ROOT_PATH}', mw.getRootDir())
     content = content.replace('{$SERVER_PATH}', service_path)
     content = content.replace('{$BLOWFISH_SECRET}', blowfish_secret)
@@ -107,7 +106,6 @@ def initCfg():
     if not os.path.exists(cfg):
         data = {}
         data['port'] = '5051'
-        data['choose'] = 'mysql'
         data['path'] = ''
         data['username'] = 'admin'
         data['password'] = 'admin'
