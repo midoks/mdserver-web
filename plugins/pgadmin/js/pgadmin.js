@@ -59,17 +59,17 @@ function safeConf() {
         var con = '<div class="ver line">\
                     <span class="tname">访问端口</span>\
                     <input style="width:110px" class="bt-input-text phpmyadmindk mr20" name="Name" id="pmport" value="' + cfg['port'] + '" placeholder="phpmyadmin访问端口" maxlength="5" type="number">\
-                    <button class="btn btn-success btn-sm" onclick="setPamPort()">保存</button>\
+                    <button class="btn btn-success btn-sm" onclick="setPgPort()">保存</button>\
                 </div>\
                 <div class="ver line">\
                     <span class="tname">用户名</span>\
                     <input style="width:110px" class="bt-input-text mr20" name="username" id="pmport" value="' + cfg['username'] + '" placeholder="认证用户名" type="text">\
-                    <button class="btn btn-success btn-sm" onclick="setPmaUsername()">保存</button>\
+                    <button class="btn btn-success btn-sm" onclick="setPgUsername()">保存</button>\
                 </div>\
                 <div class="ver line">\
                     <span class="tname">密码</span>\
                     <input style="width:110px" class="bt-input-text mr20" name="password" id="pmport" value="' + cfg['password'] + '" placeholder="密码" type="text">\
-                    <button class="btn btn-success btn-sm" onclick="setPmaPassword()">保存</button>\
+                    <button class="btn btn-success btn-sm" onclick="setPgPassword()">保存</button>\
                 </div>';
         $(".soft-man-con").html(con);
     });
