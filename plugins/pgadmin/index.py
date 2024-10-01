@@ -191,14 +191,14 @@ def initReplace():
         content = contentReplace(content)
         mw.writeFile(file_run, content)
 
-    pma_path = getServerDir() + '/pg.pass'
-    if not os.path.exists(pma_path):
+    pass_path = getServerDir() + '/pg.pass'
+    if not os.path.exists(pass_path):
         username = mw.getRandomString(8)
         password = mw.getRandomString(10)
         pass_cmd = username + ':' + mw.hasPwd(password)
         setCfg('username', username)
         setCfg('password', password)
-        mw.writeFile(pma_path, pass_cmd)
+        mw.writeFile(pass_path, pass_cmd)
 
     judge_file = getServerDir()+'/data/pgadmin4/pgadmin4.db'
     if not os.path.exists(judge_file):
