@@ -175,6 +175,11 @@ def cleanNginxLog():
             cmd = "echo '' > " + i
             mw.execShell(cmd)
 
+def getPythonName():
+    cmd = "ls /www/server/pgadmin/run/lib/ | grep python | cut -d \\  -f 1 | awk 'END {print}'"
+    data = mw.execShell(cmd)
+    return data[0].strip();
+
 def initPgConfFile():
     file_tpl = getPluginDir() + '/conf/config_local.py'
     dst_file = getServerDir()+'/run/lib/python3.10/site-packages/pgadmin4/config_local.py'
@@ -225,6 +230,9 @@ def initReplace():
         service_path = mw.getServerDir()
         content = mw.readFile(systemServiceTpl)
         content = content.replace('{$SERVER_PATH}', service_path)
+        content = content.replace('{$PY_VER}', getPythonName())
+
+        
         mw.writeFile(systemService, content)
         mw.execShell('systemctl daemon-reload')
 
