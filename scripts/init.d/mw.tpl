@@ -437,8 +437,9 @@ mw_connect_pgdb(){
 
 
     pwd=$(cd ${ROOT_PATH}/mdserver-web && python3 ${ROOT_PATH}/mdserver-web/plugins/postgresql/index.py root_pwd)
-    echo "${ROOT_PATH}/postgresql/bin/psql -U postgres -W "${pwd}""
-    ${ROOT_PATH}/postgresql/bin/psql -U postgres -W
+    export PGPASSWORD=${pwd}
+    echo "${ROOT_PATH}/postgresql/bin/psql -U postgres -W"
+    echo "\n" | ${ROOT_PATH}/postgresql/bin/psql -U postgres -W
 }
 
 
