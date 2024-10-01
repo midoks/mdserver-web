@@ -4,7 +4,7 @@
 - 面板相关命令
 
 ```
-mw default		| 显示登录信息
+mw default	| 显示登录信息
 mw db 		| 快捷连接MySQL
 mw redis 	| 快捷连接Redis
 mw mongodb 	| 快捷连接MongoDB
