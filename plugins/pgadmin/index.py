@@ -200,6 +200,8 @@ def initReplace():
         setCfg('password', password)
         mw.writeFile(pma_path, pass_cmd)
 
+    mw.execShell("python /www/server/pgadmin/run/lib/python3.10/site-packages/pgadmin4/setup.py add-user mw@gmail.com 123123")
+
     # systemd
     systemDir = mw.systemdCfgDir()
     systemService = systemDir + '/pgadmin.service'
