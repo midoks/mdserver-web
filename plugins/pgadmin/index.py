@@ -81,9 +81,9 @@ def getHomePage():
 
 
 def contentReplace(content):
+    cfg = getCfg()
     service_path = mw.getServerDir()
-    tmp = mw.execShell(
-        'cat /dev/urandom | head -n 32 | md5sum | head -c 16')
+    tmp = mw.execShell('cat /dev/urandom | head -n 32 | md5sum | head -c 16')
     blowfish_secret = tmp[0].strip()
 
     content = content.replace('{$ROOT_PATH}', mw.getRootDir())
@@ -254,7 +254,7 @@ def stop():
     conf = getConf()
     if os.path.exists(conf):
         os.remove(conf)
-        
+
     delPort()
     mw.restartWeb()
     return 'ok'
