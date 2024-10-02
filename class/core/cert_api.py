@@ -1452,12 +1452,14 @@ fullchain.pem       粘贴到证书输入框
 
                             self.__config['orders'][i]['auth_to'] = auth_to
 
-                        if not self.checkDomainIsExsits(domain):
-                            auth_to = None
-                            msg = "|-跳过被删除的域名: {}!".format(self.__config['orders'][i]['domains'])
-                            writeLog(msg)
+                        auth_to = True
+                        for domain in self.__config['orders'][i]['domains']:
+                            if not self.checkDomainIsExsits(domain):
+                                auth_to = False
+                                msg = "|-跳过被删除的域名: {}!".format(self.__config['orders'][i]['domains'])
+                                writeLog(msg)
+                        if not auth_to:
                             continue
-
                     # 是否到了允许重试的时间
                     if 'next_retry_time' in self.__config['orders'][i]:
                         timeout = self.__config['orders'][i][
