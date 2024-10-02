@@ -1296,9 +1296,9 @@ fullchain.pem       粘贴到证书输入框
         site_sql = mw.M('sites')
         siteName = None
         for domain in domains:
-            pid = sql.where('name=?', domain).getField('pid')
+            pid = sql.where('name=?', (domain,)).getField('pid')
             if pid:
-                siteName = site_sql.where('id=?', pid).getField('name')
+                siteName = site_sql.where('id=?', (pid,)).getField('name')
                 break
         return siteName
 
