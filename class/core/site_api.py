@@ -1786,8 +1786,7 @@ class site_api:
         data.append({"r_from": _from, "type": _typeCode, "r_type": _rTypeCode,
                      "r_to": _to, 'keep_path': _keepPath, 'id': _id})
         mw.writeFile(data_path, json.dumps(data))
-        mw.writeFile(
-            "{}/{}.conf".format(self.getRedirectPath(_siteName), _id), file_content)
+        mw.writeFile("{}/{}.conf".format(self.getRedirectPath(_siteName), _id), file_content)
 
         self.operateRedirectConf(_siteName, 'start')
         mw.restartWeb()

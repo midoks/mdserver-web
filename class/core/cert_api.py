@@ -1324,6 +1324,8 @@ fullchain.pem       粘贴到证书输入框
             else:
                 site_name = self.getSiteNameByDomains(domains)
         is_rep = api.httpToHttps(site_name)
+        api.operateRedirectConf(site_name,'stop')
+        mw.restartWeb()
         try:
             index = self.createOrder(
                 domains,
@@ -1375,6 +1377,9 @@ fullchain.pem       粘贴到证书输入框
             is_rep_decode = json.loads(is_rep)
             if is_rep_decode['status']:
                 api.closeToHttps(site_name)
+
+        api.operateRedirectConf(site_name,'start')
+        mw.restartWeb()
         writeLog("-" * 70)
         return cert
 
