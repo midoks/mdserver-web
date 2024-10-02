@@ -68,7 +68,7 @@ Install_lib()
 	echo  "[${LIBNAME}]" >> $extIni
 	echo "zend_extension=${LIBNAME}.so" >> $extIni
 	
-	systemctl restart php${version}-fpm 
+	systemctl restart php${version}-fpm
 	echo '==========================================================='
 	echo 'successful!'
 }
@@ -80,7 +80,8 @@ Uninstall_lib()
 	if [ -f $extIni ];then
 		rm -rf $extIni
 	fi
-
+	
+	systemctl restart php${version}-fpm
 	echo '==============================================='
 	echo 'successful!'
 }

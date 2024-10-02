@@ -16,6 +16,10 @@ fi
 git config --global credential.helper store
 git config --global pull.rebase false
 
+if [ ! -d $GIT_PROJECT_DIR ];then
+	git config --global --add safe.directory $GIT_PROJECT_DIR
+fi
+
 # echo $GIT_PROJECT_DIR
 if [ ! -d $GIT_PROJECT_DIR ];then
 	mkdir -p $GIT_USER_DIR && cd $GIT_USER_DIR
@@ -23,6 +27,8 @@ if [ ! -d $GIT_PROJECT_DIR ];then
 fi
 
 unset GIT_DIR
+
+
 
 cd $GIT_PROJECT_DIR && git pull
 

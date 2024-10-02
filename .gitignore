@@ -180,3 +180,6 @@ plugins/frp
 plugins/file_search
 plugins/proxysql
 plugins/tidb
+plugins/goedge-admin
+plugins/goedge-node
+plugins/goedge-happy

@@ -225,8 +225,7 @@ fi
                     86400  # 24小时后过期
                 self.saveConfig()
             except Exception as e:
-                raise Exception(
-                    '服务因维护而关闭或发生内部错误，查看 <a href="https://letsencrypt.status.io/" target="_blank" class="btlink">https://letsencrypt.status.io/</a> 了解更多详细信息。')
+                raise Exception('服务因维护而关闭或发生内部错误，查看 <a href="https://letsencrypt.status.io/" target="_blank" class="btlink">https://letsencrypt.status.io/</a> 了解更多详细信息。')
         return self.__apis
 
     # 系列化payload
@@ -1297,9 +1296,9 @@ fullchain.pem       粘贴到证书输入框
         site_sql = mw.M('sites')
         siteName = None
         for domain in domains:
-            pid = sql.where('name=?', domain).getField('pid')
+            pid = sql.where('name=?', (domain,)).getField('pid')
             if pid:
-                siteName = site_sql.where('id=?', pid).getField('name')
+                siteName = site_sql.where('id=?', (pid,)).getField('name')
                 break
         return siteName
 
@@ -1325,6 +1324,8 @@ fullchain.pem       粘贴到证书输入框
             else:
                 site_name = self.getSiteNameByDomains(domains)
         is_rep = api.httpToHttps(site_name)
+        api.operateProxyConf(site_name,'stop')
+        mw.restartWeb()
         try:
             index = self.createOrder(
                 domains,
@@ -1376,6 +1377,9 @@ fullchain.pem       粘贴到证书输入框
             is_rep_decode = json.loads(is_rep)
             if is_rep_decode['status']:
                 api.closeToHttps(site_name)
+
+        api.operateProxyConf(site_name,'start')
+        mw.restartWeb()
         writeLog("-" * 70)
         return cert
 
@@ -1447,8 +1451,8 @@ fullchain.pem       粘贴到证书输入框
 
                     # 是否到了最大重试次数
                     if 'retry_count' in self.__config['orders'][i]:
-                        if self.__config['orders'][i]['retry_count'] >= 5:
-                            msg = '|-本次跳过域名:{}，因连续5次续签失败，不再续签此证书(可尝试手动续签此证书，成功后错误次数将被重置)'.format(
+                        if self.__config['orders'][i]['retry_count'] >= 100:
+                            msg = '|-本次跳过域名:{}，因连续10次续签失败，不再续签此证书(可尝试手动续签此证书，成功后错误次数将被重置)'.format(
                                 self.__config['orders'][i]['domains'])
                             writeLog(msg)
                             continue

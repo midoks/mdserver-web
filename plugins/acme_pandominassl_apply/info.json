@@ -1,0 +1,17 @@
+{
+	"sort": 7,
+	"ps": "ACME泛域名SSL申请/管理",
+	"name": "acme_pandominassl_apply",
+	"title": "ACME泛域名SSL",
+	"shell": "install.sh",
+	"versions":["1.0"],
+	"tip": "soft",
+	"checks": "server/acme_pandominassl_apply",
+	"path": "server/acme_pandominassl_apply",
+	"display": 1,
+	"author": "ACME",
+	"date": "2024-09-12",
+	"home": "https://github.com/acmesh-official/acme.sh",
+	"type": 0,
+	"pid": "5"
+}

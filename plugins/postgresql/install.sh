@@ -14,6 +14,8 @@ install_tmp=${rootPath}/tmp/mw_install.pl
 action=$1
 type=$2
 
+VERSION=(${type//./ })
+
 pip install psycopg2-binary
 if [ -f ${rootPath}/bin/activate ];then
 	source ${rootPath}/bin/activate
@@ -26,7 +28,7 @@ if [ "${2}" == "" ];then
 	exit 0
 fi 
 
-if [ ! -d $curPath/versions/$2 ];then
+if [ ! -d $curPath/versions/$VERSION ];then
 	echo '缺少安装脚本2...'
 	exit 0
 fi
@@ -41,7 +43,7 @@ if [ "${action}" == "uninstall" ];then
 	fi
 fi
 
-sh -x $curPath/versions/$2/install.sh $1
+sh -x $curPath/versions/$VERSION/install.sh $1
 
 if [ "${action}" == "install" ] && [ -d $serverPath/postgresql ];then
 	#初始化 

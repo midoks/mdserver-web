@@ -4,6 +4,11 @@ export PATH
 export LANG=en_US.UTF-8
 export DEBIAN_FRONTEND=noninteractive
 
+function version_gt() { test "$(echo "$@" | tr " " "\n" | sort -V | head -n 1)" != "$1"; }
+function version_le() { test "$(echo "$@" | tr " " "\n" | sort -V | head -n 1)" == "$1"; }
+function version_lt() { test "$(echo "$@" | tr " " "\n" | sort -rV | head -n 1)" != "$1"; }
+function version_ge() { test "$(echo "$@" | tr " " "\n" | sort -rV | head -n 1)" == "$1"; }
+
 VERSION_ID=`cat /etc/*-release | grep VERSION_ID | awk -F = '{print $2}' | awk -F "\"" '{print $2}'`
 
 cn=$(curl -fsSL -m 10 http://ipinfo.io/json | grep "\"country\": \"CN\"")
@@ -22,13 +27,17 @@ if [ "$VERSION_ID" == "10" ];then
 fi
 
 
+# synchronize server
+apt install chrony -y
+
 # synchronize time first
-apt-get install ntpdate -y
-NTPHOST='time.nist.gov'
-if [ ! -z "$cn" ];then
-    NTPHOST='ntp1.aliyun.com'
-fi
-ntpdate $NTPHOST | logger -t NTP
+apt install ntpdate -y
+# NTPHOST='time.nist.gov'
+# if [ ! -z "$cn" ];then
+#     NTPHOST='ntp1.aliyun.com'
+# fi
+# ntpdate ntp1.aliyun.com | logger -t NTP
+# ntpdate $NTPHOST | logger -t NTP
 
 apt install -y net-tools
 
@@ -69,6 +78,13 @@ apt install -y python3-pip python3-dev python3-venv
 apt install -y libncurses5
 apt install -y libncurses5-dev
 apt install -y bzip2
+
+P_VER=`python3 -V | awk '{print $2}'`
+if version_ge "$P_VER" "3.11.0" ;then
+    echo -e "\e[1;31mapt install python3.12-venv\e[0m"
+    apt install -y python3.12-venv
+fi
+
 
 if [ -f /usr/sbin/ufw ];then
 	# look
@@ -192,6 +208,7 @@ apt install -y libmagickwand-dev
 
 apt install -y libxml2 libxml2-dev libbz2-dev libmcrypt-dev libpspell-dev librecode-dev
 apt install -y libgmp-dev libgmp3-dev libreadline-dev libxpm-dev
+apt install -y libpq-dev
 apt install -y dia
 
 apt install -y pkg-config

@@ -87,8 +87,10 @@ Install_lib()
 		--with-gd \
 		--with-jpeg-dir \
 		--with-png-dir \
-		--with-freetype-dir=${serverPath}/lib/freetype_old
-		# --enable-gd-jis-conv
+		--with-webp-dir \
+		--with-zlib-dir \
+		--enable-gd-jis-conv
+		# --with-freetype-dir=${serverPath}/lib/freetype_old
 		# --enable-gd-native-ttf
 		make clean && make && make install && make clean
 		

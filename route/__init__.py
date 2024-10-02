@@ -269,9 +269,15 @@ def webhook():
     if not os.path.exists(wh_install_path):
         return mw.returnJson(False, '请先安装WebHook插件!')
 
-    sys.path.append('plugins/webhook')
-    import index
-    return index.runShellArgs(input_args)
+    package = os.getcwd() + "/plugins/webhook"
+    if not package in sys.path:
+        sys.path.append(package)
+        
+    try:
+        import webhook_index
+        return webhook_index.runShellArgs(input_args)
+    except Exception as e:
+        return str(e)
 
 
 @app.route('/close')

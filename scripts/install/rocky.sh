@@ -23,6 +23,8 @@ yum install -y expect
 yum install -y curl curl-devel libcurl libcurl-devel
 yum install -y bzip2 
 yum install -y bzip2-devel
+yum install -y libzip-devel
+yum install -y re2c 
 
 if [ -f /usr/sbin/iptables ];then
 

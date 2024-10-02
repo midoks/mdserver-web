@@ -5,7 +5,7 @@ import time
 import os
 import sys
 import re
-
+import subprocess
 
 sys.path.append(os.getcwd() + "/class/core")
 import mw
@@ -138,6 +138,8 @@ def initDreplace():
     git_dir = mw.getServerDir() + '/git'
     if not os.path.exists(git_dir):
         mw.execShell('mkdir -p ' + git_dir)
+        mw.execShell('chown -R www:www ' + git_dir)
+
 
     initD_path = getServerDir() + '/init.d'
     if not os.path.exists(initD_path):
@@ -762,8 +764,13 @@ def projectScriptRun():
     if not os.path.exists(commit_sh):
         return mw.returnJson(False, '脚本文件不存在!')
 
-    mw.execShell(script_run)
-    mw.execShell('chown -R www:www ' + commit_log)
+    repo_dir = mw.getServerDir()+'/git/'+ args['name']
+
+    # mw.execShell(script_run)
+    subprocess.Popen(script_run, stdout=subprocess.PIPE, shell=True,
+                                 bufsize=4096, stderr=subprocess.PIPE)
+    subprocess.Popen('chown -R www:www ' + repo_dir, stdout=subprocess.PIPE, shell=True,
+                                 bufsize=4096, stderr=subprocess.PIPE)
     return mw.returnJson(True, '脚本文件执行成功,观察日志!')
 
 

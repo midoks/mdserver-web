@@ -110,11 +110,11 @@ docker run -itd --name mw-server --privileged=true -p 7200:7200 -p 80:80 -p 443:
 ```
 
 
-### 版本更新 0.17.2
+### 版本更新 0.17.3
 
-- MySQL9.0。
-- zabbix,zabbix-agent测试。
-- 正则匹配修复(兼容)。
+- 新增pgadmin插件。
+- 新增acme_pandominassl_apply插件。
+- 新增快捷指令:mw pgdb。
 - 常规更新。
 
 ### JSDelivr安装地址

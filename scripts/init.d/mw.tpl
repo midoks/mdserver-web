@@ -425,7 +425,20 @@ mw_connect_mysql(){
     if [ "$CHOICE_DB" == "mysql-yum" ];then
         ${ROOT_PATH}/mysql-yum/bin/usr/bin/mysql -S ${ROOT_PATH}/mysql-yum/mysql.sock -uroot -p"${pwd}"
     fi
+}
 
+
+mw_connect_pgdb(){
+    if [ ! -d "${ROOT_PATH}/postgresql" ];then
+        echo -e "postgresql not install!"
+        exit 1
+    fi
+
+
+    pwd=$(cd ${ROOT_PATH}/mdserver-web && python3 ${ROOT_PATH}/mdserver-web/plugins/postgresql/index.py root_pwd)
+    export PGPASSWORD=${pwd}
+    echo "${ROOT_PATH}/postgresql/bin/psql -U postgres -W"
+    ${ROOT_PATH}/postgresql/bin/psql -U postgres -W
 }
 
 
@@ -498,6 +511,7 @@ case "$1" in
     'close') mw_close;;
     'open') mw_open;;
     'update') mw_update;;
+    'dev') mw_update_dev;;
     'update_dev') mw_update_dev;;
     'install_app') mw_install_app;;
     'close_admin_path') mw_close_admin_path;;
@@ -506,6 +520,7 @@ case "$1" in
     'debug') mw_debug;;
     'mirror') mw_mirror;;
     'db') mw_connect_mysql;;
+    'pgdb') mw_connect_pgdb;;
     'redis') mw_redis;;
     'mongodb') mw_mongodb;;
     'venv') mw_update_venv;;

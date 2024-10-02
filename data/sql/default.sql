@@ -71,8 +71,13 @@ CREATE TABLE IF NOT EXISTS `sites` (
   `type_id` INTEGER,
   `ps` TEXT,
   `edate` TEXT,
+  `ssl_effective_date` TEXT,
+  `ssl_expiration_date` TEXT,
   `addtime` TEXT
 );
+
+ALTER TABLE `sites` ADD COLUMN `ssl_effective_date` TEXT DEFAULT '';
+ALTER TABLE `sites` ADD COLUMN `ssl_expiration_date` TEXT DEFAULT '';
 
 CREATE TABLE IF NOT EXISTS `site_types` (
   `id` INTEGER PRIMARY KEY AUTOINCREMENT,

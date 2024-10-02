@@ -1786,8 +1786,7 @@ class site_api:
         data.append({"r_from": _from, "type": _typeCode, "r_type": _rTypeCode,
                      "r_to": _to, 'keep_path': _keepPath, 'id': _id})
         mw.writeFile(data_path, json.dumps(data))
-        mw.writeFile(
-            "{}/{}.conf".format(self.getRedirectPath(_siteName), _id), file_content)
+        mw.writeFile("{}/{}.conf".format(self.getRedirectPath(_siteName), _id), file_content)
 
         self.operateRedirectConf(_siteName, 'start')
         mw.restartWeb()
@@ -1977,6 +1976,7 @@ class site_api:
 location ^~ {from} {\n\
     proxy_pass {to};\n\
     proxy_set_header Host {host};\n\
+    proxy_ssl_server_name on;\n\
     proxy_set_header X-Real-IP $remote_addr;\n\
     proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;\n\
     proxy_set_header REMOTE-HOST $remote_addr;\n\

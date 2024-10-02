@@ -945,7 +945,7 @@ function _M.match_spider(self, ua)
     end
 
     -- Curl|Yahoo|HeadlessChrome|包含bot|Wget|Spider|Crawler|Scrapy|zgrab|python|java|Adsbot|DuckDuckGo
-    find_spider, _ = ngx.re.match(ua, "(Yahoo|Slurp|DuckDuckGo|Semrush|Spider|Bot)", "ijo")
+    find_spider, _ = ngx.re.match(ua, "(Yahoo|Slurp|DuckDuckGo|Semrush|Spider|Bot|crawler)", "ijo")
     if find_spider then
         spider_match = string.lower(find_spider[0])
         if string.find(spider_match, "yahoo", 1, true) then
@@ -959,6 +959,8 @@ function _M.match_spider(self, ua)
         elseif string.find(spider_match, "spider", 1, true) then
             spider_name = "other"
         elseif string.find(spider_match, "bot", 1, true) then
+            spider_name = "other"
+        elseif string.find(spider_match, "crawler", 1, true) then
             spider_name = "other"
         end
         return true, spider_name, spider_table[spider_name]

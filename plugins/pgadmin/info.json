@@ -1,0 +1,15 @@
+{
+	"title":"pgadmin",
+	"tip":"soft",
+	"name":"pgadmin",
+	"type":"运行环境",
+	"ps":"全能Postgres数据库Web管理工具",
+	"versions":["4"],
+	"shell":"install.sh",
+	"checks":"server/pgadmin",
+	"path": "server/pgadmin",
+	"author":"pgadmin",
+	"home":"https://www.pgadmin.org/download/pgadmin-4-python/",
+	"date":"2024-10-1",
+	"pid": "2"
+}

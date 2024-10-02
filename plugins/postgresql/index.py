@@ -696,6 +696,8 @@ def setDbBackup():
     os.system(cmd)
     return mw.returnJson(True, 'ok')
 
+def rootPwd():
+    return pSqliteDb('config').where('id=?', (1,)).getField('pg_root')
 
 def importDbBackup():
     args = getArgs()
@@ -1589,6 +1591,8 @@ if __name__ == "__main__":
         print(getPgPort())
     elif func == 'set_pg_port':
         print(setPgPort())
+    elif func == 'root_pwd':
+        print(rootPwd())
     elif func == 'get_db_list':
         print(getDbList())
     elif func == 'add_db':

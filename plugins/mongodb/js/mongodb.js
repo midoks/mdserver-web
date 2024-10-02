@@ -767,6 +767,18 @@ function delDb(id, name){
     });
 }
 
+function delDbTable( name, table_name){
+    safeMessage('删除['+name+']','您真的要删除['+table_name+']吗？',function(){
+        var data='name='+name+'&table_name='+table_name;
+        mgPost('del_db_table', '', data, function(data){
+            var rdata = $.parseJSON(data.data);
+            showMsg(rdata.msg,function(){
+                repTools(name);
+            },{icon: rdata.status ? 1 : 2}, 600);
+        });
+    });
+}
+
 function delDbBatch(){
     var arr = [];
     $('input[type="checkbox"].check:checked').each(function () {
@@ -835,22 +847,10 @@ function setDbPass(id, username, password){
 }
 
 function repTools(db_name, res){
+	
     mgPost('get_db_info', '', {name:db_name}, function(data){
         var rdata = $.parseJSON(data.data);
         var rdata = rdata.data;
-        // console.log(rdata.collection_list);
-        var tbody = '';
-        for (var i = 0; i < rdata.collection_list.length; i++) {
-            tbody += '<tr>\
-                    <td><span style="width:220px;"> ' + rdata.collection_list[i].collection_name + '</span></td>\
-                    <td><span style="width:220px;"> ' + rdata.collection_list[i].count + '</span></td>\
-                    <td>' + toSize(rdata.collection_list[i].size) + '</td>\
-                    <td><span style="width:90px;"> ' + toSize(rdata.collection_list[i].avg_obj_size) + '</span></td>\
-                    <td>' + toSize(rdata.collection_list[i].storage_size) + '</td>\
-                    <td>' + rdata.collection_list[i].nindexes + '</td>\
-                    <td>' + toSize(rdata.collection_list[i].total_index_size) + '</td>\
-                </tr> '
-        }
 
         layer.open({
             type: 1,
@@ -858,7 +858,7 @@ function repTools(db_name, res){
             area: ['780px', '480px'],
             closeBtn: 1,
             shadeClose: false,
-            content: '<div class="pd15">\
+            content: '<div class="pd15" id="mongodb_list">\
                             <div class="db_list">\
                                 <span><a>数据库名称：'+ db_name + '</a>\
                                 <a>集合：'+ rdata.collections + '</a>\
@@ -879,13 +879,51 @@ function repTools(db_name, res){
                                         <th>存储大小</th>\
                                         <th>索引数量</th>\
                                         <th>索引大小</th>\
+                                        <th>操作</th>\
                                     </tr>\
                                 </thead>\
-                                <tbody class="gztr">' + tbody + '</tbody>\
+                                <tbody class="gztr"></tbody>\
                             </table>\
                             </div>\
                         </div>\
-                    </div>'
+                    </div>',
+            success:function(layer_id, layer_index){
+            	
+		        var tbody = '';
+		        for (var i = 0; i < rdata.collection_list.length; i++) {
+		            tbody += '<tr>\
+		                    <td><span style="width:220px;"> ' + rdata.collection_list[i].collection_name + '</span></td>\
+		                    <td><span style="width:220px;"> ' + rdata.collection_list[i].count + '</span></td>\
+		                    <td>' + toSize(rdata.collection_list[i].size) + '</td>\
+		                    <td><span style="width:90px;"> ' + toSize(rdata.collection_list[i].avg_obj_size) + '</span></td>\
+		                    <td>' + toSize(rdata.collection_list[i].storage_size) + '</td>\
+		                    <td>' + rdata.collection_list[i].nindexes + '</td>\
+		                    <td>' + toSize(rdata.collection_list[i].total_index_size) + '</td>\
+		                    <td>' + '<a href="javascript:;" data-index="'+i+'" class="delete btlink" title="删除">删除</a>'+'</td>\
+		                </tr>';
+		        }
+
+		        $('#mongodb_list tbody').html(tbody);
+
+		        $('#mongodb_list .delete').click(function(){
+		        	var index = $(this).data('index');
+
+		        	var name = db_name;
+		        	var table_name = rdata.collection_list[index].collection_name;
+
+		        	safeMessage('删除['+name+']','您真的要删除['+table_name+']吗？',function(){
+				        var data='name='+name+'&table_name='+table_name;
+				        mgPost('del_db_table', '', data, function(data){
+				            var rdata = $.parseJSON(data.data);
+				            showMsg(rdata.msg,function(){
+				            	layer.close(layer_index);
+				                repTools(name);
+				            },{icon: rdata.status ? 1 : 2}, 600);
+				        });
+				    });
+
+		        });
+            }
         });
         tableFixed('database_fix');
     });

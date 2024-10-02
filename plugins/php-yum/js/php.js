@@ -26,12 +26,13 @@ function phpPost(method, version, args,callback){
     },'json'); 
 }
 
-function phpPostCallbak(method, version, args,callback){
+function phpPostCallback(method, version, args,callback){
     var loadT = layer.msg('正在获取...', { icon: 16, time: 0, shade: 0.3 });
 
     var req_data = {};
     req_data['name'] = 'php-yum';
     req_data['func'] = method;
+    req_data['script']='index_php_yum';
     args['version'] = version;
  
     if (typeof(args) == 'string'){
@@ -593,7 +594,7 @@ function getPHPInfo_old(version) {
 }
 
 function getPHPInfo(version) {
-    phpPostCallbak('get_php_info', version, {}, function(data){
+    phpPostCallback('get_php_info', version, {}, function(data){
         if (!data.status){
             layer.msg(rdata.msg, { icon: 2 });
             return;

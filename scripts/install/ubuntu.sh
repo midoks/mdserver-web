@@ -4,10 +4,21 @@ export PATH
 export LANG=en_US.UTF-8
 export DEBIAN_FRONTEND=noninteractive
 
+function version_gt() { test "$(echo "$@" | tr " " "\n" | sort -V | head -n 1)" != "$1"; }
+function version_le() { test "$(echo "$@" | tr " " "\n" | sort -V | head -n 1)" == "$1"; }
+function version_lt() { test "$(echo "$@" | tr " " "\n" | sort -rV | head -n 1)" != "$1"; }
+function version_ge() { test "$(echo "$@" | tr " " "\n" | sort -rV | head -n 1)" == "$1"; }
+
+
 if grep -Eq "Ubuntu" /etc/*-release; then
     sudo ln -sf /bin/bash /bin/sh
     #sudo dpkg-reconfigure dash
 fi
+
+# synchronize server
+# systemctl status chronyd -l
+apt install chrony -y
+apt install ntpdate -y
 
 apt update -y
 apt autoremove -y
@@ -26,6 +37,12 @@ apt install -y libncurses5
 apt install -y libncurses5-dev
 apt install -y software-properties-common
 apt install -y bzip2
+
+P_VER=`python3 -V | awk '{print $2}'`
+if version_ge "$P_VER" "3.11.0" ;then
+    echo -e "\e[1;31mapt install python3.12-venv\e[0m"
+    apt install -y python3.12-venv
+fi
 
 # choose lang cmd
 # dpkg-reconfigure --frontend=noninteractive locales
@@ -121,6 +138,7 @@ apt install -y libmagickwand-dev
 
 apt install -y libxml2 libxml2-dev libbz2-dev libmcrypt-dev libpspell-dev librecode-dev
 apt install -y libgmp-dev libgmp3-dev libreadline-dev libxpm-dev
+apt install -y libpq-dev
 apt install -y dia
 
 apt install -y pkg-config
