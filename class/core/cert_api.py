@@ -1383,6 +1383,17 @@ fullchain.pem       粘贴到证书输入框
         writeLog("-" * 70)
         return cert
 
+    def checkDomainIsExsits(self, domain):
+        if mw.M('domain').where("name=?", (domain,)).count() > 0:
+            return True
+
+        if mw.M('sites').where("name=?", (domain,)).count() > 0:
+            return True
+
+        if mw.M('binding').where("name=?", (domain,)).count() > 0:
+            return True                  
+        return False
+
     def renewCert(self, index):
         writeLog("", "wb+")
         # self.D('renew_cert', index)
@@ -1429,6 +1440,8 @@ fullchain.pem       粘贴到证书输入框
                             for domain in self.__config['orders'][i]['domains']:
                                 if domain.find('*') != -1:
                                     break
+
+
                                 if not mw.M('domain').where("name=?", (domain,)).count() and not mw.M('binding').where("domain=?", domain).count():
                                     auth_to = None
                                     msg = "|-跳过被删除的域名: {}".format(
@@ -1439,6 +1452,14 @@ fullchain.pem       粘贴到证书输入框
 
                             self.__config['orders'][i]['auth_to'] = auth_to
 
+                        auth_to = True
+                        for domain in self.__config['orders'][i]['domains']:
+                            if not self.checkDomainIsExsits(domain):
+                                auth_to = False
+                                msg = "|-跳过被删除的域名: {}!".format(self.__config['orders'][i]['domains'])
+                                writeLog(msg)
+                        if not auth_to:
+                            continue
                     # 是否到了允许重试的时间
                     if 'next_retry_time' in self.__config['orders'][i]:
                         timeout = self.__config['orders'][i][
@@ -1452,7 +1473,7 @@ fullchain.pem       粘贴到证书输入框
                     # 是否到了最大重试次数
                     if 'retry_count' in self.__config['orders'][i]:
                         if self.__config['orders'][i]['retry_count'] >= 100:
-                            msg = '|-本次跳过域名:{}，因连续10次续签失败，不再续签此证书(可尝试手动续签此证书，成功后错误次数将被重置)'.format(
+                            msg = '|-本次跳过域名:{}，因连续100次续签失败，不再续签此证书(可尝试手动续签此证书，成功后错误次数将被重置)'.format(
                                 self.__config['orders'][i]['domains'])
                             writeLog(msg)
                             continue
