@@ -1454,8 +1454,7 @@ fullchain.pem       粘贴到证书输入框
 
                         if not self.checkDomainIsExsits(domain):
                             auth_to = None
-                            msg = "|-跳过被删除的域名: {}!".format(
-                                self.__config['orders'][i]['domains'])
+                            msg = "|-跳过被删除的域名: {}!".format(self.__config['orders'][i]['domains'])
                             writeLog(msg)
                             continue
 
