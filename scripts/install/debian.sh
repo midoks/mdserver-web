@@ -208,6 +208,7 @@ apt install -y libmagickwand-dev
 
 apt install -y libxml2 libxml2-dev libbz2-dev libmcrypt-dev libpspell-dev librecode-dev
 apt install -y libgmp-dev libgmp3-dev libreadline-dev libxpm-dev
+apt install -y libpq-dev
 apt install -y dia
 
 apt install -y pkg-config
