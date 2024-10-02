@@ -874,16 +874,16 @@ class site_api:
             # 检测存在反向代理
             data_path = self.getProxyDataPath(siteName)
             data_content = mw.readFile(data_path)
-            # if data_content != False:
-            #     try:
-            #         data = json.loads(data_content)
-            #     except:
-            #         pass
-            #     for proxy in data:
-            #         proxy_dir = "{}/{}".format(self.proxyPath, siteName)
-            #         proxy_dir_file = proxy_dir + '/' + proxy['id'] + '.conf'
-            #         if os.path.exists(proxy_dir_file):
-            #             return mw.returnJson(False, '检测到您的站点做了反向代理设置，请先关闭反向代理!')
+            if data_content != False:
+                try:
+                    data = json.loads(data_content)
+                except:
+                    pass
+                for proxy in data:
+                    proxy_dir = "{}/{}".format(self.proxyPath, siteName)
+                    proxy_dir_file = proxy_dir + '/' + proxy['id'] + '.conf'
+                    if os.path.exists(proxy_dir_file):
+                        return mw.returnJson(False, '检测到您的站点做了反向代理设置，请先关闭反向代理!')
 
             # fix binddir domain ssl apply question
             mw.backFile(host_conf_file)
