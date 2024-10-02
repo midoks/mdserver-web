@@ -1457,6 +1457,7 @@ fullchain.pem       粘贴到证书输入框
                             msg = "|-跳过被删除的域名: {}!".format(
                                 self.__config['orders'][i]['domains'])
                             writeLog(msg)
+                            continue
 
                     # 是否到了允许重试的时间
                     if 'next_retry_time' in self.__config['orders'][i]:
