@@ -19,7 +19,7 @@ fi
 
 # openresty
 if [ ! -d /www/server/openresty ];then
-	cd /www/server/mdserver-web/plugins/openresty && bash install.sh install 1.21.4.1
+	cd /www/server/mdserver-web/plugins/openresty && bash install.sh install 1.25.3
 else
 	echo "openresty alreay exist!"
 fi
@@ -50,7 +50,7 @@ fi
 
 # mysql
 if [ ! -d /www/server/mysql ];then
-	cd /www/server/mdserver-web/plugins/mysql && bash install.sh install 5.6
+	cd /www/server/mdserver-web/plugins/mysql && bash install.sh install 5.7
 else
 	echo "mysql alreay exist!"
 fi
