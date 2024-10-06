@@ -38,7 +38,7 @@ if [ ! -d $sourcePath/php/php${PHP_VER} ];then
 
 	if [ ! -f $sourcePath/php/php-${version}.tar.xz ];then
 		# wget --no-check-certificate -O $sourcePath/php/php-${version}.tar.xz https://www.php.net/distributions/php-${version}.tar.xz
-		wget --no-check-certificate -O $sourcePath/php/php-${version}.tar.xz https://downloads.php.net/~saki/php-${PHP_VER}.tar.xz
+		wget --no-check-certificate -O $sourcePath/php/php-${version}.tar.xz https://downloads.php.net/~saki/php-${version}.tar.xz
 	fi
 
 	#检测文件是否损坏.
