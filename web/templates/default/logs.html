@@ -1,0 +1,189 @@
+{% extends "layout.html" %}
+{% block content %}
+
+<style type="text/css">
+#operationLog thead th:nth-child(1),
+#operationLog tbody tr td:nth-child(1){width:100px;}
+#operationLog thead th:nth-child(2),
+#operationLog tbody tr td:nth-child(2){width:130px;}
+#operationLog thead th:nth-child(4),
+#operationLog tbody tr td:nth-child(4){width:150px;}
+
+
+.logAuditContent {
+    padding: 0 0 0 15px;
+    margin-left: 15px;
+    width: 100%;
+    flex: 1;
+    border-left: 1px solid #ececec;
+}
+
+.tootls_group .logs_search .search_input {
+    height: 30px;
+    line-height: 30px;
+    border-radius: 2px;
+    border: 1px solid #ccc;
+    outline: none;
+    padding-left: 8px;
+    vertical-align: top;
+    width: 230px;
+}
+
+.tootls_group .logs_search .glyphicon-search {
+    height: 28px;
+    line-height: 28px;
+    padding: 0 10px;
+    color: #888;
+    position: absolute;
+    right: 0;
+    font-size: 14px;
+    cursor: pointer;
+}
+
+#logAudit .tootls_group {
+    justify-content: space-between;
+}
+
+#logAudit .tootls_group, #panelRun .tootls_group.tools_bottom {
+    display: flex;
+    flex-wrap: wrap;
+    height: auto;
+    line-height: inherit;
+}
+
+.logAuditTabContent {
+    display: flex;
+    height: 100%;
+}
+
+.logAuditTabContent .logAuditTab {
+    border: 1px solid #ececec;
+    overflow: auto;
+}
+
+.logAuditTabContent .logAuditTab .logAuditItem {
+    height: 35px;
+    line-height: 35px;
+    padding: 0 10px;
+    border-bottom: 1px solid #ececec;
+    cursor: pointer;
+    overflow: hidden;
+}
+
+.logAuditTabContent .logAuditTab .logAuditItem:hover, .logAuditTabContent .logAuditTab .logAuditItem.active {
+    background-color: #f2f2f2;
+}
+
+#logAuditTable thead th:nth-child(1),
+#logAuditTable tbody tr td:nth-child(1){width:;}
+#logAuditTable thead th:nth-child(2),
+#logAuditTable tbody tr td:nth-child(2){width:;}
+#logAuditTable thead th:nth-child(3),
+#logAuditTable tbody tr td:nth-child(3){width:;}
+#logAuditTable thead th:nth-child(4),
+#logAuditTable tbody tr td:nth-child(4){width:300px;}
+</style>
+
+<div class="main-content" style="min-height: 389px;">
+	<div class="container-fluid" style="padding-bottom: 50px;">
+		<div id="cutTab" class="pos-box bgw mtb15" style="height:45px">
+			<div class="tab-list">
+				<div class="tabs-item active" data-name="panelLogs">面板日志</div>
+				<div class="tabs-item" data-name="logAudit">日志审计</div>
+			</div>
+		</div>
+
+
+		<div class="bgw mtb15 pd15 tab-view-box firewall-tab-view" style="overflow: hidden;">
+
+			<!-- logs start -->
+			<div class="tab-con show w-full" id="panelLogs" style="padding: 0px;">
+				<div id="operationLog" style="position: relative;">
+					<div class="tootls_group tootls_top">
+						<div class="pull-left">
+							<button type="button" title="刷新日志" class="refresh btn btn-success btn-sm mr5">
+								<span>刷新日志</span>
+							</button>
+							<button type="button" title="清空日志" class="clear btn btn-default btn-sm mr5">
+								<span>清空日志</span>
+							</button>
+						</div>
+					</div>
+					<div class="divtable mtb10">
+						<table class="table table-hover">
+							<thead style="position: relative;z-index: 1;"><tr>
+								<th><span>编号</span></th>
+								<th><span>操作类型</span></th>
+								<th><span>详情</span></th>
+								<th><span>操作时间</span></th>
+							</tr></thead>
+							<tbody></tbody>
+						</table>
+					</div>
+				</div>
+				<div class="dataTables_paginate paging_bootstrap page operationLog">
+					<div><span class="Pcurrent">1</span><span class="Pcount">共1条</span></div>
+				</div>
+			</div>
+			<!-- logs end -->
+
+
+			<div class="tab-con hide" id="logAudit" style="height: auto;">
+				<div class="logAuditTabContent">
+					<div class="logAuditTab" style="width: 300px;overflow: hidden;overflow-y: auto;">
+					<!--	
+						<div class="logAuditItem active" title="wtmp - 登录和重启记录" data-file="/wtmp">
+							wtmp - 登录和重启记录(4.88 KB)
+						</div>
+					-->
+					</div>
+					<div class="logAuditContent" style="overflow: hidden;overflow-y: auto;">
+						<div id="logAuditTable" class="bt_table" style="display: block;">
+							<div class="tootls_group tootls_top">
+								<div class="pull-left">
+									<button type="button" title="刷新列表" class="btn btn-success btn-sm mr5"><span>刷新列表</span></button>
+								</div>
+								<div class="pull-right">
+									<div class="logs_search" style="position: relative;">
+										<input type="text" class="search_input" style="" placeholder="请输入来源/端口/角色/事件">
+										<span class="glyphicon glyphicon-search" aria-hidden="true"></span>
+									</div>
+								</div>
+							</div>
+							<div class="divtable mtb10" style="max-height: 83px;">
+								<table class="table table-hover">
+									<thead style="position: relative;z-index: 1;">
+										<tr>
+											<th><span data-index="0"><span>用户</span></span></th>
+											<th><span data-index="1"><span>来源</span></span></th>
+											<th><span data-index="2"><span>端口</span></span></th>
+											<th><span data-index="3"><span>时间</span></span></th>
+										</tr>
+									</thead>
+									<tbody>
+										<!-- <tr><td><span>root</span></td>
+											<td><span>117.139.193.29</span></td>
+											<td><span>pts/0</span></td>
+											<td><span>2023-08-25 13:27 still logged in</span></td>
+										</tr> -->
+									</tbody>
+								</table>
+							</div>
+							<div class="tootls_group tootls_bottom">
+								<div class="pull-left"></div>
+								<div class="pull-right">
+									<div class="page"><span class="Pcount">第 1 页</span></div>
+								</div>
+							</div>
+						</div>
+						<div id="logAuditPages" class="page" style="display: flex; justify-content: flex-end;"></div>
+						<div id="logAuditPre" style="display: none;"><pre style="height: 188px; background-color: rgb(51, 51, 51); color: rgb(255, 255, 255); overflow-x: hidden; overflow-wrap: break-word; white-space: pre-wrap;"><code></code></pre></div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+
+<script src="/static/app/logs.js?v={{config.version}}"></script>
+{% endblock %}

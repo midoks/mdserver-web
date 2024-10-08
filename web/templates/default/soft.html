@@ -1,0 +1,58 @@
+{% extends "layout.html" %}
+
+{% block content %}
+
+<div class="main-content">
+		<div class="container-fluid" style="padding-bottom:54px">
+			<div class="pos-box bgw mtb15">
+				<div class="position f14 c9 pull-left">
+					<a class="plr10 c4" href="/">首页</a>/<span class="plr10 c4">软件管理</span>
+				</div>
+				<div class="search pull-right">
+					<form target="_self" onsubmit='getSList();return false;'>
+						<input type="text" id="SearchValue" class="ser-text pull-left" placeholder="搜索" autocomplete="false" />
+						<button type="button" class="ser-sub pull-left" onclick='getSList()'></button>
+					</form>
+				</div>
+			</div>
+			<div class="softbox bgw mtb15">
+				<div class="softlist">
+					<div class="divtable pd15 relative">
+
+						<div class="menu-sub softtype"></div>
+
+						<input type="file" style="display:none;" accept=".zip,.tar.gz" id="update_zip" multiple="multiple">
+						<button class="btn btn-default btn-sm" onclick="importPluginOpen()" title="添加插件" style="position:absolute;top:12px;right:15px">添加插件</button>
+						<div id="updata_pro_info"></div>
+						<table class="table table-hover" width="100%" cellspacing="0" cellpadding="0" border="0">
+							<thead>
+								<tr>
+									<th width="185">软件名称</th>
+									<th>说明</th>
+									<th width="40">位置</th>
+									<th width="40">状态</th>
+									<th width="64">首页显示</th>
+									<th style="text-align: right;" width="120">操作</th>
+								</tr>
+							</thead>
+							<tbody id="softList"></tbody>
+						</table>
+						<div class="dataTables_paginate paging_bootstrap pagination">
+							<ul id="softPage" class="page"></ul>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+<script type="text/javascript" src="/static/js/jquery.dragsort-0.5.2.min.js?v={{config.version}}"></script>
+<script type="text/javascript" src="/static/laydate/laydate.js?v={{config.version}}"></script>
+<script type="text/javascript" src="/static/app/soft.js?v={{config.version}}"></script>
+<script>
+//取软件列表
+getSList();
+</script>
+
+
+{% endblock %}
