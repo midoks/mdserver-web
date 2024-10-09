@@ -4,7 +4,7 @@ After=network.target
 
 [Service]
 Type=forking
-ExecStart={$SERVER_PATH}/alist/alist server
+ExecStart={$SERVER_PATH}/alist/alist server &
 ExecReload=/bin/kill -USR2 $MAINPID
 Restart=on-failure
 
