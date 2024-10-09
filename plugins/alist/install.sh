@@ -8,6 +8,7 @@ rootPath=$(dirname "$rootPath")
 serverPath=$(dirname "$rootPath")
 
 # cd /Users/midoks/Desktop/mwdev/server/mdserver-web/plugins/alist && bash install.sh install 3.37.4
+# cd /www/server/mdserver-web/plugins/alist && bash install.sh install 3.37.4
 
 install_tmp=${rootPath}/tmp/mw_install.pl
 VERSION=$2
@@ -49,10 +50,10 @@ Install_App()
 	cd $ALIST_DIR && tar -zxvf ${FILE_TGZ}  -C $serverPath/alist
 	echo "${VERSION}" > $serverPath/alist/version.pl
 
-	cd $serverPath/alist && ./alist admin set admin
-	
 	cd ${rootPath} && python3 ${rootPath}/plugins/alist/index.py start
 	cd ${rootPath} && python3 ${rootPath}/plugins/alist/index.py initd_install
+
+	cd $serverPath/alist && ./alist admin set admin
 
 	echo '安装完成'
 }
