@@ -147,6 +147,7 @@ def initConf():
             "/www/server/openresty/nginx/logs",
             "/www/server/phpmyadmin",
             "/www/server/redis/data",
+            "/www/server/alist/data/log"
             "/www/server/cron",
         ]
         for i in clogcom:
