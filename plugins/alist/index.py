@@ -244,7 +244,7 @@ def clearCopyTask():
     conn = pSqliteDb('x_task_items')
     conn.where('key=?', ('copy',)).setField('persist_data','[]')
     restart()
-    return mw.returnJson(True, '清空成功')
+    return mw.returnJson(True, '清空成功并重启服务!')
 
 if __name__ == "__main__":
     func = sys.argv[1]
