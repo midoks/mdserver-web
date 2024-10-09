@@ -54,6 +54,7 @@ Install_App()
 	cd ${rootPath} && python3 ${rootPath}/plugins/alist/index.py initd_install
 
 	cd $serverPath/alist && ./alist admin set admin
+	# cd /www/server/alist && ./alist admin set admin
 
 	echo '安装完成'
 }
