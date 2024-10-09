@@ -55,15 +55,11 @@ function alistPostCallbak(method, version, args,callback){
 
 
 function alistReadme(){
-    var cmd_01 = '/www/server/redis/bin/redis-cli --cluster create 127.0.0.1:6379 127.0.0.1:6380 127.0.0.1:6381 --cluster-replicas 0';
-    var cmd_02 = '/www/server/redis/bin/redis-cli --cluster create 127.0.0.1:6379 127.0.0.1:6380 127.0.0.1:6381 127.0.0.1:6382 127.0.0.1:6383 127.0.0.1:6384 --cluster-replicas 1';
-
+ 
 
     var readme = '<ul class="help-info-text c7">';
-    readme += '<li>集群创建1</li>';
-    readme += '<li>'+cmd_01+'</li>';
-    readme += '<li>集群创建2</li>';
-    readme += '<li>'+cmd_02+'</li>';
+    readme += '<li>默认admin:admin</li>';
+    readme += '<li>手动改密码:./alist admin set NEW_PASSWORD</li>';
     readme += '</ul>';
 
     $('.soft-man-con').html(readme);   
