@@ -233,6 +233,19 @@ def initdUinstall():
 def runLog():
     return getServerDir() + '/data/log/log.log'
 
+def pSqliteDb(dbname='databases'):
+    pos_file = getServerDir() + '/data/'
+    file = pos_file + '/data.db'
+    name = 'data'
+    conn = mw.M(dbname).dbPos(pos_file, name)
+    return conn
+
+def clearCopyTask():
+    conn = pSqliteDb('x_task_items')
+    conn.where('key=?', ('copy',)).setField('persist_data','[]')
+    restart()
+    return mw.returnJson(True, '清空成功')
+
 if __name__ == "__main__":
     func = sys.argv[1]
     if func == 'status':
@@ -259,5 +272,7 @@ if __name__ == "__main__":
         print(configTpl())
     elif func == 'read_config_tpl':
         print(readConfigTpl())
+    elif func == 'clear_copy_task':
+        print(clearCopyTask())
     else:
         print('error')

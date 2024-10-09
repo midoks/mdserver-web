@@ -53,7 +53,25 @@ function alistPostCallbak(method, version, args,callback){
     },'json'); 
 }
 
+function clearTaskCopy(){
+    layer.confirm('您真的要清空复制任务吗?', { icon: 3, closeBtn: 2 }, function() {
+        alistPost('clear_copy_task', '', {}, function(data){
+            var rdata = $.parseJSON(data.data);
+            showMsg(rdata.msg, function(){},{ icon: rdata.status ? 1 : 2 });        
+        });
+    });
+}
 
+//php超时限制
+function alistCommonFunc(){
+    var con = '';
+    con += '<hr/><p class="conf_p" style="text-align:center;">\
+        <button class="btn btn-default btn-sm" onclick="clearTaskCopy()">清空复制任务</button>  \
+    </p>';
+
+    $(".soft-man-con").html(con);
+ 
+}
 function alistReadme(){
  
 
