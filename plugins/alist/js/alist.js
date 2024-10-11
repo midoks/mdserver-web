@@ -86,7 +86,7 @@ function alistReadme(){
 
     var readme = '<ul class="help-info-text c7">';
     readme += '<li>默认admin:admin</li>';
-    readme += '<li>手动改密码:./alist admin set NEW_PASSWORD</li>';
+    readme += '<li>手动改密码: cd /www/server/alist && ./alist admin set NEW_PASSWORD</li>';
     readme += '</ul>';
 
     $('.soft-man-con').html(readme);   
