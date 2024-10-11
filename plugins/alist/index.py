@@ -247,7 +247,6 @@ def clearCopyTask():
     return mw.returnJson(True, '清空成功并重启服务!')
 
 def homePage():
-
     import json
     content = mw.readFile(getConf())
     data = json.loads(content)

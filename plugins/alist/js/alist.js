@@ -63,14 +63,12 @@ function clearTaskCopy(){
 }
 
 function commonHomePage(){
-    
     alistPost('home_page', '', {}, function(data){
         var rdata = $.parseJSON(data.data);
         window.open(rdata.data);
     });
 }
 
-//php超时限制
 function alistCommonFunc(){
     var con = '';
     con += '<hr/><p class="conf_p" style="text-align:center;">\
@@ -79,8 +77,8 @@ function alistCommonFunc(){
     </p>';
 
     $(".soft-man-con").html(con);
- 
 }
+
 function alistReadme(){
  
 
