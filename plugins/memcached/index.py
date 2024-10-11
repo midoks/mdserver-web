@@ -209,10 +209,10 @@ def runInfo():
 
         conf = mw.readFile(getServerDir() + '/memcached.env')
         result['bind'] = re.search('IP=(.+)', conf).groups()[0]
-        result['port'] = int(re.search('PORT=(\d+)', conf).groups()[0])
-        result['maxconn'] = int(re.search('MAXCONN=(\d+)', conf).groups()[0])
+        result['port'] = int(re.search('PORT=(\\d+)', conf).groups()[0])
+        result['maxconn'] = int(re.search('MAXCONN=(\\d+)', conf).groups()[0])
         result['cachesize'] = int(
-            re.search('CACHESIZE=(\d+)', conf).groups()[0])
+            re.search('CACHESIZE=(\\d+)', conf).groups()[0])
         return mw.getJson(result)
     except Exception as e:
         return mw.getJson({})
