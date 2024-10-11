@@ -113,6 +113,8 @@ def initConf():
            
             "/tmp/yum_save_*",
             "/tmp/tmp.*",
+
+            "/www/server/dztasks/logs/dztasks.*",
         ]
         for i in clog:
             content += i + "\n"
