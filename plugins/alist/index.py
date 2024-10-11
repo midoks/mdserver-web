@@ -246,6 +246,19 @@ def clearCopyTask():
     restart()
     return mw.returnJson(True, '清空成功并重启服务!')
 
+def homePage():
+
+    import json
+    content = mw.readFile(getConf())
+    data = json.loads(content)
+    http_port = data['scheme']['http_port']
+    ip = mw.getLocalIp()
+    if mw.isAppleSystem():
+        ip = '127.0.0.1'
+    url = 'http://'+ip+":"+str(http_port)
+    # print(url)
+    return mw.returnJson(True, 'ok!', url)
+
 if __name__ == "__main__":
     func = sys.argv[1]
     if func == 'status':
@@ -274,5 +287,7 @@ if __name__ == "__main__":
         print(readConfigTpl())
     elif func == 'clear_copy_task':
         print(clearCopyTask())
+    elif func == 'home_page':
+        print(homePage())
     else:
         print('error')
