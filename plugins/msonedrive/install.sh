@@ -10,6 +10,8 @@ serverPath=$(dirname "$rootPath")
 install_tmp=${rootPath}/tmp/mw_install.pl
 VERSION=$2
 
+# cd /www/server/mdserver-web/plugins/msonedrive  && bash install.sh install 1.0
+
 if [ -f ${rootPath}/bin/activate ];then
 	source ${rootPath}/bin/activate
 fi
