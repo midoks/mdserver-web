@@ -22,18 +22,18 @@ if sys.path[0] != os.path.dirname(os.path.realpath(__file__)):
 
 # print(sys.path)
 
-import config
-from admin import create_app, socketio
+import setting
+from admin import app, socketio
 
-
-app = create_app()
+# print(setting.DEFAULT_SERVER,setting.DEFAULT_SERVER_PORT)
+# app = create_app()
 def main():
     socketio.run(
         app,
-        debug=config.DEBUG,
+        debug=setting.DEBUG,
         allow_unsafe_werkzeug=True,
-        host=config.DEFAULT_SERVER,
-        port=config.EFFECTIVE_SERVER_PORT,
+        host=setting.DEFAULT_SERVER,
+        port=7201,
     )
 
 if __name__ == '__main__':

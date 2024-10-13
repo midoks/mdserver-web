@@ -14,51 +14,43 @@ from flask import Flask
 from flask_socketio import SocketIO, emit, send
 from flask import Flask, abort, request, current_app, session, url_for
 from werkzeug.local import LocalProxy
+from flask import Blueprint, render_template
+
+import setting
 
 socketio = SocketIO(manage_session=False, async_mode='threading',
                     logger=False, engineio_logger=False, debug=False,
                     ping_interval=25, ping_timeout=120)
 
-class MwAdmin(Flask):
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-	
 
-    def find_submodules(self, basemodule):
-        print(basemodule)
-
-    @property
-    def submodules(self):
-        for blueprint in self.blueprints.values():
-            if isinstance(blueprint, PgAdminModule):
-                yield blueprint
+app = Flask(__name__, template_folder='templates/default')
+socketio.init_app(app, cors_allowed_origins="*")
 
 
-def _find_blueprint():
-    if request.blueprint:
-        return current_app.blueprints[request.blueprint]
+# 加载模块
+from .submodules import get_submodules
+for module in get_submodules():
+    app.logger.info('Registering blueprint module: %s' % module)
+    if app.blueprints.get(module.name) is None:
+        app.register_blueprint(module)
 
 
-current_blueprint = LocalProxy(_find_blueprint)
-print("current_blueprint",current_blueprint)
+# Log the startup
+app.logger.info('########################################################')
+app.logger.info('Starting %s v%s...', setting.APP_NAME, setting.APP_VERSION)
+app.logger.info('########################################################')
+app.logger.debug("Python syspath: %s", sys.path)
 
-def create_app(app_name = None):
-    import config
-    if not app_name:
-        app_name = config.APP_NAME
 
-    # Check if app is created for CLI operations or Web
-    cli_mode = False
-    if app_name.endswith('-cli'):
-        cli_mode = True
+# def create_app(app_name = None):
+#     
+#     if not app_name:
+#         app_name = config.APP_NAME
 
-    app = MwAdmin(__name__, template_folder='templates/default')
-    socketio.init_app(app, cors_allowed_origins="*")
+#     # Check if app is created for CLI operations or Web
+#     cli_mode = False
+#     if app_name.endswith('-cli'):
+#         cli_mode = True
 
-    # Log the startup
-    app.logger.info('########################################################')
-    app.logger.info('Starting %s v%s...', config.APP_NAME, config.APP_VERSION)
-    app.logger.info('########################################################')
-    app.logger.debug("Python syspath: %s", sys.path)
 
-    return app
+#     return app
