@@ -240,12 +240,6 @@ def pSqliteDb(dbname='databases'):
     conn = mw.M(dbname).dbPos(pos_file, name)
     return conn
 
-def clearCopyTask():
-    conn = pSqliteDb('x_task_items')
-    conn.where('key=?', ('copy',)).setField('persist_data','[]')
-    restart()
-    return mw.returnJson(True, '清空成功并重启服务!')
-
 def getCloudrevePort():
     file = getConf()
     content = mw.readFile(file)
@@ -288,8 +282,6 @@ if __name__ == "__main__":
         print(configTpl())
     elif func == 'read_config_tpl':
         print(readConfigTpl())
-    elif func == 'clear_copy_task':
-        print(clearCopyTask())
     elif func == 'home_page':
         print(homePage())
     else:
