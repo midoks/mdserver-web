@@ -48,7 +48,7 @@ def getConf():
 
 
 def getConfTpl():
-    path = getPluginDir() + "/config/fail2ban.conf"
+    path = getPluginDir() + "/tpl/fail2ban.conf"
     return path
 
 
