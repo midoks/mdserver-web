@@ -135,13 +135,13 @@ def initDreplace():
     file_bin = initD_path + '/' + getPluginName()
 
     # config replace
-    dst_conf = getConf()
-    dst_conf_init = getServerDir() + '/init.pl'
-    if not os.path.exists(dst_conf_init):
-        content = mw.readFile(getConfTpl())
-        content = contentReplace(content)
-        mw.writeFile(dst_conf, content)
-        mw.writeFile(dst_conf_init, 'ok')
+    # dst_conf = getConf()
+    # dst_conf_init = getServerDir() + '/init.pl'
+    # if not os.path.exists(dst_conf_init):
+    #     content = mw.readFile(getConfTpl())
+    #     content = contentReplace(content)
+    #     mw.writeFile(dst_conf, content)
+    #     mw.writeFile(dst_conf_init, 'ok')
 
     # systemd
     systemDir = mw.systemdCfgDir()
