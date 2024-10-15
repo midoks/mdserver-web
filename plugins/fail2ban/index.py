@@ -123,6 +123,13 @@ def contentReplace(content):
     return content
 
 
+def initJailD():
+    dst_conf = f2bEtcDir() + '/jail.d/default.conf'
+    dst_conf_tpl = getPluginDir() + '/tpl/jail.d/default.conf'
+    if not os.path.exists(dst_conf):
+        content = mw.readFile(dst_conf_tpl)
+        content = contentReplace(content)
+        mw.writeFile(dst_conf, content)
 
 def initDreplace():
 
@@ -142,6 +149,8 @@ def initDreplace():
     #     content = contentReplace(content)
     #     mw.writeFile(dst_conf, content)
     #     mw.writeFile(dst_conf_init, 'ok')
+
+    initJailD()
 
     # systemd
     systemDir = mw.systemdCfgDir()
