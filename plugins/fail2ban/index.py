@@ -89,7 +89,7 @@ def configTpl():
     for one in pathFile:
         if one.endswith("conf"):
             file = path + '/' + one
-        tmp.append(file)
+            tmp.append(file)
     return mw.getJson(tmp)
 
 
