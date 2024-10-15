@@ -9,7 +9,7 @@ After=network.target
 
 [Service]
 
-ExecStart=/www/server/pgadmin/run/bin/gunicorn --bind unix:/tmp/pgadmin4.sock --workers=1 --threads=25 --chdir {$SERVER_PATH}/pgadmin/run/lib/{$PY_VER}/site-packages/pgadmin4 pgAdmin4:app
+ExecStart={$SERVER_PATH}/pgadmin/run/bin/gunicorn --bind unix:/tmp/pgadmin4.sock --workers=1 --threads=25 --chdir {$SERVER_PATH}/pgadmin/run/lib/{$PY_VER}/site-packages/pgadmin4 pgAdmin4:app
 ExecReload=/bin/kill -USR2 $MAINPID
 PrivateTmp=false
 
