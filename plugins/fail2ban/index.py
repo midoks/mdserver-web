@@ -48,7 +48,7 @@ def getConf():
 
 
 def getConfTpl():
-    path = getPluginDir() + "/config/redis.conf"
+    path = getPluginDir() + "/config/fail2ban.conf"
     return path
 
 
@@ -141,15 +141,24 @@ def initDreplace():
     #     mw.writeFile(file_bin, content)
     #     mw.execShell('chmod +x ' + file_bin)
 
+    # config replace
+    dst_conf = getConf()
+    dst_conf_init = getServerDir() + '/init.pl'
+    if not os.path.exists(dst_conf_init):
+        content = mw.readFile(getConfTpl())
+        content = contentReplace(content)
+        mw.writeFile(dst_conf, content)
+        mw.writeFile(dst_conf_init, 'ok')
+
     # systemd
     systemDir = mw.systemdCfgDir()
     systemService = systemDir + '/' + getPluginName() + '.service'
     if os.path.exists(systemDir) and not os.path.exists(systemService):
         systemServiceTpl = getPluginDir() + '/init.d/' + getPluginName() + '.service.tpl'
         service_path = mw.getServerDir()
-        se_content = mw.readFile(systemServiceTpl)
-        se_content = se_content.replace('{$SERVER_PATH}', service_path)
-        mw.writeFile(systemService, se_content)
+        content = mw.readFile(systemServiceTpl)
+        content = content.replace('{$SERVER_PATH}', service_path)
+        mw.writeFile(systemService, content)
         mw.execShell('systemctl daemon-reload')
 
     return file_bin
