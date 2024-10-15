@@ -134,13 +134,6 @@ def initDreplace():
         os.mkdir(initD_path)
     file_bin = initD_path + '/' + getPluginName()
 
-    # initd replace
-    # if not os.path.exists(file_bin):
-    #     content = mw.readFile(file_tpl)
-    #     content = content.replace('{$SERVER_PATH}', service_path)
-    #     mw.writeFile(file_bin, content)
-    #     mw.execShell('chmod +x ' + file_bin)
-
     # config replace
     dst_conf = getConf()
     dst_conf_init = getServerDir() + '/init.pl'
