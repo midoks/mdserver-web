@@ -55,6 +55,10 @@ Uninstall_App()
 	if [ -d $serverPath/fail2ban ];then
 		rm -rf $serverPath/fail2ban
 	fi
+
+	if [ -d /etc/fail2ban ];then
+		rm -rf /etc/fail2ban
+	fi
 	
 	echo "卸载fail2ban成功"
 }
