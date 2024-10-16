@@ -9,7 +9,7 @@ rootPath=$(dirname "$rootPath")
 serverPath=$(dirname "$rootPath")
 
 install_tmp=${rootPath}/tmp/mw_install.pl
-VERSION=5.0.20
+VERSION=5.0.29
 
 MG_DIR=$serverPath/source/mongodb
 mkdir -p $MG_DIR

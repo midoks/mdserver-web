@@ -14,6 +14,7 @@ SYS_ARCH=`arch`
 SYS_VERSION_ID=`cat /etc/*-release | grep VERSION_ID | awk -F = '{print $2}' | awk -F "\"" '{print $2}'`
 SYS_NAME=${SYS_VERSION_ID/./}
 
+SYS_NAME="11"
 if [ "$SYS_NAME" -gt "11" ];then
 	SYS_NAME="11"
 fi
