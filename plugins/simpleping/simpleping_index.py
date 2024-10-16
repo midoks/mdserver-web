@@ -45,7 +45,7 @@ def pingData(args = ()):
     elif atype == 'range':
         start = args['start']
         end = args['end']
-        data = conn.where('created_unix>=? and created_unix<=?',(start,end)).limit("1000").select()
+        data = conn.where('created_unix>=? and created_unix<=?',(start,end,)).limit("1000").select()
     return data
 
 
