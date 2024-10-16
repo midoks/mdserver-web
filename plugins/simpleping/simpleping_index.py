@@ -26,6 +26,7 @@ def getServerDir():
     return mw.getServerDir() + '/' + getPluginName()
 
 def pingData(args = ()):
+    # print(args)
     conn = mw.M('sp_ping').dbPos(getServerDir()+'/data', 'simpleping', 'db3')
     field = 'id,ip,speed,created_unix'
     conn = conn.field(field)
@@ -36,16 +37,21 @@ def pingData(args = ()):
         ip = 'all'
     else:
         ip = args['ip']
-    if ip != 'all':
-        conn = conn.where('ip=?',(ip,))
         
     if atype == 'pos':
-        pos = args['pos']
-        data = conn.where('created_unix>?',(pos,)).limit("3000").select()
+        if 'pos' in args:
+            pos = args['pos']
+            conn.where('created_unix>?',(pos,)).limit("3000")
+            if ip != 'all':
+                conn.andWhere('ip=?',(ip,))
     elif atype == 'range':
         start = args['start']
         end = args['end']
-        data = conn.where('created_unix>=? and created_unix<=?',(start,end,)).limit("1000").select()
+        conn.where('created_unix>=? and created_unix<=?',(start,end,)).limit("1000")
+        if ip != 'all':
+            conn.andWhere('ip=?',(ip,))
+
+    data = conn.select()
     return data
 
 
