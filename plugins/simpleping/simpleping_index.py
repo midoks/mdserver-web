@@ -28,7 +28,7 @@ def getServerDir():
 def pingData(args = ()):
     # print(args)
     conn = mw.M('sp_ping').dbPos(getServerDir()+'/data', 'simpleping', 'db3')
-    field = 'id,ip,speed,created_unix'
+    field = 'id,speed,created_unix'
     conn = conn.field(field)
     data = []
     atype = args['type']
