@@ -269,8 +269,26 @@ def initdUinstall():
     return 'ok'
 
 
+# 读取配置
+def _read_conf(path, l=None):
+    conf = mw.readFile(path)
+    if not conf:
+        if not l:
+            conf = {}
+        else:
+            conf = []
+        mw.writeFile(path, json.dumps(conf))
+        return conf
+    return json.loads(conf)
 
-
+def getBlackList():
+    _black_list = getServerDir + "/black_list.json"
+    conf = _read_conf(_black_list, l=1)
+    if not conf:
+        return ''
+    if not conf:
+        return []
+    return "\n".join(conf)
 
 if __name__ == "__main__":
     func = sys.argv[1]
