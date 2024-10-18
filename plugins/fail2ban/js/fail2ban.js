@@ -61,5 +61,21 @@ function f2bBanIp(){
                 <ul class="help-info-text c7 ptb15">\
                     <li>此处为主配置文件,若您不了解配置规则,请勿随意修改。</li>\
                 </ul>';
+
     $(".soft-man-con").html(con);
+    $("#textBody").empty();
+    var editor = CodeMirror.fromTextArea(document.getElementById("textBody"), {
+        extraKeys: {
+            "Ctrl-Space": "autocomplete",
+            "Ctrl-F": "findPersistent",
+            "Ctrl-H": "replaceAll",
+            "Ctrl-S": function() {
+                $("#textBody").text(editor.getValue());
+                // pluginConfigSave(fileName);
+            }
+        },
+        lineNumbers: true,
+        matchBrackets:true,
+    });
+    editor.focus();
 }
