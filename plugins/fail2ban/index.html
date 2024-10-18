@@ -24,6 +24,8 @@
 	</div>
 </div>
 <script type="text/javascript">
+resetPluginWinWidth(1000);
+resetPluginWinHeight(700);
 $.getScript( "/plugins/file?name=fail2ban&f=js/fail2ban.js", function(){
 	pluginService('fail2ban', $('.plugin_version').attr('version'));
 });
