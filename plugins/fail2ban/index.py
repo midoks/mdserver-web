@@ -18,10 +18,10 @@ def getPluginName():
     return 'fail2ban'
 
 def f2bDir():
-    return '/run/fail2ban'
+    return '/run/'+getPluginName()
 
 def f2bEtcDir():
-    return '/etc/fail2ban'
+    return '/etc/'+getPluginName()
 
 def getPluginDir():
     return mw.getPluginDir() + '/' + getPluginName()
@@ -123,6 +123,14 @@ def contentReplace(content):
     return content
 
 
+def initFail2BanD():
+    dst_conf = f2bEtcDir() + '/fail2ban.d/default.conf'
+    dst_conf_tpl = getPluginDir() + '/tpl/fail2ban.d/default.conf'
+    if not os.path.exists(dst_conf):
+        content = mw.readFile(dst_conf_tpl)
+        content = contentReplace(content)
+        mw.writeFile(dst_conf, content)
+
 def initJailD():
     dst_conf = f2bEtcDir() + '/jail.d/default.conf'
     dst_conf_tpl = getPluginDir() + '/tpl/jail.d/default.conf'
@@ -150,6 +158,7 @@ def initDreplace():
     #     mw.writeFile(dst_conf, content)
     #     mw.writeFile(dst_conf_init, 'ok')
 
+    initFail2BanD()
     initJailD()
 
     # systemd
