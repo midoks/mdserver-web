@@ -11,7 +11,7 @@
 
 from flask import Blueprint, render_template
 
-blueprint = Blueprint('dashboard', __name__, url_prefix='/', template_folder='../../templates/default')
-@blueprint.route('/')
-def index():
-    return render_template('index.html', data = {})
+blueprint = Blueprint('task', __name__, url_prefix='/task', template_folder='../../templates/default')
+@blueprint.route('/count', endpoint='task_count')
+def task_count():
+    return "0"

@@ -26,6 +26,8 @@ socketio = SocketIO(manage_session=False, async_mode='threading',
 app = Flask(__name__, template_folder='templates/default')
 socketio.init_app(app, cors_allowed_origins="*")
 
+from whitenoise import WhiteNoise
+app.wsgi_app = WhiteNoise(app.wsgi_app, root="../web/static/", prefix="static/", max_age=604800)
 
 # 加载模块
 from .submodules import get_submodules
@@ -51,6 +53,4 @@ app.logger.debug("Python syspath: %s", sys.path)
 #     cli_mode = False
 #     if app_name.endswith('-cli'):
 #         cli_mode = True
-
-
 #     return app

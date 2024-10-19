@@ -11,7 +11,7 @@
 
 from flask import Blueprint, render_template
 
-blueprint = Blueprint('dashboard', __name__, url_prefix='/', template_folder='../../templates/default')
-@blueprint.route('/')
+blueprint = Blueprint('site', __name__, url_prefix='/site', template_folder='../../templates/default')
+@blueprint.route('/index', endpoint='index')
 def index():
-    return render_template('index.html', data = {})
+    return render_template('site.html', data={})
