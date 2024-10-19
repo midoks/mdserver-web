@@ -282,16 +282,38 @@ def _read_conf(path, l=None):
         return conf
     return json.loads(conf)
 
-def getBlackList():
-    _black_list = getServerDir() + "/black_list.json"
+def getBlackFile():
+    return getServerDir() + "/black_list.json"
+
+def getBlackListArr():
+    _black_list = getBlackFile()
     conf = _read_conf(_black_list, l=1)
     if not conf:
         conf = []
+    return conf
+
+
+def getBlackList():
+    conf = getBlackListArr()
     content = "\n".join(conf)
     return mw.returnJson(True, 'ok', content)
 
 def setBlackIp():
-    return ''
+    ip_list = getBlackListArr()
+
+    args = getArgs()
+    data = checkArgs(args, ['black_ip'])
+    if not data[0]:
+        return data[1]
+
+    new_ip_list = args['black_ip']
+    add_ip_list = [new_ip for new_ip in new_ip_list if new_ip not in ip_list]
+    del_ip_list = [del_ip for del_ip in ip_list if del_ip not in new_ip_list]
+    rep_ip = "^(25[0-5]|2[0-4]\\d|[0-1]?\\d?\\d)(\\.(25[0-5]|2[0-4]\\d|[0-1]?\\d?\\d)){3}($|[\\/\\d]+$)"
+    rep_ipv6 = "^\\s*((([0-9A-Fa-f]{1,4}:){7}(([0-9A-Fa-f]{1,4})|:))|(([0-9A-Fa-f]{1,4}:){6}(:|((25[0-5]|2[0-4]\\d|[01]?\\d{1,2})(\\.(25[0-5]|2[0-4]\\d|[01]?\\d{1,2})){3})|(:[0-9A-Fa-f]{1,4})))|(([0-9A-Fa-f]{1,4}:){5}((:((25[0-5]|2[0-4]\\d|[01]?\\d{1,2})(\\.(25[0-5]|2[0-4]\\d|[01]?\\d{1,2})){3})?)|((:[0-9A-Fa-f]{1,4}){1,2})))|(([0-9A-Fa-f]{1,4}:){4}(:[0-9A-Fa-f]{1,4}){0,1}((:((25[0-5]|2[0-4]\\d|[01]?\\d{1,2})(\\.(25[0-5]|2[0-4]\\d|[01]?\\d{1,2})){3})?)|((:[0-9A-Fa-f]{1,4}){1,2})))|(([0-9A-Fa-f]{1,4}:){3}(:[0-9A-Fa-f]{1,4}){0,2}((:((25[0-5]|2[0-4]\\d|[01]?\\d{1,2})(\\.(25[0-5]|2[0-4]\\d|[01]?\\d{1,2})){3})?)|((:[0-9A-Fa-f]{1,4}){1,2})))|(([0-9A-Fa-f]{1,4}:){2}(:[0-9A-Fa-f]{1,4}){0,3}((:((25[0-5]|2[0-4]\\d|[01]?\\d{1,2})(\\.(25[0-5]|2[0-4]\\d|[01]?\\d{1,2})){3})?)|((:[0-9A-Fa-f]{1,4}){1,2})))|(([0-9A-Fa-f]{1,4}:)(:[0-9A-Fa-f]{1,4}){0,4}((:((25[0-5]|2[0-4]\\d|[01]?\\d{1,2})(\\.(25[0-5]|2[0-4]\\d|[01]?\\d{1,2})){3})?)|((:[0-9A-Fa-f]{1,4}){1,2})))|(:(:[0-9A-Fa-f]{1,4}){0,5}((:((25[0-5]|2[0-4]\\d|[01]?\\d{1,2})(\\.(25[0-5]|2[0-4]\\d|[01]?\\d{1,2})){3})?)|((:[0-9A-Fa-f]{1,4}){1,2})))|(((25[0-5]|2[0-4]\\d|[01]?\\d{1,2})(\\.(25[0-5]|2[0-4]\\d|[01]?\\d{1,2})){3})))(%.+)?\\s*$"
+    
+    mw.writeFile(getBlackFile(), json.dumps(ip_list))
+    return mw.returnJson(True, "添加黑名单成功")
 
 if __name__ == "__main__":
     func = sys.argv[1]
