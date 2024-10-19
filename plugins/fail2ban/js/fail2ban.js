@@ -54,7 +54,7 @@ function f2bPostCallbak(method, version, args, callback){
 }
 
 function f2bBanIpSave(black_ip){
-    f2bPost('set_black_ip', '', {'black_ip':black_ip}, function(data){
+    f2bPost('set_black_ip', $('.plugin_version').attr('version'), {'black_ip':black_ip}, function(data){
         var rdata = $.parseJSON(data.data);
         layer.msg(rdata.msg, { icon: rdata.status ? 1 : 2 });
     });
