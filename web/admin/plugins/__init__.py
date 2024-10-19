@@ -15,3 +15,9 @@ blueprint = Blueprint('plugins', __name__, url_prefix='/plugins', template_folde
 @blueprint.route('/index', endpoint='index')
 def index():
     return render_template('plugins.html', data={})
+
+
+# 插件列表
+@blueprint.route('/list', endpoint='list', methods=['GET'])
+def list():
+    return []

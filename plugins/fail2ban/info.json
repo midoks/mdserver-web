@@ -11,7 +11,7 @@
 	"path": "server/fail2ban",
 	"display": 1,
 	"author": "fail2ban",
-	"date": "2025-07-28",
+	"date": "2024-07-28",
 	"home": "https://www.fail2ban.org",
 	"type": 0,
 	"pid": "4"

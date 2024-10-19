@@ -282,13 +282,14 @@ def _read_conf(path, l=None):
     return json.loads(conf)
 
 def getBlackList():
-    _black_list = getServerDir + "/black_list.json"
+    _black_list = getServerDir() + "/black_list.json"
     conf = _read_conf(_black_list, l=1)
     if not conf:
         return ''
     if not conf:
         return []
-    return "\n".join(conf)
+    content = "\n".join(conf)
+    return mw.returnJson(True, 'ok', content)
 
 if __name__ == "__main__":
     func = sys.argv[1]
@@ -318,5 +319,7 @@ if __name__ == "__main__":
         print(configTpl())
     elif func == 'read_config_tpl':
         print(readConfigTpl())
+    elif func == 'get_black_list':
+        print(getBlackList())
     else:
         print('error')

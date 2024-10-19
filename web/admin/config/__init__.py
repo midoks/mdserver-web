@@ -15,3 +15,9 @@ blueprint = Blueprint('config', __name__, url_prefix='/config', template_folder=
 @blueprint.route('/index', endpoint='index')
 def index():
     return render_template('config.html', data={})
+
+
+
+@blueprint.route('/get_panel_list', endpoint='get_panel_list', methods=['POST'])
+def get_panel_list():
+    return []

@@ -418,7 +418,7 @@ def getGogsConf():
     result = []
 
     for g in gets:
-        rep = g['name'] + '\s*=\s*(.*)'
+        rep = g['name'] + '\\s*=\\s*(.*)'
         tmp = re.search(rep, conf)
         if not tmp:
             continue
@@ -447,7 +447,7 @@ def submitGogsConf():
     conf = mw.readFile(filename)
     for g in gets:
         if g in args:
-            rep = g + '\s*=\s*(.*)'
+            rep = g + '\\s*=\\s*(.*)'
             val = g + ' = ' + args[g]
             conf = re.sub(rep, val, conf)
     mw.writeFile(filename, conf)

@@ -81,4 +81,9 @@ function f2bBanIp(){
         matchBrackets:true,
     });
     editor.focus();
+
+    f2bPost('get_black_list', '', {}, function(data){
+        console.log(data);
+    })
 }
+
