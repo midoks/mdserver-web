@@ -15,7 +15,7 @@ from flask_socketio import SocketIO, emit, send
 from flask import Flask, abort, request, current_app, session, url_for
 from werkzeug.local import LocalProxy
 from flask import Blueprint, render_template
-
+from flask import render_template_string
 import setting
 
 socketio = SocketIO(manage_session=False, async_mode='threading',
@@ -42,6 +42,18 @@ app.logger.info('########################################################')
 app.logger.info('Starting %s v%s...', setting.APP_NAME, setting.APP_VERSION)
 app.logger.info('########################################################')
 app.logger.debug("Python syspath: %s", sys.path)
+
+
+@app.after_request
+def requestAfter(response):
+    response.headers['soft'] = setting.APP_NAME
+    response.headers['mw-version'] = setting.APP_VERSION
+    return response
+
+
+@app.errorhandler(404)
+def page_unauthorized(error):
+    return render_template_string('404 not found', error_info=error), 404
 
 
 # def create_app(app_name = None):
