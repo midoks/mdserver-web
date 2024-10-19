@@ -74,8 +74,6 @@ function f2bBanIp(){
             "Ctrl-H": "replaceAll",
             "Ctrl-S": function() {
                 $("#textBody").text(editor.getValue());
-                // pluginConfigSave(fileName);
-
                 f2bPost('set_black_list', '', {'black_ip':editor.getValue()}, function(data){
                     var rdata = $.parseJSON(data.data);
                     layer.msg(rdata.msg, { icon: rdata.status ? 1 : 2 });
