@@ -53,6 +53,12 @@ function f2bPostCallbak(method, version, args, callback){
     },'json'); 
 }
 
+function f2bBanIpSave(black_ip){
+    f2bPost('set_black_list', '', {'black_ip':editor.getValue()}, function(data){
+        var rdata = $.parseJSON(data.data);
+        layer.msg(rdata.msg, { icon: rdata.status ? 1 : 2 });
+    });
+}
 
 function f2bBanIp(){
     var con = '<p style="color: #666; margin-bottom: 7px">提示：Ctrl+F 搜索关键字，Ctrl+G 查找下一个，Ctrl+S 保存，Ctrl+Shift+R 查找替换!</p>\
@@ -77,7 +83,9 @@ function f2bBanIp(){
                 f2bPost('set_black_list', '', {'black_ip':editor.getValue()}, function(data){
                     var rdata = $.parseJSON(data.data);
                     layer.msg(rdata.msg, { icon: rdata.status ? 1 : 2 });
-                })
+                });
+
+                f2bBanIpSave(editor.getValue());
             }
         },
         lineNumbers: true,
@@ -88,6 +96,10 @@ function f2bBanIp(){
     f2bPost('get_black_list', '', {}, function(data){
         var rdata = $.parseJSON(data.data);
         $("#textBody").text(rdata.data);
+    });
+
+    $("#onlineEditFileBtn").click(function(){
+        f2bBanIpSave(editor.getValue());
     });
 }
 
