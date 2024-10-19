@@ -1,3 +1,7 @@
+function getVersion(){
+    return $('.plugin_version').attr('version');
+}
+
 function f2bPost(method, version, args,callback){
     var loadT = layer.msg('正在获取...', { icon: 16, time: 0, shade: 0.3 });
 
@@ -54,7 +58,8 @@ function f2bPostCallbak(method, version, args, callback){
 }
 
 function f2bBanIpSave(black_ip){
-    f2bPost('set_black_ip', $('.plugin_version').attr('version'), {'black_ip':black_ip}, function(data){
+    var ver = getVersion();
+    f2bPost('set_black_ip', ver, {'black_ip':black_ip}, function(data){
         var rdata = $.parseJSON(data.data);
         layer.msg(rdata.msg, { icon: rdata.status ? 1 : 2 });
     });
