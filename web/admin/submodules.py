@@ -5,6 +5,11 @@ from .task import blueprint as TaskModule
 from .config import blueprint as ConfigModule
 from .logs import blueprint as LogsModule
 from .files import blueprint as FilesModule
+from .soft import blueprint as SoftModule
+from .plugins import blueprint as PluginsModule
+from .crontab import blueprint as CrontabModule
+from .firewall import blueprint as FirewallModule
+from .control import blueprint as ControlModule
 
 def get_submodules():
     return [
@@ -13,5 +18,10 @@ def get_submodules():
         TaskModule,
         LogsModule,
         FilesModule,
-        ConfigModule
+        SoftModule,
+        PluginsModule,
+        CrontabModule,
+        FirewallModule,
+        ControlModule,
+        ConfigModule,
     ]
