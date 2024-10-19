@@ -83,7 +83,8 @@ function f2bBanIp(){
     editor.focus();
 
     f2bPost('get_black_list', '', {}, function(data){
-        console.log(data);
+        var rdata = $.parseJSON(data.data);
+        $("#textBody").text(rdata.data);
     })
 }
 

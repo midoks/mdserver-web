@@ -290,6 +290,9 @@ def getBlackList():
     content = "\n".join(conf)
     return mw.returnJson(True, 'ok', content)
 
+def setBlackIp():
+    return ''
+
 if __name__ == "__main__":
     func = sys.argv[1]
     if func == 'status':
@@ -320,5 +323,7 @@ if __name__ == "__main__":
         print(readConfigTpl())
     elif func == 'get_black_list':
         print(getBlackList())
+    elif func == 'set_black_ip':
+        print(setBlackIp())
     else:
         print('error')
