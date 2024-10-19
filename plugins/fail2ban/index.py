@@ -285,6 +285,11 @@ def _read_conf(path, l=None):
 def getBlackFile():
     return getServerDir() + "/black_list.json"
 
+
+def getConfigFile():
+    return getServerDir() + "/config.json"
+
+
 def getBlackListArr():
     _black_list = getBlackFile()
     conf = _read_conf(_black_list, l=1)
@@ -312,7 +317,33 @@ def setBlackIp():
     rep_ip = "^(25[0-5]|2[0-4]\\d|[0-1]?\\d?\\d)(\\.(25[0-5]|2[0-4]\\d|[0-1]?\\d?\\d)){3}($|[\\/\\d]+$)"
     rep_ipv6 = "^\\s*((([0-9A-Fa-f]{1,4}:){7}(([0-9A-Fa-f]{1,4})|:))|(([0-9A-Fa-f]{1,4}:){6}(:|((25[0-5]|2[0-4]\\d|[01]?\\d{1,2})(\\.(25[0-5]|2[0-4]\\d|[01]?\\d{1,2})){3})|(:[0-9A-Fa-f]{1,4})))|(([0-9A-Fa-f]{1,4}:){5}((:((25[0-5]|2[0-4]\\d|[01]?\\d{1,2})(\\.(25[0-5]|2[0-4]\\d|[01]?\\d{1,2})){3})?)|((:[0-9A-Fa-f]{1,4}){1,2})))|(([0-9A-Fa-f]{1,4}:){4}(:[0-9A-Fa-f]{1,4}){0,1}((:((25[0-5]|2[0-4]\\d|[01]?\\d{1,2})(\\.(25[0-5]|2[0-4]\\d|[01]?\\d{1,2})){3})?)|((:[0-9A-Fa-f]{1,4}){1,2})))|(([0-9A-Fa-f]{1,4}:){3}(:[0-9A-Fa-f]{1,4}){0,2}((:((25[0-5]|2[0-4]\\d|[01]?\\d{1,2})(\\.(25[0-5]|2[0-4]\\d|[01]?\\d{1,2})){3})?)|((:[0-9A-Fa-f]{1,4}){1,2})))|(([0-9A-Fa-f]{1,4}:){2}(:[0-9A-Fa-f]{1,4}){0,3}((:((25[0-5]|2[0-4]\\d|[01]?\\d{1,2})(\\.(25[0-5]|2[0-4]\\d|[01]?\\d{1,2})){3})?)|((:[0-9A-Fa-f]{1,4}){1,2})))|(([0-9A-Fa-f]{1,4}:)(:[0-9A-Fa-f]{1,4}){0,4}((:((25[0-5]|2[0-4]\\d|[01]?\\d{1,2})(\\.(25[0-5]|2[0-4]\\d|[01]?\\d{1,2})){3})?)|((:[0-9A-Fa-f]{1,4}){1,2})))|(:(:[0-9A-Fa-f]{1,4}){0,5}((:((25[0-5]|2[0-4]\\d|[01]?\\d{1,2})(\\.(25[0-5]|2[0-4]\\d|[01]?\\d{1,2})){3})?)|((:[0-9A-Fa-f]{1,4}){1,2})))|(((25[0-5]|2[0-4]\\d|[01]?\\d{1,2})(\\.(25[0-5]|2[0-4]\\d|[01]?\\d{1,2})){3})))(%.+)?\\s*$"
     
+    data = _read_conf(getConfigFile())
 
+    if new_ip_list == '':
+        for d in data:
+            for ip in ip_list:
+                mw.execShell('fail2ban-client -vvv set {jail} unbanip {ip}'.format(jail=d, ip=ip))
+
+        mw.writeFile(getBlackFile(), json.dumps([]))
+        return nw.returnJson(True, "禁止IP成功")
+
+    # 检查IP格式
+    for ip in add_ip_list:
+        if not re.search(rep_ip, ip) and not re.search(rep_ipv6, ip):
+            return mw.returnJson(False, "IP格式错误 {}".format(ip))
+
+    # 添加新域名到黑名单
+    for d in data:
+        for ip in add_ip_list:
+            mw.execShell('fail2ban-client -vvv set {jail} banip {ip}'.format(jail=d, ip=ip))
+
+    # 检查是否有清理掉的IP
+    for d in data:
+        for ip in del_ip_list:
+            mw.execShell('fail2ban-client -vvv set {jail} unbanip {ip}'.format(jail=d, ip=ip))
+
+    for ip in add_ip_list:
+        ip_list.append(ip)
 
     mw.writeFile(getBlackFile(), json.dumps(ip_list))
     return mw.returnJson(True, "添加黑名单成功")
