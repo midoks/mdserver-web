@@ -286,9 +286,7 @@ def getBlackList():
     _black_list = getServerDir() + "/black_list.json"
     conf = _read_conf(_black_list, l=1)
     if not conf:
-        return ''
-    if not conf:
-        return []
+        conf = []
     content = "\n".join(conf)
     return mw.returnJson(True, 'ok', content)
 
