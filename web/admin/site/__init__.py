@@ -15,3 +15,7 @@ blueprint = Blueprint('site', __name__, url_prefix='/site', template_folder='../
 @blueprint.route('/index', endpoint='index')
 def index():
     return render_template('site.html', data={})
+
+@blueprint.route('/get_site_types', endpoint='get_site_types',methods=['POST'])
+def get_site_types():
+    return []

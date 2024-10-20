@@ -16,6 +16,8 @@ from flask import Flask, abort, request, current_app, session, url_for
 from werkzeug.local import LocalProxy
 from flask import Blueprint, render_template
 from flask import render_template_string
+
+import core.mw as mw
 import setting
 
 socketio = SocketIO(manage_session=False, async_mode='threading',
@@ -29,19 +31,22 @@ socketio.init_app(app, cors_allowed_origins="*")
 from whitenoise import WhiteNoise
 app.wsgi_app = WhiteNoise(app.wsgi_app, root="../web/static/", prefix="static/", max_age=604800)
 
+
+
+app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///tmp/example.db'  # 使用 SQLite 数据库
+app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+
+
+
+# print(mw.getRunDir())
+
+
 # 加载模块
 from .submodules import get_submodules
 for module in get_submodules():
     app.logger.info('Registering blueprint module: %s' % module)
     if app.blueprints.get(module.name) is None:
         app.register_blueprint(module)
-
-
-# Log the startup
-app.logger.info('########################################################')
-app.logger.info('Starting %s v%s...', setting.APP_NAME, setting.APP_VERSION)
-app.logger.info('########################################################')
-app.logger.debug("Python syspath: %s", sys.path)
 
 
 @app.after_request
@@ -55,6 +60,64 @@ def requestAfter(response):
 def page_unauthorized(error):
     return render_template_string('404 not found', error_info=error), 404
 
+
+# 设置模板全局变量
+@app.context_processor
+def inject_global_variables():
+    config = {
+        'version': setting.APP_VERSION
+    }
+    return dict(config=config)
+
+
+# from flasgger import Swagger
+# Swagger(app)
+
+# @app.route('/colors/<palette>/')
+# def colors(palette):
+#     """
+#     根据调色板名称返回颜色列表
+#     ---
+#     parameters:
+#       - name: palette
+#         in: path
+#         type: string
+#         enum: ['all', 'rgb', 'cmyk']
+#         required: true
+#         default: all
+#     definitions:
+#       Palette:
+#         type: object
+#         properties:
+#           palette_name:
+#             type: array
+#             items:
+#               $ref: '#/definitions/Color'
+#       Color:
+#         type: string
+#     responses:
+#       200:
+#         description: 返回的颜色列表，可按调色板过滤
+#         schema:
+#           $ref: '#/definitions/Palette'
+#         examples:
+#           rgb: ['red', 'green', 'blue']
+#     """
+#     all_colors = {
+#         'cmyk': ['cyan', 'magenta', 'yellow', 'black'],
+#         'rgb': ['red', 'green', 'blue']
+#     }
+#     if palette == 'all':
+#         result = all_colorselse
+#         result = {palette: all_colors.get(palette)}
+#     return jsonify(result)
+
+
+# Log the startup
+app.logger.info('########################################################')
+app.logger.info('Starting %s v%s...', setting.APP_NAME, setting.APP_VERSION)
+app.logger.info('########################################################')
+app.logger.debug("Python syspath: %s", sys.path)
 
 # def create_app(app_name = None):
 #     

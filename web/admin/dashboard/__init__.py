@@ -15,3 +15,8 @@ blueprint = Blueprint('dashboard', __name__, url_prefix='/', template_folder='..
 @blueprint.route('/')
 def index():
     return render_template('index.html', data = {})
+
+
+@blueprint.route('/check_login')
+def check_login():
+    return "0"
