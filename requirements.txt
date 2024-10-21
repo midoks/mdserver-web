@@ -16,6 +16,7 @@ psutil==5.9.1
 chardet==3.0.4
 SQLAlchemy==2.*
 Flask-SQLAlchemy==3.1.*
+Flask-Migrate==4.*
 pyOpenSSL==23.2.0
 cryptography>=40.0.2
 configparser==5.2.0
