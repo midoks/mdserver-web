@@ -13,12 +13,18 @@ import sys
 from flask import Flask
 from flask_socketio import SocketIO, emit, send
 from flask import Flask, abort, request, current_app, session, url_for
-from werkzeug.local import LocalProxy
 from flask import Blueprint, render_template
 from flask import render_template_string
+from flask_migrate import Migrate
+
+from werkzeug.local import LocalProxy
+
+from admin.model import db as sys_db
 
 import core.mw as mw
 import setting
+
+root_dir = mw.getRunDir()
 
 socketio = SocketIO(manage_session=False, async_mode='threading',
                     logger=False, engineio_logger=False, debug=False,
@@ -26,19 +32,26 @@ socketio = SocketIO(manage_session=False, async_mode='threading',
 
 
 app = Flask(__name__, template_folder='templates/default')
-socketio.init_app(app, cors_allowed_origins="*")
 
+
+# 静态文件配置
 from whitenoise import WhiteNoise
 app.wsgi_app = WhiteNoise(app.wsgi_app, root="../web/static/", prefix="static/", max_age=604800)
 
+# db的配置
+app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///'+root_dir+'/example.log'  # 使用 SQLite 数据库
+app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = True
 
+# 初始化db
+sys_db.init_app(app)
+Migrate(app, sys_db)
 
-app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///tmp/example.db'  # 使用 SQLite 数据库
-app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
-
+with app.app_context():
+    sys_db.create_all()
 
 
 # print(mw.getRunDir())
+# print(app.config['SQLALCHEMY_DATABASE_URI'])
 
 
 # 加载模块
@@ -71,6 +84,7 @@ def inject_global_variables():
 
 
 # from flasgger import Swagger
+# api = Api(app, version='1.0', title='API', description='API 文档')
 # Swagger(app)
 
 # @app.route('/colors/<palette>/')
@@ -118,6 +132,11 @@ app.logger.info('########################################################')
 app.logger.info('Starting %s v%s...', setting.APP_NAME, setting.APP_VERSION)
 app.logger.info('########################################################')
 app.logger.debug("Python syspath: %s", sys.path)
+
+
+
+# OK
+socketio.init_app(app, cors_allowed_origins="*")
 
 # def create_app(app_name = None):
 #     
