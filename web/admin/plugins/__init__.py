@@ -21,9 +21,8 @@ def index():
 # 插件列表
 @blueprint.route('/list', endpoint='list', methods=['GET'])
 def list():
-
     pg = MwPlugin.instance()
-    print(pg.getList())
+    # print(pg.getList())
     return pg.getList()
 
 # 初始化检查,首页提示选择安装
