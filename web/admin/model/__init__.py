@@ -23,6 +23,7 @@ db = SQLAlchemy(
         }
     )
 
+
 class Version(db.Model):
     """用于参考/升级的版本号"""
     __tablename__ = 'version'
