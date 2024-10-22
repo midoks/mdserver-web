@@ -716,11 +716,9 @@ def enPunycode(domain):
             newdomain += dkey + '.'
         else:
             if sys.version_info[0] == 2:
-                newdomain += 'xn--' + \
-                    dkey.decode('utf-8').encode('punycode') + '.'
+                newdomain += 'xn--' + dkey.decode('utf-8').encode('punycode') + '.'
             else:
-                newdomain += 'xn--' + \
-                    dkey.encode('punycode').decode('utf-8') + '.'
+                newdomain += 'xn--' + dkey.encode('punycode').decode('utf-8') + '.'
     if tmp[0] == '*':
         newdomain = "*." + newdomain
     return newdomain[0:-1]
@@ -732,8 +730,7 @@ def dePunycode(domain):
     newdomain = ''
     for dkey in tmp:
         if dkey.find('xn--') >= 0:
-            newdomain += dkey.replace('xn--',
-                                      '').encode('utf-8').decode('punycode') + '.'
+            newdomain += dkey.replace('xn--','').encode('utf-8').decode('punycode') + '.'
         else:
             newdomain += dkey + '.'
     return newdomain[0:-1]

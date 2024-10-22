@@ -61,11 +61,74 @@ def execShell(cmdstring, cwd=None, timeout=None, shell=True):
 
 def getTracebackInfo():
     import traceback
-    errorMsg = traceback.format_exc()
-    return errorMsg
+    return traceback.format_exc()
 
 def getRunDir():
     return os.getcwd()
+
+def getRootDir():
+    return os.path.dirname(getRunDir())
+
+def getPluginDir():
+    return getRootDir() + '/plugins'
+
+def getPanelDataDir():
+    return getRootDir() + '/data'
+
+def getMWLogs():
+    return getRootDir() + '/logs'
+
+def getPanelTmp():
+    return getRootDir() + '/tmp'
+
+
+def getServerDir():
+    return getRunDir() + '/server'
+
+def getLogsDir():
+    return getRunDir() + '/wwwlogs'
+
+def getRandomString(length):
+    # 取随机字符串
+    rnd_str = ''
+    chars = 'AaBbCcDdEeFfGgHhIiJjKkLlMmNnOoPpQqRrSsTtUuVvWwXxYyZz0123456789'
+    chrlen = len(chars) - 1
+    random = Random()
+    for i in range(length):
+        rnd_str += chars[random.randint(0, chrlen)]
+    return rnd_str
+
+
+def getUniqueId():
+    """
+    根据时间生成唯一ID
+    :return:
+    """
+    current_time = datetime.datetime.now()
+    str_time = current_time.strftime('%Y%m%d%H%M%S%f')[:-3]
+    unique_id = "{0}".format(str_time)
+    return unique_id
+
+def readFile(filename):
+    # 读文件内容
+    try:
+        fp = open(filename, 'r')
+        fBody = fp.read()
+        fp.close()
+        return fBody
+    except Exception as e:
+        # print(e)
+        return False
+
+def writeFile(filename, content, mode='w+'):
+    # 写文件内容
+    try:
+        fp = open(filename, mode)
+        fp.write(content)
+        fp.close()
+        return True
+    except Exception as e:
+        return False
 
 def dbSqitePrefix():
     WIN = sys.platform.startswith('win')
