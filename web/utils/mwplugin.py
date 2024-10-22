@@ -103,7 +103,6 @@ class MwPlugin(object):
 
     def getVersion(self, path):
         version_t = path + '/version.pl'
-        print(version_t)
         if os.path.exists(version_t):
             return mw.readFile(version_t).strip()
         return ''

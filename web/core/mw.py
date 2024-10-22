@@ -136,26 +136,59 @@ def writeFile(filename, content, mode='w+'):
     except Exception as e:
         return False
 
-def isNumber(s):
-    try:
-        float(s)
-        return True
-    except ValueError:
-        pass
+def triggerTask():
+    isTask = getPanelDir() + '/tmp/panelTask.pl'
+    writeFile(isTask, 'True')
 
-    try:
-        import unicodedata
-        unicodedata.numeric(s)
-        return True
-    except (TypeError, ValueError):
-        pass
 
-    return False
+def systemdCfgDir():
+    # ubuntu
+    cfg_dir = '/lib/systemd/system'
+    if os.path.exists(cfg_dir):
+        return cfg_dir
+
+    # debian,centos
+    cfg_dir = '/usr/lib/systemd/system'
+    if os.path.exists(cfg_dir):
+        return cfg_dir
+
+    # local test
+    return "/tmp"
+
+
+def getSslCrt():
+    if os.path.exists('/etc/ssl/certs/ca-certificates.crt'):
+        return '/etc/ssl/certs/ca-certificates.crt'
+    if os.path.exists('/etc/pki/tls/certs/ca-bundle.crt'):
+        return '/etc/pki/tls/certs/ca-bundle.crt'
+    return ''
+
+
+def getOs():
+    return sys.platform
+
+
+def getOsName():
+    cmd = "cat /etc/*-release | grep PRETTY_NAME |awk -F = '{print $2}' | awk -F '\"' '{print $2}'| awk '{print $1}'"
+    data = execShell(cmd)
+    return data[0].strip().lower()
+
+
+def getOsID():
+    cmd = "cat /etc/*-release | grep VERSION_ID | awk -F = '{print $2}' | awk -F '\"' '{print $2}'"
+    data = execShell(cmd)
+    return data[0].strip()
+
+
+def getFileSuffix(file):
+    tmp = file.split('.')
+    ext = tmp[len(tmp) - 1]
+    return ext
 
 def getPathSuffix(path):
     return os.path.splitext(path)[-1]
 
-def dbSqitePrefix():
+def getSqitePrefix():
     WIN = sys.platform.startswith('win')
     if WIN:  # 如果是 Windows 系统，使用三个斜线
         prefix = 'sqlite:///'
@@ -196,4 +229,50 @@ def getPageObject(args, result='1,2,3,4,5,8'):
         info['args_tpl'] = args['args_tpl']
 
     return (page.GetPage(info, result), page)
+
+def isAppleSystem():
+    if getOs() == 'darwin':
+        return True
+    return False
+
+def isDocker():
+    return os.path.exists('/.dockerenv')
+
+def isSupportSystemctl():
+    if isAppleSystem():
+        return False
+    if isDocker():
+        return False
+
+    current_os = getOs()
+    if current_os.startswith("freebsd"):
+        return False
+    return True
+
+def isDebugMode():
+    if isAppleSystem():
+        return True
+
+    debugPath = getPanelDir() + "/data/debug.pl"
+    if os.path.exists(debugPath):
+        return True
+
+    return False
+
+def isNumber(s):
+    try:
+        float(s)
+        return True
+    except ValueError:
+        pass
+
+    try:
+        import unicodedata
+        unicodedata.numeric(s)
+        return True
+    except (TypeError, ValueError):
+        pass
+
+    return False
+
 
