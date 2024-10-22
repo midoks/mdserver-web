@@ -130,6 +130,25 @@ def writeFile(filename, content, mode='w+'):
     except Exception as e:
         return False
 
+def isNumber(s):
+    try:
+        float(s)
+        return True
+    except ValueError:
+        pass
+
+    try:
+        import unicodedata
+        unicodedata.numeric(s)
+        return True
+    except (TypeError, ValueError):
+        pass
+
+    return False
+    
+def getPathSuffix(path):
+    return os.path.splitext(path)[-1]
+
 def dbSqitePrefix():
     WIN = sys.platform.startswith('win')
     if WIN:  # 如果是 Windows 系统，使用三个斜线
@@ -137,4 +156,38 @@ def dbSqitePrefix():
     else:  # 否则使用四个斜线
         prefix = 'sqlite:////'
     return prefix
+
+
+def getPage(args, result='1,2,3,4,5,8'):
+    data = getPageObject(args, result)
+    return data[0]
+
+
+def getPageObject(args, result='1,2,3,4,5,8'):
+    # 取分页
+    from utils import page
+    # 实例化分页类
+    page = page.Page()
+    info = {}
+
+    info['count'] = 0
+    if 'count' in args:
+        info['count'] = int(args['count'])
+
+    info['row'] = 10
+    if 'row' in args:
+        info['row'] = int(args['row'])
+
+    info['p'] = 1
+    if 'p' in args:
+        info['p'] = int(args['p'])
+    info['uri'] = {}
+    info['return_js'] = ''
+    if 'tojs' in args:
+        info['return_js'] = args['tojs']
+
+    if 'args_tpl' in args:
+        info['args_tpl'] = args['args_tpl']
+
+    return (page.GetPage(info, result), page)
 

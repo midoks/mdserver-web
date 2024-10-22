@@ -177,7 +177,7 @@ class MwPlugin(object):
             "coexist": coexist,
             "versions": info['versions'],
             # "updates": info['updates'],
-            "task": False,
+            "task": True,
             "display": False,
             "setup": False,
             "setup_version": "",
@@ -256,9 +256,9 @@ class MwPlugin(object):
         if keyword != '' and not self.searchKey(data, keyword):
             return info
 
-        plugin_info_t = self.makeCoexistList(data, type)
-        print(plugin_info_t)
-
+        plugin_t = self.makeCoexistList(data, type)
+        for index in range(len(plugin_t)):
+            info.append(plugin_t[index])
         return info
 
 
@@ -266,32 +266,46 @@ class MwPlugin(object):
         self,
         type: str | None = None,
         keyword: str | None = None,
-        page: str | None = 1, 
-        size: str | None = 10, 
+        page: int | None = 1, 
+        size: int | None = 10, 
     ):
-        plugins_info = []
+        info = []
 
         # print(mw.getPluginDir())
         for name in os.listdir(self.__plugin_dir):
             if name.startswith('.'):
                 continue
-            plugin_list = self.getPluginList(name,keyword,type=type)
-            print(plugin_list)
+            t = self.getPluginList(name, keyword, type=type)
+            for index in range(len(t)):
+                info.append(t[index])
 
-        return plugins_info
+        start = (page - 1) * size
+        end = start + size
+        _info = info[start:end]
+
+        # print(info)
+        return (_info, len(info))
 
     def getList(
         self,
         type: str | None = None,
         keyword: str | None = None,
-        page: str | None = 1, 
-        size: str | None = 10, 
+        page: int | None = 1, 
+        size: int | None = 10, 
     ) -> object:
+        # print(type,keyword,page,size)
         rdata = {}
         rdata['type'] = self.def_plugin_type
-        # print(type,keyword,page,size)
+    
+        data = self.getAllPluginList(type,keyword, page, size)
+        rdata['data'] = data[0]
 
-        self.getAllPluginList(type,keyword, page, size)
+        args = {}
+        args['count'] = data[1]
+        args['p'] = page
+        args['tojs'] = 'getSList'
+        args['row'] = size
+        rdata['list'] = mw.getPage(args)
 
         return rdata
 
