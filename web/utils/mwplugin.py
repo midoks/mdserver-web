@@ -103,6 +103,7 @@ class MwPlugin(object):
 
     def getVersion(self, path):
         version_t = path + '/version.pl'
+        print(version_t)
         if os.path.exists(version_t):
             return mw.readFile(version_t).strip()
         return ''
@@ -152,11 +153,16 @@ class MwPlugin(object):
         path = ''
         coexist = False
 
+        if info["checks"].startswith('/'):
+            checks = info["checks"]
+        else:
+            checks = mw.getFatherDir() + '/' + info['checks']
+
         if 'path' in info:
             path = info['path']
 
         if not path.startswith('/'):
-            path = mw.getRootDir() + '/' + path
+            path = mw.getFatherDir() + '/' + path
 
         if 'coexist' in info and info['coexist']:
             coexist = True
@@ -192,8 +198,13 @@ class MwPlugin(object):
         if checks.find('VERSION') > -1:
             pInfo['install_checks'] = checks.replace('VERSION', info['versions'])
 
+        if path.find('VERSION') > -1:
+            pInfo['path'] = path.replace('VERSION', info['versions'])
+
         pInfo['display'] = self.checkDisplayIndex(info['name'], pInfo['versions'], coexist)
         pInfo['setup'] = os.path.exists(pInfo['install_checks'])
+
+
 
         if coexist and pInfo['setup']:
             pInfo['setup_version'] = info['versions']

@@ -69,17 +69,23 @@ def getRunDir():
 def getRootDir():
     return os.path.dirname(getRunDir())
 
+def getPanelDir():
+    return getRootDir()
+
+def getFatherDir():
+    return os.path.dirname(os.path.dirname(getPanelDir()))
+
 def getPluginDir():
-    return getRootDir() + '/plugins'
+    return getPanelDir() + '/plugins'
 
 def getPanelDataDir():
-    return getRootDir() + '/data'
+    return getPanelDir() + '/data'
 
 def getMWLogs():
-    return getRootDir() + '/logs'
+    return getPanelDir() + '/logs'
 
 def getPanelTmp():
-    return getRootDir() + '/tmp'
+    return getPanelDir() + '/tmp'
 
 
 def getServerDir():
@@ -145,7 +151,7 @@ def isNumber(s):
         pass
 
     return False
-    
+
 def getPathSuffix(path):
     return os.path.splitext(path)[-1]
 
