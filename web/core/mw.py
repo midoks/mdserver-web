@@ -115,6 +115,14 @@ def getUniqueId():
     unique_id = "{0}".format(str_time)
     return unique_id
 
+def returnData(status, msg, data=None):
+    return {'status': status, 'msg': msg, 'data': data}
+
+def returnJson(status, msg, data=None):
+    if data == None:
+        return getJson({'status': status, 'msg': msg})
+    return getJson({'status': status, 'msg': msg, 'data': data})
+
 def readFile(filename):
     # 读文件内容
     try:
@@ -154,6 +162,14 @@ def systemdCfgDir():
 
     # local test
     return "/tmp"
+
+def getJson(data):
+    import json
+    return json.dumps(data)
+
+def getObjectByJson(data):
+    import json
+    return json.loads(data)
 
 
 def getSslCrt():

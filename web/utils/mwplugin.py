@@ -13,6 +13,25 @@ import threading
 import json
 import core.mw as mw
 
+
+import threading
+import multiprocessing
+
+class pa_thread(threading.Thread):
+
+    def __init__(self, func, args, name=''):
+        threading.Thread.__init__(self)
+        self.name = name
+        self.func = func
+        self.args = args
+        self.result = self.func(*self.args)
+
+    def getResult(self):
+        try:
+            return self.result
+        except Exception:
+            return None
+
 class MwPlugin(object):
 
     def_plugin_type = [
@@ -271,6 +290,37 @@ class MwPlugin(object):
             info.append(plugin_t[index])
         return info
 
+    # 检查插件状态
+    def checkStatusThreads(self, info, i):
+        if not info['setup']:
+            return False
+        data = self.run(info['name'], 'status', info['setup_version'])
+        if data[0] == 'start':
+            return True
+        else:
+            return False
+
+    # 多线程检查插件状态
+    def checkStatusMThreads(self, info):
+        try:
+            threads = []
+            ntmp_list = range(len(info))
+            for i in ntmp_list:
+                t = pa_thread(self.checkStatusThreads,(info[i], i))
+                threads.append(t)
+
+            for i in ntmp_list:
+                threads[i].start()
+            for i in ntmp_list:
+                threads[i].join()
+
+            for i in ntmp_list:
+                t = threads[i].getResult()
+                info[i]['status'] = t
+        except Exception as e:
+            print('checkStatusMThreads:', str(e))
+
+        return info
 
     def getAllPluginList(
         self,
@@ -294,6 +344,8 @@ class MwPlugin(object):
         _info = info[start:end]
 
         # print(info)
+
+        _info = self.checkStatusMThreads(_info)
         return (_info, len(info))
 
     def getList(
@@ -316,8 +368,58 @@ class MwPlugin(object):
         args['tojs'] = 'getSList'
         args['row'] = size
         rdata['list'] = mw.getPage(args)
-
         return rdata
+
+    # shell/bash方式调用
+    def run(self, name, func,
+        version: str | None = '',
+        args: str | None = '',
+        script: str | None = 'index',
+    ):
+
+        path = self.__plugin_dir + '/' + name + '/' + script + '.py'
+        if not os.path.exists(path):
+            path = self.__plugin_dir + '/' + name + '/' + name + '.py'
+
+        py = 'python3 ' + path
+        if args == '':
+            py_cmd = py + ' ' + func + ' ' + version
+        else:
+            py_cmd = py + ' ' + func + ' ' + version + ' ' + args
+
+        if not os.path.exists(path):
+            return ('', '')
+        py_cmd = 'cd ' + mw.getPanelDir() + " && "+ py_cmd
+        data = mw.execShell(py_cmd)
+        # print(data)
+        if mw.isDebugMode():
+            print('run:', py_cmd)
+            print(data)
+        # print os.path.exists(py_cmd)
+        return (data[0].strip(), data[1].strip())
+
+    # 映射包调用
+    def callback(self, name, func,
+        args: str | None = '',
+        script: str | None = 'index',
+    ):
+
+        package = self.__plugin_dir + '/' + name
+        if not os.path.exists(package):
+            return (False, "插件不存在!")
+        if not package in sys.path:
+            sys.path.append(package)
+
+        eval_str = "__import__('" + script + "')." + func + '(' + args + ')'
+        newRet = None
+        try:
+            newRet = eval(eval_str)
+        except Exception as e:
+            print(mw.getTracebackInfo())
+        
+        if mw.isDebugMode():
+            print('callback', eval_str)
+        return (True, newRet)
 
 
 

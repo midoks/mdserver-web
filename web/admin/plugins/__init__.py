@@ -17,6 +17,8 @@ from utils.mwplugin import MwPlugin
 
 import core.mw as mw
 
+pg = MwPlugin.instance()
+
 blueprint = Blueprint('plugins', __name__, url_prefix='/plugins', template_folder='../../templates/default')
 @blueprint.route('/index', endpoint='index')
 def index():
@@ -47,12 +49,10 @@ def list():
     if not mw.isNumber(page):
         page = 0
 
-    pg = MwPlugin.instance()
-
     # pg.getList(plugins_type, search, int(page))
     return pg.getList(plugins_type, search, int(page))
 
-# 图片文件读取
+# 文件读取
 @blueprint.route('/file', endpoint='file', methods=['GET'])
 def file():
     name = request.args.get('name', '')
@@ -76,5 +76,31 @@ def file():
         return make_response(v)
     content = open(file, 'rb').read()
     return content
+
+# 插件设置页
+@blueprint.route('/setting', endpoint='setting', methods=['GET'])
+def setting():
+    name = request.args.get('name', '')
+    html = mw.getPluginDir() + '/' + name + '/index.html'
+    return mw.readFile(html)
+
+
+# 插件统一回调入口API
+@blueprint.route('/run', endpoint='run', methods=['GET','POST'])
+def run():
+    name = request.form.get('name', '')
+    func = request.form.get('func', '')
+    version = request.form.get('version', '')
+    args = request.form.get('args', '')
+    script = request.form.get('script', 'index')
+
+    pg = MwPlugin.instance()
+    data = pg.run(name, func, version, args, script)
+
+    if data[1] == '':
+        r = mw.returnData(True, "OK", data[0].strip())
+    else:
+        r = mw.returnData(False, data[1].strip())
+    return r
 
 
