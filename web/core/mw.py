@@ -195,6 +195,34 @@ def getOsID():
     data = execShell(cmd)
     return data[0].strip()
 
+# 获取文件权限描述
+def getFileStatsDesc(
+    filename: str | None = None,
+    path: str | None = None,
+):
+    # print(filename,path)
+    filename = filename.replace('//', '/')
+    try:
+        stat = os.stat(filename)
+        accept = str(oct(stat.st_mode)[-3:])
+        mtime = str(int(stat.st_mtime))
+        user = ''
+        try:
+            user = str(pwd.getpwuid(stat.st_uid).pw_name)
+        except:
+            user = str(stat.st_uid)
+        size = str(stat.st_size)
+        link = ''
+        if os.path.islink(filename):
+            link = ' -> ' + os.readlink(filename)
+
+        if path:
+            tmp_path = (path + '/').replace('//', '/')
+            filename = filename.replace(tmp_path, '', 1)
+
+        return filename + ';' + size + ';' + mtime + ';' + accept + ';' + user + ';' + link
+    except Exception as e:
+        return ';;;;;'
 
 def getFileSuffix(file):
     tmp = file.split('.')

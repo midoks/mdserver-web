@@ -17,6 +17,6 @@ def index():
     return render_template('index.html', data = {})
 
 
-@blueprint.route('/check_login')
+@blueprint.route('/check_login',methods=['GET','POST'])
 def check_login():
     return "0"
