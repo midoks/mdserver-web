@@ -212,6 +212,59 @@ def getSqitePrefix():
         prefix = 'sqlite:////'
     return prefix
 
+def getLastLine(path, num, p=1):
+    pyVersion = sys.version_info[0]
+    try:
+        import html
+        if not os.path.exists(path):
+            return ""
+        start_line = (p - 1) * num
+        count = start_line + num
+        fp = open(path, 'rb')
+        buf = ""
+
+        fp.seek(0, 2)
+        if fp.read(1) == "\n":
+            fp.seek(0, 2)
+        data = []
+        b = True
+        n = 0
+
+        for i in range(count):
+            while True:
+                newline_pos = str.rfind(str(buf), "\n")
+                pos = fp.tell()
+                if newline_pos != -1:
+                    if n >= start_line:
+                        line = buf[newline_pos + 1:]
+                        try:
+                            data.insert(0, html.escape(line))
+                        except Exception as e:
+                            pass
+                    buf = buf[:newline_pos]
+                    n += 1
+                    break
+                else:
+                    if pos == 0:
+                        b = False
+                        break
+                    to_read = min(4096, pos)
+                    fp.seek(-to_read, 1)
+                    t_buf = fp.read(to_read)
+                    if pyVersion == 3:
+                        if type(t_buf) == bytes:
+                            t_buf = t_buf.decode("utf-8", "ignore").strip()
+                    buf = t_buf + buf
+                    fp.seek(-to_read, 1)
+                    if pos - to_read == 0:
+                        buf = "\n" + buf
+            if not b:
+                break
+        fp.close()
+    except Exception as e:
+        return str(e)
+
+    return "\n".join(data)
 
 def getPage(args, result='1,2,3,4,5,8'):
     data = getPageObject(args, result)
