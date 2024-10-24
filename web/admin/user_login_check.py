@@ -12,7 +12,9 @@ from functools import wraps
 
 def panel_login_required(func):
 
+    print('panel_login_required',func)
+
+    @wraps(func)
     def wrapper(*args, **kwargs):
         return func(*args, **kwargs)
-
     return wrapper
