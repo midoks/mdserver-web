@@ -40,6 +40,7 @@ def init():
 
 # 插件列表
 @blueprint.route('/list', endpoint='list', methods=['GET'])
+@panel_login_required
 def list():
     plugins_type = request.args.get('type', '0')
     page = request.args.get('p', '1')
@@ -56,6 +57,7 @@ def list():
 
 # 文件读取
 @blueprint.route('/file', endpoint='file', methods=['GET'])
+@panel_login_required
 def file():
     name = request.args.get('name', '')
     if name.strip() == '':
@@ -81,6 +83,7 @@ def file():
 
 # 插件设置页
 @blueprint.route('/setting', endpoint='setting', methods=['GET'])
+@panel_login_required
 def setting():
     name = request.args.get('name', '')
     html = mw.getPluginDir() + '/' + name + '/index.html'
@@ -89,6 +92,7 @@ def setting():
 
 # 插件统一回调入口API
 @blueprint.route('/run', endpoint='run', methods=['GET','POST'])
+@panel_login_required
 def run():
     name = request.form.get('name', '')
     func = request.form.get('func', '')
