@@ -419,7 +419,7 @@ def getGogsConf():
     result = []
 
     for g in gets:
-        rep = g['name'] + '\s*=\s*(.*)'
+        rep = g['name'] + '\\s*=\\s*(.*)'
         tmp = re.search(rep, conf)
         if not tmp:
             continue
