@@ -14,6 +14,7 @@ from flask import Blueprint, render_template
 from flask import request
 
 from utils.mwplugin import MwPlugin
+from admin.user_login_check import panel_login_required
 
 import core.mw as mw
 
@@ -21,6 +22,7 @@ pg = MwPlugin.instance()
 
 blueprint = Blueprint('plugins', __name__, url_prefix='/plugins', template_folder='../../templates/default')
 @blueprint.route('/index', endpoint='index')
+@panel_login_required
 def index():
     return render_template('plugins.html', data={})
 

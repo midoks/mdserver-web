@@ -86,7 +86,7 @@ function getCronData(page){
 		layer.close(load);
 		var cbody = "";
 		if(rdata == ""){
-			cbody="<tr><td colspan='6'>"+lan.crontab.task_empty+"</td></tr>";
+			cbody="<tr><td colspan='9' style='text-align: center;'>"+lan.crontab.task_empty+"</td></tr>";
 		} else {
 			for(var i=0;i<rdata.data.length;i++){
 				//状态
