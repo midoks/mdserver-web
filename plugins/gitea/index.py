@@ -220,7 +220,7 @@ def getDbConfValue():
     rep_scope = r"\[database\](.*?)\["
     tmp = re.findall(rep_scope, content, re.S)
 
-    rep = '(\w*)\s*=\s*(.*)'
+    rep = '(\\w*)\\s*=\\s*(.*)'
     tmp = re.findall(rep, tmp[0])
     r = {}
     for x in range(len(tmp)):

@@ -42,7 +42,7 @@ class config_api:
         'bind_domain' : 'data/bind_domain.pl',                  # 面板域名绑定
         'unauth_status' : 'data/unauthorized_status.pl',        # URL路径未成功显示状态
         'auth_secret': 'data/auth_secret.pl',                   # 二次验证密钥
-        'ssl':'ssl/choose.pl',                                    # ssl设置
+        'ssl':'ssl/choose.pl',                                  # ssl设置
         'hook_database' : 'data/hook_database.json',            # 数据库钩子
         'hook_menu' : 'data/hook_menu.json',                    # 菜单钩子
         'hook_global_static' : 'data/hook_global_static.json',  # 静态文件钩子

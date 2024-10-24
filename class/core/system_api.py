@@ -717,7 +717,6 @@ class system_api:
 
             self.cache[iokey] = {'info':diskio_group,'time':mtime}
         except Exception as e:
-            # print(mw.getTracebackInfo())
             pass
 
         return diskInfo

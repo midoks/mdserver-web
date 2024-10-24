@@ -8,12 +8,4 @@
 # Author: midoks <midoks@163.com>
 # ---------------------------------------------------------------------------------
 
-from functools import wraps
-
-def panel_login_required(func):
-    
-    @wraps(func)
-    def wrapper(*args, **kwargs):
-        print('panel_login_required', args, kwargs)
-        return func(*args, **kwargs)
-    return wrapper
+from .user import *

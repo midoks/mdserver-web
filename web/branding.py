@@ -14,5 +14,8 @@
 APP_NAME = 'mdserver-web'
 APP_ICON = 'icon'
 
+APP_LOG_NAME = 'panel'
+APP_SQLITE_NAME = 'panel'
+
 # Copyright string for display in the app
 APP_COPYRIGHT = 'Copyright (C) 2018-∞ All rights reserved.'

@@ -116,11 +116,11 @@ def getUniqueId():
     return unique_id
 
 def returnData(status, msg, data=None):
+    if data == None:
+        return {'status': status, 'msg': msg}
     return {'status': status, 'msg': msg, 'data': data}
 
 def returnJson(status, msg, data=None):
-    if data == None:
-        return getJson({'status': status, 'msg': msg})
     return getJson({'status': status, 'msg': msg, 'data': data})
 
 def readFile(filename):
@@ -162,6 +162,52 @@ def systemdCfgDir():
 
     # local test
     return "/tmp"
+
+
+def formatDate(format="%Y-%m-%d %H:%M:%S", times=None):
+    # 格式化指定时间戳
+    if not times:
+        times = int(time.time())
+    time_local = time.localtime(times)
+    return time.strftime(format, time_local)
+
+
+def strfToTime(sdate):
+    # 转换时间
+    import time
+    return time.strftime('%Y-%m-%d', time.strptime(sdate, '%b %d %H:%M:%S %Y %Z'))
+
+
+def md5(content):
+    # 生成MD5
+    try:
+        m = hashlib.md5()
+        m.update(content.encode("utf-8"))
+        return m.hexdigest()
+    except Exception as ex:
+        return False
+
+
+def getFileMd5(filename):
+    # 文件的MD5值
+    if not os.path.isfile(filename):
+        return False
+
+    myhash = hashlib.md5()
+    f = file(filename, 'rb')
+    while True:
+        b = f.read(8096)
+        if not b:
+            break
+        myhash.update(b)
+    f.close()
+    return myhash.hexdigest()
+
+
+def getClientIp():
+    from flask import request
+    return request.remote_addr.replace('::ffff:', '')
+
 
 def getJson(data):
     import json
@@ -239,6 +285,41 @@ def getSqitePrefix():
     else:  # 否则使用四个斜线
         prefix = 'sqlite:////'
     return prefix
+
+def getCpuType():
+    cpuType = ''
+    if isAppleSystem():
+        cmd = "system_profiler SPHardwareDataType | grep 'Processor Name' | awk -F ':' '{print $2}'"
+        cpuinfo = execShell(cmd)
+        return cpuinfo[0].strip()
+
+    current_os = getOs()
+    if current_os.startswith('freebsd'):
+        cmd = "sysctl -a | egrep -i 'hw.model' | awk -F ':' '{print $2}'"
+        cpuinfo = execShell(cmd)
+        return cpuinfo[0].strip()
+
+    # 取CPU类型
+    cpuinfo = open('/proc/cpuinfo', 'r').read()
+    rep = "model\\s+name\\s+:\\s+(.+)"
+    tmp = re.search(rep, cpuinfo, re.I)
+    if tmp:
+        cpuType = tmp.groups()[0]
+    else:
+        cpuinfo = execShell('LANG="en_US.UTF-8" && lscpu')[0]
+        rep = "Model\\s+name:\\s+(.+)"
+        tmp = re.search(rep, cpuinfo, re.I)
+        if tmp:
+            cpuType = tmp.groups()[0]
+    return cpuType
+
+
+def getInfo(msg, args=()):
+    # 取提示消息
+    for i in range(len(args)):
+        rep = '{' + str(i + 1) + '}'
+        msg = msg.replace(rep, args[i])
+    return msg
 
 def getLastLine(path, num, p=1):
     pyVersion = sys.version_info[0]

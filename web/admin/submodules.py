@@ -20,6 +20,7 @@ from .plugins import blueprint as PluginsModule
 from .crontab import blueprint as CrontabModule
 from .firewall import blueprint as FirewallModule
 from .control import blueprint as ControlModule
+from .system import blueprint as SystemModule
 
 def get_submodules():
     return [
@@ -33,5 +34,6 @@ def get_submodules():
         CrontabModule,
         FirewallModule,
         ControlModule,
+        SystemModule,
         ConfigModule,
     ]

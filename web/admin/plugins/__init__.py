@@ -28,6 +28,7 @@ def index():
 
 # 初始化检查,首页提示选择安装
 @blueprint.route('/init', endpoint='init', methods=['POST'])
+@panel_login_required
 def init():
     plugin_names = {
         'openresty': '1.25.3',
@@ -37,6 +38,13 @@ def init():
         'phpmyadmin': '4.4.15',
     }
     return []
+
+# 首页软件展示
+@blueprint.route('/index_list', endpoint='index_list', methods=['GET','POST'])
+@panel_login_required
+def index_list():
+    pg = MwPlugin.instance()
+    return pg.getIndexList()
 
 # 插件列表
 @blueprint.route('/list', endpoint='list', methods=['GET'])
@@ -102,7 +110,6 @@ def run():
 
     pg = MwPlugin.instance()
     data = pg.run(name, func, version, args, script)
-
     if data[1] == '':
         r = mw.returnData(True, "OK", data[0].strip())
     else:

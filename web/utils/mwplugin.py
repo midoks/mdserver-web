@@ -104,6 +104,46 @@ class MwPlugin(object):
             mw.writeFile(self.__index, '[]')
         self.__index_data = json.loads(mw.readFile(self.__index))
 
+    def getIndexList(self):
+        if not os.path.exists(self.__index):
+            mw.writeFile(self.__index, '[]')
+        
+        indexList = json.loads(mw.readFile(self.__index))
+        plist = []
+        for i in indexList:
+            tmp = i.split('-')
+            tmp_len = len(tmp)
+            plugin_name = tmp[0]
+            plugin_ver = tmp[1]
+            if tmp_len > 2:
+                tmpArr = tmp[0:tmp_len - 1]
+                plugin_name = '-'.join(tmpArr)
+                plugin_ver = tmp[tmp_len - 1]
+
+            read_json_file = self.__plugin_dir + '/' + plugin_name + '/info.json'
+            if os.path.exists(read_json_file):
+                content = mw.readFile(read_json_file)
+                try:
+                    data = json.loads(content)
+                    data = self.makeCoexistList(data)
+                    for index in range(len(data)):
+                        if data[index]['coexist']:
+                            if data[index]['versions'] == plugin_ver or plugin_ver in data[index]['versions']:
+                                data[index]['display'] = True
+                                plist.append(data[index])
+                                continue
+                        else:
+                            data[index]['display'] = True
+                            plist.append(data[index])
+
+                except Exception as e:
+                    print('getIndexList:', mw.getTracebackInfo())
+
+        # 使用gevent模式时,无法使用多进程
+        # plist = self.checkStatusMProcess(plist)
+        plist = self.checkStatusMThreads(plist)
+        return plist
+
     # 插件搜索匹配
     def searchKey(self, info,
         keyword: str | None = None,

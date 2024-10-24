@@ -8,7 +8,11 @@
 # Author: midoks <midoks@163.com>
 # ---------------------------------------------------------------------------------
 
+import os
 import sys
+import uuid
+import logging
+from datetime import timedelta
 
 from flask import Flask
 from flask_socketio import SocketIO, emit, send
@@ -20,6 +24,7 @@ from flask_migrate import Migrate
 from werkzeug.local import LocalProxy
 
 from admin.model import db as sys_db
+from admin import setup
 
 import core.mw as mw
 import setting
@@ -33,25 +38,46 @@ socketio = SocketIO(manage_session=False, async_mode='threading',
 
 app = Flask(__name__, template_folder='templates/default')
 
+# app.debug = True
 
 # 静态文件配置
 from whitenoise import WhiteNoise
 app.wsgi_app = WhiteNoise(app.wsgi_app, root="../web/static/", prefix="static/", max_age=604800)
 
+# session配置
+app.secret_key = uuid.UUID(int=uuid.getnode()).hex[-12:]
+# app.config['sessions'] = dict()
+app.config['SESSION_PERMANENT'] = True
+app.config['SESSION_USE_SIGNER'] = True
+app.config['SESSION_KEY_PREFIX'] = 'MW_:'
+app.config['SESSION_COOKIE_NAME'] = "MW_VER_1"
+app.config['PERMANENT_SESSION_LIFETIME'] = timedelta(days=31)
+
 # db的配置
-app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///'+root_dir+'/example.log'  # 使用 SQLite 数据库
+app.config['SQLALCHEMY_DATABASE_URI'] = mw.getSqitePrefix()+setting.SQLITE_PATH  # 使用 SQLite 数据库
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = True
+
 
 # 初始化db
 sys_db.init_app(app)
 Migrate(app, sys_db)
 
+# 检查数据库是否存在。如果没有就创建它。
+setup_db_required = False
+if not os.path.isfile(setting.SQLITE_PATH):
+    setup_db_required = True
+
+# with app.app_context():
+#     sys_db.create_all()
+
 with app.app_context():
-    sys_db.create_all()
+    if setup_db_required:
+        sys_db.create_all()
 
+# 初始化用户信息
+with app.app_context():
+    setup.init_admin_user()
 
-# print(mw.getRunDir())
-# print(app.config['SQLALCHEMY_DATABASE_URI'])
 
 
 # 加载模块
@@ -61,6 +87,9 @@ for module in get_submodules():
     if app.blueprints.get(module.name) is None:
         app.register_blueprint(module)
 
+@app.before_request
+def requestCheck():
+    print("hh")
 
 @app.after_request
 def requestAfter(response):
@@ -125,6 +154,8 @@ def inject_global_variables():
 #         result = all_colorselse
 #         result = {palette: all_colors.get(palette)}
 #     return jsonify(result)
+
+
 
 
 # Log the startup
