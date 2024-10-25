@@ -76,7 +76,9 @@ with app.app_context():
 
 # 初始化用户信息
 with app.app_context():
-    setup.init_admin_user()
+    if setup_db_required:
+        setup.init_admin_user()
+        setup.init_option()
 
 
 
@@ -89,7 +91,8 @@ for module in get_submodules():
 
 @app.before_request
 def requestCheck():
-    print("hh")
+    # print("hh")
+    pass
 
 @app.after_request
 def requestAfter(response):
@@ -107,7 +110,9 @@ def page_unauthorized(error):
 @app.context_processor
 def inject_global_variables():
     config = {
-        'version': setting.APP_VERSION
+        'version': setting.APP_VERSION,
+        'title' : '面板',
+        'ip' : '127.0.0.1'
     }
     return dict(config=config)
 

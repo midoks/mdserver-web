@@ -89,7 +89,7 @@ def getPanelTmp():
 
 
 def getServerDir():
-    return getRunDir() + '/server'
+    return getFatherDir() + '/server'
 
 def getLogsDir():
     return getRunDir() + '/wwwlogs'

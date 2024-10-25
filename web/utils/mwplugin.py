@@ -11,11 +11,11 @@
 import os
 import threading
 import json
-import core.mw as mw
-
-
 import threading
 import multiprocessing
+
+import core.mw as mw
+import admin.model.option as option
 
 class pa_thread(threading.Thread):
 
@@ -105,10 +105,7 @@ class MwPlugin(object):
         self.__index_data = json.loads(mw.readFile(self.__index))
 
     def getIndexList(self):
-        if not os.path.exists(self.__index):
-            mw.writeFile(self.__index, '[]')
-        
-        indexList = json.loads(mw.readFile(self.__index))
+        indexList = option.getOptionByJson('display_index')
         plist = []
         for i in indexList:
             tmp = i.split('-')
@@ -144,6 +141,36 @@ class MwPlugin(object):
         plist = self.checkStatusMThreads(plist)
         return plist
 
+    def addIndex(self, name, version):
+        vname = name + '-' + version
+        indexList = option.getOptionByJson('display_index')
+        if vname in indexList:
+            return mw.returnData(False, '请不要重复添加!')
+        if len(indexList) > 12:
+            return mw.returnData(False, '首页最多只能显示12个软件!')
+
+        indexList.append(vname)
+        option.setOption('display_index', json.dumps(indexList))
+        return mw.returnData(True, '添加成功!')
+
+    def removeIndex(self, name, version):
+        vname = name + '-' + version
+        indexList = option.getOptionByJson('display_index')
+        if not vname in indexList:
+            return mw.returnData(True, '删除成功!!')
+        indexList.remove(vname)
+
+        print(indexList)
+        option.setOption('display_index', json.dumps(indexList))
+        return mw.returnData(True, '删除成功!')
+
+    def install(self):
+        pass
+
+    # 卸载插件
+    def uninstall(self):
+        pass
+
     # 插件搜索匹配
     def searchKey(self, info,
         keyword: str | None = None,
@@ -167,7 +194,7 @@ class MwPlugin(object):
         return ''
 
     def checkIndexList(self, name, version):
-        indexList = self.__index_data
+        indexList = option.getOptionByJson('display_index')
         for i in indexList:
             t = i.split('-')
             if t[0] == name:

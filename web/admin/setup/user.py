@@ -11,7 +11,7 @@
 from flask import request
 
 from admin.model import db, Users
-
+import admin.model.option as option
 import core.mw as mw
 
 # 初始化用户信息
@@ -36,4 +36,13 @@ def init_admin_user():
         db.session.add(add_user)
         db.session.commit()
         db.session.close()
+    return True
+
+def init_option():
+    option.setOption('title', '后羿面板')
+    option.setOption('recycle_bin', 'open')
+    option.setOption('template', 'default')
+
+    # 首页展示初始化
+    option.setOption('display_index', '[]')
     return True

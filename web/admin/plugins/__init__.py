@@ -9,6 +9,7 @@
 # ---------------------------------------------------------------------------------
 
 import os
+import json
 
 from flask import Blueprint, render_template
 from flask import request
@@ -18,7 +19,7 @@ from admin.user_login_check import panel_login_required
 
 import core.mw as mw
 
-pg = MwPlugin.instance()
+
 
 blueprint = Blueprint('plugins', __name__, url_prefix='/plugins', template_folder='../../templates/default')
 @blueprint.route('/index', endpoint='index')
@@ -37,7 +38,28 @@ def init():
         'mysql': '5.7',
         'phpmyadmin': '4.4.15',
     }
-    return []
+
+    pn_dir = mw.getPluginDir()
+    pn_server_dir = mw.getServerDir()
+    pn_list = []
+    for pn in plugin_names:
+        info = {}
+        pn_json = pn_dir + '/' + pn + '/info.json'
+        pn_server = pn_server_dir + '/' + pn
+        if not os.path.exists(pn_server):
+
+            tmp = mw.readFile(pn_json)
+            tmp = json.loads(tmp)
+
+            info['title'] = tmp['title']
+            info['name'] = tmp['name']
+            info['versions'] = tmp['versions']
+            info['default_ver'] = plugin_names[pn]
+            pn_list.append(info)
+        else:
+            return mw.returnData(False, 'ok')
+
+    return mw.returnData(True, 'ok', pn_list)
 
 # 首页软件展示
 @blueprint.route('/index_list', endpoint='index_list', methods=['GET','POST'])
@@ -60,8 +82,40 @@ def list():
     if not mw.isNumber(page):
         page = 0
 
-    # pg.getList(plugins_type, search, int(page))
+    pg = MwPlugin.instance()
     return pg.getList(plugins_type, search, int(page))
+
+# 插件设置是否在首页展示
+@blueprint.route('/set_index', endpoint='set_index', methods=['POST'])
+@panel_login_required
+def set_index():
+    name = request.form.get('name', '')
+    status = request.form.get('status', '0')
+    version = request.form.get('version', '')
+
+    pg = MwPlugin.instance()
+    if status == '1':
+        return pg.addIndex(name, version)
+    return pg.removeIndex(name, version)
+
+# 插件卸载
+@blueprint.route('/uninstall', endpoint='uninstall', methods=['POST'])
+@panel_login_required
+def uninstall():
+    rundir = mw.getRunDir()
+    name = request.form.get('name', '')
+    version = request.form.get('version', '')
+
+    if name.strip() == '':
+        return mw.returnData(False, '缺少插件名称!', ())
+
+    if version.strip() == '':
+        return mw.returnData(False, '缺少版本信息!', ())
+
+    pg = MwPlugin.instance()
+
+    # pg.getList(plugins_type, search, int(page))
+    return []
 
 # 文件读取
 @blueprint.route('/file', endpoint='file', methods=['GET'])
