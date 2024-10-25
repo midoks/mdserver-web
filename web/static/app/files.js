@@ -415,7 +415,6 @@ function getFiles(Path) {
 
 	var loadT = layer.load();
 	$.post('/files/get_dir?' + query_str, post, function(rdata) {
-		console.log(rdata);
 		layer.close(loadT);
 		
 		//构建分页
@@ -426,7 +425,6 @@ function getFiles(Path) {
 		}
 
 		for (var i = 0; i < rdata.dir.length; i++) {
-			console.log(rdata.dir[i]);
 			var fmp = rdata.dir[i].split(";");
 			var cnametext =fmp[0] + fmp[5];
 
@@ -479,8 +477,7 @@ function getFiles(Path) {
 		}
 
 		for (var i = 0; i < rdata.files.length; i++) {
-			console.log(rdata.files[i]);
-			// if(rdata.files[i] == null) continue;
+			if(rdata.files[i] == null) continue;
 			var fmp = rdata.files[i].split(";");
 			var bodyZip = '';
 			var download = '';
