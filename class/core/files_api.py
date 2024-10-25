@@ -1074,9 +1074,9 @@ class files_api:
 
         order_arr = order.split(' ')
         if len(order_arr) < 2:
-            plist = mw.sortFileList(path, order_arr[0],'')
+            plist = mw.sortFileList(path, order_arr[0], '')
         else:
-            plist = mw.sortFileList(path, order_arr[0],order_arr[1])
+            plist = mw.sortFileList(path, order_arr[0], order_arr[1])
         
         for filename in plist:
             if search:

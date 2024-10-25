@@ -14,6 +14,7 @@ from flask import Blueprint, render_template
 from flask import request
 
 import core.mw as mw
+import utils.file as file
 
 blueprint = Blueprint('files', __name__, url_prefix='/files', template_folder='../../templates/default')
 @blueprint.route('/index', endpoint='index')
@@ -99,22 +100,20 @@ def get_file_last_body():
 def get_dir():
     path = request.form.get('path', '')
     if not os.path.exists(path):
-        path = mw.getRootDir() + "/wwwroot"
+        path = mw.getFatherDir() + '/wwwroot'
     search = request.args.get('search', '').strip().lower()
     search_all = request.args.get('all', '').strip().lower()
     page = request.args.get('p', '1').strip().lower()
     row = request.args.get('row', '10')
     order = request.form.get('order', '')
 
-    print(path,search,search_all,page,row,order)
-    if not os.path.exists(path):
-        return mw.returnData(False, '文件不存在', (path,))
+    if search_all == 'yes' and search != '':
+        dir_list = file.getAllDirList(path, int(page), int(row),order, search)
+    else:
+        dir_list = file.getDirList(path, int(page), int(row),order, search)
 
-    try:
-        data = mw.getLastLine(path, int(line))
-        return mw.returnData(True, 'OK', data)
-    except Exception as ex:
-        return mw.returnData(False, '无法正确读取文件!' + str(ex))
+    dir_list['page'] = mw.getPage({'p':page, 'row': row, 'tojs':'getFiles', 'count': dir_list['count']}, '1,2,3,4,5,6,7,8')
+    return dir_list
 
 
 

@@ -10,6 +10,7 @@
 
 import os
 import sys
+import time
 import uuid
 import logging
 from datetime import timedelta
@@ -109,8 +110,12 @@ def page_unauthorized(error):
 # 设置模板全局变量
 @app.context_processor
 def inject_global_variables():
+    ver = setting.APP_VERSION;
+    if mw.isDebugMode():
+        ver = ver + str(time.time())
+
     config = {
-        'version': setting.APP_VERSION,
+        'version': ver,
         'title' : '面板',
         'ip' : '127.0.0.1'
     }

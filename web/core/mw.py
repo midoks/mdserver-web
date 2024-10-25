@@ -115,6 +115,19 @@ def getUniqueId():
     unique_id = "{0}".format(str_time)
     return unique_id
 
+def toSize(size, middle='') -> str:
+    """
+    字节单位转换
+    """
+    units = ('b', 'KB', 'MB', 'GB', 'TB')
+    s = d[0]
+    for u in units:
+        if size < 1024:
+            return str(round(size, 2)) + middle + u
+        size = float(size) / 1024.0
+        s = u
+    return str(round(size, 2)) + middle + u
+
 def returnData(status, msg, data=None):
     if data == None:
         return {'status': status, 'msg': msg}
@@ -469,7 +482,6 @@ def writeLog(stype, msg, args=()):
 def writeDbLog(stype, msg, args=(), uid=1):
     try:
         import admin.model.logs as logs
-        
         format_msg = getInfo(msg, args)
         logs.add(stype, format_msg, uid)
         # mdate = time.strftime('%Y-%m-%d %X', time.localtime())
@@ -478,4 +490,28 @@ def writeDbLog(stype, msg, args=(), uid=1):
         print("writeDbLog:"+str(e))
         return False
 
+
+# ---------------------------------------------------------------------------------
+# 打印相关 START
+# ---------------------------------------------------------------------------------
+
+def echoStart(tag):
+    print("=" * 89)
+    print("★开始{}[{}]".format(tag, formatDate()))
+    print("=" * 89)
+
+
+def echoEnd(tag):
+    print("=" * 89)
+    print("☆{}完成[{}]".format(tag, formatDate()))
+    print("=" * 89)
+    print("\n")
+
+
+def echoInfo(msg):
+    print("|-{}".format(msg))
+
+# ---------------------------------------------------------------------------------
+# 打印相关 END
+# ---------------------------------------------------------------------------------
 
