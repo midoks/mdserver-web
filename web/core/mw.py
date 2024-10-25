@@ -453,4 +453,29 @@ def isNumber(s):
 
     return False
 
+def writeLog(stype, msg, args=()):
+    # 写日志
+    uid = 1
+    try:
+        from flask import session
+        if 'uid' in session:
+            uid = session['uid']
+    except Exception as e:
+        print(str(e))
+        # pass
+        # writeFileLog(getTracebackInfo())
+    return writeDbLog(stype, msg, args, uid)
+
+def writeDbLog(stype, msg, args=(), uid=1):
+    try:
+        import admin.model.logs as logs
+        
+        format_msg = getInfo(msg, args)
+        logs.add(stype, format_msg, uid)
+        # mdate = time.strftime('%Y-%m-%d %X', time.localtime())
+        return True
+    except Exception as e:
+        print("writeDbLog:"+str(e))
+        return False
+
 

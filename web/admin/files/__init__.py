@@ -21,8 +21,8 @@ def index():
     return render_template('files.html', data={})
 
 # 获取文件内容
-@blueprint.route('/get_body', endpoint='getFileBody', methods=['POST'])
-def getFileBody():
+@blueprint.route('/get_body', endpoint='get_file_body', methods=['POST'])
+def get_file_body():
     path = request.form.get('path', '')
 
     if not os.path.exists(path):
@@ -55,8 +55,8 @@ def getFileBody():
     return mw.returnData(True, 'OK', data)
 
 # 获取文件内容
-@blueprint.route('/save_body', endpoint='saveBody', methods=['POST'])
-def saveBody():
+@blueprint.route('/save_body', endpoint='save_body', methods=['POST'])
+def save_body():
     path = request.form.get('path', '')
     data = request.form.get('data', '')
     encoding = request.form.get('encoding', '')
@@ -79,11 +79,34 @@ def saveBody():
         return mw.returnData(False, '文件保存错误:' + str(ex))
 
 # 获取文件内容(最新行数)
-@blueprint.route('/get_last_body', endpoint='getFileLastBody', methods=['POST'])
-def getFileLastBody():
+@blueprint.route('/get_last_body', endpoint='get_file_last_body', methods=['POST'])
+def get_file_last_body():
     path = request.form.get('path', '')
     line = request.form.get('line', '100')
 
+    if not os.path.exists(path):
+        return mw.returnData(False, '文件不存在', (path,))
+
+    try:
+        data = mw.getLastLine(path, int(line))
+        return mw.returnData(True, 'OK', data)
+    except Exception as ex:
+        return mw.returnData(False, '无法正确读取文件!' + str(ex))
+
+
+# 获取文件列表
+@blueprint.route('/get_dir', endpoint='get_dir', methods=['POST'])
+def get_dir():
+    path = request.form.get('path', '')
+    if not os.path.exists(path):
+        path = mw.getRootDir() + "/wwwroot"
+    search = request.args.get('search', '').strip().lower()
+    search_all = request.args.get('all', '').strip().lower()
+    page = request.args.get('p', '1').strip().lower()
+    row = request.args.get('row', '10')
+    order = request.form.get('order', '')
+
+    print(path,search,search_all,page,row,order)
     if not os.path.exists(path):
         return mw.returnData(False, '文件不存在', (path,))
 

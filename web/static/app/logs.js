@@ -185,7 +185,7 @@ function getLogs(page,search) {
 						<td><em class='dlt-num'>" + data.data[i].id + "</em></td>\
 						<td>" + data.data[i].type + "</td>\
 						<td>" + data.data[i].log + "</td>\
-						<td>" + data.data[i].addtime + "</td>\
+						<td>" + data.data[i].add_time + "</td>\
 					</tr>";
 		}
 		$("#operationLog tbody").html(body);
