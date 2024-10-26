@@ -4,7 +4,7 @@
 	"name": "alist",
 	"title": "Alist",
 	"shell": "install.sh",
-	"versions":["3.37.4"],
+	"versions":["3.37.4","3.38.0"],
 	"tip": "soft",
 	"checks": "server/alist",
 	"path": "server/alist",
