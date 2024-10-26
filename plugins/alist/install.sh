@@ -22,7 +22,7 @@ if [ "$sysArch" == "arm64" ];then
 elif [ "$sysArch" == "x86_64" ]; then
 	ALIST_ARCH_NAME=amd64
 elif [ "$sysArch" == "aarch64" ]; then
-	ALIST_ARCH_NAME=aarch64
+	ALIST_ARCH_NAME=arm64
 fi
 
 ALIST_NAME=linux
