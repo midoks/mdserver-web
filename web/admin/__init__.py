@@ -114,6 +114,7 @@ def inject_global_variables():
     if mw.isDebugMode():
         ver = ver + str(time.time())
 
+    # print(ver)
     config = {
         'version': ver,
         'title' : '面板',

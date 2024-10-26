@@ -33,7 +33,7 @@ class Sql():
     __OPT_PARAM = ()            # where值
 
     def __init__(self):
-        self.__DB_FILE = 'data/default.db'
+        self.__DB_FILE = '../data/default.db'
 
     def __getConn(self):
         # 取数据库对象

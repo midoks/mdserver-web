@@ -491,6 +491,11 @@ def writeDbLog(stype, msg, args=(), uid=1):
         return False
 
 
+def M(table):
+    import core.db as db
+    sql = db.Sql()
+    return sql.table(table)
+
 # ---------------------------------------------------------------------------------
 # 打印相关 START
 # ---------------------------------------------------------------------------------
