@@ -10,12 +10,27 @@
 
 
 import json
+import time
 
 from admin.model import db, Logs
-import core.mw as mw
 
-def add(type, log, uid=1) -> str:
-    add_time = mw.formatDate()
+def formatDate(format="%Y-%m-%d %H:%M:%S", times=None):
+    # 格式化指定时间戳
+    if not times:
+        times = int(time.time())
+    time_local = time.localtime(times)
+    return time.strftime(format, time_local)
+
+def addLog(type, log,
+    uid: int | None = 1
+) -> str:
+    '''
+    添加日志
+    :type -> str 类型 (必填)
+    :log -> str 日志内容 (必填)
+    :uid -> int 用户ID
+    '''
+    add_time = formatDate()
     add_logs = Logs(
         uid=uid,
         log=log, 

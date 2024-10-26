@@ -12,21 +12,52 @@
 import json
 
 from admin.model import db, Option
-import core.mw as mw
 
-def getOption(name, type='common') -> str:
+def getOption(name,
+    type: str | None = 'common',
+    default : str | None = None
+) -> str:
+    '''
+    获取配置的值
+    :name -> str 名称 (必填)
+    :type -> str 类型 (可选|默认common)
+    :default -> str 默认值 (可选)
+    '''
     data = Option.query.filter_by(name=name, type=type).first()
     if data is not None:
         return data.value
+
+    if default is not None:
+        return default
     return ''
 
-def getOptionByJson(name, type='common') -> object:
+def getOptionByJson(name,
+    type: str | None = 'common',
+    default : object | None = None
+) -> object:
+    '''
+    获取配置的值,返回对象类型
+    :name -> str 名称 (必填)
+    :type -> str 类型 (可选|默认common)
+    :default -> str 默认值 (可选)
+    '''
     data = Option.query.filter_by(name=name, type=type).first()
     if data is not None:
         return json.loads(data.value)
+
+    if default is not None:
+        return default
     return []
 
-def setOption(name, value, type='common') -> bool:
+def setOption(name, value,
+    type: str | None = 'common'
+) -> bool:
+    '''
+    设置配置的值
+    :name -> str 名称 (必填)
+    :value -> object值 (必填)
+    :type -> str 类型 (可选|默认common)
+    '''
     data = Option.query.filter_by(name=name, type=type).first()
     if data is None:
         add_option = Option(
