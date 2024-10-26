@@ -164,12 +164,67 @@ class MwPlugin(object):
         option.setOption('display_index', json.dumps(indexList))
         return mw.returnData(True, '删除成功!')
 
-    def install(self):
-        pass
+    def install(self, name, version,
+        upgrade: bool | None = None
+    ):
+        if name.strip() == '':
+            return mw.returnData(False, '缺少插件名称!', ())
+
+        if version.strip() == '':
+            return mw.returnData(False, '缺少版本信息!', ())
+
+        msg_head = '安装'
+        if upgrade is not None:
+            mtype = 'update'
+            msg_head = '更新'
+
+        info_file = self.__plugin_dir + '/' + name + '/' + 'info.json'
+        if not os.path.exists(info_file):
+            return mw.returnData(False, "配置文件不存在!", ())
+
+        info_data = json.loads(mw.readFile(info_file))
+
+        exec_bash = 'cd {0} && bash {1} install {2}'.format(
+            mw.getPluginDir() + '/'+name,
+            info_data['shell'],
+            version
+        )
+
+        if mw.isDebugMode():
+            print(exec_bash)
+
+        title = '{0}[{1}-{2}]'.format(msg_head,name,version)
+
+        return mw.returnData(True, '已将安装任务添加到队列!')
 
     # 卸载插件
-    def uninstall(self):
-        pass
+    def uninstall(self, name, version):
+        rundir = mw.getRunDir()
+        if name.strip() == '':
+            return mw.returnData(False, "缺少插件名称!", ())
+
+        if version.strip() == '':
+            return mw.returnData(False, "缺少版本信息!", ())
+
+        info_file = self.__plugin_dir + '/' + name + '/' + 'info.json'
+        if not os.path.exists(info_file):
+            return mw.returnData(False, "配置文件不存在!", ())
+
+        info_data = json.loads(mw.readFile(info_file))
+
+        exec_bash = "cd {0} && /bin/bash {1} uninstall {2}".format(
+            mw.getPluginDir() + '/'+name,
+            info_data['shell'],
+            version
+        )
+
+        data = mw.execShell(exec_bash)
+        if mw.isDebugMode():
+            print(exec_bash)
+            print(data[0], data[1])
+
+        self.removeIndex(name, version)
+        return mw.returnData(True, '卸载执行成功!')
 
     # 插件搜索匹配
     def searchKey(self, info,

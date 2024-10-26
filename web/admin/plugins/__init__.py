@@ -98,24 +98,29 @@ def set_index():
         return pg.addIndex(name, version)
     return pg.removeIndex(name, version)
 
+# 插件安装
+@blueprint.route('/install', endpoint='install', methods=['POST'])
+@panel_login_required
+def install():
+    name = request.form.get('name', '')
+    version = request.form.get('version', '')
+    
+    msg_head = '安装'
+    if hasattr(request.form, 'upgrade'):
+        mtype = 'update'
+        msg_head = '更新'
+
+    pg = MwPlugin.instance()
+    return pg.install(name, version)
+
 # 插件卸载
 @blueprint.route('/uninstall', endpoint='uninstall', methods=['POST'])
 @panel_login_required
 def uninstall():
-    rundir = mw.getRunDir()
     name = request.form.get('name', '')
     version = request.form.get('version', '')
-
-    if name.strip() == '':
-        return mw.returnData(False, '缺少插件名称!', ())
-
-    if version.strip() == '':
-        return mw.returnData(False, '缺少版本信息!', ())
-
     pg = MwPlugin.instance()
-
-    # pg.getList(plugins_type, search, int(page))
-    return []
+    return pg.uninstall(name, version)
 
 # 文件读取
 @blueprint.route('/file', endpoint='file', methods=['GET'])
