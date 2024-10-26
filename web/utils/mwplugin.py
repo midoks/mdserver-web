@@ -174,7 +174,7 @@ class MwPlugin(object):
             return mw.returnData(False, '缺少版本信息!', ())
 
         msg_head = '安装'
-        if upgrade is not None:
+        if upgrade is not None and upgrade is True:
             mtype = 'update'
             msg_head = '更新'
 

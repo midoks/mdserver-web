@@ -104,14 +104,13 @@ def set_index():
 def install():
     name = request.form.get('name', '')
     version = request.form.get('version', '')
-    
-    msg_head = '安装'
+
+    upgrade = None
     if hasattr(request.form, 'upgrade'):
-        mtype = 'update'
-        msg_head = '更新'
+        upgrade = True
 
     pg = MwPlugin.instance()
-    return pg.install(name, version)
+    return pg.install(name, version, upgrade=upgrade)
 
 # 插件卸载
 @blueprint.route('/uninstall', endpoint='uninstall', methods=['POST'])
