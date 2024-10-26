@@ -421,6 +421,17 @@ def getPageObject(args, result='1,2,3,4,5,8'):
 
     return (page.GetPage(info, result), page)
 
+
+def getHostPort():
+    if os.path.exists('data/port.pl'):
+        return readFile('data/port.pl').strip()
+    return '7200'
+
+
+def setHostPort(port):
+    file = getPanelDir() + '/data/port.pl'
+    return writeFile(file, port)
+
 def isAppleSystem():
     if getOs() == 'darwin':
         return True

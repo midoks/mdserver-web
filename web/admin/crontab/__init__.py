@@ -17,7 +17,7 @@ from admin.model import Crontab
 blueprint = Blueprint('crontab', __name__, url_prefix='/crontab', template_folder='../../templates/default')
 @blueprint.route('/index', endpoint='index')
 def index():
-    return render_template('crontab.html', data={})
+    return render_template('crontab.html')
 
 # 插件列表
 @blueprint.route('/list', endpoint='list', methods=['GET','POST'])

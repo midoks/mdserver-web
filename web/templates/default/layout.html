@@ -5,7 +5,7 @@
 <meta charset="utf-8">
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="renderer" content="webkit">
-<title>{{config['title']}}</title>
+<title>{{data['title']}}</title>
 <link rel="shortcut icon" href="/static/favicon.ico" type="image/x-icon" />
 <link href="/static/bootstrap-3.3.5/css/bootstrap.min.css?v={{config.version}}" rel="stylesheet">
 <link href="/static/css/site.css?v={{config.version}}" rel="stylesheet">
@@ -37,7 +37,7 @@
             <div class="sidebar-scroll">
                 <div class="sidebar-auto">
                     <div id="task" class="task cw" onclick="messageBox();"></div>
-                    <h3 class="mypcip"><span class="f14 cw">{{config['ip']}}</span></h3>
+                    <h3 class="mypcip"><span class="f14 cw">{{data['ip']}}</span></h3>
                     <ul class="menu">
                         <li id="memuA"><a class="menu_home" href="/">首页</a></li>
                         <li id="memuAsite"><a class="menu_web" href="/site/index">网站</a></li>

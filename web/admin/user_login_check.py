@@ -14,6 +14,6 @@ def panel_login_required(func):
     
     @wraps(func)
     def wrapper(*args, **kwargs):
-        print('panel_login_required', args, kwargs)
+        # print('panel_login_required', args, kwargs)
         return func(*args, **kwargs)
     return wrapper

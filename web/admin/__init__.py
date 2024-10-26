@@ -29,6 +29,7 @@ from admin import setup
 
 import core.mw as mw
 import setting
+import utils.config as utils_config
 
 root_dir = mw.getRunDir()
 
@@ -114,13 +115,13 @@ def inject_global_variables():
     if mw.isDebugMode():
         ver = ver + str(time.time())
 
-    # print(ver)
+    data = utils_config.getGlobalVar()
     config = {
         'version': ver,
         'title' : '面板',
         'ip' : '127.0.0.1'
     }
-    return dict(config=config)
+    return dict(config=config, data=data)
 
 
 # from flasgger import Swagger

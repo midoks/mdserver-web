@@ -25,7 +25,7 @@ blueprint = Blueprint('plugins', __name__, url_prefix='/plugins', template_folde
 @blueprint.route('/index', endpoint='index')
 @panel_login_required
 def index():
-    return render_template('plugins.html', data={})
+    return render_template('plugins.html')
 
 # 初始化检查,首页提示选择安装
 @blueprint.route('/init', endpoint='init', methods=['POST'])

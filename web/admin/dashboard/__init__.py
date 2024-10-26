@@ -17,7 +17,7 @@ import core.mw as mw
 blueprint = Blueprint('dashboard', __name__, url_prefix='/', template_folder='../../templates')
 @blueprint.route('/')
 def index():
-    return render_template('default/index.html', data = {})
+    return render_template('default/index.html')
 
 
 # ---------------------------------------------------------------------------------
@@ -26,7 +26,7 @@ def index():
 
 @blueprint.route('/login')
 def login():
-    return render_template('default/login.html', data = {})
+    return render_template('default/login.html')
 
 # 检查是否登录
 @blueprint.route('/check_login',methods=['GET','POST'])

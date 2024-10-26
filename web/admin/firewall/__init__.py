@@ -20,7 +20,7 @@ import core.mw as mw
 blueprint = Blueprint('firewall', __name__, url_prefix='/firewall', template_folder='../../templates/default')
 @blueprint.route('/index', endpoint='index')
 def index():
-    return render_template('firewall.html', data={})
+    return render_template('firewall.html')
 
 
 # 防火墙列表

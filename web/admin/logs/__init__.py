@@ -22,7 +22,7 @@ import utils.adult_log as adult_log
 blueprint = Blueprint('logs', __name__, url_prefix='/logs', template_folder='../../templates')
 @blueprint.route('/index', endpoint='index')
 def index():
-    return render_template('default/logs.html', data={})
+    return render_template('default/logs.html')
 
 
 # 日志列表

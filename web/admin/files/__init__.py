@@ -19,7 +19,7 @@ import utils.file as file
 blueprint = Blueprint('files', __name__, url_prefix='/files', template_folder='../../templates/default')
 @blueprint.route('/index', endpoint='index')
 def index():
-    return render_template('files.html', data={})
+    return render_template('files.html')
 
 # 获取文件内容
 @blueprint.route('/get_body', endpoint='get_file_body', methods=['POST'])

@@ -122,7 +122,7 @@ $('#site_search').click(function(){
             });
 		}
 		if(body.length < 10){
-			body = "<tr><td colspan='9'>当前没有站点数据</td></tr>";
+			body = "<tr><td colspan='9' style='text-align: center;'>当前没有站点数据</td></tr>";
 			// $(".dataTables_paginate").hide();
 			$("#webBody").html(body);
 		}

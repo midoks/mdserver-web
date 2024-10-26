@@ -14,6 +14,7 @@ from flask import request
 
 import core.mw as mw
 import utils.system as sys
+import admin.model.option as option
 
 blueprint = Blueprint('system', __name__, url_prefix='/system', template_folder='../../templates')
 
@@ -102,7 +103,52 @@ def get_network_io():
 def set_control():
     stype = request.form.get('type', '')
     day = request.form.get('day', '')
-    return mw.returnData(True, "设置成功!")
+
+    if stype == '0':
+        option.setOption('monitor_status', 'close', type='monitor')
+        return mw.returnData(True, "设置成功!")
+    elif stype == '1':
+        _day = int(day)
+        if _day < 1:
+            return mw.returnData(False, "设置失败!")
+        option.setOption('monitor_day', day, type='monitor')
+    elif stype == '2':
+        option.setOption('monitor_only_netio', 'close', type='monitor')
+        return mw.returnData(True, "设置成功!")
+    elif stype == '3':
+        option.setOption('monitor_only_netio', 'open', type='monitor')
+        return mw.returnData(True, "设置成功!")
+    elif stype == 'del':
+        if not mw.isRestart():
+            return mw.returnData(False, '请等待所有安装任务完成再执行')
+        os.remove("data/system.db")
+
+        sql = db.Sql().dbfile('system')
+        csql = mw.readFile('data/sql/system.sql')
+        csql_list = csql.split(';')
+        for index in range(len(csql_list)):
+            sql.execute(csql_list[index], ())
+        return mw.returnData(True, "监控服务已关闭")
+    else:
+        monitor_status = option.getOption('monitor_status', default='open', type='monitor')
+        monitor_day = option.getOption('monitor_day', default='30', type='monitor')
+        monitor_only_netio = option.getOption('monitor_only_netio', default='open', type='monitor')
+        data = {}
+        data['day'] = monitor_day
+        if monitor_status == 'open':   
+            data['status'] = True
+        else:
+            data['status'] = False
+        if monitor_only_netio == 'open':
+            data['stat_all_status'] = True
+        else:
+            data['stat_all_status'] = False
+
+        return data
+
+    return mw.returnData(False, "异常!")
+
+    
 
 
 # 升级检测

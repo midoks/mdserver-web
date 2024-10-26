@@ -8,12 +8,9 @@
 # Author: midoks <midoks@163.com>
 # ---------------------------------------------------------------------------------
 
-
-from flask import Blueprint, render_template
-
-blueprint = Blueprint('task', __name__, url_prefix='/task', template_folder='../../templates/default')
+from admin.model import db, Sites
 
 
-@blueprint.route('/count', endpoint='task_count')
-def task_count():
-    return "0"
+def getSitesCount():
+	return Sites.query.count()
+

@@ -14,7 +14,7 @@ from flask import Blueprint, render_template
 blueprint = Blueprint('config', __name__, url_prefix='/config', template_folder='../../templates/default')
 @blueprint.route('/index', endpoint='index')
 def index():
-    return render_template('config.html', data={})
+    return render_template('config.html')
 
 
 
