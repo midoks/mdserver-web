@@ -138,11 +138,13 @@ $('.panel_ad_list_mode').click(function(){
 
 
 function getUrlPath(){
-    var thisUrl = window.location.href;
+    var thisUrl = window.location.pathname;
+    console.log(thisUrl);
     var pathArr = thisUrl.split('/');
     return pathArr[pathArr.length - 1];
 }
 var thisPath = getUrlPath();
+// console.log(thisPath);
 if (thisPath.indexOf('?')>-1){
     var tag = $.getUrlParam('tag');
     if(tag != undefined){

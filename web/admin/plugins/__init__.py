@@ -175,3 +175,19 @@ def run():
     return r
 
 
+# 插件统一回调入口API
+@blueprint.route('/callback', endpoint='callback', methods=['GET','POST'])
+@panel_login_required
+def callback():
+    name = request.form.get('name', '')
+    func = request.form.get('func', '')
+    args = request.form.get('args', '')
+    script = request.form.get('script', 'index')
+
+    pg = MwPlugin.instance()
+    data = pg.callback(name, func, args=args, script=script)
+    if data[0]:
+        return mw.returnData(True, "OK", data[1])
+    return mw.returnData(False, data[1])
+
+

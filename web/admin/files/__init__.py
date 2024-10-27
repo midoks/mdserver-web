@@ -116,6 +116,14 @@ def get_dir():
     return dir_list
 
 
+# 获取站点日志目录
+@blueprint.route('/get_dir_size', endpoint='get_dir_size', methods=['POST'])
+def get_dir_size():
+    path = request.form.get('path', '')
+    size = file.getDirSize(path)
+    return mw.returnData(True, mw.toSize(size))
+
+
 
 
 

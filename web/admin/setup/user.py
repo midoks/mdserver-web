@@ -10,8 +10,9 @@
 
 from flask import request
 
+from admin import model
 from admin.model import db, Users
-import admin.model.option as option
+
 import core.mw as mw
 
 # 初始化用户信息
@@ -39,22 +40,20 @@ def init_admin_user():
     return True
 
 def init_option():
-    option.setOption('title', '后羿面板')
-    option.setOption('recycle_bin', 'open')
-    option.setOption('template', 'default')
+    model.setOption('title', '后羿面板')
+    model.setOption('recycle_bin', 'open')
+    model.setOption('template', 'default')
 
     # 首页展示初始化
-    option.setOption('display_index', '[]')
+    model.setOption('display_index', '[]')
 
     # 监控默认配置
-    option.setOption('monitor_status', 'open', type='monitor')
-    option.setOption('monitor_day', '30', type='monitor')
-    option.setOption('monitor_only_netio', 'open', type='monitor')
+    model.setOption('monitor_status', 'open', type='monitor')
+    model.setOption('monitor_day', '30', type='monitor')
+    model.setOption('monitor_only_netio', 'open', type='monitor')
 
     # 初始化安全路径
-    option.setOption('admin_path', mw.getRandomString(8))
-    option.setOption('server_ip', '127.0.0.1')
-
-
+    model.setOption('admin_path', mw.getRandomString(8))
+    model.setOption('server_ip', '127.0.0.1')
 
     return True

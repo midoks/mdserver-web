@@ -9,6 +9,7 @@
 # ---------------------------------------------------------------------------------
 
 import os
+import sys
 import threading
 import json
 import threading
@@ -533,15 +534,19 @@ class MwPlugin(object):
             sys.path.append(package)
 
         eval_str = "__import__('" + script + "')." + func + '(' + args + ')'
-        newRet = None
-        try:
-            newRet = eval(eval_str)
-        except Exception as e:
-            print(mw.getTracebackInfo())
-        
+
         if mw.isDebugMode():
             print('callback', eval_str)
-        return (True, newRet)
+
+        data = None
+        try:
+            data = eval(eval_str)
+        except Exception as e:
+            print(mw.getTracebackInfo())
+            return (False, mw.getTracebackInfo())
+        
+        
+        return (True, data)
 
 
 

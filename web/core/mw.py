@@ -92,7 +92,7 @@ def getServerDir():
     return getFatherDir() + '/server'
 
 def getLogsDir():
-    return getRunDir() + '/wwwlogs'
+    return getFatherDir() + '/wwwlogs'
 
 def getRandomString(length):
     # 取随机字符串
@@ -115,12 +115,31 @@ def getUniqueId():
     unique_id = "{0}".format(str_time)
     return unique_id
 
+def getDate():
+    # 取格式时间
+    import time
+    return time.strftime('%Y-%m-%d %X', time.localtime())
+
+
+def getDateFromNow(tf_format="%Y-%m-%d %H:%M:%S", time_zone="Asia/Shanghai"):
+    # 取格式时间
+    import time
+    os.environ['TZ'] = time_zone
+    time.tzset()
+    return time.strftime(tf_format, time.localtime())
+
+
+def getDataFromInt(val):
+    time_format = '%Y-%m-%d %H:%M:%S'
+    time_str = time.localtime(val)
+    return time.strftime(time_format, time_str)
+
 def toSize(size, middle='') -> str:
     """
     字节单位转换
     """
     units = ('b', 'KB', 'MB', 'GB', 'TB')
-    s = d[0]
+    s = units[0]
     for u in units:
         if size < 1024:
             return str(round(size, 2)) + middle + u
@@ -492,10 +511,9 @@ def writeLog(stype, msg, args=()):
 
 def writeDbLog(stype, msg, args=(), uid=1):
     try:
-        import admin.model.logs as logs
+        from admin import model
         format_msg = getInfo(msg, args)
-        logs.add(stype, format_msg, uid)
-        # mdate = time.strftime('%Y-%m-%d %X', time.localtime())
+        model.addLog(stype, format_msg, uid)
         return True
     except Exception as e:
         print("writeDbLog:"+str(e))

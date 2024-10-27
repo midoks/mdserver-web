@@ -7,8 +7,12 @@ import time
 import json
 import re
 
-sys.path.append(os.getcwd() + "/class/core")
-import mw
+
+try:
+    sys.path.append(os.getcwd() + "/class/core")
+    import mw
+except Exception as e:
+    import core.mw as mw
 
 
 app_debug = False

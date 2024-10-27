@@ -48,3 +48,20 @@ def get_list():
     data['data'] = rows
     data['page'] = mw.getPage({'count':count,'tojs':'getLogs','p':p})
     return data
+
+# 获取站点日志目录
+@blueprint.route('/get_www_path', endpoint='get_www_path', methods=['POST'])
+def get_www_path():
+    path = mw.getLogsDir()
+    return {'path': path}
+
+# 获取站点日志目录
+@blueprint.route('/get_ssh_info', endpoint='get_ssh_info', methods=['POST'])
+def get_ssh_info():
+    pass
+
+
+
+
+
+
