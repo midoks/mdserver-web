@@ -310,6 +310,12 @@ def getFileSuffix(file):
 def getPathSuffix(path):
     return os.path.splitext(path)[-1]
 
+def getHostAddr():
+    ip_text = getPanelDataDir() + '/iplist.txt'
+    if os.path.exists(ip_text):
+        return readFile(ip_text).strip()
+    return '127.0.0.1'
+
 def getSqitePrefix():
     WIN = sys.platform.startswith('win')
     if WIN:  # 如果是 Windows 系统，使用三个斜线
@@ -498,13 +504,13 @@ def isNumber(s):
 
 def writeLog(stype, msg, args=()):
     # 写日志
-    uid = 1
+    uid = 0
     try:
         from flask import session
         if 'uid' in session:
             uid = session['uid']
     except Exception as e:
-        print(str(e))
+        print("writeLog:"+str(e))
         # pass
         # writeFileLog(getTracebackInfo())
     return writeDbLog(stype, msg, args, uid)

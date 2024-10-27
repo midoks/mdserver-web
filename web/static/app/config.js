@@ -17,7 +17,7 @@ $('input[name="webname"]').change(function(){
 	var webname = $(this).val();
 	$('.btn_webname').removeAttr('disabled');
 	$('.btn_webname').unbind().click(function(){
-		$.post('/config/set_webname','webname='+webname, function(rdata){
+		$.post('/setting/set_webname','webname='+webname, function(rdata){
 			showMsg(rdata.msg,function(){window.location.reload();},{icon:rdata.status?1:2},2000);
 		},'json');
 	});
@@ -28,7 +28,7 @@ $('input[name="host_ip"]').change(function(){
 	var host_ip = $(this).val();
 	$('.btn_host_ip').removeAttr('disabled');
 	$('.btn_host_ip').unbind().click(function(){
-		$.post('/config/set_ip','host_ip='+host_ip, function(rdata){
+		$.post('/setting/set_ip','host_ip='+host_ip, function(rdata){
 			showMsg(rdata.msg,function(){window.location.reload();},{icon:rdata.status?1:2},2000);
 		},'json');
 	});
@@ -39,7 +39,7 @@ $('input[name="port"]').change(function(){
 	var old_port = $(this).data('port');
 	$('.btn_port').removeAttr('disabled');
 	$('.btn_port').unbind().click(function(){
-		$.post('/config/set_port','port='+port, function(rdata){
+		$.post('/setting/set_port','port='+port, function(rdata){
 			showMsg(rdata.msg,function(){
 				window.location.href = window.location.href.replace(old_port,port);
 				// window.location.reload();
@@ -52,7 +52,7 @@ $('input[name="sites_path"]').change(function(){
 	var sites_path = $(this).val();
 	$('.btn_sites_path').removeAttr('disabled');
 	$('.btn_sites_path').unbind().click(function(){
-		$.post('/config/set_www_dir','sites_path='+sites_path, function(rdata){
+		$.post('/setting/set_www_dir','sites_path='+sites_path, function(rdata){
 			showMsg(rdata.msg,function(){window.location.reload();},{icon:rdata.status?1:2},2000);
 		},'json');
 	});
@@ -63,7 +63,7 @@ $('input[name="backup_path"]').change(function(){
 	var backup_path = $(this).val();
 	$('.btn_backup_path').removeAttr('disabled');
 	$('.btn_backup_path').unbind().click(function(){
-		$.post('/config/set_backup_dir','backup_path='+backup_path, function(rdata){
+		$.post('/setting/set_backup_dir','backup_path='+backup_path, function(rdata){
 			showMsg(rdata.msg,function(){window.location.reload();},{icon:rdata.status?1:2},2000);
 		},'json');
 	});
@@ -74,7 +74,7 @@ $('input[name="bind_domain"]').change(function(){
 	var domain = $(this).val();
 	$('.btn_bind_domain').removeAttr('disabled');
 	$('.btn_bind_domain').unbind().click(function(){
-		$.post('/config/set_panel_domain','domain='+domain, function(rdata){
+		$.post('/setting/set_panel_domain','domain='+domain, function(rdata){
 			showMsg(rdata.msg,function(){
 				window.location.href = rdata.data;
 			},{icon:rdata.status?1:2},5000);
@@ -126,7 +126,7 @@ $('input[name="bind_ssl"]').click(function(){
 			yes: function(){
 
 				var cert_type = $('select[name=cert_type]').val();
-				$.post('/config/set_panel_local_ssl',{'cert_type':cert_type}, function(rdata){
+				$.post('/setting/set_panel_local_ssl',{'cert_type':cert_type}, function(rdata){
 					// console.log(rdata);
 					var to_https = window.location.href.replace('http','https');
 					showMsg(rdata.msg,function(){
@@ -163,7 +163,7 @@ $('input[name="bind_ssl"]').click(function(){
 					return;
 				}
 
-				$.post('/config/close_panel_ssl',{}, function(rdata){
+				$.post('/setting/close_panel_ssl',{}, function(rdata){
 					var to_http = window.location.href.replace('https','http');
 					showMsg(rdata.msg,function(){
 						if (rdata.status){
@@ -234,7 +234,7 @@ function closePanel(){
 	layer.confirm('关闭面板会导致您无法访问面板 ,您真的要关闭Linux面板吗？',{title:'关闭面板',closeBtn:2,icon:13,cancel:function(){
 		$("#closePl").prop("checked",false);
 	}}, function() {
-		$.post('/config/close_panel','',function(rdata){
+		$.post('/setting/close_panel','',function(rdata){
 			layer.msg(rdata.msg,{icon:rdata.status?1:2});
 			setTimeout(function(){
 				window.location.reload();
@@ -248,7 +248,7 @@ function closePanel(){
 //开发模式
 function debugMode(){
 	var loadT = layer.msg('正在发送请求,请稍候...', { icon: 16, time: 0, shade: [0.3, '#000'] });
-    $.post('/config/open_debug', {}, function (rdata) {
+    $.post('/setting/open_debug', {}, function (rdata) {
         layer.close(loadT);
         showMsg(rdata.msg, function(){
 			window.location.reload();
@@ -339,7 +339,7 @@ function setPassword(a) {
 			layer.msg('两次输入的密码不一致', {icon: 2});
 			return;
 		}
-		$.post("/config/set_password", "password1=" + encodeURIComponent(p1) + "&password2=" + encodeURIComponent(p2), function(b) {
+		$.post("/setting/set_password", "password1=" + encodeURIComponent(p1) + "&password2=" + encodeURIComponent(p2), function(b) {
 			if(b.status) {
 				layer.closeAll();
 				layer.msg(b.msg, {icon: 1});
@@ -394,7 +394,7 @@ function setUserName(a) {
 			layer.msg('两次输入的用户名不一致', {icon: 2});
 			return;
 		}
-		$.post("/config/set_name", "name1=" + encodeURIComponent(p1) + "&name2=" + encodeURIComponent(p2), function(b) {
+		$.post("/setting/set_name", "name1=" + encodeURIComponent(p1) + "&name2=" + encodeURIComponent(p2), function(b) {
 			if(b.status) {
 				layer.closeAll();
 				layer.msg(b.msg, {icon: 1});
@@ -463,7 +463,7 @@ function setTimezone(){
         yes:function(index){
 		    var loadT = layer.msg("正在设置时区...", { icon: 16, time: 0, shade: [0.3, '#000'] });
 		    var timezone = $('select[name="timezone"]').val();
-		    $.post('/config/set_timezone', { timezone: timezone }, function (rdata) {
+		    $.post('/setting/set_timezone', { timezone: timezone }, function (rdata) {
 		    	showMsg(rdata.msg, function(){
 		    		layer.close(index);
 		    		layer.close(loadT);
@@ -473,7 +473,7 @@ function setTimezone(){
         },
         btn3:function(){
         	var loadT = layer.msg('正在同步时间...',{icon:16,time:0,shade: [0.3, '#000']});
-			$.post('/config/sync_date','',function(rdata){
+			$.post('/setting/sync_date','',function(rdata){
 				layer.close(loadT);
 				layer.msg(rdata.msg,{icon:rdata.status?1:2});
 				setTimeout(function(){window.location.reload();},1500);
@@ -485,7 +485,7 @@ function setTimezone(){
 
 function setIPv6() {
     var loadT = layer.msg('正在配置,请稍候...', { icon: 16, time: 0, shade: [0.3, '#000'] });
-    $.post('/config/set_ipv6_status', {}, function (rdata) {
+    $.post('/setting/set_ipv6_status', {}, function (rdata) {
         layer.close(loadT);
         layer.msg(rdata.msg, {icon:rdata.status?1:2});
         setTimeout(function(){window.location.reload();},5000);
@@ -513,7 +513,7 @@ function setPanelSSL(){
 			}
 		}
 		var loadT = layer.msg('正在安装并设置SSL组件,这需要几分钟时间...',{icon:16,time:0,shade: [0.3, '#000']});
-		$.post('/config/set_panel_ssl','',function(rdata){
+		$.post('/setting/set_panel_ssl','',function(rdata){
 			layer.close(loadT);
 			layer.msg(rdata.msg,{icon:rdata.status?1:5});
 			if(rdata.status === true){
@@ -538,7 +538,7 @@ function setPanelSSL(){
 function setNotifyApi(tag, obj){
 	var enable = $(obj).prop("checked");
 	// console.log(tag,obj,enable);
-	$.post('/config/set_notify_enable', {'tag':tag, 'enable':enable},function(rdata){
+	$.post('/setting/set_notify_enable', {'tag':tag, 'enable':enable},function(rdata){
 		showMsg(rdata.msg, function(){
 			if (rdata.status){}
 		} ,{icon:rdata.status?1:2}, 1000);
@@ -547,7 +547,7 @@ function setNotifyApi(tag, obj){
 
 function getTgbot(){
 	var loadT = layer.msg('正在获取TgBot信息...',{icon:16,time:0,shade: [0.3, '#000']});
-	$.post('/config/get_notify',{},function(data){
+	$.post('/setting/get_notify',{},function(data){
 		layer.close(loadT);
 
 		var app_token = '';
@@ -593,7 +593,7 @@ function getTgbot(){
 					return false;
 				}
 
-				$.post('/config/set_notify',{'tag':'tgbot', 'data':JSON.stringify(pdata)},function(rdata){
+				$.post('/setting/set_notify',{'tag':'tgbot', 'data':JSON.stringify(pdata)},function(rdata){
 					showMsg(rdata.msg, function(){
 						if (rdata.status){
 							layer.close(index);
@@ -617,7 +617,7 @@ function getTgbot(){
 					return false;
 				}
 
-				$.post('/config/set_notify_test',{'tag':'tgbot', 'data':JSON.stringify(pdata)},function(rdata){
+				$.post('/setting/set_notify_test',{'tag':'tgbot', 'data':JSON.stringify(pdata)},function(rdata){
 					showMsg(rdata.msg, function(){
 						if (rdata.status){
 							layer.close(index);
@@ -632,7 +632,7 @@ function getTgbot(){
 
 function getEmailCfg(){
 	var loadT = layer.msg('正在获取邮件配置信息...',{icon:16,time:0,shade: [0.3, '#000']});
-	$.post('/config/get_notify',{},function(data){
+	$.post('/setting/get_notify',{},function(data){
 		layer.close(loadT);
 
 		var smtp_host = 'smtp.163.com';
@@ -801,7 +801,7 @@ function getEmailCfg(){
 
 function getPanelSSL(){
 	var loadT = layer.msg('正在获取证书信息...',{icon:16,time:0,shade: [0.3, '#000']});
-	$.post('/config/get_panel_ssl',{},function(cert){
+	$.post('/setting/get_panel_ssl',{},function(cert){
 		layer.close(loadT);
 
 		// console.log(cert);
@@ -943,7 +943,7 @@ function getPanelSSL(){
 						var data = {};
 						data['choose'] = 'local';
 						var loadT = layer.msg('正在删除面板SSL【本地】...',{icon:16,time:0,shade: [0.3, '#000']});
-						$.post('/config/del_panel_ssl',data,function(rdata){
+						$.post('/setting/del_panel_ssl',data,function(rdata){
 							console.log(rdata);
 							layer.close(loadT);
 							showMsg(rdata.msg, function(){
@@ -998,7 +998,7 @@ function getPanelSSL(){
 
 
 function removeTempAccess(id){
-	$.post('/config/remove_temp_login', {id:id}, function(rdata){
+	$.post('/setting/remove_temp_login', {id:id}, function(rdata){
 		showMsg(rdata.msg, function(){
 			setTempAccessReq();
 		},{ icon: rdata.status ? 1 : 2 }, 2000);
@@ -1006,7 +1006,7 @@ function removeTempAccess(id){
 }
 
 function getTempAccessLogsReq(id){
-	$.post('/config/get_temp_login_logs', {id:id}, function(rdata){			
+	$.post('/setting/get_temp_login_logs', {id:id}, function(rdata){			
 		var tbody = '';
 		for (var i = 0; i < rdata.data.length; i++) {
 
@@ -1054,7 +1054,7 @@ function setTempAccessReq(page){
 		page = 1;
 	}
 
-	$.post('/config/get_temp_login', {page:page}, function(rdata){
+	$.post('/setting/get_temp_login', {page:page}, function(rdata){
 		if ( typeof(rdata.status) !='undefined' && !rdata.status){
 			showMsg(rdata.msg,function(){
 				layer.closeAll();
@@ -1228,7 +1228,7 @@ function setTempAccess(){
 
 //二次验证
 function setAuthBind(){
-	$.post('/config/get_auth_secret', {}, function(rdata){
+	$.post('/setting/get_auth_secret', {}, function(rdata){
 		console.log(rdata);
 		var tip = layer.open({
 			area: ['500px', '355px'],
@@ -1275,7 +1275,7 @@ function setAuthBind(){
 
 function setAuthSecretApi(){
 	var cfg_panel_auth = $('#cfg_panel_auth').prop("checked");
-	$.post('/config/set_auth_secret', {'op_type':"2"},function(rdata){
+	$.post('/setting/set_auth_secret', {'op_type':"2"},function(rdata){
 		showMsg(rdata.msg, function(){
 			if (rdata.data == 1){
 				setAuthBind();
@@ -1374,7 +1374,7 @@ function setBasicAuth(){
 	    {btn: ['确定', '取消'], title: "是否关闭BasicAuth认证?", icon:13}, function (index) {
 	    	var basic_user = '';
 			var basic_pwd = '';
-			$.post('/config/set_basic_auth', {'is_open':'false'},function(rdata){
+			$.post('/setting/set_basic_auth', {'is_open':'false'},function(rdata){
 				showMsg(rdata.msg, function(){
 					layer.close(index);
 					window.location.reload();
@@ -1387,7 +1387,7 @@ function setBasicAuth(){
 }
 
 function showPanelApi(){
-	$.post('/config/get_panel_token', '', function(rdata){
+	$.post('/setting/get_panel_token', '', function(rdata){
 		var tip = layer.open({
 			area: ['500px', '355px'],
 			title: '配置面板API',
@@ -1447,7 +1447,7 @@ function showPanelApi(){
 
 function setPanelApi(){
 	var cfg_panel_api = $('#cfg_panel_api').prop("checked");
-	$.post('/config/set_panel_token', {'op_type':"2"},function(rdata){
+	$.post('/setting/set_panel_token', {'op_type':"2"},function(rdata){
 		showMsg(rdata.msg, function(){
 			if (rdata.status){
 				showPanelApi();

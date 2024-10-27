@@ -8,10 +8,12 @@
 # Author: midoks <midoks@163.com>
 # ---------------------------------------------------------------------------------
 
+from admin.model import db, Tasks
 
-from flask import Blueprint, render_template
 
-blueprint = Blueprint('control', __name__, url_prefix='/control', template_folder='../../templates/default')
-@blueprint.route('/index', endpoint='index')
-def index():
-    return render_template('control.html',)
+
+def getTaskCount(
+		status: str | None = None
+	) -> int:
+
+	return Tasks.query.filter_by().count()

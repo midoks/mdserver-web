@@ -28,7 +28,7 @@ from admin.model import db as sys_db
 from admin import setup
 
 import core.mw as mw
-import setting
+import config
 import utils.config as utils_config
 
 root_dir = mw.getRunDir()
@@ -56,7 +56,7 @@ app.config['SESSION_COOKIE_NAME'] = "MW_VER_1"
 app.config['PERMANENT_SESSION_LIFETIME'] = timedelta(days=31)
 
 # db的配置
-app.config['SQLALCHEMY_DATABASE_URI'] = mw.getSqitePrefix()+setting.SQLITE_PATH  # 使用 SQLite 数据库
+app.config['SQLALCHEMY_DATABASE_URI'] = mw.getSqitePrefix()+config.SQLITE_PATH  # 使用 SQLite 数据库
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = True
 
 
@@ -66,7 +66,7 @@ Migrate(app, sys_db)
 
 # 检查数据库是否存在。如果没有就创建它。
 setup_db_required = False
-if not os.path.isfile(setting.SQLITE_PATH):
+if not os.path.isfile(config.SQLITE_PATH):
     setup_db_required = True
 
 # with app.app_context():
@@ -98,8 +98,8 @@ def requestCheck():
 
 @app.after_request
 def requestAfter(response):
-    response.headers['soft'] = setting.APP_NAME
-    response.headers['mw-version'] = setting.APP_VERSION
+    response.headers['soft'] = config.APP_NAME
+    response.headers['mw-version'] = config.APP_VERSION
     return response
 
 
@@ -111,17 +111,17 @@ def page_unauthorized(error):
 # 设置模板全局变量
 @app.context_processor
 def inject_global_variables():
-    ver = setting.APP_VERSION;
+    ver = config.APP_VERSION;
     if mw.isDebugMode():
         ver = ver + str(time.time())
 
     data = utils_config.getGlobalVar()
-    config = {
+    g_config = {
         'version': ver,
         'title' : '面板',
         'ip' : '127.0.0.1'
     }
-    return dict(config=config, data=data)
+    return dict(config=g_config, data=data)
 
 
 # from flasgger import Swagger
@@ -172,7 +172,7 @@ def inject_global_variables():
 
 # Log the startup
 app.logger.info('########################################################')
-app.logger.info('Starting %s v%s...', setting.APP_NAME, setting.APP_VERSION)
+app.logger.info('Starting %s v%s...', config.APP_NAME, config.APP_VERSION)
 app.logger.info('########################################################')
 app.logger.debug("Python syspath: %s", sys.path)
 

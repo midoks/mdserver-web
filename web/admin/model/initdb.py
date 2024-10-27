@@ -11,15 +11,15 @@
 
 from flask_sqlalchemy import SQLAlchemy
 # from flask_security import UserMixin, RoleMixin
-import setting
+import config
 
 SCHEMA_VERSION = 1
 
 
 db = SQLAlchemy(
     engine_options={
-        'pool_size': setting.CONFIG_DATABASE_CONNECTION_POOL_SIZE,
-        'max_overflow': setting.CONFIG_DATABASE_CONNECTION_MAX_OVERFLOW
+        'pool_size': config.CONFIG_DATABASE_CONNECTION_POOL_SIZE,
+        'max_overflow': config.CONFIG_DATABASE_CONNECTION_MAX_OVERFLOW
     }
 )
 
@@ -82,7 +82,7 @@ class Logs(db.Model):
     """定义日志"""
     __tablename__ = 'logs'
     id = db.Column(db.Integer(), primary_key=True,autoincrement=True, comment="ID")
-    uid = db.Column(db.Integer(), unique=True, nullable=False, comment="用户ID")
+    uid = db.Column(db.Integer(), unique=False, nullable=False, comment="用户ID")
     type = db.Column(db.String(128), unique=False, nullable=False, comment="日志类型")
     log = db.Column(db.TEXT, unique=False, nullable=True, comment="日志内容")
     add_time = db.Column(db.TEXT, nullable=False, comment="添加时间")

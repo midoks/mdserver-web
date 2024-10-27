@@ -9,11 +9,9 @@
 # ---------------------------------------------------------------------------------
 
 
-from .initdb import *
-from .logs import addLog
-from .option import getOption,getOptionByJson,setOption
-from .sites import getSitesCount
-from .task import getTaskCount
+from flask import Blueprint, render_template
 
-
-
+blueprint = Blueprint('monitor', __name__, url_prefix='/monitor', template_folder='../../templates/default')
+@blueprint.route('/index', endpoint='index')
+def index():
+    return render_template('monitor.html',)

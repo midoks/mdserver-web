@@ -37,7 +37,7 @@ def get_log_list():
     if search != '':
         pagination = Logs.query.filter_by(Logs.type.like(search) or Logs.log.like(search)).paginate(page=int(p), per_page=int(size))
     else:
-        pagination = Logs.query.filter_by().paginate(page=int(p), per_page=int(size))
+        pagination = Logs.query.filter_by().order_by(Logs.id.desc()).paginate(page=int(p), per_page=int(size))
   
     rows = []
     for item in pagination.items:

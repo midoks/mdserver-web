@@ -16,10 +16,10 @@ from admin import model
 import core.mw as mw
 
 # 默认页面
-blueprint = Blueprint('config', __name__, url_prefix='/config', template_folder='../../templates')
+blueprint = Blueprint('setting', __name__, url_prefix='/setting', template_folder='../../templates')
 @blueprint.route('/index', endpoint='index')
 def index():
-    return render_template('default/config.html')
+    return render_template('default/setting.html')
 
 
 
@@ -37,3 +37,12 @@ def set_webname():
         model.setOption('title', webname)
     return mw.returnData(True, '面板别名保存成功!')
 
+@blueprint.route('/set_ip', endpoint='set_ip', methods=['POST'])
+def set_ip():
+    host_ip = request.form.get('host_ip', '')
+    src_host_ip = model.getOption('server_ip')
+    if host_ip != src_host_ip:
+        model.setOption('server_ip', host_ip)
+    return mw.returnJson(True, 'IP保存成功!')
+
+ 

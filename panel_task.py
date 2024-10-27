@@ -28,8 +28,12 @@ web_dir = os.getcwd() + "/web"
 os.chdir(web_dir)
 sys.path.append(web_dir)
 
+from admin import app
+from admin import model
+
 import core.mw as mw
 import core.db as db
+
 
 print(mw.getPanelDir())
 
@@ -47,18 +51,18 @@ timeoutCount = 0
 isCheck = 0
 oldEdate = None
 
-logPath = os.getcwd() + '/tmp/panelExec.log'
-isTask = os.getcwd() + '/tmp/panelTask.pl'
+g_log_file = mw.getMWLogs() + '/panelExec.log'
+isTask = mw.getMWLogs() + '/panelTask.pl'
 
 if not os.path.exists(os.getcwd() + "/tmp"):
     os.system('mkdir -p ' + os.getcwd() + "/tmp")
 
-if not os.path.exists(logPath):
-    os.system("touch " + logPath)
+if not os.path.exists(g_log_file):
+    os.system("touch " + g_log_file)
 
 def execShell(cmdstring, cwd=None, timeout=None, shell=True):
     try:
-        global logPath
+        global g_log_file
         import shlex
         import datetime
         import subprocess
@@ -66,9 +70,8 @@ def execShell(cmdstring, cwd=None, timeout=None, shell=True):
         if timeout:
             end_time = datetime.datetime.now() + datetime.timedelta(seconds=timeout)
 
-        cmd = cmdstring + ' > ' + logPath + ' 2>&1'
-        sub = subprocess.Popen(
-            cmd, cwd=cwd, stdin=subprocess.PIPE, shell=shell, bufsize=4096)
+        cmd = cmdstring + ' > ' + g_log_file + ' 2>&1'
+        sub = subprocess.Popen(cmd, cwd=cwd, stdin=subprocess.PIPE, shell=shell, bufsize=4096)
         while sub.poll() is None:
             time.sleep(0.1)
 
@@ -140,14 +143,12 @@ def downloadFile(url, filename):
         import socket
         socket.setdefaulttimeout(300)
 
-        headers = (
-            'User-Agent', 'Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/87.0.4280.88 Safari/537.36')
+        headers = ('User-Agent', 'Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/87.0.4280.88 Safari/537.36')
         opener = urllib.request.build_opener()
         opener.addheaders = [headers]
         urllib.request.install_opener(opener)
 
-        urllib.request.urlretrieve(
-            url, filename=filename, reporthook=downloadHook)
+        urllib.request.urlretrieve(url, filename=filename, reporthook=downloadHook)
 
         if not mw.isAppleSystem():
             os.system('chown www.www ' + filename)
@@ -155,6 +156,7 @@ def downloadFile(url, filename):
         writeLogs('done')
     except Exception as e:
         writeLogs(str(e))
+    return True
 
 
 def downloadHook(count, blockSize, totalSize):
@@ -168,61 +170,66 @@ def downloadHook(count, blockSize, totalSize):
     writeLogs(json.dumps(speed))
 
 
-def writeLogs(logMsg):
+def writeLogs(data):
     # 写输出日志
     try:
-        global logPath
-        fp = open(logPath, 'w+')
-        fp.write(logMsg)
+        fp = open(g_log_file, 'w+')
+        fp.write(data)
         fp.close()
     except:
         pass
 
 
 def runTask():
-    global isTask
-    try:
-        if os.path.exists(isTask):
-            sql = db.Sql()
-            sql.table('tasks').where(
-                "status=?", ('-1',)).setField('status', '0')
-            taskArr = sql.table('tasks').where("status=?", ('0',)).field(
-                'id,type,execstr').order("id asc").select()
-            for value in taskArr:
-                start = int(time.time())
-                if not sql.table('tasks').where("id=?", (value['id'],)).count():
-                    continue
-                sql.table('tasks').where("id=?", (value['id'],)).save(
-                    'status,start', ('-1', start))
-                if value['type'] == 'download':
-                    argv = value['execstr'].split('|mw|')
-                    downloadFile(argv[0], argv[1])
-                elif value['type'] == 'execshell':
-                    execShell(value['execstr'])
-                end = int(time.time())
-                sql.table('tasks').where("id=?", (value['id'],)).save(
-                    'status,end', ('1', end))
+    
 
-                if(sql.table('tasks').where("status=?", ('0')).count() < 1):
-                    os.system('rm -f ' + isTask)
+    mw.writeLog("后台任务", "运行")
 
-            sql.close()
-    except Exception as e:
-        print(str(e))
+    print(model.getTaskCount())
+    # global isTask
+    # try:
+
+    #     if os.path.exists(isTask):
+    #         sql = db.Sql()
+    #         sql.table('tasks').where(
+    #             "status=?", ('-1',)).setField('status', '0')
+    #         taskArr = sql.table('tasks').where("status=?", ('0',)).field(
+    #             'id,type,execstr').order("id asc").select()
+    #         for value in taskArr:
+    #             start = int(time.time())
+    #             if not sql.table('tasks').where("id=?", (value['id'],)).count():
+    #                 continue
+    #             sql.table('tasks').where("id=?", (value['id'],)).save('status,start', ('-1', start))
+    #             if value['type'] == 'download':
+    #                 argv = value['execstr'].split('|mw|')
+    #                 downloadFile(argv[0], argv[1])
+    #             elif value['type'] == 'execshell':
+    #                 execShell(value['execstr'])
+    #             end = int(time.time())
+    #             sql.table('tasks').where("id=?", (value['id'],)).save(
+    #                 'status,end', ('1', end))
+
+    #             if(sql.table('tasks').where("status=?", ('0')).count() < 1):
+    #                 os.system('rm -f ' + isTask)
+
+    #         sql.close()
+    # except Exception as e:
+    #     print(str(e))
 
     # 站点过期检查
-    siteEdate()
+    # siteEdate()
 
 
-def startTask():
+def startPanelTask():
     # 任务队列
     try:
         while True:
             runTask()
-            time.sleep(2)
+            time.sleep(1)
     except Exception as e:
-        time.sleep(60)
-        startTask()
+        print(str(e))
+        time.sleep(10)
+        startPanelTask()
 
 
 def siteEdate():
@@ -605,33 +612,38 @@ def setDaemon(t):
         t.setDaemon(True)
     return t
 
+def run():
+    # # 系统监控
+    # sysTask = threading.Thread(target=systemTask)
+    # sysTask = setDaemon(sysTask)
+    # sysTask.start()
+
+    # # PHP 502错误检查线程
+    # php502 = threading.Thread(target=check502Task)
+    # php502 = setDaemon(php502)
+    # php502.start()
+
+    # # OpenResty Restart At Once Start
+    # oraos = threading.Thread(target=openrestyRestartAtOnce)
+    # oraos = setDaemon(oraos)
+    # oraos.start()
+
+
+    # # OpenResty Auto Restart Start
+    # oar = threading.Thread(target=openrestyAutoRestart)
+    # oar = setDaemon(oar)
+    # oar.start()
+
+
+    # # Panel Restart Start
+    # rps = threading.Thread(target=restartPanelService)
+    # rps = setDaemon(rps)
+    # rps.start()
+
+    # 面板后台任务
+    startPanelTask()
+
 if __name__ == "__main__":
-
-    # 系统监控
-    sysTask = threading.Thread(target=systemTask)
-    sysTask = setDaemon(sysTask)
-    sysTask.start()
-
-    # PHP 502错误检查线程
-    php502 = threading.Thread(target=check502Task)
-    php502 = setDaemon(php502)
-    php502.start()
-
-    # OpenResty Restart At Once Start
-    oraos = threading.Thread(target=openrestyRestartAtOnce)
-    oraos = setDaemon(oraos)
-    oraos.start()
-
-
-    # OpenResty Auto Restart Start
-    oar = threading.Thread(target=openrestyAutoRestart)
-    oar = setDaemon(oar)
-    oar.start()
-
-
-    # Panel Restart Start
-    rps = threading.Thread(target=restartPanelService)
-    rps = setDaemon(rps)
-    rps.start()
-
-    startTask()
+    with app.app_context():
+        run()
+    

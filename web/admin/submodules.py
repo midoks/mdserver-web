@@ -12,14 +12,14 @@
 from .dashboard import blueprint as DashboardModule
 from .site import blueprint as SiteModule
 from .task import blueprint as TaskModule
-from .config import blueprint as ConfigModule
+from .setting import blueprint as SettingModule
 from .logs import blueprint as LogsModule
 from .files import blueprint as FilesModule
 from .soft import blueprint as SoftModule
 from .plugins import blueprint as PluginsModule
 from .crontab import blueprint as CrontabModule
 from .firewall import blueprint as FirewallModule
-from .control import blueprint as ControlModule
+from .monitor import blueprint as MonitorModule
 from .system import blueprint as SystemModule
 
 def get_submodules():
@@ -33,7 +33,7 @@ def get_submodules():
         PluginsModule,
         CrontabModule,
         FirewallModule,
-        ControlModule,
+        MonitorModule,
         SystemModule,
-        ConfigModule,
+        SettingModule,
     ]
