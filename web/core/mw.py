@@ -94,6 +94,12 @@ def getServerDir():
 def getLogsDir():
     return getFatherDir() + '/wwwlogs'
 
+def getRecycleBinDir():
+    rb_dir = getFatherDir() + '/recycle_bin'
+    if not os.path.exists(rb_dir):
+        os.system('mkdir -p ' + rb_dir)
+    return rb_dir
+
 def getRandomString(length):
     # 取随机字符串
     rnd_str = ''

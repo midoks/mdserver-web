@@ -13,6 +13,9 @@ import os
 from flask import Blueprint, render_template
 from flask import request
 
+
+from admin import model
+
 import core.mw as mw
 import utils.file as file
 
@@ -25,35 +28,7 @@ def index():
 @blueprint.route('/get_body', endpoint='get_file_body', methods=['POST'])
 def get_file_body():
     path = request.form.get('path', '')
-
-    if not os.path.exists(path):
-        return mw.returnData(False, '文件不存在', (path,))
-
-    if os.path.getsize(path) > 2097152:
-        return mw.returnData(False, '不能在线编辑大于2MB的文件!')
-
-    if os.path.isdir(path):
-        return mw.returnData(False, '这不是一个文件!')
-
-    fp = open(path, 'rb')
-    data = {}
-    data['status'] = True
-    if fp:
-        srcBody = fp.read()
-        fp.close()
-
-        encoding_list = ['utf-8', 'GBK', 'BIG5']
-        for el in encoding_list:
-            try:
-                data['encoding'] = el
-                data['data'] = srcBody.decode(data['encoding'])
-                break
-            except Exception as ex:
-                if el == 'BIG5':
-                    return mw.returnData(False, '文件编码不被兼容，无法正确读取文件!' + str(ex))
-    else:
-        return mw.returnData(False, '文件未正常打开!')
-    return mw.returnData(True, 'OK', data)
+    return file.getFileBody(path)
 
 # 获取文件内容
 @blueprint.route('/save_body', endpoint='save_body', methods=['POST'])
@@ -74,7 +49,7 @@ def save_body():
 
         if path.find("web_conf") > 0:
             mw.restartWeb()
-        # mw.writeLog('文件管理', '文件[{1}]保存成功', (path,))
+        mw.writeLog('文件管理', '文件[{1}]保存成功', (path,))
         return mw.returnData(True, '文件保存成功')
     except Exception as ex:
         return mw.returnData(False, '文件保存错误:' + str(ex))
@@ -115,13 +90,39 @@ def get_dir():
     dir_list['page'] = mw.getPage({'p':page, 'row': row, 'tojs':'getFiles', 'count': dir_list['count']}, '1,2,3,4,5,6,7,8')
     return dir_list
 
-
 # 获取站点日志目录
 @blueprint.route('/get_dir_size', endpoint='get_dir_size', methods=['POST'])
 def get_dir_size():
     path = request.form.get('path', '')
     size = file.getDirSize(path)
     return mw.returnData(True, mw.toSize(size))
+
+
+# 删除文件
+@blueprint.route('/delete', endpoint='delete', methods=['POST'])
+def delete():
+    path = request.form.get('path', '')
+    return file.fileDelete(path)
+
+
+# 回收站文件
+@blueprint.route('/get_recycle_bin', endpoint='get_recycle_bin', methods=['POST'])
+def get_recycle_bin():
+    return file.getRecycleBin()
+
+# 回收站文件恢复
+@blueprint.route('/re_recycle_bin', endpoint='re_recycle_bin', methods=['POST'])
+def re_recycle_bin():
+    path = request.form.get('path', '')
+    return file.reRecycleBin(path)
+
+# 回收站文件
+@blueprint.route('/recycle_bin', endpoint='recycle_bin', methods=['POST'])
+def recycle_bin():
+    return file.toggleRecycleBin()
+
+
+
 
 
 

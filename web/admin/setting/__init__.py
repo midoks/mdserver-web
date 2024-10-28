@@ -51,12 +51,14 @@ def set_ip():
 @blueprint.route('/set_admin_path', endpoint='set_admin_path', methods=['POST'])
 def set_admin_path():
     admin_path = request.form.get('admin_path', '')
-    admin_path_sensitive = ['/', '/close', '/login',
-         '/do_login', '/site', '/sites',
-         '/download_file', '/control', '/crontab',
-         '/firewall', '/files', '/config', '/setting','/monitor'
-         '/soft', '/system', '/code',
-         '/ssl', '/plugins', '/hook']
+    admin_path_sensitive = [
+        '/', '/close', '/login',
+        '/do_login', '/site', '/sites',
+        '/download_file', '/control', '/crontab',
+        '/firewall', '/files', '/config', '/setting','/monitor'
+        '/soft', '/system', '/code',
+        '/ssl', '/plugins', '/hook'
+    ]
 
     if admin_path == '':
         admin_path = '/'

@@ -51,7 +51,7 @@ timeoutCount = 0
 isCheck = 0
 oldEdate = None
 
-g_log_file = mw.getMWLogs() + '/panelExec.log'
+g_log_file = mw.getMWLogs() + '/panel_task.log'
 isTask = mw.getMWLogs() + '/panelTask.pl'
 
 if not os.path.exists(os.getcwd() + "/tmp"):
@@ -183,7 +183,7 @@ def writeLogs(data):
 def runTask():
     
 
-    mw.writeLog("后台任务", "运行")
+    # mw.writeLog("后台任务", "运行")
 
     print(model.getTaskCount())
     # global isTask

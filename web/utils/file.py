@@ -10,8 +10,41 @@
 
 import os
 import pwd
+import time
+
+from admin import model
 
 import core.mw as mw
+
+def getFileBody(path):
+    if not os.path.exists(path):
+        return mw.returnData(False, '文件不存在', (path,))
+
+    if os.path.getsize(path) > 2097152:
+        return mw.returnData(False, '不能在线编辑大于2MB的文件!')
+
+    if os.path.isdir(path):
+        return mw.returnData(False, '这不是一个文件!')
+
+    fp = open(path, 'rb')
+    data = {}
+    data['status'] = True
+    if fp:
+        srcBody = fp.read()
+        fp.close()
+
+        encoding_list = ['utf-8', 'GBK', 'BIG5']
+        for el in encoding_list:
+            try:
+                data['encoding'] = el
+                data['data'] = srcBody.decode(data['encoding'])
+                break
+            except Exception as ex:
+                if el == 'BIG5':
+                    return mw.returnData(False, '文件编码不被兼容，无法正确读取文件!' + str(ex))
+    else:
+        return mw.returnData(False, '文件未正常打开!')
+    return mw.returnData(True, 'OK', data)
 
 # 获取文件权限描述
 def getFileStatsDesc(
@@ -240,3 +273,110 @@ def getAccess(fname):
         data['chmod'] = 755
         data['chown'] = 'www'
     return data
+
+def fileDelete(path):
+    if not os.path.exists(path):
+        return mw.returnData(False, '指定文件不存在!')
+
+    # 检查是否为.user.ini
+    if path.find('.user.ini') >= 0:
+        cmd = "which chattr && chattr -i {0}".format(path)
+        mw.execShell(cmd)
+
+    try:
+        recycle_bin = model.getOption('recycle_bin')
+        if recycle_bin == 'open':
+            if file.mvRecycleBin(path):
+                return mw.returnData(True, '已将文件移动到回收站!')
+            return mw.returnData(False, '移动到回收站失败!') 
+        os.remove(path)
+        mw.writeLog('文件管理', mw.getInfo('删除文件[{1}]成功!', (path,)))
+        return mw.returnData(True, '删除文件成功!')
+    except Exception as e:
+        return mw.returnData(False, '删除文件失败!')
+
+# 关闭
+def toggleRecycleBin():
+    recycle_bin = model.getOption('recycle_bin')
+    if recycle_bin == 'open':
+        model.setOption('recycle_bin','close')
+        mw.writeLog('文件管理', '已关闭回收站功能!')
+        return mw.returnData(True, '已关闭回收站功能!')
+    else:
+        model.setOption('recycle_bin','open')
+        mw.writeLog('文件管理', '已开启回收站功能!')
+        return mw.returnData(True, '已开启回收站功能!')
+
+def getRecycleBin():
+    rb_dir = mw.getRecycleBinDir()
+    recycle_bin = model.getOption('recycle_bin')
+
+    data = {}
+    data['dirs'] = []
+    data['files'] = []
+    data['status'] = False
+    if recycle_bin == 'open': 
+        data['status'] = True
+    
+    for file in os.listdir(rb_dir):
+        try:
+            tmp = {}
+            fname = rb_dir+'/'+ file
+            tmp1 = file.split('_mw_')
+            tmp2 = tmp1[len(tmp1) - 1].split('_t_')
+            tmp['rname'] = file
+            tmp['dname'] = file.replace('_mw_', '/').split('_t_')[0]
+            tmp['name'] = tmp2[0]
+            tmp['time'] = int(float(tmp2[1]))
+            if os.path.islink(fname):
+                filePath = os.readlink(fname)
+                link = ' -> ' + filePath
+                if os.path.exists(filePath):
+                    tmp['size'] = os.path.getsize(filePath)
+                else:
+                    tmp['size'] = 0
+            else:
+                tmp['size'] = os.path.getsize(fname)
+            if os.path.isdir(fname):
+                data['dirs'].append(tmp)
+            else:
+                data['files'].append(tmp)
+        except Exception as e:
+            continue
+
+    return mw.returnJson(True, 'OK', data)
+
+# 移动到回收站
+def mvRecycleBin(path):
+    rb_dir = mw.getRecycleBinDir()
+    rb_file = rb_dir + '/' + path.replace('/', '_mw_') + '_t_' + str(time.time())
+    try:
+        import shutil
+        shutil.move(path, rb_dir)
+        mw.writeLog('文件管理', mw.getInfo('移动[{1}]到回收站成功!', (path,)))
+        return True
+    except Exception as e:
+        mw.writeLog('文件管理', mw.getInfo('移动[{1}]到回收站失败!', (path,)))
+        return False
+
+# 回收站文件恢复
+def reRecycleBin(path):
+    rb_dir = mw.getRecycleBinDir()
+    dst_file = path.replace('_mw_', '/').split('_t_')[0]
+    try:
+        import shutil
+        shutil.move(rb_dir + '/' + path, dst_file)
+        msg = mw.getInfo('移动文件[{1}]到回收站成功!', (dst_file,))
+        mw.writeLog('文件管理', msg)
+        return mw.returnData(True, '恢复成功!')
+    except Exception as e:
+        msg = mw.getInfo('从回收站恢复[{1}]失败!', (dst_file,))
+        mw.writeLog('文件管理', msg)
+        return mw.returnData(False, '恢复失败!')
+
+# 设置文件和目录权限
+def setMode(path):
+    s_path = os.path.dirname(path)
+    p_stat = os.stat(s_path)
+    os.chown(path, p_stat.st_uid, p_stat.st_gid)
+    os.chmod(path, p_stat.st_mode)
