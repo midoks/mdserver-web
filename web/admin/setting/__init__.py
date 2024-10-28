@@ -37,6 +37,7 @@ def set_webname():
         model.setOption('title', webname)
     return mw.returnData(True, '面板别名保存成功!')
 
+# 设置服务器IP
 @blueprint.route('/set_ip', endpoint='set_ip', methods=['POST'])
 def set_ip():
     host_ip = request.form.get('host_ip', '')
