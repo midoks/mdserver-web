@@ -265,7 +265,7 @@ function modifyAuthPath() {
         title: "修改安全入口",
         closeBtn: 1,
         shift: 5,
-        btn:['提交','关闭'],
+        btn:['提交','关闭', '随机生成'],
         shadeClose: false,
         content: '<div class="bt-form bt-form pd20">\
                     <div class="line ">\
@@ -282,25 +282,30 @@ function modifyAuthPath() {
 		    	cancel:function(){
 				}}, function() {
 					var loadT = layer.msg(lan.config.config_save, { icon: 16, time: 0, shade: [0.3, '#000'] });
-				    $.post('/config/set_admin_path', { admin_path: auth_path }, function (rdata) {
+				    $.post('/setting/set_admin_path', { admin_path: auth_path }, function (rdata) {
 				    	showMsg(rdata.msg, function(){
 				    		layer.close(index);
 				    		layer.close(loadT);
-				    		$("#admin_path").val(auth_path);
+				    		location.reload();
 				    	},{ icon: rdata.status ? 1 : 2 }, 2000);
 					},'json');
 				});
 		    	return;
 		    } else {
 		    	var loadT = layer.msg(lan.config.config_save, { icon: 16, time: 0, shade: [0.3, '#000'] });
-			    $.post('/config/set_admin_path', { admin_path: auth_path }, function (rdata) {
+			    $.post('/setting/set_admin_path', { admin_path: auth_path }, function (rdata) {
 			    	showMsg(rdata.msg, function(){
 			    		layer.close(index);
 			    		layer.close(loadT);
-			    		$("#admin_path").val(auth_path);
+			    		location.reload();
 			    	},{ icon: rdata.status ? 1 : 2 }, 2000);
 			    },'json');
 		    }
+        },
+        btn3:function(){
+        	var rand_str = getRandomString(8);
+        	$("input[name='auth_path_set']").val('/'+rand_str);
+        	return false;
         }
     });
 }
