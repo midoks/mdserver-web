@@ -259,6 +259,8 @@ function myPerfOpt() {
                             <option value="3">4-8GB</option>\
                             <option value="4">8-16GB</option>\
                             <option value="5">16-32GB</option>\
+                            <option value="6">32-64GB</option>\
+                            <option value="7">64-128GB</option>\
                         </select>\
                         <span>' + lan.soft.mysql_set_maxmem + ': </span><input style="width:70px;background-color:#eee;" class="bt-input-text mr5" name="memSize" type="text" value="' + memSize.toFixed(2) + '" readonly>MB\
                         </div>\
@@ -438,6 +440,36 @@ function mySQLMemOpt(opt) {
             $("input[name='thread_cache_size']").val(256);
             $("input[name='table_open_cache']").val(2048);
             $("input[name='max_connections']").val(500);
+            break;
+        case '6':
+            $("input[name='key_buffer_size']").val(2048);
+            if (query_size) $("input[name='query_cache_size']").val(384);
+            $("input[name='tmp_table_size']").val(4096);
+            $("input[name='innodb_buffer_pool_size']").val(8192);
+            $("input[name='sort_buffer_size']").val(8192);
+            $("input[name='read_buffer_size']").val(8192);
+            $("input[name='read_rnd_buffer_size']").val(4096);
+            $("input[name='join_buffer_size']").val(16384);
+            $("input[name='thread_stack']").val(1024);
+            $("input[name='binlog_cache_size']").val(512);
+            $("input[name='thread_cache_size']").val(512);
+            $("input[name='table_open_cache']").val(4096);
+            $("input[name='max_connections']").val(1000);
+            break;
+        case '7':
+            $("input[name='key_buffer_size']").val(4096);
+            if (query_size) $("input[name='query_cache_size']").val(384);
+            $("input[name='tmp_table_size']").val(8192);
+            $("input[name='innodb_buffer_pool_size']").val(16384);
+            $("input[name='sort_buffer_size']").val(16384);
+            $("input[name='read_buffer_size']").val(16384);
+            $("input[name='read_rnd_buffer_size']").val(8192);
+            $("input[name='join_buffer_size']").val(16384);
+            $("input[name='thread_stack']").val(2048);
+            $("input[name='binlog_cache_size']").val(1024);
+            $("input[name='thread_cache_size']").val(1024);
+            $("input[name='table_open_cache']").val(8192);
+            $("input[name='max_connections']").val(2000);
             break;
     }
 }
