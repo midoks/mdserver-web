@@ -20,12 +20,16 @@ from flask_socketio import SocketIO, emit, send
 from flask import Flask, abort, request, current_app, session, url_for
 from flask import Blueprint, render_template
 from flask import render_template_string
-from flask_migrate import Migrate
 
+from flask_migrate import Migrate
+from flask_caching import Cache
 from werkzeug.local import LocalProxy
 
-from admin.model import db as sys_db
+from admin import model
 from admin import setup
+
+from admin.model import db as sys_db
+
 
 import core.mw as mw
 import config
@@ -59,6 +63,9 @@ app.config['PERMANENT_SESSION_LIFETIME'] = timedelta(days=31)
 app.config['SQLALCHEMY_DATABASE_URI'] = mw.getSqitePrefix()+config.SQLITE_PATH  # 使用 SQLite 数据库
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = True
 
+# 缓存配置
+cache = Cache(config={'CACHE_TYPE': 'simple'})
+cache.init_app(app, config={'CACHE_TYPE': 'simple'})
 
 # 初始化db
 sys_db.init_app(app)
@@ -90,6 +97,7 @@ for module in get_submodules():
     app.logger.info('Registering blueprint module: %s' % module)
     if app.blueprints.get(module.name) is None:
         app.register_blueprint(module)
+
 
 @app.before_request
 def requestCheck():

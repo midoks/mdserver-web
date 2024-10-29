@@ -11,3 +11,5 @@
 import os
 
 IS_WIN = (os.name == 'nt')
+
+

@@ -19,6 +19,7 @@ import core.mw as mw
 
 blueprint = Blueprint('firewall', __name__, url_prefix='/firewall', template_folder='../../templates/default')
 @blueprint.route('/index', endpoint='index')
+@panel_login_required
 def index():
     return render_template('firewall.html')
 
@@ -51,12 +52,14 @@ def get_list():
 
 # 获取站点日志目录
 @blueprint.route('/get_www_path', endpoint='get_www_path', methods=['POST'])
+@panel_login_required
 def get_www_path():
     path = mw.getLogsDir()
     return {'path': path}
 
 # 获取站点日志目录
 @blueprint.route('/get_ssh_info', endpoint='get_ssh_info', methods=['POST'])
+@panel_login_required
 def get_ssh_info():
     pass
 

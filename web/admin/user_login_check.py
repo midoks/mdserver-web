@@ -10,10 +10,16 @@
 
 from functools import wraps
 
+from admin import model
+from admin import session
+from admin.common import isLogined
+
 def panel_login_required(func):
-    
+
     @wraps(func)
     def wrapper(*args, **kwargs):
-        # print('panel_login_required', args, kwargs)
+        if not isLogined():
+            return {'status':False, 'msg':'未登录/登录过期'}
+
         return func(*args, **kwargs)
     return wrapper

@@ -12,10 +12,11 @@
 from flask import Blueprint, render_template
 from flask import request
 
-from utils.mwplugin import MwPlugin
-
-import core.mw as mw
 from admin.model import Sites
+from admin.user_login_check import panel_login_required
+
+from utils.mwplugin import MwPlugin
+import core.mw as mw
 
 blueprint = Blueprint('site', __name__, url_prefix='/site', template_folder='../../templates/default')
 @blueprint.route('/index', endpoint='index')
@@ -24,6 +25,7 @@ def index():
 
 # 插件列表
 @blueprint.route('/list', endpoint='list', methods=['GET','POST'])
+@panel_login_required
 def list():
     p = request.form.get('p', '1')
     limit = request.form.get('limit', '10')
@@ -55,5 +57,6 @@ def list():
     return data
 
 @blueprint.route('/get_site_types', endpoint='get_site_types',methods=['POST'])
+@panel_login_required
 def get_site_types():
     return []

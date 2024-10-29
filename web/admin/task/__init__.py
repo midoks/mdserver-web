@@ -14,6 +14,7 @@ from flask import request
 
 from admin import model
 from admin.model import db,Tasks
+from admin.user_login_check import panel_login_required
 
 import core.mw as mw
 
@@ -21,11 +22,13 @@ blueprint = Blueprint('task', __name__, url_prefix='/task', template_folder='../
 
 
 @blueprint.route('/count', endpoint='task_count')
+@panel_login_required
 def task_count():
     return str(model.getTaskUnexecutedCount())
 
 
 @blueprint.route('/list', endpoint='list', methods=['POST'])
+@panel_login_required
 def list():
     p = request.form.get('p', '1')
     limit = request.form.get('limit', '10').strip()
@@ -53,12 +56,14 @@ def list():
     return data
 
 @blueprint.route('/get_exec_log', endpoint='get_exec_log', methods=['POST'])
+@panel_login_required
 def get_exec_log():
     file = mw.getPanelTaskLog()
     return mw.getLastLine(file, 100)
 
 
 @blueprint.route('/get_task_speed', endpoint='get_task_speed', methods=['POST'])
+@panel_login_required
 def get_task_speed():
     count = model.getTaskUnexecutedCount()
     if count == 0:

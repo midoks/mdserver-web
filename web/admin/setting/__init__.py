@@ -14,23 +14,28 @@ from flask import Blueprint, render_template
 from flask import request
 
 from admin import model
+from admin.user_login_check import panel_login_required
+
 import core.mw as mw
 
 # 默认页面
 blueprint = Blueprint('setting', __name__, url_prefix='/setting', template_folder='../../templates')
 @blueprint.route('/index', endpoint='index')
+@panel_login_required
 def index():
     return render_template('default/setting.html')
 
 
 
 @blueprint.route('/get_panel_list', endpoint='get_panel_list', methods=['POST'])
+@panel_login_required
 def get_panel_list():
     return []
 
 
 # 设置面板名称
 @blueprint.route('/set_webname', endpoint='set_webname', methods=['POST'])
+@panel_login_required
 def set_webname():
     webname = request.form.get('webname', '')
     src_webname = model.getOption('title')
@@ -40,6 +45,7 @@ def set_webname():
 
 # 设置服务器IP
 @blueprint.route('/set_ip', endpoint='set_ip', methods=['POST'])
+@panel_login_required
 def set_ip():
     host_ip = request.form.get('host_ip', '')
     src_host_ip = model.getOption('server_ip')
@@ -49,6 +55,7 @@ def set_ip():
 
 # 默认备份目录
 @blueprint.route('/set_backup_dir', endpoint='set_backup_dir', methods=['POST'])
+@panel_login_required
 def set_backup_dir():
     backup_path = request.form.get('backup_path', '')
     src_backup_path = model.getOption('backup_path')
@@ -58,6 +65,7 @@ def set_backup_dir():
 
 # 默认站点目录
 @blueprint.route('/set_www_dir', endpoint='set_www_dir', methods=['POST'])
+@panel_login_required
 def set_www_dir():
     sites_path = request.form.get('sites_path', '')
     src_sites_path = model.getOption('sites_path')
@@ -68,6 +76,7 @@ def set_www_dir():
 
 # 设置安全入口
 @blueprint.route('/set_admin_path', endpoint='set_admin_path', methods=['POST'])
+@panel_login_required
 def set_admin_path():
     admin_path = request.form.get('admin_path', '')
     admin_path_sensitive = [

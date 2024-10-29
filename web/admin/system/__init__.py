@@ -12,14 +12,18 @@
 from flask import Blueprint, render_template
 from flask import request
 
+from admin.user_login_check import panel_login_required
+import admin.model.option as option
+
 import core.mw as mw
 import utils.system as sys
-import admin.model.option as option
+
 
 blueprint = Blueprint('system', __name__, url_prefix='/system', template_folder='../../templates')
 
 # 获取系统的统计信息
 @blueprint.route('/system_total', endpoint='system_total')
+@panel_login_required
 def system_total():
     data = sys.getMemInfo()
     cpu = sys.getCpuInfo(interval=1)
@@ -32,6 +36,7 @@ def system_total():
 
 # 获取系统的网络流量信息
 @blueprint.route('/network', endpoint='network')
+@panel_login_required
 def network():
     stat = {}
     stat['cpu'] = sys.getCpuInfo()
@@ -43,12 +48,14 @@ def network():
 
 # 获取系统的磁盘信息
 @blueprint.route('/disk_info', endpoint='disk_info')
+@panel_login_required
 def disk_info():
     data = sys.getDiskInfo()
     return data
 
 # 获取系统的负载统计信息
 @blueprint.route('/get_load_average', endpoint='get_load_average', methods=['GET'])
+@panel_login_required
 def get_load_average():
     start = request.args.get('start', '')
     end = request.args.get('end', '')
@@ -62,6 +69,7 @@ def get_load_average():
 
 # 获取系统的磁盘IO统计信息
 @blueprint.route('/get_disk_io', endpoint='get_disk_io', methods=['GET'])
+@panel_login_required
 def get_disk_io():
     start = request.args.get('start', '')
     end = request.args.get('end', '')
@@ -73,6 +81,7 @@ def get_disk_io():
 
 # 获取系统的CPU/IO统计信息
 @blueprint.route('/get_cpu_io', endpoint='get_cpu_io', methods=['GET'])
+@panel_login_required
 def get_cpu_io():
     start = request.args.get('start', '')
     end = request.args.get('end', '')
@@ -87,6 +96,7 @@ def get_cpu_io():
 
 # 获取系统网络IO统计信息
 @blueprint.route('/get_network_io', endpoint='get_network_io', methods=['GET'])
+@panel_login_required
 def get_network_io():
     start = request.args.get('start', '')
     end = request.args.get('end', '')
@@ -100,6 +110,7 @@ def get_network_io():
 
 # 获取系统网络IO统计信息
 @blueprint.route('/set_control', endpoint='set_control', methods=['POST'])
+@panel_login_required
 def set_control():
     stype = request.form.get('type', '')
     day = request.form.get('day', '')
@@ -153,6 +164,7 @@ def set_control():
 
 # 升级检测
 @blueprint.route('/update_server', endpoint='update_server')
+@panel_login_required
 def update_server():
     panel_type = request.args.get('type', 'check')
     version = request.args.get('version', '')

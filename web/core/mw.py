@@ -422,6 +422,22 @@ def getLastLine(path, num, p=1):
 
     return "\n".join(data)
 
+# 获取系统温度
+def getSystemDeviceTemperature():
+    import psutil
+    if not hasattr(psutil, "sensors_temperatures"):
+        return False, "platform not supported"
+    temps = psutil.sensors_temperatures()
+    if not temps:
+        return False, "can't read any temperature"
+    for name, entries in temps.items():
+        for entry in entries:
+            return True, entry.label
+            # print("%-20s %s °C (high = %s °C, critical = %s °C)" % (
+            #     entry.label or name, entry.current, entry.high,
+            #     entry.critical))
+    return False, ""
+
 def getPage(args, result='1,2,3,4,5,8'):
     data = getPageObject(args, result)
     return data[0]

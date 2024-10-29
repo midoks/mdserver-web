@@ -12,6 +12,7 @@
 from flask import Blueprint, render_template
 from flask import request
 
+from admin.user_login_check import panel_login_required
 from admin.model import Crontab
 
 blueprint = Blueprint('crontab', __name__, url_prefix='/crontab', template_folder='../../templates/default')
@@ -21,6 +22,7 @@ def index():
 
 # 插件列表
 @blueprint.route('/list', endpoint='list', methods=['GET','POST'])
+@panel_login_required
 def list():
     page = request.args.get('p', 1)
     size = 10

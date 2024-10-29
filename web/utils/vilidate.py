@@ -30,7 +30,7 @@ class vieCode:
     __inCurve = True  # 是否画干扰线
     __inNoise = True  # 是否画干扰点
     __type = 2  # 验证码类型 1、纯字母  2、数字字母混合
-    __fontPatn = 'class/fonts/2.ttf'  # 字体
+    __fontPatn = 'static/fonts/2.ttf'  # 字体
 
     def GetCodeImage(self, size=80, length=4):
         '''获取验证码图片
