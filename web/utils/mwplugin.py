@@ -15,6 +15,8 @@ import json
 import threading
 import multiprocessing
 
+from admin import model
+
 import core.mw as mw
 import admin.model.option as option
 
@@ -191,11 +193,11 @@ class MwPlugin(object):
             version
         )
 
+        title = '{0}[{1}-{2}]'.format(msg_head,name,version)
+        model.addTask(name=title,cmd=exec_bash, status=0)
+
         if mw.isDebugMode():
             print(exec_bash)
-
-        title = '{0}[{1}-{2}]'.format(msg_head,name,version)
-
         return mw.returnData(True, '已将安装任务添加到队列!')
 
     # 卸载插件

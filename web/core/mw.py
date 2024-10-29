@@ -87,6 +87,9 @@ def getMWLogs():
 def getPanelTmp():
     return getPanelDir() + '/tmp'
 
+def getPanelTaskLog():
+    return getMWLogs() + '/panel_task.log'
+
 
 def getServerDir():
     return getFatherDir() + '/server'

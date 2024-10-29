@@ -156,8 +156,8 @@ class Tasks(db.Model):
     __tablename__ = 'tasks'
     id = db.Column(db.Integer(), primary_key=True,autoincrement=True, comment="ID")
     name = db.Column(db.TEXT, unique=False, nullable=False, comment="任务名称")
-    type = db.Column(db.TEXT, unique=False, nullable=False, comment="域名")
-    execstr = db.Column(db.TEXT, unique=False, nullable=False, comment="执行命令")
+    type = db.Column(db.TEXT, unique=False, nullable=False, comment="类型")
+    cmd = db.Column(db.TEXT, unique=False, nullable=False, comment="执行命令")
     start = db.Column(db.Integer(), unique=False, nullable=True, comment="开始执行时间")
     end = db.Column(db.Integer(), unique=False, nullable=True, comment="结束执行时间")
     status = db.Column(db.Integer(), unique=False, nullable=True, default=1, comment="状态")

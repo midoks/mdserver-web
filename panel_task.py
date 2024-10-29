@@ -35,7 +35,7 @@ import core.mw as mw
 import core.db as db
 
 
-print(mw.getPanelDir())
+# print(mw.getPanelDir())
 
 # print sys.path
 
@@ -51,11 +51,8 @@ timeoutCount = 0
 isCheck = 0
 oldEdate = None
 
-g_log_file = mw.getMWLogs() + '/panel_task.log'
+g_log_file = mw.getPanelTaskLog()
 isTask = mw.getMWLogs() + '/panelTask.pl'
-
-if not os.path.exists(os.getcwd() + "/tmp"):
-    os.system('mkdir -p ' + os.getcwd() + "/tmp")
 
 if not os.path.exists(g_log_file):
     os.system("touch " + g_log_file)
@@ -180,60 +177,44 @@ def writeLogs(data):
         pass
 
 
-def runTask():
-    
+def runPanelTask():
+    try:
+        bash_list = model.getTaskList(status=-1)
+        for task in bash_list:
+            model.setTaskStatus(task['id'], 0)
 
-    # mw.writeLog("后台任务", "运行")
-
-    print(model.getTaskCount())
-    # global isTask
-    # try:
-
-    #     if os.path.exists(isTask):
-    #         sql = db.Sql()
-    #         sql.table('tasks').where(
-    #             "status=?", ('-1',)).setField('status', '0')
-    #         taskArr = sql.table('tasks').where("status=?", ('0',)).field(
-    #             'id,type,execstr').order("id asc").select()
-    #         for value in taskArr:
-    #             start = int(time.time())
-    #             if not sql.table('tasks').where("id=?", (value['id'],)).count():
-    #                 continue
-    #             sql.table('tasks').where("id=?", (value['id'],)).save('status,start', ('-1', start))
-    #             if value['type'] == 'download':
-    #                 argv = value['execstr'].split('|mw|')
-    #                 downloadFile(argv[0], argv[1])
-    #             elif value['type'] == 'execshell':
-    #                 execShell(value['execstr'])
-    #             end = int(time.time())
-    #             sql.table('tasks').where("id=?", (value['id'],)).save(
-    #                 'status,end', ('1', end))
-
-    #             if(sql.table('tasks').where("status=?", ('0')).count() < 1):
-    #                 os.system('rm -f ' + isTask)
-
-    #         sql.close()
-    # except Exception as e:
-    #     print(str(e))
+        run_list = model.getTaskList(status=0)
+        for run_task in run_list:
+            start = int(time.time())
+            model.setTaskData(run_task['id'], start=start)
+            model.setTaskStatus(run_task['id'], -1)
+            if run_task['type'] == 'download':
+                argv = run_task['cmd'].split('|mw|')
+                downloadFile(argv[0], argv[1])
+            elif run_task['type'] == 'execshell':
+                execShell(run_task['cmd'])
+            end = int(time.time())
+            model.setTaskData(run_task['id'], end=end)
+            model.setTaskStatus(run_task['id'], 1)
+    except Exception as e:
+        print(str(e))
 
     # 站点过期检查
     # siteEdate()
 
-
+# 任务队列
 def startPanelTask():
-    # 任务队列
     try:
         while True:
-            runTask()
+            runPanelTask()
             time.sleep(1)
     except Exception as e:
         print(str(e))
         time.sleep(10)
         startPanelTask()
 
-
+# 网站到期处理
 def siteEdate():
-    # 网站到期处理
     global oldEdate
     try:
         if not oldEdate:
@@ -430,7 +411,7 @@ def check502():
         verlist = [
             '52', '53', '54', '55', '56', '70',
             '71', '72', '73', '74', '80', '81', 
-            '82', '83'
+            '82', '83', '84'
         ]
         for ver in verlist:
             sdir = mw.getServerDir()

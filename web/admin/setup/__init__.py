@@ -8,4 +8,6 @@
 # Author: midoks <midoks@163.com>
 # ---------------------------------------------------------------------------------
 
-from .user import *
+from .user import init_admin_user
+from .option import init_option
+

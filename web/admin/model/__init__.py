@@ -8,12 +8,16 @@
 # Author: midoks <midoks@163.com>
 # ---------------------------------------------------------------------------------
 
-
 from .initdb import *
+
 from .logs import addLog
+
 from .option import getOption,getOptionByJson,setOption
+from .option import setOption
+
 from .sites import getSitesCount
-from .task import getTaskCount
 
-
+from .task import addTask
+from .task import getTaskCount,getTaskUnexecutedCount,getTaskList,getTaskFirstByRun
+from .task import setTaskStatus,setTaskData
 

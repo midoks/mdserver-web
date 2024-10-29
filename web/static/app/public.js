@@ -1400,7 +1400,7 @@ function remind(a){
 						<span class="rs-time">'+cos_text+'</span>\
 					</div>\
 				</td>\
-				<td class="text-right c3">'+g.data[d].addtime+'</td>\
+				<td class="text-right c3">'+g.data[d].add_time+'</td>\
 			</tr>';
 		}
 		var con = '<div class="divtable"><table class="table table-hover">\
@@ -1458,7 +1458,7 @@ function getReloads() {
 		a++;
 		$.post('/task/get_task_speed', '', function(h) {
 			if(h.task == undefined) {
-				$(".cmdlist").html(lan.bt.task_not_list);
+				$(".cmdlist").html('当前没有任务!');
 				return;
 			}
 			var b = "";
