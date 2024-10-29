@@ -85,9 +85,8 @@ def get_task_speed():
                     break
             except Exception as e:
                 if i == 2:
-                    mw.M('tasks').where("id=?", (row['id'],)).save(
-                        'status', ('0',))
-                    return mw.returnJson(False, '当前没有任务队列在执行-4:' + str(e))
+                    model.setTaskStatus(row['id'],0)
+                    return mw.returnData(False, '当前没有任务队列在执行-4:' + str(e))
             time.sleep(0.5)
     else:
         data['msg'] = mw.getLastLine(task_logfile, 10)
@@ -96,9 +95,6 @@ def get_task_speed():
 
     data['task'] = model.getTaskList(status=-1)
     return data
-
-    # file = mw.getPanelTaskLog()
-    # return mw.getLastLine(file, 100)
     
 
 
