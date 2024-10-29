@@ -21,6 +21,7 @@ import utils.adult_log as adult_log
 # 日志页面
 blueprint = Blueprint('logs', __name__, url_prefix='/logs', template_folder='../../templates')
 @blueprint.route('/index', endpoint='index')
+@panel_login_required
 def index():
     return render_template('default/logs.html')
 
