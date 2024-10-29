@@ -144,6 +144,12 @@ class MwPlugin(object):
         plist = self.checkStatusMThreads(plist)
         return plist
 
+    def menuGetAbsPath(self, tag, path):
+        if path[0:1] == '/':
+            return path
+        else:
+            return mw.getPluginDir() + '/' + tag + '/' + path
+
     def addIndex(self, name, version):
         vname = name + '-' + version
         indexList = option.getOptionByJson('display_index')
@@ -166,6 +172,66 @@ class MwPlugin(object):
         print(indexList)
         option.setOption('display_index', json.dumps(indexList))
         return mw.returnData(True, '删除成功!')
+
+    def hookInstallOption(self, hook_name, info):
+        hn_name = 'hook_'+hook_name
+        src_data = option.getOptionByJson(hn_name,type='hook',default=[])
+        isNeedAdd = True
+        for x in range(len(src_data)):
+            if src_data[x]['title'] == info['title'] and src_data[x]['name'] == info['name']:
+                isNeedAdd = False
+
+        if isNeedAdd:
+            src_data.append(info)
+
+        option.setOption(hn_name, json.dumps(src_data), type='hook')
+        return True
+
+    def hookUninstallOption(self, hook_name, info):
+        hn_name = 'hook_'+hook_name
+        src_data = option.getOptionByJson(hn_name,type='hook',default=[])
+        for idx in range(len(src_data)):
+            if src_data[idx]['name'] == info['name']:
+                src_data.remove(src_data[idx])
+                break
+        option.setOption(hn_name, json.dumps(src_data), type='hook')
+        return True
+
+    def hookInstall(self, info):
+        valid_hook = ['backup', 'database']
+        valid_list_hook = ['menu', 'global_static', 'site_cb']
+        if 'hook' in info:
+            hooks = info['hook']
+            for h in hooks:
+                hooks_type = type(h)
+                if hooks_type == dict:
+                    tag = h['tag']
+                    if tag in valid_list_hook:
+                        self.hookInstallOption(tag, h[tag])
+                elif hooks_type == str:
+                    for x in hooks:
+                        if x in valid_hook:
+                            self.hookInstallOption(x, info)
+                            return True
+        return False
+
+    def hookUninstall(self, info):
+        valid_hook = ['backup', 'database']
+        valid_list_hook = ['menu', 'global_static', 'site_cb']
+        if 'hook' in info:
+            hooks = info['hook']
+            for h in hooks:
+                hooks_type = type(h)
+                if hooks_type == dict:
+                    tag = h['tag']
+                    if tag in valid_list_hook:
+                        self.hookUninstallOption(tag, h[tag])
+                elif hooks_type == str:
+                    for x in hooks:
+                        if x in valid_hook:
+                            self.hookUninstallOption(x, info)
+                            return True
+        return False
 
     def install(self, name, version,
         upgrade: bool | None = None
@@ -193,11 +259,12 @@ class MwPlugin(object):
             version
         )
 
+        self.hookInstall(info_data)
         title = '{0}[{1}-{2}]'.format(msg_head,name,version)
         model.addTask(name=title,cmd=exec_bash, status=0)
 
-        if mw.isDebugMode():
-            print(exec_bash)
+        # 调式日志
+        mw.debugLog(exec_bash)
         return mw.returnData(True, '已将安装任务添加到队列!')
 
     # 卸载插件
@@ -220,13 +287,10 @@ class MwPlugin(object):
             info_data['shell'],
             version
         )
-
+        self.hookUninstall(info_data)
         data = mw.execShell(exec_bash)
-        if mw.isDebugMode():
-            print(exec_bash)
-            print(data[0], data[1])
-
         self.removeIndex(name, version)
+        mw.debugLog(exec_bash, data)
         return mw.returnData(True, '卸载执行成功!')
 
     # 插件搜索匹配

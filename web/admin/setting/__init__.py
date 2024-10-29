@@ -47,6 +47,25 @@ def set_ip():
         model.setOption('server_ip', host_ip)
     return mw.returnData(True, 'IP保存成功!')
 
+# 默认备份目录
+@blueprint.route('/set_backup_dir', endpoint='set_backup_dir', methods=['POST'])
+def set_backup_dir():
+    backup_path = request.form.get('backup_path', '')
+    src_backup_path = model.getOption('backup_path')
+    if backup_path != src_backup_path:
+        model.setOption('backup_path', backup_path)
+    return mw.returnData(True, '修改默认备份目录成功!')
+
+# 默认站点目录
+@blueprint.route('/set_www_dir', endpoint='set_www_dir', methods=['POST'])
+def set_www_dir():
+    sites_path = request.form.get('sites_path', '')
+    src_sites_path = model.getOption('sites_path')
+    if sites_path != src_sites_path:
+        model.setOption('sites_path', sites_path)
+    return mw.returnData(True, '修改默认建站目录成功!')
+
+
 # 设置安全入口
 @blueprint.route('/set_admin_path', endpoint='set_admin_path', methods=['POST'])
 def set_admin_path():

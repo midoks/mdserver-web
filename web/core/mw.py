@@ -511,6 +511,12 @@ def isNumber(s):
 
     return False
 
+def debugLog(*data):
+    if isDebugMode():
+        print(data)
+    return True
+
+
 def writeLog(stype, msg, args=()):
     # 写日志
     uid = 0
@@ -539,6 +545,106 @@ def M(table):
     import core.db as db
     sql = db.Sql()
     return sql.table(table)
+
+# ------------------------------ openresty start -----------------------------
+
+def restartWeb():
+    return opWeb("reload")
+
+def isInstalledWeb():
+    path = getServerDir() + '/openresty/nginx/sbin/nginx'
+    if os.path.exists(path):
+        return True
+    return False
+
+def opWeb(method):
+    if not isInstalledWeb():
+        return False
+
+    # systemd
+    systemd = '/lib/systemd/system/openresty.service'
+    if os.path.exists(systemd):
+        execShell('systemctl ' + method + ' openresty')
+        return True
+
+    # initd
+    initd = getServerDir() + '/openresty/init.d/openresty'
+
+    if os.path.exists(initd):
+        execShell(initd + ' ' + method)
+        return True
+
+    return False
+def opLuaMake(cmd_name):
+    path = getServerDir() + '/web_conf/nginx/lua/lua.conf'
+    root_dir = getServerDir() + '/web_conf/nginx/lua/' + cmd_name
+    dst_path = getServerDir() + '/web_conf/nginx/lua/' + cmd_name + '.lua'
+    def_path = getServerDir() + '/web_conf/nginx/lua/empty.lua'
+
+    if not os.path.exists(root_dir):
+        execShell('mkdir -p ' + root_dir)
+
+    files = []
+    for fl in os.listdir(root_dir):
+        suffix = getFileSuffix(fl)
+        if suffix != 'lua':
+            continue
+        flpath = os.path.join(root_dir, fl)
+        files.append(flpath)
+
+    if len(files) > 0:
+        def_path = dst_path
+        content = ''
+        for f in files:
+            t = readFile(f)
+            f_base = os.path.basename(f)
+            content += '-- ' + '*' * 20 + ' ' + f_base + ' start ' + '*' * 20 + "\n"
+            content += t
+            content += "\n" + '-- ' + '*' * 20 + ' ' + f_base + ' end ' + '*' * 20 + "\n"
+        writeFile(dst_path, content)
+    else:
+        if os.path.exists(dst_path):
+            os.remove(dst_path)
+
+    conf = readFile(path)
+    conf = re.sub(cmd_name + ' (.*);',
+                  cmd_name + " " + def_path + ";", conf)
+    writeFile(path, conf)
+
+
+def opLuaInitFile():
+    opLuaMake('init_by_lua_file')
+
+
+def opLuaInitWorkerFile():
+    opLuaMake('init_worker_by_lua_file')
+
+
+def opLuaInitAccessFile():
+    opLuaMake('access_by_lua_file')
+
+
+def opLuaMakeAll():
+    opLuaInitFile()
+    opLuaInitWorkerFile()
+    opLuaInitAccessFile()
+
+# ------------------------------ openresty end -----------------------------
+
+# ---------------------------------------------------------------------------------
+# 数据库 START
+# ---------------------------------------------------------------------------------
+def getMyORM():
+    '''
+    获取MySQL资源的ORM
+    '''
+    import core.orm as orm
+    o = orm.ORM()
+    return o
+# ---------------------------------------------------------------------------------
+# 数据库 START
+# ---------------------------------------------------------------------------------
+
 
 # ---------------------------------------------------------------------------------
 # 打印相关 START

@@ -17,8 +17,10 @@ from flask import request
 from utils.mwplugin import MwPlugin
 from admin.user_login_check import panel_login_required
 
-import core.mw as mw
+from admin import model
 
+import core.mw as mw
+import utils.config as utils_config
 
 
 blueprint = Blueprint('plugins', __name__, url_prefix='/plugins', template_folder='../../templates/default')
@@ -120,6 +122,25 @@ def uninstall():
     version = request.form.get('version', '')
     pg = MwPlugin.instance()
     return pg.uninstall(name, version)
+
+# 文件读取
+@blueprint.route('/menu', endpoint='menu', methods=['GET'])
+@panel_login_required
+def menu():
+    data = utils_config.getGlobalVar()
+    pg = MwPlugin.instance()
+    tag = request.args.get('tag', '')
+
+    hook_menu = model.getOptionByJson('hook_menu',type='hook',default=[])
+    content = ''
+    for menu_data in hook_menu:
+        if tag == menu_data['name'] and 'path' in menu_data:
+            t = pg.menuGetAbsPath(tag, menu_data['path'])
+            content = mw.readFile(t)
+    #------------------------------------------------------------
+    data['hook_tag'] = tag
+    data['plugin_content'] = content
+    return render_template('plugin_menu.html', data=data)
 
 # 文件读取
 @blueprint.route('/file', endpoint='file', methods=['GET'])

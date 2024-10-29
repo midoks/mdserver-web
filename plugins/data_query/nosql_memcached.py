@@ -11,8 +11,12 @@ import re
 import json
 import pymemcache
 
-sys.path.append(os.getcwd() + "/class/core")
-import mw
+try: 
+    sys.path.append(os.getcwd() + "/class/core")
+    import mw
+except Exception as e:
+    import core.mw as mw
+    
 
 def singleton(cls):
     _instance = {}

@@ -118,7 +118,7 @@ def inject_global_variables():
     data = utils_config.getGlobalVar()
     g_config = {
         'version': ver,
-        'title' : '面板',
+        'title' : 'MW面板',
         'ip' : '127.0.0.1'
     }
     return dict(config=g_config, data=data)

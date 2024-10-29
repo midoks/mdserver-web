@@ -35,4 +35,10 @@ def init_option():
     model.setOption('admin_path', mw.getRandomString(8))
     model.setOption('server_ip', '127.0.0.1')
 
+    # 默认备份目录
+    model.setOption('backup_path', mw.getFatherDir()+'/backup')
+    # 默认站点目录
+    model.setOption('site_path', mw.getFatherDir()+'/wwwroot')
+    
+
     return True

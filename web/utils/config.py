@@ -29,5 +29,9 @@ def getGlobalVar():
     # 服务器时间
     sformat = 'date +"%Y-%m-%d %H:%M:%S %Z %z"'
     data['systemdate'] = mw.execShell(sformat)[0].strip()
+
+
+    data['hook_menu'] = model.getOptionByJson('hook_menu',type='hook',default=[])
+    data['hook_global_static'] = model.getOptionByJson('hook_global_static',type='hook',default=[])
     
     return data
