@@ -286,13 +286,31 @@ def fileDelete(path):
     try:
         recycle_bin = model.getOption('recycle_bin')
         if recycle_bin == 'open':
-            if file.mvRecycleBin(path):
+            if mvRecycleBin(path):
                 return mw.returnData(True, '已将文件移动到回收站!')
             return mw.returnData(False, '移动到回收站失败!') 
         os.remove(path)
         mw.writeLog('文件管理', mw.getInfo('删除文件[{1}]成功!', (path,)))
         return mw.returnData(True, '删除文件成功!')
     except Exception as e:
+        return mw.returnData(False, '删除文件失败!')
+
+def dirDelete(path):
+    if not os.path.exists(path):
+        return mw.returnData(False, '指定文件不存在!')
+
+    # 检查是否为.user.ini
+    if path.find('.user.ini'):
+        os.system("which chattr && chattr -i '" + path + "'")
+    try:
+        recycle_bin = model.getOption('recycle_bin')
+        if recycle_bin == 'open':
+            if mvRecycleBin(path):
+                return mw.returnData(True, '已将文件移动到回收站!')
+        mw.execShell('rm -rf ' + path)
+        mw.writeLog('文件管理', '删除{1}成功！', (path,))
+        return mw.returnData(True, '删除文件成功!')
+    except:
         return mw.returnData(False, '删除文件失败!')
 
 # 关闭
@@ -352,7 +370,7 @@ def mvRecycleBin(path):
     rb_file = rb_dir + '/' + path.replace('/', '_mw_') + '_t_' + str(time.time())
     try:
         import shutil
-        shutil.move(path, rb_dir)
+        shutil.move(path, rb_file)
         mw.writeLog('文件管理', mw.getInfo('移动[{1}]到回收站成功!', (path,)))
         return True
     except Exception as e:

@@ -105,6 +105,13 @@ def delete():
     return file.fileDelete(path)
 
 
+# 删除文件
+@blueprint.route('/delete_dir', endpoint='delete_dir', methods=['POST'])
+def delete_dir():
+    path = request.form.get('path', '')
+    return file.dirDelete(path)
+
+
 # 回收站文件
 @blueprint.route('/get_recycle_bin', endpoint='get_recycle_bin', methods=['POST'])
 def get_recycle_bin():
