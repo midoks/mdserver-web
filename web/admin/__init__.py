@@ -60,7 +60,7 @@ app.config['SESSION_COOKIE_NAME'] = "MW_VER_1"
 app.config['PERMANENT_SESSION_LIFETIME'] = timedelta(days=31)
 
 # db的配置
-app.config['SQLALCHEMY_DATABASE_URI'] = mw.getSqitePrefix()+config.SQLITE_PATH  # 使用 SQLite 数据库
+app.config['SQLALCHEMY_DATABASE_URI'] = mw.getSqitePrefix()+config.SQLITE_PATH+"?timeout=20"  # 使用 SQLite 数据库
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = True
 
 # 缓存配置

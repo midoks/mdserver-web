@@ -21,6 +21,18 @@ def formatDate(format="%Y-%m-%d %H:%M:%S", times=None):
     time_local = time.localtime(times)
     return time.strftime(format, time_local)
 
+def clearLog():
+    try:
+        # from sqlalchemy import text
+        # db.session.execute(text("DELETE FROM logs where id>1"))
+        db.session.query(Logs).filter(Logs.id > 0).delete(synchronize_session=False)
+        db.session.commit()
+    except Exception as e:
+        db.session.commit()
+    finally:
+        db.session.close()
+    return True
+
 def addLog(type, log,
     uid: int | None = 1
 ) -> str:
@@ -38,4 +50,5 @@ def addLog(type, log,
         add_time=add_time)
     db.session.add(add_logs)
     db.session.commit()
+    db.session.close()
     return True

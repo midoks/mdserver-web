@@ -19,7 +19,7 @@ SCHEMA_VERSION = 1
 db = SQLAlchemy(
     engine_options={
         'pool_size': config.CONFIG_DATABASE_CONNECTION_POOL_SIZE,
-        'max_overflow': config.CONFIG_DATABASE_CONNECTION_MAX_OVERFLOW
+        'max_overflow': config.CONFIG_DATABASE_CONNECTION_MAX_OVERFLOW,
     }
 )
 

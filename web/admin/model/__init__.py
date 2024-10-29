@@ -10,7 +10,7 @@
 
 from .initdb import *
 
-from .logs import addLog
+from .logs import addLog,clearLog
 
 from .option import getOption,getOptionByJson,setOption
 from .option import setOption

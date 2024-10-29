@@ -13,6 +13,8 @@ from flask import Blueprint, render_template
 from flask import request
 
 from admin.user_login_check import panel_login_required
+
+from admin import model
 from admin.model import db, Logs
 
 import core.mw as mw
@@ -59,9 +61,8 @@ def get_log_list():
 @blueprint.route('/del_panel_logs', endpoint='del_panel_logs', methods=['POST'])
 @panel_login_required
 def del_panel_logs():
-    db.session.query(Logs).filter(Logs.id > 0).delete()
-    # db.session.execute('truncate table logs;')
-    db.session.commit()
+    model.clearLog()
+    # mw.M('logs').dbPos(mw.getPanelDataDir(),'panel').where('id>?', (0,)).delete()
     mw.writeLog('面板设置', '面板操作日志已清空!')
     return mw.returnData(True, '面板操作日志已清空!')
 

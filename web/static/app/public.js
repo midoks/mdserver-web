@@ -1611,8 +1611,10 @@ function backMyComputer() {
 //检查登陆状态
 function check_login(){
 	$.post('/check_login',{},function(rdata){
-		if(rdata === true) return;
-	});
+		if(!rdata.status){
+			location.reload();
+		}
+	},'json');
 }
 
 //登陆跳转

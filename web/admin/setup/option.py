@@ -20,8 +20,12 @@ def init_option():
     model.setOption('recycle_bin', 'open')
     model.setOption('template', 'default')
 
+    # 后台面板是否关闭
+    model.setOption('admin_close', 'no')
     # 调式模式,默认关闭
     model.setOption('debug', 'close')
+
+
 
 
     # 开启后台任务

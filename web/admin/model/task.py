@@ -48,6 +48,7 @@ def addTask(
         add_time=add_time)
     db.session.add(add_data)
     db.session.commit()
+    db.session.close()
     return True
 
 def getTaskFirstByRun() -> None:
