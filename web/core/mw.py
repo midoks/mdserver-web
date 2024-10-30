@@ -137,11 +137,25 @@ def getDateFromNow(tf_format="%Y-%m-%d %H:%M:%S", time_zone="Asia/Shanghai"):
     time.tzset()
     return time.strftime(tf_format, time.localtime())
 
-
 def getDataFromInt(val):
     time_format = '%Y-%m-%d %H:%M:%S'
     time_str = time.localtime(val)
     return time.strftime(time_format, time_str)
+
+def getCommonFile():
+    # 统一默认配置文件
+    base_dir = getPanelDir()+'/'
+    data = {
+        'debug' : base_dir+'data/debug.pl',                              # DEBUG文件
+        'close' : base_dir+'data/close.pl',                              # 识别关闭面板文件
+        'basic_auth' : base_dir+'data/basic_auth.json',                  # 面板Basic验证
+        'ipv6' : base_dir+'data/ipv6.pl',                                # ipv6识别文件
+        'bind_domain' : base_dir+'data/bind_domain.pl',                  # 面板域名绑定
+        'auth_secret': base_dir+'data/auth_secret.pl',                   # 二次验证密钥
+        'ssl': base_dir+'ssl/choose.pl',                                 # ssl设置
+    }
+    return data
+
 
 def toSize(size, middle='') -> str:
     """

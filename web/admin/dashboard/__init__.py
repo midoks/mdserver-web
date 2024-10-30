@@ -29,10 +29,40 @@ blueprint = Blueprint('dashboard', __name__, url_prefix='/', template_folder='..
 def index():
     return render_template('default/index.html')
 
+# 安全路径
+@blueprint.route('/<path>',endpoint='admin_safe_path',methods=['GET'])
+def admin_safe_path(path):
+    db_path = model.getOption('admin_path')
+    if db_path == path:
+        return render_template('default/login.html')
+
+    unauthorized_status = model.getOption('unauthorized_status')
+    if unauthorized_status == '0':
+        return render_template('default/path.html')
+    return Response(status=int(unauthorized_status))
+
 
 # ---------------------------------------------------------------------------------
 # 定义登录入口相关方法
 # ---------------------------------------------------------------------------------
+
+# 登录页: 当设置了安全路径,本页失效。
+@blueprint.route('/login')
+def login():
+    signout = request.args.get('signout', '')
+    if signout == 'True':
+        session.clear()
+        session['login'] = False
+        session['overdue'] = 0
+
+    db_path = model.getOption('admin_path')
+    if db_path == '':
+        return render_template('default/login.html')
+    else:
+        unauthorized_status = model.getOption('unauthorized_status')
+        if unauthorized_status == '0':
+            return render_template('default/path.html')
+        return Response(status=int(unauthorized_status))
 
 # 验证码
 @blueprint.route('/code')
@@ -46,15 +76,6 @@ def code():
 
     img = Response(out.getvalue(), headers={'Content-Type': 'image/png'})
     return make_response(img)
-
-@blueprint.route('/login')
-def login():
-    signout = request.args.get('signout', '')
-    if signout == 'True':
-        session.clear()
-        session['login'] = False
-        session['overdue'] = 0
-    return render_template('default/login.html')
 
 # 检查是否登录
 @blueprint.route('/check_login',methods=['GET','POST'])

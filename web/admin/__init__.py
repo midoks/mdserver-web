@@ -10,16 +10,22 @@
 
 import os
 import sys
+import json
 import time
 import uuid
 import logging
 from datetime import timedelta
 
 from flask import Flask
+
 from flask_socketio import SocketIO, emit, send
-from flask import Flask, abort, request, current_app, session, url_for
+from flask import Flask, abort, current_app, session, url_for
 from flask import Blueprint, render_template
 from flask import render_template_string
+
+from flask import request
+from flask import Response
+
 
 from flask_migrate import Migrate
 from flask_caching import Cache
@@ -44,7 +50,9 @@ socketio = SocketIO(manage_session=False, async_mode='threading',
 
 app = Flask(__name__, template_folder='templates/default')
 
-# app.debug = True
+# 缓存配置
+cache = Cache(config={'CACHE_TYPE': 'simple'})
+cache.init_app(app, config={'CACHE_TYPE': 'simple'})
 
 # 静态文件配置
 from whitenoise import WhiteNoise
@@ -63,13 +71,10 @@ app.config['PERMANENT_SESSION_LIFETIME'] = timedelta(days=31)
 app.config['SQLALCHEMY_DATABASE_URI'] = mw.getSqitePrefix()+config.SQLITE_PATH+"?timeout=20"  # 使用 SQLite 数据库
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = True
 
-# 缓存配置
-cache = Cache(config={'CACHE_TYPE': 'simple'})
-cache.init_app(app, config={'CACHE_TYPE': 'simple'})
-
 # 初始化db
 sys_db.init_app(app)
 Migrate(app, sys_db)
+
 
 # 检查数据库是否存在。如果没有就创建它。
 setup_db_required = False
@@ -89,6 +94,11 @@ with app.app_context():
         setup.init_admin_user()
         setup.init_option()
 
+app.config['BASIC_AUTH_OPEN'] = False
+with app.app_context():
+    basic_auth = model.getOptionByJson('basic_auth', default={'open':False})
+    if basic_auth['open']:
+        app.config['BASIC_AUTH_OPEN'] = True
 
 
 # 加载模块
@@ -98,11 +108,36 @@ for module in get_submodules():
     if app.blueprints.get(module.name) is None:
         app.register_blueprint(module)
 
+def sendAuthenticated():
+    # 发送http认证信息
+    request_host = mw.getHostAddr()
+    result = Response('', 401, {'WWW-Authenticate': 'Basic realm="%s"' % request_host.strip()})
+    if not 'login' in session and not 'admin_auth' in session:
+        session.clear()
+    return result
 
 @app.before_request
 def requestCheck():
-    # print("hh")
-    pass
+    # 自定义basic auth认证
+    if app.config['BASIC_AUTH_OPEN']:
+        basic_auth = model.getOptionByJson('basic_auth', default={'open':False})
+        if not basic_auth['open']:
+            return
+
+        auth = request.authorization
+        if request.path in ['/download', '/hook', '/down']:
+            return
+        if not auth:
+            return sendAuthenticated()
+
+        # print(auth.username.strip(),auth.password.strip())
+        salt = basic_auth['salt']
+        basic_user = mw.md5(auth.username.strip() + salt)
+        basic_pwd = mw.md5(auth.password.strip() + salt)
+        if basic_user != basic_auth['basic_user'] or basic_pwd != basic_auth['basic_pwd']:
+            return sendAuthenticated()
+            
+
 
 @app.after_request
 def requestAfter(response):

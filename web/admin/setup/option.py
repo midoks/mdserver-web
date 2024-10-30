@@ -8,6 +8,8 @@
 # Author: midoks <midoks@163.com>
 # ---------------------------------------------------------------------------------
 
+import json
+
 from flask import request
 
 from admin import model
@@ -22,8 +24,15 @@ def init_option():
 
     # 后台面板是否关闭
     model.setOption('admin_close', 'no')
+
+    # 未认证状态码
+    model.setOption('unauthorized_status', '0')
+
     # 调式模式,默认关闭
     model.setOption('debug', 'close')
+
+    # basic auth 配置
+    model.setOption('basic_auth', json.dumps({'open':False}))
 
 
 

@@ -1152,7 +1152,7 @@ function setStatusCode(o){
         yes:function(index){
 		    var loadT = layer.msg("正在设置未认证时的响应状态", { icon: 16, time: 0, shade: [0.3, '#000'] });
 		    var status_code = $('select[name="status_code"]').val();
-		    $.post('/config/set_status_code', { status_code: status_code }, function (rdata) {
+		    $.post('/setting/set_status_code', { status_code: status_code }, function (rdata) {
 		    	showMsg(rdata.msg, function(){
 		    		layer.close(index);
 		    		layer.close(loadT);
@@ -1362,7 +1362,7 @@ function setBasicAuth(){
 					$('.save_auth_cfg').click(function(){
 						var basic_user = $('input[name="basic_user"]').val();
 						var basic_pwd = $('input[name="basic_pwd"]').val();
-						$.post('/config/set_basic_auth', {'basic_user':basic_user,'basic_pwd':basic_pwd},function(rdata){
+						$.post('/setting/set_basic_auth', {'basic_user':basic_user,'basic_pwd':basic_pwd},function(rdata){
 							showMsg(rdata.msg, function(){
 								window.location.reload();
 							} ,{icon:rdata.status?1:2}, 2000);

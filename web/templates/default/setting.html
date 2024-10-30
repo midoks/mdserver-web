@@ -121,7 +121,8 @@
 
 				<p class="mtb15">
 					<span class="set-tit text-right" title="BasicAuth认证" style="float: left;">BasicAuth认证</span>
-						<input class="btswitch btswitch-ios" id="cfg_basic_auth" type="checkbox" {{data['basic_auth']}}/>
+						<input class="btswitch btswitch-ios" id="cfg_basic_auth" type="checkbox" 
+						{% if data['basic_auth']['open'] %}checked{% endif %}/>
 	                <label class="btswitch-btn ml5" for="cfg_basic_auth" style="float: left;margin-top:4px;" onclick="setBasicAuth()"></label>
 					<span class="set-info c7">为面板增加一道基于BasicAuth的认证服务，有效防止面板被扫描</span>
 				</p>
@@ -136,8 +137,8 @@
 
 				<p class="mtb15">
 					<span class="set-tit text-right" title="未认证响应状态">未认证响应状态</span>
-					<input name="status_code" class="inputtxt bt-input-text disable" type="text" value="{{data['status_code_msg']}}" disabled>
-					<button type="button" class="btn btn-success btn-sm ml5" data-code="{{data['status_code']}}" onclick="setStatusCode(this)">设置</button>
+					<input name="status_code" class="inputtxt bt-input-text disable" type="text" value="{{data['unauthorized_status']['text']}}" disabled>
+					<button type="button" class="btn btn-success btn-sm ml5" data-code="{{data['unauthorized_status']['code']}}" onclick="setStatusCode(this)">设置</button>
 					<span class="set-info c7">用于在未登录且未正确输入安全入口时的响应，可用于隐藏面板特征</span>
 				</p>
 
