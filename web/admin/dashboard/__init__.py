@@ -29,6 +29,37 @@ blueprint = Blueprint('dashboard', __name__, url_prefix='/', template_folder='..
 def index():
     return render_template('default/index.html')
 
+# 仅针对webhook插件
+@app.route("/hook", methods=['POST', 'GET'])
+def webhook():
+    # 兼容获取关键数据
+    access_key = request.args.get('access_key', '').strip()
+    if access_key == '':
+        access_key = request.form.get('access_key', '').strip()
+
+    params = request.args.get('params', '').strip()
+    if params == '':
+        params = request.form.get('params', '').strip()
+
+    input_args = {
+        'access_key': access_key,
+        'params': params,
+    }
+
+    wh_install_path = mw.getServerDir() + '/webhook'
+    if not os.path.exists(wh_install_path):
+        return mw.returnJson(False, '请先安装WebHook插件!')
+
+    package = mw.getPanelDir() + "/plugins/webhook"
+    if not package in sys.path:
+        sys.path.append(package)
+        
+    try:
+        import webhook_index
+        return webhook_index.runShellArgs(input_args)
+    except Exception as e:
+        return str(e)
+
 # 安全路径
 @blueprint.route('/<path>',endpoint='admin_safe_path',methods=['GET'])
 def admin_safe_path(path):
