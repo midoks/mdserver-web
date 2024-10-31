@@ -30,7 +30,7 @@ def index():
     return render_template('default/index.html')
 
 # 仅针对webhook插件
-@app.route("/hook", methods=['POST', 'GET'])
+@blueprint.route("/hook", methods=['POST', 'GET'])
 def webhook():
     # 兼容获取关键数据
     access_key = request.args.get('access_key', '').strip()

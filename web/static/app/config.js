@@ -1170,29 +1170,33 @@ function setTempAccess(){
 		closeBtn:1,
 		shift: 0,
 		type: 1,
-		content: "<div class=\"login_view_table pd20\">\
-					<button class=\"btn btn-success btn-sm create_temp_login\">临时访问授权</button>\
-					<div class=\"divtable mt10\">\
-						<table class=\"table table-hover\">\
+		content: "<div class='login_view_table pd20'>\
+					<button class='btn btn-success btn-sm create_temp_login'>临时访问授权</button>\
+					<div class='divtable mt10'>\
+						<table class='table table-hover'>\
 							<thead>\
-								<tr><th>登录IP</th><th>状态</th><th>登录时间</th><th>过期时间</th><th style=\"text-align:right;\">操作</th></tr>\
+							<tr>\
+								<th>登录IP</th>\
+								<th>状态</th><th>登录时间</th>\
+								<th>过期时间</th>\
+								<th style='text-align:right;'>操作</th>\
+							</tr>\
 							</thead>\
-							<tbody id=\"temp_login_view_tbody\"></tbody>\
+							<tbody id='temp_login_view_tbody'></tbody>\
 						</table>\
-						<div class=\"temp_login_view_page page\"></div>\
+						<div class='temp_login_view_page page'></div>\
 					</div>\
 				</div>",
 		success:function(){
 			setTempAccessReq();
 
 			$('.create_temp_login').click(function(){
-				layer.confirm('<span style="color:red">注意1：滥用临时授权可能导致安全风险。</br>注意2：请勿在公共场合发布临时授权连接</span></br>即将创建临时授权连接，继续吗？',
-				{
+				layer.confirm('<span style="color:red">注意1：滥用临时授权可能导致安全风险。</br>注意2：请勿在公共场合发布临时授权连接</span></br>即将创建临时授权连接，继续吗？',{
 					title:'风险提示',
 					closeBtn:1,
 					icon:13,
 				}, function(create_temp_login_layer) {
-					$.post('/config/set_temp_login', {}, function(rdata){
+					$.post('/setting/set_temp_login', {}, function(rdata){
 						layer.close(create_temp_login_layer);
 						setTempAccessReq();
 						layer.open({

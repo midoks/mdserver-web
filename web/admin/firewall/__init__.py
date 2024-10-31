@@ -15,6 +15,9 @@ from flask import request
 from admin.user_login_check import panel_login_required
 from admin.model import db, Firewall
 
+
+from utils.firewall import Firewall as MwFirewall
+
 import core.mw as mw
 
 blueprint = Blueprint('firewall', __name__, url_prefix='/firewall', template_folder='../../templates/default')
@@ -61,7 +64,8 @@ def get_www_path():
 @blueprint.route('/get_ssh_info', endpoint='get_ssh_info', methods=['POST'])
 @panel_login_required
 def get_ssh_info():
-    pass
+    mf = MwFirewall.instance()
+    return mf.getSshInfo()
 
 
 

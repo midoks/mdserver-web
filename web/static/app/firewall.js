@@ -119,7 +119,7 @@ function getSshInfo(){
 		}
 		$("#firewall_status").html(fStatus);
 		
-		showAccept(1);
+		// showAccept(1);
 
 	},'json');
 }
@@ -306,6 +306,12 @@ function showAccept(page,search) {
 						<td class='text-right'><a href='javascript:;' class='btlink' onclick=\"delAcceptPort(" + data.data[i].id + ",'" + data.data[i].port + "','"+data.data[i].protocol+"')\">删除</a></td>\
 					</tr>";
 		}
+
+		if (data.data.length == 0){
+			body = '<tr><td colspan="5" style="text-align: center;">当前没有数据</td></tr>';
+		}
+
+
 		$("#firewallBody").html(body);
 		$("#firewallPage").html(data.page);
 	},'json');
