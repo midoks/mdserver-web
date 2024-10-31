@@ -24,7 +24,7 @@ from admin.user_login_check import panel_login_required
 import core.mw as mw
 import utils.config as utils_config
 
-from .main import blueprint
+from .setting import blueprint
 
 
 @blueprint.route('/get_auth_secret', endpoint='get_auth_secret', methods=['POST'])

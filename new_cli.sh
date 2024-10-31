@@ -3,10 +3,11 @@ PATH=/bin:/sbin:/usr/bin:/usr/sbin:/usr/local/bin:/usr/local/sbin:~/bin:/opt/hom
 DIR=$(cd "$(dirname "$0")"; pwd)
 MDIR=$(dirname "$DIR")
 
+# echo $DIR
 
 PATH=$PATH:$DIR/bin
-if [ -f bin/activate ];then
-	source bin/activate
+if [ -f ${DIR}/bin/activate ];then
+	source ${DIR}/bin/activate
 
 	if [ "$?" != "0" ];then
 		echo "load local python env fail!"
@@ -46,27 +47,31 @@ mw_start(){
 
 
 mw_start_debug(){
-	if [ ! -f $DIR/logs/task.log ];then
-		echo '' > $DIR/logs/task.log
+	if [ ! -f $DIR/logs/panel_task.log ];then
+		echo '' > $DIR/logs/panel_task.log
 	fi
 
-	python3 task.py >> $DIR/logs/task.log 2>&1 &
+	python3 panel_task.py >> $DIR/logs/panel_task.log 2>&1 &
 	port=7200    
     if [ -f /www/server/mdserver-web/data/port.pl ];then
         port=$(cat /www/server/mdserver-web/data/port.pl)
     fi
+
+    if [ -f ${DIR}/data/port.pl ];then
+        port=$(cat ${DIR}/data/port.pl)
+    fi
     # gunicorn -b :${port} -k gevent -w 1 app:app
-	gunicorn -b :${port} -k geventwebsocket.gunicorn.workers.GeventWebSocketWorker -w 1 app:app
+	cd web && gunicorn -b :${port} -w 1 app:app
 }
 
 mw_start_debug2(){
-	python3 task.py >> $DIR/logs/task.log 2>&1 &
-	gunicorn -b :7200 -k geventwebsocket.gunicorn.workers.GeventWebSocketWorker -w 1  app:app
+	python3 panel_task.py >> $DIR/logs/panel_task.log 2>&1 &
+	gunicorn -b :7200 -w 1  app:app
 }
 
 mw_start_debug3(){
 	gunicorn -c setting.py app:app
-	python3 task.py
+	python3 panel_task.py
 }
 
 
@@ -78,7 +83,7 @@ mw_stop()
 	    kill -9 $i > /dev/null 2>&1
 	done
 
-	pids=`ps -ef|grep task.py | grep -v grep |awk '{print $2}'`
+	pids=`ps -ef|grep panel_task.py | grep -v grep |awk '{print $2}'`
 	arr=($pids)
     for p in ${arr[@]}
     do

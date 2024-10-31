@@ -8,7 +8,7 @@
 # Author: midoks <midoks@163.com>
 # ---------------------------------------------------------------------------------
 
-from .main import *
+from .setting import *
 from .temp_login import *
 from .timezone import *
 from .secondary_verifiy import *
