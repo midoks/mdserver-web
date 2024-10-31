@@ -13,6 +13,7 @@ import time
 
 from flask import Blueprint, render_template
 from flask import make_response
+from flask import redirect
 from flask import Response
 from flask import request,g
 
@@ -20,6 +21,8 @@ from admin.common import isLogined
 from admin.user_login_check import panel_login_required
 from admin import cache,session
 from admin import model
+from admin.model import db,TempLogin,Users
+
 import core.mw as mw
 
 
@@ -77,9 +80,76 @@ def admin_safe_path(path):
 # 定义登录入口相关方法
 # ---------------------------------------------------------------------------------
 
+def getErrorNum(key, limit=None):
+    key = mw.md5(key)
+    num = cache.get(key)
+    if not num:
+        num = 0
+    if not limit:
+        return num
+    if limit > num:
+        return True
+    return False
+
+
+def setErrorNum(key, empty=False, expire=3600):
+    key = mw.md5(key)
+    num = cache.get(key)
+    if not num:
+        num = 0
+    else:
+        if empty:
+            cache.delete(key)
+            return True
+    cache.set(key, num + 1, expire)
+    return True
+
+def login_temp_user(token):
+    if len(token) != 32:
+        return '错误的参数!'
+
+    skey = mw.getClientIp() + '_temp_login'
+    if not getErrorNum(skey, 10):
+        return '连续10次验证失败，禁止1小时'
+
+    stime = int(time.time())
+
+    tmp_data = model.getTempLoginByToken(token)
+    if not tmp_data:
+        setErrorNum(skey)
+        return '验证失败!'
+
+    if stime > int(tmp_data['expire']):
+        setErrorNum(skey)
+        return "过期"
+
+    user_data = model.getUserById(1)
+
+    login_addr = mw.getClientIp() + ":" + str(request.environ.get('REMOTE_PORT'))
+    mw.writeLog('用户临时登录', "登录成功,帐号:{1},登录IP:{2}",(user_data['name'], login_addr))
+
+    TempLogin.query.filter(TempLogin.id==tmp_data['id']).update({"login_time": stime, 'state': 1, 'login_addr': login_addr})
+    db.session.commit()
+    
+    session['login'] = True
+    session['username'] = user_data['name']
+    session['tmp_login'] = True
+    session['tmp_login_id'] = str(tmp_data['id'])
+    session['tmp_login_expire'] = int(tmp_data['expire'])
+    session['uid'] = user_data['id']
+    
+    return redirect('/')
+
 # 登录页: 当设置了安全路径,本页失效。
 @blueprint.route('/login')
 def login():
+
+    # 临时登录功能
+    token = request.args.get('tmp_token', '').strip()
+    if token != '':
+        return login_temp_user(token)
+
+    # 注销登录
     signout = request.args.get('signout', '')
     if signout == 'True':
         session.clear()

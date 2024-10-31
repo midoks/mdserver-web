@@ -123,6 +123,7 @@ def set_control():
         if _day < 1:
             return mw.returnData(False, "设置失败!")
         option.setOption('monitor_day', day, type='monitor')
+        return mw.returnData(True, "设置成功!")
     elif stype == '2':
         option.setOption('monitor_only_netio', 'close', type='monitor')
         return mw.returnData(True, "设置成功!")

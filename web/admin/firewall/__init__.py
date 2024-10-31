@@ -50,7 +50,7 @@ def get_list():
 
     data = {}
     data['data'] = rows
-    data['page'] = mw.getPage({'count':count,'tojs':'getLogs','p':p})
+    data['page'] = mw.getPage({'count':count,'tojs':'getLogs','p':p,'row':limit})
     return data
 
 # 获取站点日志目录
@@ -60,12 +60,22 @@ def get_www_path():
     path = mw.getLogsDir()
     return {'path': path}
 
-# 获取站点日志目录
+# 获取ssh信息
 @blueprint.route('/get_ssh_info', endpoint='get_ssh_info', methods=['POST'])
 @panel_login_required
 def get_ssh_info():
     mf = MwFirewall.instance()
     return mf.getSshInfo()
+
+
+# 切换ping开关
+@blueprint.route('/set_ping', endpoint='set_ping', methods=['POST'])
+@panel_login_required
+def set_ping():
+    mf = MwFirewall.instance()
+    return mf.setPing()
+
+
 
 
 

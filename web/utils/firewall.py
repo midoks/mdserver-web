@@ -118,3 +118,20 @@ class Firewall(object):
         else:
             data['firewall_status'] = self.getFwStatus()
         return mw.getJson(data)
+
+    def setPing(self):
+        if mw.isAppleSystem():
+            return mw.returnData(True, '开发机不能操作!')
+
+        status = request.form.get('status')
+        filename = '/etc/sysctl.conf'
+        conf = mw.readFile(filename)
+        if conf.find('net.ipv4.icmp_echo') != -1:
+            rep = r"net\.ipv4\.icmp_echo.*"
+            conf = re.sub(rep, 'net.ipv4.icmp_echo_ignore_all=' + status, conf)
+        else:
+            conf += "\nnet.ipv4.icmp_echo_ignore_all=" + status
+
+        mw.writeFile(filename, conf)
+        mw.execShell('sysctl -p')
+        return mw.returnData(True, '设置成功!')

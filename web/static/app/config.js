@@ -452,7 +452,7 @@ function setTimezone(){
 		</div>",
 		success:function(){
 			var tbody = '';
-			$.post('/config/get_timezone_list', {}, function (rdata) {
+			$.post('/setting/get_timezone_list', {}, function (rdata) {
 		        for (var i = 0; i < rdata.length; i++) {
 
 		        	if (rdata[i] == 'Asia/Shanghai'){
@@ -1060,6 +1060,7 @@ function setTempAccessReq(page){
 	}
 
 	$.post('/setting/get_temp_login', {page:page}, function(rdata){
+		console.log(rdata);
 		if ( typeof(rdata.status) !='undefined' && !rdata.status){
 			showMsg(rdata.msg,function(){
 				layer.closeAll();
@@ -1165,7 +1166,7 @@ function setStatusCode(o){
 
 function setTempAccess(){
 	layer.open({
-		area: ['700px', '250px'],
+		area: ['700px', '380px'],
 		title: '临时授权管理',
 		closeBtn:1,
 		shift: 0,
@@ -1268,7 +1269,7 @@ function setAuthBind(){
 				$('.reset_secret').click(function(){
 					layer.confirm('您确定要重置当前密钥吗？<br/><span style="color: red; ">重置密钥后，已关联密钥产品，将失效，请重新添加新密钥至产品。</span>',{title:'重置密钥',closeBtn:2,icon:13,cancel:function(){
 					}}, function() {
-						$.post('/config/get_auth_secret', {'reset':"1"},function(rdata){
+						$.post('/setting/get_auth_secret', {'reset':"1"},function(rdata){
 							showMsg("接口密钥已生成，重置密钥后，已关联密钥产品，将失效，请重新添加新密钥至产品。", function(){
 								$('input[name="secret"]').val(rdata.data['secret']);
 								$('.qrcode').html('').qrcode({ text: rdata.data['url']});

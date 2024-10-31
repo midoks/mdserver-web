@@ -549,13 +549,7 @@ class MwPlugin(object):
     
         data = self.getAllPluginList(type,keyword, page, size)
         rdata['data'] = data[0]
-
-        args = {}
-        args['count'] = data[1]
-        args['p'] = page
-        args['tojs'] = 'getSList'
-        args['row'] = size
-        rdata['list'] = mw.getPage(args)
+        rdata['list'] = mw.getPage({'count':data[1],'p':page,'tojs':'getSList','row':size})
         return rdata
 
     # shell/bash方式调用

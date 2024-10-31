@@ -142,7 +142,7 @@ def set_basic_auth():
     return mw.returnData(True, '设置成功!')
 
 
-# 默认站点目录
+# 设置站点状态
 @blueprint.route('/set_status_code', endpoint='set_status_code', methods=['POST'])
 @panel_login_required
 def set_status_code():
@@ -159,9 +159,7 @@ def set_status_code():
     model.setOption('unauthorized_status', str(status_code))
     mw.writeLog('面板设置', '将未授权响应状态码设置为:{0}:{1}'.format(status_code,info['text']))
     return mw.returnData(True, '设置成功!')
-
-
-
+        
 
 
  

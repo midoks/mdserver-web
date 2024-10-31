@@ -576,6 +576,43 @@ def M(table):
     sql = db.Sql()
     return sql.table(table)
 
+
+def enDoubleCrypt(key, strings):
+    # 加密字符串
+    try:
+        import base64
+        _key = md5(key).encode('utf-8')
+        _key = base64.urlsafe_b64encode(_key)
+
+        if type(strings) != bytes:
+            strings = strings.encode('utf-8')
+        import cryptography
+        from cryptography.fernet import Fernet
+        f = Fernet(_key)
+        result = f.encrypt(strings)
+        return result.decode('utf-8')
+    except:
+        writeFileLog(getTracebackInfo())
+        return strings
+
+
+def deDoubleCrypt(key, strings):
+    # 解密字符串
+    try:
+        import base64
+        _key = md5(key).encode('utf-8')
+        _key = base64.urlsafe_b64encode(_key)
+
+        if type(strings) != bytes:
+            strings = strings.encode('utf-8')
+        from cryptography.fernet import Fernet
+        f = Fernet(_key)
+        result = f.decrypt(strings).decode('utf-8')
+        return result
+    except:
+        writeFileLog(getTracebackInfo())
+        return strings
+
 # ------------------------------ openresty start -----------------------------
 
 def restartWeb():
