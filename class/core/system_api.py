@@ -865,7 +865,7 @@ class system_api:
         return {}
 
     def updateServer(self, stype, version=''):
-        return mw.returnJson(True, '与后续版本差异太大,不再提供更新', '0.18.0')
+        return mw.returnJson(False, '与后续版本差异太大,不再提供更新', '0.18.0')
         # 更新服务
         try:
             if not mw.isRestart():
