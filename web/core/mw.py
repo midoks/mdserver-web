@@ -541,6 +541,18 @@ def isNumber(s):
 
     return False
 
+
+# 检查端口是否占用
+def isOpenPort(port):
+    import socket
+    s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    try:
+        s.connect(('127.0.0.1', int(port)))
+        s.shutdown(2)
+        return True
+    except Exception as e:
+        return False
+
 def debugLog(*data):
     if isDebugMode():
         print(data)
