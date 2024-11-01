@@ -16,6 +16,7 @@ from admin.model import Sites
 from admin.user_login_check import panel_login_required
 
 from utils.mwplugin import MwPlugin
+from utils.site import site
 import core.mw as mw
 
 blueprint = Blueprint('site', __name__, url_prefix='/site', template_folder='../../templates/default')
@@ -69,7 +70,7 @@ def get_cli_php_version():
         return mw.returnData(False, '未安装PHP,无法设置')
 
     php_bin = '/usr/bin/php'
-    php_versions = self.getPhpVersion()
+    php_versions = site.getPhpVersion()
     php_versions = php_versions[1:]
 
     if len(php_versions) < 1:
