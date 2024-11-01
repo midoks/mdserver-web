@@ -60,3 +60,25 @@ def list():
 @panel_login_required
 def get_site_types():
     return []
+
+@blueprint.route('/get_cli_php_version', endpoint='get_cli_php_version',methods=['POST'])
+@panel_login_required
+def get_cli_php_version():
+    php_dir = mw.getServerDir() + '/php'
+    if not os.path.exists(php_dir):
+        return mw.returnData(False, '未安装PHP,无法设置')
+
+    php_bin = '/usr/bin/php'
+    php_versions = self.getPhpVersion()
+    php_versions = php_versions[1:]
+
+    if len(php_versions) < 1:
+        return mw.returnData(False, '未安装PHP,无法设置')
+
+    if os.path.exists(php_bin) and os.path.islink(php_bin):
+        link_re = os.readlink(php_bin)
+        for v in php_versions:
+            if link_re.find(v['version']) != -1:
+                return mw.returnData({"select": v, "versions": php_versions})
+
+    return mw.getJson({"select": php_versions[0],"versions": php_versions})
