@@ -573,9 +573,9 @@ case "$1" in
                     mw_start
                 fi
 
-                address="MW-Panel-Url-Ipv4: ${scheme}://$v4:$port$auth_path \nMW-Panel-Url-Ipv6: ${scheme}://[$v6]:$port$auth_path"
+                address="MW-PANEL-URL-Ipv4: ${scheme}://$v4:$port$auth_path \nMW-Panel-URL-Ipv6: ${scheme}://[$v6]:$port$auth_path"
             elif [ "$v4" != "" ]; then
-                address="MW-Panel-Url: ${scheme}://$v4:$port$auth_path"
+                address="MW-PANEL-URL: ${scheme}://$v4:$port$auth_path"
             elif [ "$v6" != "" ]; then
 
                 if [ ! -f ${PANEL_DIR}/data/ipv6.pl ];then
@@ -584,17 +584,17 @@ case "$1" in
                     mw_stop
                     mw_start
                 fi
-                address="MW-Panel-Url: ${scheme}://[$v6]:$port$auth_path"
+                address="MW-PANEL-URL: ${scheme}://[$v6]:$port$auth_path"
             else
-                address="MW-Panel-Url: ${scheme}://you-network-ip:$port$auth_path"
+                address="MW-PANEL-URL: ${scheme}://you-network-ip:$port$auth_path"
             fi
         else
-            address="MW-Panel-Url: ${scheme}://$address:$port$auth_path"
+            address="MW-PANEL-URL: ${scheme}://$address:$port$auth_path"
         fi
 
         show_panel_ip="$port|"
         echo -e "=================================================================="
-        echo -e "\033[32mMW-Panel default info!\033[0m"
+        echo -e "\033[32mMW-PANEL DEFAULT INFO!\033[0m"
         echo -e "=================================================================="
         echo -e "$address"
         echo -e `cd ${PANEL_DIR} && python3 ${PANEL_DIR}/panel_tools.py username`
