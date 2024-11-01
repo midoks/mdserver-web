@@ -562,8 +562,8 @@ case "$1" in
         fi
 	    
         if [ "$address" == "" ];then
-            v4=$(python3 ${PANEL_DIR}/tools.py getServerIp 4)
-            v6=$(python3 ${PANEL_DIR}/tools.py getServerIp 6)
+            v4=$(python3 ${PANEL_DIR}/panel_tools.py getServerIp 4)
+            v6=$(python3 ${PANEL_DIR}/panel_tools.py getServerIp 6)
 
             if [ "$v4" != "" ] && [ "$v6" != "" ]; then
 
