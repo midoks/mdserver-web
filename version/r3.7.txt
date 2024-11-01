@@ -1,4 +1,6 @@
 urllib3==1.21.1
 gevent==22.10.2
 gunicorn==21.2.0
+sqlalchemy==1.4.47
+flask-sqlalchemy==2.5.1
 pyyaml

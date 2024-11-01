@@ -4,6 +4,13 @@ export PATH
 # LANG=en_US.UTF-8
 is64bit=`getconf LONG_BIT`
 
+if [ -f /www/server/mdserver-web/tools.py ];then
+	echo -e "存在旧版代码,不能安装!,已知风险的情况下" 
+	echo -e "rm -rf /www/server/mdserver-web"
+	echo -e "可安装!" 
+	exit 0
+fi
+
 LOG_FILE=/var/log/mw-install.log
 
 {

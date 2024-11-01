@@ -5,6 +5,7 @@ import io
 import os
 import time
 import re
+import json
 
 sys.path.append(os.getcwd() + "/class/core")
 import mw
@@ -18,10 +19,10 @@ def getPluginName():
     return 'fail2ban'
 
 def f2bDir():
-    return '/run/fail2ban'
+    return '/run/'+getPluginName()
 
 def f2bEtcDir():
-    return '/etc/fail2ban'
+    return '/etc/'+getPluginName()
 
 def getPluginDir():
     return mw.getPluginDir() + '/' + getPluginName()
@@ -48,7 +49,7 @@ def getConf():
 
 
 def getConfTpl():
-    path = getPluginDir() + "/config/redis.conf"
+    path = getPluginDir() + "/tpl/fail2ban.conf"
     return path
 
 
@@ -89,7 +90,7 @@ def configTpl():
     for one in pathFile:
         if one.endswith("conf"):
             file = path + '/' + one
-        tmp.append(file)
+            tmp.append(file)
     return mw.getJson(tmp)
 
 
@@ -123,6 +124,21 @@ def contentReplace(content):
     return content
 
 
+def initFail2BanD():
+    dst_conf = f2bEtcDir() + '/fail2ban.d/default.conf'
+    dst_conf_tpl = getPluginDir() + '/tpl/fail2ban.d/default.conf'
+    if not os.path.exists(dst_conf):
+        content = mw.readFile(dst_conf_tpl)
+        content = contentReplace(content)
+        mw.writeFile(dst_conf, content)
+
+def initJailD():
+    dst_conf = f2bEtcDir() + '/jail.d/default.conf'
+    dst_conf_tpl = getPluginDir() + '/tpl/jail.d/default.conf'
+    if not os.path.exists(dst_conf):
+        content = mw.readFile(dst_conf_tpl)
+        content = contentReplace(content)
+        mw.writeFile(dst_conf, content)
 
 def initDreplace():
 
@@ -134,12 +150,17 @@ def initDreplace():
         os.mkdir(initD_path)
     file_bin = initD_path + '/' + getPluginName()
 
-    # initd replace
-    # if not os.path.exists(file_bin):
-    #     content = mw.readFile(file_tpl)
-    #     content = content.replace('{$SERVER_PATH}', service_path)
-    #     mw.writeFile(file_bin, content)
-    #     mw.execShell('chmod +x ' + file_bin)
+    # config replace
+    # dst_conf = getConf()
+    # dst_conf_init = getServerDir() + '/init.pl'
+    # if not os.path.exists(dst_conf_init):
+    #     content = mw.readFile(getConfTpl())
+    #     content = contentReplace(content)
+    #     mw.writeFile(dst_conf, content)
+    #     mw.writeFile(dst_conf_init, 'ok')
+
+    initFail2BanD()
+    initJailD()
 
     # systemd
     systemDir = mw.systemdCfgDir()
@@ -147,9 +168,9 @@ def initDreplace():
     if os.path.exists(systemDir) and not os.path.exists(systemService):
         systemServiceTpl = getPluginDir() + '/init.d/' + getPluginName() + '.service.tpl'
         service_path = mw.getServerDir()
-        se_content = mw.readFile(systemServiceTpl)
-        se_content = se_content.replace('{$SERVER_PATH}', service_path)
-        mw.writeFile(systemService, se_content)
+        content = mw.readFile(systemServiceTpl)
+        content = content.replace('{$SERVER_PATH}', service_path)
+        mw.writeFile(systemService, content)
         mw.execShell('systemctl daemon-reload')
 
     return file_bin
@@ -249,8 +270,83 @@ def initdUinstall():
     return 'ok'
 
 
+# 读取配置
+def _read_conf(path, l=None):
+    conf = mw.readFile(path)
+    if not conf:
+        if not l:
+            conf = {}
+        else:
+            conf = []
+        mw.writeFile(path, json.dumps(conf))
+        return conf
+    return json.loads(conf)
+
+def getBlackFile():
+    return getServerDir() + "/black_list.json"
 
 
+def getConfigFile():
+    return getServerDir() + "/config.json"
+
+
+def getBlackListArr():
+    _black_list = getBlackFile()
+    conf = _read_conf(_black_list, l=1)
+    if not conf:
+        conf = []
+    return conf
+
+
+def getBlackList():
+    conf = getBlackListArr()
+    content = "\n".join(conf)
+    return mw.returnJson(True, 'ok', content)
+
+def setBlackIp():
+    ip_list = getBlackListArr()
+
+    args = getArgs()
+    data = checkArgs(args, ['black_ip'])
+    if not data[0]:
+        return data[1]
+
+    new_ip_list = args['black_ip']
+    add_ip_list = [new_ip for new_ip in new_ip_list if new_ip not in ip_list]
+    del_ip_list = [del_ip for del_ip in ip_list if del_ip not in new_ip_list]
+    rep_ip = "^(25[0-5]|2[0-4]\\d|[0-1]?\\d?\\d)(\\.(25[0-5]|2[0-4]\\d|[0-1]?\\d?\\d)){3}($|[\\/\\d]+$)"
+    rep_ipv6 = "^\\s*((([0-9A-Fa-f]{1,4}:){7}(([0-9A-Fa-f]{1,4})|:))|(([0-9A-Fa-f]{1,4}:){6}(:|((25[0-5]|2[0-4]\\d|[01]?\\d{1,2})(\\.(25[0-5]|2[0-4]\\d|[01]?\\d{1,2})){3})|(:[0-9A-Fa-f]{1,4})))|(([0-9A-Fa-f]{1,4}:){5}((:((25[0-5]|2[0-4]\\d|[01]?\\d{1,2})(\\.(25[0-5]|2[0-4]\\d|[01]?\\d{1,2})){3})?)|((:[0-9A-Fa-f]{1,4}){1,2})))|(([0-9A-Fa-f]{1,4}:){4}(:[0-9A-Fa-f]{1,4}){0,1}((:((25[0-5]|2[0-4]\\d|[01]?\\d{1,2})(\\.(25[0-5]|2[0-4]\\d|[01]?\\d{1,2})){3})?)|((:[0-9A-Fa-f]{1,4}){1,2})))|(([0-9A-Fa-f]{1,4}:){3}(:[0-9A-Fa-f]{1,4}){0,2}((:((25[0-5]|2[0-4]\\d|[01]?\\d{1,2})(\\.(25[0-5]|2[0-4]\\d|[01]?\\d{1,2})){3})?)|((:[0-9A-Fa-f]{1,4}){1,2})))|(([0-9A-Fa-f]{1,4}:){2}(:[0-9A-Fa-f]{1,4}){0,3}((:((25[0-5]|2[0-4]\\d|[01]?\\d{1,2})(\\.(25[0-5]|2[0-4]\\d|[01]?\\d{1,2})){3})?)|((:[0-9A-Fa-f]{1,4}){1,2})))|(([0-9A-Fa-f]{1,4}:)(:[0-9A-Fa-f]{1,4}){0,4}((:((25[0-5]|2[0-4]\\d|[01]?\\d{1,2})(\\.(25[0-5]|2[0-4]\\d|[01]?\\d{1,2})){3})?)|((:[0-9A-Fa-f]{1,4}){1,2})))|(:(:[0-9A-Fa-f]{1,4}){0,5}((:((25[0-5]|2[0-4]\\d|[01]?\\d{1,2})(\\.(25[0-5]|2[0-4]\\d|[01]?\\d{1,2})){3})?)|((:[0-9A-Fa-f]{1,4}){1,2})))|(((25[0-5]|2[0-4]\\d|[01]?\\d{1,2})(\\.(25[0-5]|2[0-4]\\d|[01]?\\d{1,2})){3})))(%.+)?\\s*$"
+    
+    data = _read_conf(getConfigFile())
+
+    if new_ip_list == '':
+        for d in data:
+            for ip in ip_list:
+                mw.execShell('fail2ban-client -vvv set {jail} unbanip {ip}'.format(jail=d, ip=ip))
+
+        mw.writeFile(getBlackFile(), json.dumps([]))
+        return nw.returnJson(True, "禁止IP成功")
+
+    # 检查IP格式
+    for ip in add_ip_list:
+        if not re.search(rep_ip, ip) and not re.search(rep_ipv6, ip):
+            return mw.returnJson(False, "IP格式错误 {}".format(ip))
+
+    # 添加新域名到黑名单
+    for d in data:
+        for ip in add_ip_list:
+            mw.execShell('fail2ban-client -vvv set {jail} banip {ip}'.format(jail=d, ip=ip))
+
+    # 检查是否有清理掉的IP
+    for d in data:
+        for ip in del_ip_list:
+            mw.execShell('fail2ban-client -vvv set {jail} unbanip {ip}'.format(jail=d, ip=ip))
+
+    for ip in add_ip_list:
+        ip_list.append(ip)
+
+    mw.writeFile(getBlackFile(), json.dumps(ip_list))
+    return mw.returnJson(True, "添加黑名单成功")
 
 if __name__ == "__main__":
     func = sys.argv[1]
@@ -280,5 +376,9 @@ if __name__ == "__main__":
         print(configTpl())
     elif func == 'read_config_tpl':
         print(readConfigTpl())
+    elif func == 'get_black_list':
+        print(getBlackList())
+    elif func == 'set_black_ip':
+        print(setBlackIp())
     else:
         print('error')

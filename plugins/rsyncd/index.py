@@ -331,7 +331,7 @@ def getRecListData():
     path = appConf()
     content = mw.readFile(path)
 
-    flist = re.findall("\[(.*)\]", content)
+    flist = re.findall("\\[(.*)\\]", content)
 
     flist_len = len(flist)
     ret_list = []
@@ -341,15 +341,15 @@ def getRecListData():
         n = i + 1
         reg = ''
         if n == flist_len:
-            reg = '\[' + flist[i] + '\](.*)\[?'
+            reg = '\\[' + flist[i] + '\\](.*)\\[?'
         else:
-            reg = '\[' + flist[i] + '\](.*)\[' + flist[n] + '\]'
+            reg = '\\[' + flist[i] + '\\](.*)\\[' + flist[n] + '\\]'
 
         t1 = re.search(reg, content, re.S)
         if t1:
             args = t1.groups()[0]
             # print('args start', args, 'args_end')
-            t2 = re.findall('\s*(.*)\s*\=\s*?(.*)?', args, re.M | re.I)
+            t2 = re.findall('\\s*(.*)\\s*\\=\\s*?(.*)?', args, re.M | re.I)
             for i in range(len(t2)):
                 tmp[t2[i][0].strip()] = t2[i][1].strip()
         ret_list.append(tmp)
@@ -456,9 +456,9 @@ def delRecBy(name):
                     next_name = reclist[x + 1]['name']
         reg = ''
         if is_end:
-            reg = '\[' + name + '\]\s*(.*)'
+            reg = '\\[' + name + '\\]\\s*(.*)'
         else:
-            reg = '\[' + name + '\]\s*(.*)\s*\[' + next_name + '\]'
+            reg = '\\[' + name + '\\]\\s*(.*)\\s*\\[' + next_name + '\\]'
 
         conre = re.search(reg,  content, re.S)
         content = content.replace(

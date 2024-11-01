@@ -120,7 +120,7 @@ def contentReplace(content):
     service_path = mw.getServerDir()
     content = content.replace('{$ROOT_PATH}', mw.getRootDir())
     content = content.replace('{$SERVER_PATH}', service_path)
-    content = content.replace('{$SERVER_APP}', service_path + '/redis')
+    content = content.replace('{$SERVER_APP}', service_path + '/'+getPluginName())
     content = content.replace('{$REDIS_PASS}', mw.getRandomString(10))
     return content
 

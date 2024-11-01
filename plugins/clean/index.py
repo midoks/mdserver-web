@@ -113,6 +113,9 @@ def initConf():
            
             "/tmp/yum_save_*",
             "/tmp/tmp.*",
+
+            "/www/server/dztasks/logs/dztasks.*.log",
+            "/www/server/dztasks/logs/dztasks_*",
         ]
         for i in clog:
             content += i + "\n"
@@ -147,6 +150,8 @@ def initConf():
             "/www/server/openresty/nginx/logs",
             "/www/server/phpmyadmin",
             "/www/server/redis/data",
+            "/www/server/alist/data/log",
+            "/www/server/dztasks/logs",
             "/www/server/cron",
         ]
         for i in clogcom:

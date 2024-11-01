@@ -1,0 +1,17 @@
+{
+	"sort": 7,
+	"ps": "一个支持多种存储的文件列表程序",
+	"name": "cloudreve",
+	"title": "cloudreve",
+	"shell": "install.sh",
+	"versions":["3.8.3"],
+	"tip": "soft",
+	"checks": "server/cloudreve",
+	"path": "server/cloudreve",
+	"display": 1,
+	"author": "cloudreve",
+	"date": "2024-10-14",
+	"home": "https://cloudreve.org/",
+	"type": 0,
+	"pid": "5"
+}

@@ -727,43 +727,43 @@ class site_api:
         conf = mw.readFile(file)
 
         if conf:
-            rep = "\n\s*#HTTP_TO_HTTPS_START(.|\n){1,300}#HTTP_TO_HTTPS_END"
+            rep = "\n\\s*#HTTP_TO_HTTPS_START(.|\n){1,300}#HTTP_TO_HTTPS_END"
             conf = re.sub(rep, '', conf)
-            rep = "\s+ssl_certificate\s+.+;\s+ssl_certificate_key\s+.+;"
+            rep = "\\s+ssl_certificate\\s+.+;\\s+ssl_certificate_key\\s+.+;"
             conf = re.sub(rep, '', conf)
-            rep = "\s+ssl_protocols\s+.+;\n"
+            rep = "\\s+ssl_protocols\\s+.+;\n"
             conf = re.sub(rep, '', conf)
-            rep = "\s+ssl_ciphers\s+.+;\n"
+            rep = "\\s+ssl_ciphers\\s+.+;\n"
             conf = re.sub(rep, '', conf)
-            rep = "\s+ssl_prefer_server_ciphers\s+.+;\n"
+            rep = "\\s+ssl_prefer_server_ciphers\\s+.+;\n"
             conf = re.sub(rep, '', conf)
-            rep = "\s+ssl_session_cache\s+.+;\n"
+            rep = "\\s+ssl_session_cache\\s+.+;\n"
             conf = re.sub(rep, '', conf)
-            rep = "\s+ssl_session_timeout\s+.+;\n"
+            rep = r"\s+ssl_session_timeout\s+.+;\n"
             conf = re.sub(rep, '', conf)
-            rep = "\s+ssl_ecdh_curve\s+.+;\n"
+            rep = r"\s+ssl_ecdh_curve\s+.+;\n"
             conf = re.sub(rep, '', conf)
-            rep = "\s+ssl_session_tickets\s+.+;\n"
+            rep = r"\s+ssl_session_tickets\s+.+;\n"
             conf = re.sub(rep, '', conf)
-            rep = "\s+ssl_stapling\s+.+;\n"
+            rep = r"\s+ssl_stapling\s+.+;\n"
             conf = re.sub(rep, '', conf)
-            rep = "\s+ssl_stapling_verify\s+.+;\n"
+            rep = r"\s+ssl_stapling_verify\s+.+;\n"
             conf = re.sub(rep, '', conf)
-            rep = "\s+add_header\s+.+;\n"
+            rep = r"\s+add_header\s+.+;\n"
             conf = re.sub(rep, '', conf)
-            rep = "\s+add_header\s+.+;\n"
+            rep = r"\s+add_header\s+.+;\n"
             conf = re.sub(rep, '', conf)
-            rep = "\s+ssl\s+on;"
+            rep = r"\s+ssl\s+on;"
             conf = re.sub(rep, '', conf)
-            rep = "\s+error_page\s497.+;"
+            rep = r"\s+error_page\s497.+;"
             conf = re.sub(rep, '', conf)
-            rep = "\s+if.+server_port.+\n.+\n\s+\s*}"
+            rep = r"\s+if.+server_port.+\n.+\n\s+\s*}"
             conf = re.sub(rep, '', conf)
-            rep = "\s+listen\s+443.*;"
+            rep = r"\s+listen\s+443.*;"
             conf = re.sub(rep, '', conf)
-            rep = "\s+listen\s+\[\:\:\]\:443.*;"
+            rep = r"\s+listen\s+\[\:\:\]\:443.*;"
             conf = re.sub(rep, '', conf)
-            rep = "\s+http2\s+on;"
+            rep = r"\s+http2\s+on;"
             conf = re.sub(rep, '', conf)
             mw.writeFile(file, conf)
 
@@ -888,7 +888,7 @@ class site_api:
             # fix binddir domain ssl apply question
             mw.backFile(host_conf_file)
             auth_to = self.getSitePath(siteName)
-            rep = "\s*root\s*(.+);"
+            rep = r"\s*root\s*(.+);"
             replace_root = "\n\troot " + auth_to + ";"
             siteConf = re.sub(rep, replace_root, siteConf)
             mw.writeFile(host_conf_file, siteConf)
@@ -1043,7 +1043,7 @@ class site_api:
         src_path = mw.getAcmeDomainDir(domains[0])
         src_cert = src_path + '/fullchain.cer'
         src_key = src_path + '/' + domains[0] + '.key'
-        src_cert.replace("\*", "*")
+        src_cert.replace("\\*", "*")
 
         msg = '签发失败,您尝试申请证书的失败次数已达上限!<p>1、检查域名是否绑定到对应站点</p>\
             <p>2、检查域名是否正确解析到本服务器,或解析还未完全生效</p>\
@@ -1115,9 +1115,9 @@ class site_api:
         file = self.getHostConf(site_name)
         conf = mw.readFile(file)
         if conf:
-            rep = "\n\s*#HTTP_TO_HTTPS_START(.|\n){1,300}#HTTP_TO_HTTPS_END"
+            rep = r"\n\s*#HTTP_TO_HTTPS_START(.|\n){1,300}#HTTP_TO_HTTPS_END"
             conf = re.sub(rep, '', conf)
-            rep = "\s+if.+server_port.+\n.+\n\s+\s*}"
+            rep = r"\s+if.+server_port.+\n.+\n\s+\s*}"
             conf = re.sub(rep, '', conf)
             mw.writeFile(file, conf)
 
@@ -1282,7 +1282,7 @@ class site_api:
             domain_name = self.toPunycode(domain[0])
             domain_port = '80'
 
-            reg = "^([\w\-\*]{1,100}\.){1,4}([\w\-]{1,24}|[\w\-]{1,24}\.[\w\-]{1,24})$"
+            reg = r"^([\w\-\*]{1,100}\.){1,4}([\w\-]{1,24}|[\w\-]{1,24}\.[\w\-]{1,24})$"
             if not re.match(reg, domain_name):
                 return mw.returnJson(False, '域名格式不正确!')
 
@@ -1339,7 +1339,7 @@ class site_api:
         if dirName == '':
             mw.returnJson(False, '目录不能为空!')
 
-        reg = "^([\w\-\*]{1,100}\.){1,4}(\w{1,10}|\w{1,10}\.\w{1,10})$"
+        reg = r"^([\w\-\*]{1,100}\.){1,4}(\w{1,10}|\w{1,10}\.\w{1,10})$"
         if not re.match(reg, domain):
             return mw.returnJson(False, '主域名格式不正确!')
 
@@ -1355,7 +1355,7 @@ class site_api:
         filename = self.getHostConf(siteInfo['name'])
         conf = mw.readFile(filename)
         if conf:
-            rep = "enable-php-([0-9]{2,3})\.conf"
+            rep = r"enable-php-([0-9]{2,3})\.conf"
             tmp = re.search(rep, conf).groups()
             version = tmp[0]
 
@@ -1507,7 +1507,7 @@ class site_api:
         filename = self.getHostConf(siteName)
         if os.path.exists(filename):
             conf = mw.readFile(filename)
-            rep = '\s*root\s*(.+);'
+            rep = r'\s*root\s*(.+);'
             path = re.search(rep, conf).groups()[0]
             conf = conf.replace(path, newPath)
             mw.writeFile(filename, conf)
@@ -1578,7 +1578,7 @@ class site_api:
 
         if os.path.exists(configFile):
             conf = mw.readFile(configFile)
-            rep = "\n\s*#AUTH_START(.|\n){1,200}#AUTH_END"
+            rep = r"\n\s*#AUTH_START(.|\n){1,200}#AUTH_END"
             conf = re.sub(rep, '', conf)
             mw.writeFile(configFile, conf)
 
@@ -1604,19 +1604,19 @@ class site_api:
         conf = mw.readFile(file)
         if conf:
             # 删除域名
-            rep = "server_name\s+(.+);"
+            rep = r"server_name\s+(.+);"
             tmp = re.search(rep, conf).group()
             newServerName = tmp.replace(' ' + domain + ';', ';')
             newServerName = newServerName.replace(' ' + domain + ' ', ' ')
             conf = conf.replace(tmp, newServerName)
 
             # 删除端口
-            rep = "listen\s+([0-9]+);"
+            rep = r"listen\s+([0-9]+);"
             tmp = re.findall(rep, conf)
             port_count = mw.M('domain').where(
                 'pid=? AND port=?', (pid, port)).count()
             if mw.inArray(tmp, port) == True and port_count < 2:
-                rep = "\n*\s+listen\s+" + port + ";"
+                rep = r"\n*\s+listen\s+" + port + ";"
                 conf = re.sub(rep, '', conf)
             # 保存配置
             mw.writeFile(file, conf)
@@ -1778,7 +1778,7 @@ class site_api:
             if item["r_from"] == _from:
                 return mw.returnJson(False, "重复的规则!")
 
-        rep = "http(s)?\:\/\/([a-zA-Z0-9][-a-zA-Z0-9]{0,62}\.)+([a-zA-Z0-9][a-zA-Z0-9]{0,62})+.?"
+        rep = r"http(s)?\:\/\/([a-zA-Z0-9][-a-zA-Z0-9]{0,62}\.)+([a-zA-Z0-9][a-zA-Z0-9]{0,62})+.?"
         if not re.match(rep, _to):
             return mw.returnJson(False, "错误的目标地址")
 
@@ -1942,7 +1942,7 @@ class site_api:
         if _name == "" or _siteName == "" or _from == "" or _to == "" or _host == "":
             return mw.returnJson(False, "必填项不能为空")
 
-        rep = "http(s)?\:\/\/([a-zA-Z0-9][-a-zA-Z0-9]{0,62}\.)+([a-zA-Z0-9][a-zA-Z0-9]{0,62})+.?"
+        rep = r"http(s)?\:\/\/([a-zA-Z0-9][-a-zA-Z0-9]{0,62}\.)+([a-zA-Z0-9][a-zA-Z0-9]{0,62})+.?"
         if not re.match(rep, _to):
             return mw.returnJson(False, "错误的目标地址!")
 
@@ -1990,7 +1990,7 @@ location ^~ {from} {\n\
 }\n\
 # PROXY-END"
 
-        tpl_proxy_cache = "\n\
+        tpl_proxy_cache = r"\n\
     if ( $uri ~* \"\.(gif|png|jpg|css|js|woff|woff2)$\" )\n\
     {\n\
         expires {cache_time}m;\n\
@@ -2001,7 +2001,7 @@ location ^~ {from} {\n\
     proxy_cache_valid 200 304 301 302 {cache_time}m;\n\
 "
 
-        tpl_proxy_nocache = "\n\
+        tpl_proxy_nocache = r"\n\
     set $static_files_app 0; \n\
     if ( $uri ~* \"\.(gif|png|jpg|css|js|woff|woff2)$\" )\n\
     {\n\
@@ -2219,7 +2219,7 @@ location ^~ {from} {\n\
         file = self.getHostConf(siteName)
         if os.path.exists(file):
             conf = mw.readFile(file)
-            rep = '\s*root\s*(.+);'
+            rep = r'\s*root\s*(.+);'
             find_cnf = re.search(rep, conf)
             if not find_cnf:
                 return ''
@@ -2236,7 +2236,7 @@ location ^~ {from} {\n\
         filename = self.getHostConf(siteName)
         if os.path.exists(filename):
             conf = mw.readFile(filename)
-            rep = '\s*root\s*(.+);'
+            rep = r'\s*root\s*(.+);'
             path = re.search(rep, conf).groups()[0]
 
         data = {}
@@ -2321,7 +2321,7 @@ location ^~ {from} {\n\
 
     def getSitePhpVersion(self, siteName):
         conf = mw.readFile(self.getHostConf(siteName))
-        rep = "enable-php-(.*)\.conf"
+        rep = r"enable-php-(.*)\.conf"
         find_php_cnf = re.search(rep, conf)
 
         def_pver = '00'
@@ -2337,7 +2337,7 @@ location ^~ {from} {\n\
         siteName = mw.M('sites').where("id=?", (sid,)).getField('name')
         file = self.getHostConf(siteName)
         conf = mw.readFile(file)
-        rep = "\s+index\s+(.+);"
+        rep = r"\s+index\s+(.+);"
         tmp = re.search(rep, conf).groups()
         return tmp[0].replace(' ', ',')
 
@@ -2356,7 +2356,7 @@ location ^~ {from} {\n\
         file = self.getHostConf(siteName)
         conf = mw.readFile(file)
         if conf:
-            rep = "\s+index\s+.+;"
+            rep = r"\s+index\s+.+;"
             conf = re.sub(rep, "\n\tindex " + index_l + ";", conf)
             mw.writeFile(file, conf)
 
@@ -2370,17 +2370,17 @@ location ^~ {from} {\n\
         data = {}
         conf = mw.readFile(filename)
         try:
-            rep = "\s+limit_conn\s+perserver\s+([0-9]+);"
+            rep = r"\s+limit_conn\s+perserver\s+([0-9]+);"
             tmp = re.search(rep, conf).groups()
             data['perserver'] = int(tmp[0])
 
             # IP并发限制
-            rep = "\s+limit_conn\s+perip\s+([0-9]+);"
+            rep = r"\s+limit_conn\s+perip\s+([0-9]+);"
             tmp = re.search(rep, conf).groups()
             data['perip'] = int(tmp[0])
 
             # 请求并发限制
-            rep = "\s+limit_rate\s+([0-9]+)\w+;"
+            rep = r"\s+limit_rate\s+([0-9]+)\w+;"
             tmp = re.search(rep, conf).groups()
             data['limit_rate'] = int(tmp[0])
         except:
@@ -2410,15 +2410,15 @@ location ^~ {from} {\n\
         conf = mw.readFile(filename)
         if(conf.find('limit_conn perserver') != -1):
             # 替换总并发
-            rep = "limit_conn\s+perserver\s+([0-9]+);"
+            rep = r"limit_conn\s+perserver\s+([0-9]+);"
             conf = re.sub(rep, str_perserver, conf)
 
             # 替换IP并发限制
-            rep = "limit_conn\s+perip\s+([0-9]+);"
+            rep = r"limit_conn\s+perip\s+([0-9]+);"
             conf = re.sub(rep, str_perip, conf)
 
             # 替换请求流量限制
-            rep = "limit_rate\s+([0-9]+)\w+;"
+            rep = r"limit_rate\s+([0-9]+)\w+;"
             conf = re.sub(rep, str_limit_rate, conf)
         else:
             conf = conf.replace('#error_page 404/404.html;', "#error_page 404/404.html;\n    " +
@@ -2434,15 +2434,15 @@ location ^~ {from} {\n\
         filename = self.getHostConf(siteName)
         conf = mw.readFile(filename)
         # 清理总并发
-        rep = "\s+limit_conn\s+perserver\s+([0-9]+);"
+        rep = r"\s+limit_conn\s+perserver\s+([0-9]+);"
         conf = re.sub(rep, '', conf)
 
         # 清理IP并发限制
-        rep = "\s+limit_conn\s+perip\s+([0-9]+);"
+        rep = r"\s+limit_conn\s+perip\s+([0-9]+);"
         conf = re.sub(rep, '', conf)
 
         # 清理请求流量限制
-        rep = "\s+limit_rate\s+([0-9]+)\w+;"
+        rep = r"\s+limit_rate\s+([0-9]+)\w+;"
         conf = re.sub(rep, '', conf)
         mw.writeFile(filename, conf)
         mw.restartWeb()
@@ -2458,15 +2458,15 @@ location ^~ {from} {\n\
             rep = "#SECURITY-START(\n|.){1,500}#SECURITY-END"
             tmp = re.search(rep, conf).group()
             data['fix'] = re.search(
-                "\(.+\)\$", tmp).group().replace('(', '').replace(')$', '').replace('|', ',')
+                r"\(.+\)\$", tmp).group().replace('(', '').replace(')$', '').replace('|', ',')
 
             data['status'] = False
             data['none'] = False
 
             valid_referers = re.search(
-                "valid_referers\s+(.+);\n", tmp)
+                r"valid_referers\s+(.+);\n", tmp)
             valid_referers_none = re.search(
-                "valid_referers\s+none\s+blocked\s+(.+);\n", tmp)
+                r"valid_referers\s+none\s+blocked\s+(.+);\n", tmp)
 
             if valid_referers or valid_referers_none:
                 data['status'] = True
@@ -2500,11 +2500,11 @@ location ^~ {from} {\n\
         if os.path.exists(file):
             conf = mw.readFile(file)
             if status == 'false':
-                rep = "\s{0,4}#SECURITY-START(\n|.){1,500}#SECURITY-END\n?"
+                rep = r"\s{0,4}#SECURITY-START(\n|.){1,500}#SECURITY-END\n?"
                 conf = re.sub(rep, '', conf)
                 mw.writeLog('网站管理', '站点[' + name + ']已关闭防盗链设置!')
             else:
-                rep = "\s{0,4}#SECURITY-START(\n|.){1,500}#SECURITY-END\n?"
+                rep = r"\s{0,4}#SECURITY-START(\n|.){1,500}#SECURITY-END\n?"
                 conf = re.sub(rep, '', conf)
 
                 valid_referers = domains.strip().replace(',', ' ')
@@ -2512,8 +2512,8 @@ location ^~ {from} {\n\
                     valid_referers = 'none blocked ' + valid_referers
 
                 pre_path = self.setupPath + "/php/conf"
-                re_path = "include\s+" + pre_path + "/enable-php-"
-                rconf = '''#SECURITY-START 防盗链配置
+                re_path = r"include\s+" + pre_path + "/enable-php-"
+                rconf = r'''#SECURITY-START 防盗链配置
     location ~ .*\.(%s)$
     {
         expires      30d;
@@ -2555,7 +2555,7 @@ location ^~ {from} {\n\
         conf_dir = mw.getServerDir() + "/web_conf/php/conf"
         conf_list = os.listdir(conf_dir)
         l = len(conf_list)
-        rep = "enable-php-(.*?)\.conf"
+        rep = r"enable-php-(.*?)\.conf"
         for name in conf_list:
             tmp = {}
             try:
@@ -2611,7 +2611,7 @@ location ^~ {from} {\n\
             return
 
         # 添加域名
-        rep = "server_name\s*(.*);"
+        rep = r"server_name\s*(.*);"
         tmp = re.search(rep, conf).group()
         domains = tmp.split(' ')
         if not mw.inArray(domains, domain):
@@ -2619,7 +2619,7 @@ location ^~ {from} {\n\
             conf = conf.replace(tmp, newServerName)
 
         # 添加端口
-        rep = "listen\s+([0-9]+)\s*[default_server]*\s*;"
+        rep = r"listen\s+([0-9]+)\s*[default_server]*\s*;"
         tmp = re.findall(rep, conf)
         if not mw.inArray(tmp, port):
             listen = re.search(rep, conf).group()
@@ -2820,7 +2820,7 @@ location ^~ {from} {\n\
 
             conf = conf.replace('#error_page 404/404.html;', sslStr)
 
-            rep = "listen\s+([0-9]+)\s*[default_server|reuseport]*;"
+            rep = r"listen\s+([0-9]+)\s*[default_server|reuseport]*;"
             tmp = re.findall(rep, conf)
             if not mw.inArray(tmp, '443'):
                 listen = re.search(rep, conf).group()

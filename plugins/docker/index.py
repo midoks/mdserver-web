@@ -10,7 +10,11 @@ import json
 sys.path.append(os.getcwd() + "/class/core")
 import mw
 
-import docker
+try:
+    import docker
+except Exception as e:
+    pass
+
 
 
 app_debug = False

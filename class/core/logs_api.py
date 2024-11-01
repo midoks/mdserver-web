@@ -173,14 +173,12 @@ class logs_api:
 
     def __to_date2(self, date_str):
         tmp = date_str.split()
-        s_date = str(tmp[-1]) + '-' + self.__months.get(tmp[1],
-                                                        tmp[1]) + '-' + tmp[2] + ' ' + tmp[3]
+        s_date = str(tmp[-1]) + '-' + self.__months.get(tmp[1], tmp[1]) + '-' + tmp[2] + ' ' + tmp[3]
         return s_date
 
     def __to_date3(self, date_str):
         tmp = date_str.split()
-        s_date = str(datetime.now().year) + '-' + \
-            self.__months.get(tmp[1], tmp[1]) + '-' + tmp[2] + ' ' + tmp[3]
+        s_date = str(datetime.now().year) + '-' + self.__months.get(tmp[1], tmp[1]) + '-' + tmp[2] + ' ' + tmp[3]
         return s_date
 
     def __to_date4(self, date_str):

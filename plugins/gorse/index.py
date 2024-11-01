@@ -238,7 +238,7 @@ def getPort():
     conf = getServerDir() + '/gorse.conf'
     content = mw.readFile(conf)
 
-    rep = "^(" + 'port' + ')\s*([.0-9A-Za-z_& ~]+)'
+    rep = "^(" + 'port' + ')\\s*([.0-9A-Za-z_& ~]+)'
     tmp = re.search(rep, content, re.M)
     if tmp:
         return tmp.groups()[1]

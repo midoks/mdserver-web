@@ -172,7 +172,7 @@ class backupTools:
         if auth != 'disabled':
             uoption =' --authenticationDatabase admin -u root -p '+mg_root
     
-        cmd = db_path + "/bin/mongodump "+uoption+" --port "+str(port)+" -d test -o "+backup_path 
+        cmd = db_path + "/bin/mongodump "+uoption+" --port "+str(port)+" -d "+name+" -o "+backup_path 
         # print(cmd)
         mw.execShell(cmd)
         cmd_gz = "cd "+backup_path+"/"+name+" && tar -zcvf "+filename + " ./"

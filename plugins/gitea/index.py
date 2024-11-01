@@ -220,7 +220,7 @@ def getDbConfValue():
     rep_scope = r"\[database\](.*?)\["
     tmp = re.findall(rep_scope, content, re.S)
 
-    rep = '(\w*)\s*=\s*(.*)'
+    rep = '(\\w*)\\s*=\\s*(.*)'
     tmp = re.findall(rep, tmp[0])
     r = {}
     for x in range(len(tmp)):
@@ -418,7 +418,7 @@ def getGogsConf():
     result = []
 
     for g in gets:
-        rep = g['name'] + '\s*=\s*(.*)'
+        rep = g['name'] + '\\s*=\\s*(.*)'
         tmp = re.search(rep, conf)
         if not tmp:
             continue
@@ -447,7 +447,7 @@ def submitGogsConf():
     conf = mw.readFile(filename)
     for g in gets:
         if g in args:
-            rep = g + '\s*=\s*(.*)'
+            rep = g + '\\s*=\\s*(.*)'
             val = g + ' = ' + args[g]
             conf = re.sub(rep, val, conf)
     mw.writeFile(filename, conf)

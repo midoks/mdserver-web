@@ -12,6 +12,7 @@ install_tmp=${rootPath}/tmp/mw_install.pl
 VERSION=$2
 
 # cd /www/server/mdserver-web/plugins/fail2ban && bash install.sh install 1.1.0
+# cd /www/server/mdserver-web && python3 plugins/fail2ban/index.py config_tpl
 
 Install_App()
 {
@@ -31,7 +32,7 @@ Install_App()
 Uninstall_App()
 {
 	apt remove -y fail2ban
-
+	apt purge -y fail2ban
 
 	if [ -f /usr/lib/systemd/system/fail2ban.service ];then
 		systemctl stop fail2ban
@@ -53,6 +54,10 @@ Uninstall_App()
 
 	if [ -d $serverPath/fail2ban ];then
 		rm -rf $serverPath/fail2ban
+	fi
+
+	if [ -d /etc/fail2ban ];then
+		rm -rf /etc/fail2ban
 	fi
 	
 	echo "卸载fail2ban成功"

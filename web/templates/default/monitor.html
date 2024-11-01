@@ -1,0 +1,176 @@
+{% extends "layout.html" %}
+
+{% block content %}
+
+<div class="main-content">
+		<div class="container-fluid" style="padding-bottom: 50px;">
+			<div class="pos-box bgw mtb15">
+				<div class="position f14 c9 pull-left">
+					<a class="plr10 c4" href="/">首页监控</a>/<span class="plr10 c4">系统监控</span>
+				</div>
+			</div>
+			<div class="safe container-fluid  bgw mtb15 pd15" style="overflow: hidden;">
+				<div class="mr50 pull-left">
+					<div class="ss-text pull-left">
+						<em>开启监控</em>
+						<div class='ssh-item' id="openJK"></div>
+					</div>
+				</div>
+				<div class="mr50 pull-left">
+					<div class="ss-text pull-left">
+						<em>保存天数：</em>
+						<input class="bt-input-text" id="save_day" value="" type="number">
+					</div>
+					<div class="ss-text pull-left" style="margin-left:10px">
+						<button class="btn btn-default btn-sm" type="button" onclick="setControl('save_day',true);">更改</button>
+					</div>
+				</div>
+				<div class="mr50 pull-left" style="padding-left:10px; border-left:#ccc 1px solid; margin-right:0">
+					<div class="mr50 pull-left">
+						<div class="ss-text pull-left">
+							<em>仅统计外网</em>
+							<div class='ssh-item' id="statAll"></div>
+						</div>
+					</div>
+
+					<button class="btn btn-default btn-sm" type="button" onclick="closeControl()">清空记录</button>
+				</div>
+			</div>
+			<div class="control">
+				<div class="col-xs-12 col-sm-12 col-md-12 pull-left pd0 view0">
+					<div class="mb15">
+						<div class="bgw pb15">
+							<div class="title c6 plr15 mb15">
+								<h3 class="c-tit f16">平均负载</h3>
+								<div class="searcTime pull-right">
+									<span class="tit">区间检索：</span>
+									<span class="gt" onclick="Wday(1,'getload')">昨天</span>
+									<span class="gt on" onclick="Wday(0,'getload')">今天</span>
+									<span class="gt" onclick="Wday(7,'getload')">最近7天</span>
+									<span class="gt" onclick="Wday(30,'getload')">最近30天</span>
+									<div class="ss">
+										<span class="st">自定义时间</span>
+										<div class="time">
+											<span class="bt">时间范围
+												<input id="loadbtn_rtime" class="rtime" type="text" value="2023-07-06 00:00:00 - 2023-08-08 00:00:00">
+											</span>
+											<div class="sbtn loadbtn">提交</div>
+										</div>
+									</div>
+								</div>
+							</div>
+							<div id="getloadview" style="width:100%; height:330px;"></div>
+						</div>
+					</div>
+				</div>
+				<div class="col-xs-12 col-sm-12 col-md-6 pull-left pd0 view1">
+					<div class="pr8">
+						<div class="bgw pb15">
+							<div class="title c6 plr15">
+								<h3 class="c-tit f16">CPU</h3>
+								<div class="searcTime pull-right">
+									<span class="tit">区间检索：</span>
+									<span class="gt" onclick="Wday(1,'cpu')">昨天</span>
+									<span class="gt on" onclick="Wday(0,'cpu')">今天</span>
+									<span class="gt" onclick="Wday(7,'cpu')">最近7天</span>
+									<span class="gt" onclick="Wday(30,'cpu')">最近30天</span>
+									<div class="ss">
+										<span class="st">自定义时间</span>
+										<div class="time">
+											<span class="bt">时间范围
+												<input id="cpubtn_rtime" class="rtime" type="text" value="2023-07-06 00:00:00 - 2023-08-08 00:00:00">
+											</span>
+											<div class="sbtn cpubtn">提交</div>
+										</div>
+									</div>
+								</div>
+							</div>
+							<div id="cupview" style="width:100%; height:330px"></div>
+						</div>
+					</div>
+				</div>
+				<div class="col-xs-12 col-sm-12 col-md-6 pull-left pd0 view2">
+					<div class="pl7">
+						<div class="bgw pb15">
+							<div class="title c6 plr15">
+								<h3 class="c-tit f16">内存</h3>
+								<div class="searcTime pull-right">
+									<span class="tit">区间检索：</span>
+									<span class="gt" onclick="Wday(1,'mem')">昨天</span>
+									<span class="gt on" onclick="Wday(0,'mem')">今天</span>、
+									<span class="gt" onclick="Wday(7,'mem')">最近7天</span>
+									<span class="gt" onclick="Wday(30,'mem')">最近30天</span>
+									<div class="ss">
+										<span class="st">自定义时间</span>
+										<div class="time">
+											<span class="bt">时间范围
+												<input id="membtn_rtime" class="rtime" type="text" value="2023-07-06 00:00:00 - 2023-08-08 00:00:00">
+											</span>
+											<div class="sbtn membtn">提交</div>
+										</div>
+									</div>
+								</div>
+							</div>
+							<div id="memview" style="width:100%; height:330px"></div>
+						</div>
+					</div>
+				</div>
+				<div class="col-xs-12 col-sm-12 col-md-6 pull-left pd0 view1">
+					<div class="pr8">
+						<div class="bgw pb15">
+							<div class="title c6 plr15 mb15">
+								<h3 class="c-tit f16">磁盘IO</h3>
+								<div class="searcTime pull-right">
+									<span class="tit">$data['lan']['S1']</span>
+									<span class="gt" onclick="Wday(1,'disk')">昨天</span>
+									<span class="gt on" onclick="Wday(0,'disk')">今天</span>
+									<span class="gt" onclick="Wday(7,'disk')">最近7天</span>
+									<span class="gt" onclick="Wday(30,'disk')">最近30天</span>
+									<div class="ss">
+										<span class="st">自定义时间</span>
+										<div class="time">
+											<span class="bt">时间范围
+												<input id="diskbtn_rtime" class="rtime" type="text" value="2023-07-06 00:00:00 - 2023-08-08 00:00:00">
+											</span>
+											<div class="sbtn diskbtn">提交</div>
+										</div>
+									</div>
+								</div>
+							</div>
+							<div id="diskview" style="width:100%; height:330px"></div>
+						</div>
+					</div>
+				</div>
+				<div class="col-xs-12 col-sm-12 col-md-6 pull-left pd0 view2">
+					<div class="pl7">
+						<div class="bgw pb15">
+							<div class="title c6 plr15 mb15">
+								<h3 class="c-tit f16">网络IO</h3>
+								<div class="searcTime pull-right">
+									<span class="tit">$data['lan']['S1']</span>
+									<span class="gt" onclick="Wday(1,'network')">昨天</span>
+									<span class="gt on" onclick="Wday(0,'network')">今天</span>
+									<span class="gt" onclick="Wday(7,'network')">最近7天</span>
+									<span class="gt" onclick="Wday(30,'network')">最近30天</span>
+									<div class="ss">
+										<span class="st">自定义时间</span>
+										<div class="time">
+											<span class="bt">时间范围
+												<input id="networkbtn_rtime" class="rtime" type="text" value="2023-07-06 00:00:00 - 2023-08-08 00:00:00">
+											</span>
+											<div class="sbtn networkbtn">提交</div>
+										</div>
+									</div>
+								</div>
+							</div>
+							<div id="network" style="width:100%; height:330px"></div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+<script type="text/javascript" src="/static/laydate/laydate.js?v={{config.version}}"></script>
+<script src="/static/app/control.js?v={{config.version}}"></script>
+{% endblock %}

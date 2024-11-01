@@ -1,0 +1,117 @@
+{% extends "layout.html" %}
+
+{% block content %}
+
+<style>
+.weblog{
+	font-size: 12px;
+    display:inline-block;
+	line-height:30px;
+}
+.weblog em{
+	font-style:normal;
+	color:#666;
+	margin: 0 30px;
+}
+.weblog span{
+	margin-right:5px;
+}
+.weblog a{
+	color:#20a53a;
+}
+.firewall-port-box{
+	margin-bottom:15px;
+}
+</style>
+<div class="main-content">
+	<div class="container-fluid" style="padding-bottom: 50px;">
+		<div class="pos-box bgw mtb15">
+			<div class="position f14 c9 pull-left">
+				<a class="plr10 c4" href="/">首页</a>/<span class="plr10 c4">系统安全</span>
+			</div>
+			<div class="search pull-right">
+				<form target="hid" onsubmit='getLogs(1,$("#SearchValue").prop("value"))'>
+					<input type="text" id="SearchValue" class="ser-text pull-left" placeholder="搜索日志" />
+					<button type="button" class="ser-sub pull-left" onclick='getLogs(1,$("#SearchValue").prop("value"))'></button>
+				</form>
+				<iframe name='hid' id="hid" style="display:none"></iframe>
+			</div>
+		</div>
+		<div class="safe container-fluid bgw mtb15 pd15">
+			<div class="mr20 pull-left" style="border-right: 1px solid #ccc;padding-right: 20px;">
+
+				<form>
+					<div class="ss-text pull-left">
+						<a class="btlink" style="line-height: 32px;" onclick="sshMgr();">SSH管理</a>
+					</div>
+				</form>
+			</div>
+			<div class="mr20 pull-left" style="border-right: 1px solid #ccc;padding-right: 20px;">
+
+				<div class="ss-text pull-left mr5">
+					<em>SSH端口:</em>
+					<input type="text" class="bt-input-text" id="mstscPort" value=""/>
+				</div>
+				<div class="ss-text pull-left">
+					<button id="mstscSubmit" onclick='mstsc($("#mstscPort").prop("value"))' class="btn btn-default btn-sm" type="button">更改</button>
+				</div>
+			</div>
+			<div class="mr20 pull-left" style="border-right: 1px solid #ccc; padding-right: 20px;">
+				<div class="ss-text pull-left">
+					<em>启用禁ping</em>
+					<div class='ssh-item' id="is_ping">
+						<input class='btswitch btswitch-ios' id='noping' type='checkbox'><label class='btswitch-btn noping' for='noping' ></label>
+					</div>
+				</div>
+			</div>
+
+			<div class="mr20 pull-left" style="border-right: 1px solid #ccc; padding-right: 20px;">
+				<form>
+					<div class="ss-text pull-left">
+						<em>启用防火墙</em>
+						<div class='ssh-item' id="firewall_status">
+							<input class='btswitch btswitch-ios' id='firewall_status' type='checkbox'><label class='btswitch-btn sshswitch' for='firewall_status' ></label>
+						</div>
+					</div>
+				</form>
+			</div>
+
+			<div class="weblog" id='firewall_weblog'></div>
+		</div>
+		
+		<div class="white-black-ip bgw mtb15">
+            <div class="black-ip">
+                <div class="def-log">
+                    <div class="title c6 plr15">
+                        <h3 class="f16">防火墙</h3>             
+                    </div>
+
+                    <div class="divtable pd15">
+						<div class="firewall-port-box">
+							<select id="firewalldType" class="bt-input-text c5 mr5" name="type" style="width:80px;">
+								<option value="port">放行端口</option>
+								<option value="address">屏蔽</option>
+							</select>
+							<input type="text" class="bt-input-text mr5" style="width: 117px;" id="AcceptPort" placeholder="端口">
+							<input type="text" class="bt-input-text mr5" id="Ps" placeholder="备注/说明">
+							<select class="bt-input-text c5 mr5" name="protocol" style="width:80px;">
+								<option value="tcp">tcp</option>
+								<option value="udp">udp</option>
+								<option value="tcp/udp">tcp/udp</option>
+							</select>
+							<button id="toAccept" onclick="addAcceptPort();" class="btn btn-default btn-sm va0" type="button">放行</button>
+							<span id="f-ps" class="c9" style="margin-left: 10px;">说明: 支持放行端口范围，如: 3000:3500</span>
+						</div>
+                        <div class="tablescroll">
+                            <table id="firewallBody" class="table table-hover" style="min-width: 640px;border: 0 none;"></table>
+                        </div>
+                        <div id="firewallPage" class="dataTables_paginate paging_bootstrap page firewallBody" style="margin-bottom:0"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+	</div>
+</div>
+<script src="/static/app/firewall.js?v={{config.version}}"></script>
+{% endblock %}

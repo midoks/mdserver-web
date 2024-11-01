@@ -268,7 +268,7 @@ def runLog():
 def ipList():
     config = getServerDir() + '/conf/app.conf'
     content = mw.readFile(config)
-    rep = 'ip\s*=\s*(.*)'
+    rep = r'ip\s*=\s*(.*)'
     tmp = re.search(rep, content)
     if not tmp:
         return ''

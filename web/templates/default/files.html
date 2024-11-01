@@ -1,0 +1,113 @@
+{% extends "layout.html" %}
+
+{% block content %}
+<div class="main-content">
+    <div class="container-fluid" style="padding-bottom:50px">
+        <div class="file-box bgw mtb15" style="position:relative; padding-top:110px">
+            <div id="tipTools" class="plr15">
+                <div class="ptb15">
+                    <div class="clearfix">
+                        <div class="pull-left">
+                            <button id="backBtn" class="backBtn btn btn-default btn-sm glyphicon glyphicon-arrow-left pull-left" title="" onClick="backDir()"></button>
+                            <button class="backBtn refreshBtn btn btn-default btn-sm glyphicon glyphicon-refresh pull-right" title="" style="margin-left:-1px;"></button>
+                            <span id='DirPathPlace' class="pull-left"><input id="fileInputPath" type="text"></span>
+                            <span id='PathPlaceBtn' class="pull-left"></span>
+                        </div>
+                        <div class="pull-left mlr15" style="line-height:26px"><span id='dir_info'></span></div>
+                        <div class="search pull-right" style="position: absolute; top: 6px; right: 5px;">
+                            <form target="hid">
+                                <input type="text" id="search_file" class="ser-text pull-left" placeholder="搜索文件/目录" autocomplete="false" />
+                                <button type="button" class="ser-sub pull-left" onclick='searchFile(1)'></button>
+                                <div class="file_search" draggable="false">
+                                    <label for="search_file">包含子目录</label>
+                                    <div id="search_all" class="file_search_checked"></div>
+                                </div>
+                            </form>
+                            <iframe name='hid' id="hid" style="display:none"></iframe>
+                        </div>
+                    </div>
+                </div>
+                <div class="clearfix ptb10">
+                    <button class="btn btn-default btn-sm pull-left" onclick="uploadFiles()">上传</button>
+                    <button class="btn btn-default btn-sm pull-left" onclick="downloadFile()" title="远程下载" style="margin:0 5px">远程下载</button>
+                    <span id='BarTools'></span>
+                    <span id='Batch' style="background-color:#fff;position:absolute;right:190px;z-index:10"></span>
+                    <span id='comlist' class="comlist"></span>
+                    <div class="btn-group btn-group-sm pull-right" style="margin-right:5px;">
+                        <button id="set_icon" type="button" class="btn btn-default">
+                            <i class="glyphicon glyphicon-th"></i>
+                        </button>
+                        <button id="set_list" type="button" class="btn btn-default active">
+                            <i class="glyphicon glyphicon-th-list"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+            <!-- 文件展示 -->
+            <div class="divtable pd15" id="fileCon"></div>
+            <div class="dataTables_paginate paging_bootstrap pagination plr15" style="position: relative; top: -6px;">
+                <ul id="filePage" class="page"></ul>
+            </div>
+        </div>
+    </div>
+</div>
+</div>
+<ul id="rmenu" class="dropdown-menu" style="display:none">
+    <li onclick="javascript:batch(1);"><a style="cursor: pointer;">复制</a></li>
+    <li onclick="javascript:batch(2);"><a style="cursor: pointer;">剪切</a></li>
+    <li onclick="javascript:batch(3);"><a style="cursor: pointer;">权限</a></li>
+    <li onclick="javascript:batch(5);"><a style="cursor: pointer;">压缩</a></li>
+    <li onclick="javascript:batch(4);"><a style="cursor: pointer;">删除</a></li>
+</ul>
+
+<script src="/static/app/files.js?v={{config.version}}"></script>
+<script src="/static/js/jquery-ui.min.js?v={{config.version}}"></script>
+<script src="/static/js/jquery.contextify.min.js?v={{config.version}}"></script>
+<script type="text/javascript">
+
+
+$("#search_file").focus().keyup(function(e){
+    if(e.keyCode == 13) searchFile(1);
+});
+
+
+setTimeout(function() {
+    getDisk();
+}, 500);
+
+
+var xPath = getCookie('open_dir_path');
+setTimeout(function() {
+    getFiles((xPath != undefined ? xPath : '/www/wwwroot'));
+}, 800);
+
+pathPlaceBtn((xPath != undefined ? xPath : '/www/wwwroot'));
+setCookie('uploadSize', 1024 * 1024 * 1024);
+if (getCookie('rank') == undefined || getCookie('rank') == null) {
+    setCookie('rank', 'a');
+}
+
+$("#set_icon").click(function() {
+    setCookie('rank', 'b');
+    $(this).addClass("active");
+    $("#set_list").removeClass("active");
+    getFiles(getCookie('open_dir_path'));
+});
+
+$("#set_list").click(function() {
+    setCookie('rank', 'a');
+    $(this).addClass("active");
+    $("#set_icon").removeClass("active");
+    getFiles(getCookie('open_dir_path'));
+})
+
+$(".refreshBtn").click(function() {
+    getFiles(getCookie('open_dir_path'));
+})
+
+
+$('#search_all').click(function(){
+    $(this).toggleClass('active');
+});
+</script>
+{% endblock %}

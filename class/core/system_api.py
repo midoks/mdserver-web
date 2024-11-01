@@ -717,7 +717,6 @@ class system_api:
 
             self.cache[iokey] = {'info':diskio_group,'time':mtime}
         except Exception as e:
-            # print(mw.getTracebackInfo())
             pass
 
         return diskInfo
@@ -866,6 +865,7 @@ class system_api:
         return {}
 
     def updateServer(self, stype, version=''):
+        return mw.returnJson(False, '与后续版本差异太大,不再提供更新')
         # 更新服务
         try:
             if not mw.isRestart():

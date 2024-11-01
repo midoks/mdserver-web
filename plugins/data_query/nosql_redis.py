@@ -7,8 +7,13 @@ import time
 import re
 import redis
 
-sys.path.append(os.getcwd() + "/class/core")
-import mw
+
+try: 
+    sys.path.append(os.getcwd() + "/class/core")
+    import mw
+except Exception as e:
+    import core.mw as mw
+
 
 # def getPluginName():
 #     return 'data_query'

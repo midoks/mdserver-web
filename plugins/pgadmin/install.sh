@@ -79,10 +79,10 @@ Install_pgadmin()
 	    fi
 	fi
 
-
 	if [ -f ${PG_DIR}/bin/activate ];then
 		source ${PG_DIR}/bin/activate
 	fi
+	pip install gunicorn
 
 	# pip install https://ftp.postgresql.org/pub/pgadmin/pgadmin4/v8.10/pip/pgadmin4-8.10-py3-none-any.whl
 	pip install https://ftp.postgresql.org/pub/pgadmin/pgadmin4/v8.12/pip/pgadmin4-8.12-py3-none-any.whl

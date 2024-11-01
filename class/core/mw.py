@@ -593,8 +593,11 @@ def writeLog(stype, msg, args=()):
         if 'uid' in session:
             uid = session['uid']
     except Exception as e:
-        pass
+        print('writeL:',e)
+        # pass
         # writeFileLog(getTracebackInfo())
+
+    print(stype, msg)
     return writeDbLog(stype, msg, args, uid)
 
 
@@ -716,11 +719,9 @@ def enPunycode(domain):
             newdomain += dkey + '.'
         else:
             if sys.version_info[0] == 2:
-                newdomain += 'xn--' + \
-                    dkey.decode('utf-8').encode('punycode') + '.'
+                newdomain += 'xn--' + dkey.decode('utf-8').encode('punycode') + '.'
             else:
-                newdomain += 'xn--' + \
-                    dkey.encode('punycode').decode('utf-8') + '.'
+                newdomain += 'xn--' + dkey.encode('punycode').decode('utf-8') + '.'
     if tmp[0] == '*':
         newdomain = "*." + newdomain
     return newdomain[0:-1]
@@ -732,8 +733,7 @@ def dePunycode(domain):
     newdomain = ''
     for dkey in tmp:
         if dkey.find('xn--') >= 0:
-            newdomain += dkey.replace('xn--',
-                                      '').encode('utf-8').decode('punycode') + '.'
+            newdomain += dkey.replace('xn--','').encode('utf-8').decode('punycode') + '.'
         else:
             newdomain += dkey + '.'
     return newdomain[0:-1]

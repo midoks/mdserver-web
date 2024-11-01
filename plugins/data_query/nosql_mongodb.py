@@ -12,8 +12,11 @@ import yaml
 from bson.objectid import ObjectId
 from bson.json_util import dumps
 
-sys.path.append(os.getcwd() + "/class/core")
-import mw
+try: 
+    sys.path.append(os.getcwd() + "/class/core")
+    import mw
+except Exception as e:
+    import core.mw as mw
 
 def singleton(cls):
     _instance = {}

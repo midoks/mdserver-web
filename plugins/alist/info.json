@@ -1,0 +1,17 @@
+{
+	"sort": 7,
+	"ps": "一个支持多种存储的文件列表程序",
+	"name": "alist",
+	"title": "Alist",
+	"shell": "install.sh",
+	"versions":["3.37.4","3.38.0"],
+	"tip": "soft",
+	"checks": "server/alist",
+	"path": "server/alist",
+	"display": 1,
+	"author": "alist",
+	"date": "2022-10-09",
+	"home": "https://alist.nn.ci",
+	"type": 0,
+	"pid": "5"
+}

@@ -663,7 +663,7 @@ class plugins_api:
             return mw.readFile(version_f).strip()
         return ''
 
-     # 构造本地插件信息
+    # 构造本地插件信息
     def getPluginInfo(self, info):
         checks = ''
         path = ''

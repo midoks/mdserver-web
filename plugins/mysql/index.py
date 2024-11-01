@@ -1,4 +1,5 @@
-# coding:utf-8
+#!/usr/bin/env python
+# coding=utf-8
 
 import sys
 import io
@@ -2241,7 +2242,7 @@ def getMasterStatus(version=''):
 
         return mw.returnJson(master_status, '设置成功', data)
     except Exception as e:
-        return mw.returnJson(False, "数据库密码错误,在管理列表-点击【修复】,"+str(e), 'pwd')
+        return mw.returnJson(False, "数据库密码错误,在管理列表-点击【修复】,"+str(mw.getTracebackInfo()), 'pwd')
 
 
 def setMasterStatus(version=''):
