@@ -21,7 +21,9 @@ from .task import addTask
 from .task import getTaskCount,getTaskUnexecutedCount,getTaskList,getTaskFirstByRun
 from .task import setTaskStatus,setTaskData
 
-from .user import getUserByName,getUserById,isLoginCheck
+from .user import isLoginCheck
+from .user import getUserByName,getUserById,getUserByRoot
+from .user import setUserByRoot
 
 from .temp_login import getTempLoginByToken,clearTempLogin
 

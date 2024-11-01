@@ -120,7 +120,7 @@ def mwcli(mw_input=0):
         input_user = mw_input_cmd("请输入新的面板用户名(>=5位)：")
         set_panel_username(input_user.strip())
     elif mw_input == 13:
-        os.system('tail -100 ' + mw.getPanelDir() + '/logs/error.log')
+        os.system('tail -100 ' + mw.getPanelDir() + '/logs/panel_error.log')
     elif mw_input == 20:
         basic_auth = 'data/basic_auth.json'
         if os.path.exists(basic_auth):
@@ -246,7 +246,6 @@ def show_panel_pwd():
 
 def set_panel_username(username=None):
     # 随机面板用户名
-    sql = db.Sql()
     if username:
         if len(username) < 5:
             print("|-错误，用户名长度不能少于5位")
@@ -255,15 +254,15 @@ def set_panel_username(username=None):
             print("|-错误，不能使用过于简单的用户名")
             return
 
-        sql.table('users').where('id=?', (1,)).setField('username', username)
+        model.setUserByRoot(name=username)
         print("|-新用户名: %s" % username)
         return
 
-    username = sql.table('users').where('id=?', (1,)).getField('username')
-    if username == 'admin':
+    info = model.getUserByRoot()
+    if info['name'] == 'admin':
         username = mw.getRandomString(8).lower()
-        sql.table('users').where('id=?', (1,)).setField('username', username)
-    print('username: ' + username)
+        model.setUserByRoot(name=username)
+    print('|-用户名: ' + info['name'])
 
 
 def getServerIp():
@@ -276,6 +275,10 @@ def getServerIp():
 
 
 if __name__ == "__main__":
+
+    if len(sys.argv) == 1:
+        print('ERROR: Parameter error!')
+        exit(-2)
     method = sys.argv[1]
     if method == 'panel':
         set_panel_pwd(sys.argv[2])

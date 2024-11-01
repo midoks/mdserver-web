@@ -32,16 +32,6 @@ def getUserByName(name,
     row['update_time'] = item.update_time
     return row
 
-def isLoginCheck(username, password) -> bool:
-    info = getUserByName(data['username'])
-    if info is None:
-        return False
-
-    if info['password'] == mw.md5(password):
-        return True
-    return False
-
-
 def getUserById(id,
 ) -> None:
     '''
@@ -61,6 +51,47 @@ def getUserById(id,
     row['add_time'] = item.add_time
     row['update_time'] = item.update_time
     return row
+
+def getUserByRoot() -> None:
+    '''
+    获取用户信息通过用户名
+    '''
+    return getUserById(1)
+
+def setUserByRoot(
+    name: str | None = None,
+    password: str | None =None,
+) -> bool:
+    '''
+    设置配置的值
+    :name -> str 名称 (必填)
+    :value -> object值 (必填)
+    :type -> str 类型 (可选|默认common)
+    '''
+    data = {}
+
+    if name is not None:
+        data['name'] = name
+
+    if name is not None:
+        data['password'] = mw.md5(password)
+    
+    db.session.query(Users).filter_by(Users.id==1).update(data)
+    db.session.commit()
+    db.session.close()
+    return True
+
+def isLoginCheck(username, password) -> bool:
+    info = getUserByName(data['username'])
+    if info is None:
+        return False
+
+    if info['password'] == mw.md5(password):
+        return True
+    return False
+
+
+
 
 def isLoginCheck(username, password) -> bool:
     info = getUserByName(data['username'])
