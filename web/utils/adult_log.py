@@ -173,7 +173,7 @@ def getAuditLast(log_name):
     # lastlog_list = sorted(lastlog_list,key=lambda x:x['时间'],reverse=True)
     return mw.returnData(True, 'ok!', lastlog_list)
 
-def getAuditLastLog(self):
+def getAuditLastLog():
     cmd = '''LANG=en_US.UTF-8 lastlog|grep -v Username'''
     result = mw.execShell(cmd)
     lastlog_list = []
