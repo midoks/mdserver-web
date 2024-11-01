@@ -219,7 +219,6 @@ def open_ssh_port():
 
 def set_panel_pwd(password, ncli=False):
     info = model.getUserByRoot()
-    username = sql.table('users').where('id=?', (1,)).getField('username')
     model.setUserByRoot(password=password)
     if ncli:
         print("|-用户名: " + info['name'])
