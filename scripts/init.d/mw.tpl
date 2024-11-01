@@ -597,8 +597,8 @@ case "$1" in
         echo -e "\033[32mMW-Panel default info!\033[0m"
         echo -e "=================================================================="
         echo -e "$address"
-        echo -e `python3 ${PANEL_DIR}/panel_tools.py username`
-        echo -e `python3 ${PANEL_DIR}/panel_tools.py password`
+        echo -e `cd ${PANEL_DIR} && python3 ${PANEL_DIR}/panel_tools.py username`
+        echo -e `cd ${PANEL_DIR} && python3 ${PANEL_DIR}/panel_tools.py password`
         # echo -e "password: $password"
         echo -e "\033[33mWarning:\033[0m"
         echo -e "\033[33mIf you cannot access the panel. \033[0m"
