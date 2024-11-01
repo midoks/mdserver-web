@@ -84,3 +84,41 @@ def get_cli_php_version():
                 return mw.returnData({"select": v, "versions": php_versions})
 
     return mw.getJson({"select": php_versions[0],"versions": php_versions})
+
+@blueprint.route('/get_cli_php_version', endpoint='get_cli_php_version',methods=['POST'])
+@panel_login_required
+def get_cli_php_version():
+    if mw.isAppleSystem():
+        return mw.returnData(False, "开发机不可设置!")
+
+    version = request.form.get('version', '')
+
+    php_bin = '/usr/bin/php'
+    php_bin_src = "/www/server/php/%s/bin/php" % version
+    php_ize = '/usr/bin/phpize'
+    php_ize_src = "/www/server/php/%s/bin/phpize" % version
+    php_fpm = '/usr/bin/php-fpm'
+    php_fpm_src = "/www/server/php/%s/sbin/php-fpm" % version
+    php_pecl = '/usr/bin/pecl'
+    php_pecl_src = "/www/server/php/%s/bin/pecl" % version
+    php_pear = '/usr/bin/pear'
+    php_pear_src = "/www/server/php/%s/bin/pear" % version
+    if not os.path.exists(php_bin_src):
+        return mw.returnData(False, '指定PHP版本未安装!')
+
+    is_chattr = mw.execShell('lsattr /usr|grep /usr/bin')[0].find('-i-')
+    if is_chattr != -1:
+        mw.execShell('chattr -i /usr/bin')
+    mw.execShell("rm -f " + php_bin + ' ' + php_ize + ' ' +
+                 php_fpm + ' ' + php_pecl + ' ' + php_pear)
+    mw.execShell("ln -sf %s %s" % (php_bin_src, php_bin))
+    mw.execShell("ln -sf %s %s" % (php_ize_src, php_ize))
+    mw.execShell("ln -sf %s %s" % (php_fpm_src, php_fpm))
+    mw.execShell("ln -sf %s %s" % (php_pecl_src, php_pecl))
+    mw.execShell("ln -sf %s %s" % (php_pear_src, php_pear))
+    if is_chattr != -1:
+        mw.execShell('chattr +i /usr/bin')
+    mw.writeLog('面板设置', '设置PHP-CLI版本为: %s' % version)
+    return mw.returnData(True, '设置成功!')
+
+
