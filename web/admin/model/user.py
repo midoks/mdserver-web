@@ -73,10 +73,8 @@ def setUserByRoot(
     if name is not None:
         data['name'] = name
 
-    if name is not None:
+    if password is not None:
         data['password'] = mw.md5(password)
-
-    print(data)
     
     Users.query.filter(Users.id==1).update(data)
     db.session.commit()
