@@ -584,9 +584,9 @@ def setDaemon(t):
 
 def run():
     # # 系统监控
-    # sysTask = threading.Thread(target=systemTask)
-    # sysTask = setDaemon(sysTask)
-    # sysTask.start()
+    sysTask = threading.Thread(target=systemTask)
+    sysTask = setDaemon(sysTask)
+    sysTask.start()
 
     # # PHP 502错误检查线程
     # php502 = threading.Thread(target=check502Task)

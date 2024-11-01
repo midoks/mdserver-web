@@ -18,4 +18,10 @@ import psutil
 import core.mw as mw
 
 
+class monitor:
+
+	def initDBFile():
+		pass
+
+
 

@@ -65,12 +65,12 @@ mw_start_debug(){
 
 mw_start_debug2(){
 	python3 panel_task.py >> $DIR/logs/panel_task.log 2>&1 &
-	gunicorn -b :7200 -w 1  app:app
+	cd ${DIR}/web && gunicorn -b :7200 -w 1  app:app
 }
 
 mw_start_debug3(){
-	gunicorn -c setting.py app:app
-	python3 panel_task.py
+	cd ${DIR}/web && gunicorn -c setting.py app:app
+	cd ${DIR} && python3 panel_task.py
 }
 
 
