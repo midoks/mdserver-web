@@ -90,15 +90,3 @@ def isLoginCheck(username, password) -> bool:
     if info['password'] == mw.md5(password):
         return True
     return False
-
-
-
-
-def isLoginCheck(username, password) -> bool:
-    info = getUserByName(data['username'])
-    if info is None:
-        return False
-
-    if info['password'] == mw.md5(password):
-        return True
-    return False
