@@ -30,7 +30,9 @@ export LANG=en_US.UTF-8
 
 PANEL_DIR={$SERVER_PATH}
 ROOT_PATH=$(dirname "$PANEL_DIR")
-PATH=$PATH:$mw_path/bin
+PATH=$PATH:${PANEL_DIR}/bin
+
+echo ${PANEL_DIR}
 
 
 if [ -f ${PANEL_DIR}/bin/activate ];then
