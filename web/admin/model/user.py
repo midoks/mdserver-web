@@ -60,7 +60,7 @@ def getUserByRoot() -> None:
 
 def setUserByRoot(
     name: str | None = None,
-    password: str | None =None,
+    password: str | None = None,
 ) -> bool:
     '''
     设置配置的值
@@ -76,7 +76,7 @@ def setUserByRoot(
     if name is not None:
         data['password'] = mw.md5(password)
     
-    db.session.query(Users).filter(Users.id==1).update(data)
+    Users.query.filter(Users.id==1).update(data)
     db.session.commit()
     db.session.close()
     return True
