@@ -23,13 +23,9 @@ web_dir = os.getcwd() + "/web"
 os.chdir(web_dir)
 sys.path.append(web_dir)
 
+from admin import model
 import core.mw as mw
 import core.db as db
-
-# cmd = 'ls /usr/local/lib/ | grep python  | cut -d \\  -f 1 | awk \'END {print}\''
-# info = mw.execShell(cmd)
-# p = "/usr/local/lib/" + info[0].strip() + "/site-packages"
-# sys.path.append(p)
 
 INIT_DIR = "/etc/rc.d/init.d"
 if mw.isAppleSystem():
