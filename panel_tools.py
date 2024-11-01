@@ -218,14 +218,11 @@ def open_ssh_port():
 
 
 def set_panel_pwd(password, ncli=False):
-    # 设置面板密码
-    import db
-    sql = db.Sql()
-    result = sql.table('users').where('id=?', (1,)).setField(
-        'password', mw.md5(password))
+    info = model.getUserByRoot()
     username = sql.table('users').where('id=?', (1,)).getField('username')
+    model.setUserByRoot(password=password)
     if ncli:
-        print("|-用户名: " + username)
+        print("|-用户名: " + info['name'])
         print("|-新密码: " + password)
     else:
         print(username)
