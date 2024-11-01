@@ -13,22 +13,22 @@ from flask import Blueprint, render_template
 from flask import request
 
 from admin.user_login_check import panel_login_required
-from admin.model import Crontab
 
-blueprint = Blueprint('crontab', __name__, url_prefix='/crontab', template_folder='../../templates/default')
-@blueprint.route('/index', endpoint='index')
-def index():
-    return render_template('crontab.html')
+from admin import model
 
-# 插件列表
-@blueprint.route('/list', endpoint='list', methods=['GET','POST'])
+import core.mw as mw
+import utils.system as sys
+
+from .system import blueprint
+
+# 升级检测
+@blueprint.route('/update_server', endpoint='update_server')
 @panel_login_required
-def list():
-    page = request.args.get('p', 1)
-    size = 10
-    count = Crontab.query.count()
-    # print(count)
-    clist = Crontab.query.paginate(page=int(page), per_page=size)
-    # print(clist)
+def update_server():
+    panel_type = request.args.get('type', 'check')
+    version = request.args.get('version', '')
 
-    return []
+    return mw.returnData(False, '已经是最新,无需更新!')
+
+
+

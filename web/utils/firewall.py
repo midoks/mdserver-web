@@ -11,6 +11,10 @@
 import os
 import re
 import threading
+import re
+import time
+
+from admin import model
 
 import core.mw as mw
 
@@ -42,6 +46,18 @@ class Firewall(object):
             self.__isIptables = True
         elif mw.isAppleSystem():
             self.__isMac = True
+
+    def reload(self):
+        if self.__isUfw:
+            mw.execShell('/usr/sbin/ufw reload')
+            return
+        elif self.__isIptables:
+            mw.execShell('service iptables save')
+            mw.execShell('service iptables restart')
+        elif self.__isFirewalld:
+            mw.execShell('firewall-cmd --reload')
+        else:
+            pass
 
     def getFwStatus(self):
         if self.__isUfw:
@@ -135,3 +151,93 @@ class Firewall(object):
         mw.writeFile(filename, conf)
         mw.execShell('sysctl -p')
         return mw.returnData(True, '设置成功!')
+
+    def setFw(self, status):
+        if self.__isIptables:
+            self.setFwIptables(status)
+            return mw.returnData(True, '设置成功!')
+
+        if status == '1':
+            if self.__isUfw:
+                mw.execShell('/usr/sbin/ufw disable')
+            elif self.__isFirewalld:
+                mw.execShell('systemctl stop firewalld.service')
+                mw.execShell('systemctl disable firewalld.service')
+            else:
+                pass
+        else:
+            if self.__isUfw:
+                mw.execShell("echo 'y'| ufw enable")
+            elif self.__isFirewalld:
+                mw.execShell('systemctl start firewalld.service')
+                mw.execShell('systemctl enable firewalld.service')
+            else:
+                pass
+        return mw.returnData(True, '设置成功!')
+
+    def addAcceptPortCmd(self, port,
+        protocol:str  | None ='tcp'
+    ):
+        if self.__isUfw:
+            if protocol == 'tcp':
+                mw.execShell('ufw allow ' + port + '/tcp')
+            if protocol == 'udp':
+                mw.execShell('ufw allow ' + port + '/udp')
+            if protocol == 'tcp/udp':
+                mw.execShell('ufw allow ' + port + '/tcp')
+                mw.execShell('ufw allow ' + port + '/udp')
+        elif self.__isFirewalld:
+            port = port.replace(':', '-')
+            if protocol == 'tcp':
+                cmd = 'firewall-cmd --permanent --zone=public --add-port=' + port + '/tcp'
+                mw.execShell(cmd)
+            if protocol == 'udp':
+                cmd = 'firewall-cmd --permanent --zone=public --add-port=' + port + '/udp'
+                mw.execShell(cmd)
+            if protocol == 'tcp/udp':
+                cmd = 'firewall-cmd --permanent --zone=public --add-port=' + port + '/tcp'
+                mw.execShell(cmd)
+                cmd = 'firewall-cmd --permanent --zone=public --add-port=' + port + '/udp'
+                mw.execShell(cmd)
+        elif self.__isIptables:
+            if protocol == 'tcp':
+                cmd = 'iptables -I INPUT -p tcp -m state --state NEW -m tcp --dport ' + port + ' -j ACCEPT'
+                mw.execShell(cmd)
+            if protocol == 'udp':
+                cmd = 'iptables -I INPUT -p udp -m state --state NEW -m udp --dport ' + port + ' -j ACCEPT'
+                mw.execShell(cmd)
+            if protocol == 'tcp/udp':
+                cmd = 'iptables -I INPUT -p tcp -m state --state NEW -m tcp --dport ' + port + ' -j ACCEPT'
+                mw.execShell(cmd)
+                cmd = 'iptables -I INPUT -p udp -m state --state NEW -m udp --dport ' + port + ' -j ACCEPT'
+                mw.execShell(cmd)
+        else:
+            pass
+        return True
+
+    # 添加放行端口
+    def addAcceptPort(self, port, ps, stype,
+        protocol: str  | None ='tcp'
+    ):
+        if not self.getFwStatus():
+            self.setFw(0)
+
+
+        rep = r"^\d{1,5}(:\d{1,5})?$"
+        if not re.search(rep, port):
+            return mw.returnData(False, '端口范围不正确!')
+
+        if model.getFirewallCountByPort(port) > 0:
+            return mw.returnData(False, '您要放行的端口已存在，无需重复放行!')
+
+        model.addFirewall(port,ps=ps,protocol=protocol)
+        self.addAcceptPortCmd(port, protocol=protocol)
+        self.reload()
+        
+        msg = mw.getInfo('放行端口[{1}][{2}]成功', (port, protocol,))
+        mw.writeLog("防火墙管理", msg)
+
+        return mw.returnData(True, '添加放行(' + port + ')端口成功!')
+
+
+

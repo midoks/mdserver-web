@@ -31,16 +31,6 @@ import core.mw as mw
 import core.db as db
 
 
-# print(mw.getPanelDir())
-
-# print sys.path
-
-# cmd = 'ls /usr/local/lib/ | grep python  | cut -d \\  -f 1 | awk \'END {print}\''
-# info = mw.execShell(cmd)
-# p = "/usr/local/lib/" + info[0].strip() + "/site-packages"
-# sys.path.append(p)
-
-
 global pre, timeoutCount, logPath, isTask, oldEdate, isCheck
 pre = 0
 timeoutCount = 0
@@ -85,9 +75,12 @@ def service_cmd(method):
         execShell(cmd + ' ' + method)
         return
 
-    cmd = mw.getRunDir() + '/scripts/init.d/mw'
+    cmd = mw.getPanelDir() + '/scripts/init.d/mw'
+    print(cmd)
     if os.path.exists(cmd):
-        execShell(cmd + ' ' + method)
+        print(cmd + ' ' + method)
+        data = execShell(cmd + ' ' + method)
+        print(data)
         return
 
 
@@ -573,7 +566,7 @@ def openrestyRestartAtOnce():
 
 # --------------------------------------Panel Restart Start   --------------------------------------------- #
 def restartPanelService():
-    restartTip = 'data/restart.pl'
+    restartTip = mw.getPanelDir()+'/data/restart.pl'
     while True:
         if os.path.exists(restartTip):
             os.remove(restartTip)
@@ -612,10 +605,10 @@ def run():
     # oar.start()
 
 
-    # # Panel Restart Start
-    # rps = threading.Thread(target=restartPanelService)
-    # rps = setDaemon(rps)
-    # rps.start()
+    # Panel Restart Start
+    rps = threading.Thread(target=restartPanelService)
+    rps = setDaemon(rps)
+    rps.start()
 
     # 面板后台任务
     startPanelTask()

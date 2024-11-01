@@ -487,8 +487,9 @@ def getPageObject(args, result='1,2,3,4,5,8'):
 
 
 def getHostPort():
-    if os.path.exists('data/port.pl'):
-        return readFile('data/port.pl').strip()
+    port_file = getPanelDir() + '/data/port.pl'
+    if os.path.exists(port_file):
+        return readFile(port_file).strip()
     return '7200'
 
 
@@ -626,6 +627,11 @@ def deDoubleCrypt(key, strings):
         return strings
 
 # ------------------------------ openresty start -----------------------------
+
+def restartMw():
+    restart_file = getPanelDir()+'/data/restart.pl'
+    writeFile(restart_file, 'True')
+    return True
 
 def restartWeb():
     return opWeb("reload")

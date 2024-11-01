@@ -41,7 +41,7 @@
                     <ul class="menu">
                         <li id="memuA"><a class="menu_home" href="/">首页</a></li>
                         <li id="memuAsite"><a class="menu_web" href="/site/index">网站</a></li>
-                        <li id="memuAcontrol"><a class="menu_control" href="/monitor/index">监控</a></li>
+                        <li id="memuAmonitor"><a class="menu_control" href="/monitor/index">监控</a></li>
                         <li id="memuAfirewall"><a class="menu_firewall" href="/firewall/index">安全</a></li>
                         <li id="memuAfiles"><a class="menu_folder" href="/files/index">文件</a></li>
                         <li id="memuAlogs"><a class="menu_logs" href="/logs/index">日志</a></li>                        
@@ -53,7 +53,7 @@
                         </li>
                         {% endfor %}
                         <li id="memuAsoft"><a class="menu_soft" href="/soft/index">软件管理</a><span class="softnum">1</span></li>
-                        <li id="memuAconfig"><a class="menu_set" href="/setting/index">面板设置</a></li>
+                        <li id="memuAsetting"><a class="menu_set" href="/setting/index">面板设置</a></li>
                         <li><a class="menu_exit" href="javascript:;" id="signout">退出</a></li>
                     </ul>
                     <div id="newbtpc"></div>
@@ -137,26 +137,18 @@ $('.panel_ad_list_mode').click(function(){
 });
 
 
-function getUrlPath(){
-    var thisUrl = window.location.pathname;
-    console.log(thisUrl);
-    var pathArr = thisUrl.split('/');
-    return pathArr[pathArr.length - 1];
-}
-var thisPath = getUrlPath();
-// console.log(thisPath);
+var thisPath = window.location.pathname.trim()+window.location.search;
 if (thisPath.indexOf('?')>-1){
     var tag = $.getUrlParam('tag');
     if(tag != undefined){
         $('#memuAplugins_'+tag).css('background-color','#2c3138');
-    } else {
-        $('#memuA').css('background-color','#f2f2f2');
     }
 } else{
-    if(thisPath != undefined){
-        $('#memuA'+thisPath).css('background-color','#2c3138');
-    } else {
-        $('#memuA').css('background-color','#f2f2f2');
+    if(thisPath != '/'){
+        var pathArr = thisPath.substring(1).split('/');
+        $('#memuA'+pathArr[0]).css('background-color','#2c3138');
+    } else{
+        $('#memuA').css('background-color','#2c3138');
     }
 }
 </script>

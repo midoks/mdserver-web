@@ -142,7 +142,7 @@ def set_basic_auth():
     return mw.returnData(True, '设置成功!')
 
 
-# 设置站点状态
+# 设置面板未登录状态
 @blueprint.route('/set_status_code', endpoint='set_status_code', methods=['POST'])
 @panel_login_required
 def set_status_code():
@@ -159,7 +159,32 @@ def set_status_code():
     model.setOption('unauthorized_status', str(status_code))
     mw.writeLog('面板设置', '将未授权响应状态码设置为:{0}:{1}'.format(status_code,info['text']))
     return mw.returnData(True, '设置成功!')
-        
 
+# 设置站点状态
+@blueprint.route('/set_port', endpoint='set_port', methods=['POST'])
+@panel_login_required
+def set_port():
+    port = request.form.get('port', '')
+    if port != mw.getHostPort():
+        import system_api
+        import firewall_api
 
+        sysCfgDir = mw.systemdCfgDir()
+        if os.path.exists(sysCfgDir + "/firewalld.service"):
+            if not firewall_api.firewall_api().getFwStatus():
+                return mw.returnData(False, 'firewalld必须先启动!')
+
+        # mw.setHostPort(port)
+
+        msg = mw.getInfo('放行端口[{1}]成功', (port,))
+        mw.writeLog("防火墙管理", msg)
+        addtime = time.strftime('%Y-%m-%d %X', time.localtime())
+        mw.M('firewall').add('port,ps,addtime', (port, "配置修改", addtime))
+
+        # firewall_api.firewall_api().addAcceptPort(port)
+        # firewall_api.firewall_api().firewallReload()
+
+        # system_api.system_api().restartMw()
+
+    return mw.returnJson(True, '端口保存成功!')
  

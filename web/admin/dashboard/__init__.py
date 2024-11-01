@@ -32,6 +32,18 @@ blueprint = Blueprint('dashboard', __name__, url_prefix='/', template_folder='..
 def index():
     return render_template('default/index.html')
 
+# 安全路径
+@blueprint.route('/<path>',endpoint='admin_safe_path',methods=['GET'])
+def admin_safe_path(path):
+    db_path = model.getOption('admin_path')
+    if db_path == path:
+        return render_template('default/login.html')
+
+    unauthorized_status = model.getOption('unauthorized_status')
+    if unauthorized_status == '0':
+        return render_template('default/path.html')
+    return Response(status=int(unauthorized_status))
+
 # 仅针对webhook插件
 @blueprint.route("/hook", methods=['POST', 'GET'])
 def webhook():
@@ -62,19 +74,6 @@ def webhook():
         return webhook_index.runShellArgs(input_args)
     except Exception as e:
         return str(e)
-
-# 安全路径
-@blueprint.route('/<path>',endpoint='admin_safe_path',methods=['GET'])
-def admin_safe_path(path):
-    db_path = model.getOption('admin_path')
-    if db_path == path:
-        return render_template('default/login.html')
-
-    unauthorized_status = model.getOption('unauthorized_status')
-    if unauthorized_status == '0':
-        return render_template('default/path.html')
-    return Response(status=int(unauthorized_status))
-
 
 # ---------------------------------------------------------------------------------
 # 定义登录入口相关方法

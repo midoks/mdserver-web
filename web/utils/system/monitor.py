@@ -8,6 +8,14 @@
 # Author: midoks <midoks@163.com>
 # ---------------------------------------------------------------------------------
 
-from .system import *
-from .upgrade import *
+import os
+import sys
+import re
+import time
+import math
+import psutil
+
+import core.mw as mw
+
+
 

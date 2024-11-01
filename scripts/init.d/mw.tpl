@@ -104,7 +104,7 @@ mw_start()
 # /www/server/mdserver-web/tmp/panelTask.pl && service mw restart_task
 mw_stop_task()
 {
-    if [ -f $mw_path/tmp/panelTask.pl ];then
+    if [ -f ${PANEL_DIR}/tmp/panelTask.pl ];then
         echo -e "\033[32mthe task is running and cannot be stopped\033[0m"
         exit 0
     fi
@@ -123,7 +123,7 @@ mw_stop_panel()
 {
     echo -e "stopping mw-panel... \c";
 
-    pidfile=${mw_path}/logs/mw.pid
+    pidfile=${PANEL_DIR}/logs/mw.pid
     if [ -f $pidfile ];then
         pid=`cat $pidfile`
         kill -9 $pid > /dev/null 2>&1

@@ -3,6 +3,8 @@ PATH=/bin:/sbin:/usr/bin:/usr/sbin:/usr/local/bin:/usr/local/sbin:~/bin:/opt/hom
 DIR=$(cd "$(dirname "$0")"; pwd)
 MDIR=$(dirname "$DIR")
 
+export LC_ALL="en_US.UTF-8"
+
 # echo $DIR
 
 PATH=$PATH:$DIR/bin
@@ -13,9 +15,6 @@ if [ -f ${DIR}/bin/activate ];then
 		echo "load local python env fail!"
 	fi
 fi
-
-export LC_ALL="en_US.UTF-8"
-
 
 mw_start_task()
 {

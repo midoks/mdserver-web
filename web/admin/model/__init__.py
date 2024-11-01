@@ -8,6 +8,7 @@
 # Author: midoks <midoks@163.com>
 # ---------------------------------------------------------------------------------
 
+
 from .initdb import *
 
 from .logs import addLog,clearLog
@@ -25,5 +26,11 @@ from .user import isLoginCheck
 from .user import getUserByName,getUserById,getUserByRoot
 from .user import setUserByRoot
 
+from .firewall import addFirewall
+
 from .temp_login import getTempLoginByToken,clearTempLogin
+
+
+
+
 

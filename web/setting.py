@@ -20,9 +20,8 @@ import os
 
 
 import core.mw as mw
-
-
 import utils.system as system 
+
 cpu_info = system.getCpuInfo()
 workers = cpu_info[1]
 
@@ -35,8 +34,9 @@ if not os.path.exists(log_dir):
 
 # default port
 mw_port = '7200'
-if os.path.exists(panel_dir+'/data/port.pl'):
-    mw_port = mw.readFile(panel_dir+'/data/port.pl')
+default_port_file = panel_dir+'/data/port.pl'
+if os.path.exists(default_port_file):
+    mw_port = mw.readFile(default_port_file)
     mw_port.strip()
 # else:
 #     import firewall_api
@@ -47,21 +47,21 @@ if os.path.exists(panel_dir+'/data/port.pl'):
 #     mw.writeFile('data/port.pl', mw_port)
 
 bind = []
-if os.path.exists('data/ipv6.pl'):
+default_ipv6_file = panel_dir+'/data/ipv6.pl'
+if os.path.exists(default_ipv6_file):
     bind.append('[0:0:0:0:0:0:0:0]:%s' % mw_port)
 else:
     bind.append('0.0.0.0:%s' % mw_port)
 
-print(mw_port)
 if workers > 2:
-    workers = 2
+    workers = 1
 
 threads = workers * 1
 backlog = 512
 reload = False
 daemon = True
 # worker_class = 'geventwebsocket.gunicorn.workers.GeventWebSocketWorker'
-timeout = 7200
+timeout = 600
 keepalive = 60
 preload_app = True
 capture_output = True

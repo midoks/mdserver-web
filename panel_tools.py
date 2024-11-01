@@ -228,16 +228,15 @@ def set_panel_pwd(password, ncli=False):
 
 
 def show_panel_pwd():
-    # 设置面板密码
-    sql = db.Sql()
-    password = sql.table('users').where('id=?', (1,)).getField('password')
+    # 面板密码展示
+    info = model.getUserByRoot()
+    defailt_pwd_file = mw.getPanelDir()+'/data/default.pl'
+    pwd = ''
+    if os.path.exists(defailt_pwd_file):
+        pwd = mw.readFile(defailt_pwd_file).strip()
 
-    file_pwd = ''
-    if os.path.exists('data/default.pl'):
-        file_pwd = mw.readFile('data/default.pl').strip()
-
-    if mw.md5(file_pwd) == password:
-        print('password: ' + file_pwd)
+    if mw.md5(pwd) == info['password']:
+        print('password: ' + pwd)
         return
     print("password has been changed!")
 
