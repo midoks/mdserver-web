@@ -522,12 +522,12 @@ mw_default(){
     fi
 
     password=$(cat ${PANEL_DIR}/data/default.pl)
+
     if [ -f ${PANEL_DIR}/data/domain.conf ];then
         address=$(cat ${PANEL_DIR}/data/domain.conf)
     fi
-    if [ -f ${PANEL_DIR}/data/admin_path.pl ];then
-        auth_path=$(cat ${PANEL_DIR}/data/admin_path.pl)
-    fi
+
+    admin_path=$(python3 ${PANEL_DIR}/panel_tools.py admin_path)
     
     if [ "$address" == "" ];then
         v4=$(python3 ${PANEL_DIR}/panel_tools.py getServerIp 4)

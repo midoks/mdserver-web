@@ -245,6 +245,10 @@ def show_panel_pwd():
         return
     print("password has been changed!")
 
+def show_panel_adminpath():
+    admin_path = model.getOption('admin_path')
+    print(admin_path)
+
 
 def set_panel_username(username=None):
     # 随机面板用户名
@@ -290,6 +294,8 @@ def main():
             set_panel_username()
     elif method == 'password':
         show_panel_pwd()
+    elif method == 'admin_path':
+        show_panel_adminpath()
     elif method == 'getServerIp':
         getServerIp()
     elif method == "cli":
