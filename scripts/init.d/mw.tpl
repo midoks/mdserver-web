@@ -527,8 +527,8 @@ mw_default(){
         address=$(cat ${PANEL_DIR}/data/domain.conf)
     fi
 
-    admin_path=$(python3 ${PANEL_DIR}/panel_tools.py admin_path)
-    
+    admin_path=$(cd ${PANEL_DIR} && python3 ${PANEL_DIR}/panel_tools.py admin_path)
+
     if [ "$address" == "" ];then
         v4=$(python3 ${PANEL_DIR}/panel_tools.py getServerIp 4)
         v6=$(python3 ${PANEL_DIR}/panel_tools.py getServerIp 6)
