@@ -235,7 +235,6 @@ def set_panel_pwd(password, ncli=False):
 
 def show_panel_pwd():
     # 设置面板密码
-    import db
     sql = db.Sql()
     password = sql.table('users').where('id=?', (1,)).getField('password')
 
@@ -251,7 +250,6 @@ def show_panel_pwd():
 
 def set_panel_username(username=None):
     # 随机面板用户名
-    import db
     sql = db.Sql()
     if username:
         if len(username) < 5:
