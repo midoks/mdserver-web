@@ -16,7 +16,7 @@ from admin.model import Sites
 from admin.user_login_check import panel_login_required
 
 from utils.mwplugin import MwPlugin
-from utils.site import site
+import utils.site as site
 import core.mw as mw
 
 blueprint = Blueprint('site', __name__, url_prefix='/site', template_folder='../../templates/default')
