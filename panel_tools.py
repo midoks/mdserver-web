@@ -23,6 +23,8 @@ web_dir = os.getcwd() + "/web"
 os.chdir(web_dir)
 sys.path.append(web_dir)
 
+
+from admin import app
 from admin import model
 import core.mw as mw
 import core.db as db
@@ -274,8 +276,7 @@ def getServerIp():
     print(ip[0])
 
 
-if __name__ == "__main__":
-
+def main():
     if len(sys.argv) == 1:
         print('ERROR: Parameter error!')
         exit(-2)
@@ -301,3 +302,7 @@ if __name__ == "__main__":
         mwcli(clinum)
     else:
         print('ERROR: Parameter error')
+
+if __name__ == "__main__":
+    with app.app_context():
+        run()
