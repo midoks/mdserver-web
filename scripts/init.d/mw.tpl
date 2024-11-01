@@ -536,7 +536,7 @@ case "$1" in
     'venv') mw_update_venv;;
     'clean_lib') mw_clean_lib;;
     'default')
-        cd $mw_path
+        cd ${PANEL_DIR}
         port=7200
         scheme=http
 
