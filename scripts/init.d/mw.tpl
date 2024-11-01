@@ -541,7 +541,7 @@ mw_default(){
                 mw_start
             fi
 
-            address="MW-PANEL-URL-Ipv4: ${scheme}://$v4:$port$auth_path \nMW-Panel-URL-Ipv6: ${scheme}://[$v6]:$port$auth_path"
+            address="MW-PANEL-URL-IPV4: ${scheme}://$v4:$port$auth_path \nMW-PANEL-URL-IPV6: ${scheme}://[$v6]:$port$auth_path"
         elif [ "$v4" != "" ]; then
             address="MW-PANEL-URL: ${scheme}://$v4:$port$auth_path"
         elif [ "$v6" != "" ]; then
