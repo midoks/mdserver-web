@@ -8,6 +8,7 @@
 # Author: midoks <midoks@163.com>
 # ---------------------------------------------------------------------------------
 
+import os
 
 from flask import Blueprint, render_template
 from flask import request
