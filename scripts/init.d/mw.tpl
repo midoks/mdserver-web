@@ -528,7 +528,6 @@ mw_default(){
     fi
 
     admin_path=$(cd ${PANEL_DIR} && python3 ${PANEL_DIR}/panel_tools.py admin_path)
-    echo "admin_path:$admin_path"
     if [ "$address" == "" ];then
         v4=$(python3 ${PANEL_DIR}/panel_tools.py getServerIp 4)
         v6=$(python3 ${PANEL_DIR}/panel_tools.py getServerIp 6)
@@ -541,9 +540,9 @@ mw_default(){
                 mw_start
             fi
 
-            address="MW-PANEL-URL-IPV4: ${scheme}://$v4:$port$auth_path \nMW-PANEL-URL-IPV6: ${scheme}://[$v6]:$port$auth_path"
+            address="MW-PANEL-URL-IPV4: ${scheme}://$v4:$port$admin_path \nMW-PANEL-URL-IPV6: ${scheme}://[$v6]:$port$admin_path"
         elif [ "$v4" != "" ]; then
-            address="MW-PANEL-URL: ${scheme}://$v4:$port$auth_path"
+            address="MW-PANEL-URL: ${scheme}://$v4:$port$admin_path"
         elif [ "$v6" != "" ]; then
 
             if [ ! -f ${PANEL_DIR}/data/ipv6.pl ];then
@@ -552,12 +551,12 @@ mw_default(){
                 mw_stop
                 mw_start
             fi
-            address="MW-PANEL-URL: ${scheme}://[$v6]:$port$auth_path"
+            address="MW-PANEL-URL: ${scheme}://[$v6]:$port$admin_path"
         else
-            address="MW-PANEL-URL: ${scheme}://you-network-ip:$port$auth_path"
+            address="MW-PANEL-URL: ${scheme}://you-network-ip:$port$admin_path"
         fi
     else
-        address="MW-PANEL-URL: ${scheme}://$address:$port$auth_path"
+        address="MW-PANEL-URL: ${scheme}://$address:$port$admin_path"
     fi
 
     show_panel_ip="$port|"
