@@ -85,9 +85,9 @@ def get_cli_php_version():
 
     return mw.getJson({"select": php_versions[0],"versions": php_versions})
 
-@blueprint.route('/get_cli_php_version', endpoint='get_cli_php_version',methods=['POST'])
+@blueprint.route('/set_cli_php_version', endpoint='set_cli_php_version',methods=['POST'])
 @panel_login_required
-def get_cli_php_version():
+def set_cli_php_version():
     if mw.isAppleSystem():
         return mw.returnData(False, "开发机不可设置!")
 
