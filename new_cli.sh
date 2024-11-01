@@ -61,7 +61,7 @@ mw_start_debug(){
         port=$(cat ${DIR}/data/port.pl)
     fi
     # gunicorn -b :${port} -k gevent -w 1 app:app
-	cd web && gunicorn -b :${port} -w 1 app:app
+	cd ${DIR}/web && gunicorn -b :${port} -w 1 app:app
 }
 
 mw_start_debug2(){
