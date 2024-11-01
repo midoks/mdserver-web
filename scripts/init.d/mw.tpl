@@ -503,6 +503,78 @@ mw_clean_lib(){
     cd ${PANEL_DIR} && rm -rf include
 }
 
+mw_default(){
+    cd ${PANEL_DIR}
+    port=7200
+    scheme=http
+
+    if [ -f ${PANEL_DIR}/ssl/choose.pl ];then
+        scheme=https
+    fi
+    
+    if [ -f ${PANEL_DIR}/data/port.pl ];then
+        port=$(cat ${PANEL_DIR}/data/port.pl)
+    fi
+
+    if [ ! -f ${PANEL_DIR}/data/default.pl ];then
+        echo -e "\033[33mInstall Failed\033[0m"
+        exit 1
+    fi
+
+    password=$(cat ${PANEL_DIR}/data/default.pl)
+    if [ -f ${PANEL_DIR}/data/domain.conf ];then
+        address=$(cat ${PANEL_DIR}/data/domain.conf)
+    fi
+    if [ -f ${PANEL_DIR}/data/admin_path.pl ];then
+        auth_path=$(cat ${PANEL_DIR}/data/admin_path.pl)
+    fi
+    
+    if [ "$address" == "" ];then
+        v4=$(cd ${PANEL_DIR} && python3 ${PANEL_DIR}/panel_tools.py getServerIp 4)
+        v6=$(cd ${PANEL_DIR} && python3 ${PANEL_DIR}/panel_tools.py getServerIp 6)
+
+        if [ "$v4" != "" ] && [ "$v6" != "" ]; then
+
+            if [ ! -f ${PANEL_DIR}/data/ipv6.pl ];then
+                echo 'True' > ${PANEL_DIR}/data/ipv6.pl
+                mw_stop
+                mw_start
+            fi
+
+            address="MW-PANEL-URL-Ipv4: ${scheme}://$v4:$port$auth_path \nMW-Panel-URL-Ipv6: ${scheme}://[$v6]:$port$auth_path"
+        elif [ "$v4" != "" ]; then
+            address="MW-PANEL-URL: ${scheme}://$v4:$port$auth_path"
+        elif [ "$v6" != "" ]; then
+
+            if [ ! -f ${PANEL_DIR}/data/ipv6.pl ];then
+                #  Need to restart ipv6 to take effect
+                echo 'True' > ${PANEL_DIR}/data/ipv6.pl
+                mw_stop
+                mw_start
+            fi
+            address="MW-PANEL-URL: ${scheme}://[$v6]:$port$auth_path"
+        else
+            address="MW-PANEL-URL: ${scheme}://you-network-ip:$port$auth_path"
+        fi
+    else
+        address="MW-PANEL-URL: ${scheme}://$address:$port$auth_path"
+    fi
+
+    show_panel_ip="$port|"
+    echo -e "=================================================================="
+    echo -e "\033[32mMW-PANEL DEFAULT INFO!\033[0m"
+    echo -e "=================================================================="
+    echo -e "$address"
+    echo -e `cd ${PANEL_DIR} && python3 ${PANEL_DIR}/panel_tools.py username`
+    echo -e `cd ${PANEL_DIR} && python3 ${PANEL_DIR}/panel_tools.py password`
+    # echo -e "password: $password"
+    echo -e "\033[33mWarning:\033[0m"
+    echo -e "\033[33mIf you cannot access the panel. \033[0m"
+    echo -e "\033[33mrelease the following port (${show_panel_ip}80|443|22) in the security group.\033[0m"
+    echo -e "=================================================================="
+    ;;
+}
+
 case "$1" in
     'start') mw_start;;
     'stop') mw_stop;;
@@ -535,76 +607,7 @@ case "$1" in
     'mongodb') mw_mongodb;;
     'venv') mw_update_venv;;
     'clean_lib') mw_clean_lib;;
-    'default')
-        cd ${PANEL_DIR}
-        port=7200
-        scheme=http
-
-        if [ -f ${PANEL_DIR}/ssl/choose.pl ];then
-            scheme=https
-        fi
-        
-        if [ -f ${PANEL_DIR}/data/port.pl ];then
-            port=$(cat ${PANEL_DIR}/data/port.pl)
-        fi
-
-        if [ ! -f ${PANEL_DIR}/data/default.pl ];then
-            echo -e "\033[33mInstall Failed\033[0m"
-            exit 1
-        fi
-
-        password=$(cat ${PANEL_DIR}/data/default.pl)
-        if [ -f ${PANEL_DIR}/data/domain.conf ];then
-            address=$(cat ${PANEL_DIR}/data/domain.conf)
-        fi
-        if [ -f ${PANEL_DIR}/data/admin_path.pl ];then
-            auth_path=$(cat ${PANEL_DIR}/data/admin_path.pl)
-        fi
-	    
-        if [ "$address" == "" ];then
-            v4=$(cd ${PANEL_DIR} && python3 ${PANEL_DIR}/panel_tools.py getServerIp 4)
-            v6=$(cd ${PANEL_DIR} && python3 ${PANEL_DIR}/panel_tools.py getServerIp 6)
-
-            if [ "$v4" != "" ] && [ "$v6" != "" ]; then
-
-                if [ ! -f ${PANEL_DIR}/data/ipv6.pl ];then
-                    echo 'True' > ${PANEL_DIR}/data/ipv6.pl
-                    mw_stop
-                    mw_start
-                fi
-
-                address="MW-PANEL-URL-Ipv4: ${scheme}://$v4:$port$auth_path \nMW-Panel-URL-Ipv6: ${scheme}://[$v6]:$port$auth_path"
-            elif [ "$v4" != "" ]; then
-                address="MW-PANEL-URL: ${scheme}://$v4:$port$auth_path"
-            elif [ "$v6" != "" ]; then
-
-                if [ ! -f ${PANEL_DIR}/data/ipv6.pl ];then
-                    #  Need to restart ipv6 to take effect
-                    echo 'True' > ${PANEL_DIR}/data/ipv6.pl
-                    mw_stop
-                    mw_start
-                fi
-                address="MW-PANEL-URL: ${scheme}://[$v6]:$port$auth_path"
-            else
-                address="MW-PANEL-URL: ${scheme}://you-network-ip:$port$auth_path"
-            fi
-        else
-            address="MW-PANEL-URL: ${scheme}://$address:$port$auth_path"
-        fi
-
-        show_panel_ip="$port|"
-        echo -e "=================================================================="
-        echo -e "\033[32mMW-PANEL DEFAULT INFO!\033[0m"
-        echo -e "=================================================================="
-        echo -e "$address"
-        echo -e `cd ${PANEL_DIR} && python3 ${PANEL_DIR}/panel_tools.py username`
-        echo -e `cd ${PANEL_DIR} && python3 ${PANEL_DIR}/panel_tools.py password`
-        # echo -e "password: $password"
-        echo -e "\033[33mWarning:\033[0m"
-        echo -e "\033[33mIf you cannot access the panel. \033[0m"
-        echo -e "\033[33mrelease the following port (${show_panel_ip}80|443|22) in the security group.\033[0m"
-        echo -e "=================================================================="
-        ;;
+    'default') mw_default;;
     *)
         cd ${PANEL_DIR} && python3 ${PANEL_DIR}/panel_tools.py cli $1
         ;;
