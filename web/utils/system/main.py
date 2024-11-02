@@ -150,4 +150,21 @@ def getMemInfo():
         memInfo['memRealUsed'] = memInfo['memTotal'] - memInfo['memFree'] - memInfo['memBuffers'] - memInfo['memCached']
     return memInfo
 
+def getMemUsed():
+    # 取内存使用率
+    try:
+        import psutil
+        mem = psutil.virtual_memory()
+
+        if mw.getOs() == 'darwin':
+            return mem.percent
+
+        memInfo = {'memTotal': mem.total / 1024 / 1024, 'memFree': mem.free / 1024 / 1024,
+                   'memBuffers': mem.buffers / 1024 / 1024, 'memCached': mem.cached / 1024 / 1024}
+        tmp = memInfo['memTotal'] - memInfo['memFree'] - \
+            memInfo['memBuffers'] - memInfo['memCached']
+        tmp1 = memInfo['memTotal'] / 100
+        return (tmp / tmp1)
+    except Exception as ex:
+        return 1
 

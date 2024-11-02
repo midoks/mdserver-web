@@ -12,11 +12,18 @@
 # sqlite3操作
 # ---------------------------------------------------------------------------------
 
-
-import sqlite3
 import os
 import sys
+import sqlite3
 
+import core.mw as mw
+
+def getPanelDir():
+    return os.path.dirname(os.getcwd())
+
+def getTracebackInfo():
+    import traceback
+    return traceback.format_exc()
 
 class Sql():
     #------------------------------
@@ -33,7 +40,7 @@ class Sql():
     __OPT_PARAM = ()            # where值
 
     def __init__(self):
-        self.__DB_FILE = '../data/default.db'
+        self.__DB_FILE = getPanelDir()+'/data/panel.db'
 
     def __getConn(self):
         # 取数据库对象
@@ -42,7 +49,7 @@ class Sql():
                 self.__DB_CONN = sqlite3.connect(self.__DB_FILE)
                 self.__DB_CONN.text_factory = str
         except Exception as ex:
-            # print(mw.getTracebackInfo())
+            print(getTracebackInfo())
             return "error: " + str(ex)
 
     def changeTextFactoryToBytes(self):
@@ -51,14 +58,12 @@ class Sql():
 
     def autoTextFactory(self):
         if sys.version_info[0] == 3:
-            self.__DB_CONN.text_factory = lambda x: str(
-                x, encoding="utf-8", errors='ignore')
+            self.__DB_CONN.text_factory = lambda x: str(x, encoding="utf-8", errors='ignore')
         else:
-            self.__DB_CONN.text_factory = lambda x: unicode(
-                x, "utf-8", "ignore")
+            self.__DB_CONN.text_factory = lambda x: unicode(x, "utf-8", "ignore")
 
     def dbfile(self, name):
-        self.__DB_FILE = 'data/' + name + '.db'
+        self.__DB_FILE = getPanelDir()+'/data/' + name + '.db'
         return self
 
     def dbPos(self, path, name, suffix_name = 'db'):
@@ -192,7 +197,6 @@ class Sql():
     def getField(self, keyName):
         # 取回指定字段
         result = self.field(keyName).select()
-        # print(result)
         if len(result) == 1:
             return result[0][keyName]
         return result

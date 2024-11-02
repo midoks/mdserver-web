@@ -11,4 +11,4 @@
 from .main import *
 from .query import *
 from .stats import *
-from .monitor import *
+from .monitor import monitor

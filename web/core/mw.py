@@ -584,9 +584,11 @@ def writeDbLog(stype, msg, args=(), uid=1):
         return False
 
 
-def M(table):
+def M(table=''):
     import core.db as db
     sql = db.Sql()
+    if table == '':
+        return sql
     return sql.table(table)
 
 
