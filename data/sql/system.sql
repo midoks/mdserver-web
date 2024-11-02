@@ -11,8 +11,8 @@ CREATE TABLE IF NOT EXISTS `network` (
 
 CREATE TABLE IF NOT EXISTS `cpuio` (
   `id` INTEGER PRIMARY KEY AUTOINCREMENT,
-  `pro` INTEGER,
-  `mem` INTEGER,
+  `pro` TEXT,
+  `mem` TEXT,
   `addtime` INTEGER
 );
 
