@@ -141,6 +141,7 @@ class monitor:
         info['used'] = round(info['used'], 2)
         
         info['mem'] = getMemUsed()
+        info['mem'] = round(info['mem'], 2)
 
         netio = self.getNetIoInfo()
         diskio = self.getDiskInfo()
