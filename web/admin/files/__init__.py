@@ -12,6 +12,9 @@ import os
 
 from flask import Blueprint, render_template
 from flask import request
+from flask import make_response
+from flask import send_file
+from flask import send_from_directory
 
 
 from admin import model
@@ -119,6 +122,19 @@ def delete_dir():
     path = request.form.get('path', '')
     return file.dirDelete(path)
 
+# 删除文件
+@blueprint.route('/download', endpoint='download', methods=['GET'])
+@panel_login_required
+def download():
+    filename = request.args.get('filename', '')
+    if not os.path.exists(filename):
+        return ''
+    is_attachment = True
+    if filename.endswith(".svg"):
+        is_attachment = False
+
+    response = make_response(send_from_directory(os.path.dirname(filename), os.path.basename(filename), as_attachment=is_attachment))
+    return response
 
 # 回收站文件
 @blueprint.route('/get_recycle_bin', endpoint='get_recycle_bin', methods=['POST'])
