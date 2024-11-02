@@ -175,6 +175,10 @@ Install_openresty()
 	if [ -d ${openrestyDir}/libressl-${libresslVersion} ];then
 		rm -rf ${openrestyDir}/libressl-${libresslVersion}
 	fi
+
+	if [ -d ${openrestyDir}/nginx-rtmp-module-${nginx_rtmp_ver} ];then
+		rm -rf ${openrestyDir}/nginx-rtmp-module-${nginx_rtmp_ver}
+	fi
 	echo '安装完成'
 }
 
