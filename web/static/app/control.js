@@ -490,7 +490,8 @@ function network(b,e){
 		option = {
 			tooltip: {
 				trigger: 'axis',
-				axisPointer: { type: 'cross' }
+				axisPointer: { type: 'cross' },
+				formatter:"时间：{b0}<br />{a0}: {c0} Kb/s<br />{a1}: {c1} Kb/s", 
 			},
 			legend: {
 				data:[lan.index.net_up,lan.index.net_down]

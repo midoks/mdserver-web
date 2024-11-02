@@ -346,12 +346,10 @@ def systemTask():
 
                     # LoadAverage
                     load_average = sm.getLoadAverage()
-                    lpro = round(
-                        (load_average['one'] / load_average['max']) * 100, 2)
+                    lpro = round((load_average['one'] / load_average['max']) * 100, 2)
                     if lpro > 100:
                         lpro = 100
-                    sql.table('load_average').add('pro,one,five,fifteen,addtime', (lpro, load_average[
-                        'one'], load_average['five'], load_average['fifteen'], addtime))
+                    sql.table('load_average').add('pro,one,five,fifteen,addtime', (lpro, load_average['one'], load_average['five'], load_average['fifteen'], addtime))
 
                     lpro = None
                     load_average = None
@@ -380,6 +378,20 @@ def systemTask():
 
         time.sleep(30)
         systemTask()
+
+def systemTask2():
+    # 系统监控任务
+    try:
+        from  utils.system import monitor
+        while True:
+            monitor.instance().run()
+            time.sleep(5)
+    except Exception as ex:
+        print(str(ex))
+        mw.writeFile('logs/sys_interrupt.pl', str(ex))
+        restartMw()
+        time.sleep(30)
+        systemTask2()
 
 
 # -------------------------------------- PHP监控 start --------------------------------------------- #
@@ -584,7 +596,7 @@ def setDaemon(t):
 
 def run():
     # # 系统监控
-    sysTask = threading.Thread(target=systemTask)
+    sysTask = threading.Thread(target=systemTask2)
     sysTask = setDaemon(sysTask)
     sysTask.start()
 

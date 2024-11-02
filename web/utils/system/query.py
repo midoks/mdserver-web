@@ -60,7 +60,7 @@ def toAddtime(data, tomem=False):
 def toUseAddtime(data):
     dlen = len(data)
     for i in range(dlen):
-        data[i]['addtime'] = time.strftime('%m/%d %H:%M', time.localtime(float(data[i]['addtime'])))
+        data[i]['addtime'] = time.strftime('%m/%d %H:%M:%S', time.localtime(float(data[i]['addtime'])))
     return data
 
 def getLoadAverageByDB(start, end):
