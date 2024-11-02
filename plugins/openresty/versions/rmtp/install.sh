@@ -131,14 +131,15 @@ Install_openresty()
 	fi
 
 	# rtmp推流功能
+	nginx_rtmp_ver=1.2.2
 	if [ ! -f ${openrestyDir}/nginx-rtmp-module.tar.gz ];then
-		wget --no-check-certificate -O ${openrestyDir}/nginx-rtmp-module.tar.gz https://github.com/arut/nginx-rtmp-module/archive/refs/tags/v1.2.2.tar.gz
+		wget --no-check-certificate -O ${openrestyDir}/nginx-rtmp-module.tar.gz https://github.com/arut/nginx-rtmp-module/archive/refs/tags/v${nginx_rtmp_ver}.tar.gz
 	fi
 
 	if [ ! -d ${openrestyDir}/nginx-rtmp-module.tar.gz ];then
 		cd ${openrestyDir} &&  tar -zxvf nginx-rtmp-module.tar.gz
 	fi
-	OPTIONS="${OPTIONS} --add-module=${openrestyDir}/nginx-rtmp-module"
+	OPTIONS="${OPTIONS} --add-module=${openrestyDir}/nginx-rtmp-module-${nginx_rtmp_ver}"
 
 
 	cd ${openrestyDir}/openresty-${VERSION} && ./configure \
