@@ -504,7 +504,7 @@ function network(b,e){
 			},
 			yAxis: {
 				type: 'value',
-				name: lan.index.unit+':KB/s',
+				name: '单位:KB/s',
 				boundaryGap: [0, '100%'],
 				splitLine:{ lineStyle:{ color:"#ddd" } },
 				axisLine:{ lineStyle:{ color:"#666" } }

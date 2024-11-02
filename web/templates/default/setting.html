@@ -17,7 +17,7 @@
 				<div class="ss-text pull-left mr50">
 					<em>开发模式</em>
 					<div class="ssh-item">
-                        <input class="btswitch btswitch-ios" id="debugMode" type="checkbox" {{data['debug']}}>
+                        <input class="btswitch btswitch-ios" id="debugMode" type="checkbox" {%if data['debug']=='open'%}checked{%endif%}>
                         <label class="btswitch-btn" for="debugMode" onclick="debugMode()"></label>
                     </div>
 				</div>

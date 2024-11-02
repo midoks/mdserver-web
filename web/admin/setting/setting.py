@@ -160,6 +160,18 @@ def set_status_code():
     mw.writeLog('面板设置', '将未授权响应状态码设置为:{0}:{1}'.format(status_code,info['text']))
     return mw.returnData(True, '设置成功!')
 
+# 设置面板调式模式
+@blueprint.route('/open_debug', endpoint='open_debug', methods=['POST'])
+@panel_login_required
+def open_debug():
+    debug = model.getOption('debug',default='close')
+    if debug == 'open':
+        model.setOption('debug','close')
+        return mw.returnData(True, '开发模式关闭!')
+    model.setOption('debug','open')
+    return mw.returnData(True, '开发模式开启!')
+
+
 # 设置站点状态
 @blueprint.route('/set_port', endpoint='set_port', methods=['POST'])
 @panel_login_required
