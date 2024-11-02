@@ -520,10 +520,9 @@ def isDebugMode():
     if isAppleSystem():
         return True
 
-    debugPath = getPanelDir() + "/data/debug.pl"
-    if os.path.exists(debugPath):
+    debug = M('option').field('name').where('name=?',('debug',)).getField('value')
+    if debug == 'open':
         return True
-
     return False
 
 def isNumber(s):
