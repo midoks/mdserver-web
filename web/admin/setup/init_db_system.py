@@ -8,7 +8,9 @@
 # Author: midoks <midoks@163.com>
 # ---------------------------------------------------------------------------------
 
-from .user import init_admin_user
-from .option import init_option
-from .init_db_system import init_db_system
+from utils.system import monitor
 
+
+def init_db_system():
+	monitor.instance().initDBFile()
+	return True

@@ -93,6 +93,7 @@ with app.app_context():
     if setup_db_required:
         setup.init_admin_user()
         setup.init_option()
+setup.init_db_system()
 
 app.config['BASIC_AUTH_OPEN'] = False
 with app.app_context():
