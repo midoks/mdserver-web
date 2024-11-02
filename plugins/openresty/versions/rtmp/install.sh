@@ -179,6 +179,11 @@ Install_openresty()
 	if [ -d ${openrestyDir}/nginx-rtmp-module-${nginx_rtmp_ver} ];then
 		rm -rf ${openrestyDir}/nginx-rtmp-module-${nginx_rtmp_ver}
 	fi
+
+	if [ -d $openrestyDir/openresty-${VERSION} ];then
+		rm -rf $openrestyDir/openresty-${VERSION}
+	fi
+	
 	echo '安装完成'
 }
 
