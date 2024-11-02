@@ -27,7 +27,7 @@ Install_openresty()
 	
 	# ----- cpu start ------
 	if [ -z "${cpuCore}" ]; then
-    	cpuCore="1"
+		cpuCore="1"
 	fi
 
 	if [ -f /proc/cpuinfo ];then
@@ -36,11 +36,11 @@ Install_openresty()
 
 	MEM_INFO=$(free -m|grep Mem|awk '{printf("%.f",($2)/1024)}')
 	if [ "${cpuCore}" != "1" ] && [ "${MEM_INFO}" != "0" ];then
-	    if [ "${cpuCore}" -gt "${MEM_INFO}" ];then
-	        cpuCore="${MEM_INFO}"
-	    fi
+		if [ "${cpuCore}" -gt "${MEM_INFO}" ];then
+			cpuCore="${MEM_INFO}"
+		fi
 	else
-	    cpuCore="1"
+		cpuCore="1"
 	fi
 
 	if [ "$cpuCore" -gt "2" ];then
@@ -89,13 +89,13 @@ Install_openresty()
 
 
 		if [ ! -f ${openrestyDir}/openssl-${opensslVersion}.tar.gz ];then
-	        wget --no-check-certificate -O ${openrestyDir}/openssl-${opensslVersion}.tar.gz https://www.openssl.org/source/openssl-${opensslVersion}.tar.gz
-	    fi
+			wget --no-check-certificate -O ${openrestyDir}/openssl-${opensslVersion}.tar.gz https://www.openssl.org/source/openssl-${opensslVersion}.tar.gz
+		fi
 
-	    if [ ! -d ${openrestyDir}/openssl-${opensslVersion} ];then
+		if [ ! -d ${openrestyDir}/openssl-${opensslVersion} ];then
 			cd ${openrestyDir} &&  tar -zxvf openssl-${opensslVersion}.tar.gz
 		fi
-	    OPTIONS="${OPTIONS} --with-openssl=${openrestyDir}/openssl-${opensslVersion}"
+		OPTIONS="${OPTIONS} --with-openssl=${openrestyDir}/openssl-${opensslVersion}"
 
 		# BREW_DIR=`which brew`
 		# BREW_DIR=${BREW_DIR/\/bin\/brew/}
@@ -105,10 +105,10 @@ Install_openresty()
 		# OPTIONS="${OPTIONS} --with-openssl=${OPENSSL_LIB_DEPEND_DIR}"
 	else
 		if [ ! -f ${openrestyDir}/openssl-${opensslVersion}.tar.gz ];then
-	        wget --no-check-certificate -O ${openrestyDir}/openssl-${opensslVersion}.tar.gz https://www.openssl.org/source/openssl-${opensslVersion}.tar.gz
-	    fi
+			wget --no-check-certificate -O ${openrestyDir}/openssl-${opensslVersion}.tar.gz https://www.openssl.org/source/openssl-${opensslVersion}.tar.gz
+		fi
 
-	    if [ ! -d ${openrestyDir}/openssl-${opensslVersion} ];then
+		if [ ! -d ${openrestyDir}/openssl-${opensslVersion} ];then
 			cd ${openrestyDir} &&  tar -zxvf openssl-${opensslVersion}.tar.gz
 		fi
 		OPTIONS="${OPTIONS} --with-openssl=${openrestyDir}/openssl-${opensslVersion}"
@@ -119,16 +119,26 @@ Install_openresty()
 		OPTIONS="${OPTIONS} --with-http_v3_module"
 
 		if [ ! -f ${openrestyDir}/libressl-${libresslVersion}.tar.gz ];then
-	        wget --no-check-certificate -O ${openrestyDir}/libressl-${libresslVersion}.tar.gz https://ftp.openbsd.org/pub/OpenBSD/LibreSSL/libressl-${libresslVersion}.tar.gz
-	    fi
+			wget --no-check-certificate -O ${openrestyDir}/libressl-${libresslVersion}.tar.gz https://ftp.openbsd.org/pub/OpenBSD/LibreSSL/libressl-${libresslVersion}.tar.gz
+		fi
 
-	    if [ ! -d ${openrestyDir}/libressl-${libresslVersion} ];then
+		if [ ! -d ${openrestyDir}/libressl-${libresslVersion} ];then
 			cd ${openrestyDir} &&  tar -zxvf libressl-${libresslVersion}.tar.gz
 		fi
-	    
-	    OPTIONS="${OPTIONS} --with-cc-opt=-I${openrestyDir}/libressl-${libresslVersion}/libressl/build/include"
-	    OPTIONS="${OPTIONS} --with-cc-opt=-I${openrestyDir}/libressl-${libresslVersion}/libressl/build/lib"
+		
+		OPTIONS="${OPTIONS} --with-cc-opt=-I${openrestyDir}/libressl-${libresslVersion}/libressl/build/include"
+		OPTIONS="${OPTIONS} --with-cc-opt=-I${openrestyDir}/libressl-${libresslVersion}/libressl/build/lib"
 	fi
+
+	# rtmp推流功能
+	if [ ! -f ${openrestyDir}/nginx-rtmp-module.tar.gz ];then
+		wget --no-check-certificate -O ${openrestyDir}/nginx-rtmp-module.tar.gz https://github.com/arut/nginx-rtmp-module/archive/refs/tags/v1.2.2.tar.gz
+	fi
+
+	if [ ! -d ${openrestyDir}/nginx-rtmp-module.tar.gz ];then
+		cd ${openrestyDir} &&  tar -zxvf nginx-rtmp-module.tar.gz
+	fi
+	OPTIONS="${OPTIONS} --add-module=${openrestyDir}/nginx-rtmp-module"
 
 
 	cd ${openrestyDir}/openresty-${VERSION} && ./configure \
@@ -153,17 +163,17 @@ Install_openresty()
 	fi
 
 
-    if [ -d ${openrestyDir}/pcre-${pcreVersion} ];then
-    	rm -rf ${openrestyDir}/pcre-${pcreVersion}
-    fi
+	if [ -d ${openrestyDir}/pcre-${pcreVersion} ];then
+		rm -rf ${openrestyDir}/pcre-${pcreVersion}
+	fi
 
-    if [ -d ${openrestyDir}/openssl-${opensslVersion} ];then
-    	rm -rf ${openrestyDir}/openssl-${opensslVersion}
-    fi
+	if [ -d ${openrestyDir}/openssl-${opensslVersion} ];then
+		rm -rf ${openrestyDir}/openssl-${opensslVersion}
+	fi
 
-    if [ -d ${openrestyDir}/libressl-${libresslVersion} ];then
-    	rm -rf ${openrestyDir}/libressl-${libresslVersion}
-    fi
+	if [ -d ${openrestyDir}/libressl-${libresslVersion} ];then
+		rm -rf ${openrestyDir}/libressl-${libresslVersion}
+	fi
 	echo '安装完成'
 }
 
