@@ -1,7 +1,7 @@
 CREATE TABLE IF NOT EXISTS `network` (
   `id` INTEGER PRIMARY KEY AUTOINCREMENT,
-  `up` REAL,
-  `down` REAL,
+  `up` TEXT,
+  `down` TEXT,
   `total_up` INTEGER,
   `total_down` INTEGER,
   `down_packets` INTEGER,
