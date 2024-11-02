@@ -130,7 +130,7 @@ def set_control():
         if not mw.isRestart():
             return mw.returnData(False, '请等待所有安装任务完成再执行')
         monitor.instance().clearDbFile()
-        return mw.returnData(True, "清空记录成功!")
+        return mw.returnData(True, "清空监控记录成功!")
     else:
         monitor_status = option.getOption('monitor_status', default='open', type='monitor')
         monitor_day = option.getOption('monitor_day', default='30', type='monitor')
