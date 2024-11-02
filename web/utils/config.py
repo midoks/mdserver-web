@@ -49,6 +49,7 @@ def getGlobalVar():
     data['backup_path'] = model.getOption('backup_path', default=mw.getFatherDir()+'/backup')
     data['admin_path'] = '/'+model.getOption('admin_path', default='')
     data['debug'] = model.getOption('debug', default='close')
+    data['admin_close'] = model.getOption('admin_close', default='no')
     data['site_count'] = model.getSitesCount()
     data['port'] = mw.getHostPort()
 

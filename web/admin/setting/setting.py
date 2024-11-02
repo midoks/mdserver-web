@@ -172,6 +172,18 @@ def open_debug():
     return mw.returnData(True, '开发模式开启!')
 
 
+# 设置面板开关
+@blueprint.route('/close_panel', endpoint='close_panel', methods=['POST'])
+@panel_login_required
+def close_panel():
+    admin_close = model.getOption('admin_close',default='no')
+    if admin_close == 'no':
+        model.setOption('admin_close','yes')
+        return mw.returnData(True, '开启面板成功!')
+    model.setOption('admin_close','no')
+    return mw.returnData(True, '关闭面板成功!')
+
+
 # 设置站点状态
 @blueprint.route('/set_port', endpoint='set_port', methods=['POST'])
 @panel_login_required

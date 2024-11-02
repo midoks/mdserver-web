@@ -10,7 +10,7 @@
 				<div class="ss-text pull-left mr50">
 					<em>关闭面板</em>
 					<div class="ssh-item">
-                        <input class="btswitch btswitch-ios" id="closePl" type="checkbox">
+                        <input class="btswitch btswitch-ios" id="closePl" type="checkbox" {%if data['admin_close']=='yes' %}checked{%endif%}>
                         <label class="btswitch-btn" for="closePl" onclick="closePanel()"></label>
                     </div>
 				</div>
