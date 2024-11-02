@@ -57,5 +57,4 @@ if [ "${action}" == "install" ] && [ -d $serverPath/openresty ];then
 	#初始化 
 	cd ${rootPath} && python3 ${rootPath}/plugins/openresty/index.py start
 	cd ${rootPath} && python3 ${rootPath}/plugins/openresty/index.py initd_install
-	rm -rf $openrestyDir/openresty-${VERSION}
 fi
