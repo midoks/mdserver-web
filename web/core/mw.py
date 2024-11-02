@@ -541,7 +541,13 @@ def isNumber(s):
 
     return False
 
-
+def isRestart():
+    # 检查是否允许重启
+    num = M('tasks').where('status!=?', ('1',)).count()
+    if num > 0:
+        return False
+    return True
+    
 # 检查端口是否占用
 def isOpenPort(port):
     import socket

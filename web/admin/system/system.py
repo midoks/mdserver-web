@@ -8,15 +8,18 @@
 # Author: midoks <midoks@163.com>
 # ---------------------------------------------------------------------------------
 
+import os
 
 from flask import Blueprint, render_template
 from flask import request
 
 from admin.user_login_check import panel_login_required
-import admin.model.option as option
+from utils.system import monitor
 
+import admin.model.option as option
 import core.mw as mw
 import utils.system as sys
+
 
 
 blueprint = Blueprint('system', __name__, url_prefix='/system', template_folder='../../templates')
@@ -126,14 +129,8 @@ def set_control():
     elif stype == 'del':
         if not mw.isRestart():
             return mw.returnData(False, '请等待所有安装任务完成再执行')
-        os.remove("data/system.db")
-
-        sql = db.Sql().dbfile('system')
-        csql = mw.readFile('data/sql/system.sql')
-        csql_list = csql.split(';')
-        for index in range(len(csql_list)):
-            sql.execute(csql_list[index], ())
-        return mw.returnData(True, "监控服务已关闭")
+        monitor.instance().clearDbFile()
+        return mw.returnData(True, "清空记录成功!")
     else:
         monitor_status = option.getOption('monitor_status', default='open', type='monitor')
         monitor_day = option.getOption('monitor_day', default='30', type='monitor')

@@ -45,6 +45,11 @@ class monitor:
                     monitor._instance = monitor(*args, **kwargs)
         return monitor._instance
 
+    def clearDbFile(self):
+        os.remove(self._dbfile)
+        self.initDBFile()
+        return True
+
     def initDBFile(self):
         if os.path.exists(self._dbfile):
             return True
