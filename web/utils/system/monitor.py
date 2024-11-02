@@ -66,12 +66,6 @@ class monitor:
             return True
         return False
 
-    # def safeRun(self):
-    #     self.initDBFile()
-
-    #     monitor_day =mw.M('option').field('name').where('name=?',('monitor_day',)).getField('value')
-    #     print(monitor_day)
-    #     print("monitor data", mw.formatDate())
     def psutilNetIoCounters(self):
         '''
         统计网卡流量
@@ -80,18 +74,12 @@ class monitor:
             local_lo = (0, 0, 0, 0)
             ioName = psutil.net_io_counters(pernic=True).keys()
             for x in ioName:
-
                 if x.find("lo") > -1:
-                    local_lo = psutil.net_io_counters(
-                        pernic=True).get(x)[:4]
+                    local_lo = psutil.net_io_counters(pernic=True).get(x)[:4]
 
             all_io = psutil.net_io_counters()[:4]
-            result_io = tuple([all_io[i] - local_lo[i]
-                               for i in range(0, len(all_io))])
+            result_io = tuple([all_io[i] - local_lo[i] for i in range(0, len(all_io))])
 
-            # print(local_lo)
-            # print(all_io)
-            # print(result_io)
             return result_io
         return psutil.net_io_counters()[:4]
 
