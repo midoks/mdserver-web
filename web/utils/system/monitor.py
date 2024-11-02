@@ -138,6 +138,8 @@ class monitor:
         info = {}
         # 取当前CPU Io
         info['used'] = psutil.cpu_percent(interval=1)
+        info['used'] = round(info['used'], 2)
+        
         info['mem'] = getMemUsed()
 
         netio = self.getNetIoInfo()
