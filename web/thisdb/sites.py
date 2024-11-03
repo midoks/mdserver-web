@@ -8,7 +8,8 @@
 # Author: midoks <midoks@163.com>
 # ---------------------------------------------------------------------------------
 
-from .init import *
-from .option import *
-from .user import *
-from .sites import *
+import core.mw as mw
+
+def getSitesCount():
+	return mw.M('sites').count()
+

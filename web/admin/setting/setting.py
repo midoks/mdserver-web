@@ -191,6 +191,7 @@ def set_ipv6_status():
     ipv6_file = __file['ipv6']
     if os.path.exists(ipv6_file):
         os.remove(ipv6_file)
+        mw.writeLog('面板设置', '关闭面板IPv6兼容!')
         mw.returnData('面板设置', '关闭面板IPv6兼容!')
     else:
         mw.writeFile(ipv6_file, 'True')
@@ -222,7 +223,7 @@ def set_port():
         # firewall_api.firewall_api().addAcceptPort(port)
         # firewall_api.firewall_api().firewallReload()
 
-        # system_api.system_api().restartMw()
+        mw.restartMw()
 
     return mw.returnJson(True, '端口保存成功!')
  
