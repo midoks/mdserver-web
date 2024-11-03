@@ -13,3 +13,4 @@ from .option import *
 from .user import *
 from .sites import *
 from .tasks import *
+from .logs import *
