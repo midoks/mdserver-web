@@ -10,6 +10,26 @@
 
 import core.mw as mw
 
+def getUserByName(name,
+) -> None:
+    '''
+    获取用户信息通过用户名
+    '''
+    users_field = 'id,name,password,login_ip,login_time,phone,email,add_time,update_time'
+    item =  mw.M('users').field(users_field).where('name=?', (name,)).select()
+    if len(item) == 0:
+        return None
+    row = {}
+    row['id'] = item[0]['id']
+    row['name'] = item[0]['name']
+    row['password'] = item[0]['password']
+    row['login_ip'] = item[0]['login_ip']
+    row['login_time'] = item[0]['login_time']
+    row['phone'] = item[0]['phone']
+    row['email'] = item[0]['email']
+    row['add_time'] = item[0]['add_time']
+    row['update_time'] = item[0]['update_time']
+    return row
 
 def getUserById(id,
 ) -> None:
