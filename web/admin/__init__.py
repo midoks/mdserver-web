@@ -99,9 +99,13 @@ setup.init_db_system()
 
 app.config['BASIC_AUTH_OPEN'] = False
 with app.app_context():
-    basic_auth = model.getOptionByJson('basic_auth', default={'open':False})
-    if basic_auth['open']:
-        app.config['BASIC_AUTH_OPEN'] = True
+    try:
+        basic_auth = model.getOptionByJson('basic_auth', default={'open':False})
+        if basic_auth['open']:
+            app.config['BASIC_AUTH_OPEN'] = True
+    except Exception as e:
+        pass
+    
 
 
 # 加载模块
