@@ -39,7 +39,7 @@ mw_start_task()
 }
 
 mw_start(){
-	cd web && gunicorn -c setting.py app:app
+	cd ${DIR}/web && gunicorn -c setting.py app:app
 	#安全启动
 	mw_start_task
 }
