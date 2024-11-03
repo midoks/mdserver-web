@@ -27,7 +27,6 @@ def addLog(type, log,
     '''
     add_time = mw.formatDate()
     insert_data = {
-        'name':name,
         'type':type,
         'log':log,
         'add_time':add_time,
