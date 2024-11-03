@@ -222,8 +222,8 @@ def set_panel_pwd(password, ncli=False):
     info = model.getUserByRoot()
     model.setUserByRoot(password=password)
     if ncli:
-        print("|-用户名: " + info['name'])
-        print("|-新密码: " + password)
+        print("|-username: " + info['name'])
+        print("|-password: " + password)
     else:
         print(username)
 
@@ -257,7 +257,7 @@ def set_panel_username(username=None):
             return
 
         thisdb.setUserByRoot(name=username)
-        print("|-新用户名: %s" % username)
+        print("|-username: %s" % username)
         return
 
     info = thisdb.getUserByRoot()
