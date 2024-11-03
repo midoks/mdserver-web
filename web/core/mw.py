@@ -665,7 +665,7 @@ def isRestart():
     return True
 
 def triggerTask():
-    isTask = getPanelDir() + '/tmp/panelTask.pl'
+    isTask = getPanelDir() + '/logs/panel_task.lock'
     writeFile(isTask, 'True')
 
 def restartTask():

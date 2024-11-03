@@ -104,7 +104,7 @@ mw_start()
 # /www/server/mdserver-web/tmp/panelTask.pl && service mw restart_task
 mw_stop_task()
 {
-    if [ -f ${PANEL_DIR}/tmp/panelTask.pl ];then
+    if [ -f ${PANEL_DIR}/logs/panel_task.lock ];then
         echo -e "\033[32mthe task is running and cannot be stopped\033[0m"
         exit 0
     fi
