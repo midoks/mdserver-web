@@ -183,6 +183,20 @@ def close_panel():
     model.setOption('admin_close','no')
     return mw.returnData(True, '关闭面板成功!')
 
+# 设置IPV6状态
+@blueprint.route('/set_ipv6_status', endpoint='set_ipv6_status', methods=['POST'])
+@panel_login_required
+def set_ipv6_status():
+    __file = mw.getCommonFile()
+    ipv6_file = __file['ipv6']
+    if os.path.exists(ipv6_file):
+        os.remove(ipv6_file)
+        mw.returnData('面板设置', '关闭面板IPv6兼容!')
+    else:
+        mw.writeFile(ipv6_file, 'True')
+        mw.writeLog('面板设置', '开启面板IPv6兼容!')
+    mw.restartMw()
+    return mw.returnData(True, '设置成功!')
 
 # 设置站点状态
 @blueprint.route('/set_port', endpoint='set_port', methods=['POST'])

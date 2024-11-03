@@ -8,6 +8,8 @@
 # Author: midoks <midoks@163.com>
 # ---------------------------------------------------------------------------------
 
+import os
+
 from admin import model
 
 import core.mw as mw
@@ -52,6 +54,12 @@ def getGlobalVar():
     data['admin_close'] = model.getOption('admin_close', default='no')
     data['site_count'] = model.getSitesCount()
     data['port'] = mw.getHostPort()
+
+    __file = mw.getCommonFile()
+    if os.path.exists(__file['ipv6']):
+        data['ipv6'] = 'checked'
+    else:
+        data['ipv6'] = ''
 
     # 获取未认证状态信息
     unauthorized_status = model.getOption('unauthorized_status', default='0')
