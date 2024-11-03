@@ -602,9 +602,9 @@ def writeLog(stype, msg, args=()):
 
 def writeDbLog(stype, msg, args=(), uid=1):
     try:
-        from admin import model
+        import thisdb
         format_msg = getInfo(msg, args)
-        model.addLog(stype, format_msg, uid)
+        thisdb.addLog(stype, format_msg, uid)
         return True
     except Exception as e:
         print("writeDbLog:"+str(e))
