@@ -230,7 +230,7 @@ def set_panel_pwd(password, ncli=False):
 
 def show_panel_pwd():
     # 面板密码展示
-    info = model.getUserByRoot()
+    info = thisdb.getUserByRoot()
     defailt_pwd_file = mw.getPanelDir()+'/data/default.pl'
     pwd = ''
     if os.path.exists(defailt_pwd_file):
