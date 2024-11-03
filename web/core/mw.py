@@ -610,6 +610,31 @@ def writeDbLog(stype, msg, args=(), uid=1):
         print("writeDbLog:"+str(e))
         return False
 
+def writeSpeed(title, used, total, speed=0):
+    path = getPanelDir()
+    speed_file= path + '/data/panelSpeed.pl'
+    # 写进度
+    if not title:
+        data = {'title': None, 'progress': 0,'total': 0, 'used': 0, 'speed': 0}
+    else:
+        progress = int((100.0 * used / total))
+        data = {'title': title, 'progress': progress,'total': total, 'used': used, 'speed': speed}
+    writeFile(speed_file, json.dumps(data))
+    return True
+
+
+def getSpeed():
+    path = getPanelDir()
+    speed_file= path + '/data/panelSpeed.pl'
+    # 取进度
+    path = getPanelDir()
+    data = readFile(speed_file)
+    if not data:
+        data = json.dumps({'title': None, 'progress': 0,'total': 0, 'used': 0, 'speed': 0})
+        writeFile(speed_file, data)
+    return json.loads(data)
+
+
 
 def M(table=''):
     import core.db as db

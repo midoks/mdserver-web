@@ -15,6 +15,7 @@ import time
 from admin import model
 
 import core.mw as mw
+import thisdb
 
 def getFileBody(path):
     if not os.path.exists(path):
@@ -284,7 +285,7 @@ def fileDelete(path):
         mw.execShell(cmd)
 
     try:
-        recycle_bin = model.getOption('recycle_bin')
+        recycle_bin = thisdb.getOption('recycle_bin')
         if recycle_bin == 'open':
             if mvRecycleBin(path):
                 return mw.returnData(True, '已将文件移动到回收站!')
@@ -303,7 +304,7 @@ def dirDelete(path):
     if path.find('.user.ini'):
         os.system("which chattr && chattr -i '" + path + "'")
     try:
-        recycle_bin = model.getOption('recycle_bin')
+        recycle_bin = thisdb.getOption('recycle_bin')
         if recycle_bin == 'open':
             if mvRecycleBin(path):
                 return mw.returnData(True, '已将文件移动到回收站!')
@@ -315,19 +316,19 @@ def dirDelete(path):
 
 # 关闭
 def toggleRecycleBin():
-    recycle_bin = model.getOption('recycle_bin')
+    recycle_bin = thisdb.getOption('recycle_bin')
     if recycle_bin == 'open':
-        model.setOption('recycle_bin','close')
+        thisdb.setOption('recycle_bin','close')
         mw.writeLog('文件管理', '已关闭回收站功能!')
         return mw.returnData(True, '已关闭回收站功能!')
     else:
-        model.setOption('recycle_bin','open')
+        thisdb.setOption('recycle_bin','open')
         mw.writeLog('文件管理', '已开启回收站功能!')
         return mw.returnData(True, '已开启回收站功能!')
 
 def getRecycleBin():
     rb_dir = mw.getRecycleBinDir()
-    recycle_bin = model.getOption('recycle_bin')
+    recycle_bin = thisdb.getOption('recycle_bin')
 
     data = {}
     data['dirs'] = []
@@ -391,6 +392,26 @@ def reRecycleBin(path):
         msg = mw.getInfo('从回收站恢复[{1}]失败!', (dst_file,))
         mw.writeLog('文件管理', msg)
         return mw.returnData(False, '恢复失败!')
+
+
+def closeRecycleBin():
+    rb_dir = mw.getRecycleBinDir()
+    mw.execShell('which chattr && chattr -R -i ' + rb_dir)
+    rlist = os.listdir(rb_dir)
+    i = 0
+    l = len(rlist)
+    for name in rlist:
+        i += 1
+        path = rb_dir + '/' + name
+        mw.writeSpeed(name, i, l)
+        if os.path.isdir(path):
+            shutil.rmtree(path)
+        else:
+            os.remove(path)
+    mw.writeSpeed(None, 0, 0)
+    mw.writeLog('文件管理', '已清空回收站!')
+    return mw.returnJson(True, '已清空回收站!')
+
 
 # 设置文件和目录权限
 def setMode(path):

@@ -156,6 +156,13 @@ def recycle_bin():
     return file.toggleRecycleBin()
 
 
+# 回收站文件
+@blueprint.route('/close_recycle_bin', endpoint='close_recycle_bin', methods=['POST'])
+@panel_login_required
+def close_recycle_bin():
+    return file.closeRecycleBin()
+
+
 
 
 
