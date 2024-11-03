@@ -21,7 +21,7 @@ def init_admin_user():
     if not data:
         name = mw.getRandomString(8).lower()
         password = mw.getRandomString(8).lower()
-        file_pass_pl = mw.getPanelDataDir() + '/default_new.pl'
+        file_pass_pl = mw.getPanelDataDir() + '/default.pl'
         mw.writeFile(file_pass_pl, password)
         insert_time = mw.formatDate()
         login_ip = '127.0.0.1'
