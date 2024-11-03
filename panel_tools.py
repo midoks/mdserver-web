@@ -237,9 +237,9 @@ def show_panel_pwd():
         pwd = mw.readFile(defailt_pwd_file).strip()
 
     if mw.md5(pwd) == info['password']:
-        print('password: ' + pwd)
+        print('|-password: ' + pwd)
         return
-    print("password has been changed!")
+    print("* password has been changed!")
 
 def show_panel_adminpath():
     admin_path = thisdb.getOption('admin_path')
@@ -264,7 +264,7 @@ def set_panel_username(username=None):
     if info['name'] == 'admin':
         username = mw.getRandomString(8).lower()
         thisdb.setUserByRoot(name=username)
-    print('|-用户名: ' + info['name'])
+    print('|-username: ' + info['name'])
 
 
 def getServerIp():

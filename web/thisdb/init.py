@@ -8,6 +8,6 @@
 # Author: midoks <midoks@163.com>
 # ---------------------------------------------------------------------------------
 
-from .init import *
-from .option import *
-from .user import *
+
+def initPanelData():
+	pass
