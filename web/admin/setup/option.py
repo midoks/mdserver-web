@@ -34,9 +34,6 @@ def init_option():
     # basic auth 配置
     model.setOption('basic_auth', json.dumps({'open':False}))
 
-
-
-
     # 开启后台任务
     # model.setOption('run_bg_task', 'close')
 
@@ -50,7 +47,10 @@ def init_option():
 
     # 初始化安全路径
     model.setOption('admin_path', mw.getRandomString(8))
-    model.setOption('server_ip', '127.0.0.1')
+
+
+    ip = mw.getLocalIp()
+    model.setOption('server_ip', ip)
 
     # 默认备份目录
     model.setOption('backup_path', mw.getFatherDir()+'/backup')

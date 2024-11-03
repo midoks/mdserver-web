@@ -93,7 +93,9 @@ with app.app_context():
     if setup_db_required:
         setup.init_admin_user()
         setup.init_option()
+setup.init_cmd()
 setup.init_db_system()
+
 
 app.config['BASIC_AUTH_OPEN'] = False
 with app.app_context():
@@ -155,6 +157,7 @@ def page_unauthorized(error):
 # 设置模板全局变量
 @app.context_processor
 def inject_global_variables():
+    start_t = time.time()
     ver = config.APP_VERSION;
     if mw.isDebugMode():
         ver = ver + str(time.time())
@@ -165,6 +168,9 @@ def inject_global_variables():
         'title' : 'MW面板',
         'ip' : '127.0.0.1'
     }
+
+    end_t = time.time()
+    print("cos:"+str(end_t-start_t))
     return dict(config=g_config, data=data)
 
 

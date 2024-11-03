@@ -36,6 +36,10 @@ def index():
 @blueprint.route('/<path>',endpoint='admin_safe_path',methods=['GET'])
 def admin_safe_path(path):
     db_path = model.getOption('admin_path')
+
+    if isLogined():
+       return redirect('/')
+
     if db_path == path:
         return render_template('default/login.html')
 
@@ -63,7 +67,7 @@ def webhook():
 
     wh_install_path = mw.getServerDir() + '/webhook'
     if not os.path.exists(wh_install_path):
-        return mw.returnJson(False, '请先安装WebHook插件!')
+        return mw.returnData(False, '请先安装WebHook插件!')
 
     package = mw.getPanelDir() + "/plugins/webhook"
     if not package in sys.path:

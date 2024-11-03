@@ -19,7 +19,7 @@ from .option import setOption
 from .sites import getSitesCount
 
 from .task import addTask
-from .task import getTaskCount,getTaskUnexecutedCount,getTaskList,getTaskFirstByRun
+from .task import getTaskCount,getTaskUnexecutedCount,getTaskList,getTaskFirstByRun,getTaskRunList
 from .task import setTaskStatus,setTaskData
 
 from .user import isLoginCheck

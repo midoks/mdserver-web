@@ -941,7 +941,7 @@ function removeTask(b) {
 		time: 0,
 		shade: [0.3, "#000"]
 	});
-	$.post("/files/remove_task", "id=" + b, function(c) {
+	$.post("/task/remove_task", "id=" + b, function(c) {
 		layer.close(a);
 		layer.msg(c.msg, {
 			icon: c.status ? 1 : 5

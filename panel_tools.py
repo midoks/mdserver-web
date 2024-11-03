@@ -26,6 +26,7 @@ sys.path.append(web_dir)
 
 from admin import app
 from admin import model
+import thisdb
 import core.mw as mw
 import core.db as db
 
@@ -241,7 +242,7 @@ def show_panel_pwd():
     print("password has been changed!")
 
 def show_panel_adminpath():
-    admin_path = model.getOption('admin_path')
+    admin_path = thisdb.getOption('admin_path')
     print('/'+admin_path)
 
 
@@ -289,6 +290,8 @@ def main():
             set_panel_username()
     elif method == 'password':
         show_panel_pwd()
+    elif method == 'test':
+        thisdb.getOption('admin_path')
     elif method == 'admin_path':
         show_panel_adminpath()
     elif method == 'getServerIp':
@@ -305,5 +308,4 @@ def main():
         print('ERROR: Parameter error')
 
 if __name__ == "__main__":
-    with app.app_context():
-        main()
+    main()

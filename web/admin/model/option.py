@@ -71,5 +71,4 @@ def setOption(name, value,
     
     db.session.query(Option).filter_by(name=name, type=type).update({"value":value})
     db.session.commit()
-    db.session.close()
     return True

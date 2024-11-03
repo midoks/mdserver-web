@@ -17,6 +17,7 @@ from admin.model import db,Tasks
 from admin.user_login_check import panel_login_required
 
 import core.mw as mw
+import utils.task as MwTasks
 
 blueprint = Blueprint('task', __name__, url_prefix='/task', template_folder='../../templates/default')
 
@@ -98,9 +99,16 @@ def get_task_speed():
         data['isDownload'] = False
 
 
-    data['task'] = model.getTaskList(status=-1)
+    data['task'] = model.getTaskRunList()
     return data
-    
+
+@blueprint.route('/remove_task', endpoint='remove_task', methods=['POST'])
+@panel_login_required
+def remove_task():
+    task_id = request.form.get('id', '')
+    if task_id == '':
+        return mw.returnData(False, '任务ID不能为空!')
+    return MwTasks.removeTask(task_id)
 
 
     

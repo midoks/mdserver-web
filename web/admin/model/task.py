@@ -88,6 +88,26 @@ def getTaskList(
         rows.append(t)
     return rows
 
+def getTaskRunList(
+    page: int | None = 1,
+    size: int | None = 10,
+):
+    pagination = Tasks.query.filter(Tasks.status!=1).order_by(Tasks.id.asc()).paginate(page=int(page), per_page=int(size))
+  
+    rows = []
+    for item in pagination.items:
+        t = {}
+        t['id'] = item.id
+        t['name'] = item.name
+        t['type'] = item.type
+        t['cmd'] = item.cmd
+        t['start'] = item.start
+        t['end'] = item.end
+        t['status'] = item.status
+        t['add_time'] = item.add_time
+        rows.append(t)
+    return rows
+
 
 
 

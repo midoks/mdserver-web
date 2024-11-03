@@ -199,10 +199,6 @@ def writeFile(filename, content, mode='w+'):
     except Exception as e:
         return False
 
-def triggerTask():
-    isTask = getPanelDir() + '/tmp/panelTask.pl'
-    writeFile(isTask, 'True')
-
 
 def systemdCfgDir():
     # ubuntu
@@ -263,6 +259,39 @@ def getClientIp():
     from flask import request
     return request.remote_addr.replace('::ffff:', '')
 
+def getLocalIp():
+    filename = getPanelDir()+'/data/iplist.txt'
+    try:
+        ipaddress = readFile(filename)
+        if not ipaddress or ipaddress == '127.0.0.1':
+            cmd = "curl --insecure -4 -sS --connect-timeout 5 -m 60 https://v6r.ipip.net/?format=text"
+            ip = execShell(cmd)
+            result = ip[0].strip()
+            if result == '':
+                raise Exception("ipv4 is empty!")
+            writeFile(filename, result)
+            return result
+        return ipaddress
+    except Exception as e:
+        cmd = "curl --insecure -6 -sS --connect-timeout 5 -m 60 https://v6r.ipip.net/?format=text"
+        ip = execShell(cmd)
+        result = ip[0].strip()
+        if result == '':
+            return '127.0.0.1'
+        writeFile(filename, result)
+        return result
+    finally:
+        pass
+    return '127.0.0.1'
+
+
+def inArray(arrays, searchStr):
+    # 搜索数据中是否存在
+    for key in arrays:
+        if key == searchStr:
+            return True
+
+    return False
 
 def getJson(data):
     import json
@@ -541,13 +570,6 @@ def isNumber(s):
 
     return False
 
-def isRestart():
-    # 检查是否允许重启
-    num = M('tasks').where('status!=?', ('1',)).count()
-    if num > 0:
-        return False
-    return True
-    
 # 检查端口是否占用
 def isOpenPort(port):
     import socket
@@ -633,13 +655,33 @@ def deDoubleCrypt(key, strings):
         writeFileLog(getTracebackInfo())
         return strings
 
-# ------------------------------ openresty start -----------------------------
+# ------------------------------   panel start  -----------------------------
+
+def isRestart():
+    # 检查是否允许重启
+    num = M('tasks').where('status!=?', ('1',)).count()
+    if num > 0:
+        return False
+    return True
+
+def triggerTask():
+    isTask = getPanelDir() + '/tmp/panelTask.pl'
+    writeFile(isTask, 'True')
+
+def restartTask():
+    initd = getPanelDir() + '/scripts/init.d/mw'
+    if os.path.exists(initd):
+        cmd = initd + ' ' + 'restart_task'
+        os.system(cmd)
+    return True
 
 def restartMw():
     restart_file = getPanelDir()+'/data/restart.pl'
     writeFile(restart_file, 'True')
     return True
+# ------------------------------    panel end    -----------------------------
 
+# ------------------------------ openresty start -----------------------------
 def restartWeb():
     return opWeb("reload")
 
@@ -667,6 +709,7 @@ def opWeb(method):
         return True
 
     return False
+
 def opLuaMake(cmd_name):
     path = getServerDir() + '/web_conf/nginx/lua/lua.conf'
     root_dir = getServerDir() + '/web_conf/nginx/lua/' + cmd_name

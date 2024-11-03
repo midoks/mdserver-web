@@ -117,7 +117,7 @@ def mw_async(f):
 @mw_async
 def restartMw():
     time.sleep(1)
-    cmd = mw.getRunDir() + '/scripts/init.d/mw reload &'
+    cmd = mw.getPanelDir() + '/scripts/init.d/mw reload &'
     mw.execShell(cmd)
 
 
@@ -225,173 +225,15 @@ def siteEdate():
 
 
 def systemTask():
+    from  utils.system import monitor
     # 系统监控任务
     try:
-        import system_api
-        import psutil
-        sm = system_api.system_api()
-        filename = 'data/control.conf'
-
-        sql = db.Sql().dbfile('system')
-        csql = mw.readFile('data/sql/system.sql')
-        csql_list = csql.split(';')
-        for index in range(len(csql_list)):
-            sql.execute(csql_list[index], ())
-
-        cpuIo = cpu = {}
-        cpuCount = psutil.cpu_count()
-        used = count = 0
-        reloadNum = 0
-        network_up = network_down = diskio_1 = diskio_2 = networkInfo = cpuInfo = diskInfo = None
-        while True:
-            if not os.path.exists(filename):
-                time.sleep(10)
-                continue
-
-            day = 30
-            try:
-                day = int(mw.readFile(filename))
-                if day < 1:
-                    time.sleep(10)
-                    continue
-            except:
-                day = 30
-
-            tmp = {}
-            # 取当前CPU Io
-            tmp['used'] = psutil.cpu_percent(interval=1)
-            if tmp['used'] > 80:
-                panel_title = mw.getConfig('title')
-                ip = mw.getHostAddr()
-                now_time = mw.getDateFromNow()
-                msg = now_time + '|节点[' + panel_title + ':' + ip + \
-                    ']处于高负载[' + str(tmp['used']) + '],请排查原因!'
-                mw.notifyMessage(msg, '面板监控', 600)
-
-            if not cpuInfo:
-                tmp['mem'] = sm.getMemUsed()
-                cpuInfo = tmp
-
-            if cpuInfo['used'] < tmp['used']:
-                tmp['mem'] = sm.getMemUsed()
-                cpuInfo = tmp
-
-            # 取当前网络Io
-            networkIo = sm.psutilNetIoCounters()
-            if not network_up:
-                network_up = networkIo[0]
-                network_down = networkIo[1]
-            tmp = {}
-            tmp['upTotal'] = networkIo[0]
-            tmp['downTotal'] = networkIo[1]
-            tmp['up'] = round(float((networkIo[0] - network_up) / 1024), 2)
-            tmp['down'] = round(float((networkIo[1] - network_down) / 1024), 2)
-            tmp['downPackets'] = networkIo[3]
-            tmp['upPackets'] = networkIo[2]
-
-            network_up = networkIo[0]
-            network_down = networkIo[1]
-
-            if not networkInfo:
-                networkInfo = tmp
-            if (tmp['up'] + tmp['down']) > (networkInfo['up'] + networkInfo['down']):
-                networkInfo = tmp
-            # 取磁盘Io
-            # if os.path.exists('/proc/diskstats'):
-            diskio_2 = psutil.disk_io_counters()
-            if not diskio_1:
-                diskio_1 = diskio_2
-            tmp = {}
-            tmp['read_count'] = diskio_2.read_count - diskio_1.read_count
-            tmp['write_count'] = diskio_2.write_count - diskio_1.write_count
-            tmp['read_bytes'] = diskio_2.read_bytes - diskio_1.read_bytes
-            tmp['write_bytes'] = diskio_2.write_bytes - diskio_1.write_bytes
-            tmp['read_time'] = diskio_2.read_time - diskio_1.read_time
-            tmp['write_time'] = diskio_2.write_time - diskio_1.write_time
-
-            if not diskInfo:
-                diskInfo = tmp
-            else:
-                diskInfo['read_count'] += tmp['read_count']
-                diskInfo['write_count'] += tmp['write_count']
-                diskInfo['read_bytes'] += tmp['read_bytes']
-                diskInfo['write_bytes'] += tmp['write_bytes']
-                diskInfo['read_time'] += tmp['read_time']
-                diskInfo['write_time'] += tmp['write_time']
-            diskio_1 = diskio_2
-
-            # print diskInfo
-            if count >= 12:
-                try:
-                    addtime = int(time.time())
-                    deltime = addtime - (day * 86400)
-
-                    data = (cpuInfo['used'], cpuInfo['mem'], addtime)
-                    sql.table('cpuio').add('pro,mem,addtime', data)
-                    sql.table('cpuio').where("addtime<?", (deltime,)).delete()
-
-                    data = (networkInfo['up'] / 5, networkInfo['down'] / 5, networkInfo['upTotal'], networkInfo[
-                        'downTotal'], networkInfo['downPackets'], networkInfo['upPackets'], addtime)
-                    sql.table('network').add(
-                        'up,down,total_up,total_down,down_packets,up_packets,addtime', data)
-                    sql.table('network').where(
-                        "addtime<?", (deltime,)).delete()
-                    # if os.path.exists('/proc/diskstats'):
-                    data = (diskInfo['read_count'], diskInfo['write_count'], diskInfo['read_bytes'], diskInfo[
-                        'write_bytes'], diskInfo['read_time'], diskInfo['write_time'], addtime)
-                    sql.table('diskio').add(
-                        'read_count,write_count,read_bytes,write_bytes,read_time,write_time,addtime', data)
-                    sql.table('diskio').where(
-                        "addtime<?", (deltime,)).delete()
-
-                    # LoadAverage
-                    load_average = sm.getLoadAverage()
-                    lpro = round((load_average['one'] / load_average['max']) * 100, 2)
-                    if lpro > 100:
-                        lpro = 100
-                    sql.table('load_average').add('pro,one,five,fifteen,addtime', (lpro, load_average['one'], load_average['five'], load_average['fifteen'], addtime))
-
-                    lpro = None
-                    load_average = None
-                    cpuInfo = None
-                    networkInfo = None
-                    diskInfo = None
-                    count = 0
-                    reloadNum += 1
-                    if reloadNum > 1440:
-                        reloadNum = 0
-                        mw.writeFile('logs/sys_interrupt.pl',
-                                     "reload num:" + str(reloadNum))
-                        restartMw()
-                except Exception as ex:
-                    print(str(ex))
-                    mw.writeFile('logs/sys_interrupt.pl', str(ex))
-
-            del(tmp)
-            time.sleep(5)
-            count += 1
-    except Exception as ex:
-        print(str(ex))
-        mw.writeFile('logs/sys_interrupt.pl', str(ex))
-
-        restartMw()
-
-        time.sleep(30)
-        systemTask()
-
-def systemTask2():
-    # 系统监控任务
-    try:
-        from  utils.system import monitor
         while True:
             monitor.instance().run()
             time.sleep(5)
     except Exception as ex:
-        print(str(ex))
-        mw.writeFile('logs/sys_interrupt.pl', str(ex))
-        restartMw()
         time.sleep(30)
-        systemTask2()
+        systemTask()
 
 
 # -------------------------------------- PHP监控 start --------------------------------------------- #
@@ -596,7 +438,7 @@ def setDaemon(t):
 
 def run():
     # # 系统监控
-    sysTask = threading.Thread(target=systemTask2)
+    sysTask = threading.Thread(target=systemTask)
     sysTask = setDaemon(sysTask)
     sysTask.start()
 

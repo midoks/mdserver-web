@@ -8,8 +8,21 @@
 # Author: midoks <midoks@163.com>
 # ---------------------------------------------------------------------------------
 
-from .user import init_admin_user
-from .option import init_option
-from .init_db_system import init_db_system
-from .init_cmd import init_cmd
 
+import core.mw as mw
+
+def getOption(name,
+    type: str | None = 'common',
+    default : str | None = None
+) -> str:
+    '''
+    获取配置的值
+    :name -> str 名称 (必填)
+    :type -> str 类型 (可选|默认common)
+    :default -> str 默认值 (可选)
+    '''
+    data = mw.M('option').field('name').where('name=? and type=?',(name, type,)).getField('value')
+
+    if len(data) == 0:
+        return default
+    return data
