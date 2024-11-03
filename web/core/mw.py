@@ -679,6 +679,18 @@ def restartMw():
     restart_file = getPanelDir()+'/data/restart.pl'
     writeFile(restart_file, 'True')
     return True
+
+def panelCmd(method):
+    cmd = '/etc/init.d/mw'
+    if os.path.exists(cmd):
+        execShell(cmd + ' ' + method)
+        return
+
+    cmd = mw.getPanelDir() + '/scripts/init.d/mw'
+    if os.path.exists(cmd):
+        data = execShell(cmd + ' ' + method)
+        return
+
 # ------------------------------    panel end    -----------------------------
 
 # ------------------------------ openresty start -----------------------------
@@ -696,14 +708,19 @@ def opWeb(method):
         return False
 
     # systemd
-    systemd = '/lib/systemd/system/openresty.service'
+    systemd = systemdCfgDir() + '/openresty.service'
     if os.path.exists(systemd):
         execShell('systemctl ' + method + ' openresty')
         return True
 
+
+    sys_initd = '/etc/init.d/openresty'
+    if os.path.exists(sys_initd):
+        os.system(sys_initd + ' ' + method)
+        return True
+
     # initd
     initd = getServerDir() + '/openresty/init.d/openresty'
-
     if os.path.exists(initd):
         execShell(initd + ' ' + method)
         return True
@@ -767,8 +784,58 @@ def opLuaMakeAll():
 # ------------------------------ openresty end -----------------------------
 
 # ---------------------------------------------------------------------------------
+# PHP START
+# ---------------------------------------------------------------------------------
+
+def getFpmConfFile(version):
+    return getServerDir() + '/php/' + version + '/etc/php-fpm.d/www.conf'
+
+def getFpmAddress(version):
+    fpm_address = '/tmp/php-cgi-{}.sock'.format(version)
+    php_fpm_file = getFpmConfFile(version)
+    try:
+        content = readFile(php_fpm_file)
+        tmp = re.findall(r"listen\s*=\s*(.+)", content)
+        if not tmp:
+            return fpm_address
+        if tmp[0].find('sock') != -1:
+            return fpm_address
+        if tmp[0].find(':') != -1:
+            listen_tmp = tmp[0].split(':')
+            if bind:
+                fpm_address = (listen_tmp[0], int(listen_tmp[1]))
+            else:
+                fpm_address = ('127.0.0.1', int(listen_tmp[1]))
+        else:
+            fpm_address = ('127.0.0.1', int(tmp[0]))
+        return fpm_address
+    except:
+        return fpm_address
+
+def requestFcgiPHP(sock, uri, document_root='/tmp', method='GET', pdata=b''):
+    # 直接请求到PHP-FPM
+    # version php版本
+    # uri 请求uri
+    # filename 要执行的php文件
+    # args 请求参数
+    # method 请求方式
+
+    import utils.php.fpm as fpm
+    p = fpm.fpm(sock, document_root)
+
+    if type(pdata) == dict:
+        pdata = url_encode(pdata)
+    result = p.load_url_public(uri, pdata, method)
+    return result
+# ---------------------------------------------------------------------------------
+# PHP END
+# ---------------------------------------------------------------------------------
+
+
+# ---------------------------------------------------------------------------------
 # 数据库 START
 # ---------------------------------------------------------------------------------
+
 def getMyORM():
     '''
     获取MySQL资源的ORM

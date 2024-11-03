@@ -602,7 +602,7 @@ def writeLog(stype, msg, args=()):
 
 
 def writeFileLog(msg, path=None, limit_size=50 * 1024 * 1024, save_limit=3):
-    log_file = getServerDir() + '/mdserver-web/logs/debug.log'
+    log_file = getPanelDir() + '/logs/debug.log'
     if path != None:
         log_file = path
 
@@ -632,14 +632,15 @@ def writeFileLog(msg, path=None, limit_size=50 * 1024 * 1024, save_limit=3):
 
 def writeDbLog(stype, msg, args=(), uid=1):
     try:
-        import time
-        import db
-        import json
-        sql = db.Sql()
-        mdate = time.strftime('%Y-%m-%d %X', time.localtime())
-        wmsg = getInfo(msg, args)
-        data = (stype, wmsg, uid, mdate)
-        result = sql.table('logs').add('type,log,uid,addtime', data)
+        add_time = formatDate()
+        format_msg = getInfo(msg, args)
+        add_data = {
+            'type':stype,
+            'msg':format_msg,
+            'uid':uid,
+            'add_time':add_time,
+        }
+        result = M('logs').insert(add_data)
         return True
     except Exception as e:
         return False
