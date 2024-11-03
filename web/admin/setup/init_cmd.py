@@ -39,8 +39,6 @@ def init_cmd():
         initd_bin = '/etc/rc.d/init.d/mw'
         shutil.copyfile(script_bin, initd_bin)
         mw.execShell('chmod +x ' + initd_bin)
-
-
         # 加入自启动
         mw.execShell('which chkconfig && chkconfig --add mw')
 
