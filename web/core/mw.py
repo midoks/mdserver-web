@@ -604,7 +604,7 @@ def writeDbLog(stype, msg, args=(), uid=1):
     try:
         import thisdb
         format_msg = getInfo(msg, args)
-        thisdb.addLog(stype, format_msg, uid)
+        thisdb.addLog(stype, format_msg, uid=uid)
         return True
     except Exception as e:
         print("writeDbLog:"+str(e))
