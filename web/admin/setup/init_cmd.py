@@ -15,7 +15,7 @@ import core.mw as mw
 
 def contentReplace(src, dst):
     content = mw.readFile(src)
-    content = content.replace("{$SERVER_PATH}", mw.getFatherDir())
+    content = content.replace("{$SERVER_PATH}", mw.getPanelDir())
 
     content += "\n# make:{0}".format(mw.formatDate())
     mw.writeFile(dst, content)
