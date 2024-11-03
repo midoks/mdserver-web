@@ -256,14 +256,14 @@ def set_panel_username(username=None):
             print("|-错误，不能使用过于简单的用户名")
             return
 
-        model.setUserByRoot(name=username)
+        thisdb.setUserByRoot(name=username)
         print("|-新用户名: %s" % username)
         return
 
-    info = model.getUserByRoot()
+    info = thisdb.getUserByRoot()
     if info['name'] == 'admin':
         username = mw.getRandomString(8).lower()
-        model.setUserByRoot(name=username)
+        thisdb.setUserByRoot(name=username)
     print('|-用户名: ' + info['name'])
 
 
