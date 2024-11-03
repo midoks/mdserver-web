@@ -63,12 +63,12 @@ mw_start_debug(){
 	cd ${DIR}/web && gunicorn -b :${port} -w 1 app:app
 }
 
-mw_start_debug2(){
+mw_start_panel(){
 	python3 panel_task.py >> $DIR/logs/panel_task.log 2>&1 &
 	cd ${DIR}/web && gunicorn -b :7200 -w 1  app:app
 }
 
-mw_start_debug3(){
+mw_start_bgtask(){
 	cd ${DIR}/web && gunicorn -c setting.py app:app
 	cd ${DIR} && python3 panel_task.py
 }
@@ -101,12 +101,12 @@ case "$1" in
 		mw_stop 
 		mw_start_debug
 		;;
-	'debug2') 
+	'panel') 
 		mw_stop 
-		mw_start_debug2
+		mw_start_panel
 		;;
-	'debug3') 
+	'task') 
 		mw_stop 
-		mw_start_debug3
+		mw_start_bgtask
 		;;
 esac
