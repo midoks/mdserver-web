@@ -18,8 +18,10 @@ from flask import request
 from admin import model
 from admin.user_login_check import panel_login_required
 
+
 import core.mw as mw
 import utils.config as utils_config
+
 
 # 默认页面
 blueprint = Blueprint('setting', __name__, url_prefix='/setting', template_folder='../../templates')
@@ -218,12 +220,12 @@ def set_port():
         msg = mw.getInfo('放行端口[{1}]成功', (port,))
         mw.writeLog("防火墙管理", msg)
         addtime = time.strftime('%Y-%m-%d %X', time.localtime())
-        mw.M('firewall').add('port,ps,addtime', (port, "配置修改", addtime))
+        mw.M('firewall').add('port,ps,add_time', (port, "配置修改", add_time))
 
         # firewall_api.firewall_api().addAcceptPort(port)
         # firewall_api.firewall_api().firewallReload()
 
         mw.restartMw()
 
-    return mw.returnJson(True, '端口保存成功!')
+    return mw.returnData(True, '端口保存成功!')
  

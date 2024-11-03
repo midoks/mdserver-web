@@ -6,7 +6,7 @@ CREATE TABLE IF NOT EXISTS `backup` (
   `pid` INTEGER,
   `filename` TEXT,
   `size` INTEGER,
-  `addtime` TEXT
+  `add_time` TEXT
 );
 
 CREATE TABLE IF NOT EXISTS `binding` (
@@ -15,7 +15,7 @@ CREATE TABLE IF NOT EXISTS `binding` (
   `domain` TEXT,
   `path` TEXT,
   `port` INTEGER,
-  `addtime` TEXT
+  `add_time` TEXT
 );
 
 
@@ -27,7 +27,6 @@ CREATE TABLE IF NOT EXISTS `crontab` (
   `where_hour` INTEGER,
   `where_minute` INTEGER,
   `echo` TEXT,
-  `addtime` TEXT,
   `status` INTEGER DEFAULT '1',
   `save` INTEGER DEFAULT '3',
   `backup_to` TEXT DEFAULT 'off', 
@@ -35,6 +34,7 @@ CREATE TABLE IF NOT EXISTS `crontab` (
   `sbody` TEXT,
   'stype' TEXT,
   `urladdress` TEXT
+  `add_time` TEXT
 );
 
 CREATE TABLE IF NOT EXISTS `firewall` (
@@ -42,12 +42,12 @@ CREATE TABLE IF NOT EXISTS `firewall` (
   `port` TEXT,
   `protocol` TEXT DEFAULT 'tcp',
   `ps` TEXT,
-  `addtime` TEXT
+  `add_time` TEXT
 );
 
 ALTER TABLE `firewall` ADD COLUMN `protocol` TEXT DEFAULT 'tcp';
 
-INSERT INTO `firewall` (`id`, `port`, `protocol`, `ps`, `addtime`) VALUES
+INSERT INTO `firewall` (`id`, `port`, `protocol`, `ps`, `add_time`) VALUES
 (1, '80',  'tcp','网站默认端口', '0000-00-00 00:00:00'),
 (2, '443', 'tcp/udp', 'HTTPS', '0000-00-00 00:00:00');
 
@@ -58,7 +58,7 @@ CREATE TABLE IF NOT EXISTS `logs` (
   `type` TEXT,
   `log` TEXT,
   `uid` INTEGER DEFAULT '1',
-  `addtime` TEXT
+  `add_time` TEXT
 );
 ALTER TABLE `logs` ADD COLUMN `uid` INTEGER DEFAULT '1';
 
@@ -73,7 +73,7 @@ CREATE TABLE IF NOT EXISTS `sites` (
   `edate` TEXT,
   `ssl_effective_date` TEXT,
   `ssl_expiration_date` TEXT,
-  `addtime` TEXT
+  `add_time` TEXT
 );
 
 ALTER TABLE `sites` ADD COLUMN `ssl_effective_date` TEXT DEFAULT '';
@@ -89,7 +89,7 @@ CREATE TABLE IF NOT EXISTS `domain` (
   `pid` INTEGER,
   `name` TEXT,
   `port` INTEGER,
-  `addtime` TEXT
+  `add_time` TEXT
 );
 
 CREATE TABLE IF NOT EXISTS `users` (
@@ -110,11 +110,11 @@ CREATE TABLE IF NOT EXISTS `tasks` (
   `id` INTEGER PRIMARY KEY AUTOINCREMENT,
   `name` 			TEXT,
   `type`			TEXT,
-  `status` 		TEXT,
-  `addtime` 	TEXT,
   `start` 	  INTEGER,
   `end` 	    INTEGER,
-  `execstr` 	TEXT
+  `cmd` 	    TEXT,
+  `status`    INTEGER,
+  `add_time`  INTEGER
 );
 
 CREATE TABLE IF NOT EXISTS `temp_login` (
@@ -126,7 +126,7 @@ CREATE TABLE IF NOT EXISTS `temp_login` (
   `login_addr`  REAL,
   `logout_time` INTEGER,
   `expire`  INTEGER,
-  `addtime` INTEGER
+  `add_time` INTEGER
 );
 
 CREATE TABLE IF NOT EXISTS `panel` (
@@ -136,5 +136,12 @@ CREATE TABLE IF NOT EXISTS `panel` (
   `username` TEXT,
   `password` TEXT,
   `click` INTEGER,
-  `addtime` INTEGER
+  `add_time` INTEGER
+);
+
+CREATE TABLE IF NOT EXISTS `option` (
+  `id` INTEGER PRIMARY KEY AUTOINCREMENT,
+  `name` TEXT,
+  `type` TEXT,
+  `value` TEXT
 );

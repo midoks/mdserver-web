@@ -14,7 +14,7 @@ import json
 from flask import Blueprint, render_template
 from flask import request
 
-from utils.mwplugin import MwPlugin
+from utils.plugin import plugin as MwPlugin
 from admin.user_login_check import panel_login_required
 
 from admin import model

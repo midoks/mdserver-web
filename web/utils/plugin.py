@@ -18,8 +18,9 @@ from admin import model
 
 import core.mw as mw
 import admin.model.option as option
+import thisdb
 
-class pa_thread(threading.Thread):
+class pg_thread(threading.Thread):
 
     def __init__(self, func, args, name=''):
         threading.Thread.__init__(self)
@@ -34,7 +35,7 @@ class pa_thread(threading.Thread):
         except Exception:
             return None
 
-class MwPlugin(object):
+class plugin(object):
 
     def_plugin_type = [
         {
@@ -88,11 +89,11 @@ class MwPlugin(object):
 
     @classmethod
     def instance(cls, *args, **kwargs):
-        if not hasattr(MwPlugin, "_instance"):
-            with MwPlugin._instance_lock:
-                if not hasattr(MwPlugin, "_instance"):
-                    MwPlugin._instance = MwPlugin(*args, **kwargs)
-        return MwPlugin._instance
+        if not hasattr(plugin, "_instance"):
+            with plugin._instance_lock:
+                if not hasattr(plugin, "_instance"):
+                    plugin._instance = plugin(*args, **kwargs)
+        return plugin._instance
 
     """插件类初始化"""
     def __init__(self):
@@ -260,7 +261,7 @@ class MwPlugin(object):
 
         self.hookInstall(info_data)
         title = '{0}[{1}-{2}]'.format(msg_head,name,version)
-        model.addTask(name=title,cmd=exec_bash, status=0)
+        thisdb.addTask(name=title,cmd=exec_bash, status=0)
 
         # 调式日志
         mw.debugLog(exec_bash)
@@ -494,7 +495,7 @@ class MwPlugin(object):
             threads = []
             ntmp_list = range(len(info))
             for i in ntmp_list:
-                t = pa_thread(self.checkStatusThreads,(info[i], i))
+                t = pg_thread(self.checkStatusThreads,(info[i], i))
                 threads.append(t)
 
             for i in ntmp_list:

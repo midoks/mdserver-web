@@ -32,3 +32,18 @@ def list():
     # print(clist)
 
     return []
+
+
+@blueprint.route('/add', endpoint='add', methods=['GET','POST'])
+@panel_login_required
+def add():
+    page = request.args.get('p', 1)
+    size = 10
+    count = Crontab.query.count()
+    # print(count)
+    clist = Crontab.query.paginate(page=int(page), per_page=size)
+    # print(clist)
+
+    return []
+
+

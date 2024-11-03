@@ -230,7 +230,7 @@ class Firewall(object):
         if model.getFirewallCountByPort(port) > 0:
             return mw.returnData(False, '您要放行的端口已存在，无需重复放行!')
 
-        model.addFirewall(port,ps=ps,protocol=protocol)
+        model.addFirewall(port, ps=ps,protocol=protocol)
         self.addAcceptPortCmd(port, protocol=protocol)
         self.reload()
         

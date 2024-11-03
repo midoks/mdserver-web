@@ -500,8 +500,7 @@ class crontab_api:
 
     # 取任务构造Month
     def month(self, param):
-        cuonConfig = "{0} {1} {2} * * ".format(
-            param['minute'], param['hour'], param['where1'])
+        cuonConfig = "{0} {1} {2} * * ".format(param['minute'], param['hour'], param['where1'])
         return cuonConfig
 
     # 取执行脚本
