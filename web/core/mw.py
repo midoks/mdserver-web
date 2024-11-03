@@ -590,12 +590,12 @@ def debugLog(*data):
 def writeLog(stype, msg, args=()):
     # 写日志
     uid = 0
-    try:
-        from flask import session
-        if 'uid' in session:
-            uid = session['uid']
-    except Exception as e:
-        print("writeLog:"+str(e))
+    # try:
+    #     from flask import session
+    #     if 'uid' in session:
+    #         uid = session['uid']
+    # except Exception as e:
+    #     print("writeLog:"+str(e))
         # pass
         # writeFileLog(getTracebackInfo())
     return writeDbLog(stype, msg, args, uid)
