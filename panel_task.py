@@ -107,7 +107,7 @@ def runPanelTask():
                 downloadFile(argv[0], argv[1])
             elif run_task['type'] == 'execshell':
                 execShell(run_task['cmd'])
-            print(run_task)
+            # print(run_task)
             end = int(time.time())
             thisdb.setTaskData(run_task['id'], end=end)
             thisdb.setTaskStatus(run_task['id'], 1)
