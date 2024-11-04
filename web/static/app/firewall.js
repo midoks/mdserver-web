@@ -301,8 +301,8 @@ function showAccept(page,search) {
 						<td>" + data.data[i].protocol + "</td>\
 						<td>" + (data.data[i].port.indexOf('.') == -1?'放行端口'+':['+data.data[i].port+']':'屏蔽IP'+':['+data.data[i].port+']') + "</td>\
 						<td>" + status + "</td>\
-						<td>" + data.data[i].addtime + "</td>\
 						<td>" + data.data[i].ps + "</td>\
+						<td>" + data.data[i].add_time + "</td>\
 						<td class='text-right'><a href='javascript:;' class='btlink' onclick=\"delAcceptPort(" + data.data[i].id + ",'" + data.data[i].port + "','"+data.data[i].protocol+"')\">删除</a></td>\
 					</tr>";
 		}
