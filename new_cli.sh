@@ -64,7 +64,6 @@ mw_start_debug(){
 }
 
 mw_start_panel(){
-	python3 panel_task.py >> $DIR/logs/panel_task.log 2>&1 &
 	cd ${DIR}/web && gunicorn -b :7200 -w 1  app:app
 }
 

@@ -8,6 +8,7 @@
 # Author: midoks <midoks@163.com>
 # ---------------------------------------------------------------------------------
 
+import json
 
 
 import core.mw as mw
@@ -33,3 +34,29 @@ def addLog(type, log,
     }
     mw.M('logs').insert(insert_data)
     return True
+
+def getLogsList(
+    page:int | None = 1,
+    size:int | None = 10,
+    search: str | None = ''
+):
+    sql_where = ''
+    if search != '' :
+        sql_where = " type like '%" + search + "%' or log like '%" + search + "%' "
+
+    field = 'id,type,log,uid,add_time'
+    dbM = dbC = mw.M('logs').field(field)
+
+    if sql_where != '':
+        count = mw.M('logs').field(field).where(sql_where).count()
+    else:
+        count = mw.M('logs').field(field).count()
+
+    start = (int(page) - 1) * (int(size))
+    limit = str(start) + ',' +str(size)
+    logs_list = mw.M('logs').field(field).limit(limit).order('id desc').select()
+
+    data = {}
+    data['list'] = logs_list
+    data['count'] = count
+    return data

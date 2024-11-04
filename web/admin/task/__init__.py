@@ -18,6 +18,7 @@ from admin.user_login_check import panel_login_required
 
 import core.mw as mw
 import utils.task as MwTasks
+import thisdb
 
 blueprint = Blueprint('task', __name__, url_prefix='/task', template_folder='../../templates/default')
 
@@ -25,7 +26,7 @@ blueprint = Blueprint('task', __name__, url_prefix='/task', template_folder='../
 @blueprint.route('/count', endpoint='task_count')
 @panel_login_required
 def task_count():
-    return str(model.getTaskUnexecutedCount())
+    return str(thisdb.getTaskUnexecutedCount())
 
 
 @blueprint.route('/list', endpoint='list', methods=['POST'])

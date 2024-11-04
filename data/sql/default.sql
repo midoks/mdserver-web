@@ -33,8 +33,9 @@ CREATE TABLE IF NOT EXISTS `crontab` (
   `sname` TEXT,
   `sbody` TEXT,
   'stype' TEXT,
-  `urladdress` TEXT
-  `add_time` TEXT
+  `url_address` TEXT,
+  `add_time` TEXT,
+  `update_time` TEXT
 );
 
 CREATE TABLE IF NOT EXISTS `firewall` (
@@ -60,7 +61,6 @@ CREATE TABLE IF NOT EXISTS `logs` (
   `uid` INTEGER DEFAULT '1',
   `add_time` TEXT
 );
-ALTER TABLE `logs` ADD COLUMN `uid` INTEGER DEFAULT '1';
 
 CREATE TABLE IF NOT EXISTS `sites` (
   `id` INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -73,11 +73,9 @@ CREATE TABLE IF NOT EXISTS `sites` (
   `edate` TEXT,
   `ssl_effective_date` TEXT,
   `ssl_expiration_date` TEXT,
-  `add_time` TEXT
+  `add_time` TEXT,
+  `update_time` TEXT
 );
-
-ALTER TABLE `sites` ADD COLUMN `ssl_effective_date` TEXT DEFAULT '';
-ALTER TABLE `sites` ADD COLUMN `ssl_expiration_date` TEXT DEFAULT '';
 
 CREATE TABLE IF NOT EXISTS `site_types` (
   `id` INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -94,17 +92,15 @@ CREATE TABLE IF NOT EXISTS `domain` (
 
 CREATE TABLE IF NOT EXISTS `users` (
   `id` INTEGER PRIMARY KEY AUTOINCREMENT,
-  `username` TEXT,
+  `name` TEXT,
   `password` TEXT,
   `login_ip` TEXT,
   `login_time` TEXT,
   `phone` TEXT,
-  `email` TEXT
+  `email` TEXT,
+  `add_time` INTEGER,
+  `update_time` INTEGER
 );
-
-INSERT INTO `users` (`id`, `username`, `password`, `login_ip`, `login_time`, `phone`, `email`) VALUES
-(1, 'admin', '21232f297a57a5a743894a0e4a801fc3', '192.168.0.10', '2022-02-02 00:00:00', 0, 'midoks@163.com');
-
 
 CREATE TABLE IF NOT EXISTS `tasks` (
   `id` INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -145,3 +141,5 @@ CREATE TABLE IF NOT EXISTS `option` (
   `type` TEXT,
   `value` TEXT
 );
+
+CREATE UNIQUE INDEX name_idx ON option(name);

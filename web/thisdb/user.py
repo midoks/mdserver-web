@@ -10,25 +10,49 @@
 
 import core.mw as mw
 
+# 初始化用户信息
+def initAdminUser():
+    data = mw.M('users').field('id').where('id=?', (1,)).find()
+    if data is None:
+        name = mw.getRandomString(8).lower()
+        password = mw.getRandomString(8).lower()
+        insert_time = mw.formatDate()
+        login_ip = '127.0.0.1'
+        add_user = {
+            'name':name, 
+            'password':mw.md5(password),
+            'login_ip':login_ip,
+            'login_time':insert_time,
+            'phone':'',
+            'email':'',
+            'add_time':insert_time,
+            'update_time':insert_time
+        }
+        file_pass_pl = mw.getPanelDataDir() + '/default.pl'
+        mw.writeFile(file_pass_pl, password)
+        mw.M('users').insert(add_user)
+    return True
+
+
 def getUserByName(name,
 ) -> None:
     '''
     获取用户信息通过用户名
     '''
     users_field = 'id,name,password,login_ip,login_time,phone,email,add_time,update_time'
-    item =  mw.M('users').field(users_field).where('name=?', (name,)).select()
-    if len(item) == 0:
+    data =  mw.M('users').field(users_field).where('name=?', (name,)).find()
+    if data is None:
         return None
     row = {}
-    row['id'] = item[0]['id']
-    row['name'] = item[0]['name']
-    row['password'] = item[0]['password']
-    row['login_ip'] = item[0]['login_ip']
-    row['login_time'] = item[0]['login_time']
-    row['phone'] = item[0]['phone']
-    row['email'] = item[0]['email']
-    row['add_time'] = item[0]['add_time']
-    row['update_time'] = item[0]['update_time']
+    row['id'] = data['id']
+    row['name'] = data['name']
+    row['password'] = data['password']
+    row['login_ip'] = data['login_ip']
+    row['login_time'] = data['login_time']
+    row['phone'] = data['phone']
+    row['email'] = data['email']
+    row['add_time'] = data['add_time']
+    row['update_time'] = data['update_time']
     return row
 
 def getUserById(id,
@@ -37,19 +61,19 @@ def getUserById(id,
     获取用户信息通过用户名
     '''
     users_field = 'id,name,password,login_ip,login_time,phone,email,add_time,update_time'
-    item =  mw.M('users').field(users_field).where('id=?', (1,)).select()
-    if len(item) == 0:
+    data =  mw.M('users').field(users_field).where('id=?', (1,)).find()
+    if data is None:
         return None
     row = {}
-    row['id'] = item[0]['id']
-    row['name'] = item[0]['name']
-    row['password'] = item[0]['password']
-    row['login_ip'] = item[0]['login_ip']
-    row['login_time'] = item[0]['login_time']
-    row['phone'] = item[0]['phone']
-    row['email'] = item[0]['email']
-    row['add_time'] = item[0]['add_time']
-    row['update_time'] = item[0]['update_time']
+    row['id'] = data['id']
+    row['name'] = data['name']
+    row['password'] = data['password']
+    row['login_ip'] = data['login_ip']
+    row['login_time'] = data['login_time']
+    row['phone'] = data['phone']
+    row['email'] = data['email']
+    row['add_time'] = data['add_time']
+    row['update_time'] = data['update_time']
     return row
 
 

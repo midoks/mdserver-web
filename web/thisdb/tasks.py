@@ -10,6 +10,10 @@
 
 import core.mw as mw
 
+# 未执行任务总数
+def getTaskUnexecutedCount() -> int:
+    return mw.M('tasks').where('status!=?',(1,)).count()
+
 def addTask(
     name: str | None = '常用任务',
     cmd: str | None = None,
@@ -36,4 +40,35 @@ def addTask(
         'add_time':add_time,
     }
     mw.M('tasks').insert(insert_data)
+    return True
+
+
+def getTaskList(
+    status: int | None = 1,
+    page: int | None = 1,
+    size: int | None = 10,
+):
+    start = (page - 1) * size
+    limit = str(start) + ',' + str(size)
+
+    field = 'id,name,type,start,end,status,add_time'
+    data = mw.M('tasks').where('', ()).field(field).limit(limit).order('id asc').select()
+    return data
+
+
+
+def setTaskStatus(id,
+    status: int | None = 0
+):
+    mw.M('tasks').where('id=?',(id,)).update({'status':status})
+    return True
+
+def setTaskData(id,
+    start: int | None = None,
+    end: int | None = None,
+):
+    if start is not None:
+        mw.M('tasks').where('id=?',(id,)).update({'start':start})
+    if end is not None:
+        mw.M('tasks').where('id=?',(id,)).update({'end':end})
     return True

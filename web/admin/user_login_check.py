@@ -14,17 +14,17 @@ from flask import Response
 
 from functools import wraps
 
-from admin import model
 from admin import session
 from admin.common import isLogined
 
+import thisdb
 
 def panel_login_required(func):
 
     @wraps(func)
     def wrapper(*args, **kwargs):
         if not isLogined():
-            unauthorized_status = model.getOption('unauthorized_status')
+            unauthorized_status = thisdb.getOption('unauthorized_status')
             if unauthorized_status == '0':
                 return render_template('default/path.html')
             return Response(status=int(unauthorized_status))

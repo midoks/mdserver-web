@@ -23,8 +23,7 @@ def getOption(name,
     :default -> str 默认值 (可选)
     '''
     data = mw.M('option').field('name').where('name=? and type=?',(name, type,)).getField('value')
-
-    if len(data) == 0:
+    if data is None:
         return default
     return data
 
@@ -40,7 +39,7 @@ def getOptionByJson(name,
     :default -> str 默认值 (可选)
     '''
     data = mw.M('option').field('name').where('name=? and type=?',(name, type,)).getField('value')
-    if len(data) == 0:
+    if data is None:
         return default
     if data is not None:
         return json.loads(data)
@@ -54,5 +53,15 @@ def setOption(name, value,
     :value -> object值 (必填)
     :type -> str 类型 (可选|默认common)
     '''
-    mw.M('option').field('name').where('name=? and type=?',(name, type,)).setField('value', value)
+
+    data = mw.M('option').field('name,type,value').where('name=? and type=?',(name, type,)).find()
+    if data is not None:
+        mw.M('option').field('name').where('name=? and type=?',(name, type,)).setField('value', value)
+        return True
+    add_option = {
+        'name':name,
+        'type':type,
+        'value':value
+    }
+    mw.M('option').insert(add_option)
     return True

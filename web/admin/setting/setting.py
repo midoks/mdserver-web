@@ -16,10 +16,12 @@ from flask import Blueprint, render_template
 from flask import request
 
 from admin import model
+
 from admin.user_login_check import panel_login_required
 
 
 import core.mw as mw
+import thisdb
 import utils.config as utils_config
 
 
@@ -41,9 +43,9 @@ def get_panel_list():
 @panel_login_required
 def set_webname():
     webname = request.form.get('webname', '')
-    src_webname = model.getOption('title')
+    src_webname = thisdb.getOption('title')
     if webname != src_webname:
-        model.setOption('title', webname)
+        thisdb.setOption('title', webname)
     return mw.returnData(True, '面板别名保存成功!')
 
 # 设置服务器IP
@@ -51,9 +53,9 @@ def set_webname():
 @panel_login_required
 def set_ip():
     host_ip = request.form.get('host_ip', '')
-    src_host_ip = model.getOption('server_ip')
+    src_host_ip = thisdb.getOption('server_ip')
     if host_ip != src_host_ip:
-        model.setOption('server_ip', host_ip)
+        thisdb.setOption('server_ip', host_ip)
     return mw.returnData(True, 'IP保存成功!')
 
 # 默认备份目录
@@ -61,9 +63,9 @@ def set_ip():
 @panel_login_required
 def set_backup_dir():
     backup_path = request.form.get('backup_path', '')
-    src_backup_path = model.getOption('backup_path')
+    src_backup_path = thisdb.getOption('backup_path')
     if backup_path != src_backup_path:
-        model.setOption('backup_path', backup_path)
+        thisdb.setOption('backup_path', backup_path)
     return mw.returnData(True, '修改默认备份目录成功!')
 
 # 默认站点目录
@@ -71,9 +73,9 @@ def set_backup_dir():
 @panel_login_required
 def set_www_dir():
     sites_path = request.form.get('sites_path', '')
-    src_sites_path = model.getOption('sites_path')
+    src_sites_path = thisdb.getOption('sites_path')
     if sites_path != src_sites_path:
-        model.setOption('sites_path', sites_path)
+        thisdb.setOption('sites_path', sites_path)
     return mw.returnData(True, '修改默认建站目录成功!')
 
 
@@ -102,9 +104,9 @@ def set_admin_path():
         if not re.match(r"^/[\w]+$", admin_path):
             return mw.returnData(False, '入口地址格式不正确,示例: /mw_rand')
     
-    src_admin_path = model.getOption('admin_path')
+    src_admin_path = thisdb.getOption('admin_path')
     if admin_path != src_admin_path:
-        model.setOption('admin_path', admin_path[1:])
+        thisdb.setOption('admin_path', admin_path[1:])
     return mw.returnData(True, '修改成功!')
 
 
@@ -125,7 +127,7 @@ def set_basic_auth():
         is_open = False
 
     if basic_open == 'false':
-        model.setOption('basic_auth', json.dumps({'open':False}))
+        thisdb.setOption('basic_auth', json.dumps({'open':False}))
         mw.writeLog('面板设置', '设置BasicAuth状态为: %s' % is_open)
         return mw.returnData(True, '删除BasicAuth成功!')
 
@@ -139,7 +141,7 @@ def set_basic_auth():
     data['basic_pwd'] = mw.md5(basic_pwd + salt)
     data['open'] = is_open
 
-    model.setOption('basic_auth', json.dumps(data))
+    thisdb.setOption('basic_auth', json.dumps(data))
     mw.writeLog('面板设置', '设置BasicAuth状态为: %s' % is_open)
     return mw.returnData(True, '设置成功!')
 
@@ -158,7 +160,7 @@ def set_status_code():
         return mw.returnData(False, '状态码范围错误!')
 
     info = utils_config.getUnauthStatus(code=str(status_code))
-    model.setOption('unauthorized_status', str(status_code))
+    thisdb.setOption('unauthorized_status', str(status_code))
     mw.writeLog('面板设置', '将未授权响应状态码设置为:{0}:{1}'.format(status_code,info['text']))
     return mw.returnData(True, '设置成功!')
 
@@ -166,11 +168,11 @@ def set_status_code():
 @blueprint.route('/open_debug', endpoint='open_debug', methods=['POST'])
 @panel_login_required
 def open_debug():
-    debug = model.getOption('debug',default='close')
+    debug = thisdb.getOption('debug',default='close')
     if debug == 'open':
-        model.setOption('debug','close')
+        thisdb.setOption('debug','close')
         return mw.returnData(True, '开发模式关闭!')
-    model.setOption('debug','open')
+    thisdb.setOption('debug','open')
     return mw.returnData(True, '开发模式开启!')
 
 
@@ -178,11 +180,11 @@ def open_debug():
 @blueprint.route('/close_panel', endpoint='close_panel', methods=['POST'])
 @panel_login_required
 def close_panel():
-    admin_close = model.getOption('admin_close',default='no')
+    admin_close = thisdb.getOption('admin_close',default='no')
     if admin_close == 'no':
-        model.setOption('admin_close','yes')
+        thisdb.setOption('admin_close','yes')
         return mw.returnData(True, '开启面板成功!')
-    model.setOption('admin_close','no')
+    thisdb.setOption('admin_close','no')
     return mw.returnData(True, '关闭面板成功!')
 
 # 设置IPV6状态

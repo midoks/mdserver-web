@@ -40,8 +40,7 @@ class crontab_api:
         startPage = (int(p) - 1) * psize
         pageInfo = str(startPage) + ',' + str(psize)
 
-        _list = mw.M('crontab').where('', ()).field(
-            self.field).limit(pageInfo).order('id desc').select()
+        _list = mw.M('crontab').where('', ()).field(self.field).limit(pageInfo).order('id desc').select()
 
         data = []
         for i in range(len(_list)):

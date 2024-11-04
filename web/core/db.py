@@ -120,6 +120,21 @@ class Sql():
             self.__OPT_FIELD = field
         return self
 
+    def getDbField(self,name):
+        sql = "PRAGMA table_info(%s)" % name
+        result = self.__DB_CONN.execute(sql)
+        data = result.fetchall()
+
+        fields = []
+        for i in data:
+            fields.append(i[1])
+        return fields
+
+    def getDbFieldString(self,name):
+        fields = self.getDbField(name)
+        return ','.join(fields)
+        
+
     def select(self):
         # 查询数据集
         self.__getConn()
@@ -130,25 +145,40 @@ class Sql():
             # print(self.__OPT_PARAM)
             result = self.__DB_CONN.execute(sql, self.__OPT_PARAM)
             data = result.fetchall()
+            if len(data) == 0:
+                return data
+
             # 构造字曲系列
             if self.__OPT_FIELD != "*":
                 field = self.__OPT_FIELD.split(',')
                 tmp = []
                 for row in data:
                     i = 0
-                    tmp1 = {}
+                    t = {}
                     for key in field:
-                        tmp1[key] = row[i]
+                        t[key] = row[i]
                         i += 1
-                    tmp.append(tmp1)
-                    del(tmp1)
+                    tmp.append(t)
+                    del(t)
                 data = tmp
                 del(tmp)
             else:
-                # 将元组转换成列表
-                tmp = map(list, data)
+                field = self.getDbField(self.__DB_TABLE)
+                tmp = []
+                for row in data:
+                    i = 0
+                    t = {}
+                    for key in field:
+                        t[key] = row[i]
+                        i += 1
+                    tmp.append(t)
+                    del(t)
                 data = tmp
                 del(tmp)
+                # 将元组转换成列表
+                # tmp = map(list, data)
+                # data = tmp
+                # del(tmp)
             self.__close()
             return data
         except Exception as ex:
@@ -162,7 +192,8 @@ class Sql():
             sql = "SELECT " + self.__OPT_FIELD + " FROM " + self.__DB_TABLE + \
                 self.__OPT_WHERE + self.__OPT_GROUP + self.__OPT_ORDER + self.__OPT_LIMIT
 
-            if os.path.exists('data/debug.pl'):
+            debug = getPanelDir()+'/data/debug.pl'
+            if os.path.exists(debug):
                 print(sql, self.__OPT_PARAM)
             result = self.__DB_CONN.execute(sql, self.__OPT_PARAM)
             data = result.fetchall()
@@ -199,7 +230,7 @@ class Sql():
         result = self.field(keyName).select()
         if len(result) == 1:
             return result[0][keyName]
-        return result
+        return None
 
     def setField(self, keyName, keyValue):
         # 更新指定字段
@@ -210,7 +241,7 @@ class Sql():
         result = self.limit("1").select()
         if len(result) == 1:
             return result[0]
-        return result
+        return None
 
     def count(self):
         # 取行数
@@ -237,7 +268,8 @@ class Sql():
             self.__DB_CONN.commit()
             return last_id
         except Exception as ex:
-            return "error: " + str(ex)
+            print(str(ex))
+            return 0
 
     # 插入数据
     def insert(self, pdata):

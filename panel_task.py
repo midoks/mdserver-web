@@ -41,32 +41,17 @@ def execShell(cmdstring, cwd=None, timeout=None, shell=True):
     cmd = cmdstring + ' > ' + g_log_file + ' 2>&1'
     return mw.execShell(cmd)
 
-def service_cmd(method):
-    cmd = '/etc/init.d/mw'
-    if os.path.exists(cmd):
-        execShell(cmd + ' ' + method)
-        return
-
-    cmd = mw.getPanelDir() + '/scripts/init.d/mw'
-    if os.path.exists(cmd):
-        print(cmd + ' ' + method)
-        data = execShell(cmd + ' ' + method)
-        print(data)
-        return
-
 def mw_async(f):
     def wrapper(*args, **kwargs):
         thr = threading.Thread(target=f, args=args, kwargs=kwargs)
         thr.start()
     return wrapper
 
-
 @mw_async
 def restartMw():
     time.sleep(1)
     cmd = mw.getPanelDir() + '/scripts/init.d/mw reload &'
     mw.execShell(cmd)
-
 
 
 def downloadFile(url, filename):
@@ -115,23 +100,23 @@ def writeLogs(data):
 
 def runPanelTask():
     try:
-        bash_list = model.getTaskList(status=-1)
+        bash_list = thisdb.getTaskList(status=-1)
         for task in bash_list:
-            model.setTaskStatus(task['id'], 0)
+            thisdb.setTaskStatus(task['id'], 0)
 
-        run_list = model.getTaskList(status=0)
+        run_list = thisdb.getTaskList(status=0)
         for run_task in run_list:
             start = int(time.time())
-            model.setTaskData(run_task['id'], start=start)
-            model.setTaskStatus(run_task['id'], -1)
+            thisdb.setTaskData(run_task['id'], start=start)
+            thisdb.setTaskStatus(run_task['id'], -1)
             if run_task['type'] == 'download':
                 argv = run_task['cmd'].split('|mw|')
                 downloadFile(argv[0], argv[1])
             elif run_task['type'] == 'execshell':
                 execShell(run_task['cmd'])
             end = int(time.time())
-            model.setTaskData(run_task['id'], end=end)
-            model.setTaskStatus(run_task['id'], 1)
+            thisdb.setTaskData(run_task['id'], end=end)
+            thisdb.setTaskStatus(run_task['id'], 1)
     except Exception as e:
         print(str(e))
 
@@ -371,6 +356,5 @@ def run():
     startPanelTask()
 
 if __name__ == "__main__":
-    with app.app_context():
-        run()
+    run()
     

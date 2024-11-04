@@ -8,4 +8,423 @@
 # Author: midoks <midoks@163.com>
 # ---------------------------------------------------------------------------------
 
+import os
+import sys
+import time
+import json
+import threading
+import multiprocessing
+
+from admin import model
+
+import core.mw as mw
+import thisdb
+
+class crontab(object):
+        # lock
+    _instance_lock = threading.Lock()
+
+    @classmethod
+    def instance(cls, *args, **kwargs):
+        if not hasattr(crontab, "_instance"):
+            with crontab._instance_lock:
+                if not hasattr(crontab, "_instance"):
+                    crontab._instance = crontab(*args, **kwargs)
+        return crontab._instance
+
+    # 获取指定任务数据
+    def getCrondFind(self, cron_id):
+        return thisdb.getCrond(cron_id)
+
+    def add(self, data):
+        if len(data['name']) < 1:
+            return mw.returnData(False, '任务名称不能为空!')
+
+        is_check_pass, msg = self.cronCheck(data)
+        if not is_check_pass:
+            return mw.returnData(is_check_pass, msg)
+
+        cmd, title = self.getCrondCycle(data)
+        cron_path = mw.getServerDir() + '/cron'
+        cron_name = self.getShell(data)
+
+        cmd += ' ' + cron_path + '/' + cron_name + ' >> ' + cron_path + '/' + cron_name + '.log 2>&1'
+
+        if not mw.isAppleSystem():
+            data = self.writeShell(cmd)
+            if not data['status']:
+                return data
+            self.crondReload()
+
+        add_dbdata = {}
+        add_dbdata['name'] = data['name']
+        add_dbdata['type'] = data['type']
+        add_dbdata['where1'] = data['where1']
+        add_dbdata['where_hour'] = data['hour']
+        add_dbdata['where_minute'] = data['minute']
+        add_dbdata['save'] = data['save']
+        add_dbdata['backup_to'] = data['backup_to']
+        add_dbdata['sname'] = data['sname']
+        add_dbdata['sbody'] = data['sbody']
+        add_dbdata['stype'] = data['stype']
+        add_dbdata['echo'] = cron_name
+        add_dbdata['url_address'] = data['url_address']
+
+        tid = thisdb.addCrontab(add_dbdata)
+        if tid > 0:
+            return mw.returnData(True, '添加成功')
+        return mw.returnData(False, '添加失败')
+
+    def delete(self, tid):
+        data = thisdb.getCrond(tid)
+        if not self.removeForCrond(data['echo']):
+            return mw.returnData(False, '无法写入文件，请检查是否开启了系统加固功能!')
+
+        cron_path = mw.getServerDir() + '/cron'
+        cron_file = cron_path + '/' + data['echo']
+
+        if os.path.exists(cron_file):
+            os.remove(cron_file)
+        cron_file = cron_path + '/' + data['echo'] + '.log'
+        if os.path.exists(cron_file):
+            os.remove(cron_file)
+
+        thisdb.deleteCronById(tid)
+        msg = mw.getInfo('删除计划任务[{1}]成功!', (data['name'],))
+        mw.writeLog('计划任务', msg)
+        return mw.returnData(True, msg)
+
+    def getCrontabHuman(self, data):
+        rdata = []
+        for i in range(len(data)):
+            t = data[i]
+            if t['type'] == "day":
+                t['type'] = '每天'
+                t['cycle'] = mw.getInfo('每天, {1}点{2}分 执行', (str(t['where_hour']), str(t['where_minute'])))
+            elif t['type'] == "day-n":
+                t['type'] = mw.getInfo('每{1}天', (str(t['where1']),))
+                t['cycle'] = mw.getInfo('每隔{1}天, {2}点{3}分 执行',  (str(t['where1']), str(t['where_hour']), str(t['where_minute'])))
+            elif t['type'] == "hour":
+                t['type'] = '每小时'
+                t['cycle'] = mw.getInfo('每小时, 第{1}分钟 执行', (str(t['where_minute']),))
+            elif t['type'] == "hour-n":
+                t['type'] = mw.getInfo('每{1}小时', (str(t['where1']),))
+                t['cycle'] = mw.getInfo('每{1}小时, 第{2}分钟 执行', (str(t['where1']), str(t['where_minute'])))
+            elif t['type'] == "minute-n":
+                t['type'] = mw.getInfo('每{1}分钟', (str(t['where1']),))
+                t['cycle'] = mw.getInfo('每隔{1}分钟执行', (str(t['where1']),))
+            elif t['type'] == "week":
+                t['type'] = '每周'
+                if not t['where1']:
+                    t['where1'] = '0'
+                t['cycle'] = mw.getInfo('每周{1}, {2}点{3}分执行', (self.toWeek(int(t['where1'])), str(t['where_hour']), str(t['where_minute'])))
+            elif t['type'] == "month":
+                t['type'] = '每月'
+                t['cycle'] = mw.getInfo('每月, {1}日 {2}点{3}分执行', (str(t['where1']), str(t['where_hour']), str(t['where_minute'])))
+            rdata.append(t)
+        return rdata
+
+    # 从crond删除
+    def removeForCrond(self, echo):
+        if mw.isAppleSystem():
+            return True
+
+        u_file = '/var/spool/cron/crontabs/root'
+        if not os.path.exists(u_file):
+            file = '/var/spool/cron/root'
+            if not os.path.exists(file):
+                return False
+        else:
+            file = u_file
+
+        conf = mw.readFile(file)
+        rep = ".+" + str(echo) + ".+\n"
+        conf = re.sub(rep, "", conf)
+        if not mw.writeFile(file, conf):
+            return False
+        self.crondReload()
+        return True
+
+    def getCrontabList(self,
+        page:int | None = 1,
+        size:int | None = 10
+    ):
+        info = thisdb.getCrontabList(page=int(page),size=int(size))
+
+        rdata = {}
+        rdata['data'] = self.getCrontabHuman(info['list'])
+        rdata['page'] = mw.getPage({'count':info['count'],'tojs':'getCronData','p':page,'row':size})
+        return rdata
+
+    def getCrondCycle(self, params):
+        cron_cmd = ''
+        title = ''
+        if params['type'] == "day":
+            cron_cmd = self.getDay(params)
+            title = '每天'
+        elif params['type'] == "day-n":
+            cron_cmd = self.getDay_N(params)
+            title = mw.getInfo('每{1}天', (params['where1'],))
+        elif params['type'] == "hour":
+            cron_cmd = self.getHour(params)
+            title = '每小时'
+        elif params['type'] == "hour-n":
+            cron_cmd = self.getHour_N(params)
+            title = '每小时'
+        elif params['type'] == "minute-n":
+            cron_cmd = self.minute_N(params)
+        elif params['type'] == "week":
+            params['where1'] = params['week']
+            cron_cmd = self.week(params)
+        elif params['type'] == "month":
+            cron_cmd = self.month(params)
+        return cron_cmd, title
+
+    # 转换大写星期
+    def toWeek(self, num):
+        wheres = {
+            0:   '日',
+            1:   '一',
+            2:   '二',
+            3:   '三',
+            4:   '四',
+            5:   '五',
+            6:   '六'
+        }
+        try:
+            return wheres[num]
+        except:
+            return ''
+
+    # 取任务构造Day
+    def getDay(self, param):
+        cmd = "{0} {1} * * * ".format(param['minute'], param['hour'])
+        return cmd
+
+    # 取任务构造Day_n
+    def getDay_N(self, param):
+        cmd = "{0} {1} */{2} * * ".format(param['minute'], param['hour'], param['where1'])
+        return cmd
+
+    # 取任务构造Hour
+    def getHour(self, param):
+        cmd = "{0} * * * * ".format(param['minute'])
+        return cmd
+
+    # 取任务构造Hour-N
+    def getHour_N(self, param):
+        cmd = "{0} */{1} * * * ".format(param['minute'], param['where1'])
+        return cmd
+
+    # 取任务构造Minute-N
+    def minute_N(self, param):
+        cmd = "*/{0} * * * * ".format(param['where1'])
+        return cmd
+
+    # 取任务构造week
+    def week(self, param):
+        cmd = "{0} {1} * * {2}".format(param['minute'], param['hour'], param['week'])
+        return cmd
+
+    # 取任务构造Month
+    def month(self, param):
+        cmd = "{0} {1} {2} * * ".format(param['minute'], param['hour'], param['where1'])
+        return cmd
+
+    # 参数校验
+    def cronCheck(self, params):
+        if params['stype'] == 'site' or params['stype'] == 'database' or params['stype'].find('database_') > -1 or params['stype'] == 'logs' or params['stype'] == 'path':
+            if params['save'] == '':
+                return False, '保留份数不能为空!'
+
+        if params['type'] == 'day':
+            if params['hour'] == '':
+                return False, '小时不能为空!'
+            if params['minute'] == '':
+                return False, '分钟不能为空!'
+
+        if params['type'] == 'day-n':
+            if params['where1'] == '':
+                return False, '天不能为空!'
+            if params['hour'] == '':
+                return False, '小时不能为空!'
+            if params['minute'] == '':
+                return False, '分钟不能为空!'
+        if params['type'] == 'hour':
+            if params['minute'] == '':
+                return False, '分钟不能为空!'
+
+        if params['type'] == 'hour-n':
+            if params['where1'] == '':
+                return False, '小时不能为空!'
+            if params['minute'] == '':
+                return False, '分钟不能为空!'
+
+        if params['type'] == 'minute-n':
+            if params['where1'] == '':
+                return False, '分钟不能为空!'
+
+        if params['type'] == 'week':
+            if params['hour'] == '':
+                return False, '小时不能为空!'
+            if params['minute'] == '':
+                return False, '分钟不能为空!'
+
+        if params['type'] == 'month':
+            if params['where1'] == '':
+                return False, '日不能为空!'
+            if params['hour'] == '':
+                return False, '小时不能为空!'
+            if params['minute'] == '':
+                return False, '分钟不能为空!'
+        return True, 'OK'
+
+
+    # 取执行脚本
+    def getShell(self, param):
+        # try:
+        stype = param['stype']
+        if stype == 'toFile':
+            shell = param.sFile
+        else:
+            head = "#!/bin/bash\nPATH=/bin:/sbin:/usr/bin:/usr/sbin:/usr/local/bin:/usr/local/sbin:~/bin\nexport PATH\n"
+
+            start_head = '''
+SCRIPT_RUN_TIME="0s"
+MW_ToSeconds()
+{
+    SEC=$1
+    if [ $SEC -lt 60 ]; then
+       SCRIPT_RUN_TIME="${SEC}s"
+    elif [ $SEC -ge 60 ] && [ $SEC -lt 3600 ];then
+       SCRIPT_RUN_TIME="$(( SEC / 60 ))m$(( SEC % 60 ))s"
+    elif [ $SEC -ge 3600 ]; then
+       SCRIPT_RUN_TIME="$(( SEC / 3600 ))h$(( (SEC % 3600) / 60 ))m$(( (SEC % 3600) % 60 ))s"
+    fi
+}
+START_MW_SHELL_TIME=`date +%s`
+'''
+
+            source_bin_activate = '''
+export LANG=en_US.UTF-8
+MW_PATH=%s/bin/activate
+if [ -f $MW_PATH ];then
+    source $MW_PATH
+fi''' % (mw.getPanelDir(),)
+
+            head = head + start_head + source_bin_activate + "\n"
+            log = '.log'
+
+            #所有
+            if param['sname'] == 'ALL':
+                log = ''
+
+            script_dir = mw.getPanelDir() + "/scripts"
+            source_stype = 'database'
+            if stype.find('database_') > -1:
+                plugin_name = stype.replace('database_', '')
+                script_dir = mw.getPanelDir() + "/plugins/" + plugin_name + "/scripts"
+
+                source_stype = stype
+                stype = 'database'
+
+            wheres = {
+                'path': head + "python3 " + script_dir + "/backup.py path " + param['sname'] + " " + str(param['save']),
+                'site':   head + "python3 " + script_dir + "/backup.py site " + param['sname'] + " " + str(param['save']),
+                'database': head + "python3 " + script_dir + "/backup.py database " + param['sname'] + " " + str(param['save']),
+                'logs':   head + "python3 " + script_dir + "/logs_backup.py " + param['sname'] + log + " " + str(param['save']),
+                'rememory': head + "/bin/bash " + script_dir + '/rememory.sh'
+            }
+            if param['backup_to'] != 'localhost':
+                cfile = mw.getPluginDir() + "/" + \
+                    param['backup_to'] + "/index.py"
+
+                wheres['path'] = head + "python3 " + cfile + \
+                    " path " + param['sname'] + " " + str(param['save'])
+                wheres['site'] = head + "python3 " + cfile + \
+                    " site " + param['sname'] + " " + str(param['save'])
+                wheres['database'] = head + "python3 " + cfile + " " + \
+                    source_stype + " " + \
+                    param['sname'] + " " + str(param['save'])
+            try:
+                shell = wheres[stype]
+            except:
+                if stype == 'toUrl':
+                    shell = head + "curl -sS --connect-timeout 10 -m 60 '" + \
+                        param['urladdress'] + "'"
+                else:
+                    shell = head + param['sbody'].replace("\r\n", "\n")
+
+            shell += '''
+echo "----------------------------------------------------------------------------"
+endDate=`date +"%Y-%m-%d %H:%M:%S"`
+END_MW_SHELL_TIME=`date +"%s"`
+((SHELL_COS_TIME=($END_MW_SHELL_TIME-$START_MW_SHELL_TIME)))
+MW_ToSeconds $SHELL_COS_TIME
+echo "★[$endDate] Successful | Script Run [$SCRIPT_RUN_TIME] "
+echo "----------------------------------------------------------------------------"
+'''
+        cron_path = mw.getServerDir() + '/cron'
+        if not os.path.exists(cron_path):
+            mw.execShell('mkdir -p ' + cron_path)
+
+        if not 'echo' in param:
+            cron_name = mw.md5(mw.md5(str(time.time()) + '_mw'))
+        else:
+            cron_name = param['echo']
+        file = cron_path + '/' + cron_name
+        mw.writeFile(file, self.checkScript(shell))
+        mw.execShell('chmod 750 ' + file)
+        return cron_name
+
+    # 检查脚本
+    def checkScript(self, shell):
+        keys = ['shutdown', 'init 0', 'mkfs', 'passwd',
+                'chpasswd', '--stdin', 'mkfs.ext', 'mke2fs']
+        for key in keys:
+            shell = shell.replace(key, '[***]')
+        return shell
+
+
+
+    # 将Shell脚本写到文件
+    def writeShell(self, config):
+        file = '/var/spool/cron/crontabs/root'
+        current_os = mw.getOs()
+        if current_os == 'darwin':
+            file = '/etc/crontab'
+        elif current_os.startswith("freebsd"):
+            file = '/var/cron/tabs/root'
+
+        if not os.path.exists(file):
+            file = '/var/spool/cron/root'
+
+        if not os.path.exists(file):
+            mw.writeFile(file, '')
+        conf = mw.readFile(file)
+        conf += str(config) + "\n"
+        if mw.writeFile(file, conf):
+            if not os.path.exists(file):
+                mw.execShell("chmod 600 '" + file +"' && chown root.root " + file)
+            else:
+                mw.execShell("chmod 600 '" + file +"' && chown root.crontab " + file)
+            return mw.returnData(True, 'ok')
+        return mw.returnData(False, '文件写入失败,请检查是否开启系统加固功能!')
+
+    # 重载配置
+    def crondReload(self):
+        if mw.isAppleSystem():
+            if os.path.exists('/etc/crontab'):
+                pass
+        else:
+            if os.path.exists('/etc/init.d/crond'):
+                mw.execShell('/etc/init.d/crond reload')
+            elif os.path.exists('/etc/init.d/cron'):
+                mw.execShell('service cron restart')
+            else:
+                mw.execShell("systemctl reload crond")
+
+
+
+
 

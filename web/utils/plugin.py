@@ -17,7 +17,6 @@ import multiprocessing
 from admin import model
 
 import core.mw as mw
-import admin.model.option as option
 import thisdb
 
 class pg_thread(threading.Thread):
@@ -108,7 +107,7 @@ class plugin(object):
         self.__index_data = json.loads(mw.readFile(self.__index))
 
     def getIndexList(self):
-        indexList = option.getOptionByJson('display_index')
+        indexList = thisdb.getOptionByJson('display_index')
         plist = []
         for i in indexList:
             tmp = i.split('-')
@@ -152,30 +151,30 @@ class plugin(object):
 
     def addIndex(self, name, version):
         vname = name + '-' + version
-        indexList = option.getOptionByJson('display_index')
+        indexList = thisdb.getOptionByJson('display_index',default=[])
+
         if vname in indexList:
             return mw.returnData(False, '请不要重复添加!')
         if len(indexList) > 12:
             return mw.returnData(False, '首页最多只能显示12个软件!')
 
         indexList.append(vname)
-        option.setOption('display_index', json.dumps(indexList))
+
+        thisdb.setOption('display_index', json.dumps(indexList))
         return mw.returnData(True, '添加成功!')
 
     def removeIndex(self, name, version):
         vname = name + '-' + version
-        indexList = option.getOptionByJson('display_index')
+        indexList = thisdb.getOptionByJson('display_index')
         if not vname in indexList:
             return mw.returnData(True, '删除成功!!')
         indexList.remove(vname)
-
-        print(indexList)
-        option.setOption('display_index', json.dumps(indexList))
+        thisdb.setOption('display_index', json.dumps(indexList))
         return mw.returnData(True, '删除成功!')
 
     def hookInstallOption(self, hook_name, info):
         hn_name = 'hook_'+hook_name
-        src_data = option.getOptionByJson(hn_name,type='hook',default=[])
+        src_data = thisdb.getOptionByJson(hn_name,type='hook',default=[])
         isNeedAdd = True
         for x in range(len(src_data)):
             if src_data[x]['title'] == info['title'] and src_data[x]['name'] == info['name']:
@@ -184,17 +183,17 @@ class plugin(object):
         if isNeedAdd:
             src_data.append(info)
 
-        option.setOption(hn_name, json.dumps(src_data), type='hook')
+        thisdb.setOption(hn_name, json.dumps(src_data), type='hook')
         return True
 
     def hookUninstallOption(self, hook_name, info):
         hn_name = 'hook_'+hook_name
-        src_data = option.getOptionByJson(hn_name,type='hook',default=[])
+        src_data = thisdb.getOptionByJson(hn_name,type='hook',default=[])
         for idx in range(len(src_data)):
             if src_data[idx]['name'] == info['name']:
                 src_data.remove(src_data[idx])
                 break
-        option.setOption(hn_name, json.dumps(src_data), type='hook')
+        thisdb.setOption(hn_name, json.dumps(src_data), type='hook')
         return True
 
     def hookInstall(self, info):
@@ -316,7 +315,7 @@ class plugin(object):
         return ''
 
     def checkIndexList(self, name, version):
-        indexList = option.getOptionByJson('display_index')
+        indexList = thisdb.getOptionByJson('display_index',default=[])
         for i in indexList:
             t = i.split('-')
             if t[0] == name:
@@ -426,15 +425,28 @@ class plugin(object):
         return pInfo
 
     def makeCoexistData(self, data):
-        plugins_t = []
+        plugins = []
         if type(data['versions']) == list and 'coexist' in data and data['coexist']:
             data_t = self.makeCoexist(data)
             for index in range(len(data_t)):
-                plugins_t.append(data_t[index])
+                plugins.append(data_t[index])
         else:
             pg = self.getPluginInfo(data)
-            plugins_t.append(pg)
-        return plugins_t
+            plugins.append(pg)
+        return plugins
+
+    def makeCoexistDataInstalled(self, data):
+        plugins = []
+        if type(data['versions']) == list and 'coexist' in data and data['coexist']:
+            data_t = self.makeCoexist(data)
+            for index in range(len(data_t)):
+                if data_t[index]['setup']:
+                    plugins.append(data_t[index])
+        else:
+            pg = self.getPluginInfo(data)
+            if pg['setup']:
+                plugins.append(pg)
+        return plugins
 
     # 对多版本共存进行处理
     def makeCoexistList(self, data,
@@ -449,10 +461,9 @@ class plugin(object):
         if plugin_type == None or plugin_type == '0':
             return self.makeCoexistData(data)
         # 已经安装
-        if plugin_type == '-1':
-            return self.makeCoexistData(data)
+        if str(plugin_type) == '-1':
+            return self.makeCoexistDataInstalled(data)
         return plugins_t
-
 
 
     def getPluginList(self, name,

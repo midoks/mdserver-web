@@ -19,6 +19,7 @@ from admin.user_login_check import panel_login_required
 from utils.plugin import plugin as MwPlugin
 import utils.site as site
 import core.mw as mw
+import thisdb
 
 blueprint = Blueprint('site', __name__, url_prefix='/site', template_folder='../../templates/default')
 @blueprint.route('/index', endpoint='index')
@@ -34,28 +35,11 @@ def list():
     type_id = request.form.get('type_id', '0').strip()
     search = request.form.get('search', '').strip()
 
-    count = Sites.query.count()
-    pagination = Sites.query.paginate(page=int(p), per_page=int(limit))
-
-    site_list = []
-    for item in pagination.items:
-        t = {}
-        t['id'] = item.id
-        t['name'] = item.name
-        t['path'] = item.path
-        t['index'] = item.index
-        t['ps'] = item.ps
-        t['edate'] = item.edate
-        t['type_id'] = item.type_id
-        t['status'] = item.status
-        t['add_time'] = item.add_time
-        t['update_time'] = item.update_time
-        site_list.append(t)
+    info = thisdb.getSitesList(page=int(p),size=int(limit),type_id=int(type_id), search=search)
 
     data = {}
-    data['data'] = site_list
-    data['page'] = mw.getPage({'count':count,'tojs':'getWeb','p':p, 'row':limit})
-
+    data['data'] = info['list']
+    data['page'] = mw.getPage({'count':info['count'],'tojs':'getWeb','p':p, 'row':limit})
     return data
 
 @blueprint.route('/get_site_types', endpoint='get_site_types',methods=['POST'])

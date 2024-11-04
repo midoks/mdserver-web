@@ -16,9 +16,9 @@ from flask import request
 from admin.user_login_check import panel_login_required
 from utils.system import monitor
 
-import admin.model.option as option
 import core.mw as mw
 import utils.system as sys
+import thisdb
 
 
 
@@ -112,19 +112,19 @@ def set_control():
     day = request.form.get('day', '')
 
     if stype == '0':
-        option.setOption('monitor_status', 'close', type='monitor')
+        thisdb.setOption('monitor_status', 'close', type='monitor')
         return mw.returnData(True, "设置成功!")
     elif stype == '1':
         _day = int(day)
         if _day < 1:
             return mw.returnData(False, "设置失败!")
-        option.setOption('monitor_day', day, type='monitor')
+        thisdb.setOption('monitor_day', day, type='monitor')
         return mw.returnData(True, "设置成功!")
     elif stype == '2':
-        option.setOption('monitor_only_netio', 'close', type='monitor')
+        thisdb.setOption('monitor_only_netio', 'close', type='monitor')
         return mw.returnData(True, "设置成功!")
     elif stype == '3':
-        option.setOption('monitor_only_netio', 'open', type='monitor')
+        thisdb.setOption('monitor_only_netio', 'open', type='monitor')
         return mw.returnData(True, "设置成功!")
     elif stype == 'del':
         if not mw.isRestart():
@@ -132,9 +132,9 @@ def set_control():
         monitor.instance().clearDbFile()
         return mw.returnData(True, "清空监控记录成功!")
     else:
-        monitor_status = option.getOption('monitor_status', default='open', type='monitor')
-        monitor_day = option.getOption('monitor_day', default='30', type='monitor')
-        monitor_only_netio = option.getOption('monitor_only_netio', default='open', type='monitor')
+        monitor_status = thisdb.getOption('monitor_status', default='open', type='monitor')
+        monitor_day = thisdb.getOption('monitor_day', default='30', type='monitor')
+        monitor_only_netio = thisdb.getOption('monitor_only_netio', default='open', type='monitor')
         data = {}
         data['day'] = monitor_day
         if monitor_status == 'open':   

@@ -83,6 +83,7 @@ function getBackupName(hook_data, name){
 function getCronData(page){
 	var load = layer.msg(lan.public.the,{icon:16,time:0,shade: [0.3, '#000']});
 	$.post("/crontab/list?p="+page,'', function(rdata){
+		console.log(rdata);
 		layer.close(load);
 		var cbody = "";
 		if(rdata == ""){
@@ -115,7 +116,7 @@ function getCronData(page){
 					<td>"+rdata.data[i].cycle+"</td>\
 					<td>"+cron_save +"</td>\
 					<td>"+cron_backupto+"</td>\
-					<td>"+rdata.data[i].addtime+"</td>\
+					<td>"+rdata.data[i].add_time+"</td>\
 					<td>\
 						<a href=\"javascript:startTask("+rdata.data[i].id+");\" class='btlink'>执行</a> | \
 						<a href=\"javascript:editTaskInfo('"+rdata.data[i].id+"');\" class='btlink'>编辑</a> | \
@@ -341,7 +342,7 @@ function planAdd(){
 	
 	$("#cronConfig input[name='sName']").val(sName);
 	layer.msg('正在添加,请稍候...!',{icon:16,time:0,shade: [0.3, '#000']});
-	var data = $("#cronConfig").serialize() + '&sBody='+sBody + '&urladdress=' + urladdress;
+	var data = $("#cronConfig").serialize() + '&sBody='+sBody;
 	// console.log(data);
 	$.post('/crontab/add',data,function(rdata){
 		if(!rdata.status) {
