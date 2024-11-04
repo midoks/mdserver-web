@@ -68,7 +68,7 @@ def getTaskPage(
 ):
     start = (page - 1) * size
     limit = str(start) + ',' + str(size)
-    task_list = mw.M('tasks').where('', ()).field(__FIELD).limit(limit).order('id asc').select()
+    task_list = mw.M('tasks').where('', ()).field(__FIELD).limit(limit).order('id desc').select()
     count = mw.M('tasks').where('', ()).count()
 
     rdata = {}
