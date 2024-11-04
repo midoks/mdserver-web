@@ -8,8 +8,12 @@ import threading
 import subprocess
 import re
 
-sys.path.append(os.getcwd() + "/class/core")
-import mw
+
+web_dir = os.getcwd() + "/web"
+sys.path.append(web_dir)
+os.chdir(web_dir)
+
+import core.mw as mw
 
 app_debug = False
 if mw.isAppleSystem():
@@ -41,18 +45,19 @@ def getInitDFile():
 
 def getArgs():
     args = sys.argv[2:]
+    # print(args)
     tmp = {}
     args_len = len(args)
 
     if args_len == 1:
         t = args[0].strip('{').strip('}')
-        t = t.split(':')
+        t = t.split(':',2)
         tmp[t[0]] = t[1]
     elif args_len > 1:
         for i in range(len(args)):
-            t = args[i].split(':')
+            t = args[i].split(':',2)
             tmp[t[0]] = t[1]
-
+    # print(tmp)
     return tmp
 
 
@@ -398,16 +403,25 @@ def initdUinstall():
     mw.execShell('systemctl disable openresty')
     return 'ok'
 
+def getNgxStatusPort():
+    ngx_status_file = mw.getServerDir() + '/web_conf/nginx/vhost/0.nginx_status.conf'
+    content = mw.readFile(ngx_status_file)
+    rep = r'listen\s*(.*);'
+    tmp = re.search(rep, content)
+    port =  tmp.groups()[0].strip()
+    return port
+
 
 def runInfo():
     op_status = status()
     if op_status == 'stop':
         return mw.returnJson(False, "未启动!")
 
+    port = getNgxStatusPort()
     # 取Openresty负载状态
     try:
-        url = 'http://127.0.0.1/nginx_status'
-        result = mw.httpGet(url, timeout=1)
+        url = 'http://127.0.0.1:%s/nginx_status' % port
+        result = mw.httpGet(url, timeout=3)
         tmp = result.split()
         data = {}
         data['active'] = tmp[2]
@@ -419,8 +433,7 @@ def runInfo():
         data['Waiting'] = tmp[15]
         return mw.getJson(data)
     except Exception as e:
-
-        url = 'http://' + mw.getHostAddr() + '/nginx_status'
+        url = 'http://' + mw.getHostAddr() + ':%s/nginx_status' % port
         result = mw.httpGet(url)
         tmp = result.split()
         data = {}
@@ -550,6 +563,13 @@ def installPreInspection():
 
 
 if __name__ == "__main__":
+    version_pl = getServerDir() + "/version.pl"
+    if not os.path.exists(version_pl):
+        print('error')
+        exit(-1) 
+    version = mw.readFile(version_pl)
+
+
     func = sys.argv[1]
     if func == 'status':
         print(status())
