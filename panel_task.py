@@ -99,7 +99,6 @@ def runPanelTask():
 
         run_list = thisdb.getTaskList(status=0)
         for run_task in run_list:
-            print(run_task)
             start = int(time.time())
             thisdb.setTaskData(run_task['id'], start=start)
             thisdb.setTaskStatus(run_task['id'], -1)
@@ -113,6 +112,7 @@ def runPanelTask():
             thisdb.setTaskStatus(run_task['id'], 1)
     except Exception as e:
         print(mw.getTracebackInfo())
+        time.sleep(10)
 
     # 站点过期检查
     # siteEdate()
