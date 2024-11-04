@@ -87,15 +87,20 @@ def getMWLogs():
 def getPanelTmp():
     return getPanelDir() + '/tmp'
 
-def getPanelTaskLog():
-    return getMWLogs() + '/panel_task.log'
-
-
 def getServerDir():
     return getFatherDir() + '/server'
 
 def getLogsDir():
     return getFatherDir() + '/wwwlogs'
+
+def getRecycleBinDir():
+    rb_dir = getFatherDir() + '/recycle_bin'
+    if not os.path.exists(rb_dir):
+        os.system('mkdir -p ' + rb_dir)
+    return rb_dir
+
+def getPanelTaskLog():
+    return getMWLogs() + '/panel_task.log'
 
 def getWwwDir():
     file = getPanelDir() + '/data/site.pl'
@@ -103,12 +108,13 @@ def getWwwDir():
         return readFile(file).strip()
     return getFatherDir() + '/wwwroot'
 
-    
-def getRecycleBinDir():
-    rb_dir = getFatherDir() + '/recycle_bin'
-    if not os.path.exists(rb_dir):
-        os.system('mkdir -p ' + rb_dir)
-    return rb_dir
+
+def getPanelPort():
+    port_file = mw.getPanelDir()+'/data/port.pl'
+    port = mw.readFile(port_file).strip()
+    if not port:
+        return 7200
+    return int(port)
 
 def getRandomString(length):
     # 取随机字符串
@@ -417,7 +423,7 @@ def setOwn(filename, user, group=None):
         group = user_info.pw_gid
     os.chown(filename, user, group)
     return True
-    
+
 def setMode(filename, mode):
     # 设置文件权限
     if not os.path.exists(filename):

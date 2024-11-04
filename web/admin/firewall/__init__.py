@@ -66,6 +66,16 @@ def add_accept_port():
 
     return MwFirewall.instance().addAcceptPort(port, ps, stype, protocol=protocol)
 
+# 添加放行端口
+@blueprint.route('/del_accept_port', endpoint='del_accept_port', methods=['POST'])
+@panel_login_required
+def del_accept_port():
+    port = request.form.get('port', '').strip()
+    firewall_id = request.form.get('id', '').strip()
+    protocol = request.form.get('protocol', '').strip()
+    return MwFirewall.instance().delAcceptPort(firewall_id, port, protocol=protocol)
+
+
 
 
 
