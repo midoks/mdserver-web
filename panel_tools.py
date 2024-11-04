@@ -23,12 +23,8 @@ web_dir = os.getcwd() + "/web"
 os.chdir(web_dir)
 sys.path.append(web_dir)
 
-
-from admin import app
-from admin import model
-import thisdb
 import core.mw as mw
-import core.db as db
+import thisdb
 
 INIT_DIR = "/etc/rc.d/init.d"
 if mw.isAppleSystem():
