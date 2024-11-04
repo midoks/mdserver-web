@@ -99,6 +99,7 @@ def runPanelTask():
 
         run_list = thisdb.getTaskList(status=0)
         for run_task in run_list:
+            print(run_task)
             start = int(time.time())
             thisdb.setTaskData(run_task['id'], start=start)
             thisdb.setTaskStatus(run_task['id'], -1)
@@ -157,7 +158,6 @@ def systemTask():
             monitor.instance().run()
             time.sleep(5)
     except Exception as ex:
-        print(mw.getTracebackInfo())
         time.sleep(30)
         systemTask()
 

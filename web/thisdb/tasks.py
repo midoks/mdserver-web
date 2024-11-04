@@ -10,6 +10,8 @@
 
 import core.mw as mw
 
+__FIELD = 'id,name,type,start,end,cmd,status,add_time'
+
 def getTaskCount(
         status: int | None = -1
     ) -> int:
@@ -56,9 +58,7 @@ def getTaskList(
 ):
     start = (page - 1) * size
     limit = str(start) + ',' + str(size)
-
-    field = 'id,name,type,start,end,status,add_time'
-    task_list = mw.M('tasks').where('', ()).field(field).limit(limit).order('id asc').select()
+    task_list = mw.M('tasks').where('', ()).field(__FIELD).limit(limit).order('id asc').select()
     return task_list
 
 def getTaskPage(
@@ -68,9 +68,7 @@ def getTaskPage(
 ):
     start = (page - 1) * size
     limit = str(start) + ',' + str(size)
-
-    field = 'id,name,type,start,end,status,add_time'
-    task_list = mw.M('tasks').where('', ()).field(field).limit(limit).order('id asc').select()
+    task_list = mw.M('tasks').where('', ()).field(__FIELD).limit(limit).order('id asc').select()
     count = mw.M('tasks').where('', ()).count()
 
     rdata = {}
@@ -79,8 +77,7 @@ def getTaskPage(
     return rdata
 
 def getTaskFirstByRun() -> None:
-    field = 'id,name,type,start,end,status,add_time'
-    data = mw.M('tasks').where('status=?', (-1,)).field(field).order('id asc').find()
+    data = mw.M('tasks').where('status=?', (-1,)).field(__FIELD).order('id asc').find()
     if item is None:
         return None
     return data
@@ -92,8 +89,7 @@ def getTaskRunList(
     start = (page - 1) * size
     limit = str(start) + ',' + str(size)
 
-    field = 'id,name,type,start,end,status,add_time'
-    task_list = mw.M('tasks').where('', ()).field(field).limit(limit).order('id desc').select()
+    task_list = mw.M('tasks').where('', ()).field(__FIELD).limit(limit).order('id desc').select()
     count = mw.M('tasks').where('', ()).count()
 
     rdata = {}
