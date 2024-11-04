@@ -112,7 +112,6 @@ def runPanelTask():
             thisdb.setTaskStatus(run_task['id'], 1)
     except Exception as e:
         print(mw.getTracebackInfo())
-        time.sleep(10)
 
     # 站点过期检查
     # siteEdate()
