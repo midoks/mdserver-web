@@ -123,7 +123,6 @@ def startPanelTask():
             runPanelTask()
             time.sleep(1)
     except Exception as e:
-        print(mw.getTracebackInfo())
         time.sleep(10)
         startPanelTask()
 
