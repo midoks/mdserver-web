@@ -59,6 +59,18 @@ def getTaskList(
 
     field = 'id,name,type,start,end,status,add_time'
     task_list = mw.M('tasks').where('', ()).field(field).limit(limit).order('id asc').select()
+    return task_list
+
+def getTaskPage(
+    status: int | None = 1,
+    page: int | None = 1,
+    size: int | None = 10,
+):
+    start = (page - 1) * size
+    limit = str(start) + ',' + str(size)
+
+    field = 'id,name,type,start,end,status,add_time'
+    task_list = mw.M('tasks').where('', ()).field(field).limit(limit).order('id asc').select()
     count = mw.M('tasks').where('', ()).count()
 
     rdata = {}

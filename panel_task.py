@@ -24,12 +24,8 @@ web_dir = os.getcwd() + "/web"
 os.chdir(web_dir)
 sys.path.append(web_dir)
 
-from admin import app
-from admin import model
-
-import thisdb
 import core.mw as mw
-import core.db as db
+import thisdb
 
 g_log_file = mw.getPanelTaskLog()
 isTask = mw.getMWLogs() + '/panelTask.pl'
@@ -118,7 +114,7 @@ def runPanelTask():
             thisdb.setTaskData(run_task['id'], end=end)
             thisdb.setTaskStatus(run_task['id'], 1)
     except Exception as e:
-        print(str(e))
+        print(mw.getTracebackInfo())
 
     # 站点过期检查
     # siteEdate()
@@ -130,7 +126,7 @@ def startPanelTask():
             runPanelTask()
             time.sleep(1)
     except Exception as e:
-        print(str(e))
+        print(mw.getTracebackInfo())
         time.sleep(10)
         startPanelTask()
 
@@ -164,6 +160,7 @@ def systemTask():
             monitor.instance().run()
             time.sleep(5)
     except Exception as ex:
+        print(mw.getTracebackInfo())
         time.sleep(30)
         systemTask()
 
@@ -249,6 +246,7 @@ def startPHPVersion(version):
         if os.path.exists(cgi):
             return True
     except Exception as e:
+        print(mw.getTracebackInfo())
         mw.writeLog('PHP守护程序', '自动修复异常:'+str(e))
         return True
 
@@ -326,31 +324,31 @@ def setDaemon(t):
 
 def run():
     # # 系统监控
-    sysTask = threading.Thread(target=systemTask)
-    sysTask = setDaemon(sysTask)
-    sysTask.start()
+    # sysTask = threading.Thread(target=systemTask)
+    # sysTask = setDaemon(sysTask)
+    # sysTask.start()
 
     # # PHP 502错误检查线程
-    php502 = threading.Thread(target=check502Task)
-    php502 = setDaemon(php502)
-    php502.start()
+    # php502 = threading.Thread(target=check502Task)
+    # php502 = setDaemon(php502)
+    # php502.start()
 
-    # OpenResty Restart At Once Start
-    oraos = threading.Thread(target=openrestyRestartAtOnce)
-    oraos = setDaemon(oraos)
-    oraos.start()
-
-
-    # OpenResty Auto Restart Start
-    oar = threading.Thread(target=openrestyAutoRestart)
-    oar = setDaemon(oar)
-    oar.start()
+    # # OpenResty Restart At Once Start
+    # oraos = threading.Thread(target=openrestyRestartAtOnce)
+    # oraos = setDaemon(oraos)
+    # oraos.start()
 
 
-    # Panel Restart Start
-    rps = threading.Thread(target=restartPanelService)
-    rps = setDaemon(rps)
-    rps.start()
+    # # OpenResty Auto Restart Start
+    # oar = threading.Thread(target=openrestyAutoRestart)
+    # oar = setDaemon(oar)
+    # oar.start()
+
+
+    # # Panel Restart Start
+    # rps = threading.Thread(target=restartPanelService)
+    # rps = setDaemon(rps)
+    # rps.start()
 
     # 面板后台任务
     startPanelTask()
