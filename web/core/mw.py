@@ -375,6 +375,14 @@ def getHostAddr():
         return readFile(ip_text).strip()
     return '127.0.0.1'
 
+def setMode(filename, mode):
+    # 设置文件权限
+    if not os.path.exists(filename):
+        return False
+    mode = int(str(mode), 8)
+    os.chmod(filename, mode)
+    return True
+
 def getSqitePrefix():
     WIN = sys.platform.startswith('win')
     if WIN:  # 如果是 Windows 系统，使用三个斜线
@@ -382,6 +390,26 @@ def getSqitePrefix():
     else:  # 否则使用四个斜线
         prefix = 'sqlite:////'
     return prefix
+
+def checkPort(port):
+    # 检查端口是否合法
+    ports = ['21', '443', '888']
+    if port in ports:
+        return False
+    intport = int(port)
+    if intport < 1 or intport > 65535:
+        return False
+    return True
+
+def getStrBetween(startStr, endStr, srcStr):
+    # 字符串取中间
+    start = srcStr.find(startStr)
+    if start == -1:
+        return None
+    end = srcStr.find(endStr)
+    if end == -1:
+        return None
+    return srcStr[start + 1:end]
 
 def getCpuType():
     cpuType = ''
