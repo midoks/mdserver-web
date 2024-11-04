@@ -375,6 +375,49 @@ def getHostAddr():
         return readFile(ip_text).strip()
     return '127.0.0.1'
 
+def checkIp(ip):
+    # 检查是否为IPv4地址
+    import re
+    p = re.compile(r'^((25[0-5]|2[0-4]\d|[01]?\d\d?)\.){3}(25[0-5]|2[0-4]\d|[01]?\d\d?)$')
+    if p.match(ip):
+        return True
+    else:
+        return False
+
+def createLinuxUser(user, group):
+    execShell("groupadd {}".format(group))
+    execShell('useradd -s /sbin/nologin -g {} {}'.format(user, group))
+    return True
+
+
+def setOwn(filename, user, group=None):
+    if isAppleSystem():
+        return True
+
+    # 设置用户组
+    if not os.path.exists(filename):
+        return False
+    from pwd import getpwnam
+    try:
+        user_info = getpwnam(user)
+        user = user_info.pw_uid
+        if group:
+            user_info = getpwnam(group)
+        group = user_info.pw_gid
+    except:
+        if user == 'www':
+            createLinuxUser(user)
+        # 如果指定用户或组不存在，则使用www
+        try:
+            user_info = getpwnam('www')
+        except:
+            createLinuxUser(user)
+            user_info = getpwnam('www')
+        user = user_info.pw_uid
+        group = user_info.pw_gid
+    os.chown(filename, user, group)
+    return True
+    
 def setMode(filename, mode):
     # 设置文件权限
     if not os.path.exists(filename):
