@@ -53,7 +53,7 @@ class monitor:
     def initDBFile(self):
         if os.path.exists(self._dbfile):
             return True
-        sql_file = mw.getPanelDataDir() + '/sql/system.sql'
+        sql_file = mw.getPanelDir() + '/web/admin/setup/sql/system.sql'
         sql = db.Sql().dbPos(mw.getPanelDataDir(),'system')
         csql = mw.readFile(sql_file)
         csql_list = csql.split(';')
