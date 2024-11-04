@@ -15,8 +15,8 @@ import time
 import core.mw as mw
 import thisdb
 
-def getTaskList(page=1,size=10):
-    info = thisdb.getTaskList(page=page, size=size)
+def getTaskPage(page=1,size=10):
+    info = thisdb.getTaskPage(page=page, size=size)
 
     rdata = {}
     rdata['data'] = info['list']

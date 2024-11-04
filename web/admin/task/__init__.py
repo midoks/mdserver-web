@@ -35,7 +35,7 @@ def list():
     p = request.form.get('p', '1')
     limit = request.form.get('limit', '10').strip()
     search = request.form.get('search', '').strip()
-    return MwTasks.getTaskList(int(p), int(limit))
+    return MwTasks.getTaskPage(int(p), int(limit))
 
 @blueprint.route('/get_exec_log', endpoint='get_exec_log', methods=['POST'])
 @panel_login_required

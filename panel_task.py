@@ -320,32 +320,32 @@ def setDaemon(t):
     return t
 
 def run():
-    # # 系统监控
-    # sysTask = threading.Thread(target=systemTask)
-    # sysTask = setDaemon(sysTask)
-    # sysTask.start()
+    # 系统监控
+    sysTask = threading.Thread(target=systemTask)
+    sysTask = setDaemon(sysTask)
+    sysTask.start()
 
-    # # PHP 502错误检查线程
-    # php502 = threading.Thread(target=check502Task)
-    # php502 = setDaemon(php502)
-    # php502.start()
+    # PHP 502错误检查线程
+    php502 = threading.Thread(target=check502Task)
+    php502 = setDaemon(php502)
+    php502.start()
 
-    # # OpenResty Restart At Once Start
-    # oraos = threading.Thread(target=openrestyRestartAtOnce)
-    # oraos = setDaemon(oraos)
-    # oraos.start()
-
-
-    # # OpenResty Auto Restart Start
-    # oar = threading.Thread(target=openrestyAutoRestart)
-    # oar = setDaemon(oar)
-    # oar.start()
+    # OpenResty Restart At Once Start
+    oraos = threading.Thread(target=openrestyRestartAtOnce)
+    oraos = setDaemon(oraos)
+    oraos.start()
 
 
-    # # Panel Restart Start
-    # rps = threading.Thread(target=restartPanelService)
-    # rps = setDaemon(rps)
-    # rps.start()
+    # OpenResty Auto Restart Start
+    oar = threading.Thread(target=openrestyAutoRestart)
+    oar = setDaemon(oar)
+    oar.start()
+
+
+    # Panel Restart Start
+    rps = threading.Thread(target=restartPanelService)
+    rps = setDaemon(rps)
+    rps.start()
 
     # 面板后台任务
     startPanelTask()
