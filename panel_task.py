@@ -37,6 +37,15 @@ def execShell(cmdstring, cwd=None, timeout=None, shell=True):
     cmd = cmdstring + ' > ' + g_log_file + ' 2>&1'
     return mw.execShell(cmd)
 
+def writeLogs(data):
+    # 写输出日志
+    try:
+        fp = open(g_log_file, 'w+')
+        fp.write(data)
+        fp.close()
+    except:
+        pass
+
 def mw_async(f):
     def wrapper(*args, **kwargs):
         thr = threading.Thread(target=f, args=args, kwargs=kwargs)
@@ -72,7 +81,6 @@ def downloadFile(url, filename):
         writeLogs(str(e))
     return True
 
-
 def downloadHook(count, blockSize, totalSize):
     # 下载文件进度回调
     global pre
@@ -82,17 +90,6 @@ def downloadHook(count, blockSize, totalSize):
         return
     speed = {'total': totalSize, 'used': used, 'pre': pre1}
     writeLogs(json.dumps(speed))
-
-
-def writeLogs(data):
-    # 写输出日志
-    try:
-        fp = open(g_log_file, 'w+')
-        fp.write(data)
-        fp.close()
-    except:
-        pass
-
 
 def runPanelTask():
     try:
