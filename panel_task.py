@@ -107,6 +107,7 @@ def runPanelTask():
                 downloadFile(argv[0], argv[1])
             elif run_task['type'] == 'execshell':
                 execShell(run_task['cmd'])
+            print(run_task)
             end = int(time.time())
             thisdb.setTaskData(run_task['id'], end=end)
             thisdb.setTaskStatus(run_task['id'], 1)
@@ -121,9 +122,9 @@ def startPanelTask():
     try:
         while True:
             runPanelTask()
-            time.sleep(1)
+            time.sleep(5)
     except Exception as e:
-        time.sleep(10)
+        time.sleep(30)
         startPanelTask()
 
 # 网站到期处理

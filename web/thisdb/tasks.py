@@ -58,7 +58,7 @@ def getTaskList(
 ):
     start = (page - 1) * size
     limit = str(start) + ',' + str(size)
-    task_list = mw.M('tasks').where('', ()).field(__FIELD).limit(limit).order('id asc').select()
+    task_list = mw.M('tasks').where('status=?', (status,)).field(__FIELD).limit(limit).order('id asc').select()
     return task_list
 
 def getTaskPage(
@@ -107,10 +107,10 @@ def getTaskRunPage(
     return rdata
 
 
-def setTaskStatus(id,
+def setTaskStatus(task_id,
     status: int | None = 0
 ):
-    mw.M('tasks').where('id=?',(id,)).update({'status':status})
+    mw.M('tasks').where('id=?',(task_id,)).update({'status':status})
     return True
 
 def setTaskData(id,

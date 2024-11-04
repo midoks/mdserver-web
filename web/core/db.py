@@ -56,6 +56,10 @@ class Sql():
         self.__DB_CONN.text_factory = bytes
         return True
 
+    def debug(self, debug=False):
+        self.__debug = debug
+        return self
+
     def autoTextFactory(self):
         if sys.version_info[0] == 3:
             self.__DB_CONN.text_factory = lambda x: str(x, encoding="utf-8", errors='ignore')
@@ -341,8 +345,8 @@ class Sql():
             opt = opt[0:len(opt) - 1]
             sql = "UPDATE " + self.__DB_TABLE + " SET " + opt + self.__OPT_WHERE
 
-            # import mw
-            # mw.writeFile('/tmp/test.pl', sql)
+            if self.__debug:
+                print(sql, param)
 
             # 处理拼接WHERE与UPDATE参数
             tmp = list(param)
