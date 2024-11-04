@@ -78,11 +78,20 @@ def getTaskPage(
 
 def getTaskFirstByRun() -> None:
     data = mw.M('tasks').where('status=?', (-1,)).field(__FIELD).order('id asc').find()
-    if item is None:
+    if data is None:
         return None
     return data
 
 def getTaskRunList(
+    page: int | None = 1,
+    size: int | None = 10,
+):
+    start = (page - 1) * size
+    limit = str(start) + ',' + str(size)
+    task_list = mw.M('tasks').where('', ()).field(__FIELD).limit(limit).order('id desc').select()
+    return task_list
+
+def getTaskRunPage(
     page: int | None = 1,
     size: int | None = 10,
 ):
