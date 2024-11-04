@@ -47,15 +47,15 @@ def get_exec_log():
 @blueprint.route('/get_task_speed', endpoint='get_task_speed', methods=['POST'])
 @panel_login_required
 def get_task_speed():
-    count = model.getTaskUnexecutedCount()
+    count = thisdb.getTaskUnexecutedCount()
     if count == 0:
         return mw.returnData(False, '当前没有任务队列在执行-2!')
     
-    row = model.getTaskFirstByRun()
+    row = thisdb.getTaskFirstByRun()
     if row is None:
         return mw.returnData(False, '当前没有任务队列在执行-3!')
 
-    task_logfile = mw.getPanelTaskLog()
+    task_logfile = thisdb.getPanelTaskLog()
 
     data = {}
     data['name'] = row['name']
@@ -72,7 +72,7 @@ def get_task_speed():
                     break
             except Exception as e:
                 if i == 2:
-                    model.setTaskStatus(row['id'],0)
+                    thisdb.setTaskStatus(row['id'],0)
                     return mw.returnData(False, '当前没有任务队列在执行-4:' + str(e))
             time.sleep(0.5)
     else:
@@ -80,7 +80,7 @@ def get_task_speed():
         data['isDownload'] = False
 
 
-    data['task'] = model.getTaskRunList()
+    data['task'] = thisdb.getTaskRunList()
     return data
 
 @blueprint.route('/remove_task', endpoint='remove_task', methods=['POST'])

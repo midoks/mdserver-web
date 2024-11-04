@@ -10,6 +10,12 @@
 
 import core.mw as mw
 
+def getTaskCount(
+        status: int | None = -1
+    ) -> int:
+    return mw.M('tasks').where('status=?',(1,)).count()
+
+
 # 未执行任务总数
 def getTaskUnexecutedCount() -> int:
     return mw.M('tasks').where('status!=?',(1,)).count()
@@ -60,6 +66,28 @@ def getTaskList(
     rdata['count'] = count
     return rdata
 
+def getTaskFirstByRun() -> None:
+    field = 'id,name,type,start,end,status,add_time'
+    data = mw.M('tasks').where('status=?', (-1,)).field(field).order('id asc').find()
+    if item is None:
+        return None
+    return data
+
+def getTaskRunList(
+    page: int | None = 1,
+    size: int | None = 10,
+):
+    start = (page - 1) * size
+    limit = str(start) + ',' + str(size)
+
+    field = 'id,name,type,start,end,status,add_time'
+    task_list = mw.M('tasks').where('', ()).field(field).limit(limit).order('id desc').select()
+    count = mw.M('tasks').where('', ()).count()
+
+    rdata = {}
+    rdata['list'] = task_list
+    rdata['count'] = count
+    return rdata
 
 
 def setTaskStatus(id,
