@@ -13,6 +13,15 @@ import pwd
 import time
 
 import core.mw as mw
+import thisdb
+
+def getTaskList(page=1,size=10):
+    info = thisdb.getTaskList(page=page, size=size)
+
+    rdata = {}
+    rdata['data'] = info['list']
+    rdata['page'] = mw.getPage({'count':info['count'],'tojs':'remind','p':page,'row':size})
+    return rdata
 
 # 删除进程下的所有进程
 def removeTaskRecursion(pid):

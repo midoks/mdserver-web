@@ -35,27 +35,7 @@ def list():
     p = request.form.get('p', '1')
     limit = request.form.get('limit', '10').strip()
     search = request.form.get('search', '').strip()
-
-    count = Tasks.query.filter_by().count()
-    pagination = Tasks.query.filter_by().order_by(Tasks.id.desc()).paginate(page=int(p), per_page=int(limit))
-  
-    rows = []
-    for item in pagination.items:
-        t = {}
-        t['id'] = item.id
-        t['name'] = item.name
-        t['type'] = item.type
-        t['cmd'] = item.cmd
-        t['start'] = item.start
-        t['end'] = item.end
-        t['status'] = item.status
-        t['add_time'] = item.add_time
-        rows.append(t)
-
-    data = {}
-    data['data'] = rows
-    data['page'] = mw.getPage({'count':count,'tojs':'remind','p':p})
-    return data
+    return MwTasks.getTaskList(int(p), int(limit))
 
 @blueprint.route('/get_exec_log', endpoint='get_exec_log', methods=['POST'])
 @panel_login_required

@@ -53,23 +53,18 @@ def get_ssh_info():
 @blueprint.route('/set_ping', endpoint='set_ping', methods=['POST'])
 @panel_login_required
 def set_ping():
-    mf = MwFirewall.instance()
-    return mf.setPing()
+    return MwFirewall.instance().setPing()
 
 # 添加放行端口
 @blueprint.route('/add_accept_port', endpoint='add_accept_port', methods=['POST'])
 @panel_login_required
 def add_accept_port():
-    mf = MwFirewall.instance()
-    if not mf.getFwStatus():
-        return mw.returnData(False, '防火墙启动时,才能添加规则!')
-
     port = request.form.get('port', '').strip()
     ps = request.form.get('ps', '').strip()
     protocol = request.form.get('protocol', '').strip()
     stype = request.form.get('type', '').strip()
 
-    return mf.addAcceptPort(port, ps, stype, protocol=protocol)
+    return MwFirewall.instance().addAcceptPort(port, ps, stype, protocol=protocol)
 
 
 

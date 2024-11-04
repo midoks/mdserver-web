@@ -229,16 +229,16 @@ class Firewall(object):
     ):
         if not self.getFwStatus():
             self.setFw(0)
-
+            return mw.returnData(False, '防火墙启动时,才能添加规则!')
 
         rep = r"^\d{1,5}(:\d{1,5})?$"
         if not re.search(rep, port):
             return mw.returnData(False, '端口范围不正确!')
 
-        if model.getFirewallCountByPort(port) > 0:
+        if thisdb.getFirewallCountByPort(port) > 0:
             return mw.returnData(False, '您要放行的端口已存在，无需重复放行!')
 
-        model.addFirewall(port, ps=ps,protocol=protocol)
+        thisdb.addFirewall(port, ps=ps,protocol=protocol)
         self.addAcceptPortCmd(port, protocol=protocol)
         self.reload()
         

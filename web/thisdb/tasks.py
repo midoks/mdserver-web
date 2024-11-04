@@ -52,8 +52,13 @@ def getTaskList(
     limit = str(start) + ',' + str(size)
 
     field = 'id,name,type,start,end,status,add_time'
-    data = mw.M('tasks').where('', ()).field(field).limit(limit).order('id asc').select()
-    return data
+    task_list = mw.M('tasks').where('', ()).field(field).limit(limit).order('id asc').select()
+    count = mw.M('tasks').where('', ()).count()
+
+    rdata = {}
+    rdata['list'] = task_list
+    rdata['count'] = count
+    return rdata
 
 
 
