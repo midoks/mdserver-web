@@ -110,8 +110,8 @@ def getWwwDir():
 
 
 def getPanelPort():
-    port_file = mw.getPanelDir()+'/data/port.pl'
-    port = mw.readFile(port_file).strip()
+    port_file = getPanelDir()+'/data/port.pl'
+    port = readFile(port_file).strip()
     if not port:
         return 7200
     return int(port)
