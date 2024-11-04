@@ -33,25 +33,7 @@ def index():
 def get_list():
     p = request.form.get('p', '1').strip()
     limit = request.form.get('limit', '10').strip()
-
-    count = Firewall.query.filter_by().count()
-    pagination = Firewall.query.filter_by().paginate(page=int(p), per_page=int(limit))
-  
-    rows = []
-    for item in pagination.items:
-        t = {}
-        t['id'] = item.id
-        t['port'] = item.port
-        t['protocol'] = item.protocol
-        t['ps'] = item.ps
-        t['add_time'] = item.add_time
-        t['update_time'] = item.update_time
-        rows.append(t)
-
-    data = {}
-    data['data'] = rows
-    data['page'] = mw.getPage({'count':count,'tojs':'getLogs','p':p,'row':limit})
-    return data
+    return MwFirewall.instance().getList(p,limit)
 
 # 获取站点日志目录
 @blueprint.route('/get_www_path', endpoint='get_www_path', methods=['POST'])
@@ -64,8 +46,7 @@ def get_www_path():
 @blueprint.route('/get_ssh_info', endpoint='get_ssh_info', methods=['POST'])
 @panel_login_required
 def get_ssh_info():
-    mf = MwFirewall.instance()
-    return mf.getSshInfo()
+    return MwFirewall.instance().getSshInfo()
 
 
 # 切换ping开关
@@ -88,8 +69,7 @@ def add_accept_port():
     protocol = request.form.get('protocol', '').strip()
     stype = request.form.get('type', '').strip()
 
-    data = mf.addAcceptPort(port, ps, stype, protocol=protocol)
-    return mw.getJson(data)
+    return mf.addAcceptPort(port, ps, stype, protocol=protocol)
 
 
 

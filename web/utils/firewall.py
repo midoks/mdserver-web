@@ -14,9 +14,9 @@ import threading
 import re
 import time
 
-from admin import model
 
 import core.mw as mw
+import thisdb
 
 class Firewall(object):
 
@@ -46,6 +46,14 @@ class Firewall(object):
             self.__isIptables = True
         elif mw.isAppleSystem():
             self.__isMac = True
+
+    def getList(self, page=1,size=10):
+        info = thisdb.getFirewallList(page=page, size=size)
+
+        rdata = {}
+        rdata['data'] = info['list']
+        rdata['page'] = mw.getPage({'count':info['count'],'tojs':'showAccept','p':page,'row':size})
+        return rdata
 
     def reload(self):
         if self.__isUfw:
@@ -236,8 +244,7 @@ class Firewall(object):
         
         msg = mw.getInfo('放行端口[{1}][{2}]成功', (port, protocol,))
         mw.writeLog("防火墙管理", msg)
-
-        return mw.returnData(True, '添加放行(' + port + ')端口成功!')
+        return mw.returnData(True, msg)
 
 
 

@@ -10,6 +10,7 @@
 
 import os
 import sys
+import re
 import time
 import json
 import threading
@@ -19,6 +20,7 @@ from admin import model
 
 import core.mw as mw
 import thisdb
+
 
 class crontab(object):
         # lock
@@ -31,6 +33,119 @@ class crontab(object):
                 if not hasattr(crontab, "_instance"):
                     crontab._instance = crontab(*args, **kwargs)
         return crontab._instance
+
+    def modifyCrond(self,cron_id,data):
+        if len(data['name']) < 1:
+            return mw.returnData(False, '任务名称不能为空!')
+
+        is_check_pass, msg = self.cronCheck(data)
+        if not is_check_pass:
+            return mw.returnData(is_check_pass, msg)
+
+        info = thisdb.getCrond(cron_id)
+
+        dbdata = {}
+        dbdata['name'] = data['name']
+        dbdata['type'] = data['type']
+        dbdata['where1'] = data['where1']
+        dbdata['where_hour'] = data['hour']
+        dbdata['where_minute'] = data['minute']
+        dbdata['save'] = data['save']
+        dbdata['backup_to'] = data['backup_to']
+        dbdata['sname'] = data['sname']
+        dbdata['sbody'] = data['sbody']
+        dbdata['stype'] = data['stype']
+        dbdata['url_address'] = data['url_address']
+
+        if not self.removeForCrond(info['echo']):
+            return mw.returnData(False, '无法写入文件，是否开启了系统加固功能!')
+
+        thisdb.setCrontabData(cron_id, dbdata)
+        self.syncToCrond(cron_id)
+        msg = '修改计划任务[' + data['name'] + ']成功'
+        mw.writeLog('计划任务', msg)
+        return mw.returnData(True, msg)
+
+    # 取数据列表
+    def getDataList(self,stype=''):
+    
+        bak_data = []
+        if stype == 'site' or stype == 'sites' or stype == 'database' or stype.find('database_') > -1 or stype == 'path':
+            hookPath = mw.getPanelDataDir() + "/hook_backup.json"
+            if os.path.exists(hookPath):
+                t = mw.readFile(hookPath)
+                bak_data = json.loads(t)
+
+        if stype == 'database' or stype.find('database_') > -1:
+            sqlite3_name = 'mysql'
+            path = mw.getServerDir() + '/mysql'
+            if stype != 'database':
+                soft_name = stype.replace('database_', '')
+                path = mw.getServerDir() + '/' + soft_name
+
+                if soft_name == 'postgresql':
+                    sqlite3_name = 'pgsql'
+
+                if soft_name == 'mongodb':
+                    sqlite3_name = 'mongodb'
+
+            db_list = {}
+            db_list['orderOpt'] = bak_data
+
+            if not os.path.exists(path + '/' + sqlite3_name + '.db'):
+                db_list['data'] = []
+            else:
+                db_list['data'] = mw.M('databases').dbPos(path, sqlite3_name).field('name,ps').select()
+            return mw.getJson(db_list)
+
+        if stype == 'path':
+            db_list = {}
+            db_list['data'] = [{"name": mw.getWwwDir(), "ps": "www"}]
+            db_list['orderOpt'] = bak_data
+            return mw.getJson(db_list)
+
+        data = {}
+        data['orderOpt'] = bak_data
+
+        default_db = 'sites'
+        data['data'] = mw.M(default_db).field('name,ps').select()
+        return mw.getJson(data)
+
+    def setCronStatus(self,cron_id):
+        data = thisdb.getCrond(cron_id)
+
+        status = 1
+        status_msg = '开启'
+        if data['status'] == status:
+            status = 0
+            status_msg = '关闭'
+            self.removeForCrond(data['echo'])
+        else:
+            data['status'] = 1
+            self.syncToCrond(cron_id)
+
+        thisdb.setCrontabStatus(cron_id, status)
+
+        msg = '修改计划任务[' + data['name'] + ']状态为[' + str(status_msg) + ']'
+        mw.writeLog('计划任务', msg)
+        return mw.returnJson(True, msg)
+
+
+    def cronLog(self, cron_id):
+        data = thisdb.getCrond(cron_id)
+        log_file = mw.getServerDir() + '/cron/' + data['echo'] + '.log'
+        if not os.path.exists(log_file):
+            return mw.returnData(False, '当前日志为空!')
+        content = mw.getLastLine(log_file, 500)
+        return mw.returnData(True, content)
+
+    def startTask(self, cron_id):
+        data = thisdb.getCrond(cron_id)
+        cmd_file = mw.getServerDir() + '/cron/' + data['echo']
+        os.system('chmod +x ' + cmd_file)
+        os.system('nohup ' + cmd_file + ' >> ' + cmd_file + '.log 2>&1 &')
+        return mw.returnData(True, '计划任务【%s】已执行!' % data['name'])
+
 
     # 获取指定任务数据
     def getCrondFind(self, cron_id):
@@ -78,7 +193,7 @@ class crontab(object):
     def delete(self, tid):
         data = thisdb.getCrond(tid)
         if not self.removeForCrond(data['echo']):
-            return mw.returnData(False, '无法写入文件，请检查是否开启了系统加固功能!')
+            return mw.returnData(False, '无法写入文件，是否开启了系统加固功能!')
 
         cron_path = mw.getServerDir() + '/cron'
         cron_file = cron_path + '/' + data['echo']
@@ -93,6 +208,17 @@ class crontab(object):
         msg = mw.getInfo('删除计划任务[{1}]成功!', (data['name'],))
         mw.writeLog('计划任务', msg)
         return mw.returnData(True, msg)
+
+
+    def delLogs(self,cron_id):
+        try:
+            data = thisdb.getCrond(cron_id)
+            log_file = mw.getServerDir() + '/cron/' + data['echo'] + '.log'
+            if os.path.exists(log_file):
+                os.remove(log_file)
+            return mw.returnData(True, '任务日志已清空!')
+        except:
+            return mw.returnData(False, '任务日志清空失败!')
 
     def getCrontabHuman(self, data):
         rdata = []
@@ -129,18 +255,23 @@ class crontab(object):
         if mw.isAppleSystem():
             return True
 
-        u_file = '/var/spool/cron/crontabs/root'
-        if not os.path.exists(u_file):
-            file = '/var/spool/cron/root'
-            if not os.path.exists(file):
-                return False
-        else:
-            file = u_file
+        cron_file = [
+            '/var/spool/cron/crontabs/root',
+            '/var/spool/cron/root',
+        ]
 
-        conf = mw.readFile(file)
+        file = ''
+        for i in cron_file:
+            if os.path.exists(file):
+                file = i
+
+        if file == '':
+            return False
+
+        content = mw.readFile(file)
         rep = ".+" + str(echo) + ".+\n"
-        conf = re.sub(rep, "", conf)
-        if not mw.writeFile(file, conf):
+        content = re.sub(rep, "", content)
+        if not mw.writeFile(file, content):
             return False
         self.crondReload()
         return True
@@ -288,7 +419,6 @@ class crontab(object):
             shell = param.sFile
         else:
             head = "#!/bin/bash\nPATH=/bin:/sbin:/usr/bin:/usr/sbin:/usr/local/bin:/usr/local/sbin:~/bin\nexport PATH\n"
-
             start_head = '''
 SCRIPT_RUN_TIME="0s"
 MW_ToSeconds()
@@ -336,22 +466,16 @@ fi''' % (mw.getPanelDir(),)
                 'rememory': head + "/bin/bash " + script_dir + '/rememory.sh'
             }
             if param['backup_to'] != 'localhost':
-                cfile = mw.getPluginDir() + "/" + \
-                    param['backup_to'] + "/index.py"
+                cfile = mw.getPluginDir() + "/" + param['backup_to'] + "/index.py"
 
-                wheres['path'] = head + "python3 " + cfile + \
-                    " path " + param['sname'] + " " + str(param['save'])
-                wheres['site'] = head + "python3 " + cfile + \
-                    " site " + param['sname'] + " " + str(param['save'])
-                wheres['database'] = head + "python3 " + cfile + " " + \
-                    source_stype + " " + \
-                    param['sname'] + " " + str(param['save'])
+                wheres['path'] = head + "python3 " + cfile + " path " + param['sname'] + " " + str(param['save'])
+                wheres['site'] = head + "python3 " + cfile + " site " + param['sname'] + " " + str(param['save'])
+                wheres['database'] = head + "python3 " + cfile + " " + source_stype + " " + param['sname'] + " " + str(param['save'])
             try:
                 shell = wheres[stype]
             except:
                 if stype == 'toUrl':
-                    shell = head + "curl -sS --connect-timeout 10 -m 60 '" + \
-                        param['urladdress'] + "'"
+                    shell = head + "curl -sS --connect-timeout 10 -m 60 '" + param['urladdress'] + "'"
                 else:
                     shell = head + param['sbody'].replace("\r\n", "\n")
 
@@ -381,19 +505,19 @@ echo "--------------------------------------------------------------------------
     def checkScript(self, shell):
         keys = ['shutdown', 'init 0', 'mkfs', 'passwd',
                 'chpasswd', '--stdin', 'mkfs.ext', 'mke2fs']
-        for key in keys:
-            shell = shell.replace(key, '[***]')
+        for k in keys:
+            shell = shell.replace(k, '[***]')
         return shell
 
-
-
     # 将Shell脚本写到文件
-    def writeShell(self, config):
+    def writeShell(self, bash_script):
+        if mw.isAppleSystem():
+            return mw.returnData(True, 'ok')
         file = '/var/spool/cron/crontabs/root'
-        current_os = mw.getOs()
-        if current_os == 'darwin':
+        sys_os = mw.getOs()
+        if sys_os == 'darwin':
             file = '/etc/crontab'
-        elif current_os.startswith("freebsd"):
+        elif sys_os.startswith("freebsd"):
             file = '/var/cron/tabs/root'
 
         if not os.path.exists(file):
@@ -401,15 +525,16 @@ echo "--------------------------------------------------------------------------
 
         if not os.path.exists(file):
             mw.writeFile(file, '')
-        conf = mw.readFile(file)
-        conf += str(config) + "\n"
-        if mw.writeFile(file, conf):
+
+        content = mw.readFile(file)
+        content += str(bash_script) + "\n"
+        if mw.writeFile(file, content):
             if not os.path.exists(file):
                 mw.execShell("chmod 600 '" + file +"' && chown root.root " + file)
             else:
                 mw.execShell("chmod 600 '" + file +"' && chown root.crontab " + file)
             return mw.returnData(True, 'ok')
-        return mw.returnData(False, '文件写入失败,请检查是否开启系统加固功能!')
+        return mw.returnData(False, '文件写入失败,是否开启系统加固功能!')
 
     # 重载配置
     def crondReload(self):
@@ -424,7 +549,22 @@ echo "--------------------------------------------------------------------------
             else:
                 mw.execShell("systemctl reload crond")
 
+    def syncToCrond(self, cron_id):
+        info = thisdb.getCrond(cron_id)
+        if 'status' in info:
+            if info['status'] == 0:
+                return False
 
+        if 'where_hour' in info:
+            info['hour'] = info['where_hour']
+            info['minute'] = info['where_minute']
+            info['week'] = info['where1']
 
-
+        cmd, _ = self.getCrondCycle(info)
+        cron_path = mw.getServerDir() + '/cron'
+        cron_name = self.getShell(info)
+        cmd += ' ' + cron_path + '/' + cron_name + ' >> ' + cron_path + '/' + cron_name + '.log 2>&1'
+        self.writeShell(cmd)
+        self.crondReload()
+        return True
 

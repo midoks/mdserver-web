@@ -97,6 +97,13 @@ def getServerDir():
 def getLogsDir():
     return getFatherDir() + '/wwwlogs'
 
+def getWwwDir():
+    file = getPanelDir() + '/data/site.pl'
+    if os.path.exists(file):
+        return readFile(file).strip()
+    return getFatherDir() + '/wwwroot'
+
+    
 def getRecycleBinDir():
     rb_dir = getFatherDir() + '/recycle_bin'
     if not os.path.exists(rb_dir):

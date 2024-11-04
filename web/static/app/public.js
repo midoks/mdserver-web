@@ -259,7 +259,6 @@ function getFormatTime(tm, format) {
 
 
 function changePathCallback(default_dir, callback) {
-
 	var c = layer.open({
 		type: 1,
 		area: "650px",
@@ -276,7 +275,7 @@ function changePathCallback(default_dir, callback) {
 					</div>\
 					<div class='path-con'>\
 						<div class='path-con-left'>\
-						<dl><dt id='changecomlist' onclick='backMyComputer()'>计算机</dt></dl>\
+							<dl><dt id='changecomlist' onclick='backMyComputer()'>计算机</dt></dl>\
 						</div>\
 						<div class='path-con-right'>\
 							<ul class='default' id='computerDefautl'></ul>\
@@ -387,14 +386,15 @@ function getDiskList(b) {
 	var a = "";
 	var c = "path=" + b + "&disk=True";
 	$.post("/files/get_dir", c, function(h) {
-		if(h.DISK != undefined) {
-			for(var f = 0; f < h.DISK.length; f++) {
-				a += "<dd onclick=\"getDiskList('" + h.DISK[f].path + "')\"><span class='glyphicon glyphicon-hdd'></span>&nbsp;" + h.DISK[f].path + "</dd>"
-			}
-			$("#changecomlist").html(a)
-		}
-		for(var f = 0; f < h.DIR.length; f++) {
-			var g = h.DIR[f].split(";");
+		// console.log(h);
+		// if(h.dir != undefined) {
+		// 	for(var f = 0; f < h.dir.length; f++) {
+		// 		a += "<dd onclick=\"getDiskList('" + h.dir[f].path + "')\"><span class='glyphicon glyphicon-hdd'></span>&nbsp;" + h.dir[f].path + "</dd>";
+		// 	}
+		// 	$("#changecomlist").html(a);
+		// }
+		for(var f = 0; f < h.dir.length; f++) {
+			var g = h.dir[f].split(";");
 			var e = g[0];
 		
 			if(isChineseChar(e)) {
@@ -408,16 +408,16 @@ function getDiskList(b) {
 			}
 
 			d += "<tr>\
-				<td onclick=\"getDiskList('" + h.PATH + "/" + g[0] + "')\" title='" + g[0] + "'>\
+				<td onclick=\"getDiskList('" + h.path + "/" + g[0] + "')\" title='" + g[0] + "'>\
 					<span class='glyphicon glyphicon-folder-open'></span>" + e + "</td><td>" + getLocalTime(g[2]) + "</td>\
 				<td>" + g[3] + "</td>\
 				<td>" + g[4] + "</td>\
-				<td><span class='delfile-btn' onclick=\"NewDelFile('" + h.PATH + "/" + g[0] + "')\">X</span></td>\
+				<td><span class='delfile-btn' onclick=\"NewDelFile('" + h.path + "/" + g[0] + "')\">X</span></td>\
 			</tr>";
 		}
-		if(h.FILES != null && h.FILES != "") {
-			for(var f = 0; f < h.FILES.length; f++) {
-				var g = h.FILES[f].split(";");
+		if(h.files != null && h.files != "") {
+			for(var f = 0; f < h.files.length; f++) {
+				var g = h.files[f].split(";");
 				var e = g[0];
 				if(isChineseChar(e)) {
 					if(e.length > 10) {
@@ -441,10 +441,10 @@ function getDiskList(b) {
 		$(".default").hide();
 		$(".file-list").show();
 		$("#tbody").html(d);
-		if(h.PATH.substr(h.PATH.length - 1, 1) != "/") {
-			h.PATH += "/";
+		if(h.path.substr(h.path.length - 1, 1) != "/") {
+			h.path += "/";
 		}
-		$("#PathPlace").find("span").html(h.PATH);
+		$("#PathPlace").find("span").html(h.path);
 		activeDisk();
 		return;
 	},'json');
@@ -530,10 +530,11 @@ function activeDisk() {
 }
 
 function backMyComputer() {
-	$(".default").show();
-	$(".file-list").hide();
-	$("#PathPlace").find("span").html("");
-	activeDisk();
+	// $(".default").show();
+	// $(".file-list").hide();
+	// $("#PathPlace").find("span").html("");
+	// activeDisk();
+	return;
 }
 
 function backFile() {
@@ -1600,13 +1601,6 @@ function activeDisk() {
 	}
 }
 
-
-function backMyComputer() {
-	$(".default").show();
-	$(".file-list").hide();
-	$("#PathPlace").find("span").html("");
-	activeDisk();
-}
 
 //检查登陆状态
 function check_login(){

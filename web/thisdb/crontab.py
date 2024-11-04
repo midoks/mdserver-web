@@ -20,6 +20,14 @@ def addCrontab(data):
     data['update_time'] = now_time
     return mw.M('crontab').insert(data)
 
+def setCrontabData(cron_id, data):
+    mw.M('crontab').where('id=?', (cron_id,)).update(data)
+    return True
+
+def setCrontabStatus(cron_id, status):
+    mw.M('crontab').where('id=?', (cron_id,)).update({'status':status})
+    return True
+
 def getCrond(id):
     return mw.M('crontab').where('id=?', (id,)).field(__field).find()
 
@@ -41,3 +49,4 @@ def getCrontabList(
     data['count'] = count
     data['list'] = cron_list
     return data
+

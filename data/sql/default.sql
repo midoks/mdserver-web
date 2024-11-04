@@ -43,14 +43,15 @@ CREATE TABLE IF NOT EXISTS `firewall` (
   `port` TEXT,
   `protocol` TEXT DEFAULT 'tcp',
   `ps` TEXT,
-  `add_time` TEXT
+  `add_time` TEXT,
+  `update_time` TEXT
 );
 
 ALTER TABLE `firewall` ADD COLUMN `protocol` TEXT DEFAULT 'tcp';
 
 INSERT INTO `firewall` (`id`, `port`, `protocol`, `ps`, `add_time`) VALUES
-(1, '80',  'tcp','网站默认端口', '0000-00-00 00:00:00'),
-(2, '443', 'tcp/udp', 'HTTPS', '0000-00-00 00:00:00');
+(1, '80',  'tcp','网站默认端口', '0000-00-00 00:00:00','0000-00-00 00:00:00'),
+(2, '443', 'tcp/udp', 'HTTPS', '0000-00-00 00:00:00','0000-00-00 00:00:00');
 
 
 

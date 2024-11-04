@@ -100,13 +100,12 @@ setup.init_db_system()
 
 
 app.config['BASIC_AUTH_OPEN'] = False
-with app.app_context():
-    try:
-        basic_auth = model.getOptionByJson('basic_auth', default={'open':False})
-        if basic_auth['open']:
-            app.config['BASIC_AUTH_OPEN'] = True
-    except Exception as e:
-        pass
+try:
+    basic_auth = model.getOptionByJson('basic_auth', default={'open':False})
+    if basic_auth['open']:
+        app.config['BASIC_AUTH_OPEN'] = True
+except Exception as e:
+    pass
     
 
 
@@ -127,6 +126,7 @@ def sendAuthenticated():
 
 @app.before_request
 def requestCheck():
+    config.APP_START_TIME=time.time()
     # 自定义basic auth认证
     if app.config['BASIC_AUTH_OPEN']:
         basic_auth = model.getOptionByJson('basic_auth', default={'open':False})
@@ -152,6 +152,8 @@ def requestCheck():
 def requestAfter(response):
     response.headers['soft'] = config.APP_NAME
     response.headers['mw-version'] = config.APP_VERSION
+    if mw.isDebugMode():
+        response.headers['mw-debug-cos'] = time.time() - config.APP_START_TIME
     return response
 
 
@@ -163,20 +165,16 @@ def page_unauthorized(error):
 # 设置模板全局变量
 @app.context_processor
 def inject_global_variables():
-    start_t = time.time()
-    ver = config.APP_VERSION;
+    app_ver = config.APP_VERSION
     if mw.isDebugMode():
-        ver = ver + str(time.time())
+        app_ver = app_ver + str(time.time())
 
     data = utils_config.getGlobalVar()
     g_config = {
-        'version': ver,
+        'version': app_ver,
         'title' : 'MW面板',
         'ip' : '127.0.0.1'
     }
-
-    end_t = time.time()
-    print("cos:"+str(end_t-start_t))
     return dict(config=g_config, data=data)
 
 

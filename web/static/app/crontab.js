@@ -83,7 +83,6 @@ function getBackupName(hook_data, name){
 function getCronData(page){
 	var load = layer.msg(lan.public.the,{icon:16,time:0,shade: [0.3, '#000']});
 	$.post("/crontab/list?p="+page,'', function(rdata){
-		console.log(rdata);
 		layer.close(load);
 		var cbody = "";
 		if(rdata == ""){
