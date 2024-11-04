@@ -98,7 +98,7 @@ def getTaskRunPage(
     start = (page - 1) * size
     limit = str(start) + ',' + str(size)
 
-    task_list = mw.M('tasks').where('status!=?', (1,)).field(__FIELD).limit(limit).order('id desc').select()
+    task_list = mw.M('tasks').where('status!=?', (1,)).field(__FIELD).limit(limit).order('id asc').select()
     count = mw.M('tasks').where('status!=?', (1,)).count()
 
     rdata = {}
