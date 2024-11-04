@@ -11,8 +11,11 @@ import shutil
 # reload(sys)
 # sys.setdefaultencoding('utf8')
 
-sys.path.append(os.getcwd() + "/class/core")
-import mw
+try:
+    sys.path.append(os.getcwd() + "/class/core")
+    import mw
+except Exception as e:
+    import core.mw as mw
 
 if mw.isAppleSystem():
     cmd = 'ls /usr/local/lib/ | grep python  | cut -d \\  -f 1 | awk \'END {print}\''
