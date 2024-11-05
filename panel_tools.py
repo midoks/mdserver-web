@@ -158,9 +158,10 @@ def mwcli(mw_input=0):
         open_ssh_port()
         print("|-已开启!")
     elif mw_input == 26:
-        auth_secret = 'data/auth_secret.pl'
-        if os.path.exists(auth_secret):
-            os.remove(auth_secret)
+        two_step_verification = thisdb.getOptionByJson('two_step_verification', default={'open':False})
+        if two_step_verification['open']:
+            two_step_verification['open'] = False
+            thisdb.setOption('two_step_verification', json.dumps(two_step_verification))
             print("|-关闭二次验证成功!")
         else:
             print("|-二次验证已关闭!")

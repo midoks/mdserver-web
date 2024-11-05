@@ -10,9 +10,11 @@
 
 import core.mw as mw
 
+__field = 'id,name,password,login_ip,login_time,phone,email,add_time,update_time'
+
 # 初始化用户信息
 def initAdminUser():
-    data = mw.M('users').field('id').where('id=?', (1,)).find()
+    data = mw.M('users').field(__field).where('id=?', (1,)).find()
     if data is None:
         name = mw.getRandomString(8).lower()
         password = mw.getRandomString(8).lower()
@@ -39,8 +41,7 @@ def getUserByName(name,
     '''
     获取用户信息通过用户名
     '''
-    users_field = 'id,name,password,login_ip,login_time,phone,email,add_time,update_time'
-    data =  mw.M('users').field(users_field).where('name=?', (name,)).find()
+    data =  mw.M('users').field(__field).where('name=?', (name,)).find()
     if data is None:
         return None
     row = {}
@@ -60,8 +61,7 @@ def getUserById(id,
     '''
     获取用户信息通过用户名
     '''
-    users_field = 'id,name,password,login_ip,login_time,phone,email,add_time,update_time'
-    data =  mw.M('users').field(users_field).where('id=?', (1,)).find()
+    data =  mw.M('users').field(__field).where('id=?', (1,)).find()
     if data is None:
         return None
     row = {}
@@ -82,6 +82,11 @@ def getUserByRoot() -> None:
     获取用户信息通过用户名
     '''
     return getUserById(1)
+
+def updateUserLoginTime():
+    now_time = mw.formatDate()
+    mw.M('users').field(__field).where('id=?', (1,)).update({'login_time',now_time})
+    return True
 
 def setUserByRoot(
     name: str | None = None,

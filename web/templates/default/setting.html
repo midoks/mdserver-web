@@ -149,11 +149,11 @@
 				</p>
 
 				<p class="mtb15">
-					<span class="set-tit text-right" title="二次验证" style="float: left;">二次验证</span>
-					<input class="btswitch btswitch-ios" id="cfg_panel_auth" type="checkbox" {{data['auth_secret']}}/>
+					<span class="set-tit text-right" title="二步验证" style="float: left;">二步验证</span>
+					<input class="btswitch btswitch-ios" id="cfg_panel_auth" type="checkbox" {% if data['two_step_verification']['open'] %}checked{% endif %}/>
 	                <label class="btswitch-btn ml5" for="cfg_panel_auth" style="float: left;margin-top:4px;" onclick="setAuthSecretApi()"></label>
 					<button type="button" class="btn btn-default btn-xs panel_api_btn" style="vertical-align: middle; margin-left: 10px" onclick="setAuthBind();">绑定设置</button>
-					<span class="set-info c7">二次验证，加强安全登录</span>
+					<span class="set-info c7">二步验证，加强安全登录</span>
 				</p>
 			</div>
 

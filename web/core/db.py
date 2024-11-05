@@ -39,6 +39,8 @@ class Sql():
     __OPT_FIELD = "*"           # field条件
     __OPT_PARAM = ()            # where值
 
+    __debug = False
+
     def __init__(self):
         self.__DB_FILE = getPanelDir()+'/data/panel.db'
 

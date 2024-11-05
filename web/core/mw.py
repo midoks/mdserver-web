@@ -909,6 +909,19 @@ def panelCmd(method):
 # ------------------------------    panel end    -----------------------------
 
 # ------------------------------ openresty start -----------------------------
+
+def checkWebConfig():
+    op_dir = getServerDir() + '/openresty/nginx'
+    # "ulimit -n 10240 && " +
+    cmd = op_dir + "/sbin/nginx -t -c " + op_dir + "/conf/nginx.conf"
+    result = execShell(cmd)
+    searchStr = 'test is successful'
+    if result[1].find(searchStr) == -1:
+        msg = getInfo('配置文件错误: {1}', (result[1],))
+        writeLog("软件管理", msg)
+        return result[1]
+    return True
+
 def restartWeb():
     return opWeb("reload")
 

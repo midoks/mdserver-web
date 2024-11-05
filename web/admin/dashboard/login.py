@@ -20,8 +20,6 @@ from flask import request,g
 from admin.common import isLogined
 from admin.user_login_check import panel_login_required
 from admin import cache,session
-from admin import model
-from admin.model import db,TempLogin,Users
 
 import core.mw as mw
 import thisdb
@@ -63,7 +61,7 @@ def login_temp_user(token):
 
     stime = int(time.time())
 
-    tmp_data = model.getTempLoginByToken(token)
+    tmp_data = thisdb.getTempLoginByToken(token)
     if not tmp_data:
         setErrorNum(skey)
         return '验证失败!'
@@ -73,12 +71,10 @@ def login_temp_user(token):
         return "过期"
 
     user_data = thisdb.getUserById(1)
-
     login_addr = mw.getClientIp() + ":" + str(request.environ.get('REMOTE_PORT'))
     mw.writeLog('用户临时登录', "登录成功,帐号:{1},登录IP:{2}",(user_data['name'], login_addr))
 
-    TempLogin.query.filter(TempLogin.id==tmp_data['id']).update({"login_time": stime, 'state': 1, 'login_addr': login_addr})
-    db.session.commit()
+    mw.M('temp_login').where('id=?',(tmp_data['id'],)).update({"login_time": stime, 'state': 1, 'login_addr': login_addr})
     
     session['login'] = True
     session['username'] = user_data['name']
@@ -105,11 +101,11 @@ def login():
         session['login'] = False
         session['overdue'] = 0
 
-    db_path = model.getOption('admin_path')
+    db_path = thisdb.getOption('admin_path')
     if db_path == '':
         return render_template('default/login.html')
     else:
-        unauthorized_status = model.getOption('unauthorized_status')
+        unauthorized_status = thisdb.getOption('unauthorized_status')
         if unauthorized_status == '0':
             return render_template('default/path.html')
         return Response(status=int(unauthorized_status))
@@ -133,6 +129,32 @@ def check_login():
     if isLogined():
         return mw.returnData(True,'已登录')
     return mw.returnData(False,'未登录')
+
+@blueprint.route("/verify_login", methods=['POST'])
+def verifyLogin():
+    import pyotp
+
+    username = request.form.get('username', '').strip()
+    password = request.form.get('password', '').strip()
+    password = mw.md5(password)
+
+    info = thisdb.getUserByRoot()
+    if info['name'] != username or info['password'] != password:
+        return mw.returnJson(-1, "密码错误?")
+
+    auth = request.form.get('auth', '').strip()    
+    two_step_verification = thisdb.getOptionByJson('two_step_verification', default={'open':False})
+    if two_step_verification['open']:
+        sec = mw.deDoubleCrypt('mdserver-web', two_step_verification['secret'])
+        totp = pyotp.TOTP(sec)
+        if totp.verify(auth):
+            session['login'] = True
+            session['username'] = info['name']
+            session['overdue'] = int(time.time()) + 7 * 24 * 60 * 60
+
+            thisdb.updateUserLoginTime()
+            return mw.returnData(1, '二次验证成功!')
+    return mw.returnData(-1, '二次验证失败!')
 
 # 执行登录操作
 @blueprint.route('/do_login', endpoint='do_login', methods=['POST'])
@@ -181,9 +203,15 @@ def do_login():
         mw.writeLog('用户登录', mw.getInfo(msg))
         return mw.returnData(-1, mw.getInfo("用户名或密码错误,您还可以尝试[{1}]次!", (str(login_cache_count - login_cache_limit))))
 
+    cache.delete('login_cache_limit')
+    # 二步验证密钥
+    two_step_verification = thisdb.getOptionByJson('two_step_verification', default={'open':False})
+    if two_step_verification['open']:
+        return mw.returnData(2, '需要两步验证!')
 
     session['login'] = True
     session['username'] = info['name']
     session['overdue'] = int(time.time()) + 7 * 24 * 60 * 60
-
+    
+    thisdb.updateUserLoginTime()
     return mw.returnJson(1, '登录成功,正在跳转...')

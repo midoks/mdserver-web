@@ -231,7 +231,7 @@ $('#login-button').click(function(){
 			layer.prompt({
 			 	formType: 3,
 			 	value: '',
-			 	title: '二次验证',
+			 	title: '二步验证',
 			}, function(value, index, elem){
 			 	$.post('/verify_login',{'auth':value,'username':username,'password':password},function(vdata){
 			 		if (vdata.status < 0){

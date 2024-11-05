@@ -105,12 +105,13 @@ def getSystemVersion():
 
 def getBootTime():
     # 取系统启动时间
-    uptime = mw.readFile('/proc/uptime')
-    if uptime == False:
+    if os.path.exists('/proc/uptime'):
+        uptime = mw.readFile('/proc/uptime')
+        run_time = uptime.split()[0]
+    else:
         start_time = psutil.boot_time()
         run_time = time.time() - start_time
-    else:
-        run_time = uptime.split()[0]
+        
     tStr = float(run_time)
     min = tStr / 60
     hours = min / 60

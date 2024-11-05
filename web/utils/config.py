@@ -62,10 +62,14 @@ def getGlobalVar():
     else:
         data['ipv6'] = ''
 
+    # 获取ROOT用户名
+    data['username'] = mw.M('users').where("id=?", (1,)).getField('name')
+
     # 获取未认证状态信息
     unauthorized_status = thisdb.getOption('unauthorized_status', default='0')
     data['unauthorized_status'] = getUnauthStatus(code=unauthorized_status)
     data['basic_auth'] = thisdb.getOptionByJson('basic_auth', default={'open':False})
+    data['two_step_verification'] = thisdb.getOptionByJson('two_step_verification', default={'open':False})
 
     # 服务器时间
     sformat = 'date +"%Y-%m-%d %H:%M:%S %Z %z"'

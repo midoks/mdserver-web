@@ -1236,13 +1236,13 @@ function setTempAccess(){
 	});
 }
 
-//二次验证
+//二步验证
 function setAuthBind(){
 	$.post('/setting/get_auth_secret', {}, function(rdata){
 		console.log(rdata);
 		var tip = layer.open({
 			area: ['500px', '355px'],
-			title: '二次验证设置',
+			title: '二步验证设置',
 			closeBtn:1,
 			shift: 0,
 			type: 1,

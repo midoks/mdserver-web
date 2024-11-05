@@ -51,7 +51,7 @@ mw_start_debug(){
 	fi
 
 	python3 panel_task.py >> $DIR/logs/panel_task.log 2>&1 &
-	port=7200    
+	port=7200
     if [ -f /www/server/mdserver-web/data/port.pl ];then
         port=$(cat /www/server/mdserver-web/data/port.pl)
     fi
@@ -64,7 +64,11 @@ mw_start_debug(){
 }
 
 mw_start_panel(){
-	cd ${DIR}/web && gunicorn -b :7200 -w 1  app:app
+	port=7200
+	if [ -f ${DIR}/data/port.pl ];then
+        port=$(cat ${DIR}/data/port.pl)
+    fi
+	cd ${DIR}/web && gunicorn -b :${port} -w 1  app:app
 }
 
 mw_start_bgtask(){

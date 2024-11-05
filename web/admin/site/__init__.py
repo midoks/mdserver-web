@@ -26,7 +26,7 @@ blueprint = Blueprint('site', __name__, url_prefix='/site', template_folder='../
 def index():
     return render_template('site.html')
 
-# 插件列表
+# 站点列表
 @blueprint.route('/list', endpoint='list', methods=['GET','POST'])
 @panel_login_required
 def list():
@@ -42,10 +42,53 @@ def list():
     data['page'] = mw.getPage({'count':info['count'],'tojs':'getWeb','p':p, 'row':limit})
     return data
 
+#添加站点
+@blueprint.route('/add', endpoint='add',methods=['POST'])
+@panel_login_required
+def add():
+    webname = request.form.get('webinfo', '')
+    ps = request.form.get('ps', '')
+    path = request.form.get('path', '')
+    version = request.form.get('version', '')
+    port = request.form.get('port', '')
+    return []
+
+# 获取站点类型
 @blueprint.route('/get_site_types', endpoint='get_site_types',methods=['POST'])
 @panel_login_required
 def get_site_types():
     return []
+
+# 获取站点根目录
+@blueprint.route('/get_root_dir', endpoint='get_root_dir',methods=['POST'])
+@panel_login_required
+def get_root_dir():
+    data = {}
+    data['dir'] = mw.getWwwDir()
+    return data
+
+# 检查OpenResty安装/启动状态
+@blueprint.route('/check_web_status', endpoint='check_web_status',methods=['POST'])
+@panel_login_required
+def check_web_status():
+    '''
+    创建站点检查web服务
+    '''
+    if not mw.isInstalledWeb():
+        return mw.returnJson(False, '请安装并启动OpenResty服务!')
+
+    # 这个快点
+    pid = mw.getServerDir() + '/openresty/nginx/logs/nginx.pid'
+    if not os.path.exists(pid):
+        return mw.returnData(False, '请启动OpenResty服务!')
+    return mw.returnData(True, 'OK')
+
+# 获取PHP版本
+@blueprint.route('/get_php_version', endpoint='get_php_version',methods=['POST'])
+@panel_login_required
+def get_php_version():
+    return site.getPhpVersion()
+
 
 @blueprint.route('/get_cli_php_version', endpoint='get_cli_php_version',methods=['POST'])
 @panel_login_required

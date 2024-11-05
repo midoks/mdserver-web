@@ -32,6 +32,9 @@ def init_option():
     # basic auth 配置
     thisdb.setOption('basic_auth', json.dumps({'open':False}))
 
+    # 二步验证|默认关闭
+    thisdb.setOption('two_step_verification', json.dumps({'open':False}))
+
     # 开启后台任务
     # model.setOption('run_bg_task', 'close')
 
