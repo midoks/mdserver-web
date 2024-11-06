@@ -338,7 +338,7 @@ class sites(object):
 
         thisdb.setOption('default_site', name)
         mw.restartWeb()
-        return mw.returnJson(True, '设置成功!')
+        return mw.returnData(True, '设置成功!')
 
     def setCliPhpVersion(self, version):
         php_bin = '/usr/bin/php'
