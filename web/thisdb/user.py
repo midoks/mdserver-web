@@ -85,7 +85,7 @@ def getUserByRoot() -> None:
 
 def updateUserLoginTime():
     now_time = mw.formatDate()
-    mw.M('users').field(__field).where('id=?', (1,)).update({'login_time',now_time})
+    mw.M('users').field(__field).where('id=?', (1,)).update({'login_time':now_time})
     return True
 
 def setUserByRoot(

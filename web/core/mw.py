@@ -879,6 +879,33 @@ def isRestart():
         return False
     return True
 
+def getAcmeDir():
+    acme = '/root/.acme.sh'
+    if isAppleSystem():
+        cmd = "who | sed -n '2, 1p' |awk '{print $1}'"
+        user = execShell(cmd)[0].strip()
+        acme = '/Users/' + user + '/.acme.sh'
+    if not os.path.exists(acme):
+        acme = '/.acme.sh'
+    return acme
+
+
+def getAcmeDomainDir(domain):
+    acme_dir = getAcmeDir()
+    acme_domain = acme_dir + '/' + domain
+    acme_domain_ecc = acme_domain + '_ecc'
+    if os.path.exists(acme_domain_ecc):
+        acme_domain = acme_domain_ecc
+    return acme_domain
+
+
+def fileNameCheck(filename):
+    f_strs = [';', '&', '<', '>']
+    for fs in f_strs:
+        if filename.find(fs) != -1:
+            return False
+    return True
+
 def triggerTask():
     isTask = getPanelDir() + '/logs/panel_task.lock'
     writeFile(isTask, 'True')
@@ -924,6 +951,10 @@ def checkWebConfig():
 
 def restartWeb():
     return opWeb("reload")
+
+def deleteFile(file):
+    if os.path.exists(file):
+        os.remove(file)
 
 def isInstalledWeb():
     path = getServerDir() + '/openresty/nginx/sbin/nginx'

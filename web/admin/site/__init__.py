@@ -17,6 +17,7 @@ from admin.model import Sites
 from admin.user_login_check import panel_login_required
 
 from utils.plugin import plugin as MwPlugin
+from utils.site import sites as MwSites
 import utils.site as site
 import core.mw as mw
 import thisdb
@@ -42,7 +43,7 @@ def list():
     data['page'] = mw.getPage({'count':info['count'],'tojs':'getWeb','p':p, 'row':limit})
     return data
 
-#添加站点
+# 添加站点
 @blueprint.route('/add', endpoint='add',methods=['POST'])
 @panel_login_required
 def add():
@@ -51,7 +52,15 @@ def add():
     path = request.form.get('path', '')
     version = request.form.get('version', '')
     port = request.form.get('port', '')
-    return []
+    return MwSites.instance().add(webname, port, ps, path, version)
+
+# 站点删除
+@blueprint.route('/delete', endpoint='delete',methods=['POST'])
+@panel_login_required
+def delete():
+    site_id = request.form.get('id', '')
+    path = request.form.get('path', '')
+    return MwSites.instance().delete(site_id, path)
 
 # 获取站点类型
 @blueprint.route('/get_site_types', endpoint='get_site_types',methods=['POST'])
@@ -87,8 +96,38 @@ def check_web_status():
 @blueprint.route('/get_php_version', endpoint='get_php_version',methods=['POST'])
 @panel_login_required
 def get_php_version():
-    return site.getPhpVersion()
+    return MwSites.instance().getPhpVersion()
 
+
+# 设置网站到期
+@blueprint.route('/set_end_date', endpoint='set_end_date',methods=['POST'])
+@panel_login_required
+def set_end_date():
+    site_id = request.form.get('id', '')
+    edate = request.form.get('edate', '')
+    return MwSites.instance().setEndDate(site_id, edate)
+
+
+# 设置网站备注
+@blueprint.route('/set_ps', endpoint='set_ps',methods=['POST'])
+@panel_login_required
+def set_ps():
+    site_id = request.form.get('id', '')
+    ps = request.form.get('ps', '')
+    return MwSites.instance().setPs(site_id, ps)
+
+
+# 设置默认网站信息
+@blueprint.route('/get_default_site', endpoint='get_default_site',methods=['POST'])
+@panel_login_required
+def get_default_site():
+    return MwSites.instance().getDefaultSite()
+
+@blueprint.route('/set_default_site', endpoint='set_default_site',methods=['POST'])
+@panel_login_required
+def set_default_site():
+    name = request.form.get('name', '')
+    return MwSites.instance().setDefaultSite(name)
 
 @blueprint.route('/get_cli_php_version', endpoint='get_cli_php_version',methods=['POST'])
 @panel_login_required
@@ -98,7 +137,7 @@ def get_cli_php_version():
         return mw.returnData(False, '未安装PHP,无法设置')
 
     php_bin = '/usr/bin/php'
-    php_versions = site.getPhpVersion()
+    php_versions = MwSites.instance().getPhpVersion()
     php_versions = php_versions[1:]
 
     if len(php_versions) < 1:
@@ -117,35 +156,7 @@ def get_cli_php_version():
 def set_cli_php_version():
     if mw.isAppleSystem():
         return mw.returnData(False, "开发机不可设置!")
-
     version = request.form.get('version', '')
-
-    php_bin = '/usr/bin/php'
-    php_bin_src = "/www/server/php/%s/bin/php" % version
-    php_ize = '/usr/bin/phpize'
-    php_ize_src = "/www/server/php/%s/bin/phpize" % version
-    php_fpm = '/usr/bin/php-fpm'
-    php_fpm_src = "/www/server/php/%s/sbin/php-fpm" % version
-    php_pecl = '/usr/bin/pecl'
-    php_pecl_src = "/www/server/php/%s/bin/pecl" % version
-    php_pear = '/usr/bin/pear'
-    php_pear_src = "/www/server/php/%s/bin/pear" % version
-    if not os.path.exists(php_bin_src):
-        return mw.returnData(False, '指定PHP版本未安装!')
-
-    is_chattr = mw.execShell('lsattr /usr|grep /usr/bin')[0].find('-i-')
-    if is_chattr != -1:
-        mw.execShell('chattr -i /usr/bin')
-    mw.execShell("rm -f " + php_bin + ' ' + php_ize + ' ' +
-                 php_fpm + ' ' + php_pecl + ' ' + php_pear)
-    mw.execShell("ln -sf %s %s" % (php_bin_src, php_bin))
-    mw.execShell("ln -sf %s %s" % (php_ize_src, php_ize))
-    mw.execShell("ln -sf %s %s" % (php_fpm_src, php_fpm))
-    mw.execShell("ln -sf %s %s" % (php_pecl_src, php_pecl))
-    mw.execShell("ln -sf %s %s" % (php_pear_src, php_pear))
-    if is_chattr != -1:
-        mw.execShell('chattr +i /usr/bin')
-    mw.writeLog('面板设置', '设置PHP-CLI版本为: %s' % version)
-    return mw.returnData(True, '设置成功!')
+    return MwSites.instance().setCliPhpVersion(version)
 
 

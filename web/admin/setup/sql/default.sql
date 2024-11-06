@@ -12,9 +12,9 @@ CREATE TABLE IF NOT EXISTS `backup` (
 CREATE TABLE IF NOT EXISTS `binding` (
   `id` INTEGER PRIMARY KEY AUTOINCREMENT,
   `pid` INTEGER,
+  `port` INTEGER,
   `domain` TEXT,
   `path` TEXT,
-  `port` INTEGER,
   `add_time` TEXT
 );
 
@@ -49,7 +49,7 @@ CREATE TABLE IF NOT EXISTS `firewall` (
 
 ALTER TABLE `firewall` ADD COLUMN `protocol` TEXT DEFAULT 'tcp';
 
-INSERT INTO `firewall` (`id`, `port`, `protocol`, `ps`, `add_time`) VALUES
+INSERT INTO `firewall` (`id`, `port`, `protocol`, `ps`, `add_time`, `update_time`) VALUES
 (1, '80',  'tcp','网站默认端口', '0000-00-00 00:00:00','0000-00-00 00:00:00'),
 (2, '443', 'tcp/udp', 'HTTPS', '0000-00-00 00:00:00','0000-00-00 00:00:00');
 
