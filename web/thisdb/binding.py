@@ -10,6 +10,8 @@
 
 import core.mw as mw
 
+# 站点-子目录绑定
+
 __FIELD = 'id,pid,domain,port,path,add_time'
 
 def addBinding(pid, domain, port, path):
