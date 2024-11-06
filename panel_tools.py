@@ -23,8 +23,10 @@ web_dir = os.getcwd() + "/web"
 os.chdir(web_dir)
 sys.path.append(web_dir)
 
+from utils.firewall import firewall as MwFirewall
 import core.mw as mw
 import thisdb
+
 
 INIT_DIR = "/etc/rc.d/init.d"
 if mw.isAppleSystem():
@@ -98,10 +100,9 @@ def mwcli(mw_input=0):
         in_port = mw_input_cmd("请输入新的面板端口：")
         in_port_int = int(in_port.strip())
         if in_port_int < 65536 and in_port_int > 0:
-            import firewall_api
-            firewall_api.firewall_api().addAcceptPortArgs(
-                in_port, 'WEB面板[TOOLS修改]', 'port')
-            mw.writeFile('data/port.pl', in_port)
+            MwFirewall.instance().addAcceptPort(in_port, 'WEB面板[TOOLS修改]', 'port')
+            panel_port = mw.getPanelDir() + '/data/port.pl'
+            mw.writeFile(panel_port, in_port)
             os.system(INIT_CMD + " restart_panel")
             os.system(INIT_CMD + " default")
         else:
@@ -181,7 +182,7 @@ def mwcli(mw_input=0):
         if not run_cmd:
             mw.echoInfo("未检测到防火墙!")
     elif mw_input == 100:
-        php_conf = 'plugins/php/info.json'
+        php_conf = mw.getPanelDir() + '/plugins/php/info.json'
         if os.path.exists(php_conf):
             cont = mw.readFile(php_conf)
             cont = re.sub("\"53\"", "\"52\",\"53\"", cont)
@@ -189,7 +190,7 @@ def mwcli(mw_input=0):
             mw.writeFile(php_conf, cont)
             mw.echoInfo("执行PHP52显示成功!")
     elif mw_input == 101:
-        php_conf = 'plugins/php/info.json'
+        php_conf = mw.getPanelDir() + '/plugins/php/info.json'
         if os.path.exists(php_conf):
             cont = mw.readFile(php_conf)
             cont = re.sub("\"52\",", "", cont)
@@ -203,7 +204,7 @@ def mwcli(mw_input=0):
 
 
 def open_ssh_port():
-    import firewall_api
+    
     find_ssh_port_cmd = "cat /etc/ssh/sshd_config | grep '^Port \\d*' | tail -1"
     cmd_data = mw.execShell(find_ssh_port_cmd)
     ssh_port = cmd_data[0].replace("Port ", '').strip()
@@ -211,13 +212,13 @@ def open_ssh_port():
         ssh_port = '22'
 
     print("|-SSH端口: "+ str(ssh_port))
-    firewall_api.firewall_api().addAcceptPortArgs(ssh_port, 'SSH远程管理服务', 'port')
+    MwFirewall.instance().addAcceptPort(ssh_port, 'SSH远程管理服务', 'port')
     return True
 
 
 def set_panel_pwd(password, ncli=False):
-    info = model.getUserByRoot()
-    model.setUserByRoot(password=password)
+    info = thisdb.getUserByRoot()
+    thisdb.setUserByRoot(password=password)
     if ncli:
         print("|-username: " + info['name'])
         print("|-password: " + password)
