@@ -262,7 +262,7 @@ class sites(object):
     def setEndDate(self, site_id, end_date):
         info = thisdb.getSitesById(site_id)
         thisdb.setSitesData(site_id, edate=end_date)
-        mw.writeLog('网站', '设置成功,站点【{1}】到期【{2}】后将自动停止!', (info['name'], end_date,))
+        mw.writeLog('网站管理', '设置成功,站点【{1}】到期【{2}】后将自动停止!', (info['name'], end_date,))
         return mw.returnData(True, '设置成功,站点到期后将自动停止!')
 
     # 设置网站备注
@@ -276,8 +276,7 @@ class sites(object):
         data = {}
         data['sites'] = mw.M('sites').field('name').order('id desc').select()
         data['default_site'] = thisdb.getOption('default_site', default='')
-        return mw.getJson(data)
-
+        return data
 
     # 获取域名列表
     def getDomain(self, pid):
