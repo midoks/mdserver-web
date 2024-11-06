@@ -14,6 +14,7 @@ from .user import *
 
 from .sites import *
 from .domain import *
+from .binding import *
 
 from .tasks import *
 from .logs import *

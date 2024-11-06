@@ -76,6 +76,31 @@ def get_root_dir():
     data['dir'] = mw.getWwwDir()
     return data
 
+# 获取站点配置
+@blueprint.route('/get_host_conf', endpoint='get_host_conf',methods=['POST'])
+@panel_login_required
+def get_host_conf():
+    siteName = request.form.get('siteName', '')      
+    host = MwSites.instance().getHostConf(siteName)
+    return {'host': host}
+
+
+# 获取站点PHP版本
+@blueprint.route('/get_site_php_version', endpoint='get_site_php_version',methods=['POST'])
+@panel_login_required
+def get_site_php_version():
+    siteName = request.form.get('siteName', '')      
+    return MwSites.instance().getSitePhpVersion(siteName)
+
+
+# 设置站点PHP版本
+@blueprint.route('/set_php_version', endpoint='set_php_version',methods=['POST'])
+@panel_login_required
+def set_php_version():
+    siteName = request.form.get('siteName', '')
+    version = request.form.get('version', '') 
+    return MwSites.instance().setPhpVersion(siteName,version)
+
 # 检查OpenResty安装/启动状态
 @blueprint.route('/check_web_status', endpoint='check_web_status',methods=['POST'])
 @panel_login_required
@@ -122,6 +147,14 @@ def set_ps():
 @panel_login_required
 def get_default_site():
     return MwSites.instance().getDefaultSite()
+
+# 站点删除
+@blueprint.route('/get_domain', endpoint='get_domain',methods=['POST'])
+@panel_login_required
+def get_domain():
+    site_id = request.form.get('id', '')
+    return MwSites.instance().getDomain(site_id)
+
 
 @blueprint.route('/set_default_site', endpoint='set_default_site',methods=['POST'])
 @panel_login_required

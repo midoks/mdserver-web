@@ -200,6 +200,7 @@ class sites(object):
 
     def delete(self, site_id, path):
         info = thisdb.getSitesById(site_id)
+        print(info)
         webname = info['name']
         self.deleteWSLogs(webname)
 
@@ -239,7 +240,8 @@ class sites(object):
         return mw.returnData(True, '站点【%s】删除成功!' % webname)
 
     def nginxAddConf(self):
-        source_tpl = mw.getRunDir() + '/data/tpl/nginx.conf'
+        source_tpl = mw.getPanelDir() + '/data/tpl/nginx.conf'
+        print(source_tpl)
         vhost_file = self.vhostPath + '/' + self.siteName + '.conf'
         content = mw.readFile(source_tpl)
 
@@ -275,6 +277,43 @@ class sites(object):
         data['sites'] = mw.M('sites').field('name').order('id desc').select()
         data['default_site'] = thisdb.getOption('default_site', default='')
         return mw.getJson(data)
+
+
+    # 获取域名列表
+    def getDomain(self, pid):
+        return thisdb.getDomainByPid(pid)
+
+
+    def getSitePhpVersion(self, siteName):
+        conf = mw.readFile(self.getHostConf(siteName))
+        rep = r"enable-php-(.*)\.conf"
+        find_php_cnf = re.search(rep, conf)
+
+        def_pver = '00'
+        if find_php_cnf:
+            tmp = find_php_cnf.groups()
+            def_pver = tmp[0]
+            
+        data = {}
+        data['phpversion'] = def_pver
+        return data
+
+
+    def setPhpVersion(self, siteName, version):
+        # nginx
+        file = self.getHostConf(siteName)
+        conf = mw.readFile(file)
+        if conf:
+            rep = r"enable-php-(.*)\.conf"
+            tmp = re.search(rep, conf).group()
+            conf = conf.replace(tmp, 'enable-php-' + version + '.conf')
+            mw.writeFile(file, conf)
+
+        msg = mw.getInfo('成功切换网站[{1}]的PHP版本为PHP-{2}', (siteName, version))
+        mw.writeLog("网站管理", msg)
+        mw.restartWeb()
+        return mw.returnJson(True, msg)
+
 
     def setDefaultSite(self, name):
         # 清理旧的
