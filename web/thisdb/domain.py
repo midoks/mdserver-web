@@ -23,7 +23,8 @@ def addDomain(pid, name, port):
     return mw.M('domain').insert(insert_data)
 
 def getDomainByPid(pid):
-    return mw.M('domain').where("pid=?", (pid,)).field(__FIELD).select()
+    # .debug(True)
+    return mw.M('domain').field(__FIELD).where("pid=?", (pid,)).select()
 
 
 def deleteDomainId(domain_id):

@@ -183,6 +183,28 @@ def set_ps():
     ps = request.form.get('ps', '')
     return MwSites.instance().setPs(site_id, ps)
 
+# 站点绑定域名
+@blueprint.route('/get_domain', endpoint='get_domain',methods=['POST'])
+@panel_login_required
+def get_domain():
+    site_id = request.form.get('pid', '')
+    return MwSites.instance().getDomain(site_id)
+
+# 获取默认为静态列表
+@blueprint.route('/get_rewrite_list', endpoint='get_rewrite_list',methods=['POST'])
+@panel_login_required
+def get_rewrite_list():
+    return MwSites.instance().getRewriteList()
+
+# 获取默认为静态列表
+@blueprint.route('/get_rewrite_conf', endpoint='get_rewrite_conf',methods=['POST'])
+@panel_login_required
+def get_rewrite_conf():
+    siteName = request.form.get('siteName', '')
+    rewrite = MwSites.instance().getRewriteConf(siteName)
+    return {'rewrite': rewrite}
+
+
 
 # 设置默认网站信息
 @blueprint.route('/get_default_site', endpoint='get_default_site',methods=['POST'])
@@ -190,14 +212,7 @@ def set_ps():
 def get_default_site():
     return MwSites.instance().getDefaultSite()
 
-# 站点删除
-@blueprint.route('/get_domain', endpoint='get_domain',methods=['POST'])
-@panel_login_required
-def get_domain():
-    site_id = request.form.get('id', '')
-    return MwSites.instance().getDomain(site_id)
-
-
+# 设置默认站
 @blueprint.route('/set_default_site', endpoint='set_default_site',methods=['POST'])
 @panel_login_required
 def set_default_site():

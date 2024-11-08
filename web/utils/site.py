@@ -281,8 +281,18 @@ class sites(object):
 
     # 获取域名列表
     def getDomain(self, pid):
-        return thisdb.getDomainByPid(pid)
+        data =  thisdb.getDomainByPid(pid)
+        return data
 
+    def getRewriteList(self):
+        rewriteList = {}
+        rewriteList['rewrite'] = []
+        rewriteList['rewrite'].append('0.当前')
+        rewrite_nginx_dir = mw.getPanelDir() + '/rewrite/nginx'
+        for ds in os.listdir(rewrite_nginx_dir):
+            rewriteList['rewrite'].append(ds[0:len(ds) - 5])
+        rewriteList['rewrite'] = sorted(rewriteList['rewrite'])
+        return rewriteList
 
     def getSitePhpVersion(self, siteName):
         conf = mw.readFile(self.getHostConf(siteName))
