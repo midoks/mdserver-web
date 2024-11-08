@@ -126,6 +126,14 @@ def get_host_conf():
     host = MwSites.instance().getHostConf(siteName)
     return {'host': host}
 
+# 设置站点配置
+@blueprint.route('/save_host_conf', endpoint='save_host_conf',methods=['POST'])
+@panel_login_required
+def save_host_conf():
+    path = request.form.get('path', '')
+    data = request.form.get('data', '')
+    encoding = request.form.get('encoding', '')
+    return MwSites.instance().saveHostConf(path,data,encoding)
 
 # 获取站点PHP版本
 @blueprint.route('/get_site_php_version', endpoint='get_site_php_version',methods=['POST'])
@@ -203,6 +211,28 @@ def get_rewrite_conf():
     siteName = request.form.get('siteName', '')
     rewrite = MwSites.instance().getRewriteConf(siteName)
     return {'rewrite': rewrite}
+
+# 获取防盗链信息
+@blueprint.route('/get_security', endpoint='get_security',methods=['POST'])
+@panel_login_required
+def get_security():
+    site_id = request.form.get('id', '')
+    return MwSites.instance().getSecurity(site_id)
+
+# 设置防盗链
+@blueprint.route('/set_security', endpoint='set_security',methods=['POST'])
+@panel_login_required
+def set_security():
+    fix = request.form.get('fix', '')
+    domains = request.form.get('domains', '')
+    status = request.form.get('status', '')
+    name = request.form.get('name', '')
+    none = request.form.get('none', '')
+    site_id = request.form.get('id', '')
+    return MwSites.instance().setSecurity(site_id, fix, domains, status, none)
+
+
+
 
 # 设置默认网站信息
 @blueprint.route('/get_default_site', endpoint='get_default_site',methods=['POST'])

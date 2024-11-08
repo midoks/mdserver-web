@@ -94,6 +94,21 @@ class sites(object):
     def getHostConf(self, siteName):
         return self.vhostPath + '/' + siteName + '.conf'
 
+    def saveHostConf(self, path, data, encoding):
+        import utils.file as file
+        mw.backFile(path)
+        rdata = file.saveBody(path, data, encoding)
+
+        if rdata['status']:
+            isError = mw.checkWebConfig()
+            if isError != True:
+                mw.restoreFile(path)
+                msg = 'ERROR: 检测到配置文件有错误,请先排除后再操作<br><br><a style="color:red;">' + isError.replace("\n", '<br>') + '</a>'
+                return mw.returnData(False, msg)
+            mw.restartWeb()
+            mw.removeBackFile(path)
+        return rdata
+
     def getRewriteConf(self, siteName):
         return self.rewritePath + '/' + siteName + '.conf'
 
@@ -293,6 +308,89 @@ class sites(object):
             rewriteList['rewrite'].append(ds[0:len(ds) - 5])
         rewriteList['rewrite'] = sorted(rewriteList['rewrite'])
         return rewriteList
+
+    def getSecurity(self, site_id):
+        info = thisdb.getSitesById(site_id)
+        name = info['name']
+        filename = self.getHostConf(name)
+        conf = mw.readFile(filename)
+        data = {}
+        if conf.find('SECURITY-START') != -1:
+            rep = "#SECURITY-START(\n|.){1,500}#SECURITY-END"
+            tmp = re.search(rep, conf).group()
+            data['fix'] = re.search(r"\(.+\)\$", tmp).group().replace('(', '').replace(')$', '').replace('|', ',')
+
+            data['status'] = False
+            data['none'] = False
+
+            valid_referers = re.search(
+                r"valid_referers\s+(.+);\n", tmp)
+            valid_referers_none = re.search(
+                r"valid_referers\s+none\s+blocked\s+(.+);\n", tmp)
+
+            if valid_referers or valid_referers_none:
+                data['status'] = True
+
+            if valid_referers_none:
+                domain_t = valid_referers_none.groups()[0].split()
+                data['domains'] = ','.join(domain_t)
+                data['none'] = True
+            elif valid_referers:
+                domain_t = valid_referers.groups()[0].split()
+                data['domains'] = ','.join(domain_t)
+                data['none'] = False
+        else:
+            data['fix'] = 'gif|jpg|jpeg|png|bmp|swf|js|css|ttf|woff2'
+            domains = thisdb.getDomainByPid(site_id)
+            tmp = []
+            for domain in domains:
+                tmp.append(domain['name'])
+            data['domains'] = ','.join(tmp)
+            data['status'] = False
+            data['none'] = False
+        return data
+
+    def setSecurity(self, site_id, fix, domains, status, none=''):
+        info = thisdb.getSitesById(site_id)
+        name = info['name']
+
+        if len(fix) < 2:
+            return mw.returnData(False, 'URL后缀不能为空!')
+
+        file = self.getHostConf(name)
+        if os.path.exists(file):
+            conf = mw.readFile(file)
+            if status == 'false':
+                rep = r"\s{0,4}#SECURITY-START(\n|.){1,500}#SECURITY-END\n?"
+                conf = re.sub(rep, '', conf)
+                mw.writeLog('网站管理', '站点[' + name + ']已关闭防盗链设置!')
+            else:
+                rep = r"\s{0,4}#SECURITY-START(\n|.){1,500}#SECURITY-END\n?"
+                conf = re.sub(rep, '', conf)
+
+                valid_referers = domains.strip().replace(',', ' ')
+                if none == 'true':
+                    valid_referers = 'none blocked ' + valid_referers
+
+                pre_path = self.setupPath + "/php/conf"
+                re_path = r"include\s+" + pre_path + "/enable-php-"
+                rconf = r'''#SECURITY-START 防盗链配置
+    location ~ .*\.(%s)$
+    {
+        expires      30d;
+        access_log /dev/null;
+        valid_referers %s;
+        if ($invalid_referer){
+           return 404;
+        }
+    }
+    #SECURITY-END
+    include %s/enable-php-''' % (fix.strip().replace(',', '|'), valid_referers, pre_path)
+                conf = re.sub(re_path, rconf, conf)
+                mw.writeLog('网站管理', '站点[' + name + ']已开启防盗链!')
+            mw.writeFile(file, conf)
+        mw.restartWeb()
+        return mw.returnData(True, '设置成功!')
 
     def getSitePhpVersion(self, siteName):
         conf = mw.readFile(self.getHostConf(siteName))

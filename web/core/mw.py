@@ -213,6 +213,43 @@ def writeFile(filename, content, mode='w+'):
         return False
 
 
+def backFile(file, act=None):
+    """
+        @name 备份配置文件
+        @param file 需要备份的文件
+        @param act 如果存在，则备份一份作为默认配置
+    """
+    file_type = "_bak"
+    if act:
+        file_type = "_def"
+
+    # print("cp -p {0} {1}".format(file, file + file_type))
+    execShell("cp -p {0} {1}".format(file, file + file_type))
+
+
+def removeBackFile(file, act=None):
+    """
+        @name 删除备份配置文件
+        @param file 需要删除备份文件
+        @param act 如果存在，则还原默认配置
+    """
+    file_type = "_bak"
+    if act:
+        file_type = "_def"
+    execShell("rm -rf {0}".format(file + file_type))
+
+
+def restoreFile(file, act=None):
+    """
+        @name 还原配置文件
+        @param file 需要还原的文件
+        @param act 如果存在，则还原默认配置
+    """
+    file_type = "_bak"
+    if act:
+        file_type = "_def"
+    execShell("cp -p {1} {0}".format(file, file + file_type))
+
 def systemdCfgDir():
     # ubuntu
     cfg_dir = '/lib/systemd/system'

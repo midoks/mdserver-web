@@ -47,6 +47,25 @@ def getFileBody(path):
         return mw.returnData(False, '文件未正常打开!')
     return mw.returnData(True, 'OK', data)
 
+def saveBody(path, data, encoding):
+    if not os.path.exists(path):
+        return mw.returnData(False, '文件不存在')
+    try:
+        if encoding == 'ascii':
+            encoding = 'utf-8'
+
+        data = data.encode(encoding, errors='ignore').decode(encoding)
+        fp = open(path, 'w+', encoding=encoding)
+        fp.write(data)
+        fp.close()
+
+        if path.find("web_conf") > 0:
+            mw.restartWeb()
+        mw.writeLog('文件管理', '文件[{1}]保存成功', (path,))
+        return mw.returnData(True, '文件保存成功')
+    except Exception as ex:
+        return mw.returnData(False, '文件保存错误:' + str(ex))
+
 # 获取文件权限描述
 def getFileStatsDesc(
     filename: str | None = None,
