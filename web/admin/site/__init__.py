@@ -196,15 +196,13 @@ def get_domain():
 def get_rewrite_list():
     return MwSites.instance().getRewriteList()
 
-# 获取默认为静态列表
+# 获取站点Rewrite配置
 @blueprint.route('/get_rewrite_conf', endpoint='get_rewrite_conf',methods=['POST'])
 @panel_login_required
 def get_rewrite_conf():
     siteName = request.form.get('siteName', '')
     rewrite = MwSites.instance().getRewriteConf(siteName)
     return {'rewrite': rewrite}
-
-
 
 # 设置默认网站信息
 @blueprint.route('/get_default_site', endpoint='get_default_site',methods=['POST'])
