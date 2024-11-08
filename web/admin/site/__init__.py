@@ -224,7 +224,7 @@ def get_cli_php_version():
             if link_re.find(v['version']) != -1:
                 return mw.returnData({"select": v, "versions": php_versions})
 
-    return mw.getJson({"select": php_versions[0],"versions": php_versions})
+    return {"select": php_versions[0],"versions": php_versions}
 
 @blueprint.route('/set_cli_php_version', endpoint='set_cli_php_version',methods=['POST'])
 @panel_login_required
