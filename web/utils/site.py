@@ -115,6 +115,7 @@ class sites(object):
     def getIndexConf(self):
         return mw.getServerDir() + '/openresty/nginx/conf/nginx.conf'
 
+
     # 路径处理
     def getPath(self, path):
         if path[-1] == '/':
@@ -297,6 +298,116 @@ class sites(object):
         data['phpversion'] = def_pver
         return data
 
+    def getIndex(self, site_id):
+        info = thisdb.getSitesById(site_id)
+        file = self.getHostConf(info['name'])
+        conf = mw.readFile(file)
+        rep = r"\s+index\s+(.+);"
+        tmp = re.search(rep, conf).groups()
+        return tmp[0].replace(' ', ',')
+
+    def setIndex(self, site_id, index):
+        if index.find('.') == -1:
+            return mw.returnData(False,  '默认文档格式不正确，例：index.html')
+
+        index = index.replace(' ', '')
+        index = index.replace(',,', ',')
+
+        if len(index) < 3:
+            return mw.returnData(False,  '默认文档不能为空!')
+
+        info = thisdb.getSitesById(site_id)
+        siteName = info['name']
+        index_l = index.replace(",", " ")
+        file = self.getHostConf(siteName)
+        conf = mw.readFile(file)
+        if conf:
+            rep = r"\s+index\s+.+;"
+            conf = re.sub(rep, "\n\tindex " + index_l + ";", conf)
+            mw.writeFile(file, conf)
+
+        mw.writeLog('网站管理', '站点[{1}]设置{2}成功', (siteName, index_l))
+        return mw.returnJson(True,  '设置成功!')
+
+    def getLimitNet(self, site_id):
+        info = thisdb.getSitesById(site_id)
+        siteName = info['name']
+        filename = self.getHostConf(siteName)
+        # 站点总并发
+        data = {}
+        conf = mw.readFile(filename)
+        try:
+            rep = r"\s+limit_conn\s+perserver\s+([0-9]+);"
+            tmp = re.search(rep, conf).groups()
+            data['perserver'] = int(tmp[0])
+
+            # IP并发限制
+            rep = r"\s+limit_conn\s+perip\s+([0-9]+);"
+            tmp = re.search(rep, conf).groups()
+            data['perip'] = int(tmp[0])
+
+            # 请求并发限制
+            rep = r"\s+limit_rate\s+([0-9]+)\w+;"
+            tmp = re.search(rep, conf).groups()
+            data['limit_rate'] = int(tmp[0])
+        except:
+            data['perserver'] = 0
+            data['perip'] = 0
+            data['limit_rate'] = 0
+        return data
+
+    def setLimitNet(self, site_id, perserver, perip, limit_rate):
+        str_perserver = 'limit_conn perserver ' + perserver + ';'
+        str_perip = 'limit_conn perip ' + perip + ';'
+        str_limit_rate = 'limit_rate ' + limit_rate + 'k;'
+
+        info = thisdb.getSitesById(site_id)
+        siteName = info['name']
+
+        filename = self.getHostConf(siteName)
+        conf = mw.readFile(filename)
+        if(conf.find('limit_conn perserver') != -1):
+            # 替换总并发
+            rep = r"limit_conn\s+perserver\s+([0-9]+);"
+            conf = re.sub(rep, str_perserver, conf)
+
+            # 替换IP并发限制
+            rep = r"limit_conn\s+perip\s+([0-9]+);"
+            conf = re.sub(rep, str_perip, conf)
+
+            # 替换请求流量限制
+            rep = r"limit_rate\s+([0-9]+)\w+;"
+            conf = re.sub(rep, str_limit_rate, conf)
+        else:
+            conf = conf.replace('#error_page 404/404.html;', "#error_page 404/404.html;\n    " +
+                                str_perserver + "\n    " + str_perip + "\n    " + str_limit_rate)
+
+        mw.writeFile(filename, conf)
+        mw.restartWeb()
+        mw.writeLog('网站管理', '网站[{1}]流量限制已开启!', (siteName,))
+        return mw.returnData(True, '设置成功!')
+        
+    def closeLimitNet(self, site_id):
+        info = thisdb.getSitesById(site_id)
+        siteName = info['name']
+
+        filename = self.getHostConf(siteName)
+        conf = mw.readFile(filename)
+        # 清理总并发
+        rep = r"\s+limit_conn\s+perserver\s+([0-9]+);"
+        conf = re.sub(rep, '', conf)
+
+        # 清理IP并发限制
+        rep = r"\s+limit_conn\s+perip\s+([0-9]+);"
+        conf = re.sub(rep, '', conf)
+
+        # 清理请求流量限制
+        rep = r"\s+limit_rate\s+([0-9]+)\w+;"
+        conf = re.sub(rep, '', conf)
+        mw.writeFile(filename, conf)
+        mw.restartWeb()
+        mw.writeLog('网站管理', '网站[{1}]流量限制已关闭!', (siteName,))
+        return mw.returnData(True, '已关闭流量限制!')
 
     def setPhpVersion(self, siteName, version):
         # nginx

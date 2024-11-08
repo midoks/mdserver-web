@@ -1246,7 +1246,7 @@ function saveLimitNet(id, type){
 	if(isChecked == undefined || type == 1 ){
 		var data = 'id='+id+'&perserver='+$("input[name='perserver']").val()+'&perip='+$("input[name='perip']").val()+'&limit_rate='+$("input[name='limit_rate']").val();
 		var loadT = layer.msg(lan.public.config,{icon:16,time:10000})
-		$.post('/site/save_limit_net',data,function(rdata){
+		$.post('/site/set_limit_net',data,function(rdata){
 			layer.close(loadT);
 			limitNet(id);
 			layer.msg(rdata.msg,{icon:rdata.status?1:2});

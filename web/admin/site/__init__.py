@@ -76,6 +76,48 @@ def get_root_dir():
     data['dir'] = mw.getWwwDir()
     return data
 
+# 获取站点默认文档
+@blueprint.route('/get_index', endpoint='get_index',methods=['POST'])
+@panel_login_required
+def get_index():
+    site_id = request.form.get('id', '')
+    data = {}
+    index = MwSites.instance().getIndex(site_id)
+    data['index'] = index
+    return data
+
+# 获取站点默认文档
+@blueprint.route('/set_index', endpoint='set_index',methods=['POST'])
+@panel_login_required
+def set_index():
+    site_id = request.form.get('id', '')
+    index = request.form.get('index', '')
+    return MwSites.instance().setIndex(site_id, index)
+
+# 获取站点默认文档
+@blueprint.route('/get_limit_net', endpoint='get_limit_net',methods=['POST'])
+@panel_login_required
+def get_limit_net():
+    site_id = request.form.get('id', '')
+    return  MwSites.instance().getLimitNet(site_id)
+
+# 获取站点默认文档
+@blueprint.route('/set_limit_net', endpoint='set_limit_net',methods=['POST'])
+@panel_login_required
+def set_limit_net():
+    site_id = request.form.get('id', '')
+    perserver = request.form.get('perserver', '')
+    perip = request.form.get('perip', '')
+    limit_rate = request.form.get('limit_rate', '')
+    return MwSites.instance().setLimitNet(site_id, perserver,perip,limit_rate)
+
+# 获取站点默认文档
+@blueprint.route('/close_limit_net', endpoint='close_limit_net',methods=['POST'])
+@panel_login_required
+def close_limit_net():
+    site_id = request.form.get('id', '')
+    return  MwSites.instance().closeLimitNet(site_id)
+
 # 获取站点配置
 @blueprint.route('/get_host_conf', endpoint='get_host_conf',methods=['POST'])
 @panel_login_required
