@@ -543,7 +543,7 @@ function setPanelSSL(){
 function setNotifyApi(tag, obj){
 	var enable = $(obj).prop("checked");
 	// console.log(tag,obj,enable);
-	$.post('/setting/set_notify_enable', {'tag':tag, 'enable':enable},function(rdata){
+	$.post('/setting/set_notify_email_enable', {'tag':tag, 'enable':enable},function(rdata){
 		showMsg(rdata.msg, function(){
 			if (rdata.status){}
 		} ,{icon:rdata.status?1:2}, 1000);
@@ -637,7 +637,7 @@ function getTgbot(){
 
 function getEmailCfg(){
 	var loadT = layer.msg('正在获取邮件配置信息...',{icon:16,time:0,shade: [0.3, '#000']});
-	$.post('/setting/get_notify',{},function(data){
+	$.post('/setting/get_notify_email',{},function(data){
 		layer.close(loadT);
 
 		var smtp_host = 'smtp.163.com';
@@ -651,14 +651,13 @@ function getEmailCfg(){
 
 		if (data.status){
 			if (typeof(data['data']['email']) !='undefined'){
-				smtp_host = data['data']['email']['data']['smtp_host'];
-				smtp_port = data['data']['email']['data']['smtp_port'];
-				username = data['data']['email']['data']['username'];
-				password = data['data']['email']['data']['password'];
-				to_mail_addr = data['data']['email']['data']['to_mail_addr'];
+				smtp_host = data['data']['email']['smtp_host'];
+				smtp_port = data['data']['email']['smtp_port'];
+				username = data['data']['email']['username'];
+				password = data['data']['email']['password'];
+				to_mail_addr = data['data']['email']['to_mail_addr'];
 
-
-				var smtp_ssl = data['data']['email']['data']['smtp_ssl'];
+				var smtp_ssl = data['data']['email']['smtp_ssl'];
 				if (smtp_ssl == 'ssl'){
 					smtp_ssl_no = '';
 					smtp_ssl_yes = 'checked';
@@ -742,13 +741,13 @@ function getEmailCfg(){
 					return false;
 				}
 
-				$.post('/config/set_notify',{'tag':'email', 'data':JSON.stringify(pdata)},function(rdata){
+				$.post('/setting/set_notify_email',{'tag':'email', 'data':JSON.stringify(pdata)},function(rdata){
 					showMsg(rdata.msg, function(){
 						if (rdata.status){
 							layer.close(index);
 						}
 					},{icon:rdata.status?1:2},2000);
-				});
+				},'json');
 			},
 
 			btn3:function(index){
@@ -791,17 +790,17 @@ function getEmailCfg(){
 					layer.msg('验证测试不能为空!', {icon:2});
 					return false;
 				}
-				$.post('/config/set_notify_test',{'tag':'email', 'data':JSON.stringify(pdata)},function(rdata){
+				$.post('/setting/set_notify_email_test',{'tag':'email', 'data':JSON.stringify(pdata)},function(rdata){
 					showMsg(rdata.msg, function(){
 						if (rdata.status){
 							layer.close(index);
 						}
 					},{icon:rdata.status?1:2},2000);
-				});
+				},'json');
 				return false;
 			}
 		});
-	});
+	},'json');
 }
 
 function getPanelSSL(){

@@ -57,5 +57,9 @@ def init_option():
     thisdb.setOption('backup_path', mw.getFatherDir()+'/backup')
     # 默认站点目录
     thisdb.setOption('site_path', mw.getFatherDir()+'/wwwroot')
+
+
+    # 邮件通知
+    thisdb.setOption('notify_email', json.dumps({'open':False}), type='notify')
     
     return True
