@@ -56,8 +56,14 @@ def set_notify_email():
 @blueprint.route('/set_notify_email_test', endpoint='set_notify_email_test', methods=['POST'])
 @panel_login_required
 def set_notify_email_test():
-    return mw.returnData(True,'设置成功')
+    tag = request.form.get('tag', '').strip()
+    tag_data = request.form.get('data', '').strip()
 
+    data = json.loads(tag_data)
+    test_pass = mw.emailNotifyTest(data)
+    if test_pass:
+        return mw.returnData(True, '验证成功')
+    return mw.returnData(False, '验证失败')
 
 # 切换邮件开关
 @blueprint.route('/set_notify_email_enable', endpoint='set_notify_email_enable', methods=['POST'])
