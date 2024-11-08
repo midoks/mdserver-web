@@ -587,6 +587,18 @@ class sites(object):
         mw.writeLog('面板设置', '设置PHP-CLI版本为: %s' % version)
         return mw.returnData(True, '设置成功!')
 
+    def addSiteTypes(name):
+        if not name:
+            return mw.returnData(False, "分类名称不能为空")
+        if len(name) > 18:
+            return mw.returnData(False, "分类名称长度不能超过6个汉字或18位字母")
+        if mw.M('site_types').count() >= 10:
+            return mw.returnData(False, '最多添加10个分类!')
+        if mw.M('site_types').where('name=?', (name,)).count() > 0:
+            return mw.returnData(False, "指定分类名称已存在!")
+        mw.M('site_types').add("name", (name,))
+        return mw.returnData(True, '添加成功!')
+
 
     def getPhpVersion(self):
         phpVersions = ('00', '52', '53', '54', '55',

@@ -8,17 +8,12 @@
 # Author: midoks <midoks@163.com>
 # ---------------------------------------------------------------------------------
 
-from .init import *
-from .option import *
-from .user import *
+__FIELD = 'id,name'
 
-from .sites import *
-from .domain import *
-from .binding import *
+import core.mw as mw
 
-from .tasks import *
-from .logs import *
-from .crontab import *
-from .firewall import *
-from .temp_login import *
-from .site_types import *
+def getSiteTypesList():
+    # .debug(True)
+    return mw.M('site_types').field(__FIELD).order("id asc").select()
+
+
