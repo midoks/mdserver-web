@@ -61,9 +61,9 @@ def set_notify_email_test():
 
     data = json.loads(tag_data)
     test_pass = mw.emailNotifyTest(data)
-    if test_pass:
+    if test_pass == True:
         return mw.returnData(True, '验证成功')
-    return mw.returnData(False, '验证失败')
+    return mw.returnData(False, '验证失败:'+test_pass)
 
 # 切换邮件开关
 @blueprint.route('/set_notify_email_enable', endpoint='set_notify_email_enable', methods=['POST'])

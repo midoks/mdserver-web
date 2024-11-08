@@ -1198,16 +1198,19 @@ def emailNotifyMessage(data):
     import utils.email as email
     try:
         if data['smtp_ssl'] == 'ssl':
-            email.sendSSL(data['smtp_host'], data['smtp_port'],
+            r = email.sendSSL(data['smtp_host'], data['smtp_port'],
                            data['username'], data['password'],
                            data['to_mail_addr'], data['subject'], data['content'])
         else:
-            email.send(data['smtp_host'], data['smtp_port'],
+            r = email.send(data['smtp_host'], data['smtp_port'],
                         data['username'], data['password'],
                         data['to_mail_addr'], data['subject'], data['content'])
+
+            print(r)
         return True
     except Exception as e:
         print(getTracebackInfo())
+        return str(e)
     return False
 
 
