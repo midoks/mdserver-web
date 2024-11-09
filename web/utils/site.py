@@ -314,6 +314,20 @@ class sites(object):
         data =  thisdb.getDomainByPid(pid)
         return data
 
+    # 获取日志内容
+    def getLogs(self, siteName):
+        logPath = mw.getLogsDir() + '/' + siteName + '.log'
+        if not os.path.exists(logPath):
+            return mw.returnData(False, '日志为空')
+        return mw.returnData(True, mw.getLastLine(logPath, 100))
+
+    # 获取错误日志内容
+    def getErrorLogs(self, siteName):
+        logPath = mw.getLogsDir() + '/' + siteName + '.error.log'
+        if not os.path.exists(logPath):
+            return mw.returnData(False, '日志为空')
+        return mw.returnData(True, mw.getLastLine(logPath, 100))
+
     # 获取模版名内容
     def getRewriteTpl(self, tplname):
         file = mw.getPanelDir() + '/rewrite/nginx/' + tplname + '.conf'

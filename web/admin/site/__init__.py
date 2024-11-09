@@ -11,3 +11,5 @@
 from .site import *
 from .site_types import *
 from .site_default import *
+from .php import *
+from .logs import *
