@@ -10,3 +10,4 @@
 
 from .site import *
 from .site_types import *
+from .site_default import *

@@ -2704,22 +2704,24 @@ function siteDefaultPage(){
 		closeBtn: 1,
 		shift: 0,
 		content: '<div class="changeDefault pd20">\
-						<button class="btn btn-default btn-sm mg10" style="width:188px" onclick="changeDefault(1)">默认文档</button>\
-						<button class="btn btn-default btn-sm mg10" style="width:188px" onclick="changeDefault(2)">404错误页</button>\
-						<button class="btn btn-default btn-sm mg10" style="width:188px" onclick="changeDefault(3)">空白页</button>\
-						<button class="btn btn-default btn-sm mg10" style="width:188px" onclick="changeDefault(4)">默认站点停止页</button>\
-				</div>'
+			<button class="btn btn-default btn-sm mg10" style="width:188px" onclick="changeDefault(1,this)">默认文档</button>\
+			<button class="btn btn-default btn-sm mg10" style="width:188px" onclick="changeDefault(2,this)">404错误页</button>\
+			<button class="btn btn-default btn-sm mg10" style="width:188px" onclick="changeDefault(3,this)">空白页</button>\
+			<button class="btn btn-default btn-sm mg10" style="width:188px" onclick="changeDefault(4,this)">默认站点停止页</button>\
+		</div>'
 	});
 }
 
-function changeDefault(type){
+function changeDefault(type, obj){
+	$(obj).attr('disabled', true);
 	$.post('/site/get_site_doc','type='+type, function(rdata){
-		showMsg('操作成功!',function(){
-			if (rdata.status){
-				vhref = rdata.data.path;
-				onlineEditFile(0,vhref);
-			}
-		},{icon:rdata.status?1:2});
+		setTimeout(function(){
+			$(obj).attr('disabled', false);
+		},3000);
+		if (rdata.status){
+			var path = rdata.data.path;
+			onlineEditFile(0,path);
+		}
 	},'json');
 }
 
