@@ -721,6 +721,34 @@ def writeLog(stype, msg, args=()):
         # writeFileLog(getTracebackInfo())
     return writeDbLog(stype, msg, args, uid)
 
+def writeFileLog(msg, path=None, limit_size=50 * 1024 * 1024, save_limit=3):
+    log_file = getPanelDir() + '/logs/debug.log'
+    if path != None:
+        log_file = path
+
+    if os.path.exists(log_file):
+        size = os.path.getsize(log_file)
+        if size > limit_size:
+            log_file_rename = log_file + "_" + \
+                time.strftime("%Y-%m-%d_%H%M%S") + '.log'
+            os.rename(log_file, log_file_rename)
+            logs = sorted(glob.glob(log_file + "_*"))
+            count = len(logs)
+            save_limit = count - save_limit
+            for i in range(count):
+                if i > save_limit:
+                    break
+                os.remove(logs[i])
+                # print('|---多余日志[' + logs[i] + ']已删除!')
+
+    f = open(log_file, 'ab+')
+    msg += "\n"
+    if __name__ == '__main__':
+        print(msg)
+    f.write(msg.encode('utf-8'))
+    f.close()
+    return True
+
 def writeDbLog(stype, msg, args=(), uid=1):
     try:
         import thisdb
@@ -1220,6 +1248,7 @@ def tgbotNotifyHttpPost(app_token, chat_id, msg):
         return True
     except Exception as e:
         writeFileLog(str(e))
+        return str(e)
     return False
 
 

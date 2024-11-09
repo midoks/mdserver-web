@@ -540,10 +540,19 @@ function setPanelSSL(){
 	});
 }
 
-function setNotifyApi(tag, obj){
+function setNotifyTgbot(obj){
 	var enable = $(obj).prop("checked");
-	// console.log(tag,obj,enable);
-	$.post('/setting/set_notify_email_enable', {'tag':tag, 'enable':enable},function(rdata){
+	$.post('/setting/set_notify_tgbot_enable', {'enable':enable},function(rdata){
+		showMsg(rdata.msg, function(){
+			if (rdata.status){}
+		} ,{icon:rdata.status?1:2}, 1000);
+	},'json');
+}
+
+
+function setNotifyEmail(obj){
+	var enable = $(obj).prop("checked");
+	$.post('/setting/set_notify_email_enable', {'enable':enable},function(rdata){
 		showMsg(rdata.msg, function(){
 			if (rdata.status){}
 		} ,{icon:rdata.status?1:2}, 1000);
@@ -552,16 +561,16 @@ function setNotifyApi(tag, obj){
 
 function getTgbot(){
 	var loadT = layer.msg('正在获取TgBot信息...',{icon:16,time:0,shade: [0.3, '#000']});
-	$.post('/setting/get_notify',{},function(data){
+	$.post('/setting/get_notify_tgbot',{},function(data){
 		layer.close(loadT);
 
 		var app_token = '';
 		var chat_id = '';
 
 		if (data.status){
-			if (typeof(data['data']['tgbot']) !='undefined'){
-				app_token = data['data']['tgbot']['data']['app_token'];
-				chat_id = data['data']['tgbot']['data']['chat_id'];
+			if (data['data']['tgbot'].length != 0){
+				app_token = data['data']['tgbot']['app_token'];
+				chat_id = data['data']['tgbot']['chat_id'];
 			}
 		}
 
@@ -598,7 +607,7 @@ function getTgbot(){
 					return false;
 				}
 
-				$.post('/setting/set_notify',{'tag':'tgbot', 'data':JSON.stringify(pdata)},function(rdata){
+				$.post('/setting/set_notify_tgbot',{'tag':'tgbot', 'data':JSON.stringify(pdata)},function(rdata){
 					showMsg(rdata.msg, function(){
 						if (rdata.status){
 							layer.close(index);
@@ -622,7 +631,7 @@ function getTgbot(){
 					return false;
 				}
 
-				$.post('/setting/set_notify_test',{'tag':'tgbot', 'data':JSON.stringify(pdata)},function(rdata){
+				$.post('/setting/set_notify_tgbot_test',{'tag':'tgbot', 'data':JSON.stringify(pdata)},function(rdata){
 					showMsg(rdata.msg, function(){
 						if (rdata.status){
 							layer.close(index);

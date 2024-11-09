@@ -59,7 +59,9 @@ def init_option():
     thisdb.setOption('site_path', mw.getFatherDir()+'/wwwroot')
 
 
-    # 邮件通知
+    # 异步邮件通知
     thisdb.setOption('notify_email', json.dumps({'open':False}), type='notify')
+    # 异步Telegram Bot 通知
+    thisdb.setOption('notify_tgbot', json.dumps({'open':False}), type='notify')
     
     return True
