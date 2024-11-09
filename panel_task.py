@@ -224,7 +224,7 @@ def startPHPVersion(version):
             return True
         # 尝试重启服务
         cgi = '/tmp/php-cgi-' + version + '.sock'
-        pid = sdir + '/php/' + version + '/var/run/php-fpm.pid'
+        pid = server_dir + '/php/' + version + '/var/run/php-fpm.pid'
         data = mw.execShell("ps -ef | grep php/" + version +" | grep -v grep|grep -v python |awk '{print $2}'")
         if data[0] != '':
             os.system("ps -ef | grep php/" + version + " | grep -v grep|grep -v python |awk '{print $2}' | xargs kill ")
