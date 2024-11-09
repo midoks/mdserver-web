@@ -124,8 +124,8 @@ class sites(object):
     def getProxyPath(self, siteName):
         return "{}/{}".format(self.proxyPath, siteName)
 
-    def getDirBindRewrite(self, siteName, dirname):
-        return self.rewritePath + '/' + siteName + '_' + dirname + '.conf'
+    def getDirBindRewrite(self, site_name, dir_name):
+        return self.rewritePath + '/' + site_name + '_' + dir_name + '.conf'
 
     def getIndexConf(self):
         return mw.getServerDir() + '/openresty/nginx/conf/nginx.conf'
@@ -256,8 +256,7 @@ class sites(object):
 
     def nginxAddConf(self):
         source_tpl = mw.getPanelDir() + '/data/tpl/nginx.conf'
-        print(source_tpl)
-        vhost_file = self.vhostPath + '/' + self.siteName + '.conf'
+        vhost_file = self.getHostConf(self.siteName)
         content = mw.readFile(source_tpl)
 
         content = content.replace('{$PORT}', self.sitePort)
@@ -462,6 +461,154 @@ class sites(object):
             return mw.returnData(True, '已清除防跨站设置!')
         self.addDirUserIni(site_path, run_path)
         return mw.returnData(True, '已打开防跨站设置!')
+
+
+    def getDirBinding(self, site_id):
+        info = thisdb.getSitesById(site_id)
+        path = info['path']
+        if not os.path.exists(path):
+            checks = ['/', '/usr', '/etc']
+            if path in checks:
+                data = {}
+                data['dirs'] = []
+                data['binding'] = []
+                return mw.returnData(True, 'OK', data)
+            os.system('mkdir -p ' + path)
+            os.system('chmod 755 ' + path)
+            os.system('chown www:www ' + path)
+            siteName = info['name']
+            mw.writeLog('网站管理', '站点[' + siteName + '],根目录[' + path + ']不存在,已重新创建!')
+
+        dirnames = []
+        for filename in os.listdir(path):
+            try:
+                filePath = path + '/' + filename
+                if os.path.islink(filePath):
+                    continue
+                if os.path.isdir(filePath):
+                    dirnames.append(filename)
+            except:
+                pass
+
+        data = {}
+        data['dirs'] = dirnames
+        data['binding'] = thisdb.getBindingListBySiteId(site_id)
+        return mw.returnJson(True, 'OK', data)
+
+    def addDirBind(self, site_id, domain, dir_name):
+        domain_split = domain.split(':')
+        domain = domain_split[0]
+        port = '80'
+        if len(domain_split) > 1:
+            port = domain_split[1]
+        if dir_name == '':
+            mw.returnData(False, '目录不能为空!')
+
+        reg = r"^([\w\-\*]{1,100}\.){1,4}(\w{1,10}|\w{1,10}\.\w{1,10})$"
+        if not re.match(reg, domain):
+            return mw.returnData(False, '主域名格式不正确!')
+
+        info = thisdb.getSitesById(site_id)
+        webdir = info['path'] + '/' + dir_name
+
+        if thisdb.getBindingCountByDomain(domain):
+            return mw.returnData(False, '您添加的域名在子目录已存在!')
+
+        if thisdb.getDomainCountByName(domain) > 0:
+            return mw.returnData(False, '您添加的域名已存在!')
+
+        filename = self.getHostConf(info['name'])
+        conf = mw.readFile(filename)
+        if conf:
+            rep = r"enable-php-([0-9]{2,3})\.conf"
+            domain_split = re.search(rep, conf).groups()
+            version = domain_split[0]
+
+            source_dirbind_tpl = mw.getPanelDir() + '/data/tpl/nginx_dirbind.conf'
+            content = mw.readFile(source_dirbind_tpl)
+            content = content.replace('{$PORT}', port)
+            content = content.replace('{$PHPVER}', version)
+            content = content.replace('{$DIRBIND}', domain)
+            content = content.replace('{$ROOT_DIR}', webdir)
+            content = content.replace('{$SERVER_MAIN}', info['name'])
+            content = content.replace('{$OR_REWRITE}', self.rewritePath)
+            content = content.replace('{$PHP_DIR}', self.setupPath + '/php')
+            content = content.replace('{$LOGPATH}', mw.getLogsDir())
+
+            conf += "\r\n" + content
+            mw.backFile(filename)
+            mw.writeFile(filename, conf)
+        conf = mw.readFile(filename)
+
+        # 检查配置是否有误
+        isError = mw.checkWebConfig()
+        if isError != True:
+            mw.restoreFile(filename)
+            msg = 'ERROR: <br><a style="color:red;">' + isError.replace("\n", '<br>') + '</a>'
+            return mw.returnData(False, msg)
+
+        thisdb.addBinding(site_id,domain,port,dir_name)
+        msg = mw.getInfo('网站[{1}]子目录[{2}]绑定到[{3}]',(info['name'], dir_name, domain))
+        mw.writeLog('网站管理', msg)
+        mw.restartWeb()
+        mw.removeBackFile(filename)
+        return mw.returnData(True, '添加成功!')
+
+    # 取子目录Rewrite
+    def getDirBindingRewrite(self, binding_id, add):
+        binding_info = thisdb.getBindingById(binding_id)
+        info = thisdb.getSitesById(binding_info['pid'])
+
+        filename = self.getDirBindRewrite(info['name'], binding_info['path'])
+        if add == '1':
+            mw.writeFile(filename, '')
+            file = self.getHostConf(info['name'])
+            conf = mw.readFile(file)
+            domain = binding_info['domain']
+            rep = "\n#BINDING-" + domain + "-START(.|\n)+BINDING-" + domain + "-END"
+            tmp = re.search(rep, conf).group()
+            dirConf = tmp.replace('rewrite/' + info['name'] + '.conf;', 'rewrite/' + info['name'] + '_' + binding_info['path'] + '.conf;')
+            conf = conf.replace(tmp, dirConf)
+            mw.writeFile(file, conf)
+        data = {}
+        data['rewrite_dir'] = self.rewritePath
+        data['status'] = False
+        if os.path.exists(filename):
+            data['status'] = True
+            data['data'] = mw.readFile(filename)
+            data['rlist'] = []
+            for ds in os.listdir(self.rewritePath):
+                if ds[0:1] == '.':
+                    continue
+                if ds == 'list.txt':
+                    continue
+                data['rlist'].append(ds[0:len(ds) - 5])
+            data['filename'] = filename
+        return data
+
+    def delDirBinding(self, binding_id):
+
+        binding_info = thisdb.getBindingById(binding_id)
+        info = thisdb.getSitesById(binding_info['pid'])
+
+        filename = self.getHostConf(info['name'])
+        conf = mw.readFile(filename)
+        if conf:
+            rep = r"\s*.+BINDING-" + binding_info['domain'] + "-START(.|\n)+BINDING-" + binding_info['domain'] + "-END"
+            conf = re.sub(rep, '', conf)
+            mw.writeFile(filename, conf)
+
+        filename = self.getDirBindRewrite(info['name'],  binding_info['path'])
+        if os.path.exists(filename):
+            os.remove(filename)
+        
+        msg = mw.getInfo('删除网站[{1}]子目录[{2}]绑定',(info['name'], binding_info['path']))
+        mw.writeLog('网站管理', msg)
+        mw.restartWeb()
+
+        thisdb.deleteBindingById(binding_id)
+        return mw.returnJson(True, '删除成功!')
+
 
     def logsOpen(self, site_id):
         info = thisdb.getSitesById(site_id)
@@ -781,6 +928,116 @@ class sites(object):
         mw.restartWeb()
         mw.writeLog('网站管理', '网站[{1}]流量限制已关闭!', (siteName,))
         return mw.returnData(True, '已关闭流量限制!')
+
+
+    # 获取重定向配置
+    def getRedirect(self, siteName):
+        redirect_file = self.getRedirectDataPath(siteName)
+        if not os.path.exists(redirect_file):
+            mw.execShell("mkdir {}/{}".format(self.redirectPath, siteName))
+            return mw.returnData(True, "no exists!", {"result": [], "count": 0})
+
+        content = mw.readFile(redirect_file)
+        data = json.loads(content)
+        # 处理301信息
+        return mw.returnData(True, "ok", {"result": data, "count": len(data)})
+
+    # 操作 重定向配置
+    def operateRedirectConf(self, siteName, method='start'):
+        vhost_file = self.getHostConf(siteName)
+        content = mw.readFile(vhost_file)
+
+        cnf_301 = '''#301-START
+    include %s/*.conf;
+    #301-END''' % (self.getRedirectPath( siteName))
+
+        cnf_301_source = '#301-START'
+        # print('operateRedirectConf', content.find('#301-END'))
+        if content.find('#301-END') != -1:
+            if method == 'stop':
+                rep = '#301-START(\n|.){1,500}#301-END'
+                content = re.sub(rep, '#301-START', content)
+        else:
+            if method == 'start':
+                content = re.sub(cnf_301_source, cnf_301, content)
+
+        mw.writeFile(vhost_file, content)
+
+    # get redirect status
+    def setRedirect(self, siteName, site_from, to, type, r_type, keep_path):
+        if siteName == '' or site_from == '' or to == '' or type == '' or r_type == '':
+            return mw.returnData(False, "必填项不能为空!")
+
+        redirect_file = self.getRedirectDataPath(siteName)
+        content = mw.readFile(redirect_file) if os.path.exists(redirect_file) else ""
+        data = json.loads(content) if content != "" else []
+
+        _r_type = 0 if r_type == "301" else 1
+        _type_code = 0 if type == "path" else 1
+        _keep_path = 1 if keep_path == "1" else 0
+
+        # check if domain exists in site
+        if _type_code == 1:
+            pid = mw.M('domain').where("name=?", (_siteName,)).field('id,pid,name,port,addtime').select()
+            site_domain_lists = mw.M('domain').where("pid=?", (pid[0]['pid'],)).field('name').select()
+            found = False
+            for item in site_domain_lists:
+                if item['name'] == _from:
+                    found = True
+                    break
+            if found == False:
+                return mw.returnData(False, "域名不存在!")
+
+        file_content = ""
+        # path
+        if _type_code == 0:
+            redirect_type = "permanent" if _r_type == 0 else "redirect"
+            if not site_from.startswith("/"):
+                site_from = "/{}".format(site_from)
+            if _keep_path == 1:
+                to = "{}$1".format(to)
+                site_from = "{}(.*)".format(site_from)
+            file_content = "rewrite ^{} {} {};".format(site_from, to, redirect_type)
+        # domain
+        else:
+            if _keep_path == 1:
+                _to = "{}$request_uri".format(_to)
+
+            redirect_type = "301" if _type_code == 0 else "302"
+            _if = "if ($host ~ '^{}')".format(site_from)
+            _return = "return {} {}; ".format(redirect_type, to)
+            file_content = _if + "{\r\n    " + _return + "\r\n}"
+
+        _id = mw.md5("{}+{}".format(file_content, siteName))
+
+        # 防止规则重复
+        for item in data:
+            if item["r_from"] == site_from:
+                return mw.returnData(False, "重复的规则!")
+
+        rep = r"http(s)?\:\/\/([a-zA-Z0-9][-a-zA-Z0-9]{0,62}\.)+([a-zA-Z0-9][a-zA-Z0-9]{0,62})+.?"
+        if not re.match(rep, to):
+            return mw.returnData(False, "错误的目标地址")
+
+        # write data json file
+        data.append({"r_from": site_from, "type": _type_code, "r_type": _type_code,"r_to": to, 'keep_path': _keep_path, 'id': _id})
+        mw.writeFile(redirect_file, json.dumps(data))
+        mw.writeFile("{}/{}.conf".format(self.getRedirectPath(siteName), _id), file_content)
+
+        self.operateRedirectConf(siteName, 'start')
+        mw.restartWeb()
+        return mw.returnData(True, "设置成功")
+
+    def getRedirectConf(self,siteName, rid):
+        if rid == '' or siteName == '':
+            return mw.returnData(False, "必填项不能为空!")
+
+        path = self.getRedirectPath(siteName)
+        conf = "{}/{}.conf".format(path, rid)
+        data = mw.readFile(conf)
+        if data == False:
+            return mw.returnData(False, "获取失败!")
+        return mw.returnData(True, "ok", {"result": data})
 
     def setPhpVersion(self, siteName, version):
         # nginx

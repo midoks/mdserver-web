@@ -12,6 +12,10 @@ import core.mw as mw
 
 __FIELD = 'id,pid,name,port,add_time'
 
+def getDomainCountByName(name):
+    # .debug(True)
+    return mw.M('domain').where("name=?", (name,)).count()
+
 def addDomain(pid, name, port):
     now_time = mw.getDateFromNow()
     insert_data = {
@@ -25,7 +29,7 @@ def addDomain(pid, name, port):
 def getDomainByPid(pid):
     # .debug(True)
     return mw.M('domain').field(__FIELD).where("pid=?", (pid,)).select()
-
+    
 
 def deleteDomainId(domain_id):
     return mw.M('domain').where("id=?", (domain_id,)).delete()

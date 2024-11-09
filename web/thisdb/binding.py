@@ -14,6 +14,10 @@ import core.mw as mw
 
 __FIELD = 'id,pid,domain,port,path,add_time'
 
+def getBindingCountByDomain(name):
+    # .debug(True)
+    return mw.M('binding').where("domain=?", (name,)).count()
+
 def addBinding(pid, domain, port, path):
     now_time = mw.getDateFromNow()
     insert_data = {
@@ -25,15 +29,17 @@ def addBinding(pid, domain, port, path):
     }
     return mw.M('binding').insert(insert_data)
 
-
 def getBindingListBySiteId(site_id):
-    task_list = mw.M('binding').where('pid=?', (site_id,)).field(__FIELD).select()
-    return task_list
+    # .debug(True)
+    binding_list = mw.M('binding').field(__FIELD).where('pid=?', (site_id,)).select()
+    return binding_list
+
+def getBindingById(site_id):
+    return mw.M('binding').where("id=?", (site_id,)).field(__FIELD).find()
 
 
-
-def deleteBindingId(domain_id):
-    return mw.M('binding').where("id=?", (domain_id,)).delete()
+def deleteBindingById(binding_id):
+    return mw.M('binding').where("id=?", (binding_id,)).delete()
 
 def deleteBindingBySiteId(site_id):
     return mw.M('binding').where("pid=?", (site_id,)).delete()

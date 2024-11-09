@@ -212,21 +212,6 @@ def get_php_version():
     tplname = request.form.get('tplname', '')
     return MwSites.instance().getRewriteTpl(tplname)
 
-# 获取网站目录
-@blueprint.route('/get_dir_user_ini', endpoint='get_dir_user_ini',methods=['POST'])
-@panel_login_required
-def get_dir_user_ini():
-    site_id = request.form.get('id', '')
-    return MwSites.instance().getDirUserIni(site_id)
-
-# 设置防跨站攻击
-@blueprint.route('/set_dir_user_ini', endpoint='set_dir_user_ini',methods=['POST'])
-@panel_login_required
-def set_dir_user_ini():
-    path = request.form.get('path', '')
-    run_path = request.form.get('run_path', '')
-    return MwSites.instance().setDirUserIni(path,run_path)
-
 # 网站日志开关
 @blueprint.route('/logs_open', endpoint='logs_open',methods=['POST'])
 @panel_login_required
@@ -250,8 +235,6 @@ def set_site_run_path():
     site_id = request.form.get('id', '')
     run_path = request.form.get('run_path', '')
     return MwSites.instance().setSiteRunPath(site_id, run_path)
-
-
 
 
 # 设置网站 - 开启密码访问

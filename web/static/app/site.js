@@ -1347,13 +1347,13 @@ function showRewrite(rdata){
 //添加子目录绑定
 function addDirBinding(id){
 	var domain = $("input[name='domain']").val();
-	var dirName = $("select[name='dirName']").val();
-	if(domain == '' || dirName == '' || dirName == null){
+	var dir_name = $("select[name='dirName']").val();
+	if(domain == '' || dir_name == '' || dir_name == null){
 		layer.msg(lan.site.d_s_empty,{icon:2});
 		return;
 	}
 	
-	var data = 'id='+id+'&domain='+domain+'&dirName='+dirName;
+	var data = 'id='+id+'&domain='+domain+'&dir_name='+dir_name;
 	$.post('/site/add_dir_bind',data,function(rdata){
 		dirBinding(id);
 		layer.msg(rdata.msg,{icon:rdata.status?1:2});
@@ -1421,6 +1421,7 @@ function to301(siteName, type, obj){
 			$('.btn-colse-prosy').click(function() {
 				layer.close(redirect_form);
 			});
+
 			$('.btn-submit-redirect').click(function() {
 				var keep_path = $('[name="keep_path"]').prop('checked') ? 1 : 0;
 				var r_type = $('[name="r_type"]').val();
@@ -1428,24 +1429,14 @@ function to301(siteName, type, obj){
 				var from = $('[name="from"]').val();
 				var to = $('[name="to"]').val();
 				
-				$.post('/site/set_redirect', {
-					siteName: siteName,
-					type: type,
-					r_type: r_type,
-					from: from,
-					to: to,
-					keep_path: keep_path
-				}, function(res) {
-					res = JSON.parse(res);
-					if (res.status) {
+				$.post('/site/set_redirect', {siteName: siteName,type: type,r_type: r_type,from: from,to: to,keep_path: keep_path}, function(data) {
+					if (data.status) {
 						layer.close(redirect_form);
-						to301(siteName)
+						to301(siteName);
 					} else {
-						layer.msg(res.msg, {
-							icon: 2
-						});
+						layer.msg(data.msg, {icon: 2});
 					}
-				});
+				},'json');
 			});
 		}, 100);
 	}
@@ -1455,14 +1446,13 @@ function to301(siteName, type, obj){
 			siteName: siteName,
 			id: obj,
 		}, function(res) {
-			res = JSON.parse(res);
 			if (res.status == true) {
 				layer.msg('删除成功', {time: 1000,icon: 1});
 				to301(siteName);
 			} else {
 				layer.msg(res.msg, {time: 1000,icon: 2});
 			}
-		});
+		},'json');
 		return
 	}
 
@@ -1471,7 +1461,6 @@ function to301(siteName, type, obj){
 		var data = {siteName: siteName,id: obj};
 		$.post('/site/get_redirect_conf', data, function(res) {
 			layer.close(laoding);
-			res = JSON.parse(res);
 			if (res.status == true) {
 				var mBody = "<div class='webEdit-box' style='padding: 20px'>\
 				<textarea style='height: 320px; width: 445px; margin-left: 20px; line-height:18px' id='configRedirectBody'>"+res.data.result+"</textarea>\
@@ -2326,7 +2315,7 @@ function opSSL(type, id, siteName, callback){
 			var key = '';
 			var csr = '';
 			var loadT = layer.msg('正在提交任务...',{icon:16,time:0,shade: [0.3, '#000']});
-			$.post('site/get_ssl','site_name='+siteName,function(data){
+			$.post('/site/get_ssl','site_name='+siteName,function(data){
 				layer.close(loadT);
 				var rdata = data['data'];
 

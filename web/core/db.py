@@ -191,7 +191,8 @@ class Sql():
             self.__close()
             return data
         except Exception as ex:
-            return "error: " + str(ex)
+            # return "error: " + str(ex)
+            return []
 
     def inquiry(self, input_field=''):
         # 查询数据集
