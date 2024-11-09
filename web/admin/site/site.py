@@ -167,7 +167,6 @@ def check_web_status():
 def get_php_version():
     return MwSites.instance().getPhpVersion()
 
-
 # 设置网站到期
 @blueprint.route('/set_end_date', endpoint='set_end_date',methods=['POST'])
 @panel_login_required
@@ -206,6 +205,71 @@ def get_rewrite_conf():
     rewrite = MwSites.instance().getRewriteConf(siteName)
     return {'rewrite': rewrite}
 
+# 获取Rewrite模版名
+@blueprint.route('/get_rewrite_tpl', endpoint='get_rewrite_tpl',methods=['POST'])
+@panel_login_required
+def get_php_version():
+    tplname = request.form.get('tplname', '')
+    return MwSites.instance().getRewriteTpl(tplname)
+
+# 获取网站目录
+@blueprint.route('/get_dir_user_ini', endpoint='get_dir_user_ini',methods=['POST'])
+@panel_login_required
+def get_dir_user_ini():
+    site_id = request.form.get('id', '')
+    return MwSites.instance().getDirUserIni(site_id)
+
+# 设置防跨站攻击
+@blueprint.route('/set_dir_user_ini', endpoint='set_dir_user_ini',methods=['POST'])
+@panel_login_required
+def set_dir_user_ini():
+    path = request.form.get('path', '')
+    run_path = request.form.get('run_path', '')
+    return MwSites.instance().setDirUserIni(path,run_path)
+
+# 网站日志开关
+@blueprint.route('/logs_open', endpoint='logs_open',methods=['POST'])
+@panel_login_required
+def logs_open():
+    site_id = request.form.get('id', '')
+    return MwSites.instance().logsOpen(site_id)
+
+# 设置网站路径
+@blueprint.route('/set_path', endpoint='set_path',methods=['POST'])
+@panel_login_required
+def set_path():
+    site_id = request.form.get('id', '')
+    path = request.form.get('path', '')
+    return MwSites.instance().setSitePath(site_id, path)
+
+
+# 设置网站路径
+@blueprint.route('/set_site_run_path', endpoint='set_site_run_path',methods=['POST'])
+@panel_login_required
+def set_site_run_path():
+    site_id = request.form.get('id', '')
+    run_path = request.form.get('run_path', '')
+    return MwSites.instance().setSiteRunPath(site_id, run_path)
+
+
+
+
+# 设置网站 - 开启密码访问
+@blueprint.route('/set_has_pwd', endpoint='set_has_pwd',methods=['POST'])
+@panel_login_required
+def set_has_pwd():
+    site_id = request.form.get('id', '')
+    username = request.form.get('username', '')
+    password = request.form.get('password', '')
+    return MwSites.instance().setHasPwd(site_id, username, password)
+
+# 设置网站 - 关闭密码访问
+@blueprint.route('/close_has_pwd', endpoint='close_has_pwd',methods=['POST'])
+@panel_login_required
+def close_has_pwd():
+    site_id = request.form.get('id', '')
+    return MwSites.instance().closeHasPwd(site_id)
+
 # 获取防盗链信息
 @blueprint.route('/get_security', endpoint='get_security',methods=['POST'])
 @panel_login_required
@@ -238,35 +302,5 @@ def get_default_site():
 def set_default_site():
     name = request.form.get('name', '')
     return MwSites.instance().setDefaultSite(name)
-
-@blueprint.route('/get_cli_php_version', endpoint='get_cli_php_version',methods=['POST'])
-@panel_login_required
-def get_cli_php_version():
-    php_dir = mw.getServerDir() + '/php'
-    if not os.path.exists(php_dir):
-        return mw.returnData(False, '未安装PHP,无法设置')
-
-    php_bin = '/usr/bin/php'
-    php_versions = MwSites.instance().getPhpVersion()
-    php_versions = php_versions[1:]
-
-    if len(php_versions) < 1:
-        return mw.returnData(False, '未安装PHP,无法设置')
-
-    if os.path.exists(php_bin) and os.path.islink(php_bin):
-        link_re = os.readlink(php_bin)
-        for v in php_versions:
-            if link_re.find(v['version']) != -1:
-                return mw.returnData({"select": v, "versions": php_versions})
-
-    return {"select": php_versions[0],"versions": php_versions}
-
-@blueprint.route('/set_cli_php_version', endpoint='set_cli_php_version',methods=['POST'])
-@panel_login_required
-def set_cli_php_version():
-    if mw.isAppleSystem():
-        return mw.returnData(False, "开发机不可设置!")
-    version = request.form.get('version', '')
-    return MwSites.instance().setCliPhpVersion(version)
 
 

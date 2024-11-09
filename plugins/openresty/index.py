@@ -10,8 +10,9 @@ import re
 
 
 web_dir = os.getcwd() + "/web"
-sys.path.append(web_dir)
-os.chdir(web_dir)
+if os.path.exists(web_dir):
+    sys.path.append(web_dir)
+    os.chdir(web_dir)
 
 import core.mw as mw
 
@@ -132,7 +133,7 @@ def checkAuthEq(file, owner='root'):
 
 
 def confReplace():
-    service_path = os.path.dirname(os.getcwd())
+    service_path = mw.getServerDir()
     content = mw.readFile(getConfTpl())
     content = content.replace('{$SERVER_PATH}', service_path)
 

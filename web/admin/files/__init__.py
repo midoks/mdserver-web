@@ -82,6 +82,14 @@ def get_dir():
     dir_list['page'] = mw.getPage({'p':page, 'row': row, 'tojs':'getFiles', 'count': dir_list['count']}, '1,2,3,4,5,6,7,8')
     return dir_list
 
+# 创建目录
+@blueprint.route('/create_dir', endpoint='create_dir', methods=['POST'])
+@panel_login_required
+def create_dir():
+    path = request.form.get('path', '')
+    return file.createDir(path)
+
+
 # 获取站点日志目录
 @blueprint.route('/get_dir_size', endpoint='get_dir_size', methods=['POST'])
 @panel_login_required

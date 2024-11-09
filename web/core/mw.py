@@ -288,7 +288,11 @@ def md5(content):
     except Exception as ex:
         return False
 
-
+def hasPwd(password):
+    # 加密密码字符
+    import crypt
+    return crypt.crypt(password, password)
+    
 def getFileMd5(filename):
     # 文件的MD5值
     if not os.path.isfile(filename):

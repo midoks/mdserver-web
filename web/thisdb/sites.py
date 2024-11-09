@@ -78,12 +78,16 @@ def deleteSitesById(site_id):
 def setSitesData(site_id,
     edate: str | None = None,
     ps: str | None = None,
+    path: str | None = None,
 ):
     update_data = {}
     if edate is not None:
         update_data['edate'] = edate
     if ps is not None:
         update_data['ps'] = ps
+
+    if path is not None:
+        update_data['path'] = path
 
     return mw.M('sites').where('id=?',(site_id,)).update(update_data)
 

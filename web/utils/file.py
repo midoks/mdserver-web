@@ -17,6 +17,61 @@ from admin import model
 import core.mw as mw
 import thisdb
 
+def setFileAccept(filename):
+    auth = 'www:www'
+    if mw.getOs() == 'darwin':
+        user = mw.execShell("who | sed -n '2, 1p' |awk '{print $1}'")[0].strip()
+        auth = user + ':staff'
+    os.system('chown -R ' + auth + ' ' + filename)
+    os.system('chmod -R 755 ' + filename)
+
+def createDir(path):
+    try:
+        if not checkFileName(path):
+            return mw.returnData(False, '目录名中不能包含特殊字符!')
+        if os.path.exists(path):
+            return mw.returnData(False, '指定目录已存在!')
+        os.makedirs(path)
+        setFileAccept(path)
+        msg = mw.getInfo('创建目录[{1}]成功!', (path,))
+        mw.writeLog('文件管理', msg)
+        return mw.returnData(True, '目录创建成功!')
+    except Exception as e:
+        print(e)
+        return mw.returnData(False, '目录创建失败!')
+
+# 检查敏感目录
+def checkDir(path):
+    path = path.replace('//', '/')
+    if path[-1:] == '/':
+        path = path[:-1]
+
+    sense_dir = ('',
+        '/',
+        '/*',
+        '/www',
+        '/root',
+        '/boot',
+        '/bin',
+        '/etc',
+        '/home',
+        '/dev',
+        '/sbin',
+        '/var',
+        '/usr',
+        '/tmp',
+        '/sys',
+        '/proc',
+        '/media',
+        '/mnt',
+        '/opt',
+        '/lib',
+        '/srv',
+        '/selinux',
+        '/www/server',
+        mw.getRootDir())
+    return not path in sense_dir
+
 def getFileBody(path):
     if not os.path.exists(path):
         return mw.returnData(False, '文件不存在', (path,))

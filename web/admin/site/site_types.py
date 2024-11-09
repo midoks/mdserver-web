@@ -52,7 +52,7 @@ def remove_site_type():
     mw.M("sites").where("type_id=?", (site_type_id,)).save("type_id", (0,))
     return mw.returnData(True, "分类已删除!")
 
-# 添加网站分类
+# 修改网站分类
 @blueprint.route('/modify_site_type_name', endpoint='modify_site_type_name',methods=['POST'])
 @panel_login_required
 def modify_site_type_name():
@@ -67,7 +67,7 @@ def modify_site_type_name():
     mw.M('site_types').where('id=?', (site_type_id,)).setField('name', name)
     return mw.returnData(True, "修改成功!")
 
-# 添加网站分类
+# 设置网站分类
 @blueprint.route('/set_site_type', endpoint='set_site_type',methods=['POST'])
 @panel_login_required
 def set_site_type():

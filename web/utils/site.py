@@ -187,7 +187,7 @@ class sites(object):
         return mw.returnData(True, '添加成功')
 
 
-    def deleteWSLogs(self, webname):
+    def deleteALlLogs(self, webname):
         assLogPath = mw.getLogsDir() + '/' + webname + '.log'
         errLogPath = mw.getLogsDir() + '/' + webname + '.error.log'
         confFile = self.setupPath + '/nginx/vhost/' + webname + '.conf'
@@ -216,13 +216,12 @@ class sites(object):
 
     def delete(self, site_id, path):
         info = thisdb.getSitesById(site_id)
-        print(info)
         webname = info['name']
-        self.deleteWSLogs(webname)
+        self.deleteALlLogs(webname)
 
         if path == '1':
-            rootPath = mw.getWwwDir() + '/' + webname
-            mw.execShell('rm -rf ' + rootPath)
+            web_root_path = mw.getWwwDir() + '/' + webname
+            mw.execShell('rm -rf ' + web_root_path)
 
         # ssl
         ssl_dir = self.sslDir + '/' + webname
@@ -243,13 +242,13 @@ class sites(object):
         binding_list = thisdb.getBindingListBySiteId(site_id)
         for x in binding_list:
             tag = mw.getLogsDir() + "/" + webname + "_" + x['domain']
-            wlog = tag + ".log"
-            wlog_error = tag + ".error.log"
+            site_log = tag + ".log"
+            site_error = tag + ".error.log"
 
-            if os.path.exists(wlog):
-                mw.execShell('rm -rf ' + wlog)
-            if os.path.exists(wlog_error):
-                mw.execShell('rm -rf ' + wlog_error)
+            if os.path.exists(site_log):
+                mw.execShell('rm -rf ' + site_log)
+            if os.path.exists(site_error):
+                mw.execShell('rm -rf ' + site_error)
 
         thisdb.deleteBindingBySiteId(site_id)
         mw.restartWeb()
@@ -273,6 +272,22 @@ class sites(object):
         logsPath = mw.getLogsDir()
         content = content.replace('{$LOGPATH}', logsPath)
         mw.writeFile(vhost_file, content)
+
+        # 和反代配置冲突 && 默认伪静态为空
+#         rewrite_content = '''
+# location /{
+#     if ($PHP_ENV != "1"){
+#         break;
+#     }
+
+#     if (!-e $request_filename) {
+#        rewrite  ^(.*)$  /index.php/$1  last;
+#        break;
+#     }
+# }
+# '''
+        rewrite_file = self.getRewriteConf(self.siteName)
+        mw.writeFile(rewrite_file, '')
 
     # 设置网站过期
     def setEndDate(self, site_id, end_date):
@@ -299,6 +314,13 @@ class sites(object):
         data =  thisdb.getDomainByPid(pid)
         return data
 
+    # 获取模版名内容
+    def getRewriteTpl(self, tplname):
+        file = mw.getPanelDir() + '/rewrite/nginx/' + tplname + '.conf'
+        if not os.path.exists(file):
+            return mw.returnData(False, '模版不存在!')
+        return mw.returnData(True, 'OK', file)
+
     def getRewriteList(self):
         rewriteList = {}
         rewriteList['rewrite'] = []
@@ -308,6 +330,237 @@ class sites(object):
             rewriteList['rewrite'].append(ds[0:len(ds) - 5])
         rewriteList['rewrite'] = sorted(rewriteList['rewrite'])
         return rewriteList
+
+    # 取日志状态
+    def getLogsStatus(self, siteName):
+        filename = self.getHostConf(siteName)
+        conf = mw.readFile(filename)
+        if conf.find('#ErrorLog') != -1:
+            return False
+        if conf.find("access_log  off") != -1:
+            return False
+        return True
+
+    # 取目录加密状态
+    def getHasPwd(self, siteName):
+        filename = self.getHostConf(siteName)
+        conf = mw.readFile(filename)
+        if conf.find('#AUTH_START') != -1:
+            return True
+        return False
+
+    # 取当站点前运行目录
+    def getSiteRunPath(self, site_name, site_path):
+        filename = self.getHostConf(site_name)
+        if os.path.exists(filename):
+            conf = mw.readFile(filename)
+            rep = r'\s*root\s*(.+);'
+            path = re.search(rep, conf).groups()[0]
+
+        data = {}
+        if site_path == path:
+            data['path'] = '/'
+        else:
+            data['path'] = path.replace(site_path, '')
+
+        dirnames = []
+        dirnames.append('/')
+        for filename in os.listdir(site_path):
+            try:
+                file_path = site_path + '/' + filename
+                if os.path.islink(file_path):
+                    continue
+                if os.path.isdir(file_path):
+                    dirnames.append('/' + filename)
+            except:
+                pass
+
+        data['dirs'] = dirnames
+        return data
+
+    def getDirUserIni(self, site_id):
+
+        info = thisdb.getSitesById(site_id)
+
+        path = info['path']
+        name = info['name']
+        data = {}
+        data['logs'] = self.getLogsStatus(name)
+        data['run_path'] = self.getSiteRunPath(name, path)
+
+        data['user_ini'] = False
+        if os.path.exists(path + '/.user.ini'):
+            data['user_ini'] = True
+
+        if data['run_path']['path'] != '/':
+            user_ini = path + data['run_path']['path'] + '/.user.ini'
+            if os.path.exists(user_ini):
+                data['userini'] = True
+
+        data['pass'] = self.getHasPwd(name)
+        data['path'] = path
+        data['name'] = name
+        return mw.returnData(True, 'OK', data)
+
+    # 清除多余user.ini
+    def delUserInI(self, path, up=0):
+        filename = path + '/.user.ini'
+        if os.path.exists(filename):
+            mw.execShell("which chattr && chattr -i " + filename)
+            os.remove(filename)
+        
+        for f in os.listdir(path):
+            try:
+                npath = path + '/' + f
+                if os.path.isdir(npath):
+                    if up < 100:
+                        self.delUserInI(npath, up + 1)
+
+                user_ini = npath + '/.user.ini'
+                print('ff:',user_ini)
+                if not os.path.exists(user_ini):
+                    continue
+                mw.execShell('which chattr && chattr -i ' + user_ini)
+                os.remove(user_ini)
+            except:
+                continue
+        return True
+
+
+    # 设置目录防御
+    def addDirUserIni(self, site_path, run_path):
+        new_path = site_path + run_path
+        filename = new_path + '/.user.ini'
+        if os.path.exists(filename):
+            return mw.returnData(True, '已打开防跨站设置!')
+
+        open_path = 'open_basedir={}/:{}/'.format(new_path, site_path)
+        if run_path == '/' or run_path == '':
+            open_path = 'open_basedir={}/'.format(site_path)
+
+        mw.writeFile(filename, open_path + ':/www/server/php:/tmp/:/proc/')
+        mw.execShell("which chattr && chattr +i " + filename)
+
+    def setDirUserIni(self, site_path, run_path):
+        filename = site_path + '/.user.ini'
+        if os.path.exists(filename):
+            self.delUserInI(site_path)
+            return mw.returnData(True, '已清除防跨站设置!')
+        self.addDirUserIni(site_path, run_path)
+        return mw.returnData(True, '已打开防跨站设置!')
+
+    def logsOpen(self, site_id):
+        info = thisdb.getSitesById(site_id)
+        name = info['name']
+
+        filename = self.getHostConf(name)
+        if os.path.exists(filename):
+            conf = mw.readFile(filename)
+            rep = self.logsPath + '/' + name + '.log'
+            if conf.find(rep) != -1:
+                conf = conf.replace(rep + ' main', 'off')
+            else:
+                conf = conf.replace('access_log  off', 'access_log  ' + rep + ' main')
+            mw.writeFile(filename, conf)
+
+        mw.restartWeb()
+        return mw.returnData(True, '操作成功!')
+
+    def setSitePath(self, site_id, path):
+        path = self.getPath(path)
+        if path == "" or site_id == '0':
+            return mw.returnData(False,  "目录不能为空!")
+
+        import utils.file as file
+        if not file.checkDir(path):
+            return mw.returnData(False,  "不能以系统关键目录作为站点目录")
+
+        info = thisdb.getSitesById(site_id)
+        if info['path'] == path:
+            return mw.returnData(False,  "与原路径一致，无需修改!")
+        conf_file = self.getHostConf(info['name'])
+        content = mw.readFile(conf_file)
+        if content:
+            content = content.replace(info['path'], path)
+            mw.writeFile(file, content)
+
+        thisdb.setSitesData(site_id, path=path)
+        msg = mw.getInfo('修改网站[{1}]物理路径成功!', (info['name'],))
+        mw.writeLog('网站管理', msg)
+        mw.restartWeb()
+        return mw.returnData(True,  "设置成功!")
+
+    # 设置当前站点运行目录
+    def setSiteRunPath(self, site_id, run_path):
+        info = thisdb.getSitesById(site_id)
+        site_name = info['name']
+        site_path = info['path']
+
+        new_path = site_path + run_path
+
+        # 处理Nginx
+        filename = self.getHostConf(site_name)
+        if os.path.exists(filename):
+            conf = mw.readFile(filename)
+            rep = r'\s*root\s*(.+);'
+            path = re.search(rep, conf).groups()[0]
+            conf = conf.replace(path, new_path)
+            mw.writeFile(filename, conf)
+
+        self.setSitePath(site_path, run_path)
+        mw.restartWeb()
+        return mw.returnData(True, '设置成功!')
+
+    # 设置目录加密
+    def setHasPwd(self, site_id, username, password):
+        if len(username.strip()) == 0 or len(password.strip()) == 0:
+            return mw.returnData(False, '用户名或密码不能为空!')
+
+        info = thisdb.getSitesById(site_id)
+        siteName = info['name']
+        filename = self.passPath + '/' + siteName + '.pass'
+        passconf = username + ':' + mw.hasPwd(password)
+
+        configFile = self.getHostConf(siteName)
+        # 处理Nginx配置
+        conf = mw.readFile(configFile)
+        if conf:
+            rep = '#error_page   404   /404.html;'
+            if conf.find(rep) == -1:
+                rep = '#error_page 404/404.html;'
+            data = '''
+    #AUTH_START
+    auth_basic "Authorization";
+    auth_basic_user_file %s;
+    #AUTH_END''' % (filename,)
+            conf = conf.replace(rep, rep + data)
+            mw.writeFile(configFile, conf)
+        # 写密码配置
+        passDir = self.passPath
+        if not os.path.exists(passDir):
+            mw.execShell('mkdir -p ' + passDir)
+        mw.writeFile(filename, passconf)
+
+        msg = mw.getInfo('设置网站[{1}]为需要密码认证!', (siteName,))
+        mw.writeLog("网站管理", msg)
+        mw.restartWeb()
+        return mw.returnData(True, '设置成功!')
+
+    # 取消目录加密
+    def closeHasPwd(self, site_id):
+        info = thisdb.getSitesById(site_id)
+        siteName = info['name']
+        configFile = self.getHostConf(siteName)
+        if os.path.exists(configFile):
+            conf = mw.readFile(configFile)
+            rep = r"\n\s*#AUTH_START(.|\n){1,200}#AUTH_END"
+            conf = re.sub(rep, '', conf)
+            mw.writeFile(configFile, conf)
+
+        msg = mw.getInfo('清除网站[{1}]的密码认证!', (siteName,))
+        mw.writeLog("网站管理", msg)
+        mw.restartWeb()
+        return mw.returnData(True, '设置成功!')
 
     def getSecurity(self, site_id):
         info = thisdb.getSitesById(site_id)
@@ -323,10 +576,8 @@ class sites(object):
             data['status'] = False
             data['none'] = False
 
-            valid_referers = re.search(
-                r"valid_referers\s+(.+);\n", tmp)
-            valid_referers_none = re.search(
-                r"valid_referers\s+none\s+blocked\s+(.+);\n", tmp)
+            valid_referers = re.search(r"valid_referers\s+(.+);\n", tmp)
+            valid_referers_none = re.search(r"valid_referers\s+none\s+blocked\s+(.+);\n", tmp)
 
             if valid_referers or valid_referers_none:
                 data['status'] = True
@@ -592,11 +843,16 @@ class sites(object):
             return mw.returnData(False, "分类名称不能为空")
         if len(name) > 18:
             return mw.returnData(False, "分类名称长度不能超过6个汉字或18位字母")
-        if mw.M('site_types').count() >= 10:
+
+        all_count = thisdb.getSiteTypesCount()
+        if all_count >= 10:
             return mw.returnData(False, '最多添加10个分类!')
-        if mw.M('site_types').where('name=?', (name,)).count() > 0:
+
+        name_count = thisdb.getSiteTypesCountByName(name)
+        if name_count > 0:
             return mw.returnData(False, "指定分类名称已存在!")
-        mw.M('site_types').add("name", (name,))
+
+        thisdb.addSiteTypes(name)
         return mw.returnData(True, '添加成功!')
 
 

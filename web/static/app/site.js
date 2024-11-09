@@ -351,30 +351,30 @@ function webAddPage(type) {
 
 //修改网站目录
 function webPathEdit(id){
-	$.post('/site/get_dir_user_ini','&id='+id, function(data){
-		var userini = data['data'];
-		var webpath = userini['path'];
-		var siteName = userini['name'];
-		var runPath = userini['runPath']['runPath'];
-		var userinicheckeds = userini.userini?'checked':'';
-		var logscheckeds = userini.logs?'checked':'';
-		var opt = ''
+	$.post('/site/get_dir_user_ini','id='+id, function(data){
+		var data = data['data'];
+		var site_path = data['path'];
+		var site_name = data['name'];
+		var run_path = data['run_path']['run_path'];
+		var user_ini_checked = data.user_ini?'checked':'';
+		var logs_checked = data.logs?'checked':'';
+		var opt = '';
 		var selected = '';
-		for(var i=0;i<userini.runPath.dirs.length;i++){
+		for(var i=0;i<data.run_path.dirs.length;i++){
 			selected = '';
-			if(userini.runPath.dirs[i] == userini.runPath.runPath){ 
+			if(data.run_path.dirs[i] == data.run_path.path){ 
 				selected = 'selected';
 			}
-			opt += '<option value="'+ userini.runPath.dirs[i] +'" '+selected+'>'+ userini.runPath.dirs[i] +'</option>'
+			opt += '<option value="'+ data.run_path.dirs[i] +'" '+selected+'>'+ data.run_path.dirs[i] +'</option>';
 		}
-		var webPathHtml = "<div class='webedit-box soft-man-con'>\
+		var content = "<div class='webedit-box soft-man-con'>\
 					<div class='label-input-group ptb10'>\
-						<input type='checkbox' name='userini' id='userini'"+userinicheckeds+" /><label class='mr20' for='userini' style='font-weight:normal'>防跨站攻击(open_basedir)</label>\
-						<input type='checkbox' name='logs' id='logs'"+logscheckeds+" /><label for='logs' style='font-weight:normal'>写访问日志</label>\
+						<input type='checkbox' name='userini' id='userini'"+user_ini_checked+" /><label class='mr20' for='userini' style='font-weight:normal'>防跨站攻击(open_basedir)</label>\
+						<input type='checkbox' name='logs' id='logs'"+logs_checked+" /><label for='logs' style='font-weight:normal'>写访问日志</label>\
 					</div>\
 					<div class='line mt10'>\
 						<span class='mr5'>网站目录</span>\
-						<input class='bt-input-text mr5' type='text' style='width:50%' placeholder='网站根目录' value='"+webpath+"' name='webdir' id='inputPath'>\
+						<input class='bt-input-text mr5' type='text' style='width:50%' placeholder='网站根目录' value='"+site_path+"' name='webdir' id='inputPath'>\
 						<span onclick='changePath(&quot;inputPath&quot;)' class='glyphicon glyphicon-folder-open cursor mr20'></span>\
 						<button class='btn btn-success btn-sm' onclick='setSitePath("+id+")'>保存</button>\
 					</div>\
@@ -389,11 +389,11 @@ function webPathEdit(id){
 					</ul>"
 					+'<div class="user_pw_tit" style="margin-top: -8px;padding-top: 11px;">'
 						+'<span class="tit">密码访问</span>'
-						+'<span class="btswitch-p"><input '+(userini.pass?'checked':'')+' class="btswitch btswitch-ios" id="pathSafe" type="checkbox">'
+						+'<span class="btswitch-p"><input '+(data.pass?'checked':'')+' class="btswitch btswitch-ios" id="pathSafe" type="checkbox">'
 							+'<label class="btswitch-btn phpmyadmin-btn" for="pathSafe" onclick="pathSafe('+id+')"></label>'
 						+'</span>'
 					+'</div>'
-					+'<div class="user_pw" style="margin-top: 10px;display:'+(userini.pass?'block;':'none;')+'">'
+					+'<div class="user_pw" style="margin-top: 10px;display:'+(data.pass?'block;':'none;')+'">'
 						+'<p><span>授权账号</span><input id="username_get" class="bt-input-text" name="username_get" value="" type="text" placeholder="不修改请留空"></p>'
 						+'<p><span>访问密码</span><input id="password_get_1" class="bt-input-text" name="password_get_1" value="" type="password" placeholder="不修改请留空"></p>'
 						+'<p><span>重复密码</span><input id="password_get_2" class="bt-input-text" name="password_get_1" value="" type="password" placeholder="不修改请留空"></p>'
@@ -401,14 +401,11 @@ function webPathEdit(id){
 					+'</div>'
 				+'</div>';
 
-		$("#webedit-con").html(webPathHtml);		
+		$("#webedit-con").html(content);		
 		$("#userini").change(function(){
-			$.post('/site/set_dir_user_ini',{
-				'path':webpath,
-				'runPath':runPath,
-			},function(userini){
-				layer.msg(userini.msg+'<p style="color:red;">注意：设置防跨站需要重启PHP才能生效!</p>',{icon:userini.status?1:2});
-				tryRestartPHP(siteName);
+			$.post('/site/set_dir_user_ini',{'path':site_path,'run_path':run_path,},function(userini){
+				layer.msg(data.msg+'<p style="color:red;">注意：设置防跨站需要重启PHP才能生效!</p>',{icon:data.status?1:2});
+				tryRestartPHP(site_name);
 			},'json');
 		});
 		
@@ -458,10 +455,9 @@ function setPathSafe(id){
 function setSiteRunPath(id){
 	var NewPath = $("#runPath").val();
 	var loadT = layer.msg(lan.public.the,{icon:16,time:10000,shade: [0.3, '#000']});
-	$.post('/site/set_site_run_path','id='+id+'&runPath='+NewPath,function(rdata){
+	$.post('/site/set_site_run_path','id='+id+'&run_path='+NewPath,function(rdata){
 		layer.close(loadT);
-		var ico = rdata.status?1:2;
-		layer.msg(rdata.msg,{icon:ico});
+		layer.msg(rdata.msg,{icon:rdata.status?1:2});
 	},'json');
 }
 
@@ -2898,7 +2894,7 @@ function tryRestartPHP(siteName){
 		var phpversion = data.phpversion;
 
 		if (phpversion == "00"){
-			return
+			return;
 		}
 		
 		var php_sign = 'php';
@@ -2915,11 +2911,10 @@ function tryRestartPHP(siteName){
 		var reqData = {name: php_sign, func:'restart'}
 		reqData['version'] = phpversion;
 
-		// console.log(reqData);
 		var loadT = layer.msg('尝试自动重启PHP['+phpversion+']...', { icon: 16, time: 0, shade: 0.3 });
 		$.post('/plugins/run', reqData, function(data) {
 			layer.close(loadT);
-	        layer.msg(data.msg,{icon:data.status?1:2,time:3000,shade: [0.3, '#000']});
+	        layer.msg( 'PHP['+phpversion+']'+(data.status?'重启成功!':'重启失败!'),{icon:data.status?1:2,time:3000,shade: [0.3, '#000']});
 	    },'json');
 	},'json');
 }
