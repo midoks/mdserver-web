@@ -138,6 +138,7 @@ CREATE TABLE IF NOT EXISTS `panel` (
 
 CREATE TABLE IF NOT EXISTS `app` (
   `id` INTEGER PRIMARY KEY AUTOINCREMENT,
+  `name` TEXT,
   `app_id` TEXT,
   `app_secret` TEXT,
   `white_list` TEXT,
@@ -145,6 +146,7 @@ CREATE TABLE IF NOT EXISTS `app` (
   `add_time` TEXT,
   `update_time` TEXT
 );
+CREATE UNIQUE INDEX name_idx ON app(name);
 CREATE UNIQUE INDEX app_id_idx ON app(app_id);
 
 CREATE TABLE IF NOT EXISTS `option` (
