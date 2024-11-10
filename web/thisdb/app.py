@@ -13,7 +13,7 @@ import core.mw as mw
 __FIELD = 'id,app_id,app_secret,status,add_time,update_time'
 
 def addApp(app_id,app_secret):
-	now_time = mw.getDateFromNow()
+    now_time = mw.getDateFromNow()
     add_data = {
         'app_id': app_id,
         'app_secret': app_secret,
@@ -24,23 +24,23 @@ def addApp(app_id,app_secret):
     return mw.M('app').insert(add_data)
 
 def getAppList(
-	page:int | None = 1,
+    page:int | None = 1,
     size:int | None = 10,
-):	
-	m = mw.M('app').field(__FIELD)
+):  
+    m = mw.M('app').field(__FIELD)
 
-	start = (int(page) - 1) * (int(size))
+    start = (int(page) - 1) * (int(size))
     limit = str(start) + ',' +str(size)
-	app_list = m.limit(limit).order('id desc').select()
-	count = m.count()
+    app_list = m.limit(limit).order('id desc').select()
+    count = m.count()
 
-	data = {}
+    data = {}
     data['list'] = app_list
     data['count'] = count
     return data
 
 def getAppById(aid):
-	return mw.M('app').field(__FIELD).where("id=?", (aid,)).find()
+    return mw.M('app').field(__FIELD).where("id=?", (aid,)).find()
 
 def deleteAppById(aid):
     return mw.M('app').where("id=?", (aid,)).delete()
