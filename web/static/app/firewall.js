@@ -312,8 +312,8 @@ function showAccept(page,search) {
 		}
 
 
-		$("#firewallBody").html(body);
-		$("#firewallPage").html(data.page);
+		$("#firewall_body").html(body);
+		$("#firewall_page").html(data.page);
 	},'json');
 }
 
