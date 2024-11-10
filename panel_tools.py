@@ -237,7 +237,7 @@ def show_panel_pwd():
     if mw.md5(pwd) == info['password']:
         print('|-password: ' + pwd)
         return
-    print("* password has been changed!")
+    print("*-password has been changed!")
 
 def show_panel_adminpath():
     admin_path = thisdb.getOption('admin_path')
