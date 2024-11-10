@@ -76,27 +76,7 @@ app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = True
 # 初始化db
 # sys_db.init_app(app)
 # Migrate(app, sys_db)
-
-
-# 检查数据库是否存在。如果没有就创建它。
-setup_db_required = False
-if not os.path.isfile(config.SQLITE_PATH):
-    setup_db_required = True
-
-# with app.app_context():
-#     sys_db.create_all()
-
-# with app.app_context():
-#     if setup_db_required:
-#         sys_db.create_all()
-
-if setup_db_required:
-    # 初始化用户信息
-    thisdb.initPanelData()
-    setup.init_admin_user()
-    setup.init_option()
-setup.init_cmd()
-setup.init_db_system()
+setup.init()
 
 
 app.config['BASIC_AUTH_OPEN'] = False

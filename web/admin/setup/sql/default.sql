@@ -37,6 +37,7 @@ CREATE TABLE IF NOT EXISTS `crontab` (
   `add_time` TEXT,
   `update_time` TEXT
 );
+CREATE UNIQUE INDEX name_idx ON crontab(name);
 
 CREATE TABLE IF NOT EXISTS `firewall` (
   `id` INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -46,14 +47,11 @@ CREATE TABLE IF NOT EXISTS `firewall` (
   `add_time` TEXT,
   `update_time` TEXT
 );
-
-ALTER TABLE `firewall` ADD COLUMN `protocol` TEXT DEFAULT 'tcp';
+CREATE UNIQUE INDEX port_idx ON firewall(port);
 
 INSERT INTO `firewall` (`id`, `port`, `protocol`, `ps`, `add_time`, `update_time`) VALUES
 (1, '80',  'tcp','网站默认端口', '0000-00-00 00:00:00','0000-00-00 00:00:00'),
 (2, '443', 'tcp/udp', 'HTTPS', '0000-00-00 00:00:00','0000-00-00 00:00:00');
-
-
 
 CREATE TABLE IF NOT EXISTS `logs` (
   `id` INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -77,11 +75,13 @@ CREATE TABLE IF NOT EXISTS `sites` (
   `add_time` TEXT,
   `update_time` TEXT
 );
+CREATE UNIQUE INDEX name_idx ON sites(name);
 
 CREATE TABLE IF NOT EXISTS `site_types` (
   `id` INTEGER PRIMARY KEY AUTOINCREMENT,
   `name` TEXT
 );
+CREATE UNIQUE INDEX name_idx ON site_types(name);
 
 CREATE TABLE IF NOT EXISTS `domain` (
   `id` INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -145,6 +145,7 @@ CREATE TABLE IF NOT EXISTS `app` (
   `add_time` TEXT,
   `update_time` TEXT
 );
+CREATE UNIQUE INDEX app_id_idx ON app(app_id);
 
 CREATE TABLE IF NOT EXISTS `option` (
   `id` INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -152,5 +153,4 @@ CREATE TABLE IF NOT EXISTS `option` (
   `type` TEXT,
   `value` TEXT
 );
-
 CREATE UNIQUE INDEX name_idx ON option(name);

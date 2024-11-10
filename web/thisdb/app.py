@@ -10,14 +10,15 @@
 
 import core.mw as mw
 
-__FIELD = 'id,app_id,app_secret,status,add_time,update_time'
+__FIELD = 'id,app_id,app_secret,white_list,status,add_time,update_time'
 
-def addApp(app_id,app_secret):
+def addApp(app_id,app_secret,white_list):
     now_time = mw.getDateFromNow()
     add_data = {
         'app_id': app_id,
         'app_secret': app_secret,
         'status': 1,
+        'white_list':white_list,
         'add_time': now_time,
         'update_time': now_time
     }

@@ -27,6 +27,9 @@ sys.path.append(web_dir)
 import core.mw as mw
 import thisdb
 
+from admin import setup
+setup.init()
+
 g_log_file = mw.getPanelTaskLog()
 isTask = mw.getMWLogs() + '/panelTask.pl'
 

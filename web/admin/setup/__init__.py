@@ -8,8 +8,24 @@
 # Author: midoks <midoks@163.com>
 # ---------------------------------------------------------------------------------
 
+import os
+
 from .user import init_admin_user
 from .option import init_option
 from .init_db_system import init_db_system
 from .init_cmd import init_cmd
+
+
+import thisdb
+import config
+
+def init():
+	# 检查数据库是否存在。如果没有就创建它。
+	if not os.path.isfile(config.SQLITE_PATH):
+	    # 初始化用户信息
+	    thisdb.initPanelData()
+	    init_admin_user()
+	    init_option()
+	init_cmd()
+	init_db_system()
 
