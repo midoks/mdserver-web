@@ -99,8 +99,8 @@ CREATE TABLE IF NOT EXISTS `users` (
   `login_time` TEXT,
   `phone` TEXT,
   `email` TEXT,
-  `add_time` INTEGER,
-  `update_time` INTEGER
+  `add_time` TEXT,
+  `update_time` TEXT
 );
 
 CREATE TABLE IF NOT EXISTS `tasks` (
@@ -111,7 +111,7 @@ CREATE TABLE IF NOT EXISTS `tasks` (
   `end` 	    INTEGER,
   `cmd` 	    TEXT,
   `status`    INTEGER,
-  `add_time`  INTEGER
+  `add_time`  TEXT
 );
 
 CREATE TABLE IF NOT EXISTS `temp_login` (
@@ -123,7 +123,7 @@ CREATE TABLE IF NOT EXISTS `temp_login` (
   `login_addr`  REAL,
   `logout_time` INTEGER,
   `expire`  INTEGER,
-  `add_time` INTEGER
+  `add_time` TEXT
 );
 
 CREATE TABLE IF NOT EXISTS `panel` (
@@ -133,7 +133,17 @@ CREATE TABLE IF NOT EXISTS `panel` (
   `username` TEXT,
   `password` TEXT,
   `click` INTEGER,
-  `add_time` INTEGER
+  `add_time` TEXT
+);
+
+CREATE TABLE IF NOT EXISTS `app` (
+  `id` INTEGER PRIMARY KEY AUTOINCREMENT,
+  `app_id` TEXT,
+  `app_secret` TEXT,
+  `white_list` TEXT,
+  `status` INTEGER,
+  `add_time` TEXT,
+  `update_time` TEXT
 );
 
 CREATE TABLE IF NOT EXISTS `option` (

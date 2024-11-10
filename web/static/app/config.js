@@ -268,13 +268,13 @@ function modifyAuthPath() {
         btn:['提交','关闭', '随机生成'],
         shadeClose: false,
         content: '<div class="bt-form bt-form pd20">\
-                    <div class="line ">\
-                        <span class="tname">入口地址</span>\
-                        <div class="info-r">\
-                            <input name="auth_path_set" class="bt-input-text mr5" type="text" style="width: 311px" value="' + auth_path + '">\
-                        </div>\
-                    </div>\
-                </div>',
+            <div class="line ">\
+                <span class="tname">入口地址</span>\
+                <div class="info-r">\
+                    <input name="auth_path_set" class="bt-input-text mr5" type="text" style="width: 311px" value="' + auth_path + '">\
+                </div>\
+            </div>\
+        </div>',
         yes:function(index){
         	var auth_path = $("input[name='auth_path_set']").val();
 		    if (auth_path == '/' || auth_path == ''){

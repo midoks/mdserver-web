@@ -10,9 +10,9 @@
 
 from .init import *
 from .option import *
-from .user import *
 
 from .sites import *
+from .site_types import *
 from .domain import *
 from .binding import *
 
@@ -20,5 +20,7 @@ from .tasks import *
 from .logs import *
 from .crontab import *
 from .firewall import *
+
 from .temp_login import *
-from .site_types import *
+from .user import *
+from .app import *
