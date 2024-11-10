@@ -155,7 +155,11 @@ def close_recycle_bin():
     return file.closeRecycleBin()
 
 
-
+# 日志清空
+@blueprint.route('/close_logs', endpoint='close_logs', methods=['POST'])
+@panel_login_required
+def close_logs():
+    return file.closeLogs()
 
 
 

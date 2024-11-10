@@ -322,7 +322,7 @@ def getDirSize(filePath, size=0):
 # 获取目录大小(bash)
 def getDirSizeByBash(path):
     tmp = mw.execShell('du -sh ' + path)
-    return tmp[0].split()[0]
+    return tmp[0].split()[0].lower()
 
 # 计算文件数量
 def getCount(path, search = None):
@@ -493,3 +493,13 @@ def setMode(path):
     p_stat = os.stat(s_path)
     os.chown(path, p_stat.st_uid, p_stat.st_gid)
     os.chmod(path, p_stat.st_mode)
+
+
+def closeLogs():
+    log_file = mw.getLogsDir()
+    os.system('rm -rf ' + log_file + '/*')
+    mw.opWeb('reload')
+    # os.system('kill -USR1 `cat ' + mw.getServerDir() +'/openresty/nginx/logs/nginx.pid`')
+    mw.writeLog('文件管理', '网站日志已被清空!')
+    tmp = getDirSizeByBash(log_file)
+    return mw.returnData(True, tmp)
