@@ -15,4 +15,5 @@ from .php import *
 from .logs import *
 from .dir import *
 from .redirect import *
+from .proxy import *
 from .ssl import *

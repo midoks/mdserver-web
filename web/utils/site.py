@@ -1028,7 +1028,7 @@ class sites(object):
         mw.restartWeb()
         return mw.returnData(True, "设置成功")
 
-    def getRedirectConf(self,siteName, rid):
+    def getRedirectConf(self, siteName, rid):
         if rid == '' or siteName == '':
             return mw.returnData(False, "必填项不能为空!")
 
@@ -1038,6 +1038,257 @@ class sites(object):
         if data == False:
             return mw.returnData(False, "获取失败!")
         return mw.returnData(True, "ok", {"result": data})
+
+        # 删除指定重定向
+    def delRedirect(self,siteName, rid):
+        if rid == '' or siteName == '':
+            return mw.returnData(False, "必填项不能为空!")
+
+        try:
+            data_path = self.getRedirectDataPath(siteName)
+            data_content = mw.readFile(data_path) if os.path.exists(data_path) else ""
+            data = json.loads(data_content) if data_content != "" else []
+            for item in data:
+                if item["id"] == rid:
+                    data.remove(item)
+                    break
+            # write database
+            mw.writeFile(data_path, json.dumps(data))
+            # data is empty ,should stop
+            if len(data) == 0:
+                self.operateRedirectConf(siteName, 'stop')
+            # remove conf file
+            mw.execShell("rm -rf {}/{}.conf".format(self.getRedirectPath(siteName), rid))
+        except Exception as e:
+            return mw.returnData(False, "删除失败:"+str(e))
+        return mw.returnData(True, "删除成功!")
+
+    # 读取 网站 反向代理列表
+    def getProxyList(self, site_name):
+        data_path = self.getProxyDataPath(site_name)
+
+        if not os.path.exists(data_path):
+            mw.execShell("mkdir {}/{}".format(self.proxyPath, site_name))
+            return mw.returnData(True, "", {"result": [], "count": 0})
+
+        content = mw.readFile(data_path)
+        data = json.loads(content)
+        tmp = []
+        for proxy in data:
+            proxy_dir = "{}/{}".format(self.proxyPath, site_name)
+            proxy_dir_file = proxy_dir + '/' + proxy['id'] + '.conf'
+            if os.path.exists(proxy_dir_file):
+                proxy['status'] = True
+            else:
+                proxy['status'] = False
+            tmp.append(proxy)
+        return mw.returnData(True, "ok", {"result": data, "count": len(data)})
+
+    # 操作 反向代理配置
+    def operateProxyConf(self, site_name, method='start'):
+        vhost_file = self.getHostConf(site_name)
+        content = mw.readFile(vhost_file)
+
+        proxy_cnf = '''#PROXY-START
+    include %s/*.conf;
+    #PROXY-END''' % (self.getProxyPath(site_name))
+
+        proxy_cnf_source = '#PROXY-START'
+
+        if content.find('#PROXY-END') != -1:
+            if method == 'stop':
+                rep = '#PROXY-START(\n|.){1,500}#PROXY-END'
+                content = re.sub(rep, '#PROXY-START', content)
+        else:
+            if method == 'start':
+                content = re.sub(proxy_cnf_source, proxy_cnf, content)
+
+        mw.writeFile(vhost_file, content)
+
+    # 设置 网站 反向代理列表
+    def setProxy(self, site_name, site_from, to, host, name, open_proxy, open_cache, cache_time, pid):
+        from urllib.parse import urlparse
+        if  site_name == "" or site_from == "" or to == "" or host == "" or name == "":
+            return mw.returnData(False, "必填项不能为空")
+
+        rep = r"http(s)?\:\/\/([a-zA-Z0-9][-a-zA-Z0-9]{0,62}\.)+([a-zA-Z0-9][a-zA-Z0-9]{0,62})+.?"
+        if not re.match(rep, to):
+            return mw.returnData(False, "错误的目标地址!")
+
+        # get host from url
+        try:
+            if host == "$host":
+                host_tmp = urlparse(_to)
+                host = host_tmp.netloc
+        except:
+            return mw.returnData(False, "错误的目标地址")
+
+        proxy_site_path = self.getProxyDataPath(site_name)
+        data_content = mw.readFile(proxy_site_path) if os.path.exists(proxy_site_path) else ""
+        data = json.loads(data_content) if data_content != "" else []
+
+        proxy_action = 'add'
+        if pid == "":
+            pid = mw.md5("{}".format(name))
+        else:
+            proxy_action = 'edit'
+
+        if proxy_action == "add":
+            for item in data:
+                if item["name"] == name:
+                    return mw.returnData(False, "名称重复!!")
+                if item["from"] == site_from:
+                    return mw.returnData(False, "代理目录已存在!!")
+
+        tpl = "#PROXY-START\n\
+location ^~ {from} {\n\
+    proxy_pass {to};\n\
+    proxy_set_header Host {host};\n\
+    proxy_ssl_server_name on;\n\
+    proxy_set_header X-Real-IP $remote_addr;\n\
+    proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;\n\
+    proxy_set_header REMOTE-HOST $remote_addr;\n\
+    proxy_set_header Upgrade $http_upgrade;\n\
+    proxy_set_header Connection $connection_upgrade;\n\
+    proxy_http_version 1.1;\n\
+    \n\
+    add_header X-Cache $upstream_cache_status;\n\
+    \n\
+     {proxy_cache}\n\
+}\n\
+# PROXY-END"
+
+        tpl_proxy_cache = "\n\
+    if ( $uri ~* \\.(gif|png|jpg|css|js|woff|woff2)$\" )\n\
+    {\n\
+        expires {cache_time}m;\n\
+    }\n\
+    proxy_ignore_headers Set-Cookie Cache-Control expires;\n\
+    proxy_cache mw_cache;\n\
+    proxy_cache_key \"$host$uri$is_args$args\";\n\
+    proxy_cache_valid 200 304 301 302 {cache_time}m;\n\
+"
+
+        tpl_proxy_nocache = "\n\
+    set $static_files_app 0; \n\
+    if ( $uri ~* \\.(gif|png|jpg|css|js|woff|woff2)$\" )\n\
+    {\n\
+        set $static_files_app 1;\n\
+        expires 12h;\n\
+    }\n\
+    if ( $static_files_app = 0 )\n\
+    {\n\
+        add_header Cache-Control no-cache;\n\
+    }\n\
+"
+
+        # replace
+        if site_from[0] != '/':
+            site_from = '/' + site_from
+        tpl = tpl.replace("{from}", site_from, 999)
+        tpl = tpl.replace("{to}", to)
+        tpl = tpl.replace("{host}", host, 999)
+        tpl = tpl.replace("{cache_time}", cache_time, 999)
+
+        if open_cache == 'on':
+            tpl_proxy_cache = tpl_proxy_cache.replace("{cache_time}", cache_time, 999)
+            tpl = tpl.replace("{proxy_cache}", tpl_proxy_cache, 999)
+        else:
+            tpl = tpl.replace("{proxy_cache}", tpl_proxy_nocache, 999)
+
+
+        conf_proxy = "{}/{}.conf".format(self.getProxyPath(site_name), pid)
+        conf_bk = "{}/{}.conf.txt".format(self.getProxyPath(site_name), pid)
+        mw.writeFile(conf_proxy, tpl)
+
+        rule_test = mw.checkWebConfig()
+        if rule_test != True:
+            os.remove(conf_proxy)
+            return mw.returnData(False, "OpenResty配置测试不通过, 请重试: {}".format(rule_test))
+
+        if proxy_action == "add":
+            # 添加代理
+            pid = mw.md5("{}".format(name))
+            for item in data:
+                if item["name"] == name:
+                    return mw.returnData(False, "名称重复!")
+                if item["from"] == site_from:
+                    return mw.returnData(False, "代理目录已存在!")
+            data.append({
+                "name": name,
+                "from": site_from,
+                "to": to,
+                "host": host,
+                "open_cache": open_cache,
+                "open_proxy": open_proxy,
+                "cache_time": cache_time,
+                "id": pid,
+            })
+        else:
+            # 修改代理
+            dindex = -1
+            for x in range(len(data)):
+                if data[x]["id"] == pid:
+                    dindex = x
+                    break
+            if dindex < 0:
+                return mw.returnData(False, "异常请求")
+            data[dindex]['from'] = site_from
+            data[dindex]['to'] = to
+            data[dindex]['host'] = host
+            data[dindex]['open_cache'] = open_cache
+            data[dindex]['open_proxy'] = open_proxy
+            data[dindex]['cache_time'] = cache_time
+
+        if open_proxy != 'on':
+            os.rename(conf_proxy, conf_bk)
+
+        mw.writeFile(proxy_site_path, json.dumps(data))
+        self.operateProxyConf(site_name, 'start')
+        mw.restartWeb()
+        return mw.returnData(True, "ok", {"hash": pid})
+
+    def getProxyConf(self, site_name, pid):
+        if pid == '' or site_name == '':
+            return mw.returnData(False, "必填项不能为空!")
+
+        conf_file = "{}/{}/{}.conf".format(self.proxyPath, site_name, pid)
+        if not os.path.exists(conf_file):
+            conf_file = "{}/{}/{}.conf.txt".format(self.proxyPath, site_name, pid)
+
+        if not os.path.exists(conf_file):
+            return mw.returnData(False, "获取失败!")
+
+        data = mw.readFile(conf_file)
+        return mw.returnData(True, "ok", {"result": data})
+
+    def delProxy(self, site_name, pid):
+        if pid == '' or site_name == '':
+            return mw.returnData(False, "必填项不能为空!")
+
+        try:
+            data_path = self.getProxyDataPath(site_name)
+            data_content = mw.readFile(data_path) if os.path.exists(data_path) else ""
+            data = json.loads(data_content) if data_content != "" else []
+            for item in data:
+                if item["id"] == pid:
+                    data.remove(item)
+                    break
+            # write database
+            mw.writeFile(data_path, json.dumps(data))
+
+            # data is empty,should stop
+            if len(data) == 0:
+                self.operateProxyConf(site_name, 'stop')
+            # remove conf file
+            cmd = "rm -rf {}/{}.conf*".format(self.getProxyPath(site_name), pid)
+            mw.execShell(cmd)
+        except:
+            return mw.returnData(False, "删除反代失败!")
+
+        mw.restartWeb()
+        return mw.returnData(True, "删除反代成功!")
+
 
     def setPhpVersion(self, siteName, version):
         # nginx
