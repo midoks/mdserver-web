@@ -15,8 +15,7 @@ import os
 from flask import Blueprint, render_template
 from flask import request
 
-from admin import model
-
+from admin import session
 from admin.user_login_check import panel_login_required
 
 
@@ -202,6 +201,34 @@ def set_ipv6_status():
         mw.writeLog('面板设置', '开启面板IPv6兼容!')
     mw.restartMw()
     return mw.returnData(True, '设置成功!')
+
+# 设置面板用户
+@blueprint.route('/set_name', endpoint='set_name', methods=['POST'])
+@panel_login_required
+def set_name():
+    name1 = request.form.get('name1', '')
+    name2 = request.form.get('name2', '')
+    if name1 != name2:
+        return mw.returnData(False, '两次输入的用户名不一致，请重新输入!')
+    if len(name1) < 3:
+        return mw.returnData(False, '用户名长度不能少于3位')
+    thisdb.setUserByName(session['username'], name1)
+    session['username'] = name1
+    return mw.returnData(True, '用户修改成功!')
+
+@blueprint.route('/set_password', endpoint='set_password', methods=['POST'])
+@panel_login_required
+def set_password():
+    password1 = request.form.get('password1', '')
+    password2 = request.form.get('password2', '')
+    if password1 != password2:
+        return mw.returnData(False, '两次输入的密码不一致，请重新输入!')
+    if len(password1) < 5:
+        return mw.returnData(False, '用户密码不能小于5位!')
+
+    thisdb.setUserPwdByName(session['username'], password1)
+    return mw.returnData(True, '密码修改成功!')
+
 
 # 设置站点状态
 @blueprint.route('/set_port', endpoint='set_port', methods=['POST'])

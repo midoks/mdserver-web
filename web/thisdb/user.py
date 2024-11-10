@@ -88,6 +88,13 @@ def updateUserLoginTime():
     mw.M('users').field(__field).where('id=?', (1,)).update({'login_time':now_time})
     return True
 
+def setUserByName(name, new_name):
+    return mw.M('users').where("name=?", (name,)).setField('name', new_name.strip())
+
+def setUserPwdByName(name, password):
+    pwd = mw.md5(password)
+    return mw.M('users').where("name=?", (name,)).setField('password', pwd)
+
 def setUserByRoot(
     name: str | None = None,
     password: str | None = None,

@@ -23,7 +23,7 @@ web_dir = os.getcwd() + "/web"
 os.chdir(web_dir)
 sys.path.append(web_dir)
 
-from utils.firewall import firewall as MwFirewall
+from utils.firewall import Firewall as MwFirewall
 import core.mw as mw
 import thisdb
 
