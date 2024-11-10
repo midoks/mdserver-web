@@ -1051,7 +1051,9 @@ function createDir(type, path) {
 				</div>',
 		success:function(){
 			$("#newDirName").focus().keyup(function(e){
-				if(e.keyCode == 13) $("#createDirBtn").click();
+				if(e.keyCode == 13) {
+					$("#createDirBtn").click();
+				}
 			});
 		}
 	});
