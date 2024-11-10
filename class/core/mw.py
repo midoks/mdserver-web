@@ -1832,11 +1832,9 @@ def getCertName(certPath):
             if hasattr(issuer, 'O'):
                 result['issuer'] = issuer.O
         # 取到期时间
-        result['notAfter'] = strfDate(
-            bytes.decode(x509.get_notAfter())[:-1])
+        result['notAfter'] = strfDate(bytes.decode(x509.get_notAfter())[:-1])
         # 取申请时间
-        result['notBefore'] = strfDate(
-            bytes.decode(x509.get_notBefore())[:-1])
+        result['notBefore'] = strfDate(bytes.decode(x509.get_notBefore())[:-1])
         # 取可选名称
         result['dns'] = []
         for i in range(x509.get_extension_count()):

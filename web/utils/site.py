@@ -1290,6 +1290,64 @@ location ^~ {from} {\n\
         return mw.returnData(True, "删除反代成功!")
 
 
+
+    # 是否跳转到https
+    def isToHttps(self, site_name):
+        file = self.getHostConf(site_name)
+        conf = mw.readFile(file)
+        if conf:
+            # if conf.find('HTTP_TO_HTTPS_START') != -1:
+            #     return True
+            if conf.find('$server_port !~ 443') != -1:
+                return True
+        return False
+
+    def getSsl(self, site_name, ssl_type):
+
+        path = self.sslDir + '/' + site_name
+
+        file = self.getHostConf(site_name)
+        content = mw.readFile(file)
+
+        key_text = 'ssl_certificate'
+        status = True
+        stype = 0
+        if content.find(key_text) == -1:
+            status = False
+            stype = -1
+
+        to_https = self.isToHttps(site_name)
+
+        sid = mw.M('sites').where("name=?", (site_name,)).getField('id')
+        domains = mw.M('domain').where("pid=?", (sid,)).field('name').select()
+
+        csr_path = path + '/fullchain.pem'  # 生成证书路径
+        key_path = path + '/privkey.pem'    # 密钥文件路径
+
+        cert_data = None
+        if ssl_type == 'lets':
+            csr_path = self.sslLetsDir + '/' + site_name + '/fullchain.pem'  # 生成证书路径
+            key_path = self.sslLetsDir + '/' + site_name + '/privkey.pem'    # 密钥文件路径
+        elif ssl_type == 'acme':
+            acme_dir = mw.getAcmeDomainDir(site_name)
+            csr_path = acme_dir + '/fullchain.cer'  # 生成证书路径
+            key_path = acme_dir + '/' + site_name + '.key'    # 密钥文件路径
+
+        key = mw.readFile(key_path)
+        csr = mw.readFile(csr_path)
+        cert_data = mw.getCertName(csr_path)
+        data = {
+            'status': status,
+            'domain': domains,
+            'key': key,
+            'csr': csr,
+            'type': stype,
+            'httpTohttps': to_https,
+            'cert_data': cert_data,
+        }
+        return mw.returnData(True, 'OK', data)
+
+
     def setPhpVersion(self, siteName, version):
         # nginx
         file = self.getHostConf(siteName)

@@ -25,6 +25,15 @@ import thisdb
 from .site import blueprint
 
 
+# 删除代理配置
+@blueprint.route('/get_ssl', endpoint='get_ssl', methods=['POST'])
+@panel_login_required
+def get_ssl():
+    site_name = request.form.get('site_name', '')
+    ssl_type = request.form.get('ssl_type', '')
+    return MwSites.instance().getSsl(site_name, ssl_type)
+
+
 
 
 
