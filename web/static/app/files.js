@@ -1,15 +1,8 @@
-// console.log(lan);
-
 //判断磁盘数量超出宽度
 function isDiskWidth(){
-	var comlistWidth = $("#comlist").width();
-	var bodyWidth = $(".file-box").width();
-	if(comlistWidth + 530 > bodyWidth){
-		$("#comlist").css({"width":bodyWidth-530+"px","height":"34px","overflow":"auto"});
-	}
-	else{
-		$("#comlist").removeAttr("style");
-	}
+	var comlist_width = $("#comlist").width();
+	var body_width = $(".file-box").width();
+	$("#comlist").css({"width":(body_width-520)+"px","height":"34px","overflow":"auto"});
 }
 
 //打开回收站
@@ -227,7 +220,9 @@ function getFileName(name){
 function reisImage(fileName){
 	var exts = ['jpg','jpeg','png','bmp','gif','tiff','ico'];
 	for(var i=0; i<exts.length; i++){
-		if(fileName == exts[i]) return true
+		if(fileName == exts[i]) {
+			return true;
+		}
 	}
 	return false;
 }
