@@ -1467,7 +1467,7 @@ function setPanelApi(){
 	$.post('/setting/set_panel_token', {'op_type':"2"},function(rdata){
 		showMsg(rdata.msg, function(){
 			if (rdata.status){
-				showPanelApi();
+				addApp();
 			}
 		} ,{icon:rdata.status?1:2}, 1000);
 	},'json');
@@ -1483,6 +1483,16 @@ function deleteApp(id){
 			}
 		},'json');
 	});
+}
+
+function toggleAppstatus(id){
+	$.post('/setting/toggle_app_status', {id:id}, function(rdata){
+		showMsg(rdata.msg, function(){
+			if (rdata.status){
+				getAppList();
+			}
+		} ,{icon:rdata.status?1:2}, 2000);
+	},'json');
 }
 
 function getAppList(page) {
@@ -1503,9 +1513,9 @@ function getAppList(page) {
 			tbody += '<td>' + row['white_list'] +'</td>';
 
 			if (row['status'] == 1){
-				tbody += '<td><a class="btlink">已开启</a></td>';
+				tbody += '<td><a class="btlink" onclick="toggleAppstatus('+row['id']+');">已开启</a></td>';
 			} else {
-				tbody += '<td><a style="color:red;">已关闭</a></td>';
+				tbody += '<td><a style="color:red;" onclick="toggleAppstatus('+row['id']+');">已关闭</a></td>';
 			}
 			
 			tbody += '<td>' + row['add_time'] +'</td>';

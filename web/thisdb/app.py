@@ -46,6 +46,13 @@ def getAppById(aid):
 def deleteAppById(aid):
     return mw.M('app').where("id=?", (aid,)).delete()
 
+def toggleAppStatus(aid):
+    info = mw.M('app').field(__FIELD).where("id=?", (aid,)).find()
+    if info['status'] == 1:
+        return mw.M('app').where('id=?',(aid,)).update({'status':0})
+    return mw.M('app').where('id=?',(aid,)).update({'status':1})
+
+
 def setAppData(aid,
     status: str | None = None,
     app_id: str | None = None,

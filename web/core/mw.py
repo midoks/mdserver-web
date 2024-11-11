@@ -1235,7 +1235,194 @@ def getCertName(certPath):
     except Exception as e:
         writeFileLog(getTracebackInfo())
         return None
+
+def createLocalSSL():
+    if not os.path.exists('ssl/local'):
+        execShell('mkdir -p ssl/local')
+
+
+    # 自签证书
+    # if os.path.exists('ssl/local/input.pl'):
+    #     return True
+
+    client_ip = getClientIp()
+
+    import OpenSSL
+    key = OpenSSL.crypto.PKey()
+    key.generate_key(OpenSSL.crypto.TYPE_RSA, 2048)
+    cert = OpenSSL.crypto.X509()
+    cert.set_serial_number(0)
+    
+    if client_ip == '127.0.0.1':
+        cert.get_subject().CN = '127.0.0.1'
+    else:
+        cert.get_subject().CN = getLocalIp()
+    
+    cert.set_issuer(cert.get_subject())
+    cert.gmtime_adj_notBefore(0)
+    cert.gmtime_adj_notAfter(86400 * 3650)
+    cert.set_pubkey(key)
+    cert.sign(key, 'md5')
+    cert_ca = OpenSSL.crypto.dump_certificate(OpenSSL.crypto.FILETYPE_PEM, cert)
+    private_key = OpenSSL.crypto.dump_privatekey(OpenSSL.crypto.FILETYPE_PEM, key)
+    if len(cert_ca) > 100 and len(private_key) > 100:
+        writeFile('ssl/local/cert.pem', cert_ca, 'wb+')
+        writeFile('ssl/local/private.pem', private_key, 'wb+')
+        return True
+    return False
+
+
+def getSSHPort():
+    try:
+        file = '/etc/ssh/sshd_config'
+        conf = readFile(file)
+        rep = "(#*)?Port\\s+([0-9]+)\\s*\n"
+        port = re.search(rep, conf).groups(0)[1]
+        return int(port)
+    except:
+        return 22
+
+
+def getSSHStatus():
+    if os.path.exists('/usr/bin/apt-get'):
+        status = execShell("service ssh status | grep -P '(dead|stop)'")
+    else:
+        import system_api
+        version = system_api.system_api().getSystemVersion()
+        if version.find(' Mac ') != -1:
+            return True
+        if version.find(' 7.') != -1:
+            status = execShell("systemctl status sshd.service | grep 'dead'")
+        else:
+            status = execShell(
+                "/etc/init.d/sshd status | grep -e 'stopped' -e '已停'")
+    if len(status[0]) > 3:
+        status = False
+    else:
+        status = True
+    return status
+
 ##################### ssl  end #########################################
+
+def getGlibcVersion():
+    try:
+        cmd_result = execShell("ldd --version")[0]
+        if not cmd_result: return ''
+        glibc_version = cmd_result.split("\n")[0].split()[-1]
+    except:
+        return ''
+    return glibc_version
+
+##################### ssh  start #########################################
+def getSshDir():
+    if isAppleSystem():
+        user = execShell("who | sed -n '2, 1p' |awk '{print $1}'")[0].strip()
+        return '/Users/' + user + '/.ssh'
+    return '/root/.ssh'
+
+
+def processExists(pname, exe=None, cmdline=None):
+    # 进程是否存在
+    try:
+        import psutil
+        pids = psutil.pids()
+        for pid in pids:
+            try:
+                p = psutil.Process(pid)
+                if p.name() == pname:
+                    if not exe and not cmdline:
+                        return True
+                    else:
+                        if exe:
+                            if p.exe() == exe:
+                                return True
+                        if cmdline:
+                            if cmdline in p.cmdline():
+                                return True
+            except:
+                pass
+        return False
+    except:
+        return True
+
+
+def createRsa():
+    # ssh-keygen -t rsa -P "" -C "midoks@163.com"
+    ssh_dir = getSshDir()
+    # mw.execShell("rm -f /root/.ssh/*")
+    if not os.path.exists(ssh_dir + '/authorized_keys'):
+        execShell('touch ' + ssh_dir + '/authorized_keys')
+
+    if not os.path.exists(ssh_dir + '/id_rsa.pub') and os.path.exists(ssh_dir + '/id_rsa'):
+        execShell('echo y | ssh-keygen -q -t rsa -P "" -f ' +
+                  ssh_dir + '/id_rsa')
+    else:
+        execShell('ssh-keygen -q -t rsa -P "" -f ' + ssh_dir + '/id_rsa')
+
+    execShell('cat ' + ssh_dir + '/id_rsa.pub >> ' +
+              ssh_dir + '/authorized_keys')
+    execShell('chmod 600 ' + ssh_dir + '/authorized_keys')
+
+
+def createSshInfo():
+    ssh_dir = getSshDir()
+    if not os.path.exists(ssh_dir + '/id_rsa') or not os.path.exists(ssh_dir + '/id_rsa.pub'):
+        createRsa()
+
+    # 检查是否写入authorized_keys
+    data = execShell("cat " + ssh_dir + "/id_rsa.pub | awk '{print $3}'")
+    if data[0] != "":
+        cmd = "cat " + ssh_dir + "/authorized_keys | grep " + data[0]
+        ak_data = execShell(cmd)
+        if ak_data[0] == "":
+            cmd = 'cat ' + ssh_dir + '/id_rsa.pub >> ' + ssh_dir + '/authorized_keys'
+            execShell(cmd)
+            execShell('chmod 600 ' + ssh_dir + '/authorized_keys')
+
+
+def connectSsh():
+    import paramiko
+    ssh = paramiko.SSHClient()
+    createSshInfo()
+    ssh.set_missing_host_key_policy(paramiko.AutoAddPolicy())
+
+    port = getSSHPort()
+    try:
+        ssh.connect('127.0.0.1', port, timeout=5)
+    except Exception as e:
+        ssh.connect('localhost', port, timeout=5)
+    except Exception as e:
+        ssh.connect(getHostAddr(), port, timeout=30)
+    except Exception as e:
+        return False
+
+    shell = ssh.invoke_shell(term='xterm', width=83, height=21)
+    shell.setblocking(0)
+    return shell
+
+
+def clearSsh():
+    # 服务器IP
+    ip = getHostAddr()
+    sh = '''
+#!/bin/bash
+PLIST=`who | grep localhost | awk '{print $2}'`
+for i in $PLIST
+do
+    ps -t /dev/$i |grep -v TTY | awk '{print $1}' | xargs kill -9
+done
+
+# getHostAddr
+PLIST=`who | grep "${ip}" | awk '{print $2}'`
+for i in $PLIST
+do
+    ps -t /dev/$i |grep -v TTY | awk '{print $1}' | xargs kill -9
+done
+'''
+    if not isAppleSystem():
+        info = execShell(sh)
+        print(info[0], info[1])
+##################### ssh  end   #########################################
         
 ##################### notify  start #########################################
 

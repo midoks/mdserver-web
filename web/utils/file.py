@@ -11,8 +11,7 @@
 import os
 import pwd
 import time
-
-from admin import model
+import shutil
 
 import core.mw as mw
 import thisdb
@@ -24,6 +23,23 @@ def setFileAccept(filename):
         auth = user + ':staff'
     os.system('chown -R ' + auth + ' ' + filename)
     os.system('chmod -R 755 ' + filename)
+
+def createFile(file_path):
+    try:
+        if not checkFileName(file_path):
+            return mw.returnData(False, '文件名中不能包含特殊字符!')
+        if os.path.exists(file_path):
+            return mw.returnData(False, '指定文件已存在!')
+        _path = os.path.dirname(file_path)
+        if not os.path.exists(_path):
+            os.makedirs(_path)
+        open(file_path, 'w+').close()
+        setFileAccept(file)
+        msg = mw.getInfo('创建文件[{1}]成功!', (file_path,))
+        mw.writeLog('文件管理', msg)
+        return mw.returnData(True, '文件创建成功!')
+    except Exception as e:
+        return mw.returnData(True, '文件创建失败:'+str(e))
 
 def createDir(path):
     try:

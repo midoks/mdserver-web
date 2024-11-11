@@ -49,7 +49,10 @@ def init_option():
     # 初始化安全路径
     thisdb.setOption('admin_path', mw.getRandomString(8))
 
+    # API是否开启|默认关闭
+    thisdb.setOption('api', 'no')
 
+    # 获取服务器IP
     ip = mw.getLocalIp()
     thisdb.setOption('server_ip', ip)
 

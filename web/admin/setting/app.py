@@ -41,7 +41,7 @@ def get_app_list():
     return data
 
 
-# 获取APP列表
+# 添加APP列表
 @blueprint.route('/add_app', endpoint='add_app', methods=['POST'])
 @panel_login_required
 def add_app():
@@ -53,6 +53,16 @@ def add_app():
     if rid > 0:
         return mw.returnData(True, '添加成功!')
     return mw.returnData(False, '添加失败!')
+
+# 添加APP列表
+@blueprint.route('/toggle_app_status', endpoint='toggle_app_status', methods=['POST'])
+@panel_login_required
+def toggle_app_status():
+    aid = request.form.get('id', '').strip()
+    rid = thisdb.toggleAppStatus(aid)
+    if rid > 0:
+        return mw.returnData(True, '切换成功!')
+    return mw.returnData(False, '切换失败!')
 
 
 # 获取APP列表
