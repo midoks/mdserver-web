@@ -47,6 +47,16 @@ class Firewall(object):
         elif mw.isAppleSystem():
             self.__isMac = True
 
+    # 自动识别防火墙配置 | Automatically identify firewall
+    def aIF():
+        if self.__isFirewalld:
+            self.AIF_Firewalld()
+
+    def AIF_Firewalld():
+        # firewall-cmd --list-all | grep '  ports'
+        data = mw.execShell("firewall-cmd --list-all | grep '  ports'")
+        print(data)
+
     def getList(self, page=1,size=10):
         info = thisdb.getFirewallList(page=page, size=size)
 

@@ -15,6 +15,7 @@ from .option import init_option
 from .init_db_system import init_db_system
 from .init_cmd import init_cmd
 
+from utils.firewall import Firewall as MwFirewall
 
 import thisdb
 import config
@@ -28,4 +29,7 @@ def init():
 	    init_option()
 	init_cmd()
 	init_db_system()
+
+	# 自动识别防火墙配置
+	MwFirewall.instance().aIF()
 

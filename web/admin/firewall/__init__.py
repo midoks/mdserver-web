@@ -13,8 +13,6 @@ from flask import Blueprint, render_template
 from flask import request
 
 from admin.user_login_check import panel_login_required
-from admin.model import db, Firewall
-
 
 from utils.firewall import Firewall as MwFirewall
 
