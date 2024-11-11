@@ -17,10 +17,10 @@ from flask import request
 from utils.plugin import plugin as MwPlugin
 from admin.user_login_check import panel_login_required
 
-from admin import model
 
 import core.mw as mw
 import utils.config as utils_config
+import thisdb
 
 
 blueprint = Blueprint('plugins', __name__, url_prefix='/plugins', template_folder='../../templates/default')
@@ -131,7 +131,7 @@ def menu():
     pg = MwPlugin.instance()
     tag = request.args.get('tag', '')
 
-    hook_menu = model.getOptionByJson('hook_menu',type='hook',default=[])
+    hook_menu = thisdb.getOptionByJson('hook_menu',type='hook',default=[])
     content = ''
     for menu_data in hook_menu:
         if tag == menu_data['name'] and 'path' in menu_data:

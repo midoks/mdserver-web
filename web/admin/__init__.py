@@ -215,6 +215,12 @@ app.logger.debug("Python syspath: %s", sys.path)
 # OK
 socketio.init_app(app, cors_allowed_origins="*")
 
+from gevent.pywsgi import WSGIServer
+from geventwebsocket.handler import WebSocketHandler
+http_server = WSGIServer(('0.0.0.0', config.DEFAULT_SERVER_PORT), app, handler_class=WebSocketHandler)
+http_server.serve_forever()
+socketio.run(app, host=HOST, port=PORT)
+
 # def create_app(app_name = None):
 #     
 #     if not app_name:

@@ -14,8 +14,6 @@ import json
 import threading
 import multiprocessing
 
-from admin import model
-
 import core.mw as mw
 import thisdb
 

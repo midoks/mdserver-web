@@ -8,6 +8,8 @@
 # Author: midoks <midoks@163.com>
 # ---------------------------------------------------------------------------------
 
+from flask import request
+
 from admin import socketio
 from admin.common import isLogined
 
