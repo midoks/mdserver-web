@@ -12,6 +12,7 @@ flask-caching>=1.10.1
 cache==1.0.3
 gevent>=22.10.2
 gevent-websocket==0.10.1
+eventlet>=0.24.1
 psutil==5.9.1
 chardet==3.0.4
 SQLAlchemy==2.*
