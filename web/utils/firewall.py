@@ -48,11 +48,11 @@ class Firewall(object):
             self.__isMac = True
 
     # 自动识别防火墙配置 | Automatically identify firewall
-    def aIF():
+    def aIF(self):
         if self.__isFirewalld:
             self.AIF_Firewalld()
 
-    def AIF_Firewalld():
+    def AIF_Firewalld(self):
         # firewall-cmd --list-all | grep '  ports'
         data = mw.execShell("firewall-cmd --list-all | grep '  ports'")
         print(data)
