@@ -66,7 +66,7 @@ def add_accept_port():
 
     return MwFirewall.instance().addAcceptPort(port, ps, stype, protocol=protocol)
 
-# 添加放行端口
+# 删除放行端口
 @blueprint.route('/del_accept_port', endpoint='del_accept_port', methods=['POST'])
 @panel_login_required
 def del_accept_port():
@@ -76,7 +76,14 @@ def del_accept_port():
     return MwFirewall.instance().delAcceptPort(firewall_id, port, protocol=protocol)
 
 
-
+# 设置防火墙状态
+@blueprint.route('/set_fw', endpoint='set_fw', methods=['POST'])
+@panel_login_required
+def set_fw():
+    if mw.isAppleSystem():
+        return mw.returnData(True, '开发机不能设置!')
+    status = request.form.get('status', '1')
+    return MwFirewall.instance().setFw(status)
 
 
 
