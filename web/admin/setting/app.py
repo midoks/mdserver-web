@@ -32,7 +32,7 @@ import thisdb
 def get_app_list():
     limit = request.form.get('limit', '5').strip()
     page = request.form.get('page', '1').strip()
-    tojs = request.form.get('tojs', '').strip()
+    tojs = request.form.get('tojs', 'getAppList').strip()
 
     info = thisdb.getAppList(page=int(page),size=int(limit))
     data = {}
@@ -53,3 +53,14 @@ def add_app():
     if rid > 0:
         return mw.returnData(True, '添加成功!')
     return mw.returnData(False, '添加失败!')
+
+
+# 获取APP列表
+@blueprint.route('/delete_app', endpoint='delete_app', methods=['POST'])
+@panel_login_required
+def delete_app():
+    aid = request.form.get('id', '').strip()
+    rid = thisdb.deleteAppById(aid)
+    if rid > 0:
+        return mw.returnData(True, '删除成功!')
+    return mw.returnData(False, '删除失败!')
