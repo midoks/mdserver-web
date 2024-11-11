@@ -63,20 +63,36 @@ app.config['PERMANENT_SESSION_LIFETIME'] = timedelta(days=31)
 # app.config['SQLALCHEMY_DATABASE_URI'] = mw.getSqitePrefix()+config.SQLITE_PATH+"?timeout=20"  # 使用 SQLite 数据库
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = True
 
-
 # 初始化db
-# sys_db.init_app(app)
-# Migrate(app, sys_db)
 setup.init()
-
 
 # webssh
 socketio = SocketIO()
 socketio.init_app(app)
-from .ssh import websshRun
-websshRun()
+
+@socketio.on('webssh_websocketio')
+def webssh_websocketio(data):
+    if not isLogined():
+        emit('server_response', {'data': '会话丢失，请重新登陆面板!\r\n'})
+        return
+    import utils.ssh.ssh_terminal as ssh_terminal
+    shell_client = ssh_terminal.ssh_terminal.instance()
+    shell_client.run(request.sid, data)
+    return
 
 
+@socketio.on('webssh')
+def webssh(data):
+    if not isLogined():
+        emit('server_response', {'data': '会话丢失，请重新登陆面板!\r\n'})
+        return None
+
+    import utils.ssh.ssh_local as ssh_local
+    shell = ssh_local.ssh_local.instance()
+    shell.run(data)
+    return
+
+# BASIC AUTH
 app.config['BASIC_AUTH_OPEN'] = False
 try:
     basic_auth = model.getOptionByJson('basic_auth', default={'open':False})
