@@ -14,30 +14,30 @@ import json
 import time
 import uuid
 import logging
+
 from datetime import timedelta
 
 from flask import Flask
 from flask import request
 from flask import Response
-
-from flask_socketio import SocketIO, emit, send
 from flask import Flask, abort, current_app, session, url_for
 from flask import Blueprint, render_template
 from flask import render_template_string
 
-
-
+from flask_socketio import SocketIO, emit, send
 
 from flask_migrate import Migrate
 from flask_caching import Cache
 from werkzeug.local import LocalProxy
 
 from admin import setup
+from admin.common import isLogined
 
 import core.mw as mw
 import config
 import utils.config as utils_config
 import thisdb
+
 
 
 app = Flask(__name__, template_folder='templates/default')
