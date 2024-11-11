@@ -192,6 +192,7 @@ curl --insecure -fsSL  https://raw.githubusercontent.com/midoks/mdserver-web/dev
 ### 旧版安装
 ```
 curl --insecure -fsSL  https://raw.githubusercontent.com/midoks/mdserver-web/dev/scripts/old/install.sh | bash
+curl --insecure -fsSL  https://raw.githubusercontent.com/midoks/mdserver-web/dev/scripts/old/update.sh | bash
 ```
 
 ### 捐赠地址 USDT（TRC20）
