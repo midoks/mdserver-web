@@ -30,7 +30,7 @@ from flask_socketio import SocketIO, emit, send
 
 class ssh_terminal(object):
 
-    __debug_file = 'logs/ssh_terminal.log'
+    __debug_file =  'logs/ssh_terminal.log'
     __log_type = 'SSH终端'
 
     # websocketio 唯一标识
@@ -59,6 +59,7 @@ class ssh_terminal(object):
     _instance_lock = threading.Lock()
 
     def __init__(self):
+        self.__debug_file = mw.getPanelDir()+ '/logs/ssh_terminal.log'
         ht = threading.Thread(target=self.heartbeat)
         ht.start()
 

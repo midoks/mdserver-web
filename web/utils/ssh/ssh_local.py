@@ -39,7 +39,7 @@ class ssh_local(object):
     _instance_lock = threading.Lock()
 
     def __init__(self):
-        pass
+        self.__debug_file = mw.getPanelDir()+ '/logs/ssh_terminal.log'
 
     @classmethod
     def instance(cls, *args, **kwargs):
