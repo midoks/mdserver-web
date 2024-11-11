@@ -17,36 +17,27 @@ import logging
 from datetime import timedelta
 
 from flask import Flask
+from flask import request
+from flask import Response
 
 from flask_socketio import SocketIO, emit, send
 from flask import Flask, abort, current_app, session, url_for
 from flask import Blueprint, render_template
 from flask import render_template_string
 
-from flask import request
-from flask import Response
+
 
 
 from flask_migrate import Migrate
 from flask_caching import Cache
 from werkzeug.local import LocalProxy
 
-# from admin import model
 from admin import setup
-import thisdb
-
-from admin.model import db as sys_db
-
 
 import core.mw as mw
 import config
 import utils.config as utils_config
-
-root_dir = mw.getRunDir()
-
-socketio = SocketIO(manage_session=False, async_mode='threading',
-                    logger=False, engineio_logger=False, debug=False,
-                    ping_interval=25, ping_timeout=120)
+import thisdb
 
 
 app = Flask(__name__, template_folder='templates/default')
@@ -77,6 +68,13 @@ app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = True
 # sys_db.init_app(app)
 # Migrate(app, sys_db)
 setup.init()
+
+
+# webssh
+socketio = SocketIO()
+socketio.init_app(app)
+from .ssh import websshRun
+websshRun()
 
 
 app.config['BASIC_AUTH_OPEN'] = False
@@ -158,68 +156,11 @@ def inject_global_variables():
     return dict(config=g_config, data=data)
 
 
-# from flasgger import Swagger
-# api = Api(app, version='1.0', title='API', description='API 文档')
-# Swagger(app)
-
-# @app.route('/colors/<palette>/')
-# def colors(palette):
-#     """
-#     根据调色板名称返回颜色列表
-#     ---
-#     parameters:
-#       - name: palette
-#         in: path
-#         type: string
-#         enum: ['all', 'rgb', 'cmyk']
-#         required: true
-#         default: all
-#     definitions:
-#       Palette:
-#         type: object
-#         properties:
-#           palette_name:
-#             type: array
-#             items:
-#               $ref: '#/definitions/Color'
-#       Color:
-#         type: string
-#     responses:
-#       200:
-#         description: 返回的颜色列表，可按调色板过滤
-#         schema:
-#           $ref: '#/definitions/Palette'
-#         examples:
-#           rgb: ['red', 'green', 'blue']
-#     """
-#     all_colors = {
-#         'cmyk': ['cyan', 'magenta', 'yellow', 'black'],
-#         'rgb': ['red', 'green', 'blue']
-#     }
-#     if palette == 'all':
-#         result = all_colorselse
-#         result = {palette: all_colors.get(palette)}
-#     return jsonify(result)
-
-
-
-
-# Log the startup
-app.logger.info('########################################################')
-app.logger.info('Starting %s v%s...', config.APP_NAME, config.APP_VERSION)
-app.logger.info('########################################################')
-app.logger.debug("Python syspath: %s", sys.path)
-
-
-
-# OK
-socketio.init_app(app, cors_allowed_origins="*")
-
-from gevent.pywsgi import WSGIServer
-from geventwebsocket.handler import WebSocketHandler
-http_server = WSGIServer(('0.0.0.0', config.DEFAULT_SERVER_PORT), app, handler_class=WebSocketHandler)
-http_server.serve_forever()
-socketio.run(app, host=HOST, port=PORT)
+# from gevent.pywsgi import WSGIServer
+# from geventwebsocket.handler import WebSocketHandler
+# http_server = WSGIServer(('0.0.0.0', config.DEFAULT_SERVER_PORT), app, handler_class=WebSocketHandler)
+# http_server.serve_forever()
+# socketio.run(app, host='0.0.0.0', port=PORT)
 
 # def create_app(app_name = None):
 #     
@@ -231,3 +172,10 @@ socketio.run(app, host=HOST, port=PORT)
 #     if app_name.endswith('-cli'):
 #         cli_mode = True
 #     return app
+
+
+# Log the startup
+app.logger.info('########################################################')
+app.logger.info('Starting %s v%s...', config.APP_NAME, config.APP_VERSION)
+app.logger.info('########################################################')
+app.logger.debug("Python syspath: %s", sys.path)
