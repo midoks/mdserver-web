@@ -170,6 +170,25 @@ class Firewall(object):
         mw.execShell('sysctl -p')
         return mw.returnData(True, '设置成功!')
 
+    def setSshPort(self, port):
+        if int(port) < 22 or int(port) > 65535:
+            return mw.returnData(False, '端口范围必需在22-65535之间!')
+
+        ports = ['21', '25', '80', '443', '888']
+        if port in ports:
+            return mw.returnData(False, '(' + port + ')' + '特殊端口不可设置!')
+
+        file = '/etc/ssh/sshd_config'
+        conf = mw.readFile(file)
+
+        rep = r"#*Port\s+([0-9]+)\s*\n"
+        conf = re.sub(rep, "Port " + port + "\n", conf)
+        mw.writeFile(file, conf)
+
+        self.addAcceptPort(port, 'SSH端口修改', 'port')
+        self.reload()
+        return mw.returnData(True, '修改成功!')
+
     def setFw(self, status):
         if self.__isIptables:
             self.setFwIptables(status)

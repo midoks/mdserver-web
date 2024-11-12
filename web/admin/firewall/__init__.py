@@ -53,6 +53,14 @@ def get_ssh_info():
 def set_ping():
     return MwFirewall.instance().setPing()
 
+
+# 修改ssh端口
+@blueprint.route('/set_ssh_port', endpoint='set_ssh_port', methods=['POST'])
+@panel_login_required
+def set_ssh_port():
+    port = request.form.get('port', '1').strip()
+    return MwFirewall.instance().setSshPort(port)
+
 # 添加放行端口
 @blueprint.route('/add_accept_port', endpoint='add_accept_port', methods=['POST'])
 @panel_login_required
