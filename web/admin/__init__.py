@@ -66,32 +66,6 @@ app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = True
 # 初始化db
 setup.init()
 
-# webssh
-socketio = SocketIO()
-socketio.init_app(app)
-
-@socketio.on('webssh_websocketio')
-def webssh_websocketio(data):
-    if not isLogined():
-        emit('server_response', {'data': '会话丢失，请重新登陆面板!\r\n'})
-        return
-    import utils.ssh.ssh_terminal as ssh_terminal
-    shell_client = ssh_terminal.ssh_terminal.instance()
-    shell_client.run(request.sid, data)
-    return
-
-
-@socketio.on('webssh')
-def webssh(data):
-    if not isLogined():
-        emit('server_response', {'data': '会话丢失，请重新登陆面板!\r\n'})
-        return None
-
-    import utils.ssh.ssh_local as ssh_local
-    shell = ssh_local.ssh_local.instance()
-    shell.run(data)
-    return
-
 # BASIC AUTH
 app.config['BASIC_AUTH_OPEN'] = False
 try:
@@ -171,6 +145,31 @@ def inject_global_variables():
     }
     return dict(config=g_config, data=data)
 
+# webssh
+socketio = SocketIO()
+socketio.init_app(app)
+
+@socketio.on('webssh_websocketio')
+def webssh_websocketio(data):
+    if not isLogined():
+        emit('server_response', {'data': '会话丢失，请重新登陆面板!\r\n'})
+        return
+    import utils.ssh.ssh_terminal as ssh_terminal
+    shell_client = ssh_terminal.ssh_terminal.instance()
+    shell_client.run(request.sid, data)
+    return
+
+
+@socketio.on('webssh')
+def webssh(data):
+    if not isLogined():
+        emit('server_response', {'data': '会话丢失，请重新登陆面板!\r\n'})
+        return None
+
+    import utils.ssh.ssh_local as ssh_local
+    shell = ssh_local.ssh_local.instance()
+    shell.run(data)
+    return
 
 # Log the startup
 app.logger.info('########################################################')
