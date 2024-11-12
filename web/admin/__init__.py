@@ -171,17 +171,6 @@ def inject_global_variables():
     }
     return dict(config=g_config, data=data)
 
-# def create_app(app_name = None):
-#     
-#     if not app_name:
-#         app_name = config.APP_NAME
-
-#     # Check if app is created for CLI operations or Web
-#     cli_mode = False
-#     if app_name.endswith('-cli'):
-#         cli_mode = True
-#     return app
-
 
 # Log the startup
 app.logger.info('########################################################')
