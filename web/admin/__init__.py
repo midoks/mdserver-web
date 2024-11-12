@@ -171,13 +171,6 @@ def inject_global_variables():
     }
     return dict(config=g_config, data=data)
 
-
-# from gevent.pywsgi import WSGIServer
-# from geventwebsocket.handler import WebSocketHandler
-# http_server = WSGIServer(('0.0.0.0', config.DEFAULT_SERVER_PORT), app, handler_class=WebSocketHandler)
-# http_server.serve_forever()
-# socketio.run(app, host='0.0.0.0', port=PORT)
-
 # def create_app(app_name = None):
 #     
 #     if not app_name:
