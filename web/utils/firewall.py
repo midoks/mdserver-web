@@ -55,7 +55,8 @@ class Firewall(object):
     def AIF_Firewalld(self):
         # firewall-cmd --list-all | grep '  ports'
         data = mw.execShell("firewall-cmd --list-all | grep '  ports'")
-        print(data)
+        all_port = data[0].strip()
+        print(all_port)
 
     def getList(self, page=1,size=10):
         info = thisdb.getFirewallList(page=page, size=size)
