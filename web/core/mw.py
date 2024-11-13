@@ -84,6 +84,9 @@ def getPanelDataDir():
 def getMWLogs():
     return getPanelDir() + '/logs'
 
+def getPanelLogs():
+    return getPanelDir() + '/logs'
+
 def getPanelTmp():
     return getPanelDir() + '/tmp'
 

@@ -25,6 +25,17 @@ import utils.config as utils_config
 from .setting import blueprint
 import thisdb
 
+# 设置API
+@blueprint.route('/set_panel_api', endpoint='set_panel_api', methods=['POST'])
+@panel_login_required
+def set_panel_api():
+    admin_api = thisdb.getOption('api', default='no')
+    if admin_api == 'no':
+        thisdb.setOption('api', 'yes')
+        return mw.returnData(True, '开启API成功!')
+    thisdb.setOption('api', 'no')
+    return mw.returnData(True, '开启API成功!')
+
 
 # 获取APP列表
 @blueprint.route('/get_app_list', endpoint='get_app_list', methods=['POST'])
@@ -48,6 +59,8 @@ def add_app():
     app_id = request.form.get('app_id', '').strip()
     app_secret = request.form.get('app_secret', '1').strip()
     limit_addr = request.form.get('limit_addr', '').strip()
+    if limit_addr == '':
+        return mw.returnData(False, 'IP限制不能为空!')
 
     rid = thisdb.addApp(app_id,app_secret,limit_addr)
     if rid > 0:

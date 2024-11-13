@@ -1464,7 +1464,7 @@ function showPanelApi(){
 
 function setPanelApi(){
 	var cfg_panel_api = $('#cfg_panel_api').prop("checked");
-	$.post('/setting/set_panel_token', {'op_type':"2"},function(rdata){
+	$.post('/setting/set_panel_api', {},function(rdata){
 		showMsg(rdata.msg, function(){
 			if (rdata.status){
 				addApp();
