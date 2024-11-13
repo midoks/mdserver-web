@@ -27,7 +27,6 @@ workers = cpu_info[1]
 
 panel_dir = mw.getPanelDir()
 
-
 log_dir = mw.getMWLogs()
 if not os.path.exists(log_dir):
     os.mkdir(log_dir)
