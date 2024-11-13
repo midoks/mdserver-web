@@ -171,6 +171,24 @@ def webssh(data):
     shell.run(data)
     return
 
+# File logging
+logger = logging.getLogger('werkzeug')
+logger.setLevel(config.CONSOLE_LOG_LEVEL)
+
+from utils.enhanced_log_rotation import EnhancedRotatingFileHandler
+fh = EnhancedRotatingFileHandler(config.LOG_FILE,
+                                 config.LOG_ROTATION_SIZE,
+                                 config.LOG_ROTATION_AGE,
+                                 config.LOG_ROTATION_MAX_LOG_FILES)
+fh.setLevel(config.FILE_LOG_LEVEL)
+app.logger.addHandler(fh)
+logger.addHandler(fh)
+
+# Console logging
+ch = logging.StreamHandler()
+ch.setLevel(config.CONSOLE_LOG_LEVEL)
+ch.setFormatter(logging.Formatter(config.CONSOLE_LOG_FORMAT))
+
 # Log the startup
 app.logger.info('########################################################')
 app.logger.info('Starting %s v%s...', config.APP_NAME, config.APP_VERSION)
