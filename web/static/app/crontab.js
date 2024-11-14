@@ -85,8 +85,8 @@ function getCronData(page){
 	$.post("/crontab/list?p="+page,'', function(rdata){
 		layer.close(load);
 		var cbody = "";
-		if(rdata == ""){
-			cbody="<tr><td colspan='9' style='text-align: center;'>"+lan.crontab.task_empty+"</td></tr>";
+		if(rdata.data.length == 0){
+			cbody="<tr><td colspan='9' style='text-align: center;'>当前没有计划任务</td></tr>";
 		} else {
 			for(var i=0;i<rdata.data.length;i++){
 				//状态
