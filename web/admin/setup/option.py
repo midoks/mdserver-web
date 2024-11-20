@@ -20,6 +20,9 @@ def init_option():
     thisdb.setOption('recycle_bin', 'open')
     thisdb.setOption('template', 'default')
 
+    # SSL邮件地址
+    thisdb.setOption('ssl_email', '')
+
     # 后台面板是否关闭
     thisdb.setOption('admin_close', 'no')
 

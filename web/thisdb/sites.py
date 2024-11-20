@@ -10,6 +10,8 @@
 
 import core.mw as mw
 
+from .option  import getOption
+
 __FIELD = 'id,name,path,status,ps,edate,type_id,add_time,update_time'
 
 def getSitesCount():
@@ -32,7 +34,7 @@ def getSitesDomainById(site_id):
         t['id'] = b['id']
         domains.append(t)
     data['domains'] = domains
-    data['email'] = mw.M('users').getField('email')
+    data['email'] = getOption('ssl_email', default='')
     return data
 
 def addSites(name, path):

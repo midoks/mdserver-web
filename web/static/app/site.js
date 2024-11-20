@@ -2037,16 +2037,222 @@ function renewSSL(type,id,siteName){
 }
 
 function fileCheck(){
-
+	$('#dnsapi_option').css('display','none');
 }
 
 function dnsCheck(){
+	$('#dnsapi_option').css('display','block');
+}
+
+function renderDnsapiHtml(data){
+	console.log(data);
+	layer.open({
+        type: 1,
+        area: '500px',
+        title: '设置'+data['title']+'接口',
+        closeBtn: 1,
+        shift: 5,
+        shadeClose: true,
+        btn:["确定","取消"],
+        content: "<form class='bt-form pd15'>\
+			<div class='line'>\
+			    <span class='tname'>DNSAPI类型</span>\
+			    <div class='info-r'>\
+			        <select class='bt-input-text mr5' name='type' style='width:100%;'>\
+			            <option name='cf'>"+data['name']+"</option>\
+			        </select>\
+			    </div>\
+			</div>\
+			<div class='line' id='dnsapi_option'>\
+			    <span class='tname'>CF_Key</span>\
+			    <div class='info-r'>\
+			        <input name='v1' class='bt-input-text mr5' style='width:100%;' placeholder='请输入对应值' type='text'>\
+			    </div>\
+			    <span class='tname'>CF_Email</span>\
+			    <div class='info-r'>\
+			        <input name='v2' class='bt-input-text mr5' style='width:100%;' placeholder='请输入对应值' type='text'>\
+			    </div>\
+			</div>\
+			<div class='line'>\
+				<div>\
+					<ul class='help-info-text c7' style='margin-top:0px;'>\
+						<li>使用【"+data['title']+"】的API接口自动解析申请SSL</li>\
+					</ul>\
+				</div>\
+			</div>\
+		</form>",
+        success:function(){
+            
+        },
+        yes:function(index) {
+            
+        }
+    });
 
 }
 
-//SSL
-function opSSL(type, id, siteName, callback){
+function renderDnsapi(){
+	$.post('/site/get_dnsapi', {}, function(data){
+		var dnsapi_option = '';
+		for (var i = 0; i < data.length; i++) {
+			dnsapi_option+='<option value="'+data[i]['name']+'" index="'+i+'">'+data[i]['title']+'</option>';
+		}
 
+		$('#dnsapi_option select').html(dnsapi_option);
+
+		$('#dnsapi_option select').on('change',function(){
+			var val = $(this).val();
+			var index = $('#dnsapi_option option:selected').attr('index');
+			if (val == 'none'){
+				$('#dnsapi_option button').css('display','none');
+			} else {
+				$('#dnsapi_option button').css('display','inline-block');
+			}
+			renderDnsapiHtml(data[index]);
+		});
+
+		$('#dnsapi_set').on('click', function(){
+			var index = $('#dnsapi_option option:selected').attr('index');
+			renderDnsapiHtml(data[index]);
+		});
+	},'json');
+}
+
+function opSSLAcme(type, id, siteName, callback){
+	var acme =  '<div class="apply_ssl">\
+		<div class="label-input-group">\
+			<div class="line mtb10">\
+				<span class="tname text-center">验证方式</span>\
+				<div style="margin-top:7px;display:inline-block">\
+					<input type="radio" name="dns_type" onclick="fileCheck()" id="check_file" checked="checked"/>\
+  					<label class="mr20" for="check_file" style="font-weight:normal">文件验证</label></label>\
+  					<input type="radio" name="dns_type" onclick="dnsCheck()" id="check_dns"/>\
+  					<label class="mr20" for="check_dns" style="font-weight:normal">DNS验证</label></label>\
+  				</div>\
+	  		</div>\
+	  		<div class="line mtb10" id="dnsapi_option" style="display:none;">\
+				<span class="tname text-center"></span>\
+				<div style="margin-top:7px;display:inline-block">\
+					<select class="bt-input-text mr20">\
+						<option value="none">手动解析</option>\
+					</select>\
+					<button id="dnsapi_set" class="btn btn-default btn-sm btn-title" style="display:none;">配置</button>\
+  				</div>\
+	  		</div>\
+  			<div class="check_message line">\
+  				<div style="margin-left:100px">\
+  					<input type="checkbox" name="checkDomain" id="checkDomain" checked="">\
+  					<label class="mr20" for="checkDomain" style="font-weight:normal">提前校验域名(提前发现问题,减少失败率)</label>\
+  				</div>\
+  			</div>\
+  		</div>\
+  		<div class="line mtb10">\
+  			<span class="tname text-center">邮箱</span>\
+  			<input class="bt-input-text" style="width:240px;" type="text" name="admin_email" />\
+  		</div>\
+  		<div class="line mtb10">\
+  			<span class="tname text-center">域名</span>\
+  			<ul id="ymlist" style="padding: 5px 10px;max-height:180px;overflow:auto; width:240px;border:#ccc 1px solid;border-radius:3px"></ul>\
+  		</div>\
+  		<div class="line mtb10" style="margin-left:100px">\
+  			<button class="btn btn-success btn-sm letsApply">申请</button>\
+  		</div>\
+		<ul class="help-info-text c7" id="lets_help">\
+			<li>申请之前，请确保域名已解析，如未解析会导致审核失败</li>\
+			<li>由ACME免费申请证书，有效期3个月，支持多域名。默认会自动续签</li>\
+			<li>若您的站点使用了CDN或301重定向会导致续签失败</li>\
+			<li>在未指定SSL默认站点时,未开启SSL的站点使用HTTPS会直接访问到已开启SSL的站点</li></ul>\
+	 	</ul>\
+	</div>';
+
+	$(".tab-con").html(acme);
+
+	renderDnsapi();
+
+	$.post('/site/get_ssl','site_name='+siteName+'&ssl_type=acme', function(data){
+		var rdata = data['data'];
+		if(rdata.csr == false){
+			$.post('/site/get_site_domains','id='+id, function(rdata) {
+				var data = rdata['data'];
+				var opt='';
+				for(var i=0;i<data.domains.length;i++){
+					var isIP = isValidIP(data.domains[i].name);
+					var x = isContains(data.domains[i].name, '*');
+					if(!isIP && !x){
+						opt += '<li style="line-height:26px">\
+							<input type="checkbox" style="margin-right:5px; vertical-align:-2px" value="'+data.domains[i].name+'">'+data.domains[i].name
+						+'</li>';
+					}
+				}
+				$("input[name='admin_email']").val(data.email);
+				$("#ymlist").html(opt);
+				$("#ymlist li input").click(function(e){
+					e.stopPropagation();
+				})
+				$("#ymlist li").click(function(){
+					var o = $(this).find("input");
+					if(o.prop("checked")){
+						o.prop("checked",false)
+					}
+					else{
+						o.prop("checked",true);
+					}
+				})
+				$(".letsApply").click(function(){
+					var c = $("#ymlist input[type='checkbox']");
+					var str = [];
+					var domains = '';
+					for(var i=0; i<c.length; i++){
+						if(c[i].checked){
+							str.push(c[i].value);
+						}
+					}
+					domains = JSON.stringify(str);
+					newAcmeSSL(siteName, id, domains);
+				});
+
+				if (typeof (callback) != 'undefined'){
+					callback(rdata);
+				}
+			},'json');
+			return;
+		}
+		var acme = '<div class="myKeyCon ptb15">\
+				<div class="ssl_state_info" style="display:none;"></div>\
+				<div class="custom_certificate_info">\
+					<div class="ssl-con-key pull-left mr20" readonly>密钥(KEY)<br><textarea id="key" class="bt-input-text">'+rdata.key+'</textarea></div>\
+					<div class="ssl-con-key pull-left" readonly>证书(PEM格式)<br><textarea id="csr" class="bt-input-text">'+rdata.csr+'</textarea></div>\
+				</div>\
+				<div class="ssl-btn pull-left mtb15" style="width:100%">\
+					<button class="btn btn-success btn-sm" onclick="deploySSL(\'acme\','+id+',\''+siteName+'\')">部署</button>\
+					<button class="btn btn-success btn-sm" onclick="deleteSSL(\'acme\','+id+',\''+siteName+'\')">删除</button>\
+				</div>\
+			</div>\
+			<ul class="help-info-text c7 pull-left">\
+				<li>已为您自动生成ACME免费证书</li>\
+				<li>由ACME免费申请证书，有效期3个月，支持多域名。默认会自动续签</li>\
+				<li>如需使用其他SSL,请切换其他证书后粘贴您的KEY以及PEM内容，然后保存即可。</li>\
+			</ul>';
+		$(".tab-con").html(acme);
+
+		if (rdata['cert_data']){
+			var issuer = rdata['cert_data']['issuer'].split(" ");
+			var domains = rdata['cert_data']['dns'].join("、");
+
+			var cert_data = "<div class='state_info_flex'>\
+				<div class='state_item'><span>证书品牌：</span><span class='ellipsis_text'>"+issuer[0]+"</span></div>\
+				<div class='state_item'><span>到期时间：</span><span class='btlink'>剩余"+rdata['cert_data']['endtime']+"天到期</span></div>\
+			</div>\
+			<div class='state_info_flex'>\
+				<div class='state_item'><span>认证域名：</span><span class='ellipsis_text'>"+domains+"</span></div>\
+			</div>";
+			$(".ssl_state_info").html(cert_data);
+			$(".ssl_state_info").css('display','block');
+		}
+	},'json');
+}
+
+function opSSLNow(type, id, siteName, callback){
 	var now = '<div class="myKeyCon ptb15">\
 			<div class="ssl_state_info" style="display:none;"></div>\
 		<div class="custom_certificate_info">\
@@ -2061,10 +2267,66 @@ function opSSL(type, id, siteName, callback){
 		<li>粘贴您的*.key以及*.pem内容，然后保存即可。</li>\
 		<li>如果浏览器提示证书链不完整,请检查是否正确拼接PEM证书</li><li>PEM格式证书 = 域名证书.crt + 根证书(root_bundle).crt</li>\
 		<li>在未指定SSL默认站点时,未开启SSL的站点使用HTTPS会直接访问到已开启SSL的站点</li>\
-	</ul>';	
+	</ul>';
 
-	// 	<input type="radio" name="c_type" onclick="dnsCheck()" id="check_dns"/>\
-	// <label class="mr20" for="check_dns" style="font-weight:normal">DNS验证</label></label>\
+	$(".tab-con").html(now);
+	var key = '';
+	var csr = '';
+	var loadT = layer.msg('正在提交任务...',{icon:16,time:0,shade: [0.3, '#000']});
+	$.post('/site/get_ssl','site_name='+siteName,function(data){
+		layer.close(loadT);
+		var rdata = data['data'];
+
+		if (rdata['cert_data']){
+			var issuer = rdata['cert_data']['issuer'].split(" ");
+			var domains = rdata['cert_data']['dns'].join("、");
+
+			var cert_data = "<div class='state_info_flex'>\
+				<div class='state_item'><span>证书品牌：</span><span class='ellipsis_text'>"+issuer[0]+"</span></div>\
+				<div class='state_item'><span>到期时间：</span><span class='btlink'>剩余"+rdata['cert_data']['endtime']+"天到期</span></div>\
+			</div>\
+			<div class='state_info_flex'>\
+				<div class='state_item'><span>认证域名：</span><span class='ellipsis_text'>"+domains+"</span></div>\
+				<div class='state_item'><span>强制HTTPS：</span><span class='switch'>\
+					<input class='btswitch btswitch-ios' id='toHttps' type='checkbox'>\
+                    <label class='btswitch-btn' for='toHttps' onclick=\"httpToHttps('" + siteName + "')\">\
+				</span></div>\
+			</div>";
+			$(".ssl_state_info").html(cert_data);
+			$(".ssl_state_info").css('display','block');
+		}
+
+		if(rdata.key == false){
+			rdata.key = '';
+		} else {
+			$(".ssl-btn").append('<button style=\'margin-left:3px;\' class="btn btn-success btn-sm" onclick="deleteSSL(\'now\','+id+',\''+siteName+'\')">删除</button>');
+		}
+
+		if(rdata.csr == false){
+			rdata.csr = '';
+		}
+		$("#key").val(rdata.key);
+		$("#csr").val(rdata.csr);
+
+		$("#toHttps").attr('checked',rdata.httpTohttps);
+		if(rdata.status){
+			$('.warning_info').css('display','none');
+			
+			$(".ssl-btn").append("<button class='btn btn-success btn-sm' onclick=\"ocSSL('close_ssl_conf','"+siteName+"')\" style='margin-left:3px;'>关闭SSL</button>");
+			$('#now_ssl').html('当前证书 - <i style="color:#20a53a;">[已部署SSL]</i>');
+		} else{
+			$('.warning_info').css('display','block');
+			$('#now_ssl').html('当前证书 - <i style="color:red;">[未部署SSL]</i>');
+		}
+
+
+		if (typeof (callback) != 'undefined'){
+			callback(rdata);
+		}
+	},'json');
+}
+
+function opSSLLet(type, id, siteName, callback){
 	var lets =  '<div class="apply_ssl">\
 		<div class="label-input-group">\
 			<div class="line mtb10">\
@@ -2102,274 +2364,96 @@ function opSSL(type, id, siteName, callback){
 	  	</ul>\
   	</div>';
 
-  	// <input type="radio" name="c_type" onclick="dnsCheck()" id="check_dns"/>\
-	// <label class="mr20" for="check_dns" style="font-weight:normal">DNS验证</label></label>\
-	var acme =  '<div class="apply_ssl">\
-		<div class="label-input-group">\
-			<div class="line mtb10">\
-				<form>\
-					<span class="tname text-center">验证方式</span>\
-					<div style="margin-top:7px;display:inline-block">\
-						<input type="radio" name="c_type" onclick="fileCheck()" id="check_file" checked="checked" />\
-	  					<label class="mr20" for="check_file" style="font-weight:normal">文件验证</label></label>\
-	  				</div>\
-	  			</form>\
-	  		</div>\
-  			<div class="check_message line">\
-  				<div style="margin-left:100px">\
-  					<input type="checkbox" name="checkDomain" id="checkDomain" checked="">\
-  					<label class="mr20" for="checkDomain" style="font-weight:normal">提前校验域名(提前发现问题,减少失败率)</label>\
-  				</div>\
-  			</div>\
-  		</div>\
-  		<div class="line mtb10">\
-  			<span class="tname text-center">管理员邮箱</span>\
-  			<input class="bt-input-text" style="width:240px;" type="text" name="admin_email" />\
-  		</div>\
-  		<div class="line mtb10">\
-  			<span class="tname text-center">域名</span>\
-  			<ul id="ymlist" style="padding: 5px 10px;max-height:180px;overflow:auto; width:240px;border:#ccc 1px solid;border-radius:3px"></ul>\
-  		</div>\
-  		<div class="line mtb10" style="margin-left:100px">\
-  			<button class="btn btn-success btn-sm letsApply">申请</button>\
-  		</div>\
-		<ul class="help-info-text c7" id="lets_help">\
-			<li>申请之前，请确保域名已解析，如未解析会导致审核失败</li>\
-			<li>由ACME免费申请证书，有效期3个月，支持多域名。默认会自动续签</li>\
-			<li>若您的站点使用了CDN或301重定向会导致续签失败</li>\
-			<li>在未指定SSL默认站点时,未开启SSL的站点使用HTTPS会直接访问到已开启SSL的站点</li></ul>\
-	 	</ul>\
-	</div>';
-
-			
-	switch(type){
-		case 'lets':
-			$(".tab-con").html(lets);
-			$.post('/site/get_ssl',  'site_name='+siteName+'&ssl_type=lets', function(data){
-				var rdata = data['data'];
-				if(rdata.csr == false){
-					$.post('/site/get_site_domains','id='+id, function(rdata) {
-						var data = rdata['data'];
-						var opt='';
-						for(var i=0;i<data.domains.length;i++){
-							var isIP = isValidIP(data.domains[i].name);
-							var x = isContains(data.domains[i].name, '*');
-							if(!isIP && !x){
-								opt+='<li style="line-height:26px"><input type="checkbox" style="margin-right:5px; vertical-align:-2px" value="'+data.domains[i].name+'">'+data.domains[i].name+'</li>'
-							}
+  	$(".tab-con").html(lets);
+	$.post('/site/get_ssl',  'site_name='+siteName+'&ssl_type=lets', function(data){
+		var rdata = data['data'];
+		if(rdata.csr == false){
+			$.post('/site/get_site_domains','id='+id, function(rdata) {
+				var data = rdata['data'];
+				var opt='';
+				for(var i=0;i<data.domains.length;i++){
+					var isIP = isValidIP(data.domains[i].name);
+					var x = isContains(data.domains[i].name, '*');
+					if(!isIP && !x){
+						opt+='<li style="line-height:26px"><input type="checkbox" style="margin-right:5px; vertical-align:-2px" value="'+data.domains[i].name+'">'+data.domains[i].name+'</li>'
+					}
+				}
+				$("input[name='admin_email']").val(data.email);
+				$("#ymlist").html(opt);
+				$("#ymlist li input").click(function(e){
+					e.stopPropagation();
+				})
+				$("#ymlist li").click(function(){
+					var o = $(this).find("input");
+					if(o.prop("checked")){
+						o.prop("checked",false)
+					}
+					else{
+						o.prop("checked",true);
+					}
+				})
+				$(".letsApply").click(function(){
+					var c = $("#ymlist input[type='checkbox']");
+					var str = [];
+					var domains = '';
+					for(var i=0; i<c.length; i++){
+						if(c[i].checked){
+							str.push(c[i].value);
 						}
-						$("input[name='admin_email']").val(data.email);
-						$("#ymlist").html(opt);
-						$("#ymlist li input").click(function(e){
-							e.stopPropagation();
-						})
-						$("#ymlist li").click(function(){
-							var o = $(this).find("input");
-							if(o.prop("checked")){
-								o.prop("checked",false)
-							}
-							else{
-								o.prop("checked",true);
-							}
-						})
-						$(".letsApply").click(function(){
-							var c = $("#ymlist input[type='checkbox']");
-							var str = [];
-							var domains = '';
-							for(var i=0; i<c.length; i++){
-								if(c[i].checked){
-									str.push(c[i].value);
-								}
-							}
-							domains = JSON.stringify(str);
-							newSSL(siteName, id, domains);
-						});
-
-						if (typeof (callback) != 'undefined'){
-							callback(rdata);
-						}
-					},'json');
-					return;
-				}
-				var lets = '<div class="myKeyCon ptb15">\
-						<div class="ssl_state_info" style="display:none;"></div>\
-						<div class="custom_certificate_info">\
-							<div class="ssl-con-key pull-left mr20" readonly>密钥(KEY)<br><textarea id="key" class="bt-input-text">'+rdata.key+'</textarea></div>\
-							<div class="ssl-con-key pull-left" readonly>证书(PEM格式)<br><textarea id="csr" class="bt-input-text">'+rdata.csr+'</textarea></div>\
-						</div>\
-						<div class="ssl-btn pull-left mtb15" style="width:100%">\
-							<button class="btn btn-success btn-sm" onclick="deploySSL(\'lets\','+id+',\''+siteName+'\')">部署</button>\
-							<button class="btn btn-success btn-sm" onclick="renewSSL(\'lets\','+id+',\''+siteName+'\')">续期</button>\
-							<button class="btn btn-success btn-sm" onclick="deleteSSL(\'lets\','+id+',\''+siteName+'\')">删除</button>\
-						</div>\
-					</div>\
-					<ul class="help-info-text c7 pull-left">\
-						<li>已为您自动生成Let\'s Encrypt免费证书</li>\
-						<li>由Let\'s Encrypt免费申请证书，有效期3个月，支持多域名。默认会自动续签</li>\
-						<li>如需使用其他SSL,请切换其他证书后粘贴您的KEY以及PEM内容，然后保存即可。</li>\
-					</ul>';
-				$(".tab-con").html(lets);
-
-				if (rdata['cert_data']){
-					var issuer = rdata['cert_data']['issuer'].split(" ");
-					var domains = rdata['cert_data']['dns'].join("、");
-
-					var cert_data = "<div class='state_info_flex'>\
-						<div class='state_item'><span>证书品牌：</span><span class='ellipsis_text'>"+issuer[0]+"</span></div>\
-						<div class='state_item'><span>到期时间：</span><span class='btlink'>剩余"+rdata['cert_data']['endtime']+"天到期</span></div>\
-					</div>\
-					<div class='state_info_flex'>\
-						<div class='state_item'><span>认证域名：</span><span class='ellipsis_text'>"+domains+"</span></div>\
-					</div>";
-					$(".ssl_state_info").html(cert_data);
-					$(".ssl_state_info").css('display','block');
-				}
-			},'json');			
-			break;
-		case 'acme':
-			$(".tab-con").html(acme);
-			$.post('/site/get_ssl',  'site_name='+siteName+'&ssl_type=acme', function(data){
-				var rdata = data['data'];
-				if(rdata.csr == false){
-					$.post('/site/get_site_domains','id='+id, function(rdata) {
-						var data = rdata['data'];
-						var opt='';
-						for(var i=0;i<data.domains.length;i++){
-							var isIP = isValidIP(data.domains[i].name);
-							var x = isContains(data.domains[i].name, '*');
-							if(!isIP && !x){
-								opt += '<li style="line-height:26px">\
-									<input type="checkbox" style="margin-right:5px; vertical-align:-2px" value="'+data.domains[i].name+'">'+data.domains[i].name
-								+'</li>';
-							}
-						}
-						$("input[name='admin_email']").val(data.email);
-						$("#ymlist").html(opt);
-						$("#ymlist li input").click(function(e){
-							e.stopPropagation();
-						})
-						$("#ymlist li").click(function(){
-							var o = $(this).find("input");
-							if(o.prop("checked")){
-								o.prop("checked",false)
-							}
-							else{
-								o.prop("checked",true);
-							}
-						})
-						$(".letsApply").click(function(){
-							var c = $("#ymlist input[type='checkbox']");
-							var str = [];
-							var domains = '';
-							for(var i=0; i<c.length; i++){
-								if(c[i].checked){
-									str.push(c[i].value);
-								}
-							}
-							domains = JSON.stringify(str);
-							newAcmeSSL(siteName, id, domains);
-						});
-
-						if (typeof (callback) != 'undefined'){
-							callback(rdata);
-						}
-					},'json');
-					return;
-				}
-				var acme = '<div class="myKeyCon ptb15">\
-						<div class="ssl_state_info" style="display:none;"></div>\
-						<div class="custom_certificate_info">\
-							<div class="ssl-con-key pull-left mr20" readonly>密钥(KEY)<br><textarea id="key" class="bt-input-text">'+rdata.key+'</textarea></div>\
-							<div class="ssl-con-key pull-left" readonly>证书(PEM格式)<br><textarea id="csr" class="bt-input-text">'+rdata.csr+'</textarea></div>\
-						</div>\
-						<div class="ssl-btn pull-left mtb15" style="width:100%">\
-							<button class="btn btn-success btn-sm" onclick="deploySSL(\'acme\','+id+',\''+siteName+'\')">部署</button>\
-							<button class="btn btn-success btn-sm" onclick="deleteSSL(\'acme\','+id+',\''+siteName+'\')">删除</button>\
-						</div>\
-					</div>\
-					<ul class="help-info-text c7 pull-left">\
-						<li>已为您自动生成ACME免费证书</li>\
-						<li>由ACME免费申请证书，有效期3个月，支持多域名。默认会自动续签</li>\
-						<li>如需使用其他SSL,请切换其他证书后粘贴您的KEY以及PEM内容，然后保存即可。</li>\
-					</ul>';
-				$(".tab-con").html(acme);
-
-				if (rdata['cert_data']){
-					var issuer = rdata['cert_data']['issuer'].split(" ");
-					var domains = rdata['cert_data']['dns'].join("、");
-
-					var cert_data = "<div class='state_info_flex'>\
-						<div class='state_item'><span>证书品牌：</span><span class='ellipsis_text'>"+issuer[0]+"</span></div>\
-						<div class='state_item'><span>到期时间：</span><span class='btlink'>剩余"+rdata['cert_data']['endtime']+"天到期</span></div>\
-					</div>\
-					<div class='state_info_flex'>\
-						<div class='state_item'><span>认证域名：</span><span class='ellipsis_text'>"+domains+"</span></div>\
-					</div>";
-					$(".ssl_state_info").html(cert_data);
-					$(".ssl_state_info").css('display','block');
-				}
-			},'json');			
-			break;
-		case 'now':
-			$(".tab-con").html(now);
-			var key = '';
-			var csr = '';
-			var loadT = layer.msg('正在提交任务...',{icon:16,time:0,shade: [0.3, '#000']});
-			$.post('/site/get_ssl','site_name='+siteName,function(data){
-				layer.close(loadT);
-				var rdata = data['data'];
-
-				if (rdata['cert_data']){
-					var issuer = rdata['cert_data']['issuer'].split(" ");
-					var domains = rdata['cert_data']['dns'].join("、");
-
-					var cert_data = "<div class='state_info_flex'>\
-						<div class='state_item'><span>证书品牌：</span><span class='ellipsis_text'>"+issuer[0]+"</span></div>\
-						<div class='state_item'><span>到期时间：</span><span class='btlink'>剩余"+rdata['cert_data']['endtime']+"天到期</span></div>\
-					</div>\
-					<div class='state_info_flex'>\
-						<div class='state_item'><span>认证域名：</span><span class='ellipsis_text'>"+domains+"</span></div>\
-						<div class='state_item'><span>强制HTTPS：</span><span class='switch'>\
-							<input class='btswitch btswitch-ios' id='toHttps' type='checkbox'>\
-		                    <label class='btswitch-btn' for='toHttps' onclick=\"httpToHttps('" + siteName + "')\">\
-						</span></div>\
-					</div>";
-					$(".ssl_state_info").html(cert_data);
-					$(".ssl_state_info").css('display','block');
-				}
-
-				if(rdata.key == false){
-					rdata.key = '';
-				} else {
-					$(".ssl-btn").append('<button style=\'margin-left:3px;\' class="btn btn-success btn-sm" onclick="deleteSSL(\'now\','+id+',\''+siteName+'\')">删除</button>');
-				}
-
-				if(rdata.csr == false){
-					rdata.csr = '';
-				}
-				$("#key").val(rdata.key);
-				$("#csr").val(rdata.csr);
-
-				$("#toHttps").attr('checked',rdata.httpTohttps);
-				if(rdata.status){
-					$('.warning_info').css('display','none');
-					
-					$(".ssl-btn").append("<button class='btn btn-success btn-sm' onclick=\"ocSSL('close_ssl_conf','"+siteName+"')\" style='margin-left:3px;'>关闭SSL</button>");
-					$('#now_ssl').html('当前证书 - <i style="color:#20a53a;">[已部署SSL]</i>');
-				} else{
-					$('.warning_info').css('display','block');
-					$('#now_ssl').html('当前证书 - <i style="color:red;">[未部署SSL]</i>');
-				}
-
+					}
+					domains = JSON.stringify(str);
+					newSSL(siteName, id, domains);
+				});
 
 				if (typeof (callback) != 'undefined'){
 					callback(rdata);
 				}
 			},'json');
-			break;
-		default:
-			layer.msg("错误类型", {icon:5});
-			break;
+			return;
+		}
+		var lets = '<div class="myKeyCon ptb15">\
+				<div class="ssl_state_info" style="display:none;"></div>\
+				<div class="custom_certificate_info">\
+					<div class="ssl-con-key pull-left mr20" readonly>密钥(KEY)<br><textarea id="key" class="bt-input-text">'+rdata.key+'</textarea></div>\
+					<div class="ssl-con-key pull-left" readonly>证书(PEM格式)<br><textarea id="csr" class="bt-input-text">'+rdata.csr+'</textarea></div>\
+				</div>\
+				<div class="ssl-btn pull-left mtb15" style="width:100%">\
+					<button class="btn btn-success btn-sm" onclick="deploySSL(\'lets\','+id+',\''+siteName+'\')">部署</button>\
+					<button class="btn btn-success btn-sm" onclick="renewSSL(\'lets\','+id+',\''+siteName+'\')">续期</button>\
+					<button class="btn btn-success btn-sm" onclick="deleteSSL(\'lets\','+id+',\''+siteName+'\')">删除</button>\
+				</div>\
+			</div>\
+			<ul class="help-info-text c7 pull-left">\
+				<li>已为您自动生成Let\'s Encrypt免费证书</li>\
+				<li>由Let\'s Encrypt免费申请证书，有效期3个月，支持多域名。默认会自动续签</li>\
+				<li>如需使用其他SSL,请切换其他证书后粘贴您的KEY以及PEM内容，然后保存即可。</li>\
+			</ul>';
+		$(".tab-con").html(lets);
+
+		if (rdata['cert_data']){
+			var issuer = rdata['cert_data']['issuer'].split(" ");
+			var domains = rdata['cert_data']['dns'].join("、");
+
+			var cert_data = "<div class='state_info_flex'>\
+				<div class='state_item'><span>证书品牌：</span><span class='ellipsis_text'>"+issuer[0]+"</span></div>\
+				<div class='state_item'><span>到期时间：</span><span class='btlink'>剩余"+rdata['cert_data']['endtime']+"天到期</span></div>\
+			</div>\
+			<div class='state_info_flex'>\
+				<div class='state_item'><span>认证域名：</span><span class='ellipsis_text'>"+domains+"</span></div>\
+			</div>";
+			$(".ssl_state_info").html(cert_data);
+			$(".ssl_state_info").css('display','block');
+		}
+	},'json');
+}
+
+//SSL
+function opSSL(type, id, siteName, callback){
+	switch(type){
+		case 'lets':opSSLLet(type, id, siteName, callback);break;
+		case 'acme':opSSLAcme(type, id, siteName, callback);break;
+		case 'now':opSSLNow(type, id, siteName, callback);break;
+		default:layer.msg("错误类型", {icon:5});break;
 	}
 }
 

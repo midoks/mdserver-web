@@ -24,27 +24,25 @@ import thisdb
 from .site import blueprint
 
 
-# 获取证书信息
-@blueprint.route('/get_ssl', endpoint='get_ssl', methods=['POST'])
+# 获取ACME日志
+@blueprint.route('/get_acme_logs', endpoint='get_acme_logs', methods=['POST'])
 @panel_login_required
-def get_ssl():
-    site_name = request.form.get('site_name', '')
-    ssl_type = request.form.get('ssl_type', '')
-    return MwSites.instance().getSsl(site_name, ssl_type)
+def get_acme_logs():
+    log_file = mw.getPanelDir() + '/logs/acme.log'
+    if not os.path.exists(log_file):
+        mw.execShell('touch ' + log_file)
+    return mw.returnData(True, 'OK', log_file)
 
-# 获取证书列表
-@blueprint.route('/get_cert_list', endpoint='get_cert_list', methods=['GET','POST'])
+
+@blueprint.route('/create_acme', endpoint='create_acme', methods=['POST'])
 @panel_login_required
-def get_cert_list():
-    return MwSites.instance().getCertList()
-
-
-# 获取证书配置
-@blueprint.route('/get_dnsapi', endpoint='get_dnsapi', methods=['GET','POST'])
-@panel_login_required
-def get_dnsapi():
-    return MwSites.instance().getDnsapi()
-
+def create_acme():
+    site_name = request.form.get('siteName', '')
+    domains = request.form.get('domains', '')
+    force = request.form.get('force', '')
+    renew = request.form.get('renew', '')
+    email = request.form.get('email', '')
+    return MwSites.instance().createAcme(site_name, domains,force,renew,email)
 
 
 

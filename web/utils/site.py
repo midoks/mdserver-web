@@ -137,6 +137,18 @@ class sites(object):
             return path[0:-1]
         return path
 
+    def getSitePath(self, siteName):
+        file = self.getHostConf(siteName)
+        if os.path.exists(file):
+            conf = mw.readFile(file)
+            rep = r'\s*root\s*(.+);'
+            find_cnf = re.search(rep, conf)
+            if not find_cnf:
+                return ''
+            path = find_cnf.groups()[0]
+            return path
+        return ''
+
     def createRootDir(self, path):
         autoInit = False
         if not os.path.exists(path):
@@ -1319,7 +1331,7 @@ location ^~ {from} {\n\
         to_https = self.isToHttps(site_name)
 
         info = thisdb.getSitesByName(site_name)
-        domains = mw.M('domain').where("pid=?", (info['id'],)).field('name').select()
+        domains = mw.M('domain').field('name').where("pid=?", (info['id'],)).select()
 
         csr_path = path + '/fullchain.pem'  # 生成证书路径
         key_path = path + '/privkey.pem'    # 密钥文件路径
@@ -1333,15 +1345,13 @@ location ^~ {from} {\n\
             csr_path = acme_dir + '/fullchain.cer'              # ACME生成证书路径
             key_path = acme_dir + '/' + site_name + '.key'      # ACME密钥文件路径
 
+        key = ''
         if os.path.exists(key_path):
             key = mw.readFile(key_path)
-        else:
-            key = ''
 
+        csr = ''
         if os.path.exists(csr_path):
             csr = mw.readFile(csr_path)
-        else:
-            csr = ''
 
         cert_data = mw.getCertName(csr_path)
         data = {
@@ -1471,6 +1481,198 @@ location ^~ {from} {\n\
 
         thisdb.addSiteTypes(name)
         return mw.returnData(True, '添加成功!')
+
+    def getDnsapi(self):
+        dnsapi_data = thisdb.getOptionByJson('dnsapi', default={})
+        dnsapi_option = [
+            {"name":"none", "title":'手动解析', 'key':''},
+            {"name":"dns_ali", "title":'Aliyun', 'key':'Ali_Key:Ali_Secret'},
+            {"name":"dns_cf", "title":'cloudflare', 'key':'CF_Key:CF_Email'},
+            {"name":"dns_dp", "title":'dnspod/国内', 'key':'DP_Id:DP_Key'},
+            {"name":"dns_dpi", "title":'dnspod/国际', 'key':'DPI_Id:DPI_Key'},
+            {"name":"dns_gd", "title":'GoDaddy', 'key':'GD_Key:GD_Secret'},
+            {"name":"dns_pdns", "title":'PowerDNS', 'key':'PDNS_Url:PDNS_ServerId:PDNS_Token:PDNS_Ttl'},
+            {"name":"dns_lua", "title":'LuaDNS', 'key':'LUA_Key:LUA_Email'},
+            {"name":"dns_me", "title":'DNSMadeEasy', 'key':'ME_Key:ME_Secret'},
+            {"name":"dns_aws", "title":'Amazon Route53', 'key':'AWS_ACCESS_KEY_ID:AWS_SECRET_ACCESS_KEY'},
+            {"name":"dns_ispconfig", "title":'ISPConfig', 'key':'ISPC_User:ISPC_Password:ISPC_Api:ISPC_Api_Insecure'},
+            {"name":"dns_ad", "title":'Alwaysdata', 'key':'AD_API_KEY'},
+            {"name":"dns_linode_v4", "title":'Linode', 'key':'LINODE_V4_API_KEY'},
+            {"name":"dns_freedns", "title":'FreeDNS', 'key':'FREEDNS_User:FREEDNS_Password'},
+            {"name":"dns_cyon", "title":'cyon.ch', 'key':'CY_Username:CY_Password:CY_OTP_Secret'},
+            {"name":"dns_gandi_livedns", "title":'LiveDNS', 'key':'GANDI_LIVEDNS_TOKEN'},
+            {"name":"dns_knot", "title":'Knot', 'key':'KNOT_SERVER:KNOT_KEY'},
+            {"name":"dns_dgon", "title":'DigitalOcean', 'key':'DO_API_KEY'},
+            {"name":"dns_cloudns", "title":'ClouDNS.net', 'key':'CLOUDNS_SUB_AUTH_ID:CLOUDNS_AUTH_PASSWORD'},
+            {"name":"dns_namesilo", "title":'Namesilo', 'key':'Namesilo_Key'},
+            {"name":"dns_azure", "title":'Azure', 'key':'AZUREDNS_SUBSCRIPTIONID:AZUREDNS_TENANTID:AZUREDNS_APPID:AZUREDNS_CLIENTSECRET'},
+            {"name":"dns_selectel", "title":'selectel.com', 'key':'SL_Key'},
+            {"name":"dns_zonomi", "title":'zonomi.com', 'key':'ZM_Key'},
+            {"name":"dns_kinghost", "title":'KingHost', 'key':'KINGHOST_Username:KINGHOST_Password'},
+            {"name":"dns_zilore", "title":'Zilore', 'key':'Zilore_Key'},
+            {"name":"dns_gcloud", "title":'Google Cloud DNS', 'key':'CLOUDSDK_ACTIVE_CONFIG_NAME'},
+            {"name":"dns_mydnsjp", "title":'MyDNS.JP', 'key':'MYDNSJP_MasterID:MYDNSJP_Password'},
+            {"name":"dns_doapi", "title":'do.de', 'key':'DO_LETOKEN'},
+            {"name":"dns_online", "title":'Online', 'key':'ONLINE_API_KEY'},
+            {"name":"dns_cn", "title":'Core-Networks', 'key':'CN_User:CN_Password'},
+            {"name":"dns_ultra", "title":'UltraDNS', 'key':'ULTRA_USR:ULTRA_PWD'},
+            {"name":"dns_hetzner", "title":'Hetzner', 'key':'HETZNER_Token'},
+            {"name":"dns_ddnss", "title":'DDNSS.de', 'key':'DDNSS_Token'},
+        ];
+
+        for i in range(len(dnsapi_option)):
+            dval = dnsapi_option[i]['key']
+            dname = dnsapi_option[i]['name']
+            if dname == 'none':
+                continue
+
+            keys = dval.split(':')
+            data = {}
+            if dname in dnsapi_data:
+                dnsapi_option[i]['data'] = dnsapi_data[dname]
+                dnsapi_option[i]['title'] = dnsapi_option[i]['title'] + '[已配置]'
+            else:
+                t = {}
+                for field in keys:
+                    t[field] = ''
+                dnsapi_option[i]['data'] = t
+        return dnsapi_option
+
+    def createAcme(self, site_name, domains, force, renew, input_email):
+        domains = json.loads(domains)
+
+        print(site_name,domains,input_email,renew,force)
+        email = thisdb.getOption('ssl_email', default='')
+        if input_email.strip() != '':
+            thisdb.setOption('ssl_email', input_email)
+            email = input_email
+
+        if not len(domains):
+            return mw.returnData(False, '请选择域名')
+
+        file = self.getHostConf(site_name)
+        if os.path.exists(file):
+            siteConf = mw.readFile(file)
+            if siteConf.find('301-END') != -1:
+                return mw.returnData(False, '检测到您的站点做了301重定向设置，请先关闭重定向!')
+
+            # 检测存在反向代理
+            data_path = self.getProxyDataPath(site_name)
+            data_content = mw.readFile(data_path)
+            if data_content != False:
+                try:
+                    data = json.loads(data_content)
+                except:
+                    pass
+                for proxy in data:
+                    proxy_dir = "{}/{}".format(self.proxyPath, site_name)
+                    proxy_dir_file = proxy_dir + '/' + proxy['id'] + '.conf'
+                    if os.path.exists(proxy_dir_file):
+                        return mw.returnData(False, '检测到您的站点做了反向代理设置，请先关闭反向代理!')
+
+        siteInfo = thisdb.getSitesByName(site_name)
+        path = self.getSitePath(site_name)
+        if path == '':
+            return mw.returnData(False, '【'+site_name+'】配置文件,异常!')
+
+        srcPath = siteInfo['path']
+
+        # 检测acme是否安装
+        acme_dir = mw.getAcmeDir()
+        if not os.path.exists(acme_dir):
+            try:
+                mw.execShell("curl -sS curl https://get.acme.sh | sh")
+            except:
+                pass
+        if not os.path.exists(acme_dir):
+            return mw.returnData(False, '尝试自动安装ACME失败,请通过以下命令尝试手动安装<p>安装命令: curl https://get.acme.sh | sh</p>')
+
+        # 避免频繁执行
+        checkAcmeRun = mw.execShell('ps -ef|grep acme.sh |grep -v grep')
+        if checkAcmeRun[0] != '':
+            return mw.returnData(False, '正在申请或更新SSL中...')
+
+        if force == 'true':
+            force_bool = True
+
+        if renew == 'true':
+            execStr = acme_dir + "/acme.sh --renew --yes-I-know-dns-manual-mode-enough-go-ahead-please"
+        else:
+            execStr = acme_dir + "/acme.sh --issue --force"
+
+        # 确定主域名顺序
+        domainsTmp = []
+        if site_name in domains:
+            domainsTmp.append(site_name)
+        for domainTmp in domains:
+            if domainTmp == site_name:
+                continue
+            domainsTmp.append(domainTmp)
+        domains = domainsTmp
+
+        domainCount = 0
+        for domain in domains:
+            if mw.checkIp(domain):
+                continue
+            if domain.find('*.') != -1:
+                return mw.returnData(False, '泛域名不能使用【文件验证】的方式申请证书!')
+            execStr += ' -w ' + path
+            execStr += ' -d ' + domain
+            domainCount += 1
+        if domainCount == 0:
+            return mw.returnData(False, '请选择域名(不包括IP地址与泛域名)!')
+
+        log_file = mw.getPanelDir() + '/logs/acme.log'
+        mw.writeFile(log_file, "开始ACME申请...\n", "wb+")
+        cmd = 'export ACCOUNT_EMAIL=' + email + ' && ' + execStr + ' >> ' + log_file
+        # print(domains)
+        # print(cmd)
+        result = mw.execShell(cmd)
+
+        src_path = mw.getAcmeDomainDir(domains[0])
+        src_cert = src_path + '/fullchain.cer'
+        src_key = src_path + '/' + domains[0] + '.key'
+        src_cert.replace("\\*", "*")
+
+        msg = '签发失败,您尝试申请证书的失败次数已达上限!<p>1、检查域名是否绑定到对应站点</p>\
+            <p>2、检查域名是否正确解析到本服务器,或解析还未完全生效</p>\
+            <p>3、如果您的站点设置了反向代理,或使用了CDN,请先将其关闭</p>\
+            <p>4、如果您的站点设置了301重定向,请先将其关闭</p>\
+            <p>5、如果以上检查都确认没有问题，请尝试更换DNS服务商</p>'
+        if not os.path.exists(src_cert):
+            data = {}
+            data['err'] = result
+            data['out'] = result[0]
+            data['msg'] = msg
+            data['result'] = {}
+            if result[1].find('new-authz error:') != -1:
+                data['result'] = json.loads(
+                    re.search("{.+}", result[1]).group())
+                if data['result']['status'] == 429:
+                    data['msg'] = msg
+            data['status'] = False
+            return mw.getJson(data)
+
+        dst_path = self.sslDir + '/' + site_name
+        dst_cert = dst_path + "/fullchain.pem"  # 生成证书路径
+        dst_key = dst_path + "/privkey.pem"  # 密钥文件路径
+
+        if not os.path.exists(dst_path):
+            mw.execShell("mkdir -p " + dst_path)
+
+        mw.buildSoftLink(src_cert, dst_cert, True)
+        mw.buildSoftLink(src_key, dst_key, True)
+        mw.execShell('echo "acme" > "' + dst_path + '/README"')
+
+        # 写入配置文件
+        result = self.setSslConf(site_name)
+        if not result['status']:
+            return mw.getJson(result)
+        result['csr'] = mw.readFile(src_cert)
+        result['key'] = mw.readFile(src_key)
+
+        mw.restartWeb()
+        return mw.returnData(True, '证书已更新!', result)
 
 
     def getPhpVersion(self):
