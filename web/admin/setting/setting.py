@@ -29,7 +29,8 @@ blueprint = Blueprint('setting', __name__, url_prefix='/setting', template_folde
 @blueprint.route('/index', endpoint='index')
 @panel_login_required
 def index():
-    return render_template('default/setting.html')
+    name = thisdb.getOption('template', default='default')
+    return render_template('%s/setting.html' % name)
 
 @blueprint.route('/get_panel_list', endpoint='get_panel_list', methods=['POST'])
 @panel_login_required

@@ -23,8 +23,8 @@ blueprint = Blueprint('logs', __name__, url_prefix='/logs', template_folder='../
 @blueprint.route('/index', endpoint='index')
 @panel_login_required
 def index():
-    return render_template('default/logs.html')
-
+    name = thisdb.getOption('template', default='default')
+    return render_template('%s/logs.html' % name)
 
 # 日志列表
 @blueprint.route('/get_log_list', endpoint='get_log_list', methods=['POST'])

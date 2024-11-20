@@ -21,12 +21,14 @@ from werkzeug.utils import secure_filename
 from admin.user_login_check import panel_login_required
 import core.mw as mw
 import utils.file as file
+import thisdb
 
-blueprint = Blueprint('files', __name__, url_prefix='/files', template_folder='../../templates/default')
+blueprint = Blueprint('files', __name__, url_prefix='/files', template_folder='../../templates')
 @blueprint.route('/index', endpoint='index')
 @panel_login_required
 def index():
-    return render_template('files.html')
+    name = thisdb.getOption('template', default='default')
+    return render_template('%s/files.html' % name)
 
 # 获取文件内容
 @blueprint.route('/get_body', endpoint='get_file_body', methods=['POST'])

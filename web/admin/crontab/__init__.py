@@ -18,10 +18,11 @@ from utils.crontab import crontab as MwCrontab
 import core.mw as mw
 import thisdb
 
-blueprint = Blueprint('crontab', __name__, url_prefix='/crontab', template_folder='../../templates/default')
+blueprint = Blueprint('crontab', __name__, url_prefix='/crontab', template_folder='../../templates')
 @blueprint.route('/index', endpoint='index')
 def index():
-    return render_template('crontab.html')
+    name = thisdb.getOption('template', default='default')
+    return render_template('%s/crontab.html' % name)
 
 # 计划任务列表
 @blueprint.route('/list', endpoint='list', methods=['POST'])

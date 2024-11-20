@@ -23,11 +23,12 @@ import utils.config as utils_config
 import thisdb
 
 
-blueprint = Blueprint('plugins', __name__, url_prefix='/plugins', template_folder='../../templates/default')
+blueprint = Blueprint('plugins', __name__, url_prefix='/plugins', template_folder='../../templates')
 @blueprint.route('/index', endpoint='index')
 @panel_login_required
 def index():
-    return render_template('plugins.html')
+    name = thisdb.getOption('template', default='default')
+    return render_template('%s/plugins.html' % name)
 
 # 初始化检查,首页提示选择安装
 @blueprint.route('/init', endpoint='init', methods=['POST'])

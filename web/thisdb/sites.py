@@ -19,6 +19,22 @@ def getSitesCount():
 def getSitesById(site_id):
     return mw.M('sites').field(__FIELD).where("id=?", (site_id,)).find()
 
+def getSitesByName(site_name):
+    return mw.M('sites').field(__FIELD).where("name=?", (site_name,)).find()
+
+def getSitesDomainById(site_id):
+    data = {}
+    domains = mw.M('domain').where('pid=?', (site_id,)).field('name,id').select()
+    binding = mw.M('binding').where('pid=?', (site_id,)).field('domain,id').select()
+    for b in binding:
+        t = {}
+        t['name'] = b['domain']
+        t['id'] = b['id']
+        domains.append(t)
+    data['domains'] = domains
+    data['email'] = mw.M('users').getField('email')
+    return data
+
 def addSites(name, path):
     now_time = mw.getDateFromNow()
     insert_data = {

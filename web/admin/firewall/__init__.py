@@ -17,12 +17,14 @@ from admin.user_login_check import panel_login_required
 from utils.firewall import Firewall as MwFirewall
 
 import core.mw as mw
+import thisdb
 
-blueprint = Blueprint('firewall', __name__, url_prefix='/firewall', template_folder='../../templates/default')
+blueprint = Blueprint('firewall', __name__, url_prefix='/firewall', template_folder='../../templates')
 @blueprint.route('/index', endpoint='index')
 @panel_login_required
 def index():
-    return render_template('firewall.html')
+    name = thisdb.getOption('template', default='default')
+    return render_template('%s/firewall.html' % name)
 
 
 # 防火墙列表

@@ -18,7 +18,6 @@ from admin.user_login_check import panel_login_required
 
 from utils.plugin import plugin as MwPlugin
 from utils.site import sites as MwSites
-import utils.site as site
 import core.mw as mw
 import thisdb
 
@@ -136,6 +135,13 @@ def get_site_php_version():
     siteName = request.form.get('siteName', '')      
     return MwSites.instance().getSitePhpVersion(siteName)
 
+# 获取站点PHP版本
+@blueprint.route('/get_site_domains', endpoint='get_site_domains',methods=['POST'])
+@panel_login_required
+def get_site_domains():
+    site_id = request.form.get('id', '')
+    data = thisdb.getSitesDomainById(site_id)
+    return mw.returnData(True, 'OK', data)
 
 # 设置站点PHP版本
 @blueprint.route('/set_php_version', endpoint='set_php_version',methods=['POST'])
@@ -285,5 +291,6 @@ def get_default_site():
 def set_default_site():
     name = request.form.get('name', '')
     return MwSites.instance().setDefaultSite(name)
+
 
 

@@ -1318,8 +1318,8 @@ location ^~ {from} {\n\
 
         to_https = self.isToHttps(site_name)
 
-        sid = mw.M('sites').where("name=?", (site_name,)).getField('id')
-        domains = mw.M('domain').where("pid=?", (sid,)).field('name').select()
+        info = thisdb.getSitesByName(site_name)
+        domains = mw.M('domain').where("pid=?", (info['id'],)).field('name').select()
 
         csr_path = path + '/fullchain.pem'  # 生成证书路径
         key_path = path + '/privkey.pem'    # 密钥文件路径
@@ -1330,11 +1330,19 @@ location ^~ {from} {\n\
             key_path = self.sslLetsDir + '/' + site_name + '/privkey.pem'    # 密钥文件路径
         elif ssl_type == 'acme':
             acme_dir = mw.getAcmeDomainDir(site_name)
-            csr_path = acme_dir + '/fullchain.cer'  # 生成证书路径
-            key_path = acme_dir + '/' + site_name + '.key'    # 密钥文件路径
+            csr_path = acme_dir + '/fullchain.cer'              # ACME生成证书路径
+            key_path = acme_dir + '/' + site_name + '.key'      # ACME密钥文件路径
 
-        key = mw.readFile(key_path)
-        csr = mw.readFile(csr_path)
+        if os.path.exists(key_path):
+            key = mw.readFile(key_path)
+        else:
+            key = ''
+
+        if os.path.exists(csr_path):
+            csr = mw.readFile(csr_path)
+        else:
+            csr = ''
+
         cert_data = mw.getCertName(csr_path)
         data = {
             'status': status,
@@ -1346,6 +1354,35 @@ location ^~ {from} {\n\
             'cert_data': cert_data,
         }
         return mw.returnData(True, 'OK', data)
+
+    def getCertList(self):
+        try:
+            vpath = self.sslDir
+            if not os.path.exists(vpath):
+                os.system('mkdir -p ' + vpath)
+            data = []
+            for d in os.listdir(vpath):
+
+                # keyPath = self.sslDir + siteName + '/privkey.pem'
+                # certPath = self.sslDir + siteName + '/fullchain.pem'
+
+                keyPath = vpath + '/' + d + '/privkey.pem'
+                certPath = vpath + '/' + d + '/fullchain.pem'
+                if os.path.exists(keyPath) and os.path.exists(certPath):
+                    self.saveCert(keyPath, certPath)
+
+                mpath = vpath + '/' + d + '/info.json'
+                if not os.path.exists(mpath):
+                    continue
+
+                tmp = mw.readFile(mpath)
+                if not tmp:
+                    continue
+                tmp1 = json.loads(tmp)
+                data.append(tmp1)
+            return mw.returnData(True, 'OK', data)
+        except:
+            return mw.returnData(True, 'OK', [])
 
 
     def setPhpVersion(self, siteName, version):

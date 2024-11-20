@@ -30,7 +30,8 @@ blueprint = Blueprint('dashboard', __name__, url_prefix='/', template_folder='..
 @blueprint.route('/')
 @panel_login_required
 def index():
-    return render_template('default/index.html')
+    name = thisdb.getOption('template', default='default')
+    return render_template('%s/index.html' % name)
 
 # 安全路径
 @blueprint.route('/<path>',endpoint='admin_safe_path',methods=['GET'])

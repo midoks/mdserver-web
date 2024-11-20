@@ -18,20 +18,25 @@ from admin.user_login_check import panel_login_required
 
 from utils.plugin import plugin as MwPlugin
 from utils.site import sites as MwSites
-import utils.site as site
 import core.mw as mw
 import thisdb
 
 from .site import blueprint
 
 
-# 删除代理配置
+# 获取证书信息
 @blueprint.route('/get_ssl', endpoint='get_ssl', methods=['POST'])
 @panel_login_required
 def get_ssl():
     site_name = request.form.get('site_name', '')
     ssl_type = request.form.get('ssl_type', '')
     return MwSites.instance().getSsl(site_name, ssl_type)
+
+# 获取证书列表
+@blueprint.route('/get_cert_list', endpoint='get_cert_list', methods=['GET','POST'])
+@panel_login_required
+def get_cert_list():
+    return MwSites.instance().getCertList()
 
 
 
