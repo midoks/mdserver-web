@@ -1556,18 +1556,8 @@ location ^~ {from} {\n\
     def createAcmeMultiDomin(self):
         pass
 
-    def createAcmeFile(self):
-        pass
-
-    def createAcmeDns(self):
-        pass
-
-    def createAcme(self, site_name, domains,force,renew, apply_type, dnspai, email):
-        domains = json.loads(domains)
-        if len(domains) < 1:
-            return mw.returnData(False, '请选择域名')
-        if email.strip() != '':
-            thisdb.setOption('ssl_email', email)
+    def createAcmeFile(self, site_name, domains,force,renew, apply_type, dnspai, email):
+        
 
         print(site_name, domains,force,renew,apply_type, dnspai, email)
         
@@ -1696,6 +1686,34 @@ location ^~ {from} {\n\
 
         mw.restartWeb()
         return mw.returnData(True, '证书已更新!', result)
+
+    def createAcmeDns(self, site_name, domains, force, renew, dnspai):
+        dnsapi_option = thisdb.getOptionByJson('dnsapi', default={})
+        if not dnspai in dnsapi_option:
+            return mw.returnData(False, dnspai+'未设置')
+
+        dnsapi_data = dnsapi_option[dnspai]
+        for k in dnsapi_data:
+            if dnsapi_data[k] == '':
+                return mw.returnData(False, k+'为空!')
+
+
+        print(dnsapi_data)
+        print(domains)
+        return mw.returnData(False, '测试中!')
+
+    def createAcme(self, site_name, domains,force,renew, apply_type, dnspai, email):
+        domains = json.loads(domains)
+        if len(domains) < 1:
+            return mw.returnData(False, '请选择域名')
+        if email.strip() != '':
+            thisdb.setOption('ssl_email', email)
+
+        if apply_type == 'file':
+            return self.createAcmeFile(site_name, domains,force,renew, apply_type, dnspai, email)
+        elif apply_type == 'dns':
+            return self.createAcmeDns(site_name, domains, force, renew, dnspai)
+        return mw.returnData(False, '异常请求') 
 
 
     def getPhpVersion(self):
