@@ -42,7 +42,9 @@ def create_acme():
     force = request.form.get('force', '')
     renew = request.form.get('renew', '')
     email = request.form.get('email', '')
-    return MwSites.instance().createAcme(site_name, domains,force,renew,email)
+    apply_type = request.form.get('apply_type', 'file')
+    dnspai = request.form.get('dnspai','') 
+    return MwSites.instance().createAcme(site_name, domains,force,renew,apply_type,dnspai, email)
 
 
 

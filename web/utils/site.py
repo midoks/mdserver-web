@@ -1490,34 +1490,34 @@ location ^~ {from} {\n\
             {"name":"dns_cf", "title":'cloudflare', 'key':'CF_Key:CF_Email'},
             {"name":"dns_dp", "title":'dnspod/国内', 'key':'DP_Id:DP_Key'},
             {"name":"dns_dpi", "title":'dnspod/国际', 'key':'DPI_Id:DPI_Key'},
-            {"name":"dns_gd", "title":'GoDaddy', 'key':'GD_Key:GD_Secret'},
-            {"name":"dns_pdns", "title":'PowerDNS', 'key':'PDNS_Url:PDNS_ServerId:PDNS_Token:PDNS_Ttl'},
-            {"name":"dns_lua", "title":'LuaDNS', 'key':'LUA_Key:LUA_Email'},
-            {"name":"dns_me", "title":'DNSMadeEasy', 'key':'ME_Key:ME_Secret'},
-            {"name":"dns_aws", "title":'Amazon Route53', 'key':'AWS_ACCESS_KEY_ID:AWS_SECRET_ACCESS_KEY'},
-            {"name":"dns_ispconfig", "title":'ISPConfig', 'key':'ISPC_User:ISPC_Password:ISPC_Api:ISPC_Api_Insecure'},
-            {"name":"dns_ad", "title":'Alwaysdata', 'key':'AD_API_KEY'},
-            {"name":"dns_linode_v4", "title":'Linode', 'key':'LINODE_V4_API_KEY'},
-            {"name":"dns_freedns", "title":'FreeDNS', 'key':'FREEDNS_User:FREEDNS_Password'},
-            {"name":"dns_cyon", "title":'cyon.ch', 'key':'CY_Username:CY_Password:CY_OTP_Secret'},
-            {"name":"dns_gandi_livedns", "title":'LiveDNS', 'key':'GANDI_LIVEDNS_TOKEN'},
-            {"name":"dns_knot", "title":'Knot', 'key':'KNOT_SERVER:KNOT_KEY'},
-            {"name":"dns_dgon", "title":'DigitalOcean', 'key':'DO_API_KEY'},
-            {"name":"dns_cloudns", "title":'ClouDNS.net', 'key':'CLOUDNS_SUB_AUTH_ID:CLOUDNS_AUTH_PASSWORD'},
-            {"name":"dns_namesilo", "title":'Namesilo', 'key':'Namesilo_Key'},
-            {"name":"dns_azure", "title":'Azure', 'key':'AZUREDNS_SUBSCRIPTIONID:AZUREDNS_TENANTID:AZUREDNS_APPID:AZUREDNS_CLIENTSECRET'},
-            {"name":"dns_selectel", "title":'selectel.com', 'key':'SL_Key'},
-            {"name":"dns_zonomi", "title":'zonomi.com', 'key':'ZM_Key'},
-            {"name":"dns_kinghost", "title":'KingHost', 'key':'KINGHOST_Username:KINGHOST_Password'},
-            {"name":"dns_zilore", "title":'Zilore', 'key':'Zilore_Key'},
-            {"name":"dns_gcloud", "title":'Google Cloud DNS', 'key':'CLOUDSDK_ACTIVE_CONFIG_NAME'},
-            {"name":"dns_mydnsjp", "title":'MyDNS.JP', 'key':'MYDNSJP_MasterID:MYDNSJP_Password'},
-            {"name":"dns_doapi", "title":'do.de', 'key':'DO_LETOKEN'},
-            {"name":"dns_online", "title":'Online', 'key':'ONLINE_API_KEY'},
-            {"name":"dns_cn", "title":'Core-Networks', 'key':'CN_User:CN_Password'},
-            {"name":"dns_ultra", "title":'UltraDNS', 'key':'ULTRA_USR:ULTRA_PWD'},
-            {"name":"dns_hetzner", "title":'Hetzner', 'key':'HETZNER_Token'},
-            {"name":"dns_ddnss", "title":'DDNSS.de', 'key':'DDNSS_Token'},
+            # {"name":"dns_gd", "title":'GoDaddy', 'key':'GD_Key:GD_Secret'},
+            # {"name":"dns_pdns", "title":'PowerDNS', 'key':'PDNS_Url:PDNS_ServerId:PDNS_Token:PDNS_Ttl'},
+            # {"name":"dns_lua", "title":'LuaDNS', 'key':'LUA_Key:LUA_Email'},
+            # {"name":"dns_me", "title":'DNSMadeEasy', 'key':'ME_Key:ME_Secret'},
+            # {"name":"dns_aws", "title":'Amazon Route53', 'key':'AWS_ACCESS_KEY_ID:AWS_SECRET_ACCESS_KEY'},
+            # {"name":"dns_ispconfig", "title":'ISPConfig', 'key':'ISPC_User:ISPC_Password:ISPC_Api:ISPC_Api_Insecure'},
+            # {"name":"dns_ad", "title":'Alwaysdata', 'key':'AD_API_KEY'},
+            # {"name":"dns_linode_v4", "title":'Linode', 'key':'LINODE_V4_API_KEY'},
+            # {"name":"dns_freedns", "title":'FreeDNS', 'key':'FREEDNS_User:FREEDNS_Password'},
+            # {"name":"dns_cyon", "title":'cyon.ch', 'key':'CY_Username:CY_Password:CY_OTP_Secret'},
+            # {"name":"dns_gandi_livedns", "title":'LiveDNS', 'key':'GANDI_LIVEDNS_TOKEN'},
+            # {"name":"dns_knot", "title":'Knot', 'key':'KNOT_SERVER:KNOT_KEY'},
+            # {"name":"dns_dgon", "title":'DigitalOcean', 'key':'DO_API_KEY'},
+            # {"name":"dns_cloudns", "title":'ClouDNS.net', 'key':'CLOUDNS_SUB_AUTH_ID:CLOUDNS_AUTH_PASSWORD'},
+            # {"name":"dns_namesilo", "title":'Namesilo', 'key':'Namesilo_Key'},
+            # {"name":"dns_azure", "title":'Azure', 'key':'AZUREDNS_SUBSCRIPTIONID:AZUREDNS_TENANTID:AZUREDNS_APPID:AZUREDNS_CLIENTSECRET'},
+            # {"name":"dns_selectel", "title":'selectel.com', 'key':'SL_Key'},
+            # {"name":"dns_zonomi", "title":'zonomi.com', 'key':'ZM_Key'},
+            # {"name":"dns_kinghost", "title":'KingHost', 'key':'KINGHOST_Username:KINGHOST_Password'},
+            # {"name":"dns_zilore", "title":'Zilore', 'key':'Zilore_Key'},
+            # {"name":"dns_gcloud", "title":'Google Cloud DNS', 'key':'CLOUDSDK_ACTIVE_CONFIG_NAME'},
+            # {"name":"dns_mydnsjp", "title":'MyDNS.JP', 'key':'MYDNSJP_MasterID:MYDNSJP_Password'},
+            # {"name":"dns_doapi", "title":'do.de', 'key':'DO_LETOKEN'},
+            # {"name":"dns_online", "title":'Online', 'key':'ONLINE_API_KEY'},
+            # {"name":"dns_cn", "title":'Core-Networks', 'key':'CN_User:CN_Password'},
+            # {"name":"dns_ultra", "title":'UltraDNS', 'key':'ULTRA_USR:ULTRA_PWD'},
+            # {"name":"dns_hetzner", "title":'Hetzner', 'key':'HETZNER_Token'},
+            # {"name":"dns_ddnss", "title":'DDNSS.de', 'key':'DDNSS_Token'},
         ];
 
         for i in range(len(dnsapi_option)):
@@ -1538,17 +1538,39 @@ location ^~ {from} {\n\
                 dnsapi_option[i]['data'] = t
         return dnsapi_option
 
-    def createAcme(self, site_name, domains, force, renew, input_email):
+    def setDnsapi(self, type, data):
+        dnsapi_data = thisdb.getOptionByJson('dnsapi', default={})
+        dnsapi_data[type] = json.loads(data)
+        thisdb.setOption('dnsapi',json.dumps(dnsapi_data))
+        return mw.returnData(True, '设置成功!')
+
+
+    def acmeLogFile(self):
+        return mw.getPanelDir() + '/logs/acme.log'
+
+    def writeAcmeLog(self,msg):
+        log_file = self.acmeLogFile()
+        mw.writeFile(log_file, msg+"\n", "wb+")
+        return True
+
+    def createAcmeMultiDomin(self):
+        pass
+
+    def createAcmeFile(self):
+        pass
+
+    def createAcmeDns(self):
+        pass
+
+    def createAcme(self, site_name, domains,force,renew, apply_type, dnspai, email):
         domains = json.loads(domains)
-
-        print(site_name,domains,input_email,renew,force)
-        email = thisdb.getOption('ssl_email', default='')
-        if input_email.strip() != '':
-            thisdb.setOption('ssl_email', input_email)
-            email = input_email
-
-        if not len(domains):
+        if len(domains) < 1:
             return mw.returnData(False, '请选择域名')
+        if email.strip() != '':
+            thisdb.setOption('ssl_email', email)
+
+        print(site_name, domains,force,renew,apply_type, dnspai, email)
+        
 
         file = self.getHostConf(site_name)
         if os.path.exists(file):
@@ -1622,11 +1644,12 @@ location ^~ {from} {\n\
         if domainCount == 0:
             return mw.returnData(False, '请选择域名(不包括IP地址与泛域名)!')
 
-        log_file = mw.getPanelDir() + '/logs/acme.log'
-        mw.writeFile(log_file, "开始ACME申请...\n", "wb+")
+        self.writeAcmeLog('开始ACME申请...')
+        log_file = self.acmeLogFile()
         cmd = 'export ACCOUNT_EMAIL=' + email + ' && ' + execStr + ' >> ' + log_file
-        # print(domains)
-        # print(cmd)
+        print(domains)
+        print(cmd)
+        return mw.returnData(False, '测试中!')
         result = mw.execShell(cmd)
 
         src_path = mw.getAcmeDomainDir(domains[0])

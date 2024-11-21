@@ -39,11 +39,19 @@ def get_cert_list():
     return MwSites.instance().getCertList()
 
 
-# 获取证书配置
+# 获取DNSAPI
 @blueprint.route('/get_dnsapi', endpoint='get_dnsapi', methods=['GET','POST'])
 @panel_login_required
 def get_dnsapi():
     return MwSites.instance().getDnsapi()
+
+# 设置DNSAPI
+@blueprint.route('/set_dnsapi', endpoint='set_dnsapi', methods=['GET','POST'])
+@panel_login_required
+def set_dnsapi():
+    type = request.form.get('type', '')
+    data = request.form.get('data')
+    return MwSites.instance().setDnsapi(type,data)
 
 
 

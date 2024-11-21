@@ -2036,16 +2036,20 @@ function renewSSL(type,id,siteName){
 	});	
 }
 
-function fileCheck(){
-	$('#dnsapi_option').css('display','none');
-}
 
-function dnsCheck(){
-	$('#dnsapi_option').css('display','block');
-}
 
 function renderDnsapiHtml(data){
-	console.log(data);
+
+	var fields = data.data;
+	var fields_html = '';
+
+	for (var d in fields) {
+		fields_html += "<span class='tname'>"+d+"</span>\
+	    <div class='info-r'>\
+	        <input name='"+d+"' class='bt-input-text mr5' style='width:100%;' value='"+fields[d]+"' type='text'>\
+	    </div>";
+	}
+
 	layer.open({
         type: 1,
         area: '500px',
@@ -2058,20 +2062,13 @@ function renderDnsapiHtml(data){
 			<div class='line'>\
 			    <span class='tname'>DNSAPI类型</span>\
 			    <div class='info-r'>\
-			        <select class='bt-input-text mr5' name='type' style='width:100%;'>\
+			        <select class='bt-input-text mr5' name='type_name' style='width:100%;'>\
 			            <option name='cf'>"+data['name']+"</option>\
 			        </select>\
 			    </div>\
 			</div>\
 			<div class='line' id='dnsapi_option'>\
-			    <span class='tname'>CF_Key</span>\
-			    <div class='info-r'>\
-			        <input name='v1' class='bt-input-text mr5' style='width:100%;' placeholder='请输入对应值' type='text'>\
-			    </div>\
-			    <span class='tname'>CF_Email</span>\
-			    <div class='info-r'>\
-			        <input name='v2' class='bt-input-text mr5' style='width:100%;' placeholder='请输入对应值' type='text'>\
-			    </div>\
+			    "+fields_html+"\
 			</div>\
 			<div class='line'>\
 				<div>\
@@ -2081,17 +2078,29 @@ function renderDnsapiHtml(data){
 				</div>\
 			</div>\
 		</form>",
-        success:function(){
-            
-        },
-        yes:function(index) {
-            
+        yes:function(index,l) {
+            var type_name = $('select[name="type_name"]').val();
+            var data_field = {};
+            for (var d in fields) {
+            	data_field[d] = $('input[name="'+d+'"]').val();
+			}
+
+            $.post('/site/set_dnsapi', {'type':type_name,'data':JSON.stringify(data_field)}, function(rdata){
+            	showMsg(rdata.msg, function(){
+            		if (rdata.status){
+            			layer.close(index);
+            			renderDnsapi();
+            		}
+            	},{icon:rdata.status?1:2});
+            },'json');
         }
     });
 
 }
 
 function renderDnsapi(){
+	$('#dnsapi_set').css('display', 'none');
+
 	$.post('/site/get_dnsapi', {}, function(data){
 		var dnsapi_option = '';
 		for (var i = 0; i < data.length; i++) {
@@ -2099,7 +2108,6 @@ function renderDnsapi(){
 		}
 
 		$('#dnsapi_option select').html(dnsapi_option);
-
 		$('#dnsapi_option select').on('change',function(){
 			var val = $(this).val();
 			var index = $('#dnsapi_option option:selected').attr('index');
@@ -2107,8 +2115,10 @@ function renderDnsapi(){
 				$('#dnsapi_option button').css('display','none');
 			} else {
 				$('#dnsapi_option button').css('display','inline-block');
+				if (!(data[index]['title'].indexOf('[')>0)){
+					renderDnsapiHtml(data[index]);					
+				}
 			}
-			renderDnsapiHtml(data[index]);
 		});
 
 		$('#dnsapi_set').on('click', function(){
@@ -2124,21 +2134,27 @@ function opSSLAcme(type, id, siteName, callback){
 			<div class="line mtb10">\
 				<span class="tname text-center">验证方式</span>\
 				<div style="margin-top:7px;display:inline-block">\
-					<input type="radio" name="dns_type" onclick="fileCheck()" id="check_file" checked="checked"/>\
+					<input type="radio" name="apply_type" value="file" id="check_file" checked="checked"/>\
   					<label class="mr20" for="check_file" style="font-weight:normal">文件验证</label></label>\
-  					<input type="radio" name="dns_type" onclick="dnsCheck()" id="check_dns"/>\
+  					<input type="radio" name="apply_type" value="dns" id="check_dns"/>\
   					<label class="mr20" for="check_dns" style="font-weight:normal">DNS验证</label></label>\
   				</div>\
 	  		</div>\
 	  		<div class="line mtb10" id="dnsapi_option" style="display:none;">\
-				<span class="tname text-center"></span>\
+				<span class="tname text-center" style="line-height: 42px;">选择DNS接口</span>\
 				<div style="margin-top:7px;display:inline-block">\
-					<select class="bt-input-text mr20">\
+					<select name="dnspai" class="bt-input-text mr20">\
 						<option value="none">手动解析</option>\
 					</select>\
 					<button id="dnsapi_set" class="btn btn-default btn-sm btn-title" style="display:none;">配置</button>\
   				</div>\
 	  		</div>\
+  			<div class="check_message line" id="wildcard_domain_block" style="display:none;">\
+  				<div style="margin-left:100px">\
+  					<input type="checkbox" name="wildcard_domain" id="wildcard_domain" checked="checked">\
+  					<label class="mr20" for="wildcard_domain" style="font-weight:normal">自动组合泛域名</label>\
+  				</div>\
+  			</div>\
   			<div class="check_message line">\
   				<div style="margin-left:100px">\
   					<input type="checkbox" name="checkDomain" id="checkDomain" checked="">\
@@ -2166,6 +2182,18 @@ function opSSLAcme(type, id, siteName, callback){
 	</div>';
 
 	$(".tab-con").html(acme);
+
+	$('input[name="apply_type"]').on('change', function(){
+		var val = $(this).val();
+		if (val == 'file'){
+			$('#dnsapi_option').css('display','none');
+			$('#wildcard_domain_block').css('display','none');
+		} else {
+			$('#dnsapi_option').css('display','block');
+			$('#wildcard_domain_block').css('display','block');
+		}
+	});
+
 
 	renderDnsapi();
 
@@ -2346,7 +2374,7 @@ function opSSLLet(type, id, siteName, callback){
   			</div>\
   		</div>\
   		<div class="line mtb10">\
-  			<span class="tname text-center">管理员邮箱</span>\
+  			<span class="tname text-center">邮箱</span>\
   			<input class="bt-input-text" style="width:240px;" type="text" name="admin_email" />\
   		</div>\
   		<div class="line mtb10">\
@@ -2512,19 +2540,31 @@ function newSSL(siteName, id, domains){
 function newAcmeSSL(siteName, id, domains){
 	showSpeedWindow('正在由ACME申请...', 'site.get_acme_logs', function(layers,index){
 		var force = '';
-		if($("#checkDomain").prop("checked")){
-			force = '&force=true';
-		}
 		var email = $("input[name='admin_email']").val();
-		$.post('/site/create_acme','siteName='+siteName+'&domains='+domains+'&email='+email + force,function(rdata){
-			layer.close(index);
-			if(rdata.status){
-				showMsg(rdata.msg, function(){
+		var apply_type = $('input[name="apply_type"]:checked').val();
+
+		var pdata = {};
+		pdata['siteName'] = siteName;
+		pdata['domains'] = domains;
+		pdata['email'] = email;
+		pdata['apply_type'] = apply_type;
+		if($("#checkDomain").prop("checked")){
+			pdata['force'] = 'true';
+		}
+
+		if (apply_type == 'dns'){
+			pdata['dnspai'] = $('#dnsapi_option option:selected').val();
+		}
+
+		console.log(pdata);
+		$.post('/site/create_acme',pdata,function(rdata){
+			console.log(rdata);
+			showMsg(rdata.msg, function(){
+				layer.close(index);
+				if(rdata.status){	
 					$(".tab-nav span:first-child").click();
-				},{icon:1}, 2000);
-				return;
-			}
-			layer.msg(rdata.msg,{icon:2,area:'500px',time:0,shade:0.3,shadeClose:true});
+				}
+			},{icon:rdata.status?1:2}, 3000);
 		},'json');
 	});
 }
