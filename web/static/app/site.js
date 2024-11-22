@@ -691,7 +691,7 @@ function checkDomain() {
  * @param {Int} id  网站ID
  * @param {String} webname 主域名
  */
-function domainAdd(id, webname,type) {
+function domainAdd(id, webname, type) {
 	var Domain = $("#newdomain").val().split("\n");
 
 	var domainlist = '';
@@ -706,7 +706,7 @@ function domainAdd(id, webname,type) {
 
 	domainlist = domainlist.substring(0,domainlist.length-1);
 	var loadT = layer.load();
-	var data = "domain=" + domainlist + "&webname=" + webname + "&id=" + id;
+	var data = "domain=" + domainlist + "&site_name=" + webname + "&id=" + id;
 	$.post('/site/add_domain', data, function(retuls) {
 		layer.close(loadT);
 		domainEdit(id, webname, retuls.msg, retuls.status);
@@ -726,10 +726,9 @@ function delDomain(wid, wname, domain, port,type) {
 		layer.msg(lan.site.domain_last_cannot);
 	}
 	layer.confirm(lan.site.domain_del_confirm,{icon:3,closeBtn:2}, function(index) {
-		var url = "/site/del_domain"
-		var data = "id=" + wid + "&webname=" + wname + "&domain=" + domain + "&port=" + port;
-		var loadT = layer.msg(lan.public.the_del,{time:0,icon:16});
-		$.post(url,data, function(ret) {
+		var data = "id=" + wid + "&site_name=" + wname + "&domain=" + domain + "&port=" + port;
+		var loadT = layer.msg('您真的要从站点中删除这个域名吗？',{time:0,icon:16});
+		$.post('/site/del_domain', data, function(ret) {
 			layer.close(loadT);
 			layer.msg(ret.msg,{icon:ret.status?1:2})
 			if(type == 1){
@@ -2039,7 +2038,6 @@ function renewSSL(type,id,siteName){
 
 
 function renderDnsapiHtml(data){
-
 	var fields = data.data;
 	var fields_html = '';
 

@@ -53,6 +53,25 @@ def add():
     port = request.form.get('port', '')
     return MwSites.instance().add(webname, port, ps, path, version)
 
+# 添加站点 - 域名
+@blueprint.route('/add_domain', endpoint='add_domain',methods=['POST'])
+@panel_login_required
+def add_domain():
+    domain = request.form.get('domain', '')
+    site_name = request.form.get('site_name', '')
+    site_id = request.form.get('id', '')
+    return MwSites.instance().addDomain(site_id, site_name, domain)
+
+# 删除站点 - 域名
+@blueprint.route('/del_domain', endpoint='del_domain',methods=['POST'])
+@panel_login_required
+def del_domain():
+    site_name = request.form.get('site_name', '')
+    site_id = request.form.get('id', '')
+    domain = request.form.get('domain', '')
+    port = request.form.get('port', '')
+    return MwSites.instance().delDomain(site_id, site_name, domain, port)
+
 # 站点删除
 @blueprint.route('/delete', endpoint='delete',methods=['POST'])
 @panel_login_required

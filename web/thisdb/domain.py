@@ -16,6 +16,10 @@ def getDomainCountByName(name):
     # .debug(True)
     return mw.M('domain').where("name=?", (name,)).count()
 
+def getDomainCountBySiteId(site_id):
+    # .debug(True)
+    return mw.M('domain').where("pid=?", (site_id,)).count()
+
 def addDomain(pid, name, port):
     now_time = mw.getDateFromNow()
     insert_data = {

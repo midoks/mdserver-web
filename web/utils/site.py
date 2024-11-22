@@ -62,6 +62,25 @@ class sites(object):
         if not os.path.exists(self.sslLetsDir):
             mw.execShell("mkdir -p " + self.sslLetsDir +" && chmod -R 755 " + self.sslLetsDir)
 
+
+    def runHook(self, hook_name, func_name):
+        # 站点操作Hook
+        hook_cfg = thisdb.getOptionByJson('hook_site_cb',type='hook',default=[])
+        hook_num = len(hook_cfg)
+        if hook_num == 0:
+            return
+
+        from utils.plugin import plugin as MwPlugin
+        pa = MwPlugin.instance()
+
+        for x in range(hook_num):
+            hook_data = hook_cfg[x]
+            if func_name in hook_data:
+                app_name = hook_data["name"]
+                run_func = hook_data[func_name]['func']
+                pa.run(app_name, run_func)
+        return True
+
     # 域名编码转换
     def toPunycode(self, domain):
         if sys.version_info[0] == 2:
@@ -198,6 +217,99 @@ class sites(object):
         # return mw.returnData(False, '开发中!')
         return mw.returnData(True, '添加成功')
 
+    def nginxAddDomain(self, site_name, domain, port):
+        file = self.getHostConf(site_name)
+        conf = mw.readFile(file)
+        if not conf:
+            return
+
+        # 添加域名
+        rep = r"server_name\s*(.*);"
+        tmp = re.search(rep, conf).group()
+        domains = tmp.split(' ')
+        if not mw.inArray(domains, domain):
+            newServerName = tmp.replace(';', ' ' + domain + ';')
+            conf = conf.replace(tmp, newServerName)
+
+        # 添加端口
+        rep = r"listen\s+([0-9]+)\s*[default_server]*\s*;"
+        tmp = re.findall(rep, conf)
+        if not mw.inArray(tmp, port):
+            listen = re.search(rep, conf).group()
+            conf = conf.replace(
+                listen, listen + "\n\tlisten " + port + ';')
+        # 保存配置文件
+        mw.writeFile(file, conf)
+        return True
+
+    def addDomain(self, site_id, site_name, domain):
+        isError = mw.checkWebConfig()
+        if isError != True:
+            msg = 'ERROR: 检测到配置文件有错误,请先排除后再操作<br><br><a style="color:red;">' + isError.replace("\n", '<br>') + '</a>'
+            return mw.returnData(False, msg)
+
+        domains = domain.split(',')
+        for d in domains:
+            if d == '':
+                continue
+            d = d.split(':')
+            name = self.toPunycode(d[0])
+            port = '80'
+            if len(d) == 2:
+                port = d[1]
+
+            if not mw.checkPort(port):
+                return mw.returnData(False, '端口范围不合法!')
+
+            reg = r"^([\w\-\*]{1,100}\.){1,4}([\w\-]{1,24}|[\w\-]{1,24}\.[\w\-]{1,24})$"
+            if not re.match(reg, name):
+                return mw.returnData(False, '域名格式不正确!')
+
+            if thisdb.checkSitesDomainIsExist(name, port):
+                return mw.returnData(False, '您添加的域名[{}:{}],已使用。请仔细检查!'.format(name, port))
+
+            self.nginxAddDomain(site_name, name, port)
+
+            msg = mw.getInfo('网站[{1}]添加域名[{2}]成功!', (site_name, name))
+            mw.writeLog('网站管理', msg)
+            thisdb.addDomain(site_id, name, port)
+
+        mw.restartWeb()
+        self.runHook('site_cb', 'add')
+        return mw.returnData(True, '域名添加成功!')
+
+    def delDomain(self, site_id, site_name, domain, port):
+        domain_nums = thisdb.getDomainCountBySiteId(site_id)
+        if domain_nums == 1:
+            return mw.returnData(False, '最后一个域名不能删除!')
+
+        info = mw.M('domain').field('id,name').where("pid=? AND name=? AND port=?",(site_id, domain, port)).find()
+
+        file = self.getHostConf(site_name)
+        conf = mw.readFile(file)
+        if conf:
+            # 删除域名
+            rep = r"server_name\s+(.+);"
+            tmp = re.search(rep, conf).group()
+            newServerName = tmp.replace(' ' + domain + ';', ';')
+            newServerName = newServerName.replace(' ' + domain + ' ', ' ')
+            conf = conf.replace(tmp, newServerName)
+
+            # 删除端口
+            rep = r"listen\s+([0-9]+);"
+            tmp = re.findall(rep, conf)
+            port_nums = mw.M('domain').where('pid=? AND port=?', (site_id, port)).count()
+            if mw.inArray(tmp, port) == True and port_nums < 2:
+                rep = r"\n*\s+listen\s+" + port + ";"
+                conf = re.sub(rep, '', conf)
+            # 保存配置
+            mw.writeFile(file, conf)
+
+        thisdb.deleteDomainId(info['id'])
+        msg = mw.getInfo('网站[{1}]删除域名[{2}:{3}]成功!', (site_name, domain, port))
+        mw.writeLog('网站管理', msg)
+        mw.restartWeb()
+        return mw.returnData(True, '站点删除成功!')
 
     def deleteALlLogs(self, webname):
         assLogPath = mw.getLogsDir() + '/' + webname + '.log'
@@ -1687,6 +1799,15 @@ location ^~ {from} {\n\
         mw.restartWeb()
         return mw.returnData(True, '证书已更新!', result)
 
+    def getDnsapiExportVar(self, data):
+        def_var = ''
+        for k in data:
+            def_var += 'export '+k+'="'+data[k]+'"\n'
+        return def_var
+
+    def getDomainRootName(self, domain):
+        pass
+
     def createAcmeDns(self, site_name, domains, force, renew, dnspai):
         dnsapi_option = thisdb.getOptionByJson('dnsapi', default={})
         if not dnspai in dnsapi_option:
@@ -1697,9 +1818,15 @@ location ^~ {from} {\n\
             if dnsapi_data[k] == '':
                 return mw.returnData(False, k+'为空!')
 
+        cmd = self.getDnsapiExportVar(dnsapi_data)
+
+        for d in domains:
+            print(d)
+            cmd += 'acme.sh --issue --dns '+str(dnspai)+' -d '+d+' -d "*.'+d+'" --force'
 
         print(dnsapi_data)
         print(domains)
+        print(cmd)
         return mw.returnData(False, '测试中!')
 
     def createAcme(self, site_name, domains,force,renew, apply_type, dnspai, email):

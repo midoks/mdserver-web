@@ -15,8 +15,6 @@ from flask import Blueprint, render_template
 from flask import request
 
 from admin.user_login_check import panel_login_required
-
-from utils.plugin import plugin as MwPlugin
 from utils.site import sites as MwSites
 
 import core.mw as mw
@@ -72,12 +70,5 @@ def get_dir_bind_rewrite():
 def del_dir_bind():
     binding_id = request.form.get('id', '')
     return MwSites.instance().delDirBinding(binding_id)
-
-
-
-
-
-
-
 
 

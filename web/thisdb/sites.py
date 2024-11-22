@@ -14,9 +14,18 @@ from .option  import getOption
 
 __FIELD = 'id,name,path,status,ps,edate,type_id,add_time,update_time'
 
+def checkSitesDomainIsExist(domain, port):
+    nums = mw.M('domain').where("name=? AND port=?", (domain, port,)).count()
+    if nums>0:
+        return True
+
+    nums = mw.M('binding').where("name=? AND port=?", (domain, port,)).count()
+    if nums>0:
+        return True
+    return False
+
 def getSitesCount():
     return mw.M('sites').count()
-
 
 def getSitesById(site_id):
     return mw.M('sites').field(__FIELD).where("id=?", (site_id,)).find()
