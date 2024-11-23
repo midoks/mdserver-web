@@ -533,6 +533,33 @@ def getCpuType():
     return cpuType
 
 
+def getLanguage():
+    path = 'data/language.pl'
+    if not os.path.exists(path):
+        return 'Simplified_Chinese'
+    return readFile(path).strip()
+
+
+def getStaticJson(name="public"):
+    file = 'static/language/' + getLanguage() + '/' + name + '.json'
+    if not os.path.exists(file):
+        file = 'route/static/language/' + getLanguage() + '/' + name + '.json'
+    return file
+
+
+def returnMsg(status, msg, args=()):
+    # 取通用字曲返回
+    pjson = getStaticJson('public')
+    logMessage = json.loads(readFile(pjson))
+    keys = logMessage.keys()
+
+    if msg in keys:
+        msg = logMessage[msg]
+        for i in range(len(args)):
+            rep = '{' + str(i + 1) + '}'
+            msg = msg.replace(rep, args[i])
+    return {'status': status, 'msg': msg, 'data': args}
+    
 def getInfo(msg, args=()):
     # 取提示消息
     for i in range(len(args)):
