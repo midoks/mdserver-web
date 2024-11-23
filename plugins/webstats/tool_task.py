@@ -66,8 +66,6 @@ def createBgTask():
             return True
 
 
-    
-
     cmd = "cd " + mw.getPanelDir() + " && nice -n 10 python3 " + getPluginDir() + "/tool_task.py execute"
     params = {
         'name': name,
