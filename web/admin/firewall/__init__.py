@@ -101,6 +101,15 @@ def set_ssh_pass_status():
     status = request.form.get('status', '1')
     return MwFirewall.instance().setSshPassStatus(status)
 
+@blueprint.route('/set_ssh_pubkey_status', endpoint='set_ssh_pubkey_status', methods=['POST'])
+@panel_login_required
+def set_ssh_pubkey_status():
+    if mw.isAppleSystem():
+        return mw.returnData(True, '开发机不能设置!')
+    status = request.form.get('status', '1')
+    return MwFirewall.instance().setSshPubkeyStatus(status)
+
+
 
 
 

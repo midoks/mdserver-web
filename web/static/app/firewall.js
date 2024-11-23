@@ -49,7 +49,6 @@ $("#firewalldType").change(function(){
 
 
 function sshMgr(){
-
 	$.post('/firewall/get_ssh_info', '', function(rdata){
 		var ssh_status = rdata.status ? 'checked':'';
 		var pass_prohibit_status = rdata.pass_prohibit_status ? 'checked':'';
@@ -81,8 +80,8 @@ function sshMgr(){
                             <td>禁止密钥登陆</td>\
                             <td>\
                                 <div class="ssh-item" style="margin-left:0">\
-                                    <input class="btswitch btswitch-ios" id="pass_status" type="checkbox" '+pubkey_prohibit_status+'>\
-                                    <label class="btswitch-btn" for="pass_status" onclick=\'setSshPassStatus()\'></label>\
+                                    <input class="btswitch btswitch-ios" id="pubkey_status" type="checkbox" '+pubkey_prohibit_status+'>\
+                                    <label class="btswitch-btn" for="pubkey_status" onclick=\'setSshPubkeyStatus()\'></label>\
                                 </div>\
                             </td>\
                         </tr>\
@@ -100,7 +99,6 @@ function sshMgr(){
 	        success:function(){
 	        },
 	    });
-
 	},'json');
 }
 
@@ -282,6 +280,37 @@ function setSshPassStatus(){
 		}
 	});
 }
+
+/**
+ * 设置远程服务状态
+ * @param {Int} state 0.启用 1.关闭
+ */
+function setSshPubkeyStatus(){
+	status = $("#pubkey_status").prop("checked")==true?1:0;
+	var msg = status==1?'开启密码登陆,继续吗？':'确定禁止密码登陆吗？';
+	layer.confirm(msg,{title:'警告',closeBtn:2,cancel:function(){
+		if(status == 0){
+			$("#pubkey_status").prop("checked",false);
+		} else {
+			$("#pubkey_status").prop("checked",true);
+		}
+	}},function(index){
+		if(index > 0){
+			layer.msg('正在处理,请稍候...',{icon:16,time:20000});
+			$.post('/firewall/set_ssh_pubkey_status','status='+status,function(rdata){
+				layer.msg(rdata.msg,{icon:rdata.status?1:2});
+			},'json');
+		}
+	},function(){
+		if(status == 0){
+			$("#pubkey_status").prop("checked",false);
+		} else {
+			$("#pubkey_status").prop("checked",true);
+		}
+	});
+}
+
+
 
 /**
  * 取回数据

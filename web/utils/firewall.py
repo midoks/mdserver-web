@@ -393,7 +393,35 @@ class Firewall(object):
         mw.writeFile(file, conf)
         mw.execShell("systemctl restart sshd.service")
         mw.writeLog("SSH管理", msg)
-        return mw.returnJson(True, msg)
+        return mw.returnData(True, msg)
+
+    def setSshPubkeyStatus(self, status):
+        msg = '禁止密钥登陆成功'
+        if status == "1":
+            msg = '开启密钥登陆成功'
+
+        file = '/etc/ssh/sshd_config'
+        if not os.path.exists(file):
+            return mw.returnJson(False, '无法设置!')
+
+        content = mw.readFile(file)
+
+        pubkey_rep = r"PubkeyAuthentication\s+(\w*)\s*\n"
+        pubkey_status = re.search(pubkey_rep, content)
+        if not pubkey_status:
+            rep = r"(#)?PubkeyAuthentication\s+(\w*)\s*\n"
+            content = re.sub(rep, "PubkeyAuthentication yes\n", content)
+
+        if status == '1':
+            rep = r"PubkeyAuthentication\s+(\w*)\s*\n"
+            content = re.sub(rep, "PubkeyAuthentication yes\n", content)
+        else:
+            rep = r"PubkeyAuthentication\s+(\w*)\s*\n"
+            content = re.sub(rep, "PubkeyAuthentication no\n", content)
+        mw.writeFile(file, content)
+        mw.execShell("systemctl restart sshd.service")
+        mw.writeLog("SSH管理", msg)
+        return mw.returnData(True, msg)
 
 
 
