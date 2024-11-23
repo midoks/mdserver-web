@@ -7,9 +7,12 @@ import time
 import re
 import json
 
-sys.path.append(os.getcwd() + "/class/core")
-import mw
-import site_api
+web_dir = os.getcwd() + "/web"
+if os.path.exists(web_dir):
+    sys.path.append(web_dir)
+    os.chdir(web_dir)
+
+import core.mw as mw
 
 app_debug = False
 if mw.isAppleSystem():
@@ -90,7 +93,7 @@ def contentReplace(content):
     content = content.replace('{$APP_PATH}', service_path+'/'+getPluginName()+'/data')
 
     port = cfg["port"]
-    rep = 'listen\s*(.*);'
+    rep = r'listen\s*(.*);'
     content = re.sub(rep, "listen " + port + ';', content)
     return content
 
