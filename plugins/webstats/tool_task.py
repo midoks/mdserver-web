@@ -39,10 +39,9 @@ def getTaskConf():
 
 
 def getConfigData():
-    try:
+    conf = getTaskConf()
+    if os.path.exists(conf):
         return json.loads(mw.readFile(getTaskConf()))
-    except:
-        pass
     return {
         "task_id": -1,
         "task_list": ["migrate_hot_logs"],
