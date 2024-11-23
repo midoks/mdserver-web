@@ -42,8 +42,8 @@ Install_app()
 
 	echo "${VERSION}" > $serverPath/supervisor/version.pl
 
-	cd ${rootPath} && python3 ${rootPath}/plugins/supervisor/index.py start
-	cd ${rootPath} && python3 ${rootPath}/plugins/supervisor/index.py initd_install
+	cd ${rootPath} && python3 plugins/supervisor/index.py start
+	cd ${rootPath} && python3 plugins/supervisor/index.py initd_install
 	
 	echo '安装完成[supervisor]'
 }
