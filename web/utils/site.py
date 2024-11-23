@@ -1597,11 +1597,12 @@ location ^~ {from} {\n\
     def getDnsapi(self):
         dnsapi_data = thisdb.getOptionByJson('dnsapi', default={})
         dnsapi_option = [
-            {"name":"none", "title":'手动解析', 'key':''},
-            {"name":"dns_ali", "title":'Aliyun', 'key':'Ali_Key:Ali_Secret'},
-            {"name":"dns_cf", "title":'cloudflare', 'key':'CF_Key:CF_Email'},
-            {"name":"dns_dp", "title":'dnspod/国内', 'key':'DP_Id:DP_Key'},
-            {"name":"dns_dpi", "title":'dnspod/国际', 'key':'DPI_Id:DPI_Key'},
+            {"name":"none", "title":'手动解析', 'key':'', 'help':''},
+            {"name":"dns_ali", "title":'Aliyun', 'key':'Ali_Key:Ali_Secret', 'help':'阿里云控制台》用户头像》accesskeys按指引获取AccessKey/SecretKey'},
+            {"name":"dns_cf", "title":'cloudflare', 'key':'CF_Key:CF_Email', 'help':'CloudFlare后台获取Global API Key'},
+            {"name":"dns_dp", "title":'dnspod/国内', 'key':'DP_Id:DP_Key','help':'DnsPod后台》用户中心》安全设置，开启API Token'},
+            {"name":"dns_dpi", "title":'dnspod/国际', 'key':'DPI_Id:DPI_Key','help':'DnsPod后台》用户中心》安全设置，开启API Token'},
+            {"name":"dns_tencent", "title":"腾讯云DNS", 'key':'Tencent_SecretId:Tencent_SecretKey', 'help':'腾讯云后台获取通行证'},
             # {"name":"dns_gd", "title":'GoDaddy', 'key':'GD_Key:GD_Secret'},
             # {"name":"dns_pdns", "title":'PowerDNS', 'key':'PDNS_Url:PDNS_ServerId:PDNS_Token:PDNS_Ttl'},
             # {"name":"dns_lua", "title":'LuaDNS', 'key':'LUA_Key:LUA_Email'},
@@ -1806,9 +1807,13 @@ location ^~ {from} {\n\
         return def_var
 
     def getDomainRootName(self, domain):
-        pass
+        s = domain.split('.')
+        count = len(s)
+        last_index = count - 1
+        top_domain =  s[last_index-1]+'.'+s[last_index]
+        return top_domain
 
-    def createAcmeDns(self, site_name, domains, force, renew, dnspai):
+    def createAcmeDns(self, site_name, domains, dnspai, force, renew):
         dnsapi_option = thisdb.getOptionByJson('dnsapi', default={})
         if not dnspai in dnsapi_option:
             return mw.returnData(False, dnspai+'未设置')
@@ -1821,8 +1826,8 @@ location ^~ {from} {\n\
         cmd = self.getDnsapiExportVar(dnsapi_data)
 
         for d in domains:
-            print(d)
-            cmd += 'acme.sh --issue --dns '+str(dnspai)+' -d '+d+' -d "*.'+d+'" --force'
+            top_domain = self.getDomainRootName(d)
+            cmd += 'acme.sh --issue --dns '+str(dnspai)+' -d '+top_domain+' -d "*.'+top_domain+'" --force'
 
         print(dnsapi_data)
         print(domains)
@@ -1839,7 +1844,7 @@ location ^~ {from} {\n\
         if apply_type == 'file':
             return self.createAcmeFile(site_name, domains,force,renew, apply_type, dnspai, email)
         elif apply_type == 'dns':
-            return self.createAcmeDns(site_name, domains, force, renew, dnspai)
+            return self.createAcmeDns(site_name, domains, dnspai,force, renew)
         return mw.returnData(False, '异常请求') 
 
 
