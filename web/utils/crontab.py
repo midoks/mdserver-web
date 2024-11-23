@@ -164,9 +164,9 @@ class crontab(object):
         cmd += ' ' + cron_path + '/' + cron_name + ' >> ' + cron_path + '/' + cron_name + '.log 2>&1'
 
         if not mw.isAppleSystem():
-            data = self.writeShell(cmd)
-            if not data['status']:
-                return data
+            sh_data = self.writeShell(cmd)
+            if not sh_data['status']:
+                return sh_data
             self.crondReload()
 
         add_dbdata = {}
