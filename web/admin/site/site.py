@@ -46,12 +46,12 @@ def list():
 @blueprint.route('/add', endpoint='add',methods=['POST'])
 @panel_login_required
 def add():
-    webname = request.form.get('webinfo', '')
+    webinfo = request.form.get('webinfo', '')
     ps = request.form.get('ps', '')
     path = request.form.get('path', '')
     version = request.form.get('version', '')
     port = request.form.get('port', '')
-    return MwSites.instance().add(webname, port, ps, path, version)
+    return MwSites.instance().add(webinfo, port, ps, path, version)
 
 # 添加站点 - 域名
 @blueprint.route('/add_domain', endpoint='add_domain',methods=['POST'])

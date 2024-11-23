@@ -180,15 +180,14 @@ class sites(object):
             mw.writeFile(path + '/index.html', 'Work has started!!!')
             mw.execShell('chmod -R 755 ' + path)
 
-    def add(self, webname, port, ps, path, version):
+    def add(self, site_info, port, ps, path, version):
         site_root_dir = mw.getWwwDir()
         if site_root_dir == path.rstrip('/'):
             return mw.returnData(False, '不要以网站根目录创建站点!')
 
-        print(webname, port, ps, path, version)
-        siteMenu = json.loads(webname)
+        site_info = json.loads(site_info)
 
-        self.siteName = self.toPunycode(siteMenu['domain'].strip().split(':')[0]).strip()
+        self.siteName = self.toPunycode(site_info['domain'].strip().split(':')[0]).strip()
         self.sitePath = self.toPunycodePath(self.getPath(path.replace(' ', '')))
         self.sitePort = port.strip().replace(' ', '')
         self.phpVersion = version
@@ -196,25 +195,20 @@ class sites(object):
         if thisdb.isSitesExist(self.siteName):
             return mw.returnData(False, '您添加的站点[%s]已存在!' % self.siteName)
 
-        pid = thisdb.addSites(self.siteName, self.sitePath)
-        if pid < 1:
+        site_id = thisdb.addSites(self.siteName, self.sitePath)
+        if site_id < 1:
             return mw.returnData(False, '添加失败!') 
-
 
         self.createRootDir(self.sitePath)
         self.nginxAddConf()
 
         # 主域名配置
-        thisdb.addDomain(pid, self.siteName, self.sitePort)
-
-        # 绑定域名配置
-
+        thisdb.addDomain(site_id, self.siteName, self.sitePort)
         # 添加更多域名
-        # for domain in siteMenu['domainlist']:
-        #     thisdb.addDomain(pid, self.siteName, self.sitePort)
+        for domain in site_info['domainlist']:
+            self.addDomain(site_id, self.siteName, domain)
 
         mw.restartWeb()
-        # return mw.returnData(False, '开发中!')
         return mw.returnData(True, '添加成功')
 
     def nginxAddDomain(self, site_name, domain, port):
@@ -957,7 +951,6 @@ class sites(object):
     def setSecurity(self, site_id, fix, domains, status, none=''):
         info = thisdb.getSitesById(site_id)
         name = info['name']
-
         if len(fix) < 2:
             return mw.returnData(False, 'URL后缀不能为空!')
 

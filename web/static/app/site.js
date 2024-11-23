@@ -1117,9 +1117,8 @@ function getSiteErrorLogs(siteName){
 
 //防盗链
 function security(id,name){
-	var loadT = layer.msg(lan.site.the_msg,{icon:16,time:0,shade: [0.3, '#000']});
+	var loadT = layer.msg('正在提交任务...',{icon:16,time:0,shade: [0.3, '#000']});
 	$.post('/site/get_security',{id:id,name:name},function(rdata){
-		console.log(rdata);
 		layer.close(loadT);
 		var mbody = '<div>'
 					+'<p style="margin-bottom:8px"><span style="display: inline-block; width: 60px;">URL后缀</span><input class="bt-input-text" type="text" name="sec_fix" value="'+rdata.fix+'" style="margin-left: 5px;width: 425px;height: 30px;margin-right:10px;'+(rdata.status?'background-color: #eee;':'')+'" placeholder="多个请用逗号隔开,例：png,jpeg,jpg,gif,zip" '+(rdata.status?'readonly':'')+'></p>'
