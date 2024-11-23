@@ -31,8 +31,12 @@ import thisdb
 def get_notify_email():
     notify_email = thisdb.getOptionByJson('notify_email', default={'open':False}, type='notify')
 
-    decrypt_data = mw.deDoubleCrypt('email', notify_email['cfg'])
-    notify_email['email'] =  json.loads(decrypt_data)
+    if 'cfg' in notify_email:
+        decrypt_data = mw.deDoubleCrypt('email', notify_email['cfg'])
+        notify_email['email'] =  json.loads(decrypt_data)
+    else:
+        notify_email['email'] = {'smtp_host':'','smtp_port':'','smtp_ssl':'','to_mail_addr':'','username':'','password':''}
+    
     return mw.returnData(True,'ok',notify_email)
 
 
