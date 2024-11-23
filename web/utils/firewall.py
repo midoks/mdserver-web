@@ -357,5 +357,33 @@ class Firewall(object):
         self.reload()
         return True
 
+    def setSshPassStatus(self, status):
+        msg = '禁止密码登陆成功'
+        if status == "1":
+            msg = '开启密码登陆成功'
+
+        file = '/etc/ssh/sshd_config'
+        if not os.path.exists(file):
+            return mw.returnJson(False, '无法设置!')
+
+        conf = mw.readFile(file)
+
+        pass_rep = r"PasswordAuthentication\s+(\w*)\s*\n"
+        pass_status = re.search(pass_rep, conf)
+        if not pass_status:
+            rep = r"(#)?PasswordAuthentication\s+(\w*)\s*\n"
+            conf = re.sub(rep, "PasswordAuthentication yes\n", conf)
+
+        if status == '1':
+            rep = r"PasswordAuthentication\s+(\w*)\s*\n"
+            conf = re.sub(rep, "PasswordAuthentication yes\n", conf)
+        else:
+            rep = r"PasswordAuthentication\s+(\w*)\s*\n"
+            conf = re.sub(rep, "PasswordAuthentication no\n", conf)
+        mw.writeFile(file, conf)
+        mw.execShell("systemctl restart sshd.service")
+        mw.writeLog("SSH管理", msg)
+        return mw.returnJson(True, msg)
+
 
 

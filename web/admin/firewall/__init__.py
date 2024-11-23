@@ -93,5 +93,16 @@ def set_fw():
     status = request.form.get('status', '1')
     return MwFirewall.instance().setFw(status)
 
+@blueprint.route('/set_fw', endpoint='set_fw', methods=['POST'])
+@panel_login_required
+def set_fw():
+    if mw.isAppleSystem():
+        return mw.returnData(True, '开发机不能设置!')
+    status = request.form.get('status', '1')
+    return MwFirewall.instance().setSshPassStatus(status)
+
+
+
+
 
 
