@@ -42,7 +42,7 @@ def getTaskConf():
 def getConfigData():
     conf = getTaskConf()
     if os.path.exists(conf):
-        return json.loads(mw.readFile(getTaskConf()))
+        return json.loads(mw.readFile(conf))
     return []
 
 
@@ -69,8 +69,7 @@ def createBgTaskByName(name, args):
         return True
 
     if "task_id" in cfg.keys() and cfg["task_id"] > 0:
-        res = mw.M("crontab").field("id, name").where(
-            "id=?", (cfg["task_id"],)).find()
+        res = mw.M("crontab").field("id, name").where("id=?", (cfg["task_id"],)).find()
         if res and res["id"] == cfg["task_id"]:
             print("计划任务已经存在!")
             return True
