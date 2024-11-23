@@ -115,6 +115,10 @@ def add():
     request_data['sname'] = request.form.get('sName', '')
     request_data['sbody'] = request.form.get('sBody', '')
     request_data['url_address'] = request.form.get('urladdress', '')
-    return MwCrontab.instance().add(request_data)
+    
+    cron_id = MwCrontab.instance().add(request_data)
+    if cron_id > 0:
+        return mw.returnData(True, '添加成功')
+    return mw.returnData(False, '添加失败')
 
 

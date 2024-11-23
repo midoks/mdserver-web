@@ -184,9 +184,7 @@ class crontab(object):
         add_dbdata['url_address'] = data['url_address']
 
         tid = thisdb.addCrontab(add_dbdata)
-        if tid > 0:
-            return mw.returnData(True, '添加成功')
-        return mw.returnData(False, '添加失败')
+        return tid
 
     def delete(self, tid):
         data = thisdb.getCrond(tid)
