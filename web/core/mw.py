@@ -213,7 +213,7 @@ def writeFile(filename, content, mode='w+'):
         fp.close()
         return True
     except Exception as e:
-        print(e)
+        print(getTracebackInfo())
         return False
 
 
