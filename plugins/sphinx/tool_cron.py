@@ -115,7 +115,7 @@ logs_file=$plugin_path/${rname}.log
         'stype': "toShell",
         'sname': '',
         'sbody': cmd,
-        'urladdress': '',
+        'url_address': '',
     }
 
     task_id = MwCrontab.instance().add(params)
