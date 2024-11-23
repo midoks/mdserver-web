@@ -133,7 +133,7 @@ Install_App()
 		cp -rf $serverPath/source/webstats/GeoLite2-City.mmdb $serverPath/webstats/GeoLite2-City.mmdb
 	fi
 
-	cd $rootPath && python3 ${rootPath}/plugins/webstats/index.py start
+	cd $rootPath && python3 plugins/webstats/index.py start
 
 	echo '网站统计安装完成'
 

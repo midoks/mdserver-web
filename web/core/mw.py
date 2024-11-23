@@ -205,7 +205,7 @@ def readFile(filename):
         print(e)
         return False
 
-def writeFile(filename, content, mode='w+'):
+def writeFile(filename, content, mode='aw+'):
     # 写文件内容
     try:
         fp = open(filename, mode)

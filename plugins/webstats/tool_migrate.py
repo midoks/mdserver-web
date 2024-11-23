@@ -31,11 +31,6 @@ def getServerDir():
     return mw.getServerDir() + '/' + getPluginName()
 
 
-def getTaskConf():
-    conf = getServerDir() + "/task_config.json"
-    return conf
-
-
 def getConf():
     conf = getServerDir() + "/lua/config.json"
     return conf
@@ -126,7 +121,7 @@ def migrateSiteHotLogs(site_name, query_date):
                 if field is None:
                     field = "\'\'"
                 elif type(field) == str:
-                    field = "\'" + field.replace("\'", "\”") + "\'"
+                    field = "\'" + field.replace("\'", "\"") + "\'"
                 params += str(field)
             insert_sql = "insert into web_logs(" + \
                 _columns + ") values(" + params + ")"
