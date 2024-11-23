@@ -258,8 +258,9 @@ class crontab(object):
 
         file = ''
         for i in cron_file:
-            if os.path.exists(file):
+            if os.path.exists(i):
                 file = i
+
 
         if file == '':
             return False
