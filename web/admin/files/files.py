@@ -19,6 +19,8 @@ from flask import send_from_directory
 from werkzeug.utils import secure_filename
 
 from admin.user_login_check import panel_login_required
+from admin import session
+
 import core.mw as mw
 import utils.file as file
 import thisdb
@@ -31,9 +33,43 @@ def index():
     return render_template('%s/files.html' % name)
 
 # 获取文件内容
-@blueprint.route('/get_body', endpoint='get_file_body', methods=['POST'])
+@blueprint.route('/check_exists_files', endpoint='check_exists_files', methods=['POST'])
 @panel_login_required
-def get_file_body():
+def check_exists_files():
+    dfile = request.form.get('dfile', '')
+    filename = request.form.get('filename', '')
+    data = []
+    filesx = []
+    if filename == '':
+        filesx = json.loads(session['selected']['data'])
+    else:
+        filesx.append(filename)
+
+    for fn in filesx:
+        if fn == '.':
+            continue
+        filename = dfile + '/' + fn
+        if os.path.exists(filename):
+            tmp = {}
+            stat = os.stat(filename)
+            tmp['filename'] = fn
+            tmp['size'] = os.path.getsize(filename)
+            tmp['mtime'] = str(int(stat.st_mtime))
+            data.append(tmp)
+    return mw.returnData(True, 'ok', data)
+
+# 获取文件内容
+@blueprint.route('/copy_file', endpoint='copy_file', methods=['POST'])
+@panel_login_required
+def copy_file():
+    sfile = request.form.get('sfile', '')
+    dfile = request.form.get('dfile', '')
+    return file.copyFile(sfile, dfile)
+
+# 获取文件内容
+@blueprint.route('/get_body', endpoint='get_body', methods=['POST'])
+@panel_login_required
+def get_body():
     path = request.form.get('path', '')
     return file.getFileBody(path)
 

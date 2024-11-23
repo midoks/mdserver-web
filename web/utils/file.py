@@ -16,6 +16,45 @@ import shutil
 import core.mw as mw
 import thisdb
 
+def copyDir(src_file, dst_file):
+    if not os.path.exists(src_file):
+        return mw.returnData(False, '指定目录不存在!')
+
+    if os.path.exists(dst_file):
+        return mw.returnData(False, '指定目录已存在!')
+
+    import shutil
+    try:
+        shutil.copytree(src_file, dst_file)
+        stat = os.stat(src_file)
+        os.chown(dst_file, stat.st_uid, stat.st_gid)
+        msg = mw.getInfo('复制目录[{1}]到[{2}]成功!', (src_file, dst_file))
+        mw.writeLog('文件管理', msg)
+        return mw.returnData(True, '目录复制成功!')
+    except:
+        return mw.returnData(False, '目录复制失败!')
+
+def copyFile(src_file, dst_file):
+    if src_file == dst_file:
+        return mw.returnJson(False, '源与目的一致!')
+
+    if not os.path.exists(src_file):
+        return mw.returnJson(False, '指定文件不存在!')
+
+    if os.path.isdir(src_file):
+        return copyDir(src_file, dst_file)
+
+    try:
+        import shutil
+        shutil.copyfile(src_file, dst_file)
+        msg = mw.getInfo('复制文件[{1}]到[{2}]成功!', (src_file, dst_file,))
+        mw.writeLog('文件管理', msg)
+        stat = os.stat(src_file)
+        os.chown(dst_file, stat.st_uid, stat.st_gid)
+        return mw.returnData(True, '文件复制成功!')
+    except:
+        return mw.returnData(False, '文件复制失败!')
+
 def setFileAccept(filename):
     auth = 'www:www'
     if mw.getOs() == 'darwin':
