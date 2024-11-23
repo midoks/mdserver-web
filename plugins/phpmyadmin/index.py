@@ -7,9 +7,13 @@ import time
 import re
 import json
 
-sys.path.append(os.getcwd() + "/class/core")
-import mw
-import site_api
+web_dir = os.getcwd() + "/web"
+if os.path.exists(web_dir):
+    sys.path.append(web_dir)
+    os.chdir(web_dir)
+
+import core.mw as mw
+from utils.site import sites as MwSites
 
 app_debug = False
 if mw.isAppleSystem():
@@ -85,7 +89,7 @@ def getHomePage():
 
 
 def getPhpVer(expect=55):
-    v = site_api.site_api().getPhpVersion()
+    v = MwSites.instance().getPhpVersion()
     is_find = False
     for i in range(len(v)):
         t = str(v[i]['version'])
@@ -142,7 +146,7 @@ def contentReplace(content):
     content = content.replace('{$PMA_PATH}', cfg['path'])
 
     port = cfg["port"]
-    rep = 'listen\s*(.*);'
+    rep = r'listen\s*(.*);'
     content = re.sub(rep, "listen " + port + ';', content)
     return content
 

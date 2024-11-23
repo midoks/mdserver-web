@@ -9,12 +9,12 @@ import re
 import json
 
 
-# reload(sys)
-# sys.setdefaultencoding('utf-8')
+web_dir = os.getcwd() + "/web"
+if os.path.exists(web_dir):
+    sys.path.append(web_dir)
+    os.chdir(web_dir)
 
-sys.path.append(os.getcwd() + "/class/core")
-import mw
-
+import core.mw as mw
 
 if mw.isAppleSystem():
     cmd = 'ls /usr/local/lib/ | grep python  | cut -d \\  -f 1 | awk \'END {print}\''

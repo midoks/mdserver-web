@@ -13,9 +13,13 @@ if sys.platform != "darwin":
     os.chdir("/www/server/mdserver-web")
 
 
-sys.path.append(os.getcwd() + "/class/core")
-import mw
-import db
+web_dir = os.getcwd() + "/web"
+if os.path.exists(web_dir):
+    sys.path.append(web_dir)
+    os.chdir(web_dir)
+
+import core.mw as mw
+import core.db as db
 
 _ver = sys.version_info
 is_py2 = (_ver[0] == 2)

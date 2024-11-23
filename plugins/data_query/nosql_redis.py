@@ -7,12 +7,12 @@ import time
 import re
 import redis
 
+web_dir = os.getcwd() + "/web"
+if os.path.exists(web_dir):
+    sys.path.append(web_dir)
+    os.chdir(web_dir)
 
-try: 
-    sys.path.append(os.getcwd() + "/class/core")
-    import mw
-except Exception as e:
-    import core.mw as mw
+import core.mw as mw
 
 
 # def getPluginName():

@@ -5,18 +5,16 @@ import time
 import os
 import sys
 import re
-
-
-sys.path.append(os.getcwd() + "/class/core")
-import mw
-
-
-# cmd = 'ls /usr/local/lib/ | grep python  | cut -d \\  -f 1 | awk \'END {print}\''
-# info = mw.execShell(cmd)
-# p = "/usr/local/lib/" + info[0].strip() + "/site-packages"
-# sys.path.append(p)
-
 import psutil
+
+web_dir = os.getcwd() + "/web"
+if os.path.exists(web_dir):
+    sys.path.append(web_dir)
+    os.chdir(web_dir)
+
+import core.mw as mw
+
+
 
 
 app_debug = False

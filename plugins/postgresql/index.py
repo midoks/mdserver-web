@@ -17,8 +17,12 @@ import json
 # ps -ef | grep -v grep| grep run_info | awk '{print $2}' | xargs kill -9
 # vi /etc/sysconfig/network-scripts/ifcfg-eth0
 
-sys.path.append(os.getcwd() + "/class/core")
-import mw
+web_dir = os.getcwd() + "/web"
+if os.path.exists(web_dir):
+    sys.path.append(web_dir)
+    os.chdir(web_dir)
+
+import core.mw as mw
 
 
 if mw.isAppleSystem():
