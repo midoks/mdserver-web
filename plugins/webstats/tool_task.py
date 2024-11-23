@@ -79,7 +79,7 @@ def createBgTask():
         'stype': "toShell",
         'sname': '',
         'sbody': cmd,
-        'urladdress': '',
+        'url_address': '',
     }
 
     task_id = MwCrontab.instance().add(params)
