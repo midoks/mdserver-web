@@ -68,10 +68,8 @@ def createBgTaskByName(name):
         if res and res["id"] == args["task_id"]:
             print("计划任务已经存在!")
             return True
-    import crontab_api
-    api = crontab_api.crontab_api()
 
-    mw_dir = mw.getRunDir()
+    mw_dir = mw.getPanelDir()
     cmd = '''
 mw_dir=%s
 rname=%s
