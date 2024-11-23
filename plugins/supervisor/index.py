@@ -89,7 +89,7 @@ def initDreplace():
     systemService = systemDir + '/supervisor.service'
     systemServiceTpl = getPluginDir() + '/init.d/supervisor.service'
 
-    service_path = os.path.dirname(os.getcwd())
+    service_path = mw.getServerDir()
 
     if not os.path.exists(confD):
         os.mkdir(confD)
