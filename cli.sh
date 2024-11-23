@@ -59,8 +59,8 @@ mw_start_debug(){
     if [ -f ${DIR}/data/port.pl ];then
         port=$(cat ${DIR}/data/port.pl)
     fi
-    # gunicorn -b :${port} -k gevent -w 1 app:app
-	cd ${DIR}/web && gunicorn -b :${port} -k eventlet -w 1 app:app
+    cd ${DIR}/web && gunicorn -b :${port} -k eventlet -w 1 app:app
+	# cd ${DIR}/web && gunicorn -b :${port} -k geventwebsocket.gunicorn.workers.GeventWebSocketWorker -w 1 app:app
 }
 
 mw_start_panel(){
@@ -68,8 +68,9 @@ mw_start_panel(){
 	if [ -f ${DIR}/data/port.pl ];then
         port=$(cat ${DIR}/data/port.pl)
     fi
-	# cd ${DIR}/web && gunicorn -b :${port} -k geventwebsocket.gunicorn.workers.GeventWebSocketWorker -w 1  app:app
-	cd ${DIR}/web && gunicorn -b :${port} -k eventlet -w 1  app:app
+	# cd ${DIR}/web && gunicorn -b :${port} -k eventlet -w 1  app:app
+	cd ${DIR}/web && gunicorn -b :${port} -k geventwebsocket.gunicorn.workers.GeventWebSocketWorker -w 1  app:app
+	
 }
 
 mw_start_bgtask(){

@@ -38,7 +38,9 @@ import config
 import utils.config as utils_config
 import thisdb
 
-
+# from threading import Lock
+# thread = None
+# thread_lock = Lock()
 
 app = Flask(__name__, template_folder='templates/default')
 
@@ -51,7 +53,9 @@ from whitenoise import WhiteNoise
 app.wsgi_app = WhiteNoise(app.wsgi_app, root="../web/static/", prefix="static/", max_age=604800)
 
 # session配置
-app.secret_key = uuid.UUID(int=uuid.getnode()).hex[-12:]
+# app.secret_key = uuid.UUID(int=uuid.getnode()).hex[-12:]
+app.config['SECRET_KEY'] = uuid.UUID(int=uuid.getnode()).hex[-12:]
+
 # app.config['sessions'] = dict()
 app.config['SESSION_PERMANENT'] = True
 app.config['SESSION_USE_SIGNER'] = True
