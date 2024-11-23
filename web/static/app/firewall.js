@@ -92,7 +92,7 @@ function sshMgr(){
         layer.open({
 	        type: 1,
 	        title: "SSH管理",
-	        area: ['300px', '230px'],
+	        area: ['300px', '260px'],
 	        closeBtn: 1,
 	        shadeClose: false,
 	        content: '<div id="ssh_list">'+con+'</div>',
