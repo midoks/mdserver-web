@@ -53,33 +53,43 @@ function sshMgr(){
 	$.post('/firewall/get_ssh_info', '', function(rdata){
 		var ssh_status = rdata.status ? 'checked':'';
 		var pass_prohibit_status = rdata.pass_prohibit_status ? 'checked':'';
+		var pubkey_prohibit_status = rdata.pubkey_prohibit_status ? 'checked':'';
 		var con = '<div class="pd15">\
-                <div class="divtable">\
-                    <table class="table table-hover waftable">\
-                        <thead><tr><th>名称</th><th width="80">状态</th></tr></thead>\
-                        <tbody>\
-                            <tr>\
-                                <td>启动SSH</td>\
-                                <td>\
-                                    <div class="ssh-item" style="margin-left:0">\
-                                        <input class="btswitch btswitch-ios" id="sshswitch" type="checkbox" '+ssh_status+'>\
-                                        <label class="btswitch-btn" for="sshswitch" onclick=\'setMstscStatus()\'></label>\
-                                    </div>\
-                                </td>\
-                            </tr>\
-                            <tr>\
-                                <td>禁止密码登陆</td>\
-                                <td>\
-                                    <div class="ssh-item" style="margin-left:0">\
-                                        <input class="btswitch btswitch-ios" id="pass_status" type="checkbox" '+pass_prohibit_status+'>\
-                                        <label class="btswitch-btn" for="pass_status" onclick=\'setSshPassStatus()\'></label>\
-                                    </div>\
-                                </td>\
-                            </tr>\
-                        </tbody>\
-                    </table>\
-                </div>\
-            </div>';
+            <div class="divtable">\
+                <table class="table table-hover waftable">\
+                    <thead><tr><th>名称</th><th width="80">状态</th></tr></thead>\
+                    <tbody>\
+                        <tr>\
+                            <td>启动SSH</td>\
+                            <td>\
+                                <div class="ssh-item" style="margin-left:0">\
+                                    <input class="btswitch btswitch-ios" id="sshswitch" type="checkbox" '+ssh_status+'>\
+                                    <label class="btswitch-btn" for="sshswitch" onclick=\'setMstscStatus()\'></label>\
+                                </div>\
+                            </td>\
+                        </tr>\
+                        <tr>\
+                            <td>禁止密码登陆</td>\
+                            <td>\
+                                <div class="ssh-item" style="margin-left:0">\
+                                    <input class="btswitch btswitch-ios" id="pass_status" type="checkbox" '+pass_prohibit_status+'>\
+                                    <label class="btswitch-btn" for="pass_status" onclick=\'setSshPassStatus()\'></label>\
+                                </div>\
+                            </td>\
+                        </tr>\
+                        <tr>\
+                            <td>禁止密钥登陆</td>\
+                            <td>\
+                                <div class="ssh-item" style="margin-left:0">\
+                                    <input class="btswitch btswitch-ios" id="pass_status" type="checkbox" '+pubkey_prohibit_status+'>\
+                                    <label class="btswitch-btn" for="pass_status" onclick=\'setSshPassStatus()\'></label>\
+                                </div>\
+                            </td>\
+                        </tr>\
+                    </tbody>\
+                </table>\
+            </div>\
+        </div>';
         layer.open({
 	        type: 1,
 	        title: "SSH管理",

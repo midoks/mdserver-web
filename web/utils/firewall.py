@@ -157,8 +157,8 @@ class Firewall(object):
         if ssh_status[0] != '':
             status = False
 
-        data['pass_prohibit_status'] = False
         # 密码登陆配置检查
+        data['pass_prohibit_status'] = False
         pass_rep = r"PasswordAuthentication\s+(\w*)\s*\n"
         pass_status = re.search(pass_rep, conf)
         if pass_status:
@@ -166,6 +166,16 @@ class Firewall(object):
                 data['pass_prohibit_status'] = True
         else:
             data['pass_prohibit_status'] = True
+
+        # 密钥登陆配置检查
+        data['pubkey_prohibit_status'] = False
+        pass_rep = r"PubkeyAuthentication\s+(\w*)\s*\n"
+        pass_status = re.search(pass_rep, conf)
+        if pass_status:
+            if pass_status and pass_status.groups(0)[0].strip() == 'no':
+                data['pubkey_prohibit_status'] = True
+        else:
+            data['pubkey_prohibit_status'] = True
 
         data['port'] = port
         data['status'] = status
