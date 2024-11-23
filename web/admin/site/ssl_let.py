@@ -25,18 +25,18 @@ from .site import blueprint
 
 
 # 获取ACME日志
-@blueprint.route('/get_acme_logs', endpoint='get_acme_logs', methods=['POST'])
+@blueprint.route('/get_let_logs', endpoint='get_let_logs', methods=['POST'])
 @panel_login_required
-def get_acme_logs():
-    log_file = mw.getPanelDir() + '/logs/acme.log'
+def get_let_logs():
+    log_file = MwSites.instance().letLogFile()
     if not os.path.exists(log_file):
         mw.execShell('touch ' + log_file)
     return mw.returnData(True, 'OK', log_file)
 
 
-@blueprint.route('/create_acme', endpoint='create_acme', methods=['POST'])
+@blueprint.route('/create_let', endpoint='create_let', methods=['POST'])
 @panel_login_required
-def create_acme():
+def create_let():
     site_name = request.form.get('siteName', '')
     domains = request.form.get('domains', '')
     force = request.form.get('force', '')
@@ -45,7 +45,7 @@ def create_acme():
     wildcard_domain = request.form.get('wildcard_domain','')
     apply_type = request.form.get('apply_type', 'file')
     dnspai = request.form.get('dnspai','') 
-    return MwSites.instance().createAcme(site_name, domains, force, renew, apply_type, dnspai, email, wildcard_domain)
+    return MwSites.instance().createLet(site_name, domains, force, renew, apply_type, dnspai, email, wildcard_domain)
 
 
 

@@ -2119,10 +2119,84 @@ function renderDnsapi(){
 			}
 		});
 
-		$('#dnsapi_set').on('click', function(){
+		$('#dnsapi_set').unbind('click').on('click', function(){
 			var index = $('#dnsapi_option option:selected').attr('index');
 			renderDnsapiHtml(data[index]);
 		});
+	},'json');
+}
+
+function opSSLNow(type, id, siteName, callback){
+	var now = '<div class="myKeyCon ptb15">\
+			<div class="ssl_state_info" style="display:none;"></div>\
+		<div class="custom_certificate_info">\
+			<div class="ssl-con-key pull-left mr20">密钥(KEY)<br><textarea id="key" class="bt-input-text"></textarea></div>\
+			<div class="ssl-con-key pull-left">证书(PEM格式)<br><textarea id="csr" class="bt-input-text"></textarea></div>\
+		</div>\
+		<div class="ssl-btn pull-left mtb15" style="width:100%">\
+			<button class="btn btn-success btn-sm" onclick="saveSSL(\''+siteName+'\')">保存</button>\
+		</div>\
+	</div>\
+	<ul class="help-info-text c7 pull-left">\
+		<li>粘贴您的*.key以及*.pem内容，然后保存即可。</li>\
+		<li>如果浏览器提示证书链不完整,请检查是否正确拼接PEM证书</li><li>PEM格式证书 = 域名证书.crt + 根证书(root_bundle).crt</li>\
+		<li>在未指定SSL默认站点时,未开启SSL的站点使用HTTPS会直接访问到已开启SSL的站点</li>\
+	</ul>';
+
+	$(".tab-con").html(now);
+	var key = '';
+	var csr = '';
+	var loadT = layer.msg('正在提交任务...',{icon:16,time:0,shade: [0.3, '#000']});
+	$.post('/site/get_ssl','site_name='+siteName,function(data){
+		layer.close(loadT);
+		var rdata = data['data'];
+
+		if (rdata['cert_data']){
+			var issuer = rdata['cert_data']['issuer'].split(" ");
+			var domains = rdata['cert_data']['dns'].join("、");
+
+			var cert_data = "<div class='state_info_flex'>\
+				<div class='state_item'><span>证书品牌：</span><span class='ellipsis_text'>"+issuer[0]+"</span></div>\
+				<div class='state_item'><span>到期时间：</span><span class='btlink'>剩余"+rdata['cert_data']['endtime']+"天到期</span></div>\
+			</div>\
+			<div class='state_info_flex'>\
+				<div class='state_item'><span>认证域名：</span><span class='ellipsis_text'>"+domains+"</span></div>\
+				<div class='state_item'><span>强制HTTPS：</span><span class='switch'>\
+					<input class='btswitch btswitch-ios' id='toHttps' type='checkbox'>\
+                    <label class='btswitch-btn' for='toHttps' onclick=\"httpToHttps('" + siteName + "')\">\
+				</span></div>\
+			</div>";
+			$(".ssl_state_info").html(cert_data);
+			$(".ssl_state_info").css('display','block');
+		}
+
+		if(rdata.key == false){
+			rdata.key = '';
+		} else {
+			$(".ssl-btn").append('<button style=\'margin-left:3px;\' class="btn btn-success btn-sm" onclick="deleteSSL(\'now\','+id+',\''+siteName+'\')">删除</button>');
+		}
+
+		if(rdata.csr == false){
+			rdata.csr = '';
+		}
+		$("#key").val(rdata.key);
+		$("#csr").val(rdata.csr);
+
+		$("#toHttps").attr('checked',rdata.httpTohttps);
+		if(rdata.status){
+			$('.warning_info').css('display','none');
+			
+			$(".ssl-btn").append("<button class='btn btn-success btn-sm' onclick=\"ocSSL('close_ssl_conf','"+siteName+"')\" style='margin-left:3px;'>关闭SSL</button>");
+			$('#now_ssl').html('当前证书 - <i style="color:#20a53a;">[已部署SSL]</i>');
+		} else{
+			$('.warning_info').css('display','block');
+			$('#now_ssl').html('当前证书 - <i style="color:red;">[未部署SSL]</i>');
+		}
+
+
+		if (typeof (callback) != 'undefined'){
+			callback(rdata);
+		}
 	},'json');
 }
 
@@ -2191,7 +2265,6 @@ function opSSLAcme(type, id, siteName, callback){
 			$('#wildcard_domain_block').css('display','block');
 		}
 	});
-
 
 	renderDnsapi();
 
@@ -2278,92 +2351,33 @@ function opSSLAcme(type, id, siteName, callback){
 	},'json');
 }
 
-function opSSLNow(type, id, siteName, callback){
-	var now = '<div class="myKeyCon ptb15">\
-			<div class="ssl_state_info" style="display:none;"></div>\
-		<div class="custom_certificate_info">\
-			<div class="ssl-con-key pull-left mr20">密钥(KEY)<br><textarea id="key" class="bt-input-text"></textarea></div>\
-			<div class="ssl-con-key pull-left">证书(PEM格式)<br><textarea id="csr" class="bt-input-text"></textarea></div>\
-		</div>\
-		<div class="ssl-btn pull-left mtb15" style="width:100%">\
-			<button class="btn btn-success btn-sm" onclick="saveSSL(\''+siteName+'\')">保存</button>\
-		</div>\
-	</div>\
-	<ul class="help-info-text c7 pull-left">\
-		<li>粘贴您的*.key以及*.pem内容，然后保存即可。</li>\
-		<li>如果浏览器提示证书链不完整,请检查是否正确拼接PEM证书</li><li>PEM格式证书 = 域名证书.crt + 根证书(root_bundle).crt</li>\
-		<li>在未指定SSL默认站点时,未开启SSL的站点使用HTTPS会直接访问到已开启SSL的站点</li>\
-	</ul>';
-
-	$(".tab-con").html(now);
-	var key = '';
-	var csr = '';
-	var loadT = layer.msg('正在提交任务...',{icon:16,time:0,shade: [0.3, '#000']});
-	$.post('/site/get_ssl','site_name='+siteName,function(data){
-		layer.close(loadT);
-		var rdata = data['data'];
-
-		if (rdata['cert_data']){
-			var issuer = rdata['cert_data']['issuer'].split(" ");
-			var domains = rdata['cert_data']['dns'].join("、");
-
-			var cert_data = "<div class='state_info_flex'>\
-				<div class='state_item'><span>证书品牌：</span><span class='ellipsis_text'>"+issuer[0]+"</span></div>\
-				<div class='state_item'><span>到期时间：</span><span class='btlink'>剩余"+rdata['cert_data']['endtime']+"天到期</span></div>\
-			</div>\
-			<div class='state_info_flex'>\
-				<div class='state_item'><span>认证域名：</span><span class='ellipsis_text'>"+domains+"</span></div>\
-				<div class='state_item'><span>强制HTTPS：</span><span class='switch'>\
-					<input class='btswitch btswitch-ios' id='toHttps' type='checkbox'>\
-                    <label class='btswitch-btn' for='toHttps' onclick=\"httpToHttps('" + siteName + "')\">\
-				</span></div>\
-			</div>";
-			$(".ssl_state_info").html(cert_data);
-			$(".ssl_state_info").css('display','block');
-		}
-
-		if(rdata.key == false){
-			rdata.key = '';
-		} else {
-			$(".ssl-btn").append('<button style=\'margin-left:3px;\' class="btn btn-success btn-sm" onclick="deleteSSL(\'now\','+id+',\''+siteName+'\')">删除</button>');
-		}
-
-		if(rdata.csr == false){
-			rdata.csr = '';
-		}
-		$("#key").val(rdata.key);
-		$("#csr").val(rdata.csr);
-
-		$("#toHttps").attr('checked',rdata.httpTohttps);
-		if(rdata.status){
-			$('.warning_info').css('display','none');
-			
-			$(".ssl-btn").append("<button class='btn btn-success btn-sm' onclick=\"ocSSL('close_ssl_conf','"+siteName+"')\" style='margin-left:3px;'>关闭SSL</button>");
-			$('#now_ssl').html('当前证书 - <i style="color:#20a53a;">[已部署SSL]</i>');
-		} else{
-			$('.warning_info').css('display','block');
-			$('#now_ssl').html('当前证书 - <i style="color:red;">[未部署SSL]</i>');
-		}
-
-
-		if (typeof (callback) != 'undefined'){
-			callback(rdata);
-		}
-	},'json');
-}
-
 function opSSLLet(type, id, siteName, callback){
 	var lets =  '<div class="apply_ssl">\
 		<div class="label-input-group">\
 			<div class="line mtb10">\
-				<form>\
-					<span class="tname text-center">验证方式</span>\
-					<div style="margin-top:7px;display:inline-block">\
-						<input type="radio" name="c_type" onclick="fileCheck()" id="check_file" checked="checked" />\
-	  					<label class="mr20" for="check_file" style="font-weight:normal">文件验证</label></label>\
-	  				</div>\
-	  			</form>\
+				<span class="tname text-center">验证方式</span>\
+				<div style="margin-top:7px;display:inline-block">\
+					<input type="radio" name="apply_type" value="file" id="check_file" checked="checked"/>\
+  					<label class="mr20" for="check_file" style="font-weight:normal">文件验证</label></label>\
+  					<input type="radio" name="apply_type" value="dns" id="check_dns"/>\
+  					<label class="mr20" for="check_dns" style="font-weight:normal">DNS验证</label></label>\
+  				</div>\
 	  		</div>\
+	  		<div class="line mtb10" id="dnsapi_option" style="display:none;">\
+				<span class="tname text-center" style="line-height: 42px;">选择DNS接口</span>\
+				<div style="margin-top:7px;display:inline-block">\
+					<select name="dnspai" class="bt-input-text mr20">\
+						<option value="none">手动解析</option>\
+					</select>\
+					<button id="dnsapi_set" class="btn btn-default btn-sm btn-title" style="display:none;">配置</button>\
+  				</div>\
+	  		</div>\
+	  		<div class="check_message line" id="wildcard_domain_block" style="display:none;">\
+  				<div style="margin-left:100px">\
+  					<input type="checkbox" name="wildcard_domain" id="wildcard_domain" checked="checked">\
+  					<label class="mr20" for="wildcard_domain" style="font-weight:normal">自动组合泛域名</label>\
+  				</div>\
+  			</div>\
   			<div class="check_message line">\
   				<div style="margin-left:100px">\
   					<input type="checkbox" name="checkDomain" id="checkDomain" checked="">\
@@ -2391,6 +2405,20 @@ function opSSLLet(type, id, siteName, callback){
   	</div>';
 
   	$(".tab-con").html(lets);
+
+  	$('input[name="apply_type"]').on('change', function(){
+		var val = $(this).val();
+		if (val == 'file'){
+			$('#dnsapi_option').css('display','none');
+			$('#wildcard_domain_block').css('display','none');
+		} else {
+			$('#dnsapi_option').css('display','block');
+			$('#wildcard_domain_block').css('display','block');
+		}
+	});
+
+	renderDnsapi();
+
 	$.post('/site/get_ssl',  'site_name='+siteName+'&ssl_type=lets', function(data){
 		var rdata = data['data'];
 		if(rdata.csr == false){
@@ -2517,46 +2545,58 @@ function ocSSL(action,siteName){
 //生成SSL
 function newSSL(siteName, id, domains){
 	showSpeedWindow('正在申请...', 'site.get_let_logs', function(layers,index){
-		var force = '';
-		if ($("#checkDomain").prop("checked")){
-			force = '&force=true';
+		var pdata = {};
+		pdata['siteName'] = siteName;
+		pdata['domains'] = domains;
+		pdata['email'] = $("input[name='admin_email']").val();
+		
+		if($("#checkDomain").prop("checked")){
+			pdata['force'] = 'true';
 		}
-		var email = $("input[name='admin_email']").val();
-		$.post('/site/create_let','siteName='+siteName+'&domains='+domains+'&email='+email + force,function(rdata){
-			layer.close(index);
-			if(rdata.status){
-				showMsg(rdata.msg, function(){
+
+		if($("#wildcard_domain").prop("checked")){
+			pdata['wildcard_domain'] = 'true'; 
+		}
+
+		var apply_type = $('input[name="apply_type"]:checked').val();
+		pdata['apply_type'] = apply_type;
+		if (apply_type == 'dns'){
+			pdata['dnspai'] = $('#dnsapi_option option:selected').val();
+		}
+
+		$.post('/site/create_let',pdata,function(rdata){
+			showMsg(rdata.msg, function(){
+				layer.close(index);
+				if(rdata.status){	
 					$(".tab-nav span:first-child").click();
-				},{icon:1}, 2000);
-				return;
-			}
-			layer.msg(rdata.msg,{icon:2,area:'500px',time:0,shade:0.3,shadeClose:true});
+				}
+			},{icon:rdata.status?1:2}, 3000);
 		},'json');
 	});
 }
 
 function newAcmeSSL(siteName, id, domains){
 	showSpeedWindow('正在由ACME申请...', 'site.get_acme_logs', function(layers,index){
-		var force = '';
-		var email = $("input[name='admin_email']").val();
-		var apply_type = $('input[name="apply_type"]:checked').val();
-
 		var pdata = {};
 		pdata['siteName'] = siteName;
 		pdata['domains'] = domains;
-		pdata['email'] = email;
-		pdata['apply_type'] = apply_type;
+		pdata['email'] = $("input[name='admin_email']").val();
+		
 		if($("#checkDomain").prop("checked")){
 			pdata['force'] = 'true';
 		}
 
+		if($("#wildcard_domain").prop("checked")){
+			pdata['wildcard_domain'] = 'true'; 
+		}
+
+		var apply_type = $('input[name="apply_type"]:checked').val();
+		pdata['apply_type'] = apply_type;
 		if (apply_type == 'dns'){
 			pdata['dnspai'] = $('#dnsapi_option option:selected').val();
 		}
 
-		console.log(pdata);
 		$.post('/site/create_acme',pdata,function(rdata){
-			console.log(rdata);
 			showMsg(rdata.msg, function(){
 				layer.close(index);
 				if(rdata.status){	

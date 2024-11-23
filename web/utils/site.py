@@ -419,6 +419,74 @@ class sites(object):
         mw.writeLog('网站管理', '设置成功,站点【{1}】到期【{2}】后将自动停止!', (info['name'], end_date,))
         return mw.returnData(True, '设置成功,站点到期后将自动停止!')
 
+    # ssl相关方法 start
+    def setSslConf(self, site_name):
+        file = self.getHostConf(site_name)
+        conf = mw.readFile(file)
+
+        version = mw.getOpVer()
+
+        keyPath = self.sslDir + '/' + site_name + '/privkey.pem'
+        certPath = self.sslDir + '/' + site_name + '/fullchain.pem'
+        if conf:
+            if conf.find('ssl_certificate') == -1:
+                # ssl_ciphers ECDHE-RSA-AES128-GCM-SHA256:HIGH:!aNULL:!MD5:!RC4:!DHE;
+                # add_header Alt-Svc 'h3=":443";ma=86400,h3-29=":443";ma=86400';
+                http3Header = """
+    add_header Strict-Transport-Security "max-age=63072000";
+    add_header Alt-Svc 'h3=":443";ma=86400';
+"""
+                if not version.startswith('1.25'):
+                    http3Header = '';
+
+                sslStr = """#error_page 404/404.html;
+    ssl_certificate    %s;
+    ssl_certificate_key  %s;
+    ssl_protocols TLSv1 TLSv1.1 TLSv1.2 TLSv1.3;
+    ssl_ciphers ECDHE-ECDSA-AES128-GCM-SHA256:ECDHE-RSA-AES128-GCM-SHA256:ECDHE-ECDSA-AES256-GCM-SHA384:ECDHE-RSA-AES256-GCM-SHA384:ECDHE-ECDSA-CHACHA20-POLY1305:ECDHE-RSA-CHACHA20-POLY1305:DHE-RSA-AES128-GCM-SHA256:DHE-RSA-AES256-GCM-SHA384:DHE-RSA-CHACHA20-POLY1305;
+    ssl_prefer_server_ciphers on;
+    ssl_session_cache shared:SSL:10m;
+    ssl_session_timeout 10m;
+    %s
+    error_page 497  https://$host$request_uri;""" % (certPath, keyPath, http3Header)
+            if(conf.find('ssl_certificate') != -1):
+                return mw.returnData(True, 'SSL开启成功!')
+
+            conf = conf.replace('#error_page 404/404.html;', sslStr)
+
+            rep = r"listen\s+([0-9]+)\s*[default_server|reuseport]*;"
+            tmp = re.findall(rep, conf)
+            if not mw.inArray(tmp, '443'):
+                listen = re.search(rep, conf).group()
+                
+                if version.startswith('1.25'):
+                    http_ssl = "\n\tlisten 443 ssl;"
+                    http_ssl = http_ssl + "\n\tlisten [::]:443 ssl;"
+                    http_ssl = http_ssl + "\n\tlisten 443 quic;"
+                    http_ssl = http_ssl + "\n\tlisten [::]:443 quic;"
+                    http_ssl = http_ssl + "\n\thttp2 on;"
+                else:
+                    http_ssl = "\n\tlisten 443 ssl http2;"
+                    http_ssl = http_ssl + "\n\tlisten [::]:443 ssl http2;"
+
+
+                conf = conf.replace(listen, listen + http_ssl)
+
+            mw.backFile(file)
+            mw.writeFile(file, conf)
+            isError = mw.checkWebConfig()
+            if(isError != True):
+                mw.restoreFile(file)
+                return mw.returnData(False, '证书错误: <br><a style="color:red;">' + isError.replace("\n", '<br>') + '</a>')
+
+        self.saveCert(keyPath, certPath)
+
+        msg = mw.getInfo('网站[{1}]开启SSL成功!', (site_name,))
+        mw.writeLog('网站管理', msg)
+
+        mw.restartWeb()
+        return mw.returnData(True, 'SSL开启成功!')
+
     # 设置网站备注
     def setPs(self, site_id, ps):
         if thisdb.setSitesData(site_id, ps=ps):
@@ -1466,6 +1534,7 @@ location ^~ {from} {\n\
             csr = mw.readFile(csr_path)
 
         cert_data = mw.getCertName(csr_path)
+        # print(csr_path,cert_data)
         data = {
             'status': status,
             'domain': domains,
@@ -1476,6 +1545,21 @@ location ^~ {from} {\n\
             'cert_data': cert_data,
         }
         return mw.returnData(True, 'OK', data)
+
+    def saveCert(self, keyPath, certPath):
+        try:
+            certInfo = mw.getCertName(certPath)
+            if not certInfo:
+                return mw.returnData(False, '证书解析失败!')
+            vpath = self.sslDir + '/' + certInfo['subject'].strip()
+            if not os.path.exists(vpath):
+                os.system('mkdir -p ' + vpath)
+            mw.writeFile(vpath + '/privkey.pem', mw.readFile(keyPath))
+            mw.writeFile(vpath + '/fullchain.pem', mw.readFile(certPath))
+            mw.writeFile(vpath + '/info.json', json.dumps(certInfo))
+            return mw.returnData(True, '证书保存成功!')
+        except Exception as e:
+            return mw.returnData(False, '证书保存失败!')
 
     def getCertList(self):
         try:
@@ -1657,7 +1741,6 @@ location ^~ {from} {\n\
         thisdb.setOption('dnsapi',json.dumps(dnsapi_data))
         return mw.returnData(True, '设置成功!')
 
-
     def acmeLogFile(self):
         return mw.getPanelDir() + '/logs/acme.log'
 
@@ -1666,13 +1749,20 @@ location ^~ {from} {\n\
         mw.writeFile(log_file, msg+"\n", "wb+")
         return True
 
+    def letLogFile(self):
+        return mw.getPanelDir() + '/logs/letsencrypt.log'
+
+    def writeLetLog(self,msg):
+        log_file = self.letLogFile()
+        mw.writeFile(log_file, msg+"\n", "wb+")
+        return True
+
     def createAcmeMultiDomin(self):
         pass
 
-    def createAcmeFile(self, site_name, domains,force,renew, apply_type, dnspai, email):
-        
+    def createAcmeFile(self, site_name, domains, email, force, renew):
 
-        print(site_name, domains,force,renew,apply_type, dnspai, email)
+        print(site_name, domains,force,renew, email)
         
 
         file = self.getHostConf(site_name)
@@ -1702,20 +1792,7 @@ location ^~ {from} {\n\
 
         srcPath = siteInfo['path']
 
-        # 检测acme是否安装
-        acme_dir = mw.getAcmeDir()
-        if not os.path.exists(acme_dir):
-            try:
-                mw.execShell("curl -sS curl https://get.acme.sh | sh")
-            except:
-                pass
-        if not os.path.exists(acme_dir):
-            return mw.returnData(False, '尝试自动安装ACME失败,请通过以下命令尝试手动安装<p>安装命令: curl https://get.acme.sh | sh</p>')
-
-        # 避免频繁执行
-        checkAcmeRun = mw.execShell('ps -ef|grep acme.sh |grep -v grep')
-        if checkAcmeRun[0] != '':
-            return mw.returnData(False, '正在申请或更新SSL中...')
+        
 
         if force == 'true':
             force_bool = True
@@ -1813,7 +1890,7 @@ location ^~ {from} {\n\
         top_domain =  s[last_index-1]+'.'+s[last_index]
         return top_domain
 
-    def createAcmeDns(self, site_name, domains, dnspai, force, renew):
+    def createAcmeDns(self, site_name, domains, dnspai, wildcard_domain, force, renew):
         dnsapi_option = thisdb.getOptionByJson('dnsapi', default={})
         if not dnspai in dnsapi_option:
             return mw.returnData(False, dnspai+'未设置')
@@ -1823,29 +1900,187 @@ location ^~ {from} {\n\
             if dnsapi_data[k] == '':
                 return mw.returnData(False, k+'为空!')
 
-        cmd = self.getDnsapiExportVar(dnsapi_data)
-
+        acme_dir = mw.getAcmeDir()
         for d in domains:
-            top_domain = self.getDomainRootName(d)
-            cmd += 'acme.sh --issue --dns '+str(dnspai)+' -d '+top_domain+' -d "*.'+top_domain+'" --force'
+            cmd = '''
+#!/bin/bash
+PATH=/bin:/sbin:/usr/bin:/usr/sbin:/usr/local/bin:/usr/local/sbin:~/bin:/opt/homebrew/bin:%s
+export PATH
+''' % (acme_dir,)
 
-        print(dnsapi_data)
-        print(domains)
-        print(cmd)
-        return mw.returnData(False, '测试中!')
+            cmd += self.getDnsapiExportVar(dnsapi_data)
+            if wildcard_domain == 'true':
+                top_domain = self.getDomainRootName(d)
+                cmd += 'acme.sh --issue --dns '+str(dnspai)+' -d '+top_domain+' -d "*.'+top_domain+'"'
+                d = top_domain
+            else:
+                cmd += 'acme.sh --issue --dns '+str(dnspai)+' -d '+d
 
-    def createAcme(self, site_name, domains,force,renew, apply_type, dnspai, email):
+            log_file = self.acmeLogFile()
+            cmd +=  ' >> ' + log_file
+            print(cmd)
+            result = mw.execShell(cmd)
+            print(result)
+
+            # acme源的ssl证书
+            src_path = mw.getAcmeDomainDir(d)
+            src_cert = src_path + '/fullchain.cer'
+            src_key = src_path + '/' + d + '.key'
+            src_cert.replace("\\*", "*")
+
+            msg = '签发失败,您尝试申请证书的失败次数已达上限!\
+                <p>1、检查域名是否正确解析到本服务器,或解析还未完全生效</p>\
+                <p>2、如果以上检查都确认没有问题，请尝试更换DNS服务商</p>'
+            if not os.path.exists(src_cert):
+                data = {}
+                data['err'] = result
+                data['out'] = result[0]
+                data['msg'] = msg
+                data['result'] = {}
+                if result[1].find('new-authz error:') != -1:
+                    data['result'] = json.loads(re.search("{.+}", result[1]).group())
+                    if data['result']['status'] == 429:
+                        data['msg'] = msg
+                data['status'] = False
+                return data
+
+            # acme源建立软链接(目标)
+            dst_path = self.sslDir + '/' + site_name
+            dst_cert = dst_path + "/fullchain.pem"  # 生成证书路径
+            dst_key = dst_path + "/privkey.pem"  # 密钥文件路径
+
+            if not os.path.exists(dst_path):
+                mw.execShell("mkdir -p " + dst_path)
+
+            mw.buildSoftLink(src_cert, dst_cert, True)
+            mw.buildSoftLink(src_key, dst_key, True)
+            mw.execShell('echo "acme" > "' + dst_path + '/README"')
+
+            # 写入配置文件
+            result = self.setSslConf(site_name)
+            if not result['status']:
+                return result
+            result['csr'] = mw.readFile(src_cert)
+            result['key'] = mw.readFile(src_key)
+
+        mw.restartWeb()
+        return mw.returnData(True, '证书已更新!', result)
+
+    def createAcme(self, site_name, domains,force,renew, apply_type, dnspai, email, wildcard_domain):
         domains = json.loads(domains)
         if len(domains) < 1:
             return mw.returnData(False, '请选择域名')
         if email.strip() != '':
             thisdb.setOption('ssl_email', email)
 
+        # 检测acme是否安装
+        acme_dir = mw.getAcmeDir()
+        if not os.path.exists(acme_dir):
+            try:
+                mw.execShell("curl -sS curl https://get.acme.sh | sh")
+            except:
+                pass
+        if not os.path.exists(acme_dir):
+            return mw.returnData(False, '尝试自动安装ACME失败,请通过以下命令尝试手动安装<p>安装命令: curl https://get.acme.sh | sh</p>')
+
+        # 避免频繁执行
+        checkAcmeRun = mw.execShell('ps -ef|grep acme.sh |grep -v grep')
+        if checkAcmeRun[0] != '':
+            return mw.returnData(False, '正在申请或更新SSL中...')
+
         if apply_type == 'file':
-            return self.createAcmeFile(site_name, domains,force,renew, apply_type, dnspai, email)
+            return self.createAcmeFile(site_name, domains, email,force,renew)
         elif apply_type == 'dns':
-            return self.createAcmeDns(site_name, domains, dnspai,force, renew)
-        return mw.returnData(False, '异常请求') 
+            return self.createAcmeDns(site_name, domains, dnspai, wildcard_domain,force, renew)
+        return mw.returnData(False, '异常请求')
+
+    def createLet(self, site_name, domains, force, renew, apply_type, dnspai, email, wildcard_domain):
+        siteName = request.form.get('siteName', '')
+        domains = request.form.get('domains', '')
+        force = request.form.get('force', '')
+        renew = request.form.get('renew', '')
+        email_args = request.form.get('email', '')
+
+        domains = json.loads(domains)
+        email = mw.M('users').getField('email')
+        if email_args.strip() != '':
+            mw.M('users').setField('email', email_args)
+            email = email_args
+
+        if not len(domains):
+            return mw.returnJson(False, '请选择域名')
+
+        host_conf_file = self.getHostConf(siteName)
+        if os.path.exists(host_conf_file):
+            siteConf = mw.readFile(host_conf_file)
+            if siteConf.find('301-END') != -1:
+                return mw.returnJson(False, '检测到您的站点做了301重定向设置，请先关闭重定向!')
+
+            # 检测存在反向代理
+            data_path = self.getProxyDataPath(siteName)
+            data_content = mw.readFile(data_path)
+            if data_content != False:
+                try:
+                    data = json.loads(data_content)
+                except:
+                    pass
+                for proxy in data:
+                    proxy_dir = "{}/{}".format(self.proxyPath, siteName)
+                    proxy_dir_file = proxy_dir + '/' + proxy['id'] + '.conf'
+                    if os.path.exists(proxy_dir_file):
+                        return mw.returnJson(False, '检测到您的站点做了反向代理设置，请先关闭反向代理!')
+
+            # fix binddir domain ssl apply question
+            mw.backFile(host_conf_file)
+            auth_to = self.getSitePath(siteName)
+            rep = r"\s*root\s*(.+);"
+            replace_root = "\n\troot " + auth_to + ";"
+            siteConf = re.sub(rep, replace_root, siteConf)
+            mw.writeFile(host_conf_file, siteConf)
+            mw.restartWeb()
+
+        to_args = {
+            'domains': domains,
+            'auth_type': 'http',
+            'auth_to': auth_to,
+        }
+
+        src_letpath = mw.getServerDir() + '/web_conf/letsencrypt/' + siteName
+        src_csrpath = src_letpath + "/fullchain.pem"  # 生成证书路径
+        src_keypath = src_letpath + "/privkey.pem"  # 密钥文件路径
+
+        dst_letpath = self.sslDir + '/' + siteName
+        dst_csrpath = dst_letpath + '/fullchain.pem'
+        dst_keypath = dst_letpath + '/privkey.pem'
+
+        if not os.path.exists(src_letpath):
+            import cert_api
+            data = cert_api.cert_api().applyCertApi(to_args)
+            mw.restoreFile(host_conf_file)
+            if not data['status']:
+                msg = data['msg']
+                if type(data['msg']) != str:
+                    msg = data['msg'][0]
+                    emsg = data['msg'][1]['challenges'][0]['error']
+                    msg = msg + '<p><span>响应状态:</span>' + str(emsg['status']) + '</p><p><span>错误类型:</span>' + emsg[
+                        'type'] + '</p><p><span>错误代码:</span>' + emsg['detail'] + '</p>'
+                return mw.returnJson(data['status'], msg, data['msg'])
+
+        mw.execShell('mkdir -p ' + dst_letpath)
+        mw.buildSoftLink(src_csrpath, dst_csrpath, True)
+        mw.buildSoftLink(src_keypath, dst_keypath, True)
+        mw.execShell('echo "lets" > "' + dst_letpath + '/README"')
+
+        # 写入配置文件
+        result = self.setSslConf(siteName)
+        if not result['status']:
+            return mw.getJson(result)
+
+        result['csr'] = mw.readFile(src_csrpath)
+        result['key'] = mw.readFile(src_keypath)
+
+        mw.restartWeb()
+        return mw.returnData(data['status'], data['msg'], result)
 
 
     def getPhpVersion(self):
