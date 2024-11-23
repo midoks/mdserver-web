@@ -107,7 +107,7 @@ def initDreplace():
         mw.writeFile(conf, conf_content)
 
     if os.path.exists(systemDir) and not os.path.exists(systemService):
-        activate_file = mw.getRunDir() + '/bin/activate'
+        activate_file = mw.getPanelDir() + '/bin/activate'
         if os.path.exists(activate_file):
             supervisord_bin = mw.execShell(
                 'source ' + activate_file + '&& which supervisord')[0].strip()
