@@ -1995,29 +1995,21 @@ export PATH
         return mw.returnData(False, '异常请求')
 
     def createLet(self, site_name, domains, force, renew, apply_type, dnspai, email, wildcard_domain):
-        siteName = request.form.get('siteName', '')
-        domains = request.form.get('domains', '')
-        force = request.form.get('force', '')
-        renew = request.form.get('renew', '')
-        email_args = request.form.get('email', '')
-
         domains = json.loads(domains)
-        email = mw.M('users').getField('email')
-        if email_args.strip() != '':
-            mw.M('users').setField('email', email_args)
-            email = email_args
+        if len(domains) < 1:
+            return mw.returnData(False, '请选择域名')
+        if email.strip() != '':
+            thisdb.setOption('ssl_email', email)
 
-        if not len(domains):
-            return mw.returnJson(False, '请选择域名')
 
-        host_conf_file = self.getHostConf(siteName)
+        host_conf_file = self.getHostConf(site_name)
         if os.path.exists(host_conf_file):
             siteConf = mw.readFile(host_conf_file)
             if siteConf.find('301-END') != -1:
                 return mw.returnJson(False, '检测到您的站点做了301重定向设置，请先关闭重定向!')
 
             # 检测存在反向代理
-            data_path = self.getProxyDataPath(siteName)
+            data_path = self.getProxyDataPath(site_name)
             data_content = mw.readFile(data_path)
             if data_content != False:
                 try:
@@ -2025,14 +2017,14 @@ export PATH
                 except:
                     pass
                 for proxy in data:
-                    proxy_dir = "{}/{}".format(self.proxyPath, siteName)
+                    proxy_dir = "{}/{}".format(self.proxyPath, site_name)
                     proxy_dir_file = proxy_dir + '/' + proxy['id'] + '.conf'
                     if os.path.exists(proxy_dir_file):
                         return mw.returnJson(False, '检测到您的站点做了反向代理设置，请先关闭反向代理!')
 
             # fix binddir domain ssl apply question
             mw.backFile(host_conf_file)
-            auth_to = self.getSitePath(siteName)
+            auth_to = self.getSitePath(site_name)
             rep = r"\s*root\s*(.+);"
             replace_root = "\n\troot " + auth_to + ";"
             siteConf = re.sub(rep, replace_root, siteConf)
@@ -2045,11 +2037,11 @@ export PATH
             'auth_to': auth_to,
         }
 
-        src_letpath = mw.getServerDir() + '/web_conf/letsencrypt/' + siteName
+        src_letpath = mw.getServerDir() + '/web_conf/letsencrypt/' + site_name
         src_csrpath = src_letpath + "/fullchain.pem"  # 生成证书路径
         src_keypath = src_letpath + "/privkey.pem"  # 密钥文件路径
 
-        dst_letpath = self.sslDir + '/' + siteName
+        dst_letpath = self.sslDir + '/' + site_name
         dst_csrpath = dst_letpath + '/fullchain.pem'
         dst_keypath = dst_letpath + '/privkey.pem'
 
@@ -2064,7 +2056,7 @@ export PATH
                     emsg = data['msg'][1]['challenges'][0]['error']
                     msg = msg + '<p><span>响应状态:</span>' + str(emsg['status']) + '</p><p><span>错误类型:</span>' + emsg[
                         'type'] + '</p><p><span>错误代码:</span>' + emsg['detail'] + '</p>'
-                return mw.returnJson(data['status'], msg, data['msg'])
+                return mw.returnData(data['status'], msg, data['msg'])
 
         mw.execShell('mkdir -p ' + dst_letpath)
         mw.buildSoftLink(src_csrpath, dst_csrpath, True)
@@ -2072,9 +2064,9 @@ export PATH
         mw.execShell('echo "lets" > "' + dst_letpath + '/README"')
 
         # 写入配置文件
-        result = self.setSslConf(siteName)
+        result = self.setSslConf(site_name)
         if not result['status']:
-            return mw.getJson(result)
+            return result
 
         result['csr'] = mw.readFile(src_csrpath)
         result['key'] = mw.readFile(src_keypath)
