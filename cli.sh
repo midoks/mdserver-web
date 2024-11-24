@@ -84,7 +84,6 @@ mw_stop()
 	PLIST=`ps -ef|grep app:app |grep -v grep|awk '{print $2}'`
 	for i in ${($PLIST)[@]}
 	do
-		echo "kill -9 $i > /dev/null 2>&1"
 	    kill -9 $i > /dev/null 2>&1
 	done
 
