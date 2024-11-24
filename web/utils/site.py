@@ -1513,7 +1513,7 @@ location ^~ {from} {\n\
                 redirect_conf = redirect_dir + '/' + redirect_data['id'] + '.conf'
                 redirect_txt = "{}/{}/{}.conf.txt".format(self.redirectPath, site_name, redirect_data['id'])
                 if os.path.exists(redirect_conf):
-                    self.close_redirect.append(r['id'])
+                    self.close_redirect.append(redirect_data['id'])
                     mw.execShell('mv ' + redirect_conf + ' ' + redirect_txt)
             mw.restartWeb()
 
