@@ -98,16 +98,16 @@ $('#site_search').click(function(){
 				var _this = $(this);
 				var id = $(this).attr('data-ids');
 				laydate.render({
-					elem: '#site_'+ id //指定元素
-					,min:getDate(1)
-					,max:'2099-12-31'
-					,vlue:getDate(365)
-					,type:'date'
-					,format :'yyyy-MM-dd'
-					,trigger:'click'
-					,btns:['perpetual', 'confirm']
-					,theme:'#20a53a'
-					,done:function(dates){
+					elem: '#site_'+ id,
+					min:getDate(1),
+					max:'9999-12-31',
+					vlue:getDate(365),
+					type:'date',
+					format :'yyyy-MM-dd',
+					trigger:'click',
+					btns:['perpetual', 'confirm'],
+					theme:'#20a53a',
+					done:function(dates){
 						if(_this.html() == '永久'){
 						 	dates = '0000-00-00';
 						}
@@ -1031,7 +1031,7 @@ function webEdit(id,website,endTime,addtime){
 	// <p onclick='dirBinding("+id+")'>子目录绑定</p>\
 	layer.open({
 		type: 1,
-		area: '700px',
+		area: ['700px','580px'],
 		title: '站点修改['+website+']  --  添加时间['+addtime+']',
 		closeBtn: 1,
 		shift: 0,
@@ -1082,7 +1082,7 @@ function webEdit(id,website,endTime,addtime){
 	});	
 }
 
-//取网站日志
+//取网站日志pluginLogs
 function getSiteLogs(siteName){
 	var loadT = layer.msg('正在处理,请稍候...',{icon:16,time:0,shade: [0.3, '#000']});
 	$.post('/site/get_logs',{siteName:siteName},function(logs){
@@ -1091,9 +1091,10 @@ function getSiteLogs(siteName){
 			logs.msg = '';
 		}
 		if (logs.msg == '') logs.msg = '当前没有日志.';
-		var phpCon = '<textarea wrap="off" readonly="" style="white-space: pre;margin: 0px;width: 560px;height: 530px;background-color: #333;color:#fff; padding:0 5px" id="error_log">'+logs.msg+'</textarea>';
-		$("#webedit-con").html(phpCon);
-		var ob = document.getElementById('error_log');
+		var h =  parseInt($('.bt-w-menu').css('height')) - 50;
+		var con = '<textarea wrap="off" style="white-space:pre;margin: 0px;width: 560px;height: '+h+'px;background-color: #333;color:#fff; padding:0 5px;" id="site_log">'+logs.msg+'</textarea>';
+		$("#webedit-con").html(con);
+		var ob = document.getElementById('site_log');
 		ob.scrollTop = ob.scrollHeight;		
 	},'json');
 }
@@ -1102,14 +1103,14 @@ function getSiteLogs(siteName){
 function getSiteErrorLogs(siteName){
 	var loadT = layer.msg('正在处理,请稍候...',{icon:16,time:0,shade: [0.3, '#000']});
 	$.post('/site/get_error_logs',{siteName:siteName},function(logs){
-		// console.log(logs);
 		layer.close(loadT);
 		if(logs.status !== true){
 			logs.msg = '';
 		}
 		if (logs.msg == '') logs.msg = '当前没有日志.';
-		var phpCon = '<textarea wrap="off" readonly="" style="white-space: pre;margin: 0px;width: 560px;height: 530px;background-color: #333;color:#fff; padding:0 5px" id="error_log">'+logs.msg+'</textarea>';
-		$("#webedit-con").html(phpCon);
+		var h =  parseInt($('.bt-w-menu').css('height')) - 50;
+		var con = '<textarea wrap="off" style="white-space:pre;margin:0px;width:560px;height:'+h+'px;background-color: #333;color:#fff; padding:0 5px;" id="error_log">'+logs.msg+'</textarea>';
+		$("#webedit-con").html(con);
 		var ob = document.getElementById('error_log');
 		ob.scrollTop = ob.scrollHeight;		
 	},'json');
