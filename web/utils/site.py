@@ -1508,10 +1508,10 @@ location ^~ {from} {\n\
         if os.path.exists(redirect_path):
             content = mw.readFile(redirect_path)
             data = json.loads(content)
-            for r in data:
+            for redirect_data in data:
                 redirect_dir = "{}/{}".format(self.redirectPath, site_name)
-                redirect_conf = redirect_dir + '/' + r['id'] + '.conf'
-                redirect_txt = "{}/{}/{}.conf.txt".format(self.redirectPath, site_name, r['id'])
+                redirect_conf = redirect_dir + '/' + redirect_data['id'] + '.conf'
+                redirect_txt = "{}/{}/{}.conf.txt".format(self.redirectPath, site_name, redirect_data['id'])
                 if os.path.exists(redirect_conf):
                     self.close_redirect.append(r['id'])
                     mw.execShell('mv ' + redirect_conf + ' ' + redirect_txt)
