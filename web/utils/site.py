@@ -1291,7 +1291,7 @@ class sites(object):
         mw.writeFile(vhost_file, content)
 
     # 设置 网站 反向代理列表
-    def setProxy(self, site_name, site_from, to, host, name, open_proxy, open_cache, cache_time, pid):
+    def setProxy(self, site_name, site_from, to, host, name, open_proxy, open_cache, cache_time, site_id):
         from urllib.parse import urlparse
         if  site_name == "" or site_from == "" or to == "" or host == "" or name == "":
             return mw.returnData(False, "必填项不能为空")
@@ -1432,6 +1432,21 @@ location ^~ {from} {\n\
         self.operateProxyConf(site_name, 'start')
         mw.restartWeb()
         return mw.returnData(True, "ok", {"hash": pid})
+
+    def setProxyStatus(self, site_name, proxy_id, status):
+        if status == '' or site_name == '' or proxy_id == '':
+            return mw.returnData(False, "必填项不能为空!")
+
+        conf_file = "{}/{}/{}.conf".format(self.proxyPath, site_name, proxy_id)
+        conf_txt = "{}/{}/{}.conf.txt".format(self.proxyPath, site_name, proxy_id)
+
+        if _status == '1':
+            mw.execShell('mv ' + conf_txt + ' ' + conf_file)
+        else:
+            mw.execShell('mv ' + conf_file + ' ' + conf_txt)
+
+        mw.restartWeb()
+        return mw.returnData(True, "OK")
 
     def getProxyConf(self, site_name, pid):
         if pid == '' or site_name == '':
