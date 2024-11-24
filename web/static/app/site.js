@@ -1031,12 +1031,12 @@ function webEdit(id,website,endTime,addtime){
 	// <p onclick='dirBinding("+id+")'>子目录绑定</p>\
 	layer.open({
 		type: 1,
-		area: ['700px','580px'],
+		area: ['700px','570px'],
 		title: '站点修改['+website+']  --  添加时间['+addtime+']',
 		closeBtn: 1,
 		shift: 0,
 		content: "<div class='bt-form'>\
-			<div class='bt-w-menu pull-left' style='height: 565px;'>\
+			<div class='bt-w-menu pull-left'>\
 				<p class='bgw' onclick=\"domainEdit(" + id + ",'" + website + "')\">域名管理</p>\
 				<p onclick='webPathEdit("+id+")'>网站目录</p>\
 				<p onclick='limitNet("+id+")'>流量限制</p>\
@@ -1051,7 +1051,7 @@ function webEdit(id,website,endTime,addtime){
 				<p id='site_"+id+"' onclick=\"getSiteLogs('"+website+"')\">响应日志</p>\
 				<p id='site_"+id+"' onclick=\"getSiteErrorLogs('"+website+"')\">错误日志</p>\
 			</div>\
-			<div id='webedit-con' class='bt-w-con webedit-con pd15' style='height: 565px;overflow: scroll;'></div>\
+			<div id='webedit-con' class='bt-w-con webedit-con pd15' style='height: 100%;overflow: scroll;'></div>\
 		</div>",
 		success:function(){
 			//域名输入提示
@@ -1091,7 +1091,7 @@ function getSiteLogs(siteName){
 			logs.msg = '';
 		}
 		if (logs.msg == '') logs.msg = '当前没有日志.';
-		var h =  parseInt($('.bt-w-menu').css('height')) - 50;
+		var h =  parseInt($('.bt-w-menu').css('height')) - 35;
 		var con = '<textarea wrap="off" style="white-space:pre;margin: 0px;width: 560px;height: '+h+'px;background-color: #333;color:#fff; padding:0 5px;" id="site_log">'+logs.msg+'</textarea>';
 		$("#webedit-con").html(con);
 		var ob = document.getElementById('site_log');
@@ -1108,7 +1108,7 @@ function getSiteErrorLogs(siteName){
 			logs.msg = '';
 		}
 		if (logs.msg == '') logs.msg = '当前没有日志.';
-		var h =  parseInt($('.bt-w-menu').css('height')) - 50;
+		var h =  parseInt($('.bt-w-menu').css('height')) - 35;
 		var con = '<textarea wrap="off" style="white-space:pre;margin:0px;width:560px;height:'+h+'px;background-color: #333;color:#fff; padding:0 5px;" id="error_log">'+logs.msg+'</textarea>';
 		$("#webedit-con").html(con);
 		var ob = document.getElementById('error_log');
