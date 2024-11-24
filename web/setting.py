@@ -50,6 +50,19 @@ if os.path.exists(default_ipv6_file):
 else:
     bind.append('0.0.0.0:%s' % panel_port)
 
+
+ssl_choose_file = panel_dir+'/ssl/choose.pl'
+if os.path.exists(ssl_choose_file):
+    ssl_choose = mw.readFile(ssl_choose_file).strip()
+    if mw.inArray(['local','nginx'],ssl_choose):
+        tmp_cert = panel_dir+'/ssl/'+ssl_choose+'/cert.pem'
+        tmp_private = panel_dir+'/ssl/'+ssl_choose+'/private.pem'
+        if os.path.exists(tmp_cert) and os.path.exists(tmp_private):
+            certfile = tmp_cert
+            keyfile  = tmp_private
+            ciphers = 'TLSv1 TLSv1.1 TLSv1.2 TLSv1.3'
+            ssl_version = 2
+
 if workers > 2:
     workers = 1
 
