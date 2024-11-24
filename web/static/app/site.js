@@ -1373,70 +1373,75 @@ function to301(siteName, type, obj){
 	
 	// 设置 页面展示
 	if(type == 1) {
-		obj = {
+		var obj = {
+			type: 1,
+			keep_path: 1,
 			to: 'http://',
 			from: '',
 			r_type: '',
+			type: 'path'
+		};
+
+		var keep_path_ht = obj.keep_path == 1 ? 'checked="checked"' : '';
+		var redirect_title = type == 1 ? '创建重定向' : '修改重定向[' + obj.redirectname + ']';
+		layer.open({
 			type: 1,
-			type: 'path',
-			keep_path: 1
-		}
-		var redirect_form = layer.open({
-			type: 1,
-			skin: 'demo-class',
-			area: '650px',
-			title: type == 1 ? '创建重定向' : '修改重定向[' + obj.redirectname + ']',
+			area: ['650px','270px'],
+			title: redirect_title,
 			closeBtn: 1,
 			shift: 5,
+			btn: ['提交','关闭'],
 			shadeClose: false,
-			content: "<form id='form_redirect' class='divtable pd20' style='padding-bottom: 60px'>" +
-				"<div class='line' style='overflow:hidden;height: 40px;'>" +
-				"<div style='display: inline-block;'>" +
-				"<span class='tname' style='margin-left:10px;position: relative;top: -5px;'>保留URI参数</span>" +
-				"<input class='btswitch btswitch-ios' id='keep_path' type='checkbox' name='keep_path' " + (obj.keep_path == 1 ? 'checked="checked"' : '') + " /><label class='btswitch-btn phpmyadmin-btn' for='keep_path' style='float:left'></label>" +
-				"</div>" +
-				"</div>" +
-				"<div class='line' style='clear:both;'>" +
-				"<span class='tname'>重定向类型</span>" +
-				"<div class='info-r  ml0'>" +
-				"<select class='bt-input-text mr5' name='type' style='width:100px'><option value='domain' " + (obj.type == 'domain' ? 'selected ="selected"' : "") + ">域名</option><option value='path'  " + (obj.type == 'path' ? 'selected ="selected"' : "") + ">路径</option></select>" +
-				"<span class='mlr15'>重定向方式</span>" +
-				"<select class='bt-input-text ml10' name='r_type' style='width:100px'><option value='301' " + (obj.r_type == '301' ? 'selected ="selected"' : "") + " >301</option><option value='302' " + (obj.r_type == '302' ? 'selected ="selected"' : "") + ">302</option></select></div>" +
-				"</div>" +
-				"<div class='line redirectdomain'>" +
-				"<span class='tname'>重定向源</span>" +
-				"<div class='info-r  ml0'>" +
-				"<input  name='from' placeholder='域名或路径' class='bt-input-text mr5' type='text' style='width:200px;float: left;margin-right:0px' value='" + obj.from + "'>" +
-				"<span class='tname' style='width:90px'>目标URL</span>" +
-				"<input  name='to' class='bt-input-text mr5' type='text' style='width:200px' value='" + obj.to + "'>" +
-				"</div>" +
-				"</div>" +
-				"</div>" +
-				"<div class='bt-form-submit-btn'><button type='button' class='btn btn-sm btn-danger btn-colse-prosy'>关闭</button><button type='button' class='btn btn-sm btn-success btn-submit-redirect'>" + (type == 1 ? " 提交" : "保存") + "</button></div>" +
-				"</form>"
-		});
-		setTimeout(function() {
-			$('.btn-colse-prosy').click(function() {
-				layer.close(redirect_form);
-			});
-
-			$('.btn-submit-redirect').click(function() {
+			content: "<form id='form_redirect' class='divtable pd20'>\
+			<div class='line' style='overflow:hidden;height: 40px;'>\
+				<div style='display: inline-block;'>\
+					<span class='tname' style='margin-left:10px;position: relative;top: -5px;'>保留URI参数</span>\
+					<input class='btswitch btswitch-ios' id='keep_path' type='checkbox' name='keep_path' " + keep_path_ht + " />\
+					<label class='btswitch-btn' for='keep_path' style='float:left'></label>\
+				</div>\
+			</div>\
+			<div class='line' style='clear:both;'><span class='tname'>重定向类型</span>\
+				<div class='info-r ml0'>\
+					<select class='bt-input-text mr5' name='type' style='width:100px'>\
+						<option value='domain' " + (obj.type == 'domain' ? 'selected ="selected"' : "") + ">域名</option>\
+						<option value='path'  " + (obj.type == 'path' ? 'selected ="selected"' : "") + ">路径</option>\
+					</select>\
+					<span class='mlr15'>重定向方式</span>\
+					<select class='bt-input-text ml10' name='r_type' style='width:100px'>\
+						<option value='301' " + (obj.r_type == '301' ? 'selected ="selected"' : "") + " >301</option>\
+						<option value='302' " + (obj.r_type == '302' ? 'selected ="selected"' : "") + ">302</option>\
+					</select>\
+				</div>\
+			</div>\
+			<div class='line redirectdomain'>\
+				<span class='tname'>重定向源</span>\
+				<div class='info-r ml0'>\
+					<input  name='from' placeholder='域名或路径' class='bt-input-text mr5' type='text' style='width:200px;float: left;margin-right:0px' value='" + obj.from + "'>\
+					<span class='tname' style='width:90px'>目标URL</span>\
+					<input name='to' class='bt-input-text mr5' type='text' style='width:200px' value='" + obj.to + "'>\
+				</div>\
+			</div>\
+			</form>",
+			success:function(index,layero){
+			},
+			yes:function(index,index1){
 				var keep_path = $('[name="keep_path"]').prop('checked') ? 1 : 0;
 				var r_type = $('[name="r_type"]').val();
 				var type = $('[name="type"]').val();
 				var from = $('[name="from"]').val();
 				var to = $('[name="to"]').val();
 				
-				$.post('/site/set_redirect', {siteName: siteName,type: type,r_type: r_type,from: from,to: to,keep_path: keep_path}, function(data) {
+				var pdata = {siteName: siteName, type: type,r_type: r_type,from: from,to: to,keep_path: keep_path};
+				$.post('/site/set_redirect', pdata, function(data) {
 					if (data.status) {
-						layer.close(redirect_form);
+						layer.close(index);
 						to301(siteName);
 					} else {
 						layer.msg(data.msg, {icon: 2});
 					}
 				},'json');
-			});
-		}, 100);
+			}
+		});
 	}
 
 	if (type == 2) {
@@ -1516,40 +1521,53 @@ function to301(siteName, type, obj){
 	}
 
 	var body = '<div id="redirect_list" class="bt_table">\
-					<div style="padding-bottom: 10px">\
-						<button type="button" title="添加重定向" class="btn btn-success btn-sm mr5" onclick="to301(\''+siteName+'\',1)" ><span>添加重定向</span></button>\
-					</div>\
-					<div class="divtable" style="max-height:200px;">\
-						<table class="table table-hover" >\
-							<thead style="position: relative;z-index: 1;">\
-								<tr>\
-									<th><span data-index="1"><span>重定向类型</span></span></th>\
-									<th><span data-index="2"><span>重定向方式</span></span></th>\
-									<th><span data-index="3"><span>保留URL参数</span></span></th>\
-									<th><span data-index="4"><span>操作</span></span></th>\
-								</tr>\
-							</thead>\
-							<tbody id="md-301-body">\
-							</tbody>\
-						</table>\
-					</div>\
-				</div>';
+		<div style="padding-bottom: 10px">\
+			<button type="button" title="添加重定向" class="btn btn-success btn-sm mr5" onclick="to301(\''+siteName+'\',1)" >\
+			<span>添加重定向</span>\
+		</button>\
+		</div>\
+		<div class="divtable" style="max-height:200px;">\
+			<table class="table table-hover" >\
+				<thead style="position: relative;z-index: 1;">\
+					<tr>\
+						<th><span data-index="1"><span>重定向类型</span></span></th>\
+						<th><span data-index="2"><span>重定向方式</span></span></th>\
+						<th><span data-index="3"><span>保留URL参数</span></span></th>\
+						<th><span data-index="4"><span>状态</span></span></th>\
+						<th><span data-index="5"><span>操作</span></span></th>\
+					</tr>\
+				</thead>\
+				<tbody id="md-301-body">\
+				</tbody>\
+			</table>\
+		</div>\
+	</div>';
 	$("#webedit-con").html(body);
 	
 	var loadT = layer.msg(lan.site.the_msg,{icon:16,time:0,shade: [0.3, '#000']});
 	$.post('/site/get_redirect','siteName='+siteName, function(res) {
 		layer.close(loadT);
 		$("#md-301-loading").remove();
-		if (res.status === true) {
-			let data = res.data.result;
+		if (res.status) {
+			var data = res.data.result;
 			data.forEach(function(item){
-				lan_r_type = item.r_type == 0 ? "永久重定向" : "临时重定向"
-				keep_path = item.keep_path == 0 ? "不保留" : "保留"
+				var lan_r_type = item.r_type == 0 ? "永久重定向" : "临时重定向";
+				var keep_path = item.keep_path == 0 ? "不保留" : "保留";
+
+				var switchProxy  = '<span onclick="toRedirect(\''+siteName+'\',\''+ item.id +'\',10)" style="color:rgb(92, 184, 92);" class="btlink glyphicon glyphicon-play"></span>';
+				if (!item['status']){
+					switchProxy = '<span onclick="toRedirect(\''+siteName+'\',\''+ item.id +'\',11)" style="color:rgb(255, 0, 0);" class="btlink glyphicon glyphicon-pause"></span>';
+				}
+
 				let tmp = '<tr>\
 					<td><span data-index="1"><span>'+item.r_from+'</span></span></td>\
 					<td><span data-index="2"><span>'+lan_r_type+'</span></span></td>\
-					<td><span data-index="2"><span>'+keep_path+'</span></span></td>\
-					<td><span data-index="4"  onclick="to301(\''+siteName+'\', 3, \''+ item.id +'\')"  class="btlink">详细</span> | <span data-index="5" onclick="to301(\''+siteName+'\', 2, \''+ item.id +'\')" class="btlink">删除</span></td>\
+					<td><span data-index="3"><span>'+keep_path+'</span></span></td>\
+					<td><span data-index="4"><span>'+switchProxy+'</span></span></td>\
+					<td>\
+						<span data-index="5" onclick="to301(\''+siteName+'\', 3, \''+ item.id +'\')"  class="btlink">详细</span> | \
+						<span data-index="5" onclick="to301(\''+siteName+'\', 2, \''+ item.id +'\')" class="btlink">删除</span>\
+					</td>\
 				</tr>';
 				$("#md-301-body").append(tmp);
 			})
@@ -1559,6 +1577,28 @@ function to301(siteName, type, obj){
 	},'json');
 }
 
+
+function toRedirect(siteName, redirect_id, type){
+	if (type == 10 || type == 11) {
+		//[11]启动 或 停止[10]
+		var status = type == 10 ? '0' : '1';
+		var loading = layer.msg(lan.site.the_msg,{icon:16,time:0,shade: [0.3, '#000']});
+
+		var pdata = {siteName: siteName, 'status':status,'id':redirect_id };
+		$.post('/site/set_redirect_status', pdata, function(rdata) {
+			layer.close(loading);
+			if (!rdata.status){
+				layer.msg(res.msg, {time: 3000,icon: 2});
+				return;
+			}
+
+			showMsg("设置成功",function(){
+				to301(siteName);
+			},{icon: 1,time:2000});
+		},'json');
+		return;
+	}
+}
 
 //反向代理
 function toProxy(siteName, type, obj) {
@@ -1828,27 +1868,27 @@ function toProxy(siteName, type, obj) {
 	}
 
 	var body = '<div id="proxy_list" class="bt_table">\
-					<div style="padding-bottom: 10px">\
-						<button type="button" title="添加反向代理" class="btn btn-success btn-sm mr5" onclick="toProxy(\''+siteName+'\',1)" >\
-							<span>添加反向代理</span>\
-						</button>\
-					</div>\
-					<div class="divtable" style="max-height:200px;">\
-						<table class="table table-hover" >\
-							<thead style="position: relative;z-index: 1;">\
-								<tr>\
-									<th>名称</th>\
-									<th>代理目录</th>\
-									<th>目标地址</th>\
-									<th>缓存</th>\
-									<th>状态</th>\
-									<th>操作</th>\
-								</tr>\
-							</thead>\
-							<tbody id="md-301-body"></tbody>\
-						</table>\
-					</div>\
-				</div>';
+		<div style="padding-bottom: 10px">\
+			<button type="button" title="添加反向代理" class="btn btn-success btn-sm mr5" onclick="toProxy(\''+siteName+'\',1)" >\
+				<span>添加反向代理</span>\
+			</button>\
+		</div>\
+		<div class="divtable" style="max-height:200px;">\
+			<table class="table table-hover" >\
+				<thead style="position: relative;z-index: 1;">\
+					<tr>\
+						<th>名称</th>\
+						<th>代理目录</th>\
+						<th>目标地址</th>\
+						<th>缓存</th>\
+						<th>状态</th>\
+						<th>操作</th>\
+					</tr>\
+				</thead>\
+				<tbody id="md-301-body"></tbody>\
+			</table>\
+		</div>\
+	</div>';
 	$("#webedit-con").html(body);
 	
 	var loading = layer.msg(lan.site.the_msg,{icon:16,time:0,shade: [0.3, '#000']});

@@ -37,16 +37,16 @@ def index():
 @blueprint.route('/<path>',endpoint='admin_safe_path',methods=['GET'])
 def admin_safe_path(path):
     db_path = thisdb.getOption('admin_path')
+    name = thisdb.getOption('template', default='default')
     if isLogined():
        return redirect('/')
-
-    print(db_path,path)
+    # print(db_path,path)
     if db_path == path:
-        return render_template('default/login.html')
+        return render_template('%s/login.html' % name)
 
     unauthorized_status = thisdb.getOption('unauthorized_status')
     if unauthorized_status == '0':
-        return render_template('default/path.html')
+        return render_template('%s/path.html' % name)
     return Response(status=int(unauthorized_status))
 
 # 仅针对webhook插件

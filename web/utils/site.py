@@ -128,20 +128,20 @@ class sites(object):
             mw.removeBackFile(path)
         return rdata
 
-    def getRewriteConf(self, siteName):
-        return self.rewritePath + '/' + siteName + '.conf'
+    def getRewriteConf(self, site_name):
+        return self.rewritePath + '/' + site_name + '.conf'
 
-    def getRedirectDataPath(self, siteName):
-        return "{}/{}/data.json".format(self.redirectPath, siteName)
+    def getRedirectDataPath(self, site_name):
+        return "{}/{}/data.json".format(self.redirectPath, site_name)
 
-    def getRedirectPath(self, siteName):
-        return "{}/{}".format(self.redirectPath, siteName)
+    def getRedirectPath(self, site_name):
+        return "{}/{}".format(self.redirectPath, site_name)
 
-    def getProxyDataPath(self, siteName):
-        return "{}/{}/data.json".format(self.proxyPath, siteName)
+    def getProxyDataPath(self, site_name):
+        return "{}/{}/data.json".format(self.proxyPath, site_name)
 
-    def getProxyPath(self, siteName):
-        return "{}/{}".format(self.proxyPath, siteName)
+    def getProxyPath(self, site_name):
+        return "{}/{}".format(self.proxyPath, site_name)
 
     def getDirBindRewrite(self, site_name, dir_name):
         return self.rewritePath + '/' + site_name + '_' + dir_name + '.conf'
@@ -1084,8 +1084,10 @@ class sites(object):
             rep = r"limit_rate\s+([0-9]+)\w+;"
             conf = re.sub(rep, str_limit_rate, conf)
         else:
-            conf = conf.replace('#error_page 404/404.html;', "#error_page 404/404.html;\n    " +
-                                str_perserver + "\n    " + str_perip + "\n    " + str_limit_rate)
+            conf = conf.replace('#error_page 404/404.html;', "#error_page 404/404.html;\n    "+\
+                                str_perserver+"\n    "+\
+                                str_perip+"\n    "+\
+                                str_limit_rate)
 
         mw.writeFile(filename, conf)
         mw.restartWeb()
@@ -1116,16 +1118,38 @@ class sites(object):
 
 
     # 获取重定向配置
-    def getRedirect(self, siteName):
-        redirect_file = self.getRedirectDataPath(siteName)
+    def getRedirect(self, site_name):
+        redirect_file = self.getRedirectDataPath(site_name)
         if not os.path.exists(redirect_file):
-            mw.execShell("mkdir {}/{}".format(self.redirectPath, siteName))
+            mw.execShell("mkdir " + self.getRedirectPath(site_name))
             return mw.returnData(True, "no exists!", {"result": [], "count": 0})
 
         content = mw.readFile(redirect_file)
         data = json.loads(content)
-        # 处理301信息
+
+        for i in range(len(data)):
+            redirect_dir = self.getRedirectPath(site_name)
+            redirect_file = redirect_dir + '/' + data[i]['id'] + '.conf'
+            if os.path.exists(redirect_file):
+                data[i]['status'] = True
+            else:
+                data[i]['status'] = False
         return mw.returnData(True, "ok", {"result": data, "count": len(data)})
+
+    def setRedirectStatus(self, site_name, redirect_id, status):
+        if status == '' or site_name == '' or redirect_id == '':
+            return mw.returnData(False, "必填项不能为空!")
+
+        conf_file = "{}/{}/{}.conf".format(self.redirectPath, site_name, redirect_id)
+        conf_txt = "{}/{}/{}.conf.txt".format(self.redirectPath, site_name, redirect_id)
+
+        if status == '1':
+            mw.execShell('mv ' + conf_txt + ' ' + conf_file)
+        else:
+            mw.execShell('mv ' + conf_file + ' ' + conf_txt)
+
+        mw.restartWeb()
+        return mw.returnData(True, "OK")
 
     # 操作 重定向配置
     def operateRedirectConf(self, siteName, method='start'):
@@ -1134,7 +1158,7 @@ class sites(object):
 
         cnf_301 = '''#301-START
     include %s/*.conf;
-    #301-END''' % (self.getRedirectPath( siteName))
+    #301-END''' % (self.getRedirectPath(siteName,))
 
         cnf_301_source = '#301-START'
         # print('operateRedirectConf', content.find('#301-END'))
@@ -1213,12 +1237,12 @@ class sites(object):
         mw.restartWeb()
         return mw.returnData(True, "设置成功")
 
-    def getRedirectConf(self, siteName, rid):
-        if rid == '' or siteName == '':
+    def getRedirectConf(self, site_name, redirect_id):
+        if redirect_id == '' or site_name == '':
             return mw.returnData(False, "必填项不能为空!")
 
-        path = self.getRedirectPath(siteName)
-        conf = "{}/{}.conf".format(path, rid)
+        path = self.getRedirectPath(site_name)
+        conf = "{}/{}.conf".format(path, redirect_id)
         data = mw.readFile(conf)
         if data == False:
             return mw.returnData(False, "获取失败!")
@@ -1407,7 +1431,7 @@ location ^~ {from} {\n\
                 "open_cache": open_cache,
                 "open_proxy": open_proxy,
                 "cache_time": cache_time,
-                "id": pid,
+                "id": proxy_id,
             })
         else:
             # 修改代理
@@ -1478,6 +1502,33 @@ location ^~ {from} {\n\
             self.close_proxy = []
         return True
 
+    def closeRedirectAll(self, site_name):
+        self.close_redirect = []
+        redirect_path = self.getRedirectDataPath(site_name)
+        if os.path.exists(redirect_path):
+            content = mw.readFile(redirect_path)
+            data = json.loads(content)
+            for r in data:
+                redirect_dir = "{}/{}".format(self.redirectPath, site_name)
+                redirect_conf = redirect_dir + '/' + r['id'] + '.conf'
+                redirect_txt = "{}/{}/{}.conf.txt".format(self.redirectPath, site_name, r['id'])
+                if os.path.exists(proxy_conf):
+                    self.close_redirect.append(r['id'])
+                    mw.execShell('mv ' + proxy_conf + ' ' + proxy_txt)
+            mw.restartWeb()
+
+    def openProxyByOpen(self, site_name):
+        for redirect_id in self.close_redirect:
+            redirect_dir = "{}/{}".format(self.redirectPath, site_name)
+            redirect_conf = redirect_dir + '/' + redirect_id + '.conf'
+            redirect_txt = "{}/{}/{}.conf.txt".format(self.redirectPath, site_name, redirect_id)
+            if os.path.exists(proxy_txt):
+                mw.execShell('mv ' + redirect_txt + ' ' + redirect_conf)
+
+        if len(self.close_redirect) > 0:
+            mw.restartWeb()
+            self.close_redirect = []
+        return True
 
 
     def getProxyConf(self, site_name, proxy_id):
