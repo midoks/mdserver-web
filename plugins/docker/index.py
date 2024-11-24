@@ -438,7 +438,7 @@ def dockerRemoveImage():
 
 
 def getImageListFunc(dbname=''):
-    bkDir = mw.getRootDir() + '/backup/docker'
+    bkDir = mw.getFatherDir() + '/backup/docker'
     blist = os.listdir(bkDir)
     r = []
 
@@ -452,13 +452,13 @@ def getImageListFunc(dbname=''):
 
 
 def dockerImagePickDir():
-    bkDir = mw.getRootDir() + '/backup/docker'
+    bkDir = mw.getFatherDir() + '/backup/docker'
     return mw.returnJson(True, 'ok', bkDir)
 
 
 def dockerImagePickList():
 
-    bkDir = mw.getRootDir() + '/backup/docker'
+    bkDir = mw.getFatherDir() + '/backup/docker'
     if not os.path.exists(bkDir):
         os.mkdir(bkDir)
 
@@ -490,7 +490,7 @@ def dockerImagePickSave():
     if not data[0]:
         return data[1]
 
-    bkDir = mw.getRootDir() + '/backup/docker/'
+    bkDir = mw.getFatherDir() + '/backup/docker/'
     images = args['images']
     try:
         file_name = bkDir + \

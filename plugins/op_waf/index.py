@@ -249,7 +249,7 @@ def contentReplace(content):
     service_path = mw.getServerDir()
     waf_root = getServerDir()
     waf_path = waf_root + "/waf"
-    content = content.replace('{$ROOT_PATH}', mw.getRootDir())
+    content = content.replace('{$ROOT_PATH}', mw.getFatherDir())
     content = content.replace('{$SERVER_PATH}', service_path)
     content = content.replace('{$WAF_PATH}', waf_path)
     content = content.replace('{$WAF_ROOT}', waf_root)

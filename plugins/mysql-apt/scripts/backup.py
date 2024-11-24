@@ -44,7 +44,7 @@ class backupTools:
                 "----------------------------------------------------------------------------")
             return
 
-        backup_path = mw.getRootDir() + '/backup/database/mysql-apt'
+        backup_path = mw.getFatherDir() + '/backup/database/mysql-apt'
         if not os.path.exists(backup_path):
             mw.execShell("mkdir -p " + backup_path)
 
@@ -56,7 +56,7 @@ class backupTools:
 
         my_conf_path = db_path + '/etc/my.cnf'
         mycnf = mw.readFile(my_conf_path)
-        rep = "\[mysqldump\]\nuser=root"
+        rep = r"\[mysqldump\]\nuser=root"
         sea = "[mysqldump]\n"
         subStr = sea + "user=root\npassword=" + mysql_root + "\n"
         mycnf = mycnf.replace(sea, subStr)

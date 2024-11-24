@@ -152,7 +152,7 @@ def getAuthPolicy():
 
 def contentReplace(content):
     service_path = mw.getServerDir()
-    content = content.replace('{$ROOT_PATH}', mw.getRootDir())
+    content = content.replace('{$ROOT_PATH}', mw.getFatherDir())
     content = content.replace('{$SERVER_PATH}', service_path)
     content = content.replace('{$SERVER_APP_PATH}',service_path + '/' + getPluginName())
 
@@ -930,7 +930,7 @@ def importDbExternalProgressBar():
     file = args['file']
     name = args['name']
 
-    import_dir = mw.getRootDir() + '/backup/import/'
+    import_dir = mw.getFatherDir() + '/backup/import/'
 
     file_path = import_dir + file
     if not os.path.exists(file_path):

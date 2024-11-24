@@ -97,7 +97,7 @@ def contentReplace(content):
     service_path = mw.getServerDir()
     php_ver = getCachePhpVer()
     # print php_ver
-    content = content.replace('{$ROOT_PATH}', mw.getRootDir())
+    content = content.replace('{$ROOT_PATH}', mw.getFatherDir())
     content = content.replace('{$SERVER_PATH}', service_path)
     content = content.replace('{$PHP_VER}', php_ver)
     return content
@@ -106,7 +106,7 @@ def contentReplace(content):
 def contentReplacePHP(content, version):
     service_path = mw.getServerDir()
     # print php_ver
-    content = content.replace('{$ROOT_PATH}', mw.getRootDir())
+    content = content.replace('{$ROOT_PATH}', mw.getFatherDir())
     content = content.replace('{$SERVER_PATH}', service_path)
     content = content.replace('{$PHP_VER}', version)
     return content

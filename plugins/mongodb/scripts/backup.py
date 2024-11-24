@@ -131,7 +131,7 @@ def mongdbClient():
 class backupTools:
 
     def getDbBackupList(self,dbname=''):
-        bkDir = mw.getRootDir() + '/backup/database'
+        bkDir = mw.getFatherDir() + '/backup/database'
         blist = os.listdir(bkDir)
         r = []
 

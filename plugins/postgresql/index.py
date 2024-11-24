@@ -147,7 +147,7 @@ def getInitdTpl(version=''):
 
 def contentReplace(content):
     service_path = mw.getServerDir()
-    content = content.replace('{$ROOT_PATH}', mw.getRootDir())
+    content = content.replace('{$ROOT_PATH}', mw.getFatherDir())
     content = content.replace('{$SERVER_PATH}', service_path)
     content = content.replace('{$APP_PATH}', service_path + '/postgresql')
     return content
@@ -721,8 +721,7 @@ def importDbBackup():
 
     pwd = pSqliteDb('config').where('id=?', (1,)).getField('pg_root')
 
-    mysql_cmd = mw.getRootDir() + '/server/mysql/bin/mysql -uroot -p' + pwd + \
-        ' ' + name + ' < ' + file_path_sql
+    mysql_cmd = mw.getFatherDir() + '/server/mysql/bin/mysql -uroot -p' + pwd + ' ' + name + ' < ' + file_path_sql
 
     # print(mysql_cmd)
     os.system(mysql_cmd)

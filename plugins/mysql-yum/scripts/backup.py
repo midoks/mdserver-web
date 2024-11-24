@@ -44,7 +44,7 @@ class backupTools:
                 "----------------------------------------------------------------------------")
             return
 
-        backup_path = mw.getRootDir() + '/backup/database/mysql-yum'
+        backup_path = mw.getFatherDir() + '/backup/database/mysql-yum'
         if not os.path.exists(backup_path):
             mw.execShell("mkdir -p " + backup_path)
 
@@ -58,7 +58,7 @@ class backupTools:
 
         mw.backFile(my_cnf)
         content = mw.readFile(my_cnf)
-        rep = "\[mysqldump\]\nuser=root"
+        rep = r"\[mysqldump\]\nuser=root"
         sea = "[mysqldump]\n"
         subStr = sea + "user=root\npassword=" + mysql_root + "\n"
         content = content.replace(sea, subStr)

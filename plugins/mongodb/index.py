@@ -1204,7 +1204,7 @@ def replClose():
     return mw.returnJson(True, '关闭副本同步成功!')
 
 def getDbBackupListFunc(dbname=''):
-    bkDir = mw.getRootDir() + '/backup/database'
+    bkDir = mw.getBackupDir() + '/database'
     blist = os.listdir(bkDir)
     r = []
 
@@ -1223,7 +1223,7 @@ def getDbBackupList():
         return data[1]
 
     r = getDbBackupListFunc(args['name'])
-    bkDir = mw.getRootDir() + '/backup/database'
+    bkDir = mw.getBackupDir() + '/database'
     rr = []
     for x in range(0, len(r)):
         p = bkDir + '/' + r[x]
@@ -1245,7 +1245,7 @@ def getDbBackupList():
 
 def getDbBackupImportList():
 
-    bkImportDir = mw.getRootDir() + '/backup/mongodb_import'
+    bkImportDir = mw.getBackupDir() + '/mongodb_import'
     if not os.path.exists(bkImportDir):
         os.mkdir(bkImportDir)
 
@@ -1283,7 +1283,7 @@ def deleteDbBackup():
 
     path = args['path']
     full_file = ""
-    bkDir = mw.getRootDir() + '/backup/database'
+    bkDir = mw.getBackupDir() + '/database'
     full_file = bkDir + '/' + args['filename']
     if path != "":
         full_file = path + "/" + args['filename']
@@ -1303,7 +1303,7 @@ def setDbBackup():
 
 
 def getListBson(dbname=''):
-    bkDir = mw.getRootDir() + '/backup/mongodb_import/'+dbname
+    bkDir = mw.getBackupDir() + '/mongodb_import/'+dbname
     blist = os.listdir(bkDir)
     r = []
 
@@ -1327,7 +1327,7 @@ def importDbExternal():
     file = args['file']
     name = args['name']
 
-    import_dir = mw.getRootDir() + '/backup/mongodb_import/'
+    import_dir = mw.getBackupDir() + '/mongodb_import/'
     mg_root = pSqliteDb('config').where('id=?', (1,)).getField('mg_root')
     port = getConfPort()
 
@@ -1535,8 +1535,7 @@ def installPreInspection(version):
     if sys[1] != '':
         return '暂时不支持该系统'
 
-    sys_id = mw.execShell(
-        "cat /etc/*-release | grep VERSION_ID | awk -F = '{print $2}' | awk -F '\"' '{print $2}'")
+    sys_id = mw.execShell("cat /etc/*-release | grep VERSION_ID | awk -F = '{print $2}' | awk -F '\"' '{print $2}'")
 
     sysName = sys[0].strip().lower()
     sysId = sys_id[0].strip()

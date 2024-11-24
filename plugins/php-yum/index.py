@@ -77,7 +77,7 @@ def status(version):
 
 def contentReplace(content, version):
     service_path = mw.getServerDir()
-    content = content.replace('{$ROOT_PATH}', mw.getRootDir())
+    content = content.replace('{$ROOT_PATH}', mw.getFatherDir())
     content = content.replace('{$SERVER_PATH}', service_path)
     content = content.replace('{$PHP_VERSION}', version)
     content = content.replace('{$LOCAL_IP}', mw.getLocalIp())
@@ -88,15 +88,15 @@ def contentReplace(content, version):
         content = content.replace('{$PHP_USER}', 'nobody')
         content = content.replace('{$PHP_GROUP}', 'nobody')
 
-        rep = 'listen.owner\s*=\s*(.+)\r?\n'
+        rep = r'listen.owner\s*=\s*(.+)\r?\n'
         val = ';listen.owner = nobody\n'
         content = re.sub(rep, val, content)
 
-        rep = 'listen.group\s*=\s*(.+)\r?\n'
+        rep = r'listen.group\s*=\s*(.+)\r?\n'
         val = ';listen.group = nobody\n'
         content = re.sub(rep, val, content)
 
-        rep = 'user\s*=\s*(.+)\r?\n'
+        rep = r'user\s*=\s*(.+)\r?\n'
         val = ';user = nobody\n'
         content = re.sub(rep, val, content)
 
@@ -742,7 +742,7 @@ def getPhpinfo(version):
         return 'PHP[' + version + ']未启动,不可访问!!!'
 
     sock_file = getFpmAddress(version)
-    root_dir = mw.getRootDir() + '/phpinfo'
+    root_dir = mw.getFatherDir() + '/phpinfo'
 
     mw.execShell("rm -rf " + root_dir)
     mw.execShell("mkdir -p " + root_dir)

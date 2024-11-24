@@ -139,7 +139,7 @@ def getInitdTpl(version=''):
 def contentReplace(content):
 
     service_path = mw.getServerDir()
-    content = content.replace('{$ROOT_PATH}', mw.getRootDir())
+    content = content.replace('{$ROOT_PATH}', mw.getFatherDir())
     content = content.replace('{$SERVER_PATH}', service_path)
     content = content.replace('{$SERVER_APP_PATH}', service_path + '/mysql')
 
@@ -1011,7 +1011,7 @@ def importDbExternal():
     file = args['file']
     name = args['name']
 
-    import_dir = mw.getRootDir() + '/backup/import/'
+    import_dir = mw.getFatherDir() + '/backup/import/'
 
     file_path = import_dir + file
     if not os.path.exists(file_path):
@@ -1096,7 +1096,7 @@ def importDbExternalProgressBar():
     file = args['file']
     name = args['name']
 
-    import_dir = mw.getRootDir() + '/backup/import/'
+    import_dir = mw.getFatherDir() + '/backup/import/'
 
     file_path = import_dir + file
     if not os.path.exists(file_path):
@@ -1159,11 +1159,11 @@ def importDbBackup():
     file = args['file']
     name = args['name']
 
-    file_path = mw.getRootDir() + '/backup/database/' + file
-    file_path_sql = mw.getRootDir() + '/backup/database/' + file.replace('.gz', '')
+    file_path = mw.getFatherDir() + '/backup/database/' + file
+    file_path_sql = mw.getFatherDir() + '/backup/database/' + file.replace('.gz', '')
 
     if not os.path.exists(file_path_sql):
-        cmd = 'cd ' + mw.getRootDir() + '/backup/database && gzip -d ' + file
+        cmd = 'cd ' + mw.getFatherDir() + '/backup/database && gzip -d ' + file
         mw.execShell(cmd)
 
     local_mode = recognizeDbMode()
@@ -1210,11 +1210,11 @@ def importDbBackupProgressBar():
     file = args['file']
     name = args['name']
 
-    file_path = mw.getRootDir() + '/backup/database/' + file
-    file_path_sql = mw.getRootDir() + '/backup/database/' + file.replace('.gz', '')
+    file_path = mw.getFatherDir() + '/backup/database/' + file
+    file_path_sql = mw.getFatherDir() + '/backup/database/' + file.replace('.gz', '')
 
     if not os.path.exists(file_path_sql):
-        cmd = 'cd ' + mw.getRootDir() + '/backup/database && gzip -d ' + file
+        cmd = 'cd ' + mw.getFatherDir() + '/backup/database && gzip -d ' + file
         mw.execShell(cmd)
 
     local_mode = recognizeDbMode()
@@ -1241,7 +1241,7 @@ def deleteDbBackup():
 
     path = args['path']
     full_file = ""
-    bkDir = mw.getRootDir() + '/backup/database'
+    bkDir = mw.getFatherDir() + '/backup/database'
     full_file = bkDir + '/' + args['filename']
     if path != "":
         full_file = path + "/" + args['filename']
@@ -1256,7 +1256,7 @@ def getDbBackupList():
         return data[1]
 
     r = getDbBackupListFunc(args['name'])
-    bkDir = mw.getRootDir() + '/backup/database'
+    bkDir = mw.getFatherDir() + '/backup/database'
     rr = []
     for x in range(0, len(r)):
         p = bkDir + '/' + r[x]
@@ -1279,7 +1279,7 @@ def getDbBackupList():
 
 def getDbBackupImportList():
 
-    bkImportDir = mw.getRootDir() + '/backup/import'
+    bkImportDir = mw.getFatherDir() + '/backup/import'
     if not os.path.exists(bkImportDir):
         os.mkdir(bkImportDir)
 

@@ -119,7 +119,7 @@ export HOME=%s && ''' % ( getRunUser(), getHomeDir())
 def contentReplace(content):
 
     service_path = mw.getServerDir()
-    content = content.replace('{$ROOT_PATH}', mw.getRootDir())
+    content = content.replace('{$ROOT_PATH}', mw.getFatherDir())
     content = content.replace('{$SERVER_PATH}', service_path)
     content = content.replace('{$RUN_USER}', getRunUser())
     content = content.replace('{$HOME_DIR}', getHomeDir())
@@ -686,7 +686,7 @@ def projectScriptLoad():
     commit_tpl = getPluginDir() + '/hook/commit.tpl'
     commit = path + '/custom_hooks/commit'
 
-    codeDir = mw.getRootDir() + '/git'
+    codeDir = mw.getFatherDir() + '/git'
 
     cc_content = mw.readFile(commit_tpl)
 

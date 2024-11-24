@@ -379,7 +379,7 @@ class classApi:
         # 创建目录
         self.send('/files/create_dir', {"path": dpath})
 
-        backup_path = mw.getRootDir() + '/backup'
+        backup_path = mw.getFatherDir() + '/backup'
         if not os.path.exists(backup_path):
             os.makedirs(backup_path, 384)
 
@@ -701,7 +701,7 @@ class classApi:
         root = self.getDbConn('mysql', 'config').where(
             'id=?', (1,)).getField('mysql_root')
 
-        backup_path = mw.getRootDir() + '/backup'
+        backup_path = mw.getFatherDir() + '/backup'
         if not os.path.exists(backup_path):
             os.makedirs(backup_path, 384)
 

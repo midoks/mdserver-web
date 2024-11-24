@@ -97,7 +97,7 @@ def getPhpinfo(version):
         return 'PHP[' + version + ']未启动,不可访问!!!'
 
     sock_file = getFpmAddress(version)
-    root_dir = mw.getRootDir() + '/phpinfo'
+    root_dir = mw.getFatherDir() + '/phpinfo'
 
     mw.execShell("rm -rf " + root_dir)
     mw.execShell("mkdir -p " + root_dir)

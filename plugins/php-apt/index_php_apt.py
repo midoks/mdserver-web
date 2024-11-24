@@ -118,7 +118,7 @@ def getPhpinfo(version):
 
     sock_file = getFpmAddress(version)
     # print(sock_file)
-    root_dir = mw.getRootDir() + '/phpinfo'
+    root_dir = mw.getFatherDir() + '/phpinfo'
 
     mw.execShell("rm -rf " + root_dir)
     mw.execShell("mkdir -p " + root_dir)

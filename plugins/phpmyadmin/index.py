@@ -122,7 +122,7 @@ def contentReplace(content):
     blowfish_secret = tmp[0].strip()
     # print php_ver
     php_conf_dir = mw.getServerDir() + '/web_conf/php/conf'
-    content = content.replace('{$ROOT_PATH}', mw.getRootDir())
+    content = content.replace('{$ROOT_PATH}', mw.getFatherDir())
     content = content.replace('{$SERVER_PATH}', service_path)
     content = content.replace('{$PHP_CONF_PATH}', php_conf_dir)
     content = content.replace('{$PHP_VER}', php_ver)
