@@ -1440,7 +1440,7 @@ location ^~ {from} {\n\
         conf_file = "{}/{}/{}.conf".format(self.proxyPath, site_name, proxy_id)
         conf_txt = "{}/{}/{}.conf.txt".format(self.proxyPath, site_name, proxy_id)
 
-        if _status == '1':
+        if status == '1':
             mw.execShell('mv ' + conf_txt + ' ' + conf_file)
         else:
             mw.execShell('mv ' + conf_file + ' ' + conf_txt)
