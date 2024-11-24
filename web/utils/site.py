@@ -1846,15 +1846,15 @@ location ^~ {from} {\n\
             return mw.returnData(False, '检测到您的站点做了301重定向设置，请先关闭重定向!')
 
         # 检测存在反向代理
-        data_path = self.getProxyDataPath(site_name)
-        if os.path.exists(data_path):
-            data_content = mw.readFile(data_path)
-            data = json.loads(data_content)
-            for proxy in data:
-                proxy_dir = "{}/{}".format(self.proxyPath, site_name)
-                proxy_dir_file = proxy_dir + '/' + proxy['id'] + '.conf'
-                if os.path.exists(proxy_dir_file):
-                    return mw.returnData(False, '检测到您的站点做了反向代理设置，请先关闭反向代理!')
+        # data_path = self.getProxyDataPath(site_name)
+        # if os.path.exists(data_path):
+        #     data_content = mw.readFile(data_path)
+        #     data = json.loads(data_content)
+        #     for proxy in data:
+        #         proxy_dir = "{}/{}".format(self.proxyPath, site_name)
+        #         proxy_dir_file = proxy_dir + '/' + proxy['id'] + '.conf'
+        #         if os.path.exists(proxy_dir_file):
+        #             return mw.returnData(False, '检测到您的站点做了反向代理设置，请先关闭反向代理!')
             
 
         site_info = thisdb.getSitesByName(site_name)
