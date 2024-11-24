@@ -72,7 +72,7 @@ class Firewall(object):
 
             if not is_same:
                 t = {}
-                t['port'] = info[0]
+                t['port'] = info[0].replace('-',':')
                 t['protocol'] = info[1]
                 ports_all.append(t)
 
