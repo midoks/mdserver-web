@@ -1755,7 +1755,7 @@ location ^~ {from} {\n\
 
     def createAcmeFile(self, site_name, domains, email, force, renew):
 
-        print(site_name, domains,force,renew, email)
+        print(site_name, domains,force, renew, email)
         
 
         file = self.getHostConf(site_name)
@@ -1778,15 +1778,14 @@ location ^~ {from} {\n\
                     if os.path.exists(proxy_dir_file):
                         return mw.returnData(False, '检测到您的站点做了反向代理设置，请先关闭反向代理!')
 
-        siteInfo = thisdb.getSitesByName(site_name)
+        site_info = thisdb.getSitesByName(site_name)
         path = self.getSitePath(site_name)
         if path == '':
             return mw.returnData(False, '【'+site_name+'】配置文件,异常!')
 
-        srcPath = siteInfo['path']
+        srcPath = site_info['path']
 
-        
-
+        acme_dir = mw.getAcmeDir()
         if force == 'true':
             force_bool = True
 
@@ -1819,10 +1818,8 @@ location ^~ {from} {\n\
 
         self.writeAcmeLog('开始ACME申请...')
         log_file = self.acmeLogFile()
+
         cmd = 'export ACCOUNT_EMAIL=' + email + ' && ' + execStr + ' >> ' + log_file
-        print(domains)
-        print(cmd)
-        return mw.returnData(False, '测试中!')
         result = mw.execShell(cmd)
 
         src_path = mw.getAcmeDomainDir(domains[0])
@@ -1863,7 +1860,7 @@ location ^~ {from} {\n\
         # 写入配置文件
         result = self.setSslConf(site_name)
         if not result['status']:
-            return mw.getJson(result)
+            return result
         result['csr'] = mw.readFile(src_cert)
         result['key'] = mw.readFile(src_key)
 
