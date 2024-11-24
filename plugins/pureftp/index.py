@@ -398,7 +398,7 @@ def modFtpPort():
             return '端口范围不正确!'
         file = file = getServerDir() + '/etc/pure-ftpd.conf'
         conf = mw.readFile(file)
-        rep = u"\n#?\s*Bind\s+[0-9]+\.[0-9]+\.[0-9]+\.+[0-9]+,([0-9]+)"
+        rep = r"\n#?\s*Bind\s+[0-9]+\.[0-9]+\.[0-9]+\.+[0-9]+,([0-9]+)"
         # preg_match(rep,conf,tmp)
         conf = re.sub(
             rep, "\nBind                         0.0.0.0," + port, conf)
