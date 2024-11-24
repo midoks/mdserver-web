@@ -1387,15 +1387,15 @@ def importDbBackup():
 
     port = getConfPort()
 
-    file_tgz = mw.getRootDir() + '/backup/database/' + file
-    file_dir = mw.getRootDir() + '/backup/database/' + file.replace('.tar.gz','')
+    file_tgz = mw.getBackupDir() + '/database/' + file
+    file_dir = mw.getBackupDir() + '/database/' + file.replace('.tar.gz','')
 
     if not os.path.exists(file_dir):
         mw.execShell("mkdir -p "+file_dir)
 
     # print(os.path.exists(file_tgz))
     if os.path.exists(file_tgz):
-        cmd = 'cd ' + mw.getRootDir() + '/backup/database && tar -xzvf ' + file + " -C "+file_dir
+        cmd = 'cd ' + mw.getBackupDir() + '/database && tar -xzvf ' + file + " -C "+file_dir
         # print(cmd)
         mw.execShell(cmd)
 
@@ -1549,8 +1549,8 @@ def installPreInspection(version):
 def uninstallPreInspection(version):
     stop()
 
-    import plugins_api
-    plugins_api.plugins_api().removeIndex(getPluginName(), version)
+    from utils.plugin import plugin as MwPlugin
+    MwPlugin.instance().removeIndex(getPluginName(), version)
 
     return "请手动删除MongoDB[{}]<br/> rm -rf {}".format(version, getServerDir())
 
