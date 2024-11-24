@@ -1025,8 +1025,10 @@ function setIndexList(id){
 }
 
 
-/*站点修改*/
+/* 站点修改 */
 function webEdit(id,website,endTime,addtime){
+	// 暂时关闭 - 子目录绑定
+	// <p onclick='dirBinding("+id+")'>子目录绑定</p>\
 	layer.open({
 		type: 1,
 		area: '700px',
@@ -1036,7 +1038,6 @@ function webEdit(id,website,endTime,addtime){
 		content: "<div class='bt-form'>\
 			<div class='bt-w-menu pull-left' style='height: 565px;'>\
 				<p class='bgw' onclick=\"domainEdit(" + id + ",'" + website + "')\">域名管理</p>\
-				<p onclick='dirBinding("+id+")'>子目录绑定</p>\
 				<p onclick='webPathEdit("+id+")'>网站目录</p>\
 				<p onclick='limitNet("+id+")'>流量限制</p>\
 				<p onclick=\"rewrite('"+website+"')\">伪静态</p>\

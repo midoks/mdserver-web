@@ -413,6 +413,46 @@ class sites(object):
         mw.writeLog('网站管理', '设置成功,站点【{1}】到期【{2}】后将自动停止!', (info['name'], end_date,))
         return mw.returnData(True, '设置成功,站点到期后将自动停止!')
 
+    def setSsl(self, site_name, key, csr):
+        path = self.sslDir + '/' + site_name
+        if not os.path.exists(path):
+            mw.execShell('mkdir -p ' + path)
+
+        csrpath = path + "/fullchain.pem"  # 生成证书路径
+        keypath = path + "/privkey.pem"    # 密钥文件路径
+
+        if(key.find('KEY') == -1):
+            return mw.returnJson(False, '秘钥错误，请检查!')
+        if(csr.find('CERTIFICATE') == -1):
+            return mw.returnJson(False, '证书错误，请检查!')
+
+        mw.writeFile('/tmp/cert.pl', csr)
+        if not mw.checkCert('/tmp/cert.pl'):
+            return mw.returnData(False, '证书错误,请粘贴正确的PEM格式证书!')
+
+        mw.backFile(keypath)
+        mw.backFile(csrpath)
+
+        mw.writeFile(keypath, key)
+        mw.writeFile(csrpath, csr)
+
+        # 写入配置文件
+        result = self.setSslConf(site_name)
+        if not result['status']:
+            return result
+
+        isError = mw.checkWebConfig()
+        if(type(isError) == str):
+            mw.restoreFile(keypath)
+            mw.restoreFile(csrpath)
+
+            msg = 'ERROR: <br><a style="color:red;">' + isError.replace("\n", '<br>') + '</a>'
+            return mw.returnData(False, msg)
+
+        mw.writeLog('网站管理', '证书已保存!')
+        mw.restartWeb()
+        return mw.returnData(True, '证书已保存!')
+
     # ssl相关方法 start
     def setSslConf(self, site_name):
         file = self.getHostConf(site_name)

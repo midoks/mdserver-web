@@ -32,6 +32,16 @@ def get_ssl():
     ssl_type = request.form.get('ssl_type', '')
     return MwSites.instance().getSsl(site_name, ssl_type)
 
+# 获取证书信息
+@blueprint.route('/set_ssl', endpoint='set_ssl', methods=['POST'])
+@panel_login_required
+def set_ssl():
+    site_name = request.form.get('siteName', '')
+    key = request.form.get('key', '')
+    csr = request.form.get('csr', '')
+    return MwSites.instance().setSsl(site_name, key, csr)
+
+
 # 删除证书
 @blueprint.route('/close_ssl_conf', endpoint='close_ssl_conf', methods=['POST'])
 @panel_login_required
