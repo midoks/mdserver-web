@@ -400,8 +400,7 @@ def modFtpPort():
         conf = mw.readFile(file)
         rep = r"\n#?\s*Bind\s+[0-9]+\.[0-9]+\.[0-9]+\.+[0-9]+,([0-9]+)"
         # preg_match(rep,conf,tmp)
-        conf = re.sub(
-            rep, "\nBind                         0.0.0.0," + port, conf)
+        conf = re.sub(rep, "\nBind                         0.0.0.0," + port, conf)
         mw.writeFile(file, conf)
         restart()
         return 'ok'
