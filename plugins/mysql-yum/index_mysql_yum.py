@@ -51,7 +51,7 @@ def getConf():
 def getDataDir():
     file = getConf()
     content = mw.readFile(file)
-    rep = 'datadir\s*=\s*(.*)'
+    rep = r'datadir\s*=\s*(.*)'
     tmp = re.search(rep, content)
     return tmp.groups()[0].strip()
 
@@ -59,7 +59,7 @@ def getDataDir():
 def getRelayLogName():
     file = getConf()
     content = mw.readFile(file)
-    rep = 'relay-log\s*=\s*(.*)'
+    rep = r'relay-log\s*=\s*(.*)'
     tmp = re.search(rep, content)
     return tmp.groups()[0].strip()
 
@@ -67,7 +67,7 @@ def getRelayLogName():
 def getLogBinName():
     file = getConf()
     content = mw.readFile(file)
-    rep = 'log-bin\s*=\s*(.*)'
+    rep = r'log-bin\s*=\s*(.*)'
     tmp = re.search(rep, content)
     return tmp.groups()[0].strip()
 
