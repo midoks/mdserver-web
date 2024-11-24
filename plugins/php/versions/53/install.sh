@@ -8,7 +8,6 @@ rootPath=$(dirname "$rootPath")
 serverPath=$(dirname "$rootPath")
 sourcePath=${serverPath}/source
 sysName=`uname`
-install_tmp=${rootPath}/tmp/mw_install.pl
 SYS_ARCH=`arch`
 
 version=5.3.29
@@ -16,7 +15,7 @@ PHP_VER=53
 Install_php()
 {
 #------------------------ install start ------------------------------------#
-echo "安装php-5.3.29 ..." > $install_tmp
+echo "安装php-5.3.29 ..."
 mkdir -p $sourcePath/php
 mkdir -p $serverPath/php
 
@@ -167,7 +166,7 @@ Uninstall_php()
 {
 	$serverPath/php/init.d/php53 stop
 	rm -rf $serverPath/php/53
-	echo "uninstall php-5.3.29 ..." > $install_tmp
+	echo "uninstall php-5.3.29 ..."
 }
 
 action=${1}

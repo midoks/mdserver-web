@@ -9,8 +9,6 @@ serverPath=$(dirname "$rootPath")
 sourcePath=${serverPath}/source
 sysName=`uname`
 SYS_ARCH=`arch`
-install_tmp=${rootPath}/tmp/mw_install.pl
-
 
 version=7.2.31
 PHP_VER=72

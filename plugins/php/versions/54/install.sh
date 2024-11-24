@@ -10,14 +10,12 @@ sourcePath=${serverPath}/source
 sysName=`uname`
 SYS_ARCH=`arch`
 
-install_tmp=${rootPath}/tmp/mw_install.pl
-
 version=5.4.45
 PHP_VER=54
 Install_php()
 {
 #------------------------ install start ------------------------------------#
-echo "安装php-${version} ..." > $install_tmp
+echo "安装php-${version} ..."
 mkdir -p $sourcePath/php
 mkdir -p $serverPath/php
 
@@ -182,7 +180,7 @@ Uninstall_php()
 {
 	$serverPath/php/init.d/php54 stop
 	rm -rf $serverPath/php/54
-	echo "卸载php-5.4.45 ..." > $install_tmp
+	echo "卸载php-5.4.45 ..."
 }
 
 action=${1}

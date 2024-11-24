@@ -9,14 +9,13 @@ serverPath=$(dirname "$rootPath")
 sourcePath=${serverPath}/source
 sysName=`uname`
 SYS_ARCH=`arch`
-install_tmp=${rootPath}/tmp/mw_install.pl
 
 version=7.0.33
 PHP_VER=70
 Install_php()
 {
 #------------------------ install start ------------------------------------#
-echo "安装php-${version} ..." > $install_tmp
+echo "安装php-${version} ..."
 mkdir -p $sourcePath/php
 mkdir -p $serverPath/php
 
