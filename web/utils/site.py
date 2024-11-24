@@ -496,7 +496,7 @@ class sites(object):
             if not mw.inArray(tmp, '443'):
                 listen = re.search(rep, conf).group()
                 
-                if version.startswith('1.25'):
+                if version.startswith('1.25') or version.startswith('1.27'):
                     http_ssl = "\n\tlisten 443 ssl;"
                     http_ssl = http_ssl + "\n\tlisten [::]:443 ssl;"
                     http_ssl = http_ssl + "\n\tlisten 443 quic;"
