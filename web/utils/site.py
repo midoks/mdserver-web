@@ -1512,7 +1512,7 @@ location ^~ {from} {\n\
                 redirect_dir = "{}/{}".format(self.redirectPath, site_name)
                 redirect_conf = redirect_dir + '/' + r['id'] + '.conf'
                 redirect_txt = "{}/{}/{}.conf.txt".format(self.redirectPath, site_name, r['id'])
-                if os.path.exists(proxy_conf):
+                if os.path.exists(redirect_conf):
                     self.close_redirect.append(r['id'])
                     mw.execShell('mv ' + redirect_conf + ' ' + redirect_txt)
             mw.restartWeb()
@@ -1522,7 +1522,7 @@ location ^~ {from} {\n\
             redirect_dir = "{}/{}".format(self.redirectPath, site_name)
             redirect_conf = redirect_dir + '/' + redirect_id + '.conf'
             redirect_txt = "{}/{}/{}.conf.txt".format(self.redirectPath, site_name, redirect_id)
-            if os.path.exists(proxy_txt):
+            if os.path.exists(redirect_txt):
                 mw.execShell('mv ' + redirect_txt + ' ' + redirect_conf)
 
         if len(self.close_redirect) > 0:
