@@ -314,6 +314,7 @@ class Firewall(object):
         panel_port = mw.getPanelPort()
 
         if port.find(':') > 0:
+            pass
         else:
             if(int(port) == int(panel_port)):
                 return mw.returnData(False, '失败，不能删除当前面板端口!')
