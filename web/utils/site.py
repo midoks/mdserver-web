@@ -1514,7 +1514,7 @@ location ^~ {from} {\n\
                 redirect_txt = "{}/{}/{}.conf.txt".format(self.redirectPath, site_name, r['id'])
                 if os.path.exists(proxy_conf):
                     self.close_redirect.append(r['id'])
-                    mw.execShell('mv ' + proxy_conf + ' ' + proxy_txt)
+                    mw.execShell('mv ' + redirect_conf + ' ' + redirect_txt)
             mw.restartWeb()
 
     def openRedirectByOpen(self, site_name):
