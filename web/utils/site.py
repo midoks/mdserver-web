@@ -503,8 +503,8 @@ class sites(object):
                     http_ssl = http_ssl + "\n\tlisten [::]:443 quic;"
                     http_ssl = http_ssl + "\n\thttp2 on;"
                 else:
-                    http_ssl = "\n\tlisten 443 ssl http2;"
-                    http_ssl = http_ssl + "\n\tlisten [::]:443 ssl http2;"
+                    http_ssl = "\n\tlisten 443 ssl;"
+                    http_ssl = http_ssl + "\n\tlisten [::]:443 ssl;"
 
 
                 conf = conf.replace(listen, listen + http_ssl)
