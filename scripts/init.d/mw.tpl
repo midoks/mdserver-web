@@ -130,8 +130,8 @@ mw_stop_panel()
         rm -f $pidfile
     fi
 
-    arr=`ps aux|grep 'gunicorn -c setting.py app:app'|grep -v grep|awk '{print $2}'`
-    for p in ${arr[@]}
+    ARR=`ps aux|grep 'gunicorn -c setting.py app:app'|grep -v grep|awk '{print $2}'`
+    for p in ${ARR[@]}
     do
         kill -9 $p > /dev/null 2>&1
     done
