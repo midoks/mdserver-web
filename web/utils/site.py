@@ -1470,9 +1470,8 @@ location ^~ {from} {\n\
             proxy_dir = "{}/{}".format(self.proxyPath, site_name)
             proxy_conf = proxy_dir + '/' + proxy_id + '.conf'
             proxy_txt = "{}/{}/{}.conf.txt".format(self.proxyPath, site_name, proxy_id)
-            if os.path.exists(proxy_conf):
+            if os.path.exists(proxy_txt):
                 mw.execShell('mv ' + proxy_txt + ' ' + proxy_conf)
-
 
         if len(self.close_proxy) > 0:
             mw.restartWeb()
