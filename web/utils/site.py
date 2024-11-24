@@ -156,8 +156,8 @@ class sites(object):
             return path[0:-1]
         return path
 
-    def getSitePath(self, siteName):
-        file = self.getHostConf(siteName)
+    def getSitePath(self, site_name):
+        file = self.getHostConf(site_name)
         if os.path.exists(file):
             conf = mw.readFile(file)
             rep = r'\s*root\s*(.+);'
@@ -1448,6 +1448,34 @@ location ^~ {from} {\n\
         mw.restartWeb()
         return mw.returnData(True, "OK")
 
+
+    def closeProxyAll(self, site_name):
+        self.close_proxy = []
+        proxy_path = self.getProxyDataPath(site_name)
+        if os.path.exists(proxy_path):
+            content = mw.readFile(proxy_path)
+            data = json.loads(content)
+            for proxy in data:
+                proxy_dir = "{}/{}".format(self.proxyPath, site_name)
+                proxy_conf = proxy_dir + '/' + proxy['id'] + '.conf'
+                proxy_txt = "{}/{}/{}.conf.txt".format(self.proxyPath, site_name, proxy['id'])
+                if os.path.exists(proxy_conf):
+                    self.close_proxy.append(proxy['id'])
+                    mw.execShell('mv ' + proxy_conf + ' ' + proxy_txt)
+        return True
+
+    def openProxyByOpen(self, site_name):
+        for proxy_id in self.close_proxy:
+            proxy_dir = "{}/{}".format(self.proxyPath, site_name)
+            proxy_conf = proxy_dir + '/' + proxy_id + '.conf'
+            proxy_txt = "{}/{}/{}.conf.txt".format(self.proxyPath, site_name, proxy_id)
+            if os.path.exists(proxy_conf):
+                mw.execShell('mv ' + proxy_txt + ' ' + proxy_conf)
+        self.close_proxy = []
+        return True
+
+
+
     def getProxyConf(self, site_name, proxy_id):
         if pid == '' or site_name == '':
             return mw.returnData(False, "必填项不能为空!")
@@ -1488,8 +1516,6 @@ location ^~ {from} {\n\
 
         mw.restartWeb()
         return mw.returnData(True, "删除反代成功!")
-
-
 
     # 是否跳转到https
     def isToHttps(self, site_name):
@@ -1754,7 +1780,7 @@ location ^~ {from} {\n\
 
     def writeAcmeLog(self,msg):
         log_file = self.acmeLogFile()
-        mw.writeFile(log_file, msg+"\n", "wb+")
+        mw.writeFile(log_file, msg+"\n", 'w+')
         return True
 
     def letLogFile(self):
@@ -1852,25 +1878,16 @@ location ^~ {from} {\n\
     def createAcmeFile(self, site_name, domains, email, force, renew):
         print(site_name, domains,force, renew, email)
 
-        file = self.getHostConf(site_name)
-        if not os.path.exists(file):
+        site_conf = self.getHostConf(site_name)
+        if not os.path.exists(site_conf):
             return mw.returnData(False, '配置异常!')
 
-        content = mw.readFile(file)
+        content = mw.readFile(site_conf)
         if content.find('301-END') != -1:
             return mw.returnData(False, '检测到您的站点做了301重定向设置，请先关闭重定向!')
 
-        # 检测存在反向代理
-        # data_path = self.getProxyDataPath(site_name)
-        # if os.path.exists(data_path):
-        #     data_content = mw.readFile(data_path)
-        #     data = json.loads(data_content)
-        #     for proxy in data:
-        #         proxy_dir = "{}/{}".format(self.proxyPath, site_name)
-        #         proxy_dir_file = proxy_dir + '/' + proxy['id'] + '.conf'
-        #         if os.path.exists(proxy_dir_file):
-        #             return mw.returnData(False, '检测到您的站点做了反向代理设置，请先关闭反向代理!')
-            
+        # 关闭反向代理
+        self.closeProxyAll(site_name)
 
         site_info = thisdb.getSitesByName(site_name)
         path = self.getSitePath(site_name)
@@ -1889,25 +1906,25 @@ location ^~ {from} {\n\
             cmd = acme_dir + "/acme.sh --issue --force"
 
         # 确定主域名顺序
-        domainsTmp = []
+        t = []
         if site_name in domains:
-            domainsTmp.append(site_name)
-        for domainTmp in domains:
-            if domainTmp == site_name:
+            t.append(site_name)
+        for dd in domains:
+            if dd == site_name:
                 continue
-            domainsTmp.append(domainTmp)
-        domains = domainsTmp
+            t.append(dd)
+        domains = t
 
-        domainCount = 0
-        for domain in domains:
-            if mw.checkIp(domain):
+        domain_nums = 0
+        for d in domains:
+            if mw.checkIp(d):
                 continue
-            if domain.find('*.') != -1:
+            if d.find('*.') != -1:
                 return mw.returnData(False, '泛域名不能使用【文件验证】的方式申请证书!')
             cmd += ' -w ' + path
-            cmd += ' -d ' + domain
-            domainCount += 1
-        if domainCount == 0:
+            cmd += ' -d ' + d
+            domain_nums += 1
+        if domain_nums == 0:
             return mw.returnData(False, '请选择域名(不包括IP地址与泛域名)!')
 
         self.writeAcmeLog('开始ACME申请...')
@@ -1915,6 +1932,9 @@ location ^~ {from} {\n\
 
         cmd = 'export ACCOUNT_EMAIL=' + email + ' && ' + cmd + ' >> ' + log_file
         result = mw.execShell(cmd)
+
+        # 开启代理
+        self.openProxyByOpen(site_name)
 
         src_path = mw.getAcmeDomainDir(domains[0])
         src_cert = src_path + '/fullchain.cer'
@@ -1933,8 +1953,7 @@ location ^~ {from} {\n\
             data['msg'] = msg
             data['result'] = {}
             if result[1].find('new-authz error:') != -1:
-                data['result'] = json.loads(
-                    re.search("{.+}", result[1]).group())
+                data['result'] = json.loads(re.search("{.+}", result[1]).group())
                 if data['result']['status'] == 429:
                     data['msg'] = msg
             data['status'] = False
@@ -2073,6 +2092,7 @@ export PATH
             return mw.returnData(False, '正在申请或更新SSL中...')
 
         if apply_type == 'file':
+            print('apply_type',apply_type)
             return self.createAcmeFile(site_name, domains, email,force,renew)
         elif apply_type == 'dns':
             return self.createAcmeDns(site_name, domains, dnspai, wildcard_domain,force, renew)
