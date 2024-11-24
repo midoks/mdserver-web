@@ -426,10 +426,13 @@ class sites(object):
         if(csr.find('CERTIFICATE') == -1):
             return mw.returnJson(False, '证书错误，请检查!')
 
-        mw.writeFile('/tmp/cert.pl', csr)
-        if not mw.checkCert('/tmp/cert.pl'):
+        tmp_cert = '/tmp/cert.pl'
+        mw.writeFile(tmp_cert, csr)
+        if not mw.checkCert(tmp_cert):
+            os.remove(tmp_cert)
             return mw.returnData(False, '证书错误,请粘贴正确的PEM格式证书!')
-
+        os.remove(tmp_cert)
+        
         mw.backFile(keypath)
         mw.backFile(csrpath)
 
