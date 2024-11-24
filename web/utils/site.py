@@ -1750,6 +1750,56 @@ location ^~ {from} {\n\
         mw.writeFile(log_file, msg+"\n", "wb+")
         return True
 
+    def closeSslConf(self, site_name):
+        file = self.getHostConf(site_name)
+        conf = mw.readFile(file)
+
+        if conf:
+            rep = "\n\\s*#HTTP_TO_HTTPS_START(.|\n){1,300}#HTTP_TO_HTTPS_END"
+            conf = re.sub(rep, '', conf)
+            rep = "\\s+ssl_certificate\\s+.+;\\s+ssl_certificate_key\\s+.+;"
+            conf = re.sub(rep, '', conf)
+            rep = "\\s+ssl_protocols\\s+.+;\n"
+            conf = re.sub(rep, '', conf)
+            rep = "\\s+ssl_ciphers\\s+.+;\n"
+            conf = re.sub(rep, '', conf)
+            rep = "\\s+ssl_prefer_server_ciphers\\s+.+;\n"
+            conf = re.sub(rep, '', conf)
+            rep = "\\s+ssl_session_cache\\s+.+;\n"
+            conf = re.sub(rep, '', conf)
+            rep = r"\s+ssl_session_timeout\s+.+;\n"
+            conf = re.sub(rep, '', conf)
+            rep = r"\s+ssl_ecdh_curve\s+.+;\n"
+            conf = re.sub(rep, '', conf)
+            rep = r"\s+ssl_session_tickets\s+.+;\n"
+            conf = re.sub(rep, '', conf)
+            rep = r"\s+ssl_stapling\s+.+;\n"
+            conf = re.sub(rep, '', conf)
+            rep = r"\s+ssl_stapling_verify\s+.+;\n"
+            conf = re.sub(rep, '', conf)
+            rep = r"\s+add_header\s+.+;\n"
+            conf = re.sub(rep, '', conf)
+            rep = r"\s+add_header\s+.+;\n"
+            conf = re.sub(rep, '', conf)
+            rep = r"\s+ssl\s+on;"
+            conf = re.sub(rep, '', conf)
+            rep = r"\s+error_page\s497.+;"
+            conf = re.sub(rep, '', conf)
+            rep = r"\s+if.+server_port.+\n.+\n\s+\s*}"
+            conf = re.sub(rep, '', conf)
+            rep = r"\s+listen\s+443.*;"
+            conf = re.sub(rep, '', conf)
+            rep = r"\s+listen\s+\[\:\:\]\:443.*;"
+            conf = re.sub(rep, '', conf)
+            rep = r"\s+http2\s+on;"
+            conf = re.sub(rep, '', conf)
+            mw.writeFile(file, conf)
+
+        msg = mw.getInfo('网站[{1}]关闭SSL成功!', (site_name,))
+        mw.writeLog('网站管理', msg)
+        mw.restartWeb()
+        return mw.returnData(True, 'SSL已关闭!')
+
     def deleteSsl(self,site_name,ssl_type):
         path = self.sslDir + '/' + site_name
         csr_path = path + '/fullchain.pem'
@@ -1785,45 +1835,46 @@ location ^~ {from} {\n\
         return mw.returnData(True, '删除成功')
 
     def createAcmeFile(self, site_name, domains, email, force, renew):
-
         print(site_name, domains,force, renew, email)
-        
 
         file = self.getHostConf(site_name)
-        if os.path.exists(file):
-            siteConf = mw.readFile(file)
-            if siteConf.find('301-END') != -1:
-                return mw.returnData(False, '检测到您的站点做了301重定向设置，请先关闭重定向!')
+        if not os.path.exists(file):
+            return mw.returnData(False, '配置异常!')
 
-            # 检测存在反向代理
-            data_path = self.getProxyDataPath(site_name)
-            data_content = mw.readFile(data_path)
-            if data_content != False:
-                try:
-                    data = json.loads(data_content)
-                except:
-                    pass
-                for proxy in data:
-                    proxy_dir = "{}/{}".format(self.proxyPath, site_name)
-                    proxy_dir_file = proxy_dir + '/' + proxy['id'] + '.conf'
-                    if os.path.exists(proxy_dir_file):
-                        return mw.returnData(False, '检测到您的站点做了反向代理设置，请先关闭反向代理!')
+        content = mw.readFile(file)
+        if content.find('301-END') != -1:
+            return mw.returnData(False, '检测到您的站点做了301重定向设置，请先关闭重定向!')
+
+        # 检测存在反向代理
+        data_path = self.getProxyDataPath(site_name)
+
+        data_content = mw.readFile(data_path)
+        if data_content != False:
+            try:
+                data = json.loads(data_content)
+            except:
+                pass
+            for proxy in data:
+                proxy_dir = "{}/{}".format(self.proxyPath, site_name)
+                proxy_dir_file = proxy_dir + '/' + proxy['id'] + '.conf'
+                if os.path.exists(proxy_dir_file):
+                    return mw.returnData(False, '检测到您的站点做了反向代理设置，请先关闭反向代理!')
 
         site_info = thisdb.getSitesByName(site_name)
         path = self.getSitePath(site_name)
         if path == '':
             return mw.returnData(False, '【'+site_name+'】配置文件,异常!')
 
-        srcPath = site_info['path']
-
+        src_path = site_info['path']
         acme_dir = mw.getAcmeDir()
+
         if force == 'true':
             force_bool = True
 
         if renew == 'true':
-            execStr = acme_dir + "/acme.sh --renew --yes-I-know-dns-manual-mode-enough-go-ahead-please"
+            cmd = acme_dir + "/acme.sh --renew --yes-I-know-dns-manual-mode-enough-go-ahead-please"
         else:
-            execStr = acme_dir + "/acme.sh --issue --force"
+            cmd = acme_dir + "/acme.sh --issue --force"
 
         # 确定主域名顺序
         domainsTmp = []
@@ -1841,8 +1892,8 @@ location ^~ {from} {\n\
                 continue
             if domain.find('*.') != -1:
                 return mw.returnData(False, '泛域名不能使用【文件验证】的方式申请证书!')
-            execStr += ' -w ' + path
-            execStr += ' -d ' + domain
+            cmd += ' -w ' + path
+            cmd += ' -d ' + domain
             domainCount += 1
         if domainCount == 0:
             return mw.returnData(False, '请选择域名(不包括IP地址与泛域名)!')
@@ -1850,7 +1901,7 @@ location ^~ {from} {\n\
         self.writeAcmeLog('开始ACME申请...')
         log_file = self.acmeLogFile()
 
-        cmd = 'export ACCOUNT_EMAIL=' + email + ' && ' + execStr + ' >> ' + log_file
+        cmd = 'export ACCOUNT_EMAIL=' + email + ' && ' + cmd + ' >> ' + log_file
         result = mw.execShell(cmd)
 
         src_path = mw.getAcmeDomainDir(domains[0])
@@ -1875,7 +1926,7 @@ location ^~ {from} {\n\
                 if data['result']['status'] == 429:
                     data['msg'] = msg
             data['status'] = False
-            return mw.getJson(data)
+            return data
 
         dst_path = self.sslDir + '/' + site_name
         dst_cert = dst_path + "/fullchain.pem"  # 生成证书路径
