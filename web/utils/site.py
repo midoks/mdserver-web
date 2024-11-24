@@ -1517,7 +1517,7 @@ location ^~ {from} {\n\
                     mw.execShell('mv ' + proxy_conf + ' ' + proxy_txt)
             mw.restartWeb()
 
-    def openProxyByOpen(self, site_name):
+    def openRedirectByOpen(self, site_name):
         for redirect_id in self.close_redirect:
             redirect_dir = "{}/{}".format(self.redirectPath, site_name)
             redirect_conf = redirect_dir + '/' + redirect_id + '.conf'
@@ -1931,18 +1931,14 @@ location ^~ {from} {\n\
         return mw.returnData(True, '删除成功')
 
     def createAcmeFile(self, site_name, domains, email, force, renew):
-        print(site_name, domains,force, renew, email)
-
         site_conf = self.getHostConf(site_name)
         if not os.path.exists(site_conf):
             return mw.returnData(False, '配置异常!')
 
-        content = mw.readFile(site_conf)
-        if content.find('301-END') != -1:
-            return mw.returnData(False, '检测到您的站点做了301重定向设置，请先关闭重定向!')
-
         # 关闭反向代理
         self.closeProxyAll(site_name)
+        # 关闭重定向
+        self.closeRedirectAll(site_name)
 
         site_info = thisdb.getSitesByName(site_name)
         path = self.getSitePath(site_name)
@@ -1990,6 +1986,8 @@ location ^~ {from} {\n\
 
         # 开启代理
         self.openProxyByOpen(site_name)
+        # 开启重定向
+        self.openRedirectByOpen(site_name)
 
         src_path = mw.getAcmeDomainDir(domains[0])
         src_cert = src_path + '/fullchain.cer'
@@ -2147,7 +2145,6 @@ export PATH
             return mw.returnData(False, '正在申请或更新SSL中...')
 
         if apply_type == 'file':
-            print('apply_type',apply_type)
             return self.createAcmeFile(site_name, domains, email,force,renew)
         elif apply_type == 'dns':
             return self.createAcmeDns(site_name, domains, dnspai, wildcard_domain,force, renew)
