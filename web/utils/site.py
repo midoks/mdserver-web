@@ -1448,13 +1448,13 @@ location ^~ {from} {\n\
         mw.restartWeb()
         return mw.returnData(True, "OK")
 
-    def getProxyConf(self, site_name, pid):
+    def getProxyConf(self, site_name, proxy_id):
         if pid == '' or site_name == '':
             return mw.returnData(False, "必填项不能为空!")
 
-        conf_file = "{}/{}/{}.conf".format(self.proxyPath, site_name, pid)
+        conf_file = "{}/{}/{}.conf".format(self.proxyPath, site_name, proxy_id)
         if not os.path.exists(conf_file):
-            conf_file = "{}/{}/{}.conf.txt".format(self.proxyPath, site_name, pid)
+            conf_file = "{}/{}/{}.conf.txt".format(self.proxyPath, site_name, proxy_id)
 
         if not os.path.exists(conf_file):
             return mw.returnData(False, "获取失败!")
