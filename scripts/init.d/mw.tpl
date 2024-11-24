@@ -135,6 +135,12 @@ mw_stop_panel()
     do
         kill -9 $p > /dev/null 2>&1
     done
+
+    PLIST=`ps -ef|grep app:app |grep -v grep|awk '{print $2}'`
+    for i in ${($PLIST)[@]}
+    do
+        kill -9 $i > /dev/null 2>&1
+    done
     
     echo -e "\033[32mdone\033[0m"
 }
