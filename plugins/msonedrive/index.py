@@ -285,8 +285,7 @@ def backupAllFunc(stype):
         bk_name = stype
 
     find_path = backup_dir + '/' + bk_name + '/' + bk_prefix + '_' + name
-    find_new_file = "ls " + find_path + \
-        "_* | grep '.gz' | cut -d \  -f 1 | awk 'END {print}'"
+    find_new_file = "ls " + find_path + "_* | grep '.gz' | cut -d \\  -f 1 | awk 'END {print}'"
 
     # print(find_new_file)
 
