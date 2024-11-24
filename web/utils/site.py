@@ -1462,6 +1462,7 @@ location ^~ {from} {\n\
                 if os.path.exists(proxy_conf):
                     self.close_proxy.append(proxy['id'])
                     mw.execShell('mv ' + proxy_conf + ' ' + proxy_txt)
+        mw.restartWeb()
         return True
 
     def openProxyByOpen(self, site_name):
