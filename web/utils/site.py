@@ -1472,7 +1472,11 @@ location ^~ {from} {\n\
             proxy_txt = "{}/{}/{}.conf.txt".format(self.proxyPath, site_name, proxy_id)
             if os.path.exists(proxy_conf):
                 mw.execShell('mv ' + proxy_txt + ' ' + proxy_conf)
-        self.close_proxy = []
+
+
+        if len(self.close_proxy) > 0:
+            mw.restartWeb()
+            self.close_proxy = []
         return True
 
 
