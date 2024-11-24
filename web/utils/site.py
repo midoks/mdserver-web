@@ -473,7 +473,7 @@ class sites(object):
     add_header Strict-Transport-Security "max-age=63072000";
     add_header Alt-Svc 'h3=":443";ma=86400';
 """
-                if not version.startswith('1.25'):
+                if not version.startswith('1.25') or version.startswith('1.27'):
                     http3Header = '';
 
                 sslStr = """#error_page 404/404.html;
