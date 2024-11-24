@@ -313,8 +313,10 @@ class Firewall(object):
     ):
         panel_port = mw.getPanelPort()
 
-        if(int(port) == int(panel_port)):
-            return mw.returnData(False, '失败，不能删除当前面板端口!')
+        if port.find(':') > 0:
+        else:
+            if(int(port) == int(panel_port)):
+                return mw.returnData(False, '失败，不能删除当前面板端口!')
         try:
             self.delAcceptPortCmd(port, protocol)
             mw.M('firewall').where("id=?", (firewall_id,)).delete()
