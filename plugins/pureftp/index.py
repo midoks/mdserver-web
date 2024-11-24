@@ -88,8 +88,8 @@ def contentReplace(content):
 def ftp_release_port(port):
     from collections import namedtuple
     try:
-        import firewall_api
-        firewall_api.firewall_api().addAcceptPortArgs(port, 'pure-ftpd', 'port')
+        from utils.firewall import Firewall as MwFirewall
+        MwFirewall.instance().addAcceptPort(port, 'pure-ftpd', 'port')
         return port
     except Exception as e:
         return "Release failed {}".format(e)
