@@ -147,7 +147,7 @@ def initDreplace():
         # and not os.path.exists(systemService)
         content = mw.readFile(systemServiceTpl)
         content = content.replace('{$SERVER_PATH}', service_path)
-        mw.writeFile(systemService, se_content)
+        mw.writeFile(systemService, content)
         mw.execShell('systemctl daemon-reload')
 
     return file_bin
