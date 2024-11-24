@@ -106,11 +106,19 @@ def getPanelTaskLog():
     return getMWLogs() + '/panel_task.log'
 
 def getWwwDir():
-    file = getPanelDir() + '/data/site.pl'
-    if os.path.exists(file):
-        return readFile(file).strip()
-    return getFatherDir() + '/wwwroot'
+    import thisdb
+    site_path = thisdb.getOption('site_path')
+    return site_path
 
+def getBackupDir():
+    import thisdb
+    backup_path = thisdb.getOption('backup_path')
+    return backup_path
+
+def setBackupDir(bdir):
+    import thisdb
+    thisdb.setOption('backup_path', bdir)
+    return True
 
 def getPanelPort():
     port_file = getPanelDir()+'/data/port.pl'
