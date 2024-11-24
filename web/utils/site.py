@@ -1291,7 +1291,7 @@ class sites(object):
         mw.writeFile(vhost_file, content)
 
     # 设置 网站 反向代理列表
-    def setProxy(self, site_name, site_from, to, host, name, open_proxy, open_cache, cache_time, site_id):
+    def setProxy(self, site_name, site_from, to, host, name, open_proxy, open_cache, cache_time, proxy_id):
         from urllib.parse import urlparse
         if  site_name == "" or site_from == "" or to == "" or host == "" or name == "":
             return mw.returnData(False, "必填项不能为空")
@@ -1313,8 +1313,8 @@ class sites(object):
         data = json.loads(data_content) if data_content != "" else []
 
         proxy_action = 'add'
-        if pid == "":
-            pid = mw.md5("{}".format(name))
+        if proxy_id == "":
+            proxy_id = mw.md5("{}".format(name))
         else:
             proxy_action = 'edit'
 
@@ -1382,8 +1382,8 @@ location ^~ {from} {\n\
             tpl = tpl.replace("{proxy_cache}", tpl_proxy_nocache, 999)
 
 
-        conf_proxy = "{}/{}.conf".format(self.getProxyPath(site_name), pid)
-        conf_bk = "{}/{}.conf.txt".format(self.getProxyPath(site_name), pid)
+        conf_proxy = "{}/{}.conf".format(self.getProxyPath(site_name), proxy_id)
+        conf_bk = "{}/{}.conf.txt".format(self.getProxyPath(site_name), proxy_id)
         mw.writeFile(conf_proxy, tpl)
 
         rule_test = mw.checkWebConfig()
@@ -1393,7 +1393,7 @@ location ^~ {from} {\n\
 
         if proxy_action == "add":
             # 添加代理
-            pid = mw.md5("{}".format(name))
+            proxy_id = mw.md5("{}".format(name))
             for item in data:
                 if item["name"] == name:
                     return mw.returnData(False, "名称重复!")
@@ -1413,7 +1413,7 @@ location ^~ {from} {\n\
             # 修改代理
             dindex = -1
             for x in range(len(data)):
-                if data[x]["id"] == pid:
+                if data[x]["id"] == proxy_id:
                     dindex = x
                     break
             if dindex < 0:
@@ -1431,7 +1431,7 @@ location ^~ {from} {\n\
         mw.writeFile(proxy_site_path, json.dumps(data))
         self.operateProxyConf(site_name, 'start')
         mw.restartWeb()
-        return mw.returnData(True, "ok", {"hash": pid})
+        return mw.returnData(True, "ok", {"hash": proxy_id})
 
     def setProxyStatus(self, site_name, proxy_id, status):
         if status == '' or site_name == '' or proxy_id == '':

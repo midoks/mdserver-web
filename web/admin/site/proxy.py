@@ -44,8 +44,8 @@ def set_proxy():
     open_proxy = request.form.get('open_proxy', '')
     open_cache = request.form.get('open_cache', '')
     cache_time = request.form.get('cache_time', '')
-    pid = request.form.get('id', '')
-    return MwSites.instance().setProxy(site_name,site_from,to,host,name,open_proxy, open_cache,cache_time, pid)
+    proxy_id = request.form.get('id', '')
+    return MwSites.instance().setProxy(site_name,site_from,to,host,name,open_proxy, open_cache,cache_time, proxy_id)
 
 # 获取代理状态
 @blueprint.route('/set_proxy_status', endpoint='set_proxy_status', methods=['POST'])
