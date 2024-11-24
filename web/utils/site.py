@@ -1462,8 +1462,8 @@ location ^~ {from} {\n\
         data = mw.readFile(conf_file)
         return mw.returnData(True, "ok", {"result": data})
 
-    def delProxy(self, site_name, pid):
-        if pid == '' or site_name == '':
+    def delProxy(self, site_name, proxy_id):
+        if proxy_id == '' or site_name == '':
             return mw.returnData(False, "必填项不能为空!")
 
         try:
@@ -1471,7 +1471,7 @@ location ^~ {from} {\n\
             data_content = mw.readFile(data_path) if os.path.exists(data_path) else ""
             data = json.loads(data_content) if data_content != "" else []
             for item in data:
-                if item["id"] == pid:
+                if item["id"] == proxy_id:
                     data.remove(item)
                     break
             # write database
@@ -1481,7 +1481,7 @@ location ^~ {from} {\n\
             if len(data) == 0:
                 self.operateProxyConf(site_name, 'stop')
             # remove conf file
-            cmd = "rm -rf {}/{}.conf*".format(self.getProxyPath(site_name), pid)
+            cmd = "rm -rf {}/{}.conf*".format(self.getProxyPath(site_name), proxy_id)
             mw.execShell(cmd)
         except:
             return mw.returnData(False, "删除反代失败!")
