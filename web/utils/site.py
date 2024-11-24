@@ -1750,8 +1750,39 @@ location ^~ {from} {\n\
         mw.writeFile(log_file, msg+"\n", "wb+")
         return True
 
-    def createAcmeMultiDomin(self):
-        pass
+    def deleteSsl(self,site_name,ssl_type):
+        path = self.sslDir + '/' + site_name
+        csr_path = path + '/fullchain.pem'
+
+        file = self.getHostConf(site_name)
+        content = mw.readFile(file)
+        key_text = 'ssl_certificate'
+        status = True
+        if content.find(key_text) == -1:
+            status = False
+
+        if ssl_type == 'now':
+            if status:
+                return mw.returnData(False, '使用中,先关闭再删除')
+            if os.path.exists(path):
+                mw.execShell('rm -rf ' + path)
+            else:
+                return mw.returnData(False, '还未申请!')
+        elif ssl_type == 'lets':
+            ssl_lets_dir = self.sslLetsDir + '/' + site_name
+            csr_lets_path = ssl_lets_dir + '/fullchain.pem'  # 生成证书路径
+            if mw.md5(mw.readFile(csr_lets_path)) == mw.md5(mw.readFile(csr_path)):
+                return mw.returnData(False, '使用中,先关闭再删除')
+            mw.execShell('rm -rf ' + ssl_lets_dir)
+        elif ssl_type == 'acme':
+            ssl_acme_dir = mw.getAcmeDomainDir(site_name)
+            csr_acme_path = ssl_acme_dir + '/fullchain.cer'  # 生成证书路径
+            if mw.md5(mw.readFile(csr_acme_path)) == mw.md5(mw.readFile(csr_path)):
+                return mw.returnData(False, '使用中,先关闭再删除')
+            mw.execShell('rm -rf ' + ssl_acme_dir)
+
+        mw.restartWeb()
+        return mw.returnData(True, '删除成功')
 
     def createAcmeFile(self, site_name, domains, email, force, renew):
 

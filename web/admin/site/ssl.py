@@ -32,6 +32,15 @@ def get_ssl():
     ssl_type = request.form.get('ssl_type', '')
     return MwSites.instance().getSsl(site_name, ssl_type)
 
+# 删除证书
+@blueprint.route('/delete_ssl', endpoint='delete_ssl', methods=['POST'])
+@panel_login_required
+def delete_ssl():
+    site_name = request.form.get('site_name', '')
+    ssl_type = request.form.get('ssl_type', '')
+    return MwSites.instance().deleteSsl(site_name, ssl_type)
+
+
 # 获取证书列表
 @blueprint.route('/get_cert_list', endpoint='get_cert_list', methods=['GET','POST'])
 @panel_login_required
