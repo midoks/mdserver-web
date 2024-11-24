@@ -1847,18 +1847,15 @@ location ^~ {from} {\n\
 
         # 检测存在反向代理
         data_path = self.getProxyDataPath(site_name)
-
-        data_content = mw.readFile(data_path)
-        if data_content != False:
-            try:
-                data = json.loads(data_content)
-            except:
-                pass
+        if os.path.exists(data_path):
+            data_content = mw.readFile(data_path)
+            data = json.loads(data_content)
             for proxy in data:
                 proxy_dir = "{}/{}".format(self.proxyPath, site_name)
                 proxy_dir_file = proxy_dir + '/' + proxy['id'] + '.conf'
                 if os.path.exists(proxy_dir_file):
                     return mw.returnData(False, '检测到您的站点做了反向代理设置，请先关闭反向代理!')
+            
 
         site_info = thisdb.getSitesByName(site_name)
         path = self.getSitePath(site_name)
