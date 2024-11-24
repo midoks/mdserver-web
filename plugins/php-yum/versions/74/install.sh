@@ -8,7 +8,6 @@ rootPath=$(dirname "$rootPath")
 serverPath=$(dirname "$rootPath")
 sourcePath=${serverPath}/source
 sysName=`uname`
-install_tmp=${rootPath}/tmp/mw_install.pl
 
 version=7.4.x
 PHP_VER=74
@@ -30,7 +29,7 @@ Uninstall_php()
 {
 	yum remove -y php74 php74-php-fpm php74-*
 	rm -rf $serverPath/php-yum/${PHP_VER}
-	echo "卸载php-${version}..." > $install_tmp
+	echo "卸载php-${version}..."
 }
 
 action=${1}
