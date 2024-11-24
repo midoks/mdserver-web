@@ -180,6 +180,105 @@ def getCommonFile():
     }
     return data
 
+def checkCert(certPath='ssl/certificate.pem'):
+    # 验证证书
+    openssl = '/usr/bin/openssl'
+    if not os.path.exists(openssl):
+        openssl = '/usr/local/openssl/bin/openssl'
+    if not os.path.exists(openssl):
+        openssl = 'openssl'
+    certPem = readFile(certPath)
+    s = "\n-----BEGIN CERTIFICATE-----"
+    tmp = certPem.strip().split(s)
+    for tmp1 in tmp:
+        if tmp1.find('-----BEGIN CERTIFICATE-----') == -1:
+            tmp1 = s + tmp1
+        writeFile(certPath, tmp1)
+        result = execShell(openssl + " x509 -in " +
+                           certPath + " -noout -subject")
+        if result[1].find('-bash:') != -1:
+            return True
+        if len(result[1]) > 2:
+            return False
+        if result[0].find('error:') != -1:
+            return False
+    return True
+
+def sortFileList(path, ftype = 'mtime', sort = 'desc'):
+    flist = os.listdir(path)
+    if ftype == 'mtime':
+        if sort == 'desc':
+            flist = sorted(flist, key=lambda f: os.path.getmtime(os.path.join(path,f)), reverse=True)
+        if sort == 'asc':
+            flist = sorted(flist, key=lambda f: os.path.getmtime(os.path.join(path,f)), reverse=False)
+
+    if ftype == 'size':
+        if sort == 'desc':
+            flist = sorted(flist, key=lambda f: os.path.getsize(os.path.join(path,f)), reverse=True)
+        if sort == 'asc':
+            flist = sorted(flist, key=lambda f: os.path.getsize(os.path.join(path,f)), reverse=False)
+
+    if ftype == 'fname':
+        if sort == 'desc':
+            flist = sorted(flist, key=lambda f: os.path.join(path,f), reverse=True)
+        if sort == 'asc':
+            flist = sorted(flist, key=lambda f: os.path.join(path,f), reverse=False)
+    return flist
+
+
+def sortAllFileList(path, ftype = 'mtime', sort = 'desc', search = '',limit = 3000):
+    count = 0
+    flist = []
+    for d_list in os.walk(path):
+        if count >= limit:
+            break
+
+        for d in d_list[1]:
+            if count >= limit:
+                break
+            if d.lower().find(search) != -1:
+                filename = d_list[0] + '/' + d
+                if not os.path.exists(filename):
+                    continue
+                count += 1
+                flist.append(filename)
+
+        for f in d_list[2]:
+            if count >= limit:
+                break
+
+            if f.lower().find(search) != -1:
+                filename = d_list[0] + '/' + f
+                if not os.path.exists(filename):
+                    continue
+                count += 1
+                flist.append(filename)
+
+    if ftype == 'mtime':
+        if sort == 'desc':
+            flist = sorted(flist, key=lambda f: os.path.getmtime(f), reverse=True)
+        if sort == 'asc':
+            flist = sorted(flist, key=lambda f: os.path.getmtime(f), reverse=False)
+
+    if ftype == 'size':
+        if sort == 'desc':
+            flist = sorted(flist, key=lambda f: os.path.getsize(f), reverse=True)
+        if sort == 'asc':
+            flist = sorted(flist, key=lambda f: os.path.getsize(f), reverse=False)
+    return flist
+
+def getPathSize(path):
+    # 取文件或目录大小
+    if not os.path.exists(path):
+        return 0
+    if not os.path.isdir(path):
+        return os.path.getsize(path)
+    size_total = 0
+    for nf in os.walk(path):
+        for f in nf[2]:
+            filename = nf[0] + '/' + f
+            size_total += os.path.getsize(filename)
+    return size_total
 
 def toSize(size, middle='') -> str:
     """
