@@ -7,8 +7,6 @@ rootPath=$(dirname "$curPath")
 rootPath=$(dirname "$rootPath")
 serverPath=$(dirname "$rootPath")
 
-install_tmp=${rootPath}/tmp/mw_install.pl
-
 
 if [ -f ${rootPath}/bin/activate ];then
 	source ${rootPath}/bin/activate
@@ -103,12 +101,12 @@ Install_pureftp()
 	
 	if [ -d ${serverPath}/pureftp ];then 
 		echo "${1}" > ${serverPath}/pureftp/version.pl
-		echo '安装完成' > $install_tmp
+		echo '安装完成'
 
 		cd ${rootPath} && python3 ${rootPath}/plugins/pureftp/index.py start
 		cd ${rootPath} && python3 ${rootPath}/plugins/pureftp/index.py initd_install
 	else
-		echo '安装失败' > $install_tmp
+		echo '安装失败'
 	fi
 }
 
@@ -128,7 +126,7 @@ Uninstall_pureftp()
 	rm -rf ${serverPath}/pureftp
 	userdel ftp
 	groupdel ftp
-	echo '卸载完成' > $install_tmp
+	echo '卸载完成'
 }
 
 action=$1
