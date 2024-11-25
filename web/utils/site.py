@@ -630,7 +630,10 @@ class sites(object):
         rewriteList['rewrite'].append('0.当前')
         rewrite_nginx_dir = mw.getPanelDir() + '/web/misc/nginx/rewrite'
         for ds in os.listdir(rewrite_nginx_dir):
-            rewriteList['rewrite'].append(ds[0:len(ds) - 5])
+            if ds.startswith('.'):
+                continue
+            if ds.endswith('conf'):
+                rewriteList['rewrite'].append(ds[0:len(ds) - 5])
         rewriteList['rewrite'] = sorted(rewriteList['rewrite'])
         return rewriteList
 
