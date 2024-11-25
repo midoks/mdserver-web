@@ -73,7 +73,10 @@ cd $sourcePath/php/php${PHP_VER}
 
 OPTIONS='--without-iconv'
 if [ $sysName == 'Darwin' ]; then
-	OPTIONS="${OPTIONS} --with-curl"
+	BREW_DIR=`which brew`
+	BREW_DIR=${BREW_DIR/\/bin\/brew/}
+	LIB_DEPEND_DIR=`brew info curl | grep ${BREW_DIR}/Cellar/curl | cut -d \  -f 1 | awk 'END {print}'`
+	OPTIONS="${OPTIONS} --with-curl=$LIB_DEPEND_DIR"
 else
 	OPTIONS="${OPTIONS} --with-curl"
 	OPTIONS="${OPTIONS} --with-readline"
@@ -150,6 +153,28 @@ if [ ! -d $serverPath/php/${PHP_VER} ];then
 	--disable-fileinfo \
 	$OPTIONS \
 	--enable-fpm
+	echo "./configure \
+	--prefix=$serverPath/php/${PHP_VER} \
+	--exec-prefix=$serverPath/php/${PHP_VER} \
+	--with-config-file-path=$serverPath/php/${PHP_VER}/etc \
+	--enable-mysqlnd \
+	--with-mysqli=mysqlnd \
+	--with-pdo-mysql=mysqlnd \
+	--with-zlib-dir=$serverPath/lib/zlib \
+	$ZIP_OPTION \
+	--enable-mbstring \
+	--enable-ftp \
+	--enable-sockets \
+	--enable-simplexml \
+	--enable-soap \
+	--enable-posix \
+	--enable-sysvmsg \
+	--enable-sysvsem \
+	--enable-sysvshm \
+	--disable-intl \
+	--disable-fileinfo \
+	$OPTIONS \
+	--enable-fpm"
 	make clean && make -j${cpuCore} && make install && make clean
 
 	# rm -rf $sourcePath/php/php${PHP_VER}
