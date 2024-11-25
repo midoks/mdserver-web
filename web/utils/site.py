@@ -604,15 +604,18 @@ class sites(object):
             return mw.returnData(False, '日志为空')
         return mw.returnData(True, mw.getLastLine(logPath, 100))
 
+    def getNgxRewriteDir(self):
+        return mw.getPanelDir() + '/web/misc/nginx/rewrite/'
+
     # 获取模版名内容
     def getRewriteTpl(self, tplname):
-        file = mw.getPanelDir() + '/web/misc/nginx/rewrite/' + tplname + '.conf'
+        file = self.getNgxRewriteDir() + tplname + '.conf'
         if not os.path.exists(file):
             return mw.returnData(False, '模版不存在!')
         return mw.returnData(True, 'OK', file)
 
     def setRewriteTpl(self,name,data):
-        path = mw.getPanelDir() + '/web/misc/nginx/rewrite/' + name + ".conf"
+        path = self.getNgxRewriteDir() + name + ".conf"
         if os.path.exists(path):
             return mw.returnData(False, '模版已经存在!')
 
@@ -628,7 +631,7 @@ class sites(object):
         rewriteList = {}
         rewriteList['rewrite'] = []
         rewriteList['rewrite'].append('0.当前')
-        rewrite_nginx_dir = mw.getPanelDir() + '/web/misc/nginx/rewrite'
+        rewrite_nginx_dir = self.getNgxRewriteDir()
         for ds in os.listdir(rewrite_nginx_dir):
             if ds.startswith('.'):
                 continue
