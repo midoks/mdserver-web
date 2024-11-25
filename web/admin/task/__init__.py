@@ -8,6 +8,8 @@
 # Author: midoks <midoks@163.com>
 # ---------------------------------------------------------------------------------
 
+import json
+import time
 
 from flask import Blueprint, render_template
 from flask import request
@@ -62,14 +64,12 @@ def get_task_speed():
     data['cmd'] = row['cmd']
 
     if row['type'] == 'download':
-        readLine = ""
+        readLine = ''
         for i in range(3):
             try:
                 readLine = mw.readFile(task_logfile)
-                if len(readLine) > 10:
-                    data['msg'] = json.loads(readLine)
-                    data['isDownload'] = True
-                    break
+                data['msg'] = json.loads(readLine)
+                data['isDownload'] = True
             except Exception as e:
                 if i == 2:
                     thisdb.setTaskStatus(row['id'],0)

@@ -9,6 +9,7 @@
 # ---------------------------------------------------------------------------------
 
 import os
+import time
 
 from flask import Blueprint, render_template
 from flask import request
@@ -185,7 +186,7 @@ def delete_dir():
     path = request.form.get('path', '')
     return file.dirDelete(path)
 
-# 删除文件
+# 下载文件
 @blueprint.route('/download', endpoint='download', methods=['GET'])
 @panel_login_required
 def download():
@@ -198,6 +199,23 @@ def download():
 
     response = make_response(send_from_directory(os.path.dirname(filename), os.path.basename(filename), as_attachment=is_attachment))
     return response
+
+# 远程下载
+@blueprint.route('/download_file', endpoint='download_file', methods=['POST'])
+@panel_login_required
+def download_file():
+    url = request.form.get('url', '')
+    path = request.form.get('path', '')
+    filename = request.form.get('filename', '')
+    
+    execstr = url + '|mw|' + path + '/' + filename
+    execstr = execstr.strip()
+
+    title = '下载文件[' + filename + ']'
+    thisdb.addTaskByDownload(name=title, cmd=execstr)
+    # self.setFileAccept(path + '/' + filename)
+    mw.triggerTask()
+    return mw.returnData(True, '已将下载任务添加到队列!')
 
 # 日志清空
 @blueprint.route('/close_logs', endpoint='close_logs', methods=['POST'])

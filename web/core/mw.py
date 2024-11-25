@@ -1273,9 +1273,12 @@ def fileNameCheck(filename):
             return False
     return True
 
+def getTriggerTaskLockFile():
+    return getPanelDir() + '/logs/panel_task.lock'
+
 def triggerTask():
-    isTask = getPanelDir() + '/logs/panel_task.lock'
-    writeFile(isTask, 'True')
+    lock_file = getTriggerTaskLockFile()
+    writeFile(lock_file, 'True')
 
 def restartTask():
     initd = getPanelDir() + '/scripts/init.d/mw'

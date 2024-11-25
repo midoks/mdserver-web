@@ -22,6 +22,34 @@ def getTaskCount(
 def getTaskUnexecutedCount() -> int:
     return mw.M('tasks').where('status!=?',(1,)).count()
 
+def addTaskByDownload(
+    name: str | None = '下载文件',
+    cmd: str | None = None,
+    type: str | None = 'download',
+    status: int | None = 0,
+):
+    '''
+    添加后台任务
+    :name -> str 类型
+    :cmd -> str 日志内容 (必填)
+    :type -> str 用户ID
+    '''
+    if cmd is None:
+        return False
+
+    add_time = mw.formatDate()
+    insert_data = {
+        'name':name,
+        'type':type,
+        'cmd':cmd,
+        'start':0,
+        'end':0,
+        'status':status,
+        'add_time':add_time,
+    }
+    mw.M('tasks').insert(insert_data)
+    return True
+
 def addTask(
     name: str | None = '常用任务',
     cmd: str | None = None,
@@ -77,7 +105,7 @@ def getTaskPage(
     return rdata
 
 def getTaskFirstByRun() -> None:
-    data = mw.M('tasks').where('status=?', (-1,)).field(__FIELD).order('id asc').find()
+    data = mw.M('tasks').where('status=? or status=0', (-1,)).field(__FIELD).order('id asc').find()
     if data is None:
         return None
     return data

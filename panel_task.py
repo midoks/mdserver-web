@@ -77,43 +77,46 @@ def downloadFile(url, filename):
         if not mw.isAppleSystem():
             os.system('chown www.www ' + filename)
 
-        writeLogs('done')
+        writeLogs(filename + ' download success!')
     except Exception as e:
         writeLogs(str(e))
     return True
 
 def downloadHook(count, blockSize, totalSize):
     # 下载文件进度回调
-    global pre
     used = count * blockSize
-    pre1 = int((100.0 * used / totalSize))
-    if pre == (100 - pre1):
-        return
-    speed = {'total': totalSize, 'used': used, 'pre': pre1}
+    pre = int((100.0 * used / totalSize))
+    speed = {'total': totalSize, 'used': used, 'pre': pre}
     writeLogs(json.dumps(speed))
 
 def runPanelTask():
     # 站点过期检查
     siteEdateCheck()
 
+    lock_file = mw.getTriggerTaskLockFile()
+    # mw.writeFile(lock_file,'True')
     try:
-        bash_list = thisdb.getTaskList(status=-1)
-        for task in bash_list:
-            thisdb.setTaskStatus(task['id'], 0)
+        if os.path.exists(lock_file):
+            bash_list = thisdb.getTaskList(status=-1)
+            for task in bash_list:
+                thisdb.setTaskStatus(task['id'], 0)
 
-        run_list = thisdb.getTaskList(status=0)
-        for run_task in run_list:
-            start = int(time.time())
-            thisdb.setTaskData(run_task['id'], start=start)
-            thisdb.setTaskStatus(run_task['id'], -1)
-            if run_task['type'] == 'download':
-                argv = run_task['cmd'].split('|mw|')
-                downloadFile(argv[0], argv[1])
-            elif run_task['type'] == 'execshell':
-                execShell(run_task['cmd'])
-            end = int(time.time())
-            thisdb.setTaskData(run_task['id'], end=end)
-            thisdb.setTaskStatus(run_task['id'], 1)
+            run_list = thisdb.getTaskList(status=0)
+            for run_task in run_list:
+                start = int(time.time())
+                thisdb.setTaskData(run_task['id'], start=start)
+                thisdb.setTaskStatus(run_task['id'], -1)
+
+                if run_task['type'] == 'download':
+                    argv = run_task['cmd'].split('|mw|')
+                    downloadFile(argv[0], argv[1])
+                elif run_task['type'] == 'execshell':
+                    execShell(run_task['cmd'])
+
+                end = int(time.time())
+                thisdb.setTaskData(run_task['id'], end=end)
+                thisdb.setTaskStatus(run_task['id'], 1)
+            os.remove(lock_file)
     except Exception as e:
         pass
 
