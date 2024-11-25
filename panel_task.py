@@ -148,7 +148,7 @@ def siteEdate():
         oldEdate = mEdate
         mw.writeFile('data/edate.pl', mEdate)
     except Exception as e:
-        print(str(e))
+        print(mw.getTracebackInfo())
 
 
 def systemTask():
