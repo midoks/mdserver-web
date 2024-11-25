@@ -66,6 +66,10 @@ def isSitesExist(name):
         return True
     return False
 
+def getSitesEdateList(edate):
+    elist = mw.M('sites').field(__FIELD).where('edate>? AND edate<? AND status=?', ('0000-00-00', edate, 1,)).select()
+    return elist
+
 def getSitesList(
     page:int | None = 1,
     size:int | None = 10,

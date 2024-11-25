@@ -10,6 +10,16 @@ $('#site_search').click(function(){
 	getWeb(1, -1, $('#site_search_input').val());
 });
 
+//设置到期日期
+function getDate(a) {
+	var dd = new Date();
+	dd.setTime(dd.getTime() + (a == undefined || isNaN(parseInt(a)) ? 0 : parseInt(a)) * 86400000);
+	var y = dd.getFullYear();
+	var m = dd.getMonth() + 1;
+	var d = dd.getDate();
+	return y + "-" + (m < 10 ? ('0' + m) : m) + "-" + (d < 10 ? ('0' + d) : d);
+}
+
 /**
  * 取回网站数据列表
  * @param {Number} page   当前页
@@ -84,22 +94,12 @@ $('#site_search').click(function(){
 					</td></tr>"
 			
 			$("#webBody").append(body);
-			//setEdate(data.data[i].id,data.data[i].edate);
-         	//设置到期日期
-			function getDate(a) {
-				var dd = new Date();
-				dd.setTime(dd.getTime() + (a == undefined || isNaN(parseInt(a)) ? 0 : parseInt(a)) * 86400000);
-				var y = dd.getFullYear();
-				var m = dd.getMonth() + 1;
-				var d = dd.getDate();
-				return y + "-" + (m < 10 ? ('0' + m) : m) + "-" + (d < 10 ? ('0' + d) : d);
-			}
             $('#webBody').on('click','#site_'+ data.data[i].id,function(){
 				var _this = $(this);
 				var id = $(this).attr('data-ids');
 				laydate.render({
 					elem: '#site_'+ id,
-					min:getDate(1),
+					min:getDate(-1),
 					max:'9999-12-31',
 					vlue:getDate(365),
 					type:'date',
@@ -111,7 +111,7 @@ $('#site_search').click(function(){
 						if(_this.html() == '永久'){
 						 	dates = '0000-00-00';
 						}
-						var loadT = layer.msg(lan.site.saving_txt, { icon: 16, time: 0, shade: [0.3, "#000"]}); 
+						var loadT = layer.msg('正在保存...', { icon: 16, time: 0, shade: [0.3, "#000"]}); 
 						$.post('/site/set_end_date','id='+id+'&edate='+dates,function(rdata){
 							layer.close(loadT);
 							layer.msg(rdata.msg,{icon:rdata.status?1:5});
@@ -123,7 +123,6 @@ $('#site_search').click(function(){
 		}
 		if(body.length < 10){
 			body = "<tr><td colspan='9' style='text-align: center;'>当前没有站点数据</td></tr>";
-			// $(".dataTables_paginate").hide();
 			$("#webBody").html(body);
 		}
 		//输出数据列表

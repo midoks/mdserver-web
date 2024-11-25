@@ -58,16 +58,14 @@ def add():
 @panel_login_required
 def stop():
     site_id = request.form.get('id', '')
-    site_name = request.form.get('name', '')
-    return MwSites.instance().stop(site_id, site_name)
+    return MwSites.instance().stop(site_id)
 
 # 站点开启
 @blueprint.route('/start', endpoint='start',methods=['POST'])
 @panel_login_required
 def start():
     site_id = request.form.get('id', '')
-    site_name = request.form.get('name', '')
-    return MwSites.instance().start(site_id, site_name)
+    return MwSites.instance().start(site_id)
 
 # 添加站点 - 域名
 @blueprint.route('/add_domain', endpoint='add_domain',methods=['POST'])

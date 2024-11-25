@@ -114,10 +114,10 @@ def runPanelTask():
             thisdb.setTaskData(run_task['id'], end=end)
             thisdb.setTaskStatus(run_task['id'], 1)
     except Exception as e:
-        print(mw.getTracebackInfo())
+        pass
 
     # 站点过期检查
-    # siteEdate()
+    siteEdateCheck()
 
 # 任务队列
 def startPanelTask():
@@ -130,25 +130,20 @@ def startPanelTask():
         startPanelTask()
 
 # 网站到期处理
-def siteEdate():
-    global oldEdate
+def siteEdateCheck():
     try:
-        if not oldEdate:
-            oldEdate = mw.readFile('data/edate.pl')
-        if not oldEdate:
-            oldEdate = '0000-00-00'
-        mEdate = time.strftime('%Y-%m-%d', time.localtime())
-        if oldEdate == mEdate:
+        from utils.site import sites as MwSites
+        website_edate = thisdb.getOption('website_edate', default='0000-00-00')
+        now_time_ymd = time.strftime('%Y-%m-%d', time.localtime())
+
+        if website_edate == now_time_ymd:
             return False
-        edateSites = mw.M('sites').where('edate>? AND edate<? AND (status=? OR status=?)',
-                                         ('0000-00-00', mEdate, 1, '正在运行')).field('id,name').select()
-        import site_api
-        for site in edateSites:
-            site_api.site_api().stop(site['id'], site['name'])
-        oldEdate = mEdate
-        mw.writeFile('data/edate.pl', mEdate)
+        site_list = thisdb.getSitesEdateList(now_time_ymd)
+        for site in site_list:
+            MwSites.instance().stop(site['id'])
+        thisdb.setOption('website_edate', now_time_ymd)
     except Exception as e:
-        print(mw.getTracebackInfo())
+        pass
 
 
 def systemTask():
