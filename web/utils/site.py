@@ -421,7 +421,8 @@ class sites(object):
         return mw.returnData(True, '站点【%s】删除成功!' % webname)
 
     def nginxAddConf(self):
-        source_tpl = mw.getPanelDir() + '/data/tpl/nginx.conf'
+
+        source_tpl = self.getNgxTplDir() + '/nginx.conf'
         vhost_file = self.getHostConf(self.siteName)
         content = mw.readFile(source_tpl)
 
@@ -605,17 +606,20 @@ class sites(object):
         return mw.returnData(True, mw.getLastLine(logPath, 100))
 
     def getNgxRewriteDir(self):
-        return mw.getPanelDir() + '/web/misc/nginx/rewrite/'
+        return mw.getPanelDir() + '/web/misc/nginx/rewrite'
+
+    def getNgxTplDir(self):
+        return mw.getPanelDir() + '/web/misc/nginx/tpl'
 
     # 获取模版名内容
-    def getRewriteTpl(self, tplname):
-        file = self.getNgxRewriteDir() + tplname + '.conf'
+    def getRewriteTpl(self, name):
+        path = self.getNgxRewriteDir() +'/'+ name + ".conf"
         if not os.path.exists(file):
             return mw.returnData(False, '模版不存在!')
         return mw.returnData(True, 'OK', file)
 
     def setRewriteTpl(self,name,data):
-        path = self.getNgxRewriteDir() + name + ".conf"
+        path = self.getNgxRewriteDir() +'/'+ name + ".conf"
         if os.path.exists(path):
             return mw.returnData(False, '模版已经存在!')
 
@@ -820,7 +824,7 @@ class sites(object):
             domain_split = re.search(rep, conf).groups()
             version = domain_split[0]
 
-            source_dirbind_tpl = mw.getPanelDir() + '/data/tpl/nginx_dirbind.conf'
+            source_dirbind_tpl = self.getNgxTplDir() + '/nginx_dirbind.conf'
             content = mw.readFile(source_dirbind_tpl)
             content = content.replace('{$PORT}', port)
             content = content.replace('{$PHPVER}', version)
