@@ -1,0 +1,52 @@
+# coding:utf-8
+
+# ---------------------------------------------------------------------------------
+# MW-Linux面板
+# ---------------------------------------------------------------------------------
+# copyright (c) 2018-∞(https://github.com/midoks/mdserver-web) All rights reserved.
+# ---------------------------------------------------------------------------------
+# Author: midoks <midoks@163.com>
+# ---------------------------------------------------------------------------------
+
+import re
+import json
+import os
+import time
+
+from flask import Blueprint, render_template
+from flask import request
+
+from admin import session
+from admin.user_login_check import panel_login_required
+
+import core.mw as mw
+import utils.config as utils_config
+
+from utils.setting import setting as MwSetting
+
+from .setting import blueprint
+import thisdb
+
+# 获取面板证书信息
+@blueprint.route('/get_panel_ssl', endpoint='get_panel_ssl', methods=['POST'])
+@panel_login_required
+def get_panel_ssl():
+    return MwSetting.instance().getPanelSsl()
+
+
+# 获取面板证书信息
+@blueprint.route('/save_panel_ssl', endpoint='save_panel_ssl', methods=['POST'])
+@panel_login_required
+def save_panel_ssl():
+    choose = request.form.get('choose', '').strip()
+    certPem = request.form.get('certPem', '').strip()
+    privateKey = request.form.get('privateKey', '').strip()
+    return MwSetting.instance().savePanelSsl(choose,certPem,privateKey)
+
+# 获取面板证书信息
+@blueprint.route('/del_panel_ssl', endpoint='del_panel_ssl', methods=['POST'])
+@panel_login_required
+def del_panel_ssl():
+    choose = request.form.get('choose', '').strip()
+    return MwSetting.instance().delPanelSsl(choose)
+

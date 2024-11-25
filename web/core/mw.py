@@ -1548,9 +1548,10 @@ def getCertName(certPath):
         return None
 
 def createLocalSSL():
-    if not os.path.exists('ssl/local'):
-        execShell('mkdir -p ssl/local')
-
+    pdir = getPanelDir()
+    local_dir = pdir+'/ssl/local'
+    if not os.path.exists(local_dir):
+        execShell('mkdir -p ' + local_dir)
 
     # 自签证书
     # if os.path.exists('ssl/local/input.pl'):
@@ -1577,8 +1578,8 @@ def createLocalSSL():
     cert_ca = OpenSSL.crypto.dump_certificate(OpenSSL.crypto.FILETYPE_PEM, cert)
     private_key = OpenSSL.crypto.dump_privatekey(OpenSSL.crypto.FILETYPE_PEM, key)
     if len(cert_ca) > 100 and len(private_key) > 100:
-        writeFile('ssl/local/cert.pem', cert_ca, 'wb+')
-        writeFile('ssl/local/private.pem', private_key, 'wb+')
+        writeFile(local_dir+'/cert.pem', cert_ca, 'wb+')
+        writeFile(local_dir+'/private.pem', private_key, 'wb+')
         return True
     return False
 

@@ -905,7 +905,7 @@ function getPanelSSL(){
 						btn3:function(){
 							data['choose'] = 'nginx';
 							var loadT = layer.msg('正在安装并设置SSL组件,这需要几分钟时间...',{icon:16,time:0,shade: [0.3, '#000']});
-							$.post('/config/save_panel_ssl',data,function(rdata){
+							$.post('/setting/save_panel_ssl',data,function(rdata){
 								layer.close(loadT);
 								if(rdata.status){
 									layer.closeAll();
@@ -917,7 +917,7 @@ function getPanelSSL(){
 					function(index) {
 						data['choose'] = 'local';
 				    	var loadT = layer.msg('正在安装并设置SSL组件,这需要几分钟时间...',{icon:16,time:0,shade: [0.3, '#000']});
-						$.post('/config/save_panel_ssl',data,function(rdata){
+						$.post('/setting/save_panel_ssl',data,function(rdata){
 							layer.close(loadT);
 							if(rdata.status){
 								layer.closeAll();
@@ -942,7 +942,7 @@ function getPanelSSL(){
 							var data = {};
 							data['choose'] = 'nginx';
 							var loadT = layer.msg('正在删除面板SSL【nginx】...',{icon:16,time:0,shade: [0.3, '#000']});
-							$.post('/config/del_panel_ssl',data,function(rdata){
+							$.post('/setting/del_panel_ssl',data,function(rdata){
 								layer.close(loadT);
 								if(rdata.status){
 									layer.closeAll();
