@@ -31,8 +31,6 @@ from admin import setup
 setup.init()
 
 g_log_file = mw.getPanelTaskLog()
-isTask = mw.getMWLogs() + '/panelTask.pl'
-
 if not os.path.exists(g_log_file):
     os.system("touch " + g_log_file)
 
@@ -95,6 +93,9 @@ def downloadHook(count, blockSize, totalSize):
     writeLogs(json.dumps(speed))
 
 def runPanelTask():
+    # 站点过期检查
+    siteEdateCheck()
+
     try:
         bash_list = thisdb.getTaskList(status=-1)
         for task in bash_list:
@@ -116,19 +117,6 @@ def runPanelTask():
     except Exception as e:
         pass
 
-    # 站点过期检查
-    siteEdateCheck()
-
-# 任务队列
-def startPanelTask():
-    try:
-        while True:
-            runPanelTask()
-            time.sleep(5)
-    except Exception as e:
-        time.sleep(30)
-        startPanelTask()
-
 # 网站到期处理
 def siteEdateCheck():
     try:
@@ -145,6 +133,15 @@ def siteEdateCheck():
     except Exception as e:
         pass
 
+# 任务队列
+def startPanelTask():
+    try:
+        while True:
+            runPanelTask()
+            time.sleep(5)
+    except Exception as e:
+        time.sleep(30)
+        startPanelTask()
 
 def systemTask():
     # 系统监控任务
@@ -156,7 +153,6 @@ def systemTask():
     except Exception as ex:
         time.sleep(30)
         systemTask()
-
 
 # -------------------------------------- PHP监控 start --------------------------------------------- #
 # 502错误检查线程
@@ -239,7 +235,7 @@ def startPHPVersion(version):
         if os.path.exists(cgi):
             return True
     except Exception as e:
-        print(mw.getTracebackInfo())
+        # print(mw.getTracebackInfo())
         mw.writeLog('PHP守护程序', '自动修复异常:'+str(e))
         return True
 
@@ -331,12 +327,10 @@ def run():
     oraos = setDaemon(oraos)
     oraos.start()
 
-
     # OpenResty Auto Restart Start
     oar = threading.Thread(target=openrestyAutoRestart)
     oar = setDaemon(oar)
     oar.start()
-
 
     # Panel Restart Start
     rps = threading.Thread(target=restartPanelService)
