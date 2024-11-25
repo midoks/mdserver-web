@@ -248,9 +248,17 @@ def get_rewrite_conf():
 # 获取Rewrite模版名
 @blueprint.route('/get_rewrite_tpl', endpoint='get_rewrite_tpl',methods=['POST'])
 @panel_login_required
-def get_php_version():
+def get_rewrite_tpl():
     tplname = request.form.get('tplname', '')
     return MwSites.instance().getRewriteTpl(tplname)
+
+# 设置Rewrite模版名
+@blueprint.route('/set_rewrite_tpl', endpoint='set_rewrite_tpl',methods=['POST'])
+@panel_login_required
+def set_rewrite_tpl():
+    name = request.form.get('name', '')
+    data = request.form.get('data', '')
+    return MwSites.instance().setRewriteTpl(name,data)
 
 # 网站日志开关
 @blueprint.route('/logs_open', endpoint='logs_open',methods=['POST'])

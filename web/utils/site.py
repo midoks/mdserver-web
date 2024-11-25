@@ -606,16 +606,29 @@ class sites(object):
 
     # 获取模版名内容
     def getRewriteTpl(self, tplname):
-        file = mw.getPanelDir() + '/rewrite/nginx/' + tplname + '.conf'
+        file = mw.getPanelDir() + '/web/misc/nginx/rewrite/' + tplname + '.conf'
         if not os.path.exists(file):
             return mw.returnData(False, '模版不存在!')
         return mw.returnData(True, 'OK', file)
+
+    def setRewriteTpl(self,name,data):
+        path = mw.getPanelDir() + '/web/misc/nginx/rewrite/' + name + ".conf"
+        if os.path.exists(path):
+            return mw.returnData(False, '模版已经存在!')
+
+        if data == "":
+            return mw.returnData(False, '模版内容不能为空!')
+        ok = mw.writeFile(path, data)
+        if not ok:
+            return mw.returnData(False, '模版保持失败!')
+
+        return mw.returnData(True, '设置模板成功!')
 
     def getRewriteList(self):
         rewriteList = {}
         rewriteList['rewrite'] = []
         rewriteList['rewrite'].append('0.当前')
-        rewrite_nginx_dir = mw.getPanelDir() + '/rewrite/nginx'
+        rewrite_nginx_dir = mw.getPanelDir() + '/web/misc/nginx/rewrite'
         for ds in os.listdir(rewrite_nginx_dir):
             rewriteList['rewrite'].append(ds[0:len(ds) - 5])
         rewriteList['rewrite'] = sorted(rewriteList['rewrite'])
