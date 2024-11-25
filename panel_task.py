@@ -94,7 +94,7 @@ def runPanelTask():
     siteEdateCheck()
 
     lock_file = mw.getTriggerTaskLockFile()
-    # mw.writeFile(lock_file,'True')
+    mw.writeFile(lock_file,'True')
     try:
         if os.path.exists(lock_file):
             bash_list = thisdb.getTaskList(status=-1)
