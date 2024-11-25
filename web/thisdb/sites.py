@@ -74,7 +74,8 @@ def getSitesList(
     page:int | None = 1,
     size:int | None = 10,
     type_id:int | None = 0,
-    search: str | None = ''
+    search: str | None = '',
+    order:str | None = None,
 ):
     sql_where = ''
     if search != '' :
@@ -94,7 +95,11 @@ def getSitesList(
 
     start = (int(page) - 1) * (int(size))
     limit = str(start) + ',' +str(size)
-    site_list = dbM.limit(limit).order('id desc').select()
+
+    if order is not None:
+        site_list = dbM.limit(limit).order(order).select()
+    else:
+        site_list = dbM.limit(limit).order('id desc').select()
 
     
     data = {}

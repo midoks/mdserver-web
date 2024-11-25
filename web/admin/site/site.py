@@ -34,8 +34,9 @@ def list():
     limit = request.form.get('limit', '10')
     type_id = request.form.get('type_id', '0').strip()
     search = request.form.get('search', '').strip()
+    order = request.form.get('order', '').strip()
 
-    info = thisdb.getSitesList(page=int(p),size=int(limit),type_id=int(type_id), search=search)
+    info = thisdb.getSitesList(page=int(p),size=int(limit),type_id=int(type_id), search=search,order=order)
 
     data = {}
     data['data'] = info['list']

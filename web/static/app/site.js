@@ -45,56 +45,56 @@ function getDate(a) {
 		type = '&type_id='+type_id;
 	}
 
-	var sUrl = '/site/list';
 	var pdata = 'limit=10&p=' + page + '&search=' + search + order + type;
 	var loadT = layer.load();
 	//取回数据
-	$.post(sUrl, pdata, function(data) {
+	$.post('/site/list', pdata, function(data) {
 		layer.close(loadT);
 		//构造数据列表
 		var body = '';
 		$("#webBody").html(body);
-		for (var i = 0; i < data.data.length; i++) {
+		var list = data.data;
+		for (var i = 0; i < list.length; i++) {
 			//当前站点状态
-			if (data.data[i].status == '正在运行' || data.data[i].status == '1') {
-				var status = "<a href='javascript:;' title='停用这个站点' onclick=\"webStop(" + data.data[i].id + ",'" + data.data[i].name + "')\" class='btn-defsult'><span style='color:rgb(92, 184, 92)'>运行中</span><span style='color:rgb(92, 184, 92)' class='glyphicon glyphicon-play'></span></a>";
+			if (list[i].status == '正在运行' || list[i].status == '1') {
+				var status = "<a href='javascript:;' title='停用这个站点' onclick=\"webStop(" + list[i].id + ",'" + list[i].name + "')\" class='btn-defsult'><span style='color:rgb(92, 184, 92)'>运行中</span><span style='color:rgb(92, 184, 92)' class='glyphicon glyphicon-play'></span></a>";
 			} else {
-				var status = "<a href='javascript:;' title='启用这个站点' onclick=\"webStart(" + data.data[i].id + ",'" + data.data[i].name + "')\" class='btn-defsult'><span style='color:red'>已停止</span><span style='color:rgb(255, 0, 0);' class='glyphicon glyphicon-pause'></span></a>";
+				var status = "<a href='javascript:;' title='启用这个站点' onclick=\"webStart(" + list[i].id + ",'" + list[i].name + "')\" class='btn-defsult'><span style='color:red'>已停止</span><span style='color:rgb(255, 0, 0);' class='glyphicon glyphicon-pause'></span></a>";
 			}
 
 			//是否有备份
-			if (data.data[i].backup_count > 0) {
-				var backup = "<a href='javascript:;' class='btlink' onclick=\"getBackup(" + data.data[i].id + ")\">有备份</a>";
+			if (list[i].backup_count > 0) {
+				var backup = "<a href='javascript:;' class='btlink' onclick=\"getBackup(" + list[i].id + ")\">有备份</a>";
 			} else {
-				var backup = "<a href='javascript:;' class='btlink' onclick=\"getBackup(" + data.data[i].id + ")\">无备份</a>";
+				var backup = "<a href='javascript:;' class='btlink' onclick=\"getBackup(" + list[i].id + ")\">无备份</a>";
 			}
 			//是否设置有效期
-			var web_end_time = (data.data[i].edate == "0000-00-00") ? '永久': data.data[i].edate;
+			var web_end_time = (list[i].edate == "0000-00-00") ? '永久': list[i].edate;
 			//表格主体
-			var shortwebname = data.data[i].name;
-			var shortpath = data.data[i].path;
-			if(data.data[i].name.length > 30) {
-				shortwebname = data.data[i].name.substring(0, 30) + "...";
+			var shortwebname = list[i].name;
+			var shortpath = list[i].path;
+			if(list[i].name.length > 30) {
+				shortwebname = list[i].name.substring(0, 30) + "...";
 			}
-			if(data.data[i].path.length > 30){
-				shortpath = data.data[i].path.substring(0, 30) + "...";
+			if(list[i].path.length > 30){
+				shortpath = list[i].path.substring(0, 30) + "...";
 			}
-			var idname = data.data[i].name.replace(/\./g,'_');
+			var idname = list[i].name.replace(/\./g,'_');
 			
-			body = "<tr><td><input type='checkbox' name='id' title='"+data.data[i].name+"' onclick='checkSelect();' value='" + data.data[i].id + "'></td>\
-					<td><a class='btlink webtips' href='javascript:;' onclick=\"webEdit(" + data.data[i].id + ",'" + data.data[i].name + "','" + data.data[i].edate + "','" + data.data[i].add_time + "')\" title='"+data.data[i].name+"'>" + shortwebname + "</td>\
+			body = "<tr><td><input type='checkbox' name='id' title='"+list[i].name+"' onclick='checkSelect();' value='" + list[i].id + "'></td>\
+					<td><a class='btlink webtips' href='javascript:;' onclick=\"webEdit(" + list[i].id + ",'" + list[i].name + "','" + list[i].edate + "','" + list[i].add_time + "')\" title='"+list[i].name+"'>" + shortwebname + "</td>\
 					<td>" + status + "</td>\
 					<td>" + backup + "</td>\
-					<td><a class='btlink' title='打开目录"+data.data[i].path+"' href=\"javascript:openPath('"+data.data[i].path+"');\">" + shortpath + "</a></td>\
-					<td><a class='btlink setTimes' id='site_"+data.data[i].id+"' data-ids='"+data.data[i].id+"'>" + web_end_time + "</a></td>\
-					<td><a class='btlinkbed' href='javascript:;' data-id='"+data.data[i].id+"'>" + data.data[i].ps + "</a></td>\
+					<td><a class='btlink' title='打开目录"+list[i].path+"' href=\"javascript:openPath('"+data.data[i].path+"');\">" + shortpath + "</a></td>\
+					<td><a class='btlink setTimes' id='site_"+list[i].id+"' data-ids='"+list[i].id+"'>" + web_end_time + "</a></td>\
+					<td><a class='btlinkbed' href='javascript:;' data-id='"+list[i].id+"'>" + list[i].ps + "</a></td>\
 					<td style='text-align:right; color:#bbb'>\
-					<a href='javascript:;' class='btlink' onclick=\"webEdit(" + data.data[i].id + ",'" + data.data[i].name + "','" + data.data[i].edate + "','" + data.data[i].add_time + "')\">设置</a>\
-                        | <a href='javascript:;' class='btlink' onclick=\"webDelete('" + data.data[i].id + "','" + data.data[i].name + "')\" title='删除站点'>删除</a>\
+					<a href='javascript:;' class='btlink' onclick=\"webEdit(" + list[i].id + ",'" + list[i].name + "','" +list[i].edate + "','" + list[i].add_time + "')\">设置</a>\
+                        | <a href='javascript:;' class='btlink' onclick=\"webDelete('" + list[i].id + "','" + list[i].name + "')\" title='删除站点'>删除</a>\
 					</td></tr>"
 			
 			$("#webBody").append(body);
-            $('#webBody').on('click','#site_'+ data.data[i].id,function(){
+            $('#webBody').on('click','#site_'+ list[i].id,function(){
 				var _this = $(this);
 				var id = $(this).attr('data-ids');
 				laydate.render({
@@ -134,7 +134,6 @@ function getDate(a) {
 		
 		//输出分页
 		$("#webPage").html(data.page);
-		// $("#webPage").html('<div class="site_type"><span>站点分类:</span><select class="bt-input-text mr5" style="width:100px"><option value="-1">全部分类</option><option value="0">默认分类</option></select></div>');
 		
 		$(".btlinkbed").click(function(){
 			var dataid = $(this).attr("data-id");
@@ -336,9 +335,7 @@ function webAddPage(type) {
 				if (len > 20) {
 					str = str.substring(0, 20);
 					$(this).val(str);
-					layer.msg('不能超出20个字符!', {
-						icon: 0
-					});
+					layer.msg('不能超出20个字符!', {icon: 0});
 				}
 			})
 			//获取当前时间时间戳，截取后6位
