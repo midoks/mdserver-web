@@ -67,7 +67,7 @@ def getConfInc():
 def getPort():
     file = getConf()
     content = mw.readFile(file)
-    rep = 'listen\s*(.*);'
+    rep = r'listen\s*(.*);'
     tmp = re.search(rep, content)
     return tmp.groups()[0].strip()
 
@@ -196,8 +196,8 @@ def status():
 def __release_port(port):
     from collections import namedtuple
     try:
-        import firewall_api
-        firewall_api.firewall_api().addAcceptPortArgs(port, 'phpMyAdmin默认端口', 'port')
+        from utils.firewall import Firewall as MwFirewall
+        MwFirewall.instance().addAcceptPort(port, 'phpMyAdmin默认端口', 'port')
         return port
     except Exception as e:
         return "Release failed {}".format(e)
@@ -206,8 +206,8 @@ def __release_port(port):
 def __delete_port(port):
     from collections import namedtuple
     try:
-        import firewall_api
-        firewall_api.firewall_api().delAcceptPortArgs(port, 'tcp')
+        from utils.firewall import Firewall as MwFirewall
+        MwFirewall.instance().delAcceptPortCmd(port, 'tcp')
         return port
     except Exception as e:
         return "Release failed {}".format(e)
