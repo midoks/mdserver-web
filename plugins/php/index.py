@@ -978,14 +978,10 @@ def installLib(version):
         return data[1]
 
     name = args['name']
-    execstr = "cd " + getPluginDir() + "/versions && /bin/bash  common.sh " + \
-        version + ' install ' + name
-
-    rettime = time.strftime('%Y-%m-%d %H:%M:%S')
-    insert_info = (None, '安装[' + name + '-' + version + ']',
-                   'execshell', '0', rettime, execstr)
-    mw.M('tasks').add('id,name,type,status,addtime,execstr', insert_info)
-
+    cmd = "cd " + getPluginDir() + "/versions && /bin/bash  common.sh " + version + ' install ' + name
+    install_name = '安装[' + name + '-' + version + ']'
+    import thisdb
+    thisdb.addTask(name=install_name,cmd=cmd)
     mw.triggerTask()
     return mw.returnJson(True, '已将下载任务添加到队列!')
 
