@@ -78,8 +78,6 @@ class plugin(object):
     ]
 
     __plugin_dir = 'plugins'
-    __index = 'data/json/index.json'
-    __index_data = None
 
     # lock
     _instance_lock = threading.Lock()
@@ -95,14 +93,7 @@ class plugin(object):
     """插件类初始化"""
     def __init__(self):
         self.__plugin_dir = mw.getPluginDir()
-        self.__index = mw.getPanelDataDir() + '/json/index.json'
-        self.initIndexData()
 
-
-    def initIndexData(self):
-        if not os.path.exists(self.__index):
-            mw.writeFile(self.__index, '[]')
-        self.__index_data = json.loads(mw.readFile(self.__index))
 
     def getIndexList(self):
         indexList = thisdb.getOptionByJson('display_index')
@@ -307,9 +298,9 @@ class plugin(object):
             return False
 
     def getVersion(self, path):
-        version_t = path + '/version.pl'
-        if os.path.exists(version_t):
-            return mw.readFile(version_t).strip()
+        version_pl = path + '/version.pl'
+        if os.path.exists(version_pl):
+            return mw.readFile(version_pl).strip()
         return ''
 
     def checkIndexList(self, name, version):
@@ -321,7 +312,7 @@ class plugin(object):
         return False
 
     def checkDisplayIndex(self, name, version, coexist):
-        indexList = self.__index_data
+        indexList = thisdb.getOptionByJson('display_index',default=[])
         if coexist:
             if type(version) == list:
                 for index in range(len(version)):
