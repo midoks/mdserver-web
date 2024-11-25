@@ -106,6 +106,7 @@ def setSitesData(site_id,
     edate: str | None = None,
     ps: str | None = None,
     path: str | None = None,
+    status: str | None = None,
 ):
     update_data = {}
     if edate is not None:
@@ -115,6 +116,9 @@ def setSitesData(site_id,
 
     if path is not None:
         update_data['path'] = path
+
+    if status is not None:
+        update_data['status'] = status
 
     return mw.M('sites').where('id=?',(site_id,)).update(update_data)
 

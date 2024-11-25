@@ -211,6 +211,53 @@ class sites(object):
         mw.restartWeb()
         return mw.returnData(True, '添加成功')
 
+    def stop(self, site_id, site_name):
+        path = self.setupPath + '/stop'
+        if not os.path.exists(path):
+            os.makedirs(path)
+            default_text = 'The website has been closed!!!'
+            mw.writeFile(path + '/index.html', default_text)
+
+        binding = thisdb.getBindingListBySiteId(site_id)
+        for b in binding:
+            bpath = path + '/' + b['path']
+            if not os.path.exists(bpath):
+                mw.execShell('mkdir -p ' + bpath)
+                mw.execShell('ln -sf ' + path +'/index.html ' + bpath + '/index.html')
+
+        site_info = thisdb.getSitesById(site_id)
+
+        # nginx
+        file = self.getHostConf(site_name)
+        conf = mw.readFile(file)
+        if conf:
+            conf = conf.replace(site_info['path'], path)
+            mw.writeFile(file, conf)
+
+        thisdb.setSitesData(site_id, status='0')
+        msg = mw.getInfo('网站[{1}]已被停用!', (site_name,))
+        mw.writeLog('网站管理', msg)
+        mw.restartWeb()
+        return mw.returnData(True, '站点已停用!')
+
+    def start(self, site_id, site_name):
+        path = self.setupPath + '/stop'
+
+        site_info = thisdb.getSitesById(site_id)
+        # nginx
+        file = self.getHostConf(site_name)
+        conf = mw.readFile(file)
+        if conf:
+            conf = conf.replace(path, site_info['path'])
+            mw.writeFile(file, conf)
+
+        thisdb.setSitesData(site_id, status='1')
+        
+        msg = mw.getInfo('网站[{1}]已被启用!', (site_name,))
+        mw.writeLog('网站管理', msg)
+        mw.restartWeb()
+        return mw.returnData(True, '站点已启用!')
+
     def nginxAddDomain(self, site_name, domain, port):
         file = self.getHostConf(site_name)
         conf = mw.readFile(file)
