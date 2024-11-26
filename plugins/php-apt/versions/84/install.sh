@@ -9,7 +9,6 @@ serverPath=$(dirname "$rootPath")
 sourcePath=${serverPath}/source
 sysName=`uname`
 
-
 #获取信息和版本
 # bash /www/server/mdsever-web/scripts/getos.sh
 bash ${rootPath}/scripts/getos.sh
@@ -22,6 +21,7 @@ PHP_VER=84
 
 Install_php()
 {
+apt update -y
 #------------------------ install start ------------------------------------#
 apt -y install php${version} php${version}-fpm php${version}-dev
 if [ "$?" == "0" ];then
