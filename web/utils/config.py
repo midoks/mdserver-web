@@ -14,7 +14,7 @@ import core.mw as mw
 import thisdb
 
 def getUnauthStatus(
-    code: str | None = '0'
+    code= '0'
 ):
     code = str(code)
     data = {}
