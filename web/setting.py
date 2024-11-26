@@ -77,7 +77,7 @@ if workers > 2:
 threads = workers * 1
 backlog = 512
 reload = False
-daemon = False
+daemon = True
 # worker_class = 'geventwebsocket.gunicorn.workers.GeventWebSocketWorker'
 worker_class = 'eventlet'
 timeout = 600
