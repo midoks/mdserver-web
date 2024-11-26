@@ -19,8 +19,10 @@ def initPanelData():
         return True
     sql_file = mw.getPanelDir() + '/web/admin/setup/sql/default.sql'
     sql = mw.M().dbPos(mw.getPanelDataDir(),'panel')
-    csql = mw.readFile(sql_file)
-    csql_list = csql.split(';')
-    for index in range(len(csql_list)):
-        sql.execute(csql_list[index], ())
+    content = mw.readFile(sql_file)
+    csql_data = content.split(';')
+    for i in range(len(csql_data)):
+        # print(csql_data[i])
+        # print(sql.execute(csql_data[i], ()))
+        sql.execute(csql_data[i], ())
     return True
