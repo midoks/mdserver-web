@@ -17,8 +17,8 @@ import config
 from gevent.pywsgi import WSGIServer
 from geventwebsocket.handler import WebSocketHandler
 
-# from gevent import monkey
-# monkey.patch_all()
+import eventlet
+eventlet.monkey_patch(socket=True, select=True)
 
 
 if sys.version_info < (3, 6):

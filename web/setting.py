@@ -23,6 +23,10 @@ import core.mw as mw
 import utils.system as system 
 import thisdb
 
+# 初始化db
+from admin import setup
+setup.init()
+
 cpu_info = system.getCpuInfo()
 workers = cpu_info[1]
 
@@ -73,7 +77,7 @@ if workers > 2:
 threads = workers * 1
 backlog = 512
 reload = False
-daemon = True
+daemon = False
 # worker_class = 'geventwebsocket.gunicorn.workers.GeventWebSocketWorker'
 worker_class = 'eventlet'
 timeout = 600

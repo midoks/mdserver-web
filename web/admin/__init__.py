@@ -30,14 +30,16 @@ from flask_migrate import Migrate
 from flask_caching import Cache
 from werkzeug.local import LocalProxy
 
-from admin import setup
+
 from admin.common import isLogined
 
 import core.mw as mw
 import config
 import utils.config as utils_config
 import thisdb
+
 # 初始化db
+from admin import setup
 setup.init()
 
 # from threading import Lock
@@ -77,8 +79,6 @@ try:
         app.config['BASIC_AUTH_OPEN'] = True
 except Exception as e:
     pass
-    
-
 
 # 加载模块
 from .submodules import get_submodules
@@ -177,6 +177,7 @@ def webssh(data):
     shell = ssh_local.ssh_local.instance()
     shell.run(data)
     return
+
 
 # File logging
 logger = logging.getLogger('werkzeug')
