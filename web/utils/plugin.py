@@ -222,7 +222,7 @@ class plugin(object):
         return False
 
     def install(self, name, version,
-        upgrade: bool | None = None
+        upgrade = None
     ):
         if name.strip() == '':
             return mw.returnData(False, '缺少插件名称!', ())
@@ -283,7 +283,7 @@ class plugin(object):
 
     # 插件搜索匹配
     def searchKey(self, info,
-        keyword: str | None = None,
+        keyword = None,
     ):
         if keyword == None:
             return True
@@ -456,8 +456,8 @@ class plugin(object):
 
 
     def getPluginList(self, name,
-        keyword: str | None = None,
-        type: str | None = None,
+        keyword = None,
+        type = None,
     ):
         info = []
         path = self.__plugin_dir + '/' + name
@@ -513,10 +513,10 @@ class plugin(object):
 
     def getAllPluginList(
         self,
-        type: str | None = None,
-        keyword: str | None = None,
-        page: int | None = 1, 
-        size: int | None = 10, 
+        type = None,
+        keyword = None,
+        page = 1, 
+        size = 10, 
     ):
         info = []
 
@@ -539,10 +539,10 @@ class plugin(object):
 
     def getList(
         self,
-        type: str | None = None,
-        keyword: str | None = None,
-        page: int | None = 1, 
-        size: int | None = 10, 
+        type = None,
+        keyword = None,
+        page = 1, 
+        size  = 10, 
     ) -> object:
         # print(type,keyword,page,size)
         rdata = {}
@@ -555,9 +555,9 @@ class plugin(object):
 
     # shell/bash方式调用
     def run(self, name, func,
-        version: str | None = '',
-        args: str | None = '',
-        script: str | None = 'index',
+        version = '',
+        args  = '',
+        script  = 'index',
     ):
 
         path = self.__plugin_dir + '/' + name + '/' + script + '.py'
@@ -583,8 +583,8 @@ class plugin(object):
 
     # 映射包调用
     def callback(self, name, func,
-        args: str | None = '',
-        script: str | None = 'index',
+        args = '',
+        script = 'index',
     ):
 
         package = self.__plugin_dir + '/' + name
