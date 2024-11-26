@@ -71,11 +71,11 @@ def getSitesEdateList(edate):
     return elist
 
 def getSitesList(
-    page:int | None = 1,
-    size:int | None = 10,
-    type_id:int | None = 0,
-    search: str | None = '',
-    order:str | None = None,
+    page = 1,
+    size = 10,
+    type_id = 0,
+    search = '',
+    order = None,
 ):
     sql_where = ''
     if search != '' :
