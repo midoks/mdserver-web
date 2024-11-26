@@ -29,12 +29,15 @@ import thisdb
 @blueprint.route('/set_panel_api', endpoint='set_panel_api', methods=['POST'])
 @panel_login_required
 def set_panel_api():
-    admin_api = thisdb.getOption('api', default='no')
-    if admin_api == 'no':
-        thisdb.setOption('api', 'yes')
+    panel_api = thisdb.getOptionByJson('panel_api', default={'open':False})
+    if not panel_api['open']:
+        panel_api['open'] = True
+        thisdb.setOption('panel_api', json.dumps(panel_api))
         return mw.returnData(True, '开启API成功!')
-    thisdb.setOption('api', 'no')
-    return mw.returnData(True, '开启API成功!')
+    else:
+        panel_api['open'] = False
+        thisdb.setOption('panel_api', json.dumps(panel_api))
+        return mw.returnData(True, '关闭API成功!')
 
 
 # 获取APP列表

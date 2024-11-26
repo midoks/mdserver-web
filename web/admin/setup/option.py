@@ -53,7 +53,7 @@ def init_option():
     thisdb.setOption('admin_path', mw.getRandomString(8))
 
     # API是否开启|默认关闭
-    thisdb.setOption('api', 'no')
+    thisdb.setOption('panel_api', json.dumps({'open':False}))
 
     # 获取服务器IP
     ip = mw.getLocalIp()

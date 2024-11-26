@@ -129,7 +129,7 @@
 
 				<p class="mtb15">
 					<span class="set-tit text-right" title="API接口" style="float: left;">API接口</span>
-					<input class="btswitch btswitch-ios" id="cfg_panel_api" type="checkbox" {{data['api_token']}}/>
+					<input class="btswitch btswitch-ios" id="cfg_panel_api" type="checkbox" {% if data['panel_api']['open'] %}checked{% endif %}/>
 	                <label class="btswitch-btn ml5" for="cfg_panel_api" style="float: left;margin-top:4px;" onclick="setPanelApi()"></label>
 	                <button ype="button" class="btn btn-default btn-xs" style="vertical-align: middle; margin-left: 10px" onclick="appPage();">APP应用管理</button>
 					<span class="set-info c7">提供面板API接口访问的支持</span>

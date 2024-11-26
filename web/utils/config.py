@@ -81,9 +81,9 @@ def getGlobalVar():
     # 邮件通知设置
     data['notify_email'] = thisdb.getOptionByJson('notify_email', default={'open':False}, type='notify')
     data['notify_tgbot'] = thisdb.getOptionByJson('notify_tgbot', default={'open':False}, type='notify')
-
+    
+    data['panel_api'] = thisdb.getOptionByJson('panel_api', default={'open':False})
     data['panel_ssl'] = thisdb.getOptionByJson('panel_ssl', default={'open':False})
     data['panel_domain'] = thisdb.getOption('panel_domain', default='')
-    
     
     return data
