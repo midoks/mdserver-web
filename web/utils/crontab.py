@@ -274,8 +274,8 @@ class crontab(object):
         return True
 
     def getCrontabList(self,
-        page:int | None = 1,
-        size:int | None = 10
+        page = 1,
+        size = 10
     ):
         info = thisdb.getCrontabList(page=int(page),size=int(size))
 
