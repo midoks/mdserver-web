@@ -250,7 +250,7 @@ class plugin(object):
         self.hookInstall(info_data)
         title = '{0}[{1}-{2}]'.format(msg_head,name,version)
         thisdb.addTask(name=title,cmd=exec_bash, status=0)
-
+        mw.triggerTask()
         # 调式日志
         mw.debugLog(exec_bash)
         return mw.returnData(True, '已将安装任务添加到队列!')
