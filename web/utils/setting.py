@@ -271,3 +271,21 @@ class setting(object):
     #     if is_already_apply:
     #         return mw.returnJson(True, '重复申请!', data)
     #     return mw.returnJson(True, '申请成功!', data)
+
+    def setPanelDomain(self, domain):
+        port = mw.getPanelPort()
+        ip = mw.getLocalIp()
+
+        panel_domain = thisdb.getOption('panel_domain', default='')
+        if domain == '':
+            to_panel_url = 'http://'+ip+":"+str(port)+'/setting/index'
+            thisdb.setOption('panel_domain', '')
+            mw.restartMw()
+            return mw.returnData(True, '清空域名成功!', to_panel_url)
+
+        thisdb.setOption('panel_domain', domain)
+        to_panel_url = 'http://'+domain+":"+str(port)+'/setting/index'
+        mw.restartMw()
+        return mw.returnData(True, '设置域名成功!',to_panel_url)
+
+

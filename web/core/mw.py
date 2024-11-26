@@ -420,9 +420,61 @@ def getFileMd5(filename):
     return myhash.hexdigest()
 
 
+def getHost(port=False):
+    from flask import request
+    host_tmp = request.headers.get('host')
+    if not host_tmp:
+        if request.url_root:
+            tmp = re.findall(r"(https|http)://([\w:\.-]+)", request.url_root)
+            if tmp:
+                host_tmp = tmp[0][1]
+    if not host_tmp:
+        host_tmp = getLocalIp() + ':' + readFile('data/port.pl').strip()
+    try:
+        if host_tmp.find(':') == -1:
+            host_tmp += ':80'
+    except:
+        host_tmp = "127.0.0.1:8888"
+    h = host_tmp.split(':')
+    if port:
+        return h[-1]
+    return ':'.join(h[0:-1])
+
 def getClientIp():
     from flask import request
     return request.remote_addr.replace('::ffff:', '')
+
+def checkDomainPanel():
+    import thisdb
+    from flask import Flask, redirect, request, url_for
+    current_host = getHost()
+
+    domain = thisdb.getOption('panel_domain', default='')
+    port = getPanelPort()
+    scheme = 'http'
+
+    panel_ssl_data = thisdb.getOptionByJson('panel_ssl', default={'open':False})
+    if panel_ssl_data['open']:
+        choose = panel_ssl_data['choose']        
+        if not inArray(['local','nginx'], choose):
+            return False
+        scheme = 'https'
+
+    client_ip = getClientIp()
+    if client_ip in ['127.0.0.1', 'localhost', '::1']:
+        return False
+
+    ip = getHostAddr()
+    if domain == '':
+        if current_host.strip().lower() != ip.strip().lower():
+            to = scheme + "://" + ip + ":" + str(port)
+            return redirect(to, code=302)
+        return False
+    else:
+        if current_host.strip().lower() != domain.strip().lower():
+            to = scheme + "://" + domain + ":" + str(port)
+            return redirect(to, code=302)
+    return False
 
 def getLocalIp():
     filename = getPanelDir()+'/data/iplist.txt'

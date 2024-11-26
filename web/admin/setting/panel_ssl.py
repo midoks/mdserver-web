@@ -57,10 +57,21 @@ def set_panel_local_ssl():
     cert_type = request.form.get('cert_type', '').strip()
     return MwSetting.instance().setPanelLocalSsl(cert_type)
 
+# 关闭面板证书
 @blueprint.route('/close_panel_ssl', endpoint='close_panel_ssl', methods=['POST'])
 @panel_login_required
 def close_panel_ssl():
     return MwSetting.instance().closePanelSsl()
+
+# 设置面板域名
+@blueprint.route('/set_panel_domain', endpoint='set_panel_domain', methods=['POST'])
+@panel_login_required
+def set_panel_domain():
+    domain = request.form.get('domain', '').strip()
+    return MwSetting.instance().setPanelDomain(domain)
+
+
+
 
 
 

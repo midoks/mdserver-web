@@ -117,6 +117,10 @@ def requestCheck():
         basic_pwd = mw.md5(auth.password.strip() + salt)
         if basic_user != basic_auth['basic_user'] or basic_pwd != basic_auth['basic_pwd']:
             return sendAuthenticated()
+
+    domain_check = mw.checkDomainPanel()
+    if domain_check:
+        return domain_check
             
 
 

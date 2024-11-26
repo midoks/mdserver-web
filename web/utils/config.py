@@ -85,5 +85,7 @@ def getGlobalVar():
     data['notify_tgbot'] = thisdb.getOptionByJson('notify_tgbot', default={'open':False}, type='notify')
 
     data['panel_ssl'] = thisdb.getOptionByJson('panel_ssl', default={'open':False})
+    data['panel_domain'] = thisdb.getOption('panel_domain', default='')
+    
     
     return data
