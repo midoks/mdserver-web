@@ -24,10 +24,7 @@ def addApp(app_id,app_secret,white_list):
     }
     return mw.M('app').insert(add_data)
 
-def getAppList(
-    page:int | None = 1,
-    size:int | None = 10,
-):  
+def getAppList(page=1,size=10):  
     m = mw.M('app').field(__FIELD)
 
     start = (int(page) - 1) * (int(size))
@@ -53,11 +50,7 @@ def toggleAppStatus(aid):
     return mw.M('app').where('id=?',(aid,)).update({'status':1})
 
 
-def setAppData(aid,
-    status: str | None = None,
-    app_id: str | None = None,
-    app_secret: str | None = None,
-):
+def setAppData(aid, status=None, app_id=None, app_secret=None):
     up_data = {}
     if status is not None:
         up_data['status'] = status

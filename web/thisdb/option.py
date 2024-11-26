@@ -13,8 +13,8 @@ import json
 import core.mw as mw
 
 def getOption(name,
-    type: str | None = 'common',
-    default : str | None = None
+    type='common',
+    default=None
 ) -> str:
     '''
     获取配置的值
@@ -29,8 +29,8 @@ def getOption(name,
 
 
 def getOptionByJson(name,
-    type: str | None = 'common',
-    default : object | None = None
+    type='common',
+    default=None
 ) -> object:
     '''
     获取配置的值,返回对象类型
@@ -44,9 +44,7 @@ def getOptionByJson(name,
     if data is not None:
         return json.loads(data)
 
-def setOption(name, value,
-    type: str | None = 'common'
-) -> bool:
+def setOption(name, value, type = 'common') -> bool:
     '''
     设置配置的值
     :name -> str 名称 (必填)
