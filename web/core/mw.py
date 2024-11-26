@@ -463,16 +463,16 @@ def checkDomainPanel():
     if client_ip in ['127.0.0.1', 'localhost', '::1']:
         return False
 
-    ip = getHostAddr()
-    if domain == '':
-        if current_host.strip().lower() != ip.strip().lower():
-            to = scheme + "://" + ip + ":" + str(port)
-            return redirect(to, code=302)
-        return False
-    else:
-        if current_host.strip().lower() != domain.strip().lower():
-            to = scheme + "://" + domain + ":" + str(port)
-            return redirect(to, code=302)
+    # ip = getHostAddr()
+    # if domain == '':
+    #     if current_host.strip().lower() != ip.strip().lower():
+    #         to = scheme + "://" + ip + ":" + str(port)
+    #         return redirect(to, code=302)
+    #     return False
+    # else:
+    #     if current_host.strip().lower() != domain.strip().lower():
+    #         to = scheme + "://" + domain + ":" + str(port)
+    #         return redirect(to, code=302)
     return False
 
 def getLocalIp():
