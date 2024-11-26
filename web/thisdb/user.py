@@ -18,17 +18,17 @@ def initAdminUser():
     if data is None:
         name = mw.getRandomString(8).lower()
         password = mw.getRandomString(8).lower()
-        insert_time = mw.formatDate()
+        now_time = mw.formatDate()
         login_ip = '127.0.0.1'
         add_user = {
             'name':name, 
             'password':mw.md5(password),
             'login_ip':login_ip,
-            'login_time':insert_time,
+            'login_time':now_time,
             'phone':'',
             'email':'',
-            'add_time':insert_time,
-            'update_time':insert_time
+            'add_time':now_time,
+            'update_time':now_time
         }
         file_pass_pl = mw.getPanelDataDir() + '/default.pl'
         mw.writeFile(file_pass_pl, password)
