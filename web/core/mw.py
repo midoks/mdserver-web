@@ -543,10 +543,10 @@ def getOsID():
 
 # 获取文件权限描述
 def getFileStatsDesc(
-    filename: str | None = None,
-    path: str | None = None,
+    filename: str | None = '',
+    path: str | None = '',
 ):
-    if path is None or filename is None:
+    if path == '' or filename == '':
         return ';;;;;'
     try:
         filename = filename.replace('//', '/')
