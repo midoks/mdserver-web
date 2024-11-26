@@ -8,7 +8,7 @@ CREATE TABLE IF NOT EXISTS `network` (
   `up_packets` INTEGER,
   `addtime` INTEGER
 );
-CREATE INDEX addtime_idx ON network(`addtime`);
+CREATE INDEX network_addtime_idx ON network(`addtime`);
 
 CREATE TABLE IF NOT EXISTS `cpuio` (
   `id` INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -16,7 +16,7 @@ CREATE TABLE IF NOT EXISTS `cpuio` (
   `mem` TEXT,
   `addtime` INTEGER
 );
-CREATE INDEX addtime_idx ON cpuio(`addtime`);
+CREATE INDEX cpuio_addtime_idx ON cpuio(`addtime`);
 
 CREATE TABLE IF NOT EXISTS `diskio` (
   `id` INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -28,7 +28,7 @@ CREATE TABLE IF NOT EXISTS `diskio` (
   `write_time` INTEGER,
   `addtime` INTEGER
 );
-CREATE INDEX addtime_idx ON diskio(`addtime`);
+CREATE INDEX diskio_addtime_idx ON diskio(`addtime`);
 
 CREATE TABLE IF NOT EXISTS `load_average` (
   `id` INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -38,4 +38,4 @@ CREATE TABLE IF NOT EXISTS `load_average` (
   `fifteen` REAL,
   `addtime` INTEGER
 );
-CREATE INDEX addtime_idx ON load_average(`addtime`);
+CREATE INDEX load_average_addtime_idx ON load_average(`addtime`);
