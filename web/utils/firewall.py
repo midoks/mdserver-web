@@ -307,7 +307,7 @@ class Firewall(object):
         return mw.returnData(True, msg)
 
     def delAcceptPort(self, firewall_id, port,
-        protocol: str  | None ='tcp'
+        protocol='tcp'
     ):
         panel_port = mw.getPanelPort()
 
@@ -326,7 +326,7 @@ class Firewall(object):
             return mw.returnData(False, '删除失败!:' + str(e))
 
     def delAcceptPortCmd(self, port,
-        protocol: str  | None ='tcp'
+        protocol ='tcp'
     ):
         if self.__isUfw:
             if protocol == 'tcp':
