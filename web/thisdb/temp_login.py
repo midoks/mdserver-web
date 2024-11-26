@@ -14,10 +14,7 @@ import core.mw as mw
 
 __FIELD = 'id,token,salt,state,login_time,login_addr,logout_time,expire,add_time'
 
-def addTempLogin(
-    token:str | None = None,
-    expire:int | None = None
-):
+def addTempLogin(token = None,expire = None):
     if expire is None:
         start_time = int(time.time())
         expire=start_time+3600
@@ -40,10 +37,7 @@ def addTempLogin(
 
     return mw.M('temp_login').insert(insert_data)
 
-def getTempLoginPage(
-    page: int | None = 1,
-    size: int | None = 10,
-):
+def getTempLoginPage(page = 1,size = 10):
     start = (page - 1) * size
     limit = str(start) + ',' + str(size)
     tl_list = mw.M('temp_login').where('', ()).field(__FIELD).limit(limit).order('id desc').select()

@@ -17,9 +17,7 @@ def clearLog():
     mw.M('logs').where('id>?', (0,)).delete()
     return True
 
-def addLog(type, log,
-    uid: int | None = 1
-) -> str:
+def addLog(type, log, uid = 1) -> str:
     '''
     添加日志
     :type -> str 类型 (必填)
@@ -35,11 +33,7 @@ def addLog(type, log,
     mw.M('logs').insert(insert_data)
     return True
 
-def getLogsList(
-    page:int | None = 1,
-    size:int | None = 10,
-    search: str | None = ''
-):
+def getLogsList(page = 1,size = 10,search = ''):
     sql_where = ''
     if search != '' :
         sql_where = " type like '%" + search + "%' or log like '%" + search + "%' "

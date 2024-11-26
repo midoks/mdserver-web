@@ -12,9 +12,7 @@ import core.mw as mw
 
 __FIELD = 'id,name,type,start,end,cmd,status,add_time'
 
-def getTaskCount(
-        status: int | None = -1
-    ) -> int:
+def getTaskCount(status = -1) -> int:
     return mw.M('tasks').where('status=?',(1,)).count()
 
 
@@ -22,12 +20,7 @@ def getTaskCount(
 def getTaskUnexecutedCount() -> int:
     return mw.M('tasks').where('status!=?',(1,)).count()
 
-def addTaskByDownload(
-    name: str | None = '下载文件',
-    cmd: str | None = None,
-    type: str | None = 'download',
-    status: int | None = 0,
-):
+def addTaskByDownload(name = '下载文件',cmd = None,type = 'download',status = 0):
     '''
     添加后台任务
     :name -> str 类型
@@ -110,19 +103,13 @@ def getTaskFirstByRun() -> None:
         return None
     return data
 
-def getTaskRunList(
-    page: int | None = 1,
-    size: int | None = 10,
-):
+def getTaskRunList(page = 1,size = 10):
     start = (page - 1) * size
     limit = str(start) + ',' + str(size)
     task_list = mw.M('tasks').where('status!=?', (1,)).field(__FIELD).limit(limit).order('id asc').select()
     return task_list
 
-def getTaskRunPage(
-    page: int | None = 1,
-    size: int | None = 10,
-):
+def getTaskRunPage(page = 1, size = 10):
     start = (page - 1) * size
     limit = str(start) + ',' + str(size)
 
@@ -135,16 +122,11 @@ def getTaskRunPage(
     return rdata
 
 
-def setTaskStatus(task_id,
-    status: int | None = 0
-):
+def setTaskStatus(task_id,status = 0):
     mw.M('tasks').where('id=?',(task_id,)).update({'status':status})
     return True
 
-def setTaskData(id,
-    start: int | None = None,
-    end: int | None = None,
-):
+def setTaskData(id, start = None,end = None):
     if start is not None:
         mw.M('tasks').where('id=?',(id,)).update({'start':start})
     if end is not None:

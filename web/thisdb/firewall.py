@@ -12,10 +12,7 @@ import core.mw as mw
 
 __FIELD = 'id,port,protocol,ps,add_time,update_time'
 
-def getFirewallList(
-    page:int | None = 1,
-    size:int | None = 10,
-):
+def getFirewallList(page=1,size=10):
     start = (int(page) - 1) * (int(size))
     limit = str(start) + ',' +str(size)
 
@@ -27,10 +24,7 @@ def getFirewallList(
     data['list'] = firewall_list
     return data
 
-def addFirewall(port,
-    protocol: str | None = 'tcp',
-    ps: str | None = '备注'
-) -> bool:
+def addFirewall(port, protocol='tcp',ps='备注') -> bool:
     '''
     设置配置的值
     :port -> str 端口 (必填)

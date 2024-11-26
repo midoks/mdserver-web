@@ -36,8 +36,7 @@ def initAdminUser():
     return True
 
 
-def getUserByName(name,
-) -> None:
+def getUserByName(name) -> None:
     '''
     获取用户信息通过用户名
     '''
@@ -56,8 +55,7 @@ def getUserByName(name,
     row['update_time'] = data['update_time']
     return row
 
-def getUserById(id,
-) -> None:
+def getUserById(id) -> None:
     '''
     获取用户信息通过用户名
     '''
@@ -95,10 +93,7 @@ def setUserPwdByName(name, password):
     pwd = mw.md5(password)
     return mw.M('users').where("name=?", (name,)).setField('password', pwd)
 
-def setUserByRoot(
-    name: str | None = None,
-    password: str | None = None,
-) -> bool:
+def setUserByRoot(name = None,password = None) -> bool:
     '''
     设置配置的值
     :name -> str 名称 (必填)

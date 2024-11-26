@@ -12,10 +12,7 @@ import os
 import json
 import core.mw as mw
 
-def getOption(name,
-    type='common',
-    default=None
-) -> str:
+def getOption(name,type='common',default=None) -> str:
     '''
     获取配置的值
     :name -> str 名称 (必填)
@@ -28,10 +25,7 @@ def getOption(name,
     return data
 
 
-def getOptionByJson(name,
-    type='common',
-    default=None
-) -> object:
+def getOptionByJson(name,type='common',default=None) -> object:
     '''
     获取配置的值,返回对象类型
     :name -> str 名称 (必填)
