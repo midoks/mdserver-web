@@ -27,6 +27,9 @@ from utils.firewall import Firewall as MwFirewall
 import core.mw as mw
 import thisdb
 
+from admin import setup
+setup.init()
+
 
 INIT_DIR = "/etc/rc.d/init.d"
 if mw.isAppleSystem():
