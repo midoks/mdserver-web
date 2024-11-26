@@ -546,9 +546,8 @@ def getFileStatsDesc(
     filename: str | None = None,
     path: str | None = None,
 ):
-    # print(filename,path)
-    filename = filename.replace('//', '/')
     try:
+        filename = filename.replace('//', '/')
         stat = os.stat(filename)
         accept = str(oct(stat.st_mode)[-3:])
         mtime = str(int(stat.st_mtime))
