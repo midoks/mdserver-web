@@ -447,16 +447,15 @@ def getClientIp():
 def checkDomainPanel():
     import thisdb
     from flask import Flask, redirect, request, url_for
+    
     current_host = getHost()
-
     domain = thisdb.getOption('panel_domain', default='')
     port = getPanelPort()
     scheme = 'http'
 
     panel_ssl_data = thisdb.getOptionByJson('panel_ssl', default={'open':False})
     if panel_ssl_data['open']:
-        choose = panel_ssl_data['choose']        
-        if not inArray(['local','nginx'], choose):
+        if not inArray(['local','nginx'], panel_ssl_data['choose']):
             return False
         scheme = 'https'
 
