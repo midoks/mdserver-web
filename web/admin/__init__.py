@@ -37,6 +37,8 @@ import core.mw as mw
 import config
 import utils.config as utils_config
 import thisdb
+# 初始化db
+setup.init()
 
 # from threading import Lock
 # thread = None
@@ -66,9 +68,6 @@ app.config['PERMANENT_SESSION_LIFETIME'] = timedelta(days=31)
 # db的配置
 # app.config['SQLALCHEMY_DATABASE_URI'] = mw.getSqitePrefix()+config.SQLITE_PATH+"?timeout=20"  # 使用 SQLite 数据库
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = True
-
-# 初始化db
-setup.init()
 
 # BASIC AUTH
 app.config['BASIC_AUTH_OPEN'] = False
