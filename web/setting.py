@@ -32,6 +32,10 @@ log_dir = mw.getMWLogs()
 if not os.path.exists(log_dir):
     os.mkdir(log_dir)
 
+data_dir = panel_dir+'/data'
+if not os.path.exists(data_dir):
+    os.mkdir(data_dir)
+
 # default port
 panel_port = '7200'
 default_port_file = panel_dir+'/data/port.pl'
