@@ -546,6 +546,8 @@ def getFileStatsDesc(
     filename: str | None = None,
     path: str | None = None,
 ):
+    if path is None or filename is None:
+        return ';;;;;'
     try:
         filename = filename.replace('//', '/')
         stat = os.stat(filename)
