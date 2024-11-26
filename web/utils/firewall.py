@@ -245,9 +245,7 @@ class Firewall(object):
                 pass
         return mw.returnData(True, '设置成功!')
 
-    def addAcceptPortCmd(self, port,
-        protocol:str  | None ='tcp'
-    ):
+    def addAcceptPortCmd(self, port, protocol ='tcp'):
         if self.__isUfw:
             if protocol == 'tcp':
                 mw.execShell('ufw allow ' + port + '/tcp')
