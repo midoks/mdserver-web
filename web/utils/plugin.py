@@ -132,6 +132,61 @@ class plugin(object):
         plist = self.checkStatusMThreads(plist)
         return plist
 
+    def init(self):
+        plugin_names = {
+            'openresty': '1.25.3',
+            'php': '56',
+            'swap': '1.1',
+            'mysql': '5.7',
+            'phpmyadmin': '4.4.15',
+        }
+
+        pn_dir = mw.getPluginDir()
+        pn_server_dir = mw.getServerDir()
+        pn_list = []
+        for pn in plugin_names:
+            info = {}
+            pn_json = pn_dir + '/' + pn + '/info.json'
+            pn_server = pn_server_dir + '/' + pn
+            if not os.path.exists(pn_server):
+
+                tmp = mw.readFile(pn_json)
+                tmp = json.loads(tmp)
+
+                info['title'] = tmp['title']
+                info['name'] = tmp['name']
+                info['versions'] = tmp['versions']
+                info['default_ver'] = plugin_names[pn]
+                pn_list.append(info)
+            else:
+                return mw.returnData(False, 'ok')
+
+        return mw.returnData(True, 'ok', pn_list)
+
+    def initInstall(self, plugin_list):
+        try:
+            pn_list = json.loads(plugin_list)
+            for pn in pn_list:
+                name = pn['name']
+                version = pn['version']
+                info_file = self.__plugin_dir + '/' + name + '/' + 'info.json'
+                pluginInfo = json.loads(mw.readFile(info_file))
+                self.hookInstall(pluginInfo)
+
+                cmd = 'cd {0} && bash {1} install {2}'.format(
+                    mw.getPluginDir() + '/'+name,
+                    pluginInfo['shell'],
+                    version
+                )
+                title = '安装[' + name + '-' + version + ']'
+                thisdb.addTask(name=title,cmd=cmd)
+            os.mkdir(mw.getServerDir() + '/php')
+            # 任务执行相关
+            mw.triggerTask()
+            return mw.returnData(True, '添加成功')
+        except Exception as e:
+            return mw.returnData(False, mw.getTracebackInfo())
+
     def menuGetAbsPath(self, tag, path):
         if path[0:1] == '/':
             return path

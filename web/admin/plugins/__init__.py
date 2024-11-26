@@ -34,35 +34,14 @@ def index():
 @blueprint.route('/init', endpoint='init', methods=['POST'])
 @panel_login_required
 def init():
-    plugin_names = {
-        'openresty': '1.25.3',
-        'php': '56',
-        'swap': '1.1',
-        'mysql': '5.7',
-        'phpmyadmin': '4.4.15',
-    }
+    return MwPlugin.instance().init()
 
-    pn_dir = mw.getPluginDir()
-    pn_server_dir = mw.getServerDir()
-    pn_list = []
-    for pn in plugin_names:
-        info = {}
-        pn_json = pn_dir + '/' + pn + '/info.json'
-        pn_server = pn_server_dir + '/' + pn
-        if not os.path.exists(pn_server):
-
-            tmp = mw.readFile(pn_json)
-            tmp = json.loads(tmp)
-
-            info['title'] = tmp['title']
-            info['name'] = tmp['name']
-            info['versions'] = tmp['versions']
-            info['default_ver'] = plugin_names[pn]
-            pn_list.append(info)
-        else:
-            return mw.returnData(False, 'ok')
-
-    return mw.returnData(True, 'ok', pn_list)
+# 初始化安装
+@blueprint.route('/init_install', endpoint='init_install', methods=['POST'])
+@panel_login_required
+def init_install(): 
+    plugin_list = request.form.get('list', '')
+    return MwPlugin.instance().initInstall(plugin_list)
 
 # 首页软件展示
 @blueprint.route('/index_list', endpoint='index_list', methods=['GET','POST'])

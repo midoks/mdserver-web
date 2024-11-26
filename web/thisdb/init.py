@@ -14,9 +14,9 @@ import core.mw as mw
 
 
 def initPanelData():
-    # _dbfile = mw.getPanelDataDir() + '/panel.db'
-    # if os.path.exists(_dbfile):
-    #     return True
+    _dbfile = mw.getPanelDataDir() + '/panel.db'
+    if os.path.exists(_dbfile):
+        return True
     sql_file = mw.getPanelDir() + '/web/admin/setup/sql/default.sql'
     sql = mw.M().dbPos(mw.getPanelDataDir(),'panel')
     content = mw.readFile(sql_file)
