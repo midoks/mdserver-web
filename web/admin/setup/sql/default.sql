@@ -47,10 +47,10 @@ CREATE TABLE IF NOT EXISTS `firewall` (
   `add_time` TEXT,
   `update_time` TEXT
 );
-CREATE UNIQUE INDEX port_idx ON firewall(port);
+-- CREATE UNIQUE INDEX port_idx ON firewall(port);
 
 INSERT INTO `firewall` (`id`, `port`, `protocol`, `ps`, `add_time`, `update_time`) VALUES
-(1, '80',  'tcp','网站默认端口', '0000-00-00 00:00:00','0000-00-00 00:00:00'),
+(1, '80',  'tcp', '网站默认端口', '0000-00-00 00:00:00','0000-00-00 00:00:00'),
 (2, '443', 'tcp/udp', 'HTTPS', '0000-00-00 00:00:00','0000-00-00 00:00:00');
 
 CREATE TABLE IF NOT EXISTS `logs` (
