@@ -563,7 +563,7 @@ def getFileStatsDesc(
         if os.path.islink(filename):
             link = ' -> ' + os.readlink(filename)
 
-        if path:
+        if path != '':
             tmp_path = (path + '/').replace('//', '/')
             filename = filename.replace(tmp_path, '', 1)
 
