@@ -439,7 +439,7 @@ class plugin(object):
 
     # 对多版本共存进行处理
     def makeCoexistList(self, data,
-        plugin_type: str | None = None,
+        plugin_type = None,
     ):
         plugins_t = []
         # 返回指定类型
