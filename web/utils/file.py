@@ -176,37 +176,6 @@ def saveBody(path, data, encoding):
     except Exception as ex:
         return mw.returnData(False, '文件保存错误:' + str(ex))
 
-# 获取文件权限描述
-def getFileStatsDesc(
-    filename: str | None = None,
-    path: str | None = None,
-):
-    if path is None or filename is None:
-        return ';;;;;'
-    filename = filename.replace('//', '/')
-    try:
-        stat = os.stat(filename)
-        accept = str(oct(stat.st_mode)[-3:])
-        mtime = str(int(stat.st_mtime))
-        user = ''
-        try:
-            user = str(pwd.getpwuid(stat.st_uid).pw_name)
-        except:
-            user = str(stat.st_uid)
-        size = str(stat.st_size)
-        link = ''
-        if os.path.islink(filename):
-            link = ' -> ' + os.readlink(filename)
-
-        if path:
-            path_t = (path + '/').replace('//', '/')
-            filename = filename.replace(path_t, '', 1)
-
-        return filename + ';' + size + ';' + mtime + ';' + accept + ';' + user + ';' + link
-    except Exception as e:
-        print(str(e))
-        return ';;;;;'
-
 
 def sortFileList(path, ftype = 'mtime', sort = 'desc'):
     flist = os.listdir(path)
@@ -295,7 +264,7 @@ def getAllDirList(path, page=1, size=10, order = '', search=None):
     for dst_file in plist:
         if not os.path.exists(dst_file):
             continue
-        stat = getFileStatsDesc(filename=dst_file, path=path)
+        stat = mw.getFileStatsDesc(filename=dst_file, path=path)
         if os.path.isdir(dst_file):
             dirnames.append(stat)
         else:
@@ -343,7 +312,7 @@ def getDirList(path, page=1, size=10, order = '', search=None):
         if not os.path.exists(abs_file):
             continue
 
-        stats = getFileStatsDesc(filename=abs_file, path=path)
+        stats = mw.getFileStatsDesc(filename=abs_file, path=path)
         if os.path.isdir(abs_file):
             dirnames.append(stats)
         else:
