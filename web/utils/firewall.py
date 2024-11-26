@@ -285,7 +285,7 @@ class Firewall(object):
 
     # 添加放行端口
     def addAcceptPort(self, port, ps, stype,
-        protocol: str  | None ='tcp'
+        protocol='tcp'
     ):
         if not self.getFwStatus():
             self.setFw(0)
