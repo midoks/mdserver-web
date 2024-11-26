@@ -21,7 +21,6 @@ PHP_VER=84
 
 Install_php()
 {
-apt update -y
 #------------------------ install start ------------------------------------#
 apt -y install php${version} php${version}-fpm php${version}-dev
 if [ "$?" == "0" ];then

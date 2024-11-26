@@ -86,6 +86,8 @@ fi
 cd ${curPath} && sh -x $curPath/versions/$2/install.sh $1
 
 if [ "${action}" == "install" ] && [ -d ${serverPath}/php-apt/${type} ];then
+	apt update -y
+	
 	#初始化 
 	cd ${rootPath} && python3 ${rootPath}/plugins/php-apt/index.py start ${type}
 	cd ${rootPath} && python3 ${rootPath}/plugins/php-apt/index.py restart ${type}
