@@ -264,7 +264,7 @@ def getAllDirList(path, page=1, size=10, order = '', search=None):
     for dst_file in plist:
         if not os.path.exists(dst_file):
             continue
-        stat = mw.getFileStatsDesc(filename=dst_file, path=path)
+        stat = mw.getFileStatsDesc(dst_file, path)
         if os.path.isdir(dst_file):
             dirnames.append(stat)
         else:
@@ -312,7 +312,7 @@ def getDirList(path, page=1, size=10, order = '', search=None):
         if not os.path.exists(abs_file):
             continue
 
-        stats = mw.getFileStatsDesc(filename=abs_file, path=path)
+        stats = mw.getFileStatsDesc(abs_file, path)
         if os.path.isdir(abs_file):
             dirnames.append(stats)
         else:

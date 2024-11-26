@@ -542,10 +542,7 @@ def getOsID():
     return data[0].strip()
 
 # 获取文件权限描述
-def getFileStatsDesc(
-    filename: str | None = '',
-    path: str | None = ''
-):
+def getFileStatsDesc(filename,path):
     if path == '' or filename == '':
         return ';;;;;'
     try:
