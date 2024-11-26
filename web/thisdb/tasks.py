@@ -44,10 +44,10 @@ def addTaskByDownload(name = '下载文件',cmd = None,type = 'download',status 
     return True
 
 def addTask(
-    name: str | None = '常用任务',
-    cmd: str | None = None,
-    type: str | None = 'execshell',
-    status: int | None = 0,
+    name = '常用任务',
+    cmd = None,
+    type = 'execshell',
+    status = 0,
 ):
     '''
     添加后台任务
@@ -73,9 +73,9 @@ def addTask(
 
 
 def getTaskList(
-    status: int | None = 1,
-    page: int | None = 1,
-    size: int | None = 10,
+    status = 1,
+    page = 1,
+    size = 10,
 ):
     start = (page - 1) * size
     limit = str(start) + ',' + str(size)
@@ -83,9 +83,9 @@ def getTaskList(
     return task_list
 
 def getTaskPage(
-    status: int | None = 1,
-    page: int | None = 1,
-    size: int | None = 10,
+    status = 1,
+    page = 1,
+    size = 10,
 ):
     start = (page - 1) * size
     limit = str(start) + ',' + str(size)

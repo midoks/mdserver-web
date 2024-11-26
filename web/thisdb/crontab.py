@@ -36,8 +36,8 @@ def deleteCronById(id):
     return True
 
 def getCrontabList(
-    page:int | None = 1,
-    size:int | None = 10,
+    page = 1,
+    size = 10,
 ):
     start = (int(page) - 1) * size
     limit = str(start) + ',' + str(size)
