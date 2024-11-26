@@ -274,10 +274,14 @@ class setting(object):
 
     def setPanelDomain(self, domain):
         port = mw.getPanelPort()
-        ip = mw.getLocalIp()
-
+        
         panel_domain = thisdb.getOption('panel_domain', default='')
         if domain == '':
+            ip = mw.getLocalIp()
+            client_ip = mw.getClientIp()
+            if client_ip in ['127.0.0.1', 'localhost', '::1']:
+                ip = client_ip
+
             to_panel_url = 'http://'+ip+":"+str(port)+'/setting/index'
             thisdb.setOption('panel_domain', '')
             mw.restartMw()
