@@ -523,10 +523,10 @@ mw_default(){
         port=$(cat ${PANEL_DIR}/data/port.pl)
     fi
 
-    if [ ! -f ${PANEL_DIR}/data/default.pl ];then
-        echo -e "\033[33mInstall Failed\033[0m"
-        exit 1
-    fi
+    # if [ ! -f ${PANEL_DIR}/data/default.pl ];then
+    #     echo -e "\033[33mInstall Failed\033[0m"
+    #     exit 1
+    # fi
 
     password=$(cat ${PANEL_DIR}/data/default.pl)
 
