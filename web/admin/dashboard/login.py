@@ -174,7 +174,7 @@ def do_login():
                 login_cache_limit = int(login_cache_limit) + 1
 
             if login_cache_limit >= login_cache_count:
-                model.setOption('admin_close', 'yes')
+                thisdb.setOption('admin_close', 'yes')
                 return mw.returnJson(False, '面板已经关闭!')
 
             cache.set('login_cache_limit', login_cache_limit, timeout=10000)
@@ -195,7 +195,7 @@ def do_login():
             login_cache_limit = int(login_cache_limit) + 1
 
         if login_cache_limit >= login_cache_count:
-            model.setOption('admin_close', 'yes')
+            thisdb.setOption('admin_close', 'yes')
             return mw.returnData(False, '面板已经关闭!')
 
         cache.set('login_cache_limit', login_cache_limit, timeout=10000)

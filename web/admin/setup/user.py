@@ -10,8 +10,6 @@
 
 from flask import request
 
-from admin import model
-from admin.model import db, Users
 
 import core.mw as mw
 import thisdb

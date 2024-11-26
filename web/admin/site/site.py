@@ -13,7 +13,6 @@ import os
 from flask import Blueprint, render_template
 from flask import request
 
-from admin.model import Sites
 from admin.user_login_check import panel_login_required
 
 from utils.plugin import plugin as MwPlugin

@@ -20,7 +20,6 @@ from flask import request,g
 from admin.common import isLogined
 from admin.user_login_check import panel_login_required
 from admin import cache,session
-from admin.model import db,TempLogin,Users
 
 import core.mw as mw
 import thisdb

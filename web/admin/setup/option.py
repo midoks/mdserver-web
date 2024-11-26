@@ -39,7 +39,7 @@ def init_option():
     thisdb.setOption('two_step_verification', json.dumps({'open':False}))
 
     # 开启后台任务
-    # model.setOption('run_bg_task', 'close')
+    # thisdb.setOption('run_bg_task', 'close')
 
     # 首页展示初始化
     thisdb.setOption('display_index', '[]')

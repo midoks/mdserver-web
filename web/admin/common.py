@@ -10,7 +10,6 @@
 
 import time
 
-# from admin import model
 from admin import session
 import thisdb
 

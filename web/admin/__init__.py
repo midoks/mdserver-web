@@ -73,7 +73,7 @@ setup.init()
 # BASIC AUTH
 app.config['BASIC_AUTH_OPEN'] = False
 try:
-    basic_auth = model.getOptionByJson('basic_auth', default={'open':False})
+    basic_auth = thisdb.getOptionByJson('basic_auth', default={'open':False})
     if basic_auth['open']:
         app.config['BASIC_AUTH_OPEN'] = True
 except Exception as e:
@@ -101,7 +101,7 @@ def requestCheck():
     config.APP_START_TIME=time.time()
     # 自定义basic auth认证
     if app.config['BASIC_AUTH_OPEN']:
-        basic_auth = model.getOptionByJson('basic_auth', default={'open':False})
+        basic_auth = thisdb.getOptionByJson('basic_auth', default={'open':False})
         if not basic_auth['open']:
             return
 

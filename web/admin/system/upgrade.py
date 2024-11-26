@@ -14,8 +14,6 @@ from flask import request
 
 from admin.user_login_check import panel_login_required
 
-from admin import model
-
 import core.mw as mw
 import utils.system as sys
 
