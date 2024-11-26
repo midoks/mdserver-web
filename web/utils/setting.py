@@ -13,6 +13,7 @@ import re
 import threading
 import re
 import time
+import json
 
 import core.mw as mw
 import thisdb
@@ -164,21 +165,34 @@ class setting(object):
         return  mw.returnData(False, '未知类型!')
 
     # 面板本地SSL设置
-    def setPanelLocalSsl(self):
-        pdir = mw.getPanelDir()
+    def setPanelLocalSsl(self, cert_type):
+        panel_ssl_data = thisdb.getOptionByJson('panel_ssl', default={'open':False})
 
+        if not panel_ssl_data['open']:
+            panel_ssl_data['open'] = True
+
+        pdir = mw.getPanelDir()
         cert = {}
         keyPath = pdir+'/ssl/local/private.pem'
         certPath = pdir+'/ssl/local/cert.pem'
-
         if not os.path.exists(certPath):
             mw.createLocalSSL()
 
-        choose_file = self.__file['ssl']
-        mw.writeFile(choose_file, 'local')
-
+        panel_ssl_data['choose'] = 'local'
+        thisdb.setOption('panel_ssl', json.dumps(panel_ssl_data))
         mw.restartMw()
-        return mw.returnJson(True, '设置成功')
+        return mw.returnData(True, '设置成功')
+
+    def closePanelSsl(self):
+        panel_ssl_data = thisdb.getOptionByJson('panel_ssl', default={'open':False})
+
+        if panel_ssl_data['open']:
+            panel_ssl_data['open'] = False
+
+        thisdb.setOption('panel_ssl', json.dumps(panel_ssl_data))
+        mw.restartMw()
+        return mw.returnData(True, '设置成功')
+
 
     # 申请面板let证书
     # def applyPanelAcmeSsl(self):

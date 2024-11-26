@@ -63,5 +63,4 @@ def setOption(name, value,
         'type':type,
         'value':value
     }
-    mw.M('option').insert(add_option)
-    return True
+    return mw.M('option').insert(add_option)

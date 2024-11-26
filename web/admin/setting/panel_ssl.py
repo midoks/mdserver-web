@@ -50,3 +50,20 @@ def del_panel_ssl():
     choose = request.form.get('choose', '').strip()
     return MwSetting.instance().delPanelSsl(choose)
 
+# 开启面板证书
+@blueprint.route('/set_panel_local_ssl', endpoint='set_panel_local_ssl', methods=['POST'])
+@panel_login_required
+def set_panel_local_ssl():
+    cert_type = request.form.get('cert_type', '').strip()
+    return MwSetting.instance().setPanelLocalSsl(cert_type)
+
+@blueprint.route('/close_panel_ssl', endpoint='close_panel_ssl', methods=['POST'])
+@panel_login_required
+def close_panel_ssl():
+    return MwSetting.instance().closePanelSsl()
+
+
+
+
+
+

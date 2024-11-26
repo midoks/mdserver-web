@@ -21,6 +21,7 @@ import os
 
 import core.mw as mw
 import utils.system as system 
+import thisdb
 
 cpu_info = system.getCpuInfo()
 workers = cpu_info[1]
@@ -50,16 +51,15 @@ if os.path.exists(default_ipv6_file):
 else:
     bind.append('0.0.0.0:%s' % panel_port)
 
-
-ssl_choose_file = panel_dir+'/ssl/choose.pl'
-if os.path.exists(ssl_choose_file):
-    ssl_choose = mw.readFile(ssl_choose_file).strip()
-    if mw.inArray(['local','nginx'],ssl_choose):
-        tmp_cert = panel_dir+'/ssl/'+ssl_choose+'/cert.pem'
-        tmp_private = panel_dir+'/ssl/'+ssl_choose+'/private.pem'
-        if os.path.exists(tmp_cert) and os.path.exists(tmp_private):
-            certfile = tmp_cert
-            keyfile  = tmp_private
+panel_ssl_data = thisdb.getOptionByJson('panel_ssl', default={'open':False})
+if panel_ssl_data['open']:
+    choose = panel_ssl_data['choose']
+    if mw.inArray(['local','nginx'],choose):
+        panel_cert = panel_dir+'/ssl/'+choose+'/cert.pem'
+        panel_private = panel_dir+'/ssl/'+choose+'/private.pem'
+        if os.path.exists(panel_cert) and os.path.exists(panel_private):
+            certfile = panel_cert
+            keyfile  = panel_private
             ciphers = 'TLSv1 TLSv1.1 TLSv1.2 TLSv1.3'
             ssl_version = 2
 

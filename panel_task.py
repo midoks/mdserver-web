@@ -47,19 +47,6 @@ def writeLogs(data):
     except:
         pass
 
-def mw_async(f):
-    def wrapper(*args, **kwargs):
-        thr = threading.Thread(target=f, args=args, kwargs=kwargs)
-        thr.start()
-    return wrapper
-
-@mw_async
-def restartMw():
-    time.sleep(1)
-    cmd = mw.getPanelDir() + '/scripts/init.d/mw reload &'
-    mw.execShell(cmd)
-
-
 def downloadFile(url, filename):
     # 下载文件
     try:
@@ -298,10 +285,11 @@ def openrestyRestartAtOnce():
 
 # --------------------------------------Panel Restart Start   --------------------------------------------- #
 def restartPanelService():
-    restartTip = mw.getPanelDir()+'/data/restart.pl'
+    restart_tip = mw.getPanelDir()+'/data/restart.pl'
     while True:
-        if os.path.exists(restartTip):
-            os.remove(restartTip)
+        if os.path.exists(restart_tip):
+            print("restart panel")
+            os.remove(restart_tip)
             mw.panelCmd('restart_panel')
         time.sleep(1)
 # --------------------------------------Panel Restart End   --------------------------------------------- #

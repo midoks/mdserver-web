@@ -1298,7 +1298,7 @@ def panelCmd(method):
         execShell(cmd + ' ' + method)
         return
 
-    cmd = mw.getPanelDir() + '/scripts/init.d/mw'
+    cmd = getPanelDir() + '/scripts/init.d/mw'
     if os.path.exists(cmd):
         data = execShell(cmd + ' ' + method)
         return

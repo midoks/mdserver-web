@@ -110,7 +110,7 @@ case "$1" in
 		mw_start_panel
 		;;
 	'task') 
-		mw_stop 
+		# mw_stop 
 		mw_start_bgtask
 		;;
 esac
