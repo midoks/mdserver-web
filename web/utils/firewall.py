@@ -55,6 +55,9 @@ class Firewall(object):
     def AIF_Firewalld(self):
         # firewall-cmd --list-all | grep '  ports'
         t = mw.execShell("firewall-cmd --list-all | grep '  ports'")
+        if t[1] != '':
+            return True
+
         all_port = t[0].strip()
         data = all_port.split(":")
         ports_str = data[1]
