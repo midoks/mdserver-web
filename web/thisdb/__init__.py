@@ -13,6 +13,8 @@ from .option import *
 
 from .sites import *
 from .site_types import *
+from .backup import *
+
 from .domain import *
 from .binding import *
 

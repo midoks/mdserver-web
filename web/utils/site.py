@@ -2351,15 +2351,46 @@ export PATH
         data = {}
         data['data'] = info['list']
         data['site'] = site_info
-        data['page'] = mw.getPage({'count':info['count'],'tojs':'getBackup','p':page, 'row':limit})
+        data['page'] = mw.getPage({'count':info['count'],'tojs':'getBackup','p':page, 'row':size})
         return data
+
+    def toBackup(self, site_id):
+        site_info = thisdb.getSitesById(site_id)
+
+        filename = site_info['name'] + '_' + time.strftime('%Y%m%d_%H%M%S', time.localtime()) + '.zip'
+        backup_path = mw.getBackupDir() + '/site'
+        zip_name = backup_path + '/' + filename
+        if not (os.path.exists(backup_path)):
+            os.makedirs(backup_path)
+        exec_log = mw.getPanelDir() + '/logs/panel_exec.log'
+        cmd = "cd '" + site_info['path'] + "' && zip '" + zip_name + "' -r ./* > " + exec_log + " 2>&1"
+        mw.execShell(cmd)
+
+        fsize = 0
+        if os.path.exists(zip_name):
+            fsize = os.path.getsize(zip_name)
+
+        thisdb.addBackup(site_id,filename,zip_name,fsize)
+
+        msg = mw.getInfo('备份网站[{1}]成功!', (site_info['name'],))
+        mw.writeLog('网站管理', msg)
+        return mw.returnData(True, '备份成功!')
+
+    def delBackup(self,backup_id):
+        info = thisdb.getBackupById(backup_id)
+        if os.path.exists(info['filename']):
+            os.remove(info['filename'])
+        msg = mw.getInfo('删除网站[{1}]的备份[{2}]成功!', (info['name'], info['filename']))
+        mw.writeLog('网站管理', msg)
+
+        thisdb.deleteBackupById(backup_id)
+        return mw.returnData(True, '站点删除成功!')
 
 
     def getPhpVersion(self):
-        phpVersions = ('00', '52', '53', '54', '55',
-                       '56', '70', '71', '72', '73',
-                       '74', '80', '81', '82', '83',
-                       '84')
+        phpVersions = ('00', '52', '53', '54', '55', '56',
+                       '70', '71', '72', '73', '74', '80',
+                       '81', '82', '83', '84')
         data = []
         for val in phpVersions:
             tmp = {}

@@ -1,9 +1,9 @@
 
 CREATE TABLE IF NOT EXISTS `backup` (
   `id` INTEGER PRIMARY KEY AUTOINCREMENT,
+  `pid` INTEGER,
   `type` INTEGER,
   `name` TEXT,
-  `pid` INTEGER,
   `filename` TEXT,
   `size` INTEGER,
   `add_time` TEXT

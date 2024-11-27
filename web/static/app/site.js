@@ -803,7 +803,7 @@ function getBackup(id,name,page) {
 			var ftpdown = "<a class='btlink' href='/files/download?filename="+frdata.data[i].filename+"&name="+frdata.data[i].name+"' target='_blank'>下载</a> | ";
 			body += "<tr><td><span class='glyphicon glyphicon-file'></span>"+frdata.data[i].name+"</td>\
 					<td>" + (toSize(frdata.data[i].size)) + "</td>\
-					<td>" + frdata.data[i].addtime + "</td>\
+					<td>" + frdata.data[i].add_time + "</td>\
 					<td class='text-right' style='color:#ccc'>"+ ftpdown + "<a class='btlink' href='javascript:;' onclick=\"webBackupDelete('" + frdata.data[i].id + "',"+id+")\">删除</a></td>\
 				</tr>"
 		}
@@ -813,9 +813,9 @@ function getBackup(id,name,page) {
 
 		if(name == 0){
 			var sBody = "<table width='100%' id='webBackupList' class='table table-hover'>\
-						<thead><tr><th>文件名称</th><th>文件大小</th><th>打包时间</th><th width='140px' class='text-right'>操作</th></tr></thead>\
-						<tbody id='webBackupBody' class='list-list'>"+body+"</tbody>\
-						</table>"
+				<thead><tr><th>文件名称</th><th>文件大小</th><th>打包时间</th><th width='140px' class='text-right'>操作</th></tr></thead>\
+				<tbody id='webBackupBody' class='list-list'>"+body+"</tbody>\
+			</table>"
 			$("#webBackupList").html(sBody);
 			$(".page").html(frdata.page);
 			return;
@@ -830,17 +830,17 @@ function getBackup(id,name,page) {
 			shift: 0,
 			shadeClose: false,
 			content: "<div class='bt-form ptb15 mlr15' id='webBackup'>\
-						<button class='btn btn-default btn-sm' style='margin-right:10px' type='button' onclick=\"webBackup('" + frdata['site']['id'] + "','" +  frdata['site']['name'] + "')\">打包备份</button>\
-						<div class='divtable mtb15' style='margin-bottom:0'>\
-							<table width='100%' id='webBackupList' class='table table-hover'>\
-							<thead>\
-								<tr><th>文件名称</th><th>文件大小</th><th>打包时间</th><th width='140px' class='text-right'>操作</th></tr>\
-							</thead>\
-							<tbody id='webBackupBody' class='list-list'>" + body + "</tbody>\
-							</table>\
-							<div class='page'>" + frdata.page + "</div>\
-						</div>\
-					</div>"
+				<button class='btn btn-default btn-sm' style='margin-right:10px' type='button' onclick=\"webBackup('" + frdata['site']['id'] + "','" +  frdata['site']['name'] + "')\">打包备份</button>\
+				<div class='divtable mtb15' style='margin-bottom:0'>\
+					<table width='100%' id='webBackupList' class='table table-hover'>\
+					<thead>\
+						<tr><th>文件名称</th><th>文件大小</th><th>打包时间</th><th width='140px' class='text-right'>操作</th></tr>\
+					</thead>\
+					<tbody id='webBackupBody' class='list-list'>" + body + "</tbody>\
+					</table>\
+					<div class='page'>" + frdata.page + "</div>\
+				</div>\
+			</div>"
 		});
 	},'json');
 }
