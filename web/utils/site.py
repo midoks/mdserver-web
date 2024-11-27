@@ -2344,6 +2344,16 @@ export PATH
         mw.restartWeb()
         return mw.returnData(data['status'], data['msg'], result)
 
+    def getBackup(self,site_id,page=1,size=10):
+        site_info = thisdb.getSitesById(site_id)
+        info = thisdb.getBackupPage(site_id, page, size)
+        
+        data = {}
+        data['data'] = info['list']
+        data['site'] = site_info
+        data['page'] = mw.getPage({'count':info['count'],'tojs':'getBackup','p':page, 'row':limit})
+        return data
+
 
     def getPhpVersion(self):
         phpVersions = ('00', '52', '53', '54', '55',
