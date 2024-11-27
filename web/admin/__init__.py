@@ -155,8 +155,8 @@ def inject_global_variables():
 # socketio = SocketIO(manage_session=False, async_mode='threading',
 #                     logger=False, engineio_logger=False, debug=False,
 #                     ping_interval=25, ping_timeout=120)
-socketio = SocketIO(logger=True,
-    engineio_logger=True,
+socketio = SocketIO(logger=False,
+    engineio_logger=False,
     cors_allowed_origins="*")
 socketio.init_app(app)
 

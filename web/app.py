@@ -9,24 +9,13 @@
 # ---------------------------------------------------------------------------------
 
 
+
 import sys
 import os
 
 from admin import app, socketio
 import config
 
-from gevent.pywsgi import WSGIServer
-from geventwebsocket.handler import WebSocketHandler
-
-# from gevent import monkey
-# monkey.patch_all()
-
-import eventlet
-eventlet.monkey_patch()
-
-
-# from requests.packages.urllib3.util.ssl_ import create_urllib3_context
-# create_urllib3_context()
 
 if sys.version_info < (3, 6):
     raise RuntimeError('This application must be run under Python 3.6 or later.')
@@ -36,20 +25,15 @@ if sys.path[0] != os.path.dirname(os.path.realpath(__file__)):
     sys.path.insert(0, os.path.dirname(os.path.realpath(__file__)))
 
 
-# print(config.DEFAULT_SERVER,config.DEFAULT_SERVER_PORT)
-# app = create_app()
-
 def main():
-
+    import eventlet
+    eventlet.monkey_patch()
     try:
-        http_server = WSGIServer(
-                (HOST, PORT), app, handler_class=WebSocketHandler)
-        http_server.serve_forever()
-        socketio.run(app, host=config.DEFAULT_SERVER,debug=config.DEBUG)
+        socketio.run(app)
+        # app.run(debug=True)
     except Exception as e:
-        print(str(e))
-
-    # app.run(debug=True)
+        pass
 
 if __name__ == '__main__':
+    
     main()
