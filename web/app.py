@@ -8,8 +8,6 @@
 # Author: midoks <midoks@163.com>
 # ---------------------------------------------------------------------------------
 
-# import eventlet
-# eventlet.monkey_patch()
 
 import sys
 import os
@@ -21,6 +19,11 @@ import config
 # from gevent.pywsgi import WSGIServer
 # from geventwebsocket.handler import WebSocketHandler
 
+from gevent import monkey
+monkey.patch_all()
+
+from requests.packages.urllib3.util.ssl_ import create_urllib3_context
+create_urllib3_context()
 
 if sys.version_info < (3, 6):
     raise RuntimeError('This application must be run under Python 3.6 or later.')
