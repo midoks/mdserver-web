@@ -153,7 +153,9 @@ def inject_global_variables():
     return dict(config=g_config, data=data)
 
 # webssh
-socketio = SocketIO()
+socketio = SocketIO(manage_session=False, async_mode='threading',
+                    logger=False, engineio_logger=False, debug=False,
+                    ping_interval=25, ping_timeout=120)
 socketio.init_app(app)
 
 @socketio.on('webssh_websocketio')
