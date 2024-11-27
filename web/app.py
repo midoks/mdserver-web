@@ -35,7 +35,7 @@ def try_eventlet():
 
 def main():
     try:
-        try_eventlet()
+        # try_eventlet()
         socketio.run(app)
         # app.run(debug=True)
     except Exception as e:
