@@ -12,9 +12,6 @@
 # 配置文件
 # ---------------------------------------------------------------------------------
 
-# import eventlet
-# eventlet.monkey_patch()
-
 import time
 import sys
 import random
