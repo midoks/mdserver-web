@@ -18,7 +18,7 @@ PHP_VER=56
 Install_php()
 {
 #------------------------ install start ------------------------------------#
-echo "安装php-${version} ..." >
+echo "安装php-${version} ..."
 mkdir -p $sourcePath/php
 mkdir -p $serverPath/php
 
