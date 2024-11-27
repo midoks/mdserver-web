@@ -18,8 +18,8 @@ import config
 from gevent.pywsgi import WSGIServer
 from geventwebsocket.handler import WebSocketHandler
 
-from gevent import monkey
-monkey.patch_all()
+# from gevent import monkey
+# monkey.patch_all()
 
 
 # from requests.packages.urllib3.util.ssl_ import create_urllib3_context
