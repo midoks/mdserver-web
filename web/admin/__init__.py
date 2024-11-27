@@ -110,7 +110,6 @@ def requestCheck():
         if not auth:
             return sendAuthenticated()
 
-        # print(auth.username.strip(),auth.password.strip())
         salt = basic_auth['salt']
         basic_user = mw.md5(auth.username.strip() + salt)
         basic_pwd = mw.md5(auth.password.strip() + salt)
@@ -156,7 +155,9 @@ def inject_global_variables():
 # socketio = SocketIO(manage_session=False, async_mode='threading',
 #                     logger=False, engineio_logger=False, debug=False,
 #                     ping_interval=25, ping_timeout=120)
-socketio = SocketIO()
+socketio = SocketIO(logger=True,
+    engineio_logger=True,
+    cors_allowed_origins="*")
 socketio.init_app(app)
 
 @socketio.on('webssh_websocketio')

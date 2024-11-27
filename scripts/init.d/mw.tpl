@@ -352,8 +352,8 @@ mw_debug(){
     if [ -d ${PANEL_DIR}/web ];then
         cd ${PANEL_DIR}/web
     fi
-    gunicorn -b :$port -k geventwebsocket.gunicorn.workers.GeventWebSocketWorker -w 1  app:app
-    # gunicorn -b :$port -k eventlet -w 1  app:app
+    # gunicorn -b :$port -k geventwebsocket.gunicorn.workers.GeventWebSocketWorker -w 1  app:app
+    gunicorn -b :$port -k eventlet -w 1  app:app
 }
 
 
