@@ -38,10 +38,6 @@ import config
 import utils.config as utils_config
 import thisdb
 
-# 初始化db
-from admin import setup
-setup.init()
-
 app = Flask(__name__, template_folder='templates/default')
 
 # 缓存配置
