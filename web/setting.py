@@ -12,10 +12,6 @@
 # 配置文件
 # ---------------------------------------------------------------------------------
 
-# 初始化db
-from admin import setup
-setup.init()
-
 import time
 import sys
 import random
