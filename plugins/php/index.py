@@ -344,8 +344,8 @@ def phpOp(version, method):
 
 
 def start(version):
-    mw.execShell(
-        'export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/www/server/lib/icu/lib')
+    cmd = 'export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/www/server/lib/icu/lib'
+    mw.execShell(cmd)
     return phpOp(version, 'start')
 
 
