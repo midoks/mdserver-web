@@ -465,7 +465,6 @@ def checkDomainPanel():
 
     ip = getHostAddr()
     if domain == '':
-        print(current_host.strip().lower(), ip.strip().lower())
         if ip in ['127.0.0.1', 'localhost', '::1']:
             return False
         if current_host.strip().lower() != ip.strip().lower():
