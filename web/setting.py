@@ -73,7 +73,7 @@ if panel_ssl_data['open']:
 if workers > 2:
     workers = 1
 
-threads = workers * 1
+threads = workers * 2
 backlog = 512
 reload = False
 daemon = True
