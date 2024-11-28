@@ -27,8 +27,6 @@ from utils.firewall import Firewall as MwFirewall
 import core.mw as mw
 import thisdb
 
-
-
 INIT_DIR = "/etc/rc.d/init.d"
 if mw.isAppleSystem():
     INIT_DIR = mw.getPanelDir() + "/scripts/init.d"
