@@ -79,9 +79,10 @@ fi
 cd $sourcePath/php/php${PHP_VER}
 
 OPTIONS='--without-iconv'
-if [ $sysName == 'Darwin' ]; then
-	OPTIONS="${OPTIONS} --with-external-pcre=$(brew --prefix pcre2)"
-fi
+
+# if [ $sysName == 'Darwin' ]; then
+# 	OPTIONS="${OPTIONS} --with-external-pcre=$(brew --prefix pcre2)"
+# fi
 
 IS_64BIT=`getconf LONG_BIT`
 if [ "$IS_64BIT" == "64" ];then
