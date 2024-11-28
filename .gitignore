@@ -123,7 +123,7 @@ logs/panel.pid
 logs/panel.log
 logs/panel_task.log
 logs/panel_exec.log
-
+logs/panel_task.lock
 
 ssl/local
 ssl/nginx
@@ -189,7 +189,3 @@ plugins/goedge-admin
 plugins/goedge-node
 plugins/goedge-happy
 plugins/dztasks
-
-
-
-logs/panel_task.lock
