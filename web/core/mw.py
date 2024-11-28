@@ -50,13 +50,24 @@ def execShell(cmdstring, cwd=None, timeout=None, shell=True):
         return sub.communicate()
 
     data = sub.communicate()
-    # python3 fix 返回byte数据
-    if isinstance(data[0], bytes):
-        t1 = str(data[0], encoding='utf-8')
 
-    if isinstance(data[1], bytes):
-        t2 = str(data[1], encoding='utf-8')
-    return (t1, t2)
+    success = data[0]
+    error = data[1]
+    # python3 fix 返回byte数据
+    if isinstance(success, bytes):
+        # success = str(success, encoding='utf-8')
+        try:
+            success = success.decode('utf-8')
+        except Exception as e:
+            success = str(e)
+
+    if isinstance(error, bytes):
+        # error = str(error, encoding='utf-8')
+        try:
+            error = error.decode('utf-8')
+        except Exception as e:
+            error = str(e)
+    return (success, error)
 
 
 def getTracebackInfo():
