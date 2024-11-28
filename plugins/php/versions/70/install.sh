@@ -60,12 +60,7 @@ fi
 OPTIONS='--without-iconv'
 if [ $sysName == 'Darwin' ]; then
 	OPTIONS="${OPTIONS} --with-freetype-dir=${serverPath}/lib/freetype"
-	OPTIONS="${OPTIONS} --with-curl"
 	# OPTIONS="${OPTIONS} --with-external-pcre=$(brew --prefix pcre2)"
-else
-	# OPTIONS="--with-iconv=${serverPath}/lib/libiconv"
-	OPTIONS="${OPTIONS} --with-curl"
-	OPTIONS="${OPTIONS} --with-readline"
 fi
 
 IS_64BIT=`getconf LONG_BIT`

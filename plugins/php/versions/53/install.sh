@@ -66,12 +66,7 @@ fi
 # OPTIONS="${OPTIONS} --with-jpeg --with-jpeg-dir=/usr/lib"
 OPTIONS='--without-iconv'
 if [ $sysName == 'Darwin' ]; then
-	
 	OPTIONS="${OPTIONS} --with-freetype-dir=${serverPath}/lib/freetype"
-	OPTIONS="${OPTIONS} --with-curl=$(brew --prefix curl)"
-else
-	# OPTIONS=" --with-iconv=${serverPath}/lib/libiconv"
-	OPTIONS="${OPTIONS} --with-curl"
 fi
 
 IS_64BIT=`getconf LONG_BIT`

@@ -59,21 +59,11 @@ fi
 
 OPTIONS='--without-iconv'
 if [ $sysName == 'Darwin' ]; then
-	
 	OPTIONS="${OPTIONS} --with-freetype-dir=${serverPath}/lib/freetype"
-
-	BREW_DIR=`which brew`
-	BREW_DIR=${BREW_DIR/\/bin\/brew/}
-	CURL_DEPEND_DIR=`brew info curl | grep ${BREW_DIR}/Cellar/curl | cut -d \  -f 1 | awk 'END {print}'`
-	OPTIONS="$OPTIONS --with-curl=${CURL_DEPEND_DIR}"
 	# OPTIONS="${OPTIONS} --with-pcre-dir=${serverPath}/lib/pcre"
 	# OPTIONS="${OPTIONS} --with-external-pcre=${serverPath}/lib/pcre"
-
 else
-	# OPTIONS="--with-iconv=${serverPath}/lib/libiconv"
-	OPTIONS="${OPTIONS} --with-curl"
 	OPTIONS="${OPTIONS} --enable-mbstring"
-	OPTIONS="${OPTIONS} --with-readline"
 fi
 
 IS_64BIT=`getconf LONG_BIT`

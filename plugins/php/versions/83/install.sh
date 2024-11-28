@@ -71,16 +71,9 @@ fi
 cd $sourcePath/php/php${PHP_VER}
 
 OPTIONS='--without-iconv'
-if [ $sysName == 'Darwin' ]; then
-	# BREW_DIR=`which brew`
-	# BREW_DIR=${BREW_DIR/\/bin\/brew/}
-	# LIB_DEPEND_DIR=`brew info curl | grep ${BREW_DIR}/Cellar/curl | cut -d \  -f 1 | awk 'END {print}'`
-	# OPTIONS="${OPTIONS} --with-curl=$LIB_DEPEND_DIR"
-	echo "curl"
-else
-	OPTIONS="${OPTIONS} --with-curl"
-	OPTIONS="${OPTIONS} --with-readline"
-fi
+# if [ $sysName == 'Darwin' ]; then
+# 	OPTIONS="${OPTIONS} --with-curl"
+# fi
 
 argon_version=`pkg-config libargon2 --modversion`
 if [ "$?" == "0" ];then

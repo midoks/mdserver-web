@@ -72,15 +72,12 @@ fi
 cd $sourcePath/php/php${PHP_VER}
 
 OPTIONS='--without-iconv'
-if [ $sysName == 'Darwin' ]; then
-	BREW_DIR=`which brew`
-	BREW_DIR=${BREW_DIR/\/bin\/brew/}
-	LIB_DEPEND_DIR=`brew info curl | grep ${BREW_DIR}/Cellar/curl | cut -d \  -f 1 | awk 'END {print}'`
-	OPTIONS="${OPTIONS} --with-curl=$LIB_DEPEND_DIR"
-else
-	OPTIONS="${OPTIONS} --with-curl"
-	OPTIONS="${OPTIONS} --with-readline"
-fi
+# if [ $sysName == 'Darwin' ]; then
+# 	BREW_DIR=`which brew`
+# 	BREW_DIR=${BREW_DIR/\/bin\/brew/}
+# 	LIB_DEPEND_DIR=`brew info curl | grep ${BREW_DIR}/Cellar/curl | cut -d \  -f 1 | awk 'END {print}'`
+# 	OPTIONS="${OPTIONS} --with-curl=$LIB_DEPEND_DIR"
+# fi
 
 IS_64BIT=`getconf LONG_BIT`
 if [ "$IS_64BIT" == "64" ];then

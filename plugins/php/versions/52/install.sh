@@ -82,17 +82,10 @@ if [ -f $serverPath/php/${PHP_VER}/bin/php ];then
 	return
 fi
 
-OPTIONS=''
+OPTIONS='--without-iconv'
 if [ $sysName == 'Darwin' ]; then
-	OPTIONS='--without-iconv'
 	OPTIONS="${OPTIONS} --with-freetype-dir=${serverPath}/lib/freetype"
-	OPTIONS="${OPTIONS} --with-curl=${serverPath}/lib/curl"
-else
-	OPTIONS='--without-iconv'
-	# OPTIONS="--with-iconv=${serverPath}/lib/libiconv"
-	OPTIONS="${OPTIONS} --with-curl"
 fi
-
 
 IS_64BIT=`getconf LONG_BIT`
 if [ "$IS_64BIT" == "64" ];then

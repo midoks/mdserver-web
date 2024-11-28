@@ -80,19 +80,7 @@ cd $sourcePath/php/php${PHP_VER}
 
 OPTIONS='--without-iconv'
 if [ $sysName == 'Darwin' ]; then
-	
-	OPTIONS="${OPTIONS} --with-curl"
 	OPTIONS="${OPTIONS} --with-external-pcre=$(brew --prefix pcre2)"
-
-	# BREW_DIR=`which brew`
-	# BREW_DIR=${BREW_DIR/\/bin\/brew/}
-	# XML_LIB_DEPEND_DIR=`brew info libxml2 | grep /opt/homebrew/Cellar/libxml2 | cut -d \  -f 1 | awk 'END {print}'`
-	# XML_LIB_DEPEND_DIR=`brew info libxml2 | grep ${BREW_DIR}/Cellar/libxml2 | cut -d \  -f 1 | awk 'END {print}'`
-	# OPTIONS="${OPTIONS} --with-libxml=${XML_LIB_DEPEND_DIR}"
-
-else
-	OPTIONS="${OPTIONS} --with-curl"
-	OPTIONS="${OPTIONS} --with-readline"
 fi
 
 IS_64BIT=`getconf LONG_BIT`
