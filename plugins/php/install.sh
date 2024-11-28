@@ -65,6 +65,7 @@ if [ "${action}" == "install" ] && [ -d ${serverPath}/php/${type} ];then
 	# cd /www/server/mdserver-web/plugins/php/versions/common  && bash fileinfo.sh install 81
 	cd ${rootPath}/plugins/php/versions/common && bash curl.sh install ${type}
 	cd ${rootPath}/plugins/php/versions/common && bash gd.sh install ${type}
+	cd ${rootPath}/plugins/php/versions/common && bash readline.sh install ${type}
 	cd ${rootPath}/plugins/php/versions/common && bash iconv.sh install ${type}
 	cd ${rootPath}/plugins/php/versions/common && bash exif.sh install ${type}
 	cd ${rootPath}/plugins/php/versions/common && bash intl.sh install ${type}
