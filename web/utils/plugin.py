@@ -78,6 +78,7 @@ class plugin(object):
     ]
 
     __plugin_dir = 'plugins'
+    __tasks = None
 
     # lock
     _instance_lock = threading.Lock()
@@ -366,6 +367,31 @@ class plugin(object):
                 return True
         return False
 
+    def checkSetupTask(self, name, version, coexist):
+        if not self.__tasks:
+            self.__tasks = thisdb.getTaskRunAll()
+        isTask = '1'
+        for task in self.__tasks:
+            tmpt = mw.getStrBetween('[', ']', task['name'])
+            if not tmpt:
+                continue
+            task_sign = tmpt.split('-')
+            task_len = len(task_sign)
+
+            task_name = task_sign[0].lower()
+            task_ver = task_sign[1]
+            if task_len > 2:
+                nameArr = task_sign[0:task_len - 1]
+                task_name = '-'.join(nameArr).lower()
+                task_ver = task_sign[task_len - 1]
+            if coexist:
+                if task_name == name and task_ver == version:
+                    isTask = task['status']
+            else:
+                if task_name == name:
+                    isTask = task['status']
+        return isTask
+
     def checkDisplayIndex(self, name, version, coexist):
         indexList = thisdb.getOptionByJson('display_index',default=[])
         if coexist:
@@ -451,6 +477,7 @@ class plugin(object):
         if path.find('VERSION') > -1:
             pInfo['path'] = path.replace('VERSION', info['versions'])
 
+        pInfo['task'] = self.checkSetupTask(pInfo['name'], info['versions'], coexist)
         pInfo['display'] = self.checkDisplayIndex(info['name'], pInfo['versions'], coexist)
         pInfo['setup'] = os.path.exists(pInfo['install_checks'])
 
