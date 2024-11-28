@@ -15,7 +15,7 @@ function version_lt() { test "$(echo "$@" | tr " " "\n" | sort -rV | head -n 1)"
 function version_ge() { test "$(echo "$@" | tr " " "\n" | sort -rV | head -n 1)" == "$1"; }
 
 
-version=8.2.24
+version=8.2.26
 PHP_VER=82
 Install_php()
 {
@@ -56,7 +56,7 @@ if [ ! -d $sourcePath/php/php${PHP_VER} ];then
 	fi
 
 	#检测文件是否损坏.
-	md5_file_ok=80a5225746a9eb484475b312d4c626c63a88a037d8e56d214f30205e1ba1411a
+	md5_file_ok=54747400cb4874288ad41a785e6147e2ff546cceeeb55c23c00c771ac125c6ef
 	if [ -f $sourcePath/php/php-${version}.tar.xz ];then
 		md5_file=`sha256sum $sourcePath/php/php-${version}.tar.xz  | awk '{print $1}'`
 		if [ "${md5_file}" != "${md5_file_ok}" ]; then
@@ -72,12 +72,6 @@ fi
 cd $sourcePath/php/php${PHP_VER}
 
 OPTIONS='--without-iconv'
-# if [ $sysName == 'Darwin' ]; then
-# 	BREW_DIR=`which brew`
-# 	BREW_DIR=${BREW_DIR/\/bin\/brew/}
-# 	LIB_DEPEND_DIR=`brew info curl | grep ${BREW_DIR}/Cellar/curl | cut -d \  -f 1 | awk 'END {print}'`
-# 	OPTIONS="${OPTIONS} --with-curl=$LIB_DEPEND_DIR"
-# fi
 
 IS_64BIT=`getconf LONG_BIT`
 if [ "$IS_64BIT" == "64" ];then
@@ -123,8 +117,7 @@ if version_lt "$libzip_version" "0.11.0" ;then
 fi
 
 
-echo "$sourcePath/php/php${PHP_VER}"
-
+# echo "$sourcePath/php/php${PHP_VER}"
 if [ ! -d $serverPath/php/${PHP_VER} ];then
 	cd $sourcePath/php/php${PHP_VER}
 	./buildconf --force
