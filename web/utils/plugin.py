@@ -368,8 +368,7 @@ class plugin(object):
         return False
 
     def checkSetupTask(self, name, version, coexist):
-        if not self.__tasks:
-            self.__tasks = thisdb.getTaskRunAll()
+        self.__tasks = thisdb.getTaskRunAll()
         isTask = '1'
         for task in self.__tasks:
             tmpt = mw.getStrBetween('[', ']', task['name'])
