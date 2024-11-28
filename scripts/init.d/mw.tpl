@@ -101,7 +101,7 @@ mw_start()
 	mw_start_panel
 }
 
-# /www/server/mdserver-web/tmp/panelTask.pl && service mw restart_task
+# /www/server/mdserver-web/logs/panel_task.lock && service mw restart_task
 mw_stop_task()
 {
     if [ -f ${PANEL_DIR}/logs/panel_task.lock ];then
