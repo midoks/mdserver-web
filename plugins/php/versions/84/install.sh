@@ -104,6 +104,8 @@ if version_lt "$libzip_version" "0.11.0" ;then
 	ZIP_OPTION="--with-zip=$serverPath/lib/libzip"
 fi
 
+# OPTIONS="${OPTIONS} --enable-debug"
+# OPTIONS="${OPTIONS} --enable-dtrace"
 
 echo "$sourcePath/php/php${PHP_VER}"
 
