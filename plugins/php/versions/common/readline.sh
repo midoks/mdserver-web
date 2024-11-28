@@ -64,7 +64,8 @@ Install_lib()
 			cd ${rootPath}/plugins/php/lib && /bin/bash libedit.sh
 			OPTIONS="$OPTIONS --with-libedit=${serverPath}/lib/libedit"
 		else
-			OPTIONS="$OPTIONS --with-readline"
+			cd ${rootPath}/plugins/php/lib && /bin/bash libedit.sh
+			OPTIONS="$OPTIONS --with-libedit=${serverPath}/lib/libedit"
 		fi
 
 		$serverPath/php/$version/bin/phpize
