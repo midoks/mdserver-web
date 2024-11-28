@@ -102,7 +102,9 @@ def runPanelTask():
                 end = int(time.time())
                 thisdb.setTaskData(run_task['id'], end=end)
                 thisdb.setTaskStatus(run_task['id'], 1)
-            os.remove(lock_file)
+
+            if thisdb.getTaskUnexecutedCount() < 1:
+                os.remove(lock_file)
     except Exception as e:
         pass
 
