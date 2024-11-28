@@ -71,9 +71,6 @@ fi
 cd $sourcePath/php/php${PHP_VER}
 
 OPTIONS='--without-iconv'
-# if [ $sysName == 'Darwin' ]; then
-# 	OPTIONS="${OPTIONS} --with-curl"
-# fi
 
 argon_version=`pkg-config libargon2 --modversion`
 if [ "$?" == "0" ];then
