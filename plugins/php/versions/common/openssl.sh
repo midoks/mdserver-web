@@ -46,6 +46,10 @@ Install_lib()
 		cd ${rootPath}/plugins/php/lib && /bin/bash openssl_10.sh
 	fi
 
+	if [ "$version" -gt "82" ];then
+		cd ${rootPath}/plugins/php/lib && /bin/bash openssl.sh
+	fi
+
 	if [ "$sysName" == "Darwin" ] ;then 
 		BREW_DIR=`which brew`
 		BREW_DIR=${BREW_DIR/\/bin\/brew/}
@@ -72,15 +76,18 @@ Install_lib()
 			export PKG_CONFIG_PATH=$serverPath/lib/openssl10/lib/pkgconfig
 		fi
 
+		if [ "$version" -gt "82" ] && [ "$sysName" == "Darwin" ];then
+			export PKG_CONFIG_PATH=$serverPath/lib/openssl/lib/pkgconfig
+		fi
+
 		OPTIONS=""
 		if [ "${SYS_ARCH}" == "aarch64" ] && [ "$version" -lt "56" ];then
 			OPTIONS="$OPTIONS --build=aarch64-unknown-linux-gnu --host=aarch64-unknown-linux-gnu"
 		fi
 
 		$serverPath/php/$version/bin/phpize
-		./configure --with-php-config=$serverPath/php/$version/bin/php-config \
-		$OPTIONS \
-		--with-openssl
+		echo "./configure --with-php-config=$serverPath/php/$version/bin/php-config $OPTIONS --with-openssl"
+		./configure --with-php-config=$serverPath/php/$version/bin/php-config $OPTIONS --with-openssl
 		make clean && make && make install && make clean
 
 		if [ -d $sourcePath/php${version} ];then
