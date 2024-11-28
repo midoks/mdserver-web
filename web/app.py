@@ -25,21 +25,12 @@ if sys.path[0] != os.path.dirname(os.path.realpath(__file__)):
     sys.path.insert(0, os.path.dirname(os.path.realpath(__file__)))
 
 
-def try_eventlet():
-    try:
-        import eventlet
-        eventlet.monkey_patch()
-    except Exception as e:
-        pass
-
-
 def main():
-    try:
-        # try_eventlet()
-        socketio.run(app)
-        # app.run(debug=True)
-    except Exception as e:
-        pass
+
+    print(config.DEBUG)
+    socketio.run(app,debug=config.DEBUG)
+    # app.run(debug=True)
+
 
 if __name__ == '__main__':
     main()
