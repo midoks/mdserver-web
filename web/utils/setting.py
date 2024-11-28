@@ -121,8 +121,7 @@ class setting(object):
         if not mw.inArray(['local','nginx'], choose):
             return mw.returnData(True, '删除错误面板SSL类型!')
 
-        port_pl = mw.getPanelDir()+'/data/port.pl'
-        port = mw.readFile(port_pl).strip()
+        port = mw.getPanelPort()
 
         to_panel_url = 'http://'+ip+":"+port+'/config'
 
