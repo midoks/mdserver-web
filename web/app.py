@@ -26,11 +26,8 @@ if sys.path[0] != os.path.dirname(os.path.realpath(__file__)):
 
 
 def main():
-
-    print(config.DEBUG)
     socketio.run(app,debug=config.DEBUG)
     # app.run(debug=True)
-
 
 if __name__ == '__main__':
     main()
