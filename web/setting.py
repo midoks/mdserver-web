@@ -17,6 +17,9 @@ import sys
 import random
 import os
 
+# 初始化db
+from admin import setup
+setup.init()
 
 import core.mw as mw
 import utils.system as system 
