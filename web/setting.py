@@ -22,15 +22,11 @@ import core.mw as mw
 import utils.system as system 
 import thisdb
 
-# 初始化db
-from admin import setup
-setup.init()
-
 cpu_info = system.getCpuInfo()
 workers = cpu_info[1]
+# workers = 1
 
 panel_dir = mw.getPanelDir()
-
 log_dir = mw.getMWLogs()
 if not os.path.exists(log_dir):
     os.mkdir(log_dir)
@@ -71,14 +67,14 @@ if panel_ssl_data['open']:
             ssl_version = 2
 
 if workers > 2:
-    workers = 1
+    workers = 2
 
 threads = workers * 2
 backlog = 512
 reload = False
 daemon = True
-# worker_class = 'geventwebsocket.gunicorn.workers.GeventWebSocketWorker'
-worker_class = 'gthread'
+# # worker_class = 'geventwebsocket.gunicorn.workers.GeventWebSocketWorker'
+worker_class = 'eventlet'
 timeout = 600
 keepalive = 60
 preload_app = True
