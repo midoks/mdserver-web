@@ -103,8 +103,7 @@ def getHomeDir():
 
 def getRunUser():
     if mw.isAppleSystem():
-        user = mw.execShell(
-            "who | sed -n '2, 1p' |awk '{print $1}'")[0].strip()
+        user = mw.execShell("who | sed -n '2, 1p' |awk '{print $1}'")[0].strip()
         return user
     else:
         return 'root'
@@ -566,8 +565,7 @@ def repoList():
     # print(list_data)
     list_data = checkRepoListIsHasScript(list_data)
 
-    data['list'] = mw.getPage({'count': count, 'p': page,
-                               'row': page_size, 'tojs': 'gogsRepoListPage'})
+    data['list'] = mw.getPage({'count': count, 'p': page, 'row': page_size, 'tojs': 'gogsRepoListPage'})
     data['page'] = page
     data['page_size'] = page_size
     data['page_count'] = int(math.ceil(count / page_size))
@@ -826,8 +824,7 @@ def projectScriptSelf_Create():
     name = args['name'] + '.git'
     file = args['file']
 
-    self_path = path = getRootPath() + '/' + user + '/' + \
-        name + '/custom_hooks/self'
+    self_path = path = getRootPath() + '/' + user + '/' + name + '/custom_hooks/self'
 
     if not os.path.exists(self_path):
         os.mkdir(self_path)
