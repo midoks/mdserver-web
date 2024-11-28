@@ -22,7 +22,7 @@ if [ "$version" -lt "72" ];then
 fi 
 
 if [ "$version" == "84" ];then
-	LIBV=1.0.7
+	LIBV=1.0.6
 fi 
 
 
