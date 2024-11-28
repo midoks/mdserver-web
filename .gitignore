@@ -119,9 +119,11 @@ debug.out
 mdioks.session-journal
 *.session
 
+logs/panel.pid
 logs/panel.log
 logs/panel_task.log
-logs/panel.pid
+logs/panel_exec.log
+
 
 ssl/local
 ssl/nginx
