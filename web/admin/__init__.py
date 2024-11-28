@@ -42,10 +42,6 @@ import thisdb
 from admin import setup
 setup.init()
 
-# from threading import Lock
-# thread = None
-# thread_lock = Lock()
-
 app = Flask(__name__, template_folder='templates/default')
 
 # 缓存配置
