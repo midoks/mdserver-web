@@ -12,7 +12,6 @@
 # 配置信息
 # ---------------------------------------------------------------------------------
 
-
 import builtins
 import logging
 import os
@@ -40,6 +39,18 @@ CONFIG_DATABASE_CONNECTION_MAX_OVERFLOW = 100
 #   NOTSET    0
 CONSOLE_LOG_LEVEL = logging.WARNING
 FILE_LOG_LEVEL = logging.WARNING
+
+# Number of values to trust for X-Forwarded-For
+PROXY_X_FOR_COUNT = 1
+# Number of values to trust for X-Forwarded-Proto.
+PROXY_X_PROTO_COUNT = 1
+# Number of values to trust for X-Forwarded-Host.
+PROXY_X_HOST_COUNT = 0
+# Number of values to trust for X-Forwarded-Port.
+PROXY_X_PORT_COUNT = 1
+# Number of values to trust for X-Forwarded-Prefix.
+PROXY_X_PREFIX_COUNT = 0
+
 
 DATA_DIR = mw.getPanelDataDir()
 
