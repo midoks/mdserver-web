@@ -438,6 +438,7 @@ function mysqlCommonFuncRedundantIndexes(){
                     t += '<td>'+items[i]['redundant_index_name']+'</td>';
                     t += '<td>'+items[i]['redundant_index_columns']+'</td>';
                     t += '<td>'+items[i]['sql_drop_index']+'</td>';
+                    t += '<td><a class="btlink">执行</a></td>';
                     t += '</tr>';
                     tbody += t;
                 }
@@ -462,6 +463,7 @@ function mysqlCommonFuncRedundantIndexes(){
                     <th style="width:50px;">冗余索引名</th>\
                     <th style="width:50px;">冗余索引列名</th>\
                     <th style="width:300px;">删除冗余索引SQL</th>\
+                    <th style="width:30px;">操作</th>\
                 </thead>\
                 <tbody></tbody>\
             </table>\
