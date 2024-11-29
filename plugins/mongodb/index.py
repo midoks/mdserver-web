@@ -1525,6 +1525,12 @@ def runLog():
     return getServerDir() + '/logs.pl'
 
 
+def installPreInspectionDebainCheck(sysId,version):
+    if version.startwidth('8.0'):
+        if sysId != '12':
+            return "[%s]需要debain[12]" % (version,)
+    return ''
+
 def installPreInspection(version):
     if mw.isAppleSystem():
         return 'ok'
@@ -1543,6 +1549,12 @@ def installPreInspection(version):
     supportOs = ['centos', 'ubuntu', 'debian', 'opensuse']
     if not sysName in supportOs:
         return '暂时仅支持{}'.format(','.join(supportOs))
+
+    if sysName == 'debian':
+        check = installPreInspectionDebainCheck(sysId, version) 
+        if check != '':
+            return check
+
     return 'ok'
 
 def uninstallPreInspection(version):
@@ -1556,7 +1568,7 @@ def uninstallPreInspection(version):
 if __name__ == "__main__":
     func = sys.argv[1]
 
-    version = "4.4"
+    version = '4.4'
     if (len(sys.argv) > 2):
         version = sys.argv[2]
 
