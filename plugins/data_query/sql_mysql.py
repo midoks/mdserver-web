@@ -381,6 +381,29 @@ class nosqlMySQLCtr():
             return mw.returnData(False, "查询失败!")
         # print(data)
         return mw.returnData(True, 'ok', data)
+
+    def redundantIndexesCmd(self, args):
+        sid = args['sid']
+        my_instance = self.getInstanceBySid(sid).conn()
+        if my_instance is False:
+            return mw.returnData(False,'无法链接')
+
+        is_performance_schema = my_instance.find("SELECT @@performance_schema")
+        if is_performance_schema["@@performance_schema"] == 0:
+            msg = "performance_schema参数未开启。\n"
+            msg += "在my.cnf配置文件里添加performance_schema=1，并重启mysqld进程生效。"
+            return mw.returnData(False, msg)
+
+        data = my_instance.query("select table_schema,table_name,redundant_index_name,redundant_index_columns,sql_drop_index from sys.schema_redundant_indexes")
+        if data is None:
+            return mw.returnData(False, "查询失败!")
+
+        index = int(args['index'])
+
+        cmd = data[index]['sql_drop_index']
+
+        my_instance.execute(cmd)
+        return mw.returnData(True, '执行成功!')
 # ---------------------------------- run ----------------------------------
 # 获取 mysql 列表
 def get_db_list(args):
@@ -422,6 +445,11 @@ def get_net_list(args):
 def get_redundant_indexes(args):
     t = nosqlMySQLCtr()
     return t.getRedundantIndexes(args)
+
+# 查看重复或冗余的索引
+def redundant_indexes_cmd(args):
+    t = nosqlMySQLCtr()
+    return t.redundantIndexesCmd(args)
 
 
 

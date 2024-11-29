@@ -438,11 +438,22 @@ function mysqlCommonFuncRedundantIndexes(){
                     t += '<td>'+items[i]['redundant_index_name']+'</td>';
                     t += '<td>'+items[i]['redundant_index_columns']+'</td>';
                     t += '<td>'+items[i]['sql_drop_index']+'</td>';
-                    t += '<td><a class="btlink">执行</a></td>';
+                    t += '<td><a class="exec btlink" index="'+i+'">执行</a></td>';
                     t += '</tr>';
                     tbody += t;
                 }
                 $('#redundant_indexes tbody').html(tbody);
+                $('#redundant_indexes tbody .exec').click(function(){
+                    var index = $(this).attr('index');
+                    myPostCB('redundant_indexes_cmd', {'sid':sid, 'index':index}, function(rdata){
+                        var data = rdata.data;
+                        showMsg(data.msg,function(){
+                            if (data.status){
+                                renderSQL();
+                            }
+                        },{icon: data.status ? 1 : 2}, 2000);
+                    });
+                });
             } else {
                 layer.msg(data.msg,{icon:2});
             }
