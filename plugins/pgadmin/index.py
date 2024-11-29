@@ -184,8 +184,9 @@ def getPythonName():
     return data[0].strip();
 
 def initPgConfFile():
+    pyname = getPythonName()
     file_tpl = getPluginDir() + '/conf/config_local.py'
-    dst_file = getServerDir()+'/run/lib/python3.10/site-packages/pgadmin4/config_local.py'
+    dst_file = getServerDir()+'/run/lib/'+pyname+'/site-packages/pgadmin4/config_local.py'
     if not os.path.exists(dst_file):
         service_path = mw.getServerDir()
         content = mw.readFile(file_tpl)
