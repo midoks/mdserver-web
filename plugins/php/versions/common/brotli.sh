@@ -54,7 +54,7 @@ Install_lib()
 			fi
 			cd $php_lib && tar xvf ${LIBNAME}-${LIBV}.tgz
 		fi
-		cd $php_lib/${LIBNAME}-${LIBV}/extension
+		cd $php_lib/${LIBNAME}-${LIBV}
 
 		OPTIONS=''
 		if [ "${SYS_ARCH}" == "aarch64" ] && [ "$version" -lt "56" ];then
