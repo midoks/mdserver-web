@@ -133,7 +133,7 @@ def contentReplace(content):
 def initDreplace():
 
     file_tpl = getInitDTpl()
-    service_path = os.path.dirname(os.getcwd())
+    service_path = mw.getServerDir()
 
     initD_path = getServerDir() + '/init.d'
     if not os.path.exists(initD_path):
@@ -158,8 +158,7 @@ def initDreplace():
     if not os.path.exists(dst_conf_init):
         conf_content = mw.readFile(getConfTpl())
         conf_content = conf_content.replace('{$SERVER_PATH}', service_path)
-        conf_content = conf_content.replace(
-            '{$REDIS_PASS}', mw.getRandomString(10))
+        conf_content = conf_content.replace('{$REDIS_PASS}', mw.getRandomString(10))
 
         mw.writeFile(dst_conf, conf_content)
         mw.writeFile(dst_conf_init, 'ok')
