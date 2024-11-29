@@ -167,7 +167,6 @@ def pSqliteDb(dbname='dnsapi'):
 def initDreplace():
 
     file_tpl = getInitDTpl()
-    service_path = os.path.dirname(os.getcwd())
 
     initD_path = getServerDir() + '/init.d'
     if not os.path.exists(initD_path):
