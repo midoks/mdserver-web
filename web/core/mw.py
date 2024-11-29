@@ -1390,6 +1390,20 @@ def checkWebConfig():
         return result[1]
     return True
 
+def isIpAddr(ip):
+    check_ip = re.compile(r'^(1\d{2}|2[0-4]\d|25[0-5]|[1-9]\d|[1-9])\.(1\d{2}|2[0-4]\d|25[0-5]|[1-9]\d|\d)\.(1\d{2}|2[0-4]\d|25[0-5]|[1-9]\d|\d)\.(1\d{2}|2[0-4]\d|25[0-5]|[1-9]\d|\\d)$')
+    if check_ip.match(ip):
+        return True
+    else:
+        return False
+
+def getWebStatus():
+    pid = getServerDir() + '/openresty/nginx/logs/nginx.pid'
+    if os.path.exists(pid):
+        return True
+    return False
+
+
 def restartWeb():
     return opWeb("reload")
 
