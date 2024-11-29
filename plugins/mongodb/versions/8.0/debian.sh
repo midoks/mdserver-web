@@ -15,15 +15,15 @@ SYS_NAME=${SYS_VERSION_ID/./}
 
 
 if [ "$SYS_NAME" -gt "11" ];then
-	SYS_NAME="11"
+	SYS_NAME="12"
 fi
 
 if [ "$SYS_NAME" -lt "11" ];then
-	SYS_NAME="11"
+	SYS_NAME="12"
 fi
 
 if [ "$SYS_NAME" == "" ];then
-	SYS_NAME="11"
+	SYS_NAME="12"
 fi
 
 FILE_NAME=mongodb-linux-${SYS_ARCH}-debian${SYS_NAME}-${VERSION}
