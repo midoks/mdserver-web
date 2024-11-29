@@ -92,7 +92,7 @@ Install_app()
 		make -j${cpuCore} && make install && make clean
 
 		if [ -d $serverPath/mariadb ];then
-			echo '11.4' > $serverPath/mariadb/version.pl
+			echo '11.5' > $serverPath/mariadb/version.pl
 			echo '安装完成'
 		else
 			echo '安装失败'
