@@ -556,7 +556,8 @@ def getOsID():
     return data[0].strip()
 
 # 获取文件权限描述
-def getFileStatsDesc(filename,path):
+def getFileStatsDesc(filename, path=None):
+    import pwd
     if path == '' or filename == '':
         return ';;;;;'
     try:
@@ -569,12 +570,13 @@ def getFileStatsDesc(filename,path):
             user = str(pwd.getpwuid(stat.st_uid).pw_name)
         except:
             user = str(stat.st_uid)
+            
         size = str(stat.st_size)
         link = ''
         if os.path.islink(filename):
             link = ' -> ' + os.readlink(filename)
 
-        if path != '':
+        if path:
             tmp_path = (path + '/').replace('//', '/')
             filename = filename.replace(tmp_path, '', 1)
 
