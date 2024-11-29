@@ -23,6 +23,10 @@ if [ "$SYS_NAME" -lt "2004" ];then
 	SYS_NAME="2004"
 fi
 
+if [ "$SYS_NAME" == "2404" ];then
+	SYS_NAME="2404"
+fi
+
 MG_DIR=$serverPath/source/mongodb
 mkdir -p $MG_DIR
 
