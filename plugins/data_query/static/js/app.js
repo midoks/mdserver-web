@@ -423,6 +423,55 @@ function mysqlCommonFuncMysqlNet(){
     });
 }
 
+function mysqlCommonFuncRedundantIndexes(){
+    function renderSQL(){
+        var sid = mysqlGetSid();
+        myPostCBN('get_redundant_indexes',{'sid':sid} ,function(rdata){
+            var data = rdata.data;
+            if (data['status']){
+                var items = data.data;
+                var tbody = '';
+                for (var i = 0; i < items.length; i++) {
+                    var t = '<tr>';
+                    t += '<td>'+items[i]['table_schema']+'</td>';
+                    t += '<td>'+items[i]['table_name']+'</td>';
+                    t += '<td>'+items[i]['redundant_index_name']+'</td>';
+                    t += '<td>'+items[i]['redundant_index_columns']+'</td>';
+                    t += '<td>'+items[i]['sql_drop_index']+'</td>';
+                    t += '</tr>';
+                    tbody += t;
+                }
+                $('#redundant_indexes tbody').html(tbody);
+            } else {
+                layer.msg(data.msg,{icon:2});
+            }
+        });
+    }
+
+    layer.open({
+        type: 1,
+        title: "查看重复或冗余的索引",
+        area: ['1100px', '400px'],
+        closeBtn: 1,
+        shadeClose: false,
+        content: '<div class="bt-form pd20 divtable taskdivtable">\
+            <table class="table table-hover" id="redundant_indexes">\
+                <thead>\
+                    <th style="width:100px;">数据库名</th>\
+                    <th style="width:50px;">表名</th>\
+                    <th style="width:50px;">冗余索引名</th>\
+                    <th style="width:50px;">冗余索引列名</th>\
+                    <th style="width:300px;">删除冗余索引SQL</th>\
+                </thead>\
+                <tbody></tbody>\
+            </table>\
+        </div>',
+        success:function(i,l){
+            renderSQL();
+        }
+    });
+}
+
 function mysqlCommonFunc(){
     $('#mysql_common').click(function(){
         layer.open({
@@ -432,8 +481,9 @@ function mysqlCommonFunc(){
             closeBtn: 1,
             shadeClose: false,
             content: '<div class="bt-form pd20">\
-                <button id="mysql_top_nsql" type="button" class="btn btn-default btn-sm">查询执行次数最频繁的前N条SQL语句</button>\
-                <button id="mysql_net_stat" type="button" class="btn btn-default btn-sm">MySQL服务器的QPS/TPS/网络带宽指标</button>\
+                <button style="margin-bottom: 8px;" id="mysql_top_nsql" type="button" class="btn btn-default btn-sm">查询执行次数最频繁的前N条SQL语句</button>\
+                <button style="margin-bottom: 8px;" id="mysql_net_stat" type="button" class="btn btn-default btn-sm">MySQL服务器的QPS/TPS/网络带宽指标</button>\
+                <button style="margin-bottom: 8px;" id="mysql_redundant_indexes" type="button" class="btn btn-default btn-sm">查看重复或冗余的索引</button>\
             </div>',
             success:function(i,l){
                 $('#mysql_top_nsql').click(function(){
@@ -442,6 +492,10 @@ function mysqlCommonFunc(){
 
                 $('#mysql_net_stat').click(function(){
                     mysqlCommonFuncMysqlNet();
+                });
+
+                $('#mysql_redundant_indexes').click(function(){
+                    mysqlCommonFuncRedundantIndexes();
                 });
             }
         });
