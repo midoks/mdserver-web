@@ -564,11 +564,11 @@ def installPreInspection():
 
 
 if __name__ == "__main__":
+
+    version = '1.27.1'
     version_pl = getServerDir() + "/version.pl"
-    if not os.path.exists(version_pl):
-        print('error')
-        exit(-1) 
-    version = mw.readFile(version_pl)
+    if os.path.exists(version_pl):
+        version = mw.readFile(version_pl)
 
 
     func = sys.argv[1]
