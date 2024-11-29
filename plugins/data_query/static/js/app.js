@@ -353,6 +353,11 @@ function mysqlGetTableList(p){
     // console.log('mysqlGetTableList',p);
     var sid = mysqlGetSid();
     var db = mysqlGetDbName();
+
+    if (!db){
+        return;
+    }
+
     myPostCB('get_table_list',{'sid':sid,'db':db} ,function(rdata){
         if (rdata.data.status){
 
