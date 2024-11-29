@@ -11,24 +11,16 @@ rootPath=$(dirname "$rootPath")
 serverPath=$(dirname "$rootPath")
 sourcePath=${serverPath}/source/php
 SYS_ARCH=`arch`
-LIBNAME=redis
-LIBV=6.1.0
+LIBNAME=brotli
+LIBV=0.15.2
 sysName=`uname`
 actionType=$1
 version=$2
 
-if [ "$version" == "52" ];then
-	LIBV=2.2.7
-elif [ "$version" -lt "70" ];then
-	LIBV=4.2.0
-elif [ "$version" -lt "80" ];then
-	LIBV=5.3.7
-elif [ "$version" -gt "80" ];then
-	LIBV=6.1.0
-else
-	echo 'ok'
+if [ "$version" -lt "70" ];then
+	echo "not need"
+	exit 1
 fi
-
 
 LIB_PATH_NAME=lib/php
 if [ -d $serverPath/php/${version}/lib64 ];then
@@ -44,17 +36,16 @@ else
 	BAK=''
 fi
 
+
 Install_lib()
 {
-	isInstall=`cat $serverPath/php/${version}/etc/php.ini|grep "${LIBNAME}.so"`
+	isInstall=`cat $serverPath/php/$version/etc/php.ini|grep "${LIBNAME}.so"`
 	if [ "${isInstall}" != "" ];then
 		echo "php-$version 已安装${LIBNAME},请选择其它版本!"
 		return
 	fi
 	
-	
 	if [ ! -f "$extFile" ];then
-
 		php_lib=$sourcePath/php_lib
 		mkdir -p $php_lib
 		if [ ! -d $php_lib/${LIBNAME}-${LIBV} ];then
@@ -63,25 +54,27 @@ Install_lib()
 			fi
 			cd $php_lib && tar xvf ${LIBNAME}-${LIBV}.tgz
 		fi
-		cd $php_lib/${LIBNAME}-${LIBV}
+		cd $php_lib/${LIBNAME}-${LIBV}/extension
 
-		OPTIONS=""
+		OPTIONS=''
 		if [ "${SYS_ARCH}" == "aarch64" ] && [ "$version" -lt "56" ];then
 			OPTIONS="$OPTIONS --build=aarch64-unknown-linux-gnu --host=aarch64-unknown-linux-gnu"
 		fi
-		
+
 		$serverPath/php/$version/bin/phpize
-		./configure --with-php-config=$serverPath/php/$version/bin/php-config $OPTIONS
+		./configure --enable-brotli \
+		--with-php-config=$serverPath/php/$version/bin/php-config $OPTIONS
 		make clean && make && make install && make clean
 
 		cd $php_lib && rm -rf $php_lib/${LIBNAME}-${LIBV}
 	fi
-
+	
 	if [ ! -f "$extFile" ];then
 		echo "ERROR!"
 		return
 	fi
 
+	echo "" >> $serverPath/php/$version/etc/php.ini
 	echo "[${LIBNAME}]" >> $serverPath/php/$version/etc/php.ini
 	echo "extension=${LIBNAME}.so" >> $serverPath/php/$version/etc/php.ini
 
@@ -97,7 +90,7 @@ Uninstall_lib()
 		echo "php-$version 未安装,请选择其它版本!"
 		return
 	fi
-
+	
 	if [ ! -f "$extFile" ];then
 		echo "php-$version 未安装${LIBNAME},请选择其它版本!"
 		echo "php-$version not install ${LIBNAME}, Plese select other version!"
@@ -112,7 +105,6 @@ Uninstall_lib()
 	echo '==============================================='
 	echo 'successful!'
 }
-
 
 
 if [ "$actionType" == 'install' ];then
