@@ -486,7 +486,7 @@ function mysqlCommonFuncRedundantIndexes(){
 }
 
 function mysqlCommonFunc(){
-    $('#mysql_common').click(function(){
+    $('#mysql_common').unbind('click').click(function(){
         layer.open({
             type: 1,
             title: "MySQL常用功能",
