@@ -18,12 +18,11 @@ serverPath=$(dirname "$rootPath")
 # /Users/midoks/Desktop/mwdev/server/redis/bin/redis-cli -h 127.0.0.1 -p 6399
 # /www/server/redis/bin/redis-cli -h 127.0.0.1 -p 6399
 
-install_tmp=${rootPath}/tmp/mw_install.pl
 VERSION=$2
 
 Install_App()
 {
-	echo '正在安装脚本文件...' > $install_tmp
+	echo '正在安装脚本文件...'
 	mkdir -p $serverPath/source
 	mkdir -p $serverPath/source/redis
 
