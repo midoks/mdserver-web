@@ -85,7 +85,7 @@ Install_pgadmin()
 	pip install gunicorn
 
 	# pip install https://ftp.postgresql.org/pub/pgadmin/pgadmin4/v8.10/pip/pgadmin4-8.10-py3-none-any.whl
-	pip install https://ftp.postgresql.org/pub/pgadmin/pgadmin4/v8.12/pip/pgadmin4-8.12-py3-none-any.whl
+	pip install https://ftp.postgresql.org/pub/pgadmin/pgadmin4/v8.13/pip/pgadmin4-8.13-py3-none-any.whl
 
 	cd ${rootPath} && python3 ${rootPath}/plugins/pgadmin/index.py start
 	echo '安装完成'
