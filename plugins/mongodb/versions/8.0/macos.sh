@@ -14,18 +14,25 @@ VERSION=8.0.3
 MG_DIR=$serverPath/source/mongodb
 mkdir -p $MG_DIR
 
-if [ ! -f $MG_DIR/mongodb-macos-x86_64-${VERSION}.tgz ]; then
-	wget --no-check-certificate -O $MG_DIR/mongodb-macos-x86_64-${VERSION}.tgz https://fastdl.mongodb.org/osx/mongodb-macos-x86_64-${VERSION}.tgz
-	echo "wget --no-check-certificate -O $MG_DIR/mongodb-macos-x86_64-${VERSION}.tgz https://fastdl.mongodb.org/osx/mongodb-macos-x86_64-${VERSION}.tgz"
+# https://fastdl.mongodb.org/osx/mongodb-macos-arm64-8.0.3.tgz
+FILE_NAME=mongodb-macos-x86_64-${VERSION}
+if [ "arm64" == "${SYS_ARCH}" ];then
+	FILE_NAME=mongodb-macos-arm64-${VERSION}
+fi
+FILE_NAME_TGZ=${FILE_NAME}.tgz
+
+if [ ! -f $MG_DIR/${FILE_NAME_TGZ} ]; then
+	wget --no-check-certificate -O $MG_DIR/${FILE_NAME_TGZ} https://fastdl.mongodb.org/osx/${FILE_NAME_TGZ}
+	echo "wget --no-check-certificate -O $MG_DIR/${FILE_NAME_TGZ} https://fastdl.mongodb.org/osx/${FILE_NAME_TGZ}"
 fi
 
-if [ ! -d $MG_DIR/mongodb-macos-x86_64-${VERSION} ];then 
-	cd $MG_DIR && tar -zxvf mongodb-macos-x86_64-${VERSION}.tgz
+if [ ! -d $MG_DIR/${FILE_NAME} ];then 
+	cd $MG_DIR && tar -zxvf ${FILE_NAME_TGZ}
 fi
 
 if [ ! -d $serverPath/mongodb/bin ];then
 	mkdir -p $serverPath/mongodb
-	cd $MG_DIR/mongodb-macos-x86_64-${VERSION} && cp -rf ./bin $serverPath/mongodb
+	cd $MG_DIR/${FILE_NAME} && cp -rf ./bin $serverPath/mongodb
 fi
 
 # https://downloads.mongodb.com/compass/mongosh-2.2.5-darwin-x64.zip
