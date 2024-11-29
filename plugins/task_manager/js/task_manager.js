@@ -506,25 +506,25 @@ function get_resource_list() {
       buildRealProcess()
       var tbody_tr = createProcessTable(true);
       var tbody = '<thead>\
-					<tr style="cursor: pointer;">\
-						<th style="width:120px;" class="pro_name pro_ps" onclick="get_process_list(\'ps\',\'' + res_list[reverse] + '\')">应用名称</th>\
-						<th class="pro_pid" onclick="get_process_list(\'pid\',\'' + res_list[reverse] + '\')">PID</th>\
-						<th style="width:50px;"class="pro_threads" onclick="get_process_list(\'threads\',\'True\')">线程</th>\
-						<th style="width:60px;" class="pro_user" onclick="get_process_list(\'user\',\'' + res_list[reverse] + '\')">用户</th>\
-						<th style="width:70px;" class="pro_cpu_percent" onclick="get_process_list(\'cpu_percent\',\'True\')">CPU</th>\
-						<th style="width:70px;" class="pro_memory_used" onclick="get_process_list(\'memory_used\',\'True\')">内存</th>\
-						<th style="width:70px;" class="pro_io_read_speed" onclick="get_process_list(\'io_read_speed\',\'True\')">io读</th>\
-						<th style="width:70px;" class="pro_io_write_speed" onclick="get_process_list(\'io_write_speed\',\'True\')">io写</th>\
-						<th style="width:70px;" class="pro_up" onclick="get_process_list(\'up\',\'True\')">上行</th>\
-						<th style="width:70px;" class="pro_down" onclick="get_process_list(\'down\',\'True\')">下行</th>\
-						<th style="width:50px;" class="pro_connects" onclick="get_process_list(\'connects\',\'True\')">连接</th>\
-						<th style="width:50px;" class="pro_status" onclick="get_process_list(\'status\',\'' + res_list[reverse] + '\')">状态</th>\
-						<th style="width:50px;cursor:text">操作</th>\
-					</tr>\
-				</thead>\
-				<tbody>' + tbody_tr + '</tbody>'
-      $('#taskResourceTable').html(tbody);
-      $(".table-cont").css("height", "220px");
+        	<tr style="cursor: pointer;">\
+        		<th style="width:120px;" class="pro_name pro_ps" onclick="get_process_list(\'ps\',\'' + res_list[reverse] + '\')">应用名称</th>\
+        		<th class="pro_pid" onclick="get_process_list(\'pid\',\'' + res_list[reverse] + '\')">PID</th>\
+        		<th style="width:50px;"class="pro_threads" onclick="get_process_list(\'threads\',\'True\')">线程</th>\
+        		<th style="width:60px;" class="pro_user" onclick="get_process_list(\'user\',\'' + res_list[reverse] + '\')">用户</th>\
+        		<th style="width:70px;" class="pro_cpu_percent" onclick="get_process_list(\'cpu_percent\',\'True\')">CPU</th>\
+        		<th style="width:70px;" class="pro_memory_used" onclick="get_process_list(\'memory_used\',\'True\')">内存</th>\
+        		<th style="width:70px;" class="pro_io_read_speed" onclick="get_process_list(\'io_read_speed\',\'True\')">io读</th>\
+        		<th style="width:70px;" class="pro_io_write_speed" onclick="get_process_list(\'io_write_speed\',\'True\')">io写</th>\
+        		<th style="width:70px;" class="pro_up" onclick="get_process_list(\'up\',\'True\')">上行</th>\
+        		<th style="width:70px;" class="pro_down" onclick="get_process_list(\'down\',\'True\')">下行</th>\
+        		<th style="width:50px;" class="pro_connects" onclick="get_process_list(\'connects\',\'True\')">连接</th>\
+        		<th style="width:50px;" class="pro_status" onclick="get_process_list(\'status\',\'' + res_list[reverse] + '\')">状态</th>\
+        		<th style="width:50px;cursor:text">操作</th>\
+        	</tr>\
+        </thead>\
+        <tbody>' + tbody_tr + '</tbody>';
+        $('#taskResourceTable').html(tbody);
+        $(".table-cont").css("height", "220px");
     })
 
     $("#load_average").html('')

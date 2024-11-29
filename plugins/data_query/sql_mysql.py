@@ -90,7 +90,7 @@ class nosqlMySQL():
         keys = ["bind_ip", "port"]
 
         result['host'] = '127.0.0.1'
-        rep = 'port\s*=\s*(.*)'
+        rep = r'port\s*=\s*(.*)'
 
         port_re = re.search(rep, my_content)
         if port_re:
@@ -98,7 +98,7 @@ class nosqlMySQL():
         else:
             result['port'] = 3306
 
-        socket_rep = 'socket\s*=\s*(.*)'
+        socket_rep = r'socket\s*=\s*(.*)'
         socket_re = re.search(socket_rep, my_content)
         if socket_re:
             result['socket'] = socket_re.groups()[0].strip()
@@ -281,6 +281,88 @@ class nosqlMySQLCtr():
         rdata['list'] = result
         return mw.returnData(True,'ok', rdata)
 
+    def getNetRow(self, my_instance):
+        row = {}
+
+        data = my_instance.find("SHOW GLOBAL STATUS LIKE 'Com_select'")
+        row['select'] = data['Value']
+
+        data = my_instance.find("SHOW GLOBAL STATUS LIKE 'Com_insert'")
+        row['insert'] = data['Value']
+
+        data = my_instance.find("SHOW GLOBAL STATUS LIKE 'Com_update'")
+        row['update'] = data['Value']
+
+        data = my_instance.find("SHOW GLOBAL STATUS LIKE 'Com_delete'")
+        row['delete']  = data['Value']
+
+        
+
+        data = my_instance.find("SHOW GLOBAL STATUS LIKE 'Bytes_received'")
+        row['recv_bytes']  = data['Value']
+
+        data = my_instance.find("SHOW GLOBAL STATUS LIKE 'Bytes_sent'")
+        row['send_bytes']  = data['Value']
+        return row
+
+
+    def getNetList(self, args):
+        from datetime import datetime
+        sid = args['sid']
+        my_instance = self.getInstanceBySid(sid).conn()
+        if my_instance is False:
+            return mw.returnData(False,'无法链接')
+
+        rdata = []
+        row = {}
+        row1 = self.getNetRow(my_instance)
+        # 等待1秒
+        time.sleep(1)
+        row2 = self.getNetRow(my_instance)
+
+        data = my_instance.find("SHOW GLOBAL VARIABLES LIKE 'max_connections'")
+        row['max_conn'] = data['Value']
+
+        data = my_instance.find("SHOW GLOBAL STATUS LIKE 'Threads_connected'")
+        row['conn']  = data['Value']
+
+        current_time = datetime.now()
+        row['current_time'] = current_time.strftime("%Y-%m-%d %H:%M:%S")
+
+        row['select'] = int(row2['select']) - int(row1['select'])
+        row['insert'] = int(row2['insert']) - int(row1['insert'])
+        row['update'] = int(row2['update']) - int(row1['update'])
+        row['delete'] = int(row2['delete']) - int(row1['delete'])
+
+        recv_per_second = int(row2['recv_bytes']) - int(row1['recv_bytes'])
+        send_per_second = int(row2['send_bytes']) - int(row1['send_bytes'])
+
+        # 将每秒接收和发送数据量从字节转换为兆比特
+        row['recv_mbps'] = "{:.2f}".format(recv_per_second * 8 / 1000000) + " MBit/s" 
+        row['send_mbps'] = "{:.2f}".format(send_per_second * 8 / 1000000) + " MBit/s"
+
+        rdata.append(row)
+        return mw.returnData(True, 'ok', rdata)
+
+
+    def getTopnList(self, args):
+        sid = args['sid']
+        my_instance = self.getInstanceBySid(sid).conn()
+        if my_instance is False:
+            return mw.returnData(False,'无法链接')
+
+        is_performance_schema = my_instance.find("SELECT @@performance_schema")
+        if is_performance_schema["@@performance_schema"] == 0:
+            msg = "performance_schema参数未开启。\n"
+            msg += "在my.cnf配置文件里添加performance_schema=1，并重启mysqld进程生效。"
+            return mw.returnData(False, msg)
+
+        my_instance.execute("SET @sys.statement_truncate_len=4096")
+        data = my_instance.query("select query,db,last_seen,exec_count,max_latency,avg_latency from sys.statement_analysis order by exec_count desc, last_seen desc limit 10")
+        if data is None:
+            return mw.returnData(False, "查询失败!")
+        return mw.returnData(True, 'ok', data)
+
 # ---------------------------------- run ----------------------------------
 # 获取 mysql 列表
 def get_db_list(args):
@@ -307,6 +389,19 @@ def get_status_list(args):
 def get_stats_list(args):
     t = nosqlMySQLCtr()
     return t.showStatsList(args)
+
+# 查询执行次数最频繁的前N条SQL语句
+def get_topn_list(args):
+    t = nosqlMySQLCtr()
+    return t.getTopnList(args)
+
+# MySQL服务器的QPS/TPS/网络带宽指标
+def get_net_list(args):
+    t = nosqlMySQLCtr()
+    return t.getNetList(args)
+
+
+
 
 
 # 测试

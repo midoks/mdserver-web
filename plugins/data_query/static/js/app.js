@@ -267,6 +267,185 @@ function initTabMySQL(){
         var name = $(this).data('name');
         mysqlRunMysqlTab(name);
     });
+
+    mysqlCommonFunc();
+}
+
+function mysqlCommonFuncMysqlNSQL(){
+    function renderSQL(){
+        var sid = mysqlGetSid();
+        myPostCBN('get_topn_list',{'sid':sid} ,function(rdata){
+            var data = rdata.data;
+            if (data['status']){
+                var items = data.data;
+                var tbody = '';
+                for (var i = 0; i < items.length; i++) {
+                    var t = '<tr>';
+                    t += '<td>'+items[i].query+'</td>';
+                    t += '<td>'+items[i].db+'</td>';
+                    t += '<td>'+items[i].last_seen+'</td>';
+                    t += '<td>'+items[i].exec_count+'</td>';
+                    t += '<td>'+items[i].max_latency+'</td>';
+                    t += '<td>'+items[i].avg_latency+'</td>';
+                    t += '</tr>';
+                    tbody += t;
+                }
+                $('#topn_list tbody').html(tbody);
+            } else {
+                layer.msg(data.msg,{icon:2});
+            }
+        });
+    }
+
+    var sql_timer = null;
+    layer.open({
+        type: 1,
+        title: "查询执行次数最频繁的前N条SQL语句",
+        area: ['1200px', '500px'],
+        closeBtn: 1,
+        shadeClose: false,
+        content: '<div class="bt-form pd20 divtable taskdivtable">\
+            <div class="mr20 pull-left" style="border-right: 1px solid #ccc; padding-right: 20px;">\
+                <div class="ss-text pull-left">\
+                    <em>实时监控</em>\
+                    <div class="ssh-item">\
+                        <input class="btswitch btswitch-ios" id="real_time_monitoring" type="checkbox">\
+                        <label id="real_time_label" class="btswitch-btn" for="real_time_monitoring"></label>\
+                    </div>\
+                </div>\
+            </div>\
+            <hr />\
+            <table class="table table-hover" id="topn_list">\
+                <thead>\
+                    <th>SQL</th>\
+                    <th style="width:100px;">数据名</th>\
+                    <th>最近时间</th>\
+                    <th style="width:100px;">总次数</th>\
+                    <th style="width:100px;">最大时间</th>\
+                    <th style="width:100px;">平均时间</th>\
+                </thead>\
+                <tbody></tbody>\
+            </table>\
+        </div>',
+        success:function(i,l){
+            renderSQL();
+
+            $('#real_time_label').click(function(){
+                sql_timer = setInterval(function(){
+                    var t = $('#real_time_monitoring').is(':checked');
+                    if (t){
+                        renderSQL();
+                    } else{
+                        clearInterval(sql_timer);
+                    }
+                }, 3000);
+            });
+        }
+    });
+}
+
+function mysqlCommonFuncMysqlNet(){
+    function renderSQL(){
+        var sid = mysqlGetSid();
+        myPostCBN('get_net_list',{'sid':sid} ,function(rdata){
+            var data = rdata.data;
+            if (data['status']){
+                var items = data.data;
+                var tbody = '';
+                for (var i = 0; i < items.length; i++) {
+                    var t = '<tr>';
+                    t += '<td>'+items[i]['current_time']+'</td>';
+                    t += '<td>'+items[i]['select']+'</td>';
+                    t += '<td>'+items[i]['insert']+'</td>';
+                    t += '<td>'+items[i]['update']+'</td>';
+                    t += '<td>'+items[i]['delete']+'</td>';
+                    t += '<td>'+items[i]['conn']+'</td>';
+                    t += '<td>'+items[i]['max_conn']+'</td>';
+                    t += '<td>'+items[i]['recv_mbps']+'</td>';
+                    t += '<td>'+items[i]['send_mbps']+'</td>';
+                    t += '</tr>';
+                    tbody += t;
+                }
+                $('#net_list tbody').html(tbody);
+            } else {
+                layer.msg(data.msg,{icon:2});
+            }
+        });
+    }
+
+    var sql_timer = null;
+    layer.open({
+        type: 1,
+        title: "MySQL服务器的QPS/TPS/网络带宽指标",
+        area: ['700px', '220px'],
+        closeBtn: 1,
+        shadeClose: false,
+        content: '<div class="bt-form pd20 divtable taskdivtable">\
+            <div class="mr20 pull-left" style="border-right: 1px solid #ccc; padding-right: 20px;">\
+                <div class="ss-text pull-left">\
+                    <em>实时监控</em>\
+                    <div class="ssh-item">\
+                        <input class="btswitch btswitch-ios" id="real_qps_monitoring" type="checkbox">\
+                        <label id="real_qps_label" class="btswitch-btn" for="real_qps_monitoring"></label>\
+                    </div>\
+                </div>\
+            </div>\
+            <hr />\
+            <table class="table table-hover" id="net_list">\
+                <thead>\
+                    <th style="width:160px;">时间</th>\
+                    <th style="width:50px;">Select</th>\
+                    <th style="width:50px;">Insert</th>\
+                    <th style="width:50px;">Update</th>\
+                    <th style="width:50px;">Delete</th>\
+                    <th style="width:50px;">Conn</th>\
+                    <th style="width:50px;">Max_conn</th>\
+                    <th style="width:90px;">Recv</th>\
+                    <th style="width:90px;">Send</th>\
+                </thead>\
+                <tbody></tbody>\
+            </table>\
+        </div>',
+        success:function(i,l){
+            renderSQL();
+
+            $('#real_qps_label').click(function(){
+                sql_timer = setInterval(function(){
+                    var t = $('#real_qps_monitoring').is(':checked');
+                    if (t){
+                        renderSQL();
+                    } else{
+                        clearInterval(sql_timer);
+                    }
+                }, 3000);
+            });
+        }
+    });
+}
+
+function mysqlCommonFunc(){
+    $('#mysql_common').click(function(){
+        layer.open({
+            type: 1,
+            title: "MySQL常用功能",
+            area: ['600px', '400px'],
+            closeBtn: 1,
+            shadeClose: false,
+            content: '<div class="bt-form pd20">\
+                <button id="mysql_top_nsql" type="button" class="btn btn-default btn-sm">查询执行次数最频繁的前N条SQL语句</button>\
+                <button id="mysql_net_stat" type="button" class="btn btn-default btn-sm">MySQL服务器的QPS/TPS/网络带宽指标</button>\
+            </div>',
+            success:function(i,l){
+                $('#mysql_top_nsql').click(function(){
+                    mysqlCommonFuncMysqlNSQL();
+                });
+
+                $('#mysql_net_stat').click(function(){
+                    mysqlCommonFuncMysqlNet();
+                });
+            }
+        });
+    });
 }
 
 function mysqlRunMysqlTab(name){
