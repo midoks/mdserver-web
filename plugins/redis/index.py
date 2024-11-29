@@ -150,6 +150,7 @@ def initDreplace():
     # log
     dataLog = getServerDir() + '/data'
     if not os.path.exists(dataLog):
+        mw.execShell('mkdir -p ' + dataLog)
         mw.execShell('chmod +x ' + file_bin)
 
     # config replace
