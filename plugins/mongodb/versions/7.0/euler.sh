@@ -8,7 +8,6 @@ rootPath=$(dirname "$rootPath")
 rootPath=$(dirname "$rootPath")
 serverPath=$(dirname "$rootPath")
 
-install_tmp=${rootPath}/tmp/mw_install.pl
 VERSION=7.0.15
 SYS_ARCH=`arch`
 
