@@ -9,7 +9,7 @@ serverPath=$(dirname "$rootPath")
 
 install_tmp=${rootPath}/tmp/mw_install.pl
 sys_os=`uname`
-VERSION=1.6.29
+VERSION=1.6.32
 
 echo $sys_os
 
