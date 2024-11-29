@@ -14,18 +14,7 @@ SYS_VERSION_ID=`cat /etc/*-release | grep VERSION_ID | awk -F = '{print $2}' | a
 SYS_NAME=${SYS_VERSION_ID/./}
 
 
-if [ "$SYS_NAME" -gt "11" ];then
-	SYS_NAME="12"
-fi
-
-if [ "$SYS_NAME" -lt "11" ];then
-	SYS_NAME="12"
-fi
-
-if [ "$SYS_NAME" == "" ];then
-	SYS_NAME="12"
-fi
-
+SYS_NAME="12"
 FILE_NAME=mongodb-linux-${SYS_ARCH}-debian${SYS_NAME}-${VERSION}
 FILE_NAME_TGZ=${FILE_NAME}.tgz
 
