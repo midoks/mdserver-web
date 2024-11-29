@@ -1535,8 +1535,8 @@ def installPreInspection(version):
     if mw.isAppleSystem():
         return 'ok'
 
-    sys = mw.execShell(
-        "cat /etc/*-release | grep PRETTY_NAME |awk -F = '{print $2}' | awk -F '\"' '{print $2}'| awk '{print $1}'")
+    cmd = "cat /etc/*-release | grep PRETTY_NAME |awk -F = '{print $2}' | awk -F '\"' '{print $2}'| awk '{print $1}'"
+    sys = mw.execShell(cmd)
 
     if sys[1] != '':
         return '暂时不支持该系统'
