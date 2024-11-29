@@ -634,6 +634,76 @@ class plugin(object):
         rdata['list'] = mw.getPage({'count':data[1],'p':page,'tojs':'getSList','row':size})
         return rdata
 
+    def updateZip(self, request_zip):
+        tmp_path = mw.getPanelDir() + '/temp'
+        if not os.path.exists(tmp_path):
+            os.makedirs(tmp_path)
+        mw.execShell("rm -rf " + tmp_path + '/*')
+
+        tmp_file = tmp_path + '/plugin_tmp.zip'
+        if request_zip.filename[-4:] != '.zip':
+            return mw.returnData(False, '仅支持zip文件!')
+
+        request_zip.save(tmp_file)
+        mw.execShell('cd ' + tmp_path + ' && unzip ' + tmp_file)
+        os.remove(tmp_file)
+
+        p_info = tmp_path + '/info.json'
+        if not os.path.exists(p_info):
+            d_path = None
+            for df in os.walk(tmp_path):
+                if len(df[2]) < 3:
+                    continue
+                if not 'info.json' in df[2]:
+                    continue
+                if not 'install.sh' in df[2]:
+                    continue
+                if not os.path.exists(df[0] + '/info.json'):
+                    continue
+                d_path = df[0]
+            if d_path:
+                tmp_path = d_path
+                p_info = tmp_path + '/info.json'
+        try:
+            data = json.loads(mw.readFile(p_info))
+            data['size'] = mw.getPathSize(tmp_path)
+            if not 'author' in data:
+                data['author'] = '未知'
+            if not 'home' in data:
+                data['home'] = 'https://github.com/midoks/mdserver-web'
+            plugin_path = mw.getPluginDir() + data['name'] + '/info.json'
+            data['old_version'] = '0'
+            data['tmp_path'] = tmp_path
+            if os.path.exists(plugin_path):
+                try:
+                    old_info = json.loads(mw.readFile(plugin_path))
+                    data['old_version'] = old_info['versions']
+                except:
+                    pass
+        except:
+            mw.execShell("rm -rf " + tmp_path)
+            return mw.returnData(False, '在压缩包中没有找到插件信息,请检查插件包!')
+        protectPlist = ('openresty', 'mysql', 'php', 'redis', 'memcached'
+                        'mongodb', 'swap', 'gogs', 'pureftp')
+        if data['name'] in protectPlist:
+            return mw.returnData(False, '[' + data['name'] + '],重要插件不可修改!')
+        return data
+
+    def inputZipApi(self, plugin_name,tmp_path):
+        if not os.path.exists(tmp_path):
+            return mw.returnData(False, '临时文件不存在,请重新上传!')
+        plugin_path = mw.getPluginDir() + '/' + plugin_name
+        if not os.path.exists(plugin_path):
+            print(mw.execShell('mkdir -p ' + plugin_path))
+        mw.execShell("cp -rf " + tmp_path + '/* ' + plugin_path + '/')
+        mw.execShell('chmod -R 755 ' + plugin_path)
+        p_info = mw.readFile(plugin_path + '/info.json')
+        if p_info:
+            mw.writeLog('软件管理', '安装第三方插件[%s]' %json.loads(p_info)['title'])
+            return mw.returnData(True, '安装成功!')
+        mw.execShell("rm -rf " + plugin_path)
+        return mw.returnData(False, '安装失败!')
+
     # shell/bash方式调用
     def run(self, name, func,
         version = '',

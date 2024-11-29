@@ -148,6 +148,23 @@ def file():
     content = open(file, 'rb').read()
     return content
 
+
+# 插件上传
+@blueprint.route('/update_zip', endpoint='update_zip', methods=['POST'])
+@panel_login_required
+def update_zip():
+    request_zip = request.files['plugin_zip']
+    return MwPlugin.instance().updateZip(request_zip)
+
+
+@blueprint.route('/input_zip', endpoint='input_zip', methods=['POST'])
+@panel_login_required
+def input_zip():
+    plugin_name = request.form.get('plugin_name', '')
+    tmp_path = request.form.get('tmp_path', '')
+    return MwPlugin.instance().inputZipApi(plugin_name,tmp_path)
+
+
 # 插件设置页
 @blueprint.route('/setting', endpoint='setting', methods=['GET'])
 @panel_login_required
