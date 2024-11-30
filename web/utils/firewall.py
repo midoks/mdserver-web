@@ -83,7 +83,6 @@ class Firewall(object):
                 thisdb.addFirewall(add_info['port'], ps='自动识别',protocol=add_info['protocol'])
 
     def AIF_Firewalld(self):
-        # firewall-cmd --list-all | grep '  ports'
         t = mw.execShell("firewall-cmd --list-all | grep '  ports'")
         if t[1] != '':
             return True
