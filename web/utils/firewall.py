@@ -310,6 +310,8 @@ class Firewall(object):
         return mw.returnData(True, msg)
 
     def addPanelPort(self, port):
+        self.setFw(0)
+
         protocol = 'tcp'
         ps = 'PANEL端口'
 
