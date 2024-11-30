@@ -482,6 +482,13 @@ class nosqlMySQLCtr():
             "GROUP BY user,db,substring_index(HOST,':',1) ORDER BY COUNT(1) DESC"
         )
 
+        for i in range(len(data)):
+            if data[i]['db'] is None:
+                data[i]['db'] = '空'
+
+            if data[i]['Client_IP'] == '':
+                data[i]['Client_IP'] = '空'
+
         # data2 = my_instance.query("SELECT USER, COUNT(*) as nums FROM information_schema.PROCESSLIST GROUP BY USER ORDER BY COUNT(*) DESC")
         # print(data)
         # print(data2)
