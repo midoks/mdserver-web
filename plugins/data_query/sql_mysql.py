@@ -516,6 +516,54 @@ class nosqlMySQLCtr():
             """
         )
         return mw.returnData(True, 'ok', data)
+
+    def getLockSql(self, args):
+        sid = args['sid']
+        my_instance = self.getInstanceBySid(sid).conn()
+        if my_instance is False:
+            return mw.returnData(False,'无法链接')
+
+        data = my_instance.query(
+            """
+            SELECT 
+                a.trx_id AS trx_id, 
+                a.trx_state AS trx_state, 
+                a.trx_started AS trx_started, 
+                b.id AS processlist_id, 
+                b.info AS info, 
+                b.user AS user, 
+                b.host AS host, 
+                b.db AS db, 
+                b.command AS command, 
+                b.state AS state, 
+                CONCAT('KILL QUERY ', b.id) AS sql_kill_blocking_query
+            FROM 
+                information_schema.INNODB_TRX a, 
+                information_schema.PROCESSLIST b 
+            WHERE 
+                a.trx_mysql_thread_id = b.id
+            ORDER BY 
+                a.trx_started
+            """
+        )
+
+        print(data)
+        return mw.returnData(True, 'ok', data)
+
+    def getDeadlockInfo(self, args):
+        sid = args['sid']
+        my_instance = self.getInstanceBySid(sid).conn()
+        if my_instance is False:
+            return mw.returnData(False,'无法链接')
+
+        data = my_instance.find("SHOW ENGINE INNODB STATUS")
+        if data is not None:
+            innodb_status = data['Status']
+            deadlock_info = re.search(r"LATEST DETECTED DEADLOCK.*?WE ROLL BACK TRANSACTION\s+\(\d+\)", innodb_status, re.DOTALL)
+            if deadlock_info is None:
+                return mw.returnData(True, 'ok', '无锁表')
+            return mw.returnData(True, 'ok', deadlock_info.group(0))
+        return mw.returnData(True, 'ok', '无锁表')
 # ---------------------------------- run ----------------------------------
 # 获取 mysql 列表
 def get_db_list(args):
@@ -577,6 +625,16 @@ def get_conn_count(args):
 def get_fpk_info(args):
     t = nosqlMySQLCtr()
     return t.getFpkInfo(args)
+
+# 查看当前锁阻塞的SQL
+def get_lock_sql(args):
+    t = nosqlMySQLCtr()
+    return t.getLockSql(args)
+
+# 查看死锁信息
+def get_deadlock_info(args):
+    t = nosqlMySQLCtr()
+    return t.getDeadlockInfo(args)
 
 
 # 测试
