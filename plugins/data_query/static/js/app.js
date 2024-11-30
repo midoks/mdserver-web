@@ -543,6 +543,7 @@ function mysqlCommonFuncTableInfo(){
         }
     });
 }
+
 function mysqlCommonFuncConnCount(){
     function renderSQL(){
         var sid = mysqlGetSid();
@@ -612,6 +613,49 @@ function mysqlCommonFuncConnCount(){
     });
 }
 
+function mysqlCommonFuncFpkInfo(){
+    function renderSQL(){
+        var sid = mysqlGetSid();
+        myPostCBN('get_fpk_info',{'sid':sid} ,function(rdata){
+            var data = rdata.data;
+            if (data['status']){
+                var items = data.data;
+                var tbody = '';
+                for (var i = 0; i < items.length; i++) {
+                    var t = '<tr>';
+                    t += '<td>'+items[i]['table_schema']+'</td>';
+                    t += '<td>'+items[i]['table_name']+'</td>';
+                    t += '</tr>';
+                    tbody += t;
+                }
+                $('#mysql_data_id tbody').html(tbody);
+            } else {
+                layer.msg(data.msg,{icon:2});
+            }
+        });
+    }
+
+    layer.open({
+        type: 1,
+        title: "快速找出没有主键的表",
+        area: ['800px', '400px'],
+        closeBtn: 1,
+        shadeClose: false,
+        content: '<div class="bt-form pd20 divtable taskdivtable">\
+            <table class="table table-hover" id="mysql_data_id">\
+                <thead>\
+                    <th style="width:100px;">库名</th>\
+                    <th style="width:50px;">表名</th>\
+                </thead>\
+                <tbody></tbody>\
+            </table>\
+        </div>',
+        success:function(i,l){
+            renderSQL();
+        }
+    });
+}
+
 function mysqlCommonFunc(){
     $('#mysql_common').unbind('click').click(function(){
         layer.open({
@@ -626,6 +670,7 @@ function mysqlCommonFunc(){
                 <button style="margin-bottom: 8px;" id="mysql_redundant_indexes" type="button" class="btn btn-default btn-sm">查看重复或冗余的索引</button>\
                 <button style="margin-bottom: 8px;" id="mysql_table_info" type="button" class="btn btn-default btn-sm">统计库里每个表的大小</button>\
                 <button style="margin-bottom: 8px;" id="mysql_conn_count" type="button" class="btn btn-default btn-sm">查看应用端IP连接数总和</button>\
+                <button style="margin-bottom: 8px;" id="mysql_fpk_info" type="button" class="btn btn-default btn-sm">快速找出没有主键的表</button>\
             </div>',
             success:function(i,l){
                 $('#mysql_top_nsql').click(function(){
@@ -646,6 +691,10 @@ function mysqlCommonFunc(){
 
                 $('#mysql_conn_count').click(function(){
                     mysqlCommonFuncConnCount();
+                });
+
+                $('#mysql_fpk_info').click(function(){
+                    mysqlCommonFuncFpkInfo();
                 });
             }
         });

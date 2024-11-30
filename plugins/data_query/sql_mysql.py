@@ -493,6 +493,29 @@ class nosqlMySQLCtr():
         # print(data)
         # print(data2)
         return mw.returnData(True, 'ok', data)
+
+    # 快速找出没有主键的表
+    def getFpkInfo(self, args):
+        sid = args['sid']
+        my_instance = self.getInstanceBySid(sid).conn()
+        if my_instance is False:
+            return mw.returnData(False,'无法链接')
+
+        data = my_instance.query(
+            """
+            SELECT t.table_schema,
+                   t.table_name
+            FROM information_schema.tables t
+            LEFT JOIN information_schema.key_column_usage k
+                 ON t.table_schema = k.table_schema
+                    AND t.table_name = k.table_name
+                    AND k.constraint_name = 'PRIMARY'
+            WHERE t.table_schema NOT IN ('mysql', 'information_schema', 'sys', 'performance_schema')
+              AND k.constraint_name IS NULL
+              AND t.table_type = 'BASE TABLE';
+            """
+        )
+        return mw.returnData(True, 'ok', data)
 # ---------------------------------- run ----------------------------------
 # 获取 mysql 列表
 def get_db_list(args):
@@ -549,6 +572,11 @@ def get_table_info(args):
 def get_conn_count(args):
     t = nosqlMySQLCtr()
     return t.getConnCount(args)
+
+# 快速找出没有主键的表
+def get_fpk_info(args):
+    t = nosqlMySQLCtr()
+    return t.getFpkInfo(args)
 
 
 # 测试
