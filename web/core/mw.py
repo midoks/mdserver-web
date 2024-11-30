@@ -331,7 +331,7 @@ def writeFile(filename, content, mode='w+'):
         fp.close()
         return True
     except Exception as e:
-        print(getTracebackInfo())
+        writeFileLog(getTracebackInfo())
         return False
 
 
@@ -968,7 +968,7 @@ def writeDbLog(stype, msg, args=(), uid=1):
 
 def writeSpeed(title, used, total, speed=0):
     path = getPanelDir()
-    speed_file= path + '/data/panelSpeed.pl'
+    speed_file= path + '/data/panel_speed.pl'
     # 写进度
     if not title:
         data = {'title': None, 'progress': 0,'total': 0, 'used': 0, 'speed': 0}
@@ -981,7 +981,7 @@ def writeSpeed(title, used, total, speed=0):
 
 def getSpeed():
     path = getPanelDir()
-    speed_file= path + '/data/panelSpeed.pl'
+    speed_file= path + '/data/panel_speed.pl'
     # 取进度
     path = getPanelDir()
     data = readFile(speed_file)
