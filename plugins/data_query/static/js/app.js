@@ -666,12 +666,35 @@ function mysqlCommonFuncLockSQL(){
                 var tbody = '';
                 for (var i = 0; i < items.length; i++) {
                     var t = '<tr>';
-                    t += '<td>'+items[i]['table_schema']+'</td>';
-                    t += '<td>'+items[i]['table_name']+'</td>';
+                    t += '<td>'+items[i]['trx_id']+'</td>';
+                    t += '<td>'+items[i]['trx_state']+'</td>';
+                    t += '<td>'+items[i]['trx_started']+'</td>';
+                    t += '<td>'+items[i]['processlist_id']+'</td>';
+                    t += '<td>'+items[i]['info']+'</td>';
+                    t += '<td>'+items[i]['user']+'</td>';
+                    t += '<td>'+items[i]['host']+'</td>';
+                    t += '<td>'+items[i]['db']+'</td>';
+                    t += '<td>'+items[i]['command']+'</td>';
+                    t += '<td>'+items[i]['state']+'</td>';
+                    t += '<td>'+items[i]['sql_kill_blocking_query']+'</td>';
+                    t += '<td><a class="exec btlink" index="'+i+'">执行</a></td>';
                     t += '</tr>';
                     tbody += t;
                 }
                 $('#mysql_data_id tbody').html(tbody);
+
+                $('#mysql_data_id tbody .exec').click(function(){
+                    var index = $(this).attr('index');
+                    var pid = items[index]['processlist_id'];
+                    myPostCB('kill_lock_pid', {'sid':sid, 'pid':pid}, function(rdata){
+                        var data = rdata.data;
+                        showMsg(data.msg,function(){
+                            if (data.status){
+                                renderSQL();
+                            }
+                        },{icon: data.status ? 1 : 2}, 2000);
+                    });
+                });
             } else {
                 layer.msg(data.msg,{icon:2});
             }
@@ -681,20 +704,46 @@ function mysqlCommonFuncLockSQL(){
     layer.open({
         type: 1,
         title: "查看当前锁阻塞的SQL",
-        area: ['800px', '400px'],
+        area: ['1000px', '400px'],
         closeBtn: 1,
         shadeClose: false,
         content: '<div class="bt-form pd20 divtable taskdivtable">\
+            <div class="mr20 pull-left" style="border-right: 1px solid #ccc; padding-right: 20px;">\
+                <button id="kill_all" type="button" class="btn btn-default btn-sm">关闭所有阻塞</button>\
+            </div>\
+            <hr />\
             <table class="table table-hover" id="mysql_data_id">\
                 <thead>\
-                    <th style="width:100px;">库名</th>\
-                    <th style="width:50px;">表名</th>\
+                    <th style="width:80px;">事务ID</th>\
+                    <th style="width:80px;">事务状态</th>\
+                    <th style="width:220px;">执行时间</th>\
+                    <th style="width:100px;">线程ID</th>\
+                    <th style="width:50px;">Info</th>\
+                    <th style="width:50px;">user</th>\
+                    <th style="width:50px;">host</th>\
+                    <th style="width:50px;">db</th>\
+                    <th style="width:50px;">command</th>\
+                    <th style="width:50px;">state</th>\
+                    <th style="width:140px;">kill</th>\
+                    <th style="width:50px;">操作</th>\
                 </thead>\
                 <tbody></tbody>\
             </table>\
         </div>',
         success:function(i,l){
             renderSQL();
+
+            $('#kill_all').unbind('click').click(function(){
+                var sid = mysqlGetSid();
+                myPostCB('kill_all_lock', {'sid':sid}, function(rdata){
+                    var data = rdata.data;
+                    showMsg(data.msg,function(){
+                        if (data.status){
+                            renderSQL();
+                        }
+                    },{icon: data.status ? 1 : 2}, 2000);
+                });
+            });
         }
     });
 }

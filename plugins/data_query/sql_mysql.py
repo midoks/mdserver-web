@@ -546,9 +546,32 @@ class nosqlMySQLCtr():
                 a.trx_started
             """
         )
-
-        print(data)
         return mw.returnData(True, 'ok', data)
+
+    def killLockPid(self, args):
+        sid = args['sid']
+        my_instance = self.getInstanceBySid(sid).conn()
+        if my_instance is False:
+            return mw.returnData(False,'无法链接')
+
+        pid = args['pid']
+        my_instance.execute('kill %s' % pid)
+        return mw.returnData(True, '执行成功!')
+
+    def killAllLock(self, args):
+        sid = args['sid']
+        my_instance = self.getInstanceBySid(sid).conn()
+        if my_instance is False:
+            return mw.returnData(False,'无法链接')
+
+        data = self.getLockSql(args)
+        if data['status']:
+            pid_data = data['data']
+            for x in pid_data:
+                my_instance.execute('kill %s' % x['processlist_id'])
+        return mw.returnData(True, '执行成功!')
+
+    
 
     def getDeadlockInfo(self, args):
         sid = args['sid']
@@ -589,9 +612,7 @@ class nosqlMySQLCtr():
         else:
             msg = '主从复制报错，请检查\nSlave_IO_Running状态值是：%s, |  Slave_SQL_Running状态值是：%s\nLast_Error错误信息是：%s\nLast_SQL_Error错误信息是：%s\n' \
             % (slave_info['Slave_IO_Running'], slave_info['Slave_SQL_Running'], slave_info['Last_Error'], slave_info['Last_SQL_Error'])
-            error_dict = my_instance.find('select LAST_ERROR_NUMBER,LAST_ERROR_MESSAGE,LAST_ERROR_TIMESTAMP '
-                                        'from performance_schema.replication_applier_status_by_worker '
-                                        'ORDER BY LAST_ERROR_TIMESTAMP desc limit 1')
+            error_dict = my_instance.find('select LAST_ERROR_NUMBER,LAST_ERROR_MESSAGE,LAST_ERROR_TIMESTAMP from performance_schema.replication_applier_status_by_worker ORDER BY LAST_ERROR_TIMESTAMP desc limit 1')
             msg += '错误号是：%s \n' % error_dict['LAST_ERROR_NUMBER']
             msg += '错误信息是：%s \n' % error_dict['LAST_ERROR_MESSAGE']
             msg += '报错时间是：%s \n' % error_dict['LAST_ERROR_TIMESTAMP']
@@ -665,6 +686,16 @@ def get_lock_sql(args):
     t = nosqlMySQLCtr()
     return t.getLockSql(args)
 
+# KILL阻塞SQL
+def kill_lock_pid(args):
+    t = nosqlMySQLCtr()
+    return t.killLockPid(args)
+
+# KILL阻塞SQL
+def kill_all_lock(args):
+    t = nosqlMySQLCtr()
+    return t.killAllLock(args)
+
 # 查看死锁信息
 def get_deadlock_info(args):
     t = nosqlMySQLCtr()
@@ -674,6 +705,10 @@ def get_deadlock_info(args):
 def get_slave_status(args):
     t = nosqlMySQLCtr()
     return t.getSlaveStatus(args)
+
+
+
+
 
 
 # 测试
