@@ -564,6 +564,44 @@ class nosqlMySQLCtr():
                 return mw.returnData(True, 'ok', '无锁表')
             return mw.returnData(True, 'ok', deadlock_info.group(0))
         return mw.returnData(True, 'ok', '无锁表')
+
+    def getSlaveStatus(self, args):
+        sid = args['sid']
+        my_instance = self.getInstanceBySid(sid).conn()
+        if my_instance is False:
+            return mw.returnData(False,'无法链接')
+
+        slave_info = my_instance.find('SHOW SLAVE STATUS')
+
+        if len(slave_info) == 0:
+            return mw.returnData(True, 'ok', '未开启从库!')
+
+        msg = ''
+        if slave_info['Auto_Position'] != 1:
+            msg += '你没有开启基于GTID全局事务ID复制，请确保CHANGE MASTER TO MASTER_AUTO_POSITION = 1.\n'
+
+
+        if slave_info['Slave_IO_Running'] == 'Yes' and slave_info['Slave_SQL_Running'] == 'Yes':
+            if slave_info['Seconds_Behind_Master'] == 0:
+                msg = "同步正常，无延迟"
+                return mw.returnData(True, 'ok', msg)
+            else:
+                return mw.returnData(True, 'ok', '同步正常，但有延迟，延迟时间为：%s' % slave_info['Seconds_Behind_Master'])
+        else:
+            msg = '[bold red]主从复制报错，请检查. Slave_IO_Running状态值是：%s\
+                    |  Slave_SQL_Running状态值是：%s  \n  \tLast_Error错误信息是：%s\
+                    \n\n  \tLast_SQL_Error错误信息是：%s [/bold red]' \
+                    % (r_dict['Slave_IO_Running'], r_dict['Slave_SQL_Running'], \
+                         r_dict['Last_Error'], r_dict['Last_SQL_Error'])
+            error_dict = my_instance.find('select LAST_ERROR_NUMBER,LAST_ERROR_MESSAGE,LAST_ERROR_TIMESTAMP '
+                                        'from performance_schema.replication_applier_status_by_worker '
+                                        'ORDER BY LAST_ERROR_TIMESTAMP desc limit 1')
+            msg += '错误号是：%s' % error_dict['LAST_ERROR_NUMBER']
+            msg +='错误信息是：%s' % error_dict['LAST_ERROR_MESSAGE']
+            msg +='报错时间是：%s\n' % error_dict['LAST_ERROR_TIMESTAMP']
+            msg += 'MySQL Replication Health is NOT OK!'
+            return mw.returnData(True, 'ok', msg)
+
 # ---------------------------------- run ----------------------------------
 # 获取 mysql 列表
 def get_db_list(args):
@@ -635,6 +673,11 @@ def get_lock_sql(args):
 def get_deadlock_info(args):
     t = nosqlMySQLCtr()
     return t.getDeadlockInfo(args)
+
+# 查看主从复制信息
+def get_slave_status(args):
+    t = nosqlMySQLCtr()
+    return t.getSlaveStatus(args)
 
 
 # 测试

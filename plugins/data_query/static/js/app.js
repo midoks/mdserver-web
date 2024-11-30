@@ -726,6 +726,33 @@ function mysqlCommonFuncDeadlockInfo(){
     });
 }
 
+function mysqlCommonFuncSlaveStatus(){
+
+    function renderSQL(){
+        var sid = mysqlGetSid();
+        myPostCBN('get_slave_status',{'sid':sid} ,function(rdata){
+            var data = rdata.data;
+            $('#info_log').html(data.data);
+            var ob = document.getElementById('info_log');
+            ob.scrollTop = ob.scrollHeight; 
+        });
+    }
+
+    layer.open({
+        type: 1,
+        title: "查看主从复制信息",
+        area: ['800px', '400px'],
+        closeBtn: 1,
+        shadeClose: false,
+        content: '<div class="bt-form pd15">\
+            <textarea readonly="" style="margin: 0px;height: 330px;width: 100%;background-color: #333;color:#fff; padding:0 5px" id="info_log"></textarea>\
+        </div>',
+        success:function(i,l){
+            renderSQL();
+        }
+    });
+}
+
 function mysqlCommonFunc(){
     $('#mysql_common').unbind('click').click(function(){
         layer.open({
@@ -743,6 +770,7 @@ function mysqlCommonFunc(){
                 <button style="margin-bottom: 8px;" id="mysql_fpk_info" type="button" class="btn btn-default btn-sm">快速找出没有主键的表</button>\
                 <button style="margin-bottom: 8px;" id="mysql_lock_sql" type="button" class="btn btn-default btn-sm">查看当前锁阻塞的SQL</button>\
                 <button style="margin-bottom: 8px;" id="mysql_deadlock_info" type="button" class="btn btn-default btn-sm">查看死锁信息</button>\
+                <button style="margin-bottom: 8px;" id="mysql_slave_status" type="button" class="btn btn-default btn-sm">查看主从复制信息</button>\
             </div>',
             success:function(i,l){
                 $('#mysql_top_nsql').click(function(){
@@ -775,6 +803,10 @@ function mysqlCommonFunc(){
 
                 $('#mysql_deadlock_info').click(function(){
                     mysqlCommonFuncDeadlockInfo();
+                });
+
+                $('#mysql_slave_status').click(function(){
+                    mysqlCommonFuncSlaveStatus();
                 });
             }
         });
