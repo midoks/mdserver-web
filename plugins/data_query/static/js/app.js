@@ -807,7 +807,7 @@ function mysqlCommonFunc(){
         layer.open({
             type: 1,
             title: "MySQL常用功能",
-            area: ['600px', '400px'],
+            area: ['600px', '200px'],
             closeBtn: 1,
             shadeClose: false,
             content: '<div class="bt-form pd20">\
