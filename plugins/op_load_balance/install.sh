@@ -7,7 +7,6 @@ rootPath=$(dirname "$curPath")
 rootPath=$(dirname "$rootPath")
 serverPath=$(dirname "$rootPath")
 
-install_tmp=${rootPath}/tmp/mw_install.pl
 
 action=$1
 version=$2
@@ -24,11 +23,11 @@ else
 fi
 
 Install_App(){
-	echo '正在安装脚本文件...' > $install_tmp
+	echo '正在安装脚本文件...'
 	mkdir -p $serverPath/op_load_balance
 	echo "${version}" > $serverPath/op_load_balance/version.pl
 	cd ${rootPath} && python3 ${rootPath}/plugins/op_load_balance/index.py start
-	echo 'install ok' > $install_tmp
+	echo '安装OP负载均衡成功!'
 }
 
 Uninstall_App(){
