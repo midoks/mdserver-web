@@ -51,6 +51,41 @@ class Firewall(object):
     def aIF(self):
         if self.__isFirewalld:
             self.AIF_Firewalld()
+        if self.__isUfw:
+            self.aIF_Ufw()
+
+
+    def aIF_Ufw(self):
+        t = mw.execShell("ufw status|awk '{print $1}' | grep -v 'Status'|grep -v 'To'|grep -v '-'")
+        if t[1] != '':
+            return True
+
+        print(t)
+
+        # all_port = t[0].strip()
+        # data = all_port.split(":")
+        # ports_str = data[1]
+        # ports_list = ports_str.strip().split(' ')
+
+        # ports_all = []
+        # for pinfo in ports_list:
+        #     info = pinfo.split('/')
+
+        #     is_same = False
+        #     for i in range(len(ports_all)):
+        #         if ports_all[i]['port'] == info[0] and ports_all[i]['protocol'] != info[1]:
+        #             ports_all[i]['protocol'] = ports_all[i]['protocol']+'/'+info[1]
+        #             is_same = True
+
+        #     if not is_same:
+        #         t = {}
+        #         t['port'] = info[0].replace('-',':')
+        #         t['protocol'] = info[1]
+        #         ports_all.append(t)
+
+        # for add_info in ports_all:
+        #     if thisdb.getFirewallCountByPort(add_info['port']) == 0:
+        #         thisdb.addFirewall(add_info['port'], ps='自动识别',protocol=add_info['protocol'])
 
     def AIF_Firewalld(self):
         # firewall-cmd --list-all | grep '  ports'
