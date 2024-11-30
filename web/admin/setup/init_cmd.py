@@ -37,8 +37,8 @@ def init_cmd():
     # initd
     if os.path.exists('/etc/rc.d/init.d'):
         initd_bin = '/etc/rc.d/init.d/mw'
-        if not os.access(initd_bin, os.W_OK):
-            return False
+        # if not os.access(initd_bin, os.W_OK):
+        #     return False
         shutil.copyfile(script_bin, initd_bin)
         mw.execShell('chmod +x ' + initd_bin)
         # 加入自启动
@@ -46,8 +46,8 @@ def init_cmd():
 
     if os.path.exists('/etc/init.d'):
         initd_bin = '/etc/init.d/mw'
-        if not os.access(initd_bin, os.W_OK):
-            return False
+        # if not os.access(initd_bin, os.W_OK):
+        #     return False
         shutil.copyfile(script_bin, initd_bin)
         mw.execShell('chmod +x ' + initd_bin)
         # 加入自启动
