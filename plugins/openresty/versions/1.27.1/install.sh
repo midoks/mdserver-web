@@ -167,12 +167,12 @@ Install_openresty()
     if [ -d $openrestyDir/openresty-${VERSION} ];then
 		rm -rf $openrestyDir/openresty-${VERSION}
 	fi
-	echo '安装完成'
+	echo 'Installation of Openresty completed'
 }
 
 Uninstall_openresty()
 {
-	echo '卸载完成'
+	echo 'Uninstalling Openresty completed'
 }
 
 action=$1
