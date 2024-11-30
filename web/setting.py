@@ -45,7 +45,7 @@ default_port_file = panel_dir+'/data/port.pl'
 if os.path.exists(default_port_file):
     panel_port = mw.readFile(default_port_file)
     panel_port.strip()
-    MwFirewall.instance().addPanelPort(panel_port)
+    MwFirewall.instance().addAcceptPort(panel_port,'PANEL端口', 'port')
 else:
     panel_port = str(random.randint(10000, 65530))
     MwFirewall.instance().addPanelPort(panel_port)
