@@ -9,8 +9,6 @@ rootPath=$(dirname "$curPath")
 rootPath=$(dirname "$rootPath")
 serverPath=$(dirname "$rootPath")
 
-install_tmp=${rootPath}/tmp/mw_install.pl
-
 action=$1
 version=$2
 sys_os=`uname`
@@ -28,7 +26,7 @@ fi
 
 Install_App(){
 	
-	echo '正在安装脚本文件...' > $install_tmp
+	echo '正在安装脚本文件...'
 	mkdir -p $serverPath/source/op_waf
 	mkdir -p $serverPath/op_waf
 
@@ -114,7 +112,7 @@ Install_App(){
 	fi
 
 	echo "${version}" > $serverPath/op_waf/version.pl
-	echo 'install ok' > $install_tmp
+	echo '安装OP防火墙成功!'
 
 	cd ${rootPath} && python3 ${rootPath}/plugins/op_waf/index.py start
 	echo "cd ${rootPath} && python3 ${rootPath}/plugins/op_waf/index.py start"
