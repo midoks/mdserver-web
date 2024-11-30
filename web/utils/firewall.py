@@ -309,6 +309,18 @@ class Firewall(object):
         mw.writeLog("防火墙管理", msg)
         return mw.returnData(True, msg)
 
+    def addPanelPort(self, port):
+        protocol = 'tcp'
+        ps = 'PANEL端口'
+
+        thisdb.addFirewall(port, ps=ps,protocol=protocol)
+        self.addAcceptPortCmd(port, protocol=protocol)
+        self.reload()
+
+        msg = mw.getInfo('放行端口[{1}][{2}]成功', (port, protocol,))
+        mw.writeLog("防火墙管理", msg)
+        return mw.returnData(True, msg)
+
     def delAcceptPort(self, firewall_id, port,
         protocol='tcp'
     ):

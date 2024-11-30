@@ -47,7 +47,7 @@ if os.path.exists(default_port_file):
 else:
     from utils.firewall import Firewall as MwFirewall
     panel_port = str(random.randint(10000, 65530))
-    MwFirewall.instance().addAcceptPort(panel_port, 'PANEL端口', 'port')
+    MwFirewall.instance().addPanelPort(panel_port)
     mw.writeFile(default_port_file, panel_port)
 
 bind = []
