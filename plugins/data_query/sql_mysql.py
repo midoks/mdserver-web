@@ -587,17 +587,14 @@ class nosqlMySQLCtr():
             else:
                 return mw.returnData(True, 'ok', '同步正常，但有延迟，延迟时间为：%s' % slave_info['Seconds_Behind_Master'])
         else:
-            msg = '[bold red]主从复制报错，请检查. Slave_IO_Running状态值是：%s\
-                    |  Slave_SQL_Running状态值是：%s  \n  \tLast_Error错误信息是：%s\
-                    \n\n  \tLast_SQL_Error错误信息是：%s [/bold red]' \
-                    % (r_dict['Slave_IO_Running'], r_dict['Slave_SQL_Running'], \
-                         r_dict['Last_Error'], r_dict['Last_SQL_Error'])
+            msg = '主从复制报错，请检查\nSlave_IO_Running状态值是：%s, |  Slave_SQL_Running状态值是：%s\nLast_Error错误信息是：%s\nLast_SQL_Error错误信息是：%s\n' \
+            % (slave_info['Slave_IO_Running'], slave_info['Slave_SQL_Running'], slave_info['Last_Error'], slave_info['Last_SQL_Error'])
             error_dict = my_instance.find('select LAST_ERROR_NUMBER,LAST_ERROR_MESSAGE,LAST_ERROR_TIMESTAMP '
                                         'from performance_schema.replication_applier_status_by_worker '
                                         'ORDER BY LAST_ERROR_TIMESTAMP desc limit 1')
-            msg += '错误号是：%s' % error_dict['LAST_ERROR_NUMBER']
-            msg +='错误信息是：%s' % error_dict['LAST_ERROR_MESSAGE']
-            msg +='报错时间是：%s\n' % error_dict['LAST_ERROR_TIMESTAMP']
+            msg += '错误号是：%s \n' % error_dict['LAST_ERROR_NUMBER']
+            msg += '错误信息是：%s \n' % error_dict['LAST_ERROR_MESSAGE']
+            msg += '报错时间是：%s \n' % error_dict['LAST_ERROR_TIMESTAMP']
             msg += 'MySQL Replication Health is NOT OK!'
             return mw.returnData(True, 'ok', msg)
 
