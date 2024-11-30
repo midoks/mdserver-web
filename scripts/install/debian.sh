@@ -74,7 +74,9 @@ apt install -y rar
 apt install -y unrar
 apt install -y pv
 apt install -y bc
-apt install -y python3-pip python3-dev python3-venv
+apt install -y python3-pip 
+apt install -y python3-dev 
+apt install -y python3-venv
 apt install -y libncurses5
 apt install -y libncurses5-dev
 apt install -y bzip2
