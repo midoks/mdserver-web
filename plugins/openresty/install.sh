@@ -2,8 +2,8 @@
 PATH=/bin:/sbin:/usr/bin:/usr/sbin:/usr/local/bin:/usr/local/sbin:~/bin:/opt/homebrew/bin
 export PATH
 
-# cd /Users/midoks/Desktop/mwdev/server/mdserver-web/plugins/openresty && bash install.sh install 1.21.4.2
-# cd /www/server/mdserver-web/plugins/openresty && bash install.sh install 1.21.4.2
+# cd /Users/midoks/Desktop/mwdev/server/mdserver-web/plugins/openresty && bash install.sh install 1.21.4
+# cd /www/server/mdserver-web/plugins/openresty && bash install.sh install 1.21.4
 
 curPath=`pwd`
 rootPath=$(dirname "$curPath")
