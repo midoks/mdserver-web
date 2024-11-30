@@ -7,7 +7,6 @@ rootPath=$(dirname "$curPath")
 rootPath=$(dirname "$rootPath")
 serverPath=$(dirname "$rootPath")
 
-install_tmp=${rootPath}/tmp/mw_install.pl
 VERSION=$2
 
 # cd /www/server/mdserver-web/plugins/msonedrive  && bash install.sh install 1.0
@@ -20,10 +19,10 @@ Install_App()
 {
 	pip install requests-oauthlib==1.3.0
 	mkdir -p $serverPath/msonedrive
-	echo '正在安装脚本文件...' > $install_tmp
+	echo '正在安装脚本文件...'
 
 	echo "${VERSION}" > $serverPath/msonedrive/version.pl
-	echo '安装完成' > $install_tmp
+	echo '安装完成'
 
 	echo "Successify"
 }

@@ -16,7 +16,6 @@ type=$2
 
 VERSION=1.25.3.2
 
-install_tmp=${rootPath}/tmp/mw_install.pl
 openrestyDir=${serverPath}/source/openresty
 
 Install_openresty()

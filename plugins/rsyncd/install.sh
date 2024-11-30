@@ -28,11 +28,11 @@ else
 	useradd -g www -s /bin/bash www
 fi
 
-echo $OSNAME
-install_tmp=${rootPath}/tmp/mw_install.pl
+# echo $OSNAME
+
 Install_rsyncd()
 {
-	echo '正在安装脚本文件...' > $install_tmp
+	echo '正在安装脚本文件...'
 	
 
 	if [ "$OSNAME" == "debian" ] || [ "$OSNAME" == "ubuntu" ];then
@@ -55,7 +55,7 @@ Install_rsyncd()
 	mkdir -p $serverPath/rsyncd/send
 	
 	echo '2.0' > $serverPath/rsyncd/version.pl
-	echo '安装完成' > $install_tmp
+	echo '安装完成'
 	cd ${rootPath} && python3 ${rootPath}/plugins/rsyncd/index.py start
 	cd ${rootPath} && python3 ${rootPath}/plugins/rsyncd/index.py initd_install
 }
@@ -83,7 +83,7 @@ Uninstall_rsyncd()
 	fi
 	
 	rm -rf $serverPath/rsyncd
-	echo "卸载完成" > $install_tmp
+	echo "卸载完成"
 }
 
 action=$1

@@ -8,24 +8,21 @@ rootPath=$(dirname "$curPath")
 rootPath=$(dirname "$rootPath")
 serverPath=$(dirname "$rootPath")
 
-
-install_tmp=${rootPath}/tmp/mw_install.pl
-
 VERSION=$2
 
 Install_webssh()
 {
-	echo '正在安装脚本文件...' > $install_tmp
+	echo '正在安装脚本文件...'
 	mkdir -p $serverPath/webssh
 	echo "${VERSION}" > $serverPath/webssh/version.pl
-	echo '安装完成' > $install_tmp
+	echo '安装完成'
 
 }
 
 Uninstall_webssh()
 {
 	rm -rf $serverPath/webssh
-	echo "卸载完成" > $install_tmp
+	echo "卸载完成"
 }
 
 action=$1

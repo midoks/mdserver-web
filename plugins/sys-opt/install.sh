@@ -8,23 +8,19 @@ rootPath=$(dirname "$curPath")
 rootPath=$(dirname "$rootPath")
 serverPath=$(dirname "$rootPath")
 
-
-install_tmp=${rootPath}/tmp/mw_install.pl
-
-
 Install_sysopt()
 {
-	echo '正在安装脚本文件...' > $install_tmp
+	echo '正在安装脚本文件...'
 	mkdir -p $serverPath/sys-opt
 	echo '1.0' > $serverPath/sys-opt/version.pl
-	echo '安装完成' > $install_tmp
+	echo '安装完成'
 
 }
 
 Uninstall_sysopt()
 {
 	rm -rf $serverPath/sys-opt
-	echo "卸载完成" > $install_tmp
+	echo "卸载完成"
 }
 
 action=$1

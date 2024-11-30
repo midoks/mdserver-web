@@ -15,7 +15,6 @@ action=$1
 type=$2
 
 VERSION=$2
-install_tmp=${rootPath}/tmp/mw_install.pl
 openrestyDir=${serverPath}/source/openresty
 
 if id www &> /dev/null ;then 

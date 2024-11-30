@@ -8,14 +8,13 @@ rootPath=$(dirname "$curPath")
 rootPath=$(dirname "$rootPath")
 serverPath=$(dirname "$rootPath")
 
-install_tmp=${rootPath}/tmp/mw_install.pl
 
 VERSION=1.0
 
 Install_App(){
 	mkdir -p $serverPath/migration_api
 	echo "${VERSION}" > $serverPath/migration_api/version.pl
-	echo '正在安装脚本文件...' > $install_tmp
+	echo '正在安装脚本文件...'
 }
 
 Uninstall_App()

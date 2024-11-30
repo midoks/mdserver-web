@@ -13,17 +13,16 @@ if [ -f ${rootPath}/bin/activate ];then
 fi
 pip install pyinotify
 
-install_tmp=${rootPath}/tmp/mw_install.pl
 SYSOS=`uname`
 VERSION=$2
 APP_NAME=tamper_proof_py
 
 Install_App()
 {
-	echo '正在安装脚本文件...' > $install_tmp
+	echo '正在安装脚本文件...'
 	mkdir -p $serverPath/tamper_proof_py
 	echo "$VERSION" > $serverPath/tamper_proof_py/version.pl
-	echo 'install complete' > $install_tmp
+	echo 'install complete'
 
 	#初始化 
 	cd ${serverPath}/mdserver-web && python3 plugins/tamper_proof_py/index.py start $VERSION
@@ -41,7 +40,7 @@ Uninstall_App()
 	fi
 
 	rm -rf $serverPath/tamper_proof_py
-	echo "uninstall completed" > $install_tmp
+	echo "uninstall completed"
 }
 
 action=$1

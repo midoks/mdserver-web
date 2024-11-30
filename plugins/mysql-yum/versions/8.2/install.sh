@@ -13,7 +13,6 @@ serverPath=$(dirname "$rootPath")
 sysName=`uname`
 
 
-install_tmp=${rootPath}/tmp/mw_install.pl
 myDir=${serverPath}/source/mysql-yum
 
 ARCH=`uname -m`
@@ -115,7 +114,7 @@ rm -rf ${myDir}
 Install_mysql()
 {
 
-	echo '正在安装脚本文件...' > $install_tmp
+	echo '正在安装脚本文件...'
 
 	mkdir -p $serverPath/mysql-yum
 

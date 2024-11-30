@@ -7,7 +7,6 @@ rootPath=$(dirname "$curPath")
 rootPath=$(dirname "$rootPath")
 serverPath=$(dirname "$rootPath")
 
-install_tmp=${rootPath}/tmp/mw_install.pl
 VERSION=$2
 
 # curl  https://get.acme.sh | sh
@@ -31,7 +30,7 @@ fi
 # pip install cloudflare
 Install_App()
 {
-	echo '正在安装脚本文件...' > $install_tmp
+	echo '正在安装脚本文件...'
 	mkdir -p $serverPath/source
 	mkdir -p $serverPath/acme_pandominassl_apply
 	echo "${VERSION}" > $serverPath/acme_pandominassl_apply/version.pl

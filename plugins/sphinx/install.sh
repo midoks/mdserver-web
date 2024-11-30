@@ -9,7 +9,6 @@ serverPath=$(dirname "$rootPath")
 sysName=`uname`
 sysArch=`arch`
 
-install_tmp=${rootPath}/tmp/mw_install.pl
 
 if [ -f ${rootPath}/bin/activate ];then
 	source ${rootPath}/bin/activate

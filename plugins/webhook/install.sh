@@ -7,22 +7,20 @@ rootPath=$(dirname "$curPath")
 rootPath=$(dirname "$rootPath")
 serverPath=$(dirname "$rootPath")
 
-install_tmp=${rootPath}/tmp/mw_install.pl
-
 VERSION=1.0
 
 Install_App()
 {
-	echo '正在安装脚本文件...' > $install_tmp
+	echo '正在安装脚本文件...'
 	mkdir -p $serverPath/webhook
 	echo "${VERSION}" > $serverPath/webhook/version.pl
-	echo '安装完成' > $install_tmp
+	echo '安装完成'
 }
 
 Uninstall_App()
 {
 	rm -rf $serverPath/webhook
-	echo "Uninstall_App" > $install_tmp
+	echo "Uninstall_App"
 }
 
 action=$1

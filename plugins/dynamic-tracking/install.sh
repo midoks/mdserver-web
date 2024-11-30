@@ -10,7 +10,6 @@ serverPath=$(dirname "$rootPath")
 # cd /www/server/mdserver-web/plugins/dynamic-tracking && /bin/bash install.sh uninstall 1.0
 # cd /www/server/mdserver-web/plugins/dynamic-tracking && /bin/bash install.sh install 1.0
 
-install_tmp=${rootPath}/tmp/mw_install.pl
 VERSION=$2
 
 if [ -f ${rootPath}/bin/activate ];then
@@ -31,7 +30,7 @@ fi
 Install_App()
 {
 
-	echo '正在安装脚本文件...' > $install_tmp
+	echo '正在安装脚本文件...'
 	mkdir -p $serverPath/source
 	mkdir -p $serverPath/dynamic-tracking
 
@@ -57,7 +56,7 @@ Install_App()
 	shell_file=${curPath}/versions/${OSNAME}.sh
 	echo $shell_file
 	if [ ! -f $shell_file ];then
-		echo '不支持...' > $install_tmp 
+		echo '不支持...' 
 		exit 1
 	fi
 	
@@ -67,7 +66,7 @@ Install_App()
 	cp -rf ${curPath}/shell $serverPath/dynamic-tracking
 
 	echo "${VERSION}" > $serverPath/dynamic-tracking/version.pl
-	echo '安装完成' > $install_tmp
+	echo '安装完成'
 
 	cd ${rootPath} && python3 ${rootPath}/plugins/dynamic-tracking/index.py start
 	# cd ${rootPath} && python3 ${rootPath}/plugins/dynamic-tracking/index.py initd_install
@@ -77,7 +76,7 @@ Install_App()
 Uninstall_App()
 {
 	rm -rf $serverPath/dynamic-tracking
-	echo "Uninstall_App" > $install_tmp
+	echo "Uninstall_App"
 }
 
 action=$1

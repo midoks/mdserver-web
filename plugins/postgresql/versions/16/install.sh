@@ -10,7 +10,6 @@ rootPath=$(dirname "$rootPath")
 serverPath=$(dirname "$rootPath")
 sysName=`uname`
 
-install_tmp=${rootPath}/tmp/mw_install.pl
 postgreDir=${serverPath}/source/postgresql
 
 VERSION=16.4
@@ -20,7 +19,7 @@ VERSION=16.4
 Install_App()
 {
 	mkdir -p ${postgreDir}
-	echo '正在安装脚本文件...' > $install_tmp
+	echo '正在安装脚本文件...'
 
 	if id postgres &> /dev/null ;then 
 	    echo "postgres uid is `id -u postgres`"

@@ -10,7 +10,6 @@ serverPath=$(dirname "$rootPath")
 # cd /Users/midoks/Desktop/mwdev/server/mdserver-web/plugins/alist && bash install.sh install 3.37.4
 # cd /www/server/mdserver-web/plugins/alist && bash install.sh install 3.37.4
 
-install_tmp=${rootPath}/tmp/mw_install.pl
 VERSION=$2
 
 sysArch=`arch`

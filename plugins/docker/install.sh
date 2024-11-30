@@ -41,7 +41,7 @@ Install_Docker()
 {
 	# which docker
 	# if [ "$?" == "0" ];then
-	# 	echo '安装已经完成docker' > $install_tmp
+	# 	echo '安装已经完成docker'
 	# 	exit 0
 	# fi
 

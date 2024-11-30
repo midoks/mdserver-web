@@ -13,7 +13,6 @@ rootPath=$(dirname "$rootPath")
 serverPath=$(dirname "$rootPath")
 sysName=`uname`
 
-install_tmp=${rootPath}/tmp/mw_install.pl
 myDir=${serverPath}/source/mysql-apt
 
 bash ${rootPath}/scripts/getos.sh
@@ -24,7 +23,7 @@ VERSION_ID=`cat /etc/*-release | grep VERSION_ID | awk -F = '{print $2}' | awk -
 
 # 暂时debian12没有标准版,先用11使用
 # if [ "$OSNAME" == 'debian' ] && [ "$VERSION_ID" == '12' ] ;then 
-# 	echo "暂时不支持该${OSNAME}${VERSION_ID}" > $install_tmp
+# 	echo "暂时不支持该${OSNAME}${VERSION_ID}"
 # 	exit 1
 # fi
 
@@ -40,7 +39,7 @@ else
 fi
 
 if [ "$ARCH" != "amd64" ];then
-	echo "暂时不支持该${ARCH}" > $install_tmp
+	echo "暂时不支持该${ARCH}"
 	exit 1
 fi
 
@@ -102,7 +101,7 @@ rm -rf $myDir
 
 Install_mysql()
 {
-	echo '正在安装脚本文件...' > $install_tmp
+	echo '正在安装脚本文件...'
 
 	isApt=`which apt`
 	if [ "$isApt" != "" ];then
@@ -128,7 +127,7 @@ Uninstall_mysql()
 	fi
 
 	rm -rf $serverPath/mysql-apt
-	echo '卸载完成' > $install_tmp
+	echo '卸载完成'
 }
 
 action=$1

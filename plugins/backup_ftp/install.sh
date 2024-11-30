@@ -7,7 +7,6 @@ rootPath=$(dirname "$curPath")
 rootPath=$(dirname "$rootPath")
 serverPath=$(dirname "$rootPath")
 
-install_tmp=${rootPath}/tmp/mw_install.pl
 sys_os=`uname`
 
 
@@ -15,7 +14,7 @@ Install_App()
 {
 	mkdir -p ${serverPath}/backup_ftp
 	echo "${1}" > ${serverPath}/backup_ftp/version.pl
-	echo '安装完成' > $install_tmp
+	echo '安装完成'
 
 }
 

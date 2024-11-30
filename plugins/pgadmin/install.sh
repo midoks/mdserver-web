@@ -26,8 +26,6 @@ echo "python:$P_VER"
 # cd /www/server/mdserver-web && python3 plugins/pgadmin/index.py start
 # cd /www/server/mdserver-web && python3 plugins/pgadmin/index.py stop
 
-install_tmp=${rootPath}/tmp/mw_install.pl
-
 if [ "$sys_os" == "Darwin" ];then
 	BAK='_bak'
 else

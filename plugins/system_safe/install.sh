@@ -7,17 +7,16 @@ rootPath=$(dirname "$curPath")
 rootPath=$(dirname "$rootPath")
 serverPath=$(dirname "$rootPath")
 
-install_tmp=${rootPath}/tmp/mw_install.pl
 SYSOS=`uname`
 VERSION=$2
 APP_NAME=system_safe
 
 Install_App()
 {
-	echo '正在安装脚本文件...' > $install_tmp
+	echo '正在安装脚本文件...'
 	mkdir -p $serverPath/system_safe
 	echo "$VERSION" > $serverPath/system_safe/version.pl
-	echo 'install complete' > $install_tmp
+	echo 'install complete'
 
 	#初始化 
 	cd ${serverPath}/mdserver-web && python3 plugins/system_safe/system_safe.py start $VERSION
@@ -36,7 +35,7 @@ Uninstall_App()
 	fi
 
 	rm -rf $serverPath/system_safe
-	echo "uninstall completed" > $install_tmp
+	echo "uninstall completed"
 }
 
 action=$1

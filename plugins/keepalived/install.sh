@@ -18,8 +18,6 @@ serverPath=$(dirname "$rootPath")
 # systemctl restart keepalived
 # ifconfig
 
-install_tmp=${rootPath}/tmp/mw_install.pl
-
 VERSION=$2
 
 Install_App()
