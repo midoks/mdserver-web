@@ -196,7 +196,9 @@ def confReplace():
     # vhost
     vhost_dir = mw.getServerDir() + '/web_conf/nginx/vhost'
     vhost_tpl_dir = getPluginDir() + '/conf/vhost'
-    # print(vhost_dir, vhost_tpl_dir)
+    if os.path.exists(vhost_dir):
+        mw.execShell('mkdir -p ' + vhost_dir)
+
     vhost_list = ['0.websocket.conf', '0.nginx_status.conf']
     for f in vhost_list:
         a_conf = vhost_dir + '/' + f
