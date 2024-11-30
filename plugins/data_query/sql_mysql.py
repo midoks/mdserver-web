@@ -404,6 +404,88 @@ class nosqlMySQLCtr():
 
         my_instance.execute(cmd)
         return mw.returnData(True, '执行成功!')
+
+    def getTableInfo(self, args):
+        from decimal import Decimal
+
+        sid = args['sid']
+        my_instance = self.getInstanceBySid(sid).conn()
+        if my_instance is False:
+            return mw.returnData(False,'无法链接')
+
+        my_instance.execute("SET sql_mode=(SELECT REPLACE(@@sql_mode,'ONLY_FULL_GROUP_BY',''))")
+        data = my_instance.query(
+            """
+            SELECT t.TABLE_SCHEMA as TABLE_SCHEMA, t.TABLE_NAME as TABLE_NAME, t.ENGINE as ENGINE,
+                IFNULL(t.DATA_LENGTH/1024/1024/1024, 0) as DATA_LENGTH,
+                IFNULL(t.INDEX_LENGTH/1024/1024/1024, 0) as INDEX_LENGTH,
+                IFNULL((DATA_LENGTH+INDEX_LENGTH)/1024/1024/1024, 0) AS TOTAL_LENGTH,
+                c.column_name AS COLUMN_NAME, c.data_type AS DATA_TYPE, c.COLUMN_TYPE AS COLUMN_TYPE,
+                t.AUTO_INCREMENT AS AUTO_INCREMENT, locate('unsigned', c.COLUMN_TYPE) = 0 AS IS_SIGNED 
+            FROM information_schema.TABLES t 
+            JOIN information_schema.COLUMNS c ON t.TABLE_SCHEMA = c.TABLE_SCHEMA AND t.table_name=c.table_name 
+            WHERE t.TABLE_SCHEMA NOT IN ('mysql', 'information_schema', 'performance_schema', 'sys') 
+            GROUP BY TABLE_NAME 
+            ORDER BY TOTAL_LENGTH DESC, AUTO_INCREMENT DESC;
+            """
+        )
+
+        for i in range(len(data)):
+            row = data[i]
+
+            data[i]['DATA_LENGTH'] = round(row['DATA_LENGTH'] or 0, 2)
+            data[i]['INDEX_LENGTH'] = round(row['INDEX_LENGTH'] or 0, 2)
+            data[i]['TOTAL_LENGTH'] = round(row['TOTAL_LENGTH'] or 0, 2)
+
+            AUTO_INCREMENT = row['AUTO_INCREMENT']
+            DATA_TYPE = row['DATA_TYPE']
+            IS_SIGNED = row['IS_SIGNED']
+            RESIDUAL_AUTO_INCREMENT = 0
+            if AUTO_INCREMENT is not None:
+                if DATA_TYPE == 'tinyint':
+                    if IS_SIGNED == 0:
+                        RESIDUAL_AUTO_INCREMENT = int(255 - AUTO_INCREMENT)
+                    if IS_SIGNED == 1:
+                        RESIDUAL_AUTO_INCREMENT = int(127 - AUTO_INCREMENT)
+
+                if DATA_TYPE == 'smallint':
+                    if IS_SIGNED == 0:
+                        RESIDUAL_AUTO_INCREMENT = int(65535 - AUTO_INCREMENT)
+                    if IS_SIGNED == 1:
+                        RESIDUAL_AUTO_INCREMENT = int(32767 - AUTO_INCREMENT)
+
+                if DATA_TYPE == 'int':
+                    if IS_SIGNED == 0:
+                        RESIDUAL_AUTO_INCREMENT = int(4294967295 - AUTO_INCREMENT)
+                    if IS_SIGNED == 1:
+                        RESIDUAL_AUTO_INCREMENT = int(2147483647 - AUTO_INCREMENT)
+
+                if DATA_TYPE == 'bigint':
+                    if IS_SIGNED == 0:
+                        RESIDUAL_AUTO_INCREMENT = Decimal("18446744073709551615") - Decimal(AUTO_INCREMENT)
+                    if IS_SIGNED == 1:
+                        RESIDUAL_AUTO_INCREMENT = Decimal("9223372036854775807") - Decimal(AUTO_INCREMENT)
+            else:
+                RESIDUAL_AUTO_INCREMENT = "主键非自增"
+            data[i]['RESIDUAL_AUTO_INCREMENT'] = RESIDUAL_AUTO_INCREMENT
+        return mw.returnData(True, 'ok', data)
+
+    # 查看应用端IP连接数总和
+    def getConnCount(self, args):
+        sid = args['sid']
+        my_instance = self.getInstanceBySid(sid).conn()
+        if my_instance is False:
+            return mw.returnData(False,'无法链接')
+
+        data = my_instance.query(
+            "SELECT user,db,substring_index(HOST,':',1) AS Client_IP,count(1) AS count FROM information_schema.PROCESSLIST "
+            "GROUP BY user,db,substring_index(HOST,':',1) ORDER BY COUNT(1) DESC"
+        )
+
+        # data2 = my_instance.query("SELECT USER, COUNT(*) as nums FROM information_schema.PROCESSLIST GROUP BY USER ORDER BY COUNT(*) DESC")
+        # print(data)
+        # print(data2)
+        return mw.returnData(True, 'ok', data)
 # ---------------------------------- run ----------------------------------
 # 获取 mysql 列表
 def get_db_list(args):
@@ -446,13 +528,20 @@ def get_redundant_indexes(args):
     t = nosqlMySQLCtr()
     return t.getRedundantIndexes(args)
 
-# 查看重复或冗余的索引
+# 删除重复或冗余的索引
 def redundant_indexes_cmd(args):
     t = nosqlMySQLCtr()
     return t.redundantIndexesCmd(args)
 
+# 统计库里每个表的大小
+def get_table_info(args):
+    t = nosqlMySQLCtr()
+    return t.getTableInfo(args)
 
-
+# 查看应用端IP连接数总和
+def get_conn_count(args):
+    t = nosqlMySQLCtr()
+    return t.getConnCount(args)
 
 
 # 测试

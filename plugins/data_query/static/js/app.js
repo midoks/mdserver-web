@@ -485,6 +485,133 @@ function mysqlCommonFuncRedundantIndexes(){
     });
 }
 
+function mysqlCommonFuncTableInfo(){
+    function renderSQL(){
+        var sid = mysqlGetSid();
+        myPostCBN('get_table_info',{'sid':sid} ,function(rdata){
+            var data = rdata.data;
+            if (data['status']){
+                var items = data.data;
+                var tbody = '';
+                for (var i = 0; i < items.length; i++) {
+                    var t = '<tr>';
+                    t += '<td>'+items[i]['TABLE_SCHEMA']+'</td>';
+                    t += '<td>'+items[i]['TABLE_NAME']+'</td>';
+                    t += '<td>'+items[i]['ENGINE']+'</td>';
+                    t += '<td>'+items[i]['DATA_LENGTH']+'</td>';
+                    t += '<td>'+items[i]['INDEX_LENGTH']+'</td>';
+                    t += '<td>'+items[i]['TOTAL_LENGTH']+'</td>';
+                    t += '<td>'+items[i]['COLUMN_NAME']+'</td>';
+                    t += '<td>'+items[i]['COLUMN_TYPE']+'</td>';
+                    t += '<td>'+items[i]['AUTO_INCREMENT']+'</td>';
+                    t += '<td>'+items[i]['RESIDUAL_AUTO_INCREMENT']+'</td>';
+                    t += '</tr>';
+                    tbody += t;
+                }
+                $('#mysql_data_id tbody').html(tbody);
+            } else {
+                layer.msg(data.msg,{icon:2});
+            }
+        });
+    }
+
+    layer.open({
+        type: 1,
+        title: "统计库里每个表的大小",
+        area: ['1200px', '400px'],
+        closeBtn: 1,
+        shadeClose: false,
+        content: '<div class="bt-form pd20 divtable taskdivtable">\
+            <table class="table table-hover" id="mysql_data_id">\
+                <thead>\
+                    <th style="width:100px;">库名</th>\
+                    <th style="width:50px;">表名</th>\
+                    <th style="width:80px;">储存引擎</th>\
+                    <th style="width:150px;">数据大小(GB)</th>\
+                    <th style="width:130px;">索引大小(GB)</th>\
+                    <th style="width:100px;">总计(GB)</th>\
+                    <th style="width:150px;">主键自增字段</th>\
+                    <th style="width:200px;">主键字段属性</th>\
+                    <th style="width:150px;">主键自增当前</th>\
+                    <th style="width:150px;">主键自增剩余</th>\
+                </thead>\
+                <tbody></tbody>\
+            </table>\
+        </div>',
+        success:function(i,l){
+            renderSQL();
+        }
+    });
+}
+function mysqlCommonFuncConnCount(){
+    function renderSQL(){
+        var sid = mysqlGetSid();
+        myPostCBN('get_conn_count',{'sid':sid} ,function(rdata){
+            var data = rdata.data;
+            if (data['status']){
+                var items = data.data;
+                var tbody = '';
+                for (var i = 0; i < items.length; i++) {
+                    var t = '<tr>';
+                    t += '<td>'+items[i]['user']+'</td>';
+                    t += '<td>'+items[i]['db']+'</td>';
+                    t += '<td>'+items[i]['Client_IP']+'</td>';
+                    t += '<td>'+items[i]['count']+'</td>';
+                    t += '</tr>';
+                    tbody += t;
+                }
+                $('#app_ip_list tbody').html(tbody);
+            } else {
+                layer.msg(data.msg,{icon:2});
+            }
+        });
+    }
+
+    var sql_timer = null;
+    layer.open({
+        type: 1,
+        title: "查看应用端IP连接数总和",
+        area: ['700px', '420px'],
+        closeBtn: 1,
+        shadeClose: false,
+        content: '<div class="bt-form pd20 divtable taskdivtable">\
+            <div class="mr20 pull-left" style="border-right: 1px solid #ccc; padding-right: 20px;">\
+                <div class="ss-text pull-left">\
+                    <em>实时监控</em>\
+                    <div class="ssh-item">\
+                        <input class="btswitch btswitch-ios" id="app_ip_monitoring" type="checkbox">\
+                        <label id="app_ip_label" class="btswitch-btn" for="app_ip_monitoring"></label>\
+                    </div>\
+                </div>\
+            </div>\
+            <hr />\
+            <table class="table table-hover" id="app_ip_list">\
+                <thead>\
+                    <th style="width:160px;">连接用户</th>\
+                    <th style="width:50px;">数据库名</th>\
+                    <th style="width:50px;">应用端IP</th>\
+                    <th style="width:50px;">数量</th>\
+                </thead>\
+                <tbody></tbody>\
+            </table>\
+        </div>',
+        success:function(i,l){
+            renderSQL();
+
+            $('#app_ip_label').click(function(){
+                sql_timer = setInterval(function(){
+                    var t = $('#app_ip_monitoring').is(':checked');
+                    if (t){
+                        renderSQL();
+                    } else{
+                        clearInterval(sql_timer);
+                    }
+                }, 3000);
+            });
+        }
+    });
+}
+
 function mysqlCommonFunc(){
     $('#mysql_common').unbind('click').click(function(){
         layer.open({
@@ -497,6 +624,8 @@ function mysqlCommonFunc(){
                 <button style="margin-bottom: 8px;" id="mysql_top_nsql" type="button" class="btn btn-default btn-sm">查询执行次数最频繁的前N条SQL语句</button>\
                 <button style="margin-bottom: 8px;" id="mysql_net_stat" type="button" class="btn btn-default btn-sm">MySQL服务器的QPS/TPS/网络带宽指标</button>\
                 <button style="margin-bottom: 8px;" id="mysql_redundant_indexes" type="button" class="btn btn-default btn-sm">查看重复或冗余的索引</button>\
+                <button style="margin-bottom: 8px;" id="mysql_table_info" type="button" class="btn btn-default btn-sm">统计库里每个表的大小</button>\
+                <button style="margin-bottom: 8px;" id="mysql_conn_count" type="button" class="btn btn-default btn-sm">查看应用端IP连接数总和</button>\
             </div>',
             success:function(i,l){
                 $('#mysql_top_nsql').click(function(){
@@ -509,6 +638,14 @@ function mysqlCommonFunc(){
 
                 $('#mysql_redundant_indexes').click(function(){
                     mysqlCommonFuncRedundantIndexes();
+                });
+
+                $('#mysql_table_info').click(function(){
+                    mysqlCommonFuncTableInfo();
+                });
+
+                $('#mysql_conn_count').click(function(){
+                    mysqlCommonFuncConnCount();
                 });
             }
         });
