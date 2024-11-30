@@ -31,7 +31,7 @@ jobs:
         sudo bash scripts/install_dev.sh
     - name: Install OpenResty
       run: |
-        cd /www/server/mdserver-web/plugins/openresty && sudo bash install.sh install 1.27
+        cd /www/server/mdserver-web/plugins/openresty && sudo bash install.sh install 1.27.1
     - name: Start DEBUG
       run: |
         cd web && gunicorn -c setting.py app:app
