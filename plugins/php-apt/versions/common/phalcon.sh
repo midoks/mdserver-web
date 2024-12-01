@@ -50,6 +50,8 @@ elif [[ "$version" == '8.2' ]]; then
 	CMD="${CMD}phalcon5"
 elif [[ "$version" == '8.3' ]]; then
 	CMD="${CMD}phalcon5"
+elif [[ "$version" == '8.4' ]]; then
+	CMD="${CMD}phalcon5"
 fi
 
 $CMD

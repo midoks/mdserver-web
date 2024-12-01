@@ -21,14 +21,8 @@ actionType=$1
 version=$2
 SG_VER=${version:0:1}.${version:1:2}
 
-
-LIB_PATH_NAME=lib/php
-if [ -d $serverPath/php/${version}/lib64 ];then
-	LIB_PATH_NAME=lib64
-fi
-
-NON_ZTS_FILENAME=`ls $serverPath/php/${version}/${LIB_PATH_NAME}/extensions | grep no-debug-non-zts`
-extFile=$serverPath/php/${version}/${LIB_PATH_NAME}/extensions/${NON_ZTS_FILENAME}/${LIBNAME}.so
+extVer=`bash $curPath/lib.sh $version`
+extFile=/usr/lib/php/${extVer}/${LIBNAME}.so
 
 if [ "$sysName" == "Darwin" ];then
 	BAK='_bak'
@@ -36,6 +30,7 @@ else
 	BAK=''
 fi
 
+SORT_LIBNAME="10-${LIBNAME}"
 
 Install_lib()
 {
@@ -56,7 +51,7 @@ Install_lib()
 		SUFFIX_NAME=dar
 	fi
 
-	isInstall=`cat $serverPath/php/$version/etc/php.ini|grep "${LIBNAME}.so"`
+	isInstall=`cat /etc/php/${version}/fpm/conf.d/* | grep -v '^;' |tr -s '\n' |grep "${LIBNAME}.so"`
 	if [ "${isInstall}" != "" ];then
 		echo "php-$version 已安装${LIBNAME},请选择其它版本!"
 		return
@@ -97,11 +92,11 @@ Install_lib()
 		return
 	fi
 
-	echo "" >> $serverPath/php/$version/etc/php.ini
-	echo "[${LIBNAME}]" >> $serverPath/php/$version/etc/php.ini
-	echo "extension=${LIBNAME}.so" >> $serverPath/php/$version/etc/php.ini
-
-	cd  ${curPath} && bash ${rootPath}/plugins/php/versions/lib.sh $version restart
+	echo  "" >> /etc/php/${version}/fpm/conf.d/${SORT_LIBNAME}.ini
+	echo  "[${LIBNAME}]" >> /etc/php/${version}/fpm/conf.d/${SORT_LIBNAME}.ini
+	echo "extension=${LIBNAME}.so" >> /etc/php/${version}/fpm/conf.d/${SORT_LIBNAME}.ini
+	
+	systemctl restart php${version}-fpm 
 	echo '==========================================================='
 	echo 'successful!'
 }
@@ -109,23 +104,18 @@ Install_lib()
 
 Uninstall_lib()
 {
-	if [ ! -f "$serverPath/php/$version/bin/php-config" ];then
-		echo "php$version 未安装,请选择其它版本!"
+	if [ ! -f "/usr/bin/php-config${version}" ];then
+		echo "php-$version 未安装,请选择其它版本!"
 		return
 	fi
-	
-	if [ ! -f "$extFile" ];then
-		echo "php$version 未安装${LIBNAME},请选择其它版本!"
-		echo "php-$vphp not install ${LIBNAME}, Plese select other version!"
-		return
-	fi
-	
-	sed -i $BAK "/${LIBNAME}.so/d" $serverPath/php/$version/etc/php.ini
-	sed -i $BAK "/${LIBNAME}/d" $serverPath/php/$version/etc/php.ini
-		
-	rm -f $extFile
 
-	cd  ${curPath} && bash ${rootPath}/plugins/php/versions/lib.sh $version restart
+	
+	if [ -f /etc/php/${version}/fpm/conf.d/${SORT_LIBNAME}.ini ];then
+		rm -rf /etc/php/${version}/fpm/conf.d/${SORT_LIBNAME}.ini
+		rm -rf $extFile
+	fi
+
+	systemctl restart php${version}-fpm 
 	echo '==============================================='
 	echo 'successful!'
 }
