@@ -54,4 +54,32 @@ def init_cmd():
             mw.execShell('chmod +x ' + initd_bin)
         # 加入自启动
         mw.execShell('which update-rc.d && update-rc.d -f mw defaults')
+
+    if mw.getOsName() == 'opensuse':
+        init_cmd_systemd()
     return True
+
+
+
+
+def init_cmd_systemd():
+    systemctl
+    sysCfgDir = mw.systemdCfgDir()
+
+    systemd_mw = sysCfgDir + '/mw.service'
+    systemd_mw_task = sysCfgDir + '/mw-task.service'
+
+    systemd_mw_tpl = mw.getPanelDir() + '/scripts/init.d/mw.service.tpl'
+    systemd_mw_task_tpl = mw.getPanelDir() + '/scripts/init.d/mw-task.service.tpl'
+
+    if os.path.exists(systemd_mw):
+        os.remove(systemd_mw)
+    if os.path.exists(systemd_mw_task):
+        os.remove(systemd_mw_task)
+
+    doContentReplace(systemd_mw_tpl, systemd_mw)
+    doContentReplace(systemd_mw_task_tpl, systemd_mw_task)
+
+    mw.execShell('systemctl enable mw')
+    mw.execShell('systemctl enable mw-task')
+    mw.execShell('systemctl daemon-reload')
