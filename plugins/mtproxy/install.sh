@@ -78,6 +78,8 @@ Install_app()
 	    yum install -y golang golang-src
 	elif [ "$OSNAME" == "rhel" ]; then
 	    yum install -y golang golang-src
+	elif [ "$OSNAME" == "opensuse" ]; then
+	    zypper install -y golang golang-src
 	elif [ "$sysName" == "macos" ]; then
 	    echo "macos"
 	else
