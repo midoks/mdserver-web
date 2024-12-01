@@ -37,7 +37,7 @@ Install_lib()
 	bash ${rootPath}/scripts/getos.sh
 	OSNAME=`cat ${rootPath}/data/osname.pl`
 
-	echo "${OSNAME}:${VERSION_ID}"
+	echo "${OSNAME}"
 
 	DEFAULT_OSNAME=linux-x86_64
 	SUFFIX_NAME=lin
