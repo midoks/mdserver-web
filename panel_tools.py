@@ -274,7 +274,8 @@ def getServerIp():
     #     "curl --insecure -{} -sS --connect-timeout 5 -m 60 https://v6r.ipip.net/?format=text".format(version))
     ip = mw.execShell(
         "curl --insecure -{} -sS --connect-timeout 5 -m 60 https://ip.cachecha.com/?format=text".format(version))
-    print(ip[0])
+    # print(ip[0])
+    return ip[0]
 
 
 def getPanelSslType():
@@ -283,6 +284,9 @@ def getPanelSslType():
     if panel_ssl['open']:
         scheme = 'https'
     return scheme
+
+def getPanelBindDomain():
+    return thisdb.getOption('panel_domain', default='')
 
 
 def main():
@@ -304,9 +308,11 @@ def main():
     elif method == 'admin_path':
         show_panel_adminpath()
     elif method == 'getServerIp':
-        getServerIp()
+        print(getServerIp())
     elif method == 'panel_ssl_type':
         print(getPanelSslType())
+    elif method == 'panel_bind_domain':
+        print(getPanelBindDomain())
     elif method == "cli":
         clinum = 0
         try:
