@@ -598,7 +598,7 @@ class nosqlMySQLCtr():
             return mw.returnData(False,'无法链接')
 
         slave_info = my_instance.find('SHOW SLAVE STATUS')
-        if len(slave_info) == 0:
+        if slave_info is None:
             return mw.returnData(True, 'ok', '未开启从库!')
 
         msg = ''
