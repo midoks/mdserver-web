@@ -131,7 +131,7 @@ class plugin(object):
         # 使用gevent模式时,无法使用多进程
         # plist = self.checkStatusMProcess(plist)
         plist = self.checkStatusMThreads(plist)
-        return plist
+        return mw.returnData(True, 'ok', plist)
 
     def init(self):
         plugin_names = {
