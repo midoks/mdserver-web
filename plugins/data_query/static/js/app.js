@@ -901,7 +901,7 @@ function mysqlInitField(f, data){
 
     $('select[name="mysql_field_key"]').html(option_html);
 
-    $('#mysql .mysql_find').unbind('click').click(function(){
+    $('#mysql_find').unbind('click').click(function(){
         var val = $('input[name="mysql_field_value"]').val();
         if (val == ''){
             layer.msg('搜索不能为空!',{icon:7});
