@@ -88,11 +88,25 @@ def __release_port(port):
     except Exception as e:
         return "Release failed {}".format(e)
 
+def __delete_port(port):
+    from collections import namedtuple
+    try:
+        from utils.firewall import Firewall as MwFirewall
+        MwFirewall.instance().delAcceptPortCmd(port, 'tcp')
+        return port
+    except Exception as e:
+        return "Delete failed {}".format(e)
 
 def openPort():
     port = getMtproxyPort()
     for i in [port]:
         __release_port(i)
+    return True
+    
+def delPort():
+    port = getMtproxyPort()
+    for i in [port]:
+        __delete_port(i)
     return True
 
 
