@@ -122,7 +122,8 @@ class ORM:
     def find(self, sql):
         d = self.query(sql)
         if d is not None:
-            return d[0]
+            if len(d) > 0:
+                return d[0]
         return None
 
     def query(self, sql):
