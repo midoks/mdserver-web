@@ -566,6 +566,7 @@ mw_default(){
         address="MW-PANEL-URL: ${scheme}://$address:$port$admin_path"
     fi
 
+    # bind domain check
     panel_bind_domain=$(python3 ${PANEL_DIR}/panel_tools.py panel_bind_domain)
     if [ "$panel_bind_domain" != "" ];then
         address="MW-PANEL-URL: ${scheme}://$panel_bind_domain:$port$admin_path\n${address}"
