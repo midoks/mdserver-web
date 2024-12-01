@@ -210,6 +210,21 @@ def getMtproxyUrl():
     url = 'tg://proxy?server={0}&port={1}&secret={2}'.format(ip, info[1], secret)
     return mw.returnJson(True, 'ok', url)
 
+def installPreInspection(version):
+    sys = mw.execShell("cat /etc/*-release | grep PRETTY_NAME |awk -F = '{print $2}' | awk -F '\"' '{print $2}'| awk '{print $1}'")
+
+    if sys[1] != '':
+        return '不支持该系统'
+
+    sys_id = mw.execShell("cat /etc/*-release | grep VERSION_ID | awk -F = '{print $2}' | awk -F '\"' '{print $2}'")
+
+    sysName = sys[0].strip().lower()
+    sysId = sys_id[0].strip()
+
+    if sysName in ('opensuse'):
+        return '不支持该系统'
+
+    return 'ok'
 
 
 if __name__ == "__main__":
@@ -230,6 +245,8 @@ if __name__ == "__main__":
         print(initdInstall())
     elif func == 'initd_uninstall':
         print(initdUinstall())
+    elif func == 'install_pre_inspection':
+        print(installPreInspection())
     elif func == 'conf':
         print(getServiceFile())
     elif func == 'conf_env':
