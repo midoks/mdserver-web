@@ -39,11 +39,19 @@ def admin_safe_path(path):
     if login != '':
         import base64
         import json
+        import time
         try:
             # print(login)
             login_str = base64.b64decode(login)
             login_str = login_str.decode('utf-8')
             data = json.loads(login_str)
+
+            time_now = time.time() * 1000
+            time_diff = time_now - data['time']
+
+            if time_diff > 2000:
+                return redirect('/')
+
 
             info = thisdb.getUserByName(data['username'])
             if info is None:
