@@ -39,8 +39,9 @@ def init_cmd():
         initd_bin = '/etc/rc.d/init.d/mw'
         # if not os.access(initd_bin, os.W_OK):
         #     return False
-        shutil.copyfile(script_bin, initd_bin)
-        mw.execShell('chmod +x ' + initd_bin)
+        if not os.path.exists(initd_bin):
+            shutil.copyfile(script_bin, initd_bin)
+            mw.execShell('chmod +x ' + initd_bin)
         # 加入自启动
         mw.execShell('which chkconfig && chkconfig --add mw')
 
@@ -48,8 +49,9 @@ def init_cmd():
         initd_bin = '/etc/init.d/mw'
         # if not os.access(initd_bin, os.W_OK):
         #     return False
-        shutil.copyfile(script_bin, initd_bin)
-        mw.execShell('chmod +x ' + initd_bin)
+        if not os.path.exists(initd_bin):
+            shutil.copyfile(script_bin, initd_bin)
+            mw.execShell('chmod +x ' + initd_bin)
         # 加入自启动
         mw.execShell('which update-rc.d && update-rc.d -f mw defaults')
     return True
