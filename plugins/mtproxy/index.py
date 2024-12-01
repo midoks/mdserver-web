@@ -75,6 +75,10 @@ def getServiceFile():
     return systemDir + '/mtproxy.service'
 
 
+def getMtproxyPort():
+    return '8349'
+
+
 def __release_port(port):
     from collections import namedtuple
     try:
@@ -85,8 +89,9 @@ def __release_port(port):
         return "Release failed {}".format(e)
 
 
-def openFtpPort():
-    for i in ["8349"]:
+def openPort():
+    port = getMtproxyPort()
+    for i in [port]:
         __release_port(i)
     return True
 
@@ -99,9 +104,10 @@ def initDreplace():
     secret = mw.execShell(cmd)
     if not os.path.exists(dstEnv):
         env_content = mw.readFile(envTpl)
-        env_content = env_content.replace('{$PORT}', '8349')
+        env_content = env_content.replace('{$PORT}', getMtproxyPort())
         env_content = env_content.replace('{$SECRET}', secret[0].strip())
         mw.writeFile(dstEnv, env_content)
+        openPort()
 
     # systemd
     systemDir = mw.systemdCfgDir()
