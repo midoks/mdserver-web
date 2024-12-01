@@ -29,7 +29,7 @@ from .site import blueprint
 def get_site_types():
     data = thisdb.getSiteTypesList()
     data.insert(0, {"id": 0, "name": "默认分类"})
-    return data
+    return mw.returnData(True, "ok", data)
 
 
 # 添加网站分类

@@ -2914,6 +2914,7 @@ function changeDefault(type, obj){
 function getClassType(){
 	var select = $('.site_type > select');
 	$.post('/site/get_site_types',function(rdata){
+		var rdata = rdata.data;
 		$(select).html('');
 		$(select).append('<option value="-1">全部分类</option>');
 		for (var i = 0; i<rdata.length; i++) {
@@ -2930,6 +2931,8 @@ getClassType();
 
 function setClassType(){
 	$.post('/site/get_site_types',function(rdata){
+		var rdata = rdata.data;
+		
 		var list = '';
 		for (var i = 0; i<rdata.length; i++) {
 			list +='<tr><td>' + rdata[i]['name'] + '</td>\
@@ -2944,16 +2947,16 @@ function setClassType(){
 			closeBtn: 1,
 			shift: 0,
 			content: '<div class="bt-form edit_site_type">\
-					<div class="divtable mtb15" style="overflow:auto">\
-						<div class="line "><div class="info-r  ml0">\
-							<input name="type_name" class="bt-input-text mr5 type_name" placeholder="请填写分类名称" type="text" style="width:50%" value=""><button name="btn_submit" class="btn btn-success btn-sm mr5 ml5 btn_submit" onclick="addClassType();">添加</button></div>\
-						</div>\
-						<table id="type_table" class="table table-hover" width="100%">\
-							<thead><tr><th>名称</th><th width="80px">操作</th></tr></thead>\
-							<tbody>'+list+'</tbody>\
-						</table>\
+				<div class="divtable mtb15" style="overflow:auto">\
+					<div class="line "><div class="info-r  ml0">\
+						<input name="type_name" class="bt-input-text mr5 type_name" placeholder="请填写分类名称" type="text" style="width:50%" value=""><button name="btn_submit" class="btn btn-success btn-sm mr5 ml5 btn_submit" onclick="addClassType();">添加</button></div>\
 					</div>\
-				</div>'
+					<table id="type_table" class="table table-hover" width="100%">\
+						<thead><tr><th>名称</th><th width="80px">操作</th></tr></thead>\
+						<tbody>'+list+'</tbody>\
+					</table>\
+				</div>\
+			</div>'
 		});
 	},'json');
 }
