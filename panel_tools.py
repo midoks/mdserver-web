@@ -102,7 +102,7 @@ def mwcli(mw_input=0):
         in_port_int = int(in_port.strip())
         if in_port_int < 65536 and in_port_int > 0:
             MwFirewall.instance().addAcceptPort(in_port, 'WEB面板[TOOLS修改]', 'port')
-            panel_port = mw.getPanelDir() + '/data/port.pl'
+            panel_port = panel_dir + '/data/port.pl'
             mw.writeFile(panel_port, in_port)
             os.system(INIT_CMD + " restart_panel")
             os.system(INIT_CMD + " default")
@@ -121,23 +121,25 @@ def mwcli(mw_input=0):
         input_user = mw_input_cmd("请输入新的面板用户名(>=5位)：")
         set_panel_username(input_user.strip())
     elif mw_input == 13:
-        os.system('tail -100 ' + mw.getPanelDir() + '/logs/panel_error.log')
+        os.system('tail -100 ' + panel_dir + '/logs/panel_error.log')
     elif mw_input == 20:
-        basic_auth = 'data/basic_auth.json'
-        if os.path.exists(basic_auth):
-            os.remove(basic_auth)
+        basic_auth = thisdb.getOptionByJson('basic_auth', default={'open':False})
+        if basic_auth['open']:
+            basic_auth['open'] = False
+            thisdb.setOption('basic_auth', json.dumps(basic_auth))
             os.system(INIT_CMD + " restart")
             print("|-关闭basic_auth成功")
     elif mw_input == 21:
-        bind_domain = 'data/bind_domain.pl'
-        if os.path.exists(bind_domain):
-            os.remove(bind_domain)
+        panel_domain = thisdb.getOption('panel_domain', default='')
+        if panel_domain != '':
+            thisdb.setOption('panel_domain', '')
             os.system(INIT_CMD + " unbind_domain")
             print("|-解除域名绑定成功")
     elif mw_input == 22:
-        ssl_choose = 'ssl/choose.pl'
-        if os.path.exists(ssl_choose):
-            os.remove(ssl_choose)
+        panel_ssl = thisdb.getOptionByJson('panel_ssl', default={'open':False})
+        if panel_ssl['open']:
+            panel_ssl['open'] = False
+            thisdb.setOption('panel_ssl', json.dumps(panel_ssl))
             os.system(INIT_CMD + " unbind_ssl")
             print("|-解除面板SSL绑定成功")
     elif mw_input == 23:
