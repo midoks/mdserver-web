@@ -612,9 +612,9 @@ class sites(object):
     # 获取模版名内容
     def getRewriteTpl(self, name):
         path = self.getNgxRewriteDir() +'/'+ name + ".conf"
-        if not os.path.exists(file):
+        if not os.path.exists(path):
             return mw.returnData(False, '模版不存在!')
-        return mw.returnData(True, 'OK', file)
+        return mw.returnData(True, 'OK', path)
 
     def setRewriteTpl(self,name,data):
         path = self.getNgxRewriteDir() +'/'+ name + ".conf"
