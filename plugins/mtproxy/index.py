@@ -210,7 +210,7 @@ def getMtproxyUrl():
     url = 'tg://proxy?server={0}&port={1}&secret={2}'.format(ip, info[1], secret)
     return mw.returnJson(True, 'ok', url)
 
-def installPreInspection(version):
+def installPreInspection():
     sys = mw.execShell("cat /etc/*-release | grep PRETTY_NAME |awk -F = '{print $2}' | awk -F '\"' '{print $2}'| awk '{print $1}'")
 
     if sys[1] != '':
