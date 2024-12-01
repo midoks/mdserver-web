@@ -277,6 +277,14 @@ def getServerIp():
     print(ip[0])
 
 
+def getPanelSslType():
+    scheme = 'http'
+    panel_ssl = thisdb.getOptionByJson('panel_ssl', default={'open':False})
+    if panel_ssl['open']:
+        scheme = 'https'
+    return scheme
+
+
 def main():
     if len(sys.argv) == 1:
         print('ERROR: Parameter error!')
@@ -297,6 +305,8 @@ def main():
         show_panel_adminpath()
     elif method == 'getServerIp':
         getServerIp()
+    elif method == 'panel_ssl_type':
+        print(getPanelSslType())
     elif method == "cli":
         clinum = 0
         try:

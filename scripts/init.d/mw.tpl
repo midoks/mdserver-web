@@ -521,11 +521,7 @@ mw_clean_lib(){
 mw_default(){
     cd ${PANEL_DIR}
     port=7200
-    scheme=http
-
-    if [ -f ${PANEL_DIR}/ssl/choose.pl ];then
-        scheme=https
-    fi
+    scheme=$(python3 ${PANEL_DIR}/panel_tools.py panel_ssl_type)
     
     if [ -f ${PANEL_DIR}/data/port.pl ];then
         port=$(cat ${PANEL_DIR}/data/port.pl)
