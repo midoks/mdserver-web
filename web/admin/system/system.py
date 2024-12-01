@@ -62,7 +62,8 @@ def disk_info():
 def get_load_average():
     start = request.args.get('start', '')
     end = request.args.get('end', '')
-    return sys.getLoadAverageByDB(start, end)
+    data = sys.getLoadAverageByDB(start, end)
+    return mw.returnData(True, 'ok', data)
 
 # 获取系统的磁盘IO统计信息
 @blueprint.route('/get_disk_io', endpoint='get_disk_io', methods=['GET'])
@@ -70,7 +71,8 @@ def get_load_average():
 def get_disk_io():
     start = request.args.get('start', '')
     end = request.args.get('end', '')
-    return sys.getDiskIoByDB(start, end)
+    data = sys.getDiskIoByDB(start, end)
+    return mw.returnData(True, 'ok', data)
 
 # 获取系统的CPU/IO统计信息
 @blueprint.route('/get_cpu_io', endpoint='get_cpu_io', methods=['GET'])
@@ -78,7 +80,8 @@ def get_disk_io():
 def get_cpu_io():
     start = request.args.get('start', '')
     end = request.args.get('end', '')
-    return sys.getCpuIoByDB(start, end)
+    data = sys.getCpuIoByDB(start, end)
+    return mw.returnData(True, 'ok', data)
 
 # 获取系统网络IO统计信息
 @blueprint.route('/get_network_io', endpoint='get_network_io', methods=['GET'])
@@ -86,7 +89,8 @@ def get_cpu_io():
 def get_network_io():
     start = request.args.get('start', '')
     end = request.args.get('end', '')
-    return sys.getNetworkIoByDB(start, end)
+    data = sys.getNetworkIoByDB(start, end)
+    return mw.returnData(True, 'ok', data)
 
 # 重启面板
 @blueprint.route('/restart', endpoint='restart', methods=['POST'])
@@ -101,8 +105,6 @@ def restart():
 def restart_server():
     mw.restartMw()
     return mw.returnData(True, '面板已重启!')
-
-    
 
 # 设置
 @blueprint.route('/set_control', endpoint='set_control', methods=['POST'])

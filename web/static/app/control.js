@@ -240,6 +240,7 @@ function getBeforeDate(n){
 //cpu
 function cpu(b,e){
 	$.get('/system/get_cpu_io?start='+b+'&end='+e,function(rdata){
+		var rdata = rdata.data;
 		var myChartCpu = echarts.init(document.getElementById('cupview'));
 		var xData = [];
 		var yData = [];
@@ -311,6 +312,7 @@ function cpu(b,e){
 //内存
 function mem(b,e){
 	$.get('/system/get_cpu_io?start='+b+'&end='+e,function(rdata){
+		var rdata = rdata.data;
 		var myChartMen = echarts.init(document.getElementById('memview'));
 		var xData = [];
 		//var yData = [];
@@ -382,6 +384,7 @@ function mem(b,e){
 //磁盘io
 function disk(b,e){
 	$.get('/system/get_disk_io?start='+b+'&end='+e,function(rdata){
+		var rdata = rdata.data;
 		var myChartDisk = echarts.init(document.getElementById('diskview'));
 		var rData = [];
 		var wData = [];
@@ -469,6 +472,7 @@ function disk(b,e){
 //网络Io
 function network(b,e){
 	$.get('/system/get_network_io?start='+b+'&end='+e,function(rdata){
+		var rdata = rdata.data;
 		var myChartNetwork = echarts.init(document.getElementById('network'));
 		var aData = [];
 		var bData = [];
