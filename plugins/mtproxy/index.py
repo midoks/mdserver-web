@@ -4,6 +4,7 @@ import sys
 import io
 import os
 import time
+import re
 
 web_dir = os.getcwd() + "/web"
 if os.path.exists(web_dir):
@@ -191,7 +192,25 @@ def getMtproxyUrl():
     conf = getConfEnv()
     content = mw.readFile(conf)
 
-    
+
+    rep = r'bind-to\s*=\s*(.*)'
+    tmp = re.search(rep, content)
+    bind_to = tmp.groups()[0].strip()
+    bind_to = bind_to.strip('"')
+
+    rep = r'secret\s*=\s*(.*)'
+    tmp = re.search(rep, content)
+    secret = tmp.groups()[0].strip()
+    secret = secret.strip('"')
+
+    info = bind_to.split(":")
+
+    ip = mw.getLocalIp()
+
+    url = 'tg://proxy?server={0}&port={1}&secret={2}'.format(ip, info[1], secret)
+    return mw.returnJson(True, 'ok', url)
+
+
 
 if __name__ == "__main__":
     func = sys.argv[1]

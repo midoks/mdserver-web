@@ -35,7 +35,27 @@ function mtCommonFunc(){
 
     $('#mtproxy_url').click(function(){
     	mtPost('url', '', {}, function(rdata){
-    		console.log(rdata);
+            var data = $.parseJSON(rdata.data);
+
+            layer.open({
+                title: "mtproxy代理信息",
+                area: ['600px', '180px'],
+                type:1,
+                closeBtn: 1,
+                shadeClose: false,
+                btn:["复制","取消"],
+                content: '<div class="pd15">\
+                            <div class="divtable">\
+                                <pre class="layui-code">'+data.data+'</pre>\
+                            </div>\
+                        </div>',
+                success:function(){
+                    copyText(data.data);
+                },
+                yes:function(){
+                    copyText(data.data);
+                }
+            });
     	});
     });
 }

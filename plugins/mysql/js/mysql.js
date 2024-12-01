@@ -2041,7 +2041,7 @@ function getFullSyncStatus(db){
                     myPostN('full_sync_cmd', {'db':db,'sign':''}, function(rdata){
                         var rdata = $.parseJSON(rdata.data);
                         layer.open({
-                        title: "手动执行命令CMD",
+                            title: "手动执行命令CMD",
                             area: ['600px', '180px'],
                             type:1,
                             closeBtn: 1,
