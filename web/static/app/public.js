@@ -1152,10 +1152,13 @@ function getPanelList(){
 		},function(){
 			$(this).css("opacity",".6");
 		}).click(function(){
-			$("#btpanelform").remove();
+			// $("#btpanelform").remove();
 			var murl = $(this).attr("data-url");
 			var user = $(this).attr("data-user");
 			var pw = $(this).attr("data-pw");
+
+			const now_url = new URL(murl)
+			// console.log(murl,user,pw,now_url.origin);
 			layer.open({
 				type: 2,
 				title: false,
@@ -1165,21 +1168,23 @@ function getPanelList(){
 				offset: 'rb', //右下角弹出
 				time: 5, //2秒后自动关闭
 				anim: 2,
-				content: [murl+'/login', 'no']
+				content: [murl, 'no']
 			});
-			var loginForm ='<div id="btpanelform" style="display:none"><form id="toBtpanel" action="'+murl+'/do_login" method="post" target="btpfrom">\
+			// 
+			var loginForm ='<div id="btpanelform" style="display:none"><form id="toBtpanel" action="'+now_url.origin+'/do_login" method="post" target="btpfrom">\
 				<input name="username" id="btp_username" value="'+user+'" type="text">\
 				<input name="password" id="btp_password" value="'+pw+'" type="password">\
-				<input name="code" id="bt_code" value="12345" type="text">\
+				<input name="code" id="bt_code" value="" type="text">\
 			</form><iframe name="btpfrom" src=""></iframe></div>';
 			$("body").append(loginForm);
+			// console.log($("btpanelform").html());
 			layer.msg('正在打开面板...',{icon:16,shade: [0.3, '#000'],time:1000});
 			setTimeout(function(){
 				$("#toBtpanel").submit();
-			},500);
+			},1000);
 			setTimeout(function(){
 				window.open(murl);
-			},1000);
+			},2000);
 		});
 		$(".btedit").click(function(e){
 			e.stopPropagation();
