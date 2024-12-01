@@ -534,9 +534,6 @@ mw_default(){
 
     password=$(cat ${PANEL_DIR}/data/default.pl)
 
-    panel_bind_domain=$(python3 ${PANEL_DIR}/panel_tools.py panel_bind_domain)
-    echo "panel_bind_domain:$panel_bind_domain"
-
     admin_path=$(cd ${PANEL_DIR} && python3 ${PANEL_DIR}/panel_tools.py admin_path)
     if [ "$address" == "" ];then
         v4=$(python3 ${PANEL_DIR}/panel_tools.py getServerIp 4)
@@ -567,6 +564,11 @@ mw_default(){
         fi
     else
         address="MW-PANEL-URL: ${scheme}://$address:$port$admin_path"
+    fi
+
+    panel_bind_domain=$(python3 ${PANEL_DIR}/panel_tools.py panel_bind_domain)
+    if [ "$panel_bind_domain" != "" ];then
+        address="${address}\nMW-PANEL-URL: ${scheme}://$panel_bind_domain:$port$admin_path"
     fi
 
     show_panel_ip="$port|"
