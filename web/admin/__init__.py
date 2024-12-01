@@ -130,7 +130,8 @@ def requestAfter(response):
 
 @app.errorhandler(404)
 def page_unauthorized(error):
-    return render_template_string('404 not found', error_info=error), 404
+    return redirect('/', code=302)
+    # return render_template_string('404 not found', error_info=error), 404
 
 
 # 设置模板全局变量

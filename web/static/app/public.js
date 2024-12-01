@@ -1140,7 +1140,7 @@ function getPanelList(){
 	var con ='';
 	$.post("/setting/get_panel_list",function(rdata){
 		for(var i=0; i<rdata.length; i++){
-			con +='<h3 class="mypcip mypcipnew" style="opacity:.6" data-url="'+rdata[i].url+'" data-user="'+rdata[i].username+'" data-pw="'+rdata[i].password+'">\
+			con +='<h3 class="mypcip mypcipnew" style="opacity:.6;cursor: pointer;" data-url="'+rdata[i].url+'" data-user="'+rdata[i].username+'" data-pw="'+rdata[i].password+'">\
 				<span class="f14 cw">'+rdata[i].title+'</span>\
 				<em class="btedit" onclick="bindPanel(0,\'c\',\''+rdata[i].title+'\',\''+rdata[i].id+'\',\''+rdata[i].url+'\',\''+rdata[i].username+'\',\''+rdata[i].password+'\')"></em>\
 				</h3>';
