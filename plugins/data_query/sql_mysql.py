@@ -413,7 +413,7 @@ class nosqlMySQLCtr():
         if my_instance is False:
             return mw.returnData(False,'无法链接')
 
-        my_instance.execute("SET sql_mode=(SELECT REPLACE(@@sql_mode,'ONLY_FULL_GROUP_BY',''))")
+        # my_instance.execute("SET sql_mode=(SELECT REPLACE(@@sql_mode,'ONLY_FULL_GROUP_BY',''))")
         data = my_instance.query(
             """
             SELECT t.TABLE_SCHEMA as TABLE_SCHEMA, t.TABLE_NAME as TABLE_NAME, t.ENGINE as ENGINE,
