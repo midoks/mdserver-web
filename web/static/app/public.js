@@ -1152,7 +1152,7 @@ function getPanelList(){
 		},function(){
 			$(this).css("opacity",".6");
 		}).click(function(){
-			// $("#btpanelform").remove();
+			// $("#panel_form").remove();
 			var murl = $(this).attr("data-url");
 			var user = $(this).attr("data-user");
 			var pw = $(this).attr("data-pw");
@@ -1172,13 +1172,13 @@ function getPanelList(){
 			});
 			// window.open(murl);
 			// 
-			var loginForm ='<div id="btpanelform" style="display:none"><form id="toBtpanel" action="'+now_url.origin+'/do_login" method="post" target="btpfrom">\
+			var loginForm ='<div id="panel_form" style="display:none"><form id="toBtpanel" action="'+now_url.origin+'/do_login" method="post" target="btpfrom">\
 				<input name="username" value="'+user+'" type="text">\
 				<input name="password" value="'+pw+'" type="password">\
 				<input name="code" id="bt_code" value="" type="text">\
 			</form><iframe name="btpfrom" src=""></iframe></div>';
 			$("body").append(loginForm);
-			// console.log($("btpanelform").html());
+			// console.log($("panel_form").html());
 			layer.msg('正在打开面板...',{icon:16,shade: [0.3, '#000'],time:1000});
 			setTimeout(function(){
 				$("#toBtpanel").submit();
