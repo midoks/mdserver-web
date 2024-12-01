@@ -11,6 +11,10 @@ sysArch=`arch`
 sysName=`uname`
 
 
+# cd /www/server/mdserver-web && python3 plugins/mtproxy/index.py url
+
+# cd /www/server/mdserver-web/plugins/mtproxy && /bin/bash install.sh install 1.0
+
 bash ${rootPath}/scripts/getos.sh
 echo "bash ${rootPath}/scripts/getos.sh"
 OSNAME=`cat ${rootPath}/data/osname.pl`
