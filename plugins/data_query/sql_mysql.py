@@ -430,6 +430,9 @@ class nosqlMySQLCtr():
             """
         )
 
+        if data is None:
+            return mw.returnData(True, 'ok', [])
+
         for i in range(len(data)):
             row = data[i]
 
