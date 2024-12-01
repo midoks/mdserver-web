@@ -28,8 +28,14 @@ function mtPost(method, version, args,callback){
 
 function mtCommonFunc(){
 	var con = '<hr/><p class="conf_p" style="text-align:center;">\
-        <button class="btn btn-default btn-sm" onclick="">获取连接地址</button>\
+        <button id="mtproxy_url" class="btn btn-default btn-sm">获取连接地址</button>\
     </p>';
 
     $(".soft-man-con").html(con);
+
+    $('#mtproxy_url').click(function(){
+    	mtPost('url', '', {}, function(rdata){
+    		console.log(rdata);
+    	});
+    });
 }

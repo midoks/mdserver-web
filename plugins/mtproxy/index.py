@@ -60,11 +60,9 @@ def getArgs():
 
     return tmp
 
-
 def status():
-    data = mw.execShell(
-        "ps -ef|grep mtproxy| grep mtg |grep -v grep | grep -v python  | awk '{print $2}'")
-
+    cmd = "ps -ef|grep mtproxy| grep mtg |grep -v grep | grep -v python  | awk '{print $2}'"
+    data = mw.execShell(cmd)
     if data[0] == '':
         return 'stop'
     return 'start'
@@ -102,7 +100,7 @@ def openPort():
     for i in [port]:
         __release_port(i)
     return True
-    
+
 def delPort():
     port = getMtproxyPort()
     for i in [port]:
@@ -176,22 +174,24 @@ def initdStatus():
         return 'fail'
     return 'ok'
 
-
 def initdInstall():
     if mw.isAppleSystem():
         return "Apple Computer does not support"
-
     mw.execShell('systemctl enable mtproxy')
     return 'ok'
 
 
 def initdUinstall():
-
     if mw.isAppleSystem():
         return "Apple Computer does not support"
-
     mw.execShell('systemctl disable mtproxy')
     return 'ok'
+
+def getMtproxyUrl():
+    conf = getConfEnv()
+    content = mw.readFile(conf)
+
+    
 
 if __name__ == "__main__":
     func = sys.argv[1]
@@ -215,5 +215,7 @@ if __name__ == "__main__":
         print(getServiceFile())
     elif func == 'conf_env':
         print(getConfEnv())
+    elif func == 'url':
+        print(getMtproxyUrl())
     else:
         print('error')

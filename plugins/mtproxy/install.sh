@@ -7,17 +7,18 @@ rootPath=$(dirname "$curPath")
 rootPath=$(dirname "$rootPath")
 serverPath=$(dirname "$rootPath")
 
+sysArch=`arch`
+sysName=`uname`
 
 
 bash ${rootPath}/scripts/getos.sh
+echo "bash ${rootPath}/scripts/getos.sh"
 OSNAME=`cat ${rootPath}/data/osname.pl`
-OSNAME_ID=`cat /etc/*-release | grep VERSION_ID | awk -F = '{print $2}' | awk -F "\"" '{print $2}'`
 
-
-
-VERSION=v2.1.7
 VERSION_MIN=2.1.7
-OS=$(uname | tr '[:upper:]' '[:lower:]')
+VERSION=v${VERSION_MIN}
+
+sysName=$(uname | tr '[:upper:]' '[:lower:]')
 
 ARCH=amd64
 get_arch() {
@@ -29,14 +30,13 @@ import (
 func main() { fmt.Println(runtime.GOARCH) }" > /tmp/go_arch.go
 
 	ARCH=$(go run /tmp/go_arch.go)
+	echo "ARCH:${ARCH}"
 }
 
 TARGET_DIR="${serverPath}/mtproxy"
 
-
-
 get_download_url() {
-	DOWNLOAD_URL="https://github.com/9seconds/mtg/releases/download/$VERSION/mtg-${VERSION_MIN}-${OS}-${ARCH}.tar.gz"
+	DOWNLOAD_URL="https://github.com/9seconds/mtg/releases/download/$VERSION/mtg-${VERSION_MIN}-${sysName}-${ARCH}.tar.gz"
 }
 
 # download file
@@ -64,28 +64,35 @@ download_file() {
 }
 
 # /www/server/mtproxy/mtg/mtg run /www/server/mtproxy/mt.toml
-
 Install_app()
 {
-
-	if [[ $OSNAME = "centos" ]]; then
-    	yum install -y golang golang-src
-	elif [[ $OSNAME = "amazon" ]]; then
-	    yum install -y golang golang-src
-	elif [[ $OSNAME = "rocky" ]]; then
-	    yum install -y golang golang-src
-	elif [[ $OSNAME = "rhel" ]]; then
-	    yum install -y golang golang-src
-	else
-		apt install -y golang golang-src
-	fi
-
 	mkdir -p ${serverPath}/mtproxy
 	mkdir -p ${serverPath}/source/mtproxy
 	echo "${1}" > ${serverPath}/mtproxy/version.pl
 
-	get_arch
-	get_download_url
+	if [ "$OSNAME" == "centos" ]; then
+    	yum install -y golang golang-src
+	elif [ "$OSNAME" == "amazon" ]; then
+	    yum install -y golang golang-src
+	elif [ "$OSNAME" == "rocky" ]; then
+	    yum install -y golang golang-src
+	elif [ "$OSNAME" == "rhel" ]; then
+	    yum install -y golang golang-src
+	elif [ "$sysName" == "macos" ]; then
+	    echo "macos"
+	else
+		apt install -y golang golang-src
+	fi
+
+	if [ "$sysName" == "darwin" ]; then
+		ARCH=arm64
+		DOWNLOAD_URL="https://github.com/9seconds/mtg/releases/download/$VERSION/mtg-${VERSION_MIN}-${sysName}-arm64.tar.gz"
+	elif [ "$sysName" != "macos" ]; then
+		get_arch
+		get_download_url
+	else
+		echo "else"
+	fi
 
 	DOWNLOAD_FILE="$(mktemp).tar.gz"
 	download_file $DOWNLOAD_URL $DOWNLOAD_FILE
@@ -102,7 +109,7 @@ Install_app()
 	# curl -s https://core.telegram.org/getProxyConfig -o proxy-multi.conf
 	
 
-	mv ${serverPath}/mtproxy/mtg-${VERSION_MIN}-${OS}-${ARCH} ${serverPath}/mtproxy/mtg
+	mv ${serverPath}/mtproxy/mtg-${VERSION_MIN}-${sysName}-${ARCH} ${serverPath}/mtproxy/mtg
 	echo '安装完成'
 
 	#初始化 
