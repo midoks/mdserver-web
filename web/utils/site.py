@@ -616,6 +616,20 @@ class sites(object):
             return mw.returnData(False, '模版不存在!')
         return mw.returnData(True, 'OK', path)
 
+    def setRewrite(self,path,data,encoding):
+        if not os.path.exists(path):
+            mw.writeFile(path, '')
+
+        mw.backFile(path)
+        mw.writeFile(path, data)
+        isError = mw.checkWebConfig()
+        if(type(isError) == str):
+            mw.restoreFile(path)
+            msg = 'ERROR: <br><a style="color:red;">' + isError.replace("\n", '<br>') + '</a>'
+            return mw.returnJson(False, msg)
+        mw.restartWeb()
+        return mw.returnData(True, '设置成功!')
+
     def setRewriteTpl(self,name,data):
         path = self.getNgxRewriteDir() +'/'+ name + ".conf"
         if os.path.exists(path):

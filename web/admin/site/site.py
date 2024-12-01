@@ -251,6 +251,16 @@ def get_rewrite_tpl():
     tplname = request.form.get('tplname', '')
     return MwSites.instance().getRewriteTpl(tplname)
 
+# 设置站点Rewrite
+@blueprint.route('/set_rewrite', endpoint='set_rewrite',methods=['POST'])
+@panel_login_required
+def set_rewrite():
+    data = request.form.get('data', '')
+    path = request.form.get('path', '')
+    encoding = request.form.get('encoding', '')
+    return MwSites.instance().setRewrite(path,data,encoding)
+
+
 # 设置Rewrite模版名
 @blueprint.route('/set_rewrite_tpl', endpoint='set_rewrite_tpl',methods=['POST'])
 @panel_login_required
