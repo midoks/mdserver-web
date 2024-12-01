@@ -1,6 +1,7 @@
 {
 	"sort": 7,
 	"ps": "你的纸飞机",
+	"install_pre_inspection":true,
 	"name": "mtproxy",
 	"title": "mtproxy",
 	"shell": "install.sh",
