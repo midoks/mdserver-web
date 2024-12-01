@@ -1139,6 +1139,12 @@ function listOrder(skey,type,obj){
 function getPanelList(){
 	var con ='';
 	$.post("/setting/get_panel_list",function(rdata){
+		if (!rdata.status){
+			return;
+		}
+
+		var rdata = rdata.data;
+
 		for(var i=0; i<rdata.length; i++){
 			con +='<h3 class="mypcip mypcipnew" style="opacity:.6;cursor: pointer;" data-url="'+rdata[i].url+'" data-user="'+rdata[i].username+'" data-pw="'+rdata[i].password+'">\
 				<span class="f14 cw">'+rdata[i].title+'</span>\

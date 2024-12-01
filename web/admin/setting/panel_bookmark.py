@@ -51,7 +51,8 @@ def add_panel_info():
 @panel_login_required
 def get_panel_list():
     data = mw.M('panel').field('id,title,url,username,password,click,add_time').order('click desc').select()
-    return data
+    return mw.returnData(True, 'ok!', data)
+
 
 # 删除面板书签
 @blueprint.route('/del_panel_info', endpoint='del_panel_info', methods=['GET','POST'])
