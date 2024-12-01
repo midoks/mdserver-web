@@ -54,7 +54,7 @@ def network():
 @panel_login_required
 def disk_info():
     data = sys.getDiskInfo()
-    return data
+    return mw.returnData(True, 'ok', data)
 
 # 获取系统的负载统计信息
 @blueprint.route('/get_load_average', endpoint='get_load_average', methods=['GET'])

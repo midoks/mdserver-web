@@ -940,6 +940,7 @@ function getDisk() {
 	var LBody = '';
 
 	$.get('/system/disk_info', function(rdata) {
+		var rdata = rdata.data;
 		for (var i = 0; i < rdata.length; i++) {
 			LBody += "<span onclick=\"getFiles('" + rdata[i].path + "')\">\
 				<span class='glyphicon glyphicon-hdd'></span>&nbsp;" + (rdata[i].path=='/'?lan.files.path_root:rdata[i].path) + "(" + rdata[i].size[2] + ")</span>";
