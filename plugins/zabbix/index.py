@@ -338,10 +338,10 @@ def initAgentConf():
 
 def openPort():
     try:
-        import firewall_api
-        firewall_api.firewall_api().addAcceptPortArgs('18888', 'zabbix-web', 'port')
-        firewall_api.firewall_api().addAcceptPortArgs('10051', 'zabbix-server', 'port')
-        firewall_api.firewall_api().addAcceptPortArgs('10050', 'zabbix-agent', 'port')
+        from utils.firewall import Firewall as MwFirewall
+        MwFirewall.instance().addAcceptPort('18888', 'zabbix-web', 'port')
+        MwFirewall.instance().addAcceptPort('10051', 'zabbix-server', 'port')
+        MwFirewall.instance().addAcceptPort('10050', 'zabbix-agent', 'port')
         return port
     except Exception as e:
         return "Release failed {}".format(e)

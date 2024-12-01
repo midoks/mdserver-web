@@ -54,8 +54,8 @@ class App:
     def __release_port(self, port):
         from collections import namedtuple
         try:
-            import firewall_api
-            firewall_api.firewall_api().addAcceptPortArgs(port, 'IMail-Server', 'port')
+            from utils.firewall import Firewall as MwFirewall
+            MwFirewall.instance().addAcceptPort(port, 'IMail-Server', 'port')
             return port
         except Exception as e:
             return "Release failed {}".format(e)

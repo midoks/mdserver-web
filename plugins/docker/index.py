@@ -610,8 +610,8 @@ def getDockerCreateInfo():
 def __release_port(port):
     from collections import namedtuple
     try:
-        import firewall_api
-        firewall_api.firewall_api().addAcceptPortArgs(port, 'docker', 'port')
+        from utils.firewall import Firewall as MwFirewall
+        MwFirewall.instance().addAcceptPort(port, 'docker', 'port')
         return port
     except Exception as e:
         return "Release failed {}".format(e)
