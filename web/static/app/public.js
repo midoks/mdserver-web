@@ -1157,35 +1157,49 @@ function getPanelList(){
 			var user = $(this).attr("data-user");
 			var pw = $(this).attr("data-pw");
 
-			const now_url = new URL(murl)
-			// console.log(murl,user,pw,now_url.origin);
-			layer.open({
-				type: 2,
-				title: false,
-			 	closeBtn: 0, //不显示关闭按钮
-				shade: [0],
-				area: ['340px', '215px'],
-				offset: 'rb', //右下角弹出
-				time: 5, //2秒后自动关闭
-				anim: 2,
-				content: [murl, 'no']
-			});
+			var random_str = getRandomString(8);
+
+			var timestamp = Date.parse(new Date());
+			var data = {
+				'rand':random_str,
+				'username':user,
+				'password':pw,
+				'time':timestamp
+			};
+
+
+			data_json =JSON.stringify(data);
+			login_args = base64_encode(data_json);
+
+			endpoint_url = murl + '?login='+login_args;
+			window.open(endpoint_url);
+			// layer.open({
+			// 	type: 2,
+			// 	title: false,
+			//  	closeBtn: 0, //不显示关闭按钮
+			// 	shade: [0],
+			// 	area: ['340px', '215px'],
+			// 	offset: 'rb', //右下角弹出
+			// 	time: 5, //2秒后自动关闭
+			// 	anim: 2,
+			// 	content: [murl, 'no']
+			// });
 			// window.open(murl);
 			// 
-			var loginForm ='<div id="panel_form" style="display:none"><form id="toBtpanel" action="'+now_url.origin+'/do_login" method="post" target="btpfrom">\
-				<input name="username" value="'+user+'" type="text">\
-				<input name="password" value="'+pw+'" type="password">\
-				<input name="code" id="bt_code" value="" type="text">\
-			</form><iframe name="btpfrom" src=""></iframe></div>';
-			$("body").append(loginForm);
-			// console.log($("panel_form").html());
-			layer.msg('正在打开面板...',{icon:16,shade: [0.3, '#000'],time:1000});
-			setTimeout(function(){
-				$("#toBtpanel").submit();
-			},1000);
-			setTimeout(function(){
-				window.open(murl);
-			},2000);
+			// var loginForm ='<div id="panel_form" style="display:none"><form id="toBtpanel" action="'+now_url.origin+'/do_login" method="post" target="btpfrom">\
+			// 	<input name="username" value="'+user+'" type="text">\
+			// 	<input name="password" value="'+pw+'" type="password">\
+			// 	<input name="code" id="bt_code" value="" type="text">\
+			// </form><iframe name="btpfrom" src=""></iframe></div>';
+			// $("body").append(loginForm);
+			// // console.log($("panel_form").html());
+			// layer.msg('正在打开面板...',{icon:16,shade: [0.3, '#000'],time:1000});
+			// setTimeout(function(){
+			// 	$("#toBtpanel").submit();
+			// },1000);
+			// setTimeout(function(){
+			// 	window.open(murl);
+			// },2000);
 		});
 		$(".btedit").click(function(e){
 			e.stopPropagation();

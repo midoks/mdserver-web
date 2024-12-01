@@ -35,6 +35,13 @@ def index():
 # 安全路径
 @blueprint.route('/<path>',endpoint='admin_safe_path',methods=['GET'])
 def admin_safe_path(path):
+
+    login = request.args.get('login', '')
+    if login != '':
+        print(login)
+        return '123'
+
+
     db_path = thisdb.getOption('admin_path')
     name = thisdb.getOption('template', default='default')
     if isLogined():
