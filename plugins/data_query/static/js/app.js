@@ -377,7 +377,7 @@ function mysqlCommonFuncMysqlNet(){
     layer.open({
         type: 1,
         title: "MySQL服务器的QPS/TPS/网络带宽指标",
-        area: ['700px', '220px'],
+        area: ['750px', '220px'],
         closeBtn: 1,
         shadeClose: false,
         content: '<div class="bt-form pd20 divtable taskdivtable">\
