@@ -535,7 +535,7 @@ mw_default(){
     password=$(cat ${PANEL_DIR}/data/default.pl)
 
     panel_bind_domain=$(python3 ${PANEL_DIR}/panel_tools.py panel_bind_domain)
-    print(panel_bind_domain)
+    echo "panel_bind_domain:$panel_bind_domain"
 
     admin_path=$(cd ${PANEL_DIR} && python3 ${PANEL_DIR}/panel_tools.py admin_path)
     if [ "$address" == "" ];then
