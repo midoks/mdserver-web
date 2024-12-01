@@ -66,7 +66,6 @@ def admin_safe_path(path):
     name = thisdb.getOption('template', default='default')
     if isLogined():
        return redirect('/')
-    # print(db_path,path)
     if db_path == path:
         return render_template('%s/login.html' % name)
 
