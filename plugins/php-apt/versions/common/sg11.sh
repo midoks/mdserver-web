@@ -34,15 +34,6 @@ SORT_LIBNAME="10-${LIBNAME}"
 
 Install_lib()
 {
-	bash ${rootPath}/scripts/getos.sh
-	OSNAME=`cat ${rootPath}/data/osname.pl`
-	if [ "$OSNAME" == 'macos' ];then
-		VERSION_ID=none
-	else
-		VERSION_ID=`cat /etc/*-release | grep VERSION_ID | awk -F = '{print $2}' | awk -F "\"" '{print $2}'`
-	fi
-	
-	echo "${OSNAME}:${VERSION_ID}"
 
 	DEFAULT_OSNAME=linux-x86_64
 	SUFFIX_NAME=lin
