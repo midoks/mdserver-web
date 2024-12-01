@@ -130,6 +130,7 @@ def requestAfter(response):
 
 @app.errorhandler(404)
 def page_unauthorized(error):
+    from flask import redirect
     return redirect('/', code=302)
     # return render_template_string('404 not found', error_info=error), 404
 

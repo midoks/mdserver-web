@@ -483,7 +483,7 @@ def checkDomainPanel():
             return redirect(to, code=302)
         return False
     else:
-        print(current_host.strip().lower(), domain.strip().lower())
+        # print(current_host.strip().lower(), domain.strip().lower())
         if current_host.strip().lower() != domain.strip().lower():
             to = scheme + "://" + domain + ":" + str(port)
             return redirect(to, code=302)
