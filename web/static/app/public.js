@@ -1170,10 +1170,11 @@ function getPanelList(){
 				anim: 2,
 				content: [murl, 'no']
 			});
+			// window.open(murl);
 			// 
 			var loginForm ='<div id="btpanelform" style="display:none"><form id="toBtpanel" action="'+now_url.origin+'/do_login" method="post" target="btpfrom">\
-				<input name="username" id="btp_username" value="'+user+'" type="text">\
-				<input name="password" id="btp_password" value="'+pw+'" type="password">\
+				<input name="username" value="'+user+'" type="text">\
+				<input name="password" value="'+pw+'" type="password">\
 				<input name="code" id="bt_code" value="" type="text">\
 			</form><iframe name="btpfrom" src=""></iframe></div>';
 			$("body").append(loginForm);
