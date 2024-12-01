@@ -347,15 +347,15 @@ def getRecListData():
         n = i + 1
         reg = ''
         if n == flist_len:
-            reg = '\\[' + flist[i] + '\\](.*)\\[?'
+            reg = r'\[' + flist[i] + r'\](.*)\[?'
         else:
-            reg = '\\[' + flist[i] + '\\](.*)\\[' + flist[n] + '\\]'
+            reg = r'\[' + flist[i] + r'\](.*)\[' + flist[n] + r'\]'
 
         t1 = re.search(reg, content, re.S)
         if t1:
             args = t1.groups()[0]
             # print('args start', args, 'args_end')
-            t2 = re.findall('\\s*(.*)\\s*\\=\\s*?(.*)?', args, re.M | re.I)
+            t2 = re.findall(r'\s*(.*)\s*\=\s*?(.*)?', args, re.M | re.I)
             for i in range(len(t2)):
                 tmp[t2[i][0].strip()] = t2[i][1].strip()
         ret_list.append(tmp)

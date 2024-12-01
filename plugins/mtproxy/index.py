@@ -75,6 +75,22 @@ def getServiceFile():
     return systemDir + '/mtproxy.service'
 
 
+def __release_port(port):
+    from collections import namedtuple
+    try:
+        from utils.firewall import Firewall as MwFirewall
+        MwFirewall.instance().addAcceptPort(port, 'mtproxy', 'port')
+        return port
+    except Exception as e:
+        return "Release failed {}".format(e)
+
+
+def openFtpPort():
+    for i in ["8349"]:
+        __release_port(i)
+    return True
+
+
 def initDreplace():
 
     envTpl = getConfEnvTpl()
