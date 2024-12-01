@@ -119,9 +119,10 @@ def getLsyncdLog():
 
 
 def __release_port(port):
+    from collections import namedtuple
     try:
-        import firewall_api
-        firewall_api.firewall_api().addAcceptPortArgs(port, 'RSYNC同步', 'port')
+        from utils.firewall import Firewall as MwFirewall
+        MwFirewall.instance().addAcceptPort(port, 'RSYNC同步', 'port')
         return port
     except Exception as e:
         return "Release failed {}".format(e)
@@ -461,13 +462,12 @@ def delRecBy(name):
                     next_name = reclist[x + 1]['name']
         reg = ''
         if is_end:
-            reg = '\\[' + name + '\\]\\s*(.*)'
+            reg = r'\[' + name + r'\]\s*(.*)'
         else:
-            reg = '\\[' + name + '\\]\\s*(.*)\\s*\\[' + next_name + '\\]'
+            reg = r'\\[' + name + r'\]\s*(.*)\s*\[' + next_name + r'\]'
 
         conre = re.search(reg,  content, re.S)
-        content = content.replace(
-            "[" + name + "]\n" + conre.groups()[0], '')
+        content = content.replace("[" + name + "]\n" + conre.groups()[0], '')
         mw.writeFile(path, content)
     except Exception as e:
         return False
