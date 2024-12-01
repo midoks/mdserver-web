@@ -74,6 +74,8 @@ Install_app()
 	    yum install -y golang golang-src
 	elif [[ $OSNAME = "rocky" ]]; then
 	    yum install -y golang golang-src
+	elif [[ $OSNAME = "rhel" ]]; then
+	    yum install -y golang golang-src
 	else
 		apt install -y golang golang-src
 	fi
