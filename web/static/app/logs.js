@@ -58,7 +58,8 @@ $('#panelLogs .clear').click(function(){
 
 function getAuditLogsFiles(){
 	var loadT = layer.msg('正在获取日志审计列表...', { icon: 16, time: 0, shade: 0.3 });
-	$.post('/logs/get_audit_logs_files',{}, function(data) {
+	$.post('/logs/get_audit_logs_files',{}, function(rdata) {
+		var data = rdata.data;
 		layer.close(loadT);
         var option = '';
         for (var i = 0; i < data.length; i++) {

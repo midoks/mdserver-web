@@ -54,7 +54,7 @@ def del_panel_logs():
 @panel_login_required
 def get_audit_logs_files():
     logs_file = adult_log.getAuditLogsFiles()
-    return logs_file
+    return mw.returnData(True, 'ok', logs_file)
 
 # 系统审计日志列表
 @blueprint.route('/get_audit_file', endpoint='get_audit_file', methods=['POST'])
