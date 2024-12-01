@@ -34,5 +34,5 @@ jobs:
         cd /www/server/mdserver-web/plugins/mysql && sudo bash install.sh install 5.7
     - name: Start DEBUG
       run: |
-        gunicorn -c setting.py app:app
-        python3 task.py &
+        cd web && gunicorn -c setting.py app:app
+        python3 panel_task.py &
