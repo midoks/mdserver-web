@@ -35,12 +35,32 @@ def index():
 # 安全路径
 @blueprint.route('/<path>',endpoint='admin_safe_path',methods=['GET'])
 def admin_safe_path(path):
-
     login = request.args.get('login', '')
     if login != '':
-        print(login)
-        return '123'
+        import base64
+        import json
+        try:
+            # print(login)
+            login_str = base64.b64decode(login)
+            login_str = login_str.decode('utf-8')
+            data = json.loads(login_str)
 
+            info = thisdb.getUserByName(data['username'])
+            if info is None:
+                return redirect('/')
+
+            if info['password'] != mw.md5(data['password']):
+                return redirect('/')
+
+            session['login'] = True
+            session['username'] = info['name']
+            session['overdue'] = int(time.time()) + 7 * 24 * 60 * 60
+
+            thisdb.updateUserLoginTime()
+            return redirect('/')
+        except Exception as e:
+            pass
+        
 
     db_path = thisdb.getOption('admin_path')
     name = thisdb.getOption('template', default='default')
