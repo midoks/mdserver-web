@@ -32,12 +32,6 @@ def index():
     name = thisdb.getOption('template', default='default')
     return render_template('%s/setting.html' % name)
 
-@blueprint.route('/get_panel_list', endpoint='get_panel_list', methods=['POST'])
-@panel_login_required
-def get_panel_list():
-    return []
-
-
 # 设置面板名称
 @blueprint.route('/set_webname', endpoint='set_webname', methods=['POST'])
 @panel_login_required

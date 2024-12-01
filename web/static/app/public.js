@@ -1138,7 +1138,7 @@ function listOrder(skey,type,obj){
 //获取关联列表
 function getPanelList(){
 	var con ='';
-	$.post("/config/get_panel_list",function(rdata){
+	$.post("/setting/get_panel_list",function(rdata){
 		for(var i=0; i<rdata.length; i++){
 			con +='<h3 class="mypcip mypcipnew" style="opacity:.6" data-url="'+rdata[i].url+'" data-user="'+rdata[i].username+'" data-pw="'+rdata[i].password+'">\
 				<span class="f14 cw">'+rdata[i].title+'</span>\
@@ -1203,7 +1203,7 @@ function bindPanel(a,type,ip,btid,url,user,pw){
 	if(pw == undefined) pw="";
 	if(ip == undefined) ip="";
 	if(a == 1) {
-		var gurl = "/config/add_panel_info";
+		var gurl = "/setting/add_panel_info";
 		var btaddress = $("#btaddress").val();
 		if(!btaddress.match(/^(http|https)+:\/\/([\w-]+\.)+[\w-]+:\d+/)){
 			layer.msg('面板地址格式不正确，示例：<p>http://192.168.0.1:8888</p>',{icon:5,time:5000});
@@ -1218,7 +1218,7 @@ function bindPanel(a,type,ip,btid,url,user,pw){
 			return;
 		}
 		if(type=="c"){
-			gurl = "/config/set_panel_info";
+			gurl = "/setting/set_panel_info";
 			data = data+"&id="+btid;
 		}
 		$.post(gurl, data, function(b) {
@@ -1276,7 +1276,7 @@ function bindPanel(a,type,ip,btid,url,user,pw){
 }
 //删除快捷登录
 function bindPaneldel(id){
-	$.post("/config/del_panel_info","id="+id,function(rdata){
+	$.post("/setting/del_panel_info","id="+id,function(rdata){
 		layer.closeAll();
 		layer.msg(rdata.msg,{icon:rdata.status?1:2});
 		getPanelList();
@@ -1309,6 +1309,7 @@ function getSpeed(sele){
 		},1000);
 	},'json');
 }
+
 //消息盒子
 function messageBox() {
 	layer.open({
@@ -1318,17 +1319,17 @@ function messageBox() {
 		closeBtn: 1,
 		shadeClose: false,
 		content: '<div class="bt-form">\
-					<div class="bt-w-main">\
-						<div class="bt-w-menu">\
-							<p class="bgw" id="taskList" onclick="tasklist()">任务列表(<span class="task_count">0</span>)</p>\
-							<p onclick="remind()">消息列表(<span class="msg_count">0</span>)</p>\
-							<p onclick="execLog()">执行日志</p>\
-						</div>\
-						<div class="bt-w-con pd15">\
-							<div class="taskcon"></div>\
-						</div>\
-					</div>\
-				</div>'
+			<div class="bt-w-main">\
+				<div class="bt-w-menu">\
+					<p class="bgw" id="taskList" onclick="tasklist()">任务列表(<span class="task_count">0</span>)</p>\
+					<p onclick="remind()">消息列表(<span class="msg_count">0</span>)</p>\
+					<p onclick="execLog()">执行日志</p>\
+				</div>\
+				<div class="bt-w-con pd15">\
+					<div class="taskcon"></div>\
+				</div>\
+			</div>\
+		</div>'
 	});
 	$(".bt-w-menu p").click(function(){
 		$(this).addClass("bgw").siblings().removeClass("bgw");

@@ -19,4 +19,5 @@ from .notify_tgbot import *
 from .app import *
 
 from .panel_ssl import *
+from .panel_bookmark import *
 
