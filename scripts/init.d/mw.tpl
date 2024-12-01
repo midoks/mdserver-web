@@ -106,7 +106,7 @@ mw_stop_task()
 {
     if [ -f ${PANEL_DIR}/logs/panel_task.lock ];then
         echo -e "\033[32mthe task is running and cannot be stopped\033[0m"
-        exit 0
+        return 0
     fi
 
     echo -e "stopping mw-tasks... \c";
