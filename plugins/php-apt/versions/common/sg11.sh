@@ -6,7 +6,6 @@ curPath=`pwd`
 rootPath=$(dirname "$curPath")
 rootPath=$(dirname "$rootPath")
 rootPath=$(dirname "$rootPath")
-rootPath=$(dirname "$rootPath")
 serverPath=$(dirname "$rootPath")
 sourcePath=${serverPath}/source/php
 
@@ -19,7 +18,8 @@ LIBV=0
 sysName=`uname`
 actionType=$1
 version=$2
-SG_VER=${version:0:1}.${version:1:2}
+# SG_VER=${version:0:1}.${version:1:2}
+SG_VER=${version}
 
 extVer=`bash $curPath/lib.sh $version`
 extFile=/usr/lib/php/${extVer}/${LIBNAME}.so
@@ -34,6 +34,10 @@ SORT_LIBNAME="10-${LIBNAME}"
 
 Install_lib()
 {
+	bash ${rootPath}/scripts/getos.sh
+	OSNAME=`cat ${rootPath}/data/osname.pl`
+
+	echo "${OSNAME}:${VERSION_ID}"
 
 	DEFAULT_OSNAME=linux-x86_64
 	SUFFIX_NAME=lin
