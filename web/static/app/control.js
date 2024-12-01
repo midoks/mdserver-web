@@ -692,6 +692,7 @@ function getload_old(b,e){
 //系统负载
 function getload(b,e){
 	$.get('/system/get_load_average?start='+b+'&end='+e,function(rdata){
+		var rdata = rdata.data;
 		var myChartgetload = echarts.init(document.getElementById('getloadview'));
 		var aData = [];
 		var bData = [];
