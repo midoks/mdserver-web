@@ -72,7 +72,7 @@ def status():
 
 def getServiceFile():
     systemDir = mw.systemdCfgDir()
-    return systemDir+'/mtproxy.service'
+    return systemDir + '/mtproxy.service'
 
 
 def initDreplace():
