@@ -43,6 +43,8 @@ def mw_input_cmd(msg):
 
 
 def mwcli(mw_input=0):
+    panel_dir = mw.getPanelDir()
+
     raw_tip = "======================================================"
     if not mw_input:
         print("===============mdserver-web cli tools=================")
@@ -139,7 +141,7 @@ def mwcli(mw_input=0):
             os.system(INIT_CMD + " unbind_ssl")
             print("|-解除面板SSL绑定成功")
     elif mw_input == 23:
-        listen_ipv6 = 'data/ipv6.pl'
+        listen_ipv6 = panel_dir + '/data/ipv6.pl'
         if not os.path.exists(listen_ipv6):
             mw.writeFile(listen_ipv6,'True')
             os.system(INIT_CMD + " restart")
@@ -147,7 +149,7 @@ def mwcli(mw_input=0):
         else:
             print("|-已开启IPv6支持!")
     elif mw_input == 24:
-        listen_ipv6 = 'data/ipv6.pl'
+        listen_ipv6 = panel_dir + '/data/ipv6.pl'
         if not os.path.exists(listen_ipv6):
             print("|-已关闭IPv6支持!")
         else:
@@ -181,7 +183,7 @@ def mwcli(mw_input=0):
         if not run_cmd:
             mw.echoInfo("未检测到防火墙!")
     elif mw_input == 100:
-        php_conf = mw.getPanelDir() + '/plugins/php/info.json'
+        php_conf = panel_dir + '/plugins/php/info.json'
         if os.path.exists(php_conf):
             cont = mw.readFile(php_conf)
             cont = re.sub("\"53\"", "\"52\",\"53\"", cont)
@@ -189,7 +191,7 @@ def mwcli(mw_input=0):
             mw.writeFile(php_conf, cont)
             mw.echoInfo("执行PHP52显示成功!")
     elif mw_input == 101:
-        php_conf = mw.getPanelDir() + '/plugins/php/info.json'
+        php_conf = panel_dir + '/plugins/php/info.json'
         if os.path.exists(php_conf):
             cont = mw.readFile(php_conf)
             cont = re.sub("\"52\",", "", cont)
