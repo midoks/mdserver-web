@@ -17,6 +17,9 @@ chmod 755 /www/server/mdserver-web/data
 
 
 if [ -f /etc/rc.d/init.d/mw ];then
+    if [ -f /usr/bin/mw ];then
+        rm -rf /usr/bin/mw
+    fi
     bash /etc/rc.d/init.d/mw stop && rm -rf /www/server/mdserver-web/scripts/init.d/mw && rm -rf /etc/rc.d/init.d/mw
 fi
 
