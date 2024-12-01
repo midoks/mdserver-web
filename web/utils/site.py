@@ -548,8 +548,6 @@ class sites(object):
                 if version.startswith('1.25') or version.startswith('1.27'):
                     http_ssl = "\n\tlisten 443 ssl;"
                     http_ssl = http_ssl + "\n\tlisten [::]:443 ssl;"
-                    http_ssl = http_ssl + "\n\tlisten 443;"
-                    http_ssl = http_ssl + "\n\tlisten [::]:443;"
                     http_ssl = http_ssl + "\n\thttp2 on;"
                 else:
                     http_ssl = "\n\tlisten 443 ssl;"
