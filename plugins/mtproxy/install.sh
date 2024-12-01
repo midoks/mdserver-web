@@ -7,8 +7,6 @@ rootPath=$(dirname "$curPath")
 rootPath=$(dirname "$rootPath")
 serverPath=$(dirname "$rootPath")
 
-install_tmp=${rootPath}/tmp/mw_install.pl
-
 
 
 bash ${rootPath}/scripts/getos.sh
@@ -80,6 +78,7 @@ Install_app()
 
 	mkdir -p ${serverPath}/mtproxy
 	mkdir -p ${serverPath}/source/mtproxy
+	echo "${1}" > ${serverPath}/mtproxy/version.pl
 
 	get_arch
 	get_download_url
@@ -100,10 +99,7 @@ Install_app()
 	
 
 	mv ${serverPath}/mtproxy/mtg-${VERSION_MIN}-${OS}-${ARCH} ${serverPath}/mtproxy/mtg
-
-	
-	echo "${1}" > ${serverPath}/mtproxy/version.pl
-	echo '安装完成' > $install_tmp
+	echo '安装完成'
 
 	#初始化 
 	cd ${rootPath} && python3 ${rootPath}/plugins/mtproxy/index.py start
@@ -118,7 +114,7 @@ Uninstall_app()
 		systemctl daemon-reload
 	fi
 	rm -rf ${serverPath}/mtproxy
-	echo '卸载完成' > $install_tmp
+	echo '卸载完成'
 }
 
 action=$1
