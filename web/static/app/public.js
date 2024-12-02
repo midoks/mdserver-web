@@ -1523,7 +1523,7 @@ function tasklist(a){
 				case "0":
 					c += "<li>\
 						<span class='titlename'>" + g.data[d].name + "</span>\
-						<span class='state pull-right c6'>等待</span> | <a href=\"javascript:removeTask(" + g.data[d].id + ")\" class='btlink'>"+lan.public.del+"</a>\
+						<span class='state pull-right c6'>等待</span> | <a href=\"javascript:removeTask(" + g.data[d].id + ")\" class='btlink'>删除</a>\
 					</li>";
 					break;
 			}
