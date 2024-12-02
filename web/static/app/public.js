@@ -938,54 +938,6 @@ function removeTask(b) {
 	});
 }
 
-function GetTaskList(a) {
-	a = a == undefined ? 1 : a;
-	$.post("/task/list", "tojs=GetTaskList&table=tasks&limit=10&p=" + a, function(g) {
-		console.log(g);
-		var e = "";
-		var b = "";
-		var c = "";
-		var f = false;
-		for(var d = 0; d < g.data.length; d++) {
-			switch(g.data[d].status) {
-				case "-1":
-					f = true;
-					if(g.data[d].type != "download") {
-						b = "<li>\
-								<span class='titlename'>" + g.data[d].name + "</span>\
-								<span class='state'>正在安装 <img src='/static/img/ing.gif'> | <a href=\"javascript:removeTask(" + g.data[d].id + ")\">关闭</a></span>\
-								<span class='opencmd'></span><pre class='cmd'></pre>\
-							</li>";
-					} else {
-						b = "<li>\
-							<div class='line-progress' style='width:0%'></div>\
-							<span class='titlename'>" + g.data[d].name + "<a id='speed' style='margin-left:130px;'>0.0M/12.5M</a></span>\
-							<span class='com-progress'>0%</span><span class='state'>\
-								下载中 <img src='/static/img/ing.gif'> | <a href=\"javascript:removeTask(" + g.data[d].id + ")\">"+lan.public.close+"</a>\
-							</span>\
-						</li>";
-					}
-					break;
-				case "0":
-					c += "<li>\
-							<span class='titlename'>" + g.data[d].name + "</span>\
-							<span class='state'>等待</span> | <a href=\"javascript:removeTask(" + g.data[d].id + ")\">删除</a>\
-						</li>";
-					break;
-				case "1":
-					e += "<li>\
-						<span class='titlename'>" + g.data[d].name + "</span>\
-						<span class='state'>" + g.data[d].addtime + "  "+'已完成'+"  "+ '耗时' + (g.data[d].end - g.data[d].start)+"秒</span>\
-						</li>";
-			}
-		}
-		$("#srunning").html(b + c);
-		$("#sbody").html(e);
-		return f
-	})
-}
-
-
 //获取任务总数
 function getTaskCount() {
 	$.get("/task/count", "", function(a) {
