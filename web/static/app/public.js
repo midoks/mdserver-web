@@ -1491,7 +1491,7 @@ function getReloads() {
 			}
 			var b = "";
 			var d = "";
-			$("#task").text(h.task.length);
+			$("#task").text(h.count);
 			$(".task_count").text(h.task.length);
 			for(var g = 0; g < h.task.length; g++) {
 				if(h.task[g].status == "-1") {
