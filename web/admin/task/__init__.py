@@ -77,7 +77,7 @@ def get_task_speed():
         data['msg'] = mw.getLastLine(task_logfile, 10)
         data['isDownload'] = False
 
-
+    data['count'] = count
     data['task'] = thisdb.getTaskRunList(1,6)
     return data
 
