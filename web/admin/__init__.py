@@ -26,7 +26,6 @@ from flask import render_template_string
 
 from flask_socketio import SocketIO, emit, send
 
-from flask_migrate import Migrate
 from flask_caching import Cache
 from werkzeug.local import LocalProxy
 
