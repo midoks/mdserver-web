@@ -115,7 +115,7 @@ docker run -itd --name mw-server --privileged=true -p 7200:7200 -p 80:80 -p 443:
 - 重新架构面面板。
 - PHP84正式版。
 - 加入alist插件。
-- 加数据管理-常用命令。
+- 数据管理-常用命令。
 - 常规更新。
 
 ### JSDelivr安装地址
