@@ -74,8 +74,8 @@ def init_cmd_systemd():
     if os.path.exists(systemd_mw_task):
         os.remove(systemd_mw_task)
 
-    doContentReplace(systemd_mw_tpl, systemd_mw)
-    doContentReplace(systemd_mw_task_tpl, systemd_mw_task)
+    contentReplace(systemd_mw_tpl, systemd_mw)
+    contentReplace(systemd_mw_task_tpl, systemd_mw_task)
 
     mw.execShell('systemctl enable mw')
     mw.execShell('systemctl enable mw-task')
