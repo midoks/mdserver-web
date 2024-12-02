@@ -1535,7 +1535,7 @@ function getReloads() {
 				return;
 			}
 		},'json').error(function(){});
-	}, 1000);
+	}, 3000);
 }
 
 //检查选中项
