@@ -15,6 +15,7 @@ import core.mw as mw
 
 def cmdContent():
     script = mw.getPanelDir() + '/scripts/init.d/mw.tpl'
+    content = mw.readFile(src)
     content = content.replace("{$SERVER_PATH}", mw.getPanelDir())
     content += "\n# make:{0}".format(mw.formatDate())
     return content
