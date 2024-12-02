@@ -20,6 +20,7 @@ def getTaskPage(page=1,size=10):
 
     rdata = {}
     rdata['data'] = info['list']
+    rdata['count'] = info['count']
     rdata['page'] = mw.getPage({'count':info['count'],'tojs':'remind','p':page,'row':size})
     return rdata
 

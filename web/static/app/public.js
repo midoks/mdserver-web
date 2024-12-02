@@ -922,20 +922,6 @@ function task() {
 	messageBox();
 }
 
-function ActionTask() {
-	var a = layer.msg(lan.public.the_del, {
-		icon: 16,
-		time: 0,
-		shade: [0.3, "#000"]
-	});
-	$.post("/files?action=ActionTask", "", function(b) {
-		layer.close(a);
-		layer.msg(b.msg, {
-			icon: b.status ? 1 : 5
-		})
-	})
-}
-
 function removeTask(b) {
 	var a = layer.msg('正在删除,请稍候...', {
 		icon: 16,
@@ -1565,7 +1551,6 @@ function tasklist(a){
 		var b = "";
 		var c = "";
 		var f = false;
-		var task_count =0;
 		for(var d = 0; d < g.data.length; d++) {
 			switch(g.data[d].status) {
 				case "-1":
@@ -1595,7 +1580,7 @@ function tasklist(a){
 		}
 		
 		
-		$(".task_count").text(task_count);
+		$(".task_count").text(g.count);
 		$(".cmdlist").html(b + c);
 		getReloads();
 		return f
