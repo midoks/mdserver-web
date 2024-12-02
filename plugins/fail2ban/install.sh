@@ -18,7 +18,8 @@ Install_App()
 	echo '正在安装脚本文件...'
 	mkdir -p $serverPath/source
 
-	apt install -y fail2ban
+	which yum && yum install -y fail2ban
+	which apt && apt install -y fail2ban
 
 	mkdir -p $serverPath/fail2ban
 	echo "${VERSION}" > $serverPath/fail2ban/version.pl
@@ -30,8 +31,11 @@ Install_App()
 
 Uninstall_App()
 {
-	apt remove -y fail2ban
-	apt purge -y fail2ban
+	which apt && apt remove -y fail2ban
+	which apt && apt purge -y fail2ban
+
+	which yum && yum remove -y fail2ban
+	which yum && yum purge -y fail2ban
 
 	if [ -f /usr/lib/systemd/system/fail2ban.service ];then
 		systemctl stop fail2ban
