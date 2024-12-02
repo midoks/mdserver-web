@@ -1519,14 +1519,12 @@ function tasklist(a){
 							<span class='com-progress'>0%</span><span class='state'>下载中 <img src='/static/img/ing.gif'> | <a href=\"javascript:removeTask(" + g.data[d].id + ")\">关闭</a></span>\
 						</li>";
 					}
-					task_count++;
 					break;
 				case "0":
 					c += "<li>\
 						<span class='titlename'>" + g.data[d].name + "</span>\
 						<span class='state pull-right c6'>等待</span> | <a href=\"javascript:removeTask(" + g.data[d].id + ")\" class='btlink'>"+lan.public.del+"</a>\
 					</li>";
-					task_count++;
 					break;
 			}
 		}
