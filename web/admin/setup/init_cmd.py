@@ -38,9 +38,6 @@ def init_cmd():
     # initd
     if os.path.exists('/etc/rc.d/init.d'):
         initd_bin = '/etc/rc.d/init.d/mw'
-        # if not os.access(initd_bin, os.W_OK):
-        #     return False
-
         mw.writeFile(initd_bin, cmd_content)
         mw.execShell('chmod +x ' + initd_bin)
         # 加入自启动
