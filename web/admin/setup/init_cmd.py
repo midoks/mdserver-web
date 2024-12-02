@@ -13,18 +13,17 @@ import shutil
 
 import core.mw as mw
 
-def contentReplace(src, dst):
-    content = mw.readFile(src)
+def cmdContent():
+    script = mw.getPanelDir() + '/scripts/init.d/mw.tpl'
     content = content.replace("{$SERVER_PATH}", mw.getPanelDir())
-
     content += "\n# make:{0}".format(mw.formatDate())
-    mw.writeFile(dst, content)
+    return content
 
 
 def init_cmd():
-    script = mw.getPanelDir() + '/scripts/init.d/mw.tpl'
+    cmd_content = cmdContent()
     script_bin = mw.getPanelDir() + '/scripts/init.d/mw'
-    contentReplace(script, script_bin)
+    mw.writeFile(script_bin, cmd_content)
     mw.execShell('chmod +x ' + script_bin)
 
     # 在linux系统中,确保/etc/init.d存在
@@ -41,9 +40,9 @@ def init_cmd():
         initd_bin = '/etc/rc.d/init.d/mw'
         # if not os.access(initd_bin, os.W_OK):
         #     return False
-        if not os.path.exists(initd_bin):
-            shutil.copyfile(script_bin, initd_bin)
-            mw.execShell('chmod +x ' + initd_bin)
+
+        mw.writeFile(initd_bin, cmd_content)
+        mw.execShell('chmod +x ' + initd_bin)
         # 加入自启动
         mw.execShell('which chkconfig && chkconfig --add mw')
 
@@ -55,9 +54,9 @@ def init_cmd():
         initd_bin = '/etc/init.d/mw'
         # if not os.access(initd_bin, os.W_OK):
         #     return False
-        if not os.path.exists(initd_bin):
-            shutil.copyfile(script_bin, initd_bin)
-            mw.execShell('chmod +x ' + initd_bin)
+        mw.writeFile(initd_bin, cmd_content)
+        mw.execShell('chmod +x ' + initd_bin)
+
         # 加入自启动
         mw.execShell('which update-rc.d && update-rc.d -f mw defaults')
 
