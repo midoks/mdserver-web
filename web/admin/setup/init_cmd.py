@@ -44,17 +44,11 @@ def init_cmd():
         # 加入自启动
         mw.execShell('which chkconfig && chkconfig --add mw')
 
-        # if sys_name == 'opensuse':
-        #     mw.execShell('which chkconfig && chkconfig --level 3 mw on')
-
 
     if os.path.exists('/etc/init.d'):
         initd_bin = '/etc/init.d/mw'
-        # if not os.access(initd_bin, os.W_OK):
-        #     return False
         mw.writeFile(initd_bin, cmd_content)
         mw.execShell('chmod +x ' + initd_bin)
-
         # 加入自启动
         mw.execShell('which update-rc.d && update-rc.d -f mw defaults')
 
