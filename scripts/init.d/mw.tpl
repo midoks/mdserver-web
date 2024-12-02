@@ -521,7 +521,7 @@ mw_clean_lib(){
 mw_default(){
     cd ${PANEL_DIR}
     port=7200
-    scheme=$(python3 ${PANEL_DIR}/panel_tools.py panel_ssl_type)
+    scheme=$(cd ${PANEL_DIR} && python3 ${PANEL_DIR}/panel_tools.py panel_ssl_type)
     
     if [ -f ${PANEL_DIR}/data/port.pl ];then
         port=$(cat ${PANEL_DIR}/data/port.pl)
@@ -536,8 +536,8 @@ mw_default(){
 
     admin_path=$(cd ${PANEL_DIR} && python3 ${PANEL_DIR}/panel_tools.py admin_path)
     if [ "$address" == "" ];then
-        v4=$(python3 ${PANEL_DIR}/panel_tools.py getServerIp 4)
-        v6=$(python3 ${PANEL_DIR}/panel_tools.py getServerIp 6)
+        v4=$(cd ${PANEL_DIR} && python3 ${PANEL_DIR}/panel_tools.py getServerIp 4)
+        v6=$(cd ${PANEL_DIR} && python3 ${PANEL_DIR}/panel_tools.py getServerIp 6)
 
         if [ "$v4" != "" ] && [ "$v6" != "" ]; then
 
@@ -577,8 +577,8 @@ mw_default(){
     echo -e "\033[32mMW-PANEL DEFAULT INFO!\033[0m"
     echo -e "=================================================================="
     echo -e "$address"
-    echo -e `python3 ${PANEL_DIR}/panel_tools.py username`
-    echo -e `python3 ${PANEL_DIR}/panel_tools.py password`
+    echo -e `cd ${PANEL_DIR} && python3 ${PANEL_DIR}/panel_tools.py username`
+    echo -e `cd ${PANEL_DIR} && python3 ${PANEL_DIR}/panel_tools.py password`
     echo -e "\033[33mWarning:\033[0m"
     echo -e "\033[33mIf you cannot access the panel. \033[0m"
     echo -e "\033[33mrelease the following port (${show_panel_ip}80|443|22) in the security group.\033[0m"
