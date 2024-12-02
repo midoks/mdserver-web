@@ -110,11 +110,12 @@ docker run -itd --name mw-server --privileged=true -p 7200:7200 -p 80:80 -p 443:
 ```
 
 
-### 版本更新 0.17.3
+### 版本更新 0.18.0
 
-- 新增pgadmin插件。
-- 新增acme_pandominassl_apply插件。
-- 新增快捷指令:mw pgdb。
+- 重新架构面面板。
+- PHP84正式版。
+- 加入alist插件。
+- 加数据管理-常用命令。
 - 常规更新。
 
 ### JSDelivr安装地址
