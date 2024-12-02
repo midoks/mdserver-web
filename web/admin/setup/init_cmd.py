@@ -55,8 +55,8 @@ def init_cmd():
         # 加入自启动
         mw.execShell('which update-rc.d && update-rc.d -f mw defaults')
 
-    if mw.getOsName() == 'opensuse':
-        init_cmd_systemd()
+    # if mw.getOsName() == 'opensuse':
+    #     init_cmd_systemd()
     return True
 
 
