@@ -242,8 +242,7 @@ class classApi:
     def close_sync(self, args):
         # 取消迁移
         mw.execShell("kill -9 {}".format(self.get_pid()))
-        mw.execShell(
-            "kill -9 $(ps aux|grep index.py|grep -v grep|awk '{print $2}')")
+        mw.execShell("kill -9 $(ps aux|grep index.py|grep -v grep|awk '{print $2}')")
         # 删除迁移配置
         time.sleep(1)
         if os.path.exists(self._INFO_FILE):
@@ -538,14 +537,14 @@ class classApi:
     def getSocketFile(self, mtype='mysql'):
         file = self.getConf(mtype)
         content = mw.readFile(file)
-        rep = 'socket\s*=\s*(.*)'
+        rep = r'socket\s*=\s*(.*)'
         tmp = re.search(rep, content)
         return tmp.groups()[0].strip()
 
     def getDbPort(self, mtype='mysql'):
         file = self.getConf(mtype)
         content = mw.readFile(file)
-        rep = 'port\s*=\s*(.*)'
+        rep = r'port\s*=\s*(.*)'
         tmp = re.search(rep, content)
         return tmp.groups()[0].strip()
 
