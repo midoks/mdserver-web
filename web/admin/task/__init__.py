@@ -78,7 +78,7 @@ def get_task_speed():
         data['isDownload'] = False
 
 
-    data['task'] = thisdb.getTaskRunList()
+    data['task'] = thisdb.getTaskRunList(1,6)
     return data
 
 @blueprint.route('/remove_task', endpoint='remove_task', methods=['POST'])
