@@ -788,8 +788,7 @@ class classApi:
 
     def run(self):
         # 开始迁移
-        # self.upload_file("/tmp/mysql-boost-5.7.39.tar.gz",
-        # "/tmp/mysql-boost-5.7.39.tar.gz")
+        # self.upload_file("/tmp/mysql-boost-5.7.39.tar.gz", "/tmp/mysql-boost-5.7.39.tar.gz")
 
         # self.sync_other()
         self.sync_site()
