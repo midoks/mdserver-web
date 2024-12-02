@@ -60,14 +60,11 @@ def init_cmd():
     return True
 
 
-
-
 def init_cmd_systemd():
-    systemctl
-    sysCfgDir = mw.systemdCfgDir()
+    systemd_dir = mw.systemdCfgDir()
 
-    systemd_mw = sysCfgDir + '/mw.service'
-    systemd_mw_task = sysCfgDir + '/mw-task.service'
+    systemd_mw = systemd_dir + '/mw.service'
+    systemd_mw_task = systemd_dir + '/mw-task.service'
 
     systemd_mw_tpl = mw.getPanelDir() + '/scripts/init.d/mw.service.tpl'
     systemd_mw_task_tpl = mw.getPanelDir() + '/scripts/init.d/mw-task.service.tpl'
