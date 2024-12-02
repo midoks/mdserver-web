@@ -520,6 +520,7 @@ mw_clean_lib(){
 
 mw_default(){
     cd ${PANEL_DIR}
+    echo "PANEL_DIR:${PANEL_DIR}"
     port=7200
     scheme=$(cd ${PANEL_DIR} && python3 ${PANEL_DIR}/panel_tools.py panel_ssl_type)
     
