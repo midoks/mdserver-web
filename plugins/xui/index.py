@@ -156,17 +156,17 @@ def initdUinstall():
 
 def getXuiInfo():
 
+    data = {}
     user = pSqliteDb('users')
-
     info = user.field('username,password').where("id=?", (1,)).find()
 
     setting = pSqliteDb('settings')
+    setting_data = setting.field('webPort')..where("key=?", ('webPort',)).find()
 
-    setting_data = setting.where("key=?", ('webPort',)).find()
-
-    print(info)
-    print(setting_data)
-    return mw.returnJson(True, 'ok', '')
+    data['username'] = info['username']
+    data['password'] = info['password']
+    data['port'] = info['webPort']
+    return mw.returnJson(True, 'ok', data)
 
 def installPreInspection():
     sys = mw.execShell("cat /etc/*-release | grep PRETTY_NAME |awk -F = '{print $2}' | awk -F '\"' '{print $2}'| awk '{print $1}'")

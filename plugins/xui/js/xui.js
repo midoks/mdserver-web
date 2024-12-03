@@ -27,35 +27,53 @@ function mtPost(method, version, args,callback){
 }
 
 function mtCommonFunc(){
-	var con = '<hr/><p class="conf_p" style="text-align:center;">\
-        <button id="mtproxy_url" class="btn btn-default btn-sm">获取连接地址</button>\
-    </p>';
 
-    $(".soft-man-con").html(con);
+    mtPost('info', '', {}, function(rdata){
+        var rdata = $.parseJSON(rdata.data);
+        var con = '<p class="conf_p">\
+            <span>用户名</span>\
+            <input class="bt-input-text mr5" type="number" value="' + rdata['username'] + '">, 秒\
+        </p>';
 
-    $('#mtproxy_url').click(function(){
-    	mtPost('url', '', {}, function(rdata){
-            var data = $.parseJSON(rdata.data);
+        con += '<p class="conf_p">\
+            <span>密码</span>\
+            <input class="bt-input-text mr5" type="number" value="' + rdata['password']  +'" name="max">,MB\
+        </p>';
+        con += '<p class="conf_p">\
+            <span>端口</span>\
+            <input class="bt-input-text mr5" type="number" value="' + rdata['port']  +'" name="max">,MB\
+        </p>';
 
-            layer.open({
-                title: "mtproxy代理信息",
-                area: ['600px', '180px'],
-                type:1,
-                closeBtn: 1,
-                shadeClose: false,
-                btn:["复制","取消"],
-                content: '<div class="pd15">\
-                            <div class="divtable">\
-                                <pre class="layui-code">'+data.data+'</pre>\
-                            </div>\
-                        </div>',
-                success:function(){
-                    copyText(data.data);
-                },
-                yes:function(){
-                    copyText(data.data);
-                }
-            });
-    	});
+        var con = '<hr/><p class="conf_p" style="text-align:center;">\
+            <button id="mtproxy_url" class="btn btn-default btn-sm">打开XUI</button>\
+        </p>';
+
+        $(".soft-man-con").html(con);
     });
+    
+    // $('#mtproxy_url').click(function(){
+    // 	mtPost('url', '', {}, function(rdata){
+    //         var data = $.parseJSON(rdata.data);
+
+    //         layer.open({
+    //             title: "mtproxy代理信息",
+    //             area: ['600px', '180px'],
+    //             type:1,
+    //             closeBtn: 1,
+    //             shadeClose: false,
+    //             btn:["复制","取消"],
+    //             content: '<div class="pd15">\
+    //                         <div class="divtable">\
+    //                             <pre class="layui-code">'+data.data+'</pre>\
+    //                         </div>\
+    //                     </div>',
+    //             success:function(){
+    //                 copyText(data.data);
+    //             },
+    //             yes:function(){
+    //                 copyText(data.data);
+    //             }
+    //         });
+    // 	});
+    // });
 }
