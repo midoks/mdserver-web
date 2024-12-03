@@ -17,7 +17,7 @@ import psutil
 
 import core.mw as mw
 
-def getEnvInfo(self):
+def getEnvInfo():
     data = {}
     data['status'] = True
     sdir = mw.getServerDir()
