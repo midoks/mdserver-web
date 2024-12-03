@@ -940,9 +940,9 @@ function removeTask(b) {
 
 //获取任务总数
 function getTaskCount() {
-	$.get("/task/count", "", function(a) {
-		$(".task").text(a);
-	});
+	$.get("/task/count", '', function(data) {
+		$(".task").text(data.data);
+	},'json');
 }
 getTaskCount();
 setInterval(function(){
@@ -1342,7 +1342,6 @@ function remind(a){
 	$.post("/task/list", "table=tasks&result=2,4,6,8&limit=10&p=" + a, function(g) {
 		var e = '';
 		var f = false;
-		var task_count = 0;
 		for(var d = 0; d < g.data.length; d++) {
 			var status = g.data[d].status;
 			var status_text = '已经完成';
@@ -1387,12 +1386,10 @@ function remind(a){
 					</div>\
 					<div id="taskPage" class="page"></div>\
 				</div>';
-		
-		$(".task_count").text(task_count);
-		$(".msg_count").text(g.count);
 		$(".taskcon").html(con);
-		$("#taskPage").html(g.page);
 
+		$(".msg_count").text(g.count);
+		$("#taskPage").html(g.page);
 		$("#Rs-checkAll").click(function(){
 			if($(this).prop("checked")){
 				$("#remind").find("input").prop("checked",true);
@@ -1427,17 +1424,15 @@ function getReloads() {
 				$(".cmdlist").html('当前没有任务!');
 				return;
 			}
-			var b = "";
-			var d = "";
-			$("#task").text(h.count);
-			$(".task_count").text(h.task.length);
+			var b = '';
+			var d = '';
 			for(var g = 0; g < h.task.length; g++) {
 				if(h.task[g].status == "-1") {
 					if(h.task[g].type != "download") {
 						var c = "";
 						var f = h.msg.split("\n");
 						for(var e = 0; e < f.length; e++) {
-							c += f[e] + "<br>"
+							c += f[e] + "<br>";
 						}
 						if(h.task[g].name.indexOf("扫描") != -1) {
 							b = "<li>\
@@ -1457,14 +1452,16 @@ function getReloads() {
 						b = "<li>\
 								<div class='line-progress' style='width:" + h.msg.pre + "%'></div>\
 								<span class='titlename'>" + h.task[g].name + "<a style='margin-left:130px;'>" + (toSize(h.msg.used) + "/" + toSize(h.msg.total)) + "</a></span>\
-									<span class='com-progress'>" + h.msg.pre + "%</span>\
-									<span class='state'>下载中<img src='/static/img/ing.gif'> | <a href=\"javascript:removeTask(" + h.task[g].id + ")\">"+lan.public.close+"</a></span>\
+								<span class='com-progress'>" + h.msg.pre + "%</span>\
+								<span class='state'>下载中<img src='/static/img/ing.gif'> | <a href=\"javascript:removeTask(" + h.task[g].id + ")\">"+lan.public.close+"</a></span>\
 							</li>"
 					}
 				} else {
 					d += "<li><span class='titlename'>" + h.task[g].name + "</span><span class='state'>等待 | <a style='color:green' href=\"javascript:removeTask(" + h.task[g].id + ')">删除</a></span></li>'
 				}
 			}
+			$("#task").text(h.count);
+			$(".task_count").text(h.count);
 			$(".cmdlist").html(b + d);
 			$(".cmd").html(c);
 			try{
@@ -1530,7 +1527,7 @@ function tasklist(a){
 		}
 		
 		
-		$(".task_count").text(g.count);
+		// $(".task_count").text(g.count);
 		$(".cmdlist").html(b + c);
 		getReloads();
 		return f

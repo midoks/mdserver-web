@@ -26,8 +26,7 @@ blueprint = Blueprint('task', __name__, url_prefix='/task', template_folder='../
 @blueprint.route('/count', endpoint='task_count')
 @panel_login_required
 def task_count():
-    return str(thisdb.getTaskUnexecutedCount())
-
+    return mw.returnData(True, 'ok',thisdb.getTaskUnexecutedCount())
 
 @blueprint.route('/list', endpoint='list', methods=['POST'])
 @panel_login_required

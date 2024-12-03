@@ -40,6 +40,9 @@ def getAppList(page=1,size=10):
 def getAppById(aid):
     return mw.M('app').field(__FIELD).where("id=?", (aid,)).find()
 
+def getAppByAppId(app_id):
+    return mw.M('app').field(__FIELD).where("app_id=?", (app_id,)).find()
+
 def deleteAppById(aid):
     return mw.M('app').where("id=?", (aid,)).delete()
 
