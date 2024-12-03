@@ -121,6 +121,14 @@ def get_dir():
     dir_list['page'] = mw.getPage({'p':page, 'row': row, 'tojs':'getFiles', 'count': dir_list['count']}, '1,2,3,4,5,6,7,8')
     return dir_list
 
+# 获取文件列表
+@blueprint.route('/uncompress', endpoint='uncompress', methods=['POST'])
+@panel_login_required
+def uncompress(self):
+    sfile = request.form.get('sfile', '')
+    dfile = request.form.get('dfile', '')
+    path = request.form.get('path', '')
+    return file.uncompress(sfile, dfile, path)
 
 # 上传文件
 @blueprint.route('/upload_file', endpoint='upload_file', methods=['POST'])

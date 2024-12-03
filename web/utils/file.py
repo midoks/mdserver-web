@@ -16,6 +16,48 @@ import shutil
 import core.mw as mw
 import thisdb
 
+def uncompress(sfile, dfile, path):
+    if not os.path.exists(sfile):
+        return mw.returnData(False, '指定文件不存在!')
+
+    filename = os.path.basename(sfile)
+    extension = os.path.splitext(filename)[-1]
+    extension = extension.strip('.')
+
+    tar_gz = 'tar.gz'
+    tar_gz_len = len(tar_gz)
+    suffix_gz = sfile[-tar_gz_len:]
+    if suffix_gz == tar_gz:
+        extension = suffix_gz
+
+    if not extension in ['tar.gz', 'gz', 'zip', 'rar']:
+        return mw.returnData(False, '现在仅支持gz,zip,rar格式解压!')
+
+    if mw.isAppleSystem() and extension == 'rar':
+        return mw.returnData(False, 'macosx暂时不支持rar格式解压')
+
+    try:
+        tmps = mw.getRunDir() + '/logs/panel_exec.log'
+        if extension == 'zip':
+            cmd = "cd " + path + " && unzip -o -d '" + dfile + "' '" + sfile + "' > " + tmps + " 2>&1 &"
+            mw.execShell(cmd)
+        if extension == 'tar.gz':
+            cmd = "cd " + path + " && tar -zxvf " + sfile + " -C " + dfile + " > " + tmps + " 2>&1 &"
+            mw.execShell(cmd)
+        if extension == 'gz':
+            cmd = "cd " + path + " && gunzip -k " + sfile + " > " + tmps + " 2>&1 &"
+            mw.execShell(cmd)
+        if extension == 'rar':
+            cmd = "cd " + path + " && unrar x " + sfile + " " + dfile + " > " + tmps + " 2>&1 &"
+            mw.execShell(cmd)
+
+        if os.path.exists(dfile):
+            setFileAccept(dfile)
+        mw.writeLog("文件管理", '文件[{1}]解压[{2}]成功!', (sfile, dfile))
+        return mw.returnData(True, '文件解压成功!')
+    except Exception as e:
+        return mw.returnData(False, '文件解压失败!:' + str(e))
+
 def copyDir(src_file, dst_file):
     if not os.path.exists(src_file):
         return mw.returnData(False, '指定目录不存在!')
