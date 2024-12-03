@@ -12,11 +12,12 @@ import os
 import pwd
 import time
 import shutil
+import json
 
 import core.mw as mw
 import thisdb
 
-def uploadSegmentApi():
+def uploadSegment():
     # 分段上传
     path = request.form.get('path', '')
     name = request.form.get('name', '')
@@ -130,6 +131,66 @@ def uncompress(sfile, dfile, path):
         return mw.returnData(True, '文件解压成功!')
     except Exception as e:
         return mw.returnData(False, '文件解压失败!:' + str(e))
+
+def setBatchData(path, stype, access, user, data):
+    if stype == '1' or stype == '2':
+        session['selected'] = {
+            'path': path,
+            'type': stype,
+            'access': access,
+            'user': user,
+            'data': data
+        }
+        return mw.returnData(True, '标记成功,请在目标目录点击粘贴所有按钮!')
+    elif stype == '3':
+        for key in json.loads(data):
+            try:
+                filename = path + '/' + key
+                if not self.checkDir(filename):
+                    return mw.returnData(False, 'FILE_DANGER')
+                os.system('chmod -R ' + access + " '" + filename + "'")
+                os.system('chown -R ' + user + ':' + user + " '" + filename + "'")
+            except:
+                continue
+        mw.writeLog('文件管理', '批量设置权限成功!')
+        return mw.returnData(True, '批量设置权限成功!')
+    else:
+        recycle_bin = thisdb.getOption('recycle_bin')
+        is_recycle = False
+        if recycle_bin == 'open':
+            is_recycle = True
+        data = json.loads(data)
+        l = len(data)
+        i = 0
+        for key in data:
+            try:
+                filename = path + '/' + key
+                topath = filename
+                if not os.path.exists(filename):
+                    continue
+
+                i += 1
+                mw.writeSpeed(key, i, l)
+                if os.path.isdir(filename):
+                    if not checkDir(filename):
+                        return mw.returnData(False, '请不要花样作死!')
+                    if is_recycle:
+                        mvRecycleBin(topath)
+                    else:
+                        shutil.rmtree(filename)
+                else:
+                    if key == '.user.ini':
+                        os.system('which chattr && chattr -i ' + filename)
+                    if is_recycle:
+                        mvRecycleBin(topath)
+                    else:
+                        os.remove(filename)
+            except:
+                continue
+            mw.writeSpeed(None, 0, 0)
+        mw.writeLog('文件管理', '批量删除成功!')
+        return mw.returnData(True, '批量删除成功！')
+
 
 def copyDir(src_file, dst_file):
     if not os.path.exists(src_file):
