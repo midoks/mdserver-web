@@ -980,8 +980,7 @@ def stepTwo():
 def get_src_info(args):
     # 获取本地服务器网站、数据库.
     data = {}
-    data['sites'] = mw.M('sites').field(
-        "id,name,path,ps,status,addtime").order("id desc").select()
+    data['sites'] = mw.M('sites').field("id,name,path,ps,status,add_time").order("id desc").select()
 
     my_db_pos = mw.getServerDir() + '/mysql'
     conn = mw.M('databases').dbPos(my_db_pos, 'mysql')
@@ -995,8 +994,8 @@ def stepThree():
 
 
 def getPid():
-    result = mw.execShell(
-        "ps aux|grep 'plugins/migration_api/index.py bg_process' |grep -v grep|awk '{print $2}'|xargs")[0].strip()
+    cmd = "ps aux|grep 'plugins/migration_api/index.py bg_process' |grep -v grep|awk '{print $2}'|xargs"
+    result = mw.execShell(cmd)[0].strip()
     if not result:
         return None
     return result
