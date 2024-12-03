@@ -256,9 +256,11 @@ class classApi:
             start_time = time.time()
 
             try:
-                url = self.__MW_PANEL + '/api/files/upload_segment'
-                res = self._REQUESTS.post(
-                    url, data=pdata, files=files, timeout=30000)
+                url = self.__MW_PANEL + '/files/upload_segment'
+                res = self._REQUESTS.post(url, data=pdata, files=files, headers={
+                    'app-id':self.__MW_APP_ID,
+                    'app-secret':self.__MW_APP_SECRET
+                },timeout=30000)
 
                 success_num += 1
                 err_num = 0
