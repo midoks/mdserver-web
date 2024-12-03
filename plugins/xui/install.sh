@@ -24,15 +24,18 @@ Install_app()
 	echo "$VERSION" > $serverPath/xui/version.pl
 
 	bash ${curPath}/install_xui.sh
+
+	cd ${rootPath} && python3 plugins/xui/index.py start
 	echo '安装完成'
 }
 
 Uninstall_app()
 {
+	cd ${rootPath} && python3 plugins/xui/index.py stop
+	
 	rm -rf $serverPath/xui
 	echo 'y' | x-ui uninstall
 	rm /usr/bin/x-ui -f
-
 	echo '卸载完成'
 }
 

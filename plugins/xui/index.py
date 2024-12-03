@@ -81,18 +81,6 @@ def __delete_port(port):
     except Exception as e:
         return "Delete failed {}".format(e)
 
-def openPort():
-    port = getXuiPort()
-    for i in [port]:
-        __release_port(i)
-    return True
-
-def delPort():
-    port = getXuiPort()
-    for i in [port]:
-        __delete_port(i)
-    return True
-
 
 def pSqliteDb(dbname='databases'):
     conn = mw.M(dbname).dbPos('/etc/x-ui', 'x-ui')
@@ -120,6 +108,7 @@ def start():
 
 
 def stop():
+    closePort()
     return xuiOp('stop')
 
 
@@ -153,6 +142,16 @@ def initdUinstall():
         return "Apple Computer does not support"
     mw.execShell('systemctl disable x-ui')
     return 'ok'
+
+def openPort():
+    port_data = setting.field('id,key,value').where("key=?", ('webPort',)).find()
+    port = port_data['value']
+    __release_port(port)
+
+def closePort():
+    port_data = setting.field('id,key,value').where("key=?", ('webPort',)).find()
+    port = port_data['value']
+    __delete_port(port)
 
 def getXuiInfo():
 
