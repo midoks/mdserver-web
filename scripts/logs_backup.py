@@ -13,13 +13,13 @@ if sys.platform != 'darwin':
     os.chdir('/www/server/mdserver-web')
 
 
-chdir = os.getcwd()
-sys.path.append(chdir + '/class/core')
+web_dir = os.getcwd() + "/web"
+if os.path.exists(web_dir):
+    sys.path.append(web_dir)
+    os.chdir(web_dir)
 
-# importlib.reload(sys)
-# sys.setdefaultencoding('utf-8')
+import core.mw as mw
 
-import mw
 print('==================================================================')
 print('★[' + time.strftime("%Y/%m/%d %H:%M:%S") + ']，切割日志')
 print('==================================================================')

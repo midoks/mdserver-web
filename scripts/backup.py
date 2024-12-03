@@ -6,21 +6,18 @@
 import sys
 import os
 import re
+import time
 
 if sys.platform != 'darwin':
     os.chdir('/www/server/mdserver-web')
 
+web_dir = os.getcwd() + "/web"
+if os.path.exists(web_dir):
+    sys.path.append(web_dir)
+    os.chdir(web_dir)
 
-chdir = os.getcwd()
-sys.path.append(chdir + '/class/core')
-
-# reload(sys)
-# sys.setdefaultencoding('utf-8')
-
-
-import mw
-import db
-import time
+import core.mw as mw
+import core.db as db
 
 
 class backupTools:
