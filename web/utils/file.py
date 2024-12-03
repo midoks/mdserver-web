@@ -125,7 +125,7 @@ def uncompress(sfile, dfile, path):
 
         if os.path.exists(dfile):
             setFileAccept(dfile)
-        mw.writeLog("文件管理", '文件[{1}]解压[{2}]成功!', (sfile, dfile))
+        mw.writeLog("文件管理", '文件[{1}]解压[{2}]成功!', (sfile, dfile,))
         return mw.returnData(True, '文件解压成功!')
     except Exception as e:
         return mw.returnData(False, '文件解压失败!:' + str(e))
