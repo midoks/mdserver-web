@@ -14,16 +14,23 @@ sysName=`uname`
 # cd /www/server/mdserver-web && python3 plugins/mtproxy/index.py url
 # cd /www/server/mdserver-web/plugins/xui && /bin/bash install.sh install 1.0
 
-
+VERSION=$2
 Install_app()
 {
+	mkdir -p $serverPath/source
+	mkdir -p $serverPath/source/xui
+	mkdir -p $serverPath/xui
 
-	echo "serverPath:$serverPath"
+	echo "$VERSION" > $serverPath/xui/version.pl
+
+	echo "curPath:$curPath"
+
 	echo '安装完成'
 }
 
 Uninstall_app()
 {
+	rm -rf $serverPath/xui
 	echo '卸载完成'
 }
 
