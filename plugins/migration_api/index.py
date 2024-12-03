@@ -895,12 +895,13 @@ def getStepOneData():
 
 def stepOne():
     args = getArgs()
-    data = checkArgs(args, ['url', 'token'])
+    data = checkArgs(args, ['url', 'app_id','app_sercet'])
     if not data[0]:
         return data[1]
 
     url = args['url']
-    token = args['token']
+    app_id = args['app_id']
+    app_sercet = args['app_sercet']
 
     speed_file = getServerDir() + '/config/speed.json'
     if os.path.exists(speed_file):
@@ -919,7 +920,8 @@ def stepOne():
     data = getCfgData()
 
     data['url'] = url
-    data['token'] = token
+    data['app_id'] = app_id
+    data['app_sercet'] = app_sercet
     writeConf(data)
 
     return mw.returnJson(True, '验证成功')

@@ -91,8 +91,9 @@ function selectProgress(val){
 
 function initStep1(){
     var url = $('input[name="sync_url"]').val();
-    var token = $('input[name="sync_token"]').val();
-    maPost('step_one',{url:url,token:token}, function(rdata){
+    var app_id = $('input[name="sync_app_id"]').val();
+    var app_sercet = $('input[name="sync_app_sercet"]').val();
+    maPost('step_one',{'url':url,'app_id':app_id,'app_sercet':app_sercet}, function(rdata){
         var rdata = $.parseJSON(rdata.data);
         showMsg(rdata.msg,function(){
             if (rdata.status){
