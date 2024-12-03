@@ -249,7 +249,7 @@ function initStep4(){
         var progress = '<div style="margin: 0 40px;">\
             <div class="line">\
                 <div style="text-align:left"><span class="action">--</span>\
-                <span style="margin-left: 20px;" class="done">当前: --</span><img src="/static/img/ing.gif"><a style="position: absolute;right: 40px;" class="btlink psync_close" onclick="migrate.close();">[取消]</a></div>\
+                <span style="margin-left: 20px;" class="done">当前: --</span><img src="/static/img/ing.gif"><a style="position: absolute;right: 40px;" class="btlink psync_close">[取消]</a></div>\
                 <div class="bt-progress" style="border-radius:0;height:20px;line-height:19px">\
                     <div class="bt-progress-bar progress_info_bar" style="border-radius: 0px; height: 20px; width: 0%;">\
                         <span class="bt-progress-text progress_info"></span></div>\
