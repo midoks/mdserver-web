@@ -30,21 +30,6 @@ def getServerDir():
     return mw.getServerDir() + '/' + getPluginName()
 
 
-def getServiceTpl():
-    path = getPluginDir() + "/init.d/" + getPluginName() + ".service.tpl"
-    return path
-
-
-def getConfEnvTpl():
-    path = getPluginDir() + "/conf/mt.toml"
-    return path
-
-
-def getConfEnv():
-    path = getServerDir() + "/mt.toml"
-    return path
-
-
 def getArgs():
     args = sys.argv[2:]
     tmp = {}
@@ -71,10 +56,10 @@ def status():
 
 def getServiceFile():
     systemDir = mw.systemdCfgDir()
-    return systemDir + '/mtproxy.service'
+    return systemDir + '/xui.service'
 
 
-def getMtproxyPort():
+def getXuiPort():
     return '8349'
 
 
@@ -82,7 +67,7 @@ def __release_port(port):
     from collections import namedtuple
     try:
         from utils.firewall import Firewall as MwFirewall
-        MwFirewall.instance().addAcceptPort(port, 'mtproxy', 'port')
+        MwFirewall.instance().addAcceptPort(port, 'xui', 'port')
         return port
     except Exception as e:
         return "Release failed {}".format(e)
@@ -97,13 +82,13 @@ def __delete_port(port):
         return "Delete failed {}".format(e)
 
 def openPort():
-    port = getMtproxyPort()
+    port = getXuiPort()
     for i in [port]:
         __release_port(i)
     return True
 
 def delPort():
-    port = getMtproxyPort()
+    port = getXuiPort()
     for i in [port]:
         __delete_port(i)
     return True
@@ -114,29 +99,6 @@ def pSqliteDb(dbname='databases'):
     return conn
 
 def initDreplace():
-
-    envTpl = getConfEnvTpl()
-    dstEnv = getConfEnv()
-    cmd = getServerDir() + '/mtg/mtg generate-secret `head -c 16 /dev/urandom | xxd -ps`'
-    secret = mw.execShell(cmd)
-    if not os.path.exists(dstEnv):
-        env_content = mw.readFile(envTpl)
-        env_content = env_content.replace('{$PORT}', getMtproxyPort())
-        env_content = env_content.replace('{$SECRET}', secret[0].strip())
-        mw.writeFile(dstEnv, env_content)
-        openPort()
-
-    # systemd
-    systemDir = mw.systemdCfgDir()
-    systemService = systemDir + '/mtproxy.service'
-    systemServiceTpl = getServiceTpl()
-    if os.path.exists(systemDir) and not os.path.exists(systemService):
-        service_path = mw.getServerDir()
-        se_content = mw.readFile(systemServiceTpl)
-        se_content = se_content.replace('{$SERVER_PATH}', service_path)
-        mw.writeFile(systemService, se_content)
-        mw.execShell('systemctl daemon-reload')
-
     return 'ok'
 
 
@@ -145,7 +107,7 @@ def xuiOp(method):
 
     if not mw.isAppleSystem():
         mw.execShell('systemctl daemon-reload')
-        data = mw.execShell('systemctl ' + method + ' xui')
+        data = mw.execShell('systemctl ' + method + ' x-ui')
         if data[1] == '':
             return 'ok'
         return data[1]
