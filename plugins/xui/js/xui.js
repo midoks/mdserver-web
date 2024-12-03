@@ -2,7 +2,7 @@ function mtPost(method, version, args,callback){
     var loadT = layer.msg('正在获取...', { icon: 16, time: 0, shade: 0.3 });
 
     var req_data = {};
-    req_data['name'] = 'mtproxy';
+    req_data['name'] = 'xui';
     req_data['func'] = method;
     req_data['version'] = version;
  
