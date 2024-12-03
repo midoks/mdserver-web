@@ -104,6 +104,7 @@ def xuiOp(method):
 
 
 def start():
+    openPort()
     return xuiOp('start')
 
 
@@ -144,11 +145,13 @@ def initdUinstall():
     return 'ok'
 
 def openPort():
+    setting = pSqliteDb('settings')
     port_data = setting.field('id,key,value').where("key=?", ('webPort',)).find()
     port = port_data['value']
     __release_port(port)
 
 def closePort():
+    setting = pSqliteDb('settings')
     port_data = setting.field('id,key,value').where("key=?", ('webPort',)).find()
     port = port_data['value']
     __delete_port(port)
