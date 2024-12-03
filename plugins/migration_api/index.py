@@ -30,7 +30,6 @@ class classApi:
 
     _buff_size = 1024 * 1024 * 2
 
-    _REQUESTS = None
     _SPEED_FILE = None
     _INFO_FILE = None
     _SYNC_INFO = None
