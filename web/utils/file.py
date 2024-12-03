@@ -52,7 +52,7 @@ def uploadSegment(path,name,size,start,dir_mode,file_mode,b64_data,upload_files)
     f.close()
     f_size = os.path.getsize(save_path)
     if f_size != int(size):
-        return str(f_size)
+        return mw.returnData(True, 'size', f_size)
 
     new_name = os.path.join(path, name)
     if os.path.exists(new_name):
