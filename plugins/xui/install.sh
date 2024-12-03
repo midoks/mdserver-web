@@ -24,8 +24,6 @@ Install_app()
 	echo "$VERSION" > $serverPath/xui/version.pl
 
 	bash ${curPath}/install_xui.sh
-
-	x-ui 7
 	echo '安装完成'
 }
 
