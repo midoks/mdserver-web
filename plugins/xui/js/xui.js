@@ -32,16 +32,16 @@ function xuiCommonFunc(){
         var rdata = $.parseJSON(rdata.data);
         var con = '<p class="conf_p">\
             <span>用户名</span>\
-            <input class="bt-input-text mr5" type="number" value="' + rdata['username'] + '">, 秒\
+            <input class="bt-input-text mr5" type="number" value="' + rdata['username'] + '">\
         </p>';
 
         con += '<p class="conf_p">\
             <span>密码</span>\
-            <input class="bt-input-text mr5" type="number" value="' + rdata['password']  +'" name="max">,MB\
+            <input class="bt-input-text mr5" type="number" value="' + rdata['password']  +'">\
         </p>';
         con += '<p class="conf_p">\
             <span>端口</span>\
-            <input class="bt-input-text mr5" type="number" value="' + rdata['port']  +'" name="max">,MB\
+            <input class="bt-input-text mr5" type="number" value="' + rdata['port']  +'">\
         </p>';
 
         var con += '<hr/><p class="conf_p" style="text-align:center;">\
