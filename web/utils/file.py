@@ -77,7 +77,7 @@ def uploadSegment(path,name,size,start,dir_mode,file_mode,b64_data,upload_files)
 
     msg = mw.getInfo('上传文件[{1}] 到 [{2}]成功!', (new_name, path))
     mw.writeLog('文件管理', msg)
-    return mw.returnData(True, '上传成功!')
+    return mw.returnData(True, '上传成功!', f_size)
 
 
 def mvFile(sfile, dfile):
