@@ -109,6 +109,10 @@ def delPort():
     return True
 
 
+def pSqliteDb(dbname='databases'):
+    conn = mw.M(dbname).dbPos('/etc/x-ui', 'x-ui')
+    return conn
+
 def initDreplace():
 
     envTpl = getConfEnvTpl()
@@ -136,12 +140,12 @@ def initDreplace():
     return 'ok'
 
 
-def mtOp(method):
+def xuiOp(method):
     file = initDreplace()
 
     if not mw.isAppleSystem():
         mw.execShell('systemctl daemon-reload')
-        data = mw.execShell('systemctl ' + method + ' mtproxy')
+        data = mw.execShell('systemctl ' + method + ' xui')
         if data[1] == '':
             return 'ok'
         return data[1]
@@ -150,15 +154,15 @@ def mtOp(method):
 
 
 def start():
-    return mtOp('start')
+    return xuiOp('start')
 
 
 def stop():
-    return mtOp('stop')
+    return xuiOp('stop')
 
 
 def restart():
-    return mtOp('restart')
+    return xuiOp('restart')
 
 
 def reload():
@@ -189,26 +193,18 @@ def initdUinstall():
     return 'ok'
 
 def getMtproxyUrl():
-    conf = getConfEnv()
-    content = mw.readFile(conf)
 
+    user = pSqliteDb('users')
 
-    rep = r'bind-to\s*=\s*(.*)'
-    tmp = re.search(rep, content)
-    bind_to = tmp.groups()[0].strip()
-    bind_to = bind_to.strip('"')
+    info = user.field('username,password').where("id=?", (1,)).find()
 
-    rep = r'secret\s*=\s*(.*)'
-    tmp = re.search(rep, content)
-    secret = tmp.groups()[0].strip()
-    secret = secret.strip('"')
+    setting = pSqliteDb('setting')
 
-    info = bind_to.split(":")
+    setting_data = setting.where("key=?", ('webPort',)).find()
 
-    ip = mw.getLocalIp()
-
-    url = 'tg://proxy?server={0}&port={1}&secret={2}'.format(ip, info[1], secret)
-    return mw.returnJson(True, 'ok', url)
+    print(info)
+    print(setting_data)
+    return mw.returnJson(True, 'ok', '')
 
 def installPreInspection():
     sys = mw.execShell("cat /etc/*-release | grep PRETTY_NAME |awk -F = '{print $2}' | awk -F '\"' '{print $2}'| awk '{print $1}'")

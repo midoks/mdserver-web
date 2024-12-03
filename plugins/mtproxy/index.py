@@ -162,7 +162,7 @@ def restart():
 
 
 def reload():
-    return redisOp('reload')
+    return mtOp('reload')
 
 
 def initdStatus():
