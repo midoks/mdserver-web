@@ -8,6 +8,7 @@ import re
 import hashlib
 import json
 import subprocess
+import requests
 
 web_dir = os.getcwd() + "/web"
 if os.path.exists(web_dir):
@@ -22,8 +23,9 @@ if mw.isAppleSystem():
 
 
 class classApi:
-    __MW_KEY = 'app'
     __MW_PANEL = 'http://127.0.0.1:7200'
+    __MW_APP_ID = ''
+    __MW_APP_SECRET = ''
     __VHOST_PATH = ''
 
     _buff_size = 1024 * 1024 * 2
@@ -34,47 +36,27 @@ class classApi:
     _SYNC_INFO = None
 
     # 如果希望多台面板，可以在实例化对象时，将面板地址与密钥传入
-    def __init__(self, mw_panel=None, mw_key=None):
+    def __init__(self, mw_panel=None, app_id=None, app_secret=None):
         if mw_panel:
             self.__MW_PANEL = mw_panel
-            self.__MW_KEY = mw_key
-
-        import requests
-        if not self._REQUESTS:
-            self._REQUESTS = requests.session()
+            self.__MW_APP_ID = app_id
+            self.__MW_APP_SECRET = app_secret
 
         self._SPEED_FILE = getServerDir() + '/config/speed.json'
         self._INFO_FILE = getServerDir() + '/config/sync_info.json'
         self._SYNC_INFO = self.get_sync_info(None)
         self.__VHOST_PATH = mw.getServerDir() + '/web_conf'
 
-    # 计算MD5
-    def __get_md5(self, s):
-        m = hashlib.md5()
-        m.update(s.encode('utf-8'))
-        return m.hexdigest()
-
-    # 构造带有签名的关联数组
-    def __get_key_data(self):
-        now_time = int(time.time())
-        ready_data = {
-            'request_token': self.__get_md5(str(now_time) + '' + self.__get_md5(self.__MW_KEY)),
-            'request_time': now_time
-        }
-        return ready_data
-
-    def __http_post_cookie(self, url, p_data, timeout=1800):
+    def post(self, endpoint, request_data, timeout=60):
+        url = self.__MW_PANEL + endpoint  
+        post_data = requests.post(url, data=request_data, headers={
+            'app-id':self.__MW_APP_ID,
+            'app-secret':self.__MW_APP_SECRET
+        })
         try:
-            # print(url)
-            res = self._REQUESTS.post(url, p_data, timeout=timeout)
-            return res.text
-        except Exception as ex:
-            ex = str(ex)
-            if ex.find('Max retries exceeded with') != -1:
-                return mw.returnJson(False, '连接服务器失败!')
-            if ex.find('Read timed out') != -1 or ex.find('Connection aborted') != -1:
-                return mw.returnJson(False, '连接超时!')
-            return mw.returnJson(False, '连接服务器失败!')
+            return post_data.json()
+        except Exception as e:
+            return post_data.text
 
     def makeSyncInfo(self, args):
         data = {}
@@ -176,14 +158,11 @@ class classApi:
         return True
 
     def send(self, url, args, timeout=600):
-        url = self.__MW_PANEL + '/api' + url
-        post_data = self.__get_key_data()  # 取签名
-        post_data.update(args)
-        result = self.__http_post_cookie(url, post_data, timeout)
         try:
-            return json.loads(result)
-        except Exception as e:
+            result = self.post(url, args, timeout)
             return result
+        except Exception as e:
+            return str(e)
 
     def sendPlugins(self, name, func, args, timeout=36000):
         url = '/plugins/run'
@@ -225,7 +204,7 @@ class classApi:
         if not os.path.exists(sfile):
             write_log("|-指定目录不存在{}".format(sfile))
             return False
-        pdata = self.__get_key_data()
+
         pdata['name'] = os.path.basename(dfile)
         pdata['path'] = os.path.dirname(dfile)
         pdata['size'] = os.path.getsize(sfile)
@@ -407,10 +386,8 @@ class classApi:
         write_log("|-正在解压文件到目录[{}]...".format(dpath))
         self.write_speed('done', '正在解压')
 
-        self.send('/files/uncompress',
-                  {"sfile": zip_dst, "dfile": dpath, 'path': dpath})
-        self.send('/files/exec_shell',
-                  {"shell": "rm -f " + zip_dst, "path": "/www"}, 30)
+        self.send('/files/uncompress',{"sfile": zip_dst, "dfile": dpath, 'path': dpath})
+        self.send('/files/exec_shell',{"shell": "rm -f " + zip_dst, "path": "/www"}, 30)
         return True
 
     def state(self, stype, index, state, error=''):
@@ -506,20 +483,20 @@ class classApi:
             try:
                 self.state('sites', i, 1)
                 siteInfo = mw.M('sites').where('name=?', (site_name,)).field(
-                    'id,name,path,ps,status,edate,addtime').find()
+                    'id,name,path,ps,status,edate,add_time').find()
 
                 if not siteInfo:
                     err_msg = "指定站点[{}]不存在!".format(site_name)
                     self.state('sites', i, -1, err_msg)
                     self.error(err_msg)
                     continue
-                pid = siteInfo['id']
+                site_id = siteInfo['id']
 
                 siteInfo['port'] = mw.M('domain').where(
-                    'pid=? and name=?', (pid, site_name,)).getField('port')
+                    'pid=? and name=?', (site_id, site_name,)).getField('port')
 
                 siteInfo['domain'] = mw.M('domain').where(
-                    'pid=? and name!=?', (pid, site_name)).field('name,port').select()
+                    'pid=? and name!=?', (site_id, site_name)).field('name,port').select()
 
                 siteInfo['binding'] = mw.M('binding').where(
                     'pid=?', (id,)).field('domain,path,port').select()
@@ -559,21 +536,18 @@ class classApi:
 
         db.setPort(self.getDbPort(mtype))
         db.setSocket(self.getSocketFile(mtype))
-        pwd = self.getDbConn(mtype, 'config').where(
-            'id=?', (1,)).getField('mysql_root')
+        pwd = self.getDbConn(mtype, 'config').where('id=?', (1,)).getField('mysql_root')
         db.setPwd(pwd)
         return db
 
     def getDbList(self):
         conn = self.getDbConn()
-        alist = conn.field(
-            'id,name,username,password,ps').order("id desc").select()
+        alist = conn.field('id,name,username,password,ps').order("id desc").select()
         return alist
 
     def getDbInfo(self, name):
         conn = self.getDbConn()
-        info = conn.field(
-            'id,name,username,password,ps').where('name=?', (name,)).find()
+        info = conn.field('id,name,username,password,ps').where('name=?', (name,)).find()
         return info
 
     def mapToList(self, map_obj):
@@ -895,13 +869,13 @@ def getStepOneData():
 
 def stepOne():
     args = getArgs()
-    data = checkArgs(args, ['url', 'app_id','app_sercet'])
+    data = checkArgs(args, ['url', 'app_id','app_secret'])
     if not data[0]:
         return data[1]
 
     url = args['url']
     app_id = args['app_id']
-    app_sercet = args['app_sercet']
+    app_secret = args['app_secret']
 
     speed_file = getServerDir() + '/config/speed.json'
     if os.path.exists(speed_file):
@@ -911,17 +885,16 @@ def stepOne():
     if os.path.exists(sync_file):
         os.remove(sync_file)
 
-    api = classApi(url, token)
+    api = classApi(url, app_id, app_secret)
     # api =
     # classApi('http://127.0.0.1:7200','HfJNKGP5RPqGvhIOyrwpXG4A2fTjSh9B')
     rdata = api.send('/task/count', {})
-    if type(rdata) != int:
+    if not rdata['status']:
         return mw.returnJson(False, rdata['msg'])
     data = getCfgData()
-
     data['url'] = url
     data['app_id'] = app_id
-    data['app_sercet'] = app_sercet
+    data['app_secret'] = app_secret
     writeConf(data)
 
     return mw.returnJson(True, '验证成功')
@@ -929,44 +902,45 @@ def stepOne():
 
 # 获取本地服务器和环境配置
 def get_src_config(args):
-    serverInfo = {}
-    serverInfo['status'] = True
+    data = {}
+    data['status'] = True
     sdir = mw.getServerDir()
 
-    serverInfo['webserver'] = '未安装'
+    data['webserver'] = '未安装'
     if os.path.exists(sdir + '/openresty/nginx/sbin/nginx'):
-        serverInfo['webserver'] = 'OpenResty'
-    serverInfo['php'] = []
+        data['webserver'] = 'OpenResty'
+    data['php'] = []
     phpversions = ['52', '53', '54', '55', '56', '70', '71',
                    '72', '73', '74', '80', '81', '82', '83', '84']
     phpPath = sdir + '/php/'
     for pv in phpversions:
         if not os.path.exists(phpPath + pv + '/bin/php'):
             continue
-        serverInfo['php'].append(pv)
-    serverInfo['mysql'] = False
+        data['php'].append(pv)
+    data['mysql'] = False
     if os.path.exists(sdir + '/mysql/bin/mysql'):
-        serverInfo['mysql'] = True
+        data['mysql'] = True
     import psutil
     try:
         diskInfo = psutil.disk_usage('/www')
     except:
         diskInfo = psutil.disk_usage('/')
 
-    serverInfo['disk'] = mw.toSize(diskInfo[2])
-    return serverInfo
+    data['disk'] = mw.toSize(diskInfo[2])
+    return data
 
 
 def get_dst_config(args):
 
     data = getCfgData()
-    api = classApi(data['url'], data['token'])
+    api = classApi(data['url'], data['app_id'], data['app_secret'])
     disk = api.send('/system/disk_info', {})
     info = api.send('/system/get_env_info', {})
 
+    # print(disk)
+    # print(info)
     result = info['data']
-
-    result['disk'] = disk
+    result['disk'] = disk['data']
     return result
 
 
@@ -1018,7 +992,7 @@ def bgProcessRun():
     # demo_url = 'http://127.0.0.1:7200'
     # demo_key = 'HfJNKGP5RPqGvhIOyrwpXG4A2fTjSh9B'
     # api = classApi(demo_url, demo_key)
-    api = classApi(data['url'], data['token'])
+    api = classApi(data['url'], data['app_id'], data['app_secret'])
     api.run()
     return ''
 
@@ -1039,7 +1013,7 @@ def stepFour():
         'sites': sites.strip(',').split(','),
         'databases': databases.strip(',').split(',')
     }
-    api = classApi(data['url'], data['token'])
+    api = classApi(data['url'], data['app_id'],data['app_secret'])
     return api.set_sync_info(args)
 
 
@@ -1059,7 +1033,7 @@ def getSpeed():
     except:
         return mw.returnJson(False, '正在准备..')
     data = getCfgData()
-    api = classApi(data['url'], data['token'])
+    api = classApi(data['url'], data['app_id'], data['app_secret'])
     sync_info = api.get_sync_info(None)
     speed_info['all_total'] = sync_info['total']
     speed_info['all_speed'] = sync_info['speed']
