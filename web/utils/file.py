@@ -39,8 +39,7 @@ def uploadSegmentApi(self):
         if not dir_mode != '' or not file_mode != '':
             mw.setMode(path)
 
-    save_path = os.path.join(
-        path, name + '.' + str(int(size)) + '.upload.tmp')
+    save_path = os.path.join(path, name + '.' + str(int(size)) + '.upload.tmp')
     d_size = 0
     if os.path.exists(save_path):
         d_size = os.path.getsize(save_path)
