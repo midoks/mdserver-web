@@ -109,7 +109,7 @@ def uncompress(sfile, dfile, path):
         return mw.returnData(False, 'macosx暂时不支持rar格式解压')
 
     try:
-        tmps = mw.getRunDir() + '/logs/panel_exec.log'
+        tmps = mw.getPanelDir() + '/logs/panel_exec.log'
         if extension == 'zip':
             cmd = "cd " + path + " && unzip -o -d '" + dfile + "' '" + sfile + "' > " + tmps + " 2>&1 &"
             mw.execShell(cmd)
