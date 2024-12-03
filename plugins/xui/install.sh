@@ -23,6 +23,8 @@ Install_app()
 
 	echo "$VERSION" > $serverPath/xui/version.pl
 
+	bash ${curPath}/install_xui.sh
+
 	echo "curPath:$curPath"
 
 	echo '安装完成'
