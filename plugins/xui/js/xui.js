@@ -1,4 +1,4 @@
-function mtPost(method, version, args,callback){
+function xuiPost(method, version, args,callback){
     var loadT = layer.msg('正在获取...', { icon: 16, time: 0, shade: 0.3 });
 
     var req_data = {};
@@ -26,9 +26,9 @@ function mtPost(method, version, args,callback){
     },'json'); 
 }
 
-function mtCommonFunc(){
+function xuiCommonFunc(){
 
-    mtPost('info', '', {}, function(rdata){
+    xuiPost('info', '', {}, function(rdata){
         var rdata = $.parseJSON(rdata.data);
         var con = '<p class="conf_p">\
             <span>用户名</span>\
