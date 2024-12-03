@@ -89,6 +89,24 @@ def uploadSegment():
     mw.writeLog('文件管理', msg)
     return mw.returnData(True, '上传成功!')
 
+
+def mvFile(sfile, dfile):
+    if not checkFileName(dfile):
+        return mw.returnData(False, '文件名中不能包含特殊字符!')
+    if not os.path.exists(sfile):
+        return mw.returnData(False, '指定文件不存在!')
+
+    if not checkDir(sfile):
+        return mw.returnData(False, 'FILE_DANGER')
+
+    try:
+        shutil.move(sfile, dfile)
+        msg = mw.getInfo('移动或重名命文件[{1}]到[{2}]成功!', (sfile, dfile,))
+        mw.writeLog('文件管理', msg)
+        return mw.returnData(True, '移动或重名命文件成功!')
+    except:
+        return mw.returnData(False, '移动或重名命文件失败!')
+
 def uncompress(sfile, dfile, path):
     if not os.path.exists(sfile):
         return mw.returnData(False, '指定文件不存在!')
@@ -199,7 +217,6 @@ def copyDir(src_file, dst_file):
     if os.path.exists(dst_file):
         return mw.returnData(False, '指定目录已存在!')
 
-    import shutil
     try:
         shutil.copytree(src_file, dst_file)
         stat = os.stat(src_file)
@@ -221,7 +238,6 @@ def copyFile(src_file, dst_file):
         return copyDir(src_file, dst_file)
 
     try:
-        import shutil
         shutil.copyfile(src_file, dst_file)
         msg = mw.getInfo('复制文件[{1}]到[{2}]成功!', (src_file, dst_file,))
         mw.writeLog('文件管理', msg)

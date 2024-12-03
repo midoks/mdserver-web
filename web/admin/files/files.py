@@ -165,6 +165,14 @@ def upload_file():
     mw.writeLog('文件管理', msg)
     return mw.returnData(True, '上传成功!')
 
+# 修改文件名
+@blueprint.route('/mv_file', endpoint='mv_file', methods=['POST'])
+@panel_login_required
+def mv_file():
+    sfile = request.form.get('sfile', '')
+    dfile = request.form.get('dfile', '')
+    return file.mvFile(sfile, dfile)
+
 # 创建文件
 @blueprint.route('/create_file', endpoint='create_file', methods=['POST'])
 @panel_login_required
