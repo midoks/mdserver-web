@@ -165,7 +165,7 @@ def getXuiInfo():
 
     data['username'] = info['username']
     data['password'] = info['password']
-    data['port'] = info['webPort']
+    data['port'] = setting_data['webPort']
     return mw.returnJson(True, 'ok', data)
 
 def installPreInspection():
