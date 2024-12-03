@@ -18,9 +18,9 @@ import json
 
 
 class mwApi:
-    __MW_PANEL = 'http://127.0.0.1:64307'
-    __MW_APP_ID = 'hC6XArWzRY'
-    __MW_APP_SERECT = 'NSGaFhMWyaN5Yi3ftTkZ'
+    __MW_PANEL = 'http://154.12.53.90:51377/'
+    __MW_APP_ID = 'yhYkxGssPD'
+    __MW_APP_SERECT = 'ErmBdr563eJ5GMM5sWbc'
     
     # 如果希望多台面板，可以在实例化对象时，将面板地址与密钥传入
     def __init__(self, panel_url=None, app_id=None, app_serect=None):
@@ -42,7 +42,7 @@ class mwApi:
             return post_data.text
     # 取面板日志
     def getLogs(self):
-        result = self.post('/logs/get_log_list',{'limit':10,'p':1})
+        result = self.post('/task/count',{'limit':10,'p':1})
         return result
 
 
