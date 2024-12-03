@@ -167,7 +167,7 @@ def getXuiInfo():
     if path_data is not None:
         data['path'] = path_data['value']
     else:
-        data['path'] = ''
+        data['path'] = '/'
 
     data['username'] = info['username']
     data['password'] = info['password']
