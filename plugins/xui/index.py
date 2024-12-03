@@ -169,7 +169,7 @@ def initdStatus():
     if mw.isAppleSystem():
         return "Apple Computer does not support"
 
-    shell_cmd = 'systemctl status mtproxy | grep loaded | grep "enabled;"'
+    shell_cmd = 'systemctl status x-ui | grep loaded | grep "enabled;"'
     data = mw.execShell(shell_cmd)
     if data[0] == '':
         return 'fail'
@@ -178,14 +178,14 @@ def initdStatus():
 def initdInstall():
     if mw.isAppleSystem():
         return "Apple Computer does not support"
-    mw.execShell('systemctl enable mtproxy')
+    mw.execShell('systemctl enable x-ui')
     return 'ok'
 
 
 def initdUinstall():
     if mw.isAppleSystem():
         return "Apple Computer does not support"
-    mw.execShell('systemctl disable mtproxy')
+    mw.execShell('systemctl disable x-ui')
     return 'ok'
 
 def getMtproxyUrl():
