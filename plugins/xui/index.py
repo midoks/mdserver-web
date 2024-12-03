@@ -161,11 +161,14 @@ def getXuiInfo():
     info = user.field('username,password').where("id=?", (1,)).find()
 
     setting = pSqliteDb('settings')
-    setting_data = setting.field('id,key,value').where("key=?", ('webPort',)).find()
-
+    port_data = setting.field('id,key,value').where("key=?", ('webPort',)).find()
+    path_data = setting.field('id,key,value').where("key=?", ('webBasePath',)).find()
     data['username'] = info['username']
     data['password'] = info['password']
-    data['port'] = setting_data['value']
+    data['port'] = port_data['value']
+    data['path'] = path_data['value']
+
+    data['ip'] = mw.getHostAddr()
     return mw.returnJson(True, 'ok', data)
 
 def installPreInspection():

@@ -704,7 +704,8 @@ def getCpuType():
 
 
 def getLanguage():
-    path = 'data/language.pl'
+    panel_dir = getPanelDir()
+    path = panel_dir+'/data/language.pl'
     if not os.path.exists(path):
         return 'Simplified_Chinese'
     return readFile(path).strip()
@@ -965,8 +966,8 @@ def writeDbLog(stype, msg, args=(), uid=1):
         return False
 
 def writeSpeed(title, used, total, speed=0):
-    path = getPanelDir()
-    speed_file= path + '/data/panel_speed.pl'
+    panel_dir = getPanelDir()
+    speed_file= panel_dir + '/data/panel_speed.pl'
     # 写进度
     if not title:
         data = {'title': None, 'progress': 0,'total': 0, 'used': 0, 'speed': 0}
@@ -978,8 +979,8 @@ def writeSpeed(title, used, total, speed=0):
 
 
 def getSpeed():
-    path = getPanelDir()
-    speed_file= path + '/data/panel_speed.pl'
+    panel_dir = getPanelDir()
+    speed_file= panel_dir + '/data/panel_speed.pl'
     # 取进度
     path = getPanelDir()
     data = readFile(speed_file)

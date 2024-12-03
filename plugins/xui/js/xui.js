@@ -45,36 +45,20 @@ function xuiCommonFunc(){
             <input class="bt-input-text mr5" type="text" value="' + info.port  +'">\
         </p>';
 
+        con += '<p class="conf_p">\
+            <span>路径</span>\
+            <input class="bt-input-text mr5" type="text" value="' + info.path  +'">\
+        </p>';
+
         con += '<hr/><p class="conf_p" style="text-align:center;">\
             <button id="open_url" class="btn btn-default btn-sm">打开XUI</button>\
         </p>';
 
         $(".soft-man-con").html(con);
+        $('#open_url').click(function(){
+            var url = 'http://' + data.ip + ':' + data.port;
+            window.open(url);
+            copyText(url);
+        });
     });
-    
-    // $('#mtproxy_url').click(function(){
-    // 	mtPost('url', '', {}, function(rdata){
-    //         var data = $.parseJSON(rdata.data);
-
-    //         layer.open({
-    //             title: "mtproxy代理信息",
-    //             area: ['600px', '180px'],
-    //             type:1,
-    //             closeBtn: 1,
-    //             shadeClose: false,
-    //             btn:["复制","取消"],
-    //             content: '<div class="pd15">\
-    //                         <div class="divtable">\
-    //                             <pre class="layui-code">'+data.data+'</pre>\
-    //                         </div>\
-    //                     </div>',
-    //             success:function(){
-    //                 copyText(data.data);
-    //             },
-    //             yes:function(){
-    //                 copyText(data.data);
-    //             }
-    //         });
-    // 	});
-    // });
 }
