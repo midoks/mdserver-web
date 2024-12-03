@@ -108,19 +108,20 @@ def uncompress(sfile, dfile, path):
     if mw.isAppleSystem() and extension == 'rar':
         return mw.returnData(False, 'macosx暂时不支持rar格式解压')
 
+    cmd = "cd " + path
     try:
         tmps = mw.getPanelDir() + '/logs/panel_exec.log'
         if extension == 'zip':
-            cmd = "cd " + path + " && unzip -o -d '" + dfile + "' '" + sfile + "' > " + tmps + " 2>&1 &"
+            cmd += " && unzip -o -d '" + dfile + "' '" + sfile + "' > " + tmps + " 2>&1 &"
             mw.execShell(cmd)
         if extension == 'tar.gz':
-            cmd = "cd " + path + " && tar -zxvf " + sfile + " -C " + dfile + " > " + tmps + " 2>&1 &"
+            cmd += " && tar -zxvf " + sfile + " -C " + dfile + " > " + tmps + " 2>&1 &"
             mw.execShell(cmd)
         if extension == 'gz':
-            cmd = "cd " + path + " && gunzip -k " + sfile + " > " + tmps + " 2>&1 &"
+            cmd += " && gunzip -k " + sfile + " > " + tmps + " 2>&1 &"
             mw.execShell(cmd)
         if extension == 'rar':
-            cmd = "cd " + path + " && unrar x " + sfile + " " + dfile + " > " + tmps + " 2>&1 &"
+            cmd +=  " && unrar x " + sfile + " " + dfile + " > " + tmps + " 2>&1 &"
             mw.execShell(cmd)
 
         if os.path.exists(dfile):
