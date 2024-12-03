@@ -29,20 +29,20 @@ function xuiPost(method, version, args,callback){
 function xuiCommonFunc(){
 
     xuiPost('info', '', {}, function(rdata){
-        console.log(rdata);
         var rdata = $.parseJSON(rdata.data);
+        var info = rdata['data'];
         var con = '<p class="conf_p">\
             <span>用户名</span>\
-            <input class="bt-input-text mr5" type="number" value="' + rdata['username'] + '">\
+            <input class="bt-input-text mr5" type="number" value="' + info.username + '">\
         </p>';
 
         con += '<p class="conf_p">\
             <span>密码</span>\
-            <input class="bt-input-text mr5" type="number" value="' + rdata['password']  +'">\
+            <input class="bt-input-text mr5" type="number" value="' + info.password  +'">\
         </p>';
         con += '<p class="conf_p">\
             <span>端口</span>\
-            <input class="bt-input-text mr5" type="number" value="' + rdata['port']  +'">\
+            <input class="bt-input-text mr5" type="number" value="' + info.port  +'">\
         </p>';
 
         var con += '<hr/><p class="conf_p" style="text-align:center;">\
