@@ -310,6 +310,8 @@ def returnData(status, msg, data=None):
     return {'status': status, 'msg': msg, 'data': data}
 
 def returnJson(status, msg, data=None):
+    if not data:
+        return getJson({'status': status, 'msg': msg})
     return getJson({'status': status, 'msg': msg, 'data': data})
 
 def readFile(filename):

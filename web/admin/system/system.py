@@ -20,8 +20,6 @@ import core.mw as mw
 import utils.system as sys
 import thisdb
 
-
-
 blueprint = Blueprint('system', __name__, url_prefix='/system', template_folder='../../templates')
 
 # 获取系统的统计信息
@@ -37,6 +35,12 @@ def system_total():
     data['version'] = '0.0.1'
     return data
 
+# 获取环境信息
+@blueprint.route('/get_env_info', endpoint='get_env_info', methods=['GET','POST'])
+@panel_login_required
+def get_env_info():
+    return sys.getEnvInfo()
+
 # 获取系统的网络流量信息
 @blueprint.route('/network', endpoint='network')
 @panel_login_required
@@ -50,7 +54,7 @@ def network():
     return stat
 
 # 获取系统的磁盘信息
-@blueprint.route('/disk_info', endpoint='disk_info')
+@blueprint.route('/disk_info', endpoint='disk_info', methods=['GET','POST'])
 @panel_login_required
 def disk_info():
     data = sys.getDiskInfo()

@@ -15,8 +15,32 @@ import time
 import math
 import psutil
 
-
 import core.mw as mw
+
+def getEnvInfo(self):
+    data = {}
+    data['status'] = True
+    sdir = mw.getServerDir()
+
+    data['webserver'] = '未安装'
+    if os.path.exists(sdir + '/openresty/nginx/sbin/nginx'):
+        data['webserver'] = 'OpenResty'
+    data['php'] = []
+    phpversions = ['52', '53', '54', '55', '56', '70', '71', '72', '73', '74', '80', '81', '82', '83', '84']
+    phpPath = sdir + '/php/'
+    for pv in phpversions:
+        if not os.path.exists(phpPath + pv + '/bin/php'):
+            continue
+        data['php'].append(pv)
+    data['mysql'] = False
+    if os.path.exists(sdir + '/mysql/bin/mysql'):
+        data['mysql'] = True
+    try:
+        diskInfo = psutil.disk_usage('/www')
+    except:
+        diskInfo = psutil.disk_usage('/')
+    data['disk'] = diskInfo[2]
+    return mw.returnData(True, 'ok', data)
 
 def getDiskInfo():
     # 取磁盘分区信息
