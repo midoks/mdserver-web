@@ -160,7 +160,7 @@ def getMtproxyUrl():
 
     info = user.field('username,password').where("id=?", (1,)).find()
 
-    setting = pSqliteDb('setting')
+    setting = pSqliteDb('settings')
 
     setting_data = setting.where("key=?", ('webPort',)).find()
 
