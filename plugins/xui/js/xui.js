@@ -45,8 +45,8 @@ function xuiCommonFunc(){
             <input class="bt-input-text mr5" type="text" value="' + info.port  +'">\
         </p>';
 
-        var con += '<hr/><p class="conf_p" style="text-align:center;">\
-            <button id="mtproxy_url" class="btn btn-default btn-sm">打开XUI</button>\
+        con += '<hr/><p class="conf_p" style="text-align:center;">\
+            <button id="open_url" class="btn btn-default btn-sm">打开XUI</button>\
         </p>';
 
         $(".soft-man-con").html(con);
