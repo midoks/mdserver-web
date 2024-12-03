@@ -1,0 +1,23 @@
+debug = false
+
+secret = "{$SECRET}"
+bind-to = "0.0.0.0:{$PORT}"
+
+concurrency = 256
+prefer-ip = "prefer-ipv4"
+domain-fronting-port = 443
+tolerate-time-skewness = "10s"
+
+[network]
+doh-ip = "9.9.9.9"
+
+[network.timeout]
+tcp = "5s"
+http = "10s"
+idle = "1m"
+
+[defense.anti-replay]
+enabled = true
+max-size = "1mib"
+error-rate = 0.001
+
