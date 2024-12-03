@@ -44,7 +44,7 @@ function mtCommonFunc(){
             <input class="bt-input-text mr5" type="number" value="' + rdata['port']  +'" name="max">,MB\
         </p>';
 
-        var con = '<hr/><p class="conf_p" style="text-align:center;">\
+        var con += '<hr/><p class="conf_p" style="text-align:center;">\
             <button id="mtproxy_url" class="btn btn-default btn-sm">打开XUI</button>\
         </p>';
 
