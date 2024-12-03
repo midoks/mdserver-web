@@ -17,6 +17,7 @@ sysName=`uname`
 
 Install_app()
 {
+	bash <(curl -Ls https://raw.githubusercontent.com/FranzKafkaYu/x-ui/master/install.sh)
 	echo '安装完成'
 }
 
