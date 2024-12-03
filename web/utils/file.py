@@ -18,15 +18,7 @@ import base64
 import core.mw as mw
 import thisdb
 
-def uploadSegment():
-    # 分段上传
-    path = request.form.get('path', '')
-    name = request.form.get('name', '')
-    size = request.form.get('size')
-    start = request.form.get('start')
-    dir_mode = request.form.get('dir_mode', '')
-    file_mode = request.form.get('file_mode', '')
-
+def uploadSegment(path,name,size,start,dir_mode,file_mode,b64_data,upload_files):
     if not mw.fileNameCheck(name):
         return mw.returnData(False, '文件名中不能包含特殊字符!')
 
@@ -50,12 +42,10 @@ def uploadSegment():
         return str(d_size)
 
     f = open(save_path, 'ab')
-    b64_data = request.form.get('b64_data', '0')
     if b64_data == '1':
-        b64_data = base64.b64decode(args.b64_data)
+        b64_data = base64.b64decode(b64_data)
         f.write(b64_data)
     else:
-        upload_files = request.files.getlist("blob")
         for tmp_f in upload_files:
             f.write(tmp_f.read())
 

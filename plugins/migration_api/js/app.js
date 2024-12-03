@@ -92,8 +92,8 @@ function selectProgress(val){
 function initStep1(){
     var url = $('input[name="sync_url"]').val();
     var app_id = $('input[name="sync_app_id"]').val();
-    var app_sercet = $('input[name="sync_app_sercet"]').val();
-    maPost('step_one',{'url':url,'app_id':app_id,'app_sercet':app_sercet}, function(rdata){
+    var app_secret = $('input[name="sync_app_secret"]').val();
+    maPost('step_one',{'url':url,'app_id':app_id,'app_secret':app_secret}, function(rdata){
         var rdata = $.parseJSON(rdata.data);
         showMsg(rdata.msg,function(){
             if (rdata.status){
@@ -106,6 +106,7 @@ function initStep1(){
 function initStep2(){
     maPost('step_two',{}, function(rdata){
         var rdata = $.parseJSON(rdata.data);
+        console.log(rdata);
         showMsg(rdata.msg,function(){
             if (rdata.status){
                 selectProgress(2);
@@ -272,7 +273,8 @@ function initStep(){
     maPost('get_conf',{}, function(rdata){
         var rdata = $.parseJSON(rdata.data);
         $('input[name="sync_url"]').val(rdata.data['url']);
-        $('input[name="sync_token"]').val(rdata.data['token']);
+        $('input[name="sync_app_id"]').val(rdata.data['app_id']);
+        $('input[name="sync_app_secret"]').val(rdata.data['app_secret']);
     });
 
     $('.infoNext').click(function(){

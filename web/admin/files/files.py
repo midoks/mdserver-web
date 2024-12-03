@@ -165,6 +165,22 @@ def upload_file():
     mw.writeLog('文件管理', msg)
     return mw.returnData(True, '上传成功!')
 
+
+# 上传文件
+@blueprint.route('/upload_segment', endpoint='upload_segment', methods=['POST'])
+@panel_login_required
+def upload_segment():
+    path = request.form.get('path', '')
+    name = request.form.get('name', '')
+    size = request.form.get('size')
+    start = request.form.get('start')
+    dir_mode = request.form.get('dir_mode', '')
+    file_mode = request.form.get('file_mode', '')
+    b64_data = request.form.get('b64_data', '0')
+    upload_files = request.files.getlist("blob")
+    return file.uploadSegment(path,name,size,start,dir_mode,file_mode,b64_data,upload_files)
+
+
 # 修改文件名
 @blueprint.route('/mv_file', endpoint='mv_file', methods=['POST'])
 @panel_login_required
