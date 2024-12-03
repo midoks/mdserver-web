@@ -257,7 +257,7 @@ class classApi:
 
             try:
                 url = self.__MW_PANEL + '/files/upload_segment'
-                res = self._REQUESTS.post(url, data=pdata, files=files, headers={
+                res = requests.post(url, data=pdata, files=files, headers={
                     'app-id':self.__MW_APP_ID,
                     'app-secret':self.__MW_APP_SECRET
                 },timeout=30000)
