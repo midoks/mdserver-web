@@ -124,7 +124,7 @@ def get_dir():
 # 获取文件列表
 @blueprint.route('/uncompress', endpoint='uncompress', methods=['POST'])
 @panel_login_required
-def uncompress(self):
+def uncompress():
     sfile = request.form.get('sfile', '')
     dfile = request.form.get('dfile', '')
     path = request.form.get('path', '')

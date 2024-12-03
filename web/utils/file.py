@@ -16,7 +16,7 @@ import shutil
 import core.mw as mw
 import thisdb
 
-def uploadSegmentApi(self):
+def uploadSegmentApi():
     # 分段上传
     path = request.form.get('path', '')
     name = request.form.get('name', '')
@@ -82,7 +82,7 @@ def uploadSegmentApi(self):
         mw.setMode(new_name, mode_tmp2[0])
         mw.setOwn(new_name, mode_tmp2[1])
     else:
-        self.setMode(new_name)
+        mw.setMode(new_name)
 
     msg = mw.getInfo('上传文件[{1}] 到 [{2}]成功!', (new_name, path))
     mw.writeLog('文件管理', msg)
