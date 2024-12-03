@@ -204,7 +204,7 @@ class classApi:
         if not os.path.exists(sfile):
             write_log("|-指定目录不存在{}".format(sfile))
             return False
-
+        pdata = {}
         pdata['name'] = os.path.basename(dfile)
         pdata['path'] = os.path.dirname(dfile)
         pdata['size'] = os.path.getsize(sfile)
