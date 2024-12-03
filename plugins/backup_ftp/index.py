@@ -188,7 +188,7 @@ def findPathName(path, filename):
     return l
 
 def backupAllFunc(stype):
-    os.chdir(mw.getRunDir())
+    os.chdir(mw.getPanelDir())
 
     name = sys.argv[2]
     num = sys.argv[3]
@@ -230,11 +230,11 @@ def backupAllFunc(stype):
             'type=? and pid=?', ('1', pid)).field('id,filename').select()
 
     args = stype + " " + name + " " + num
-    cmd = 'python3 ' + mw.getRunDir() + '/scripts/backup.py ' + args
+    cmd = 'python3 ' + mw.getPanelDir() + '/scripts/backup.py ' + args
     if stype.find('database_') > -1:
         plugin_name = stype.replace('database_', '')
         args = "database " + name + " " + num
-        cmd = 'python3 ' + mw.getRunDir() + '/plugins/' + plugin_name + \
+        cmd = 'python3 ' + mw.getPanelDir() + '/plugins/' + plugin_name + \
             '/scripts/backup.py ' + args
 
     os.system(cmd)

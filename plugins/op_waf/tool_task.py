@@ -93,7 +93,7 @@ def createBgTaskByName(name, args):
         _where1 = args['minute-n']
         _minute = ''
 
-    mw_dir = mw.getRunDir()
+    mw_dir = mw.getPanelDir()
     cmd = '''
 mw_dir=%s
 rname=%s

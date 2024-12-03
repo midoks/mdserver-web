@@ -2478,7 +2478,7 @@ def trySlaveSyncBugfix(version=''):
     return mw.returnJson(True, '修复成功!')
 
 def getSlaveSyncCmd(version=''):
-    root = mw.getRunDir()
+    root = mw.getPanelDir()
     cmd = 'cd ' + root + ' && python3 ' + root + \
         '/plugins/mariadb/index.py do_full_sync {"db":"all","sign":""}'
     return mw.returnJson(True, 'ok', cmd)
@@ -3027,7 +3027,7 @@ def fullSync(version=''):
 
     status_file = asyncTmpfile()
     if args['begin'] == '1':
-        cmd = 'cd ' + mw.getRunDir() + ' && python3 ' + \
+        cmd = 'cd ' + mw.getPanelDir() + ' && python3 ' + \
             getPluginDir() + \
             '/index.py do_full_sync {"db":"' + args['db'] + '","sign":"' + sign + '"} &'
         # print(cmd)

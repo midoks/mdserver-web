@@ -72,7 +72,7 @@ def createBgTaskByName(name):
     import crontab_api
     api = crontab_api.crontab_api()
 
-    mw_dir = mw.getRunDir()
+    mw_dir = mw.getPanelDir()
     cmd = '''
 mw_dir=%s
 rname=%s

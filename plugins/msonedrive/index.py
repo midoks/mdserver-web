@@ -217,9 +217,9 @@ def backupAllFunc(stype):
         mw.echoInfo("未授权API,无法使用!!!")
         return ''
 
-    os.chdir(mw.getRunDir())
+    os.chdir(mw.getPanelDir())
     backup_dir = mw.getBackupDir()
-    run_dir = mw.getRunDir()
+    run_dir = mw.getPanelDir()
 
     stype = sys.argv[1]
     name = sys.argv[2]

@@ -384,7 +384,7 @@ class classApi:
 
         zip_file = backup_path + \
             "/psync_tmp_{}.tar.gz".format(os.path.basename(spath))
-        zip_dst = mw.getRunDir() + '/tmp/psync_tmp_{}.tar.gz'.format(
+        zip_dst = mw.getPanelDir() + '/tmp/psync_tmp_{}.tar.gz'.format(
             os.path.basename(dpath))
         write_log("|-正在压缩目录[{}]...".format(spath))
         self.write_speed('done', '正在压缩')

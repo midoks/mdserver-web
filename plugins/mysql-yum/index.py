@@ -830,7 +830,7 @@ def setDbBackup():
     if not data[0]:
         return data[1]
 
-    scDir = getPluginDir() + '/scripts/backup.py'
+    scDir = getPanelDir() + '/scripts/backup.py'
     cmd = 'python3 ' + scDir + ' database ' + args['name'] + ' 3'
     os.system(cmd)
     return mw.returnJson(True, 'ok')
@@ -2551,7 +2551,7 @@ def trySlaveSyncBugfix(version=''):
 
 def getSlaveSyncCmd(version=''):
 
-    root = mw.getRunDir()
+    root = mw.getPanelDir()
     cmd = 'cd ' + root + ' && python3 ' + root + \
         '/plugins/mysql/index.py do_full_sync {"db":"all"}'
     return mw.returnJson(True, 'ok', cmd)
@@ -3433,7 +3433,7 @@ def fullSync(version=''):
 
     status_file = asyncTmpfile()
     if args['begin'] == '1':
-        cmd = 'cd ' + mw.getRunDir() + ' && python3 ' + getPluginDir() + \
+        cmd = 'cd ' + mw.getPanelDir() + ' && python3 ' + getPluginDir() + \
             '/index.py do_full_sync {"db":"' + \
             args['db'] + '","sign":"' + sign + '"} &'
         # print(cmd)

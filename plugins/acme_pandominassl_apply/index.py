@@ -563,7 +563,7 @@ def runHookPy(domain,path):
     # print(domain,path)
     run_log = runLog()
     hook_file = getConf()
-    cmd = 'cd '+mw.getRunDir()
+    cmd = 'cd '+mw.getPanelDir()
     cmd += ' && python3 '+hook_file + ' ' + domain + ' ' + path
     cmd += ' >> '+ run_log
     print(cmd)
@@ -644,7 +644,7 @@ def getHookIdCmd():
     if not data[0]:
         return data[1]
 
-    cmd = "cd "+mw.getRunDir()+" "
+    cmd = "cd "+mw.getPanelDir()+" "
     cmd += '&& python3 plugins/acme_pandominassl_apply/index.py run_hook_id 1.0 {"id":"'+args['id']+'"}'
     return mw.returnJson(True, 'ok',cmd)
 
@@ -661,7 +661,7 @@ def runHookId():
     return 'run hook '+args['id']+' end'
 
 def runHookCmd():
-    cmd = "cd "+mw.getRunDir()+" "
+    cmd = "cd "+mw.getPanelDir()+" "
     cmd += '&& python3 plugins/acme_pandominassl_apply/index.py run_hook'
     return mw.returnJson(True, 'ok',cmd)
 
@@ -738,7 +738,7 @@ def runSyncCfData():
     return ''
 
 def runSyncCfCmd():
-    cmd = "cd "+mw.getRunDir()+" "
+    cmd = "cd "+mw.getPanelDir()+" "
     cmd += '&& python3 plugins/acme_pandominassl_apply/index.py run_sync_cf_data'
     return mw.returnJson(True, 'ok',cmd)
 
@@ -791,7 +791,7 @@ def runSyncDnsPodData():
     return ''
 
 def runSyncDnsPodCmd():
-    cmd = "cd "+mw.getRunDir()+" "
+    cmd = "cd "+mw.getPanelDir()+" "
     cmd += '&& python3 plugins/acme_pandominassl_apply/index.py run_sync_dnspod_data'
     return mw.returnJson(True, 'ok',cmd)
 
