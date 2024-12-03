@@ -9,6 +9,8 @@ rootPath=$(dirname "$rootPath")
 serverPath=$(dirname "$rootPath")
 
 
+# cd /www/server/mdserver-web && source bin/activate && python3 plugins/migration_api/index.py bg_process
+
 VERSION=1.0
 
 Install_App(){
