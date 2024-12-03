@@ -13,6 +13,7 @@ import pwd
 import time
 import shutil
 import json
+import base64
 
 import core.mw as mw
 import thisdb
@@ -51,7 +52,6 @@ def uploadSegment():
     f = open(save_path, 'ab')
     b64_data = request.form.get('b64_data', '0')
     if b64_data == '1':
-        import base64
         b64_data = base64.b64decode(args.b64_data)
         f.write(b64_data)
     else:
