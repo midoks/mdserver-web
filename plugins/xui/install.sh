@@ -26,9 +26,6 @@ Install_app()
 	bash ${curPath}/install_xui.sh
 
 	x-ui 7
-
-	echo "curPath:$curPath"
-
 	echo '安装完成'
 }
 
