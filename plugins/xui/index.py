@@ -161,7 +161,7 @@ def getXuiInfo():
     info = user.field('username,password').where("id=?", (1,)).find()
 
     setting = pSqliteDb('settings')
-    setting_data = setting.field('id,webPort,value').where("key=?", ('webPort',)).find()
+    setting_data = setting.field('id,key,value').where("key=?", ('webPort',)).find()
 
     data['username'] = info['username']
     data['password'] = info['password']
