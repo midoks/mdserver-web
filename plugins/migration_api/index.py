@@ -1021,18 +1021,18 @@ def getSpeed():
     path = getServerDir() + '/config/speed.json'
     if not os.path.exists(path):
         return mw.returnJson(False, '正在准备..')
+
     try:
         speed_info = json.loads(mw.readFile(path))
-    except:
-        return mw.returnJson(False, '正在准备..')
+    except Exception as e:
+        return mw.returnJson(True, str(e)+'...')
     data = getCfgData()
     api = classApi(data['url'], data['app_id'], data['app_secret'])
     sync_info = api.get_sync_info(None)
     speed_info['all_total'] = sync_info['total']
     speed_info['all_speed'] = sync_info['speed']
     speed_info['total_time'] = speed_info['end_time'] - speed_info['time']
-    speed_info['total_time'] = str(int(speed_info[
-        'total_time'] // 60)) + "分" + str(int(speed_info['total_time'] % 60)) + "秒"
+    speed_info['total_time'] = str(int(speed_info['total_time'] // 60)) + "分" + str(int(speed_info['total_time'] % 60)) + "秒"
     log_file = getServerDir() + '/sync.log'
     speed_info['log'] = mw.execShell("tail -n 10 {}".format(log_file))[0]
     speed_info['log_file'] = log_file
