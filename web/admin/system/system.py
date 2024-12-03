@@ -25,7 +25,7 @@ import thisdb
 blueprint = Blueprint('system', __name__, url_prefix='/system', template_folder='../../templates')
 
 # 获取系统的统计信息
-@blueprint.route('/system_total', endpoint='system_total')
+@blueprint.route('/system_total', endpoint='system_total', methods=['GET','POST'])
 @panel_login_required
 def system_total():
     data = sys.getMemInfo()
