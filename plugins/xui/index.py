@@ -163,10 +163,15 @@ def getXuiInfo():
     setting = pSqliteDb('settings')
     port_data = setting.field('id,key,value').where("key=?", ('webPort',)).find()
     path_data = setting.field('id,key,value').where("key=?", ('webBasePath',)).find()
+
+    if path_data is not None:
+        data['path'] = path_data['value']
+    else:
+        data['path'] = ''
+
     data['username'] = info['username']
     data['password'] = info['password']
     data['port'] = port_data['value']
-    data['path'] = path_data['value']
 
     data['ip'] = mw.getHostAddr()
     return mw.returnJson(True, 'ok', data)
