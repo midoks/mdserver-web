@@ -207,8 +207,6 @@ if __name__ == "__main__":
         print(installPreInspection())
     elif func == 'conf':
         print(getServiceFile())
-    elif func == 'conf_env':
-        print(getConfEnv())
     elif func == 'info':
         print(getXuiInfo())
     else:
