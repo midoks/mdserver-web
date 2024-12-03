@@ -73,7 +73,7 @@ def uploadSegment(path,name,size,start,dir_mode,file_mode,b64_data,upload_files)
         mw.setMode(new_name, mode_tmp2[0])
         mw.setOwn(new_name, mode_tmp2[1])
     else:
-        mw.setMode(new_name)
+        setMode(new_name)
 
     msg = mw.getInfo('上传文件[{1}] 到 [{2}]成功!', (new_name, path))
     mw.writeLog('文件管理', msg)
