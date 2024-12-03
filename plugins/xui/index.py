@@ -154,7 +154,7 @@ def initdUinstall():
     mw.execShell('systemctl disable x-ui')
     return 'ok'
 
-def getMtproxyUrl():
+def getXuiInfo():
 
     user = pSqliteDb('users')
 
@@ -209,7 +209,7 @@ if __name__ == "__main__":
         print(getServiceFile())
     elif func == 'conf_env':
         print(getConfEnv())
-    elif func == 'url':
-        print(getMtproxyUrl())
+    elif func == 'info':
+        print(getXuiInfo())
     else:
         print('error')
