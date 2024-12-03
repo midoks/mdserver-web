@@ -39,7 +39,7 @@ def uploadSegment(path,name,size,start,dir_mode,file_mode,b64_data,upload_files)
         d_size = os.path.getsize(save_path)
 
     if d_size != int(start):
-        return str(d_size)
+        return mw.returnData(True, 'size', d_size)
 
     f = open(save_path, 'ab')
     if b64_data == '1':
