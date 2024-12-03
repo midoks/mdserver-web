@@ -244,8 +244,7 @@ class classApi:
         self.write_speed('size', pdata['size'])
         self.write_speed('used', 0)
         self.write_speed('speed', 0)
-        write_log("|-上传文件[{}], 总大小：{}, 当前分片大小为：{}".format(pdata['name'],
-                                                          toSize(pdata['size']), toSize(self._buff_size)))
+        write_log("|-上传文件[{}], 总大小：{}, 当前分片大小为：{}".format(pdata['name'], toSize(pdata['size']), toSize(self._buff_size)))
         while True:
             buff_size = self._buff_size
             max_buff = int(pdata['size'] - pdata['start'])
@@ -269,8 +268,7 @@ class classApi:
                     success_num = up_buff_num - 3  # 如再顺利发送3次则继续提升分片大小
                     if self._buff_size > max_buff_size:
                         self._buff_size = max_buff_size
-                    write_log(
-                        "|-发送顺利, 尝试调整分片大小为: {}".format(toSize(self._buff_size)))
+                    write_log("|-发送顺利, 尝试调整分片大小为: {}".format(toSize(self._buff_size)))
             except Exception as e:
                 times = time.time() - start_time
                 total_time += times
@@ -301,7 +299,7 @@ class classApi:
             times = time.time() - start_time
             total_time += times
 
-            if type(result) == int:
+            if result['status'] and result['msg'] == 'size':
                 if result == split_done:
                     split_num += 1
                 else:
@@ -310,14 +308,14 @@ class classApi:
                 if split_num > 10:
                     write_log("|-上传失败, 跳过本次上传任务")
                     return False
-                if result > pdata['size']:
+                if result['data'] > pdata['size']:
                     write_log("|-上传失败, 跳过本次上传任务")
                     return False
                 self.write_speed('used', result)
                 self.write_speed('speed', int(buff_size / times))
-                write_log("|-已上传 {},上传速度 {}/s, 共用时 {}分{:.2f}秒,  {:.2f}%".format(toSize(float(result)), toSize(
-                    buff_size / times), int(total_time // 60), total_time % 60, (float(result) / float(pdata['size']) * 100)))
-                pdata['start'] = result  # 设置断点
+                write_log("|-已上传 {},上传速度 {}/s, 共用时 {}分{:.2f}秒,  {:.2f}%".format(toSize(result['data']), toSize(
+                    buff_size / times), int(total_time // 60), total_time % 60, (float(result['data']) / float(pdata['size']) * 100)))
+                pdata['start'] = result['data']  # 设置断点
             else:
                 if not result['status']:  # 如果服务器响应上传失败
                     write_log(result['msg'])
@@ -332,8 +330,7 @@ class classApi:
 
         self.write_speed('total_size', pdata['size'])
         self.write_speed('end_time', int(time.time()))
-        write_log("|-总耗时：{} 分钟, {:.2f} 秒, 平均速度：{}/s".format(int(total_time //
-                                                                60), total_time % 60, toSize(pdata['size'] / total_time)))
+        write_log("|-总耗时：{} 分钟, {:.2f} 秒, 平均速度：{}/s".format(int(total_time // 60), total_time % 60, toSize(pdata['size'] / total_time)))
         return True
 
     def send_list(self, s_files):
@@ -369,8 +366,7 @@ class classApi:
         write_log("|-正在压缩目录[{}]...".format(spath))
         self.write_speed('done', '正在压缩')
 
-        mw.execShell(
-            "cd {} && tar zcvf {} ./ > /dev/null".format(spath, zip_file))
+        mw.execShell("cd {} && tar zcvf {} ./ > /dev/null".format(spath, zip_file))
         if not os.path.exists(zip_file):
             self.error("目录[{}]打包失败!".format(spath))
             return False
@@ -662,7 +658,7 @@ class classApi:
 
     def export_database(self, name, index):
         self.write_speed('done', '正在导出数据库')
-        write_log("|-正在导出数据库{}...".format(name))
+        write_log("|-正在导出数据库[{}]...".format(name))
         conn = self.getMyConn()
         result = conn.execute("show databases")
         isError = self.isSqlError(result)
@@ -724,18 +720,14 @@ class classApi:
         db_dir = '/www/backup/import'
         new_db_name = 'psync_import_{}.sql.gz'.format(dbInfo['name'])
         upload_file = db_dir + '/' + new_db_name
-        self.send('/files/exec_shell',
-                  {"shell": "rm -f " + upload_file, "path": "/www"}, 30)
+        self.send('/files/exec_shell', {"shell": "rm -f " + upload_file, "path": "/www"}, 30)
 
         if self.upload_file(filename, upload_file):
             self.write_speed('done', '正在导入数据库')
             write_log("|-正在导入数据库{}...".format(dbInfo['name']))
 
-            t = self.sendPlugins('mysql', 'import_db_external', {
-                "file": new_db_name, "name": dbInfo['name']})
-            # print(t)
-            self.send('/files/exec_shell',
-                      {"shell": "rm -f " + upload_file, "path": "/www"}, 30)
+            self.sendPlugins('mysql', 'import_db_external', {"file": new_db_name, "name": dbInfo['name']})
+            self.send('/files/exec_shell',{"shell": "rm -f " + upload_file, "path": "/www"}, 30)
             return True
         self.state('databases', index, -1, "数据传输失败")
         return False
