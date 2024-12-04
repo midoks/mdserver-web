@@ -830,7 +830,7 @@ def setDbBackup():
     if not data[0]:
         return data[1]
 
-    scDir = getPanelDir() + '/scripts/backup.py'
+    scDir = mw.getPanelDir() + '/scripts/backup.py'
     cmd = 'python3 ' + scDir + ' database ' + args['name'] + ' 3'
     os.system(cmd)
     return mw.returnJson(True, 'ok')
