@@ -27,8 +27,9 @@ def init():
 	    thisdb.initPanelData()
 	    init_admin_user()
 	    init_option()
+	    init_db_system()
+
 	init_cmd()
-	init_db_system()
 
 	# 自动识别防火墙配置
 	firewall_port = thisdb.getOption('setpu_auto_identify_firewall_port', default='no')
