@@ -235,10 +235,8 @@ def backupAllFunc(stype):
     if stype.find('database_') > -1:
         plugin_name = stype.replace('database_', '')
         db_path = mw.getServerDir() + '/' + plugin_name
-        pid = mw.M('databases').dbPos(db_path, 'mysql').where(
-            'name=?', (name,)).getField('id')
-        backups = sql.table('backup').where(
-            'type=? and pid=?', ('1', pid)).field('id,filename').select()
+        pid = mw.M('databases').dbPos(db_path, 'mysql').where('name=?', (name,)).getField('id')
+        backups = mw.M('backup').where('type=? and pid=?', ('1', pid)).field('id,filename').select()
 
     args = stype + " " + name + " " + num
     cmd = 'python3 ' + run_dir + '/scripts/backup.py ' + args
