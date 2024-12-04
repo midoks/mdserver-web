@@ -2,7 +2,7 @@
 PATH=/bin:/sbin:/usr/bin:/usr/sbin:/usr/local/bin:/usr/local/sbin:~/bin:/opt/homebrew/bin
 export PATH=$PATH:/opt/homebrew/bin
 
-# cd /www/server/mdserver-web/plugins/php/versions/common && bash readline.sh install 54
+# cd /www/server/mdserver-web/plugins/php/versions/common && bash readline.sh install 81
 
 curPath=`pwd`
 
@@ -63,6 +63,7 @@ Install_lib()
 			OPTIONS="$OPTIONS --build=aarch64-unknown-linux-gnu --host=aarch64-unknown-linux-gnu"
 		fi
 
+		export PKG_CONFIG_PATH=$PKG_CONFIG_PATH:${serverPath}/lib/pkgconfig
 		if [ "$sysName" == "Darwin" ];then
 			cd ${rootPath}/plugins/php/lib && /bin/bash libedit.sh
 			OPTIONS="$OPTIONS --with-libedit=${serverPath}/lib/libedit"
