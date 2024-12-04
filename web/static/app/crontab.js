@@ -266,7 +266,7 @@ function planAdd(){
 	$("#cronConfig input[name='week']").val($(".planweek").find("b").attr("val"));
 
 	var sType = $(".planjs").find("b").attr("val");
-	var sBody = encodeURIComponent($("#implement textarea[name='sBody']").val());
+	var sBody = encodeURIComponent($("#implement textarea[name='sbody']").val());
 
 	if (sType == 'toShell'){
 		if(sBody == ''){
@@ -296,7 +296,7 @@ function planAdd(){
 	$("#cronConfig input[name='stype']").val(sType);
 	$("#cronConfig textarea[name='sbody']").val(decodeURIComponent(sBody));
 	
-	if(sType == 'site' || sType == 'database' || sType == 'path'){
+	if(sType == 'site' || sType == 'database' || sType.find('_mysql')>0 || sType == 'path'){
 		var backupTo = $(".planBackupTo").find("b").attr("val");
 		$("#backup_to").val(backupTo);
 	}
@@ -602,31 +602,31 @@ function toBackup(type){
 		}
 
 		var sBody = '<div class="dropdown pull-left mr20 check">\
-					  <button class="btn btn-default dropdown-toggle sname" type="button" id="backdata" data-toggle="dropdown" style="width:auto">\
-						<b id="sName" val="'+rdata.data[0].name+'">'+rdata.data[0].name+'['+rdata.data[0].ps+']</b> <span class="caret"></span>\
-					  </button>\
-					  <ul class="dropdown-menu" role="menu" aria-labelledby="backdata">'+sOpt+'</ul>\
-					</div>\
-					'+ changeDir +'\
-					<div class="textname pull-left mr20">备份到</div>\
-					<div class="dropdown planBackupTo pull-left mr20">\
-					  <button class="btn btn-default dropdown-toggle" type="button" id="excode" data-toggle="dropdown" style="width:auto;">\
-						<b val="localhost">服务器磁盘</b><span class="caret"></span>\
-					  </button>\
-					  <ul class="dropdown-menu" role="menu" aria-labelledby="excode">\
-						<li><a role="menuitem" tabindex="-1" href="javascript:;" value="localhost">服务器磁盘</a></li>\
-						'+ orderOpt +'\
-					  </ul>\
-					</div>\
-					<div class="textname pull-left mr20">保留最新</div><div class="plan_hms pull-left mr20 bt-input-text">\
-					<span><input type="number" name="save" id="save" value="3" maxlength="4" max="100" min="1"></span>\
-					<span class="name">份</span>\
-					</div>';
+		 	<button class="btn btn-default dropdown-toggle sname" type="button" id="backdata" data-toggle="dropdown" style="width:auto">\
+				<b id="sName" val="'+rdata.data[0].name+'">'+rdata.data[0].name+'['+rdata.data[0].ps+']</b> <span class="caret"></span>\
+		  	</button>\
+		 	<ul class="dropdown-menu" role="menu" aria-labelledby="backdata">'+sOpt+'</ul>\
+		</div>\
+		'+ changeDir +'\
+		<div class="textname pull-left mr20">备份到</div>\
+		<div class="dropdown planBackupTo pull-left mr20">\
+		  	<button class="btn btn-default dropdown-toggle" type="button" id="excode" data-toggle="dropdown" style="width:auto;">\
+				<b val="localhost">服务器磁盘</b><span class="caret"></span>\
+		  	</button>\
+		  	<ul class="dropdown-menu" role="menu" aria-labelledby="excode">\
+				<li><a role="menuitem" tabindex="-1" href="javascript:;" value="localhost">服务器磁盘</a></li>\
+				'+ orderOpt +'\
+		  	</ul>\
+		</div>\
+		<div class="textname pull-left mr20">保留最新</div><div class="plan_hms pull-left mr20 bt-input-text">\
+			<span><input type="number" name="save" id="save" value="3" maxlength="4" max="100" min="1"></span>\
+			<span class="name">份</span>\
+		</div>';
 		$("#implement").html(sBody);
 		getselectname();
 
 		$('.changePathDir').click(function(){
-			changePathCallback($('#sName').val(),function(select_dir){
+			changePathCallback($('#sname').val(),function(select_dir){
 				$(".planname input[name='name']").val('备份目录['+select_dir+']');
 				$('#implement .sname b').attr('val',select_dir).text(select_dir);
 			});
@@ -634,7 +634,7 @@ function toBackup(type){
 
 
 		$(".dropdown ul li a").click(function(){
-			var sName = $("#sName").attr("val");
+			var sName = $("#sname").attr("val");
 			if(!sName) return;
 			$(".planname input[name='name']").val(sMsg+'['+sName+']');
 		});
@@ -1032,8 +1032,8 @@ function toWhere1(ix){
 //小时
 function toHour(){
 	var mBody = '<div class="plan_hms pull-left mr20 bt-input-text">\
-	<span><input type="number" name="hour" value="1" maxlength="2" max="23" min="0"></span>\
-	<span class="name">小时</span>\
+		<span><input type="number" name="hour" value="1" maxlength="2" max="23" min="0"></span>\
+		<span class="name">小时</span>\
 	</div>';
 	$("#ptime").append(mBody);
 }
@@ -1041,8 +1041,8 @@ function toHour(){
 //分钟
 function toMinute(){
 	var mBody = '<div class="plan_hms pull-left mr20 bt-input-text">\
-	<span><input type="number" name="minute" value="30" maxlength="2" max="59" min="0"></span>\
-	<span class="name">分钟</span>\
+		<span><input type="number" name="minute" value="30" maxlength="2" max="59" min="0"></span>\
+		<span class="name">分钟</span>\
 	</div>';
 	$("#ptime").append(mBody);
 	
@@ -1051,7 +1051,7 @@ function toMinute(){
 //从文件
 function toFile(){
 	var tBody = '<input type="text" value="" name="file" id="viewfile" onclick="fileupload()" readonly="true">\
-				<button class="btn btn-default" onclick="fileupload()">上次</button>';
+		<button class="btn btn-default" onclick="fileupload()">上次</button>';
 	$("#implement").html(tBody);
 	$(".planname input[name='name']").removeAttr('readonly style').val("");
 }
