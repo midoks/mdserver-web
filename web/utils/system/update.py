@@ -18,7 +18,7 @@ import json
 
 import core.mw as mw
 
-def versionDiff(old, new):
+def versionDiff(now, new):
     '''
         test 测试
         new 有新版本
@@ -28,16 +28,13 @@ def versionDiff(old, new):
     if len(new_list) > 3:
         return 'test'
 
-    old_list = old.split('.')
+    now_list = now.split('.')
     ret = 'none'
-
-    isHasNew = True
-    if int(new_list[0]) == int(old_list[0]) and int(new_list[1]) == int(old_list[1]) and int(new_list[2]) == int(old_list[2]):
-        isHasNew = False
-
-    if isHasNew:
+    from distutils.version import LooseVersion
+    if LooseVersion(new) > LooseVersion(now):
         return 'new'
-    return ret
+    else:
+        return 'none'
 
 def getServerInfo():
     import urllib.request
