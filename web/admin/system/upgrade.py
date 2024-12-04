@@ -26,7 +26,6 @@ def update_server():
     panel_type = request.args.get('type', 'check')
     version = request.args.get('version', '')
     return sys.updateServer(panel_type, version)
-    # return mw.returnData(False, '已经是最新,无需更新!')
 
 
 
