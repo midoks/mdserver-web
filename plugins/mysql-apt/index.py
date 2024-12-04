@@ -831,15 +831,14 @@ def setDbBackup():
     if not data[0]:
         return data[1]
 
-    scDir = mw.getPanelDir() + '/scripts/backup.py'
+    scDir = getPluginDir() + '/scripts/backup.py'
     cmd = 'python3 ' + scDir + ' database ' + args['name'] + ' 3'
     os.system(cmd)
     return mw.returnJson(True, 'ok')
 
 
 def rootPwd():
-    return pSqliteDb('config').where(
-        'id=?', (1,)).getField('mysql_root')
+    return pSqliteDb('config').where('id=?', (1,)).getField('mysql_root')
 
 
 def importDbExternal():
