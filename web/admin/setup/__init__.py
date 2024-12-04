@@ -31,5 +31,8 @@ def init():
 	init_db_system()
 
 	# 自动识别防火墙配置
-	MwFirewall.instance().aIF()
+	firewall_port = thisdb.getOption('setpu_auto_identify_firewall_port', default='no')
+	if firewall_port == 'no':
+		MwFirewall.instance().aIF()
+		thisdb.getOption('setpu_auto_identify_firewall_port', 'yes')
 
