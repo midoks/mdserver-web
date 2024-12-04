@@ -270,7 +270,7 @@ function planAdd(){
 
 	if (sType == 'toShell'){
 		if(sBody == ''){
-			$("#implement textarea[name='sBody']").focus();
+			$("#implement textarea[name='sbody']").focus();
 			layer.msg('脚本代码不能为空!',{icon:2});
 			return;
 		}
@@ -293,8 +293,8 @@ function planAdd(){
 	}
 	// urladdress = encodeURIComponent(urladdress);
 	$("#cronConfig input[name='urladdress']").val(urladdress);
-	$("#cronConfig input[name='sType']").val(sType);
-	$("#cronConfig textarea[name='sBody']").val(decodeURIComponent(sBody));
+	$("#cronConfig input[name='stype']").val(sType);
+	$("#cronConfig textarea[name='sbody']").val(decodeURIComponent(sBody));
 	
 	if(sType == 'site' || sType == 'database' || sType == 'path'){
 		var backupTo = $(".planBackupTo").find("b").attr("val");
@@ -339,9 +339,9 @@ function planAdd(){
 	}
 	
 	
-	$("#cronConfig input[name='sName']").val(sName);
+	$("#cronConfig input[name='sname']").val(sName);
 	layer.msg('正在添加,请稍候...!',{icon:16,time:0,shade: [0.3, '#000']});
-	var data = $("#cronConfig").serialize() + '&sBody='+sBody;
+	var data = $("#cronConfig").serialize() + '&sbody='+sBody;
 	// console.log(data);
 	$.post('/crontab/add',data,function(rdata){
 		if(!rdata.status) {
