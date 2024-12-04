@@ -76,6 +76,7 @@ def getGlobalVar():
 
     data['hook_menu'] = thisdb.getOptionByJson('hook_menu',type='hook',default=[])
     data['hook_global_static'] = thisdb.getOptionByJson('hook_global_static',type='hook',default=[])
+    data['hook_database'] = thisdb.getOptionByJson('hook_database',type='hook',default=[])
 
 
     # 邮件通知设置
