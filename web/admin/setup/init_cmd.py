@@ -33,9 +33,6 @@ def init_cmd():
 
     if not mw.isAppleSystem() and not os.path.exists("/etc/init.d"):
         mw.execShell('mkdir -p /etc/init.d')
-
-    sys_name = mw.getOsName()
-
     # initd
     if os.path.exists('/etc/rc.d/init.d'):
         initd_bin = '/etc/rc.d/init.d/mw'
@@ -54,6 +51,7 @@ def init_cmd():
         # 加入自启动
         mw.execShell('which update-rc.d && update-rc.d -f mw defaults')
 
+    # sys_name = mw.getOsName()
     # if sys_name == 'opensuse':
     #     init_cmd_systemd()
     return True
