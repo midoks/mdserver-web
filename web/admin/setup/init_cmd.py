@@ -48,7 +48,6 @@ def init_cmd():
 
     if os.path.exists('/etc/init.d'):
         initd_bin = '/etc/init.d/mw'
-
         if not os.path.exists(initd_bin):
             mw.writeFile(initd_bin, cmd_content)
             mw.execShell('chmod +x ' + initd_bin)
