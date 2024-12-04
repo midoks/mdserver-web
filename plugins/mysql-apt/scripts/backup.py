@@ -5,22 +5,19 @@
 
 import sys
 import os
+import time
+import re
 
 if sys.platform != 'darwin':
     os.chdir('/www/server/mdserver-web')
 
+web_dir = os.getcwd() + "/web"
+if os.path.exists(web_dir):
+    sys.path.append(web_dir)
+    os.chdir(web_dir)
 
-chdir = os.getcwd()
-sys.path.append(chdir + '/class/core')
-
-# reload(sys)
-# sys.setdefaultencoding('utf-8')
-
-
-import mw
-import db
-import time
-import re
+import core.mw as mw
+import core.db as db
 
 '''
 DEBUG:
@@ -82,11 +79,9 @@ class backupTools:
 
         endDate = time.strftime('%Y/%m/%d %X', time.localtime())
         outTime = time.time() - startTime
-        pid = mw.M('databases').dbPos(db_path, db_name).where(
-            'name=?', (name,)).getField('id')
+        pid = mw.M('databases').dbPos(db_path, db_name).where('name=?', (name,)).getField('id')
 
-        mw.M('backup').add('type,name,pid,filename,addtime,size', (1, os.path.basename(
-            filename), pid, filename, endDate, os.path.getsize(filename)))
+        mw.M('backup').add('type,name,pid,filename,add_time,size', (1, os.path.basename(filename), pid, filename, endDate, os.path.getsize(filename)))
         log = "数据库[" + name + "]备份成功,用时[" + str(round(outTime, 2)) + "]秒"
         mw.writeLog('计划任务', log)
         print("★[" + endDate + "] " + log)
@@ -94,8 +89,7 @@ class backupTools:
         print("|---文件名:" + filename)
 
         # 清理多余备份
-        backups = mw.M('backup').where(
-            'type=? and pid=?', ('1', pid)).field('id,filename').select()
+        backups = mw.M('backup').where('type=? and pid=?', ('1', pid)).field('id,filename').select()
 
         num = len(backups) - int(count)
         if num > 0:
@@ -110,8 +104,7 @@ class backupTools:
     def backupDatabaseAll(self, save):
         db_path = mw.getServerDir() + '/mysql-apt'
         db_name = 'mysql'
-        databases = mw.M('databases').dbPos(
-            db_path, db_name).field('name').select()
+        databases = mw.M('databases').dbPos(db_path, db_name).field('name').select()
         for database in databases:
             self.backupDatabase(database['name'], save)
 
