@@ -301,7 +301,7 @@ function planAdd(){
 		$("#backup_to").val(backupTo);
 	}
 	
-	var sName = $("#sname").attr("val");
+	var sName = $("#sName").attr("val");
 	$("#cronConfig input[name='sname']").val(sName);
 
 	// if(sName == 'backupAll'){
@@ -1058,7 +1058,7 @@ function toFile(){
 
 //从脚本
 function toShell(){
-	var tBody = "<textarea class='txtsjs bt-input-text' name='sBody'></textarea>";
+	var tBody = "<textarea class='txtsjs bt-input-text' name='sbody'></textarea>";
 	$("#implement").html(tBody);
 	$(".planname input[name='name']").removeAttr('readonly style').val("");
 }
