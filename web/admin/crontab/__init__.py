@@ -83,7 +83,7 @@ def modify_crond():
     request_data['hour'] = request.form.get('hour', '')
     request_data['minute'] = request.form.get('minute', '')
     request_data['save'] = request.form.get('save', '')
-    request_data['backup_to'] = request.form.get('backupTo', '')
+    request_data['backup_to'] = request.form.get('backup_to', '')
     request_data['stype'] = request.form.get('stype', '')
     request_data['sname'] = request.form.get('sname', '')
     request_data['sbody'] = request.form.get('sbody', '')
