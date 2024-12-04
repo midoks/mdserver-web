@@ -115,7 +115,11 @@ def add():
     request_data['sname'] = request.form.get('sname', '')
     request_data['sbody'] = request.form.get('sbody', '')
     request_data['url_address'] = request.form.get('urladdress', '')
-    
+
+    info = thisdb.getCronByName(request_data['name'])
+    if info is not None:
+        return mw.returnData(False, '任务名称重复')
+
     cron_id = MwCrontab.instance().add(request_data)
     if cron_id > 0:
         return mw.returnData(True, '添加成功')

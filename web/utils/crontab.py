@@ -151,11 +151,6 @@ class crontab(object):
             # 任务名称不能为空
             return -1
 
-        info = thisdb.getCronByName(data['name'])
-        if info is not None:
-            # 任务名称重复!
-            return -1
-
         is_check_pass, msg = self.cronCheck(data)
         if not is_check_pass:
             return mw.returnData(is_check_pass, msg)
