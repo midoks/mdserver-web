@@ -296,7 +296,7 @@ function planAdd(){
 	$("#cronConfig input[name='stype']").val(sType);
 	$("#cronConfig textarea[name='sbody']").val(decodeURIComponent(sBody));
 	
-	if(sType == 'site' || sType == 'database' || sType.find('_mysql')>0 || sType == 'path'){
+	if(sType == 'site' || sType == 'database' || sType.indexOf('database_')>-1 || sType == 'path'){
 		var backupTo = $(".planBackupTo").find("b").attr("val");
 		$("#backup_to").val(backupTo);
 	}
