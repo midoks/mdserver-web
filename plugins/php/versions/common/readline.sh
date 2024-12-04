@@ -63,15 +63,10 @@ Install_lib()
 			OPTIONS="$OPTIONS --build=aarch64-unknown-linux-gnu --host=aarch64-unknown-linux-gnu"
 		fi
 
+		cd ${rootPath}/plugins/php/lib && /bin/bash libedit.sh
 		export PKG_CONFIG_PATH=$PKG_CONFIG_PATH:${serverPath}/lib/libedit/lib/pkgconfig
-		if [ "$sysName" == "Darwin" ];then
-			cd ${rootPath}/plugins/php/lib && /bin/bash libedit.sh
-			OPTIONS="$OPTIONS --with-libedit=${serverPath}/lib/libedit"
-		else
-			cd ${rootPath}/plugins/php/lib && /bin/bash libedit.sh
-			OPTIONS="$OPTIONS --with-libedit=${serverPath}/lib/libedit"
-		fi
-
+		OPTIONS="$OPTIONS --with-libedit=${serverPath}/lib/libedit"
+		
 		cd $sourcePath/php${version}/ext/${LIBNAME}
 		$serverPath/php/$version/bin/phpize
 		./configure --with-php-config=$serverPath/php/$version/bin/php-config $OPTIONS
