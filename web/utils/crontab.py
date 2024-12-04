@@ -279,6 +279,10 @@ class crontab(object):
         rdata = {}
         rdata['data'] = self.getCrontabHuman(info['list'])
         rdata['page'] = mw.getPage({'count':info['count'],'tojs':'getCronData','p':page,'row':size})
+
+
+        # backup hook
+        rdata['backup_hook'] = thisdb.getOptionByJson('hook_backup', type='hook', default=[])
         return rdata
 
     def getCrondCycle(self, params):
