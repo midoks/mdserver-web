@@ -14,6 +14,7 @@ import re
 import time
 import math
 import psutil
+import json
 
 import core.mw as mw
 
@@ -53,7 +54,7 @@ def getServerInfo():
         return None
     return None
 
-def updateServer(self, stype, version=''):
+def updateServer(stype, version=''):
     import config
     # 更新服务
     try:
