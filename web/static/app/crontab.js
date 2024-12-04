@@ -298,11 +298,12 @@ function planAdd(){
 	
 	if(sType == 'site' || sType == 'database' || sType == 'path'){
 		var backupTo = $(".planBackupTo").find("b").attr("val");
-		$("#backupTo").val(backupTo);
+		$("#backup_to").val(backupTo);
 	}
 	
-	var sName = $("#sName").attr("val");
-	
+	var sName = $("#sname").attr("val");
+	$("#cronConfig input[name='sname']").val(sName);
+
 	// if(sName == 'backupAll'){
 	// 	var alist = $("ul[aria-labelledby='backdata'] li a");
 	// 	var dataList = new Array();
@@ -338,8 +339,7 @@ function planAdd(){
 		$("#cronConfig input[name='where1']").val(where1);
 	}
 	
-	
-	$("#cronConfig input[name='sname']").val(sName);
+
 	layer.msg('正在添加,请稍候...!',{icon:16,time:0,shade: [0.3, '#000']});
 	var data = $("#cronConfig").serialize() + '&sbody='+sBody;
 	// console.log(data);
