@@ -188,7 +188,6 @@ def findPathName(path, filename):
     return l
 
 def backupAllFunc(stype):
-    os.chdir(mw.getPanelDir())
 
     name = sys.argv[2]
     num = sys.argv[3]
@@ -200,20 +199,15 @@ def backupAllFunc(stype):
     }
 
     backups = []
-    sql = db.Sql()
-
     # print("stype:", stype)
     # 提前获取-清理多余备份
     if stype == 'site':
-        pid = sql.table('sites').where('name=?', (name,)).getField('id')
-        backups = sql.table('backup').where(
-            'type=? and pid=?', ('0', pid)).field('id,filename').select()
+        pid = mw.M('sites').where('name=?', (name,)).getField('id')
+        backups = mw.M('backup').where('type=? and pid=?', ('0', pid)).field('id,filename').select()
     if stype == 'database':
         db_path = mw.getServerDir() + '/mysql'
-        pid = mw.M('databases').dbPos(db_path, 'mysql').where(
-            'name=?', (name,)).getField('id')
-        backups = sql.table('backup').where(
-            'type=? and pid=?', ('1', pid)).field('id,filename').select()
+        pid = mw.M('databases').dbPos(db_path, 'mysql').where('name=?', (name,)).getField('id')
+        backups = mw.M('backup').where('type=? and pid=?', ('1', pid)).field('id,filename').select()
     if stype == 'path':
         backup_dir = mw.getBackupDir()
         backup_path = backup_dir + '/path'
@@ -224,18 +218,15 @@ def backupAllFunc(stype):
     if stype.find('database_') > -1:
         plugin_name = stype.replace('database_', '')
         db_path = mw.getServerDir() + '/' + plugin_name
-        pid = mw.M('databases').dbPos(db_path, 'mysql').where(
-            'name=?', (name,)).getField('id')
-        backups = sql.table('backup').where(
-            'type=? and pid=?', ('1', pid)).field('id,filename').select()
+        pid = mw.M('databases').dbPos(db_path, 'mysql').where('name=?', (name,)).getField('id')
+        backups = mw.M('backup').where('type=? and pid=?', ('1', pid)).field('id,filename').select()
 
     args = stype + " " + name + " " + num
     cmd = 'python3 ' + mw.getPanelDir() + '/scripts/backup.py ' + args
     if stype.find('database_') > -1:
         plugin_name = stype.replace('database_', '')
         args = "database " + name + " " + num
-        cmd = 'python3 ' + mw.getPanelDir() + '/plugins/' + plugin_name + \
-            '/scripts/backup.py ' + args
+        cmd = 'python3 ' + mw.getPanelDir() + '/plugins/' + plugin_name + '/scripts/backup.py ' + args
 
     os.system(cmd)
 
