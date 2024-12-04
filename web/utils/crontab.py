@@ -69,10 +69,7 @@ class crontab(object):
     
         bak_data = []
         if stype == 'site' or stype == 'sites' or stype == 'database' or stype.find('database_') > -1 or stype == 'path':
-            hookPath = mw.getPanelDataDir() + "/hook_backup.json"
-            if os.path.exists(hookPath):
-                t = mw.readFile(hookPath)
-                bak_data = json.loads(t)
+            bak_data = thisdb.getOptionByJson('hook_backup',type='hook', default=[])
 
         if stype == 'database' or stype.find('database_') > -1:
             sqlite3_name = 'mysql'
@@ -94,20 +91,20 @@ class crontab(object):
                 db_list['data'] = []
             else:
                 db_list['data'] = mw.M('databases').dbPos(path, sqlite3_name).field('name,ps').select()
-            return mw.getJson(db_list)
+            return db_list
 
         if stype == 'path':
             db_list = {}
             db_list['data'] = [{"name": mw.getWwwDir(), "ps": "www"}]
             db_list['orderOpt'] = bak_data
-            return mw.getJson(db_list)
+            return db_list
 
         data = {}
         data['orderOpt'] = bak_data
 
         default_db = 'sites'
         data['data'] = mw.M(default_db).field('name,ps').select()
-        return mw.getJson(data)
+        return data
 
     def setCronStatus(self,cron_id):
         data = thisdb.getCrond(cron_id)
