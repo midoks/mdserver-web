@@ -361,6 +361,14 @@ class nosqlMySQLCtr():
         data = my_instance.query("select query,db,last_seen,exec_count,max_latency,avg_latency from sys.statement_analysis order by exec_count desc, last_seen desc limit 20")
         if data is None:
             return mw.returnData(False, "查询失败!")
+
+        filter_db = args['filter_db']
+        if filter_db == 'yes':
+            new_data = []
+            for x in data:
+                if x['db'] is not None:
+                    new_data.append(x)
+            return mw.returnData(True, 'ok', new_data)
         return mw.returnData(True, 'ok', data)
 
     # 查看重复或冗余的索引

@@ -274,7 +274,8 @@ function initTabMySQL(){
 function mysqlCommonFuncMysqlNSQL(){
     function renderSQL(){
         var sid = mysqlGetSid();
-        myPostCBN('get_topn_list',{'sid':sid} ,function(rdata){
+        var filter_db = $('#filter_db').is(':checked');
+        myPostCBN('get_topn_list',{'sid':sid,'filter_db':filter_db ? 'yes':'no'} ,function(rdata){
             var data = rdata.data;
             if (data['status']){
                 var items = data.data;
@@ -311,6 +312,13 @@ function mysqlCommonFuncMysqlNSQL(){
                     <div class="ssh-item">\
                         <input class="btswitch btswitch-ios" id="real_time_monitoring" type="checkbox">\
                         <label id="real_time_label" class="btswitch-btn" for="real_time_monitoring"></label>\
+                    </div>\
+                </div>\
+                <div class="ss-text pull-left" style="padding-left:10px;">\
+                    <em>过滤数据库</em>\
+                    <div class="ssh-item">\
+                        <input class="btswitch btswitch-ios" id="filter_db" type="checkbox">\
+                        <label class="btswitch-btn" for="filter_db"></label>\
                     </div>\
                 </div>\
             </div>\
