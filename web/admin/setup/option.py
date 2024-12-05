@@ -16,7 +16,7 @@ import core.mw as mw
 import thisdb
 
 def init_option():
-    thisdb.setOption('title', '后羿面板')
+    thisdb.setOption('title', '夸父面板')
     thisdb.setOption('recycle_bin', 'open')
     thisdb.setOption('template', 'default')
 
