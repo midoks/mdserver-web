@@ -10,8 +10,6 @@
 
 import json
 
-from flask import request
-
 import core.mw as mw
 import thisdb
 
