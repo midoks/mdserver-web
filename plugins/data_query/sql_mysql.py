@@ -358,7 +358,7 @@ class nosqlMySQLCtr():
             return mw.returnData(False, msg)
 
         my_instance.execute("SET @sys.statement_truncate_len=4096")
-        data = my_instance.query("select query,db,last_seen,exec_count,max_latency,avg_latency from sys.statement_analysis order by exec_count desc, last_seen desc limit 10")
+        data = my_instance.query("select query,db,last_seen,exec_count,max_latency,avg_latency from sys.statement_analysis order by exec_count desc, last_seen desc limit 20")
         if data is None:
             return mw.returnData(False, "查询失败!")
         return mw.returnData(True, 'ok', data)
