@@ -154,7 +154,7 @@ def initdUinstall():
 def runLog():
     path = getConf()
     content = mw.readFile(path)
-    rep = 'log\s*=\s*(.*)'
+    rep = r'log\s*=\s*(.*)'
     tmp = re.search(rep, content)
     return tmp.groups()[0]
 

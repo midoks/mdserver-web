@@ -307,7 +307,7 @@ def getPhpConf(version):
     phpini = mw.readFile(getConf(version))
     result = []
     for g in gets:
-        rep = g['name'] + '\s*=\s*([0-9A-Za-z_& ~]+)(\s*;?|\r?\n)'
+        rep = g['name'] + r'\s*=\s*([0-9A-Za-z_& ~]+)(\s*;?|\r?\n)'
         tmp = re.search(rep, phpini)
         if not tmp:
             continue
@@ -326,7 +326,7 @@ def submitPhpConf(version):
     phpini = mw.readFile(filename)
     for g in gets:
         if g in args:
-            rep = g + '\s*=\s*(.+)\r?\n'
+            rep = g + r'\s*=\s*(.+)\r?\n'
             val = g + ' = ' + args[g] + '\n'
             phpini = re.sub(rep, val, phpini)
     mw.writeFile(filename, phpini)

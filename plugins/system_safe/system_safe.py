@@ -578,7 +578,7 @@ class App:
 
     # 转换时间格式
     def __to_date(self, date_str):
-        tmp = re.split('\s+', date_str)
+        tmp = re.split(r'\s+', date_str)
         s_date = str(datetime.now().year) + '-' + \
             self.__months.get(tmp[0]) + '-' + tmp[1] + ' ' + tmp[2]
         time_array = time.strptime(s_date, "%Y-%m-%d %H:%M:%S")
