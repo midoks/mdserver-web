@@ -60,6 +60,15 @@ def check_exists_files():
             data.append(tmp)
     return mw.returnData(True, 'ok', data)
 
+
+# 粘贴内容
+@blueprint.route('/batch_paste', endpoint='batch_paste', methods=['POST'])
+@panel_login_required
+def batch_paste():
+    path = request.form.get('path', '')
+    stype = request.form.get('type', '')
+    return file.batchPaste(path, stype)
+
 # 获取文件内容
 @blueprint.route('/copy_file', endpoint='copy_file', methods=['POST'])
 @panel_login_required

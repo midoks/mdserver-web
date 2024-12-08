@@ -200,6 +200,54 @@ def setBatchData(path, stype, access, user, data):
         mw.writeLog('文件管理', '批量删除成功!')
         return mw.returnData(True, '批量删除成功！')
 
+def batchPaste(path, stype):
+    from admin import session
+    if not checkDir(path):
+        return mw.returnData(False, '请不要花样作死!')
+    i = 0
+    myfiles = json.loads(session['selected']['data'])
+    l = len(myfiles)
+    if stype == '1':
+        for key in myfiles:
+            i += 1
+            mw.writeSpeed(key, i, l)
+            try:
+
+                sfile = session['selected'][
+                    'path'] + '/' + key
+                dfile = path + '/' + key
+
+                if os.path.isdir(sfile):
+                    shutil.copytree(sfile, dfile)
+                else:
+                    shutil.copyfile(sfile, dfile)
+                stat = os.stat(sfile)
+                os.chown(dfile, stat.st_uid, stat.st_gid)
+            except:
+                continue
+        msg = mw.getInfo('从[{1}]批量复制到[{2}]成功',(session['selected']['path'], path,))
+        mw.writeLog('文件管理', msg)
+    else:
+        for key in myfiles:
+            try:
+                i += 1
+                mw.writeSpeed(key, i, l)
+
+                sfile = session['selected'][
+                    'path'] + '/' + key
+                dfile = path + '/' + key
+
+                shutil.move(sfile, dfile)
+            except:
+                continue
+        msg = mw.getInfo('从[{1}]批量移动到[{2}]成功',(session['selected']['path'], path,))
+        mw.writeLog('文件管理', msg)
+    mw.writeSpeed(None, 0, 0)
+    errorCount = len(myfiles) - i
+    del(session['selected'])
+    msg = mw.getInfo('批量操作成功[{1}],失败[{2}]', (str(i), str(errorCount)))
+    return mw.returnData(True, msg)
+
 
 def copyDir(src_file, dst_file):
     if not os.path.exists(src_file):
