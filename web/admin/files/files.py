@@ -69,7 +69,17 @@ def batch_paste():
     stype = request.form.get('type', '')
     return file.batchPaste(path, stype)
 
-# 获取文件内容
+# 压缩文件
+@blueprint.route('/zip', endpoint='zip', methods=['POST'])
+@panel_login_required
+def zip():
+    sfile = request.form.get('sfile', '')
+    dfile = request.form.get('dfile', '')
+    stype = request.form.get('type', '')
+    path = request.form.get('path', '')
+    return file.zip(sfile, dfile, stype, path)
+
+# 复制文件内容
 @blueprint.route('/copy_file', endpoint='copy_file', methods=['POST'])
 @panel_login_required
 def copy_file():

@@ -249,6 +249,51 @@ def batchPaste(path, stype):
     return mw.returnData(True, msg)
 
 
+def zip(sfile, dfile, stype, path):
+    if sfile.find(',') == -1:
+        if not os.path.exists(path + '/' + sfile):
+            return mw.returnData(False, '指定文件不存在!')
+
+    try:
+        tmps = mw.getPanelDir() + '/logs/panel_exec.log'
+        if stype == 'zip':
+            mw.execShell("cd '" + path + "' && zip '" + dfile +
+                         "' -r '" + sfile + "' > " + tmps + " 2>&1")
+        else:
+            sfiles = ''
+            for sfile in sfile.split(','):
+                if not sfile:
+                    continue
+                sfiles += " '" + sfile + "'"
+            mw.execShell("cd '" + path + "' && tar -zcvf '" + dfile + "' " + sfiles + " > " + tmps + " 2>&1")
+        setFileAccept(dfile)
+        mw.writeLog("文件管理", '文件[{1}]压缩[{2}]成功!', (sfile, dfile))
+        return mw.returnData(True, '文件压缩成功!')
+    except:
+        return mw.returnData(False, '文件压缩失败!')
+
+def unzip(sfile, dfile, stype, path):
+    if not os.path.exists(sfile):
+        return mw.returnData(False, '指定文件不存在!')
+
+    try:
+        tmps = mw.getPanelDir() + '/logs/panel_exec.log'
+        if stype == 'zip':
+            mw.execShell("cd " + path + " && unzip -o -d '" + dfile + "' '" + sfile + "' > " + tmps + " 2>&1 &")
+        else:
+            sfiles = ''
+            for sfile in sfile.split(','):
+                if not sfile:
+                    continue
+                sfiles += " '" + sfile + "'"
+            mw.execShell("cd " + path + " && tar -zxvf " + sfiles + " -C " + dfile + " > " + tmps + " 2>&1 &")
+
+        setFileAccept(dfile)
+        mw.writeLog("文件管理", '文件[{1}]解压[{2}]成功!', (sfile, dfile))
+        return mw.returnData(True, '文件解压成功!')
+    except:
+        return mw.returnData(False, '文件解压失败!')
+
 def copyDir(src_file, dst_file):
     if not os.path.exists(src_file):
         return mw.returnData(False, '指定目录不存在!')
