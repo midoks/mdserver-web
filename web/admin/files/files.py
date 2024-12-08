@@ -10,6 +10,7 @@
 
 import os
 import time
+import json
 
 from flask import Blueprint, render_template
 from flask import request
@@ -37,8 +38,6 @@ def index():
 @blueprint.route('/check_exists_files', endpoint='check_exists_files', methods=['POST'])
 @panel_login_required
 def check_exists_files():
-    from admin import session
-    
     dfile = request.form.get('dfile', '')
     filename = request.form.get('filename', '')
     data = []
