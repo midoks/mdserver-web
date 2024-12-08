@@ -106,7 +106,7 @@ def runPanelTask():
             if thisdb.getTaskUnexecutedCount() < 1:
                 os.remove(lock_file)
     except Exception as e:
-        pass
+        print('runPanelTask:',mw.getTracebackInfo())
 
 # 网站到期处理
 def siteEdateCheck():
@@ -122,7 +122,7 @@ def siteEdateCheck():
             MwSites.instance().stop(site['id'])
         thisdb.setOption('website_edate', now_time_ymd)
     except Exception as e:
-        pass
+        print('siteEdateCheck:',mw.getTracebackInfo())
 
 # 任务队列
 def startPanelTask():
@@ -131,6 +131,7 @@ def startPanelTask():
             runPanelTask()
             time.sleep(5)
     except Exception as e:
+        print('startPanelTask:',mw.getTracebackInfo())
         time.sleep(30)
         startPanelTask()
 
@@ -142,8 +143,25 @@ def systemTask():
             monitor.instance().run()
             time.sleep(5)
     except Exception as ex:
+        print('systemTask:',mw.getTracebackInfo())
         time.sleep(30)
         systemTask()
+
+
+def panelPluginStatusCheck():
+    # 系统监控任务
+    from  utils.plugin import plugin
+    try:
+        while True:
+            start_t = time.time()
+            plugin.instance().autoCachePluginStatus()
+            end_t = time.time()
+            print('cos:', end_t - start_t)
+            time.sleep(60)
+    except Exception as ex:
+        print('panelPluginStatusCheck:',mw.getTracebackInfo())
+        time.sleep(120)
+        panelPluginStatusCheck()
 
 # -------------------------------------- PHP监控 start --------------------------------------------- #
 # 502错误检查线程
@@ -226,7 +244,7 @@ def startPHPVersion(version):
         if os.path.exists(cgi):
             return True
     except Exception as e:
-        # print(mw.getTracebackInfo())
+        print('startPHPVersion:',mw.getTracebackInfo())
         mw.writeLog('PHP守护程序', '自动修复异常:'+str(e))
         return True
 
@@ -323,6 +341,11 @@ def run():
     oar = threading.Thread(target=openrestyAutoRestart)
     oar = setDaemon(oar)
     oar.start()
+
+    # Panel Plugin Status Check
+    pps = threading.Thread(target=panelPluginStatusCheck)
+    pps = setDaemon(pps)
+    pps.start()
 
     # Panel Restart Start
     rps = threading.Thread(target=restartPanelService)

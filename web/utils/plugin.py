@@ -80,6 +80,9 @@ class plugin(object):
     __plugin_dir = 'plugins'
     __tasks = None
 
+    __plugin_status_cachekey = 'plugin_list_status'
+    __plugin_status_data = None
+
     # lock
     _instance_lock = threading.Lock()
 
@@ -128,9 +131,7 @@ class plugin(object):
                 except Exception as e:
                     print('getIndexList:', mw.getTracebackInfo())
 
-        # 使用gevent模式时,无法使用多进程
-        # plist = self.checkStatusMProcess(plist)
-        plist = self.checkStatusMThreads(plist)
+        plist = self.checkStatusMThreadsByCache(plist)
         return mw.returnData(True, 'ok', plist)
 
     def init(self):
@@ -570,6 +571,77 @@ class plugin(object):
         else:
             return False
 
+    # 检查插件状态
+    def checkStatusThreadsByCache(self, info, i):
+        # 初始化db
+        if not info['setup']:
+            return False
+
+        plugin_list_status = self.__plugin_status_data
+        cache_field = info['name']
+        if plugin_list_status is not None:
+            if cache_field in plugin_list_status:
+
+                print(cache_field,plugin_list_status[cache_field])
+                if plugin_list_status[cache_field]:
+                    return True
+                else: 
+                    return False
+
+        data = self.run(info['name'], 'status', info['setup_version'])
+        if data[0] == 'start':
+            return True
+        else:
+            return False
+
+    # 多线程检查插件状态[cache]
+    def checkStatusMThreadsByCache(self, info):
+        try:
+            self.__plugin_status_data = thisdb.getOptionByJson(self.__plugin_status_cachekey, default=None)
+            threads = []
+            ntmp_list = range(len(info))
+            for i in ntmp_list:
+                t = pg_thread(self.checkStatusThreadsByCache,(info[i], i))
+                threads.append(t)
+
+            for i in ntmp_list:
+                threads[i].start()
+            for i in ntmp_list:
+                threads[i].join()
+
+            for i in ntmp_list:
+                t = threads[i].getResult()
+                k = info[i]['name']
+                self.__plugin_status_data[k] = t
+                info[i]['status'] = t
+
+            thisdb.setOption(self.__plugin_status_cachekey, json.dumps(self.__plugin_status_data))
+        except Exception as e:
+            print(mw.getTracebackInfo())
+            print('checkStatusMThreadsByCache:', str(e))
+        return info
+
+    def autoCachePluginStatus(self):
+        info = []
+        for name in os.listdir(self.__plugin_dir):
+            if name.startswith('.'):
+                continue
+            t = self.getPluginList(name)
+            for index in range(len(t)):
+                info.append(t[index])
+
+        self.__plugin_status_data = {}
+        for x in info:
+            if not x['setup']:
+                continue
+            data = self.run(x['name'], 'status', x['setup_version'])
+            if data[0].strip() == 'start':
+                self.__plugin_status_data[x['name']] = True
+            else:
+                self.__plugin_status_data[x['name']] = False
+        thisdb.setOption(self.__plugin_status_cachekey, json.dumps(self.__plugin_status_data))
+        return True
+
     # 多线程检查插件状态
     def checkStatusMThreads(self, info):
         try:
@@ -600,7 +672,6 @@ class plugin(object):
         size = 10, 
     ):
         info = []
-
         # print(mw.getPluginDir())
         for name in os.listdir(self.__plugin_dir):
             if name.startswith('.'):
@@ -614,8 +685,7 @@ class plugin(object):
         _info = info[start:end]
 
         # print(info)
-
-        _info = self.checkStatusMThreads(_info)
+        _info = self.checkStatusMThreadsByCache(_info)
         return (_info, len(info))
 
     def getList(
@@ -625,11 +695,13 @@ class plugin(object):
         page = 1, 
         size  = 10, 
     ) -> object:
+        '''
         # print(type,keyword,page,size)
+        '''
         rdata = {}
         rdata['type'] = self.def_plugin_type
     
-        data = self.getAllPluginList(type,keyword, page, size)
+        data = self.getAllPluginList(type, keyword, page, size)
         rdata['data'] = data[0]
         rdata['list'] = mw.getPage({'count':data[1],'p':page,'tojs':'getSList','row':size})
         return rdata
@@ -704,13 +776,28 @@ class plugin(object):
         mw.execShell("rm -rf " + plugin_path)
         return mw.returnData(False, '安装失败!')
 
+    # 缓存[start|stop|status]
+    def runByCache(self, name, func, data):
+        ppos = mw.getServerDir()+'/'+name
+        if not os.path.exists(ppos):
+            return
+
+        
+        plugin_list_status = thisdb.getOptionByJson(self.__plugin_status_cachekey, default={})
+
+        print("plugin_list_status",plugin_list_status)
+        if name in plugin_list_status:
+            print("run op1:",plugin_list_status)
+            del(plugin_list_status[name])
+            print("run op2:",plugin_list_status)
+            thisdb.setOption(self.__plugin_status_cachekey, json.dumps(plugin_list_status))
+
     # shell/bash方式调用
     def run(self, name, func,
         version = '',
         args  = '',
         script  = 'index',
     ):
-
         path = self.__plugin_dir + '/' + name + '/' + script + '.py'
         if not os.path.exists(path):
             path = self.__plugin_dir + '/' + name + '/' + name + '.py'
@@ -725,6 +812,11 @@ class plugin(object):
             return ('', '')
         py_cmd = 'cd ' + mw.getPanelDir() + " && "+ py_cmd
         data = mw.execShell(py_cmd)
+
+        if mw.inArray(['start','stop'], func):
+            print('dddddrun',func)
+            self.runByCache(name,func, data[0].strip())
+
         # print(data)
         if mw.isDebugMode():
             print('run:', py_cmd)
@@ -737,26 +829,22 @@ class plugin(object):
         args = '',
         script = 'index',
     ):
-
         package = self.__plugin_dir + '/' + name
         if not os.path.exists(package):
             return (False, "插件不存在!")
         if not package in sys.path:
             sys.path.append(package)
 
-        eval_str = "__import__('" + script + "')." + func + '(' + args + ')'
-
+        cmd = "__import__('" + script + "')." + func + '(' + args + ')'
         if mw.isDebugMode():
-            print('callback', eval_str)
+            print('callback', cmd)
 
         data = None
         try:
-            data = eval(eval_str)
+            data = eval(cmd)
         except Exception as e:
             print(mw.getTracebackInfo())
-            return (False, mw.getTracebackInfo())
-        
-        
+            return (False, mw.getTracebackInfo())        
         return (True, data)
 
 
