@@ -107,8 +107,7 @@ def restart():
 @blueprint.route('/restart_server', endpoint='restart_server', methods=['POST'])
 @panel_login_required
 def restart_server():
-    mw.restartServer()
-    return mw.returnData(True, '面板已重启!')
+    return mw.restartServer()
 
 # 设置
 @blueprint.route('/set_control', endpoint='set_control', methods=['POST'])
