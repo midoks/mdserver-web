@@ -141,6 +141,7 @@ def uncompress(sfile, dfile, path):
         return mw.returnData(False, '文件解压失败!:' + str(e))
 
 def setBatchData(path, stype, access, user, data):
+    from admin import session
     if stype == '1' or stype == '2':
         session['selected'] = {
             'path': path,
@@ -154,7 +155,7 @@ def setBatchData(path, stype, access, user, data):
         for key in json.loads(data):
             try:
                 filename = path + '/' + key
-                if not self.checkDir(filename):
+                if not checkDir(filename):
                     return mw.returnData(False, 'FILE_DANGER')
                 os.system('chmod -R ' + access + " '" + filename + "'")
                 os.system('chown -R ' + user + ':' + user + " '" + filename + "'")
