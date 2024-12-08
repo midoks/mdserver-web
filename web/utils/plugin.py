@@ -581,7 +581,6 @@ class plugin(object):
         cache_field = info['name']
         if plugin_list_status is not None:
             if cache_field in plugin_list_status:
-                # print(cache_field,plugin_list_status[cache_field])
                 if plugin_list_status[cache_field]:
                     return True
                 else: 
