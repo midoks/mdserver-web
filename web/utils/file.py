@@ -294,6 +294,17 @@ def unzip(sfile, dfile, stype, path):
     except:
         return mw.returnData(False, '文件解压失败!')
 
+def getAccess(filename):
+    data = {}
+    try:
+        stat = os.stat(filename)
+        data['chmod'] = str(oct(stat.st_mode)[-3:])
+        data['chown'] = pwd.getpwuid(stat.st_uid).pw_name
+    except:
+        data['chmod'] = 755
+        data['chown'] = 'www'
+    return data
+
 def copyDir(src_file, dst_file):
     if not os.path.exists(src_file):
         return mw.returnData(False, '指定目录不存在!')
@@ -648,6 +659,20 @@ def getAccess(fname):
         data['chmod'] = 755
         data['chown'] = 'www'
     return data
+
+def getSysUserList():
+    pwd_file = '/etc/passwd'
+    if os.path.exists(pwd_file):
+        content = mw.readFile(pwd_file)
+        clist = content.split('\n')
+        sys_users = []
+        for line in clist:
+            if line.find(":")<0:
+                continue
+            lines = line.split(":",1)
+            sys_users.append(lines[0])
+        return sys_users
+    return ['root','mysql','www']
 
 def fileDelete(path):
     if not os.path.exists(path):

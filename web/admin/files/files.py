@@ -79,6 +79,15 @@ def zip():
     path = request.form.get('path', '')
     return file.zip(sfile, dfile, stype, path)
 
+# 文件权限查看
+@blueprint.route('/file_access', endpoint='file_access', methods=['POST'])
+@panel_login_required
+def file_access():
+    filename = request.form.get('filename', '')
+    data = file.getAccess(filename)
+    data['sys_users'] = file.getSysUserList()
+    return data
+
 # 复制文件内容
 @blueprint.route('/copy_file', endpoint='copy_file', methods=['POST'])
 @panel_login_required
