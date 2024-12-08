@@ -660,6 +660,23 @@ def getAccess(fname):
         data['chown'] = 'www'
     return data
 
+def setFileAccess(filename,user,access):
+    sall = '-R'
+    try:
+        if not self.checkDir(filename):
+            return mw.returnData(False, '请不要花样作死')
+
+        if not os.path.exists(filename):
+            return mw.returnData(False, '指定文件不存在!')
+
+        os.system('chmod ' + sall + ' ' + access + " '" + filename + "'")
+        os.system('chown ' + sall + ' ' + user + ':' + user + " '" + filename + "'")
+        msg = mw.getInfo('设置[{1}]权限为[{2}]所有者为[{3}]', (filename, access, user,))
+        mw.writeLog('文件管理', msg)
+        return mw.returnData(True, '设置成功!')
+    except:
+        return mw.returnData(False, '设置失败!')
+
 def getSysUserList():
     pwd_file = '/etc/passwd'
     if os.path.exists(pwd_file):

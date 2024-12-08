@@ -88,6 +88,19 @@ def file_access():
     data['sys_users'] = file.getSysUserList()
     return data
 
+# 设置权限
+@blueprint.route('/set_file_access', endpoint='set_file_access', methods=['POST'])
+@panel_login_required
+def set_file_access():
+    if mw.isAppleSystem():
+        return mw.returnData(True, '开发机不设置!')
+
+    filename = request.form.get('filename', '')
+    user = request.form.get('user', '')
+    access = request.form.get('access', '755')
+    return file.setFileAccess(filename, user, access)
+
+
 # 复制文件内容
 @blueprint.route('/copy_file', endpoint='copy_file', methods=['POST'])
 @panel_login_required
