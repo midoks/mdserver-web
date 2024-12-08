@@ -663,7 +663,7 @@ def getAccess(fname):
 def setFileAccess(filename,user,access):
     sall = '-R'
     try:
-        if not self.checkDir(filename):
+        if not checkDir(filename):
             return mw.returnData(False, '请不要花样作死')
 
         if not os.path.exists(filename):
@@ -674,8 +674,8 @@ def setFileAccess(filename,user,access):
         msg = mw.getInfo('设置[{1}]权限为[{2}]所有者为[{3}]', (filename, access, user,))
         mw.writeLog('文件管理', msg)
         return mw.returnData(True, '设置成功!')
-    except:
-        return mw.returnData(False, '设置失败!')
+    except Exception as e:
+        return mw.returnData(False, '设置失败!'+str(e))
 
 def getSysUserList():
     pwd_file = '/etc/passwd'
