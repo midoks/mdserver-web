@@ -33,6 +33,16 @@ def restartServer():
     mw.execShell("sync && init 6 &")
     return mw.returnData(True, '命令发送成功!')
 
+def getPid(self, pname):
+    try:
+        pids = psutil.pids()
+        for pid in pids:
+            if psutil.Process(pid).name() == pname:
+                return True
+        return False
+    except:
+        return False
+
 def getEnvInfo():
     data = {}
     data['status'] = True
