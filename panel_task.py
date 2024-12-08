@@ -156,7 +156,6 @@ def panelPluginStatusCheck():
             start_t = time.time()
             plugin.instance().autoCachePluginStatus()
             end_t = time.time()
-            print('cos:', end_t - start_t)
             time.sleep(60)
     except Exception as ex:
         print('panelPluginStatusCheck:',mw.getTracebackInfo())
