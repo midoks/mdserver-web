@@ -108,7 +108,7 @@ def restart():
 @panel_login_required
 def restart_server():
     if mw.isAppleSystem():
-        return mw.returnData(False, "开发环境不可重起")
+        return mw.returnData(False, "开发环境不可重起!")
     sys.restartServer()
     return mw.returnData(True, '正在重启服务器!')
 
