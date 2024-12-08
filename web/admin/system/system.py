@@ -107,7 +107,10 @@ def restart():
 @blueprint.route('/restart_server', endpoint='restart_server', methods=['POST'])
 @panel_login_required
 def restart_server():
-    return sys.restartServer()
+    if mw.isAppleSystem():
+        return mw.returnData(False, "开发环境不可重起")
+    sys.restartServer()
+    return mw.returnData(True, '正在重启服务器!')
 
 # 设置
 @blueprint.route('/set_control', endpoint='set_control', methods=['POST'])
