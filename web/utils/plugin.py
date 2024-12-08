@@ -581,8 +581,7 @@ class plugin(object):
         cache_field = info['name']
         if plugin_list_status is not None:
             if cache_field in plugin_list_status:
-
-                print(cache_field,plugin_list_status[cache_field])
+                # print(cache_field,plugin_list_status[cache_field])
                 if plugin_list_status[cache_field]:
                     return True
                 else: 
@@ -776,21 +775,15 @@ class plugin(object):
         mw.execShell("rm -rf " + plugin_path)
         return mw.returnData(False, '安装失败!')
 
-    # 缓存[start|stop|status]
+    # [start|stop]操作,删除缓存!
     def runByCache(self, name, func, data):
         ppos = mw.getServerDir()+'/'+name
         if not os.path.exists(ppos):
             return
-
-        
-        plugin_list_status = thisdb.getOptionByJson(self.__plugin_status_cachekey, default={})
-
-        print("plugin_list_status",plugin_list_status)
-        if name in plugin_list_status:
-            print("run op1:",plugin_list_status)
-            del(plugin_list_status[name])
-            print("run op2:",plugin_list_status)
-            thisdb.setOption(self.__plugin_status_cachekey, json.dumps(plugin_list_status))
+        data = thisdb.getOptionByJson(self.__plugin_status_cachekey, default={})
+        if name in data:
+            del(data[name])
+            thisdb.setOption(self.__plugin_status_cachekey, json.dumps(data))
 
     # shell/bash方式调用
     def run(self, name, func,
