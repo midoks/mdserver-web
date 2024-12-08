@@ -17,6 +17,22 @@ import psutil
 
 import core.mw as mw
 
+from threading import Thread
+from time import sleep
+
+def mw_async(f):
+    def wrapper(*args, **kwargs):
+        thr = Thread(target=f, args=args, kwargs=kwargs)
+        thr.start()
+    return wrapper
+
+@mw_async
+def restartServer():
+    if not mw.isRestart():
+        return mw.returnData(False, '请等待所有安装任务完成再执行!')
+    mw.execShell("sync && init 6 &")
+    return mw.returnData(True, '命令发送成功!')
+
 def getEnvInfo():
     data = {}
     data['status'] = True
