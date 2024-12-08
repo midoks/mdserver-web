@@ -418,13 +418,13 @@ class plugin(object):
             data_t = data.copy()
             data_t['title'] = data_t['title'] + '-' + data['versions'][index]
             data_t['versions'] = data['versions'][index]
-            pg = self.getPluginInfo(data_t)
+            pg = self.makePluginInfo(data_t)
             plugins_info.append(pg)
 
         return plugins_info
 
     # 构造插件基本信息
-    def getPluginInfo(self, info):
+    def makePluginInfo(self, info):
         checks = ''
         path = ''
         coexist = False
@@ -502,7 +502,7 @@ class plugin(object):
             for index in range(len(data_t)):
                 plugins.append(data_t[index])
         else:
-            pg = self.getPluginInfo(data)
+            pg = self.makePluginInfo(data)
             plugins.append(pg)
         return plugins
 
@@ -514,7 +514,7 @@ class plugin(object):
                 if data_t[index]['setup']:
                     plugins.append(data_t[index])
         else:
-            pg = self.getPluginInfo(data)
+            pg = self.makePluginInfo(data)
             if pg['setup']:
                 plugins.append(pg)
         return plugins
@@ -536,30 +536,35 @@ class plugin(object):
             return self.makeCoexistDataInstalled(data)
         return plugins_t
 
+    def getPluginInfo(self, name):
+        info = {}
+        path = self.__plugin_dir + '/' + name
+        info_path = path + '/info.json'
+        if not os.path.exists(info_path):
+            return info
+        try:
+            data = json.loads(mw.readFile(info_path))
+            return data
+        except Exception as e:
+            return info
 
     def getPluginList(self, name,
         keyword = None,
         type = None,
     ):
-        info = []
-        path = self.__plugin_dir + '/' + name
-        info_path = path + '/info.json'
-        if not os.path.exists(info_path):
-            return info
-
-        try:
-            data = json.loads(mw.readFile(info_path))
-        except Exception as e:
-            return info
+        infos = []
+        data = self.getPluginInfo(name)
+        if data is None or len(data) == 0:
+            return infos
         
         # 判断是否搜索
         if keyword != '' and not self.searchKey(data, keyword):
-            return info
+            return infos
 
         plugin_t = self.makeCoexistList(data, type)
         for index in range(len(plugin_t)):
-            info.append(plugin_t[index])
-        return info
+            infos.append(plugin_t[index])
+        return infos
 
     # 检查插件状态
     def checkStatusThreads(self, info, i):
@@ -578,10 +583,13 @@ class plugin(object):
             return False
 
         plugin_list_status = self.__plugin_status_data
-        cache_field = info['name']
         if plugin_list_status is not None:
-            if cache_field in plugin_list_status:
-                if plugin_list_status[cache_field]:
+            k = info['name']
+            if 'coexist' in info and info['coexist']:
+                k = info['title']
+            # print(k)
+            if k in plugin_list_status:
+                if plugin_list_status[k]:
                     return True
                 else: 
                     return False
@@ -633,10 +641,13 @@ class plugin(object):
             if not x['setup']:
                 continue
             data = self.run(x['name'], 'status', x['setup_version'])
+            k = x['name']
+            if 'coexist' in x and x['coexist']:
+                k = x['title']
             if data[0].strip() == 'start':
-                self.__plugin_status_data[x['name']] = True
+                self.__plugin_status_data[k] = True
             else:
-                self.__plugin_status_data[x['name']] = False
+                self.__plugin_status_data[k] = False
         thisdb.setOption(self.__plugin_status_cachekey, json.dumps(self.__plugin_status_data))
         return True
 
@@ -670,7 +681,6 @@ class plugin(object):
         size = 10, 
     ):
         info = []
-        # print(mw.getPluginDir())
         for name in os.listdir(self.__plugin_dir):
             if name.startswith('.'):
                 continue
@@ -680,11 +690,10 @@ class plugin(object):
 
         start = (page - 1) * size
         end = start + size
-        _info = info[start:end]
+        x = info[start:end]
 
-        # print(info)
-        _info = self.checkStatusMThreadsByCache(_info)
-        return (_info, len(info))
+        x = self.checkStatusMThreadsByCache(x)
+        return (x, len(info))
 
     def getList(
         self,
@@ -775,13 +784,16 @@ class plugin(object):
         return mw.returnData(False, '安装失败!')
 
     # [start|stop]操作,删除缓存!
-    def runByCache(self, name, func, data):
+    def runByCache(self, name, func, version):
         ppos = mw.getServerDir()+'/'+name
         if not os.path.exists(ppos):
             return
         data = thisdb.getOptionByJson(self.__plugin_status_cachekey, default={})
+        info = self.getPluginInfo(name)
+        if 'coexist' in info and info['coexist']:
+            name = info['title'] + '-'+ version
         if name in data:
-            del(data[name])
+            del(data[name])            
             thisdb.setOption(self.__plugin_status_cachekey, json.dumps(data))
 
     # shell/bash方式调用
@@ -806,8 +818,7 @@ class plugin(object):
         data = mw.execShell(py_cmd)
 
         if mw.inArray(['start','stop'], func):
-            print('dddddrun',func)
-            self.runByCache(name,func, data[0].strip())
+            self.runByCache(name, func, version)
 
         # print(data)
         if mw.isDebugMode():
