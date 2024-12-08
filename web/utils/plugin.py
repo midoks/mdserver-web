@@ -566,7 +566,7 @@ class plugin(object):
         if not info['setup']:
             return False
         data = self.run(info['name'], 'status', info['setup_version'])
-        if data[0] == 'start':
+        if data[0].strip() == 'start':
             return True
         else:
             return False
