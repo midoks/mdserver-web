@@ -884,7 +884,8 @@ function mysqlRunMysqlTab(name){
 
 // ------------------------- mysql start -------------------------------
 function mysqlGetSid(){
-    return 0;
+    return $('#mysql select[name=sid]').val();
+    // return 0;
 }
 
 function mysqlGetDbName(){
