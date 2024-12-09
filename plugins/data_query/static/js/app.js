@@ -251,6 +251,7 @@ function initTabMySQL(){
     mysqlGetDbList();
 
     mysqlProcessList();
+    clearInterval(mysql_timer);
     var mysql_timer = setInterval(function(){
         var name = $('#mysql_list_tab .tab-nav span.on').data('name');
         mysqlRunMysqlTab(name);
@@ -261,7 +262,7 @@ function initTabMySQL(){
         }
     },2000);
 
-    $('#mysql_list_tab .tab-nav span').click(function(){
+    $('#mysql_list_tab .tab-nav span').unbind('click').click(function(){
         $('#mysql_list_tab .tab-nav span').removeClass('on');
         $(this).addClass('on');
         var name = $(this).data('name');
