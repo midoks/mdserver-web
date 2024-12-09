@@ -1410,8 +1410,9 @@ function getReloads() {
 		return
 	}
 	if(speed) {return;}
-	speed = setInterval(function() {
-		var mm = $(".bt-w-menu .bgw").html()
+
+	function renderRunTask(){
+		var mm = $(".bt-w-menu .bgw").html();
 		if(mm == undefined || mm.indexOf(lan.bt.task_list) == -1) {
 			clearInterval(speed);
 			speed = null;
@@ -1421,6 +1422,7 @@ function getReloads() {
 		a++;
 		$.post('/task/get_task_speed', '', function(h) {
 			if(h.task == undefined) {
+				$(".task_count").text(0);
 				$(".cmdlist").html('当前没有任务!');
 				return;
 			}
@@ -1470,7 +1472,12 @@ function getReloads() {
 				return;
 			}
 		},'json').error(function(){});
-	}, 3000);
+	}
+
+	renderRunTask();
+	speed = setInterval(function() {
+		renderRunTask();
+	}, 2000);
 }
 
 //检查选中项
@@ -1496,42 +1503,9 @@ function tasklist(a){
 	$(".taskcon").html(con);
 	a = a == undefined ? 1 : a;
 	$.post("/task/list", "tojs=getTaskList&table=tasks&limit=10&p=" + a, function(g) {
-		var e = "";
-		var b = "";
-		var c = "";
-		var f = false;
-		for(var d = 0; d < g.data.length; d++) {
-			switch(g.data[d].status) {
-				case "-1":
-					f = true;
-					if(g.data[d].type != "download") {
-						b = "<li>\
-							<span class='titlename'>" + g.data[d].name + "</span>\
-							<span class='state pull-right c6'>正在安装<img src='/static/img/ing.gif'> | <a class='btlink' href=\"javascript:removeTask(" + g.data[d].id + ")\">关闭</a></span>\
-							<span class='opencmd'></span><pre class='cmd'></pre>\
-						</li>";
-					} else {
-						b = "<li>\
-							<div class='line-progress' style='width:0%'></div><span class='titlename'>" + g.data[d].name + "<a id='speed' style='margin-left:130px;'>0.0M/12.5M</a></span>\
-							<span class='com-progress'>0%</span><span class='state'>下载中 <img src='/static/img/ing.gif'> | <a href=\"javascript:removeTask(" + g.data[d].id + ")\">关闭</a></span>\
-						</li>";
-					}
-					break;
-				case "0":
-					c += "<li>\
-						<span class='titlename'>" + g.data[d].name + "</span>\
-						<span class='state pull-right c6'>等待</span> | <a href=\"javascript:removeTask(" + g.data[d].id + ")\" class='btlink'>删除</a>\
-					</li>";
-					break;
-			}
-		}
-		
-		
-		// $(".task_count").text(g.count);
-		$(".cmdlist").html(b + c);
-		getReloads();
-		return f
+		$('.msg_count').html(g.count);
 	},'json');
+	getReloads();
 }
 
 function activeDisk() {
