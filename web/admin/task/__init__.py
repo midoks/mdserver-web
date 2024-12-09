@@ -39,7 +39,7 @@ def list():
 @blueprint.route('/get_exec_log', endpoint='get_exec_log', methods=['POST'])
 @panel_login_required
 def get_exec_log():
-    file = mw.getPanelTaskLog()
+    file = mw.getPanelTaskExecLog()
     return mw.getLastLine(file, 100)
 
 
