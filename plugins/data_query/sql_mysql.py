@@ -80,9 +80,7 @@ class nosqlMySQL():
 
             mysql_pass = self.sqliteDb(sid, 'config').where('id=?', (1,)).getField('mysql_root')
             result['password'] = mysql_pass
-        
-            keys = ["bind_ip", "port"]
-
+            
             rep = r'port\s*=\s*(.*)'
             port_re = re.search(rep, mydb_content)
             if port_re:
