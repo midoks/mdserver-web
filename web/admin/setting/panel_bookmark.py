@@ -66,5 +66,23 @@ def del_panel_info():
     return mw.returnData(True, '删除成功!')
 
 
+# 设置面板域名
+@blueprint.route('/set_panel_info', endpoint='set_panel_info', methods=['POST'])
+@panel_login_required
+def set_panel_info():
+    title = request.form.get('title', '')
+    url = request.form.get('url', '')
+    username = request.form.get('username', '')
+    password = request.form.get('password', '')
+    panel_id = request.form.get('id', '')
+    # 校验是还是重复
+    isSave = mw.M('panel').where('(title=? OR url=?) AND id!=?', (title, url, panel_id)).count()
+    if isSave:
+        return mw.returnData(False, '备注或面板地址重复!')
 
+    # 更新到数据库
+    isRe = mw.M('panel').where('id=?', (panel_id,)).save('title,url,username,password', (title, url, username, password))
+    if isRe:
+        return mw.returnData(True, '修改成功!')
+    return mw.returnData(False, '修改失败!')
 
