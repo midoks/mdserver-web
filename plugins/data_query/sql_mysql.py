@@ -64,10 +64,10 @@ class nosqlMySQL():
             self.__DB_ERR = mw.get_error_info()
         return False
 
-    def sqliteDb(self, sid, dbname='databases'):
-        my_root_path = mw.getServerDir() +'/mysql'
+    def sqliteDb(self, db_pos_name, dbname='databases'):
+        mydb_path = mw.getServerDir() +'/'+db_pos_name
         name = 'mysql'
-        conn = mw.M(dbname).dbPos(my_root_path, name)
+        conn = mw.M(dbname).dbPos(mydb_path, name)
         return conn
 
     # 获取配置项
