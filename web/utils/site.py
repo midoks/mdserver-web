@@ -509,62 +509,62 @@ class sites(object):
     def setSslConf(self, site_name):
         file = self.getHostConf(site_name)
         conf = mw.readFile(file)
+        if not conf:
+            return mw.returnData(False, '站点[%s]配置异常!'.format(site_name))
 
         version = mw.getOpVer()
-
         keyPath = self.sslDir + '/' + site_name + '/privkey.pem'
         certPath = self.sslDir + '/' + site_name + '/fullchain.pem'
-        if conf:
-            if conf.find('ssl_certificate') == -1:
-                # ssl_ciphers ECDHE-RSA-AES128-GCM-SHA256:HIGH:!aNULL:!MD5:!RC4:!DHE;
-                # add_header Alt-Svc 'h3=":443";ma=86400,h3-29=":443";ma=86400';
-                http3Header = """
-    add_header Strict-Transport-Security "max-age=63072000";
-    add_header Alt-Svc 'h3=":443";ma=86400';
+
+        if conf.find('ssl_certificate') == -1:
+            # ssl_ciphers ECDHE-RSA-AES128-GCM-SHA256:HIGH:!aNULL:!MD5:!RC4:!DHE;
+            # add_header Alt-Svc 'h3=":443";ma=86400,h3-29=":443";ma=86400';
+            http3Header = """
+add_header Strict-Transport-Security "max-age=63072000";
+add_header Alt-Svc 'h3=":443";ma=86400';
 """
-                if not version.startswith('1.25') or version.startswith('1.27'):
-                    http3Header = '';
+            if not version.startswith('1.25') or version.startswith('1.27'):
+                http3Header = '';
 
-                sslStr = """#error_page 404/404.html;
-    ssl_certificate    %s;
-    ssl_certificate_key  %s;
-    ssl_protocols TLSv1 TLSv1.1 TLSv1.2 TLSv1.3;
-    ssl_ciphers ECDHE-ECDSA-AES128-GCM-SHA256:ECDHE-RSA-AES128-GCM-SHA256:ECDHE-ECDSA-AES256-GCM-SHA384:ECDHE-RSA-AES256-GCM-SHA384:ECDHE-ECDSA-CHACHA20-POLY1305:ECDHE-RSA-CHACHA20-POLY1305:DHE-RSA-AES128-GCM-SHA256:DHE-RSA-AES256-GCM-SHA384:DHE-RSA-CHACHA20-POLY1305;
-    ssl_prefer_server_ciphers on;
-    ssl_session_cache shared:SSL:10m;
-    ssl_session_timeout 10m;
-    %s
-    error_page 497  https://$host$request_uri;""" % (certPath, keyPath, http3Header)
-            if(conf.find('ssl_certificate') != -1):
-                return mw.returnData(True, 'SSL开启成功!')
+            sslStr = """#error_page 404/404.html;
+ssl_certificate    %s;
+ssl_certificate_key  %s;
+ssl_protocols TLSv1 TLSv1.1 TLSv1.2 TLSv1.3;
+ssl_ciphers ECDHE-ECDSA-AES128-GCM-SHA256:ECDHE-RSA-AES128-GCM-SHA256:ECDHE-ECDSA-AES256-GCM-SHA384:ECDHE-RSA-AES256-GCM-SHA384:ECDHE-ECDSA-CHACHA20-POLY1305:ECDHE-RSA-CHACHA20-POLY1305:DHE-RSA-AES128-GCM-SHA256:DHE-RSA-AES256-GCM-SHA384:DHE-RSA-CHACHA20-POLY1305;
+ssl_prefer_server_ciphers on;
+ssl_session_cache shared:SSL:10m;
+ssl_session_timeout 10m;
+%s
+error_page 497  https://$host$request_uri;""" % (certPath, keyPath, http3Header)
+        if(conf.find('ssl_certificate') != -1):
+            return mw.returnData(True, 'SSL开启成功!')
 
-            conf = conf.replace('#error_page 404/404.html;', sslStr)
+        conf = conf.replace('#error_page 404/404.html;', sslStr)
 
-            rep = r"listen\s+([0-9]+)\s*[default_server|reuseport]*;"
-            tmp = re.findall(rep, conf)
-            if not mw.inArray(tmp, '443'):
-                listen = re.search(rep, conf).group()
-                
-                if version.startswith('1.25') or version.startswith('1.27'):
-                    http_ssl = "\n\tlisten 443 ssl;"
-                    http_ssl = http_ssl + "\n\tlisten [::]:443 ssl;"
-                    http_ssl = http_ssl + "\n\thttp2 on;"
-                else:
-                    http_ssl = "\n\tlisten 443 ssl;"
-                    http_ssl = http_ssl + "\n\tlisten [::]:443 ssl;"
+        rep = r"listen\s+([0-9]+)\s*[default_server|reuseport]*;"
+        tmp = re.findall(rep, conf)
+        if not mw.inArray(tmp, '443'):
+            listen = re.search(rep, conf).group()
+            
+            if version.startswith('1.25') or version.startswith('1.27'):
+                http_ssl = "\n\tlisten 443 ssl;"
+                http_ssl = http_ssl + "\n\tlisten [::]:443 ssl;"
+                http_ssl = http_ssl + "\n\thttp2 on;"
+            else:
+                http_ssl = "\n\tlisten 443 ssl;"
+                http_ssl = http_ssl + "\n\tlisten [::]:443 ssl;"
 
 
-                conf = conf.replace(listen, listen + http_ssl)
+            conf = conf.replace(listen, listen + http_ssl)
 
-            mw.backFile(file)
-            mw.writeFile(file, conf)
-            isError = mw.checkWebConfig()
-            if(isError != True):
-                mw.restoreFile(file)
-                return mw.returnData(False, '证书错误: <br><a style="color:red;">' + isError.replace("\n", '<br>') + '</a>')
-
-        self.saveCert(keyPath, certPath)
-
+        mw.backFile(file)
+        mw.writeFile(file, conf)
+        isError = mw.checkWebConfig()
+        if not isError:
+            mw.restoreFile(file)
+            return mw.returnData(False, '证书错误: <br><a style="color:red;">' + isError.replace("\n", '<br>') + '</a>')
+    
+        self.saveCert(site_name, keyPath, certPath)
         msg = mw.getInfo('网站[{1}]开启SSL成功!', (site_name,))
         mw.writeLog('网站管理', msg)
 
@@ -1758,7 +1758,7 @@ location ^~ {from} {\n\
         }
         return mw.returnData(True, 'OK', data)
 
-    def saveCert(self, keyPath, certPath):
+    def saveCert(self, site_name, keyPath, certPath):
         try:
             certInfo = mw.getCertName(certPath)
             if not certInfo:
@@ -1787,7 +1787,7 @@ location ^~ {from} {\n\
                 keyPath = vpath + '/' + d + '/privkey.pem'
                 certPath = vpath + '/' + d + '/fullchain.pem'
                 if os.path.exists(keyPath) and os.path.exists(certPath):
-                    self.saveCert(keyPath, certPath)
+                    self.saveCert(d, keyPath, certPath)
 
                 mpath = vpath + '/' + d + '/info.json'
                 if not os.path.exists(mpath):
@@ -2172,7 +2172,7 @@ location ^~ {from} {\n\
     def createAcmeDns(self, site_name, domains, email, dnspai, wildcard_domain, force, renew):
         dnsapi_option = thisdb.getOptionByJson('dnsapi', default={})
         if not dnspai in dnsapi_option:
-            return mw.returnData(False, dnspai+'未设置')
+            return mw.returnData(False, '['+dnspai+']未设置!')
 
         dnsapi_data = dnsapi_option[dnspai]
         for k in dnsapi_data:
