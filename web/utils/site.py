@@ -2357,8 +2357,6 @@ export PATH
         return mw.returnData(data['status'], data['msg'], result)
 
     def setCertToSite(self, site_name, cert_name):
-        certName = request.form.get('certName', '')
-        siteName = request.form.get('siteName', '')
         try:
             path = self.sslDir + '/' + site_name.strip()
             if not os.path.exists(path):
