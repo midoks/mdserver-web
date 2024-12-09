@@ -1703,8 +1703,6 @@ location ^~ {from} {\n\
         file = self.getHostConf(site_name)
         conf = mw.readFile(file)
         if conf:
-            # if conf.find('HTTP_TO_HTTPS_START') != -1:
-            #     return True
             if conf.find('$server_port !~ 443') != -1:
                 return True
         return False
@@ -1727,17 +1725,18 @@ location ^~ {from} {\n\
         domains = thisdb.getDomainBySiteId(site_info['id'])
 
         path = self.sslDir + '/' + site_name
-        csr_path = path + '/fullchain.pem'  # 生成证书路径
-        key_path = path + '/privkey.pem'    # 密钥文件路径
-
-        cert_data = None
         if ssl_type == 'lets':
-            csr_path = self.sslLetsDir + '/' + site_name + '/fullchain.pem'  # 生成证书路径
-            key_path = self.sslLetsDir + '/' + site_name + '/privkey.pem'    # 密钥文件路径
+            csr_path = self.sslLetsDir + '/' + site_name + '/fullchain.pem' # Let生成证书路径
+            key_path = self.sslLetsDir + '/' + site_name + '/privkey.pem'   # Let密钥文件路径
         elif ssl_type == 'acme':
-            acme_dir = mw.getAcmeDomainDir(site_name)
-            csr_path = acme_dir + '/fullchain.cer'              # ACME生成证书路径
-            key_path = acme_dir + '/' + site_name + '.key'      # ACME密钥文件路径
+            csr_path = path + '/fullchain.pem' 
+            key_path = path + '/privkey.pem'
+            # acme_dir = mw.getAcmeDomainDir(site_name)
+            # csr_path = acme_dir + '/fullchain.cer'            # ACME生成证书路径
+            # key_path = acme_dir + '/' + site_name + '.key'    # ACME密钥文件路径
+        else:
+            csr_path = path + '/fullchain.pem'                              # 生成证书路径
+            key_path = path + '/privkey.pem'                                # 密钥文件路径
 
         key = ''
         if os.path.exists(key_path):

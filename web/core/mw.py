@@ -322,7 +322,7 @@ def readFile(filename):
         fp.close()
         return fBody
     except Exception as e:
-        print(e)
+        print('readFile:',str(e))
         return False
 
 def writeFile(filename, content, mode='w+'):
