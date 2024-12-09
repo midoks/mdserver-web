@@ -116,6 +116,7 @@ docker run -itd --name mw-server --privileged=true -p 7200:7200 -p 80:80 -p 443:
 - PHP84正式版。
 - 加入alist插件。
 - 数据管理-常用命令。
+- 插件读取优化(加入缓存+定时检查状态)。
 - 常规更新。
 
 ### JSDelivr安装地址
