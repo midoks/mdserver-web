@@ -1939,7 +1939,7 @@ location ^~ {from} {\n\
             data = {}
             if dname in dnsapi_data:
                 dnsapi_option[i]['data'] = dnsapi_data[dname]
-                dnsapi_option[i]['title'] = dnsapi_option[i]['title'] + ' *** [已配置]'
+                dnsapi_option[i]['title'] = dnsapi_option[i]['title'] + ' - [已配置]'
             else:
                 t = {}
                 for field in keys:
