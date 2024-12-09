@@ -112,7 +112,7 @@ docker run -itd --name mw-server --privileged=true -p 7200:7200 -p 80:80 -p 443:
 
 ### 版本更新 0.18.0
 
-- 重新架构面面板。
+- 重新架构面板。
 - PHP84正式版。
 - 加入alist插件。
 - 数据管理-常用命令。
