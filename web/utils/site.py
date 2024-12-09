@@ -2248,12 +2248,15 @@ export PATH
         mw.restartWeb()
         return mw.returnData(True, '证书已更新!', result)
 
-    def createAcme(self, site_name, domains,force,renew, apply_type, dnspai, email, wildcard_domain):
+    def createAcme(self, site_name, domains, force, renew, apply_type, dnspai, email, wildcard_domain):
         domains = json.loads(domains)
         if len(domains) < 1:
             return mw.returnData(False, '请选择域名')
         if email.strip() != '':
             thisdb.setOption('ssl_email', email)
+
+        if email.strip() == '':
+            email = mw.getRandomString(10)+"."+mw.getRandomString(3) + '@google.com'
 
         # 检测acme是否安装
         acme_dir = mw.getAcmeDir()
