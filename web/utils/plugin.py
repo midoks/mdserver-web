@@ -314,7 +314,6 @@ class plugin(object):
 
     # 卸载插件
     def uninstall(self, name, version):
-        rundir = mw.getRunDir()
         if name.strip() == '':
             return mw.returnData(False, "缺少插件名称!", ())
 
