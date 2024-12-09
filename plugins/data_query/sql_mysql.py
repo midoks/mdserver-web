@@ -34,8 +34,10 @@ class nosqlMySQL():
     __DB_LOCAL = None
 
     def __init__(self):
-        self.__config = self.get_options(None)
-
+        pass
+        
+    def setSid(self, sid):
+        self.__config = self.get_options(sid=sid)
 
     def conn(self):
         if self.__DB_HOST in ['127.0.0.1', 'localhost']:
@@ -43,7 +45,6 @@ class nosqlMySQL():
             if not os.path.exists(my_path): return False
 
         if not self.__DB_LOCAL:
-            # print(self.__config)
             self.__DB_PORT = int(self.__config['port'])
             self.__DB_USER = self.__config['username']
             self.__DB_PASS = self.__config['password']
@@ -63,41 +64,40 @@ class nosqlMySQL():
             self.__DB_ERR = mw.get_error_info()
         return False
 
-    def sqliteDb(self,dbname='databases'):
+    def sqliteDb(self, sid, dbname='databases'):
         my_root_path = mw.getServerDir() +'/mysql'
         name = 'mysql'
         conn = mw.M(dbname).dbPos(my_root_path, name)
         return conn
 
     # 获取配置项
-    def get_options(self, get=None):
+    def get_options(self, sid=None):
         result = {}
-
-
-        my_cnf_path = "{}/mysql/etc/my.cnf".format(mw.getServerDir())
-        my_content = mw.readFile(my_cnf_path)
-        if not my_content: return False
-
-        mysql_pass = self.sqliteDb('config').where('id=?', (1,)).getField('mysql_root')
-        result['password'] = mysql_pass
-        result['username'] = 'root'
-        keys = ["bind_ip", "port"]
-
+        result['socket'] = ''
+        result['port'] = 3306
         result['host'] = '127.0.0.1'
-        rep = r'port\s*=\s*(.*)'
+        result['username'] = 'root'
 
-        port_re = re.search(rep, my_content)
-        if port_re:
-            result['port'] = int(port_re.groups()[0].strip())
-        else:
-            result['port'] = 3306
+        if sid in ['mysql', 'mysql-apt', 'mysql-yum']:
+            my_cnf_path = "{}/{}/etc/my.cnf".format(mw.getServerDir(),sid)
 
-        socket_rep = r'socket\s*=\s*(.*)'
-        socket_re = re.search(socket_rep, my_content)
-        if socket_re:
-            result['socket'] = socket_re.groups()[0].strip()
-        else:
-            result['socket'] = ''
+            my_content = mw.readFile(my_cnf_path)
+            if not my_content: return False
+
+            mysql_pass = self.sqliteDb(sid,'config').where('id=?', (1,)).getField('mysql_root')
+            result['password'] = mysql_pass
+        
+            keys = ["bind_ip", "port"]
+
+            rep = r'port\s*=\s*(.*)'
+            port_re = re.search(rep, my_content)
+            if port_re:
+                result['port'] = int(port_re.groups()[0].strip())
+            socket_rep = r'socket\s*=\s*(.*)'
+            socket_re = re.search(socket_rep, my_content)
+            if socket_re:
+                result['socket'] = socket_re.groups()[0].strip()
+            
 
         return result
 
@@ -119,15 +119,15 @@ class nosqlMySQL():
 
         local_mysql = "{}/mysql/etc/my.cnf".format(mw.getServerDir())
         if os.path.exists(local_mysql):
-            data.append({'name':'本地服务器', 'val':'0'})
+            data.append({'name':'本地服务器', 'val':'mysql'})
 
         local_mysql_apt = "{}/mysql-apt/etc/my.cnf".format(mw.getServerDir())
         if os.path.exists(local_mysql_apt):
-            data.append({'name':'本地服务器[apt]', 'val':'apt'})
+            data.append({'name':'本地服务器[apt]', 'val':'mysql-apt'})
 
         local_mysql_yum = "{}/mysql-yum/etc/my.cnf".format(mw.getServerDir())
         if os.path.exists(local_mysql_yum):
-            data.append({'name':'本地服务器[yum]', 'val':'yum'})
+            data.append({'name':'本地服务器[yum]', 'val':'mysql-yum'})
         return mw.returnData(True, 'ok', data)
 
 @singleton
@@ -140,8 +140,9 @@ class nosqlMySQLCtr():
         instance = nosqlMySQL()
         return instance.getServerList()
 
-    def getInstanceBySid(self, sid = 0):
+    def getInstanceBySid(self, sid):
         instance = nosqlMySQL()
+        instance.setSid(sid)
         return instance
 
     def getDbList(self, args):
