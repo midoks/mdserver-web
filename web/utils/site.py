@@ -2172,7 +2172,7 @@ location ^~ {from} {\n\
         top_domain =  s[last_index-1]+'.'+s[last_index]
         return top_domain
 
-    def createAcmeDns(self, site_name, domains, dnspai, wildcard_domain, force, renew):
+    def createAcmeDns(self, site_name, domains, email, dnspai, wildcard_domain, force, renew):
         dnsapi_option = thisdb.getOptionByJson('dnsapi', default={})
         if not dnspai in dnsapi_option:
             return mw.returnData(False, dnspai+'未设置')
@@ -2189,7 +2189,7 @@ location ^~ {from} {\n\
 PATH=/bin:/sbin:/usr/bin:/usr/sbin:/usr/local/bin:/usr/local/sbin:~/bin:/opt/homebrew/bin:%s
 export PATH
 ''' % (acme_dir,)
-
+            cmd += "acme.sh --register-account -m "+email+" \n"
             cmd += self.getDnsapiExportVar(dnsapi_data)
             if wildcard_domain == 'true':
                 top_domain = self.getDomainRootName(d)
@@ -2273,7 +2273,7 @@ export PATH
         if apply_type == 'file':
             return self.createAcmeFile(site_name, domains, email,force,renew)
         elif apply_type == 'dns':
-            return self.createAcmeDns(site_name, domains, dnspai, wildcard_domain,force, renew)
+            return self.createAcmeDns(site_name, domains, email, dnspai, wildcard_domain,force, renew)
         return mw.returnData(False, '异常请求')
 
     def createLet(self, site_name, domains, force, renew, apply_type, dnspai, email, wildcard_domain):
