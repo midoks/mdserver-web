@@ -44,7 +44,7 @@ if [ ! -d $serverPath/lib/libzip ];then
 	cd ${rootPath}/plugins/php/lib && /bin/bash libzip.sh
 fi
 
-export PKG_CONFIG_PATH=/www/server/lib/libzip/lib/pkgconfig
+export PKG_CONFIG_PATH=${serverPath}/lib/libzip/lib/pkgconfig
 
 Install_lib()
 {
@@ -65,8 +65,7 @@ Install_lib()
 		cd $sourcePath/php${version}/ext/${LIBNAME}
 		
 		$serverPath/php/$version/bin/phpize
-		./configure --with-php-config=$serverPath/php/$version/bin/php-config \
-		--with-zip
+		./configure --with-php-config=$serverPath/php/$version/bin/php-config --with-zip
 
 		make clean && make && make install && make clean
 
