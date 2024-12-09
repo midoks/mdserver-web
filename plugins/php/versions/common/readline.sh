@@ -65,6 +65,12 @@ Install_lib()
 
 		cd ${rootPath}/plugins/php/lib && /bin/bash libedit.sh
 		export PKG_CONFIG_PATH=$PKG_CONFIG_PATH:${serverPath}/lib/libedit/lib/pkgconfig
+
+
+		OPTIONS="$OPTIONS --with-libedit=${serverPath}/lib/libedit"
+
+		readlinelib=`pkg-config --path readline`
+		export PKG_CONFIG_PATH=$PKG_CONFIG_PATH:${serverPath}/lib/libedit/lib/pkgconfig
 		OPTIONS="$OPTIONS --with-libedit=${serverPath}/lib/libedit"
 		
 		cd $sourcePath/php${version}/ext/${LIBNAME}
