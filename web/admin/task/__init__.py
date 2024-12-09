@@ -54,7 +54,7 @@ def get_task_speed():
     if row is None:
         return mw.returnData(False, '当前没有任务队列在执行-3!')
 
-    task_logfile = mw.getPanelTaskLog()
+    task_logfile = mw.getPanelTaskExecLog()
 
     data = {}
     data['name'] = row['name']
