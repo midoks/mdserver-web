@@ -38,7 +38,6 @@ class nosqlMySQL():
 
 
     def conn(self):
-
         if self.__DB_HOST in ['127.0.0.1', 'localhost']:
             my_path = "{}/mysql".format(mw.getServerDir())
             if not os.path.exists(my_path): return False
@@ -114,13 +113,32 @@ class nosqlMySQL():
         self.__DB_LOCAL = 1
         return self
 
+    def getServerList(self):
+        my_cnf_path = "{}/mysql/etc/my.cnf".format(mw.getServerDir())
+        data = []
 
+        local_mysql = "{}/mysql/etc/my.cnf".format(mw.getServerDir())
+        if os.path.exists(local_mysql):
+            data.append({'name':'本地服务器', 'val':'0'})
+
+        local_mysql_apt = "{}/mysql-apt/etc/my.conf".format(mw.getServerDir())
+        if os.path.exists(local_mysql_apt):
+            data.append({'name':'本地服务器[apt]', 'val':'apt'})
+
+        local_mysql_yum = "{}/mysql-yum/etc/my.conf".format(mw.getServerDir())
+        if os.path.exists(local_mysql_yum):
+            data.append({'name':'本地服务器[yum]', 'val':'yum'})
+        return mw.returnData(True, 'ok', data)
 
 @singleton
 class nosqlMySQLCtr():
 
     def __init__(self):
         pass
+
+    def getServerList(self, args):
+        instance = nosqlMySQL()
+        return instance.getServerList()
 
     def getInstanceBySid(self, sid = 0):
         instance = nosqlMySQL()
@@ -626,6 +644,11 @@ class nosqlMySQLCtr():
             return mw.returnData(True, 'ok', msg)
 
 # ---------------------------------- run ----------------------------------
+
+def get_server_list(args):
+    t = nosqlMySQLCtr()
+    return t.getServerList(args)
+
 # 获取 mysql 列表
 def get_db_list(args):
     t = nosqlMySQLCtr()

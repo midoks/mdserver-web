@@ -247,10 +247,15 @@ function initTabMemcached(){
     });
 }
 
+var mysql_timer = null;
 function initTabMySQL(){
+
+    mysqlGetServerList();
+
     mysqlGetDbList();
     clearInterval(mysql_timer);
-    var mysql_timer = setInterval(function(){
+    mysqlProcessList();
+    mysql_timer = setInterval(function(){
         var name = $('#mysql_list_tab .tab-nav span.on').data('name');
         mysqlRunMysqlTab(name);
 
@@ -918,6 +923,31 @@ function mysqlInitField(f, data){
     });
 }
 
+
+function mysqlGetServerList(call_func){
+    myPostCB('get_server_list', {}, function(rdata){
+        var rdata = rdata.data;
+        if (rdata.data.length != 0){
+            var items = rdata.data;
+            var content = '';
+            for (var i = 0; i < items.length; i++) {
+                var t = items[i];
+                if (i == 0){
+                    content += '<option value="'+t['val']+'" selected>'+t['name']+'</option>';
+                } else {
+                    content += '<option value="'+t['val']+'">'+t['name']+'</option>';
+                }
+            }
+            $('select[name=sid]').html(content);
+            if (typeof(call_func) == 'function'){
+                call_func();
+            }
+            closeInstallLayer();
+        } else {
+            showInstallLayer();
+        }
+    });
+}
 
 function mysqlGetDbList(){
     var sid = mysqlGetSid();
