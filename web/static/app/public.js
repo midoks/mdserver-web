@@ -267,40 +267,40 @@ function changePathCallback(default_dir, callback) {
 		shift: 5,
 		shadeClose: false,
 		content: "<div class='changepath'>\
-					<div class='path-top'>\
-						<button type='button' class='btn btn-default btn-sm' onclick='backFile()'>\
-							<span class='glyphicon glyphicon-share-alt'></span>返回\
-						</button>\
-						<div class='place' id='PathPlace'>当前路径：<span></span></div>\
-					</div>\
-					<div class='path-con'>\
-						<div class='path-con-left'>\
-							<dl><dt id='changecomlist' onclick='backMyComputer()'>计算机</dt></dl>\
-						</div>\
-						<div class='path-con-right'>\
-							<ul class='default' id='computerDefautl'></ul>\
-							<div class='file-list divtable'>\
-								<table class='table table-hover' style='border:0 none'>\
-									<thead>\
-										<tr class='file-list-head'>\
-											<th width='40%'>文件名</th>\
-											<th width='20%'>修改时间</th>\
-											<th width='10%'>权限</th>\
-											<th width='10%'>所有者</th>\
-											<th width='10%'></th>\
-										</tr>\
-									</thead>\
-									<tbody id='tbody' class='list-list'></tbody>\
-								</table>\
-							</div>\
-						</div>\
+			<div class='path-top'>\
+				<button type='button' class='btn btn-default btn-sm' onclick='backFile()'>\
+					<span class='glyphicon glyphicon-share-alt'></span>返回\
+				</button>\
+				<div class='place' id='PathPlace'>当前路径：<span></span></div>\
+			</div>\
+			<div class='path-con'>\
+				<div class='path-con-left'>\
+					<dl><dt id='changecomlist' onclick='backMyComputer()'>计算机</dt></dl>\
+				</div>\
+				<div class='path-con-right'>\
+					<ul class='default' id='computerDefautl'></ul>\
+					<div class='file-list divtable'>\
+						<table class='table table-hover' style='border:0 none'>\
+							<thead>\
+								<tr class='file-list-head'>\
+									<th width='40%'>文件名</th>\
+									<th width='20%'>修改时间</th>\
+									<th width='10%'>权限</th>\
+									<th width='10%'>所有者</th>\
+									<th width='10%'></th>\
+								</tr>\
+							</thead>\
+							<tbody id='tbody' class='list-list'></tbody>\
+						</table>\
 					</div>\
 				</div>\
-				<div class='getfile-btn' style='margin-top:0'>\
-					<button type='button' class='btn btn-default btn-sm pull-left' onclick='createFolder()'>新建文件夹</button>\
-					<button type='button' class='btn btn-danger btn-sm mr5 btn-close'>关闭</button>\
-					<button type='button' class='btn btn-success btn-sm btn-choose'>选择</button>\
-				</div>",
+			</div>\
+		</div>\
+		<div class='getfile-btn' style='margin-top:0'>\
+			<button type='button' class='btn btn-default btn-sm pull-left' onclick='createFolder()'>新建文件夹</button>\
+			<button type='button' class='btn btn-danger btn-sm mr5 btn-close'>关闭</button>\
+			<button type='button' class='btn btn-success btn-sm btn-choose'>选择</button>\
+		</div>",
 		success:function(layero,layer_index){
 			$('.btn-close').click(function(){
 				layer.close(layer_index);
@@ -332,38 +332,37 @@ function changePath(d) {
 		closeBtn: 1,
 		shift: 5,
 		shadeClose: false,
-		content: "\
-			<div class='changepath'>\
-				<div class='path-top'>\
-					<button type='button' class='btn btn-default btn-sm' onclick='backFile()'><span class='glyphicon glyphicon-share-alt'></span>返回</button>\
-					<div class='place' id='PathPlace'>当前路径：<span></span></div>\
-				</div>\
-				<div class='path-con'>\
-					<div class='path-con-left'><dl><dt id='changecomlist' onclick='backMyComputer()'>计算机</dt></dl></div>\
-					<div class='path-con-right'>\
-						<ul class='default' id='computerDefautl'></ul>\
-						<div class='file-list divtable'>\
-							<table class='table table-hover' style='border:0 none'>\
-								<thead>\
-									<tr class='file-list-head'>\
-										<th width='40%'>文件名</th>\
-										<th width='20%'>修改时间</th>\
-										<th width='10%'>权限</th>\
-										<th width='10%'>所有者</th>\
-										<th width='10%'></th>\
-									</tr>\
-								</thead>\
-								<tbody id='tbody' class='list-list'></tbody>\
-							</table>\
-						</div>\
+		content: "<div class='changepath'>\
+			<div class='path-top'>\
+				<button type='button' class='btn btn-default btn-sm' onclick='backFile()'><span class='glyphicon glyphicon-share-alt'></span>返回</button>\
+				<div class='place' id='PathPlace'>当前路径：<span></span></div>\
+			</div>\
+			<div class='path-con'>\
+				<div class='path-con-left'><dl><dt id='changecomlist' onclick='backMyComputer()'>计算机</dt></dl></div>\
+				<div class='path-con-right'>\
+					<ul class='default' id='computerDefautl'></ul>\
+					<div class='file-list divtable'>\
+						<table class='table table-hover' style='border:0 none'>\
+							<thead>\
+								<tr class='file-list-head'>\
+									<th width='40%'>文件名</th>\
+									<th width='20%'>修改时间</th>\
+									<th width='10%'>权限</th>\
+									<th width='10%'>所有者</th>\
+									<th width='10%'></th>\
+								</tr>\
+							</thead>\
+							<tbody id='tbody' class='list-list'></tbody>\
+						</table>\
 					</div>\
 				</div>\
 			</div>\
-			<div class='getfile-btn' style='margin-top:0'>\
-				<button type='button' class='btn btn-default btn-sm pull-left' onclick='createFolder()'>新建文件夹</button>\
-				<button type='button' class='btn btn-danger btn-sm mr5' onclick=\"layer.close(getCookie('changePath'))\">关闭</button>\
-				<button type='button' class='btn btn-success btn-sm' onclick='getfilePath()'>选择</button>\
-			</div>"
+		</div>\
+		<div class='getfile-btn' style='margin-top:0'>\
+			<button type='button' class='btn btn-default btn-sm pull-left' onclick='createFolder()'>新建文件夹</button>\
+			<button type='button' class='btn btn-danger btn-sm mr5' onclick=\"layer.close(getCookie('changePath'))\">关闭</button>\
+			<button type='button' class='btn btn-success btn-sm' onclick='getfilePath()'>选择</button>\
+		</div>"
 	});
 	setCookie("changePath", c);
 	var b = $("#" + d).val();
@@ -412,7 +411,7 @@ function getDiskList(b) {
 					<span class='glyphicon glyphicon-folder-open'></span>" + e + "</td><td>" + getLocalTime(g[2]) + "</td>\
 				<td>" + g[3] + "</td>\
 				<td>" + g[4] + "</td>\
-				<td><span class='delfile-btn' onclick=\"NewDelFile('" + h.path + "/" + g[0] + "')\">X</span></td>\
+				<td><span class='delfile-btn' onclick=\"newDelFile('" + h.path + "/" + g[0] + "')\">X</span></td>\
 			</tr>";
 		}
 		if(h.files != null && h.files != "") {
@@ -485,7 +484,7 @@ function createFolder() {
 	})
 }
 
-function NewDelFile(c) {
+function newDelFile(c) {
 	var a = $("#PathPlace").find("span").text();
 	newTxt = c.replace(new RegExp(/(\/\/)/g), "/");
 	var b = "path=" + newTxt + "&empty=True";
@@ -1339,6 +1338,7 @@ function getSFM(seconds, dateFormat = 'H:i:s') {
 
 function remind(a){
 	a = a == undefined ? 1 : a;
+	$(".taskcon").html('');
 	$.post("/task/list", "table=tasks&result=2,4,6,8&limit=10&p=" + a, function(g) {
 		var e = '';
 		var f = false;
@@ -1403,7 +1403,7 @@ function remind(a){
 function getReloads() {
 	var a = 0;
 	var mm = $(".bt-w-menu .bgw").html()
-	if(mm == undefined || mm.indexOf(lan.bt.task_list) == -1) {
+	if(mm == undefined || mm.indexOf('任务列表') == -1) {
 		clearInterval(speed);
 		a = 0;
 		speed = null;
@@ -1505,7 +1505,10 @@ function tasklist(a){
 	$.post("/task/list", "tojs=getTaskList&table=tasks&limit=10&p=" + a, function(g) {
 		$('.msg_count').html(g.count);
 	},'json');
-	getReloads();
+
+	setTimeout(function(){
+		getReloads();
+	},100);
 }
 
 function activeDisk() {
@@ -1559,13 +1562,6 @@ function scroll_handle(e){
 	var scrollTop = this.scrollTop;
 	$(this).find("thead").css({"transform":"translateY("+scrollTop+"px)","position":"relative","z-index":"1"});
 }
-
-
-$(function(){
-///
-setInterval(function(){check_login();},6000);
-///
-});
 
 function asyncLoadImage(obj, url){
 	
@@ -2704,8 +2700,8 @@ function pluginStandAloneLogs(_name, version, func, _args, line){
 }
 /*** 其中功能,针对插件通过库使用 end ***/
 
-
 $(function() {
+	setInterval(function(){check_login();},6000);
 	autoHeight();
 });
 $(window).resize(function() {
