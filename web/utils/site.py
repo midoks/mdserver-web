@@ -1763,7 +1763,7 @@ location ^~ {from} {\n\
             certInfo = mw.getCertName(certPath)
             if not certInfo:
                 return mw.returnData(False, '证书解析失败!')
-            vpath = self.sslDir + '/' + certInfo['subject'].strip()
+            vpath = self.sslDir + '/' + site_name
             if not os.path.exists(vpath):
                 os.system('mkdir -p ' + vpath)
             mw.writeFile(vpath + '/privkey.pem', mw.readFile(keyPath))
