@@ -925,7 +925,7 @@ function mysqlInitField(f, data){
 
 
 function mysqlGetServerList(call_func){
-    myPostCB('get_server_list', {}, function(rdata){
+    myPostCBN('get_server_list', {}, function(rdata){
         var rdata = rdata.data;
         if (rdata.data.length != 0){
             var items = rdata.data;
@@ -938,7 +938,12 @@ function mysqlGetServerList(call_func){
                     content += '<option value="'+t['val']+'">'+t['name']+'</option>';
                 }
             }
-            $('select[name=sid]').html(content);
+
+
+            $('#mysql select[name=sid]').html(content);
+            $('#mysql select[name=sid]').change(function(){
+                mysqlGetDbList();
+            });
             if (typeof(call_func) == 'function'){
                 call_func();
             }
@@ -951,7 +956,7 @@ function mysqlGetServerList(call_func){
 
 function mysqlGetDbList(){
     var sid = mysqlGetSid();
-    myPostCB('get_db_list',{'sid':sid} ,function(rdata){
+    myPostCBN('get_db_list',{'sid':sid} ,function(rdata){
         if (rdata.data.status){
 
             var items = rdata.data.data['list'];
@@ -988,7 +993,7 @@ function mysqlGetTableList(p){
         return;
     }
 
-    myPostCB('get_table_list',{'sid':sid,'db':db} ,function(rdata){
+    myPostCBN('get_table_list',{'sid':sid,'db':db} ,function(rdata){
         if (rdata.data.status){
 
             var items = rdata.data.data['list'];
