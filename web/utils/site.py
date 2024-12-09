@@ -585,8 +585,8 @@ class sites(object):
         return data
 
     # 获取域名列表
-    def getDomain(self, pid):
-        data =  thisdb.getDomainByPid(pid)
+    def getDomain(self, site_id):
+        data =  thisdb.getDomainBySiteId(site_id)
         return data
 
     # 获取日志内容
@@ -1065,7 +1065,7 @@ class sites(object):
                 data['none'] = False
         else:
             data['fix'] = 'gif|jpg|jpeg|png|bmp|swf|js|css|ttf|woff2'
-            domains = thisdb.getDomainByPid(site_id)
+            domains = thisdb.getDomainBySiteId(site_id)
             tmp = []
             for domain in domains:
                 tmp.append(domain['name'])
@@ -1711,8 +1711,6 @@ location ^~ {from} {\n\
 
     def getSsl(self, site_name, ssl_type):
 
-        path = self.sslDir + '/' + site_name
-
         file = self.getHostConf(site_name)
         content = mw.readFile(file)
 
@@ -1725,9 +1723,10 @@ location ^~ {from} {\n\
 
         to_https = self.isToHttps(site_name)
 
-        info = thisdb.getSitesByName(site_name)
-        domains = mw.M('domain').field('name').where("pid=?", (info['id'],)).select()
+        site_info = thisdb.getSitesByName(site_name)
+        domains = thisdb.getDomainBySiteId(site_info['id'])
 
+        path = self.sslDir + '/' + site_name
         csr_path = path + '/fullchain.pem'  # 生成证书路径
         key_path = path + '/privkey.pem'    # 密钥文件路径
 

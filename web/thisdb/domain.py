@@ -20,19 +20,19 @@ def getDomainCountBySiteId(site_id):
     # .debug(True)
     return mw.M('domain').where("pid=?", (site_id,)).count()
 
-def addDomain(pid, name, port):
+def addDomain(site_id, name, port):
     now_time = mw.getDateFromNow()
     insert_data = {
-        'pid': pid,
+        'pid': site_id,
         'name': name,
         'port':port,
         'add_time': now_time,
     }
     return mw.M('domain').insert(insert_data)
-
-def getDomainByPid(pid):
+    
+def getDomainBySiteId(site_id):
     # .debug(True)
-    return mw.M('domain').field(__FIELD).where("pid=?", (pid,)).select()
+    return mw.M('domain').field(__FIELD).where("pid=?", (site_id,)).select()
     
 
 def deleteDomainId(domain_id):
