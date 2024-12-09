@@ -106,8 +106,8 @@ fi
 # ----- cpu end ------
 
 if [ ! -d $serverPath/php/${PHP_VER} ];then
-	cd $sourcePath/php/php${PHP_VER} && ./configure \
-	--prefix=$serverPath/php/${PHP_VER} \
+	cd $sourcePath/php/php${PHP_VER}
+	./configure --prefix=$serverPath/php/${PHP_VER} \
 	--exec-prefix=$serverPath/php/${PHP_VER} \
 	--with-config-file-path=$serverPath/php/${PHP_VER}/etc \
 	--enable-mysqlnd \

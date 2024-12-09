@@ -102,19 +102,9 @@ else
 fi
 # ----- cpu end ------
 
-# ZIP_OPTION='--with-zip'
-# libzip_version=`pkg-config libzip --modversion`
-# if version_lt "$libzip_version" "0.11.0" ;then
-# 	cd ${rootPath}/plugins/php/lib && /bin/bash libzip.sh
-# 	export PKG_CONFIG_PATH=$serverPath/lib/libzip/lib/pkgconfig
-# 	ZIP_OPTION="--with-zip=$serverPath/lib/libzip"
-# fi
-
-
 # echo "$sourcePath/php/php${PHP_VER}"
 if [ ! -d $serverPath/php/${PHP_VER} ];then
 	cd $sourcePath/php/php${PHP_VER}
-	./buildconf --force
 	./configure \
 	--prefix=$serverPath/php/${PHP_VER} \
 	--exec-prefix=$serverPath/php/${PHP_VER} \
@@ -135,28 +125,6 @@ if [ ! -d $serverPath/php/${PHP_VER} ];then
 	--disable-fileinfo \
 	$OPTIONS \
 	--enable-fpm
-	echo "./configure \
-	--prefix=$serverPath/php/${PHP_VER} \
-	--exec-prefix=$serverPath/php/${PHP_VER} \
-	--with-config-file-path=$serverPath/php/${PHP_VER}/etc \
-	--enable-mysqlnd \
-	--with-mysqli=mysqlnd \
-	--with-pdo-mysql=mysqlnd \
-	--with-zlib-dir=$serverPath/lib/zlib \
-	$ZIP_OPTION \
-	--enable-mbstring \
-	--enable-ftp \
-	--enable-sockets \
-	--enable-simplexml \
-	--enable-soap \
-	--enable-posix \
-	--enable-sysvmsg \
-	--enable-sysvsem \
-	--enable-sysvshm \
-	--disable-intl \
-	--disable-fileinfo \
-	$OPTIONS \
-	--enable-fpm"
 	make clean && make -j${cpuCore} && make install && make clean
 
 	# rm -rf $sourcePath/php/php${PHP_VER}

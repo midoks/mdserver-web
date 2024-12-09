@@ -74,7 +74,6 @@ fi
 cd $sourcePath/php/php${PHP_VER}
 
 OPTIONS='--without-iconv'
-
 # if [ $sysName == 'Darwin' ]; then
 # 	OPTIONS="${OPTIONS} --with-external-pcre=$(brew --prefix pcre2)"
 # fi
@@ -83,16 +82,6 @@ IS_64BIT=`getconf LONG_BIT`
 if [ "$IS_64BIT" == "64" ];then
 	OPTIONS="${OPTIONS} --with-libdir=lib64"
 fi
-
-echo "$sourcePath/php/php${PHP_VER}"
-
-# ZIP_OPTION='--with-zip'
-# libzip_version=`pkg-config libzip --modversion`
-# if version_lt "$libzip_version" "0.11.0" ;then
-# 	cd ${rootPath}/plugins/php/lib && /bin/bash libzip.sh
-# 	export PKG_CONFIG_PATH=$serverPath/lib/libzip/lib/pkgconfig
-# 	ZIP_OPTION="--with-zip=$serverPath/lib/libzip"
-# fi
 
 # ----- cpu start ------
 if [ -z "${cpuCore}" ]; then
@@ -118,9 +107,9 @@ else
 	cpuCore="1"
 fi
 # ----- cpu end ------
+
 if [ ! -d $serverPath/php/${PHP_VER} ];then
 	cd $sourcePath/php/php${PHP_VER} && make clean
-	# ./buildconf --force
 	./configure \
 	--prefix=$serverPath/php/${PHP_VER} \
 	--exec-prefix=$serverPath/php/${PHP_VER} \
