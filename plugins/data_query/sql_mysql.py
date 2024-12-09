@@ -80,7 +80,7 @@ class nosqlMySQL():
 
             mysql_pass = self.sqliteDb(sid, 'config').where('id=?', (1,)).getField('mysql_root')
             result['password'] = mysql_pass
-            
+
             rep = r'port\s*=\s*(.*)'
             port_re = re.search(rep, mydb_content)
             if port_re:
@@ -474,6 +474,12 @@ class nosqlMySQLCtr():
                         RESIDUAL_AUTO_INCREMENT = int(4294967295 - AUTO_INCREMENT)
                     if IS_SIGNED == 1:
                         RESIDUAL_AUTO_INCREMENT = int(2147483647 - AUTO_INCREMENT)
+
+                if DATA_TYPE == 'mediumint':
+                    if IS_SIGNED == 0:
+                        RESIDUAL_AUTO_INCREMENT = int(16777215 - AUTO_INCREMENT)
+                    if IS_SIGNED == 1:
+                        RESIDUAL_AUTO_INCREMENT = int(8388607 - AUTO_INCREMENT)
 
                 if DATA_TYPE == 'bigint':
                     if IS_SIGNED == 0:
