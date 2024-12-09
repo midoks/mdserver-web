@@ -8,11 +8,6 @@ import re
 import pymongo
 import json
 
-web_dir = os.getcwd() + "/web"
-if os.path.exists(web_dir):
-    sys.path.append(web_dir)
-    os.chdir(web_dir)
-
 import core.mw as mw
 
 def singleton(cls):
