@@ -9,11 +9,6 @@ serverPath=$(dirname "$rootPath")
 sourcePath=${serverPath}/source
 sysName=`uname`
 
-function version_gt() { test "$(echo "$@" | tr " " "\n" | sort -V | head -n 1)" != "$1"; }
-function version_le() { test "$(echo "$@" | tr " " "\n" | sort -V | head -n 1)" == "$1"; }
-function version_lt() { test "$(echo "$@" | tr " " "\n" | sort -rV | head -n 1)" != "$1"; }
-function version_ge() { test "$(echo "$@" | tr " " "\n" | sort -rV | head -n 1)" == "$1"; }
-
 version=8.3.14
 PHP_VER=83
 Install_php()
@@ -107,13 +102,13 @@ else
 fi
 # ----- cpu end ------
 
-ZIP_OPTION='--with-zip'
-libzip_version=`pkg-config libzip --modversion`
-if version_lt "$libzip_version" "0.11.0" ;then
-	cd ${rootPath}/plugins/php/lib && /bin/bash libzip.sh
-	export PKG_CONFIG_PATH=$serverPath/lib/libzip/lib/pkgconfig
-	ZIP_OPTION="--with-zip=$serverPath/lib/libzip"
-fi
+# ZIP_OPTION='--with-zip'
+# libzip_version=`pkg-config libzip --modversion`
+# if version_lt "$libzip_version" "0.11.0" ;then
+# 	cd ${rootPath}/plugins/php/lib && /bin/bash libzip.sh
+# 	export PKG_CONFIG_PATH=$serverPath/lib/libzip/lib/pkgconfig
+# 	ZIP_OPTION="--with-zip=$serverPath/lib/libzip"
+# fi
 
 
 echo "$sourcePath/php/php${PHP_VER}"
@@ -128,8 +123,6 @@ if [ ! -d $serverPath/php/${PHP_VER} ];then
 	--enable-mysqlnd \
 	--with-mysqli=mysqlnd \
 	--with-pdo-mysql=mysqlnd \
-	--with-zlib-dir=$serverPath/lib/zlib \
-	$ZIP_OPTION \
 	--enable-mbstring \
 	--enable-ftp \
 	--enable-sockets \
