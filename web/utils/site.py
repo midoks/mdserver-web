@@ -1708,7 +1708,6 @@ location ^~ {from} {\n\
         return False
 
     def getSsl(self, site_name, ssl_type):
-
         file = self.getHostConf(site_name)
         content = mw.readFile(file)
 
@@ -1900,27 +1899,27 @@ location ^~ {from} {\n\
             {"name":"dns_dp", "title":'dnspod/国内', 'key':'DP_Id:DP_Key','help':'DnsPod后台》用户中心》安全设置，开启API Token'},
             {"name":"dns_dpi", "title":'dnspod/国际', 'key':'DPI_Id:DPI_Key','help':'DnsPod后台》用户中心》安全设置，开启API Token'},
             {"name":"dns_tencent", "title":"腾讯云DNS", 'key':'Tencent_SecretId:Tencent_SecretKey', 'help':'腾讯云后台获取通行证'},
-            # {"name":"dns_gd", "title":'GoDaddy', 'key':'GD_Key:GD_Secret'},
+            {"name":"dns_gd", "title":'GoDaddy', 'key':'GD_Key:GD_Secret'},
             # {"name":"dns_pdns", "title":'PowerDNS', 'key':'PDNS_Url:PDNS_ServerId:PDNS_Token:PDNS_Ttl'},
             # {"name":"dns_lua", "title":'LuaDNS', 'key':'LUA_Key:LUA_Email'},
             # {"name":"dns_me", "title":'DNSMadeEasy', 'key':'ME_Key:ME_Secret'},
-            # {"name":"dns_aws", "title":'Amazon Route53', 'key':'AWS_ACCESS_KEY_ID:AWS_SECRET_ACCESS_KEY'},
+            {"name":"dns_aws", "title":'Amazon Route53', 'key':'AWS_ACCESS_KEY_ID:AWS_SECRET_ACCESS_KEY'},
             # {"name":"dns_ispconfig", "title":'ISPConfig', 'key':'ISPC_User:ISPC_Password:ISPC_Api:ISPC_Api_Insecure'},
             # {"name":"dns_ad", "title":'Alwaysdata', 'key':'AD_API_KEY'},
-            # {"name":"dns_linode_v4", "title":'Linode', 'key':'LINODE_V4_API_KEY'},
+            {"name":"dns_linode_v4", "title":'Linode', 'key':'LINODE_V4_API_KEY'},
             # {"name":"dns_freedns", "title":'FreeDNS', 'key':'FREEDNS_User:FREEDNS_Password'},
             # {"name":"dns_cyon", "title":'cyon.ch', 'key':'CY_Username:CY_Password:CY_OTP_Secret'},
             # {"name":"dns_gandi_livedns", "title":'LiveDNS', 'key':'GANDI_LIVEDNS_TOKEN'},
             # {"name":"dns_knot", "title":'Knot', 'key':'KNOT_SERVER:KNOT_KEY'},
-            # {"name":"dns_dgon", "title":'DigitalOcean', 'key':'DO_API_KEY'},
+            {"name":"dns_dgon", "title":'DigitalOcean', 'key':'DO_API_KEY'},
             # {"name":"dns_cloudns", "title":'ClouDNS.net', 'key':'CLOUDNS_SUB_AUTH_ID:CLOUDNS_AUTH_PASSWORD'},
-            # {"name":"dns_namesilo", "title":'Namesilo', 'key':'Namesilo_Key'},
-            # {"name":"dns_azure", "title":'Azure', 'key':'AZUREDNS_SUBSCRIPTIONID:AZUREDNS_TENANTID:AZUREDNS_APPID:AZUREDNS_CLIENTSECRET'},
+            {"name":"dns_namesilo", "title":'Namesilo', 'key':'Namesilo_Key'},
+            {"name":"dns_azure", "title":'Azure', 'key':'AZUREDNS_SUBSCRIPTIONID:AZUREDNS_TENANTID:AZUREDNS_APPID:AZUREDNS_CLIENTSECRET'},
             # {"name":"dns_selectel", "title":'selectel.com', 'key':'SL_Key'},
             # {"name":"dns_zonomi", "title":'zonomi.com', 'key':'ZM_Key'},
             # {"name":"dns_kinghost", "title":'KingHost', 'key':'KINGHOST_Username:KINGHOST_Password'},
             # {"name":"dns_zilore", "title":'Zilore', 'key':'Zilore_Key'},
-            # {"name":"dns_gcloud", "title":'Google Cloud DNS', 'key':'CLOUDSDK_ACTIVE_CONFIG_NAME'},
+            {"name":"dns_gcloud", "title":'Google Cloud DNS', 'key':'CLOUDSDK_ACTIVE_CONFIG_NAME'},
             # {"name":"dns_mydnsjp", "title":'MyDNS.JP', 'key':'MYDNSJP_MasterID:MYDNSJP_Password'},
             # {"name":"dns_doapi", "title":'do.de', 'key':'DO_LETOKEN'},
             # {"name":"dns_online", "title":'Online', 'key':'ONLINE_API_KEY'},
