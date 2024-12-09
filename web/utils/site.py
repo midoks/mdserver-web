@@ -2200,9 +2200,9 @@ export PATH
 
             log_file = self.acmeLogFile()
             cmd +=  ' >> ' + log_file
-            print(cmd)
+            # print(cmd)
             result = mw.execShell(cmd)
-            print(result)
+            # print(result)
 
             # acme源的ssl证书
             src_path = mw.getAcmeDomainDir(d)
