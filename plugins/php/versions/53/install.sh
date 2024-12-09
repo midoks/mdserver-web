@@ -66,9 +66,11 @@ fi
 # OPTIONS="${OPTIONS} --with-jpeg --with-jpeg-dir=/usr/lib"
 OPTIONS='--without-iconv'
 
-# if [ $sysName == 'Darwin' ]; then
-# 	OPTIONS="${OPTIONS} --with-freetype-dir=${serverPath}/lib/freetype"
-# fi
+if [ $sysName == 'Darwin' ]; then
+	OPTIONS="${OPTIONS} --with-freetype-dir=${serverPath}/lib/freetype"
+else
+	OPTIONS="${OPTIONS} --with-readline"
+fi
 
 IS_64BIT=`getconf LONG_BIT`
 if [ "$IS_64BIT" == "64" ];then
@@ -113,6 +115,7 @@ if [ ! -d $serverPath/php/${PHP_VER}/bin ];then
 	--with-mysql=mysqlnd \
 	--with-pdo-mysql=mysqlnd \
 	--with-mysqli=mysqlnd \
+	--enable-mbstring \
 	--enable-exif \
 	--enable-hash \
 	--enable-libxml \

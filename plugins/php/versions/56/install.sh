@@ -65,7 +65,7 @@ if [ $sysName == 'Darwin' ]; then
 	OPTIONS="${OPTIONS} --with-freetype-dir=${serverPath}/lib/freetype"
 	OPTIONS="${OPTIONS} --with-zlib-dir=$(brew --prefix zlib)"
 else
-	OPTIONS="${OPTIONS} --enable-mbstring"
+	OPTIONS="${OPTIONS} --with-readline"
 fi
 
 IS_64BIT=`getconf LONG_BIT`
@@ -125,6 +125,7 @@ if [ ! -d $serverPath/php/${PHP_VER} ];then
 	--with-mysql=mysqlnd \
 	--with-pdo-mysql=mysqlnd \
 	--with-mysqli=mysqlnd \
+	--enable-mbstring \
 	--enable-simplexml \
 	--enable-ftp \
 	--enable-sockets \

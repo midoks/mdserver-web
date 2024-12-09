@@ -21,7 +21,10 @@ version=$2
 LIBNAME=readline
 LIBV=0
 
-
+if [ "$version" -lt "74" ];then
+	echo "not need"
+	exit 0
+fi
 
 LIB_PATH_NAME=lib/php
 if [ -d $serverPath/php/${version}/lib64 ];then
@@ -65,14 +68,8 @@ Install_lib()
 
 		cd ${rootPath}/plugins/php/lib && /bin/bash libedit.sh
 		export PKG_CONFIG_PATH=$PKG_CONFIG_PATH:${serverPath}/lib/libedit/lib/pkgconfig
-
-
 		OPTIONS="$OPTIONS --with-libedit=${serverPath}/lib/libedit"
 
-		readlinelib=`pkg-config --path readline`
-		export PKG_CONFIG_PATH=$PKG_CONFIG_PATH:${serverPath}/lib/libedit/lib/pkgconfig
-		OPTIONS="$OPTIONS --with-libedit=${serverPath}/lib/libedit"
-		
 		cd $sourcePath/php${version}/ext/${LIBNAME}
 		$serverPath/php/$version/bin/phpize
 		./configure --with-php-config=$serverPath/php/$version/bin/php-config $OPTIONS

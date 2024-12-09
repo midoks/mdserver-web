@@ -70,7 +70,6 @@ if [ $sysName == 'Darwin' ]; then
 	OPTIONS="${OPTIONS} --with-curl=$(brew --prefix curl)"
 	OPTIONS="${OPTIONS} --with-pcre-dir=$(brew --prefix pcre2)"
 else
-	OPTIONS="${OPTIONS} --with-zlib-dir=$serverPath/lib/zlib"
 	OPTIONS="${OPTIONS} --with-readline"
 fi
 

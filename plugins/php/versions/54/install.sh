@@ -63,7 +63,7 @@ if [ $sysName == 'Darwin' ]; then
 	# OPTIONS="${OPTIONS} --with-pcre-dir=${serverPath}/lib/pcre"
 	# OPTIONS="${OPTIONS} --with-external-pcre=${serverPath}/lib/pcre"
 else
-	OPTIONS="${OPTIONS} --enable-mbstring"
+	OPTIONS="${OPTIONS} --with-readline"
 fi
 
 IS_64BIT=`getconf LONG_BIT`
@@ -116,6 +116,7 @@ if [ ! -d $serverPath/php/${PHP_VER} ];then
 	--with-mysql=mysqlnd \
 	--with-pdo-mysql=mysqlnd \
 	--with-mysqli=mysqlnd \
+	--enable-mbstring \
 	--enable-sockets \
 	--enable-ftp \
 	--enable-simplexml \

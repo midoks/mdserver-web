@@ -58,8 +58,12 @@ if [ ! -d $sourcePath/php/php${PHP_VER} ];then
 fi
 
 OPTIONS='--without-iconv'
-OPTIONS="${OPTIONS} --with-zlib-dir=$serverPath/lib/zlib"
-
+if [ $sysName == 'Darwin' ]; then	
+	OPTIONS="${OPTIONS} --with-curl=$(brew --prefix curl)"
+	OPTIONS="${OPTIONS} --with-pcre-dir=$(brew --prefix pcre2)"
+else
+	OPTIONS="${OPTIONS} --with-readline"
+fi
 IS_64BIT=`getconf LONG_BIT`
 if [ "$IS_64BIT" == "64" ];then
 	OPTIONS="${OPTIONS} --with-libdir=lib64"
