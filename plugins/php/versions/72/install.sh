@@ -105,7 +105,6 @@ if [ ! -d $serverPath/php/${PHP_VER} ];then
 	--enable-mysqlnd \
 	--with-mysqli=mysqlnd \
 	--with-pdo-mysql=mysqlnd \
-	--with-libzip \
 	--enable-mbstring \
 	--enable-simplexml \
 	--enable-sockets \

@@ -62,13 +62,13 @@ if [ ! -d $sourcePath/php/php${PHP_VER} ];then
 	mv $sourcePath/php/php-${version} $sourcePath/php/php${PHP_VER}
 fi
 
-ZIP_OPTION='--enable-zip'
-libzip_version=`pkg-config libzip --modversion`
-if [ "$?" != "0" ] || version_lt "$libzip_version" "0.11.0" ;then
-	cd ${rootPath}/plugins/php/lib && /bin/bash libzip.sh
-	export PKG_CONFIG_PATH=$serverPath/lib/libzip/lib/pkgconfig
-	ZIP_OPTION="--with-libzip=$serverPath/lib/libzip"
-fi
+# ZIP_OPTION='--enable-zip'
+# libzip_version=`pkg-config libzip --modversion`
+# if [ "$?" != "0" ] || version_lt "$libzip_version" "0.11.0" ;then
+# 	cd ${rootPath}/plugins/php/lib && /bin/bash libzip.sh
+# 	export PKG_CONFIG_PATH=$serverPath/lib/libzip/lib/pkgconfig
+# 	ZIP_OPTION="--with-libzip=$serverPath/lib/libzip"
+# fi
 
 OPTIONS='--without-iconv'
 if [ $sysName == 'Darwin' ]; then	
@@ -76,7 +76,6 @@ if [ $sysName == 'Darwin' ]; then
 	OPTIONS="${OPTIONS} --with-pcre-dir=$(brew --prefix pcre2)"
 else
 	OPTIONS="${OPTIONS} --with-zlib-dir=$serverPath/lib/zlib"
-	OPTIONS="${OPTIONS} ${ZIP_OPTION}"
 	OPTIONS="${OPTIONS} --with-readline"
 fi
 

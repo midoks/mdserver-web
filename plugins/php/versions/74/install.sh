@@ -91,13 +91,13 @@ fi
 
 echo "$sourcePath/php/php${PHP_VER}"
 
-ZIP_OPTION='--with-zip'
-libzip_version=`pkg-config libzip --modversion`
-if version_lt "$libzip_version" "0.11.0" ;then
-	cd ${rootPath}/plugins/php/lib && /bin/bash libzip.sh
-	export PKG_CONFIG_PATH=$serverPath/lib/libzip/lib/pkgconfig
-	ZIP_OPTION="--with-zip=$serverPath/lib/libzip"
-fi
+# ZIP_OPTION='--with-zip'
+# libzip_version=`pkg-config libzip --modversion`
+# if version_lt "$libzip_version" "0.11.0" ;then
+# 	cd ${rootPath}/plugins/php/lib && /bin/bash libzip.sh
+# 	export PKG_CONFIG_PATH=$serverPath/lib/libzip/lib/pkgconfig
+# 	ZIP_OPTION="--with-zip=$serverPath/lib/libzip"
+# fi
 
 # ----- cpu start ------
 if [ -z "${cpuCore}" ]; then
@@ -134,7 +134,6 @@ if [ ! -d $serverPath/php/${PHP_VER} ];then
 	--with-mysqli=mysqlnd \
 	--with-pdo-mysql=mysqlnd \
 	--with-zlib-dir=$serverPath/lib/zlib \
-	$ZIP_OPTION \
 	--enable-ftp \
 	--enable-mbstring \
 	--enable-sockets \
