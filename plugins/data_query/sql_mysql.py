@@ -40,18 +40,12 @@ class nosqlMySQL():
         self.__config = self.get_options(sid=sid)
 
     def conn(self):
-        if self.__DB_HOST in ['127.0.0.1', 'localhost']:
-            my_path = "{}/mysql".format(mw.getServerDir())
-            if not os.path.exists(my_path): return False
-
-        if not self.__DB_LOCAL:
-            self.__DB_PORT = int(self.__config['port'])
-            self.__DB_USER = self.__config['username']
-            self.__DB_PASS = self.__config['password']
-            self.__DB_SOCKET = self.__config['socket']
+        self.__DB_PORT = int(self.__config['port'])
+        self.__DB_USER = self.__config['username']
+        self.__DB_PASS = self.__config['password']
+        self.__DB_SOCKET = self.__config['socket']
 
         try:
-
             db = mw.getMyORM()
             db.setPort(self.__DB_PORT)
             db.setPwd(self.__DB_PASS)
@@ -97,8 +91,6 @@ class nosqlMySQL():
             socket_re = re.search(socket_rep, mydb_content)
             if socket_re:
                 result['socket'] = socket_re.groups()[0].strip()
-            
-
         return result
 
     def set_host(self, host, port, name, username, password, prefix=''):
