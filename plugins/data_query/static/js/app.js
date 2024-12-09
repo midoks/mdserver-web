@@ -249,8 +249,6 @@ function initTabMemcached(){
 
 function initTabMySQL(){
     mysqlGetDbList();
-
-    mysqlProcessList();
     clearInterval(mysql_timer);
     var mysql_timer = setInterval(function(){
         var name = $('#mysql_list_tab .tab-nav span.on').data('name');
