@@ -121,11 +121,11 @@ class nosqlMySQL():
         if os.path.exists(local_mysql):
             data.append({'name':'本地服务器', 'val':'0'})
 
-        local_mysql_apt = "{}/mysql-apt/etc/my.conf".format(mw.getServerDir())
+        local_mysql_apt = "{}/mysql-apt/etc/my.cnf".format(mw.getServerDir())
         if os.path.exists(local_mysql_apt):
             data.append({'name':'本地服务器[apt]', 'val':'apt'})
 
-        local_mysql_yum = "{}/mysql-yum/etc/my.conf".format(mw.getServerDir())
+        local_mysql_yum = "{}/mysql-yum/etc/my.cnf".format(mw.getServerDir())
         if os.path.exists(local_mysql_yum):
             data.append({'name':'本地服务器[yum]', 'val':'yum'})
         return mw.returnData(True, 'ok', data)
