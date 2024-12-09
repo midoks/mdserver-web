@@ -30,7 +30,7 @@ import thisdb
 from admin import setup
 setup.init()
 
-g_log_file = mw.getPanelTaskLog()
+g_log_file = mw.getPanelTaskExecLog()
 if not os.path.exists(g_log_file):
     os.system("touch " + g_log_file)
 

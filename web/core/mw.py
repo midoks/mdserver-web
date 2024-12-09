@@ -116,6 +116,9 @@ def getRecycleBinDir():
 def getPanelTaskLog():
     return getMWLogs() + '/panel_task.log'
 
+def getPanelTaskExecLog():
+    return getMWLogs() + '/panel_exec.log'
+
 def getWwwDir():
     import thisdb
     site_path = thisdb.getOption('site_path')
