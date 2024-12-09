@@ -14,10 +14,6 @@ if os.path.exists(web_dir):
 
 import core.mw as mw
 
-
-# def getPluginName():
-#     return 'data_query'
-
 def singleton(cls):
     _instance = {}
 
@@ -47,7 +43,8 @@ class nosqlRedis():
 
         if self.__DB_HOST in ['127.0.0.1', 'localhost']:
             redis_path = "{}/redis".format(mw.getServerDir())
-            if not os.path.exists(redis_path): return False
+            if not os.path.exists(redis_path):
+                return False
 
         if not self.__DB_LOCAL:
             self.__DB_PASS = self.__config['requirepass']
@@ -75,7 +72,7 @@ class nosqlRedis():
         keys = ["bind", "port", "timeout", "maxclients", "databases", "requirepass", "maxmemory"]
         for k in keys:
             v = ""
-            rep = "\n%s\s+(.+)" % k
+            rep = r"\n%s\s+(.+)" % k
             group = re.search(rep, redis_conf)
             if not group:
                 if k == "maxmemory":
