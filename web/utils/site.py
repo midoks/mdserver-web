@@ -2356,6 +2356,34 @@ export PATH
         mw.restartWeb()
         return mw.returnData(data['status'], data['msg'], result)
 
+    def setCertToSite(self, site_name, cert_name):
+        certName = request.form.get('certName', '')
+        siteName = request.form.get('siteName', '')
+        try:
+            path = self.sslDir + '/' + site_name.strip()
+            if not os.path.exists(path):
+                return mw.returnData(False, '证书不存在!')
+
+            result = self.setSslConf(siteName)
+            if not result['status']:
+                return result
+
+            mw.restartWeb()
+            mw.writeLog('网站管理', '证书已部署!')
+            return mw.returnData(True, '证书已部署!')
+        except Exception as ex:
+            return mw.returnData(False, '设置错误:' + str(ex))
+
+    def removeCert(self, cert_name):
+        try:
+            path = self.sslDir + '/' + cert_name
+            if not os.path.exists(path):
+                return mw.returnData(False, '证书已不存在!')
+            os.system("rm -rf " + path)
+            return mw.returnData(True, '证书已删除!')
+        except Exception as ex:
+            return mw.returnData(False, '证书删除失败:'+str(ex))
+
     def getBackup(self,site_id,page=1,size=10):
         site_info = thisdb.getSitesById(site_id)
         info = thisdb.getBackupPage(site_id, page, size)

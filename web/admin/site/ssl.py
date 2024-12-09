@@ -81,6 +81,22 @@ def set_dnsapi():
     data = request.form.get('data')
     return MwSites.instance().setDnsapi(type,data)
 
+# 设置证书到站点
+@blueprint.route('/set_cert_to_site', endpoint='set_cert_to_site', methods=['GET','POST'])
+@panel_login_required
+def set_cert_to_site():
+    site_name = request.form.get('siteName', '')
+    cert_name = request.form.get('certName', '')
+    return MwSites.instance().setCertToSite(site_name, cert_name)
+
+
+@blueprint.route('/remove_cert', endpoint='remove_cert', methods=['GET','POST'])
+@panel_login_required
+def remove_cert():
+    cert_name = request.form.get('certName', '')
+    return MwSites.instance().removeCert(cert_name)
+
+
 
 
 
