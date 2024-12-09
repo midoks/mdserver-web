@@ -960,7 +960,6 @@ function mysqlGetDbList(){
     var sid = mysqlGetSid();
     myPostCBN('get_db_list',{'sid':sid} ,function(rdata){
         if (rdata.data.status){
-
             var items = rdata.data.data['list'];
             var content = '';
             for (var i = 0; i < items.length; i++) {
@@ -978,10 +977,6 @@ function mysqlGetDbList(){
             });
 
             mysqlGetTableList(1);
-
-            closeInstallLayer();
-        } else {
-            showInstallLayer();
         }
     });
 }
