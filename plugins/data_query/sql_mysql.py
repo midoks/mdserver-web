@@ -81,20 +81,20 @@ class nosqlMySQL():
         if sid in ['mysql', 'mysql-apt', 'mysql-yum']:
             my_cnf_path = "{}/{}/etc/my.cnf".format(mw.getServerDir(),sid)
 
-            my_content = mw.readFile(my_cnf_path)
-            if not my_content: return False
+            mydb_content = mw.readFile(my_cnf_path)
+            if not mydb_content: return False
 
-            mysql_pass = self.sqliteDb(sid,'config').where('id=?', (1,)).getField('mysql_root')
+            mysql_pass = self.sqliteDb(sid, 'config').where('id=?', (1,)).getField('mysql_root')
             result['password'] = mysql_pass
         
             keys = ["bind_ip", "port"]
 
             rep = r'port\s*=\s*(.*)'
-            port_re = re.search(rep, my_content)
+            port_re = re.search(rep, mydb_content)
             if port_re:
                 result['port'] = int(port_re.groups()[0].strip())
             socket_rep = r'socket\s*=\s*(.*)'
-            socket_re = re.search(socket_rep, my_content)
+            socket_re = re.search(socket_rep, mydb_content)
             if socket_re:
                 result['socket'] = socket_re.groups()[0].strip()
             
