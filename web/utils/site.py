@@ -2256,7 +2256,7 @@ export PATH
             thisdb.setOption('ssl_email', email)
 
         if email.strip() == '':
-            email = mw.getRandomString(10)+"."+mw.getRandomString(3) + '@google.com'
+            email = mw.getRandomString(10)+"."+mw.getRandomString(3) + '@gmail.com'
 
         # 检测acme是否安装
         acme_dir = mw.getAcmeDir()
