@@ -2362,7 +2362,7 @@ export PATH
             if not os.path.exists(path):
                 return mw.returnData(False, '证书不存在!')
 
-            result = self.setSslConf(siteName)
+            result = self.setSslConf(site_name)
             if not result['status']:
                 return result
 
