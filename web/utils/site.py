@@ -1333,11 +1333,11 @@ class sites(object):
         mw.writeFile(vhost_file, content)
 
     # get redirect status
-    def setRedirect(self, siteName, site_from, to, type, r_type, keep_path):
-        if siteName == '' or site_from == '' or to == '' or type == '' or r_type == '':
+    def setRedirect(self, site_name, site_from, to, type, r_type, keep_path):
+        if site_name == '' or site_from == '' or to == '' or type == '' or r_type == '':
             return mw.returnData(False, "必填项不能为空!")
 
-        redirect_file = self.getRedirectDataPath(siteName)
+        redirect_file = self.getRedirectDataPath(site_name)
         content = mw.readFile(redirect_file) if os.path.exists(redirect_file) else ""
         data = json.loads(content) if content != "" else []
 
@@ -1347,11 +1347,11 @@ class sites(object):
 
         # check if domain exists in site
         if _type_code == 1:
-            pid = mw.M('domain').where("name=?", (_siteName,)).field('id,pid,name,port,addtime').select()
-            site_domain_lists = mw.M('domain').where("pid=?", (pid[0]['pid'],)).field('name').select()
+            domain_list = mw.M('domain').where("name=?", (site_name,)).field('id,pid,name,port,add_time').select()
+            site_domain_lists = mw.M('domain').where("pid=?", (domain_list[0]['pid'],)).field('name').select()
             found = False
             for item in site_domain_lists:
-                if item['name'] == _from:
+                if item['name'] == site_from:
                     found = True
                     break
             if found == False:
@@ -1370,14 +1370,14 @@ class sites(object):
         # domain
         else:
             if _keep_path == 1:
-                _to = "{}$request_uri".format(_to)
+                _to = "{}$request_uri".format(to)
 
             redirect_type = "301" if _type_code == 0 else "302"
             _if = "if ($host ~ '^{}')".format(site_from)
             _return = "return {} {}; ".format(redirect_type, to)
             file_content = _if + "{\r\n    " + _return + "\r\n}"
 
-        _id = mw.md5("{}+{}".format(file_content, siteName))
+        _id = mw.md5("{}+{}".format(file_content, site_name))
 
         # 防止规则重复
         for item in data:
@@ -1391,9 +1391,9 @@ class sites(object):
         # write data json file
         data.append({"r_from": site_from, "type": _type_code, "r_type": _type_code,"r_to": to, 'keep_path': _keep_path, 'id': _id})
         mw.writeFile(redirect_file, json.dumps(data))
-        mw.writeFile("{}/{}.conf".format(self.getRedirectPath(siteName), _id), file_content)
+        mw.writeFile("{}/{}.conf".format(self.getRedirectPath(site_name), _id), file_content)
 
-        self.operateRedirectConf(siteName, 'start')
+        self.operateRedirectConf(site_name, 'start')
         mw.restartWeb()
         return mw.returnData(True, "设置成功")
 
