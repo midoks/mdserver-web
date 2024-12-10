@@ -1273,12 +1273,11 @@ function getSpeed(sele){
 	},'json');
 }
 
-function tasklist(a){
+function tasklist(){
 	var con='<ul class="cmdlist"></ul>\
 		<span style="position:  fixed;bottom: 13px;">若任务长时间未执行，请尝试在首页点【重启面板】来重置任务队列</span>';
 	$(".taskcon").html(con);
-	a = a == undefined ? 1 : a;
-	$.post("/task/list", "tojs=getTaskList&table=tasks&limit=10&p=" + a, function(g) {
+	$.post("/task/list", "tojs=getTaskList&table=tasks&limit=10&p=1", function(g) {
 		$('.msg_count').html(g.count);
 	},'json');
 
