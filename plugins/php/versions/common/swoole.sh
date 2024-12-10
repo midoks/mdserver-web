@@ -15,7 +15,7 @@ actionType=$1
 version=$2
 
 LIBNAME=swoole
-LIBV=4.8.10
+LIBV=5.1.6
 
 if [ "$version" -lt "70" ];then
 	LIBV=1.10.1
