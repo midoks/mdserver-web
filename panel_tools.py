@@ -41,38 +41,55 @@ def mw_input_cmd(msg):
         in_val = input(msg)
     return in_val
 
+def getRemainLen(cmd, max_length=100):
+    cmd_len = len(cmd)
+    cmd_u8_len = len(cmd.encode('utf-8'))
+    # print(cmd, cmd_u8_len, cmd_len, int((cmd_u8_len - cmd_len)/2+cmd_len))
+    return max_length-int((cmd_u8_len - cmd_len)/2+cmd_len)
 
 def mwcli(mw_input=0):
     panel_dir = mw.getPanelDir()
 
-    raw_tip = "======================================================"
+    raw_tip = "=================================================================="
     if not mw_input:
-        print("===============mdserver-web cli tools=================")
-        print("(1)      重启面板服务")
-        print("(2)      停止面板服务")
-        print("(3)      启动面板服务")
-        print("(4)      重载面板服务")
-        print("(5)      修改面板端口")
-        print("(10)     查看面板默认信息")
-        print("(11)     修改面板密码")
-        print("(12)     修改面板用户名")
-        print("(13)     显示面板错误日志")
-        print("(14)     关闭面板访问")
-        print("(15)     开启面板访问")
-        print("(20)     关闭BasicAuth认证")
-        print("(21)     解除域名绑定")
-        print("(22)     解除面板SSL绑定")
-        print("(23)     开启IPV6支持")
-        print("(24)     关闭IPV6支持")
-        print("(25)     开启防火墙SSH端口")
-        print("(26)     关闭二次验证")
-        print("(27)     查看防火墙信息")
-        print("(28)     自动识别防火墙端口到面板")
-        print("(100)    开启PHP52显示")
-        print("(101)    关闭PHP52显示")
-        print("(200)    切换Linux系统软件源")
-        print("(201)    简单速度测试")
-        print("(0)      取消")
+        print("=====================mdserver-web cli tools=======================")
+        cmd_list = [
+            '(1)    重启面板服务',
+            '(2)    停止面板服务',
+            '(3)    启动面板服务',
+            '(4)    重载面板服务',
+            '(5)    修改面板端口',
+            '(10)   查看面板默认信息',
+            '(11)   修改面板密码',
+            '(12)   修改面板用户名',
+            '(13)   显示面板错误日志',
+            '(14)   关闭面板访问',
+            '(15)   开启面板访问',
+            '(20)   关闭BasicAuth认证',
+            '(21)   解除域名绑定',
+            '(22)   解除面板SSL绑定',
+            '(23)   开启IPV6支持',
+            '(24)   关闭IPV6支持',
+            '(25)   开启防火墙SSH端口',
+            '(26)   关闭二次验证',
+            '(27)   查看防火墙信息',
+            '(28)   自动识别防火墙端口到面板',
+            '(100)  开启PHP52显示',
+            '(101)  关闭PHP52显示',
+            '(200)  切换Linux系统软件源',
+            '(201)  简单速度测试',
+            '(0)    取消'
+        ]
+        cmd_list_num = len(cmd_list)
+        for index in range(cmd_list_num):
+            cmd = cmd_list[index]
+            if index % 2 == 0:
+                if index == (cmd_list_num-1):
+                    print(cmd)
+                else:
+                    print(cmd + " " * getRemainLen(cmd, 40), end="")
+            if index % 2 == 1:
+                print(cmd)
         print(raw_tip)
         try:
             mw_input = input("请输入命令编号：")
