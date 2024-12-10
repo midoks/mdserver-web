@@ -3774,8 +3774,9 @@ def uninstallPreInspection(version):
     if mw.isDebugMode():
         return 'ok'
 
-    import plugins_api
-    plugins_api.plugins_api().removeIndex(getPluginName(), version)
+
+    from utils.plugin import plugin as MwPlugin
+    MwPlugin.instance().removeIndex(getPluginName(), version)
 
     return "请手动删除MySQL[{}]<br/> rm -rf {}".format(version, getServerDir())
 
