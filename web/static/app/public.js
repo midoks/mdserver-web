@@ -1416,19 +1416,17 @@ function remind(a){
 }
 
 function getReloads() {
-	var a = 0;
-	var mm = $(".bt-w-menu .bgw").html()
+	var mm = $("#msg_box .bt-w-menu .bgw").html();
 	if(mm == undefined || mm.indexOf('任务列表') == -1) {
 		clearInterval(speed);
-		a = 0;
 		speed = null;
 		return
 	}
 	if(speed) {return;}
 
 	function renderRunTask(){
-		var mm = $(".bt-w-menu .bgw").html();
-		if(mm == undefined || mm.indexOf(lan.bt.task_list) == -1) {
+		var mm = $("#msg_box .bt-w-menu .bgw").html();
+		if(mm == undefined || mm.indexOf('任务列表') == -1) {
 			clearInterval(speed);
 			speed = null;
 			a = 0;
