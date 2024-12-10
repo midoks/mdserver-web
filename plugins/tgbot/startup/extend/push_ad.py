@@ -45,6 +45,7 @@ def send_msg(bot, tag='ad', trigger_time=300):
     mw.writeFile(lock_file, json.dumps(lock_data))
     # 信号只在一个周期内执行一次|end
 
+    # 跨链混币器Cce.Cash💰低手续费💰隔断溯源 | 10/m | @hu ge
     # TTKCDN 无视移动墙/GFW/SNI阻断 TG第一性价比 | 10/m | @ssdpflood
     # https://t.me/gjgzs2022 ｜ 22/m | @GJ_gzs
     # https://zhaoziyuan1.cc | web | 15/m | 2m | next,12/15 ｜ @baleite
@@ -52,6 +53,10 @@ def send_msg(bot, tag='ad', trigger_time=300):
     # 实名认证/过人脸🕵️‍♀️各种账号处理✅ | 30/m| next,12/30 | @nngzs
     # 桃花资源采集| 13/m| next,1/13 | @xiaolizi1122
     keyboard = [
+        [
+            types.InlineKeyboardButton(
+                text="跨链混币器Cce.Cash💰低手续费💰隔断溯源", url='https://cce.cash/#/main/home?MW')
+        ],
         [
             types.InlineKeyboardButton(
                 text="TTKCDN 无视移动墙/GFW/SNI阻断 TG第一性价比", url='https://t.me/ssdpflood')
