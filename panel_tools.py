@@ -44,7 +44,6 @@ def mw_input_cmd(msg):
 def getRemainLen(cmd, max_length=100):
     cmd_len = len(cmd)
     cmd_u8_len = len(cmd.encode('utf-8'))
-    # print(cmd, cmd_u8_len, cmd_len, int((cmd_u8_len - cmd_len)/2+cmd_len))
     return max_length-int((cmd_u8_len - cmd_len)/2+cmd_len)
 
 def mwcli(mw_input=0):
