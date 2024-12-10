@@ -184,7 +184,6 @@ class Firewall(object):
         if ssh_status[0] != '':
             status = False
 
-
         data['pubkey_prohibit_status'] = False
         data['pass_prohibit_status'] = False
         port = '22'
