@@ -158,11 +158,6 @@ class Firewall(object):
     def getSshInfo(self):
         data = {}
 
-        file = '/etc/ssh/sshd_config'
-        conf = mw.readFile(file)
-        rep = r"#*Port\s+([0-9]+)\s*\n"
-        port = re.search(rep, conf).groups(0)[0]
-
         isPing = True
         try:
             if mw.isAppleSystem():
@@ -189,25 +184,33 @@ class Firewall(object):
         if ssh_status[0] != '':
             status = False
 
-        # 密码登陆配置检查
-        data['pass_prohibit_status'] = False
-        pass_rep = r"PasswordAuthentication\s+(\w*)\s*\n"
-        pass_status = re.search(pass_rep, conf)
-        if pass_status:
-            if pass_status and pass_status.groups(0)[0].strip() == 'no':
-                data['pass_prohibit_status'] = True
-        else:
-            data['pass_prohibit_status'] = True
 
-        # 密钥登陆配置检查
         data['pubkey_prohibit_status'] = False
-        pass_rep = r"PubkeyAuthentication\s+(\w*)\s*\n"
-        pass_status = re.search(pass_rep, conf)
-        if pass_status:
-            if pass_status and pass_status.groups(0)[0].strip() == 'no':
+        data['pass_prohibit_status'] = False
+        port = '22'
+        sshd_file = '/etc/ssh/sshd_config'
+        if  os.path.exists(sshd_file):
+            conf = mw.readFile(sshd_file)
+            rep = r"#*Port\s+([0-9]+)\s*\n"
+            port = re.search(rep, conf).groups(0)[0]
+
+            # 密码登陆配置检查
+            pass_rep = r"PasswordAuthentication\s+(\w*)\s*\n"
+            pass_status = re.search(pass_rep, conf)
+            if pass_status:
+                if pass_status and pass_status.groups(0)[0].strip() == 'no':
+                    data['pass_prohibit_status'] = True
+            else:
+                data['pass_prohibit_status'] = True
+
+            # 密钥登陆配置检查
+            pass_rep = r"PubkeyAuthentication\s+(\w*)\s*\n"
+            pass_status = re.search(pass_rep, conf)
+            if pass_status:
+                if pass_status and pass_status.groups(0)[0].strip() == 'no':
+                    data['pubkey_prohibit_status'] = True
+            else:
                 data['pubkey_prohibit_status'] = True
-        else:
-            data['pubkey_prohibit_status'] = True
 
         data['port'] = port
         data['status'] = status
@@ -216,7 +219,7 @@ class Firewall(object):
             data['firewall_status'] = False
         else:
             data['firewall_status'] = self.getFwStatus()
-        return mw.getJson(data)
+        return data
 
     def setPing(self, status):
         if mw.isAppleSystem():
