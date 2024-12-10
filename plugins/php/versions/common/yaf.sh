@@ -16,7 +16,7 @@ version=$2
 
 sysName=`uname`
 LIBNAME=yaf
-LIBV=3.3.5
+LIBV=3.3.6
 
 if [ "$version" -lt "70" ];then
 	LIBV=2.3.5
