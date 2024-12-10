@@ -218,11 +218,10 @@ class Firewall(object):
             data['firewall_status'] = self.getFwStatus()
         return mw.getJson(data)
 
-    def setPing(self):
+    def setPing(self, status):
         if mw.isAppleSystem():
             return mw.returnData(True, '开发机不能操作!')
 
-        status = request.form.get('status')
         filename = '/etc/sysctl.conf'
         conf = mw.readFile(filename)
         if conf.find('net.ipv4.icmp_echo') != -1:
