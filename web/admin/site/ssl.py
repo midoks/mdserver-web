@@ -89,12 +89,26 @@ def set_cert_to_site():
     cert_name = request.form.get('certName', '')
     return MwSites.instance().setCertToSite(site_name, cert_name)
 
-
+# 删除证书
 @blueprint.route('/remove_cert', endpoint='remove_cert', methods=['GET','POST'])
 @panel_login_required
 def remove_cert():
     cert_name = request.form.get('certName', '')
     return MwSites.instance().removeCert(cert_name)
+
+# 强制开启HTTPS
+@blueprint.route('/http_to_https', endpoint='http_to_https', methods=['GET','POST'])
+@panel_login_required
+def http_to_https():
+    site_name = request.form.get('siteName', '')
+    return MwSites.instance().httpToHttps(site_name)
+
+# 强制关闭HTTPS
+@blueprint.route('/close_to_https', endpoint='close_to_https', methods=['GET','POST'])
+@panel_login_required
+def close_to_https():
+    site_name = request.form.get('siteName', '')
+    return MwSites.instance().closeToHttps(site_name)
 
 
 

@@ -1129,6 +1129,40 @@ error_page 497  https://$host$request_uri;""" % (certPath, keyPath, http3Header)
         data['phpversion'] = def_pver
         return data
 
+    def httpToHttps(self, site_name):
+        file = self.getHostConf(site_name)
+        conf = mw.readFile(file)
+        if not conf:
+            return mw.returnData(False, '站点[{}]配置异常!'.format(site_name))
+
+        if conf.find('ssl_certificate') == -1:
+            return mw.returnData(False, '当前未开启SSL')
+        to = "#error_page 404/404.html;\n\
+#HTTP_TO_HTTPS_START\n\
+if ($server_port !~ 443){\n\
+    rewrite ^(/.*)$ https://$host$1 permanent;\n\
+}\n\
+#HTTP_TO_HTTPS_END"
+        conf = conf.replace('#error_page 404/404.html;', to)
+        mw.writeFile(file, conf)
+
+        mw.restartWeb()
+        return mw.returnData(True, '设置成功!')
+
+    def closeToHttps(self, site_name):
+        file = self.getHostConf(site_name)
+        conf = mw.readFile(file)
+        if not conf:
+            return mw.returnData(False, '站点[{}]配置异常!'.format(site_name))
+        rep = r"\n\s*#HTTP_TO_HTTPS_START(.|\n){1,300}#HTTP_TO_HTTPS_END"
+        conf = re.sub(rep, '', conf)
+        rep = r"\s+if.+server_port.+\n.+\n\s+\s*}"
+        conf = re.sub(rep, '', conf)
+        mw.writeFile(file, conf)
+
+        mw.restartWeb()
+        return mw.returnData(True, '关闭HTTPS跳转成功!')
+
     def getIndex(self, site_id):
         info = thisdb.getSitesById(site_id)
         file = self.getHostConf(info['name'])
@@ -1158,7 +1192,7 @@ error_page 497  https://$host$request_uri;""" % (certPath, keyPath, http3Header)
             mw.writeFile(file, conf)
 
         mw.writeLog('网站管理', '站点[{1}]设置{2}成功', (siteName, index_l))
-        return mw.returnJson(True,  '设置成功!')
+        return mw.returnData(True,  '设置成功!')
 
     def getLimitNet(self, site_id):
         info = thisdb.getSitesById(site_id)
