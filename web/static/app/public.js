@@ -1292,12 +1292,14 @@ function messageBox() {
 					<div class="taskcon"></div>\
 				</div>\
 			</div>\
-		</div>'
+		</div>',
+		success:function(){
+			$(".bt-w-menu p").click(function(){
+				$(this).addClass("bgw").siblings().removeClass("bgw");
+			});
+			tasklist();
+		}
 	});
-	$(".bt-w-menu p").click(function(){
-		$(this).addClass("bgw").siblings().removeClass("bgw");
-	});
-	tasklist();
 }
 
 //取执行日志
