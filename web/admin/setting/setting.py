@@ -243,7 +243,7 @@ def set_port():
         msg = mw.getInfo('放行端口[{1}]成功', (port,))
         mw.writeLog("防火墙管理", msg)
 
-        MwFirewall.instance().addAcceptPort(port, '配置修改', 'port')
+        MwFirewall.instance().addAcceptPort(port, 'PANEL端口-配置修改', 'port')
         mw.restartMw()
 
     return mw.returnData(True, '端口保存成功!')
