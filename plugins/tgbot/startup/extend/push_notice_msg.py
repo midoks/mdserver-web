@@ -55,7 +55,7 @@ def send_msg(bot, tag='ad', trigger_time=300):
     # 信号只在一个周期内执行一次|end
 
     # 跨链混币器Cce.Cash💰低手续费💰隔断溯源 | 10/m | next,6/10 | @hu ge
-    # TTKCDN | 10/m | @ssdpflood
+    # TTKCDN | 10/m | @ssdpflood | 5
     # https://t.me/gjgzs2022 ｜ 22/m | @GJ_gzs
     # https://zhaoziyuan1.cc | web | 15/m | 2m | next,12/15 ｜ @baleite
     # 综合包网/NG接口开户 | 28/m | 6m | next,4/28 | x
@@ -120,7 +120,7 @@ def send_msg(bot, tag='ad', trigger_time=300):
             types.InlineKeyboardButton(
                 text="@ME", url='tg://user?id=5568699210'),
             types.InlineKeyboardButton(
-                text="100RMB/M", url='tg://user?id=5568699210')
+                text="100RMB/M[已满]", url='tg://user?id=5568699210')
         ]
     ]
     markup = types.InlineKeyboardMarkup(keyboard)
