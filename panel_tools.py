@@ -50,9 +50,9 @@ def getRemainLen(cmd, max_length=100):
 def mwcli(mw_input=0):
     panel_dir = mw.getPanelDir()
 
-    raw_tip = "=================================================================="
+    raw_tip = "===================================================================="
     if not mw_input:
-        print("=====================mdserver-web cli tools=======================")
+        print("======================mdserver-web cli tools========================")
         cmd_list = [
             '(1)    重启面板服务',
             '(2)    停止面板服务',
