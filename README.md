@@ -39,6 +39,10 @@ Talk is cheap, show me the code.  -- linus
 - [兼容性测试报告](/compatibility.md)
 - [常用命令说明](/cmd.md) [ mw default ] [ mw update_dev ]
 
+### 特别赞助
+
+- [找资源 - 阿里云盘资源搜索引擎](https://zhaoziyuan1.cc)
+
 ### 主要插件介绍
 
 * OpenResty - 轻量级，占有内存少，并发能力强。
@@ -87,10 +91,6 @@ PHP[72-84]支持phpMyAdmin[5.2.1]
 
 - https://www.youtube.com/watch?v=2taa5K-Jmmw
 
-
-# 特别赞助
-
-- [找资源 - 阿里云盘资源搜索引擎](https://zhaoziyuan1.cc)
 
 # AD - VPS推荐 - 🙏
 
