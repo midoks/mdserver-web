@@ -152,6 +152,8 @@ def mwcli(mw_input=0):
             thisdb.setOption('panel_domain', '')
             os.system(INIT_CMD + " unbind_domain")
             print("|-解除域名绑定成功")
+        else:
+            print("|-面板未绑定域名!")
     elif mw_input == 22:
         panel_ssl = thisdb.getOptionByJson('panel_ssl', default={'open':False})
         if panel_ssl['open']:
@@ -162,7 +164,7 @@ def mwcli(mw_input=0):
     elif mw_input == 23:
         listen_ipv6 = panel_dir + '/data/ipv6.pl'
         if not os.path.exists(listen_ipv6):
-            mw.writeFile(listen_ipv6,'True')
+            mw.writeFile(listen_ipv6, 'True')
             os.system(INIT_CMD + " restart")
             print("|-开启IPv6支持了")
         else:
