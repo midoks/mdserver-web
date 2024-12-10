@@ -50,7 +50,7 @@ Install_lib()
 		cd $php_lib/${LIBNAME}-${LIBV}
 
 		/opt/remi/php${version}/root/usr/bin/phpize
-		./configure --with-php-config=/usr/bin/php-config${version}
+		./configure --with-php-config=/opt/remi/php${version}/root/usr/bin/
 		make && make install && make clean
 
 	fi

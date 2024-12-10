@@ -99,8 +99,8 @@ if [ "${action}" == "install" ] && [ -d ${serverPath}/php-yum/${type} ];then
 	echo "install PHP-YUM[${type}] extend end"
 
 	#初始化 
-	cd ${rootPath} && python3 ${rootPath}/plugins/php-yum/index.py start ${type}
-	cd ${rootPath} && python3 ${rootPath}/plugins/php-yum/index.py initd_install ${type}
+	cd ${rootPath} && python3 plugins/php-yum/index.py start ${type}
+	cd ${rootPath} && python3 plugins/php-yum/index.py initd_install ${type}
 
 	if [ ! -f /usr/local/bin/composer ];then
 		cd /tmp
