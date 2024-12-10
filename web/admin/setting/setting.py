@@ -11,6 +11,7 @@
 import re
 import json
 import os
+import time
 
 from flask import Blueprint, render_template
 from flask import request
@@ -211,6 +212,7 @@ def set_name():
     session['username'] = name1
     return mw.returnData(True, '用户修改成功!')
 
+# 设置面板密码
 @blueprint.route('/set_password', endpoint='set_password', methods=['POST'])
 @panel_login_required
 def set_password():
@@ -224,31 +226,24 @@ def set_password():
     thisdb.setUserPwdByName(session['username'], password1)
     return mw.returnData(True, '密码修改成功!')
 
-
-# 设置站点状态
+# 设置面板端口
 @blueprint.route('/set_port', endpoint='set_port', methods=['POST'])
 @panel_login_required
 def set_port():
     port = request.form.get('port', '')
     if port != mw.getHostPort():
-        import system_api
-        import firewall_api
+        from utils.firewall import Firewall as MwFirewall
 
         sysCfgDir = mw.systemdCfgDir()
         if os.path.exists(sysCfgDir + "/firewalld.service"):
-            if not firewall_api.firewall_api().getFwStatus():
+            if not MwFirewall.instance().getFwStatus():
                 return mw.returnData(False, 'firewalld必须先启动!')
 
-        # mw.setHostPort(port)
-
+        mw.setHostPort(port)
         msg = mw.getInfo('放行端口[{1}]成功', (port,))
         mw.writeLog("防火墙管理", msg)
-        addtime = time.strftime('%Y-%m-%d %X', time.localtime())
-        mw.M('firewall').add('port,ps,add_time', (port, "配置修改", add_time))
 
-        # firewall_api.firewall_api().addAcceptPort(port)
-        # firewall_api.firewall_api().firewallReload()
-
+        MwFirewall.instance().addAcceptPort(port, '配置修改', 'port')
         mw.restartMw()
 
     return mw.returnData(True, '端口保存成功!')
