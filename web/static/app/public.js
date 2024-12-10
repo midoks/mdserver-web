@@ -1276,9 +1276,9 @@ function getSpeed(sele){
 function tasklist(){
 	var con='<ul class="cmdlist"></ul>\
 		<span style="position:  fixed;bottom: 13px;">若任务长时间未执行，请尝试在首页点【重启面板】来重置任务队列</span>';
-	$(".taskcon").html(con);
+	$("#msg_box .taskcon").html(con);
 	$.post("/task/list", "tojs=getTaskList&table=tasks&limit=10&p=1", function(g) {
-		$('.msg_count').html(g.count);
+		$('#msg_box .msg_count').html(g.count);
 	},'json');
 
 	setTimeout(function(){
@@ -1295,7 +1295,7 @@ function messageBox() {
 		closeBtn: 1,
 		shadeClose: false,
 		content: '<div class="bt-form">\
-			<div class="bt-w-main">\
+			<div class="bt-w-main" id="msg_box">\
 				<div class="bt-w-menu">\
 					<p class="bgw" id="taskList" onclick="tasklist()">任务列表(<span class="task_count">0</span>)</p>\
 					<p onclick="remind()">消息列表(<span class="msg_count">0</span>)</p>\
