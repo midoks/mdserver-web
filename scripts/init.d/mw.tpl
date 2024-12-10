@@ -206,14 +206,12 @@ mw_reload()
 }
 
 mw_close(){
-    echo 'True' > ${PANEL_DIR}/data/close.pl
+    cd ${PANEL_DIR} && python3 panel_tools.py cli 14
 }
 
 mw_open()
 {
-    if [ -f ${PANEL_DIR}/data/close.pl ];then
-        rm -rf ${PANEL_DIR}/data/close.pl
-    fi
+    cd ${PANEL_DIR} && python3 panel_tools.py cli 15
 }
 
 mw_unbind_domain()

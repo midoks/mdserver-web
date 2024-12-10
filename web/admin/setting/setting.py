@@ -177,9 +177,9 @@ def close_panel():
     admin_close = thisdb.getOption('admin_close',default='no')
     if admin_close == 'no':
         thisdb.setOption('admin_close','yes')
-        return mw.returnData(True, '开启面板成功!')
+        return mw.returnData(True, '关闭面板成功!')
     thisdb.setOption('admin_close','no')
-    return mw.returnData(True, '关闭面板成功!')
+    return mw.returnData(True, '开启面板成功!')
 
 # 设置IPV6状态
 @blueprint.route('/set_ipv6_status', endpoint='set_ipv6_status', methods=['POST'])

@@ -88,6 +88,7 @@ def login_temp_user(token):
 # 登录页: 当设置了安全路径,本页失效。
 @blueprint.route('/login')
 def login():
+    name = thisdb.getOption('template', default='default')
 
     # 临时登录功能
     token = request.args.get('tmp_token', '').strip()
@@ -103,12 +104,21 @@ def login():
 
     db_path = thisdb.getOption('admin_path')
     if db_path == '':
-        return render_template('default/login.html')
+        return render_template('%s/login.html' % name)
     else:
         unauthorized_status = thisdb.getOption('unauthorized_status')
         if unauthorized_status == '0':
-            return render_template('default/path.html')
+            return render_template('%s/path.html' % name)
         return Response(status=int(unauthorized_status))
+
+@blueprint.route('/close')
+def close():
+    name = thisdb.getOption('template', default='default')
+    admin_close = thisdb.getOption('admin_close')
+    if admin_close == 'no':
+        return redirect('/', code=302)
+    return render_template('%s/close.html' % name)
+
 
 # 验证码
 @blueprint.route('/code')
@@ -179,7 +189,7 @@ def do_login():
 
             if login_cache_limit >= login_cache_count:
                 thisdb.setOption('admin_close', 'yes')
-                return mw.returnJson(False, '面板已经关闭!')
+                return mw.returnData(False, '面板已经关闭!')
 
             cache.set('login_cache_limit', login_cache_limit, timeout=10000)
             login_cache_limit = cache.get('login_cache_limit')
@@ -218,4 +228,4 @@ def do_login():
     session['overdue'] = int(time.time()) + 7 * 24 * 60 * 60
     
     thisdb.updateUserLoginTime()
-    return mw.returnJson(1, '登录成功,正在跳转...')
+    return mw.returnData(1, '登录成功,正在跳转...')

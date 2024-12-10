@@ -19,6 +19,7 @@ from datetime import timedelta
 
 from flask import Flask
 from flask import request
+from flask import redirect
 from flask import Response
 from flask import Flask, abort, current_app, session, url_for
 from flask import Blueprint, render_template
@@ -93,6 +94,12 @@ def sendAuthenticated():
 
 @app.before_request
 def requestCheck():
+
+    admin_close = thisdb.getOption('admin_close')
+    if admin_close == 'yes':
+        if not request.path.startswith('/close'):
+            return redirect('/close')
+
     config.APP_START_TIME=time.time()
     # 自定义basic auth认证
     if app.config['BASIC_AUTH_OPEN']:

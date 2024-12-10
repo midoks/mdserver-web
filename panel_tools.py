@@ -57,6 +57,8 @@ def mwcli(mw_input=0):
         print("(11)     修改面板密码")
         print("(12)     修改面板用户名")
         print("(13)     显示面板错误日志")
+        print("(14)     关闭面板访问")
+        print("(15)     开启面板访问")
         print("(20)     关闭BasicAuth认证")
         print("(21)     解除域名绑定")
         print("(22)     解除面板SSL绑定")
@@ -80,7 +82,7 @@ def mwcli(mw_input=0):
             mw_input = 0
 
     nums = [
-        1, 2, 3, 4, 5, 10, 11, 12, 13,
+        1, 2, 3, 4, 5, 10, 11, 12, 13, 14, 15,
         20, 21, 22, 23, 24, 25, 26, 27, 28,
         100, 101, 
         200, 201
@@ -123,6 +125,20 @@ def mwcli(mw_input=0):
         set_panel_username(input_user.strip())
     elif mw_input == 13:
         os.system('tail -100 ' + panel_dir + '/logs/panel_error.log')
+    elif mw_input == 14:
+        admin_close = thisdb.getOption('admin_close')
+        if admin_close == 'no':
+            thisdb.setOption('admin_close', 'yes')
+            print("|-关闭面板访问成功!")
+        else:
+            print("|-已关闭面板访问!")
+    elif mw_input == 15:
+        admin_close = thisdb.getOption('admin_close')
+        if admin_close == 'yes':
+            thisdb.setOption('admin_close', 'no')
+            print("|-开启面板访问成功!")
+        else:
+            print("|-已开启面板访问!")
     elif mw_input == 20:
         basic_auth = thisdb.getOptionByJson('basic_auth', default={'open':False})
         if basic_auth['open']:
