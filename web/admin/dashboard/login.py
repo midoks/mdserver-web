@@ -159,6 +159,10 @@ def verifyLogin():
 # 执行登录操作
 @blueprint.route('/do_login', endpoint='do_login', methods=['POST'])
 def do_login():
+    admin_close = thisdb.getOption('admin_close')
+    if admin_close == 'yes':
+        return mw.returnData(False, '面板已经关闭!')
+
     username = request.form.get('username', '').strip()
     password = request.form.get('password', '').strip()
     code = request.form.get('code', '').strip()

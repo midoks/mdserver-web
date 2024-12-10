@@ -55,6 +55,22 @@ def send_msg(bot, tag='ad', trigger_time=300):
     keyboard = [
         [
             types.InlineKeyboardButton(
+                text="TTKCDN 性价比最高的商业CDN", url='https://t.me/ssdpflood')
+        ],
+        [
+            types.InlineKeyboardButton(
+                text="TTKCDN 过河南郑州/泉州等地区阻断", url='https://t.me/ssdpflood')
+        ],
+        [
+            types.InlineKeyboardButton(
+                text="TTKCDN 私人定制 属于你自己的独立CDN", url='https://t.me/ssdpflood')
+        ],
+        [
+            types.InlineKeyboardButton(
+                text="TTKCDN 全系主动防御 全球威胁情报网", url='https://t.me/ssdpflood')
+        ],
+        [
+            types.InlineKeyboardButton(
                 text="跨链混币器Cce.Cash💰低手续费💰隔断溯源", url='https://cce.cash/#/main/home?MW')
         ],
         [
@@ -95,7 +111,7 @@ def send_msg(bot, tag='ad', trigger_time=300):
             types.InlineKeyboardButton(
                 text="@ME", url='tg://user?id=5568699210'),
             types.InlineKeyboardButton(
-                text="100RMB/M", url='tg://user?id=5568699210')
+                text="100RMB/M [已满]", url='tg://user?id=5568699210')
         ]
     ]
     markup = types.InlineKeyboardMarkup(keyboard)
