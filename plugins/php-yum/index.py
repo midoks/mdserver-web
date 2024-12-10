@@ -739,7 +739,7 @@ def setDisableFunc(version):
 def getPhpinfo(version):
     stat = status(version)
     if stat == 'stop':
-        return 'PHP[' + version + ']未启动,不可访问!!!'
+        return 'PHP[' + version + ']未启动,不可访问!'
 
     sock_file = getFpmAddress(version)
     root_dir = mw.getFatherDir() + '/phpinfo'
@@ -771,8 +771,7 @@ def getLibConf(version):
     phplib = json.loads(mw.readFile(libpath))
 
     libs = []
-    tasks = mw.M('tasks').where(
-        "status!=?", ('1',)).field('status,name').select()
+    tasks = mw.M('tasks').where("status!=?", ('1',)).field('status,name').select()
     for lib in phplib:
         lib['task'] = '1'
         for task in tasks:
