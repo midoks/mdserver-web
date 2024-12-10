@@ -1432,7 +1432,6 @@ function getReloads() {
 			a = 0;
 			return
 		}
-		a++;
 		$.post('/task/get_task_speed', '', function(h) {
 			if(h.task == undefined) {
 				$(".task_count").text(0);
