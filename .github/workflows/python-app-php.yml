@@ -65,4 +65,4 @@ jobs:
     - name: Start DEBUG
       run: |
         cd web && gunicorn -c setting.py app:app
-        python3 panel_task.py &
+        cd web && python3 panel_task.py &
