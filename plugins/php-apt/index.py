@@ -762,8 +762,7 @@ def getLibConf(version):
         return mw.returnJson(False, '指定PHP版本不存在!')
 
     # phpini = mw.readFile(fname)
-    content = mw.execShell(
-        'cat /etc/php/' + version + '/fpm/conf.d/*' + " | grep -v '^;' |tr -s '\n'")
+    content = mw.execShell('cat /etc/php/' + version + '/fpm/conf.d/*' + " | grep -v '^;' |tr -s '\n'")
     content = content[0]
 
     libpath = getPluginDir() + '/versions/phplib.conf'
@@ -781,7 +780,7 @@ def getLibConf(version):
             if tmp1[0].lower() == lib['name'].lower():
                 lib['task'] = task['status']
                 lib['phpversions'] = []
-                lib['phpversions'].append(tmp1[1])
+                lib['phpversions'].append(tmp1[1].replace('.',''))
         if content.find(lib['check']) == -1:
             lib['status'] = False
         else:
