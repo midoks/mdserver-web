@@ -126,14 +126,14 @@ def mwcli(mw_input=0):
             os.system(INIT_CMD + " restart_panel")
             os.system(INIT_CMD + " default")
         else:
-            print("|-端口范围在0-65536之间")
+            mw.echoInfo("端口范围在0-65536之间")
         return
     elif mw_input == 10:
         os.system(INIT_CMD + " default")
     elif mw_input == 11:
         input_pwd = mw_input_cmd("请输入新的面板密码：")
         if len(input_pwd.strip()) < 5:
-            print("|-错误，密码长度不能小于5位")
+            mw.echoInfo("错误，密码长度不能小于5位")
             return
         set_panel_pwd(input_pwd.strip(), True)
     elif mw_input == 12:
@@ -145,54 +145,54 @@ def mwcli(mw_input=0):
         admin_close = thisdb.getOption('admin_close')
         if admin_close == 'no':
             thisdb.setOption('admin_close', 'yes')
-            print("|-关闭面板访问成功!")
+            mw.echoInfo("关闭面板访问成功!")
         else:
-            print("|-已关闭面板访问!")
+            mw.echoInfo("已关闭面板访问!")
     elif mw_input == 15:
         admin_close = thisdb.getOption('admin_close')
         if admin_close == 'yes':
             thisdb.setOption('admin_close', 'no')
-            print("|-开启面板访问成功!")
+            mw.echoInfo("开启面板访问成功!")
         else:
-            print("|-已开启面板访问!")
+            mw.echoInfo("已开启面板访问!")
     elif mw_input == 20:
         basic_auth = thisdb.getOptionByJson('basic_auth', default={'open':False})
         if basic_auth['open']:
             basic_auth['open'] = False
             thisdb.setOption('basic_auth', json.dumps(basic_auth))
             os.system(INIT_CMD + " restart")
-            print("|-关闭basic_auth成功")
+            mw.echoInfo("关闭basic_auth成功")
     elif mw_input == 21:
         panel_domain = thisdb.getOption('panel_domain', default='')
         if panel_domain != '':
             thisdb.setOption('panel_domain', '')
             os.system(INIT_CMD + " unbind_domain")
-            print("|-解除域名绑定成功")
+            mw.echoInfo("解除域名绑定成功")
         else:
-            print("|-面板未绑定域名!")
+            mw.echoInfo("面板未绑定域名!")
     elif mw_input == 22:
         panel_ssl = thisdb.getOptionByJson('panel_ssl', default={'open':False})
         if panel_ssl['open']:
             panel_ssl['open'] = False
             thisdb.setOption('panel_ssl', json.dumps(panel_ssl))
             os.system(INIT_CMD + " unbind_ssl")
-            print("|-解除面板SSL绑定成功")
+            mw.echoInfo("解除面板SSL绑定成功")
     elif mw_input == 23:
         listen_ipv6 = panel_dir + '/data/ipv6.pl'
         if not os.path.exists(listen_ipv6):
             mw.writeFile(listen_ipv6, 'True')
             os.system(INIT_CMD + " restart")
-            print("|-开启IPv6支持了")
+            mw.echoInfo("开启IPv6支持了")
         else:
-            print("|-已开启IPv6支持!")
+            mw.echoInfo("已开启IPv6支持!")
     elif mw_input == 24:
         listen_ipv6 = panel_dir + '/data/ipv6.pl'
         if not os.path.exists(listen_ipv6):
-            print("|-已关闭IPv6支持!")
+            mw.echoInfo("已关闭IPv6支持!")
         else:
             os.remove(listen_ipv6)
             os.system(INIT_CMD + " restart")
-            print("|-关闭IPv6支持了")
+            mw.echoInfo("关闭IPv6支持了")
     elif mw_input == 25:
         open_ssh_port()
         print("|-已开启!")
@@ -201,9 +201,9 @@ def mwcli(mw_input=0):
         if two_step_verification['open']:
             two_step_verification['open'] = False
             thisdb.setOption('two_step_verification', json.dumps(two_step_verification))
-            print("|-关闭二次验证成功!")
+            mw.echoInfo("关闭二次验证成功!")
         else:
-            print("|-二次验证已关闭!")
+            mw.echoInfo("二次验证已关闭!")
     elif mw_input == 27:
         cmd = 'which ufw'
         run_cmd = False
@@ -253,7 +253,7 @@ def open_ssh_port():
     if ssh_port == '':
         ssh_port = '22'
 
-    print("|-SSH端口: "+ str(ssh_port))
+    mw.echoInfo("SSH端口: "+ str(ssh_port))
     MwFirewall.instance().addAcceptPort(ssh_port, 'SSH远程管理服务', 'port')
     return True
 
@@ -262,8 +262,8 @@ def set_panel_pwd(password, ncli=False):
     info = thisdb.getUserByRoot()
     thisdb.setUserByRoot(password=password)
     if ncli:
-        print("|-username: " + info['name'])
-        print("|-password: " + password)
+        mw.echoInfo("username: " + info['name'])
+        mw.echoInfo("password: " + password)
     else:
         print(username)
 
@@ -277,7 +277,7 @@ def show_panel_pwd():
         pwd = mw.readFile(defailt_pwd_file).strip()
 
     if mw.md5(pwd) == info['password']:
-        print('|-password: ' + pwd)
+        mw.echoInfo('password: ' + pwd)
         return
     print("*-password has been changed!")
 
@@ -290,21 +290,21 @@ def set_panel_username(username=None):
     # 随机面板用户名
     if username:
         if len(username) < 5:
-            print("|-错误，用户名长度不能少于5位")
+            mw.echoInfo("错误，用户名长度不能少于5位")
             return
         if username in ['admin', 'root']:
-            print("|-错误，不能使用过于简单的用户名")
+            mw.echoInfo("错误，不能使用过于简单的用户名")
             return
 
         thisdb.setUserByRoot(name=username)
-        print("|-username: %s" % username)
+        mw.echoInfo("username: %s" % username)
         return
 
     info = thisdb.getUserByRoot()
     if info['name'] == 'admin':
         username = mw.getRandomString(8).lower()
         thisdb.setUserByRoot(name=username)
-    print('|-username: ' + info['name'])
+    mw.echoInfo('username: ' + info['name'])
 
 
 def getServerIp():
