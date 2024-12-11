@@ -42,7 +42,7 @@ def get_cli_php_version():
         link_re = os.readlink(php_bin)
         for v in php_versions:
             if link_re.find(v['version']) != -1:
-                return mw.returnData({"select": v, "versions": php_versions})
+                return {"select": v, "versions": php_versions}
 
     return {"select": php_versions[0],"versions": php_versions}
 
