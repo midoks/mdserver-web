@@ -816,7 +816,7 @@ class plugin(object):
         py_cmd = 'cd ' + mw.getPanelDir() + " && "+ py_cmd
         data = mw.execShell(py_cmd)
 
-        if mw.inArray(['start','stop','reload'], func):
+        if mw.inArray(['start','stop','restart','reload'], func):
             self.runByCache(name, func, version)
 
         # print(data)
