@@ -481,11 +481,13 @@ class plugin(object):
         pInfo['setup'] = os.path.exists(pInfo['install_checks'])
 
 
-
         if coexist and pInfo['setup']:
             pInfo['setup_version'] = info['versions']
-        else:
-            pInfo['setup_version'] = self.getVersion(pInfo['install_checks'])
+        elif pInfo['setup']:
+            if os.path.isdir(pInfo['install_checks']):
+                pInfo['setup_version'] = self.getVersion(pInfo['install_checks'])
+            else:
+                pInfo['setup_version'] = mw.readFile(pInfo['install_checks']).strip()
 
         if 'install_pre_inspection' in info:
             pInfo['install_pre_inspection'] = info['install_pre_inspection']
@@ -792,7 +794,7 @@ class plugin(object):
         if 'coexist' in info and info['coexist']:
             name = info['title'] + '-'+ version
         if name in data:
-            del(data[name])            
+            del(data[name])
             thisdb.setOption(self.__plugin_status_cachekey, json.dumps(data))
 
     # shell/bash方式调用
@@ -801,6 +803,10 @@ class plugin(object):
         args  = '',
         script  = 'index',
     ):
+
+        if mw.inArray(['start','stop','restart','reload','uninstall_pre_inspection','install','uninstall'], func):
+            self.runByCache(name, func, version)
+
         path = self.__plugin_dir + '/' + name + '/' + script + '.py'
         if not os.path.exists(path):
             path = self.__plugin_dir + '/' + name + '/' + name + '.py'
@@ -816,8 +822,7 @@ class plugin(object):
         py_cmd = 'cd ' + mw.getPanelDir() + " && "+ py_cmd
         data = mw.execShell(py_cmd)
 
-        if mw.inArray(['start','stop','restart','reload'], func):
-            self.runByCache(name, func, version)
+        
 
         # print(data)
         if mw.isDebugMode():

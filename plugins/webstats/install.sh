@@ -130,12 +130,12 @@ Install_App()
 	if [ -f $serverPath/source/webstats/GeoLite2-City.mmdb ];then
 		cp -rf $serverPath/source/webstats/GeoLite2-City.mmdb $serverPath/webstats/GeoLite2-City.mmdb
 	fi
-
-	echo "${VERSION}" > $serverPath/webstats/version.pl
+	
 	cd $rootPath && python3 plugins/webstats/index.py start
+	echo "${VERSION}" > $serverPath/webstats/version.pl
 
 	echo '网站统计安装完成'
-	
+
 	# delete install data
 	if [ -d $serverPath/source/webstats/lsqlite3_fsl09y ];then
 		rm -rf $serverPath/source/webstats/lsqlite3_fsl09y

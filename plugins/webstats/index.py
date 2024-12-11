@@ -1398,6 +1398,10 @@ def installPreInspection():
         return "请先安装OpenResty"
     return 'ok'
 
+def uninstallPreInspection():
+    stop()
+    return 'ok'
+
 if __name__ == "__main__":
     func = sys.argv[1]
     if func == 'status':
@@ -1412,6 +1416,8 @@ if __name__ == "__main__":
         print(reload())
     elif func == 'install_pre_inspection':
         print(installPreInspection())
+    elif func == 'uninstall_pre_inspection':
+        print(uninstallPreInspection())
     elif func == 'run_info':
         print(runInfo())
     elif func == 'get_global_conf':
