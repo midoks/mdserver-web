@@ -15,6 +15,7 @@ import core.mw as mw
 
 def clearLog():
     mw.M('logs').where('id>?', (0,)).delete()
+    mw.M('logs').execute("update sqlite_sequence set seq=0 where name='logs'")
     return True
 
 def addLog(type, log, uid = 1) -> str:
