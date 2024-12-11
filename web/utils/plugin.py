@@ -822,8 +822,6 @@ class plugin(object):
         py_cmd = 'cd ' + mw.getPanelDir() + " && "+ py_cmd
         data = mw.execShell(py_cmd)
 
-        
-
         # print(data)
         if mw.isDebugMode():
             print('run:', py_cmd)
