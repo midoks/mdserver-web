@@ -35,4 +35,4 @@ jobs:
     - name: Start DEBUG
       run: |
         source /www/server/mdserver-web/bin/activate && cd web && gunicorn -c setting.py app:app
-        python3 panel_task.py &
+        cd /www/server/mdserver-web && python3 panel_task.py &
