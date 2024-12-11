@@ -195,7 +195,7 @@ def mwcli(mw_input=0):
             mw.echoInfo("关闭IPv6支持了")
     elif mw_input == 25:
         open_ssh_port()
-        print("|-已开启!")
+        mw.echoInfo("已开启!")
     elif mw_input == 26:
         two_step_verification = thisdb.getOptionByJson('two_step_verification', default={'open':False})
         if two_step_verification['open']:
