@@ -48,7 +48,6 @@ Install_App()
 	echo '正在安装脚本文件...'
 	mkdir -p $serverPath/source/webstats
 	mkdir -p $serverPath/webstats
-	echo "${VERSION}" > $serverPath/webstats/version.pl
 
 	# 下载源码安装包
 	# curl -O $serverPath/source/webstats/lua-5.1.5.tar.gz https://www.lua.org/ftp/lua-5.1.5.tar.gz
@@ -132,10 +131,11 @@ Install_App()
 		cp -rf $serverPath/source/webstats/GeoLite2-City.mmdb $serverPath/webstats/GeoLite2-City.mmdb
 	fi
 
+	echo "${VERSION}" > $serverPath/webstats/version.pl
 	cd $rootPath && python3 plugins/webstats/index.py start
 
 	echo '网站统计安装完成'
-
+	
 	# delete install data
 	if [ -d $serverPath/source/webstats/lsqlite3_fsl09y ];then
 		rm -rf $serverPath/source/webstats/lsqlite3_fsl09y
