@@ -590,7 +590,7 @@ class nosqlMySQLCtr():
             pid_data = data['data']
             for x in pid_data:
                 cmd = 'kill %s' % x['processlist_id']
-                print(cmd)
+                # print(cmd)
                 my_instance.execute(cmd)
         return mw.returnData(True, '执行成功!')
 
