@@ -40,7 +40,7 @@ RUN apt update -y && \
 RUN cd /www/server/mdserver-web/plugins/php && \
     bash install.sh install 74 && \
     cd /www/server/mdserver-web/plugins/openresty && \
-    bash install.sh install 1.21.4.1 && \
+    bash install.sh install 1.21.4 && \
     cd /www/server/mdserver-web/plugins/mysql && \
     bash install.sh install 5.6 && \
     cd /www/server/mdserver-web/plugins/phpmyadmin && \
