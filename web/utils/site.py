@@ -2484,6 +2484,8 @@ export PATH
 
         # 其他PHP安装类型
         conf_dir = mw.getServerDir() + "/web_conf/php/conf"
+        if not os.path.exists(conf_dir):
+            return data
         conf_list = os.listdir(conf_dir)
         l = len(conf_list)
         rep = r"enable-php-(.*?)\.conf"
