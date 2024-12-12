@@ -13,7 +13,6 @@ serverPath=$(dirname "$rootPath")
 sysName=`uname`
 
 
-install_tmp=${rootPath}/tmp/mw_install.pl
 myDir=${serverPath}/source/mysql-yum
 
 ARCH=`uname -m`
@@ -118,7 +117,7 @@ rm -rf ${myDir}
 Install_mysql()
 {
 
-	echo '正在安装脚本文件...' > $install_tmp
+	echo '正在安装脚本文件...'
 
 	mkdir -p $serverPath/mysql-yum
 
@@ -134,14 +133,14 @@ Install_mysql()
 	
 	rm -rf $myDir
 	echo '5.7' > $serverPath/mysql-yum/version.pl
-	echo '安装完成' > $install_tmp
+	echo '安装完成'
 }
 
 Uninstall_mysql()
 {
 	YUM_UNINSTALL
 	rm -rf $serverPath/mysql-yum
-	echo '卸载完成' > $install_tmp
+	echo '卸载完成'
 }
 
 action=$1

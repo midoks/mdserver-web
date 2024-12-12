@@ -49,48 +49,56 @@ $("#firewalldType").change(function(){
 
 
 function sshMgr(){
-
 	$.post('/firewall/get_ssh_info', '', function(rdata){
 		var ssh_status = rdata.status ? 'checked':'';
 		var pass_prohibit_status = rdata.pass_prohibit_status ? 'checked':'';
+		var pubkey_prohibit_status = rdata.pubkey_prohibit_status ? 'checked':'';
 		var con = '<div class="pd15">\
-                <div class="divtable">\
-                    <table class="table table-hover waftable">\
-                        <thead><tr><th>名称</th><th width="80">状态</th></tr></thead>\
-                        <tbody>\
-                            <tr>\
-                                <td>启动SSH</td>\
-                                <td>\
-                                    <div class="ssh-item" style="margin-left:0">\
-                                        <input class="btswitch btswitch-ios" id="sshswitch" type="checkbox" '+ssh_status+'>\
-                                        <label class="btswitch-btn" for="sshswitch" onclick=\'setMstscStatus()\'></label>\
-                                    </div>\
-                                </td>\
-                            </tr>\
-                            <tr>\
-                                <td>禁止密码登陆</td>\
-                                <td>\
-                                    <div class="ssh-item" style="margin-left:0">\
-                                        <input class="btswitch btswitch-ios" id="pass_status" type="checkbox" '+pass_prohibit_status+'>\
-                                        <label class="btswitch-btn" for="pass_status" onclick=\'setSshPassStatus()\'></label>\
-                                    </div>\
-                                </td>\
-                            </tr>\
-                        </tbody>\
-                    </table>\
-                </div>\
-            </div>';
+            <div class="divtable">\
+                <table class="table table-hover waftable">\
+                    <thead><tr><th>名称</th><th width="80">状态</th></tr></thead>\
+                    <tbody>\
+                        <tr>\
+                            <td>启动SSH</td>\
+                            <td>\
+                                <div class="ssh-item" style="margin-left:0">\
+                                    <input class="btswitch btswitch-ios" id="sshswitch" type="checkbox" '+ssh_status+'>\
+                                    <label class="btswitch-btn" for="sshswitch" onclick=\'setMstscStatus()\'></label>\
+                                </div>\
+                            </td>\
+                        </tr>\
+                        <tr>\
+                            <td>禁止密码登陆</td>\
+                            <td>\
+                                <div class="ssh-item" style="margin-left:0">\
+                                    <input class="btswitch btswitch-ios" id="pass_status" type="checkbox" '+pass_prohibit_status+'>\
+                                    <label class="btswitch-btn" for="pass_status" onclick=\'setSshPassStatus()\'></label>\
+                                </div>\
+                            </td>\
+                        </tr>\
+                        <tr>\
+                            <td>禁止密钥登陆</td>\
+                            <td>\
+                                <div class="ssh-item" style="margin-left:0">\
+                                    <input class="btswitch btswitch-ios" id="pubkey_status" type="checkbox" '+pubkey_prohibit_status+'>\
+                                    <label class="btswitch-btn" for="pubkey_status" onclick=\'setSshPubkeyStatus()\'></label>\
+                                </div>\
+                            </td>\
+                        </tr>\
+                    </tbody>\
+                </table>\
+            </div>\
+        </div>';
         layer.open({
 	        type: 1,
 	        title: "SSH管理",
-	        area: ['300px', '230px'],
+	        area: ['300px', '260px'],
 	        closeBtn: 1,
 	        shadeClose: false,
 	        content: '<div id="ssh_list">'+con+'</div>',
 	        success:function(){
 	        },
 	    });
-
 	},'json');
 }
 
@@ -274,6 +282,37 @@ function setSshPassStatus(){
 }
 
 /**
+ * 设置远程服务状态
+ * @param {Int} state 0.启用 1.关闭
+ */
+function setSshPubkeyStatus(){
+	status = $("#pubkey_status").prop("checked")==true?1:0;
+	var msg = status==1?'开启密码登陆,继续吗？':'确定禁止密码登陆吗？';
+	layer.confirm(msg,{title:'警告',closeBtn:2,cancel:function(){
+		if(status == 0){
+			$("#pubkey_status").prop("checked",false);
+		} else {
+			$("#pubkey_status").prop("checked",true);
+		}
+	}},function(index){
+		if(index > 0){
+			layer.msg('正在处理,请稍候...',{icon:16,time:20000});
+			$.post('/firewall/set_ssh_pubkey_status','status='+status,function(rdata){
+				layer.msg(rdata.msg,{icon:rdata.status?1:2});
+			},'json');
+		}
+	},function(){
+		if(status == 0){
+			$("#pubkey_status").prop("checked",false);
+		} else {
+			$("#pubkey_status").prop("checked",true);
+		}
+	});
+}
+
+
+
+/**
  * 取回数据
  * @param {Int} page  分页号
  */
@@ -297,23 +336,22 @@ function showAccept(page,search) {
 					break;
 			}
 			body += "<tr>\
-						<td><em class='dlt-num'>" + data.data[i].id + "</em></td>\
-						<td>" + data.data[i].protocol + "</td>\
-						<td>" + (data.data[i].port.indexOf('.') == -1?'放行端口'+':['+data.data[i].port+']':'屏蔽IP'+':['+data.data[i].port+']') + "</td>\
-						<td>" + status + "</td>\
-						<td>" + data.data[i].addtime + "</td>\
-						<td>" + data.data[i].ps + "</td>\
-						<td class='text-right'><a href='javascript:;' class='btlink' onclick=\"delAcceptPort(" + data.data[i].id + ",'" + data.data[i].port + "','"+data.data[i].protocol+"')\">删除</a></td>\
-					</tr>";
+				<td><em class='dlt-num'>" + data.data[i].id + "</em></td>\
+				<td>" + data.data[i].protocol + "</td>\
+				<td>" + (data.data[i].port.indexOf('.') == -1?'放行端口'+':['+data.data[i].port+']':'屏蔽IP'+':['+data.data[i].port+']') + "</td>\
+				<td>" + status + "</td>\
+				<td>" + data.data[i].ps + "</td>\
+				<td>" + data.data[i].add_time + "</td>\
+				<td class='text-right'><a href='javascript:;' class='btlink' onclick=\"delAcceptPort(" + data.data[i].id + ",'" + data.data[i].port + "','"+data.data[i].protocol+"')\">删除</a></td>\
+			</tr>";
 		}
 
 		if (data.data.length == 0){
 			body = '<tr><td colspan="5" style="text-align: center;">当前没有数据</td></tr>';
 		}
 
-
-		$("#firewallBody").html(body);
-		$("#firewallPage").html(data.page);
+		$("#firewall_body").html(body);
+		$("#firewall_page").html(data.page);
 	},'json');
 }
 

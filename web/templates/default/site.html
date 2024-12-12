@@ -37,10 +37,12 @@
 								<tr>
 									<th width="30"><input type="checkbox" onclick="checkSelect();" id="setBox"></th>
 									<th width="150" onclick="listOrder('name','site',this)" style="cursor: pointer;">域名<span class="glyphicon glyphicon-triangle-top" style="margin-left:5px;color:#bbb"></span></th>
-									<th onclick="listOrder('status','site',this)" style="cursor: pointer;" width="98">网站状态<span class="glyphicon glyphicon-triangle-top" style="margin-left:5px;color:#bbb"></span></th>
+									<th style="cursor: pointer;" width="98">网站状态</th>
 									<th width="58">备份</th>
 									<th width="26%">网站目录</th>
-									<th onclick="listOrder('edate','site',this)" style="cursor: pointer;" width="86">到期日期<span class="glyphicon glyphicon-triangle-top" style="margin-left:5px;color:#bbb"></span></th>
+									<th onclick="listOrder('edate','site',this)" style="cursor: pointer;" width="86">
+										到期日期<span class="glyphicon glyphicon-triangle-top" style="margin-left:5px;color:#bbb"></span>
+									</th>
 									<th>备注</th>
 									<th width='130' class='text-right'>操作</th>
 								</tr>
@@ -55,8 +57,10 @@
 						<div class="site_type">
 							<span>站点分类:</span>
 							<select class="bt-input-text mr5" style="width:100px">
-								<!-- <option value="-1">全部分类</option>
-								<option value="0">默认分类</option> -->
+								<!--
+									<option value="-1">全部分类</option>
+									<option value="0">默认分类</option> 
+								-->
 							</select>
 						</div>
 					</div>

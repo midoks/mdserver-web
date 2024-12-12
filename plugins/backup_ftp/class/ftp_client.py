@@ -14,8 +14,12 @@ import json
 import paramiko
 import ftplib
 
-sys.path.append(os.getcwd() + "/class/core")
-import mw
+web_dir = os.getcwd() + "/web"
+if os.path.exists(web_dir):
+    sys.path.append(web_dir)
+    os.chdir(web_dir)
+
+import core.mw as mw
 
 DEBUG = True
 BLOCK_SIZE = 1024 * 1024 * 2
@@ -136,7 +140,7 @@ class FtpPSClient:
             "database": "db",
             "path": "path",
         }
-        file_regx = prefix_dict.get(data_type) + "_(.+)_20\d+_\d+\."
+        file_regx = prefix_dict.get(data_type) + r"_(.+)_20\d+_\d+\."
         sub_search = re.search(file_regx, file_name)
         sub_path_name = ""
         if sub_search:

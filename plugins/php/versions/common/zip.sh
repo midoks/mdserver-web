@@ -2,8 +2,12 @@
 PATH=/bin:/sbin:/usr/bin:/usr/sbin:/usr/local/bin:/usr/local/sbin:~/bin:/opt/homebrew/bin
 export PATH=$PATH:/opt/homebrew/bin
 
-curPath=`pwd`
+function version_gt() { test "$(echo "$@" | tr " " "\n" | sort -V | head -n 1)" != "$1"; }
+function version_le() { test "$(echo "$@" | tr " " "\n" | sort -V | head -n 1)" == "$1"; }
+function version_lt() { test "$(echo "$@" | tr " " "\n" | sort -rV | head -n 1)" != "$1"; }
+function version_ge() { test "$(echo "$@" | tr " " "\n" | sort -rV | head -n 1)" == "$1"; }
 
+curPath=`pwd`
 appPath=$(dirname "$curPath")
 
 rootPath=$(dirname "$curPath")
@@ -18,12 +22,6 @@ version=$2
 
 LIBNAME=zip
 LIBV=0
-
-
-if [ "$version" -lt "72" ];then
-	echo "not need"
-	exit 1
-fi
 
 LIB_PATH_NAME=lib/php
 if [ -d $serverPath/php/${version}/lib64 ];then
@@ -44,7 +42,15 @@ if [ ! -d $serverPath/lib/libzip ];then
 	cd ${rootPath}/plugins/php/lib && /bin/bash libzip.sh
 fi
 
-export PKG_CONFIG_PATH=/www/server/lib/libzip/lib/pkgconfig
+export PKG_CONFIG_PATH=${serverPath}/lib/libzip/lib/pkgconfig
+
+# ZIP_OPTION='--with-zip'
+# libzip_version=`pkg-config libzip --modversion`
+# if version_lt "$libzip_version" "0.11.0" ;then
+# 	cd ${rootPath}/plugins/php/lib && /bin/bash libzip.sh
+# 	export PKG_CONFIG_PATH=$serverPath/lib/libzip/lib/pkgconfig
+# 	ZIP_OPTION="--with-zip=$serverPath/lib/libzip"
+# fi
 
 Install_lib()
 {
@@ -65,8 +71,7 @@ Install_lib()
 		cd $sourcePath/php${version}/ext/${LIBNAME}
 		
 		$serverPath/php/$version/bin/phpize
-		./configure --with-php-config=$serverPath/php/$version/bin/php-config \
-		--with-zip
+		./configure --with-php-config=$serverPath/php/$version/bin/php-config --with-zip
 
 		make clean && make && make install && make clean
 

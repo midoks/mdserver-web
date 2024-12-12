@@ -119,7 +119,13 @@ debug.out
 mdioks.session-journal
 *.session
 
-logs/*
+temp
+
+logs/panel.pid
+logs/panel.log
+logs/panel_task.log
+logs/panel_exec.log
+logs/panel_task.lock
 
 ssl/local
 ssl/nginx
@@ -161,6 +167,7 @@ data/api.json
 data/bind_domain.pl
 data/unauthorized_status.pl
 data/auth_secret.pl
+data/panelSpeed.pl
 
 plugins/vip_*
 plugins/own_*
@@ -170,7 +177,6 @@ plugins/l2tp
 plugins/openlitespeed
 plugins/tamper_proof
 plugins/cryptocurrency_trade
-plugins/mtproxy
 plugins/zimg
 plugins/bk_demo
 plugins/mail
@@ -185,4 +191,5 @@ plugins/goedge-node
 plugins/goedge-happy
 plugins/dztasks
 
-data/default_new.pl
+/logs
+/data

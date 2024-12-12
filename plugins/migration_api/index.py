@@ -8,9 +8,14 @@ import re
 import hashlib
 import json
 import subprocess
+import requests
 
-sys.path.append(os.getcwd() + "/class/core")
-import mw
+web_dir = os.getcwd() + "/web"
+if os.path.exists(web_dir):
+    sys.path.append(web_dir)
+    os.chdir(web_dir)
+
+import core.mw as mw
 
 app_debug = False
 if mw.isAppleSystem():
@@ -18,59 +23,39 @@ if mw.isAppleSystem():
 
 
 class classApi:
-    __MW_KEY = 'app'
     __MW_PANEL = 'http://127.0.0.1:7200'
+    __MW_APP_ID = ''
+    __MW_APP_SECRET = ''
     __VHOST_PATH = ''
 
     _buff_size = 1024 * 1024 * 2
 
-    _REQUESTS = None
     _SPEED_FILE = None
     _INFO_FILE = None
     _SYNC_INFO = None
 
     # 如果希望多台面板，可以在实例化对象时，将面板地址与密钥传入
-    def __init__(self, mw_panel=None, mw_key=None):
+    def __init__(self, mw_panel=None, app_id=None, app_secret=None):
         if mw_panel:
             self.__MW_PANEL = mw_panel
-            self.__MW_KEY = mw_key
-
-        import requests
-        if not self._REQUESTS:
-            self._REQUESTS = requests.session()
+            self.__MW_APP_ID = app_id
+            self.__MW_APP_SECRET = app_secret
 
         self._SPEED_FILE = getServerDir() + '/config/speed.json'
         self._INFO_FILE = getServerDir() + '/config/sync_info.json'
         self._SYNC_INFO = self.get_sync_info(None)
         self.__VHOST_PATH = mw.getServerDir() + '/web_conf'
 
-    # 计算MD5
-    def __get_md5(self, s):
-        m = hashlib.md5()
-        m.update(s.encode('utf-8'))
-        return m.hexdigest()
-
-    # 构造带有签名的关联数组
-    def __get_key_data(self):
-        now_time = int(time.time())
-        ready_data = {
-            'request_token': self.__get_md5(str(now_time) + '' + self.__get_md5(self.__MW_KEY)),
-            'request_time': now_time
-        }
-        return ready_data
-
-    def __http_post_cookie(self, url, p_data, timeout=1800):
+    def post(self, endpoint, request_data, timeout=60):
+        url = self.__MW_PANEL + endpoint  
+        post_data = requests.post(url, data=request_data, headers={
+            'app-id':self.__MW_APP_ID,
+            'app-secret':self.__MW_APP_SECRET
+        })
         try:
-            # print(url)
-            res = self._REQUESTS.post(url, p_data, timeout=timeout)
-            return res.text
-        except Exception as ex:
-            ex = str(ex)
-            if ex.find('Max retries exceeded with') != -1:
-                return mw.returnJson(False, '连接服务器失败!')
-            if ex.find('Read timed out') != -1 or ex.find('Connection aborted') != -1:
-                return mw.returnJson(False, '连接超时!')
-            return mw.returnJson(False, '连接服务器失败!')
+            return post_data.json()
+        except Exception as e:
+            return post_data.text
 
     def makeSyncInfo(self, args):
         data = {}
@@ -172,14 +157,11 @@ class classApi:
         return True
 
     def send(self, url, args, timeout=600):
-        url = self.__MW_PANEL + '/api' + url
-        post_data = self.__get_key_data()  # 取签名
-        post_data.update(args)
-        result = self.__http_post_cookie(url, post_data, timeout)
         try:
-            return json.loads(result)
-        except Exception as e:
+            result = self.post(url, args, timeout)
             return result
+        except Exception as e:
+            return str(e)
 
     def sendPlugins(self, name, func, args, timeout=36000):
         url = '/plugins/run'
@@ -221,7 +203,7 @@ class classApi:
         if not os.path.exists(sfile):
             write_log("|-指定目录不存在{}".format(sfile))
             return False
-        pdata = self.__get_key_data()
+        pdata = {}
         pdata['name'] = os.path.basename(dfile)
         pdata['path'] = os.path.dirname(dfile)
         pdata['size'] = os.path.getsize(sfile)
@@ -238,8 +220,7 @@ class classApi:
     def close_sync(self, args):
         # 取消迁移
         mw.execShell("kill -9 {}".format(self.get_pid()))
-        mw.execShell(
-            "kill -9 $(ps aux|grep index.py|grep -v grep|awk '{print $2}')")
+        mw.execShell("kill -9 $(ps aux|grep index.py|grep -v grep|awk '{print $2}')")
         # 删除迁移配置
         time.sleep(1)
         if os.path.exists(self._INFO_FILE):
@@ -263,8 +244,7 @@ class classApi:
         self.write_speed('size', pdata['size'])
         self.write_speed('used', 0)
         self.write_speed('speed', 0)
-        write_log("|-上传文件[{}], 总大小：{}, 当前分片大小为：{}".format(pdata['name'],
-                                                          toSize(pdata['size']), toSize(self._buff_size)))
+        write_log("|-上传文件[{}], 总大小：{}, 当前分片大小为：{}".format(pdata['name'], toSize(pdata['size']), toSize(self._buff_size)))
         while True:
             buff_size = self._buff_size
             max_buff = int(pdata['size'] - pdata['start'])
@@ -274,9 +254,11 @@ class classApi:
             start_time = time.time()
 
             try:
-                url = self.__MW_PANEL + '/api/files/upload_segment'
-                res = self._REQUESTS.post(
-                    url, data=pdata, files=files, timeout=30000)
+                url = self.__MW_PANEL + '/files/upload_segment'
+                res = requests.post(url, data=pdata, files=files, headers={
+                    'app-id':self.__MW_APP_ID,
+                    'app-secret':self.__MW_APP_SECRET
+                },timeout=30000)
 
                 success_num += 1
                 err_num = 0
@@ -286,8 +268,7 @@ class classApi:
                     success_num = up_buff_num - 3  # 如再顺利发送3次则继续提升分片大小
                     if self._buff_size > max_buff_size:
                         self._buff_size = max_buff_size
-                    write_log(
-                        "|-发送顺利, 尝试调整分片大小为: {}".format(toSize(self._buff_size)))
+                    write_log("|-发送顺利, 尝试调整分片大小为: {}".format(toSize(self._buff_size)))
             except Exception as e:
                 times = time.time() - start_time
                 total_time += times
@@ -318,7 +299,7 @@ class classApi:
             times = time.time() - start_time
             total_time += times
 
-            if type(result) == int:
+            if result['status'] and result['msg'] == 'size':
                 if result == split_done:
                     split_num += 1
                 else:
@@ -327,14 +308,14 @@ class classApi:
                 if split_num > 10:
                     write_log("|-上传失败, 跳过本次上传任务")
                     return False
-                if result > pdata['size']:
+                if result['data'] > pdata['size']:
                     write_log("|-上传失败, 跳过本次上传任务")
                     return False
                 self.write_speed('used', result)
                 self.write_speed('speed', int(buff_size / times))
-                write_log("|-已上传 {},上传速度 {}/s, 共用时 {}分{:.2f}秒,  {:.2f}%".format(toSize(float(result)), toSize(
-                    buff_size / times), int(total_time // 60), total_time % 60, (float(result) / float(pdata['size']) * 100)))
-                pdata['start'] = result  # 设置断点
+                write_log("|-已上传 {},上传速度 {}/s, 共用时 {}分{:.2f}秒,  {:.2f}%".format(toSize(result['data']), toSize(
+                    buff_size / times), int(total_time // 60), total_time % 60, (float(result['data']) / float(pdata['size']) * 100)))
+                pdata['start'] = result['data']  # 设置断点
             else:
                 if not result['status']:  # 如果服务器响应上传失败
                     write_log(result['msg'])
@@ -349,8 +330,7 @@ class classApi:
 
         self.write_speed('total_size', pdata['size'])
         self.write_speed('end_time', int(time.time()))
-        write_log("|-总耗时：{} 分钟, {:.2f} 秒, 平均速度：{}/s".format(int(total_time //
-                                                                60), total_time % 60, toSize(pdata['size'] / total_time)))
+        write_log("|-总耗时：{} 分钟, {:.2f} 秒, 平均速度：{}/s".format(int(total_time // 60), total_time % 60, toSize(pdata['size'] / total_time)))
         return True
 
     def send_list(self, s_files):
@@ -375,19 +355,18 @@ class classApi:
         # 创建目录
         self.send('/files/create_dir', {"path": dpath})
 
-        backup_path = mw.getRootDir() + '/backup'
+        backup_path = mw.getFatherDir() + '/backup'
         if not os.path.exists(backup_path):
             os.makedirs(backup_path, 384)
 
         zip_file = backup_path + \
             "/psync_tmp_{}.tar.gz".format(os.path.basename(spath))
-        zip_dst = mw.getRunDir() + '/tmp/psync_tmp_{}.tar.gz'.format(
+        zip_dst = mw.getPanelDir() + '/tmp/psync_tmp_{}.tar.gz'.format(
             os.path.basename(dpath))
         write_log("|-正在压缩目录[{}]...".format(spath))
         self.write_speed('done', '正在压缩')
 
-        mw.execShell(
-            "cd {} && tar zcvf {} ./ > /dev/null".format(spath, zip_file))
+        mw.execShell("cd {} && tar zcvf {} ./ > /dev/null".format(spath, zip_file))
         if not os.path.exists(zip_file):
             self.error("目录[{}]打包失败!".format(spath))
             return False
@@ -404,10 +383,8 @@ class classApi:
         write_log("|-正在解压文件到目录[{}]...".format(dpath))
         self.write_speed('done', '正在解压')
 
-        self.send('/files/uncompress',
-                  {"sfile": zip_dst, "dfile": dpath, 'path': dpath})
-        self.send('/files/exec_shell',
-                  {"shell": "rm -f " + zip_dst, "path": "/www"}, 30)
+        self.send('/files/uncompress',{"sfile": zip_dst, "dfile": dpath, 'path': dpath})
+        self.send('/files/exec_shell',{"shell": "rm -f " + zip_dst, "path": "/www"}, 30)
         return True
 
     def state(self, stype, index, state, error=''):
@@ -503,20 +480,20 @@ class classApi:
             try:
                 self.state('sites', i, 1)
                 siteInfo = mw.M('sites').where('name=?', (site_name,)).field(
-                    'id,name,path,ps,status,edate,addtime').find()
+                    'id,name,path,ps,status,edate,add_time').find()
 
                 if not siteInfo:
                     err_msg = "指定站点[{}]不存在!".format(site_name)
                     self.state('sites', i, -1, err_msg)
                     self.error(err_msg)
                     continue
-                pid = siteInfo['id']
+                site_id = siteInfo['id']
 
                 siteInfo['port'] = mw.M('domain').where(
-                    'pid=? and name=?', (pid, site_name,)).getField('port')
+                    'pid=? and name=?', (site_id, site_name,)).getField('port')
 
                 siteInfo['domain'] = mw.M('domain').where(
-                    'pid=? and name!=?', (pid, site_name)).field('name,port').select()
+                    'pid=? and name!=?', (site_id, site_name)).field('name,port').select()
 
                 siteInfo['binding'] = mw.M('binding').where(
                     'pid=?', (id,)).field('domain,path,port').select()
@@ -534,14 +511,14 @@ class classApi:
     def getSocketFile(self, mtype='mysql'):
         file = self.getConf(mtype)
         content = mw.readFile(file)
-        rep = 'socket\s*=\s*(.*)'
+        rep = r'socket\s*=\s*(.*)'
         tmp = re.search(rep, content)
         return tmp.groups()[0].strip()
 
     def getDbPort(self, mtype='mysql'):
         file = self.getConf(mtype)
         content = mw.readFile(file)
-        rep = 'port\s*=\s*(.*)'
+        rep = r'port\s*=\s*(.*)'
         tmp = re.search(rep, content)
         return tmp.groups()[0].strip()
 
@@ -556,21 +533,18 @@ class classApi:
 
         db.setPort(self.getDbPort(mtype))
         db.setSocket(self.getSocketFile(mtype))
-        pwd = self.getDbConn(mtype, 'config').where(
-            'id=?', (1,)).getField('mysql_root')
+        pwd = self.getDbConn(mtype, 'config').where('id=?', (1,)).getField('mysql_root')
         db.setPwd(pwd)
         return db
 
     def getDbList(self):
         conn = self.getDbConn()
-        alist = conn.field(
-            'id,name,username,password,ps').order("id desc").select()
+        alist = conn.field('id,name,username,password,ps').order("id desc").select()
         return alist
 
     def getDbInfo(self, name):
         conn = self.getDbConn()
-        info = conn.field(
-            'id,name,username,password,ps').where('name=?', (name,)).find()
+        info = conn.field('id,name,username,password,ps').where('name=?', (name,)).find()
         return info
 
     def mapToList(self, map_obj):
@@ -684,7 +658,7 @@ class classApi:
 
     def export_database(self, name, index):
         self.write_speed('done', '正在导出数据库')
-        write_log("|-正在导出数据库{}...".format(name))
+        write_log("|-正在导出数据库[{}]...".format(name))
         conn = self.getMyConn()
         result = conn.execute("show databases")
         isError = self.isSqlError(result)
@@ -697,7 +671,7 @@ class classApi:
         root = self.getDbConn('mysql', 'config').where(
             'id=?', (1,)).getField('mysql_root')
 
-        backup_path = mw.getRootDir() + '/backup'
+        backup_path = mw.getFatherDir() + '/backup'
         if not os.path.exists(backup_path):
             os.makedirs(backup_path, 384)
 
@@ -746,18 +720,14 @@ class classApi:
         db_dir = '/www/backup/import'
         new_db_name = 'psync_import_{}.sql.gz'.format(dbInfo['name'])
         upload_file = db_dir + '/' + new_db_name
-        self.send('/files/exec_shell',
-                  {"shell": "rm -f " + upload_file, "path": "/www"}, 30)
+        self.send('/files/exec_shell', {"shell": "rm -f " + upload_file, "path": "/www"}, 30)
 
         if self.upload_file(filename, upload_file):
             self.write_speed('done', '正在导入数据库')
             write_log("|-正在导入数据库{}...".format(dbInfo['name']))
 
-            t = self.sendPlugins('mysql', 'import_db_external', {
-                "file": new_db_name, "name": dbInfo['name']})
-            # print(t)
-            self.send('/files/exec_shell',
-                      {"shell": "rm -f " + upload_file, "path": "/www"}, 30)
+            self.sendPlugins('mysql', 'import_db_external', {"file": new_db_name, "name": dbInfo['name']})
+            self.send('/files/exec_shell',{"shell": "rm -f " + upload_file, "path": "/www"}, 30)
             return True
         self.state('databases', index, -1, "数据传输失败")
         return False
@@ -785,8 +755,7 @@ class classApi:
 
     def run(self):
         # 开始迁移
-        # self.upload_file("/tmp/mysql-boost-5.7.39.tar.gz",
-        # "/tmp/mysql-boost-5.7.39.tar.gz")
+        # self.upload_file("/tmp/mysql-boost-5.7.39.tar.gz", "/tmp/mysql-boost-5.7.39.tar.gz")
 
         # self.sync_other()
         self.sync_site()
@@ -893,12 +862,13 @@ def getStepOneData():
 
 def stepOne():
     args = getArgs()
-    data = checkArgs(args, ['url', 'token'])
+    data = checkArgs(args, ['url', 'app_id','app_secret'])
     if not data[0]:
         return data[1]
 
     url = args['url']
-    token = args['token']
+    app_id = args['app_id']
+    app_secret = args['app_secret']
 
     speed_file = getServerDir() + '/config/speed.json'
     if os.path.exists(speed_file):
@@ -908,16 +878,16 @@ def stepOne():
     if os.path.exists(sync_file):
         os.remove(sync_file)
 
-    api = classApi(url, token)
+    api = classApi(url, app_id, app_secret)
     # api =
     # classApi('http://127.0.0.1:7200','HfJNKGP5RPqGvhIOyrwpXG4A2fTjSh9B')
     rdata = api.send('/task/count', {})
-    if type(rdata) != int:
+    if not rdata['status']:
         return mw.returnJson(False, rdata['msg'])
     data = getCfgData()
-
     data['url'] = url
-    data['token'] = token
+    data['app_id'] = app_id
+    data['app_secret'] = app_secret
     writeConf(data)
 
     return mw.returnJson(True, '验证成功')
@@ -925,44 +895,45 @@ def stepOne():
 
 # 获取本地服务器和环境配置
 def get_src_config(args):
-    serverInfo = {}
-    serverInfo['status'] = True
+    data = {}
+    data['status'] = True
     sdir = mw.getServerDir()
 
-    serverInfo['webserver'] = '未安装'
+    data['webserver'] = '未安装'
     if os.path.exists(sdir + '/openresty/nginx/sbin/nginx'):
-        serverInfo['webserver'] = 'OpenResty'
-    serverInfo['php'] = []
+        data['webserver'] = 'OpenResty'
+    data['php'] = []
     phpversions = ['52', '53', '54', '55', '56', '70', '71',
                    '72', '73', '74', '80', '81', '82', '83', '84']
     phpPath = sdir + '/php/'
     for pv in phpversions:
         if not os.path.exists(phpPath + pv + '/bin/php'):
             continue
-        serverInfo['php'].append(pv)
-    serverInfo['mysql'] = False
+        data['php'].append(pv)
+    data['mysql'] = False
     if os.path.exists(sdir + '/mysql/bin/mysql'):
-        serverInfo['mysql'] = True
+        data['mysql'] = True
     import psutil
     try:
         diskInfo = psutil.disk_usage('/www')
     except:
         diskInfo = psutil.disk_usage('/')
 
-    serverInfo['disk'] = mw.toSize(diskInfo[2])
-    return serverInfo
+    data['disk'] = mw.toSize(diskInfo[2])
+    return data
 
 
 def get_dst_config(args):
 
     data = getCfgData()
-    api = classApi(data['url'], data['token'])
+    api = classApi(data['url'], data['app_id'], data['app_secret'])
     disk = api.send('/system/disk_info', {})
     info = api.send('/system/get_env_info', {})
 
+    # print(disk)
+    # print(info)
     result = info['data']
-
-    result['disk'] = disk
+    result['disk'] = disk['data']
     return result
 
 
@@ -976,8 +947,7 @@ def stepTwo():
 def get_src_info(args):
     # 获取本地服务器网站、数据库.
     data = {}
-    data['sites'] = mw.M('sites').field(
-        "id,name,path,ps,status,addtime").order("id desc").select()
+    data['sites'] = mw.M('sites').field("id,name,path,ps,status,add_time").order("id desc").select()
 
     my_db_pos = mw.getServerDir() + '/mysql'
     conn = mw.M('databases').dbPos(my_db_pos, 'mysql')
@@ -991,8 +961,8 @@ def stepThree():
 
 
 def getPid():
-    result = mw.execShell(
-        "ps aux|grep 'plugins/migration_api/index.py bg_process' |grep -v grep|awk '{print $2}'|xargs")[0].strip()
+    cmd = "ps aux|grep 'plugins/migration_api/index.py bg_process' |grep -v grep|awk '{print $2}'|xargs"
+    result = mw.execShell(cmd)[0].strip()
     if not result:
         return None
     return result
@@ -1015,7 +985,7 @@ def bgProcessRun():
     # demo_url = 'http://127.0.0.1:7200'
     # demo_key = 'HfJNKGP5RPqGvhIOyrwpXG4A2fTjSh9B'
     # api = classApi(demo_url, demo_key)
-    api = classApi(data['url'], data['token'])
+    api = classApi(data['url'], data['app_id'], data['app_secret'])
     api.run()
     return ''
 
@@ -1036,7 +1006,7 @@ def stepFour():
         'sites': sites.strip(',').split(','),
         'databases': databases.strip(',').split(',')
     }
-    api = classApi(data['url'], data['token'])
+    api = classApi(data['url'], data['app_id'],data['app_secret'])
     return api.set_sync_info(args)
 
 
@@ -1051,18 +1021,18 @@ def getSpeed():
     path = getServerDir() + '/config/speed.json'
     if not os.path.exists(path):
         return mw.returnJson(False, '正在准备..')
+
     try:
         speed_info = json.loads(mw.readFile(path))
-    except:
-        return mw.returnJson(False, '正在准备..')
+    except Exception as e:
+        return mw.returnJson(True, str(e)+'...')
     data = getCfgData()
-    api = classApi(data['url'], data['token'])
+    api = classApi(data['url'], data['app_id'], data['app_secret'])
     sync_info = api.get_sync_info(None)
     speed_info['all_total'] = sync_info['total']
     speed_info['all_speed'] = sync_info['speed']
     speed_info['total_time'] = speed_info['end_time'] - speed_info['time']
-    speed_info['total_time'] = str(int(speed_info[
-        'total_time'] // 60)) + "分" + str(int(speed_info['total_time'] % 60)) + "秒"
+    speed_info['total_time'] = str(int(speed_info['total_time'] // 60)) + "分" + str(int(speed_info['total_time'] % 60)) + "秒"
     log_file = getServerDir() + '/sync.log'
     speed_info['log'] = mw.execShell("tail -n 10 {}".format(log_file))[0]
     speed_info['log_file'] = log_file

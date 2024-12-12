@@ -259,7 +259,6 @@ function getFormatTime(tm, format) {
 
 
 function changePathCallback(default_dir, callback) {
-
 	var c = layer.open({
 		type: 1,
 		area: "650px",
@@ -268,40 +267,40 @@ function changePathCallback(default_dir, callback) {
 		shift: 5,
 		shadeClose: false,
 		content: "<div class='changepath'>\
-					<div class='path-top'>\
-						<button type='button' class='btn btn-default btn-sm' onclick='backFile()'>\
-							<span class='glyphicon glyphicon-share-alt'></span>返回\
-						</button>\
-						<div class='place' id='PathPlace'>当前路径：<span></span></div>\
-					</div>\
-					<div class='path-con'>\
-						<div class='path-con-left'>\
-						<dl><dt id='changecomlist' onclick='backMyComputer()'>计算机</dt></dl>\
-						</div>\
-						<div class='path-con-right'>\
-							<ul class='default' id='computerDefautl'></ul>\
-							<div class='file-list divtable'>\
-								<table class='table table-hover' style='border:0 none'>\
-									<thead>\
-										<tr class='file-list-head'>\
-											<th width='40%'>文件名</th>\
-											<th width='20%'>修改时间</th>\
-											<th width='10%'>权限</th>\
-											<th width='10%'>所有者</th>\
-											<th width='10%'></th>\
-										</tr>\
-									</thead>\
-									<tbody id='tbody' class='list-list'></tbody>\
-								</table>\
-							</div>\
-						</div>\
+			<div class='path-top'>\
+				<button type='button' class='btn btn-default btn-sm' onclick='backFile()'>\
+					<span class='glyphicon glyphicon-share-alt'></span>返回\
+				</button>\
+				<div class='place' id='PathPlace'>当前路径：<span></span></div>\
+			</div>\
+			<div class='path-con'>\
+				<div class='path-con-left'>\
+					<dl><dt id='changecomlist' onclick='backMyComputer()'>计算机</dt></dl>\
+				</div>\
+				<div class='path-con-right'>\
+					<ul class='default' id='computerDefautl'></ul>\
+					<div class='file-list divtable'>\
+						<table class='table table-hover' style='border:0 none'>\
+							<thead>\
+								<tr class='file-list-head'>\
+									<th width='40%'>文件名</th>\
+									<th width='20%'>修改时间</th>\
+									<th width='10%'>权限</th>\
+									<th width='10%'>所有者</th>\
+									<th width='10%'></th>\
+								</tr>\
+							</thead>\
+							<tbody id='tbody' class='list-list'></tbody>\
+						</table>\
 					</div>\
 				</div>\
-				<div class='getfile-btn' style='margin-top:0'>\
-					<button type='button' class='btn btn-default btn-sm pull-left' onclick='createFolder()'>新建文件夹</button>\
-					<button type='button' class='btn btn-danger btn-sm mr5 btn-close'>关闭</button>\
-					<button type='button' class='btn btn-success btn-sm btn-choose'>选择</button>\
-				</div>",
+			</div>\
+		</div>\
+		<div class='getfile-btn' style='margin-top:0'>\
+			<button type='button' class='btn btn-default btn-sm pull-left' onclick='createFolder()'>新建文件夹</button>\
+			<button type='button' class='btn btn-danger btn-sm mr5 btn-close'>关闭</button>\
+			<button type='button' class='btn btn-success btn-sm btn-choose'>选择</button>\
+		</div>",
 		success:function(layero,layer_index){
 			$('.btn-close').click(function(){
 				layer.close(layer_index);
@@ -333,38 +332,37 @@ function changePath(d) {
 		closeBtn: 1,
 		shift: 5,
 		shadeClose: false,
-		content: "\
-			<div class='changepath'>\
-				<div class='path-top'>\
-					<button type='button' class='btn btn-default btn-sm' onclick='backFile()'><span class='glyphicon glyphicon-share-alt'></span>返回</button>\
-					<div class='place' id='PathPlace'>当前路径：<span></span></div>\
-				</div>\
-				<div class='path-con'>\
-					<div class='path-con-left'><dl><dt id='changecomlist' onclick='backMyComputer()'>计算机</dt></dl></div>\
-					<div class='path-con-right'>\
-						<ul class='default' id='computerDefautl'></ul>\
-						<div class='file-list divtable'>\
-							<table class='table table-hover' style='border:0 none'>\
-								<thead>\
-									<tr class='file-list-head'>\
-										<th width='40%'>文件名</th>\
-										<th width='20%'>修改时间</th>\
-										<th width='10%'>权限</th>\
-										<th width='10%'>所有者</th>\
-										<th width='10%'></th>\
-									</tr>\
-								</thead>\
-								<tbody id='tbody' class='list-list'></tbody>\
-							</table>\
-						</div>\
+		content: "<div class='changepath'>\
+			<div class='path-top'>\
+				<button type='button' class='btn btn-default btn-sm' onclick='backFile()'><span class='glyphicon glyphicon-share-alt'></span>返回</button>\
+				<div class='place' id='PathPlace'>当前路径：<span></span></div>\
+			</div>\
+			<div class='path-con'>\
+				<div class='path-con-left'><dl><dt id='changecomlist' onclick='backMyComputer()'>计算机</dt></dl></div>\
+				<div class='path-con-right'>\
+					<ul class='default' id='computerDefautl'></ul>\
+					<div class='file-list divtable'>\
+						<table class='table table-hover' style='border:0 none'>\
+							<thead>\
+								<tr class='file-list-head'>\
+									<th width='40%'>文件名</th>\
+									<th width='20%'>修改时间</th>\
+									<th width='10%'>权限</th>\
+									<th width='10%'>所有者</th>\
+									<th width='10%'></th>\
+								</tr>\
+							</thead>\
+							<tbody id='tbody' class='list-list'></tbody>\
+						</table>\
 					</div>\
 				</div>\
 			</div>\
-			<div class='getfile-btn' style='margin-top:0'>\
-				<button type='button' class='btn btn-default btn-sm pull-left' onclick='createFolder()'>新建文件夹</button>\
-				<button type='button' class='btn btn-danger btn-sm mr5' onclick=\"layer.close(getCookie('changePath'))\">关闭</button>\
-				<button type='button' class='btn btn-success btn-sm' onclick='getfilePath()'>选择</button>\
-			</div>"
+		</div>\
+		<div class='getfile-btn' style='margin-top:0'>\
+			<button type='button' class='btn btn-default btn-sm pull-left' onclick='createFolder()'>新建文件夹</button>\
+			<button type='button' class='btn btn-danger btn-sm mr5' onclick=\"layer.close(getCookie('changePath'))\">关闭</button>\
+			<button type='button' class='btn btn-success btn-sm' onclick='getfilePath()'>选择</button>\
+		</div>"
 	});
 	setCookie("changePath", c);
 	var b = $("#" + d).val();
@@ -387,14 +385,15 @@ function getDiskList(b) {
 	var a = "";
 	var c = "path=" + b + "&disk=True";
 	$.post("/files/get_dir", c, function(h) {
-		if(h.DISK != undefined) {
-			for(var f = 0; f < h.DISK.length; f++) {
-				a += "<dd onclick=\"getDiskList('" + h.DISK[f].path + "')\"><span class='glyphicon glyphicon-hdd'></span>&nbsp;" + h.DISK[f].path + "</dd>"
-			}
-			$("#changecomlist").html(a)
-		}
-		for(var f = 0; f < h.DIR.length; f++) {
-			var g = h.DIR[f].split(";");
+		// console.log(h);
+		// if(h.dir != undefined) {
+		// 	for(var f = 0; f < h.dir.length; f++) {
+		// 		a += "<dd onclick=\"getDiskList('" + h.dir[f].path + "')\"><span class='glyphicon glyphicon-hdd'></span>&nbsp;" + h.dir[f].path + "</dd>";
+		// 	}
+		// 	$("#changecomlist").html(a);
+		// }
+		for(var f = 0; f < h.dir.length; f++) {
+			var g = h.dir[f].split(";");
 			var e = g[0];
 		
 			if(isChineseChar(e)) {
@@ -408,16 +407,16 @@ function getDiskList(b) {
 			}
 
 			d += "<tr>\
-				<td onclick=\"getDiskList('" + h.PATH + "/" + g[0] + "')\" title='" + g[0] + "'>\
+				<td onclick=\"getDiskList('" + h.path + "/" + g[0] + "')\" title='" + g[0] + "'>\
 					<span class='glyphicon glyphicon-folder-open'></span>" + e + "</td><td>" + getLocalTime(g[2]) + "</td>\
 				<td>" + g[3] + "</td>\
 				<td>" + g[4] + "</td>\
-				<td><span class='delfile-btn' onclick=\"NewDelFile('" + h.PATH + "/" + g[0] + "')\">X</span></td>\
+				<td><span class='delfile-btn' onclick=\"newDelFile('" + h.path + "/" + g[0] + "')\">X</span></td>\
 			</tr>";
 		}
-		if(h.FILES != null && h.FILES != "") {
-			for(var f = 0; f < h.FILES.length; f++) {
-				var g = h.FILES[f].split(";");
+		if(h.files != null && h.files != "") {
+			for(var f = 0; f < h.files.length; f++) {
+				var g = h.files[f].split(";");
 				var e = g[0];
 				if(isChineseChar(e)) {
 					if(e.length > 10) {
@@ -441,10 +440,10 @@ function getDiskList(b) {
 		$(".default").hide();
 		$(".file-list").show();
 		$("#tbody").html(d);
-		if(h.PATH.substr(h.PATH.length - 1, 1) != "/") {
-			h.PATH += "/";
+		if(h.path.substr(h.path.length - 1, 1) != "/") {
+			h.path += "/";
 		}
-		$("#PathPlace").find("span").html(h.PATH);
+		$("#PathPlace").find("span").html(h.path);
 		activeDisk();
 		return;
 	},'json');
@@ -485,7 +484,7 @@ function createFolder() {
 	})
 }
 
-function NewDelFile(c) {
+function newDelFile(c) {
 	var a = $("#PathPlace").find("span").text();
 	newTxt = c.replace(new RegExp(/(\/\/)/g), "/");
 	var b = "path=" + newTxt + "&empty=True";
@@ -530,10 +529,11 @@ function activeDisk() {
 }
 
 function backMyComputer() {
-	$(".default").show();
-	$(".file-list").hide();
-	$("#PathPlace").find("span").html("");
-	activeDisk();
+	// $(".default").show();
+	// $(".file-list").hide();
+	// $("#PathPlace").find("span").html("");
+	// activeDisk();
+	return;
 }
 
 function backFile() {
@@ -921,27 +921,13 @@ function task() {
 	messageBox();
 }
 
-function ActionTask() {
-	var a = layer.msg(lan.public.the_del, {
-		icon: 16,
-		time: 0,
-		shade: [0.3, "#000"]
-	});
-	$.post("/files?action=ActionTask", "", function(b) {
-		layer.close(a);
-		layer.msg(b.msg, {
-			icon: b.status ? 1 : 5
-		})
-	})
-}
-
 function removeTask(b) {
 	var a = layer.msg('正在删除,请稍候...', {
 		icon: 16,
 		time: 0,
 		shade: [0.3, "#000"]
 	});
-	$.post("/files/remove_task", "id=" + b, function(c) {
+	$.post("/task/remove_task", "id=" + b, function(c) {
 		layer.close(a);
 		layer.msg(c.msg, {
 			icon: c.status ? 1 : 5
@@ -951,59 +937,11 @@ function removeTask(b) {
 	});
 }
 
-function GetTaskList(a) {
-	a = a == undefined ? 1 : a;
-	$.post("/task/list", "tojs=GetTaskList&table=tasks&limit=10&p=" + a, function(g) {
-		console.log(g);
-		var e = "";
-		var b = "";
-		var c = "";
-		var f = false;
-		for(var d = 0; d < g.data.length; d++) {
-			switch(g.data[d].status) {
-				case "-1":
-					f = true;
-					if(g.data[d].type != "download") {
-						b = "<li>\
-								<span class='titlename'>" + g.data[d].name + "</span>\
-								<span class='state'>正在安装 <img src='/static/img/ing.gif'> | <a href=\"javascript:removeTask(" + g.data[d].id + ")\">关闭</a></span>\
-								<span class='opencmd'></span><pre class='cmd'></pre>\
-							</li>";
-					} else {
-						b = "<li>\
-							<div class='line-progress' style='width:0%'></div>\
-							<span class='titlename'>" + g.data[d].name + "<a id='speed' style='margin-left:130px;'>0.0M/12.5M</a></span>\
-							<span class='com-progress'>0%</span><span class='state'>\
-								下载中 <img src='/static/img/ing.gif'> | <a href=\"javascript:removeTask(" + g.data[d].id + ")\">"+lan.public.close+"</a>\
-							</span>\
-						</li>";
-					}
-					break;
-				case "0":
-					c += "<li>\
-							<span class='titlename'>" + g.data[d].name + "</span>\
-							<span class='state'>等待</span> | <a href=\"javascript:removeTask(" + g.data[d].id + ")\">删除</a>\
-						</li>";
-					break;
-				case "1":
-					e += "<li>\
-						<span class='titlename'>" + g.data[d].name + "</span>\
-						<span class='state'>" + g.data[d].addtime + "  "+'已完成'+"  "+ '耗时' + (g.data[d].end - g.data[d].start)+"秒</span>\
-						</li>";
-			}
-		}
-		$("#srunning").html(b + c);
-		$("#sbody").html(e);
-		return f
-	})
-}
-
-
 //获取任务总数
 function getTaskCount() {
-	$.get("/task/count", "", function(a) {
-		$(".task").text(a);
-	});
+	$.get("/task/count", '', function(data) {
+		$(".task").text(data.data);
+	},'json');
 }
 getTaskCount();
 setInterval(function(){
@@ -1137,9 +1075,15 @@ function listOrder(skey,type,obj){
 //获取关联列表
 function getPanelList(){
 	var con ='';
-	$.post("/config/get_panel_list",function(rdata){
+	$.post("/setting/get_panel_list",function(rdata){
+		if (!rdata.status){
+			return;
+		}
+
+		var rdata = rdata.data;
+
 		for(var i=0; i<rdata.length; i++){
-			con +='<h3 class="mypcip mypcipnew" style="opacity:.6" data-url="'+rdata[i].url+'" data-user="'+rdata[i].username+'" data-pw="'+rdata[i].password+'">\
+			con +='<h3 class="mypcip mypcipnew" style="opacity:.6;cursor: pointer;" data-url="'+rdata[i].url+'" data-user="'+rdata[i].username+'" data-pw="'+rdata[i].password+'">\
 				<span class="f14 cw">'+rdata[i].title+'</span>\
 				<em class="btedit" onclick="bindPanel(0,\'c\',\''+rdata[i].title+'\',\''+rdata[i].id+'\',\''+rdata[i].url+'\',\''+rdata[i].username+'\',\''+rdata[i].password+'\')"></em>\
 				</h3>';
@@ -1151,34 +1095,54 @@ function getPanelList(){
 		},function(){
 			$(this).css("opacity",".6");
 		}).click(function(){
-			$("#btpanelform").remove();
+			// $("#panel_form").remove();
 			var murl = $(this).attr("data-url");
 			var user = $(this).attr("data-user");
 			var pw = $(this).attr("data-pw");
-			layer.open({
-				type: 2,
-				title: false,
-			 	closeBtn: 0, //不显示关闭按钮
-				shade: [0],
-				area: ['340px', '215px'],
-				offset: 'rb', //右下角弹出
-				time: 5, //2秒后自动关闭
-				anim: 2,
-				content: [murl+'/login', 'no']
-			});
-			var loginForm ='<div id="btpanelform" style="display:none"><form id="toBtpanel" action="'+murl+'/do_login" method="post" target="btpfrom">\
-				<input name="username" id="btp_username" value="'+user+'" type="text">\
-				<input name="password" id="btp_password" value="'+pw+'" type="password">\
-				<input name="code" id="bt_code" value="12345" type="text">\
-			</form><iframe name="btpfrom" src=""></iframe></div>';
-			$("body").append(loginForm);
-			layer.msg('正在打开面板...',{icon:16,shade: [0.3, '#000'],time:1000});
-			setTimeout(function(){
-				$("#toBtpanel").submit();
-			},500);
-			setTimeout(function(){
-				window.open(murl);
-			},1000);
+
+			var random_str = getRandomString(8);
+
+			var timestamp = Date.parse(new Date());
+			var data = {
+				'rand':random_str,
+				'username':user,
+				'password':pw,
+				'time':timestamp
+			};
+
+
+			data_json =JSON.stringify(data);
+			login_args = base64_encode(data_json);
+
+			endpoint_url = murl + '?login='+login_args;
+			window.open(endpoint_url);
+			// layer.open({
+			// 	type: 2,
+			// 	title: false,
+			//  	closeBtn: 0, //不显示关闭按钮
+			// 	shade: [0],
+			// 	area: ['340px', '215px'],
+			// 	offset: 'rb', //右下角弹出
+			// 	time: 5, //2秒后自动关闭
+			// 	anim: 2,
+			// 	content: [murl, 'no']
+			// });
+			// window.open(murl);
+			// 
+			// var loginForm ='<div id="panel_form" style="display:none"><form id="toBtpanel" action="'+now_url.origin+'/do_login" method="post" target="btpfrom">\
+			// 	<input name="username" value="'+user+'" type="text">\
+			// 	<input name="password" value="'+pw+'" type="password">\
+			// 	<input name="code" id="bt_code" value="" type="text">\
+			// </form><iframe name="btpfrom" src=""></iframe></div>';
+			// $("body").append(loginForm);
+			// // console.log($("panel_form").html());
+			// layer.msg('正在打开面板...',{icon:16,shade: [0.3, '#000'],time:1000});
+			// setTimeout(function(){
+			// 	$("#toBtpanel").submit();
+			// },1000);
+			// setTimeout(function(){
+			// 	window.open(murl);
+			// },2000);
 		});
 		$(".btedit").click(function(e){
 			e.stopPropagation();
@@ -1202,7 +1166,7 @@ function bindPanel(a,type,ip,btid,url,user,pw){
 	if(pw == undefined) pw="";
 	if(ip == undefined) ip="";
 	if(a == 1) {
-		var gurl = "/config/add_panel_info";
+		var gurl = "/setting/add_panel_info";
 		var btaddress = $("#btaddress").val();
 		if(!btaddress.match(/^(http|https)+:\/\/([\w-]+\.)+[\w-]+:\d+/)){
 			layer.msg('面板地址格式不正确，示例：<p>http://192.168.0.1:8888</p>',{icon:5,time:5000});
@@ -1217,7 +1181,7 @@ function bindPanel(a,type,ip,btid,url,user,pw){
 			return;
 		}
 		if(type=="c"){
-			gurl = "/config/set_panel_info";
+			gurl = "/setting/set_panel_info";
 			data = data+"&id="+btid;
 		}
 		$.post(gurl, data, function(b) {
@@ -1275,7 +1239,7 @@ function bindPanel(a,type,ip,btid,url,user,pw){
 }
 //删除快捷登录
 function bindPaneldel(id){
-	$.post("/config/del_panel_info","id="+id,function(rdata){
+	$.post("/setting/del_panel_info","id="+id,function(rdata){
 		layer.closeAll();
 		layer.msg(rdata.msg,{icon:rdata.status?1:2});
 		getPanelList();
@@ -1308,6 +1272,20 @@ function getSpeed(sele){
 		},1000);
 	},'json');
 }
+
+function tasklist(){
+	var con='<ul class="cmdlist"></ul>\
+		<span style="position:  fixed;bottom: 13px;">若任务长时间未执行，请尝试在首页点【重启面板】来重置任务队列</span>';
+	$("#msg_box .taskcon").html(con);
+	$.post("/task/list", "tojs=getTaskList&table=tasks&limit=10&p=1", function(g) {
+		$('#msg_box .msg_count').html(g.count);
+	},'json');
+
+	setTimeout(function(){
+		getReloads();
+	},100);
+}
+
 //消息盒子
 function messageBox() {
 	layer.open({
@@ -1317,22 +1295,24 @@ function messageBox() {
 		closeBtn: 1,
 		shadeClose: false,
 		content: '<div class="bt-form">\
-					<div class="bt-w-main">\
-						<div class="bt-w-menu">\
-							<p class="bgw" id="taskList" onclick="tasklist()">任务列表(<span class="task_count">0</span>)</p>\
-							<p onclick="remind()">消息列表(<span class="msg_count">0</span>)</p>\
-							<p onclick="execLog()">执行日志</p>\
-						</div>\
-						<div class="bt-w-con pd15">\
-							<div class="taskcon"></div>\
-						</div>\
-					</div>\
-				</div>'
+			<div class="bt-w-main" id="msg_box">\
+				<div class="bt-w-menu">\
+					<p class="bgw" id="taskList" onclick="tasklist()">任务列表(<span class="task_count">0</span>)</p>\
+					<p onclick="remind()">消息列表(<span class="msg_count">0</span>)</p>\
+					<p onclick="execLog()">执行日志</p>\
+				</div>\
+				<div class="bt-w-con pd15">\
+					<div class="taskcon"></div>\
+				</div>\
+			</div>\
+		</div>',
+		success:function(){
+			$(".bt-w-menu p").click(function(){
+				$(this).addClass("bgw").siblings().removeClass("bgw");
+			});
+			tasklist();
+		}
 	});
-	$(".bt-w-menu p").click(function(){
-		$(this).addClass("bgw").siblings().removeClass("bgw");
-	});
-	tasklist();
 }
 
 //取执行日志
@@ -1373,10 +1353,10 @@ function getSFM(seconds, dateFormat = 'H:i:s') {
 
 function remind(a){
 	a = a == undefined ? 1 : a;
+	$(".taskcon").html('');
 	$.post("/task/list", "table=tasks&result=2,4,6,8&limit=10&p=" + a, function(g) {
 		var e = '';
 		var f = false;
-		var task_count = 0;
 		for(var d = 0; d < g.data.length; d++) {
 			var status = g.data[d].status;
 			var status_text = '已经完成';
@@ -1421,12 +1401,10 @@ function remind(a){
 					</div>\
 					<div id="taskPage" class="page"></div>\
 				</div>';
-		
-		$(".task_count").text(task_count);
-		$(".msg_count").text(g.count);
 		$(".taskcon").html(con);
-		$("#taskPage").html(g.page);
 
+		$(".msg_count").text(g.count);
+		$("#taskPage").html(g.page);
 		$("#Rs-checkAll").click(function(){
 			if($(this).prop("checked")){
 				$("#remind").find("input").prop("checked",true);
@@ -1438,40 +1416,37 @@ function remind(a){
 }
 
 function getReloads() {
-	var a = 0;
-	var mm = $(".bt-w-menu .bgw").html()
-	if(mm == undefined || mm.indexOf(lan.bt.task_list) == -1) {
+	var mm = $("#msg_box .bt-w-menu .bgw").html();
+	if(mm == undefined || mm.indexOf('任务列表') == -1) {
 		clearInterval(speed);
-		a = 0;
 		speed = null;
 		return
 	}
 	if(speed) {return;}
-	speed = setInterval(function() {
-		var mm = $(".bt-w-menu .bgw").html()
-		if(mm == undefined || mm.indexOf(lan.bt.task_list) == -1) {
+
+	function renderRunTask(){
+		var mm = $("#msg_box .bt-w-menu .bgw").html();
+		if(mm == undefined || mm.indexOf('任务列表') == -1) {
 			clearInterval(speed);
 			speed = null;
 			a = 0;
 			return
 		}
-		a++;
 		$.post('/task/get_task_speed', '', function(h) {
 			if(h.task == undefined) {
+				$(".task_count").text(0);
 				$(".cmdlist").html('当前没有任务!');
 				return;
 			}
-			var b = "";
-			var d = "";
-			$("#task").text(h.task.length);
-			$(".task_count").text(h.task.length);
+			var b = '';
+			var d = '';
 			for(var g = 0; g < h.task.length; g++) {
 				if(h.task[g].status == "-1") {
 					if(h.task[g].type != "download") {
 						var c = "";
 						var f = h.msg.split("\n");
 						for(var e = 0; e < f.length; e++) {
-							c += f[e] + "<br>"
+							c += f[e] + "<br>";
 						}
 						if(h.task[g].name.indexOf("扫描") != -1) {
 							b = "<li>\
@@ -1491,14 +1466,16 @@ function getReloads() {
 						b = "<li>\
 								<div class='line-progress' style='width:" + h.msg.pre + "%'></div>\
 								<span class='titlename'>" + h.task[g].name + "<a style='margin-left:130px;'>" + (toSize(h.msg.used) + "/" + toSize(h.msg.total)) + "</a></span>\
-									<span class='com-progress'>" + h.msg.pre + "%</span>\
-									<span class='state'>"+lan.bt.task_downloading+" <img src='/static/img/ing.gif'> | <a href=\"javascript:removeTask(" + h.task[g].id + ")\">"+lan.public.close+"</a></span>\
+								<span class='com-progress'>" + h.msg.pre + "%</span>\
+								<span class='state'>下载中<img src='/static/img/ing.gif'> | <a href=\"javascript:removeTask(" + h.task[g].id + ")\">"+lan.public.close+"</a></span>\
 							</li>"
 					}
 				} else {
 					d += "<li><span class='titlename'>" + h.task[g].name + "</span><span class='state'>等待 | <a style='color:green' href=\"javascript:removeTask(" + h.task[g].id + ')">删除</a></span></li>'
 				}
 			}
+			$("#task").text(h.count);
+			$(".task_count").text(h.count);
 			$(".cmdlist").html(b + d);
 			$(".cmd").html(c);
 			try{
@@ -1507,7 +1484,12 @@ function getReloads() {
 				return;
 			}
 		},'json').error(function(){});
-	}, 1000);
+	}
+
+	renderRunTask();
+	speed = setInterval(function() {
+		renderRunTask();
+	}, 2000);
 }
 
 //检查选中项
@@ -1524,54 +1506,6 @@ function RscheckSelect(){
 			$(".rs-del,.rs-read").attr("disabled","disabled");
 		}
 	},5);
-}
-
-
-function tasklist(a){
-	var con='<ul class="cmdlist"></ul>\
-		<span style="position:  fixed;bottom: 13px;">若任务长时间未执行，请尝试在首页点【重启面板】来重置任务队列</span>';
-	$(".taskcon").html(con);
-	a = a == undefined ? 1 : a;
-	$.post("/task/list", "tojs=getTaskList&table=tasks&limit=10&p=" + a, function(g) {
-		var e = "";
-		var b = "";
-		var c = "";
-		var f = false;
-		var task_count =0;
-		for(var d = 0; d < g.data.length; d++) {
-			switch(g.data[d].status) {
-				case "-1":
-					f = true;
-					if(g.data[d].type != "download") {
-						b = "<li>\
-							<span class='titlename'>" + g.data[d].name + "</span>\
-							<span class='state pull-right c6'>正在安装<img src='/static/img/ing.gif'> | <a class='btlink' href=\"javascript:removeTask(" + g.data[d].id + ")\">关闭</a></span>\
-							<span class='opencmd'></span><pre class='cmd'></pre>\
-						</li>";
-					} else {
-						b = "<li>\
-							<div class='line-progress' style='width:0%'></div><span class='titlename'>" + g.data[d].name + "<a id='speed' style='margin-left:130px;'>0.0M/12.5M</a></span>\
-							<span class='com-progress'>0%</span><span class='state'>下载中 <img src='/static/img/ing.gif'> | <a href=\"javascript:removeTask(" + g.data[d].id + ")\">关闭</a></span>\
-						</li>";
-					}
-					task_count++;
-					break;
-				case "0":
-					c += "<li>\
-						<span class='titlename'>" + g.data[d].name + "</span>\
-						<span class='state pull-right c6'>等待</span> | <a href=\"javascript:removeTask(" + g.data[d].id + ")\" class='btlink'>"+lan.public.del+"</a>\
-					</li>";
-					task_count++;
-					break;
-			}
-		}
-		
-		
-		$(".task_count").text(task_count);
-		$(".cmdlist").html(b + c);
-		getReloads();
-		return f
-	},'json');
 }
 
 function activeDisk() {
@@ -1601,13 +1535,6 @@ function activeDisk() {
 }
 
 
-function backMyComputer() {
-	$(".default").show();
-	$(".file-list").hide();
-	$("#PathPlace").find("span").html("");
-	activeDisk();
-}
-
 //检查登陆状态
 function check_login(){
 	$.post('/check_login',{},function(rdata){
@@ -1632,13 +1559,6 @@ function scroll_handle(e){
 	var scrollTop = this.scrollTop;
 	$(this).find("thead").css({"transform":"translateY("+scrollTop+"px)","position":"relative","z-index":"1"});
 }
-
-
-$(function(){
-///
-setInterval(function(){check_login();},6000);
-///
-});
 
 function asyncLoadImage(obj, url){
 	
@@ -2777,8 +2697,8 @@ function pluginStandAloneLogs(_name, version, func, _args, line){
 }
 /*** 其中功能,针对插件通过库使用 end ***/
 
-
 $(function() {
+	setInterval(function(){check_login();},6000);
 	autoHeight();
 });
 $(window).resize(function() {

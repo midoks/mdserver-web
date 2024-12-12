@@ -7,8 +7,6 @@ rootPath=$(dirname "$curPath")
 rootPath=$(dirname "$rootPath")
 serverPath=$(dirname "$rootPath")
 
-install_tmp=${rootPath}/tmp/mw_install.pl
-
 if [ -f ${rootPath}/bin/activate ];then
 	source ${rootPath}/bin/activate
 fi
@@ -36,7 +34,7 @@ Install_gogs()
 	
 	mkdir -p $serverPath/source/gogs
 
-	echo '正在安装脚本文件...' > $install_tmp
+	echo '正在安装脚本文件...'
 	version=$1
 	os=`getOs`
 
@@ -78,7 +76,7 @@ Install_gogs()
 	# 	echo "gogs ALL=(ALL)    NOPASSWD: ALL" >> /etc/sudoers
 	# fi
 
-	echo 'install success' > $install_tmp
+	echo 'install success'
 }
 
 Uninstall_gogs()
@@ -96,7 +94,7 @@ Uninstall_gogs()
 	fi
 
 	rm -rf $serverPath/gogs
-	echo 'uninstall success' > $install_tmp
+	echo 'uninstall success'
 }
 
 

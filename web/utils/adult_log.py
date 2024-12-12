@@ -134,7 +134,7 @@ def parseAuditFile(log_name, result):
         log_list.append(_line)
     return log_list
 
-def getAuditLast(self, log_name):
+def getAuditLast(log_name):
     # 获取日志
     cmd = '''LANG=en_US.UTF-8 last -n 200 -x -f {} |grep -v 127.0.0.1|grep -v " begins"'''.format(
         '/var/log/' + log_name)
@@ -173,7 +173,7 @@ def getAuditLast(self, log_name):
     # lastlog_list = sorted(lastlog_list,key=lambda x:x['时间'],reverse=True)
     return mw.returnData(True, 'ok!', lastlog_list)
 
-def getAuditLastLog(self):
+def getAuditLastLog():
     cmd = '''LANG=en_US.UTF-8 lastlog|grep -v Username'''
     result = mw.execShell(cmd)
     lastlog_list = []

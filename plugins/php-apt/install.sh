@@ -7,7 +7,6 @@ rootPath=$(dirname "$curPath")
 rootPath=$(dirname "$rootPath")
 serverPath=$(dirname "$rootPath")
 
-install_tmp=${rootPath}/tmp/mw_install.pl
 
 if id www &> /dev/null ;then 
     echo "www uid is `id -u www`"
@@ -34,12 +33,12 @@ type=$2
 apt_ver=${type:0:1}.${type:1:2}
 
 if [ "${2}" == "" ];then
-	echo '缺少安装脚本...' > $install_tmp
+	echo '缺少安装脚本...'
 	exit 0
 fi 
 
 if [ ! -d $curPath/versions/$2 ];then
-	echo '缺少安装脚本2...' > $install_tmp
+	echo '缺少安装脚本2...'
 	exit 0
 fi
 
@@ -87,6 +86,8 @@ fi
 cd ${curPath} && sh -x $curPath/versions/$2/install.sh $1
 
 if [ "${action}" == "install" ] && [ -d ${serverPath}/php-apt/${type} ];then
+	apt update -y
+	
 	#初始化 
 	cd ${rootPath} && python3 ${rootPath}/plugins/php-apt/index.py start ${type}
 	cd ${rootPath} && python3 ${rootPath}/plugins/php-apt/index.py restart ${type}

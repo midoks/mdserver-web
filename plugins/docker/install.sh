@@ -10,7 +10,6 @@ serverPath=$(dirname "$rootPath")
 # cd /www/server/mdserver-web/plugins/docker && /bin/bash install.sh uninstall 1.0
 # cd /www/server/mdserver-web/plugins/docker && /bin/bash install.sh install 1.0
 
-install_tmp=${rootPath}/tmp/mw_install.pl
 VERSION=$2
 
 if [ -f ${rootPath}/bin/activate ];then
@@ -42,11 +41,11 @@ Install_Docker()
 {
 	# which docker
 	# if [ "$?" == "0" ];then
-	# 	echo '安装已经完成docker' > $install_tmp
+	# 	echo '安装已经完成docker'
 	# 	exit 0
 	# fi
 
-	echo '正在安装脚本文件...' > $install_tmp
+	echo '正在安装脚本文件...'
 	mkdir -p $serverPath/source
 
 	if [ ! -d  $serverPath/docker ];then
@@ -59,7 +58,7 @@ Install_Docker()
 	
 	if [ -d $serverPath/docker ];then
 		echo "${VERSION}" > $serverPath/docker/version.pl
-		echo '安装完成' > $install_tmp
+		echo '安装Docker完成'
 
 		cd ${rootPath} && python3 ${rootPath}/plugins/docker/index.py start
 		cd ${rootPath} && python3 ${rootPath}/plugins/docker/index.py initd_install
@@ -94,7 +93,7 @@ Uninstall_Docker()
 	# docker-ce
 
 	rm -rf $serverPath/docker
-	echo "Uninstall_Docker" > $install_tmp
+	echo "卸载Docker"
 }
 
 action=$1

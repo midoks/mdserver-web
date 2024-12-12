@@ -7,15 +7,12 @@ import sys
 import re
 import subprocess
 
-sys.path.append(os.getcwd() + "/class/core")
-import mw
+web_dir = os.getcwd() + "/web"
+if os.path.exists(web_dir):
+    sys.path.append(web_dir)
+    os.chdir(web_dir)
 
-
-# cmd = 'ls /usr/local/lib/ | grep python  | cut -d \\  -f 1 | awk \'END {print}\''
-# info = mw.execShell(cmd)
-# p = "/usr/local/lib/" + info[0].strip() + "/site-packages"
-# sys.path.append(p)
-
+import core.mw as mw
 
 app_debug = False
 if mw.isAppleSystem():
@@ -122,7 +119,7 @@ export HOME=%s && ''' % ( getRunUser(), getHomeDir())
 def contentReplace(content):
 
     service_path = mw.getServerDir()
-    content = content.replace('{$ROOT_PATH}', mw.getRootDir())
+    content = content.replace('{$ROOT_PATH}', mw.getFatherDir())
     content = content.replace('{$SERVER_PATH}', service_path)
     content = content.replace('{$RUN_USER}', getRunUser())
     content = content.replace('{$HOME_DIR}', getHomeDir())
@@ -689,7 +686,7 @@ def projectScriptLoad():
     commit_tpl = getPluginDir() + '/hook/commit.tpl'
     commit = path + '/custom_hooks/commit'
 
-    codeDir = mw.getRootDir() + '/git'
+    codeDir = mw.getFatherDir() + '/git'
 
     cc_content = mw.readFile(commit_tpl)
 

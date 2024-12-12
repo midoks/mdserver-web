@@ -10,7 +10,6 @@ rootPath=$(dirname "$curPath")
 rootPath=$(dirname "$rootPath")
 serverPath=$(dirname "$rootPath")
 
-install_tmp=${rootPath}/tmp/mw_install.pl
 VERSION=$2
 
 sysName=`uname`
@@ -228,7 +227,7 @@ Install_app_linux()
 
 Install_app()
 {
-	echo '正在安装脚本文件...' > $install_tmp
+	echo '正在安装脚本文件...'
 	mkdir -p $serverPath/source
 	
 	if [ "macos" == "$OSNAME" ];then
@@ -240,7 +239,7 @@ Install_app()
 	if [ "$?" == "0" ];then
 		mkdir -p $serverPath/mongodb
 		echo "${VERSION}" > $serverPath/mongodb/version.pl
-		echo '安装完成' > $install_tmp
+		echo '安装完成'
 
 		#初始化 
 		cd ${rootPath} && python3 ${rootPath}/plugins/mongodb/index.py start
@@ -276,7 +275,7 @@ Uninstall_app()
 	fi
 
 	rm -rf $serverPath/mongodb
-	echo "Uninstall_mongodb" > $install_tmp
+	echo "Uninstall_mongodb"
 }
 
 action=$1

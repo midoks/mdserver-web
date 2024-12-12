@@ -6,8 +6,12 @@ import os
 import time
 import re
 
-sys.path.append(os.getcwd() + "/class/core")
-import mw
+web_dir = os.getcwd() + "/web"
+if os.path.exists(web_dir):
+    sys.path.append(web_dir)
+    os.chdir(web_dir)
+
+import core.mw as mw
 
 app_debug = False
 if mw.isAppleSystem():
@@ -122,7 +126,7 @@ def status():
 
 
 def contentReplace(content):
-    service_path = os.path.dirname(os.getcwd())
+    service_path = mw.getServerDir()
     content = content.replace('{$SERVER_PATH}', service_path)
     content = content.replace('{$PLUGIN_PATH}', getPluginDir())
 
@@ -162,7 +166,7 @@ def copyScripts():
 def initDreplace():
 
     file_tpl = getInitDTpl()
-    service_path = os.path.dirname(os.getcwd())
+    service_path = mw.getServerDir()
 
     initD_path = getServerDir() + '/init.d'
     if not os.path.exists(initD_path):
@@ -198,7 +202,6 @@ def initDreplace():
     systemService = systemDir + '/' + getPluginName() + '.service'
     if os.path.exists(systemDir) and not os.path.exists(systemService):
         systemServiceTpl = getPluginDir() + '/init.d/' + getPluginName() + '.service.tpl'
-        service_path = mw.getServerDir()
         content = mw.readFile(systemServiceTpl)
         content = contentReplace(content)
         mw.writeFile(systemService, content)

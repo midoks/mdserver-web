@@ -13,9 +13,13 @@ if sys.platform != "darwin":
     os.chdir("/www/server/mdserver-web")
 
 
-sys.path.append(os.getcwd() + "/class/core")
-import mw
-import db
+web_dir = os.getcwd() + "/web"
+if os.path.exists(web_dir):
+    sys.path.append(web_dir)
+    os.chdir(web_dir)
+
+import core.mw as mw
+import core.db as db
 
 _ver = sys.version_info
 is_py2 = (_ver[0] == 2)
@@ -213,9 +217,9 @@ def backupAllFunc(stype):
         mw.echoInfo("未授权API,无法使用!!!")
         return ''
 
-    os.chdir(mw.getRunDir())
+    os.chdir(mw.getPanelDir())
     backup_dir = mw.getBackupDir()
-    run_dir = mw.getRunDir()
+    run_dir = mw.getPanelDir()
 
     stype = sys.argv[1]
     name = sys.argv[2]
@@ -281,8 +285,7 @@ def backupAllFunc(stype):
         bk_name = stype
 
     find_path = backup_dir + '/' + bk_name + '/' + bk_prefix + '_' + name
-    find_new_file = "ls " + find_path + \
-        "_* | grep '.gz' | cut -d \  -f 1 | awk 'END {print}'"
+    find_new_file = "ls " + find_path + "_* | grep '.gz' | cut -d \\  -f 1 | awk 'END {print}'"
 
     # print(find_new_file)
 

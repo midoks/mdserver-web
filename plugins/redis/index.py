@@ -6,8 +6,12 @@ import os
 import time
 import re
 
-sys.path.append(os.getcwd() + "/class/core")
-import mw
+web_dir = os.getcwd() + "/web"
+if os.path.exists(web_dir):
+    sys.path.append(web_dir)
+    os.chdir(web_dir)
+
+import core.mw as mw
 
 app_debug = False
 if mw.isAppleSystem():
@@ -118,7 +122,7 @@ def status():
 
 def contentReplace(content):
     service_path = mw.getServerDir()
-    content = content.replace('{$ROOT_PATH}', mw.getRootDir())
+    content = content.replace('{$ROOT_PATH}', mw.getFatherDir())
     content = content.replace('{$SERVER_PATH}', service_path)
     content = content.replace('{$SERVER_APP}', service_path + '/'+getPluginName())
     content = content.replace('{$REDIS_PASS}', mw.getRandomString(10))
@@ -129,7 +133,7 @@ def contentReplace(content):
 def initDreplace():
 
     file_tpl = getInitDTpl()
-    service_path = os.path.dirname(os.getcwd())
+    service_path = mw.getServerDir()
 
     initD_path = getServerDir() + '/init.d'
     if not os.path.exists(initD_path):
@@ -146,6 +150,7 @@ def initDreplace():
     # log
     dataLog = getServerDir() + '/data'
     if not os.path.exists(dataLog):
+        mw.execShell('mkdir -p ' + dataLog)
         mw.execShell('chmod +x ' + file_bin)
 
     # config replace
@@ -154,8 +159,7 @@ def initDreplace():
     if not os.path.exists(dst_conf_init):
         conf_content = mw.readFile(getConfTpl())
         conf_content = conf_content.replace('{$SERVER_PATH}', service_path)
-        conf_content = conf_content.replace(
-            '{$REDIS_PASS}', mw.getRandomString(10))
+        conf_content = conf_content.replace('{$REDIS_PASS}', mw.getRandomString(10))
 
         mw.writeFile(dst_conf, conf_content)
         mw.writeFile(dst_conf_init, 'ok')
@@ -166,9 +170,9 @@ def initDreplace():
     if os.path.exists(systemDir) and not os.path.exists(systemService):
         systemServiceTpl = getPluginDir() + '/init.d/' + getPluginName() + '.service.tpl'
         service_path = mw.getServerDir()
-        se_content = mw.readFile(systemServiceTpl)
-        se_content = se_content.replace('{$SERVER_PATH}', service_path)
-        mw.writeFile(systemService, se_content)
+        content = mw.readFile(systemServiceTpl)
+        content = content.replace('{$SERVER_PATH}', service_path)
+        mw.writeFile(systemService, content)
         mw.execShell('systemctl daemon-reload')
 
     return file_bin
@@ -220,7 +224,7 @@ def getPort():
     conf = getServerDir() + '/redis.conf'
     content = mw.readFile(conf)
 
-    rep = r"^(" + r'port' + r')\s*([.0-9A-Za-z_& ~]+)'
+    rep = r"^(port)\s*([.0-9A-Za-z_& ~]+)"
     tmp = re.search(rep, content, re.M)
     if tmp:
         return tmp.groups()[1]
@@ -232,7 +236,7 @@ def getRedisCmd():
     requirepass = ""
     conf = getServerDir() + '/redis.conf'
     content = mw.readFile(conf)
-    rep = r"^(requirepass" + r')\s*([.0-9A-Za-z_& ~]+)'
+    rep = r"^(requirepass)\s*([.0-9A-Za-z_& ~]+)"
     tmp = re.search(rep, content, re.M)
     if tmp:
         requirepass = tmp.groups()[1]
@@ -242,12 +246,10 @@ def getRedisCmd():
     # findDebian = mw.execShell('cat /etc/issue |grep Debian')
     # if findDebian[0] != '':
     #     default_ip = mw.getLocalIp()
-    cmd = getServerDir() + "/bin/redis-cli -h " + \
-        default_ip + ' -p ' + port + " "
+    cmd = getServerDir() + "/bin/redis-cli -h " + default_ip + ' -p ' + port + " "
 
     if requirepass != "":
-        cmd = getServerDir() + '/bin/redis-cli -h ' + default_ip + \
-            ' -p ' + port + ' -a "' + requirepass + '" '
+        cmd = getServerDir() + '/bin/redis-cli -h ' + default_ip + ' -p ' + port + ' -a "' + requirepass + '" '
 
     return cmd
 

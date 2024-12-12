@@ -247,11 +247,16 @@ function initTabMemcached(){
     });
 }
 
+var mysql_timer = null;
 function initTabMySQL(){
-    mysqlGetDbList();
 
-    mysqlProcessList();
-    var mysql_timer = setInterval(function(){
+    mysqlGetServerList(function(){
+        mysqlGetDbList();
+        mysqlProcessList();
+    });
+
+    clearInterval(mysql_timer);    
+    mysql_timer = setInterval(function(){
         var name = $('#mysql_list_tab .tab-nav span.on').data('name');
         mysqlRunMysqlTab(name);
 
@@ -261,11 +266,612 @@ function initTabMySQL(){
         }
     },2000);
 
-    $('#mysql_list_tab .tab-nav span').click(function(){
+    $('#mysql_list_tab .tab-nav span').unbind('click').click(function(){
         $('#mysql_list_tab .tab-nav span').removeClass('on');
         $(this).addClass('on');
         var name = $(this).data('name');
         mysqlRunMysqlTab(name);
+    });
+
+    mysqlCommonFunc();
+}
+
+function mysqlCommonFuncMysqlNSQL(){
+    function renderSQL(){
+        var sid = mysqlGetSid();
+        var filter_db = $('#filter_db').is(':checked');
+        myPostCBN('get_topn_list',{'sid':sid,'filter_db':filter_db ? 'yes':'no'} ,function(rdata){
+            var data = rdata.data;
+            if (data['status']){
+                var items = data.data;
+                var tbody = '';
+                for (var i = 0; i < items.length; i++) {
+                    var t = '<tr>';
+                    t += '<td>'+items[i].query+'</td>';
+                    t += '<td>'+items[i].db+'</td>';
+                    t += '<td>'+items[i].last_seen+'</td>';
+                    t += '<td>'+items[i].exec_count+'</td>';
+                    t += '<td>'+items[i].max_latency+'</td>';
+                    t += '<td>'+items[i].avg_latency+'</td>';
+                    t += '</tr>';
+                    tbody += t;
+                }
+                $('#topn_list tbody').html(tbody);
+            } else {
+                layer.msg(data.msg,{icon:2});
+            }
+        });
+    }
+
+    var sql_timer = null;
+    layer.open({
+        type: 1,
+        title: "查询执行次数最频繁的前N条SQL语句",
+        area: ['1200px', '500px'],
+        closeBtn: 1,
+        shadeClose: false,
+        content: '<div class="bt-form pd20 divtable taskdivtable">\
+            <div class="mr20 pull-left" style="border-right: 1px solid #ccc; padding-right: 20px;">\
+                <div class="ss-text pull-left">\
+                    <em>实时监控</em>\
+                    <div class="ssh-item">\
+                        <input class="btswitch btswitch-ios" id="real_time_monitoring" type="checkbox">\
+                        <label id="real_time_label" class="btswitch-btn" for="real_time_monitoring"></label>\
+                    </div>\
+                </div>\
+                <div class="ss-text pull-left" style="padding-left:10px;">\
+                    <em>过滤数据库</em>\
+                    <div class="ssh-item">\
+                        <input class="btswitch btswitch-ios" id="filter_db" type="checkbox">\
+                        <label class="btswitch-btn" for="filter_db"></label>\
+                    </div>\
+                </div>\
+            </div>\
+            <hr />\
+            <table class="table table-hover" id="topn_list">\
+                <thead>\
+                    <th>SQL</th>\
+                    <th style="width:100px;">数据名</th>\
+                    <th>最近时间</th>\
+                    <th style="width:100px;">总次数</th>\
+                    <th style="width:100px;">最大时间</th>\
+                    <th style="width:100px;">平均时间</th>\
+                </thead>\
+                <tbody></tbody>\
+            </table>\
+        </div>',
+        success:function(i,l){
+            renderSQL();
+
+            $('#real_time_label').click(function(){
+                sql_timer = setInterval(function(){
+                    var t = $('#real_time_monitoring').is(':checked');
+                    if (t){
+                        renderSQL();
+                    } else{
+                        clearInterval(sql_timer);
+                    }
+                }, 3000);
+            });
+        }
+    });
+}
+
+function mysqlCommonFuncMysqlNet(){
+    function renderSQL(){
+        var sid = mysqlGetSid();
+        myPostCBN('get_net_list',{'sid':sid} ,function(rdata){
+            var data = rdata.data;
+            if (data['status']){
+                var items = data.data;
+                var tbody = '';
+                for (var i = 0; i < items.length; i++) {
+                    var t = '<tr>';
+                    t += '<td>'+items[i]['current_time']+'</td>';
+                    t += '<td>'+items[i]['select']+'</td>';
+                    t += '<td>'+items[i]['insert']+'</td>';
+                    t += '<td>'+items[i]['update']+'</td>';
+                    t += '<td>'+items[i]['delete']+'</td>';
+                    t += '<td>'+items[i]['conn']+'</td>';
+                    t += '<td>'+items[i]['max_conn']+'</td>';
+                    t += '<td>'+items[i]['recv_mbps']+'</td>';
+                    t += '<td>'+items[i]['send_mbps']+'</td>';
+                    t += '</tr>';
+                    tbody += t;
+                }
+                $('#net_list tbody').html(tbody);
+            } else {
+                layer.msg(data.msg,{icon:2});
+            }
+        });
+    }
+
+    var sql_timer = null;
+    layer.open({
+        type: 1,
+        title: "MySQL服务器的QPS/TPS/网络带宽指标",
+        area: ['750px', '220px'],
+        closeBtn: 1,
+        shadeClose: false,
+        content: '<div class="bt-form pd20 divtable taskdivtable">\
+            <div class="mr20 pull-left" style="border-right: 1px solid #ccc; padding-right: 20px;">\
+                <div class="ss-text pull-left">\
+                    <em>实时监控</em>\
+                    <div class="ssh-item">\
+                        <input class="btswitch btswitch-ios" id="real_qps_monitoring" type="checkbox">\
+                        <label id="real_qps_label" class="btswitch-btn" for="real_qps_monitoring"></label>\
+                    </div>\
+                </div>\
+            </div>\
+            <hr />\
+            <table class="table table-hover" id="net_list">\
+                <thead>\
+                    <th style="width:160px;">时间</th>\
+                    <th style="width:50px;">Select</th>\
+                    <th style="width:50px;">Insert</th>\
+                    <th style="width:50px;">Update</th>\
+                    <th style="width:50px;">Delete</th>\
+                    <th style="width:50px;">Conn</th>\
+                    <th style="width:50px;">Max_conn</th>\
+                    <th style="width:90px;">Recv</th>\
+                    <th style="width:90px;">Send</th>\
+                </thead>\
+                <tbody></tbody>\
+            </table>\
+        </div>',
+        success:function(i,l){
+            renderSQL();
+
+            $('#real_qps_label').click(function(){
+                sql_timer = setInterval(function(){
+                    var t = $('#real_qps_monitoring').is(':checked');
+                    if (t){
+                        renderSQL();
+                    } else{
+                        clearInterval(sql_timer);
+                    }
+                }, 3000);
+            });
+        }
+    });
+}
+
+function mysqlCommonFuncRedundantIndexes(){
+    function renderSQL(){
+        var sid = mysqlGetSid();
+        myPostCBN('get_redundant_indexes',{'sid':sid} ,function(rdata){
+            var data = rdata.data;
+            if (data['status']){
+                var items = data.data;
+                var tbody = '';
+                for (var i = 0; i < items.length; i++) {
+                    var t = '<tr>';
+                    t += '<td>'+items[i]['table_schema']+'</td>';
+                    t += '<td>'+items[i]['table_name']+'</td>';
+                    t += '<td>'+items[i]['redundant_index_name']+'</td>';
+                    t += '<td>'+items[i]['redundant_index_columns']+'</td>';
+                    t += '<td>'+items[i]['sql_drop_index']+'</td>';
+                    t += '<td><a class="exec btlink" index="'+i+'">执行</a></td>';
+                    t += '</tr>';
+                    tbody += t;
+                }
+                $('#redundant_indexes tbody').html(tbody);
+                $('#redundant_indexes tbody .exec').click(function(){
+                    var index = $(this).attr('index');
+                    myPostCB('redundant_indexes_cmd', {'sid':sid, 'index':index}, function(rdata){
+                        var data = rdata.data;
+                        showMsg(data.msg,function(){
+                            if (data.status){
+                                renderSQL();
+                            }
+                        },{icon: data.status ? 1 : 2}, 2000);
+                    });
+                });
+            } else {
+                layer.msg(data.msg,{icon:2});
+            }
+        });
+    }
+
+    layer.open({
+        type: 1,
+        title: "查看重复或冗余的索引",
+        area: ['1100px', '400px'],
+        closeBtn: 1,
+        shadeClose: false,
+        content: '<div class="bt-form pd20 divtable taskdivtable">\
+            <table class="table table-hover" id="redundant_indexes">\
+                <thead>\
+                    <th style="width:100px;">数据库名</th>\
+                    <th style="width:50px;">表名</th>\
+                    <th style="width:50px;">冗余索引名</th>\
+                    <th style="width:50px;">冗余索引列名</th>\
+                    <th style="width:300px;">删除冗余索引SQL</th>\
+                    <th style="width:30px;">操作</th>\
+                </thead>\
+                <tbody></tbody>\
+            </table>\
+        </div>',
+        success:function(i,l){
+            renderSQL();
+        }
+    });
+}
+
+function mysqlCommonFuncTableInfo(){
+    function renderSQL(){
+        var sid = mysqlGetSid();
+        myPostCBN('get_table_info',{'sid':sid} ,function(rdata){
+            var data = rdata.data;
+            if (data['status']){
+                var items = data.data;
+                var tbody = '';
+                for (var i = 0; i < items.length; i++) {
+                    var t = '<tr>';
+                    t += '<td>'+items[i]['TABLE_SCHEMA']+'</td>';
+                    t += '<td>'+items[i]['TABLE_NAME']+'</td>';
+                    t += '<td>'+items[i]['ENGINE']+'</td>';
+                    t += '<td>'+items[i]['DATA_LENGTH']+'</td>';
+                    t += '<td>'+items[i]['INDEX_LENGTH']+'</td>';
+                    t += '<td>'+items[i]['TOTAL_LENGTH']+'</td>';
+                    t += '<td>'+items[i]['COLUMN_NAME']+'</td>';
+                    t += '<td>'+items[i]['COLUMN_TYPE']+'</td>';
+                    t += '<td>'+items[i]['AUTO_INCREMENT']+'</td>';
+                    t += '<td>'+items[i]['RESIDUAL_AUTO_INCREMENT']+'</td>';
+                    t += '</tr>';
+                    tbody += t;
+                }
+                $('#mysql_data_id tbody').html(tbody);
+            } else {
+                layer.msg(data.msg,{icon:2});
+            }
+        });
+    }
+
+    layer.open({
+        type: 1,
+        title: "统计库里每个表的大小",
+        area: ['1200px', '400px'],
+        closeBtn: 1,
+        shadeClose: false,
+        content: '<div class="bt-form pd20 divtable taskdivtable">\
+            <table class="table table-hover" id="mysql_data_id">\
+                <thead>\
+                    <th style="width:100px;">库名</th>\
+                    <th style="width:50px;">表名</th>\
+                    <th style="width:80px;">储存引擎</th>\
+                    <th style="width:150px;">数据大小(GB)</th>\
+                    <th style="width:130px;">索引大小(GB)</th>\
+                    <th style="width:100px;">总计(GB)</th>\
+                    <th style="width:150px;">主键自增字段</th>\
+                    <th style="width:200px;">主键字段属性</th>\
+                    <th style="width:150px;">主键自增当前</th>\
+                    <th style="width:150px;">主键自增剩余</th>\
+                </thead>\
+                <tbody></tbody>\
+            </table>\
+        </div>',
+        success:function(i,l){
+            renderSQL();
+        }
+    });
+}
+
+function mysqlCommonFuncConnCount(){
+    function renderSQL(){
+        var sid = mysqlGetSid();
+        myPostCBN('get_conn_count',{'sid':sid} ,function(rdata){
+            var data = rdata.data;
+            if (data['status']){
+                var items = data.data;
+                var tbody = '';
+                for (var i = 0; i < items.length; i++) {
+                    var t = '<tr>';
+                    t += '<td>'+items[i]['user']+'</td>';
+                    t += '<td>'+items[i]['db']+'</td>';
+                    t += '<td>'+items[i]['Client_IP']+'</td>';
+                    t += '<td>'+items[i]['count']+'</td>';
+                    t += '</tr>';
+                    tbody += t;
+                }
+                $('#app_ip_list tbody').html(tbody);
+            } else {
+                layer.msg(data.msg,{icon:2});
+            }
+        });
+    }
+
+    var sql_timer = null;
+    layer.open({
+        type: 1,
+        title: "查看应用端IP连接数总和",
+        area: ['700px', '420px'],
+        closeBtn: 1,
+        shadeClose: false,
+        content: '<div class="bt-form pd20 divtable taskdivtable">\
+            <div class="mr20 pull-left" style="border-right: 1px solid #ccc; padding-right: 20px;">\
+                <div class="ss-text pull-left">\
+                    <em>实时监控</em>\
+                    <div class="ssh-item">\
+                        <input class="btswitch btswitch-ios" id="app_ip_monitoring" type="checkbox">\
+                        <label id="app_ip_label" class="btswitch-btn" for="app_ip_monitoring"></label>\
+                    </div>\
+                </div>\
+            </div>\
+            <hr />\
+            <table class="table table-hover" id="app_ip_list">\
+                <thead>\
+                    <th style="width:160px;">连接用户</th>\
+                    <th style="width:50px;">数据库名</th>\
+                    <th style="width:50px;">应用端IP</th>\
+                    <th style="width:50px;">数量</th>\
+                </thead>\
+                <tbody></tbody>\
+            </table>\
+        </div>',
+        success:function(i,l){
+            renderSQL();
+
+            $('#app_ip_label').click(function(){
+                sql_timer = setInterval(function(){
+                    var t = $('#app_ip_monitoring').is(':checked');
+                    if (t){
+                        renderSQL();
+                    } else{
+                        clearInterval(sql_timer);
+                    }
+                }, 3000);
+            });
+        }
+    });
+}
+
+function mysqlCommonFuncFpkInfo(){
+    function renderSQL(){
+        var sid = mysqlGetSid();
+        myPostCBN('get_fpk_info',{'sid':sid} ,function(rdata){
+            var data = rdata.data;
+            if (data['status']){
+                var items = data.data;
+                var tbody = '';
+                for (var i = 0; i < items.length; i++) {
+                    var t = '<tr>';
+                    t += '<td>'+items[i]['table_schema']+'</td>';
+                    t += '<td>'+items[i]['table_name']+'</td>';
+                    t += '</tr>';
+                    tbody += t;
+                }
+                $('#mysql_data_id tbody').html(tbody);
+            } else {
+                layer.msg(data.msg,{icon:2});
+            }
+        });
+    }
+
+    layer.open({
+        type: 1,
+        title: "快速找出没有主键的表",
+        area: ['800px', '400px'],
+        closeBtn: 1,
+        shadeClose: false,
+        content: '<div class="bt-form pd20 divtable taskdivtable">\
+            <table class="table table-hover" id="mysql_data_id">\
+                <thead>\
+                    <th style="width:100px;">库名</th>\
+                    <th style="width:50px;">表名</th>\
+                </thead>\
+                <tbody></tbody>\
+            </table>\
+        </div>',
+        success:function(i,l){
+            renderSQL();
+        }
+    });
+}
+
+function mysqlCommonFuncLockSQL(){
+    function renderSQL(){
+        var sid = mysqlGetSid();
+        myPostCBN('get_lock_sql',{'sid':sid} ,function(rdata){
+            var data = rdata.data;
+            if (data['status']){
+                var items = data.data;
+                var tbody = '';
+                for (var i = 0; i < items.length; i++) {
+                    var t = '<tr>';
+                    t += '<td>'+items[i]['trx_id']+'</td>';
+                    t += '<td>'+items[i]['trx_state']+'</td>';
+                    t += '<td>'+items[i]['trx_started']+'</td>';
+                    t += '<td>'+items[i]['processlist_id']+'</td>';
+                    t += '<td>'+items[i]['info']+'</td>';
+                    t += '<td>'+items[i]['user']+'</td>';
+                    t += '<td>'+items[i]['host']+'</td>';
+                    t += '<td>'+items[i]['db']+'</td>';
+                    t += '<td>'+items[i]['command']+'</td>';
+                    t += '<td>'+items[i]['state']+'</td>';
+                    t += '<td>'+items[i]['sql_kill_blocking_query']+'</td>';
+                    t += '<td><a class="exec btlink" index="'+i+'">执行</a></td>';
+                    t += '</tr>';
+                    tbody += t;
+                }
+                $('#mysql_data_id tbody').html(tbody);
+
+                $('#mysql_data_id tbody .exec').click(function(){
+                    var index = $(this).attr('index');
+                    var pid = items[index]['processlist_id'];
+                    myPostCB('kill_lock_pid', {'sid':sid, 'pid':pid}, function(rdata){
+                        var data = rdata.data;
+                        showMsg(data.msg,function(){
+                            if (data.status){
+                                renderSQL();
+                            }
+                        },{icon: data.status ? 1 : 2}, 2000);
+                    });
+                });
+            } else {
+                layer.msg(data.msg,{icon:2});
+            }
+        });
+    }
+
+    layer.open({
+        type: 1,
+        title: "查看当前锁阻塞的SQL",
+        area: ['1000px', '400px'],
+        closeBtn: 1,
+        shadeClose: false,
+        content: '<div class="bt-form pd20 divtable taskdivtable">\
+            <div class="mr20 pull-left" style="border-right: 1px solid #ccc; padding-right: 20px;">\
+                <button id="kill_all" type="button" class="btn btn-default btn-sm">关闭所有阻塞</button>\
+            </div>\
+            <hr />\
+            <table class="table table-hover" id="mysql_data_id">\
+                <thead>\
+                    <th style="width:80px;">事务ID</th>\
+                    <th style="width:80px;">事务状态</th>\
+                    <th style="width:220px;">执行时间</th>\
+                    <th style="width:100px;">线程ID</th>\
+                    <th style="width:50px;">Info</th>\
+                    <th style="width:50px;">user</th>\
+                    <th style="width:50px;">host</th>\
+                    <th style="width:50px;">db</th>\
+                    <th style="width:50px;">command</th>\
+                    <th style="width:50px;">state</th>\
+                    <th style="width:140px;">kill</th>\
+                    <th style="width:50px;">操作</th>\
+                </thead>\
+                <tbody></tbody>\
+            </table>\
+        </div>',
+        success:function(i,l){
+            renderSQL();
+
+            $('#kill_all').unbind('click').click(function(){
+                var sid = mysqlGetSid();
+                myPostCB('kill_all_lock', {'sid':sid}, function(rdata){
+                    var data = rdata.data;
+                    showMsg(data.msg,function(){
+                        if (data.status){
+                            renderSQL();
+                        }
+                    },{icon: data.status ? 1 : 2}, 2000);
+                });
+            });
+        }
+    });
+}
+
+function mysqlCommonFuncDeadlockInfo(){
+
+    function renderSQL(){
+        var sid = mysqlGetSid();
+        myPostCBN('get_deadlock_info',{'sid':sid} ,function(rdata){
+            var data = rdata.data;
+            $('#info_log').html(data.data);
+            var ob = document.getElementById('info_log');
+            ob.scrollTop = ob.scrollHeight; 
+        });
+    }
+
+    layer.open({
+        type: 1,
+        title: "查看死锁信息",
+        area: ['800px', '400px'],
+        closeBtn: 1,
+        shadeClose: false,
+        content: '<div class="bt-form pd15">\
+            <textarea readonly="" style="margin: 0px;height: 330px;width: 100%;background-color: #333;color:#fff; padding:0 5px" id="info_log"></textarea>\
+        </div>',
+        success:function(i,l){
+            renderSQL();
+        }
+    });
+}
+
+function mysqlCommonFuncSlaveStatus(){
+
+    function renderSQL(){
+        var sid = mysqlGetSid();
+        myPostCBN('get_slave_status',{'sid':sid} ,function(rdata){
+            var data = rdata.data;
+            $('#info_log').html(data.data);
+            var ob = document.getElementById('info_log');
+            ob.scrollTop = ob.scrollHeight; 
+        });
+    }
+
+    layer.open({
+        type: 1,
+        title: "查看主从复制信息",
+        area: ['800px', '400px'],
+        closeBtn: 1,
+        shadeClose: false,
+        content: '<div class="bt-form pd15">\
+            <textarea readonly="" style="margin: 0px;height: 330px;width: 100%;background-color: #333;color:#fff; padding:0 5px" id="info_log"></textarea>\
+        </div>',
+        success:function(i,l){
+            renderSQL();
+        }
+    });
+}
+
+function mysqlCommonFunc(){
+    $('#mysql_common').unbind('click').click(function(){
+        layer.open({
+            type: 1,
+            title: "MySQL常用功能",
+            area: ['600px', '200px'],
+            closeBtn: 1,
+            shadeClose: false,
+            content: '<div class="bt-form pd20">\
+                <button style="margin-bottom: 8px;" id="mysql_top_nsql" type="button" class="btn btn-default btn-sm">查询执行次数最频繁的前N条SQL语句</button>\
+                <button style="margin-bottom: 8px;" id="mysql_net_stat" type="button" class="btn btn-default btn-sm">MySQL服务器的QPS/TPS/网络带宽指标</button>\
+                <button style="margin-bottom: 8px;" id="mysql_redundant_indexes" type="button" class="btn btn-default btn-sm">查看重复或冗余的索引</button>\
+                <button style="margin-bottom: 8px;" id="mysql_table_info" type="button" class="btn btn-default btn-sm">统计库里每个表的大小</button>\
+                <button style="margin-bottom: 8px;" id="mysql_conn_count" type="button" class="btn btn-default btn-sm">查看应用端IP连接数总和</button>\
+                <button style="margin-bottom: 8px;" id="mysql_fpk_info" type="button" class="btn btn-default btn-sm">快速找出没有主键的表</button>\
+                <button style="margin-bottom: 8px;" id="mysql_lock_sql" type="button" class="btn btn-default btn-sm">查看当前锁阻塞的SQL</button>\
+                <button style="margin-bottom: 8px;" id="mysql_deadlock_info" type="button" class="btn btn-default btn-sm">查看死锁信息</button>\
+                <button style="margin-bottom: 8px;" id="mysql_slave_status" type="button" class="btn btn-default btn-sm">查看主从复制信息</button>\
+            </div>',
+            success:function(i,l){
+                $('#mysql_top_nsql').click(function(){
+                    mysqlCommonFuncMysqlNSQL();
+                });
+
+                $('#mysql_net_stat').click(function(){
+                    mysqlCommonFuncMysqlNet();
+                });
+
+                $('#mysql_redundant_indexes').click(function(){
+                    mysqlCommonFuncRedundantIndexes();
+                });
+
+                $('#mysql_table_info').click(function(){
+                    mysqlCommonFuncTableInfo();
+                });
+
+                $('#mysql_conn_count').click(function(){
+                    mysqlCommonFuncConnCount();
+                });
+
+                $('#mysql_fpk_info').click(function(){
+                    mysqlCommonFuncFpkInfo();
+                });
+
+                $('#mysql_lock_sql').click(function(){
+                    mysqlCommonFuncLockSQL();
+                });
+
+                $('#mysql_deadlock_info').click(function(){
+                    mysqlCommonFuncDeadlockInfo();
+                });
+
+                $('#mysql_slave_status').click(function(){
+                    mysqlCommonFuncSlaveStatus();
+                });
+            }
+        });
     });
 }
 
@@ -279,7 +885,8 @@ function mysqlRunMysqlTab(name){
 
 // ------------------------- mysql start -------------------------------
 function mysqlGetSid(){
-    return 0;
+    return $('#mysql select[name=sid]').val();
+    // return 0;
 }
 
 function mysqlGetDbName(){
@@ -308,7 +915,7 @@ function mysqlInitField(f, data){
 
     $('select[name="mysql_field_key"]').html(option_html);
 
-    $('#mysql .mysql_find').unbind('click').click(function(){
+    $('#mysql_find').unbind('click').click(function(){
         var val = $('input[name="mysql_field_value"]').val();
         if (val == ''){
             layer.msg('搜索不能为空!',{icon:7});
@@ -319,11 +926,40 @@ function mysqlInitField(f, data){
 }
 
 
+function mysqlGetServerList(call_func){
+    myPostCBN('get_server_list', {}, function(rdata){
+        var rdata = rdata.data;
+        if (rdata.data.length != 0){
+            var items = rdata.data;
+            var content = '';
+            for (var i = 0; i < items.length; i++) {
+                var t = items[i];
+                if (i == 0){
+                    content += '<option value="'+t['val']+'" selected>'+t['name']+'</option>';
+                } else {
+                    content += '<option value="'+t['val']+'">'+t['name']+'</option>';
+                }
+            }
+
+
+            $('#mysql select[name=sid]').html(content);
+            $('#mysql select[name=sid]').change(function(){
+                mysqlGetDbList();
+            });
+            if (typeof(call_func) == 'function'){
+                call_func();
+            }
+            closeInstallLayer();
+        } else {
+            showInstallLayer();
+        }
+    });
+}
+
 function mysqlGetDbList(){
     var sid = mysqlGetSid();
-    myPostCB('get_db_list',{'sid':sid} ,function(rdata){
+    myPostCBN('get_db_list',{'sid':sid} ,function(rdata){
         if (rdata.data.status){
-
             var items = rdata.data.data['list'];
             var content = '';
             for (var i = 0; i < items.length; i++) {
@@ -341,10 +977,6 @@ function mysqlGetDbList(){
             });
 
             mysqlGetTableList(1);
-
-            closeInstallLayer();
-        } else {
-            showInstallLayer();
         }
     });
 }
@@ -353,7 +985,12 @@ function mysqlGetTableList(p){
     // console.log('mysqlGetTableList',p);
     var sid = mysqlGetSid();
     var db = mysqlGetDbName();
-    myPostCB('get_table_list',{'sid':sid,'db':db} ,function(rdata){
+
+    if (!db){
+        return;
+    }
+
+    myPostCBN('get_table_list',{'sid':sid,'db':db} ,function(rdata){
         if (rdata.data.status){
 
             var items = rdata.data.data['list'];

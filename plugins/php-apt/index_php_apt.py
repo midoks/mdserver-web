@@ -8,11 +8,12 @@ import re
 import json
 import shutil
 
-# reload(sys)
-# sys.setdefaultencoding('utf8')
+web_dir = os.getcwd() + "/web"
+if os.path.exists(web_dir):
+    sys.path.append(web_dir)
+    os.chdir(web_dir)
 
-sys.path.append(os.getcwd() + "/class/core")
-import mw
+import core.mw as mw
 
 if mw.isAppleSystem():
     cmd = 'ls /usr/local/lib/ | grep python  | cut -d \\  -f 1 | awk \'END {print}\''
@@ -117,7 +118,7 @@ def getPhpinfo(version):
 
     sock_file = getFpmAddress(version)
     # print(sock_file)
-    root_dir = mw.getRootDir() + '/phpinfo'
+    root_dir = mw.getFatherDir() + '/phpinfo'
 
     mw.execShell("rm -rf " + root_dir)
     mw.execShell("mkdir -p " + root_dir)

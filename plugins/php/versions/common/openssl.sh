@@ -46,11 +46,15 @@ Install_lib()
 		cd ${rootPath}/plugins/php/lib && /bin/bash openssl_10.sh
 	fi
 
+	if [ "$version" -gt "82" ];then
+		cd ${rootPath}/plugins/php/lib && /bin/bash openssl.sh
+	fi
+
 	if [ "$sysName" == "Darwin" ] ;then 
 		BREW_DIR=`which brew`
 		BREW_DIR=${BREW_DIR/\/bin\/brew/}
 
-		LIB_DEPEND_DIR=`brew info openssl@1.1 | grep ${BREW_DIR}/Cellar/openssl | cut -d \  -f 1 | awk 'END {print}'`
+		LIB_DEPEND_DIR=`brew info openssl@1.0 | grep ${BREW_DIR}/Cellar/openssl | cut -d \  -f 1 | awk 'END {print}'`
 		export PKG_CONFIG_PATH=$LIB_DEPEND_DIR/lib/pkgconfig
 	fi
 
@@ -66,21 +70,54 @@ Install_lib()
 			mv config0.m4 config.m4
 		fi
 		
-		# openssl_version=`pkg-config openssl --modversion`
-		# export PKG_CONFIG_PATH=$serverPath/lib/openssl10/lib/pkgconfig
-		if [ "$version" -lt "81" ] && [ "$sysName" != "Darwin" ];then
-			export PKG_CONFIG_PATH=$serverPath/lib/openssl10/lib/pkgconfig
-		fi
-
 		OPTIONS=""
 		if [ "${SYS_ARCH}" == "aarch64" ] && [ "$version" -lt "56" ];then
 			OPTIONS="$OPTIONS --build=aarch64-unknown-linux-gnu --host=aarch64-unknown-linux-gnu"
 		fi
 
+		# openssl_version=`pkg-config openssl --modversion`
+		# export PKG_CONFIG_PATH=$serverPath/lib/openssl10/lib/pkgconfig
+		if [ "$version" -lt "81" ] && [ "$sysName" != "Darwin" ];then
+			export PKG_CONFIG_PATH=$PKG_CONFIG_PATH:$serverPath/lib/openssl10/lib/pkgconfig
+		fi
+
+		# Darwin
+		# otool -L /Users/midoks/Desktop/mwdev/server/php/83/bin/php
+		# lldb /Users/midoks/Desktop/mwdev/server/php/83/bin/php -r 'phpinfo()'
+		# otool -L /Users/midoks/Desktop/mwdev/server/php/83/lib/php/extensions/no-debug-non-zts-20230831/openssl.so 
+		# ldd /www/server/php/83/bin/php
+
+		if [ "$version" -lt "84" ] && [ "$sysName" == "Darwin" ];then
+			BREW_DIR=`which brew`
+			BREW_DIR=${BREW_DIR/\/bin\/brew/}
+			LIB_DEPEND_DIR=`brew info openssl@1.0 | grep ${BREW_DIR}/Cellar/openssl@1.0 | cut -d \  -f 1 | awk 'END {print}'`
+			OPTIONS="$OPTIONS --with-openssl=$(brew --prefix openssl@1.0)"
+			export PKG_CONFIG_PATH=$LIB_DEPEND_DIR/lib/pkgconfig
+			export OPENSSL_CFLAGS="-I${LIB_DEPEND_DIR}/include"
+			export OPENSSL_LIBS="-L/${LIB_DEPEND_DIR}/lib -lssl -lcrypto -lz"
+
+			echo "$LIB_DEPEND_DIR/lib/pkgconfig"
+		fi
+
+		if [ "$version" -ge "84" ] &&  [ "$sysName" == "Darwin" ];then
+			BREW_DIR=`which brew`
+			BREW_DIR=${BREW_DIR/\/bin\/brew/}
+			LIB_DEPEND_DIR=`brew info openssl | grep ${BREW_DIR}/Cellar/openssl | cut -d \  -f 1 | awk 'END {print}'`
+			OPTIONS="$OPTIONS --with-openssl=$(brew --prefix openssl)"
+			export PKG_CONFIG_PATH=$LIB_DEPEND_DIR/lib/pkgconfig
+			export OPENSSL_CFLAGS="-I${LIB_DEPEND_DIR}/include"
+			export OPENSSL_LIBS="-L/${LIB_DEPEND_DIR}/lib -lssl -lcrypto -lz"
+		fi
+
+		# if [ "$version" -gt "82" ] && [ "$sysName" == "Darwin" ];then
+		# 	export PKG_CONFIG_PATH=$serverPath/lib/openssl/lib/pkgconfig
+		# fi
+
+		
 		$serverPath/php/$version/bin/phpize
-		./configure --with-php-config=$serverPath/php/$version/bin/php-config \
-		$OPTIONS \
-		--with-openssl
+		# --with-openssl
+		echo "./configure --with-php-config=$serverPath/php/$version/bin/php-config $OPTIONS"
+		./configure --with-php-config=$serverPath/php/$version/bin/php-config $OPTIONS
 		make clean && make && make install && make clean
 
 		if [ -d $sourcePath/php${version} ];then

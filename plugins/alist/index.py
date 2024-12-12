@@ -5,9 +5,14 @@ import io
 import os
 import time
 import re
+import json
 
-sys.path.append(os.getcwd() + "/class/core")
-import mw
+web_dir = os.getcwd() + "/web"
+if os.path.exists(web_dir):
+    sys.path.append(web_dir)
+    os.chdir(web_dir)
+
+import core.mw as mw
 
 app_debug = False
 if mw.isAppleSystem():
@@ -92,18 +97,40 @@ def readConfigTpl():
     content = contentReplace(content)
     return mw.returnJson(True, 'ok', content)
 
+def __release_port(port, ps = '开启端口'):
+    try:
+        from utils.firewall import Firewall as MwFirewall
+        MwFirewall.instance().addAcceptPort(port, ps, 'port')
+        return port
+    except Exception as e:
+        return "Release failed {}".format(e)
+
+def __delete_port(port):
+    try:
+        from utils.firewall import Firewall as MwFirewall
+        MwFirewall.instance().delAcceptPortCmd(port, 'tcp')
+        return port
+    except Exception as e:
+        return "Delete failed {}".format(e)
+
+
+def openPort():
+    content = mw.readFile(getConf())
+    data = json.loads(content)
+    http_port = data['scheme']['http_port']
+    __release_port(http_port, 'alist')
+    return True
 
 def status():
-    data = mw.execShell(
-        "ps aux|grep alist |grep -v grep | grep -v python | grep -v mdserver-web | awk '{print $2}'")
-
+    cmd = "ps aux|grep alist |grep -v grep | grep -v python | grep -v mdserver-web | awk '{print $2}'"
+    data = mw.execShell(cmd)
     if data[0] == '':
         return 'stop'
     return 'start'
 
 def contentReplace(content):
     service_path = mw.getServerDir()
-    content = content.replace('{$ROOT_PATH}', mw.getRootDir())
+    content = content.replace('{$ROOT_PATH}', mw.getFatherDir())
     content = content.replace('{$SERVER_PATH}', service_path)
     content = content.replace('{$SERVER_APP}', service_path + '/'+getPluginName())
     return content
@@ -111,7 +138,7 @@ def contentReplace(content):
 def initDreplace():
 
     file_tpl = getInitDTpl()
-    service_path = os.path.dirname(os.getcwd())
+    service_path = mw.getServerDir()
 
     initD_path = getServerDir() + '/init.d'
     if not os.path.exists(initD_path):
@@ -124,6 +151,7 @@ def initDreplace():
         content = content.replace('{$SERVER_PATH}', service_path)
         mw.writeFile(file_bin, content)
         mw.execShell('chmod +x ' + file_bin)
+        
 
     # systemd
     systemDir = mw.systemdCfgDir()
@@ -135,7 +163,7 @@ def initDreplace():
         se_content = se_content.replace('{$SERVER_PATH}', service_path)
         mw.writeFile(systemService, se_content)
         mw.execShell('systemctl daemon-reload')
-
+        time.sleep(1)
     return file_bin
 
 
@@ -247,7 +275,6 @@ def clearCopyTask():
     return mw.returnJson(True, '清空成功并重启服务!')
 
 def homePage():
-    import json
     content = mw.readFile(getConf())
     data = json.loads(content)
     http_port = data['scheme']['http_port']

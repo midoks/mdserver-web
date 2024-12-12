@@ -8,8 +8,12 @@ import re
 import string
 import subprocess
 
-sys.path.append(os.getcwd() + "/class/core")
-import mw
+web_dir = os.getcwd() + "/web"
+if os.path.exists(web_dir):
+    sys.path.append(web_dir)
+    os.chdir(web_dir)
+
+import core.mw as mw
 
 app_debug = False
 if mw.isAppleSystem():
@@ -94,7 +98,7 @@ def readConfigTpl():
 
 def contentReplace(content):
     service_path = mw.getServerDir()
-    content = content.replace('{$ROOT_PATH}', mw.getRootDir())
+    content = content.replace('{$ROOT_PATH}', mw.getFatherDir())
     content = content.replace('{$SERVER_PATH}', service_path)
     content = content.replace('{$SERVER_APP}', service_path + '/sphinx')
     return content
@@ -125,7 +129,7 @@ def mkdirAll():
 def initDreplace():
 
     file_tpl = getInitDTpl()
-    service_path = os.path.dirname(os.getcwd())
+    service_path = mw.getServerDir()
 
     initD_path = getServerDir() + '/init.d'
     if not os.path.exists(initD_path):
@@ -151,7 +155,6 @@ def initDreplace():
     systemService = systemDir + '/sphinx.service'
     systemServiceTpl = getPluginDir() + '/init.d/sphinx.service.tpl'
     if os.path.exists(systemDir) and not os.path.exists(systemService):
-        service_path = mw.getServerDir()
         se_content = mw.readFile(systemServiceTpl)
         se_content = se_content.replace('{$SERVER_PATH}', service_path)
         mw.writeFile(systemService, se_content)

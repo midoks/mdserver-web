@@ -7,7 +7,6 @@ rootPath=$(dirname "$curPath")
 rootPath=$(dirname "$rootPath")
 serverPath=$(dirname "$rootPath")
 
-install_tmp=${rootPath}/tmp/mw_install.pl
 VERSION=$2
 
 # /www/server/mdserver-web/bin/supervisorctl  -c /www/server/supervisor/supervisor.conf
@@ -42,8 +41,8 @@ Install_app()
 
 	echo "${VERSION}" > $serverPath/supervisor/version.pl
 
-	cd ${rootPath} && python3 ${rootPath}/plugins/supervisor/index.py start
-	cd ${rootPath} && python3 ${rootPath}/plugins/supervisor/index.py initd_install
+	cd ${rootPath} && python3 plugins/supervisor/index.py start
+	cd ${rootPath} && python3 plugins/supervisor/index.py initd_install
 	
 	echo '安装完成[supervisor]'
 }

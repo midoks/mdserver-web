@@ -9,8 +9,8 @@ rootPath=$(dirname "$rootPath")
 serverPath=$(dirname "$rootPath")
 sourcePath=${serverPath}/source
 sysName=`uname`
-install_tmp=${rootPath}/tmp/mw_install.pl
 SYS_ARCH=`arch`
+
 SYS_VERSION_ID=`cat /etc/*-release | grep VERSION_ID | awk -F = '{print $2}' | awk -F "\"" '{print $2}'`
 
 ubuntu_suffix=

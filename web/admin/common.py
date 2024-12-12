@@ -10,13 +10,13 @@
 
 import time
 
-from admin import model
 from admin import session
+import thisdb
 
 def isLogined():
     if 'login' in session  and session['login'] == True and 'username' in session:
         username = session['username']
-        info = model.getUserByName(username)
+        info = thisdb.getUserByName(username)
         if info is None:
             return False
 

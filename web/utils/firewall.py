@@ -11,8 +11,12 @@
 import os
 import re
 import threading
+import re
+import time
+
 
 import core.mw as mw
+import thisdb
 
 class Firewall(object):
 
@@ -43,6 +47,91 @@ class Firewall(object):
         elif mw.isAppleSystem():
             self.__isMac = True
 
+    # 自动识别防火墙配置 | Automatically identify firewall
+    def aIF(self):
+        if self.__isFirewalld:
+            self.AIF_Firewalld()
+        if self.__isUfw:
+            self.aIF_Ufw()
+
+
+    def aIF_Ufw(self):
+        t = mw.execShell("ufw status|awk '{print $1}' | grep -v 'Status'|grep -v 'To'|grep -v '-'")
+        if t[1] != '':
+            return True
+
+        all_port = t[0].strip()
+        ports_list = all_port.split('\n')
+
+        ports_all = []
+        for pinfo in ports_list:
+            info = pinfo.split('/')
+
+            is_same = False
+            for i in range(len(ports_all)):
+                if ports_all[i]['port'] == info[0] and ports_all[i]['protocol'] != info[1]:
+                    ports_all[i]['protocol'] = ports_all[i]['protocol']+'/'+info[1]
+                    is_same = True
+
+            if not is_same:
+                t = {}
+                t['port'] = info[0].replace('-',':')
+                t['protocol'] = info[1]
+                ports_all.append(t)
+        for add_info in ports_all:
+            if thisdb.getFirewallCountByPort(add_info['port']) == 0:
+                thisdb.addFirewall(add_info['port'], ps='自动识别',protocol=add_info['protocol'])
+
+    def AIF_Firewalld(self):
+        t = mw.execShell("firewall-cmd --list-all | grep '  ports'")
+        if t[1] != '':
+            return True
+
+        all_port = t[0].strip()
+        data = all_port.split(":")
+        ports_str = data[1]
+        ports_list = ports_str.strip().split(' ')
+
+        ports_all = []
+        for pinfo in ports_list:
+            info = pinfo.split('/')
+
+            is_same = False
+            for i in range(len(ports_all)):
+                if ports_all[i]['port'] == info[0] and ports_all[i]['protocol'] != info[1]:
+                    ports_all[i]['protocol'] = ports_all[i]['protocol']+'/'+info[1]
+                    is_same = True
+
+            if not is_same:
+                t = {}
+                t['port'] = info[0].replace('-',':')
+                t['protocol'] = info[1]
+                ports_all.append(t)
+
+        for add_info in ports_all:
+            if thisdb.getFirewallCountByPort(add_info['port']) == 0:
+                thisdb.addFirewall(add_info['port'], ps='自动识别',protocol=add_info['protocol'])
+
+    def getList(self, page=1,size=10):
+        info = thisdb.getFirewallList(page=page, size=size)
+
+        rdata = {}
+        rdata['data'] = info['list']
+        rdata['page'] = mw.getPage({'count':info['count'],'tojs':'showAccept','p':page,'row':size})
+        return rdata
+
+    def reload(self):
+        if self.__isUfw:
+            mw.execShell('/usr/sbin/ufw reload')
+            return
+        elif self.__isIptables:
+            mw.execShell('service iptables save')
+            mw.execShell('service iptables restart')
+        elif self.__isFirewalld:
+            mw.execShell('firewall-cmd --reload')
+        else:
+            pass
+
     def getFwStatus(self):
         if self.__isUfw:
             cmd = "/usr/sbin/ufw status| grep Status | awk -F ':' '{print $2}'"
@@ -68,11 +157,6 @@ class Firewall(object):
 
     def getSshInfo(self):
         data = {}
-
-        file = '/etc/ssh/sshd_config'
-        conf = mw.readFile(file)
-        rep = r"#*Port\s+([0-9]+)\s*\n"
-        port = re.search(rep, conf).groups(0)[0]
 
         isPing = True
         try:
@@ -100,15 +184,32 @@ class Firewall(object):
         if ssh_status[0] != '':
             status = False
 
+        data['pubkey_prohibit_status'] = False
         data['pass_prohibit_status'] = False
-        # 密码登陆配置检查
-        pass_rep = r"PasswordAuthentication\s+(\w*)\s*\n"
-        pass_status = re.search(pass_rep, conf)
-        if pass_status:
-            if pass_status and pass_status.groups(0)[0].strip() == 'no':
+        port = '22'
+        sshd_file = '/etc/ssh/sshd_config'
+        if  os.path.exists(sshd_file):
+            conf = mw.readFile(sshd_file)
+            rep = r"#*Port\s+([0-9]+)\s*\n"
+            port = re.search(rep, conf).groups(0)[0]
+
+            # 密码登陆配置检查
+            pass_rep = r"PasswordAuthentication\s+(\w*)\s*\n"
+            pass_status = re.search(pass_rep, conf)
+            if pass_status:
+                if pass_status and pass_status.groups(0)[0].strip() == 'no':
+                    data['pass_prohibit_status'] = True
+            else:
                 data['pass_prohibit_status'] = True
-        else:
-            data['pass_prohibit_status'] = True
+
+            # 密钥登陆配置检查
+            pass_rep = r"PubkeyAuthentication\s+(\w*)\s*\n"
+            pass_status = re.search(pass_rep, conf)
+            if pass_status:
+                if pass_status and pass_status.groups(0)[0].strip() == 'no':
+                    data['pubkey_prohibit_status'] = True
+            else:
+                data['pubkey_prohibit_status'] = True
 
         data['port'] = port
         data['status'] = status
@@ -117,13 +218,12 @@ class Firewall(object):
             data['firewall_status'] = False
         else:
             data['firewall_status'] = self.getFwStatus()
-        return mw.getJson(data)
+        return data
 
-    def setPing(self):
+    def setPing(self, status):
         if mw.isAppleSystem():
             return mw.returnData(True, '开发机不能操作!')
 
-        status = request.form.get('status')
         filename = '/etc/sysctl.conf'
         conf = mw.readFile(filename)
         if conf.find('net.ipv4.icmp_echo') != -1:
@@ -135,3 +235,246 @@ class Firewall(object):
         mw.writeFile(filename, conf)
         mw.execShell('sysctl -p')
         return mw.returnData(True, '设置成功!')
+
+    def setSshPort(self, port):
+        if int(port) < 22 or int(port) > 65535:
+            return mw.returnData(False, '端口范围必需在22-65535之间!')
+
+        ports = ['21', '25', '80', '443', '888']
+        if port in ports:
+            return mw.returnData(False, '(' + port + ')' + '特殊端口不可设置!')
+
+        file = '/etc/ssh/sshd_config'
+        conf = mw.readFile(file)
+
+        rep = r"#*Port\s+([0-9]+)\s*\n"
+        conf = re.sub(rep, "Port " + port + "\n", conf)
+        mw.writeFile(file, conf)
+
+        self.addAcceptPort(port, 'SSH端口修改', 'port')
+        self.reload()
+        return mw.returnData(True, '修改成功!')
+
+    def setFw(self, status):
+        if self.__isIptables:
+            self.setFwIptables(status)
+            return mw.returnData(True, '设置成功!')
+
+        if status == '1':
+            if self.__isUfw:
+                mw.execShell('/usr/sbin/ufw disable')
+            elif self.__isFirewalld:
+                mw.execShell('systemctl stop firewalld.service')
+                mw.execShell('systemctl disable firewalld.service')
+            else:
+                pass
+        else:
+            if self.__isUfw:
+                mw.execShell("echo 'y'| ufw enable")
+            elif self.__isFirewalld:
+                mw.execShell('systemctl start firewalld.service')
+                mw.execShell('systemctl enable firewalld.service')
+            else:
+                pass
+        return mw.returnData(True, '设置成功!')
+
+    def addAcceptPortCmd(self, port, protocol ='tcp'):
+        if self.__isUfw:
+            if protocol == 'tcp':
+                mw.execShell('ufw allow ' + port + '/tcp')
+            if protocol == 'udp':
+                mw.execShell('ufw allow ' + port + '/udp')
+            if protocol == 'tcp/udp':
+                mw.execShell('ufw allow ' + port + '/tcp')
+                mw.execShell('ufw allow ' + port + '/udp')
+        elif self.__isFirewalld:
+            port = port.replace(':', '-')
+            if protocol == 'tcp':
+                cmd = 'firewall-cmd --permanent --zone=public --add-port=' + port + '/tcp'
+                mw.execShell(cmd)
+            if protocol == 'udp':
+                cmd = 'firewall-cmd --permanent --zone=public --add-port=' + port + '/udp'
+                mw.execShell(cmd)
+            if protocol == 'tcp/udp':
+                cmd = 'firewall-cmd --permanent --zone=public --add-port=' + port + '/tcp'
+                mw.execShell(cmd)
+                cmd = 'firewall-cmd --permanent --zone=public --add-port=' + port + '/udp'
+                mw.execShell(cmd)
+        elif self.__isIptables:
+            if protocol == 'tcp':
+                cmd = 'iptables -I INPUT -p tcp -m state --state NEW -m tcp --dport ' + port + ' -j ACCEPT'
+                mw.execShell(cmd)
+            if protocol == 'udp':
+                cmd = 'iptables -I INPUT -p udp -m state --state NEW -m udp --dport ' + port + ' -j ACCEPT'
+                mw.execShell(cmd)
+            if protocol == 'tcp/udp':
+                cmd = 'iptables -I INPUT -p tcp -m state --state NEW -m tcp --dport ' + port + ' -j ACCEPT'
+                mw.execShell(cmd)
+                cmd = 'iptables -I INPUT -p udp -m state --state NEW -m udp --dport ' + port + ' -j ACCEPT'
+                mw.execShell(cmd)
+        else:
+            pass
+        return True
+
+    # 添加放行端口
+    def addAcceptPort(self, port, ps, stype,
+        protocol='tcp'
+    ):
+        if not self.getFwStatus():
+            self.setFw(0)
+            return mw.returnData(False, '防火墙启动时,才能添加规则!')
+
+        rep = r"^\d{1,5}(:\d{1,5})?$"
+        if not re.search(rep, port):
+            return mw.returnData(False, '端口范围不正确!')
+
+        if thisdb.getFirewallCountByPort(port) > 0:
+            return mw.returnData(False, '您要放行的端口已存在，无需重复放行!')
+
+        thisdb.addFirewall(port, ps=ps,protocol=protocol)
+        self.addAcceptPortCmd(port, protocol=protocol)
+        self.reload()
+        
+        msg = mw.getInfo('放行端口[{1}][{2}]成功', (port, protocol,))
+        mw.writeLog("防火墙管理", msg)
+        return mw.returnData(True, msg)
+
+    def addPanelPort(self, port):
+        self.setFw(0)
+
+        protocol = 'tcp'
+        ps = 'PANEL端口'
+
+        if thisdb.getFirewallCountByPort(port) > 0:
+            return mw.returnData(False, '您要放行的端口已存在，无需重复放行!')
+
+        thisdb.addFirewall(port, ps=ps,protocol=protocol)
+        self.addAcceptPortCmd(port, protocol=protocol)
+        self.reload()
+
+        msg = mw.getInfo('放行端口[{1}][{2}]成功', (port, protocol,))
+        mw.writeLog("防火墙管理", msg)
+        return mw.returnData(True, msg)
+
+    def delAcceptPort(self, firewall_id, port,
+        protocol='tcp'
+    ):
+        panel_port = mw.getPanelPort()
+
+        if port.find(':') > 0:
+            pass
+        elif port.find('-') > 0:
+            pass
+        else:
+            if(int(port) == int(panel_port)):
+                return mw.returnData(False, '失败，不能删除当前面板端口!')
+        try:
+            self.delAcceptPortCmd(port, protocol)
+            mw.M('firewall').where("id=?", (firewall_id,)).delete()
+            return mw.returnData(True, '删除成功!')
+        except Exception as e:
+            return mw.returnData(False, '删除失败!:' + str(e))
+
+    def delAcceptPortCmd(self, port,
+        protocol ='tcp'
+    ):
+        if self.__isUfw:
+            if protocol == 'tcp':
+                mw.execShell('ufw delete allow ' + port + '/tcp')
+            if protocol == 'udp':
+                mw.execShell('ufw delete allow ' + port + '/udp')
+            if protocol == 'tcp/udp':
+                mw.execShell('ufw delete allow ' + port + '/tcp')
+                mw.execShell('ufw delete allow ' + port + '/udp')
+        elif self.__isFirewalld:
+            port = port.replace(':', '-')
+            if protocol == 'tcp':
+                mw.execShell(
+                    'firewall-cmd --permanent --zone=public --remove-port=' + port + '/tcp')
+            if protocol == 'udp':
+                mw.execShell(
+                    'firewall-cmd --permanent --zone=public --remove-port=' + port + '/udp')
+            if protocol == 'tcp/udp':
+                mw.execShell(
+                    'firewall-cmd --permanent --zone=public --remove-port=' + port + '/tcp')
+                mw.execShell(
+                    'firewall-cmd --permanent --zone=public --remove-port=' + port + '/udp')
+        elif self.__isIptables:
+            if protocol == 'tcp':
+                mw.execShell(
+                    'iptables -D INPUT -p tcp -m state --state NEW -m tcp --dport ' + port + ' -j ACCEPT')
+            if protocol == 'udp':
+                mw.execShell(
+                    'iptables -D INPUT -p udp -m state --state NEW -m udp --dport ' + port + ' -j ACCEPT')
+            if protocol == 'tcp/udp':
+                mw.execShell(
+                    'iptables -D INPUT -p tcp -m state --state NEW -m tcp --dport ' + port + ' -j ACCEPT')
+                mw.execShell(
+                    'iptables -D INPUT -p udp -m state --state NEW -m udp --dport ' + port + ' -j ACCEPT')
+        else:
+            pass
+
+        mw.M('firewall').where("port=?", (port,)).delete()
+        msg = mw.getInfo('删除防火墙放行端口[{1}][{2}]成功!', (port, protocol,))
+        mw.writeLog("防火墙管理", msg)
+        self.reload()
+        return True
+
+    def setSshPassStatus(self, status):
+        msg = '禁止密码登陆成功'
+        if status == "1":
+            msg = '开启密码登陆成功'
+
+        file = '/etc/ssh/sshd_config'
+        if not os.path.exists(file):
+            return mw.returnJson(False, '无法设置!')
+
+        conf = mw.readFile(file)
+
+        pass_rep = r"PasswordAuthentication\s+(\w*)\s*\n"
+        pass_status = re.search(pass_rep, conf)
+        if not pass_status:
+            rep = r"(#)?PasswordAuthentication\s+(\w*)\s*\n"
+            conf = re.sub(rep, "PasswordAuthentication yes\n", conf)
+
+        if status == '1':
+            rep = r"PasswordAuthentication\s+(\w*)\s*\n"
+            conf = re.sub(rep, "PasswordAuthentication yes\n", conf)
+        else:
+            rep = r"PasswordAuthentication\s+(\w*)\s*\n"
+            conf = re.sub(rep, "PasswordAuthentication no\n", conf)
+        mw.writeFile(file, conf)
+        mw.execShell("systemctl restart sshd.service")
+        mw.writeLog("SSH管理", msg)
+        return mw.returnData(True, msg)
+
+    def setSshPubkeyStatus(self, status):
+        msg = '禁止密钥登陆成功'
+        if status == "1":
+            msg = '开启密钥登陆成功'
+
+        file = '/etc/ssh/sshd_config'
+        if not os.path.exists(file):
+            return mw.returnJson(False, '无法设置!')
+
+        content = mw.readFile(file)
+
+        pubkey_rep = r"PubkeyAuthentication\s+(\w*)\s*\n"
+        pubkey_status = re.search(pubkey_rep, content)
+        if not pubkey_status:
+            rep = r"(#)?PubkeyAuthentication\s+(\w*)\s*\n"
+            content = re.sub(rep, "PubkeyAuthentication yes\n", content)
+
+        if status == '1':
+            rep = r"PubkeyAuthentication\s+(\w*)\s*\n"
+            content = re.sub(rep, "PubkeyAuthentication yes\n", content)
+        else:
+            rep = r"PubkeyAuthentication\s+(\w*)\s*\n"
+            content = re.sub(rep, "PubkeyAuthentication no\n", content)
+        mw.writeFile(file, content)
+        mw.execShell("systemctl restart sshd.service")
+        mw.writeLog("SSH管理", msg)
+        return mw.returnData(True, msg)
+
+
+

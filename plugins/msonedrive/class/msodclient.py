@@ -8,13 +8,18 @@ import re
 import json
 import io
 
-sys.path.append(os.getcwd() + "/class/core")
-import mw
-
 import oauthlib
 import requests
 import datetime
 from requests_oauthlib import OAuth2Session
+
+web_dir = os.getcwd() + "/web"
+if os.path.exists(web_dir):
+    sys.path.append(web_dir)
+    os.chdir(web_dir)
+
+import core.mw as mw
+
 
 DEBUG = False
 

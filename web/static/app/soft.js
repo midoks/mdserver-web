@@ -337,6 +337,7 @@ function indexListHtml(callback){
 
     // var loadT = layer.msg('正在获取列表...', { icon: 16, time: 0, shade: [0.3, '#000'] });
     $.get('/plugins/index_list', function(rdata) {
+        var rdata = rdata.data;
         // layer.close(loadT);
         $("#indexsoft").html('');
         var con = '';

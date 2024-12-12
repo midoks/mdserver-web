@@ -32,7 +32,7 @@ fi
 echo "OpenResty -- END"
 
 
-PHP_VER_LIST=(53 54 55 56 70 71 72 73 74 80 81)
+PHP_VER_LIST=(53 54 55 56 70 71 72 73 74 80 81 82 83 84)
 for PHP_VER in ${PHP_VER_LIST[@]}; do
 echo "PHP${PHP_VER} -- START"
 if [ -f /usr/lib/systemd/system/php${PHP_VER}.service ];then

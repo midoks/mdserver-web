@@ -51,9 +51,11 @@
                                 <input name="mysql_field_value" type="text" class="bt-input-text" placeholder="请输入查找内容">
                             </div>
 
-                            <button type="button" class="mysql_find btn btn-success btn-sm mr5 ml5" style="float:right;">
-                                <span>查找</span>
-                            </button>
+
+                            <div style="float:left;">
+                                <button id="mysql_find" type="button" class="btn btn-success btn-sm mr5 ml5" >查找</button>
+                                <button id="mysql_common" type="button" class="btn btn-success btn-sm mr5 ml5">常用功能</button>
+                            </div>
                         </div>
 
                     </div>
@@ -78,6 +80,8 @@
                     </div>
                 </div>
 
+                <hr style="border:none;" />
+                
                 <div class="col-md-12" style="padding-left: 3px;">
                     <div id="mysql_list_tab" style="padding-top:0px;">
                         <div class="tab-nav">

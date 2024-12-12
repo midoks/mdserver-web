@@ -8,9 +8,6 @@ rootPath=$(dirname "$rootPath")
 serverPath=$(dirname "$rootPath")
 sysName=`uname`
 
-install_tmp=${rootPath}/tmp/mw_install.pl
-
-
 bash ${rootPath}/scripts/getos.sh
 OSNAME=`cat ${rootPath}/data/osname.pl`
 OSNAME_ID=`cat /etc/*-release | grep VERSION_ID | awk -F = '{print $2}' | awk -F "\"" '{print $2}'`
@@ -63,7 +60,7 @@ Install_App()
 	fi
 
 	echo $MIN_VERSION > $serverPath/haproxy/version.pl
-	echo '安装Haproxy成功' > $install_tmp
+	echo '安装Haproxy成功'
 
 	#Haproxy日志配置
 	if [ -f /etc/rsyslog.conf ];then

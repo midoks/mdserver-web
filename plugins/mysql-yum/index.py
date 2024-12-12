@@ -9,18 +9,18 @@ import re
 import json
 
 
-# reload(sys)
-# sys.setdefaultencoding('utf-8')
+web_dir = os.getcwd() + "/web"
+if os.path.exists(web_dir):
+    sys.path.append(web_dir)
+    os.chdir(web_dir)
 
-sys.path.append(os.getcwd() + "/class/core")
-import mw
+import core.mw as mw
 
-
-if mw.isAppleSystem():
-    cmd = 'ls /usr/local/lib/ | grep python  | cut -d \\  -f 1 | awk \'END {print}\''
-    info = mw.execShell(cmd)
-    p = "/usr/local/lib/" + info[0].strip() + "/site-packages"
-    sys.path.append(p)
+# if mw.isAppleSystem():
+#     cmd = 'ls /usr/local/lib/ | grep python  | cut -d \\  -f 1 | awk \'END {print}\''
+#     info = mw.execShell(cmd)
+#     p = "/usr/local/lib/" + info[0].strip() + "/site-packages"
+#     sys.path.append(p)
 
 
 app_debug = False
@@ -85,21 +85,21 @@ def getConf():
 def getDataDir():
     file = getConf()
     content = mw.readFile(file)
-    rep = 'datadir\s*=\s*(.*)'
+    rep = r'datadir\s*=\s*(.*)'
     tmp = re.search(rep, content)
     return tmp.groups()[0].strip()
 
 def getLogBinName():
     file = getConf()
     content = mw.readFile(file)
-    rep = 'log-bin\s*=\s*(.*)'
+    rep = r'log-bin\s*=\s*(.*)'
     tmp = re.search(rep, content)
     return tmp.groups()[0].strip()
 
 def getPidFile():
     file = getConf()
     content = mw.readFile(file)
-    rep = 'pid-file\s*=\s*(.*)'
+    rep = r'pid-file\s*=\s*(.*)'
     tmp = re.search(rep, content)
     return tmp.groups()[0].strip()
 
@@ -107,7 +107,7 @@ def getPidFile():
 def getDbPort():
     file = getConf()
     content = mw.readFile(file)
-    rep = 'port\s*=\s*(.*)'
+    rep = r'port\s*=\s*(.*)'
     tmp = re.search(rep, content)
     return tmp.groups()[0].strip()
 
@@ -115,7 +115,7 @@ def getDbPort():
 def getDbServerId():
     file = getConf()
     content = mw.readFile(file)
-    rep = 'server-id\s*=\s*(.*)'
+    rep = r'server-id\s*=\s*(.*)'
     tmp = re.search(rep, content)
     return tmp.groups()[0].strip()
 
@@ -123,7 +123,7 @@ def getDbServerId():
 def getSocketFile():
     file = getConf()
     content = mw.readFile(file)
-    rep = 'socket\s*=\s*(.*)'
+    rep = r'socket\s*=\s*(.*)'
     tmp = re.search(rep, content)
     socket = tmp.groups()[0].strip()
 
@@ -136,14 +136,14 @@ def getSocketFile():
 def getErrorLogsFile():
     file = getConf()
     content = mw.readFile(file)
-    rep = 'log-error\s*=\s*(.*)'
+    rep = r'log-error\s*=\s*(.*)'
     tmp = re.search(rep, content)
     return tmp.groups()[0].strip()
 
 def getAuthPolicy():
     file = getConf()
     content = mw.readFile(file)
-    rep = 'authentication_policy\s*=\s*(.*)'
+    rep = r'authentication_policy\s*=\s*(.*)'
     tmp = re.search(rep, content)
     if tmp:
         return tmp.groups()[0].strip()
@@ -152,7 +152,7 @@ def getAuthPolicy():
 
 def contentReplace(content):
     service_path = mw.getServerDir()
-    content = content.replace('{$ROOT_PATH}', mw.getRootDir())
+    content = content.replace('{$ROOT_PATH}', mw.getFatherDir())
     content = content.replace('{$SERVER_PATH}', service_path)
     content = content.replace('{$SERVER_APP_PATH}',service_path + '/' + getPluginName())
 
@@ -385,7 +385,7 @@ def getErrorLog():
 def getShowLogFile():
     file = getConf()
     content = mw.readFile(file)
-    rep = 'slow-query-log-file\s*=\s*(.*)'
+    rep = r'slow-query-log-file\s*=\s*(.*)'
     tmp = re.search(rep, content)
     return tmp.groups()[0].strip()
 
@@ -435,7 +435,7 @@ def initMysql8Data():
     return True
 
 def getLib64Pos(name=''):
-    cmd = "ls /usr/lib64 | grep "+name+".so | cut -d \  -f 1 | awk 'END {print}'"
+    cmd = "ls /usr/lib64 | grep "+name+".so | cut -d \\  -f 1 | awk 'END {print}'"
     d = mw.execShell(cmd)
     return '/usr/lib64/'+d[0]
 
@@ -604,7 +604,7 @@ def initdUinstall():
 def getMyDbPos():
     file = getConf()
     content = mw.readFile(file)
-    rep = 'datadir\s*=\s*(.*)'
+    rep = r'datadir\s*=\s*(.*)'
     tmp = re.search(rep, content)
     return tmp.groups()[0].strip()
 
@@ -655,7 +655,7 @@ def setMyDbPos(version=''):
 def getMyPort():
     file = getConf()
     content = mw.readFile(file)
-    rep = 'port\s*=\s*(.*)'
+    rep = r'port\s*=\s*(.*)'
     tmp = re.search(rep, content)
     return tmp.groups()[0].strip()
 
@@ -669,7 +669,7 @@ def setMyPort():
     port = args['port']
     file = getConf()
     content = mw.readFile(file)
-    rep = "port\s*=\s*([0-9]+)\s*\n"
+    rep = r"port\s*=\s*([0-9]+)\s*\n"
     content = re.sub(rep, 'port = ' + port + '\n', content)
     mw.writeFile(file, content)
     restart()
@@ -757,7 +757,7 @@ def setDbStatus(version):
             s = 'K'
         if g in emptys:
             s = ''
-        rep = '\s*' + g + '\s*=\s*\d+(M|K|k|m|G)?\n'
+        rep = r'\s*' + g + r'\s*=\s*\d+(M|K|k|m|G)?\n'
         c = g + ' = ' + args[g] + s + '\n'
         if content.find(g) != -1:
             content = re.sub(rep, '\n' + c, content, 1)
@@ -930,7 +930,7 @@ def importDbExternalProgressBar():
     file = args['file']
     name = args['name']
 
-    import_dir = mw.getRootDir() + '/backup/import/'
+    import_dir = mw.getFatherDir() + '/backup/import/'
 
     file_path = import_dir + file
     if not os.path.exists(file_path):
@@ -1349,7 +1349,7 @@ def addDb():
     dataAccess = args['dataAccess'].strip()
     ps = args['ps'].strip()
 
-    reg = "^[\w-]+$"
+    reg = r"^[\w-]+$"
     if not re.match(reg, args['name']):
         return mw.returnJson(False, '数据库名称不能带有特殊符号!')
     checks = ['root', 'mysql', 'test', 'sys', 'performance_schema','information_schema']
@@ -1512,13 +1512,10 @@ def resetDbRootPwd(version):
         auth_policy = getAuthPolicy()
 
         reset_pwd = 'flush privileges;'
-        reset_pwd = reset_pwd + \
-            "UPDATE mysql.user SET authentication_string='' WHERE user='root';"
+        reset_pwd = reset_pwd + "UPDATE mysql.user SET authentication_string='' WHERE user='root';"
         reset_pwd = reset_pwd + "flush privileges;"
-        reset_pwd = reset_pwd + \
-            "alter user 'root'@'localhost' IDENTIFIED by '" + pwd + "';"
-        reset_pwd = reset_pwd + \
-            "alter user 'root'@'localhost' IDENTIFIED WITH "+auth_policy+" by '" + pwd + "';"
+        reset_pwd = reset_pwd + "alter user 'root'@'localhost' IDENTIFIED by '" + pwd + "';"
+        reset_pwd = reset_pwd + "alter user 'root'@'localhost' IDENTIFIED WITH "+auth_policy+" by '" + pwd + "';"
         reset_pwd = reset_pwd + "flush privileges;"
 
         tmp_file = "/tmp/mysql_init_tmp.log"
@@ -2113,7 +2110,7 @@ def addMasterRepSlaveUser(version=''):
     username = args['username'].strip()
     password = args['password'].strip()
 
-    reg = "^[\w-]+$"
+    reg = r"^[\w-]+$"
     if not re.match(reg, username):
         return mw.returnJson(False, '用户名不能带有特殊符号!')
     checks = ['root', 'mysql', 'test', 'sys', 'performance_schema','information_schema']
@@ -2554,7 +2551,7 @@ def trySlaveSyncBugfix(version=''):
 
 def getSlaveSyncCmd(version=''):
 
-    root = mw.getRunDir()
+    root = mw.getPanelDir()
     cmd = 'cd ' + root + ' && python3 ' + root + \
         '/plugins/mysql/index.py do_full_sync {"db":"all"}'
     return mw.returnJson(True, 'ok', cmd)
@@ -3436,7 +3433,7 @@ def fullSync(version=''):
 
     status_file = asyncTmpfile()
     if args['begin'] == '1':
-        cmd = 'cd ' + mw.getRunDir() + ' && python3 ' + getPluginDir() + \
+        cmd = 'cd ' + mw.getPanelDir() + ' && python3 ' + getPluginDir() + \
             '/index.py do_full_sync {"db":"' + \
             args['db'] + '","sign":"' + sign + '"} &'
         # print(cmd)
@@ -3490,8 +3487,8 @@ def uninstallPreInspection(version):
     if mw.isDebugMode():
         return 'ok'
 
-    import plugins_api
-    plugins_api.plugins_api().removeIndex(getPluginName(), version)
+    from utils.plugin import plugin as MwPlugin
+    MwPlugin.instance().removeIndex(getPluginName(), version)
 
     return "请手动删除MySQL[{}]<br/> rm -rf {}".format(version, getServerDir())
 

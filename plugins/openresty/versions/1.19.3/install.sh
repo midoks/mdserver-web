@@ -15,8 +15,6 @@ action=$1
 type=$2
 
 VERSION=1.19.3.1
-
-install_tmp=${rootPath}/tmp/mw_install.pl
 openrestyDir=${serverPath}/source/openresty
 
 Install_openresty()
@@ -150,6 +148,10 @@ Install_openresty()
     if [ -d ${openrestyDir}/libressl-${libresslVersion} ];then
     	rm -rf ${openrestyDir}/libressl-${libresslVersion}
     fi
+
+    if [ -d $openrestyDir/openresty-${VERSION} ];then
+		rm -rf $openrestyDir/openresty-${VERSION}
+	fi
 	echo '安装完成'
 }
 

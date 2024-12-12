@@ -7,12 +7,11 @@ rootPath=$(dirname "$curPath")
 rootPath=$(dirname "$rootPath")
 serverPath=$(dirname "$rootPath")
 
-install_tmp=${rootPath}/tmp/mw_install.pl
 VERSION=$2
 
 Install_App()
 {
-	echo '正在安装脚本文件...' > $install_tmp
+	echo '正在安装脚本文件...'
 	mkdir -p $serverPath/source
 	mkdir -p $serverPath/data_query
 	echo "${VERSION}" > $serverPath/data_query/version.pl

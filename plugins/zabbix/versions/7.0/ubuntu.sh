@@ -11,7 +11,6 @@ sourcePath=${serverPath}/source
 sysName=`uname`
 sysArch=`arch`
 
-install_tmp=${rootPath}/tmp/mw_install.pl
 ubuntu_suffix=
 if [ "$sysArch" == "aarch64" ];then
 	ubuntu_suffix="-arm64"

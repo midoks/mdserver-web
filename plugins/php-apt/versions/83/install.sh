@@ -8,8 +8,6 @@ rootPath=$(dirname "$rootPath")
 serverPath=$(dirname "$rootPath")
 sourcePath=${serverPath}/source
 sysName=`uname`
-install_tmp=${rootPath}/tmp/mw_install.pl
-
 
 #获取信息和版本
 # bash /www/server/mdsever-web/scripts/getos.sh

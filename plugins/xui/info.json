@@ -1,0 +1,19 @@
+{
+	"sort": 7,
+	"ps": "支持多协议多用户的xray面板",
+	"install_pre_inspection":true,
+	"name": "xui",
+	"title": "xui",
+	"shell": "install.sh",
+	"versions":["1.0"],
+	"updates":["1.0"],
+	"tip": "soft",
+	"checks": "server/xui",
+	"path": "server/xui",
+	"display": 1,
+	"author": "FranzKafkaYu",
+	"date": "2024-12-03",
+	"home": "https://github.com/FranzKafkaYu/x-ui",
+	"type": 0,
+	"pid": "5"
+}

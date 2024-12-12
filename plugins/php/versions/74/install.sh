@@ -8,12 +8,6 @@ rootPath=$(dirname "$rootPath")
 serverPath=$(dirname "$rootPath")
 sourcePath=${serverPath}/source
 sysName=`uname`
-install_tmp=${rootPath}/tmp/mw_install.pl
-
-function version_gt() { test "$(echo "$@" | tr " " "\n" | sort -V | head -n 1)" != "$1"; }
-function version_le() { test "$(echo "$@" | tr " " "\n" | sort -V | head -n 1)" == "$1"; }
-function version_lt() { test "$(echo "$@" | tr " " "\n" | sort -rV | head -n 1)" != "$1"; }
-function version_ge() { test "$(echo "$@" | tr " " "\n" | sort -rV | head -n 1)" == "$1"; }
 
 version=7.4.26
 PHP_VER=74
@@ -80,35 +74,13 @@ fi
 cd $sourcePath/php/php${PHP_VER}
 
 OPTIONS='--without-iconv'
-if [ $sysName == 'Darwin' ]; then
-	
-	OPTIONS="${OPTIONS} --with-curl"
-	OPTIONS="${OPTIONS} --with-external-pcre=$(brew --prefix pcre2)"
-
-	# BREW_DIR=`which brew`
-	# BREW_DIR=${BREW_DIR/\/bin\/brew/}
-	# XML_LIB_DEPEND_DIR=`brew info libxml2 | grep /opt/homebrew/Cellar/libxml2 | cut -d \  -f 1 | awk 'END {print}'`
-	# XML_LIB_DEPEND_DIR=`brew info libxml2 | grep ${BREW_DIR}/Cellar/libxml2 | cut -d \  -f 1 | awk 'END {print}'`
-	# OPTIONS="${OPTIONS} --with-libxml=${XML_LIB_DEPEND_DIR}"
-
-else
-	OPTIONS="${OPTIONS} --with-curl"
-	OPTIONS="${OPTIONS} --with-readline"
-fi
+# if [ $sysName == 'Darwin' ]; then
+# 	OPTIONS="${OPTIONS} --with-external-pcre=$(brew --prefix pcre2)"
+# fi
 
 IS_64BIT=`getconf LONG_BIT`
 if [ "$IS_64BIT" == "64" ];then
 	OPTIONS="${OPTIONS} --with-libdir=lib64"
-fi
-
-echo "$sourcePath/php/php${PHP_VER}"
-
-ZIP_OPTION='--with-zip'
-libzip_version=`pkg-config libzip --modversion`
-if version_lt "$libzip_version" "0.11.0" ;then
-	cd ${rootPath}/plugins/php/lib && /bin/bash libzip.sh
-	export PKG_CONFIG_PATH=$serverPath/lib/libzip/lib/pkgconfig
-	ZIP_OPTION="--with-zip=$serverPath/lib/libzip"
 fi
 
 # ----- cpu start ------
@@ -120,7 +92,7 @@ if [ -f /proc/cpuinfo ];then
 	cpuCore=`cat /proc/cpuinfo | grep "processor" | wc -l`
 fi
 
-MEM_INFO=$(free -m|grep Mem|awk '{printf("%.f",($2)/1024)}')
+MEM_INFO=$(which free > /dev/null && free -m|grep Mem|awk '{printf("%.f",($2)/1024)}')
 if [ "${cpuCore}" != "1" ] && [ "${MEM_INFO}" != "0" ];then
     if [ "${cpuCore}" -gt "${MEM_INFO}" ];then
         cpuCore="${MEM_INFO}"
@@ -135,9 +107,9 @@ else
 	cpuCore="1"
 fi
 # ----- cpu end ------
+
 if [ ! -d $serverPath/php/${PHP_VER} ];then
 	cd $sourcePath/php/php${PHP_VER} && make clean
-	# ./buildconf --force
 	./configure \
 	--prefix=$serverPath/php/${PHP_VER} \
 	--exec-prefix=$serverPath/php/${PHP_VER} \
@@ -145,8 +117,6 @@ if [ ! -d $serverPath/php/${PHP_VER} ];then
 	--enable-mysqlnd \
 	--with-mysqli=mysqlnd \
 	--with-pdo-mysql=mysqlnd \
-	--with-zlib-dir=$serverPath/lib/zlib \
-	$ZIP_OPTION \
 	--enable-ftp \
 	--enable-mbstring \
 	--enable-sockets \

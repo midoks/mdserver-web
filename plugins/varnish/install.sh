@@ -7,7 +7,6 @@ rootPath=$(dirname "$curPath")
 rootPath=$(dirname "$rootPath")
 serverPath=$(dirname "$rootPath")
 
-install_tmp=${rootPath}/tmp/mw_install.pl
 VERSION=$2
 
 
@@ -18,7 +17,7 @@ OSNAME_ID=`cat /etc/*-release | grep VERSION_ID | awk -F = '{print $2}' | awk -F
 
 Install_varnish()
 {
-	echo '正在安装脚本文件...' > $install_tmp
+	echo '正在安装脚本文件...'
 	mkdir -p $serverPath/source
 
 	if [ "${OSNAME}" == "macos" ]; then
@@ -38,7 +37,7 @@ Install_varnish()
 
 	mkdir -p $serverPath/varnish
 	echo "1.0" > $serverPath/varnish/version.pl
-	echo '安装完成' > $install_tmp
+	echo '安装完成'
 
 	cd ${rootPath} && python3 ${rootPath}/plugins/varnish/index.py start
 	cd ${rootPath} && python3 ${rootPath}/plugins/varnish/index.py initd_install
@@ -63,7 +62,7 @@ Uninstall_varnish()
 		echo "I won't support it"
 	fi
 	rm -rf $serverPath/varnish
-	echo "uninstall varnish" > $install_tmp
+	echo "uninstall varnish"
 }
 
 action=$1

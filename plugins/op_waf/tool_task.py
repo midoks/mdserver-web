@@ -6,8 +6,13 @@ import os
 import time
 import json
 
-sys.path.append(os.getcwd() + "/class/core")
-import mw
+web_dir = os.getcwd() + "/web"
+if os.path.exists(web_dir):
+    sys.path.append(web_dir)
+    os.chdir(web_dir)
+
+import core.mw as mw
+from utils.crontab import crontab as MwCrontab
 
 
 app_debug = False
@@ -33,10 +38,9 @@ def getTaskConf():
 
 
 def getConfigData():
-    try:
+    conf = getTaskConf()
+    if os.path.exists(conf):
         return json.loads(mw.readFile(getTaskConf()))
-    except:
-        pass
     return []
 
 
@@ -89,7 +93,7 @@ def createBgTaskByName(name, args):
         _where1 = args['minute-n']
         _minute = ''
 
-    mw_dir = mw.getRunDir()
+    mw_dir = mw.getPanelDir()
     cmd = '''
 mw_dir=%s
 rname=%s
@@ -122,10 +126,10 @@ logs_file=$plugin_path/${rname}.log
         'stype': "toShell",
         'sname': '',
         'sbody': cmd,
-        'urladdress': '',
+        'url_address': '',
     }
 
-    task_id = cron_api.add(params)
+    task_id = MwCrontab.instance().add(params)
     if task_id > 0:
         cfg["task_id"] = task_id
         cfg["name"] = name
@@ -146,9 +150,7 @@ def removeBgTask():
             res = mw.M("crontab").field("id, name").where(
                 "id=?", (cfg["task_id"],)).find()
             if res and res["id"] == cfg["task_id"]:
-                import crontab_api
-                api = crontab_api.crontab_api()
-                data = api.delete(cfg["task_id"])
+                data = MwCrontab.instance().delete(cfg["task_id"])
                 if data[0]:
                     cfg["task_id"] = -1
                     cfg_list[x] = cfg

@@ -12,9 +12,13 @@ if sys.platform != "darwin":
     os.chdir("/www/server/mdserver-web")
 
 
-sys.path.append(os.getcwd() + "/class/core")
-import mw
-import db
+web_dir = os.getcwd() + "/web"
+if os.path.exists(web_dir):
+    sys.path.append(web_dir)
+    os.chdir(web_dir)
+
+import core.mw as mw
+import core.db as db
 
 _ver = sys.version_info
 is_py2 = (_ver[0] == 2)
@@ -184,7 +188,6 @@ def findPathName(path, filename):
     return l
 
 def backupAllFunc(stype):
-    os.chdir(mw.getRunDir())
 
     name = sys.argv[2]
     num = sys.argv[3]
@@ -196,20 +199,15 @@ def backupAllFunc(stype):
     }
 
     backups = []
-    sql = db.Sql()
-
     # print("stype:", stype)
     # 提前获取-清理多余备份
     if stype == 'site':
-        pid = sql.table('sites').where('name=?', (name,)).getField('id')
-        backups = sql.table('backup').where(
-            'type=? and pid=?', ('0', pid)).field('id,filename').select()
+        pid = mw.M('sites').where('name=?', (name,)).getField('id')
+        backups = mw.M('backup').where('type=? and pid=?', ('0', pid)).field('id,filename').select()
     if stype == 'database':
         db_path = mw.getServerDir() + '/mysql'
-        pid = mw.M('databases').dbPos(db_path, 'mysql').where(
-            'name=?', (name,)).getField('id')
-        backups = sql.table('backup').where(
-            'type=? and pid=?', ('1', pid)).field('id,filename').select()
+        pid = mw.M('databases').dbPos(db_path, 'mysql').where('name=?', (name,)).getField('id')
+        backups = mw.M('backup').where('type=? and pid=?', ('1', pid)).field('id,filename').select()
     if stype == 'path':
         backup_dir = mw.getBackupDir()
         backup_path = backup_dir + '/path'
@@ -220,18 +218,15 @@ def backupAllFunc(stype):
     if stype.find('database_') > -1:
         plugin_name = stype.replace('database_', '')
         db_path = mw.getServerDir() + '/' + plugin_name
-        pid = mw.M('databases').dbPos(db_path, 'mysql').where(
-            'name=?', (name,)).getField('id')
-        backups = sql.table('backup').where(
-            'type=? and pid=?', ('1', pid)).field('id,filename').select()
+        pid = mw.M('databases').dbPos(db_path, 'mysql').where('name=?', (name,)).getField('id')
+        backups = mw.M('backup').where('type=? and pid=?', ('1', pid)).field('id,filename').select()
 
     args = stype + " " + name + " " + num
-    cmd = 'python3 ' + mw.getRunDir() + '/scripts/backup.py ' + args
+    cmd = 'python3 ' + mw.getPanelDir() + '/scripts/backup.py ' + args
     if stype.find('database_') > -1:
         plugin_name = stype.replace('database_', '')
         args = "database " + name + " " + num
-        cmd = 'python3 ' + mw.getRunDir() + '/plugins/' + plugin_name + \
-            '/scripts/backup.py ' + args
+        cmd = 'python3 ' + mw.getPanelDir() + '/plugins/' + plugin_name + '/scripts/backup.py ' + args
 
     os.system(cmd)
 
@@ -251,8 +246,7 @@ def backupAllFunc(stype):
         _name = 'path_{}'.format(os.path.basename(name))
         find_path = mw.getBackupDir() + '/path/'+_name
 
-    find_new_file = "ls " + find_path + \
-        "_* | grep '.gz' | cut -d \  -f 1 | awk 'END {print}'"
+    find_new_file = "ls " + find_path + "_* | grep '.gz' | cut -d \\  -f 1 | awk 'END {print}'"
 
     filename = mw.execShell(find_new_file)[0].strip()
     if filename == "":

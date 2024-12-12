@@ -8,12 +8,13 @@
 # Author: midoks <midoks@163.com>
 # ---------------------------------------------------------------------------------
 
-from admin import model
+import os
 
 import core.mw as mw
+import thisdb
 
 def getUnauthStatus(
-    code: str | None = '0'
+    code= '0'
 ):
     code = str(code)
     data = {}
@@ -42,26 +43,48 @@ def getGlobalVar():
     获取全局变量
     '''
     data = {}
-    data['title'] = model.getOption('title', default='后羿面板')
-    data['ip'] = model.getOption('server_ip', default='127.0.0.1')
+    data['title'] = thisdb.getOption('title', default='后羿面板')
+    data['ip'] = thisdb.getOption('server_ip', default='127.0.0.1')
 
-    data['site_path'] = model.getOption('site_path', default=mw.getFatherDir()+'/wwwroot')
-    data['backup_path'] = model.getOption('backup_path', default=mw.getFatherDir()+'/backup')
-    data['admin_path'] = '/'+model.getOption('admin_path', default='')
-    data['site_count'] = model.getSitesCount()
+    data['site_path'] = thisdb.getOption('site_path', default=mw.getFatherDir()+'/wwwroot')
+    data['backup_path'] = thisdb.getOption('backup_path', default=mw.getFatherDir()+'/backup')
+    data['admin_path'] = '/'+thisdb.getOption('admin_path', default='')
+    data['debug'] = thisdb.getOption('debug', default='close')
+    data['admin_close'] = thisdb.getOption('admin_close', default='no')
+    data['site_count'] = thisdb.getSitesCount()
     data['port'] = mw.getHostPort()
 
+    __file = mw.getCommonFile()
+    if os.path.exists(__file['ipv6']):
+        data['ipv6'] = 'checked'
+    else:
+        data['ipv6'] = ''
+
+    # 获取ROOT用户名
+    data['username'] = mw.M('users').where("id=?", (1,)).getField('name')
+
     # 获取未认证状态信息
-    unauthorized_status = model.getOption('unauthorized_status', default='0')
+    unauthorized_status = thisdb.getOption('unauthorized_status', default='0')
     data['unauthorized_status'] = getUnauthStatus(code=unauthorized_status)
-    data['basic_auth'] = model.getOptionByJson('basic_auth', default={'open':False})
+    data['basic_auth'] = thisdb.getOptionByJson('basic_auth', default={'open':False})
+    data['two_step_verification'] = thisdb.getOptionByJson('two_step_verification', default={'open':False})
 
     # 服务器时间
     sformat = 'date +"%Y-%m-%d %H:%M:%S %Z %z"'
     data['systemdate'] = mw.execShell(sformat)[0].strip()
 
 
-    data['hook_menu'] = model.getOptionByJson('hook_menu',type='hook',default=[])
-    data['hook_global_static'] = model.getOptionByJson('hook_global_static',type='hook',default=[])
+    data['hook_menu'] = thisdb.getOptionByJson('hook_menu',type='hook',default=[])
+    data['hook_global_static'] = thisdb.getOptionByJson('hook_global_static',type='hook',default=[])
+    data['hook_database'] = thisdb.getOptionByJson('hook_database',type='hook',default=[])
+
+
+    # 邮件通知设置
+    data['notify_email'] = thisdb.getOptionByJson('notify_email', default={'open':False}, type='notify')
+    data['notify_tgbot'] = thisdb.getOptionByJson('notify_tgbot', default={'open':False}, type='notify')
+    
+    data['panel_api'] = thisdb.getOptionByJson('panel_api', default={'open':False})
+    data['panel_ssl'] = thisdb.getOptionByJson('panel_ssl', default={'open':False})
+    data['panel_domain'] = thisdb.getOption('panel_domain', default='')
     
     return data

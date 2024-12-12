@@ -34,6 +34,7 @@ else
 	BAK=''
 fi
 
+# --with-zlib-dir=$serverPath/lib/zlib
 Install_lib()
 {
 

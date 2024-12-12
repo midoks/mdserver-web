@@ -10,14 +10,14 @@
 				<div class="ss-text pull-left mr50">
 					<em>关闭面板</em>
 					<div class="ssh-item">
-                        <input class="btswitch btswitch-ios" id="closePl" type="checkbox">
+                        <input class="btswitch btswitch-ios" id="closePl" type="checkbox" {%if data['admin_close']=='yes' %}checked{%endif%}>
                         <label class="btswitch-btn" for="closePl" onclick="closePanel()"></label>
                     </div>
 				</div>
 				<div class="ss-text pull-left mr50">
 					<em>开发模式</em>
 					<div class="ssh-item">
-                        <input class="btswitch btswitch-ios" id="debugMode" type="checkbox" {{data['debug']}}>
+                        <input class="btswitch btswitch-ios" id="debugMode" type="checkbox" {%if data['debug']=='open'%}checked{%endif%}>
                         <label class="btswitch-btn" for="debugMode" onclick="debugMode()"></label>
                     </div>
 				</div>
@@ -106,14 +106,14 @@
 
 				<p class="mtb15">
 					<span class="set-tit text-right" title="绑定域名" style="float: left;">绑定域名</span>
-						<input name="bind_domain" class="inputtxt bt-input-text" type="text" value="{{data['bind_domain']}}">
+						<input name="bind_domain" class="inputtxt bt-input-text" type="text" value="{{data['panel_domain']}}">
 	                <button type="button" class="btn btn-success btn-sm ml5 btn_bind_domain" disabled>保存</button>
 					<span class="set-info c7">为面板绑定一个访问域名，<b style="color: red;">注意：一旦绑定域名，只能通过域名访问面板</b></span>
 				</p>
 
 				<p class="mtb15">
 					<span class="set-tit text-right" title="面板SSL" style="float: left;">面板SSL</span>
-						<input id="cfg_ssl" name="bind_ssl" class="btswitch btswitch-ios" type="checkbox" {{data['ssl']}}>
+						<input id="cfg_ssl" name="bind_ssl" class="btswitch btswitch-ios" type="checkbox" {% if data['panel_ssl']['open'] %}checked{% endif %}>
 						<label class="btswitch-btn ml5" for="cfg_ssl" style="float: left;margin-top:4px;"></label>
 	                <button ype="button" class="btn btn-default btn-xs panel_api_btn" style="vertical-align: middle; margin-left: 10px" onclick="getPanelSSL();">面板SSL配置</button>
 					<span class="set-info c7">为面板设置https协议访问，提升面板访问<b style="color: red;">安全性</b></span>
@@ -129,9 +129,9 @@
 
 				<p class="mtb15">
 					<span class="set-tit text-right" title="API接口" style="float: left;">API接口</span>
-					<input class="btswitch btswitch-ios" id="cfg_panel_api" type="checkbox" {{data['api_token']}}/>
+					<input class="btswitch btswitch-ios" id="cfg_panel_api" type="checkbox" {% if data['panel_api']['open'] %}checked{% endif %}/>
 	                <label class="btswitch-btn ml5" for="cfg_panel_api" style="float: left;margin-top:4px;" onclick="setPanelApi()"></label>
-	                <button ype="button" class="btn btn-default btn-xs panel_api_btn" style="vertical-align: middle; margin-left: 10px" onclick="showPanelApi();">API接口配置</button>
+	                <button ype="button" class="btn btn-default btn-xs" style="vertical-align: middle; margin-left: 10px" onclick="appPage();">APP应用管理</button>
 					<span class="set-info c7">提供面板API接口访问的支持</span>
 				</p>
 
@@ -149,11 +149,11 @@
 				</p>
 
 				<p class="mtb15">
-					<span class="set-tit text-right" title="二次验证" style="float: left;">二次验证</span>
-					<input class="btswitch btswitch-ios" id="cfg_panel_auth" type="checkbox" {{data['auth_secret']}}/>
+					<span class="set-tit text-right" title="二步验证" style="float: left;">二步验证</span>
+					<input class="btswitch btswitch-ios" id="cfg_panel_auth" type="checkbox" {% if data['two_step_verification']['open'] %}checked{% endif %}/>
 	                <label class="btswitch-btn ml5" for="cfg_panel_auth" style="float: left;margin-top:4px;" onclick="setAuthSecretApi()"></label>
-					<button type="button" class="btn btn-default btn-xs panel_api_btn" style="vertical-align: middle; margin-left: 10px" onclick="setAuthBind();">绑定设置</button>
-					<span class="set-info c7">二次验证，加强安全登录</span>
+					<button type="button" class="btn btn-default btn-xs" style="vertical-align: middle; margin-left: 10px" onclick="setAuthBind();">绑定设置</button>
+					<span class="set-info c7">二步验证，加强安全登录</span>
 				</p>
 			</div>
 
@@ -164,7 +164,7 @@
 
 				<p class="mtb15">
 					<span class="set-tit text-right" title="TelegramBot" style="float: left;">TG机器人通知</span>
-						<input id="cfg_tgbot" name="cfg_tgbot" onclick="setNotifyApi('tgbot',this)" class="btswitch btswitch-ios" type="checkbox" {{data['notify_tgbot_enable']}}>
+						<input id="cfg_tgbot" name="cfg_tgbot" onclick="setNotifyTgbot(this)" class="btswitch btswitch-ios" type="checkbox" {% if data['notify_tgbot']['open'] %}checked{% endif %}>
 						<label class="btswitch-btn ml5" for="cfg_tgbot" style="float: left;margin-top:4px;"></label>
 	                <button ype="button" class="btn btn-default btn-xs panel_api_btn" style="vertical-align: middle; margin-left: 10px" onclick="getTgbot();">TelegramBot配置</button>
 					<span class="set-info c7">Telegram Bot机器人通知【<b style="color:red;">国内可能无法使用</b>】</span>
@@ -172,7 +172,7 @@
 
 				<p class="mtb15">
 					<span class="set-tit text-right" title="绑定账号" style="float: left;">邮件通知</span>
-						<input id="cfg_email" name="cfg_email" onclick="setNotifyApi('email',this)" class="btswitch btswitch-ios" type="checkbox" {{data['notify_email_enable']}}>
+						<input id="cfg_email" name="cfg_email" onclick="setNotifyEmail(this)" class="btswitch btswitch-ios" type="checkbox" {% if data['notify_email']['open'] %}checked{% endif %}>
 						<label class="btswitch-btn ml5" for="cfg_email" style="float: left;margin-top:4px;"></label>
 	                <button ype="button" class="btn btn-default btn-xs panel_api_btn" style="vertical-align: middle; margin-left: 10px" onclick="getEmailCfg();">邮件配置</button>
 					<span class="set-info c7">邮件通知</span>

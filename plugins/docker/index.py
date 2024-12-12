@@ -7,8 +7,12 @@ import time
 import re
 import json
 
-sys.path.append(os.getcwd() + "/class/core")
-import mw
+web_dir = os.getcwd() + "/web"
+if os.path.exists(web_dir):
+    sys.path.append(web_dir)
+    os.chdir(web_dir)
+
+import core.mw as mw
 
 try:
     import docker
@@ -434,7 +438,7 @@ def dockerRemoveImage():
 
 
 def getImageListFunc(dbname=''):
-    bkDir = mw.getRootDir() + '/backup/docker'
+    bkDir = mw.getFatherDir() + '/backup/docker'
     blist = os.listdir(bkDir)
     r = []
 
@@ -448,13 +452,13 @@ def getImageListFunc(dbname=''):
 
 
 def dockerImagePickDir():
-    bkDir = mw.getRootDir() + '/backup/docker'
+    bkDir = mw.getFatherDir() + '/backup/docker'
     return mw.returnJson(True, 'ok', bkDir)
 
 
 def dockerImagePickList():
 
-    bkDir = mw.getRootDir() + '/backup/docker'
+    bkDir = mw.getFatherDir() + '/backup/docker'
     if not os.path.exists(bkDir):
         os.mkdir(bkDir)
 
@@ -486,7 +490,7 @@ def dockerImagePickSave():
     if not data[0]:
         return data[1]
 
-    bkDir = mw.getRootDir() + '/backup/docker/'
+    bkDir = mw.getFatherDir() + '/backup/docker/'
     images = args['images']
     try:
         file_name = bkDir + \
@@ -606,8 +610,8 @@ def getDockerCreateInfo():
 def __release_port(port):
     from collections import namedtuple
     try:
-        import firewall_api
-        firewall_api.firewall_api().addAcceptPortArgs(port, 'docker', 'port')
+        from utils.firewall import Firewall as MwFirewall
+        MwFirewall.instance().addAcceptPort(port, 'docker', 'port')
         return port
     except Exception as e:
         return "Release failed {}".format(e)

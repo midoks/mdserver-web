@@ -8,8 +8,12 @@ import re
 import requests
 import json
 
-sys.path.append(os.getcwd() + "/class/core")
-import mw
+web_dir = os.getcwd() + "/web"
+if os.path.exists(web_dir):
+    sys.path.append(web_dir)
+    os.chdir(web_dir)
+
+import core.mw as mw
 
 app_debug = False
 if mw.isAppleSystem():
@@ -127,7 +131,7 @@ def status():
 
 def contentReplace(content):
     service_path = mw.getServerDir()
-    content = content.replace('{$ROOT_PATH}', mw.getRootDir())
+    content = content.replace('{$ROOT_PATH}', mw.getFatherDir())
     content = content.replace('{$SERVER_PATH}', service_path)
     content = content.replace('{$SERVER_APP}', service_path + '/redis')
     content = content.replace('{$REDIS_PASS}', mw.getRandomString(10))
@@ -163,7 +167,6 @@ def pSqliteDb(dbname='dnsapi'):
 def initDreplace():
 
     file_tpl = getInitDTpl()
-    service_path = os.path.dirname(os.getcwd())
 
     initD_path = getServerDir() + '/init.d'
     if not os.path.exists(initD_path):
@@ -560,7 +563,7 @@ def runHookPy(domain,path):
     # print(domain,path)
     run_log = runLog()
     hook_file = getConf()
-    cmd = 'cd '+mw.getRunDir()
+    cmd = 'cd '+mw.getPanelDir()
     cmd += ' && python3 '+hook_file + ' ' + domain + ' ' + path
     cmd += ' >> '+ run_log
     print(cmd)
@@ -641,7 +644,7 @@ def getHookIdCmd():
     if not data[0]:
         return data[1]
 
-    cmd = "cd "+mw.getRunDir()+" "
+    cmd = "cd "+mw.getPanelDir()+" "
     cmd += '&& python3 plugins/acme_pandominassl_apply/index.py run_hook_id 1.0 {"id":"'+args['id']+'"}'
     return mw.returnJson(True, 'ok',cmd)
 
@@ -658,7 +661,7 @@ def runHookId():
     return 'run hook '+args['id']+' end'
 
 def runHookCmd():
-    cmd = "cd "+mw.getRunDir()+" "
+    cmd = "cd "+mw.getPanelDir()+" "
     cmd += '&& python3 plugins/acme_pandominassl_apply/index.py run_hook'
     return mw.returnJson(True, 'ok',cmd)
 
@@ -735,7 +738,7 @@ def runSyncCfData():
     return ''
 
 def runSyncCfCmd():
-    cmd = "cd "+mw.getRunDir()+" "
+    cmd = "cd "+mw.getPanelDir()+" "
     cmd += '&& python3 plugins/acme_pandominassl_apply/index.py run_sync_cf_data'
     return mw.returnJson(True, 'ok',cmd)
 
@@ -788,7 +791,7 @@ def runSyncDnsPodData():
     return ''
 
 def runSyncDnsPodCmd():
-    cmd = "cd "+mw.getRunDir()+" "
+    cmd = "cd "+mw.getPanelDir()+" "
     cmd += '&& python3 plugins/acme_pandominassl_apply/index.py run_sync_dnspod_data'
     return mw.returnJson(True, 'ok',cmd)
 

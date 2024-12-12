@@ -9,14 +9,13 @@ serverPath=$(dirname "$rootPath")
 sourcePath=${serverPath}/source
 sysName=`uname`
 SYS_ARCH=`arch`
-install_tmp=${rootPath}/tmp/mw_install.pl
 
 version=7.0.33
 PHP_VER=70
 Install_php()
 {
 #------------------------ install start ------------------------------------#
-echo "安装php-${version} ..." > $install_tmp
+echo "安装php-${version} ..."
 mkdir -p $sourcePath/php
 mkdir -p $serverPath/php
 
@@ -61,11 +60,8 @@ fi
 OPTIONS='--without-iconv'
 if [ $sysName == 'Darwin' ]; then
 	OPTIONS="${OPTIONS} --with-freetype-dir=${serverPath}/lib/freetype"
-	OPTIONS="${OPTIONS} --with-curl"
 	# OPTIONS="${OPTIONS} --with-external-pcre=$(brew --prefix pcre2)"
 else
-	# OPTIONS="--with-iconv=${serverPath}/lib/libiconv"
-	OPTIONS="${OPTIONS} --with-curl"
 	OPTIONS="${OPTIONS} --with-readline"
 fi
 
@@ -83,7 +79,7 @@ if [ -f /proc/cpuinfo ];then
 	cpuCore=`cat /proc/cpuinfo | grep "processor" | wc -l`
 fi
 
-MEM_INFO=$(free -m|grep Mem|awk '{printf("%.f",($2)/1024)}')
+MEM_INFO=$(which free > /dev/null && free -m|grep Mem|awk '{printf("%.f",($2)/1024)}')
 if [ "${cpuCore}" != "1" ] && [ "${MEM_INFO}" != "0" ];then
     if [ "${cpuCore}" -gt "${MEM_INFO}" ];then
         cpuCore="${MEM_INFO}"
@@ -112,11 +108,9 @@ if [ ! -d $serverPath/php/${PHP_VER} ];then
 	--prefix=$serverPath/php/${PHP_VER} \
 	--exec-prefix=$serverPath/php/${PHP_VER} \
 	--with-config-file-path=$serverPath/php/${PHP_VER}/etc \
-	--with-zlib-dir=$serverPath/lib/zlib \
 	--enable-mysqlnd \
 	--with-mysqli=mysqlnd \
 	--with-pdo-mysql=mysqlnd \
-	--enable-zip \
 	--enable-mbstring \
 	--enable-simplexml \
 	--enable-ftp \

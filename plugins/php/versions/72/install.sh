@@ -9,8 +9,6 @@ serverPath=$(dirname "$rootPath")
 sourcePath=${serverPath}/source
 sysName=`uname`
 SYS_ARCH=`arch`
-install_tmp=${rootPath}/tmp/mw_install.pl
-
 
 version=7.2.31
 PHP_VER=72
@@ -60,14 +58,12 @@ if [ ! -d $sourcePath/php/php${PHP_VER} ];then
 fi
 
 OPTIONS='--without-iconv'
-if [ $sysName == 'Darwin' ]; then
-	OPTIONS="${OPTIONS} --with-curl"
+if [ $sysName == 'Darwin' ]; then	
+	OPTIONS="${OPTIONS} --with-curl=$(brew --prefix curl)"
+	OPTIONS="${OPTIONS} --with-pcre-dir=$(brew --prefix pcre2)"
 else
-	OPTIONS="${OPTIONS} --with-curl"
-	OPTIONS="${OPTIONS} --with-zlib-dir=$serverPath/lib/zlib"
 	OPTIONS="${OPTIONS} --with-readline"
 fi
-
 IS_64BIT=`getconf LONG_BIT`
 if [ "$IS_64BIT" == "64" ];then
 	OPTIONS="${OPTIONS} --with-libdir=lib64"
@@ -82,7 +78,7 @@ if [ -f /proc/cpuinfo ];then
 	cpuCore=`cat /proc/cpuinfo | grep "processor" | wc -l`
 fi
 
-MEM_INFO=$(free -m|grep Mem|awk '{printf("%.f",($2)/1024)}')
+MEM_INFO=$(which free > /dev/null && free -m|grep Mem|awk '{printf("%.f",($2)/1024)}')
 if [ "${cpuCore}" != "1" ] && [ "${MEM_INFO}" != "0" ];then
     if [ "${cpuCore}" -gt "${MEM_INFO}" ];then
         cpuCore="${MEM_INFO}"
@@ -113,7 +109,6 @@ if [ ! -d $serverPath/php/${PHP_VER} ];then
 	--enable-mysqlnd \
 	--with-mysqli=mysqlnd \
 	--with-pdo-mysql=mysqlnd \
-	--with-libzip \
 	--enable-mbstring \
 	--enable-simplexml \
 	--enable-sockets \

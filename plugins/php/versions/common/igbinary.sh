@@ -15,7 +15,7 @@ actionType=$1
 version=$2
 
 LIBNAME=igbinary
-LIBV=3.2.7
+LIBV=3.2.16
 
 if [ "$version" -lt "70" ];then
 	echo "not need"

@@ -9,8 +9,12 @@ import json
 import datetime
 import yaml
 
-sys.path.append(os.getcwd() + "/class/core")
-import mw
+web_dir = os.getcwd() + "/web"
+if os.path.exists(web_dir):
+    sys.path.append(web_dir)
+    os.chdir(web_dir)
+
+import core.mw as mw
 
 app_debug = False
 if mw.isAppleSystem():
@@ -222,7 +226,7 @@ def initDreplace():
         mw.execShell("chmod 400 "+mg_key)
 
     file_tpl = getInitDTpl()
-    service_path = os.path.dirname(os.getcwd())
+    service_path = mw.getServerDir()
 
     initD_path = getServerDir() + '/init.d'
     if not os.path.exists(initD_path):
@@ -1200,7 +1204,7 @@ def replClose():
     return mw.returnJson(True, '关闭副本同步成功!')
 
 def getDbBackupListFunc(dbname=''):
-    bkDir = mw.getRootDir() + '/backup/database'
+    bkDir = mw.getBackupDir() + '/database'
     blist = os.listdir(bkDir)
     r = []
 
@@ -1219,7 +1223,7 @@ def getDbBackupList():
         return data[1]
 
     r = getDbBackupListFunc(args['name'])
-    bkDir = mw.getRootDir() + '/backup/database'
+    bkDir = mw.getBackupDir() + '/database'
     rr = []
     for x in range(0, len(r)):
         p = bkDir + '/' + r[x]
@@ -1241,7 +1245,7 @@ def getDbBackupList():
 
 def getDbBackupImportList():
 
-    bkImportDir = mw.getRootDir() + '/backup/mongodb_import'
+    bkImportDir = mw.getBackupDir() + '/mongodb_import'
     if not os.path.exists(bkImportDir):
         os.mkdir(bkImportDir)
 
@@ -1279,7 +1283,7 @@ def deleteDbBackup():
 
     path = args['path']
     full_file = ""
-    bkDir = mw.getRootDir() + '/backup/database'
+    bkDir = mw.getBackupDir() + '/database'
     full_file = bkDir + '/' + args['filename']
     if path != "":
         full_file = path + "/" + args['filename']
@@ -1299,7 +1303,7 @@ def setDbBackup():
 
 
 def getListBson(dbname=''):
-    bkDir = mw.getRootDir() + '/backup/mongodb_import/'+dbname
+    bkDir = mw.getBackupDir() + '/mongodb_import/'+dbname
     blist = os.listdir(bkDir)
     r = []
 
@@ -1323,7 +1327,7 @@ def importDbExternal():
     file = args['file']
     name = args['name']
 
-    import_dir = mw.getRootDir() + '/backup/mongodb_import/'
+    import_dir = mw.getBackupDir() + '/mongodb_import/'
     mg_root = pSqliteDb('config').where('id=?', (1,)).getField('mg_root')
     port = getConfPort()
 
@@ -1383,15 +1387,15 @@ def importDbBackup():
 
     port = getConfPort()
 
-    file_tgz = mw.getRootDir() + '/backup/database/' + file
-    file_dir = mw.getRootDir() + '/backup/database/' + file.replace('.tar.gz','')
+    file_tgz = mw.getBackupDir() + '/database/' + file
+    file_dir = mw.getBackupDir() + '/database/' + file.replace('.tar.gz','')
 
     if not os.path.exists(file_dir):
         mw.execShell("mkdir -p "+file_dir)
 
     # print(os.path.exists(file_tgz))
     if os.path.exists(file_tgz):
-        cmd = 'cd ' + mw.getRootDir() + '/backup/database && tar -xzvf ' + file + " -C "+file_dir
+        cmd = 'cd ' + mw.getBackupDir() + '/database && tar -xzvf ' + file + " -C "+file_dir
         # print(cmd)
         mw.execShell(cmd)
 
@@ -1521,18 +1525,23 @@ def runLog():
     return getServerDir() + '/logs.pl'
 
 
+def installPreInspectionDebainCheck(sysId,version):
+    if version == '8.0':
+        if sysId != '12':
+            return "[%s]需要debain[12]" % (version,)
+    return ''
+
 def installPreInspection(version):
     if mw.isAppleSystem():
         return 'ok'
 
-    sys = mw.execShell(
-        "cat /etc/*-release | grep PRETTY_NAME |awk -F = '{print $2}' | awk -F '\"' '{print $2}'| awk '{print $1}'")
+    cmd = "cat /etc/*-release | grep PRETTY_NAME |awk -F = '{print $2}' | awk -F '\"' '{print $2}'| awk '{print $1}'"
+    sys = mw.execShell(cmd)
 
     if sys[1] != '':
         return '暂时不支持该系统'
 
-    sys_id = mw.execShell(
-        "cat /etc/*-release | grep VERSION_ID | awk -F = '{print $2}' | awk -F '\"' '{print $2}'")
+    sys_id = mw.execShell("cat /etc/*-release | grep VERSION_ID | awk -F = '{print $2}' | awk -F '\"' '{print $2}'")
 
     sysName = sys[0].strip().lower()
     sysId = sys_id[0].strip()
@@ -1540,20 +1549,26 @@ def installPreInspection(version):
     supportOs = ['centos', 'ubuntu', 'debian', 'opensuse']
     if not sysName in supportOs:
         return '暂时仅支持{}'.format(','.join(supportOs))
+
+    if sysName == 'debian':
+        check = installPreInspectionDebainCheck(sysId, version) 
+        if check != '':
+            return check
+
     return 'ok'
 
 def uninstallPreInspection(version):
     stop()
 
-    import plugins_api
-    plugins_api.plugins_api().removeIndex(getPluginName(), version)
+    from utils.plugin import plugin as MwPlugin
+    MwPlugin.instance().removeIndex(getPluginName(), version)
 
     return "请手动删除MongoDB[{}]<br/> rm -rf {}".format(version, getServerDir())
 
 if __name__ == "__main__":
     func = sys.argv[1]
 
-    version = "4.4"
+    version = '4.4'
     if (len(sys.argv) > 2):
         version = sys.argv[2]
 

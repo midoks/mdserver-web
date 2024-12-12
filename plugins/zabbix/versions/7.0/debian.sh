@@ -10,8 +10,6 @@ sourcePath=${serverPath}/source
 sysName=`uname`
 sysArch=`arch`
 
-install_tmp=${rootPath}/tmp/mw_install.pl
-
 debian_suffix=
 if [ "$sysArch" == "aarch64" ];then
 	debian_suffix="-arm64"

@@ -14,54 +14,34 @@ import json
 from flask import Blueprint, render_template
 from flask import request
 
-from utils.mwplugin import MwPlugin
+from utils.plugin import plugin as MwPlugin
 from admin.user_login_check import panel_login_required
 
-from admin import model
 
 import core.mw as mw
 import utils.config as utils_config
+import thisdb
 
 
-blueprint = Blueprint('plugins', __name__, url_prefix='/plugins', template_folder='../../templates/default')
+blueprint = Blueprint('plugins', __name__, url_prefix='/plugins', template_folder='../../templates')
 @blueprint.route('/index', endpoint='index')
 @panel_login_required
 def index():
-    return render_template('plugins.html')
+    name = thisdb.getOption('template', default='default')
+    return render_template('%s/plugins.html' % name)
 
 # 初始化检查,首页提示选择安装
 @blueprint.route('/init', endpoint='init', methods=['POST'])
 @panel_login_required
 def init():
-    plugin_names = {
-        'openresty': '1.25.3',
-        'php': '56',
-        'swap': '1.1',
-        'mysql': '5.7',
-        'phpmyadmin': '4.4.15',
-    }
+    return MwPlugin.instance().init()
 
-    pn_dir = mw.getPluginDir()
-    pn_server_dir = mw.getServerDir()
-    pn_list = []
-    for pn in plugin_names:
-        info = {}
-        pn_json = pn_dir + '/' + pn + '/info.json'
-        pn_server = pn_server_dir + '/' + pn
-        if not os.path.exists(pn_server):
-
-            tmp = mw.readFile(pn_json)
-            tmp = json.loads(tmp)
-
-            info['title'] = tmp['title']
-            info['name'] = tmp['name']
-            info['versions'] = tmp['versions']
-            info['default_ver'] = plugin_names[pn]
-            pn_list.append(info)
-        else:
-            return mw.returnData(False, 'ok')
-
-    return mw.returnData(True, 'ok', pn_list)
+# 初始化安装
+@blueprint.route('/init_install', endpoint='init_install', methods=['POST'])
+@panel_login_required
+def init_install(): 
+    plugin_list = request.form.get('list', '')
+    return MwPlugin.instance().initInstall(plugin_list)
 
 # 首页软件展示
 @blueprint.route('/index_list', endpoint='index_list', methods=['GET','POST'])
@@ -131,7 +111,7 @@ def menu():
     pg = MwPlugin.instance()
     tag = request.args.get('tag', '')
 
-    hook_menu = model.getOptionByJson('hook_menu',type='hook',default=[])
+    hook_menu = thisdb.getOptionByJson('hook_menu',type='hook',default=[])
     content = ''
     for menu_data in hook_menu:
         if tag == menu_data['name'] and 'path' in menu_data:
@@ -167,6 +147,23 @@ def file():
         return make_response(v)
     content = open(file, 'rb').read()
     return content
+
+
+# 插件上传
+@blueprint.route('/update_zip', endpoint='update_zip', methods=['POST'])
+@panel_login_required
+def update_zip():
+    request_zip = request.files['plugin_zip']
+    return MwPlugin.instance().updateZip(request_zip)
+
+
+@blueprint.route('/input_zip', endpoint='input_zip', methods=['POST'])
+@panel_login_required
+def input_zip():
+    plugin_name = request.form.get('plugin_name', '')
+    tmp_path = request.form.get('tmp_path', '')
+    return MwPlugin.instance().inputZipApi(plugin_name,tmp_path)
+
 
 # 插件设置页
 @blueprint.route('/setting', endpoint='setting', methods=['GET'])

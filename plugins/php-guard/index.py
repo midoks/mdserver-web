@@ -8,11 +8,12 @@ import re
 import json
 import shutil
 
-# reload(sys)
-# sys.setdefaultencoding('utf8')
+web_dir = os.getcwd() + "/web"
+if os.path.exists(web_dir):
+    sys.path.append(web_dir)
+    os.chdir(web_dir)
 
-sys.path.append(os.getcwd() + "/class/core")
-import mw
+import core.mw as mw
 
 app_debug = False
 if mw.isAppleSystem():

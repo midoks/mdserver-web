@@ -7,9 +7,13 @@ import time
 import re
 import json
 
-sys.path.append(os.getcwd() + "/class/core")
-import mw
-import site_api
+web_dir = os.getcwd() + "/web"
+if os.path.exists(web_dir):
+    sys.path.append(web_dir)
+    os.chdir(web_dir)
+
+import core.mw as mw
+from utils.site import sites as MwSites
 
 app_debug = False
 if mw.isAppleSystem():
@@ -63,7 +67,7 @@ def getConfInc():
 def getPort():
     file = getConf()
     content = mw.readFile(file)
-    rep = 'listen\s*(.*);'
+    rep = r'listen\s*(.*);'
     tmp = re.search(rep, content)
     return tmp.groups()[0].strip()
 
@@ -85,7 +89,7 @@ def getHomePage():
 
 
 def getPhpVer(expect=55):
-    v = site_api.site_api().getPhpVersion()
+    v = MwSites.instance().getPhpVersion()
     is_find = False
     for i in range(len(v)):
         t = str(v[i]['version'])
@@ -118,7 +122,7 @@ def contentReplace(content):
     blowfish_secret = tmp[0].strip()
     # print php_ver
     php_conf_dir = mw.getServerDir() + '/web_conf/php/conf'
-    content = content.replace('{$ROOT_PATH}', mw.getRootDir())
+    content = content.replace('{$ROOT_PATH}', mw.getFatherDir())
     content = content.replace('{$SERVER_PATH}', service_path)
     content = content.replace('{$PHP_CONF_PATH}', php_conf_dir)
     content = content.replace('{$PHP_VER}', php_ver)
@@ -142,7 +146,7 @@ def contentReplace(content):
     content = content.replace('{$PMA_PATH}', cfg['path'])
 
     port = cfg["port"]
-    rep = 'listen\s*(.*);'
+    rep = r'listen\s*(.*);'
     content = re.sub(rep, "listen " + port + ';', content)
     return content
 
@@ -192,8 +196,8 @@ def status():
 def __release_port(port):
     from collections import namedtuple
     try:
-        import firewall_api
-        firewall_api.firewall_api().addAcceptPortArgs(port, 'phpMyAdmin默认端口', 'port')
+        from utils.firewall import Firewall as MwFirewall
+        MwFirewall.instance().addAcceptPort(port, 'phpMyAdmin默认端口', 'port')
         return port
     except Exception as e:
         return "Release failed {}".format(e)
@@ -202,8 +206,8 @@ def __release_port(port):
 def __delete_port(port):
     from collections import namedtuple
     try:
-        import firewall_api
-        firewall_api.firewall_api().delAcceptPortArgs(port, 'tcp')
+        from utils.firewall import Firewall as MwFirewall
+        MwFirewall.instance().delAcceptPortCmd(port, 'tcp')
         return port
     except Exception as e:
         return "Release failed {}".format(e)

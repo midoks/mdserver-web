@@ -119,10 +119,17 @@ class ORM:
             print(e)
         return True
 
+    def find(self, sql):
+        d = self.query(sql)
+        if d is not None:
+            if len(d) > 0:
+                return d[0]
+        return None
+
     def query(self, sql):
         # 执行SQL语句返回数据集
         if not self.__Conn():
-            return self.__DB_ERR
+            return None
         try:
             self.__DB_CUR.execute(sql)
             result = self.__DB_CUR.fetchall()
@@ -132,7 +139,7 @@ class ORM:
             self.__Close()
             return result
         except Exception as ex:
-            return ex
+            return None
 
     def __Close(self):
         # 关闭连接

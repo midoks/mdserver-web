@@ -12,15 +12,13 @@ sourcePath=${serverPath}/source
 sysName=`uname`
 SYS_ARCH=`arch`
 
-install_tmp=${rootPath}/tmp/mw_install.pl
-
 version=5.6.40
 PHP_VER=56
 
 Install_php()
 {
 #------------------------ install start ------------------------------------#
-echo "安装php-${version} ..." > $install_tmp
+echo "安装php-${version} ..."
 mkdir -p $sourcePath/php
 mkdir -p $serverPath/php
 
@@ -65,13 +63,8 @@ fi
 OPTIONS='--without-iconv'
 if [ $sysName == 'Darwin' ]; then
 	OPTIONS="${OPTIONS} --with-freetype-dir=${serverPath}/lib/freetype"
-	OPTIONS="${OPTIONS} --with-curl=$(brew --prefix curl)"
 	OPTIONS="${OPTIONS} --with-zlib-dir=$(brew --prefix zlib)"
-	# OPTIONS="${OPTIONS} --with-external-pcre=$(brew --prefix pcre2)"
 else
-	# OPTIONS="--with-iconv=${serverPath}/lib/libiconv"
-	OPTIONS="${OPTIONS} --with-curl"
-	OPTIONS="${OPTIONS} --enable-mbstring"
 	OPTIONS="${OPTIONS} --with-readline"
 fi
 
@@ -89,7 +82,7 @@ if [ -f /proc/cpuinfo ];then
 	cpuCore=`cat /proc/cpuinfo | grep "processor" | wc -l`
 fi
 
-MEM_INFO=$(free -m|grep Mem|awk '{printf("%.f",($2)/1024)}')
+MEM_INFO=$(which free > /dev/null && free -m|grep Mem|awk '{printf("%.f",($2)/1024)}')
 if [ "${cpuCore}" != "1" ] && [ "${MEM_INFO}" != "0" ];then
     if [ "${cpuCore}" -gt "${MEM_INFO}" ];then
         cpuCore="${MEM_INFO}"
@@ -128,12 +121,11 @@ if [ ! -d $serverPath/php/${PHP_VER} ];then
 	--prefix=$serverPath/php/${PHP_VER} \
 	--exec-prefix=$serverPath/php/${PHP_VER} \
 	--with-config-file-path=$serverPath/php/56/etc \
-	--with-zlib-dir=$serverPath/lib/zlib \
 	--enable-mysqlnd \
 	--with-mysql=mysqlnd \
 	--with-pdo-mysql=mysqlnd \
 	--with-mysqli=mysqlnd \
-	--enable-zip \
+	--enable-mbstring \
 	--enable-simplexml \
 	--enable-ftp \
 	--enable-sockets \
@@ -161,7 +153,7 @@ Uninstall_php()
 {
 	$serverPath/php/init.d/php56 stop
 	rm -rf $serverPath/php/56
-	echo "卸载php-${version} ..." > $install_tmp
+	echo "卸载php-${version} ..."
 }
 
 action=${1}

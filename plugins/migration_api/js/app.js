@@ -91,8 +91,9 @@ function selectProgress(val){
 
 function initStep1(){
     var url = $('input[name="sync_url"]').val();
-    var token = $('input[name="sync_token"]').val();
-    maPost('step_one',{url:url,token:token}, function(rdata){
+    var app_id = $('input[name="sync_app_id"]').val();
+    var app_secret = $('input[name="sync_app_secret"]').val();
+    maPost('step_one',{'url':url,'app_id':app_id,'app_secret':app_secret}, function(rdata){
         var rdata = $.parseJSON(rdata.data);
         showMsg(rdata.msg,function(){
             if (rdata.status){
@@ -105,6 +106,7 @@ function initStep1(){
 function initStep2(){
     maPost('step_two',{}, function(rdata){
         var rdata = $.parseJSON(rdata.data);
+        console.log(rdata);
         showMsg(rdata.msg,function(){
             if (rdata.status){
                 selectProgress(2);
@@ -247,7 +249,7 @@ function initStep4(){
         var progress = '<div style="margin: 0 40px;">\
             <div class="line">\
                 <div style="text-align:left"><span class="action">--</span>\
-                <span style="margin-left: 20px;" class="done">当前: --</span><img src="/static/img/ing.gif"><a style="position: absolute;right: 40px;" class="btlink psync_close" onclick="migrate.close();">[取消]</a></div>\
+                <span style="margin-left: 20px;" class="done">当前: --</span><img src="/static/img/ing.gif"><a style="position: absolute;right: 40px;" class="btlink psync_close">[取消]</a></div>\
                 <div class="bt-progress" style="border-radius:0;height:20px;line-height:19px">\
                     <div class="bt-progress-bar progress_info_bar" style="border-radius: 0px; height: 20px; width: 0%;">\
                         <span class="bt-progress-text progress_info"></span></div>\
@@ -271,7 +273,8 @@ function initStep(){
     maPost('get_conf',{}, function(rdata){
         var rdata = $.parseJSON(rdata.data);
         $('input[name="sync_url"]').val(rdata.data['url']);
-        $('input[name="sync_token"]').val(rdata.data['token']);
+        $('input[name="sync_app_id"]').val(rdata.data['app_id']);
+        $('input[name="sync_app_secret"]').val(rdata.data['app_secret']);
     });
 
     $('.infoNext').click(function(){

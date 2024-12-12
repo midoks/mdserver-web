@@ -10,14 +10,12 @@ sourcePath=${serverPath}/source
 sysName=`uname`
 SYS_ARCH=`arch`
 
-install_tmp=${rootPath}/tmp/mw_install.pl
-
 version=5.4.45
 PHP_VER=54
 Install_php()
 {
 #------------------------ install start ------------------------------------#
-echo "安装php-${version} ..." > $install_tmp
+echo "安装php-${version} ..."
 mkdir -p $sourcePath/php
 mkdir -p $serverPath/php
 
@@ -61,20 +59,10 @@ fi
 
 OPTIONS='--without-iconv'
 if [ $sysName == 'Darwin' ]; then
-	
 	OPTIONS="${OPTIONS} --with-freetype-dir=${serverPath}/lib/freetype"
-
-	BREW_DIR=`which brew`
-	BREW_DIR=${BREW_DIR/\/bin\/brew/}
-	CURL_DEPEND_DIR=`brew info curl | grep ${BREW_DIR}/Cellar/curl | cut -d \  -f 1 | awk 'END {print}'`
-	OPTIONS="$OPTIONS --with-curl=${CURL_DEPEND_DIR}"
 	# OPTIONS="${OPTIONS} --with-pcre-dir=${serverPath}/lib/pcre"
 	# OPTIONS="${OPTIONS} --with-external-pcre=${serverPath}/lib/pcre"
-
 else
-	# OPTIONS="--with-iconv=${serverPath}/lib/libiconv"
-	OPTIONS="${OPTIONS} --with-curl"
-	OPTIONS="${OPTIONS} --enable-mbstring"
 	OPTIONS="${OPTIONS} --with-readline"
 fi
 
@@ -92,7 +80,7 @@ if [ -f /proc/cpuinfo ];then
 	cpuCore=`cat /proc/cpuinfo | grep "processor" | wc -l`
 fi
 
-MEM_INFO=$(free -m|grep Mem|awk '{printf("%.f",($2)/1024)}')
+MEM_INFO=$(which free > /dev/null && free -m|grep Mem|awk '{printf("%.f",($2)/1024)}')
 if [ "${cpuCore}" != "1" ] && [ "${MEM_INFO}" != "0" ];then
     if [ "${cpuCore}" -gt "${MEM_INFO}" ];then
         cpuCore="${MEM_INFO}"
@@ -124,12 +112,11 @@ if [ ! -d $serverPath/php/${PHP_VER} ];then
 	--prefix=$serverPath/php/${PHP_VER} \
 	--exec-prefix=$serverPath/php/${PHP_VER} \
 	--with-config-file-path=$serverPath/php/${PHP_VER}/etc \
-	--with-zlib-dir=$serverPath/lib/zlib \
 	--enable-mysqlnd \
 	--with-mysql=mysqlnd \
 	--with-pdo-mysql=mysqlnd \
 	--with-mysqli=mysqlnd \
-	--enable-zip \
+	--enable-mbstring \
 	--enable-sockets \
 	--enable-ftp \
 	--enable-simplexml \
@@ -182,7 +169,7 @@ Uninstall_php()
 {
 	$serverPath/php/init.d/php54 stop
 	rm -rf $serverPath/php/54
-	echo "卸载php-5.4.45 ..." > $install_tmp
+	echo "卸载php-5.4.45 ..."
 }
 
 action=${1}

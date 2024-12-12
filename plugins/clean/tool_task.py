@@ -6,8 +6,13 @@ import os
 import time
 import json
 
-sys.path.append(os.getcwd() + "/class/core")
-import mw
+web_dir = os.getcwd() + "/web"
+if os.path.exists(web_dir):
+    sys.path.append(web_dir)
+    os.chdir(web_dir)
+
+import core.mw as mw
+from utils.crontab import crontab as MwCrontab
 
 
 app_debug = False
@@ -33,10 +38,9 @@ def getTaskConf():
 
 
 def getConfigData():
-    try:
+    conf = getTaskConf()
+    if os.path.exists(conf):
         return json.loads(mw.readFile(getTaskConf()))
-    except:
-        pass
     return {
         "task_id": -1,
         "period": "day-n",
@@ -64,10 +68,8 @@ def createBgTaskByName(name):
         if res and res["id"] == args["task_id"]:
             print("计划任务已经存在!")
             return True
-    import crontab_api
-    api = crontab_api.crontab_api()
 
-    mw_dir = mw.getRunDir()
+    mw_dir = mw.getPanelDir()
     cmd = '''
 mw_dir=%s
 rname=%s
@@ -94,10 +96,10 @@ logs_file=$plugin_path/${rname}.log
         'stype': "toShell",
         'sname': '',
         'sbody': cmd,
-        'urladdress': '',
+        'url_address': '',
     }
 
-    task_id = api.add(params)
+    task_id = MwCrontab.instance().add(params)
     if task_id > 0:
         args["task_id"] = task_id
         args["name"] = name
@@ -110,9 +112,7 @@ def removeBgTask():
         res = mw.M("crontab").field("id, name").where(
             "id=?", (cfg["task_id"],)).find()
         if res and res["id"] == cfg["task_id"]:
-            import crontab_api
-            api = crontab_api.crontab_api()
-            data = api.delete(cfg["task_id"])
+            data = MwCrontab.instance().delete(cfg["task_id"])
             if data[0]:
                 cfg["task_id"] = -1
                 mw.writeFile(getTaskConf(), json.dumps(cfg))

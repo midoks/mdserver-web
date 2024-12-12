@@ -5,18 +5,16 @@ import time
 import os
 import sys
 import re
-
-
-sys.path.append(os.getcwd() + "/class/core")
-import mw
-
-
-# cmd = 'ls /usr/local/lib/ | grep python  | cut -d \\  -f 1 | awk \'END {print}\''
-# info = mw.execShell(cmd)
-# p = "/usr/local/lib/" + info[0].strip() + "/site-packages"
-# sys.path.append(p)
-
 import psutil
+
+web_dir = os.getcwd() + "/web"
+if os.path.exists(web_dir):
+    sys.path.append(web_dir)
+    os.chdir(web_dir)
+
+import core.mw as mw
+
+
 
 
 app_debug = False
@@ -105,8 +103,7 @@ def getHomeDir():
 
 def getRunUser():
     if mw.isAppleSystem():
-        user = mw.execShell(
-            "who | sed -n '2, 1p' |awk '{print $1}'")[0].strip()
+        user = mw.execShell("who | sed -n '2, 1p' |awk '{print $1}'")[0].strip()
         return user
     else:
         return 'root'
@@ -121,7 +118,7 @@ export HOME=%s && ''' % ( getRunUser(), getHomeDir())
 def contentReplace(content):
 
     service_path = mw.getServerDir()
-    content = content.replace('{$ROOT_PATH}', mw.getRootDir())
+    content = content.replace('{$ROOT_PATH}', mw.getFatherDir())
     content = content.replace('{$SERVER_PATH}', service_path)
     content = content.replace('{$RUN_USER}', getRunUser())
     content = content.replace('{$HOME_DIR}', getHomeDir())
@@ -568,8 +565,7 @@ def repoList():
     # print(list_data)
     list_data = checkRepoListIsHasScript(list_data)
 
-    data['list'] = mw.getPage({'count': count, 'p': page,
-                               'row': page_size, 'tojs': 'gogsRepoListPage'})
+    data['list'] = mw.getPage({'count': count, 'p': page, 'row': page_size, 'tojs': 'gogsRepoListPage'})
     data['page'] = page
     data['page_size'] = page_size
     data['page_count'] = int(math.ceil(count / page_size))
@@ -690,7 +686,7 @@ def projectScriptLoad():
     commit_tpl = getPluginDir() + '/hook/commit.tpl'
     commit = path + '/custom_hooks/commit'
 
-    codeDir = mw.getRootDir() + '/git'
+    codeDir = mw.getFatherDir() + '/git'
 
     cc_content = mw.readFile(commit_tpl)
 
@@ -828,8 +824,7 @@ def projectScriptSelf_Create():
     name = args['name'] + '.git'
     file = args['file']
 
-    self_path = path = getRootPath() + '/' + user + '/' + \
-        name + '/custom_hooks/self'
+    self_path = path = getRootPath() + '/' + user + '/' + name + '/custom_hooks/self'
 
     if not os.path.exists(self_path):
         os.mkdir(self_path)

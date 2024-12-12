@@ -12,7 +12,6 @@ serverPath=$(dirname "$rootPath")
 sysName=`uname`
 sysArch=`arch`
 
-install_tmp=${rootPath}/tmp/mw_install.pl
 mysqlDir=${serverPath}/source/mysql
 
 VERSION=5.5.62
@@ -60,7 +59,7 @@ VERSION_ID=`cat /etc/*-release | grep VERSION_ID | awk -F = '{print $2}' | awk -
 Install_mysql()
 {
 	mkdir -p ${mysqlDir}
-	echo '正在安装脚本文件...' > $install_tmp
+	echo '正在安装脚本文件...'
 
 	if [ "$sysName" != "Darwin" ];then
 		mkdir -p /var/log/mariadb
@@ -164,7 +163,7 @@ Install_mysql()
 Uninstall_mysql()
 {
 	rm -rf $serverPath/mysql
-	echo '卸载完成' > $install_tmp
+	echo '卸载完成'
 }
 
 action=$1

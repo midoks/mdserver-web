@@ -268,13 +268,13 @@ function modifyAuthPath() {
         btn:['提交','关闭', '随机生成'],
         shadeClose: false,
         content: '<div class="bt-form bt-form pd20">\
-                    <div class="line ">\
-                        <span class="tname">入口地址</span>\
-                        <div class="info-r">\
-                            <input name="auth_path_set" class="bt-input-text mr5" type="text" style="width: 311px" value="' + auth_path + '">\
-                        </div>\
-                    </div>\
-                </div>',
+            <div class="line ">\
+                <span class="tname">入口地址</span>\
+                <div class="info-r">\
+                    <input name="auth_path_set" class="bt-input-text mr5" type="text" style="width: 311px" value="' + auth_path + '">\
+                </div>\
+            </div>\
+        </div>',
         yes:function(index){
         	var auth_path = $("input[name='auth_path_set']").val();
 		    if (auth_path == '/' || auth_path == ''){
@@ -310,126 +310,125 @@ function modifyAuthPath() {
     });
 }
 
-function setPassword(a) {
-	if(a == 1) {
-		p1 = $("#p1").val();
-		p2 = $("#p2").val();
-		if(p1 == "" || p1.length < 8) {
-			layer.msg('面板密码不能少于8位!', {icon: 2});
-			return
-		}
-		
-		//准备弱口令匹配元素
-		var checks = ['admin888','123123123','12345678','45678910','87654321','asdfghjkl','password','qwerqwer'];
-		pchecks = 'abcdefghijklmnopqrstuvwxyz1234567890';
-		for(var i=0;i<pchecks.length;i++){
-			checks.push(pchecks[i]+pchecks[i]+pchecks[i]+pchecks[i]+pchecks[i]+pchecks[i]+pchecks[i]+pchecks[i]);
-		}
-		
-		//检查弱口令
-		cps = p1.toLowerCase();
-		var isError = "";
-		for(var i=0;i<checks.length;i++){
-			if(cps == checks[i]){
-				isError += '['+checks[i]+'] ';
-			}
-		}
-		
-		if(isError != ""){
-			layer.msg('面板密码不能为弱口令'+isError,{icon:5});
-			return;
-		}
-			
-		if(p1 != p2) {
-			layer.msg('两次输入的密码不一致', {icon: 2});
-			return;
-		}
-		$.post("/setting/set_password", "password1=" + encodeURIComponent(p1) + "&password2=" + encodeURIComponent(p2), function(b) {
-			if(b.status) {
-				layer.closeAll();
-				layer.msg(b.msg, {icon: 1});
-			} else {
-				layer.msg(b.msg, {icon: 2});
-			}
-		},'json');
-		return;
-	}
+function setPassword() {
 	layer.open({
 		type: 1,
-		area: "290px",
+		area: ["350px",'auto'],
 		title: '修改密码',
 		closeBtn: 1,
 		shift: 5,
 		shadeClose: false,
-		content: "<div class='bt-form pd20 pb70'>\
+		btn:["修改","关闭","随机"],
+		content: "<div class='bt-form'>\
 				<div class='line'>\
 					<span class='tname'>密码</span>\
-					<div class='info-r'><input class='bt-input-text' type='text' name='password1' id='p1' value='' placeholder='新的密码' style='width:100%'/></div>\
+					<div class='info-r'><input class='bt-input-text' type='text' name='password1' id='p1' value='' placeholder='新的密码' style='width:70%'/></div>\
 				</div>\
 				<div class='line'>\
 					<span class='tname'>重复</span>\
-					<div class='info-r'><input class='bt-input-text' type='text' name='password2' id='p2' value='' placeholder='再输一次' style='width:100%' /></div>\
+					<div class='info-r'><input class='bt-input-text' type='text' name='password2' id='p2' value='' placeholder='再输一次' style='width:70%' /></div>\
 				</div>\
-				<div class='bt-form-submit-btn'>\
-					<span style='float: left;' title='随机密码' class='btn btn-default btn-sm' onclick='randPwd(10)'>随机</span>\
-					<button type='button' class='btn btn-danger btn-sm' onclick=\"layer.closeAll()\">关闭</button>\
-					<button type='button' class='btn btn-success btn-sm' onclick=\"setPassword(1)\">修改</button>\
-				</div>\
-			</div>"
+			</div>",
+		yes:function(){
+			var p1 = $("#p1").val();
+			var p2 = $("#p2").val();
+			if(p1 == "" || p1.length < 8) {
+				layer.msg('面板密码不能少于8位!', {icon: 2});
+				return
+			}
+			
+			//准备弱口令匹配元素
+			var checks = ['admin888','123123123','12345678','45678910','87654321','asdfghjkl','password','qwerqwer'];
+			pchecks = 'abcdefghijklmnopqrstuvwxyz1234567890';
+			for(var i=0;i<pchecks.length;i++){
+				checks.push(pchecks[i]+pchecks[i]+pchecks[i]+pchecks[i]+pchecks[i]+pchecks[i]+pchecks[i]+pchecks[i]);
+			}
+			
+			//检查弱口令
+			cps = p1.toLowerCase();
+			var isError = "";
+			for(var i=0;i<checks.length;i++){
+				if(cps == checks[i]){
+					isError += '['+checks[i]+'] ';
+				}
+			}
+			
+			if(isError != ""){
+				layer.msg('面板密码不能为弱口令'+isError,{icon:5});
+				return;
+			}
+				
+			if(p1 != p2) {
+				layer.msg('两次输入的密码不一致', {icon: 2});
+				return;
+			}
+			$.post("/setting/set_password", "password1=" + encodeURIComponent(p1) + "&password2=" + encodeURIComponent(p2), function(b) {
+				if(b.status) {
+					layer.closeAll();
+					layer.msg(b.msg, {icon: 1});
+				} else {
+					layer.msg(b.msg, {icon: 2});
+				}
+			},'json');
+			return;
+		},
+		btn3: function(){
+			var pwd = randomStrPwd(12);
+			$("#p1").val(pwd);
+			$("#p2").val(pwd);
+			layer.msg('请在修改前记录好您的新密码!',{time:2000});
+			return false;
+		}
 	});
 }
 
-
-function randPwd(){
-	var pwd = randomStrPwd(12);
-	$("#p1").val(pwd);
-	$("#p2").val(pwd);
-	layer.msg(lan.bt.pass_rep_ps,{time:2000})
-}
-
-function setUserName(a) {
-	if(a == 1) {
-		p1 = $("#p1").val();
-		p2 = $("#p2").val();
-		if(p1 == "" || p1.length < 3) {
-			layer.msg('用户名长度不能少于3位', {icon: 2});
-			return;
-		}
-		if(p1 != p2) {
-			layer.msg('两次输入的用户名不一致', {icon: 2});
-			return;
-		}
-		$.post("/setting/set_name", "name1=" + encodeURIComponent(p1) + "&name2=" + encodeURIComponent(p2), function(b) {
-			if(b.status) {
-				layer.closeAll();
-				layer.msg(b.msg, {icon: 1});
-				$("input[name='username_']").val(p1)
-			} else {
-				layer.msg(b.msg, {icon: 2});
-			}
-		},'json');
-		return
-	}
+function setUserName() {
 	layer.open({
 		type: 1,
-		area: "290px",
+		area: ["350px",'auto'],
 		title: '修改面板用户名',
 		closeBtn: 1,
 		shift: 5,
 		shadeClose: false,
-		content: "<div class='bt-form pd20 pb70'>\
+		btn:["确定","取消","随机"],
+		content: "<div class='bt-form pd20'>\
 			<div class='line'><span class='tname'>用户名</span>\
-				<div class='info-r'><input class='bt-input-text' type='text' name='password1' id='p1' value='' placeholder='新的用户名' style='width:100%'/></div>\
+				<div class='info-r'><input class='bt-input-text' type='text' name='password1' id='p1' value='' placeholder='新的用户名' style='width:70%'/></div>\
 			</div>\
 			<div class='line'>\
 				<span class='tname'>重复</span>\
-				<div class='info-r'><input class='bt-input-text' type='text' name='password2' id='p2' value='' placeholder='再输一次' style='width:100%'/></div>\
+				<div class='info-r'><input class='bt-input-text' type='text' name='password2' id='p2' value='' placeholder='再输一次' style='width:70%'/></div>\
 			</div>\
-			<div class='bt-form-submit-btn'>\
-				<button type='button' class='btn btn-danger btn-sm' onclick=\"layer.closeAll()\">关闭</button>\
-				<button type='button' class='btn btn-success btn-sm' onclick=\"setUserName(1)\">修改</button>\
-			</div>\
-		</div>"
+		</div>",
+		yes: function(){
+			p1 = $("#p1").val();
+			p2 = $("#p2").val();
+			if(p1 == "" || p1.length < 3) {
+				layer.msg('用户名长度不能少于3位', {icon: 2});
+				return;
+			}
+			if(p1 != p2) {
+				layer.msg('两次输入的用户名不一致', {icon: 2});
+				return;
+			}
+			$.post("/setting/set_name", "name1=" + encodeURIComponent(p1) + "&name2=" + encodeURIComponent(p2), function(b) {
+				if(b.status) {
+					layer.closeAll();
+					layer.msg(b.msg, {icon: 1});
+					$("input[name='username_']").val(p1)
+				} else {
+					layer.msg(b.msg, {icon: 2});
+				}
+			},'json');
+			return
+		},
+		btn3:function(){
+			var pwd = randomStrPwd(12);
+			$("#p1").val(pwd);
+			$("#p2").val(pwd);
+			layer.msg('请在修改前记录好您的用户名!',{time:2000});
+			return false;
+		}
 	})
 }
 
@@ -540,10 +539,19 @@ function setPanelSSL(){
 	});
 }
 
-function setNotifyApi(tag, obj){
+function setNotifyTgbot(obj){
 	var enable = $(obj).prop("checked");
-	// console.log(tag,obj,enable);
-	$.post('/setting/set_notify_enable', {'tag':tag, 'enable':enable},function(rdata){
+	$.post('/setting/set_notify_tgbot_enable', {'enable':enable},function(rdata){
+		showMsg(rdata.msg, function(){
+			if (rdata.status){}
+		} ,{icon:rdata.status?1:2}, 1000);
+	},'json');
+}
+
+
+function setNotifyEmail(obj){
+	var enable = $(obj).prop("checked");
+	$.post('/setting/set_notify_email_enable', {'enable':enable},function(rdata){
 		showMsg(rdata.msg, function(){
 			if (rdata.status){}
 		} ,{icon:rdata.status?1:2}, 1000);
@@ -552,16 +560,16 @@ function setNotifyApi(tag, obj){
 
 function getTgbot(){
 	var loadT = layer.msg('正在获取TgBot信息...',{icon:16,time:0,shade: [0.3, '#000']});
-	$.post('/setting/get_notify',{},function(data){
+	$.post('/setting/get_notify_tgbot',{},function(data){
 		layer.close(loadT);
 
 		var app_token = '';
 		var chat_id = '';
 
 		if (data.status){
-			if (typeof(data['data']['tgbot']) !='undefined'){
-				app_token = data['data']['tgbot']['data']['app_token'];
-				chat_id = data['data']['tgbot']['data']['chat_id'];
+			if (data['data']['tgbot'].length != 0){
+				app_token = data['data']['tgbot']['app_token'];
+				chat_id = data['data']['tgbot']['chat_id'];
 			}
 		}
 
@@ -598,7 +606,7 @@ function getTgbot(){
 					return false;
 				}
 
-				$.post('/setting/set_notify',{'tag':'tgbot', 'data':JSON.stringify(pdata)},function(rdata){
+				$.post('/setting/set_notify_tgbot',{'tag':'tgbot', 'data':JSON.stringify(pdata)},function(rdata){
 					showMsg(rdata.msg, function(){
 						if (rdata.status){
 							layer.close(index);
@@ -622,7 +630,7 @@ function getTgbot(){
 					return false;
 				}
 
-				$.post('/setting/set_notify_test',{'tag':'tgbot', 'data':JSON.stringify(pdata)},function(rdata){
+				$.post('/setting/set_notify_tgbot_test',{'tag':'tgbot', 'data':JSON.stringify(pdata)},function(rdata){
 					showMsg(rdata.msg, function(){
 						if (rdata.status){
 							layer.close(index);
@@ -637,7 +645,7 @@ function getTgbot(){
 
 function getEmailCfg(){
 	var loadT = layer.msg('正在获取邮件配置信息...',{icon:16,time:0,shade: [0.3, '#000']});
-	$.post('/setting/get_notify',{},function(data){
+	$.post('/setting/get_notify_email',{},function(data){
 		layer.close(loadT);
 
 		var smtp_host = 'smtp.163.com';
@@ -651,14 +659,13 @@ function getEmailCfg(){
 
 		if (data.status){
 			if (typeof(data['data']['email']) !='undefined'){
-				smtp_host = data['data']['email']['data']['smtp_host'];
-				smtp_port = data['data']['email']['data']['smtp_port'];
-				username = data['data']['email']['data']['username'];
-				password = data['data']['email']['data']['password'];
-				to_mail_addr = data['data']['email']['data']['to_mail_addr'];
+				smtp_host = data['data']['email']['smtp_host'];
+				smtp_port = data['data']['email']['smtp_port'];
+				username = data['data']['email']['username'];
+				password = data['data']['email']['password'];
+				to_mail_addr = data['data']['email']['to_mail_addr'];
 
-
-				var smtp_ssl = data['data']['email']['data']['smtp_ssl'];
+				var smtp_ssl = data['data']['email']['smtp_ssl'];
 				if (smtp_ssl == 'ssl'){
 					smtp_ssl_no = '';
 					smtp_ssl_yes = 'checked';
@@ -742,13 +749,13 @@ function getEmailCfg(){
 					return false;
 				}
 
-				$.post('/config/set_notify',{'tag':'email', 'data':JSON.stringify(pdata)},function(rdata){
+				$.post('/setting/set_notify_email',{'tag':'email', 'data':JSON.stringify(pdata)},function(rdata){
 					showMsg(rdata.msg, function(){
 						if (rdata.status){
 							layer.close(index);
 						}
 					},{icon:rdata.status?1:2},2000);
-				});
+				},'json');
 			},
 
 			btn3:function(index){
@@ -791,17 +798,17 @@ function getEmailCfg(){
 					layer.msg('验证测试不能为空!', {icon:2});
 					return false;
 				}
-				$.post('/config/set_notify_test',{'tag':'email', 'data':JSON.stringify(pdata)},function(rdata){
+				$.post('/setting/set_notify_email_test',{'tag':'email', 'data':JSON.stringify(pdata)},function(rdata){
 					showMsg(rdata.msg, function(){
 						if (rdata.status){
 							layer.close(index);
 						}
 					},{icon:rdata.status?1:2},2000);
-				});
+				},'json');
 				return false;
 			}
 		});
-	});
+	},'json');
 }
 
 function getPanelSSL(){
@@ -898,7 +905,7 @@ function getPanelSSL(){
 						btn3:function(){
 							data['choose'] = 'nginx';
 							var loadT = layer.msg('正在安装并设置SSL组件,这需要几分钟时间...',{icon:16,time:0,shade: [0.3, '#000']});
-							$.post('/config/save_panel_ssl',data,function(rdata){
+							$.post('/setting/save_panel_ssl',data,function(rdata){
 								layer.close(loadT);
 								if(rdata.status){
 									layer.closeAll();
@@ -910,7 +917,7 @@ function getPanelSSL(){
 					function(index) {
 						data['choose'] = 'local';
 				    	var loadT = layer.msg('正在安装并设置SSL组件,这需要几分钟时间...',{icon:16,time:0,shade: [0.3, '#000']});
-						$.post('/config/save_panel_ssl',data,function(rdata){
+						$.post('/setting/save_panel_ssl',data,function(rdata){
 							layer.close(loadT);
 							if(rdata.status){
 								layer.closeAll();
@@ -935,7 +942,7 @@ function getPanelSSL(){
 							var data = {};
 							data['choose'] = 'nginx';
 							var loadT = layer.msg('正在删除面板SSL【nginx】...',{icon:16,time:0,shade: [0.3, '#000']});
-							$.post('/config/del_panel_ssl',data,function(rdata){
+							$.post('/setting/del_panel_ssl',data,function(rdata){
 								layer.close(loadT);
 								if(rdata.status){
 									layer.closeAll();
@@ -1236,13 +1243,13 @@ function setTempAccess(){
 	});
 }
 
-//二次验证
+//二步验证
 function setAuthBind(){
 	$.post('/setting/get_auth_secret', {}, function(rdata){
 		console.log(rdata);
 		var tip = layer.open({
 			area: ['500px', '355px'],
-			title: '二次验证设置',
+			title: '二步验证设置',
 			closeBtn:1,
 			shift: 0,
 			type: 1,
@@ -1457,11 +1464,169 @@ function showPanelApi(){
 
 function setPanelApi(){
 	var cfg_panel_api = $('#cfg_panel_api').prop("checked");
-	$.post('/setting/set_panel_token', {'op_type':"2"},function(rdata){
+	$.post('/setting/set_panel_api', {},function(rdata){
 		showMsg(rdata.msg, function(){
 			if (rdata.status){
-				showPanelApi();
+				addApp();
 			}
 		} ,{icon:rdata.status?1:2}, 1000);
 	},'json');
+}
+
+
+function deleteApp(id){
+	layer.confirm('您确定要删除吗？',{title:'删除应用',closeBtn:2,icon:13,cancel:function(){}}, function() {
+		$.post('/setting/delete_app', {'id':id},function(rdata){
+			layer.msg(rdata.msg,{icon:rdata.status?1:2});
+			if (rdata.status){
+				getAppList();
+			}
+		},'json');
+	});
+}
+
+function toggleAppstatus(id){
+	$.post('/setting/toggle_app_status', {id:id}, function(rdata){
+		showMsg(rdata.msg, function(){
+			if (rdata.status){
+				getAppList();
+			}
+		} ,{icon:rdata.status?1:2}, 2000);
+	},'json');
+}
+
+function getAppList(page) {
+
+	if (typeof(page) == 'undefined'){
+		page = 1;
+	}
+
+	$.post('/setting/get_app_list', {page:page}, function(rdata){
+		var tbody = '';
+		for (var i = 0; i < rdata.data.length; i++) {
+			var row = rdata.data[i];
+
+			tbody += '<tr>';
+
+			tbody += '<td>' + row['app_id'] +'</td>';
+			tbody += '<td>' + row['app_secret'] +'</td>';
+			tbody += '<td>' + row['white_list'] +'</td>';
+
+			if (row['status'] == 1){
+				tbody += '<td><a class="btlink" onclick="toggleAppstatus('+row['id']+');">已开启</a></td>';
+			} else {
+				tbody += '<td><a style="color:red;" onclick="toggleAppstatus('+row['id']+');">已关闭</a></td>';
+			}
+			
+			tbody += '<td>' + row['add_time'] +'</td>';
+
+			tbody += '<td>';
+			tbody += '<a class="btlink" onclick="deleteApp(\''+row['id']+'\')" style="float:right;">删除</a>';
+			tbody += '</td>';
+
+			tbody += '</tr>';
+		}
+
+		$('#app_list_body tbody').html(tbody);
+		$('#app_list_body .page').html(rdata.page);
+	},'json');
+}
+
+function addApp(){
+	layer.open({
+		area: '570px',
+		title: '添加应用',
+		shift: 0,
+		type: 1,
+		content: '<div class="bt-form pd20">\
+	<div class="line">\
+		<span class="tname">应用ID</span>\
+		<div class="info-r">\
+			<input class="bt-input-text mr5" name="app_id" type="text" style="width: 310px;" disabled>\
+			<button class="btn btn-success btn-xs app_id" style="margin-left: -50px;">重置</button>\
+		</div>\
+	</div>\
+	<div class="line">\
+		<span class="tname">应用密钥</span>\
+		<div class="info-r">\
+			<input class="bt-input-text mr5" name="app_secret" type="text" style="width: 310px;" disabled>\
+			<button class="btn btn-success btn-xs app_secret" style="margin-left: -50px;">重置</button>\
+		</div>\
+	</div>\
+	<div class="line">\
+		<span class="tname" style="width: 90px; overflow: initial; height: 20px; line-height: 20px;">IP白名单<br/>(每行1个)</span>\
+		<div class="info-r"><textarea class="bt-input-text" name="api_limit_addr" style="width: 310px; height: 80px; line-height: 20px; padding: 5px 8px;"></textarea></div>\
+	</div>\
+	<div class="line">\
+		<span class="tname"></span>\
+		<div class="info-r"><button class="btn btn-success btn-sm save_app_data">保存配置</button></div>\
+	</div>\
+	<ul class="help-info-text c7">\
+		<li>开启API后，必需在IP白名单列表中的IP才能访问面板API接口</li>\
+		<li style="color: red;">请谨慎在生产环境开启，这可能增加服务器安全风险；</li>\
+	</ul>\
+</div>',
+		success:function(obj,cur_layer){
+			$('input[name="app_id"]').val(getRandomString(10));
+			$('input[name="app_secret"]').val(getRandomString(20));
+
+			$('.app_id').click(function(){
+				$('input[name="app_id"]').val(getRandomString(10));
+			});
+
+			$('.app_secret').click(function(){
+				$('input[name="app_secret"]').val(getRandomString(20));
+			});
+
+			$('.save_app_data').click(function(){
+				var app_id = $('input[name="app_id"]').val();
+				var app_secret = $('input[name="app_secret"]').val();
+				var limit_addr = $('textarea[name="api_limit_addr"]').val();
+				$.post('/setting/add_app', {'app_id':app_id,'app_secret':app_secret,'limit_addr':limit_addr},function(rdata){
+					showMsg(rdata.msg, function(){
+						if (rdata.status){
+							getAppList();
+							layer.close(cur_layer);
+						}
+					} ,{icon:rdata.status?1:2}, 2000);
+				},'json');
+			});
+
+		}
+	});
+}
+
+function appPage(){
+	layer.open({
+		area: ['900px', '380px'],
+		title: 'APP应用管理',
+		closeBtn:1,
+		shift: 0,
+		type: 1,
+		content: "<div class='login_view_table pd20'>\
+			<button class='btn btn-success btn-sm app_add'>添加</button>\
+			<div class='divtable mt10' id='app_list_body'>\
+				<table class='table table-hover'>\
+					<thead>\
+					<tr>\
+						<th>应用ID</th>\
+						<th>应用密钥</th>\
+						<th>白名单</th>\
+						<th>状态</th>\
+						<th>添加时间</th>\
+						<th style='text-align:right;'>操作</th>\
+					</tr>\
+					</thead>\
+					<tbody></tbody>\
+				</table>\
+				<div class='page'></div>\
+			</div>\
+		</div>",
+		success:function(){
+			getAppList();
+			$('.app_add').click(function(){
+				addApp();
+			});
+		}
+	});
 }

@@ -8,7 +8,6 @@ rootPath=$(dirname "$rootPath")
 serverPath=$(dirname "$rootPath")
 sourcePath=${serverPath}/source
 sysName=`uname`
-install_tmp=${rootPath}/tmp/mw_install.pl
 SYS_ARCH=`arch`
 
 version=5.3.29
@@ -16,7 +15,7 @@ PHP_VER=53
 Install_php()
 {
 #------------------------ install start ------------------------------------#
-echo "安装php-5.3.29 ..." > $install_tmp
+echo "安装php-5.3.29 ..."
 mkdir -p $sourcePath/php
 mkdir -p $serverPath/php
 
@@ -66,13 +65,9 @@ fi
 # OPTIONS="${OPTIONS} --with-gd --enable-gd-native-ttf"
 # OPTIONS="${OPTIONS} --with-jpeg --with-jpeg-dir=/usr/lib"
 OPTIONS='--without-iconv'
+
 if [ $sysName == 'Darwin' ]; then
-	
 	OPTIONS="${OPTIONS} --with-freetype-dir=${serverPath}/lib/freetype"
-	OPTIONS="${OPTIONS} --with-curl=$(brew --prefix curl)"
-else
-	# OPTIONS=" --with-iconv=${serverPath}/lib/libiconv"
-	OPTIONS="${OPTIONS} --with-curl"
 fi
 
 IS_64BIT=`getconf LONG_BIT`
@@ -89,7 +84,7 @@ if [ -f /proc/cpuinfo ];then
 	cpuCore=`cat /proc/cpuinfo | grep "processor" | wc -l`
 fi
 
-MEM_INFO=$(free -m|grep Mem|awk '{printf("%.f",($2)/1024)}')
+MEM_INFO=$(which free > /dev/null && free -m|grep Mem|awk '{printf("%.f",($2)/1024)}')
 if [ "${cpuCore}" != "1" ] && [ "${MEM_INFO}" != "0" ];then
     if [ "${cpuCore}" -gt "${MEM_INFO}" ];then
         cpuCore="${MEM_INFO}"
@@ -114,12 +109,11 @@ if [ ! -d $serverPath/php/${PHP_VER}/bin ];then
 	--prefix=$serverPath/php/${PHP_VER} \
 	--exec-prefix=$serverPath/php/${PHP_VER} \
 	--with-config-file-path=$serverPath/php/${PHP_VER}/etc \
-	--with-zlib-dir=$serverPath/lib/zlib \
 	--enable-mysqlnd \
 	--with-mysql=mysqlnd \
 	--with-pdo-mysql=mysqlnd \
 	--with-mysqli=mysqlnd \
-	--enable-zip \
+	--enable-mbstring \
 	--enable-exif \
 	--enable-hash \
 	--enable-libxml \
@@ -167,7 +161,7 @@ Uninstall_php()
 {
 	$serverPath/php/init.d/php53 stop
 	rm -rf $serverPath/php/53
-	echo "uninstall php-5.3.29 ..." > $install_tmp
+	echo "uninstall php-5.3.29 ..."
 }
 
 action=${1}

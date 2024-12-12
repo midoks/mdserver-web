@@ -10,8 +10,12 @@ import json
 
 from datetime import datetime
 
-sys.path.append(os.getcwd() + "/class/core")
-import mw
+web_dir = os.getcwd() + "/web"
+if os.path.exists(web_dir):
+    sys.path.append(web_dir)
+    os.chdir(web_dir)
+
+import core.mw as mw
 
 app_debug = False
 if mw.isAppleSystem():
@@ -50,8 +54,8 @@ class App:
     def __release_port(self, port):
         from collections import namedtuple
         try:
-            import firewall_api
-            firewall_api.firewall_api().addAcceptPortArgs(port, 'IMail-Server', 'port')
+            from utils.firewall import Firewall as MwFirewall
+            MwFirewall.instance().addAcceptPort(port, 'IMail-Server', 'port')
             return port
         except Exception as e:
             return "Release failed {}".format(e)
@@ -100,7 +104,7 @@ class App:
     def contentReplace(self, content):
 
         service_path = mw.getServerDir()
-        content = content.replace('{$ROOT_PATH}', mw.getRootDir())
+        content = content.replace('{$ROOT_PATH}', mw.getFatherDir())
         content = content.replace('{$SERVER_PATH}', service_path)
         content = content.replace('{$RUN_USER}', self.getRunUser())
         content = content.replace('{$HOME_DIR}', self.getHomeDir())

@@ -6,8 +6,12 @@ import os
 import time
 import re
 
-sys.path.append(os.getcwd() + "/class/core")
-import mw
+web_dir = os.getcwd() + "/web"
+if os.path.exists(web_dir):
+    sys.path.append(web_dir)
+    os.chdir(web_dir)
+
+import core.mw as mw
 
 app_debug = False
 if mw.isAppleSystem():
@@ -85,7 +89,7 @@ def initDreplace():
     systemService = systemDir + '/supervisor.service'
     systemServiceTpl = getPluginDir() + '/init.d/supervisor.service'
 
-    service_path = os.path.dirname(os.getcwd())
+    service_path = mw.getServerDir()
 
     if not os.path.exists(confD):
         os.mkdir(confD)
@@ -103,7 +107,7 @@ def initDreplace():
         mw.writeFile(conf, conf_content)
 
     if os.path.exists(systemDir) and not os.path.exists(systemService):
-        activate_file = mw.getRunDir() + '/bin/activate'
+        activate_file = mw.getPanelDir() + '/bin/activate'
         if os.path.exists(activate_file):
             supervisord_bin = mw.execShell(
                 'source ' + activate_file + '&& which supervisord')[0].strip()

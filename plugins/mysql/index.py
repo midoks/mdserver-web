@@ -10,11 +10,12 @@ import re
 import json
 
 
-# reload(sys)
-# sys.setdefaultencoding('utf-8')
+web_dir = os.getcwd() + "/web"
+if os.path.exists(web_dir):
+    sys.path.append(web_dir)
+    os.chdir(web_dir)
 
-sys.path.append(os.getcwd() + "/class/core")
-import mw
+import core.mw as mw
 
 
 if mw.isAppleSystem():
@@ -138,7 +139,7 @@ def getInitdTpl(version=''):
 def contentReplace(content):
 
     service_path = mw.getServerDir()
-    content = content.replace('{$ROOT_PATH}', mw.getRootDir())
+    content = content.replace('{$ROOT_PATH}', mw.getFatherDir())
     content = content.replace('{$SERVER_PATH}', service_path)
     content = content.replace('{$SERVER_APP_PATH}', service_path + '/mysql')
 
@@ -953,7 +954,7 @@ def __createUser(dbname, username, password, address):
 
 
 def getDbBackupListFunc(dbname=''):
-    bkDir = mw.getRootDir() + '/backup/database'
+    bkDir = mw.getBackupDir() + '/database'
     blist = os.listdir(bkDir)
     r = []
 
@@ -972,7 +973,7 @@ def setDbBackup():
     if not data[0]:
         return data[1]
 
-    scDir = mw.getRunDir() + '/scripts/backup.py'
+    scDir = mw.getPanelDir() + '/scripts/backup.py'
     cmd = 'python3 ' + scDir + ' database ' + args['name'] + ' 3'
     os.system(cmd)
     return mw.returnJson(True, 'ok')
@@ -1010,7 +1011,7 @@ def importDbExternal():
     file = args['file']
     name = args['name']
 
-    import_dir = mw.getRootDir() + '/backup/import/'
+    import_dir = mw.getFatherDir() + '/backup/import/'
 
     file_path = import_dir + file
     if not os.path.exists(file_path):
@@ -1095,7 +1096,7 @@ def importDbExternalProgressBar():
     file = args['file']
     name = args['name']
 
-    import_dir = mw.getRootDir() + '/backup/import/'
+    import_dir = mw.getFatherDir() + '/backup/import/'
 
     file_path = import_dir + file
     if not os.path.exists(file_path):
@@ -1158,11 +1159,11 @@ def importDbBackup():
     file = args['file']
     name = args['name']
 
-    file_path = mw.getRootDir() + '/backup/database/' + file
-    file_path_sql = mw.getRootDir() + '/backup/database/' + file.replace('.gz', '')
+    file_path = mw.getFatherDir() + '/backup/database/' + file
+    file_path_sql = mw.getFatherDir() + '/backup/database/' + file.replace('.gz', '')
 
     if not os.path.exists(file_path_sql):
-        cmd = 'cd ' + mw.getRootDir() + '/backup/database && gzip -d ' + file
+        cmd = 'cd ' + mw.getFatherDir() + '/backup/database && gzip -d ' + file
         mw.execShell(cmd)
 
     local_mode = recognizeDbMode()
@@ -1209,11 +1210,11 @@ def importDbBackupProgressBar():
     file = args['file']
     name = args['name']
 
-    file_path = mw.getRootDir() + '/backup/database/' + file
-    file_path_sql = mw.getRootDir() + '/backup/database/' + file.replace('.gz', '')
+    file_path = mw.getFatherDir() + '/backup/database/' + file
+    file_path_sql = mw.getFatherDir() + '/backup/database/' + file.replace('.gz', '')
 
     if not os.path.exists(file_path_sql):
-        cmd = 'cd ' + mw.getRootDir() + '/backup/database && gzip -d ' + file
+        cmd = 'cd ' + mw.getFatherDir() + '/backup/database && gzip -d ' + file
         mw.execShell(cmd)
 
     local_mode = recognizeDbMode()
@@ -1240,7 +1241,7 @@ def deleteDbBackup():
 
     path = args['path']
     full_file = ""
-    bkDir = mw.getRootDir() + '/backup/database'
+    bkDir = mw.getFatherDir() + '/backup/database'
     full_file = bkDir + '/' + args['filename']
     if path != "":
         full_file = path + "/" + args['filename']
@@ -1255,7 +1256,7 @@ def getDbBackupList():
         return data[1]
 
     r = getDbBackupListFunc(args['name'])
-    bkDir = mw.getRootDir() + '/backup/database'
+    bkDir = mw.getFatherDir() + '/backup/database'
     rr = []
     for x in range(0, len(r)):
         p = bkDir + '/' + r[x]
@@ -1278,7 +1279,7 @@ def getDbBackupList():
 
 def getDbBackupImportList():
 
-    bkImportDir = mw.getRootDir() + '/backup/import'
+    bkImportDir = mw.getFatherDir() + '/backup/import'
     if not os.path.exists(bkImportDir):
         os.mkdir(bkImportDir)
 
@@ -2779,7 +2780,7 @@ def trySlaveSyncBugfix(version=''):
 
 
 def getSlaveSyncCmd(version=''):
-    root = mw.getRunDir()
+    root = mw.getPanelDir()
     cmd = 'cd ' + root + ' && python3 ' + root + \
         '/plugins/mysql/index.py do_full_sync {"db":"all","sign",""}'
     return mw.returnJson(True, 'ok', cmd)
@@ -3727,7 +3728,7 @@ def fullSync(version=''):
 
     status_file = asyncTmpfile()
     if args['begin'] == '1':
-        cmd = 'cd ' + mw.getRunDir() + ' && python3 ' + getPluginDir() + \
+        cmd = 'cd ' + mw.getPanelDir() + ' && python3 ' + getPluginDir() + \
             '/index.py do_full_sync {"db":"' + \
             args['db'] + '","sign":"' + sign + '"} &'
         # print(cmd)
@@ -3773,8 +3774,9 @@ def uninstallPreInspection(version):
     if mw.isDebugMode():
         return 'ok'
 
-    import plugins_api
-    plugins_api.plugins_api().removeIndex(getPluginName(), version)
+
+    from utils.plugin import plugin as MwPlugin
+    MwPlugin.instance().removeIndex(getPluginName(), version)
 
     return "请手动删除MySQL[{}]<br/> rm -rf {}".format(version, getServerDir())
 

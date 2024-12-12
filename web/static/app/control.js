@@ -240,6 +240,7 @@ function getBeforeDate(n){
 //cpu
 function cpu(b,e){
 	$.get('/system/get_cpu_io?start='+b+'&end='+e,function(rdata){
+		var rdata = rdata.data;
 		var myChartCpu = echarts.init(document.getElementById('cupview'));
 		var xData = [];
 		var yData = [];
@@ -311,6 +312,7 @@ function cpu(b,e){
 //内存
 function mem(b,e){
 	$.get('/system/get_cpu_io?start='+b+'&end='+e,function(rdata){
+		var rdata = rdata.data;
 		var myChartMen = echarts.init(document.getElementById('memview'));
 		var xData = [];
 		//var yData = [];
@@ -382,6 +384,7 @@ function mem(b,e){
 //磁盘io
 function disk(b,e){
 	$.get('/system/get_disk_io?start='+b+'&end='+e,function(rdata){
+		var rdata = rdata.data;
 		var myChartDisk = echarts.init(document.getElementById('diskview'));
 		var rData = [];
 		var wData = [];
@@ -469,6 +472,7 @@ function disk(b,e){
 //网络Io
 function network(b,e){
 	$.get('/system/get_network_io?start='+b+'&end='+e,function(rdata){
+		var rdata = rdata.data;
 		var myChartNetwork = echarts.init(document.getElementById('network'));
 		var aData = [];
 		var bData = [];
@@ -490,7 +494,8 @@ function network(b,e){
 		option = {
 			tooltip: {
 				trigger: 'axis',
-				axisPointer: { type: 'cross' }
+				axisPointer: { type: 'cross' },
+				formatter:"时间：{b0}<br />{a0}: {c0} Kb/s<br />{a1}: {c1} Kb/s", 
 			},
 			legend: {
 				data:[lan.index.net_up,lan.index.net_down]
@@ -503,7 +508,7 @@ function network(b,e){
 			},
 			yAxis: {
 				type: 'value',
-				name: lan.index.unit+':KB/s',
+				name: '单位:KB/s',
 				boundaryGap: [0, '100%'],
 				splitLine:{ lineStyle:{ color:"#ddd" } },
 				axisLine:{ lineStyle:{ color:"#666" } }
@@ -556,6 +561,7 @@ function network(b,e){
 //负载
 function getload_old(b,e){
 	$.get('/system/get_load_average?start='+b+'&end='+e,function(rdata){
+		var rdata = data.data;
 		var myChartgetload = echarts.init(document.getElementById('getloadview'));
 		var aData = [];
 		var bData = [];
@@ -686,6 +692,7 @@ function getload_old(b,e){
 //系统负载
 function getload(b,e){
 	$.get('/system/get_load_average?start='+b+'&end='+e,function(rdata){
+		var rdata = rdata.data;
 		var myChartgetload = echarts.init(document.getElementById('getloadview'));
 		var aData = [];
 		var bData = [];

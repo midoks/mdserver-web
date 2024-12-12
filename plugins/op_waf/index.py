@@ -12,8 +12,12 @@ import subprocess
 import json
 import re
 
-sys.path.append(os.getcwd() + "/class/core")
-import mw
+web_dir = os.getcwd() + "/web"
+if os.path.exists(web_dir):
+    sys.path.append(web_dir)
+    os.chdir(web_dir)
+
+import core.mw as mw
 
 
 app_debug = False
@@ -245,7 +249,7 @@ def contentReplace(content):
     service_path = mw.getServerDir()
     waf_root = getServerDir()
     waf_path = waf_root + "/waf"
-    content = content.replace('{$ROOT_PATH}', mw.getRootDir())
+    content = content.replace('{$ROOT_PATH}', mw.getFatherDir())
     content = content.replace('{$SERVER_PATH}', service_path)
     content = content.replace('{$WAF_PATH}', waf_path)
     content = content.replace('{$WAF_ROOT}', waf_root)

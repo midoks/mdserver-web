@@ -7,9 +7,6 @@ rootPath=$(dirname "$curPath")
 rootPath=$(dirname "$rootPath")
 serverPath=$(dirname "$rootPath")
 
-
-install_tmp=${rootPath}/tmp/mw_install.pl
-
 VERSION=$2
 
 # pip3 install ccxt
@@ -22,7 +19,7 @@ pip3 install telebot
 
 Install_App()
 {
-	echo '正在安装脚本文件...' > $install_tmp
+	echo '正在安装脚本文件...'
 	mkdir -p $serverPath/source
 	mkdir -p $serverPath/tgbot
 	echo "${VERSION}" > $serverPath/tgbot/version.pl
@@ -31,7 +28,7 @@ Install_App()
 
 	cd ${rootPath} && python3 ${rootPath}/plugins/tgbot/index.py start
 	cd ${rootPath} && python3 ${rootPath}/plugins/tgbot/index.py initd_install
-	echo '安装完成' > $install_tmp
+	echo '安装完成'
 }
 
 Uninstall_App()
@@ -48,7 +45,7 @@ Uninstall_App()
 	fi
 
 	rm -rf $serverPath/tgbot
-	echo "Uninstall_redis" > $install_tmp
+	echo "Uninstall_redis"
 }
 
 action=$1

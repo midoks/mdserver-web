@@ -13,8 +13,6 @@ serverPath=$(dirname "$rootPath")
 # cd /www/server/mdserver-web && python3 /www/server/mdserver-web/plugins/mysql-yum/index.py start 8.0
 # cd /www/server/mdserver-web && python3 /www/server/mdserver-web/plugins/mysql-yum/index.py get_master_status 8.4
 
-install_tmp=${rootPath}/tmp/mw_install.pl
-
 
 action=$1
 type=$2
@@ -30,12 +28,12 @@ fi
 
 
 if [ "${2}" == "" ];then
-	echo '缺少安装脚本...' > $install_tmp
+	echo '缺少安装脚本...'
 	exit 0
 fi 
 
 if [ ! -d $curPath/versions/$2 ];then
-	echo '缺少安装脚本2...' > $install_tmp
+	echo '缺少安装脚本2...'
 	exit 0
 fi
 

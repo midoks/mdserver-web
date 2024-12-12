@@ -8,8 +8,12 @@ import subprocess
 import re
 import json
 
-sys.path.append(os.getcwd() + "/class/core")
-import mw
+web_dir = os.getcwd() + "/web"
+if os.path.exists(web_dir):
+    sys.path.append(web_dir)
+    os.chdir(web_dir)
+
+import core.mw as mw
 
 
 if mw.isAppleSystem():
@@ -48,7 +52,7 @@ def getConf():
 def getDataDir():
     file = getConf()
     content = mw.readFile(file)
-    rep = 'datadir\s*=\s*(.*)'
+    rep = r'datadir\s*=\s*(.*)'
     tmp = re.search(rep, content)
     return tmp.groups()[0].strip()
 
@@ -56,7 +60,7 @@ def getDataDir():
 def getRelayLogName():
     file = getConf()
     content = mw.readFile(file)
-    rep = 'relay-log\s*=\s*(.*)'
+    rep = r'relay-log\s*=\s*(.*)'
     tmp = re.search(rep, content)
     return tmp.groups()[0].strip()
 
@@ -64,7 +68,7 @@ def getRelayLogName():
 def getLogBinName():
     file = getConf()
     content = mw.readFile(file)
-    rep = 'log-bin\s*=\s*(.*)'
+    rep = r'log-bin\s*=\s*(.*)'
     tmp = re.search(rep, content)
     return tmp.groups()[0].strip()
 

@@ -6,8 +6,14 @@ import os
 import time
 import json
 
-sys.path.append(os.getcwd() + "/class/core")
-import mw
+
+web_dir = os.getcwd() + "/web"
+if os.path.exists(web_dir):
+    sys.path.append(web_dir)
+    os.chdir(web_dir)
+
+import core.mw as mw
+from utils.crontab import crontab as MwCrontab
 
 
 app_debug = False
@@ -33,10 +39,9 @@ def getTaskConf():
 
 
 def getConfigData():
-    try:
+    conf = getTaskConf()
+    if os.path.exists(conf):
         return json.loads(mw.readFile(getTaskConf()))
-    except:
-        pass
     return {
         "task_id": -1,
         "task_list": ["migrate_hot_logs"],
@@ -53,16 +58,13 @@ def createBgTask():
         return True
 
     if "task_id" in cfg.keys() and cfg["task_id"] > 0:
-        res = mw.M("crontab").field("id, name").where(
-            "id=?", (cfg["task_id"],)).find()
+        res = mw.M("crontab").field("id, name").where("id=?", (cfg["task_id"],)).find()
         if res and res["id"] == cfg["task_id"]:
             print("计划任务已经存在!")
             return True
-    import crontab_api
-    api = crontab_api.crontab_api()
 
-    cmd = "cd " + mw.getRunDir() + " && nice -n 10 python3 " + \
-        getPluginDir() + "/tool_task.py execute"
+
+    cmd = "cd " + mw.getPanelDir() + " && nice -n 10 python3 " + getPluginDir() + "/tool_task.py execute"
     params = {
         'name': name,
         'type': 'day',
@@ -75,10 +77,10 @@ def createBgTask():
         'stype': "toShell",
         'sname': '',
         'sbody': cmd,
-        'urladdress': '',
+        'url_address': '',
     }
 
-    task_id = api.add(params)
+    task_id = MwCrontab.instance().add(params)
     if task_id > 0:
         cfg["task_id"] = task_id
         mw.writeFile(getTaskConf(), json.dumps(cfg))
@@ -90,11 +92,8 @@ def removeBgTask():
         res = mw.M("crontab").field("id, name").where(
             "id=?", (cfg["task_id"],)).find()
         if res and res["id"] == cfg["task_id"]:
-            import crontab_api
-            api = crontab_api.crontab_api()
-
-            data = api.delete(cfg["task_id"])
-            if data[0]:
+            data = MwCrontab.instance().delete(cfg["task_id"])
+            if data['status']:
                 # print(data[1])
                 cfg["task_id"] = -1
                 mw.writeFile(getTaskConf(), json.dumps(cfg))

@@ -631,9 +631,9 @@ function phpLibConfig(version){
             }
 
             if (libs[i]['task'] == '-1' && libs[i].phpversions.indexOf(version) != -1) {
-                opt = '<a style="color:green;" href="javascript:messageBox();">安装</a>'
+                opt = '<a style="color:green;" href="javascript:messageBox();">安装.</a>'
             } else if (libs[i]['task'] == '0' && libs[i].phpversions.indexOf(version) != -1) {
-                opt = '<a style="color:#C0C0C0;" href="javascript:messageBox();">等待安装...</a>'
+                opt = '<a style="color:#C0C0C0;" href="javascript:messageBox();">等待.</a>'
             } else if (libs[i].status) {
                 opt = '<a style="color:red;" href="javascript:uninstallPHPLib(\'' + version + '\',\'' + libs[i].name + '\',\'' + libs[i].title + '\',' + '' + ');">卸载</a>'
             } else {

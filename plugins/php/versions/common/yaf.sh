@@ -16,22 +16,13 @@ version=$2
 
 sysName=`uname`
 LIBNAME=yaf
-LIBV=3.3.5
+LIBV=3.3.6
 
-if [ "$version" -lt "70" ];then
+if [ "$version" -lt "70" ]; then
 	LIBV=2.3.5
-fi
-
-if [ "$version" -eq "70" ] || [ "$version" -eq "71" ];then
+elif [ "$version" -lt "74" ]; then
 	LIBV=3.2.5
-fi
-
-if [ "$version" -eq "72" ] || [ "$version" -eq "73" ];then
-	LIBV=3.2.5
-fi
-
-
-if [ "$version" -gt "74" ];then
+elif [ "$version" -lt "80" ]; then
 	LIBV=3.3.5
 fi
 

@@ -2,7 +2,7 @@
 PATH=/bin:/sbin:/usr/bin:/usr/sbin:/usr/local/bin:/usr/local/sbin:~/bin:/opt/homebrew/bin
 export PATH=$PATH:/opt/homebrew/bin
 
-# cd /www/server/mdserver-web/plugins/php/versions/common && bash readline.sh install 54
+# cd /www/server/mdserver-web/plugins/php/versions/common && bash readline.sh install 81
 
 curPath=`pwd`
 
@@ -21,7 +21,10 @@ version=$2
 LIBNAME=readline
 LIBV=0
 
-
+if [ "$version" -lt "74" ];then
+	echo "not need"
+	exit 0
+fi
 
 LIB_PATH_NAME=lib/php
 if [ -d $serverPath/php/${version}/lib64 ];then
@@ -47,8 +50,6 @@ Install_lib()
 		return
 	fi
 	
-	cd ${rootPath}/plugins/php/lib && /bin/bash libedit.sh
-	
 	if [ ! -f "$extFile" ];then
 
 		if [ ! -d $sourcePath/php${version}/ext ];then
@@ -56,18 +57,23 @@ Install_lib()
 		fi
 
 		cd $sourcePath/php${version}/ext/${LIBNAME}
-		
+		if [ ! -f "config.m4" ];then
+			mv config0.m4 config.m4
+		fi
+
 		OPTIONS=""
 		if [ "${SYS_ARCH}" == "aarch64" ] && [ "$version" -lt "56" ];then
 			OPTIONS="$OPTIONS --build=aarch64-unknown-linux-gnu --host=aarch64-unknown-linux-gnu"
 		fi
 
-		OPTIONS="$OPTIONS  --with-libedit=${serverPath}/lib/libedit"
+		cd ${rootPath}/plugins/php/lib && /bin/bash libedit.sh
+		export PKG_CONFIG_PATH=$PKG_CONFIG_PATH:${serverPath}/lib/libedit/lib/pkgconfig
+		OPTIONS="$OPTIONS --with-libedit=${serverPath}/lib/libedit"
 
+		cd $sourcePath/php${version}/ext/${LIBNAME}
 		$serverPath/php/$version/bin/phpize
 		./configure --with-php-config=$serverPath/php/$version/bin/php-config $OPTIONS
 		make clean && make && make install && make clean
-		
 	fi
 
 	if [ ! -f "$extFile" ];then

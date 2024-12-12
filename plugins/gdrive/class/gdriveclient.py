@@ -9,8 +9,12 @@ import json
 import io
 
 
-sys.path.append(os.getcwd() + "/class/core")
-import mw
+web_dir = os.getcwd() + "/web"
+if os.path.exists(web_dir):
+    sys.path.append(web_dir)
+    os.chdir(web_dir)
+
+import core.mw as mw
 
 # -----------------------------
 import google.oauth2.credentials
@@ -211,7 +215,7 @@ class gdriveclient():
             print("data_type 类型错误!!!")
             exit(1)
 
-        file_regx = prefix_dict.get(data_type) + "_(.+)_20\d+_\d+\."
+        file_regx = prefix_dict.get(data_type) + r"_(.+)_20\d+_\d+\."
         sub_search = re.search(file_regx.lower(), file_name)
         sub_path_name = ""
         if sub_search:

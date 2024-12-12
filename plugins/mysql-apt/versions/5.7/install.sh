@@ -17,7 +17,6 @@ rootPath=$(dirname "$rootPath")
 serverPath=$(dirname "$rootPath")
 sysName=`uname`
 
-install_tmp=${rootPath}/tmp/mw_install.pl
 myDir=${serverPath}/source/mysql-apt
 
 bash ${rootPath}/scripts/getos.sh
@@ -46,7 +45,7 @@ else
 fi
 
 if [ "$ARCH" != "amd64" ];then
-	echo "暂时不支持该${ARCH}" > $install_tmp
+	echo "暂时不支持该${ARCH}"
 	exit 0
 fi
 
@@ -95,7 +94,7 @@ rm -rf $myDir
 
 Install_mysql()
 {
-	echo '正在安装脚本文件...' > $install_tmp
+	echo '正在安装脚本文件...'
 
 	isApt=`which apt`
 	if [ "$isApt" != "" ];then
@@ -105,9 +104,9 @@ Install_mysql()
 	if [ "$?" == "0" ];then
 		mkdir -p $serverPath/mysql-apt
 		echo '5.7' > $serverPath/mysql-apt/version.pl
-		echo '安装完成' > $install_tmp
+		echo '安装完成'
 	else
-		echo "暂时不支持该系统" > $install_tmp
+		echo "暂时不支持该系统"
 	fi
 }
 
@@ -120,7 +119,7 @@ Uninstall_mysql()
 	fi
 
 	rm -rf $serverPath/mysql-apt
-	echo '卸载完成' > $install_tmp
+	echo '卸载完成'
 }
 
 action=$1

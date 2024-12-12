@@ -28,13 +28,13 @@ WORKING='[\033[34m*\033[0m]'
 PATH=/usr/local/bin:/bin:/sbin:/usr/bin:/usr/sbin:/usr/local/bin:/usr/local/sbin:~/bin
 export LANG=en_US.UTF-8
 
-mw_path={$SERVER_PATH}
-ROOT_PATH=$(dirname "$mw_path")
-PATH=$PATH:$mw_path/bin
+PANEL_DIR={$SERVER_PATH}
+ROOT_PATH=$(dirname "$PANEL_DIR")
+PATH=$PATH:${PANEL_DIR}/bin
 
 
-if [ -f $mw_path/bin/activate ];then
-    source $mw_path/bin/activate
+if [ -f ${PANEL_DIR}/bin/activate ];then
+    source ${PANEL_DIR}/bin/activate
     if [ "$?" != "0" ];then
         echo "load local python env fail!"
     fi
@@ -45,8 +45,8 @@ mw_start_panel()
     isStart=`ps -ef|grep 'gunicorn -c setting.py app:app' |grep -v grep|awk '{print $2}'`
     if [ "$isStart" == '' ];then
         echo -e "starting mw-panel... \c"
-        cd $mw_path &&  gunicorn -c setting.py app:app
-        port=$(cat ${mw_path}/data/port.pl)
+        cd ${PANEL_DIR}/web &&  gunicorn -c setting.py app:app
+        port=$(cat ${PANEL_DIR}/data/port.pl)
         isStart=""
         while [[ "$isStart" == "" ]];
         do
@@ -61,7 +61,7 @@ mw_start_panel()
         if [ "$isStart" == '' ];then
             echo -e "\033[31mfailed\033[0m"
             echo '------------------------------------------------------'
-            tail -n 20 ${mw_path}/logs/error.log
+            tail -n 20 ${PANEL_DIR}/logs/panel_error.log
             echo '------------------------------------------------------'
             echo -e "\033[31mError: mw-panel service startup failed.\033[0m"
             return;
@@ -75,16 +75,16 @@ mw_start_panel()
 
 mw_start_task()
 {
-    isStart=$(ps aux |grep 'task.py'|grep -v grep|awk '{print $2}')
+    isStart=$(ps aux |grep 'panel_task.py'|grep -v grep|awk '{print $2}')
     if [ "$isStart" == '' ];then
         echo -e "starting mw-tasks... \c"
-        cd $mw_path && python3 task.py >> ${mw_path}/logs/task.log 2>&1 &
+        cd ${PANEL_DIR} && python3 panel_task.py >> ${PANEL_DIR}/logs/panel_task.log 2>&1 &
         sleep 0.3
-        isStart=$(ps aux |grep 'task.py'|grep -v grep|awk '{print $2}')
+        isStart=$(ps aux |grep 'panel_task.py'|grep -v grep|awk '{print $2}')
         if [ "$isStart" == '' ];then
             echo -e "\033[31mfailed\033[0m"
             echo '------------------------------------------------------'
-            tail -n 20 $mw_path/logs/task.log
+            tail -n 20 ${PANEL_DIR}/logs/panel_task.log
             echo '------------------------------------------------------'
             echo -e "\033[31mError: mw-tasks service startup failed.\033[0m"
             return;
@@ -101,20 +101,27 @@ mw_start()
 	mw_start_panel
 }
 
-# /www/server/mdserver-web/tmp/panelTask.pl && service mw restart_task
+# /www/server/mdserver-web/logs/panel_task.lock && service mw restart_task
 mw_stop_task()
 {
-    if [ -f $mw_path/tmp/panelTask.pl ];then
+    if [ -f ${PANEL_DIR}/logs/panel_task.lock ];then
         echo -e "\033[32mthe task is running and cannot be stopped\033[0m"
-        exit 0
+        return 0
     fi
 
     echo -e "stopping mw-tasks... \c";
-    pids=$(ps aux | grep 'task.py'|grep -v grep|awk '{print $2}')
+    pids=$(ps aux | grep 'panel_task.py'|grep -v grep|awk '{print $2}')
     arr=($pids)
     for p in ${arr[@]}
     do
         kill -9 $p  > /dev/null 2>&1
+    done
+
+    zzpids=$(ps -A -o stat,ppid,pid,cmd | grep -e '^[Zz]' | awk '{print $2}')
+    arr=($zzpids)
+    for p in ${arr[@]}
+    do
+        kill -9 $p > /dev/null 2>&1
     done
     echo -e "\033[32mdone\033[0m"
 }
@@ -123,17 +130,24 @@ mw_stop_panel()
 {
     echo -e "stopping mw-panel... \c";
 
-    pidfile=${mw_path}/logs/mw.pid
+    pidfile=${PANEL_DIR}/logs/mw.pid
     if [ -f $pidfile ];then
         pid=`cat $pidfile`
         kill -9 $pid > /dev/null 2>&1
         rm -f $pidfile
     fi
 
-    arr=`ps aux|grep 'gunicorn -c setting.py app:app'|grep -v grep|awk '{print $2}'`
-    for p in ${arr[@]}
+    ARR=`ps aux|grep 'gunicorn -c setting.py app:app'|grep -v grep|awk '{print $2}'`
+    for p in ${ARR[@]}
     do
         kill -9 $p > /dev/null 2>&1
+    done
+
+    PLIST=`ps -ef|grep app:app |grep -v grep|awk '{print $2}'`
+    ARR=($PLIST)
+    for i in ${ARR[@]}
+    do
+        kill -9 $i > /dev/null 2>&1
     done
     
     echo -e "\033[32mdone\033[0m"
@@ -154,7 +168,7 @@ mw_status()
         echo -e "\033[31mmw not running\033[0m"
     fi
     
-    isStart=$(ps aux |grep 'task.py'|grep -v grep|awk '{print $2}')
+    isStart=$(ps aux |grep 'panel_task.py'|grep -v grep|awk '{print $2}')
     if [ "$isStart" != '' ];then
         echo -e "\033[32mmw-task (pid $isStart) already running\033[0m"
     else
@@ -174,7 +188,7 @@ mw_reload()
         do
                 kill -9 $p
         done
-        cd $mw_path && gunicorn -c setting.py app:app
+        cd ${PANEL_DIR}/web && gunicorn -c setting.py app:app
         isStart=`ps aux|grep 'gunicorn -c setting.py app:app'|grep -v grep|awk '{print $2}'`
         if [ "$isStart" == '' ];then
             echo -e "\033[31mfailed\033[0m"
@@ -192,27 +206,25 @@ mw_reload()
 }
 
 mw_close(){
-    echo 'True' > $mw_path/data/close.pl
+    cd ${PANEL_DIR} && python3 panel_tools.py cli 14
 }
 
 mw_open()
 {
-    if [ -f $mw_path/data/close.pl ];then
-        rm -rf $mw_path/data/close.pl
-    fi
+    cd ${PANEL_DIR} && python3 panel_tools.py cli 15
 }
 
 mw_unbind_domain()
 {
-    if [ -f $mw_path/data/bind_domain.pl ];then
-        rm -rf $mw_path/data/bind_domain.pl
+    if [ -f ${PANEL_DIR}/data/bind_domain.pl ];then
+        rm -rf ${PANEL_DIR}/data/bind_domain.pl
     fi
 }
 
 mw_unbind_ssl()
 {
-    if [ -f $mw_path/local ];then
-        rm -rf $mw_path/local
+    if [ -f ${PANEL_DIR}/local ];then
+        rm -rf ${PANEL_DIR}/local
     fi
 
     if [ -f $mw_path/nginx ];then
@@ -226,12 +238,12 @@ mw_unbind_ssl()
 
 error_logs()
 {
-	tail -n 100 $mw_path/logs/error.log
+	tail -n 100 ${PANEL_DIR}/logs/panel_error.log
 }
 
 mw_update()
 {
-    if [ -f $mw_path/task.py ];then
+    if [ -f ${PANEL_DIR}/task.py ];then
         echo "与后续版本差异太大,不再提供更新"
         exit 0
     fi
@@ -251,7 +263,7 @@ mw_update()
 
 mw_update_dev()
 {
-    if [ -f $mw_path/task.py ];then
+    if [ -f ${PANEL_DIR}/task.py ];then
         echo "与后续版本差异太大,不再提供更新"
         exit 0
     fi
@@ -267,14 +279,14 @@ mw_update_dev()
     else
         curl --insecure -fsSL https://code.midoks.icu/midoks/mdserver-web/raw/branch/dev/scripts/update_dev.sh | bash
     fi
-    cd /www/server/mdserver-web
+    cd ${PANEL_DIR}
 }
 
 mw_update_venv()
 {
-    rm -rf /www/server/mdserver-web/bin
-    rm -rf /www/server/mdserver-web/lib64
-    rm -rf /www/server/mdserver-web/lib
+    rm -rf ${PANEL_DIR}/bin
+    rm -rf ${PANEL_DIR}/lib64
+    rm -rf ${PANEL_DIR}/lib
 
     LOCAL_ADDR=common
     cn=$(curl -fsSL -m 10 -s http://ipinfo.io/json | grep "\"country\": \"CN\"")
@@ -287,7 +299,7 @@ mw_update_venv()
     else
         curl --insecure -fsSL https://code.midoks.icu/midoks/mdserver-web/raw/branch/dev/scripts/update_dev.sh | bash
     fi
-    cd /www/server/mdserver-web
+    cd ${PANEL_DIR}
 }
 
 mw_mirror()
@@ -303,7 +315,7 @@ mw_mirror()
     else
         bash <(curl --insecure -sSL https://gitee.com/SuperManito/LinuxMirrors/raw/main/ChangeMirrors.sh)
     fi
-    cd ${ROOT_PATH}/mdserver-web
+    cd ${ROOT_PATH}
 }
 
 mw_install_app()
@@ -338,14 +350,15 @@ mw_debug(){
     mw_force_kill
 
     port=7200    
-    if [ -f $mw_path/data/port.pl ];then
-        port=$(cat $mw_path/data/port.pl)
+    if [ -f ${PANEL_DIR}/data/port.pl ];then
+        port=$(cat ${PANEL_DIR}/data/port.pl)
     fi
 
-    if [ -d ${ROOT_PATH}/mdserver-web ];then
-        cd ${ROOT_PATH}/mdserver-web
+    if [ -d ${PANEL_DIR}/web ];then
+        cd ${PANEL_DIR}/web
     fi
-    gunicorn -b :$port -k geventwebsocket.gunicorn.workers.GeventWebSocketWorker -w 1  app:app
+    # gunicorn -b :$port -k geventwebsocket.gunicorn.workers.GeventWebSocketWorker -w 1  app:app
+    gunicorn -b :$port -k eventlet -w 1  app:app
 }
 
 
@@ -445,7 +458,7 @@ mw_connect_pgdb(){
     fi
 
 
-    pwd=$(cd ${ROOT_PATH}/mdserver-web && python3 ${ROOT_PATH}/mdserver-web/plugins/postgresql/index.py root_pwd)
+    pwd=$(cd ${PANEL_DIR} && python3 ${PANEL_DIR}/plugins/postgresql/index.py root_pwd)
     export PGPASSWORD=${pwd}
     echo "${ROOT_PATH}/postgresql/bin/psql -U postgres -W"
     ${ROOT_PATH}/postgresql/bin/psql -U postgres -W
@@ -464,7 +477,7 @@ mw_mongodb(){
 
     AUTH_STR=""
     if [[ "$MGDB_AUTH" == "enabled" ]];then
-        pwd=$(cd ${ROOT_PATH}/mdserver-web && python3 ${ROOT_PATH}/mdserver-web/plugins/mongodb/index.py root_pwd)
+        pwd=$(cd ${PANEL_DIR} && python3 ${PANEL_DIR}/plugins/mongodb/index.py root_pwd)
         AUTH_STR="-u root -p ${pwd}"
     fi
 
@@ -493,14 +506,81 @@ mw_redis(){
 }
 
 mw_venv(){
-    cd ${ROOT_PATH}/mdserver-web && source bin/activate
+    cd ${PANEL_DIR} && source bin/activate
 }
 
 mw_clean_lib(){
-    cd ${ROOT_PATH}/mdserver-web && rm -rf lib
-    cd ${ROOT_PATH}/mdserver-web && rm -rf lib64
-    cd ${ROOT_PATH}/mdserver-web && rm -rf bin
-    cd ${ROOT_PATH}/mdserver-web && rm -rf include
+    cd ${PANEL_DIR} && rm -rf lib
+    cd ${PANEL_DIR} && rm -rf lib64
+    cd ${PANEL_DIR} && rm -rf bin
+    cd ${PANEL_DIR} && rm -rf include
+}
+
+mw_default(){
+    cd ${PANEL_DIR}
+    port=7200
+    scheme=$(cd ${PANEL_DIR} && python3 ${PANEL_DIR}/panel_tools.py panel_ssl_type)
+    
+    if [ -f ${PANEL_DIR}/data/port.pl ];then
+        port=$(cat ${PANEL_DIR}/data/port.pl)
+    fi
+
+    if [ ! -f ${PANEL_DIR}/data/default.pl ];then
+        echo -e "\033[33mInstall Failed\033[0m"
+        exit 1
+    fi
+
+    password=$(cat ${PANEL_DIR}/data/default.pl)
+
+    admin_path=$(cd ${PANEL_DIR} && python3 ${PANEL_DIR}/panel_tools.py admin_path)
+    if [ "$address" == "" ];then
+        v4=$(cd ${PANEL_DIR} && python3 ${PANEL_DIR}/panel_tools.py getServerIp 4)
+        v6=$(cd ${PANEL_DIR} && python3 ${PANEL_DIR}/panel_tools.py getServerIp 6)
+
+        if [ "$v4" != "" ] && [ "$v6" != "" ]; then
+
+            if [ ! -f ${PANEL_DIR}/data/ipv6.pl ];then
+                echo 'True' > ${PANEL_DIR}/data/ipv6.pl
+                mw_stop
+                mw_start
+            fi
+
+            address="MW-PANEL-URL-IPV4: ${scheme}://$v4:$port$admin_path \nMW-PANEL-URL-IPV6: ${scheme}://[$v6]:$port$admin_path"
+        elif [ "$v4" != "" ]; then
+            address="MW-PANEL-URL: ${scheme}://$v4:$port$admin_path"
+        elif [ "$v6" != "" ]; then
+
+            if [ ! -f ${PANEL_DIR}/data/ipv6.pl ];then
+                #  Need to restart ipv6 to take effect
+                echo 'True' > ${PANEL_DIR}/data/ipv6.pl
+                mw_stop
+                mw_start
+            fi
+            address="MW-PANEL-URL: ${scheme}://[$v6]:$port$admin_path"
+        else
+            address="MW-PANEL-URL: ${scheme}://you-network-ip:$port$admin_path"
+        fi
+    else
+        address="MW-PANEL-URL: ${scheme}://$address:$port$admin_path"
+    fi
+
+    # bind domain check
+    panel_bind_domain=$(cd ${PANEL_DIR} && python3 ${PANEL_DIR}/panel_tools.py panel_bind_domain)
+    if [ "$panel_bind_domain" != "" ];then
+        address="MW-PANEL-URL: ${scheme}://$panel_bind_domain:$port$admin_path\n${address}"
+    fi
+
+    show_panel_ip="$port|"
+    echo -e "=================================================================="
+    echo -e "\033[32mMW-PANEL DEFAULT INFO!\033[0m"
+    echo -e "=================================================================="
+    echo -e "$address"
+    echo -e `cd ${PANEL_DIR} && python3 ${PANEL_DIR}/panel_tools.py username`
+    echo -e `cd ${PANEL_DIR} && python3 ${PANEL_DIR}/panel_tools.py password`
+    echo -e "\033[33mWarning:\033[0m"
+    echo -e "\033[33mIf you cannot access the panel. \033[0m"
+    echo -e "\033[33mrelease the following port (${show_panel_ip}80|443|22) in the security group.\033[0m"
+    echo -e "=================================================================="
 }
 
 case "$1" in
@@ -535,77 +615,8 @@ case "$1" in
     'mongodb') mw_mongodb;;
     'venv') mw_update_venv;;
     'clean_lib') mw_clean_lib;;
-    'default')
-        cd $mw_path
-        port=7200
-        scheme=http
-
-        if [ -f $mw_path/ssl/choose.pl ];then
-            scheme=https
-        fi
-        
-        if [ -f $mw_path/data/port.pl ];then
-            port=$(cat $mw_path/data/port.pl)
-        fi
-
-        if [ ! -f $mw_path/data/default.pl ];then
-            echo -e "\033[33mInstall Failed\033[0m"
-            exit 1
-        fi
-
-        password=$(cat $mw_path/data/default.pl)
-        if [ -f $mw_path/data/domain.conf ];then
-            address=$(cat $mw_path/data/domain.conf)
-        fi
-        if [ -f $mw_path/data/admin_path.pl ];then
-            auth_path=$(cat $mw_path/data/admin_path.pl)
-        fi
-	    
-        if [ "$address" == "" ];then
-            v4=$(python3 $mw_path/tools.py getServerIp 4)
-            v6=$(python3 $mw_path/tools.py getServerIp 6)
-
-            if [ "$v4" != "" ] && [ "$v6" != "" ]; then
-
-                if [ ! -f $mw_path/data/ipv6.pl ];then
-                    echo 'True' > $mw_path/data/ipv6.pl
-                    mw_stop
-                    mw_start
-                fi
-
-                address="MW-Panel-Url-Ipv4: ${scheme}://$v4:$port$auth_path \nMW-Panel-Url-Ipv6: ${scheme}://[$v6]:$port$auth_path"
-            elif [ "$v4" != "" ]; then
-                address="MW-Panel-Url: ${scheme}://$v4:$port$auth_path"
-            elif [ "$v6" != "" ]; then
-
-                if [ ! -f $mw_path/data/ipv6.pl ];then
-                    #  Need to restart ipv6 to take effect
-                    echo 'True' > $mw_path/data/ipv6.pl
-                    mw_stop
-                    mw_start
-                fi
-                address="MW-Panel-Url: ${scheme}://[$v6]:$port$auth_path"
-            else
-                address="MW-Panel-Url: ${scheme}://you-network-ip:$port$auth_path"
-            fi
-        else
-            address="MW-Panel-Url: ${scheme}://$address:$port$auth_path"
-        fi
-
-        show_panel_ip="$port|"
-        echo -e "=================================================================="
-        echo -e "\033[32mMW-Panel default info!\033[0m"
-        echo -e "=================================================================="
-        echo -e "$address"
-        echo -e `python3 $mw_path/tools.py username`
-        echo -e `python3 $mw_path/tools.py password`
-        # echo -e "password: $password"
-        echo -e "\033[33mWarning:\033[0m"
-        echo -e "\033[33mIf you cannot access the panel. \033[0m"
-        echo -e "\033[33mrelease the following port (${show_panel_ip}80|443|22) in the security group.\033[0m"
-        echo -e "=================================================================="
-        ;;
+    'default') mw_default;;
     *)
-        cd $mw_path && python3 $mw_path/tools.py cli $1
+        cd ${PANEL_DIR} && python3 ${PANEL_DIR}/panel_tools.py cli $1
         ;;
 esac

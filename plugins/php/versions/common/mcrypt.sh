@@ -14,7 +14,7 @@ actionType=$1
 version=$2
 
 LIBNAME=mcrypt
-LIBV=1.0.6
+LIBV=1.0.7
 
 if [ "$version" -lt "72" ];then
 	echo "not need"
@@ -23,6 +23,8 @@ fi
 
 if [ "$version" == "84" ];then
 	LIBV=1.0.7
+	echo "not need"
+	exit 1
 fi 
 
 
@@ -70,7 +72,12 @@ Install_lib()
 		fi
 
 		if [ "$sysName" == "Darwin" ];then
+
+			BREW_DIR=`which brew`
+			BREW_DIR=${BREW_DIR/\/bin\/brew/}
+			LIB_DEPEND_DIR=`brew info mcrypt | grep ${BREW_DIR}/Cellar/mcrypt | cut -d \  -f 1 | awk 'END {print}'`
 			OPTIONS="$OPTIONS --with-mcrypt=$(brew --prefix mcrypt)"
+			export PKG_CONFIG_PATH=$PKG_CONFIG_PATH:$LIB_DEPEND_DIR/lib/pkgconfig
 		fi
 
 		$serverPath/php/$version/bin/phpize

@@ -117,6 +117,7 @@ function getPercent(num, total) {
 
 function getDiskInfo() {
     $.get('/system/disk_info', function(rdata) {
+        var rdata = rdata.data;
         var dBody;
         for (var i = 0; i < rdata.length; i++) {
             var LoadColor = setcolor(parseInt(rdata[i].size[3].replace('%', '')), false, 75, 90, 95);

@@ -8,7 +8,6 @@ rootPath=$(dirname "$curPath")
 rootPath=$(dirname "$rootPath")
 serverPath=$(dirname "$rootPath")
 
-install_tmp=${rootPath}/tmp/mw_install.pl
 VERSION=$2
 
 # cd /www/server/mdserver-web/plugins/fail2ban && bash install.sh install 1.1.0
@@ -16,10 +15,11 @@ VERSION=$2
 
 Install_App()
 {
-	echo '正在安装脚本文件...' > $install_tmp
+	echo '正在安装脚本文件...'
 	mkdir -p $serverPath/source
 
-	apt install -y fail2ban
+	which yum && yum install -y fail2ban
+	which apt && apt install -y fail2ban
 
 	mkdir -p $serverPath/fail2ban
 	echo "${VERSION}" > $serverPath/fail2ban/version.pl
@@ -31,8 +31,11 @@ Install_App()
 
 Uninstall_App()
 {
-	apt remove -y fail2ban
-	apt purge -y fail2ban
+	which apt && apt remove -y fail2ban
+	which apt && apt purge -y fail2ban
+
+	which yum && yum remove -y fail2ban
+	which yum && yum purge -y fail2ban
 
 	if [ -f /usr/lib/systemd/system/fail2ban.service ];then
 		systemctl stop fail2ban

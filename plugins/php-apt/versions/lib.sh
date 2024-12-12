@@ -30,4 +30,6 @@ elif [[ "$version" == '8.2' ]]; then
 	echo '20220829'
 elif [[ "$version" == '8.3' ]]; then
 	echo '20230831'
+elif [[ "$version" == '8.4' ]]; then
+	echo '20240924'
 fi

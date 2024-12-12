@@ -8,19 +8,13 @@ rootPath=$(dirname "$rootPath")
 serverPath=$(dirname "$rootPath")
 sourcePath=${serverPath}/source
 sysName=`uname`
-install_tmp=${rootPath}/tmp/mw_install.pl
 
-function version_gt() { test "$(echo "$@" | tr " " "\n" | sort -V | head -n 1)" != "$1"; }
-function version_le() { test "$(echo "$@" | tr " " "\n" | sort -V | head -n 1)" == "$1"; }
-function version_lt() { test "$(echo "$@" | tr " " "\n" | sort -rV | head -n 1)" != "$1"; }
-function version_ge() { test "$(echo "$@" | tr " " "\n" | sort -rV | head -n 1)" == "$1"; }
-
-version=8.3.12
+version=8.3.14
 PHP_VER=83
 Install_php()
 {
 #------------------------ install start ------------------------------------#
-echo "安装php-${version} ..." > $install_tmp
+echo "安装php-${version} ..."
 mkdir -p $sourcePath/php
 mkdir -p $serverPath/php
 
@@ -56,7 +50,7 @@ if [ ! -d $sourcePath/php/php${PHP_VER} ];then
 	fi
 
 	#检测文件是否损坏.
-	md5_file_ok=f774e28633e26fc8c5197f4dae58ec9e3ff87d1b4311cbc61ab05a7ad24bd131
+	md5_file_ok=58b4cb9019bf70c0cbcdb814c7df79b9065059d14cf7dbf48d971f8e56ae9be7
 	if [ -f $sourcePath/php/php-${version}.tar.xz ];then
 		md5_file=`sha256sum $sourcePath/php/php-${version}.tar.xz  | awk '{print $1}'`
 		if [ "${md5_file}" != "${md5_file_ok}" ]; then
@@ -72,12 +66,6 @@ fi
 cd $sourcePath/php/php${PHP_VER}
 
 OPTIONS='--without-iconv'
-if [ $sysName == 'Darwin' ]; then
-	OPTIONS="${OPTIONS} --with-curl"
-else
-	OPTIONS="${OPTIONS} --with-curl"
-	OPTIONS="${OPTIONS} --with-readline"
-fi
 
 argon_version=`pkg-config libargon2 --modversion`
 if [ "$?" == "0" ];then
@@ -98,7 +86,7 @@ if [ -f /proc/cpuinfo ];then
 	cpuCore=`cat /proc/cpuinfo | grep "processor" | wc -l`
 fi
 
-MEM_INFO=$(free -m|grep Mem|awk '{printf("%.f",($2)/1024)}')
+MEM_INFO=$(which free > /dev/null && free -m|grep Mem|awk '{printf("%.f",($2)/1024)}')
 if [ "${cpuCore}" != "1" ] && [ "${MEM_INFO}" != "0" ];then
     if [ "${cpuCore}" -gt "${MEM_INFO}" ];then
         cpuCore="${MEM_INFO}"
@@ -114,20 +102,10 @@ else
 fi
 # ----- cpu end ------
 
-ZIP_OPTION='--with-zip'
-libzip_version=`pkg-config libzip --modversion`
-if version_lt "$libzip_version" "0.11.0" ;then
-	cd ${rootPath}/plugins/php/lib && /bin/bash libzip.sh
-	export PKG_CONFIG_PATH=$serverPath/lib/libzip/lib/pkgconfig
-	ZIP_OPTION="--with-zip=$serverPath/lib/libzip"
-fi
-
-
 echo "$sourcePath/php/php${PHP_VER}"
 
 if [ ! -d $serverPath/php/${PHP_VER} ];then
 	cd $sourcePath/php/php${PHP_VER}
-	./buildconf --force
 	./configure \
 	--prefix=$serverPath/php/${PHP_VER} \
 	--exec-prefix=$serverPath/php/${PHP_VER} \
@@ -135,8 +113,6 @@ if [ ! -d $serverPath/php/${PHP_VER} ];then
 	--enable-mysqlnd \
 	--with-mysqli=mysqlnd \
 	--with-pdo-mysql=mysqlnd \
-	--with-zlib-dir=$serverPath/lib/zlib \
-	$ZIP_OPTION \
 	--enable-mbstring \
 	--enable-ftp \
 	--enable-sockets \
@@ -161,7 +137,7 @@ Uninstall_php()
 {
 	$serverPath/php/init.d/php${PHP_VER} stop
 	rm -rf $serverPath/php/${PHP_VER}
-	echo "卸载php-${version}..." > $install_tmp
+	echo "卸载php-${version}..."
 }
 
 action=${1}

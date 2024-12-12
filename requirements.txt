@@ -1,10 +1,10 @@
 setuptools>=33.1.1
-Werkzeug>=1.0.1,<3.0.0
+Werkzeug>=1.0.1
 wheel>=0.37.1
 gunicorn>=21.2.0
 requests>=2.27.1
 urllib3>=1.21.1
-flask>=2.0.3,<3.0.0
+flask>=2.0.3
 flask-session==0.3.2
 flask-helper==0.19
 flask-bcrypt==1.0.1
@@ -12,20 +12,21 @@ flask-caching>=1.10.1
 cache==1.0.3
 gevent>=22.10.2
 gevent-websocket==0.10.1
+eventlet>=0.24.1
 psutil==5.9.1
 chardet==3.0.4
-SQLAlchemy==2.*
-Flask-SQLAlchemy==3.1.*
-Flask-Migrate==4.*
+SQLAlchemy>=1.4.54
+Flask-SQLAlchemy>=2.5.1
+#Flask-Migrate==4.*
 #Flask-Security-Too==5.5.*; python_version >= '3.10'
 #Flask-Security-Too==5.4.*; python_version <= '3.9'
 pyOpenSSL==23.2.0
 cryptography>=40.0.2
 configparser==5.2.0
-python-engineio==4.3.2
+python-engineio>=4.3.2
 python-socketio>=4.2.0
-flask-socketio==5.2.0
-flask-sockets==0.2.1
+flask-socketio>=5.2.0
+flask-sockets>=0.2.1
 zmq==0.0.0
 paramiko>=2.8.0
 pymongo

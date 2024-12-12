@@ -15,7 +15,7 @@ actionType=$1
 version=$2
 
 LIBNAME=swoole
-LIBV=4.8.10
+LIBV=5.1.6
 
 if [ "$version" -lt "70" ];then
 	LIBV=1.10.1
@@ -26,7 +26,7 @@ elif [ "$version" == "71" ];then
 elif [ "$version" == "72" ] || [ "$version" == "73" ] || [ "$version" == "74" ];then
 	LIBV=4.8.10
 elif [ "$version" -gt "74" ];then
-	LIBV=5.1.1
+	LIBV=5.1.6
 else
 	echo 'other?'
 	exit 0

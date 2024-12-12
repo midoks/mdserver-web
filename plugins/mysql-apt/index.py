@@ -9,11 +9,12 @@ import re
 import json
 
 
-# reload(sys)
-# sys.setdefaultencoding('utf-8')
+web_dir = os.getcwd() + "/web"
+if os.path.exists(web_dir):
+    sys.path.append(web_dir)
+    os.chdir(web_dir)
 
-sys.path.append(os.getcwd() + "/class/core")
-import mw
+import core.mw as mw
 
 app_debug = False
 if mw.isAppleSystem():
@@ -134,7 +135,7 @@ def getAuthPolicy():
     
 def contentReplace(content):
     service_path = mw.getServerDir()
-    content = content.replace('{$ROOT_PATH}', mw.getRootDir())
+    content = content.replace('{$ROOT_PATH}', mw.getFatherDir())
     content = content.replace('{$SERVER_PATH}', service_path)
     content = content.replace('{$SERVER_APP_PATH}',
                               service_path + '/' + getPluginName())
@@ -837,8 +838,7 @@ def setDbBackup():
 
 
 def rootPwd():
-    return pSqliteDb('config').where(
-        'id=?', (1,)).getField('mysql_root')
+    return pSqliteDb('config').where('id=?', (1,)).getField('mysql_root')
 
 
 def importDbExternal():
@@ -931,7 +931,7 @@ def importDbExternalProgressBar():
     file = args['file']
     name = args['name']
 
-    import_dir = mw.getRootDir() + '/backup/import/'
+    import_dir = mw.getFatherDir() + '/backup/import/'
 
     file_path = import_dir + file
     if not os.path.exists(file_path):
@@ -2568,7 +2568,7 @@ def trySlaveSyncBugfix(version=''):
 
 def getSlaveSyncCmd(version=''):
 
-    root = mw.getRunDir()
+    root = mw.getPanelDir()
     cmd = 'cd ' + root + ' && python3 ' + root + \
         '/plugins/mysql/index.py do_full_sync {"db":"all","sign":""}'
     return mw.returnJson(True, 'ok', cmd)
@@ -3449,7 +3449,7 @@ def fullSync(version=''):
 
     status_file = asyncTmpfile()
     if args['begin'] == '1':
-        cmd = 'cd ' + mw.getRunDir() + ' && python3 ' + getPluginDir() + \
+        cmd = 'cd ' + mw.getPanelDir() + ' && python3 ' + getPluginDir() + \
             '/index.py do_full_sync {"db":"' + \
             args['db'] + '","sign":"' + sign + '"} &'
         # print(cmd)
@@ -3523,9 +3523,9 @@ def uninstallPreInspection(version):
     if mw.isDebugMode():
         return 'ok'
 
-    import plugins_api
-    plugins_api.plugins_api().removeIndex(getPluginName(), version)
-
+    from utils.plugin import plugin as MwPlugin
+    MwPlugin.instance().removeIndex(getPluginName(), version)
+    
     return "请手动删除MySQL[{}]<br/> rm -rf {}".format(version, getServerDir())
 
 if __name__ == "__main__":

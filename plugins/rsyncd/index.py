@@ -7,8 +7,13 @@ import json
 import re
 import sys
 
-sys.path.append(os.getcwd() + "/class/core")
-import mw
+web_dir = os.getcwd() + "/web"
+if os.path.exists(web_dir):
+    sys.path.append(web_dir)
+    os.chdir(web_dir)
+
+import core.mw as mw
+
 
 app_debug = False
 if mw.isAppleSystem():
@@ -114,9 +119,10 @@ def getLsyncdLog():
 
 
 def __release_port(port):
+    from collections import namedtuple
     try:
-        import firewall_api
-        firewall_api.firewall_api().addAcceptPortArgs(port, 'RSYNC同步', 'port')
+        from utils.firewall import Firewall as MwFirewall
+        MwFirewall.instance().addAcceptPort(port, 'RSYNC同步', 'port')
         return port
     except Exception as e:
         return "Release failed {}".format(e)
@@ -341,15 +347,15 @@ def getRecListData():
         n = i + 1
         reg = ''
         if n == flist_len:
-            reg = '\\[' + flist[i] + '\\](.*)\\[?'
+            reg = r'\[' + flist[i] + r'\](.*)\[?'
         else:
-            reg = '\\[' + flist[i] + '\\](.*)\\[' + flist[n] + '\\]'
+            reg = r'\[' + flist[i] + r'\](.*)\[' + flist[n] + r'\]'
 
         t1 = re.search(reg, content, re.S)
         if t1:
             args = t1.groups()[0]
             # print('args start', args, 'args_end')
-            t2 = re.findall('\\s*(.*)\\s*\\=\\s*?(.*)?', args, re.M | re.I)
+            t2 = re.findall(r'\s*(.*)\s*\=\s*?(.*)?', args, re.M | re.I)
             for i in range(len(t2)):
                 tmp[t2[i][0].strip()] = t2[i][1].strip()
         ret_list.append(tmp)
@@ -456,13 +462,12 @@ def delRecBy(name):
                     next_name = reclist[x + 1]['name']
         reg = ''
         if is_end:
-            reg = '\\[' + name + '\\]\\s*(.*)'
+            reg = r'\[' + name + r'\]\s*(.*)'
         else:
-            reg = '\\[' + name + '\\]\\s*(.*)\\s*\\[' + next_name + '\\]'
+            reg = r'\\[' + name + r'\]\s*(.*)\s*\[' + next_name + r'\]'
 
         conre = re.search(reg,  content, re.S)
-        content = content.replace(
-            "[" + name + "]\n" + conre.groups()[0], '')
+        content = content.replace("[" + name + "]\n" + conre.groups()[0], '')
         mw.writeFile(path, content)
     except Exception as e:
         return False

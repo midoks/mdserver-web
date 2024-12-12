@@ -12,8 +12,6 @@ rootPath=$(dirname "$rootPath")
 serverPath=$(dirname "$rootPath")
 sysName=`uname`
 
-
-install_tmp=${rootPath}/tmp/mw_install.pl
 mysqlDir=${serverPath}/source/mysql
 
 _os=`uname`
@@ -60,7 +58,7 @@ VERSION=8.2.0
 Install_mysql()
 {
 	mkdir -p ${mysqlDir}
-	echo '正在安装脚本文件...' > $install_tmp
+	echo '正在安装脚本文件...'
 
 	# ----- cpu start ------
 	if [ -z "${cpuCore}" ]; then

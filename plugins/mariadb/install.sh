@@ -14,8 +14,6 @@ serverPath=$(dirname "$rootPath")
 # cd /www/server/mdserver-web && source bin/activate && python3 plugins/mariadb/index.py init_slave_status
 # cd /www/server/mdserver-web && source bin/activate && python3 plugins/mariadb/index.py install_pre_inspection
 
-install_tmp=${rootPath}/tmp/mw_install.pl
-
 
 action=$1
 type=$2

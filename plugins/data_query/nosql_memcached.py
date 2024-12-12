@@ -11,11 +11,12 @@ import re
 import json
 import pymemcache
 
-try: 
-    sys.path.append(os.getcwd() + "/class/core")
-    import mw
-except Exception as e:
-    import core.mw as mw
+web_dir = os.getcwd() + "/web"
+if os.path.exists(web_dir):
+    sys.path.append(web_dir)
+    os.chdir(web_dir)
+
+import core.mw as mw
     
 
 def singleton(cls):
@@ -68,7 +69,7 @@ class nosqlMemcached():
         if not mem_content: return False
 
         keys = ["bind", "PORT"]
-        rep = 'PORT\s*=\s*(.*)'
+        rep = r'PORT\s*=\s*(.*)'
         port_re = re.search(rep, mem_content)
         if port_re:
             result['port'] = int(port_re.groups()[0].strip())
@@ -105,7 +106,7 @@ class nosqlMemcachedCtr():
 
         item_no = []
         for i in m_items:
-            item_match = b'items:(\d*?):number'
+            item_match = rb'items:(\d*?):number'
             item_match_re = re.search(item_match, i)
             if item_match_re:
                 v = item_match_re.groups()[0].strip()

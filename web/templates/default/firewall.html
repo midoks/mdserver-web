@@ -13,14 +13,16 @@
 	color:#666;
 	margin: 0 30px;
 }
+
 .weblog span{
 	margin-right:5px;
 }
+
 .weblog a{
 	color:#20a53a;
 }
 .firewall-port-box{
-	margin-bottom:15px;
+	margin-bottom:5px;
 }
 </style>
 <div class="main-content">
@@ -66,14 +68,13 @@
 			</div>
 
 			<div class="mr20 pull-left" style="border-right: 1px solid #ccc; padding-right: 20px;">
-				<form>
-					<div class="ss-text pull-left">
-						<em>启用防火墙</em>
-						<div class='ssh-item' id="firewall_status">
-							<input class='btswitch btswitch-ios' id='firewall_status' type='checkbox'><label class='btswitch-btn sshswitch' for='firewall_status' ></label>
-						</div>
+				<div class="ss-text pull-left">
+					<em>启用防火墙</em>
+					<div class='ssh-item' id="firewall_status">
+						<input class='btswitch btswitch-ios' id='firewall_status' type='checkbox'>
+						<label class='btswitch-btn sshswitch' for='firewall_status'></label>
 					</div>
-				</form>
+				</div>
 			</div>
 
 			<div class="weblog" id='firewall_weblog'></div>
@@ -92,7 +93,7 @@
 								<option value="port">放行端口</option>
 								<option value="address">屏蔽</option>
 							</select>
-							<input type="text" class="bt-input-text mr5" style="width: 117px;" id="AcceptPort" placeholder="端口">
+							<input type="number" class="bt-input-text mr5" style="width: 117px;" id="AcceptPort" placeholder="端口">
 							<input type="text" class="bt-input-text mr5" id="Ps" placeholder="备注/说明">
 							<select class="bt-input-text c5 mr5" name="protocol" style="width:80px;">
 								<option value="tcp">tcp</option>
@@ -102,10 +103,10 @@
 							<button id="toAccept" onclick="addAcceptPort();" class="btn btn-default btn-sm va0" type="button">放行</button>
 							<span id="f-ps" class="c9" style="margin-left: 10px;">说明: 支持放行端口范围，如: 3000:3500</span>
 						</div>
-                        <div class="tablescroll">
-                            <table id="firewallBody" class="table table-hover" style="min-width: 640px;border: 0 none;"></table>
+                        <div class="tablescroll" style="border-top-width: 0px;">
+                            <table id="firewall_body" class="table table-hover" style="min-width: 640px;border: 0 none;"></table>
                         </div>
-                        <div id="firewallPage" class="dataTables_paginate paging_bootstrap page firewallBody" style="margin-bottom:0"></div>
+                        <div id="firewall_page" class="dataTables_paginate paging_bootstrap page firewall_body" style="margin-bottom:0px;"></div>
                     </div>
                 </div>
             </div>

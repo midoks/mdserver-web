@@ -10,7 +10,6 @@ rootPath=$(dirname "$curPath")
 rootPath=$(dirname "$rootPath")
 serverPath=$(dirname "$rootPath")
 
-install_tmp=${rootPath}/tmp/mw_install.pl
 VERSION=$2
 
 if [ -f ${rootPath}/bin/activate ];then
@@ -20,19 +19,19 @@ fi
 
 Install_app()
 {
-	echo '正在安装脚本文件...' > $install_tmp
+	echo '正在安装脚本文件...'
 	mkdir -p $serverPath/clean
 
 	cd ${rootPath} && python3 ${rootPath}/plugins/clean/index.py start
 	echo "${VERSION}" > $serverPath/clean/version.pl
-	echo '安装完成' > $install_tmp
+	echo '安装完成'
 }
 
 Uninstall_app()
 {
 	cd ${rootPath} && python3 ${rootPath}/plugins/clean/index.py stop
 	rm -rf $serverPath/clean
-	echo "Uninstall_clean" > $install_tmp
+	echo "Uninstall_clean"
 }
 
 action=$1

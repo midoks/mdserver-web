@@ -10,7 +10,6 @@ rootPath=$(dirname "$curPath")
 rootPath=$(dirname "$rootPath")
 serverPath=$(dirname "$rootPath")
 
-install_tmp=${rootPath}/tmp/mw_install.pl
 
 PATH=$PATH:${rootPath}/bin
 export PATH
@@ -58,13 +57,13 @@ Install_App()
             pip install -I google-api-python-client==2.39.0 google-auth-httplib2==0.1.0 google-auth-oauthlib==0.5.0 -i https://pypi.Python.org/simple
             pip install -I httplib2==0.18.1 -i https://pypi.Python.org/simple
         fi
-        echo '正在安装脚本文件...' > $install_tmp
+        echo '正在安装脚本文件...'
 
         mkdir -p $serverPath/gdrive
         echo "${VERSION}" > $serverPath/gdrive/version.pl
-        echo '安装完成' > $install_tmp
+        echo '安装完成'
     else
-        echo '服务器连接不上谷歌云！安装失败！' > $install_tmp
+        echo '服务器连接不上谷歌云！安装失败！'
         exit 1
     fi
 }
@@ -72,7 +71,7 @@ Install_App()
 Uninstall_App()
 {
 	rm -rf $serverPath/gdrive
-	echo '卸载完成' > $install_tmp
+	echo '卸载完成'
 }
 
 

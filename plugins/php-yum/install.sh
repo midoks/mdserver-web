@@ -7,8 +7,6 @@ rootPath=$(dirname "$curPath")
 rootPath=$(dirname "$rootPath")
 serverPath=$(dirname "$rootPath")
 
-install_tmp=${rootPath}/tmp/mw_install.pl
-
 if id www &> /dev/null ;then 
     echo "www uid is `id -u www`"
     echo "www shell is `grep "^www:" /etc/passwd |cut -d':' -f7 `"
@@ -101,8 +99,8 @@ if [ "${action}" == "install" ] && [ -d ${serverPath}/php-yum/${type} ];then
 	echo "install PHP-YUM[${type}] extend end"
 
 	#初始化 
-	cd ${rootPath} && python3 ${rootPath}/plugins/php-yum/index.py start ${type}
-	cd ${rootPath} && python3 ${rootPath}/plugins/php-yum/index.py initd_install ${type}
+	cd ${rootPath} && python3 plugins/php-yum/index.py start ${type}
+	cd ${rootPath} && python3 plugins/php-yum/index.py initd_install ${type}
 
 	if [ ! -f /usr/local/bin/composer ];then
 		cd /tmp

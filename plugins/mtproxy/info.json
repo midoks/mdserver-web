@@ -1,0 +1,19 @@
+{
+	"sort": 7,
+	"ps": "你的纸飞机",
+	"install_pre_inspection":true,
+	"name": "mtproxy",
+	"title": "mtproxy",
+	"shell": "install.sh",
+	"versions":["1.0"],
+	"updates":["1.0"],
+	"tip": "soft",
+	"checks": "server/mtproxy",
+	"path": "server/mtproxy",
+	"display": 1,
+	"author": "TelegramMessenger",
+	"date": "2022-07-09",
+	"home": "https://github.com/9seconds/mtg",
+	"type": 0,
+	"pid": "5"
+}

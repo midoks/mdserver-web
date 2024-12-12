@@ -6,9 +6,13 @@ import os
 import time
 import re
 
-sys.path.append(os.getcwd() + "/class/core")
-import mw
-import site_api
+web_dir = os.getcwd() + "/web"
+if os.path.exists(web_dir):
+    sys.path.append(web_dir)
+    os.chdir(web_dir)
+
+import core.mw as mw
+from utils.site import sites as MwSites
 
 app_debug = False
 if mw.isAppleSystem():
@@ -70,7 +74,7 @@ def getHomePage():
 
 def getPhpVer(expect=56):
     import json
-    v = site_api.site_api().getPhpVersion()
+    v = MwSites.instance().getPhpVersion()
     for i in range(len(v)):
         t = int(v[i]['version'])
         if (t >= expect):
@@ -93,7 +97,7 @@ def contentReplace(content):
     service_path = mw.getServerDir()
     php_ver = getCachePhpVer()
     # print php_ver
-    content = content.replace('{$ROOT_PATH}', mw.getRootDir())
+    content = content.replace('{$ROOT_PATH}', mw.getFatherDir())
     content = content.replace('{$SERVER_PATH}', service_path)
     content = content.replace('{$PHP_VER}', php_ver)
     return content
@@ -102,7 +106,7 @@ def contentReplace(content):
 def contentReplacePHP(content, version):
     service_path = mw.getServerDir()
     # print php_ver
-    content = content.replace('{$ROOT_PATH}', mw.getRootDir())
+    content = content.replace('{$ROOT_PATH}', mw.getFatherDir())
     content = content.replace('{$SERVER_PATH}', service_path)
     content = content.replace('{$PHP_VER}', version)
     return content

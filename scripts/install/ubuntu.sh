@@ -70,7 +70,7 @@ echo "SSH PORT:${SSH_PORT}"
 if [ -f /usr/sbin/ufw ];then
 	# look
 	# ufw status
-	ufw enable
+	echo 'y' | ufw enable
 
 	if [ "$SSH_PORT" != "" ];then
 		ufw allow $SSH_PORT/tcp

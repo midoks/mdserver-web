@@ -10,52 +10,62 @@
 
 import json
 
-from flask import request
-
-from admin import model
-from admin.model import db, Users
-
 import core.mw as mw
+import thisdb
 
 def init_option():
-    model.setOption('title', '后羿面板')
-    model.setOption('recycle_bin', 'open')
-    model.setOption('template', 'default')
+    thisdb.setOption('title', '夸父面板')
+    thisdb.setOption('recycle_bin', 'open')
+    thisdb.setOption('template', 'default')
+
+    # SSL邮件地址
+    thisdb.setOption('ssl_email', '')
 
     # 后台面板是否关闭
-    model.setOption('admin_close', 'no')
+    thisdb.setOption('admin_close', 'no')
 
     # 未认证状态码
-    model.setOption('unauthorized_status', '0')
+    thisdb.setOption('unauthorized_status', '0')
 
     # 调式模式,默认关闭
-    model.setOption('debug', 'close')
+    thisdb.setOption('debug', 'close')
 
     # basic auth 配置
-    model.setOption('basic_auth', json.dumps({'open':False}))
+    thisdb.setOption('basic_auth', json.dumps({'open':False}))
 
-
-
+    # 二步验证|默认关闭
+    thisdb.setOption('two_step_verification', json.dumps({'open':False}))
 
     # 开启后台任务
-    # model.setOption('run_bg_task', 'close')
+    # thisdb.setOption('run_bg_task', 'close')
 
     # 首页展示初始化
-    model.setOption('display_index', '[]')
+    thisdb.setOption('display_index', '[]')
 
     # 监控默认配置
-    model.setOption('monitor_status', 'open', type='monitor')
-    model.setOption('monitor_day', '30', type='monitor')
-    model.setOption('monitor_only_netio', 'open', type='monitor')
+    thisdb.setOption('monitor_status', 'open', type='monitor')
+    thisdb.setOption('monitor_day', '30', type='monitor')
+    thisdb.setOption('monitor_only_netio', 'open', type='monitor')
 
     # 初始化安全路径
-    model.setOption('admin_path', mw.getRandomString(8))
-    model.setOption('server_ip', '127.0.0.1')
+    thisdb.setOption('admin_path', mw.getRandomString(8))
+
+    # API是否开启|默认关闭
+    thisdb.setOption('panel_api', json.dumps({'open':False}))
+
+    # 获取服务器IP
+    ip = mw.getLocalIp()
+    thisdb.setOption('server_ip', ip)
 
     # 默认备份目录
-    model.setOption('backup_path', mw.getFatherDir()+'/backup')
+    thisdb.setOption('backup_path', mw.getFatherDir()+'/backup')
     # 默认站点目录
-    model.setOption('site_path', mw.getFatherDir()+'/wwwroot')
-    
+    thisdb.setOption('site_path', mw.getFatherDir()+'/wwwroot')
 
+
+    # 异步邮件通知
+    thisdb.setOption('notify_email', json.dumps({'open':False}), type='notify')
+    # 异步Telegram Bot 通知
+    thisdb.setOption('notify_tgbot', json.dumps({'open':False}), type='notify')
+    
     return True

@@ -9,14 +9,12 @@ import json
 import shutil
 
 
-sys.path.append(os.getcwd() + "/class/core")
-import mw
+web_dir = os.getcwd() + "/web"
+if os.path.exists(web_dir):
+    sys.path.append(web_dir)
+    os.chdir(web_dir)
 
-if mw.isAppleSystem():
-    cmd = 'ls /usr/local/lib/ | grep python  | cut -d \\  -f 1 | awk \'END {print}\''
-    info = mw.execShell(cmd)
-    p = "/usr/local/lib/" + info[0].strip() + "/site-packages"
-    sys.path.append(p)
+import core.mw as mw
 
 app_debug = False
 if mw.isAppleSystem():
@@ -87,7 +85,7 @@ def status(version):
 
 def contentReplace(content, version):
     service_path = mw.getServerDir()
-    content = content.replace('{$ROOT_PATH}', mw.getRootDir())
+    content = content.replace('{$ROOT_PATH}', mw.getFatherDir())
     content = content.replace('{$SERVER_PATH}', service_path)
     content = content.replace('{$PHP_VERSION}', version)
     content = content.replace('{$LOCAL_IP}', mw.getLocalIp())
@@ -741,7 +739,7 @@ def getPhpinfo(version):
         return 'PHP[' + version + ']未启动,不可访问!!!'
 
     sock_file = getFpmAddress(version)
-    root_dir = mw.getRootDir() + '/phpinfo'
+    root_dir = mw.getFatherDir() + '/phpinfo'
 
     mw.execShell("rm -rf " + root_dir)
     mw.execShell("mkdir -p " + root_dir)
@@ -764,16 +762,14 @@ def getLibConf(version):
         return mw.returnJson(False, '指定PHP版本不存在!')
 
     # phpini = mw.readFile(fname)
-    content = mw.execShell(
-        'cat /etc/php/' + version + '/fpm/conf.d/*' + " | grep -v '^;' |tr -s '\n'")
+    content = mw.execShell('cat /etc/php/' + version + '/fpm/conf.d/*' + " | grep -v '^;' |tr -s '\n'")
     content = content[0]
 
     libpath = getPluginDir() + '/versions/phplib.conf'
     phplib = json.loads(mw.readFile(libpath))
 
     libs = []
-    tasks = mw.M('tasks').where(
-        "status!=?", ('1',)).field('status,name').select()
+    tasks = mw.M('tasks').where("status!=?", ('1',)).field('status,name').select()
     for lib in phplib:
         lib['task'] = '1'
         for task in tasks:
@@ -784,7 +780,7 @@ def getLibConf(version):
             if tmp1[0].lower() == lib['name'].lower():
                 lib['task'] = task['status']
                 lib['phpversions'] = []
-                lib['phpversions'].append(tmp1[1])
+                lib['phpversions'].append(tmp1[1].replace('.',''))
         if content.find(lib['check']) == -1:
             lib['status'] = False
         else:
@@ -800,13 +796,10 @@ def installLib(version):
         return data[1]
 
     name = args['name']
-    execstr = "cd " + getPluginDir() + "/versions  && /bin/bash common.sh " + \
-        version + ' install ' + name
-
-    rettime = time.strftime('%Y-%m-%d %H:%M:%S')
-    insert_info = (None, '安装PHPAPT[' + name + '-' + version + ']',
-                   'execshell', '0', rettime, execstr)
-    mw.M('tasks').add('id,name,type,status,addtime,execstr', insert_info)
+    cmd = "cd " + getPluginDir() + "/versions && /bin/bash  common.sh " + version + ' install ' + name
+    install_name = '安装PHPAPT[' + name + '-' + version + ']'
+    import thisdb
+    thisdb.addTask(name=install_name,cmd=cmd)
 
     mw.triggerTask()
     return mw.returnJson(True, '已将下载任务添加到队列!')
@@ -819,8 +812,7 @@ def uninstallLib(version):
         return data[1]
 
     name = args['name']
-    execstr = "cd " + getPluginDir() + "/versions && /bin/bash common.sh " + \
-        version + ' uninstall ' + name
+    execstr = "cd " + getPluginDir() + "/versions && /bin/bash common.sh " + version + ' uninstall ' + name
 
     data = mw.execShell(execstr)
     # data[0] == '' and

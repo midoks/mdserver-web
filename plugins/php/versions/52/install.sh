@@ -8,7 +8,6 @@ rootPath=$(dirname "$rootPath")
 serverPath=$(dirname "$rootPath")
 sourcePath=${serverPath}/source
 sysName=`uname`
-install_tmp=${rootPath}/tmp/mw_install.pl
 SYS_ARCH=`arch`
 
 version=5.2.17
@@ -16,7 +15,7 @@ PHP_VER=52
 Install_php()
 {
 #------------------------ install start ------------------------------------#
-echo "安装php-${version} ..." > $install_tmp
+echo "安装php-${version} ..."
 mkdir -p $sourcePath/php
 mkdir -p $serverPath/php
 
@@ -83,17 +82,10 @@ if [ -f $serverPath/php/${PHP_VER}/bin/php ];then
 	return
 fi
 
-OPTIONS=''
+OPTIONS='--without-iconv'
 if [ $sysName == 'Darwin' ]; then
-	OPTIONS='--without-iconv'
 	OPTIONS="${OPTIONS} --with-freetype-dir=${serverPath}/lib/freetype"
-	OPTIONS="${OPTIONS} --with-curl=${serverPath}/lib/curl"
-else
-	OPTIONS='--without-iconv'
-	# OPTIONS="--with-iconv=${serverPath}/lib/libiconv"
-	OPTIONS="${OPTIONS} --with-curl"
 fi
-
 
 IS_64BIT=`getconf LONG_BIT`
 if [ "$IS_64BIT" == "64" ];then
@@ -113,8 +105,6 @@ if [ ! -d $serverPath/php/${PHP_VER} ];then
 	--prefix=$serverPath/php/${PHP_VER} \
 	--exec-prefix=$serverPath/php/${PHP_VER} \
 	--with-config-file-path=$serverPath/php/${PHP_VER}/etc \
-	--with-zlib-dir=$serverPath/lib/zlib \
-	--enable-zip \
 	--enable-xml \
 	--enable-shared \
 	--with-mysql=mysqlnd \
@@ -163,7 +153,7 @@ Uninstall_php()
 {
 	$serverPath/php/init.d/php${PHP_VER} stop
 	rm -rf $serverPath/php/${PHP_VER}
-	echo "uninstall php-${version} ..." > $install_tmp
+	echo "uninstall php-${version} ..."
 }
 
 action=${1}

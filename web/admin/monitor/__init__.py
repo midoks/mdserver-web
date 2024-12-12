@@ -13,8 +13,11 @@ from flask import Blueprint, render_template
 
 from admin.user_login_check import panel_login_required
 
-blueprint = Blueprint('monitor', __name__, url_prefix='/monitor', template_folder='../../templates/default')
+import thisdb
+
+blueprint = Blueprint('monitor', __name__, url_prefix='/monitor', template_folder='../../templates')
 @blueprint.route('/index', endpoint='index')
 @panel_login_required
 def index():
-    return render_template('monitor.html')
+    name = thisdb.getOption('template', default='default')
+    return render_template('%s/monitor.html' % name)

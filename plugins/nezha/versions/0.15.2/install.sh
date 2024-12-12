@@ -7,7 +7,6 @@ rootPath=$(dirname "$curPath")
 rootPath=$(dirname "$rootPath")
 serverPath=$(dirname "$rootPath")
 
-install_tmp=${rootPath}/tmp/mw_install.pl
 VERSION=0.15.2
 
 # bash install.sh install 0.15.2
@@ -82,7 +81,7 @@ download_file() {
 
 
 Install_dashborad(){
-	echo '正在安装哪吒监控...' > $install_tmp
+	echo '正在安装哪吒监控...'
 	mkdir -p $serverPath/source
 
 	if [ ! -f $TARGET_DIR/nezha ];then
@@ -103,7 +102,7 @@ Install_dashborad(){
 }
 
 Install_agent(){
-	echo -e "正在下载监控端" > $install_tmp
+	echo -e "正在下载监控端"
 	mkdir -p $serverPath/source
 
 	version=v0.15.1
@@ -137,7 +136,7 @@ Install_App()
 		echo "$VERSION" > $serverPath/nezha/version.pl
 		cd ${rootPath} && python3 ${rootPath}/plugins/nezha/index.py init_cfg
 	fi
-	echo 'install successful' > $install_tmp
+	echo 'install successful'
 }
 
 Uninstall_App()
@@ -147,7 +146,7 @@ Uninstall_App()
 	cd ${rootPath} && python3 ${rootPath}/plugins/nezha/index.py stop
 	cd ${rootPath} && python3 ${rootPath}/plugins/nezha/index.py stop_agent
 	rm -rf $serverPath/nezha
-	echo "install fail" > $install_tmp
+	echo "install fail"
 }
 
 action=$1

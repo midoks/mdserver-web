@@ -6,8 +6,12 @@ import os
 import time
 import shutil
 
-sys.path.append(os.getcwd() + "/class/core")
-import mw
+web_dir = os.getcwd() + "/web"
+if os.path.exists(web_dir):
+    sys.path.append(web_dir)
+    os.chdir(web_dir)
+
+import core.mw as mw
 
 app_debug = False
 if mw.isAppleSystem():
@@ -76,7 +80,7 @@ def status():
 
 def contentReplace(content):
     service_path = mw.getServerDir()
-    content = content.replace('{$ROOT_PATH}', mw.getRootDir())
+    content = content.replace('{$ROOT_PATH}', mw.getFatherDir())
     content = content.replace('{$SERVER_PATH}', service_path)
     return content
 
@@ -84,8 +88,8 @@ def contentReplace(content):
 def ftp_release_port(port):
     from collections import namedtuple
     try:
-        import firewall_api
-        firewall_api.firewall_api().addAcceptPortArgs(port, 'pure-ftpd', 'port')
+        from utils.firewall import Firewall as MwFirewall
+        MwFirewall.instance().addAcceptPort(port, 'pure-ftpd', 'port')
         return port
     except Exception as e:
         return "Release failed {}".format(e)
@@ -100,7 +104,7 @@ def openFtpPort():
 def initDreplace():
 
     file_tpl = getInitDTpl()
-    service_path = os.path.dirname(os.getcwd())
+    service_path = mw.getServerDir()
 
     initD_path = getServerDir() + '/init.d'
     if not os.path.exists(initD_path):
@@ -140,10 +144,9 @@ def initDreplace():
     systemServiceTpl = getPluginDir() + '/init.d/pureftp.service.tpl'
 
     if os.path.exists(systemDir):
-        # and not os.path.exists(systemService)
-        se_content = mw.readFile(systemServiceTpl)
-        se_content = se_content.replace('{$SERVER_PATH}', service_path)
-        mw.writeFile(systemService, se_content)
+        content = mw.readFile(systemServiceTpl)
+        content = content.replace('{$SERVER_PATH}', service_path)
+        mw.writeFile(systemService, content)
         mw.execShell('systemctl daemon-reload')
 
     return file_bin
@@ -394,10 +397,9 @@ def modFtpPort():
             return '端口范围不正确!'
         file = file = getServerDir() + '/etc/pure-ftpd.conf'
         conf = mw.readFile(file)
-        rep = u"\n#?\s*Bind\s+[0-9]+\.[0-9]+\.[0-9]+\.+[0-9]+,([0-9]+)"
+        rep = r"\n#?\s*Bind\s+[0-9]+\.[0-9]+\.[0-9]+\.+[0-9]+,([0-9]+)"
         # preg_match(rep,conf,tmp)
-        conf = re.sub(
-            rep, "\nBind                         0.0.0.0," + port, conf)
+        conf = re.sub(rep, "\nBind                         0.0.0.0," + port, conf)
         mw.writeFile(file, conf)
         restart()
         return 'ok'

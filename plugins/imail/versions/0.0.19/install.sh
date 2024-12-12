@@ -7,7 +7,6 @@ rootPath=$(dirname "$curPath")
 rootPath=$(dirname "$rootPath")
 serverPath=$(dirname "$rootPath")
 
-install_tmp=${rootPath}/tmp/mw_install.pl
 VERSION=0.0.19
 
 # bash install.sh install 0.0.19
@@ -67,7 +66,7 @@ download_file() {
 
 Install_App()
 {
-	echo '正在安装脚本文件...' > $install_tmp
+	echo '正在安装脚本文件...'
 	mkdir -p $serverPath/source
 
 	load_vars
@@ -93,7 +92,7 @@ Install_App()
 		cd ${rootPath} && python3 ${rootPath}/plugins/imail/index.py start
 		cd ${rootPath} && python3 ${rootPath}/plugins/imail/index.py initd_install
 	fi
-	echo 'install successful' > $install_tmp
+	echo 'install successful'
 }
 
 Uninstall_App()
@@ -101,7 +100,7 @@ Uninstall_App()
 	cd ${rootPath} && python3 ${rootPath}/plugins/imail/index.py initd_uninstall
 	cd ${rootPath} && python3 ${rootPath}/plugins/imail/index.py stop
 	rm -rf $serverPath/imail
-	echo "install fail" > $install_tmp
+	echo "install fail"
 }
 
 action=$1

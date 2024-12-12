@@ -8,8 +8,6 @@ rootPath=$(dirname "$rootPath")
 serverPath=$(dirname "$rootPath")
 SYSOS=`uname`
 
-install_tmp=${rootPath}/tmp/mw_install.pl
-
 VERSION=$2
 
 # cd /www/server/mdserver-web/plugins/swap && /bin/bash install.sh install 1.1
@@ -20,7 +18,7 @@ Install_swap()
 		exit 0
 	fi
 
-	echo '正在安装脚本文件...' > $install_tmp
+	echo '正在安装脚本文件...'
 	mkdir -p $serverPath/source
 	mkdir -p $serverPath/swap
 	echo "${VERSION}" > $serverPath/swap/version.pl
@@ -34,7 +32,7 @@ Install_swap()
 		swapon $serverPath/swap/swapfile
 	fi 
 
-	echo '安装完成' > $install_tmp
+	echo '安装完成'
 
 	cd ${rootPath} && python3 ${rootPath}/plugins/swap/index.py start
 	cd ${rootPath} && python3 ${rootPath}/plugins/swap/index.py initd_install
@@ -59,7 +57,7 @@ Uninstall_swap()
 
 	rm -rf $serverPath/swap
 	
-	echo "Uninstall_swap" > $install_tmp
+	echo "Uninstall_swap"
 }
 
 action=$1

@@ -12,13 +12,11 @@ sysArch=`arch`
 # cd /Users/midoks/Desktop/mwdev/server/mdserver-web/plugins/gorse && bash install.sh install 0.4.15
 # cd /www/server/mdserver-web/plugins/gorse && bash install.sh install 0.4.15
 
-
-install_tmp=${rootPath}/tmp/mw_install.pl
 VERSION=$2
 
 Install_App()
 {
-	echo '正在安装脚本文件...' > $install_tmp
+	echo '正在安装脚本文件...'
 	mkdir -p $serverPath/source
 	mkdir -p $serverPath/source/gorse
 

@@ -8,14 +8,15 @@ rootPath=$(dirname "$curPath")
 rootPath=$(dirname "$rootPath")
 serverPath=$(dirname "$rootPath")
 
-install_tmp=${rootPath}/tmp/mw_install.pl
+
+# cd /www/server/mdserver-web && source bin/activate && python3 plugins/migration_api/index.py bg_process
 
 VERSION=1.0
 
 Install_App(){
 	mkdir -p $serverPath/migration_api
 	echo "${VERSION}" > $serverPath/migration_api/version.pl
-	echo '正在安装脚本文件...' > $install_tmp
+	echo '正在安装脚本文件...'
 }
 
 Uninstall_App()

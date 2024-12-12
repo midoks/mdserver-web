@@ -7,8 +7,12 @@ import time
 import json
 import re
 
-sys.path.append(os.getcwd() + "/class/core")
-import mw
+web_dir = os.getcwd() + "/web"
+if os.path.exists(web_dir):
+    sys.path.append(web_dir)
+    os.chdir(web_dir)
+
+import core.mw as mw
 
 
 app_debug = False
@@ -1394,6 +1398,10 @@ def installPreInspection():
         return "请先安装OpenResty"
     return 'ok'
 
+def uninstallPreInspection():
+    stop()
+    return 'ok'
+
 if __name__ == "__main__":
     func = sys.argv[1]
     if func == 'status':
@@ -1408,6 +1416,8 @@ if __name__ == "__main__":
         print(reload())
     elif func == 'install_pre_inspection':
         print(installPreInspection())
+    elif func == 'uninstall_pre_inspection':
+        print(uninstallPreInspection())
     elif func == 'run_info':
         print(runInfo())
     elif func == 'get_global_conf':

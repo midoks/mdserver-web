@@ -10,8 +10,13 @@ import psutil
 from datetime import datetime
 
 sys.dont_write_bytecode = True
-sys.path.append(os.getcwd() + "/class/core")
-import mw
+
+web_dir = os.getcwd() + "/web"
+if os.path.exists(web_dir):
+    sys.path.append(web_dir)
+    os.chdir(web_dir)
+
+import core.mw as mw
 
 app_debug = False
 if mw.isAppleSystem():
@@ -573,7 +578,7 @@ class App:
 
     # 转换时间格式
     def __to_date(self, date_str):
-        tmp = re.split('\s+', date_str)
+        tmp = re.split(r'\s+', date_str)
         s_date = str(datetime.now().year) + '-' + \
             self.__months.get(tmp[0]) + '-' + tmp[1] + ' ' + tmp[2]
         time_array = time.strptime(s_date, "%Y-%m-%d %H:%M:%S")

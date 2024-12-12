@@ -1,0 +1,25 @@
+<div class="bt-form">
+	<div class="bt-w-main">
+		<div class="bt-w-menu">
+			<p class="bgw" onclick="pluginService('xui');">服务</p>
+			<p onclick="pluginInitD('xui');">自启动</p>
+			<p onclick="xuiCommonFunc();">常用功能</p>
+		</div>
+		<div class="bt-w-con pd15">
+			<div class="soft-man-con"></div>
+		</div>
+	</div>
+</div>
+
+<!-- <script type="text/javascript" src="/plugins/file?name=xui&f=js/xui.js"></script> -->
+<script type="text/javascript">
+//xui  start
+
+
+var loading = layer.msg("资源加载中...", { icon: 16, time: 0, shade: 0.3 });
+$.getScript('/plugins/file?name=xui&f=js/xui.js', function(){
+	layer.close(loading);
+	pluginService('xui')
+});
+//xui end
+</script>

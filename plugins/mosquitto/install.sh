@@ -13,8 +13,6 @@ echo "use system: ${sysName}"
 # cd /Users/midoks/Desktop/mwdev/server/mdserver-web/plugins/mosquitto && bash install.sh install 2.0.18
 # cd /www/mdserver-web/plugins/mosquitto && bash install.sh install 2.0.18
 
-install_tmp=${rootPath}/tmp/mw_install.pl
-
 VERSION=$2
 
 Install_App()
@@ -27,7 +25,7 @@ Install_App()
 		useradd -g mosquitto mosquitto
 	fi
 
-	echo '正在安装脚本文件...' > $install_tmp
+	echo '正在安装脚本文件...'
 	mkdir -p $serverPath/source
 
 	if [ ! -f $serverPath/source/mosquitto-${VERSION}.tar.gz ];then
@@ -55,7 +53,7 @@ Install_App()
 	
 	if [ -d $serverPath/mosquitto ];then
 		echo "${VERSION}" > $serverPath/mosquitto/version.pl
-		echo '安装完成' > $install_tmp
+		echo '安装mosquitto完成'
 
 
 		cd ${rootPath} && python3 ${rootPath}/plugins/mosquitto/index.py start
@@ -77,7 +75,7 @@ Uninstall_App()
 	fi
 
 	rm -rf $serverPath/mosquitto
-	echo "uninstall mosquitto" > $install_tmp
+	echo "卸载mosquitto成功"
 }
 
 action=$1

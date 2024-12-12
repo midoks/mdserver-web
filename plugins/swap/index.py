@@ -5,8 +5,12 @@ import io
 import os
 import time
 
-sys.path.append(os.getcwd() + "/class/core")
-import mw
+web_dir = os.getcwd() + "/web"
+if os.path.exists(web_dir):
+    sys.path.append(web_dir)
+    os.chdir(web_dir)
+
+import core.mw as mw
 
 app_debug = False
 if mw.isAppleSystem():
@@ -75,7 +79,7 @@ def getInitDTpl():
 def initDreplace():
 
     file_tpl = getInitDTpl()
-    service_path = os.path.dirname(os.getcwd())
+    service_path = mw.getServerDir()
 
     initD_path = getServerDir() + '/init.d'
     if not os.path.exists(initD_path):
@@ -97,12 +101,11 @@ def initDreplace():
     if os.path.exists(systemDir) and not os.path.exists(systemService):
         swapon_bin = mw.execShell('which swapon')[0].strip()
         swapoff_bin = mw.execShell('which swapoff')[0].strip()
-        service_path = mw.getServerDir()
-        se_content = mw.readFile(systemServiceTpl)
-        se_content = se_content.replace('{$SERVER_PATH}', service_path)
-        se_content = se_content.replace('{$SWAPON_BIN}', swapon_bin)
-        se_content = se_content.replace('{$SWAPOFF_BIN}', swapoff_bin)
-        mw.writeFile(systemService, se_content)
+        content = mw.readFile(systemServiceTpl)
+        content = content.replace('{$SERVER_PATH}', service_path)
+        content = content.replace('{$SWAPON_BIN}', swapon_bin)
+        content = content.replace('{$SWAPOFF_BIN}', swapoff_bin)
+        mw.writeFile(systemService, content)
         mw.execShell('systemctl daemon-reload')
 
     return file_bin

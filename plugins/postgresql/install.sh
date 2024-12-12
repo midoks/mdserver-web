@@ -9,8 +9,6 @@ serverPath=$(dirname "$rootPath")
 
 # cd /www/server/mdserver-web/plugins/postgresql && bash install.sh install 16
 
-install_tmp=${rootPath}/tmp/mw_install.pl
-
 action=$1
 type=$2
 

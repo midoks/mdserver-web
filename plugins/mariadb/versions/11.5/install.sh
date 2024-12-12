@@ -11,7 +11,6 @@ rootPath=$(dirname "$rootPath")
 serverPath=$(dirname "$rootPath")
 sysName=`uname`
 
-install_tmp=${rootPath}/tmp/mw_install.pl
 mariadbDir=${serverPath}/source/mariadb
 
 MY_VER=11.5.2
@@ -19,7 +18,7 @@ MY_VER=11.5.2
 Install_app()
 {
 	mkdir -p ${mariadbDir}
-	echo '正在安装脚本文件...' > $install_tmp
+	echo '正在安装脚本文件...'
 
 	if [ "$sysName" != "Darwin" ];then
 		mkdir -p /var/log/mariadb
@@ -92,7 +91,7 @@ Install_app()
 		make -j${cpuCore} && make install && make clean
 
 		if [ -d $serverPath/mariadb ];then
-			echo '11.4' > $serverPath/mariadb/version.pl
+			echo '11.5' > $serverPath/mariadb/version.pl
 			echo '安装完成'
 		else
 			echo '安装失败'
@@ -110,7 +109,7 @@ Install_app()
 Uninstall_app()
 {
 	rm -rf $serverPath/mariadb
-	echo '卸载完成' > $install_tmp
+	echo '卸载完成'
 }
 
 action=$1

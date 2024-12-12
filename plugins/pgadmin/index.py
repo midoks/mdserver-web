@@ -7,9 +7,12 @@ import time
 import re
 import json
 
-sys.path.append(os.getcwd() + "/class/core")
-import mw
-import site_api
+web_dir = os.getcwd() + "/web"
+if os.path.exists(web_dir):
+    sys.path.append(web_dir)
+    os.chdir(web_dir)
+
+import core.mw as mw
 
 app_debug = False
 if mw.isAppleSystem():
@@ -59,7 +62,7 @@ def getConf():
 def getPort():
     file = getConf()
     content = mw.readFile(file)
-    rep = 'listen\s*(.*);'
+    rep = r'listen\s*(.*);'
     tmp = re.search(rep, content)
     return tmp.groups()[0].strip()
 
@@ -85,12 +88,12 @@ def contentReplace(content):
     cfg = getCfg()
     service_path = mw.getServerDir()
 
-    content = content.replace('{$ROOT_PATH}', mw.getRootDir())
+    content = content.replace('{$ROOT_PATH}', mw.getFatherDir())
     content = content.replace('{$SERVER_PATH}', service_path)
     content = content.replace('{$APP_PATH}', service_path+'/'+getPluginName()+'/data')
 
     port = cfg["port"]
-    rep = 'listen\s*(.*);'
+    rep = r'listen\s*(.*);'
     content = re.sub(rep, "listen " + port + ';', content)
     return content
 
@@ -133,8 +136,8 @@ def returnCfg():
 def __release_port(port):
     from collections import namedtuple
     try:
-        import firewall_api
-        firewall_api.firewall_api().addAcceptPortArgs(port, 'pgAdmin默认端口', 'port')
+        from utils.firewall import Firewall as MwFirewall
+        MwFirewall.instance().addAcceptPort(port, 'pgAdmin默认端口', 'port')
         return port
     except Exception as e:
         return "Release failed {}".format(e)
@@ -143,8 +146,8 @@ def __release_port(port):
 def __delete_port(port):
     from collections import namedtuple
     try:
-        import firewall_api
-        firewall_api.firewall_api().delAcceptPortArgs(port, 'tcp')
+        from utils.firewall import Firewall as MwFirewall
+        MwFirewall.instance().delAcceptPort(port, 'tcp')
         return port
     except Exception as e:
         return "Release failed {}".format(e)
@@ -181,8 +184,9 @@ def getPythonName():
     return data[0].strip();
 
 def initPgConfFile():
+    pyname = getPythonName()
     file_tpl = getPluginDir() + '/conf/config_local.py'
-    dst_file = getServerDir()+'/run/lib/python3.10/site-packages/pgadmin4/config_local.py'
+    dst_file = getServerDir()+'/run/lib/'+pyname+'/site-packages/pgadmin4/config_local.py'
     if not os.path.exists(dst_file):
         service_path = mw.getServerDir()
         content = mw.readFile(file_tpl)

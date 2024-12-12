@@ -64,5 +64,5 @@ jobs:
         cd /www/server/mdserver-web/plugins/php && sudo bash install.sh install 81
     - name: Start DEBUG
       run: |
-        gunicorn -c setting.py app:app
-        python3 task.py &
+        source /www/server/mdserver-web/bin/activate && cd web && gunicorn -c setting.py app:app
+        cd /www/server/mdserver-web && python3 panel_task.py &

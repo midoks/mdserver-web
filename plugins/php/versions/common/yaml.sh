@@ -16,7 +16,7 @@ version=$2
 
 sysName=`uname`
 LIBNAME=yaml
-LIBV=2.2.3
+LIBV=2.2.4
 
 LIB_PATH_NAME=lib/php
 if [ -d $serverPath/php/${version}/lib64 ];then

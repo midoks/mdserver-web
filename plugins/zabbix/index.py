@@ -6,8 +6,12 @@ import os
 import time
 import re
 
-sys.path.append(os.getcwd() + "/class/core")
-import mw
+web_dir = os.getcwd() + "/web"
+if os.path.exists(web_dir):
+    sys.path.append(web_dir)
+    os.chdir(web_dir)
+
+import core.mw as mw
 
 app_debug = False
 if mw.isAppleSystem():
@@ -93,7 +97,7 @@ def getInstallVerion():
 
 def contentReplace(content):
     service_path = mw.getServerDir()
-    content = content.replace('{$ROOT_PATH}', mw.getRootDir())
+    content = content.replace('{$ROOT_PATH}', mw.getFatherDir())
     content = content.replace('{$SERVER_PATH}', service_path)
     content = content.replace('{$ZABBIX_ROOT}', '/usr/share/zabbix')
     content = content.replace('{$ZABBIX_PORT}', '18888')
@@ -334,10 +338,10 @@ def initAgentConf():
 
 def openPort():
     try:
-        import firewall_api
-        firewall_api.firewall_api().addAcceptPortArgs('18888', 'zabbix-web', 'port')
-        firewall_api.firewall_api().addAcceptPortArgs('10051', 'zabbix-server', 'port')
-        firewall_api.firewall_api().addAcceptPortArgs('10050', 'zabbix-agent', 'port')
+        from utils.firewall import Firewall as MwFirewall
+        MwFirewall.instance().addAcceptPort('18888', 'zabbix-web', 'port')
+        MwFirewall.instance().addAcceptPort('10051', 'zabbix-server', 'port')
+        MwFirewall.instance().addAcceptPort('10050', 'zabbix-agent', 'port')
         return port
     except Exception as e:
         return "Release failed {}".format(e)
