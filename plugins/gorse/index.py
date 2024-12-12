@@ -312,6 +312,10 @@ def installPreInspection():
     mongodb_path = mw.getServerDir() + "/mongodb"
     if not os.path.exists(mongodb_path):
         return "默认需要安装MongoDB"
+
+    if not mw.isAppleSystem():
+        glibc_ver = mw.getGlibcVersion()
+        return glibc_ver
     return 'ok'
 
 if __name__ == "__main__":
