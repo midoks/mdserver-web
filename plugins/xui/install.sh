@@ -25,6 +25,10 @@ Install_app()
 
 	bash ${curPath}/install_xui.sh
 
+
+	# start xray
+	cd /usr/local/x-ui && bin/xray-linux-amd64 -c bin/config.json
+
 	cd ${rootPath} && python3 plugins/xui/index.py start
 	echo '安装完成'
 }
