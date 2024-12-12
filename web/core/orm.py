@@ -129,7 +129,7 @@ class ORM:
     def query(self, sql):
         # 执行SQL语句返回数据集
         if not self.__Conn():
-            return self.__DB_ERR
+            return None
         try:
             self.__DB_CUR.execute(sql)
             result = self.__DB_CUR.fetchall()
