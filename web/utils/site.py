@@ -209,6 +209,8 @@ class sites(object):
             self.addDomain(site_id, self.siteName, domain)
 
         mw.restartWeb()
+
+        self.runHook('site_cb', 'add')
         return mw.returnData(True, '添加成功')
 
     def stop(self, site_id):
@@ -418,6 +420,8 @@ class sites(object):
 
         thisdb.deleteBindingBySiteId(site_id)
         mw.restartWeb()
+
+        self.runHook('site_cb', 'delete')
         return mw.returnData(True, '站点【%s】删除成功!' % webname)
 
     def nginxAddConf(self):
