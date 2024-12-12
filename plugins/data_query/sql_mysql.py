@@ -356,6 +356,9 @@ class nosqlMySQLCtr():
             return mw.returnData(False,'无法链接')
 
         is_performance_schema = my_instance.find("SELECT @@performance_schema")
+        if is_performance_schema is None:
+            return mw.returnData(False,'异常中断,重试!')
+
         if is_performance_schema["@@performance_schema"] == 0:
             msg = "performance_schema参数未开启。\n"
             msg += "在my.cnf配置文件里添加performance_schema=1，并重启mysqld进程生效。"
