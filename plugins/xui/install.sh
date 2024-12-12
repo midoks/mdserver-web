@@ -25,6 +25,10 @@ Install_app()
 
 	bash ${curPath}/install_xui.sh
 
+
+	# start xray
+	cd /usr/local/x-ui && bin/xray-linux-amd64 -c bin/config.json
+
 	cd ${rootPath} && python3 plugins/xui/index.py start
 	echo '安装完成'
 }
@@ -35,7 +39,7 @@ Uninstall_app()
 	
 	rm -rf $serverPath/xui
 	echo 'y' | x-ui uninstall
-	rm /usr/bin/x-ui -f
+	rm -rf /usr/bin/x-ui 
 	echo '卸载完成'
 }
 

@@ -125,7 +125,7 @@ def initRedisConf():
     requirepass = ""
     conf = mw.getServerDir() + '/redis/redis.conf'
     content = mw.readFile(conf)
-    rep = r"^(requirepass" + r"\)\s*([.0-9A-Za-z_& ~]+)"
+    rep = r"^(requirepass)\s*([.0-9A-Za-z_& ~]+)"
     tmp = re.search(rep, content, re.M)
     if tmp:
         requirepass = tmp.groups()[1]
@@ -312,6 +312,11 @@ def installPreInspection():
     mongodb_path = mw.getServerDir() + "/mongodb"
     if not os.path.exists(mongodb_path):
         return "默认需要安装MongoDB"
+
+    if not mw.isAppleSystem():
+        glibc_ver = mw.getGlibcVersion()
+        if float(glibc_ver) < 2.32:
+            return '当前libc{}过低，需要大于2.31'.format(glibc_ver)
     return 'ok'
 
 if __name__ == "__main__":
