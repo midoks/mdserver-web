@@ -151,7 +151,6 @@ def initDreplace():
         content = content.replace('{$SERVER_PATH}', service_path)
         mw.writeFile(file_bin, content)
         mw.execShell('chmod +x ' + file_bin)
-        openPort()
         
 
     # systemd
@@ -164,7 +163,8 @@ def initDreplace():
         se_content = se_content.replace('{$SERVER_PATH}', service_path)
         mw.writeFile(systemService, se_content)
         mw.execShell('systemctl daemon-reload')
-
+        time.sleep(1)
+        openPort()
     return file_bin
 
 
