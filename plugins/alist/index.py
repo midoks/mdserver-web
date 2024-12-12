@@ -164,7 +164,6 @@ def initDreplace():
         mw.writeFile(systemService, se_content)
         mw.execShell('systemctl daemon-reload')
         time.sleep(1)
-        openPort()
     return file_bin
 
 
