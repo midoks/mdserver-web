@@ -9,12 +9,12 @@ serverPath=$(dirname "$rootPath")
 
 Install_pg()
 {
-	echo '卸载PHP守护中...'
+	echo '安装PHP守护中...'
 	echo 'True' > ${rootPath}/data/502Task.pl
 
 	mkdir -p $serverPath/php-guard
 	echo '1.0' > $serverPath/php-guard/version.pl	
-	echo '卸载PHP守护成功!!'
+	echo '安装PHP守护成功!!'
 }
 
 Uninstall_pg()
