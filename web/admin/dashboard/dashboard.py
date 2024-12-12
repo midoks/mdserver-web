@@ -10,6 +10,8 @@
 
 import io
 import time
+import base64
+import json
 
 from flask import Blueprint, render_template
 from flask import make_response
@@ -37,9 +39,6 @@ def index():
 def admin_safe_path(path):
     login = request.args.get('login', '')
     if login != '':
-        import base64
-        import json
-        import time
         try:
             # print(login)
             login_str = base64.b64decode(login)
