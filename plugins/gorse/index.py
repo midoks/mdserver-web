@@ -316,7 +316,7 @@ def installPreInspection():
     if not mw.isAppleSystem():
         glibc_ver = mw.getGlibcVersion()
         if float(glibc_ver) < 2.32:
-            return '当前libc{}过低，需要大于2.31'.fomart(glibc_ver)
+            return '当前libc{}过低，需要大于2.31'.format(glibc_ver)
     return 'ok'
 
 if __name__ == "__main__":
