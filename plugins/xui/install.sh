@@ -39,7 +39,7 @@ Uninstall_app()
 	
 	rm -rf $serverPath/xui
 	echo 'y' | x-ui uninstall
-	rm /usr/bin/x-ui -f
+	rm -rf /usr/bin/x-ui 
 	echo '卸载完成'
 }
 
