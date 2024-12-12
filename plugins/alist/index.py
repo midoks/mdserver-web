@@ -5,6 +5,7 @@ import io
 import os
 import time
 import re
+import json
 
 web_dir = os.getcwd() + "/web"
 if os.path.exists(web_dir):
@@ -96,11 +97,33 @@ def readConfigTpl():
     content = contentReplace(content)
     return mw.returnJson(True, 'ok', content)
 
+def __release_port(port, ps = '开启端口'):
+    try:
+        from utils.firewall import Firewall as MwFirewall
+        MwFirewall.instance().addAcceptPort(port, ps, 'port')
+        return port
+    except Exception as e:
+        return "Release failed {}".format(e)
+
+def __delete_port(port):
+    try:
+        from utils.firewall import Firewall as MwFirewall
+        MwFirewall.instance().delAcceptPortCmd(port, 'tcp')
+        return port
+    except Exception as e:
+        return "Delete failed {}".format(e)
+
+
+def openPort():
+    content = mw.readFile(getConf())
+    data = json.loads(content)
+    http_port = data['scheme']['http_port']
+    __release_port(http_port, 'alist')
+    return True
 
 def status():
-    data = mw.execShell(
-        "ps aux|grep alist |grep -v grep | grep -v python | grep -v mdserver-web | awk '{print $2}'")
-
+    cmd = "ps aux|grep alist |grep -v grep | grep -v python | grep -v mdserver-web | awk '{print $2}'"
+    data = mw.execShell(cmd)
     if data[0] == '':
         return 'stop'
     return 'start'
@@ -128,6 +151,8 @@ def initDreplace():
         content = content.replace('{$SERVER_PATH}', service_path)
         mw.writeFile(file_bin, content)
         mw.execShell('chmod +x ' + file_bin)
+        openPort()
+        
 
     # systemd
     systemDir = mw.systemdCfgDir()
@@ -251,7 +276,6 @@ def clearCopyTask():
     return mw.returnJson(True, '清空成功并重启服务!')
 
 def homePage():
-    import json
     content = mw.readFile(getConf())
     data = json.loads(content)
     http_port = data['scheme']['http_port']
