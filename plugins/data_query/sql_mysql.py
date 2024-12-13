@@ -44,7 +44,7 @@ class nosqlMySQL():
 
     def conn(self):
 
-        if self.__sid is not:
+        if self.__sid is None:
             return False
 
         if self.__sid is not None:
