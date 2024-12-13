@@ -48,7 +48,7 @@ class nosqlMySQL():
             return False
 
         if self.__sid is not None:
-            mycnf_path = "{}/{}/etc/my.cnf".format(mw.getServerDir(),sid)
+            mycnf_path = "{}/{}/etc/my.cnf".format(mw.getServerDir(),self.__sid)
             if not os.path.exists(mycnf_path):
                 return False
 
