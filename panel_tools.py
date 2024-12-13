@@ -287,7 +287,10 @@ def show_panel_pwd():
 
 def show_panel_adminpath():
     admin_path = thisdb.getOption('admin_path')
-    print('/'+admin_path)
+    if admin_path == '':
+        print('/login')
+    else:
+        print('/'+admin_path)
 
 
 def set_panel_username(username=None):
