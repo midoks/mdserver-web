@@ -125,13 +125,14 @@ def getConfAppStart():
 
 def phpPrependFile(version):
     app_start = getConfAppStart()
-    if not os.path.exists(app_start):
-        tpl = mw.getPluginDir() + '/php/conf/app_start.php'
-        content = mw.readFile(tpl)
-        content = contentReplace(content, version)
-        mw.writeFile(app_start, content)
+    tpl = mw.getPluginDir() + '/php/conf/app_start.php'
+    content = mw.readFile(tpl)
+    content = contentReplace(content, version)
+    mw.writeFile(app_start, content)
 
 def start():
+    phpPrependFile()
+
     file_tpl = getPluginDir() + '/conf/xhprof.conf'
     file_run = getConf()
 
