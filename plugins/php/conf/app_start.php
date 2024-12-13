@@ -1,7 +1,9 @@
 <?php
 
 if (isset($_GET['mw_opcache_reset']) && $_GET['mw_opcache_reset'] == 'ok') {
-	opcache_reset();
+	if (function_exists('opcache_reset')) {
+		opcache_reset();
+	}
 }
 
 define('XHProf_Name', 'mdd');

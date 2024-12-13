@@ -118,6 +118,18 @@ def status():
         return 'start'
     return 'stop'
 
+def getConfAppStart():
+    pstart = mw.getServerDir() + '/php/app_start.php'
+    return pstart
+
+
+def phpPrependFile(version):
+    app_start = getConfAppStart()
+    if not os.path.exists(app_start):
+        tpl = mw.getPluginDir() + '/php/conf/app_start.php'
+        content = mw.readFile(tpl)
+        content = contentReplace(content, version)
+        mw.writeFile(app_start, content)
 
 def start():
     file_tpl = getPluginDir() + '/conf/xhprof.conf'
@@ -201,11 +213,6 @@ def setXhPort():
     mw.writeFile(file, content)
     mw.restartWeb()
     return mw.returnJson(True, '修改成功!')
-
-
-def getConfAppStart():
-    pstart = mw.getServerDir() + '/php/app_start.php'
-    return pstart
 
 
 def installPreInspection():
