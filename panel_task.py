@@ -140,7 +140,7 @@ def systemTask():
     from  utils.system import monitor
     try:
         while True:
-            monitor_status = thisdb.getOption('monitor_status',common='monitor',default='open')
+            monitor_status = thisdb.getOption('monitor_status',type='monitor',default='open')
             if monitor_status == 'open':
                 monitor.instance().run()
             time.sleep(5)
