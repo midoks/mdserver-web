@@ -100,6 +100,7 @@ def contentReplace(content):
     content = content.replace('{$ROOT_PATH}', mw.getFatherDir())
     content = content.replace('{$SERVER_PATH}', service_path)
     content = content.replace('{$PHP_VER}', php_ver)
+    content = content.replace('{$LOCAL_IP}', mw.getLocalIp())
     return content
 
 
@@ -109,6 +110,7 @@ def contentReplacePHP(content, version):
     content = content.replace('{$ROOT_PATH}', mw.getFatherDir())
     content = content.replace('{$SERVER_PATH}', service_path)
     content = content.replace('{$PHP_VER}', version)
+    content = content.replace('{$LOCAL_IP}', mw.getLocalIp())
     return content
 
 
@@ -121,11 +123,6 @@ def status():
 def getConfAppStart():
     pstart = mw.getServerDir() + '/php/app_start.php'
     return pstart
-
-def contentReplace(content):
-    content = content.replace('{$ROOT_PATH}', mw.getFatherDir())
-    content = content.replace('{$LOCAL_IP}', mw.getLocalIp())
-    return content
 
 
 def phpPrependFile():
