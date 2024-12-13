@@ -58,6 +58,7 @@ def mwcli(mw_input=0):
             '(3)    启动面板服务',
             '(4)    重载面板服务',
             '(5)    修改面板端口',
+            '(6)    关闭安全入口',
             '(10)   查看面板默认信息',
             '(11)   修改面板密码',
             '(12)   修改面板用户名',
@@ -98,7 +99,8 @@ def mwcli(mw_input=0):
             mw_input = 0
 
     nums = [
-        1, 2, 3, 4, 5, 10, 11, 12, 13, 14, 15,
+        1, 2, 3, 4, 5, 6,
+        10, 11, 12, 13, 14, 15,
         20, 21, 22, 23, 24, 25, 26, 27, 28,
         100, 101, 
         200, 201
@@ -128,6 +130,9 @@ def mwcli(mw_input=0):
         else:
             mw.echoInfo("端口范围在0-65536之间")
         return
+    elif mw_input == 6:
+        thisdb.setOption('admin_path', '')
+        mw.echoInfo("关闭安全入口成功!")
     elif mw_input == 10:
         os.system(INIT_CMD + " default")
     elif mw_input == 11:
@@ -220,7 +225,6 @@ def mwcli(mw_input=0):
         if not run_cmd:
             mw.echoInfo("未检测到防火墙!")
     elif mw_input == 28:
-        from utils.firewall import Firewall as MwFirewall
         MwFirewall.instance().aIF()
         mw.echoInfo("执行自动识别防火墙端口到面板成功!")
     elif mw_input == 100:
@@ -283,7 +287,10 @@ def show_panel_pwd():
 
 def show_panel_adminpath():
     admin_path = thisdb.getOption('admin_path')
-    print('/'+admin_path)
+    if admin_path == '':
+        print('/login')
+    else:
+        print('/'+admin_path)
 
 
 def set_panel_username(username=None):

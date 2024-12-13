@@ -28,7 +28,7 @@ import thisdb
 
 
 blueprint = Blueprint('dashboard', __name__, url_prefix='/', template_folder='../../templates')
-@blueprint.route('/')
+@blueprint.route('/', endpoint='index', methods=['GET'])
 @panel_login_required
 def index():
     name = thisdb.getOption('template', default='default')

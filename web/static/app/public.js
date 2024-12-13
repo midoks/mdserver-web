@@ -735,11 +735,11 @@ function onlineEditFile(k, f, callback) {
 						"Ctrl-H": "replaceAll",
 						"Ctrl-S": function() {
 							$("#textBody").text(code_mirror.getValue());
-							onlineEditFile(2, f,callback);
+							onlineEditFile(2, f, callback);
 						},
 						"Cmd-S":function() {
 							$("#textBody").text(code_mirror.getValue());
-							onlineEditFile(2, f,callback);
+							onlineEditFile(2, f, callback);
 						},
 					},
 					mode: d,
@@ -758,7 +758,7 @@ function onlineEditFile(k, f, callback) {
 			},
 			yes:function(){
 				$("#textBody").text(code_mirror.getValue());
-				onlineEditFile(1, f,callback);
+				onlineEditFile(1, f, callback);
 			}
 		});
 	},'json');
