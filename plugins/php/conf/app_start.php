@@ -51,6 +51,7 @@ if (extension_loaded('xhprof')
 	app_xhprof_start();
 	register_shutdown_function('app_xhprof_end');
 	include_once $_SERVER['SCRIPT_FILENAME'];
+	exit;
 }
 
 ?>
