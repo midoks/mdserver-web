@@ -140,7 +140,9 @@ def systemTask():
     from  utils.system import monitor
     try:
         while True:
-            monitor.instance().run()
+            monitor_status = thisdb.getOption('monitor_status',default='open')
+            if monitor_status == 'open':
+                monitor.instance().run()
             time.sleep(5)
     except Exception as ex:
         print('systemTask:',mw.getTracebackInfo())
