@@ -73,7 +73,7 @@ def getHomePage():
         return mw.returnJson(False, '插件未启动!')
 
 
-def getPhpVer(expect=56):
+def getPhpVer(expect=74):
     v = MwSites.instance().getPhpVersion()
     for i in range(len(v)):
         t = int(v[i]['version'])
