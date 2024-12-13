@@ -68,9 +68,9 @@ def set_backup_dir():
 @panel_login_required
 def set_www_dir():
     sites_path = request.form.get('sites_path', '')
-    src_sites_path = thisdb.getOption('sites_path')
+    src_sites_path = thisdb.getOption('site_path')
     if sites_path != src_sites_path:
-        thisdb.setOption('sites_path', sites_path)
+        thisdb.setOption('site_path', sites_path)
     return mw.returnData(True, '修改默认建站目录成功!')
 
 
