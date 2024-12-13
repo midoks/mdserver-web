@@ -134,6 +134,7 @@ def phpPrependFile():
     content = mw.readFile(tpl)
     content = contentReplace(content)
     mw.writeFile(app_start, content)
+    return True
 
 def start():
     phpPrependFile()
