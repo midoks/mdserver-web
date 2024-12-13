@@ -2148,9 +2148,10 @@ function pluginConfig(_name, version, func){
                 <ul class="help-info-text c7 ptb15">\
                     <li>此处为'+ _name + version +'主配置文件,若您不了解配置规则,请勿随意修改。</li>\
                 </ul>';
-    
+
 
     var loadT = layer.msg('配置文件路径获取中...',{icon:16,time:0,shade: [0.3, '#000']});
+    var editor;
     $.post('/plugins/run', {name:_name, func:func_name,version:version},function (data) {
         layer.close(loadT);
 
@@ -2174,15 +2175,23 @@ function pluginConfig(_name, version, func){
             }
             $("#textBody").empty().text(rdata.data.data);
             $(".CodeMirror").remove();
-            var editor = CodeMirror.fromTextArea(document.getElementById("textBody"), {
+
+            function saveDataFunc(){
+		    	$("#textBody").text(editor.getValue());
+		        pluginConfigSave(fileName);
+		    }
+            
+            editor = CodeMirror.fromTextArea(document.getElementById("textBody"), {
                 extraKeys: {
                     "Ctrl-Space": "autocomplete",
                     "Ctrl-F": "findPersistent",
                     "Ctrl-H": "replaceAll",
                     "Ctrl-S": function() {
-                    	$("#textBody").text(editor.getValue());
-                        pluginConfigSave(fileName);
-                    }
+                    	saveDataFunc()
+                    },
+                    "Cmd-S":function() {
+						saveDataFunc();
+					}
                 },
                 lineNumbers: true,
                 matchBrackets:true,
@@ -2190,8 +2199,7 @@ function pluginConfig(_name, version, func){
             editor.focus();
             $(".CodeMirror-scroll").css({"height":"300px","margin":0,"padding":0});
             $("#onlineEditFileBtn").click(function(){
-                $("#textBody").text(editor.getValue());
-                pluginConfigSave(fileName);
+                saveDataFunc();
             });
         },'json');
     },'json');
@@ -2235,6 +2243,12 @@ function pluginConfigTpl(_name, version, func, config_tpl_func, read_config_tpl_
     	return f 
     }
 
+    var editor;
+    function saveDataFunc(){
+    	$("#textBody").text(editor.getValue());
+        pluginConfigSave(fileName,save_callback_func);
+    }
+
     var fileName = '';
     $.post('/plugins/run',{name:_name, func:_config_tpl_func,version:version}, function(data){
     	var rdata = $.parseJSON(data.data);
@@ -2248,6 +2262,7 @@ function pluginConfigTpl(_name, version, func, config_tpl_func, read_config_tpl_
     			var loadT = layer.msg('配置模版获取中...',{icon:16,time:0,shade: [0.3, '#000']});
 
     			var _args = JSON.stringify({file:selected});
+    			
     			$.post('/plugins/run', {name:_name, func:_read_config_tpl_func,version:version,args:_args}, function(data){
     				layer.close(loadT);
     				var rdata = $.parseJSON(data.data);
@@ -2258,15 +2273,17 @@ function pluginConfigTpl(_name, version, func, config_tpl_func, read_config_tpl_
 
     				$("#textBody").empty().text(rdata.data);
     				$(".CodeMirror").remove();
-		            var editor = CodeMirror.fromTextArea(document.getElementById("textBody"), {
+		            editor = CodeMirror.fromTextArea(document.getElementById("textBody"), {
 		                extraKeys: {
 		                    "Ctrl-Space": "autocomplete",
 		                    "Ctrl-F": "findPersistent",
 		                    "Ctrl-H": "replaceAll",
 		                    "Ctrl-S": function() {
-		                    	$("#textBody").text(editor.getValue());
-		                        pluginConfigSave(fileName,save_callback_func);
-		                    }
+		                    	saveDataFunc();
+		                    },
+		                    "Cmd-S":function() {
+								saveDataFunc();
+							}
 		                },
 		                lineNumbers: true,
 		                matchBrackets:true,
@@ -2275,8 +2292,7 @@ function pluginConfigTpl(_name, version, func, config_tpl_func, read_config_tpl_
 		            $(".CodeMirror-scroll").css({"height":"300px","margin":0,"padding":0});
 		            $("#onlineEditFileBtn").unbind('click');
 		            $("#onlineEditFileBtn").click(function(){
-		                $("#textBody").text(editor.getValue());
-		                pluginConfigSave(fileName, save_callback_func);
+		                saveDataFunc()
 		            });
     			},'json');
     		}
@@ -2304,9 +2320,11 @@ function pluginConfigTpl(_name, version, func, config_tpl_func, read_config_tpl_
                     "Ctrl-F": "findPersistent",
                     "Ctrl-H": "replaceAll",
                     "Ctrl-S": function() {
-                    	$("#textBody").text(editor.getValue());
-                        pluginConfigSave(fileName,save_callback_func);
-                    }
+                    	saveDataFunc();
+                    },
+                    "Cmd-S":function() {
+						saveDataFunc();
+					}
                 },
                 lineNumbers: true,
                 matchBrackets:true,
@@ -2314,8 +2332,7 @@ function pluginConfigTpl(_name, version, func, config_tpl_func, read_config_tpl_
             editor.focus();
             $(".CodeMirror-scroll").css({"height":"300px","margin":0,"padding":0});
             $("#onlineEditFileBtn").click(function(){
-                $("#textBody").text(editor.getValue());
-                pluginConfigSave(fileName,save_callback_func);
+                saveDataFunc();
             });
         },'json');
     },'json');
@@ -2353,6 +2370,12 @@ function pluginConfigListTpl(_name, version, config_tpl_func, read_config_tpl_fu
     	return f 
     }
 
+    var editor;
+    function saveDataFunc(){
+    	$("#textBody").text(editor.getValue());
+        pluginConfigSave(fileName);
+    }
+
     function loadTextBody(fileName){
         $.post('/files/get_body', 'path=' + fileName, function(rdata) {
             if (!rdata.status){
@@ -2361,14 +2384,16 @@ function pluginConfigListTpl(_name, version, config_tpl_func, read_config_tpl_fu
             }
             $("#textBody").empty().text(rdata.data.data);
             $(".CodeMirror").remove();
-            var editor = CodeMirror.fromTextArea(document.getElementById("textBody"), {
+            editor = CodeMirror.fromTextArea(document.getElementById("textBody"), {
                 extraKeys: {
                     "Ctrl-Space": "autocomplete",
                     "Ctrl-F": "findPersistent",
                     "Ctrl-H": "replaceAll",
                     "Ctrl-S": function() {
-                    	$("#textBody").text(editor.getValue());
-                        pluginConfigSave(fileName);
+                    	saveDataFunc();
+                    },
+                    "Cmd-S": function() {
+                    	saveDataFunc();
                     }
                 },
                 lineNumbers: true,
@@ -2377,8 +2402,7 @@ function pluginConfigListTpl(_name, version, config_tpl_func, read_config_tpl_fu
             editor.focus();
             $(".CodeMirror-scroll").css({"height":"300px","margin":0,"padding":0});
             $("#onlineEditFileBtn").click(function(){
-                $("#textBody").text(editor.getValue());
-                pluginConfigSave(fileName);
+                saveDataFunc();
             });
         },'json');
     }
@@ -2413,25 +2437,25 @@ function pluginConfigListTpl(_name, version, config_tpl_func, read_config_tpl_fu
 
 				$("#textBody").empty().text(rdata.data);
 				$(".CodeMirror").remove();
-	            var editor = CodeMirror.fromTextArea(document.getElementById("textBody"), {
+	            editor = CodeMirror.fromTextArea(document.getElementById("textBody"), {
 	                extraKeys: {
 	                    "Ctrl-Space": "autocomplete",
 	                    "Ctrl-F": "findPersistent",
 	                    "Ctrl-H": "replaceAll",
 	                    "Ctrl-S": function() {
-	                    	$("#textBody").text(editor.getValue());
-	                        pluginConfigSave(fileName);
-	                    }
+	                    	saveDataFunc();
+	                    },
+		                "Cmd-S":function() {
+							saveDataFunc();
+						}
 	                },
 	                lineNumbers: true,
 	                matchBrackets:true,
 	            });
 	            editor.focus();
 	            $(".CodeMirror-scroll").css({"height":"300px","margin":0,"padding":0});
-	            $("#onlineEditFileBtn").unbind('click');
-	            $("#onlineEditFileBtn").click(function(){
-	                $("#textBody").text(editor.getValue());
-	                pluginConfigSave(fileName);
+	            $("#onlineEditFileBtn").unbind('click').click(function(){
+	                saveDataFunc();
 	            });
 			},'json');
     		
