@@ -5,6 +5,7 @@ import io
 import os
 import time
 import re
+import json
 
 web_dir = os.getcwd() + "/web"
 if os.path.exists(web_dir):
@@ -73,7 +74,6 @@ def getHomePage():
 
 
 def getPhpVer(expect=56):
-    import json
     v = MwSites.instance().getPhpVersion()
     for i in range(len(v)):
         t = int(v[i]['version'])
