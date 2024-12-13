@@ -36,7 +36,9 @@ function app_xhprof_end() {
 
 	$profiler_url = sprintf('http://{$LOCAL_IP}:5858/index.php?run=%s&source=xhprof_foo', $run_id);
 	// echo "<script language='javascript'>window.open('{$profiler_url}')</script>";
-	echo '<a href="' . $profiler_url . '" target="_blank">Profiler output</a>';
+
+	$style_css = 'bottom: 0px;right: 0px;z-index: 100000000;color: red;background-color: black;padding: 0px;margin: 0px;';
+	echo '<a href="' . $profiler_url . '" target="_blank" style="' . $style_css . '">XHProf分析结果</a>';
 
 }
 
