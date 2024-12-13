@@ -122,12 +122,20 @@ def getConfAppStart():
     pstart = mw.getServerDir() + '/php/app_start.php'
     return pstart
 
+def contentReplace(content):
+    service_path = mw.getServerDir()
+    content = content.replace('{$ROOT_PATH}', mw.getFatherDir())
+    content = content.replace('{$SERVER_PATH}', service_path)
+    content = content.replace('{$LOCAL_IP}', mw.getLocalIp())
 
-def phpPrependFile(version):
+    return content
+
+
+def phpPrependFile():
     app_start = getConfAppStart()
     tpl = mw.getPluginDir() + '/php/conf/app_start.php'
     content = mw.readFile(tpl)
-    content = contentReplace(content, version)
+    content = contentReplace(content)
     mw.writeFile(app_start, content)
 
 def start():
