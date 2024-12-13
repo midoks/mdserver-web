@@ -39,6 +39,7 @@ class nosqlMySQL():
         pass
         
     def setSid(self, sid):
+        self.__sid = sid
         self.__config = self.get_options(sid=sid)
 
     def conn(self):
