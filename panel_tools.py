@@ -220,7 +220,6 @@ def mwcli(mw_input=0):
         if not run_cmd:
             mw.echoInfo("未检测到防火墙!")
     elif mw_input == 28:
-        from utils.firewall import Firewall as MwFirewall
         MwFirewall.instance().aIF()
         mw.echoInfo("执行自动识别防火墙端口到面板成功!")
     elif mw_input == 100:
