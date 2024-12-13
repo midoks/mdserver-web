@@ -324,9 +324,7 @@ mw_install_app()
 }
 
 mw_close_admin_path(){
-    if [ -f $mw_path/data/admin_path.pl ]; then
-        rm -rf $mw_path/data/admin_path.pl
-    fi
+    cd ${PANEL_DIR} && python3 panel_tools.py cli 6
 }
 
 mw_force_kill()

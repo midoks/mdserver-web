@@ -58,6 +58,7 @@ def mwcli(mw_input=0):
             '(3)    启动面板服务',
             '(4)    重载面板服务',
             '(5)    修改面板端口',
+            '(6)    关闭安全入口',
             '(10)   查看面板默认信息',
             '(11)   修改面板密码',
             '(12)   修改面板用户名',
@@ -128,6 +129,9 @@ def mwcli(mw_input=0):
         else:
             mw.echoInfo("端口范围在0-65536之间")
         return
+    elif mw_input == 6:
+        thisdb.setOption('admin_path', '')
+        mw.echoInfo("关闭安全入口成功!")
     elif mw_input == 10:
         os.system(INIT_CMD + " default")
     elif mw_input == 11:
