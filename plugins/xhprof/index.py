@@ -165,7 +165,6 @@ def setPhpVer():
     mw.writeFile(file_run, centent)
 
     mw.restartWeb()
-
     return 'ok'
 
 
