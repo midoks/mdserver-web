@@ -110,7 +110,6 @@ def contentReplacePHP(content, version):
     content = content.replace('{$ROOT_PATH}', mw.getFatherDir())
     content = content.replace('{$SERVER_PATH}', service_path)
     content = content.replace('{$PHP_VER}', version)
-    content = content.replace('{$LOCAL_IP}', mw.getLocalIp())
     return content
 
 
@@ -176,9 +175,9 @@ def setPhpVer():
     file_tpl = getPluginDir() + '/conf/xhprof.conf'
     file_run = getConf()
 
-    centent = mw.readFile(file_tpl)
-    centent = contentReplacePHP(centent, args['phpver'])
-    mw.writeFile(file_run, centent)
+    content = mw.readFile(file_tpl)
+    content = contentReplacePHP(content, args['phpver'])
+    mw.writeFile(file_run, content)
 
     mw.restartWeb()
     return 'ok'
