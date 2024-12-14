@@ -121,7 +121,7 @@ def getPanelTaskExecLog():
 
 def getWwwDir():
     import thisdb
-    site_path = thisdb.getOption('site_path')
+    site_path = thisdb.getOption('site_path', default=getFatherDir()+'/backup')
     return site_path
 
 def getBackupDir():
