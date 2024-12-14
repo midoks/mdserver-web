@@ -19,7 +19,11 @@ bash ${rootPath}/scripts/getos.sh
 OSNAME=`cat ${rootPath}/data/osname.pl`
 VERSION_ID=`cat /etc/*-release | grep VERSION_ID | awk -F = '{print $2}' | awk -F "\"" '{print $2}'`
 
+# cd /www/server/mdserver-web && python3 /www/server/mdserver-web/plugins/mysql-apt/index.py start 9.1
 # cd /www/server/mdserver-web/plugins/mysql-apt && bash install.sh install 9.1
+
+#x-faq
+# strings /lib/x86_64-linux-gnu/libstdc++.so.6 | grep GLIB
 
 # debian12
 if [ "$OSNAME" == 'debian' ] && [ "$VERSION_ID" -lt '12' ] ;then 

@@ -419,8 +419,8 @@ def initMysql57Data():
         cmd = serverdir + '/bin/usr/sbin/mysqld --basedir=' + serverdir + '/bin/usr --datadir=' + \
             datadir + ' --initialize-insecure --explicit_defaults_for_timestamp'
         data = mw.execShell(cmd)
-        # print(cmd)
-        # print(data)
+        if data[1].lower().find('error') != -1:
+            exit("Init MySQL5.7 Data Error:"+data[1])
 
         if not mw.isAppleSystem():
             mw.execShell('chown -R mysql:mysql ' + datadir)
@@ -446,12 +446,8 @@ def initMysql8Data():
 
         cmd = serverdir + '/bin/usr/sbin/mysqld --basedir=' + serverdir + '/bin/usr --datadir=' + datadir + \
             ' --initialize-insecure --lower-case-table-names=1'
-        data = mw.execShell(cmd)
-        if data[1].find('ERROR') != -1:
-            exit("Init MySQL{} Data Error".format(8))
-
-        if data[1].find('error') != -1:
-            exit("Init MySQL Data Error:"+data[1])
+        if data[1].lower().find('error') != -1:
+            exit("Init MySQL8+ Data Error:"+data[1])
 
         if not mw.isAppleSystem():
             mw.execShell('chown -R mysql:mysql ' + datadir)
