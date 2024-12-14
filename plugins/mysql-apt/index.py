@@ -554,6 +554,10 @@ def my8cmd(version, method):
 
 
 def appCMD(version, action):
+    if float(version)>9:
+        cmd = 'export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/www/server/lib/openssl3/lib'
+        mw.execShell(cmd)
+
     return my8cmd(version, action)
 
 
