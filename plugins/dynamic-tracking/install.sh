@@ -51,6 +51,9 @@ Install_App()
 	fi
 	# FlameGraph end
 
+	# apt install linux-tools-$(uname -r) linux-tools-generic -y
+	# apt install linux-tools-$(uname -r) linux-tools-generic -y
+
 	
 
 	shell_file=${curPath}/versions/${OSNAME}.sh
