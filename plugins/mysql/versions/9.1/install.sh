@@ -3,8 +3,7 @@
 PATH=/bin:/sbin:/usr/bin:/usr/sbin:/usr/local/bin:/usr/local/sbin:~/bin:/opt/homebrew/bin
 export PATH
 
-#https://dev.mysql.com/downloads/mysql/5.7.html
-#https://dev.mysql.com/downloads/file/?id=489855
+# https://dev.mysql.com/downloads/mysql/
 
 curPath=`pwd`
 rootPath=$(dirname "$curPath")
