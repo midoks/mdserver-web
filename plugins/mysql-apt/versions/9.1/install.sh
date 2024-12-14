@@ -110,10 +110,10 @@ Install_mysql()
 
 	if [ "$?" == "0" ];then
 		mkdir -p $serverPath/mysql-apt
-		echo '9.0' > $serverPath/mysql-apt/version.pl
+		echo '9.1' > $serverPath/mysql-apt/version.pl
 		echo '安装完成'
 	else
-		echo '9.0' > $serverPath/mysql-apt/version.pl
+		echo '9.1' > $serverPath/mysql-apt/version.pl
 		echo "暂时不支持该系统"
 	fi
 }
