@@ -33,6 +33,8 @@ if [ ! -d ${SERVER_ROOT}/openssl11 ];then
 
     ldconfig
 
+    # ldconfig -p  | grep openssl
+
     cd $SOURCE_ROOT && rm -rf $SOURCE_ROOT/openssl-${opensslVersion}
 fi
 

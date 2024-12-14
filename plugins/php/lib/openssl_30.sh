@@ -34,6 +34,7 @@ if [ ! -d ${SERVER_ROOT}/openssl30 ];then
     fi
 
     ldconfig
+    # ldconfig -p  | grep openssl
 
     cd $SOURCE_ROOT && rm -rf $SOURCE_ROOT/openssl-${opensslVersion}
 fi
