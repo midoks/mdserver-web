@@ -59,8 +59,12 @@ mkdir -p $serverPath/mysql-apt/bin
 mkdir -p /var/run/mysqld
 chown mysql -R /var/run/mysqld
 
-# https://cdn.mysql.com/archives/mysql-8.4/mysql-server_${SUFFIX_NAME}.deb-bundle.tar
-# https://dev.mysql.com/get/Downloads/MySQL-8.4/mysql-server_${SUFFIX_NAME}.deb-bundle.tar
+# Linux - Generic
+
+# https://cdn.mysql.com/archives/mysql-8.4/mysql-8.4.2-linux-glibc2.28-x86_64.tar.xz
+
+# SUFFIX_NAME=${MYSQL_VER}-linux-glibc2.28_${TMP_ARCH}
+# wget --no-check-certificate -O mysql-8.4.2-linux-glibc2.28-x86_64.tar.xz https://cdn.mysql.com/archives/mysql-8.4/mysql-${SUFFIX_NAME}.tar.xz
 
 wget --no-check-certificate -O ${myDir}/mysql-server_${SUFFIX_NAME}.deb-bundle.tar https://dev.mysql.com/get/Downloads/MySQL-8.4/mysql-server_${SUFFIX_NAME}.deb-bundle.tar
 chmod +x ${myDir}/mysql-server_${SUFFIX_NAME}.deb-bundle.tar
