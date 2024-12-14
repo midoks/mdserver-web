@@ -126,7 +126,7 @@ def getWwwDir():
 
 def getBackupDir():
     import thisdb
-    backup_path = thisdb.getOption('backup_path')
+    backup_path = thisdb.getOption('backup_path', default=getFatherDir()+'/backup')
     return backup_path
 
 def setBackupDir(bdir):
