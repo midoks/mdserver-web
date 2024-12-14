@@ -431,6 +431,10 @@ mw_connect_mysql(){
     echo "login to ${CHOICE_DB}:"
 
     pwd=$(cd ${ROOT_PATH}/mdserver-web && python3 ${ROOT_PATH}/mdserver-web/plugins/${CHOICE_DB}/index.py root_pwd)
+    if [ "$pwd" == "admin" ];then
+        pwd=""
+    fi
+
     if [ "$CHOICE_DB" == "mysql" ];then
         ${ROOT_PATH}/mysql/bin/mysql -uroot -p"${pwd}"
     fi

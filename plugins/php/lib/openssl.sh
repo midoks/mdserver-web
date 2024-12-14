@@ -7,6 +7,7 @@ rootPath=$(dirname "$curPath")
 rootPath=$(dirname "$rootPath")
 rootPath=$(dirname "$rootPath")
 rootPath=$(dirname "$rootPath")
+
 opensslVersion="3.0.10"
 # echo $rootPath
 

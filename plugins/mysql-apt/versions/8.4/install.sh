@@ -19,13 +19,12 @@ bash ${rootPath}/scripts/getos.sh
 OSNAME=`cat ${rootPath}/data/osname.pl`
 VERSION_ID=`cat /etc/*-release | grep VERSION_ID | awk -F = '{print $2}' | awk -F "\"" '{print $2}'`
 
-# cd /www/server/mdserver-web/plugins/mysql-apt && bash install.sh install 8.0
+# cd /www/server/mdserver-web/plugins/mysql-apt && bash install.sh install 8.4
+# cd /www/server/mdserver-web && python3 /www/server/mdserver-web/plugins/mysql-apt/index.py start 8.4
 
-# 暂时debian12没有标准版,先用11使用
-# if [ "$OSNAME" == 'debian' ] && [ "$VERSION_ID" == '12' ] ;then 
-# 	echo "暂时不支持该${OSNAME}${VERSION_ID}"
-# 	exit 1
-# fi
+if [ "$OSNAME" == 'debian' ] && [ "$VERSION_ID" -lt '12' ] ;then 
+	VERSION_ID="12"
+fi
 
 
 ARCH="amd64"
@@ -111,7 +110,7 @@ Install_mysql()
 	if [ "$?" == "0" ];then
 		mkdir -p $serverPath/mysql-apt
 		echo '8.4' > $serverPath/mysql-apt/version.pl
-		echo '安装完成' >
+		echo '安装完成'
 	else
 		echo '8.4' > $serverPath/mysql-apt/version.pl
 		echo "暂时不支持该系统"

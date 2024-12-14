@@ -8,8 +8,10 @@ export DEBIAN_FRONTEND=noninteractive
 # https://downloads.mysql.com/archives/community/
 
 # debug
-# cd /www/server/mdserver-web/plugins/mysql-apt && bash install.sh install 8.0
+# cd /www/server/mdserver-web/plugins/mysql-apt && bash install.sh install 5.7
+# cd /www/server/mdserver-web && python3 /www/server/mdserver-web/plugins/mysql-apt/index.py start 5.7
 # /www/server/mysql-apt/bin/usr/sbin/mysqld --defaults-file=/www/server/mysql-apt/etc/my.cnf --daemonize
+# /www/server/mysql-apt/bin/usr/bin/mysql -S /www/server/mysql-apt/mysql.sock -uroot -p
 
 curPath=`pwd`
 rootPath=$(dirname "$curPath")

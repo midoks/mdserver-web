@@ -9,6 +9,9 @@ serverPath=$(dirname "$rootPath")
 
 # https://downloads.mysql.com/archives/community/
 
+# /www/server/mysql-apt/bin/usr/sbin/mysqld --basedir=/www/server/mysql-apt/bin/usr --datadir=/www/server/mysql-apt/data --initialize-insecure --explicit_defaults_for_timestamp
+
+
 # cd /www/server/mdserver-web/plugins/mysql-apt && bash install.sh install 8.0
 # cd /www/server/mdserver-web/plugins/mysql-apt && bash install.sh uninstall 8.0
 # cd /www/server/mdserver-web && python3 /www/server/mdserver-web/plugins/mysql-apt/index.py start 5.7
