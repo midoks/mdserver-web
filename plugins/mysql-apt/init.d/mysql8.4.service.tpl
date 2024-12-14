@@ -36,7 +36,7 @@ User=mysql
 Group=mysql
 Type=notify
 ExecStart={$SERVER_PATH}/mysql-apt/bin/usr/sbin/mysqld --defaults-file={$SERVER_PATH}/mysql-apt/etc/my.cnf
-TimeoutSec=0
+TimeoutSec=600
 LimitNOFILE = 10000
 Restart=on-failure
 RestartPreventExitStatus=1
