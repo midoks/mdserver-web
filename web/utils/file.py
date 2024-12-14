@@ -101,7 +101,7 @@ def mvFile(sfile, dfile):
         mw.writeLog('文件管理', msg)
         return mw.returnData(True, '移动或重名命文件成功!')
     except Exception as e:
-        return mw.returnData(False, '移动或重名命文件失败!'. str(e))
+        return mw.returnData(False, '移动或重名命文件失败!'+str(e))
 
 def uncompress(sfile, dfile, path):
     if not os.path.exists(sfile):
