@@ -52,7 +52,7 @@ Install_App()
 	# FlameGraph end
 
 	# apt install linux-tools-$(uname -r) linux-tools-generic -y
-	# apt install linux-tools-$(uname -r) linux-tools-generic -y
+	# apt install linux-tools-$(uname -r) linux-tools-generic -y --fix-missing
 
 	
 
