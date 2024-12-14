@@ -189,7 +189,7 @@ function gdList(file_id){
         if(rdata.status === false){
             showMsg(rdata.msg,function(){
                 authApi();
-            },{icon:2},2000);
+            },{icon:2});
             return;
         }
 

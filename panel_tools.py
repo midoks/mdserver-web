@@ -244,7 +244,8 @@ def mwcli(mw_input=0):
             mw.writeFile(php_conf, cont)
             mw.echoInfo("执行PHP52隐藏成功!")
     elif mw_input == 200:
-        os.system(INIT_CMD + " mirror")
+        os.system("bash <(curl -sSL https://linuxmirrors.cn/main.sh)")
+        # os.system(INIT_CMD + " mirror")
     elif mw_input == 201:
         os.system('curl -Lso- bench.sh | bash')
 

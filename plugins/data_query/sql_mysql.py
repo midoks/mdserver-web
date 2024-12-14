@@ -23,6 +23,8 @@ def singleton(cls):
 @singleton
 class nosqlMySQL():
 
+    __sid = None
+
     __DB_PASS = None
     __DB_USER = None
     __DB_PORT = 3306
@@ -37,9 +39,19 @@ class nosqlMySQL():
         pass
         
     def setSid(self, sid):
+        self.__sid = sid
         self.__config = self.get_options(sid=sid)
 
     def conn(self):
+
+        if self.__sid is None:
+            return False
+
+        if self.__sid is not None:
+            mycnf_path = "{}/{}/etc/my.cnf".format(mw.getServerDir(),self.__sid)
+            if not os.path.exists(mycnf_path):
+                return False
+
         self.__DB_PORT = int(self.__config['port'])
         self.__DB_USER = self.__config['username']
         self.__DB_PASS = self.__config['password']
@@ -74,6 +86,8 @@ class nosqlMySQL():
 
         if sid in ['mysql', 'mysql-apt', 'mysql-yum']:
             my_cnf_path = "{}/{}/etc/my.cnf".format(mw.getServerDir(),sid)
+            if not os.path.exists(my_cnf_path):
+                return False
 
             mydb_content = mw.readFile(my_cnf_path)
             if not mydb_content: return False
