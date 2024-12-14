@@ -20,6 +20,7 @@ OSNAME=`cat ${rootPath}/data/osname.pl`
 VERSION_ID=`cat /etc/*-release | grep VERSION_ID | awk -F = '{print $2}' | awk -F "\"" '{print $2}'`
 
 # cd /www/server/mdserver-web/plugins/mysql-apt && bash install.sh install 8.0
+# cd /www/server/mdserver-web && python3 /www/server/mdserver-web/plugins/mysql-apt/index.py start 8.0
 
 # 暂时debian12没有标准版,先用11使用
 # if [ "$OSNAME" == 'debian' ] && [ "$VERSION_ID" == '12' ] ;then 
