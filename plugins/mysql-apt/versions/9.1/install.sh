@@ -52,6 +52,9 @@ SUFFIX_NAME=${MYSQL_VER}-1${OSNAME}${VERSION_ID}_${ARCH}
 
 APT_INSTALL()
 {
+
+cd ${rootPath}/plugins/php/lib && /bin/bash openssl_30.sh
+
 ########
 mkdir -p $myDir
 mkdir -p $serverPath/mysql-apt/bin

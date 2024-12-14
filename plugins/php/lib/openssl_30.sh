@@ -15,14 +15,14 @@ SERVER_ROOT=$rootPath/lib
 SOURCE_ROOT=$rootPath/source/lib
 mkdir -p $SOURCE_ROOT
 
-if [ ! -d ${SERVER_ROOT}/openssl ];then
+if [ ! -d ${SERVER_ROOT}/openssl3 ];then
     cd ${SOURCE_ROOT}
-    if [ ! -f ${SOURCE_ROOT}/openssl-${opensslVersion}.tar.gz ];then
+    if [ ! -f ${SOURCE_ROOT}/openssl3-${opensslVersion}.tar.gz ];then
         wget --no-check-certificate -O ${SOURCE_ROOT}/openssl-${opensslVersion}.tar.gz https://www.openssl.org/source/openssl-${opensslVersion}.tar.gz
     fi 
     tar -zxvf openssl-${opensslVersion}.tar.gz
     cd openssl-${opensslVersion}
-    ./config --prefix=${SERVER_ROOT}/openssl zlib-dynamic shared
+    ./config --prefix=${SERVER_ROOT}/openssl3 zlib-dynamic shared
     make && make install
 
     cd $SOURCE_ROOT && rm -rf $SOURCE_ROOT/openssl-${opensslVersion}
