@@ -60,9 +60,9 @@ mkdir -p $serverPath/mysql-apt/bin
 mkdir -p /var/run/mysqld
 chown mysql -R /var/run/mysqld
 
-# https://cdn.mysql.com/archives/mysql-8.4/mysql-server_${SUFFIX_NAME}.deb-bundle.tar
-# https://dev.mysql.com/get/Downloads/MySQL-8.4/mysql-server_${SUFFIX_NAME}.deb-bundle.tar
+# https://dev.mysql.com/get/Downloads/MySQL-9.0/mysql-server_${SUFFIX_NAME}.deb-bundle.tar
 # https://cdn.mysql.com/archives/mysql-9.0/mysql-server_9.0.1-1debian12_amd64.deb-bundle.tar
+
 wget --no-check-certificate -O ${myDir}/mysql-server_${SUFFIX_NAME}.deb-bundle.tar https://cdn.mysql.com/archives/mysql-9.0/mysql-server_${SUFFIX_NAME}.deb-bundle.tar
 # wget  --no-check-certificate -O ${myDir}/mysql-server_${SUFFIX_NAME}.deb-bundle.tar https://dev.mysql.com/get/Downloads/MySQL-9.1/mysql-server_${SUFFIX_NAME}.deb-bundle.tar
 chmod +x ${myDir}/mysql-server_${SUFFIX_NAME}.deb-bundle.tar
