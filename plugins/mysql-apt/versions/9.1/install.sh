@@ -21,7 +21,7 @@ VERSION_ID=`cat /etc/*-release | grep VERSION_ID | awk -F = '{print $2}' | awk -
 
 # cd /www/server/mdserver-web/plugins/mysql-apt && bash install.sh install 9.1
 
-# 暂时debian12没有标准版,先用11使用
+# debian12
 if [ "$OSNAME" == 'debian' ] && [ "$VERSION_ID" -lt '12' ] ;then 
 	VERSION_ID="12"
 fi

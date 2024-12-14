@@ -22,10 +22,9 @@ VERSION_ID=`cat /etc/*-release | grep VERSION_ID | awk -F = '{print $2}' | awk -
 # cd /www/server/mdserver-web/plugins/mysql-apt && bash install.sh install 9.0
 
 # 暂时debian12没有标准版,先用11使用
-# if [ "$OSNAME" == 'debian' ] && [ "$VERSION_ID" == '12' ] ;then 
-# 	echo "暂时不支持该${OSNAME}${VERSION_ID}"
-# 	exit 1
-# fi
+if [ "$OSNAME" == 'debian' ] && [ "$VERSION_ID" -lt '12' ] ;then 
+	VERSION_ID="12"
+fi
 
 
 ARCH="amd64"
