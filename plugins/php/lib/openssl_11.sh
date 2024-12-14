@@ -24,6 +24,15 @@ if [ ! -d ${SERVER_ROOT}/openssl11 ];then
     ./config --prefix=${SERVER_ROOT}/openssl11 zlib-dynamic shared
     make && make install
 
+    # export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/www/server/lib/openssl11/lib
+    if [ -d /etc/ld.so.conf.d ];then
+        echo "/www/server/lib/openssl11/lib" > /etc/ld.so.conf.d/openssl11.conf
+    elif [ -f /etc/ld.so.conf ]; then
+        echo "/www/server/lib/openssl11/lib" >> /etc/ld.so.conf
+    fi
+
+    ldconfig
+
     cd $SOURCE_ROOT && rm -rf $SOURCE_ROOT/openssl-${opensslVersion}
 fi
 

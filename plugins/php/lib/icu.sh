@@ -44,7 +44,7 @@ if [ ! -d ${SERVER_ROOT}/icu ];then
 		# export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/www/server/lib/icu/lib
 		if [ -d /etc/ld.so.conf.d ];then
 			echo "/www/server/lib/icu/lib" > /etc/ld.so.conf.d/mw-icu.conf
-		elif [[ -f /etc/ld.so.conf ]]; then
+		elif [ -f /etc/ld.so.conf ]; then
 			echo "/www/server/lib/icu/lib" >> /etc/ld.so.conf
 		fi
 
