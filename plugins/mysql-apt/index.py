@@ -451,7 +451,7 @@ def initMysql8Data():
             exit("Init MySQL{} Data Error".format(8))
 
         if data[1].find('error') != -1:
-            exit("Init MySQL{} Data Error".format(8))
+            exit("Init MySQL Data Error:"+data[1])
 
         if not mw.isAppleSystem():
             mw.execShell('chown -R mysql:mysql ' + datadir)
