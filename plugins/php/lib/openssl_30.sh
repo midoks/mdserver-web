@@ -28,9 +28,9 @@ if [ ! -d ${SERVER_ROOT}/openssl30 ];then
 
     # export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/www/server/lib/openssl30/lib
     if [ -d /etc/ld.so.conf.d ];then
-        echo "/www/server/lib/openssl30/lib" > /etc/ld.so.conf.d/openssl30.conf
+        echo "/www/server/lib/openssl30/lib64" > /etc/ld.so.conf.d/openssl30.conf
     elif [ -f /etc/ld.so.conf ]; then
-        echo "/www/server/lib/openssl30/lib" >> /etc/ld.so.conf
+        echo "/www/server/lib/openssl30/lib64" >> /etc/ld.so.conf
     fi
 
     ldconfig
