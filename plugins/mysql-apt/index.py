@@ -449,6 +449,8 @@ def initMysql8Data():
         data = mw.execShell(cmd)
         if data[1].lower().find('error') != -1:
             exit("Init MySQL8+ Data Error:"+data[1])
+        if data[1].lower().find('not found') != -1:
+            exit("Init MySQL8+ Data Error:"+data[1])
 
         if not mw.isAppleSystem():
             mw.execShell('chown -R mysql:mysql ' + datadir)
