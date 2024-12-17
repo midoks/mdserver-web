@@ -17,7 +17,7 @@ myDir=${serverPath}/source/mysql-apt
 
 OS_ARCH=`arch`
 MYSQL_VER=5.7.44
-SUFFIX_NAME=${MYSQL_VER}-linux-glibc2.28-${OS_ARCH}
+SUFFIX_NAME=${MYSQL_VER}-linux-glibc2.12-${OS_ARCH}
 
 # cd /www/server/mdserver-web/plugins/mysql-apt && bash install.sh install 5.7
 # cd /www/server/mdserver-web && python3 /www/server/mdserver-web/plugins/mysql-apt/index.py start 5.7
