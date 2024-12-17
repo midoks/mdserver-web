@@ -51,6 +51,7 @@ Talk is cheap, show me the code.  -- linus
 * MariaDB - 是MySQL的一个重要分支。
 * MySQL[community] - 一种关系数据库管理系统。
 * MongoDB - 一种非关系NOSQL数据库管理系统。
+* PostgreSQL - 功能强大的开源数据库。
 * phpMyAdmin - 著名Web端MySQL管理工具。
 * Memcached - 一个高性能的分布式内存对象缓存系统。
 * Redis - 一个高性能的KV数据库。
