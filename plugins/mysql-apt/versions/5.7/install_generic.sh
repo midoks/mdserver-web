@@ -19,6 +19,10 @@ OS_ARCH=`arch`
 MYSQL_VER=5.7.44
 SUFFIX_NAME=${MYSQL_VER}-linux-glibc2.12-${OS_ARCH}
 
+if [ "$OS_ARCH" != "x86_64" ];then
+	echo "暂时不支持该${OS_ARCH}"
+	exit 0
+
 # cd /www/server/mdserver-web/plugins/mysql-apt && bash install.sh install 5.7
 # cd /www/server/mdserver-web && python3 /www/server/mdserver-web/plugins/mysql-apt/index.py start 5.7
 APT_INSTALL()
