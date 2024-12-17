@@ -1,0 +1,17 @@
+{
+	"sort": 8,
+	"ps": "一个高性能键值数据存储系统",
+	"name": "valkey",
+	"title": "valkey",
+	"shell": "install.sh",
+	"versions":["8.0.1"],
+	"tip": "soft",
+	"checks": "server/valkey",
+	"path": "server/valkey",
+	"display": 1,
+	"author": "valkey",
+	"date": "2024-12-08",
+	"home": "https://valkey.io/download/",
+	"type": 0,
+	"pid": "2"
+}
