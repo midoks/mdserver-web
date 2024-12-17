@@ -41,7 +41,7 @@ if [ ! -f ${myDir}/mysql-${SUFFIX_NAME}.tar.gz ];then
 fi
 
 if [ -d ${myDir} ];then
-	cd ${myDir} && tar -Jxf ${myDir}/mysql-${SUFFIX_NAME}.tar.gz
+	cd ${myDir} && tar -zvxf ${myDir}/mysql-${SUFFIX_NAME}.tar.gz
 	cp -rf ${myDir}/mysql-${SUFFIX_NAME}/* $serverPath/mysql-apt
 fi
 
