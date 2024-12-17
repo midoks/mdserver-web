@@ -137,12 +137,10 @@ def contentReplace(content):
     service_path = mw.getServerDir()
     content = content.replace('{$ROOT_PATH}', mw.getFatherDir())
     content = content.replace('{$SERVER_PATH}', service_path)
-    content = content.replace('{$SERVER_APP_PATH}',
-                              service_path + '/' + getPluginName())
+    content = content.replace('{$SERVER_APP_PATH}',service_path + '/' + getPluginName())
 
     server_id = int(time.time())
     content = content.replace('{$SERVER_ID}', str(server_id))
-
     return content
 
 
@@ -418,7 +416,9 @@ def initMysql57Data():
 
         cmd = serverdir + '/bin/mysqld --basedir=' + serverdir + ' --datadir=' + \
             datadir + ' --initialize-insecure --explicit_defaults_for_timestamp'
+        # print(cmd)
         data = mw.execShell(cmd)
+        # print(data)
         if data[1].lower().find('error') != -1:
             exit("Init MySQL5.7 Data Error:"+data[1])
 
@@ -446,7 +446,9 @@ def initMysql8Data():
 
         cmd = serverdir + '/bin/mysqld --basedir=' + serverdir + ' --datadir=' + datadir + \
             ' --initialize-insecure --lower-case-table-names=1'
+        # print(cmd)
         data = mw.execShell(cmd)
+        # print(data)
         if data[1].lower().find('error') != -1:
             exit("Init MySQL8+ Data Error:"+data[1])
         if data[1].lower().find('not found') != -1:
