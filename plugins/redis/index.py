@@ -154,7 +154,7 @@ def initDreplace():
         mw.execShell('chmod +x ' + file_bin)
 
     # config replace
-    dst_conf = getServerDir() + '/redis.conf'
+    dst_conf = getConf()
     dst_conf_init = getServerDir() + '/init.pl'
     if not os.path.exists(dst_conf_init):
         conf_content = mw.readFile(getConfTpl())
@@ -221,7 +221,7 @@ def reload():
 
 
 def getPort():
-    conf = getServerDir() + '/redis.conf'
+    conf = getConf()
     content = mw.readFile(conf)
 
     rep = r"^(port)\s*([.0-9A-Za-z_& ~]+)"
@@ -234,7 +234,7 @@ def getPort():
 
 def getRedisCmd():
     requirepass = ""
-    conf = getServerDir() + '/redis.conf'
+    conf = getConf()
     content = mw.readFile(conf)
     rep = r"^(requirepass)\s*([.0-9A-Za-z_& ~]+)"
     tmp = re.search(rep, content, re.M)
@@ -467,7 +467,7 @@ def runLog():
 
 
 def getRedisConfInfo():
-    conf = getServerDir() + '/redis.conf'
+    conf = getConf()
 
     gets = [
         {'name': 'bind', 'type': 2, 'ps': '绑定IP(修改绑定IP可能会存在安全隐患)','must_show':1},
@@ -510,7 +510,7 @@ def submitRedisConf():
     gets = ['bind', 'port', 'timeout', 'maxclients',
             'databases', 'requirepass', 'maxmemory','slaveof','masterauth']
     args = getArgs()
-    conf = getServerDir() + '/redis.conf'
+    conf = getConf()
     content = mw.readFile(conf)
     for g in gets:
         if g in args:
