@@ -154,7 +154,7 @@ def initDreplace():
         mw.execShell('chmod +x ' + file_bin)
 
     # config replace
-    dst_conf = getServerDir() + '/valkey.conf'
+    dst_conf = getConf()
     dst_conf_init = getServerDir() + '/init.pl'
     if not os.path.exists(dst_conf_init):
         content = mw.readFile(getConfTpl())
@@ -233,7 +233,7 @@ def getPort():
 
 def getRedisCmd():
     requirepass = ""
-    conf = getServerDir() + '/valkey.conf'
+    conf = getConf()
     content = mw.readFile(conf)
     rep = r"^(requirepass)\s*([.0-9A-Za-z_& ~]+)"
     tmp = re.search(rep, content, re.M)
@@ -462,11 +462,11 @@ def initdUinstall():
 
 
 def runLog():
-    return getServerDir() + '/data/redis.log'
+    return getServerDir() + '/data/valkey.log'
 
 
 def getRedisConfInfo():
-    conf = getServerDir() + '/redis.conf'
+    conf = getConf()
 
     gets = [
         {'name': 'bind', 'type': 2, 'ps': '绑定IP(修改绑定IP可能会存在安全隐患)','must_show':1},
@@ -509,7 +509,7 @@ def submitRedisConf():
     gets = ['bind', 'port', 'timeout', 'maxclients',
             'databases', 'requirepass', 'maxmemory','slaveof','masterauth']
     args = getArgs()
-    conf = getServerDir() + '/valkey.conf'
+    conf = getConf()
     content = mw.readFile(conf)
     for g in gets:
         if g in args:
