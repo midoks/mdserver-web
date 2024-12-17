@@ -198,7 +198,7 @@ if [ "$VERSION_ID" -ge "8" ];then
         openssl openssl-devel patchelf libargon2-devel \
         ImageMagick ImageMagick-devel libyaml-devel \
         pv bc \
-        ncurses-compat-libs \
+        ncurses-compat-libs numactl \
         readline-devel rpcgen sqlite-devel rar unrar tar unzip vim-minimal wget zip zlib zlib-devel;
     do
         # dnf --enablerepo=remi,appstream,baseos,epel,extras,powertools install -y oniguruma5php-devel
@@ -219,7 +219,7 @@ else
         make mysql-devel ncurses ncurses-devel net-tools oniguruma oniguruma-devel openldap openldap-devel \
         openssl openssl-devel patch pcre pcre-devel perl perl-Data-Dumper perl-devel psmisc python-devel \
         pv bc\
-        ncurses-compat-libs \
+        ncurses-compat-libs numactl \
         python3-devel python3-pip re2c readline-devel rpcgen sqlite-devel tar unzip rar unrar vim-minimal vixie-cron \
         wget zip zlib zlib-devel ImageMagick ImageMagick-devel libyaml-devel patchelf libargon2-devel;
     do

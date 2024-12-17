@@ -41,7 +41,7 @@ Talk is cheap, show me the code.  -- linus
 
 ### 特别赞助
 
-- [找资源 - 阿里云盘资源搜索引擎](https://zhaoziyuan1.cc)
+- [虚位以待](https://bbs.midoks.icu)
 
 ### 主要插件介绍
 
@@ -49,8 +49,9 @@ Talk is cheap, show me the code.  -- linus
 * PHP[53-84] - PHP是世界上最好的编程语言。
 * MySQL - 一种关系数据库管理系统。
 * MariaDB - 是MySQL的一个重要分支。
-* MySQL[APT/YUM] - 一种关系数据库管理系统。
+* MySQL[community] - 一种关系数据库管理系统。
 * MongoDB - 一种非关系NOSQL数据库管理系统。
+* PostgreSQL - 功能强大的开源数据库。
 * phpMyAdmin - 著名Web端MySQL管理工具。
 * Memcached - 一个高性能的分布式内存对象缓存系统。
 * Redis - 一个高性能的KV数据库。

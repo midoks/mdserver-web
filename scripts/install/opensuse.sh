@@ -57,6 +57,7 @@ zypper install -y freetype2-devel
 zypper install -y libargon2-devel
 
 zypper install -y net-tools-deprecated
+zypper install -y numactl
 
 # zypper install -y  php-config
 
