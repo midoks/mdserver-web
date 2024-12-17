@@ -6,6 +6,7 @@ export PATH
 export DEBIAN_FRONTEND=noninteractive
 
 # https://downloads.mysql.com/archives/community/
+
 curPath=`pwd`
 rootPath=$(dirname "$curPath")
 rootPath=$(dirname "$rootPath")
@@ -15,11 +16,11 @@ sysName=`uname`
 myDir=${serverPath}/source/mysql-apt
 
 OS_ARCH=`arch`
-MYSQL_VER=9.0.1
+MYSQL_VER=5.7.39
 SUFFIX_NAME=${MYSQL_VER}-linux-glibc2.28-${OS_ARCH}
 
-# cd /www/server/mdserver-web/plugins/mysql-apt && bash install.sh install 9.0
-# cd /www/server/mdserver-web && python3 /www/server/mdserver-web/plugins/mysql-apt/index.py start 9.0
+# cd /www/server/mdserver-web/plugins/mysql-apt && bash install.sh install 5.7
+# cd /www/server/mdserver-web && python3 /www/server/mdserver-web/plugins/mysql-apt/index.py start 5.7
 APT_INSTALL()
 {
 
@@ -28,9 +29,8 @@ mkdir -p $myDir
 mkdir -p $serverPath/mysql-apt
 
 # Linux - Generic
-# https://cdn.mysql.com/archives/mysql-9.0/mysql-9.0.1-linux-glibc2.28-x86_64.tar.xz
 if [ ! -f ${myDir}/mysql-${SUFFIX_NAME}.tar.xz ];then
-	wget --no-check-certificate -O ${myDir}/mysql-${SUFFIX_NAME}.tar.xz https://cdn.mysql.com/archives/mysql-9.0/mysql-${SUFFIX_NAME}.tar.xz
+	wget --no-check-certificate -O ${myDir}/mysql-${SUFFIX_NAME}.tar.xz https://cdn.mysql.com/archives/mysql-5.7/mysql-${SUFFIX_NAME}.tar.xz
 fi
 
 if [ -d ${myDir} ];then
@@ -62,10 +62,10 @@ Install_mysql()
 
 	if [ "$?" == "0" ];then
 		mkdir -p $serverPath/mysql-apt
-		echo '9.0' > $serverPath/mysql-apt/version.pl
+		echo '5.7' > $serverPath/mysql-apt/version.pl
 		echo '安装完成'
 	else
-		echo '9.0' > $serverPath/mysql-apt/version.pl
+		echo '5.7' > $serverPath/mysql-apt/version.pl
 		echo "暂时不支持该系统"
 	fi
 }

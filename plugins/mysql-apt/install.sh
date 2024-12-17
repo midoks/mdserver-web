@@ -7,7 +7,9 @@ rootPath=$(dirname "$curPath")
 rootPath=$(dirname "$rootPath")
 serverPath=$(dirname "$rootPath")
 
+# https://dev.mysql.com/downloads/mysql/
 # https://downloads.mysql.com/archives/community/
+
 
 # /www/server/mysql-apt/bin/usr/sbin/mysqld --basedir=/www/server/mysql-apt/bin/usr --datadir=/www/server/mysql-apt/data --initialize-insecure --explicit_defaults_for_timestamp
 
@@ -17,8 +19,6 @@ serverPath=$(dirname "$rootPath")
 # cd /www/server/mdserver-web && python3 /www/server/mdserver-web/plugins/mysql-apt/index.py start 5.7
 # cd /www/server/mdserver-web && python3 /www/server/mdserver-web/plugins/mysql-apt/index.py fix_db_access
 # cd /www/server/mdserver-web && source bin/activate && python3 plugins/mysql/index.py do_full_sync  {"db":"xxx","sign":"","begin":1}
-
-
 
 action=$1
 type=$2
@@ -58,11 +58,7 @@ if [ "${action}" == "uninstall" ];then
 fi
 
 
-if [ "$2" == "8.4" ];then
-	sh -x $curPath/versions/$2/install_generic.sh $1
-else
-	sh -x $curPath/versions/$2/install.sh $1
-fi
+sh -x $curPath/versions/$2/install_generic.sh $1
 
 if [ "${action}" == "install" ];then
 	#初始化

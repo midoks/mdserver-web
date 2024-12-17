@@ -45,7 +45,7 @@ if [ "$ARCH" != "amd64" ];then
 fi
 
 
-MYSQL_VER=8.0.36
+MYSQL_VER=8.0.39
 SUFFIX_NAME=${MYSQL_VER}-1${OSNAME}${VERSION_ID}_${ARCH}
 
 

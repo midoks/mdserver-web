@@ -15,29 +15,14 @@ sysName=`uname`
 
 myDir=${serverPath}/source/mysql-apt
 
+OS_ARCH=`arch`
+MYSQL_VER=9.1.0
+SUFFIX_NAME=${MYSQL_VER}-linux-glibc2.28-${OS_ARCH}
+
 # cd /www/server/mdserver-web/plugins/mysql-apt && bash install.sh install 8.4
 # cd /www/server/mdserver-web && python3 /www/server/mdserver-web/plugins/mysql-apt/index.py start 8.4
 APT_INSTALL()
 {
-
-ARCH="amd64"
-TMP_ARCH=`arch`
-if [ "$TMP_ARCH" == "x86_64" ];then
-	ARCH="amd64"
-elif [ "$TMP_ARCH" == "aarch64" ];then
-	ARCH="arm64"
-else
-	ARCH="amd64"
-fi
-
-if [ "$ARCH" != "amd64" ];then
-	echo "暂时不支持该${ARCH}"
-	exit 1
-fi
-
-
-MYSQL_VER=8.4.2
-SUFFIX_NAME=${MYSQL_VER}-linux-glibc2.28-${TMP_ARCH}
 
 ########
 mkdir -p $myDir
@@ -45,8 +30,9 @@ mkdir -p $serverPath/mysql-apt
 
 # Linux - Generic
 # https://cdn.mysql.com/archives/mysql-8.4/mysql-8.4.2-linux-glibc2.28-x86_64.tar.xz
+# https://cdn.mysql.com/Downloads/MySQL-9.1/mysql-mysql-${SUFFIX_NAME}.tar.xz
 if [ ! -f ${myDir}/mysql-${SUFFIX_NAME}.tar.xz ];then
-	wget --no-check-certificate -O ${myDir}/mysql-${SUFFIX_NAME}.tar.xz https://cdn.mysql.com/archives/mysql-8.4/mysql-${SUFFIX_NAME}.tar.xz
+	wget --no-check-certificate -O ${myDir}/mysql-${SUFFIX_NAME}.tar.xz https://cdn.mysql.com/Downloads/MySQL-9.1/mysql-mysql-${SUFFIX_NAME}.tar.xz
 fi
 
 if [ -d ${myDir} ];then
@@ -62,7 +48,7 @@ rm -rf $myDir/mysql-${SUFFIX_NAME}
 APT_UNINSTALL()
 {
 ###
-rm -rf $myDir
+rm -rf $myDir/mysql-${SUFFIX_NAME}
 # apt remove -y mysql-server
 ###
 }
@@ -79,10 +65,10 @@ Install_mysql()
 
 	if [ "$?" == "0" ];then
 		mkdir -p $serverPath/mysql-apt
-		echo '8.4' > $serverPath/mysql-apt/version.pl
+		echo '9.1' > $serverPath/mysql-apt/version.pl
 		echo '安装完成'
 	else
-		echo '8.4' > $serverPath/mysql-apt/version.pl
+		echo '9.1' > $serverPath/mysql-apt/version.pl
 		echo "暂时不支持该系统"
 	fi
 }
