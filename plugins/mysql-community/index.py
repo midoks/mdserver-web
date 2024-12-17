@@ -3480,7 +3480,7 @@ def installPreInspection(version):
     sys = mw.execShell(cmd)
 
     if sys[1] != '':
-        return '不支持改系统'
+        return '不支持该系统'
 
     cmd = "cat /etc/*-release | grep VERSION_ID | awk -F = '{print $2}' | awk -F '\"' '{print $2}'"
     sys_id = mw.execShell(cmd)
