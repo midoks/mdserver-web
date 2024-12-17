@@ -20,16 +20,6 @@ if os.path.exists(web_dir):
 import core.mw as mw
 import core.db as db
 
-_ver = sys.version_info
-is_py2 = (_ver[0] == 2)
-is_py3 = (_ver[0] == 3)
-
-DEBUG = False
-
-if is_py2:
-    reload(sys)
-    sys.setdefaultencoding('utf-8')
-
 app_debug = False
 if mw.isAppleSystem():
     app_debug = True
@@ -81,7 +71,10 @@ def status():
 def getConf():
     cfg = getServerDir() + "/cfg.json"
     if not os.path.exists(cfg):
-        return mw.returnJson(False, "未配置", [])
+        rdata = {
+            'use_sftp':False,
+        }
+        return mw.returnJson(False, "未配置", rdata)
     data = mw.readFile(cfg)
     data = json.loads(data)
     return mw.returnJson(True, "OK", data)
