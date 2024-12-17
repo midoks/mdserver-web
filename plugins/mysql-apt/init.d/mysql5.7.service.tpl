@@ -31,8 +31,7 @@ User=mysql
 Group=mysql
 Type=simple
 PermissionsStartOnly=true
-#ExecStartPre={$SERVER_PATH}/mysql-apt/bin/usr/share/mysql/mysql-systemd-start pre
-ExecStart={$SERVER_PATH}/mysql-apt/bin/usr/sbin/mysqld --defaults-file={$SERVER_PATH}/mysql-apt/etc/my.cnf
+ExecStart={$SERVER_PATH}/mysql-apt/bin/mysqld --defaults-file={$SERVER_PATH}/mysql-apt/etc/my.cnf
 TimeoutSec=600
 LimitNOFILE = 5000
 Restart=on-failure
