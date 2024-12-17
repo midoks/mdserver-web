@@ -1,5 +1,5 @@
 {
-	"sort": 7,
+	"sort":3,
 	"hook":["database"],
 	"ps": "一个高性能的NOSQL数据库【社区版】",
 	"name": "mongodb",

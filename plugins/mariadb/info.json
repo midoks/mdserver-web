@@ -1,4 +1,5 @@
 {
+	"sort":2,
 	"hook":["database"],
 	"title":"MariaDB",
 	"tip":"soft",
