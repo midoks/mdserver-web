@@ -260,10 +260,7 @@ def runInfo():
     
     cmd = getRedisCmd()
     cmd = cmd + 'info'
-
-    print(cmd)
     data = mw.execShell(cmd)[0]
-    print(data)
     res = [
         'tcp_port',
         'uptime_in_days',  # 已运行天数
