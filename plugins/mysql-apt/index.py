@@ -416,7 +416,7 @@ def initMysql57Data():
         myconf = serverdir + "/etc/my.cnf"
         user = pGetDbUser()
 
-        cmd = serverdir + '/bin/usr/sbin/mysqld --basedir=' + serverdir + '/bin/usr --datadir=' + \
+        cmd = serverdir + '/bin/mysqld --basedir=' + serverdir + ' --datadir=' + \
             datadir + ' --initialize-insecure --explicit_defaults_for_timestamp'
         data = mw.execShell(cmd)
         if data[1].lower().find('error') != -1:
@@ -444,7 +444,7 @@ def initMysql8Data():
         serverdir = getServerDir()
         user = pGetDbUser()
 
-        cmd = serverdir + '/bin/usr/sbin/mysqld --basedir=' + serverdir + '/bin/usr --datadir=' + datadir + \
+        cmd = serverdir + '/bin/mysqld --basedir=' + serverdir + ' --datadir=' + datadir + \
             ' --initialize-insecure --lower-case-table-names=1'
         data = mw.execShell(cmd)
         if data[1].lower().find('error') != -1:
@@ -470,7 +470,7 @@ def initMysql8Pwd():
     myconf = serverdir + "/etc/my.cnf"
     pwd = mw.getRandomString(16)
 
-    cmd_my = serverdir + '/bin/usr/bin/mysql'
+    cmd_my = serverdir + '/bin/mysql'
 
     cmd_pass = cmd_my + ' --defaults-file=' + myconf + ' -uroot -e'
     cmd_pass = cmd_pass + '"alter user \'root\'@\'localhost\' identified by \'' + pwd + '\';'
@@ -494,12 +494,10 @@ def initMysql8Pwd():
     # 删除冗余账户
     hostname = mw.execShell('hostname')[0].strip()
     if hostname != 'localhost':
-        drop_hostname =  cmd_my + ' --defaults-file=' + \
-            myconf + ' -uroot -p' + pwd + ' -e "drop user \'\'@\'' + hostname + '\'";'
+        drop_hostname =  cmd_my + ' --defaults-file=' + myconf + ' -uroot -p' + pwd + ' -e "drop user \'\'@\'' + hostname + '\'";'
         mw.execShell(drop_hostname)
 
-        drop_root_hostname =  cmd_my + ' --defaults-file=' + \
-            myconf + ' -uroot -p' + pwd + ' -e "drop user \'root\'@\'' + hostname + '\'";'
+        drop_root_hostname =  cmd_my + ' --defaults-file=' + myconf + ' -uroot -p' + pwd + ' -e "drop user \'root\'@\'' + hostname + '\'";'
         mw.execShell(drop_root_hostname)
 
     return True
@@ -898,7 +896,7 @@ def importDbExternal():
     sock = getSocketFile()
 
     os.environ["MYSQL_PWD"] = pwd
-    mysql_cmd = getServerDir() + '/bin/usr/bin/mysql -S ' + sock + ' -uroot -p' + \
+    mysql_cmd = getServerDir() + '/bin/mysql -S ' + sock + ' -uroot -p' + \
         pwd + ' ' + name + ' < ' + import_sql
 
     # print(mysql_cmd)
@@ -984,7 +982,7 @@ def importDbExternalProgressBar():
     #     option = ' --set-gtid-purged=off '
 
     my_cnf = getConf()
-    mysql_cmd = getServerDir() + '/bin/usr/bin/mysql --defaults-file=' + my_cnf + \
+    mysql_cmd = getServerDir() + '/bin/mysql --defaults-file=' + my_cnf + \
         ' -uroot -p"' + pwd + '" -f ' + name
     mysql_cmd_progress_bar = "pv -t -p " + import_sql + '|'+ mysql_cmd
     print(mysql_cmd_progress_bar)
@@ -1009,7 +1007,7 @@ def importDbBackup():
 
     pwd = pSqliteDb('config').where('id=?', (1,)).getField('mysql_root')
     sock = getSocketFile()
-    mysql_cmd = getServerDir() + '/bin/usr/bin/mysql -S ' + sock + ' -uroot -p' + pwd + \
+    mysql_cmd = getServerDir() + '/bin/mysql -S ' + sock + ' -uroot -p' + pwd + \
         ' ' + name + ' < ' + file_path_sql
 
     # print(mysql_cmd)
@@ -1514,7 +1512,7 @@ def resetDbRootPwd(version):
     pSqliteDb('config').where('id=?', (1,)).save('mysql_root', (pwd,))
     mdb8 = getMdb8Ver()
     if not mw.inArray(mdb8, version):
-        cmd_pass = serverdir + '/bin/usr/bin/mysql --defaults-file=' + myconf + ' -uroot -e'
+        cmd_pass = serverdir + '/bin/mysql --defaults-file=' + myconf + ' -uroot -e'
         cmd_pass = cmd_pass + '"UPDATE mysql.user SET password=PASSWORD(\'' + pwd + "') WHERE user='root';"
         cmd_pass = cmd_pass + 'flush privileges;"'
         data = mw.execShell(cmd_pass)
@@ -1534,7 +1532,7 @@ def resetDbRootPwd(version):
 
         tmp_file = "/tmp/mysql_init_tmp.log"
         mw.writeFile(tmp_file, reset_pwd)
-        cmd_pass = serverdir + '/bin/usr/bin/mysql --defaults-file=' + myconf + ' -uroot -proot < ' + tmp_file
+        cmd_pass = serverdir + '/bin/mysql --defaults-file=' + myconf + ' -uroot -proot < ' + tmp_file
 
         data = mw.execShell(cmd_pass)
         # print(data)
@@ -3245,7 +3243,7 @@ def doFullSyncUser(version=''):
                 dmp_option += " --master-data=1 --apply-slave-statements --include-master-host-port --compress "
             
 
-        dump_sql_data = getServerDir() + "/bin/usr/bin/mysqldump --single-transaction --default-character-set=utf8mb4  -q " + dmp_option + " -h" + \
+        dump_sql_data = getServerDir() + "/bin/mysqldump --single-transaction --default-character-set=utf8mb4  -q " + dmp_option + " -h" + \
             ip + " -P" + port + " -u" + user + ' -p"' + apass + '" --ssl-mode=DISABLED ' + sync_db + " > " + bak_file
         print(dump_sql_data)
         time_s = time.time()
@@ -3276,16 +3274,16 @@ def doFullSyncUser(version=''):
         sock = getSocketFile()
 
         if is_exist_pv:
-            my_import_cmd = getServerDir() + '/bin/usr/bin/mysql -S ' + sock + " -uroot -p'" + pwd + "' " + sync_db_import
+            my_import_cmd = getServerDir() + '/bin/mysql -S ' + sock + " -uroot -p'" + pwd + "' " + sync_db_import
             my_import_cmd = "pv -t -p " + bak_file + '|' + my_import_cmd
             print(my_import_cmd)
             os.system(my_import_cmd)
         else:
-            my_import_cmd = getServerDir() + '/bin/usr/bin/mysql -S ' + sock + " -uroot -p'" + pwd + "' " + sync_db_import + ' < ' + bak_file
+            my_import_cmd = getServerDir() + '/bin/mysql -S ' + sock + " -uroot -p'" + pwd + "' " + sync_db_import + ' < ' + bak_file
             print(my_import_cmd)
             mw.execShell(my_import_cmd)
 
-        my_import_cmd = getServerDir() + '/bin/usr/bin/mysql -S ' + sock + ' -uroot -p' + pwd + \
+        my_import_cmd = getServerDir() + '/bin/mysql -S ' + sock + ' -uroot -p' + pwd + \
             ' ' + sync_db_import + ' < ' + bak_file
         mw.execShell(my_import_cmd)
 
@@ -3420,7 +3418,7 @@ def doFullSyncSSH(version=''):
     root_dir = getServerDir()
     msock = root_dir + "/mysql.sock"
     mw.execShell("cd /tmp && gzip -d dump.sql.gz")
-    cmd = root_dir + "/bin/usr/bin/mysql -S " + msock + \
+    cmd = root_dir + "/bin/mysql -S " + msock + \
         " -uroot -p" + pwd + " < /tmp/dump.sql"
 
     print(cmd)

@@ -15,11 +15,11 @@ if os.path.exists(web_dir):
 
 import core.mw as mw
 
-if mw.isAppleSystem():
-    cmd = 'ls /usr/local/lib/ | grep python  | cut -d \\  -f 1 | awk \'END {print}\''
-    info = mw.execShell(cmd)
-    p = "/usr/local/lib/" + info[0].strip() + "/site-packages"
-    sys.path.append(p)
+# if mw.isAppleSystem():
+#     cmd = 'ls /usr/local/lib/ | grep python  | cut -d \\  -f 1 | awk \'END {print}\''
+#     info = mw.execShell(cmd)
+#     p = "/usr/local/lib/" + info[0].strip() + "/site-packages"
+#     sys.path.append(p)
 
 
 app_debug = False

@@ -27,6 +27,12 @@ if [ "$OSNAME" == 'debian' ] && [ "$VERSION_ID" -lt '12' ] ;then
 fi
 
 
+# /lib/systemd/system/mysql.service
+# /etc/mysql/my.cnf
+
+APT_INSTALL()
+{
+
 ARCH="amd64"
 TMP_ARCH=`arch`
 if [ "$TMP_ARCH" == "x86_64" ];then
@@ -44,32 +50,25 @@ fi
 
 
 MYSQL_VER=8.4.2
-SUFFIX_NAME=${MYSQL_VER}-linux-glibc2.28_${TMP_ARCH}
+SUFFIX_NAME=${MYSQL_VER}-linux-glibc2.28-${TMP_ARCH}
 
-
-# /lib/systemd/system/mysql.service
-# /etc/mysql/my.cnf
-
-APT_INSTALL()
-{
 ########
 mkdir -p $myDir
-mkdir -p $serverPath/mysql-apt/bin
-
-mkdir -p /var/run/mysqld
-chown mysql -R /var/run/mysqld
+mkdir -p $serverPath/mysql-apt
 
 # Linux - Generic
 # https://cdn.mysql.com/archives/mysql-8.4/mysql-8.4.2-linux-glibc2.28-x86_64.tar.xz
-wget --no-check-certificate -O ${myDir}/mysql-${SUFFIX_NAME}.tar.xz https://cdn.mysql.com/archives/mysql-8.4/mysql-${SUFFIX_NAME}.tar.xz
+if [ ! -f ${myDir}/mysql-${SUFFIX_NAME}.tar.xz ];then
+	wget --no-check-certificate -O ${myDir}/mysql-${SUFFIX_NAME}.tar.xz https://cdn.mysql.com/archives/mysql-8.4/mysql-${SUFFIX_NAME}.tar.xz
+fi
 
 if [ -d ${myDir} ];then
-	cd ${myDir} && tar zvxf ${myDir}/mysql-${SUFFIX_NAME}.tar.xz
-
+	cd ${myDir} && tar -Jxf ${myDir}/mysql-${SUFFIX_NAME}.tar.xz
+	cp -rf ${myDir}/mysql-${SUFFIX_NAME}/* $serverPath/mysql-apt
 fi
 
 # 测试时可关闭
-rm -rf $myDir
+rm -rf $myDir/mysql-${SUFFIX_NAME}
 #######
 }
 
