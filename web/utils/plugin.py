@@ -444,6 +444,7 @@ class plugin(object):
 
         pInfo = {
             "id": 10000,
+            "sort": 10000,
             "pid": info['pid'],
             "type": 1000,
             "name": info['name'],
@@ -469,6 +470,9 @@ class plugin(object):
 
         if 'icon' in info:
             pInfo['icon'] = info['icon']
+
+        if 'sort' in info:
+            pInfo['sort'] = info['sort']
 
         if checks.find('VERSION') > -1:
             pInfo['install_checks'] = checks.replace('VERSION', info['versions'])
@@ -689,6 +693,8 @@ class plugin(object):
             for index in range(len(t)):
                 info.append(t[index])
 
+        info = sorted(info, key=lambda f: int(f['sort']), reverse=False)
+        
         start = (page - 1) * size
         end = start + size
         x = info[start:end]

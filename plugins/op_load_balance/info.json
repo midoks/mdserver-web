@@ -1,4 +1,5 @@
 {
+	"sort":3,
 	"title":"OP负载均衡",
 	"tip":"soft",
 	"name":"op_load_balance",

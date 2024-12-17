@@ -1,5 +1,6 @@
 {
 	"hook":["database"],
+	"sort": 6,
 	"title":"PostgreSQL",
 	"tip":"soft",
 	"name":"postgresql",

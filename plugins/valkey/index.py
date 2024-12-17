@@ -19,7 +19,7 @@ if mw.isAppleSystem():
 
 
 def getPluginName():
-    return 'redis'
+    return 'valkey'
 
 
 def getPluginDir():
@@ -42,12 +42,12 @@ def getInitDFile():
 
 
 def getConf():
-    path = getServerDir() + "/redis.conf"
+    path = getServerDir() + "/valkey.conf"
     return path
 
 
 def getConfTpl():
-    path = getPluginDir() + "/config/redis.conf"
+    path = getPluginDir() + "/config/valkey.conf"
     return path
 
 
@@ -125,7 +125,7 @@ def contentReplace(content):
     content = content.replace('{$ROOT_PATH}', mw.getFatherDir())
     content = content.replace('{$SERVER_PATH}', service_path)
     content = content.replace('{$SERVER_APP}', service_path + '/'+getPluginName())
-    content = content.replace('{$REDIS_PASS}', mw.getRandomString(10))
+    content = content.replace('{$VALKEY_PASS}', mw.getRandomString(10))
     return content
 
 
@@ -157,11 +157,11 @@ def initDreplace():
     dst_conf = getConf()
     dst_conf_init = getServerDir() + '/init.pl'
     if not os.path.exists(dst_conf_init):
-        conf_content = mw.readFile(getConfTpl())
-        conf_content = conf_content.replace('{$SERVER_PATH}', service_path)
-        conf_content = conf_content.replace('{$REDIS_PASS}', mw.getRandomString(10))
+        content = mw.readFile(getConfTpl())
+        content = content.replace('{$SERVER_PATH}', service_path)
+        content = content.replace('{$VALKEY_PASS}', mw.getRandomString(10))
 
-        mw.writeFile(dst_conf, conf_content)
+        mw.writeFile(dst_conf, content)
         mw.writeFile(dst_conf_init, 'ok')
 
     # systemd
@@ -169,7 +169,6 @@ def initDreplace():
     systemService = systemDir + '/' + getPluginName() + '.service'
     if os.path.exists(systemDir) and not os.path.exists(systemService):
         systemServiceTpl = getPluginDir() + '/init.d/' + getPluginName() + '.service.tpl'
-        service_path = mw.getServerDir()
         content = mw.readFile(systemServiceTpl)
         content = content.replace('{$SERVER_PATH}', service_path)
         mw.writeFile(systemService, content)
@@ -178,7 +177,7 @@ def initDreplace():
     return file_bin
 
 
-def redisOp(method):
+def wkOp(method):
     file = initDreplace()
 
     current_os = mw.getOs()
@@ -201,15 +200,15 @@ def redisOp(method):
 
 
 def start():
-    return redisOp('start')
+    return wkOp('start')
 
 
 def stop():
-    return redisOp('stop')
+    return wkOp('stop')
 
 
 def restart():
-    status = redisOp('restart')
+    status = wkOp('restart')
 
     log_file = runLog()
     mw.execShell("echo '' > " + log_file)
@@ -217,11 +216,11 @@ def restart():
 
 
 def reload():
-    return redisOp('reload')
+    return wkOp('reload')
 
 
 def getPort():
-    conf = getConf()
+    conf = getServerDir() + '/valkey.conf'
     content = mw.readFile(conf)
 
     rep = r"^(port)\s*([.0-9A-Za-z_& ~]+)"
@@ -246,10 +245,10 @@ def getRedisCmd():
     # findDebian = mw.execShell('cat /etc/issue |grep Debian')
     # if findDebian[0] != '':
     #     default_ip = mw.getLocalIp()
-    cmd = getServerDir() + "/bin/redis-cli -h " + default_ip + ' -p ' + port + " "
+    cmd = getServerDir() + "/bin/valkey-cli -h " + default_ip + ' -p ' + port + " "
 
     if requirepass != "":
-        cmd = getServerDir() + '/bin/redis-cli -h ' + default_ip + ' -p ' + port + ' -a "' + requirepass + '" '
+        cmd = getServerDir() + '/bin/valkey-cli -h ' + default_ip + ' -p ' + port + ' -a "' + requirepass + '" '
 
     return cmd
 
@@ -261,10 +260,7 @@ def runInfo():
     
     cmd = getRedisCmd()
     cmd = cmd + 'info'
-
-    # print(cmd)
     data = mw.execShell(cmd)[0]
-    # print(data)
     res = [
         'tcp_port',
         'uptime_in_days',  # 已运行天数
@@ -463,7 +459,7 @@ def initdUinstall():
 
 
 def runLog():
-    return getServerDir() + '/data/redis.log'
+    return getServerDir() + '/data/valkey.log'
 
 
 def getRedisConfInfo():

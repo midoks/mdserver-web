@@ -2253,6 +2253,7 @@ function pluginConfigTpl(_name, version, func, config_tpl_func, read_config_tpl_
         pluginConfigSave(fileName,save_callback_func);
     }
 
+
     var fileName = '';
     $.post('/plugins/run',{name:_name, func:_config_tpl_func,version:version}, function(data){
     	var rdata = $.parseJSON(data.data);
@@ -2266,6 +2267,7 @@ function pluginConfigTpl(_name, version, func, config_tpl_func, read_config_tpl_
     			var loadT = layer.msg('配置模版获取中...',{icon:16,time:0,shade: [0.3, '#000']});
 
     			var _args = JSON.stringify({file:selected});
+
     			
     			$.post('/plugins/run', {name:_name, func:_read_config_tpl_func,version:version,args:_args}, function(data){
     				layer.close(loadT);
@@ -2275,9 +2277,13 @@ function pluginConfigTpl(_name, version, func, config_tpl_func, read_config_tpl_
 		                return;
 		            }
 
+		            
+
     				$("#textBody").empty().text(rdata.data);
     				$(".CodeMirror").remove();
 		            editor = CodeMirror.fromTextArea(document.getElementById("textBody"), {
+		            	lineNumbers: true,
+		                matchBrackets:true,
 		                extraKeys: {
 		                    "Ctrl-Space": "autocomplete",
 		                    "Ctrl-F": "findPersistent",
@@ -2288,15 +2294,12 @@ function pluginConfigTpl(_name, version, func, config_tpl_func, read_config_tpl_
 		                    "Cmd-S":function() {
 								saveDataFunc();
 							}
-		                },
-		                lineNumbers: true,
-		                matchBrackets:true,
+		                }
 		            });
 		            editor.focus();
 		            $(".CodeMirror-scroll").css({"height":"300px","margin":0,"padding":0});
-		            $("#onlineEditFileBtn").unbind('click');
-		            $("#onlineEditFileBtn").click(function(){
-		                saveDataFunc()
+		            $("#onlineEditFileBtn").unbind('click').click(function(){
+		                saveDataFunc();
 		            });
     			},'json');
     		}
@@ -2318,7 +2321,7 @@ function pluginConfigTpl(_name, version, func, config_tpl_func, read_config_tpl_
             }
             $("#textBody").empty().text(rdata.data.data);
             $(".CodeMirror").remove();
-            var editor = CodeMirror.fromTextArea(document.getElementById("textBody"), {
+            editor = CodeMirror.fromTextArea(document.getElementById("textBody"), {
                 extraKeys: {
                     "Ctrl-Space": "autocomplete",
                     "Ctrl-F": "findPersistent",

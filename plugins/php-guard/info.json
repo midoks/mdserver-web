@@ -1,5 +1,5 @@
 {
-	"sort": 7,
+	"sort": 5,
 	"ps": "监控PHP-FPM运行状态，防止大批量出现502错误!",
 	"shell": "install.sh",
 	"name": "php-guard",
