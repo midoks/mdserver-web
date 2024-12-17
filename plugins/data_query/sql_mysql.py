@@ -84,7 +84,7 @@ class nosqlMySQL():
         result['host'] = '127.0.0.1'
         result['username'] = 'root'
 
-        if sid in ['mysql', 'mysql-apt', 'mysql-yum']:
+        if sid in ['mysql', 'mysql-apt', 'mysql-yum', 'mysql-community']:
             my_cnf_path = "{}/{}/etc/my.cnf".format(mw.getServerDir(),sid)
             if not os.path.exists(my_cnf_path):
                 return False
@@ -132,6 +132,10 @@ class nosqlMySQL():
         local_mysql_yum = "{}/mysql-yum/etc/my.cnf".format(mw.getServerDir())
         if os.path.exists(local_mysql_yum):
             data.append({'name':'本地服务器[yum]', 'val':'mysql-yum'})
+
+        local_mysql_yum = "{}/mysql-community/etc/my.cnf".format(mw.getServerDir())
+        if os.path.exists(local_mysql_yum):
+            data.append({'name':'本地服务器[community]', 'val':'mysql-community'})
         return mw.returnData(True, 'ok', data)
 
 @singleton

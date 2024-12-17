@@ -15,6 +15,7 @@ sed -i 's#SELINUX=enforcing#SELINUX=disabled#g' /etc/selinux/config
 
 yum install -y wget curl lsof unzip
 yum install -y expect
+yum install -y ncurses-compat-libs
 dnf install crontabs -y
 
 SSH_PORT=`netstat -ntpl|grep sshd|grep -v grep | sed -n "1,1p" | awk '{print $4}' | awk -F : '{print $2}'`

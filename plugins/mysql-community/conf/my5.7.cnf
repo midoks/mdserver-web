@@ -1,0 +1,110 @@
+[client]
+user = root
+#password	= your_password
+port		= 33206
+socket		= {$SERVER_APP_PATH}/mysql.sock
+default-character-set = UTF8MB4
+
+[mysqld]
+!include {$SERVER_APP_PATH}/etc/mode/classic.cnf
+
+pid-file = {$SERVER_APP_PATH}/data/mysql.pid
+user = mysql
+port		= 33206
+socket		= {$SERVER_APP_PATH}/mysql.sock
+datadir = {$SERVER_APP_PATH}/data
+log-error =  {$SERVER_APP_PATH}/data/error.log
+server-id	= {$SERVER_ID}
+sql-mode=NO_ENGINE_SUBSTITUTION,STRICT_TRANS_TABLES
+
+default_storage_engine = InnoDB
+language={$SERVER_APP_PATH}/share/english
+
+key_buffer_size = 8M
+table_open_cache = 32
+sort_buffer_size = 256K
+net_buffer_length = 4K
+read_buffer_size = 128K
+read_rnd_buffer_size = 256K
+myisam_sort_buffer_size = 4M
+thread_cache_size = 4
+lower_case_table_names=0
+character-set-server = UTF8MB4
+
+query_cache_type = 1
+query_cache_size = 64M
+
+max_connections = 500
+max_connect_errors = 100
+open_files_limit = 2560
+max_allowed_packet = 128M
+
+skip_name_resolve = 1
+skip-ssl
+#skip-networking
+#skip-external-locking
+#loose-skip-innodb
+#skip-grant-tables
+
+log-bin=mysql-bin
+binlog_format=mixed
+slow_query_log=1
+slow-query-log-file={$SERVER_APP_PATH}/data/mysql-slow.log
+long_query_time=3
+expire_logs_days=30
+#log_queries_not_using_indexes=on
+
+relay-log=mdserver
+relay-log-index=mdserver
+
+#master
+#sync_binlog=1
+
+#binlog-do-db
+binlog-ignore-db = test
+binlog-ignore-db = mysql
+binlog-ignore-db = information_schema
+binlog-ignore-db = performance_schema
+
+#slave
+log-slave-updates
+#replicate-do-db
+slave_skip_errors=1062,1396
+replicate-ignore-db = information_schema
+replicate-ignore-db = performance_schema
+replicate-ignore-db = mysql
+replicate-ignore-db = test
+
+master_info_repository = table
+relay_log_info_repository = table
+
+default_storage_engine = InnoDB
+innodb_data_home_dir = {$SERVER_APP_PATH}/data
+innodb_data_file_path = ibdata1:10M:autoextend
+innodb_log_group_home_dir = {$SERVER_APP_PATH}/data
+innodb_buffer_pool_size = 16M
+innodb_log_file_size = 5M
+innodb_log_buffer_size = 8M
+innodb_flush_log_at_trx_commit = 1
+innodb_lock_wait_timeout = 120
+innodb_max_dirty_pages_pct = 90
+innodb_read_io_threads = 1
+innodb_write_io_threads = 1
+innodb_file_per_table=1
+
+secure-file-priv={$SERVER_APP_PATH}/tmp
+
+[mysqldump]
+quick
+
+[mysql]
+no-auto-rehash
+
+[myisamchk]
+key_buffer_size = 20M
+sort_buffer_size = 20M
+read_buffer = 2M
+write_buffer = 2M
+
+[mysqlhotcopy]
+interactive-timeout

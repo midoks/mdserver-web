@@ -398,6 +398,10 @@ mw_connect_mysql(){
         DB_TYPE["mysql-yum"]="mysql-yum"
     fi
 
+    if [ -d "${ROOT_PATH}/mysql-community" ];then
+        DB_TYPE["mysql-community"]="mysql-community"
+    fi
+
     SOURCE_LIST_KEY_SORT_TMP=$(echo ${!DB_TYPE[@]} | tr ' ' '\n' | sort -n)
     SOURCE_LIST_KEY=(${SOURCE_LIST_KEY_SORT_TMP//'\n'/})
     SOURCE_LIST_LEN=${#DB_TYPE[*]}
@@ -449,6 +453,10 @@ mw_connect_mysql(){
 
     if [ "$CHOICE_DB" == "mysql-yum" ];then
         ${ROOT_PATH}/mysql-yum/bin/usr/bin/mysql -S ${ROOT_PATH}/mysql-yum/mysql.sock -uroot -p"${pwd}"
+    fi
+
+    if [ "$CHOICE_DB" == "mysql-community" ];then
+        ${ROOT_PATH}/mysql-community/bin/mysql -S ${ROOT_PATH}/mysql-community/mysql.sock -uroot -p"${pwd}"
     fi
 }
 
