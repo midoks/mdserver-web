@@ -16,7 +16,7 @@ sysName=`uname`
 myDir=${serverPath}/source/mysql-apt
 
 OS_ARCH=`arch`
-MYSQL_VER=5.7.39
+MYSQL_VER=5.7.44
 SUFFIX_NAME=${MYSQL_VER}-linux-glibc2.28-${OS_ARCH}
 
 # cd /www/server/mdserver-web/plugins/mysql-apt && bash install.sh install 5.7
