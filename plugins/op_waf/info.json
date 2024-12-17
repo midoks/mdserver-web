@@ -11,6 +11,7 @@
 			}
 		}
 	],
+	"sort":2,
 	"title":"OP防火墙",
 	"tip":"soft",
 	"name":"op_waf",
