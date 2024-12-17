@@ -24,6 +24,7 @@ if [ "$OS_ARCH" == "x86_64" ] || [ "$OS_ARCH" == "i686" ];then
 else
 	echo "暂时不支持该${OS_ARCH}"
 	exit 0
+fi
 
 # cd /www/server/mdserver-web/plugins/mysql-apt && bash install.sh install 5.7
 # cd /www/server/mdserver-web && python3 /www/server/mdserver-web/plugins/mysql-apt/index.py start 5.7
