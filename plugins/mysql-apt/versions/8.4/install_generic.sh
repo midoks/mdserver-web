@@ -44,7 +44,7 @@ fi
 
 
 MYSQL_VER=8.4.2
-SUFFIX_NAME=${MYSQL_VER}-1${OSNAME}${VERSION_ID}_${ARCH}
+SUFFIX_NAME=${MYSQL_VER}-linux-glibc2.28_${TMP_ARCH}
 
 
 # /lib/systemd/system/mysql.service
@@ -60,33 +60,13 @@ mkdir -p /var/run/mysqld
 chown mysql -R /var/run/mysqld
 
 # Linux - Generic
-
 # https://cdn.mysql.com/archives/mysql-8.4/mysql-8.4.2-linux-glibc2.28-x86_64.tar.xz
+wget --no-check-certificate -O ${myDir}/mysql-${SUFFIX_NAME}.tar.xz https://cdn.mysql.com/archives/mysql-8.4/mysql-${SUFFIX_NAME}.tar.xz
 
-# SUFFIX_NAME=${MYSQL_VER}-linux-glibc2.28_${TMP_ARCH}
-# wget --no-check-certificate -O mysql-8.4.2-linux-glibc2.28-x86_64.tar.xz https://cdn.mysql.com/archives/mysql-8.4/mysql-${SUFFIX_NAME}.tar.xz
+if [ -d ${myDir} ];then
+	cd ${myDir} && tar zvxf ${myDir}/mysql-${SUFFIX_NAME}.tar.xz
 
-wget --no-check-certificate -O ${myDir}/mysql-server_${SUFFIX_NAME}.deb-bundle.tar https://dev.mysql.com/get/Downloads/MySQL-8.4/mysql-server_${SUFFIX_NAME}.deb-bundle.tar
-chmod +x ${myDir}/mysql-server_${SUFFIX_NAME}.deb-bundle.tar
-cd ${myDir} && tar vxf ${myDir}/mysql-server_${SUFFIX_NAME}.deb-bundle.tar
-
-apt update -y
-apt install -y libnuma1 libaio1 libmecab2
-
-# 安装
-dpkg -X mysql-common_${SUFFIX_NAME}.deb $serverPath/mysql-apt/bin
-
-
-
-dpkg -X mysql-community-client-plugins_${SUFFIX_NAME}.deb $serverPath/mysql-apt/bin
-dpkg -X mysql-community-client-core_${SUFFIX_NAME}.deb $serverPath/mysql-apt/bin
-dpkg -X mysql-community-client_${SUFFIX_NAME}.deb $serverPath/mysql-apt/bin
-dpkg -X mysql-client_${SUFFIX_NAME}.deb $serverPath/mysql-apt/bin
-
-dpkg -X mysql-community-server-core_${SUFFIX_NAME}.deb $serverPath/mysql-apt/bin
-
-dpkg -X mysql-community-server_${SUFFIX_NAME}.deb $serverPath/mysql-apt/bin
-dpkg -X mysql-server_${SUFFIX_NAME}.deb $serverPath/mysql-apt/bin
+fi
 
 # 测试时可关闭
 rm -rf $myDir
