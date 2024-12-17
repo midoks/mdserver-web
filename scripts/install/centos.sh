@@ -36,6 +36,7 @@ yum install -y bc
 yum install -y bzip2
 yum install -y bzip2-devel
 yum install -y ncurses-compat-libs
+yum install -y numactl
 
 
 # if [ -f /usr/sbin/iptables ];then
