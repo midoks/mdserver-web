@@ -15,21 +15,8 @@ sysName=`uname`
 
 myDir=${serverPath}/source/mysql-apt
 
-bash ${rootPath}/scripts/getos.sh
-OSNAME=`cat ${rootPath}/data/osname.pl`
-VERSION_ID=`cat /etc/*-release | grep VERSION_ID | awk -F = '{print $2}' | awk -F "\"" '{print $2}'`
-
 # cd /www/server/mdserver-web/plugins/mysql-apt && bash install.sh install 8.4
 # cd /www/server/mdserver-web && python3 /www/server/mdserver-web/plugins/mysql-apt/index.py start 8.4
-
-if [ "$OSNAME" == 'debian' ] && [ "$VERSION_ID" -lt '12' ] ;then 
-	VERSION_ID="12"
-fi
-
-
-# /lib/systemd/system/mysql.service
-# /etc/mysql/my.cnf
-
 APT_INSTALL()
 {
 
