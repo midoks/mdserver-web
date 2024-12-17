@@ -2109,7 +2109,7 @@ function pluginOpService(a, b, v, _suffix_name='') {
         $.post("/plugins/run", c, function(g) {
             layer.close(e);
             
-            var f = g.data == 'ok' ? msgTpl('{1}{2}服务已{3}',[a,_ver,d]) : msgTpl('{1}{2}服务{3}失败!',[a,_ver,d]);
+            var f = g.data == 'ok' ? msgTpl('{1}{2}服务已{3}',[a,_ver,d],{area: ['400px','auto'],time: 0}) : msgTpl('{1}{2}服务{3}失败!',[a,_ver,d],{area: ['400px','auto'],time: 0});
             layer.msg(f, {icon: g.data == 'ok' ? 1 : 2});
             
             if( b != "reload" && g.data == 'ok' ) {
