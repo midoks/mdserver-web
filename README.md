@@ -41,7 +41,7 @@ Talk is cheap, show me the code.  -- linus
 
 ### 特别赞助
 
-- [找资源 - 阿里云盘资源搜索引擎](https://zhaoziyuan1.cc)
+- [虚位以待](https://bbs.midoks.icu)
 
 ### 主要插件介绍
 
