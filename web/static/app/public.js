@@ -2105,7 +2105,7 @@ function pluginOpService(a, b, v, _suffix_name='') {
     	icon: 3, 
     	closeBtn: 1
     }, function() {
-        var e = layer.msg(msgTpl('正在{1}{2}{3}服务,请稍候...',[d,a,_ver]), {icon: 16,time: 0});
+        var e = layer.msg(msgTpl('正在{1}{2}{3}服务,请稍候...',[d,a,_ver]), {area: ['400px','auto'],icon: 16,time: 0});
         $.post("/plugins/run", c, function(g) {
             layer.close(e);
             
