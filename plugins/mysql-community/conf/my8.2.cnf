@@ -1,0 +1,103 @@
+[client]
+user = root
+#password	= your_password
+port		= 33206
+socket		= {$SERVER_APP_PATH}/mysql.sock
+default-character-set = UTF8MB4
+
+[mysqld]
+!include {$SERVER_APP_PATH}/etc/mode/classic.cnf
+
+authentication_policy=caching_sha2_password
+pid-file = {$SERVER_APP_PATH}/data/mysql.pid
+user = mysql
+port		= 33206
+mysqlx_port = 33260
+socket		= {$SERVER_APP_PATH}/mysql.sock
+datadir = {$SERVER_APP_PATH}/data
+log-error =  {$SERVER_APP_PATH}/data/error.log
+server-id	= {$SERVER_ID}
+
+default_storage_engine = InnoDB
+
+key_buffer_size = 8M
+table_open_cache = 32
+sort_buffer_size = 256K
+net_buffer_length = 4K
+read_buffer_size = 128K
+read_rnd_buffer_size = 256K
+myisam_sort_buffer_size = 4M
+thread_cache_size = 4
+lower_case_table_names=1
+tmp_table_size = 8M
+character-set-server = UTF8MB4
+
+max_connections = 500
+max_connect_errors = 100
+open_files_limit = 2560
+max_allowed_packet = 128M
+
+#skip-external-locking
+#skip-grant-tables
+#loose-skip-innodb
+#skip-networking
+#skip-name-resolve
+
+log-bin=mysql-bin
+slow_query_log=1
+slow-query-log-file={$SERVER_APP_PATH}/data/mysql-slow.log
+long_query_time=3
+#log_queries_not_using_indexes=on
+
+relay-log=mdserver
+relay-log-index=mdserver
+
+#master
+#sync_binlog=1
+
+#binlog-do-db
+binlog-ignore-db = test
+binlog-ignore-db = mysql
+binlog-ignore-db = information_schema
+binlog-ignore-db = performance_schema
+
+#slave
+log_replica_updates
+#replicate-do-db
+replica_skip_errors=1062,1396
+replicate-ignore-db = information_schema
+replicate-ignore-db = performance_schema
+replicate-ignore-db = mysql
+replicate-ignore-db = test
+
+default_storage_engine = InnoDB
+innodb_data_home_dir = {$SERVER_APP_PATH}/data
+innodb_data_file_path = ibdata1:10M:autoextend
+innodb_log_group_home_dir = {$SERVER_APP_PATH}/data
+innodb_buffer_pool_size = 16M
+innodb_redo_log_capacity=10485760
+innodb_log_buffer_size = 8M
+innodb_flush_log_at_trx_commit = 1
+innodb_lock_wait_timeout = 120
+innodb_max_dirty_pages_pct = 90
+innodb_read_io_threads = 1
+innodb_write_io_threads = 1
+innodb_file_per_table=1
+binlog_expire_logs_seconds=2592000
+
+secure-file-priv={$SERVER_APP_PATH}/tmp
+
+[mysqldump]
+quick
+
+[mysql]
+no-auto-rehash
+
+[myisamchk]
+key_buffer_size = 20M
+sort_buffer_size = 20M
+read_buffer = 2M
+write_buffer = 2M
+
+[mysqlhotcopy]
+interactive-timeout

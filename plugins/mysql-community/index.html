@@ -1,0 +1,59 @@
+<div class="bt-form">
+	<div class='plugin_version'></div>
+	<div class="bt-w-main">
+		<div class="bt-w-menu">
+			<!-- <script type="text/javascript">console.log($('.plugin_version').attr('version'));</script> -->
+			<p class="bgw" onclick="pluginService('mysql-community', $('.plugin_version').attr('version'));">服务</p>
+			<p onclick="pluginInitD('mysql-community', $('.plugin_version').attr('version'));">自启动</p>
+			<p onclick="pluginConfig('mysql-community', $('.plugin_version').attr('version'));">配置文件</p>
+			<p onclick="myDbPos();">存储位置</p>
+			<p onclick="myPort();">端口</p>
+			<p onclick="runInfo();">当前状态</p>
+			<p onclick="myPerfOpt();">性能优化</p>
+			<p onclick="myLogs();">日志</p>
+			<p onclick="pluginLogs('mysql-community',$('.plugin_version').attr('version'),'show_log');">慢日志</p>
+			<p onclick="myBinLogs();">BINLOG</p>
+			<p onclick="dbList()">管理列表</p>
+			<p onclick="masterOrSlaveConf($('.plugin_version').attr('version'))">主从配置</p>
+		</div>
+		<div class="bt-w-con pd15" style="height:555px;overflow: auto;">
+			<div class="soft-man-con"></div>
+		</div>
+	</div>
+
+</div>
+
+
+<style type="text/css">
+.db_list{
+	padding: 0px 0 10px 0;
+    font-size: 13px;
+    line-height: 35px;
+    height: 45px;
+}
+.db_list a{
+	margin-right: 15px;
+	color: #555;
+    font-weight: 600;
+}
+.db_list span:nth-child(1){
+	display: block;
+    float: left;
+    padding-left: 15px;
+    background: #ececec;
+    border-radius: 3px;
+}
+
+#db_tools button {
+    margin-right: 10px;
+}
+#db_tools button:last-child{
+	margin-right: 0;
+}
+</style>
+<script type="text/javascript">
+resetPluginWinWidth(800);
+$.getScript( "/plugins/file?name=mysql-community&f=js/mysql-community.js", function(){
+	pluginService('mysql-community',$('.plugin_version').attr('version'));
+});
+</script>
