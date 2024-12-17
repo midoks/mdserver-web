@@ -3472,43 +3472,6 @@ def fullSync(version=''):
 
 
 def installPreInspection(version):
-    arch_data = mw.execShell('arch')
-    if arch_data[0].strip().startswith('aarch'):
-        return '不支持aarch架构'
-
-    cmd = "cat /etc/*-release | grep PRETTY_NAME |awk -F = '{print $2}' | awk -F '\"' '{print $2}'| awk '{print $1}'"
-    sys = mw.execShell(cmd)
-
-    if sys[1] != '':
-        return '不支持该系统'
-
-    cmd = "cat /etc/*-release | grep VERSION_ID | awk -F = '{print $2}' | awk -F '\"' '{print $2}'"
-    sys_id = mw.execShell(cmd)
-
-    sysName = sys[0].strip().lower()
-    sysId = sys_id[0].strip()
-    mdb8 = getMdb8Ver()
-
-    if not sysName in ('debian', 'ubuntu'):
-        return '仅支持debian,ubuntu'
-
-    if (sysName == 'debian' and not sysId in('12', '11', '10')):
-        return 'debian支持10,11,12'
-
-    if sysName == 'debian' and sysId == '12' and version == '8.0':
-        return 'debian12,暂时不支持8.0'
-
-    if version == '9.0':
-        if sysName == 'debian' and sysId != '12':
-            return '9.0 仅支持debian12'
-        if sysName == 'ubuntu' and sysId != '24.04':
-            return '9.0 仅支持ubuntu24.04'
-
-    if (sysName == 'ubuntu' and version == '5.7' and not sysId in ('18.04')):
-        return "Ubuntu Apt MySQL[" + version + "] 仅支持18.04"
-
-    if (sysName == 'ubuntu' and version == '8.0' and not sysId in ('18.04', '20.04', '22.04','24.04')):
-        return 'Ubuntu Apt MySQL[' + version + '] 仅支持18.04,20.04,22.04,24.04'
     return 'ok'
 
 
