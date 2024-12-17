@@ -36,12 +36,12 @@ mkdir -p $myDir
 mkdir -p $serverPath/mysql-apt
 
 # Linux - Generic
-if [ ! -f ${myDir}/mysql-${SUFFIX_NAME}.tar.xz ];then
-	wget --no-check-certificate -O ${myDir}/mysql-${SUFFIX_NAME}.tar.xz https://cdn.mysql.com/archives/mysql-5.7/mysql-${SUFFIX_NAME}.tar.xz
+if [ ! -f ${myDir}/mysql-${SUFFIX_NAME}.tar.gz ];then
+	wget --no-check-certificate -O ${myDir}/mysql-${SUFFIX_NAME}.tar.gz https://cdn.mysql.com/archives/mysql-5.7/mysql-${SUFFIX_NAME}.tar.gz
 fi
 
 if [ -d ${myDir} ];then
-	cd ${myDir} && tar -Jxf ${myDir}/mysql-${SUFFIX_NAME}.tar.xz
+	cd ${myDir} && tar -Jxf ${myDir}/mysql-${SUFFIX_NAME}.tar.gz
 	cp -rf ${myDir}/mysql-${SUFFIX_NAME}/* $serverPath/mysql-apt
 fi
 
