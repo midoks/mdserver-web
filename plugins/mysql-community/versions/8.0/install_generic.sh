@@ -13,20 +13,20 @@ rootPath=$(dirname "$rootPath")
 serverPath=$(dirname "$rootPath")
 sysName=`uname`
 
-myDir=${serverPath}/source/mysql-apt
+myDir=${serverPath}/source/mysql-community
 
 OS_ARCH=`arch`
 MYSQL_VER=8.0.39
 SUFFIX_NAME=${MYSQL_VER}-linux-glibc2.28-${OS_ARCH}
 
-# cd /www/server/mdserver-web/plugins/mysql-apt && bash install.sh install 8.0
-# cd /www/server/mdserver-web && python3 /www/server/mdserver-web/plugins/mysql-apt/index.py start 8.0
-APT_INSTALL()
+# cd /www/server/mdserver-web/plugins/mysql-community && bash install.sh install 8.0
+# cd /www/server/mdserver-web && python3 /www/server/mdserver-web/plugins/mysql-community/index.py start 8.0
+COMMUNITY_INSTALL()
 {
 
 ########
 mkdir -p $myDir
-mkdir -p $serverPath/mysql-apt
+mkdir -p $serverPath/mysql-community
 
 # Linux - Generic
 if [ ! -f ${myDir}/mysql-${SUFFIX_NAME}.tar.xz ];then
@@ -35,7 +35,7 @@ fi
 
 if [ -d ${myDir} ];then
 	cd ${myDir} && tar -Jxf ${myDir}/mysql-${SUFFIX_NAME}.tar.xz
-	cp -rf ${myDir}/mysql-${SUFFIX_NAME}/* $serverPath/mysql-apt
+	cp -rf ${myDir}/mysql-${SUFFIX_NAME}/* $serverPath/mysql-community
 fi
 
 # 测试时可关闭
@@ -43,7 +43,7 @@ rm -rf $myDir/mysql-${SUFFIX_NAME}
 #######
 }
 
-APT_UNINSTALL()
+COMMUNITY_UNINSTALL()
 {
 ###
 rm -rf $myDir/mysql-${SUFFIX_NAME}
@@ -55,30 +55,23 @@ Install_mysql()
 {
 	echo '正在安装脚本文件...'
 
-	isApt=`which apt`
-	if [ "$isApt" != "" ];then
-		APT_INSTALL
-	fi
+	COMMUNITY_INSTALL
 
 	if [ "$?" == "0" ];then
-		mkdir -p $serverPath/mysql-apt
-		echo '8.0' > $serverPath/mysql-apt/version.pl
+		mkdir -p $serverPath/mysql-community
+		echo '8.0' > $serverPath/mysql-community/version.pl
 		echo '安装完成'
 	else
-		echo '8.0' > $serverPath/mysql-apt/version.pl
+		echo '8.0' > $serverPath/mysql-community/version.pl
 		echo "暂时不支持该系统"
 	fi
 }
 
 Uninstall_mysql()
 {
+	COMMUNITY_UNINSTALL
 
-	isApt=`which apt`
-	if [ "$isApt" != "" ];then
-		APT_UNINSTALL
-	fi
-
-	rm -rf $serverPath/mysql-apt
+	rm -rf $serverPath/mysql-community
 	echo '卸载完成'
 }
 
