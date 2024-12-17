@@ -19,8 +19,8 @@ OS_ARCH=`arch`
 MYSQL_VER=9.1.0
 SUFFIX_NAME=${MYSQL_VER}-linux-glibc2.28-${OS_ARCH}
 
-# cd /www/server/mdserver-web/plugins/mysql-apt && bash install.sh install 8.4
-# cd /www/server/mdserver-web && python3 /www/server/mdserver-web/plugins/mysql-apt/index.py start 8.4
+# cd /www/server/mdserver-web/plugins/mysql-apt && bash install.sh install 9.1
+# cd /www/server/mdserver-web && python3 /www/server/mdserver-web/plugins/mysql-apt/index.py start 9.1
 APT_INSTALL()
 {
 
@@ -30,9 +30,9 @@ mkdir -p $serverPath/mysql-apt
 
 # Linux - Generic
 # https://cdn.mysql.com/archives/mysql-8.4/mysql-8.4.2-linux-glibc2.28-x86_64.tar.xz
-# https://cdn.mysql.com/Downloads/MySQL-9.1/mysql-mysql-${SUFFIX_NAME}.tar.xz
+# https://cdn.mysql.com/Downloads/MySQL-9.1/mysql-${SUFFIX_NAME}.tar.xz
 if [ ! -f ${myDir}/mysql-${SUFFIX_NAME}.tar.xz ];then
-	wget --no-check-certificate -O ${myDir}/mysql-${SUFFIX_NAME}.tar.xz https://cdn.mysql.com/Downloads/MySQL-9.1/mysql-mysql-${SUFFIX_NAME}.tar.xz
+	wget --no-check-certificate -O ${myDir}/mysql-${SUFFIX_NAME}.tar.xz https://cdn.mysql.com/Downloads/MySQL-9.1/mysql-${SUFFIX_NAME}.tar.xz
 fi
 
 if [ -d ${myDir} ];then
