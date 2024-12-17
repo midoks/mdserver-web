@@ -42,7 +42,7 @@ fi
 
 if [ -d ${myDir} ];then
 	cd ${myDir} && tar -zvxf ${myDir}/mysql-${SUFFIX_NAME}.tar.gz
-	cp -rf ${myDir}/mysql-${SUFFIX_NAME}/* $serverPath/mysql-apt
+	cp -rf ${myDir}/mysql-${SUFFIX_NAME}/* $serverPath/mysql-community
 fi
 
 # 测试时可关闭
