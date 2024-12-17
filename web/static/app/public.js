@@ -2101,7 +2101,7 @@ function pluginOpService(a, b, v, _suffix_name='') {
     }
 
     layer.confirm( msgTpl('您真的要{1}{2}{3}服务吗？', [d,a,_ver]), {
-    	area: ['300px'],
+    	area: ['400px','auto'],
     	icon: 3, 
     	closeBtn: 1
     }, function() {
