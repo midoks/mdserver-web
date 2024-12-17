@@ -431,10 +431,10 @@ def initMysql57Data():
 
 def initMysql8Data():
     '''
-    chmod 644 /www/server/mysql-apt/etc/my.cnf
+    chmod 644 /www/server/mysql-community/etc/my.cnf
     try:
-    mysqld --basedir=/usr  --datadir=/www/server/mysql-apt/data --initialize-insecure
-    mysqld --defaults-file=/www/server/mysql-apt/etc/my.cnf --initialize-insecure
+    mysqld --basedir=/usr  --datadir=/www/server/mysql-community/data --initialize-insecure
+    mysqld --defaults-file=/www/server/mysql-community/etc/my.cnf --initialize-insecure
     mysqld --initialize-insecure
     select user, plugin from user;
     update user set authentication_string=password("123123"),plugin='mysql_native_password' where user='root';
