@@ -1513,46 +1513,53 @@ class sites(object):
                 if item["from"] == site_from:
                     return mw.returnData(False, "代理目录已存在!!")
 
-        tpl = "#PROXY-START\n\
-location ^~ {from} {\n\
-    proxy_pass {to};\n\
-    proxy_set_header Host {host};\n\
-    proxy_ssl_server_name on;\n\
-    proxy_set_header X-Real-IP $remote_addr;\n\
-    proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;\n\
-    proxy_set_header REMOTE-HOST $remote_addr;\n\
-    proxy_set_header Upgrade $http_upgrade;\n\
-    proxy_set_header Connection $connection_upgrade;\n\
-    proxy_http_version 1.1;\n\
-    \n\
-    add_header X-Cache $upstream_cache_status;\n\
-    \n\
-     {proxy_cache}\n\
+        tpl = "#PROXY-START\n \
+location ^~ {from} {\n \
+    proxy_pass {to};\n \
+    proxy_set_header Host {host};\n \
+    proxy_ssl_server_name on;\n \
+    proxy_set_header X-Real-IP $remote_addr;\n \
+    proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;\n \
+    proxy_set_header REMOTE-HOST $remote_addr;\n \
+    proxy_set_header Upgrade $http_upgrade;\n \
+    proxy_set_header Connection $connection_upgrade;\n \
+    proxy_http_version 1.1;\n \
+    \n \
+    add_header X-Cache $upstream_cache_status;\n \
+    {cors}\n \
+    \n \
+    {proxy_cache}\n \
 }\n\
 # PROXY-END"
 
-        tpl_proxy_cache = "\n\
-    if ( $uri ~* \\.(gif|png|jpg|css|js|woff|woff2)$\" )\n\
-    {\n\
-        expires {cache_time}m;\n\
-    }\n\
-    proxy_ignore_headers Set-Cookie Cache-Control expires;\n\
-    proxy_cache mw_cache;\n\
-    proxy_cache_key \"$host$uri$is_args$args\";\n\
-    proxy_cache_valid 200 304 301 302 {cache_time}m;\n\
+        tpl_proxy_cache = "\n \
+    if ( $uri ~* \\.(gif|png|jpg|css|js|woff|woff2)$\" )\n \
+    {\n \
+        expires {cache_time}m;\n \
+    }\n \
+    proxy_ignore_headers Set-Cookie Cache-Control expires;\n \
+    proxy_cache mw_cache;\n \
+    proxy_cache_key \"$host$uri$is_args$args\";\n \
+    proxy_cache_valid 200 304 301 302 {cache_time}m;\n \
 "
 
-        tpl_proxy_nocache = "\n\
-    set $static_files_app 0; \n\
-    if ( $uri ~* \\.(gif|png|jpg|css|js|woff|woff2)$\" )\n\
-    {\n\
+        tpl_proxy_nocache = "\n \
+    set $static_files_app 0; \n \
+    if ( $uri ~* \\.(gif|png|jpg|css|js|woff|woff2)$\" )\n \
+    {\n \
         set $static_files_app 1;\n\
         expires 12h;\n\
-    }\n\
-    if ( $static_files_app = 0 )\n\
-    {\n\
-        add_header Cache-Control no-cache;\n\
-    }\n\
+    }\n \
+    if ( $static_files_app = 0 )\n \
+    {\n \
+        add_header Cache-Control no-cache;\n \
+    }\n \
+"
+        tpl_proxy_cors = "\n \
+    add_header 'Access-Control-Allow-Methods' 'GET,OPTIONS,POST' always;\n \
+    add_header 'Access-Control-Allow-Credentials' 'true';\n \
+    add_header 'Access-Control-Allow-Origin' *;\n \
+    add_header 'Access-Control-Allow-Headers' *;\n \
 "
 
         # replace
@@ -1568,6 +1575,11 @@ location ^~ {from} {\n\
             tpl = tpl.replace("{proxy_cache}", tpl_proxy_cache, 999)
         else:
             tpl = tpl.replace("{proxy_cache}", tpl_proxy_nocache, 999)
+
+        if open_cors == 'on':
+            tpl = tpl.replace("{cors}", tpl_proxy_cors, 999)
+        else:
+            tpl = tpl.replace("{cors}", tpl_proxy_cors, 999)
 
 
         conf_proxy = "{}/{}.conf".format(self.getProxyPath(site_name), proxy_id)
