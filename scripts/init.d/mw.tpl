@@ -447,16 +447,16 @@ mw_connect_mysql(){
         ${ROOT_PATH}/mariadb/bin/mariadb  -S ${ROOT_PATH}/mariadb/mysql.sock -uroot -p"${pwd}"
     fi
 
+    if [ "$CHOICE_DB" == "mysql-community" ];then
+        ${ROOT_PATH}/mysql-community/bin/mysql -S ${ROOT_PATH}/mysql-community/mysql.sock -uroot -p"${pwd}"
+    fi
+
     if [ "$CHOICE_DB" == "mysql-apt" ];then
         ${ROOT_PATH}/mysql-apt/bin/usr/bin/mysql -S ${ROOT_PATH}/mysql-apt/mysql.sock -uroot -p"${pwd}"
     fi
 
     if [ "$CHOICE_DB" == "mysql-yum" ];then
         ${ROOT_PATH}/mysql-yum/bin/usr/bin/mysql -S ${ROOT_PATH}/mysql-yum/mysql.sock -uroot -p"${pwd}"
-    fi
-
-    if [ "$CHOICE_DB" == "mysql-community" ];then
-        ${ROOT_PATH}/mysql-community/bin/mysql -S ${ROOT_PATH}/mysql-community/mysql.sock -uroot -p"${pwd}"
     fi
 }
 
@@ -542,6 +542,19 @@ mw_clean_lib(){
     cd ${PANEL_DIR} && rm -rf lib64
     cd ${PANEL_DIR} && rm -rf bin
     cd ${PANEL_DIR} && rm -rf include
+}
+
+mw_list(){
+    echo -e "mw default      - 显示面板默认信息"
+    echo -e "mw db           - 连接MySQL"
+    echo -e "mw pgdb         - 连接PostgreSQL"
+    echo -e "mw mongdb       - 连接MongoDB"
+    echo -e "mw redis        - 连接Redis"
+    echo -e "mw valkey       - 连接WalKey"
+    echo -e "mw update       - 更新到正式环境最新代码"
+    echo -e "mw update_dev   - 更新到测试环境最新代码"
+    echo -e "mw debug        - 调式开发面板"
+    echo -e "mw list         - 显示命令列表"
 }
 
 mw_default(){
@@ -644,6 +657,7 @@ case "$1" in
     'mongodb') mw_mongodb;;
     'venv') mw_update_venv;;
     'clean_lib') mw_clean_lib;;
+    'list') mw_list;;
     'default') mw_default;;
     *)
         cd ${PANEL_DIR} && python3 ${PANEL_DIR}/panel_tools.py cli $1

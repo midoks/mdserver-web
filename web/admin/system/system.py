@@ -119,21 +119,29 @@ def set_control():
     stype = request.form.get('type', '')
     day = request.form.get('day', '')
 
+    
+
     if stype == '0':
+        _day = int(day)
+        if _day < 1:
+            return mw.returnData(False, "保存天数异常!")
+        thisdb.setOption('monitor_day', day, type='monitor')
         thisdb.setOption('monitor_status', 'close', type='monitor')
-        return mw.returnData(True, "设置成功!")
+        return mw.returnData(True, "关闭监控成功!")
     elif stype == '1':
         _day = int(day)
         if _day < 1:
-            return mw.returnData(False, "设置失败!")
+            return mw.returnData(False, "保存天数异常!")
+
         thisdb.setOption('monitor_day', day, type='monitor')
-        return mw.returnData(True, "设置成功!")
+        thisdb.setOption('monitor_status', 'open', type='monitor')
+        return mw.returnData(True, "开启监控成功!")
     elif stype == '2':
         thisdb.setOption('monitor_only_netio', 'close', type='monitor')
-        return mw.returnData(True, "设置成功!")
+        return mw.returnData(True, "关闭仅统计外网成功!")
     elif stype == '3':
         thisdb.setOption('monitor_only_netio', 'open', type='monitor')
-        return mw.returnData(True, "设置成功!")
+        return mw.returnData(True, "开启仅统计外网成功!")
     elif stype == 'del':
         if not mw.isRestart():
             return mw.returnData(False, '请等待所有安装任务完成再执行')
