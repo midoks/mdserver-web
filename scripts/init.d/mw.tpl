@@ -544,6 +544,19 @@ mw_clean_lib(){
     cd ${PANEL_DIR} && rm -rf include
 }
 
+mw_list(){
+    echo -e "mw default - 显示面板默认信息"
+    echo -e "mw db - 连接MysSQL"
+    echo -e "mw pgdb - 连接PostgreSQL"
+    echo -e "mw mongdb - 连接MongoDB"
+    echo -e "mw redis - 连接Redis"
+    echo -e "mw valkey - 连接WalKey"
+    echo -e "mw update - 更新到正式环境最新代码"
+    echo -e "mw update_dev - 更新到测试环境最新代码"
+    echo -e "mw debug - 调式开发面板"
+    echo -e "mw list - 显示命令列表"
+}
+
 mw_default(){
     cd ${PANEL_DIR}
     port=7200
@@ -644,6 +657,7 @@ case "$1" in
     'mongodb') mw_mongodb;;
     'venv') mw_update_venv;;
     'clean_lib') mw_clean_lib;;
+    'list') mw_list;;
     'default') mw_default;;
     *)
         cd ${PANEL_DIR} && python3 ${PANEL_DIR}/panel_tools.py cli $1
