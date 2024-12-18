@@ -515,6 +515,24 @@ mw_redis(){
     ${CLIEXEC}
 }
 
+mw_valkey(){
+    CONF="${ROOT_PATH}/valkey/valkey.conf"
+
+    if [ ! -f "$CONF" ]; then
+        echo -e "not install valkey!"
+        exit 1
+    fi
+
+    REDISPORT=$(cat $CONF |grep port|grep -v '#'|awk '{print $2}')
+    REDISPASS=$(cat $CONF |grep requirepass|grep -v '#'|awk '{print $2}')
+    if [ "$REDISPASS" != "" ];then
+        REDISPASS=" -a $REDISPASS"
+    fi
+    CLIEXEC="${ROOT_PATH}/valkey/bin/valkey-cli -p $REDISPORT$REDISPASS"
+    echo $CLIEXEC
+    ${CLIEXEC}
+}
+
 mw_venv(){
     cd ${PANEL_DIR} && source bin/activate
 }
@@ -622,6 +640,7 @@ case "$1" in
     'db') mw_connect_mysql;;
     'pgdb') mw_connect_pgdb;;
     'redis') mw_redis;;
+    'valkey')mw_valkey;;
     'mongodb') mw_mongodb;;
     'venv') mw_update_venv;;
     'clean_lib') mw_clean_lib;;
