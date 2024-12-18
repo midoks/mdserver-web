@@ -61,6 +61,18 @@ def get_redirect_conf():
     redirect_id = request.form.get("id", '')
     return MwSites.instance().getRedirectConf(site_name, redirect_id)
 
+# 设置重定向配置
+@blueprint.route('/save_redirect_conf', endpoint='save_redirect_conf', methods=['POST'])
+@panel_login_required
+def save_redirect_conf():
+    site_name = request.form.get("siteName", '')
+    redirect_id = request.form.get("id", '')
+    config = request.form.get("config", "")
+    return MwSites.instance().saveRedirectConf(site_name, redirect_id, config)
+
+
+
+
 # 删除重定向配置
 @blueprint.route('/del_redirect', endpoint='del_redirect', methods=['POST'])
 @panel_login_required

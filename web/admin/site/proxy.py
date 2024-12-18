@@ -47,7 +47,7 @@ def set_proxy():
     proxy_id = request.form.get('id', '')
     return MwSites.instance().setProxy(site_name,site_from,to,host,name,open_proxy, open_cache,cache_time, proxy_id)
 
-# 获取代理状态
+# 设置代理状态
 @blueprint.route('/set_proxy_status', endpoint='set_proxy_status', methods=['POST'])
 @panel_login_required
 def set_proxy_status():
@@ -64,6 +64,15 @@ def get_proxy_conf():
     site_name = request.form.get("siteName", '')
     rid = request.form.get("id", '')
     return MwSites.instance().getProxyConf(site_name, rid)
+
+# 设置代理
+@blueprint.route('/save_proxy_conf', endpoint='save_proxy_conf', methods=['POST'])
+@panel_login_required
+def save_proxy_conf():
+    site_name = request.form.get("siteName", '')
+    rid = request.form.get("id", '')
+    config = request.form.get("config", "")
+    return MwSites.instance().saveProxyConf(site_name, rid, config)
 
 
 # 删除代理配置
