@@ -545,16 +545,16 @@ mw_clean_lib(){
 }
 
 mw_list(){
-    echo -e "mw default - 显示面板默认信息"
-    echo -e "mw db - 连接MySQL"
-    echo -e "mw pgdb - 连接PostgreSQL"
-    echo -e "mw mongdb - 连接MongoDB"
-    echo -e "mw redis - 连接Redis"
-    echo -e "mw valkey - 连接WalKey"
-    echo -e "mw update - 更新到正式环境最新代码"
-    echo -e "mw update_dev - 更新到测试环境最新代码"
-    echo -e "mw debug - 调式开发面板"
-    echo -e "mw list - 显示命令列表"
+    echo -e "mw default      - 显示面板默认信息"
+    echo -e "mw db           - 连接MySQL"
+    echo -e "mw pgdb         - 连接PostgreSQL"
+    echo -e "mw mongdb       - 连接MongoDB"
+    echo -e "mw redis        - 连接Redis"
+    echo -e "mw valkey       - 连接WalKey"
+    echo -e "mw update       - 更新到正式环境最新代码"
+    echo -e "mw update_dev   - 更新到测试环境最新代码"
+    echo -e "mw debug        - 调式开发面板"
+    echo -e "mw list         - 显示命令列表"
 }
 
 mw_default(){
