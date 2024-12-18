@@ -1637,7 +1637,7 @@ function toProxy(siteName, type, obj) {
 				<div class='line' style='display:none' id='cache_time'>\
 					<span class='tname'>缓存时间</span>\
 					<div class='info-r ml0'>\
-					<input name='cache_time' value='1' class='bt-input-text mr5' type='text' style='width:200px''>分钟\
+					<input name='cache_time' value='1' class='bt-input-text mr5' type='number' style='width:200px''>分钟\
 					</div>\
 				</div>\
 				<div class='line'>\
