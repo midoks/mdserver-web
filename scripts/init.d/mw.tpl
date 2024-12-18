@@ -546,7 +546,7 @@ mw_clean_lib(){
 
 mw_list(){
     echo -e "mw default - 显示面板默认信息"
-    echo -e "mw db - 连接MysSQL"
+    echo -e "mw db - 连接MySQL"
     echo -e "mw pgdb - 连接PostgreSQL"
     echo -e "mw mongdb - 连接MongoDB"
     echo -e "mw redis - 连接Redis"
