@@ -1709,6 +1709,25 @@ location ^~ {from} {\n\
         data = mw.readFile(conf_file)
         return mw.returnData(True, "ok", {"result": data})
 
+    def saveProxyConf(self, site_name, proxy_id, config):
+        
+        if proxy_id == '' or site_name == '':
+            return mw.returnData(False, "必填项不能为空!")
+
+        proxy_file = "{}/{}/{}.conf".format(self.proxyPath, site_name, proxy_id)
+        mw.backFile(proxy_file)
+        mw.writeFile(proxy_file, config)
+        rule_test = mw.checkWebConfig()
+        if rule_test != True:
+            mw.restoreFile(proxy_file)
+            mw.removeBackFile(proxy_file)
+            return mw.returnData(False, "OpenResty 配置测试不通过, 请重试: {}".format(rule_test))
+
+        mw.removeBackFile(proxy_file)
+        self.operateRedirectConf(site_name, 'start')
+        mw.restartWeb()
+        return mw.returnData(True, "ok")
+
     def delProxy(self, site_name, proxy_id):
         if proxy_id == '' or site_name == '':
             return mw.returnData(False, "必填项不能为空!")
