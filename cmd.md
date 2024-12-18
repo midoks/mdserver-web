@@ -7,6 +7,7 @@
 mw default	| 显示登录信息
 mw db 		| 快捷连接MySQL
 mw redis 	| 快捷连接Redis
+mw valkey 	| 快捷连接valkey
 mw mongodb 	| 快捷连接MongoDB
 mw pgdb 	| 快捷连接PostgreSQL
 ----------------------------------------
