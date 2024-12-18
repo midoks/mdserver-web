@@ -447,16 +447,16 @@ mw_connect_mysql(){
         ${ROOT_PATH}/mariadb/bin/mariadb  -S ${ROOT_PATH}/mariadb/mysql.sock -uroot -p"${pwd}"
     fi
 
+    if [ "$CHOICE_DB" == "mysql-community" ];then
+        ${ROOT_PATH}/mysql-community/bin/mysql -S ${ROOT_PATH}/mysql-community/mysql.sock -uroot -p"${pwd}"
+    fi
+
     if [ "$CHOICE_DB" == "mysql-apt" ];then
         ${ROOT_PATH}/mysql-apt/bin/usr/bin/mysql -S ${ROOT_PATH}/mysql-apt/mysql.sock -uroot -p"${pwd}"
     fi
 
     if [ "$CHOICE_DB" == "mysql-yum" ];then
         ${ROOT_PATH}/mysql-yum/bin/usr/bin/mysql -S ${ROOT_PATH}/mysql-yum/mysql.sock -uroot -p"${pwd}"
-    fi
-
-    if [ "$CHOICE_DB" == "mysql-community" ];then
-        ${ROOT_PATH}/mysql-community/bin/mysql -S ${ROOT_PATH}/mysql-community/mysql.sock -uroot -p"${pwd}"
     fi
 }
 
