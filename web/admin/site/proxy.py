@@ -66,9 +66,9 @@ def get_proxy_conf():
     return MwSites.instance().getProxyConf(site_name, rid)
 
 # 设置代理
-@blueprint.route('/get_proxy_conf', endpoint='get_proxy_conf', methods=['POST'])
+@blueprint.route('/save_proxy_conf', endpoint='save_proxy_conf', methods=['POST'])
 @panel_login_required
-def get_proxy_conf():
+def save_proxy_conf():
     site_name = request.form.get("siteName", '')
     rid = request.form.get("id", '')
     config = request.form.get("config", "")
