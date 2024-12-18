@@ -8,13 +8,18 @@ import re
 import json
 import io
 
-
 web_dir = os.getcwd() + "/web"
 if os.path.exists(web_dir):
     sys.path.append(web_dir)
     os.chdir(web_dir)
 
 import core.mw as mw
+
+gd_dir = mw.getServerDir() +'/gdrive/lib'
+cmd = 'ls '+gd_dir+' | grep python  | cut -d \\  -f 1 | awk \'END {print}\''
+info = mw.execShell(cmd)
+p = gd_dir +'/'+ info[0].strip() + "/site-packages"
+sys.path.append(p)
 
 # -----------------------------
 import google.oauth2.credentials

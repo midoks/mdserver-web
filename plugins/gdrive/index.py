@@ -12,7 +12,6 @@ import json
 if sys.platform != "darwin":
     os.chdir("/www/server/mdserver-web")
 
-
 web_dir = os.getcwd() + "/web"
 if os.path.exists(web_dir):
     sys.path.append(web_dir)
@@ -20,16 +19,6 @@ if os.path.exists(web_dir):
 
 import core.mw as mw
 import core.db as db
-
-_ver = sys.version_info
-is_py2 = (_ver[0] == 2)
-is_py3 = (_ver[0] == 3)
-
-DEBUG = False
-
-if is_py2:
-    reload(sys)
-    sys.setdefaultencoding('utf-8')
 
 app_debug = False
 if mw.isAppleSystem():

@@ -57,7 +57,6 @@ def send_msg(bot, tag='ad', trigger_time=300):
     # 跨链混币器Cce.Cash💰低手续费💰隔断溯源 | 10/m | next,6/10 | @hu ge
     # TTKCDN | 10/m | @ssdpflood | 5
     # https://t.me/gjgzs2022 ｜ 22/m | @GJ_gzs
-    # https://zhaoziyuan1.cc | web | 15/m | 2m | next,12/15 ｜ @baleite
     # 综合包网/NG接口开户 | 28/m | 6m | next,4/28 | x
     # 实名认证/过人脸🕵️‍♀️各种账号处理✅ | 30/m| next,12/30 | @nngzs
     # 桃花资源采集| 13/m| next,1/13 | @xiaolizi1122
