@@ -21,9 +21,9 @@ serverPath=$(dirname "$rootPath")
 PATH=$PATH:${rootPath}/bin
 export PATH
 
-if [ -f ${rootPath}/bin/activate ];then
-    source ${rootPath}/bin/activate
-fi
+# if [ -f ${rootPath}/bin/activate ];then
+#     source ${rootPath}/bin/activate
+# fi
 
 VERSION=$2
 
