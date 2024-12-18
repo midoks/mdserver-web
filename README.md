@@ -95,8 +95,6 @@ PHP[72-84]支持phpMyAdmin[5.2.1]
 
 # AD - VPS推荐 - 🙏
 
-- [ZZZ评测](https://www.zzzvps.com/)
-
 | 服务商			| 	LOGO   |  推广地址  | 优惠码 |
 | ------------- |----------|-----------|-------|
 | digitalvirt	|[![digitalvirt](https://digitalvirt.com/templates/BlueWhite/img/logo-dark.svg)](https://digitalvirt.com/aff.php?aff=154) | https://digitalvirt.com/aff.php?aff=154 | mdserver-web |
