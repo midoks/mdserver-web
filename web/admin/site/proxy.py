@@ -42,10 +42,11 @@ def set_proxy():
     host = request.form.get('host', '')
     name = request.form.get('name', '')
     open_proxy = request.form.get('open_proxy', '')
+    open_cors = request.form.get('open_cors','')
     open_cache = request.form.get('open_cache', '')
     cache_time = request.form.get('cache_time', '')
     proxy_id = request.form.get('id', '')
-    return MwSites.instance().setProxy(site_name,site_from,to,host,name,open_proxy, open_cache,cache_time, proxy_id)
+    return MwSites.instance().setProxy(site_name,site_from,to,host,name,open_proxy,open_cors,open_cache,cache_time, proxy_id)
 
 # 设置代理状态
 @blueprint.route('/set_proxy_status', endpoint='set_proxy_status', methods=['POST'])
