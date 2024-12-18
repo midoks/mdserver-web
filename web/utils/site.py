@@ -1694,6 +1694,24 @@ location ^~ {from} {\n\
             self.close_redirect = []
         return True
 
+    def saveRedirectConf(self, site_name, redirect_id, config):
+        if redirect_id == '' or site_name == '':
+            return mw.returnData(False, "必填项不能为空!")
+
+        _old_config = mw.readFile("{}/{}/{}.conf".format(self.redirectPath, site_name, redirect_id))
+        if _old_config == False:
+            return mw.returnData(False, "非法操作")
+
+        mw.writeFile("{}/{}/{}.conf".format(self.redirectPath, site_name, redirect_id), config)
+        rule_test = mw.checkWebConfig()
+        if rule_test != True:
+            mw.writeFile("{}/{}/{}.conf".format(self.redirectPath,site_name, redirect_id), _old_config)
+            return mw.returnData(False, "OpenResty 配置测试不通过, 请重试: {}".format(rule_test))
+
+        self.operateRedirectConf(site_name, 'start')
+        mw.restartWeb()
+        return mw.returnData(True, "ok")
+
 
     def getProxyConf(self, site_name, proxy_id):
         if proxy_id == '' or site_name == '':
