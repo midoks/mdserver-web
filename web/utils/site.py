@@ -1696,7 +1696,7 @@ location ^~ {from} {\n\
 
 
     def getProxyConf(self, site_name, proxy_id):
-        if pid == '' or site_name == '':
+        if proxy_id == '' or site_name == '':
             return mw.returnData(False, "必填项不能为空!")
 
         conf_file = "{}/{}/{}.conf".format(self.proxyPath, site_name, proxy_id)
