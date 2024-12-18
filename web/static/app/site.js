@@ -1617,14 +1617,19 @@ function toProxy(siteName, type, obj) {
 			btn: ['提交','关闭'],
 			content: "<form id='form_proxy' class='divtable pd15' style='padding-bottom: 10px'>\
 				<div class='line'>\
-					<span class='tname'>开启代理</span>\
+					<span class='tname' style='line-height:20px;'>开启代理</span>\
 					<div class='info-r ml0 mt5'>\
 						<input name='open_proxy' class='btswitch btswitch-ios' type='checkbox' checked>\
 						<label id='open_proxy' class='btswitch-btn' for='openProxy' style='float:left'></label>\
 						<div style='display: inline-block'>\
-							<span class='tname' style='margin-left:15px;position: relative;top: -5px;'>是否缓存</span>\
+							<span class='tname' style='position: relative;top: -5px;'>是否缓存</span>\
 							<input class='btswitch btswitch-ios' type='checkbox' name='open_cache'>\
 							<label class='btswitch-btn' id='open_cache' for='openCache' style='float:left'></label>\
+						</div>\
+						<div style='display: inline-block'>\
+							<span class='tname' style='position: relative;top: -5px;'>是否跨域</span>\
+							<input class='btswitch btswitch-ios' type='checkbox' name='open_cors'>\
+							<label class='btswitch-btn' id='open_cors' for='open_cors' style='float:left'></label>\
 						</div>\
 					</div>\
 				</div>\
@@ -1666,11 +1671,19 @@ function toProxy(siteName, type, obj) {
 			success:function(){
 
 				if (typeof(obj) != 'undefined'){
-					// console.log(obj);
+					console.log(obj);
 					$('input[name="name"]').val(obj['name']).attr('readonly','readonly').addClass('disabled');
 					if (obj['open_cache'] == 'on'){
 						$("input[name='open_cache']").prop("checked",true);
 						$('#cache_time').show();
+					}
+
+					if (obj['open_cors'] == 'on'){
+						$("input[name='open_cors']").prop("checked",true);
+					}
+
+					if (obj['open_proxy'] == 'on'){
+						$("input[name='open_proxy']").prop("checked",true);
 					}
 
 					$('input[name="from"]').val(obj['from']);
@@ -1720,6 +1733,15 @@ function toProxy(siteName, type, obj) {
 					}else{
 						$('#cache_time').show();
 						$("input[name='open_cache']").prop("checked",true);
+					}
+				});
+
+				$('#open_cors').click(function(){
+					var status = $("input[name='open_cors']").prop("checked")==true?1:0;
+					if(status==1){
+						$("input[name='open_cors']").prop("checked",false);
+					}else{
+						$("input[name='open_cors']").prop("checked",true);
 					}
 				});
 			},

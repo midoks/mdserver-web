@@ -1479,7 +1479,7 @@ class sites(object):
         mw.writeFile(vhost_file, content)
 
     # 设置 网站 反向代理列表
-    def setProxy(self, site_name, site_from, to, host, name, open_proxy, open_cache, cache_time, proxy_id):
+    def setProxy(self, site_name, site_from, to, host, name, open_proxy, open_cors, open_cache, cache_time, proxy_id):
         from urllib.parse import urlparse
         if  site_name == "" or site_from == "" or to == "" or host == "" or name == "":
             return mw.returnData(False, "必填项不能为空")
@@ -1593,8 +1593,9 @@ location ^~ {from} {\n\
                 "to": to,
                 "host": host,
                 "open_cache": open_cache,
-                "open_proxy": open_proxy,
                 "cache_time": cache_time,
+                "open_proxy": open_proxy,
+                "open_cors": open_cors,
                 "id": proxy_id,
             })
         else:
@@ -1610,8 +1611,9 @@ location ^~ {from} {\n\
             data[dindex]['to'] = to
             data[dindex]['host'] = host
             data[dindex]['open_cache'] = open_cache
-            data[dindex]['open_proxy'] = open_proxy
             data[dindex]['cache_time'] = cache_time
+            data[dindex]['open_proxy'] = open_proxy
+            data[dindex]['open_cors'] = open_cors
 
         if open_proxy != 'on':
             os.rename(conf_proxy, conf_bk)
