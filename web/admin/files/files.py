@@ -252,7 +252,7 @@ def create_dir():
 @panel_login_required
 def get_dir_size():
     path = request.form.get('path', '')
-    size = file.getDirSize(path)
+    size = file.getDirSizeByBash(path)
     return mw.returnData(True, mw.toSize(size))
 
 
