@@ -1532,7 +1532,7 @@ location ^~ {from} {\n\
 # PROXY-END"
 
         tpl_proxy_cache = "\n\
-    if ( $uri ~* \\.(gif|png|jpg|css|js|woff|woff2)$\" )\n\
+    if ( $uri ~* \\.(gif|png|jpg|css|js|ttf|woff|woff2)$\" )\n\
     {\n\
         expires {cache_time}m;\n\
     }\n\
