@@ -68,8 +68,8 @@ if [ "$OSNAME" == "ubuntu" ] && [ "$VERSION_ID" ~ "24" ];then
 		ln -s libaio.so.1t64.0.2 libaio.so.1
 	fi
 
-	if [ -f libancurses.so.6 ];then
-		ln -s libancursesw.so.6.4 libancurses.so.6
+	if [ -f libncurses.so.6 ];then
+		ln -s libncursesw.so.6.4 libncurses.so.6
 	fi
 	
 	
