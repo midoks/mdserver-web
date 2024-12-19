@@ -156,6 +156,7 @@ def initConf():
             "/www/server/redis/data",
             "/www/server/alist/data/log",
             "/www/server/dztasks/logs",
+            "/www/server/rsyncd/lsyncd.log"
             "/www/server/cron",
         ]
         for i in clogcom:

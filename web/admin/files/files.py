@@ -252,8 +252,10 @@ def create_dir():
 @panel_login_required
 def get_dir_size():
     path = request.form.get('path', '')
-    size = file.getDirSize(path)
-    return mw.returnData(True, mw.toSize(size))
+    size = file.getDirSizeByBash(path)
+    return mw.returnData(True, size)
+    # size = file.getDirSize(path)
+    # return mw.returnData(True, mw.toSize(size))
 
 
 # 删除文件
