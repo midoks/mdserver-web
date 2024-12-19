@@ -2186,19 +2186,19 @@ function pluginConfig(_name, version, func){
 		    }
             
             editor = CodeMirror.fromTextArea(document.getElementById("textBody"), {
+            	lineNumbers: true,
+                matchBrackets:true,
                 extraKeys: {
                     "Ctrl-Space": "autocomplete",
                     "Ctrl-F": "findPersistent",
                     "Ctrl-H": "replaceAll",
                     "Ctrl-S": function() {
-                    	saveDataFunc()
+                    	saveDataFunc();
                     },
                     "Cmd-S":function() {
 						saveDataFunc();
 					}
-                },
-                lineNumbers: true,
-                matchBrackets:true,
+                }
             });
             editor.focus();
             $(".CodeMirror-scroll").css({"height":"300px","margin":0,"padding":0});

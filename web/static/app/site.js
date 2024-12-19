@@ -1805,6 +1805,25 @@ function toProxy(siteName, type, obj) {
 				</div>\
 			</div>";
 			var editor;
+			function saveDataFunc(){
+				$("#configProxyBody").empty().text(editor.getValue());
+				var load = layer.load();
+				var data = {
+					siteName: siteName,
+					id: obj,
+					config: editor.getValue(),
+				};
+
+				$.post('/site/save_proxy_conf', data, function(res) {
+					layer.close(load)
+					if (res.status == true) {
+						layer.msg('保存成功', {icon: 1});
+						layer.close(index);
+					} else {
+						layer.msg(res.msg, {time: 3000,icon: 2});
+					}
+				},'json');
+			}
 			var index = layer.open({
 				type: 1,
 				title: '编辑配置文件',
@@ -1815,32 +1834,26 @@ function toProxy(siteName, type, obj) {
 				content: mBody,
 				success: function () {
 					editor = CodeMirror.fromTextArea(document.getElementById("configProxyBody"), {
-						extraKeys: {"Ctrl-Space": "autocomplete"},
 						lineNumbers: true,
 						matchBrackets:true,
+						extraKeys: {
+							"Ctrl-Space": "autocomplete",
+		                    "Ctrl-F": "findPersistent",
+		                    "Ctrl-H": "replaceAll",
+		                    "Ctrl-S": function() {
+		                    	saveDataFunc();
+		                    },
+		                    "Cmd-S":function() {
+								saveDataFunc();
+							}
+						}
 					});
 					editor.focus();
 					$(".CodeMirror-scroll").css({"height":"300px","margin":0,"padding":0});
 					$("#onlineEditFileBtn").unbind('click');
 				},
 				yes:function(index,layero){
-					$("#configProxyBody").empty().text(editor.getValue());
-					var load = layer.load();
-					var data = {
-						siteName: siteName,
-						id: obj,
-						config: editor.getValue(),
-					};
-
-					$.post('/site/save_proxy_conf', data, function(res) {
-						layer.close(load)
-						if (res.status == true) {
-							layer.msg('保存成功', {icon: 1});
-							layer.close(index);
-						} else {
-							layer.msg(res.msg, {time: 3000,icon: 2});
-						}
-					},'json');
+					saveDataFunc();
 					return true;
 		        },
 			});
