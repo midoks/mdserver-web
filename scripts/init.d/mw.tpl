@@ -661,6 +661,7 @@ case "$1" in
     'logs') error_logs;;
     'close') mw_close;;
     'open') mw_open;;
+    'install') mw_install;;
     'update') mw_update;;
     'dev') mw_update_dev;;
     'update_dev') mw_update_dev;;
