@@ -1559,8 +1559,8 @@ location ^~ {from} {\n\
 "
         tpl_proxy_cors = "\n\
     add_header Access-Control-Allow-Origin *;\n\
+    add_header Access-Control-Allow-Headers *;\n\
     add_header Access-Control-Allow-Methods 'GET, POST, OPTIONS';\n\
-    add_header Access-Control-Allow-Headers '*';\n\
     if ($request_method = 'OPTIONS') {\n\
         return 204;\n\
     }\n\
