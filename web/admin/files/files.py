@@ -253,7 +253,9 @@ def create_dir():
 def get_dir_size():
     path = request.form.get('path', '')
     size = file.getDirSizeByBash(path)
-    return mw.returnData(True, mw.toSize(size))
+    return mw.returnData(True, size)
+    # size = file.getDirSize(path)
+    # return mw.returnData(True, mw.toSize(size))
 
 
 # 删除文件
