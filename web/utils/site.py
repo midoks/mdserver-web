@@ -1541,8 +1541,7 @@ location ^~ {from} {\n\
     proxy_cache_key \"$host$uri$is_args$args\";\n\
     proxy_cache_valid 200 304 301 302 {cache_time}m;\n\
 "
-
-        tpl_proxy_nocache = "\n\
+        tpl_proxy_nocache_bak = "\n\
     set $static_files_app 0; \n\
     if ( $uri ~* \\.(gif|png|jpg|jpeg|css|js|ttf|woff|woff2)$\" )\n\
     {\n\
@@ -1553,6 +1552,10 @@ location ^~ {from} {\n\
     {\n\
         add_header Cache-Control no-cache;\n\
     }\n\
+"
+
+        tpl_proxy_nocache = "\n\
+    add_header Cache-Control no-cache;\n\
 "
         tpl_proxy_cors = "\n\
     add_header Access-Control-Allow-Origin *;\n\
