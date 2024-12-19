@@ -39,9 +39,13 @@ apt install -y libncurses5-dev
 apt install -y software-properties-common
 apt install -y bzip2
 
-apt install -y libnuma1 
-apt install -y libaio1 
+apt install -y libnuma1
+apt install -y libaio1
+apt install -y libaio-dev
 apt install -y libmecab2
+apt install -y numactl
+apt install -y libaio1t64
+
 
 P_VER=`python3 -V | awk '{print $2}'`
 if version_ge "$P_VER" "3.11.0" ;then

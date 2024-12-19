@@ -32,6 +32,48 @@ else
 fi
 
 
+_os=`uname`
+echo "use system: ${_os}"
+if [ ${_os} == "Darwin" ]; then
+	OSNAME='macos'
+elif grep -Eq "openSUSE" /etc/*-release; then
+	OSNAME='opensuse'
+elif grep -Eq "FreeBSD" /etc/*-release; then
+	OSNAME='freebsd'
+elif grep -Eqi "Arch" /etc/issue || grep -Eq "Arch" /etc/*-release; then
+	OSNAME='arch'
+elif grep -Eqi "CentOS" /etc/issue || grep -Eq "CentOS" /etc/*-release; then
+	OSNAME='centos'
+elif grep -Eqi "Fedora" /etc/issue || grep -Eq "Fedora" /etc/*-release; then
+	OSNAME='fedora'
+elif grep -Eqi "Rocky" /etc/issue || grep -Eq "Rocky" /etc/*-release; then
+	OSNAME='rocky'
+elif grep -Eqi "AlmaLinux" /etc/issue || grep -Eq "AlmaLinux" /etc/*-release; then
+	OSNAME='alma'
+elif grep -Eqi "Debian" /etc/issue || grep -Eq "Debian" /etc/*-release; then
+	OSNAME='debian'
+elif grep -Eqi "Ubuntu" /etc/issue || grep -Eq "Ubuntu" /etc/*-release; then
+	OSNAME='ubuntu'
+else
+	OSNAME='unknow'
+fi
+
+VERSION_ID=`cat /etc/*-release | grep 'VERSION_ID' | awk -F = '{print $2}' | awk -F "\"" '{print $2}'`
+
+# 针对ubuntu24进行优化
+if [[ "$OSNAME" == "ubuntu" ]] && [[ "$VERSION_ID" =~ "24" ]]; then
+	cur_dir=`pwd`
+	cd /usr/lib/x86_64-linux-gnu
+	if [ ! -f libaio.so.1 ];then
+		ln -s libaio.so.1t64.0.2 libaio.so.1
+	fi
+
+	if [ ! -f libncurses.so.6 ];then
+		ln -s libncursesw.so.6.4 libncurses.so.6
+	fi
+	cd $cur_dir
+fi
+
 if [ "${2}" == "" ];then
 	echo '缺少安装脚本...'
 	exit 0
