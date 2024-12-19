@@ -1537,7 +1537,7 @@ location ^~ {from} {\n\
         expires {cache_time}m;\n\
     }\n\
     proxy_ignore_headers Set-Cookie Cache-Control expires;\n\
-    proxy_cache mw_cache;\n \
+    proxy_cache mw_cache;\n\
     proxy_cache_key \"$host$uri$is_args$args\";\n\
     proxy_cache_valid 200 304 301 302 {cache_time}m;\n\
 "
