@@ -1555,13 +1555,12 @@ location ^~ {from} {\n \
     }\n\
 "
         tpl_proxy_cors = "\n\
-    add_header Access-Control-Allow-Origin *;\
-    add_header Access-Control-Allow-Methods 'GET, POST, OPTIONS';\
-    add_header Access-Control-Allow-Headers 'DNT,X-Mx-ReqToken,Keep-Alive,User-Agent,X-Requested-With,If-Modified-Since,Cache-Control,Content-Type,Authorization';\
-    add_header X-Cache $upstream_cache_status;\
-    if ($request_method = 'OPTIONS') {\
-        return 204;\
-    }\
+    add_header Access-Control-Allow-Origin *;\n\
+    add_header Access-Control-Allow-Methods 'GET, POST, OPTIONS';\n\
+    add_header Access-Control-Allow-Headers 'DNT,X-Mx-ReqToken,Keep-Alive,User-Agent,X-Requested-With,If-Modified-Since,Cache-Control,Content-Type,Authorization';\n\
+    if ($request_method = 'OPTIONS') {\n\
+        return 204;\n\
+    }\n\
 "
 
         # replace
