@@ -1544,7 +1544,7 @@ location ^~ {from} {\n\
 
         tpl_proxy_nocache = "\n\
     set $static_files_app 0; \n \
-    if ( $uri ~* \\.(gif|png|jpg|css|js|woff|woff2)$\" )\n\
+    if ( $uri ~* \\.(gif|png|jpg|css|js|ttf|woff|woff2)$\" )\n\
     {\n\
         set $static_files_app 1;\n\
         expires 12h;\n\
