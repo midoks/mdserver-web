@@ -58,10 +58,10 @@ else
 	OSNAME='unknow'
 fi
 
-VERSION_ID=`cat /etc/*-release | grep VERSION_ID | awk -F = '{print $2}' | awk -F "\"" '{print $2}'`
+VERSION_ID=`cat /etc/*-release | grep 'VERSION_ID' | awk -F = '{print $2}' | awk -F "\"" '{print $2}'`
 
 # 针对ubuntu24进行优化
-if [ "$OSNAME" == "ubuntu" ] && [ "$VERSION_ID" ~ "24" ];then
+if [[ "$OSNAME" == "ubuntu" ]] && [[ "$VERSION_ID" =~ "24" ]]; then
 	cur_dir=`pwd`
 	cd /usr/lib/x86_64-linux-gnu
 	if [ ! -f libaio.so.1 ];then
