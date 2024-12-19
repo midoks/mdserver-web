@@ -64,11 +64,11 @@ VERSION_ID=`cat /etc/*-release | grep VERSION_ID | awk -F = '{print $2}' | awk -
 if [ "$OSNAME" == "ubuntu" ] && [ "$VERSION_ID" ~ "24" ];then
 	cur_dir=`pwd`
 	cd /usr/lib/x86_64-linux-gnu
-	if [ -f libaio.so.1 ];then
+	if [ ! -f libaio.so.1 ];then
 		ln -s libaio.so.1t64.0.2 libaio.so.1
 	fi
 
-	if [ -f libncurses.so.6 ];then
+	if [ ! -f libncurses.so.6 ];then
 		ln -s libncursesw.so.6.4 libncurses.so.6
 	fi
 	cd $cur_dir
