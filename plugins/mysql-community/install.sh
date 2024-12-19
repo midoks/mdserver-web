@@ -32,6 +32,54 @@ else
 fi
 
 
+_os=`uname`
+echo "use system: ${_os}"
+if [ ${_os} == "Darwin" ]; then
+	OSNAME='macos'
+elif grep -Eq "openSUSE" /etc/*-release; then
+	OSNAME='opensuse'
+	zypper refresh
+elif grep -Eq "FreeBSD" /etc/*-release; then
+	OSNAME='freebsd'
+	pkg install -y wget unzip
+elif grep -Eqi "Arch" /etc/issue || grep -Eq "Arch" /etc/*-release; then
+	OSNAME='arch'
+	echo y | pacman -Sy unzip
+elif grep -Eqi "CentOS" /etc/issue || grep -Eq "CentOS" /etc/*-release; then
+	OSNAME='centos'
+	yum install -y wget zip unzip
+elif grep -Eqi "Fedora" /etc/issue || grep -Eq "Fedora" /etc/*-release; then
+	OSNAME='fedora'
+	yum install -y wget zip unzip
+elif grep -Eqi "Rocky" /etc/issue || grep -Eq "Rocky" /etc/*-release; then
+	OSNAME='rocky'
+	yum install -y wget zip unzip
+elif grep -Eqi "AlmaLinux" /etc/issue || grep -Eq "AlmaLinux" /etc/*-release; then
+	OSNAME='alma'
+	yum install -y wget zip unzip
+elif grep -Eqi "Debian" /etc/issue || grep -Eq "Debian" /etc/*-release; then
+	OSNAME='debian'
+	apt update -y
+	apt install -y devscripts
+	apt install -y wget zip unzip
+elif grep -Eqi "Ubuntu" /etc/issue || grep -Eq "Ubuntu" /etc/*-release; then
+	OSNAME='ubuntu'
+	apt install -y wget zip unzip
+else
+	OSNAME='unknow'
+fi
+
+VERSION_ID=`cat /etc/*-release | grep VERSION_ID | awk -F = '{print $2}' | awk -F "\"" '{print $2}'`
+
+# 针对ubuntu24进行优化
+if [ "$OSNAME" == "ubuntu" && "$VERSION_ID" ~ "24" ];then
+	cur_dir=`pwd`
+	cd /usr/lib/x86_64-linux-gnu
+	ln -s libaio.so.1t64.0.2 libaio.so.1
+	ln -s libancursesw.so.6.4 libaio.so.6
+	cd $cur_dir
+fi
+
 if [ "${2}" == "" ];then
 	echo '缺少安装脚本...'
 	exit 0
