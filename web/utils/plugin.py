@@ -363,7 +363,14 @@ class plugin(object):
         indexList = thisdb.getOptionByJson('display_index',default=[])
         for i in indexList:
             t = i.split('-')
-            if t[0] == name:
+            tlen = len(t)
+            plugin_name = t[0]
+            plugin_ver = t[1]
+            if tlen > 2:
+                tArr = t[0:tlen - 1]
+                plugin_name = '-'.join(tArr)
+                plugin_ver = t[tlen - 1]
+            if plugin_name == name:
                 return True
         return False
 
