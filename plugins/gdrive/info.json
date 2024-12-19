@@ -1,6 +1,6 @@
 {
 	"hook":["backup"],
-	"id":998,
+	"sort":3,
 	"title":"谷歌云网盘",
 	"tip":"lib",
 	"name":"gdrive",
