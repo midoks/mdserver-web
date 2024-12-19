@@ -72,7 +72,7 @@ fi
 VERSION_ID=`cat /etc/*-release | grep VERSION_ID | awk -F = '{print $2}' | awk -F "\"" '{print $2}'`
 
 # 针对ubuntu24进行优化
-if [ "$OSNAME" == "ubuntu" && "$VERSION_ID" ~ "24" ];then
+if [ "$OSNAME" == "ubuntu" ] && [ "$VERSION_ID" ~ "24" ];then
 	cur_dir=`pwd`
 	cd /usr/lib/x86_64-linux-gnu
 	ln -s libaio.so.1t64.0.2 libaio.so.1
