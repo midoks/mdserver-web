@@ -1,4 +1,5 @@
 {
+	"sort":6,
 	"title":"FTP存储空间",
 	"hook":["backup"],
 	"tip":"soft",
@@ -13,5 +14,5 @@
 	"author":"midoks",
 	"home":"https://github.com/midoks/mdserver-web",
 	"date":"2022-10-23",
-	"pid": "4"
+	"pid": "5"
 }
