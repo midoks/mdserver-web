@@ -1,5 +1,5 @@
 {
-	"sort": 7,
+	"sort": 9,
 	"ps": "防止恶意IP地址暴力破解服务、站点，禁止导致多个身份验证错误的主机",
 	"name": "fail2ban",
 	"title": "fail2ban",
