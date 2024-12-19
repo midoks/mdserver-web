@@ -1,4 +1,5 @@
 {
+	"sort":1,
 	"hook":["database"],
 	"title":"MySQL[Tar]",
 	"tip":"soft",
