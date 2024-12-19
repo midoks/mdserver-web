@@ -71,8 +71,6 @@ if [ "$OSNAME" == "ubuntu" ] && [ "$VERSION_ID" ~ "24" ];then
 	if [ -f libncurses.so.6 ];then
 		ln -s libncursesw.so.6.4 libncurses.so.6
 	fi
-	
-	
 	cd $cur_dir
 fi
 
