@@ -19,7 +19,7 @@
 			}
 		}
 	],
-	"id":3,
+	"sort":3,
 	"title":"SSH终端",
 	"tip":"lib",
 	"name":"webssh",
