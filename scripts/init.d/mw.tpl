@@ -241,6 +241,25 @@ error_logs()
 	tail -n 100 ${PANEL_DIR}/logs/panel_error.log
 }
 
+mw_install(){
+   if [ -f ${PANEL_DIR}/task.py ];then
+        echo "与后续版本差异太大,不再提供更新"
+        exit 0
+    fi
+
+    LOCAL_ADDR=common
+    cn=$(curl -fsSL -m 10 -s http://ipinfo.io/json | grep "\"country\": \"CN\"")
+    if [ ! -z "$cn" ] || [ "$?" == "0" ] ;then
+        LOCAL_ADDR=cn
+    fi
+    
+    if [ "$LOCAL_ADDR" == "common" ];then
+        curl --insecure -fsSL https://raw.githubusercontent.com/midoks/mdserver-web/master/scripts/install.sh | bash
+    else
+        curl --insecure -fsSL  https://code.midoks.icu/midoks/mdserver-web/raw/branch/dev/scripts/install.sh | bash
+    fi 
+}
+
 mw_update()
 {
     if [ -f ${PANEL_DIR}/task.py ];then
@@ -551,6 +570,7 @@ mw_list(){
     echo -e "mw mongdb       - 连接MongoDB"
     echo -e "mw redis        - 连接Redis"
     echo -e "mw valkey       - 连接WalKey"
+    echo -e "mw install      - 执行安装脚本"
     echo -e "mw update       - 更新到正式环境最新代码"
     echo -e "mw update_dev   - 更新到测试环境最新代码"
     echo -e "mw debug        - 调式开发面板"
@@ -641,6 +661,7 @@ case "$1" in
     'logs') error_logs;;
     'close') mw_close;;
     'open') mw_open;;
+    'install') mw_install;;
     'update') mw_update;;
     'dev') mw_update_dev;;
     'update_dev') mw_update_dev;;
