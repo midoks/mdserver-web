@@ -3,7 +3,7 @@
 	"hook":["database"],
 	"title":"MySQL[Tar]",
 	"tip":"soft",
-	"name":"mysql[tar]",
+	"name":"mysql-community",
 	"type":"运行环境",
 	"ps":"一种关系数据库管理系统(极速安装)",
 	"todo_versions":["5.7","8.0"],
