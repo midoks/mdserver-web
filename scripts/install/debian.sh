@@ -86,6 +86,8 @@ apt install -y libnuma1
 apt install -y libaio1 
 apt install -y libmecab2
 
+apt install -y dnsutils
+
 P_VER=`python3 -V | awk '{print $2}'`
 if version_ge "$P_VER" "3.11.0" ;then
     echo -e "\e[1;31mapt install python3.12-venv\e[0m"
