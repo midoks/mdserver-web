@@ -197,7 +197,7 @@ if [ "$VERSION_ID" -ge "8" ];then
         oniguruma oniguruma-devel patch pcre pcre-devel perl perl-Data-Dumper perl-devel procps psmisc python3-devel \
         openssl openssl-devel patchelf libargon2-devel \
         ImageMagick ImageMagick-devel libyaml-devel \
-        pv bc \
+        pv bc bind-utils \
         ncurses-compat-libs numactl \
         readline-devel rpcgen sqlite-devel rar unrar tar unzip vim-minimal wget zip zlib zlib-devel;
     do
@@ -218,7 +218,7 @@ else
         libwebp libwebp-devel libxml2 libxml2-devel libxslt libxslt-devel libzip libzip-devel libzstd-devel \
         make mysql-devel ncurses ncurses-devel net-tools oniguruma oniguruma-devel openldap openldap-devel \
         openssl openssl-devel patch pcre pcre-devel perl perl-Data-Dumper perl-devel psmisc python-devel \
-        pv bc\
+        pv bc bind-utils \
         ncurses-compat-libs numactl \
         python3-devel python3-pip re2c readline-devel rpcgen sqlite-devel tar unzip rar unrar vim-minimal vixie-cron \
         wget zip zlib zlib-devel ImageMagick ImageMagick-devel libyaml-devel patchelf libargon2-devel;
