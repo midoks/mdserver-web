@@ -82,16 +82,25 @@ mw_start_bgtask(){
 
 mw_stop()
 {
-	PLIST=`ps -ef|grep app:app |grep -v grep|awk '{print $2}'`
-	for i in $PLIST
+	APP_LIST=`ps -ef|grep app:app |grep -v grep|awk '{print $2}'`
+	APP_LIST=($APP_LIST)
+	for p in ${APP_LIST[@]}
 	do
-	    kill -9 $i > /dev/null 2>&1
+	    kill -9 $p > /dev/null 2>&1
 	done
 
-	PIDS=`ps -ef|grep panel_task.py | grep -v grep |awk '{print $2}'`
-    for p in $PIDS
+	TASK_LIST=`ps -ef|grep panel_task.py | grep -v grep |awk '{print $2}'`
+	TASK_LIST=($TASK_LIST)
+    for p in ${TASK_LIST[@]}
     do
     	kill -9 $p > /dev/null 2>&1
+    done
+
+    zzpids=`ps -A -o stat,ppid,pid | grep -e '^[Zz]' | awk '{print $2}'`
+    zzpids=($zzpids)
+    for p in ${zzpids[@]}
+    do
+        kill -9 ${p} > /dev/null 2>&1
     done
 }
 
