@@ -54,8 +54,38 @@ function gorsePostCallbak(method, version, args,callback){
 }
 
 
-function gorseReadme(){
+function gorseCommonFunc(){
+    gorsePost('info', '', {}, function(rdata){
+        var rdata = $.parseJSON(rdata.data);
+        var info = rdata['data'];
+        var con = '<p class="conf_p">\
+            <span>用户名</span>\
+            <input class="bt-input-text mr5" type="text" value="' + info.dashboard_user_name + '">\
+        </p>';
 
+        con += '<p class="conf_p">\
+            <span>密码</span>\
+            <input class="bt-input-text mr5" type="text" value="' + info.dashboard_password  +'">\
+        </p>';
+        con += '<p class="conf_p">\
+            <span>端口</span>\
+            <input class="bt-input-text mr5" type="text" value="' + info.http_port  +'">\
+        </p>';
+
+        con += '<hr/><p class="conf_p" style="text-align:center;">\
+            <button id="open_url" class="btn btn-default btn-sm">打开Gorse</button>\
+        </p>';
+
+        $(".soft-man-con").html(con);
+        $('#open_url').click(function(){
+            var url = 'http://' + info.ip + ':' + info.http_port;
+            window.open(url);
+            copyText(url);
+        });
+    });
+}
+
+function gorseReadme(){
 
     var readme = '<ul class="help-info-text c7">';
     readme += '<li>参考官方</li>';
