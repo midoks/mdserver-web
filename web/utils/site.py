@@ -2282,7 +2282,7 @@ location ^~ {from} {\n\
 
     # acme手动申请方式
     # https://github.com/acmesh-official/acme.sh/wiki/dns-manual-mode
-    def createAcmeDnsTypeNone(self, site_name, domains, email, dnspai, wildcard_domain, force, renew):
+    def createAcmeDnsTypeNone(self, site_name, domains, email, dnspai, wildcard_domain, force, renew, dns_alias):
         # print(site_name, domains, email, dnspai, wildcard_domain, force, renew)
         acme_dir = mw.getAcmeDir()
         log_file = self.acmeLogFile()
@@ -2301,6 +2301,9 @@ export PATH
             else:
                 cmd += "acme.sh --issue -d " + d + " "
             cmd += " --dns --yes-I-know-dns-manual-mode-enough-go-ahead-please"
+
+            if dns_alias != '':
+                cmd += ' --domain-alias '+str(dns_alias)
 
             if renew == 'true':
                 cmd += " --renew"
@@ -2341,7 +2344,7 @@ export PATH
         mw.restartWeb()
         return mw.returnData(True, '证书已更新!', result)
 
-    def createAcmeDns(self, site_name, domains, email, dnspai, wildcard_domain, force, renew):
+    def createAcmeDns(self, site_name, domains, email, dnspai, wildcard_domain, force, renew, dns_alias):
         dnsapi_option = thisdb.getOptionByJson('dnsapi', default={})
         log_file = self.acmeLogFile()
         cmd = 'echo "..." > '+ log_file
@@ -2349,7 +2352,7 @@ export PATH
 
         # 手动方式申请
         if dnspai == 'none':
-            return self.createAcmeDnsTypeNone(site_name, domains, email, dnspai, wildcard_domain, force, renew)
+            return self.createAcmeDnsTypeNone(site_name, domains, email, dnspai, wildcard_domain, force, renew, dns_alias)
 
         if not dnspai in dnsapi_option:
             return mw.returnData(False, '['+dnspai+']未设置!')
@@ -2375,6 +2378,10 @@ export PATH
                 d = top_domain
             else:
                 cmd += 'acme.sh --issue --dns '+str(dnspai)+' -d '+d
+
+            if dns_alias != '':
+                cmd += ' --domain-alias '+str(dns_alias)
+                
             cmd +=  ' > ' + log_file
             # print(cmd)
             result = mw.execShell(cmd)
@@ -2424,7 +2431,7 @@ export PATH
         mw.restartWeb()
         return mw.returnData(True, '证书已更新!', result)
 
-    def createAcme(self, site_name, domains, force, renew, apply_type, dnspai, email, wildcard_domain):
+    def createAcme(self, site_name, domains, force, renew, apply_type, dnspai, email, wildcard_domain, dns_alias):
         domains = json.loads(domains)
         if len(domains) < 1:
             return mw.returnData(False, '请选择域名')
@@ -2452,7 +2459,7 @@ export PATH
         if apply_type == 'file':
             return self.createAcmeFile(site_name, domains, email,force,renew)
         elif apply_type == 'dns':
-            return self.createAcmeDns(site_name, domains, email, dnspai, wildcard_domain,force, renew)
+            return self.createAcmeDns(site_name, domains, email, dnspai, wildcard_domain,force, renew, dns_alias)
         return mw.returnData(False, '异常请求')
 
     def createLet(self, site_name, domains, force, renew, apply_type, dnspai, email, wildcard_domain):

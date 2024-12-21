@@ -47,7 +47,7 @@ def create_acme():
     apply_type = request.form.get('apply_type', 'file')
     dnspai = request.form.get('dnspai','')
     dns_alias = request.form.get('dns_alias','')
-    return MwSites.instance().createAcme(site_name, domains, force, renew, apply_type, dnspai, email, wildcard_domain)
+    return MwSites.instance().createAcme(site_name, domains, force, renew, apply_type, dnspai, email, wildcard_domain,dns_alias)
 
 
 

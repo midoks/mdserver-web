@@ -2312,6 +2312,11 @@ function opSSLAcme(type, id, siteName, callback){
   			<span class="tname text-center">邮箱</span>\
   			<input class="bt-input-text" style="width:240px;" type="text" name="admin_email" />\
   		</div>\
+  		<div class="line mtb10" id="dns_alias" style="display:none;">\
+			<span class="tname text-center">别名验证</span>\
+			<input class="bt-input-text" style="width:240px;" type="text" name="dns_alias" />\
+			<span> (可不填) <a class="btlink" target="_blank" href="https://github.com/acmesh-official/acme.sh/wiki/DNS-alias-mode#7-challenge-alias-or-domain-alias">文档说明</a><span>\
+		</div>\
   		<div class="line mtb10">\
   			<span class="tname text-center">域名</span>\
   			<ul id="ymlist" style="padding: 5px 10px;max-height:180px;overflow:auto; width:240px;border:#ccc 1px solid;border-radius:3px"></ul>\
@@ -2334,9 +2339,11 @@ function opSSLAcme(type, id, siteName, callback){
 		if (val == 'file'){
 			$('#dnsapi_option').css('display','none');
 			$('#wildcard_domain_block').css('display','none');
+			$('#dns_alias').css('display','none');
 		} else {
 			$('#dnsapi_option').css('display','block');
 			$('#wildcard_domain_block').css('display','block');
+			$('#dns_alias').css('display','block');
 		}
 	});
 
@@ -2673,11 +2680,10 @@ function newAcmeHandApplyNotice(siteName, id, domains, data){
 			<ul id="acme_hand_ssl_notice_help" class="help-info-text c6">\
 			    <li>解析域名需要一定时间来生效,完成所以上所有解析操作后,请等待1分钟后再点击【验证】按钮</li>\
 			    <li>可通过CMD命令来手动验证域名解析是否生效: nslookup -q=txt _acme-challenge.xx.cn</li>\
-			    <li>若您使用的是阿里云DNS,DnsPod作为DNS,可使用DNS接口自动解析</li>\
+			    <li>若您使用的是阿里云DNS,DnsPod等等作为DNS,可使用DNS接口自动解析</li>\
 		    </ul>\
 		</div>',
 		success:function(){
-
 			var list = '';
 			for (var i = 0; i < data.length; i++) {
 				list += '<tr>';
@@ -2720,6 +2726,8 @@ function newAcmeHandApplyNotice(siteName, id, domains, data){
 				if (apply_type == 'dns'){
 					pdata['dnspai'] = $('#dnsapi_option option:selected').val();
 				}
+				pdata['dns_alias'] = $("input[name='dns_alias']").val();
+				
 				pdata['renew'] = 'true';
 				$.post('/site/create_acme',pdata,function(rdata){
 					showMsg(rdata.msg, function(){
@@ -2755,6 +2763,7 @@ function newAcmeSSL(siteName, id, domains){
 			pdata['dnspai'] = $('#dnsapi_option option:selected').val();
 		}
 
+		pdata['dns_alias'] = $("input[name='dns_alias']").val();
 		$.post('/site/create_acme',pdata,function(rdata){
 			showMsg(rdata.msg, function(){
 				if (rdata.status){
