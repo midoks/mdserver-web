@@ -2391,8 +2391,6 @@ export PATH
             src_path = mw.getAcmeDomainDir(d)
             src_cert = src_path + '/fullchain.cer'
             src_key = src_path + '/' + d + '.key'
-            if not os.path.exists(src_cert):
-                src_cert = src_path + '/'+d+'.cer'
 
             # src_cert.replace("\\*", "*")
             msg = '签发失败,您尝试申请证书的失败次数已达上限!\
