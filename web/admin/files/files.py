@@ -163,7 +163,17 @@ def get_dir():
     dir_list['page'] = mw.getPage({'p':page, 'row': row, 'tojs':'getFiles', 'count': dir_list['count']}, '1,2,3,4,5,6,7,8')
     return dir_list
 
-# 解压
+# 解压ZIP
+@blueprint.route('/unzip', endpoint='unzip', methods=['POST'])
+@panel_login_required
+def unzip():
+    sfile = request.form.get('sfile', '')
+    dfile = request.form.get('dfile', '')
+    stype = request.form.get('type', '')
+    path = request.form.get('path', '')
+    return file.unzip(sfile, dfile, stype, path)
+
+# 解压可解压文件
 @blueprint.route('/uncompress', endpoint='uncompress', methods=['POST'])
 @panel_login_required
 def uncompress():
