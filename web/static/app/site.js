@@ -2315,7 +2315,7 @@ function opSSLAcme(type, id, siteName, callback){
   		<div class="line mtb10" id="dns_alias" style="display:none;">\
 			<span class="tname text-center">别名验证</span>\
 			<input class="bt-input-text" style="width:240px;" type="text" name="dns_alias" />\
-			<span> (可不填) <a class="btlink" target="_blank" href="https://github.com/acmesh-official/acme.sh/wiki/DNS-alias-mode#7-challenge-alias-or-domain-alias">文档说明</a><span>\
+			<span> (建议别用) <a class="btlink" target="_blank" href="https://github.com/acmesh-official/acme.sh/wiki/DNS-alias-mode#7-challenge-alias-or-domain-alias">文档说明</a><span>\
 		</div>\
   		<div class="line mtb10">\
   			<span class="tname text-center">域名</span>\
