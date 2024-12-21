@@ -2343,6 +2343,8 @@ function opSSLAcme(type, id, siteName, callback){
 		} else {
 			$('#dnsapi_option').css('display','block');
 			$('#wildcard_domain_block').css('display','block');
+
+			// 关闭,咱不开发,没有验证通过
 			// $('#dns_alias').css('display','block');
 		}
 	});
