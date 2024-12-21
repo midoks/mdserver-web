@@ -2339,11 +2339,11 @@ function opSSLAcme(type, id, siteName, callback){
 		if (val == 'file'){
 			$('#dnsapi_option').css('display','none');
 			$('#wildcard_domain_block').css('display','none');
-			$('#dns_alias').css('display','none');
+			// $('#dns_alias').css('display','none');
 		} else {
 			$('#dnsapi_option').css('display','block');
 			$('#wildcard_domain_block').css('display','block');
-			$('#dns_alias').css('display','block');
+			// $('#dns_alias').css('display','block');
 		}
 	});
 
