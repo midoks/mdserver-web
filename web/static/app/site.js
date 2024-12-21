@@ -471,13 +471,13 @@ function setSitePath(id){
 function webBakEdit(id){
 	$.post("/data?action=getKey','table=sites&key=ps&id="+id,function(rdata){
 		var webBakHtml = "<div class='webEdit-box padding-10'>\
-					<div class='line'>\
-					<label><span>"+lan.site.note_ph+"</span></label>\
-					<div class='info-r'>\
-					<textarea name='beizhu' id='webbeizhu' col='5' style='width:96%'>"+rdata+"</textarea>\
-					<br><br><button class='btn btn-success btn-sm' onclick='SetSitePs("+id+")'>保存</button>\
-					</div>\
-					</div>";
+			<div class='line'>\
+			<label><span>"+lan.site.note_ph+"</span></label>\
+			<div class='info-r'>\
+			<textarea name='beizhu' id='webbeizhu' col='5' style='width:96%'>"+rdata+"</textarea>\
+			<br><br><button class='btn btn-success btn-sm' onclick='SetSitePs("+id+")'>保存</button>\
+			</div>\
+		</div>";
 		$("#webedit-con").html(webBakHtml);
 	});
 }
@@ -2649,6 +2649,91 @@ function newSSL(siteName, id, domains){
 	});
 }
 
+// 手动申请dns提示
+function newAcmeHandApplyNotice(siteName, id, domains, data){
+	// console.log(siteName, id, domains, data);
+	layer.open({
+		type: 1,
+		area: '700px',
+		title: '手动解析TXT记录',
+		closeBtn: 1,
+		shift: 5,
+		shadeClose: true,
+		btn:["验证", "取消"],
+		content:'<div class="bt-form" style="padding: 10px 20px;">\
+			<div class="line"><span>请按以下列表做TXT解析: </span></div>\
+			<div id="acme_hand_ssl_notice" class="divtable mtb10">\
+                <div class="tablescroll">\
+                    <table class="table table-hover" width="100%" cellspacing="0" cellpadding="0" border="0" style="border: 0 none;">\
+                    <thead><tr><th>解析域名</th><th>记录值</th><th>类型</th><th>必需</th></tr></thead>\
+                    <tbody></tbody>\
+                    </table>\
+                </div>\
+            </div>\
+			<ul id="acme_hand_ssl_notice_help" class="help-info-text c6">\
+			    <li>解析域名需要一定时间来生效,完成所以上所有解析操作后,请等待1分钟后再点击【验证】按钮</li>\
+			    <li>可通过CMD命令来手动验证域名解析是否生效: nslookup -q=txt _acme-challenge.xx.cn</li>\
+			    <li>若您使用的是阿里云DNS,DnsPod作为DNS,可使用DNS接口自动解析</li>\
+		    </ul>\
+		</div>',
+		success:function(){
+
+			var list = '';
+			for (var i = 0; i < data.length; i++) {
+				list += '<tr>';
+				list += '<td>'+data[i]['domain']+'</td>';
+				list += '<td>'+data[i]['val']+'</td>';
+				list += '<td>'+data[i]['type']+'</td>';
+
+				if (data[i]['must']){
+					list += '<td>必需</td>';
+				} else{
+					list += '<td>可选</td>';
+				}
+				list += '</tr>';
+			}
+			$('#acme_hand_ssl_notice tbody').html(list);
+
+			if (data.length>0){
+				var help_txt = "可通过CMD命令来手动验证域名解析是否生效: nslookup -q=txt "+data[0]['domain'];
+				$('#acme_hand_ssl_notice_help li:eq(1)').text(help_txt);
+			}
+		},
+		yes:function(layero,index){
+			layer.close(index);
+			showSpeedWindow('正在由ACME申请手动SSL...', 'site.get_acme_logs', function(layers,index){
+				var pdata = {};
+				pdata['siteName'] = siteName;
+				pdata['domains'] = domains;
+				pdata['email'] = $("input[name='admin_email']").val();
+				
+				if($("#checkDomain").prop("checked")){
+					pdata['force'] = 'true';
+				}
+
+				if($("#wildcard_domain").prop("checked")){
+					pdata['wildcard_domain'] = 'true'; 
+				}
+
+				var apply_type = $('input[name="apply_type"]:checked').val();
+				pdata['apply_type'] = apply_type;
+				if (apply_type == 'dns'){
+					pdata['dnspai'] = $('#dnsapi_option option:selected').val();
+				}
+				pdata['renew'] = 'true';
+				$.post('/site/create_acme',pdata,function(rdata){
+					showMsg(rdata.msg, function(){
+						if (rdata.status){
+							layer.close(index);
+							$(".tab-nav span:first-child").click();
+						}
+					},{icon:rdata.status?1:2}, 3000);
+				},'json');
+			});
+		}
+	});
+}
+
 function newAcmeSSL(siteName, id, domains){
 	showSpeedWindow('正在由ACME申请...', 'site.get_acme_logs', function(layers,index){
 		var pdata = {};
@@ -2672,9 +2757,13 @@ function newAcmeSSL(siteName, id, domains){
 
 		$.post('/site/create_acme',pdata,function(rdata){
 			showMsg(rdata.msg, function(){
-				layer.close(index);
-				if(rdata.status){	
-					$(".tab-nav span:first-child").click();
+				if (rdata.status){
+					layer.close(index);
+					if (rdata.msg == '手动解析'){
+						newAcmeHandApplyNotice(siteName, id, domains, rdata.data);
+					} else{
+						$(".tab-nav span:first-child").click();
+					}
 				}
 			},{icon:rdata.status?1:2}, 3000);
 		},'json');

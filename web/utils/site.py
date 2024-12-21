@@ -2262,8 +2262,95 @@ location ^~ {from} {\n\
         top_domain =  s[last_index-1]+'.'+s[last_index]
         return top_domain
 
+    # 查找手动验证,需要改动域名dns的配置
+    # nslookup -q=txt _acme-challenge.xx.com
+    def findAcmeHandDnsNotice(self, top_domain):
+        log_file = self.acmeLogFile()
+        info = mw.readFile(log_file)
+        txt_rep = r"TXT value: \'(.*)\'"
+        txt_value = re.finditer(txt_rep, info)
+
+        rdata = []
+        for text in txt_value:
+            t = {}
+            t['domain'] = '_acme-challenge.'+top_domain
+            t['val'] = text.groups()[0]
+            t['type'] = 'TXT'
+            t['must'] = True
+            rdata.append(t)
+        return rdata
+
+    # acme手动申请方式
+    # https://github.com/acmesh-official/acme.sh/wiki/dns-manual-mode
+    def createAcmeDnsTypeNone(self, site_name, domains, email, dnspai, wildcard_domain, force, renew):
+        # print(site_name, domains, email, dnspai, wildcard_domain, force, renew)
+        acme_dir = mw.getAcmeDir()
+        log_file = self.acmeLogFile()
+
+        for d in domains:
+            top_domain = self.getDomainRootName(d)
+            cmd = '''
+#!/bin/bash
+PATH=/bin:/sbin:/usr/bin:/usr/sbin:/usr/local/bin:/usr/local/sbin:~/bin:/opt/homebrew/bin:%s
+export PATH
+''' % (acme_dir,)
+            cmd += "acme.sh --register-account -m " + email + " \n"
+            if wildcard_domain == 'true':
+                cmd += 'acme.sh --issue -d '+top_domain+' -d "*.'+top_domain+'"'
+                d = top_domain
+            else:
+                cmd += "acme.sh --issue -d " + d + " "
+            cmd += " --dns --yes-I-know-dns-manual-mode-enough-go-ahead-please"
+
+            if renew == 'true':
+                cmd += " --renew"
+            cmd +=  ' > ' + log_file
+            print(cmd)
+            result = mw.execShell(cmd)
+            # print(result)
+
+            # acme源的ssl证书
+            src_path = mw.getAcmeDomainDir(d)
+            src_cert = src_path + '/fullchain.cer'
+            src_key = src_path + '/' + d + '.key'
+
+            if not os.path.exists(src_cert):
+                info = self.findAcmeHandDnsNotice(top_domain)
+                if len(info) != 0:
+                    return mw.returnData(True, '手动解析', info)
+
+            # acme源建立软链接(目标)
+            dst_path = self.sslDir + '/' + site_name
+            dst_cert = dst_path + "/fullchain.pem"  # 生成证书路径
+            dst_key = dst_path + "/privkey.pem"  # 密钥文件路径
+
+            if not os.path.exists(dst_path):
+                mw.execShell("mkdir -p " + dst_path)
+
+            mw.buildSoftLink(src_cert, dst_cert, True)
+            mw.buildSoftLink(src_key, dst_key, True)
+            mw.execShell('echo "acme" > "' + dst_path + '/README"')
+
+            # 写入配置文件
+            result = self.setSslConf(site_name)
+            if not result['status']:
+                return result
+            result['csr'] = mw.readFile(src_cert)
+            result['key'] = mw.readFile(src_key)
+
+        mw.restartWeb()
+        return mw.returnData(True, '证书已更新!', result)
+
     def createAcmeDns(self, site_name, domains, email, dnspai, wildcard_domain, force, renew):
         dnsapi_option = thisdb.getOptionByJson('dnsapi', default={})
+        log_file = self.acmeLogFile()
+        cmd = 'echo "..." > '+ log_file
+        mw.execShell(cmd)
+
+        # 手动方式申请
+        if dnspai == 'none':
+            return self.createAcmeDnsTypeNone(site_name, domains, email, dnspai, wildcard_domain, force, renew)
+
         if not dnspai in dnsapi_option:
             return mw.returnData(False, '['+dnspai+']未设置!')
 
@@ -2273,6 +2360,7 @@ location ^~ {from} {\n\
                 return mw.returnData(False, k+'为空!')
 
         acme_dir = mw.getAcmeDir()
+        
         for d in domains:
             cmd = '''
 #!/bin/bash
@@ -2287,9 +2375,7 @@ export PATH
                 d = top_domain
             else:
                 cmd += 'acme.sh --issue --dns '+str(dnspai)+' -d '+d
-
-            log_file = self.acmeLogFile()
-            cmd +=  ' >> ' + log_file
+            cmd +=  ' > ' + log_file
             # print(cmd)
             result = mw.execShell(cmd)
             # print(result)
