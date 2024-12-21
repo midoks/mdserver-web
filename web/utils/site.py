@@ -2391,8 +2391,7 @@ export PATH
             src_path = mw.getAcmeDomainDir(d)
             src_cert = src_path + '/fullchain.cer'
             src_key = src_path + '/' + d + '.key'
-
-            # src_cert.replace("\\*", "*")
+            
             msg = '签发失败,您尝试申请证书的失败次数已达上限!\
                 <p>1、检查域名是否正确解析到本服务器,或解析还未完全生效</p>\
                 <p>2、如果以上检查都确认没有问题，请尝试更换DNS服务商</p>'
