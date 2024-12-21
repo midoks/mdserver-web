@@ -2305,7 +2305,7 @@ export PATH
             if renew == 'true':
                 cmd += " --renew"
             cmd +=  ' > ' + log_file
-            print(cmd)
+            # print(cmd)
             result = mw.execShell(cmd)
             # print(result)
 

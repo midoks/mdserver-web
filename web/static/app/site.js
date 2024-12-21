@@ -2700,7 +2700,7 @@ function newAcmeHandApplyNotice(siteName, id, domains, data){
 			}
 		},
 		yes:function(layero,index){
-			layer.close(index);
+			layer.close(layero);
 			showSpeedWindow('正在由ACME申请手动SSL...', 'site.get_acme_logs', function(layers,index){
 				var pdata = {};
 				pdata['siteName'] = siteName;
