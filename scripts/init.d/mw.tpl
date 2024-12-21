@@ -110,16 +110,16 @@ mw_stop_task()
     fi
 
     echo -e "stopping mw-tasks... \c";
-    pids=$(ps aux | grep 'panel_task.py'|grep -v grep|awk '{print $2}')
-    arr=($pids)
-    for p in ${arr[@]}
+    panel_task=$(ps aux | grep 'panel_task.py'|grep -v grep|awk '{print $2}')
+    panel_task=($panel_task)
+    for p in ${panel_task[@]}
     do
         kill -9 $p  > /dev/null 2>&1
     done
 
     zzpids=$(ps -A -o stat,ppid,pid,cmd | grep -e '^[Zz]' | awk '{print $2}')
-    arr=($zzpids)
-    for p in ${arr[@]}
+    zzpids=($zzpids)
+    for p in ${zzpids[@]}
     do
         kill -9 $p > /dev/null 2>&1
     done
@@ -129,7 +129,6 @@ mw_stop_task()
 mw_stop_panel()
 {
     echo -e "stopping mw-panel... \c";
-
     pidfile=${PANEL_DIR}/logs/mw.pid
     if [ -f $pidfile ];then
         pid=`cat $pidfile`
@@ -137,19 +136,19 @@ mw_stop_panel()
         rm -f $pidfile
     fi
 
-    ARR=`ps aux|grep 'gunicorn -c setting.py app:app'|grep -v grep|awk '{print $2}'`
-    for p in ${ARR[@]}
+    APP_LIST=`ps aux|grep 'gunicorn -c setting.py app:app'|grep -v grep|awk '{print $2}'`
+    APP_LIST=($APP_LIST)
+    for p in ${APP_LIST[@]}
     do
         kill -9 $p > /dev/null 2>&1
     done
 
-    PLIST=`ps -ef|grep app:app |grep -v grep|awk '{print $2}'`
-    ARR=($PLIST)
-    for i in ${ARR[@]}
+    APP_LIST=`ps -ef|grep app:app |grep -v grep|awk '{print $2}'`
+    APP_LIST=($APP_LIST)
+    for i in ${APP_LIST[@]}
     do
         kill -9 $i > /dev/null 2>&1
     done
-    
     echo -e "\033[32mdone\033[0m"
 }
 

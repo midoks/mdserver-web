@@ -103,6 +103,29 @@ def mvFile(sfile, dfile):
     except Exception as e:
         return mw.returnData(False, '移动或重名命文件失败!'+str(e))
 
+def unzip(sfile, dfile, stype, path):
+    if not os.path.exists(sfile):
+        return mw.returnData(False, '指定文件不存在!')
+
+    try:
+        tmps = mw.getPanelDir() + '/logs/panel_exec.log'
+        if stype == 'zip':
+            mw.execShell("cd " + path + " && unzip -o -d '" + dfile +"' '" + sfile + "' > " + tmps + " 2>&1 &")
+        else:
+            sfiles = ''
+            for sfile in sfile.split(','):
+                if not sfile:
+                    continue
+                sfiles += " '" + sfile + "'"
+            mw.execShell("cd " + path + " && tar -zxvf " + sfiles +" -C " + dfile + " > " + tmps + " 2>&1 &")
+
+        if os.path.exists(dfile):
+            setFileAccept(dfile)
+        mw.writeLog("文件管理", '文件[{1}]解压[{2}]成功!', (sfile, dfile))
+        return mw.returnData(True, '文件解压成功!')
+    except:
+        return mw.returnData(False, '文件解压失败!')
+
 def uncompress(sfile, dfile, path):
     if not os.path.exists(sfile):
         return mw.returnData(False, '指定文件不存在!')

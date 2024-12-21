@@ -46,6 +46,7 @@ apt install -y libmecab2
 apt install -y numactl
 apt install -y libaio1t64
 
+apt install -y dnsutils
 
 P_VER=`python3 -V | awk '{print $2}'`
 if version_ge "$P_VER" "3.11.0" ;then

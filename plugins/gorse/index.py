@@ -304,6 +304,34 @@ def initdUinstall():
 def runLog():
     return getServerDir() + '/logs.pl'
 
+def getGorseInfo():
+    conf_file = getConf()
+    content = mw.readFile(conf_file)
+
+    rdata = {}
+
+    rep = r'dashboard_user_name\s*=\s*"(.*)"'
+    tmp = re.search(rep, content)
+    tmp = re.search(rep, content, re.M)
+    if tmp:
+        rdata['dashboard_user_name'] = tmp.groups()[0]
+
+
+    rep = r'dashboard_password\s*=\s*"(.*)"'
+    tmp = re.search(rep, content)
+    tmp = re.search(rep, content, re.M)
+    if tmp:
+        rdata['dashboard_password'] = tmp.groups()[0]
+
+    rep = r'http_port\s*=\s*(.*)'
+    tmp = re.search(rep, content)
+    tmp = re.search(rep, content, re.M)
+    if tmp:
+        rdata['http_port'] = tmp.groups()[0]
+
+    rdata['ip'] = mw.getHostAddr()
+    return mw.returnJson(True,'ok', rdata)
+
 def installPreInspection():
     redis_path = mw.getServerDir() + "/redis"
     if not os.path.exists(redis_path):
@@ -347,5 +375,7 @@ if __name__ == "__main__":
         print(configTpl())
     elif func == 'read_config_tpl':
         print(readConfigTpl())
+    elif func == 'info':
+        print(getGorseInfo())
     else:
         print('error')

@@ -10,6 +10,7 @@
 
 import os
 import json
+import re
 
 from flask import Blueprint, render_template
 from flask import request
@@ -28,7 +29,7 @@ from .site import blueprint
 @blueprint.route('/get_acme_logs', endpoint='get_acme_logs', methods=['POST'])
 @panel_login_required
 def get_acme_logs():
-    log_file = mw.getPanelDir() + '/logs/acme.log'
+    log_file = MwSites.instance().acmeLogFile()
     if not os.path.exists(log_file):
         mw.execShell('touch ' + log_file)
     return mw.returnData(True, 'OK', log_file)
@@ -36,7 +37,7 @@ def get_acme_logs():
 
 @blueprint.route('/create_acme', endpoint='create_acme', methods=['POST'])
 @panel_login_required
-def create_acme():
+def create_acme():    
     site_name = request.form.get('siteName', '')
     domains = request.form.get('domains', '')
     force = request.form.get('force', '')
@@ -44,8 +45,9 @@ def create_acme():
     email = request.form.get('email', '')
     wildcard_domain = request.form.get('wildcard_domain','')
     apply_type = request.form.get('apply_type', 'file')
-    dnspai = request.form.get('dnspai','') 
-    return MwSites.instance().createAcme(site_name, domains, force, renew, apply_type, dnspai, email, wildcard_domain)
+    dnspai = request.form.get('dnspai','')
+    dns_alias = request.form.get('dns_alias','')
+    return MwSites.instance().createAcme(site_name, domains, force, renew, apply_type, dnspai, email, wildcard_domain,dns_alias)
 
 
 
