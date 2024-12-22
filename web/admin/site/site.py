@@ -22,6 +22,7 @@ import thisdb
 
 blueprint = Blueprint('site', __name__, url_prefix='/site', template_folder='../../templates/default')
 @blueprint.route('/index', endpoint='index')
+@panel_login_required
 def index():
     return render_template('site.html')
 
