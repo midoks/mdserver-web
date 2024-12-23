@@ -9,7 +9,7 @@ serverPath=$(dirname "$rootPath")
 sourcePath=${serverPath}/source
 sysName=`uname`
 
-version=8.2.26
+version=8.2.27
 PHP_VER=82
 Install_php()
 {
@@ -50,7 +50,7 @@ if [ ! -d $sourcePath/php/php${PHP_VER} ];then
 	fi
 
 	#检测文件是否损坏.
-	md5_file_ok=54747400cb4874288ad41a785e6147e2ff546cceeeb55c23c00c771ac125c6ef
+	md5_file_ok=92636453210f7f2174d6ee6df17a5811368f556a6c2c2cbcf019321e36456e01
 	if [ -f $sourcePath/php/php-${version}.tar.xz ];then
 		md5_file=`sha256sum $sourcePath/php/php-${version}.tar.xz  | awk '{print $1}'`
 		if [ "${md5_file}" != "${md5_file_ok}" ]; then
