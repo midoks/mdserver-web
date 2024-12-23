@@ -57,7 +57,7 @@ class backupTools:
 
         outTime = time.time() - startTime
         pid = sql.table('sites').where('name=?', (name,)).getField('id')
-        sql.table('backup').add('type,name,pid,filename,addtime,size', ('0', os.path.basename(
+        sql.table('backup').add('type,name,pid,filename,add_time,size', ('0', os.path.basename(
             filename), pid, filename, endDate, os.path.getsize(filename)))
         log = "网站[" + name + "]备份成功,用时[" + str(round(outTime, 2)) + "]秒"
         mw.writeLog('计划任务', log)
