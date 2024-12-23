@@ -1491,9 +1491,10 @@ class sites(object):
         # get host from url
         try:
             if host == "$host":
-                host_tmp = urlparse(_to)
+                host_tmp = urlparse(to)
                 host = host_tmp.netloc
-        except:
+
+        except Exception as e:
             return mw.returnData(False, "错误的目标地址")
 
         proxy_site_path = self.getProxyDataPath(site_name)
