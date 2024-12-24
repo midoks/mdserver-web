@@ -132,6 +132,17 @@ class Firewall(object):
         else:
             pass
 
+    def reloadSshd(self):
+        if self.__isUfw:
+            mw.execShell("service ssh restart")
+        elif self.__isIptables:
+            mw.execShell("/etc/init.d/sshd restart")
+        elif self.__isFirewalld:
+            mw.execShell("systemctl restart sshd.service")
+        else:
+            return False
+        return True
+
     def getFwStatus(self):
         if self.__isUfw:
             cmd = "/usr/sbin/ufw status| grep Status | awk -F ':' '{print $2}'"
@@ -250,9 +261,12 @@ class Firewall(object):
         rep = r"#*Port\s+([0-9]+)\s*\n"
         conf = re.sub(rep, "Port " + port + "\n", conf)
         mw.writeFile(file, conf)
-
+        
         self.addAcceptPort(port, 'SSH端口修改', 'port')
         self.reload()
+
+        if not self.reloadSshd():
+            return mw.returnData(False, '重启sshd失败,尝试手动重启:service ssh restart!')
         return mw.returnData(True, '修改成功!')
 
     def setFw(self, status):
