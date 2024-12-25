@@ -156,9 +156,9 @@ def get_dir():
     order = request.form.get('order', '')
 
     if search_all == 'yes' and search != '':
-        dir_list = file.getAllDirList(path, int(page), int(row),order, search)
+        dir_list = file.getAllDirList(path, int(page), int(row), order, search)
     else:
-        dir_list = file.getDirList(path, int(page), int(row),order, search)
+        dir_list = file.getDirList(path, int(page), int(row), order, search)
 
     dir_list['page'] = mw.getPage({'p':page, 'row': row, 'tojs':'getFiles', 'count': dir_list['count']}, '1,2,3,4,5,6,7,8')
     return dir_list
