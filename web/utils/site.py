@@ -957,11 +957,11 @@ class sites(object):
         info = thisdb.getSitesById(site_id)
         if info['path'] == path:
             return mw.returnData(False,  "与原路径一致，无需修改!")
-        conf_file = self.getHostConf(info['name'])
-        content = mw.readFile(conf_file)
+        host_conf = self.getHostConf(info['name'])
+        content = mw.readFile(host_conf)
         if content:
             content = content.replace(info['path'], path)
-            mw.writeFile(conf_file, content)
+            mw.writeFile(host_conf, content)
 
         thisdb.setSitesData(site_id, path=path)
         msg = mw.getInfo('修改网站[{1}]物理路径成功!', (info['name'],))
