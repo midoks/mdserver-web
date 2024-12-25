@@ -694,15 +694,17 @@ class sites(object):
 
         dirnames = []
         dirnames.append('/')
-        for filename in os.listdir(site_path):
-            try:
-                file_path = site_path + '/' + filename
-                if os.path.islink(file_path):
-                    continue
-                if os.path.isdir(file_path):
-                    dirnames.append('/' + filename)
-            except:
-                pass
+
+        if os.path.exists(site_path):
+            for filename in os.listdir(site_path):
+                try:
+                    file_path = site_path + '/' + filename
+                    if os.path.islink(file_path):
+                        continue
+                    if os.path.isdir(file_path):
+                        dirnames.append('/' + filename)
+                except:
+                    pass
 
         data['dirs'] = dirnames
         return data
