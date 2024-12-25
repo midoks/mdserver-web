@@ -978,15 +978,15 @@ class sites(object):
         new_path = site_path + run_path
 
         # 处理Nginx
-        filename = self.getHostConf(site_name)
-        if os.path.exists(filename):
-            conf = mw.readFile(filename)
+        site_host = self.getHostConf(site_name)
+        if os.path.exists(site_host):
+            conf = mw.readFile(site_host)
             rep = r'\s*root\s*(.+);'
             path = re.search(rep, conf).groups()[0]
             conf = conf.replace(path, new_path)
-            mw.writeFile(filename, conf)
+            mw.writeFile(site_host, conf)
 
-        self.setSitePath(site_path, run_path)
+        self.setSitePath(site_id, run_path)
         mw.restartWeb()
         return mw.returnData(True, '设置成功!')
 
