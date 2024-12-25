@@ -32,7 +32,8 @@ def get_cli_php_version():
         return mw.returnData(False, '未安装PHP,无法设置')
 
     php_bin = '/usr/bin/php'
-    php_versions = MwSites.instance().getPhpVersion()
+    data = MwSites.instance().getPhpVersion()
+    php_versions = data['data']
     php_versions = php_versions[1:]
 
     if len(php_versions) < 1:
