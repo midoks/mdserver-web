@@ -619,7 +619,8 @@ function syncDeleteSite(dataList,successCount,errorMsg,path){
  * @param {Int} id 网站ID
  */
 function domainEdit(id, name, msg, status) {
-	$.post('/site/get_domain' ,{pid:id}, function(domain) {
+	$.post('/site/get_domain' ,{pid:id}, function(data) {
+		var domain = data.data;
 
 		var echoHtml = "";
 		for (var i = 0; i < domain.length; i++) {
@@ -2806,7 +2807,8 @@ function phpVersion(siteName){
 			layer.msg(version.msg,{icon:5});
 			return;
 		}
-		$.post('/site/get_php_version',function(rdata){
+		$.post('/site/get_php_version',function(data){
+			var rdata = data.data;
 			var versionSelect = "<div class='webEdit-box'>\
 									<div class='line'>\
 										<span class='tname' style='width:100px'>PHP版本</span>\
