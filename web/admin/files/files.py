@@ -149,16 +149,16 @@ def get_dir():
     path = request.form.get('path', '')
     if not os.path.exists(path):
         path = mw.getFatherDir() + '/wwwroot'
-    search = request.args.get('search', '').strip().lower()
-    search_all = request.args.get('all', '').strip().lower()
-    page = request.args.get('p', '1').strip().lower()
-    row = request.args.get('row', '10')
+    search = request.form.get('search', '').strip().lower()
+    search_all = request.form.get('all', '').strip().lower()
+    page = request.form.get('p', '1').strip().lower()
+    row = request.form.get('row', '10')
     order = request.form.get('order', '')
 
     if search_all == 'yes' and search != '':
-        dir_list = file.getAllDirList(path, int(page), int(row),order, search)
+        dir_list = file.getAllDirList(path, int(page), int(row), order, search)
     else:
-        dir_list = file.getDirList(path, int(page), int(row),order, search)
+        dir_list = file.getDirList(path, int(page), int(row), order, search)
 
     dir_list['page'] = mw.getPage({'p':page, 'row': row, 'tojs':'getFiles', 'count': dir_list['count']}, '1,2,3,4,5,6,7,8')
     return dir_list

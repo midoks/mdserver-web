@@ -694,15 +694,17 @@ class sites(object):
 
         dirnames = []
         dirnames.append('/')
-        for filename in os.listdir(site_path):
-            try:
-                file_path = site_path + '/' + filename
-                if os.path.islink(file_path):
-                    continue
-                if os.path.isdir(file_path):
-                    dirnames.append('/' + filename)
-            except:
-                pass
+
+        if os.path.exists(site_path):
+            for filename in os.listdir(site_path):
+                try:
+                    file_path = site_path + '/' + filename
+                    if os.path.islink(file_path):
+                        continue
+                    if os.path.isdir(file_path):
+                        dirnames.append('/' + filename)
+                except:
+                    pass
 
         data['dirs'] = dirnames
         return data
@@ -955,11 +957,11 @@ class sites(object):
         info = thisdb.getSitesById(site_id)
         if info['path'] == path:
             return mw.returnData(False,  "与原路径一致，无需修改!")
-        conf_file = self.getHostConf(info['name'])
-        content = mw.readFile(conf_file)
+        host_conf = self.getHostConf(info['name'])
+        content = mw.readFile(host_conf)
         if content:
             content = content.replace(info['path'], path)
-            mw.writeFile(file, content)
+            mw.writeFile(host_conf, content)
 
         thisdb.setSitesData(site_id, path=path)
         msg = mw.getInfo('修改网站[{1}]物理路径成功!', (info['name'],))
@@ -974,17 +976,15 @@ class sites(object):
         site_path = info['path']
 
         new_path = site_path + run_path
-
         # 处理Nginx
-        filename = self.getHostConf(site_name)
-        if os.path.exists(filename):
-            conf = mw.readFile(filename)
+        site_host = self.getHostConf(site_name)
+        if os.path.exists(site_host):
+            content = mw.readFile(site_host)
             rep = r'\s*root\s*(.+);'
-            path = re.search(rep, conf).groups()[0]
-            conf = conf.replace(path, new_path)
-            mw.writeFile(filename, conf)
+            path = re.search(rep, content).groups()[0]
+            content = content.replace(path, new_path)
+            mw.writeFile(site_host, content)
 
-        self.setSitePath(site_path, run_path)
         mw.restartWeb()
         return mw.returnData(True, '设置成功!')
 
