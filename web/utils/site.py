@@ -980,11 +980,11 @@ class sites(object):
         # 处理Nginx
         site_host = self.getHostConf(site_name)
         if os.path.exists(site_host):
-            conf = mw.readFile(site_host)
+            content = mw.readFile(site_host)
             rep = r'\s*root\s*(.+);'
-            path = re.search(rep, conf).groups()[0]
-            conf = conf.replace(path, new_path)
-            mw.writeFile(site_host, conf)
+            path = re.search(rep, content).groups()[0]
+            content = conf.replace(path, new_path)
+            mw.writeFile(site_host, content)
 
         self.setSitePath(site_id, run_path)
         mw.restartWeb()
