@@ -2650,4 +2650,5 @@ export PATH
             tmp['version'] = matchVer
             tmp['name'] = 'PHP-' + matchVer
             data.append(tmp)
-        return data
+        return mw.returnData(True, 'ok', data)
+        # return data

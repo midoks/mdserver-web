@@ -232,7 +232,8 @@ function webAddPage(type) {
 		return;
 	}
 	
-	$.post('/site/get_php_version',function(rdata){
+	$.post('/site/get_php_version',function(data){
+		var rdata = data.data;
 	
 		var defaultPath = $("#defaultPath").html();
 		var php_version = "<div class='line'><span class='tname'>"+lan.site.php_ver+"</span><select class='bt-input-text' name='version' id='c_k3' style='width:100px'>";
