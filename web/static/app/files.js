@@ -156,14 +156,14 @@ function recycleBin(type){
 		
 		var tablehtml = '<div class="re-head">\
 				<div style="margin-left: 3px;" class="ss-text">\
-                        <em>文件回收站</em>\
-                        <div class="ssh-item">\
-                                <input class="btswitch btswitch-ios" id="setRecycleBin" type="checkbox" '+(rdata.status?'checked':'')+'>\
-                                <label class="btswitch-btn" for="setRecycleBin" onclick="setRecycleBin()"></label>\
-                        </div>\
-                </div>\
+						<em>文件回收站</em>\
+						<div class="ssh-item">\
+								<input class="btswitch btswitch-ios" id="setRecycleBin" type="checkbox" '+(rdata.status?'checked':'')+'>\
+								<label class="btswitch-btn" for="setRecycleBin" onclick="setRecycleBin()"></label>\
+						</div>\
+				</div>\
 				<span style="line-height: 32px; margin-left: 30px;">注意：关闭回收站，删除的文件无法恢复！</span>\
-                <button style="float: right" class="btn btn-default btn-sm" onclick="closeRecycleBin();">清空回收站</button>\
+				<button style="float: right" class="btn btn-default btn-sm" onclick="closeRecycleBin();">清空回收站</button>\
 				</div>\
 				<div class="re-con">\
 					<div class="re-con-menu">\
@@ -290,7 +290,7 @@ function openFilename(obj){
 	}
 
 	if (inArray(ext,['png','jpeg','jpg','gif','webp','bmp','ico'])){
-        getImage(path);
+		getImage(path);
 	}
 
 	if (inArray(ext,['svg'])){
@@ -303,19 +303,19 @@ function openFilename(obj){
 			maxmin:true,
 			shadeClose: true,
 			content: '<iframe width="100%" height="100%"\
-                src="'+url+'"\
-                frameborder="0"\
-                border="0"\
-                marginwidth="0"\
-                marginheight="0"\
-                scrolling="yes"\
-                noresize=""\
-                allowfullscreen="allowfullscreen"\
-                mozallowfullscreen="mozallowfullscreen"\
-                msallowfullscreen="msallowfullscreen"\
-                oallowfullscreen="oallowfullscreen"\
-                webkitallowfullscreen="webkitallowfullscreen"\
-                allowfullscreen="true"></iframe>'
+				src="'+url+'"\
+				frameborder="0"\
+				border="0"\
+				marginwidth="0"\
+				marginheight="0"\
+				scrolling="yes"\
+				noresize=""\
+				allowfullscreen="allowfullscreen"\
+				mozallowfullscreen="mozallowfullscreen"\
+				msallowfullscreen="msallowfullscreen"\
+				oallowfullscreen="oallowfullscreen"\
+				webkitallowfullscreen="webkitallowfullscreen"\
+				allowfullscreen="true"></iframe>'
 		});
 	}
 }
@@ -374,16 +374,15 @@ function getFiles(Path) {
 		Path = getCookie('open_dir_path');
 	}
 
-	var args = {};
-	args['p'] = p;
 	var post = {};
 	post['path'] = Path;
+	post['p'] = p;
 
 	var file_row = $.cookie('file_row');
 	if(!file_row) {
 		file_row = '100';
 	}
-	args['row'] = file_row;
+	post['row'] = file_row;
 
 	var body = '';
 	var totalSize = 0;
@@ -392,13 +391,13 @@ function getFiles(Path) {
 	var search_file = $("#search_file").val();
 
 	if(search_file.length > 0){
-		args['search'] = search_file;
+		post['search'] = search_file;
 	}
 
 	var search_all = '';
 	var all = $('#search_all').hasClass('active');
 	if(all){
-		args['all'] = 'yes';
+		post['all'] = 'yes';
 	}
 
 	var file_order = $.cookie('file_order');
@@ -406,10 +405,9 @@ function getFiles(Path) {
 		post['order'] = file_order.replace('|',' ');
 	}
 
-	var query_str = toUrlParam(args);
 
 	var loadT = layer.load();
-	$.post('/files/get_dir?' + query_str, post, function(rdata) {
+	$.post('/files/get_dir', post, function(rdata) {
 		layer.close(loadT);
 		
 		//构建分页
@@ -1428,9 +1426,9 @@ function isCompressFile(fileName){
 	var extName = ext[ext.length-1].toLowerCase();
 	var support = ['zip','gz','tgz','rar'];
 	for (x in support) {
-	    if (support[x]==extName){
-	    	return true;
-	    }
+		if (support[x]==extName){
+			return true;
+		}
 	}
 	return false;
 }
@@ -1638,8 +1636,8 @@ function setChmod(action,fileName){
 						</select></span></div>\
 						<div class="bt-form-submit-btn">\
 							<button type="button" class="btn btn-danger btn-sm btn-title" onclick="layer.closeAll()">关闭</button>\
-					        <button type="button" class="btn btn-success btn-sm btn-title" onclick="'+toExec+'" >确定</button>\
-				        </div>\
+							<button type="button" class="btn btn-success btn-sm btn-title" onclick="'+toExec+'" >确定</button>\
+						</div>\
 					</div>'
 		});
 		
@@ -1717,7 +1715,7 @@ function rightMenuClick(type,path,name){
 		{text: "剪切", 	onclick: function() {cutFile(path)}},
 		{text: "重命名", onclick: function() {reName(0,name)}},
 		{text: lan.files.file_menu_auth, onclick: function() {setChmod(0,path)}},
-	 	{text: lan.files.file_menu_zip, onclick: function() {zip(path)}},
+		{text: lan.files.file_menu_zip, onclick: function() {zip(path)}},
 	]};
 	if(type == "dir"){
 		options.items.push({text: lan.files.file_menu_del, onclick: function() {
