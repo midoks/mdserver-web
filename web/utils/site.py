@@ -591,7 +591,7 @@ class sites(object):
     # 获取域名列表
     def getDomain(self, site_id):
         data =  thisdb.getDomainBySiteId(site_id)
-        return data
+        return mw.returnData(True, 'ok', data)
 
     # 获取日志内容
     def getLogs(self, siteName):

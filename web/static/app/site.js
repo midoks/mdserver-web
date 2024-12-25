@@ -619,7 +619,8 @@ function syncDeleteSite(dataList,successCount,errorMsg,path){
  * @param {Int} id 网站ID
  */
 function domainEdit(id, name, msg, status) {
-	$.post('/site/get_domain' ,{pid:id}, function(domain) {
+	$.post('/site/get_domain' ,{pid:id}, function(data) {
+		var domain = data.data;
 
 		var echoHtml = "";
 		for (var i = 0; i < domain.length; i++) {
