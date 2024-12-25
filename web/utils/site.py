@@ -961,7 +961,7 @@ class sites(object):
         content = mw.readFile(conf_file)
         if content:
             content = content.replace(info['path'], path)
-            mw.writeFile(file, content)
+            mw.writeFile(conf_file, content)
 
         thisdb.setSitesData(site_id, path=path)
         msg = mw.getInfo('修改网站[{1}]物理路径成功!', (info['name'],))
