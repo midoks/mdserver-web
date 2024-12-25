@@ -2808,7 +2808,7 @@ function phpVersion(siteName){
 			return;
 		}
 		$.post('/site/get_php_version',function(data){
-			var rdata = rdata.data;
+			var rdata = data.data;
 			var versionSelect = "<div class='webEdit-box'>\
 									<div class='line'>\
 										<span class='tname' style='width:100px'>PHP版本</span>\
