@@ -149,10 +149,10 @@ def get_dir():
     path = request.form.get('path', '')
     if not os.path.exists(path):
         path = mw.getFatherDir() + '/wwwroot'
-    search = request.args.get('search', '').strip().lower()
-    search_all = request.args.get('all', '').strip().lower()
-    page = request.args.get('p', '1').strip().lower()
-    row = request.args.get('row', '10')
+    search = request.form.get('search', '').strip().lower()
+    search_all = request.form.get('all', '').strip().lower()
+    page = request.form.get('p', '1').strip().lower()
+    row = request.form.get('row', '10')
     order = request.form.get('order', '')
 
     if search_all == 'yes' and search != '':
