@@ -383,7 +383,7 @@ function changePath(d) {
 function getDiskList(b) {
 	var d = "";
 	var a = "";
-	var c = "path=" + b + "&disk=True";
+	var c = "path=" + b + "&disk=True&row=1000";
 	$.post("/files/get_dir", c, function(h) {
 		// console.log(h);
 		// if(h.dir != undefined) {
