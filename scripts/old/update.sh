@@ -80,16 +80,17 @@ if [ "$LOCAL_ADDR" != "common" ];then
 	wget --no-check-certificate -O /tmp/master.zip https://github.com/midoks/mdserver-web/archive/refs/tags/${VERSION}.zip
 	cd /tmp && unzip /tmp/master.zip
 
-	$CP_CMD -rf /tmp/mdserver-web/* /www/server/mdserver-web
+	$CP_CMD -rf /tmp/mdserver-web-${VERSION}/* /www/server/mdserver-web
 	rm -rf /tmp/master.zip
-	rm -rf /tmp/mdserver-web
+	rm -rf /tmp/mdserver-web-${VERSION}
 else
+	# curl --insecure -sSLo /tmp/master.zip https://github.com/midoks/mdserver-web/archive/refs/tags/0.17.3.zip
 	curl --insecure -sSLo /tmp/master.zip https://github.com/midoks/mdserver-web/archive/refs/tags/${VERSION}.zip
 
 	cd /tmp && unzip /tmp/master.zip
-	$CP_CMD -rf /tmp/mdserver-web-master/* /www/server/mdserver-web
+	$CP_CMD -rf /tmp/mdserver-web-${VERSION}/* /www/server/mdserver-web
 	rm -rf /tmp/master.zip
-	rm -rf /tmp/mdserver-web-master
+	rm -rf /tmp/mdserver-web-${VERSION}
 fi
 
 
