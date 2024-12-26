@@ -38,6 +38,7 @@ PyMySQL>=1.0.2
 whitenoise==5.3.0
 pyotp
 pytz
+supervisor
 pyTelegramBotAPI
 telebot
 pyyaml
