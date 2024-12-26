@@ -41,3 +41,4 @@ pytz
 pyTelegramBotAPI
 telebot
 pyyaml
+supervisor
