@@ -83,6 +83,8 @@ if [ "$LOCAL_ADDR" != "common" ];then
 	$CP_CMD -rf /tmp/mdserver-web-${VERSION}/* /www/server/mdserver-web
 	rm -rf /tmp/master.zip
 	rm -rf /tmp/mdserver-web-${VERSION}
+
+	pip install -r /www/server/mdserver-web/requirements.txt
 else
 	# curl --insecure -sSLo /tmp/master.zip https://github.com/midoks/mdserver-web/archive/refs/tags/0.17.3.zip
 	curl --insecure -sSLo /tmp/master.zip https://github.com/midoks/mdserver-web/archive/refs/tags/${VERSION}.zip
@@ -91,6 +93,8 @@ else
 	$CP_CMD -rf /tmp/mdserver-web-${VERSION}/* /www/server/mdserver-web
 	rm -rf /tmp/master.zip
 	rm -rf /tmp/mdserver-web-${VERSION}
+
+	pip install -r /www/server/mdserver-web/requirements.txt
 fi
 
 
