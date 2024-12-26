@@ -102,7 +102,7 @@ def setUserByRoot(name = None,password = None) -> bool:
     '''
     data = {}
     if name is not None:
-        mw.M('users').where('id=?', (1,)).setField('username', name)
+        mw.M('users').where('id=?', (1,)).setField('name', name)
 
     if password is not None:
         pwd = mw.md5(password)
