@@ -6,7 +6,7 @@ is64bit=`getconf LONG_BIT`
 
 startTime=`date +%s`
 
-VERSION=0.17.1
+VERSION=0.17.3
 
 _os=`uname`
 echo "use system: ${_os}"
