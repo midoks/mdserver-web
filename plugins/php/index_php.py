@@ -132,6 +132,14 @@ def libConfCommon(version):
     libpath = getPluginDir() + '/versions/phplib.conf'
     phplib = json.loads(mw.readFile(libpath))
 
+    php_dir = getServerDir() + "/" + version
+    ext_dir = php_dir+"/lib/php/extensions"
+
+    ext_list = os.listdir(ext_dir)
+    for sodir in ext_list:
+        if sodir.find("no-debug-non-zts") > -1:
+            ext_dir += "/"+ sodir
+
     libs = []
     tasks = mw.M('tasks').where("status!=?", ('1',)).field('status,name').select()
     for lib in phplib:
@@ -145,10 +153,15 @@ def libConfCommon(version):
                 lib['task'] = task['status']
                 lib['phpversions'] = []
                 lib['phpversions'].append(tmp1[1])
-        if phpini.find(lib['check']) == -1:
-            lib['status'] = False
-        else:
+
+        lib['status'] = False
+        if phpini.find(lib['check']) > -1:
             lib['status'] = True
+        sofile = ext_dir+"/"+lib['check']
+        if os.path.exists(sofile):
+            # print(os.path.getsize(sofile))
+            if os.path.getsize(sofile) == 7:
+                lib['status'] = True
         libs.append(lib)
     return libs
 
