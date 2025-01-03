@@ -12,15 +12,16 @@ serverPath=$(dirname "$rootPath")
 
 # SHOW VARIABLES LIKE 'default_authentication_plugin';
 # SELECT user, host, plugin FROM mysql.user;
+# default_authentication_plugin=caching_sha2_password
 
 # /www/server/mysql-community/bin/mysqld --basedir=/www/server/mysql-community --datadir=/www/server/mysql-community/data --initialize-insecure --explicit_defaults_for_timestamp
 
-
+# source bin/activate
 # cd /www/server/mdserver-web/plugins/mysql-community && bash install.sh install 9.0
 # cd /www/server/mdserver-web/plugins/mysql-community && bash install.sh uninstall 9.0
 # cd /www/server/mdserver-web && python3 plugins/mysql-community/index.py start 8.0
 # cd /www/server/mdserver-web && python3 plugins/mysql-community/index.py fix_db_access
-# cd /www/server/mdserver-web && source bin/activate && python3 plugins/mysql/index.py do_full_sync  {"db":"xxx","sign":"","begin":1}
+# cd /www/server/mdserver-web && python3 plugins/mysql/index.py do_full_sync  {"db":"xxx","sign":"","begin":1}
 
 action=$1
 type=$2
