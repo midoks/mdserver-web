@@ -30,7 +30,7 @@ def get_timezone_list():
     # 获取时区列表
     # pytz.all_timezones | 所有
     # pytz.common_timezones
-    return pytz.all_timezones
+    return mw.returnData(True, 'ok', pytz.all_timezones)
 
 @blueprint.route('/sync_date', endpoint='sync_date', methods=['POST'])
 @panel_login_required
