@@ -16,6 +16,7 @@ if os.path.exists(web_dir):
     os.chdir(web_dir)
 
 import core.mw as mw
+from utils.site import sites as MwSites
 
 app_debug = False
 if mw.isAppleSystem():
@@ -560,12 +561,11 @@ class App:
             return mw.returnJson(False, "此目录不存在")
 
         # 判断是否安装php
-        import site_api
-        php_version = site_api.site_api().getPhpVersion()
-        if not php_version:
+        php_version = MwSites.instance().getPhpVersion()
+        if not php_version['data']:
             return mw.returnJson(False, "未安装PHP测试失败")
 
-        php_path = '/www/server/php/' + php_version[1]['version'] + '/bin/php'
+        php_path = '/www/server/php/' + php_version['data'][1]['version'] + '/bin/php'
         php_name = path + "/" + str(int(time.time())) + ".php"
         if os.path.exists(php_name):
             mw.execShell("rm -rf %s" % php_name)

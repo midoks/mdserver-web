@@ -63,7 +63,8 @@ function phpVer(version) {
         version = _version['data'];
     }
 
-    $.post('/site/get_php_version', function(rdata) {
+    $.post('/site/get_php_version', function(data) {
+        var rdata = data['data'];
         // console.log(rdata);
         var body = "<div class='ver line'><span class='tname'>PHP版本</span><select id='phpver' class='bt-input-text mr20' name='phpVersion' style='width:110px'>";
         var optionSelect = '';

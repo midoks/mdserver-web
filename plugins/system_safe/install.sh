@@ -11,6 +11,8 @@ SYSOS=`uname`
 VERSION=$2
 APP_NAME=system_safe
 
+# cd /www/server/mdserver-web && python3 plugins/system_safe/system_safe.py stop 1.0
+
 Install_App()
 {
 	echo '正在安装脚本文件...'

@@ -87,6 +87,7 @@ apt install -y libaio1
 apt install -y libmecab2
 
 apt install -y dnsutils
+apt install -y apache2-utils
 
 P_VER=`python3 -V | awk '{print $2}'`
 if version_ge "$P_VER" "3.11.0" ;then
