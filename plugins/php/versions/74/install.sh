@@ -108,6 +108,19 @@ else
 fi
 # ----- cpu end ------
 
+if [ "$sysName" == "Darwin" ];then
+	BREW_DIR=`which brew`
+	BREW_DIR=${BREW_DIR/\/bin\/brew/}
+
+	LIB_DEPEND_DIR=`brew info openssl | grep ${BREW_DIR}/Cellar/openssl | cut -d \  -f 1 | awk 'END {print}'`
+	OPTIONS="$OPTIONS --with-openssl=$(brew --prefix openssl)"
+	export PKG_CONFIG_PATH=$LIB_DEPEND_DIR/lib/pkgconfig
+	export OPENSSL_CFLAGS="-I${LIB_DEPEND_DIR}/include"
+	export OPENSSL_LIBS="-L/${LIB_DEPEND_DIR}/lib -lssl -lcrypto -lz"
+else
+	OPTIONS="$OPTIONS --with-openssl"
+fi
+
 if [ ! -d $serverPath/php/${PHP_VER} ];then
 	cd $sourcePath/php/php${PHP_VER} && make clean
 	./configure \
