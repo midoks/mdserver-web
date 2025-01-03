@@ -114,26 +114,26 @@ Install_lib()
 		# fi
 
 		
-		$serverPath/php/$version/bin/phpize
+		# $serverPath/php/$version/bin/phpize
 		# --with-openssl
-		echo "./configure --with-php-config=$serverPath/php/$version/bin/php-config $OPTIONS"
-		./configure --with-php-config=$serverPath/php/$version/bin/php-config $OPTIONS
-		make clean && make && make install && make clean
+		# echo "./configure --with-php-config=$serverPath/php/$version/bin/php-config $OPTIONS"
+		# ./configure --with-php-config=$serverPath/php/$version/bin/php-config $OPTIONS
+		# make clean && make && make install && make clean
 
-		if [ -d $sourcePath/php${version} ];then
-			cd ${sourcePath} && rm -rf $sourcePath/php${version}
-		fi
+		# if [ -d $sourcePath/php${version} ];then
+		# 	cd ${sourcePath} && rm -rf $sourcePath/php${version}
+		# fi
 		
 	fi
 
-	if [ ! -f "$extFile" ];then
-		echo "ERROR!"
-		return
-	fi
+	# if [ ! -f "$extFile" ];then
+	# 	echo "ERROR!"
+	# 	return
+	# fi
 
     echo "" >> $serverPath/php/$version/etc/php.ini
 	echo "[${LIBNAME}]" >> $serverPath/php/$version/etc/php.ini
-	echo "extension=${LIBNAME}.so" >> $serverPath/php/$version/etc/php.ini
+	# echo "extension=${LIBNAME}.so" >> $serverPath/php/$version/etc/php.ini
 	if [ -f "/etc/ssl/certs/ca-certificates.crt" ];then
 		echo "openssl.cafile=/etc/ssl/certs/ca-certificates.crt" >> $serverPath/php/$version/etc/php.ini
 	elif [ -f "/etc/pki/tls/certs/ca-bundle.crt" ];then
