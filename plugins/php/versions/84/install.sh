@@ -104,8 +104,10 @@ if [ ! -d $serverPath/php/${PHP_VER} ];then
 	--exec-prefix=$serverPath/php/${PHP_VER} \
 	--with-config-file-path=$serverPath/php/${PHP_VER}/etc \
 	--enable-mysqlnd \
+	--with-mysql=mysqlnd \
 	--with-mysqli=mysqlnd \
 	--with-pdo-mysql=mysqlnd \
+	--with-mysqlnd-ssl \
 	--enable-mbstring \
 	--enable-ftp \
 	--enable-sockets \
