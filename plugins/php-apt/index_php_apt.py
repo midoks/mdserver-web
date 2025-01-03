@@ -140,8 +140,7 @@ def libConfCommon(version):
     phplib = json.loads(mw.readFile(libpath))
 
     libs = []
-    tasks = mw.M('tasks').where(
-        "status!=?", ('1',)).field('status,name').select()
+    tasks = mw.M('tasks').where("status!=?", ('1',)).field('status,name').select()
     for lib in phplib:
         lib['task'] = '1'
         for task in tasks:

@@ -64,7 +64,7 @@ def status_progress(version):
 def getPhpSocket(version):
     path = getFpmConfFile(version)
     content = mw.readFile(path)
-    rep = 'listen\s*=\s*(.*)'
+    rep = r'listen\s*=\s*(.*)'
     tmp = re.search(rep, content)
     return tmp.groups()[0].strip()
 
@@ -133,8 +133,7 @@ def libConfCommon(version):
     phplib = json.loads(mw.readFile(libpath))
 
     libs = []
-    tasks = mw.M('tasks').where(
-        "status!=?", ('1',)).field('status,name').select()
+    tasks = mw.M('tasks').where("status!=?", ('1',)).field('status,name').select()
     for lib in phplib:
         lib['task'] = '1'
         for task in tasks:

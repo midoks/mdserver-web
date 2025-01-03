@@ -54,7 +54,7 @@ def getFpmConfFile(version):
 def getPhpSocket(version):
     path = getFpmConfFile(version)
     content = mw.readFile(path)
-    rep = 'listen\s*=\s*(.*)'
+    rep = r'listen\s*=\s*(.*)'
     tmp = re.search(rep, content)
     return tmp.groups()[0].strip()
 
