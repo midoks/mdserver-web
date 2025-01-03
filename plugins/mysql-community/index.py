@@ -130,6 +130,11 @@ def getAuthPolicy():
     tmp = re.search(rep, content)
     if tmp:
         return tmp.groups()[0].strip()
+
+    rep2 = r'default-authentication-plugin\s*=\s*(.*)'
+    tmp2 = re.search(rep, content)
+    if tmp2:
+        return tmp2.groups()[0].strip()
     # caching_sha2_password
     return 'mysql_native_password'
     

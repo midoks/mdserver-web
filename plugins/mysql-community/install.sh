@@ -11,6 +11,7 @@ serverPath=$(dirname "$rootPath")
 # https://downloads.mysql.com/archives/community/
 
 # SHOW VARIABLES LIKE 'default_authentication_plugin';
+# SELECT user, host, plugin FROM mysql.user;
 
 # /www/server/mysql-community/bin/mysqld --basedir=/www/server/mysql-community --datadir=/www/server/mysql-community/data --initialize-insecure --explicit_defaults_for_timestamp
 
