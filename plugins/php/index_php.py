@@ -139,6 +139,7 @@ def libConfCommon(version):
     for sodir in ext_list:
         if sodir.find("no-debug-non-zts") > -1:
             ext_dir += "/"+ sodir
+            break
 
     libs = []
     tasks = mw.M('tasks').where("status!=?", ('1',)).field('status,name').select()
