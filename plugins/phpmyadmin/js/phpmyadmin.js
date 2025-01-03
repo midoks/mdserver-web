@@ -109,6 +109,7 @@ function safeConf() {
                     <select id="access_choose" class="bt-input-text mr20" name="choose" style="width:110px">\
                         <option value="mariadb" '+(cfg['choose']=="mariadb"?"selected='selected'":"")+'>MariaDB</option>\
                         <option value="mysql" '+ (cfg['choose']=="mysql"?"selected='selected'":"")+'>MySQL</option>\
+                        <option value="mysql-community" '+ (cfg['choose']=="mysql-community"?"selected='selected'":"")+'>MySQL[Tar]</option>\
                         <option value="mysql-apt" '+ (cfg['choose']=="mysql-apt"?"selected='selected'":"")+'>MySQL[APT]</option>\
                         <option value="mysql-yum" '+ (cfg['choose']=="mysql-yum"?"selected='selected'":"")+'>MySQL[YUM]</option>\
                     </select>\
