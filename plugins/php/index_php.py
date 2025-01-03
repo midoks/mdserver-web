@@ -158,8 +158,8 @@ def libConfCommon(version):
         if phpini.find(lib['check']) > -1:
             lib['status'] = True
         sofile = ext_dir+"/"+lib['check']
+        # 自定义，比较特殊的方式
         if os.path.exists(sofile):
-            # print(os.path.getsize(sofile))
             if os.path.getsize(sofile) == 7:
                 lib['status'] = True
         libs.append(lib)
