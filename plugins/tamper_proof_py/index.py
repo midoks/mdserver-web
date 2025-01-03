@@ -562,7 +562,6 @@ class App:
 
         # 判断是否安装php
         php_version = MwSites.instance().getPhpVersion()
-
         if not php_version['data']:
             return mw.returnJson(False, "未安装PHP测试失败")
 

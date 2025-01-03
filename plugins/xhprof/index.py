@@ -75,7 +75,7 @@ def getHomePage():
 
 def getPhpVer(expect=74):
     php_vers = MwSites.instance().getPhpVersion()
-    v = php_ver['data']
+    v = php_vers['data']
     for i in range(len(v)):
         t = int(v[i]['version'])
         if (t >= expect):
