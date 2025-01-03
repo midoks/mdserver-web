@@ -451,7 +451,8 @@ function setTimezone(){
 		</div>",
 		success:function(){
 			var tbody = '';
-			$.post('/setting/get_timezone_list', {}, function (rdata) {
+			$.post('/setting/get_timezone_list', {}, function (data) {
+				var rdata = data['data'];
 		        for (var i = 0; i < rdata.length; i++) {
 
 		        	if (rdata[i] == 'Asia/Shanghai'){
