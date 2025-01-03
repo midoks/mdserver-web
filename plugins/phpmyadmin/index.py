@@ -134,6 +134,9 @@ def contentReplace(content):
     if cfg['choose'] == "mysql":
         content = content.replace('{$CHOOSE_DB}', 'mysql')
         content = content.replace('{$CHOOSE_DB_DIR}', 'mysql')
+    elif cfg['choose'] == "mysql-community":
+        content = content.replace('{$CHOOSE_DB}', 'mysql-community')
+        content = content.replace('{$CHOOSE_DB_DIR}', 'mysql-community')
     elif cfg['choose'] == "mysql-apt":
         content = content.replace('{$CHOOSE_DB}', 'mysql')
         content = content.replace('{$CHOOSE_DB_DIR}', 'mysql-apt')
