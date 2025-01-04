@@ -13,6 +13,7 @@ if os.path.exists(web_dir):
     os.chdir(web_dir)
 
 import core.mw as mw
+import thisdb
 from utils.site import sites as MwSites
 
 app_debug = False
@@ -478,7 +479,7 @@ def pluginsDbSupport():
     port = getPort()
     ip = '127.0.0.1'
     if not mw.isAppleSystem():
-        ip = mw.getLocalIp()
+        ip = thisdb.getOption('server_ip')
 
     cfg = data['cfg']
     auth = cfg['username']+':'+cfg['password']
