@@ -46,8 +46,7 @@ function app_xhprof_end() {
 
 if (extension_loaded('xhprof')
 	&& isset($_GET[XHProf_Name]) && $_GET[XHProf_Name] == 'ok' &&
-	(! in_array($_SERVER['SCRIPT_NAME'], ['/xhprof_html/callgraph.php',
-		'/xhprof_html/index.php'])) {
+	(! in_array($_SERVER['SCRIPT_NAME'], array('/xhprof_html/callgraph.php','/xhprof_html/index.php')))) {
 	app_xhprof_start();
 	register_shutdown_function('app_xhprof_end');
 	include_once $_SERVER['SCRIPT_FILENAME'];
