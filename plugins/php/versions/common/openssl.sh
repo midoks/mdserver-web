@@ -35,7 +35,7 @@ fi
 Install_lib()
 {
 	if [ "$version" -lt "70" ];then
-		bash $curPath/openssl_low_version.sh $1 $2
+		bash $curPath/openssl_low_version.sh $actionType $version
 		return 
 	fi
 
