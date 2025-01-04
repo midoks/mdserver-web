@@ -115,7 +115,6 @@ if [ "${SYS_ARCH}" == "arm64" ] && [ "$sysName" == "Darwin" ] ;then
 	cat ${curPath}/versions/${PHP_VER}/src/mkstemp.c > $sourcePath/php/php${PHP_VER}/ext/zip/lib/mkstemp.c
 fi
 
-
 if [ ! -d $serverPath/php/${PHP_VER} ];then
 	cd $sourcePath/php/php${PHP_VER} && ./configure \
 	--prefix=$serverPath/php/${PHP_VER} \

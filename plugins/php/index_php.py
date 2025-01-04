@@ -64,7 +64,7 @@ def status_progress(version):
 def getPhpSocket(version):
     path = getFpmConfFile(version)
     content = mw.readFile(path)
-    rep = 'listen\s*=\s*(.*)'
+    rep = r'listen\s*=\s*(.*)'
     tmp = re.search(rep, content)
     return tmp.groups()[0].strip()
 
@@ -132,9 +132,17 @@ def libConfCommon(version):
     libpath = getPluginDir() + '/versions/phplib.conf'
     phplib = json.loads(mw.readFile(libpath))
 
+    php_dir = getServerDir() + "/" + version
+    ext_dir = php_dir+"/lib/php/extensions"
+
+    ext_list = os.listdir(ext_dir)
+    for sodir in ext_list:
+        if sodir.find("no-debug-non-zts") > -1:
+            ext_dir += "/"+ sodir
+            break
+
     libs = []
-    tasks = mw.M('tasks').where(
-        "status!=?", ('1',)).field('status,name').select()
+    tasks = mw.M('tasks').where("status!=?", ('1',)).field('status,name').select()
     for lib in phplib:
         lib['task'] = '1'
         for task in tasks:
@@ -146,10 +154,15 @@ def libConfCommon(version):
                 lib['task'] = task['status']
                 lib['phpversions'] = []
                 lib['phpversions'].append(tmp1[1])
-        if phpini.find(lib['check']) == -1:
-            lib['status'] = False
-        else:
+
+        lib['status'] = False
+        if phpini.find(lib['check']) > -1:
             lib['status'] = True
+        sofile = ext_dir+"/"+lib['check']
+        # 自定义，比较特殊的方式
+        if os.path.exists(sofile):
+            if os.path.getsize(sofile) == 7:
+                lib['status'] = True
         libs.append(lib)
     return libs
 

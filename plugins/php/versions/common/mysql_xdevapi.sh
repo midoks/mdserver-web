@@ -11,11 +11,12 @@ rootPath=$(dirname "$rootPath")
 serverPath=$(dirname "$rootPath")
 sourcePath=${serverPath}/source/php
 SYS_ARCH=`arch`
+LIBNAME=mysql_xdevapi
+LIBV=8.0.30
+sysName=`uname`
 actionType=$1
 version=$2
 
-LIBNAME=openssl
-LIBV=0
 
 LIB_PATH_NAME=lib/php
 if [ -d $serverPath/php/${version}/lib64 ];then
@@ -25,7 +26,6 @@ fi
 NON_ZTS_FILENAME=`ls $serverPath/php/${version}/${LIB_PATH_NAME}/extensions | grep no-debug-non-zts`
 extFile=$serverPath/php/${version}/${LIB_PATH_NAME}/extensions/${NON_ZTS_FILENAME}/${LIBNAME}.so
 
-sysName=`uname`
 if [ "$sysName" == "Darwin" ];then
 	BAK='_bak'
 else
@@ -34,30 +34,45 @@ fi
 
 Install_lib()
 {
-	if [ "$version" -lt "70" ];then
-		bash $curPath/openssl_low_version.sh $actionType $version
-		return 
-	fi
-
-
-	isInstall=`cat $serverPath/php/$version/etc/php.ini|grep "${LIBNAME}.so"`
+	isInstall=`cat $serverPath/php/${version}/etc/php.ini|grep "${LIBNAME}.so"`
 	if [ "${isInstall}" != "" ];then
 		echo "php-$version 已安装${LIBNAME},请选择其它版本!"
 		return
 	fi
+	
+	
+	if [ ! -f "$extFile" ];then
+
+		php_lib=$sourcePath/php_lib
+		mkdir -p $php_lib
+		if [ ! -d $php_lib/${LIBNAME}-${LIBV} ];then
+			if [ ! -f $php_lib/${LIBNAME}-${LIBV}.tgz ];then
+				wget --no-check-certificate -O $php_lib/${LIBNAME}-${LIBV}.tgz http://pecl.php.net/get/${LIBNAME}-${LIBV}.tgz
+			fi
+			cd $php_lib && tar xvf ${LIBNAME}-${LIBV}.tgz
+		fi
+		cd $php_lib/${LIBNAME}-${LIBV}
+
+		OPTIONS=""
+		if [ "${SYS_ARCH}" == "aarch64" ] && [ "$version" -lt "56" ];then
+			OPTIONS="$OPTIONS --build=aarch64-unknown-linux-gnu --host=aarch64-unknown-linux-gnu"
+		fi
+		
+		$serverPath/php/$version/bin/phpize
+		./configure --with-php-config=$serverPath/php/$version/bin/php-config $OPTIONS
+		make clean && make && make install && make clean
+
+		cd $php_lib && rm -rf $php_lib/${LIBNAME}-${LIBV}
+	fi
 
 	if [ ! -f "$extFile" ];then
-		echo "locked" > $extFile
+		echo "ERROR!"
+		return
 	fi
 
-    echo "" >> $serverPath/php/$version/etc/php.ini
 	echo "[${LIBNAME}]" >> $serverPath/php/$version/etc/php.ini
-	if [ -f "/etc/ssl/certs/ca-certificates.crt" ];then
-		echo "openssl.cafile=/etc/ssl/certs/ca-certificates.crt" >> $serverPath/php/$version/etc/php.ini
-	elif [ -f "/etc/pki/tls/certs/ca-bundle.crt" ];then
-		echo "openssl.cafile=/etc/pki/tls/certs/ca-bundle.crt" >> $serverPath/php/$version/etc/php.ini
-	fi
-	
+	echo "extension=${LIBNAME}.so" >> $serverPath/php/$version/etc/php.ini
+
 	cd  ${curPath} && bash ${rootPath}/plugins/php/versions/lib.sh $version restart
 	echo '==========================================================='
 	echo 'successful!'
@@ -70,13 +85,13 @@ Uninstall_lib()
 		echo "php-$version 未安装,请选择其它版本!"
 		return
 	fi
-	
+
 	if [ ! -f "$extFile" ];then
 		echo "php-$version 未安装${LIBNAME},请选择其它版本!"
+		echo "php-$version not install ${LIBNAME}, Plese select other version!"
 		return
 	fi
 	
-	echo $serverPath/php/$version/etc/php.ini
 	sed -i $BAK "/${LIBNAME}.so/d" $serverPath/php/$version/etc/php.ini
 	sed -i $BAK "/${LIBNAME}/d" $serverPath/php/$version/etc/php.ini
 		
