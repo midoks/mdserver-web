@@ -48,6 +48,13 @@ apt install -y libaio1t64
 
 apt install -y dnsutils
 
+# https://www.php.net/manual/zh/mysql-xdevapi.installation.php
+apt install -y libprotobuf-dev
+apt install -y protobuf-compiler
+apt install -y libboost-dev
+apt install -y liblz4-tool
+apt install -y zstd
+
 P_VER=`python3 -V | awk '{print $2}'`
 if version_ge "$P_VER" "3.11.0" ;then
     echo -e "\e[1;31mapt install python3.12-venv\e[0m"
