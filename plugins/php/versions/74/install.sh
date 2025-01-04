@@ -112,8 +112,8 @@ if [ "$sysName" == "Darwin" ];then
 	BREW_DIR=`which brew`
 	BREW_DIR=${BREW_DIR/\/bin\/brew/}
 
-	LIB_DEPEND_DIR=`brew info openssl | grep ${BREW_DIR}/Cellar/openssl | cut -d \  -f 1 | awk 'END {print}'`
-	OPTIONS="$OPTIONS --with-openssl=$(brew --prefix openssl)"
+	LIB_DEPEND_DIR=`brew info openssl@1.0 | grep ${BREW_DIR}/Cellar/openssl@1.0 | cut -d \  -f 1 | awk 'END {print}'`
+	OPTIONS="$OPTIONS --with-openssl=$(brew --prefix openssl@1.0)"
 	export PKG_CONFIG_PATH=$LIB_DEPEND_DIR/lib/pkgconfig
 	export OPENSSL_CFLAGS="-I${LIB_DEPEND_DIR}/include"
 	export OPENSSL_LIBS="-L/${LIB_DEPEND_DIR}/lib -lssl -lcrypto -lz"
