@@ -234,6 +234,14 @@ apt install -y xsltproc
 apt install -y libcurl4-openssl-dev
 apt install -y curl libcurl4-gnutls-dev
 
+# https://www.php.net/manual/zh/mysql-xdevapi.installation.php
+apt install -y libprotobuf-dev 
+apt install -y protobuf-compiler
+apt install -y libboost-dev 
+apt install -y liblz4-tool
+apt install -y zstd
+
+
 # Disabled due to dependency issues
 #apt install --ignore-missing -y autoconf automake cmake curl dia gcc imagemagick libbz2-dev libcurl4-gnutls-dev\
 #    libcurl4-openssl-dev libevent-dev libffi-dev libfreetype6 libfreetype6-dev libgmp-dev libgmp3-dev libicu-dev \
