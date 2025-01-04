@@ -49,9 +49,9 @@ apt install -y libaio1t64
 apt install -y dnsutils
 
 # https://www.php.net/manual/zh/mysql-xdevapi.installation.php
-apt install -y libprotobuf-dev 
+apt install -y libprotobuf-dev
 apt install -y protobuf-compiler
-apt install -y libboost-dev 
+apt install -y libboost-dev
 apt install -y liblz4-tool
 apt install -y zstd
 
