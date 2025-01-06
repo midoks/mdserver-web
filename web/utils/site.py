@@ -1489,13 +1489,14 @@ class sites(object):
             return mw.returnData(False, "错误的目标地址!")
 
         # get host from url
-        try:
-            if host == "$host":
-                host_tmp = urlparse(to)
-                host = host_tmp.netloc
+        # try:
+        #     if host == "$host":
+        #         host_tmp = urlparse(to)
+        #         host = host_tmp.netloc
 
-        except Exception as e:
-            return mw.returnData(False, "错误的目标地址")
+        # except Exception as e:
+        #     return mw.returnData(False, "错误的目标地址")
+        # print(host)
 
         proxy_site_path = self.getProxyDataPath(site_name)
         data_content = mw.readFile(proxy_site_path) if os.path.exists(proxy_site_path) else ""
