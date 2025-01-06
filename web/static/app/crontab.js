@@ -338,6 +338,11 @@ function planAdd(){
 		var where1 = $("#ptime input[name='where1']").val();
 		$("#cronConfig input[name='where1']").val(where1);
 	}
+
+	if (type == 'week'){
+		var where1 = $("#ptime input[name='where1']").val();
+		$("#cronConfig input[name='where1']").val(where1);
+	}
 	
 
 	layer.msg('正在添加,请稍候...!',{icon:16,time:0,shade: [0.3, '#000']});
@@ -836,8 +841,6 @@ function editTaskInfo(id){
 						$('.site_list').show();
 					}
 
-					
-
 					obj.from.minute = $('.minute_create').val();
 					obj.from.hour = $('.hour_create').val();
 					obj.from.where1 = $('.where1_create').val();
@@ -963,6 +966,8 @@ function editTaskInfo(id){
 						} else if(obj.from.type == 'minute-n') {
 							obj.from.where1 = obj.from.minute;
 							obj.from.minute = '';
+						} else if(obj.from.type == 'week') {
+							obj.from.where1 = obj.from.week;
 						}
 						var loadT = layer.msg('正在保存编辑内容，请稍后...',{icon:16,time:0,shade: [0.3, '#000']});
 						$.post('/crontab/modify_crond',obj.from,function(rdata){
