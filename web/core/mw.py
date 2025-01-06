@@ -1403,6 +1403,38 @@ def isIpAddr(ip):
     else:
         return False
 
+def isVaildIpV4(ip):
+    import ipaddress
+    try:
+        ipaddress.IPv4Address(ip)
+        return True
+    except ipaddress.AddressValueError:
+        return False
+
+def isVaildIpV6(ip):
+    import ipaddress
+    try:
+        ipaddress.IPv6Address(ip)
+        return True
+    except ipaddress.AddressValueError:
+        return False
+
+def isVaildIp(ip):
+    import ipaddress
+    try:
+        ipaddress.IPv4Address(ip)
+        return True
+    except ipaddress.AddressValueError:
+        pass
+
+    try:
+        ipaddress.IPv6Address(ip)
+        return True
+    except ipaddress.AddressValueError:
+        pass
+    return False
+
+
 def getWebStatus():
     pid = getServerDir() + '/openresty/nginx/logs/nginx.pid'
     if os.path.exists(pid):

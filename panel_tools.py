@@ -57,8 +57,9 @@ def mwcli(mw_input=0):
             '(2)    停止面板服务',
             '(3)    启动面板服务',
             '(4)    重载面板服务',
-            '(5)    修改面板端口',
-            '(6)    关闭安全入口',
+            '(5)    修改面板IP',
+            '(6)    修改面板端口',
+            '(7)    关闭安全入口',
             '(10)   查看面板默认信息',
             '(11)   修改面板密码',
             '(12)   修改面板用户名',
@@ -99,7 +100,7 @@ def mwcli(mw_input=0):
             mw_input = 0
 
     nums = [
-        1, 2, 3, 4, 5, 6,
+        1, 2, 3, 4, 5, 6, 7,
         10, 11, 12, 13, 14, 15,
         20, 21, 22, 23, 24, 25, 26, 27, 28,
         100, 101, 
@@ -119,6 +120,16 @@ def mwcli(mw_input=0):
     elif mw_input == 4:
         os.system(INIT_CMD + " reload")
     elif mw_input == 5:
+        in_ip = mw_input_cmd("请输入设置的面板IP：")
+        in_ip = in_ip.strip()
+        ip_text = panel_dir + '/data/iplist.txt'
+        if not mw.isVaildIp(in_ip):
+            mw.echoInfo("【"+in_ip+"】: IP不合法")
+            return
+        mw.writeFile(ip_text, in_ip)
+        thisdb.setOption('server_ip', in_ip)
+        mw.echoInfo("设置面板IP: " + in_ip)
+    elif mw_input == 6:
         in_port = mw_input_cmd("请输入新的面板端口：")
         in_port_int = int(in_port.strip())
         if in_port_int < 65536 and in_port_int > 0:
@@ -130,7 +141,7 @@ def mwcli(mw_input=0):
         else:
             mw.echoInfo("端口范围在0-65536之间")
         return
-    elif mw_input == 6:
+    elif mw_input == 7:
         thisdb.setOption('admin_path', '')
         mw.echoInfo("关闭安全入口成功!")
     elif mw_input == 10:
