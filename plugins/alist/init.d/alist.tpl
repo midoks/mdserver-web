@@ -23,7 +23,7 @@ app_start(){
 
 app_stop(){
 	echo "dztasks stopped"
-	ps -ef| grep alist | grep -v grep | grep -v python | grep -v sh | awk '{print $2}'| xargs kill
+	ps -ef| grep alist | grep -v grep | grep -v python | grep -v sh | awk '{print $2}'| xargs kill -9
 }
 
 
