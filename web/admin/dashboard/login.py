@@ -200,9 +200,25 @@ def do_login():
     info = thisdb.getUserByName(username)
     password = mw.md5(password)
 
+    if info is None:
+        msg = mw.getInfo("<a style='color: red'>密码错误</a>,帐号:{1},密码:{2},登录IP:{3}", (username, '******', request.remote_addr))
+        if login_cache_limit == None:
+            login_cache_limit = 1
+        else:
+            login_cache_limit = int(login_cache_limit) + 1
+
+        if login_cache_limit >= login_cache_count:
+            thisdb.setOption('admin_close', 'yes')
+            return mw.returnData(False, '面板已经关闭!')
+
+        cache.set('login_cache_limit', login_cache_limit, timeout=10000)
+        login_cache_limit = cache.get('login_cache_limit')
+        mw.writeLog('用户登录', msg)
+        return mw.returnData(-1, mw.getInfo("用户名或密码错误,您还可以尝试[{1}]次!", (str(login_cache_count - login_cache_limit))))
+
     # print(info)
-    if info is None or info['name'] != username or info['password'] != password:
-        msg = "<a style='color: red'>密码错误</a>,帐号:{1},密码:{2},登录IP:{3}", (('****', '******', request.remote_addr))
+    if info['name'] != username or info['password'] != password:
+        msg = mw.getInfo("<a style='color: red'>密码错误</a>,帐号:{1},密码:{2},登录IP:{3}", (username, '******', request.remote_addr))
 
         if login_cache_limit == None:
             login_cache_limit = 1
@@ -215,7 +231,7 @@ def do_login():
 
         cache.set('login_cache_limit', login_cache_limit, timeout=10000)
         login_cache_limit = cache.get('login_cache_limit')
-        mw.writeLog('用户登录', mw.getInfo(msg))
+        mw.writeLog('用户登录', msg)
         return mw.returnData(-1, mw.getInfo("用户名或密码错误,您还可以尝试[{1}]次!", (str(login_cache_count - login_cache_limit))))
 
     cache.delete('login_cache_limit')
