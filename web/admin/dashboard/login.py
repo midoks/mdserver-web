@@ -200,7 +200,7 @@ def do_login():
     info = thisdb.getUserByName(username)
     password = mw.md5(password)
 
-    if info['name'] != username or info['password'] != password:
+    if info is None or info['name'] != username or info['password'] != password:
         msg = "<a style='color: red'>密码错误</a>,帐号:{1},密码:{2},登录IP:{3}", (('****', '******', request.remote_addr))
 
         if login_cache_limit == None:
