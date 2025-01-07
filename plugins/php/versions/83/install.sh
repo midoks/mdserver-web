@@ -112,6 +112,8 @@ if [ "$sysName" == "Darwin" ];then
 	export OPENSSL_CFLAGS="-I${LIB_DEPEND_DIR}/include"
 	export OPENSSL_LIBS="-L/${LIB_DEPEND_DIR}/lib -lssl -lcrypto -lz"
 else
+	cd ${rootPath}/plugins/php/lib && /bin/bash openssl_11.sh
+	export PKG_CONFIG_PATH=$PKG_CONFIG_PATH:$serverPath/lib/openssl11/lib/pkgconfig
 	OPTIONS="$OPTIONS --with-openssl"
 fi
 
