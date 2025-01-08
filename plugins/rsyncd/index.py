@@ -730,9 +730,16 @@ def lsyncdAdd():
     path = args['path']
 
     if not mw.isAppleSystem():
-        os.system("mkdir -p " + path + " &")
-        os.system("chown -R  www:www " + path + " &")
-        os.system("chmod -R 755 " + path + " &")
+        if os.path.exists(path):
+            import utils.file as utils_file
+            info = utils_file.getAccess(path)
+            file_chown = info['chown']
+            if file_chown != 'www':
+                return mw.returnJson(False, '建议手动执行命令: chown -R www:www '+ args_path)
+        else:
+            os.system("mkdir -p " + path + " &")
+            os.system("chown -R  www:www " + path + " &")
+            os.system("chmod -R 755 " + path + " &")
 
     conn_type = args['conn_type']
 
