@@ -308,12 +308,12 @@ def toSize(size, middle='') -> str:
     return str(round(size, 2)) + middle + u
 
 def returnData(status, msg, data=None):
-    if data == None:
+    if data is None:
         return {'status': status, 'msg': msg}
     return {'status': status, 'msg': msg, 'data': data}
 
 def returnJson(status, msg, data=None):
-    if not data:
+    if data is None:
         return getJson({'status': status, 'msg': msg})
     return getJson({'status': status, 'msg': msg, 'data': data})
 
