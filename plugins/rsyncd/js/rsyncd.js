@@ -673,7 +673,6 @@ function addReceive(name = ""){
                         setTimeout(function(){rsyncdReceive();},2000); 
                     } else {
                         layer.msg(rdata.msg,{icon:rdata.status?1:2,time:10000,shade: [0.3, '#000']});
-                        setTimeout(function(){rsyncdReceive();},10000);
                     }
                 });
             }
