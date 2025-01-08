@@ -387,9 +387,16 @@ def addRec():
     args_ps = args['ps']
 
     if not mw.isAppleSystem():
-        os.system("mkdir -p " + args_path + " &")
-        os.system("chown -R  www:www " + args_path + " &")
-        os.system("chmod -R 755 " + args_path + " &")
+        if os.path.exists(args_path):
+            import utils.file as utils_file
+            info = utils_file.getAccess(args_path)
+            file_chown = info['chown']
+            if file_chown != 'www':
+                return mw.returnJson(False, '建议手动执行命令: chown -R www:www '+ args_path)
+        else:
+            os.system("mkdir -p " + args_path + " &")
+            os.system("chown -R  www:www " + args_path + " &")
+            os.system("chmod -R 755 " + args_path + " &")
 
     delRecBy(args_name)
 
