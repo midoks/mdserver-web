@@ -668,10 +668,13 @@ function addReceive(name = ""){
                 rsPost('add_rec', args, function(data){
                     var rdata = $.parseJSON(data.data);
                     if (rdata['status']){
-                        layer.close(loadOpen);    
+                        layer.close(loadOpen);
+                        layer.msg(rdata.msg,{icon:rdata.status?1:2,time:2000,shade: [0.3, '#000']});
+                        setTimeout(function(){rsyncdReceive();},2000); 
+                    } else {
+                        layer.msg(rdata.msg,{icon:rdata.status?1:2,time:10000,shade: [0.3, '#000']});
+                        setTimeout(function(){rsyncdReceive();},10000);
                     }
-                    layer.msg(rdata.msg,{icon:rdata.status?1:2,time:2000,shade: [0.3, '#000']});
-                    setTimeout(function(){rsyncdReceive();},2000);
                 });
             }
         });
