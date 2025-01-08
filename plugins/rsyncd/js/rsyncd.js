@@ -667,7 +667,9 @@ function addReceive(name = ""){
                 var loadT = layer.msg('正在获取...', { icon: 16, time: 0, shade: 0.3 });
                 rsPost('add_rec', args, function(data){
                     var rdata = $.parseJSON(data.data);
-                    layer.close(loadOpen);
+                    if (rdata['status']){
+                        layer.close(loadOpen);    
+                    }
                     layer.msg(rdata.msg,{icon:rdata.status?1:2,time:2000,shade: [0.3, '#000']});
                     setTimeout(function(){rsyncdReceive();},2000);
                 });
