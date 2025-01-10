@@ -496,10 +496,17 @@ def saveBody(path, data, encoding):
 def sortFileList(path, ftype = 'mtime', sort = 'desc'):
     flist = os.listdir(path)
     if ftype == 'mtime':
-        if sort == 'desc':
-            flist = sorted(flist, key=lambda f: os.path.getmtime(os.path.join(path,f)), reverse=True)
-        if sort == 'asc':
-            flist = sorted(flist, key=lambda f: os.path.getmtime(os.path.join(path,f)), reverse=False)
+        try:
+            if sort == 'desc':
+                flist = sorted(flist, key=lambda f: os.path.getmtime(os.path.join(path,f)), reverse=True)
+            if sort == 'asc':
+                flist = sorted(flist, key=lambda f: os.path.getmtime(os.path.join(path,f)), reverse=False)
+        except Exception as e:
+            if sort == 'desc':
+                flist = sorted(flist, key=lambda f: os.path.getctime(os.path.join(path,f)), reverse=True)
+            if sort == 'asc':
+                flist = sorted(flist, key=lambda f: os.path.getctime(os.path.join(path,f)), reverse=False)
+        
 
     if ftype == 'size':
         if sort == 'desc':
