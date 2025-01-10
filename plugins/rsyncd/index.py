@@ -281,21 +281,33 @@ def rsyncOp(method):
     return 'fail'
 
 
-def start():
-    return rsyncOp('start')
+def lsyncdOp(method):
+    if not mw.isAppleSystem():
+        data = mw.execShell('systemctl ' + method + ' lsyncd')
+        if data[1] == '':
+            return 'ok'
+        return 'fail'
+    return 'fail'
 
+def start():
+    status = rsyncOp('start')
+    lsyncdOp('start')
+    return status
 
 def stop():
-    return rsyncOp('stop')
-
+    status =  rsyncOp('stop')
+    lsyncdOp('stop')
+    return status
 
 def restart():
-    return rsyncOp('restart')
-
+    status = rsyncOp('restart')
+    lsyncdOp('restart')
+    return status
 
 def reload():
-    return rsyncOp('reload')
-
+    status = rsyncOp('reload')
+    lsyncdOp('reload')
+    return status
 
 def initdStatus():
     if mw.isAppleSystem():
