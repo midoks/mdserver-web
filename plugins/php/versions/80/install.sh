@@ -39,7 +39,7 @@ if [ ! -d $sourcePath/php/php${PHP_VER} ];then
 
 	if [ "$LOCAL_ADDR" == "cn" ];then
 		if [ ! -f $sourcePath/php/php-${version}.tar.xz ];then
-			wget --no-check-certificate -O $sourcePath/php/php-${version}.tar.xz https://mirrors.sohu.com/php/php-${version}.tar.xz
+			wget --no-check-certificate -O $sourcePath/php/php-${version}.tar.xz https://mirrors.nju.edu.cn/php/php-${version}.tar.xz
 		fi
 	fi
 	# ----------------------------------------------------------------------- #
