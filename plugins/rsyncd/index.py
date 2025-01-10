@@ -734,7 +734,7 @@ def lsyncdAdd():
     import base64
 
     args = getArgs()
-    data = checkArgs(args, ['ip', 'conn_type', 'path', 'delay', 'period'])
+    data = checkArgs(args, ['ip', 'conn_type', 'path', 'delay', 'period', 'bwlimit'])
     if not data[0]:
         return data[1]
 
