@@ -155,7 +155,7 @@ function createSendTask(name = ''){
                 <div class='line'>\
                     <span class='tname'>限速</span>\
                     <div class='info-r c4'>\
-                        <input class='bt-input-text' type='number' name='"+bwlimit+"' min='0'  value='1024' style='width:100px' /> KB\
+                        <input class='bt-input-text' type='number' name='bwlimit' min='0'  value='"+bwlimit+"' style='width:100px' /> KB\
                         <span data-toggle='tooltip' data-placement='top' title='【限速】限制数据同步任务的速度，防止因同步数据导致带宽跑高' class='bt-ico-ask' style='cursor: pointer;'>?</span>\
                         <span style='margin-left: 29px;margin-right: 10px;'>延迟</span><input class='bt-input-text' min='0' type='number' name='delay'  value='"+delay+"' style='width:100px' /> 秒\
                         <span data-toggle='tooltip' data-placement='top' title='【延迟】在延迟时间周期内仅记录不同步，到达周期后一次性同步数据，以节省开销' class='bt-ico-ask' style='cursor: pointer;'>?</span>\
