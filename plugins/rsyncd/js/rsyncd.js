@@ -85,12 +85,14 @@ function createSendTask(name = ''){
         }
 
         var bwlimit = "1024";
-        var delay = "3";
         if ('rsync' in data){
             bwlimit = data['rsync']['bwlimit'];
-            delay = data['rsync']['delay'];
         }
 
+        var delay = "3";
+        if ('delay' in data){
+            delay = data['delay'];
+        }
 
         var layerID = layer.open({
             type: 1,
