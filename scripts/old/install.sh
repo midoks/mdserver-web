@@ -101,7 +101,7 @@ if [ $OSNAME != "macos" ];then
 		if [ "$LOCAL_ADDR" == "common" ];then
 			curl --insecure -sSLo /tmp/master.zip ${HTTP_PREFIX}github.com/midoks/mdserver-web/archive/refs/tags/${VERSION}.zip
 			cd /tmp && unzip /tmp/master.zip
-			mv -f /tmp/mdserver-web-master /www/server/mdserver-web
+			mv -f /tmp/mdserver-web-${VERSION} /www/server/mdserver-web
 			rm -rf /tmp/master.zip
 			rm -rf /tmp/mdserver-web-master
 		else
