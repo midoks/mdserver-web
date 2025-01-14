@@ -55,7 +55,7 @@ def send_msg(bot, tag='ad', trigger_time=300):
     keyboard = [
         [
             types.InlineKeyboardButton(
-                text="SJ资源网播放计费", url='https://t.me/ssdpflood')
+                text="SJ资源网播放计费", url='https://sjzy.tv?mw')
         ],
         [
             types.InlineKeyboardButton(
