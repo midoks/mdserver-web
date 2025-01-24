@@ -503,6 +503,23 @@ def getCfg():
 
     return mw.returnJson(True, "ok", rdata)
 
+def replaceChar(value, index, new_char):
+    return value[:index] + new_char + value[index+1:]
+
+def makeWorkerCpuAffinity(val):
+    if val == "auto":
+        return "auto"
+
+    if mw.isNumber(val):
+        core_num = int(val)
+        default_core_str = "0"*core_num
+        core_num_arr = []
+        for x in range(core_num):
+            t = replaceChar(default_core_str, x , "1")
+            core_num_arr.append(t)
+        return " ".join(core_num_arr)
+
+    return 'auto'
 
 def setCfg():
 
@@ -543,6 +560,14 @@ def setCfg():
         else:
             if not re.search(r"\d+", v):
                 return mw.returnJson(False, '参数值错误,请输入数字整数')
+
+        if k == "worker_processes" :
+            k_wca = "worker_cpu_affinity"
+            rep_wca = r"%s\s+[^\;\n]+" % k_wca
+            v_wca = makeWorkerCpuAffinity(v)
+            newconf = "%s %s" % (k_wca, v_wca)
+            content = re.sub(rep_wca, newconf, content)
+
 
         if re.search(rep, content):
             newconf = "%s %s" % (k, v)
