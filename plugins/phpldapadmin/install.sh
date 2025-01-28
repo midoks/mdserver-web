@@ -67,7 +67,7 @@ Install_App()
 
 	cp -r $serverPath/source/phpldapadmin/$FDIR $serverPath/phpldapadmin/
 	cd $serverPath/phpldapadmin/ && mv $FDIR phpldapadmin
-	rm -rf $serverPath/source/phpldapadmin/$FDIR
+	# rm -rf $serverPath/source/phpldapadmin/$FDIR
 	
 	echo '安装完成'
 
