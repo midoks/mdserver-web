@@ -69,9 +69,8 @@ Install_App()
 	cd $serverPath/phpldapadmin/ && mv $FDIR phpldapadmin
 	# rm -rf $serverPath/source/phpldapadmin/$FDIR
 	
-	echo '安装完成'
-
 	cd ${rootPath} && python3 ${rootPath}/plugins/phpldapadmin/index.py start
+	echo '安装完成'
 		
 }
 
