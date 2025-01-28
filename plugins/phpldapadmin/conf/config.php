@@ -649,6 +649,11 @@ $servers->setValue('server','force_may',array('uidNumber','gidNumber','sambaSID'
  ***********************************************************************************/
 
 
+$servers->setValue('server','host','127.0.0.1');
+$servers->setValue('server','port',389);
+$servers->setValue('server','base',array('dc=local,dc=com'));
+$servers->setValue('login','bind_id','cn=admin,dc=local,dc=com');
+
 $config->custom->session['reCAPTCHA-enable'] = false;
 $config->custom->session['reCAPTCHA-key-site'] = '<put-here-key-site>';
 $config->custom->session['reCAPTCHA-key-server'] = '<put-here-key-server>';
