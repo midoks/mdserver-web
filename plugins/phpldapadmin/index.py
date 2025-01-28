@@ -372,27 +372,6 @@ def setPmaPort():
     return mw.returnJson(True, '修改成功!')
 
 
-def setPmaChoose():
-    args = getArgs()
-    data = checkArgs(args, ['choose'])
-    if not data[0]:
-        return data[1]
-
-    choose = args['choose']
-    setCfg('choose', choose)
-
-    pma_path = getCfg()['path']
-    conf_run = getServerDir() + "/" + pma_path + '/config/config.php'
-
-    conf_tpl = getPluginDir() + '/conf/config.php'
-    content = mw.readFile(conf_tpl)
-    content = contentReplace(content)
-    mw.writeFile(conf_run, content)
-
-    mw.restartWeb()
-    return mw.returnJson(True, '修改成功!')
-
-
 def setPmaUsername():
     args = getArgs()
     data = checkArgs(args, ['username'])
@@ -522,8 +501,6 @@ if __name__ == "__main__":
         print(setPmaPort())
     elif func == 'get_pma_option':
         print(getPmaOption())
-    elif func == 'set_pma_choose':
-        print(setPmaChoose())
     elif func == 'set_pma_username':
         print(setPmaUsername())
     elif func == 'set_pma_password':

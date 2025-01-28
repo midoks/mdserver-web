@@ -124,15 +124,6 @@ function safeConf() {
     });
 }
 
-
-function setPmaChoose(){
-    var choose = $("#access_choose").val();
-    pmaPost('set_pma_choose',{'choose':choose}, function(data){
-        var rdata = $.parseJSON(data.data);
-        layer.msg(rdata.msg, { icon: rdata.status ? 1 : 2 });
-    });
-}
-
 function setPmaUsername(){
     var username = $("input[name=username]").val();
     pmaPost('set_pma_username',{'username':username}, function(data){
