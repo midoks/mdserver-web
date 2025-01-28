@@ -13,6 +13,11 @@ if [ -f ${rootPath}/bin/activate ];then
 fi
 pip install pyinotify
 
+# cd /www/server/mdserver-web && python3 plugins/tamper_proof_py/index.py start 1.0
+# cd /www/server/mdserver-web && python3 plugins/tamper_proof_py/index.py service_admin  {"serviceStatus":"start"}
+# systemctl start tamper_proof_py
+# systemctl status tamper_proof_py
+
 SYSOS=`uname`
 VERSION=$2
 APP_NAME=tamper_proof_py
