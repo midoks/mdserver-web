@@ -12,6 +12,8 @@ sysArch=`arch`
 
 VERSION=$2
 
+# https://juejin.cn/post/7309323953683480588
+
 Install_App()
 {
 	echo '正在安装脚本文件...'

@@ -99,7 +99,7 @@ function submitConf(version) {
         maxmemory: $("input[name='maxmemory']").val(),
     };
 
-    redisPost('submit_redis_conf', version, data, function(ret_data){
+    redisPost('submit_ladp_conf', version, data, function(ret_data){
         var rdata = $.parseJSON(ret_data.data);
         layer.msg(rdata.msg, { icon: rdata.status ? 1 : 2 });
     });
