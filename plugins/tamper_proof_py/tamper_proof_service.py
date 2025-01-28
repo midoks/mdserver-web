@@ -1,4 +1,4 @@
-# coding=utf-8
+﻿# coding=utf-8
 
 # +--------------------------------------------------------------------
 # |   事件型防篡改
@@ -494,7 +494,7 @@ def run():
     # 处理网站属性
     sites = event.get_sites()
     print("=" * 60)
-    print("【{}】正在启动防篡改，请稍候...".format(mw.formatDate()))
+    print("{} Starting anti tampering, please wait...".format(mw.formatDate()))
     print("-" * 60)
     tip_path = event._PLUGIN_PATH + '/tips/'
     if not os.path.exists(tip_path):
@@ -506,11 +506,11 @@ def run():
         if not siteInfo['open']:
             continue
         if sys.version_info[0] == 2:
-            print("【{}】|-网站[{}]".format(mw.formatDate(),
+            print("{}|-网站[{}]".format(mw.formatDate(),
                                         siteInfo['siteName'])),
         else:
             os.system(
-                "echo -e '【{}】|-网站[{}]\c'".format(mw.formatDate(), siteInfo['siteName']))
+                "echo -e '{}|-网站[{}]\c'".format(mw.formatDate(), siteInfo['siteName']))
             # print("【{}】|-网站[{}]".format(public.format_date(),siteInfo['siteName']),end=" ")
         mw.writeFile(speed_file, "正在处理网站[{}]，请稍候...".format(
             siteInfo['siteName']))
@@ -530,7 +530,7 @@ def run():
     mw.writeLog('防篡改程序', "网站防篡改服务已成功启动,耗时[%s]秒" % endtime)
     notifier = pyinotify.Notifier(watchManager, event)
     print("-" * 60)
-    print('|-防篡改服务已启动')
+    print('|-Anti tampering service has been started')
     print("=" * 60)
     end_tips = ">>>>>>>>>>END<<<<<<<<<<"
     print(end_tips)
