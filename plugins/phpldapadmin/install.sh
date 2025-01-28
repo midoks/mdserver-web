@@ -52,7 +52,7 @@ Install_App()
 	VER=$1
 
 	# https://github.com/leenooks/phpLDAPadmin/archive/refs/tags/1.2.6.7.tar.gz
-	# FDIR=phpMyAdmin-${VER}-all-languages
+	FDIR=phpLDAPadmin-${VER}
 	FILE=${VER}.tar.gz
 	DOWNLOAD=https://github.com/leenooks/phpLDAPadmin/archive/refs/tags/${FILE}
 	
