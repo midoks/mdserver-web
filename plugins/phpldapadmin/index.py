@@ -243,7 +243,7 @@ def start():
         rand_str = rand_str.lower()
         pma_dir_dst = pma_dir + "_" + rand_str
         mw.execShell("mv " + pma_dir + " " + pma_dir_dst)
-        setCfg('path', 'phpmyadmin_' + rand_str)
+        setCfg('path', 'phpldapadmin_' + rand_str)
 
     file_tpl = getPluginDir() + '/conf/phpldapadmin.conf'
     file_run = getConf()
