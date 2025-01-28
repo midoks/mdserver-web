@@ -7,7 +7,8 @@ rootPath=$(dirname "$curPath")
 rootPath=$(dirname "$rootPath")
 serverPath=$(dirname "$rootPath")
 
-# cd /www/server/mdserver-web && python3 plugins/phpmyadmin/index.py start
+# cd /www/server/mdserver-web/plugins/phpldapadmin && bash install.sh install 1.2.6.7
+# cd /www/server/mdserver-web && python3 plugins/phpldapadmin/index.py start
 
 if [ -f ${rootPath}/bin/activate ];then
 	source ${rootPath}/bin/activate
