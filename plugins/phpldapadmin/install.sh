@@ -7,7 +7,8 @@ rootPath=$(dirname "$curPath")
 rootPath=$(dirname "$rootPath")
 serverPath=$(dirname "$rootPath")
 
-# cd /www/server/mdserver-web && python3 plugins/phpmyadmin/index.py start
+# cd /www/server/mdserver-web/plugins/phpldapadmin && bash install.sh install 1.2.6.7
+# cd /www/server/mdserver-web && python3 plugins/phpldapadmin/index.py start
 
 if [ -f ${rootPath}/bin/activate ];then
 	source ${rootPath}/bin/activate
@@ -38,51 +39,52 @@ else
 	OSNAME='unknow'
 fi
 
-Install_phpmyadmin()
+Install_App()
 {
-	if [ -d $serverPath/phpmyadmin ];then
+	if [ -d $serverPath/phpldapadmin ];then
 		exit 0
 	fi
 
-	mkdir -p ${serverPath}/source/phpmyadmin
-	echo "${1}" > ${serverPath}/phpmyadmin/version.pl
+	mkdir -p ${serverPath}/phpldapadmin
+	mkdir -p ${serverPath}/source/phpldapadmin
+	echo "${1}" > ${serverPath}/phpldapadmin/version.pl
 	
 	VER=$1
-	
-	FDIR=phpMyAdmin-${VER}-all-languages
-	FILE=phpMyAdmin-${VER}-all-languages.tar.gz
-	DOWNLOAD=https://files.phpmyadmin.net/phpMyAdmin/${VER}/$FILE
+
+	# https://github.com/leenooks/phpLDAPadmin/archive/refs/tags/1.2.6.7.tar.gz
+	FDIR=phpLDAPadmin-${VER}
+	FILE=${VER}.tar.gz
+	DOWNLOAD=https://github.com/leenooks/phpLDAPadmin/archive/refs/tags/${FILE}
 	
 
 	if [ ! -f $serverPath/source/phpmyadmin/$FILE ];then
-		wget --no-check-certificate -O $serverPath/source/phpmyadmin/$FILE $DOWNLOAD
+		wget --no-check-certificate -O $serverPath/source/phpldapadmin/$FILE $DOWNLOAD
 	fi
 
-	if [ ! -d $serverPath/source/phpmyadmin/$FDIR ];then
-		cd $serverPath/source/phpmyadmin  && tar zxvf $FILE
+	if [ ! -d $serverPath/source/phpldapadmin/$FDIR ];then
+		cd $serverPath/source/phpldapadmin  && tar zxvf $FILE
 	fi
+
+	cp -r $serverPath/source/phpldapadmin/$FDIR $serverPath/phpldapadmin/
+	cd $serverPath/phpldapadmin/ && mv $FDIR phpldapadmin
+	# rm -rf $serverPath/source/phpldapadmin/$FDIR
 	
-	mkdir -p ${serverPath}/phpmyadmin
-	cp -r $serverPath/source/phpmyadmin/$FDIR $serverPath/phpmyadmin/
-	cd $serverPath/phpmyadmin/ && mv $FDIR phpmyadmin
-	rm -rf $serverPath/source/phpmyadmin/$FDIR
-	
-	cd ${rootPath} && python3 ${rootPath}/plugins/phpmyadmin/index.py start
-	
+	cd ${rootPath} && python3 ${rootPath}/plugins/phpldapadmin/index.py start
 	echo '安装完成'
+		
 }
 
-Uninstall_phpmyadmin()
+Uninstall_App()
 {
-	cd ${rootPath} && python3 ${rootPath}/plugins/phpmyadmin/index.py stop
+	cd ${rootPath} && python3 ${rootPath}/plugins/phpldapadmin/index.py stop
 	
-	rm -rf ${serverPath}/phpmyadmin
+	rm -rf ${serverPath}/phpldapadmin
 	echo '卸载完成'
 }
 
 action=$1
 if [ "${1}" == 'install' ];then
-	Install_phpmyadmin $2
+	Install_App $2
 else
-	Uninstall_phpmyadmin $2
+	Uninstall_App $2
 fi

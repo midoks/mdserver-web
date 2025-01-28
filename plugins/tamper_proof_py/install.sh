@@ -7,11 +7,18 @@ rootPath=$(dirname "$curPath")
 rootPath=$(dirname "$rootPath")
 serverPath=$(dirname "$rootPath")
 
-pip install pyinotify
+# pip install pyinotify
 if [ -f ${rootPath}/bin/activate ];then
 	source ${rootPath}/bin/activate
 fi
 pip install pyinotify
+
+# cd /www/server/mdserver-web/plugins/tamper_proof_py && bash install.sh install 1.0
+
+# cd /www/server/mdserver-web && python3 plugins/tamper_proof_py/index.py start 1.0
+# cd /www/server/mdserver-web && python3 plugins/tamper_proof_py/index.py service_admin  {"serviceStatus":"start"}
+# systemctl start tamper_proof_py
+# systemctl status tamper_proof_py
 
 SYSOS=`uname`
 VERSION=$2

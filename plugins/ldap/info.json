@@ -1,0 +1,17 @@
+{
+	"sort":4,
+	"ps": "LDAP轻量目录服务",
+	"name": "ldap",
+	"title": "LDAP",
+	"shell": "install.sh",
+	"versions":["1.0"],
+	"tip": "soft",
+	"checks": "server/ldap",
+	"path": "server/ldap",
+	"display": 1,
+	"author": "ladp",
+	"date": "2025-01-28",
+	"home": "",
+	"type": 0,
+	"pid": "4"
+}

@@ -1,0 +1,15 @@
+{
+	"title":"phpLDAPadmin",
+	"tip":"soft",
+	"name":"phpldapadmin",
+	"type":"运行环境",
+	"ps":"LDAP管理工具",
+	"versions":["1.2.6.7"],
+	"shell":"install.sh",
+	"checks":"server/phpldapadmin",
+	"path": "server/phpldapadmin",
+	"author":"leenooks",
+	"home":"https://github.com/leenooks/phpLDAPadmin",
+	"date":"2025-1-28",
+	"pid": "2"
+}
