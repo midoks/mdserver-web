@@ -42,7 +42,8 @@ def getInitDFile():
 
 
 def getConf():
-    path = getServerDir() + "/redis.conf"
+    # path = getServerDir() + "/redis.conf"
+    path = "/etc/ldap/ldap.conf"
     return path
 
 
