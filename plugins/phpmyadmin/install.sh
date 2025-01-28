@@ -44,7 +44,6 @@ Install_phpmyadmin()
 		exit 0
 	fi
 
-	mkdir -p ${serverPath}/phpmyadmin
 	mkdir -p ${serverPath}/source/phpmyadmin
 	echo "${1}" > ${serverPath}/phpmyadmin/version.pl
 	
@@ -62,15 +61,15 @@ Install_phpmyadmin()
 	if [ ! -d $serverPath/source/phpmyadmin/$FDIR ];then
 		cd $serverPath/source/phpmyadmin  && tar zxvf $FILE
 	fi
-
+	
+	mkdir -p ${serverPath}/phpmyadmin
 	cp -r $serverPath/source/phpmyadmin/$FDIR $serverPath/phpmyadmin/
 	cd $serverPath/phpmyadmin/ && mv $FDIR phpmyadmin
 	rm -rf $serverPath/source/phpmyadmin/$FDIR
 	
-	echo '安装完成'
-
 	cd ${rootPath} && python3 ${rootPath}/plugins/phpmyadmin/index.py start
-		
+	
+	echo '安装完成'
 }
 
 Uninstall_phpmyadmin()
