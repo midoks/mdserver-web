@@ -439,8 +439,7 @@ class MyEventHandler(pyinotify.ProcessEvent):
                 print(
                     "【{}】|-解锁网站[{}]".format(mw.formatDate(), siteInfo['siteName'])),
             else:
-                os.system(
-                    "echo -e '{}|-解锁网站[{}]\c'".format(mw.formatDate(), siteInfo['siteName']))
+                os.system("echo -e '{}|-解锁网站[{}]\c'".format(mw.formatDate(), siteInfo['siteName']))
                 #print("【{}】|-解锁网站[{}]".format(mw.format_date(),siteInfo['siteName']),end=" ")
             self.unlock(siteInfo['path'])
             if os.path.exists(tip):
@@ -509,8 +508,7 @@ def run():
             print("{}|-网站[{}]".format(mw.formatDate(),
                                         siteInfo['siteName'])),
         else:
-            os.system(
-                "echo -e '{}|-网站[{}]\c'".format(mw.formatDate(), siteInfo['siteName']))
+            os.system("echo -e '{}|-网站[{}]\c'".format(mw.formatDate(), siteInfo['siteName']))
             # print("【{}】|-网站[{}]".format(public.format_date(),siteInfo['siteName']),end=" ")
         mw.writeFile(speed_file, "正在处理网站[{}]，请稍候...".format(
             siteInfo['siteName']))
