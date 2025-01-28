@@ -437,14 +437,14 @@ class MyEventHandler(pyinotify.ProcessEvent):
                 continue
             if sys.version_info[0] == 2:
                 print(
-                    "【{}】|-解锁网站[{}]".format(mw.formatDate(), siteInfo['siteName'])),
+                    "【{}】|-Unlock website[{}]".format(mw.formatDate(), siteInfo['siteName'])),
             else:
-                os.system("echo -e '{}|-解锁网站[{}]\c'".format(mw.formatDate(), siteInfo['siteName']))
+                os.system("echo -e '{}|-Unlock website[{}]\c'".format(mw.formatDate(), siteInfo['siteName']))
                 #print("【{}】|-解锁网站[{}]".format(mw.format_date(),siteInfo['siteName']),end=" ")
             self.unlock(siteInfo['path'])
             if os.path.exists(tip):
                 os.remove(tip)
-            print("\t=> 完成")
+            print("\t=> complete")
         print("-" * 60)
         print('|-Anti tampering has been turned off')
         print("=" * 60)
@@ -505,12 +505,11 @@ def run():
         if not siteInfo['open']:
             continue
         if sys.version_info[0] == 2:
-            print("{}|-网站[{}]".format(mw.formatDate(),
-                                        siteInfo['siteName'])),
+            print("{}|-website[{}]".format(mw.formatDate(),siteInfo['siteName'])),
         else:
-            os.system("echo -e '{}|-网站[{}]\c'".format(mw.formatDate(), siteInfo['siteName']))
+            os.system("echo -e '{}|-website[{}]\c'".format(mw.formatDate(), siteInfo['siteName']))
             # print("【{}】|-网站[{}]".format(public.format_date(),siteInfo['siteName']),end=" ")
-        mw.writeFile(speed_file, "正在处理网站[{}]，请稍候...".format(
+        mw.writeFile(speed_file, "Processing website[{}]please wait a moment...".format(
             siteInfo['siteName']))
         if not os.path.exists(tip):
             event.list_DIR(siteInfo['path'], siteInfo)
@@ -521,11 +520,11 @@ def run():
             print(mw.getTracebackInfo())
         tout = round(time.time() - s, 2)
         mw.writeFile(tip, '1')
-        print("\t\t=> 完成，耗时 {} 秒".format(tout))
+        print("\t\t=> Completed, time-consuming {}s".format(tout))
 
     # 启动服务
     endtime = round(time.time() - starttime, 2)
-    mw.writeLog('防篡改程序', "网站防篡改服务已成功启动,耗时[%s]秒" % endtime)
+    mw.writeLog('防篡改程序', "The website anti tampering service has been successfully started,[%s]s" % endtime)
     notifier = pyinotify.Notifier(watchManager, event)
     print("-" * 60)
     print('|-Anti tampering service has been started')
