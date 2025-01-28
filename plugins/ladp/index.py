@@ -129,65 +129,17 @@ def contentReplace(content):
     content = content.replace('{$REDIS_PASS}', mw.getRandomString(10))
     return content
 
-
-
 def initDreplace():
-
-    file_tpl = getInitDTpl()
     service_path = mw.getServerDir()
-
-    initD_path = getServerDir() + '/init.d'
-    if not os.path.exists(initD_path):
-        os.mkdir(initD_path)
-    file_bin = initD_path + '/' + getPluginName()
-
-    # initd replace
-    if not os.path.exists(file_bin):
-        content = mw.readFile(file_tpl)
-        content = content.replace('{$SERVER_PATH}', service_path)
-        mw.writeFile(file_bin, content)
-        mw.execShell('chmod +x ' + file_bin)
-
-    # log
-    dataLog = getServerDir() + '/data'
-    if not os.path.exists(dataLog):
-        mw.execShell('mkdir -p ' + dataLog)
-        mw.execShell('chmod +x ' + file_bin)
-
-    # config replace
-    dst_conf = getConf()
-    dst_conf_init = getServerDir() + '/init.pl'
-    if not os.path.exists(dst_conf_init):
-        conf_content = mw.readFile(getConfTpl())
-        conf_content = conf_content.replace('{$SERVER_PATH}', service_path)
-        conf_content = conf_content.replace('{$REDIS_PASS}', mw.getRandomString(10))
-
-        mw.writeFile(dst_conf, conf_content)
-        mw.writeFile(dst_conf_init, 'ok')
-
-    # systemd
-    systemDir = mw.systemdCfgDir()
-    systemService = systemDir + '/' + getPluginName() + '.service'
-    if os.path.exists(systemDir) and not os.path.exists(systemService):
-        systemServiceTpl = getPluginDir() + '/init.d/' + getPluginName() + '.service.tpl'
-        service_path = mw.getServerDir()
-        content = mw.readFile(systemServiceTpl)
-        content = content.replace('{$SERVER_PATH}', service_path)
-        mw.writeFile(systemService, content)
-        mw.execShell('systemctl daemon-reload')
-
-    return file_bin
+    return True
 
 
 def ladpOp(method):
-    file = initDreplace()
+    initDreplace()
 
     current_os = mw.getOs()
     if current_os == "darwin":
-        data = mw.execShell(file + ' ' + method)
-        if data[1] == '':
-            return 'ok'
-        return data[1]
+        return 'ok'
 
     if current_os.startswith("freebsd"):
         data = mw.execShell('service slapd ' + method)
