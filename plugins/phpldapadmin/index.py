@@ -58,11 +58,11 @@ def checkArgs(data, ck=[]):
 
 
 def getConf():
-    return mw.getServerDir() + '/web_conf/nginx/vhost/phpmyadmin.conf'
+    return mw.getServerDir() + '/web_conf/nginx/vhost/phpldapadmin.conf'
 
 
 def getConfInc():
-    return getServerDir() + "/" + getCfg()['path'] + '/config.inc.php'
+    return getServerDir() + "/" + getCfg()['path'] + '/config.php'
 
 
 def getPort():
@@ -191,7 +191,7 @@ def returnCfg():
 
 def status():
     conf = getConf()
-    conf_inc = getServerDir() + "/" + getCfg()["path"] + '/config.inc.php'
+    conf_inc = getServerDir() + "/" + getCfg()["path"] + '/config.php'
     # 两个文件都在，才算启动成功
     if os.path.exists(conf) and os.path.exists(conf_inc):
         return 'start'
@@ -202,7 +202,7 @@ def __release_port(port):
     from collections import namedtuple
     try:
         from utils.firewall import Firewall as MwFirewall
-        MwFirewall.instance().addAcceptPort(port, 'phpMyAdmin默认端口', 'port')
+        MwFirewall.instance().addAcceptPort(port, 'phpLDAPadmin默认端口', 'port')
         return port
     except Exception as e:
         return "Release failed {}".format(e)
