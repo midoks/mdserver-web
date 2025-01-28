@@ -1,8 +1,8 @@
-function ladpPost(method, version, args,callback){
+function ldapPost(method, version, args,callback){
     var loadT = layer.msg('正在获取...', { icon: 16, time: 0, shade: 0.3 });
 
     var req_data = {};
-    req_data['name'] = 'ladp';
+    req_data['name'] = 'ldap';
     req_data['func'] = method;
     req_data['version'] = version;
  
@@ -26,11 +26,11 @@ function ladpPost(method, version, args,callback){
     },'json'); 
 }
 
-function ladpPostCallbak(method, version, args,callback){
+function ldapPostCallbak(method, version, args,callback){
     var loadT = layer.msg('正在获取...', { icon: 16, time: 0, shade: 0.3 });
 
     var req_data = {};
-    req_data['name'] = 'ladp';
+    req_data['name'] = 'ldap';
     req_data['func'] = method;
     args['version'] = version;
  
