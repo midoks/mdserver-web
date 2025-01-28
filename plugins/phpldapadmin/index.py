@@ -160,7 +160,7 @@ def initCfg():
     cfg = getServerDir() + "/cfg.json"
     if not os.path.exists(cfg):
         data = {}
-        data['port'] = '888'
+        data['port'] = '988'
         data['choose'] = 'mysql'
         data['path'] = ''
         data['username'] = 'admin'
