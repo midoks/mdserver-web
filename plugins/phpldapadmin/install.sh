@@ -50,8 +50,7 @@ Install_App()
 	
 	VER=$1
 
-	https://github.com/leenooks/phpLDAPadmin/archive/refs/tags/1.2.6.7.tar.gz
-	
+	# https://github.com/leenooks/phpLDAPadmin/archive/refs/tags/1.2.6.7.tar.gz
 	# FDIR=phpMyAdmin-${VER}-all-languages
 	FILE=${VER}.tar.gz
 	DOWNLOAD=https://github.com/leenooks/phpLDAPadmin/archive/refs/tags/${FILE}
@@ -66,7 +65,7 @@ Install_App()
 	fi
 
 	cp -r $serverPath/source/phpldapadmin/$FDIR $serverPath/phpldapadmin/
-	cd $serverPath/phpldapadmin/ && mv $FDIR phpldapadmin
+	# cd $serverPath/phpldapadmin/ && mv $FDIR phpldapadmin
 	# rm -rf $serverPath/source/phpldapadmin/$FDIR
 	
 	echo '安装完成'
