@@ -23,13 +23,13 @@ Install_App()
 	mkdir -p $serverPath/ladp
 	apt install -y slapd ldap-utils
 
-	echo "${VERSION}" > $serverPath/ladp/version.pl
+	echo "${VERSION}" > $serverPath/ldap/version.pl
 	echo "${VERSION}安装完成"
 }
 
 Uninstall_App()
 {	
-	rm -rf $serverPath/ladp/version.pl
+	rm -rf $serverPath/ldap/version.pl
 	echo "卸载ldap成功"
 }
 
