@@ -62,7 +62,7 @@ def getConf():
 
 
 def getConfInc():
-    return getServerDir() + "/" + getCfg()['path'] + '/config.php'
+    return getServerDir() + "/" + getCfg()['path'] + '/config/config.php'
 
 
 def getPort():
@@ -190,7 +190,7 @@ def returnCfg():
 
 def status():
     conf = getConf()
-    conf_inc = getServerDir() + "/" + getCfg()["path"] + '/config.php'
+    conf_inc = getServerDir() + "/" + getCfg()["path"] + '/config/config.php'
     # 两个文件都在，才算启动成功
     if os.path.exists(conf) and os.path.exists(conf_inc):
         return 'start'
@@ -266,7 +266,7 @@ def start():
         os.mkdir(tmp)
         mw.execShell("chown -R www:www " + tmp)
 
-    conf_run = getServerDir() + "/" + getCfg()["path"] + '/config.php'
+    conf_run = getServerDir() + "/" + getCfg()["path"] + '/config/config.php'
     if not os.path.exists(conf_run):
         conf_tpl = getPluginDir() + '/conf/config.php'
         centent = mw.readFile(conf_tpl)
@@ -382,7 +382,7 @@ def setPmaChoose():
     setCfg('choose', choose)
 
     pma_path = getCfg()['path']
-    conf_run = getServerDir() + "/" + pma_path + '/config.php'
+    conf_run = getServerDir() + "/" + pma_path + '/config/config.php'
 
     conf_tpl = getPluginDir() + '/conf/config.php'
     content = mw.readFile(conf_tpl)
