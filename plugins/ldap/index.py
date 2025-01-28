@@ -19,7 +19,7 @@ if mw.isAppleSystem():
 
 
 def getPluginName():
-    return 'ladp'
+    return 'ldap'
 
 
 def getPluginDir():
