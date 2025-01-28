@@ -238,7 +238,7 @@ def start():
     initCfg()
     openPort()
 
-    pma_dir = getServerDir() + "/phpmyadmin"
+    pma_dir = getServerDir() + "/phpldapadmin"
     if os.path.exists(pma_dir):
         rand_str = mw.getRandomString(6)
         rand_str = rand_str.lower()
@@ -246,7 +246,7 @@ def start():
         mw.execShell("mv " + pma_dir + " " + pma_dir_dst)
         setCfg('path', 'phpmyadmin_' + rand_str)
 
-    file_tpl = getPluginDir() + '/conf/phpmyadmin.conf'
+    file_tpl = getPluginDir() + '/conf/phpldapadmin.conf'
     file_run = getConf()
     if not os.path.exists(file_run):
         centent = mw.readFile(file_tpl)
@@ -267,9 +267,9 @@ def start():
         os.mkdir(tmp)
         mw.execShell("chown -R www:www " + tmp)
 
-    conf_run = getServerDir() + "/" + getCfg()["path"] + '/config.inc.php'
+    conf_run = getServerDir() + "/" + getCfg()["path"] + '/config.php'
     if not os.path.exists(conf_run):
-        conf_tpl = getPluginDir() + '/conf/config.inc.php'
+        conf_tpl = getPluginDir() + '/conf/config.php'
         centent = mw.readFile(conf_tpl)
         centent = contentReplace(centent)
         mw.writeFile(conf_run, centent)
@@ -300,7 +300,7 @@ def restart():
 
 
 def reload():
-    file_tpl = getPluginDir() + '/conf/phpmyadmin.conf'
+    file_tpl = getPluginDir() + '/conf/phpldapadmin.conf'
     file_run = getConf()
     if os.path.exists(file_run):
         centent = mw.readFile(file_tpl)
@@ -318,7 +318,7 @@ def setPhpVer():
     cacheFile = getServerDir() + '/php.pl'
     mw.writeFile(cacheFile, args['phpver'])
 
-    file_tpl = getPluginDir() + '/conf/phpmyadmin.conf'
+    file_tpl = getPluginDir() + '/conf/phpldapadmin.conf'
     file_run = getConf()
 
     content = mw.readFile(file_tpl)
@@ -383,9 +383,9 @@ def setPmaChoose():
     setCfg('choose', choose)
 
     pma_path = getCfg()['path']
-    conf_run = getServerDir() + "/" + pma_path + '/config.inc.php'
+    conf_run = getServerDir() + "/" + pma_path + '/config.php'
 
-    conf_tpl = getPluginDir() + '/conf/config.inc.php'
+    conf_tpl = getPluginDir() + '/conf/config.php'
     content = mw.readFile(conf_tpl)
     content = contentReplace(content)
     mw.writeFile(conf_run, content)
