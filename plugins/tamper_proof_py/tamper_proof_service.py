@@ -427,7 +427,7 @@ class MyEventHandler(pyinotify.ProcessEvent):
         sites = self.get_sites()
         print("")
         print("=" * 60)
-        print("【{}】正在关闭防篡改，请稍候...".format(mw.formatDate()))
+        print("{}Disabling anti tampering, please wait...".format(mw.formatDate()))
         print("-" * 60)
         for siteInfo in sites:
             tip = self._PLUGIN_PATH + '/tips/' + siteInfo['siteName'] + '.pl'
@@ -440,14 +440,14 @@ class MyEventHandler(pyinotify.ProcessEvent):
                     "【{}】|-解锁网站[{}]".format(mw.formatDate(), siteInfo['siteName'])),
             else:
                 os.system(
-                    "echo -e '【{}】|-解锁网站[{}]\c'".format(mw.formatDate(), siteInfo['siteName']))
+                    "echo -e '{}|-解锁网站[{}]\c'".format(mw.formatDate(), siteInfo['siteName']))
                 #print("【{}】|-解锁网站[{}]".format(mw.format_date(),siteInfo['siteName']),end=" ")
             self.unlock(siteInfo['path'])
             if os.path.exists(tip):
                 os.remove(tip)
             print("\t=> 完成")
         print("-" * 60)
-        print('|-防篡改已关闭')
+        print('|-Anti tampering has been turned off')
         print("=" * 60)
         print(">>>>>>>>>>END<<<<<<<<<<")
 
