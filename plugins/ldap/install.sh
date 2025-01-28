@@ -20,9 +20,9 @@ VERSION=$2
 Install_App()
 {
 	echo '正在安装脚本文件...'
-	mkdir -p $serverPath/ladp
 	apt install -y slapd ldap-utils
 
+	mkdir -p $serverPath/ldap
 	echo "${VERSION}" > $serverPath/ldap/version.pl
 	echo "${VERSION}安装完成"
 }
