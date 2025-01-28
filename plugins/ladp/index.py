@@ -292,124 +292,6 @@ def runInfo():
         result[t[0]] = t[1]
     return mw.getJson(result)
 
-def infoReplication():
-    # 复制信息
-    s = status()
-    if s == 'stop':
-        return mw.returnJson(False, '未启动')
-
-    cmd = getRedisCmd()
-    cmd = cmd + 'info replication'
-
-    # print(cmd)
-    data = mw.execShell(cmd)[0]
-    # print(data)
-    res = [
-        #slave
-        'role',#角色
-        'master_host',  # 连接主库HOST
-        'master_port',  # 连接主库PORT
-        'master_link_status',  # 连接主库状态
-        'master_last_io_seconds_ago',  # 上次同步时间
-        'master_sync_in_progress',  # 正在同步中
-        'slave_read_repl_offset',  # 从库读取复制位置
-        'slave_repl_offset',  # 从库复制位置
-        'slave_priority',  # 从库同步优先级
-        'slave_read_only',  # 从库是否仅读
-        'replica_announced',  # 已复制副本
-        'connected_slaves',  # 连接从库数量
-        'master_failover_state',  # 主库故障状态
-        'master_replid',  # 主库复制ID
-        'master_repl_offset',  # 主库复制位置
-        'second_repl_offset',  # 主库复制位置时间
-        'repl_backlog_active',  # 复制状态
-        'repl_backlog_size',  # 复制大小
-        'repl_backlog_first_byte_offset',  # 第一个字节偏移量
-        'repl_backlog_histlen',  # backlog中数据的长度
-    ]
-
-    data = data.split("\n")
-    result = {}
-    for d in data:
-        if len(d) < 3:
-            continue
-        t = d.strip().split(':')
-        if not t[0] in res:
-            continue
-        result[t[0]] = t[1]
-
-    if 'role' in result and result['role'] == 'master':
-        connected_slaves = int(result['connected_slaves'])
-        slave_l = [] 
-        for x in range(connected_slaves):
-            slave_l.append('slave'+str(x))
-
-        for d in data:
-            if len(d) < 3:
-                continue
-            t = d.strip().split(':')
-            if not t[0] in slave_l:
-                continue
-            result[t[0]] = t[1]
-
-    return mw.getJson(result)
-
-
-def clusterInfo():
-    #集群信息
-    # https://redis.io/commands/cluster-info/
-    s = status()
-    if s == 'stop':
-        return mw.returnJson(False, '未启动')
-
-    cmd = getRedisCmd()
-    cmd = cmd + 'cluster info'
-
-    # print(cmd)
-    data = mw.execShell(cmd)[0]
-    # print(data)
-
-    res = [
-        'cluster_state',#状态
-        'cluster_slots_assigned',  # 被分配的槽
-        'cluster_slots_ok',  # 被分配的槽状态
-        'cluster_slots_pfail',  # 连接主库状态
-        'cluster_slots_fail',  # 失败的槽
-        'cluster_known_nodes',  # 知道的节点
-        'cluster_size',  # 大小
-        'cluster_current_epoch',  # 
-        'cluster_my_epoch',  # 
-        'cluster_stats_messages_sent',  # 发送
-        'cluster_stats_messages_received',  # 接受
-        'total_cluster_links_buffer_limit_exceeded',  #
-    ]
-
-    data = data.split("\n")
-    result = {}
-    for d in data:
-        if len(d) < 3:
-            continue
-        t = d.strip().split(':')
-        if not t[0] in res:
-            continue
-        result[t[0]] = t[1]
-
-    return mw.getJson(result)
-
-def clusterNodes():
-    s = status()
-    if s == 'stop':
-        return mw.returnJson(False, '未启动')
-
-    cmd = getRedisCmd()
-    cmd = cmd + 'cluster nodes'
-
-    # print(cmd)
-    data = mw.execShell(cmd)[0]
-    # print(data)
-
-    data = data.strip().split("\n")
-    return mw.getJson(data)
 
 def initdStatus():
     current_os = mw.getOs()
@@ -421,8 +303,7 @@ def initdStatus():
         if os.path.exists(initd_bin):
             return 'ok'
 
-    shell_cmd = 'systemctl status ' + \
-        getPluginName() + ' | grep loaded | grep "enabled;"'
+    shell_cmd = 'systemctl status slapd | grep loaded | grep "enabled;"'
     data = mw.execShell(shell_cmd)
     if data[0] == '':
         return 'fail'
@@ -441,10 +322,10 @@ def initdInstall():
         initd_bin = getInitDFile()
         shutil.copyfile(source_bin, initd_bin)
         mw.execShell('chmod +x ' + initd_bin)
-        mw.execShell('sysrc ' + getPluginName() + '_enable="YES"')
+        mw.execShell('sysrc slapd_enable="YES"')
         return 'ok'
 
-    mw.execShell('systemctl enable ' + getPluginName())
+    mw.execShell('systemctl enable slapd')
     return 'ok'
 
 
@@ -456,10 +337,10 @@ def initdUinstall():
     if current_os.startswith('freebsd'):
         initd_bin = getInitDFile()
         os.remove(initd_bin)
-        mw.execShell('sysrc ' + getPluginName() + '_enable="NO"')
+        mw.execShell('sysrc slapd_enable="NO"')
         return 'ok'
 
-    mw.execShell('systemctl disable ' + getPluginName())
+    mw.execShell('systemctl disable slapd')
     return 'ok'
 
 
@@ -485,7 +366,7 @@ def getRedisConfInfo():
 
     result = []
     for g in gets:
-        rep = r"^(" + g['name'] + r')\s*([.0-9A-Za-z_& ~]+)'
+        rep = r"^(" + g['name'] + r'\)\s*([.0-9A-Za-z_& ~]+)'
         tmp = re.search(rep, content, re.M)
         if not tmp:
             if g['must_show'] == 0:
