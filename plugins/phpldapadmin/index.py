@@ -89,7 +89,7 @@ def getHomePage():
         return mw.returnJson(False, '插件未启动!')
 
 
-def getPhpVer(expect=55):
+def getPhpVer(expect=74):
     php_vers = MwSites.instance().getPhpVersion()
     v = php_vers['data']
     is_find = False
