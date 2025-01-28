@@ -434,12 +434,6 @@ if __name__ == "__main__":
         print(initdUinstall())
     elif func == 'run_info':
         print(runInfo())
-    elif func == 'info_replication':
-        print(infoReplication())
-    elif func == 'cluster_info':
-        print(clusterInfo())
-    elif func == 'cluster_nodes':
-        print(clusterNodes())
     elif func == 'conf':
         print(getConf())
     elif func == 'run_log':
