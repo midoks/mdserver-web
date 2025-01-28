@@ -110,7 +110,7 @@ def getPidFile():
     return tmp.groups()[0].strip()
 
 def status():
-    pid_file = getPidFile()
+    pid_file = "/var/run/slapd/slapd.pid"
     if not os.path.exists(pid_file):
         return 'stop'
 
@@ -179,7 +179,7 @@ def initDreplace():
     return file_bin
 
 
-def redisOp(method):
+def ladpOp(method):
     file = initDreplace()
 
     current_os = mw.getOs()
@@ -190,27 +190,27 @@ def redisOp(method):
         return data[1]
 
     if current_os.startswith("freebsd"):
-        data = mw.execShell('service ' + getPluginName() + ' ' + method)
+        data = mw.execShell('service slapd ' + method)
         if data[1] == '':
             return 'ok'
         return data[1]
 
-    data = mw.execShell('systemctl ' + method + ' ' + getPluginName())
+    data = mw.execShell('systemctl ' + method + ' slapd')
     if data[1] == '':
         return 'ok'
     return data[1]
 
 
 def start():
-    return redisOp('start')
+    return ladpOp('start')
 
 
 def stop():
-    return redisOp('stop')
+    return ladpOp('stop')
 
 
 def restart():
-    status = redisOp('restart')
+    status = ladpOp('restart')
 
     log_file = runLog()
     mw.execShell("echo '' > " + log_file)
@@ -218,7 +218,7 @@ def restart():
 
 
 def reload():
-    return redisOp('reload')
+    return ladpOp('reload')
 
 
 def getPort():

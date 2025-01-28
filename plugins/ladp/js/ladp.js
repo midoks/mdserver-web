@@ -54,7 +54,7 @@ function ladpPostCallbak(method, version, args,callback){
 }
 
 //配置修改
-function getRedisConfig(version) {
+function getLadpConfig(version) {
     ladpPost('get_redis_conf', version,'',function(data){
         // console.log(data);
         var rdata = $.parseJSON(data.data);

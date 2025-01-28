@@ -7,6 +7,8 @@ rootPath=$(dirname "$curPath")
 rootPath=$(dirname "$rootPath")
 serverPath=$(dirname "$rootPath")
 
+sysName=`uname`
+sysArch=`arch`
 
 VERSION=$2
 
