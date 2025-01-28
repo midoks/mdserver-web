@@ -7,28 +7,23 @@ rootPath=$(dirname "$curPath")
 rootPath=$(dirname "$rootPath")
 serverPath=$(dirname "$rootPath")
 
-# https://www.cnblogs.com/zlonger/p/16177595.html
-# https://www.cnblogs.com/BNTang/articles/15841688.html
-
-# ps -ef|grep redis |grep -v grep | awk '{print $2}' | xargs kill
-
-# cd /Users/midoks/Desktop/mwdev/server/mdserver-web/plugins/redis && bash install.sh install 7.2.2
-
-# cmd查看| info replication
-# /Users/midoks/Desktop/mwdev/server/redis/bin/redis-cli -h 127.0.0.1 -p 6399
-# /www/server/redis/bin/redis-cli -h 127.0.0.1 -p 6399
 
 VERSION=$2
 
 Install_App()
 {
 	echo '正在安装脚本文件...'
-	mkdir -p $serverPath/source
+	mkdir -p $serverPath/ladp
+	apt install -y slapd ldap-utils
+
+	echo "${VERSION}" > $serverPath/ladp/version.pl
+	echo "${VERSION}安装完成"
 }
 
 Uninstall_App()
 {	
-	echo "卸载redis成功"
+	rm -rf $serverPath/ladp/version.pl
+	echo "卸载ldap成功"
 }
 
 action=$1
