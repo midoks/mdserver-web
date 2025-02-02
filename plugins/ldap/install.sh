@@ -34,7 +34,6 @@ Uninstall_App()
 	apt remove -y slapd ldap-utils
 	rm -rf $serverPath/ldap/version.pl
 	rm -rf $serverPath/ldap
-	rm -rf /etc/ldap
 	echo "卸载ldap成功"
 }
 
