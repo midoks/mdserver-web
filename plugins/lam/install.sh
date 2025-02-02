@@ -7,8 +7,8 @@ rootPath=$(dirname "$curPath")
 rootPath=$(dirname "$rootPath")
 serverPath=$(dirname "$rootPath")
 
-# cd /www/server/mdserver-web/plugins/phpldapadmin && bash install.sh install 1.2.6.7
-# cd /www/server/mdserver-web && python3 plugins/phpldapadmin/index.py start
+# cd /www/server/mdserver-web/plugins/lam && bash install.sh install 9.0
+# cd /www/server/mdserver-web && python3 plugins/lam/index.py start
 
 if [ -f ${rootPath}/bin/activate ];then
 	source ${rootPath}/bin/activate
@@ -52,7 +52,7 @@ Install_App()
 	VER=$1
 
 	# https://github.com/LDAPAccountManager/lam/releases/download/9.0/ldap-account-manager-9.0.tar.bz2
-	FDIR=lam-${VER}
+	FDIR=ldap-account-manager-${VER}
 	FILE=ldap-account-manager-${VER}.tar.bz2
 	DOWNLOAD=https://github.com/LDAPAccountManager/lam/releases/download/9.0/${FILE}
 	
