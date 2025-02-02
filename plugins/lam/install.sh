@@ -51,9 +51,7 @@ Install_App()
 	
 	VER=$1
 
-	# https://github.com/leenooks/phpLDAPadmin/archive/refs/tags/1.2.6.7.tar.gz
-
-	https://github.com/LDAPAccountManager/lam/releases/download/9.0/ldap-account-manager-9.0.tar.bz2
+	# https://github.com/LDAPAccountManager/lam/releases/download/9.0/ldap-account-manager-9.0.tar.bz2
 	FDIR=lam-${VER}
 	FILE=ldap-account-manager-${VER}.tar.bz2
 	DOWNLOAD=https://github.com/LDAPAccountManager/lam/releases/download/9.0/${FILE}
