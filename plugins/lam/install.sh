@@ -52,9 +52,11 @@ Install_App()
 	VER=$1
 
 	# https://github.com/leenooks/phpLDAPadmin/archive/refs/tags/1.2.6.7.tar.gz
-	FDIR=phpLDAPadmin-${VER}
-	FILE=${VER}.tar.gz
-	DOWNLOAD=https://github.com/leenooks/phpLDAPadmin/archive/refs/tags/${FILE}
+
+	https://github.com/LDAPAccountManager/lam/releases/download/9.0/ldap-account-manager-9.0.tar.bz2
+	FDIR=lam-${VER}
+	FILE=ldap-account-manager-${VER}.tar.bz2
+	DOWNLOAD=https://github.com/LDAPAccountManager/lam/releases/download/9.0/${FILE}
 	
 
 	if [ ! -f $serverPath/source/phpmyadmin/$FILE ];then
@@ -62,7 +64,7 @@ Install_App()
 	fi
 
 	if [ ! -d $serverPath/source/lam/$FDIR ];then
-		cd $serverPath/source/lam  && tar zxvf $FILE
+		cd $serverPath/source/lam  && tar jxvf $FILE
 	fi
 
 	cp -r $serverPath/source/lam/$FDIR $serverPath/lam/
