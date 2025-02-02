@@ -225,6 +225,7 @@ def start():
         rand_str = rand_str.lower()
         pma_dir_dst = pma_dir + "_" + rand_str
         mw.execShell("mv " + pma_dir + " " + pma_dir_dst)
+        mw.execShell("chown -R www:www " + pma_dir_dst+'/sess')
         mw.execShell("chmod -R 777 " + pma_dir_dst+'/sess')
         mw.execShell("chmod -R 777 " + pma_dir_dst+'/tmp')
         setCfg('path', 'lam_' + rand_str)
