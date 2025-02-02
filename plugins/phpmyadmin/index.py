@@ -98,6 +98,11 @@ def getPhpVer(expect=55):
         if (t == expect):
             is_find = True
             return str(t)
+        expect_str = str(expect)
+        new_ex = expect_str[0:1]+"."+expect_str[1:2]
+        if t.find(new_ex) > -1:
+            is_find = True
+            return str(t)
     if not is_find:
         if len(v) > 1:
             return v[1]['version']
