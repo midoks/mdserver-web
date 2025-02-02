@@ -302,6 +302,13 @@ def submitRedisConf():
     reload()
     return mw.returnJson(True, '设置成功')
 
+def installPreInspection():
+    slapd_path = '/etc/ldap/slapd.d'
+    if not os.path.exists(slapd_path):
+        return "需要手动执行:apt install -y slapd ldap-utils"
+    return 'ok'
+
+
 if __name__ == "__main__":
     func = sys.argv[1]
     if func == 'status':
@@ -320,6 +327,8 @@ if __name__ == "__main__":
         print(initdInstall())
     elif func == 'initd_uninstall':
         print(initdUinstall())
+    elif func == 'install_pre_inspection':
+        print(installPreInspection())
     elif func == 'run_info':
         print(runInfo())
     elif func == 'conf':

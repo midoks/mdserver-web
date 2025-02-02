@@ -205,7 +205,7 @@ $('#login-button').click(function(){
 	var data = 'username='+username+'&password='+password+'&code='+code;
 	var loadT = layer.msg("正在登录中...",{icon:16,time:0,shade: [0.3, '#000']});
 	$.post('/do_login',data,function(rdata){
-		console.log('do_login',rdata);
+		// console.log('do_login',rdata);
 		layer.close(loadT);
 		if(!rdata.status || rdata.status < 0){
 			if(username == 'admin' && rdata.msg.indexOf('用户名') != -1){
