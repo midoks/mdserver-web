@@ -89,7 +89,7 @@ def getHomePage():
         return mw.returnJson(False, '插件未启动!')
 
 
-def getPhpVer(expect=74):
+def getPhpVer(expect=83):
     php_vers = MwSites.instance().getPhpVersion()
     v = php_vers['data']
     is_find = False
@@ -225,6 +225,8 @@ def start():
         rand_str = rand_str.lower()
         pma_dir_dst = pma_dir + "_" + rand_str
         mw.execShell("mv " + pma_dir + " " + pma_dir_dst)
+        mw.execShell("chmod -R 777 " + pma_dir_dst+'/sess')
+        mw.execShell("chmod -R 777 " + pma_dir_dst+'/tmp')
         setCfg('path', 'lam_' + rand_str)
 
     file_tpl = getPluginDir() + '/conf/lam.conf'
