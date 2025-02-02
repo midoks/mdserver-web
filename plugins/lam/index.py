@@ -142,7 +142,7 @@ def initCfg():
     cfg = getServerDir() + "/cfg.json"
     if not os.path.exists(cfg):
         data = {}
-        data['port'] = '989'
+        data['port'] = '987'
         data['path'] = ''
         data['username'] = 'admin'
         data['password'] = 'admin'
