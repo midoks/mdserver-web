@@ -48,7 +48,7 @@ def getConf():
 
 
 def getConfTpl():
-    path = getPluginDir() + "/config/redis.conf"
+    path = getPluginDir() + "/config/ldap.conf"
     return path
 
 
@@ -128,6 +128,13 @@ def contentReplace(content):
 
 def initDreplace():
     service_path = mw.getServerDir()
+
+    conf = getConf()
+    conf_tpl = getConfTpl()
+    if not os.path.exists(conf):
+        content = mw.readFile(conf_tpl)
+        content = contentReplace(content)
+        mw.writeFile(conf, content)
     return True
 
 
