@@ -62,7 +62,7 @@ def getConf():
 
 
 def getConfInc():
-    return getServerDir() + "/" + getCfg()['path'] + '/config/config.php'
+    return getServerDir() + "/" + getCfg()['path'] + '/config/config.cfg'
 
 
 def getPort():
@@ -172,7 +172,7 @@ def returnCfg():
 
 def status():
     conf = getConf()
-    conf_inc = getServerDir() + "/" + getCfg()["path"] + '/config/config.php'
+    conf_inc = getServerDir() + "/" + getCfg()["path"] + '/config/config.cfg'
     # 两个文件都在，才算启动成功
     if os.path.exists(conf) and os.path.exists(conf_inc):
         return 'start'
@@ -251,9 +251,9 @@ def start():
         os.mkdir(tmp)
         mw.execShell("chown -R www:www " + tmp)
 
-    conf_run = getServerDir() + "/" + getCfg()["path"] + '/config/config.php'
+    conf_run = getServerDir() + "/" + getCfg()["path"] + '/config/config.cfg'
     if not os.path.exists(conf_run):
-        conf_tpl = getPluginDir() + '/conf/config.php'
+        conf_tpl = getPluginDir() + '/conf/config.cfg'
         centent = mw.readFile(conf_tpl)
         centent = contentReplace(centent)
         mw.writeFile(conf_run, centent)
@@ -425,35 +425,6 @@ def errorLog():
 def installVersion():
     return mw.readFile(getServerDir() + '/version.pl')
 
-def pluginsDbSupport():
-    data = {}
-
-    data['installed'] = 'no'
-    install_path = getServerDir()
-    if not os.path.exists(install_path):
-        return mw.returnJson(True, 'ok', data) 
-
-    data['installed'] = 'ok'
-    data['status'] = status()
-    if (data['status'] == 'stop'):
-        return mw.returnJson(True, 'ok', data)
-
-    data['cfg'] = getCfg()
-    port = getPort()
-    ip = '127.0.0.1'
-    if not mw.isAppleSystem():
-        ip = thisdb.getOption('server_ip')
-
-    cfg = data['cfg']
-    auth = cfg['username']+':'+cfg['password']
-    rand_path = cfg['path']
-    home_page = 'http://' + auth + '@' + ip + ':' + port + '/' + rand_path + '/index.php'
-
-    data['home_page'] = home_page
-    data['version'] = installVersion().strip()
-
-    return mw.returnJson(True, 'ok', data)
-
 if __name__ == "__main__":
     func = sys.argv[1]
     if func == 'status':
@@ -496,7 +467,5 @@ if __name__ == "__main__":
         print(accessLog())
     elif func == 'error_log':
         print(errorLog())
-    elif func == 'plugins_db_support':
-        print(pluginsDbSupport())
     else:
         print('error')

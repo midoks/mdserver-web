@@ -422,35 +422,6 @@ def errorLog():
 def installVersion():
     return mw.readFile(getServerDir() + '/version.pl')
 
-def pluginsDbSupport():
-    data = {}
-
-    data['installed'] = 'no'
-    install_path = getServerDir()
-    if not os.path.exists(install_path):
-        return mw.returnJson(True, 'ok', data) 
-
-    data['installed'] = 'ok'
-    data['status'] = status()
-    if (data['status'] == 'stop'):
-        return mw.returnJson(True, 'ok', data)
-
-    data['cfg'] = getCfg()
-    port = getPort()
-    ip = '127.0.0.1'
-    if not mw.isAppleSystem():
-        ip = thisdb.getOption('server_ip')
-
-    cfg = data['cfg']
-    auth = cfg['username']+':'+cfg['password']
-    rand_path = cfg['path']
-    home_page = 'http://' + auth + '@' + ip + ':' + port + '/' + rand_path + '/index.php'
-
-    data['home_page'] = home_page
-    data['version'] = installVersion().strip()
-
-    return mw.returnJson(True, 'ok', data)
-
 if __name__ == "__main__":
     func = sys.argv[1]
     if func == 'status':
@@ -493,7 +464,5 @@ if __name__ == "__main__":
         print(accessLog())
     elif func == 'error_log':
         print(errorLog())
-    elif func == 'plugins_db_support':
-        print(pluginsDbSupport())
     else:
         print('error')
