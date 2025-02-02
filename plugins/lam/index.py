@@ -130,23 +130,6 @@ def contentReplace(content):
     content = content.replace('{$BLOWFISH_SECRET}', blowfish_secret)
 
     cfg = getCfg()
-
-    if cfg['choose'] == "mysql":
-        content = content.replace('{$CHOOSE_DB}', 'mysql')
-        content = content.replace('{$CHOOSE_DB_DIR}', 'mysql')
-    elif cfg['choose'] == "mysql-community":
-        content = content.replace('{$CHOOSE_DB}', 'mysql-community')
-        content = content.replace('{$CHOOSE_DB_DIR}', 'mysql-community')
-    elif cfg['choose'] == "mysql-apt":
-        content = content.replace('{$CHOOSE_DB}', 'mysql')
-        content = content.replace('{$CHOOSE_DB_DIR}', 'mysql-apt')
-    elif cfg['choose'] == "mysql-yum":
-        content = content.replace('{$CHOOSE_DB}', 'mysql')
-        content = content.replace('{$CHOOSE_DB_DIR}', 'mysql-yum')
-    else:
-        content = content.replace('{$CHOOSE_DB}', 'MariaDB')
-        content = content.replace('{$CHOOSE_DB_DIR}', 'mariadb')
-
     content = content.replace('{$PMA_PATH}', cfg['path'])
 
     port = cfg["port"]
@@ -160,7 +143,6 @@ def initCfg():
     if not os.path.exists(cfg):
         data = {}
         data['port'] = '989'
-        data['choose'] = 'mysql'
         data['path'] = ''
         data['username'] = 'admin'
         data['password'] = 'admin'
