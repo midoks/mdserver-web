@@ -474,7 +474,7 @@ fi''' % (mw.getPanelDir(),)
                 shell = wheres[stype]
             except:
                 if stype == 'toUrl':
-                    shell = head + "curl -sS --connect-timeout 10 -m 60 '" + param['urladdress'] + "'"
+                    shell = head + "curl -sS --connect-timeout 10 -m 60 '" + param['url_address'] + "'"
                 else:
                     shell = head + param['sbody'].replace("\r\n", "\n")
 

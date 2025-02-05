@@ -283,16 +283,16 @@ function planAdd(){
 		}
 	}
 	
-	var urladdress = $("#urladdress").val();
+	var url_address = $("#url_address").val();
 	if(sType == 'toUrl'){
-		if(!isURL(urladdress)){
+		if(!isURL(url_address)){
 			layer.msg('URL地址不正确!',{icon:2});
-			$("implement textarea[name='urladdress']").focus();
+			$("implement textarea[name='url_address']").focus();
 			return;
 		}
 	}
-	// urladdress = encodeURIComponent(urladdress);
-	$("#cronConfig input[name='urladdress']").val(urladdress);
+	// url_address = encodeURIComponent(url_address);
+	$("#cronConfig input[name='url_address']").val(url_address);
 	$("#cronConfig input[name='stype']").val(sType);
 	$("#cronConfig textarea[name='sbody']").val(decodeURIComponent(sBody));
 	
@@ -669,7 +669,7 @@ function editTaskInfo(id){
 				sname: rdata.sname,
 				backup_to: rdata.backup_to,
 				save: rdata.save,
-				urladdress: rdata.urladdress,
+				url_address: rdata.url_address,
 			},
 			sTypeArray:[['toShell','Shell脚本'],['site','备份网站'],['database','备份数据库'],['logs','日志切割'],['path','备份目录'],['rememory','释放内存'],['toUrl','访问URL']],
 			cycleArray:[['day','每天'],['day-n','N天'],['hour','每小时'],['hour-n','N小时'],['minute-n','N分钟'],['week','每星期'],['month','每月']],
@@ -814,7 +814,7 @@ function editTaskInfo(id){
 					</div>\
 					<div class="clearfix plan ptb10" style="display:'+ (obj.from.stype == "toUrl"?'block;':'none') +'">\
 						<span class="typename controls c4 pull-left f14 text-right mr20">URL地址</span>\
-						<div style="line-height:34px"><input type="text" style="width:400px; height:34px" class="bt-input-text url_create" name="urladdress"  placeholder="URL地址" value="'+ obj.from.urladdress +'"></div>\
+						<div style="line-height:34px"><input type="text" style="width:400px; height:34px" class="bt-input-text url_create" name="url_address"  placeholder="URL地址" value="'+ obj.from.url_address +'"></div>\
 					</div>\
 					<div class="clearfix plan ptb10">\
 						<div class="bt-submit plan-submits " style="margin-left: 141px;">保存编辑</div>\
@@ -868,7 +868,7 @@ function editTaskInfo(id){
 						obj.from.sbody = $(this).val();
 					});
 					$('.url_create').blur(function () {
-						obj.from.urladdress = $(this).val();
+						obj.from.url_address = $(this).val();
 					});
 		
 					$('[aria-labelledby="cycle"] a').unbind().click(function () {
@@ -1070,7 +1070,7 @@ function toShell(){
 
 //从脚本
 function toUrl(){
-	var tBody = "<input type='text' style='width:400px; height:34px' class='bt-input-text' name='urladdress' id='urladdress' placeholder='"+lan.crontab.url_address+"' value='http://' />";
+	var tBody = "<input type='text' style='width:400px; height:34px' class='bt-input-text' name='url_address' id='url_address' placeholder='"+lan.crontab.url_address+"' value='http://' />";
 	$("#implement").html(tBody);
 	$(".planname input[name='name']").removeAttr('readonly style').val("");
 }

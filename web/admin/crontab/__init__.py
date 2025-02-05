@@ -88,7 +88,7 @@ def modify_crond():
     request_data['stype'] = request.form.get('stype', '')
     request_data['sname'] = request.form.get('sname', '')
     request_data['sbody'] = request.form.get('sbody', '')
-    request_data['url_address'] = request.form.get('urladdress', '')
+    request_data['url_address'] = request.form.get('url_address', '')
     cron_id = request.form.get('id', '')
     data = MwCrontab.instance().modifyCrond(cron_id,request_data)
     return data
