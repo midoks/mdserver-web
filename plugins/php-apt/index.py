@@ -464,12 +464,10 @@ def setFpmConfig(version):
     conf = re.sub(rep, "\npm.start_servers = " + start_servers, conf)
 
     rep = r"\s*pm.min_spare_servers\s*=\s*([0-9]+)\s*"
-    conf = re.sub(rep, "\npm.min_spare_servers = " +
-                  min_spare_servers, conf)
+    conf = re.sub(rep, "\npm.min_spare_servers = " + min_spare_servers, conf)
 
     rep = r"\s*pm.max_spare_servers \s*=\s*([0-9]+)\s*"
-    conf = re.sub(rep, "\npm.max_spare_servers = " +
-                  max_spare_servers + "\n", conf)
+    conf = re.sub(rep, "\npm.max_spare_servers = " + max_spare_servers + "\n", conf)
 
     rep = r"\s*pm\s*=\s*(\w+)\s*"
     conf = re.sub(rep, "\npm = " + pm + "\n", conf)

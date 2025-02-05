@@ -639,6 +639,11 @@ $servers->setValue('server','custom_attrs',array('nsRoleDN','nsRole','nsAccountL
 $servers->setValue('server','force_may',array('uidNumber','gidNumber','sambaSID'));
 */
 
+$servers->setValue('server','host','127.0.0.1');
+$servers->setValue('server','port',389);
+$servers->setValue('login','auth_type','session');
+$servers->setValue('server','base',array('dc=local,dc=com'));
+$servers->setValue('login','bind_id','cn=admin,dc=local,dc=com');
 
 /***********************************************************************************
  * If you want to configure Google reCAPTCHA on autentication form, do so below.   *

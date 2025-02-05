@@ -22,7 +22,7 @@ if mw.isAppleSystem():
 
 
 def getPluginName():
-    return 'phpldapadmin'
+    return 'lam'
 
 
 def getPluginDir():
@@ -58,11 +58,11 @@ def checkArgs(data, ck=[]):
 
 
 def getConf():
-    return mw.getServerDir() + '/web_conf/nginx/vhost/phpldapadmin.conf'
+    return mw.getServerDir() + '/web_conf/nginx/vhost/lam.conf'
 
 
 def getConfInc():
-    return getServerDir() + "/" + getCfg()['path'] + '/config/config.php'
+    return getServerDir() + "/" + getCfg()['path'] + '/config/config.cfg'
 
 
 def getPort():
@@ -83,13 +83,13 @@ def getHomePage():
         cfg = getCfg()
         auth = cfg['username']+':'+cfg['password']
         rand_path = cfg['path']
-        url = 'http://' + auth + '@' + ip + ':' + port + '/' + rand_path + '/index.php'
+        url = 'http://' + auth + '@' + ip + ':' + port + '/' + rand_path + '/templates/login.php'
         return mw.returnJson(True, 'OK', url)
     except Exception as e:
         return mw.returnJson(False, '插件未启动!')
 
 
-def getPhpVer(expect=74):
+def getPhpVer(expect=83):
     php_vers = MwSites.instance().getPhpVersion()
     v = php_vers['data']
     is_find = False
@@ -147,7 +147,7 @@ def initCfg():
     cfg = getServerDir() + "/cfg.json"
     if not os.path.exists(cfg):
         data = {}
-        data['port'] = '988'
+        data['port'] = '987'
         data['path'] = ''
         data['username'] = 'admin'
         data['password'] = 'admin'
@@ -177,7 +177,7 @@ def returnCfg():
 
 def status():
     conf = getConf()
-    conf_inc = getServerDir() + "/" + getCfg()["path"] + '/config/config.php'
+    conf_inc = getServerDir() + "/" + getCfg()["path"] + '/config/config.cfg'
     # 两个文件都在，才算启动成功
     if os.path.exists(conf) and os.path.exists(conf_inc):
         return 'start'
@@ -188,7 +188,7 @@ def __release_port(port):
     from collections import namedtuple
     try:
         from utils.firewall import Firewall as MwFirewall
-        MwFirewall.instance().addAcceptPort(port, 'phpLDAPadmin默认端口', 'port')
+        MwFirewall.instance().addAcceptPort(port, 'LAM默认端口', 'port')
         return port
     except Exception as e:
         return "Release failed {}".format(e)
@@ -224,15 +224,18 @@ def start():
     initCfg()
     openPort()
 
-    pma_dir = getServerDir() + "/phpldapadmin"
+    pma_dir = getServerDir() + "/lam"
     if os.path.exists(pma_dir):
         rand_str = mw.getRandomString(6)
         rand_str = rand_str.lower()
         pma_dir_dst = pma_dir + "_" + rand_str
         mw.execShell("mv " + pma_dir + " " + pma_dir_dst)
-        setCfg('path', 'phpldapadmin_' + rand_str)
+        mw.execShell("chown -R www:www " + pma_dir_dst)
+        mw.execShell("chmod -R 777 " + pma_dir_dst+'/sess')
+        mw.execShell("chmod -R 777 " + pma_dir_dst+'/tmp')
+        setCfg('path', 'lam_' + rand_str)
 
-    file_tpl = getPluginDir() + '/conf/phpldapadmin.conf'
+    file_tpl = getPluginDir() + '/conf/lam.conf'
     file_run = getConf()
     if not os.path.exists(file_run):
         centent = mw.readFile(file_tpl)
@@ -253,9 +256,9 @@ def start():
         os.mkdir(tmp)
         mw.execShell("chown -R www:www " + tmp)
 
-    conf_run = getServerDir() + "/" + getCfg()["path"] + '/config/config.php'
+    conf_run = getServerDir() + "/" + getCfg()["path"] + '/config/config.cfg'
     if not os.path.exists(conf_run):
-        conf_tpl = getPluginDir() + '/conf/config.php'
+        conf_tpl = getPluginDir() + '/conf/config.cfg'
         centent = mw.readFile(conf_tpl)
         centent = contentReplace(centent)
         mw.writeFile(conf_run, centent)
@@ -286,7 +289,7 @@ def restart():
 
 
 def reload():
-    file_tpl = getPluginDir() + '/conf/phpldapadmin.conf'
+    file_tpl = getPluginDir() + '/conf/lam.conf'
     file_run = getConf()
     if os.path.exists(file_run):
         centent = mw.readFile(file_tpl)
@@ -304,7 +307,7 @@ def setPhpVer():
     cacheFile = getServerDir() + '/php.pl'
     mw.writeFile(cacheFile, args['phpver'])
 
-    file_tpl = getPluginDir() + '/conf/phpldapadmin.conf'
+    file_tpl = getPluginDir() + '/conf/lam.conf'
     file_run = getConf()
 
     content = mw.readFile(file_tpl)

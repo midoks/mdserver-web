@@ -1,0 +1,15 @@
+{
+	"title":"LAM",
+	"tip":"soft",
+	"name":"lam",
+	"type":"运行环境",
+	"ps":"LDAP管理工具(LAM)",
+	"versions":["9.0"],
+	"shell":"install.sh",
+	"checks":"server/lam",
+	"path": "server/lam",
+	"author":"gruberroland",
+	"home":"https://github.com/LDAPAccountManager",
+	"date":"2025-1-28",
+	"pid": "2"
+}

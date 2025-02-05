@@ -63,8 +63,12 @@ class Firewall(object):
         all_port = t[0].strip()
         ports_list = all_port.split('\n')
 
+
         ports_all = []
         for pinfo in ports_list:
+            if pinfo.strip() == "":
+                continue
+
             info = pinfo.split('/')
 
             is_same = False

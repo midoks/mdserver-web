@@ -15,6 +15,7 @@ VERSION=$2
 # https://juejin.cn/post/7309323953683480588
 
 # dpkg-reconfigure slapd
+# slappasswd 修改密码
 
 # 该命令将在本地服务器上查找并返回在 “dc=bytedance,dc=local” 这个起点（和其下的所有子目录）下，所有 cn 属性有值的条目的详细信息
 # ldapsearch -x -H ldap://localhost -b "dc=bytedance,dc=local" "(cn=*)"
@@ -31,9 +32,7 @@ Install_App()
 
 Uninstall_App()
 {	
-	apt remove -y slapd ldap-utils
 	rm -rf $serverPath/ldap/version.pl
-	rm -rf $serverPath/ldap
 	echo "卸载ldap成功"
 }
 
