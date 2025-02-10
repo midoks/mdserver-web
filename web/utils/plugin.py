@@ -383,6 +383,8 @@ class plugin(object):
                 continue
             task_sign = tmpt.split('-')
             task_len = len(task_sign)
+            if task_len<2:
+                continue
 
             task_name = task_sign[0].lower()
             task_ver = task_sign[1]
