@@ -1,0 +1,65 @@
+
+<div class="main-content">
+<div class="screen-all">
+<div class="content-screen safe bgw mtb15 ptb10 radius4 row" style="height: 300px;">
+<!-- start -->
+
+<div class="s-left col-md-8" style="padding-left: 2.5px;padding-right: 5px; overflow-y: scroll;height: 400px;">
+
+    <div class="panel panel-default">
+        <div class="panel-heading">订单数据</div>
+        <div class="panel-body">Panel content</div>
+    </div>
+
+    <div class="panel panel-default">
+        <div class="panel-heading">交易图表</div>
+        <div class="panel-body" style="padding: 0px;">
+            <div></div>
+            <div id="k_echarts" style="width: auto;height:400px;"></div>
+        </div>
+    </div>
+
+    <div class="panel panel-default">
+        <div class="panel-heading">策略交易日志</div>
+        <div class="panel-body" style="padding: 0px;">
+            <pre id="strategy_log" style="border:none;font-size:12px;white-space: pre;margin: 0px;width: auto;height: 200px;background-color: #333;color:#fff; padding:0 5px">当前没有日志.</pre>
+        </div>
+    </div>
+
+</div>
+
+<div class="s-right col-md-4" style="padding-left: 2.5px;padding-right: 5px; overflow-y: scroll;height: 400px;">
+    
+    <div class="panel panel-default">
+        <div class="panel-heading">策略配置</div>
+        <div class="panel-body divtable pd15 relative" style="padding: 2px 2px 5px;">
+            <table class="table table-hover" width="100%" cellspacing="0" cellpadding="0" border="0">
+                <thead>
+                    <tr>
+                        <th width="20">序列</th>
+                        <th width="120">说明</th>
+                        <th width="10">状态</th>
+                        <th style="text-align: right;" width="50">操作</th>
+                    </tr>
+                </thead>
+                <tbody id="strategy_list"></tbody>
+            </table>
+            <div class="dataTables_paginate paging_bootstrap pagination">
+                <ul id="strategy_list_page" class="page"></ul>
+            </div>
+        </div>
+    </div>
+
+    <div class="panel panel-default">
+        <div class="panel-heading">数据源日志</div>
+        <div class="panel-body" style="padding: 0px;">
+            <pre id="datasource_log" style="border:none;font-size:12px;white-space: pre;margin: 0px;width: auto;height: 200px;background-color: #333;color:#fff; padding:0 5px">当前没有日志.</pre>
+        </div>
+    </div>
+
+</div>
+
+<!-- end -->
+</div>
+</div>
+</div>

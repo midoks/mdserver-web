@@ -1,0 +1,36 @@
+{
+	"hook":[
+		{
+			"tag":"menu",
+			"menu": {
+				"title":"量化交易",
+				"name":"cryptocurrency_trade",
+				"path":"static/html/index.html",
+				"css_path":"static/css/cryptocurrency_trade.css",
+				"js_path":"static/js/cryptocurrency_trade.js"
+			}
+		},
+		{
+			"tag":"global_static",
+			"global_static": {
+				"title":"量化交易",
+				"name":"cryptocurrency_trade",
+				"css_path":"static/css/ico.css"
+			}
+		}
+	],
+	"ps": "基于CCXT的数字货币量化交易插件",
+	"name": "cryptocurrency_trade",
+	"title": "量化交易",
+	"versions": ["1.0"],
+	"tip": "soft",
+	"checks": "server/cryptocurrency_trade",
+	"path":"server/cryptocurrency_trade",
+	"author": "midoks",
+	"date": "2022-02-25",
+	"home": "https://github.com/ccxt/ccxt",
+	"type": "量化交易",
+	"shell": "install.sh",
+	"pid": "5",
+	"sort": 7
+}

@@ -1,0 +1,33 @@
+[
+	{
+		"id":"01",
+		"name": "MACD-KDJ策略检测|1h",
+		"file": "macd_kdj.py"
+	},
+	{
+		"id":"02",
+		"name": "通知测试|60s",
+		"file": "notify_demo.py"
+	},
+	{
+		"id":"03",
+		"name": "okex|macd交易策略|15m",
+		"file": "online_macd_trade.py"
+	},
+	{
+		"id":"04",
+		"name": "okex|动量交易策略|5m",
+		"file": "momentun_trade.py"
+	},
+	{
+		"id":"05",
+		"name": "gate.io|动量交易策略|5m",
+		"file": "gate_100.py"
+	},
+	{
+		"id":"06",
+		"name": "仅提醒|Vega交易策略|5m",
+		"file": "vega_trade.py"
+	}
+
+]
