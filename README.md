@@ -185,7 +185,7 @@ curl --insecure -fsSL https://code.midoks.icu/midoks/mdserver-web/raw/branch/dev
 curl --insecure -fsSL https://code.midoks.icu/midoks/mdserver-web/raw/branch/dev/scripts/update_dev.sh | bash
 ```
 
-### 旧版安装
+### 旧版安装/更新
 ```
 curl --insecure -fsSL  https://raw.githubusercontent.com/midoks/mdserver-web/dev/scripts/old/install.sh | bash
 curl --insecure -fsSL  https://raw.githubusercontent.com/midoks/mdserver-web/dev/scripts/old/update.sh | bash
