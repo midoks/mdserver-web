@@ -1,0 +1,17 @@
+{
+	"sort": 7,
+	"ps": "任务调度管理",
+	"name": "dztasks",
+	"title": "dztasks",
+	"shell": "install.sh",
+	"versions":["1.1"],
+	"tip": "soft",
+	"checks": "server/dztasks",
+	"path": "server/dztasks",
+	"display": 1,
+	"author": "dztasks",
+	"date": "2024-10-06",
+	"home": "",
+	"type": 0,
+	"pid": "5"
+}
