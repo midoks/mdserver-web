@@ -1,0 +1,11 @@
+
+/* menu start  */
+.menu .current .menu_plugin_cryptocurrency_trade:hover {
+    background-image: url("/plugins/file?name=cryptocurrency_trade&f=ico.png");
+}
+
+.menu .menu_plugin_cryptocurrency_trade {
+    background-image: url("/plugins/file?name=cryptocurrency_trade&f=ico.png");
+}
+
+/* menu end  */

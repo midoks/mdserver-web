@@ -1,0 +1,26 @@
+<style type="text/css">
+.conf_p span{width: 100px;}
+.code{padding: 20px 5px;border: 1px solid #e1e1e1;background: #fcfcfc;border-radius: 4px;line-height: 24px;}
+.code span {display: block;margin-left: 15px;margin-bottom: 0;}
+</style>
+<div class="bt-form">
+	<div class="bt-w-main">
+		<div class="bt-w-menu">
+			<p class="bgw" onclick="pluginService('cryptocurrency_trade');">服务</p>
+			<p onclick="dbConf();">数据库配置</p>
+			<p onclick="syncDataList();">同步数据配置</p>
+			<p onclick="userConf();">账户配置</p>
+		</div>
+		<div class="bt-w-con pd15">
+			<div class="soft-man-con"></div>
+		</div>
+	</div>
+</div>
+<script type="text/javascript">
+
+// resetPluginWinWidth(480);
+resetPluginWinHeight(400);
+$.getScript( "/plugins/file?name=cryptocurrency_trade&f=static/js/cryptocurrency_trade.js",function(){
+	pluginService('cryptocurrency_trade');
+});
+</script>

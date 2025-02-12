@@ -176,7 +176,6 @@ plugins/op_auth
 plugins/l2tp
 plugins/openlitespeed
 plugins/tamper_proof
-plugins/cryptocurrency_trade
 plugins/zimg
 plugins/bk_demo
 plugins/mail
@@ -189,7 +188,6 @@ plugins/tidb
 plugins/goedge-admin
 plugins/goedge-node
 plugins/goedge-happy
-plugins/dztasks
 
 /logs
 /data
