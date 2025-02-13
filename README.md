@@ -191,6 +191,17 @@ curl --insecure -fsSL  https://raw.githubusercontent.com/midoks/mdserver-web/dev
 curl --insecure -fsSL  https://raw.githubusercontent.com/midoks/mdserver-web/dev/scripts/old/update.sh | bash
 ```
 
+### 偶然问题
+- 在安装/更新时，突然出现python插件pip,psutil,可尝试如下解决方案
+```
+cd /www/server/mdserver-web rm -rf lib
+cd /www/server/mdserver-web && rm -rf lib64
+cd /www/server/mdserver-web && rm -rf bin
+cd /www/server/mdserver-web && rm -rf include
+
+mw update/mw update_dev
+```
+
 ### 捐赠地址 USDT（TRC20）
 
 TVbNgrpeGBGZVm5gTLa21ADP7RpnPFhjya
