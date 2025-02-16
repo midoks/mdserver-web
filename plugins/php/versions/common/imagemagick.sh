@@ -68,6 +68,10 @@ Install_lib()
 			OPTIONS="$OPTIONS --build=aarch64-unknown-linux-gnu --host=aarch64-unknown-linux-gnu"
 		fi
 
+		if [ "$version" -gt "74" ];then
+			OPTIONS="$OPTIONS --disable-openmp"
+		if
+
 		$serverPath/php/$version/bin/phpize
 		./configure --with-php-config=$serverPath/php/$version/bin/php-config $OPTIONS
 		make clean && make && make install && make clean
