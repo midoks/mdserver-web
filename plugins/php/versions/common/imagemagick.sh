@@ -70,7 +70,7 @@ Install_lib()
 
 		if [ "$version" -gt "74" ];then
 			OPTIONS="$OPTIONS --disable-openmp"
-		if
+		fi
 
 		$serverPath/php/$version/bin/phpize
 		./configure --with-php-config=$serverPath/php/$version/bin/php-config $OPTIONS
