@@ -46,7 +46,6 @@ def send_msg(bot, tag='ad', trigger_time=300):
     # 信号只在一个周期内执行一次|end
 
     # 跨链混币器Cce.Cash💰低手续费💰隔断溯源 | 10/m | next,6/10 | @hu ge
-    # TTKCDN 无视移动墙/GFW/SNI阻断 TG第一性价比 | 10/m | @ssdpflood
     # SJ资源网播放计费| 14/m | next,4/14 |@sjllzyw 
     # https://t.me/gjgzs2022 ｜ 22/m | @GJ_gzs
     # 综合包网/NG接口开户 | 28/m | 6m | next,4/28 | x
