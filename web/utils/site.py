@@ -1376,7 +1376,7 @@ class sites(object):
             if _keep_path == 1:
                 _to = "{}$request_uri".format(to)
 
-            redirect_type = "301" if _type_code == 0 else "302"
+            redirect_type = "301" if _r_type == 0 else "302"
             _if = "if ($host ~ '^{}')".format(site_from)
             _return = "return {} {}; ".format(redirect_type, to)
             file_content = _if + "{\r\n    " + _return + "\r\n}"
