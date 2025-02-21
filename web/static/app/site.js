@@ -1551,7 +1551,7 @@ function to301(siteName, type, obj){
 		if (res.status) {
 			var data = res.data.result;
 			data.forEach(function(item){
-				var lan_r_type = item.r_type == 0 ? "永久重定向" : "临时重定向";
+				var lan_r_type = item.r_type == 0 ? "临时重定向" : "永久重定向";
 				var keep_path = item.keep_path == 0 ? "不保留" : "保留";
 
 				var switchProxy  = '<span onclick="toRedirect(\''+siteName+'\',\''+ item.id +'\',10)" style="color:rgb(92, 184, 92);" class="btlink glyphicon glyphicon-play"></span>';
