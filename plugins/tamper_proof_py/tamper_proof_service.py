@@ -436,8 +436,7 @@ class MyEventHandler(pyinotify.ProcessEvent):
             if close_reload and siteInfo['open']:
                 continue
             if sys.version_info[0] == 2:
-                print(
-                    "【{}】|-Unlock website[{}]".format(mw.formatDate(), siteInfo['siteName'])),
+                print("【{}】|-Unlock website[{}]".format(mw.formatDate(), siteInfo['siteName'])),
             else:
                 os.system("echo -e '{}|-Unlock website[{}]\c'".format(mw.formatDate(), siteInfo['siteName']))
                 #print("【{}】|-解锁网站[{}]".format(mw.format_date(),siteInfo['siteName']),end=" ")
