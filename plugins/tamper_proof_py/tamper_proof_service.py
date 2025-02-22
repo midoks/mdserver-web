@@ -514,8 +514,7 @@ def run():
         if not os.path.exists(tip):
             event.list_DIR(siteInfo['path'], siteInfo)
         try:
-            watchManager.add_watch(
-                siteInfo['path'], mode, auto_add=True, rec=True)
+            watchManager.add_watch(siteInfo['path'], mode, auto_add=True, rec=True)
         except:
             print(mw.getTracebackInfo())
         tout = round(time.time() - s, 2)
