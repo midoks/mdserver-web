@@ -422,7 +422,7 @@ class MyEventHandler(pyinotify.ProcessEvent):
         os.system('chattr -R -a {} &> /dev/null'.format(path))
         self.set_user_ini(path)
 
-    def close(self, reload=False):
+    def close(self, close_reload=False):
         # 解除锁定
         sites = self.get_sites()
         print("")
@@ -433,7 +433,7 @@ class MyEventHandler(pyinotify.ProcessEvent):
             tip = self._PLUGIN_PATH + '/tips/' + siteInfo['siteName'] + '.pl'
             if not siteInfo['open'] and not os.path.exists(tip):
                 continue
-            if reload and siteInfo['open']:
+            if close_reload and siteInfo['open']:
                 continue
             if sys.version_info[0] == 2:
                 print(
