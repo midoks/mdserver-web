@@ -458,8 +458,7 @@ class App:
             if not protectExt in siteInfo['protectExt']:
                 continue
             siteInfo['protectExt'].remove(protectExt)
-            self.writeLog('站点[%s]从受保护列表中删除[.%s]' %
-                          (siteInfo['siteName'], protectExt))
+            self.writeLog('站点[%s]从受保护列表中删除[.%s]' % (siteInfo['siteName'], protectExt))
         self.siteReload(siteInfo)
         self.saveSiteConfig(siteInfo)
         return mw.returnJson(True, '删除成功!')

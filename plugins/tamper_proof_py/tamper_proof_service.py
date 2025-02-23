@@ -123,10 +123,10 @@ class MyEventHandler(pyinotify.ProcessEvent):
             return ret[0:20]
         return ret
 
-    def get_site_logs(self, Stiename):
+    def get_site_logs(self, site_name):
         try:
             pythonV = sys.version_info[0]
-            path = '/www/wwwlogs/' + Stiename + '.log'
+            path = '/www/wwwlogs/' + site_name + '.log'
             num = 500
             if not os.path.exists(path):
                 return []
