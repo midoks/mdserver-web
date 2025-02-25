@@ -324,8 +324,7 @@ class App:
             siteInfo['open'] = not siteInfo['open']
 
         m_logs = {True: '开启', False: '关闭'}
-        self.writeLog('%s站点[%s]防篡改保护' %
-                      (m_logs[siteInfo['open']], siteInfo['siteName']))
+        self.writeLog('%s站点[%s]防篡改保护' % (m_logs[siteInfo['open']], siteInfo['siteName']))
         self.siteReload(siteInfo)
         self.saveSiteConfig(siteInfo)
         self.restart()
@@ -592,8 +591,7 @@ class App:
         for i in range(len(sites)):
             if sites[i]['siteName'] in siteNames:
                 sites[i]['open'] = siteState
-                self.writeLog('%s站点[%s]防篡改保护' %
-                              (m_logs[siteState], sites[i]['siteName']))
+                self.writeLog('%s站点[%s]防篡改保护' % (m_logs[siteState], sites[i]['siteName']))
         self.writeSites(sites)
         return mw.returnJson(True, '批量设置成功')
 
