@@ -123,10 +123,10 @@ class MyEventHandler(pyinotify.ProcessEvent):
             return ret[0:20]
         return ret
 
-    def get_site_logs(self, Stiename):
+    def get_site_logs(self, site_name):
         try:
             pythonV = sys.version_info[0]
-            path = '/www/wwwlogs/' + Stiename + '.log'
+            path = '/www/wwwlogs/' + site_name + '.log'
             num = 500
             if not os.path.exists(path):
                 return []
@@ -422,7 +422,7 @@ class MyEventHandler(pyinotify.ProcessEvent):
         os.system('chattr -R -a {} &> /dev/null'.format(path))
         self.set_user_ini(path)
 
-    def close(self, reload=False):
+    def close(self, close_reload=False):
         # 解除锁定
         sites = self.get_sites()
         print("")
@@ -433,11 +433,10 @@ class MyEventHandler(pyinotify.ProcessEvent):
             tip = self._PLUGIN_PATH + '/tips/' + siteInfo['siteName'] + '.pl'
             if not siteInfo['open'] and not os.path.exists(tip):
                 continue
-            if reload and siteInfo['open']:
+            if close_reload and siteInfo['open']:
                 continue
             if sys.version_info[0] == 2:
-                print(
-                    "【{}】|-Unlock website[{}]".format(mw.formatDate(), siteInfo['siteName'])),
+                print("【{}】|-Unlock website[{}]".format(mw.formatDate(), siteInfo['siteName'])),
             else:
                 os.system("echo -e '{}|-Unlock website[{}]\c'".format(mw.formatDate(), siteInfo['siteName']))
                 #print("【{}】|-解锁网站[{}]".format(mw.format_date(),siteInfo['siteName']),end=" ")
@@ -514,8 +513,7 @@ def run():
         if not os.path.exists(tip):
             event.list_DIR(siteInfo['path'], siteInfo)
         try:
-            watchManager.add_watch(
-                siteInfo['path'], mode, auto_add=True, rec=True)
+            watchManager.add_watch(siteInfo['path'], mode, auto_add=True, rec=True)
         except:
             print(mw.getTracebackInfo())
         tout = round(time.time() - s, 2)

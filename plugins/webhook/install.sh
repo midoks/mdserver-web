@@ -15,6 +15,8 @@ Install_App()
 	mkdir -p $serverPath/webhook
 	echo "${VERSION}" > $serverPath/webhook/version.pl
 	echo '安装完成'
+
+	which mw && mw restart
 }
 
 Uninstall_App()
