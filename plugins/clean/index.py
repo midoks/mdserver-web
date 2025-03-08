@@ -131,6 +131,7 @@ def initConf():
             "/var/log/wtmp",
             "/var/log/secure",
             "/var/log/lastlog",
+            "/var/log/syslog"
             "/var/log/cron",
             "/www/wwwlogs",
             "/www/server/rsyncd",
