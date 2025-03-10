@@ -496,6 +496,12 @@ def pluginsDbSupport():
 
     return mw.returnJson(True, 'ok', data)
 
+def installPreInspection():
+    php_confdir = mw.getServerDir()+'/web_conf/php/conf'
+    if os.path.exists(php_confdir):
+        return "必须先安装一个php版本!"
+    return 'ok'
+
 if __name__ == "__main__":
     func = sys.argv[1]
     if func == 'status':
@@ -508,6 +514,8 @@ if __name__ == "__main__":
         print(restart())
     elif func == 'reload':
         print(reload())
+    elif func == 'install_pre_inspection':
+        print(installPreInspection())
     elif func == 'conf':
         print(getConf())
     elif func == 'version':
