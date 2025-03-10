@@ -498,7 +498,7 @@ def pluginsDbSupport():
 
 def installPreInspection():
     php_confdir = mw.getServerDir()+'/web_conf/php/conf'
-    if os.path.exists(php_confdir):
+    if not os.path.exists(php_confdir):
         return "必须先安装一个php版本!"
     return 'ok'
 
