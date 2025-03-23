@@ -322,18 +322,17 @@ mw_update_venv()
 
 mw_mirror()
 {
-    # LOCAL_ADDR=common
-    # cn=$(curl -fsSL -m 10 -s http://ipinfo.io/json | grep "\"country\": \"CN\"")
-    # if [ ! -z "$cn" ] || [ "$?" == "0" ] ;then
-    #     LOCAL_ADDR=cn
-    # fi
+    LOCAL_ADDR=common
+    cn=$(curl -fsSL -m 10 -s http://ipinfo.io/json | grep "\"country\": \"CN\"")
+    if [ ! -z "$cn" ] || [ "$?" == "0" ] ;then
+        LOCAL_ADDR=cn
+    fi
 
-    # if [ "$LOCAL_ADDR" == "common" ];then
-    #     bash <(curl --insecure -sSL https://raw.githubusercontent.com/midoks/change-linux-mirrors/main/change-mirrors.sh)
-    # else
-    #     bash <(curl -sSL https://linuxmirrors.cn/main.sh)
-    # fi
-    bash <(curl -sSL https://linuxmirrors.cn/main.sh)
+    if [ "$LOCAL_ADDR" == "common" ];then
+        bash <(curl --insecure -sSL https://raw.githubusercontent.com/midoks/change-linux-mirrors/main/change-mirrors.sh)
+    else
+        bash <(curl -sSL https://linuxmirrors.cn/main.sh)
+    fi
     cd ${ROOT_PATH}
 }
 
