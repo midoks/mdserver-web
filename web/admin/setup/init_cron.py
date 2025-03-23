@@ -27,14 +27,22 @@ def init_cron():
 
     if file == "":
         return True
-
-    # content = mw.execShell("crontab -l")
+        
     with open(file) as f:
         for line in f.readlines():
             cron_line = line.strip()
             if cron_line.startswith("#"):
                 continue
-            print(cron_line)
+
+            cron_expression = cron_line.split(maxsplit=5)[0]  # 提取前 5 个字段（* * * * *）
+            command = cron_line.split(maxsplit=5)[5]  # 提取命令部分
+
+            # 面板计划任务过滤
+            if command.startswith("/www/server/cron"):
+                continue
+
+
+            print(command)
 
     # cron_list = content.split("\n")
     # print(cron_list)
