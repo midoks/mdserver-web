@@ -157,7 +157,7 @@ class crontab(object):
 
         cmd, title = self.getCrondCycle(data)
         cron_path = mw.getServerDir() + '/cron'
-        cron_name = self.getShell(data)
+        cron_shell = self.getShell(data)
 
         cmd += ' ' + cron_path + '/' + cron_name + ' >> ' + cron_path + '/' + cron_name + '.log 2>&1'
 
@@ -178,7 +178,7 @@ class crontab(object):
         add_dbdata['sname'] = data['sname']
         add_dbdata['sbody'] = data['sbody']
         add_dbdata['stype'] = data['stype']
-        add_dbdata['echo'] = cron_name
+        add_dbdata['echo'] = cron_shell
         add_dbdata['url_address'] = data['url_address']
 
         tid = thisdb.addCrontab(add_dbdata)
