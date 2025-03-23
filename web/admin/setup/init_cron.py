@@ -8,8 +8,10 @@
 # Author: midoks <midoks@163.com>
 # ---------------------------------------------------------------------------------
 
+import core.mw as mw
 
 # 识别linux计划任务
 def init_cron():
-	print("开始识别cron")
-	print("结束识别cron")
+
+	content = mw.execShell("crontab -l")
+	print(content)
