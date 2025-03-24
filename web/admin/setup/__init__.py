@@ -31,7 +31,7 @@ def init():
 	    init_db_system()
 
 	init_cmd()
-	init_cron()
+	# init_cron()
 
 	# 自动识别防火墙配置
 	firewall_port = thisdb.getOption('setpu_auto_identify_firewall_port', default='no')
