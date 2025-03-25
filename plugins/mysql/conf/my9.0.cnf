@@ -51,7 +51,7 @@ long_query_time=10
 #log_queries_not_using_indexes=1
 #log_slow_admin_statements=1
 #log_slow_replica_statements=1
-binlog_expire_logs_seconds=2592000
+binlog_expire_logs_seconds=604800
 
 relay-log=mdserver
 relay-log-index=mdserver
