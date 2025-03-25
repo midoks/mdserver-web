@@ -280,6 +280,7 @@ def binLog():
             return mw.returnJson(False, '0')
         con = con.replace('#log-bin=mysql-bin', 'log-bin=mysql-bin')
         con = con.replace('#binlog_format=mixed', 'binlog_format=mixed')
+        mw.writeFile(conf, con)
         mw.execShell('sync')
         restart()
     else:
@@ -294,11 +295,12 @@ def binLog():
             return mw.returnJson(True, dsize)
         con = con.replace('log-bin=mysql-bin', '#log-bin=mysql-bin')
         con = con.replace('binlog_format=mixed', '#binlog_format=mixed')
+        mw.writeFile(conf, con)
         mw.execShell('sync')
         restart()
         mw.execShell('rm -f ' + path + '/mysql-bin.*')
 
-    mw.writeFile(conf, con)
+    
     return mw.returnJson(True, '设置成功!')
 
 def binLogList():

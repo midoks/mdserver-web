@@ -331,7 +331,7 @@ mw_mirror()
     if [ "$LOCAL_ADDR" == "common" ];then
         bash <(curl --insecure -sSL https://raw.githubusercontent.com/midoks/change-linux-mirrors/main/change-mirrors.sh)
     else
-        bash <(curl --insecure -sSL https://gitee.com/SuperManito/LinuxMirrors/raw/main/ChangeMirrors.sh)
+        bash <(curl -sSL https://linuxmirrors.cn/main.sh)
     fi
     cd ${ROOT_PATH}
 }

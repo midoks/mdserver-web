@@ -54,9 +54,9 @@ fi
 VERSION_ID=`cat /etc/*-release | grep VERSION_ID | awk -F = '{print $2}' | awk -F "\"" '{print $2}'`
 
 
-VERSION=9.1.0
-# https://dev.mysql.com/get/Downloads/MySQL-9.1/mysql-${VERSION}.tar.gz
-# https://cdn.mysql.com//Downloads/MySQL-9.1/mysql-boost-${VERSION}.tar.gz
+VERSION=9.2.0
+# https://dev.mysql.com/get/Downloads/MySQL-9.2/mysql-${VERSION}.tar.gz
+# https://cdn.mysql.com//Downloads/MySQL-9.2/mysql-boost-${VERSION}.tar.gz
 Install_mysql()
 {
 	mkdir -p ${mysqlDir}
@@ -100,19 +100,19 @@ Install_mysql()
 	fi
 
 	if [ ! -f ${mysqlDir}/mysql-${VERSION}.tar.gz ];then
-         wget --no-check-certificate -O ${mysqlDir}/mysql-${VERSION}.tar.gz --tries=3 https://dev.mysql.com/get/Downloads/MySQL-9.1/mysql-${VERSION}.tar.gz
+         wget --no-check-certificate -O ${mysqlDir}/mysql-${VERSION}.tar.gz --tries=3 https://dev.mysql.com/get/Downloads/MySQL-9.2/mysql-${VERSION}.tar.gz
 	fi
 
 	#检测文件是否损坏.
-	md5_mysql_ok=eb2c6bbd20569d2690bc7e34312f5210
+	md5_mysql_ok=acabc8aa764a94a8b10f90284c6e60c5
 	if [ -f ${mysqlDir}/mysql-${VERSION}.tar.gz ];then
 		md5_mysql=`md5sum ${mysqlDir}/mysql-${VERSION}.tar.gz  | awk '{print $1}'`
 		if [ "${md5_mysql_ok}" == "${md5_mysql}" ]; then
-			echo "mysql9.1 file check ok"
+			echo "mysql9.2 file check ok"
 		else
 			# 重新下载
 			rm -rf ${mysqlDir}/mysql-${VERSION}
-			wget --no-check-certificate -O ${mysqlDir}/mysql-${VERSION}.tar.gz --tries=3 https://dev.mysql.com/get/Downloads/MySQL-9.1/mysql-${VERSION}.tar.gz
+			wget --no-check-certificate -O ${mysqlDir}/mysql-${VERSION}.tar.gz --tries=3 https://dev.mysql.com/get/Downloads/MySQL-9.2/mysql-${VERSION}.tar.gz
 		fi
 	fi
 
@@ -206,7 +206,7 @@ Install_mysql()
 
 		if [ -d $serverPath/mysql ];then
 			rm -rf ${mysqlDir}/mysql-${VERSION}
-			echo '9.1' > $serverPath/mysql/version.pl
+			echo '9.2' > $serverPath/mysql/version.pl
 			echo "${VERSION}安装完成"
 		else
 			# rm -rf ${mysqlDir}/mysql-${VERSION}

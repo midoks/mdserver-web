@@ -42,3 +42,4 @@ supervisor
 pyTelegramBotAPI
 telebot
 pyyaml
+croniter

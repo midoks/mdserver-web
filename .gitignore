@@ -191,3 +191,6 @@ plugins/goedge-happy
 
 /logs
 /data
+/plugins/flexcdn
+/plugins/tools
+/plugins/choose-linux-python

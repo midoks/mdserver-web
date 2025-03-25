@@ -335,6 +335,7 @@ def binLog(version = ''):
             return mw.returnJson(False, '0')
         con = con.replace('#log-bin=mysql-bin', 'log-bin=mysql-bin')
         con = con.replace('#binlog_format=mixed', 'binlog_format=mixed')
+        mw.writeFile(conf, con)
         mw.execShell('sync')
         restart(version)
     else:
@@ -349,11 +350,12 @@ def binLog(version = ''):
             return mw.returnJson(True, dsize)
         con = con.replace('log-bin=mysql-bin', '#log-bin=mysql-bin')
         con = con.replace('binlog_format=mixed', '#binlog_format=mixed')
+        mw.writeFile(conf, con)
         mw.execShell('sync')
         restart(version)
         mw.execShell('rm -f ' + path + '/mysql-bin.*')
 
-    mw.writeFile(conf, con)
+    
     return mw.returnJson(True, '设置成功!')
 
 
@@ -432,7 +434,7 @@ def getShowLogFile():
 
 
 def getMdb8Ver():
-    return ['8.0','8.1','8.2','8.3','8.4','9.0']
+    return ['8.0','8.1','8.2','8.3','8.4','9.0',"9.1","9.2"]
 
 def pGetDbUser():
     if mw.isAppleSystem():
