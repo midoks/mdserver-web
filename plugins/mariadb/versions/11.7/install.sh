@@ -13,7 +13,7 @@ sysName=`uname`
 
 mariadbDir=${serverPath}/source/mariadb
 
-MY_VER=10.11.11
+MY_VER=11.7.2
 
 Install_app()
 {
@@ -62,7 +62,7 @@ Install_app()
 	if [ ! -d ${mariadbDir}/mariadb-${MY_VER} ];then
 		 cd ${mariadbDir} && tar -zxvf  ${mariadbDir}/mariadb-${MY_VER}.tar.gz
 	fi
-
+	
 	INSTALL_CMD=cmake
 	# check cmake version
 	CMAKE_VERSION=`cmake -version | grep version | awk '{print $3}' | awk -F '.' '{print $1}'`
@@ -71,7 +71,6 @@ Install_app()
 		touch /var/log/mariadb/mariadb.log
 		INSTALL_CMD=cmake3
 	fi
-	
 
 	if [ ! -d $serverPath/mariadb ];then
 		cd ${mariadbDir}/mariadb-${MY_VER} && ${INSTALL_CMD} \
@@ -92,7 +91,7 @@ Install_app()
 		make -j${cpuCore} && make install && make clean
 
 		if [ -d $serverPath/mariadb ];then
-			echo '10.11' > $serverPath/mariadb/version.pl
+			echo '11.7' > $serverPath/mariadb/version.pl
 			echo '安装完成'
 		else
 			echo '安装失败'
@@ -104,6 +103,7 @@ Install_app()
 	if [ -d ${mariadbDir}/mariadb-${MY_VER} ];then
 		rm -rf ${mariadbDir}/mariadb-${MY_VER}
 	fi
+
 }
 
 Uninstall_app()
