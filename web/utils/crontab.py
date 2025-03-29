@@ -159,7 +159,7 @@ class crontab(object):
         cron_path = mw.getServerDir() + '/cron'
         cron_shell = self.getShell(data)
 
-        cmd += ' ' + cron_path + '/' + cron_name + ' >> ' + cron_path + '/' + cron_name + '.log 2>&1'
+        cmd += ' ' + cron_path + '/' + cron_shell + ' >> ' + cron_path + '/' + cron_shell + '.log 2>&1'
 
         if not mw.isAppleSystem():
             sh_data = self.writeShell(cmd)
