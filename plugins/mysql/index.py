@@ -957,6 +957,9 @@ def __createUser(dbname, username, password, address):
 
 def getDbBackupListFunc(dbname=''):
     bkDir = mw.getBackupDir() + '/database'
+    if not os.path.exists(bkDir):
+        mw.execShell('mkdir -p ' + bkDir)
+
     blist = os.listdir(bkDir)
     r = []
 
