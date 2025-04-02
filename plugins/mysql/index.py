@@ -2406,7 +2406,7 @@ def getMasterRepSlaveUserCmd(version):
 
     cmd_status = "show master status"
     if pk_version.parse(version) > pk_version.parse("8.0"):
-        cmd_status = "show replica status"
+        cmd_status = "SHOW BINARY LOG STATUS"
     mstatus = db.query(cmd_status)
     if len(mstatus) == 0:
         return mw.returnJson(False, '未开启!')
