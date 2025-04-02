@@ -2404,7 +2404,12 @@ def getMasterRepSlaveUserCmd(version):
     port = getMyPort()
     db = pMysqlDb()
 
-    mstatus = db.query('show master status')
+    # SHOW REPLICA STATUS;
+
+    cmd_status = "show master status"
+    if pk_version.parse(ver) > pk_version.parse("8.0"):
+        cmd_status = "show replica status"
+    mstatus = db.query(cmd_status)
     if len(mstatus) == 0:
         return mw.returnJson(False, '未开启!')
 
