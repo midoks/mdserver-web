@@ -9,7 +9,7 @@ import subprocess
 import re
 import json
 
-from packaging import pk_version
+from packaging import version as pk_version
 
 web_dir = os.getcwd() + "/web"
 if os.path.exists(web_dir):
