@@ -2407,7 +2407,7 @@ def getMasterRepSlaveUserCmd(version):
     # SHOW REPLICA STATUS;
 
     cmd_status = "show master status"
-    if pk_version.parse(ver) > pk_version.parse("8.0"):
+    if pk_version.parse(version) > pk_version.parse("8.0"):
         cmd_status = "show replica status"
     mstatus = db.query(cmd_status)
     if len(mstatus) == 0:
