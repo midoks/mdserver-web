@@ -9,6 +9,7 @@ import subprocess
 import re
 import json
 
+from packaging import version as pk_version
 
 web_dir = os.getcwd() + "/web"
 if os.path.exists(web_dir):
@@ -854,8 +855,8 @@ def runInfo(version):
     return mw.getJson(result)
 
 
-def myDbStatus(version):
-    if status(version) == 'stop':
+def myDbStatus(ver):
+    if status(ver) == 'stop':
         return mw.returnJson(False, 'MySQL未启动', [])
 
     result = {}
@@ -868,7 +869,7 @@ def myDbStatus(version):
     gets = ['table_open_cache', 'thread_cache_size', 'key_buffer_size', 'tmp_table_size', 'max_heap_table_size', 'innodb_buffer_pool_size',
             'innodb_additional_mem_pool_size', 'innodb_log_buffer_size', 'max_connections', 'sort_buffer_size', 'read_buffer_size', 'read_rnd_buffer_size', 'join_buffer_size', 'thread_stack', 'binlog_cache_size']
 
-    if version != "8.0":
+    if pk_version.parse(ver) < pk_version.parse("8.0"):
         gets.append('query_cache_size')
 
     result['mem'] = {}
@@ -881,12 +882,11 @@ def myDbStatus(version):
     return mw.getJson(result)
 
 
-def setDbStatus(version):
+def setDbStatus(ver):
     gets = ['key_buffer_size', 'tmp_table_size', 'max_heap_table_size', 'innodb_buffer_pool_size', 'innodb_log_buffer_size', 'max_connections',
             'table_open_cache', 'thread_cache_size', 'sort_buffer_size', 'read_buffer_size', 'read_rnd_buffer_size', 'join_buffer_size', 'thread_stack', 'binlog_cache_size']
 
-    if version != "8.0":
-        # gets.append('query_cache_size')
+    if pk_version.parse(ver) < pk_version.parse("8.0"):
         gets = ['key_buffer_size', 'query_cache_size', 'tmp_table_size', 'max_heap_table_size', 'innodb_buffer_pool_size', 'innodb_log_buffer_size', 'max_connections',
                 'table_open_cache', 'thread_cache_size', 'sort_buffer_size', 'read_buffer_size', 'read_rnd_buffer_size', 'join_buffer_size', 'thread_stack', 'binlog_cache_size']
 
@@ -957,6 +957,9 @@ def __createUser(dbname, username, password, address):
 
 def getDbBackupListFunc(dbname=''):
     bkDir = mw.getBackupDir() + '/database'
+    if not os.path.exists(bkDir):
+        mw.execShell('mkdir -p ' + bkDir)
+
     blist = os.listdir(bkDir)
     r = []
 
