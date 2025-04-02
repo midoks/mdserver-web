@@ -2176,7 +2176,6 @@ def addMasterRepSlaveUser(version=''):
 
 
 def getMasterRepSlaveUserCmd(version):
-
     args = getArgs()
     data = checkArgs(args, ['username', 'db'])
     if not data[0]:
@@ -2199,7 +2198,11 @@ def getMasterRepSlaveUserCmd(version):
     port = getMyPort()
     db = pMysqlDb()
 
-    mstatus = db.query('show master status')
+    cmd_status = "show master status"
+    if pk_version.parse(version) > pk_version.parse("8.0"):
+        cmd_status = "SHOW BINARY LOG STATUS"
+    mstatus = db.query(cmd_status)
+    
     if len(mstatus) == 0:
         return mw.returnJson(False, '未开启!')
 

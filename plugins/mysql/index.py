@@ -2381,7 +2381,6 @@ def addMasterRepSlaveUser(version=''):
 
 
 def getMasterRepSlaveUserCmd(version):
-
     args = getArgs()
     data = checkArgs(args, ['username', 'db'])
     if not data[0]:
