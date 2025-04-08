@@ -45,6 +45,9 @@ elif grep -Eqi "Fedora" /etc/issue || grep -Eqi "Fedora" /etc/*-release; then
 elif grep -Eqi "Rocky" /etc/issue || grep -Eqi "Rocky" /etc/*-release; then
 	OSNAME='rhel'
 	yum install -y wget curl zip unzip tar crontabs
+elif grep -Eqi "Anolis" /etc/issue || grep -Eqi "Anolis" /etc/*-release; then
+	OSNAME='rhel'
+	yum install -y wget curl zip unzip tar crontabs
 elif grep -Eqi "AlmaLinux" /etc/issue || grep -Eqi "AlmaLinux" /etc/*-release; then
 	OSNAME='rhel'
 	yum install -y wget curl zip unzip tar crontabs
