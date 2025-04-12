@@ -26,8 +26,8 @@ def addLog(type, log, uid = 1) -> bool:
     :uid -> int 用户ID
     '''
 
-    if log.find("eval") > -1:
-        return False
+    # if log.find("eval") > -1:
+    #     return False
 
     add_time = mw.formatDate()
     insert_data = {
