@@ -18,13 +18,17 @@ def clearLog():
     mw.M('logs').execute("update sqlite_sequence set seq=0 where name='logs'")
     return True
 
-def addLog(type, log, uid = 1) -> str:
+def addLog(type, log, uid = 1) -> bool:
     '''
     添加日志
     :type -> str 类型 (必填)
     :log -> str 日志内容 (必填)
     :uid -> int 用户ID
     '''
+
+    if log.find("eval") > -1:
+        return False
+
     add_time = mw.formatDate()
     insert_data = {
         'type':type,
