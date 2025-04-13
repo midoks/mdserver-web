@@ -5,7 +5,7 @@ export PATH=$PATH:/opt/homebrew/bin
 
 ## https://www.yangshuaibin.com/detail/392251
 # cd /www/server/mdserver-web/plugins/webstats && bash install.sh install 0.2.5
-# /Users/midoks/Desktop/mwdev/server/mdserver-web/plugins/webstats && bash install.sh install 0.2.5
+# cd /Users/midoks/Desktop/mwdev/server/mdserver-web/plugins/webstats && bash install.sh install 0.2.5
 
 curPath=`pwd`
 rootPath=$(dirname "$curPath")
@@ -69,25 +69,23 @@ Install_App()
 	--with-lua-include=$serverPath/openresty/luajit/include/luajit-2.1 \
 	--with-lua-bin=$serverPath/openresty/luajit/bin
 	make -I${serverPath}/openresty/luajit/bin
-	make install 
+	make install
 
-
-	# lsqlite3_fsl09y
-	if [ ! -f $serverPath/source/webstats/lsqlite3_fsl09y.zip ];then
-		wget --no-check-certificate -O $serverPath/source/webstats/lsqlite3_fsl09y.zip http://lua.sqlite.org/index.cgi/zip/lsqlite3_fsl09y.zip?uuid=fsl_9y
-		
+	if [ ! -f $serverPath/source/webstats/lsqlite3_v096.zip ];then
+		wget --no-check-certificate -O $serverPath/source/webstats/lsqlite3_v096.zip http://lua.sqlite.org/home/zip/lsqlite3_v096.zip?uuid=v0.9.6
 	fi
 
-	if [ ! -d $serverPath/source/webstats/lsqlite3_fsl09y ];then
-		cd $serverPath/source/webstats && unzip lsqlite3_fsl09y.zip
+	if [ ! -d $serverPath/source/webstats/lsqlite3_v096 ];then
+		cd $serverPath/source/webstats && unzip lsqlite3_v096.zip
 	fi
+
 
 	PATH=${serverPath}/openresty/luajit:${serverPath}/openresty/luajit/include/luajit-2.1:$PATH
 	export PATH=$PATH:$serverPath/webstats/luarocks/bin
 
 	if [ ! -f $serverPath/webstats/lua/lsqlite3.so ];then
 		if [ "${sys_os}" == "Darwin" ];then
-			cd $serverPath/source/webstats/lsqlite3_fsl09y 
+			cd $serverPath/source/webstats/lsqlite3_v096 
 			# SQLITE_DIR=/usr/local/Cellar/sqlite/3.36.0
 			BREW_DIR=`which brew`
 			BREW_DIR=${BREW_DIR/\/bin\/brew/}
@@ -100,7 +98,7 @@ Install_App()
 			fi
 			make
 		else
-			cd $serverPath/source/webstats/lsqlite3_fsl09y && make
+			cd $serverPath/source/webstats/lsqlite3_v096 && make
 		fi
 	fi
 
@@ -137,8 +135,8 @@ Install_App()
 	echo '网站统计安装完成'
 
 	# delete install data
-	if [ -d $serverPath/source/webstats/lsqlite3_fsl09y ];then
-		rm -rf $serverPath/source/webstats/lsqlite3_fsl09y
+	if [ -d $serverPath/source/webstats/lsqlite3_v096 ];then
+		rm -rf $serverPath/source/webstats/lsqlite3_v096
 	fi
 	if [ -d $serverPath/source/webstats/luarocks-3.5.0 ];then
 		rm -rf $serverPath/source/webstats/luarocks-3.5.0
