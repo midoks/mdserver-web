@@ -2213,7 +2213,7 @@ def getMasterRepSlaveUserCmd(version):
     if sid != '':
         channel_name = " for channel 'r{}'".format(sid)
 
-    mdb8 = ['8.0','8.1','8.2','8.3','8.4']
+    mdb8 = getMdb8Ver()
     sql = ''
     if not mw.inArray(mdb8,version):
         base_sql = "CHANGE MASTER TO MASTER_HOST='" + ip + "', MASTER_PORT=" + port + ", MASTER_USER='" + \
@@ -3486,11 +3486,10 @@ def installPreInspection(version):
 
 
 def uninstallPreInspection(version):
-
     data_dir = getDataDir()
-    if os.path.exists(data_dir):
-        stop(version)
-
+    if not os.path.exists(data_dir):
+        return 'ok'
+    stop(version)
     if mw.isDebugMode():
         return 'ok'
 
