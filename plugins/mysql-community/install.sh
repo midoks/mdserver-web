@@ -7,6 +7,11 @@ rootPath=$(dirname "$curPath")
 rootPath=$(dirname "$rootPath")
 serverPath=$(dirname "$rootPath")
 
+if [ -f ${rootPath}/bin/activate ];then
+	source ${rootPath}/bin/activate
+fi
+
+
 # https://dev.mysql.com/downloads/mysql/
 # https://downloads.mysql.com/archives/community/
 
