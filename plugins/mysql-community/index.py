@@ -3487,11 +3487,9 @@ def installPreInspection(version):
 
 def uninstallPreInspection(version):
     data_dir = getDataDir()
-    if os.path.exists(data_dir):
-        stop(version)
-    else:
+    if not os.path.exists(data_dir):
         return 'ok'
-
+    stop(version)
     if mw.isDebugMode():
         return 'ok'
 
