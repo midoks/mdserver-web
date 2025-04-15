@@ -52,12 +52,13 @@ Install_App(){
 	fi
 
 
-	if [ ! -f $serverPath/source/op_waf/lsqlite3_v096.zip ];then
-		wget --no-check-certificate -O $serverPath/source/op_waf/lsqlite3_v096.zip http://lua.sqlite.org/home/zip/lsqlite3_v096.zip?uuid=v0.9.6
+	if [ ! -f $serverPath/source/op_waf/lsqlite3_fsl09y.zip ];then
+		wget --no-check-certificate -O $serverPath/source/op_waf/lsqlite3_fsl09y.zip http://lua.sqlite.org/index.cgi/zip/lsqlite3_fsl09y.zip?uuid=fsl_9y
+		cd $serverPath/source/op_waf && unzip lsqlite3_fsl09y.zip
 	fi
 
-	if [ ! -d $serverPath/source/op_waf/lsqlite3_v096 ];then
-		cd $serverPath/source/op_waf && unzip lsqlite3_v096.zip
+	if [ ! -d $serverPath/source/op_waf/lsqlite3_fsl09y ];then
+		cd $serverPath/source/op_waf && unzip lsqlite3_fsl09y.zip
 	fi
 
 	PATH=${serverPath}/openresty/luajit:${serverPath}/openresty/luajit/include/luajit-2.1:$PATH
@@ -65,7 +66,7 @@ Install_App(){
 
 	if [ ! -f $serverPath/op_waf/waf/conf/lsqlite3.so ];then
 		if [ "${sys_os}" == "Darwin" ];then
-			cd $serverPath/source/op_waf/lsqlite3_v096
+			cd $serverPath/source/op_waf/lsqlite3_fsl09y
 			find_cfg=`cat Makefile | grep 'SQLITE_DIR'`
 			if [ "$find_cfg" == "" ];then
 				LIB_SQLITE_DIR=`brew info sqlite | grep /usr/local/Cellar/sqlite | cut -d \  -f 1 | awk 'END {print}'`
@@ -74,7 +75,7 @@ Install_App(){
 			fi
 			make
 		else
-			cd $serverPath/source/op_waf/lsqlite3_v096 && make
+			cd $serverPath/source/op_waf/lsqlite3_fsl09y && make
 		fi
 	fi
 

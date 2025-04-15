@@ -436,18 +436,22 @@ def runInfo():
         data['Waiting'] = tmp[15]
         return mw.getJson(data)
     except Exception as e:
-        url = 'http://' + mw.getHostAddr() + ':%s/nginx_status' % port
-        result = mw.httpGet(url)
-        tmp = result.split()
-        data = {}
-        data['active'] = tmp[2]
-        data['accepts'] = tmp[9]
-        data['handled'] = tmp[7]
-        data['requests'] = tmp[8]
-        data['Reading'] = tmp[11]
-        data['Writing'] = tmp[13]
-        data['Waiting'] = tmp[15]
-        return mw.getJson(data)
+        try:
+            url = 'http://' + mw.getHostAddr() + ':%s/nginx_status' % port
+            result = mw.httpGet(url)
+            tmp = result.split()
+            data = {}
+            data['active'] = tmp[2]
+            data['accepts'] = tmp[9]
+            data['handled'] = tmp[7]
+            data['requests'] = tmp[8]
+            data['Reading'] = tmp[11]
+            data['Writing'] = tmp[13]
+            data['Waiting'] = tmp[15]
+            return mw.getJson(data)
+        except Exception as e:
+            return mw.returnJson(False, "oprenresty异常!")
+        
     except Exception as e:
         return mw.returnJson(False, "oprenresty not started!")
 
