@@ -25,6 +25,7 @@ fi
 
 # /www/server/openresty/luajit/bin/luajit /www/server/op_waf/waf/lua/waf_common.lua
 # /www/server/openresty/luajit/bin/luajit -bl /www/server/op_waf/waf/lua/waf_common.lua
+# /www/server/openresty/luajit/bin/luajit /www/server/web_conf/nginx/lua/access_by_lua_file.lua
 
 
 Install_App(){
