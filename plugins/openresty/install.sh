@@ -5,6 +5,8 @@ export PATH
 # cd /Users/midoks/Desktop/mwdev/server/mdserver-web/plugins/openresty && bash install.sh install 1.21.4
 # cd /www/server/mdserver-web/plugins/openresty && bash install.sh install 1.21.4
 
+# cd /www/server/mdserver-web && python3 plugins/openresty/index.py run_info
+
 curPath=`pwd`
 rootPath=$(dirname "$curPath")
 rootPath=$(dirname "$rootPath")

@@ -23,6 +23,9 @@ else
 	BAK=''
 fi
 
+# /www/server/openresty/luajit/bin/luajit /www/server/op_waf/waf/lua/waf_common.lua
+# /www/server/openresty/luajit/bin/luajit -bl /www/server/op_waf/waf/lua/waf_common.lua
+
 
 Install_App(){
 	
