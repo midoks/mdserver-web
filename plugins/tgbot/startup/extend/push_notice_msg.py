@@ -62,7 +62,7 @@ def send_msg(bot, tag='ad', trigger_time=300):
     keyboard = [
         [
             types.InlineKeyboardButton(
-                text="跨链混币器Cce.Cash💰低手续费💰隔断溯源", url='https://cce.cash/#/main/home?MW')
+                text="跨链混币器Cce.Cash💰低手续费💰隔断溯源", url='https://cce.cash/exchange?s=_midoks')
         ],
         [
             types.InlineKeyboardButton(
