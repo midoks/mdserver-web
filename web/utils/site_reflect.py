@@ -19,11 +19,14 @@ import multiprocessing
 import core.mw as mw
 import thisdb
 
-def parse():
-
+def getVhostDir():
 	sdir = mw.getServerDir()
 	nginx_conf = sdir + "/web_conf/nginx"
 	vhosts = nginx_conf+"/vhost"
+	return vhosts
+
+def parse():
+	vhosts = getVhostDir()
 
 	vh_list = os.listdir(vhosts)
 
@@ -39,10 +42,14 @@ def parse():
 			continue
 		vail_list.append(f)
 
-	for vail_f in vail_list:
-		print(vail_f)
+	for vail_domain in vail_list:
+		parseSite(vail_domain)
 
-def parseSite(domain):
-	print(domain)
+def parseSite(d):
+	vhosts = getVhostDir()
+	domain = d.replace(".conf","")
+
+	dconf = vhosts+'/'+domain
+	print(domain,dconf)
 
 	
