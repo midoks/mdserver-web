@@ -20,4 +20,29 @@ import core.mw as mw
 import thisdb
 
 def parse():
-	print('21')
+
+	sdir = mw.getServerDir()
+	nginx_conf = sdir + "/web_conf/nginx"
+	vhosts = nginx_conf+"/vhost"
+
+	vh_list = os.listdir(vhosts)
+
+	vail_list = []
+	for f in vh_list:
+		if f.startswith("0."):
+			continue
+		if f.endswith("_bak"):
+			continue
+		if f.startswith("phpmyadmin"):
+			continue
+		if f.startswith("webstats"):
+			continue
+		vail_list.append(f)
+
+	for vail_f in vail_list:
+		print(vail_f)
+
+def parseSite(domain):
+	print(domain)
+
+	
