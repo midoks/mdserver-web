@@ -42,12 +42,12 @@ def getServerName(content):
 	return []
 
 def addDomain(site_id, site_name, domain):
+	# print(site_id, site_name, domain)
 	d = domain.split(':')
 	port = '80'
 	name = d[0]
 	if len(d) == 2:
 		port = d[1]
-
 	if thisdb.checkSitesDomainIsExist(name, port):
 		print('您添加的域名[{}:{}],已使用。请仔细检查!'.format(name, port))
 		return True
@@ -82,8 +82,6 @@ def parseSite(d):
 	root_dir = getRootDir(content)
 	sn_list = getServerName(content)
 
-	# print(domain,dconf)
-	# print(sn_list)
 	if thisdb.isSitesExist(domain):
 		print('您添加的站点[%s]已存在!' % domain)
 	else:
@@ -92,4 +90,4 @@ def parseSite(d):
 	site_id = info['id']
 
 	for sn in sn_list:
-		addDomain(site_id, d, domain)
+		addDomain(site_id, d, sn)
