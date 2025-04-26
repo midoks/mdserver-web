@@ -25,11 +25,42 @@ def getVhostDir():
 	vhosts = nginx_conf+"/vhost"
 	return vhosts
 
+def getRootDir(content):
+	pattern = r'\s*root\s*(.+);'
+	match = re.search(pattern, content)
+	if match:
+		return match.group(1)
+	return ''
+
+def getServerName(content):
+	pattern = r'\s*server_name\s*(.+);'
+	match = re.search(pattern, content)
+	if match:
+		content = match.group(1)
+		clist = content.strip().split(" ");
+		return clist
+	return []
+
+def addDomain(site_id, site_name, domain):
+	d = domain.split(':')
+	port = '80'
+	name = d[0]
+	if len(d) == 2:
+		port = d[1]
+
+	if thisdb.checkSitesDomainIsExist(name, port):
+		print('您添加的域名[{}:{}],已使用。请仔细检查!'.format(name, port))
+		return True
+
+	msg = mw.getInfo('网站[{1}]添加域名[{2}]成功!', (site_name, name))
+	mw.writeLog('网站管理', msg)
+	thisdb.addDomain(site_id, name, port)
+
+	return True
+
 def parse():
 	vhosts = getVhostDir()
-
 	vh_list = os.listdir(vhosts)
-
 	vail_list = []
 	for f in vh_list:
 		if f.startswith("0."):
@@ -49,7 +80,20 @@ def parseSite(d):
 	vhosts = getVhostDir()
 	domain = d.replace(".conf","")
 
-	dconf = vhosts+'/'+domain
-	print(domain,dconf)
+	dconf = vhosts + '/' + d
+	content = mw.readFile(dconf)
 
-	
+	root_dir = getRootDir(content)
+	sn_list = getServerName(content)
+
+	# print(domain,dconf)
+	# print(sn_list)
+	if thisdb.isSitesExist(domain):
+		print('您添加的站点[%s]已存在!' % domain)
+	else:
+		thisdb.addSites(domain, root_dir)
+	info = thisdb.getSitesByName(domain)
+	site_id = info['id']
+
+	for sn in sn_list:
+		addDomain(site_id, d, domain)
