@@ -51,11 +51,7 @@ def addDomain(site_id, site_name, domain):
 	if thisdb.checkSitesDomainIsExist(name, port):
 		print('您添加的域名[{}:{}],已使用。请仔细检查!'.format(name, port))
 		return True
-
-	msg = mw.getInfo('网站[{1}]添加域名[{2}]成功!', (site_name, name))
-	mw.writeLog('网站管理', msg)
 	thisdb.addDomain(site_id, name, port)
-
 	return True
 
 def parse():
