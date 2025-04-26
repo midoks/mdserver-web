@@ -75,6 +75,7 @@ def mwcli(mw_input=0):
             '(26)   关闭二次验证',
             '(27)   查看防火墙信息',
             '(28)   自动识别防火墙端口到面板',
+            '(29)   自动识别配置站点信息',
             '(100)  开启PHP52显示',
             '(101)  关闭PHP52显示',
             '(200)  切换Linux系统软件源',
@@ -102,7 +103,7 @@ def mwcli(mw_input=0):
     nums = [
         1, 2, 3, 4, 5, 6, 7,
         10, 11, 12, 13, 14, 15,
-        20, 21, 22, 23, 24, 25, 26, 27, 28,
+        20, 21, 22, 23, 24, 25, 26, 27, 28, 29,
         100, 101, 
         200, 201
     ]
@@ -238,6 +239,10 @@ def mwcli(mw_input=0):
     elif mw_input == 28:
         MwFirewall.instance().aIF()
         mw.echoInfo("执行自动识别防火墙端口到面板成功!")
+    elif mw_input == 29:
+        from utils.site_reflect import parse as MwParse
+        MwParse()
+        mw.echoInfo("自动识别配置站点信息成功!")
     elif mw_input == 100:
         php_conf = panel_dir + '/plugins/php/info.json'
         if os.path.exists(php_conf):
