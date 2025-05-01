@@ -128,6 +128,9 @@ def cronRunLog():
 def systemRunLog():
     return '/var/log/syslog'
 
+def showHosts():
+    return '/etc/hosts'
+
 if __name__ == "__main__":
     func = sys.argv[1]
     if func == 'status':
@@ -154,5 +157,7 @@ if __name__ == "__main__":
         print(cronRunLog())
     elif func == 'sys_run_log':
         print(systemRunLog())
+    elif func == 'hosts':
+        print(showHosts())
     else:
         print('err')
