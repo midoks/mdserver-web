@@ -122,6 +122,8 @@ def msgRunLog():
 def cronRunLog():
     if os.path.exists('/var/log/syslog.log'):
         return '/var/log/syslog.log'
+    if os.path.exists('/var/log/syslog'):
+        return '/var/log/syslog'
     return '/var/log/cron'
 
 
