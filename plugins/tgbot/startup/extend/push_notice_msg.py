@@ -69,10 +69,6 @@ def send_msg(bot, tag='ad', trigger_time=300):
         ],
         [
             types.InlineKeyboardButton(
-                text="🚀 综合包网/NG接口开户", url='https://t.me/NG_Tony')
-        ],
-        [
-            types.InlineKeyboardButton(
                 text="代付-代实名-备案域名-国际云服务器", url='https://t.me/gjgzs2022')
         ],
         [
