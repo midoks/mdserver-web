@@ -56,7 +56,6 @@ def send_msg(bot, tag='ad', trigger_time=300):
 
     # 跨链混币器Cce.Cash💰低手续费💰隔断溯源 | 10/m | next,6/10 | @hu ge
     # https://t.me/gjgzs2022 ｜ 22/m | @GJ_gzs
-    # 综合包网/NG接口开户 | 28/m | 6m | next,4/28 | x
     # 实名认证/过人脸🕵️‍♀️各种账号处理✅ | 30/m| next,6/30 | @nngzs
     # 桃花资源采集| 13/m| next,7/13 | @xiaolizi1122
     keyboard = [
@@ -76,10 +75,6 @@ def send_msg(bot, tag='ad', trigger_time=300):
             types.InlineKeyboardButton(
                 text="代付-代实名-备案域名-国际云服务器", url='https://t.me/gjgzs2022')
         ],
-        # [
-        #     types.InlineKeyboardButton(
-        #         text="🚀腾云机场|解锁流媒体和ChatGPT", url='https://www.tencloud.net/index.php#/register?code=OGvXSTsc')
-        # ],
         [
             types.InlineKeyboardButton(
                 text="实名认证/过人脸🕵️‍♀️各种账号处理✅", url='https://t.me/niuniu234')
