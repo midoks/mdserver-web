@@ -24,6 +24,13 @@ else
 	echo "openresty alreay exist!"
 fi
 
+# redis
+if [ ! -d /www/server/redis ];then
+	cd /www/server/mdserver-web/plugins/redis && bash install.sh install 7.4.3
+else
+	echo "redis alreay exist!"
+fi
+
 
 # php
 if [ ! -d /www/server/php/71 ];then
