@@ -140,11 +140,14 @@ def uncompress(sfile, dfile, path):
     if suffix_gz == tar_gz:
         extension = suffix_gz
 
-    if not extension in ['tar.gz', 'gz', 'zip', 'rar']:
+    if not extension in ['tar.gz', 'gz', 'zip', 'rar', '7z']:
         return mw.returnData(False, '现在仅支持gz,zip,rar格式解压!')
 
-    if mw.isAppleSystem() and extension == 'rar':
-        return mw.returnData(False, 'macosx暂时不支持rar格式解压')
+    if extension == 'rar' and not mw.checkBinExist('rar'):
+        return mw.returnData(False, 'rar解压命令不存在，请安装!')
+    if extension == '7z' and not mw.checkBinExist('7z'):
+        return mw.returnData(False, '7z解药命令不存在，请安装!')
+
 
     cmd = "cd " + path + " "
     try:
@@ -152,14 +155,17 @@ def uncompress(sfile, dfile, path):
         if extension == 'zip':
             cmd += "&& unzip -o -d '" + dfile + "' '" + sfile + "' > " + tmps + " 2>&1 &"
             mw.execShell(cmd)
-        if extension == 'tar.gz':
+        elif extension == 'tar.gz':
             cmd += "&& tar -zxvf " + sfile + " -C " + dfile + " > " + tmps + " 2>&1 &"
             mw.execShell(cmd)
-        if extension == 'gz':
+        elif extension == 'gz':
             cmd += "&& gunzip -k " + sfile + " > " + tmps + " 2>&1 &"
             mw.execShell(cmd)
-        if extension == 'rar':
+        elif extension == 'rar':
             cmd +=  "&& unrar x " + sfile + " " + dfile + " > " + tmps + " 2>&1 &"
+            mw.execShell(cmd)
+        elif extension == '7z':
+            cmd +=  "&& 7z x " + sfile + " -r -o" + dfile + " > " + tmps + " 2>&1 &"
             mw.execShell(cmd)
 
         if os.path.exists(dfile):
@@ -286,8 +292,13 @@ def zip(sfile, dfile, stype, path):
     try:
         tmps = mw.getPanelDir() + '/logs/panel_exec.log'
         if stype == 'zip':
-            mw.execShell("cd '" + path + "' && zip '" + dfile +
-                         "' -r '" + sfile + "' > " + tmps + " 2>&1")
+            mw.execShell("cd '" + path + "' && zip '" + dfile + "' -r '" + sfile + "' > " + tmps + " 2>&1")
+        elif stype == '7z':
+            mw.execShell("cd '" + path + "' && 7z a '" + dfile + "' -r '" + sfile + "' > " + tmps + " 2>&1")
+        elif stype == 'tar_gz':
+            mw.execShell("cd '" + path + "' && tar -zcvf '" + dfile + "' " + sfile + " > " + tmps + " 2>&1")
+        elif stype == 'rar':
+            mw.execShell("cd '" + path + "' && rar a '" + dfile + "' '" + sfile + "' > " + tmps + " 2>&1")
         else:
             sfiles = ''
             for sfile in sfile.split(','):
@@ -298,8 +309,8 @@ def zip(sfile, dfile, stype, path):
         setFileAccept(dfile)
         mw.writeLog("文件管理", '文件[{1}]压缩[{2}]成功!', (sfile, dfile))
         return mw.returnData(True, '文件压缩成功!')
-    except:
-        return mw.returnData(False, '文件压缩失败!')
+    except Exception as e:
+        return mw.returnData(False, '文件压缩失败:'+str(e))
 
 def unzip(sfile, dfile, stype, path):
     if not os.path.exists(sfile):

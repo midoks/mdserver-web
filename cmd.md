@@ -4,6 +4,9 @@
 - 面板相关命令
 
 ```
+mw start    | 启动面板服务器
+mw stop     | 停止面板服务器
+mw restart  | 重启面板服务器
 mw default	| 显示登录信息
 mw db 		| 快捷连接MySQL
 mw redis 	| 快捷连接Redis
