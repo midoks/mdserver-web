@@ -450,6 +450,7 @@ function getFiles(Path) {
                         <a class='btlink' href='javascript:;' onclick=\"cutFile('" + rdata.path +"/"+ fmp[0]+ "')\">剪切</a> | \
                         <a class='btlink' href='javascript:;' onclick=\"reName(0,'" + fmp[0] + "');\">重命名</a> | \
                         <a class='btlink' href='javascript:;' onclick=\"setChmod(0,'" + rdata.path + "/"+fmp[0] + "');\">权限</a> | \
+                        <a class='btlink' href='javascript:;' onclick=\"zip('" + rdata.path +"/" +fmp[0] + "');\">压缩</a> | \
                         <a class='btlink' href='javascript:;' onclick=\"deleteDir('" + rdata.path +"/"+ fmp[0] + "')\">删除</a></span>\
                     </td>\
                 </tr>";
