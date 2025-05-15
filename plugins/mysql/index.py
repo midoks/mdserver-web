@@ -3504,6 +3504,12 @@ def doFullSyncUser(version=''):
         return False
 
     time_s = time.time()
+
+    ssl_mode = '--ssl-mode=DISABLED'
+    if pk_version.parse(version) > pk_version.parse("8.0"):
+        ssl_mode = '--ssl-mode=REQUIRED'
+
+
     if not os.path.exists(bak_file):
         dmp_option += ' '
         if mw.inArray(mdb8,version):
@@ -3513,7 +3519,7 @@ def doFullSyncUser(version=''):
             dmp_option += " --master-data=1 --apply-slave-statements --include-master-host-port --compress "
 
         dump_sql_data = getServerDir() + "/bin/mysqldump --single-transaction --default-character-set=utf8mb4 -q " + dmp_option + " -h" + ip + " -P" + \
-            port + " -u" + user + " -p'" + apass + "' --ssl-mode=DISABLED " + sync_db + " > " + bak_file
+            port + " -u" + user + " -p'" + apass + "' " + ssl_mode + " " + sync_db + " > " + bak_file
         print(dump_sql_data)
         time_s = time.time()
         r = mw.execShell(dump_sql_data)
