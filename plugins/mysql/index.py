@@ -3509,7 +3509,6 @@ def doFullSyncUser(version=''):
     if pk_version.parse(version) > pk_version.parse("8.0"):
         ssl_mode = '--ssl-mode=REQUIRED'
 
-
     if not os.path.exists(bak_file):
         dmp_option += ' '
         if mw.inArray(mdb8,version):
