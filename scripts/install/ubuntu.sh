@@ -39,6 +39,7 @@ apt install -y libncurses5
 apt install -y libncurses5-dev
 apt install -y software-properties-common
 apt install -y bzip2
+apt install -y p7zip-full
 
 apt install -y libnuma1
 apt install -y libaio1

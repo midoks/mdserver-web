@@ -69,6 +69,13 @@ def execShell(cmdstring, cwd=None, timeout=None, shell=True):
             error = str(e)
     return (success, error)
 
+def checkBinExist(name):
+    d = execShell('which ' + name)
+    if d[0] != '':
+        return True
+    return False
+
+
 
 def getTracebackInfo():
     import traceback
