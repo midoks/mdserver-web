@@ -2858,8 +2858,11 @@ def initSlaveStatusSyncUser(version=''):
     # print(data)
     pdb = pMysqlDb()
     if len(slave_data) == 1:
-        dlist = pdb.query('show slave status')
-        if len(dlist) > 0:
+        cmd_slave = 'show slave status'
+        if pk_version.parse(version) < pk_version.parse("8.0"):
+            cmd_slave = 'SHOW REPLICA STATUS'
+        dlist = pdb.query(cmd_slave)
+        if dlist and len(dlist) > 0:
             return mw.returnJson(False, '已经初始化好了zz...')
 
     msg = ''
