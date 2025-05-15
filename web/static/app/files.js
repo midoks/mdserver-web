@@ -454,7 +454,6 @@ function getFiles(Path) {
                         <a class='btlink' href='javascript:;' onclick=\"deleteDir('" + rdata.path +"/"+ fmp[0] + "')\">删除</a></span>\
                     </td>\
                 </tr>";
-                // <a class='btlink' href='javascript:;' onclick=\"zip('" + rdata.path +"/" +fmp[0] + "');\">压缩</a> | \
             } else {
                 //图标展示
                 $("#set_icon").addClass("active");
