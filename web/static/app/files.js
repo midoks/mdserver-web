@@ -676,17 +676,9 @@ function getFiles(Path) {
         });
 
         $(".folderBox,.folderBoxTr").mousedown(function(e){
-            // console.log(e);
-            var count = totalFile();
-            if(e.which == 3) {
-                if(count <= 1){
-                    var a = $(this);
-                    var option = rightMenuClick(a.attr("filetype"),a.attr("data-path"),a.find("input").val());
-                    a.contextify(option);
-                } else{
-                    rightMenuClickAll(e);
-                }
-            }
+            var box = $(this);
+            var option = rightMenuClick(box.attr("filetype"),box.attr("data-path"),box.find("input").val());
+            box.contextify(option);
         });
         
         //每页行数
@@ -733,7 +725,7 @@ function bindselect(){
             $(".ui-selectee").find("input").prop("checked", false);
             $(".ui-selecting").find("input").prop("checked", true);
             showSeclect();
-            $("#rmenu").hide()
+            $("#rmenu").hide();
         }
     });
     $("#filesBody,#fileCon").selectable("refresh");
@@ -1739,6 +1731,9 @@ function onAccess(){
     }
 }
 
+function forcePpageRefresh(){
+    location.reload(true);
+}
 
 //右键菜单
 function rightMenuClick(type,path,name){
@@ -1755,8 +1750,7 @@ function rightMenuClick(type,path,name){
         options.items.push({text: lan.files.file_menu_del, onclick: function() {
             deleteDir(path)}
         });
-    }
-    else if(isText(type)){
+    } else if(isText(type)){
         options.items.push({text: lan.files.file_menu_edit, onclick: function() {
             onlineEditFile(0,path);
         }},{text: lan.files.file_menu_down, onclick: function() {
@@ -1764,8 +1758,7 @@ function rightMenuClick(type,path,name){
         }},{ text: lan.files.file_menu_del, onclick: function() {
             deleteFile(path);
         }});
-    }
-    else if(displayZip != -1){
+    } else if(displayZip != -1){
         options.items.push({text: lan.files.file_menu_unzip, onclick: function() {
             unZip(path,displayZip);
         }},{text: lan.files.file_menu_down, onclick: function() {
@@ -1773,8 +1766,7 @@ function rightMenuClick(type,path,name){
         }},{text: lan.files.file_menu_del, onclick: function() {
             deleteFile(path);
         }});
-    }
-    else if(isImage(type)){
+    } else if(isImage(type)){
         options.items.push({text: lan.files.file_menu_img, onclick: function() {
             getImage(path);
         }},{text: lan.files.file_menu_down, onclick: function() {
@@ -1782,14 +1774,17 @@ function rightMenuClick(type,path,name){
         }},{text: lan.files.file_menu_del, onclick: function() {
             deleteFile(path);
         }});
-    }
-    else{
+    } else {
         options.items.push({text: lan.files.file_menu_down, onclick: function() {
             getFileBytes(path);
         }},{text: lan.files.file_menu_del, onclick: function() {
             deleteFile(path);
         }});
     }
+
+    options.items.push({text: '强制刷新页面', onclick: function() {
+        forcePpageRefresh();
+    }});
     return options;
 }
 
@@ -1820,7 +1815,7 @@ function getPathSize(){
 }
 
 $("body").not(".def-log").click(function(){
-    $("#rmenu").hide()
+    $("#rmenu").hide();
 });
 
 //指定路径
