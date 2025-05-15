@@ -295,13 +295,13 @@ def zip(sfile, dfile, stype, path):
             mw.execShell("cd '" + path + "' && zip '" + dfile + "' -r '" + sfile + "' > " + tmps + " 2>&1")
         elif stype == '7z':
             if not mw.checkBinExist('7z'):
-                return mw.returnData(False, '7z解压命令不存在，请安装!')
+                return mw.returnData(False, '7z压缩命令不存在，请安装!')
             mw.execShell("cd '" + path + "' && 7z a '" + dfile + "' -r '" + sfile + "' > " + tmps + " 2>&1")
         elif stype == 'tar_gz':
             mw.execShell("cd '" + path + "' && tar -zcvf '" + dfile + "' " + sfile + " > " + tmps + " 2>&1")
         elif stype == 'rar':
             if not mw.checkBinExist('rar'):
-                return mw.returnData(False, 'rar解压命令不存在，请安装!')
+                return mw.returnData(False, 'rar压缩命令不存在，请安装!')
             mw.execShell("cd '" + path + "' && rar a '" + dfile + "' '" + sfile + "' > " + tmps + " 2>&1")
         else:
             sfiles = ''
