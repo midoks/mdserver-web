@@ -2862,7 +2862,7 @@ def initSlaveStatusSyncUser(version=''):
         if pk_version.parse(version) < pk_version.parse("8.0"):
             cmd_slave = 'SHOW REPLICA STATUS'
         dlist = pdb.query(cmd_slave)
-        if len(dlist) > 0:
+        if dlist and len(dlist) > 0:
             return mw.returnJson(False, '已经初始化好了zz...')
 
     msg = ''
