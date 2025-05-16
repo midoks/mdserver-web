@@ -1227,12 +1227,22 @@ function bindPanel(a,type,ip,btid,url,user,pw){
 				var str =$(this).val();
 				var isip = /([\w-]+\.){2,6}\w+/;
 				var iptext = str.match(isip);
-				if(iptext) $("#bttitle").val(iptext[0]);
+				if(iptext) {
+					var bttitle_val = $("#bttitle").val();
+					if (bttitle_val == '') {
+						$("#bttitle").val(iptext[0]);
+					}
+				}
 			}).blur(function(){
 				var str =$(this).val();
 				var isip = /([\w-]+\.){2,6}\w+/;
 				var iptext = str.match(isip);
-				if(iptext) $("#bttitle").val(iptext[0]);
+				if(iptext) {
+					var bttitle_val = $("#bttitle").val();
+					if (bttitle_val == '') {
+						$("#bttitle").val(iptext[0]);
+					}
+				}
 			});
 		}
 	});
