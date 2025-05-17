@@ -129,7 +129,7 @@ def getLog():
 
     logPath = args['path']
 
-    content = mw.getLastLine(logPath, 16)
+    content = mw.getLastLine(logPath, 100)
     return mw.returnJson(True, 'ok', content)
 
 
