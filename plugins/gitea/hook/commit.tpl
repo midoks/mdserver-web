@@ -30,7 +30,8 @@ unset GIT_DIR
 
 
 
-cd $GIT_PROJECT_DIR && git pull
+# cd $GIT_PROJECT_DIR && git pull
+cd $GIT_PROJECT_DIR && sudo git pull
 
 # func 2
 # cd $GIT_PROJECT_DIR && env -i git pull origin master
