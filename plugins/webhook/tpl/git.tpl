@@ -14,6 +14,10 @@ else
 fi
 
 
+if [ ! -d {$ROOT_PATH}/wwwroot/{$REPO} ];then
+	mkdir -p {$ROOT_PATH}/wwwroot/{$REPO}
+fi 
+
 rsync -vauP '--exclude=.*' {$ROOT_PATH}/gitcode/{$REPO}/ {$ROOT_PATH}/wwwroot/{$REPO}
 chown -R www:www {$ROOT_PATH}/wwwroot/{$REPO}
 
