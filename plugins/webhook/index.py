@@ -97,7 +97,30 @@ def addHook():
 
     hook = {}
     hook['title'] = args['title']
-    hook['access_key'] = mw.getRandomString(48)
+    if hook['title'] == '':
+        return mw.returnJson(False, '名称不能为空!')
+
+    hook['access_key'] = mw.md5(hook['title'])
+    hook['count'] = 0
+    hook['addtime'] = int(time.time())
+    hook['uptime'] = 0
+
+    script_dir = getServerDir() + "/scripts"
+    if not os.path.exists(script_dir):
+        os.mkdir(script_dir)
+
+    addCfg(hook)
+    shellFile = script_dir + '/' + hook['access_key']
+    mw.writeFile(shellFile, args['shell'])
+    return mw.returnJson(True, '添加成功!')
+
+def addHookShell(args):
+    if args['title'] == '':
+        return mw.returnJson(False, '名称不能为空!')
+
+    hook = {}
+    hook['title'] = args['title']
+    hook['access_key'] = mw.md5(hook['title'])
     hook['count'] = 0
     hook['addtime'] = int(time.time())
     hook['uptime'] = 0
@@ -129,7 +152,7 @@ def getLog():
 
     logPath = args['path']
 
-    content = mw.getLastLine(logPath, 16)
+    content = mw.getLastLine(logPath, 100)
     return mw.returnJson(True, 'ok', content)
 
 
@@ -154,6 +177,21 @@ def runShellArgs(args):
             mw.writeFile(getCfgFilePath(), json.dumps(data))
             return mw.returnJson(True, '运行成功!')
     return mw.returnJson(False, '指定Hook不存在!')
+
+def getRunShellCmd():
+    args = getArgs()
+    check_arg = checkArgs(args, ['access_key'])
+    if not check_arg[0]:
+        return check_arg[1]
+
+    script_dir = getServerDir() + "/scripts"
+    shellFile = script_dir + '/' + args['access_key']
+    param = ''
+    if 'params' in args:
+        param = args['params']
+    param = re.sub("\"", '', param)
+    cmd = "bash {} {}".format(shellFile, param)
+    return mw.returnJson(True, 'ok', cmd)
 
 
 def runShell():
@@ -191,6 +229,39 @@ def delHook():
     mw.writeFile(jsonFile, json.dumps(newdata))
     return mw.returnJson(True, '删除成功!')
 
+
+def contentReplace(content):
+    service_path = mw.getServerDir()
+    content = content.replace('{$ROOT_PATH}', mw.getFatherDir())
+    return content
+
+
+def configTpl():
+    path = getPluginDir() + '/tpl'
+    pathFile = os.listdir(path)
+    tmp = []
+    for one in pathFile:
+        file = path + '/' + one
+        tmp.append(file)
+    return mw.getJson(tmp)
+
+def readConfigTpl():
+    args = getArgs()
+    data = checkArgs(args, ['file', 'title'])
+    if not data[0]:
+        return data[1]
+
+    if args['title'] == '':
+        return mw.returnJson(False, '名称不能为空!')
+
+    content = mw.readFile(args['file'])
+    content = contentReplace(content)
+
+    content = content.replace('{$REPO}', args['title'])
+    content = content.replace('{$REPO_NAME}', mw.md5(args['title']))
+
+    return mw.returnJson(True, 'ok', content)
+
 if __name__ == "__main__":
     func = sys.argv[1]
     if func == 'status':
@@ -201,9 +272,15 @@ if __name__ == "__main__":
         print(getList())
     elif func == "run_shell":
         print(runShell())
+    elif func == 'run_shell_cmd':
+        print(getRunShellCmd())
     elif func == 'del_hook':
         print(delHook())
     elif func == 'get_log':
         print(getLog())
+    elif func == 'config_tpl':
+        print(configTpl())
+    elif func == 'read_config_tpl':
+        print(readConfigTpl())
     else:
         print('error')
