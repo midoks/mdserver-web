@@ -135,6 +135,9 @@ def systemRunLog():
 def showHosts():
     return '/etc/hosts'
 
+def showResolv():
+    return '/etc/resolv.conf'
+
 if __name__ == "__main__":
     func = sys.argv[1]
     if func == 'status':
@@ -163,5 +166,7 @@ if __name__ == "__main__":
         print(systemRunLog())
     elif func == 'hosts':
         print(showHosts())
+    elif func == 'resolv':
+        print(showResolv())
     else:
         print('err')
