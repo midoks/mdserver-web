@@ -227,6 +227,7 @@ function getHookList(){
                 +'<td>'+mlist[i].count+'</td>'
                 +'<td><a href="javascript:showWebHookCode(\''+mlist[i].url+'\',\''+mlist[i].access_key+'\')" class="btlink">查看密钥</a></td>'
                 +'<td><a href="javascript:runHook(\''+mlist[i].access_key+'\');" class="btlink">测试</a> | '
+                +'<a href="javascript:getRunHookCmd(\''+mlist[i].access_key+'\');" class="btlink">命令</a> | '
                 +'<a href="javascript:onlineEditFile(0,\''+ script_dir + '/'+ mlist[i].access_key+'\',\'sh\');" class="btlink">编辑</a> | '
                 +'<a href="javascript:getLogs(\''+ script_dir + '/' + mlist[i].access_key+'.log\');" class="btlink">日志</a> | '
                 +'<a href="javascript:deleteHook(\''+mlist[i].access_key+'\',\''+ mlist[i].title +'\');" class="btlink">删除</a></td>'
@@ -316,6 +317,36 @@ function runHook(key){
         },{icon:1},2000);
     });
 }
+
+
+function getRunHookCmd(key) {
+    whPost('run_shell_cmd', {"access_key":key}, function(rdata){
+        var rdata = $.parseJSON(rdata.data);
+        if (!rdata.status){
+            layer.msg(rdata.msg,{icon:2});
+        }
+        layer.open({
+            title: "手动执行命令CMD",
+            area: ['600px', '180px'],
+            type:1,
+            closeBtn: 1,
+            shadeClose: false,
+            btn:["复制","取消"],
+            content: '<div class="pd15">\
+                        <div class="divtable">\
+                            <pre class="layui-code">'+rdata.data+'</pre>\
+                        </div>\
+                    </div>',
+            success:function(){
+                copyText(rdata.data);
+            },
+            yes:function(){
+                copyText(rdata.data);
+            }
+        });
+    });
+}
+
 //删除
 function deleteHook(key, title){
     layer.confirm('删除Hook-['+ title +']',{

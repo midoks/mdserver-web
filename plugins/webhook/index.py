@@ -178,6 +178,21 @@ def runShellArgs(args):
             return mw.returnJson(True, '运行成功!')
     return mw.returnJson(False, '指定Hook不存在!')
 
+def getRunShellCmd():
+    args = getArgs()
+    check_arg = checkArgs(args, ['access_key'])
+    if not check_arg[0]:
+        return check_arg[1]
+
+    script_dir = getServerDir() + "/scripts"
+    shellFile = script_dir + '/' + args['access_key']
+    param = ''
+    if 'params' in args:
+        param = args['params']
+    param = re.sub("\"", '', param)
+    cmd = "bash {} {}".format(shellFile, param)
+    return mw.returnJson(True, 'ok', cmd)
+
 
 def runShell():
     args = getArgs()
@@ -257,6 +272,8 @@ if __name__ == "__main__":
         print(getList())
     elif func == "run_shell":
         print(runShell())
+    elif func == 'run_shell_cmd':
+        print(getRunShellCmd())
     elif func == 'del_hook':
         print(delHook())
     elif func == 'get_log':
