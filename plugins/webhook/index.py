@@ -114,6 +114,26 @@ def addHook():
     mw.writeFile(shellFile, args['shell'])
     return mw.returnJson(True, '添加成功!')
 
+def addHookShell(args):
+    if args['title'] == '':
+        return mw.returnJson(False, '名称不能为空!')
+
+    hook = {}
+    hook['title'] = args['title']
+    hook['access_key'] = mw.md5(hook['title'])
+    hook['count'] = 0
+    hook['addtime'] = int(time.time())
+    hook['uptime'] = 0
+
+    script_dir = getServerDir() + "/scripts"
+    if not os.path.exists(script_dir):
+        os.mkdir(script_dir)
+
+    addCfg(hook)
+    shellFile = script_dir + '/' + hook['access_key']
+    mw.writeFile(shellFile, args['shell'])
+    return mw.returnJson(True, '添加成功!')
+
 
 def getList():
     data = getCfg()

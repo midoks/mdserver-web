@@ -154,7 +154,7 @@ function addHook(){
                         layer.close(loadT);
                         var rdata = $.parseJSON(data.data);
                         if (!rdata.status){
-                            layer.msg(rdata.msg,{icon:0,time:2000,shade: [5, '#000']});
+                            layer.msg(rdata.msg,{icon:16,time:2000,shade: [5, '#000']});
                             return;
                         }
 
@@ -186,7 +186,19 @@ function addHook(){
               title: $("#hook_title").val(),
               shell: whEditor.getValue(),
             }
-            whPost('add_hook', data, function(rdata){
+            // whPost('add_hook', data, function(rdata){
+            //     var rdata = $.parseJSON(rdata.data);
+            //     if (!rdata.status){
+            //         layer.msg(rdata.msg,{icon:2});
+            //         return;
+            //     }
+            //     layer.close(indexs);
+            //     showMsg(rdata.msg, function(){
+            //         getHookList();
+            //     }, {icon:1}, 2000);
+            // });
+
+            whPostCallbak('addHookShell', '', data, function(rdata){
                 var rdata = $.parseJSON(rdata.data);
                 if (!rdata.status){
                     layer.msg(rdata.msg,{icon:2});
