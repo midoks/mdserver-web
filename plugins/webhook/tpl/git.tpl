@@ -7,12 +7,15 @@ git config --global credential.helper store
 git config --global pull.rebase false
 
 
+if [ ! -d {$ROOT_PATH}/gitcode ];then
+	mkdir -p {$ROOT_PATH}/gitcode
+fi 
+
 if [ -d {$ROOT_PATH}/gitcode/{$REPO} ];then
 	cd {$ROOT_PATH}/gitcode/{$REPO} && sudo git pull
 else
-	git clone http://0.0.0.0:6660/xx/{$REPO}
+	cd {$ROOT_PATH}/gitcode && git clone http://0.0.0.0:6660/xx/{$REPO}
 fi
-
 
 if [ ! -d {$ROOT_PATH}/wwwroot/{$REPO} ];then
 	mkdir -p {$ROOT_PATH}/wwwroot/{$REPO}
