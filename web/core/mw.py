@@ -1328,8 +1328,8 @@ def getAcmeDir():
         cmd = "who | sed -n '2, 1p' |awk '{print $1}'"
         user = execShell(cmd)[0].strip()
         acme = '/Users/' + user + '/.acme.sh'
-    if not os.path.exists(acme):
-        acme = '/.acme.sh'
+    # if not os.path.exists(acme):
+    #     acme = '/.acme.sh'
     return acme
 
 
