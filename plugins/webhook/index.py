@@ -97,7 +97,10 @@ def addHook():
 
     hook = {}
     hook['title'] = args['title']
-    hook['access_key'] = mw.getRandomString(48)
+    if hook['title'] == '':
+        return mw.returnJson(False, '名称不能为空!')
+
+    hook['access_key'] = mw.md5(hook['title'])
     hook['count'] = 0
     hook['addtime'] = int(time.time())
     hook['uptime'] = 0
@@ -191,6 +194,39 @@ def delHook():
     mw.writeFile(jsonFile, json.dumps(newdata))
     return mw.returnJson(True, '删除成功!')
 
+
+def contentReplace(content):
+    service_path = mw.getServerDir()
+    content = content.replace('{$ROOT_PATH}', mw.getFatherDir())
+    return content
+
+
+def configTpl():
+    path = getPluginDir() + '/tpl'
+    pathFile = os.listdir(path)
+    tmp = []
+    for one in pathFile:
+        file = path + '/' + one
+        tmp.append(file)
+    return mw.getJson(tmp)
+
+def readConfigTpl():
+    args = getArgs()
+    data = checkArgs(args, ['file', 'title'])
+    if not data[0]:
+        return data[1]
+
+    if args['title'] == '':
+        return mw.returnJson(False, '名称不能为空!')
+
+    content = mw.readFile(args['file'])
+    content = contentReplace(content)
+
+    content = content.replace('{$REPO}', args['title'])
+    content = content.replace('{$REPO_NAME}', mw.md5(args['title']))
+
+    return mw.returnJson(True, 'ok', content)
+
 if __name__ == "__main__":
     func = sys.argv[1]
     if func == 'status':
@@ -205,5 +241,9 @@ if __name__ == "__main__":
         print(delHook())
     elif func == 'get_log':
         print(getLog())
+    elif func == 'config_tpl':
+        print(configTpl())
+    elif func == 'read_config_tpl':
+        print(readConfigTpl())
     else:
         print('error')

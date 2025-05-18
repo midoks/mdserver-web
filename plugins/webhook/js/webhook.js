@@ -26,7 +26,6 @@ function whPost(method, args,callback){
     },'json'); 
 }
 
-
 function whPostNoMessage(method, args,callback){
 
     var req_data = {};
@@ -79,29 +78,43 @@ function whPostCallbak(method, version, args,callback){
     },'json'); 
 }
 
+function getFileName(file){
+    var list = file.split('/');
+    var f = list[list.length-1];
+    return f;
+}
+
 var whEditor = null;
 
 //添加
 function addHook(){
     layer.open({
         type: 1,
-        area: '600px',
+        area: '650px',
         title: '添加Hook',
-        closeBtn: 1,
+        closeBtn: 2,
         shift: 5,
         shadeClose: false,
         btn:['提交','关闭'],
         content: "<div class='bt-form pd20'>\
                 <div class='line'>\
-                <span class='tname'>名称</span>\
-                <div class='info-r'><input class='bt-input-text' placeholder='Hook名称' type='text' id='hook_title' name='title' style='width:380px' /></div>\
+                    <span class='tname'>名称</span>\
+                    <div class='info-r'><input class='bt-input-text' placeholder='Hook名称' type='text' id='hook_title' name='title' style='width:380px' /></div>\
                 </div>\
                 <div class='line'>\
-                <span class='tname'>执行脚本</span>\
-                <div class='info-r'>\
-                    <textarea id='hook_shell' style='width:380px; height:300px;border:1px solid #ccc;font-size:15px'></textarea>\
+                    <span class='tname'>执行脚本</span>\
+                    <div class='info-r'>\
+                        <textarea id='hook_shell' style='width:380px; height:300px;border:1px solid #ccc;font-size:15px'></textarea>\
+                    </div>\
                 </div>\
-            </div>\
+                <div class='line'>\
+                    <span class='tname'>模板选择</span>\
+                    <div class='info-r'>\
+                        <select class='bt-input-text' id='hook_tpl'>\
+                            <option value='0'>无</option>\
+                        </select>\
+                    </div>\
+                </div>\
           </div>",
         success:function(){
 
@@ -121,6 +134,51 @@ function addHook(){
 
             $(".CodeMirror-scroll").css({"height":"300px","margin":0,"padding":0});
             whEditor.focus();
+
+
+            whPostNoMessage('config_tpl','', function(data){
+                var rdata = $.parseJSON(data.data);
+                for (var i = 0; i < rdata.length; i++) {
+                    $('#hook_tpl').append('<option value="'+rdata[i]+'"">'+getFileName(rdata[i])+'</option>');
+                }
+
+                $('#hook_tpl').change(function(){
+                    var selected = $(this).val();
+                    if (selected == '0') {
+                        return;
+                    }
+
+                    var title = $('#hook_title').val();
+                    var loadT = layer.msg('配置模版获取中...',{icon:16,time:0,shade: [0.3, '#000']});
+                    whPostNoMessage('read_config_tpl', {file:selected,title:title}, function(data){
+                        layer.close(loadT);
+                        var rdata = $.parseJSON(data.data);
+                        if (!rdata.status){
+                            layer.msg(rdata.msg,{icon:0,time:2000,shade: [5, '#000']});
+                            return;
+                        }
+
+                        $("#hook_shell").empty().text(rdata.data);
+                        $(".CodeMirror").remove();
+                        whEditor = CodeMirror.fromTextArea(document.getElementById("hook_shell"), {
+                            extraKeys: {
+                                "Ctrl-Space": "autocomplete",
+                                "Ctrl-F": "findPersistent",
+                                "Ctrl-H": "replaceAll",
+                                "Ctrl-S": function() {}
+                            },
+                            lineNumbers: true,
+                            matchBrackets:true,
+                            mode:"sh",
+                        });
+
+                        $(".CodeMirror-scroll").css({"height":"300px","margin":0,"padding":0});
+                        whEditor.focus();
+
+                    });
+                });
+            });
+
         },
         yes:function(indexs){
             var loadT = layer.msg("提交中...",{icon:16,time:0});
