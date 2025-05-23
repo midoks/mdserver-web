@@ -68,6 +68,8 @@ class ssh_local(object):
 
         port = mw.getSSHPort()
         try:
+            ssh.connect('127.0.0.1', 22, timeout=5)
+        except Exception as e:
             ssh.connect('127.0.0.1', port, timeout=5)
         except Exception as e:
             ssh.connect('localhost', port, timeout=5)
