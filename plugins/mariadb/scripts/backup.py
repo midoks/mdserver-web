@@ -12,15 +12,19 @@ if sys.platform != 'darwin':
     os.chdir('/www/server/mdserver-web')
 
 
-chdir = os.getcwd()
-sys.path.append(chdir + '/class/core')
+# chdir = os.getcwd()
+# sys.path.append(chdir + '/class/core')
 
 # reload(sys)
 # sys.setdefaultencoding('utf-8')
 
+web_dir = os.getcwd() + "/web"
+if os.path.exists(web_dir):
+    sys.path.append(web_dir)
+    os.chdir(web_dir)
 
-import mw
-import db
+import core.mw as mw
+import core.db as db
 
 
 class backupTools:
