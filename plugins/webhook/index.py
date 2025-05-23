@@ -155,6 +155,12 @@ def getLog():
     content = mw.getLastLine(logPath, 500)
     return mw.returnJson(True, 'ok', content)
 
+def getLogCb(args):
+    # print(args)
+    logPath = args['path']
+    content = mw.getLastLine(logPath, 500)
+    return mw.returnData(True, 'ok', content)
+
 
 def runShellArgs(args):
     data = getCfg()
