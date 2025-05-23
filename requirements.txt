@@ -21,12 +21,12 @@ Flask-SQLAlchemy>=2.5.1
 #Flask-Security-Too==5.5.*; python_version >= '3.10'
 #Flask-Security-Too==5.4.*; python_version <= '3.9'
 pyOpenSSL==23.2.0
-cryptography==40.0.2
+cryptography>=40.0.2
 configparser==5.2.0
-python-engineio==4.3.2
+python-engineio>=4.3.2
 python-socketio>=4.2.0
-flask-socketio==5.2.0
-flask-sockets==0.2.1
+flask-socketio>=5.2.0
+flask-sockets>=0.2.1
 zmq==0.0.0
 paramiko>=2.8.0
 pymongo
