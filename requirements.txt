@@ -24,7 +24,7 @@ pyOpenSSL==23.2.0
 cryptography==40.0.2
 configparser==5.2.0
 python-engineio==4.3.2
-python-socketio==4.2.0
+python-socketio>=4.2.0
 flask-socketio==5.2.0
 flask-sockets==0.2.1
 zmq==0.0.0
