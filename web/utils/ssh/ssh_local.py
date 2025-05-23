@@ -87,7 +87,7 @@ class ssh_local(object):
         shell = ssh.invoke_shell(term='xterm', width=83, height=21)
         shell.setblocking(0)
 
-        self.__lock = True
+        self.__lock = False
         return shell
 
     def send(self):
