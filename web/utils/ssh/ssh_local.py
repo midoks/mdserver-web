@@ -34,6 +34,7 @@ class ssh_local(object):
     __log_type = 'SSH终端'
 
     __ssh = None
+    __lock = False
 
     # lock
     _instance_lock = threading.Lock()
@@ -61,6 +62,10 @@ class ssh_local(object):
 
 
     def connectSsh(self):
+        if self.__lock :
+            return False
+        self.__lock = True
+
         import paramiko
         ssh = paramiko.SSHClient()
         mw.createSshInfo()
@@ -68,6 +73,8 @@ class ssh_local(object):
 
         port = mw.getSSHPort()
         try:
+            ssh.connect('127.0.0.1', 22, timeout=5)
+        except Exception as e:
             ssh.connect('127.0.0.1', port, timeout=5)
         except Exception as e:
             ssh.connect('localhost', port, timeout=5)
@@ -78,6 +85,8 @@ class ssh_local(object):
 
         shell = ssh.invoke_shell(term='xterm', width=83, height=21)
         shell.setblocking(0)
+
+        self.__lock = False
         return shell
 
     def send(self):
@@ -108,13 +117,16 @@ class ssh_local(object):
         if not self.__ssh:
             self.__ssh = self.connectSsh()
 
-        if self.__ssh.exit_status_ready():
-            self.__ssh = self.connectSsh()
+        if self.__ssh:
+            if self.__ssh.exit_status_ready():
+                self.__ssh = self.connectSsh()
 
-        self.__ssh.send(info)
-        try:
-            time.sleep(0.005)
-            recv = self.__ssh.recv(8192)
-            return self.wsSend(recv)
-        except Exception as ex:
-            return self.wsSend('')
+            self.__ssh.send(info)
+            try:
+                time.sleep(0.005)
+                recv = self.__ssh.recv(8192)
+                return self.wsSend(recv)
+            except Exception as ex:
+                return self.wsSend('')
+        else:
+            return self.wsSend("连接中...\r\n")

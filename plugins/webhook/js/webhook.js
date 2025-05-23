@@ -78,6 +78,30 @@ function whPostCallbak(method, version, args,callback){
     },'json'); 
 }
 
+function whPostCallbakN(method, version, args,callback){
+    var req_data = {};
+    req_data['name'] = 'webhook';
+    req_data['func'] = method;
+    args['version'] = version;
+ 
+    if (typeof(args) == 'string'){
+        req_data['args'] = JSON.stringify(toArrayObject(args));
+    } else {
+        req_data['args'] = JSON.stringify(args);
+    }
+
+    $.post('/plugins/callback', req_data, function(data) {
+        if (!data.status){
+            layer.msg(data.msg,{icon:0,time:2000,shade: [0.3, '#000']});
+            return;
+        }
+
+        if(typeof(callback) == 'function'){
+            callback(data);
+        }
+    },'json'); 
+}
+
 function getFileName(file){
     var list = file.split('/');
     var f = list[list.length-1];
@@ -275,6 +299,23 @@ function getLogsTimer(path,success,error){
     });
 }
 
+function getLogsTimerCb(path,success,error){
+     whPostCallbakN('getLogCb', "", {"path":path}, function(rdata){
+        var rdata = rdata.data;
+        if (!rdata.status){
+            if (typeof(error) == 'function'){
+                error();
+            }
+            return;   
+        }
+
+        $('[name="site_logs"]').text(rdata.data);
+        if (typeof(success) == 'function'){
+            success();
+        }
+    });
+}
+
 //查看日志
 function getLogs(path){
     logs_web = layer.open({
@@ -290,7 +331,7 @@ function getLogs(path){
             $('[name="site_logs"]').scrollTop($('[name="site_logs"]')[0].scrollHeight);
 
             logs_timer = setInterval(function(){
-                getLogsTimer(path,function(){
+                getLogsTimerCb(path,function(){
                 
                 },function(){
                     layer.msg(rdata.msg,{icon:2});

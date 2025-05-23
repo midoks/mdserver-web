@@ -152,8 +152,14 @@ def getLog():
 
     logPath = args['path']
 
-    content = mw.getLastLine(logPath, 100)
+    content = mw.getLastLine(logPath, 500)
     return mw.returnJson(True, 'ok', content)
+
+def getLogCb(args):
+    # print(args)
+    logPath = args['path']
+    content = mw.getLastLine(logPath, 3000)
+    return mw.returnData(True, 'ok', content)
 
 
 def runShellArgs(args):
@@ -190,7 +196,11 @@ def getRunShellCmd():
     if 'params' in args:
         param = args['params']
     param = re.sub("\"", '', param)
-    cmd = "bash {} {}".format(shellFile, param)
+    
+    cmd = ""
+    cmd += "git config --global credential.helper store\n"
+    cmd += "git config --global pull.rebase false\n"
+    cmd += "bash {} {}".format(shellFile, param)
     return mw.returnJson(True, 'ok', cmd)
 
 
