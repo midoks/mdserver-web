@@ -129,4 +129,4 @@ class ssh_local(object):
             except Exception as ex:
                 return self.wsSend('')
         else:
-            return self.wsSend("连接中...\n")
+            return self.wsSend("连接中...\r\n")
