@@ -188,8 +188,6 @@ class ssh_terminal(object):
 
         self.__port = mw.getSSHPort()
         try:
-            self.__ps.connect(self.__host, 22, timeout=10)
-        except Exception as e:
             self.__ps.connect(self.__host, self.__port, timeout=60)
         except Exception as e:
             self.__ps.connect('127.0.0.1', self.__port)
