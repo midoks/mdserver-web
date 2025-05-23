@@ -175,7 +175,15 @@ class ssh_terminal(object):
         else:
             return self.connectBySocket(sid)
 
+    __lock = False
+
     def connectLocalSsh(self, sid):
+
+        if self.__lock :
+            return False
+
+        self.__lock = True
+
         mw.createSshInfo()
         self.__ps = paramiko.SSHClient()
         self.__ps.set_missing_host_key_policy(paramiko.AutoAddPolicy())
@@ -219,6 +227,8 @@ class ssh_terminal(object):
         mw.writeLog(self.__log_type, '成功登录到SSH服务器 [{}:{}]'.format(
             self.__host, self.__port))
         self.debug('local-ssh:通道已构建')
+
+        self.__lock = False
         return self.returnMsg(True, '连接成功!')
 
     def connectBySocket(self, sid):
