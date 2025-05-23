@@ -230,6 +230,9 @@ class ssh_terminal(object):
         return self.returnMsg(True, '连接成功!')
 
     def connectBySocket(self, sid):
+        if self.__lock :
+            return False
+        self.__lock = True
         if not self.__host:
             return self.returnMsg(False, '错误的连接地址')
         if not self.__user:
@@ -338,6 +341,7 @@ class ssh_terminal(object):
         mw.writeLog(self.__log_type, '成功登录到SSH服务器 [{}:{}]'.format(
             self.__host, self.__port))
         self.debug('通道已构建')
+        self.__lock = False
         return self.returnMsg(True, '连接成功.')
 
     def getSshInfo(self, file):
