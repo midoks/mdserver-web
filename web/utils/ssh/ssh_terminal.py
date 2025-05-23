@@ -178,10 +178,8 @@ class ssh_terminal(object):
     __lock = False
 
     def connectLocalSsh(self, sid):
-
         if self.__lock :
             return False
-
         self.__lock = True
 
         mw.createSshInfo()

@@ -64,7 +64,6 @@ class ssh_local(object):
     def connectSsh(self):
         if self.__lock :
             return False
-
         self.__lock = True
 
         import paramiko
