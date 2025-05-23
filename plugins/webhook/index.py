@@ -158,7 +158,7 @@ def getLog():
 def getLogCb(args):
     # print(args)
     logPath = args['path']
-    content = mw.getLastLine(logPath, 1000)
+    content = mw.getLastLine(logPath, 3000)
     return mw.returnData(True, 'ok', content)
 
 
