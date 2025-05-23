@@ -3,6 +3,7 @@ echo "" > {$ROOT_PATH}/server/webhook/scripts/{$REPO_NAME}.log
 export HOME=/tmp
 date "+%Y-%m-%d %H:%M:%S"
 
+# 和手动命令一起执行
 git config --global credential.helper store
 git config --global pull.rebase false
 
