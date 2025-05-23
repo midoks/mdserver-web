@@ -34,6 +34,7 @@ class ssh_local(object):
     __log_type = 'SSH终端'
 
     __ssh = None
+    __lock = False
 
     # lock
     _instance_lock = threading.Lock()
@@ -61,6 +62,11 @@ class ssh_local(object):
 
 
     def connectSsh(self):
+        if self.__lock :
+            return False
+
+        self.__lock = True
+
         import paramiko
         ssh = paramiko.SSHClient()
         mw.createSshInfo()
@@ -80,6 +86,8 @@ class ssh_local(object):
 
         shell = ssh.invoke_shell(term='xterm', width=83, height=21)
         shell.setblocking(0)
+
+        self.__lock = True
         return shell
 
     def send(self):
