@@ -117,14 +117,17 @@ class ssh_local(object):
         if not self.__ssh:
             self.__ssh = self.connectSsh()
 
-        if hasattr(self.__ssh, 'exit_status_ready'):
-            if self.__ssh.exit_status_ready():
-                self.__ssh = self.connectSsh()
+        if self.__ssh:
+            if hasattr(self.__ssh, 'exit_status_ready'):
+                if self.__ssh.exit_status_ready():
+                    self.__ssh = self.connectSsh()
 
-        self.__ssh.send(info)
-        try:
-            time.sleep(0.005)
-            recv = self.__ssh.recv(8192)
-            return self.wsSend(recv)
-        except Exception as ex:
-            return self.wsSend('')
+            self.__ssh.send(info)
+            try:
+                time.sleep(0.005)
+                recv = self.__ssh.recv(8192)
+                return self.wsSend(recv)
+            except Exception as ex:
+                return self.wsSend('')
+        else:
+            return self.wsSend('连接中...')
