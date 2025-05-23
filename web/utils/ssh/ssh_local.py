@@ -118,9 +118,8 @@ class ssh_local(object):
             self.__ssh = self.connectSsh()
 
         if self.__ssh:
-            if hasattr(self.__ssh, 'exit_status_ready'):
-                if self.__ssh.exit_status_ready():
-                    self.__ssh = self.connectSsh()
+            if self.__ssh.exit_status_ready():
+                self.__ssh = self.connectSsh()
 
             self.__ssh.send(info)
             try:
