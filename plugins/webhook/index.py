@@ -196,7 +196,11 @@ def getRunShellCmd():
     if 'params' in args:
         param = args['params']
     param = re.sub("\"", '', param)
-    cmd = "bash {} {}".format(shellFile, param)
+    
+    cmd = ""
+    cmd += "git config --global credential.helper store\n"
+    cmd += "git config --global pull.rebase false\n"
+    cmd += "bash {} {}".format(shellFile, param)
     return mw.returnJson(True, 'ok', cmd)
 
 
