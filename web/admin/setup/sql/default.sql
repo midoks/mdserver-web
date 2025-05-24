@@ -15,7 +15,6 @@ CREATE TABLE IF NOT EXISTS `binding` (
   `port` INTEGER,
   `domain` TEXT,
   `path` TEXT,
-  `main` INTEGER DEFAULT '0',
   `add_time` TEXT
 );
 
