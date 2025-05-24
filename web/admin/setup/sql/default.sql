@@ -84,13 +84,16 @@ CREATE TABLE IF NOT EXISTS `site_types` (
 );
 CREATE UNIQUE INDEX site_types_name_idx ON site_types(name);
 
+
 CREATE TABLE IF NOT EXISTS `domain` (
   `id` INTEGER PRIMARY KEY AUTOINCREMENT,
   `pid` INTEGER,
   `name` TEXT,
   `port` INTEGER,
+  `main` INTEGER DEFAULT '0',
   `add_time` TEXT
 );
+ALTER TABLE `domain` ADD COLUMN `main` INTEGER DEFAULT '0';
 
 CREATE TABLE IF NOT EXISTS `users` (
   `id` INTEGER PRIMARY KEY AUTOINCREMENT,

@@ -1029,13 +1029,14 @@ function webEdit(id,website,endTime,addtime){
 	// <p onclick='dirBinding("+id+")'>子目录绑定</p>\
 	layer.open({
 		type: 1,
-		area: ['700px','570px'],
+		area: ['700px','603px'],
 		title: '站点修改['+website+']  --  添加时间['+addtime+']',
 		closeBtn: 1,
 		shift: 0,
 		content: "<div class='bt-form'>\
 			<div class='bt-w-menu pull-left'>\
 				<p class='bgw' onclick=\"domainEdit(" + id + ",'" + website + "')\">域名管理</p>\
+				<p onclick='dirBinding("+id+")'>子目录绑定</p>\
 				<p onclick='webPathEdit("+id+")'>网站目录</p>\
 				<p onclick='limitNet("+id+")'>流量限制</p>\
 				<p onclick=\"rewrite('"+website+"')\">伪静态</p>\
@@ -2118,7 +2119,7 @@ function renderDnsapiHtml(data){
 	var fields_html = '';
 
 	for (var d in fields) {
-		fields_html += "<span class='tname'>"+d+"</span>\
+		fields_html += "<span class='tname tips' data-toggle='tooltip' data-original-title='"+d+"'>"+d+"</span>\
 	    <div class='info-r'>\
 	        <input name='"+d+"' class='bt-input-text mr5' style='width:100%;' value='"+fields[d]+"' type='text'>\
 	    </div>";
@@ -2152,6 +2153,9 @@ function renderDnsapiHtml(data){
 				</div>\
 			</div>\
 		</form>",
+		success:function(){
+			$('[data-toggle="tooltip"]').tooltip();
+		},
         yes:function(index,l) {
             var type_name = $('select[name="type_name"]').val();
             var data_field = {};

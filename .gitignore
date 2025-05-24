@@ -194,3 +194,4 @@ plugins/goedge-happy
 /plugins/flexcdn
 /plugins/tools
 /plugins/choose-linux-python
+*.md5
