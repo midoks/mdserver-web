@@ -14,7 +14,7 @@ SYS_ARCH=`arch`
 
 version=5.6.40
 PHP_VER=56
-
+md5_file_ok=c7dde3afb16ce7b761abf2805125d372
 Install_php()
 {
 #------------------------ install start ------------------------------------#
@@ -47,7 +47,6 @@ if [ ! -d $sourcePath/php/php${PHP_VER} ];then
 	fi
 
 	#检测文件是否损坏.
-	md5_file_ok=c7dde3afb16ce7b761abf2805125d372
 	if [ -f $sourcePath/php/php-${version}.tar.xz ];then
 		md5_file=`md5sum $sourcePath/php/php-${version}.tar.xz  | awk '{print $1}'`
 		if [ "${md5_file}" != "${md5_file_ok}" ]; then

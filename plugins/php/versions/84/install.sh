@@ -11,6 +11,7 @@ sysName=`uname`
 
 version=8.4.7
 PHP_VER=84
+md5_file_ok=e29f4c23be2816ed005aa3f06bbb8eae0f22cc133863862e893515fc841e65e3
 Install_php()
 {
 #------------------------ install start ------------------------------------#
@@ -50,7 +51,6 @@ if [ ! -d $sourcePath/php/php${PHP_VER} ];then
 	fi
 
 	#检测文件是否损坏.
-	md5_file_ok=e29f4c23be2816ed005aa3f06bbb8eae0f22cc133863862e893515fc841e65e3
 	if [ -f $sourcePath/php/php-${version}.tar.xz ];then
 		md5_file=`sha256sum $sourcePath/php/php-${version}.tar.xz  | awk '{print $1}'`
 		if [ "${md5_file}" != "${md5_file_ok}" ]; then

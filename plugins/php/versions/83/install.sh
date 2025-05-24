@@ -11,6 +11,7 @@ sysName=`uname`
 
 version=8.3.21
 PHP_VER=83
+md5_file_ok=4dfb329f209a552c3716394fc123bb62e80a468b55ce27fc8cb0fd5f30b9dcd6
 Install_php()
 {
 #------------------------ install start ------------------------------------#
@@ -48,9 +49,8 @@ if [ ! -d $sourcePath/php/php${PHP_VER} ];then
 	if [ ! -f $sourcePath/php/php-${version}.tar.xz ];then
 		wget --no-check-certificate -O $sourcePath/php/php-${version}.tar.xz https://www.php.net/distributions/php-${version}.tar.xz
 	fi
-
+	
 	#检测文件是否损坏.
-	md5_file_ok=4dfb329f209a552c3716394fc123bb62e80a468b55ce27fc8cb0fd5f30b9dcd6
 	if [ -f $sourcePath/php/php-${version}.tar.xz ];then
 		md5_file=`sha256sum $sourcePath/php/php-${version}.tar.xz  | awk '{print $1}'`
 		if [ "${md5_file}" != "${md5_file_ok}" ]; then

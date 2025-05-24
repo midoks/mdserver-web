@@ -11,6 +11,7 @@ sysName=`uname`
 
 version=7.4.26
 PHP_VER=74
+md5_file_ok=0cbaae3de6c02cf8d7b82843fdfdf53d
 Install_php()
 {
 #------------------------ install start ------------------------------------#
@@ -52,7 +53,6 @@ if [ ! -d $sourcePath/php/php${PHP_VER} ];then
 	fi
 
 	#检测文件是否损坏.
-	md5_file_ok=0cbaae3de6c02cf8d7b82843fdfdf53d
 	if [ -f $sourcePath/php/php-${version}.tar.xz ];then
 		md5_file=`md5sum $sourcePath/php/php-${version}.tar.xz  | awk '{print $1}'`
 		if [ "${md5_file}" != "${md5_file_ok}" ]; then
