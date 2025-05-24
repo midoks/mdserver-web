@@ -22,20 +22,21 @@ import thisdb
 import config
 
 def init():
-	# 检查数据库是否存在。如果没有就创建它。
-	if not os.path.isfile(config.SQLITE_PATH):
-	    # 初始化用户信息
-		thisdb.initPanelData()
-		init_admin_user()
-	    init_option()
-	    init_db_system()
+    # 检查数据库是否存在。如果没有就创建它。
+    if not os.path.isfile(config.SQLITE_PATH):
+        # 初始化用户信息
+        thisdb.initPanelData()
+        init_admin_user()
+        init_option()
+        init_db_system()
 
-	init_cmd()
-	# init_cron()
+    init_cmd()
+    # init_cron()
+    
 
-	# 自动识别防火墙配置
-	firewall_port = thisdb.getOption('setpu_auto_identify_firewall_port', default='no')
-	if firewall_port == 'no':
-		MwFirewall.instance().aIF()
-		thisdb.setOption('setpu_auto_identify_firewall_port', 'yes')
+    # 自动识别防火墙配置
+    firewall_port = thisdb.getOption('setpu_auto_identify_firewall_port', default='no')
+    if firewall_port == 'no':
+        MwFirewall.instance().aIF()
+        thisdb.setOption('setpu_auto_identify_firewall_port', 'yes')
 
