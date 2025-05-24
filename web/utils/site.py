@@ -261,6 +261,10 @@ class sites(object):
         mw.restartWeb()
         return mw.returnData(True, '站点已启用!')
 
+    def nginxAddDomainFilter(self, site_id, site_name, domain, port):
+        self.nginxAddDomain(site_name, domain, port)
+        return True
+
     def nginxAddDomain(self, site_name, domain, port):
         file = self.getHostConf(site_name)
         conf = mw.readFile(file)
@@ -312,7 +316,7 @@ class sites(object):
             if thisdb.checkSitesDomainIsExist(name, port):
                 return mw.returnData(False, '您添加的域名[{}:{}],已使用。请仔细检查!'.format(name, port))
 
-            self.nginxAddDomain(site_name, name, port)
+            self.nginxAddDomainFilter(site_id, site_name, name, port)
 
             msg = mw.getInfo('网站[{1}]添加域名[{2}]成功!', (site_name, name))
             mw.writeLog('网站管理', msg)
