@@ -8,7 +8,7 @@ rootPath=$(dirname "$rootPath")
 serverPath=$(dirname "$rootPath")
 
 # cd /Users/midoks/Desktop/mwdev/server/mdserver-web/plugins/alist && bash install.sh install 3.37.4
-# cd /www/server/mdserver-web/plugins/alist && bash install.sh install 3.37.4
+# cd /www/server/mdserver-web/plugins/alist && bash install.sh install 3.45.0
 
 VERSION=$2
 
@@ -41,7 +41,7 @@ Install_App()
 	ALIST_DIR=$serverPath/source/alist
 
 	if [ ! -f $ALIST_DIR/${FILE_TGZ} ];then
-		wget -O $ALIST_DIR/${FILE_TGZ} https://github.com/alist-org/alist/releases/download/v${VERSION}/${FILE_TGZ}
+		wget --no-check-certificate -O $ALIST_DIR/${FILE_TGZ} https://github.com/alist-org/alist/releases/download/v${VERSION}/${FILE_TGZ}
 	fi
 	
 	mkdir -p $serverPath/alist
