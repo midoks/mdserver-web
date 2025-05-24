@@ -22,12 +22,11 @@ import thisdb
 import config
 
 def init():
-	# 初始化用户信息
-	thisdb.initPanelData()
-
 	# 检查数据库是否存在。如果没有就创建它。
 	if not os.path.isfile(config.SQLITE_PATH):
-	    init_admin_user()
+	    # 初始化用户信息
+		thisdb.initPanelData()
+		init_admin_user()
 	    init_option()
 	    init_db_system()
 
