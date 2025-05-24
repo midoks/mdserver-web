@@ -51,12 +51,23 @@ class monitor:
         return True
 
     def initDBFile(self):
-        if os.path.exists(self._dbfile):
-            return True
+        is_reload = False
         sql_file = mw.getPanelDir() + '/web/admin/setup/sql/system.sql'
+        sql_file_md5 = mw.getPanelDir() + '/web/admin/setup/sql/system.md5'
+        content = mw.readFile(sql_file)
+        content_md5 = mw.md5(content)
+        if not os.path.exists(sql_file_md5):
+            mw.writeFile(sql_file_md5, content_md5)
+
+        content_src_md5 = mw.readFile(sql_file)
+        if content_md5 != content_src_md5:
+            is_reload = True
+
+        if os.path.exists(self._dbfile) and not is_reload:
+            return True
+
         sql = db.Sql().dbPos(mw.getPanelDataDir(),'system')
-        csql = mw.readFile(sql_file)
-        csql_list = csql.split(';')
+        csql_list = content.split(';')
         for index in range(len(csql_list)):
             sql.execute(csql_list[index], ())
         return True
