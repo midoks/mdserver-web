@@ -17,6 +17,7 @@ if os.path.exists(web_dir):
     os.chdir(web_dir)
 
 import core.mw as mw
+from utils.crontab import crontab as MwCrontab
 
 
 app_debug = False
@@ -78,8 +79,6 @@ def createBgTaskByName(name):
         if res and res["id"] == args["task_id"]:
             print("计划任务已经存在!")
             return True
-    import crontab_api
-    api = crontab_api.crontab_api()
 
     mw_dir = mw.getPanelDir()
     cmd = '''
@@ -111,7 +110,7 @@ logs_file=$plugin_path/${rname}.log
         'urladdress': '',
     }
 
-    task_id = api.add(params)
+    task_id = MwCrontab.instance().add(params)
     if task_id > 0:
         args["task_id"] = task_id
         args["name"] = name
