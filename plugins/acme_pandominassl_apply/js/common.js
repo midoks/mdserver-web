@@ -663,11 +663,24 @@ function domainAdd(row){
                 var rdata = $.parseJSON(data.data);
                 for (var i = 0; i < rdata.length; i++) {
                     if (option_dnsapi_id == rdata[i]['id']){
-                        dnsapi_id_html += "<option value='"+rdata[i]['id']+"' selected>"+rdata[i]['name']+"</option>";
+                        dnsapi_id_html += "<option value='"+rdata[i]['id']+"' val='"+rdata[i]['val']+"' selected>"+rdata[i]['name']+"</option>";
                     } else {
-                        dnsapi_id_html += "<option value='"+rdata[i]['id']+"'>"+rdata[i]['name']+"</option>";
+                        dnsapi_id_html += "<option value='"+rdata[i]['id']+"' val='"+rdata[i]['val']+"'>"+rdata[i]['name']+"</option>";
                     }
                 }
+
+                $('select[name="dnsapi_id"]').change(function(){
+                    var val = $('select[name="dnsapi_id"]').find("option:selected").attr('val');
+                    var val_arr = val.split("|");
+                    for (var i = 0; i < val_arr.length; i++) {
+                        var param = val_arr[i];
+                        var strictEmailRegex = /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
+                        if(strictEmailRegex.test(param)){
+                            $('input[name="email"]').val(param);
+                        }
+                    }
+                    
+                });
                 $('select[name="dnsapi_id"]').html(dnsapi_id_html);
             });
         },
@@ -716,13 +729,13 @@ function domainList(page, search){
             if (rdata.data[i]['effective_date'] == ''){
                 list += '<td>空/未申请</td>';
             } else {
-                list += '<td>'+rdata.data[i]['effective_date']+'</td>';
+                list += '<td>'+getFormatTime(rdata.data[i]['effective_date'],'yyyy/MM/dd')+'</td>';
             }
 
             if (rdata.data[i]['expiration_date'] == ''){
                 list += '<td>空/未申请</td>';
             } else {
-                list += '<td>'+rdata.data[i]['expiration_date']+'</td>';
+                list += '<td>'+getFormatTime(rdata.data[i]['expiration_date'],'yyyy/MM/dd')+'</td>';
             }
 
             if (rdata.data[i]['status'] == '0'){
