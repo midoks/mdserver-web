@@ -6,8 +6,17 @@ import os
 import time
 import json
 
-sys.path.append(os.getcwd() + "/class/core")
-import mw
+# print(sys.platform)
+if sys.platform != "darwin":
+    os.chdir("/www/server/mdserver-web")
+
+
+web_dir = os.getcwd() + "/web"
+if os.path.exists(web_dir):
+    sys.path.append(web_dir)
+    os.chdir(web_dir)
+
+import core.mw as mw
 
 
 app_debug = False
