@@ -716,13 +716,13 @@ function domainList(page, search){
             if (rdata.data[i]['effective_date'] == ''){
                 list += '<td>空/未申请</td>';
             } else {
-                list += '<td>'+(rdata.data[i]['effective_date'],'yyyy/MM/dd')+'</td>';
+                list += '<td>'+rdata.data[i]['effective_date']+'</td>';
             }
 
             if (rdata.data[i]['expiration_date'] == ''){
                 list += '<td>空/未申请</td>';
             } else {
-                list += '<td>'+(rdata.data[i]['expiration_date'],'yyyy/MM/dd')+'</td>';
+                list += '<td>'+rdata.data[i]['expiration_date']+'</td>';
             }
 
             if (rdata.data[i]['status'] == '0'){
