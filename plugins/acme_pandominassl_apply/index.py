@@ -186,24 +186,25 @@ def initDreplace():
 
 def apaOp(method):
     file = initDreplace()
+    return 'ok'
 
-    current_os = mw.getOs()
-    if current_os == "darwin":
-        data = mw.execShell(file + ' ' + method)
-        if data[1] == '':
-            return 'ok'
-        return data[1]
+    # current_os = mw.getOs()
+    # if current_os == "darwin":
+    #     data = mw.execShell(file + ' ' + method)
+    #     if data[1] == '':
+    #         return 'ok'
+    #     return data[1]
 
-    if current_os.startswith("freebsd"):
-        data = mw.execShell('service ' + getPluginName() + ' ' + method)
-        if data[1] == '':
-            return 'ok'
-        return data[1]
+    # if current_os.startswith("freebsd"):
+    #     data = mw.execShell('service ' + getPluginName() + ' ' + method)
+    #     if data[1] == '':
+    #         return 'ok'
+    #     return data[1]
 
-    data = mw.execShell('systemctl ' + method + ' ' + getPluginName())
-    if data[1] == '':
-        return 'ok'
-    return data[1]
+    # data = mw.execShell('systemctl ' + method + ' ' + getPluginName())
+    # if data[1] == '':
+    #     return 'ok'
+    # return data[1]
 
 
 def start():
