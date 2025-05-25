@@ -274,7 +274,7 @@ function dnsapiAdd(row){
     // console.log(row);
     var option_name = '';
     var option_remark = '';
-    var option_type = 'cf';
+    var option_type = 'dns_cf';
     var option_val = '';
     var option_id = 0;
     if (typeof(row) != 'undefined'){
@@ -286,7 +286,6 @@ function dnsapiAdd(row){
         
     }
 
-    // console.log(option_name);
     function renderDnsapiOption(name, val){
         var vlist = {};
         if (val != ''){
@@ -303,18 +302,16 @@ function dnsapiAdd(row){
         }
 
 
+
         var key = getDnsapiKey(name);
         var klist = key.split(':');
-        // console.log(klist);
         var option_html = '';
         for (var i = 0; i < klist.length; i++) {
             var klist_val = '';
             if (klist[i] in vlist){
                 klist_val = vlist[klist[i]];
             }
-
-            option_html += "\
-                <span class='tname'>"+klist[i]+"</span>\
+            option_html += "<span class='tname'>"+klist[i]+"</span>\
                 <div class='info-r'>\
                     <input name='"+klist[i]+"' class='bt-input-text mr5' style='width:100%;' value='"+klist_val+"' placeholder='请输入对应值' type='text'>\
                 </div>";
@@ -379,7 +376,6 @@ function dnsapiAdd(row){
             $('select[name="type"]').html(option);
             $('select[name="type"]').change(function(){
                 var name = $(this).val();
-
                 if (option_type == name){
                     renderDnsapiOption(name, option_val);
                 } else {
