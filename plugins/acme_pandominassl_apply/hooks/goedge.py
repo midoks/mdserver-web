@@ -17,8 +17,16 @@ access_key = "xxx"
 # 指定用户
 userId = 1
 
-sys.path.append(os.getcwd() + "/class/core")
-import mw
+if sys.platform != "darwin":
+    os.chdir("/www/server/mdserver-web")
+
+
+web_dir = os.getcwd() + "/web"
+if os.path.exists(web_dir):
+    sys.path.append(web_dir)
+    os.chdir(web_dir)
+
+import core.mw as mw
 
 domain = sys.argv[1]
 ssl_path = sys.argv[2]
