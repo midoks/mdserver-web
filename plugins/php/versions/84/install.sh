@@ -11,6 +11,7 @@ sysName=`uname`
 
 version=8.4.7
 PHP_VER=84
+md5_file_ok=e29f4c23be2816ed005aa3f06bbb8eae0f22cc133863862e893515fc841e65e3
 Install_php()
 {
 #------------------------ install start ------------------------------------#
@@ -28,6 +29,21 @@ if [ "$?" == "0" ];then
 fi
 
 if [ ! -d $sourcePath/php/php${PHP_VER} ];then
+
+	# ----------------------------------------------------------------------- #
+	# 中国优化安装
+	cn=$(curl -fsSL -m 10 -s http://ipinfo.io/json | grep "\"country\": \"CN\"")
+	LOCAL_ADDR=common
+	if [ ! -z "$cn" ];then
+		LOCAL_ADDR=cn
+	fi
+
+	if [ "$LOCAL_ADDR" == "cn" ];then
+		if [ ! -f $sourcePath/php/php-${version}.tar.xz ];then
+			wget --no-check-certificate -O $sourcePath/php/php-${version}.tar.xz https://mirrors.nju.edu.cn/php/php-${version}.tar.xz
+		fi
+	fi
+	# ----------------------------------------------------------------------- #
 	
 
 	if [ ! -f $sourcePath/php/php-${version}.tar.xz ];then
@@ -35,14 +51,13 @@ if [ ! -d $sourcePath/php/php${PHP_VER} ];then
 	fi
 
 	#检测文件是否损坏.
-	# md5_file_ok=fd2be3b9320184e856426e01bd1a428110776ea8e976c3fb6b65808d03fc886a
-	# if [ -f $sourcePath/php/php-${version}.tar.xz ];then
-	# 	md5_file=`sha256sum $sourcePath/php/php-${version}.tar.xz  | awk '{print $1}'`
-	# 	if [ "${md5_file}" != "${md5_file_ok}" ]; then
-	# 		echo "PHP${version} 下载文件不完整,重新安装"
-	# 		rm -rf $sourcePath/php/php-${version}.tar.xz
-	# 	fi
-	# fi
+	if [ -f $sourcePath/php/php-${version}.tar.xz ];then
+		md5_file=`sha256sum $sourcePath/php/php-${version}.tar.xz  | awk '{print $1}'`
+		if [ "${md5_file}" != "${md5_file_ok}" ]; then
+			echo "PHP${version} 下载文件不完整,重新安装"
+			rm -rf $sourcePath/php/php-${version}.tar.xz
+		fi
+	fi
 	
 	cd $sourcePath/php && tar -Jxf $sourcePath/php/php-${version}.tar.xz
 	mv $sourcePath/php/php-${version} $sourcePath/php/php${PHP_VER}

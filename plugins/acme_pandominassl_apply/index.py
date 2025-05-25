@@ -186,24 +186,25 @@ def initDreplace():
 
 def apaOp(method):
     file = initDreplace()
+    return 'ok'
 
-    current_os = mw.getOs()
-    if current_os == "darwin":
-        data = mw.execShell(file + ' ' + method)
-        if data[1] == '':
-            return 'ok'
-        return data[1]
+    # current_os = mw.getOs()
+    # if current_os == "darwin":
+    #     data = mw.execShell(file + ' ' + method)
+    #     if data[1] == '':
+    #         return 'ok'
+    #     return data[1]
 
-    if current_os.startswith("freebsd"):
-        data = mw.execShell('service ' + getPluginName() + ' ' + method)
-        if data[1] == '':
-            return 'ok'
-        return data[1]
+    # if current_os.startswith("freebsd"):
+    #     data = mw.execShell('service ' + getPluginName() + ' ' + method)
+    #     if data[1] == '':
+    #         return 'ok'
+    #     return data[1]
 
-    data = mw.execShell('systemctl ' + method + ' ' + getPluginName())
-    if data[1] == '':
-        return 'ok'
-    return data[1]
+    # data = mw.execShell('systemctl ' + method + ' ' + getPluginName())
+    # if data[1] == '':
+    #     return 'ok'
+    # return data[1]
 
 
 def start():
@@ -600,6 +601,8 @@ def runHookDstDomain(row):
 
     hookWriteLog('开始申请【'+domain+'】SSL证书')
     cmd = "#!/bin/bash\n"
+    cmd += "PATH=/bin:/sbin:/usr/bin:/usr/sbin:/usr/local/bin:/usr/local/sbin:~/bin:/opt/homebrew/bin:/root/.acme.sh\n"
+    cmd += "export PATH\n"
 
     if mw.isAppleSystem():
         user = getRunUser()

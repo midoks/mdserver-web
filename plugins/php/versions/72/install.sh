@@ -12,6 +12,7 @@ SYS_ARCH=`arch`
 
 version=7.2.31
 PHP_VER=72
+md5_file_ok=968adcb8d0c5652b6e191b025fc8ba41
 Install_php()
 {
 #------------------------ install start ------------------------------------#
@@ -44,7 +45,6 @@ if [ ! -d $sourcePath/php/php${PHP_VER} ];then
 	fi
 
 	#检测文件是否损坏.
-	md5_file_ok=968adcb8d0c5652b6e191b025fc8ba41
 	if [ -f $sourcePath/php/php-${version}.tar.xz ];then
 		md5_file=`md5sum $sourcePath/php/php-${version}.tar.xz  | awk '{print $1}'`
 		if [ "${md5_file}" != "${md5_file_ok}" ]; then

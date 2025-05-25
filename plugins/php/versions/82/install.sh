@@ -11,6 +11,7 @@ sysName=`uname`
 
 version=8.2.28
 PHP_VER=82
+md5_file_ok=af8c9153153a7f489153b7a74f2f29a5ee36f5cb2c6c6929c98411a577e89c91
 Install_php()
 {
 #------------------------ install start ------------------------------------#
@@ -44,13 +45,11 @@ if [ ! -d $sourcePath/php/php${PHP_VER} ];then
 	fi
 	# ----------------------------------------------------------------------- #
 
-
 	if [ ! -f $sourcePath/php/php-${version}.tar.xz ];then
 		wget --no-check-certificate -O $sourcePath/php/php-${version}.tar.xz https://www.php.net/distributions/php-${version}.tar.xz
 	fi
 
 	#检测文件是否损坏.
-	md5_file_ok=af8c9153153a7f489153b7a74f2f29a5ee36f5cb2c6c6929c98411a577e89c91
 	if [ -f $sourcePath/php/php-${version}.tar.xz ];then
 		md5_file=`sha256sum $sourcePath/php/php-${version}.tar.xz  | awk '{print $1}'`
 		if [ "${md5_file}" != "${md5_file_ok}" ]; then
