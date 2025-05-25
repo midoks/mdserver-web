@@ -21,8 +21,8 @@ CREATE TABLE IF NOT EXISTS `domain` (
   `dnsapi_id` TEXT,
   `email` TEXT,
   `remark` TEXT,
-  `effective_date` TEXT,
-  `expiration_date` TEXT,
+  `effective_date` TEXT default '',
+  `expiration_date` TEXT default '',
   `error` TEXT,
   `status` INTEGER default '0',
   `addtime` TEXT
