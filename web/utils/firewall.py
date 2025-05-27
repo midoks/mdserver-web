@@ -70,6 +70,8 @@ class Firewall(object):
                 continue
 
             info = pinfo.split('/')
+            if len(info) != 2:
+                continue
 
             is_same = False
             for i in range(len(ports_all)):
