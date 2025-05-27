@@ -45,7 +45,7 @@ def send_msg(bot, tag='ad', trigger_time=300):
     mw.writeFile(lock_file, json.dumps(lock_data))
     # 信号只在一个周期内执行一次|end
 
-    # 跨链混币器Cce.Cash💰低手续费💰隔断溯源 | 10/m | next,6/10 | @hu ge
+    # 跨链混币器Cce.Cash💰低手续费💰隔断溯源 | 10/m | next,6/10 | @H.g
     # https://t.me/gjgzs2022 ｜ 22/m | @GJ_gzs
     # 实名认证/过人脸🕵️‍♀️各种账号处理✅ | 30/m| next,6/30 | @nngzs
     # 桃花资源采集| 13/m| next,7/13 | @xiaolizi1122
