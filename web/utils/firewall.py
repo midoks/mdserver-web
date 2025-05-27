@@ -70,6 +70,8 @@ class Firewall(object):
                 continue
 
             info = pinfo.split('/')
+            if len(info) != 2:
+                continue
 
             is_same = False
             for i in range(len(ports_all)):
@@ -79,10 +81,9 @@ class Firewall(object):
 
             if not is_same:
                 t = {}
-                if len(info) == 2:
-                    t['port'] = info[0].replace('-',':')
-                    t['protocol'] = info[1]
-                    ports_all.append(t)
+                t['port'] = info[0].replace('-',':')
+                t['protocol'] = info[1]
+                ports_all.append(t)
         for add_info in ports_all:
             if thisdb.getFirewallCountByPort(add_info['port']) == 0:
                 thisdb.addFirewall(add_info['port'], ps='自动识别',protocol=add_info['protocol'])
