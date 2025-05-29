@@ -347,7 +347,7 @@ def stop():
     return r
 
 
-def restart(version=()):
+def restart():
     return restyOp_restart()
 
 
