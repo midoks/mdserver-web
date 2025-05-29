@@ -115,7 +115,7 @@ def add():
     request_data['stype'] = request.form.get('stype', '')
     request_data['sname'] = request.form.get('sname', '')
     request_data['sbody'] = request.form.get('sbody', '')
-    request_data['url_address'] = request.form.get('urladdress', '')
+    request_data['url_address'] = request.form.get('url_address', '')
 
     info = thisdb.getCronByName(request_data['name'])
     if info is not None:
