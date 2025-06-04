@@ -79,6 +79,12 @@ Install_lib()
 			OPTIONS="$OPTIONS --with-xpm-dir"
 		fi
 
+		find_ft2=`pkg-config --list-all | grep freetype2`
+		if [ "$find_ft2" == "" ];then
+			OPTIONS="$OPTIONS --with-freetype-dir=${serverPath}/lib/freetype_old"
+		fi
+		
+
 		#--with-xpm
 		# =${serverPath}/lib/freetype_old
 		# =/usr/lib
@@ -90,7 +96,6 @@ Install_lib()
 		--with-webp-dir \
 		--with-zlib-dir \
 		--enable-gd-jis-conv \
-		--with-freetype-dir=${serverPath}/lib/freetype_old
 		# --enable-gd-native-ttf
 		make clean && make && make install && make clean
 		
