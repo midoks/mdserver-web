@@ -80,7 +80,7 @@ Install_lib()
 		fi
 
 		find_ft2=`pkg-config --list-all | grep freetype2`
-		if [ "$find_ft2" != "" ];then
+		if [ "$find_ft2" == "" ];then
 			OPTIONS="$OPTIONS --with-freetype-dir=${serverPath}/lib/freetype_old"
 		fi
 		
