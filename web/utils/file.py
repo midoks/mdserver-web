@@ -104,6 +104,9 @@ def mvFile(sfile, dfile):
         return mw.returnData(False, '移动或重名命文件失败!'+str(e))
 
 def unzip(sfile, dfile, stype, path):
+    if dfile == '' or dfile == '/':
+        return mw.returnData(False, '不能在根目录解压!')
+        
     if not os.path.exists(sfile):
         return mw.returnData(False, '指定文件不存在!')
 
@@ -322,7 +325,7 @@ def zip(sfile, dfile, stype, path):
 def unzip(sfile, dfile, stype, path):
     if dfile == '' or dfile == '/':
         return mw.returnData(False, '不能在根目录解压!')
-        
+
     if not os.path.exists(sfile):
         return mw.returnData(False, '指定文件不存在!')
 
