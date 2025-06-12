@@ -104,6 +104,9 @@ def mvFile(sfile, dfile):
         return mw.returnData(False, '移动或重名命文件失败!'+str(e))
 
 def unzip(sfile, dfile, stype, path):
+    if dfile == '' or dfile == '/':
+        return mw.returnData(False, '不能在根目录解压!')
+
     if not os.path.exists(sfile):
         return mw.returnData(False, '指定文件不存在!')
 
@@ -127,6 +130,9 @@ def unzip(sfile, dfile, stype, path):
         return mw.returnData(False, '文件解压失败!')
 
 def uncompress(sfile, dfile, path):
+    if dfile == '' or dfile == '/':
+        return mw.returnData(False, '不能在根目录解压!')
+
     if not os.path.exists(sfile):
         return mw.returnData(False, '指定文件不存在!')
 
@@ -315,28 +321,6 @@ def zip(sfile, dfile, stype, path):
         return mw.returnData(True, '文件压缩成功!')
     except Exception as e:
         return mw.returnData(False, '文件压缩失败:'+str(e))
-
-def unzip(sfile, dfile, stype, path):
-    if not os.path.exists(sfile):
-        return mw.returnData(False, '指定文件不存在!')
-
-    try:
-        tmps = mw.getPanelDir() + '/logs/panel_exec.log'
-        if stype == 'zip':
-            mw.execShell("cd " + path + " && unzip -o -d '" + dfile + "' '" + sfile + "' > " + tmps + " 2>&1 &")
-        else:
-            sfiles = ''
-            for sfile in sfile.split(','):
-                if not sfile:
-                    continue
-                sfiles += " '" + sfile + "'"
-            mw.execShell("cd " + path + " && tar -zxvf " + sfiles + " -C " + dfile + " > " + tmps + " 2>&1 &")
-
-        setFileAccept(dfile)
-        mw.writeLog("文件管理", '文件[{1}]解压[{2}]成功!', (sfile, dfile))
-        return mw.returnData(True, '文件解压成功!')
-    except:
-        return mw.returnData(False, '文件解压失败!')
 
 def getAccess(filename):
     data = {}
