@@ -127,6 +127,9 @@ def unzip(sfile, dfile, stype, path):
         return mw.returnData(False, '文件解压失败!')
 
 def uncompress(sfile, dfile, path):
+    if dfile == '' or dfile == '/':
+        return mw.returnData(False, '不能在根目录解压!')
+
     if not os.path.exists(sfile):
         return mw.returnData(False, '指定文件不存在!')
 
