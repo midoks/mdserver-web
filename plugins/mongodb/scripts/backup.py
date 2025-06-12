@@ -6,21 +6,22 @@
 import sys
 import os
 import re
+import time
+import yaml
 
 if sys.platform != 'darwin':
     os.chdir('/www/server/mdserver-web')
 
 
-chdir = os.getcwd()
-sys.path.append(chdir + '/class/core')
+web_dir = os.getcwd() + "/web"
+if os.path.exists(web_dir):
+    sys.path.append(web_dir)
+    os.chdir(web_dir)
 
-# reload(sys)
-# sys.setdefaultencoding('utf-8')
+import core.mw as mw
+import core.db as db
 
-import mw
-import db
-import time
-import yaml
+
 
 def getPluginName():
     return 'mongodb'

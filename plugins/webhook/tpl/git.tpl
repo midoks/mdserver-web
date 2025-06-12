@@ -13,7 +13,12 @@ if [ ! -d {$ROOT_PATH}/gitcode ];then
 fi 
 
 if [ -d {$ROOT_PATH}/gitcode/{$REPO} ];then
-	cd {$ROOT_PATH}/gitcode/{$REPO} && sudo git pull
+	which sudo
+	if [ "$?" == "0" ];then
+		cd {$ROOT_PATH}/gitcode/{$REPO} && sudo git pull
+	else
+		cd {$ROOT_PATH}/gitcode/{$REPO} && git pull
+	fi
 else
 	cd {$ROOT_PATH}/gitcode && git clone http://0.0.0.0:6660/xx/{$REPO}
 fi
