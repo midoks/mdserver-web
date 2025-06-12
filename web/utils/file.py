@@ -123,7 +123,8 @@ def unzip(sfile, dfile, stype, path):
             mw.execShell("cd " + path + " && tar -zxvf " + sfiles +" -C " + dfile + " > " + tmps + " 2>&1 &")
 
         if os.path.exists(dfile):
-            setFileAccept(dfile)
+            if dfile.startswith("/www"):
+                setFileAccept(dfile)
         mw.writeLog("文件管理", '文件[{1}]解压[{2}]成功!', (sfile, dfile))
         return mw.returnData(True, '文件解压成功!')
     except:
@@ -175,7 +176,8 @@ def uncompress(sfile, dfile, path):
             mw.execShell(cmd)
 
         if os.path.exists(dfile):
-            setFileAccept(dfile)
+            if dfile.startswith("/www"):
+                setFileAccept(dfile)
         mw.writeLog("文件管理", '文件[{1}]解压[{2}]成功!', (sfile, dfile,))
         return mw.returnData(True, '文件解压成功!')
     except Exception as e:
