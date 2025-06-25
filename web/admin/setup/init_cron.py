@@ -56,7 +56,7 @@ def init_acme_cron():
         'url_address': '',
     }
 
-    MwCrontab.instance().add(params)
+    crontab.add(params)
     return True
 
 # 识别linux计划任务
