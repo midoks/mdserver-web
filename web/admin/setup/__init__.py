@@ -14,7 +14,7 @@ from .user import init_admin_user
 from .option import init_option
 from .init_db_system import init_db_system
 from .init_cmd import init_cmd
-from .init_cron import init_cron
+from .init_cron import init_cron,init_acme_cron
 
 from utils.firewall import Firewall as MwFirewall
 
@@ -31,6 +31,7 @@ def init():
         init_db_system()
 
     init_cmd()
+    init_acme_cron()
     # init_cron()
     
 
