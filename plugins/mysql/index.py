@@ -3195,6 +3195,7 @@ def syncDatabaseRepair(version=''):
         if local_count_data != sync_count_data:
             if sync_count_data == None:
                 print("sync:"+table_name+" is not exists!!!")
+                mw.writeFile(tmp_log, "sync:"+table_name+" is not exists!!!"+'\n','a+')
             else:
                 print("all data compare: ",local_count_data, sync_count_data)
                 inconsistent_table.append(table_name)
