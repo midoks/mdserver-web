@@ -3169,8 +3169,11 @@ def doFullSyncUserImportContentForChannel(file, channel_name):
     # print(file, channel_name)
     content = mw.readFile(file)
 
-    content = content.replace('STOP SLAVE;', "STOP SLAVE for channel '{}';".format(channel_name))
-    content = content.replace('START SLAVE;', "START SLAVE for channel '{}';".format(channel_name))
+    slave_name = getSlaveName()
+    slave_name = slave_name.upper()
+
+    content = content.replace('STOP '+slave_name+';', "STOP {} for channel '{}';".format(slave_name,channel_name))
+    content = content.replace('START '+slave_name+';', "START {} for channel '{}';".format(slave_name,channel_name))
 
     find_head = "CHANGE MASTER TO "
     find_re = find_head+"(.*?);"
