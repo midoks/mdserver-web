@@ -3193,11 +3193,14 @@ def syncDatabaseRepair(version=''):
         sync_count_data = sync_db.query(cmd_count_sql)
 
         if local_count_data != sync_count_data:
-            print("all data compare: ",local_count_data, sync_count_data)
-            inconsistent_table.append(table_name)
-            diff = sync_count_data[0]['num'] - local_count_data[0]['num']
-            print(table_name+', need sync. diff,'+str(diff))
-            mw.writeFile(tmp_log, table_name+', need sync. diff,'+str(diff)+'\n','a+')
+            if sync_count_data == None:
+                print("sync:"+table_name+" is not exists!!!")
+            else:
+                print("all data compare: ",local_count_data, sync_count_data)
+                inconsistent_table.append(table_name)
+                diff = sync_count_data[0]['num'] - local_count_data[0]['num']
+                print(table_name+', need sync. diff,'+str(diff))
+                mw.writeFile(tmp_log, table_name+', need sync. diff,'+str(diff)+'\n','a+')
         else:
             print(table_name+' check ok.')
             mw.writeFile(tmp_log, table_name+' check ok.\n','a+')
