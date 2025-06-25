@@ -3015,6 +3015,10 @@ def setSlaveStatus(version=''):
 
 def deleteSlaveFunc(sign = ''):
     db = pMysqlDb()
+    slave_name = 'slave'
+    mdb8 = getMdb8Ver()
+    if mw.inArray(mdb8, version):
+        slave_name = 'replica'
     if 'sign' in args:
         sign = args['sign']
         db.query("stop {} for channel '{}'".format(slave_name,sign))
