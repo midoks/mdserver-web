@@ -3006,6 +3006,8 @@ def setSlaveStatus(version=''):
 
         if (v["Slave_IO_Running"] == 'Yes' or v["Slave_SQL_Running"] == 'Yes'):
             pdb.query("stop {}".format(cmd))
+        if (v["Replica_IO_Running"] == 'Yes' or v["Replica_SQL_Running"] == 'Yes'):
+            pdb.query("stop {}".format(cmd))
         else:
             pdb.query("start {}".format(cmd))
 
