@@ -3018,9 +3018,12 @@ def deleteSlaveFunc(sign = ''):
     if sign !=  '':
         db.query("stop slave for channel '{}'".format(sign))
         db.query("reset slave all for channel '{}'".format(sign))
+        db.query("reset replica all for channel '{}'".format(sign))
     else:
         db.query('stop slave')
         db.query('reset slave all')
+        db.query('reset replica all')
+        
 
 def deleteSlave(version=''):
     args = getArgs()
