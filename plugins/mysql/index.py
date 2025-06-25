@@ -2988,7 +2988,12 @@ def setSlaveStatus(version=''):
 
     mode = mw.readFile(mode_file)
     pdb = pMysqlDb()
-    dlist = pdb.query('show slave status')
+
+    cmd = 'show slave status'
+    mdb8 = getMdb8Ver()
+    if mw.inArray(mdb8, version):
+        cmd = 'show replica status'
+    dlist = pdb.query(cmd)
     if len(dlist) == 0:
         return mw.returnJson(False, '需要手动添加同步账户或者执行初始化!')
 
