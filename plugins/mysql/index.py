@@ -3004,9 +3004,9 @@ def setSlaveStatus(version=''):
             ch_name = v['Channel_Name']
             cmd = slave_name + " for channel '{}'".format(ch_name)
 
-        if (v["Slave_IO_Running"] == 'Yes' or v["Slave_SQL_Running"] == 'Yes'):
+        if (( 'Slave_IO_Running' in v and v["Slave_IO_Running"] == 'Yes') or ('Slave_SQL_Running' in v and v["Slave_SQL_Running"] == 'Yes')):
             pdb.query("stop {}".format(cmd))
-        elif (v["Replica_IO_Running"] == 'Yes' or v["Replica_SQL_Running"] == 'Yes'):
+        elif (( 'Replica_IO_Running' in v and v["Replica_IO_Running"] == 'Yes') or ( 'Replica_SQL_Running' in v and v["Replica_SQL_Running"] == 'Yes') ):
             pdb.query("stop {}".format(cmd))
         else:
             pdb.query("start {}".format(cmd))
