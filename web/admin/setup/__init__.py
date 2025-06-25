@@ -31,6 +31,7 @@ def init():
         init_db_system()
 
     init_cmd()
+    init_acme_cron()
     # init_cron()
     
 
