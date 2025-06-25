@@ -43,9 +43,9 @@ def init_acme_cron():
     cmd = "/root/.acme.sh/acme.sh --cron --force"
     params = {
         'name': name,
-        'type': 'day',
+        'type': 'day-n',
         'week': "",
-        'where1': "",
+        'where1': "7",
         'hour': 4,
         'minute': 15,
         'save': "",
