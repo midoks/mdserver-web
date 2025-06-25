@@ -2749,7 +2749,13 @@ def setSlaveStatus(version=''):
 
     mode = mw.readFile(mode_file)
     pdb = pMysqlDb()
-    dlist = pdb.query('show slave status')
+    slave_name = 'slave'
+    mdb8 = getMdb8Ver()
+    if mw.inArray(mdb8, version):
+        slave_name = 'replica'
+    cmd = 'show '+slave_name+' status'
+
+    dlist = pdb.query(cmd)
     if len(dlist) == 0:
         return mw.returnJson(False, '需要手动添加同步账户或者执行初始化!')
 
@@ -2758,9 +2764,11 @@ def setSlaveStatus(version=''):
         cmd = "slave"
         if 'Channel_Name' in v:
             ch_name = v['Channel_Name']
-            cmd = "slave for channel '{}'".format(ch_name)
+            cmd = slave_name + " for channel '{}'".format(ch_name)
 
-        if (v["Slave_IO_Running"] == 'Yes' or v["Slave_SQL_Running"] == 'Yes'):
+        if (( 'Slave_IO_Running' in v and v["Slave_IO_Running"] == 'Yes') or ('Slave_SQL_Running' in v and v["Slave_SQL_Running"] == 'Yes')):
+            pdb.query("stop {}".format(cmd))
+        elif (( 'Replica_IO_Running' in v and v["Replica_IO_Running"] == 'Yes') or ( 'Replica_SQL_Running' in v and v["Replica_SQL_Running"] == 'Yes') ):
             pdb.query("stop {}".format(cmd))
         else:
             pdb.query("start {}".format(cmd))
@@ -2775,9 +2783,11 @@ def deleteSlave(version=''):
         sign = args['sign']
         db.query("stop slave for channel '{}'".format(sign))
         db.query("reset slave all for channel '{}'".format(sign))
+        db.query("reset replica all for channel '{}'".format(sign))
     else:
         db.query('stop slave')
         db.query('reset slave all')
+        db.query('reset replica all')
 
     return mw.returnJson(True, '删除成功!')
 
