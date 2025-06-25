@@ -2855,12 +2855,15 @@ def initSlaveStatusSyncUser(version=''):
     if len(slave_data) < 1:
         return mw.returnJson(False, '需要先添加同步用户配置!')
 
+    slave_name = 'slave'
+    mdb8 = getMdb8Ver()
+    if mw.inArray(mdb8, version):
+        slave_name = 'replica'
+
     # print(data)
     pdb = pMysqlDb()
     if len(slave_data) == 1:
-        cmd_slave = 'show slave status'
-        if pk_version.parse(version) < pk_version.parse("8.0"):
-            cmd_slave = 'SHOW REPLICA STATUS'
+        cmd_slave = 'show '+slave_name+' status'
         dlist = pdb.query(cmd_slave)
         if dlist and len(dlist) > 0:
             return mw.returnJson(False, '已经初始化好了zz...')
@@ -2899,8 +2902,8 @@ def initSlaveStatusSyncUser(version=''):
         # pdb.query("start slave user='{}' password='{}';".format(
         #     u['user'], u['pass']))
 
-    pdb.query("start slave")
-    pdb.query("start all slaves")
+    pdb.query("start "+slave_name)
+    pdb.query("start all "+slave_name)
 
     if msg == '':
         msg = '初始化成功!'
