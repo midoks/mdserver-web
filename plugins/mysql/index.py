@@ -2989,20 +2989,20 @@ def setSlaveStatus(version=''):
     mode = mw.readFile(mode_file)
     pdb = pMysqlDb()
 
-    cmd = 'show slave status'
+    slave_name = 'slave'
     mdb8 = getMdb8Ver()
     if mw.inArray(mdb8, version):
-        cmd = 'show replica status'
+        slave_name = 'replica'
+    cmd = 'show '+slave_name+' status'
     dlist = pdb.query(cmd)
     if len(dlist) == 0:
         return mw.returnJson(False, '需要手动添加同步账户或者执行初始化!')
 
     for v in dlist:
         connection_name = ''
-        cmd = "slave"
         if 'Channel_Name' in v:
             ch_name = v['Channel_Name']
-            cmd = "slave for channel '{}'".format(ch_name)
+            cmd = slave_name + " for channel '{}'".format(ch_name)
 
         if (v["Slave_IO_Running"] == 'Yes' or v["Slave_SQL_Running"] == 'Yes'):
             pdb.query("stop {}".format(cmd))
