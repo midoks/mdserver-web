@@ -3015,14 +3015,13 @@ def setSlaveStatus(version=''):
 
 def deleteSlaveFunc(sign = ''):
     db = pMysqlDb()
-    if sign !=  '':
-        db.query("stop slave for channel '{}'".format(sign))
-        db.query("reset slave all for channel '{}'".format(sign))
-        db.query("reset replica all for channel '{}'".format(sign))
+    if 'sign' in args:
+        sign = args['sign']
+        db.query("stop {} for channel '{}'".format(slave_name,sign))
+        db.query("reset {} all for channel '{}'".format(slave_name, sign))
     else:
-        db.query('stop slave')
-        db.query('reset slave all')
-        db.query('reset replica all')
+        db.query('stop '+slave_name)
+        db.query('reset '+slave_name+' all')
         
 
 def deleteSlave(version=''):

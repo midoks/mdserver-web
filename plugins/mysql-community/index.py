@@ -2779,15 +2779,17 @@ def setSlaveStatus(version=''):
 def deleteSlave(version=''):
     args = getArgs()
     db = pMysqlDb()
+    slave_name = 'slave'
+    mdb8 = getMdb8Ver()
+    if mw.inArray(mdb8, version):
+        slave_name = 'replica'
     if 'sign' in args:
         sign = args['sign']
-        db.query("stop slave for channel '{}'".format(sign))
-        db.query("reset slave all for channel '{}'".format(sign))
-        db.query("reset replica all for channel '{}'".format(sign))
+        db.query("stop {} for channel '{}'".format(slave_name,sign))
+        db.query("reset {} all for channel '{}'".format(slave_name, sign))
     else:
-        db.query('stop slave')
-        db.query('reset slave all')
-        db.query('reset replica all')
+        db.query('stop '+slave_name)
+        db.query('reset '+slave_name+' all')
 
     return mw.returnJson(True, '删除成功!')
 
