@@ -3434,6 +3434,7 @@ def doFullSyncUserImportContentForChannel(file, channel_name):
 
 
 def doFullSyncUser(version=''):
+    slave_name = getSlaveName()
     which_pv = mw.execShell('which pv')
     is_exist_pv = False
     if os.path.exists(which_pv[0]):
@@ -3495,9 +3496,9 @@ def doFullSyncUser(version=''):
 
     mdb8 = getMdb8Ver()
     if mw.inArray(mdb8,version):
-        db.query("stop slave user='{}' password='{}';".format(user, apass))
+        db.query("stop {} user='{}' password='{}';".format(slave_name,user, apass))
     else:
-        db.query("stop slave")
+        db.query("stop "+slave_name)
         
     time.sleep(1)
 
@@ -3593,9 +3594,9 @@ def doFullSyncUser(version=''):
     if mw.inArray(mdb8,version):
         db.query("start replica user='{}' password='{}';".format(user, apass))
     else:
-        db.query("start slave")
+        db.query("start "+slave_name)
 
-    db.query("start all slaves")
+    db.query("start all "+slave_name)
     time_all_e = time.time()
     cos = time_all_e - time_all_s
     writeDbSyncStatus({'code': 6, 'msg': '总耗时:'+str(int(cos))+'秒,从库重启完成...', 'progress': 100})
