@@ -34,6 +34,38 @@ def cron_todb(data):
     return rdata
     # print("------")
 
+def get_acme_cfg():
+    return {
+        "default_execute_hour": 4,
+        "default_execute_minute": 15,
+    }
+
+def init_acme_cron():
+    name = "[勿删]ACME定时强制更新"
+    res = mw.M("crontab").field("id, name").where("name=?", (name,)).find()
+    if res:
+        return True
+
+
+    cmd = "acme.sh --cron --force"
+    params = {
+        'name': name,
+        'type': 'day',
+        'week': "",
+        'where1': "",
+        'hour': cfg['default_execute_hour'],
+        'minute': cfg['default_execute_minute'],
+        'save': "",
+        'backup_to': "",
+        'stype': "toShell",
+        'sname': '',
+        'sbody': cmd,
+        'url_address': '',
+    }
+
+    MwCrontab.instance().add(params)
+    return True
+
 # 识别linux计划任务
 def init_cron():
     file = ''
