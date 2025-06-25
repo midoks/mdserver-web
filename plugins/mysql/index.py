@@ -3019,7 +3019,7 @@ def deleteSlaveFunc(sign = ''):
     mdb8 = getMdb8Ver()
     if mw.inArray(mdb8, version):
         slave_name = 'replica'
-    if 'sign' in args:
+    if sign !=  '':
         sign = args['sign']
         db.query("stop {} for channel '{}'".format(slave_name,sign))
         db.query("reset {} all for channel '{}'".format(slave_name, sign))
