@@ -437,6 +437,13 @@ def getShowLogFile():
 def getMdb8Ver():
     return ['8.0','8.1','8.2','8.3','8.4','9.0',"9.1","9.2"]
 
+
+def getSlaveName():
+    mdb8 = getMdb8Ver()
+    if mw.inArray(mdb8, version):
+        return 'replica'
+    return 'slave'
+
 def pGetDbUser():
     if mw.isAppleSystem():
         user = mw.execShell(
@@ -2855,11 +2862,7 @@ def initSlaveStatusSyncUser(version=''):
     if len(slave_data) < 1:
         return mw.returnJson(False, '需要先添加同步用户配置!')
 
-    slave_name = 'slave'
-    mdb8 = getMdb8Ver()
-    if mw.inArray(mdb8, version):
-        slave_name = 'replica'
-
+    slave_name = getSlaveName()
     # print(data)
     pdb = pMysqlDb()
     if len(slave_data) == 1:
@@ -2911,8 +2914,9 @@ def initSlaveStatusSyncUser(version=''):
 
 
 def initSlaveStatusSSH(version=''):
+    slave_name = getSlaveName()
     db = pMysqlDb()
-    dlist = db.query('show slave status')
+    dlist = db.query('show '+slave_name+' status')
 
     conn = pSqliteDb('slave_id_rsa')
     ssh_list = conn.field('ip,port,id_rsa,db_user').select()
@@ -2926,8 +2930,8 @@ def initSlaveStatusSSH(version=''):
     paramiko.util.log_to_file('paramiko.log')
     ssh = paramiko.SSHClient()
 
-    db.query('stop slave')
-    db.query('reset slave all')
+    db.query('stop '+slave_name)
+    db.query('reset '+slave_name+' all')
     for data in ssh_list:
         ip = data['ip']
         SSH_PRIVATE_KEY = "/tmp/t_ssh_" + ip + ".txt"
@@ -2980,7 +2984,7 @@ def initSlaveStatusSSH(version=''):
                 os.system("rm -rf " + SSH_PRIVATE_KEY)
         except Exception as e:
             return mw.returnJson(False, '[主][' + ip + ']:SSH认证配置连接失败!' + str(e))
-    db.query('start slave')
+    db.query('start '+slave_name)
     return mw.returnJson(True, '初始化成功!')
 
 
@@ -2992,11 +2996,7 @@ def setSlaveStatus(version=''):
     mode = mw.readFile(mode_file)
     pdb = pMysqlDb()
 
-    slave_name = 'slave'
-    mdb8 = getMdb8Ver()
-    if mw.inArray(mdb8, version):
-        slave_name = 'replica'
-    cmd = 'show '+slave_name+' status'
+    slave_name = getSlaveName()
     dlist = pdb.query(cmd)
     if len(dlist) == 0:
         return mw.returnJson(False, '需要手动添加同步账户或者执行初始化!')
@@ -3018,10 +3018,7 @@ def setSlaveStatus(version=''):
 
 def deleteSlaveFunc(sign = ''):
     db = pMysqlDb()
-    slave_name = 'slave'
-    mdb8 = getMdb8Ver()
-    if mw.inArray(mdb8, version):
-        slave_name = 'replica'
+    slave_name = getSlaveName()
     if sign !=  '':
         sign = args['sign']
         db.query("stop {} for channel '{}'".format(slave_name,sign))
