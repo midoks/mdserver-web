@@ -406,6 +406,12 @@ def getShowLogFile():
 def getMdb8Ver():
     return ['8.0','8.1','8.2','8.3','8.4','9.0','9.1',"9.2"]
 
+def getSlaveName():
+    mdb8 = getMdb8Ver()
+    if mw.inArray(mdb8, version):
+        return 'replica'
+    return 'slave'
+
 def pGetDbUser():
     if mw.isAppleSystem():
         user = mw.execShell("who | sed -n '2, 1p' |awk '{print $1}'")[0].strip()
@@ -2621,10 +2627,11 @@ def initSlaveStatusSyncUser(version=''):
     if len(slave_data) < 1:
         return mw.returnJson(False, '需要先添加同步用户配置!')
 
+    slave_name = getSlaveName()
     # print(data)
     pdb = pMysqlDb()
     if len(slave_data) == 1:
-        dlist = pdb.query('show slave status')
+        dlist = pdb.query('show '+slave_name+' status')
         if len(dlist) > 0:
             return mw.returnJson(False, '已经初始化好了zz...')
 
@@ -2660,8 +2667,8 @@ def initSlaveStatusSyncUser(version=''):
         # pdb.query("start slave user='{}' password='{}';".format(
         #     u['user'], u['pass']))
 
-    pdb.query("start slave")
-    pdb.query("start all slaves")
+    pdb.query("start "+slave_name)
+    pdb.query("start all "+slave_name)
 
     if msg == '':
         msg = '初始化成功!'
@@ -2669,8 +2676,9 @@ def initSlaveStatusSyncUser(version=''):
 
 
 def initSlaveStatusSSH(version=''):
+    slave_name = getSlaveName()
     db = pMysqlDb()
-    dlist = db.query('show slave status')
+    dlist = db.query('show '+slave_name+' status')
 
     conn = pSqliteDb('slave_id_rsa')
     ssh_list = conn.field('ip,port,id_rsa,db_user').select()
@@ -2684,8 +2692,8 @@ def initSlaveStatusSSH(version=''):
     paramiko.util.log_to_file('paramiko.log')
     ssh = paramiko.SSHClient()
 
-    db.query('stop slave')
-    db.query('reset slave all')
+    db.query('stop '+slave_name)
+    db.query('reset '+slave_name+' all')
     for data in ssh_list:
         ip = data['ip']
         SSH_PRIVATE_KEY = "/tmp/t_ssh_" + ip + ".txt"
@@ -2738,7 +2746,7 @@ def initSlaveStatusSSH(version=''):
                 os.system("rm -rf " + SSH_PRIVATE_KEY)
         except Exception as e:
             return mw.returnJson(False, '[主][' + ip + ']:SSH认证配置连接失败!' + str(e))
-    db.query('start slave')
+    db.query('start '+slave_name)
     return mw.returnJson(True, '初始化成功!')
 
 
@@ -2749,7 +2757,10 @@ def setSlaveStatus(version=''):
 
     mode = mw.readFile(mode_file)
     pdb = pMysqlDb()
-    dlist = pdb.query('show slave status')
+    slave_name = getSlaveName()
+    cmd = 'show '+slave_name+' status'
+
+    dlist = pdb.query(cmd)
     if len(dlist) == 0:
         return mw.returnJson(False, '需要手动添加同步账户或者执行初始化!')
 
@@ -2758,9 +2769,11 @@ def setSlaveStatus(version=''):
         cmd = "slave"
         if 'Channel_Name' in v:
             ch_name = v['Channel_Name']
-            cmd = "slave for channel '{}'".format(ch_name)
+            cmd = slave_name + " for channel '{}'".format(ch_name)
 
-        if (v["Slave_IO_Running"] == 'Yes' or v["Slave_SQL_Running"] == 'Yes'):
+        if (( 'Slave_IO_Running' in v and v["Slave_IO_Running"] == 'Yes') or ('Slave_SQL_Running' in v and v["Slave_SQL_Running"] == 'Yes')):
+            pdb.query("stop {}".format(cmd))
+        elif (( 'Replica_IO_Running' in v and v["Replica_IO_Running"] == 'Yes') or ( 'Replica_SQL_Running' in v and v["Replica_SQL_Running"] == 'Yes') ):
             pdb.query("stop {}".format(cmd))
         else:
             pdb.query("start {}".format(cmd))
@@ -2771,13 +2784,17 @@ def setSlaveStatus(version=''):
 def deleteSlave(version=''):
     args = getArgs()
     db = pMysqlDb()
+    slave_name = 'slave'
+    mdb8 = getMdb8Ver()
+    if mw.inArray(mdb8, version):
+        slave_name = 'replica'
     if 'sign' in args:
         sign = args['sign']
-        db.query("stop slave for channel '{}'".format(sign))
-        db.query("reset slave all for channel '{}'".format(sign))
+        db.query("stop {} for channel '{}'".format(slave_name,sign))
+        db.query("reset {} all for channel '{}'".format(slave_name, sign))
     else:
-        db.query('stop slave')
-        db.query('reset slave all')
+        db.query('stop '+slave_name)
+        db.query('reset '+slave_name+' all')
 
     return mw.returnJson(True, '删除成功!')
 
@@ -3152,8 +3169,11 @@ def doFullSyncUserImportContentForChannel(file, channel_name):
     # print(file, channel_name)
     content = mw.readFile(file)
 
-    content = content.replace('STOP SLAVE;', "STOP SLAVE for channel '{}';".format(channel_name))
-    content = content.replace('START SLAVE;', "START SLAVE for channel '{}';".format(channel_name))
+    slave_name = getSlaveName()
+    slave_name = slave_name.upper()
+
+    content = content.replace('STOP '+slave_name+';', "STOP {} for channel '{}';".format(slave_name,channel_name))
+    content = content.replace('START '+slave_name+';', "START {} for channel '{}';".format(slave_name,channel_name))
 
     find_head = "CHANGE MASTER TO "
     find_re = find_head+"(.*?);"
