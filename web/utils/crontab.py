@@ -526,6 +526,8 @@ echo "--------------------------------------------------------------------------
             mw.writeFile(file, '')
 
         content = mw.readFile(file)
+        if not content:
+            return mw.returnData(False, '计划任务配置文件不存在?') 
         content += str(bash_script) + "\n"
         if mw.writeFile(file, content):
             if not os.path.exists(file):
