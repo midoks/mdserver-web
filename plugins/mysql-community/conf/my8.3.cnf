@@ -43,6 +43,9 @@ max_allowed_packet = 128M
 #skip-networking
 #skip-name-resolve
 
+#skip-log-bin
+#disable-log-bin
+#skip-slave-start
 log-bin=mysql-bin
 slow_query_log=1
 slow-query-log-file={$SERVER_APP_PATH}/data/mysql-slow.log

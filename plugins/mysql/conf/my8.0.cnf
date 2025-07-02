@@ -47,6 +47,10 @@ skip_name_resolve=1
 #loose-skip-innodb
 #skip-grant-tables
 
+#skip-log-bin
+#disable-log-bin
+#skip-slave-start
+
 log-bin=mysql-bin
 slow_query_log=1
 slow-query-log-file={$SERVER_APP_PATH}/data/mysql-slow.log
