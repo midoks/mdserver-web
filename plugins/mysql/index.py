@@ -360,11 +360,12 @@ def binLog(version = ''):
         con = con.replace('#skip-log-bin', 'skip-log-bin')
         con = con.replace('#disable-log-bin', 'disable-log-bin')
         con = con.replace('#skip-slave-start', 'skip-slave-start')
-        
+
         mw.writeFile(conf, con)
         mw.execShell('sync')
         restart(version)
         mw.execShell('rm -f ' + path + '/mysql-bin.*')
+        mw.execShell('rm -f ' + path + '/binlog.*')
 
     
     return mw.returnJson(True, '设置成功!')

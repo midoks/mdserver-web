@@ -324,6 +324,7 @@ def binLog(version=''):
         mw.execShell('sync')
         restart(version)
         mw.execShell('rm -f ' + path + '/mysql-bin.*')
+        mw.execShell('rm -f ' + path + '/binlog.*')
     return mw.returnJson(True, '设置成功!')
 
 
