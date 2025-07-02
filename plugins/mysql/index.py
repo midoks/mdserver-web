@@ -336,6 +336,11 @@ def binLog(version = ''):
             return mw.returnJson(False, '0')
         con = con.replace('#log-bin=mysql-bin', 'log-bin=mysql-bin')
         con = con.replace('#binlog_format=mixed', 'binlog_format=mixed')
+
+        con = con.replace('skip-log-bin', '#skip-log-bin')
+        con = con.replace('disable-log-bin', '#disable-log-bin')
+        con = con.replace('skip-slave-start', '#skip-slave-start')
+
         mw.writeFile(conf, con)
         mw.execShell('sync')
         restart(version)
@@ -351,6 +356,11 @@ def binLog(version = ''):
             return mw.returnJson(True, dsize)
         con = con.replace('log-bin=mysql-bin', '#log-bin=mysql-bin')
         con = con.replace('binlog_format=mixed', '#binlog_format=mixed')
+
+        con = con.replace('#skip-log-bin', 'skip-log-bin')
+        con = con.replace('#disable-log-bin', 'disable-log-bin')
+        con = con.replace('#skip-slave-start', 'skip-slave-start')
+        
         mw.writeFile(conf, con)
         mw.execShell('sync')
         restart(version)
