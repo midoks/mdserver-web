@@ -48,6 +48,10 @@ def send_msg(bot, tag='ad', trigger_time=300):
     keyboard = [
         [
             types.InlineKeyboardButton(
+                text="18+资源采集", url='https://ckzy1.com')
+        ],
+        [
+            types.InlineKeyboardButton(
                 text="桃花资源采集🚀 ", url='https://thzy.me')
         ],
         [

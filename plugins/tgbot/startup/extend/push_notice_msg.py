@@ -57,7 +57,12 @@ def send_msg(bot, tag='ad', trigger_time=300):
     # https://t.me/gjgzs2022 ｜ 22/m | @GJ_gzs
     # 实名认证/过人脸🕵️‍♀️各种账号处理✅ | 30/m| next,12/30 | @nngzs
     # 桃花资源采集| 13/m| next,7/13 | @xiaolizi1122
+    # 18+资源采集| 4/m | next,1/14 | @liuxingyu123
     keyboard = [
+        [
+            types.InlineKeyboardButton(
+                text="18+资源采集", url='https://ckzy1.com')
+        ],
         [
             types.InlineKeyboardButton(
                 text="桃花资源采集🚀 ", url='https://thzy.me')
