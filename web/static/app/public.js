@@ -630,7 +630,7 @@ function onlineEditFile(k, f, callback) {
 		},'json');
 		return
 	}
-	var e = layer.msg('正在读取文件,请稍候...', {icon: 16,time: 0});
+	
 	var g = f.split(".");
 	var b = g[g.length - 1];
 	var d;
@@ -695,40 +695,67 @@ function onlineEditFile(k, f, callback) {
 			};
 			d = j;
 	}
-	$.post("/files/get_body", "path=" + encodeURIComponent(f), function(s) {
-		if(s.status === false){
-			layer.msg(s.msg,{icon:5});
-			return;
-		}
-		layer.close(e);
-		var u = ["utf-8", "GBK", "GB2312", "BIG5"];
-		var n = "";
-		var m = "";
-		var o = "";
-		for(var p = 0; p < u.length; p++) {
-			m = s.data.encoding == u[p] ? "selected" : "";
-			n += '<option value="' + u[p] + '" ' + m + ">" + u[p] + "</option>";
-		}
-		var code_mirror = null;
-		var r = layer.open({
-			type: 1,
-			shift: 5,
-			closeBtn: 1,
-			area: ["90%", "90%"],
-			btn:['保存','关闭'],
-			title: "在线编辑[" + f + "]",
-			content: '<form class="bt-form pd20">\
-				<div class="line">\
-					<p style="color:red;margin-bottom:10px">提示：Ctrl+F 搜索关键字，Ctrl+G 查找下一个，Ctrl+S 保存，Ctrl+Shift+R 查找替换!\
-						<select class="bt-input-text" name="encoding" style="width: 74px;position: absolute;top: 31px;right: 19px;height: 22px;z-index: 9999;border-radius: 0;">' + n + '</select>\
-					</p>\
-					<textarea class="mCustomScrollbar bt-input-text" id="textBody" style="width:100%;margin:0 auto;line-height: 1.8;position: relative;top: 10px;" value="" />\
-				</div>\
-			</form>',
-			success:function(){
-				$("#textBody").text(s.data.data);
+
+	
+
+	var codding = ["utf-8", "GBK", "GB2312", "BIG5"];
+	var code_mirror = null;
+	var code_timer = null;
+
+	function getBody(callback){
+		$.post("/files/get_body", "path=" + encodeURIComponent(f), function(rdata) {
+			if (typeof(callback) == 'function'){
+				callback(rdata);
+			}
+		},'json');
+	}
+
+	var loading = layer.msg('正在读取文件,请稍候...', {icon: 16,time: 0});
+	function renderBody(callback){
+		getBody(function(rdata){
+			if (typeof(callback) == 'function'){
+				callback(rdata);
+			}
+
+			if(rdata.status === false){
+				layer.close(r);
+				layer.msg(rdata.msg,{icon:5});
+				return;
+			}
+			
+			var coding_html = "";
+			for(var p = 0; p < codding.length; p++) {
+				var coding_selected = rdata.data.encoding == codding[p] ? "selected" : "";
+				coding_html += '<option value="' + codding[p] + '" ' + coding_selected + ">" + codding[p] + "</option>";
+			}
+
+			$("select[name=encoding]").html(coding_html);
+		});
+	}
+
+	var r = layer.open({
+		type: 1,
+		shift: 5,
+		closeBtn: 1,
+		area: ["90%", "90%"],
+		btn:['保存', '关闭', '刷新', '开启自动刷新', '关闭自动刷新'],
+		title: "在线编辑[" + f + "]",
+		content: '<form class="bt-form pd20">\
+			<div class="line">\
+				<p style="color:red;margin-bottom:10px">提示：Ctrl+F 搜索关键字，Ctrl+G 查找下一个，Ctrl+S 保存，Ctrl+Shift+R 查找替换!\
+					<select class="bt-input-text" name="encoding" style="width: 74px;position: absolute;top: 31px;right: 19px;height: 22px;z-index: 9999;border-radius: 0;"><option value="utf-8" selected>utf-8</option></select>\
+				</p>\
+				<textarea class="mCustomScrollbar bt-input-text" id="textBody" style="width:100%;margin:0 auto;line-height: 1.8;position: relative;top: 10px;" value=""/>\
+			</div>\
+		</form>',
+		success:function(){
+			renderBody(function(rdata){
+				layer.close(loading);
+
+				$("#textBody").text(rdata.data.data);
 				var q = $(window).height() * 0.9;
 				$("#textBody").height(q - 160);
+
 				code_mirror = CodeMirror.fromTextArea(document.getElementById("textBody"), {
 					extraKeys: {
 						"Ctrl-F": "findPersistent",
@@ -752,16 +779,44 @@ function onlineEditFile(k, f, callback) {
 				code_mirror.setSize("auto", q - 150);
 
 				$(window).resize(function(){
-                    var q = $(window).height() * 0.9;
-                    code_mirror.setSize("auto", q - 150);
-                }); 
-			},
-			yes:function(){
-				$("#textBody").text(code_mirror.getValue());
-				onlineEditFile(1, f, callback);
-			}
-		});
-	},'json');
+	                var q = $(window).height() * 0.9;
+	                code_mirror.setSize("auto", q - 150);
+	            });
+
+
+			});
+		},
+		end:function(){
+			clearInterval(code_timer);
+		},
+		yes:function(){
+			$("#textBody").text(code_mirror.getValue());
+			onlineEditFile(1, f, callback);
+		},
+		btn3:function(){
+			var loading_refresh = layer.msg('正在刷新中,请稍候...', {icon: 16,time: 0});
+			renderBody(function(rdata){
+				layer.close(loading_refresh);
+				code_mirror.setValue(rdata.data.data);
+			});
+			return false;
+		},
+		btn4:function(){
+			code_timer = setInterval(function(){
+				renderBody(function(rdata){
+					code_mirror.setValue(rdata.data.data);
+				});
+			},5000);
+			layer.msg('开启自动刷新成功', {icon: 1,time: 1000});
+			return false;
+		},
+		btn5:function(){
+			clearInterval(code_timer);
+			layer.msg('关闭自动刷新成功', {icon: 1,time: 1000});
+			return false;
+		}
+	});
+	
 }
 
 function divcenter() {
