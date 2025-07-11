@@ -713,14 +713,14 @@ function onlineEditFile(k, f, callback) {
 	var loading = layer.msg('正在读取文件,请稍候...', {icon: 16,time: 0});
 	function renderBody(callback){
 		getBody(function(rdata){
-			if (typeof(callback) == 'function'){
-				callback(rdata);
-			}
-
 			if(rdata.status === false){
 				layer.close(r);
 				layer.msg(rdata.msg,{icon:5});
 				return;
+			}
+
+			if (typeof(callback) == 'function'){
+				callback(rdata);
 			}
 			
 			var coding_html = "";
