@@ -740,6 +740,7 @@ function onlineEditFile(k, f, callback) {
 		area: ["90%", "90%"],
 		btn:['保存', '关闭', '刷新', '开启自动刷新', '关闭自动刷新'],
 		title: "在线编辑[" + f + "]",
+		shade: 0.0000001,
 		content: '<form class="bt-form pd20">\
 			<div class="line">\
 				<p style="color:red;margin-bottom:10px">提示：Ctrl+F 搜索关键字，Ctrl+G 查找下一个，Ctrl+S 保存，Ctrl+Shift+R 查找替换!\
@@ -748,9 +749,15 @@ function onlineEditFile(k, f, callback) {
 				<textarea class="mCustomScrollbar bt-input-text" id="textBody" style="width:100%;margin:0 auto;line-height: 1.8;position: relative;top: 10px;" value=""/>\
 			</div>\
 		</form>',
-		success:function(){
+		success:function(layero){
+			$(layero).hide();
+			var layer_id = $(layero).attr('id').replace("layui-layer","");
+
 			renderBody(function(rdata){
+				$('#layui-layer-shade'+layer_id).css('opacity',0.3);
+				$(layero).show();
 				layer.close(loading);
+				
 
 				$("#textBody").text(rdata.data.data);
 				var q = $(window).height() * 0.9;
@@ -782,8 +789,6 @@ function onlineEditFile(k, f, callback) {
 	                var q = $(window).height() * 0.9;
 	                code_mirror.setSize("auto", q - 150);
 	            });
-
-
 			});
 		},
 		end:function(){
