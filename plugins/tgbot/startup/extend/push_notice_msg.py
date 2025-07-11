@@ -61,7 +61,7 @@ def send_msg(bot, tag='ad', trigger_time=300):
     keyboard = [
         [
             types.InlineKeyboardButton(
-                text="高价收一切流量 @caifutong555", url='tg://user?id=5568699210')
+                text="高价收一切流量 @caifutong555", url='https://t.me/caifutong555')
         ],
         [
             types.InlineKeyboardButton(
