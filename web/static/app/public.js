@@ -782,8 +782,6 @@ function onlineEditFile(k, f, callback) {
 	                var q = $(window).height() * 0.9;
 	                code_mirror.setSize("auto", q - 150);
 	            });
-
-
 			});
 		},
 		end:function(){
