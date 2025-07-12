@@ -810,6 +810,8 @@ function onlineEditFile(k, f, callback) {
 			code_timer = setInterval(function(){
 				renderBody(function(rdata){
 					code_mirror.setValue(rdata.data.data);
+					var scrollInfo = code_mirror.getScrollInfo();
+					code_mirror.scrollTo(null, scrollInfo.height);
 				});
 			},5000);
 			layer.msg('开启自动刷新成功', {icon: 1,time: 1000});
