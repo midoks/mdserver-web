@@ -22,6 +22,21 @@ def initPanelData():
     if not os.path.exists(sql_file_md5):
         mw.writeFile(sql_file_md5, content_md5)
 
+    sql = mw.M().dbPos(mw.getPanelDataDir(),'panel')
+    csql_data = content.split(';')
+    for i in range(len(csql_data)):
+        sql.execute(csql_data[i], ())
+    return True
+
+def reinstallPanelData():
+    is_reload = False
+    sql_file = mw.getPanelDir() + '/web/admin/setup/sql/default.sql'
+    sql_file_md5 = mw.getPanelDir() + '/web/admin/setup/sql/default.md5'
+    content = mw.readFile(sql_file)
+    content_md5 = mw.md5(content)
+    if not os.path.exists(sql_file_md5):
+        mw.writeFile(sql_file_md5, content_md5)
+
     content_src_md5 = mw.readFile(sql_file)
     if content_md5 != content_src_md5:
         is_reload = True
