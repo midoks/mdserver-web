@@ -460,17 +460,16 @@ fi''' % (mw.getPanelDir(),)
                 stype = 'database'
 
             wheres = {
-                'path': head + "python3 " + script_dir + "/backup.py path " + param['sname'] + " " + str(param['save']),
-                'site':   head + "python3 " + script_dir + "/backup.py site " + param['sname'] + " " + str(param['save']),
+                'path': head + "python3 " + script_dir + "/backup.py path " + param['sname'] + " " + str(param['save']) + " " + str(param['echo']), 
+                'site':   head + "python3 " + script_dir + "/backup.py site " + param['sname'] + " " + str(param['save']) + " " + str(param['echo']),
                 'database': head + "python3 " + script_dir + "/backup.py database " + param['sname'] + " " + str(param['save']),
                 'logs':   head + "python3 " + script_dir + "/logs_backup.py " + param['sname'] + log + " " + str(param['save']),
                 'rememory': head + "/bin/bash " + script_dir + '/rememory.sh'
             }
             if param['backup_to'] != 'localhost':
                 cfile = mw.getPluginDir() + "/" + param['backup_to'] + "/index.py"
-
-                wheres['path'] = head + "python3 " + cfile + " path " + param['sname'] + " " + str(param['save'])
-                wheres['site'] = head + "python3 " + cfile + " site " + param['sname'] + " " + str(param['save'])
+                wheres['path'] = head + "python3 " + cfile + " path " + param['sname'] + " " + str(param['save']) + " " + str(param['echo'])
+                wheres['site'] = head + "python3 " + cfile + " site " + param['sname'] + " " + str(param['save']) + " " + str(param['echo'])
                 wheres['database'] = head + "python3 " + cfile + " " + source_stype + " " + param['sname'] + " " + str(param['save'])
             try:
                 shell = wheres[stype]
@@ -498,6 +497,8 @@ echo "--------------------------------------------------------------------------
         else:
             cron_name = param['echo']
         file = cron_path + '/' + cron_name
+
+        # print(shell)
         mw.writeFile(file, self.checkScript(shell))
         mw.execShell('chmod 750 ' + file)
         return cron_name
