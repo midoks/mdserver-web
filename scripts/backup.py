@@ -237,8 +237,7 @@ class backupTools:
     def backupPath(self, path, count, echo=None):
 
         exclude_dir_cmd = self.makeExcludeDirCmd(echo)
-        print(exclude_dir_cmd)
-
+        # print(exclude_dir_cmd)
         mw.echoStart('备份')
 
         backup_path = mw.getBackupDir() + '/path'
