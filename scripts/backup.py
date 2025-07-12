@@ -22,7 +22,9 @@ import core.db as db
 
 class backupTools:
 
-    def backupSite(self, name, count):
+    def backupSite(self, name, count, echo=None):
+        exclude_dir_cmd = self.makeExcludeDirCmd(echo)
+
         sql = db.Sql()
         path = sql.table('sites').where('name=?', (name,)).getField('path')
         startTime = time.time()
@@ -42,7 +44,7 @@ class backupTools:
             time.strftime('%Y%m%d_%H%M%S', time.localtime()) + '.tar.gz'
 
         cmd = "cd " + os.path.dirname(path) + " && tar zcvf '" + \
-            filename + "' '" + os.path.basename(path) + "' > /dev/null"
+            filename + "' " + exclude_dir_cmd + " '" + os.path.basename(path) + "' > /dev/null"
 
         # print(cmd)
         mw.execShell(cmd)
