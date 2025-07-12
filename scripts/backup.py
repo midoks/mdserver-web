@@ -50,7 +50,7 @@ class backupTools:
         mw.execShell(cmd)
 
         endDate = time.strftime('%Y/%m/%d %X', time.localtime())
-        print(filename)
+        # print(filename)
         if not os.path.exists(filename):
             log = "网站[" + name + "]备份失败!"
             print("★[" + endDate + "] " + log)
