@@ -218,7 +218,26 @@ class backupTools:
                 l.append(ff.name)
         return l
 
-    def backupPath(self, path, count):
+    def makeExcludeDirCmd(self,echo):
+        exclude_dirs = []
+        crontab_list = mw.M('crontab').where('echo=?', (echo,)).field('attr').find()
+        if crontab_list:
+            attr = crontab_list['attr']
+            if attr != "":
+                ed_arrs = attr.split("\n")
+                for ed in ed_arrs:
+                    exclude_dirs.append(ed.strip())
+
+
+        cmd = ""
+        for v in exclude_dirs:
+            cmd += " --exclude='"+v+"'"
+        return cmd
+
+    def backupPath(self, path, count, echo=None):
+
+        exclude_dir_cmd = self.makeExcludeDirCmd(echo)
+        print(exclude_dir_cmd)
 
         mw.echoStart('备份')
 
@@ -234,8 +253,9 @@ class backupTools:
         p_size = mw.getPathSize(path)
         stime = time.time()
 
-        cmd = "cd " + os.path.dirname(path) + " && tar zcvf '" + dfile + "' '" + dirname + "' 2>{err_log} 1> /dev/null".format(
+        cmd = "cd " + os.path.dirname(path) + " && tar zcvf '" + dfile + "' " + exclude_dir_cmd + " '" + dirname + "' 2>{err_log} 1> /dev/null".format(
             err_log='/tmp/backup_err.log')
+        # print(cmd)
         mw.execShell(cmd)
 
         tar_size = os.path.getsize(dfile)
@@ -269,11 +289,11 @@ if __name__ == "__main__":
         if sys.argv[2] == 'ALL':
             backup.backupSiteAll(sys.argv[3])
         else:
-            backup.backupSite(sys.argv[2], sys.argv[3])
+            backup.backupSite(sys.argv[2], sys.argv[3], sys.argv[4])
     elif stype == 'database':
         if sys.argv[2] == 'ALL':
             backup.backupDatabaseAll(sys.argv[3])
         else:
             backup.backupDatabase(sys.argv[2], sys.argv[3])
     elif stype == 'path':
-        backup.backupPath(sys.argv[2], sys.argv[3])
+        backup.backupPath(sys.argv[2], sys.argv[3], sys.argv[4])
