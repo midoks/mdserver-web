@@ -817,7 +817,7 @@ function editTaskInfo(id){
 						<span class="typename controls c4 pull-left f14 text-right mr20">脚本内容</span>\
 						<div style="line-height:34px"><textarea class="txtsjs bt-input-text sbody_create" name="sbody">'+ obj.from.sbody +'</textarea></div>\
 					</div>\
-					<div class="clearfix plan ptb10"  style="display:'+ ((obj.from.stype == "path"||obj.from.stype == "sites")?'block;':'none') +'">\
+					<div class="clearfix plan ptb10"  style="display:'+ ((obj.from.stype == "path"||obj.from.stype == "site")?'block;':'none') +'">\
 						<span class="typename exclude_dir c4 pull-left f14 text-right mr20">排除目录</span>\
 						<div style="line-height:34px"><textarea class="txtsjs bt-input-text attr_create" name="exclude_dir">'+ obj.from.attr +'</textarea></div>\
 					</div>\
