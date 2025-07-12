@@ -32,14 +32,14 @@ CREATE TABLE IF NOT EXISTS `crontab` (
   `backup_to` TEXT DEFAULT 'off', 
   `sname` TEXT,
   `sbody` TEXT,
-  'stype' TEXT,
+  `stype` TEXT,
   `url_address` TEXT,
   `attr` TEXT DEFAULT '',
   `add_time` TEXT,
   `update_time` TEXT
 );
 CREATE UNIQUE INDEX crontab_name_idx ON crontab(name);
-ALTER TABLE crontab ADD COLUMN attr TEXT DEFAULT '';
+ALTER TABLE crontab ADD COLUMN attr TEXT DEFAULT '' AFTER url_address;
 
 
 CREATE TABLE IF NOT EXISTS `firewall` (

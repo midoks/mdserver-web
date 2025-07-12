@@ -50,4 +50,6 @@ def reinstallPanelData():
         # print(csql_data[i])
         # print(sql.execute(csql_data[i], ()))
         sql.execute(csql_data[i], ())
+
+    mw.writeFile(sql_file_md5, content_md5)
     return True
