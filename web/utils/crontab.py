@@ -414,6 +414,11 @@ class crontab(object):
 
     # 取执行脚本
     def getShell(self, param):
+        if not 'echo' in param:
+            cron_name = mw.md5(mw.md5(str(time.time()) + '_mw'))
+        else:
+            cron_name = param['echo']
+
         # try:
         stype = param['stype']
         if stype == 'toFile':
@@ -492,10 +497,7 @@ echo "--------------------------------------------------------------------------
         if not os.path.exists(cron_path):
             mw.execShell('mkdir -p ' + cron_path)
 
-        if not 'echo' in param:
-            cron_name = mw.md5(mw.md5(str(time.time()) + '_mw'))
-        else:
-            cron_name = param['echo']
+        
         file = cron_path + '/' + cron_name
 
         # print(shell)
