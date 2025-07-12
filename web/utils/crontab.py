@@ -181,6 +181,7 @@ class crontab(object):
         add_dbdata['stype'] = data['stype']
         add_dbdata['echo'] = cron_shell
         add_dbdata['url_address'] = data['url_address']
+        add_dbdata['attr'] = data['attr']
 
         tid = thisdb.addCrontab(add_dbdata)
         return tid

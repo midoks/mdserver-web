@@ -211,13 +211,13 @@ function planAdd(){
 	}
 	$("#cronConfig input[name='name']").val(name);
 	
-	var type = $(".plancycle").find("b").attr("val");
-	$("#cronConfig input[name='type']").val(type);
+	var time_type = $(".plancycle").find("b").attr("val");
+	$("#cronConfig input[name='type']").val(time_type);
 
 	
 	var is1;
 	var is2 = 1;
-	switch(type){
+	switch(time_type){
 		case 'day-n':
 			is1=31;
 			break;
@@ -265,10 +265,10 @@ function planAdd(){
 	$("#cronConfig input[name='save']").val(save);
 	$("#cronConfig input[name='week']").val($(".planweek").find("b").attr("val"));
 
-	var sType = $(".planjs").find("b").attr("val");
+	var cron_type = $(".planjs").find("b").attr("val");
 	var sBody = encodeURIComponent($("#implement textarea[name='sbody']").val());
 
-	if (sType == 'toShell'){
+	if (cron_type == 'toShell'){
 		if(sBody == ''){
 			$("#implement textarea[name='sbody']").focus();
 			layer.msg('脚本代码不能为空!',{icon:2});
@@ -276,7 +276,7 @@ function planAdd(){
 		}
 	}
 
-	if(sType == 'toFile'){
+	if(cron_type == 'toFile'){
 		if($("#viewfile").val() == ''){
 			layer.msg('请选择脚本文件!',{icon:2});
 			return;
@@ -284,7 +284,7 @@ function planAdd(){
 	}
 	
 	var url_address = $("#url_address").val();
-	if(sType == 'toUrl'){
+	if(cron_type == 'toUrl'){
 		if(!isURL(url_address)){
 			layer.msg('URL地址不正确!',{icon:2});
 			$("implement textarea[name='url_address']").focus();
@@ -293,16 +293,21 @@ function planAdd(){
 	}
 	// url_address = encodeURIComponent(url_address);
 	$("#cronConfig input[name='url_address']").val(url_address);
-	$("#cronConfig input[name='stype']").val(sType);
+	$("#cronConfig input[name='stype']").val(cron_type);
 	$("#cronConfig textarea[name='sbody']").val(decodeURIComponent(sBody));
 	
-	if(sType == 'site' || sType == 'database' || sType.indexOf('database_')>-1 || sType == 'path'){
+	if(cron_type == 'site' || cron_type == 'database' || cron_type.indexOf('database_')>-1 || cron_type == 'path'){
 		var backupTo = $(".planBackupTo").find("b").attr("val");
 		$("#backup_to").val(backupTo);
 	}
+
+	if (cron_type=='site' || cron_type=='path'){
+		var attr = $("#exclude_dir textarea[name='exclude_dir']").val();
+		$("#attr").val(attr);
+	}
 	
-	var sName = $("#sName").attr("val");
-	$("#cronConfig input[name='sname']").val(sName);
+	var sname = $("#sname").attr("val");
+	$("#cronConfig input[name='sname']").val(sname);
 
 	// if(sName == 'backupAll'){
 	// 	var alist = $("ul[aria-labelledby='backdata'] li a");
@@ -319,27 +324,27 @@ function planAdd(){
 	// 	return;
 	// }
 
-	if (type == 'minute-n'){
+	if (time_type == 'minute-n'){
 		var where1 = $("#ptime input[name='where1']").val();
 		$("#cronConfig input[name='where1']").val(where1);
 	}
 
-	if (type == 'day-n'){
+	if (time_type == 'day-n'){
 		var where1 = $("#ptime input[name='where1']").val();
 		$("#cronConfig input[name='where1']").val(where1);
 	}
 
-	if (type == 'hour-n'){
+	if (time_type == 'hour-n'){
 		var where1 = $("#ptime input[name='where1']").val();
 		$("#cronConfig input[name='where1']").val(where1);
 	}
 
-	if (type == 'month'){
+	if (time_type == 'month'){
 		var where1 = $("#ptime input[name='where1']").val();
 		$("#cronConfig input[name='where1']").val(where1);
 	}
 
-	if (type == 'week'){
+	if (time_type == 'week'){
 		var where1 = $("#ptime input[name='where1']").val();
 		$("#cronConfig input[name='where1']").val(where1);
 	}
@@ -424,7 +429,6 @@ function initDropdownMenu(){
 				break;
 			case 'path':
 				$('#tag_exclude_dir').show();
-				console.log("path");
 				toBackup('path');
 				$(".controls").html('备份目录');
 				break;
@@ -516,7 +520,7 @@ function toLogsHtml(type){
 
 		var sBody = '<div class="dropdown pull-left mr20 check">\
 					  <button class="btn btn-default dropdown-toggle sname" type="button" id="backdata" data-toggle="dropdown" style="width:auto">\
-						<b id="sName" val="'+rdata.data[0].name+'">'+rdata.data[0].name+'['+rdata.data[0].ps+']</b> <span class="caret"></span>\
+						<b id="sname" val="'+rdata.data[0].name+'">'+rdata.data[0].name+'['+rdata.data[0].ps+']</b> <span class="caret"></span>\
 					  </button>\
 					  <ul class="dropdown-menu" role="menu" aria-labelledby="backdata">'+sOpt+'</ul>\
 					</div>\
@@ -530,7 +534,7 @@ function toLogsHtml(type){
 		getselectname();
 
 		$('.changePathDir').click(function(){
-			changePathCallback($('#sName').val(),function(select_dir){
+			changePathCallback($('#sname').val(),function(select_dir){
 				$(".planname input[name='name']").val('备份目录['+select_dir+']');
 				$('#implement .sname b').attr('val',select_dir).text(select_dir);
 			});
@@ -538,9 +542,9 @@ function toLogsHtml(type){
 
 
 		$(".dropdown ul li a").click(function(){
-			var sName = $("#sName").attr("val");
-			if(!sName) return;
-			$(".planname input[name='name']").val(sMsg+'['+sName+']');
+			var sname = $("#sname").attr("val");
+			if(!sname) return;
+			$(".planname input[name='name']").val(sMsg+'['+sname+']');
 		});
 	},'json');
 
@@ -612,7 +616,7 @@ function toBackup(type){
 
 		var sBody = '<div class="dropdown pull-left mr20 check">\
 		 	<button class="btn btn-default dropdown-toggle sname" type="button" id="backdata" data-toggle="dropdown" style="width:auto">\
-				<b id="sName" val="'+rdata.data[0].name+'">'+rdata.data[0].name+'['+rdata.data[0].ps+']</b> <span class="caret"></span>\
+				<b id="sname" val="'+rdata.data[0].name+'">'+rdata.data[0].name+'['+rdata.data[0].ps+']</b> <span class="caret"></span>\
 		  	</button>\
 		 	<ul class="dropdown-menu" role="menu" aria-labelledby="backdata">'+sOpt+'</ul>\
 		</div>\
@@ -643,9 +647,9 @@ function toBackup(type){
 
 
 		$(".dropdown ul li a").click(function(){
-			var sName = $("#sname").attr("val");
-			if(!sName) return;
-			$(".planname input[name='name']").val(sMsg+'['+sName+']');
+			var sname = $("#sname").attr("val");
+			if(!sname) return;
+			$(".planname input[name='name']").val(sMsg+'['+sname+']');
 		});
 	},'json');
 
@@ -741,7 +745,7 @@ function editTaskInfo(id){
 			layer.open({
 				type:1,
 				title:'编辑计划任务-['+rdata.name+']',
-				area: ['850px','440px'], 
+				area: ['900px','440px'], 
 				skin:'layer-create-content',
 				shadeClose:false,
 				closeBtn:1,
