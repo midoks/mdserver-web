@@ -499,7 +499,6 @@ echo "--------------------------------------------------------------------------
 
         
         file = cron_path + '/' + cron_name
-
         # print(shell)
         mw.writeFile(file, self.checkScript(shell))
         mw.execShell('chmod 750 ' + file)
