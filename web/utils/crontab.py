@@ -418,6 +418,7 @@ class crontab(object):
             cron_name = mw.md5(mw.md5(str(time.time()) + '_mw'))
         else:
             cron_name = param['echo']
+        param['echo'] = cron_name
 
         # try:
         stype = param['stype']
