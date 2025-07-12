@@ -54,6 +54,7 @@ class crontab(object):
         dbdata['sbody'] = data['sbody']
         dbdata['stype'] = data['stype']
         dbdata['url_address'] = data['url_address']
+        dbdata['attr'] = data['attr']
 
         if not self.removeForCrond(info['echo']):
             return mw.returnData(False, '无法写入文件，是否开启了系统加固功能!')

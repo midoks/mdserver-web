@@ -365,6 +365,7 @@ function planAdd(){
 initDropdownMenu();
 function initDropdownMenu(){
 	$(".dropdown ul li a").click(function(){
+		$('#tag_exclude_dir').hide();
 		var txt = $(this).text();
 		var type = $(this).attr("value");
 		$(this).parents(".dropdown").find("button b").text(txt).attr("val",type);
@@ -418,7 +419,14 @@ function initDropdownMenu(){
 				break;
 			case 'site':
 				toBackup('sites');
+				$('#tag_exclude_dir').show();
 				$(".controls").html('备份网站');
+				break;
+			case 'path':
+				$('#tag_exclude_dir').show();
+				console.log("path");
+				toBackup('path');
+				$(".controls").html('备份目录');
 				break;
 			case 'database_mariadb':
 			case 'database_mongodb':
@@ -428,10 +436,6 @@ function initDropdownMenu(){
 			case 'database':
 				toBackup(type);
 				$(".controls").html('备份数据库');
-				break;
-			case 'path':
-				toBackup('path');
-				$(".controls").html('备份目录');
 				break;
 			case 'logs':
 				toLogsHtml('logs');
@@ -670,6 +674,7 @@ function editTaskInfo(id){
 				backup_to: rdata.backup_to,
 				save: rdata.save,
 				url_address: rdata.url_address,
+				attr:rdata.attr,
 			},
 			sTypeArray:[['toShell','Shell脚本'],['site','备份网站'],['database','备份数据库'],['logs','日志切割'],['path','备份目录'],['rememory','释放内存'],['toUrl','访问URL']],
 			cycleArray:[['day','每天'],['day-n','N天'],['hour','每小时'],['hour-n','N小时'],['minute-n','N分钟'],['week','每星期'],['month','每月']],
@@ -753,7 +758,7 @@ function editTaskInfo(id){
 					</div>\
 					<div class="clearfix plan ptb10">\
 						<span class="typename c4 pull-left f14 text-right mr20">任务名称</span>\
-						<div class="planname pull-left"><input type="text" name="name" class="bt-input-text sName_create" value="'+ obj.from.name +'"></div>\
+						<div class="planname pull-left"><input type="text" name="name" class="bt-input-text sname_create" value="'+ obj.from.name +'"></div>\
 					</div>\
 					<div class="clearfix plan ptb10">\
 						<span class="typename c4 pull-left f14 text-right mr20">执行周期</span>\
@@ -806,7 +811,11 @@ function editTaskInfo(id){
 					</div>\
 					<div class="clearfix plan ptb10"  style="display:'+ (obj.from.stype == "toShell"?'block;':'none') +'">\
 						<span class="typename controls c4 pull-left f14 text-right mr20">脚本内容</span>\
-						<div style="line-height:34px"><textarea class="txtsjs bt-input-text sBody_create" name="sbody">'+ obj.from.sbody +'</textarea></div>\
+						<div style="line-height:34px"><textarea class="txtsjs bt-input-text sbody_create" name="sbody">'+ obj.from.sbody +'</textarea></div>\
+					</div>\
+					<div class="clearfix plan ptb10"  style="display:'+ ((obj.from.stype == "path"||obj.from.stype == "sites")?'block;':'none') +'">\
+						<span class="typename exclude_dir c4 pull-left f14 text-right mr20">排除目录</span>\
+						<div style="line-height:34px"><textarea class="txtsjs bt-input-text attr_create" name="exclude_dir">'+ obj.from.attr +'</textarea></div>\
 					</div>\
 					<div class="clearfix plan ptb10" style="display:'+ (obj.from.stype == "rememory"?'block;':'none') +'">\
 						<span class="typename controls c4 pull-left f14 text-right mr20">提示</span>\
@@ -845,7 +854,7 @@ function editTaskInfo(id){
 					obj.from.hour = $('.hour_create').val();
 					obj.from.where1 = $('.where1_create').val();
 
-					$('.sName_create').blur(function () {
+					$('.sname_create').blur(function () {
 						obj.from.name = $(this).val();
 					});
 					$('.where1_create').blur(function () {
@@ -864,9 +873,15 @@ function editTaskInfo(id){
 						obj.from.save = $(this).val();
 					});
 		
-					$('.sBody_create').blur(function () {
+					$('.sbody_create').blur(function () {
 						obj.from.sbody = $(this).val();
 					});
+
+					$('.attr_create').blur(function () {
+						obj.from.attr = $(this).val();
+					});
+
+					
 					$('.url_create').blur(function () {
 						obj.from.url_address = $(this).val();
 					});

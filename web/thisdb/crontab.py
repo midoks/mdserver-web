@@ -12,7 +12,7 @@ import os
 
 import core.mw as mw
 
-__field = 'id,name,type,where1,where_hour,where_minute,echo,status,save,backup_to,stype,sname,sbody,url_address,add_time,update_time'
+__field = 'id,name,type,where1,where_hour,where_minute,echo,status,save,backup_to,stype,sname,sbody,url_address,attr,add_time,update_time'
 
 def addCrontab(data):
     now_time = mw.formatDate()
