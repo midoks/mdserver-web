@@ -211,13 +211,13 @@ function planAdd(){
 	}
 	$("#cronConfig input[name='name']").val(name);
 	
-	var type = $(".plancycle").find("b").attr("val");
-	$("#cronConfig input[name='type']").val(type);
+	var time_type = $(".plancycle").find("b").attr("val");
+	$("#cronConfig input[name='type']").val(time_type);
 
 	
 	var is1;
 	var is2 = 1;
-	switch(type){
+	switch(time_type){
 		case 'day-n':
 			is1=31;
 			break;
@@ -265,10 +265,10 @@ function planAdd(){
 	$("#cronConfig input[name='save']").val(save);
 	$("#cronConfig input[name='week']").val($(".planweek").find("b").attr("val"));
 
-	var sType = $(".planjs").find("b").attr("val");
+	var cron_type = $(".planjs").find("b").attr("val");
 	var sBody = encodeURIComponent($("#implement textarea[name='sbody']").val());
 
-	if (sType == 'toShell'){
+	if (cron_type == 'toShell'){
 		if(sBody == ''){
 			$("#implement textarea[name='sbody']").focus();
 			layer.msg('脚本代码不能为空!',{icon:2});
@@ -276,7 +276,7 @@ function planAdd(){
 		}
 	}
 
-	if(sType == 'toFile'){
+	if(cron_type == 'toFile'){
 		if($("#viewfile").val() == ''){
 			layer.msg('请选择脚本文件!',{icon:2});
 			return;
@@ -284,7 +284,7 @@ function planAdd(){
 	}
 	
 	var url_address = $("#url_address").val();
-	if(sType == 'toUrl'){
+	if(cron_type == 'toUrl'){
 		if(!isURL(url_address)){
 			layer.msg('URL地址不正确!',{icon:2});
 			$("implement textarea[name='url_address']").focus();
@@ -293,16 +293,21 @@ function planAdd(){
 	}
 	// url_address = encodeURIComponent(url_address);
 	$("#cronConfig input[name='url_address']").val(url_address);
-	$("#cronConfig input[name='stype']").val(sType);
+	$("#cronConfig input[name='stype']").val(cron_type);
 	$("#cronConfig textarea[name='sbody']").val(decodeURIComponent(sBody));
 	
-	if(sType == 'site' || sType == 'database' || sType.indexOf('database_')>-1 || sType == 'path'){
+	if(cron_type == 'site' || cron_type == 'database' || cron_type.indexOf('database_')>-1 || cron_type == 'path'){
 		var backupTo = $(".planBackupTo").find("b").attr("val");
 		$("#backup_to").val(backupTo);
 	}
+
+	if (cron_type=='site' || cron_type=='path'){
+		var attr = $("#exclude_dir textarea[name='exclude_dir']").val();
+		$("#attr").val(attr);
+	}
 	
-	var sName = $("#sName").attr("val");
-	$("#cronConfig input[name='sname']").val(sName);
+	var sname = $("#sname").attr("val");
+	$("#cronConfig input[name='sname']").val(sname);
 
 	// if(sName == 'backupAll'){
 	// 	var alist = $("ul[aria-labelledby='backdata'] li a");
@@ -319,27 +324,27 @@ function planAdd(){
 	// 	return;
 	// }
 
-	if (type == 'minute-n'){
+	if (time_type == 'minute-n'){
 		var where1 = $("#ptime input[name='where1']").val();
 		$("#cronConfig input[name='where1']").val(where1);
 	}
 
-	if (type == 'day-n'){
+	if (time_type == 'day-n'){
 		var where1 = $("#ptime input[name='where1']").val();
 		$("#cronConfig input[name='where1']").val(where1);
 	}
 
-	if (type == 'hour-n'){
+	if (time_type == 'hour-n'){
 		var where1 = $("#ptime input[name='where1']").val();
 		$("#cronConfig input[name='where1']").val(where1);
 	}
 
-	if (type == 'month'){
+	if (time_type == 'month'){
 		var where1 = $("#ptime input[name='where1']").val();
 		$("#cronConfig input[name='where1']").val(where1);
 	}
 
-	if (type == 'week'){
+	if (time_type == 'week'){
 		var where1 = $("#ptime input[name='where1']").val();
 		$("#cronConfig input[name='where1']").val(where1);
 	}
@@ -365,6 +370,7 @@ function planAdd(){
 initDropdownMenu();
 function initDropdownMenu(){
 	$(".dropdown ul li a").click(function(){
+		$('#tag_exclude_dir').hide();
 		var txt = $(this).text();
 		var type = $(this).attr("value");
 		$(this).parents(".dropdown").find("button b").text(txt).attr("val",type);
@@ -418,7 +424,13 @@ function initDropdownMenu(){
 				break;
 			case 'site':
 				toBackup('sites');
+				$('#tag_exclude_dir').show();
 				$(".controls").html('备份网站');
+				break;
+			case 'path':
+				$('#tag_exclude_dir').show();
+				toBackup('path');
+				$(".controls").html('备份目录');
 				break;
 			case 'database_mariadb':
 			case 'database_mongodb':
@@ -428,10 +440,6 @@ function initDropdownMenu(){
 			case 'database':
 				toBackup(type);
 				$(".controls").html('备份数据库');
-				break;
-			case 'path':
-				toBackup('path');
-				$(".controls").html('备份目录');
 				break;
 			case 'logs':
 				toLogsHtml('logs');
@@ -512,7 +520,7 @@ function toLogsHtml(type){
 
 		var sBody = '<div class="dropdown pull-left mr20 check">\
 					  <button class="btn btn-default dropdown-toggle sname" type="button" id="backdata" data-toggle="dropdown" style="width:auto">\
-						<b id="sName" val="'+rdata.data[0].name+'">'+rdata.data[0].name+'['+rdata.data[0].ps+']</b> <span class="caret"></span>\
+						<b id="sname" val="'+rdata.data[0].name+'">'+rdata.data[0].name+'['+rdata.data[0].ps+']</b> <span class="caret"></span>\
 					  </button>\
 					  <ul class="dropdown-menu" role="menu" aria-labelledby="backdata">'+sOpt+'</ul>\
 					</div>\
@@ -526,7 +534,7 @@ function toLogsHtml(type){
 		getselectname();
 
 		$('.changePathDir').click(function(){
-			changePathCallback($('#sName').val(),function(select_dir){
+			changePathCallback($('#sname').val(),function(select_dir){
 				$(".planname input[name='name']").val('备份目录['+select_dir+']');
 				$('#implement .sname b').attr('val',select_dir).text(select_dir);
 			});
@@ -534,9 +542,9 @@ function toLogsHtml(type){
 
 
 		$(".dropdown ul li a").click(function(){
-			var sName = $("#sName").attr("val");
-			if(!sName) return;
-			$(".planname input[name='name']").val(sMsg+'['+sName+']');
+			var sname = $("#sname").attr("val");
+			if(!sname) return;
+			$(".planname input[name='name']").val(sMsg+'['+sname+']');
 		});
 	},'json');
 
@@ -608,7 +616,7 @@ function toBackup(type){
 
 		var sBody = '<div class="dropdown pull-left mr20 check">\
 		 	<button class="btn btn-default dropdown-toggle sname" type="button" id="backdata" data-toggle="dropdown" style="width:auto">\
-				<b id="sName" val="'+rdata.data[0].name+'">'+rdata.data[0].name+'['+rdata.data[0].ps+']</b> <span class="caret"></span>\
+				<b id="sname" val="'+rdata.data[0].name+'">'+rdata.data[0].name+'['+rdata.data[0].ps+']</b> <span class="caret"></span>\
 		  	</button>\
 		 	<ul class="dropdown-menu" role="menu" aria-labelledby="backdata">'+sOpt+'</ul>\
 		</div>\
@@ -639,9 +647,9 @@ function toBackup(type){
 
 
 		$(".dropdown ul li a").click(function(){
-			var sName = $("#sname").attr("val");
-			if(!sName) return;
-			$(".planname input[name='name']").val(sMsg+'['+sName+']');
+			var sname = $("#sname").attr("val");
+			if(!sname) return;
+			$(".planname input[name='name']").val(sMsg+'['+sname+']');
 		});
 	},'json');
 
@@ -670,6 +678,7 @@ function editTaskInfo(id){
 				backup_to: rdata.backup_to,
 				save: rdata.save,
 				url_address: rdata.url_address,
+				attr:rdata.attr,
 			},
 			sTypeArray:[['toShell','Shell脚本'],['site','备份网站'],['database','备份数据库'],['logs','日志切割'],['path','备份目录'],['rememory','释放内存'],['toUrl','访问URL']],
 			cycleArray:[['day','每天'],['day-n','N天'],['hour','每小时'],['hour-n','N小时'],['minute-n','N分钟'],['week','每星期'],['month','每月']],
@@ -733,10 +742,13 @@ function editTaskInfo(id){
 				changeDir = '<span class="glyphicon glyphicon-folder-open cursor mr20 changePathDir" style="float:left;line-height: 30px;"></span>';
 			}
 
+			var exclude_dirs_placeholder = "每行一条规则,目录不能以/结尾，示例:\r\n.git \
+\r\nstatic/upload \
+\r\n*.log";
 			layer.open({
 				type:1,
 				title:'编辑计划任务-['+rdata.name+']',
-				area: ['850px','440px'], 
+				area: ['900px','440px'], 
 				skin:'layer-create-content',
 				shadeClose:false,
 				closeBtn:1,
@@ -753,7 +765,7 @@ function editTaskInfo(id){
 					</div>\
 					<div class="clearfix plan ptb10">\
 						<span class="typename c4 pull-left f14 text-right mr20">任务名称</span>\
-						<div class="planname pull-left"><input type="text" name="name" class="bt-input-text sName_create" value="'+ obj.from.name +'"></div>\
+						<div class="planname pull-left"><input type="text" name="name" class="bt-input-text sname_create" value="'+ obj.from.name +'"></div>\
 					</div>\
 					<div class="clearfix plan ptb10">\
 						<span class="typename c4 pull-left f14 text-right mr20">执行周期</span>\
@@ -806,7 +818,11 @@ function editTaskInfo(id){
 					</div>\
 					<div class="clearfix plan ptb10"  style="display:'+ (obj.from.stype == "toShell"?'block;':'none') +'">\
 						<span class="typename controls c4 pull-left f14 text-right mr20">脚本内容</span>\
-						<div style="line-height:34px"><textarea class="txtsjs bt-input-text sBody_create" name="sbody">'+ obj.from.sbody +'</textarea></div>\
+						<div style="line-height:34px"><textarea class="txtsjs bt-input-text sbody_create" name="sbody">'+ obj.from.sbody +'</textarea></div>\
+					</div>\
+					<div class="clearfix plan ptb10"  style="display:'+ ((obj.from.stype == "path"||obj.from.stype == "site")?'block;':'none') +'">\
+						<span class="typename exclude_dir c4 pull-left f14 text-right mr20">排除目录</span>\
+						<div style="line-height:34px"><textarea class="txtsjs bt-input-text attr_create" name="exclude_dir" placeholder="'+exclude_dirs_placeholder+'">'+ obj.from.attr +'</textarea></div>\
 					</div>\
 					<div class="clearfix plan ptb10" style="display:'+ (obj.from.stype == "rememory"?'block;':'none') +'">\
 						<span class="typename controls c4 pull-left f14 text-right mr20">提示</span>\
@@ -845,7 +861,7 @@ function editTaskInfo(id){
 					obj.from.hour = $('.hour_create').val();
 					obj.from.where1 = $('.where1_create').val();
 
-					$('.sName_create').blur(function () {
+					$('.sname_create').blur(function () {
 						obj.from.name = $(this).val();
 					});
 					$('.where1_create').blur(function () {
@@ -864,9 +880,15 @@ function editTaskInfo(id){
 						obj.from.save = $(this).val();
 					});
 		
-					$('.sBody_create').blur(function () {
+					$('.sbody_create').blur(function () {
 						obj.from.sbody = $(this).val();
 					});
+
+					$('.attr_create').blur(function () {
+						obj.from.attr = $(this).val();
+					});
+
+					
 					$('.url_create').blur(function () {
 						obj.from.url_address = $(this).val();
 					});

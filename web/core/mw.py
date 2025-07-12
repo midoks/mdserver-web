@@ -2045,7 +2045,6 @@ def echoEnd(tag):
     print("=" * 89)
     print("☆{}完成[{}]".format(tag, formatDate()))
     print("=" * 89)
-    print("\n")
 
 
 def echoInfo(msg):

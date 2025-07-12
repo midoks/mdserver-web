@@ -54,6 +54,7 @@ class crontab(object):
         dbdata['sbody'] = data['sbody']
         dbdata['stype'] = data['stype']
         dbdata['url_address'] = data['url_address']
+        dbdata['attr'] = data['attr']
 
         if not self.removeForCrond(info['echo']):
             return mw.returnData(False, '无法写入文件，是否开启了系统加固功能!')
@@ -180,6 +181,7 @@ class crontab(object):
         add_dbdata['stype'] = data['stype']
         add_dbdata['echo'] = cron_shell
         add_dbdata['url_address'] = data['url_address']
+        add_dbdata['attr'] = data['attr']
 
         tid = thisdb.addCrontab(add_dbdata)
         return tid
@@ -412,6 +414,12 @@ class crontab(object):
 
     # 取执行脚本
     def getShell(self, param):
+        if not 'echo' in param:
+            cron_name = mw.md5(mw.md5(str(time.time()) + '_mw'))
+        else:
+            cron_name = param['echo']
+        param['echo'] = cron_name
+
         # try:
         stype = param['stype']
         if stype == 'toFile':
@@ -458,17 +466,16 @@ fi''' % (mw.getPanelDir(),)
                 stype = 'database'
 
             wheres = {
-                'path': head + "python3 " + script_dir + "/backup.py path " + param['sname'] + " " + str(param['save']),
-                'site':   head + "python3 " + script_dir + "/backup.py site " + param['sname'] + " " + str(param['save']),
+                'path': head + "python3 " + script_dir + "/backup.py path " + param['sname'] + " " + str(param['save']) + " " + str(param['echo']), 
+                'site':   head + "python3 " + script_dir + "/backup.py site " + param['sname'] + " " + str(param['save']) + " " + str(param['echo']),
                 'database': head + "python3 " + script_dir + "/backup.py database " + param['sname'] + " " + str(param['save']),
                 'logs':   head + "python3 " + script_dir + "/logs_backup.py " + param['sname'] + log + " " + str(param['save']),
                 'rememory': head + "/bin/bash " + script_dir + '/rememory.sh'
             }
             if param['backup_to'] != 'localhost':
                 cfile = mw.getPluginDir() + "/" + param['backup_to'] + "/index.py"
-
-                wheres['path'] = head + "python3 " + cfile + " path " + param['sname'] + " " + str(param['save'])
-                wheres['site'] = head + "python3 " + cfile + " site " + param['sname'] + " " + str(param['save'])
+                wheres['path'] = head + "python3 " + cfile + " path " + param['sname'] + " " + str(param['save']) + " " + str(param['echo'])
+                wheres['site'] = head + "python3 " + cfile + " site " + param['sname'] + " " + str(param['save']) + " " + str(param['echo'])
                 wheres['database'] = head + "python3 " + cfile + " " + source_stype + " " + param['sname'] + " " + str(param['save'])
             try:
                 shell = wheres[stype]
@@ -491,11 +498,9 @@ echo "--------------------------------------------------------------------------
         if not os.path.exists(cron_path):
             mw.execShell('mkdir -p ' + cron_path)
 
-        if not 'echo' in param:
-            cron_name = mw.md5(mw.md5(str(time.time()) + '_mw'))
-        else:
-            cron_name = param['echo']
+        
         file = cron_path + '/' + cron_name
+        # print(shell)
         mw.writeFile(file, self.checkScript(shell))
         mw.execShell('chmod 750 ' + file)
         return cron_name

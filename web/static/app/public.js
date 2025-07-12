@@ -710,7 +710,7 @@ function onlineEditFile(k, f, callback) {
 		},'json');
 	}
 
-	var loading = layer.msg('正在读取文件,请稍候...', {icon: 16,time: 0});
+	
 	function renderBody(callback){
 		getBody(function(rdata){
 			if(rdata.status === false){
@@ -752,7 +752,7 @@ function onlineEditFile(k, f, callback) {
 		success:function(layero){
 			$(layero).hide();
 			var layer_id = $(layero).attr('id').replace("layui-layer","");
-
+			var loading = layer.msg('正在读取文件,请稍候...', {icon: 16,time: 0});
 			renderBody(function(rdata){
 				$('#layui-layer-shade'+layer_id).css('opacity',0.3);
 				$(layero).show();
@@ -810,6 +810,8 @@ function onlineEditFile(k, f, callback) {
 			code_timer = setInterval(function(){
 				renderBody(function(rdata){
 					code_mirror.setValue(rdata.data.data);
+					var scrollInfo = code_mirror.getScrollInfo();
+					code_mirror.scrollTo(null, scrollInfo.height);
 				});
 			},5000);
 			layer.msg('开启自动刷新成功', {icon: 1,time: 1000});

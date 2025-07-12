@@ -22,6 +22,7 @@ import thisdb
 import config
 
 def init():
+    
     # 检查数据库是否存在。如果没有就创建它。
     if not os.path.isfile(config.SQLITE_PATH):
         # 初始化用户信息
@@ -30,6 +31,7 @@ def init():
         init_option()
         init_db_system()
 
+    thisdb.reinstallPanelData()
     init_cmd()
     init_acme_cron()
     # init_cron()
