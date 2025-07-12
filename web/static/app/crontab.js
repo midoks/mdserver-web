@@ -742,6 +742,9 @@ function editTaskInfo(id){
 				changeDir = '<span class="glyphicon glyphicon-folder-open cursor mr20 changePathDir" style="float:left;line-height: 30px;"></span>';
 			}
 
+			var exclude_dirs_placeholder = "每行一条规则,目录不能以/结尾，示例:\r\n.git \
+\r\nstatic/upload \
+\r\n*.log";
 			layer.open({
 				type:1,
 				title:'编辑计划任务-['+rdata.name+']',
@@ -819,7 +822,7 @@ function editTaskInfo(id){
 					</div>\
 					<div class="clearfix plan ptb10"  style="display:'+ ((obj.from.stype == "path"||obj.from.stype == "site")?'block;':'none') +'">\
 						<span class="typename exclude_dir c4 pull-left f14 text-right mr20">排除目录</span>\
-						<div style="line-height:34px"><textarea class="txtsjs bt-input-text attr_create" name="exclude_dir">'+ obj.from.attr +'</textarea></div>\
+						<div style="line-height:34px"><textarea class="txtsjs bt-input-text attr_create" name="exclude_dir" placeholder="'+exclude_dirs_placeholder+'">'+ obj.from.attr +'</textarea></div>\
 					</div>\
 					<div class="clearfix plan ptb10" style="display:'+ (obj.from.stype == "rememory"?'block;':'none') +'">\
 						<span class="typename controls c4 pull-left f14 text-right mr20">提示</span>\
