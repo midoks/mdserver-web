@@ -39,7 +39,7 @@ CREATE TABLE IF NOT EXISTS `crontab` (
   `update_time` TEXT
 );
 CREATE UNIQUE INDEX crontab_name_idx ON crontab(name);
-ALTER TABLE crontab ADD COLUMN attr TEXT DEFAULT '' AFTER url_address;
+ALTER TABLE crontab ADD COLUMN attr TEXT DEFAULT '';
 
 
 CREATE TABLE IF NOT EXISTS `firewall` (
