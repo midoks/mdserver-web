@@ -44,7 +44,6 @@ def send_msg(bot, tag='ad', trigger_time=300):
         lock_data[tag] = {'do_time': time.time()}
     mw.writeFile(lock_file, json.dumps(lock_data))
     # 信号只在一个周期内执行一次|end
-
     keyboard = [
         [
             types.InlineKeyboardButton(
@@ -53,10 +52,6 @@ def send_msg(bot, tag='ad', trigger_time=300):
         [
             types.InlineKeyboardButton(
                 text="18+资源采集", url='https://ckzy1.com')
-        ],
-        [
-            types.InlineKeyboardButton(
-                text="桃花资源采集🚀 ", url='https://thzy.me')
         ],
         [
             types.InlineKeyboardButton(
