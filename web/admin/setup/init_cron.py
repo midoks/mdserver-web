@@ -54,6 +54,7 @@ def init_acme_cron():
         'sname': '',
         'sbody': cmd,
         'url_address': '',
+        'attr':'',
     }
 
     crontab.instance().add(params)

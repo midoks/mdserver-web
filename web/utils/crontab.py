@@ -48,13 +48,14 @@ class crontab(object):
         dbdata['where1'] = data['where1']
         dbdata['where_hour'] = data['hour']
         dbdata['where_minute'] = data['minute']
-        dbdata['save'] = data['save']
-        dbdata['backup_to'] = data['backup_to']
-        dbdata['sname'] = data['sname']
-        dbdata['sbody'] = data['sbody']
         dbdata['stype'] = data['stype']
-        dbdata['url_address'] = data['url_address']
-        dbdata['attr'] = data['attr']
+
+        dbdata['sname'] = mw.getDefault(data, 'sname', '')
+        dbdata['backup_to'] = mw.getDefault(data, 'backup_to', '')
+        dbdata['save'] = mw.getDefault(data, 'save', '')
+        dbdata['sbody'] = mw.getDefault(data, 'sbody', '')
+        dbdata['url_address'] = mw.getDefault(data, 'url_address', '')
+        dbdata['attr'] = mw.getDefault(data, 'attr', '')
 
         if not self.removeForCrond(info['echo']):
             return mw.returnData(False, '无法写入文件，是否开启了系统加固功能!')
@@ -174,14 +175,15 @@ class crontab(object):
         add_dbdata['where1'] = data['where1']
         add_dbdata['where_hour'] = data['hour']
         add_dbdata['where_minute'] = data['minute']
-        add_dbdata['save'] = data['save']
-        add_dbdata['backup_to'] = data['backup_to']
-        add_dbdata['sname'] = data['sname']
-        add_dbdata['sbody'] = data['sbody']
         add_dbdata['stype'] = data['stype']
         add_dbdata['echo'] = cron_shell
-        add_dbdata['url_address'] = data['url_address']
-        add_dbdata['attr'] = data['attr']
+
+        add_dbdata['sname'] = mw.getDefault(data, 'sname', '')
+        add_dbdata['backup_to'] = mw.getDefault(data, 'backup_to', '')
+        add_dbdata['save'] = mw.getDefault(data, 'save', '')
+        add_dbdata['sbody'] = mw.getDefault(data, 'sbody', '')
+        add_dbdata['url_address'] = mw.getDefault(data, 'url_address', '')
+        add_dbdata['attr'] = mw.getDefault(data, 'attr', '')
 
         tid = thisdb.addCrontab(add_dbdata)
         return tid
