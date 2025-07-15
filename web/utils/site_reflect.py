@@ -67,6 +67,8 @@ def parse():
 			continue
 		if f.startswith("webstats"):
 			continue
+		if f.startswith("panel"):
+			continue
 		vail_list.append(f)
 
 	for vail_domain in vail_list:
