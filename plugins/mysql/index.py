@@ -3031,7 +3031,6 @@ def deleteSlaveFunc(sign = ''):
     db = pMysqlDb()
     slave_name = getSlaveName()
     if sign !=  '':
-        sign = args['sign']
         db.query("stop {} for channel '{}'".format(slave_name,sign))
         db.query("reset {} all for channel '{}'".format(slave_name, sign))
     else:
