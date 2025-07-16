@@ -125,7 +125,7 @@ Install_App()
 		fi
 	fi
 
-	if [ -f $serverPath/source/webstats/GeoLite2-City.mmdb ];then
+	if [ -s $serverPath/source/webstats/GeoLite2-City.mmdb ];then
 		cp -rf $serverPath/source/webstats/GeoLite2-City.mmdb $serverPath/webstats/GeoLite2-City.mmdb
 	fi
 	
