@@ -117,7 +117,7 @@ Install_App()
 
 	# 缓存数据
 	GEO_VERSION=$(get_latest_release "P3TERX/GeoLite.mmdb")
-	if [ ! -f $serverPath/source/webstats/GeoLite2-City.mmdb ];then
+	if [ ! -s $serverPath/source/webstats/GeoLite2-City.mmdb ];then
 		if [ "$LOCAL_ADDR" == "cn" ];then
 			wget --no-check-certificate -O $serverPath/source/webstats/GeoLite2-City.mmdb https://dl.midoks.icu/soft/webstats/GeoLite2-City.mmdb
 		else
@@ -125,7 +125,7 @@ Install_App()
 		fi
 	fi
 
-	if [ -f $serverPath/source/webstats/GeoLite2-City.mmdb ];then
+	if [ -s $serverPath/source/webstats/GeoLite2-City.mmdb ];then
 		cp -rf $serverPath/source/webstats/GeoLite2-City.mmdb $serverPath/webstats/GeoLite2-City.mmdb
 	fi
 	
