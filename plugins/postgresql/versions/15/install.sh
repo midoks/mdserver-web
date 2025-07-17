@@ -11,7 +11,7 @@ serverPath=$(dirname "$rootPath")
 sysName=`uname`
 
 postgreDir=${serverPath}/source/postgresql
-VERSION=15.7
+VERSION=15.13
 
 # su - postgres -c "/www/server/postgresql/bin/pg_ctl start -D /www/server/postgresql/data"
 

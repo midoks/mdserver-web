@@ -57,6 +57,8 @@ elif [ "$VERSION" == "3.6.1" ]; then
 	VERSION_NUM=${VERSION}-c9dbeda
 elif [ "$VERSION" == "3.7.1" ]; then
 	VERSION_NUM=${VERSION}-da9f8a4
+elif [ "$VERSION" == "3.8.1" ]; then
+	VERSION_NUM=${VERSION}-d25e0bb
 fi
 
 # echo $VERSION_NUM
