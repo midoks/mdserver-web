@@ -63,6 +63,7 @@ app.config['SESSION_USE_SIGNER'] = True
 app.config['SESSION_KEY_PREFIX'] = 'MW_:'
 app.config['SESSION_COOKIE_NAME'] = "MW_VER_1"
 app.config['PERMANENT_SESSION_LIFETIME'] = timedelta(days=31)
+app.config['SEND_FILE_MAX_AGE_DEFAULT'] = 604800
 
 # db的配置
 # app.config['SQLALCHEMY_DATABASE_URI'] = mw.getSqitePrefix()+config.SQLITE_PATH+"?timeout=20"  # 使用 SQLite 数据库
@@ -94,13 +95,12 @@ def sendAuthenticated():
 
 @app.before_request
 def requestCheck():
+    request.start_time = time.time()
 
     admin_close = thisdb.getOption('admin_close')
     if admin_close == 'yes':
         if not request.path.startswith('/close'):
             return redirect('/close')
-
-    config.APP_START_TIME=time.time()
     # 自定义basic auth认证
     if app.config['BASIC_AUTH_OPEN']:
         basic_auth = thisdb.getOptionByJson('basic_auth', default={'open':False})
@@ -129,8 +129,7 @@ def requestCheck():
 def requestAfter(response):
     response.headers['soft'] = config.APP_NAME
     response.headers['mw-version'] = config.APP_VERSION
-    if mw.isDebugMode():
-        response.headers['mw-debug-cos'] = time.time() - config.APP_START_TIME
+    response.headers['X-Response-Time'] = round(time.time() - request.start_time, 4) 
     return response
 
 
