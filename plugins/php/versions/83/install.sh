@@ -9,9 +9,9 @@ serverPath=$(dirname "$rootPath")
 sourcePath=${serverPath}/source
 sysName=`uname`
 
-version=8.3.21
+version=8.3.23
 PHP_VER=83
-md5_file_ok=4dfb329f209a552c3716394fc123bb62e80a468b55ce27fc8cb0fd5f30b9dcd6
+md5_file_ok=08be64700f703bca6ff1284bf1fdaffa37ae1b9734b6559f8350248e8960a6db
 Install_php()
 {
 #------------------------ install start ------------------------------------#
