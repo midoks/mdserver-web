@@ -36,6 +36,7 @@ pillow
 Jinja2>=2.11.2
 PyMySQL>=1.0.2
 whitenoise==5.3.0
+tldextract
 pyotp
 pytz
 supervisor
