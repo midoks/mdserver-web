@@ -1,44 +1,44 @@
-# coding:utf-8
+# 编码:utf-8
 
 # ---------------------------------------------------------------------------------
 # MW-Linux面板
 # ---------------------------------------------------------------------------------
-# copyright (c) 2018-∞(https://github.com/midoks/mdserver-web) All rights reserved.
+# 版权 (c) 2018-∞(https://github.com/midoks/mdserver-web) 保留所有权利。
 # ---------------------------------------------------------------------------------
-# Author: midoks <midoks@163.com>
+# 作者: midoks <midoks@163.com>
 # ---------------------------------------------------------------------------------
 
-import os
-import sys
-import re
-import json
-import time
-import threading
-import multiprocessing
+import导入操作系统模块
+import导入系统
+import导入正则表达式模块
+import导入json
+import导入时间
+import导入线程
+import导入多进程
 
-import core.mw as mw
-import thisdb
+import导入 core.mw 为 mwas mw
+import导入这个数据库
 
 
-class sites(object):
-    # lock
-    _instance_lock = threading.Lock()
+class类站点（对象）：(object):
+    # 锁定# lock
+    _instance_lock = threading.Lock()Lock()
 
-    @classmethod
-    def instance(cls, *args, **kwargs):
-        if not hasattr(sites, "_instance"):
-            with sites._instance_lock:
-                if not hasattr(sites, "_instance"):
-                    sites._instance = sites(*args, **kwargs)
-        return sites._instance
+    @classmethod@classmethod
+    def instance(cls, *args, **kwargs):def instance(cls, *args, **kwargs):
+        if not hasattr(sites, "_instance"):if not hasattr(sites, "_instance"):
+            with sites._instance_lock:with sites._instance_lock:
+                if not hasattr(sites, "_instance"):if not hasattr(sites, "_instance"):
+                    sites._instance = sites(*args, **kwargs)_instance = sites(*args, **kwargs)
+        返回 sites._instancereturn sites._instance
 
-    def __init__(self):
-        # nginx conf
-        self.setupPath = mw.getServerDir() + '/web_conf'
-        self.logsPath = mw.getLogsDir()
+    def __init__(self):def __init__(self):
+        #nginx 配置# nginx conf
+        self.setupPath = mw.getServerDir() + '/web_conf'setupPath = mw.getServerDir() + '/web_conf'
+self.logsPath = mw.getLogsDir()logsPath = mw.getLogsDir()
 
         self.vhostPath = vhost = self.setupPath + '/nginx/vhost'
-        if not os.path.exists(vhost):
+        如果 不 os.path.存在(vhost):
             mw.execShell("mkdir -p " + vhost + " && chmod -R 755 " + vhost)
         self.rewritePath = rewrite = self.setupPath + '/nginx/rewrite'
         if not os.path.exists(rewrite):
@@ -2263,7 +2263,7 @@ location ^~ {from} {\n\
         return def_var
 
     def getDomainRootName(self, domain):
-        s = domain.split('.')
+        s = domain.split('.', 1)
         count = len(s)
         last_index = count - 1
         top_domain =  s[last_index-1]+'.'+s[last_index]
