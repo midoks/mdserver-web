@@ -17,6 +17,12 @@ sysName=`uname`
 actionType=$1
 version=$2
 
+if [ "$version" == "85" ];then
+	echo "not need"
+	exit 1
+fi 
+
+
 if [ "$version" -lt "70" ];then
 	LIBV=2.2.7
 fi
