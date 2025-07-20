@@ -24,7 +24,7 @@ elif [ "$version" == "70" ];then
 elif [ "$version" == "71" ];then
 	LIBV=4.5.2
 elif [ "$version" -le "74" ];then
-	LIBV=5.1.6
+	LIBV=4.8.10
 elif [ "$version" -lt "80" ];then
 	LIBV=6.0.2
 elif [ "$version" -gt "80" ];then
