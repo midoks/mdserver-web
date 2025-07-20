@@ -21,7 +21,7 @@ if [ "$version" -lt "72" ];then
 	exit 1
 fi 
 
-if [ "$version" == "84" ];then
+if [ "$version" -ge "84" ];then
 	LIBV=1.0.7
 	echo "not need"
 	exit 1
