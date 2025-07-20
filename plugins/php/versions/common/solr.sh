@@ -101,6 +101,9 @@ Uninstall_lib()
 		echo "php$version 未安装,请选择其它版本!"
 		return
 	fi
+
+	sed -i $BAK "/${LIBNAME}.so/d" $serverPath/php/$version/etc/php.ini
+	sed -i $BAK "/${LIBNAME}/d" $serverPath/php/$version/etc/php.ini
 	
 	extFile=$extDir${LIBNAME}.so
 	if [ ! -f "$extFile" ];then
@@ -108,9 +111,6 @@ Uninstall_lib()
 		echo "php-$vphp not install ${LIBNAME}, Plese select other version!"
 		return
 	fi
-	
-	sed -i $BAK "/${LIBNAME}.so/d" $serverPath/php/$version/etc/php.ini
-	sed -i $BAK "/${LIBNAME}/d" $serverPath/php/$version/etc/php.ini
 		
 	rm -f $extFile
 	cd  ${curPath} && bash ${rootPath}/plugins/php/versions/lib.sh $version restart
