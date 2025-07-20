@@ -89,6 +89,8 @@ def initConf():
             "/var/log/messages.*",
             "/var/log/debug.*",
             "/var/log/syslog.*",
+            "/var/log/syslog",
+            "/var/log/mail.*",
             "/var/log/btmp.*",
             "/var/log/sa/sa*",
             "/var/log/sysstat/sa*",
