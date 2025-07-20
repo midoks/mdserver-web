@@ -21,7 +21,7 @@ if [ "$version" -lt "70" ];then
 	LIBV=2.2.7
 fi
 
-if [ "$version" -eq "70" ] || [ "$version" -eq "71" ];then
+if [ "$version" -le "80" ];then
 	LIBV=2.7.0
 fi
 
