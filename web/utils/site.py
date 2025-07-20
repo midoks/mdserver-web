@@ -2266,8 +2266,8 @@ location ^~ {from} {\n\
         import tldextract
         extracted = tldextract.extract(domain)
         # 组合注册域名和顶级域名
-        return "{extracted.domain}.{extracted.suffix}"
-        
+        return f"{extracted.domain}.{extracted.suffix}"
+
     def getDomainRootName_Old(self, domain):
         s = domain.split('.')
         count = len(s)
