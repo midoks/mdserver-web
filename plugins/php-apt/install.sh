@@ -57,10 +57,10 @@ if [ ! -f /etc/apt/sources.list.d/php.list ] && [ "$OSNAME" == "debian" ];then
 	apt install -y apt-transport-https lsb-release ca-certificates curl
 	cn=$(curl -fsSL -m 10 http://ipinfo.io/json | grep "\"country\": \"CN\"")
 	if [ ! -z "$cn" ];then
-		curl -sSLo /usr/share/keyrings/deb.sury.org-php.gpg https://mirror.sjtu.edu.cn/sury/php/apt.gpg
+		curl -o /usr/share/keyrings/deb.sury.org-php.gpg https://mirror.sjtu.edu.cn/sury/php/apt.gpg
 	 	sh -c 'echo "deb [signed-by=/usr/share/keyrings/deb.sury.org-php.gpg] https://mirror.sjtu.edu.cn/sury/php/ $(lsb_release -sc) main" > /etc/apt/sources.list.d/php.list'
 	else
-	 	curl -sSLo /usr/share/keyrings/deb.sury.org-php.gpg https://packages.sury.org/php/apt.gpg
+	 	curl -o /usr/share/keyrings/deb.sury.org-php.gpg https://packages.sury.org/php/apt.gpg
 		sh -c 'echo "deb [signed-by=/usr/share/keyrings/deb.sury.org-php.gpg] https://packages.sury.org/php/ $(lsb_release -sc) main" > /etc/apt/sources.list.d/php.list'
 	fi
 	apt update -y
