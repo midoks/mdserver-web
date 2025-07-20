@@ -2263,6 +2263,12 @@ location ^~ {from} {\n\
         return def_var
 
     def getDomainRootName(self, domain):
+        import tldextract
+        extracted = tldextract.extract(domain)
+        # 组合注册域名和顶级域名
+        return "{extracted.domain}.{extracted.suffix}"
+        
+    def getDomainRootName_Old(self, domain):
         s = domain.split('.')
         count = len(s)
         last_index = count - 1
