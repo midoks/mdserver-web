@@ -12,21 +12,27 @@ serverPath=$(dirname "$rootPath")
 sourcePath=${serverPath}/source/php
 SYS_ARCH=`arch`
 LIBNAME=xdebug
-LIBV=3.1.5
+LIBV=3.4.5
 sysName=`uname`
 actionType=$1
 version=$2
+
+if [ "$version" == "85" ];then
+	echo "not need"
+	exit 1
+fi 
+
 
 if [ "$version" -lt "70" ];then
 	LIBV=2.2.7
 fi
 
-if [ "$version" -eq "70" ] || [ "$version" -eq "71" ];then
+if [ "$version" -le "80" ];then
 	LIBV=2.7.0
 fi
 
 if [ "$version" -gt "80" ];then
-	LIBV=3.3.2
+	LIBV=3.4.5
 fi
 
 LIB_PATH_NAME=lib/php

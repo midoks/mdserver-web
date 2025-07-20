@@ -15,7 +15,7 @@ actionType=$1
 version=$2
 
 LIBNAME=event
-LIBV=3.1.3
+LIBV=3.1.4
 
 
 if [ "$version" -lt "55" ];then
@@ -24,7 +24,7 @@ if [ "$version" -lt "55" ];then
 fi
 
 if [ "$version" -lt "83" ];then
-	LIBV=3.0.8
+	LIBV=3.1.4
 fi
 
 LIB_PATH_NAME=lib/php

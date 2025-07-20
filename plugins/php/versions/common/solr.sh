@@ -12,7 +12,7 @@ serverPath=$(dirname "$rootPath")
 sourcePath=${serverPath}/source/php
 SYS_ARCH=`arch`
 LIBNAME=solr
-LIBV=2.7.0
+LIBV=2.8.1
 sysName=`uname`
 actionType=$1
 version=$2
@@ -101,6 +101,9 @@ Uninstall_lib()
 		echo "php$version 未安装,请选择其它版本!"
 		return
 	fi
+
+	sed -i $BAK "/${LIBNAME}.so/d" $serverPath/php/$version/etc/php.ini
+	sed -i $BAK "/${LIBNAME}/d" $serverPath/php/$version/etc/php.ini
 	
 	extFile=$extDir${LIBNAME}.so
 	if [ ! -f "$extFile" ];then
@@ -108,9 +111,6 @@ Uninstall_lib()
 		echo "php-$vphp not install ${LIBNAME}, Plese select other version!"
 		return
 	fi
-	
-	sed -i $BAK "/${LIBNAME}.so/d" $serverPath/php/$version/etc/php.ini
-	sed -i $BAK "/${LIBNAME}/d" $serverPath/php/$version/etc/php.ini
 		
 	rm -f $extFile
 	cd  ${curPath} && bash ${rootPath}/plugins/php/versions/lib.sh $version restart

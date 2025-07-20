@@ -9,6 +9,7 @@ rootPath=$(dirname "$rootPath")
 serverPath=$(dirname "$rootPath")
 
 # cd /www/server/mdserver-web/plugins/php-apt/versions && /bin/bash all_test.sh
+# cd /www/server/mdserver-web/plugins/php-apt && bash install.sh install 85
 
 
 # cd /www/server/mdserver-web && python3 /www/server/mdserver-web/plugins/php-apt/index.py start 5.6
