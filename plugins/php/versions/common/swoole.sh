@@ -17,6 +17,11 @@ version=$2
 LIBNAME=swoole
 LIBV=5.1.6
 
+if [ "$version" == "85" ];then
+	echo "not need"
+	exit 1
+fi 
+
 if [ "$version" -lt "70" ];then
 	LIBV=1.10.1
 elif [ "$version" == "70" ];then
