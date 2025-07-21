@@ -77,7 +77,7 @@ def createBgTask():
 
 def createBgTaskByName(name):
     args = getConfigData()
-    _name = "[勿删]Sphinx全量更新[" + name + "]"
+    _name = "[勿删]manticoresearch全量更新[" + name + "]"
     res = mw.M("crontab").field("id, name").where("name=?", (_name,)).find()
     if res:
         return True
@@ -126,7 +126,7 @@ logs_file=$plugin_path/${rname}.log
 
 def createBgTaskDeltaByName(name):
     args = getConfigDeltaData()
-    _name = "[勿删]Sphinx增量更新[" + name + "]"
+    _name = "[勿删]manticoresearch增量更新[" + name + "]"
     res = mw.M("crontab").field("id, name").where("name=?", (_name,)).find()
     if res:
         return True
