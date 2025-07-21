@@ -100,7 +100,7 @@ def contentReplace(content):
     service_path = mw.getServerDir()
     content = content.replace('{$ROOT_PATH}', mw.getFatherDir())
     content = content.replace('{$SERVER_PATH}', service_path)
-    content = content.replace('{$SERVER_APP}', service_path + '/sphinx')
+    content = content.replace('{$SERVER_APP}', service_path + '/'+getPluginName())
     return content
 
 
@@ -183,7 +183,7 @@ def sphOp(method):
     file = initDreplace()
 
     if not mw.isAppleSystem():
-        data = mw.execShell('systemctl ' + method + ' sphinx')
+        data = mw.execShell('systemctl ' + method + ' ' + getPluginName())
         if data[1] == '':
             return 'ok'
         return 'fail'
