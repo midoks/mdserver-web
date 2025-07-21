@@ -163,7 +163,6 @@ searchd
 	log = /var/log/manticore/searchd.log
     query_log = /var/log/manticore/query.log
     pid_file = /var/run/manticore/searchd.pid
-    data_dir = /var/lib/manticore
 }
 		'''
 		conf = conf.replace("{$server_dir}", mw.getServerDir())
