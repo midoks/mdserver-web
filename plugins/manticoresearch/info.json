@@ -1,6 +1,6 @@
 {
 	"sort": 7,
-	"ps": "是一个高性能开源搜索引擎,基于C++开发,由SphinxSearch项目演变而来,专注于提升搜索效率与扩展性",
+	"ps": "SphinxSearch项目演变而来,专注于提升搜索效率与扩展性",
 	"name": "manticoresearch",
 	"title": "manticoresearch",
 	"shell": "install.sh",
