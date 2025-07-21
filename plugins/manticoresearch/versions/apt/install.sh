@@ -26,7 +26,7 @@ Install_App()
 	wget --no-check-certificate -O $MC_DIR/manticore-repo.noarch.deb https://repo.manticoresearch.com/manticore-repo.noarch.deb
 	dpkg -i $MC_DIR/manticore-repo.noarch.deb
 	apt update -y 
-	apt install manticore manticore-extra
+	apt -y install manticore manticore-extra
 
 
 	echo "${VERSION}" > $serverPath/manticoresearch/version.pl
@@ -38,6 +38,7 @@ Install_App()
 
 Uninstall_App()
 {
+	apt -y uninstall manticore manticore-extra
 	echo "卸载manticoresearch成功"
 }
 
