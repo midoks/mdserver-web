@@ -179,7 +179,7 @@ def checkIndexSph():
     return True
 
 
-def sphOp(method):
+def mcsOp(method):
     file = initDreplace()
 
     if not mw.isAppleSystem():
@@ -197,21 +197,21 @@ def sphOp(method):
 def start():
     # import tool_cron
     # tool_cron.createBgTask()
-    return sphOp('start')
+    return mcsOp('start')
 
 
 def stop():
     # import tool_cron
     # tool_cron.removeBgTask()
-    return sphOp('stop')
+    return mcsOp('stop')
 
 
 def restart():
-    return sphOp('restart')
+    return mcsOp('restart')
 
 
 def reload():
-    return sphOp('reload')
+    return mcsOp('reload')
 
 
 def rebuild():
