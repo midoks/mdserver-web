@@ -152,7 +152,7 @@ def initDreplace():
 
     # config replace
     conf_bin = getConf()
-    if not os.path.exists(conf_bin) && not isInitFile():
+    if not os.path.exists(conf_bin) or not isInitFile():
         conf_content = mw.readFile(getConfTpl())
         conf_content = contentReplace(conf_content)
         mw.writeFile(getConf(), conf_content)
