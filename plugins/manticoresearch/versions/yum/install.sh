@@ -39,7 +39,7 @@ Install_App()
 
 Uninstall_App()
 {
-	yum -y uninstall manticore manticore-extra
+	yum -y remove manticore manticore-extra
 
 	if [ -d $serverPath/manticoresearch ];then
 		rm -rf $serverPath/manticoresearch
