@@ -31,6 +31,10 @@ Install_App()
 
 	echo "${VERSION}" > $serverPath/manticoresearch/version.pl
 
+
+	cd ${rootPath} && python3 plugins/manticoresearch/index.py start ${VERSION}
+	cd ${rootPath} && python3 plugins/manticoresearch/index.py initd_install ${VERSION}
+
 	if [ -d ${MC_DIR} ];then
 		rm -rf ${MC_DIR}
 	fi
@@ -38,12 +42,14 @@ Install_App()
 
 Uninstall_App()
 {
+	cd ${rootPath} && python3 plugins/manticoresearch/index.py stop ${VERSION}
+	cd ${rootPath} && python3 plugins/manticoresearch/index.py initd_uninstall ${VERSION}
+
 	apt -y remove manticore manticore-extra
 
 	if [ -d $serverPath/manticoresearch ];then
 		rm -rf $serverPath/manticoresearch
 	fi
-
 	
 	if [ -f /usr/lib/systemd/system/manticore.service ] || [ -f /lib/systemd/system/manticore.service ];then
 		systemctl stop manticore
