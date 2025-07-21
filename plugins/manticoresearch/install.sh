@@ -10,6 +10,7 @@ sysName=`uname`
 sysArch=`arch`
 
 # cd /www/server/mdserver-web/plugins/manticoresearch && bash install.sh install 7.4.6
+# systemctl status manticore
 
 if [ -f ${rootPath}/bin/activate ];then
 	source ${rootPath}/bin/activate
