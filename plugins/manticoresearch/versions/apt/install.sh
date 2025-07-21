@@ -28,6 +28,9 @@ Install_App()
 	apt update -y 
 	apt install manticore manticore-extra
 
+
+	echo "${VERSION}" > $serverPath/manticoresearch/version.pl
+
 	if [ -d ${MC_DIR} ];then
 		rm -rf ${MC_DIR}
 	fi
