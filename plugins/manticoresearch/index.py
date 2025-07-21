@@ -125,43 +125,18 @@ def mkdirAll():
         else:
             mw.execShell('mkdir -p ' + os.path.dirname(x))
 
-
 def initDreplace():
-
-    file_tpl = getInitDTpl()
-    service_path = mw.getServerDir()
-
-    # initD_path = getServerDir() + '/init.d'
-    # if not os.path.exists(initD_path):
-    #     os.mkdir(initD_path)
-    # file_bin = initD_path + '/' + getPluginName()
-
-    # # initd replace
-    # if not os.path.exists(file_bin):
-    #     content = mw.readFile(file_tpl)
-    #     content = contentReplace(content)
-    #     mw.writeFile(file_bin, content)
-    #     mw.execShell('chmod +x ' + file_bin)
 
     # config replace
     conf_bin = getConf()
     if not os.path.exists(conf_bin):
         conf_content = mw.readFile(getConfTpl())
         conf_content = contentReplace(conf_content)
-        mw.writeFile(getServerDir() + '/manticore.conf', conf_content)
+        mw.writeFile(getConf(), conf_content)
 
-    # systemd
-    # systemDir = mw.systemdCfgDir()
-    # systemService = systemDir + '/sphinx.service'
-    # systemServiceTpl = getPluginDir() + '/init.d/sphinx.service.tpl'
-    # if os.path.exists(systemDir) and not os.path.exists(systemService):
-    #     se_content = mw.readFile(systemServiceTpl)
-    #     se_content = se_content.replace('{$SERVER_PATH}', service_path)
-    #     mw.writeFile(systemService, se_content)
-    #     mw.execShell('systemctl daemon-reload')
 
     mkdirAll()
-    return file_bin
+    return "ok"
 
 
 def checkIndexSph():
@@ -179,6 +154,7 @@ def checkIndexSph():
     return True
 
 def mcsOp(method):
+    initDreplace()
     data = mw.execShell('systemctl ' + method + ' manticore')
     if data[1] == '':
         return 'ok'
