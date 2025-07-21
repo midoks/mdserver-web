@@ -56,7 +56,7 @@ function spPost(method, args, callback){
     });
 }
 
-function commonFunc(){
+function mcsCommonFunc(){
     var con = '<button class="btn btn-default btn-sm" onclick="confirmRebuildIndex();">重建索引</button>';
     con += '&nbsp;&nbsp; <button class="btn btn-default btn-sm" onclick="autoMakeConf();">自动创建配置</button>';
     $(".soft-man-con").html(con);
@@ -239,7 +239,7 @@ function secToTime(s) {
 }
 
 
-function runStatus(){
+function mcsRunStatus(){
     spPost('run_status', '', function(data){
         var rdata = $.parseJSON(data.data);
         if (!rdata['status']){
@@ -273,9 +273,8 @@ function runStatus(){
     });
 }
 
-function readme(){
+function mcsReadme(){
     spPost('sphinx_cmd', '', function(data){
-
         var rdata = $.parseJSON(data.data);
         if (!rdata['status']){
             layer.msg(rdata['msg'],{icon:2,time:2000,shade: [0.3, '#000']});
