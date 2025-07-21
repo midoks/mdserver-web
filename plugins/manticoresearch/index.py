@@ -128,6 +128,13 @@ def mkdirAll():
         else:
             mw.execShell('mkdir -p ' + os.path.dirname(x))
 
+def isInitFile():
+    path = getServerDir() + '/init.pl'
+    if os.path.exists(path):
+        return True
+    mw.writeFile(path, 'ok')
+    return False
+
 def initDreplace():
 
     dirs_list = [
@@ -145,7 +152,7 @@ def initDreplace():
 
     # config replace
     conf_bin = getConf()
-    if not os.path.exists(conf_bin):
+    if not os.path.exists(conf_bin) && not isInitFile():
         conf_content = mw.readFile(getConfTpl())
         conf_content = contentReplace(conf_content)
         mw.writeFile(getConf(), conf_content)
