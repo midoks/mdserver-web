@@ -340,14 +340,9 @@ index {$DB_NAME}_{$TABLE_NAME}
 		return conf
 
 	def makeSphinxDbFieldRepalce(self, content, sph_field):
-		ver = self.ver.replace(".1",'')
-		ver = float(ver)
-		if ver >= 3.6:
-			content = content.replace("{$SPH_FIELD}", '')
-			content = content.replace("{$SPH_FIELD_INDEX}", '')
-		else:
-			content = content.replace("{$SPH_FIELD}", sph_field)
-			content = content.replace("{$SPH_FIELD_INDEX}", '')
+
+		content = content.replace("{$SPH_FIELD}", '')
+		content = content.replace("{$SPH_FIELD_INDEX}", '')
 
 		return content
 
