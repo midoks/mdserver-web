@@ -22,6 +22,12 @@ if mw.isAppleSystem():
 def getPluginName():
     return 'manticoresearch'
 
+def getSeName():
+    data = mw.execShell('which yum')
+    if data[1] == '':
+        return 'manticore-indexer'
+    return 'manticore'
+
 def getPluginDir():
     return mw.getPluginDir() + '/' + getPluginName()
 
@@ -168,7 +174,7 @@ def checkIndexSph():
 
 def mcsOp(method):
     initDreplace()
-    data = mw.execShell('systemctl ' + method + ' manticore')
+    data = mw.execShell('systemctl ' + method + ' ' + getSeName())
     if data[1] == '':
         return 'ok'
     return 'fail'
@@ -203,7 +209,8 @@ def rebuild():
 
 
 def initdStatus():
-    shell_cmd = 'systemctl status manticore | grep loaded | grep "enabled;"'
+    service_name = getSeName()
+    shell_cmd = 'systemctl status '+service_name+' | grep loaded | grep "enabled;"'
     data = mw.execShell(shell_cmd)
     if data[0] == '':
         return 'fail'
@@ -211,12 +218,14 @@ def initdStatus():
 
 
 def initdInstall():
-    mw.execShell('systemctl enable manticore')
+    service_name = getSeName()
+    mw.execShell('systemctl enable '+service_name)
     return 'ok'
 
 
 def initdUinstall():
-    mw.execShell('systemctl disable manticore')
+    service_name = getSeName()
+    mw.execShell('systemctl disable '+service_name)
     return 'ok'
 
 
