@@ -1,7 +1,7 @@
 function spPostMin(method, args, callback){
 
     var req_data = {};
-    req_data['name'] = 'sphinx';
+    req_data['name'] = 'manticoresearch';
     req_data['func'] = method;
  
     if (typeof(args) != 'undefined' && args!=''){
