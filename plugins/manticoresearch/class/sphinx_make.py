@@ -94,23 +94,18 @@ CREATE TABLE IF NOT EXISTS `{$DB_NAME}`.`{$TABLE_NAME}` (
 		return conf
 
 	def eqVerField(self, field):
-		ver = self.ver.replace(".1",'')
-		if float(ver) >= 3.6:
-			if field == 'sql_attr_timestamp':
-				return 'attr_bigint'
 
-			if field == 'sql_attr_bigint':
-				return 'attr_bigint'
+		if field == 'sql_attr_timestamp':
+			return 'attr_bigint'
 
-			if field == 'sql_attr_float':
-				return 'attr_float'
+		if field == 'sql_attr_bigint':
+			return 'attr_bigint'
 
-			if field == 'sql_field_string':
-				return 'field_string'
+		if field == 'sql_attr_float':
+			return 'attr_float'
 
-		if float(ver) >= 3.3:
-			if field == 'sql_attr_timestamp':
-				return 'sql_attr_bigint'
+		if field == 'sql_field_string':
+			return 'field_string'
 
 		return field
 
