@@ -279,7 +279,6 @@ index {$DB_NAME}_{$TABLE_NAME}
     {$PATH_NAME}	= {$server_dir}/sphinx/index/db/{$DB_NAME}.{$TABLE_NAME}/index
 
     ngram_len	= 1
-    ngram_chars	= U+3000..U+2FA1F
 
 {$SPH_FIELD_INDEX}
 }
