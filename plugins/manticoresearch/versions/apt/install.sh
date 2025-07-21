@@ -38,7 +38,7 @@ Install_App()
 
 Uninstall_App()
 {
-	apt -y uninstall manticore manticore-extra
+	apt -y remove manticore manticore-extra
 
 	if [ -d $serverPath/manticoresearch ];then
 		rm -rf $serverPath/manticoresearch
