@@ -24,11 +24,8 @@ Install_App()
 	MC_DIR=${serverPath}/source/manticoresearch
 	mkdir -p $MC_DIR
 
-	wget --no-check-certificate -O $MC_DIR/manticore-repo.noarch.deb https://repo.manticoresearch.com/manticore-repo.noarch.deb
-	dpkg -i $MC_DIR/manticore-repo.noarch.deb
-	apt update -y 
-	apt -y install manticore manticore-extra
-
+	yum install -y https://repo.manticoresearch.com/manticore-repo.noarch.rpm
+	yum install -y manticore manticore-extra
 
 	echo "${VERSION}" > $serverPath/manticoresearch/version.pl
 
