@@ -418,9 +418,8 @@ def updateDelta():
     return ''
 
 def installPreInspection(version):
-    data = mw.execShell('arch')
-    if data[0].strip().startswith('aarch'):
-        return '不支持aarch架构'
+    if mw.isAppleSystem():
+        return '不支持mac系统'
     return 'ok'
 
 if __name__ == "__main__":
