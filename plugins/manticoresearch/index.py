@@ -251,7 +251,7 @@ def getMainPort():
 def getMysqlPort():
     path = getConf()
     content = mw.readFile(path)
-    rep = r'listen\s*=\s*(.*)'
+    rep = r'listen\s*=\s*(.*):mysql'
     conf = re.search(rep, content)
     port_line = conf.groups()[1]
     return port_line.split(":")[1]
@@ -259,9 +259,9 @@ def getMysqlPort():
 def getHttpPort():
     path = getConf()
     content = mw.readFile(path)
-    rep = r'listen\s*=\s*(.*)'
+    rep = r'listen\s*=\s*(.*):http'
     conf = re.search(rep, content)
-    port_line = conf.groups()[2]
+    port_line = conf.groups()[0]
     return port_line.split(":")[1]
 
 
