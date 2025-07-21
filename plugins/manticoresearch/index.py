@@ -127,6 +127,16 @@ def mkdirAll():
 
 def initDreplace():
 
+    dirs_list = [
+        "/var/log/manticore",
+        "/var/run/manticore",
+        "/var/lib/manticore"
+    ]
+
+    for d in dirs_list:
+        if not os.path.exists(d):
+            mw.execShell('mkdir -p ' + d)
+
     # config replace
     conf_bin = getConf()
     if not os.path.exists(conf_bin):
