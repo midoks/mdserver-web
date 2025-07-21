@@ -155,11 +155,6 @@ CREATE TABLE IF NOT EXISTS `{$DB_NAME}`.`{$TABLE_NAME}` (
 
 	def makeSphinxHeader(self):
 		conf = '''
-indexer
-{
-	mem_limit		= 128M
-}
-
 searchd
 {
 	listen = 127.0.0.1:9322
