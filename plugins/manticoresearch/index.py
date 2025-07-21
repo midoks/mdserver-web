@@ -175,14 +175,14 @@ def mcsOp(method):
 
 
 def start():
-    # import tool_cron
-    # tool_cron.createBgTask()
+    import tool_cron
+    tool_cron.createBgTask()
     return mcsOp('start')
 
 
 def stop():
-    # import tool_cron
-    # tool_cron.removeBgTask()
+    import tool_cron
+    tool_cron.removeBgTask()
     return mcsOp('stop')
 
 
