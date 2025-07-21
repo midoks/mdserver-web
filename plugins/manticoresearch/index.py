@@ -38,12 +38,12 @@ def getInitDFile():
 
 
 def getConfTpl():
-    path = getPluginDir() + "/conf/sphinx.conf"
+    path = "/etc/manticoresearch/manticore.conf"
     return path
 
 
 def getConf():
-    path = getServerDir() + "/sphinx.conf"
+    path = "/etc/manticoresearch/manticore.conf"
     return path
 
 
