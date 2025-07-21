@@ -162,18 +162,13 @@ indexer
 
 searchd
 {
-	listen			= 9312
-	listen			= 9306:mysql41
-	log				= {$server_dir}/sphinx/index/searchd.log
-	query_log		= {$server_dir}/sphinx/index/query.log
-	read_timeout	= 5
-	max_children	= 0
-	pid_file		= {$server_dir}/sphinx/index/searchd.pid
-	seamless_rotate	= 1
-	preopen_indexes	= 1
-	unlink_old		= 1
-	#workers		= threads # for RT to work
-	binlog_path		= {$server_dir}/sphinx/index/binlog
+	listen = 127.0.0.1:9322
+    listen = 127.0.0.1:9326:mysql
+    listen = 127.0.0.1:9328:http
+	log = /var/log/manticore/searchd.log
+    query_log = /var/log/manticore/query.log
+    pid_file = /var/run/manticore/searchd.pid
+    data_dir = /var/lib/manticore
 }
 		'''
 		conf = conf.replace("{$server_dir}", mw.getServerDir())
@@ -233,7 +228,6 @@ index {$DB_NAME}_{$TABLE_NAME}_delta:{$DB_NAME}_{$TABLE_NAME}
 
     html_strip	= 1
     ngram_len	= 1
-    ngram_chars	= U+3000..U+2FA1F
 
 {$SPH_FIELD_INDEX}
 }
