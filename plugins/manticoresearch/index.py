@@ -128,6 +128,13 @@ def mkdirAll():
         else:
             mw.execShell('mkdir -p ' + os.path.dirname(x))
 
+def isInitFile():
+    path = getServerDir() + '/init.pl'
+    if os.path.exists(path):
+        return True
+    mw.writeFile(path, 'ok')
+    return False
+
 def initDreplace():
 
     dirs_list = [
@@ -145,7 +152,7 @@ def initDreplace():
 
     # config replace
     conf_bin = getConf()
-    if not os.path.exists(conf_bin):
+    if not os.path.exists(conf_bin) or not isInitFile():
         conf_content = mw.readFile(getConfTpl())
         conf_content = contentReplace(conf_content)
         mw.writeFile(getConf(), conf_content)
@@ -272,10 +279,38 @@ def runStatus():
     if s != 'start':
         return mw.returnJson(False, '没有启动程序')
 
-    port = getHttpPort()
-    url = "http://127.0.0.1:"+port+"/status"
-    data = mw.httpGet(url)
-    return mw.returnJson(True, 'ok', data)
+    sys.path.append(getPluginDir() + "/class")
+    import sphinxapi
+
+    sh = sphinxapi.SphinxClient()
+    port = getMainPort()
+    sh.SetServer('127.0.0.1', port)
+    info_status = sh.Status()
+
+    rData = {}
+    for x in range(len(info_status)):
+        rData[info_status[x][0]] = info_status[x][1]
+
+    return mw.returnJson(True, 'ok', rData)
+
+def runStatusTest():
+    s = status()
+    if s != 'start':
+        return mw.returnJson(False, '没有启动程序')
+
+    sys.path.append(getPluginDir() + "/class")
+    import sphinxapi
+
+    sh = sphinxapi.SphinxClient()
+    port = getMainPort()
+    sh.SetServer('127.0.0.1', port)
+    info_status = sh.Status()
+
+    rData = {}
+    for x in range(len(info_status)):
+        rData[info_status[x][0]] = info_status[x][1]
+
+    return mw.returnJson(True, 'ok', rData)
 
 
 def sphinxConfParse():
@@ -454,6 +489,8 @@ if __name__ == "__main__":
         print(queryLog())
     elif func == 'run_status':
         print(runStatus())
+    elif func == 'run_status_test':
+        print(runStatusTest())
     elif func == 'sphinx_cmd':
         print(sphinxCmd())
     elif func == 'db_to_sphinx':
