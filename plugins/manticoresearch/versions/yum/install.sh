@@ -32,6 +32,9 @@ Install_App()
 	if [ -d ${MC_DIR} ];then
 		rm -rf ${MC_DIR}
 	fi
+
+	cd ${rootPath} && python3 plugins/manticoresearch/index.py start ${VERSION}
+	cd ${rootPath} && python3 plugins/manticoresearch/index.py initd_install ${VERSION}
 }
 
 Uninstall_App()
@@ -49,6 +52,9 @@ Uninstall_App()
 		rm -rf /lib/systemd/system/manticore.service
 		systemctl daemon-reload
 	fi
+
+	cd ${rootPath} && python3 plugins/manticoresearch/index.py stop ${VERSION}
+	cd ${rootPath} && python3 plugins/manticoresearch/index.py initd_uninstall ${VERSION}
 
 	echo "卸载manticoresearch成功"
 }
