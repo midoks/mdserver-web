@@ -240,12 +240,28 @@ def runLog():
     return tmp.groups()[0]
 
 
-def getPort():
+def getMainPort():
     path = getConf()
     content = mw.readFile(path)
     rep = r'listen\s*=\s*(.*)'
     conf = re.search(rep, content)
     port_line = conf.groups()[0]
+    return port_line.split(":")[1]
+
+def getMysqlPort():
+    path = getConf()
+    content = mw.readFile(path)
+    rep = r'listen\s*=\s*(.*)'
+    conf = re.search(rep, content)
+    port_line = conf.groups()[1]
+    return port_line.split(":")[1]
+
+def getHttpPort():
+    path = getConf()
+    content = mw.readFile(path)
+    rep = r'listen\s*=\s*(.*)'
+    conf = re.search(rep, content)
+    port_line = conf.groups()[2]
     return port_line.split(":")[1]
 
 
@@ -262,19 +278,10 @@ def runStatus():
     if s != 'start':
         return mw.returnJson(False, '没有启动程序')
 
-    sys.path.append(getPluginDir() + "/class")
-    import sphinxapi
-
-    sh = sphinxapi.SphinxClient()
-    port = getPort()
-    sh.SetServer('127.0.0.1', port)
-    info_status = sh.Status()
-
-    rData = {}
-    for x in range(len(info_status)):
-        rData[info_status[x][0]] = info_status[x][1]
-
-    return mw.returnJson(True, 'ok', rData)
+    port = getHttpPort()
+    url = "http://127.0.0.1:"+port+"/status"
+    data = mw.httpGet(url)
+    return mw.returnJson(True, 'ok', data)
 
 
 def sphinxConfParse():
