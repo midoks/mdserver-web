@@ -178,20 +178,11 @@ def checkIndexSph():
                 return False
     return True
 
-
 def mcsOp(method):
-    file = initDreplace()
-
-    if not mw.isAppleSystem():
-        data = mw.execShell('systemctl ' + method + ' manticore')
-        if data[1] == '':
-            return 'ok'
-        return 'fail'
-
-    data = mw.execShell(file + ' ' + method)
+    data = mw.execShell('systemctl ' + method + ' manticore')
     if data[1] == '':
         return 'ok'
-    return data[1]
+    return 'fail'
 
 
 def start():
