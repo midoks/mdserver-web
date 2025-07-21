@@ -137,6 +137,9 @@ def initDreplace():
         if not os.path.exists(d):
             mw.execShell('mkdir -p ' + d)
 
+    mw.execShell("chown -R manticore:manticore /var/run/manticore")
+
+
     # config replace
     conf_bin = getConf()
     if not os.path.exists(conf_bin):
