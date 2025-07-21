@@ -23,9 +23,6 @@ def getPluginName():
     return 'manticoresearch'
 
 def getSeName():
-    data = mw.execShell('which yum')
-    if data[1] == '':
-        return 'manticore-indexer'
     return 'manticore'
 
 def getPluginDir():
