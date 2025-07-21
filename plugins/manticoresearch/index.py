@@ -38,7 +38,7 @@ def getInitDFile():
 
 
 def getConfTpl():
-    path = "/etc/manticoresearch/manticore.conf"
+    path = getPluginDir() + "/conf/manticore.conf"
     return path
 
 
