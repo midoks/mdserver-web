@@ -268,7 +268,7 @@ def sphinxConfParse():
     sindex = re.findall(rep, content)
     indexlen = len(sindex)
     cmd = {}
-    cmd['cmd'] = bin_dir + '/bin/bin/indexer -c ' + bin_dir + '/mkdir.conf'
+    cmd['cmd'] = "/usr/bin/indexer -c " + getConf()
 
     cmd['index'] = []
     cmd_index = []
