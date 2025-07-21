@@ -44,6 +44,15 @@ Uninstall_App()
 		rm -rf $serverPath/manticoresearch
 	fi
 
+	
+	if [ -f /usr/lib/systemd/system/manticore.service ] || [ -f /lib/systemd/system/manticore.service ];then
+		systemctl stop manticore
+		systemctl disable manticore
+		rm -rf /usr/lib/systemd/system/manticore.service
+		rm -rf /lib/systemd/system/manticore.service
+		systemctl daemon-reload
+	fi
+
 	echo "卸载manticoresearch成功"
 }
 
