@@ -224,10 +224,7 @@ def rebuild():
 
 
 def initdStatus():
-    if mw.isAppleSystem():
-        return "Apple Computer does not support"
-
-    shell_cmd = 'systemctl status sphinx | grep loaded | grep "enabled;"'
+    shell_cmd = 'systemctl status manticore | grep loaded | grep "enabled;"'
     data = mw.execShell(shell_cmd)
     if data[0] == '':
         return 'fail'
@@ -235,18 +232,12 @@ def initdStatus():
 
 
 def initdInstall():
-    if mw.isAppleSystem():
-        return "Apple Computer does not support"
-
-    mw.execShell('systemctl enable sphinx')
+    mw.execShell('systemctl enable manticore')
     return 'ok'
 
 
 def initdUinstall():
-    if mw.isAppleSystem():
-        return "Apple Computer does not support"
-
-    mw.execShell('systemctl disable sphinx')
+    mw.execShell('systemctl disable manticore')
     return 'ok'
 
 
