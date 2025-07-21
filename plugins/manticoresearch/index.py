@@ -277,6 +277,25 @@ def runStatus():
     data = mw.httpGet(url)
     return mw.returnJson(True, 'ok', data)
 
+def runStatusTest():
+    s = status()
+    if s != 'start':
+        return mw.returnJson(False, '没有启动程序')
+
+    sys.path.append(getPluginDir() + "/class")
+    import sphinxapi
+
+    sh = sphinxapi.SphinxClient()
+    port = getMainPort()
+    sh.SetServer('127.0.0.1', port)
+    info_status = sh.Status()
+
+    rData = {}
+    for x in range(len(info_status)):
+        rData[info_status[x][0]] = info_status[x][1]
+
+    return mw.returnJson(True, 'ok', rData)
+
 
 def sphinxConfParse():
     file = getConf()
@@ -454,6 +473,8 @@ if __name__ == "__main__":
         print(queryLog())
     elif func == 'run_status':
         print(runStatus())
+    elif func == 'run_status_test':
+        print(runStatusTest())
     elif func == 'sphinx_cmd':
         print(sphinxCmd())
     elif func == 'db_to_sphinx':
