@@ -244,8 +244,9 @@ def getPort():
     path = getConf()
     content = mw.readFile(path)
     rep = r'listen\s*=\s*(.*)'
-    tmp = re.search(rep, content)
-    return tmp.groups()[0]
+    conf = re.search(rep, content)
+    port_line = conf.groups()[0]
+    return port_line.split(":")[1]
 
 
 def queryLog():
