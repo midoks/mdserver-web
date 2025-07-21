@@ -1,0 +1,19 @@
+{
+	"sort": 7,
+	"ps": "SphinxSearch项目演变而来,专注于提升搜索效率与扩展性",
+	"name": "manticoresearch",
+	"title": "manticoresearch",
+	"shell": "install.sh",
+	"versions":["7.4.6"],
+	"tip": "soft",
+	"install_pre_inspection":true,
+	"checks": "server/manticoresearch",
+	"path": "server/manticoresearch",
+	"display": 1,
+	"author": "manticoresoftware",
+	"date": "2025-07-21",
+	"home": "https://github.com/manticoresoftware/manticoresearch/",
+	"doc1": "https://manual.manticoresearch.com/Introduction",
+	"type": 0,
+	"pid": "2"
+}

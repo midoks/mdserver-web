@@ -94,23 +94,18 @@ CREATE TABLE IF NOT EXISTS `{$DB_NAME}`.`{$TABLE_NAME}` (
 		return conf
 
 	def eqVerField(self, field):
-		ver = self.ver.replace(".1",'')
-		if float(ver) >= 3.6:
-			if field == 'sql_attr_timestamp':
-				return 'attr_bigint'
 
-			if field == 'sql_attr_bigint':
-				return 'attr_bigint'
+		if field == 'sql_attr_timestamp':
+			return 'attr_bigint'
 
-			if field == 'sql_attr_float':
-				return 'attr_float'
+		if field == 'sql_attr_bigint':
+			return 'attr_bigint'
 
-			if field == 'sql_field_string':
-				return 'field_string'
+		if field == 'sql_attr_float':
+			return 'attr_float'
 
-		if float(ver) >= 3.3:
-			if field == 'sql_attr_timestamp':
-				return 'sql_attr_bigint'
+		if field == 'sql_field_string':
+			return 'field_string'
 
 		return field
 
@@ -160,25 +155,14 @@ CREATE TABLE IF NOT EXISTS `{$DB_NAME}`.`{$TABLE_NAME}` (
 
 	def makeSphinxHeader(self):
 		conf = '''
-indexer
-{
-	mem_limit		= 128M
-}
-
 searchd
 {
-	listen			= 9312
-	listen			= 9306:mysql41
-	log				= {$server_dir}/sphinx/index/searchd.log
-	query_log		= {$server_dir}/sphinx/index/query.log
-	read_timeout	= 5
-	max_children	= 0
-	pid_file		= {$server_dir}/sphinx/index/searchd.pid
-	seamless_rotate	= 1
-	preopen_indexes	= 1
-	unlink_old		= 1
-	#workers		= threads # for RT to work
-	binlog_path		= {$server_dir}/sphinx/index/binlog
+	listen = 127.0.0.1:9322
+    listen = 127.0.0.1:9326:mysql
+    listen = 127.0.0.1:9328:http
+	log = /var/log/manticore/searchd.log
+    query_log = /var/log/manticore/query.log
+    pid_file = /var/run/manticore/searchd.pid
 }
 		'''
 		conf = conf.replace("{$server_dir}", mw.getServerDir())
@@ -238,7 +222,6 @@ index {$DB_NAME}_{$TABLE_NAME}_delta:{$DB_NAME}_{$TABLE_NAME}
 
     html_strip	= 1
     ngram_len	= 1
-    ngram_chars	= U+3000..U+2FA1F
 
 {$SPH_FIELD_INDEX}
 }
@@ -296,7 +279,6 @@ index {$DB_NAME}_{$TABLE_NAME}
     {$PATH_NAME}	= {$server_dir}/sphinx/index/db/{$DB_NAME}.{$TABLE_NAME}/index
 
     ngram_len	= 1
-    ngram_chars	= U+3000..U+2FA1F
 
 {$SPH_FIELD_INDEX}
 }
@@ -345,14 +327,9 @@ index {$DB_NAME}_{$TABLE_NAME}
 		return conf
 
 	def makeSphinxDbFieldRepalce(self, content, sph_field):
-		ver = self.ver.replace(".1",'')
-		ver = float(ver)
-		if ver >= 3.6:
-			content = content.replace("{$SPH_FIELD}", '')
-			content = content.replace("{$SPH_FIELD_INDEX}", '')
-		else:
-			content = content.replace("{$SPH_FIELD}", sph_field)
-			content = content.replace("{$SPH_FIELD_INDEX}", '')
+
+		content = content.replace("{$SPH_FIELD}", '')
+		content = content.replace("{$SPH_FIELD_INDEX}", '')
 
 		return content
 

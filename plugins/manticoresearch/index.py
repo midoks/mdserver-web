@@ -20,7 +20,10 @@ if mw.isAppleSystem():
     app_debug = True
 
 def getPluginName():
-    return 'sphinx'
+    return 'manticoresearch'
+
+def getSeName():
+    return 'manticore'
 
 def getPluginDir():
     return mw.getPluginDir() + '/' + getPluginName()
@@ -38,12 +41,12 @@ def getInitDFile():
 
 
 def getConfTpl():
-    path = getPluginDir() + "/conf/sphinx.conf"
+    path = getPluginDir() + "/conf/manticore.conf"
     return path
 
 
 def getConf():
-    path = getServerDir() + "/sphinx.conf"
+    path = "/etc/manticoresearch/manticore.conf"
     return path
 
 
@@ -105,8 +108,8 @@ def contentReplace(content):
 
 
 def status():
-    data = mw.execShell(
-        "ps -ef|grep sphinx |grep -v grep | grep -v mdserver-web | awk '{print $2}'")
+    cmd = "ps -ef|grep manticore |grep -v grep | grep -v mdserver-web | awk '{print $2}'"
+    data = mw.execShell(cmd)
     # print(data)
     if data[0] == '':
         return 'stop'
@@ -125,43 +128,31 @@ def mkdirAll():
         else:
             mw.execShell('mkdir -p ' + os.path.dirname(x))
 
-
 def initDreplace():
 
-    file_tpl = getInitDTpl()
-    service_path = mw.getServerDir()
+    dirs_list = [
+        "/var/log/manticore",
+        "/var/run/manticore",
+        "/var/lib/manticore"
+    ]
 
-    initD_path = getServerDir() + '/init.d'
-    if not os.path.exists(initD_path):
-        os.mkdir(initD_path)
-    file_bin = initD_path + '/' + getPluginName()
+    for d in dirs_list:
+        if not os.path.exists(d):
+            mw.execShell('mkdir -p ' + d)
 
-    # initd replace
-    if not os.path.exists(file_bin):
-        content = mw.readFile(file_tpl)
-        content = contentReplace(content)
-        mw.writeFile(file_bin, content)
-        mw.execShell('chmod +x ' + file_bin)
+    mw.execShell("chown -R manticore:manticore /var/run/manticore")
+
 
     # config replace
     conf_bin = getConf()
     if not os.path.exists(conf_bin):
         conf_content = mw.readFile(getConfTpl())
         conf_content = contentReplace(conf_content)
-        mw.writeFile(getServerDir() + '/sphinx.conf', conf_content)
+        mw.writeFile(getConf(), conf_content)
 
-    # systemd
-    systemDir = mw.systemdCfgDir()
-    systemService = systemDir + '/sphinx.service'
-    systemServiceTpl = getPluginDir() + '/init.d/sphinx.service.tpl'
-    if os.path.exists(systemDir) and not os.path.exists(systemService):
-        se_content = mw.readFile(systemServiceTpl)
-        se_content = se_content.replace('{$SERVER_PATH}', service_path)
-        mw.writeFile(systemService, se_content)
-        mw.execShell('systemctl daemon-reload')
 
     mkdirAll()
-    return file_bin
+    return "ok"
 
 
 def checkIndexSph():
@@ -178,45 +169,36 @@ def checkIndexSph():
                 return False
     return True
 
-
-def sphOp(method):
-    file = initDreplace()
-
-    if not mw.isAppleSystem():
-        data = mw.execShell('systemctl ' + method + ' ' + getPluginName())
-        if data[1] == '':
-            return 'ok'
-        return 'fail'
-
-    data = mw.execShell(file + ' ' + method)
+def mcsOp(method):
+    initDreplace()
+    data = mw.execShell('systemctl ' + method + ' ' + getSeName())
     if data[1] == '':
         return 'ok'
-    return data[1]
+    return 'fail'
 
 
 def start():
     import tool_cron
     tool_cron.createBgTask()
-    return sphOp('start')
+    return mcsOp('start')
 
 
 def stop():
     import tool_cron
     tool_cron.removeBgTask()
-    return sphOp('stop')
+    return mcsOp('stop')
 
 
 def restart():
-    return sphOp('restart')
+    return mcsOp('restart')
 
 
 def reload():
-    return sphOp('reload')
+    return mcsOp('reload')
 
 
 def rebuild():
-    file = initDreplace()
-    cmd = file + ' rebuild'
+    cmd = 'indexer --all --rotate'
     data = mw.execShell(cmd)
     if data[0].find('successfully')<0:
         return data[0].replace("\n","<br/>")
@@ -224,10 +206,8 @@ def rebuild():
 
 
 def initdStatus():
-    if mw.isAppleSystem():
-        return "Apple Computer does not support"
-
-    shell_cmd = 'systemctl status sphinx | grep loaded | grep "enabled;"'
+    service_name = getSeName()
+    shell_cmd = 'systemctl status '+service_name+' | grep loaded | grep "enabled;"'
     data = mw.execShell(shell_cmd)
     if data[0] == '':
         return 'fail'
@@ -235,18 +215,14 @@ def initdStatus():
 
 
 def initdInstall():
-    if mw.isAppleSystem():
-        return "Apple Computer does not support"
-
-    mw.execShell('systemctl enable sphinx')
+    service_name = getSeName()
+    mw.execShell('systemctl enable '+service_name)
     return 'ok'
 
 
 def initdUinstall():
-    if mw.isAppleSystem():
-        return "Apple Computer does not support"
-
-    mw.execShell('systemctl disable sphinx')
+    service_name = getSeName()
+    mw.execShell('systemctl disable '+service_name)
     return 'ok'
 
 
@@ -258,12 +234,29 @@ def runLog():
     return tmp.groups()[0]
 
 
-def getPort():
+def getMainPort():
     path = getConf()
     content = mw.readFile(path)
     rep = r'listen\s*=\s*(.*)'
-    tmp = re.search(rep, content)
-    return tmp.groups()[0]
+    conf = re.search(rep, content)
+    port_line = conf.groups()[0]
+    return port_line.split(":")[1]
+
+def getMysqlPort():
+    path = getConf()
+    content = mw.readFile(path)
+    rep = r'listen\s*=\s*(.*):mysql'
+    conf = re.search(rep, content)
+    port_line = conf.groups()[0]
+    return port_line.split(":")[1]
+
+def getHttpPort():
+    path = getConf()
+    content = mw.readFile(path)
+    rep = r'listen\s*=\s*(.*):http'
+    conf = re.search(rep, content)
+    port_line = conf.groups()[0]
+    return port_line.split(":")[1]
 
 
 def queryLog():
@@ -279,19 +272,10 @@ def runStatus():
     if s != 'start':
         return mw.returnJson(False, '没有启动程序')
 
-    sys.path.append(getPluginDir() + "/class")
-    import sphinxapi
-
-    sh = sphinxapi.SphinxClient()
-    port = getPort()
-    sh.SetServer('127.0.0.1', port)
-    info_status = sh.Status()
-
-    rData = {}
-    for x in range(len(info_status)):
-        rData[info_status[x][0]] = info_status[x][1]
-
-    return mw.returnJson(True, 'ok', rData)
+    port = getHttpPort()
+    url = "http://127.0.0.1:"+port+"/status"
+    data = mw.httpGet(url)
+    return mw.returnJson(True, 'ok', data)
 
 
 def sphinxConfParse():
@@ -302,7 +286,7 @@ def sphinxConfParse():
     sindex = re.findall(rep, content)
     indexlen = len(sindex)
     cmd = {}
-    cmd['cmd'] = bin_dir + '/bin/bin/indexer -c ' + bin_dir + '/sphinx.conf'
+    cmd['cmd'] = "indexer -c " + getConf()
 
     cmd['index'] = []
     cmd_index = []
@@ -427,9 +411,8 @@ def updateDelta():
     return ''
 
 def installPreInspection(version):
-    data = mw.execShell('arch')
-    if data[0].strip().startswith('aarch'):
-        return '不支持aarch架构'
+    if mw.isAppleSystem():
+        return '不支持mac系统'
     return 'ok'
 
 if __name__ == "__main__":

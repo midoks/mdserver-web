@@ -2262,6 +2262,10 @@ location ^~ {from} {\n\
             def_var += 'export '+k+'="'+data[k]+'"\n'
         return def_var
 
+    # def getDomainRootName(self, domain):
+    #     s = domain.split('.',1)
+    #     return s[1]
+
     def getDomainRootName(self, domain):
         import tldextract
         extracted = tldextract.extract(domain)
