@@ -131,17 +131,17 @@ def initDreplace():
     file_tpl = getInitDTpl()
     service_path = mw.getServerDir()
 
-    initD_path = getServerDir() + '/init.d'
-    if not os.path.exists(initD_path):
-        os.mkdir(initD_path)
-    file_bin = initD_path + '/' + getPluginName()
+    # initD_path = getServerDir() + '/init.d'
+    # if not os.path.exists(initD_path):
+    #     os.mkdir(initD_path)
+    # file_bin = initD_path + '/' + getPluginName()
 
-    # initd replace
-    if not os.path.exists(file_bin):
-        content = mw.readFile(file_tpl)
-        content = contentReplace(content)
-        mw.writeFile(file_bin, content)
-        mw.execShell('chmod +x ' + file_bin)
+    # # initd replace
+    # if not os.path.exists(file_bin):
+    #     content = mw.readFile(file_tpl)
+    #     content = contentReplace(content)
+    #     mw.writeFile(file_bin, content)
+    #     mw.execShell('chmod +x ' + file_bin)
 
     # config replace
     conf_bin = getConf()
