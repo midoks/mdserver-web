@@ -148,7 +148,7 @@ def initDreplace():
     if not os.path.exists(conf_bin):
         conf_content = mw.readFile(getConfTpl())
         conf_content = contentReplace(conf_content)
-        mw.writeFile(getServerDir() + '/sphinx.conf', conf_content)
+        mw.writeFile(getServerDir() + '/manticore.conf', conf_content)
 
     # systemd
     # systemDir = mw.systemdCfgDir()
