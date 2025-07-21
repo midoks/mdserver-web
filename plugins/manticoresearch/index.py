@@ -105,8 +105,8 @@ def contentReplace(content):
 
 
 def status():
-    data = mw.execShell(
-        "ps -ef|grep manticore |grep -v grep | grep -v mdserver-web | awk '{print $2}'")
+    cmd = "ps -ef|grep manticore |grep -v grep | grep -v mdserver-web | awk '{print $2}'"
+    data = mw.execShell(cmd)
     # print(data)
     if data[0] == '':
         return 'stop'
