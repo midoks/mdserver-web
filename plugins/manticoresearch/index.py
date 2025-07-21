@@ -253,7 +253,7 @@ def getMysqlPort():
     content = mw.readFile(path)
     rep = r'listen\s*=\s*(.*):mysql'
     conf = re.search(rep, content)
-    port_line = conf.groups()[1]
+    port_line = conf.groups()[0]
     return port_line.split(":")[1]
 
 def getHttpPort():
