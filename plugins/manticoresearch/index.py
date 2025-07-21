@@ -151,14 +151,14 @@ def initDreplace():
         mw.writeFile(getServerDir() + '/sphinx.conf', conf_content)
 
     # systemd
-    systemDir = mw.systemdCfgDir()
-    systemService = systemDir + '/sphinx.service'
-    systemServiceTpl = getPluginDir() + '/init.d/sphinx.service.tpl'
-    if os.path.exists(systemDir) and not os.path.exists(systemService):
-        se_content = mw.readFile(systemServiceTpl)
-        se_content = se_content.replace('{$SERVER_PATH}', service_path)
-        mw.writeFile(systemService, se_content)
-        mw.execShell('systemctl daemon-reload')
+    # systemDir = mw.systemdCfgDir()
+    # systemService = systemDir + '/sphinx.service'
+    # systemServiceTpl = getPluginDir() + '/init.d/sphinx.service.tpl'
+    # if os.path.exists(systemDir) and not os.path.exists(systemService):
+    #     se_content = mw.readFile(systemServiceTpl)
+    #     se_content = se_content.replace('{$SERVER_PATH}', service_path)
+    #     mw.writeFile(systemService, se_content)
+    #     mw.execShell('systemctl daemon-reload')
 
     mkdirAll()
     return file_bin
