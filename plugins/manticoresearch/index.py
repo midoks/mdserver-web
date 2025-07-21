@@ -272,10 +272,19 @@ def runStatus():
     if s != 'start':
         return mw.returnJson(False, '没有启动程序')
 
-    port = getHttpPort()
-    url = "http://127.0.0.1:"+port+"/status"
-    data = mw.httpGet(url)
-    return mw.returnJson(True, 'ok', data)
+    sys.path.append(getPluginDir() + "/class")
+    import sphinxapi
+
+    sh = sphinxapi.SphinxClient()
+    port = getMainPort()
+    sh.SetServer('127.0.0.1', port)
+    info_status = sh.Status()
+
+    rData = {}
+    for x in range(len(info_status)):
+        rData[info_status[x][0]] = info_status[x][1]
+
+    return mw.returnJson(True, 'ok', rData)
 
 def runStatusTest():
     s = status()
