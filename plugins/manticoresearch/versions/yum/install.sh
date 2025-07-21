@@ -18,7 +18,23 @@ VERSION=$2
 
 Install_App()
 {
-	echo '正在安装manticore...'
+	echo '正在安装manticoresearch...'
+	mkdir -p $serverPath/manticoresearch
+
+	MC_DIR=${serverPath}/source/manticoresearch
+	mkdir -p $MC_DIR
+
+	wget --no-check-certificate -O $MC_DIR/manticore-repo.noarch.deb https://repo.manticoresearch.com/manticore-repo.noarch.deb
+	dpkg -i $MC_DIR/manticore-repo.noarch.deb
+	apt update -y 
+	apt -y install manticore manticore-extra
+
+
+	echo "${VERSION}" > $serverPath/manticoresearch/version.pl
+
+	if [ -d ${MC_DIR} ];then
+		rm -rf ${MC_DIR}
+	fi
 }
 
 Uninstall_App()
