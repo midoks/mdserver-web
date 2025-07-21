@@ -183,7 +183,7 @@ def sphOp(method):
     file = initDreplace()
 
     if not mw.isAppleSystem():
-        data = mw.execShell('systemctl ' + method + ' sphinx')
+        data = mw.execShell('systemctl ' + method + ' manticore')
         if data[1] == '':
             return 'ok'
         return 'fail'
