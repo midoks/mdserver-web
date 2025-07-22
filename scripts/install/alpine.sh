@@ -11,7 +11,7 @@ LANG=en_US.UTF-8
 # for debug
 apk add htop --force-broken-world
 # for debug end
-
+apk add build-base --force-broken-world
 apk add openssl openssl-devel --force-broken-world
 apk add bison re2c make cmake gcc --force-broken-world
 apk add gcc-c++ --force-broken-world
