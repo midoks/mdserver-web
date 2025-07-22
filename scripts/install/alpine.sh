@@ -10,6 +10,7 @@ LANG=en_US.UTF-8
 
 # for debug
 apk add htop --force-broken-world
+apk add linux-headers --force-broken-world
 # for debug end
 apk add build-base --force-broken-world
 apk add openssl openssl-devel --force-broken-world
