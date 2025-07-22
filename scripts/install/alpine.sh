@@ -9,55 +9,55 @@ LANG=en_US.UTF-8
 # systemctl stop SuSEfirewall2
 
 # for debug
-apk add htop
+apk add htop --force-broken-world
 # for debug end
 
-apk add openssl openssl-devel
-apk add bison re2c make cmake gcc
-apk add gcc-c++
-apk add autoconf
-apk add python3-pip
-apk add pcre pcre-devel
-apk add graphviz libxml2 libxml2-devel
-apk add curl curl-devel
-apk add freetype freetype-devel
-apk add mysql-devel
-apk add ImageMagick ImageMagick-devel
-apk add libjpeg-devel libpng-devel
-apk add libevent-devel
-apk add libtirpc-devel
-apk add rpcgen
-apk add libstdc++6
-apk add expect
-apk add pv
-apk add bc
-apk add bzip2
+apk add openssl openssl-devel --force-broken-world
+apk add bison re2c make cmake gcc --force-broken-world
+apk add gcc-c++ --force-broken-world
+apk add autoconf --force-broken-world
+apk add python3-pip --force-broken-world
+apk add pcre pcre-devel --force-broken-world
+apk add graphviz libxml2 libxml2-devel --force-broken-world
+apk add curl curl-devel --force-broken-world
+apk add freetype freetype-devel --force-broken-world
+apk add mysql-devel --force-broken-world
+apk add ImageMagick ImageMagick-devel --force-broken-world
+apk add libjpeg-devel libpng-devel --force-broken-world
+apk add libevent-devel --force-broken-world
+apk add libtirpc-devel --force-broken-world
+apk add rpcgen --force-broken-world
+apk add libstdc++6 --force-broken-world
+apk add expect --force-broken-world
+apk add pv --force-broken-world
+apk add bc --force-broken-world
+apk add bzip2 --force-broken-world
 
-apk add libzip libzip-devel
-apk add unrar rar
-apk add libmemcached libmemcached-devel
+apk add libzip libzip-devel --force-broken-world
+apk add unrar rar --force-broken-world
+apk add libmemcached libmemcached-devel --force-broken-world
 
-apk add icu libicu-devel
-apk add sqlite3 sqlite3-devel
-apk add oniguruma-devel
+apk add icu libicu-devel --force-broken-world
+apk add sqlite3 sqlite3-devel --force-broken-world
+apk add oniguruma-devel --force-broken-world
 
 # apk add libmcrypt libmcrypt-devel
 # apk add protobuf
 # apk add zlib-devel
 
-apk add python3-devel
-apk add python-devel
+apk add python3-devel --force-broken-world
+apk add python-devel --force-broken-world
 
-apk add libwebp-devel
-apk add libtomcrypt
-apk add libtomcrypt-devel
+apk add libwebp-devel --force-broken-world
+apk add libtomcrypt --force-broken-world
+apk add libtomcrypt-devel --force-broken-world
 
-apk add libXpm-devel
-apk add freetype2-devel
-apk add libargon2-devel
+apk add libXpm-devel --force-broken-world
+apk add freetype2-devel --force-broken-world
+apk add libargon2-devel --force-broken-world
 
-apk add net-tools-deprecated
-apk add numactl
+apk add net-tools-deprecated --force-broken-world
+apk add numactl --force-broken-world
 
 # apk add  php-config
 
@@ -69,7 +69,7 @@ fi
 echo "SSH PORT:${SSH_PORT}"
 
 if [ ! -f /usr/sbin/firewalld ];then
-	apk add firewalld 
+	apk add firewalld --force-broken-world
 	systemctl enable firewalld
 	systemctl start firewalld
 
