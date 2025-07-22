@@ -64,6 +64,8 @@ elif grep -Eqi "Ubuntu" /etc/issue || grep -Eqi "Ubuntu" /etc/*-release; then
 	apt install -y wget zip unzip
 elif grep -Eqi "Raspbian" /etc/issue || grep -Eqi "Raspbian" /etc/*-release; then
 	OSNAME='raspbian'
+elif grep -Eqi "Alpine" /etc/issue || grep -Eqi "Alpine" /etc/*-release; then
+	OSNAME='alpine'
 else
 	OSNAME='unknow'
 fi
