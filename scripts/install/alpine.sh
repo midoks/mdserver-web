@@ -12,6 +12,7 @@ LANG=en_US.UTF-8
 apk add htop --force-broken-world
 apk add linux-headers --force-broken-world
 # for debug end
+
 apk add build-base --force-broken-world
 apk add openssl openssl-devel --force-broken-world
 apk add bison re2c make cmake gcc --force-broken-world
@@ -71,24 +72,24 @@ echo "SSH PORT:${SSH_PORT}"
 
 if [ ! -f /usr/sbin/firewalld ];then
 	apk add firewalld --force-broken-world
-	systemctl enable firewalld
-	systemctl start firewalld
+	which systemctl && systemctl enable firewalld
+	which systemctl && systemctl start firewalld
 
 	if [ "$SSH_PORT" != "" ];then
-		firewall-cmd --permanent --zone=public --add-port=${SSH_PORT}/tcp
+		which firewall-cmd && firewall-cmd --permanent --zone=public --add-port=${SSH_PORT}/tcp
 	else
-		firewall-cmd --permanent --zone=public --add-port=22/tcp
+		which firewall-cmd && firewall-cmd --permanent --zone=public --add-port=22/tcp
 	fi
 	
-	firewall-cmd --permanent --zone=public --add-port=80/tcp
-	firewall-cmd --permanent --zone=public --add-port=443/tcp
-	firewall-cmd --permanent --zone=public --add-port=443/udp
+	which firewall-cmd && firewall-cmd --permanent --zone=public --add-port=80/tcp
+	which firewall-cmd && firewall-cmd --permanent --zone=public --add-port=443/tcp
+	which firewall-cmd && firewall-cmd --permanent --zone=public --add-port=443/udp
 	# firewall-cmd --permanent --zone=public --add-port=888/tcp
 
 	sed -i 's#AllowZoneDrifting=yes#AllowZoneDrifting=no#g' /etc/firewalld/firewalld.conf
-	firewall-cmd --reload
+	which systemctl && firewall-cmd --reload
 	#安装时不开启
-	systemctl stop firewalld
+	which systemctl && systemctl stop firewalld
 fi
 
 cd /www/server/mdserver-web/scripts && bash lib.sh
