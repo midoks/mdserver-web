@@ -3,10 +3,6 @@ PATH=/bin:/sbin:/usr/bin:/usr/sbin:/usr/local/bin:/usr/local/sbin:~/bin:/opt/hom
 export PATH
 LANG=en_US.UTF-8
 
-# apk refresh
-
-
-# systemctl stop SuSEfirewall2
 
 # for debug
 apk add htop --force-broken-world
