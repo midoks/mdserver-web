@@ -70,8 +70,8 @@ elif grep -Eqi "Debian" /etc/issue || grep -Eqi "Debian" /etc/*-release; then
 elif grep -Eqi "Alpine" /etc/issue || grep -Eqi "Alpine" /etc/*-release; then
 	OSNAME='alpine'
 	apk update
-	apk add devscripts
-	apk add wget zip unzip tar
+	apk add devscripts -force-broken-world
+	apk add wget zip unzip tar -force-broken-world
 else
 	OSNAME='unknow'
 fi
