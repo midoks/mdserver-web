@@ -127,6 +127,7 @@ def mkdirAll():
             mw.execShell('mkdir -p ' + x)
         else:
             mw.execShell('mkdir -p ' + os.path.dirname(x))
+        mw.execShell("chown -R manticore:manticore "+x)
 
 def isInitFile():
     path = getServerDir() + '/init.pl'
@@ -159,6 +160,7 @@ def initDreplace():
 
 
     mkdirAll()
+
     return "ok"
 
 
