@@ -218,7 +218,7 @@ source {$DB_NAME}_{$TABLE_NAME}_delta:{$DB_NAME}_{$TABLE_NAME}
 index {$DB_NAME}_{$TABLE_NAME}_delta:{$DB_NAME}_{$TABLE_NAME}
 {
     source 	= {$DB_NAME}_{$TABLE_NAME}_delta
-    {$PATH_NAME} 	= {$server_dir}/sphinx/index/db/{$DB_NAME}.{$TABLE_NAME}/delta
+    {$PATH_NAME} 	= {$server_dir}/manticoresearch/index/db/{$DB_NAME}.{$TABLE_NAME}/delta
 
     html_strip	= 1
     ngram_len	= 1
