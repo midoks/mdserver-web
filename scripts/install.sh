@@ -62,6 +62,11 @@ elif grep -Eqi "Ubuntu" /etc/issue || grep -Eqi "Ubuntu" /etc/os-release; then
 	OSNAME='ubuntu'
 	# apt update -y
 	apt install -y wget curl zip unzip tar cron
+elif grep -Eqi "Alpine" /etc/issue || grep -Eqi "Alpine" /etc/*-release; then
+	OSNAME='alpine'
+	apk update
+	apk add devscripts -force-broken-world
+	apk add wget zip unzip tar -force-broken-world
 else
 	OSNAME='unknow'
 fi

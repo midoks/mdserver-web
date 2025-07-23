@@ -67,6 +67,11 @@ elif grep -Eqi "Debian" /etc/issue || grep -Eqi "Debian" /etc/*-release; then
 	apt update -y
 	apt install -y devscripts
 	apt install -y wget zip unzip tar
+elif grep -Eqi "Alpine" /etc/issue || grep -Eqi "Alpine" /etc/*-release; then
+	OSNAME='alpine'
+	apk update
+	apk add devscripts -force-broken-world
+	apk add curl wget zip unzip tar -force-broken-world
 else
 	OSNAME='unknow'
 fi
