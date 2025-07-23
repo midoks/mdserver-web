@@ -201,7 +201,7 @@ def restart():
 
 
 def reload():
-    return mcsOp('reload')
+    return mcsOp('restart')
 
 
 def rebuild():
