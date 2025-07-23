@@ -287,6 +287,9 @@ def runStatus():
     sh.SetServer('127.0.0.1', port)
     info_status = sh.Status()
 
+    if info_status is None:
+        return mw.returnJson(False,'无法获取运行状态!') 
+
     rData = {}
     for x in range(len(info_status)):
         rData[info_status[x][0]] = info_status[x][1]
