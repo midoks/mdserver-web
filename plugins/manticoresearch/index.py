@@ -407,6 +407,7 @@ def makeDbToSphinx():
         tables = tables.split(',')
         content = sph_make.makeSqlToSphinx(db, tables, is_delta_bool)
         mw.writeFile(sph_file,content)
+        mkdirAll()
         return mw.returnJson(True,'设置成功!')
 
     return mw.returnJson(True,'测试中')
