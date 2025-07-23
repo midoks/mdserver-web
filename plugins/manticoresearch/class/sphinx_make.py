@@ -276,7 +276,7 @@ source {$DB_NAME}_{$TABLE_NAME}
 index {$DB_NAME}_{$TABLE_NAME}
 {
     source	= {$DB_NAME}_{$TABLE_NAME}
-    {$PATH_NAME}	= {$server_dir}/sphinx/index/db/{$DB_NAME}.{$TABLE_NAME}/index
+    {$PATH_NAME}	= {$server_dir}/manticoresearch/index/db/{$DB_NAME}.{$TABLE_NAME}/index
 
     ngram_len	= 1
 
