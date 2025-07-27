@@ -1519,7 +1519,8 @@ def setRootPwdForce(new_password,version=''):
         # 设置新密码
         cmd_newpass = serverdir+f"/bin/mysql -u root -e \"ALTER USER 'root'@'localhost' IDENTIFIED BY '{new_password}'; FLUSH PRIVILEGES;\""
         data = mw.execShell(cmd_newpass)
-        print(cmd_newpass, "新密码",data)
+        print("新密码",cmd_newpass)
+        print(data)
     
     # 验证密码
     cmd = serverdir+f"/bin/mysql -u root -p'{new_password}' -e 'SHOW DATABASES;'"
