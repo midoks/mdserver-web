@@ -1478,12 +1478,18 @@ def syncToDatabases():
     return mw.returnJson(True, msg)
 
 def setRootPwdForce(new_password,version=''):
-    stop(version)
+    # stop(version)
+    # | awk '{print $2}'| xargs kill
+    data = mw.execShell("ps -ef|grep mysql|grep -v plugins |grep -v grep | awk '{print $2}'| xargs kill")
+    print(data)
     time.sleep(1)
 
     serverdir = getServerDir()
     # 启动安全模式
-    safe_process = subprocess.Popen(serverdir+"/bin/mysqld_safe --skip-grant-tables --skip-networking",
+
+    cmd_msafe = serverdir+"/bin/mysqld_safe --skip-grant-tables --skip-networking"
+    print(cmd_msafe)
+    safe_process = subprocess.Popen(cmd_msafe,
         shell=True,
         stdout=subprocess.DEVNULL,
         stderr=subprocess.DEVNULL
