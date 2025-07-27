@@ -1485,8 +1485,8 @@ def setRootPwdForce(new_password,version=''):
     time.sleep(1)
 
     serverdir = getServerDir()
-    # 启动安全模式
 
+    # 启动安全模式
     cmd_msafe = serverdir+"/bin/mysqld_safe --skip-grant-tables --skip-networking"
     print(cmd_msafe)
     safe_process = subprocess.Popen(cmd_msafe,
@@ -1497,8 +1497,10 @@ def setRootPwdForce(new_password,version=''):
     # 等待MySQL安全模式启动...
     time.sleep(5)
 
-    mw.execShell(serverdir+"/bin/mysql -u root -e \"UPDATE mysql.user SET authentication_string = '' WHERE user = 'root'; FLUSH PRIVILEGES;\"")
-
+    cmd_clear_root = serverdir+"/bin/mysql -u root -e \"UPDATE mysql.user SET authentication_string = '' WHERE user = 'root'; FLUSH PRIVILEGES;\""
+    data = mw.execShell(cmd_clear_root)
+    print(data)
+    
     # 停止安全模式
     safe_process.terminate()
     safe_process.wait()
