@@ -1516,6 +1516,9 @@ def setRootPwdForce(new_password,version=''):
     time.sleep(5)
     
     if not version.startswith("5.5") and not version.startswith("5.6"):
+        # 针对MySQL 8.0+调整密码策略
+        if version.startswith("8."):
+            adjust_password_policy(version)
         # 设置新密码
         cmd_newpass = serverdir+f"/bin/mysql -u root -e \"ALTER USER 'root'@'localhost' IDENTIFIED BY '{new_password}'; FLUSH PRIVILEGES;\""
         data = mw.execShell(cmd_newpass)
