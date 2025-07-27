@@ -1479,7 +1479,7 @@ def syncToDatabases():
 
 def setRootPwdForce(new_password,version=''):
     stop(version)
-    sleep(1)
+    time.sleep(1)
 
     serverdir = getServerDir()
     # 启动安全模式
