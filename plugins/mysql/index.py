@@ -1486,14 +1486,14 @@ def setRootPwdForce(new_password,version=''):
     # stop(version)
     # | awk '{print $2}'| xargs kill
     data = mw.execShell("ps -ef|grep mysql|grep -v plugins |grep -v grep | awk '{print $2}'| xargs kill")
-    print(data)
+    # print(data)
     time.sleep(1)
 
     serverdir = getServerDir()
 
     # 启动安全模式
     cmd_msafe = serverdir+"/bin/mysqld_safe --skip-grant-tables --skip-networking"
-    print("cmd_msafe",cmd_msafe)
+    # print("cmd_msafe",cmd_msafe)
     subprocess.Popen(cmd_msafe, stdout=subprocess.PIPE, shell=True,bufsize=4096, stderr=subprocess.PIPE)
     # 等待MySQL安全模式启动...
     time.sleep(5)
@@ -1501,15 +1501,15 @@ def setRootPwdForce(new_password,version=''):
     if version.startswith("5.5") or version.startswith("5.6"):
         cmd_mod_root = serverdir+f"/bin/mysql -u root -e \"UPDATE mysql.user SET Password=PASSWORD('{new_password}') WHERE user='root'; FLUSH PRIVILEGES;\""
         data = mw.execShell(cmd_mod_root)
-        print("修改root密码", cmd_mod_root)
-        print(data)
+        # print("修改root密码", cmd_mod_root)
+        # print(data)
     else:
         cmd_clear_root = serverdir+"/bin/mysql -u root -e \"UPDATE mysql.user SET authentication_string = '' WHERE user = 'root'; FLUSH PRIVILEGES;\""
         data = mw.execShell(cmd_clear_root)
-        print(cmd_clear_root,"清空root密码",data)
+        # print(cmd_clear_root,"清空root密码",data)
 
     data = mw.execShell("ps -ef|grep mysql|grep -v plugins |grep -v grep | awk '{print $2}'| xargs kill")
-    print("停止安全模式",data)
+    # print("停止安全模式",data)
 
     # 正常启动MySQL
     start(version)
@@ -1522,18 +1522,15 @@ def setRootPwdForce(new_password,version=''):
         # 设置新密码
         cmd_newpass = serverdir+f"/bin/mysql -u root -e \"ALTER USER 'root'@'localhost' IDENTIFIED BY '{new_password}'; FLUSH PRIVILEGES;\""
         data = mw.execShell(cmd_newpass)
-        print("新密码",cmd_newpass)
-        print(data)
+        # print("新密码",cmd_newpass)
+        # print(data)
     
     # 验证密码
     cmd = serverdir+f"/bin/mysql -u root -p'{new_password}' -e 'SHOW DATABASES;'"
     data = mw.execShell(cmd)
-    print("验证密码",data)
-    #     print("\033[32m密码重置成功!\033[0m")
-    #     print(f"新root密码: {new_password}")
-    # else:
-    #     print("\033[31m密码验证失败，请手动检查\033[0m")
-    #     sys.exit(1)
+    if data[1] == '':
+        return True
+    return False
 
 
 def setRootPwd(version=''):
@@ -1551,7 +1548,7 @@ def setRootPwd(version=''):
     if 'force' in args and args['force'] == '2':
         force = 2
         setRootPwdForce(password,version)
-
+        return mw.returnJson(True, '【强制】数据库root密码修改成功!')
     
     try:
         pdb = pMysqlDb()
