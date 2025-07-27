@@ -1493,7 +1493,7 @@ def setRootPwdForce(new_password,version=''):
     # 等待MySQL安全模式启动...
     time.sleep(5)
 
-    if mysql_version.startswith("5.5") or mysql_version.startswith("5.6"):
+    if version.startswith("5.5") or version.startswith("5.6"):
         cmd_mod_root = f"UPDATE mysql.user SET Password=PASSWORD('{new_password}') WHERE user='root'; FLUSH PRIVILEGES;"
         data = mw.execShell(cmd_mod_root)
         print(cmd_mod_root,"修改root密码",data)
@@ -1509,7 +1509,7 @@ def setRootPwdForce(new_password,version=''):
     start(version)
     time.sleep(5)
     
-    if not mysql_version.startswith("5.5") and not mysql_version.startswith("5.6"):
+    if not version.startswith("5.5") and not version.startswith("5.6"):
         # 设置新密码
         cmd_newpass = serverdir+f"/bin/mysql -u root -e \"ALTER USER 'root'@'localhost' IDENTIFIED BY '{new_password}'; FLUSH PRIVILEGES;\""
         data = mw.execShell(cmd_newpass)
