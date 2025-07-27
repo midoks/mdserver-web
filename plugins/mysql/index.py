@@ -1488,7 +1488,7 @@ def setRootPwdForce(new_password,version=''):
 
     # 启动安全模式
     cmd_msafe = serverdir+"/bin/mysqld_safe --skip-grant-tables --skip-networking"
-    print(cmd_msafe)
+    print("cmd_msafe",cmd_msafe)
     safe_process = subprocess.Popen(cmd_msafe,
         shell=True,
         stdout=subprocess.DEVNULL,
@@ -1499,8 +1499,8 @@ def setRootPwdForce(new_password,version=''):
 
     cmd_clear_root = serverdir+"/bin/mysql -u root -e \"UPDATE mysql.user SET authentication_string = '' WHERE user = 'root'; FLUSH PRIVILEGES;\""
     data = mw.execShell(cmd_clear_root)
-    print(data)
-    
+    print("cmd_clear_root",data)
+
     # 停止安全模式
     safe_process.terminate()
     safe_process.wait()
@@ -1515,7 +1515,7 @@ def setRootPwdForce(new_password,version=''):
     # 验证密码
     cmd = serverdir+f"/bin/mysql -u root -p'{new_password}' -e 'SHOW DATABASES;'"
     data = mw.execShell(cmd)
-    print(data)
+    print("验证密码",data)
     #     print("\033[32m密码重置成功!\033[0m")
     #     print(f"新root密码: {new_password}")
     # else:
