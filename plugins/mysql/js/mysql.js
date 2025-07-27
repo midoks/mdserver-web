@@ -544,7 +544,7 @@ function setRootPwd(type, pwd){
         content: "<form class='bt-form pd20' id='mod_pwd'>\
                     <div class='line'>\
                         <span class='tname'>root密码</span>\
-                        <div class='info-r'><input class='bt-input-text mr5' type='text' name='password' id='MyPassword' style='width:330px' value='"+pwd+"' />\
+                        <div class='info-r'><input class='bt-input-text mr5' type='text' name='password' id='MyPassword' style='width:630px' value='"+pwd+"' />\
                             <span title='随机密码' class='glyphicon glyphicon-repeat cursor' onclick='repeatPwd(16)'></span>\
                         </div>\
                     </div>\
