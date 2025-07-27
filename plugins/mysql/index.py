@@ -1283,6 +1283,8 @@ def getDbBackupList():
     rr = []
     for x in range(0, len(r)):
         p = bkDir + '/' + r[x]
+        if not os.path.exists(p):
+            continue
         data = {}
         data['name'] = r[x]
 
@@ -1477,27 +1479,90 @@ def syncToDatabases():
     msg = mw.getInfo('本次共同步了{1}个数据库!', (str(n),))
     return mw.returnJson(True, msg)
 
+def adjust_password_policy(version):
+    if version.startswith("8."):
+        serverdir = getServerDir()
+        mw.execShell(serverdir+f"/bin/mysql -u root -e \"SET GLOBAL validate_password.policy=LOW;\"")
+        mw.execShell(serverdir+f"/bin/mysql -u root -e \"SET GLOBAL validate_password.length=4;\"")
+
+def setRootPwdForce(new_password,version=''):
+    # stop(version)
+    # | awk '{print $2}'| xargs kill
+    data = mw.execShell("ps -ef|grep mysql|grep -v plugins |grep -v grep | awk '{print $2}'| xargs kill")
+    # print(data)
+    time.sleep(1)
+
+    serverdir = getServerDir()
+
+    # 启动安全模式
+    cmd_msafe = serverdir+"/bin/mysqld_safe --skip-grant-tables --skip-networking"
+    # print("cmd_msafe",cmd_msafe)
+    subprocess.Popen(cmd_msafe, stdout=subprocess.PIPE, shell=True,bufsize=4096, stderr=subprocess.PIPE)
+    # 等待MySQL安全模式启动...
+    time.sleep(5)
+
+    if version.startswith("5.5") or version.startswith("5.6"):
+        cmd_mod_root = serverdir+f"/bin/mysql -u root -e \"UPDATE mysql.user SET Password=PASSWORD('{new_password}') WHERE user='root'; FLUSH PRIVILEGES;\""
+        data = mw.execShell(cmd_mod_root)
+        # print("修改root密码", cmd_mod_root)
+        # print(data)
+    else:
+        cmd_clear_root = serverdir+"/bin/mysql -u root -e \"UPDATE mysql.user SET authentication_string = '' WHERE user = 'root'; FLUSH PRIVILEGES;\""
+        data = mw.execShell(cmd_clear_root)
+        # print(cmd_clear_root,"清空root密码",data)
+
+    data = mw.execShell("ps -ef|grep mysql|grep -v plugins |grep -v grep | awk '{print $2}'| xargs kill")
+    # print("停止安全模式",data)
+
+    # 正常启动MySQL
+    start(version)
+    time.sleep(5)
+    
+    if not version.startswith("5.5") and not version.startswith("5.6"):
+        # 针对MySQL 8.0+调整密码策略
+        if version.startswith("8."):
+            adjust_password_policy(version)
+        # 设置新密码
+        cmd_newpass = serverdir+f"/bin/mysql -u root -e \"ALTER USER 'root'@'localhost' IDENTIFIED BY '{new_password}'; FLUSH PRIVILEGES;\""
+        data = mw.execShell(cmd_newpass)
+        # print("新密码",cmd_newpass)
+        # print(data)
+    
+    # 验证密码
+    cmd = serverdir+f"/bin/mysql -u root -p'{new_password}' -e 'SHOW DATABASES;'"
+    data = mw.execShell(cmd)
+    if data[1] == '':
+        return True
+    return False
+
 
 def setRootPwd(version=''):
     args = getArgs()
     data = checkArgs(args, ['password'])
     if not data[0]:
         return data[1]
+    password = args['password']
 
     #强制修改
     force = 0
     if 'force' in args and args['force'] == '1':
-        force = 1
+        pSqliteDb('config').where('id=?', (1,)).save('mysql_root', (password,))
+        return mw.returnJson(True, '【强制本地记录】数据库root密码修改成功(立马检查)!')
+    if 'force' in args and args['force'] == '2':
+        force = 2
+        ok = setRootPwdForce(password,version)
 
-    password = args['password']
+        pSqliteDb('config').where('id=?', (1,)).save('mysql_root', (password,))
+        if ok and version.startswith("8"):
+            pdb = pMysqlDb()
+            pdb.query("SET GLOBAL validate_password.policy=MEDIUM;")
+        return mw.returnJson(True, '【强制】数据库root密码修改成功!')
+    
     try:
         pdb = pMysqlDb()
         result = pdb.query("show databases")
         isError = isSqlError(result)
         if isError != None:
-            if force == 1:
-                pSqliteDb('config').where('id=?', (1,)).save('mysql_root', (password,))
-                return mw.returnJson(True, '【强制修改】数据库root密码修改成功(不意为成功连接数据)!')
             return isError
 
         if version.find('5.7') > -1 or version.find('8.0') > -1:

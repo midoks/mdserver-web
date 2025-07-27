@@ -127,6 +127,7 @@ def mkdirAll():
             mw.execShell('mkdir -p ' + x)
         else:
             mw.execShell('mkdir -p ' + os.path.dirname(x))
+        mw.execShell("chown -R manticore:manticore "+x)
 
 def isInitFile():
     path = getServerDir() + '/init.pl'
@@ -156,9 +157,8 @@ def initDreplace():
         conf_content = mw.readFile(getConfTpl())
         conf_content = contentReplace(conf_content)
         mw.writeFile(getConf(), conf_content)
+        mkdirAll()
 
-
-    mkdirAll()
     return "ok"
 
 
@@ -201,7 +201,7 @@ def restart():
 
 
 def reload():
-    return mcsOp('reload')
+    return mcsOp('restart')
 
 
 def rebuild():
