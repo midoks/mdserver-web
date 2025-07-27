@@ -1548,6 +1548,7 @@ def setRootPwd(version=''):
     if 'force' in args and args['force'] == '2':
         force = 2
         setRootPwdForce(password,version)
+        pSqliteDb('config').where('id=?', (1,)).save('mysql_root', (password,))
         return mw.returnJson(True, '【强制】数据库root密码修改成功!')
     
     try:
