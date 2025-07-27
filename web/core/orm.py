@@ -139,7 +139,7 @@ class ORM:
             self.__Close()
             return result
         except Exception as ex:
-            return None
+            return ex
 
     def __Close(self):
         # 关闭连接
