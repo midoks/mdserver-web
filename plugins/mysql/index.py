@@ -1489,11 +1489,7 @@ def setRootPwdForce(new_password,version=''):
     # 启动安全模式
     cmd_msafe = serverdir+"/bin/mysqld_safe --skip-grant-tables --skip-networking"
     print("cmd_msafe",cmd_msafe)
-    safe_process = subprocess.Popen(cmd_msafe,
-        shell=True,
-        stdout=subprocess.DEVNULL,
-        stderr=subprocess.DEVNULL
-    )
+    subprocess.Popen(cmd_msafe, stdout=subprocess.PIPE, shell=True,bufsize=4096, stderr=subprocess.PIPE)
     # 等待MySQL安全模式启动...
     time.sleep(5)
 
@@ -1502,11 +1498,7 @@ def setRootPwdForce(new_password,version=''):
     print("cmd_clear_root",data)
 
     data = mw.execShell("ps -ef|grep mysql|grep -v plugins |grep -v grep | awk '{print $2}'| xargs kill")
-    print(data)
-
-    # 停止安全模式
-    safe_process.terminate()
-    safe_process.wait()
+    print("停止安全模式",data)
 
     # 正常启动MySQL
     start(version)
@@ -1540,7 +1532,7 @@ def setRootPwd(version=''):
         return mw.returnJson(True, '【强制本地记录】数据库root密码修改成功(立马检查)!')
     if 'force' in args and args['force'] == '2':
         force = 2
-        setRootPwdForce(version)
+        setRootPwdForce(password,version)
 
     
     try:
