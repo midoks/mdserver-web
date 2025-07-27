@@ -1493,9 +1493,14 @@ def setRootPwdForce(new_password,version=''):
     # 等待MySQL安全模式启动...
     time.sleep(5)
 
-    cmd_clear_root = serverdir+"/bin/mysql -u root -e \"UPDATE mysql.user SET authentication_string = '' WHERE user = 'root'; FLUSH PRIVILEGES;\""
-    data = mw.execShell(cmd_clear_root)
-    print(cmd_clear_root,"清空root密码",data)
+    if mysql_version.startswith("5.5") or mysql_version.startswith("5.6"):
+        cmd_clear_root = f"UPDATE mysql.user SET Password=PASSWORD('{new_password}') WHERE user='root'; FLUSH PRIVILEGES;"
+        data = mw.execShell(cmd_clear_root)
+        print(cmd_clear_root,"修改root密码",data)
+    else 
+        cmd_clear_root = serverdir+"/bin/mysql -u root -e \"UPDATE mysql.user SET authentication_string = '' WHERE user = 'root'; FLUSH PRIVILEGES;\""
+        data = mw.execShell(cmd_clear_root)
+        print(cmd_clear_root,"清空root密码",data)
 
     data = mw.execShell("ps -ef|grep mysql|grep -v plugins |grep -v grep | awk '{print $2}'| xargs kill")
     print("停止安全模式",data)
@@ -1504,10 +1509,11 @@ def setRootPwdForce(new_password,version=''):
     start(version)
     time.sleep(5)
     
-    # 设置新密码
-    cmd_newpass = serverdir+f"/bin/mysql -u root -e \"ALTER USER 'root'@'localhost' IDENTIFIED BY '{new_password}'; FLUSH PRIVILEGES;\""
-    data = mw.execShell(cmd_newpass)
-    print(cmd_newpass"新密码",data)
+    if not mysql_version.startswith("5.5") and not mysql_version.startswith("5.6"):
+        # 设置新密码
+        cmd_newpass = serverdir+f"/bin/mysql -u root -e \"ALTER USER 'root'@'localhost' IDENTIFIED BY '{new_password}'; FLUSH PRIVILEGES;\""
+        data = mw.execShell(cmd_newpass)
+        print(cmd_newpass"新密码",data)
     
     # 验证密码
     cmd = serverdir+f"/bin/mysql -u root -p'{new_password}' -e 'SHOW DATABASES;'"
