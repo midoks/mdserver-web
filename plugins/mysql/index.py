@@ -1481,7 +1481,7 @@ def adjust_password_policy(version):
     if version.startswith("8."):
         mw.execShell("SET GLOBAL validate_password.policy=LOW;")
         mw.execShell("SET GLOBAL validate_password.length=4;")
-        
+
 def setRootPwdForce(new_password,version=''):
     # stop(version)
     # | awk '{print $2}'| xargs kill
@@ -1499,7 +1499,7 @@ def setRootPwdForce(new_password,version=''):
     time.sleep(5)
 
     if version.startswith("5.5") or version.startswith("5.6"):
-        cmd_mod_root = f"UPDATE mysql.user SET Password=PASSWORD('{new_password}') WHERE user='root'; FLUSH PRIVILEGES;"
+        cmd_mod_root = "UPDATE mysql.user SET Password=PASSWORD("+new_password+") WHERE user='root'; FLUSH PRIVILEGES;"
         data = mw.execShell(cmd_mod_root)
         print(cmd_mod_root,"修改root密码",data)
     else:
