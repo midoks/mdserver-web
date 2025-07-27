@@ -12,6 +12,7 @@ export PATH
 # cd /www/server/mdserver-web && source bin/activate && python3 plugins/mysql/index.py init_slave_status
 # cd /www/server/mdserver-web && source bin/activate && python3 plugins/mysql/index.py install_pre_inspection
 # cd /www/server/mdserver-web && source bin/activate && python3 plugins/mysql/index.py set_slave_status {"close":"change"}
+# cd /www/server/mdserver-web && source bin/activate && python3 plugins/mysql/index.py set_root_pwd {"password":"root","force":"2"}
 curPath=`pwd`
 rootPath=$(dirname "$curPath")
 rootPath=$(dirname "$rootPath")
