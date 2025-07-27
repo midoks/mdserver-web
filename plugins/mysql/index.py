@@ -1479,8 +1479,9 @@ def syncToDatabases():
 
 def adjust_password_policy(version):
     if version.startswith("8."):
-        mw.execShell("SET GLOBAL validate_password.policy=LOW;")
-        mw.execShell("SET GLOBAL validate_password.length=4;")
+        serverdir = getServerDir()
+        mw.execShell(serverdir+f"/bin/mysql -u root -e \"SET GLOBAL validate_password.policy=LOW;\"")
+        mw.execShell(serverdir+f"/bin/mysql -u root -e \"SET GLOBAL validate_password.length=4;\"")
 
 def setRootPwdForce(new_password,version=''):
     # stop(version)
@@ -1547,8 +1548,12 @@ def setRootPwd(version=''):
         return mw.returnJson(True, '【强制本地记录】数据库root密码修改成功(立马检查)!')
     if 'force' in args and args['force'] == '2':
         force = 2
-        setRootPwdForce(password,version)
+        ok = setRootPwdForce(password,version)
+
         pSqliteDb('config').where('id=?', (1,)).save('mysql_root', (password,))
+        if ok and version.startswith("8"):
+            pdb = pMysqlDb()
+            pdb.query("SET GLOBAL validate_password.policy=MEDIUM;")
         return mw.returnJson(True, '【强制】数据库root密码修改成功!')
     
     try:
