@@ -580,7 +580,7 @@ function setRootPwd(type, pwd){
             });
             return false;
         },
-        btn4:function(layerIndex){
+        btn5:function(layerIndex){
             layer.confirm('强制修改MySQL密码,确定强制? (比较耗时)', {
                 btn: ['确定', '取消']
             }, function(index, layero){
