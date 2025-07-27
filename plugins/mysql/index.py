@@ -1477,6 +1477,11 @@ def syncToDatabases():
     msg = mw.getInfo('本次共同步了{1}个数据库!', (str(n),))
     return mw.returnJson(True, msg)
 
+def adjust_password_policy(version):
+    if version.startswith("8."):
+        mw.execShell("SET GLOBAL validate_password.policy=LOW;")
+        mw.execShell("SET GLOBAL validate_password.length=4;")
+        
 def setRootPwdForce(new_password,version=''):
     # stop(version)
     # | awk '{print $2}'| xargs kill
