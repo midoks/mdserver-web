@@ -1477,27 +1477,66 @@ def syncToDatabases():
     msg = mw.getInfo('本次共同步了{1}个数据库!', (str(n),))
     return mw.returnJson(True, msg)
 
+def setRootPwdForce(new_password,version=''):
+    stop(version)
+    sleep(1)
+
+    serverdir = getServerDir()
+    # 启动安全模式
+    safe_process = subprocess.Popen(serverdir+"/bin/mysqld_safe --skip-grant-tables --skip-networking",
+        shell=True,
+        stdout=subprocess.DEVNULL,
+        stderr=subprocess.DEVNULL
+    )
+    # 等待MySQL安全模式启动...
+    time.sleep(5)
+
+    mw.execShell(serverdir+"/bin/mysql -u root -e \"UPDATE mysql.user SET authentication_string = '' WHERE user = 'root'; FLUSH PRIVILEGES;\"")
+
+    # 停止安全模式
+    safe_process.terminate()
+    safe_process.wait()
+
+    # 正常启动MySQL
+    start(version)
+    time.sleep(3)
+    
+    # 设置新密码
+    mw.execShell(serverdir+f"/bin/mysql -u root -e \"ALTER USER 'root'@'localhost' IDENTIFIED BY '{new_password}'; FLUSH PRIVILEGES;\"")
+    
+    # 验证密码
+    cmd = serverdir+f"/bin/mysql -u root -p'{new_password}' -e 'SHOW DATABASES;'"
+    data = mw.execShell(cmd)
+    print(data)
+    #     print("\033[32m密码重置成功!\033[0m")
+    #     print(f"新root密码: {new_password}")
+    # else:
+    #     print("\033[31m密码验证失败，请手动检查\033[0m")
+    #     sys.exit(1)
+
 
 def setRootPwd(version=''):
     args = getArgs()
     data = checkArgs(args, ['password'])
     if not data[0]:
         return data[1]
+    password = args['password']
 
     #强制修改
     force = 0
     if 'force' in args and args['force'] == '1':
-        force = 1
+        pSqliteDb('config').where('id=?', (1,)).save('mysql_root', (password,))
+        return mw.returnJson(True, '【强制本地记录】数据库root密码修改成功(立马检查)!')
+    if 'force' in args and args['force'] == '2':
+        force = 2
+        setRootPwdForce(version)
 
-    password = args['password']
+    
     try:
         pdb = pMysqlDb()
         result = pdb.query("show databases")
         isError = isSqlError(result)
         if isError != None:
-            if force == 1:
-                pSqliteDb('config').where('id=?', (1,)).save('mysql_root', (password,))
-                return mw.returnJson(True, '【强制修改】数据库root密码修改成功(不意为成功连接数据)!')
             return isError
 
         if version.find('5.7') > -1 or version.find('8.0') > -1:
