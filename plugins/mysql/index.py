@@ -1501,13 +1501,16 @@ def setRootPwdForce(new_password,version=''):
     data = mw.execShell(cmd_clear_root)
     print("cmd_clear_root",data)
 
+    data = mw.execShell("ps -ef|grep mysql|grep -v plugins |grep -v grep | awk '{print $2}'| xargs kill")
+    print(data)
+
     # 停止安全模式
     safe_process.terminate()
     safe_process.wait()
 
     # 正常启动MySQL
     start(version)
-    time.sleep(3)
+    time.sleep(1)
     
     # 设置新密码
     mw.execShell(serverdir+f"/bin/mysql -u root -e \"ALTER USER 'root'@'localhost' IDENTIFIED BY '{new_password}'; FLUSH PRIVILEGES;\"")
