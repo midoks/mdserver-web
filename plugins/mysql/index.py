@@ -1283,6 +1283,8 @@ def getDbBackupList():
     rr = []
     for x in range(0, len(r)):
         p = bkDir + '/' + r[x]
+        if not os.path.exists(p):
+            continue
         data = {}
         data['name'] = r[x]
 
