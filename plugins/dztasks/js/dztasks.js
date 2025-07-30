@@ -60,11 +60,47 @@ function commonHomePage(){
     });
 }
 
+function postCrossPort(data, url) {
+    var xhr = new XMLHttpRequest();
+    xhr.open('POST', url, true);
+    xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
+    xhr.onreadystatechange = function() {
+        if(xhr.readyState == 4 && xhr.status == 200) {
+            console.log(xhr.responseText);
+        }
+    };
+    xhr.send(data);
+}
+
+function dzLogin(){
+
+    zdPost('run_info', '', {}, function(data){
+        var rdata = $.parseJSON(data.data);
+        var info = rdata.data;
+        var post_url = info['url']+'/do_login';
+
+        $("#toSite").attr('action',post_url);
+        $("#username").val(info['user']);
+        $("#password").val(info['pass']);
+        layer.msg('正在打开dztasks',{icon:16,shade: [0.3, '#000'],time:2000});
+
+        setTimeout(function(){
+            $("#toSite").submit();
+        },2000);
+    });
+}
+
 function dzCommonFunc(){
     var con = '';
     con += '<hr/><p class="conf_p" style="text-align:center;">\
-        <button class="btn btn-default btn-sm" onclick="commonHomePage()">主页</button>\
+        <button class="btn btn-default btn-sm" onclick="commonHomePage()">主页</button> \
+        <button class="btn btn-default btn-sm" onclick="dzLogin()">直接登陆</button>\
     </p>';
+
+    con += '<form id="toSite" action="" method="post" style="display: none;" target="_blank">\
+            <input type="text" name="username" id="username" value="">\
+            <input type="password" name="password" id="password" value="">\
+        </form>';
     $(".soft-man-con").html(con);
 }
 
