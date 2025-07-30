@@ -4,7 +4,7 @@
 	"name": "dztasks",
 	"title": "dztasks",
 	"shell": "install.sh",
-	"versions":["1.1","1.2"],
+	"versions":["1.2"],
 	"tip": "soft",
 	"checks": "server/dztasks",
 	"path": "server/dztasks",
