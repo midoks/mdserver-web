@@ -33,7 +33,7 @@ Install_App()
 	mkdir -p $serverPath/source/dztasks
 	mkdir -p $serverPath/dztasks
 
-	FILE_TGZ=dztasks_v${VERSION}_${DZ_NAME}_${DZ_ARCH_NAME}.tar.gz
+	FILE_TGZ=dztasks_${VERSION}_${DZ_NAME}_${DZ_ARCH_NAME}.tar.gz
 	DZ_DIR=$serverPath/source/dztasks
 
 	echo $FILE_TGZ
