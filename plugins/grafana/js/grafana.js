@@ -62,7 +62,6 @@ function gCommonFunc(){
 
     $('#grafana_url').click(function(){
         gPost('grafana_url', '', {}, function(rdata){
-            var data = $.parseJSON(rdata.data);
             layer.open({
                 title: "Grafana连接",
                 area: ['600px', '180px'],
@@ -72,14 +71,14 @@ function gCommonFunc(){
                 btn:["复制","取消"],
                 content: '<div class="pd15">\
                             <div class="divtable">\
-                                <pre class="layui-code">'+data.data+'</pre>\
+                                <pre class="layui-code">'+rdata.data+'</pre>\
                             </div>\
                         </div>',
                 success:function(){
-                    copyText(data.data);
+                    copyText(rdata.data);
                 },
                 yes:function(){
-                    copyText(data.data);
+                    copyText(rdata.data);
                 }
             });
         });
