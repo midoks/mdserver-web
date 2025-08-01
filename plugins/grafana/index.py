@@ -99,148 +99,8 @@ def contentReplace(content):
     service_path = mw.getServerDir()
     content = content.replace('{$ROOT_PATH}', mw.getFatherDir())
     content = content.replace('{$SERVER_PATH}', service_path)
-    content = content.replace('{$ZABBIX_ROOT}', '/usr/share/zabbix')
-    content = content.replace('{$ZABBIX_PORT}', '18888')
-
-    psdb = pSqliteDb('databases')
-    db_pass = psdb.where('name = ?', ('zabbix',)).getField('password')
-    content = content.replace('{$ZABBIX_DB_PORT}', getMySQLPort())
-    content = content.replace('{$ZABBIX_DB_PASS}', db_pass)
     return content
 
-
-def getMySQLConf():
-    choose_mysql = getServerDir()+'/mysql.pl'
-    if os.path.exists(choose_mysql):
-        ver = mw.readFile(choose_mysql)
-        return mw.getServerDir() + '/'+ver+'/etc/my.cnf'
-
-    apt_path = mw.getServerDir() + '/mysql-apt/etc/my.cnf'
-    if os.path.exists(apt_path):
-        mw.writeFile(choose_mysql, 'mysql-apt')
-        return apt_path
-
-    yum_path = mw.getServerDir() + '/mysql-yum/etc/my.cnf'
-    if os.path.exists(yum_path):
-        mw.writeFile(choose_mysql, 'mysql-yum')
-        return yum_path
-
-    path = mw.getServerDir() + '/mysql/etc/my.cnf'
-    if os.path.exists(path):
-        mw.writeFile(choose_mysql, 'mysql')
-        return path
-    return path
-
-
-def getMySQLPort():
-    file = getMySQLConf()
-    content = mw.readFile(file)
-    rep = r'port\s*=\s*(.*)'
-    tmp = re.search(rep, content)
-    return tmp.groups()[0].strip()
-
-def getMySQLSocketFile():
-    file = getMySQLConf()
-    content = mw.readFile(file)
-    rep = r'socket\s*=\s*(.*)'
-    tmp = re.search(rep, content)
-    return tmp.groups()[0].strip()
-
-def getMySQLBin():
-    choose_mysql = getServerDir()+'/mysql.pl'
-    ver = mw.readFile(choose_mysql)
-    mysql_dir = mw.getServerDir() + '/'+ver
-
-    if ver == 'mysql-apt':
-        return '/www/server/mysql-apt/bin/usr/bin/mysql'
-    if ver == 'mysql-yum':
-        return '/www/server/mysql-yum/bin/usr/bin/mysql'
-    return '/www/server/mysql/bin/mysql'
-
-def getMySQLBinLink():
-    choose_mysql = getServerDir()+'/mysql.pl'
-    ver = mw.readFile(choose_mysql)
-    mysql_dir = mw.getServerDir() + '/'+ver
-
-    if ver == 'mysql-apt':
-        return '/www/server/mysql-apt/bin/usr/bin/mysql -S /www/server/mysql-apt/mysql.sock'
-    if ver == 'mysql-yum':
-        return '/www/server/mysql-yum/bin/usr/bin/mysql -S /www/server/mysql-yum/mysql.sock'
-    return '/www/server/mysql/bin/mysql -S /www/server/mysql/mysql.sock'
-
-def pSqliteDb(dbname='databases'):
-    choose_mysql = getServerDir()+'/mysql.pl'
-    ver = mw.readFile(choose_mysql)
-
-    mysql_dir = mw.getServerDir() + '/'+ver
-    conn = mw.M(dbname).dbPos(mysql_dir, 'mysql')
-    return conn
-
-
-def pMysqlDb():
-    # pymysql
-    db = mw.getMyORM()
-    db.setDbName('zabbix')
-    db.setPort(getMySQLPort())
-    db.setSocket(getMySQLSocketFile())
-    db.setPwd(pSqliteDb('config').where('id=?', (1,)).getField('mysql_root'))
-    return db
-
-
-def getInstalledPhpConfDir():
-    phpver = ["80","81","82","83","84"]
-    php_type = ['php-apt','php-yum', 'php'];
-
-    for pt in php_type:
-        for ver in phpver:
-            php_install_dir = mw.getServerDir() + '/'+ pt+'/'+ver
-            if os.path.exists(php_install_dir):
-                if pt == 'php-apt':
-                    return pt + ver[0:1]+'.'+ver[1:2]
-                if pt == 'php':
-                    return pt + '-' + ver
-                if pt == 'php-yum':
-                    return pt + '-' + ver
-                return pt + ver
-    return 'php-80'
-
-def isInstalledPhp():
-    phpver = ["80","81","82","83","84","85"]
-    php_type = ['php-apt','php-yum', 'php'];
-
-    for pt in php_type:
-        for ver in phpver:
-            php_install_dir = mw.getServerDir() + '/'+ pt+'/'+ver
-            if os.path.exists(php_install_dir):
-                return True
-    return False
-
-def isInstalledMySQL():
-    mysql_type = ['mysql-apt','mysql-yum', 'mysql'];
-    for mt in mysql_type:
-        mysql_install_dir = mw.getServerDir() + '/'+ mt
-        if os.path.exists(mysql_install_dir):
-            return True
-    return False
-
-
-def zabbixServerConf():
-    ver = getInstallVerion()
-    if ver == '6.0':
-        return '/etc/zabbix_server.conf'
-    return '/etc/zabbix/zabbix_server.conf'
-
-def zabbixAgentConf():
-    return '/etc/zabbix/zabbix_agentd.conf'
-
-def initAgentConf():
-    za_src_tpl = getPluginDir()+'/conf/zabbix_agentd.conf'
-    za_dst_path = zabbixAgentConf()
-
-    # zabbix_agent配置
-    content = mw.readFile(za_src_tpl)
-    content = contentReplace(content)
-    mw.writeFile(za_dst_path, content)
 
 def openPort():
     try:
@@ -317,15 +177,7 @@ def initdUinstall():
     return 'ok'
 
 def runLog():
-    zs_conf = zabbixServerConf()
-    content = mw.readFile(zs_conf)
-
-    rep = r'LogFile=\s*(.*)'
-    tmp = re.search(rep, content)
-
-    if tmp.groups():
-        return tmp.groups()[0].strip()
-    return '/var/log/zabbix/zabbix_server.log'
+    return getServerDir() + "/data/log.log"
 
 
 def installPreInspection():
