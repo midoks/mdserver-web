@@ -73,7 +73,6 @@ Uninstall_App()
 	cd ${rootPath} && python3 ${rootPath}/plugins/grafana/index.py initd_uninstall
 
 	rm -rf $serverPath/grafana
-	rm -rf $serverPath/source/grafana
 	echo 'Grafana卸载完成'
 }
 
