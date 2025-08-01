@@ -42,7 +42,7 @@ def getInitDFile():
 
 
 def getConf():
-    path = getServerDir() + "/web_conf/nginx/vhost/zabbix.conf"
+    path = getServerDir() + "/conf/default.ini"
     return path
 
 
@@ -223,7 +223,7 @@ if __name__ == "__main__":
     elif func == 'uninstall_pre_inspection':
         print(uninstallPreInspection())
     elif func == 'conf':
-        print(zabbixNginxConf())
+        print(getConf())
     elif func == 'run_log':
         print(runLog())
     else:
