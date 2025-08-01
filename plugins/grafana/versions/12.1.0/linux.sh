@@ -41,7 +41,9 @@ Install_App()
 	fi
 
 	cd ${SourceDir} && tar -zxvf ${FILE_TGZ}
-	
+	cd ${SourceDir}/grafana-v*
+
+	cp -rf ./* $InstallDir
 }
 
 Uninstall_App()
