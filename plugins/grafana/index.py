@@ -119,7 +119,17 @@ def initDreplace():
         openPort()
         mw.writeFile(init_file, 'ok')
 
-    
+    # systemd
+    systemDir = mw.systemdCfgDir()
+    systemService = systemDir + '/' + getPluginName() + '.service'
+    if os.path.exists(systemDir) and not os.path.exists(systemService):
+        systemServiceTpl = getPluginDir() + '/init.d/' + getPluginName() + '.service.tpl'
+        service_path = mw.getServerDir()
+        content = mw.readFile(systemServiceTpl)
+        content = content.replace('{$SERVER_PATH}', service_path)
+        mw.writeFile(systemService, content)
+        mw.execShell('systemctl daemon-reload')
+        
     return True
 
 
