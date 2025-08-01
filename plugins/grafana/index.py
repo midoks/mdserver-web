@@ -129,7 +129,7 @@ def initDreplace():
         content = content.replace('{$SERVER_PATH}', service_path)
         mw.writeFile(systemService, content)
         mw.execShell('systemctl daemon-reload')
-        
+
     return True
 
 
@@ -189,7 +189,7 @@ def initdUinstall():
     return 'ok'
 
 def runLog():
-    return getServerDir() + "/data/log.log"
+    return getServerDir() + "/data/grafana.log"
 
 
 def installPreInspection():
