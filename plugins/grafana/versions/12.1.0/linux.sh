@@ -30,7 +30,6 @@ FILE_TGZ=grafana-${VERSION}.linux-${ARCH_NAME}.tar.gz
 # 检查是否通
 Install_App()
 {
-
 	SourceDir=$serverPath/source/grafana
 	InstallDir=$serverPath/grafana
 	mkdir -p ${SourceDir}
@@ -40,10 +39,11 @@ Install_App()
 		wget --no-check-certificate -O ${SourceDir}/${FILE_TGZ} https://dl.grafana.com/oss/release/${FILE_TGZ}
 	fi
 
-	cd ${SourceDir} && tar -zxvf ${FILE_TGZ}
-	cd ${SourceDir}/grafana-v*
-
-	cp -rf ./* $InstallDir
+	if [ !-d $InstallDir/bin/grafana ];then
+		cd ${SourceDir} && tar -zxvf ${FILE_TGZ}
+		cd ${SourceDir}/grafana-v*
+		cp -rf ./* $InstallDir
+	fi
 }
 
 Uninstall_App()
