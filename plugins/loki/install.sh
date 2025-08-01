@@ -3,7 +3,7 @@ PATH=/bin:/sbin:/usr/bin:/usr/sbin:/usr/local/bin:/usr/local/sbin:~/bin:/opt/hom
 export PATH
 
 # https://www.cnblogs.com/n00dle/p/16916044.html
-# cd /www/server/mdserver-web/plugins/loki && /bin/bash install.sh install 12.1.0
+# cd /www/server/mdserver-web/plugins/loki && /bin/bash install.sh install 3.5.3
 # cd /www/server/mdserver-web && python3 /www/server/mdserver-web/plugins/loki/index.py start
 
 curPath=`pwd`
@@ -60,7 +60,7 @@ Install_App()
 	cd ${rootPath} && python3 ${rootPath}/plugins/loki/index.py start
 	cd ${rootPath} && python3 ${rootPath}/plugins/loki/index.py initd_install
 
-	echo 'Grafana安装完成'
+	echo 'Grafana/Loki安装完成'
 }
 
 Uninstall_App()
@@ -74,7 +74,7 @@ Uninstall_App()
 	cd ${rootPath} && python3 ${rootPath}/plugins/loki/index.py initd_uninstall
 
 	rm -rf $serverPath/loki
-	echo 'Grafana卸载完成'
+	echo 'Grafana/Loki卸载完成'
 }
 
 action=$1
