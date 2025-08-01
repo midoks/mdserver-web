@@ -193,7 +193,7 @@ def runLog():
 
 def grafanaUrl():
     ip = mw.getLocalIp()
-    return 'https://'+ip+':'+"3000"
+    return 'http://'+ip+':'+"3000"
 
 def installPreInspection():
     return 'ok'
