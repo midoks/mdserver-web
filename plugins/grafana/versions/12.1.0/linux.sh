@@ -44,6 +44,8 @@ Install_App()
 		cd ${SourceDir}/grafana-v*
 		cp -rf ./* $InstallDir
 	fi
+
+	chown -R grafana:grafana $InstallDir
 }
 
 Uninstall_App()
