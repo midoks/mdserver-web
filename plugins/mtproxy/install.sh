@@ -10,7 +10,7 @@ serverPath=$(dirname "$rootPath")
 sysArch=`arch`
 sysName=`uname`
 
-
+# systemctl status mtg
 # cd /www/server/mdserver-web && python3 plugins/mtproxy/index.py url
 # cd /www/server/mdserver-web/plugins/mtproxy && /bin/bash install.sh install 1.0
 
