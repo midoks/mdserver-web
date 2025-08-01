@@ -264,8 +264,8 @@ def initDreplace():
 def gOp(method):
     initDreplace()
 
-    data = mw.execShell('systemctl ' + method + ' grafana')
-    mw.execShell('systemctl ' + method + ' grafana')
+    data = mw.execShell('systemctl ' + method + ' '+getPluginName())
+    mw.execShell('systemctl ' + method + ' '+getPluginName())
     if data[1] == '':
         return 'ok'
     return data[1]
@@ -288,7 +288,7 @@ def initdStatus():
     if current_os == 'darwin':
         return "Apple Computer does not support"
 
-    shell_cmd = 'systemctl status grafana | grep loaded | grep "enabled;"'
+    shell_cmd = 'systemctl status grafana|grep loaded|grep "enabled;"'
     data = mw.execShell(shell_cmd)
     if data[0] == '':
         return 'fail'
@@ -327,49 +327,8 @@ def runLog():
         return tmp.groups()[0].strip()
     return '/var/log/zabbix/zabbix_server.log'
 
-def zabbixAgentLog():
-    za_conf = zabbixAgentConf()
-    content = mw.readFile(za_conf)
-
-    rep = r'LogFile=\s*(.*)'
-    tmp = re.search(rep, content)
-
-    if tmp.groups():
-        return tmp.groups()[0].strip()
-    return '/var/log/zabbix/zabbix_agentd.log'
-
 
 def installPreInspection():
-    cmd = "cat /etc/*-release | grep PRETTY_NAME |awk -F = '{print $2}' | awk -F '\"' '{print $2}'| awk '{print $1}'"
-    sys = mw.execShell(cmd)
-
-
-    cmd = "cat /etc/*-release | grep VERSION_ID | awk -F = '{print $2}' | awk -F '\"' '{print $2}'"
-    sys_id = mw.execShell(cmd)
-
-    sysName = sys[0].strip().lower()
-    sysId = sys_id[0].strip().lower()
-
-    # opensuse
-    if not sysName in ['debian','centos','ubuntu','almalinux','rocky']:
-        return '不支持该系统'
-
-    if sysName == 'debian' and not sysId in ['12']:
-        return '不支持,'+sysName+'['+sysId+'],仅支持debian12!'
-
-    openresty_dir = mw.getServerDir() + "/openresty"
-    if not os.path.exists(openresty_dir):
-        return '需要安装Openresty插件'
-
-    is_installed_php = isInstalledPhp()
-    if not is_installed_php:
-        return '需要安装PHP/PHP-APT/PHP-YUM插件,至少8.0!'
-
-
-    is_installed_mysql = isInstalledMySQL()
-    if not is_installed_mysql:
-        return '需要安装MySQL/MySQL-APT/MySQL-YUM插件,至少8.0!'
-
     return 'ok'
 
 
@@ -403,7 +362,5 @@ if __name__ == "__main__":
         print(zabbixNginxConf())
     elif func == 'run_log':
         print(runLog())
-    elif func == 'zabbix_agent_log':
-        print(zabbixAgentLog())
     else:
         print('error')
