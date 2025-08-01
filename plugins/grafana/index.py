@@ -224,15 +224,6 @@ def isInstalledMySQL():
     return False
 
 
-def zabbixNginxConf():
-    return mw.getServerDir()+'/web_conf/nginx/vhost/zabbix.conf'
-
-def zabbixPhpConf():
-    # ver = getInstallVerion()
-    # if ver == '6.0':
-    #     return '/usr/share/zabbix/conf/zabbix.conf.php'
-    return '/etc/zabbix/web/zabbix.conf.php'
-
 def zabbixServerConf():
     ver = getInstallVerion()
     if ver == '6.0':
@@ -241,41 +232,6 @@ def zabbixServerConf():
 
 def zabbixAgentConf():
     return '/etc/zabbix/zabbix_agentd.conf'
-
-def initOpConf():
-    nginx_src_tpl = getPluginDir()+'/conf/zabbix.nginx.conf'
-    nginx_dst_vhost = zabbixNginxConf()
-
-    phpver = getInstalledPhpConfDir()
-
-    # nginx配置
-    if not os.path.exists(nginx_dst_vhost):
-        content = mw.readFile(nginx_src_tpl)
-        content = contentReplace(content)
-        content = content.replace('{$PHP_VER}',phpver)
-        mw.writeFile(nginx_dst_vhost, content)
-
-def initZsConf():
-    ver = getInstallVerion()
-    zs_src_tpl = getPluginDir()+'/conf/zabbix_server.conf'
-    if ver == '6.0':
-        zs_src_tpl = getPluginDir()+'/conf/zabbix_server6.conf'
-
-    zs_dst_path = zabbixServerConf()
-
-    # zabbix_server配置
-    content = mw.readFile(zs_src_tpl)
-    content = contentReplace(content)
-    mw.writeFile(zs_dst_path, content)
-
-def initPhpConf():
-    php_src_tpl = getPluginDir()+'/conf/zabbix.conf.php'
-    php_dst_path = zabbixPhpConf()
-    # php配置
-    # if not os.path.exists(php_dst_path):
-    content = mw.readFile(php_src_tpl)
-    content = contentReplace(content)
-    mw.writeFile(php_dst_path, content)
 
 def initAgentConf():
     za_src_tpl = getPluginDir()+'/conf/zabbix_agentd.conf'
@@ -297,10 +253,7 @@ def openPort():
 
 
 def initDreplace():
-
     # 初始化OP配置
-    # initOpConf()
-    
     init_file = getServerDir() + '/init.pl'
     if not os.path.exists(init_file):
         openPort()
@@ -448,12 +401,6 @@ if __name__ == "__main__":
         print(uninstallPreInspection())
     elif func == 'conf':
         print(zabbixNginxConf())
-    elif func == 'php_conf':
-        print(zabbixPhpConf())
-    elif func == 'zabbix_server_conf':
-        print(zabbixServerConf())
-    elif func == 'zabbix_agent_conf':
-        print(zabbixAgentConf())
     elif func == 'run_log':
         print(runLog())
     elif func == 'zabbix_agent_log':
