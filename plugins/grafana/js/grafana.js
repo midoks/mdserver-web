@@ -53,8 +53,42 @@ function gPostCallbak(method, version, args,callback){
     },'json'); 
 }
 
+function gCommonFunc(){
+    var con = '<hr/><p class="conf_p" style="text-align:center;">\
+        <button id="mtproxy_url" class="btn btn-default btn-sm">获取连接地址</button>\
+    </p>';
 
-function zabbixReadme(){
+    $(".soft-man-con").html(con);
+
+    $('#mtproxy_url').click(function(){
+        mtPost('url', '', {}, function(rdata){
+            var data = $.parseJSON(rdata.data);
+
+            layer.open({
+                title: "mtproxy代理信息",
+                area: ['600px', '180px'],
+                type:1,
+                closeBtn: 1,
+                shadeClose: false,
+                btn:["复制","取消"],
+                content: '<div class="pd15">\
+                            <div class="divtable">\
+                                <pre class="layui-code">'+data.data+'</pre>\
+                            </div>\
+                        </div>',
+                success:function(){
+                    copyText(data.data);
+                },
+                yes:function(){
+                    copyText(data.data);
+                }
+            });
+        });
+    });
+}
+
+
+function gReadme(){
     var readme = '<ul class="help-info-text c7">';
     readme += '<li>初始化账户:admin/admin</li>';
     readme += '<li>https://grafana.com/grafana/download</li>';
