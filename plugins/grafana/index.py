@@ -84,7 +84,7 @@ def getPidFile():
     return tmp.groups()[0].strip()
 
 def status():
-    cmd = "ps aux|grep zabbix_server |grep -v grep | grep -v python | grep -v mdserver-web | awk '{print $2}'"
+    cmd = "ps aux|grep grafana |grep -v grep | grep -v python | grep -v mdserver-web | awk '{print $2}'"
     data = mw.execShell(cmd)
     if data[0] == '':
         return 'stop'
@@ -242,56 +242,6 @@ def zabbixServerConf():
 def zabbixAgentConf():
     return '/etc/zabbix/zabbix_agentd.conf'
 
-def zabbixImportMySQLDataFile():
-    tgz_file = getPluginDir()+"/data/server6.0.sql.gz"
-    ver = getInstallVerion()
-    if ver == '6.0':
-        return tgz_file
-    return '/usr/share/zabbix-sql-scripts/mysql/server.sql.gz'
-
-def zabbixImportMySQLData():
-    mysql_conf = getMySQLConf()
-    if not os.path.exists(mysql_conf):
-        exit("需要安装MySQL")
-
-    choose_mysql = getServerDir()+'/mysql.pl'
-    ver = mw.readFile(choose_mysql)
-
-    pmdb = pMysqlDb()
-    psdb = pSqliteDb('databases')
-    find_ps_zabbix = psdb.field('id').where('name = ?', ('zabbix',)).select()
-    if len(find_ps_zabbix) < 1:
-        db_pass = mw.getRandomString(16)
-        # 创建数据
-        cmd = 'python3 plugins/'+ver+'/index.py add_db  {"name":"zabbix","codeing":"utf8mb4","db_user":"zabbix","password":"'+db_pass+'","dataAccess":"127.0.0.1","ps":"zabbix","address":"127.0.0.1"}'
-        # print(cmd)
-        mw.execShell(cmd)
-        pmdb.query("ALTER DATABASE `zabbix` DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_bin")
-        pmdb.query("grant all privileges on zabbix.* to zabbix@127.0.0.1")
-
-
-    db_pass = psdb.where('name = ?', ('zabbix',)).getField('password')
-    find_zabbix_version = pmdb.query("show tables like 'dbversion'")
-    if len(find_zabbix_version) == 0:
-        # 初始化导入数据
-        pmdb.query("set global log_bin_trust_function_creators=1")
-
-        mysql_bin = getMySQLBinLink()
-
-        tgz_file = zabbixImportMySQLDataFile()
-        # zcat /usr/share/zabbix-sql-scripts/mysql/server.sql.gz | /www/server/mysql/bin/mysql --default-character-set=utf8mb4 -uzabbix -p"LGhb1f7QG6SDL5CX" zabbix
-        import_data_cmd = 'zcat '+tgz_file+' | '+mysql_bin+' --default-character-set=utf8mb4 -uzabbix -p"'+db_pass+'" zabbix'
-        # print(import_data_cmd)
-        mw.execShell(import_data_cmd)
-        # pmdb.query("set global log_bin_trust_function_creators=0")
-
-
-    ver = getInstallVerion()
-    if ver == '6.0':
-        pmdb.query("update dbversion set mandatory=6000000")
-
-    return True
-
 def initOpConf():
     nginx_src_tpl = getPluginDir()+'/conf/zabbix.nginx.conf'
     nginx_dst_vhost = zabbixNginxConf()
@@ -349,8 +299,6 @@ def openPort():
 
 
 def initDreplace():
-    # 导入MySQL配置
-    # zabbixImportMySQLData()
 
     # 初始化OP配置
     # initOpConf()

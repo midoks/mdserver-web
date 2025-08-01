@@ -40,6 +40,7 @@ Install_App()
 		wget --no-check-certificate -O ${SourceDir}/${FILE_TGZ} https://dl.grafana.com/oss/release/${FILE_TGZ}
 	fi
 
+	cd ${SourceDir} && tar -zxvf ${FILE_TGZ}
 	
 }
 
