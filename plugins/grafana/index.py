@@ -189,7 +189,7 @@ def initdUinstall():
     return 'ok'
 
 def runLog():
-    return getServerDir() + "/data/grafana.log"
+    return getServerDir() + "/data/log/grafana.log"
 
 
 def installPreInspection():
