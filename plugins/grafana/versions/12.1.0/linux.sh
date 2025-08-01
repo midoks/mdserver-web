@@ -36,7 +36,7 @@ Install_App()
 	mkdir -p ${SourceDir}
 	mkdir -p ${InstallDir}
 
-	if [ -f ${SourceDir}/${FILE_TGZ} ];then
+	if [ ! -f ${SourceDir}/${FILE_TGZ} ];then
 		wget --no-check-certificate -O ${SourceDir}/${FILE_TGZ} https://dl.grafana.com/oss/release/${FILE_TGZ}
 	fi
 
