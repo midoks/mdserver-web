@@ -289,9 +289,7 @@ def initAgentConf():
 def openPort():
     try:
         from utils.firewall import Firewall as MwFirewall
-        MwFirewall.instance().addAcceptPort('18888', 'zabbix-web', 'port')
-        MwFirewall.instance().addAcceptPort('10051', 'zabbix-server', 'port')
-        MwFirewall.instance().addAcceptPort('10050', 'zabbix-agent', 'port')
+        MwFirewall.instance().addAcceptPort('3000', 'grafana', 'port')
         return port
     except Exception as e:
         return "Release failed {}".format(e)
@@ -305,59 +303,39 @@ def initDreplace():
     
     init_file = getServerDir() + '/init.pl'
     if not os.path.exists(init_file):
-        # initZsConf()
-        # initAgentConf()
-        # initPhpConf()
         openPort()
         mw.writeFile(init_file, 'ok')
     return True
 
 
-def zOp(method):
-
+def gOp(method):
     initDreplace()
 
-    data = mw.execShell('systemctl ' + method + ' zabbix-server')
-    mw.execShell('systemctl ' + method + ' zabbix-agent')
+    data = mw.execShell('systemctl ' + method + ' grafana')
+    mw.execShell('systemctl ' + method + ' grafana')
     if data[1] == '':
         return 'ok'
     return data[1]
 
 
 def start():
-    val = zOp('start')
-    mw.restartWeb()
-    return val
-
+    return gOp('start')
 
 def stop():
-    val = zOp('stop')
-
-    # 删除nginx配置
-    nginx_dst_vhost = zabbixNginxConf()
-    if os.path.exists(nginx_dst_vhost):
-        os.remove(nginx_dst_vhost)
-
-    mw.restartWeb()
-
-    return val
+    return gOp('stop')
 
 def restart():
-    status = zOp('restart')
-    return status
+    return gOp('restart')
 
 def reload():
-    initZsConf()
-    initAgentConf()
-    initPhpConf()
-    return zOp('reload')
+    return gOp('reload')
 
 def initdStatus():
     current_os = mw.getOs()
     if current_os == 'darwin':
         return "Apple Computer does not support"
 
-    shell_cmd = 'systemctl status zabbix-server | grep loaded | grep "enabled;"'
+    shell_cmd = 'systemctl status grafana | grep loaded | grep "enabled;"'
     data = mw.execShell(shell_cmd)
     if data[0] == '':
         return 'fail'
@@ -369,7 +347,7 @@ def initdInstall():
     if current_os == 'darwin':
         return "Apple Computer does not support"
 
-    data = mw.execShell('systemctl enable zabbix-server')
+    data = mw.execShell('systemctl enable grafana')
     if data[1] != '':
         return data[1]
     return 'ok'
@@ -380,7 +358,7 @@ def initdUinstall():
     if current_os == 'darwin':
         return "Apple Computer does not support"
 
-    data = mw.execShell('systemctl disable zabbix-server')
+    data = mw.execShell('systemctl disable grafana')
     if data[1] != '':
         return data[1]
     return 'ok'
