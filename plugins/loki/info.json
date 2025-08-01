@@ -1,0 +1,17 @@
+{
+	"sort": 7,
+	"ps": "Grafana/Loki是一个日志聚合系统",
+	"name": "loki",
+	"title": "loki",
+	"shell": "install.sh",
+	"versions":["3.5.3"],
+	"tip": "soft",
+	"checks": "server/loki",
+	"path": "server/loki",
+	"display": 1,
+	"author": "midoks",
+	"date": "2025-08-02",
+	"home": "https://github.com/grafana/loki",
+	"type": 0,
+	"pid": "5"
+}
