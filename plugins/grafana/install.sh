@@ -2,7 +2,7 @@
 PATH=/bin:/sbin:/usr/bin:/usr/sbin:/usr/local/bin:/usr/local/sbin:~/bin:/opt/homebrew/bin
 export PATH
 
-# cd /www/server/mdserver-web/plugins/grafana && /bin/bash install.sh install 7.0
+# cd /www/server/mdserver-web/plugins/grafana && /bin/bash install.sh install 12.1.0
 # cd /www/server/mdserver-web && python3 /www/server/mdserver-web/plugins/grafana/index.py start
 
 curPath=`pwd`
