@@ -42,7 +42,7 @@ def getInitDFile():
 
 
 def getConf():
-    path = getServerDir() + "/conf/default.ini"
+    path = getServerDir() + "/conf/defaults.ini"
     return path
 
 
