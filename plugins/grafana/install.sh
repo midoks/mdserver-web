@@ -30,6 +30,14 @@ if [ -f ${rootPath}/bin/activate ];then
 	source ${rootPath}/bin/activate
 fi
 
+if id grafana &> /dev/null ;then 
+    echo "grafana uid is `id -u grafana`"
+    echo "grafana shell is `grep "^grafana:" /etc/passwd |cut -d':' -f7 `"
+else
+    groupadd grafana
+	useradd -g grafana -s /bin/bash grafana
+fi
+
 Install_App()
 {
 	echo '正在安装脚本文件...'
