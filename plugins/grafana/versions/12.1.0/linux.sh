@@ -39,7 +39,7 @@ Install_App()
 		wget --no-check-certificate -O ${SourceDir}/${FILE_TGZ} https://dl.grafana.com/oss/release/${FILE_TGZ}
 	fi
 
-	if [ !-d $InstallDir/bin/grafana ];then
+	if [ ! -d $InstallDir/bin/grafana ];then
 		cd ${SourceDir} && tar -zxvf ${FILE_TGZ}
 		cd ${SourceDir}/grafana-v*
 		cp -rf ./* $InstallDir
