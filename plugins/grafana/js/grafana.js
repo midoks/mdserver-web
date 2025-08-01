@@ -1,4 +1,4 @@
-function zabbixPost(method, version, args,callback){
+function gPost(method, version, args,callback){
     var loadT = layer.msg('正在获取...', { icon: 16, time: 0, shade: 0.3 });
 
     var req_data = {};
@@ -26,7 +26,7 @@ function zabbixPost(method, version, args,callback){
     },'json'); 
 }
 
-function zabbixPostCallbak(method, version, args,callback){
+function gPostCallbak(method, version, args,callback){
     var loadT = layer.msg('正在获取...', { icon: 16, time: 0, shade: 0.3 });
 
     var req_data = {};

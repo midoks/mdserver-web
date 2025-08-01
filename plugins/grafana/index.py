@@ -118,6 +118,8 @@ def initDreplace():
     if not os.path.exists(init_file):
         openPort()
         mw.writeFile(init_file, 'ok')
+
+    
     return True
 
 
