@@ -36,6 +36,7 @@ Install_App()
 	mkdir -p ${SourceDir}
 	mkdir -p ${InstallDir}
 	mkdir -p ${InstallDir}/bin
+	mkdir -p ${InstallDir}/data/{chunks,rules,boltdb-shipper-active,boltdb-shipper-cache}
 
 	if [ ! -f ${SourceDir}/${FILE_TGZ} ];then
 		wget --no-check-certificate -O ${SourceDir}/${FILE_TGZ} https://github.com/grafana/loki/releases/download/v${VERSION}/${FILE_TGZ}
@@ -47,7 +48,6 @@ Install_App()
 
 	if [ ! -d $InstallDir/bin/loki ];then
 		cd ${SourceDir} && unzip ${PT_FILE_TGZ}
-		mkdir -p ${InstallDir}/data/{chunks,rules,boltdb-shipper-active,boltdb-shipper-cache}
 		cp -rf ./loki-linux-${ARCH_NAME} ${InstallDir}/bin/loki
 		rm -rf ./loki-linux-${ARCH_NAME}
 	fi
