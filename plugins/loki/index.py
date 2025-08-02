@@ -42,7 +42,7 @@ def getInitDFile():
 
 
 def getConf():
-    path = getServerDir() + "/conf/loki-local-config.yaml"
+    path = getServerDir() + "/conf/loki-config.yaml"
     return path
 
 
@@ -51,7 +51,7 @@ def getInitDTpl():
     return path
 
 def getConfTpl():
-    path = getPluginDir() + "/conf/loki-local-config.yaml"
+    path = getPluginDir() + "/conf/loki-config.yaml"
     return path
 
 
