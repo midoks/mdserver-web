@@ -1,0 +1,17 @@
+{
+	"sort": 7,
+	"ps": "监控系统与时间序列数据库",
+	"name": "prometheus",
+	"title": "prometheus",
+	"shell": "install.sh",
+	"versions":["3.5.0"],
+	"tip": "soft",
+	"checks": "server/prometheus",
+	"path": "server/prometheus",
+	"display": 1,
+	"author": "midoks",
+	"date": "2025-08-02",
+	"home": "https://prometheus.io/download/",
+	"type": 0,
+	"pid": "5"
+}
