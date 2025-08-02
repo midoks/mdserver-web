@@ -1,9 +1,9 @@
 [Unit]
-Description=Loki Log Aggregation System
+Description=Promtail System
 After=network.target
 
 [Service]
-ExecStart={$SERVER_PATH}/loki/bin/loki -config.file={$SERVER_PATH}/loki/conf/loki-config.yaml
+ExecStart={$SERVER_PATH}/loki/bin/promtail -config.file={$SERVER_PATH}/loki/conf/promtail-config.yaml
 Restart=always
 
 [Install]
