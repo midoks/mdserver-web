@@ -46,13 +46,13 @@ Install_App()
 		wget --no-check-certificate -O ${SourceDir}/${PT_FILE_TGZ} https://github.com/grafana/loki/releases/download/v${VERSION}/${PT_FILE_TGZ}
 	fi
 
-	if [ ! -d $InstallDir/bin/loki ];then
+	if [ ! -f $InstallDir/bin/loki ];then
 		cd ${SourceDir} && unzip ${PT_FILE_TGZ}
 		cp -rf ./loki-linux-${ARCH_NAME} ${InstallDir}/bin/loki
 		rm -rf ./loki-linux-${ARCH_NAME}
 	fi
 
-	if [ ! -d $InstallDir/bin/promtail ];then
+	if [ ! -f $InstallDir/bin/promtail ];then
 		cd ${SourceDir} && unzip ${PT_FILE_TGZ}
 		cp -rf ./promtail-linux-${ARCH_NAME} ${InstallDir}/bin/promtail
 		rm -rf ./promtail-linux-${ARCH_NAME}
