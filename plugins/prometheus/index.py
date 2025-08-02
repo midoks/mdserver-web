@@ -188,12 +188,9 @@ def initdUinstall():
         return data[1]
     return 'ok'
 
-def runLog():
-    return getServerDir() + "/data/log/prometheus.log"
-
 def prometheusUrl():
     ip = mw.getLocalIp()
-    return 'http://'+ip+':'+"3000"
+    return 'http://'+ip+':'+"9090"
 
 def installPreInspection():
     return 'ok'
