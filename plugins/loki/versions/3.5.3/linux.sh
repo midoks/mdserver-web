@@ -41,6 +41,7 @@ Install_App()
 
 	if [ ! -d $InstallDir/bin/loki ];then
 		cd ${SourceDir} && unzip ${FILE_TGZ}
+		mkdir -p $InstallDir/data/{chunks,rules,boltdb-shipper-active,boltdb-shipper-cache}
 		mkdir -p $InstallDir/bin
 		cp -rf ./loki-linux-${ARCH_NAME} $InstallDir/bin/loki
 		rm -rf ./loki-linux-${ARCH_NAME}
