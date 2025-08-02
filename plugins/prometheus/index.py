@@ -84,7 +84,7 @@ def getPidFile():
     return tmp.groups()[0].strip()
 
 def status():
-    cmd = "ps aux|grep grafana |grep -v grep | grep -v python | grep -v mdserver-web | awk '{print $2}'"
+    cmd = "ps aux|grep prometheus |grep -v grep | grep -v python | grep -v mdserver-web | awk '{print $2}'"
     data = mw.execShell(cmd)
     if data[0] == '':
         return 'stop'
@@ -105,7 +105,7 @@ def contentReplace(content):
 def openPort():
     try:
         from utils.firewall import Firewall as MwFirewall
-        MwFirewall.instance().addAcceptPort('3000', 'grafana', 'port')
+        MwFirewall.instance().addAcceptPort('3000', 'prometheus', 'port')
         return port
     except Exception as e:
         return "Release failed {}".format(e)
@@ -116,7 +116,7 @@ def initDreplace():
     # 初始化OP配置
     init_file = getServerDir() + '/init.pl'
     if not os.path.exists(init_file):
-        openPort()
+        # openPort()
         mw.writeFile(init_file, 'ok')
 
     # systemd
@@ -160,7 +160,7 @@ def initdStatus():
     if current_os == 'darwin':
         return "Apple Computer does not support"
 
-    shell_cmd = 'systemctl status grafana|grep loaded|grep "enabled;"'
+    shell_cmd = 'systemctl status prometheus|grep loaded|grep "enabled;"'
     data = mw.execShell(shell_cmd)
     if data[0] == '':
         return 'fail'
@@ -172,7 +172,7 @@ def initdInstall():
     if current_os == 'darwin':
         return "Apple Computer does not support"
 
-    data = mw.execShell('systemctl enable grafana')
+    data = mw.execShell('systemctl enable prometheus')
     if data[1] != '':
         return data[1]
     return 'ok'
@@ -183,13 +183,13 @@ def initdUinstall():
     if current_os == 'darwin':
         return "Apple Computer does not support"
 
-    data = mw.execShell('systemctl disable grafana')
+    data = mw.execShell('systemctl disable prometheus')
     if data[1] != '':
         return data[1]
     return 'ok'
 
 def runLog():
-    return getServerDir() + "/data/log/grafana.log"
+    return getServerDir() + "/data/log/prometheus.log"
 
 def grafanaUrl():
     ip = mw.getLocalIp()
