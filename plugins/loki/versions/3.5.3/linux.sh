@@ -52,7 +52,7 @@ Install_App()
 		rm -rf ./loki-linux-${ARCH_NAME}
 	fi
 
-	if [ ! -d $InstallDir/bin/loki ];then
+	if [ ! -d $InstallDir/bin/promtail ];then
 		cd ${SourceDir} && unzip ${PT_FILE_TGZ}
 		mkdir -p $InstallDir/bin
 		cp -rf ./promtail-linux-${ARCH_NAME} $InstallDir/bin/promtail
