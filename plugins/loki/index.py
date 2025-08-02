@@ -42,12 +42,16 @@ def getInitDFile():
 
 
 def getConf():
-    path = getServerDir() + "/conf/defaults.ini"
+    path = getServerDir() + "/conf/loki-local-config.yaml"
     return path
 
 
 def getInitDTpl():
     path = getPluginDir() + "/init.d/" + getPluginName() + ".tpl"
+    return path
+
+def getConfTpl():
+    path = getPluginDir() + "/conf/loki-local-config.yaml"
     return path
 
 
@@ -118,6 +122,14 @@ def initDreplace():
     if not os.path.exists(init_file):
         # openPort()
         mw.writeFile(init_file, 'ok')
+
+    file_tpl = getConfTpl()
+    dst_file = getConf()
+
+    if not os.path.exists(dst_file):
+        content = mw.readFile(file_tpl)
+        content = contentReplace(content)
+        mw.writeFile(dst_file, content)
 
     # systemd
     systemDir = mw.systemdCfgDir()
