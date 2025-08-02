@@ -123,6 +123,10 @@ def initDreplace():
         # openPort()
         mw.writeFile(init_file, 'ok')
 
+    conf_dir = getServerDir()+'/conf'
+    if os.path.exists(conf_dir):
+        mw.execShell('mkdir -p ' + conf_dir)
+
     file_tpl = getConfTpl()
     dst_file = getConf()
 
