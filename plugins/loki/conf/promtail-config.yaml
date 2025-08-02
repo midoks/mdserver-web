@@ -9,13 +9,13 @@ clients:
   - url: http://127.0.0.1:3100/loki/api/v1/push    #修改为loki服务器IP
 
 scrape_configs:
-- job_name: fap
+- job_name: web
   static_configs:
   - targets:
       - localhost
     labels:
-      job: "HSJ_fap"
-      __path__: /opt/cwy8.32/product/module/P/FAP/nohup.out
+      job: "web"
+      __path__: {$LOG_PATH}/web_nohup.out
 
 - job_name: portal
   static_configs:
@@ -24,43 +24,3 @@ scrape_configs:
     labels:
       job: "HSJ_portal"
       __path__: /opt/cwy8.32/product/module/P/PORTAL/nohup.out
-
-- job_name: cwy
-  static_configs:
-  - targets:
-      - localhost
-    labels:
-      job: "HSJ_cwy"
-      __path__: /opt/cwy8.32/product/module/A/CWY/nohup.out
-
-- job_name: fasp_register
-  static_configs:
-  - targets:
-      - localhost
-    labels:
-      job: "HSJ_fasp_register"
-      __path__: /opt/cwy8.32/product/module/A/FASP/register-nohup.out
-
-- job_name: fasp_gateway
-  static_configs:
-  - targets:
-      - localhost
-    labels:
-      job: "HSJ_fasp_gateway"
-      __path__: /opt/cwy8.32/product/module/A/FASP/gateway-nohup.out
-
-- job_name: fasp_base
-  static_configs:
-  - targets:
-      - localhost
-    labels:
-      job: "HSJ_fasp_base"
-      __path__: /opt/cwy8.32/product/module/A/FASP/base-nohup.out
-
-- job_name: fasp_web
-  static_configs:
-  - targets:
-      - localhost
-    labels:
-      job: "HSJ_fasp_web"
-      __path__: /opt/cwy8.32/product/module/A/FASP/web-nohup.out

@@ -36,6 +36,7 @@ Install_App()
 	mkdir -p ${SourceDir}
 	mkdir -p ${InstallDir}
 	mkdir -p ${InstallDir}/bin
+	mkdir -p ${InstallDir}/logs
 	mkdir -p ${InstallDir}/data/{chunks,rules,boltdb-shipper-active,boltdb-shipper-cache}
 
 	if [ ! -f ${SourceDir}/${FILE_TGZ} ];then
@@ -72,8 +73,8 @@ Uninstall_App()
 # MemoryLimit=1G
 # CPUQuota=200%
 
-# curl -v -H "Content-Type: application/json" -XPOST  "http://localhost:3100/loki/api/v1/push" \
-# -d "{\"streams\": [{\"stream\": {\"test\": \"test\"}, \"values\": [[\"$timestamp\", \"test message\"]]}]}"
+curl -v -H "Content-Type: application/json" -XPOST  "http://localhost:3100/loki/api/v1/push" \
+-d "{\"streams\": [{\"stream\": {\"test\": \"test\"}, \"values\": [[\"$timestamp\", \"test message\"]]}]}"
 
 action=${1}
 if [ "${1}" == 'install' ];then
