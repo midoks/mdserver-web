@@ -60,6 +60,9 @@ Uninstall_App()
 # MemoryLimit=1G
 # CPUQuota=200%
 
+# curl -v -H "Content-Type: application/json" -XPOST  "http://localhost:3100/loki/api/v1/push" \
+# -d "{\"streams\": [{\"stream\": {\"test\": \"test\"}, \"values\": [[\"$timestamp\", \"test message\"]]}]}"
+
 action=${1}
 if [ "${1}" == 'install' ];then
 	Install_App
