@@ -42,8 +42,7 @@ fi
 Install_App()
 {
 	echo '正在安装脚本文件...'
-	mkdir -p $serverPath/source/loki
-
+	mkdir -p $serverPath/source/grafana
 	mkdir -p $serverPath/loki
 	echo "${VERSION}" > $serverPath/loki/version.pl
 
