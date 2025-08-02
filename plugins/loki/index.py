@@ -204,12 +204,9 @@ def initdUinstall():
         return data[1]
     return 'ok'
 
-def runLog():
-    return getServerDir() + "/data/log/grafana.log"
-
 def grafanaUrl():
     ip = mw.getLocalIp()
-    return 'http://'+ip+':'+"3000"
+    return 'http://'+ip+':'+"3100"
 
 def installPreInspection():
     return 'ok'
@@ -243,8 +240,6 @@ if __name__ == "__main__":
         print(uninstallPreInspection())
     elif func == 'conf':
         print(getConf())
-    elif func == 'run_log':
-        print(runLog())
     elif func == 'grafana_url':
         print(grafanaUrl())
     else:
