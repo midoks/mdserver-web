@@ -39,9 +39,11 @@ Install_App()
 		wget --no-check-certificate -O ${SourceDir}/${FILE_TGZ} https://github.com/prometheus/prometheus/releases/download/v${VERSION}/${FILE_TGZ}
 	fi
 
+
+
 	if [ ! -d $InstallDir/bin/prometheus ];then
 		cd ${SourceDir} && tar -zxvf ${FILE_TGZ}
-		cd ${SourceDir}/prometheus-v*
+		cd ${SourceDir}/prometheus-${VERSION}.linux-${ARCH_NAME}
 		cp -rf ./* $InstallDir
 	fi
 }
