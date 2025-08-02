@@ -36,6 +36,7 @@ Install_App()
 	mkdir -p ${InstallDir}
 
 	if [ ! -f ${SourceDir}/${FILE_TGZ} ];then
+		# https://github.com/grafana/loki/releases/download/v${NEW_VERSION}/loki-linux-amd64.zip
 		wget --no-check-certificate -O ${SourceDir}/${FILE_TGZ} https://dl.grafana.com/oss/release/${FILE_TGZ}
 	fi
 
