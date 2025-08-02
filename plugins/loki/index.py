@@ -277,6 +277,8 @@ if __name__ == "__main__":
         print(uninstallPreInspection())
     elif func == 'conf':
         print(getConf())
+    elif func == 'promtail_conf':
+        print(getPromtailConf())
     elif func == 'grafana_url':
         print(grafanaUrl())
     else:
