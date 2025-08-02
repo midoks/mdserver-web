@@ -48,7 +48,7 @@ Install_App()
 
 	if [ ! -f $InstallDir/bin/loki ];then
 		rm -rf ./loki-linux-${ARCH_NAME}
-		cd ${SourceDir} && unzip ${PT_FILE_TGZ}
+		cd ${SourceDir} && unzip ${FILE_TGZ}
 		cp -rf ./loki-linux-${ARCH_NAME} ${InstallDir}/bin/loki
 		rm -rf ./loki-linux-${ARCH_NAME}
 	fi
