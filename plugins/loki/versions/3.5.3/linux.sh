@@ -25,7 +25,7 @@ elif [ "$sysArch" == "aarch64" ]; then
 	ARCH_NAME=aarch64
 fi
 
-FILE_TGZ=grafana-${VERSION}.linux-${ARCH_NAME}.tar.gz
+FILE_TGZ=loki-linux-${ARCH_NAME}.zip
 
 # 检查是否通
 Install_App()
@@ -36,8 +36,7 @@ Install_App()
 	mkdir -p ${InstallDir}
 
 	if [ ! -f ${SourceDir}/${FILE_TGZ} ];then
-		# https://github.com/grafana/loki/releases/download/v${NEW_VERSION}/loki-linux-amd64.zip
-		wget --no-check-certificate -O ${SourceDir}/${FILE_TGZ} https://dl.grafana.com/oss/release/${FILE_TGZ}
+		wget --no-check-certificate -O ${SourceDir}/${FILE_TGZ} https://github.com/grafana/loki/releases/download/v${VERSION}/${FILE_TGZ}
 	fi
 
 	if [ ! -d $InstallDir/bin/grafana ];then
@@ -45,8 +44,6 @@ Install_App()
 		cd ${SourceDir}/grafana-v*
 		cp -rf ./* $InstallDir
 	fi
-
-	chown -R grafana:grafana $InstallDir
 }
 
 Uninstall_App()
