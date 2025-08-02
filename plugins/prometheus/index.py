@@ -42,7 +42,7 @@ def getInitDFile():
 
 
 def getConf():
-    path = getServerDir() + "/prometheus.yaml"
+    path = getServerDir() + "/prometheus.yml"
     return path
 
 
@@ -224,8 +224,6 @@ if __name__ == "__main__":
         print(uninstallPreInspection())
     elif func == 'conf':
         print(getConf())
-    elif func == 'run_log':
-        print(runLog())
     elif func == 'prometheus_url':
         print(prometheusUrl())
     else:
