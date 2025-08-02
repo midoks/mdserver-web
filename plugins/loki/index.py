@@ -124,7 +124,7 @@ def initDreplace():
         mw.writeFile(init_file, 'ok')
 
     conf_dir = getServerDir()+'/conf'
-    if os.path.exists(conf_dir):
+    if not os.path.exists(conf_dir):
         mw.execShell('mkdir -p ' + conf_dir)
 
     file_tpl = getConfTpl()
