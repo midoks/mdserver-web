@@ -33,10 +33,9 @@ Install_App()
 	SourceDir=$serverPath/source/prometheus
 	InstallDir=$serverPath/prometheus
 	mkdir -p ${SourceDir}
-	mkdir -p ${InstallDir}
+	mkdir -p ${InstallDir}/bin
 
 	if [ ! -f ${SourceDir}/${FILE_TGZ} ];then
-
 		wget --no-check-certificate -O ${SourceDir}/${FILE_TGZ} https://github.com/prometheus/prometheus/releases/download/v${VERSION}/${FILE_TGZ}
 	fi
 
