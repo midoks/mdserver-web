@@ -52,6 +52,14 @@ Uninstall_App()
 	echo "卸载成功"
 }
 
+# StandardOutput=syslog
+# StandardError=syslog
+# SyslogIdentifier=loki
+
+# # 资源限制 (根据服务器配置调整)
+# MemoryLimit=1G
+# CPUQuota=200%
+
 action=${1}
 if [ "${1}" == 'install' ];then
 	Install_App
