@@ -30,8 +30,8 @@ FILE_TGZ=prometheus-${VERSION}.linux-${ARCH_NAME}.tar.gz
 # 检查是否通
 Install_App()
 {
-	SourceDir=$serverPath/source/grafana
-	InstallDir=$serverPath/grafana
+	SourceDir=$serverPath/source/prometheus
+	InstallDir=$serverPath/prometheus
 	mkdir -p ${SourceDir}
 	mkdir -p ${InstallDir}
 
@@ -40,9 +40,9 @@ Install_App()
 		wget --no-check-certificate -O ${SourceDir}/${FILE_TGZ} https://github.com/prometheus/prometheus/releases/download/v${VERSION}/${FILE_TGZ}
 	fi
 
-	if [ ! -d $InstallDir/bin/grafana ];then
+	if [ ! -d $InstallDir/bin/prometheus ];then
 		cd ${SourceDir} && tar -zxvf ${FILE_TGZ}
-		cd ${SourceDir}/grafana-v*
+		cd ${SourceDir}/prometheus-v*
 		cp -rf ./* $InstallDir
 	fi
 }
