@@ -42,7 +42,7 @@ def getInitDFile():
 
 
 def getConf():
-    path = getServerDir() + "/conf/defaults.ini"
+    path = getServerDir() + "/prometheus.yaml"
     return path
 
 
