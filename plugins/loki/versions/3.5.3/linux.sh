@@ -31,7 +31,7 @@ FILE_TGZ=loki-linux-${ARCH_NAME}.zip
 Install_App()
 {
 	SourceDir=$serverPath/source/grafana
-	InstallDir=$serverPath/grafana
+	InstallDir=$serverPath/loki
 	mkdir -p ${SourceDir}
 	mkdir -p ${InstallDir}
 
@@ -39,14 +39,12 @@ Install_App()
 		wget --no-check-certificate -O ${SourceDir}/${FILE_TGZ} https://github.com/grafana/loki/releases/download/v${VERSION}/${FILE_TGZ}
 	fi
 
-	echo "cd ${SourceDir} && unzip ${FILE_TGZ}"
-	cd ${SourceDir} && unzip ${FILE_TGZ}
-
-	# if [ ! -d $InstallDir/bin/grafana ];then
-	# 	cd ${SourceDir} && tar -zxvf ${FILE_TGZ}
-	# 	cd ${SourceDir}/grafana-v*
-	# 	cp -rf ./* $InstallDir
-	# fi
+	if [ ! -d $InstallDir/bin/loki ];then
+		cd ${SourceDir} && unzip ${FILE_TGZ}
+		mkdir -p $InstallDir/bin
+		cp -rf ./loki-linux-${ARCH_NAME} $InstallDir/bin/loki
+		rm -rf ./loki-linux-${ARCH_NAME}
+	fi
 }
 
 Uninstall_App()
