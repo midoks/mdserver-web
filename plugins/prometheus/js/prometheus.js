@@ -2,7 +2,7 @@ function gPost(method, version, args,callback){
     var loadT = layer.msg('正在获取...', { icon: 16, time: 0, shade: 0.3 });
 
     var req_data = {};
-    req_data['name'] = 'grafana';
+    req_data['name'] = 'prometheus';
     req_data['func'] = method;
     req_data['version'] = version;
  
@@ -30,7 +30,7 @@ function gPostCallbak(method, version, args,callback){
     var loadT = layer.msg('正在获取...', { icon: 16, time: 0, shade: 0.3 });
 
     var req_data = {};
-    req_data['name'] = 'grafana';
+    req_data['name'] = 'prometheus';
     req_data['func'] = method;
     args['version'] = version;
  
@@ -55,15 +55,15 @@ function gPostCallbak(method, version, args,callback){
 
 function gCommonFunc(){
     var con = '<hr/><p class="conf_p" style="text-align:center;">\
-        <button id="grafana_url" class="btn btn-default btn-sm">获取连接地址</button>\
+        <button id="prometheus_url" class="btn btn-default btn-sm">获取连接地址</button>\
     </p>';
 
     $(".soft-man-con").html(con);
 
-    $('#grafana_url').click(function(){
-        gPost('grafana_url', '', {}, function(rdata){
+    $('#prometheus_url').click(function(){
+        gPost('prometheus_url', '', {}, function(rdata){
             layer.open({
-                title: "Grafana连接",
+                title: "prometheus连接",
                 area: ['600px', '180px'],
                 type:1,
                 closeBtn: 1,

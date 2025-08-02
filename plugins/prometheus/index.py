@@ -191,7 +191,7 @@ def initdUinstall():
 def runLog():
     return getServerDir() + "/data/log/prometheus.log"
 
-def grafanaUrl():
+def prometheusUrl():
     ip = mw.getLocalIp()
     return 'http://'+ip+':'+"3000"
 
@@ -229,7 +229,7 @@ if __name__ == "__main__":
         print(getConf())
     elif func == 'run_log':
         print(runLog())
-    elif func == 'grafana_url':
-        print(grafanaUrl())
+    elif func == 'prometheus_url':
+        print(prometheusUrl())
     else:
         print('error')
