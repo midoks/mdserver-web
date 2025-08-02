@@ -39,6 +39,9 @@ Install_App()
 		wget --no-check-certificate -O ${SourceDir}/${FILE_TGZ} https://github.com/grafana/loki/releases/download/v${VERSION}/${FILE_TGZ}
 	fi
 
+	echo "cd ${SourceDir} && unzip ${FILE_TGZ}"
+	cd ${SourceDir} && unzip ${FILE_TGZ}
+
 	# if [ ! -d $InstallDir/bin/grafana ];then
 	# 	cd ${SourceDir} && tar -zxvf ${FILE_TGZ}
 	# 	cd ${SourceDir}/grafana-v*
