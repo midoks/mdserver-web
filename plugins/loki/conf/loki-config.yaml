@@ -49,12 +49,6 @@ ruler:
 frontend:
   encoding: protobuf
 
-query_engine:
-  # 新版本有效参数
-  max_concurrent: 20
-  timeout: 3m
-  max_look_back_period: 30s
-
 
 # By default, Loki will send anonymous, but uniquely-identifiable usage and configuration
 # analytics to Grafana Labs. These statistics are sent to https://stats.grafana.org/
