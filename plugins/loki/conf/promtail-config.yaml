@@ -22,5 +22,5 @@ scrape_configs:
   - targets:
       - localhost
     labels:
-      job: "HSJ_portal"
-      __path__: /opt/cwy8.32/product/module/P/PORTAL/nohup.out
+      job: "portal"
+      __path__: {$LOG_PATH}/portal_nohup.out
