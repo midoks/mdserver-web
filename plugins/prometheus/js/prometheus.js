@@ -88,8 +88,7 @@ function gCommonFunc(){
 
 function gReadme(){
     var readme = '<ul class="help-info-text c7">';
-    readme += '<li>初始化账户:admin/admin</li>';
-    readme += '<li>https://grafana.com/grafana/download</li>';
+    readme += '<li>https://prometheus.io/download</li>';
     readme += '</ul>';
 
     $('.soft-man-con').html(readme);   
