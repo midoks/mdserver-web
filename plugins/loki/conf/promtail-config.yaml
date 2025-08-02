@@ -1,0 +1,66 @@
+server:
+  http_listen_port: 9080  #云服务器需开放9080端口
+  grpc_listen_port: 0
+
+positions:
+  filename: /opt/promtail/positions.yaml   #positions存放路径在promtail工具地址下
+
+clients:
+  - url: http://192.168.0.105:3100/loki/api/v1/push    #修改为loki服务器IP
+
+scrape_configs:
+- job_name: fap
+  static_configs:
+  - targets:
+      - localhost
+    labels:
+      job: "HSJ_fap"
+      __path__: /opt/cwy8.32/product/module/P/FAP/nohup.out
+
+- job_name: portal
+  static_configs:
+  - targets:
+      - localhost
+    labels:
+      job: "HSJ_portal"
+      __path__: /opt/cwy8.32/product/module/P/PORTAL/nohup.out
+
+- job_name: cwy
+  static_configs:
+  - targets:
+      - localhost
+    labels:
+      job: "HSJ_cwy"
+      __path__: /opt/cwy8.32/product/module/A/CWY/nohup.out
+
+- job_name: fasp_register
+  static_configs:
+  - targets:
+      - localhost
+    labels:
+      job: "HSJ_fasp_register"
+      __path__: /opt/cwy8.32/product/module/A/FASP/register-nohup.out
+
+- job_name: fasp_gateway
+  static_configs:
+  - targets:
+      - localhost
+    labels:
+      job: "HSJ_fasp_gateway"
+      __path__: /opt/cwy8.32/product/module/A/FASP/gateway-nohup.out
+
+- job_name: fasp_base
+  static_configs:
+  - targets:
+      - localhost
+    labels:
+      job: "HSJ_fasp_base"
+      __path__: /opt/cwy8.32/product/module/A/FASP/base-nohup.out
+
+- job_name: fasp_web
+  static_configs:
+  - targets:
+      - localhost
+    labels:
+      job: "HSJ_fasp_web"
+      __path__: /opt/cwy8.32/product/module/A/FASP/web-nohup.out
