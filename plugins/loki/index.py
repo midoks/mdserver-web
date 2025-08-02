@@ -45,13 +45,16 @@ def getConf():
     path = getServerDir() + "/conf/loki-config.yaml"
     return path
 
-
-def getInitDTpl():
-    path = getPluginDir() + "/init.d/" + getPluginName() + ".tpl"
+def getPromtailConf():
+    path = getServerDir() + "/conf/promtail-config.yaml"
     return path
 
 def getConfTpl():
     path = getPluginDir() + "/conf/loki-config.yaml"
+    return path
+
+def getPromtailConfTpl():
+    path = getPluginDir() + "/conf/promtail-config.yaml"
     return path
 
 
@@ -129,7 +132,14 @@ def initDreplace():
 
     file_tpl = getConfTpl()
     dst_file = getConf()
+    if not os.path.exists(dst_file):
+        content = mw.readFile(file_tpl)
+        content = contentReplace(content)
+        mw.writeFile(dst_file, content)
 
+
+    file_tpl = getPromtailConfTpl()
+    dst_file = getPromtailConf()
     if not os.path.exists(dst_file):
         content = mw.readFile(file_tpl)
         content = contentReplace(content)
@@ -146,6 +156,17 @@ def initDreplace():
         mw.writeFile(systemService, content)
         mw.execShell('systemctl daemon-reload')
 
+    # systemd
+    systemDir = mw.systemdCfgDir()
+    systemService = systemDir + '/promtail.service'
+    if os.path.exists(systemDir) and not os.path.exists(systemService):
+        systemServiceTpl = getPluginDir() + '/init.d/promtail.service.tpl'
+        service_path = mw.getServerDir()
+        content = mw.readFile(systemServiceTpl)
+        content = content.replace('{$SERVER_PATH}', service_path)
+        mw.writeFile(systemService, content)
+        mw.execShell('systemctl daemon-reload')
+
     return True
 
 
@@ -153,10 +174,13 @@ def gOp(method):
     initDreplace()
 
     data = mw.execShell('systemctl ' + method + ' '+getPluginName())
-    mw.execShell('systemctl ' + method + ' '+getPluginName())
-    if data[1] == '':
-        return 'ok'
-    return data[1]
+    if data[1] != '':
+        return data[1]
+
+    data = mw.execShell('systemctl ' + method + ' promtail')
+    if data[1] != '':
+        return data[1]
+    return 'ok'
 
 
 def start():
@@ -180,6 +204,11 @@ def initdStatus():
     data = mw.execShell(shell_cmd)
     if data[0] == '':
         return 'fail'
+
+    shell_cmd = 'systemctl status promtail|grep loaded|grep "enabled;"'
+    data = mw.execShell(shell_cmd)
+    if data[0] == '':
+        return 'fail'
     return 'ok'
 
 
@@ -191,6 +220,10 @@ def initdInstall():
     data = mw.execShell('systemctl enable loki')
     if data[1] != '':
         return data[1]
+
+    data = mw.execShell('systemctl enable promtail')
+    if data[1] != '':
+        return data[1]
     return 'ok'
 
 
@@ -200,6 +233,10 @@ def initdUinstall():
         return "Apple Computer does not support"
 
     data = mw.execShell('systemctl disable loki')
+    if data[1] != '':
+        return data[1]
+
+    data = mw.execShell('systemctl enable promtail')
     if data[1] != '':
         return data[1]
     return 'ok'
