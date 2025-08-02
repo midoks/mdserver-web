@@ -5,8 +5,6 @@ Wants=network-online.target
 After=network-online.target
 [Service]
 Type=simple
-User=prometheus
-Group=prometheus
 ExecReload=/bin/kill -HUP $MAINPID
 ExecStart={$SERVER_PATH}/prometheus/prometheus \
   --config.file={$SERVER_PATH}/prometheus/prometheus.yml \
