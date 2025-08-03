@@ -1,0 +1,17 @@
+{
+	"sort": 7,
+	"ps": "Grafana是查询、可视化、警报观测平台",
+	"name": "grafana",
+	"title": "grafana",
+	"shell": "install.sh",
+	"versions":["12.1.0"],
+	"tip": "soft",
+	"checks": "server/grafana",
+	"path": "server/grafana",
+	"display": 1,
+	"author": "midoks",
+	"date": "2025-08-01",
+	"home": "https://grafana.com/grafana/download",
+	"type": 0,
+	"pid": "5"
+}

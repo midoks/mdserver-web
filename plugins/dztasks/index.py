@@ -275,14 +275,39 @@ def getDzPort():
     tmp = re.search(rep, content)
     return tmp.groups()[0].strip()
 
-def homePage():
+def getDzUsername():
+    file = getConf()
+    content = mw.readFile(file)
+    rep = r'user\s*=\s*(.*)'
+    tmp = re.search(rep, content)
+    return tmp.groups()[0].strip()
+
+def getDzPassword():
+    file = getConf()
+    content = mw.readFile(file)
+    rep = r'pass\s*=\s*(.*)'
+    tmp = re.search(rep, content)
+    return tmp.groups()[0].strip()
+
+def getHomePage():
     http_port = getDzPort()
     ip = mw.getLocalIp()
     if mw.isAppleSystem():
         ip = '127.0.0.1'
     url = 'http://'+ip+":"+str(http_port)
-    # print(url)
-    return mw.returnJson(True, 'ok!', url)
+    return url
+
+def homePage():
+    return mw.returnJson(True, 'ok!', getHomePage())
+
+
+def runInfo():
+    data = {}
+    data['url'] = getHomePage()
+    data['user'] = getDzUsername()
+    data['pass'] = getDzPassword()
+
+    return mw.returnJson(True, 'ok!', data)
 
 if __name__ == "__main__":
     func = sys.argv[1]

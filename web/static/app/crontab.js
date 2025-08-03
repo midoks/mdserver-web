@@ -126,7 +126,7 @@ function getCronData(page){
 			}
 		}
 		$('#cronbody').html(cbody);
-		$('#softPage').html(rdata.list);
+		$('#softPage').html(rdata.page);
 	},'json');
 }
 
@@ -584,7 +584,7 @@ function toBackup(type){
 	var data = 'type='+sType;
 
 	$.post('/crontab/get_data_list',data,function(rdata){
-		$(".planname input[name='name']").attr('readonly','true').css({"background-color":"#f6f6f6","color":"#666"});
+		$(".planname input[name='name']").css({"background-color":"#f6f6f6","color":"#666"});
 		var sOpt = "";
 		if(rdata.data.length == 0){
 			layer.msg(lan.public.list_empty,{icon:2})

@@ -50,6 +50,7 @@ apt install -y libaio1t64
 
 apt install -y dnsutils
 apt install -y numactl
+apt install -y xxd
 
 # https://www.php.net/manual/zh/mysql-xdevapi.installation.php
 apt install -y libprotobuf-dev

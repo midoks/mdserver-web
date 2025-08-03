@@ -1,0 +1,26 @@
+server:
+  http_listen_port: 9080  #云服务器需开放9080端口
+  grpc_listen_port: 0
+
+positions:
+  filename: {$APP_PATH}/positions.yaml   #positions存放路径在promtail工具地址下
+
+clients:
+  - url: http://127.0.0.1:3100/loki/api/v1/push    #修改为loki服务器IP
+
+scrape_configs:
+- job_name: web
+  static_configs:
+  - targets:
+      - localhost
+    labels:
+      job: "web"
+      __path__: {$LOG_PATH}/web_nohup.out
+
+- job_name: portal
+  static_configs:
+  - targets:
+      - localhost
+    labels:
+      job: "portal"
+      __path__: {$LOG_PATH}/portal_nohup.out
