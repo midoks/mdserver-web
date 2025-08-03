@@ -126,7 +126,7 @@ function getCronData(page){
 			}
 		}
 		$('#cronbody').html(cbody);
-		$('#softPage').html(rdata.list);
+		$('#softPage').html(rdata.page);
 	},'json');
 }
 
