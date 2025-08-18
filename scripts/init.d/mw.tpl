@@ -243,23 +243,52 @@ error_logs()
 	tail -n 100 ${PANEL_DIR}/logs/panel_error.log
 }
 
+
+mw_common_proxy(){
+    HTTP_PREFIX="https://"
+    LOCAL_ADDR=common
+    cn=$(curl -fsSL -m 10 -s http://ipinfo.io/json | grep "\"country\": \"CN\"")
+    if [ ! -z "$cn" ] || [ "$?" == "0" ] ;then
+        LOCAL_ADDR=cn
+    fi
+
+    if [ "$LOCAL_ADDR" != "common" ];then
+        declare -A PROXY_URL
+        PROXY_URL["gh_proxy_com"]="https://gh-proxy.com/"
+        PROXY_URL["ghproxy_link"]="https://ghproxy.link/"
+        PROXY_URL["gitclone_com"]="https://gitclone.com/"
+        PROXY_URL["source"]="https://"
+
+
+        SOURCE_LIST_KEY_SORT_TMP=$(echo ${!PROXY_URL[@]} | tr ' ' '\n' | sort -n)
+        SOURCE_LIST_KEY=(${SOURCE_LIST_KEY_SORT_TMP//'\n'/})
+        SOURCE_LIST_LEN=${#PROXY_URL[*]}
+    fi
+
+    if [ "$LOCAL_ADDR" != "common" ];then
+        ChooseProxyURL
+
+        if [ "$DOMAIN" != "http://" ];then
+            DOMAIN=`echo $HTTP_PREFIX | sed 's|https://||g'`
+            DOMAIN=`echo $DOMAIN | sed 's|/||g'`
+            ping -c 3 $DOMAIN > /dev/null 2>&1
+            if [ "$?" != "0" ];then
+                echo "无效代理地址:${DOMAIN}"
+                exit
+            fi
+        fi
+    fi
+}
+
 mw_install(){
    if [ -f ${PANEL_DIR}/task.py ];then
         echo "与后续版本差异太大,不再提供更新"
         exit 0
     fi
 
-    LOCAL_ADDR=common
-    cn=$(curl -fsSL -m 10 -s http://ipinfo.io/json | grep "\"country\": \"CN\"")
-    if [ ! -z "$cn" ] || [ "$?" == "0" ] ;then
-        LOCAL_ADDR=cn
-    fi
-    
-    if [ "$LOCAL_ADDR" == "common" ];then
-        bash <(bash -fsSL "https://raw.githubusercontent.com/midoks/mdserver-web/master/scripts/install.sh")
-    else
-        bash <(bash -fsSL "https://code.midoks.icu/midoks/mdserver-web/raw/branch/dev/scripts/install.sh")
-    fi 
+    mw_common_proxy
+    bash <(curl -fsSL "{$HTTP_PREFIX}raw.githubusercontent.com/midoks/mdserver-web/master/scripts/install.sh")
+    echo "bash <(curl -fsSL "{$HTTP_PREFIX}raw.githubusercontent.com/midoks/mdserver-web/master/scripts/install.sh")"
 }
 
 mw_update()
@@ -396,6 +425,68 @@ function AutoSizeStr(){
         FIX_SPACE="$FIX_SPACE "
     done
     echo -e " ❖   ${1}${FIX_SPACE}${2})"
+}
+
+function ChooseProxyURL(){
+    clear
+    echo -e '+---------------------------------------------------+'
+    echo -e '|                                                   |'
+    echo -e '|   =============================================   |'
+    echo -e '|                                                   |'
+    echo -e '|     欢迎使用 Linux 一键安装mdserver-web面板源码   |'
+    echo -e '|                                                   |'
+    echo -e '|   =============================================   |'
+    echo -e '|                                                   |'
+    echo -e '+---------------------------------------------------+'
+    echo -e ''
+    echo -e '#####################################################'
+    echo -e ''
+    echo -e '            提供以下国内代理地址可供选择:                  '
+    echo -e ''
+    echo -e '#####################################################'
+    echo -e ''
+    cm_i=0
+    for V in ${SOURCE_LIST_KEY[@]}; do
+    num=`expr $cm_i + 1`
+    AutoSizeStr "${V}" "$num"
+    cm_i=`expr $cm_i + 1`
+    done
+    echo -e ''
+    echo -e '#####################################################'
+    echo -e ''
+    echo -e "        系统时间  ${BLUE}$(date "+%Y-%m-%d %H:%M:%S")${PLAIN}"
+    echo -e ''
+    echo -e '#####################################################'
+    CHOICE_A=$(echo -e "\n${BOLD}└─ 请选择并输入你想使用的代理地址 [ 1-${SOURCE_LIST_LEN} ]：${PLAIN}")
+
+    read -p "${CHOICE_A}" INPUT
+    # echo $INPUT
+    if [ "$INPUT" == "" ];then
+        INPUT=1
+        TMP_INPUT=`expr $INPUT - 1`
+        INPUT_KEY=${SOURCE_LIST_KEY[$TMP_INPUT]}
+        echo -e "\n默认选择[${BLUE}${INPUT_KEY}${PLAIN}]安装！"
+    fi
+
+    if [ "$INPUT" -lt "0" ];then
+        INPUT=1
+        TMP_INPUT=`expr $INPUT - 1`
+        INPUT_KEY=${SOURCE_LIST_KEY[$TMP_INPUT]}
+        echo -e "\n低于边界错误!选择[${BLUE}${INPUT_KEY}${PLAIN}]安装！"
+        sleep 2s
+    fi
+
+    if [ "$INPUT" -gt "${SOURCE_LIST_LEN}" ];then
+        INPUT=${SOURCE_LIST_LEN}
+        TMP_INPUT=`expr $INPUT - 1`
+        INPUT_KEY=${SOURCE_LIST_KEY[$TMP_INPUT]}
+        echo -e "\n超出边界错误!选择[${BLUE}${INPUT_KEY}${PLAIN}]安装！"
+        sleep 2s
+    fi
+
+    INPUT=`expr $INPUT - 1`
+    INPUT_KEY=${SOURCE_LIST_KEY[$INPUT]}
+    HTTP_PREFIX=${PROXY_URL[$INPUT_KEY]}
 }
 
 mw_connect_mysql(){
