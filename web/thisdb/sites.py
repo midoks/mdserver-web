@@ -85,23 +85,24 @@ def getSitesList(
     if type_id != '' and int(type_id) >= 0:
         sql_where = " type_id=" + str(type_id)
 
-
     dbM = dbC = mw.M('sites').field(__FIELD)
 
     if sql_where != '':
         count = dbC.where(sql_where).count()
+        dbM.where(sql_where)
     else:
         count = dbC.count()
 
     start = (int(page) - 1) * (int(size))
     limit = str(start) + ',' +str(size)
 
-    if order is not None:
+    if order.find("none") > -1:
+        site_list = dbM.limit(limit).order('').select()
+    elif order is not None:
         site_list = dbM.limit(limit).order(order).select()
     else:
         site_list = dbM.limit(limit).order('id desc').select()
 
-    
     data = {}
     data['list'] = site_list
     data['count'] = count
