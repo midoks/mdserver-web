@@ -33,14 +33,7 @@ LOG_FILE=/var/log/mw-install.log
 
 {
 
-# HTTP_PREFIX="https://"
-# LOCAL_ADDR=common
-# ping  -c 1 github.com > /dev/null 2>&1
-# if [ "$?" != "0" ];then
-# 	LOCAL_ADDR=cn
-# 	HTTP_PREFIX="https://mirror.ghproxy.com/"
-# fi
-
+HTTP_PREFIX="https://"
 LOCAL_ADDR=common
 cn=$(curl -fsSL -m 10 -s http://ipinfo.io/json | grep "\"country\": \"CN\"")
 if [ ! -z "$cn" ] || [ "$?" == "0" ] ;then
@@ -134,7 +127,7 @@ function ChooseProxyURL(){
 
     INPUT=`expr $INPUT - 1`
     INPUT_KEY=${SOURCE_LIST_KEY[$INPUT]}
-    CHOICE_VERSION=${PY_VERSION[$INPUT_KEY]}
+    HTTP_PREFIX=${PROXY_URL[$INPUT_KEY]}
 }
 
 ChooseProxyURL
