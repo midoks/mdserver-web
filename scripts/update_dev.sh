@@ -205,6 +205,14 @@ if [ -f /bin/cp ];then
 	CP_CMD=/bin/cp
 fi
 
+if [ -f /tmp/dev.tar.gz ];then
+	rm -rf /tmp/dev.tar.gz
+fi
+
+if [ -d /tmp/mdserver-web-dev ];then
+	rm -rf /tmp/mdserver-web-dev
+fi
+
 echo "update mdserver-web dev code start"
 
 curl --insecure -sSLo /tmp/dev.tar.gz ${HTTP_PREFIX}github.com/midoks/mdserver-web/archive/refs/heads/dev.tar.gz
