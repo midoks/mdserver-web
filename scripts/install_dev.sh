@@ -100,6 +100,10 @@ fi
 echo "local:${LOCAL_ADDR}"
 echo "OSNAME:${OSNAME}"
 
+declare -A PROXY_URL
+PROXY_URL["gh-proxy.com"]="https://gh-proxy.com"
+
+
 if [ $OSNAME != "macos" ];then
 
 	if id www &> /dev/null ;then 
