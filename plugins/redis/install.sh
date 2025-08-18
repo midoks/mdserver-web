@@ -30,7 +30,7 @@ Install_App()
 	REDIS_DIR=$serverPath/source/redis
 
 	if [ ! -f $REDIS_DIR/${FILE_TGZ} ];then
-		wget -O $REDIS_DIR/${FILE_TGZ} http://download.redis.io/releases/${FILE_TGZ}
+		wget --no-check-certificate -O $REDIS_DIR/${FILE_TGZ} https://download.redis.io/releases/${FILE_TGZ}
 	fi
 	
 	cd $REDIS_DIR && tar -zxvf ${FILE_TGZ}
