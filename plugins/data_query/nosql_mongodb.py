@@ -170,7 +170,7 @@ class nosqlMongodb():
         keys = ["bind_ip", "port"]
 
         result['host'] = '127.0.0.1'
-        rep = 'port\s*=\s*(.*)'
+        rep = r'port\s*=\s*(.*)'
         ip_re = re.search(rep, mgdb_content)
         if ip_re:
             result['port'] = int(ip_re.groups()[0].strip())

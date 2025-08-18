@@ -7,10 +7,10 @@ is64bit=`getconf LONG_BIT`
 startTime=`date +%s`
 
 if [ -f /www/server/mdserver-web/tools.py ];then
-	echo -e "存在旧版代码,不能安装!,已知风险的情况下" 
-	echo -e "rm -rf /www/server/mdserver-web"
-	echo -e "可安装!" 
-	exit 0
+    echo -e "存在旧版代码,不能安装!,已知风险的情况下" 
+    echo -e "rm -rf /www/server/mdserver-web"
+    echo -e "可安装!" 
+    exit 0
 fi
 
 
@@ -23,88 +23,190 @@ if [ "$EUID" -ne 0 ]
 fi
 
 if [ ${_os} != "Darwin" ] && [ ! -d /www/server/mdserver-web/logs ]; then
-	mkdir -p /www/server/mdserver-web/logs
+    mkdir -p /www/server/mdserver-web/logs
 fi
 
 LOG_FILE=/var/log/mw-update.log
-
 {
-
-if [ ${_os} == "Darwin" ]; then
-	OSNAME='macos'
-elif grep -Eqi "openSUSE" /etc/*-release; then
-	OSNAME='opensuse'
-	zypper refresh
-elif grep -Eqi "EulerOS" /etc/*-release || grep -Eqi "openEuler" /etc/*-release; then
-	OSNAME='euler'
-elif grep -Eqi "FreeBSD" /etc/*-release; then
-	OSNAME='freebsd'
-elif grep -Eqi "CentOS" /etc/issue || grep -Eqi "CentOS" /etc/*-release; then
-	OSNAME='rhel'
-	yum install -y wget zip unzip
-elif grep -Eqi "Fedora" /etc/issue || grep -Eqi "Fedora" /etc/*-release; then
-	OSNAME='rhel'
-	yum install -y wget zip unzip
-elif grep -Eqi "Rocky" /etc/issue || grep -Eqi "Rocky" /etc/*-release; then
-	OSNAME='rhel'
-	yum install -y wget zip unzip
-elif grep -Eqi "AlmaLinux" /etc/issue || grep -Eqi "AlmaLinux" /etc/*-release; then
-	OSNAME='rhel'
-	yum install -y wget zip unzip
-elif grep -Eqi "Anolis" /etc/issue || grep -Eqi "Anolis" /etc/*-release; then
-	OSNAME='rhel'
-	yum install -y wget curl zip unzip tar crontabs
-elif grep -Eqi "Amazon Linux" /etc/issue || grep -Eqi "Amazon Linux" /etc/*-release; then
-	OSNAME='amazon'
-	yum install -y wget zip unzip
-elif grep -Eqi "Debian" /etc/issue || grep -Eqi "Debian" /etc/*-release; then
-	OSNAME='debian'
-	apt install -y wget zip unzip
-elif grep -Eqi "Ubuntu" /etc/issue || grep -Eqi "Ubuntu" /etc/*-release; then
-	OSNAME='ubuntu'
-	apt install -y wget zip unzip
-elif grep -Eqi "Raspbian" /etc/issue || grep -Eqi "Raspbian" /etc/*-release; then
-	OSNAME='raspbian'
-elif grep -Eqi "Alpine" /etc/issue || grep -Eqi "Alpine" /etc/*-release; then
-	OSNAME='alpine'
-	apk update
-	apk add devscripts -force-broken-world
-	apk add wget zip unzip tar -force-broken-world
-else
-	OSNAME='unknow'
-fi
-
 
 HTTP_PREFIX="https://"
 LOCAL_ADDR=common
 cn=$(curl -fsSL -m 10 -s http://ipinfo.io/json | grep "\"country\": \"CN\"")
 if [ ! -z "$cn" ] || [ "$?" == "0" ] ;then
-	LOCAL_ADDR=cn
-	HTTP_PREFIX="https://mirror.ghproxy.com/"
-fi
-echo "local:${LOCAL_ADDR}"
-
-CP_CMD=/usr/bin/cp
-if [ -f /bin/cp ];then
-		CP_CMD=/bin/cp
+    LOCAL_ADDR=cn
 fi
 
 if [ "$LOCAL_ADDR" != "common" ];then
-	# curl --insecure -sSLo /tmp/master.zip https://code.midoks.icu/midoks/mdserver-web/archive/master.zip
-	wget --no-check-certificate -O /tmp/master.zip https://code.midoks.icu/midoks/mdserver-web/archive/master.zip
-	cd /tmp && unzip /tmp/master.zip
+    declare -A PROXY_URL
+    PROXY_URL["gh_proxy_com"]="https://gh-proxy.com/"
+    PROXY_URL["github_do"]="https://github.do/"
+    PROXY_URL["gh_llkk_cc"]="https://gh.llkk.cc/https://"
+    PROXY_URL["gh_felicity_ac_cn"]="https://gh.felicity.ac.cn/https://"
+    PROXY_URL["ghfast_top"]="https://ghfast.top/"
+    PROXY_URL["ghproxy_net"]="https://ghproxy.net/"
+    PROXY_URL["source"]="https://"
 
-	$CP_CMD -rf /tmp/mdserver-web/* /www/server/mdserver-web
-	rm -rf /tmp/master.zip
-	rm -rf /tmp/mdserver-web
-else
-	curl --insecure -sSLo /tmp/master.zip https://codeload.github.com/midoks/mdserver-web/zip/master
 
-	cd /tmp && unzip /tmp/master.zip
-	$CP_CMD -rf /tmp/mdserver-web-master/* /www/server/mdserver-web
-	rm -rf /tmp/master.zip
-	rm -rf /tmp/mdserver-web-master
+    SOURCE_LIST_KEY_SORT_TMP=$(echo ${!PROXY_URL[@]} | tr ' ' '\n' | sort -n)
+    SOURCE_LIST_KEY=(${SOURCE_LIST_KEY_SORT_TMP//'\n'/})
+    SOURCE_LIST_LEN=${#PROXY_URL[*]}
 fi
+
+
+function AutoSizeStr(){
+    NAME_STR=$1
+    NAME_NUM=$2
+
+    NAME_STR_LEN=`echo "$NAME_STR" | wc -L`
+    NAME_NUM_LEN=`echo "$NAME_NUM" | wc -L`
+
+    fix_len=35
+    remaining_len=`expr $fix_len - $NAME_STR_LEN - $NAME_NUM_LEN`
+    FIX_SPACE=' '
+    for ((ass_i=1;ass_i<=$remaining_len;ass_i++))
+    do 
+        FIX_SPACE="$FIX_SPACE "
+    done
+    echo -e " ❖   ${1}${FIX_SPACE}${2})"
+}
+
+function ChooseProxyURL(){
+    clear
+    echo -e '+---------------------------------------------------+'
+    echo -e '|                                                   |'
+    echo -e '|   =============================================   |'
+    echo -e '|                                                   |'
+    echo -e '|     欢迎使用 Linux 一键安装mdserver-web面板源码   |'
+    echo -e '|                                                   |'
+    echo -e '|   =============================================   |'
+    echo -e '|                                                   |'
+    echo -e '+---------------------------------------------------+'
+    echo -e ''
+    echo -e '#####################################################'
+    echo -e ''
+    echo -e '            提供以下国内代理地址可供选择:                  '
+    echo -e ''
+    echo -e '#####################################################'
+    echo -e ''
+    cm_i=0
+    for V in ${SOURCE_LIST_KEY[@]}; do
+    num=`expr $cm_i + 1`
+    AutoSizeStr "${V}" "$num"
+    cm_i=`expr $cm_i + 1`
+    done
+    echo -e ''
+    echo -e '#####################################################'
+    echo -e ''
+    echo -e "        系统时间  ${BLUE}$(date "+%Y-%m-%d %H:%M:%S")${PLAIN}"
+    echo -e ''
+    echo -e '#####################################################'
+    CHOICE_A=$(echo -e "\n${BOLD}└─ 请选择并输入你想使用的代理地址 [ 1-${SOURCE_LIST_LEN} ]：${PLAIN}")
+
+    read -p "${CHOICE_A}" INPUT
+    # echo $INPUT
+    if [ "$INPUT" == "" ];then
+        INPUT=1
+        TMP_INPUT=`expr $INPUT - 1`
+        INPUT_KEY=${SOURCE_LIST_KEY[$TMP_INPUT]}
+        echo -e "\n默认选择[${BLUE}${INPUT_KEY}${PLAIN}]安装！"
+    fi
+
+    if [ "$INPUT" -lt "0" ];then
+        INPUT=1
+        TMP_INPUT=`expr $INPUT - 1`
+        INPUT_KEY=${SOURCE_LIST_KEY[$TMP_INPUT]}
+        echo -e "\n低于边界错误!选择[${BLUE}${INPUT_KEY}${PLAIN}]安装！"
+        sleep 2s
+    fi
+
+    if [ "$INPUT" -gt "${SOURCE_LIST_LEN}" ];then
+        INPUT=${SOURCE_LIST_LEN}
+        TMP_INPUT=`expr $INPUT - 1`
+        INPUT_KEY=${SOURCE_LIST_KEY[$TMP_INPUT]}
+        echo -e "\n超出边界错误!选择[${BLUE}${INPUT_KEY}${PLAIN}]安装！"
+        sleep 2s
+    fi
+
+    INPUT=`expr $INPUT - 1`
+    INPUT_KEY=${SOURCE_LIST_KEY[$INPUT]}
+    HTTP_PREFIX=${PROXY_URL[$INPUT_KEY]}
+}
+
+
+if [ "$LOCAL_ADDR" != "common" ];then
+    ChooseProxyURL
+
+    if [ "$DOMAIN" != "https://" ];then
+        DOMAIN=`echo $HTTP_PREFIX | sed 's|https://||g'`
+        DOMAIN=`echo $DOMAIN | sed 's|/||g'`
+        ping -c 3 $DOMAIN > /dev/null 2>&1
+        if [ "$?" != "0" ];then
+            echo "无效代理地址:${DOMAIN}"
+            exit
+        fi
+    fi
+fi
+
+if [ ${_os} == "Darwin" ]; then
+    OSNAME='macos'
+elif grep -Eqi "openSUSE" /etc/*-release; then
+    OSNAME='opensuse'
+    zypper refresh
+elif grep -Eqi "EulerOS" /etc/*-release || grep -Eqi "openEuler" /etc/*-release; then
+    OSNAME='euler'
+elif grep -Eqi "FreeBSD" /etc/*-release; then
+    OSNAME='freebsd'
+elif grep -Eqi "CentOS" /etc/issue || grep -Eqi "CentOS" /etc/*-release; then
+    OSNAME='rhel'
+    yum install -y wget zip unzip
+elif grep -Eqi "Fedora" /etc/issue || grep -Eqi "Fedora" /etc/*-release; then
+    OSNAME='rhel'
+    yum install -y wget zip unzip
+elif grep -Eqi "Rocky" /etc/issue || grep -Eqi "Rocky" /etc/*-release; then
+    OSNAME='rhel'
+    yum install -y wget zip unzip
+elif grep -Eqi "AlmaLinux" /etc/issue || grep -Eqi "AlmaLinux" /etc/*-release; then
+    OSNAME='rhel'
+    yum install -y wget zip unzip
+elif grep -Eqi "Anolis" /etc/issue || grep -Eqi "Anolis" /etc/*-release; then
+    OSNAME='rhel'
+    yum install -y wget curl zip unzip tar crontabs
+elif grep -Eqi "Amazon Linux" /etc/issue || grep -Eqi "Amazon Linux" /etc/*-release; then
+    OSNAME='amazon'
+    yum install -y wget zip unzip
+elif grep -Eqi "Debian" /etc/issue || grep -Eqi "Debian" /etc/*-release; then
+    OSNAME='debian'
+    apt install -y wget zip unzip
+elif grep -Eqi "Ubuntu" /etc/issue || grep -Eqi "Ubuntu" /etc/*-release; then
+    OSNAME='ubuntu'
+    apt install -y wget zip unzip
+elif grep -Eqi "Raspbian" /etc/issue || grep -Eqi "Raspbian" /etc/*-release; then
+    OSNAME='raspbian'
+elif grep -Eqi "Alpine" /etc/issue || grep -Eqi "Alpine" /etc/*-release; then
+    OSNAME='alpine'
+    apk update
+    apk add devscripts -force-broken-world
+    apk add wget zip unzip tar -force-broken-world
+else
+    OSNAME='unknow'
+fi
+
+echo "LOCAL:${LOCAL_ADDR}"
+
+CP_CMD=/usr/bin/cp
+if [ -f /bin/cp ];then
+        CP_CMD=/bin/cp
+fi
+
+echo "update mdserver-web code start"
+
+curl --insecure -sSLo /tmp/master.tar.gz ${HTTP_PREFIX}github.com/midoks/mdserver-web/archive/refs/heads/master.tar.gz
+cd /tmp && tar -zxvf /tmp/master.tar.gz
+$CP_CMD -rf /tmp/mdserver-web-master/* /www/server/mdserver-web
+rm -rf /tmp/master.tar.gz
+rm -rf /tmp/mdserver-web-master
+
+echo "update mdserver-web code end"
 
 
 #pip uninstall public
@@ -115,13 +217,13 @@ bash /etc/rc.d/init.d/mw restart
 bash /etc/rc.d/init.d/mw default
 
 if [ -f /usr/bin/mw ];then
-	rm -rf /usr/bin/mw
+    rm -rf /usr/bin/mw
 fi
 
 if [ ! -e /usr/bin/mw ]; then
-	if [ ! -f /usr/bin/mw ];then
-		ln -s /etc/rc.d/init.d/mw /usr/bin/mw
-	fi
+    if [ ! -f /usr/bin/mw ];then
+        ln -s /etc/rc.d/init.d/mw /usr/bin/mw
+    fi
 fi
 
 endTime=`date +%s`
