@@ -43,6 +43,7 @@ if [ "$LOCAL_ADDR" != "common" ];then
     PROXY_URL["gh_llkk_cc"]="https://gh.llkk.cc/https://"
     PROXY_URL["gh_felicity_ac_cn"]="https://gh.felicity.ac.cn/https://"
     PROXY_URL["ghfast_top"]="https://ghfast.top/"
+    PROXY_URL["ghproxy_net"]="https://ghproxy.net/"
     PROXY_URL["source"]="https://"
 
 
