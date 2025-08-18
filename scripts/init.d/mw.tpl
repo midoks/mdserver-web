@@ -357,7 +357,7 @@ mw_common_proxy(){
             DOMAIN=`echo $DOMAIN | sed 's|/||g'`
             ping -c 3 $DOMAIN > /dev/null 2>&1
             if [ "$?" != "0" ];then
-                echo "无效代理地址${HTTP_PREFIX}"
+                echo "无效代理地址:${HTTP_PREFIX}"
                 exit
             fi
         fi
