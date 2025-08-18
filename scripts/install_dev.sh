@@ -121,7 +121,7 @@ echo "local:${LOCAL_ADDR}"
 echo "OSNAME:${OSNAME}"
 
 declare -A PROXY_URL
-PROXY_URL["gh-proxy.com"]="https://gh-proxy.com"
+PROXY_URL["gh-proxy\.com"]="https://gh-proxy.com"
 
 
 SOURCE_LIST_KEY_SORT_TMP=$(echo ${!PROXY_URL[@]} | tr ' ' '\n' | sort -n)
