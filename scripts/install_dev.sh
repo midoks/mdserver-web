@@ -243,8 +243,7 @@ fi
 echo "use system version: ${OSNAME}"
 
 if [ "${OSNAME}" == "macos" ];then
-	# bash < (curl -sSL https://raw.githubusercontent.com/midoks/mdserver-web/refs/heads/dev/scripts/install/macos.sh)
-	curl --insecure -fsSL https://code.midoks.icu/midoks/mdserver-web/raw/branch/master/scripts/install/macos.sh | bash
+	curl --insecure -fsSL ${HTTP_PREFIX}raw.githubusercontent.com/midoks/mdserver-web/refs/heads/dev/scripts/install/macos.sh | bash
 else
 	cd /www/server/mdserver-web && bash scripts/install/${OSNAME}.sh
 fi
