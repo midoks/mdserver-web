@@ -79,7 +79,7 @@ setTimeout(function(){
 
 function initPage(){
 	var order = getCookie('order');
-	if (order != ''){
+	if (order){
 		var sort = order.split(' ');
 		if (sort[0] == 'name'){
 			if (sort[1] == 'desc'){
