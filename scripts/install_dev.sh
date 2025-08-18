@@ -45,7 +45,7 @@ if [ "$LOCAL_ADDR" != "common" ];then
 	PROXY_URL["gh_proxy_com"]="https://gh-proxy.com/"
 	PROXY_URL["ghproxy_link"]="https://ghproxy.link/"
 	PROXY_URL["gitclone_com"]="https://gitclone.com/"
-	
+	PROXY_URL["source"]="https://"
 
 
 	SOURCE_LIST_KEY_SORT_TMP=$(echo ${!PROXY_URL[@]} | tr ' ' '\n' | sort -n)
