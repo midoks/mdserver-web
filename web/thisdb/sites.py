@@ -85,11 +85,11 @@ def getSitesList(
     if type_id != '' and int(type_id) >= 0:
         sql_where = " type_id=" + str(type_id)
 
-
     dbM = dbC = mw.M('sites').field(__FIELD)
 
     if sql_where != '':
         count = dbC.where(sql_where).count()
+        dbM.where(sql_where)
     else:
         count = dbC.count()
 
@@ -101,7 +101,6 @@ def getSitesList(
     else:
         site_list = dbM.limit(limit).order('id desc').select()
 
-    
     data = {}
     data['list'] = site_list
     data['count'] = count
