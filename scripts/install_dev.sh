@@ -47,15 +47,15 @@ if [ ! -z "$cn" ] || [ "$?" == "0" ] ;then
 	LOCAL_ADDR=cn
 fi
 
-if [ "$LOCAL_ADDR" != "common" ];then
-	declare -A PROXY_URL
-	PROXY_URL["gh-proxy"]="https://gh-proxy.com/"
+# if [ "$LOCAL_ADDR" != "common" ];then
+declare -A PROXY_URL
+PROXY_URL["gh-proxy"]="https://gh-proxy.com/"
 
 
-	SOURCE_LIST_KEY_SORT_TMP=$(echo ${!PROXY_URL[@]} | tr ' ' '\n' | sort -n)
-	SOURCE_LIST_KEY=(${SOURCE_LIST_KEY_SORT_TMP//'\n'/})
-	SOURCE_LIST_LEN=${#PROXY_URL[*]}
-fi
+SOURCE_LIST_KEY_SORT_TMP=$(echo ${!PROXY_URL[@]} | tr ' ' '\n' | sort -n)
+SOURCE_LIST_KEY=(${SOURCE_LIST_KEY_SORT_TMP//'\n'/})
+SOURCE_LIST_LEN=${#PROXY_URL[*]}
+# fi
 
 
 function AutoSizeStr(){
