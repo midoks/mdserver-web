@@ -146,7 +146,7 @@ bash <(curl --insecure -fsSL https://code.midoks.icu/midoks/mdserver-web/raw/bra
 - 直接更新
 
 ```
-curl --insecure -fsSL https://raw.githubusercontent.com/midoks/mdserver-web/master/scripts/update.sh | bash
+bash <(curl --insecure -fsSL https://raw.githubusercontent.com/midoks/mdserver-web/master/scripts/update.sh)
 ```
 
 - 卸载脚本
@@ -161,7 +161,7 @@ wget --no-check-certificate -O uninstall.sh https://raw.githubusercontent.com/mi
 - 需已经安装mdserver-web
 
 ```
-curl --insecure -fsSL  https://raw.githubusercontent.com/midoks/mdserver-web/dev/scripts/quick/app.sh | bash
+bash <(curl --insecure -fsSL https://raw.githubusercontent.com/midoks/mdserver-web/dev/scripts/quick/app.sh)
 ```
 
 
@@ -175,7 +175,7 @@ wget --no-check-certificate -O install.sh https://raw.githubusercontent.com/mido
 
 wget --no-check-certificate -O uninstall.sh https://raw.githubusercontent.com/midoks/mdserver-web/dev/scripts/uninstall.sh && bash uninstall.sh
 
-curl --insecure -fsSL  https://raw.githubusercontent.com/midoks/mdserver-web/dev/scripts/quick/debug.sh | bash
+bash <(curl --insecure -fsSL https://raw.githubusercontent.com/midoks/mdserver-web/dev/scripts/quick/debug.sh)
 
 bash <(curl --insecure -fsSL https://code.midoks.icu/midoks/mdserver-web/raw/branch/dev/scripts/install_dev.sh)
 bash <(curl --insecure -fsSL https://code.midoks.icu/midoks/mdserver-web/raw/branch/dev/scripts/update_dev.sh)
@@ -195,7 +195,7 @@ cd /www/server/mdserver-web && rm -rf lib64
 cd /www/server/mdserver-web && rm -rf bin
 cd /www/server/mdserver-web && rm -rf include
 
-mw update/mw update_dev
+mw update/mw update_dev/mw dev
 ```
 
 ### 捐赠地址 USDT（TRC20）
