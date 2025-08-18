@@ -85,7 +85,6 @@ function ChooseProxyURL(){
     echo -e ''
     echo -e '#####################################################'
     echo -e ''
-    echo -e "        运行环境  ${BLUE}${SYSTEM_NAME} ${SYSTEM_VERSION_NUMBER} ${SYSTEM_ARCH}${PLAIN}"
     echo -e "        系统时间  ${BLUE}$(date "+%Y-%m-%d %H:%M:%S")${PLAIN}"
     echo -e ''
     echo -e '#####################################################'
