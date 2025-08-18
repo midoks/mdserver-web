@@ -1120,15 +1120,20 @@ function listOrder(skey,type,obj){
 	if(or){
 		if(or.split(' ')[1] == 'desc'){
 			orderType = 'asc';
+		} else if(or.split(' ')[1] == 'asc'){
+			orderType = 'none';
 		}
 	}
 	setCookie('order',skey + ' ' + orderType);
 	getWeb(1);
 	$(obj).find(".glyphicon-triangle-bottom").remove();
 	$(obj).find(".glyphicon-triangle-top").remove();
-	if(orderType == 'asc'){
+	$(obj).parents().find(".glyphicon-stop").remove();
+	if(orderType == 'none'){
+		$(obj).append("<span class='glyphicon glyphicon glyphicon-stop' style='margin-left:5px;color:#bbb'></span>");
+	} else if(orderType == 'asc') {
 		$(obj).append("<span class='glyphicon glyphicon-triangle-bottom' style='margin-left:5px;color:#bbb'></span>");
-	}else{
+	} else {
 		$(obj).append("<span class='glyphicon glyphicon-triangle-top' style='margin-left:5px;color:#bbb'></span>");
 	}
 }

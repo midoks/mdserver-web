@@ -96,7 +96,10 @@ def getSitesList(
     start = (int(page) - 1) * (int(size))
     limit = str(start) + ',' +str(size)
 
-    if order is not None:
+    print("order:",order)
+    if order.find("none") > -1:
+        site_list = dbM.limit(limit).order('').select()
+    elif order is not None:
         site_list = dbM.limit(limit).order(order).select()
     else:
         site_list = dbM.limit(limit).order('id desc').select()
