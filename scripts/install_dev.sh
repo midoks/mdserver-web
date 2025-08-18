@@ -139,7 +139,7 @@ function ChooseProxyURL(){
 if [ "$LOCAL_ADDR" != "common" ];then
 	ChooseProxyURL
 
-	if [ "$DOMAIN" != "https://" ];then
+	if [ "$HTTP_PREFIX" != "https://" ];then
 		DOMAIN=`echo $HTTP_PREFIX | sed 's|https://||g'`
 		DOMAIN=`echo $DOMAIN | sed 's|/||g'`
 		ping -c 3 $DOMAIN > /dev/null 2>&1
