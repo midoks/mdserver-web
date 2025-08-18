@@ -168,8 +168,8 @@ bash <(curl --insecure -fsSL https://raw.githubusercontent.com/midoks/mdserver-w
 ### DEV使用
 
 ```
-bash <(curl --insecure -fsSL https://raw.githubusercontent.com/midoks/mdserver-web/master/scripts/install.sh)
-bash <(curl --insecure -fsSL https://raw.githubusercontent.com/midoks/mdserver-web/master/scripts/update.sh)
+bash <(curl --insecure -fsSL https://raw.githubusercontent.com/midoks/mdserver-web/dev/scripts/install.sh)
+bash <(curl --insecure -fsSL https://raw.githubusercontent.com/midoks/mdserver-web/dev/scripts/update.sh)
 
 bash <(curl --insecure -fsSL https://raw.githubusercontent.com/midoks/mdserver-web/dev/scripts/install_dev.sh)
 bash <(curl --insecure -fsSL https://raw.githubusercontent.com/midoks/mdserver-web/dev/scripts/update_dev.sh)
@@ -179,6 +179,9 @@ wget --no-check-certificate -O install.sh https://raw.githubusercontent.com/mido
 wget --no-check-certificate -O uninstall.sh https://raw.githubusercontent.com/midoks/mdserver-web/dev/scripts/uninstall.sh && bash uninstall.sh
 
 bash <(curl --insecure -fsSL https://raw.githubusercontent.com/midoks/mdserver-web/dev/scripts/quick/debug.sh)
+
+bash <(curl --insecure -fsSL https://code.midoks.icu/midoks/mdserver-web/raw/branch/dev/scripts/install.sh)
+bash <(curl --insecure -fsSL https://code.midoks.icu/midoks/mdserver-web/raw/branch/dev/scripts/update.sh)
 
 bash <(curl --insecure -fsSL https://code.midoks.icu/midoks/mdserver-web/raw/branch/dev/scripts/install_dev.sh)
 bash <(curl --insecure -fsSL https://code.midoks.icu/midoks/mdserver-web/raw/branch/dev/scripts/update_dev.sh)
