@@ -144,7 +144,7 @@ if [ "$LOCAL_ADDR" != "common" ];then
 			echo "无效代理地址:${DOMAIN}"
 			exit
 		fi
-	if
+	fi
 fi
 
 if [ -f /etc/motd ];then
