@@ -1128,7 +1128,7 @@ function listOrder(skey,type,obj){
 	getWeb(1);
 	$(obj).find(".glyphicon-triangle-bottom").remove();
 	$(obj).find(".glyphicon-triangle-top").remove();
-	$(obj).parents().find(".glyphicon-stop").remove();
+	$(obj).find(".glyphicon-stop").remove();
 	if(orderType == 'none'){
 		$(obj).append("<span class='glyphicon glyphicon glyphicon-stop' style='margin-left:5px;color:#bbb'></span>");
 	} else if(orderType == 'asc') {
