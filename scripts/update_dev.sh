@@ -52,10 +52,11 @@ fi
 if [ "$LOCAL_ADDR" != "common" ];then
 	declare -A PROXY_URL
 	PROXY_URL["gh_proxy_com"]="https://gh-proxy.com/"
-	PROXY_URL["github_do"]="https://github.do/"
-	PROXY_URL["gitclone_com"]="https://gitclone.com/"
-	PROXY_URL["ghfast_top"]="https://ghfast.top/"
-	PROXY_URL["source"]="https://"
+    PROXY_URL["github_do"]="https://github.do/"
+    PROXY_URL["gh_llkk_cc"]="https://gh.llkk.cc/https://"
+    PROXY_URL["gh_felicity_ac_cn"]="https://gh.felicity.ac.cn/https://"
+    PROXY_URL["ghfast_top"]="https://ghfast.top/"
+    PROXY_URL["source"]="https://"
 
 
 	SOURCE_LIST_KEY_SORT_TMP=$(echo ${!PROXY_URL[@]} | tr ' ' '\n' | sort -n)
