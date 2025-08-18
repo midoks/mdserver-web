@@ -210,7 +210,7 @@ if [ "$EUID" -ne 0 ] && [ "$OSNAME" != "macos" ];then
 fi
 
 
-echo "local:${LOCAL_ADDR}"
+echo "LOCAL:${LOCAL_ADDR}"
 echo "OSNAME:${OSNAME}"
 
 if [ $OSNAME != "macos" ];then
