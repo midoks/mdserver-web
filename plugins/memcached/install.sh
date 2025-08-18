@@ -8,7 +8,7 @@ rootPath=$(dirname "$rootPath")
 serverPath=$(dirname "$rootPath")
 
 sys_os=`uname`
-VERSION=1.6.38
+VERSION=1.6.39
 
 echo $sys_os
 
@@ -18,7 +18,7 @@ Install_mem(){
 	echo '正在安装脚本文件...'
 
 	if [ ! -f $serverPath/source/memcached.tar.gz ];then
-		wget  --no-check-certificate -O $serverPath/source/memcached/memcached.tar.gz https://www.memcached.org/files/memcached-${VERSION}.tar.gz
+		wget --no-check-certificate -O $serverPath/source/memcached/memcached.tar.gz https://www.memcached.org/files/memcached-${VERSION}.tar.gz
 	fi
 	
 	cd $serverPath/source/memcached && tar -zxvf memcached.tar.gz
