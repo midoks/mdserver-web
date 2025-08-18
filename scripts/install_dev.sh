@@ -42,7 +42,10 @@ fi
 
 if [ "$LOCAL_ADDR" != "common" ];then
 	declare -A PROXY_URL
-	PROXY_URL["gh-proxy"]="https://gh-proxy.com/"
+	PROXY_URL["gh_proxy_com"]="https://gh-proxy.com/"
+	PROXY_URL["ghproxy_link"]="https://ghproxy.link/"
+	PROXY_URL["gitclone_com"]="https://gitclone.com/"
+	
 
 
 	SOURCE_LIST_KEY_SORT_TMP=$(echo ${!PROXY_URL[@]} | tr ' ' '\n' | sort -n)
@@ -243,6 +246,7 @@ fi
 echo "use system version: ${OSNAME}"
 
 if [ "${OSNAME}" == "macos" ];then
+	# bash < (curl -sSL https://raw.githubusercontent.com/midoks/mdserver-web/refs/heads/dev/scripts/install/macos.sh)
 	curl --insecure -fsSL https://code.midoks.icu/midoks/mdserver-web/raw/branch/master/scripts/install/macos.sh | bash
 else
 	cd /www/server/mdserver-web && bash scripts/install/${OSNAME}.sh
