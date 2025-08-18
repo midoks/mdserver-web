@@ -205,7 +205,7 @@ if [ -f /bin/cp ];then
 	CP_CMD=/bin/cp
 fi
 
-echo "update mdserver-web code start"
+echo "update mdserver-web dev code start"
 
 curl --insecure -sSLo /tmp/dev.tar.gz ${HTTP_PREFIX}github.com/midoks/mdserver-web/archive/refs/heads/dev.tar.gz
 cd /tmp && tar -zxvf /tmp/dev.tar.gz
@@ -213,7 +213,7 @@ $CP_CMD -rf /tmp/mdserver-web-dev/* /www/server/mdserver-web
 rm -rf /tmp/dev.tar.gz
 rm -rf /tmp/mdserver-web-dev
 
-echo "update mdserver-web code end"
+echo "update mdserver-web dev code end"
 
 
 #pip uninstall public
