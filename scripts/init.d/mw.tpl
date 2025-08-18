@@ -256,9 +256,9 @@ mw_install(){
     fi
     
     if [ "$LOCAL_ADDR" == "common" ];then
-        curl --insecure -fsSL https://raw.githubusercontent.com/midoks/mdserver-web/master/scripts/install.sh | bash
+        bash <(bash -fsSL "https://raw.githubusercontent.com/midoks/mdserver-web/master/scripts/install.sh")
     else
-        curl --insecure -fsSL  https://code.midoks.icu/midoks/mdserver-web/raw/branch/dev/scripts/install.sh | bash
+        bash <(bash -fsSL "https://code.midoks.icu/midoks/mdserver-web/raw/branch/dev/scripts/install.sh")
     fi 
 }
 
