@@ -350,12 +350,12 @@ mw_common_proxy(){
     if [ "$LOCAL_ADDR" != "common" ];then
         ChooseProxyURL
 
-        if [ "$DOMAIN" != "http://" ];then
+        if [ "$DOMAIN" != "https://" ];then
             DOMAIN=`echo $HTTP_PREFIX | sed 's|https://||g'`
             DOMAIN=`echo $DOMAIN | sed 's|/||g'`
             ping -c 3 $DOMAIN > /dev/null 2>&1
             if [ "$?" != "0" ];then
-                echo "无效代理地址:${DOMAIN}"
+                echo "无效代理地址${HTTP_PREFIX}"
                 exit
             fi
         fi
