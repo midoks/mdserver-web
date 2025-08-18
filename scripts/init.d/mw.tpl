@@ -337,8 +337,8 @@ mw_common_proxy(){
         declare -A PROXY_URL
         PROXY_URL["gh_proxy_com"]="https://gh-proxy.com/"
         PROXY_URL["github_do"]="https://github.do/"
-        PROXY_URL["gitclone_com"]="https://gitclone.com/"
         PROXY_URL["gh_llkk_cc"]="https://gh.llkk.cc/https://"
+        PROXY_URL["gh_felicity_ac_cn"]="https://gh.felicity.ac.cn/https://"
         PROXY_URL["ghfast_top"]="https://ghfast.top/"
         PROXY_URL["source"]="https://"
 
