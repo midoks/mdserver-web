@@ -135,6 +135,14 @@ function ChooseProxyURL(){
 
 if [ "$LOCAL_ADDR" != "common" ];then
 	ChooseProxyURL
+
+	DOMAIN=`echo $HTTP_PREFIX | sed 's|https://||g'`
+	DOMAIN=`echo $DOMAIN | sed 's|/||g'`
+	ping -c 3 $DOMAIN > /dev/null 2>&1
+	if [ "$?" != "0" ];then
+		echo "无效代理地址:${DOMAIN}"
+		exit
+	fi
 fi
 
 if [ -f /etc/motd ];then
