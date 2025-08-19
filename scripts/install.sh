@@ -239,7 +239,7 @@ if [ $OSNAME != "macos" ];then
 	    if [ "$LOCAL_ADDR" != "common" ];then
 	        curl --insecure -sSLo /tmp/acme.sh-master.tar.gz ${HTTP_PREFIX}github.com/acmesh-official/acme.sh/archive/refs/heads/master.tar.gz
 	        tar xvzf /tmp/acme.sh-master.tar.gz -C /tmp
-	        cd /tmp/acme.sh-master.tar.gz
+	        cd /tmp/acme.sh-master
 	        bash acme.sh install
 	    else
 	    	curl -fsSL https://get.acme.sh | bash

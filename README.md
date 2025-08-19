@@ -36,7 +36,7 @@ Talk is cheap, show me the code.  -- linus
 ```
 
 - [兼容性测试报告](/compatibility.md)
-- [常用命令说明](/cmd.md) [ mw default ] [ mw update_dev ]
+- [常用命令说明](/cmd.md) [ mw default ] [ mw dev ]
 
 ### 特别赞助
 
