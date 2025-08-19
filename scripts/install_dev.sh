@@ -234,11 +234,11 @@ if [ $OSNAME != "macos" ];then
 	mkdir -p /www/backup/site
 
 	if [ ! -d /www/server/mdserver-web ];then
-		echo "downloading ${HTTP_PREFIX}github.com/midoks/mdserver-web/archive/refs/heads/dev.zip"
-		curl --insecure -sSLo /tmp/dev.zip ${HTTP_PREFIX}github.com/midoks/mdserver-web/archive/refs/heads/dev.zip
-		cd /tmp && unzip /tmp/dev.zip
+		echo "downloading ${HTTP_PREFIX}github.com/midoks/mdserver-web/archive/refs/heads/dev.tar.gz"
+		curl --insecure -sSLo /tmp/dev.tar.gz ${HTTP_PREFIX}github.com/midoks/mdserver-web/archive/refs/heads/dev.tar.gz
+		cd /tmp && unzip /tmp/dev.tar.gz
 		mv -f /tmp/mdserver-web-dev /www/server/mdserver-web
-		rm -rf /tmp/dev.zip
+		rm -rf /tmp/dev.tar.gz
 		rm -rf /tmp/mdserver-web-dev
 	fi
 

@@ -227,7 +227,7 @@ if [ $OSNAME != "macos" ];then
 	mkdir -p /www/backup/site
 
 	if [ ! -d /www/server/mdserver-web ];then
-		curl --insecure -sSLo /tmp/master.zip ${HTTP_PREFIX}github.com/midoks/mdserver-web/archive/refs/heads/master.tar.gz
+		curl --insecure -sSLo /tmp/master.tar.gz ${HTTP_PREFIX}github.com/midoks/mdserver-web/archive/refs/heads/master.tar.gz
 		cd /tmp && tar -zxvf /tmp/master.tar.gz
 		mv -f /tmp/mdserver-web-master /www/server/mdserver-web
 		rm -rf /tmp/master.tar.gz
