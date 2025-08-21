@@ -2425,6 +2425,7 @@ var html = '<div>\
                         <option value="499">499</option>\
                         <option value="301">301</option>\
                         <option value="302">302</option>\
+                        <option value="206">206</option>\
                         <option value="200">200</option>\
                     </select>\
                     <span style="margin-left:10px;">来源: </span>\
