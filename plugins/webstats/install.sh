@@ -72,7 +72,7 @@ Install_App()
 	make install
 
 	if [ ! -f $serverPath/source/webstats/lsqlite3_v096.zip ];then
-		wget --no-check-certificate -O $serverPath/source/webstats/lsqlite3_v096.zip http://lua.sqlite.org/home/zip/lsqlite3_v096.zip?uuid=v0.9.6
+		wget --no-check-certificate -O $serverPath/source/webstats/lsqlite3_v096.zip "http://lua.sqlite.org/home/zip/lsqlite3_v096.zip?uuid=v0.9.6&proof=554053866"
 	fi
 
 	if [ ! -d $serverPath/source/webstats/lsqlite3_v096 ];then
