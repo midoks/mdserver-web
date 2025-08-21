@@ -748,9 +748,6 @@ def getLogsList():
     if method != "all":
         conn = conn.andWhere("method=?", (method,))
 
-    if status_code != "all":
-        conn = conn.andWhere("status_code=?", (status_code,))
-
     if request_time != "all":
         request_time_s = request_time.strip().split('-')
         # print(request_time_s)
@@ -792,6 +789,9 @@ def getLogsList():
 
     if search_uri != "":
         conn = conn.andWhere("uri like '%" + search_uri + "%'", ())
+
+    if status_code != "all":
+        conn = conn.andWhere("status_code=?", (status_code,))
 
     attacHistoryLogHack(conn, domain, query_date)
 
