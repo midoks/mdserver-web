@@ -201,9 +201,7 @@ class Sql():
         try:
             sql = "SELECT " + self.__OPT_FIELD + " FROM " + self.__DB_TABLE + \
                 self.__OPT_WHERE + self.__OPT_GROUP + self.__OPT_ORDER + self.__OPT_LIMIT
-
-            debug = getPanelDir()+'/data/debug.pl'
-            if os.path.exists(debug):
+            if mw.isDebugMode():
                 print(sql, self.__OPT_PARAM)
             result = self.__DB_CONN.execute(sql, self.__OPT_PARAM)
             data = result.fetchall()
