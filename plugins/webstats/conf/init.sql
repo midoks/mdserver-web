@@ -32,8 +32,7 @@ CREATE INDEX status_code_idx ON web_logs (`status_code`);
 CREATE INDEX request_time_idx ON web_logs (`request_time`);
 CREATE INDEX is_spider_idx ON web_logs (`is_spider`);
 CREATE INDEX body_length_idx ON web_logs (`body_length`);
-CREATE INDEX all_union_ts_idx ON web_logs (`time`,`status_code`);
-CREATE INDEX all_union_idx ON web_logs (`time`,`ip`,`method`,`status_code`,`request_time`,`is_spider`);
+CREATE INDEX all_union_idx ON web_logs(`status_code`, `time`, `ip`, `domain`, `server_name`, `method`, `is_spider`, `protocol`, `request_headers`, `ip_list`, `client_port`, `body_length`, `user_agent`, `referer`, `request_time`, `uri`);
 
 
 CREATE TABLE IF NOT EXISTS `client_stat`(
