@@ -52,8 +52,12 @@ Install_App(){
 	fi
 
 
-	if [ ! -f $serverPath/source/op_waf/lsqlite3_v096.zip ];then
-		wget --no-check-certificate -O $serverPath/source/op_waf/lsqlite3_v096.zip http://lua.sqlite.org/home/zip/lsqlite3_v096.zip?uuid=v0.9.6
+	# if [ ! -f $serverPath/source/op_waf/lsqlite3_v096.zip ];then
+	# 	wget --no-check-certificate -O $serverPath/source/op_waf/lsqlite3_v096.zip http://lua.sqlite.org/home/zip/lsqlite3_v096.zip?uuid=v0.9.6
+	# fi
+	
+	if [ ! -f $serverPath/source/webstats/lsqlite3_v096.zip ];then
+		wget --no-check-certificate -O $serverPath/source/webstats/lsqlite3_v096.zip https://github.com/midoks/mdserver-web/releases/download/0.18.4/lsqlite3_v096.zip
 	fi
 
 	if [ ! -d $serverPath/source/op_waf/lsqlite3_v096 ];then
