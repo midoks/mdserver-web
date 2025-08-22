@@ -111,12 +111,8 @@ logs_file=$plugin_path/${rname}.log
 
 
 def removeBgTask():
-    if not mw.isAppleSystem():
-        return False
-
-    cfg_list = getConfigData()
-    for x in range(len(cfg_list)):
-        cfg = cfg_list[x]
+    cfg = getConfigData()
+    for x in range(len(cfg)):
         if "task_id" in cfg.keys() and cfg["task_id"] > 0:
             res = mw.M("crontab").field("id, name").where(
                 "id=?", (cfg["task_id"],)).find()
