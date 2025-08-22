@@ -75,7 +75,7 @@ Install_App(){
 			cd $serverPath/source/op_waf/lsqlite3_v096
 			find_cfg=`cat Makefile | grep 'SQLITE_DIR'`
 			if [ "$find_cfg" == "" ];then
-				LIB_SQLITE_DIR=`brew info sqlite | grep /usr/local/Cellar/sqlite | cut -d \  -f 1 | awk 'END {print}'`
+				LIB_SQLITE_DIR=`brew info sqlite | grep /opt/homebrew/Cellar/sqlite | cut -d \  -f 1 | awk 'END {print}'`
 				echo $LIB_SQLITE_DIR
 				sed -i $BAK "s#\$(ROCKSPEC)#\$(ROCKSPEC) SQLITE_DIR=${LIB_SQLITE_DIR}#g"  Makefile
 			fi
