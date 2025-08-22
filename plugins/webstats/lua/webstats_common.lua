@@ -1037,7 +1037,7 @@ function _M.match_client(self, ua)
         else
             cls_pc = string.lower(pc_res[0])
         end
-        -- D("UA:"..ua)
+        -- self::D("UA:"..ua)
         -- D("PC cls:"..tostring(cls_pc))
         if cls_pc then
             client_stat_fields = client_stat_fields..","..self:get_update_field(clients_map[cls_pc], 1)
@@ -1127,6 +1127,11 @@ function _M.match_client_arr(self, ua)
         local pc_regx1 = "(360SE|360EE|360browser|Qihoo|TheWorld|TencentTraveler|Maxthon|Opera|QQBrowser|UCWEB|UBrowser|MetaSr|2345Explorer|Edg[e]*)" 
         local pc_res = ngx.re.match(ua, pc_regx1, "ijo")
         local cls_pc = nil
+
+        if "table" == type(ua) then
+            ua = tostring(ua[1])
+        end
+        -- self:D("UA-JSON:"..self:to_json(ua))
         if not pc_res then
             if ngx.re.find(ua, "[Ff]irefox") then
                 cls_pc = "firefox"
@@ -1140,8 +1145,8 @@ function _M.match_client_arr(self, ua)
         else
             cls_pc = string.lower(pc_res[0])
         end
-        -- D("UA:"..ua)
-        -- D("PC cls:"..tostring(cls_pc))
+        -- self:D("UA:"..ua)
+        -- self:D("PC cls:"..tostring(cls_pc))
         if cls_pc then
             client_stat_fields[clients_map[cls_pc]] = 1
         else
