@@ -93,7 +93,7 @@ logs_file=$plugin_path/${rname}.log
 
     params = {
         'name': _name,
-        'type': _type_day,
+        'type': cfg['period'],
         'week': "",
         'where1': cfg['where1'],
         'hour': cfg['hour'],
