@@ -1130,7 +1130,7 @@ function _M.match_client_arr(self, ua)
 
         -- self:D("UA-JSON:"..self:to_json(ua))
         if "table" == type(ua) then
-            ua = tostring(ua[1])
+            ua = self:to_json(ua)
         end
         
         if not pc_res then
