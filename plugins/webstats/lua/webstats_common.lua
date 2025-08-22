@@ -620,7 +620,12 @@ function _M.statistics_request(self, ip, is_spider, body_length)
     if not is_spider and ngx.status == 200 and body_length > 0 then
         local ua = ''
         if request_header['user-agent'] then
-            ua = string.lower(request_header['user-agent'])
+            if "table" == type(request_header['user-agent']) then
+                ua = self:to_json(request_header['user-agent'])
+            else
+                ua = request_header['user-agent']
+            end
+            ua = string.lower(ua)
         end
 
         pvc = 1
