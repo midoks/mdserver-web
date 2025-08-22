@@ -65,7 +65,7 @@ def createBgTask():
 
 def createBgTaskByName(name, args):
     cfg = getConfigTpl()
-    _name = "[勿删]OP防火墙后台任务[" + name + "]"
+    _name = "[勿删]OP防火墙后台任务"
     res = mw.M("crontab").field("id, name").where("name=?", (_name,)).find()
     if res:
         return True
@@ -76,8 +76,6 @@ def createBgTaskByName(name, args):
         if res and res["id"] == cfg["task_id"]:
             print("计划任务已经存在!")
             return True
-    import crontab_api
-    cron_api = crontab_api.crontab_api()
 
     period = args['period']
     _hour = ''
