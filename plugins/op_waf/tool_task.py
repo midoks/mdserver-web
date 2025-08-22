@@ -41,30 +41,23 @@ def getConfigData():
     conf = getTaskConf()
     if os.path.exists(conf):
         return json.loads(mw.readFile(getTaskConf()))
-    return []
-
-
-def getConfigTpl():
-    tpl = {
-        "name": "",
+    return {
         "task_id": -1,
+        "period": "day-n",
+        "where1": "7",
+        "hour": "0",
+        "minute": "15",
     }
-    return tpl
 
 
 def createBgTask():
     removeBgTask()
-    args = {
-        "period": "minute-n",
-        "minute-n": "1",
-    }
-
-    if mw.isAppleSystem():
-        createBgTaskByName(getPluginName(), args)
+    createBgTaskByName(getPluginName())
 
 
-def createBgTaskByName(name, args):
-    cfg = getConfigTpl()
+def createBgTaskByName(name):
+    cfg = getConfigData()
+
     _name = "[勿删]OP防火墙后台任务"
     res = mw.M("crontab").field("id, name").where("name=?", (_name,)).find()
     if res:
@@ -76,20 +69,6 @@ def createBgTaskByName(name, args):
         if res and res["id"] == cfg["task_id"]:
             print("计划任务已经存在!")
             return True
-
-    period = args['period']
-    _hour = ''
-    _minute = ''
-    _where1 = ''
-    _type_day = "day"
-    if period == 'day':
-        _type_day = 'day'
-        _hour = args['hour']
-        _minute = args['minute']
-    elif period == 'minute-n':
-        _type_day = 'minute-n'
-        _where1 = args['minute-n']
-        _minute = ''
 
     mw_dir = mw.getPanelDir()
     cmd = '''
@@ -116,9 +95,9 @@ logs_file=$plugin_path/${rname}.log
         'name': _name,
         'type': _type_day,
         'week': "",
-        'where1': _where1,
-        'hour': _hour,
-        'minute': _minute,
+        'where1': cfg['where1'],
+        'hour': cfg['hour'],
+        'minute': cfg['minute'],
         'save': "",
         'backup_to': "",
         'stype': "toShell",
@@ -129,12 +108,9 @@ logs_file=$plugin_path/${rname}.log
 
     task_id = MwCrontab.instance().add(params)
     if task_id > 0:
-        cfg["task_id"] = task_id
-        cfg["name"] = name
-
-        _dd = getConfigData()
-        _dd.append(cfg)
-        mw.writeFile(getTaskConf(), json.dumps(_dd))
+        cfg = getConfigData()
+        cfg["task_id"] = task_id        
+        mw.writeFile(getTaskConf(), json.dumps(cfg))
 
 
 def removeBgTask():
@@ -151,7 +127,6 @@ def removeBgTask():
                 data = MwCrontab.instance().delete(cfg["task_id"])
                 if data[0]:
                     cfg["task_id"] = -1
-                    cfg_list[x] = cfg
                     mw.writeFile(getTaskConf(), '[]')
                     return True
     return False
