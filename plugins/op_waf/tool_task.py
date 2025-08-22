@@ -138,9 +138,7 @@ def getCpuUsed():
 
 def pSqliteDb(dbname='logs'):
     db_dir = getServerDir() + '/logs/'
-
-    file = db_dir + 'waf.db'
-    conn = mw.M(dbname).dbPos(db_dir, name)
+    conn = mw.M(dbname).dbPos(db_dir, "waf.db")
 
     conn.execute("PRAGMA synchronous = 0")
     conn.execute("PRAGMA cache_size = 8000")
