@@ -564,9 +564,13 @@ function _M.store_logs_line(self, db, stmt, input_sn, info)
     local server_name = logline["server_name"]
     local user_agent = logline["user_agent"]
     local request_headers = logline["request_headers"]
-    local excluded = logline["excluded"] 
-
+    local excluded = logline["excluded"]
     local time_key = logline["time_key"]
+
+    if "table" == type(user_agent) then
+        user_agent = self:to_json(user_agent)
+    end
+    
     if not excluded then
         stmt:bind_names {
             time=time,
@@ -620,7 +624,12 @@ function _M.statistics_request(self, ip, is_spider, body_length)
     if not is_spider and ngx.status == 200 and body_length > 0 then
         local ua = ''
         if request_header['user-agent'] then
-            ua = string.lower(request_header['user-agent'])
+            if "table" == type(request_header['user-agent']) then
+                ua = self:to_json(request_header['user-agent'])
+            else
+                ua = request_header['user-agent']
+            end
+            ua = string.lower(ua)
         end
 
         pvc = 1
@@ -1037,7 +1046,7 @@ function _M.match_client(self, ua)
         else
             cls_pc = string.lower(pc_res[0])
         end
-        -- D("UA:"..ua)
+        -- self::D("UA:"..ua)
         -- D("PC cls:"..tostring(cls_pc))
         if cls_pc then
             client_stat_fields = client_stat_fields..","..self:get_update_field(clients_map[cls_pc], 1)
@@ -1127,6 +1136,12 @@ function _M.match_client_arr(self, ua)
         local pc_regx1 = "(360SE|360EE|360browser|Qihoo|TheWorld|TencentTraveler|Maxthon|Opera|QQBrowser|UCWEB|UBrowser|MetaSr|2345Explorer|Edg[e]*)" 
         local pc_res = ngx.re.match(ua, pc_regx1, "ijo")
         local cls_pc = nil
+
+        -- self:D("UA-JSON:"..self:to_json(ua))
+        if "table" == type(ua) then
+            ua = self:to_json(ua)
+        end
+        
         if not pc_res then
             if ngx.re.find(ua, "[Ff]irefox") then
                 cls_pc = "firefox"
@@ -1140,8 +1155,8 @@ function _M.match_client_arr(self, ua)
         else
             cls_pc = string.lower(pc_res[0])
         end
-        -- D("UA:"..ua)
-        -- D("PC cls:"..tostring(cls_pc))
+        -- self:D("UA:"..ua)
+        -- self:D("PC cls:"..tostring(cls_pc))
         if cls_pc then
             client_stat_fields[clients_map[cls_pc]] = 1
         else
