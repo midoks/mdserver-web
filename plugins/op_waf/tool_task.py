@@ -144,6 +144,19 @@ def getCpuUsed():
         mw.writeFile(path, str(int(data[0].strip())))
 
 
+def pSqliteDb(dbname='logs'):
+    db_dir = getServerDir() + '/logs/'
+
+    file = db_dir + 'waf.db'
+    conn = mw.M(dbname).dbPos(db_dir, name)
+
+    conn.execute("PRAGMA synchronous = 0")
+    conn.execute("PRAGMA cache_size = 8000")
+    conn.execute("PRAGMA page_size = 32768")
+    conn.execute("PRAGMA journal_mode = wal")
+    conn.execute("PRAGMA journal_size_limit = 1073741824")
+    return conn
+
 def run():
     getCpuUsed()
 
