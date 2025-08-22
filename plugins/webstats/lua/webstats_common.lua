@@ -565,12 +565,12 @@ function _M.store_logs_line(self, db, stmt, input_sn, info)
     local user_agent = logline["user_agent"]
     local request_headers = logline["request_headers"]
     local excluded = logline["excluded"]
+    local time_key = logline["time_key"]
 
     if "table" == type(user_agent) then
         user_agent = self:to_json(user_agent)
     end
-
-    local time_key = logline["time_key"]
+    
     if not excluded then
         stmt:bind_names {
             time=time,
