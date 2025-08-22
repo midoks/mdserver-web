@@ -293,12 +293,10 @@ def batchPaste(path, stype):
 
 
 def zip(sfile, dfile, stype, path):
-    if sfile.find(',') == -1:
-        if not os.path.exists(path + '/' + sfile):
-            return mw.returnData(False, '指定文件不存在!')
+    
 
-    try:
-        tmps = mw.getPanelDir() + '/logs/panel_exec.log'
+    tmps = mw.getPanelDir() + '/logs/panel_exec.log'
+    if sfile.find(',') == -1:
         if stype == 'zip':
             mw.execShell("cd '" + path + "' && zip '" + dfile + "' -r '" + sfile + "' > " + tmps + " 2>&1")
         elif stype == '7z':
@@ -312,17 +310,36 @@ def zip(sfile, dfile, stype, path):
                 return mw.returnData(False, 'rar压缩命令不存在，请安装!')
             mw.execShell("cd '" + path + "' && rar a '" + dfile + "' '" + sfile + "' > " + tmps + " 2>&1")
         else:
-            sfiles = ''
-            for sfile in sfile.split(','):
-                if not sfile:
-                    continue
-                sfiles += " '" + sfile + "'"
-            mw.execShell("cd '" + path + "' && tar -zcvf '" + dfile + "' " + sfiles + " > " + tmps + " 2>&1")
-        setFileAccept(dfile)
+            return mw.returnData(False, '未知压缩格式')
         mw.writeLog("文件管理", '文件[{1}]压缩[{2}]成功!', (sfile, dfile))
-        return mw.returnData(True, '文件压缩成功!')
-    except Exception as e:
-        return mw.returnData(False, '文件压缩失败:'+str(e))
+    else:
+        sfiles = ''
+        for sfile in sfile.split(','):
+            if not sfile:
+                continue
+            if not os.path.exists(sfile):
+                return mw.returnData(False, '指定文件不存在!')
+            
+            sfiles += " '" + sfile.replace(path+'/','') + "'"
+
+        if stype == 'zip':
+            mw.execShell("cd '" + path + "' && zip '" + dfile + "' -r " + sfiles + " > " + tmps + " 2>&1")
+        elif stype == '7z':
+            if not mw.checkBinExist('7z'):
+                return mw.returnData(False, '7z压缩命令不存在，请安装!')
+            mw.execShell("cd '" + path + "' && 7z a '" + dfile + "' -r " + sfiles + " > " + tmps + " 2>&1")
+        elif stype == 'tar_gz':
+            mw.execShell("cd '" + path + "' && tar -zcvf '" + dfile + "' " + sfiles + " > " + tmps + " 2>&1")
+        elif stype == 'rar':
+            if not mw.checkBinExist('rar'):
+                return mw.returnData(False, 'rar压缩命令不存在，请安装!')
+            mw.execShell("cd '" + path + "' && rar a '" + dfile + "' " + sfiles + " > " + tmps + " 2>&1")
+        else:
+            return mw.returnData(False, '未知压缩格式')
+
+        mw.writeLog("文件管理", '文件[{1}]压缩[{2}]成功!', (sfiles, dfile))
+    setFileAccept(dfile)
+    return mw.returnData(True, '文件压缩成功!')
 
 def getAccess(filename):
     data = {}

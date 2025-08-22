@@ -285,7 +285,7 @@ function openFilename(obj){
     var ext = getSuffixName(path);
 
     // console.log(path,ext);
-    if (inArray(ext,['html','htm','php','txt','md','js','css','scss','json','c','h','pl','py','java','log','conf','sh','json','ini', 'yaml'])){
+    if (inArray(ext,['html','htm','php','txt','md','js','css','scss','json','c','h','pl','py','java','log','conf','sh','json','ini', 'yml','yaml'])){
         onlineEditFile(0, path);
     }
 
@@ -820,9 +820,10 @@ function batch(type,access){
         var names = '';
         for(var i=0;i<len;i++){
             if(el[i].checked == true && el[i].value != 'on'){
-                names += el[i].value + ',';
+                names += path + "/" + el[i].value + ',';
             }
         }
+        // console.log(names);
         zip(names);
         return;
     }
@@ -1300,11 +1301,6 @@ function pasteTo(path,copyName,cutName,fileName){
 
 //压缩目录
 function zip(dirName,submits) {
-    var dirNameArr = dirName.split('/');
-    var fileName = dirNameArr[dirNameArr.length-1];
-    var pathName = dirName.replace('/'+fileName,'');
-    var randStr = getRandomString(6);
-
     if(submits != undefined){
         var sfile = $("#sfile").val();
         var path = $("#path").val();
@@ -1330,7 +1326,22 @@ function zip(dirName,submits) {
         return
     }
 
-    var defaultDfile = pathName+'/'+fileName+'_'+randStr+'.tar.gz';
+    var randStr = getRandomString(6);
+
+    if(dirName.indexOf(',') != -1){
+        dirNameArrs = dirName.split(',');
+        dirNameArr = dirNameArrs[0].split('/');
+        fileName = dirNameArr[dirNameArr.length-1];
+        sfile = dirName;
+        pathName = dirNameArrs[0].replace('/'+fileName,'');
+    } else {
+        dirNameArr = dirName.split('/');
+        fileName = dirNameArr[dirNameArr.length-1];
+        sfile = fileName;
+        pathName = dirName.replace('/'+fileName,'');
+    }
+
+    var defaultDfile = pathName + '/' + fileName+'_'+randStr+'.tar.gz';
 
     layer.open({
         type: 1,
@@ -1353,7 +1364,7 @@ function zip(dirName,submits) {
                     </div>'
                     //
                     + '<div class="line noborder">'
-                    + '<input type="text" id="sfile" value="' + fileName + '" style="display:none" />'
+                    + '<input type="text" id="sfile" value="' + sfile + '" style="display:none" />'
                     + '<input type="text" id="path" value="' + pathName + '" style="display:none" />'
                     + '<span class="tname">压缩路径</span>\
                     <input type="text" class="bt-input-text" id="dfile" value="' + defaultDfile + '" placeholder="压缩到" style="width: 75%; display: inline-block; margin: 0px 10px 0px 0px;" />\

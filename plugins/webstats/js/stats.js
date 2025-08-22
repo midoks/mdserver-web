@@ -2422,9 +2422,11 @@ var html = '<div>\
                         <option value="503">503</option>\
                         <option value="400">400</option>\
                         <option value="404">404</option>\
+                        <option value="405">405</option>\
                         <option value="499">499</option>\
                         <option value="301">301</option>\
                         <option value="302">302</option>\
+                        <option value="206">206</option>\
                         <option value="200">200</option>\
                     </select>\
                     <span style="margin-left:10px;">来源: </span>\
