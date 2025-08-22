@@ -4,6 +4,7 @@ export PATH
 
 # cd /www/server/mdserver-web/plugins/op_waf && bash install.sh install 0.4.1
 # cd /www/server/mdserver-web && python3 plugins/op_waf/index.py start
+# cd /www/server/mdserver-web && python3 plugins/op_waf/index.py stop
 # cd /www/server/mdserver-web && python3 plugins/op_waf/tool_task.py run
 
 curPath=`pwd`
@@ -130,7 +131,6 @@ Install_App(){
 }
 
 Uninstall_App(){
-
 	cd ${rootPath} && python3 ${rootPath}/plugins/op_waf/index.py stop
 	if [ "$?" == "0" ];then
 		rm -rf $serverPath/op_waf
