@@ -41,31 +41,24 @@ def getConfigData():
     conf = getTaskConf()
     if os.path.exists(conf):
         return json.loads(mw.readFile(getTaskConf()))
-    return []
-
-
-def getConfigTpl():
-    tpl = {
-        "name": "",
+    return {
         "task_id": -1,
+        "period": "day-n",
+        "where1": "7",
+        "hour": "0",
+        "minute": "15",
     }
-    return tpl
 
 
 def createBgTask():
     removeBgTask()
-    args = {
-        "period": "minute-n",
-        "minute-n": "1",
-    }
-
-    if mw.isAppleSystem():
-        createBgTaskByName(getPluginName(), args)
+    createBgTaskByName(getPluginName())
 
 
-def createBgTaskByName(name, args):
-    cfg = getConfigTpl()
-    _name = "[勿删]OP防火墙后台任务[" + name + "]"
+def createBgTaskByName(name):
+    cfg = getConfigData()
+
+    _name = "[勿删]OP防火墙后台任务"
     res = mw.M("crontab").field("id, name").where("name=?", (_name,)).find()
     if res:
         return True
@@ -76,22 +69,6 @@ def createBgTaskByName(name, args):
         if res and res["id"] == cfg["task_id"]:
             print("计划任务已经存在!")
             return True
-    import crontab_api
-    cron_api = crontab_api.crontab_api()
-
-    period = args['period']
-    _hour = ''
-    _minute = ''
-    _where1 = ''
-    _type_day = "day"
-    if period == 'day':
-        _type_day = 'day'
-        _hour = args['hour']
-        _minute = args['minute']
-    elif period == 'minute-n':
-        _type_day = 'minute-n'
-        _where1 = args['minute-n']
-        _minute = ''
 
     mw_dir = mw.getPanelDir()
     cmd = '''
@@ -104,23 +81,20 @@ logs_file=$plugin_path/${rname}.log
     cmd += 'echo "★【`date +"%Y-%m-%d %H:%M:%S"`】 STSRT★" >> $logs_file' + "\n"
     cmd += 'echo ">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>" >> $logs_file' + "\n"
 
-    if mw.isAppleSystem():
-        cmd += 'echo "cd $mw_dir && source bin/activate && python3 $script_path/tool_task.py run >> $logs_file 2>&1"' + "\n"
-        cmd += 'cd $mw_dir && source bin/activate && python3 $script_path/tool_task.py run >> $logs_file 2>&1' + "\n"
-    else:
-        cmd += 'echo "cd $mw_dir && source bin/activate && bash $script_path/shell/cpu_usage_file.sh >> $logs_file 2>&1"' + "\n"
-        cmd += 'cd $mw_dir && source bin/activate && bash $script_path/shell/cpu_usage.sh >> $logs_file 2>&1' + "\n"
+    cmd += 'echo "cd $mw_dir && source bin/activate && python3 $script_path/tool_task.py run >> $logs_file 2>&1"' + "\n"
+    cmd += 'cd $mw_dir && source bin/activate && python3 $script_path/tool_task.py run >> $logs_file 2>&1' + "\n"
+
 
     cmd += 'echo "【`date +"%Y-%m-%d %H:%M:%S"`】 END★" >> $logs_file' + "\n"
     cmd += 'echo "<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<" >> $logs_file' + "\n"
 
     params = {
         'name': _name,
-        'type': _type_day,
+        'type': cfg['period'],
         'week': "",
-        'where1': _where1,
-        'hour': _hour,
-        'minute': _minute,
+        'where1': cfg['where1'],
+        'hour': cfg['hour'],
+        'minute': cfg['minute'],
         'save': "",
         'backup_to': "",
         'stype': "toShell",
@@ -131,30 +105,21 @@ logs_file=$plugin_path/${rname}.log
 
     task_id = MwCrontab.instance().add(params)
     if task_id > 0:
-        cfg["task_id"] = task_id
-        cfg["name"] = name
-
-        _dd = getConfigData()
-        _dd.append(cfg)
-        mw.writeFile(getTaskConf(), json.dumps(_dd))
+        cfg["task_id"] = task_id        
+        mw.writeFile(getTaskConf(), json.dumps(cfg))
 
 
 def removeBgTask():
-    if not mw.isAppleSystem():
-        return False
-
-    cfg_list = getConfigData()
-    for x in range(len(cfg_list)):
-        cfg = cfg_list[x]
+    cfg = getConfigData()
+    for x in range(len(cfg)):
         if "task_id" in cfg.keys() and cfg["task_id"] > 0:
             res = mw.M("crontab").field("id, name").where(
                 "id=?", (cfg["task_id"],)).find()
             if res and res["id"] == cfg["task_id"]:
                 data = MwCrontab.instance().delete(cfg["task_id"])
-                if data[0]:
+                if data['status']:
                     cfg["task_id"] = -1
-                    cfg_list[x] = cfg
-                    mw.writeFile(getTaskConf(), '[]')
+                    mw.writeFile(getTaskConf(), json.dumps(cfg))
                     return True
     return False
 
@@ -171,8 +136,25 @@ def getCpuUsed():
         mw.writeFile(path, str(int(data[0].strip())))
 
 
+def pSqliteDb(dbname='logs'):
+    db_dir = getServerDir() + '/logs/'
+    conn = mw.M(dbname).dbPos(db_dir, "waf")
+
+    conn.execute("PRAGMA synchronous = 0")
+    conn.execute("PRAGMA cache_size = 8000")
+    conn.execute("PRAGMA page_size = 32768")
+    conn.execute("PRAGMA journal_mode = wal")
+    conn.execute("PRAGMA journal_size_limit = 1073741824")
+    return conn
+
 def run():
-    getCpuUsed()
+    now_t = int(time.time())
+    logs_conn = pSqliteDb('logs')
+    del_hot_log = "delete from logs where time<{}".format(now_t)
+    print(del_hot_log)
+    r = logs_conn.execute(del_hot_log)
+    return 'ok'
+
 
 if __name__ == "__main__":
     if len(sys.argv) > 1:

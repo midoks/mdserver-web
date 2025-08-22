@@ -3,6 +3,9 @@ PATH=/bin:/sbin:/usr/bin:/usr/sbin:/usr/local/bin:/usr/local/sbin:~/bin:/opt/hom
 export PATH
 
 # cd /www/server/mdserver-web/plugins/op_waf && bash install.sh install 0.4.1
+# cd /www/server/mdserver-web && python3 plugins/op_waf/index.py start
+# cd /www/server/mdserver-web && python3 plugins/op_waf/index.py stop
+# cd /www/server/mdserver-web && python3 plugins/op_waf/tool_task.py run
 
 curPath=`pwd`
 rootPath=$(dirname "$curPath")
@@ -52,8 +55,12 @@ Install_App(){
 	fi
 
 
+	# if [ ! -f $serverPath/source/op_waf/lsqlite3_v096.zip ];then
+	# 	wget --no-check-certificate -O $serverPath/source/op_waf/lsqlite3_v096.zip http://lua.sqlite.org/home/zip/lsqlite3_v096.zip?uuid=v0.9.6
+	# fi
+
 	if [ ! -f $serverPath/source/op_waf/lsqlite3_v096.zip ];then
-		wget --no-check-certificate -O $serverPath/source/op_waf/lsqlite3_v096.zip http://lua.sqlite.org/home/zip/lsqlite3_v096.zip?uuid=v0.9.6
+		wget --no-check-certificate -O $serverPath/source/op_waf/lsqlite3_v096.zip https://github.com/midoks/mdserver-web/releases/download/0.18.4/lsqlite3_v096.zip
 	fi
 
 	if [ ! -d $serverPath/source/op_waf/lsqlite3_v096 ];then
@@ -68,7 +75,7 @@ Install_App(){
 			cd $serverPath/source/op_waf/lsqlite3_v096
 			find_cfg=`cat Makefile | grep 'SQLITE_DIR'`
 			if [ "$find_cfg" == "" ];then
-				LIB_SQLITE_DIR=`brew info sqlite | grep /usr/local/Cellar/sqlite | cut -d \  -f 1 | awk 'END {print}'`
+				LIB_SQLITE_DIR=`brew info sqlite | grep /opt/homebrew/Cellar/sqlite | cut -d \  -f 1 | awk 'END {print}'`
 				echo $LIB_SQLITE_DIR
 				sed -i $BAK "s#\$(ROCKSPEC)#\$(ROCKSPEC) SQLITE_DIR=${LIB_SQLITE_DIR}#g"  Makefile
 			fi
@@ -88,20 +95,29 @@ Install_App(){
 	cn=$(curl -fsSL -m 10 http://ipinfo.io/json | grep "\"country\": \"CN\"")
 	HTTP_PREFIX="https://"
 	if [ ! -z "$cn" ];then
-	    HTTP_PREFIX="https://mirror.ghproxy.com/"
+	    HTTP_PREFIX="https://gh-proxy.com/"
 	fi
 
 	# download GeoLite Data
 	GeoLite2_TAG=`curl -sL "https://api.github.com/repos/P3TERX/GeoLite.mmdb/releases/latest" | grep '"tag_name":' | cut -d'"' -f4`
-	#if [ ! -f $serverPath/op_waf/GeoLite2-City.mmdb ];then
-	wget --no-check-certificate -O $serverPath/op_waf/GeoLite2-City.mmdb ${HTTP_PREFIX}github.com/P3TERX/GeoLite.mmdb/releases/download/${GeoLite2_TAG}/GeoLite2-City.mmdb
-	#fi
+	if [ ! -f $serverPath/source/op_waf/GeoLite2-City.mmdb ];then
+		wget --no-check-certificate -O $serverPath/source/op_waf/GeoLite2-City.mmdb ${HTTP_PREFIX}github.com/P3TERX/GeoLite.mmdb/releases/download/${GeoLite2_TAG}/GeoLite2-City.mmdb
+	fi
 
-	#if [ ! -f $serverPath/op_waf/GeoLite2-Country.mmdb ];then
-	wget --no-check-certificate -O $serverPath/op_waf/GeoLite2-Country.mmdb ${HTTP_PREFIX}github.com/P3TERX/GeoLite.mmdb/releases/download/${GeoLite2_TAG}/GeoLite2-Country.mmdb
-	#fi
+	if [ ! -f $serverPath/op_waf/GeoLite2-City.mmdb ];then
+		cp -rf $serverPath/source/op_waf/GeoLite2-City.mmdb $serverPath/op_waf/GeoLite2-City.mmdb
+	fi
 
-	libmaxminddb_ver='1.7.1'
+	if [ ! -f $serverPath/source/op_waf/GeoLite2-Country.mmdb ];then
+		wget --no-check-certificate -O $serverPath/source/op_waf/GeoLite2-Country.mmdb ${HTTP_PREFIX}github.com/P3TERX/GeoLite.mmdb/releases/download/${GeoLite2_TAG}/GeoLite2-Country.mmdb
+	fi
+
+	if [ ! -f $serverPath/op_waf/GeoLite2-Country.mmdb ];then
+		cp -rf $serverPath/source/op_waf/GeoLite2-Country.mmdb $serverPath/op_waf/GeoLite2-Country.mmdb
+	fi
+
+
+	libmaxminddb_ver='1.12.2'
 	if [ ! -f $serverPath/op_waf/waf/mmdb/lib/libmaxminddb.a ] && [ ! -f $serverPath/op_waf/waf/mmdb/lib/libmaxminddb.so ];then
 		libmaxminddb_local_path=$serverPath/source/op_waf/libmaxminddb-${libmaxminddb_ver}.tar.gz
 		libmaxminddb_url_path=${HTTP_PREFIX}github.com/maxmind/libmaxminddb/releases/download/${libmaxminddb_ver}/libmaxminddb-${libmaxminddb_ver}.tar.gz
@@ -124,7 +140,6 @@ Install_App(){
 }
 
 Uninstall_App(){
-
 	cd ${rootPath} && python3 ${rootPath}/plugins/op_waf/index.py stop
 	if [ "$?" == "0" ];then
 		rm -rf $serverPath/op_waf
