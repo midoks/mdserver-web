@@ -3,6 +3,7 @@ PATH=/bin:/sbin:/usr/bin:/usr/sbin:/usr/local/bin:/usr/local/sbin:~/bin:/opt/hom
 export PATH
 
 # cd /www/server/mdserver-web/plugins/op_waf && bash install.sh install 0.4.1
+# cd /www/server/mdserver-web && python3 plugins/op_waf/index.py start
 
 curPath=`pwd`
 rootPath=$(dirname "$curPath")
@@ -55,7 +56,7 @@ Install_App(){
 	# if [ ! -f $serverPath/source/op_waf/lsqlite3_v096.zip ];then
 	# 	wget --no-check-certificate -O $serverPath/source/op_waf/lsqlite3_v096.zip http://lua.sqlite.org/home/zip/lsqlite3_v096.zip?uuid=v0.9.6
 	# fi
-	
+
 	if [ ! -f $serverPath/source/webstats/lsqlite3_v096.zip ];then
 		wget --no-check-certificate -O $serverPath/source/webstats/lsqlite3_v096.zip https://github.com/midoks/mdserver-web/releases/download/0.18.4/lsqlite3_v096.zip
 	fi
