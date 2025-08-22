@@ -1128,10 +1128,11 @@ function _M.match_client_arr(self, ua)
         local pc_res = ngx.re.match(ua, pc_regx1, "ijo")
         local cls_pc = nil
 
+        -- self:D("UA-JSON:"..self:to_json(ua))
         if "table" == type(ua) then
             ua = tostring(ua[1])
         end
-        -- self:D("UA-JSON:"..self:to_json(ua))
+        
         if not pc_res then
             if ngx.re.find(ua, "[Ff]irefox") then
                 cls_pc = "firefox"
