@@ -105,7 +105,6 @@ logs_file=$plugin_path/${rname}.log
 
     task_id = MwCrontab.instance().add(params)
     if task_id > 0:
-        cfg = getConfigData()
         cfg["task_id"] = task_id        
         mw.writeFile(getTaskConf(), json.dumps(cfg))
 
@@ -120,7 +119,7 @@ def removeBgTask():
                 data = MwCrontab.instance().delete(cfg["task_id"])
                 if data['status']:
                     cfg["task_id"] = -1
-                    mw.writeFile(getTaskConf(), '[]')
+                    mw.writeFile(getTaskConf(), json.dumps(cfg))
                     return True
     return False
 
