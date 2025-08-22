@@ -150,7 +150,13 @@ def pSqliteDb(dbname='logs'):
     return conn
 
 def run():
-    getCpuUsed()
+    now_t = int(time.time())
+    logs_conn = pSqliteDb('logs')
+    del_hot_log = "delete from logs where time<{}".format(now_t)
+    print(del_hot_log)
+    r = logs_conn.execute(del_hot_log)
+    return 'ok'
+
 
 if __name__ == "__main__":
     if len(sys.argv) > 1:
