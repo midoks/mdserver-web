@@ -304,7 +304,7 @@ def stop():
 
 def restart():
     initDreplace()
-
+    loadDebugLogFile()
     luaRestart()
     return 'ok'
 
