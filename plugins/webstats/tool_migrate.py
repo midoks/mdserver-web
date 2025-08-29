@@ -193,8 +193,8 @@ def migrateSiteHotLogs(site_name, query_date):
 
 def migrateHotLogs(query_date="today"):
     print("begin migrate hot logs")
-    sites = mw.M('sites').field('name').order("addtime").select()
-
+    sites = mw.M('sites').field('name').order("add_time").select()
+    
     unset_site = {"name": "unset"}
     sites.append(unset_site)
 
