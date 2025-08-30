@@ -41,8 +41,8 @@
             "192.168.1.1"  
         ],
         "exclude_url":[],
-        "ip_top_num": 50,
-        "uri_top_num": 50,
+        "ip_top_num": 10,
+        "uri_top_num": 10,
         "statistics_machine_access": true,
         "statistics_ip": true,
         "statistics_uri": true,
