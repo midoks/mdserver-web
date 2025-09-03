@@ -116,13 +116,12 @@ class crontab(object):
         if data['status'] == status:
             status = 0
             status_msg = '关闭'
+            thisdb.setCrontabStatus(cron_id, status)
             self.removeForCrond(data['echo'])
         else:
             data['status'] = 1
             thisdb.setCrontabData(cron_id, data)
             self.syncToCrond(cron_id)
-
-        thisdb.setCrontabStatus(cron_id, status)
 
         msg = '修改计划任务[' + data['name'] + ']状态为[' + str(status_msg) + ']'
         mw.writeLog('计划任务', msg)
