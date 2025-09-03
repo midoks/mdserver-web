@@ -119,6 +119,7 @@ class crontab(object):
             self.removeForCrond(data['echo'])
         else:
             data['status'] = 1
+            thisdb.setCrontabData(cron_id, data)
             self.syncToCrond(cron_id)
 
         thisdb.setCrontabStatus(cron_id, status)
