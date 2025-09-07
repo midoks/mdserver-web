@@ -838,6 +838,20 @@ def getRecycleBin():
 
     return mw.returnJson(True, 'OK', data)
 
+def delRecycleBin(path):
+    rb_dir = mw.getRecycleBinDir()
+    rb_file = rb_dir + '/' + path
+    if os.path.isdir(rb_file):
+        import shutil
+        shutil.rmtree(rb_file)
+    else:
+        os.remove(rb_file)
+
+    tfile = path.replace('_mw_', '/').split('_t_')[0]
+    msg = mw.getInfo('已彻底从回收站删除{1}!', (tfile,))
+    mw.writeLog('文件管理', msg)
+    return mw.returnJson(True, msg)
+
 # 移动到回收站
 def mvRecycleBin(path):
     rb_dir = mw.getRecycleBinDir()

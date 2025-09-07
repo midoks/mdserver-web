@@ -21,7 +21,7 @@ import core.mw as mw
 import utils.file as file
 
 from .files import blueprint
-# 回收站文件
+# 回收站文件列表
 @blueprint.route('/get_recycle_bin', endpoint='get_recycle_bin', methods=['POST'])
 @panel_login_required
 def get_recycle_bin():
@@ -33,6 +33,12 @@ def get_recycle_bin():
 def re_recycle_bin():
     path = request.form.get('path', '')
     return file.reRecycleBin(path)
+
+@blueprint.route('/del_recycle_bin', endpoint='del_recycle_bin', methods=['POST'])
+@panel_login_required
+def del_recycle_bin():
+    path = request.form.get('path', '')
+    return file.delRecycleBin(path)
 
 # 回收站文件
 @blueprint.route('/recycle_bin', endpoint='recycle_bin', methods=['POST'])
