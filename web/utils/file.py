@@ -848,7 +848,7 @@ def delRecycleBin(path):
         os.remove(rb_file)
 
     tfile = path.replace('_mw_', '/').split('_t_')[0]
-    msg = mw.getInfo('已彻底从回收站删除{1}!', (tfile,))
+    msg = mw.getInfo('已彻底从回收站删除[{1}]!', (tfile,))
     mw.writeLog('文件管理', msg)
     return mw.returnJson(True, msg)
 
