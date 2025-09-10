@@ -79,6 +79,29 @@ Install_dep(){
 	WHERE_DIR_GPP=/usr/bin/g++-11
 }
 
+Install_dep_debain13(){
+	apt install -y libudev-dev
+	apt install -y libtirpc-dev
+	apt install -y libssl-dev
+	apt install -y libgssglue-dev
+	apt install -y software-properties-common
+
+	apt install -y build-essential
+	apt install -y cmake 
+	apt install -y pkg-config 
+	apt install -y libncurses5-dev
+	apt install -y libsystemd-dev 
+	apt install -y libsasl2-dev 
+	apt install -y libldap2-dev 
+
+	add-apt-repository -y ppa:ubuntu-toolchain-r/test
+
+	export PKG_CONFIG_PATH=/usr/lib/pkgconfig
+	apt install -y gcc-12 g++-12
+	WHERE_DIR_GCC=/usr/bin/gcc-12
+	WHERE_DIR_GPP=/usr/bin/g++-12
+}
+
 Install_mysql()
 {
 	mkdir -p ${mysqlDir}
@@ -152,7 +175,7 @@ Install_mysql()
 	fi
 
 	if [ "$OSNAME" == "debian" ] && [ "$VERSION_ID" == "13" ];then
-		Install_dep
+		Install_dep_debain13
 	fi
 
 	OPTIONS=''
