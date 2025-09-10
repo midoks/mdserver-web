@@ -196,7 +196,7 @@ class Firewall(object):
         if ssh_status[0] != '':
             status = False
 
-        cmd = "systemctl status sshd.service | grep 'dead'|grep -v grep"
+        cmd = "systemctl status sshd | grep 'dead'|grep -v grep"
         ssh_status = mw.execShell(cmd)
         if ssh_status[0] != '':
             status = False
@@ -467,7 +467,7 @@ class Firewall(object):
             rep = r"(#)?PermitRootLogin\s+(\w*)\s*\n"
             conf = re.sub(rep, "PermitRootLogin yes\n", conf)
 
-        if status == '0':
+        if status == '1':
             rep = r"PermitRootLogin\s+(\w*)\s*\n"
             conf = re.sub(rep, "PermitRootLogin yes\n", conf)
         else:
