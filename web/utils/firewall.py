@@ -474,7 +474,7 @@ class Firewall(object):
             rep = r"PermitRootLogin\s+(\w*)\s*\n"
             conf = re.sub(rep, "PermitRootLogin no\n", conf)
         mw.writeFile(file, conf)
-        mw.execShell("systemctl restart sshd.service")
+        mw.execShell("systemctl restart sshd")
         mw.writeLog("SSH管理", msg)
         return mw.returnData(True, msg)
 
@@ -502,7 +502,7 @@ class Firewall(object):
             rep = r"PasswordAuthentication\s+(\w*)\s*\n"
             conf = re.sub(rep, "PasswordAuthentication no\n", conf)
         mw.writeFile(file, conf)
-        mw.execShell("systemctl restart sshd.service")
+        mw.execShell("systemctl restart sshd")
         mw.writeLog("SSH管理", msg)
         return mw.returnData(True, msg)
 
@@ -530,7 +530,7 @@ class Firewall(object):
             rep = r"PubkeyAuthentication\s+(\w*)\s*\n"
             content = re.sub(rep, "PubkeyAuthentication no\n", content)
         mw.writeFile(file, content)
-        mw.execShell("systemctl restart sshd.service")
+        mw.execShell("systemctl restart sshd")
         mw.writeLog("SSH管理", msg)
         return mw.returnData(True, msg)
 
