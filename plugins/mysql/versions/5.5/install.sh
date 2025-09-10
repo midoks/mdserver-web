@@ -165,8 +165,8 @@ Install_mysql()
 		export CFLAGS="-D__s64=long long -D__u64='unsigned long long' -D__s32=int -D__u32='unsigned int' -D__u16='unsigned short'"
 		export CXXFLAGS="$CFLAGS"
 
-		OPTIONS="-DCMAKE_C_FLAGS="$CFLAGS""
-		OPTIONS="-DCMAKE_CXX_FLAGS="$CXXFLAGS""
+		OPTIONS="-DCMAKE_C_FLAGS=$CFLAGS"
+		OPTIONS="-DCMAKE_CXX_FLAGS=$CXXFLAGS"
 	fi
 
 	if [ ! -d $serverPath/mysql ];then
