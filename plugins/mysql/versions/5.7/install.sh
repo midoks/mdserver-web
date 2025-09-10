@@ -55,8 +55,8 @@ fi
 
 VERSION_ID=`cat /etc/*-release | grep VERSION_ID | awk -F = '{print $2}' | awk -F "\"" '{print $2}'`
 
-# 安装依赖
-Install_dep(){
+
+Install_common(){
 	apt install -y libudev-dev
 	apt install -y libtirpc-dev
 	apt install -y libssl-dev
@@ -70,6 +70,11 @@ Install_dep(){
 	apt install -y libsystemd-dev 
 	apt install -y libsasl2-dev 
 	apt install -y libldap2-dev 
+}
+
+# 安装依赖
+Install_dep(){
+	Install_common
 
 	add-apt-repository -y ppa:ubuntu-toolchain-r/test
 
@@ -80,19 +85,7 @@ Install_dep(){
 }
 
 Install_dep_debain13(){
-	apt install -y libudev-dev
-	apt install -y libtirpc-dev
-	apt install -y libssl-dev
-	apt install -y libgssglue-dev
-	apt install -y software-properties-common
-
-	apt install -y build-essential
-	apt install -y cmake 
-	apt install -y pkg-config 
-	apt install -y libncurses5-dev
-	apt install -y libsystemd-dev 
-	apt install -y libsasl2-dev 
-	apt install -y libldap2-dev 
+	Install_common
 
 	add-apt-repository -y ppa:ubuntu-toolchain-r/test
 
