@@ -465,14 +465,14 @@ class Firewall(object):
         root_status = re.search(root_rep, conf)
         if not root_status:
             rep = r"(#)?PermitRootLogin\s+(\w*)\s*\n"
-            conf = re.sub(rep, "PermitRootLogin no\n", conf)
+            conf = re.sub(rep, "PermitRootLogin yes\n", conf)
 
         if status == '1':
             rep = r"PermitRootLogin\s+(\w*)\s*\n"
-            conf = re.sub(rep, "PermitRootLogin no\n", conf)
+            conf = re.sub(rep, "PermitRootLogin yes\n", conf)
         else:
             rep = r"PermitRootLogin\s+(\w*)\s*\n"
-            conf = re.sub(rep, "PermitRootLogin yes\n", conf)
+            conf = re.sub(rep, "PermitRootLogin no\n", conf)
         mw.writeFile(file, conf)
         mw.execShell("systemctl restart sshd")
         mw.writeLog("SSH管理", msg)
