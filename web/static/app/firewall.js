@@ -69,7 +69,7 @@ function sshMgr(){
                             </td>\
                         </tr>\
                         <tr>\
-                            <td>禁止Root登陆</td>\
+                            <td>禁止root登陆</td>\
                             <td>\
                                 <div class="ssh-item" style="margin-left:0">\
                                     <input class="btswitch btswitch-ios" id="pass_status" type="checkbox" '+root_prohibit_status+'>\
