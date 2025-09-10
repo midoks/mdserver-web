@@ -159,10 +159,14 @@ Install_mysql()
 		Install_dep
 	fi
 
+	OPTIONS=''
 	if [ "$OSNAME" == "debian" ] && [ "$VERSION_ID" == "13" ];then
 		Install_dep_debain13
 		export CFLAGS="-D__s64=long long -D__u64='unsigned long long' -D__s32=int -D__u32='unsigned int' -D__u16='unsigned short'"
 		export CXXFLAGS="$CFLAGS"
+
+		OPTIONS="-DCMAKE_C_FLAGS="$CFLAGS""
+		OPTIONS="-DCMAKE_CXX_FLAGS="$CXXFLAGS""
 	fi
 
 	if [ ! -d $serverPath/mysql ];then
@@ -176,6 +180,7 @@ Install_mysql()
 		-DWITH_MEMORY_STORAGE_ENGINE=1 \
 		-DENABLED_LOCAL_INFILE=1 \
 		-DWITH_PARTITION_STORAGE_ENGINE=1 \
+		$OPTIONS \
 		-DEXTRA_CHARSETS=all \
 		-DDEFAULT_CHARSET=utf8mb4 \
 		-DDEFAULT_COLLATION=utf8mb4_general_ci \
