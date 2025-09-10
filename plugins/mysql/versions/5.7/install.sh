@@ -138,6 +138,20 @@ Install_mysql()
 		WHERE_DIR_GPP=/usr/bin/g++-11
 	fi
 
+	if [ "$OSNAME" == "debian" ] && [ "$VERSION_ID" == "13" ];then
+		apt install -y libudev-dev
+		apt install -y libtirpc-dev
+		apt install -y libssl-dev
+		apt install -y libgssglue-dev
+		apt install -y software-properties-common
+		add-apt-repository -y ppa:ubuntu-toolchain-r/test
+
+		export PKG_CONFIG_PATH=/usr/lib/pkgconfig
+		apt install -y gcc-11 g++-11
+		WHERE_DIR_GCC=/usr/bin/gcc-11
+		WHERE_DIR_GPP=/usr/bin/g++-11
+	fi
+
 	OPTIONS=''
 	##check openssl version
 	OPENSSL_VERSION=`openssl version|awk '{print $2}'|awk -F '.' '{print $1}'`
