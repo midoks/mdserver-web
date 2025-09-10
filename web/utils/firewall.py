@@ -230,7 +230,7 @@ class Firewall(object):
                 data['pubkey_prohibit_status'] = True
 
             # root登陆配置检查
-            root_rep = r"PermitRootLogin\s+(\w*)\s*\n"
+            root_rep = r"^PermitRootLogin\s+(\w*)\s*\n"
             root_status = re.search(pass_rep, conf)
             if root_status:
                 if root_status and root_status.groups(0)[0].strip() == 'no':
