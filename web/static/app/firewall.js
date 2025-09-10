@@ -53,6 +53,7 @@ function sshMgr(){
 		var ssh_status = rdata.status ? 'checked':'';
 		var pass_prohibit_status = rdata.pass_prohibit_status ? 'checked':'';
 		var pubkey_prohibit_status = rdata.pubkey_prohibit_status ? 'checked':'';
+		var root_prohibit_status = rdata.root_prohibit_status ? 'checked':'';
 		var con = '<div class="pd15">\
             <div class="divtable">\
                 <table class="table table-hover waftable">\
@@ -64,6 +65,15 @@ function sshMgr(){
                                 <div class="ssh-item" style="margin-left:0">\
                                     <input class="btswitch btswitch-ios" id="sshswitch" type="checkbox" '+ssh_status+'>\
                                     <label class="btswitch-btn" for="sshswitch" onclick=\'setMstscStatus()\'></label>\
+                                </div>\
+                            </td>\
+                        </tr>\
+                        <tr>\
+                            <td>禁止Root登陆</td>\
+                            <td>\
+                                <div class="ssh-item" style="margin-left:0">\
+                                    <input class="btswitch btswitch-ios" id="pass_status" type="checkbox" '+root_prohibit_status+'>\
+                                    <label class="btswitch-btn" for="pass_status" onclick=\'setSshRootStatus()\'></label>\
                                 </div>\
                             </td>\
                         </tr>\
@@ -256,6 +266,35 @@ function setMstscStatus(){
  * 设置远程服务状态
  * @param {Int} state 0.启用 1.关闭
  */
+function setSshRootStatus(){
+	status = $("#root_status").prop("checked")==true?1:0;
+	var msg = status==1?'开启密码登陆,继续吗？':'确定禁止密码登陆吗？';
+	layer.confirm(msg,{title:'警告',closeBtn:2,cancel:function(){
+		if(status == 0){
+			$("#root_status").prop("checked",false);
+		} else {
+			$("#root_status").prop("checked",true);
+		}
+	}},function(index){
+		if(index > 0){
+			layer.msg('正在处理,请稍候...',{icon:16,time:20000});
+			$.post('/firewall/set_ssh_root_status','status='+status,function(rdata){
+				layer.msg(rdata.msg,{icon:rdata.status?1:2});
+			},'json');
+		}
+	},function(){
+		if(status == 0){
+			$("#root_status").prop("checked",false);
+		} else {
+			$("#root_status").prop("checked",true);
+		}
+	});
+}
+
+/**
+ * 设置远程服务状态
+ * @param {Int} state 0.启用 1.关闭
+ */
 function setSshPassStatus(){
 	status = $("#pass_status").prop("checked")==true?1:0;
 	var msg = status==1?'开启密码登陆,继续吗？':'确定禁止密码登陆吗？';
@@ -280,6 +319,8 @@ function setSshPassStatus(){
 		}
 	});
 }
+
+
 
 /**
  * 设置远程服务状态
