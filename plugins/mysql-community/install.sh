@@ -22,7 +22,7 @@ fi
 # /www/server/mysql-community/bin/mysqld --basedir=/www/server/mysql-community --datadir=/www/server/mysql-community/data --initialize-insecure --explicit_defaults_for_timestamp
 
 # source bin/activate
-# cd /www/server/mdserver-web/plugins/mysql-community && bash install.sh install 9.0
+# cd /www/server/mdserver-web/plugins/mysql-community && bash install.sh install 5.7
 # cd /www/server/mdserver-web/plugins/mysql-community && bash install.sh uninstall 9.0
 # cd /www/server/mdserver-web && python3 plugins/mysql-community/index.py start 8.0
 # cd /www/server/mdserver-web && python3 plugins/mysql-community/index.py fix_db_access
@@ -78,6 +78,15 @@ if [[ "$OSNAME" == "ubuntu" ]] && [[ "$VERSION_ID" =~ "24" ]]; then
 
 	if [ ! -f libncurses.so.6 ];then
 		ln -s libncursesw.so.6.4 libncurses.so.6
+	fi
+	cd $cur_dir
+fi
+
+if [[ "$OSNAME" == "debian" ]] && [[ "$VERSION_ID" =~ "13" ]]; then
+	cur_dir=`pwd`
+	cd /usr/lib/x86_64-linux-gnu
+	if [ ! -f libaio.so.1 ];then
+		ln -s libaio.so.1t64.0.2 libaio.so.1
 	fi
 	cd $cur_dir
 fi
