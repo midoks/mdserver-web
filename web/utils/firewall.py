@@ -467,7 +467,7 @@ class Firewall(object):
             rep = r"(#)?PermitRootLogin\s+(\w*)\s*\n"
             conf = re.sub(rep, "PermitRootLogin yes\n", conf)
 
-        if status == '1':
+        if status == '0':
             rep = r"PermitRootLogin\s+(\w*)\s*\n"
             conf = re.sub(rep, "PermitRootLogin yes\n", conf)
         else:
