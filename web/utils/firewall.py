@@ -196,13 +196,14 @@ class Firewall(object):
         if ssh_status[0] != '':
             status = False
 
-        cmd = "systemctl status sshd.service | grep 'dead'|grep -v grep"
+        cmd = "systemctl status sshd | grep 'dead'|grep -v grep"
         ssh_status = mw.execShell(cmd)
         if ssh_status[0] != '':
             status = False
 
         data['pubkey_prohibit_status'] = False
         data['pass_prohibit_status'] = False
+        data['root_prohibit_status'] = False
         port = '22'
         sshd_file = '/etc/ssh/sshd_config'
         if  os.path.exists(sshd_file):
@@ -227,6 +228,15 @@ class Firewall(object):
                     data['pubkey_prohibit_status'] = True
             else:
                 data['pubkey_prohibit_status'] = True
+
+            # root登陆配置检查
+            root_rep = r"PermitRootLogin\s+(\w*)\s*\n"
+            root_status = re.search(root_rep, conf)
+            if root_status:
+                if root_status and root_status.groups(0)[0].strip() == 'no':
+                    data['root_prohibit_status'] = True
+            else:
+                data['root_prohibit_status'] = True
 
         data['port'] = port
         data['status'] = status
@@ -440,6 +450,34 @@ class Firewall(object):
         self.reload()
         return True
 
+    def setSshRootStatus(self, status):
+        msg = '禁止root登陆成功'
+        if status == "1":
+            msg = '开启root登陆成功'
+
+        file = '/etc/ssh/sshd_config'
+        if not os.path.exists(file):
+            return mw.returnJson(False, '无法设置!')
+
+        conf = mw.readFile(file)
+
+        root_rep = r"PermitRootLogin\s+(\w*)\s*\n"
+        root_status = re.search(root_rep, conf)
+        if not root_status:
+            rep = r"(#)?PermitRootLogin\s+(\w*)\s*\n"
+            conf = re.sub(rep, "PermitRootLogin yes\n", conf)
+
+        if status == '1':
+            rep = r"PermitRootLogin\s+(\w*)\s*\n"
+            conf = re.sub(rep, "PermitRootLogin yes\n", conf)
+        else:
+            rep = r"PermitRootLogin\s+(\w*)\s*\n"
+            conf = re.sub(rep, "PermitRootLogin no\n", conf)
+        mw.writeFile(file, conf)
+        mw.execShell("systemctl restart sshd")
+        mw.writeLog("SSH管理", msg)
+        return mw.returnData(True, msg)
+
     def setSshPassStatus(self, status):
         msg = '禁止密码登陆成功'
         if status == "1":
@@ -464,7 +502,7 @@ class Firewall(object):
             rep = r"PasswordAuthentication\s+(\w*)\s*\n"
             conf = re.sub(rep, "PasswordAuthentication no\n", conf)
         mw.writeFile(file, conf)
-        mw.execShell("systemctl restart sshd.service")
+        mw.execShell("systemctl restart sshd")
         mw.writeLog("SSH管理", msg)
         return mw.returnData(True, msg)
 
@@ -492,7 +530,7 @@ class Firewall(object):
             rep = r"PubkeyAuthentication\s+(\w*)\s*\n"
             content = re.sub(rep, "PubkeyAuthentication no\n", content)
         mw.writeFile(file, content)
-        mw.execShell("systemctl restart sshd.service")
+        mw.execShell("systemctl restart sshd")
         mw.writeLog("SSH管理", msg)
         return mw.returnData(True, msg)
 
