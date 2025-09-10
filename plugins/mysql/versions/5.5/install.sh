@@ -56,6 +56,45 @@ fi
 VERSION_ID=`cat /etc/*-release | grep VERSION_ID | awk -F = '{print $2}' | awk -F "\"" '{print $2}'`
 
 
+Install_common(){
+	apt install -y libudev-dev
+	apt install -y libtirpc-dev
+	apt install -y libssl-dev
+	apt install -y libgssglue-dev
+	apt install -y software-properties-common
+
+	apt install -y build-essential
+	apt install -y cmake 
+	apt install -y pkg-config 
+	apt install -y libncurses5-dev
+	apt install -y libsystemd-dev 
+	apt install -y libsasl2-dev 
+	apt install -y libldap2-dev 
+}
+
+# 安装依赖
+Install_dep(){
+	Install_common
+
+	add-apt-repository -y ppa:ubuntu-toolchain-r/test
+
+	export PKG_CONFIG_PATH=/usr/lib/pkgconfig
+	apt install -y gcc-10 g++-10
+	WHERE_DIR_GCC=/usr/bin/gcc-10
+	WHERE_DIR_GPP=/usr/bin/g++-10
+}
+
+Install_dep_debain13(){
+	Install_common
+
+	add-apt-repository -y ppa:ubuntu-toolchain-r/test
+
+	export PKG_CONFIG_PATH=/usr/lib/pkgconfig
+	apt install -y gcc-10 g++-10
+	WHERE_DIR_GCC=/usr/bin/gcc-10
+	WHERE_DIR_GPP=/usr/bin/g++-10
+}
+
 Install_mysql()
 {
 	mkdir -p ${mysqlDir}
@@ -117,17 +156,11 @@ Install_mysql()
 	fi
 
 	if [ "$OSNAME" == "ubuntu" ];then
-		apt install -y libudev-dev
-		apt install -y libtirpc-dev
-		apt install -y libssl-dev
-		apt install -y libgssglue-dev
-		apt install -y software-properties-common
-		add-apt-repository -y ppa:ubuntu-toolchain-r/test
+		Install_dep
+	fi
 
-		export PKG_CONFIG_PATH=/usr/lib/pkgconfig
-		apt install -y gcc-10 g++-10
-		WHERE_DIR_GCC=/usr/bin/gcc-10
-		WHERE_DIR_GPP=/usr/bin/g++-10
+	if [ "$OSNAME" == "debian" ] && [ "$VERSION_ID" == "13" ];then
+		Install_dep_debain13
 	fi
 
 	if [ ! -d $serverPath/mysql ];then
