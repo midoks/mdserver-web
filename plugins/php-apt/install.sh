@@ -7,6 +7,7 @@ rootPath=$(dirname "$curPath")
 rootPath=$(dirname "$rootPath")
 serverPath=$(dirname "$rootPath")
 
+# cd /www/server/mdserver-web/plugins/php-apt && bash install.sh install 56
 
 if id www &> /dev/null ;then 
     echo "www uid is `id -u www`"
