@@ -62,6 +62,15 @@ Install_dep(){
 	apt install -y libssl-dev
 	apt install -y libgssglue-dev
 	apt install -y software-properties-common
+
+	apt install -y build-essential
+	apt install -y cmake 
+	apt install -y pkg-config 
+	apt install -y libncurses5-dev
+	apt install -y libsystemd-dev 
+	apt install -y libsasl2-dev 
+	apt install -y libldap2-dev 
+
 	add-apt-repository -y ppa:ubuntu-toolchain-r/test
 
 	export PKG_CONFIG_PATH=/usr/lib/pkgconfig
