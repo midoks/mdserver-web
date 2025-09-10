@@ -161,6 +161,8 @@ Install_mysql()
 
 	if [ "$OSNAME" == "debian" ] && [ "$VERSION_ID" == "13" ];then
 		Install_dep_debain13
+		export CFLAGS="-D__s64=long long -D__u64='unsigned long long' -D__s32=int -D__u32='unsigned int' -D__u16='unsigned short'"
+		export CXXFLAGS="$CFLAGS"
 	fi
 
 	if [ ! -d $serverPath/mysql ];then
