@@ -90,9 +90,9 @@ Install_dep_debain13(){
 	add-apt-repository -y ppa:ubuntu-toolchain-r/test
 
 	export PKG_CONFIG_PATH=/usr/lib/pkgconfig
-	apt install -y gcc-10 g++-10
-	WHERE_DIR_GCC=/usr/bin/gcc-10
-	WHERE_DIR_GPP=/usr/bin/g++-10
+	apt install -y gcc-12 g++-12
+	WHERE_DIR_GCC=/usr/bin/gcc-12
+	WHERE_DIR_GPP=/usr/bin/g++-12
 }
 
 Install_mysql()
