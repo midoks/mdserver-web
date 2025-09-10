@@ -231,7 +231,7 @@ class Firewall(object):
 
             # root登陆配置检查
             root_rep = r"^PermitRootLogin\s+(\w*)\s*\n"
-            root_status = re.search(pass_rep, conf)
+            root_status = re.search(root_rep, conf)
             if root_status:
                 if root_status and root_status.groups(0)[0].strip() == 'no':
                     data['root_prohibit_status'] = True
