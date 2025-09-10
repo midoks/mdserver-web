@@ -461,9 +461,9 @@ class Firewall(object):
 
         conf = mw.readFile(file)
 
-        pass_rep = r"PermitRootLogin\s+(\w*)\s*\n"
-        pass_status = re.search(pass_rep, conf)
-        if not pass_status:
+        root_rep = r"PermitRootLogin\s+(\w*)\s*\n"
+        root_status = re.search(root_rep, conf)
+        if not root_status:
             rep = r"(#)?PermitRootLogin\s+(\w*)\s*\n"
             conf = re.sub(rep, "PermitRootLogin yes\n", conf)
 
