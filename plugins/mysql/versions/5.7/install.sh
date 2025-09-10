@@ -55,6 +55,20 @@ fi
 
 VERSION_ID=`cat /etc/*-release | grep VERSION_ID | awk -F = '{print $2}' | awk -F "\"" '{print $2}'`
 
+# 安装依赖
+Install_dep(){
+	apt install -y libudev-dev
+	apt install -y libtirpc-dev
+	apt install -y libssl-dev
+	apt install -y libgssglue-dev
+	apt install -y software-properties-common
+	add-apt-repository -y ppa:ubuntu-toolchain-r/test
+
+	export PKG_CONFIG_PATH=/usr/lib/pkgconfig
+	apt install -y gcc-11 g++-11
+	WHERE_DIR_GCC=/usr/bin/gcc-11
+	WHERE_DIR_GPP=/usr/bin/g++-11
+}
 
 Install_mysql()
 {
@@ -125,31 +139,11 @@ Install_mysql()
 	fi
 
 	if [ "$OSNAME" == "ubuntu" ];then
-		apt install -y libudev-dev
-		apt install -y libtirpc-dev
-		apt install -y libssl-dev
-		apt install -y libgssglue-dev
-		apt install -y software-properties-common
-		add-apt-repository -y ppa:ubuntu-toolchain-r/test
-
-		export PKG_CONFIG_PATH=/usr/lib/pkgconfig
-		apt install -y gcc-11 g++-11
-		WHERE_DIR_GCC=/usr/bin/gcc-11
-		WHERE_DIR_GPP=/usr/bin/g++-11
+		Install_dep
 	fi
 
 	if [ "$OSNAME" == "debian" ] && [ "$VERSION_ID" == "13" ];then
-		apt install -y libudev-dev
-		apt install -y libtirpc-dev
-		apt install -y libssl-dev
-		apt install -y libgssglue-dev
-		apt install -y software-properties-common
-		add-apt-repository -y ppa:ubuntu-toolchain-r/test
-
-		export PKG_CONFIG_PATH=/usr/lib/pkgconfig
-		apt install -y gcc-11 g++-11
-		WHERE_DIR_GCC=/usr/bin/gcc-11
-		WHERE_DIR_GPP=/usr/bin/g++-11
+		Install_dep
 	fi
 
 	OPTIONS=''
