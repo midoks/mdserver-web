@@ -170,8 +170,8 @@ Install_mysql()
 		OPTIONS="-DWITH_SSL=${serverPath}/lib/openssl10"
 
 		# 经过测试，无法安装
-		# echo "debain13不支持低版本编译"
-		# exit 0
+		echo "debain13不支持5.5低版本编译"
+		exit 0
 	fi
 
 	if [ ! -d $serverPath/mysql ];then
