@@ -164,6 +164,8 @@ Install_mysql()
 
 		# OPTIONS="${OPTIONS} -DCMAKE_C_FLAGS=${CFLAGS}"
 		# OPTIONS="${OPTIONS} -DCMAKE_CXX_FLAGS=${CXXFLAGS}"
+		OPTIONS="${OPTIONS} -DWITH_SSL=/www/server/lib/openssl11"
+
 	fi
 
 	# -DWITH_SSL=/www/server/lib/openssl11
