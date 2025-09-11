@@ -520,6 +520,7 @@ echo "--------------------------------------------------------------------------
         if mw.isAppleSystem():
             return mw.returnData(True, 'ok')
 
+        mw.execShell("mkdir -p /var/spool/cron/crontabs")
 
         file = '/var/spool/cron/crontabs/root'
         sys_os = mw.getOs()
@@ -530,8 +531,6 @@ echo "--------------------------------------------------------------------------
             file = '/var/cron/tabs/root'
         elif sys_name.startswith("ubuntu"):
             file = '/var/spool/cron/root'
-
-        mw.execShell("mkdir -p /var/spool/cron/crontabs")
 
         if not os.path.exists(file):
             mw.writeFile(file, '')
