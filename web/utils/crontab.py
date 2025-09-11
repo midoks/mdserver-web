@@ -530,8 +530,8 @@ echo "--------------------------------------------------------------------------
             file = '/etc/crontab'
         elif sys_name.startswith("freebsd"):
             file = '/var/cron/tabs/root'
-        elif sys_name.startswith("ubuntu"):
-            file = '/var/spool/cron/root'
+        # elif sys_name.startswith("ubuntu"):
+        #     file = '/var/spool/cron/root'
 
         if not os.path.exists(file):
             mw.writeFile(file, '')
