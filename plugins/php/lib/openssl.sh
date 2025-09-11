@@ -8,7 +8,7 @@ rootPath=$(dirname "$rootPath")
 rootPath=$(dirname "$rootPath")
 rootPath=$(dirname "$rootPath")
 
-opensslVersion="3.0.10"
+opensslVersion="3.5.2"
 # echo $rootPath
 
 SERVER_ROOT=$rootPath/lib
