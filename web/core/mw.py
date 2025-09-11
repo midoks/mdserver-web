@@ -431,8 +431,8 @@ def hasPwd(password):
     # import crypt
     # return crypt.crypt(password, password)
     import bcrypt
-    # salt = bcrypt.gensalt()
-    hpw = bcrypt.hashpw(password.encode('utf-8'), password.encode('utf-8'))
+    salt = bcrypt.gensalt()
+    hpw = bcrypt.hashpw(password.encode('utf-8'), salt)
     return hpw.decode('utf-8')
 
     
