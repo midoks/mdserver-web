@@ -13,7 +13,7 @@ sysName=`uname`
 
 mariadbDir=${serverPath}/source/mariadb
 
-MY_VER=11.8.3
+MY_VER=12.0.3
 
 Install_app()
 {
@@ -91,7 +91,7 @@ Install_app()
 		make -j${cpuCore} && make install && make clean
 
 		if [ -d $serverPath/mariadb ];then
-			echo '11.8' > $serverPath/mariadb/version.pl
+			echo '12.0' > $serverPath/mariadb/version.pl
 			echo '安装完成'
 		else
 			echo '安装失败'
