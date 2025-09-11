@@ -520,7 +520,8 @@ echo "--------------------------------------------------------------------------
         if mw.isAppleSystem():
             return mw.returnData(True, 'ok')
 
-        mw.execShell("mkdir -p /var/spool/cron/crontabs")
+        if not os.path.exists("/var/spool/cron/crontabs"):
+            mw.execShell("mkdir -p /var/spool/cron/crontabs")
 
         file = '/var/spool/cron/crontabs/root'
         sys_os = mw.getOs()
