@@ -170,7 +170,7 @@ Install_mysql()
 		export PKG_CONFIG_PATH=$serverPath/lib/openssl10/lib/pkgconfig
 		OPTIONS="-DWITH_SSL=${serverPath}/lib/openssl10"
 
-		# 仅测试，无法安装
+		# 经过测试，无法安装
 		# echo "debain13不支持低版本编译"
 		# exit 0
 	fi
