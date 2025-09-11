@@ -11,6 +11,7 @@ sysArch=`arch`
 
 # cd /www/server/mdserver-web/plugins/manticoresearch && bash install.sh install 7.4.6
 # cd /www/server/mdserver-web && python3 plugins/manticoresearch/index.py run_status_test
+# cd /www/server/mdserver-web && python3 plugins/manticoresearch/index.py start
 # systemctl status manticore
 # systemctl restart manticore
 

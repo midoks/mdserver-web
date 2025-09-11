@@ -181,7 +181,7 @@ def removeBgTask():
             "id=?", (cfg["task_id"],)).find()
         if res and res["id"] == cfg["task_id"]:
             data = MwCrontab.instance().delete(cfg["task_id"])
-            if data[0]:
+            if data['status']:
                 cfg["task_id"] = -1
                 mw.writeFile(getTaskConf(), json.dumps(cfg))
                 return True
