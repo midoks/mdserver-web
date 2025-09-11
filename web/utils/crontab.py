@@ -519,22 +519,27 @@ echo "--------------------------------------------------------------------------
     def writeShell(self, bash_script):
         if mw.isAppleSystem():
             return mw.returnData(True, 'ok')
+
+        if not os.path.exists("/var/spool/cron/crontabs"):
+            mw.execShell("mkdir -p /var/spool/cron/crontabs")
+
         file = '/var/spool/cron/crontabs/root'
         sys_os = mw.getOs()
+        sys_name = mw.getOsName()
         if sys_os == 'darwin':
             file = '/etc/crontab'
-        elif sys_os.startswith("freebsd"):
+        elif sys_name.startswith("freebsd"):
             file = '/var/cron/tabs/root'
-
-        if not os.path.exists(file):
-            file = '/var/spool/cron/root'
+        # elif sys_name.startswith("ubuntu"):
+        #     file = '/var/spool/cron/root'
 
         if not os.path.exists(file):
             mw.writeFile(file, '')
-
         content = mw.readFile(file)
         if not content:
-            return mw.returnData(False, '计划任务配置文件不存在?') 
+            content = ''
+        # if not content:
+        #     return mw.returnData(False, '计划任务配置文件不存在?') 
         content += str(bash_script) + "\n"
         if mw.writeFile(file, content):
             if not os.path.exists(file):

@@ -56,6 +56,42 @@ fi
 VERSION_ID=`cat /etc/*-release | grep VERSION_ID | awk -F = '{print $2}' | awk -F "\"" '{print $2}'`
 
 
+Install_common(){
+	apt install -y libudev-dev
+	apt install -y libtirpc-dev
+	apt install -y libssl-dev
+	apt install -y libgssglue-dev
+	apt install -y software-properties-common
+
+	apt install -y build-essential
+	apt install -y cmake 
+	apt install -y pkg-config 
+	apt install -y libncurses5-dev
+	apt install -y libsystemd-dev 
+	apt install -y libsasl2-dev 
+	apt install -y libldap2-dev 
+}
+
+# 安装依赖
+Install_dep(){
+	Install_common
+	add-apt-repository -y ppa:ubuntu-toolchain-r/test
+
+	export PKG_CONFIG_PATH=/usr/lib/pkgconfig
+	apt install -y gcc-10 g++-10
+	WHERE_DIR_GCC=/usr/bin/gcc-10
+	WHERE_DIR_GPP=/usr/bin/g++-10
+}
+
+Install_dep_debain13(){
+	Install_common
+	# add-apt-repository -y ppa:ubuntu-toolchain-r/test
+	export PKG_CONFIG_PATH=/usr/lib/pkgconfig
+	apt install -y gcc-12 g++-12
+	WHERE_DIR_GCC=/usr/bin/gcc-12
+	WHERE_DIR_GPP=/usr/bin/g++-12
+}
+
 Install_mysql()
 {
 	mkdir -p ${mysqlDir}
@@ -117,17 +153,25 @@ Install_mysql()
 	fi
 
 	if [ "$OSNAME" == "ubuntu" ];then
-		apt install -y libudev-dev
-		apt install -y libtirpc-dev
-		apt install -y libssl-dev
-		apt install -y libgssglue-dev
-		apt install -y software-properties-common
-		add-apt-repository -y ppa:ubuntu-toolchain-r/test
+		Install_dep
+	fi
 
-		export PKG_CONFIG_PATH=/usr/lib/pkgconfig
-		apt install -y gcc-10 g++-10
-		WHERE_DIR_GCC=/usr/bin/gcc-10
-		WHERE_DIR_GPP=/usr/bin/g++-10
+	OPTIONS=''
+
+	if [ "$OSNAME" == "debian" ] && [ "$VERSION_ID" == "13" ];then
+		Install_dep_debain13
+		# export CFLAGS="-D__s64=long long -D__u64='unsigned long long' -D__s32=int -D__u32='unsigned int' -D__u16='unsigned short'"
+		# export CXXFLAGS="$CFLAGS"
+		# OPTIONS="${OPTIONS} -DCMAKE_C_FLAGS=${CFLAGS}"
+		# OPTIONS="${OPTIONS} -DCMAKE_CXX_FLAGS=${CXXFLAGS}"
+
+		cd ${rootPath}/plugins/php/lib && /bin/bash openssl_10.sh
+		export PKG_CONFIG_PATH=${serverPath}/lib/openssl10/lib/pkgconfig
+		OPTIONS="-DWITH_SSL=${serverPath}/lib/openssl10"
+
+		# 经过测试，无法安装
+		echo "debain13不支持5.5低版本编译"
+		exit 0
 	fi
 
 	if [ ! -d $serverPath/mysql ];then
@@ -141,6 +185,7 @@ Install_mysql()
 		-DWITH_MEMORY_STORAGE_ENGINE=1 \
 		-DENABLED_LOCAL_INFILE=1 \
 		-DWITH_PARTITION_STORAGE_ENGINE=1 \
+		$OPTIONS \
 		-DEXTRA_CHARSETS=all \
 		-DDEFAULT_CHARSET=utf8mb4 \
 		-DDEFAULT_COLLATION=utf8mb4_general_ci \

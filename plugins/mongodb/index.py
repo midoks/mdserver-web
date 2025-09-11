@@ -1527,8 +1527,8 @@ def runLog():
 
 def installPreInspectionDebainCheck(sysId,version):
     if version == '8.0':
-        if sysId != '12':
-            return "[%s]需要debain[12]" % (version,)
+        if int(sysId) < 12:
+            return "[%s]需要至少debain[12]" % (version,)
     return ''
 
 def installPreInspection(version):
