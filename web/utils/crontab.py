@@ -531,6 +531,8 @@ echo "--------------------------------------------------------------------------
         elif sys_name.startswith("ubuntu"):
             file = '/var/spool/cron/root'
 
+        mw.execShell("mkdir -p /var/spool/cron/crontabs")
+
         if not os.path.exists(file):
             mw.writeFile(file, '')
         content = mw.readFile(file)
