@@ -526,7 +526,7 @@ echo "--------------------------------------------------------------------------
         sys_name = mw.getOsName()
         if sys_os == 'darwin':
             file = '/etc/crontab'
-        elif sys_os.startswith("freebsd"):
+        elif sys_name.startswith("freebsd"):
             file = '/var/cron/tabs/root'
         elif sys_name.startswith("ubuntu"):
             file = '/var/spool/cron/root'
