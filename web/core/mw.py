@@ -423,9 +423,9 @@ def md5(content):
         return False
 
 def hasPwd(password):
+    # 加密密码字符
     # python3 -c "import crypt"
     # python3 -c 'import crypt; print(crypt.crypt(""))'
-    # 加密密码字符
     # import crypt
     # return crypt.crypt(password, password)
     import bcrypt
