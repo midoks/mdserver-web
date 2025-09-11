@@ -164,10 +164,9 @@ Install_mysql()
 		# export CXXFLAGS="$CFLAGS"
 		# OPTIONS="${OPTIONS} -DCMAKE_C_FLAGS=${CFLAGS}"
 		# OPTIONS="${OPTIONS} -DCMAKE_CXX_FLAGS=${CXXFLAGS}"
-		# OPTIONS="${OPTIONS} -DWITH_SSL=/www/server/lib/openssl10"
 
 		cd ${rootPath}/plugins/php/lib && /bin/bash openssl_10.sh
-		export PKG_CONFIG_PATH=$serverPath/lib/openssl10/lib/pkgconfig
+		export PKG_CONFIG_PATH=${serverPath}/lib/openssl10/lib/pkgconfig
 		OPTIONS="-DWITH_SSL=${serverPath}/lib/openssl10"
 
 		# 经过测试，无法安装
