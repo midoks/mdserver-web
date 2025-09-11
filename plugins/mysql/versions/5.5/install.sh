@@ -157,18 +157,22 @@ Install_mysql()
 	fi
 
 	OPTIONS=''
+
 	if [ "$OSNAME" == "debian" ] && [ "$VERSION_ID" == "13" ];then
 		Install_dep_debain13
 		# export CFLAGS="-D__s64=long long -D__u64='unsigned long long' -D__s32=int -D__u32='unsigned int' -D__u16='unsigned short'"
 		# export CXXFLAGS="$CFLAGS"
 		# OPTIONS="${OPTIONS} -DCMAKE_C_FLAGS=${CFLAGS}"
 		# OPTIONS="${OPTIONS} -DCMAKE_CXX_FLAGS=${CXXFLAGS}"
-		OPTIONS="${OPTIONS} -DWITH_SSL=/www/server/lib/openssl11"
+		# OPTIONS="${OPTIONS} -DWITH_SSL=/www/server/lib/openssl10"
+
+		cd ${rootPath}/plugins/php/lib && /bin/bash openssl_10.sh
+		export PKG_CONFIG_PATH=$serverPath/lib/openssl10/lib/pkgconfig
+		OPTIONS="-DWITH_SSL=${serverPath}/lib/openssl10"
 
 		# 仅测试，无法安装
-		echo "debain13不支持低版本编译"
-		exit 0
-
+		# echo "debain13不支持低版本编译"
+		# exit 0
 	fi
 
 	# -DWITH_SSL=/www/server/lib/openssl11
