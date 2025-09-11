@@ -424,9 +424,14 @@ def md5(content):
 
 def hasPwd(password):
     # python3 -c "import crypt"
+    # python3 -c 'import crypt; print(crypt.crypt(""))'
     # 加密密码字符
-    import crypt
-    return crypt.crypt(password, password)
+    # import crypt
+    # return crypt.crypt(password, password)
+    import bcrypt
+    salt = bcrypt.gensalt()
+    return bcrypt.hashpw(password.encode('utf-8'), salt)
+
     
 def getFileMd5(filename):
     # 文件的MD5值
