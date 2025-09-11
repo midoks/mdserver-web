@@ -562,6 +562,7 @@ def getSslCrt():
 
 
 def getOs():
+    # python3 -c 'import sys; print(sys.platform)'
     return sys.platform
 
 def getOsName():

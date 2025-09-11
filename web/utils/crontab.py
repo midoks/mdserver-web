@@ -523,11 +523,12 @@ echo "--------------------------------------------------------------------------
 
         file = '/var/spool/cron/crontabs/root'
         sys_os = mw.getOs()
+        sys_name = mw.getOsName()
         if sys_os == 'darwin':
             file = '/etc/crontab'
         elif sys_os.startswith("freebsd"):
             file = '/var/cron/tabs/root'
-        elif sys_os.startswith("ubuntu"):
+        elif sys_name.startswith("ubuntu"):
             file = '/var/spool/cron/root'
 
         if not os.path.exists(file):
