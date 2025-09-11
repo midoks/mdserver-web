@@ -175,8 +175,6 @@ Install_mysql()
 		# exit 0
 	fi
 
-	# -DWITH_SSL=/www/server/lib/openssl11
-
 	if [ ! -d $serverPath/mysql ];then
 		cd ${mysqlDir}/mysql-5.5.62 && cmake \
 		-DCMAKE_INSTALL_PREFIX=$serverPath/mysql \
