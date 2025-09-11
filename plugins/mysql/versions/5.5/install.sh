@@ -75,7 +75,6 @@ Install_common(){
 # 安装依赖
 Install_dep(){
 	Install_common
-
 	add-apt-repository -y ppa:ubuntu-toolchain-r/test
 
 	export PKG_CONFIG_PATH=/usr/lib/pkgconfig
@@ -86,9 +85,7 @@ Install_dep(){
 
 Install_dep_debain13(){
 	Install_common
-
-	add-apt-repository -y ppa:ubuntu-toolchain-r/test
-
+	# add-apt-repository -y ppa:ubuntu-toolchain-r/test
 	export PKG_CONFIG_PATH=/usr/lib/pkgconfig
 	apt install -y gcc-12 g++-12
 	WHERE_DIR_GCC=/usr/bin/gcc-12
@@ -168,6 +165,8 @@ Install_mysql()
 		OPTIONS="${OPTIONS} -DCMAKE_C_FLAGS=${CFLAGS}"
 		OPTIONS="${OPTIONS} -DCMAKE_CXX_FLAGS=${CXXFLAGS}"
 	fi
+
+	# -DWITH_SSL=/www/server/lib/openssl11
 
 	if [ ! -d $serverPath/mysql ];then
 		cd ${mysqlDir}/mysql-5.5.62 && cmake \
