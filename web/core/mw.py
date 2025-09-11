@@ -432,7 +432,8 @@ def hasPwd(password):
     # return crypt.crypt(password, password)
     import bcrypt
     salt = bcrypt.gensalt()
-    return str(bcrypt.hashpw(password.encode('utf-8'), salt))
+    hpw = bcrypt.hashpw(password.encode('utf-8'), salt)
+    return hpw.encode('utf-8')
 
     
 def getFileMd5(filename):
