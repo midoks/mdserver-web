@@ -519,12 +519,16 @@ echo "--------------------------------------------------------------------------
     def writeShell(self, bash_script):
         if mw.isAppleSystem():
             return mw.returnData(True, 'ok')
+
+
         file = '/var/spool/cron/crontabs/root'
         sys_os = mw.getOs()
         if sys_os == 'darwin':
             file = '/etc/crontab'
         elif sys_os.startswith("freebsd"):
             file = '/var/cron/tabs/root'
+        elif sys_os.startswith("ubuntu"):
+            file = '/var/spool/cron/root'
 
         if not os.path.exists(file):
             mw.writeFile(file, '')
