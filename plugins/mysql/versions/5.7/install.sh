@@ -87,8 +87,7 @@ Install_dep(){
 Install_dep_debain13(){
 	Install_common
 
-	add-apt-repository -y ppa:ubuntu-toolchain-r/test
-
+	# add-apt-repository -y ppa:ubuntu-toolchain-r/test
 	export PKG_CONFIG_PATH=/usr/lib/pkgconfig
 	apt install -y gcc-12 g++-12
 	WHERE_DIR_GCC=/usr/bin/gcc-12
