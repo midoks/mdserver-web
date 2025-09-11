@@ -165,6 +165,10 @@ Install_mysql()
 		# OPTIONS="${OPTIONS} -DCMAKE_CXX_FLAGS=${CXXFLAGS}"
 		OPTIONS="${OPTIONS} -DWITH_SSL=/www/server/lib/openssl11"
 
+		# 仅测试，无法安装
+		echo "debain13不支持低版本编译"
+		exit 0
+
 	fi
 
 	# -DWITH_SSL=/www/server/lib/openssl11
