@@ -40,6 +40,7 @@ $PKGMGR install -y unixODBC-devel
 
 $PKGMGR install -y p7zip
 $PKGMGR install -y p7zip-plugins
+$PKGMGR install -y mmap-devel
 
 $PKGMGR install -y libncurses*
 
