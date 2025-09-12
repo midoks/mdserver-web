@@ -47,6 +47,7 @@ apt install -y libaio-dev
 apt install -y libmecab2
 apt install -y numactl
 apt install -y libaio1t64
+apt install -y libmm-dev
 
 apt install -y dnsutils
 apt install -y numactl
