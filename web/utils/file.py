@@ -169,13 +169,13 @@ def uncompress(sfile, dfile, path):
             cmd += "&& gunzip -k " + sfile + " > " + tmps + " 2>&1 &"
             mw.execShell(cmd)
         elif extension == 'rar':
-            cmd +=  "&& unrar x " + sfile + " " + dfile + " > " + tmps + " 2>&1 &"
+            cmd += "&& unrar x " + sfile + " " + dfile + " > " + tmps + " 2>&1 &"
             mw.execShell(cmd)
         elif extension == '7z':
-            cmd +=  "&& 7z x " + sfile + " -r -o" + dfile + " > " + tmps + " 2>&1 &"
+            cmd += "&& 7z x " + sfile + " -r -o" + dfile + " > " + tmps + " 2>&1 &"
             mw.execShell(cmd)
         elif extension == 'xz':
-            cmd +=  "&& tar -Jxvf " + sfile + " -C " + dfile + " > " + tmps + " 2>&1 &"
+            cmd += "&& tar -Jxvf " + sfile + " -C " + dfile + " > " + tmps + " 2>&1 &"
             mw.execShell(cmd)
 
         if os.path.exists(dfile):
