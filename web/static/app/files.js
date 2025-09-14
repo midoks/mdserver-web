@@ -1359,6 +1359,7 @@ function zip(dirName,submits) {
                             <option value="zip">zip (通用格式)</option>\
                             <option value="rar">rar (WinRAR对中文兼容较好)</option>\
                             <option value="7z">7z (压缩率极高的压缩格式)</option>\
+                            <option value="xz">xz (压缩率极高的压缩格式)</option>\
                             </select>\
                         </div>\
                     </div>'
