@@ -175,7 +175,7 @@ def uncompress(sfile, dfile, path):
             cmd +=  "&& 7z x " + sfile + " -r -o" + dfile + " > " + tmps + " 2>&1 &"
             mw.execShell(cmd)
         elif extension == 'xz':
-            cmd +=  "&& tar -Jxvf " + sfile + " -r -o" + dfile + " > " + tmps + " 2>&1 &"
+            cmd +=  "&& tar -Jxvf " + sfile + " -C " + dfile + " > " + tmps + " 2>&1 &"
             mw.execShell(cmd)
 
         if os.path.exists(dfile):
