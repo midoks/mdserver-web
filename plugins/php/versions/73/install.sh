@@ -10,6 +10,45 @@ sourcePath=${serverPath}/source
 sysName=`uname`
 SYS_ARCH=`arch`
 
+echo "use system: ${sysName}"
+if [ ${sysName} == "Darwin" ]; then
+	OSNAME='macos'
+elif grep -Eq "openSUSE" /etc/*-release; then
+	OSNAME='opensuse'
+	zypper refresh
+elif grep -Eq "FreeBSD" /etc/*-release; then
+	OSNAME='freebsd'
+	pkg install -y wget unzip
+elif grep -Eqi "Arch" /etc/issue || grep -Eq "Arch" /etc/*-release; then
+	OSNAME='arch'
+	echo y | pacman -Sy unzip
+elif grep -Eqi "CentOS" /etc/issue || grep -Eq "CentOS" /etc/*-release; then
+	OSNAME='centos'
+	yum install -y wget zip unzip
+elif grep -Eqi "Fedora" /etc/issue || grep -Eq "Fedora" /etc/*-release; then
+	OSNAME='fedora'
+	yum install -y wget zip unzip
+elif grep -Eqi "Rocky" /etc/issue || grep -Eq "Rocky" /etc/*-release; then
+	OSNAME='rocky'
+	yum install -y wget zip unzip
+elif grep -Eqi "AlmaLinux" /etc/issue || grep -Eq "AlmaLinux" /etc/*-release; then
+	OSNAME='alma'
+	yum install -y wget zip unzip
+elif grep -Eqi "Debian" /etc/issue || grep -Eq "Debian" /etc/*-release; then
+	OSNAME='debian'
+	apt update -y
+	apt install -y devscripts
+	apt install -y wget zip unzip
+elif grep -Eqi "Ubuntu" /etc/issue || grep -Eq "Ubuntu" /etc/*-release; then
+	OSNAME='ubuntu'
+	apt install -y wget zip unzip
+else
+	OSNAME='unknow'
+fi
+
+VERSION_ID=`cat /etc/*-release | grep VERSION_ID | awk -F = '{print $2}' | awk -F "\"" '{print $2}'`
+
+
 version=7.3.33
 PHP_VER=73
 md5_file_ok=eeabb2140c04da85c86389197421f890
@@ -104,6 +143,13 @@ else
 	cpuCore="1"
 fi
 # ----- cpu end ------
+
+
+if [ "${OSNAME}" == "debian" ] && [ "${VERSION_ID}" == "13" ];then
+	# 修复arm64架构下安装
+	cat ${curPath}/versions/${PHP_VER}/src/reentrancy.c > $sourcePath/php/php${PHP_VER}/main/reentrancy.c
+	echo "cat ${curPath}/versions/${PHP_VER}/src/reentrancy.c > $sourcePath/php/php${PHP_VER}/main/reentrancy.c"
+fi
 
 if [ "$sysName" == "Darwin" ];then
 	BREW_DIR=`which brew`

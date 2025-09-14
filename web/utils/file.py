@@ -147,8 +147,8 @@ def uncompress(sfile, dfile, path):
     if suffix_gz == tar_gz:
         extension = suffix_gz
 
-    if not extension in ['tar.gz', 'gz', 'zip', 'rar', '7z']:
-        return mw.returnData(False, '现在仅支持gz,zip,rar格式解压!')
+    if not extension in ['tar.gz', 'gz', 'zip', 'rar', '7z', 'xz']:
+        return mw.returnData(False, '现在仅支持gz,zip,rar,7z,xz格式解压!')
 
     if extension == 'rar' and not mw.checkBinExist('rar'):
         return mw.returnData(False, 'rar解压命令不存在，请安装!')
@@ -169,10 +169,13 @@ def uncompress(sfile, dfile, path):
             cmd += "&& gunzip -k " + sfile + " > " + tmps + " 2>&1 &"
             mw.execShell(cmd)
         elif extension == 'rar':
-            cmd +=  "&& unrar x " + sfile + " " + dfile + " > " + tmps + " 2>&1 &"
+            cmd += "&& unrar x " + sfile + " " + dfile + " > " + tmps + " 2>&1 &"
             mw.execShell(cmd)
         elif extension == '7z':
-            cmd +=  "&& 7z x " + sfile + " -r -o" + dfile + " > " + tmps + " 2>&1 &"
+            cmd += "&& 7z x " + sfile + " -r -o" + dfile + " > " + tmps + " 2>&1 &"
+            mw.execShell(cmd)
+        elif extension == 'xz':
+            cmd += "&& tar -Jxvf " + sfile + " -C " + dfile + " > " + tmps + " 2>&1 &"
             mw.execShell(cmd)
 
         if os.path.exists(dfile):
@@ -293,8 +296,6 @@ def batchPaste(path, stype):
 
 
 def zip(sfile, dfile, stype, path):
-    
-
     tmps = mw.getPanelDir() + '/logs/panel_exec.log'
     if sfile.find(',') == -1:
         if stype == 'zip':
@@ -305,6 +306,14 @@ def zip(sfile, dfile, stype, path):
             mw.execShell("cd '" + path + "' && 7z a '" + dfile + "' -r '" + sfile + "' > " + tmps + " 2>&1")
         elif stype == 'tar_gz':
             mw.execShell("cd '" + path + "' && tar -zcvf '" + dfile + "' " + sfile + " > " + tmps + " 2>&1")
+        elif stype == 'xz':
+            # if not mw.checkBinExist('xz'):
+            #     return mw.returnData(False, 'xz压缩命令不存在，请安装!')
+            # dfile = dfile.strip(".xz")
+            # cmd = "cd '" + path + "' && tar -cvf '" + dfile + ".tar' " + sfile + " && xz -z '" + dfile + ".tar' > " + tmps + " 2>&1 &"
+            cmd = "cd '" + path + "' && tar -cJf '" + dfile + "' " + sfile + " > " + tmps + " 2>&1"
+            # print(cmd)
+            mw.execShell(cmd)
         elif stype == 'rar':
             if not mw.checkBinExist('rar'):
                 return mw.returnData(False, 'rar压缩命令不存在，请安装!')

@@ -1359,6 +1359,7 @@ function zip(dirName,submits) {
                             <option value="zip">zip (通用格式)</option>\
                             <option value="rar">rar (WinRAR对中文兼容较好)</option>\
                             <option value="7z">7z (压缩率极高的压缩格式)</option>\
+                            <option value="xz">xz (压缩率极高的压缩格式)</option>\
                             </select>\
                         </div>\
                     </div>'
@@ -1394,6 +1395,8 @@ function zip(dirName,submits) {
                     $("#dfile").val(newPathName + '.gz');
                 } else if (z_type == '7z') {
                     $("#dfile").val(newPathName + '.7z');
+                } else if (z_type == 'xz') {
+                    $("#dfile").val(newPathName + '.xz');
                 }
             });
 
@@ -1461,7 +1464,7 @@ function unZip(fileName, type) {
 function isCompressFile(fileName){
     var ext = fileName.split('.');
     var extName = ext[ext.length-1].toLowerCase();
-    var support = ['zip','gz','tgz','rar','7z'];
+    var support = ['zip','gz','tgz','rar','7z','xz'];
     for (x in support) {
         if (support[x]==extName){
             return true;
