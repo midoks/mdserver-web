@@ -2205,6 +2205,7 @@ location ^~ {from} {\n\
         log_file = self.acmeLogFile()
 
         cmd = 'export ACCOUNT_EMAIL=' + email + ' && ' + cmd + ' >> ' + log_file
+        # print(cmd)
         result = mw.execShell(cmd)
 
         # 开启代理
