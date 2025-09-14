@@ -1395,6 +1395,8 @@ function zip(dirName,submits) {
                     $("#dfile").val(newPathName + '.gz');
                 } else if (z_type == '7z') {
                     $("#dfile").val(newPathName + '.7z');
+                } else if (z_type == 'xz') {
+                    $("#dfile").val(newPathName + '.xz');
                 }
             });
 
