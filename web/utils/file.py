@@ -311,7 +311,6 @@ def zip(sfile, dfile, stype, path):
             #     return mw.returnData(False, 'xz压缩命令不存在，请安装!')
             # dfile = dfile.strip(".xz")
             # cmd = "cd '" + path + "' && tar -cvf '" + dfile + ".tar' " + sfile + " && xz -z '" + dfile + ".tar' > " + tmps + " 2>&1 &"
-            dfile = dfile.strip(".xz")
             cmd = "cd '" + path + "' && tar -cJf '" + dfile + "' " + sfile + " > " + tmps + " 2>&1"
             # print(cmd)
             mw.execShell(cmd)
