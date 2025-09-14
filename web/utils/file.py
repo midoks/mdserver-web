@@ -296,8 +296,6 @@ def batchPaste(path, stype):
 
 
 def zip(sfile, dfile, stype, path):
-    
-
     tmps = mw.getPanelDir() + '/logs/panel_exec.log'
     if sfile.find(',') == -1:
         if stype == 'zip':
