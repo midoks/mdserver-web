@@ -308,6 +308,9 @@ def zip(sfile, dfile, stype, path):
             mw.execShell("cd '" + path + "' && 7z a '" + dfile + "' -r '" + sfile + "' > " + tmps + " 2>&1")
         elif stype == 'tar_gz':
             mw.execShell("cd '" + path + "' && tar -zcvf '" + dfile + "' " + sfile + " > " + tmps + " 2>&1")
+        elif stype == 'xz':
+            cmd = "cd '" + path + "' && tar -cvf '" + dfile + ".tar' " + sfile + " && xz -z '" + dfile + ".tar' " > " + tmps + " 2>&1"
+            mw.execShell(cmd)
         elif stype == 'rar':
             if not mw.checkBinExist('rar'):
                 return mw.returnData(False, 'rar压缩命令不存在，请安装!')
