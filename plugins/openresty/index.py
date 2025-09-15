@@ -590,6 +590,26 @@ def setCfg():
     return mw.returnJson(True, '设置成功')
 
 
+def cronAddCheck():
+    try:
+        import tool_task
+        tool_task.createBgTask()
+        return mw.returnJson(True, '添加检查任务成功')
+    except Exception as e:
+        return mw.returnJson(False, '添加检查任务失败:'+str(e))
+
+def cronDelCheck():
+    try:
+        import tool_task
+        tool_task.removeBgTask()
+        return mw.returnJson(True, '删除检查任务成功')
+    except Exception as e:
+        return mw.returnJson(False, '删除检查任务失败:'+str(e))
+
+def cronCheck():
+    return 'ok'
+
+
 def installPreInspection():
     return 'ok'
 
@@ -633,5 +653,11 @@ if __name__ == "__main__":
         print(getCfg())
     elif func == 'set_cfg':
         print(setCfg())
+    elif func == 'check':
+        print(cronCheck())
+    elif func == 'cron_add_check':
+        print(cronAddCheck())
+    elif func == 'cron_del_check':
+        print(cronDelCheck())
     else:
         print('error')
