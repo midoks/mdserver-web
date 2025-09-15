@@ -21,7 +21,7 @@ if mw.isAppleSystem():
 
 
 def getPluginName():
-    return 'clean'
+    return 'openresty'
 
 
 def getPluginDir():
@@ -43,10 +43,10 @@ def getConfigData():
         return json.loads(mw.readFile(getTaskConf()))
     return {
         "task_id": -1,
-        "period": "day-n",
-        "where1": "7",
+        "period": "minute-n",
+        "where1": "3",
         "hour": "0",
-        "minute": "15",
+        "minute": "0",
     }
 
 
@@ -57,7 +57,7 @@ def createBgTask():
 
 def createBgTaskByName(name):
     args = getConfigData()
-    _name = "[勿删]日志清理[" + name + "]"
+    _name = "[OpenResty]检查任务"
     res = mw.M("crontab").field("id, name").where("name=?", (_name,)).find()
     if res:
         return True
@@ -75,14 +75,9 @@ mw_dir=%s
 rname=%s
 plugin_path=%s
 script_path=%s
-logs_file=$plugin_path/${rname}.log
 ''' % (mw_dir, name, getServerDir(), getPluginDir())
-    cmd += 'echo "★【`date +"%Y-%m-%d %H:%M:%S"`】 STSRT★" >> $logs_file' + "\n"
-    cmd += 'echo ">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>" >> $logs_file' + "\n"
-    cmd += 'echo "python3 $script_path/index.py clean >> $logs_file 2>&1"' + "\n"
-    cmd += 'cd $mw_dir && python3 $script_path/index.py clean >> $logs_file 2>&1' + "\n"
-    cmd += 'echo "【`date +"%Y-%m-%d %H:%M:%S"`】 END★" >> $logs_file' + "\n"
-    cmd += 'echo "<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<" >> $logs_file' + "\n"
+    cmd += 'echo "python3 $script_path/check.sh"' + "\n"
+    cmd += 'cd $mw_dir && bash $script_path/check.sh' + "\n"
 
     params = {
         'name': _name,
