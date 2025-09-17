@@ -1250,14 +1250,14 @@ function otherFunc(){
 }
 
 function cronAddCheck(){
-    mgPost('cron_add_check', {}, function(data){
+    mgPost('cron_add_check', '', {}, function(data){
         var rdata = $.parseJSON(data.data);
         layer.msg(rdata.msg, { icon: rdata.status ? 1 : 2 });
     });
 }
 
 function cronDelCheck(){
-    mgPost('cron_del_check', {}, function(data){
+    mgPost('cron_del_check', '', {}, function(data){
         var rdata = $.parseJSON(data.data);
         layer.msg(rdata.msg, { icon: rdata.status ? 1 : 2 });
     });
