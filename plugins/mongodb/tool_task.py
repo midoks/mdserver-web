@@ -21,7 +21,7 @@ if mw.isAppleSystem():
 
 
 def getPluginName():
-    return 'openresty'
+    return 'mongodb'
 
 
 def getPluginDir():
@@ -44,7 +44,7 @@ def getConfigData():
     return {
         "task_id": -1,
         "period": "minute-n",
-        "where1": "3",
+        "where1": "1",
         "hour": "0",
         "minute": "0",
     }
@@ -57,7 +57,7 @@ def createBgTask():
 
 def createBgTaskByName(name):
     args = getConfigData()
-    _name = "[OpenResty]检查任务"
+    _name = "[MongoDB]检查任务"
     res = mw.M("crontab").field("id, name").where("name=?", (_name,)).find()
     if res:
         return True

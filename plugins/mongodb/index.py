@@ -1524,6 +1524,22 @@ def runLog():
         return f
     return getServerDir() + '/logs.pl'
 
+def cronAddCheck():
+    try:
+        import tool_task
+        tool_task.createBgTask()
+        return mw.returnJson(True, '添加检查任务成功')
+    except Exception as e:
+        return mw.returnJson(False, '添加检查任务失败:'+str(e))
+
+def cronDelCheck():
+    try:
+        import tool_task
+        tool_task.removeBgTask()
+        return mw.returnJson(True, '删除检查任务成功')
+    except Exception as e:
+        return mw.returnJson(False, '删除检查任务失败:'+str(e))
+
 
 def installPreInspectionDebainCheck(sysId,version):
     if version == '8.0':
@@ -1666,5 +1682,9 @@ if __name__ == "__main__":
         print(test())
     elif func == 'test_data':
         print(testData())
+    elif func == 'cron_add_check':
+        print(cronAddCheck())
+    elif func == 'cron_del_check':
+        print(cronDelCheck())
     else:
         print('error')
