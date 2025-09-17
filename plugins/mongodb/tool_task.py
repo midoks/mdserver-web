@@ -76,7 +76,7 @@ rname=%s
 plugin_path=%s
 script_path=%s
 ''' % (mw_dir, name, getServerDir(), getPluginDir())
-    cmd += 'echo "python3 $script_path/check.sh"' + "\n"
+    cmd += 'echo "bash $script_path/check.sh"' + "\n"
     cmd += 'cd $mw_dir && bash $script_path/check.sh' + "\n"
 
     params = {
