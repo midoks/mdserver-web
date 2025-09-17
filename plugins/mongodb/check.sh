@@ -24,7 +24,7 @@ restart_mongodb() {
     
     # 根据你的系统选择适当的命令
     # 对于使用 systemd 的系统（如 Ubuntu 16.04+, CentOS 7+）
-    if systemctl restart "$SERVICE_NAME"; then
+    if systemctl restart "mongodb"; then
         echo "$(date): MongoDB 重启成功"
         return 0
     else
