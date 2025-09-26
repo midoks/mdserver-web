@@ -12,6 +12,11 @@ rootPath=$(dirname "$curPath")
 rootPath=$(dirname "$rootPath")
 serverPath=$(dirname "$rootPath")
 
+if [ -f ${rootPath}/bin/activate ];then
+	source ${rootPath}/bin/activate
+fi
+
+
 P_VER=`python3 -V | awk '{print $2}'`
 echo "python:$P_VER"
 
