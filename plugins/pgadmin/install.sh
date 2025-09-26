@@ -12,6 +12,11 @@ rootPath=$(dirname "$curPath")
 rootPath=$(dirname "$rootPath")
 serverPath=$(dirname "$rootPath")
 
+if [ -f ${rootPath}/bin/activate ];then
+	source ${rootPath}/bin/activate
+fi
+
+
 P_VER=`python3 -V | awk '{print $2}'`
 echo "python:$P_VER"
 
@@ -81,9 +86,10 @@ Install_pgadmin()
 		source ${PG_DIR}/bin/activate
 	fi
 	pip install gunicorn
+	pip install pgadmin4
 
 	# pip install https://ftp.postgresql.org/pub/pgadmin/pgadmin4/v8.10/pip/pgadmin4-8.10-py3-none-any.whl
-	pip install https://ftp.postgresql.org/pub/pgadmin/pgadmin4/v8.13/pip/pgadmin4-8.13-py3-none-any.whl
+	# pip install https://ftp.postgresql.org/pub/pgadmin/pgadmin4/v8.13/pip/pgadmin4-8.13-py3-none-any.whl
 
 	cd ${rootPath} && python3 ${rootPath}/plugins/pgadmin/index.py start
 	echo '安装完成'

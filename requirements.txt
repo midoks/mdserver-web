@@ -44,4 +44,5 @@ pyTelegramBotAPI
 telebot
 pyyaml
 croniter
+bcrypt
 packaging
