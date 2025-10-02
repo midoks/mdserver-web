@@ -10,7 +10,7 @@ if systemctl is-active --quiet "$service_name"; then
     # 检查是否存在僵尸进程
     zombie_processes=$(ps -ef | grep -i openresty | grep -v grep | awk '{print $2}' | xargs ps -o state= -p 2>/dev/null | grep -c Z)
     if [ "$zombie_processes" -gt 0 ]; then
-        echo "kill nginx"
+        echo "kill nginx 僵尸进程"
         ps -ef|grep nginx| grep -v grep| awk '{print $2}' | xargs kill -9
         echo "检测到OpenResty僵尸进程，正在重启服务..."
         systemctl restart "$service_name"
