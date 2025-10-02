@@ -25,3 +25,11 @@ else
     systemctl start "$service_name"
     echo "服务已启动"
 fi
+
+NGINX_IDS=`ps -ef|grep nginx | grep -v grep| awk '{print $2}'`
+if [ "$NGINX_IDS" == "" ];then
+    ps -ef|grep nginx| grep -v grep| awk '{print $2}' | xargs kill -9
+    systemctl start "$service_name"
+    echo "OpenResty未运行，正在启动服务..."
+fi
+
