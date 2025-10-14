@@ -66,7 +66,7 @@ def init_auto_update():
     if res:
         return True
 
-    cmd = "mw dev"
+    cmd = "mw update"
     params = {
         'name': name,
         'type': 'month-n',
