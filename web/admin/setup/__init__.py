@@ -14,7 +14,7 @@ from .user import init_admin_user
 from .option import init_option
 from .init_db_system import init_db_system
 from .init_cmd import init_cmd
-from .init_cron import init_cron,init_acme_cron
+from .init_cron import init_cron,init_acme_cron, init_auto_update
 
 from utils.firewall import Firewall as MwFirewall
 
@@ -34,6 +34,7 @@ def init():
     thisdb.reinstallPanelData()
     init_cmd()
     init_acme_cron()
+    init_auto_update()
     # init_cron()
     
 
