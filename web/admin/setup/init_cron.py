@@ -60,6 +60,32 @@ def init_acme_cron():
     crontab.instance().add(params)
     return True
 
+def init_auto_update():
+    name = "[可删]面板自动更新"
+    res = mw.M("crontab").field("id, name").where("name=?", (name,)).find()
+    if res:
+        return True
+
+    cmd = "mw dev"
+    params = {
+        'name': name,
+        'type': 'month-n',
+        'week': "",
+        'where1': "1",
+        'hour': 4,
+        'minute': 15,
+        'save': "",
+        'backup_to': "",
+        'stype': "toShell",
+        'sname': '',
+        'sbody': cmd,
+        'url_address': '',
+        'attr':'',
+    }
+
+    crontab.instance().add(params)
+    return True
+
 # 识别linux计划任务
 def init_cron():
     file = ''
