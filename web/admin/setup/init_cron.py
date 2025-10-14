@@ -69,7 +69,7 @@ def init_auto_update():
     cmd = "mw update"
     params = {
         'name': name,
-        'type': 'month-n',
+        'type': 'month',
         'week': "",
         'where1': "1",
         'hour': 4,
