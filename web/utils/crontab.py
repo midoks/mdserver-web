@@ -468,7 +468,7 @@ fi''' % (mw.getPanelDir(),)
                 stype = 'database'
 
             if stype == 'path' and param['echo'] == '':
-                param['echo'] == "''"
+                param['echo'] == "1"
 
             wheres = {
                 'path': head + "python3 " + script_dir + "/backup.py path " + param['sname'] + " " + str(param['save']) + " " + str(param['echo']), 
