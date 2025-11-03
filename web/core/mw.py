@@ -496,6 +496,9 @@ def checkDomainPanel():
         return False
 
     ip = getHostAddr()
+    if isVaildIpV6(ip):
+        return False
+
     if domain == '':
         if ip in ['127.0.0.1', 'localhost', '::1']:
             return False
