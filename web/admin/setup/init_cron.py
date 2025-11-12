@@ -40,7 +40,7 @@ def init_acme_cron():
     if res:
         return True
 
-    cmd = "/root/.acme.sh/acme.sh --cron --force --webroot"
+    cmd = "/root/.acme.sh/acme.sh --cron --force --standalone"
     params = {
         'name': name,
         'type': 'day-n',
