@@ -596,6 +596,8 @@ def makeLsyncdConf(data):
                 cmd_exclude_txt += x + "\n"
             mw.writeFile(cmd_exclude, cmd_exclude_txt)
             cmd_pass = name_dir + "/pass"
+            if os.path.exists(cmd_pass):
+                mw.execShell("chmod 755 " + cmd_pass)
             mw.writeFile(cmd_pass, t['password'])
             mw.execShell("chmod 600 " + cmd_pass)
 
