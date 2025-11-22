@@ -9,9 +9,9 @@ serverPath=$(dirname "$rootPath")
 sourcePath=${serverPath}/source
 sysName=`uname`
 
-version=8.5.0beta1
+version=8.5.0
 PHP_VER=85
-# md5_file_ok=14983a9ef8800e6bc2d920739fd386054402f7976ca9cd7f711509496f0d2632
+md5_file_ok=39cb6e4acd679b574d3d3276f148213e935fc25f90403eb84fb1b836a806ef1e
 Install_php()
 {
 #------------------------ install start ------------------------------------#
@@ -30,25 +30,25 @@ fi
 
 if [ ! -d $sourcePath/php/php${PHP_VER} ];then
 
-	# # ----------------------------------------------------------------------- #
-	# # 中国优化安装
-	# cn=$(curl -fsSL -m 10 -s http://ipinfo.io/json | grep "\"country\": \"CN\"")
-	# LOCAL_ADDR=common
-	# if [ ! -z "$cn" ];then
-	# 	LOCAL_ADDR=cn
-	# fi
+	# ----------------------------------------------------------------------- #
+	# 中国优化安装
+	cn=$(curl -fsSL -m 10 -s http://ipinfo.io/json | grep "\"country\": \"CN\"")
+	LOCAL_ADDR=common
+	if [ ! -z "$cn" ];then
+		LOCAL_ADDR=cn
+	fi
 
-	# if [ "$LOCAL_ADDR" == "cn" ];then
-	# 	if [ ! -f $sourcePath/php/php-${version}.tar.xz ];then
-	# 		wget --no-check-certificate -O $sourcePath/php/php-${version}.tar.xz https://mirrors.nju.edu.cn/php/php-${version}.tar.xz
-	# 	fi
-	# fi
-	# # ----------------------------------------------------------------------- #
+	if [ "$LOCAL_ADDR" == "cn" ];then
+		if [ ! -f $sourcePath/php/php-${version}.tar.xz ];then
+			wget --no-check-certificate -O $sourcePath/php/php-${version}.tar.xz https://mirrors.nju.edu.cn/php/php-${version}.tar.xz
+		fi
+	fi
+	# ----------------------------------------------------------------------- #
 	
 
 	if [ ! -f $sourcePath/php/php-${version}.tar.xz ];then
-		# wget --no-check-certificate -O $sourcePath/php/php-${version}.tar.xz https://www.php.net/distributions/php-${version}.tar.xz
-		wget --no-check-certificate -O $sourcePath/php/php-${version}.tar.xz https://downloads.php.net/~edorian/php-${version}.tar.xz
+		wget --no-check-certificate -O $sourcePath/php/php-${version}.tar.xz https://www.php.net/distributions/php-${version}.tar.xz
+		# wget --no-check-certificate -O $sourcePath/php/php-${version}.tar.xz https://downloads.php.net/~edorian/php-${version}.tar.xz
 	fi
 
 	#检测文件是否损坏.
