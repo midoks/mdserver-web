@@ -56,7 +56,6 @@ VERSION_ID=`cat /etc/*-release | grep VERSION_ID | awk -F = '{print $2}' | awk -
 
 VERSION=9.4.0
 # https://dev.mysql.com/get/Downloads/MySQL-9.4/mysql-${VERSION}.tar.gz
-# https://cdn.mysql.com//Downloads/MySQL-9.4/mysql-boost-${VERSION}.tar.gz
 # https://cdn.mysql.com/archives/mysql-9.4/mysql-9.4.0.tar.gz
 Install_mysql()
 {
@@ -103,8 +102,6 @@ Install_mysql()
 	if [ ! -f ${mysqlDir}/mysql-${VERSION}.tar.gz ];then
          wget --no-check-certificate -O ${mysqlDir}/mysql-${VERSION}.tar.gz --tries=3 https://dev.mysql.com/get/Downloads/MySQL-9.4/mysql-${VERSION}.tar.gz
 	fi
-
-	# https://cdn.mysql.com/archives/mysql-9.4/mysql-9.4.0.tar.gz
 
 	#检测文件是否损坏.
 	md5_mysql_ok=acabc8aa764a94a8b10f90284c6e60c5
