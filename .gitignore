@@ -188,6 +188,7 @@ plugins/tidb
 plugins/goedge-admin
 plugins/goedge-node
 plugins/goedge-happy
+plugins/doh
 
 /logs
 /data
