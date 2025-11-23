@@ -147,8 +147,8 @@ def uncompress(sfile, dfile, path):
     if suffix_gz == tar_gz:
         extension = suffix_gz
 
-    if not extension in ['tar.gz', 'gz', 'zip', 'rar', '7z', 'xz']:
-        return mw.returnData(False, '现在仅支持gz,zip,rar,7z,xz格式解压!')
+    if not extension in ['tar.gz', 'gz', 'zip', 'rar', '7z', 'xz','bz2']:
+        return mw.returnData(False, '现在仅支持gz,zip,rar,7z,xz,bz2格式解压!')
 
     if extension == 'rar' and not mw.checkBinExist('rar'):
         return mw.returnData(False, 'rar解压命令不存在，请安装!')
@@ -176,6 +176,9 @@ def uncompress(sfile, dfile, path):
             mw.execShell(cmd)
         elif extension == 'xz':
             cmd += "&& tar -Jxvf " + sfile + " -C " + dfile + " > " + tmps + " 2>&1 &"
+            mw.execShell(cmd)
+        elif extension == 'bz2':
+            cmd += "&& tar -xjvf " + sfile + " -C " + dfile + " > " + tmps + " 2>&1 &"
             mw.execShell(cmd)
 
         if os.path.exists(dfile):
@@ -318,6 +321,8 @@ def zip(sfile, dfile, stype, path):
             if not mw.checkBinExist('rar'):
                 return mw.returnData(False, 'rar压缩命令不存在，请安装!')
             mw.execShell("cd '" + path + "' && rar a '" + dfile + "' '" + sfile + "' > " + tmps + " 2>&1")
+        elif stype == 'bz2':
+            mw.execShell("cd '" + path + "' && tar -cjvf '" + dfile + "' " + sfile + " > " + tmps + " 2>&1")
         else:
             return mw.returnData(False, '未知压缩格式')
         mw.writeLog("文件管理", '文件[{1}]压缩[{2}]成功!', (sfile, dfile))
@@ -343,6 +348,8 @@ def zip(sfile, dfile, stype, path):
             if not mw.checkBinExist('rar'):
                 return mw.returnData(False, 'rar压缩命令不存在，请安装!')
             mw.execShell("cd '" + path + "' && rar a '" + dfile + "' " + sfiles + " > " + tmps + " 2>&1")
+        elif stype == 'bz2':
+            mw.execShell("cd '" + path + "' && tar -cjvf '" + dfile + "' " + sfiles + " > " + tmps + " 2>&1")
         else:
             return mw.returnData(False, '未知压缩格式')
 
