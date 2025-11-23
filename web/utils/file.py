@@ -322,7 +322,7 @@ def zip(sfile, dfile, stype, path):
                 return mw.returnData(False, 'rar压缩命令不存在，请安装!')
             mw.execShell("cd '" + path + "' && rar a '" + dfile + "' '" + sfile + "' > " + tmps + " 2>&1")
         elif stype == 'bz2':
-            mw.execShell("cd '" + path + "' && tar -cjvf '" + dfile + "' " + sfiles + " > " + tmps + " 2>&1")
+            mw.execShell("cd '" + path + "' && tar -cjvf '" + dfile + "' " + sfile + " > " + tmps + " 2>&1")
         else:
             return mw.returnData(False, '未知压缩格式')
         mw.writeLog("文件管理", '文件[{1}]压缩[{2}]成功!', (sfile, dfile))
