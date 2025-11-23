@@ -177,6 +177,9 @@ def uncompress(sfile, dfile, path):
         elif extension == 'xz':
             cmd += "&& tar -Jxvf " + sfile + " -C " + dfile + " > " + tmps + " 2>&1 &"
             mw.execShell(cmd)
+        elif extension == 'bz2':
+            cmd += "&& tar -xjvf " + sfile + " -C " + dfile + " > " + tmps + " 2>&1 &"
+            mw.execShell(cmd)
 
         if os.path.exists(dfile):
             if dfile.startswith("/www/wwwroot"):
