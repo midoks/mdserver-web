@@ -1464,7 +1464,7 @@ function unZip(fileName, type) {
 function isCompressFile(fileName){
     var ext = fileName.split('.');
     var extName = ext[ext.length-1].toLowerCase();
-    var support = ['zip','gz','tgz','rar','7z','xz'];
+    var support = ['zip','gz','tgz','rar','7z','xz','bz2'];
     for (x in support) {
         if (support[x]==extName){
             return true;
