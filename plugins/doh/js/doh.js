@@ -679,81 +679,10 @@ function createScriptFile(type, user, name, file) {
     });
 }
 
-function projectScriptSelf(user, name){
-    layer.open({
-        type: 1,
-        title: '项目('+user+'/'+name+')自定义脚本',
-        area: '500px',
-        content:"<div class='bt-form pd15'>\
-                <button id='create_script' class='btn btn-success btn-sm' type='button' style='margin-right: 5px;''>添加脚本</button>\
-                <div style='float:right;'>\
-                    <span style='line-height: 23px;'>开启自定义脚本</span>\
-                    <input class='btswitch btswitch-ios' id='open_script' type='checkbox'>\
-                    <label id='script_hook_enable' class='btswitch-btn' for='open_script'  style='display: inline-flex;line-height:38px;margin-left: 4px;float: right;'></label>\
-                </div>\
-                <div id='gogs_self_table' class='divtable' style='margin-top:5px;'>\
-                    <table class='table table-hover'>\
-                        <thead><tr><th style='width:100px;'>脚本文件名</th><th>状态</th><th>操作</th></tr></thead>\
-                        <tbody></tbody>\
-                    </table>\
-                    <div class='dataTables_paginate paging_bootstrap pagination' style='margin-top:0px;'>\
-                        <ul class='page'><div class='gogs_page'></div></ul>\
-                    </div>\
-                </div>\
-            </div>",
-        success:function(){
-            projectScriptSelfRender(user, name);
-
-            $('#create_script').click(function(){
-                createScriptFile(0, user, name);
-            });
-
-            $('#script_hook_enable').click(function(){
-                var enable = $('#open_script').prop('checked');
-                var enable_option = '0';
-                if (!enable){
-                    enable_option = '1';
-                }
-                gogsPost('project_script_self_enable', {'user':user,'name':name,'enable':enable_option}, function(data){
-                    var data = $.parseJSON(data.data);
-                    showMsg(data.msg ,function(){
-                        projectScriptSelfRender(user, name);
-                    },{icon:data.status?1:2,shade: [0.3, '#000']},2000);
-                });
-
-            });
-        }
-    });  
-}
-
-function getRsaPublic(){
-    gogsPost('get_rsa_public', {}, function(data){
-        var rdata = $.parseJSON(data.data);
-        var con = '<div class="tab-con">\
-            <div class="myKeyCon ptb15">\
-                <textarea style="margin:0px;width:580px;height:110px;outline:none;" spellcheck="false">'+rdata.mw+'</textarea>\
-            </div>\
-            <ul class="help-info-text c7 pull-left"></ul>\
-        </div>'
-        layer.open({
-            type: 1,
-            area: "600px",
-            title: '本机公钥',
-            closeBtn: 2,
-            shift: 5,
-            shadeClose: false,
-            content:con
-        });   
-    });
-}
-
 function dohRead(){
 
     var readme = '<ul class="help-info-text c7">';
-    readme += '<li>默认使用MySQL,第一个启动加载各种配置,并修改成正确的数据库配置</li>';
-    readme += '<li>邮件端口使用456,gitea仅支持使用STARTTLS的SMTP协议</li>';
-    readme += '<li>项目【加载脚本】后,会自动同步到wwwroot目录下</li>';
-    readme += '<li><a href="#" onclick="getRsaPublic();">点击查看本机公钥</></li>';
+    readme += '<li>DNS</li>';
     readme += '</ul>';
 
     $('.soft-man-con').html(readme);   
