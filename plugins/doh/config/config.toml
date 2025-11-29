@@ -13,7 +13,7 @@ path = "/dns-query"
 max_concurrent_requests = 512
 
 # 日志文件
-log_file = "{$SERVER_PATH}/doh-proxy/doh-proxy.log"
+log_file = "{$SERVER_PATH}/doh/doh-proxy.log"
 
 [upstream]
 # 上游 DNS 服务器

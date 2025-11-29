@@ -14,6 +14,8 @@ fi
 
 # cd /www/server/mdserver-web/plugins/doh && bash install.sh install 0.9.15
 
+# /www/server/doh/doh-proxy --config /etc/doh-proxy/config.toml --check
+
 # 详细状态信息
 # sudo systemctl status doh -l
 # 查看完整日志

@@ -132,11 +132,6 @@ def initDreplace():
     file_tpl = getInitdConfTpl()
     service_path = mw.getServerDir()
 
-    git_dir = mw.getServerDir() + '/git'
-    if not os.path.exists(git_dir):
-        mw.execShell('mkdir -p ' + git_dir)
-        mw.execShell('chown -R www:www ' + git_dir)
-
 
     initD_path = getServerDir() + '/init.d'
     if not os.path.exists(initD_path):
