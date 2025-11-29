@@ -70,17 +70,13 @@ def getInitdConf():
     path = getServerDir() + "/init.d/doh"
     return path
 
-
-def getConf():
-    path = getServerDir() + "/custom/conf/app.ini"
-
     if not os.path.exists(path):
         return mw.returnJson(False, "请先安装初始化!<br/>默认地址:http://" + mw.getLocalIp() + ":3000")
     return path
 
 
 def getConfTpl():
-    path = getPluginDir() + "/conf/app.ini"
+    path = getPluginDir() + "/config/config.toml"
     return path
 
 
@@ -131,6 +127,12 @@ def initDreplace():
 
     file_tpl = getInitdConfTpl()
     service_path = mw.getServerDir()
+
+
+    conf_tpl = getConfTpl()
+    content = mw.readFile(conf_tpl)
+    conf_toml = getServerDir() + '/config.toml'
+    mw.writeFile(conf_toml, content)
 
 
     initD_path = getServerDir() + '/init.d'
