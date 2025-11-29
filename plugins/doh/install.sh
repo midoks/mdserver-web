@@ -52,7 +52,7 @@ Install_App()
 	fi
 
 	if [ -f $serverPath/source/doh/$file_xz ];then
-		cd $serverPath/source/doh && xz -k -d $file_xz
+		cd $serverPath/source/doh && tar -xjf $file_xz
 	fi
 	
 	if [ -f $file ];then
