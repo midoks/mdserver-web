@@ -30,7 +30,7 @@ function dohPost(method,args,callback, title){
 function dohRead(){
 
     var readme = '<ul class="help-info-text c7">';
-    readme += '<li>DNS</li>';
+    readme += '<li>DNS服务</li>';
     readme += '</ul>';
 
     $('.soft-man-con').html(readme);   
