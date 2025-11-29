@@ -88,10 +88,6 @@ Uninstall_App()
 		systemctl daemon-reload
 	fi
 
-	if [ -f $serverPath/doh/initd/doh ];then
-		$serverPath/doh/initd/doh stop
-	fi
-
 	rm -rf $serverPath/doh
 	echo 'uninstall doh success'
 }
