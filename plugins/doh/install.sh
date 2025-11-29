@@ -55,9 +55,8 @@ Install_App()
 		cd $serverPath/source/doh && tar -xjf $file_xz
 	fi
 	
-	if [ -f $file ];then
-		mkdir -p $serverPath/doh
-		mv $serverPath/source/doh/$file $serverPath/doh/doh
+	if [ -f $serverPath/source/doh/doh-proxy ];then
+		mv $serverPath/source/doh/doh-proxy/* $serverPath/doh
 	fi
 
 
