@@ -46,7 +46,7 @@ Install_App()
 
 	# https://github.com/DNSCrypt/doh-server/releases/download/0.9.15/doh-proxy_0.9.15_linux-aarch64.tar.bz2
 	file_xz="${file}.tar.bz2"
-	echo "wget -O $serverPath/source/doh/$file_xz ${URL_DOWNLOAD}/${version}/${file_xz}"
+	echo "wget -O $serverPath/source/doh/$file_xz ${URL_DOWNLOAD}/doh/${version}/${file_xz}"
 	if [ ! -f $serverPath/source/doh/$file_xz ];then
 		wget  --no-check-certificate -O $serverPath/source/doh/$file_xz ${URL_DOWNLOAD}/doh/${version}/${file_xz}
 	fi
