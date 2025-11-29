@@ -51,7 +51,10 @@ Install_App()
 		wget  --no-check-certificate -O $serverPath/source/doh/$file_xz ${URL_DOWNLOAD}/${version}/${file_xz}
 	fi
 
-	cd $serverPath/source/doh && xz -k -d $file_xz
+	if [ -f $serverPath/source/doh/$file_xz ];then
+		cd $serverPath/source/doh && xz -k -d $file_xz
+	fi
+	
 	if [ -f $file ];then
 		mkdir -p $serverPath/doh
 		mv $serverPath/source/doh/$file $serverPath/doh/doh
