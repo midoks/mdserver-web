@@ -275,18 +275,14 @@ def isSqlError(mysqlMsg):
 
 
 def appOp(method):
-    file = initDreplace()
+    initDreplace()
 
     if not mw.isAppleSystem():
         data = mw.execShell('systemctl ' + method + ' ' + getPluginName())
         if data[1] == '':
             return 'ok'
         return 'fail'
-
-    data = mw.execShell(__SR + file + ' ' + method)
-    if data[1] == '':
-        return 'ok'
-    return data[0]
+    return "fail"
 
 
 def start():
