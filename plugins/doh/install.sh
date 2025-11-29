@@ -54,9 +54,10 @@ Install_App()
 	if [ -f $serverPath/source/doh/$file_xz ];then
 		cd $serverPath/source/doh && tar -xjf $file_xz
 	fi
-	
+		
+
+	echo "mv $serverPath/source/doh/doh-proxy $serverPath/doh"
 	if [ -f $serverPath/source/doh/doh-proxy ];then
-		echo "mv $serverPath/source/doh/doh-proxy $serverPath/doh"
 		mv $serverPath/source/doh/doh-proxy $serverPath/doh
 	fi
 
