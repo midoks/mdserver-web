@@ -1,0 +1,18 @@
+{
+	"ps": "DNS over HTTPS（DoH）是一种通过HTTPS协议加密域名解析请求的技术!",
+	"name": "doh",
+	"title": "DoH",
+	"versions": ["0.9.15"],
+	"tip": "soft",
+	"install_pre_inspection":false,
+	"uninstall_pre_inspection":true,
+	"checks": "server/doh",
+	"path":"server/doh",
+	"author": "doh",
+	"date": "2025-11-23",
+	"home": "https://github.com/DNSCrypt/doh-server",
+	"type": "doh",
+	"shell": "install.sh",
+	"pid": "4",
+	"sort": 7
+}
