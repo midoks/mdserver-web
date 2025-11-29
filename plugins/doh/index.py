@@ -117,18 +117,6 @@ def initDreplace():
     conf_toml = getServerDir() + '/config.toml'
     mw.writeFile(conf_toml, content)
 
-
-    initD_path = getServerDir() + '/init.d'
-    if not os.path.exists(initD_path):
-        os.mkdir(initD_path)
-    file_bin = initD_path + '/' + getPluginName()
-
-    if not os.path.exists(file_bin):
-        content = mw.readFile(file_tpl)
-        content = contentReplace(content)
-        mw.writeFile(file_bin, content)
-        mw.execShell('chmod +x ' + file_bin)
-
     # systemd
     systemDir = mw.systemdCfgDir()
     systemService = systemDir + '/doh.service'
