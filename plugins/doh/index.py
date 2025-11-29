@@ -97,29 +97,12 @@ def getHomeDir():
         return 'www'
 
 
-def getRunUser():
-    if mw.isAppleSystem():
-        user = mw.execShell(
-            "who | sed -n '2, 1p' |awk '{print $1}'")[0].strip()
-        return user
-    else:
-        return 'www'
-
-__SR = '''#!/bin/bash
-PATH=/bin:/sbin:/usr/bin:/usr/sbin:/usr/local/bin:/usr/local/sbin:~/bin
-export PATH
-export USER=%s
-export HOME=%s && ''' % ( getRunUser(), getHomeDir())
-
 
 def contentReplace(content):
 
     service_path = mw.getServerDir()
     content = content.replace('{$ROOT_PATH}', mw.getFatherDir())
     content = content.replace('{$SERVER_PATH}', service_path)
-    content = content.replace('{$RUN_USER}', getRunUser())
-    content = content.replace('{$HOME_DIR}', getHomeDir())
-
     return content
 
 
