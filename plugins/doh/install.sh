@@ -56,7 +56,8 @@ Install_App()
 	fi
 	
 	if [ -f $serverPath/source/doh/doh-proxy ];then
-		mv $serverPath/source/doh/doh-proxy/* $serverPath/doh
+		echo "mv $serverPath/source/doh/doh-proxy $serverPath/doh"
+		mv $serverPath/source/doh/doh-proxy $serverPath/doh
 	fi
 
 
