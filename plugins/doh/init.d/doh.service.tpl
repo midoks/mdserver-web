@@ -9,6 +9,8 @@ Type=simple
 User=www
 Group=www
 WorkingDirectory={$SERVER_PATH}/doh
+# /www/server/doh/doh-proxy -u 127.0.0.1:53 -l 127.0.0.1:3000
+# /www/server/doh/doh-proxy -h
 ExecStart={$SERVER_PATH}/doh/doh-proxy -u 127.0.0.1:53 -l 127.0.0.1:3000
 Restart=always
 RemainAfterExit=yes
