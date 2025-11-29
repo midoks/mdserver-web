@@ -14,7 +14,11 @@ fi
 
 # cd /www/server/mdserver-web/plugins/doh && bash install.sh install 0.9.15
 
-# /www/server/doh/doh-proxy --config /etc/doh-proxy/config.toml --check
+# /www/server/doh/doh-proxy --config /www/server/doh/config.toml
+# /www/server/doh/doh-proxy --config /www/server/doh/config.toml --check
+
+
+# doh-proxy -H 'doh.example.com' -u 127.0.0.1:53 -l 127.0.0.1:3000
 
 # 详细状态信息
 # sudo systemctl status doh -l
