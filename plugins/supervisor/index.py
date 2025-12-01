@@ -339,7 +339,7 @@ def addJob():
     w_body += "user=" + user + "\n"
     w_body += "priority=999" + "\n"
     w_body += "numprocs={0}".format(numprocs) + "\n"
-    w_body += "process_name=%(program_name)s"
+    w_body += "process_name=%(program_name)s_%(process_num)02d"
     # _%(process_num)02d
 
     dstFile = getSubConfDir() + "/" + program + '.ini'
@@ -361,10 +361,10 @@ def startJob():
     status = args['status']
 
     action = "启动"
-    cmd = supCtl + " start " + name
+    cmd = supCtl + " start " + name + ":"
     if status == 'start':
         action = "停止"
-        cmd = supCtl + " stop " + name
+        cmd = supCtl + " stop " + name + ":"
     # print(cmd)
     data = mw.execShell(cmd)
     # print(data)
@@ -385,9 +385,9 @@ def restartJob():
     name = args['name']
     status = args['status']
 
-    cmd = supCtl + " stop " + name
+    cmd = supCtl + " stop " + name + ":"
     data = mw.execShell(cmd)
-    cmd = supCtl + " start " + name
+    cmd = supCtl + " start " + name + ":"
     data = mw.execShell(cmd)
 
     if data[1] != '':
@@ -405,7 +405,7 @@ def delJob():
     supCtl = 'supervisorctl'
     log_dir = getServerDir() + '/log/'
 
-    result = mw.execShell("{0} stop ".format(supCtl) + name)
+    result = mw.execShell("{0} stop ".format(supCtl) + name + ":")
     program = getServerDir() + "/conf.d/" + name + ".ini"
 
     # 删除日志文件
@@ -467,7 +467,7 @@ def updateJob():
     w_body += "user=" + user + "\n"
     w_body += "priority=" + priority + "\n"
     w_body += "numprocs={0}".format(numprocs) + "\n"
-    w_body += "process_name=%(program_name)s%"
+    w_body += "process_name=%(program_name)s_%(process_num)02d"
 
     mw.writeFile(programFile, w_body)
 
