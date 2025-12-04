@@ -1,3 +1,5 @@
+-- Copyright (C) midoks
+
 local _M = {
     _VERSION = '1.0'
 }
