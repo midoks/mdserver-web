@@ -239,9 +239,9 @@ function _M.obf_html()
                 return
             end
 
-            local t0 = ngx.now()
+            -- local t0 = ngx.now()
             local content,key,iv,tag = _M.obf_encode(content)
-            local t1 = ngx.now()
+            -- local t1 = ngx.now()
 
             local content_data = _M.to_uint8array(content or "")
             local iv_data = _M.to_uint8array(iv or "")
