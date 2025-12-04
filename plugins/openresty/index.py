@@ -207,7 +207,7 @@ def confReplace():
             mw.writeFile(a_conf, mw.readFile(a_conf_tpl))
 
     # copy resty lib
-    src_resty_dir = getPluginDir()+'/resty'
+    src_resty_dir = getPluginDir()+'/resty/*'
     dst_resty_dir = getServerDir()+'/lualib/resty'
     mw.execShell('cp -rf ' + src_resty_dir + ' ' + dst_resty_dir)
 
