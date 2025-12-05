@@ -46,8 +46,6 @@ function _M.obf_encode(content)
     else
         local key_bin = ffi_str(a._key, 32)
         iv_bin = ffi_str(a._iv, 12)
-        local sh1 = sha256:new(); sh1:update(key_bin); local key_fpr = resty_str.to_hex(sh1:final())
-        local sh2 = sha256:new(); sh2:update(iv_bin);  local iv_fpr  = resty_str.to_hex(sh2:final())
         local res, eerr = a:encrypt(content)
         if not res then
             log(ngx.ERR, log_fmt("aes encrypt error: %s", tostring(eerr)))
@@ -120,12 +118,35 @@ function _M.obf_html()
 
         if find(content_type, "text/html") then
 
-            local cache_key = _M.get_cache_key()..html_debug
+            local var_rand = ngx.var.obf_rand
+            local var_b64 = ngx.var.obf_uint8_b64
+            local var_skip_large = ngx.var.obf_skip_large or ""
+            local var_skip_small = ngx.var.obf_skip_small or ""
+            local cache_key = _M.get_cache_key()..html_debug..tostring(var_rand)..tostring(var_b64)..tostring(var_skip_large)..tostring(var_skip_small)
             local cached = obf_cache and obf_cache:get(cache_key)
             if cached then
                 ngx.arg[1] = cached
                 ctx.obf_buffer = nil
                 return
+            end
+
+            local var_skip = ngx.var.obf_skip_large
+            if var_skip then
+                local n = tonumber(var_skip) or 0
+                if n > 0 and #content > n then
+                    ngx.arg[1] = content
+                    ctx.obf_buffer = nil
+                    return
+                end
+            end
+            local var_skip_s = ngx.var.obf_skip_small
+            if var_skip_s then
+                local ns = tonumber(var_skip_s) or 0
+                if ns > 0 and #content < ns then
+                    ngx.arg[1] = content
+                    ctx.obf_buffer = nil
+                    return
+                end
             end
 
             local content,key,iv,tag = _M.obf_encode(content)
