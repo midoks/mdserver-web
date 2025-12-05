@@ -5,6 +5,7 @@ local mt = { __index = _M }
 local setmetatable = setmetatable
 
 local forgejs = require "resty.obf.forgejs"
+local util = require "resty.obf.util"
 local FJ = forgejs.content()
 
 function _M.new(self)
@@ -66,13 +67,17 @@ window.onload = function(){
     }
 }
 </script>
-]]
+]]  
+    -- 先随机变量名
+    cc = util.obf_rand(cc)
+
     cc = cc:gsub("{{FORGEJS}}", function() return FJ end)
     cc = cc:gsub("{{SOURCE_DATA}}", function() return data end)
     cc = cc:gsub("{{IV_DATA}}", function() return iv end)
     cc = cc:gsub("{{TAG_DATA}}", function() return tag end)
     cc = cc:gsub("{{KEY_DATA}}", function() return key end)
     cc = cc:gsub("{{DEBUG_DATA}}", function() return debug_data end)
+
     return cc
 end
 

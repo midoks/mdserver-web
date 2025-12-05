@@ -14,7 +14,8 @@ local sha256 = require "resty.sha256"
 local resty_str = require "resty.string"
 local random = require "resty.random"
 local lrucache = require "resty.lrucache"
-local obf_cache = lrucache.new(1024)
+local util = require "resty.obf.util"
+local obf_cache = lrucache.new(4096)
 
 local find = string.find
 local byte = string.byte
@@ -26,123 +27,6 @@ function _M.new(self)
     }
     return setmetatable(self, mt)
 end
-
-
-function _M.to_uint8array(content)
-    if not content then
-        content = ""
-    end
-    local arr = {}
-    for i = 1, #content do
-        arr[#arr + 1] = tostring(byte(content, i))
-    end
-    return "new Uint8Array([" .. table.concat(arr, ",") .. "])"
-end
-
-function _M.to_b64(content)
-    if not content then
-        content = ""
-    end
-    return ngx.encode_base64(content)
-end
-
--- 数据过滤
-function _M.data_filter(content)
-    content = content:gsub("<script(.-)>(.-)</script>", function(attrs, body)
-        local b = body
-        b = b:gsub("^%s*//[^\n\r]*", "")
-        b = b:gsub("\n%s*//[^\n\r]*", "\n")
-        b = b:gsub("([^:])%s+//[^\n\r]*", "%1")
-        b = b:gsub("%s+", " ")
-        b = b:gsub("%s*([%(%),;:%{%}%[%]%+%-%*%=<>])%s*", "%1")
-        return "<script" .. attrs .. ">" .. b .. "</script>"
-    end)
-
-    content = content:gsub("[\r\n]+", ""):gsub(">%s+<", "><")
-    return content
-end
-
--- 随机变量名
-function _M.obf_rand(content)
-    local function rand_ident(len)
-        local head = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz_"
-        local tail = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789_$"
-        local seed = random.bytes(16, true) .. (ngx.var.request_id or "") .. tostring(ngx.time()) .. tostring(ngx.now())
-        local h = sha256:new(); h:update(seed); local digest = resty_str.to_hex(h:final())
-        local r = {}
-        local hi = (string.byte(digest, 1) or 65) % #head + 1
-        r[1] = string.sub(head, hi, hi)
-        local pos, di = 2, 2
-        while pos <= len do
-            local c = string.byte(digest, di) or 97
-            local ti = c % #tail + 1
-            r[pos] = string.sub(tail, ti, ti)
-            pos = pos + 1
-            di = di + 1
-            if di > #digest then
-                h = sha256:new(); h:update(digest .. random.bytes(8, true)); digest = resty_str.to_hex(h:final()); di = 1
-            end
-        end
-        return table.concat(r)
-    end
-    local ids = {"encrypted","iv_data","key","tag_data","d","u8ToBytes","evpBytesToKey","startTime","dk","decipher","ok","newDoc","endTime"}
-    local map = {}
-    for _, id in ipairs(ids) do
-        map[id] = rand_ident(8)
-    end
-    for k, v in pairs(map) do
-        local pat = "%f[%w_]" .. k .. "%f[^%w_]"
-        content = content:gsub(pat, v)
-    end
-    return content
-end
-
--- 添加混淆代码
-function _M.obf_add_data(content)
-    content = content:gsub("<script(.-)>(.-)</script>", function(attrs, body)
-        local b = body
-        local function rand_ident(len)
-            local head = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz_"
-            local tail = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789_$"
-            local seed = random.bytes(16, true) .. (ngx.var.request_id or "") .. tostring(ngx.time()) .. tostring(ngx.now())
-            local h = sha256:new(); h:update(seed); local digest = resty_str.to_hex(h:final())
-            local r = {}
-            local hi = (string.byte(digest, 1) or 65) % #head + 1
-            r[1] = string.sub(head, hi, hi)
-            local pos, di = 2, 2
-            while pos <= len do
-                local c = string.byte(digest, di) or 97
-                local ti = c % #tail + 1
-                r[pos] = string.sub(tail, ti, ti)
-                pos = pos + 1
-                di = di + 1
-                if di > #digest then
-                    h = sha256:new(); h:update(digest .. random.bytes(8, true)); digest = resty_str.to_hex(h:final()); di = 1
-                end
-            end
-            return table.concat(r)
-        end
-        local v1 = rand_ident(8)
-        local v2 = rand_ident(8)
-        local v3 = rand_ident(8)
-        local f1 = rand_ident(8)
-        local f2 = rand_ident(8)
-        local tmp = rand_ident(8)
-        local filler = "var "..v1.."=\""..ngx.encode_base64(random.bytes(8, true)).."\";"
-            .."var "..v2.."=".._M.to_uint8array(random.bytes(8, true))..";"
-            .."var "..v3.."="..tostring(#ngx.encode_base64(random.bytes(6, true)))..";"
-            .."function "..f1.."(x){return x}"
-            .."function "..f2.."(){return "..v3.."}"
-            .."(function(){var "..tmp.."="..v3.."; for(var i=0;i<1;i++){"..tmp.."="..tmp.."+i}})();"
-        b = filler..";"..b
-        b = b:gsub("%s+", " ")
-        b = b:gsub("%s*([%(%),;:%{%}%[%]%+%-%*%=<>])%s*", "%1")
-        return "<script" .. attrs .. ">" .. b .. "</script>"
-    end)
-    content = content:gsub("[\r\n]+", ""):gsub(">%s+<", "><")
-    return content
-end
-
 
 -- 编码
 function _M.obf_encode(content)
@@ -203,7 +87,7 @@ function _M.obf_html()
     local ctx = ngx.ctx
     local chunk, eof = ngx.arg[1], ngx.arg[2]
     local html_debug = "false"
-    local cache_timeout = 300
+    local cache_timeout = 600
 
     local args = ngx.req.get_uri_args()
     obf = args and args.obf or nil
@@ -217,12 +101,10 @@ function _M.obf_html()
     end
 
     local var_obf_timeout = ngx.var.obf_timeout
-
     if var_obf_timeout then
         cache_timeout = var_obf_timeout
     end
     -- log(ngx.ERR, log_fmt("var_obf_timeout: %s", tostring(var_obf_timeout)))
-
 
     if not ctx.obf_buffer then
         ctx.obf_buffer = {}
@@ -246,19 +128,19 @@ function _M.obf_html()
                 return
             end
 
-            local t0 = ngx.now()
             local content,key,iv,tag = _M.obf_encode(content)
-            local t1 = ngx.now()
 
-            local content_data = _M.to_uint8array(content or "")
-            local iv_data = _M.to_uint8array(iv or "")
-            local tag_data = _M.to_uint8array(tag or "")
-            local key_data = _M.to_uint8array(key or "")
+            local content_data = util.to_uint8array(content or "")
+            local iv_data = util.to_uint8array(iv or "")
+            local tag_data = util.to_uint8array(tag or "")
+            local key_data = util.to_uint8array(key or "")
 
             local html_data = tpl.content(content_data, iv_data, tag_data, key_data,html_debug)
+            local var_rand = ngx.var.obf_rand
+            if var_rand ~= "false" then
+                html_data = util.obf_add_data(html_data)
+            end
 
-            html_data = _M.obf_rand(html_data)
-            html_data = _M.obf_add_data(html_data)
             if obf_cache then
                 obf_cache:set(cache_key, html_data, cache_timeout)
             end
