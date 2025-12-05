@@ -136,10 +136,7 @@ function _M.obf_html()
             local key_data = util.to_uint8array(key or "")
 
             local html_data = tpl.content(content_data, iv_data, tag_data, key_data,html_debug)
-            local var_rand = ngx.var.obf_rand
-            if var_rand ~= "false" then
-                html_data = util.obf_add_data(html_data)
-            end
+            html_data = util.obf_add_data(html_data)
 
             if obf_cache then
                 obf_cache:set(cache_key, html_data, cache_timeout)
