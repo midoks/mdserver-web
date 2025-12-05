@@ -15,6 +15,11 @@ function _M.to_uint8array(content)
     if len == 0 then
         return "new Uint8Array([])"
     end
+    local mode = ngx.var.obf_uint8_b64
+    if mode == "true" or (not mode and len >= 4096) then
+        local b64 = ngx.encode_base64(content)
+        return "(function(){var s='"..b64.."';var b=atob(s);var a=new Uint8Array(b.length);for(var i=0;i<b.length;i++){a[i]=b.charCodeAt(i)};return a;})()"
+    end
     local arr = {}
     for i = 1, len do
         arr[i] = byte(content, i)
