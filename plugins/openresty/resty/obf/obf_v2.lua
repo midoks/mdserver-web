@@ -39,13 +39,6 @@ function _M.to_uint8array(content)
     return "new Uint8Array([" .. table.concat(arr, ",") .. "])"
 end
 
-function _M.to_b64(content)
-    if not content then
-        content = ""
-    end
-    return ngx.encode_base64(content)
-end
-
 -- 数据过滤
 function _M.data_filter(content)
     content = content:gsub("<script(.-)>(.-)</script>", function(attrs, body)
@@ -246,9 +239,9 @@ function _M.obf_html()
                 return
             end
 
-            local t0 = ngx.now()
+            -- local t0 = ngx.now()
             local content,key,iv,tag = _M.obf_encode(content)
-            local t1 = ngx.now()
+            -- local t1 = ngx.now()
 
             local content_data = _M.to_uint8array(content or "")
             local iv_data = _M.to_uint8array(iv or "")
@@ -278,7 +271,7 @@ function _M.done()
 end   
 -- 响应处理函数
 function _M.process_response()
-    local content_type = ngx.header.content_type or ""
+
     local var_close = ngx.var.close_close
     -- log(ngx.ERR, log_fmt("var_close: %s", tostring(var_close)))
     if var_close == "true" then
