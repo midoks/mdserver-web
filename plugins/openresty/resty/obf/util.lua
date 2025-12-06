@@ -71,7 +71,7 @@ function _M.data_filter(content)
     --     b = b:gsub("%s+", " ")
     --     return "<script" .. attrs .. ">" .. b .. "</script>"
     -- end)
-    return content:gsub("[\r\n]+", ""):gsub(">%s+<", "><")
+    return content:gsub(">[%s\r\n]+<", "><")
 end
 
 
