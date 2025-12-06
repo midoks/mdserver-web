@@ -25,34 +25,7 @@ function _M.content(data, iv, tag, key, debug_data)
     local fj_open = "<script type=\"text/javascript\">"
     local fj_close = "</script>\n"
 
-    local use_raw = ngx.var.obf_kdf_raw == "true"
-    local data_script
-    if use_raw then
-        data_script = "<script>\nvar encrypted={{__HOLD_1__}}; var iv_data="..iv.."; var tag_data="..tag.."; var key="..key..";var d="..debug_data..";function u8ToBytes(u8){var s=\"\";for(var i=0;i<u8.length;i++){s+=String.fromCharCode(u8[i]);}return s;}\n"..
-        "window.onload = function(){\n"..
-        "    var startTime = Date.now();\n\n"..
-        "    var decipher = forge.cipher.createDecipher(\"AES-GCM\", u8ToBytes(key));\n"..
-        "    decipher.start({iv: u8ToBytes(iv_data), tag: forge.util.createBuffer(u8ToBytes(tag_data))});\n"..
-        "    decipher.update(forge.util.createBuffer(u8ToBytes(encrypted)));\n"..
-        "    var ok = decipher.finish();\n\n"..
-        "    if (ok) {\n"..
-        "        var newDoc = new DOMParser().parseFromString(decipher.output, \"text/html\");\n\n"..
-        "        if (d){\n"..
-        "            console.log(newDoc);\n"..
-        "            console.log(decipher.output);\n"..
-        "        }\n"..
-        "        document.head.innerHTML = newDoc.head.innerHTML;\n"..
-        "        document.open();\n"..
-        "        document.write(decipher.output);\n"..
-        "        document.close();\n"..
-        "    }\n"..
-        "    var endTime = Date.now();\n"..
-        "    if (d){\n"..
-        "        console.log(\"dec cos(ms):\",endTime - startTime);\n"..
-        "    }\n"..
-        "}\n</script>\n"
-    else
-        data_script = "<script>\nvar encrypted={{__HOLD_1__}}; var iv_data="..iv.."; var tag_data="..tag.."; var key="..key..";var d="..debug_data..";function u8ToBytes(u8){var s=\"\";for(var i=0;i<u8.length;i++){s+=String.fromCharCode(u8[i]);}return s;}\n"..
+    local data_script = "<script>\nvar encrypted={{__HOLD_1__}}; var iv_data="..iv.."; var tag_data="..tag.."; var key="..key..";var d="..debug_data..";function u8ToBytes(u8){var s=\"\";for(var i=0;i<u8.length;i++){s+=String.fromCharCode(u8[i]);}return s;}\n"..
         "function evpBytesToKey(pass, keyLen, ivLen){\n"..
         "    var m=[]; var i=0; var md=forge.md.md5.create();\n"..
         "    function concatLen(arr){var n=0; for(var j=0;j<arr.length;j++){n+=arr[j].length;} return n;}\n"..
@@ -87,7 +60,6 @@ function _M.content(data, iv, tag, key, debug_data)
         "        console.log(\"dec cos(ms):\",endTime - startTime);\n"..
         "    }\n"..
         "}\n</script>\n"
-    end
 
 
     if not (ngx.var.obf_rand_var == "false") then

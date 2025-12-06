@@ -33,25 +33,15 @@ function _M.obf_encode(content)
     local cl = ngx.header["Content-Length"] or ""
     local upstream_cl = ngx.var.upstream_http_content_length or ""
 
+    local key = random.bytes(8, true)
+    -- log(ngx.ERR, log_fmt("enc=aes-256-gcm, pass_b64=%s", ngx.encode_base64(password)))
     local cipher = aes.cipher(256, "gcm")
-    local kdf_raw = ngx.var.obf_kdf_raw == "true"
-    local key
-    local a, aerr
-    if kdf_raw then
-        key = random.bytes(32, true)
-        iv_bin = random.bytes(12, true)
-        a, aerr = aes:new(key, nil, cipher, { iv = iv_bin }, nil, 12, true)
-    else
-        key = random.bytes(8, true)
-        a, aerr = aes:new(key, nil, cipher, aes.hash.md5, 1, 12, true)
-    end
+    local a, aerr = aes:new(key, nil, cipher, aes.hash.md5, 1, 12, true)
 
     if not a then
         log(ngx.ERR, log_fmt("aes init error: %s", tostring(aerr)))
     else
-        if not kdf_raw then
-            iv_bin = ffi_str(a._iv, 12)
-        end
+        iv_bin = ffi_str(a._iv, 12)
         local res, eerr = a:encrypt(content)
         if not res then
             log(ngx.ERR, log_fmt("aes encrypt error: %s", tostring(eerr)))
