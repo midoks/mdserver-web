@@ -19,7 +19,8 @@ function _M.content(data, iv, tag, key, debug_data)
     local fj_open = "<script type=\"text/javascript\">"
     local fj_close = "</script>\n"
 
-    local data_script = "var encrypted={{__HOLD_1__}}; var iv_data="..iv.."; var tag_data="..tag.."; var key="..key..";var d="..debug_data..";function u8ToBytes(u8){var s=\"\";for(var i=0;i<u8.length;i++){s+=String.fromCharCode(u8[i]);}return s;}\n"..
+    local decode_script = "var encrypted="..data.."; var iv_data="..iv.."; var tag_data="..tag.."; var key="..key..";var d="..debug_data..";\n"..
+        "function u8ToBytes(u8){var s=\"\";for(var i=0;i<u8.length;i++){s+=String.fromCharCode(u8[i]);}return s;}\n"..
         "function evpBytesToKey(pass, keyLen, ivLen){\n"..
         "    var m=[]; var i=0; var md=forge.md.md5.create();\n"..
         "    function concatLen(arr){var n=0; for(var j=0;j<arr.length;j++){n+=arr[j].length;} return n;}\n"..
@@ -55,12 +56,9 @@ function _M.content(data, iv, tag, key, debug_data)
         "    }\n"..
         "}\n"
 
-
     if not (ngx.var.obf_rand == "false") then
-        data_script = util.obf_rand(data_script)
+        decode_script = util.obf_rand(decode_script)
     end
-
-    data_script = data_script:gsub("{{__HOLD_1__}}", data)
 
     return table.concat({
         head_html,
@@ -68,7 +66,7 @@ function _M.content(data, iv, tag, key, debug_data)
         FJ,
         fj_close,
         "<script>\n",
-        data_script,
+        decode_script,
         "</script>\n",
     })
 end
