@@ -20,7 +20,8 @@ function _M.new(self)
 end
 
 function _M.content(data, iv, tag, key, debug_data)
-    local head_html = "<!DOCTYPE html>\n<html>\n    <head>\n        <meta charset=\"utf-8\">\n        <meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\">\n    </head>\n    <body></body>\n</html>\n"
+    local head_html = "<!DOCTYPE html>\n<html>\n    <head>\n        <meta charset=\"utf-8\">\n        <meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\">\n        <link rel=\"icon\" href=\"data:,\">\n    </head>\n    <body></body>\n</html>\n"
+    
     local fj_open = "<script type=\"text/javascript\">"
     local fj_close = "</script>\n"
 
