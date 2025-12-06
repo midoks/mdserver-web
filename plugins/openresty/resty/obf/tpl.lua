@@ -4,9 +4,9 @@ local _M = { _VERSION = '1.0' }
 local mt = { __index = _M }
 local setmetatable = setmetatable
 
-local forgejs = require "resty.obf.forgejs"
 local util = require "resty.obf.util"
-local FJ = forgejs.content()
+
+local forgejs = require "resty.obf.forgejs"
 
 local obf_log = require "resty.obf.log"
 local log_fmt = obf_log.fmt
@@ -21,7 +21,7 @@ end
 
 function _M.content(data, iv, tag, key, debug_data)
     local head_html = "<!DOCTYPE html>\n<html>\n    <head>\n        <meta charset=\"utf-8\">\n        <meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\">\n        <link rel=\"icon\" href=\"data:,\">\n    </head>\n    <body></body>\n</html>\n"
-    
+
     local fj_open = "<script type=\"text/javascript\">"
     local fj_close = "</script>\n"
 
@@ -83,11 +83,27 @@ function _M.content(data, iv, tag, key, debug_data)
 
     data_script = data_script:gsub("{{__HOLD_1__}}", data)
 
+    local forge_part = ""
+    local mode = ngx.var.obf_js_mode or "link"
+    local url = ngx.var.obf_js_url or ""
+
+    if mode == "link" then
+        if url ~= '' then
+            forge_part = "<script src=\""..url.."\"></script>\n"
+        else
+            forge_part = "<script src=\"https://cdn.jsdelivr.net/npm/node-forge@1.3.1/dist/forge.min.js\"></script>\n"
+        end
+    elseif mode == "inline" then
+        if url ~= '' then
+            forge_part = "<script src=\""..url.."\"></script>\n"
+        else
+            forge_part = fj_open .. forgejs.content() .. fj_close
+        end
+    end
+
     return table.concat({
         head_html,
-        fj_open,
-        FJ,
-        fj_close,
+        forge_part,
         data_script,
     })
 end
