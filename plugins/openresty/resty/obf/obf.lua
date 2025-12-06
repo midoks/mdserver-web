@@ -114,7 +114,6 @@ function _M.obf_html()
             ngx.arg[1] = chunk
         else
             ctx.obf_buffer[#ctx.obf_buffer + 1] = chunk
-            
             ngx.arg[1] = nil
         end
     end
@@ -175,11 +174,12 @@ function _M.obf_html()
                 if max_item <= 0 or #html_data <= max_item then
                     if max_bytes > 0 then
                         local free = obf_cache:free_space()
-                        if free and free < #html_data then
-                            obf_cache:flush_all()
+                        if not free or free >= #html_data then
+                            obf_cache:set(cache_key, html_data, exptime)
                         end
+                    else
+                        obf_cache:set(cache_key, html_data, exptime)
                     end
-                    obf_cache:set(cache_key, html_data, exptime)
                 end
             end
             
