@@ -15,7 +15,7 @@ local resty_str = require "resty.string"
 local random = require "resty.random"
 local lrucache = require "resty.lrucache"
 local util = require "resty.obf.util"
-local obf_cache = lrucache.new(4096)
+local obf_cache = nil
 
 local find = string.find
 local byte = string.byte
@@ -106,18 +106,44 @@ function _M.obf_html()
 
     if not ctx.obf_buffer then
         ctx.obf_buffer = {}
+        ctx.obf_size = 0
+        ctx.obf_passthrough = false
     end
 
     if chunk and chunk ~= "" then
-        ctx.obf_buffer[#ctx.obf_buffer + 1] = chunk
-        ngx.arg[1] = nil
+        if ctx.obf_passthrough then
+            ngx.arg[1] = chunk
+        else
+            ctx.obf_buffer[#ctx.obf_buffer + 1] = chunk
+            ctx.obf_size = ctx.obf_size + #chunk
+            local sl = ngx.var.obf_skip_large
+            if sl then
+                local n = tonumber(sl) or 0
+                if n > 0 and ctx.obf_size > n then
+                    ctx.obf_passthrough = true
+                    ngx.arg[1] = table.concat(ctx.obf_buffer)
+                    ctx.obf_buffer = nil
+                    return
+                end
+            end
+            ngx.arg[1] = nil
+        end
     end
 
     if eof then
+        if ctx.obf_passthrough then
+            return
+        end
+        local prof = ngx.var.obf_prof
+        local t_all0 = ngx.now()
         local content = table.concat(ctx.obf_buffer)
 
-        if find(content_type, "text/html") then
+        if find(content_type, "text/html", 1, true) then
 
+            if not obf_cache then
+                local entries = tonumber(ngx.var.obf_cache_entries) or 1024
+                obf_cache = lrucache.new(entries)
+            end
             local var_rand = ngx.var.obf_rand
             local var_b64 = ngx.var.obf_uint8_b64
             local var_skip_large = ngx.var.obf_skip_large or ""
@@ -125,6 +151,9 @@ function _M.obf_html()
             local cache_key = _M.get_cache_key()..html_debug..tostring(var_rand)..tostring(var_b64)..tostring(var_skip_large)..tostring(var_skip_small)
             local cached = obf_cache and obf_cache:get(cache_key)
             if cached then
+                if prof == "true" then
+                    log(ngx.ERR, log_fmt("obf_prof cache_hit=1 size=%d total_ms=%.2f", #cached, (ngx.now()-t_all0)*1000))
+                end
                 ngx.arg[1] = cached
                 ctx.obf_buffer = nil
                 return
@@ -134,38 +163,53 @@ function _M.obf_html()
             if var_skip then
                 local n = tonumber(var_skip) or 0
                 if n > 0 and #content > n then
-                    ngx.arg[1] = content
-                    ctx.obf_buffer = nil
-                    return
-                end
-            end
-            local var_skip_s = ngx.var.obf_skip_small
-            if var_skip_s then
-                local ns = tonumber(var_skip_s) or 0
-                if ns > 0 and #content < ns then
+                    if prof == "true" then
+                        log(ngx.ERR, log_fmt("obf_prof skip_large=1 size=%d total_ms=%.2f", #content, (ngx.now()-t_all0)*1000))
+                    end
                     ngx.arg[1] = content
                     ctx.obf_buffer = nil
                     return
                 end
             end
 
+            local t_enc0 = ngx.now()
             local content,key,iv,tag = _M.obf_encode(content)
+            local t_enc1 = ngx.now()
 
+            local t_ser0 = ngx.now()
             local content_data = util.to_uint8array(content or "")
             local iv_data = util.to_uint8array(iv or "")
             local tag_data = util.to_uint8array(tag or "")
             local key_data = util.to_uint8array(key or "")
+            local t_ser1 = ngx.now()
 
+            local t_tpl0 = ngx.now()
             local html_data = tpl.content(content_data, iv_data, tag_data, key_data,html_debug)
-            html_data = util.obf_add_data(html_data)
+            local t_tpl1 = ngx.now()
+            if not (ngx.var.obf_rand == "false") then
+                local t_add0 = ngx.now()
+                html_data = util.obf_add_data(html_data)
+                local t_add1 = ngx.now()
+                if prof == "true" then
+                    log(ngx.ERR, log_fmt("obf_prof add_ms=%.2f", (t_add1-t_add0)*1000))
+                end
+            end
 
+            local max_item = tonumber(ngx.var.obf_cache_item_max) or 0
             if obf_cache then
-                obf_cache:set(cache_key, html_data, cache_timeout)
+                if max_item <= 0 or #html_data <= max_item then
+                    obf_cache:set(cache_key, html_data, cache_timeout)
+                end
+            end
+            if prof == "true" then
+                log(ngx.ERR, log_fmt("obf_prof size=%d enc_ms=%.2f ser_ms=%.2f tpl_ms=%.2f total_ms=%.2f", #content, (t_enc1-t_enc0)*1000, (t_ser1-t_ser0)*1000, (t_tpl1-t_tpl0)*1000, (ngx.now()-t_all0)*1000))
             end
             ngx.arg[1] = html_data
         end
         
         ctx.obf_buffer = nil
+        ctx.obf_size = nil
+        ctx.obf_passthrough = nil
     end
 end
 
