@@ -151,44 +151,7 @@ function _M.obf_html()
                     log(ngx.ERR, log_fmt("obf_prof cache_miss=1"))
                 end
             end
-            local urt = tonumber(ngx.var.upstream_response_time or "0") or 0
-            local thr_ms = tonumber(ngx.var.obf_upstream_skip_ms or "0") or 0
-
-            if prof == "true" then
-                log(ngx.ERR, log_fmt("obf_prof upstream_response_time=%0.2f", urt*1000))
-            end
-
-            if thr_ms > 0 and (urt * 1000) > thr_ms then
-                if prof == "true" then
-                    log(ngx.ERR, log_fmt("obf_prof skip_upstream=1 urt_ms=%.2f size=%d wait_ms=%.2f", urt*1000, #content, ctx.obf_first_t and util.dt_ms(ctx.obf_first_t) or 0))
-                end
-                do
-                    local content_copy = content
-                    local cache_key_copy = cache_key
-                    local html_debug_copy = tostring(html_debug)
-                    local exptime = tonumber(cache_timeout) or 600
-                    ngx.timer.at(0, function(premature)
-                        if premature then return end
-                        local ok, err = pcall(function()
-                            local enc_c, key_c, iv_c, tag_c = _M.obf_encode(content_copy)
-                            local c_data = util.to_uint8array(enc_c or "")
-                            local iv_data2 = util.to_uint8array(iv_c or "")
-                            local tag_data2 = util.to_uint8array(tag_c or "")
-                            local key_data2 = util.to_uint8array(key_c or "")
-                            local html2 = tpl.content(c_data, iv_data2, tag_data2, key_data2, html_debug_copy)
-                            if obf_cache then
-                                obf_cache:set(cache_key_copy, html2, exptime)
-                            end
-                        end)
-                        if not ok then
-                            log(ngx.ERR, log_fmt("obf_prof precompute_error=%s", tostring(err)))
-                        end
-                    end)
-                end
-                ngx.arg[1] = content
-                ctx.obf_buffer = nil
-                return
-            end
+            
 
 
             local t_enc0 = util.tmark()
@@ -233,8 +196,6 @@ end
 
 
 function _M.done()
-
-
     local content_type = ngx.header.content_type or ""
     if find(content_type, "text/html") then
         local prof = ngx.var.obf_prof
@@ -253,7 +214,6 @@ end
 function _M.process_response()
     local content_type = ngx.header.content_type or ""
     local var_close = ngx.var.close_close
-    -- log(ngx.ERR, log_fmt("var_close: %s", tostring(var_close)))
     if var_close == "true" then
         _M.done()
         return
