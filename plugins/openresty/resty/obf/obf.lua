@@ -10,15 +10,12 @@ local log_fmt = obf_log.fmt
 local aes = require "resty.aes"
 local ffi = require "ffi"
 local ffi_str = ffi.string
-local sha256 = require "resty.sha256"
-local resty_str = require "resty.string"
 local random = require "resty.random"
 local util = require "resty.obf.util"
 local obf_cache = ngx.shared.obf_cache
 local obf_cache_bytes = 0
 
 local find = string.find
-local byte = string.byte
 local log = ngx.log
 
 
@@ -44,7 +41,6 @@ function _M.obf_encode(content)
     if not a then
         log(ngx.ERR, log_fmt("aes init error: %s", tostring(aerr)))
     else
-        local key_bin = ffi_str(a._key, 32)
         iv_bin = ffi_str(a._iv, 12)
         local res, eerr = a:encrypt(content)
         if not res then
@@ -136,8 +132,11 @@ function _M.obf_html()
         if find(content_type, "text/html", 1, true) then
 
             local var_rand_var = ngx.var.obf_rand_var
+            local var_rand_extra = ngx.var.obf_rand_extra
             local var_b64 = ngx.var.obf_uint8_b64
-            local cache_key = _M.get_cache_key()..tostring(html_debug)..tostring(var_rand_var)..tostring(var_b64)
+            local js_mode = ngx.var.obf_js_mode
+            local js_url = ngx.var.obf_js_url
+            local cache_key = _M.get_cache_key()..tostring(html_debug)..tostring(var_rand_var)..tostring(var_rand_extra)..tostring(var_b64)..tostring(js_mode)..tostring(js_url)
             local cached = obf_cache and obf_cache:get(cache_key)
             if cached then
                 if prof == "true" then
@@ -174,12 +173,13 @@ function _M.obf_html()
             local exptime = tonumber(cache_timeout) or 600
             if obf_cache then
                 if max_item <= 0 or #html_data <= max_item then
-                    if max_bytes > 0 and (obf_cache_bytes + #html_data) > max_bytes then
-                        obf_cache:flush_all()
-                        obf_cache_bytes = 0
+                    if max_bytes > 0 then
+                        local free = obf_cache:free_space()
+                        if free and free < #html_data then
+                            obf_cache:flush_all()
+                        end
                     end
                     obf_cache:set(cache_key, html_data, exptime)
-                    obf_cache_bytes = obf_cache_bytes + #html_data
                 end
             end
             
