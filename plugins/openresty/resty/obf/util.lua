@@ -90,7 +90,7 @@ end
 
 
 -- 添加混淆代码
-function _M.obf_add_data(content)
+function _M.obf_rand_data(content)
     content = content:gsub("<script(.-)>(.-)</script>", function(attrs, body)
         local b = body
         local function rand_ident(len)
@@ -131,7 +131,6 @@ function _M.obf_add_data(content)
         b = b:gsub("%s*([%(%),;:%{%}%[%]%+%-%*%=<>])%s*", "%1")
         return "<script" .. attrs .. ">" .. b .. "</script>"
     end)
-    content = content:gsub("[\r\n]+", ""):gsub(">%s+<", "><")
     return content
 end
 
