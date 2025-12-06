@@ -2932,7 +2932,7 @@ function rewrite(siteName){
 			
 			var editor = CodeMirror.fromTextArea(document.getElementById("rewriteBody"), {
 	            extraKeys: {
-	            	"Ctrl-Space": "autocomplete"
+	            	"Ctrl-Space": "autocomplete",
 	            	"Ctrl-F": "findPersistent",
 					"Ctrl-H": "replaceAll",
 					"Ctrl-S": function() {
