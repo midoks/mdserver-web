@@ -56,7 +56,7 @@ function _M.content(data, iv, tag, key, debug_data)
         "}\n"
 
 
-    if not (ngx.var.obf_rand == "false") then
+    if not (ngx.var.obf_rand_var == "false") then
         data_script = util.obf_rand(data_script)
     end
 
