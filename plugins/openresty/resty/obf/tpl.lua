@@ -8,6 +8,11 @@ local forgejs = require "resty.obf.forgejs"
 local util = require "resty.obf.util"
 local FJ = forgejs.content()
 
+local obf_log = require "resty.obf.log"
+local log_fmt = obf_log.fmt
+local log = ngx.log
+
+
 function _M.new(self)
     local self = {
     }
@@ -19,7 +24,7 @@ function _M.content(data, iv, tag, key, debug_data)
     local fj_open = "<script type=\"text/javascript\">"
     local fj_close = "</script>\n"
 
-    local data_script = "var encrypted={{__HOLD_1__}}; var iv_data="..iv.."; var tag_data="..tag.."; var key="..key..";var d="..debug_data..";function u8ToBytes(u8){var s=\"\";for(var i=0;i<u8.length;i++){s+=String.fromCharCode(u8[i]);}return s;}\n"..
+    local data_script = "<script>\nvar encrypted={{__HOLD_1__}}; var iv_data="..iv.."; var tag_data="..tag.."; var key="..key..";var d="..debug_data..";function u8ToBytes(u8){var s=\"\";for(var i=0;i<u8.length;i++){s+=String.fromCharCode(u8[i]);}return s;}\n"..
         "function evpBytesToKey(pass, keyLen, ivLen){\n"..
         "    var m=[]; var i=0; var md=forge.md.md5.create();\n"..
         "    function concatLen(arr){var n=0; for(var j=0;j<arr.length;j++){n+=arr[j].length;} return n;}\n"..
@@ -53,11 +58,26 @@ function _M.content(data, iv, tag, key, debug_data)
         "    if (d){\n"..
         "        console.log(\"dec cos(ms):\",endTime - startTime);\n"..
         "    }\n"..
-        "}\n"
+        "}\n</script>\n"
 
 
     if not (ngx.var.obf_rand_var == "false") then
         data_script = util.obf_rand(data_script)
+    end
+
+    local prof = ngx.var.obf_prof
+    if not (ngx.var.obf_rand_extra == "false") then
+        local t_add0 = util.tmark()
+        data_script = util.obf_rand_data(data_script)
+        if prof == "true" then
+            log(ngx.ERR, log_fmt("obf_prof obf_rand_data add_ms=%.2f", util.dt_ms(t_add0)))
+        end
+    end
+
+    local t_df0 = util.tmark()
+    data_script = util.data_filter(data_script)
+    if prof == "true" then
+        log(ngx.ERR, log_fmt("obf_prof data_filter ms=%.2f", util.dt_ms(t_df0)))
     end
 
     data_script = data_script:gsub("{{__HOLD_1__}}", data)
@@ -67,9 +87,7 @@ function _M.content(data, iv, tag, key, debug_data)
         fj_open,
         FJ,
         fj_close,
-        "<script>\n",
         data_script,
-        "</script>\n",
     })
 end
 

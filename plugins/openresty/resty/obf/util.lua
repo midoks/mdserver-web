@@ -7,6 +7,23 @@ local resty_str = require "resty.string"
 local byte = string.byte
 
 
+function _M.tmark()
+    if ngx.hrtime then
+        return ngx.hrtime()
+    end
+    ngx.update_time()
+    return ngx.now() * 1000000
+end
+
+function _M.dt_ms(start)
+    if ngx.hrtime then
+        return (ngx.hrtime() - start) / 1000000
+    end
+    ngx.update_time()
+    return (ngx.now() * 1000000 - start) / 1000
+end
+
+
 function _M.to_uint8array(content)
     if not content then
         content = ""
@@ -37,18 +54,24 @@ end
 
 -- 数据过滤
 function _M.data_filter(content)
-    content = content:gsub("<script(.-)>(.-)</script>", function(attrs, body)
-        local b = body
-        b = b:gsub("^%s*//[^\n\r]*", "")
-        b = b:gsub("\n%s*//[^\n\r]*", "\n")
-        b = b:gsub("([^:])%s+//[^\n\r]*", "%1")
-        b = b:gsub("%s+", " ")
-        b = b:gsub("%s*([%(%),;:%{%}%[%]%+%-%*%=<>])%s*", "%1")
-        return "<script" .. attrs .. ">" .. b .. "</script>"
-    end)
-
-    content = content:gsub("[\r\n]+", ""):gsub(">%s+<", "><")
-    return content
+    if content == nil then
+        return ""
+    end
+    if type(content) ~= "string" then
+        content = tostring(content)
+    end
+    -- if not string.find(content, "<script", 1, true) then
+    --     return content:gsub("[\r\n]+", ""):gsub(">%s+<", "><")
+    -- end
+    -- content = content:gsub("<script(.-)>(.-)</script>", function(attrs, body)
+    --     local b = body
+    --     b = ("\n"..b):gsub("\n%s*//[^\n\r]*", "\n")
+    --     b = b:gsub("([^:])%s+//[^\n\r]*", "%1")
+    --     b = b:gsub("%s*([%(%),;:%{%}%[%]%+%-%*%=<>])%s*", "%1")
+    --     b = b:gsub("%s+", " ")
+    --     return "<script" .. attrs .. ">" .. b .. "</script>"
+    -- end)
+    return content:gsub("[\r\n]+", ""):gsub(">%s+<", "><")
 end
 
 
@@ -91,6 +114,12 @@ end
 
 -- 添加混淆代码
 function _M.obf_rand_data(content)
+    if content == nil then
+        return ""
+    end
+    if type(content) ~= "string" then
+        content = tostring(content)
+    end
     content = content:gsub("<script(.-)>(.-)</script>", function(attrs, body)
         local b = body
         local function rand_ident(len)

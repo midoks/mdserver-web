@@ -13,9 +13,9 @@ local ffi_str = ffi.string
 local sha256 = require "resty.sha256"
 local resty_str = require "resty.string"
 local random = require "resty.random"
-local lrucache = require "resty.lrucache"
 local util = require "resty.obf.util"
-local obf_cache = nil
+local obf_cache = ngx.shared.obf_cache
+local obf_cache_bytes = 0
 
 local find = string.find
 local byte = string.byte
@@ -93,8 +93,8 @@ function _M.obf_html()
         html_debug = "true"
     end
 
-    local var_debug = ngx.var.close_debug
-    if  var_debug == "true" then
+    local close_debug = ngx.var.close_debug
+    if  close_debug == "true" then
         html_debug = "false"
     end
 
@@ -120,6 +120,9 @@ function _M.obf_html()
             if sl then
                 local n = tonumber(sl) or 0
                 if n > 0 and ctx.obf_size > n then
+                    if ngx.var.obf_prof == "true" then
+                        log(ngx.ERR, log_fmt("obf_prof chunk_skip=1 size=%d", ctx.obf_size))
+                    end
                     ctx.obf_passthrough = true
                     ngx.arg[1] = table.concat(ctx.obf_buffer)
                     ctx.obf_buffer = nil
@@ -135,24 +138,21 @@ function _M.obf_html()
             return
         end
         local prof = ngx.var.obf_prof
-        local t_all0 = ngx.now()
+        local t_all0 = util.tmark()
         local content = table.concat(ctx.obf_buffer)
 
         if find(content_type, "text/html", 1, true) then
 
-            if not obf_cache then
-                local entries = tonumber(ngx.var.obf_cache_entries) or 1024
-                obf_cache = lrucache.new(entries)
-            end
+            obf_cache = ngx.shared.obf_cache
             local var_rand = ngx.var.obf_rand
             local var_b64 = ngx.var.obf_uint8_b64
             local var_skip_large = ngx.var.obf_skip_large or ""
             local var_skip_small = ngx.var.obf_skip_small or ""
-            local cache_key = _M.get_cache_key()..html_debug..tostring(var_rand)..tostring(var_b64)..tostring(var_skip_large)..tostring(var_skip_small)
+            local cache_key = _M.get_cache_key()..tostring(html_debug)..tostring(var_rand)..tostring(var_b64)..tostring(var_skip_large)..tostring(var_skip_small)
             local cached = obf_cache and obf_cache:get(cache_key)
             if cached then
                 if prof == "true" then
-                    log(ngx.ERR, log_fmt("obf_prof cache_hit=1 size=%d total_ms=%.2f", #cached, (ngx.now()-t_all0)*1000))
+                    log(ngx.ERR, log_fmt("obf_prof cache_hit=1 size=%d total_ms=%.2f", #cached, util.dt_ms(t_all0)))
                 end
                 ngx.arg[1] = cached
                 ctx.obf_buffer = nil
@@ -164,7 +164,7 @@ function _M.obf_html()
                 local n = tonumber(var_skip) or 0
                 if n > 0 and #content > n then
                     if prof == "true" then
-                        log(ngx.ERR, log_fmt("obf_prof skip_large=1 size=%d total_ms=%.2f", #content, (ngx.now()-t_all0)*1000))
+                        log(ngx.ERR, log_fmt("obf_prof skip_large=1 size=%d total_ms=%.2f", #content, util.dt_ms(t_all0)))
                     end
                     ngx.arg[1] = content
                     ctx.obf_buffer = nil
@@ -172,37 +172,42 @@ function _M.obf_html()
                 end
             end
 
-            local t_enc0 = ngx.now()
+            local t_enc0 = util.tmark()
             local content,key,iv,tag = _M.obf_encode(content)
-            local t_enc1 = ngx.now()
+            local enc_ms = util.dt_ms(t_enc0)
 
-            local t_ser0 = ngx.now()
+            local t_ser0 = util.tmark()
             local content_data = util.to_uint8array(content or "")
             local iv_data = util.to_uint8array(iv or "")
             local tag_data = util.to_uint8array(tag or "")
             local key_data = util.to_uint8array(key or "")
-            local t_ser1 = ngx.now()
+            local ser_ms = util.dt_ms(t_ser0)
 
-            local t_tpl0 = ngx.now()
-            local html_data = tpl.content(content_data, iv_data, tag_data, key_data,html_debug)
-            local t_tpl1 = ngx.now()
-            if not (ngx.var.obf_rand == "false") then
-                local t_add0 = ngx.now()
-                html_data = util.obf_add_data(html_data)
-                local t_add1 = ngx.now()
-                if prof == "true" then
-                    log(ngx.ERR, log_fmt("obf_prof add_ms=%.2f", (t_add1-t_add0)*1000))
-                end
-            end
+            local t_tpl0 = util.tmark()
+            local html_data = tpl.content(content_data, iv_data, tag_data, key_data,tostring(html_debug))
+            local tpl_ms = util.dt_ms(t_tpl0)
+            
+
+            local t_df0 = util.tmark()
+            html_data = util.data_filter(html_data)
+            local df_ms = util.dt_ms(t_df0)
 
             local max_item = tonumber(ngx.var.obf_cache_item_max) or 0
+            local max_bytes = tonumber(ngx.var.obf_cache_max_bytes) or 0
+            local exptime = tonumber(cache_timeout) or 600
             if obf_cache then
                 if max_item <= 0 or #html_data <= max_item then
-                    obf_cache:set(cache_key, html_data, cache_timeout)
+                    if max_bytes > 0 and (obf_cache_bytes + #html_data) > max_bytes then
+                        obf_cache:flush_all()
+                        obf_cache_bytes = 0
+                    end
+                    obf_cache:set(cache_key, html_data, exptime)
+                    obf_cache_bytes = obf_cache_bytes + #html_data
                 end
             end
+            
             if prof == "true" then
-                log(ngx.ERR, log_fmt("obf_prof size=%d enc_ms=%.2f ser_ms=%.2f tpl_ms=%.2f total_ms=%.2f", #content, (t_enc1-t_enc0)*1000, (t_ser1-t_ser0)*1000, (t_tpl1-t_tpl0)*1000, (ngx.now()-t_all0)*1000))
+                log(ngx.ERR, log_fmt("obf_prof size=%d enc_ms=%.2f ser_ms=%.2f tpl_ms=%.2f total_ms=%.2f", #content, enc_ms, ser_ms, tpl_ms, util.dt_ms(t_all0)))
             end
             ngx.arg[1] = html_data
         end
@@ -215,9 +220,20 @@ end
 
 
 function _M.done()
+
+
     local content_type = ngx.header.content_type or ""
     if find(content_type, "text/html") then
+        local prof = ngx.var.obf_prof
+        local t_start = util.tmark()
         _M.obf_html()
+        if prof == "true" then
+            log(ngx.ERR, log_fmt("total_ms=%.2f", util.dt_ms(t_start)))
+        end
+    else
+        if ngx.var.obf_prof == "true" then
+            log(ngx.ERR, log_fmt("obf_prof skip_ct=1 ct=%s", tostring(content_type)))
+        end
     end
 end   
 -- 响应处理函数
