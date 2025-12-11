@@ -123,7 +123,7 @@ else
 	echo "lib"
 	# cd ${rootPath}/plugins/php/lib && /bin/bash openssl_30.sh
 	# export PKG_CONFIG_PATH=$PKG_CONFIG_PATH:$serverPath/lib/openssl30/lib/pkgconfig
-	# OPTIONS="$OPTIONS --with-openssl"
+	OPTIONS="$OPTIONS --with-openssl"
 fi
 
 echo "$sourcePath/php/php${PHP_VER}"
