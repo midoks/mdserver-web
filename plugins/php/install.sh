@@ -9,6 +9,7 @@ serverPath=$(dirname "$rootPath")
 sysName=`uname`
 
 # cd /www/server/mdserver-web/plugins/php && bash install.sh install 73
+# cd /www/server/mdserver-web/plugins/php && bash install.sh install 85
 # https://www.php.net/releases
 
 if id www &> /dev/null ;then 
