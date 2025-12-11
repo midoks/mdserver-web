@@ -22,7 +22,7 @@ Install_App()
 
 	APP_DIR=${serverPath}/source/haproxy
 	mkdir -p $APP_DIR
-
+	echo $MIN_VERSION > $serverPath/haproxy/version.pl
 
 	LOCAL_ADDR=common
     cn=$(curl -fsSL -m 10 -s http://ipinfo.io/json | grep "\"country\": \"CN\"")
@@ -59,7 +59,6 @@ Install_App()
 		cd ${APP_DIR}/haproxy-${VERSION} && make TARGET=linux-glibc && make install PREFIX=$serverPath/haproxy
 	fi
 
-	echo $MIN_VERSION > $serverPath/haproxy/version.pl
 	echo '安装Haproxy成功'
 
 	#Haproxy日志配置

@@ -12,7 +12,7 @@ serverPath=$(dirname "$rootPath")
 sourcePath=${serverPath}/source/php
 SYS_ARCH=`arch`
 LIBNAME=redis
-LIBV=6.1.0
+LIBV=6.3.0
 sysName=`uname`
 actionType=$1
 version=$2
@@ -24,7 +24,7 @@ elif [ "$version" -lt "70" ];then
 elif [ "$version" -lt "80" ];then
 	LIBV=5.3.7
 elif [ "$version" -gt "80" ];then
-	LIBV=6.1.0
+	LIBV=6.3.0
 else
 	echo 'ok'
 fi

@@ -2931,7 +2931,21 @@ function rewrite(siteName){
 			$("#webedit-con").html(webBakHtml);
 			
 			var editor = CodeMirror.fromTextArea(document.getElementById("rewriteBody"), {
-	            extraKeys: {"Ctrl-Space": "autocomplete"},
+	            extraKeys: {
+	            	"Ctrl-Space": "autocomplete",
+	            	"Ctrl-F": "findPersistent",
+					"Ctrl-H": "replaceAll",
+					"Ctrl-S": function() {
+						$("#rewriteBody").empty();
+						$("#rewriteBody").text(editor.getValue());
+						setRewrite(filename, encodeURIComponent(editor.getValue()));
+					},
+					"Cmd-S":function() {
+						$("#rewriteBody").empty();
+						$("#rewriteBody").text(editor.getValue());
+						setRewrite(filename, encodeURIComponent(editor.getValue()));
+					},
+	            },
 				lineNumbers: true,
 				matchBrackets:true,
 			});

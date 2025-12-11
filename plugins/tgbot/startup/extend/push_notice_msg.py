@@ -54,16 +54,11 @@ def send_msg(bot, tag='ad', trigger_time=300):
     mw.writeFile(lock_file, json.dumps(lock_data))
     # 信号只在一个周期内执行一次|end
 
-    # 官方收劫持|SEO| 6m | next,2/6 | @tlx104
     # https://t.me/gjgzs2022 ｜ 22/m | @GJ_gzs
     # 实名认证/过人脸🕵️‍♀️各种账号处理✅ | 30/m| next,12/30 | @nngzs
     # 18+资源采集| 4/m | next,1/14 | @liuxingyu123
 
     keyboard = [
-        [
-            types.InlineKeyboardButton(
-                text="官方收劫持|SEO", url='https://t.me/xiaosi876')
-        ],
         [
             types.InlineKeyboardButton(
                 text="高价收一切流量 @caifutong555", url='https://t.me/caifutong555')

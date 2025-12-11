@@ -195,3 +195,4 @@ plugins/goedge-happy
 /plugins/tools
 /plugins/choose-linux-python
 *.md5
+/bak

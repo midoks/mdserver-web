@@ -1,0 +1,26 @@
+<style>
+.overflow_hide {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    vertical-align: middle;
+}
+</style>
+<div class="bt-form">
+	<div class="bt-w-main">
+		<div class="bt-w-menu">
+			<p class="bgw" onclick="pluginService('doh');">服务</p>
+			<p onclick="pluginInitD('doh');">自启动</p>
+			<p onclick="dohRead();">使用说明</p>
+		</div>
+		<div class="bt-w-con pd15">
+			<div class="soft-man-con"></div>
+		</div>
+	</div>
+</div>
+<script type="text/javascript">
+resetPluginWinHeight(530);
+$.getScript( "/plugins/file?name=doh&f=js/doh.js",function(){
+	pluginService('doh');
+});
+</script>

@@ -1,0 +1,48 @@
+[general]
+# 监听地址和端口
+listen_addr = "0.0.0.0:8080"
+
+# DoH 路径
+path = "/dns-query"
+
+# TLS 配置（如果需要 HTTPS）
+# tls_cert_path = "/etc/doh-proxy/cert.pem"
+# tls_key_path = "/etc/doh-proxy/key.pem"
+
+# 并发请求限制
+max_concurrent_requests = 512
+
+# 日志文件
+log_file = "{$SERVER_PATH}/doh/doh-proxy.log"
+
+[upstream]
+# 上游 DNS 服务器
+upstream_addr = "1.1.1.1:443"
+bootstrap_addr = "1.1.1.1:53"
+
+# 上游 DoH 服务器 URL（如果使用标准的 DoH 端点）
+# upstream_url = "https://cloudflare-dns.com/dns-query"
+
+# 超时设置
+timeout = 10
+
+# 重试次数
+tries = 3
+
+# 启用 TCP 保活
+tcp_keepalive = 30
+
+[cache]
+# 缓存设置
+max_entries = 65536
+min_ttl = 60
+max_ttl = 3600
+
+[network]
+# 网络设置
+tcp_fastopen = true
+reuse_port = true
+
+[log]
+# 日志级别：debug, info, warn, error
+level = "info"
