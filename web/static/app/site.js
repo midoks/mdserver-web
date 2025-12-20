@@ -2283,13 +2283,26 @@ function opSSLNow(type, id, siteName, callback){
 function opSSLAcme(type, id, siteName, callback){
 	var acme =  '<div class="apply_ssl">\
 		<div class="label-input-group">\
-			<div class="line mtb10">\
+			<div class="line">\
 				<span class="tname text-center">验证方式</span>\
 				<div style="margin-top:7px;display:inline-block">\
 					<input type="radio" name="apply_type" value="file" id="check_file" checked="checked"/>\
   					<label class="mr20" for="check_file" style="font-weight:normal">文件验证</label></label>\
   					<input type="radio" name="apply_type" value="dns" id="check_dns"/>\
   					<label class="mr20" for="check_dns" style="font-weight:normal">DNS验证</label></label>\
+  				</div>\
+	  		</div>\
+	  		<div class="line">\
+				<span class="tname text-center">证书</span>\
+				<div style="margin-top:7px;display:inline-block">\
+					<input type="radio" name="apply_ca" value="default" id="ca_default" checked="checked"/>\
+  					<label class="mr20" for="ca_default" style="font-weight:normal">默认</label></label>\
+  					<input type="radio" name="apply_ca" value="let" id="ca_letsencrypt"/>\
+  					<label class="mr20" for="ca_letsencrypt" style="font-weight:normal">letsencrypt</label></label>\
+  					<input type="radio" name="apply_ca" value="zerossl" id="ca_zerossl/>\
+  					<label class="mr20" for="ca_zerossl" style="font-weight:normal">zerossl</label></label>\
+  					<input type="radio" name="apply_ca" value="buypass" id="ca_buypass/>\
+  					<label class="mr20" for="ca_buypass" style="font-weight:normal">buypass</label></label>\
   				</div>\
 	  		</div>\
 	  		<div class="line mtb10" id="dnsapi_option" style="display:none;">\
@@ -2308,7 +2321,7 @@ function opSSLAcme(type, id, siteName, callback){
   				</div>\
   			</div>\
   			<div class="check_message line">\
-  				<div style="margin-left:100px">\
+  				<div style="margin-left:100px; margin-top:8px;">\
   					<input type="checkbox" name="checkDomain" id="checkDomain" checked="">\
   					<label class="mr20" for="checkDomain" style="font-weight:normal">提前校验域名(提前发现问题,减少失败率)</label>\
   				</div>\
@@ -2731,6 +2744,10 @@ function newAcmeHandApplyNotice(siteName, id, domains, data){
 
 				var apply_type = $('input[name="apply_type"]:checked').val();
 				pdata['apply_type'] = apply_type;
+
+				var apply_ca = $('input[name="apply_ca"]:checked').val();
+				pdata['apply_ca'] = apply_ca;
+
 				if (apply_type == 'dns'){
 					pdata['dnspai'] = $('#dnsapi_option option:selected').val();
 				}
@@ -2767,9 +2784,13 @@ function newAcmeSSL(siteName, id, domains){
 
 		var apply_type = $('input[name="apply_type"]:checked').val();
 		pdata['apply_type'] = apply_type;
+
+		var apply_ca = $('input[name="apply_ca"]:checked').val();
+		pdata['apply_ca'] = apply_ca;
+
 		if (apply_type == 'dns'){
 			pdata['dnspai'] = $('#dnsapi_option option:selected').val();
-		}
+		}		
 
 		pdata['dns_alias'] = $("input[name='dns_alias']").val();
 		$.post('/site/create_acme',pdata,function(rdata){
