@@ -2206,9 +2206,9 @@ location ^~ {from} {\n\
 
         if apply_ca == "let": 
             cmd = cmd + " --server letsencrypt "
-        else if apply_ca == "let":
+        elif apply_ca == "zerossl":
             cmd = cmd + " --server zerossl "
-        else if apply_ca == "let":
+        elif apply_ca == "buypass":
             cmd = cmd + " --server buypass "
 
         cmd = 'export ACCOUNT_EMAIL=' + email + ' && ' + cmd + ' >> ' + log_file
@@ -2410,9 +2410,9 @@ export PATH
 
             if apply_ca == "let": 
                 cmd = cmd + " --server letsencrypt "
-            else if apply_ca == "let":
+            elif apply_ca == "zerossl":
                 cmd = cmd + " --server zerossl "
-            else if apply_ca == "let":
+            elif apply_ca == "buypass":
                 cmd = cmd + " --server buypass "
                 
             cmd +=  ' > ' + log_file
