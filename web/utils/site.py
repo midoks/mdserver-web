@@ -2153,7 +2153,7 @@ location ^~ {from} {\n\
         mw.restartWeb()
         return mw.returnData(True, '删除成功')
 
-    def createAcmeFile(self, site_name, domains, email, force, renew):
+    def createAcmeFile(self, site_name, apply_ca, domains, email, force, renew):
         site_conf = self.getHostConf(site_name)
         if not os.path.exists(site_conf):
             return mw.returnData(False, '配置异常!')
@@ -2203,6 +2203,13 @@ location ^~ {from} {\n\
 
         self.writeAcmeLog('开始ACME申请...')
         log_file = self.acmeLogFile()
+
+        if apply_ca == "let": 
+            cmd = cmd + " --server letsencrypt "
+        elif apply_ca == "zerossl":
+            cmd = cmd + " --server zerossl "
+        elif apply_ca == "buypass":
+            cmd = cmd + " --server buypass "
 
         cmd = 'export ACCOUNT_EMAIL=' + email + ' && ' + cmd + ' >> ' + log_file
         # print(cmd)
@@ -2362,7 +2369,7 @@ export PATH
         mw.restartWeb()
         return mw.returnData(True, '证书已更新!', result)
 
-    def createAcmeDns(self, site_name, domains, email, dnspai, wildcard_domain, force, renew, dns_alias):
+    def createAcmeDns(self, site_name, apply_ca, domains, email, dnspai, wildcard_domain, force, renew, dns_alias):
         dnsapi_option = thisdb.getOptionByJson('dnsapi', default={})
         log_file = self.acmeLogFile()
         cmd = 'echo "..." > '+ log_file
@@ -2399,6 +2406,14 @@ export PATH
 
             if dns_alias != '':
                 cmd += ' --domain-alias '+str(dns_alias)
+
+
+            if apply_ca == "let": 
+                cmd = cmd + " --server letsencrypt "
+            elif apply_ca == "zerossl":
+                cmd = cmd + " --server zerossl "
+            elif apply_ca == "buypass":
+                cmd = cmd + " --server buypass "
                 
             cmd +=  ' > ' + log_file
             # print(cmd)
@@ -2448,7 +2463,7 @@ export PATH
         mw.restartWeb()
         return mw.returnData(True, '证书已更新!', result)
 
-    def createAcme(self, site_name, domains, force, renew, apply_type, dnspai, email, wildcard_domain, dns_alias):
+    def createAcme(self, site_name, domains, force, renew, apply_type, apply_ca, dnspai, email, wildcard_domain, dns_alias):
         domains = json.loads(domains)
         if len(domains) < 1:
             return mw.returnData(False, '请选择域名')
@@ -2474,9 +2489,9 @@ export PATH
             return mw.returnData(False, '正在申请或更新SSL中...')
 
         if apply_type == 'file':
-            return self.createAcmeFile(site_name, domains, email,force,renew)
+            return self.createAcmeFile(site_name, apply_ca, domains, email,force,renew)
         elif apply_type == 'dns':
-            return self.createAcmeDns(site_name, domains, email, dnspai, wildcard_domain,force, renew, dns_alias)
+            return self.createAcmeDns(site_name, apply_ca,domains, email, dnspai, wildcard_domain,force, renew, dns_alias)
         return mw.returnData(False, '异常请求')
 
     def createLet(self, site_name, domains, force, renew, apply_type, dnspai, email, wildcard_domain):
