@@ -46,7 +46,6 @@ def create_acme():
     wildcard_domain = request.form.get('wildcard_domain','')
     apply_type = request.form.get('apply_type', 'file')
     apply_ca = request.form.get('apply_ca', 'default')
-
     
     dnspai = request.form.get('dnspai','')
     dns_alias = request.form.get('dns_alias','')
