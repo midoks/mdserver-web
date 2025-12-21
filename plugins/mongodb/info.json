@@ -7,7 +7,7 @@
 	"shell": "install.sh",
 	"install_pre_inspection":true,
 	"uninstall_pre_inspection":true,
-	"versions":["4.4","5.0","6.0","7.0","8.0"],
+	"versions":["4.4","5.0","6.0","7.0","8.0","8.2"],
 	"tip": "soft",
 	"checks": "server/mongodb",
 	"path": "server/mongodb",
