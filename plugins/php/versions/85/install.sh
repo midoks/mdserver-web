@@ -122,7 +122,7 @@ if [ "$sysName" == "Darwin" ];then
 else
 	echo "lib"
 	# cd ${rootPath}/plugins/php/lib && /bin/bash openssl_35.sh
-	# export PKG_CONFIG_PATH=$PKG_CONFIG_PATH:$serverPath/lib/openssl35/lib/pkgconfig
+	export PKG_CONFIG_PATH=$PKG_CONFIG_PATH:$serverPath/lib/openssl35/lib/pkgconfig
 	OPTIONS="$OPTIONS --with-openssl"
 fi
 
