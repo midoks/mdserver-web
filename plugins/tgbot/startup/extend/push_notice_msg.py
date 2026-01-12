@@ -56,7 +56,7 @@ def send_msg(bot, tag='ad', trigger_time=300):
 
     # https://t.me/gjgzs2022 ｜ 22/m | @GJ_gzs
     # 实名认证/过人脸🕵️‍♀️各种账号处理✅ | 30/m| next,6/30 | @nngzs
-    # 18+资源采集| 4/m | next,1/14 | @liuxingyu123
+    # 18+资源采集| 4/m | next,7/14 | @liuxingyu123
 
     keyboard = [
         [
