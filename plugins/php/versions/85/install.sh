@@ -9,9 +9,9 @@ serverPath=$(dirname "$rootPath")
 sourcePath=${serverPath}/source
 sysName=`uname`
 
-version=8.5.0
+version=8.5.1
 PHP_VER=85
-md5_file_ok=39cb6e4acd679b574d3d3276f148213e935fc25f90403eb84fb1b836a806ef1e
+md5_file_ok=3f5bf99ce81201f526d25e288eddb2cfa111d068950d1e9a869530054ff98815
 Install_php()
 {
 #------------------------ install start ------------------------------------#
@@ -121,8 +121,8 @@ if [ "$sysName" == "Darwin" ];then
 	export OPENSSL_LIBS="-L/${LIB_DEPEND_DIR}/lib -lssl -lcrypto -lz"
 else
 	echo "lib"
-	cd ${rootPath}/plugins/php/lib && /bin/bash openssl_35.sh
-	export PKG_CONFIG_PATH=$PKG_CONFIG_PATH:$serverPath/lib/openssl35/lib/pkgconfig
+	# cd ${rootPath}/plugins/php/lib && /bin/bash openssl_35.sh
+	# export PKG_CONFIG_PATH=$PKG_CONFIG_PATH:$serverPath/lib/openssl35/lib/pkgconfig
 	OPTIONS="$OPTIONS --with-openssl"
 fi
 

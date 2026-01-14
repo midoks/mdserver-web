@@ -27,13 +27,13 @@ if [ ! -d ${SERVER_ROOT}/openssl35 ];then
 
 
     # export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/www/server/lib/openssl35/lib
-    if [ -d /etc/ld.so.conf.d ];then
-        echo "/www/server/lib/openssl35/lib64" > /etc/ld.so.conf.d/openssl35.conf
-    elif [ -f /etc/ld.so.conf ]; then
-        echo "/www/server/lib/openssl35/lib64" >> /etc/ld.so.conf
-    fi
+    # if [ -d /etc/ld.so.conf.d ];then
+    #     echo "/www/server/lib/openssl35/lib64" > /etc/ld.so.conf.d/openssl35.conf
+    # elif [ -f /etc/ld.so.conf ]; then
+    #     echo "/www/server/lib/openssl35/lib64" >> /etc/ld.so.conf
+    # fi
 
-    ldconfig
+    # ldconfig
     # ldconfig -p  | grep openssl
 
     cd $SOURCE_ROOT && rm -rf $SOURCE_ROOT/openssl-${opensslVersion}

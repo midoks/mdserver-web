@@ -23,6 +23,7 @@ fi
 
 # source bin/activate
 # cd /www/server/mdserver-web/plugins/mysql-community && bash install.sh install 5.7
+# cd /www/server/mdserver-web/plugins/mysql-community && bash install.sh install 9.3
 # cd /www/server/mdserver-web/plugins/mysql-community && bash install.sh uninstall 9.0
 # cd /www/server/mdserver-web && python3 plugins/mysql-community/index.py start 8.0
 # cd /www/server/mdserver-web && python3 plugins/mysql-community/index.py fix_db_access
