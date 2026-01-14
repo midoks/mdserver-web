@@ -415,7 +415,7 @@ def getShowLogFile():
     return tmp.groups()[0].strip()
 
 def getMdb8Ver():
-    return ['8.0','8.1','8.2','8.3','8.4','9.0','9.1',"9.2"]
+    return ['8.0','8.1','8.2','8.3','8.4','9.0','9.1', '9.2', '9.3', '9.4']
 
 def getSlaveName():
     mdb8 = getMdb8Ver()
@@ -2063,7 +2063,7 @@ def getMasterStatus(version=''):
 
         return mw.returnJson(master_status, '设置成功', data)
     except Exception as e:
-        return mw.returnJson(False, "数据库密码错误,在管理列表-点击【修复】!", 'pwd')
+        return mw.returnJson(False, "数据库密码错误,在管理列表-点击【修复】!" + str(e) , 'pwd')
 
 
 def setMasterStatus(version=''):
