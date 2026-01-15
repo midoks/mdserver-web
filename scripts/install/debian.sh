@@ -85,6 +85,7 @@ apt install -y p7zip-full
 
 apt install -y libnuma1 
 apt install -y libaio1 
+apt install -y libaio-dev
 apt install -y libmecab2
 apt install -y libmm-dev
 
