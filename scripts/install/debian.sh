@@ -85,6 +85,7 @@ apt install -y p7zip-full
 
 apt install -y libnuma1 
 apt install -y libaio1 
+apt install -y libaio-dev
 apt install -y libmecab2
 apt install -y libmm-dev
 
@@ -276,6 +277,13 @@ apt install -y libmariadb-dev libmariadb-dev-compat
 #apt install -y libmysqlclient-dev
 #apt install -y libmariadbclient-dev
 
+
+# find /usr/lib -name "*libaio*" 2>/dev/null
+if [ ! -f /usr/lib/libaio.so.1 ];then
+	if [ -f /usr/lib/x86_64-linux-gnu/libaio.so.1t64 ];then
+		ln -s /usr/lib/x86_64-linux-gnu/libaio.so.1t64 /usr/lib/libaio.so.1
+	fi
+fi
 
 cd /www/server/mdserver-web/scripts && bash lib.sh
 chmod 755 /www/server/mdserver-web/data

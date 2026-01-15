@@ -220,6 +220,13 @@ if [ "${VERSION_ID}" == "22.04" ];then
     pip3 install -U --force-reinstall --no-binary :all: gevent
 fi
 
+# find /usr/lib -name "*libaio*" 2>/dev/null
+if [ ! -f /usr/lib/libaio.so.1 ];then
+	if [ -f /usr/lib/x86_64-linux-gnu/libaio.so.1t64 ];then
+		ln -s /usr/lib/x86_64-linux-gnu/libaio.so.1t64 /usr/lib/libaio.so.1
+	fi
+fi
+
 cd /www/server/mdserver-web/scripts && bash lib.sh
 chmod 755 /www/server/mdserver-web/data
 
