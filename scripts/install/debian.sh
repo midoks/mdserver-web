@@ -280,7 +280,7 @@ apt install -y libmariadb-dev libmariadb-dev-compat
 
 # find /usr/lib -name "*libaio*" 2>/dev/null
 if [ ! -f /usr/lib/libaio.so.1 ];then
-	if [ -f /usr/lib/libaio.so.1 ];then
+	if [ -f /usr/lib/x86_64-linux-gnu/libaio.so.1t64 ];then
 		ln -s /usr/lib/x86_64-linux-gnu/libaio.so.1t64 /usr/lib/libaio.so.1
 	fi
 fi
