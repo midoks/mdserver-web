@@ -278,5 +278,11 @@ apt install -y libmariadb-dev libmariadb-dev-compat
 #apt install -y libmariadbclient-dev
 
 
+if [ ! -f /usr/lib/libaio.so.1 ];then
+	if [ -f /usr/lib/libaio.so.1 ];then
+		ln -s /usr/lib/x86_64-linux-gnu/libaio.so.1t64 /usr/lib/libaio.so.1
+	fi
+fi
+
 cd /www/server/mdserver-web/scripts && bash lib.sh
 chmod 755 /www/server/mdserver-web/data
