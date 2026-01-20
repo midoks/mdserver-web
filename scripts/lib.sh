@@ -86,8 +86,8 @@ if [ ! -f /www/server/mdserver-web/bin/activate ];then
         cd /www/server/mdserver-web && python3 -m venv /www/server/mdserver-web
     else
         echo "python3 < 3.10"
-        cd /www/server/mdserver-web && pip3 install -r /www/server/mdserver-web/requirements.txt -i $PIPSRC
         cd /www/server/mdserver-web && python3 -m venv .
+        cd /www/server/mdserver-web && pip3 install -r /www/server/mdserver-web/requirements.txt -i $PIPSRC
     fi
     cd /www/server/mdserver-web && source /www/server/mdserver-web/bin/activate
 else
@@ -97,7 +97,11 @@ fi
 pip3 install --upgrade pip -i $PIPSRC
 pip3 install --upgrade setuptools -i $PIPSRC
 
-# --no-cache-dir
+
+# repeated attempts
+if [ "$LOCAL_ADDR" != "common" ];then
+    cd /www/server/mdserver-web && pip3 install -r /www/server/mdserver-web/requirements.txt
+fi
 cd /www/server/mdserver-web && pip3 install -r /www/server/mdserver-web/requirements.txt -i $PIPSRC
 
 
