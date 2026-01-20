@@ -66,7 +66,7 @@ fi
 
 PIPSRC="https://pypi.python.org/simple"
 if [ "$LOCAL_ADDR" != "common" ];then
-    PIPSRC="https://pypi.tuna.tsinghua.edu.cn/simple"
+    PIPSRC="https://pypi.tuna.tsinghua.edu.cn/simple/"
 fi
 
 echo "local:${LOCAL_ADDR}"
