@@ -66,7 +66,7 @@ fi
 
 PIPSRC="https://pypi.python.org/simple"
 if [ "$LOCAL_ADDR" != "common" ];then
-    PIPSRC="https://pypi.tuna.tsinghua.edu.cn/simple/"
+    PIPSRC="https://pypi.tuna.tsinghua.edu.cn/simple"
 fi
 
 echo "local:${LOCAL_ADDR}"
@@ -97,7 +97,11 @@ fi
 pip3 install --upgrade pip -i $PIPSRC
 pip3 install --upgrade setuptools -i $PIPSRC
 
-# --no-cache-dir
+
+# repeated attempts
+if [ "$LOCAL_ADDR" != "common" ];then
+    cd /www/server/mdserver-web && pip3 install -r /www/server/mdserver-web/requirements.txt
+fi
 cd /www/server/mdserver-web && pip3 install -r /www/server/mdserver-web/requirements.txt -i $PIPSRC
 
 
