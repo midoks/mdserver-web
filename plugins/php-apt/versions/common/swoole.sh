@@ -26,6 +26,8 @@ elif [ "$version" == "7.1" ];then
 	LIBV=4.5.2
 elif [ "$version" == "7.0" ];then
 	LIBV=4.3.0
+elif [ "$version" == "8.4" ];then
+	LIBV=6.1.6
 elif [ "$version" == "8.5" ];then
 	LIBV=6.1.6
 else
