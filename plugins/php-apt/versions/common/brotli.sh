@@ -15,7 +15,7 @@ version=$2
 
 sysName=`uname`
 LIBNAME=brotli
-LIBV=0.15.2
+LIBV=0.18.3
 
 extVer=`bash $curPath/lib.sh $version`
 extFile=/usr/lib/php/${extVer}/${LIBNAME}.so
