@@ -15,7 +15,7 @@ version=$2
 
 sysName=`uname`
 LIBNAME=swoole
-LIBV=4.8.10
+LIBV=6.1.6
 
 
 APT_INSTALL=0
