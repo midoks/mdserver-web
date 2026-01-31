@@ -19,6 +19,7 @@ yum install -y bzip2
 yum install -y bzip2-devel
 yum install -y ncurses-compat-libs
 yum install -y numactl
+yum install -y sshpass
 
 SSH_PORT=`netstat -ntpl|grep sshd|grep -v grep | sed -n "1,1p" | awk '{print $4}' | awk -F : '{print $2}'`
 if [ "$SSH_PORT" == "" ];then

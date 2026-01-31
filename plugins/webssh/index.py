@@ -120,6 +120,11 @@ class App():
         destr = mw.deDoubleCrypt('mdserver-web', rdata)
         return json.loads(destr)
 
+    def get_server_by_host_data(self, host):
+        info_file = self.__host_dir + '/' + host + '/info.json'
+        info_data = self.getSshInfo(info_file)
+        return info_data
+
     def get_server_by_host(self):
         args = self.getArgs()
         check = self.checkArgs(args, ['host'])
@@ -152,8 +157,10 @@ class App():
         if os.path.exists(self.__host_dir):
             for name in os.listdir(self.__host_dir):
                 info_file = self.__host_dir + '/' + name + '/info.json'
+                # print(info_file)
                 if not os.path.exists(info_file):
                     continue
+
 
                 host_info = {}
                 try:

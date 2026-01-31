@@ -13,6 +13,7 @@ mw redis 	| 快捷连接Redis
 mw valkey 	| 快捷连接valkey
 mw mongodb 	| 快捷连接MongoDB
 mw pgdb 	| 快捷连接PostgreSQL
+mw ssh 		| 快捷连接ssh
 ----------------------------------------
 mw open				| 开启面板
 mw close			| 关闭面板

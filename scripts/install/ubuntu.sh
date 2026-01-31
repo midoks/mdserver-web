@@ -59,6 +59,7 @@ apt install -y protobuf-compiler
 apt install -y libboost-dev
 apt install -y liblz4-tool
 apt install -y zstd
+apt install -y sshpass
 
 P_VER=`python3 -V | awk '{print $2}'`
 if version_ge "$P_VER" "3.11.0" ;then

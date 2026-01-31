@@ -25,7 +25,7 @@ ERROR='[\033[31mERROR\033[0m]'
 WORKING='[\033[34m*\033[0m]'
 
 
-PATH=/usr/local/bin:/bin:/sbin:/usr/bin:/usr/sbin:/usr/local/bin:/usr/local/sbin:~/bin
+PATH=/usr/local/bin:/bin:/sbin:/usr/bin:/usr/sbin:/usr/local/bin:/usr/local/sbin:~/bin:/opt/homebrew/bin
 export LANG=en_US.UTF-8
 
 PANEL_DIR={$SERVER_PATH}
@@ -631,6 +631,21 @@ mw_valkey(){
     ${CLIEXEC}
 }
 
+mw_ssh(){
+    cd ${PANEL_DIR} && python3 panel_tools.py cli 202
+
+    if [[ "$?" == "0" ]]; then
+        POS=$(echo -e "\n${BLUE}└─ 选择登陆终端：${PLAIN}")
+        read -p "${POS}" INPUT
+        SSS=`cd ${PANEL_DIR} && python3 panel_tools.py cli 202 $INPUT`
+        # echo "info:$SSS"
+        # SSS="127.0.0.1|22|root|xx"
+        IFS='|' read -r SERVER_IP SERVER_PORT SERVER_USER SERVER_PASS <<< "$SSS"
+        echo "Attempting SSH connection to $SERVER_USER@$SERVER_IP:$SERVER_PORT"
+        sshpass -p "$SERVER_PASS" ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -o ConnectTimeout=10 -p "$SERVER_PORT" "$SERVER_USER@$SERVER_IP"
+    fi
+}
+
 mw_venv(){
     cd ${PANEL_DIR} && source bin/activate
 }
@@ -755,6 +770,7 @@ case "$1" in
     'redis') mw_redis;;
     'valkey')mw_valkey;;
     'mongodb') mw_mongodb;;
+    'ssh') mw_ssh;;
     'venv') mw_update_venv;;
     'clean_lib') mw_clean_lib;;
     'list') mw_list;;

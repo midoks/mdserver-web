@@ -80,6 +80,7 @@ def mwcli(mw_input=0):
             '(101)  关闭PHP52显示',
             '(200)  切换Linux系统软件源',
             '(201)  简单速度测试',
+            '(202)  SSH终端管理',
             '(0)    取消'
         ]
         cmd_list_num = len(cmd_list)
@@ -105,7 +106,7 @@ def mwcli(mw_input=0):
         10, 11, 12, 13, 14, 15,
         20, 21, 22, 23, 24, 25, 26, 27, 28, 29,
         100, 101, 
-        200, 201
+        200, 201, 202
     ]
     if not mw_input in nums:
         print(raw_tip)
@@ -264,7 +265,48 @@ def mwcli(mw_input=0):
         # os.system(INIT_CMD + " mirror")
     elif mw_input == 201:
         os.system('curl -Lso- bench.sh | bash')
+    elif mw_input == 202:
+        package = mw.getPanelDir()+'/plugins'
 
+        dst_plugin = mw.getServerDir() + "/webssh"
+        if not os.path.exists(dst_plugin):
+            mw.echoInfo("未安装!")
+            exit(1)
+
+        if not package in sys.path:
+            sys.path.append(package)
+        from webssh.index import App
+
+        obj = App()
+        data = obj.get_server_list()
+        data = json.loads(data)
+
+        if data['status']:
+            wlist = data['data']
+            wlist_len = len(wlist)
+            if wlist_len == 0:
+                mw.echoInfo("SSH终端管理,数据为空!")
+                exit(1)
+
+            if len(sys.argv) == 4:
+                pos = int(sys.argv[3])
+                if pos >= wlist_len:
+                    mw.echoInfo("SSH终端管理,超过限制!")
+                    exit(1)
+                dst_data = wlist[pos]
+                tmp_host = dst_data["host"]
+                info = obj.get_server_by_host_data(tmp_host)
+                pp_info = tmp_host+"|"+info["port"]+"|"+info['username']+"|"+info['password']+""
+                print(pp_info)
+                exit(0)
+
+            mw.echoInfo("请选择:")
+            for x in range(wlist_len):
+                dst_data = wlist[x]
+                tag = dst_data['host']
+                if dst_data['ps'] != "":
+                    tag = dst_data['ps']
+                print(str(x) +") " + tag)
 
 def open_ssh_port():
     

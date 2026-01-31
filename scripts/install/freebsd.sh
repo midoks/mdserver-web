@@ -65,6 +65,7 @@ pkg install -y bc
 pkg install -y bzip2
 pkg install -y bzip2-devel
 pkg install -y numactl
+pkg install -y sshpass
 
 # curl https://sh.rustup.rs -sSf | sh
 pkg install -y rust
