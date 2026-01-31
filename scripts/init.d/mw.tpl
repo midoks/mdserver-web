@@ -642,10 +642,7 @@ mw_ssh(){
         # SSS="127.0.0.1|22|root|xx"
         IFS='|' read -r SERVER_IP SERVER_PORT SERVER_USER SERVER_PASS <<< "$SSS"
         echo "Attempting SSH connection to $SERVER_USER@$SERVER_IP:$SERVER_PORT"
-        if ! sshpass -p "$SERVER_PASS" ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -o ConnectTimeout=10 -p "$SERVER_PORT" "$SERVER_USER@$SERVER_IP" "echo 'SSH connection successful'"; then
-            echo "SSH connection failed to $SERVER_USER@$SERVER_IP:$SERVER_PORT"
-            return 1
-        fi
+        sshpass -p "$SERVER_PASS" ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -o ConnectTimeout=10 -p "$SERVER_PORT" "$SERVER_USER@$SERVER_IP"
     fi
 }
 
