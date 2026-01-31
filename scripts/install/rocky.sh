@@ -27,6 +27,7 @@ yum install -y libzip-devel
 yum install -y re2c 
 yum install -y ncurses-compat-libs
 yum install -y numactl 
+apt install -y sshpass
 
 if [ -f /usr/sbin/iptables ];then
 

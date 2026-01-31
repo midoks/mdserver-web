@@ -17,6 +17,7 @@ yum install -y wget curl lsof unzip
 yum install -y expect
 yum install -y ncurses-compat-libs
 yum install -y numactl
+yum install -y sshpass
 dnf install crontabs -y
 
 SSH_PORT=`netstat -ntpl|grep sshd|grep -v grep | sed -n "1,1p" | awk '{print $4}' | awk -F : '{print $2}'`

@@ -43,6 +43,7 @@ $PKGMGR install -y p7zip-plugins
 $PKGMGR install -y mmap-devel
 
 $PKGMGR install -y libncurses*
+$PKGMGR install -y sshpass
 
 echo "install remi source"
 if [ "$VERSION_ID" == "9" ];then

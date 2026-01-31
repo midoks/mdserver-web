@@ -58,6 +58,7 @@ zypper install -y libargon2-devel
 
 zypper install -y net-tools-deprecated
 zypper install -y numactl
+zypper install -y sshpass
 
 # zypper install -y  php-config
 

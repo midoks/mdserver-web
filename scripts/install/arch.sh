@@ -54,6 +54,7 @@ echo y | pacman -Sy libvpx
 echo y | pacman -Sy libwebp
 echo y | pacman -Sy libxpm
 echo y | pacman -Syu freetype2
+echo y | pacman -Syu sshpass
 ## gd end
 
 echo y | pacman -Syu icu
