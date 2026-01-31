@@ -25,7 +25,7 @@ ERROR='[\033[31mERROR\033[0m]'
 WORKING='[\033[34m*\033[0m]'
 
 
-PATH=/usr/local/bin:/bin:/sbin:/usr/bin:/usr/sbin:/usr/local/bin:/usr/local/sbin:~/bin
+PATH=/usr/local/bin:/bin:/sbin:/usr/bin:/usr/sbin:/usr/local/bin:/usr/local/sbin:~/bin:/opt/homebrew/bin
 export LANG=en_US.UTF-8
 
 PANEL_DIR={$SERVER_PATH}
@@ -633,6 +633,16 @@ mw_valkey(){
 
 mw_ssh(){
     cd ${PANEL_DIR} && python3 panel_tools.py cli 202
+
+    if [[ "$?" == "0" ]]; then
+        POS=$(echo -e "\n${BLUE}└─ 选择登陆终端：${PLAIN}")
+        read -p "${POS}" INPUT
+        SSS=`cd ${PANEL_DIR} && python3 panel_tools.py cli 202 $INPUT`
+        # echo "info:$SSS"
+        # SSS="127.0.0.1|22|root|xx"
+        IFS='|' read -r SERVER_IP SERVER_PORT SERVER_USER SERVER_PASS <<< "$SSS"
+        sshpass -p "s8Kb6pYmy0pdPbPH" ssh -p "2022" "154.21.203.11"
+    fi
 }
 
 mw_venv(){
