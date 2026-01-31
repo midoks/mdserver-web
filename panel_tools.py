@@ -266,8 +266,35 @@ def mwcli(mw_input=0):
     elif mw_input == 201:
         os.system('curl -Lso- bench.sh | bash')
     elif mw_input == 202:
-        print("SSH终端管理")
+        package = mw.getPanelDir()+'/plugins'
 
+        dst_plugin = mw.getServerDir() + "/webssh"
+        if not os.path.exists(dst_plugin):
+            mw.echoInfo("未安装!")
+            exit(0)
+
+        if not package in sys.path:
+            sys.path.append(package)
+        from webssh.index import App
+
+        obj = App()
+        data = obj.get_server_list()
+        data = json.loads(data)
+
+        if data['status']:
+            wlist = data['data']
+            wlist_len = len(wlist)
+            if wlist_len == 0:
+                mw.echoInfo("SSH终端管理,数据为空!")
+                exit(0)
+
+            mw.echoInfo("请选择:")
+            for x in range(wlist_len):
+                dst_data = wlist[x]
+                tag = dst_data['host']
+                if dst_data['ps'] != "":
+                    tag = dst_data['ps']
+                print(str(x) +") " + tag)
 
 def open_ssh_port():
     
@@ -356,6 +383,7 @@ def getPanelBindDomain():
 
 
 def main():
+    print(sys.argv)
     if len(sys.argv) == 1:
         print('ERROR: Parameter error!')
         exit(-2)

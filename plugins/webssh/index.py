@@ -152,8 +152,10 @@ class App():
         if os.path.exists(self.__host_dir):
             for name in os.listdir(self.__host_dir):
                 info_file = self.__host_dir + '/' + name + '/info.json'
+                # print(info_file)
                 if not os.path.exists(info_file):
                     continue
+
 
                 host_info = {}
                 try:

@@ -633,7 +633,6 @@ mw_valkey(){
 
 mw_ssh(){
     cd ${PANEL_DIR} && python3 panel_tools.py cli 202
-    echo "123123"
 }
 
 mw_venv(){
