@@ -80,6 +80,7 @@ def mwcli(mw_input=0):
             '(101)  关闭PHP52显示',
             '(200)  切换Linux系统软件源',
             '(201)  简单速度测试',
+            '(202)  SSH终端管理',
             '(0)    取消'
         ]
         cmd_list_num = len(cmd_list)
@@ -264,6 +265,8 @@ def mwcli(mw_input=0):
         # os.system(INIT_CMD + " mirror")
     elif mw_input == 201:
         os.system('curl -Lso- bench.sh | bash')
+    elif mw_input == 202:
+        print("SSH终端管理")
 
 
 def open_ssh_port():

@@ -631,6 +631,10 @@ mw_valkey(){
     ${CLIEXEC}
 }
 
+mw_ssh(){
+    echo "123123"
+}
+
 mw_venv(){
     cd ${PANEL_DIR} && source bin/activate
 }
@@ -755,6 +759,7 @@ case "$1" in
     'redis') mw_redis;;
     'valkey')mw_valkey;;
     'mongodb') mw_mongodb;;
+    'ssh') mw_ssh;;
     'venv') mw_update_venv;;
     'clean_lib') mw_clean_lib;;
     'list') mw_list;;
