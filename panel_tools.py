@@ -271,7 +271,7 @@ def mwcli(mw_input=0):
         dst_plugin = mw.getServerDir() + "/webssh"
         if not os.path.exists(dst_plugin):
             mw.echoInfo("未安装!")
-            exit(0)
+            exit(1)
 
         if not package in sys.path:
             sys.path.append(package)
@@ -286,6 +286,18 @@ def mwcli(mw_input=0):
             wlist_len = len(wlist)
             if wlist_len == 0:
                 mw.echoInfo("SSH终端管理,数据为空!")
+                exit(1)
+
+            if len(sys.argv) == 4:
+                pos = int(sys.argv[3])
+                if pos >= wlist_len:
+                    mw.echoInfo("SSH终端管理,超过限制!")
+                    exit(1)
+                dst_data = wlist[pos]
+                tmp_host = dst_data["host"]
+                info = obj.get_server_by_host_data(tmp_host)
+                pp_info = tmp_host+"|"+info["port"]+"|"+info['username']+"|"+info['password']+""
+                print(pp_info)
                 exit(0)
 
             mw.echoInfo("请选择:")
@@ -383,7 +395,6 @@ def getPanelBindDomain():
 
 
 def main():
-    print(sys.argv)
     if len(sys.argv) == 1:
         print('ERROR: Parameter error!')
         exit(-2)
