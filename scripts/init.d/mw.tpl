@@ -641,7 +641,7 @@ mw_ssh(){
         # echo "info:$SSS"
         # SSS="127.0.0.1|22|root|xx"
         IFS='|' read -r SERVER_IP SERVER_PORT SERVER_USER SERVER_PASS <<< "$SSS"
-        sshpass -p "s8Kb6pYmy0pdPbPH" ssh -p "2022" "154.21.203.11"
+        sshpass -p "$SERVER_PASS" ssh -p "$SERVER_PORT" "$SERVER_IP"
     fi
 }
 
