@@ -807,7 +807,6 @@ class classApi:
         print("=" * 50)
 
 
-
     def sync_plugin(self):
         data = getCfgData()
 
