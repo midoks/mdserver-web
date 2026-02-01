@@ -809,14 +809,11 @@ class classApi:
 
     def sync_plugin(self):
         data = getCfgData()
-
         plugin = self._SYNC_INFO['plugin']
-
         for x in plugin:
             if x['name'] == 'webssh':
                 self.sync_plugin_webssh()
-
-
+        return True
 
 
     def run(self):
