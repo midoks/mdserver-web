@@ -76,6 +76,16 @@ class classApi:
             t = {'name': i}
             databases.append(t)
         data['databases'] = databases
+
+
+        plugin = []
+        for i in args['plugin']:
+            # print('db:', i)
+            if i == '':
+                continue
+            t = {'name': i}
+            plugin.append(t)
+        data['plugin'] = plugin
         return data
 
     def fock_process(self, args):
@@ -753,6 +763,59 @@ class classApi:
             except:
                 self.error(mw.getTracebackInfo())
 
+
+    def print_directory_tree(self, directory, prefix=""):
+        """递归打印目录树结构"""
+        items = sorted(os.listdir(directory))
+        for i, item in enumerate(items):
+            item_path = os.path.join(directory, item)
+            is_last = i == len(items) - 1
+            
+            if os.path.isdir(item_path):
+                print(f"{prefix}{'└── ' if is_last else '├── '}{item}/")
+                extension = "    " if is_last else "│   "
+                self.print_directory_tree(item_path, prefix + extension)
+            else:
+                print(f"{prefix}{'└── ' if is_last else '├── '}{item}")
+
+    def upload_dir(self, src, dst):
+        """递归打印目录树结构"""
+        items = sorted(os.listdir(src))
+        for i, item in enumerate(items):
+            item_path = os.path.join(src, item)
+            is_last = i == len(items) - 1
+            
+            if os.path.isdir(item_path):
+                # print("dir:",item_path, dst+'/'+item)
+                self.upload_dir(item_path, dst+'/'+item)
+            else:
+                # print("file:",item_path, dst+'/'+item)
+                self.upload_file(item_path, dst+'/'+item)
+
+    def sync_plugin_webssh(self):
+        name = "webssh"
+        webssh_dir = mw.getServerDir()+'/'+name
+
+        # 递归遍历所有文件和目录并打印
+        print(f"\n目录树结构: {webssh_dir}")
+        print("=" * 50)
+        if os.path.exists(webssh_dir):
+            # self.print_directory_tree(webssh_dir)
+            self.upload_dir(webssh_dir, "/www/server/"+name)
+        else:
+            print(f"目录不存在: {webssh_dir}")
+        print("=" * 50)
+
+
+    def sync_plugin(self):
+        data = getCfgData()
+        plugin = self._SYNC_INFO['plugin']
+        for x in plugin:
+            if x['name'] == 'webssh':
+                self.sync_plugin_webssh()
+        return True
+
+
     def run(self):
         # 开始迁移
         # self.upload_file("/tmp/mysql-boost-5.7.39.tar.gz", "/tmp/mysql-boost-5.7.39.tar.gz")
@@ -761,6 +824,7 @@ class classApi:
         self.sync_site()
         self.sync_database()
         # self.sync_path()
+        self.sync_plugin()
         self.write_speed('action', 'True')
         write_log('|-所有项目迁移完成!')
 
@@ -904,7 +968,7 @@ def get_src_config(args):
         data['webserver'] = 'OpenResty'
     data['php'] = []
     phpversions = ['52', '53', '54', '55', '56', '70', '71',
-                   '72', '73', '74', '80', '81', '82', '83', '84']
+                   '72', '73', '74', '80', '81', '82', '83', '84', '85']
     phpPath = sdir + '/php/'
     for pv in phpversions:
         if not os.path.exists(phpPath + pv + '/bin/php'):
@@ -952,6 +1016,13 @@ def get_src_info(args):
     my_db_pos = mw.getServerDir() + '/mysql'
     conn = mw.M('databases').dbPos(my_db_pos, 'mysql')
     data['databases'] = conn.field('id,name,ps').order("id desc").select()
+    data['plugin'] = []
+
+    plugin_webssh_name = "webssh"
+    webssh_dir =  mw.getServerDir()  + '/'+plugin_webssh_name
+    if os.path.exists(webssh_dir):
+        data['plugin'].append(plugin_webssh_name)
+
     return data
 
 
@@ -1000,11 +1071,13 @@ def stepFour():
 
     sites = args['sites']
     databases = args['databases']
+    plugin = args['plugin']
 
     data = getCfgData()
     args = {
         'sites': sites.strip(',').split(','),
-        'databases': databases.strip(',').split(',')
+        'databases': databases.strip(',').split(','),
+        'plugin': plugin.strip(',').split(',')
     }
     api = classApi(data['url'], data['app_id'],data['app_secret'])
     return api.set_sync_info(args)
