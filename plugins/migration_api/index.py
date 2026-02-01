@@ -1018,7 +1018,7 @@ def get_src_info(args):
     data['databases'] = conn.field('id,name,ps').order("id desc").select()
     data['plugin'] = []
 
-    plugin_webssh_name = "name"
+    plugin_webssh_name = "webssh"
     webssh_dir =  mw.getServerDir()  + '/'+plugin_webssh_name
     if os.path.exists(webssh_dir):
         data['plugin'].append(plugin_webssh_name)
