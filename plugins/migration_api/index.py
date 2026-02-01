@@ -952,6 +952,9 @@ def get_src_info(args):
     my_db_pos = mw.getServerDir() + '/mysql'
     conn = mw.M('databases').dbPos(my_db_pos, 'mysql')
     data['databases'] = conn.field('id,name,ps').order("id desc").select()
+
+
+    data['plugin'] = ["webssh"]
     return data
 
 
@@ -1000,11 +1003,13 @@ def stepFour():
 
     sites = args['sites']
     databases = args['databases']
+    plugin = args['plugin']
 
     data = getCfgData()
     args = {
         'sites': sites.strip(',').split(','),
-        'databases': databases.strip(',').split(',')
+        'databases': databases.strip(',').split(','),
+        'plugin': plugin.strip(',').split(',')
     }
     api = classApi(data['url'], data['app_id'],data['app_secret'])
     return api.set_sync_info(args)

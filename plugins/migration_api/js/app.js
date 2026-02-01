@@ -187,6 +187,18 @@ function initStep3(){
                 }
                 $('#db_li').html(db_li);
 
+
+                var plugin_li = '';
+                for (var i = 0; i < pdata.plugin.length; i++) {
+                    plugin_li+='<li>\
+                        <label>\
+                        <input type="checkbox" data-id="'+i+'" id="plugin_'+pdata.plugin[i]+'" value="'+pdata.plugin[i]+'" name="plugin" checked="">\
+                        <span title="'+pdata.plugin[i]+'">'+pdata.plugin[i]+'</span>\
+                        </label>\
+                    </li>';
+                }
+                $('#plugin_li').html(plugin_li);
+
                 $('.psync_path').hide();
                 $('.psync_data').show();
             } 
@@ -242,7 +254,12 @@ function initStep4(){
         databases_checked+=$(this).val()+',';
     });
 
-    maPost('step_four',{sites:site_checked,databases:databases_checked}, function(rdata){
+    var plugin_checked = '';
+    $('input[name="plugin"]:checked').each(function(){
+        plugin_checked+=$(this).val()+',';
+    });
+
+    maPost('step_four',{sites:site_checked,databases:databases_checked,plugin:plugin_checked}, function(rdata){
         var rdata = $.parseJSON(rdata.data);
         selectProgress(4);
 
@@ -316,6 +333,11 @@ function initStep(){
     $('#db_All').on('click',function(){ 
         var ch = $(this).prop('checked');
         $('#db_li input').prop('checked',ch);
+    });
+
+    $('#plugin_All').on('click',function(){ 
+        var ch = $(this).prop('checked');
+        $('#plugin_li input').prop('checked',ch);
     });
 
     $('.psync_migrate').on('click', '.okBtn', function(){ 
