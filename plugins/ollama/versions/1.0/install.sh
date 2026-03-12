@@ -51,7 +51,7 @@ Uninstall_App()
 	systemctl disable ollama.service
 	rm -rf /etc/systemd/system/ollama.service
 	systemctl daemon-reload
-	rm -ef $(which ollama)
+	rm -rf $(which ollama)
 	rm -rf /usr/share/ollama
 	rm -rf ~/.ollama
 
