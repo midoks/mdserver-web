@@ -1,0 +1,17 @@
+{
+	"sort": 1,
+	"ps": "Ollama是一个开源跨平台大模型工具",
+	"name": "ollama",
+	"title": "ollama",
+	"shell": "install.sh",
+	"versions":["1.0"],
+	"tip": "soft",
+	"checks": "server/ollama",
+	"path": "server/ollama",
+	"display": 1,
+	"author": "ollama",
+	"date": "2026-03-12",
+	"home": "https://ollama.com/",
+	"type": 7,
+	"pid": "7"
+}
