@@ -85,8 +85,20 @@ var ollama  = {
 
     readme:function (){
         var readme = '<ul class="help-info-text c7">';
-        readme += '<li>能查看。</li>';
+        readme += '<li>常用命令说明：</li>';
         readme += '</ul>';
+        readme += '<div class="divtable mtb15">';
+        readme += '<table class="table table-hover">';
+        readme += '<thead><tr><th>命令</th><th>说明</th><th>示例</th></tr></thead>';
+        readme += '<tbody>';
+        readme += '<tr><td><code>ollama pull &lt;模型名&gt;</code></td><td>仅下载指定的模型到本地，不立即运行</td><td><code>ollama pull deepseek-r1:7b</code></td></tr>';
+        readme += '<tr><td><code>ollama run &lt;模型名&gt;</code></td><td>下载（若本地无）并运行模型，进入交互界面</td><td><code>ollama run llama3.2</code></td></tr>';
+        readme += '<tr><td><code>ollama list</code></td><td>列出所有已下载到本地的模型</td><td><code>ollama list</code></td></tr>';
+        readme += '<tr><td><code>ollama ps</code></td><td>查看当前正在运行的模型</td><td><code>ollama ps</code></td></tr>';
+        readme += '<tr><td><code>ollama stop &lt;模型名&gt;</code></td><td>停止一个正在运行的模型</td><td><code>ollama stop llama3.2</code></td></tr>';
+        readme += '<tr><td><code>ollama rm &lt;模型名&gt;</code></td><td>从本地删除指定模型，释放磁盘空间</td><td><code>ollama rm llama3.2</code></td></tr>';
+        readme += '<tr><td><code>ollama serve</code></td><td>启动 Ollama 后台服务（首次运行模型时也会自动启动）</td><td><code>ollama serve</code></td></tr>';
+        readme += '</tbody></table></div>';
         $('.soft-man-con').html(readme);
     }
 }
