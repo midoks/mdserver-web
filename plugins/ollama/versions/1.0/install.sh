@@ -41,6 +41,8 @@ Install_App()
 
 	mkdir -p $serverPath/ollama
 	echo "$VERSION" > $serverPath/ollama/version.pl
+
+	d ${rootPath} && python3 ${rootPath}/plugins/ollama/index.py start
 	echo 'install successful'
 }
 
