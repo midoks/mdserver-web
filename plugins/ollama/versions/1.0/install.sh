@@ -48,6 +48,7 @@ Uninstall_App()
 {
 	cd ${rootPath} && python3 ${rootPath}/plugins/ollama/index.py stop
 
+	systemctl stop ollama.service
 	systemctl disable ollama.service
 	rm -rf /etc/systemd/system/ollama.service
 	systemctl daemon-reload
