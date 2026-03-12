@@ -37,8 +37,7 @@ get_arch() {
 
 Install_App()
 {
-	
-
+	curl -fsSL https://ollama.com/install.sh | sh
 
 	mkdir -p $serverPath/ollama
 	echo "$VERSION" > $serverPath/ollama/version.pl
@@ -48,6 +47,11 @@ Install_App()
 Uninstall_App()
 {
 	cd ${rootPath} && python3 ${rootPath}/plugins/ollama/index.py stop
+
+	if command -v apt &> /dev/null; then
+		apt remove -y ollama
+	fi
+
 	rm -rf $serverPath/ollama
 	echo "install fail"
 }

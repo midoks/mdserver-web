@@ -208,12 +208,6 @@ class App:
         mw.execShell('systemctl disable '+self.getPluginName())
         return 'ok'
 
-    def conf(self):
-        return self.getServerDir() + '/dashboard/data/config.yaml'
-
-
-    def run_log(self):
-        return self.getServerDir() + '/logs/nezha.log'
 
 
 if __name__ == "__main__":
