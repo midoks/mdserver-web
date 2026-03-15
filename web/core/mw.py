@@ -524,7 +524,8 @@ def getLocalIp():
             pass
         for flag in ['-4', '-6']:
             try:
-                cmd = f"curl --insecure {flag} -sS --connect-timeout 5 -m 60 https://speed.cloudflare.com/cdn-cgi/trace"
+                # 向下兼容 Python 2.7 ~ 3.x，移除 f-string，改用字符串拼接
+                cmd = "curl --insecure " + flag + " -sS --connect-timeout 5 -m 60 https://speed.cloudflare.com/cdn-cgi/trace" # 使用 speed.cloudflare.com/cdn-cgi/trace 获取公网 IP
                 ip = execShell(cmd)
                 if ip and isinstance(ip, (tuple, list)) and ip[0]:
                     for line in ip[0].splitlines():
@@ -538,8 +539,6 @@ def getLocalIp():
     except Exception:
         pass
     return '127.0.0.1'
-
-
 
 def inArray(arrays, searchStr):
     # 搜索数据中是否存在
