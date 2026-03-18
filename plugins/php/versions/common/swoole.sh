@@ -17,11 +17,6 @@ version=$2
 LIBNAME=swoole
 LIBV=5.1.6
 
-if [ "$version" == "85" ];then
-	echo "not need"
-	exit 1
-fi 
-
 if [ "$version" -lt "70" ];then
 	LIBV=1.10.1
 elif [ "$version" == "70" ];then
@@ -32,8 +27,16 @@ elif [ "$version" -le "74" ];then
 	LIBV=4.8.10
 elif [ "$version" -lt "80" ];then
 	LIBV=6.0.2
-elif [ "$version" -gt "80" ];then
-	LIBV=6.0.2
+elif [ "$version" == "81" ];then
+	LIBV=6.1.7
+elif [ "$version" == "82" ];then
+	LIBV=6.2.0
+elif [ "$version" == "83" ];then
+	LIBV=6.2.0
+elif [ "$version" == "84" ];then
+	LIBV=6.2.0
+elif [ "$version" == "85" ];then
+	LIBV=6.2.0
 else
 	echo 'other?'
 	exit 0
