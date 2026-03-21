@@ -514,30 +514,31 @@ def checkDomainPanel():
     return False
 
 def getLocalIp():
-    filename = getPanelDir()+'/data/iplist.txt'
     try:
-        ipaddress = readFile(filename)
-        if not ipaddress or ipaddress == '127.0.0.1':
-            cmd = "curl --insecure -4 -sS --connect-timeout 5 -m 60 https://v6r.ipip.net/?format=text"
-            ip = execShell(cmd)
-            result = ip[0].strip()
-            if result == '':
-                raise Exception("ipv4 is empty!")
-            writeFile(filename, result)
-            return result
-        return ipaddress
-    except Exception as e:
-        cmd = "curl --insecure -6 -sS --connect-timeout 5 -m 60 https://v6r.ipip.net/?format=text"
-        ip = execShell(cmd)
-        result = ip[0].strip()
-        if result == '':
-            return '127.0.0.1'
-        writeFile(filename, result)
-        return result
-    finally:
+        filename = getPanelDir() + '/data/iplist.txt'
+        try:
+            ipaddress = readFile(filename)
+            if ipaddress and ipaddress != '127.0.0.1':
+                return ipaddress
+        except Exception:
+            pass
+        for flag in ['-4', '-6']:
+            try:
+                # 向下兼容 Python 2.7 ~ 3.x，移除 f-string，改用字符串拼接
+                cmd = "curl --insecure " + flag + " -sS --connect-timeout 5 -m 60 https://speed.cloudflare.com/cdn-cgi/trace" # 使用 speed.cloudflare.com/cdn-cgi/trace 获取公网 IP
+                ip = execShell(cmd)
+                if ip and isinstance(ip, (tuple, list)) and ip[0]:
+                    for line in ip[0].splitlines():
+                        if line.startswith('ip='):
+                            result = line[3:].strip()
+                            if result:
+                                writeFile(filename, result)
+                                return result
+            except Exception:
+                continue
+    except Exception:
         pass
     return '127.0.0.1'
-
 
 def inArray(arrays, searchStr):
     # 搜索数据中是否存在
