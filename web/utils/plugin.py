@@ -74,6 +74,11 @@ class plugin(object):
             "title":"辅助插件",
             "type":6,
             "ps":""
+        },
+        {
+            "title":"AI插件",
+            "type":7,
+            "ps":""
         }
     ]
 
