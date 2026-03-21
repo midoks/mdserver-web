@@ -36,7 +36,12 @@ if [ "$actionType" == 'install' ];then
 		ext_file=${ext_dir}/${find_opcache}
 	fi
 	echo $ext_file
-	echo "zend_extension=${LIBNAME}.so" >> $ext_file
+
+	if [ "$version" == "8.5" ];then
+		echo "no zend_extension"
+	else
+		echo "zend_extension=${LIBNAME}.so" >> $ext_file
+	fi
 	echo "opcache.enable=1" >> $ext_file
 	echo "opcache.memory_consumption=128" >> $ext_file
 	echo "opcache.interned_strings_buffer=8" >> $ext_file
