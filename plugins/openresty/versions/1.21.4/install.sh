@@ -103,6 +103,15 @@ Install_openresty()
 		# OPENSSL_LIB_DEPEND_DIR=`brew info openssl@1.1 | grep ${BREW_DIR}/Cellar/openssl@1.1 | cut -d \  -f 1 | awk 'END {print}'`
 		# OPTIONS="${OPTIONS} --with-openssl=${OPENSSL_LIB_DEPEND_DIR}"
 	else
+		if [ ! -f ${openrestyDir}/pcre-${pcreVersion}.tar.gz ];then
+			wget --no-check-certificate -O ${openrestyDir}/pcre-${pcreVersion}.tar.gz https://netix.dl.sourceforge.net/project/pcre/pcre/${pcreVersion}/pcre-${pcreVersion}.tar.gz
+		fi
+
+		if [ ! -d ${openrestyDir}/pcre-${pcreVersion} ];then
+			cd ${openrestyDir} &&  tar -zxvf pcre-${pcreVersion}.tar.gz
+		fi
+		OPTIONS="${OPTIONS} --with-pcre=${openrestyDir}/pcre-${pcreVersion}"
+		
 		if [ ! -f ${openrestyDir}/openssl-${opensslVersion}.tar.gz ];then
 	        wget --no-check-certificate -O ${openrestyDir}/openssl-${opensslVersion}.tar.gz https://www.openssl.org/source/openssl-${opensslVersion}.tar.gz
 	    fi
@@ -113,6 +122,13 @@ Install_openresty()
 		OPTIONS="${OPTIONS} --with-openssl=${openrestyDir}/openssl-${opensslVersion}"
 	fi
 
+	# br
+	if [ ! -d ${openrestyDir}/openresty-${VERSION}/ngx_brotli ];then
+		cd ${openrestyDir}/openresty-${VERSION} && git clone https://github.com/wxx9248/ngx_brotli.git
+		cd ${openrestyDir}/openresty-${VERSION}/ngx_brotli && git submodule update --init
+
+		OPTIONS="${OPTIONS} --add-module=./ngx_brotli"
+	fi
 
 	# --with-openssl=$serverPath/source/lib/openssl-1.0.2q
 	cd ${openrestyDir}/openresty-${VERSION} && ./configure \

@@ -14,7 +14,7 @@ sysName=`uname`
 action=$1
 type=$2
 
-VERSION=1.29.2.1
+VERSION=1.29.2.3
 
 openrestyDir=${serverPath}/source/openresty
 
@@ -72,9 +72,9 @@ Install_openresty()
 
 	OPTIONS=''
 
-	opensslVersion="1.1.1p"
+	opensslVersion="3.4.4"
 	libresslVersion="3.9.1"
-	pcreVersion='8.38'
+	pcreVersion='8.45'
 	if [ "$sysName" == "Darwin" ];then
 
 		if [ ! -f ${openrestyDir}/pcre-${pcreVersion}.tar.gz ];then
@@ -114,7 +114,7 @@ Install_openresty()
 
 	fi
 
-	if [[ "$VERSION" =~ "1.25.3" ]] || [[ "$VERSION" =~ "1.27.1" ]];then
+	if [[ "$VERSION" =~ "1.29.2" ]];then
 		OPTIONS="${OPTIONS} --with-http_v3_module"
 
 		if [ ! -f ${openrestyDir}/libressl-${libresslVersion}.tar.gz ];then
@@ -127,6 +127,14 @@ Install_openresty()
 	    
 	    OPTIONS="${OPTIONS} --with-cc-opt=-I${openrestyDir}/libressl-${libresslVersion}/libressl/build/include"
 	    OPTIONS="${OPTIONS} --with-cc-opt=-I${openrestyDir}/libressl-${libresslVersion}/libressl/build/lib"
+	fi
+
+	# br
+	if [ ! -d ${openrestyDir}/openresty-${VERSION}/ngx_brotli ];then
+		cd ${openrestyDir}/openresty-${VERSION} && git clone https://github.com/wxx9248/ngx_brotli.git
+		cd ${openrestyDir}/openresty-${VERSION}/ngx_brotli && git submodule update --init
+
+		OPTIONS="${OPTIONS} --add-module=./ngx_brotli"
 	fi
 
 
@@ -167,6 +175,10 @@ Install_openresty()
     if [ -d $openrestyDir/openresty-${VERSION} ];then
 		rm -rf $openrestyDir/openresty-${VERSION}
 	fi
+
+	# if [ -d $openrestyDir/ngx_brotli ];then
+	# 	rm -rf $openrestyDir/ngx_brotli
+	# fi
 	echo 'Installation of Openresty completed'
 }
 

@@ -399,12 +399,36 @@ def systemdCfgDir():
     return "/tmp"
 
 
-def formatDate(format="%Y-%m-%d %H:%M:%S", times=None):
+def formatDate(fmat="%Y-%m-%d %H:%M:%S", times=None, time_zone=None):
     # 格式化指定时间戳
     if not times:
         times = int(time.time())
-    time_local = time.localtime(times)
-    return time.strftime(format, time_local)
+    
+    # if time_zone is None:
+    #     try:
+    #         import tzlocal
+    #         time_zone = str(tzlocal.get_localzone())
+    #     except:
+    #         try:
+    #             time_zone = time.tzname[0]
+    #         except:
+    #             time_zone = None
+    
+    if time_zone:
+        old_tz = os.environ.get('TZ')
+        os.environ['TZ'] = time_zone
+        time.tzset()
+        time_local = time.localtime(times)
+        result = time.strftime(fmat, time_local)
+        if old_tz:
+            os.environ['TZ'] = old_tz
+        else:
+            del os.environ['TZ']
+        time.tzset()
+        return result
+    else:
+        time_local = time.localtime(times)
+        return time.strftime(fmat, time_local)
 
 
 def strfToTime(sdate):
