@@ -175,6 +175,10 @@ Install_openresty()
     if [ -d $openrestyDir/openresty-${VERSION} ];then
 		rm -rf $openrestyDir/openresty-${VERSION}
 	fi
+
+	# if [ -d $openrestyDir/ngx_brotli ];then
+	# 	rm -rf $openrestyDir/ngx_brotli
+	# fi
 	echo 'Installation of Openresty completed'
 }
 
