@@ -130,6 +130,14 @@ Install_openresty()
 	fi
 
 
+	NGX_BR_ADDR="https://github.com//google/ngx_brotli/archive/refs/heads/master.zip"
+	if [ ! -f ${openrestyDir}/ngx_brotli.tar.gz ];then
+		wget --no-check-certificate -O ${openrestyDir}/ngx_brotli.tar.gz ${NGX_BR_ADDR} -T 3
+		cd ${openrestyDir} &&  tar -zxvf ngx_brotli.tar.gz
+	fi
+
+
+
 	cd ${openrestyDir}/openresty-${VERSION} && ./configure \
 	--prefix=$serverPath/openresty \
 	$OPTIONS \
