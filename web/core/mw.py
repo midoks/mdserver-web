@@ -404,15 +404,15 @@ def formatDate(fmat="%Y-%m-%d %H:%M:%S", times=None, time_zone=None):
     if not times:
         times = int(time.time())
     
-    if time_zone is None:
-        try:
-            import tzlocal
-            time_zone = str(tzlocal.get_localzone())
-        except:
-            try:
-                time_zone = time.tzname[0]
-            except:
-                time_zone = None
+    # if time_zone is None:
+    #     try:
+    #         import tzlocal
+    #         time_zone = str(tzlocal.get_localzone())
+    #     except:
+    #         try:
+    #             time_zone = time.tzname[0]
+    #         except:
+    #             time_zone = None
     
     if time_zone:
         old_tz = os.environ.get('TZ')
