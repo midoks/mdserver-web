@@ -103,6 +103,15 @@ Install_openresty()
 		# OPENSSL_LIB_DEPEND_DIR=`brew info openssl@1.1 | grep ${BREW_DIR}/Cellar/openssl@1.1 | cut -d \  -f 1 | awk 'END {print}'`
 		# OPTIONS="${OPTIONS} --with-openssl=${OPENSSL_LIB_DEPEND_DIR}"
 	else
+		if [ ! -f ${openrestyDir}/pcre-${pcreVersion}.tar.gz ];then
+			wget --no-check-certificate -O ${openrestyDir}/pcre-${pcreVersion}.tar.gz https://netix.dl.sourceforge.net/project/pcre/pcre/${pcreVersion}/pcre-${pcreVersion}.tar.gz
+		fi
+
+		if [ ! -d ${openrestyDir}/pcre-${pcreVersion} ];then
+			cd ${openrestyDir} &&  tar -zxvf pcre-${pcreVersion}.tar.gz
+		fi
+		OPTIONS="${OPTIONS} --with-pcre=${openrestyDir}/pcre-${pcreVersion}"
+		
 		echo "openssl"
 		# if [ ! -f ${openrestyDir}/openssl-${opensslVersion}.tar.gz ];then
 	    #     wget --no-check-certificate -O ${openrestyDir}/openssl-${opensslVersion}.tar.gz https://www.openssl.org/source/openssl-${opensslVersion}.tar.gz
