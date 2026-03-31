@@ -130,10 +130,14 @@ Install_openresty()
 	fi
 
 
-	NGX_BR_ADDR="https://github.com//google/ngx_brotli/archive/refs/heads/master.zip"
+	NGX_BR_ADDR="https://github.com//google/ngx_brotli/archive/refs/heads/master.tar.gz"
 	if [ ! -f ${openrestyDir}/ngx_brotli.tar.gz ];then
 		wget --no-check-certificate -O ${openrestyDir}/ngx_brotli.tar.gz ${NGX_BR_ADDR} -T 3
 		cd ${openrestyDir} &&  tar -zxvf ngx_brotli.tar.gz
+	fi
+
+	if [ -d ${openrestyDir}/ngx_brotli-master ];then
+		OPTIONS="${OPTIONS} --with-compat --add-dynamic-module=${openrestyDir}/ngx_brotli-master"
 	fi
 
 
