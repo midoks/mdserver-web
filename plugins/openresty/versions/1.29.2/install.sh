@@ -74,7 +74,7 @@ Install_openresty()
 
 	opensslVersion="3.4.4"
 	libresslVersion="3.9.1"
-	pcreVersion='8.38'
+	pcreVersion='8.45'
 	if [ "$sysName" == "Darwin" ];then
 
 		if [ ! -f ${openrestyDir}/pcre-${pcreVersion}.tar.gz ];then
