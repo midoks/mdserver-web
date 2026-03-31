@@ -6,6 +6,8 @@ export PATH
 # cd /www/server/mdserver-web/plugins/openresty && bash install.sh install 1.21.4
 # cd /www/server/mdserver-web/plugins/openresty && bash install.sh install 1.29.2
 
+# curl -I -H "Accept-Encoding: br" http://localhost
+
 # cd /www/server/mdserver-web && python3 plugins/openresty/index.py run_info
 
 curPath=`pwd`
