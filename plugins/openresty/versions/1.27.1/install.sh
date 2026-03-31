@@ -129,6 +129,13 @@ Install_openresty()
 	    OPTIONS="${OPTIONS} --with-cc-opt=-I${openrestyDir}/libressl-${libresslVersion}/libressl/build/lib"
 	fi
 
+	# br
+	if [ ! -d ${openrestyDir}/openresty-${VERSION}/ngx_brotli ];then
+		cd ${openrestyDir}/openresty-${VERSION} && git clone https://github.com/wxx9248/ngx_brotli.git
+		cd ${openrestyDir}/openresty-${VERSION}/ngx_brotli && git submodule update --init
+
+		OPTIONS="${OPTIONS} --add-module=./ngx_brotli"
+	fi
 
 	cd ${openrestyDir}/openresty-${VERSION} && ./configure \
 	--prefix=$serverPath/openresty \
