@@ -129,17 +129,13 @@ Install_openresty()
 	    OPTIONS="${OPTIONS} --with-cc-opt=-I${openrestyDir}/libressl-${libresslVersion}/libressl/build/lib"
 	fi
 
+	# br
+	if [ ! -f ${openrestyDir}/ngx_brotli ];then
+		cd ${openrestyDir} && git clone https://github.com/wxx9248/ngx_brotli.git
+		cd ${openrestyDir}/ngx_brotli && git submodule update --init
 
-	NGX_BR_ADDR="https://github.com/wxx9248/ngx_brotli/archive/refs/heads/master.tar.gz"
-	if [ ! -f ${openrestyDir}/ngx_brotli.tar.gz ];then
-		wget --no-check-certificate -O ${openrestyDir}/ngx_brotli.tar.gz ${NGX_BR_ADDR} -T 3
-		cd ${openrestyDir} &&  tar -zxvf ngx_brotli.tar.gz
+		OPTIONS="${OPTIONS} --with-compat --add-dynamic-module=${openrestyDir}/ngx_brotli"
 	fi
-
-	if [ -d ${openrestyDir}/ngx_brotli-master ];then
-		OPTIONS="${OPTIONS} --with-compat --add-dynamic-module=${openrestyDir}/ngx_brotli-master"
-	fi
-
 
 
 	cd ${openrestyDir}/openresty-${VERSION} && ./configure \
