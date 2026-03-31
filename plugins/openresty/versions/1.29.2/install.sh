@@ -14,7 +14,7 @@ sysName=`uname`
 action=$1
 type=$2
 
-VERSION=1.29.2.1
+VERSION=1.29.2.3
 
 openrestyDir=${serverPath}/source/openresty
 
