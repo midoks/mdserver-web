@@ -193,6 +193,10 @@ Uninstall_openresty()
 }
 
 action=$1
+if [ "${1}" == "upgrade" ];then
+	Install_openresty
+fi
+
 if [ "${1}" == "install" ];then
 	Install_openresty
 else
