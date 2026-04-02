@@ -554,12 +554,12 @@ class sites(object):
         tmp = re.findall(rep, conf)
         if not mw.inArray(tmp, '443'):
             listen = re.search(rep, conf).group()
-            http_ssl = http_ssl + "\n\tlisten 443 ssl;"
+            http_ssl = "listen 443 ssl;"
             http_ssl = http_ssl + "\n\tlisten [::]:443 ssl;"
             if mw.isSupportHttp3(version):
                 http_ssl = http_ssl + "\n\tlisten 443 quic reuseport;"
                 http_ssl = http_ssl + "\n\thttp3 on;"
-            
+
             http_ssl = http_ssl + "\n\thttp2 on;"
 
             conf = conf.replace(listen, listen + http_ssl)
