@@ -558,7 +558,7 @@ class sites(object):
             http_ssl = http_ssl + "\n\tlisten [::]:443 ssl;"
             if mw.isSupportHttp3(version):
                 http_ssl = http_ssl + "\n\tlisten 443 quic;#reuseport"
-                http_ssl = http_ssl + "\n\tlisten [::]:443 quic;#reuseport"
+                http_ssl = http_ssl + "\n\tlisten [::]:443 quic;"
                 http_ssl = http_ssl + "\n\thttp3 on;"
 
             http_ssl = http_ssl + "\n\thttp2 on;"
