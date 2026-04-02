@@ -1926,22 +1926,22 @@ location ^~ {from} {\n\
             path = self.getHostConf(default_site)
             if os.path.exists(path):
                 conf = mw.readFile(path)
-                rep = r"listen\s+443\s+quic\s*reuseport.+"
+                rep = r"listen\s+443\s+quic\s*reuseport default_server"
                 conf = re.sub(rep, 'listen 443 quic reuseport;', conf, 1)
-                rep = r"listen\s+\[\:\:\]\:443\s+quic\s*reuseport.+;"
+                rep = r"listen\s+\[\:\:\]\:443\s+quic\s*reuseport\s*default_server;"
                 conf = re.sub(rep, 'listen [::]:443 quic reuseport;', conf, 1)
 
-                rep = r"listen\s+80.+;"
+                rep = r"listen\s+80 default_server;"
                 conf = re.sub(rep, 'listen 80;', conf, 1)
-                rep = r"listen\s+\[\:\:\]\:80.+;"
+                rep = r"listen\s+\[\:\:\]\:80;"
                 conf = re.sub(rep, 'listen [::]:80;', conf, 1)
-                rep = r"listen\s+443.+;"
+                rep = r"listen\s+443\s*default_server;"
                 conf = re.sub(rep, 'listen 443 ssl;', conf, 1)
-                rep = r"listen\s+443\s+quic.+;"
+                rep = r"listen\s+443\s*quic\*default_server;"
                 conf = re.sub(rep, 'listen 443 quic;', conf, 1)
-                rep = r"listen\s+\[\:\:\]\:443.+;"
+                rep = r"listen\s+\[\:\:\]\:443\s*default_server;"
                 conf = re.sub(rep, 'listen [::]:443 ssl;', conf, 1)
-                rep = r"listen\s+\[\:\:\]\:443\s+quic.+;"
+                rep = r"listen\s+\[\:\:\]\:443\s+quic\*default_server;"
                 conf = re.sub(rep, 'listen [::]:443 quic;', conf, 1)
                 mw.writeFile(path, conf)
 
