@@ -561,7 +561,6 @@ class sites(object):
                 http_ssl = http_ssl + "\n\thttp3 on;"
 
             http_ssl = http_ssl + "\n\thttp2 on;"
-
             conf = conf.replace(listen, listen + http_ssl)
 
         mw.backFile(file)
