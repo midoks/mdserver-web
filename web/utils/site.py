@@ -528,8 +528,8 @@ class sites(object):
             # ssl_ciphers ECDHE-RSA-AES128-GCM-SHA256:HIGH:!aNULL:!MD5:!RC4:!DHE;
             # add_header Alt-Svc 'h3=":443";ma=86400,h3-29=":443";ma=86400';
             http3Header = """
-    add_header Strict-Transport-Security "max-age=63072000";
     add_header Alt-Svc 'h3=":443";ma=86400';
+    add_header Strict-Transport-Security "max-age=63072000";
 """
             # if not version.startswith('1.25') or version.startswith('1.27'):
             #     http3Header = '';
