@@ -139,7 +139,7 @@ Install_openresty()
 
 	OPTIONS="${OPTIONS} --with-threads"
 	OPTIONS="${OPTIONS} --with-file-aio"
-
+	OPTIONS="${OPTIONS} --with-pcre-jit"
 
 	cd ${openrestyDir}/openresty-${VERSION} && ./configure \
 	--prefix=$serverPath/openresty \
