@@ -922,6 +922,15 @@ def isSupportSystemctl():
         return False
     return True
 
+def isSupportHttp3(version):
+    if version.startswith('1.25'):
+        return True 
+    if version.startswith('1.27'):
+        return True
+    if version.startswith('1.29'):
+        return True
+    return False
+
 def isDebugMode():
     if isAppleSystem():
         return True
