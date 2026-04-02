@@ -1936,7 +1936,7 @@ location ^~ {from} {\n\
                 conf = re.sub(rep, 'listen [::]:443 ssl;', conf, 1)
                 rep = r"listen\s+[::]:443\s+quic.+;"
                 conf = re.sub(rep, 'listen [::]:443 quic;', conf, 1)
-                rep = r"listen\s+[::]:443\s+quic\s+reuseport.+;"
+                rep = r"listen\s+[::]:443\s+quic\s*reuseport.+;"
                 conf = re.sub(rep, 'listen [::]:443 quic reuseport;', conf, 1)
                 mw.writeFile(path, conf)
 
