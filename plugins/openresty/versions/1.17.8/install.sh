@@ -127,8 +127,12 @@ Install_openresty()
 		cd ${openrestyDir}/openresty-${VERSION} && git clone https://github.com/wxx9248/ngx_brotli.git
 		cd ${openrestyDir}/openresty-${VERSION}/ngx_brotli && git submodule update --init
 
-		OPTIONS="${OPTIONS} --add-module=./ngx_brotli"
+		OPTIONS="${OPTIONS} --add-module=${openrestyDir}/openresty-${VERSION}/ngx_brotli"
 	fi
+
+	OPTIONS="${OPTIONS} --with-threads"
+	OPTIONS="${OPTIONS} --with-file-aio"
+	OPTIONS="${OPTIONS} --with-pcre-jit"
 
 
 	# --with-openssl=$serverPath/source/lib/openssl-1.0.2q
