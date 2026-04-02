@@ -2111,6 +2111,8 @@ location ^~ {from} {\n\
             conf = re.sub(rep, '', conf)
             rep = r"\s+http2\s+on;"
             conf = re.sub(rep, '', conf)
+            rep = r"\s+http3\s+on;"
+            conf = re.sub(rep, '', conf)
             mw.writeFile(file, conf)
 
         msg = mw.getInfo('网站[{1}]关闭SSL成功!', (site_name,))
