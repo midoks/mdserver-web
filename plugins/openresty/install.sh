@@ -31,6 +31,18 @@ else
 	useradd -g www -s /bin/bash www
 fi
 
+if [ "${action}" == "upgrade" ];then
+	echo "${VERSION}" > $serverPath/openresty/version.pl
+
+	mkdir -p $serverPath/web_conf/php/conf
+	echo 'set $PHP_ENV 0;' > $serverPath/web_conf/php/conf/enable-php-00.conf
+
+	#初始化 
+	cd ${rootPath} && python3 ${rootPath}/plugins/openresty/index.py start
+	cd ${rootPath} && python3 ${rootPath}/plugins/openresty/index.py initd_install
+fi
+
+
 if [ "${2}" == "" ];then
 	echo '缺少安装脚本版本...'
 	exit 0
