@@ -134,6 +134,7 @@ Install_openresty()
 	OPTIONS="${OPTIONS} --with-threads"
 	OPTIONS="${OPTIONS} --with-file-aio"
 	OPTIONS="${OPTIONS} --with-pcre-jit"
+	OPTIONS="${OPTIONS} --with-http_gzip_static_module"
 
 
 	# --with-openssl=$serverPath/source/lib/openssl-1.0.2q
