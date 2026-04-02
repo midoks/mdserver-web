@@ -191,7 +191,7 @@ Uninstall_openresty()
 }
 
 action=$1
-if [ "${1}" == 'install' ];then
+if [ "${1}" == "install" ];then
 	Install_openresty
 else
 	Uninstall_openresty
