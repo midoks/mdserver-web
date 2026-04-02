@@ -117,16 +117,16 @@ Install_openresty()
 	if [[ "$VERSION" =~ "1.27.1" ]];then
 		OPTIONS="${OPTIONS} --with-http_v3_module"
 
-		if [ ! -f ${openrestyDir}/libressl-${libresslVersion}.tar.gz ];then
-	        wget --no-check-certificate -O ${openrestyDir}/libressl-${libresslVersion}.tar.gz https://ftp.openbsd.org/pub/OpenBSD/LibreSSL/libressl-${libresslVersion}.tar.gz
-	    fi
+		# if [ ! -f ${openrestyDir}/libressl-${libresslVersion}.tar.gz ];then
+	    #     wget --no-check-certificate -O ${openrestyDir}/libressl-${libresslVersion}.tar.gz https://ftp.openbsd.org/pub/OpenBSD/LibreSSL/libressl-${libresslVersion}.tar.gz
+	    # fi
 
-	    if [ ! -d ${openrestyDir}/libressl-${libresslVersion} ];then
-			cd ${openrestyDir} &&  tar -zxvf libressl-${libresslVersion}.tar.gz
-		fi
+	    # if [ ! -d ${openrestyDir}/libressl-${libresslVersion} ];then
+		# 	cd ${openrestyDir} &&  tar -zxvf libressl-${libresslVersion}.tar.gz
+		# fi
 	    
-	    OPTIONS="${OPTIONS} --with-cc-opt=-I${openrestyDir}/libressl-${libresslVersion}/libressl/build/include"
-	    OPTIONS="${OPTIONS} --with-cc-opt=-I${openrestyDir}/libressl-${libresslVersion}/libressl/build/lib"
+	    # OPTIONS="${OPTIONS} --with-cc-opt=-I${openrestyDir}/libressl-${libresslVersion}/libressl/build/include"
+	    # OPTIONS="${OPTIONS} --with-cc-opt=-I${openrestyDir}/libressl-${libresslVersion}/libressl/build/lib"
 	fi
 
 	# br
@@ -134,8 +134,12 @@ Install_openresty()
 		cd ${openrestyDir}/openresty-${VERSION} && git clone https://github.com/wxx9248/ngx_brotli.git
 		cd ${openrestyDir}/openresty-${VERSION}/ngx_brotli && git submodule update --init
 
-		OPTIONS="${OPTIONS} --add-module=./ngx_brotli"
+		OPTIONS="${OPTIONS} --add-module=${openrestyDir}/openresty-${VERSION}/ngx_brotli"
 	fi
+
+	OPTIONS="${OPTIONS} --with-threads"
+	OPTIONS="${OPTIONS} --with-file-aio"
+	OPTIONS="${OPTIONS} --with-pcre-jit"
 
 	cd ${openrestyDir}/openresty-${VERSION} && ./configure \
 	--prefix=$serverPath/openresty \
