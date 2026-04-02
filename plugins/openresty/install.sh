@@ -33,6 +33,8 @@ else
 fi
 
 if [ "${action}" == "upgrade" ];then
+	sh -x $curPath/versions/$2/install.sh $1
+	
 	echo "${VERSION}" > $serverPath/openresty/version.pl
 
 	mkdir -p $serverPath/web_conf/php/conf
@@ -41,6 +43,7 @@ if [ "${action}" == "upgrade" ];then
 	#初始化 
 	cd ${rootPath} && python3 ${rootPath}/plugins/openresty/index.py start
 	cd ${rootPath} && python3 ${rootPath}/plugins/openresty/index.py initd_install
+	exit 0
 fi
 
 
