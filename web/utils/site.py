@@ -1932,11 +1932,11 @@ location ^~ {from} {\n\
                 conf = re.sub(rep, 'listen 443 ssl;', conf, 1)
                 rep = r"listen\s+443\s+quic.+;"
                 conf = re.sub(rep, 'listen 443 quic;', conf, 1)
-                rep = r"listen\s+[::]:443.+;"
+                rep = r"listen\s+\[\:\:\]\:443.+;"
                 conf = re.sub(rep, 'listen [::]:443 ssl;', conf, 1)
-                rep = r"listen\s+[::]:443\s+quic.+;"
+                rep = r"listen\s+\[\:\:\]\:443\s+quic.+;"
                 conf = re.sub(rep, 'listen [::]:443 quic;', conf, 1)
-                rep = r"listen\s+[::]:443\s+quic\s*reuseport.+;"
+                rep = r"listen\s+\[\:\:\]\:443\s+quic\s*reuseport.+;"
                 conf = re.sub(rep, 'listen [::]:443 quic reuseport;', conf, 1)
                 mw.writeFile(path, conf)
 
@@ -1945,17 +1945,17 @@ location ^~ {from} {\n\
             conf = mw.readFile(path)
             rep = r"listen\s+80\s*;"
             conf = re.sub(rep, 'listen 80 default_server;', conf, 1)
-            rep = r"listen\s+[::]:80\s*ssl\s*\w*\s*;"
+            rep = r"listen\s+\[\:\:\]\:80\s*ssl\s*\w*\s*;"
             conf = re.sub(rep, 'listen [::]:80 default_server;', conf, 1)
             rep = r"listen\s+443\s*ssl\s*\w*\s*;"
             conf = re.sub(rep, 'listen 443 ssl default_server;', conf, 1)
             rep = r"listen\s+443\s*quic\s*\w*\s*;"
             conf = re.sub(rep, 'listen 443 quic default_server;', conf, 1)
-            rep = r"listen\s+[::]:443\s*ssl\s*\w*\s*;"
+            rep = r"listen\s+\[\:\:\]\:443\s*ssl\s*\w*\s*;"
             conf = re.sub(rep, 'listen [::]:443 ssl default_server;', conf, 1)
-            rep = r"listen\s+[::]:443\s*quic\s*\w*\s*;"
+            rep = r"listen\s+\[\:\:\]\:443\s*quic\s*\w*\s*;"
             conf = re.sub(rep, 'listen [::]:443 quic default_server;', conf, 1)
-            rep = r"listen\s+[::]:443\s*quic\s*reuseport\s*\w*\s*;"
+            rep = r"listen\s+\[\:\:\]\:443\s*quic\s*reuseport\s*\w*\s*;"
             conf = re.sub(rep, 'listen [::]:443 quic reuseport default_server;', conf, 1)
             mw.writeFile(path, conf)
 
