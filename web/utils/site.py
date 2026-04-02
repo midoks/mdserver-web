@@ -1928,6 +1928,8 @@ location ^~ {from} {\n\
                 conf = mw.readFile(path)
                 rep = r"listen\s+80.+;"
                 conf = re.sub(rep, 'listen 80;', conf, 1)
+                rep = r"listen\s+\[\:\:\]\:80.+;"
+                conf = re.sub(rep, 'listen [::]:80;', conf, 1)
                 rep = r"listen\s+443.+;"
                 conf = re.sub(rep, 'listen 443 ssl;', conf, 1)
                 rep = r"listen\s+443\s+quic.+;"
