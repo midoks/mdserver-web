@@ -1948,23 +1948,23 @@ location ^~ {from} {\n\
         path = self.getHostConf(name)
         if os.path.exists(path):
             conf = mw.readFile(path)
-            rep = r"listen\s+443\s*quic\s*reuseport\s*\w*\s*;"
+            rep = r"listen\s+443\s*quic\s*reuseport;"
             conf = re.sub(rep, 'listen 443 quic reuseport default_server;', conf, 1)
 
-            rep = r"listen\s+\[\:\:\]\:443\s*quic\s*reuseport\s*\w*\s*;"
+            rep = r"listen\s+\[\:\:\]\:443\s*quic\s*reuseport;"
             conf = re.sub(rep, 'listen [::]:443 quic reuseport default_server;', conf, 1)
 
             rep = r"listen\s+80\s*;"
             conf = re.sub(rep, 'listen 80 default_server;', conf, 1)
-            rep = r"listen\s+\[\:\:\]\:80\s*\w*\s*;"
+            rep = r"listen\s+\[\:\:\]\:80;"
             conf = re.sub(rep, 'listen [::]:80 default_server;', conf, 1)
-            rep = r"listen\s+443\s*ssl\s*\w*\s*;"
+            rep = r"listen\s+443\s*ssl;"
             conf = re.sub(rep, 'listen 443 ssl default_server;', conf, 1)
-            rep = r"listen\s+443\s*quic\s*\w*\s*;"
+            rep = r"listen\s+443\s*quic;"
             conf = re.sub(rep, 'listen 443 quic default_server;', conf, 1)
-            rep = r"listen\s+\[\:\:\]\:443\s*ssl\s*\w*\s*;"
+            rep = r"listen\s+\[\:\:\]\:443\s*ssl;"
             conf = re.sub(rep, 'listen [::]:443 ssl default_server;', conf, 1)
-            rep = r"listen\s+\[\:\:\]\:443\s*quic\s*\w*\s*;"
+            rep = r"listen\s+\[\:\:\]\:443\s*quic;"
             conf = re.sub(rep, 'listen [::]:443 quic default_server;', conf, 1)
             mw.writeFile(path, conf)
 
