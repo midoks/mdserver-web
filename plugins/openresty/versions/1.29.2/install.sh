@@ -20,6 +20,7 @@ openrestyDir=${serverPath}/source/openresty
 
 Install_openresty()
 {
+	echo "action:${action}"
 	if [ "${action}" == "install" ];then
 		if [ -d $serverPath/openresty ];then
 			exit 0
