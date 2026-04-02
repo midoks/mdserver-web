@@ -560,7 +560,7 @@ class sites(object):
 
             
             if mw.isSupportHttp3(version):
-                http_ssl = "\n\thttp2 on;"
+                http_ssl = "\n\thttp3 on;"
 
             conf = conf.replace(listen, listen + http_ssl)
 
