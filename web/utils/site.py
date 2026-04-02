@@ -1935,7 +1935,7 @@ location ^~ {from} {\n\
                 conf = re.sub(rep, 'listen 80;', conf, 1)
                 rep = r"listen\s+\[\:\:\]\:80\s*default_server;"
                 conf = re.sub(rep, 'listen [::]:80;', conf, 1)
-                rep = r"listen\s+443\s*default_server;"
+                rep = r"listen\s+443\s*ssl\s*default_server;"
                 conf = re.sub(rep, 'listen 443 ssl;', conf, 1)
                 rep = r"listen\s+443\s*quic\*default_server;"
                 conf = re.sub(rep, 'listen 443 quic;', conf, 1)
