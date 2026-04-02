@@ -137,6 +137,9 @@ Install_openresty()
 		OPTIONS="${OPTIONS} --add-module=./ngx_brotli"
 	fi
 
+	OPTIONS="${OPTIONS} --with-threads"
+	OPTIONS="${OPTIONS} --with-file-aio"
+
 
 	cd ${openrestyDir}/openresty-${VERSION} && ./configure \
 	--prefix=$serverPath/openresty \
