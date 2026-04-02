@@ -19,8 +19,10 @@ openrestyDir=${serverPath}/source/openresty
 
 Install_openresty()
 {
-	if [ -d $serverPath/openresty ];then
-		exit 0
+	if [ "${action}" == "install" ];then
+		if [ -d $serverPath/openresty ];then
+			exit 0
+		fi
 	fi
 	
 	# ----- cpu start ------
