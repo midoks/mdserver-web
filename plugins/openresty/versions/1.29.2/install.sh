@@ -20,7 +20,7 @@ openrestyDir=${serverPath}/source/openresty
 
 Install_openresty()
 {
-	if [ "${1}" == "upgrade" ];then
+	if [ "${action}" == "install" ];then
 		if [ -d $serverPath/openresty ];then
 			exit 0
 		fi
