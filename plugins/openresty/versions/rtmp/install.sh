@@ -140,6 +140,19 @@ Install_openresty()
 	fi
 	OPTIONS="${OPTIONS} --add-module=${openrestyDir}/nginx-rtmp-module-${nginx_rtmp_ver}"
 
+	# br
+	if [ ! -d ${openrestyDir}/openresty-${VERSION}/ngx_brotli ];then
+		cd ${openrestyDir}/openresty-${VERSION} && git clone https://github.com/wxx9248/ngx_brotli.git
+		cd ${openrestyDir}/openresty-${VERSION}/ngx_brotli && git submodule update --init
+
+		OPTIONS="${OPTIONS} --add-module=${openrestyDir}/openresty-${VERSION}/ngx_brotli"
+	fi
+
+	OPTIONS="${OPTIONS} --with-threads"
+	OPTIONS="${OPTIONS} --with-file-aio"
+	OPTIONS="${OPTIONS} --with-pcre-jit"
+	OPTIONS="${OPTIONS} --with-http_gzip_static_module"
+
 
 	cd ${openrestyDir}/openresty-${VERSION} && ./configure \
 	--prefix=$serverPath/openresty \
