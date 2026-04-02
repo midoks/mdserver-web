@@ -556,11 +556,10 @@ class sites(object):
 
             http_ssl = "\n\tlisten 443 ssl;"
             http_ssl = http_ssl + "\n\tlisten [::]:443 ssl;"
-            http_ssl = http_ssl + "\n\thttp2 on;"
-
             if mw.isSupportHttp3(version):
                 http_ssl = http_ssl + "\n\tlisten 443 ssl reuseport;"
                 http_ssl = http_ssl + "\n\thttp3 on;"
+            http_ssl = http_ssl + "\n\thttp2 on;"
 
             conf = conf.replace(listen, listen + http_ssl)
 
