@@ -527,9 +527,10 @@ class sites(object):
         if conf.find('ssl_certificate') == -1:
             # ssl_ciphers ECDHE-RSA-AES128-GCM-SHA256:HIGH:!aNULL:!MD5:!RC4:!DHE;
             # add_header Alt-Svc 'h3=":443";ma=86400,h3-29=":443";ma=86400';
+            # add_header Strict-Transport-Security "max-age=63072000" always;
             http3Header = """
     add_header Alt-Svc 'h3=":443";ma=86400' always;
-    add_header Strict-Transport-Security "max-age=63072000" always;
+    add_header Strict-Transport-Security "max-age=31536000; includeSubDomains; preload" always;
 """
             # if not version.startswith('1.25') or version.startswith('1.27'):
             #     http3Header = '';
