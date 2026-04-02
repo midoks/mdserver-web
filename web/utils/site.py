@@ -1532,6 +1532,7 @@ location ^~ {from} {\n\
     proxy_set_header Upgrade $http_upgrade;\n\
     proxy_set_header Connection $connection_upgrade;\n\
     proxy_http_version 1.1;\n\
+    proxy_set_header X-Forwarded-Proto $scheme;\n\
     \n\
     {proxy_cache}\n\
 }\n\
