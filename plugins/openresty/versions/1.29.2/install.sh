@@ -20,8 +20,10 @@ openrestyDir=${serverPath}/source/openresty
 
 Install_openresty()
 {
-	if [ -d $serverPath/openresty ];then
-		exit 0
+	if [ "${1}" == "upgrade" ];then
+		if [ -d $serverPath/openresty ];then
+			exit 0
+		fi
 	fi
 	
 	# ----- cpu start ------
