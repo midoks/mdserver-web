@@ -940,7 +940,7 @@ def isVhostHasReuseport():
             if filename.endswith('.conf'):
                 filepath = os.path.join(vhost_dir, filename)
                 content = readFile(filepath)
-                if content and 'reuseport' in content:
+                if content and 'quic reuseport' in content:
                     return True
     except:
         pass
