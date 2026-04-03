@@ -1544,6 +1544,7 @@ location ^~ {from} {\n\
     proxy_set_header X-Forwarded-Port $server_port;\n\
     \n\
     {proxy_cache}\n\
+    {http3}\n\
 }\n\
 # PROXY-END"
 
