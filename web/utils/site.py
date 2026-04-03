@@ -532,8 +532,8 @@ class sites(object):
     add_header Alt-Svc 'h3=":443";ma=86400' always;
     add_header Strict-Transport-Security "max-age=31536000; includeSubDomains; preload" always;
 """
-            # if not version.startswith('1.25') or version.startswith('1.27'):
-            #     http3Header = '';
+            if not mw.isSupportHttp3(version):
+                http3Header = '';
 
             sslStr = """#error_page 404/404.html;
     ssl_certificate    %s;
