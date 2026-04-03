@@ -1489,7 +1489,7 @@ class sites(object):
         mw.writeFile(vhost_file, content)
 
     # 设置 网站 反向代理列表
-    def setProxy(self, site_name, site_from, to, host, name, open_proxy, open_cors, open_cache, cache_time, proxy_id):
+    def setProxy(self, site_name, site_from, to, host, name, open_proxy, open_cors, open_http3,open_cache, cache_time, proxy_id):
         from urllib.parse import urlparse
         if  site_name == "" or site_from == "" or to == "" or host == "" or name == "":
             return mw.returnData(False, "必填项不能为空")
@@ -1582,6 +1582,10 @@ location ^~ {from} {\n\
     }\n\
 "
 
+        tpl_proxy_http3 = "\n\
+    add_header Alt-Svc 'h3=\":443\";ma=86400' always;\n\
+"
+
         # replace
         if site_from[0] != '/':
             site_from = '/' + site_from
@@ -1600,6 +1604,11 @@ location ^~ {from} {\n\
             tpl = tpl.replace("{cors}", tpl_proxy_cors, 999)
         else:
             tpl = tpl.replace("{cors}", '', 999)
+
+        if open_http3 == 'on':
+            tpl = tpl.replace("{http3}", tpl_proxy_http3, 999)
+        else:
+            tpl = tpl.replace("{http3}", '', 999)
 
 
         conf_proxy = "{}/{}.conf".format(self.getProxyPath(site_name), proxy_id)
@@ -1628,6 +1637,7 @@ location ^~ {from} {\n\
                 "cache_time": cache_time,
                 "open_proxy": open_proxy,
                 "open_cors": open_cors,
+                "open_http3": open_http3,
                 "id": proxy_id,
             })
         else:
@@ -1646,6 +1656,7 @@ location ^~ {from} {\n\
             data[dindex]['cache_time'] = cache_time
             data[dindex]['open_proxy'] = open_proxy
             data[dindex]['open_cors'] = open_cors
+            data[dindex]['open_http3'] = open_http3
 
         if open_proxy != 'on':
             os.rename(conf_proxy, conf_bk)
