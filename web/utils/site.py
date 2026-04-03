@@ -1531,7 +1531,10 @@ location ^~ {from} {\n\
     proxy_set_header Upgrade $http_upgrade;\n\
     proxy_set_header Connection $connection_upgrade;\n\
     proxy_http_version 1.1;\n\
+    proxy_set_header User-Agent $http_user_agent;\n\
     proxy_set_header X-Forwarded-Proto $scheme;\n\
+    proxy_set_header X-Forwarded-Host $http_host;\n\
+    proxy_set_header X-Forwarded-Port $server_port;\n\
     \n\
     {proxy_cache}\n\
 }\n\
