@@ -148,8 +148,6 @@ Install_openresty()
 	if [ ! -d ${openrestyDir}/zstd-nginx-module ];then
 		cd ${openrestyDir} && wget -O $openrestyDir/zstd-nginx-module.tar.gz https://github.com/tokers/zstd-nginx-module/archive/refs/heads/master.tar.gz
 		cd ${openrestyDir} && tar -zxvf zstd-nginx-module.tar.gz
-		cd ${openrestyDir}/zstd-nginx-module-master
-
 		OPTIONS="${OPTIONS} --add-module=${openrestyDir}/zstd-nginx-module-master"
 	fi
 	
