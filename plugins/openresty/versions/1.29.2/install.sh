@@ -74,7 +74,7 @@ Install_openresty()
 
 	OPTIONS=''
 
-	opensslVersion="3.4.4"
+	opensslVersion="3.5.5"
 	libresslVersion="3.9.1"
 	pcreVersion='8.45'
 	if [ "$sysName" == "Darwin" ];then
@@ -144,7 +144,7 @@ Install_openresty()
 	OPTIONS="${OPTIONS} --with-pcre-jit"
 	OPTIONS="${OPTIONS} --with-http_gzip_static_module"
 
-
+	#zstd
 	if [ ! -d ${openrestyDir}/zstd-nginx-module ];then
 		cd ${openrestyDir} && wget -O $openrestyDir/zstd-nginx-module.tar.gz https://github.com/tokers/zstd-nginx-module/archive/refs/heads/master.tar.gz
 		cd ${openrestyDir} && tar -zxvf zstd-nginx-module.tar.gz

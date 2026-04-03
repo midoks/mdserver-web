@@ -1634,6 +1634,11 @@ function toProxy(siteName, type, obj) {
 							<input class='btswitch btswitch-ios' type='checkbox' name='open_cors'>\
 							<label class='btswitch-btn' id='open_cors' for='open_cors' style='float:left'></label>\
 						</div>\
+						<div style='display: inline-block'>\
+							<span class='tname' style='position: relative;top: -5px;'>是否H3</span>\
+							<input class='btswitch btswitch-ios' type='checkbox' name='open_http3'>\
+							<label class='btswitch-btn' id='open_http3' for='open_http3' style='float:left'></label>\
+						</div>\
 					</div>\
 				</div>\
 				<div class='line'>\
@@ -1683,6 +1688,10 @@ function toProxy(siteName, type, obj) {
 
 					if (obj['open_cors'] == 'on'){
 						$("input[name='open_cors']").prop("checked",true);
+					}
+
+					if (obj['open_http3'] == 'on'){
+						$("input[name='open_http3']").prop("checked",true);
 					}
 
 					if (obj['open_proxy'] == 'on'){
@@ -1745,6 +1754,15 @@ function toProxy(siteName, type, obj) {
 						$("input[name='open_cors']").prop("checked",false);
 					}else{
 						$("input[name='open_cors']").prop("checked",true);
+					}
+				});
+
+				$('#open_http3').click(function(){
+					var status = $("input[name='open_http3']").prop("checked")==true?1:0;
+					if(status==1){
+						$("input[name='open_http3']").prop("checked",false);
+					}else{
+						$("input[name='open_http3']").prop("checked",true);
 					}
 				});
 			},
