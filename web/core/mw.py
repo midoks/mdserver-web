@@ -931,6 +931,22 @@ def isSupportHttp3(version):
         return True
     return False
 
+def isVhostHasReuseport():
+    vhost_dir = getServerDir() + '/web_conf/nginx/vhost'
+    if not os.path.exists(vhost_dir):
+        return False
+    try:
+        for filename in os.listdir(vhost_dir):
+            if filename.endswith('.conf'):
+                filepath = os.path.join(vhost_dir, filename)
+                content = readFile(filepath)
+                if content and 'reuseport' in content:
+                    return True
+    except:
+        pass
+    
+    return False
+
 def isDebugMode():
     if isAppleSystem():
         return True

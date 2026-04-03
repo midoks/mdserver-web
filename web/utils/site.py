@@ -554,11 +554,16 @@ class sites(object):
         tmp = re.findall(rep, conf)
         if not mw.inArray(tmp, '443'):
             listen = re.search(rep, conf).group()
+
+            quic_conf = "quic reuseport"
+            if mw.isVhostHasReuseport():
+                quic_conf = "quic"
+
             if mw.isSupportHttp3(version):
                 http_ssl = "\n\tlisten 443 ssl;"
                 http_ssl = http_ssl + "\n\tlisten [::]:443 ssl;"
-                http_ssl = http_ssl + "\n\tlisten 443 quic;#reuseport"
-                http_ssl = http_ssl + "\n\tlisten [::]:443 quic;"
+                http_ssl = http_ssl + "\n\tlisten 443 "+quic_conf+";"
+                http_ssl = http_ssl + "\n\tlisten [::]:443 "+quic_conf+";"
                 http_ssl = http_ssl + "\n\thttp3 on;"
                 http_ssl = http_ssl + "\n\thttp2 on;"
             else:
