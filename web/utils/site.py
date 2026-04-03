@@ -527,11 +527,12 @@ class sites(object):
         if conf.find('ssl_certificate') == -1:
             # ssl_ciphers ECDHE-RSA-AES128-GCM-SHA256:HIGH:!aNULL:!MD5:!RC4:!DHE;
             # add_header Alt-Svc 'h3=":443";ma=86400,h3-29=":443";ma=86400';
+            # add_header Strict-Transport-Security "max-age=63072000" always;
             http3Header = """
-    add_header Strict-Transport-Security "max-age=63072000";
-    add_header Alt-Svc 'h3=":443";ma=86400';
+    add_header Alt-Svc 'h3=":443";ma=86400' always;
+    add_header Strict-Transport-Security "max-age=31536000; includeSubDomains; preload" always;
 """
-            if not version.startswith('1.25') or version.startswith('1.27'):
+            if not mw.isSupportHttp3(version):
                 http3Header = '';
 
             sslStr = """#error_page 404/404.html;
@@ -553,16 +554,16 @@ class sites(object):
         tmp = re.findall(rep, conf)
         if not mw.inArray(tmp, '443'):
             listen = re.search(rep, conf).group()
-            
-            if version.startswith('1.25') or version.startswith('1.27'):
+            if mw.isSupportHttp3(version):
                 http_ssl = "\n\tlisten 443 ssl;"
                 http_ssl = http_ssl + "\n\tlisten [::]:443 ssl;"
+                http_ssl = http_ssl + "\n\tlisten 443 quic;#reuseport"
+                http_ssl = http_ssl + "\n\tlisten [::]:443 quic;"
+                http_ssl = http_ssl + "\n\thttp3 on;"
                 http_ssl = http_ssl + "\n\thttp2 on;"
             else:
-                http_ssl = "\n\tlisten 443 ssl;"
-                http_ssl = http_ssl + "\n\tlisten [::]:443 ssl;"
-
-
+                http_ssl = "\n\tlisten 443 ssl http2;"
+                http_ssl = http_ssl + "\n\tlisten [::]:443 ssl http2;"
             conf = conf.replace(listen, listen + http_ssl)
 
         mw.backFile(file)
@@ -1532,6 +1533,10 @@ location ^~ {from} {\n\
     proxy_set_header Upgrade $http_upgrade;\n\
     proxy_set_header Connection $connection_upgrade;\n\
     proxy_http_version 1.1;\n\
+    proxy_set_header User-Agent $http_user_agent;\n\
+    proxy_set_header X-Forwarded-Proto $scheme;\n\
+    proxy_set_header X-Forwarded-Host $http_host;\n\
+    proxy_set_header X-Forwarded-Port $server_port;\n\
     \n\
     {proxy_cache}\n\
 }\n\
@@ -1925,19 +1930,46 @@ location ^~ {from} {\n\
             path = self.getHostConf(default_site)
             if os.path.exists(path):
                 conf = mw.readFile(path)
-                rep = r"listen\s+80.+;"
+                rep = r"listen\s+443\s+quic\s*reuseport default_server"
+                conf = re.sub(rep, 'listen 443 quic reuseport;', conf, 1)
+                rep = r"listen\s+\[\:\:\]\:443\s+quic\s*reuseport\s*default_server;"
+                conf = re.sub(rep, 'listen [::]:443 quic reuseport;', conf, 1)
+
+                rep = r"listen\s+80\s*default_server;"
                 conf = re.sub(rep, 'listen 80;', conf, 1)
-                rep = r"listen\s+443.+;"
+                rep = r"listen\s+\[\:\:\]\:80\s*default_server;"
+                conf = re.sub(rep, 'listen [::]:80;', conf, 1)
+                rep = r"listen\s+443\s*ssl\s*default_server;"
                 conf = re.sub(rep, 'listen 443 ssl;', conf, 1)
+                rep = r"listen\s+443\s*quic\*default_server;"
+                conf = re.sub(rep, 'listen 443 quic;', conf, 1)
+                rep = r"listen\s+\[\:\:\]\:443\s*ssl\s*default_server;"
+                conf = re.sub(rep, 'listen [::]:443 ssl;', conf, 1)
+                rep = r"listen\s+\[\:\:\]\:443\s*quic\s*default_server;"
+                conf = re.sub(rep, 'listen [::]:443 quic;', conf, 1)
                 mw.writeFile(path, conf)
 
         path = self.getHostConf(name)
         if os.path.exists(path):
             conf = mw.readFile(path)
+            rep = r"listen\s+443\s*quic\s*reuseport;"
+            conf = re.sub(rep, 'listen 443 quic reuseport default_server;', conf, 1)
+
+            rep = r"listen\s+\[\:\:\]\:443\s*quic\s*reuseport;"
+            conf = re.sub(rep, 'listen [::]:443 quic reuseport default_server;', conf, 1)
+
             rep = r"listen\s+80\s*;"
             conf = re.sub(rep, 'listen 80 default_server;', conf, 1)
-            rep = r"listen\s+443\s*ssl\s*\w*\s*;"
+            rep = r"listen\s+\[\:\:\]\:80;"
+            conf = re.sub(rep, 'listen [::]:80 default_server;', conf, 1)
+            rep = r"listen\s+443\s*ssl;"
             conf = re.sub(rep, 'listen 443 ssl default_server;', conf, 1)
+            rep = r"listen\s+443\s*quic;"
+            conf = re.sub(rep, 'listen 443 quic default_server;', conf, 1)
+            rep = r"listen\s+\[\:\:\]\:443\s*ssl;"
+            conf = re.sub(rep, 'listen [::]:443 ssl default_server;', conf, 1)
+            rep = r"listen\s+\[\:\:\]\:443\s*quic;"
+            conf = re.sub(rep, 'listen [::]:443 quic default_server;', conf, 1)
             mw.writeFile(path, conf)
 
         thisdb.setOption('default_site', name)
@@ -2111,6 +2143,8 @@ location ^~ {from} {\n\
             rep = r"\s+listen\s+\[\:\:\]\:443.*;"
             conf = re.sub(rep, '', conf)
             rep = r"\s+http2\s+on;"
+            conf = re.sub(rep, '', conf)
+            rep = r"\s+http3\s+on;"
             conf = re.sub(rep, '', conf)
             mw.writeFile(file, conf)
 

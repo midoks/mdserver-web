@@ -5,8 +5,10 @@ export PATH
 # cd /Users/midoks/Desktop/mwdev/server/mdserver-web/plugins/openresty && bash install.sh install 1.21.4
 # cd /www/server/mdserver-web/plugins/openresty && bash install.sh install 1.21.4
 # cd /www/server/mdserver-web/plugins/openresty && bash install.sh install 1.29.2
+# cd /www/server/mdserver-web/plugins/openresty && bash install.sh upgrade 1.29.2
 
 # curl -I -H "Accept-Encoding: br" http://localhost
+# curl --http3 -v https://www.xxx.com
 
 # cd /www/server/mdserver-web && python3 plugins/openresty/index.py run_info
 
@@ -29,6 +31,21 @@ else
     groupadd www
 	useradd -g www -s /bin/bash www
 fi
+
+if [ "${action}" == "upgrade" ];then
+	sh -x $curPath/versions/$2/install.sh $1
+	
+	echo "${VERSION}" > $serverPath/openresty/version.pl
+
+	mkdir -p $serverPath/web_conf/php/conf
+	echo 'set $PHP_ENV 0;' > $serverPath/web_conf/php/conf/enable-php-00.conf
+
+	#初始化 
+	cd ${rootPath} && python3 ${rootPath}/plugins/openresty/index.py start
+	cd ${rootPath} && python3 ${rootPath}/plugins/openresty/index.py initd_install
+	exit 0
+fi
+
 
 if [ "${2}" == "" ];then
 	echo '缺少安装脚本版本...'

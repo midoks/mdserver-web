@@ -20,8 +20,10 @@ openrestyDir=${serverPath}/source/openresty
 
 Install_openresty()
 {
-	if [ -d $serverPath/openresty ];then
-		exit 0
+	if [ "${action}" == "install" ];then
+		if [ -d $serverPath/openresty ];then
+			exit 0
+		fi
 	fi
 	
 	# ----- cpu start ------
@@ -72,9 +74,9 @@ Install_openresty()
 
 	OPTIONS=''
 
-	opensslVersion="1.1.1p"
+	opensslVersion="3.4.4"
 	libresslVersion="3.9.1"
-	pcreVersion='8.38'
+	pcreVersion='8.45'
 	if [ "$sysName" == "Darwin" ];then
 
 		if [ ! -f ${openrestyDir}/pcre-${pcreVersion}.tar.gz ];then
@@ -114,19 +116,19 @@ Install_openresty()
 
 	fi
 
-	if [[ "$VERSION" =~ "1.25.3" ]] || [[ "$VERSION" =~ "1.27.1" ]];then
+	if [[ "$VERSION" =~ "1.27.1" ]];then
 		OPTIONS="${OPTIONS} --with-http_v3_module"
 
-		if [ ! -f ${openrestyDir}/libressl-${libresslVersion}.tar.gz ];then
-	        wget --no-check-certificate -O ${openrestyDir}/libressl-${libresslVersion}.tar.gz https://ftp.openbsd.org/pub/OpenBSD/LibreSSL/libressl-${libresslVersion}.tar.gz
-	    fi
+		# if [ ! -f ${openrestyDir}/libressl-${libresslVersion}.tar.gz ];then
+	    #     wget --no-check-certificate -O ${openrestyDir}/libressl-${libresslVersion}.tar.gz https://ftp.openbsd.org/pub/OpenBSD/LibreSSL/libressl-${libresslVersion}.tar.gz
+	    # fi
 
-	    if [ ! -d ${openrestyDir}/libressl-${libresslVersion} ];then
-			cd ${openrestyDir} &&  tar -zxvf libressl-${libresslVersion}.tar.gz
-		fi
+	    # if [ ! -d ${openrestyDir}/libressl-${libresslVersion} ];then
+		# 	cd ${openrestyDir} &&  tar -zxvf libressl-${libresslVersion}.tar.gz
+		# fi
 	    
-	    OPTIONS="${OPTIONS} --with-cc-opt=-I${openrestyDir}/libressl-${libresslVersion}/libressl/build/include"
-	    OPTIONS="${OPTIONS} --with-cc-opt=-I${openrestyDir}/libressl-${libresslVersion}/libressl/build/lib"
+	    # OPTIONS="${OPTIONS} --with-cc-opt=-I${openrestyDir}/libressl-${libresslVersion}/libressl/build/include"
+	    # OPTIONS="${OPTIONS} --with-cc-opt=-I${openrestyDir}/libressl-${libresslVersion}/libressl/build/lib"
 	fi
 
 	# br
@@ -134,8 +136,24 @@ Install_openresty()
 		cd ${openrestyDir}/openresty-${VERSION} && git clone https://github.com/wxx9248/ngx_brotli.git
 		cd ${openrestyDir}/openresty-${VERSION}/ngx_brotli && git submodule update --init
 
-		OPTIONS="${OPTIONS} --add-module=./ngx_brotli"
+		OPTIONS="${OPTIONS} --add-module=${openrestyDir}/openresty-${VERSION}/ngx_brotli"
 	fi
+
+	OPTIONS="${OPTIONS} --with-threads"
+	OPTIONS="${OPTIONS} --with-file-aio"
+	OPTIONS="${OPTIONS} --with-pcre-jit"
+	OPTIONS="${OPTIONS} --with-http_gzip_static_module"
+
+	if [ ! -d ${openrestyDir}/zstd-nginx-module ];then
+		cd ${openrestyDir} && wget -O $openrestyDir/zstd-nginx-module.tar.gz https://github.com/tokers/zstd-nginx-module/archive/refs/heads/master.tar.gz
+		cd ${openrestyDir} && tar -zxvf zstd-nginx-module.tar.gz
+
+		pkg-config --exists --print-errors libzstd
+		if [ "$?" == "0" ];then
+			OPTIONS="${OPTIONS} --add-module=${openrestyDir}/zstd-nginx-module-master"
+		fi
+	fi
+
 
 	cd ${openrestyDir}/openresty-${VERSION} && ./configure \
 	--prefix=$serverPath/openresty \
@@ -183,7 +201,9 @@ Uninstall_openresty()
 }
 
 action=$1
-if [ "${1}" == 'install' ];then
+if [ "${1}" == "install" ];then
+	Install_openresty
+elif [ "${1}" == "upgrade" ];then
 	Install_openresty
 else
 	Uninstall_openresty
