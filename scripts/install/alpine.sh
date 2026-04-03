@@ -56,6 +56,7 @@ apk add libargon2-devel --force-broken-world
 
 apk add net-tools-deprecated --force-broken-world
 apk add numactl --force-broken-world
+apk add libzstd-devel --force-broken-world
 
 # apk add  php-config
 

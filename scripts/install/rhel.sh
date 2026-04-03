@@ -44,6 +44,7 @@ $PKGMGR install -y mmap-devel
 
 $PKGMGR install -y libncurses*
 $PKGMGR install -y sshpass
+$PKGMGR install -y libzstd-devel
 
 echo "install remi source"
 if [ "$VERSION_ID" == "9" ];then
