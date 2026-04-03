@@ -191,6 +191,10 @@ Install_openresty()
 		rm -rf $openrestyDir/openresty-${VERSION}
 	fi
 
+	if [ -d $openrestyDir/zstd-nginx-module-master ];then
+		rm -rf $openrestyDir/zstd-nginx-module-master
+	fi
+
 	# if [ -d $openrestyDir/ngx_brotli ];then
 	# 	rm -rf $openrestyDir/ngx_brotli
 	# fi
