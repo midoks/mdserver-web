@@ -53,9 +53,12 @@ cache = Cache(config={'CACHE_TYPE': 'simple'})
 cache.init_app(app, config={'CACHE_TYPE': 'simple'})
 
 # 静态文件配置
-from whitenoise import WhiteNoise
-app.wsgi_app = WhiteNoise(app.wsgi_app, root="../web/static/", prefix="static/", max_age=604800)
+app.static_folder = "../static"
+app.static_url_path = "/static"
 app.jinja_env.trim_blocks = True
+
+# from whitenoise import WhiteNoise
+# app.wsgi_app = WhiteNoise(app.wsgi_app, root="../web/static/", prefix="static/", max_age=604800)
 
 # session配置
 # app.secret_key = uuid.UUID(int=uuid.getnode()).hex[-12:]
