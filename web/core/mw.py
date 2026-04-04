@@ -929,6 +929,8 @@ def isSupportHttp3(version):
         return True
     if version.startswith('1.29'):
         return True
+    if version.startswith('rtmp'):
+        return True
     return False
 
 def isVhostHasReuseport():
