@@ -164,12 +164,12 @@ def initConf():
             "/www/server/alist/data/log",
             "/www/server/dztasks/logs",
             "/www/server/rsyncd/lsyncd.log",
-            "/www/server/cron",
         ]
         for i in clogcom:
             if os.path.exists(i):
                 content += i + "\n"
 
+        content += "/www/server/cron\n"
         # 清理日志
         rootDir = "/var/log"
 
