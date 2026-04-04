@@ -377,6 +377,7 @@ mw_install(){
     mw_common_proxy
     echo "bash <(curl -fsSL "${HTTP_PREFIX}raw.githubusercontent.com/midoks/mdserver-web/master/scripts/install.sh")"
     bash <(curl -fsSL "${HTTP_PREFIX}raw.githubusercontent.com/midoks/mdserver-web/master/scripts/update.sh")
+    mw_clean_lib
     bash <(curl -fsSL "${HTTP_PREFIX}raw.githubusercontent.com/midoks/mdserver-web/master/scripts/install.sh")
 }
 
@@ -401,8 +402,8 @@ mw_update_dev()
 
     mw_common_proxy
     echo "bash <(curl -fsSL "${HTTP_PREFIX}raw.githubusercontent.com/midoks/mdserver-web/dev/scripts/update_dev.sh")"
+    mw_clean_lib
     bash <(curl -fsSL "${HTTP_PREFIX}raw.githubusercontent.com/midoks/mdserver-web/dev/scripts/update_dev.sh")
-    
     cd ${PANEL_DIR}
 }
 
