@@ -45,7 +45,7 @@ setup.init()
 
 app = Flask(__name__, template_folder='templates/default')
 
-app.config["COMPRESS_ALGORITHM"] = ["zstd", "br", "gzip"]
+app.config["COMPRESS_ALGORITHM"] = ["zstd", "br", "gzip", "deflate"]
 Compress(app)
 
 # 缓存配置
