@@ -8,6 +8,7 @@ export PATH
 # cd /www/server/mdserver-web/plugins/openresty && bash install.sh upgrade 1.29.2
 
 # curl -I -H "Accept-Encoding: br" http://localhost
+# curl -I -H "Accept-Encoding: zstd" http://localhost
 # curl --http3 -v https://www.xxx.com
 
 # cd /www/server/mdserver-web && python3 plugins/openresty/index.py run_info
