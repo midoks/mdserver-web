@@ -24,6 +24,7 @@ from flask import Response
 from flask import Flask, abort, current_app, session, url_for
 from flask import Blueprint, render_template
 from flask import render_template_string
+from flask_compress import Compress
 
 from flask_socketio import SocketIO, emit, send
 
@@ -44,14 +45,22 @@ setup.init()
 
 app = Flask(__name__, template_folder='templates/default')
 
+
+# curl --compressed -I "http://127.0.0.1:44010/" -H "Accept-Encoding: zstd" --write-out "%{json}"
+app.config["COMPRESS_ALGORITHM"] = ["zstd", "br", "gzip", "deflate"]
+Compress(app)
+
 # 缓存配置
 cache = Cache(config={'CACHE_TYPE': 'simple'})
 cache.init_app(app, config={'CACHE_TYPE': 'simple'})
 
 # 静态文件配置
-from whitenoise import WhiteNoise
-app.wsgi_app = WhiteNoise(app.wsgi_app, root="../web/static/", prefix="static/", max_age=604800)
+app.static_folder = "../static"
+app.static_url_path = "/static"
 app.jinja_env.trim_blocks = True
+
+# from whitenoise import WhiteNoise
+# app.wsgi_app = WhiteNoise(app.wsgi_app, root="../web/static/", prefix="static/", max_age=604800)
 
 # session配置
 # app.secret_key = uuid.UUID(int=uuid.getnode()).hex[-12:]
