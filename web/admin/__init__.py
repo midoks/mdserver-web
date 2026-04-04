@@ -24,6 +24,7 @@ from flask import Response
 from flask import Flask, abort, current_app, session, url_for
 from flask import Blueprint, render_template
 from flask import render_template_string
+from flask_compress import Compress
 
 from flask_socketio import SocketIO, emit, send
 
@@ -43,6 +44,9 @@ from admin import setup
 setup.init()
 
 app = Flask(__name__, template_folder='templates/default')
+
+app.config["COMPRESS_ALGORITHM"] = ["zstd", "br", "gzip"]
+Compress(app)
 
 # 缓存配置
 cache = Cache(config={'CACHE_TYPE': 'simple'})

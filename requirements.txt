@@ -46,3 +46,6 @@ pyyaml
 croniter
 bcrypt
 packaging
+Flask-Compress
+brotli
+zstd
