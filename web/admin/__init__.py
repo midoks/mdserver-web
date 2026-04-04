@@ -46,7 +46,7 @@ setup.init()
 app = Flask(__name__, template_folder='templates/default')
 
 
-# curl --compressed -I "http://127.0.0.1:44010/" -H "Accept-Encoding: br" --write-out "%{json}"
+# curl --compressed -I "http://127.0.0.1:11809/" -H "Accept-Encoding: zstd" --write-out "%{json}"
 app.config["COMPRESS_ALGORITHM"] = ["zstd", "br", "gzip", "deflate"]
 Compress(app)
 
