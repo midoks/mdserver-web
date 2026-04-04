@@ -376,6 +376,7 @@ mw_install(){
 
     mw_common_proxy
     echo "bash <(curl -fsSL "${HTTP_PREFIX}raw.githubusercontent.com/midoks/mdserver-web/master/scripts/install.sh")"
+    bash <(curl -fsSL "${HTTP_PREFIX}raw.githubusercontent.com/midoks/mdserver-web/master/scripts/update.sh")
     bash <(curl -fsSL "${HTTP_PREFIX}raw.githubusercontent.com/midoks/mdserver-web/master/scripts/install.sh")
 }
 
