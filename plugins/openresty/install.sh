@@ -12,7 +12,7 @@ export PATH
 # curl --http3 -v https://www.xxx.com
 
 # apt install ncat -y
-# nc -u -v example.com 443
+# nc -u -v www.xxmhaa.com 443
 
 # cd /www/server/mdserver-web && python3 plugins/openresty/index.py run_info
 
