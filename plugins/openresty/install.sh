@@ -11,6 +11,9 @@ export PATH
 # curl -I -H "Accept-Encoding: zstd" http://localhost
 # curl --http3 -v https://www.xxx.com
 
+# apt install ncat -y
+# nc -u -v example.com 443
+
 # cd /www/server/mdserver-web && python3 plugins/openresty/index.py run_info
 
 curPath=`pwd`
