@@ -1543,6 +1543,10 @@ location ^~ {from} {\n\
     proxy_set_header X-Forwarded-Host $http_host;\n\
     proxy_set_header X-Forwarded-Port $server_port;\n\
     \n\
+    #ws\n\
+    proxy_buffering off;\n\
+    proxy_read_timeout 300s;\n\
+    proxy_connect_timeout 75s;\n\
     {proxy_cache}\n\
     {http3}\n\
 }\n\
