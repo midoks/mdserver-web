@@ -48,6 +48,8 @@ app = Flask(__name__, template_folder='templates/default')
 
 # curl --compressed -I "http://127.0.0.1:44010/" -H "Accept-Encoding: zstd" --write-out "%{json}"
 app.config["COMPRESS_ALGORITHM"] = ["zstd", "br", "gzip", "deflate"]
+app.config["COMPRESS_LEVEL"] = 9  # 最高压缩级别
+app.config["COMPRESS_MIN_SIZE"] = 500  # 最小压缩大小
 Compress(app)
 
 # 缓存配置
