@@ -487,7 +487,7 @@ mw_debug(){
         cd ${PANEL_DIR}/web
     fi
     # gunicorn -b :$port -k geventwebsocket.gunicorn.workers.GeventWebSocketWorker -w 1  app:app
-    gunicorn -b :$port -k eventlet -w 1  app:app
+    gunicorn -b :$port -k gevent -w 1  app:app
 }
 
 mw_connect_mysql(){
