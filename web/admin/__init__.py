@@ -172,7 +172,8 @@ def inject_global_variables():
 #                     ping_interval=25, ping_timeout=120)
 socketio = SocketIO(logger=False,
     engineio_logger=False,
-    cors_allowed_origins="*")
+    cors_allowed_origins="*",
+    async_mode='threading')
 socketio.init_app(app)
 
 @socketio.on('webssh_websocketio')
