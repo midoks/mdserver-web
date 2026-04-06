@@ -420,8 +420,6 @@ mw_dev()
     cd ${PANEL_DIR}
 }
 
-
-
 mw_update_venv()
 {
     rm -rf ${PANEL_DIR}/bin
