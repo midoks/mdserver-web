@@ -536,7 +536,7 @@ def setCfg():
 
     args = getArgs()
     data = checkArgs(args, [
-        'worker_processes', 'worker_connections', 'keepalive_timeout',
+        'worker_processes', 'worker_connections', 'keepalive_timeout','zstd','brotli',
         'gzip', 'gzip_min_length', 'gzip_comp_level', 'client_max_body_size',
         'server_names_hash_bucket_size', 'client_header_buffer_size'
     ])
