@@ -552,6 +552,8 @@ def setCfg():
         {"name": "worker_processes", "ps": "处理进程,auto表示自动,数字表示进程数", 'type': 2},
         {"name": "worker_connections", "ps": "最大并发链接数", 'type': 2},
         {"name": "keepalive_timeout", "ps": "连接超时时间", 'type': 2},
+        {"name": "zstd", "ps": "是否开启zstd压缩传输", 'type': 1},
+        {"name": "brotli", "ps": "是否开启brotli压缩传输", 'type': 1},
         {"name": "gzip", "ps": "是否开启压缩传输", 'type': 1},
         {"name": "gzip_min_length", "ps": "最小压缩文件", 'type': 2},
         {"name": "gzip_comp_level", "ps": "压缩率", 'type': 2},
