@@ -185,6 +185,8 @@ function submitConf() {
         worker_processes: $("input[name='worker_processes']").val(),
         worker_connections: $("input[name='worker_connections']").val(),
         keepalive_timeout: $("input[name='keepalive_timeout']").val(),
+        zstd: $("select[name='zstd']").val() || 'on',
+        brotli: $("select[name='brotli']").val() || 'on',
         gzip: $("select[name='gzip']").val() || 'on',
         gzip_min_length: $("input[name='gzip_min_length']").val(),
         gzip_comp_level: $("input[name='gzip_comp_level']").val(),
