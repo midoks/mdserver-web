@@ -570,7 +570,7 @@ def setCfg():
         if k == "worker_processes" or k == "gzip":
             if not re.search(r"auto|on|off|\d+", v):
                 return mw.returnJson(False, '参数值错误')
-        if k == "zstd" or k == "brotli":
+        elif k == "zstd" or k == "brotli":
             if not re.search(r"auto|on|off|\d+", v):
                 return mw.returnJson(False, '参数值错误')
         else:
