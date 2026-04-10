@@ -71,6 +71,7 @@ if panel_ssl_data['open']:
             keyfile  = panel_private
             ciphers = 'TLSv1 TLSv1.1 TLSv1.2 TLSv1.3'
             ssl_version = 2
+            http2 = True
 
 if workers > 2:
     workers = 2
