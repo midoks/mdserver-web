@@ -1,6 +1,6 @@
 //获取负载
 function getLoad(data) {
-    $("#LoadList .mask").html("<span id='Load' style='font-size:14px'>获取中..</span>");
+    $("#Load").text("获取中..");
     setCookie('one', data.one);
     setCookie('five', data.five);
     setCookie('fifteen', data.fifteen);
@@ -23,19 +23,17 @@ function getLoad(data) {
         LoadColor = '#dd2f00';
         AverageText = '运行堵塞';
     }
-    index.find('.circle').css("background", LoadColor);
     index.find('.mask').css({ "color": LoadColor });
-    $("#LoadList .mask").html("<span id='Load'></span>%");
+    updateLinearProgressValue(document.getElementById('LoadProgress'), Occupy, LoadColor);
     $('#Load').html(Occupy);
     $('#LoadState').html('<span>' + AverageText + '</span>');
-    setImg();
 }
 
-$('#LoadList .circle').click(function() {
+$('#LoadList .mw-stat-progress').click(function() {
     // getNet();
 });
 
-$('#LoadList .mask').hover(function() {
+$('#LoadList .mw-stat-value').hover(function() {
     var one, five, fifteen;
     var that = this;
     one = getCookie('one');
@@ -71,6 +69,196 @@ function showCpuTips(rdata){
     });
 }
 
+function getChartTheme() {
+    var styles = getComputedStyle(document.documentElement);
+    function resolveCssVar(value) {
+        if (!value) {
+            return value;
+        }
+        var trimmed = value.trim();
+        if (trimmed.indexOf('var(') !== 0) {
+            return trimmed;
+        }
+        var match = trimmed.match(/var\((--[^,\s)]+)\s*(?:,\s*(.+))?\)/);
+        if (!match) {
+            return trimmed;
+        }
+        var resolved = styles.getPropertyValue(match[1]).trim();
+        if (resolved) {
+            return resolveCssVar(resolved);
+        }
+        if (match[2]) {
+            return resolveCssVar(match[2].trim());
+        }
+        return trimmed;
+    }
+    return {
+        primary: resolveCssVar(styles.getPropertyValue('--mw-primary')) || '#6750a4',
+        secondary: resolveCssVar(styles.getPropertyValue('--mdui-color-secondary')) || '#4f8ef7',
+        border: resolveCssVar(styles.getPropertyValue('--mw-border')) || '#e2e8f0',
+        muted: resolveCssVar(styles.getPropertyValue('--mw-muted')) || '#64748b',
+        surface: resolveCssVar(styles.getPropertyValue('--mw-surface')) || '#ffffff',
+        text: resolveCssVar(styles.getPropertyValue('--mw-text')) || '#1f1f1f',
+        surfaceContainer: resolveCssVar(styles.getPropertyValue('--mw-surface-container')) || '#f2f3f7'
+    };
+}
+
+function updateLinearProgressValue(element, value, color) {
+    if (!element) {
+        return;
+    }
+    var safeValue = Math.max(0, Math.min(100, parseFloat(value) || 0));
+    element.value = safeValue;
+    element.setAttribute('value', safeValue);
+    if (color) {
+        element.style.setProperty('--mdui-color-primary', color);
+    }
+}
+
+function escapeHtml(text) {
+    return String(text || '')
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#39;');
+}
+
+function renderNoteMarkdown(content) {
+    var text = String(content || '').trim();
+    if (!text) {
+        return '';
+    }
+    if (window.marked && typeof window.marked.parse === 'function') {
+        return window.marked.parse(text);
+    }
+    return escapeHtml(text).replace(/\n/g, '<br>');
+}
+
+function initNoteBoard() {
+    var preview = $('#notePreview');
+    if (!preview.length) {
+        return;
+    }
+    var editor = $('#noteEditor');
+    var input = $('#noteInput');
+    var editButton = $('#noteEditBtn');
+    var saveButton = $('#noteSaveBtn');
+    var cancelButton = $('#noteCancelBtn');
+    var storageKey = 'mw-note-board';
+    var fallbackText = '## 欢迎使用便签\n\n- 支持 **Markdown** 语法\n- 记录维护事项、变更说明\n- 点击底部“编辑”开始编写';
+    var storedText = '';
+    try {
+        storedText = localStorage.getItem(storageKey) || '';
+    } catch (error) {
+        storedText = '';
+    }
+    var currentText = storedText || fallbackText;
+
+    function updatePreview(text) {
+        var rendered = renderNoteMarkdown(text);
+        if (!rendered) {
+            preview.html('<p class="c9">暂无便签内容，点击“编辑”开始记录。</p>');
+        } else {
+            preview.html(rendered);
+        }
+    }
+
+    function setEditMode(editing) {
+        if (editing) {
+            editor.removeClass('hide');
+            preview.addClass('hide');
+            editButton.addClass('hide');
+        } else {
+            editor.addClass('hide');
+            preview.removeClass('hide');
+            editButton.removeClass('hide');
+        }
+    }
+
+    updatePreview(currentText);
+    setEditMode(false);
+
+    editButton.on('click', function () {
+        input.val(currentText);
+        setEditMode(true);
+        input.trigger('focus');
+    });
+
+    saveButton.on('click', function () {
+        var nextText = input.val();
+        currentText = nextText;
+        try {
+            localStorage.setItem(storageKey, nextText);
+        } catch (error) {
+            console.warn('Failed to save note content', error);
+        }
+        updatePreview(currentText);
+        setEditMode(false);
+    });
+
+    cancelButton.on('click', function () {
+        setEditMode(false);
+    });
+}
+
+function applyColorAlpha(color, alpha) {
+    if (!color) {
+        return 'rgba(0, 0, 0, ' + alpha + ')';
+    }
+    if (color.indexOf('rgb') === 0) {
+        var numbers = color.replace(/[^\d,]/g, '').split(',');
+        if (numbers.length >= 3) {
+            return 'rgba(' + numbers[0] + ', ' + numbers[1] + ', ' + numbers[2] + ', ' + alpha + ')';
+        }
+    }
+    if (color.indexOf('#') === 0) {
+        var hex = color.replace('#', '');
+        if (hex.length === 3) {
+            hex = hex.split('').map(function (item) { return item + item; }).join('');
+        }
+        if (hex.length === 6) {
+            var r = parseInt(hex.slice(0, 2), 16);
+            var g = parseInt(hex.slice(2, 4), 16);
+            var b = parseInt(hex.slice(4, 6), 16);
+            return 'rgba(' + r + ', ' + g + ', ' + b + ', ' + alpha + ')';
+        }
+    }
+    return color;
+}
+
+function initEchartWhenReady(elementId, option, onReady) {
+    if (typeof echarts === 'undefined') {
+        return null;
+    }
+    var element = document.getElementById(elementId);
+    if (!element) {
+        return null;
+    }
+    var attempt = 0;
+    var maxAttempts = 30;
+    var raf = window.requestAnimationFrame || function(callback) {
+        return setTimeout(callback, 16);
+    };
+    function tryInit() {
+        if (element.clientWidth === 0 || element.clientHeight === 0) {
+            if (attempt++ < maxAttempts) {
+                raf(tryInit);
+            }
+            return;
+        }
+        var chart = echarts.getInstanceByDom(element) || echarts.init(element);
+        if (option) {
+            chart.setOption(option);
+        }
+        if (onReady) {
+            onReady(chart);
+        }
+    }
+    tryInit();
+    return null;
+}
+
 
 function rocket(sum, m) {
     var n = sum - m;
@@ -79,31 +267,32 @@ function rocket(sum, m) {
 
 //释放内存
 function reMemory() {
-    setTimeout(function() {
-        $(".mem-release").find('.mask').css({ 'color': '#20a53a', 'font-size': '14px' }).html('<span style="display:none">1</span>' + lan.index.memre_ok_0 + ' <img src="/static/img/ings.gif">');
-        $.post('/system/rememory', '', function(rdata) {
-            var percent = getPercent(rdata.memRealUsed, rdata.memTotal);
-            var memText = Math.round(rdata.memRealUsed) + "/" + Math.round(rdata.memTotal) + " (MB)";
-            percent = Math.round(percent);
-            $(".mem-release").find('.mask').css({ 'color': '#20a53a', 'font-size': '14px' }).html("<span style='display:none'>" + percent + "</span>" + lan.index.memre_ok);
-            setCookie("mem-before", memText);
-            var memNull = Math.round(getCookie("memRealUsed") - rdata.memRealUsed);
-            setTimeout(function() {
-                if (memNull > 0) {
-                    $(".mem-release").find('.mask').css({ 'color': '#20a53a', 'font-size': '14px', 'line-height': '22px', 'padding-top': '22px' }).html("<span style='display:none'>" + percent + "</span>" + lan.index.memre_ok_1 + "<br>" + memNull + "MB");
-                } else {
-                    $(".mem-release").find('.mask').css({ 'color': '#20a53a', 'font-size': '14px' }).html("<span style='display:none'>" + percent + "</span>" + lan.index.memre_ok_2);
-                }
-                $(".mem-release").removeClass("mem-action");
-                $("#memory").text(memText);
-                setCookie("memRealUsed", rdata.memRealUsed);
-            }, 1000);
-            setTimeout(function() {
-                $(".mem-release").find('.mask').removeAttr("style").html("<span>" + percent + "</span>%");
-                $(".mem-release").find(".mem-re-min").show();
-            }, 2000)
-        },'json');
-    }, 2000);
+    var memButton = $("#memReleaseBtn");
+    memButton.prop("disabled", true);
+    $("#memory").text(lan.index.memre_ok_0);
+    $.post('/system/rememory', '', function(rdata) {
+        var percent = getPercent(rdata.memRealUsed, rdata.memTotal);
+        percent = Math.round(parseFloat(percent) || 0);
+        var memText = Math.round(rdata.memRealUsed) + "/" + Math.round(rdata.memTotal) + " (MB)";
+        var prevMemRealUsed = parseFloat(getCookie("memRealUsed")) || 0;
+        setCookie("mem-before", memText);
+        setCookie("memRealUsed", rdata.memRealUsed);
+        $("#left").text(percent);
+        var memColor = setcolor(percent, "#left", 75, 90, 95);
+        updateLinearProgressValue(document.getElementById('MemProgress'), percent, memColor);
+        var memNull = Math.round(prevMemRealUsed - rdata.memRealUsed);
+        if (prevMemRealUsed > 0 && memNull > 0) {
+            $("#memory").text(lan.index.memre_ok_1 + " " + memNull + "MB");
+        } else {
+            $("#memory").text(lan.index.memre_ok_2);
+        }
+        $(".mem-release").removeClass("mem-action");
+        memButton.prop("disabled", false);
+    },'json').fail(function() {
+        $(".mem-release").removeClass("mem-action");
+        $("#memory").text(lan.index.memre_ok_2);
+        memButton.prop("disabled", false);
+    });
 }
 
 function getPercent(num, total) {
@@ -120,12 +309,13 @@ function getDiskInfo() {
         var rdata = rdata.data;
         var dBody;
         for (var i = 0; i < rdata.length; i++) {
-            var LoadColor = setcolor(parseInt(rdata[i].size[3].replace('%', '')), false, 75, 90, 95);
+            var usagePercent = parseInt(rdata[i].size[3].replace('%', ''));
+            var LoadColor = setcolor(usagePercent, false, 75, 90, 95);
 
             //判断inode信息是否存在
             var inodes = '';
             if ( typeof(rdata[i]['inodes']) !=='undefined' ){
-                inodes = '<div class="mask" style="color:' + LoadColor + '" data="Inode信息<br>总数：' + rdata[i].inodes[0] + '<br>已使用：' + rdata[i].inodes[1] + '<br>可用：' + rdata[i].inodes[2] + '<br>Inode使用率：' + rdata[i].inodes[3] + '"><span>' + rdata[i].size[3].replace('%', '') + '</span>%</div>';
+                inodes = ' data="Inode信息<br>总数：' + rdata[i].inodes[0] + '<br>已使用：' + rdata[i].inodes[1] + '<br>可用：' + rdata[i].inodes[2] + '<br>Inode使用率：' + rdata[i].inodes[3] + '"';
 
                 var ipre = parseInt(rdata[i].inodes[3].replace('%', ''));
                 if (ipre > 95) {
@@ -141,20 +331,17 @@ function getDiskInfo() {
                 } 
             }
            
-            dBody = '<li class="col-xs-6 col-sm-3 col-md-3 col-lg-2 mtb20 circle-box text-center diskbox">' +
+            dBody = '<li class="col-xs-6 col-sm-3 col-md-3 col-lg-2 mtb20 circle-box mw-stat-item diskbox">' +
                 '<h3 class="c5 f15">' + rdata[i].path + '</h3>' +
-                '<div class="circle" style="background:' + LoadColor + '">' +
-                '<div class="pie_left">' +
-                '<div class="left"></div>' +
+                '<div class="mw-stat-progress mw-disk-progress">' +
+                '<mdui-linear-progress max="100" value="' + usagePercent + '" style="--mdui-color-primary: ' + LoadColor + ';"></mdui-linear-progress>' +
                 '</div>' +
-                '<div class="pie_right">' +
-                '<div class="right"></div>' +
-                '</div>'+ inodes +'</div>' +
+                '<div class="mw-stat-value mask" style="color:' + LoadColor + '"' + inodes + '><span>' + usagePercent + '</span>%</div>' +
                 '<h4 class="c5 f15">' + rdata[i].size[1] + '/' + rdata[i].size[0] + '</h4>' +
                 '</li>'
             $("#systemInfoList").append(dBody);
-            setImg();
         }
+        setImg();
     },'json');
 }
 
@@ -169,12 +356,21 @@ function clearSystem() {
 
 function setMemImg(info){
 
-    var memRealUsed = toSize(info.memRealUsed);
-    var memTotal = toSize(info.memTotal);
-
-    var memRealUsedVal = memRealUsed.split(' ')[0];
-    var memTotalVal = memTotal.split(' ')[0];
-    var unit = memTotal.split(' ')[1];
+    var memRealUsedBytes = parseFloat(info.memRealUsed) || 0;
+    var memTotalBytes = parseFloat(info.memTotal) || 0;
+    var gbBytes = 1024 * 1024 * 1024;
+    var memRealUsedVal;
+    var memTotalVal;
+    var unit;
+    if (memRealUsedBytes < gbBytes) {
+        memRealUsedVal = (memRealUsedBytes / 1024 / 1024).toFixed(2);
+        memTotalVal = (memTotalBytes / 1024 / 1024).toFixed(2);
+        unit = 'MB';
+    } else {
+        memRealUsedVal = (memRealUsedBytes / gbBytes).toFixed(2);
+        memTotalVal = (memTotalBytes / gbBytes).toFixed(2);
+        unit = 'GB';
+    }
 
     var mem_txt = memRealUsedVal + '/' + memTotalVal + ' ('+ unit +')';
     setCookie("mem-before", mem_txt);
@@ -182,7 +378,8 @@ function setMemImg(info){
 
     var memPre = Math.floor(info.memRealUsed / (info.memTotal / 100));
     $("#left").html(memPre);
-    setcolor(memPre, "#left", 75, 90, 95);
+    var memColor = setcolor(memPre, "#left", 75, 90, 95);
+    updateLinearProgressValue(document.getElementById('MemProgress'), memPre, memColor);
 
     var memFree = info.memTotal - info.memRealUsed;
     if (memFree/(1024*1024) < 64) {
@@ -216,7 +413,8 @@ function getInfo() {
         }
         $("#core").html(info.cpuNum + ' 核心');
         $("#state").html(info.cpuRealUsed);
-        setcolor(info.cpuRealUsed, "#state", 30, 70, 90);
+        var cpuColor = setcolor(info.cpuRealUsed, "#state", 30, 70, 90);
+        updateLinearProgressValue(document.getElementById('CpuProgress'), info.cpuRealUsed, cpuColor);
        
 
         // if (info.isuser > 0) {
@@ -229,12 +427,16 @@ function getInfo() {
 
 
 function setcolor(pre, s, s1, s2, s3) {
+    var value = parseFloat(pre);
+    if (isNaN(value)) {
+        value = 0;
+    }
     var LoadColor;
-    if (pre <= s1) {
+    if (value <= s1) {
         LoadColor = '#20a53a';
-    } else if (pre <= s2) {
+    } else if (value <= s2) {
         LoadColor = '#6ea520';
-    } else if (pre <= s3) {
+    } else if (value <= s3) {
         LoadColor = '#ff9900';
     } else {
         LoadColor = '#dd2f00';
@@ -242,9 +444,12 @@ function setcolor(pre, s, s1, s2, s3) {
     if (s == false) {
         return LoadColor;
     }
-    var co = $(s).parent('.mask');
+    var co = $(s).closest('.mask');
     co.css("color", LoadColor);
-    co.parent('.circle').css("background", LoadColor);
+    var item = co.closest('.mw-stat-item');
+    var progressElement = item.find('mdui-linear-progress').get(0);
+    updateLinearProgressValue(progressElement, value, LoadColor);
+    return LoadColor;
 }
 
 
@@ -263,7 +468,8 @@ function getNet() {
         $("#upAll").attr('title', lan.index.package + ':' + net.upPackets)
         $("#core").html(net.cpu[1] + " " + lan.index.cpu_core);
         $("#state").html(net.cpu[0]);
-        setcolor(net.cpu[0], "#state", 30, 70, 90);
+        var cpuColor = setcolor(net.cpu[0], "#state", 30, 70, 90);
+        updateLinearProgressValue(document.getElementById('CpuProgress'), net.cpu[0], cpuColor);
         setCookie("upNet", net.up);
         setCookie("downNet", net.down);
 
@@ -689,6 +895,82 @@ function reBoot() {
     });
 }
 
+//关机服务器
+function shutdownServer() {
+    layer.confirm('确定要关闭服务器吗？此操作将会停止所有服务。', { title: '关机确认', closeBtn: 1, icon: 3 }, function () {
+        var loadT = layer.load();
+        $.post('/system/shutdown_server', '', function (rdata) {
+            layer.close(loadT);
+            layer.msg(rdata.msg, { icon: rdata.status ? 1 : 2 });
+        }, 'json').error(function () {
+            layer.close(loadT);
+            layer.msg('关机请求失败，请重试。', { icon: 2 });
+        });
+    });
+}
+
+var __vipCountdownTimer = null;
+
+function formatVipRemain(seconds) {
+    if (seconds <= 0) {
+        return '永久有效';
+    }
+    var day = Math.floor(seconds / 86400);
+    var hour = Math.floor((seconds % 86400) / 3600);
+    var minute = Math.floor((seconds % 3600) / 60);
+    var second = Math.floor(seconds % 60);
+    return day + '天 ' + hour + '小时 ' + minute + '分钟 ' + second + '秒';
+}
+
+function showVipInfo() {
+    var expireAt = new Date('2038-01-19T03:14:07+08:00').getTime();
+    var content = '<div class="pd20" style="line-height:1.9;">' +
+        '<div style="font-size:18px;font-weight:600;color:#20a53a;">PowerLinux Pro Max · 永久尊享</div>' +
+        '<div style="margin-top:8px;color:#666;">您已经是永久VIP，感谢长期支持。</div>' +
+        '<hr style="margin:12px 0;">' +
+        '<div><b>会员到期时间：</b>2038年1月19日03:14:07</div>' +
+        '<div><b>剩余时长：</b><span id="vipRemainTime">计算中...</span></div>' +
+        '<hr style="margin:12px 0;">' +
+        '<div><b>会员权益</b></div>' +
+        '<ul style="margin:8px 0 0 18px;padding:0;">' +
+        '<li>无限期面板更新（优先体验新版能力）</li>' +
+        '<li>高级监控与可视化页面持续增强</li>' +
+        '<li>社区身份标识与优先反馈通道</li>' +
+        '<li>长期稳定版本与性能优化补丁</li>' +
+        '</ul>' +
+        '<div style="margin-top:10px;color:#999;font-size:12px;">提示：剩余时长将实时刷新显示。</div>' +
+        '</div>';
+
+    layer.open({
+        type: 1,
+        title: 'Pro Max会员信息',
+        area: ['520px', '430px'],
+        closeBtn: 1,
+        icon: 1,
+        content: content,
+        success: function () {
+            if (__vipCountdownTimer) {
+                clearInterval(__vipCountdownTimer);
+                __vipCountdownTimer = null;
+            }
+            function tick() {
+                var now = Date.now();
+                var left = Math.max(0, Math.floor((expireAt - now) / 1000));
+                var remain = formatVipRemain(left);
+                $('#vipRemainTime').text(remain);
+            }
+            tick();
+            __vipCountdownTimer = setInterval(tick, 1000);
+        },
+        end: function () {
+            if (__vipCountdownTimer) {
+                clearInterval(__vipCountdownTimer);
+                __vipCountdownTimer = null;
+            }
+        }
+    });
+}
+
 //修复面板
 function repPanel() {
     layer.confirm(lan.index.rep_panel_msg, { title: lan.index.rep_panel_title, closeBtn: 1, icon: 3 }, function() {
@@ -864,60 +1146,126 @@ function pluginInit(){
     },'json');
 }
 
-function loadKeyDataCount(){
-    var plist = ['mysql', 'gogs', 'gitea'];
-    for (var i = 0; i < plist.length; i++) {
-        pname = plist[i];
-        function call(pname){
-            $.post('/plugins/run', {name:pname, func:'get_total_statistics'}, function(data) {
-                try {
-                    var rdata = $.parseJSON(data['data']);
-                } catch(e){
-                    return;
-                }
-                if (!rdata['status']){
-                    return;
-                }
-                var html = '<li class="sys-li-box col-xs-3 col-sm-3 col-md-3 col-lg-3">\
-                        <p class="name f15 c9">'+pname+'</p>\
-                        <div class="val"><a class="btlink" onclick="softMain(\''+pname+'\',\''+pname+'\',\''+rdata['data']['ver']+'\')">'+rdata['data']['count']+'</a></div>\
-                    </li>';
-                $('#index_overview').append(html);
-            },'json');
-        }
-        call(pname);
+function appendOverviewItem(name, value, href, onclick) {
+    var linkStart = '<span>';
+    var linkEnd = '</span>';
+    if (onclick) {
+        linkStart = '<a class="btlink" href="javascript:;" onclick="' + onclick.replace(/"/g, '&quot;') + '">';
+        linkEnd = '</a>';
+    } else if (href) {
+        linkStart = '<a class="btlink" href="' + href + '">';
+        linkEnd = '</a>';
     }
+
+    var html = '<li class="sys-li-box mw-overview-item mw-overview-dynamic">' +
+        '<p class="name f15 c9">' + name + '</p>' +
+        '<div class="val">' + linkStart + value + linkEnd + '</div>' +
+        '</li>';
+    $('#index_overview').append(html);
 }
 
-$(function() {
-    $(".mem-release").hover(function() {
-        $(this).addClass("shine_green");
-        if (!($(this).hasClass("mem-action"))) {
-            $(this).find(".mem-re-min").hide();
-            $(this).find(".mask").css({ "color": "#d2edd8" });
-            $(this).find(".mem-re-con").css({ "display": "block" });
-            $(this).find(".mem-re-con").animate({ "top": "0", opacity: 1 });
-            $("#memory").text('内存释放');
+function loadOverviewSystemStats() {
+    $.get('/overview_stats', function(res) {
+        if (!res || !res.status || !res.data) {
+            return;
         }
-    }, function() {
-        $(this).removeClass("shine_green");
-        $(this).find(".mask").css({ "color": "#20a53a" });
-        $(this).find(".mem-re-con").css({ "top": "15px", opacity: 1, "display": "none" });
-        $("#memory").text(getCookie("mem-before"));
-        $(this).find(".mem-re-min").hide();
-    }).click(function() {
-        $(this).find(".mem-re-min").hide();
-        if (!($(this).hasClass("mem-action"))) {
-            reMemory();
-            var btlen = $(".mem-release").find(".mask span").text();
-            $(this).addClass("mem-action");
-            $(this).find(".mask").css({ "color": "#20a53a" });
-            $(this).find(".mem-re-con").animate({ "top": "-400px", opacity: 0 });
-            $(this).find(".pie_right .right").css({ "transform": "rotate(3deg)" });
-            for (var i = 0; i < btlen; i++) {
-                setTimeout("rocket(" + btlen + "," + i + ")", i * 30);
+
+        var data = res.data;
+        if ($('#overview_site_count').length) {
+            $('#overview_site_count').text(data.site_count);
+        }
+
+        appendOverviewItem('数据库', '<span id="overview_db_total">0</span>', null, null);
+        appendOverviewItem('Docker容器', '<span id="overview_docker_total">0</span>', null, null);
+        appendOverviewItem('待执行任务', data.pending_task_count, '/task/index');
+        appendOverviewItem('计划任务', data.crontab_count, '/crontab/index');
+        appendOverviewItem('防火墙规则', data.firewall_count, '/firewall/index');
+        appendOverviewItem('应用', data.enabled_app_count, '/setting/index');
+    }, 'json');
+}
+
+function loadOverviewDatabaseStats() {
+    var dbPlugins = ['mysql', 'pgsql', 'mongodb'];
+    var total = 0;
+    var done = 0;
+
+    function flushDbTotal() {
+        if ($('#overview_db_total').length) {
+            $('#overview_db_total').text(total);
+        }
+    }
+
+    if (dbPlugins.length === 0) {
+        flushDbTotal();
+    }
+
+    for (var i = 0; i < dbPlugins.length; i++) {
+        (function(pname) {
+            $.post('/plugins/run', {name: pname, func: 'get_total_statistics'}, function(data) {
+                var rdata;
+                try {
+                    rdata = $.parseJSON(data['data']);
+                } catch(e) {
+                    done++;
+                    if (done >= dbPlugins.length) flushDbTotal();
+                    return;
+                }
+
+                if (rdata && rdata['status'] && rdata['data']) {
+                    var count = Number(rdata['data']['count'] || 0);
+                    if (!isNaN(count) && count > 0) {
+                        total += count;
+                    }
+                }
+
+                done++;
+                if (done >= dbPlugins.length) {
+                    flushDbTotal();
+                }
+            }, 'json').error(function() {
+                done++;
+                if (done >= dbPlugins.length) flushDbTotal();
+            });
+        })(dbPlugins[i]);
+    }
+
+    // Docker 容器数量（未安装插件或读取失败时保持 0）
+    $.post('/plugins/run', {name: 'docker', func: 'get_total_statistics'}, function(data) {
+        var dockerCount = 0;
+        try {
+            var rdata = $.parseJSON(data['data']);
+            if (rdata && rdata['status'] && rdata['data']) {
+                dockerCount = Number(rdata['data']['count'] || 0);
+                if (isNaN(dockerCount) || dockerCount < 0) {
+                    dockerCount = 0;
+                }
             }
+        } catch(e) {}
+
+        if ($('#overview_docker_total').length) {
+            $('#overview_docker_total').text(dockerCount);
         }
+    }, 'json').error(function() {
+        if ($('#overview_docker_total').length) {
+            $('#overview_docker_total').text(0);
+        }
+    });
+}
+
+function loadKeyDataCount(){
+    $('#index_overview .mw-overview-dynamic').remove();
+    loadOverviewSystemStats();
+    loadOverviewDatabaseStats();
+}
+
+
+$(function() {
+    $("#memReleaseBtn").on("click", function() {
+        if ($(".mem-release").hasClass("mem-action")) {
+            return;
+        }
+        $(".mem-release").addClass("mem-action");
+        reMemory();
     });
 
     $("select[name='network-io'],select[name='disk-io']").change(function () {
@@ -942,10 +1290,14 @@ $(function() {
         $('.tabs-down select:eq(' + indexs + ')').removeClass('hide').siblings().addClass('hide');
         switch (indexs) {
         case 0:
-          index.net.table.resize();
+          if (index.net.table) {
+              index.net.table.resize();
+          }
           break;
         case 1:
-          index.iostat.table.resize();
+          if (index.iostat.table) {
+              index.iostat.table.resize();
+          }
           break;
         }
     })
@@ -993,23 +1345,32 @@ var index = {
                 index.net.data.zData.push(0);
             }
 
-            index.net.table = echarts.init(document.getElementById('netImg'));
             var option = index.net.defaultOption();
-            index.net.table.setOption(option);
-
-            window.addEventListener("resize", function () {
-                index.net.table.resize();
+            initEchartWhenReady('netImg', option, function (chart) {
+                index.net.table = chart;
+                window.addEventListener("resize", function () {
+                    if (index.net.table) {
+                        index.net.table.resize();
+                    }
+                });
             });
         },
         render:function(){
+            if (!index.net.table) {
+                return;
+            }
+            var theme = getChartTheme();
             index.net.table.setOption({
                 yAxis: {
                     name:  '单位 '+ index.net.default_unit,
-                    splitLine: { lineStyle: { color: "#eee" } },
-                    axisLine: { lineStyle: { color: "#666" } }
+                    splitLine: { lineStyle: { color: theme.border } },
+                    axisLine: { lineStyle: { color: theme.border } },
+                    axisLabel: { color: theme.muted }
                 },
                 xAxis: {
-                    data: index.net.data.xData
+                    data: index.net.data.xData,
+                    axisLine: { lineStyle: { color: theme.border } },
+                    axisLabel: { color: theme.muted }
                 },
                 series: [{
                     name: lan.index.net_up,
@@ -1021,19 +1382,30 @@ var index = {
             });
         },
         defaultOption:function(){
+            var theme = getChartTheme();
             var option = {
+                backgroundColor: theme.surfaceContainer,
+                color: [theme.primary, theme.secondary],
                 title: {
                     text: "",
                     left: 'center',
                     textStyle: {
-                        color: '#888888',
+                        color: theme.muted,
                         fontStyle: 'normal',
-                        fontFamily: "宋体",
-                        fontSize: 16,
+                        fontFamily: "Inter, PingFang SC, Microsoft YaHei, sans-serif",
+                        fontSize: 14
                     }
                 },
                 tooltip: {
                     trigger: 'axis',
+                    backgroundColor: theme.surface,
+                    borderColor: theme.border,
+                    textStyle: { color: theme.text },
+                    extraCssText: 'box-shadow: 0 12px 28px rgba(15, 23, 42, 0.12); border-radius: 12px; padding: 10px;',
+                    axisPointer: {
+                        type: 'line',
+                        lineStyle: { color: theme.border }
+                    },
                     formatter :function (config) {
                         var _config = config, _tips = "时间：" + _config[0].axisValue + "<br />";
                         for (var i = 0; i < config.length; i++) {
@@ -1048,7 +1420,14 @@ var index = {
                 },
                 legend: {
                     data: [lan.index.net_up, lan.index.net_down],
-                    bottom: '2%'
+                    bottom: '2%',
+                    textStyle: { color: theme.muted }
+                },
+                grid: {
+                    left: '2%',
+                    right: '3%',
+                    bottom: '15%',
+                    containLabel: true
                 },
                 xAxis: {
                     type: 'category',
@@ -1056,18 +1435,20 @@ var index = {
                     data: index.net.data.xData,
                     axisLine: {
                         lineStyle: {
-                            color: "#666"
+                            color: theme.border
                         }
-                    }
+                    },
+                    axisLabel: { color: theme.muted }
                 },
                 yAxis: {
                     name:  '单位 '+ index.net.default_unit,
                     splitLine: {
-                        lineStyle: { color: "#eee" }
+                        lineStyle: { color: theme.border }
                     },
                     axisLine: {
-                        lineStyle: { color: "#666" }
-                    }
+                        lineStyle: { color: theme.border }
+                    },
+                    axisLabel: { color: theme.muted }
                 },
                 series: [{
                     name: '上行',
@@ -1081,16 +1462,16 @@ var index = {
                         normal: {
                             color: new echarts.graphic.LinearGradient(0, 0, 0, 1, [{
                                 offset: 0,
-                                color: 'rgba(255, 140, 0,0.5)'
+                                color: applyColorAlpha(theme.primary, 0.35)
                             }, {
                                 offset: 1,
-                                color: 'rgba(255, 140, 0,0.8)'
+                                color: applyColorAlpha(theme.primary, 0.08)
                             }], false)
                         }
                     },
                     itemStyle: {
                         normal: {
-                            color: '#f7b851'
+                            color: theme.primary
                         }
                     },
                     lineStyle: {
@@ -1111,16 +1492,16 @@ var index = {
                         normal: {
                             color: new echarts.graphic.LinearGradient(0, 0, 0, 1, [{
                                 offset: 0,
-                                color: 'rgba(30, 144, 255,0.5)',
+                                color: applyColorAlpha(theme.secondary, 0.35)
                             }, {
                                 offset: 1,
-                                color: 'rgba(30, 144, 255,0.8)',
+                                color: applyColorAlpha(theme.secondary, 0.08)
                             }], false)
                         }
                     },
                     itemStyle: {
                         normal: {
-                            color: '#52a9ff',
+                            color: theme.secondary,
                         }
                     },
                     lineStyle: {
@@ -1209,19 +1590,33 @@ var index = {
                 index.iostat.data.tipsData.push({});
             }
 
-            index.iostat.table = echarts.init(document.getElementById('ioStat'));
             var option = index.iostat.defaultOption();
-            index.iostat.table.setOption(option);
-
-            window.addEventListener("resize", function () {
-                index.iostat.table.resize();
+            initEchartWhenReady('ioStat', option, function (chart) {
+                index.iostat.table = chart;
+                window.addEventListener("resize", function () {
+                    if (index.iostat.table) {
+                        index.iostat.table.resize();
+                    }
+                });
             });
         },
 
         render:function(){
+            if (!index.iostat.table) {
+                return;
+            }
+            var theme = getChartTheme();
             index.iostat.table.setOption({
                 tooltip: {
                     trigger: 'axis',
+                    backgroundColor: theme.surface,
+                    borderColor: theme.border,
+                    textStyle: { color: theme.text },
+                    extraCssText: 'box-shadow: 0 12px 28px rgba(15, 23, 42, 0.12); border-radius: 12px; padding: 10px;',
+                    axisPointer: {
+                        type: 'line',
+                        lineStyle: { color: theme.border }
+                    },
                     formatter :function (config) {
                         var _config = config, _tips = "时间：" + _config[0].axisValue + "<br />", options = {
                             read_bytes: '读取字节数',
@@ -1250,11 +1645,14 @@ var index = {
                 },
                 yAxis: {
                     name:  '单位 '+ index.iostat.default_unit,
-                    splitLine: { lineStyle: { color: "#eee" } },
-                    axisLine: { lineStyle: { color: "#666" } }
+                    splitLine: { lineStyle: { color: theme.border } },
+                    axisLine: { lineStyle: { color: theme.border } },
+                    axisLabel: { color: theme.muted }
                 },
                 xAxis: {
-                    data: index.iostat.data.xData
+                    data: index.iostat.data.xData,
+                    axisLine: { lineStyle: { color: theme.border } },
+                    axisLabel: { color: theme.muted }
                 },
                 series: [{
                     name: "读取",
@@ -1266,23 +1664,41 @@ var index = {
             });
         },
         defaultOption:function(){
+            var theme = getChartTheme();
             var option = {
+                backgroundColor: theme.surfaceContainer,
+                color: [theme.primary, theme.secondary],
                 title: {
                     text: "",
                     left: 'center',
                     textStyle: {
-                        color: '#888888',
+                        color: theme.muted,
                         fontStyle: 'normal',
-                        fontFamily: "宋体",
-                        fontSize: 16,
+                        fontFamily: "Inter, PingFang SC, Microsoft YaHei, sans-serif",
+                        fontSize: 14
                     }
                 },
                 tooltip: {
-                    trigger: 'axis'
+                    trigger: 'axis',
+                    backgroundColor: theme.surface,
+                    borderColor: theme.border,
+                    textStyle: { color: theme.text },
+                    extraCssText: 'box-shadow: 0 12px 28px rgba(15, 23, 42, 0.12); border-radius: 12px; padding: 10px;',
+                    axisPointer: {
+                        type: 'line',
+                        lineStyle: { color: theme.border }
+                    }
                 },
                 legend: {
                     data: ["读取", "写入"],
-                    bottom: '2%'
+                    bottom: '2%',
+                    textStyle: { color: theme.muted }
+                },
+                grid: {
+                    left: '2%',
+                    right: '3%',
+                    bottom: '15%',
+                    containLabel: true
                 },
                 xAxis: {
                     type: 'category',
@@ -1290,18 +1706,20 @@ var index = {
                     data: index.iostat.data.xData,
                     axisLine: {
                         lineStyle: {
-                            color: "#666"
+                            color: theme.border
                         }
-                    }
+                    },
+                    axisLabel: { color: theme.muted }
                 },
                 yAxis: {
                     name:  '单位 '+ index.iostat.default_unit,
                     splitLine: {
-                        lineStyle: { color: "#eee" }
+                        lineStyle: { color: theme.border }
                     },
                     axisLine: {
-                        lineStyle: { color: "#666" }
-                    }
+                        lineStyle: { color: theme.border }
+                    },
+                    axisLabel: { color: theme.muted }
                 },
                 series: [{
                     name: '读取',
@@ -1312,12 +1730,18 @@ var index = {
                     symbol: 'circle',
                     areaStyle: {
                         normal: {
-                            color: 'rgb(255, 70, 131)'
+                            color: new echarts.graphic.LinearGradient(0, 0, 0, 1, [{
+                                offset: 0,
+                                color: applyColorAlpha(theme.primary, 0.3)
+                            }, {
+                                offset: 1,
+                                color: applyColorAlpha(theme.primary, 0.06)
+                            }], false)
                         }
                     },
                     itemStyle: {
                         normal: {
-                            color: 'rgb(255, 70, 131)'
+                            color: theme.primary
                         }
                     },
                     lineStyle: {
@@ -1336,12 +1760,18 @@ var index = {
                     symbolSize: 6,
                     areaStyle: {
                         normal: {
-                            color: 'rgba(46, 165, 186, .7)'
+                            color: new echarts.graphic.LinearGradient(0, 0, 0, 1, [{
+                                offset: 0,
+                                color: applyColorAlpha(theme.secondary, 0.3)
+                            }, {
+                                offset: 1,
+                                color: applyColorAlpha(theme.secondary, 0.06)
+                            }], false)
                         }
                     },
                     itemStyle: {
                         normal: {
-                            color: 'rgba(46, 165, 186, .7)'
+                            color: theme.secondary
                         }
                     },
                     lineStyle: {

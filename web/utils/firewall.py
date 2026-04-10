@@ -95,12 +95,18 @@ class Firewall(object):
 
         all_port = t[0].strip()
         data = all_port.split(":")
+        if len(data) < 2:
+            return True
         ports_str = data[1]
+        if not ports_str.strip():
+            return True
         ports_list = ports_str.strip().split(' ')
 
         ports_all = []
         for pinfo in ports_list:
             info = pinfo.split('/')
+            if len(info) < 2:
+                continue
 
             is_same = False
             for i in range(len(ports_all)):
@@ -533,6 +539,5 @@ class Firewall(object):
         mw.execShell("systemctl restart sshd")
         mw.writeLog("SSH管理", msg)
         return mw.returnData(True, msg)
-
 
 

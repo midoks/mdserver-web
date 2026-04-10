@@ -33,6 +33,13 @@ def restartServer():
     mw.execShell("sync && init 6 &")
     return mw.returnData(True, '命令发送成功!')
 
+@mw_async
+def shutdownServer():
+    if not mw.isRestart():
+        return mw.returnData(False, '请等待所有安装任务完成再执行!')
+    mw.execShell("sync && init 0 &")
+    return mw.returnData(True, '命令发送成功!')
+
 def getPid(self, pname):
     try:
         pids = psutil.pids()
@@ -218,4 +225,3 @@ def getMemUsed():
         return (tmp / tmp1)
     except Exception as ex:
         return 1
-

@@ -36,7 +36,7 @@
 		"H1":"首页",
 		"H2":"网站管理",
 		"SEARCH":"网站搜索",
-		"PS":"使用宝塔Linux面板创建站点时会自动创建权限配置，统一使用www用户。",
+		"PS":"使用PowerLinux创建站点时会自动创建权限配置，统一使用www用户。",
 		"BTN1":"添加站点",
 		"BTN2":"修改默认页",
 		"BTN3":"默认站点",
@@ -138,7 +138,7 @@
 		"TITLE":"面板已关闭",
 		"H1":"抱歉,管理员已关闭面板",
 		"P1":"开启命令: rm -f /www/server/panel/data/close.pl",
-		"NAME":"宝塔Linux面板",
+		"NAME":"PowerLinux",
 		"HELP":"请求帮助"
 	},
 	

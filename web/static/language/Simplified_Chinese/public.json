@@ -1,7 +1,7 @@
 {
-	"NAME":"Linux面板",
+	"NAME":"PowerLinux",
 	"BRAND":"MW",
-	"PRODUCT":"Linux面板",
+	"PRODUCT":"PowerLinux",
 	"PAGE_ERR_TITLE":"拒绝访问",
 	"PAGE_ERR_DOMAIN_H1":"抱歉,您没有访问权限",
 	"PAGE_ERR_DOMAIN_P1":"请使用正确的域名访问!",

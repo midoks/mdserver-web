@@ -27,6 +27,7 @@ from admin import cache,session
 
 import core.mw as mw
 import thisdb
+import utils.system as usys
 
 
 blueprint = Blueprint('dashboard', __name__, url_prefix='/', template_folder='../../templates')
@@ -35,6 +36,30 @@ blueprint = Blueprint('dashboard', __name__, url_prefix='/', template_folder='..
 def index():
     name = thisdb.getOption('template', default='default')
     return render_template('%s/index.html' % name)
+
+
+@blueprint.route('/overview_stats', endpoint='overview_stats', methods=['GET'])
+@panel_login_required
+def overview_stats():
+    mem_info = usys.getMemInfo()
+    cpu_info = usys.getCpuInfo(interval=0)
+
+    mem_total_gb = 0
+    try:
+        mem_total_gb = round(float(mem_info.get('memTotal', 0)) / (1024 * 1024 * 1024), 2)
+    except Exception:
+        mem_total_gb = 0
+
+    data = {
+        'site_count': thisdb.getSitesCount(),
+        'pending_task_count': thisdb.getTaskUnexecutedCount(),
+        'crontab_count': mw.M('crontab').count(),
+        'firewall_count': mw.M('firewall').count(),
+        'enabled_app_count': mw.M('app').where('status=?', (1,)).count(),
+        'cpu_num': cpu_info[1] if isinstance(cpu_info, (list, tuple)) and len(cpu_info) > 1 else 0,
+        'mem_total_gb': mem_total_gb,
+    }
+    return mw.returnData(True, 'ok', data)
 
 # 安全路径
 @blueprint.route('/<path>',endpoint='admin_safe_path',methods=['GET'])

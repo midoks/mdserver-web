@@ -8,181 +8,125 @@
 <link rel="icon" href="/static/favicon.ico" type="image/x-icon" />
 <link rel="shortcut icon" href="/static/favicon.ico" type="image/x-icon" />
 <title>{{data['title']}}</title>
+<script type="text/javascript">
+(function () {
+    function hexToRgbTriplet(color) {
+        if (!color) {
+            return null;
+        }
+
+        var value = String(color).trim().replace(/^#/, '');
+        if (value.length === 3) {
+            value = value.split('').map(function (ch) {
+                return ch + ch;
+            }).join('');
+        }
+
+        if (value.length !== 6) {
+            return null;
+        }
+
+        var red = parseInt(value.slice(0, 2), 16);
+        var green = parseInt(value.slice(2, 4), 16);
+        var blue = parseInt(value.slice(4, 6), 16);
+        if (isNaN(red) || isNaN(green) || isNaN(blue)) {
+            return null;
+        }
+
+        return red + ', ' + green + ', ' + blue;
+    }
+
+    try {
+        var root = document.documentElement;
+        var mode = window.localStorage.getItem('mw-theme-mode');
+        if (mode !== 'light' && mode !== 'dark' && mode !== 'auto') {
+            mode = 'auto';
+        }
+        root.classList.remove('mdui-theme-light', 'mdui-theme-dark', 'mdui-theme-auto');
+        root.classList.add('mdui-theme-' + mode);
+
+        var color = window.localStorage.getItem('mw-color-scheme');
+        if (color) {
+            root.style.setProperty('--mw-theme-primary', color);
+            var colorRgb = hexToRgbTriplet(color);
+            if (colorRgb) {
+                root.style.setProperty('--mw-theme-primary-rgb', colorRgb);
+            }
+        }
+
+        var background = window.localStorage.getItem('mw-theme-background');
+        if (background) {
+            root.style.setProperty('--mw-app-background-image', background);
+        }
+
+        var backgroundMode = window.localStorage.getItem('mw-theme-background-mode');
+        if (backgroundMode !== 'plain') {
+            backgroundMode = 'default';
+        }
+        if (backgroundMode === 'plain') {
+            root.style.setProperty('--mw-app-background-overlay', 'none');
+        } else {
+            root.style.removeProperty('--mw-app-background-overlay');
+        }
+    } catch (error) {}
+})();
+</script>
+<link href="/static/css/material-icons.css?v={{config.version}}" rel="stylesheet">
+<link href="/static/vendor/mdui/mdui.css?v={{config.version}}" rel="stylesheet">
 <link rel="stylesheet" type="text/css" href="/static/layer/skin/default/layer.css?v={{config.version}}">
 <link rel="stylesheet" type="text/css" href="/static/css/site.css?v={{config.version}}">
+<link rel="stylesheet" type="text/css" href="/static/css/mdui2-theme.css?v={{config.version}}">
 <link rel="stylesheet" type="text/css" href="/static/css/login.css?v={{config.version}}">
-<style type="text/css">
-@media screen and (max-width: 640px) {
-    .scanCode{
-    	display: none;
-    }
-    .account{
-    	display: block !important;
-    }
-    .bg_img{
-    	display: none;
-    }
-}
-
-.bg_img.pc{
-	background-position: 0 -60px;
-}
-.bg_img.pc:hover{
-	background-position: -60px -60px;
-}
-
-.qrCode{
-	text-align: center;
-	padding-top: 20px;
-}
-.scanCode .titles{
-	font-size: 23px;
-	margin-top: 25px;
-	color: #444;
-	text-align: center;
-}
-.list_scan{
-	width: 150px;
-	margin: 0 auto; 
-	margin-top: 15px;
-}
-.list_scan>img{
-	width: 40px;
-	height: 40px;
-	float: left;
-	margin-right: 15px;
-}
-.list_scan span{
-	display: inline-block;
-	font-size: 13px;
-	margin-bottom: 5px;
-}
-.list_scan a:hover .weChatSamll{
-	display: block;
-}
-.list_scan .weChatSamll{
-	display: none;
-	width: 150px;
-	height: 150px;
-	position: absolute;
-	border: 1px solid #ececec;
-	border-radius: 5px;
-	bottom: 105px;
-	right: 80px;
-	padding: 20px;
-	background-color: #fff;
-}
-
-.list_scan .weChatSamll img{
-	width: 100%;
-}
-
-.list_scan .weChatSamll em{
-	position: absolute;
-	border: 7px solid #ececec;
-	border-color: #ececec transparent transparent transparent;
-	width: 0;
-	height: 0;
-	right: 87px;
-	bottom: -14px;
-	margin-left: -6px;
-}
-
-.tips{
-	width: 115px;
-	position: absolute;
-	top: 10px;
-	right: 65px;
-	color: rgb(32, 165, 58);
-	background: #dff0d8;
-	padding: 5px 10px;
-	text-align: center;
-	border-radius: 4px;
-}
-
-.tips em{
-	position: absolute;
-	border: 6px solid #dff0d8;
-	border-color:transparent  transparent transparent #dff0d8; 
-	width: 0;
-	height: 0;
-	right: -11px;
-	top: 8px;
-	margin-left: -6px;
-}
-
-.tips img{
-	height: 16px;
-	width: 16px;
-	vertical-align: middle;
-	margin-top: -1px;
-	margin-right: 4px;
-}
-.main .login .rlogo{
-	margin-top: 15px;
-	margin-bottom: 25px;
-}
-
-.layui-layer .layui-layer-btn{
-	width: 235px;
-}
-</style>
 </head>
-<body>
-<div class="main">
-	<div class="login">
-		<div class="account">
-			<form class="loginform" method="post" action="/login" onsubmit="return false;">
-			<div class="rlogo">{{data['title']}}</div>
-			<div class="line">
-				<input class="inputtxt" value="" name="username" datatype="*" nullmsg="请填写账户" errormsg="请填写账户" placeholder="账户" type="text" autocomplete="on">
-				<div class="Validform_checktip"></div>
-			</div>
-			<div class="line"><input class="inputtxt" name="password" value="" datatype="*" nullmsg="请填写密码" errormsg="请填写密码" placeholder="密码" type="password">
-				<div class="Validform_checktip"></div>
-			</div>
-			<div style="color: red;position: relative;top: -14px;" id="error"></div>
-			<div class="line yzm" style="top: -5px;{% if not session['code'] %}display:none;{% endif %}">
-				<input type="text" class="inputtxt" name="code" nullmsg="请填写4位验证码" errormsg="验证码" datatype="*" placeholder="验证码">
-				<div class="Validform_checktip"></div>
-				<div id='mw_yzm'>{% if session['code'] %}<img width="100" height="40" class="passcode" onclick="this.src=this.src.split('?')[0] + '?'+new Date().getTime()" src="/code" style="border: 1px solid #ccc; float: right;" title="" >{% endif %}</div>
-			</div>
-			<div class="login_btn"><input id="login-button" value="登录" type="submit"></div>
-			<p class="pwinfo" style="display:none"></p>
-			<a class="resetpw" href="//github.com/midoks/mdserver-web/wiki/%E5%AF%86%E7%A0%81%E4%BF%AE%E6%94%B9" target="_blank">忘记密码</a>
-			</form>
+<body class="mw-login">
+<main class="mw-login-layout">
+	<mdui-card class="mw-login-card">
+		<div class="mw-login-brand">
+			<span class="material-icons">shield</span>
+			<h1>{{data['title']}}</h1>
+			<p>欢迎回来，请登录继续管理你的服务器。</p>
 		</div>
-
-	</div>
-</div>
+		<form class="mw-login-form" method="post" action="/login" onsubmit="return false;">
+			<label class="mw-field">
+				<span>账户</span>
+				<input class="mw-input" value="" name="username" datatype="*" nullmsg="请填写账户" errormsg="请填写账户" placeholder="请输入账户" type="text" autocomplete="on">
+				<div class="Validform_checktip"></div>
+			</label>
+			<label class="mw-field">
+				<span>密码</span>
+				<input class="mw-input" name="password" value="" datatype="*" nullmsg="请填写密码" errormsg="请填写密码" placeholder="请输入密码" type="password">
+				<div class="Validform_checktip"></div>
+			</label>
+			<div class="mw-error" id="error"></div>
+			<div class="mw-field mw-captcha" style="{% if not session['code'] %}display:none;{% endif %}">
+				<span>验证码</span>
+				<div class="mw-captcha-row">
+					<input type="text" class="mw-input" name="code" nullmsg="请填写4位验证码" errormsg="验证码" datatype="*" placeholder="输入验证码">
+					<div id='mw_yzm'>{% if session['code'] %}<img width="100" height="40" class="passcode" onclick="this.src=this.src.split('?')[0] + '?'+new Date().getTime()" src="/code" title="" >{% endif %}</div>
+				</div>
+				<div class="Validform_checktip"></div>
+			</div>
+			<mdui-button class="mw-login-submit" id="login-button" variant="filled" type="submit">登录</mdui-button>
+			<p class="pwinfo" style="display:none"></p>
+			<mdui-button class="mw-login-link" variant="text" href="//github.com/midoks/mdserver-web/wiki/%E5%AF%86%E7%A0%81%E4%BF%AE%E6%94%B9" target="_blank">忘记密码</mdui-button>
+		</form>
+	</mdui-card>
+</main>
 <script type="text/javascript" src="/static/js/jquery-1.10.2.min.js?v={{config.version}}"></script>
 <script src="/static/language/zh-cn.js?v={{config.version}}"></script>
 <script src="/static/language/Simplified_Chinese/lan.js?v={{config.version}}"></script>
+<script src="/static/vendor/mdui/mdui.global.js?v={{config.version}}"></script>
+<script src="/static/app/theme.js?v={{config.version}}"></script>
+<script type="text/javascript">
+if (window.MWTheme && typeof window.MWTheme.init === 'function') {
+	window.MWTheme.init();
+}
+</script>
 <script type="text/javascript" src="/static/layer/layer.js?v={{config.version}}"></script>
 <script type="text/javascript" src="/static/js/Validform_v5.3.2_min.js?v={{config.version}}"></script>
 <script type="text/javascript">
 $(function(){
-	wreset();
-})
-
-window.onresize=function(){
-	wreset();
-}
-
-function wreset(){
-	var w = $(window).width();
-	var yzmw = $(".login .line").width() - 140;
-	if($(".yzm").is(":visible") && w > 640){
-		$(".login").css({"height":"365px","margin-top":"-230px"});
-	} else {
-		$(".login").removeAttr("style")
-	}
-	$(".login .yzm .inputtxt").width(yzmw);
-}
-
-
-$(function(){
-	$(".loginform").Validform({
+	$(".mw-login-form").Validform({
 		tiptype:function(msg,o,cssctl){
 			if(!o.obj.is("form")){
 				var objtip=o.obj.siblings(".Validform_checktip");
@@ -221,8 +165,7 @@ $('#login-button').click(function(){
 				$("input[name='code']").val('');
 				$(".passcode").click();
 			}
-			$(".yzm").show();
-			wreset();
+			$(".mw-captcha").show();
 			layer.msg(rdata.msg,{icon:2,time:5000});
 			return;
 		}

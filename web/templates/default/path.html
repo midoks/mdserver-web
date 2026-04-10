@@ -1,16 +1,105 @@
 
 <!DOCTYPE html>
-<html>
+<html lang="zh">
 <head>
     <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>安全入口校验失败</title>
+    <link rel="stylesheet" href="/static/css/material-icons.css?v={{config.version}}">
+    <link rel="stylesheet" href="/static/vendor/mdui/mdui.css?v={{config.version}}">
+    <link rel="stylesheet" href="/static/css/mdui2-theme.css?v={{config.version}}">
+    <script type="text/javascript">
+    (function () {
+        function hexToRgbTriplet(color) {
+            if (!color) {
+                return null;
+            }
+            var value = String(color).trim().replace(/^#/, '');
+            if (value.length === 3) {
+                value = value.split('').map(function (ch) {
+                    return ch + ch;
+                }).join('');
+            }
+            if (value.length !== 6) {
+                return null;
+            }
+            var red = parseInt(value.slice(0, 2), 16);
+            var green = parseInt(value.slice(2, 4), 16);
+            var blue = parseInt(value.slice(4, 6), 16);
+            if (isNaN(red) || isNaN(green) || isNaN(blue)) {
+                return null;
+            }
+            return red + ', ' + green + ', ' + blue;
+        }
+
+        try {
+            var root = document.documentElement;
+            var mode = window.localStorage.getItem('mw-theme-mode');
+            if (mode !== 'light' && mode !== 'dark' && mode !== 'auto') {
+                mode = 'auto';
+            }
+            root.classList.remove('mdui-theme-light', 'mdui-theme-dark', 'mdui-theme-auto');
+            root.classList.add('mdui-theme-' + mode);
+
+            var color = window.localStorage.getItem('mw-color-scheme');
+            if (color) {
+                root.style.setProperty('--mw-theme-primary', color);
+                var colorRgb = hexToRgbTriplet(color);
+                if (colorRgb) {
+                    root.style.setProperty('--mw-theme-primary-rgb', colorRgb);
+                }
+            }
+
+            var background = window.localStorage.getItem('mw-theme-background');
+            if (background) {
+                root.style.setProperty('--mw-app-background-image', background);
+            }
+
+            var backgroundMode = window.localStorage.getItem('mw-theme-background-mode');
+            if (backgroundMode !== 'plain') {
+                backgroundMode = 'default';
+            }
+            if (backgroundMode === 'plain') {
+                root.style.setProperty('--mw-app-background-overlay', 'none');
+            } else {
+                root.style.removeProperty('--mw-app-background-overlay');
+            }
+        } catch (error) {}
+    })();
+    </script>
 </head>
-<body>
-    <h1>请使用正确的入口登录面板</h1>
-    <p><b>错误原因：</b>当前新安装的已经开启了安全入口登录，新装机器都会随机一个8位字符的安全入口名称，亦可以在面板设置处修改，如您没记录或不记得了，可以使用以下方式解决</p>
-    <p><b>解决方法：</b>在SSH终端输入以下一种命令来解决</p>
-    <p>1.查看面板入口：mw default</p>
-    <p>2.关闭安全入口：mw close_admin_path </p>
-    <p style="color:red;">注意：【关闭安全入口】将使您的面板登录地址被直接暴露在互联网上，非常危险，请谨慎操作</p>
+<body class="mw-theme mw-standalone-page">
+    <main class="mw-standalone-shell">
+        <div class="mw-card mw-standalone-card">
+            <div class="mw-standalone-hero">
+                <div class="mw-standalone-icon">
+                    <span class="material-icons">lock</span>
+                </div>
+                <div>
+                    <h1 class="mw-standalone-title">请使用正确的入口登录面板</h1>
+                    <p class="mw-standalone-copy">当前面板启用了安全入口，必须通过正确的路径访问。这个保护层会在入口不正确时拦住请求，避免面板特征直接暴露。</p>
+                    <div class="mw-standalone-meta">
+                        <span class="mw-standalone-pill">安全入口校验</span>
+                        <span class="mw-standalone-pill">登录前保护</span>
+                        <span class="mw-standalone-pill">需要 SSH 处理</span>
+                    </div>
+                </div>
+            </div>
+            <div class="mw-standalone-steps">
+                <div class="mw-standalone-step">
+                    <strong>错误原因</strong>
+                    新安装的面板会随机生成一个 8 位左右的安全入口，也可能是管理员在面板设置里手动修改过入口。
+                </div>
+                <div class="mw-standalone-step">
+                    <strong>解决方法</strong>
+                    在 SSH 终端里执行下面任意一条命令，先查看当前入口，或者直接关闭安全入口。
+                </div>
+                <pre class="mw-standalone-code">mw default
+mw close_admin_path</pre>
+                <div class="mw-standalone-note">关闭安全入口会直接暴露登录地址，请确认这是你想要的行为后再执行。</div>
+            </div>
+        </div>
+    </main>
 </body>
 </html>

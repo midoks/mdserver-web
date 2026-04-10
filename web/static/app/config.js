@@ -23,6 +23,16 @@ $('input[name="webname"]').change(function(){
 	});
 });
 
+$('input[name="footer_text"]').change(function(){
+	var footerText = $(this).val();
+	$('.btn_footer_text').removeAttr('disabled');
+	$('.btn_footer_text').unbind().click(function(){
+		$.post('/setting/set_footer_text','footer_text='+encodeURIComponent(footerText), function(rdata){
+			showMsg(rdata.msg,function(){window.location.reload();},{icon:rdata.status?1:2},2000);
+		},'json');
+	});
+});
+
 
 $('input[name="host_ip"]').change(function(){
 	var host_ip = $(this).val();
@@ -231,7 +241,7 @@ function setVipInfo(){
 
 //关闭面板
 function closePanel(){
-	layer.confirm('关闭面板会导致您无法访问面板 ,您真的要关闭Linux面板吗？',{title:'关闭面板',closeBtn:2,icon:13,cancel:function(){
+layer.confirm('关闭面板会导致您无法访问面板 ,您真的要关闭PowerLinux吗？',{title:'关闭面板',closeBtn:2,icon:13,cancel:function(){
 		$("#closePl").prop("checked",false);
 	}}, function() {
 		$.post('/setting/close_panel','',function(rdata){
@@ -1631,3 +1641,210 @@ function appPage(){
 		}
 	});
 }
+
+$(function () {
+    var themeApi = window.MWTheme || {};
+    var themeInput = document.getElementById('mwThemeColor');
+    var themeReset = document.getElementById('mwThemeReset');
+    var modeContainer = document.getElementById('mwThemeMode');
+    var backgroundState = document.getElementById('mwThemeBgState');
+    var backgroundUrlInput = document.getElementById('mwThemeBgUrl');
+    var backgroundFileInput = document.getElementById('mwThemeBgFile');
+    var backgroundDefaultBtn = document.getElementById('mwThemeDefaultBg');
+    var backgroundClearBtn = document.getElementById('mwThemeClearBg');
+    var backgroundUploadBtn = document.getElementById('mwThemeUploadBg');
+    var backgroundApplyBtn = document.getElementById('mwThemeApplyBg');
+
+    function getThemeColor() {
+        if (themeApi && typeof themeApi.getColor === 'function') {
+            return themeApi.getColor();
+        }
+        return '#6750a4';
+    }
+
+    function syncModeButtons(mode) {
+        if (!modeContainer) {
+            return;
+        }
+
+        var nextMode = mode || 'auto';
+        modeContainer.querySelectorAll('.mw-theme-mode-btn').forEach(function (button) {
+            var buttonMode = button.getAttribute('data-mode');
+            button.classList.toggle('is-active', buttonMode === nextMode);
+        });
+    }
+
+    function syncBackgroundState(info) {
+        if (!backgroundState) {
+            return;
+        }
+
+        info = info || {};
+        var parts = [];
+        var mode = info.mode || 'default';
+        var kind = info.kind || 'default';
+
+        if (mode === 'plain') {
+            parts.push('纯净背景');
+        } else {
+            parts.push('默认背景');
+        }
+
+        if (kind === 'upload') {
+            parts.push('本地图片');
+        } else if (kind === 'url') {
+            parts.push('外链图片');
+        } else if (info.value) {
+            parts.push('自定义图片');
+        }
+
+        var text = '当前：' + parts.join(' / ');
+        if (info.source && (kind === 'upload' || kind === 'url')) {
+            text += '（' + info.source + '）';
+        }
+
+        backgroundState.textContent = text;
+
+        if (backgroundUrlInput) {
+            if (kind === 'url' && info.source) {
+                backgroundUrlInput.value = info.source;
+            } else if (kind === 'default' || kind === 'upload') {
+                backgroundUrlInput.value = '';
+            }
+        }
+    }
+
+    if (themeInput) {
+        themeInput.value = getThemeColor();
+
+        themeInput.addEventListener('input', function () {
+            if (themeApi && typeof themeApi.applyColor === 'function') {
+                themeApi.applyColor(themeInput.value);
+            }
+        });
+    }
+
+    if (themeReset) {
+        themeReset.addEventListener('click', function () {
+            if (themeApi && typeof themeApi.reset === 'function') {
+                themeApi.reset();
+            }
+            if (themeInput) {
+                themeInput.value = getThemeColor();
+            }
+        });
+    }
+
+    Array.prototype.forEach.call(document.querySelectorAll('.mw-theme-preset'), function (button) {
+        button.addEventListener('click', function () {
+            var color = button.getAttribute('data-theme-color');
+            if (!color) {
+                return;
+            }
+            if (themeInput) {
+                themeInput.value = color;
+            }
+            if (themeApi && typeof themeApi.applyColor === 'function') {
+                themeApi.applyColor(color);
+            }
+        });
+    });
+
+    if (modeContainer) {
+        syncModeButtons(themeApi && typeof themeApi.getMode === 'function' ? themeApi.getMode() : 'auto');
+        Array.prototype.forEach.call(modeContainer.querySelectorAll('.mw-theme-mode-btn'), function (button) {
+            button.addEventListener('click', function () {
+                var mode = button.getAttribute('data-mode');
+                if (!mode) {
+                    return;
+                }
+                if (themeApi && typeof themeApi.setMode === 'function') {
+                    themeApi.setMode(mode);
+                }
+                syncModeButtons(mode);
+            });
+        });
+    }
+
+    if (backgroundState && themeApi && typeof themeApi.getBackgroundInfo === 'function') {
+        syncBackgroundState(themeApi.getBackgroundInfo());
+    }
+
+    if (backgroundDefaultBtn) {
+        backgroundDefaultBtn.addEventListener('click', function () {
+            if (themeApi && typeof themeApi.setDefaultBackground === 'function') {
+                themeApi.setDefaultBackground();
+            } else if (themeApi && typeof themeApi.clearBackground === 'function') {
+                themeApi.clearBackground();
+            }
+            syncBackgroundState(themeApi && typeof themeApi.getBackgroundInfo === 'function' ? themeApi.getBackgroundInfo() : {});
+        });
+    }
+
+    if (backgroundClearBtn) {
+        backgroundClearBtn.addEventListener('click', function () {
+            if (themeApi && typeof themeApi.clearBackground === 'function') {
+                themeApi.clearBackground();
+            }
+            syncBackgroundState(themeApi && typeof themeApi.getBackgroundInfo === 'function' ? themeApi.getBackgroundInfo() : {});
+        });
+    }
+
+    if (backgroundUploadBtn && backgroundFileInput) {
+        backgroundUploadBtn.addEventListener('click', function () {
+            backgroundFileInput.click();
+        });
+    }
+
+    if (backgroundFileInput) {
+        backgroundFileInput.addEventListener('change', function () {
+            var file = backgroundFileInput.files && backgroundFileInput.files[0];
+            if (!file) {
+                return;
+            }
+
+            if (!file.type || file.type.indexOf('image/') !== 0) {
+                layer.msg('请选择图片文件', { icon: 2 });
+                backgroundFileInput.value = '';
+                return;
+            }
+
+            if (themeApi && typeof themeApi.setBackgroundFile === 'function') {
+                themeApi.setBackgroundFile(file).then(function () {
+                    backgroundFileInput.value = '';
+                    syncBackgroundState(themeApi.getBackgroundInfo());
+                    layer.msg('背景图已应用', { icon: 1 });
+                }).catch(function () {
+                    backgroundFileInput.value = '';
+                    layer.msg('背景图读取失败', { icon: 2 });
+                });
+            }
+        });
+    }
+
+    if (backgroundApplyBtn && backgroundUrlInput) {
+        backgroundApplyBtn.addEventListener('click', function () {
+            var url = backgroundUrlInput.value.trim();
+            if (!url) {
+                layer.msg('请输入图片地址', { icon: 2 });
+                return;
+            }
+
+            if (themeApi && typeof themeApi.setBackgroundUrl === 'function') {
+                themeApi.setBackgroundUrl(url);
+            } else if (themeApi && typeof themeApi.setBackground === 'function') {
+                themeApi.setBackground(url, { kind: 'url', source: url });
+            }
+
+            syncBackgroundState(themeApi && typeof themeApi.getBackgroundInfo === 'function' ? themeApi.getBackgroundInfo() : {});
+            layer.msg('背景图已应用', { icon: 1 });
+        });
+
+        backgroundUrlInput.addEventListener('keydown', function (event) {
+            if (event.key === 'Enter') {
+                event.preventDefault();
+                backgroundApplyBtn.click();
+            }
+        });
+    }
+});

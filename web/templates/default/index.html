@@ -1,155 +1,118 @@
 {% extends "layout.html" %} {% block content %}
-<div class="main-content">
-
-    <div class="index-pos-box bgw">
-        <div class="position f12 c6 pull-left" style="background:none;padding-left:15px">
-            <span class="ico-system">系统:</span><span id="info" style="margin-left:10px;">正在获取中...</span>&#12288;&#12288;<span id="running"></span>
+<div class="main-content mw-dashboard">
+    <mdui-card class="mw-card mw-page-header">
+        <div class="mw-page-left">
+            <div class="mw-page-title">系统</div>
+            <div class="mw-page-sub" id="info">正在获取中...</div>
+            <div class="mw-page-sub mw-page-runtime" id="running"></div>
         </div>
-        <span class="pull-right f12 c6" style="line-height:52px; margin-right:15px">
-            <span id="version" style="margin-right:10px">{{config.version}}</span>
-            <span id="toUpdate"><a class="btlink" href="javascript:checkUpdate();">更新</a></span> |
-            <!-- <span style="margin:0 10px"><a class="btlink" href="javascript:rePanel();">修复</a></span> -->
-            <span><a class="btlink" href="javascript:reBoot();">重启</a></span>
-        </span>
-    </div>
+        <div class="mw-page-actions">
+            <span class="mw-version" id="version">{{config.version}}</span>
+            <mdui-button variant="text" href="javascript:checkUpdate();" class="mw-link-button" id="toUpdate">更新</mdui-button>
+            <mdui-button variant="text" href="javascript:reBoot();" class="mw-link-button">重启</mdui-button>
+            <mdui-button variant="text" href="javascript:shutdownServer();" class="mw-link-button">关机</mdui-button>
+            <mdui-button variant="text" href="javascript:showVipInfo();" class="mw-link-button">Pro Max会员</mdui-button>
+        </div>
+    </mdui-card>
 
-    <div class="container-fluid" style="padding-bottom: 66px;">
-        
+    <div class="mw-dashboard-body">
         <div class="danger-tips">
             <div class="alert alert-warning" id="messageError" style="display: none;background-color: #ffe0e0;border-color: #ffb0b0;color: #ff2020; margin-bottom:0;margin-top: 12px;"></div>
         </div>
 
-        <div class="server bgw mtb15">
-            <div class="title c6 f16 plr15">
-                <h3 class="c6 f16 pull-left">状态</h3>
+        <mdui-card class="mw-card">
+            <div class="mw-card-header">
+                <div class="mw-card-title">状态</div>
             </div>
-            <div class="server-circle">
-                <ul class="row" id="systemInfoList">
-                    <li class="col-xs-6 col-sm-3 col-md-3 col-lg-2 mtb20 circle-box text-center" id="LoadList">
+            <div class="mw-card-content">
+                <ul class="mw-stat-grid" id="systemInfoList">
+                    <li class="circle-box text-center mw-stat-item" id="LoadList">
                         <h3 class="c5 f15">负载状态<a href="https://github.com/midoks/mdserver-web/wiki#负载简述" target="_blank" class="bt-ico-ask" style="cursor: pointer;">?</a></h3>
-                        <div class="circle" style="cursor: pointer;">
-                            <div class="pie_left">
-                                <div class="left"></div>
-                            </div>
-                            <div class="pie_right">
-                                <div class="right"></div>
-                            </div>
-                            <div class="mask"><span id="Load">0</span>%</div>
+                        <div class="mw-stat-progress">
+                            <mdui-linear-progress id="LoadProgress" max="100" value="0"></mdui-linear-progress>
                         </div>
-                        <h4 id="LoadState" class="c5 f15">获取中...</h4>
+                        <div class="mw-stat-value mask"><span id="Load">0</span>%</div>
+                        <div id="LoadState" class="mw-stat-status c5 f15">获取中...</div>
                     </li>
-                    <li class="col-xs-6 col-sm-3 col-md-3 col-lg-2 mtb20 circle-box text-center" id="cpuChart">
+                    <li class="circle-box text-center mw-stat-item" id="cpuChart">
                         <h3 class="c5 f15">CPU使用率</h3>
-                        <div class="circle">
-                            <div class="pie_left">
-                                <div class="left"></div>
-                            </div>
-                            <div class="pie_right">
-                                <div class="right"></div>
-                            </div>
-                            <div class="mask"><span id="state">0</span>%</div>
+                        <div class="mw-stat-progress">
+                            <mdui-linear-progress id="CpuProgress" max="100" value="0"></mdui-linear-progress>
                         </div>
-                        <h4 id="core" class="c5 f15">获取中...</h4>
+                        <div class="mw-stat-value mask"><span id="state">0</span>%</div>
+                        <div id="core" class="mw-stat-status c5 f15">获取中...</div>
                     </li>
-                    <li class="col-xs-6 col-sm-3 col-md-3 col-lg-2 mtb20 circle-box text-center">
+                    <li class="circle-box text-center mw-stat-item mem-release" id="memChart">
                         <h3 class="c5 f15">内存使用率</h3>
-                        <div class="circle mem-release">
-                            <div class="pie_left">
-                                <div class="left"></div>
-                            </div>
-                            <div class="pie_right">
-                                <div class="right"></div>
-                            </div>
-                            <div class="mask"><span id="left">0</span>%</div>
-                            <div class="mem-re-min" style="display: none;"></div>
-                            <div class="mem-re-con" title=""></div>
+                        <div class="mw-stat-progress">
+                            <mdui-linear-progress id="MemProgress" max="100" value="0"></mdui-linear-progress>
                         </div>
-                        <h4 id="memory" class="c5 f15">获取中...</h4>
+                        <div class="mw-stat-value mask"><span id="left">0</span>%</div>
+                        <div id="memory" class="mw-stat-status c5 f15">获取中...</div>
+                        <mdui-button id="memReleaseBtn" variant="text" class="mw-mem-release-btn">释放内存</mdui-button>
                     </li>
                 </ul>
             </div>
-        </div>
+        </mdui-card>
 
-        
-        <div class="conter-box system-info bgw clearfix mtb15">
-            <div class="title c6 f16 plr15">概览</div>
-            <div class="system-info-con mtb20">
-                <ul class="clearfix text-center" id='index_overview'>
-                    <li class="sys-li-box col-xs-3 col-sm-3 col-md-3 col-lg-3">
+        <mdui-card class="mw-card">
+            <div class="mw-card-header">
+                <div class="mw-card-title">概览</div>
+            </div>
+            <div class="mw-card-content">
+                <ul class="mw-overview-grid text-center" id='index_overview'>
+                    <li class="sys-li-box mw-overview-item" data-overview-key="site">
                         <p class="name f15 c9">网站</p>
-                        <div class="val"><a class="btlink" href="/site/index">{{data['site_count']}}</a></div>
+                        <div class="val"><a class="btlink" href="/site/index" id="overview_site_count">{{data['site_count']}}</a></div>
                     </li>
                 </ul>
             </div>
-        </div>
-        
-        <div class="col-xs-12 col-sm-12 col-md-6 pull-left pd0">
-            <div class="pr8">
-                <div class="bgw">
-                    <div class="title c6 f16 plr15">软件</div>
-                    <div class="setting-con" style="padding:0; height:442px; margin-right: -4px; overflow: hidden;">
+        </mdui-card>
+
+        <div class="mw-grid">
+            <mdui-card class="mw-card mw-grid-item">
+                <div class="mw-card-header">
+                    <div class="mw-card-title">软件</div>
+                </div>
+                <div class="mw-card-content">
+                    <div class="setting-con mw-soft-container">
                         <div class="container-fluid soft-man">
                             <input name="list1SortOrder" type="hidden" value="" />
                             <div id="indexsoft" class="row"></div>
                         </div>
                     </div>
                 </div>
-            </div>
-        </div>
+            </mdui-card>
 
-        <div class="col-xs-12 col-sm-12 col-md-6 pull-left pd0">
-            <div class="pl7">
-                <div class="bgw radius4" style="height:491px">
-                    <div class="title c6 f16 plr15 tabs-nav">
-                        <div class="tab-list">
-                            <span class="tabs-item active">流量</span>
-                            <span class="tabs-item">磁盘IO</span>
-                        </div>
-
-                        <div class="tabs-down">
-                            <select class="bt-input-text" name="network-io" style="font-size: 12px;">
-                                <option value="ALL">全部</option>
-                            </select>
-                            <select class="bt-input-text hide" name="disk-io" style="font-size: 12px;">
-                                <option value="ALL">全部</option>
-                            </select>
-                        </div>
-                    </div>
-
-                    <div class="tabs-content">
-                        <div class="tabs-active radius4 tabs-item">
-                            <div class="bw-info">
-                                <div class="col-sm-6 col-md-3"><p class="c9"><span class="ico-up"></span>上行</p><a id="upSpeed">0</a></div>
-                                <div class="col-sm-6 col-md-3"><p class="c9"><span class="ico-down"></span>下行</p><a id="downSpeed">0</a></div>
-                                <div class="col-sm-6 col-md-3"><p class="c9">总发送</p><a id="upAll">0</a></div>
-                                <div class="col-sm-6 col-md-3"><p class="c9">总接收</p><a id="downAll">0</a></div>
-                            </div>
-                            <div id="netImg" style="width:100%;height:330px;"></div>
-                        </div>
-
-                        <div class="radius4 tabs-item">
-                            <div class="bw-info">
-                                <div class="col-sm-6 col-md-3"><p class="c9"><span class="ico-read"></span>读取</p><a id="readBytes">0</a></div>
-                                <div class="col-sm-6 col-md-3"><p class="c9"><span class="ico-write"></span>写入</p><a id="writeBytes">0</a></div>
-                                <div class="col-sm-6 col-md-3"><p class="c9">每秒读写</p><a id="diskIops">0</a></div>
-                                <div class="col-sm-6 col-md-3"><p class="c9">读写IO延迟</p><a id="diskTime" style="color: rgb(32, 165, 58);">0</a></div>
-                            </div>
-                            <div id="ioStat" style="width:100%;height:330px;"></div>
-                        </div>
-                    </div>
-                    
+            <mdui-card class="mw-card mw-grid-item mw-monitor-summary">
+                <div class="mw-card-header mw-monitor-summary-header">
+                    <div class="mw-card-title">便签</div>
                 </div>
-            </div>
+                <div class="mw-card-content">
+                    <div class="mw-note-preview" id="notePreview"></div>
+                    <div class="mw-note-editor hide" id="noteEditor">
+                        <textarea id="noteInput" class="bt-input-text mw-note-input" rows="10" placeholder="使用 Markdown 记录你的想法..."></textarea>
+                        <div class="mw-note-actions">
+                            <mdui-button id="noteSaveBtn" variant="text">保存</mdui-button>
+                            <mdui-button id="noteCancelBtn" variant="text">取消</mdui-button>
+                        </div>
+                    </div>
+                </div>
+                <div class="mw-card-footer mw-note-footer">
+                    <mdui-button id="noteEditBtn" variant="text">编辑</mdui-button>
+                </div>
+            </mdui-card>
         </div>
     </div>
 </div>
-</div>
 <script type="text/javascript" src="/static/app/site.js?v={{config.version}}"></script>
 <script type="text/javascript" src="/static/app/soft.js?v={{config.version}}"></script>
+<script type="text/javascript" src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
 <script type="text/javascript" src="/static/app/index.js?v={{config.version}}"></script>
 <script type="text/javascript">
 
 index.init();
+initNoteBoard();
 
 pluginInit();
 //加载关键数据总数

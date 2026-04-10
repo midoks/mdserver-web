@@ -241,7 +241,7 @@ function getBeforeDate(n){
 function cpu(b,e){
 	$.get('/system/get_cpu_io?start='+b+'&end='+e,function(rdata){
 		var rdata = rdata.data;
-		var myChartCpu = echarts.init(document.getElementById('cupview'));
+		var theme = getChartTheme();
 		var xData = [];
 		var yData = [];
 		//var zData = [];
@@ -252,16 +252,28 @@ function cpu(b,e){
 			//zData.push(rdata[i].mem);
 		}
 		option = {
+			backgroundColor: 'transparent',
 			tooltip: {
 				trigger: 'axis',
-				axisPointer: { type: 'cross' },
+				backgroundColor: theme.surface,
+				borderColor: theme.border,
+				textStyle: { color: theme.text },
+				extraCssText: 'box-shadow: 0 12px 28px rgba(15, 23, 42, 0.12); border-radius: 12px; padding: 10px;',
+				axisPointer: { type: 'line', lineStyle: { color: theme.border } },
 				formatter: '{b}<br />{a}: {c}%'
+			},
+			grid: {
+				left: '2%',
+				right: '3%',
+				bottom: '12%',
+				containLabel: true
 			},
 			xAxis: {
 				type: 'category',
 				boundaryGap: false,
 				data: xData,
-				axisLine:{ lineStyle:{ color:"#666"} } 
+				axisLine:{ lineStyle:{ color: theme.border } },
+				axisLabel: { color: theme.muted }
 			},
 			yAxis: {
 				type: 'value',
@@ -269,8 +281,10 @@ function cpu(b,e){
 				boundaryGap: [0, '100%'],
 				min:0,
 				max: 100,
-				splitLine:{ lineStyle:{ color:"#ddd" } },
-				axisLine:{ lineStyle:{ color:"#666" } }
+				splitLine:{ lineStyle:{ color: theme.border } },
+				axisLine:{ lineStyle:{ color: theme.border } },
+				axisLabel: { color: theme.muted },
+				nameTextStyle: { color: theme.muted }
 			},
 			dataZoom: [{
 				type: 'inside',
@@ -278,16 +292,17 @@ function cpu(b,e){
 				end: 100,
 				zoomLock:true
 			}, {
+				type: 'slider',
 				start: 0,
 				end: 100,
-				handleIcon: 'M10.7,11.9v-1.3H9.3v1.3c-4.9,0.3-8.8,4.4-8.8,9.4c0,5,3.9,9.1,8.8,9.4v1.3h1.3v-1.3c4.9-0.3,8.8-4.4,8.8-9.4C19.5,16.3,15.6,12.2,10.7,11.9z M13.3,24.4H6.7V23h6.6V24.4z M13.3,19.6H6.7v-1.4h6.6V19.6z',
-				handleSize: '80%',
+				height: 18,
+				backgroundColor: applyColorAlpha(theme.border, 0.2),
+				fillerColor: applyColorAlpha(theme.primary, 0.18),
+				borderColor: 'transparent',
+				textStyle: { color: theme.muted },
 				handleStyle: {
-					color: '#fff',
-					shadowBlur: 3,
-					shadowColor: 'rgba(0, 0, 0, 0.6)',
-					shadowOffsetX: 2,
-					shadowOffsetY: 2
+					color: theme.surface,
+					borderColor: theme.border
 				}
 			}],
 			series: [
@@ -295,17 +310,24 @@ function cpu(b,e){
 					name:'CPU',
 					type:'line',
 					smooth:true,
-					symbol: 'none',
+					showSymbol: false,
 					sampling: 'average',
-					itemStyle: { normal: { color: 'rgb(0, 153, 238)' } },
+					lineStyle: { width: 2, color: theme.primary },
+					itemStyle: { color: theme.primary },
+					areaStyle: {
+						color: new echarts.graphic.LinearGradient(0, 0, 0, 1, [{
+							offset: 0,
+							color: applyColorAlpha(theme.primary, 0.35)
+						}, {
+							offset: 1,
+							color: applyColorAlpha(theme.primary, 0.08)
+						}])
+					},
 					data: yData
 				}
 			]
 		};
-		myChartCpu.setOption(option);
-	   window.addEventListener("resize",function(){
-			myChartCpu.resize();
-		});
+		initEchartWhenReady('cupview', option);
 	},'json');
 }
 
@@ -313,7 +335,7 @@ function cpu(b,e){
 function mem(b,e){
 	$.get('/system/get_cpu_io?start='+b+'&end='+e,function(rdata){
 		var rdata = rdata.data;
-		var myChartMen = echarts.init(document.getElementById('memview'));
+		var theme = getChartTheme();
 		var xData = [];
 		//var yData = [];
 		var zData = [];
@@ -324,16 +346,28 @@ function mem(b,e){
 			zData.push(rdata[i].mem);
 		}
 		option = {
+			backgroundColor: 'transparent',
 			tooltip: {
 				trigger: 'axis',
-				axisPointer: { type: 'cross' },
+				backgroundColor: theme.surface,
+				borderColor: theme.border,
+				textStyle: { color: theme.text },
+				extraCssText: 'box-shadow: 0 12px 28px rgba(15, 23, 42, 0.12); border-radius: 12px; padding: 10px;',
+				axisPointer: { type: 'line', lineStyle: { color: theme.border } },
 				formatter: '{b}<br />{a}: {c}%'
+			},
+			grid: {
+				left: '2%',
+				right: '3%',
+				bottom: '12%',
+				containLabel: true
 			},
 			xAxis: {
 				type: 'category',
 				boundaryGap: false,
 				data: xData,
-				axisLine:{ lineStyle:{ color:"#666" } }
+				axisLine:{ lineStyle:{ color: theme.border } },
+				axisLabel: { color: theme.muted }
 			},
 			yAxis: {
 				type: 'value',
@@ -341,8 +375,10 @@ function mem(b,e){
 				boundaryGap: [0, '100%'],
 				min:0,
 				max: 100,
-				splitLine:{ lineStyle:{ color:"#ddd" } },
-				axisLine:{ lineStyle:{ color:"#666" } }
+				splitLine:{ lineStyle:{ color: theme.border } },
+				axisLine:{ lineStyle:{ color: theme.border } },
+				axisLabel: { color: theme.muted },
+				nameTextStyle: { color: theme.muted }
 			},
 			dataZoom: [{
 				type: 'inside',
@@ -350,16 +386,17 @@ function mem(b,e){
 				end: 100,
 				zoomLock:true
 			}, {
+				type: 'slider',
 				start: 0,
 				end: 100,
-				handleIcon: 'M10.7,11.9v-1.3H9.3v1.3c-4.9,0.3-8.8,4.4-8.8,9.4c0,5,3.9,9.1,8.8,9.4v1.3h1.3v-1.3c4.9-0.3,8.8-4.4,8.8-9.4C19.5,16.3,15.6,12.2,10.7,11.9z M13.3,24.4H6.7V23h6.6V24.4z M13.3,19.6H6.7v-1.4h6.6V19.6z',
-				handleSize: '80%',
+				height: 18,
+				backgroundColor: applyColorAlpha(theme.border, 0.2),
+				fillerColor: applyColorAlpha(theme.secondary, 0.18),
+				borderColor: 'transparent',
+				textStyle: { color: theme.muted },
 				handleStyle: {
-					color: '#fff',
-					shadowBlur: 3,
-					shadowColor: 'rgba(0, 0, 0, 0.6)',
-					shadowOffsetX: 2,
-					shadowOffsetY: 2
+					color: theme.surface,
+					borderColor: theme.border
 				}
 			}],
 			series: [
@@ -367,17 +404,24 @@ function mem(b,e){
 					name:lan.index.process_mem,
 					type:'line',
 					smooth:true,
-					symbol: 'none',
+					showSymbol: false,
 					sampling: 'average',
-					itemStyle: { normal: { color: 'rgb(0, 153, 238)' } },
+					lineStyle: { width: 2, color: theme.secondary },
+					itemStyle: { color: theme.secondary },
+					areaStyle: {
+						color: new echarts.graphic.LinearGradient(0, 0, 0, 1, [{
+							offset: 0,
+							color: applyColorAlpha(theme.secondary, 0.32)
+						}, {
+							offset: 1,
+							color: applyColorAlpha(theme.secondary, 0.08)
+						}])
+					},
 					data: zData
 				}
 			]
 		};
-		myChartMen.setOption(option);
-		window.addEventListener("resize",function(){
-			myChartMen.resize();
-		});
+		initEchartWhenReady('memview', option);
 	},'json');
 }
 
@@ -385,7 +429,7 @@ function mem(b,e){
 function disk(b,e){
 	$.get('/system/get_disk_io?start='+b+'&end='+e,function(rdata){
 		var rdata = rdata.data;
-		var myChartDisk = echarts.init(document.getElementById('diskview'));
+		var theme = getChartTheme();
 		var rData = [];
 		var wData = [];
 		var xData = [];
@@ -400,28 +444,42 @@ function disk(b,e){
 			//zData.push(rdata[i].write_count);
 		}
 		option = {
+			backgroundColor: 'transparent',
 			tooltip: {
 				trigger: 'axis',
-				axisPointer: {
-					type: 'cross'
-				},
-				formatter:"时间：{b0}<br />{a0}: {c0} Kb/s<br />{a1}: {c1} Kb/s", 
+				backgroundColor: theme.surface,
+				borderColor: theme.border,
+				textStyle: { color: theme.text },
+				extraCssText: 'box-shadow: 0 12px 28px rgba(15, 23, 42, 0.12); border-radius: 12px; padding: 10px;',
+				axisPointer: { type: 'line', lineStyle: { color: theme.border } },
+				formatter:"时间：{b0}<br />{a0}: {c0} Kb/s<br />{a1}: {c1} Kb/s"
 			},
 			legend: {
-				data:['读取字节数','写入字节数']
+				data:['读取字节数','写入字节数'],
+				bottom: '2%',
+				textStyle: { color: theme.muted }
+			},
+			grid: {
+				left: '2%',
+				right: '3%',
+				bottom: '12%',
+				containLabel: true
 			},
 			xAxis: {
 				type: 'category',
 				boundaryGap: false,
 				data: xData,
-				axisLine:{ lineStyle:{ color:"#666" }}
+				axisLine:{ lineStyle:{ color: theme.border } },
+				axisLabel: { color: theme.muted }
 			},
 			yAxis: {
 				type: 'value',
 				name: '单位:KB/s',
 				boundaryGap: [0, '100%'],
-				splitLine:{ lineStyle:{ color:"#ddd"} },
-				axisLine:{ lineStyle:{ color:"#666" } }
+				splitLine:{ lineStyle:{ color: theme.border } },
+				axisLine:{ lineStyle:{ color: theme.border } },
+				axisLabel: { color: theme.muted },
+				nameTextStyle: { color: theme.muted }
 			},
 			dataZoom: [{
 				type: 'inside',
@@ -429,16 +487,17 @@ function disk(b,e){
 				end: 100,
 				zoomLock:true
 			}, {
+				type: 'slider',
 				start: 0,
 				end: 100,
-				handleIcon: 'M10.7,11.9v-1.3H9.3v1.3c-4.9,0.3-8.8,4.4-8.8,9.4c0,5,3.9,9.1,8.8,9.4v1.3h1.3v-1.3c4.9-0.3,8.8-4.4,8.8-9.4C19.5,16.3,15.6,12.2,10.7,11.9z M13.3,24.4H6.7V23h6.6V24.4z M13.3,19.6H6.7v-1.4h6.6V19.6z',
-				handleSize: '80%',
+				height: 18,
+				backgroundColor: applyColorAlpha(theme.border, 0.2),
+				fillerColor: applyColorAlpha(theme.primary, 0.18),
+				borderColor: 'transparent',
+				textStyle: { color: theme.muted },
 				handleStyle: {
-					color: '#fff',
-					shadowBlur: 3,
-					shadowColor: 'rgba(0, 0, 0, 0.6)',
-					shadowOffsetX: 2,
-					shadowOffsetY: 2
+					color: theme.surface,
+					borderColor: theme.border
 				}
 			}],
 			series: [
@@ -446,26 +505,43 @@ function disk(b,e){
 					name:'读取字节数',
 					type:'line',
 					smooth:true,
-					symbol: 'none',
+					showSymbol: false,
 					sampling: 'average',
-					itemStyle: { normal: { color: 'rgb(255, 70, 131)' } },
+					lineStyle: { width: 2, color: theme.primary },
+					itemStyle: { color: theme.primary },
+					areaStyle: {
+						color: new echarts.graphic.LinearGradient(0, 0, 0, 1, [{
+							offset: 0,
+							color: applyColorAlpha(theme.primary, 0.28)
+						}, {
+							offset: 1,
+							color: applyColorAlpha(theme.primary, 0.08)
+						}])
+					},
 					data: rData
 				},
 				{
 					name:'写入字节数',
 					type:'line',
 					smooth:true,
-					symbol: 'none',
+					showSymbol: false,
 					sampling: 'average',
-					itemStyle: { normal: { color: 'rgba(46, 165, 186, .7)'} },
+					lineStyle: { width: 2, color: theme.tertiary },
+					itemStyle: { color: theme.tertiary },
+					areaStyle: {
+						color: new echarts.graphic.LinearGradient(0, 0, 0, 1, [{
+							offset: 0,
+							color: applyColorAlpha(theme.tertiary, 0.28)
+						}, {
+							offset: 1,
+							color: applyColorAlpha(theme.tertiary, 0.08)
+						}])
+					},
 					data: wData
 				}
 			]
 		};
-		myChartDisk.setOption(option);
-		window.addEventListener("resize",function(){
-			myChartDisk.resize();
-		});
+		initEchartWhenReady('diskview', option);
 	},'json');
 }
 
@@ -473,7 +549,7 @@ function disk(b,e){
 function network(b,e){
 	$.get('/system/get_network_io?start='+b+'&end='+e,function(rdata){
 		var rdata = rdata.data;
-		var myChartNetwork = echarts.init(document.getElementById('network'));
+		var theme = getChartTheme();
 		var aData = [];
 		var bData = [];
 		var cData = [];
@@ -492,26 +568,42 @@ function network(b,e){
 			zData.push(rdata[i].down);
 		}
 		option = {
+			backgroundColor: 'transparent',
 			tooltip: {
 				trigger: 'axis',
-				axisPointer: { type: 'cross' },
-				formatter:"时间：{b0}<br />{a0}: {c0} Kb/s<br />{a1}: {c1} Kb/s", 
+				backgroundColor: theme.surface,
+				borderColor: theme.border,
+				textStyle: { color: theme.text },
+				extraCssText: 'box-shadow: 0 12px 28px rgba(15, 23, 42, 0.12); border-radius: 12px; padding: 10px;',
+				axisPointer: { type: 'line', lineStyle: { color: theme.border } },
+				formatter:"时间：{b0}<br />{a0}: {c0} Kb/s<br />{a1}: {c1} Kb/s"
 			},
 			legend: {
-				data:[lan.index.net_up,lan.index.net_down]
+				data:[lan.index.net_up,lan.index.net_down],
+				bottom: '2%',
+				textStyle: { color: theme.muted }
+			},
+			grid: {
+				left: '2%',
+				right: '3%',
+				bottom: '12%',
+				containLabel: true
 			},
 			xAxis: {
 				type: 'category',
 				boundaryGap: false,
 				data: xData,
-				axisLine:{ lineStyle:{ color:"#666" } }
+				axisLine:{ lineStyle:{ color: theme.border } },
+				axisLabel: { color: theme.muted }
 			},
 			yAxis: {
 				type: 'value',
 				name: '单位:KB/s',
 				boundaryGap: [0, '100%'],
-				splitLine:{ lineStyle:{ color:"#ddd" } },
-				axisLine:{ lineStyle:{ color:"#666" } }
+				splitLine:{ lineStyle:{ color: theme.border } },
+				axisLine:{ lineStyle:{ color: theme.border } },
+				axisLabel: { color: theme.muted },
+				nameTextStyle: { color: theme.muted }
 			},
 			dataZoom: [{
 				type: 'inside',
@@ -519,16 +611,17 @@ function network(b,e){
 				end: 100,
 				zoomLock:true
 			}, {
+				type: 'slider',
 				start: 0,
 				end: 100,
-				handleIcon: 'M10.7,11.9v-1.3H9.3v1.3c-4.9,0.3-8.8,4.4-8.8,9.4c0,5,3.9,9.1,8.8,9.4v1.3h1.3v-1.3c4.9-0.3,8.8-4.4,8.8-9.4C19.5,16.3,15.6,12.2,10.7,11.9z M13.3,24.4H6.7V23h6.6V24.4z M13.3,19.6H6.7v-1.4h6.6V19.6z',
-				handleSize: '80%',
+				height: 18,
+				backgroundColor: applyColorAlpha(theme.border, 0.2),
+				fillerColor: applyColorAlpha(theme.secondary, 0.18),
+				borderColor: 'transparent',
+				textStyle: { color: theme.muted },
 				handleStyle: {
-					color: '#fff',
-					shadowBlur: 3,
-					shadowColor: 'rgba(0, 0, 0, 0.6)',
-					shadowOffsetX: 2,
-					shadowOffsetY: 2
+					color: theme.surface,
+					borderColor: theme.border
 				}
 			}],
 			series: [
@@ -536,33 +629,49 @@ function network(b,e){
 					name:lan.index.net_up,
 					type:'line',
 					smooth:true,
-					symbol: 'none',
+					showSymbol: false,
 					sampling: 'average',
-					itemStyle: { normal: { color: 'rgb(255, 140, 0)' } },
+					lineStyle: { width: 2, color: theme.primary },
+					itemStyle: { color: theme.primary },
+					areaStyle: {
+						color: new echarts.graphic.LinearGradient(0, 0, 0, 1, [{
+							offset: 0,
+							color: applyColorAlpha(theme.primary, 0.25)
+						}, {
+							offset: 1,
+							color: applyColorAlpha(theme.primary, 0.06)
+						}])
+					},
 					data: yData
 				},
 				{
 					name:lan.index.net_down,
 					type:'line',
 					smooth:true,
-					symbol: 'none',
+					showSymbol: false,
 					sampling: 'average',
-					itemStyle: { normal: { color: 'rgb(30, 144, 255)' } },
+					lineStyle: { width: 2, color: theme.secondary },
+					itemStyle: { color: theme.secondary },
+					areaStyle: {
+						color: new echarts.graphic.LinearGradient(0, 0, 0, 1, [{
+							offset: 0,
+							color: applyColorAlpha(theme.secondary, 0.25)
+						}, {
+							offset: 1,
+							color: applyColorAlpha(theme.secondary, 0.06)
+						}])
+					},
 					data: zData
 				}
 			]
 		};
-		myChartNetwork.setOption(option);
-		window.addEventListener("resize",function(){
-			myChartNetwork.resize();
-		});
+		initEchartWhenReady('network', option);
 	},'json');
 }
 //负载
 function getload_old(b,e){
 	$.get('/system/get_load_average?start='+b+'&end='+e,function(rdata){
 		var rdata = data.data;
-		var myChartgetload = echarts.init(document.getElementById('getloadview'));
 		var aData = [];
 		var bData = [];
 		var xData = [];
@@ -683,17 +792,14 @@ function getload_old(b,e){
 				}
 			]
 		};
-		myChartgetload.setOption(option);
-		window.addEventListener("resize",function(){
-			myChartgetload.resize();
-		});
+		initEchartWhenReady('getloadview', option);
 	},'json');
 }
 //系统负载
 function getload(b,e){
 	$.get('/system/get_load_average?start='+b+'&end='+e,function(rdata){
 		var rdata = rdata.data;
-		var myChartgetload = echarts.init(document.getElementById('getloadview'));
+		var theme = getChartTheme();
 		var aData = [];
 		var bData = [];
 		var xData = [];
@@ -708,26 +814,30 @@ function getload(b,e){
 			bData.push(rdata[i].fifteen);
 		}
 		option = {
+			backgroundColor: 'transparent',
 			animation: false,
 			tooltip: {
 				trigger: 'axis',
-				axisPointer: {
-	                type: 'cross'
-	            }
+				backgroundColor: theme.surface,
+				borderColor: theme.border,
+				textStyle: { color: theme.text },
+				extraCssText: 'box-shadow: 0 12px 28px rgba(15, 23, 42, 0.12); border-radius: 12px; padding: 10px;',
+				axisPointer: { type: 'line', lineStyle: { color: theme.border } }
 			},
 			legend: {
 				data:['1分钟','5分钟','15分钟'],
-				right:'16%',
-				top:'10px'
+				right:'8%',
+				top:'10px',
+				textStyle: { color: theme.muted }
 			},
 			axisPointer: {
 				link: {xAxisIndex: 'all'},
 				lineStyle: {
-					color: '#aaaa',
+					color: theme.border,
 					width: 1
 				}
 			},
-			grid: [{ // 直角坐标系内绘图网格
+			grid: [{
 					top: '60px',
 					left: '5%',
 					right: '55%',
@@ -742,68 +852,51 @@ function getload(b,e){
 				}
 			],
 			xAxis: [
-
-				{ // 直角坐标系grid的x轴
+				{
 					type: 'category',
-					axisLine: {
-						lineStyle: {
-							color: '#666'
-						}
-					},
+					axisLine: { lineStyle: { color: theme.border } },
+					axisLabel: { color: theme.muted },
 					data: xData
 				},
-				{ // 直角坐标系grid的x轴
+				{
 					type: 'category',
 					gridIndex: 1,
-					axisLine: {
-						lineStyle: {
-							color: '#666'
-						}
-					},
+					axisLine: { lineStyle: { color: theme.border } },
+					axisLabel: { color: theme.muted },
 					data: xData
-				},
+				}
 			],
 			yAxis: [{
 					scale: true,
 					name: '资源使用率%',
-					splitLine: { // y轴网格显示
+					splitLine: {
 						show: true,
-						lineStyle:{
-							color:"#ddd"
-						}
+						lineStyle:{ color: theme.border }
 					},
-					nameTextStyle: { // 坐标轴名样式
-						color: '#666',
+					nameTextStyle: {
+						color: theme.muted,
 						fontSize: 12,
 						align: 'left'
 					},
-					axisLine:{
-						lineStyle:{
-							color: '#666',
-						}
-					}
+					axisLine:{ lineStyle:{ color: theme.border } },
+					axisLabel: { color: theme.muted }
 				},
 				{
 					scale: true,
 					name: '负载详情',
 					gridIndex: 1,
-					splitLine: { // y轴网格显示
+					splitLine: {
 						show: true,
-						lineStyle:{
-							color:"#ddd"
-						}
+						lineStyle:{ color: theme.border }
 					},
-					nameTextStyle: { // 坐标轴名样式
-						color: '#666',
+					nameTextStyle: {
+						color: theme.muted,
 						fontSize: 12,
 						align: 'left'
 					},
-					axisLine:{
-						lineStyle:{
-							color: '#666',
-						}
-					}
-				},
+					axisLine:{ lineStyle:{ color: theme.border } },
+					axisLabel: { color: theme.muted }
+				}
 			],
 			dataZoom: [{
 				type: 'inside',
@@ -816,14 +909,14 @@ function getload(b,e){
 	            type: 'slider',
 				start: 0,
 				end: 100,
-				handleIcon: 'M10.7,11.9v-1.3H9.3v1.3c-4.9,0.3-8.8,4.4-8.8,9.4c0,5,3.9,9.1,8.8,9.4v1.3h1.3v-1.3c4.9-0.3,8.8-4.4,8.8-9.4C19.5,16.3,15.6,12.2,10.7,11.9z M13.3,24.4H6.7V23h6.6V24.4z M13.3,19.6H6.7v-1.4h6.6V19.6z',
-				handleSize: '80%',
+				height: 18,
+				backgroundColor: applyColorAlpha(theme.border, 0.2),
+				fillerColor: applyColorAlpha(theme.secondary, 0.18),
+				borderColor: 'transparent',
+				textStyle: { color: theme.muted },
 				handleStyle: {
-					color: '#fff',
-					shadowBlur: 3,
-					shadowColor: 'rgba(0, 0, 0, 0.6)',
-					shadowOffsetX: 2,
-					shadowOffsetY: 2
+					color: theme.surface,
+					borderColor: theme.border
 				},
 				left:'5%',
 				right:'5%'
@@ -832,8 +925,19 @@ function getload(b,e){
 				{
 					name: '资源使用率%',
 					type: 'line',
-					lineStyle: { normal: { width: 2, color: 'rgb(255, 140, 0)'}},
-					itemStyle: {normal: { color: 'rgb(255, 140, 0)' }},
+					smooth: true,
+					showSymbol: false,
+					lineStyle: { width: 2, color: theme.primary },
+					itemStyle: { color: theme.primary },
+					areaStyle: {
+						color: new echarts.graphic.LinearGradient(0, 0, 0, 1, [{
+							offset: 0,
+							color: applyColorAlpha(theme.primary, 0.3)
+						}, {
+							offset: 1,
+							color: applyColorAlpha(theme.primary, 0.08)
+						}])
+					},
 					data: yData
 				},
 				{
@@ -841,8 +945,10 @@ function getload(b,e){
 					yAxisIndex: 1,
 					name: '1分钟',
 					type: 'line',
-					lineStyle: { normal: {width: 2,color: 'rgb(30, 144, 255)' }},
-					itemStyle: { normal: { color: 'rgb(30, 144, 255)'} },
+					smooth: true,
+					showSymbol: false,
+					lineStyle: { width: 2, color: theme.secondary },
+					itemStyle: { color: theme.secondary },
 					data: zData
 				},
 				{
@@ -850,8 +956,10 @@ function getload(b,e){
 					yAxisIndex: 1,
 					name: '5分钟',
 					type: 'line',
-					lineStyle: { normal: { width: 2, color: 'rgb(0, 178, 45)'} },
-					itemStyle: { normal: { color: 'rgb(0, 178, 45)' } },
+					smooth: true,
+					showSymbol: false,
+					lineStyle: { width: 2, color: theme.tertiary },
+					itemStyle: { color: theme.tertiary },
 					data: aData
 				},
 				{
@@ -859,16 +967,112 @@ function getload(b,e){
 					yAxisIndex: 1,
 					name: '15分钟',
 					type: 'line',
-					lineStyle: { normal: { width: 2, color: 'rgb(147, 38, 255)'}},
-					itemStyle: { normal: { color: 'rgb(147, 38, 255)' } },
+					smooth: true,
+					showSymbol: false,
+					lineStyle: { width: 2, color: theme.accent },
+					itemStyle: { color: theme.accent },
 					data: bData
 				}
 			],
-			textStyle: { color: '#666',fontSize: 12}
+			textStyle: { color: theme.muted, fontSize: 12 }
 		}
-		myChartgetload.setOption(option);
-		window.addEventListener("resize",function(){
-			myChartgetload.resize();
-		})
+		initEchartWhenReady('getloadview', option);
 	},'json');
+}
+
+function getChartTheme() {
+	var styles = getComputedStyle(document.documentElement);
+	function resolveCssVar(value) {
+		if (!value) {
+			return value;
+		}
+		var trimmed = value.trim();
+		if (trimmed.indexOf('var(') !== 0) {
+			return trimmed;
+		}
+		var match = trimmed.match(/var\((--[^,\s)]+)\s*(?:,\s*(.+))?\)/);
+		if (!match) {
+			return trimmed;
+		}
+		var resolved = styles.getPropertyValue(match[1]).trim();
+		if (resolved) {
+			return resolveCssVar(resolved);
+		}
+		if (match[2]) {
+			return resolveCssVar(match[2].trim());
+		}
+		return trimmed;
+	}
+	return {
+		primary: resolveCssVar(styles.getPropertyValue('--mw-primary')) || '#6750a4',
+		secondary: resolveCssVar(styles.getPropertyValue('--mdui-color-secondary')) || '#4f8ef7',
+		tertiary: resolveCssVar(styles.getPropertyValue('--mdui-color-tertiary')) || '#22c55e',
+		accent: resolveCssVar(styles.getPropertyValue('--mdui-color-primary-container')) || '#a855f7',
+		border: resolveCssVar(styles.getPropertyValue('--mw-border')) || '#e2e8f0',
+		muted: resolveCssVar(styles.getPropertyValue('--mw-muted')) || '#64748b',
+		surface: resolveCssVar(styles.getPropertyValue('--mw-surface')) || '#ffffff',
+		text: resolveCssVar(styles.getPropertyValue('--mw-text')) || '#1f1f1f'
+	};
+}
+
+function applyColorAlpha(color, alpha) {
+	if (!color) {
+		return 'rgba(0, 0, 0, ' + alpha + ')';
+	}
+	if (color.indexOf('rgb') === 0) {
+		var numbers = color.replace(/[^\d,]/g, '').split(',');
+		if (numbers.length >= 3) {
+			return 'rgba(' + numbers[0] + ', ' + numbers[1] + ', ' + numbers[2] + ', ' + alpha + ')';
+		}
+	}
+	if (color.indexOf('#') === 0) {
+		var hex = color.replace('#', '');
+		if (hex.length === 3) {
+			hex = hex.split('').map(function (item) { return item + item; }).join('');
+		}
+		if (hex.length === 6) {
+			var r = parseInt(hex.slice(0, 2), 16);
+			var g = parseInt(hex.slice(2, 4), 16);
+			var b = parseInt(hex.slice(4, 6), 16);
+			return 'rgba(' + r + ', ' + g + ', ' + b + ', ' + alpha + ')';
+		}
+	}
+	return color;
+}
+
+var chartResizeRegistry = {};
+
+function initEchartWhenReady(elementId, option, onReady) {
+	if (typeof echarts === 'undefined') {
+		return;
+	}
+	var element = document.getElementById(elementId);
+	if (!element) {
+		return;
+	}
+	var attempt = 0;
+	var maxAttempts = 30;
+	var raf = window.requestAnimationFrame || function(callback) {
+		return setTimeout(callback, 16);
+	};
+	function tryInit() {
+		if (element.clientWidth === 0 || element.clientHeight === 0) {
+			if (attempt++ < maxAttempts) {
+				raf(tryInit);
+			}
+			return;
+		}
+		var chart = echarts.getInstanceByDom(element) || echarts.init(element);
+		chart.setOption(option);
+		if (!chartResizeRegistry[elementId]) {
+			chartResizeRegistry[elementId] = true;
+			window.addEventListener("resize", function() {
+				chart.resize();
+			});
+		}
+		if (onReady) {
+			onReady(chart);
+		}
+	}
+	tryInit();
 }

@@ -1,31 +1,16 @@
 {% extends "layout.html" %}
 
 {% block content %}
-
-<style>
-.weblog{
-	font-size: 12px;
-    display:inline-block;
-	line-height:30px;
-}
-.weblog em{
-	font-style:normal;
-	color:#666;
-	margin: 0 30px;
-}
-
-.weblog span{
-	margin-right:5px;
-}
-
-.weblog a{
-	color:#20a53a;
-}
-.firewall-port-box{
-	margin-bottom:5px;
-}
-</style>
-<div class="main-content">
+<div class="main-content mw-dashboard mw-firewall-page">
+	<mdui-card class="mw-card mw-page-header">
+		<div class="mw-page-left">
+			<div class="mw-page-title">系统安全</div>
+			<div class="mw-page-sub">SSH、禁 ping、防火墙与端口放行集中管理，适合快速收紧或排查访问问题。</div>
+		</div>
+		<div class="mw-page-actions">
+			<span class="mw-version">安全入口 / 防火墙 / SSH / 日志搜索</span>
+		</div>
+	</mdui-card>
 	<div class="container-fluid" style="padding-bottom: 50px;">
 		<div class="pos-box bgw mtb15">
 			<div class="position f14 c9 pull-left">
@@ -40,15 +25,15 @@
 			</div>
 		</div>
 		<div class="safe container-fluid bgw mtb15 pd15">
-			<div class="mr20 pull-left" style="border-right: 1px solid #ccc;padding-right: 20px;">
+			<div class="mr20 pull-left">
 
 				<form>
 					<div class="ss-text pull-left">
-						<a class="btlink" style="line-height: 32px;" onclick="sshMgr();">SSH管理</a>
+						<a class="btlink" onclick="sshMgr();">SSH管理</a>
 					</div>
 				</form>
 			</div>
-			<div class="mr20 pull-left" style="border-right: 1px solid #ccc;padding-right: 20px;">
+			<div class="mr20 pull-left">
 
 				<div class="ss-text pull-left mr5">
 					<em>SSH端口:</em>
@@ -58,7 +43,7 @@
 					<button id="mstscSubmit" onclick='mstsc($("#mstscPort").prop("value"))' class="btn btn-default btn-sm" type="button">更改</button>
 				</div>
 			</div>
-			<div class="mr20 pull-left" style="border-right: 1px solid #ccc; padding-right: 20px;">
+			<div class="mr20 pull-left">
 				<div class="ss-text pull-left">
 					<em>启用禁ping</em>
 					<div class='ssh-item' id="is_ping">
@@ -67,7 +52,7 @@
 				</div>
 			</div>
 
-			<div class="mr20 pull-left" style="border-right: 1px solid #ccc; padding-right: 20px;">
+			<div class="mr20 pull-left">
 				<div class="ss-text pull-left">
 					<em>启用防火墙</em>
 					<div class='ssh-item' id="firewall_status">
@@ -84,7 +69,7 @@
             <div class="black-ip">
                 <div class="def-log">
                     <div class="title c6 plr15">
-                        <h3 class="f16">防火墙</h3>             
+                        <h3 class="f16">防火墙</h3>
                     </div>
 
                     <div class="divtable pd15">

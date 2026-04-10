@@ -73,8 +73,13 @@ class monitor:
         return True
 
     def getMonitorDay(self):
-        monitor_day = mw.M('option').field('name').where('name=?',('monitor_day',)).getField('value')
-        return int(monitor_day)
+        monitor_day = mw.M('option').field('name').where('name=?', ('monitor_day',)).getField('value')
+        if monitor_day is None:
+            return 30
+        try:
+            return int(monitor_day)
+        except (TypeError, ValueError):
+            return 30
 
     def isOnlyNetIoStats(self):
         monitor_only_netio = mw.M('option').field('name').where('name=?',('monitor_only_netio',)).getField('value')
@@ -187,7 +192,6 @@ class monitor:
         load_objm.add('pro,one,five,fifteen,addtime', (lpro, load_data['one'], load_data['five'], load_data['fifteen'], addtime))
         load_objm.where("addtime<?", (deltime,)).delete()
         return True
-
 
 
 

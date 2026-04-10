@@ -2,7 +2,16 @@
 
 {% block content %}
 
-<div class="main-content">
+<div class="main-content mw-dashboard mw-cron-page">
+	<mdui-card class="mw-card mw-page-header">
+		<div class="mw-page-left">
+			<div class="mw-page-title">计划任务</div>
+			<div class="mw-page-sub">按天、按小时或按星期安排脚本、备份和维护任务，把自动化集中到一个清晰的工作台。</div>
+		</div>
+		<div class="mw-page-actions">
+			<span class="mw-version">Shell / 备份 / 日志切割 / URL</span>
+		</div>
+	</mdui-card>
 	<div class="container-fluid" style="padding-bottom:54px">
 		<div class="pos-box bgw mtb15">
 			<div class="position f14 c9 pull-left">
@@ -60,11 +69,11 @@
 					</div>
 					<div id="ptime" class="pull-left">
 						<div class="dropdown planweek pull-left mr20">
-							<button class="btn btn-default dropdown-toggle" type="button" id="excode" data-toggle="dropdown">
+							<button class="btn btn-default dropdown-toggle" type="button" id="excode_week" data-toggle="dropdown">
 								<b val="1">周一</b>
 								<span class="caret"></span>
 							</button>
-							<ul class="dropdown-menu" role="menu" aria-labelledby="week">
+							<ul class="dropdown-menu" role="menu" aria-labelledby="excode_week">
 								<li><a role="menuitem" tabindex="-1" href="javascript:;" value="1">周一</a></li>
 								<li><a role="menuitem" tabindex="-1" href="javascript:;" value="2">周二</a></li>
 								<li><a role="menuitem" tabindex="-1" href="javascript:;" value="3">周三</a></li>

@@ -105,7 +105,21 @@ class plugin(object):
 
 
     def getIndexList(self):
-        indexList = thisdb.getOptionByJson('display_index')
+        indexList = thisdb.getOptionByJson('display_index', default=[])
+        if not indexList:
+            installed_plugins, _ = self.getAllPluginList(type='-1', keyword=None, page=1, size=12)
+            for plugin in installed_plugins:
+                version = plugin.get('setup_version')
+                if not version:
+                    if isinstance(plugin.get('versions'), list):
+                        if plugin['versions']:
+                            version = plugin['versions'][0]
+                    else:
+                        version = plugin.get('versions')
+                if version:
+                    indexList.append('{0}-{1}'.format(plugin['name'], version))
+            if indexList:
+                thisdb.setOption('display_index', json.dumps(indexList))
         plist = []
         for i in indexList:
             tmp = i.split('-')

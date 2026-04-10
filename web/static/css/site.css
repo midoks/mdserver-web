@@ -1129,8 +1129,12 @@ html .menu .menu_exit:hover {
 .site_type {
     height: 30px;
     line-height: 30px;
-    bottom: -9px;
-    position: absolute;
+    position: static;
+    margin-top: 12px;
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 8px;
 }
 
 .site_type span{
@@ -1141,7 +1145,7 @@ html .menu .menu_exit:hover {
     font-family: "Arial";
     font-size: 13px;
     color: #666;
-    float: left;
+    float: none;
     border: 1px solid #ececec;
     border-right: none;
     /* border: 1px solid #ececec; */
@@ -1179,7 +1183,7 @@ html .menu .menu_exit:hover {
     font-family: "Arial";
     font-size: 13px;
     color: #666;
-    float: left;
+    float: none;
     border: 1px solid #ececec;
     border-right: none;
 }
@@ -1238,6 +1242,10 @@ html .menu .menu_exit:hover {
     margin-top:8px;
 }
 .sys-li-box .val a{
+    font-size:26px;
+    font-family:arial;
+}
+.sys-li-box .val span{
     font-size:26px;
     font-family:arial;
 }
@@ -1302,6 +1310,125 @@ html .menu .menu_exit:hover {
 .circle-box h3,
 .circle-box h4 {
     line-height: 30px
+}
+
+.mw-stat-item {
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+    gap: 6px;
+    text-align: left;
+    justify-content: flex-start;
+}
+
+.mw-stat-progress {
+    width: 100%;
+    display: block;
+}
+
+.mw-stat-progress mdui-linear-progress {
+    width: 100%;
+    height: 10px;
+    border-radius: 999px;
+    background: var(--mw-surface-container);
+    --mdui-linear-progress-height: 10px;
+    display: block;
+    opacity: 1;
+}
+
+.mw-stat-value {
+    font-size: 20px;
+    font-weight: 600;
+    text-align: left;
+}
+
+.mw-stat-status {
+    line-height: 22px;
+    text-align: left;
+}
+
+.mw-stat-item .mask {
+    position: static;
+    width: auto;
+    height: auto;
+    border-radius: 0;
+    background: transparent;
+    line-height: normal;
+    font-size: 20px;
+    color: inherit;
+}
+
+.mw-disk-progress {
+    margin: 0;
+}
+
+.diskbox .mask {
+    position: static;
+    width: auto;
+    height: auto;
+    border-radius: 0;
+    background: transparent;
+    line-height: normal;
+    font-size: 20px;
+}
+
+.mw-mem-release-btn {
+    margin-top: 6px;
+}
+
+.mw-note-board {
+    display: flex;
+    flex-direction: column;
+}
+
+.mw-note-preview {
+    min-height: 240px;
+    padding: 12px;
+    border: 1px dashed var(--mw-border);
+    border-radius: 8px;
+    background: var(--mw-surface-container);
+    color: var(--mw-text);
+    line-height: 1.6;
+    white-space: normal;
+}
+
+.mw-note-preview ul,
+.mw-note-preview ol {
+    padding-left: 20px;
+}
+
+.mw-note-preview h1,
+.mw-note-preview h2,
+.mw-note-preview h3,
+.mw-note-preview h4 {
+    margin-top: 12px;
+    margin-bottom: 8px;
+    font-weight: 600;
+}
+
+.mw-note-editor {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.mw-note-input {
+    resize: vertical;
+    min-height: 240px;
+    font-family: inherit;
+    line-height: 1.6;
+}
+
+.mw-note-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 8px;
+}
+
+.mw-note-footer {
+    display: flex;
+    justify-content: flex-end;
+    padding-top: 0;
 }
 
 .circle {

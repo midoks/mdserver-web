@@ -9,9 +9,28 @@
 # ---------------------------------------------------------------------------------
 
 import os
+import re
 
 import core.mw as mw
 import thisdb
+
+
+def _sanitize_server_ip(value):
+    if not value:
+        return ''
+    value = str(value).strip()
+    lower_value = value.lower()
+    if '<html' in lower_value or '<body' in lower_value or '502 bad gateway' in lower_value:
+        return ''
+
+    if re.match(r'^\d{1,3}(?:\.\d{1,3}){3}$', value):
+        return value
+    if re.match(r'^[0-9a-fA-F:]+$', value):
+        return value
+    if re.match(r'^[a-zA-Z0-9_.-]+$', value):
+        return value
+    return ''
+
 
 def getUnauthStatus(
     code= '0'
@@ -43,8 +62,16 @@ def getGlobalVar():
     获取全局变量
     '''
     data = {}
-    data['title'] = thisdb.getOption('title', default='后羿面板')
-    data['ip'] = thisdb.getOption('server_ip', default='127.0.0.1')
+    data['title'] = thisdb.getOption('title', default='PowerLinux Pro Max')
+    server_ip = thisdb.getOption('server_ip', default='127.0.0.1')
+    server_ip = _sanitize_server_ip(server_ip)
+    if server_ip == '':
+        local_ip = _sanitize_server_ip(mw.getLocalIp())
+        if local_ip == '':
+            local_ip = '127.0.0.1'
+        server_ip = local_ip
+        thisdb.setOption('server_ip', server_ip)
+    data['ip'] = server_ip
 
     data['site_path'] = thisdb.getOption('site_path', default=mw.getFatherDir()+'/wwwroot')
     data['backup_path'] = thisdb.getOption('backup_path', default=mw.getFatherDir()+'/backup')
@@ -86,5 +113,6 @@ def getGlobalVar():
     data['panel_api'] = thisdb.getOptionByJson('panel_api', default={'open':False})
     data['panel_ssl'] = thisdb.getOptionByJson('panel_ssl', default={'open':False})
     data['panel_domain'] = thisdb.getOption('panel_domain', default='')
+    data['footer_text'] = thisdb.getOption('footer_text', default='PowerPanel 2026')
     
     return data

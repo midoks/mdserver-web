@@ -108,7 +108,7 @@ var lan = {
 	},
 	
 	"config":{
-		"close_panel_msg":"关闭面板会导致您无法访问面板 ,您真的要关闭Linux面板吗？",
+		"close_panel_msg":"关闭面板会导致您无法访问面板 ,您真的要关闭PowerLinux吗？",
 		"close_panel_title":"关闭面板",
 		"config_save":"正在保存配置...",
 		"config_sync":"正在同步时间...",

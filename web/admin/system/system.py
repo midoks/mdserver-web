@@ -112,6 +112,15 @@ def restart_server():
     sys.restartServer()
     return mw.returnData(True, '正在重启服务器!')
 
+# 关机服务器
+@blueprint.route('/shutdown_server', endpoint='shutdown_server', methods=['POST'])
+@panel_login_required
+def shutdown_server():
+    if mw.isAppleSystem():
+        return mw.returnData(False, "开发环境不可关机!")
+    sys.shutdownServer()
+    return mw.returnData(True, '正在关闭服务器!')
+
 # 设置
 @blueprint.route('/set_control', endpoint='set_control', methods=['POST'])
 @panel_login_required
@@ -165,7 +174,6 @@ def set_control():
         return data
 
     return mw.returnData(False, "异常!")
-
 
 
 

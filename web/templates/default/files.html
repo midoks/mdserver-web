@@ -1,58 +1,77 @@
 {% extends "layout.html" %}
 
 {% block content %}
-<div class="main-content">
-    <div class="container-fluid" style="padding-bottom:50px">
-        <div class="file-box bgw mtb15" style="position:relative; padding-top:110px">
-            <div id="tipTools" class="plr15">
-                <div class="ptb15">
-                    <div class="clearfix">
-                        <div class="pull-left">
-                            <button id="backBtn" class="backBtn btn btn-default btn-sm glyphicon glyphicon-arrow-left pull-left" title="" onClick="backDir()"></button>
-                            <button class="backBtn refreshBtn btn btn-default btn-sm glyphicon glyphicon-refresh pull-right" title="" style="margin-left:-1px;"></button>
-                            <span id='DirPathPlace' class="pull-left"><input id="fileInputPath" type="text"></span>
-                            <span id='PathPlaceBtn' class="pull-left"></span>
+<div class="main-content mw-dashboard">
+    <mdui-card class="mw-card mw-page-header">
+        <div class="mw-page-left">
+            <div class="mw-page-title">文件管理</div>
+            <div class="mw-page-sub" id="dir_info"></div>
+        </div>
+        <div class="mw-page-actions">
+            <mdui-button variant="text" href="/" class="mw-link-button">返回首页</mdui-button>
+        </div>
+    </mdui-card>
+
+    <mdui-card class="mw-card mw-file-card file-box">
+        <div class="mw-card-content">
+            <div id="tipTools" class="mw-file-toolbar">
+                <div class="mw-file-toolbar-row mw-file-toolbar-primary">
+                    <div class="mw-file-path">
+                        <button id="backBtn" class="backBtn mw-file-icon-btn mw-icon-button" title="返回上一级" onClick="backDir()">
+                            <span class="material-icons">arrow_back</span>
+                        </button>
+                        <button class="backBtn refreshBtn mw-file-icon-btn mw-icon-button" title="刷新目录">
+                            <span class="material-icons">refresh</span>
+                        </button>
+                        <div class="mw-file-path-field">
+                            <span class="mw-file-path-label">根目录</span>
+                            <span id='DirPathPlace' class="mw-file-path-input"><input id="fileInputPath" type="text" aria-label="路径"></span>
                         </div>
-                        <div class="pull-left mlr15" style="line-height:26px"><span id='dir_info'></span></div>
-                        <div class="search pull-right" style="position: absolute; top: 6px; right: 5px;">
-                            <form target="hid">
-                                <input type="text" id="search_file" class="ser-text pull-left" placeholder="搜索文件/目录" autocomplete="false" />
-                                <button type="button" class="ser-sub pull-left" onclick='searchFile(1)'></button>
-                                <div class="file_search" draggable="false">
-                                    <label for="search_file">包含子目录</label>
-                                    <div id="search_all" class="file_search_checked"></div>
-                                </div>
-                            </form>
-                            <iframe name='hid' id="hid" style="display:none"></iframe>
-                        </div>
+                        <span id='PathPlaceBtn' class="mw-file-path-actions"></span>
+                    </div>
+                    <div class="mw-file-search">
+                        <form target="hid" class="mw-file-search-form">
+                            <div class="mw-file-search-field">
+                                <input type="text" id="search_file" class="ser-text mw-file-search-input" placeholder="搜索文件/目录" autocomplete="false" />
+                                <button type="button" class="ser-sub mw-file-search-btn mw-icon-button" onclick='searchFile(1)' aria-label="搜索">
+                                    <span class="material-icons">search</span>
+                                </button>
+                            </div>
+                            <div class="file_search" draggable="false">
+                                <label for="search_file">包含子目录</label>
+                                <div id="search_all" class="file_search_checked"></div>
+                            </div>
+                        </form>
+                        <iframe name='hid' id="hid" style="display:none"></iframe>
                     </div>
                 </div>
-                <div class="clearfix ptb10">
-                    <button class="btn btn-default btn-sm pull-left" onclick="uploadFiles()">上传</button>
-                    <button class="btn btn-default btn-sm pull-left" onclick="downloadFile()" title="远程下载" style="margin:0 5px">远程下载</button>
-                    <span id='BarTools'></span>
-                    <span id='Batch' style="background-color:#fff;position:absolute;right:190px;z-index:10"></span>
-                    <span id='comlist' class="comlist"></span>
-                    <div class="btn-group btn-group-sm pull-right" style="margin-right:5px;">
-                        <button id="set_icon" type="button" class="btn btn-default">
-                            <i class="glyphicon glyphicon-th"></i>
+                <div class="mw-file-toolbar-row mw-file-toolbar-secondary">
+                    <div class="mw-file-actions">
+                        <mdui-button variant="outlined" class="mw-file-btn" onclick="uploadFiles()">上传</mdui-button>
+                        <mdui-button variant="outlined" class="mw-file-btn" onclick="downloadFile()" title="远程下载">远程下载</mdui-button>
+                        <span id='BarTools' class="mw-file-tool-items"></span>
+                        <span id='Batch' class="mw-file-batch"></span>
+                        <span id='comlist' class="comlist mw-file-breadcrumbs"></span>
+                    </div>
+                    <div class="mw-file-view-toggle">
+                        <button id="set_icon" type="button" class="mw-file-icon-btn mw-icon-button" aria-label="图标视图">
+                            <span class="material-icons">grid_view</span>
                         </button>
-                        <button id="set_list" type="button" class="btn btn-default active">
-                            <i class="glyphicon glyphicon-th-list"></i>
+                        <button id="set_list" type="button" class="mw-file-icon-btn mw-icon-button active" aria-label="列表视图">
+                            <span class="material-icons">list</span>
                         </button>
                     </div>
                 </div>
             </div>
             <!-- 文件展示 -->
-            <div class="divtable pd15" id="fileCon"></div>
-            <div class="dataTables_paginate paging_bootstrap pagination plr15" style="position: relative; top: -6px;">
+            <div class="divtable mw-file-table" id="fileCon"></div>
+            <div class="dataTables_paginate paging_bootstrap pagination mw-file-pagination">
                 <ul id="filePage" class="page"></ul>
             </div>
         </div>
-    </div>
+    </mdui-card>
 </div>
-</div>
-<ul id="rmenu" class="dropdown-menu" style="display:none">
+<ul id="rmenu" class="dropdown-menu mw-file-context-menu" style="display:none">
     <li onclick="javascript:batch(1);"><a style="cursor: pointer;">复制</a></li>
     <li onclick="javascript:batch(2);"><a style="cursor: pointer;">剪切</a></li>
     <li onclick="javascript:batch(3);"><a style="cursor: pointer;">权限</a></li>

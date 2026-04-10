@@ -1,31 +1,46 @@
-<p align="center">
-  <img alt="logo" src="https://cdn.jsdelivr.net/gh/midoks/mdserver-web@latest/route/static/logo.png" height="140" />
-  <h3 align="center">mdserver-web</h3>
-  <p align="center">一款简单Linux面板服务</p>
-  <p align="center">强烈推荐系统:debian</p>
-</p>
+<center><img width="100" height="100" alt="image" src="https://github.com/AndyXeCM/PowerLinux/blob/master/web/static/logo.png" />
 
-### 简介
+# PowerLinux v2.0
 
-简单的Linux面板,感谢BT.CN写出如此好的web管理软件。我一看到，就知道这是我一直想要的页面化管理方式。
-复制了后台管理界面，按照自己想要的方式写了一版。
+#### 轻量易用的下一代Linux控制面板
+<p></p>
+<img width="2788" height="3022" alt="image" src="https://github.com/user-attachments/assets/495759ae-3987-408f-ab23-f33a75defca5" />
 
-![EulerOS](https://img.shields.io/badge/LINUX-EulerOS-blue?style=for-the-badge&logo=EulerOS)
-![Debian](https://img.shields.io/badge/LINUX-Debian-blue?style=for-the-badge&logo=Debian)
-![Ubuntu](https://img.shields.io/badge/LINUX-Ubuntu-blue?style=for-the-badge&logo=Ubuntu)
-![Fedora](https://img.shields.io/badge/LINUX-Fedora-blue?style=for-the-badge&logo=Fedora)
-![CentOS](https://img.shields.io/badge/LINUX-CentOS-blue?style=for-the-badge&logo=CentOS)
+<p></p>
+欢迎各位积极完善，提交pull request!
+<p></p>
+基于[MWPanel](https://github.com/midoks/mdserver-web/) 构建，没有原作者的构建就没有这个面板，非常感谢！！！
 
 
-[![Wiki](https://img.shields.io/badge/MW-Wiki-red?style=for-the-badge&logo=wiki)](https://github.com/midoks/mdserver-web/wiki)
-[![jsdelivr](https://data.jsdelivr.com/v1/package/gh/midoks/mdserver-web/badge)](https://www.jsdelivr.com/package/gh/midoks/mdserver-web)
+***
 
-* SSH终端工具
-* 面板收藏功能
-* 网站备份功能
-* 插件方式管理
+主要设计语言：MDUI2，简洁美观，功能够用。
+<p></p>
 
-基本上可以使用,后续会继续优化!欢迎提供意见！
+功能请参照宝塔面板v9，宝塔面板有的功能这个面板基本上都有，只不过软件商店里面的软件少了一些，欢迎各位为这个面板的生态作出贡献～～～
+
+***
+
+- **一键安装**
+
+```
+bash <(curl --insecure -fsSL https://cdn.jsdelivr.net/gh/AndyXeCM/PowerLinux@master/scripts/install.sh)
+
+```
+***
+- **更新**
+
+```
+bash <(curl --insecure -fsSL https://cdn.jsdelivr.net/gh/AndyXeCM/PowerLinux@master/scripts/update.sh)
+```
+
+- **卸载**
+
+```
+wget --no-check-certificate -O uninstall.sh https://cdn.jsdelivr.net/gh/AndyXeCM/PowerLinux@master/scripts/uninstall.sh && bash uninstall.sh
+```
+
+以下是原作者readme中的补充信息：
 
 - 吹水组 - https://t.me/mdserver_web
 - 交流论坛 - https://bbs.midoks.icu
@@ -37,10 +52,6 @@ Talk is cheap, show me the code.  -- linus
 
 - [兼容性测试报告](/compatibility.md)
 - [常用命令说明](/cmd.md) [ mw default ] [ mw dev ]
-
-### 特别赞助
-
-- [虚位以待](https://bbs.midoks.icu)
 
 ### 主要插件介绍
 
@@ -92,144 +103,9 @@ PHP[72-84]支持phpMyAdmin[5.2.1]
 - https://www.youtube.com/watch?v=2taa5K-Jmmw
 
 
-# AD - VPS推荐 - 🙏
-
-| 服务商			| 	LOGO   |  推广地址  | 优惠码 |
-| ------------- |----------|-----------|-------|
-| digitalvirt	|[![digitalvirt](https://digitalvirt.com/templates/BlueWhite/img/logo-dark.svg)](https://digitalvirt.com/aff.php?aff=154) | https://digitalvirt.com/aff.php?aff=154 | mdserver-web |
-
-# Docker
-
-- 由[DDS-Derek](https://github.com/DDS-Derek)开发维护。
-- https://github.com/DDS-Derek/mdserver-web-Docker
-
-```
-docker run -itd --name mw-server --privileged=true -p 7200:7200 -p 80:80 -p 443:443 -p 888:888 ddsderek/mw-server:latest
-```
-
-
-### 版本更新 0.18.4
-
-- 国内安装优化。
-
-### JSDelivr安装地址
-
-- 初始安装
-
-```
-bash <(curl --insecure -fsSL https://cdn.jsdelivr.net/gh/midoks/mdserver-web@latest/scripts/install.sh)
-```
-
-- 直接更新
-
-```
-bash <(curl --insecure -fsSL https://cdn.jsdelivr.net/gh/midoks/mdserver-web@latest/scripts/update.sh)
-```
-
-- 卸载脚本
-
-```
-wget --no-check-certificate -O uninstall.sh https://cdn.jsdelivr.net/gh/midoks/mdserver-web@latest/scripts/uninstall.sh && bash uninstall.sh
-```
-
-### 备用地址
-
-- 初始安装
-
-```
-
-bash <(curl --insecure -fsSL https://raw.githubusercontent.com/midoks/mdserver-web/dev/scripts/install.sh)
-bash <(curl --insecure -fsSL https://code.midoks.icu/midoks/mdserver-web/raw/branch/master/scripts/install.sh)
-```
-
-- 直接更新
-
-```
-bash <(curl --insecure -fsSL https://raw.githubusercontent.com/midoks/mdserver-web/master/scripts/update.sh)
-```
-
-- 卸载脚本
-
-```
-wget --no-check-certificate -O uninstall.sh https://raw.githubusercontent.com/midoks/mdserver-web/master/scripts/uninstall.sh && bash uninstall.sh
-```
-
-
-### 通用软件安装[命令行安装]
-
-- 需已经安装mdserver-web
-
-```
-bash <(curl --insecure -fsSL https://raw.githubusercontent.com/midoks/mdserver-web/dev/scripts/quick/app.sh)
-```
-
-
-### DEV使用
-
-```
-bash <(curl --insecure -fsSL https://raw.githubusercontent.com/midoks/mdserver-web/dev/scripts/install.sh)
-bash <(curl --insecure -fsSL https://raw.githubusercontent.com/midoks/mdserver-web/dev/scripts/update.sh)
-
-bash <(curl --insecure -fsSL https://raw.githubusercontent.com/midoks/mdserver-web/dev/scripts/install_dev.sh)
-bash <(curl --insecure -fsSL https://raw.githubusercontent.com/midoks/mdserver-web/dev/scripts/update_dev.sh)
-
-wget --no-check-certificate -O install.sh https://raw.githubusercontent.com/midoks/mdserver-web/dev/scripts/install.sh && bash install.sh
-
-wget --no-check-certificate -O uninstall.sh https://raw.githubusercontent.com/midoks/mdserver-web/dev/scripts/uninstall.sh && bash uninstall.sh
-
-bash <(curl --insecure -fsSL https://raw.githubusercontent.com/midoks/mdserver-web/dev/scripts/quick/debug.sh)
-
-bash <(curl --insecure -fsSL https://code.midoks.icu/midoks/mdserver-web/raw/branch/dev/scripts/install.sh)
-bash <(curl --insecure -fsSL https://code.midoks.icu/midoks/mdserver-web/raw/branch/dev/scripts/update.sh)
-
-bash <(curl --insecure -fsSL https://code.midoks.icu/midoks/mdserver-web/raw/branch/dev/scripts/install_dev.sh)
-bash <(curl --insecure -fsSL https://code.midoks.icu/midoks/mdserver-web/raw/branch/dev/scripts/update_dev.sh)
-```
-
-### 旧版安装/更新
-```
-curl --insecure -fsSL  https://raw.githubusercontent.com/midoks/mdserver-web/dev/scripts/old/install.sh | bash
-curl --insecure -fsSL  https://raw.githubusercontent.com/midoks/mdserver-web/dev/scripts/old/update.sh | bash
-```
-
-### 偶然问题
-- 在安装/更新时，突然出现python插件pip,psutil,可尝试如下解决方案
-```
-cd /www/server/mdserver-web rm -rf lib
-cd /www/server/mdserver-web && rm -rf lib64
-cd /www/server/mdserver-web && rm -rf bin
-cd /www/server/mdserver-web && rm -rf include
-
-mw update/mw update_dev/mw dev
-```
-
-### 捐赠地址 USDT（TRC20）
-
-TVbNgrpeGBGZVm5gTLa21ADP7RpnPFhjya
-
-日行一善，以后必定大富大贵
-
-
-### 支付宝赞助
-
-[![截图](https://cdn.jsdelivr.net/gh/midoks/mdserver-web@latest/route/static/img/alipay_zz.png)](https://cdn.jsdelivr.net/gh/midoks/mdserver-web@latest/route/static/img/alipay_zz.png)
-
-
-### 无图不真相
-
-[![截图](https://cdn.jsdelivr.net/gh/midoks/mdserver-web@latest/route/static/mdw.jpg)](https://cdn.jsdelivr.net/gh/midoks/mdserver-web@latest/route/static/mdw.jpg)
-
-
-### Stargazers over time
-
-[![Stargazers over time](https://starchart.cc/midoks/mdserver-web.svg)](https://starchart.cc/midoks/mdserver-web)
-
-
-### 感谢开发赞助
-
-[![digitalvirt](https://digitalvirt.com/templates/BlueWhite/img/logo-dark.svg)](https://digitalvirt.com/aff.php?aff=154)
 
 ### 授权许可
 
 本项目采用 Apache 开源授权许可证，完整的授权说明已放置在 [LICENSE](https://github.com/midoks/mdserver-web/blob/master/LICENSE) 文件中。
+
 
