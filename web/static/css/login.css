@@ -45,7 +45,7 @@ input {
 
 .mw-login-brand .material-icons {
     font-size: 36px;
-    color: var(--mw-primary, #6750a4);
+    color: var(--mw-primary, #0f766e);
 }
 
 .mw-login-brand h1 {
@@ -85,8 +85,8 @@ input {
 }
 
 .mw-input:focus {
-    border-color: var(--mw-primary, #6750a4);
-    box-shadow: 0 0 0 4px color-mix(in srgb, var(--mw-primary, #6750a4) 18%, transparent);
+    border-color: var(--mw-primary, #0f766e);
+    box-shadow: 0 0 0 4px color-mix(in srgb, var(--mw-primary, #0f766e) 18%, transparent);
     outline: none;
 }
 
@@ -98,12 +98,12 @@ input {
 
 .mw-login-submit {
     width: 100%;
-    --mdui-color-primary: var(--mw-primary, #6750a4);
+    --mdui-color-primary: var(--mw-primary, #0f766e);
 }
 
 .mw-login-link {
     align-self: flex-end;
-    color: var(--mw-primary, #6750a4);
+    color: var(--mw-primary, #0f766e);
 }
 
 .mw-captcha-row {
@@ -128,7 +128,7 @@ body.mw-login .mw-login-submit::part(button) {
 
 body.mw-login mdui-button.mw-login-submit::part(button),
 body.mw-login mdui-button.mw-login-link::part(button) {
-    --mdui-color-primary: var(--mw-primary, #6750a4);
+    --mdui-color-primary: var(--mw-primary, #0f766e);
 }
 
 @media (max-width: 640px) {

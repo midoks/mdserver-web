@@ -1659,7 +1659,7 @@ $(function () {
         if (themeApi && typeof themeApi.getColor === 'function') {
             return themeApi.getColor();
         }
-        return '#6750a4';
+        return '#0f766e';
     }
 
     function syncModeButtons(mode) {

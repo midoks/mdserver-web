@@ -1004,10 +1004,10 @@ function getChartTheme() {
 		return trimmed;
 	}
 	return {
-		primary: resolveCssVar(styles.getPropertyValue('--mw-primary')) || '#6750a4',
+		primary: resolveCssVar(styles.getPropertyValue('--mw-primary')) || '#0f766e',
 		secondary: resolveCssVar(styles.getPropertyValue('--mdui-color-secondary')) || '#4f8ef7',
 		tertiary: resolveCssVar(styles.getPropertyValue('--mdui-color-tertiary')) || '#22c55e',
-		accent: resolveCssVar(styles.getPropertyValue('--mdui-color-primary-container')) || '#a855f7',
+		accent: resolveCssVar(styles.getPropertyValue('--mdui-color-primary-container')) || '#0f766e',
 		border: resolveCssVar(styles.getPropertyValue('--mw-border')) || '#e2e8f0',
 		muted: resolveCssVar(styles.getPropertyValue('--mw-muted')) || '#64748b',
 		surface: resolveCssVar(styles.getPropertyValue('--mw-surface')) || '#ffffff',

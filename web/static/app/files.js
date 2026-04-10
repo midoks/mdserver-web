@@ -1,8 +1,23 @@
 //判断磁盘数量超出宽度
 function isDiskWidth(){
-    var comlist_width = $("#comlist").width();
     var body_width = $(".file-box").width();
-    $("#comlist").css({"width":(body_width-520)+"px","height":"34px","overflow":"auto"});
+    $("#comlist").css({"width":Math.max(body_width-520, 220)+"px","height":"34px","overflow":"auto"});
+}
+
+function syncFileToolbarLayout(){
+    var body_width = $(".file-box").width();
+    var path_width = Math.max(body_width - 700, 290);
+
+    $("#tipTools").width(Math.max(body_width - 30, 0));
+    $("#PathPlaceBtn").width(path_width);
+    $("#DirPathPlace input").width(path_width);
+
+    if($(window).width()<1160){
+        $("#PathPlaceBtn,#DirPathPlace input").width(290);
+    }
+
+    pathLeft();
+    isDiskWidth();
 }
 
 //打开回收站
@@ -755,27 +770,11 @@ function showSeclect(){
 
 //滚动条事件
 $(window).scroll(function () {
-    if($(window).scrollTop() > 16){
-        $("#tipTools").css({"position":"fixed","top":"0","left":"195px","box-shadow":"0 1px 10px 3px #ccc"});
-    }else{
-        $("#tipTools").css({"position":"absolute","top":"0","left":"0","box-shadow":"none"});
-    }
+    $("#tipTools").toggleClass("is-sticky", $(window).scrollTop() > 16);
 });
-$("#tipTools").width($(".file-box").width());
-$("#PathPlaceBtn").width($(".file-box").width()-700);
-$("#DirPathPlace input").width($(".file-box").width()-700);
-if($(window).width()<1160){
-    $("#PathPlaceBtn").width(290);
-}
+syncFileToolbarLayout();
 window.onresize = function(){
-    $("#tipTools").width($(".file-box").width()-30);
-    $("#PathPlaceBtn").width($(".file-box").width()-700);
-    $("#DirPathPlace input").width($(".file-box").width()-700);
-    if($(window).width()<1160){
-        $("#PathPlaceBtn,#DirPathPlace input").width(290);
-    }
-    pathLeft();
-    isDiskWidth();
+    syncFileToolbarLayout();
 }
 
 //批量操作
@@ -1858,7 +1857,7 @@ function pathPlaceBtn(path){
         }
     }
     
-    html = '<div style="width:1200px;height:26px"><ul>'+html+'</ul></div>';
+    html = '<div class="mw-file-path-scroll"><ul>'+html+'</ul></div>';
     $("#PathPlaceBtn").html(html);
     $("#PathPlaceBtn ul li a").click(function(e){
         var go_path = $(this).attr("title");
@@ -1887,18 +1886,18 @@ function pathLeft(){
 
 //路径快捷点击
 $("#PathPlaceBtn").on("click", function(e){
-    if($("#DirPathPlace").is(":hidden")){
-        $("#DirPathPlace").css("display","inline");
-        $("#DirPathPlace input").focus();
-        $(this).hide();
-    }else{
-        $("#DirPathPlace").hide();
-        $(this).css("display","inline");
-    }
-    $(document).one("click", function(){
-        $("#DirPathPlace").hide();
-        $("#PathPlaceBtn").css("display","inline");
-    });
+	if($("#DirPathPlace").is(":hidden")){
+	        $("#DirPathPlace").css("display","inline-flex");
+	        $("#DirPathPlace input").focus();
+	        $(this).hide();
+	    }else{
+	        $("#DirPathPlace").hide();
+	        $(this).css("display","inline-flex");
+	    }
+	    $(document).one("click", function(){
+	        $("#DirPathPlace").hide();
+	        $("#PathPlaceBtn").css("display","inline-flex");
+	    });
     e.stopPropagation(); 
 }); 
 $("#DirPathPlace").on("click", function(e){

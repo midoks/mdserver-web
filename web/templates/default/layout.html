@@ -10,6 +10,8 @@
 <link rel="shortcut icon" href="/static/favicon.ico" type="image/x-icon" />
 <script type="text/javascript">
 (function () {
+    var DEFAULT_COLOR = '#0f766e';
+
     function hexToRgbTriplet(color) {
         if (!color) {
             return null;
@@ -46,12 +48,14 @@
         root.classList.add('mdui-theme-' + mode);
 
         var color = window.localStorage.getItem('mw-color-scheme');
-        if (color) {
-            root.style.setProperty('--mw-theme-primary', color);
-            var colorRgb = hexToRgbTriplet(color);
-            if (colorRgb) {
-                root.style.setProperty('--mw-theme-primary-rgb', colorRgb);
-            }
+        if (!color) {
+            color = DEFAULT_COLOR;
+        }
+
+        root.style.setProperty('--mw-theme-primary', color);
+        var colorRgb = hexToRgbTriplet(color);
+        if (colorRgb) {
+            root.style.setProperty('--mw-theme-primary-rgb', colorRgb);
         }
 
         var background = window.localStorage.getItem('mw-theme-background');

@@ -22,20 +22,38 @@
 
         <mdui-card class="mw-card">
             <div class="mw-card-header">
-                <div class="mw-card-title">状态</div>
+                <div class="mw-card-title">状态总览</div>
             </div>
             <div class="mw-card-content">
                 <ul class="mw-stat-grid" id="systemInfoList">
                     <li class="circle-box text-center mw-stat-item" id="LoadList">
-                        <h3 class="c5 f15">负载状态<a href="https://github.com/midoks/mdserver-web/wiki#负载简述" target="_blank" class="bt-ico-ask" style="cursor: pointer;">?</a></h3>
+                        <div class="mw-stat-top">
+                            <div class="mw-stat-label">
+                                <span class="material-icons mw-stat-icon">stacked_line_chart</span>
+                                <div>
+                                    <h3 class="c5 f15">负载状态<a href="https://github.com/midoks/mdserver-web/wiki#负载简述" target="_blank" class="bt-ico-ask" style="cursor: pointer;">?</a></h3>
+                                    <p class="mw-stat-copy">最近 1 / 5 / 15 分钟平均负载</p>
+                                </div>
+                            </div>
+                            <span class="mw-stat-chip" id="LoadState">获取中...</span>
+                        </div>
                         <div class="mw-stat-progress">
                             <mdui-linear-progress id="LoadProgress" max="100" value="0"></mdui-linear-progress>
                         </div>
                         <div class="mw-stat-value mask"><span id="Load">0</span>%</div>
-                        <div id="LoadState" class="mw-stat-status c5 f15">获取中...</div>
+                        <div class="mw-stat-footer">负载越高，状态提示会自动切换颜色。</div>
                     </li>
                     <li class="circle-box text-center mw-stat-item" id="cpuChart">
-                        <h3 class="c5 f15">CPU使用率</h3>
+                        <div class="mw-stat-top">
+                            <div class="mw-stat-label">
+                                <span class="material-icons mw-stat-icon">developer_board</span>
+                                <div>
+                                    <h3 class="c5 f15">CPU使用率</h3>
+                                    <p class="mw-stat-copy">核心占用与单核负载同步显示</p>
+                                </div>
+                            </div>
+                            <span class="mw-stat-chip">实时</span>
+                        </div>
                         <div class="mw-stat-progress">
                             <mdui-linear-progress id="CpuProgress" max="100" value="0"></mdui-linear-progress>
                         </div>
@@ -43,7 +61,16 @@
                         <div id="core" class="mw-stat-status c5 f15">获取中...</div>
                     </li>
                     <li class="circle-box text-center mw-stat-item mem-release" id="memChart">
-                        <h3 class="c5 f15">内存使用率</h3>
+                        <div class="mw-stat-top">
+                            <div class="mw-stat-label">
+                                <span class="material-icons mw-stat-icon">memory</span>
+                                <div>
+                                    <h3 class="c5 f15">内存使用率</h3>
+                                    <p class="mw-stat-copy">释放前后差值会即时回显</p>
+                                </div>
+                            </div>
+                            <span class="mw-stat-chip">可释放</span>
+                        </div>
                         <div class="mw-stat-progress">
                             <mdui-linear-progress id="MemProgress" max="100" value="0"></mdui-linear-progress>
                         </div>

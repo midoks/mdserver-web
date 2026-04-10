@@ -5,7 +5,7 @@
     var BACKGROUND_KIND_KEY = 'mw-theme-background-kind';
     var BACKGROUND_SOURCE_KEY = 'mw-theme-background-source';
     var BACKGROUND_MODE_KEY = 'mw-theme-background-mode';
-    var DEFAULT_COLOR = '#6750a4';
+    var DEFAULT_COLOR = '#0f766e';
     var DEFAULT_MODE = 'auto';
     var THEME_CLASSES = ['mdui-theme-light', 'mdui-theme-dark', 'mdui-theme-auto'];
     var MEMORY_STORE = {};
@@ -123,6 +123,7 @@
 
         getRoot().style.removeProperty('--mw-theme-primary');
         getRoot().style.removeProperty('--mw-theme-primary-rgb');
+        applyColorScheme(DEFAULT_COLOR);
     }
 
     function applyMode(mode) {
@@ -273,6 +274,8 @@
 
         if (storedColor) {
             applyColorScheme(storedColor);
+        } else {
+            applyColorScheme(DEFAULT_COLOR);
         }
 
         if (storedBackground) {

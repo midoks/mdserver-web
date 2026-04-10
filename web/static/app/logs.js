@@ -4,13 +4,27 @@ $(document).ready(function(){
 });
 
 function changeLogsViewH(){
-    var l = $(window).height();
-    $('.container-fluid .tab-view-box').css('height',l-80-40);
+	var winHeight = $(window).height();
+	var pageHeader = $('.mw-log-page .mw-page-header').outerHeight(true) || 0;
+	var tabHeader = $('#cutTab').outerHeight(true) || 0;
+	var bodyHeight = Math.max(winHeight - pageHeader - tabHeader - 180, 420);
+	var panelHeight = Math.max(bodyHeight - 40, 360);
+	var contentHeight = Math.max(panelHeight - 12, 320);
 
-    $('#panelLogs').css('height',l-80-40-50);
+	$('.mw-log-page .tab-view-box').css('height', bodyHeight + 'px');
+	$('#panelLogs').css('height', panelHeight + 'px');
 
-    $('#logAudit .logAuditTab').css('height',l-80-40-50);
-    $('#logAudit .logAuditContent').css('height',l-80-40-50);
+	$('#logAudit .logAuditTab').css('height', panelHeight + 'px');
+	$('#logAudit .logAuditContent').css({
+		'height': panelHeight + 'px',
+		'display': 'flex',
+		'flex-direction': 'column'
+	});
+	$('#logAuditTable').css({
+		'height': contentHeight + 'px',
+		'display': 'flex',
+		'flex-direction': 'column'
+	});
 
 }
 
@@ -61,6 +75,11 @@ function getAuditLogsFiles(){
 	$.post('/logs/get_audit_logs_files',{}, function(rdata) {
 		var data = rdata.data;
 		layer.close(loadT);
+        if (!data || !data.length) {
+            $("#logAudit .logAuditTab").html('<div class="logAuditItem active">暂无日志审计文件</div>');
+            $("#logAudit .logAuditContent").html('<div class="mw-empty-state">当前没有可展示的日志审计数据。</div>');
+            return;
+        }
         var option = '';
         for (var i = 0; i < data.length; i++) {
         	var tip = data[i]['name'] +' - '+data[i]['title'] + '(' + toSize(data[i]['size']) + ')';
@@ -91,12 +110,16 @@ function getAuditFile(log_name){
 		try{
             if (typeof(data) == 'object'){
             	var plist = data.data;
+                if (!plist || !plist.length) {
+                    $('#logAudit .logAuditContent').html('<div class="mw-empty-state">当前文件没有可解析的日志记录。</div>');
+                    return;
+                }
 
-            	var pre_html  ='<div id="logAuditTable" style="position: relative;display: block;">\
-							<div class="tootls_group tootls_top">\
-								<div class="pull-left">\
-									<button type="button" title="刷新列表" class="refresh btn btn-success btn-sm mr5"><span>刷新列表</span></button>\
-								</div>\
+                var pre_html = '<div id="logAuditTable" class="mw-log-audit-table" style="position: relative;display: flex;">\
+								<div class="tootls_group tootls_top">\
+									<div class="pull-left">\
+										<button type="button" title="刷新列表" class="refresh btn btn-success btn-sm mr5"><span>刷新列表</span></button>\
+									</div>\
 								<!-- <div class="pull-right">\
 									<div class="logs_search" style="position: relative;">\
 										<input type="text" class="search_input" style="" placeholder="请输入来源/端口/角色/事件">\
@@ -104,8 +127,8 @@ function getAuditFile(log_name){
 									</div>\
 								</div> --> \
 							</div>\
-							<div class="divtable mtb10" style="max-height: 83px;">\
-								<table class="table table-hover">\
+								<div class="divtable mtb10 mw-log-audit-table-scroll">\
+									<table class="table table-hover">\
 									<thead style="position: relative;z-index: 1;">\
 										<tr>\
 											<th><span data-index="0"><span>用户</span></span></th>\
@@ -134,21 +157,21 @@ function getAuditFile(log_name){
 			    //         <thead><tr><th>时间</th><th>角色</th><th>事件</th></tr></thead>\
 			    //         <tbody></tbody>\
 			    //     </table>';
-			    $('#logAudit .logAuditContent').html(pre_html);
+				    $('#logAudit .logAuditContent').html(pre_html);
+                    changeLogsViewH();
 
-			    if (plist.length>0){
-			        var tmp = plist[0];
-			        var thead = '';
-			        tbody += '<tr>'
-			        for (var i in tmp) {
-			            tbody+='<th>'+ i + '</th>';
-			        }
-			        tbody += '</tr>';
-			        $('#logAudit .logAuditContent thead').html(tbody);
-			    }
-			    
+				    if (plist.length>0){
+				        var tmp = plist[0];
+				        var thead = '<tr>';
+				        for (var i in tmp) {
+				            thead += '<th>'+ i + '</th>';
+				        }
+				        thead += '</tr>';
+				        $('#logAudit .logAuditContent thead').html(thead);
+				    }
 
-			    var tbody = '';
+
+				    var tbody = '';
 			    for (var i = 0; i < plist.length; i++) {
 			        tbody += '<tr>';
 			        for (var vv in plist[i]) {
@@ -168,9 +191,10 @@ function getAuditFile(log_name){
             		<pre style="height: 100%; background-color: rgb(51, 51, 51); color: rgb(255, 255, 255); overflow-x: hidden; overflow-wrap: break-word; white-space: pre-wrap;"><code>'+data+'</code></pre>\
             	</div>';
                 $('#logAudit .logAuditContent').html(cc);
+                changeLogsViewH();
             }
         } catch (e) {
-            layer.msg(str(e),{icon:2,time:10000,shade: [0.3, '#000']});
+            layer.msg(String(e),{icon:2,time:10000,shade: [0.3, '#000']});
         }
 	});
 }

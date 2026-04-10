@@ -93,7 +93,7 @@ function getChartTheme() {
         return trimmed;
     }
     return {
-        primary: resolveCssVar(styles.getPropertyValue('--mw-primary')) || '#6750a4',
+        primary: resolveCssVar(styles.getPropertyValue('--mw-primary')) || '#0f766e',
         secondary: resolveCssVar(styles.getPropertyValue('--mdui-color-secondary')) || '#4f8ef7',
         border: resolveCssVar(styles.getPropertyValue('--mw-border')) || '#e2e8f0',
         muted: resolveCssVar(styles.getPropertyValue('--mw-muted')) || '#64748b',
@@ -331,13 +331,22 @@ function getDiskInfo() {
                 } 
             }
            
-            dBody = '<li class="col-xs-6 col-sm-3 col-md-3 col-lg-2 mtb20 circle-box mw-stat-item diskbox">' +
-                '<h3 class="c5 f15">' + rdata[i].path + '</h3>' +
+            dBody = '<li class="mw-stat-item diskbox">' +
+                '<div class="mw-stat-top">' +
+                    '<div class="mw-stat-label">' +
+                        '<span class="material-icons mw-stat-icon">storage</span>' +
+                        '<div>' +
+                            '<h3 class="c5 f15">' + rdata[i].path + '</h3>' +
+                            '<p class="mw-stat-copy">分区占用与 Inode 状态</p>' +
+                        '</div>' +
+                    '</div>' +
+                    '<span class="mw-stat-chip">磁盘</span>' +
+                '</div>' +
                 '<div class="mw-stat-progress mw-disk-progress">' +
                 '<mdui-linear-progress max="100" value="' + usagePercent + '" style="--mdui-color-primary: ' + LoadColor + ';"></mdui-linear-progress>' +
                 '</div>' +
                 '<div class="mw-stat-value mask" style="color:' + LoadColor + '"' + inodes + '><span>' + usagePercent + '</span>%</div>' +
-                '<h4 class="c5 f15">' + rdata[i].size[1] + '/' + rdata[i].size[0] + '</h4>' +
+                '<div class="mw-stat-footer">' + rdata[i].size[1] + '/' + rdata[i].size[0] + '</div>' +
                 '</li>'
             $("#systemInfoList").append(dBody);
         }
