@@ -36,10 +36,21 @@ function softMain(name, title, version) {
     });
 }
 
+function renderSoftEmptyState(message) {
+    return '<tr class="mw-soft-empty-row"><td colspan="6">' +
+        '<div class="mw-empty-state">' +
+        '<span class="material-icons">inventory_2</span>' +
+        '<strong>' + message + '</strong>' +
+        '<p>通过“添加插件”导入软件，或在首页开启展示后，这里会出现软件卡片。</p>' +
+        '</div>' +
+        '</td></tr>';
+}
+
 //取软件列表
 function getSList(isdisplay) {
+    var loadT = null;
     if (isdisplay !== true) {
-        var loadT = layer.msg('正在获取列表...', { icon: 16, time: 0, shade: [0.3, '#000'] })
+        loadT = layer.msg('正在获取列表...', { icon: 16, time: 0, shade: [0.3, '#000'] })
     }
     if (!isdisplay || isdisplay === true)
         isdisplay = getCookie('p' + getCookie('soft_type'));
@@ -64,27 +75,52 @@ function getSList(isdisplay) {
 
     var condition = (search + type + page).slice(1);
     $.get('/plugins/list?' + condition, '', function(rdata) {
-        layer.close(loadT);
+        if (loadT) {
+            layer.close(loadT);
+        }
+        rdata = rdata || {};
+        var softTypes = Array.isArray(rdata.type) ? rdata.type : [];
+        var softList = Array.isArray(rdata.data) ? rdata.data : [];
         var tBody = '';
         var sBody = '';
         var pBody = '';
 
-        for (var i = 0; i < rdata.type.length; i++) {
+        if (!softTypes.length) {
+            tBody = '<span class="on" typeid="0">全部</span>';
+        }
+        for (var i = 0; i < softTypes.length; i++) {
             var c = '';
-            if (istype == rdata.type[i].type) {
+            if (istype == softTypes[i].type) {
                 c = 'class="on"';
             }
-            tBody += '<span typeid="' + rdata.type[i].type + '" ' + c + '>' + rdata.type[i].title + '</span>';
+            tBody += '<span typeid="' + softTypes[i].type + '" ' + c + '>' + softTypes[i].title + '</span>';
         }
 
         $(".softtype").html(tBody);
-        $("#softPage").html(rdata.list);
+        $("#softPage").html(rdata.list || '');
         $("#softPage .Pcount").css({ "position": "absolute", "left": "0" })
 
-        $(".task").text(rdata.data[rdata.length - 1]);
-        for (var i = 0; i < rdata.data.length; i++) {
-            var plugin = rdata.data[i];
-            var len = plugin.versions.length;
+        if ($(".task").length) {
+            $(".task").text(softList.length ? softList[softList.length - 1] : '');
+        }
+
+        if (!softList.length) {
+            $("#softList").html(renderSoftEmptyState('暂无软件插件'));
+            $(".menu-sub span").click(function() {
+                setCookie('soft_type', $(this).attr('typeid'));
+                $(this).addClass("on").siblings().removeClass("on");
+                getSList();
+            });
+            return;
+        }
+
+        for (var i = 0; i < softList.length; i++) {
+            var plugin = softList[i] || {};
+            if (!plugin.name) {
+                continue;
+            }
+            var pluginVersions = plugin.versions || [];
+            var len = pluginVersions.length || 0;
             var version_info = '';
             var version = '';
             var softPath = '';
@@ -99,7 +135,7 @@ function getSList(isdisplay) {
                 version_info += plugin.versions + '|';
             } else {
                 for (var j = 0; j < len; j++) {
-                    version_info += plugin.versions[j] + '|';
+                    version_info += pluginVersions[j] + '|';
                 }
             }
             if (version_info != '') {
@@ -175,7 +211,14 @@ function getSList(isdisplay) {
         });
 
         loadImage();
-    },'json');
+    },'json').fail(function() {
+        if (loadT) {
+            layer.close(loadT);
+        }
+        $(".softtype").html('<span class="on" typeid="0">全部</span>');
+        $("#softList").html(renderSoftEmptyState('软件列表加载失败'));
+        $("#softPage").html('');
+    });
 }
 
 function installPreInspection(name, ver, callback){
@@ -325,25 +368,32 @@ function toIndexDisplay(name, version, coexist) {
 }
 
 function indexListHtml(callback){
-    
-
-    // init
     $("#indexsoft").html('');
-    var index_soft = '';
-    for (var i = 0; i < 12; i++) {
-        index_soft += '<div class="col-sm-3 col-md-3 col-lg-3 no-bg"></div>';
-    }
-    $("#indexsoft").html(index_soft);
 
     // var loadT = layer.msg('正在获取列表...', { icon: 16, time: 0, shade: [0.3, '#000'] });
     $.get('/plugins/index_list', function(rdata) {
-        var rdata = rdata.data;
+        var plugins = (rdata && Array.isArray(rdata.data)) ? rdata.data : [];
         // layer.close(loadT);
         $("#indexsoft").html('');
+        if (!plugins.length) {
+            $("#indexsoft").html('<div class="mw-soft-empty-state">' +
+                '<span class="material-icons">apps</span>' +
+                '<strong>暂无首页软件卡片</strong>' +
+                '<p>到软件管理里安装插件并开启首页展示后，软件快捷卡片会显示在这里。</p>' +
+                '<a class="btlink" href="/soft/index">去软件管理</a>' +
+                '</div>');
+            if (typeof callback=='function'){
+                callback();
+            }
+            return;
+        }
         var con = '';
-        for (var i = 0; i < rdata.length; i++) {
-            var plugin = rdata[i];
-            var len = plugin.versions.length;
+        for (var i = 0; i < plugins.length; i++) {
+            var plugin = plugins[i] || {};
+            if (!plugin.name) {
+                continue;
+            }
+            var len = plugin.versions ? plugin.versions.length : 0;
             var version_info = '';
 
             if (typeof plugin.versions == "string"){
@@ -382,36 +432,36 @@ function indexListHtml(callback){
         }
 
         $("#indexsoft").html(con);
-        //软件位置移动
-        var softboxlen = $("#indexsoft > div").length;
-        var softboxsum = 12;
-        var softboxcon = '';
-        var softboxn = softboxlen;
-        if (softboxlen <= softboxsum) {
-            for (var i = 0; i < softboxsum - softboxlen; i++) {
-                softboxcon += '<div class="col-sm-3 col-md-3 col-lg-3 no-bg" data-id=""></div>';
-            }
-            $("#indexsoft").append(softboxcon);
-        }
 
         if (typeof callback=='function'){
             callback();
         }
-    },'json');
+    },'json').fail(function() {
+        $("#indexsoft").html('<div class="mw-soft-empty-state">' +
+            '<span class="material-icons">warning</span>' +
+            '<strong>软件卡片加载失败</strong>' +
+            '<p>请检查插件接口是否可用，稍后重试。</p>' +
+            '</div>');
+        if (typeof callback=='function'){
+            callback();
+        }
+    });
 }
 
 
 //首页软件列表
 function indexSoft() {
     indexListHtml(function(){
-        $("#indexsoft").dragsort({ 
-            dragSelector: ".spanmove", 
-            dragBetween: true, 
-            dragEnd: saveOrder, 
-            placeHolderTemplate: "<div class='col-sm-3 col-md-3 col-lg-3 dashed-border'></div>"
-        });
+        if ($("#indexsoft > div[data-id]").length > 1) {
+            $("#indexsoft").dragsort({
+                dragSelector: ".spanmove",
+                dragBetween: true,
+                dragEnd: saveOrder,
+                placeHolderTemplate: "<div class='col-sm-3 col-md-3 col-lg-3 dashed-border'></div>"
+            });
+        }
     });
-    
+
     function saveOrder() {
         var data = $("#indexsoft > div").map(function() { return $(this).attr("data-id"); }).get();
         tmp = [];
