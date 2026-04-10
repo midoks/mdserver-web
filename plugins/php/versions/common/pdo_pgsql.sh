@@ -11,36 +11,12 @@ rootPath=$(dirname "$rootPath")
 serverPath=$(dirname "$rootPath")
 sourcePath=${serverPath}/source/php
 SYS_ARCH=`arch`
+
 actionType=$1
 version=$2
 
-LIBNAME=swoole
-LIBV=5.1.6
-
-if [ "$version" -lt "70" ];then
-	LIBV=1.10.1
-elif [ "$version" == "70" ];then
-	LIBV=4.3.0
-elif [ "$version" == "71" ];then
-	LIBV=4.5.2
-elif [ "$version" -le "74" ];then
-	LIBV=4.8.10
-elif [ "$version" -lt "80" ];then
-	LIBV=6.0.2
-elif [ "$version" == "81" ];then
-	LIBV=6.1.7
-elif [ "$version" == "82" ];then
-	LIBV=6.2.0
-elif [ "$version" == "83" ];then
-	LIBV=6.2.0
-elif [ "$version" == "84" ];then
-	LIBV=6.2.0
-elif [ "$version" == "85" ];then
-	LIBV=6.2.0
-else
-	echo 'other?'
-	exit 0
-fi
+LIBNAME=pdo_pgsql
+LIBV=0
 
 LIB_PATH_NAME=lib/php
 if [ -d $serverPath/php/${version}/lib64 ];then
@@ -57,8 +33,10 @@ else
 	BAK=''
 fi
 
+OPTIONS=''
 Install_lib()
 {
+
 	isInstall=`cat $serverPath/php/$version/etc/php.ini|grep "${LIBNAME}.so"`
 	if [ "${isInstall}" != "" ];then
 		echo "php-$version 已安装${LIBNAME},请选择其它版本!"
@@ -67,48 +45,29 @@ Install_lib()
 	
 	if [ ! -f "$extFile" ];then
 
-		php_lib=$sourcePath/php_lib
-		mkdir -p $php_lib
-
-		cd ${rootPath}/plugins/php/lib && /bin/bash openssl_11.sh
-
-		if [ ! -d $php_lib/${LIBNAME}-${LIBV} ];then
-			if [ ! -f $php_lib/${LIBNAME}-${LIBV}.tgz ];then
-				wget --no-check-certificate -O $php_lib/${LIBNAME}-${LIBV}.tgz http://pecl.php.net/get/${LIBNAME}-${LIBV}.tgz
-			fi
-			cd $php_lib && tar xvf ${LIBNAME}-${LIBV}.tgz
+		if [ ! -d $sourcePath/php${version}/ext ];then
+			cd ${rootPath}/plugins/php && /bin/bash ${rootPath}/plugins/php/versions/${version}/install.sh install 
 		fi
-		cd $php_lib/${LIBNAME}-${LIBV}
 
-		OPTIONS=""
+		cd $sourcePath/php${version}/ext/${LIBNAME}
 		if [ "${SYS_ARCH}" == "aarch64" ] && [ "$version" -lt "56" ];then
 			OPTIONS="$OPTIONS --build=aarch64-unknown-linux-gnu --host=aarch64-unknown-linux-gnu"
 		fi
-		
-		$serverPath/php/$version/bin/phpize
-		./configure --with-php-config=$serverPath/php/$version/bin/php-config \
-		$OPTIONS \
-		--enable-openssl \
-		--with-openssl-dir=$serverPath/lib/openssl11 \
-		--enable-sockets
-		make clean && make && make install && make clean
 
-		cd $php_lib && rm -rf $php_lib/${LIBNAME}-${LIBV}
-	fi
-	
-	while [[ ! -f "$extFile" ]];
-    do
-        echo -e ".\c"
-        sleep 0.5
-        if [ ! -f "$extFile" ];then
-			echo "ERROR!"
+		$serverPath/php/$version/bin/phpize
+		./configure --with-php-config=$serverPath/php/$version/bin/php-config $OPTIONS
+		make clean && make && make install && make clean
+		
+		if [ -d $sourcePath/php${version} ];then
+			cd ${sourcePath} && rm -rf $sourcePath/php${version}
 		fi
-        let n+=1
-        if [ $n -gt 8 ];then
-        	echo "WAIT " $n "TIMES FAIL!"
-            return;
-        fi
-    done
+	fi
+
+	if [ ! -f "$extFile" ];then
+		echo "ERROR!"
+		return
+	fi
+
 
     echo "" >> $serverPath/php/$version/etc/php.ini
 	echo "[${LIBNAME}]" >> $serverPath/php/$version/etc/php.ini

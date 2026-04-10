@@ -247,7 +247,7 @@ apt install -y protobuf-compiler
 apt install -y libboost-dev
 apt install -y liblz4-tool
 apt install -y zstd
-
+apt install -y libzstd-dev
 
 # Disabled due to dependency issues
 #apt install --ignore-missing -y autoconf automake cmake curl dia gcc imagemagick libbz2-dev libcurl4-gnutls-dev\

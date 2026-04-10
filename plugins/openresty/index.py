@@ -474,7 +474,9 @@ def getCfg():
         {"name": "worker_processes", "ps": "处理进程,auto表示自动,数字表示进程数", 'type': 2},
         {"name": "worker_connections", "ps": "最大并发链接数", 'type': 2},
         {"name": "keepalive_timeout", "ps": "连接超时时间", 'type': 2},
-        {"name": "gzip", "ps": "是否开启压缩传输", 'type': 1},
+        {"name": "zstd", "ps": "是否开启zstd压缩传输", 'type': 1},
+        {"name": "brotli", "ps": "是否开启brotli压缩传输", 'type': 1},
+        {"name": "gzip", "ps": "是否开启gzip压缩传输", 'type': 1},
         {"name": "gzip_min_length", "ps": "最小压缩文件", 'type': 2},
         {"name": "gzip_comp_level", "ps": "压缩率", 'type': 2},
         {"name": "client_max_body_size", "ps": "最大上传文件", 'type': 2},
@@ -534,7 +536,7 @@ def setCfg():
 
     args = getArgs()
     data = checkArgs(args, [
-        'worker_processes', 'worker_connections', 'keepalive_timeout',
+        'worker_processes', 'worker_connections', 'keepalive_timeout','zstd','brotli',
         'gzip', 'gzip_min_length', 'gzip_comp_level', 'client_max_body_size',
         'server_names_hash_bucket_size', 'client_header_buffer_size'
     ])
@@ -550,6 +552,8 @@ def setCfg():
         {"name": "worker_processes", "ps": "处理进程,auto表示自动,数字表示进程数", 'type': 2},
         {"name": "worker_connections", "ps": "最大并发链接数", 'type': 2},
         {"name": "keepalive_timeout", "ps": "连接超时时间", 'type': 2},
+        {"name": "zstd", "ps": "是否开启zstd压缩传输", 'type': 1},
+        {"name": "brotli", "ps": "是否开启brotli压缩传输", 'type': 1},
         {"name": "gzip", "ps": "是否开启压缩传输", 'type': 1},
         {"name": "gzip_min_length", "ps": "最小压缩文件", 'type': 2},
         {"name": "gzip_comp_level", "ps": "压缩率", 'type': 2},
@@ -564,6 +568,9 @@ def setCfg():
         # print(k, v)
         rep = r"%s\s+[^kKmMgG\;\n]+" % k
         if k == "worker_processes" or k == "gzip":
+            if not re.search(r"auto|on|off|\d+", v):
+                return mw.returnJson(False, '参数值错误')
+        elif k == "zstd" or k == "brotli":
             if not re.search(r"auto|on|off|\d+", v):
                 return mw.returnJson(False, '参数值错误')
         else:

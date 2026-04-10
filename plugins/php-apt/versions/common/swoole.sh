@@ -26,8 +26,18 @@ elif [ "$version" == "7.1" ];then
 	LIBV=4.5.2
 elif [ "$version" == "7.0" ];then
 	LIBV=4.3.0
+elif [ `echo "$version < 8.0"|bc` -eq 1 ];then
+	LIBV=6.0.2
+elif [ "$version" == "8.1" ];then
+	LIBV=6.1.7
+elif [ "$version" == "8.2" ];then
+	LIBV=6.2.0
+elif [ "$version" == "8.3" ];then
+	LIBV=6.2.0
+elif [ "$version" == "8.4" ];then
+	LIBV=6.2.0
 elif [ "$version" == "8.5" ];then
-	LIBV=6.1.6
+	LIBV=6.2.0
 else
 	echo 'ok'
 	APT_INSTALL=1

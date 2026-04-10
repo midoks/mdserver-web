@@ -38,6 +38,8 @@ yum install -y bzip2-devel
 yum install -y ncurses-compat-libs
 yum install -y numactl
 yum install -y sshpass
+yum install -y libzstd-devel
+yum install -y postgresql-devel
 
 # if [ -f /usr/sbin/iptables ];then
 

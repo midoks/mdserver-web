@@ -2,8 +2,8 @@
 PATH=/bin:/sbin:/usr/bin:/usr/sbin:/usr/local/bin:/usr/local/sbin:~/bin:/opt/homebrew/bin
 export PATH
 
-# cd /Users/midoks/Desktop/mwdev/server/mdserver-web/plugins/openresty && bash install.sh install 1.21.4.2
-# cd /www/server/mdserver-web/plugins/openresty && bash install.sh install 1.21.4.2
+# cd /Users/midoks/Desktop/mwdev/server/mdserver-web/plugins/openresty && bash install.sh install 1.29.2
+# cd /www/server/mdserver-web/plugins/openresty && bash install.sh install 1.29.2
 
 curPath=`pwd`
 rootPath=$(dirname "$curPath")
@@ -14,7 +14,8 @@ sysName=`uname`
 action=$1
 type=$2
 
-VERSION=1.19.3.1
+VERSION=1.29.2.3
+
 openrestyDir=${serverPath}/source/openresty
 
 Install_openresty()
@@ -72,11 +73,10 @@ Install_openresty()
 	cd ${openrestyDir} && tar -zxvf openresty-${VERSION}.tar.gz
 
 	OPTIONS=''
-	OPTIONS="${OPTIONS} --with-ipv6"
 
-	opensslVersion="1.1.1p"
+	opensslVersion="3.5.5"
 	libresslVersion="3.9.1"
-	pcreVersion='8.38'
+	pcreVersion='8.45'
 	if [ "$sysName" == "Darwin" ];then
 
 		if [ ! -f ${openrestyDir}/pcre-${pcreVersion}.tar.gz ];then
@@ -105,24 +105,30 @@ Install_openresty()
 		# OPENSSL_LIB_DEPEND_DIR=`brew info openssl@1.1 | grep ${BREW_DIR}/Cellar/openssl@1.1 | cut -d \  -f 1 | awk 'END {print}'`
 		# OPTIONS="${OPTIONS} --with-openssl=${OPENSSL_LIB_DEPEND_DIR}"
 	else
-		if [ ! -f ${openrestyDir}/pcre-${pcreVersion}.tar.gz ];then
-			wget --no-check-certificate -O ${openrestyDir}/pcre-${pcreVersion}.tar.gz https://netix.dl.sourceforge.net/project/pcre/pcre/${pcreVersion}/pcre-${pcreVersion}.tar.gz
-		fi
+		if [ ! -f ${openrestyDir}/openssl-${opensslVersion}.tar.gz ];then
+	        wget --no-check-certificate -O ${openrestyDir}/openssl-${opensslVersion}.tar.gz https://www.openssl.org/source/openssl-${opensslVersion}.tar.gz
+	    fi
 
-		if [ ! -d ${openrestyDir}/pcre-${pcreVersion} ];then
-			cd ${openrestyDir} &&  tar -zxvf pcre-${pcreVersion}.tar.gz
+	    if [ ! -d ${openrestyDir}/openssl-${opensslVersion} ];then
+			cd ${openrestyDir} &&  tar -zxvf openssl-${opensslVersion}.tar.gz
 		fi
-		OPTIONS="${OPTIONS} --with-pcre=${openrestyDir}/pcre-${pcreVersion}"
-		
-		echo "openssl"
-		# if [ ! -f ${openrestyDir}/openssl-${opensslVersion}.tar.gz ];then
-	    #     wget --no-check-certificate -O ${openrestyDir}/openssl-${opensslVersion}.tar.gz https://www.openssl.org/source/openssl-${opensslVersion}.tar.gz
+		OPTIONS="${OPTIONS} --with-openssl=${openrestyDir}/openssl-${opensslVersion}"
+
+	fi
+
+	if [[ "$VERSION" =~ "1.29.2" ]];then
+		OPTIONS="${OPTIONS} --with-http_v3_module"
+
+		# if [ ! -f ${openrestyDir}/libressl-${libresslVersion}.tar.gz ];then
+	    #     wget --no-check-certificate -O ${openrestyDir}/libressl-${libresslVersion}.tar.gz https://ftp.openbsd.org/pub/OpenBSD/LibreSSL/libressl-${libresslVersion}.tar.gz
 	    # fi
 
-	    # if [ ! -d ${openrestyDir}/openssl-${opensslVersion} ];then
-		# 	cd ${openrestyDir} &&  tar -zxvf openssl-${opensslVersion}.tar.gz
+	    # if [ ! -d ${openrestyDir}/libressl-${libresslVersion} ];then
+		# 	cd ${openrestyDir} &&  tar -zxvf libressl-${libresslVersion}.tar.gz
 		# fi
-		# OPTIONS="${OPTIONS} --with-openssl=${openrestyDir}/openssl-${opensslVersion}"
+	    
+	    # OPTIONS="${OPTIONS} --with-cc-opt=-I${openrestyDir}/libressl-${libresslVersion}/libressl/build/include"
+	    # OPTIONS="${OPTIONS} --with-cc-opt=-I${openrestyDir}/libressl-${libresslVersion}/libressl/build/lib"
 	fi
 
 	# br
@@ -138,6 +144,7 @@ Install_openresty()
 	OPTIONS="${OPTIONS} --with-pcre-jit"
 	OPTIONS="${OPTIONS} --with-http_gzip_static_module"
 
+	#zstd
 	if [ ! -d ${openrestyDir}/zstd-nginx-module ];then
 		cd ${openrestyDir} && wget -O $openrestyDir/zstd-nginx-module.tar.gz https://github.com/tokers/zstd-nginx-module/archive/refs/heads/master.tar.gz
 		cd ${openrestyDir} && tar -zxvf zstd-nginx-module.tar.gz
@@ -147,9 +154,9 @@ Install_openresty()
 			OPTIONS="${OPTIONS} --add-module=${openrestyDir}/zstd-nginx-module-master"
 		fi
 	fi
+	
+	
 
-
-	# --with-openssl=$serverPath/source/lib/openssl-1.0.2q
 	cd ${openrestyDir}/openresty-${VERSION} && ./configure \
 	--prefix=$serverPath/openresty \
 	$OPTIONS \
@@ -171,6 +178,7 @@ Install_openresty()
 		make -j${cpuCore} && make install && make clean
 	fi
 
+
     if [ -d ${openrestyDir}/pcre-${pcreVersion} ];then
     	rm -rf ${openrestyDir}/pcre-${pcreVersion}
     fi
@@ -186,12 +194,20 @@ Install_openresty()
     if [ -d $openrestyDir/openresty-${VERSION} ];then
 		rm -rf $openrestyDir/openresty-${VERSION}
 	fi
-	echo '安装完成'
+
+	if [ -d $openrestyDir/zstd-nginx-module-master ];then
+		rm -rf $openrestyDir/zstd-nginx-module-master
+	fi
+
+	# if [ -d $openrestyDir/ngx_brotli ];then
+	# 	rm -rf $openrestyDir/ngx_brotli
+	# fi
+	echo 'Installation of Openresty completed'
 }
 
 Uninstall_openresty()
 {
-	echo '卸载完成'
+	echo 'Uninstalling Openresty completed'
 }
 
 action=$1

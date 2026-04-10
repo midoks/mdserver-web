@@ -24,6 +24,7 @@ from flask import Response
 from flask import Flask, abort, current_app, session, url_for
 from flask import Blueprint, render_template
 from flask import render_template_string
+from flask_compress import Compress
 
 from flask_socketio import SocketIO, emit, send
 
@@ -44,14 +45,24 @@ setup.init()
 
 app = Flask(__name__, template_folder='templates/default')
 
+
+# curl --compressed -I "http://127.0.0.1:44010/" -H "Accept-Encoding: br" --write-out "%{json}"
+app.config["COMPRESS_ALGORITHM"] = ["br", "zstd", "gzip", "deflate"]
+app.config["COMPRESS_LEVEL"] = 9  # 最高压缩级别
+app.config["COMPRESS_MIN_SIZE"] = 500  # 最小压缩大小
+Compress(app)
+
 # 缓存配置
 cache = Cache(config={'CACHE_TYPE': 'simple'})
 cache.init_app(app, config={'CACHE_TYPE': 'simple'})
 
 # 静态文件配置
-from whitenoise import WhiteNoise
-app.wsgi_app = WhiteNoise(app.wsgi_app, root="../web/static/", prefix="static/", max_age=604800)
+app.static_folder = "../static"
+app.static_url_path = "/static"
 app.jinja_env.trim_blocks = True
+
+# from whitenoise import WhiteNoise
+# app.wsgi_app = WhiteNoise(app.wsgi_app, root="../web/static/", prefix="static/", max_age=604800)
 
 # session配置
 # app.secret_key = uuid.UUID(int=uuid.getnode()).hex[-12:]
@@ -161,7 +172,8 @@ def inject_global_variables():
 #                     ping_interval=25, ping_timeout=120)
 socketio = SocketIO(logger=False,
     engineio_logger=False,
-    cors_allowed_origins="*")
+    cors_allowed_origins="*",
+    async_mode='threading')
 socketio.init_app(app)
 
 @socketio.on('webssh_websocketio')

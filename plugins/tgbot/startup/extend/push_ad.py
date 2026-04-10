@@ -47,6 +47,10 @@ def send_msg(bot, tag='ad', trigger_time=300):
     keyboard = [
         [
             types.InlineKeyboardButton(
+                text="海内外实名KYC-执照代付✅域名", url='https://t.me/kuadugongzuoshi')
+        ],
+        [
+            types.InlineKeyboardButton(
                 text="高价收一切流量 @caifutong555", url='https://t.me/caifutong555')
         ],
         [

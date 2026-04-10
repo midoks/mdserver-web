@@ -46,3 +46,25 @@
     z-index:1;
     background-color:white;
 }
+
+.divtable {
+    overflow: auto;
+    /*border: 1px solid #ddd;*/
+}
+
+.divtable table {
+    margin-bottom: 0;
+}
+
+.divtable table thead th {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.divtable table tbody td {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 200px;
+}

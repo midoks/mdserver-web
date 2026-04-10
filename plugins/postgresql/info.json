@@ -9,7 +9,7 @@
 	"coexist": false,
 	"install_pre_inspection":true,
 	"uninstall_pre_inspection":true,
-	"versions":["14","15","16","17"],
+	"versions":["14","15","16","17","18"],
 	"shell":"install.sh",
 	"checks":"server/postgresql",
 	"path":"server/postgresql",

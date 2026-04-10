@@ -376,6 +376,8 @@ mw_install(){
 
     mw_common_proxy
     echo "bash <(curl -fsSL "${HTTP_PREFIX}raw.githubusercontent.com/midoks/mdserver-web/master/scripts/install.sh")"
+    bash <(curl -fsSL "${HTTP_PREFIX}raw.githubusercontent.com/midoks/mdserver-web/master/scripts/update.sh")
+    mw_clean_lib
     bash <(curl -fsSL "${HTTP_PREFIX}raw.githubusercontent.com/midoks/mdserver-web/master/scripts/install.sh")
 }
 
@@ -400,8 +402,21 @@ mw_update_dev()
 
     mw_common_proxy
     echo "bash <(curl -fsSL "${HTTP_PREFIX}raw.githubusercontent.com/midoks/mdserver-web/dev/scripts/update_dev.sh")"
+    mw_clean_lib
     bash <(curl -fsSL "${HTTP_PREFIX}raw.githubusercontent.com/midoks/mdserver-web/dev/scripts/update_dev.sh")
-    
+    cd ${PANEL_DIR}
+}
+
+mw_dev()
+{
+    if [ -f ${PANEL_DIR}/task.py ];then
+        echo "与后续版本差异太大,不再提供更新"
+        exit 0
+    fi
+
+    mw_common_proxy
+    echo "bash <(curl -fsSL "${HTTP_PREFIX}raw.githubusercontent.com/midoks/mdserver-web/dev/scripts/update_dev.sh")"
+    bash <(curl -fsSL "${HTTP_PREFIX}raw.githubusercontent.com/midoks/mdserver-web/dev/scripts/update_dev.sh")
     cd ${PANEL_DIR}
 }
 
@@ -472,7 +487,7 @@ mw_debug(){
         cd ${PANEL_DIR}/web
     fi
     # gunicorn -b :$port -k geventwebsocket.gunicorn.workers.GeventWebSocketWorker -w 1  app:app
-    gunicorn -b :$port -k eventlet -w 1  app:app
+    gunicorn -b :$port -k gevent -w 1  app:app
 }
 
 mw_connect_mysql(){
@@ -757,7 +772,7 @@ case "$1" in
     'open') mw_open;;
     'install') mw_install;;
     'update') mw_update;;
-    'dev') mw_update_dev;;
+    'dev') mw_dev;;
     'update_dev') mw_update_dev;;
     'install_app') mw_install_app;;
     'close_admin_path') mw_close_admin_path;;

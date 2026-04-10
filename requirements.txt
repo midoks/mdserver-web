@@ -12,7 +12,7 @@ flask-caching>=1.10.1
 cache==1.0.3
 gevent>=22.10.2
 gevent-websocket==0.10.1
-eventlet>=0.24.1
+
 psutil==5.9.1
 chardet==3.0.4
 SQLAlchemy>=1.4.54
@@ -20,7 +20,7 @@ Flask-SQLAlchemy>=2.5.1
 #Flask-Migrate==4.*
 #Flask-Security-Too==5.5.*; python_version >= '3.10'
 #Flask-Security-Too==5.4.*; python_version <= '3.9'
-pyOpenSSL==23.2.0
+pyOpenSSL==26.0.0
 cryptography>=40.0.2
 configparser==5.2.0
 python-engineio>=4.3.2
@@ -35,7 +35,7 @@ redis
 pillow
 Jinja2>=2.11.2
 PyMySQL>=1.0.2
-whitenoise==5.3.0
+whitenoise>5.3.0
 tldextract
 pyotp
 pytz
@@ -46,3 +46,7 @@ pyyaml
 croniter
 bcrypt
 packaging
+Flask-Compress
+brotli
+zstd
+zstandard
