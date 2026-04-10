@@ -1,5 +1,10 @@
 body.mw-login {
-    background: linear-gradient(135deg, var(--mw-bg, #f6f6fa) 0%, var(--mw-surface-container, #eef2ff) 100%);
+    background-color: var(--mw-bg, #f6f6fa);
+    background-image: var(--mw-app-background-overlay, linear-gradient(180deg, rgba(246, 246, 250, 0.78) 0%, rgba(246, 246, 250, 0.94) 100%)), var(--mw-app-background-image, none);
+    background-size: auto, cover;
+    background-position: center, center;
+    background-repeat: no-repeat, no-repeat;
+    background-attachment: fixed, fixed;
     font-family: "Inter", "PingFang SC", "Microsoft YaHei", sans-serif;
     min-height: 100vh;
     margin: 0;
@@ -20,14 +25,15 @@ input {
 
 .mw-login-card {
     width: min(420px, 100%);
-    background: var(--mw-surface, #ffffff);
+    background: color-mix(in srgb, var(--mw-surface, #ffffff) 88%, transparent);
     border-radius: 24px;
     padding: 32px;
-    box-shadow: 0 20px 40px rgba(15, 23, 42, 0.12);
-    border: 1px solid var(--mw-border, #e5e7eb);
+    box-shadow: 0 20px 48px rgba(15, 23, 42, 0.18);
+    border: 1px solid color-mix(in srgb, var(--mw-border, #e5e7eb) 70%, transparent);
     display: flex;
     flex-direction: column;
     gap: 24px;
+    backdrop-filter: blur(14px);
 }
 
 .mw-login-brand {
@@ -74,13 +80,13 @@ input {
     padding: 12px 14px;
     font-size: 14px;
     background: var(--mw-surface, #ffffff);
-    color: inherit;
+    color: var(--mw-text, #1f1f1f);
     transition: border 0.2s ease, box-shadow 0.2s ease, background 0.2s ease;
 }
 
 .mw-input:focus {
     border-color: var(--mw-primary, #6750a4);
-    box-shadow: 0 0 0 4px rgba(103, 80, 164, 0.15);
+    box-shadow: 0 0 0 4px color-mix(in srgb, var(--mw-primary, #6750a4) 18%, transparent);
     outline: none;
 }
 
@@ -114,6 +120,15 @@ input {
 .Validform_checktip {
     color: var(--mw-muted, #94a3b8);
     font-size: 12px;
+}
+
+body.mw-login .mw-login-submit::part(button) {
+    border-radius: 14px;
+}
+
+body.mw-login mdui-button.mw-login-submit::part(button),
+body.mw-login mdui-button.mw-login-link::part(button) {
+    --mdui-color-primary: var(--mw-primary, #6750a4);
 }
 
 @media (max-width: 640px) {

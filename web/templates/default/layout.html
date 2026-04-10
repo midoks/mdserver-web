@@ -8,8 +8,71 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>{{data['title']}}</title>
 <link rel="shortcut icon" href="/static/favicon.ico" type="image/x-icon" />
-<link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
-<link href="https://unpkg.com/mdui@2.0.0/mdui.css" rel="stylesheet">
+<script type="text/javascript">
+(function () {
+    function hexToRgbTriplet(color) {
+        if (!color) {
+            return null;
+        }
+
+        var value = String(color).trim().replace(/^#/, '');
+        if (value.length === 3) {
+            value = value.split('').map(function (ch) {
+                return ch + ch;
+            }).join('');
+        }
+
+        if (value.length !== 6) {
+            return null;
+        }
+
+        var red = parseInt(value.slice(0, 2), 16);
+        var green = parseInt(value.slice(2, 4), 16);
+        var blue = parseInt(value.slice(4, 6), 16);
+        if (isNaN(red) || isNaN(green) || isNaN(blue)) {
+            return null;
+        }
+
+        return red + ', ' + green + ', ' + blue;
+    }
+
+    try {
+        var root = document.documentElement;
+        var mode = window.localStorage.getItem('mw-theme-mode');
+        if (mode !== 'light' && mode !== 'dark' && mode !== 'auto') {
+            mode = 'auto';
+        }
+        root.classList.remove('mdui-theme-light', 'mdui-theme-dark', 'mdui-theme-auto');
+        root.classList.add('mdui-theme-' + mode);
+
+        var color = window.localStorage.getItem('mw-color-scheme');
+        if (color) {
+            root.style.setProperty('--mw-theme-primary', color);
+            var colorRgb = hexToRgbTriplet(color);
+            if (colorRgb) {
+                root.style.setProperty('--mw-theme-primary-rgb', colorRgb);
+            }
+        }
+
+        var background = window.localStorage.getItem('mw-theme-background');
+        if (background) {
+            root.style.setProperty('--mw-app-background-image', background);
+        }
+
+        var backgroundMode = window.localStorage.getItem('mw-theme-background-mode');
+        if (backgroundMode !== 'plain') {
+            backgroundMode = 'default';
+        }
+        if (backgroundMode === 'plain') {
+            root.style.setProperty('--mw-app-background-overlay', 'none');
+        } else {
+            root.style.removeProperty('--mw-app-background-overlay');
+        }
+    } catch (error) {}
+})();
+</script>
+<link href="/static/css/material-icons.css?v={{config.version}}" rel="stylesheet">
+<link href="/static/vendor/mdui/mdui.css?v={{config.version}}" rel="stylesheet">
 <link href="/static/bootstrap-3.3.5/css/bootstrap.min.css?v={{config.version}}" rel="stylesheet">
 <link href="/static/css/site.css?v={{config.version}}" rel="stylesheet">
 <link href="/static/css/mdui2-theme.css?v={{config.version}}" rel="stylesheet">
@@ -80,6 +143,9 @@
                             <a id="memuAsetting" class="mw-topbar-item" href="/setting/index" title="面板设置" aria-label="面板设置">
                                 <span class="material-icons">settings</span>
                             </a>
+                            <button class="mw-topbar-item" type="button" title="APP应用管理" aria-label="APP应用管理" onclick="if (window.appPage) { appPage(); } else { window.location.href = '/setting/index'; }">
+                                <span class="material-icons">key</span>
+                            </button>
                             <button class="mw-topbar-item" onclick="bindPanel(0,'b')" aria-label="添加面板" type="button">
                                 <span class="material-icons">add</span>
                             </button>
@@ -123,6 +189,7 @@
             <script src="/static/js/jquery.dragsort-0.5.2.min.js"></script>
             <script src="/static/js/jquery-qrcode-0.18.0.min.js?v={{config.version}}"></script>
             <script src="/static/js/xm-select.js"></script>
+            <script src="/static/app/app.js?v={{config.version}}"></script>
             
             {% block content %}{% endblock %}
             </div>
@@ -192,7 +259,7 @@ if (thisPath.indexOf('?')>-1){
     }
 }
 </script>
-<script src="https://unpkg.com/mdui@2.0.0/mdui.global.js"></script>
+<script src="/static/vendor/mdui/mdui.global.js?v={{config.version}}"></script>
 <script src="/static/app/theme.js?v={{config.version}}"></script>
 <script type="text/javascript">
     if (window.MWTheme && typeof window.MWTheme.init === 'function') {

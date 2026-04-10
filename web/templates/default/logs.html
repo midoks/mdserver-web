@@ -1,92 +1,18 @@
 {% extends "layout.html" %}
 {% block content %}
 
-<style type="text/css">
-#operationLog thead th:nth-child(1),
-#operationLog tbody tr td:nth-child(1){width:100px;}
-#operationLog thead th:nth-child(2),
-#operationLog tbody tr td:nth-child(2){width:130px;}
-#operationLog thead th:nth-child(4),
-#operationLog tbody tr td:nth-child(4){width:150px;}
-
-
-.logAuditContent {
-    padding: 0 0 0 15px;
-    margin-left: 15px;
-    width: 100%;
-    flex: 1;
-    border-left: 1px solid #ececec;
-}
-
-.tootls_group .logs_search .search_input {
-    height: 30px;
-    line-height: 30px;
-    border-radius: 2px;
-    border: 1px solid #ccc;
-    outline: none;
-    padding-left: 8px;
-    vertical-align: top;
-    width: 230px;
-}
-
-.tootls_group .logs_search .glyphicon-search {
-    height: 28px;
-    line-height: 28px;
-    padding: 0 10px;
-    color: #888;
-    position: absolute;
-    right: 0;
-    font-size: 14px;
-    cursor: pointer;
-}
-
-#logAudit .tootls_group {
-    justify-content: space-between;
-}
-
-#logAudit .tootls_group, #panelRun .tootls_group.tools_bottom {
-    display: flex;
-    flex-wrap: wrap;
-    height: auto;
-    line-height: inherit;
-}
-
-.logAuditTabContent {
-    display: flex;
-    height: 100%;
-}
-
-.logAuditTabContent .logAuditTab {
-    border: 1px solid #ececec;
-    overflow: auto;
-}
-
-.logAuditTabContent .logAuditTab .logAuditItem {
-    height: 35px;
-    line-height: 35px;
-    padding: 0 10px;
-    border-bottom: 1px solid #ececec;
-    cursor: pointer;
-    overflow: hidden;
-}
-
-.logAuditTabContent .logAuditTab .logAuditItem:hover, .logAuditTabContent .logAuditTab .logAuditItem.active {
-    background-color: #f2f2f2;
-}
-
-#logAuditTable thead th:nth-child(1),
-#logAuditTable tbody tr td:nth-child(1){width:;}
-#logAuditTable thead th:nth-child(2),
-#logAuditTable tbody tr td:nth-child(2){width:;}
-#logAuditTable thead th:nth-child(3),
-#logAuditTable tbody tr td:nth-child(3){width:;}
-#logAuditTable thead th:nth-child(4),
-#logAuditTable tbody tr td:nth-child(4){width:300px;}
-</style>
-
-<div class="main-content" style="min-height: 389px;">
+<div class="main-content mw-dashboard mw-log-page" style="min-height: 389px;">
+	<mdui-card class="mw-card mw-page-header">
+		<div class="mw-page-left">
+			<div class="mw-page-title">日志中心</div>
+			<div class="mw-page-sub">面板日志与日志审计分开查看，便于回溯操作和检查系统行为。</div>
+		</div>
+		<div class="mw-page-actions">
+			<span class="mw-version">操作日志 / 登录审计 / 事件回放</span>
+		</div>
+	</mdui-card>
 	<div class="container-fluid" style="padding-bottom: 50px;">
-		<div id="cutTab" class="pos-box bgw mtb15" style="height:45px">
+		<div id="cutTab" class="pos-box bgw mtb15">
 			<div class="tab-list">
 				<div class="tabs-item active" data-name="panelLogs">面板日志</div>
 				<div class="tabs-item" data-name="logAudit">日志审计</div>
@@ -111,7 +37,7 @@
 					</div>
 					<div class="divtable mtb10">
 						<table class="table table-hover">
-							<thead style="position: relative;z-index: 1;"><tr>
+							<thead><tr>
 								<th><span>编号</span></th>
 								<th><span>操作类型</span></th>
 								<th><span>详情</span></th>
@@ -152,7 +78,7 @@
 							</div>
 							<div class="divtable mtb10" style="max-height: 83px;">
 								<table class="table table-hover">
-									<thead style="position: relative;z-index: 1;">
+									<thead>
 										<tr>
 											<th><span data-index="0"><span>用户</span></span></th>
 											<th><span data-index="1"><span>来源</span></span></th>
@@ -177,7 +103,7 @@
 							</div>
 						</div>
 						<div id="logAuditPages" class="page" style="display: flex; justify-content: flex-end;"></div>
-						<div id="logAuditPre" style="display: none;"><pre style="height: 188px; background-color: rgb(51, 51, 51); color: rgb(255, 255, 255); overflow-x: hidden; overflow-wrap: break-word; white-space: pre-wrap;"><code></code></pre></div>
+						<div id="logAuditPre" style="display: none;"><pre><code></code></pre></div>
 					</div>
 				</div>
 			</div>

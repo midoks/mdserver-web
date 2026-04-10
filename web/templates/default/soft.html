@@ -2,7 +2,17 @@
 
 {% block content %}
 
-<div class="main-content">
+<div class="main-content mw-dashboard mw-soft-page">
+	<mdui-card class="mw-card mw-page-header">
+		<div class="mw-page-left">
+			<div class="mw-page-title">软件管理</div>
+			<div class="mw-page-sub">浏览插件、安装/卸载、切换首页展示状态，软件中心与面板功能保持统一。</div>
+		</div>
+		<div class="mw-page-actions">
+			<span class="mw-version">支持分类切换和关键词搜索</span>
+			<mdui-button variant="filled" onclick="importPluginOpen()" class="mw-link-button">添加插件</mdui-button>
+		</div>
+	</mdui-card>
 		<div class="container-fluid" style="padding-bottom:54px">
 			<div class="pos-box bgw mtb15">
 				<div class="position f14 c9 pull-left">
@@ -22,7 +32,6 @@
 						<div class="menu-sub softtype"></div>
 
 						<input type="file" style="display:none;" accept=".zip,.tar.gz" id="update_zip" multiple="multiple">
-						<button class="btn btn-default btn-sm" onclick="importPluginOpen()" title="添加插件" style="position:absolute;top:12px;right:15px">添加插件</button>
 						<div id="updata_pro_info"></div>
 						<table class="table table-hover" width="100%" cellspacing="0" cellpadding="0" border="0">
 							<thead>
@@ -45,8 +54,7 @@
 			</div>
 		</div>
 	</div>
-</div>
-<script type="text/javascript" src="/static/js/jquery.dragsort-0.5.2.min.js?v={{config.version}}"></script>
+	<script type="text/javascript" src="/static/js/jquery.dragsort-0.5.2.min.js?v={{config.version}}"></script>
 <script type="text/javascript" src="/static/laydate/laydate.js?v={{config.version}}"></script>
 <script type="text/javascript" src="/static/app/soft.js?v={{config.version}}"></script>
 <script>

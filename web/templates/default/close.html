@@ -1,13 +1,98 @@
 <!DOCTYPE html>
-<html>
+<html lang="zh">
 <head>
     <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>抱歉,管理员已关闭面板</title>
+    <link rel="stylesheet" href="/static/css/material-icons.css?v={{config.version}}">
+    <link rel="stylesheet" href="/static/vendor/mdui/mdui.css?v={{config.version}}">
+    <link rel="stylesheet" href="/static/css/mdui2-theme.css?v={{config.version}}">
+    <script type="text/javascript">
+    (function () {
+        function hexToRgbTriplet(color) {
+            if (!color) {
+                return null;
+            }
+            var value = String(color).trim().replace(/^#/, '');
+            if (value.length === 3) {
+                value = value.split('').map(function (ch) {
+                    return ch + ch;
+                }).join('');
+            }
+            if (value.length !== 6) {
+                return null;
+            }
+            var red = parseInt(value.slice(0, 2), 16);
+            var green = parseInt(value.slice(2, 4), 16);
+            var blue = parseInt(value.slice(4, 6), 16);
+            if (isNaN(red) || isNaN(green) || isNaN(blue)) {
+                return null;
+            }
+            return red + ', ' + green + ', ' + blue;
+        }
+
+        try {
+            var root = document.documentElement;
+            var mode = window.localStorage.getItem('mw-theme-mode');
+            if (mode !== 'light' && mode !== 'dark' && mode !== 'auto') {
+                mode = 'auto';
+            }
+            root.classList.remove('mdui-theme-light', 'mdui-theme-dark', 'mdui-theme-auto');
+            root.classList.add('mdui-theme-' + mode);
+
+            var color = window.localStorage.getItem('mw-color-scheme');
+            if (color) {
+                root.style.setProperty('--mw-theme-primary', color);
+                var colorRgb = hexToRgbTriplet(color);
+                if (colorRgb) {
+                    root.style.setProperty('--mw-theme-primary-rgb', colorRgb);
+                }
+            }
+
+            var background = window.localStorage.getItem('mw-theme-background');
+            if (background) {
+                root.style.setProperty('--mw-app-background-image', background);
+            }
+
+            var backgroundMode = window.localStorage.getItem('mw-theme-background-mode');
+            if (backgroundMode !== 'plain') {
+                backgroundMode = 'default';
+            }
+            if (backgroundMode === 'plain') {
+                root.style.setProperty('--mw-app-background-overlay', 'none');
+            } else {
+                root.style.removeProperty('--mw-app-background-overlay');
+            }
+        } catch (error) {}
+    })();
+    </script>
 </head>
-<body>
-    <h1>开启命令</h1>
-    <p>mw open</p>
-    <hr>
-   <!--  <address>Linux面板<a href="" target="_blank">请求帮助</a></address> -->
+<body class="mw-theme mw-standalone-page">
+    <main class="mw-standalone-shell">
+        <div class="mw-card mw-standalone-card">
+            <div class="mw-standalone-hero">
+                <div class="mw-standalone-icon">
+                    <span class="material-icons">power_settings_new</span>
+                </div>
+                <div>
+                    <h1 class="mw-standalone-title">管理员已关闭面板</h1>
+                    <p class="mw-standalone-copy">当前面板处于关闭状态，只有在执行开启命令后才能继续访问。这通常用于维护、迁移或临时下线。</p>
+                    <div class="mw-standalone-meta">
+                        <span class="mw-standalone-pill">面板关闭中</span>
+                        <span class="mw-standalone-pill">等待管理员开启</span>
+                    </div>
+                </div>
+            </div>
+            <div class="mw-standalone-steps">
+                <div class="mw-standalone-step">
+                    <strong>开启命令</strong>
+                    在 SSH 终端中输入下面命令即可重新开启面板。
+                </div>
+                <pre class="mw-standalone-code">mw open</pre>
+                <div class="mw-standalone-note">如果你不是管理员，请联系面板所有者确认当前维护状态。</div>
+            </div>
+        </div>
+    </main>
 </body>
 </html>
