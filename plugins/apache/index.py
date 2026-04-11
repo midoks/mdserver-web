@@ -226,7 +226,7 @@ def restyOp(method):
     # 启动时,先检查一下配置文件
     check = getServerDir() + "/httpd/bin/httpd -t"
     check_data = mw.execShell(check)
-    if not check_data[1].find('test is successful') > -1:
+    if not check_data[1].find('Syntax OK') > -1:
         return check_data[1]
 
     current_os = mw.getOs()
@@ -268,7 +268,7 @@ def restyOp_restart():
     # 启动时,先检查一下配置文件
     check = getServerDir() + "/httpd/bin/httpd -t"
     check_data = mw.execShell(check)
-    if not check_data[1].find('test is successful') > -1:
+    if not check_data[1].find('Syntax OK') > -1:
         return 'ERROR: 配置出错<br><a style="color:red;">' + check_data[1].replace("\n", '<br>') + '</a>'
 
     if not mw.isAppleSystem():
@@ -567,7 +567,7 @@ def installPreInspection():
 
 if __name__ == "__main__":
 
-    version = '1.27.1'
+    version = '2.4'
     version_pl = getServerDir() + "/version.pl"
     if os.path.exists(version_pl):
         version = mw.readFile(version_pl)
