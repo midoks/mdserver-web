@@ -304,9 +304,13 @@ def initdUinstall():
     mw.execShell('systemctl disable httpd')
     return 'ok'
 
-def getNgxStatusPort():
-    ngx_status_file = mw.getServerDir() + '/web_conf/nginx/vhost/0.nginx_status.conf'
-    content = mw.readFile(ngx_status_file)
+def getHttpdStatusPort():
+    conf = mw.getServerDir() + '/httpd/conf/httpd.conf'
+    content = mw.readFile(conf)
+
+    print(content)
+
+
     rep = r'listen\s*(.*);'
     tmp = re.search(rep, content)
     port =  tmp.groups()[0].strip()
@@ -318,11 +322,13 @@ def runInfo():
     if op_status == 'stop':
         return mw.returnJson(False, "未启动!")
 
-    port = getNgxStatusPort()
+    port = getHttpdStatusPort()
     # 取Openresty负载状态
     try:
-        url = 'http://127.0.0.1:%s/nginx_status' % port
+        url = 'http://127.0.0.1:%s/server-status?auto' % port
         result = mw.httpGet(url, timeout=3)
+
+        print(result)
         tmp = result.split()
         data = {}
         data['active'] = tmp[2]
@@ -335,7 +341,7 @@ def runInfo():
         return mw.getJson(data)
     except Exception as e:
         try:
-            url = 'http://' + mw.getHostAddr() + ':%s/nginx_status' % port
+            url = 'http://' + mw.getHostAddr() + ':%s/server-status?auto' % port
             result = mw.httpGet(url)
             tmp = result.split()
             data = {}
