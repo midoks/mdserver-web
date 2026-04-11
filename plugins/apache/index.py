@@ -243,7 +243,7 @@ def start():
 def stop():
     r = restyOp('stop')
 
-    mw.execShell("ps -ef|grep httpd | grep -v grep | awk '{print $2}'|xargs kill")
+    mw.execShell("ps -ef|grep httpd | grep -v grep | awk '{print $2}'|xargs -r kill")
     return r
 
 
