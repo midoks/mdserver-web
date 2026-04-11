@@ -13,11 +13,10 @@
 
 
 PATH=/usr/local/sbin:/usr/local/bin:/sbin:/bin:/usr/sbin:/usr/bin:/opt/homebrew/bin
-NAME=apache
 # Apache 可执行文件的路径
-DAEMON={$SERVER_PATH}/httpd/bin/httpd
+DAEMON={$SERVER_PATH}/apache/httpd/bin/httpd
 # 进程的 PID 文件路径
-PIDFILE={$SERVER_PATH}/httpd/logs/httpd.pid
+PIDFILE={$SERVER_PATH}/apache/httpd/logs/httpd.pid
 
 # 根据传入的参数执行不同操作
 case "$1" in
