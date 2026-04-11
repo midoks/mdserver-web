@@ -85,8 +85,6 @@ Install_App()
 	# 安装 APR-util
 	if [ ! -d ${serverPath}/apache/apr-util ];then
 		cd ${apacheDir} && tar -jxf apr-util-${APR_UTIL_VERSION}.tar.bz2
-		echo "${apacheDir} && tar -jxf apr-util-${APR_UTIL_VERSION}.tar.bz2"
-		echo "cd ${apacheDir}/apr-util-${APR_UTIL_VERSION} && ./configure --prefix=${serverPath}/apache/apr-util --with-apr=${serverPath}/apache/apr"
 		cd ${apacheDir}/apr-util-${APR_UTIL_VERSION} && ./configure --prefix=${serverPath}/apache/apr-util --with-apr=${serverPath}/apache/apr
 		if [ "$?" == "0" ];then
 			make -j${cpuCore} && make install
@@ -111,24 +109,13 @@ Install_App()
 	
 
 	# 检查 APR 和 APR-util 可执行文件
-	APR_CONFIG=$(find ${serverPath}/apache/apr -name "apr-config" | head -1)
-	APU_CONFIG=$(find ${serverPath}/apache/apr-util -name "apu-config" | head -1)
+	APR_CONFIG=$(find ${serverPath}/apache/apr -name "apr-1-config" | head -1)
+	APU_CONFIG=$(find ${serverPath}/apache/apr-util -name "apu-1-config" | head -1)
 
-	if [ -z "$APR_CONFIG" ];then
-		echo "APR config not found"
-		exit 1
-	fi
-
-	if [ -z "$APU_CONFIG" ];then
-		echo "APR-util config not found"
-		exit 1
-	fi
-
-	echo "Using APR config: $APR_CONFIG"
-	echo "Using APR-util config: $APU_CONFIG"
-
-	OPTIONS="${OPTIONS}--with-apr=$APR_CONFIG"
+	OPTIONS="${OPTIONS} --with-apr=$APR_CONFIG"
 	OPTIONS="${OPTIONS} --with-apr-util=$APU_CONFIG"
+
+	echo "cd ${apacheDir}/httpd-${VERSION} && ./configure --prefix=$serverPath/apache $OPTIONS"
 
 	cd ${apacheDir}/httpd-${VERSION} && ./configure \
 	--prefix=$serverPath/apache \
