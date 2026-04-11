@@ -111,24 +111,24 @@ Install_App()
 	
 
 	# 检查 APR 和 APR-util 可执行文件
-APR_CONFIG=$(find ${serverPath}/apache/apr -name "apr-config" | head -1)
-APU_CONFIG=$(find ${serverPath}/apache/apr-util -name "apu-config" | head -1)
+	APR_CONFIG=$(find ${serverPath}/apache/apr -name "apr-config" | head -1)
+	APU_CONFIG=$(find ${serverPath}/apache/apr-util -name "apu-config" | head -1)
 
-if [ -z "$APR_CONFIG" ];then
-	echo "APR config not found"
-	exit 1
-fi
+	if [ -z "$APR_CONFIG" ];then
+		echo "APR config not found"
+		exit 1
+	fi
 
-if [ -z "$APU_CONFIG" ];then
-	echo "APR-util config not found"
-	exit 1
-fi
+	if [ -z "$APU_CONFIG" ];then
+		echo "APR-util config not found"
+		exit 1
+	fi
 
-echo "Using APR config: $APR_CONFIG"
-echo "Using APR-util config: $APU_CONFIG"
+	echo "Using APR config: $APR_CONFIG"
+	echo "Using APR-util config: $APU_CONFIG"
 
-OPTIONS="${OPTIONS}--with-apr=$APR_CONFIG"
-OPTIONS="${OPTIONS} --with-apr-util=$APU_CONFIG"
+	OPTIONS="${OPTIONS}--with-apr=$APR_CONFIG"
+	OPTIONS="${OPTIONS} --with-apr-util=$APU_CONFIG"
 
 	cd ${apacheDir}/httpd-${VERSION} && ./configure \
 	--prefix=$serverPath/apache \
