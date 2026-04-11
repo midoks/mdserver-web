@@ -310,7 +310,7 @@ def initdStatus():
         if os.path.exists(initd_bin):
             return 'ok'
 
-    shell_cmd = 'systemctl status '+getPluginName()+' | grep loaded | grep "enabled;"'
+    shell_cmd = 'systemctl status httpd | grep loaded | grep "enabled;"'
     data = mw.execShell(shell_cmd)
     if data[0] == '':
         return 'fail'
@@ -329,10 +329,10 @@ def initdInstall():
         initd_bin = getInitDFile()
         shutil.copyfile(source_bin, initd_bin)
         mw.execShell('chmod +x ' + initd_bin)
-        mw.execShell('sysrc ' + getPluginName() + '_enable="YES"')
+        mw.execShell('sysrc httpd_enable="YES"')
         return 'ok'
 
-    mw.execShell('systemctl enable '+getPluginName())
+    mw.execShell('systemctl enable httpd')
     return 'ok'
 
 
@@ -344,10 +344,10 @@ def initdUinstall():
     if current_os.startswith('freebsd'):
         initd_bin = getInitDFile()
         os.remove(initd_bin)
-        mw.execShell('sysrc ' + getPluginName() + '_enable="NO"')
+        mw.execShell('sysrc httpd_enable="NO"')
         return 'ok'
 
-    mw.execShell('systemctl disable '+getPluginName())
+    mw.execShell('systemctl disable httpd')
     return 'ok'
 
 def getNgxStatusPort():
