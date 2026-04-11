@@ -136,6 +136,16 @@ Install_App()
 
 	make -j${cpuCore} && make install && make clean
 
+
+	if [ -d ${apacheDir}/apr-${APR_VERSION} ];then
+    	rm -rf ${apacheDir}/apr-${APR_VERSION}
+    fi
+
+    if [ -d ${apacheDir}/apr-util-${APR_UTIL_VERSION} ];then
+    	rm -rf ${apacheDir}/apr-util-${APR_UTIL_VERSION}
+    fi
+
+
 	echo 'installation of apache completed'
 }
 
