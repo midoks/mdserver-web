@@ -310,7 +310,7 @@ def initdStatus():
         if os.path.exists(initd_bin):
             return 'ok'
 
-    shell_cmd = 'systemctl status apache | grep loaded | grep "enabled;"'
+    shell_cmd = 'systemctl status '+getPluginName()+' | grep loaded | grep "enabled;"'
     data = mw.execShell(shell_cmd)
     if data[0] == '':
         return 'fail'
@@ -332,7 +332,7 @@ def initdInstall():
         mw.execShell('sysrc ' + getPluginName() + '_enable="YES"')
         return 'ok'
 
-    mw.execShell('systemctl enable apache')
+    mw.execShell('systemctl enable '+getPluginName())
     return 'ok'
 
 
@@ -347,7 +347,7 @@ def initdUinstall():
         mw.execShell('sysrc ' + getPluginName() + '_enable="NO"')
         return 'ok'
 
-    mw.execShell('systemctl disable apache')
+    mw.execShell('systemctl disable '+getPluginName())
     return 'ok'
 
 def getNgxStatusPort():
