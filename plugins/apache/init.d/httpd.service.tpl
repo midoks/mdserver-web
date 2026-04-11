@@ -1,13 +1,16 @@
 [Unit]
-Description=OpenResty is a dynamic web platform based on NGINX and LuaJIT.
+Description=Apache Web Server
 After=network.target
 
 [Service]
-Type=forking
-ExecStart={$SERVER_PATH}/apache/bin/httpd -c {$SERVER_PATH}/apache/nginx/conf/nginx.conf
-ExecStop={$SERVER_PATH}/apache/bin/httpd -s stop
-ExecReload={$SERVER_PATH}/apache/bin/httpd -s reload
-KillMode=process
+Type=forking 
+PIDFile={$SERVER_PATH}/apache/httpd/logs/httpd.pid
+ExecStart={$SERVER_PATH}/apache/httpd/bin/apachectl start
+ExecReload={$SERVER_PATH}/apache/httpd/bin/apachectl graceful
+ExecStop={$SERVER_PATH}/apache/httpd/bin/apachectl stop
+PrivateTmp=true
+User=apache
+Group=apache
 Restart=on-failure
 
 [Install]
