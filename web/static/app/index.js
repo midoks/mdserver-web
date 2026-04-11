@@ -933,29 +933,47 @@ function formatVipRemain(seconds) {
 
 function showVipInfo() {
     var expireAt = new Date('2038-01-19T03:14:07+08:00').getTime();
-    var content = '<div class="pd20" style="line-height:1.9;">' +
-        '<div style="font-size:18px;font-weight:600;color:#20a53a;">PowerLinux Pro Max · 永久尊享</div>' +
-        '<div style="margin-top:8px;color:#666;">您已经是永久VIP，感谢长期支持。</div>' +
-        '<hr style="margin:12px 0;">' +
-        '<div><b>会员到期时间：</b>2038年1月19日03:14:07</div>' +
-        '<div><b>剩余时长：</b><span id="vipRemainTime">计算中...</span></div>' +
-        '<hr style="margin:12px 0;">' +
-        '<div><b>会员权益</b></div>' +
-        '<ul style="margin:8px 0 0 18px;padding:0;">' +
-        '<li>无限期面板更新（优先体验新版能力）</li>' +
-        '<li>高级监控与可视化页面持续增强</li>' +
-        '<li>社区身份标识与优先反馈通道</li>' +
-        '<li>长期稳定版本与性能优化补丁</li>' +
-        '</ul>' +
-        '<div style="margin-top:10px;color:#999;font-size:12px;">提示：剩余时长将实时刷新显示。</div>' +
+    var content = '' +
+        '<div class="mw-vip-modal">' +
+            '<section class="mw-vip-hero">' +
+                '<div class="mw-vip-hero-mark"><span class="material-icons">workspace_premium</span></div>' +
+                '<div class="mw-vip-hero-copy">' +
+                    '<div class="mw-vip-kicker">会员中心</div>' +
+                    '<h2 class="mw-vip-title">PowerLinux Pro Max</h2>' +
+                    '<p class="mw-vip-subtitle">永久尊享 · 持续更新 · 优先支持</p>' +
+                '</div>' +
+                '<span class="mw-vip-badge">永久有效</span>' +
+            '</section>' +
+            '<section class="mw-vip-grid">' +
+                '<article class="mw-vip-card">' +
+                    '<div class="mw-vip-card-label">会员到期时间</div>' +
+                    '<div class="mw-vip-card-value">2038年1月19日03:14:07</div>' +
+                '</article>' +
+                '<article class="mw-vip-card">' +
+                    '<div class="mw-vip-card-label">剩余时长</div>' +
+                    '<div class="mw-vip-card-value"><span id="vipRemainTime">计算中...</span></div>' +
+                '</article>' +
+            '</section>' +
+            '<section class="mw-vip-benefits">' +
+                '<div class="mw-vip-section-title">会员权益</div>' +
+                '<div class="mw-vip-section-copy">更稳定的版本节奏，更直接的优先支持，更清晰的身份标识。</div>' +
+                '<ul class="mw-vip-benefit-list">' +
+                    '<li><span class="material-icons">check_circle</span><span>无限期面板更新，优先体验新版能力</span></li>' +
+                    '<li><span class="material-icons">check_circle</span><span>高级监控与可视化页面持续增强</span></li>' +
+                    '<li><span class="material-icons">check_circle</span><span>社区身份标识与优先反馈通道</span></li>' +
+                    '<li><span class="material-icons">check_circle</span><span>长期稳定版本与性能优化补丁</span></li>' +
+                '</ul>' +
+            '</section>' +
+            '<div class="mw-vip-footnote">提示：剩余时长将实时刷新显示。</div>' +
         '</div>';
 
     layer.open({
         type: 1,
-        title: 'Pro Max会员信息',
-        area: ['520px', '430px'],
+        title: false,
+        area: ['680px', '560px'],
         closeBtn: 1,
-        icon: 1,
+        shadeClose: true,
+        skin: 'mw-vip-layer',
         content: content,
         success: function () {
             if (__vipCountdownTimer) {

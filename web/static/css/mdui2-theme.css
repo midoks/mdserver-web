@@ -3747,3 +3747,291 @@ mdui-button::part(button) {
     backdrop-filter: blur(var(--mw-glass-blur));
     -webkit-backdrop-filter: blur(var(--mw-glass-blur));
 }
+
+/* Status overview cards */
+.mw-stat-grid {
+    gap: 18px;
+}
+
+.mw-stat-grid > li {
+    display: grid !important;
+    grid-template-columns: minmax(0, 1fr);
+    grid-template-areas:
+        "top"
+        "progress"
+        "value"
+        "status"
+        "footer";
+    grid-template-rows: minmax(108px, auto) 18px 48px 26px auto;
+    align-items: start;
+    justify-content: stretch;
+    gap: 0;
+    min-height: 320px;
+}
+
+.mw-stat-top {
+    grid-area: top;
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 12px;
+    min-height: 88px;
+}
+
+.mw-stat-label {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    min-width: 0;
+}
+
+.mw-stat-label > div {
+    min-width: 0;
+}
+
+.mw-stat-copy {
+    min-height: 42px;
+    line-height: 1.45;
+    margin-top: 4px;
+}
+
+.mw-stat-chip {
+    flex: 0 0 auto;
+    align-self: flex-start;
+}
+
+.mw-stat-progress {
+    grid-area: progress;
+    margin-top: 10px;
+    width: 100%;
+}
+
+.mw-stat-progress mdui-linear-progress {
+    width: 100%;
+    height: 8px !important;
+    border-radius: 999px;
+    overflow: hidden;
+    --mdui-linear-progress-height: 8px !important;
+}
+
+.mw-stat-progress mdui-linear-progress::part(track),
+.mw-stat-progress mdui-linear-progress::part(indicator) {
+    height: 8px;
+}
+
+.mw-stat-value {
+    grid-area: value;
+    margin-top: 12px;
+    font-size: 34px;
+    font-weight: 800;
+    line-height: 1;
+    letter-spacing: -0.03em;
+}
+
+.mw-stat-status {
+    grid-area: status;
+    margin-top: 10px;
+    color: var(--mw-muted);
+    line-height: 1.45;
+    min-height: 26px;
+}
+
+.mw-stat-footer {
+    grid-area: footer;
+    margin-top: 12px;
+    color: var(--mw-muted);
+    line-height: 1.45;
+    min-height: 22px;
+}
+
+.mw-mem-release-btn {
+    grid-area: footer;
+    justify-self: start;
+    margin-top: 10px;
+}
+
+/* VIP modal */
+.mw-vip-modal {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    padding: 8px 2px 2px;
+    color: var(--mw-text);
+}
+
+.mw-vip-hero {
+    position: relative;
+    overflow: hidden;
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    padding: 20px 22px;
+    border-radius: 22px;
+    border: 1px solid color-mix(in srgb, var(--mw-border) 76%, transparent);
+    background: linear-gradient(135deg, color-mix(in srgb, var(--mw-primary) 12%, var(--mw-surface) 88%) 0%, color-mix(in srgb, var(--mw-surface) 96%, transparent) 62%, color-mix(in srgb, var(--mw-primary) 6%, var(--mw-surface) 94%) 100%);
+    box-shadow: 0 20px 42px rgba(15, 23, 42, 0.10);
+}
+
+.mw-vip-hero::after {
+    content: "";
+    position: absolute;
+    inset: auto -70px -80px auto;
+    width: 200px;
+    height: 200px;
+    border-radius: 50%;
+    background: radial-gradient(circle, color-mix(in srgb, var(--mw-primary) 20%, transparent) 0%, transparent 70%);
+    pointer-events: none;
+}
+
+.mw-vip-hero-mark {
+    width: 64px;
+    height: 64px;
+    border-radius: 20px;
+    display: grid;
+    place-items: center;
+    flex: 0 0 auto;
+    background: var(--mw-primary-soft);
+    color: var(--mw-primary);
+}
+
+.mw-vip-hero-mark .material-icons {
+    font-size: 32px;
+}
+
+.mw-vip-hero-copy {
+    min-width: 0;
+    flex: 1 1 auto;
+}
+
+.mw-vip-kicker {
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--mw-muted);
+}
+
+.mw-vip-title {
+    margin: 4px 0 0;
+    font-size: 30px;
+    line-height: 1.2;
+    font-weight: 800;
+    letter-spacing: -0.03em;
+}
+
+.mw-vip-subtitle {
+    margin: 8px 0 0;
+    font-size: 15px;
+    line-height: 1.6;
+    color: var(--mw-muted);
+}
+
+.mw-vip-badge {
+    align-self: flex-start;
+    padding: 8px 12px;
+    border-radius: 999px;
+    border: 1px solid color-mix(in srgb, var(--mw-primary) 22%, transparent);
+    background: color-mix(in srgb, var(--mw-primary) 12%, var(--mw-surface) 88%);
+    color: var(--mw-primary);
+    font-size: 12px;
+    font-weight: 700;
+    white-space: nowrap;
+}
+
+.mw-vip-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 12px;
+}
+
+.mw-vip-card {
+    padding: 16px 18px;
+    border-radius: 18px;
+    border: 1px solid color-mix(in srgb, var(--mw-border) 76%, transparent);
+    background: color-mix(in srgb, var(--mw-surface) 94%, transparent);
+}
+
+.mw-vip-card-label {
+    font-size: 12px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--mw-muted);
+}
+
+.mw-vip-card-value {
+    margin-top: 8px;
+    font-size: 17px;
+    font-weight: 800;
+    line-height: 1.45;
+    letter-spacing: -0.02em;
+}
+
+.mw-vip-benefits {
+    padding: 18px 20px 20px;
+    border-radius: 22px;
+    border: 1px solid color-mix(in srgb, var(--mw-border) 76%, transparent);
+    background: color-mix(in srgb, var(--mw-surface) 94%, transparent);
+}
+
+.mw-vip-section-title {
+    font-size: 18px;
+    font-weight: 800;
+    line-height: 1.3;
+}
+
+.mw-vip-section-copy {
+    margin-top: 6px;
+    font-size: 13px;
+    line-height: 1.6;
+    color: var(--mw-muted);
+}
+
+.mw-vip-benefit-list {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 10px;
+    list-style: none;
+    margin: 16px 0 0;
+    padding: 0;
+}
+
+.mw-vip-benefit-list li {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    padding: 14px 14px 13px;
+    border-radius: 16px;
+    background: color-mix(in srgb, var(--mw-surface-container) 82%, transparent);
+    border: 1px solid color-mix(in srgb, var(--mw-border) 70%, transparent);
+    line-height: 1.5;
+}
+
+.mw-vip-benefit-list .material-icons {
+    flex: 0 0 auto;
+    margin-top: 1px;
+    font-size: 20px;
+    color: var(--mw-primary);
+}
+
+.mw-vip-footnote {
+    font-size: 12px;
+    line-height: 1.5;
+    color: var(--mw-muted);
+}
+
+@media (max-width: 720px) {
+    .mw-stat-grid > li {
+        min-height: 0;
+        grid-template-rows: minmax(96px, auto) 18px 42px 24px auto;
+    }
+
+    .mw-vip-grid,
+    .mw-vip-benefit-list {
+        grid-template-columns: 1fr;
+    }
+
+    .mw-vip-hero {
+        align-items: flex-start;
+        flex-wrap: wrap;
+    }
+}
