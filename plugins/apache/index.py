@@ -237,12 +237,12 @@ def restyOp(method):
         return data[1]
 
     if current_os.startswith("freebsd"):
-        mw.execShell('service '+getPluginName()+' '+method)
+        mw.execShell('service httpd '+method)
         if data[1] == '':
             return 'ok'
         return data[1]
 
-    data = mw.execShell('systemctl ' + method + ' '+getPluginName())
+    data = mw.execShell('systemctl ' + method + ' httpd')
     if data[1] == '':
         return 'ok'
     return data[1]
