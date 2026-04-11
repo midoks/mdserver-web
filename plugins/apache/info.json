@@ -1,0 +1,18 @@
+{
+	"sort": 0,
+	"title":"apache",
+	"tip":"soft",
+	"name":"apache",
+	"type":"其他插件",
+	"ps":"世界排名第一，快速、可靠并且可通过简单的API扩充",
+	"shell":"install.sh",
+	"install_pre_inspection":true,
+	"checks":"server/apache",
+	"path":"server/apache",
+	"author":"apache",
+	"home":"https://downloads.apache.org/httpd/",
+	"date":"2026-04-11",
+	"pid": "1",
+	"versions": ["2.4"],
+	"updates": ["2.4:66"]
+}
