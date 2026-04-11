@@ -70,12 +70,8 @@ def checkArgs(data, ck=[]):
 
 
 def clearTemp():
-    path_bin = getServerDir() + "/apache/httpd"
+    path_bin = getServerDir() + "/httpd"
     mw.execShell('rm -rf ' + path_bin + '/client_body_temp')
-    mw.execShell('rm -rf ' + path_bin + '/fastcgi_temp')
-    mw.execShell('rm -rf ' + path_bin + '/proxy_temp')
-    mw.execShell('rm -rf ' + path_bin + '/scgi_temp')
-    mw.execShell('rm -rf ' + path_bin + '/uwsgi_temp')
 
 
 def getConf():
@@ -128,48 +124,9 @@ def confReplace():
     content = mw.readFile(getConfTpl())
     content = content.replace('{$SERVER_PATH}', service_path)
 
-    user = 'www'
-    user_group = 'www'
-
-    content = content.replace('{$OS_USER}', user)
-    content = content.replace('{$OS_USER_GROUP}', user_group)
-
-    # ng_conf_md5 = ''
-    # ng_conf_md5_file = getServerDir() + '/nginx_conf.md5'
-    # if not os.path.exists(ng_conf_md5_file):
-    #     ng_conf_md5 = mw.md5(content)
-    #     mw.writeFile(ng_conf_md5_file, ng_conf_md5)
-    # else:
-    #     ng_conf_md5 = mw.writeFile(ng_conf_md5_file).strip()
-
     # 主配置文件
-    nconf = getServerDir() + '/nginx/conf/nginx.conf'
+    nconf = getServerDir() + '/httpd/conf/httpd.conf'
     mw.writeFile(nconf, content)
-
-    # lua配置
-    lua_conf_dir = mw.getServerDir() + '/web_conf/nginx/lua'
-    if not os.path.exists(lua_conf_dir):
-        mw.execShell('mkdir -p ' + lua_conf_dir)
-    # 静态配置
-    php_conf = mw.getServerDir() + '/web_conf/php/conf'
-    if not os.path.exists(php_conf):
-        mw.execShell('mkdir -p ' + php_conf)
-    static_conf = mw.getServerDir() + '/web_conf/php/conf/enable-php-00.conf'
-    if not os.path.exists(static_conf):
-        mw.writeFile(static_conf, 'set $PHP_ENV 0;')
-
-    # vhost
-    vhost_dir = mw.getServerDir() + '/web_conf/nginx/vhost'
-    vhost_tpl_dir = getPluginDir() + '/conf/vhost'
-    if not os.path.exists(vhost_dir):
-        mw.execShell('mkdir -p ' + vhost_dir)
-
-    vhost_list = ['0.websocket.conf', '0.nginx_status.conf']
-    for f in vhost_list:
-        a_conf = vhost_dir + '/' + f
-        a_conf_tpl = vhost_tpl_dir + '/' + f
-        if not os.path.exists(a_conf):
-            mw.writeFile(a_conf, mw.readFile(a_conf_tpl))
 
 
 def initDreplace():
