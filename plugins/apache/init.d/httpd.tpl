@@ -1,118 +1,48 @@
-#! /bin/sh
-# chkconfig: 2345 55 25
-# Description: Startup script for nginx webserver on Debian. Place in /etc/init.d and
-# run 'update-rc.d -f nginx defaults', or use the appropriate command on your
-# distro. For CentOS/Redhat run: 'chkconfig --add openresty'
+#!/bin/bash
+# chkconfig: 345 85 15
+# description: Apache Server
 
 ### BEGIN INIT INFO
-# Provides:          nginx
-# Required-Start:    $all
-# Required-Stop:     $all
+# Provides:          apache
+# Required-Start:    $network
+# Required-Stop:     $network
 # Default-Start:     2 3 4 5
 # Default-Stop:      0 1 6
-# Short-Description: starts the nginx web server
-# Description:       starts nginx using start-stop-daemon
+# Description:       Apache Server
 ### END INIT INFO
 
 
 PATH=/usr/local/sbin:/usr/local/bin:/sbin:/bin:/usr/sbin:/usr/bin:/opt/homebrew/bin
-NAME=nginx
-NGINX_BIN={$SERVER_PATH}/openresty/bin/openresty
-CONFIGFILE={$SERVER_PATH}/openresty/nginx/conf/$NAME.conf
-PIDFILE={$SERVER_PATH}/openresty/nginx/logs/$NAME.pid
+NAME=apache
+# Apache 可执行文件的路径
+DAEMON={$SERVER_PATH}/httpd/bin/httpd
+# 进程的 PID 文件路径
+PIDFILE={$SERVER_PATH}/httpd/logs/httpd.pid
 
+# 根据传入的参数执行不同操作
 case "$1" in
     start)
-        echo -n "Starting $NAME... "
-		if [ -f $PIDFILE ];then
-			mPID=`cat $PIDFILE`
-			isStart=`ps ax | awk '{ print $1 }' | grep -e "^${mPID}$"`
-			if [ "$isStart" != '' ];then
-				echo "$NAME (pid `pidof $NAME`) already running."
-				exit 1
-			fi
-		fi
-
-        $NGINX_BIN -c $CONFIGFILE
-
-        if [ "$?" != 0 ] ; then
-            echo " failed"
-            exit 1
-        else
-            echo " done"
-        fi
+        echo "Starting Apache..."
+        $DAEMON -k start
         ;;
-
     stop)
-        echo -n "Stoping $NAME... "
-		if [ -f $PIDFILE ];then
-			mPID=`cat $PIDFILE`
-			isStart=`ps ax | awk '{ print $1 }' | grep -e "^${mPID}$"`
-			if [ "$isStart" = '' ];then
-				echo "$NAME is not running."
-				exit 1
-			fi
-		else
-			echo "$NAME is not running."
-			exit 1
-        fi
-        $NGINX_BIN -s stop
-
-        if [ "$?" != 0 ] ; then
-            echo " failed. Use force-quit"
-            exit 1
-        else
-            echo " done"
-        fi
-        ;;
-
-    status)
-		if [ -f $PIDFILE ];then
-			mPID=`cat $PIDFILE`
-			isStart=`ps ax | awk '{ print $1 }' | grep -e "^${mPID}$"`
-			if [ "$isStart" != '' ];then
-				echo "$NAME (pid `pidof $NAME`) already running."
-				exit 1
-			else
-				echo "$NAME is stopped"
-				exit 0
-			fi
-		else
-			echo "$NAME is stopped"
-			exit 0
-        fi
+        echo "Stopping Apache..."
+        $DAEMON -k stop
         ;;
     restart)
-        $0 stop
-        sleep 1
-        $0 start
+        echo "Restarting Apache..."
+        $DAEMON -k restart
         ;;
-
-    reload)
-        echo -n "Reload service $NAME... "
-		if [ -f $PIDFILE ];then
-			mPID=`cat $PIDFILE`
-			isStart=`ps ax | awk '{ print $1 }' | grep -e "^${mPID}$"`
-			if [ "$isStart" != '' ];then
-				$NGINX_BIN -s reload
-				echo " done"
-			else
-				echo "$NAME is not running, can't reload."
-				exit 1
-			fi
-		else
-			echo "$NAME is not running, can't reload."
-			exit 1
-		fi
+    status)
+        if [ -f $PIDFILE ]; then
+            echo "Apache is running."
+        else
+            echo "Apache is not running."
+        fi
         ;;
-
-    configtest)
-        echo -n "Test $NAME configure files... "
-        $NGINX_BIN -t
-        ;;
-
     *)
-        echo "Usage: $0 {start|stop|restart|reload|status|configtest}"
+        echo "Usage: $0 {start|stop|restart|status}"
         exit 1
-        ;;
 esac
+
+exit 0

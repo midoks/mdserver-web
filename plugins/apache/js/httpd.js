@@ -1,6 +1,6 @@
-function orPost(method, args, callback){
+function httpPost(method, args, callback){
     var loadT = layer.msg('正在获取...', { icon: 16, time: 0, shade: 0.3 });
-    $.post('/plugins/run', {name:'openresty', func:method, args:JSON.stringify(args)}, function(data) {
+    $.post('/plugins/run', {name:'apache', func:method, args:JSON.stringify(args)}, function(data) {
         layer.close(loadT);
         if (!data.status){
             layer.msg(data.msg,{icon:0,time:2000,shade: [0.3, '#000']});
@@ -21,7 +21,7 @@ function orPluginService(_name, version){
         version = '';
     }
 
-    orPost('status', data, function(data){
+    httpPost('status', data, function(data){
         if (data.data == 'start'){
             orPluginSetService(_name, true, version);
         } else {
@@ -59,7 +59,7 @@ function orPluginOpService(a, b, v,request_callback) {
         case "reload":d = '重载';break;
     }
     layer.confirm( msgTpl('您真的要{1}{2}{3}服务吗？', [d,a,v]), {icon:3,closeBtn: 2}, function() {
-        orPost('get_os',{},function(data){
+        httpPost('get_os',{},function(data){
             var rdata = $.parseJSON(data.data);
             if (!rdata['auth']){
                 layer.prompt({title: '检查到权限不足,需要输入密码!', formType: 1},function(pwd, index){
@@ -113,7 +113,7 @@ function orPluginOpServiceOp(a,b,c,d,a,v,request_callback){
 //查看Nginx负载状态
 function getOpStatus() {
     var loadT = layer.msg('正在处理，请稍后...', { icon: 16, time: 0, shade: 0.3 });
-    $.post('/plugins/run', {name:'openresty', func:'run_info'}, function(data) {
+    $.post('/plugins/run', {name:'apache', func:'run_info'}, function(data) {
         layer.close(loadT); 
         try {
             var rdata = $.parseJSON(data.data);
@@ -140,7 +140,7 @@ function getOpStatus() {
 
 
 function setOpCfg(){
-    orPost('get_cfg', {}, function(data){
+    httpPost('get_cfg', {}, function(data){
         var rdata = $.parseJSON(data.data);
         var rdata = rdata.data;
         // console.log(rdata);
@@ -196,7 +196,7 @@ function submitConf() {
     };
 
     // console.log(data);
-    orPost('set_cfg', data, function(rdata){
+    httpPost('set_cfg', data, function(rdata){
         var rdata = $.parseJSON(rdata.data);
         // console.log(rdata);
         layer.msg(rdata.msg, { icon: rdata.status ? 1 : 2 });
@@ -212,14 +212,14 @@ function otherFunc(){
 }
 
 function cronAddCheck(){
-    orPost('cron_add_check', {}, function(data){
+    httpPost('cron_add_check', {}, function(data){
         var rdata = $.parseJSON(data.data);
         layer.msg(rdata.msg, { icon: rdata.status ? 1 : 2 });
     });
 }
 
 function cronDelCheck(){
-    orPost('cron_del_check', {}, function(data){
+    httpPost('cron_del_check', {}, function(data){
         var rdata = $.parseJSON(data.data);
         layer.msg(rdata.msg, { icon: rdata.status ? 1 : 2 });
     });
