@@ -13,7 +13,7 @@ function httpPost(method, args, callback){
     },'json'); 
 }
 
-function orPluginService(_name, version){
+function httpPluginService(_name, version){
     var data = {name:_name, func:'status'}
     if ( typeof(version) != 'undefined' ){
         data['version'] = version;

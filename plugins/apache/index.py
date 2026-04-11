@@ -213,8 +213,9 @@ def initDreplace():
 
 
 def status():
-    pid_file = getPidFile()
-    if not os.path.exists(pid_file):
+    cmd = "ps -ef|grep 'httpd/bin/httpd' |grep -v grep | grep -v python | awk '{print $2}'"
+    data = mw.execShell(cmd)
+    if data[0] == '':
         return 'stop'
     return 'start'
 

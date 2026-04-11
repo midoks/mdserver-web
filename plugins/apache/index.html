@@ -2,7 +2,7 @@
 	<!-- <div class='plugin_version'></div> -->
 	<div class="bt-w-main">
 		<div class="bt-w-menu">
-			<p class="bgw" onclick="orPluginService('apache',$('.plugin_version').attr('version'));">服务</p>
+			<p class="bgw" onclick="httpPluginService('apache',$('.plugin_version').attr('version'));">服务</p>
 			<p onclick="pluginInitD('apache', $('.plugin_version').attr('version'));">自启动</p>
 			<p onclick="pluginConfig('apache');">配置修改</p>
 			<p onclick="getOpStatus();">负载状态</p>
@@ -18,7 +18,7 @@
 </div>
 
 <script type="text/javascript">
-$.getScript( "/plugins/file?name=apache&f=js/apache.js", function(){
-	orPluginService('apache');
+$.getScript( "/plugins/file?name=apache&f=js/httpd.js", function(){
+	httpPluginService('apache');
 });
 </script>
