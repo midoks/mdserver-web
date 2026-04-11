@@ -224,7 +224,7 @@ def restyOp(method):
     file = initDreplace()
 
     # 启动时,先检查一下配置文件
-    check = getServerDir() + "/apache/httpd/bin/httpd -t"
+    check = getServerDir() + "/httpd/bin/httpd -t"
     check_data = mw.execShell(check)
     if not check_data[1].find('test is successful') > -1:
         return check_data[1]
@@ -237,12 +237,12 @@ def restyOp(method):
         return data[1]
 
     if current_os.startswith("freebsd"):
-        data = mw.execShell('service httpd ' + method)
+        mw.execShell('service '+getPluginName()+' '+method)
         if data[1] == '':
             return 'ok'
         return data[1]
 
-    data = mw.execShell('systemctl ' + method + ' httpd')
+    data = mw.execShell('systemctl ' + method + ' '+getPluginName())
     if data[1] == '':
         return 'ok'
     return data[1]
@@ -251,10 +251,10 @@ def restyOp(method):
 def op_submit_systemctl_restart():
     current_os = mw.getOs()
     if current_os.startswith("freebsd"):
-        mw.execShell('service httpd restart')
+        mw.execShell('service '+getPluginName()+' restart')
         return True
 
-    mw.execShell('systemctl restart httpd')
+    mw.execShell('systemctl restart '+getPluginName())
     return True
 
 
@@ -266,7 +266,7 @@ def restyOp_restart():
     file = initDreplace()
 
     # 启动时,先检查一下配置文件
-    check = getServerDir() + "/apache/httpd/bin/httpd -t"
+    check = getServerDir() + "/httpd/bin/httpd -t"
     check_data = mw.execShell(check)
     if not check_data[1].find('test is successful') > -1:
         return 'ERROR: 配置出错<br><a style="color:red;">' + check_data[1].replace("\n", '<br>') + '</a>'
