@@ -1648,6 +1648,8 @@ $(function () {
     var themeReset = document.getElementById('mwThemeReset');
     var modeContainer = document.getElementById('mwThemeMode');
     var backgroundState = document.getElementById('mwThemeBgState');
+    var backgroundOpacityInput = document.getElementById('mwThemeBgOpacity');
+    var backgroundOpacityValue = document.getElementById('mwThemeBgOpacityValue');
     var backgroundUrlInput = document.getElementById('mwThemeBgUrl');
     var backgroundFileInput = document.getElementById('mwThemeBgFile');
     var backgroundDefaultBtn = document.getElementById('mwThemeDefaultBg');
@@ -1683,6 +1685,7 @@ $(function () {
         var parts = [];
         var mode = info.mode || 'default';
         var kind = info.kind || 'default';
+        var opacity = typeof info.opacity === 'number' ? info.opacity : (themeApi && typeof themeApi.getBackgroundOpacity === 'function' ? themeApi.getBackgroundOpacity() : 72);
 
         if (mode === 'plain') {
             parts.push('纯净背景');
@@ -1698,12 +1701,21 @@ $(function () {
             parts.push('自定义图片');
         }
 
+        parts.push('淡化 ' + opacity + '%');
+
         var text = '当前：' + parts.join(' / ');
         if (info.source && (kind === 'upload' || kind === 'url')) {
             text += '（' + info.source + '）';
         }
 
         backgroundState.textContent = text;
+
+        if (backgroundOpacityInput) {
+            backgroundOpacityInput.value = String(opacity);
+        }
+        if (backgroundOpacityValue) {
+            backgroundOpacityValue.textContent = opacity + '%';
+        }
 
         if (backgroundUrlInput) {
             if (kind === 'url' && info.source) {
@@ -1768,6 +1780,27 @@ $(function () {
 
     if (backgroundState && themeApi && typeof themeApi.getBackgroundInfo === 'function') {
         syncBackgroundState(themeApi.getBackgroundInfo());
+    }
+
+    if (backgroundOpacityInput) {
+        var initialOpacity = themeApi && typeof themeApi.getBackgroundOpacity === 'function' ? themeApi.getBackgroundOpacity() : 72;
+        backgroundOpacityInput.value = String(initialOpacity);
+        if (backgroundOpacityValue) {
+            backgroundOpacityValue.textContent = initialOpacity + '%';
+        }
+        backgroundOpacityInput.addEventListener('input', function () {
+            var nextOpacity = parseInt(backgroundOpacityInput.value, 10);
+            if (isNaN(nextOpacity)) {
+                return;
+            }
+            if (themeApi && typeof themeApi.setBackgroundOpacity === 'function') {
+                themeApi.setBackgroundOpacity(nextOpacity);
+            }
+            if (backgroundOpacityValue) {
+                backgroundOpacityValue.textContent = nextOpacity + '%';
+            }
+            syncBackgroundState(themeApi && typeof themeApi.getBackgroundInfo === 'function' ? themeApi.getBackgroundInfo() : {});
+        });
     }
 
     if (backgroundDefaultBtn) {

@@ -1,22 +1,11 @@
 //判断磁盘数量超出宽度
 function isDiskWidth(){
-    var body_width = $(".file-box").width();
-    $("#comlist").css({"width":Math.max(body_width-520, 220)+"px","height":"34px","overflow":"auto"});
+    var body_width = $(".file-box").width() || 0;
+    var nextWidth = Math.max(body_width - 520, 220);
+    $("#comlist").css({"width":nextWidth+"px","height":"34px","overflow":"auto"});
 }
 
 function syncFileToolbarLayout(){
-    var body_width = $(".file-box").width();
-    var path_width = Math.max(body_width - 700, 290);
-
-    $("#tipTools").width(Math.max(body_width - 30, 0));
-    $("#PathPlaceBtn").width(path_width);
-    $("#DirPathPlace input").width(path_width);
-
-    if($(window).width()<1160){
-        $("#PathPlaceBtn,#DirPathPlace input").width(290);
-    }
-
-    pathLeft();
     isDiskWidth();
 }
 
@@ -60,7 +49,7 @@ function recycleBin(type){
                                  | <a class="btlink" href="javascript:;" onclick="delRecycleBin(\'' + rdata.files[i].rname.replace(/'/,"\\'") + '\',this)">'+lan.files.recycle_bin_del+'</a>\
                             </td>\
                         </tr>';
-                            
+
                         continue;
                     }
                     var shortwebname = rdata.files[i].name.replace(/'/,"\\'");
@@ -167,8 +156,8 @@ function recycleBin(type){
                 $("#RecycleBody").html(body);
                 return;
         }
-                
-        
+
+
         var tablehtml = '<div class="re-head">\
                 <div style="margin-left: 3px;" class="ss-text">\
                         <em>文件回收站</em>\
@@ -209,7 +198,7 @@ function recycleBin(type){
                 title: lan.files.recycle_bin_title,
                 content: tablehtml
             });
-            
+
             if(window.location.href.indexOf("database") != -1){
                 recycleBin(6);
                 $(".re-con-menu p:last-child").addClass("on").siblings().removeClass("on");
@@ -373,11 +362,11 @@ function makeFilePage(showRow, page = ''){
         if(showRow == rows[i]) rowSelected = 'selected';
         rowOption += '<option value="'+rows[i]+'" '+rowSelected+'>'+rows[i]+'</option>';
     }
-    
+
     //分页
     $("#filePage").html(page);
     $("#filePage div").append("<span class='Pcount-item'>每页<select name='file_page' style='margin-left: 3px;margin-right: 3px;border:#ddd 1px solid;' class='showRow'>"+rowOption+"</select>条</span>");
-    $("#filePage .Pcount").css("left","16px"); 
+    $("#filePage .Pcount").css("left","16px");
 }
 
 //取数据
@@ -424,7 +413,7 @@ function getFiles(Path) {
     var loadT = layer.load();
     $.post('/files/get_dir', post, function(rdata) {
         layer.close(loadT);
-        
+
         //构建分页
         makeFilePage(file_row,rdata.page);
 
@@ -473,7 +462,7 @@ function getFiles(Path) {
                 //图标展示
                 $("#set_icon").addClass("active");
                 $("#set_list").removeClass("active");
-                body += "<div class='file folderBox menufolder' data-path='" + rdata.path + "/" + fmp[0] + "' filetype='dir' title='"+lan.files.file_name+"：" + fmp[0]+"&#13;"+lan.files.file_size+"：" 
+                body += "<div class='file folderBox menufolder' data-path='" + rdata.path + "/" + fmp[0] + "' filetype='dir' title='"+lan.files.file_name+"：" + fmp[0]+"&#13;"+lan.files.file_size+"："
                         + toSize(fmp[1])+"&#13;"+lan.files.file_etime+"："+getLocalTime(fmp[2])+"&#13;"+lan.files.file_auth+"："+fmp[3]+"&#13;"+lan.files.file_own+"："+fmp[4]+"'>\
                         <input type='checkbox' name='id' value='"+fmp[0]+"'>\
                         <div class='ico ico-folder' ondblclick=\"getFiles('" + rdata.path + "/" + fmp[0] + "')\"></div>\
@@ -508,7 +497,7 @@ function getFiles(Path) {
             } else {
                 bodyZip = "<a class='btlink' href='javascript:;' onclick=\"zip('" + rdata.path +"/" +fmp[0] + "');\">压缩</a> | ";
             }
-            
+
             if(isText(fmp[0])){
                 bodyZip += "<a class='btlink' href='javascript:;' onclick=\"onlineEditFile(0,'" + rdata.path +"/"+ fmp[0] + "')\">编辑</a> | ";
             }
@@ -518,7 +507,7 @@ function getFiles(Path) {
             } else {
                 download = "<a class='btlink' href='javascript:;' onclick=\"getFileBytes('" + rdata.path +"/"+ fmp[0] + "',"+fmp[1]+")\">下载</a> | ";
             }
-            
+
             totalSize +=  parseInt(fmp[1]);
             if(getCookie("rank")=="a"){
                 body += "<tr style='cursor:pointer;' class='folderBoxTr' data-path='" + rdata.path +"/"+ fmp[0] + "' filetype='" + fmp[0] + "' ondblclick='openFilename(this)'>\
@@ -598,10 +587,10 @@ function getFiles(Path) {
                 <tbody id="filesBody" class="list-list">'+body+'</tbody>\
             </table>';
             $("#fileCon").removeClass("fileList").html(tablehtml);
-            $("#tipTools").width($("#fileCon").width());
+            syncFileToolbarLayout();
         } else {
             $("#fileCon").addClass("fileList").html(body);
-            $("#tipTools").width($("#fileCon").width());
+            syncFileToolbarLayout();
         }
         $("#DirPathPlace input").val(rdata.path);
         var BarTools = '<div class="btn-group">\
@@ -627,7 +616,7 @@ function getFiles(Path) {
         if (isPaste != 'null' && isPaste != undefined) {
             BarTools += ' <button onclick="javascript:pasteFile(\'' + (getFileName(isPaste)) + '\');" class="btn btn-Warning btn-sm">粘贴</button>';
         }
-        
+
         $("#Batch").html('');
         var batchTools = '';
         var isBatch = getCookie('BatchSelected');
@@ -637,9 +626,9 @@ function getFiles(Path) {
         $("#Batch").html(batchTools);
 
         $("#setBox").prop("checked", false);
-        
+
         $("#BarTools").html(BarTools);
-        
+
         $("input[name=id]").click(function(){
             if($(this).prop("checked")) {
                 $(this).prop("checked", true);
@@ -656,7 +645,7 @@ function getFiles(Path) {
             if ($(this).prop("checked")) {
                 $("input[name=id]").prop("checked", true);
                 $("#filesBody > tr").addClass("ui-selected");
-                
+
             } else {
                 $("input[name=id]").prop("checked", false);
                 $("#filesBody > tr").removeClass("ui-selected");
@@ -695,7 +684,7 @@ function getFiles(Path) {
             var option = rightMenuClick(box.attr("filetype"),box.attr("data-path"),box.find("input").val());
             box.contextify(option);
         });
-        
+
         //每页行数
         $(".showRow").change(function(){
             setCookie('file_row',$(this).val());
@@ -770,11 +759,22 @@ function showSeclect(){
 
 //滚动条事件
 $(window).scroll(function () {
-    $("#tipTools").toggleClass("is-sticky", $(window).scrollTop() > 16);
+    var toolbar = $("#tipTools");
+    if (!toolbar.length) {
+        return;
+    }
+
+    if ($(window).scrollTop() > 16){
+        toolbar.css({"box-shadow":"0 18px 42px rgba(15, 23, 42, 0.16)"});
+    }else{
+        toolbar.css({"box-shadow":"none"});
+    }
 });
 syncFileToolbarLayout();
 window.onresize = function(){
     syncFileToolbarLayout();
+    pathLeft();
+    isDiskWidth();
 }
 
 //批量操作
@@ -785,7 +785,7 @@ function batch(type,access){
     var data='path='+path+'&type='+type;
     var name = 'data';
     var datas = [];
-    
+
     var oldType = getCookie('BatchPaste');
 
     for(var i=0;i<len;i++){
@@ -794,15 +794,15 @@ function batch(type,access){
         }
     }
     data += "&data=" + encodeURIComponent(JSON.stringify(datas))
-    
+
     if(type == 3 && access == undefined){
         setChmod(0,lan.files.all);
         return;
     }
-    
+
     if(type < 3) setCookie('BatchSelected', '1');
     setCookie('BatchPaste',type);
-    
+
     if(access == 1){
         var access = $("#access").val();
         var chown = $("#chown").val();
@@ -814,7 +814,7 @@ function batch(type,access){
         setCookie('BatchPaste',oldType);
         return;
     }
-    
+
     if(type == 5){
         var names = '';
         for(var i=0;i<len;i++){
@@ -826,7 +826,7 @@ function batch(type,access){
         zip(names);
         return;
     }
-        
+
     myloadT = layer.msg("<div class='myspeed'>正在处理,请稍候...</div>",{icon:16,time:0,shade: [0.3, '#000']});
     setTimeout(function(){getSpeed('.myspeed');},1000);
     // console.log(data);
@@ -862,7 +862,7 @@ function batchPaste(){
         }
     },'json');
 }
-    
+
 function batchPasteTo(data,path){
     myloadT = layer.msg("<div class='myspeed'>正在处理,请稍候...</div>",{icon:16,time:0,shade: [0.3, '#000']});
     setTimeout(function(){getSpeed('.myspeed');},1000);
@@ -876,7 +876,7 @@ function batchPasteTo(data,path){
 
 
 function getSuffixName(fileName){
-    var extArr = fileName.split(".");   
+    var extArr = fileName.split(".");
     var exts = ['folder-unempty','sql','c','cpp','cs','flv','css','js',
     'htm','html','java','log','mht','url','xml','ai','bmp','cdr','gif','ico',
     'jpeg','jpg','JPG','png','psd','webp','ape','avi','mkv','mov','mp3','mp4',
@@ -897,7 +897,7 @@ function getSuffixName(fileName){
 
 //取扩展名
 function getExtName(fileName){
-    var extArr = fileName.split(".");   
+    var extArr = fileName.split(".");
     var exts = ['folder','folder-unempty','sql','c','cpp','cs','flv','css','js',
     'htm','html','java','log','mht','php','url','xml','ai','bmp','cdr','gif','ico',
     'jpeg','jpg','JPG','png','psd','webp','ape','avi','flv','mkv','mov','mp3','mp4',
@@ -990,7 +990,7 @@ function createFile(type, path) {
         type: 1,
         shift: 5,
         closeBtn: 1,
-        area: '320px', 
+        area: '320px',
         title: '新建空白文件',
         content: '<div class="bt-form pd20 pb70">\
                     <div class="line">\
@@ -1007,7 +1007,7 @@ function createFile(type, path) {
             });
         }
     });
-    
+
 }
 //新建目录
 function createDir(type, path) {
@@ -1049,7 +1049,7 @@ function createDir(type, path) {
             });
         }
     });
-    
+
 }
 
 //删除文件
@@ -1099,10 +1099,10 @@ function reloadFiles(){
         getFiles(path);
     },3000);
 }
-            
+
 //下载文件
 function downloadFile(action){
-    
+
     if(action == 1){
         var fUrl = $("#mUrl").val();
         fUrl = encodeURIComponent(fUrl);
@@ -1185,7 +1185,7 @@ function reName(type, fileName) {
         type: 1,
         shift: 5,
         closeBtn: 1,
-        area: '320px', 
+        area: '320px',
         title: '重命名',
         btn:["确定","取消"],
         content: '<div class="bt-form pd20">\
@@ -1202,7 +1202,7 @@ function reName(type, fileName) {
             reName(1,fileName.replace(/'/,"\\'"));
         }
     });
-    
+
 }
 //剪切
 function cutFile(fileName) {
@@ -1281,7 +1281,7 @@ function pasteTo(path,copyName,cutName,fileName){
         setCookie('cutFileName', null);
         return;
     }
-    
+
     if (cutName != 'null' && cutName != undefined) {
         layer.msg(lan.files.mv_the, {
             icon: 16,
@@ -1412,9 +1412,9 @@ function zip(dirName,submits) {
             return false;
         }
     });
-    
+
 }
-        
+
 //解压目录
 function unZip(fileName, type) {
     var path = $("#DirPathPlace input").val();
@@ -1431,7 +1431,7 @@ function unZip(fileName, type) {
         },'json');
         return;
     }
-    
+
     type = (type == 1) ? 'tar':'zip';
     var umpass = '';
     if(type == 'zip'){
@@ -1449,7 +1449,7 @@ function unZip(fileName, type) {
         content: '<div class="bt-form pd20 pb70">'
             +'<div class="line unzipdiv">'
             +'<span class="tname">'+lan.files.unzip_name+'</span><input type="text" class="bt-input-text" id="sfile" value="' +fileName + '" placeholder="'+lan.files.unzip_name_title+'" style="width:330px" /></div>'
-            +'<div class="line"><span class="tname">'+lan.files.unzip_to+'</span><input type="text" class="bt-input-text" id="dfile" value="'+path + '" placeholder="'+lan.files.unzip_to+'" style="width:330px" /></div>' 
+            +'<div class="line"><span class="tname">'+lan.files.unzip_to+'</span><input type="text" class="bt-input-text" id="dfile" value="'+path + '" placeholder="'+lan.files.unzip_to+'" style="width:330px" /></div>'
             + umpass +'<div class="line"><span class="tname">'+lan.files.unzip_coding+'</span><select class="bt-input-text" name="coding">'
                 +'<option value="UTF-8">UTF-8</option>'
                 +'<option value="gb18030">GBK</option>'
@@ -1492,7 +1492,7 @@ function unCompressFile(fileName, type = 0){
         },'json');
         return;
     }
-    
+
     // var umpass = '<div class="line">\
     //      <span class="tname">解压密码</span>\
     //      <input type="text" class="bt-input-text" id="unpass" value="" placeholder="不需要请留空" style="width:330px" />\
@@ -1587,7 +1587,7 @@ function uploadFiles(){
         type:1,
         closeBtn: 1,
         title:lan.files.up_title,
-        area: ['500px','300px'], 
+        area: ['500px','300px'],
         shadeClose:false,
         content:'<div class="fileUploadDiv">\
                 <input type="hidden" id="input-val" value="'+path+'" />\
@@ -1626,7 +1626,7 @@ function setChmod(action,fileName){
         },'json');
         return;
     }
-    
+
     var toExec = fileName == lan.files.all?'batch(3,1)':'setChmod(1,\''+fileName+'\')';
     $.post('/files/file_access','filename='+encodeURIComponent(fileName),function(rdata){
         // console.log(rdata);
@@ -1650,7 +1650,7 @@ function setChmod(action,fileName){
             type:1,
             closeBtn: 1,
             title: '设置权限['+fileName+']',
-            area: '400px', 
+            area: '400px',
             shadeClose:false,
             content:'<div class="setchmod bt-form ptb15 pb70">\
                         <fieldset>\
@@ -1682,12 +1682,12 @@ function setChmod(action,fileName){
                         </div>\
                     </div>'
         });
-        
+
         onAccess();
         $("#access").keyup(function(){
             onAccess();
         });
-        
+
         $("input[type=checkbox]").change(function(){
             var idName = ['owner','group','public'];
             var onacc = '';
@@ -1706,7 +1706,7 @@ function setChmod(action,fileName){
 
 function onAccess(){
     var access = $("#access").val();
-    var idName = ['owner','group','public'];                
+    var idName = ['owner','group','public'];
     for(var n=0;n<idName.length;n++){
         $("#"+idName[n]+"_x").prop('checked',false);
         $("#"+idName[n]+"_w").prop('checked',false);
@@ -1856,8 +1856,8 @@ function pathPlaceBtn(path){
             html += '<li><a title="'+title+'">'+dst_path[i]+'</a></li>';
         }
     }
-    
-    html = '<div class="mw-file-path-scroll"><ul>'+html+'</ul></div>';
+
+    html = '<div style="width:100%;height:26px;overflow:hidden;position:relative"><ul>'+html+'</ul></div>';
     $("#PathPlaceBtn").html(html);
     $("#PathPlaceBtn ul li a").click(function(e){
         var go_path = $(this).attr("title");
@@ -1886,20 +1886,20 @@ function pathLeft(){
 
 //路径快捷点击
 $("#PathPlaceBtn").on("click", function(e){
-	if($("#DirPathPlace").is(":hidden")){
-	        $("#DirPathPlace").css("display","inline-flex");
-	        $("#DirPathPlace input").focus();
-	        $(this).hide();
-	    }else{
-	        $("#DirPathPlace").hide();
-	        $(this).css("display","inline-flex");
-	    }
-	    $(document).one("click", function(){
-	        $("#DirPathPlace").hide();
-	        $("#PathPlaceBtn").css("display","inline-flex");
-	    });
-    e.stopPropagation(); 
-}); 
+    if($("#DirPathPlace").is(":hidden")){
+        $("#DirPathPlace").css("display","inline");
+        $("#DirPathPlace input").focus();
+        $(this).hide();
+    }else{
+        $("#DirPathPlace").hide();
+        $(this).css("display","inline");
+    }
+    $(document).one("click", function(){
+        $("#DirPathPlace").hide();
+        $("#PathPlaceBtn").css("display","inline");
+    });
+    e.stopPropagation();
+});
 $("#DirPathPlace").on("click", function(e){
     e.stopPropagation();
 });

@@ -33,6 +33,54 @@
             return red + ', ' + green + ', ' + blue;
         }
 
+        function normalizeOpacity(value) {
+            var parsed = parseInt(value, 10);
+            if (isNaN(parsed)) {
+                parsed = 72;
+            }
+            if (parsed < 0) {
+                return 0;
+            }
+            if (parsed > 100) {
+                return 100;
+            }
+            return parsed;
+        }
+
+        function isDarkAppearance(root) {
+            if (root.classList.contains('mdui-theme-dark')) {
+                return true;
+            }
+            if (root.classList.contains('mdui-theme-light')) {
+                return false;
+            }
+            return window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+        }
+
+        function buildBackgroundOverlay(root, opacity) {
+            var ratio = normalizeOpacity(opacity) / 100;
+            if (isDarkAppearance(root)) {
+                var darkStart = 0.54 + (0.26 * ratio);
+                var darkMiddle = Math.min(0.96, darkStart + 0.04);
+                var darkEnd = Math.min(0.98, darkMiddle + 0.03);
+                return [
+                    'radial-gradient(circle at 14% 16%, color-mix(in srgb, var(--mw-primary) 18%, transparent) 0%, transparent 30%)',
+                    'radial-gradient(circle at 84% 12%, rgba(45, 212, 191, 0.10) 0%, transparent 28%)',
+                    'radial-gradient(circle at 50% 100%, rgba(59, 130, 246, 0.06) 0%, transparent 40%)',
+                    'linear-gradient(180deg, rgba(6, 10, 18, ' + darkStart.toFixed(2) + ') 0%, rgba(10, 14, 23, ' + darkMiddle.toFixed(2) + ') 55%, rgba(6, 9, 15, ' + darkEnd.toFixed(2) + ') 100%)'
+                ].join(', ');
+            }
+
+            var lightStart = 0.20 + (0.46 * ratio);
+            var lightMiddle = Math.min(0.92, lightStart + 0.04);
+            var lightEnd = Math.min(0.96, lightMiddle + 0.03);
+            return [
+                'radial-gradient(circle at 12% 12%, rgba(15, 118, 110, 0.08) 0%, transparent 28%)',
+                'radial-gradient(circle at 86% 8%, rgba(59, 130, 246, 0.06) 0%, transparent 30%)',
+                'linear-gradient(180deg, rgba(248, 250, 252, ' + lightStart.toFixed(2) + ') 0%, rgba(238, 243, 248, ' + lightMiddle.toFixed(2) + ') 100%)'
+            ].join(', ');
+        }
+
         try {
             var root = document.documentElement;
             var mode = window.localStorage.getItem('mw-theme-mode');
@@ -60,8 +108,11 @@
             if (backgroundMode !== 'plain') {
                 backgroundMode = 'default';
             }
+            var backgroundOpacity = normalizeOpacity(window.localStorage.getItem('mw-theme-background-opacity'));
             if (backgroundMode === 'plain') {
                 root.style.setProperty('--mw-app-background-overlay', 'none');
+            } else if (background) {
+                root.style.setProperty('--mw-app-background-overlay', buildBackgroundOverlay(root, backgroundOpacity));
             } else {
                 root.style.removeProperty('--mw-app-background-overlay');
             }
