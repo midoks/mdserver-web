@@ -131,6 +131,9 @@ Install_App()
 	OPTIONS="${OPTIONS} --with-apr=$APR_CONFIG"
 	OPTIONS="${OPTIONS} --with-apr-util=$APU_CONFIG"
 
+	if [ "$sysName" != "Darwin" ];then
+		OPTIONS="${OPTIONS} --enable-systemd"
+	fi
 	# echo "cd ${apacheDir}/httpd-${VERSION} && ./configure --prefix=$serverPath/apache $OPTIONS"
 	cd ${apacheDir}/httpd-${VERSION} && ./configure \
 	--prefix=$serverPath/apache/httpd \
