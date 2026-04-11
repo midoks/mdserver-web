@@ -160,7 +160,7 @@ def initConf():
             "/www/server/php/85/var/log",
             "/www/server/openresty/nginx/logs",
             "/www/server/phpmyadmin",
-            "/www/server/apache/httpd/log",
+            "/www/server/apache/httpd/logs",
             "/www/server/redis/data",
             "/www/server/alist/data/log",
             "/www/server/dztasks/logs",
