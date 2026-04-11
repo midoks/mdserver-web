@@ -69,6 +69,12 @@ def checkArgs(data, ck=[]):
     return (True, mw.returnJson(True, 'ok'))
 
 
+def getOs():
+    data = {}
+    data['os'] = mw.getOs()
+    data['auth'] = True
+    return mw.getJson(data)
+
 def getConf():
     path = getServerDir() + "/Caddyfile"
     return path
@@ -156,9 +162,6 @@ def start():
 
 def stop():
     r = caddyOp('stop')
-    pid_file = getPidFile()
-    if os.path.exists(pid_file):
-        os.remove(pid_file)
     return r
 
 
