@@ -1,0 +1,18 @@
+{
+	"sort": 0,
+	"title":"caddy",
+	"tip":"soft",
+	"name":"caddy",
+	"type":"其他插件",
+	"ps":"一款功能强大、企业级、开源 Web 服务器，具有用 Go 编写的自动 HTTPS",
+	"shell":"install.sh",
+	"install_pre_inspection":true,
+	"checks":"server/caddy",
+	"path":"server/caddy",
+	"author":"caddyserver",
+	"home":"https://caddyserver.com/",
+	"date":"2026-04-11",
+	"pid": "1",
+	"versions": ["2.11"],
+	"updates": ["2.11.2"]
+}
