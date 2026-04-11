@@ -363,7 +363,7 @@ def runInfo():
 
 
 def errorLogPath():
-    return getServerDir() + '/httpd/logs/error_log'
+    return getServerDir() + '/httpd/logs/error.log'
 
 
 def getCfg():
