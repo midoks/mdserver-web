@@ -110,32 +110,75 @@ function orPluginOpServiceOp(a,b,c,d,a,v,request_callback){
 }
 
 
-//查看Nginx负载状态
-function getOpStatus() {
-    var loadT = layer.msg('正在处理，请稍后...', { icon: 16, time: 0, shade: 0.3 });
+// 定时器变量
+var httpdStatusTimer = null;
+
+//查看Apache负载状态
+function getHttpdStatus() {
     $.post('/plugins/run', {name:'apache', func:'run_info'}, function(data) {
-        layer.close(loadT); 
         try {
             var rdata = $.parseJSON(data.data);
+
+            console.log(rdata);
             if ('status' in rdata && !rdata.status){
                 showMsg(rdata.msg, function(){}, null,3000);
                 return;
             }
 
             var con = "<div><table class='table table-hover table-bordered'>\
-                            <tr><th>活动连接(Active connections)</th><td>" + rdata.active + "</td></tr>\
-                            <tr><th>总连接次数(accepts)</th><td>" + rdata.accepts + "</td></tr>\
-                            <tr><th>总握手次数(handled)</th><td>" + rdata.handled + "</td></tr>\
-                            <tr><th>总请求数(requests)</th><td>" + rdata.requests + "</td></tr>\
-                            <tr><th>请求数(Reading)</th><td>" + rdata.Reading + "</td></tr>\
-                            <tr><th>响应数(Writing)</th><td>" + rdata.Writing + "</td></tr>\
-                            <tr><th>驻留进程(Waiting)</th><td>" + rdata.Waiting + "</td></tr>\
+                            <tr><th>服务器版本(ServerVersion)</th><td>" + (rdata.ServerVersion || '-') + "</td></tr>\
+                            <tr><th>服务器MPM(ServerMPM)</th><td>" + (rdata.ServerMPM || '-') + "</td></tr>\
+                            <tr><th>服务器构建时间(Server Built)</th><td>" + (rdata['Server Built'] || '-') + "</td></tr>\
+                            <tr><th>当前时间(CurrentTime)</th><td>" + (rdata.CurrentTime || '-') + "</td></tr>\
+                            <tr><th>重启时间(RestartTime)</th><td>" + (rdata.RestartTime || '-') + "</td></tr>\
+                            <tr><th>服务器运行时间(ServerUptime)</th><td>" + (rdata.ServerUptime || '-') + "</td></tr>\
+                            <tr><th>服务器运行秒数(ServerUptimeSeconds)</th><td>" + (rdata.ServerUptimeSeconds || '-') + "</td></tr>\
+                            <tr><th>1分钟负载(Load1)</th><td>" + (rdata.Load1 || '-') + "</td></tr>\
+                            <tr><th>5分钟负载(Load5)</th><td>" + (rdata.Load5 || '-') + "</td></tr>\
+                            <tr><th>15分钟负载(Load15)</th><td>" + (rdata.Load15 || '-') + "</td></tr>\
+                            <tr><th>总访问次数(Total Accesses)</th><td>" + (rdata['Total Accesses'] || '-') + "</td></tr>\
+                            <tr><th>总流量(Total kBytes)</th><td>" + (rdata['Total kBytes'] || '-') + " KB</td></tr>\
+                            <tr><th>总请求时间(Total Duration)</th><td>" + (rdata['Total Duration'] || '-') + "</td></tr>\
+                            <tr><th>CPU用户时间(CPUUser)</th><td>" + (rdata.CPUUser || '-') + "</td></tr>\
+                            <tr><th>CPU系统时间(CPUSystem)</th><td>" + (rdata.CPUSystem || '-') + "</td></tr>\
+                            <tr><th>CPU负载(CPULoad)</th><td>" + (rdata.CPULoad || '-') + "</td></tr>\
+                            <tr><th>每秒请求数(ReqPerSec)</th><td>" + (rdata.ReqPerSec || '-') + "</td></tr>\
+                            <tr><th>每秒流量(BytesPerSec)</th><td>" + (rdata.BytesPerSec || '-') + "</td></tr>\
+                            <tr><th>每请求流量(BytesPerReq)</th><td>" + (rdata.BytesPerReq || '-') + "</td></tr>\
+                            <tr><th>每请求时间(DurationPerReq)</th><td>" + (rdata.DurationPerReq || '-') + "</td></tr>\
+                            <tr><th>活动工作进程(BusyWorkers)</th><td>" + (rdata.BusyWorkers || '-') + "</td></tr>\
+                            <tr><th>优雅关闭进程(GracefulWorkers)</th><td>" + (rdata.GracefulWorkers || '-') + "</td></tr>\
+                            <tr><th>空闲工作进程(IdleWorkers)</th><td>" + (rdata.IdleWorkers || '-') + "</td></tr>\
+                            <tr><th>进程数(Processes)</th><td>" + (rdata.Processes || '-') + "</td></tr>\
+                            <tr><th>总连接数(ConnsTotal)</th><td>" + (rdata.ConnsTotal || '-') + "</td></tr>\
                          </table></div>";
             $(".soft-man-con").html(con);
         }catch(err){
              showMsg(data.data, function(){}, null,3000);
         }
     },'json');
+}
+
+// 启动自动刷新
+function startHttpdStatusAutoRefresh() {
+    // 先清除现有的定时器
+    if (httpdStatusTimer) {
+        clearInterval(httpdStatusTimer);
+    }
+    
+    // 立即执行一次
+    getHttpdStatus();
+    
+    // 设置定时器，每5秒刷新一次
+    httpdStatusTimer = setInterval(getHttpdStatus, 5000);
+}
+
+// 停止自动刷新
+function stopHttpdStatusAutoRefresh() {
+    if (httpdStatusTimer) {
+        clearInterval(httpdStatusTimer);
+        httpdStatusTimer = null;
+    }
 }
 
 

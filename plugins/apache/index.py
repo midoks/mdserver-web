@@ -305,16 +305,33 @@ def initdUinstall():
     return 'ok'
 
 def getHttpdStatusPort():
-    conf = mw.getServerDir() + '/httpd/conf/httpd.conf'
+    conf = mw.getServerDir() + '/apache/httpd/conf/httpd.conf'
     content = mw.readFile(conf)
+    if not content:
+        return None
+    rep = r'^\s*Listen\s*(?:\d+\.\d+\.\d+\.\d+:)?(\d+)'  # 匹配非注释行的 Listen 指令，忽略大小写
+    tmp = re.search(rep, content, re.IGNORECASE | re.MULTILINE)
+    if tmp:
+        port = tmp.groups()[0].strip()
+        return port
+    return None
 
-    print(content)
 
-
-    rep = r'listen\s*(.*);'
-    tmp = re.search(rep, content)
-    port =  tmp.groups()[0].strip()
-    return port
+def runInfoDone(data):
+    result = {}
+    if not data:
+        return result
+    
+    # 解析服务器状态数据
+    lines = data.strip().split('\n')
+    for line in lines:
+        if ':' in line:
+            key, value = line.split(':', 1)
+            key = key.strip()
+            value = value.strip()
+            result[key] = value
+    
+    return result
 
 
 def runInfo():
@@ -323,45 +340,30 @@ def runInfo():
         return mw.returnJson(False, "未启动!")
 
     port = getHttpdStatusPort()
+    if not port:
+        return mw.returnJson(False, "无法获取端口信息!")
+    
     # 取Openresty负载状态
     try:
         url = 'http://127.0.0.1:%s/server-status?auto' % port
         result = mw.httpGet(url, timeout=3)
-
-        print(result)
-        tmp = result.split()
-        data = {}
-        data['active'] = tmp[2]
-        data['accepts'] = tmp[9]
-        data['handled'] = tmp[7]
-        data['requests'] = tmp[8]
-        data['Reading'] = tmp[11]
-        data['Writing'] = tmp[13]
-        data['Waiting'] = tmp[15]
+        data = runInfoDone(result)
         return mw.getJson(data)
     except Exception as e:
         try:
             url = 'http://' + mw.getHostAddr() + ':%s/server-status?auto' % port
             result = mw.httpGet(url)
-            tmp = result.split()
-            data = {}
-            data['active'] = tmp[2]
-            data['accepts'] = tmp[9]
-            data['handled'] = tmp[7]
-            data['requests'] = tmp[8]
-            data['Reading'] = tmp[11]
-            data['Writing'] = tmp[13]
-            data['Waiting'] = tmp[15]
+            data = runInfoDone(result)
             return mw.getJson(data)
         except Exception as e:
-            return mw.returnJson(False, "oprenresty异常!")
+            return mw.returnJson(False, "apache异常!")
         
     except Exception as e:
-        return mw.returnJson(False, "oprenresty not started!")
+        return mw.returnJson(False, "apache not started!")
 
 
 def errorLogPath():
-    return getServerDir() + '/nginx/logs/error.log'
+    return getServerDir() + '/httpd/logs/error_log'
 
 
 def getCfg():
