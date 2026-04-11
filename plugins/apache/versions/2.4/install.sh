@@ -128,15 +128,12 @@ Install_App()
 		exit 1
 	fi
 
-echo "Using APR config: $APR_CONFIG"
-echo "Using APR-util config: $APU_CONFIG"
-
 	OPTIONS="${OPTIONS} --with-apr=$APR_CONFIG"
 	OPTIONS="${OPTIONS} --with-apr-util=$APU_CONFIG"
 
 	# echo "cd ${apacheDir}/httpd-${VERSION} && ./configure --prefix=$serverPath/apache $OPTIONS"
 	cd ${apacheDir}/httpd-${VERSION} && ./configure \
-	--prefix=$serverPath/apache \
+	--prefix=$serverPath/apache/httpd \
 	$OPTIONS
 
 	make -j${cpuCore} && make install && make clean
