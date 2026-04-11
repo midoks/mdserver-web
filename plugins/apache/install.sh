@@ -16,6 +16,7 @@ export PATH
 # cd /Users/midoks/Desktop/mwdev/server/mdserver-web/plugins/apache && python3 plugins/apache/index.py start
 # cd /www/server/mdserver-web && python3 plugins/apache/index.py start
 # cd /www/server/mdserver-web && python3 plugins/apache/index.py run_info
+# ps -ef|grep httpd | grep -v grep | awk '{print $2}'|xargs kill
 
 curPath=`pwd`
 rootPath=$(dirname "$curPath")
