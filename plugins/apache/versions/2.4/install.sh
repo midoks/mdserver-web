@@ -88,7 +88,7 @@ Install_App()
 		cd ${apacheDir}/apr-util-${APR_UTIL_VERSION} && ./configure --prefix=${serverPath}/apache/apr-util --with-apr=${serverPath}/apache/apr
 		if [ "$?" == "0" ];then
 			make -j${cpuCore} && make install
-			if [ ! -f ${serverPath}/apache/apr-util/bin/apu-config ];then
+			if [ ! -f ${serverPath}/apache/apr-util/bin/apu-1-config ];then
 				echo "APR-util installation failed: apu-config not found"
 				find ${serverPath}/apache/apr-util -name "apu-config"
 				exit 1
