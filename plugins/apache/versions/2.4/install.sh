@@ -115,8 +115,7 @@ Install_App()
 	OPTIONS="${OPTIONS} --with-apr=$APR_CONFIG"
 	OPTIONS="${OPTIONS} --with-apr-util=$APU_CONFIG"
 
-	echo "cd ${apacheDir}/httpd-${VERSION} && ./configure --prefix=$serverPath/apache $OPTIONS"
-
+	# echo "cd ${apacheDir}/httpd-${VERSION} && ./configure --prefix=$serverPath/apache $OPTIONS"
 	cd ${apacheDir}/httpd-${VERSION} && ./configure \
 	--prefix=$serverPath/apache/httpd \
 	$OPTIONS
@@ -132,6 +131,9 @@ Install_App()
     	rm -rf ${apacheDir}/apr-util-${APR_UTIL_VERSION}
     fi
 
+    if [ -d ${apacheDir}/httpd-${APR_UTIL_VERSION} ];then
+    	rm -rf ${apacheDir}/httpd-${APR_UTIL_VERSION}
+    fi
 
 	echo 'installation of apache completed'
 }
