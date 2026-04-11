@@ -13,7 +13,8 @@ export PATH
 # apt install ncat -y
 # nc -u -v www.xx.com 443
 
-# cd /www/server/mdserver-web && python3 plugins/openresty/index.py run_info
+# cd /www/server/mdserver-web && python3 plugins/apache/index.py run_info
+# cd /www/server/mdserver-web && python3 plugins/apache/index.py run_info
 
 curPath=`pwd`
 rootPath=$(dirname "$curPath")
