@@ -3748,6 +3748,25 @@ mdui-button::part(button) {
     -webkit-backdrop-filter: blur(var(--mw-glass-blur));
 }
 
+:root {
+    --mw-shell-topbar-bg: color-mix(in srgb, var(--mw-surface) 86%, transparent);
+    --mw-shell-panel-bg: color-mix(in srgb, var(--mw-surface) 93%, transparent);
+}
+
+:root.mdui-theme-dark {
+    --mw-shell-topbar-bg: color-mix(in srgb, var(--mw-surface) 82%, var(--mw-bg) 18%);
+    --mw-shell-panel-bg: color-mix(in srgb, var(--mw-surface) 90%, var(--mw-bg) 10%);
+}
+
+.mw-topbar-glass {
+    background: transparent !important;
+    border-bottom: none !important;
+}
+
+.mw-topbar-card {
+    background: var(--mw-shell-topbar-bg) !important;
+}
+
 /* Status overview cards */
 .mw-stat-grid {
     gap: 18px;
