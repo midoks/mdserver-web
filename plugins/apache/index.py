@@ -70,7 +70,7 @@ def checkArgs(data, ck=[]):
 
 
 def clearTemp():
-    path_bin = getServerDir() + "/nginx"
+    path_bin = getServerDir() + "/apache/httpd"
     mw.execShell('rm -rf ' + path_bin + '/client_body_temp')
     mw.execShell('rm -rf ' + path_bin + '/fastcgi_temp')
     mw.execShell('rm -rf ' + path_bin + '/proxy_temp')
@@ -79,33 +79,24 @@ def clearTemp():
 
 
 def getConf():
-    path = getServerDir() + "/nginx/conf/nginx.conf"
+    path = getServerDir() + "/httpd/conf/httpd.conf"
     return path
 
 
 def getConfTpl():
-    path = getPluginDir() + '/conf/nginx.conf'
+    path = getPluginDir() + '/conf/httpd.conf'
     return path
 
 
 def getOs():
     data = {}
     data['os'] = mw.getOs()
-    ng_exe_bin = getServerDir() + "/nginx/sbin/nginx"
-
-    # if mw.isAppleSystem():
-    #     data['auth'] = True
-    #     return mw.getJson(data)
-
-    if checkAuthEq(ng_exe_bin, 'root'):
-        data['auth'] = True
-    else:
-        data['auth'] = False
+    data['auth'] = True
     return mw.getJson(data)
 
 
 def getInitDTpl():
-    path = getPluginDir() + "/init.d/nginx.tpl"
+    path = getPluginDir() + "/init.d/httpd.tpl"
     return path
 
 
@@ -206,28 +197,6 @@ def initDreplace():
 
         # config replace
         confReplace()
-
-    # give nginx root permission
-    # ng_exe_bin = getServerDir() + "/nginx/sbin/nginx"
-    # if not checkAuthEq(ng_exe_bin, 'root'):
-    #     user = 'www'
-    #     user_group = 'www'
-    #     current_os = mw.getOs()
-    #     if current_os == 'darwin':
-    #         user = 'root'
-    #         user_group = 'staff'
-    #     args = getArgs()
-    #     if not 'pwd' in args:
-    #         print("权限不足，需要认证启动!")
-    #         exit(0)
-
-        sudoPwd = args['pwd']
-        cmd_own = 'chown -R ' + user+':' + user_group + ' ' + ng_exe_bin
-        mw.execShell('echo %s|sudo -S %s' % (sudoPwd, cmd_own))
-        cmd_mod = 'chmod 755 ' + ng_exe_bin
-        mw.execShell('echo %s|sudo -S %s' % (sudoPwd, cmd_mod))
-        cmd_s = 'chmod u+s ' + ng_exe_bin
-        mw.execShell('echo %s|sudo -S %s' % (sudoPwd, cmd_s))
 
     # systemd
     # /usr/lib/systemd/system

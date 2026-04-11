@@ -70,9 +70,9 @@ Install_App()
 	if [ ! -d ${serverPath}/apache/apr ];then
 		cd ${apacheDir} && tar -jxf apr-${APR_VERSION}.tar.bz2
 		cd ${apacheDir}/apr-${APR_VERSION} && ./configure --prefix=${serverPath}/apache/apr
+		make -j${cpuCore} && make install
 		if [ "$?" == "0" ];then
-			make -j${cpuCore} && make install
-			if [ ! -f ${serverPath}/apache/apr/bin/apr-config ];then
+			if [ ! -f ${serverPath}/apache/apr/bin/apr-1-config ];then
 				echo "APR installation failed: apr-config not found"
 				exit 1
 			fi
@@ -86,8 +86,8 @@ Install_App()
 	if [ ! -d ${serverPath}/apache/apr-util ];then
 		cd ${apacheDir} && tar -jxf apr-util-${APR_UTIL_VERSION}.tar.bz2
 		cd ${apacheDir}/apr-util-${APR_UTIL_VERSION} && ./configure --prefix=${serverPath}/apache/apr-util --with-apr=${serverPath}/apache/apr
+		make -j${cpuCore} && make install
 		if [ "$?" == "0" ];then
-			make -j${cpuCore} && make install
 			if [ ! -f ${serverPath}/apache/apr-util/bin/apu-1-config ];then
 				echo "APR-util installation failed: apu-config not found"
 				find ${serverPath}/apache/apr-util -name "apu-config"
