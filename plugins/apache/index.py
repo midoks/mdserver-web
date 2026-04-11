@@ -285,9 +285,6 @@ def start():
 
 def stop():
     r = restyOp('stop')
-    pid_file = getPidFile()
-    if os.path.exists(pid_file):
-        os.remove(pid_file)
     return r
 
 
