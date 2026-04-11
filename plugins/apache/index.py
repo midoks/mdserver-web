@@ -208,10 +208,10 @@ def restyOp(method):
 def op_submit_systemctl_restart():
     current_os = mw.getOs()
     if current_os.startswith("freebsd"):
-        mw.execShell('service '+getPluginName()+' restart')
+        mw.execShell('service httpd restart')
         return True
 
-    mw.execShell('systemctl restart '+getPluginName())
+    mw.execShell('systemctl restart httpd')
     return True
 
 
