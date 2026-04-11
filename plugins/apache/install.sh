@@ -59,15 +59,15 @@ if [ "${2}" == "" ];then
 fi 
 
 if [ "${action}" == "uninstall" ];then
-	if [ -f /usr/lib/systemd/system/apache.service ] || [ -f /lib/systemd/system/apache.service ];then
-		systemctl stop apache
-		rm -rf /usr/systemd/system/apache.service
-		rm -rf /lib/systemd/system/apache.service
+	if [ -f /usr/lib/systemd/system/httpd.service ] || [ -f /lib/systemd/system/httpd.service ];then
+		systemctl stop httpd
+		rm -rf /usr/systemd/system/httpd.service
+		rm -rf /lib/systemd/system/httpd.service
 		systemctl daemon-reload
 	fi
 
-	if [ -f $serverPath/apache/init.d/apache ];then
-		$serverPath/apache/init.d/apache stop
+	if [ -f $serverPath/apache/init.d/httpd ];then
+		$serverPath/apache/init.d/httpd stop
 	fi
 
 	rm -rf $serverPath/apache
