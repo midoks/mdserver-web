@@ -118,7 +118,7 @@ Install_App()
 	echo "cd ${apacheDir}/httpd-${VERSION} && ./configure --prefix=$serverPath/apache $OPTIONS"
 
 	cd ${apacheDir}/httpd-${VERSION} && ./configure \
-	--prefix=$serverPath/apache \
+	--prefix=$serverPath/apache/httpd \
 	$OPTIONS
 
 	make -j${cpuCore} && make install && make clean
