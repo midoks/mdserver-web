@@ -476,6 +476,7 @@ def replaceChar(value, index, new_char):
     return value[:index] + new_char + value[index+1:]
 
 def setCfg():
+    # return mw.returnJson(False, '暂时不支持')
 
     args = getArgs()
     
@@ -498,16 +499,18 @@ def setCfg():
 
         # 替换 MPM 特定配置
         if mpm_module:
-            rep = r"(<IfModule mpm_%s_module>.*?)%s\s+\d+(.*?</IfModule>)" % (mpm_module, k)
+            def replace_mpm_config(match):
+                return match.group(1) + k + match.group(2) + v + match.group(3)
+            rep = r"(<IfModule mpm_%s_module>.*?)%s(\s+)\d+(.*?</IfModule>)" % (mpm_module, k)
             if re.search(rep, content, re.DOTALL):
-                newconf = "\1%s %s\2" % (k, v)
-                content = re.sub(rep, newconf, content, flags=re.DOTALL)
+                content = re.sub(rep, replace_mpm_config, content, flags=re.DOTALL)
         
         # 替换通用配置
-        rep = r"%s\s+\d+" % k
+        def replace_common_config(match):
+            return k + match.group(1) + v
+        rep = r"%s(\s+)\d+" % k
         if re.search(rep, content):
-            newconf = "%s %s" % (k, v)
-            content = re.sub(rep, newconf, content)
+            content = re.sub(rep, replace_common_config, content)
 
     mw.writeFile(cfg, content)
     isError = mw.checkHttpdConfig()
