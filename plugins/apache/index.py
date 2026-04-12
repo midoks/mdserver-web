@@ -378,33 +378,85 @@ def getCfg():
     content = mw.readFile(cfg)
 
     unitrep = "[kmgKMG]"
-    cfg_args = [
-        {"name": "worker_processes", "ps": "处理进程,auto表示自动,数字表示进程数", 'type': 2},
-        {"name": "worker_connections", "ps": "最大并发链接数", 'type': 2},
-        {"name": "keepalive_timeout", "ps": "连接超时时间", 'type': 2},
-        {"name": "zstd", "ps": "是否开启zstd压缩传输", 'type': 1},
-        {"name": "brotli", "ps": "是否开启brotli压缩传输", 'type': 1},
-        {"name": "gzip", "ps": "是否开启gzip压缩传输", 'type': 1},
-        {"name": "gzip_min_length", "ps": "最小压缩文件", 'type': 2},
-        {"name": "gzip_comp_level", "ps": "压缩率", 'type': 2},
-        {"name": "client_max_body_size", "ps": "最大上传文件", 'type': 2},
-        {"name": "server_names_hash_bucket_size",
-            "ps": "服务器名字的hash表大小", 'type': 2},
-        {"name": "client_header_buffer_size", "ps": "客户端请求头buffer大小", 'type': 2},
+    
+    # 获取当前 MPM 模块
+    mpm_module = ""
+    mpm_match = re.search(r"mpm_(\w+)_module", content)
+    if mpm_match:
+        mpm_module = mpm_match.group(1)
+    
+    # MPM 配置参数
+    mpm_cfg_args = {
+        "prefork": [
+            {"name": "StartServers", "ps": "服务器进程启动数量", 'type': 2},
+            {"name": "MinSpareServers", "ps": "保持空闲的最小服务器进程数", 'type': 2},
+            {"name": "MaxSpareServers", "ps": "保持空闲的最大服务器进程数", 'type': 2},
+            {"name": "MaxRequestWorkers", "ps": "允许启动的最大服务器进程数", 'type': 2},
+            {"name": "MaxConnectionsPerChild", "ps": "服务器进程服务的最大连接数", 'type': 2},
+        ],
+        "worker": [
+            {"name": "StartServers", "ps": "初始服务器进程数", 'type': 2},
+            {"name": "MinSpareThreads", "ps": "保持空闲的最小工作线程数", 'type': 2},
+            {"name": "MaxSpareThreads", "ps": "保持空闲的最大工作线程数", 'type': 2},
+            {"name": "ThreadsPerChild", "ps": "每个服务器进程的工作线程数", 'type': 2},
+            {"name": "MaxRequestWorkers", "ps": "最大工作线程数", 'type': 2},
+            {"name": "MaxConnectionsPerChild", "ps": "服务器进程服务的最大连接数", 'type': 2},
+        ],
+        "event": [
+            {"name": "StartServers", "ps": "初始服务器进程数", 'type': 2},
+            {"name": "MinSpareThreads", "ps": "保持空闲的最小工作线程数", 'type': 2},
+            {"name": "MaxSpareThreads", "ps": "保持空闲的最大工作线程数", 'type': 2},
+            {"name": "ThreadsPerChild", "ps": "每个服务器进程的工作线程数", 'type': 2},
+            {"name": "MaxRequestWorkers", "ps": "最大工作线程数", 'type': 2},
+            {"name": "MaxConnectionsPerChild", "ps": "服务器进程服务的最大连接数", 'type': 2},
+        ],
+        "netware": [
+            {"name": "ThreadStackSize", "ps": "每个工作线程分配的堆栈大小", 'type': 2},
+            {"name": "StartThreads", "ps": "服务器启动时启动的工作线程数", 'type': 2},
+            {"name": "MinSpareThreads", "ps": "保持空闲的最小线程数", 'type': 2},
+            {"name": "MaxSpareThreads", "ps": "保持空闲的最大线程数", 'type': 2},
+            {"name": "MaxThreads", "ps": "同时活跃的最大工作线程数", 'type': 2},
+            {"name": "MaxConnectionsPerChild", "ps": "线程服务的最大连接数", 'type': 2},
+        ],
+        "mpmt_os2": [
+            {"name": "StartServers", "ps": "维护的服务器进程数", 'type': 2},
+            {"name": "MinSpareThreads", "ps": "每个进程的最小空闲线程数", 'type': 2},
+            {"name": "MaxSpareThreads", "ps": "每个进程的最大空闲线程数", 'type': 2},
+            {"name": "MaxConnectionsPerChild", "ps": "每个服务器进程的最大连接数", 'type': 2},
+        ],
+        "winnt": [
+            {"name": "ThreadsPerChild", "ps": "服务器进程中的工作线程数", 'type': 2},
+            {"name": "MaxConnectionsPerChild", "ps": "服务器进程服务的最大连接数", 'type': 2},
+        ]
+    }
+    
+    # 通用配置参数
+    common_cfg_args = [
+        {"name": "MaxMemFree", "ps": "每个分配器允许持有的最大空闲KB数", 'type': 2},
     ]
+    
+    # 合并配置参数
+    cfg_args = []
+    if mpm_module in mpm_cfg_args:
+        cfg_args.extend(mpm_cfg_args[mpm_module])
+    cfg_args.extend(common_cfg_args)
 
-    # {"name": "client_body_buffer_size", "ps": "请求主体缓冲区"}
     rdata = []
     for i in cfg_args:
-        rep = r"(%s)\s+(\w+)" % i["name"]
-        k = re.search(rep, content)
+        # 匹配 MPM 特定配置
+        rep = r"<IfModule mpm_%s_module>.*?(%s)\s+(\w+).*?</IfModule>" % (mpm_module, i["name"])
+        k = re.search(rep, content, re.DOTALL)
+        
+        # 如果没有找到 MPM 特定配置，尝试匹配通用配置
         if not k:
-            return mw.returnJson(False, "获取 key {} 失败".format(k))
-        k = k.group(1)
-        v = re.search(rep, content)
-        if not v:
-            return mw.returnJson(False, "获取 value {} 失败".format(v))
-        v = v.group(2)
+            rep = r"(%s)\s+(\w+)" % i["name"]
+            k = re.search(rep, content)
+        
+        if not k:
+            continue
+        
+        key = k.group(1)
+        v = k.group(2) if len(k.groups()) > 1 else ""
 
         if re.search(unitrep, v):
             u = str.upper(v[-1])
@@ -416,87 +468,46 @@ def getCfg():
         else:
             u = ""
 
-        kv = {"name": k, "value": v, "unit": u,
+        kv = {"name": key, "value": v, "unit": u,
               "ps": i["ps"], "type": i["type"]}
         rdata.append(kv)
-
     return mw.returnJson(True, "ok", rdata)
 
 def replaceChar(value, index, new_char):
     return value[:index] + new_char + value[index+1:]
 
-def makeWorkerCpuAffinity(val):
-    if val == "auto":
-        return "auto"
-
-    if mw.isNumber(val):
-        core_num = int(val)
-        default_core_str = "0"*core_num
-        core_num_arr = []
-        for x in range(core_num):
-            t = replaceChar(default_core_str, x , "1")
-            core_num_arr.append(t)
-        return " ".join(core_num_arr)
-
-    return 'auto'
-
 def setCfg():
 
     args = getArgs()
-    data = checkArgs(args, [
-        'worker_processes', 'worker_connections', 'keepalive_timeout','zstd','brotli',
-        'gzip', 'gzip_min_length', 'gzip_comp_level', 'client_max_body_size',
-        'server_names_hash_bucket_size', 'client_header_buffer_size'
-    ])
-    if not data[0]:
-        return data[1]
-
+    
+    # 检查参数，允许动态参数
+    
     cfg = getConf()
     mw.backFile(cfg)
     content = mw.readFile(cfg)
 
-    unitrep = "[kmgKMG]"
-    cfg_args = [
-        {"name": "worker_processes", "ps": "处理进程,auto表示自动,数字表示进程数", 'type': 2},
-        {"name": "worker_connections", "ps": "最大并发链接数", 'type': 2},
-        {"name": "keepalive_timeout", "ps": "连接超时时间", 'type': 2},
-        {"name": "zstd", "ps": "是否开启zstd压缩传输", 'type': 1},
-        {"name": "brotli", "ps": "是否开启brotli压缩传输", 'type': 1},
-        {"name": "gzip", "ps": "是否开启压缩传输", 'type': 1},
-        {"name": "gzip_min_length", "ps": "最小压缩文件", 'type': 2},
-        {"name": "gzip_comp_level", "ps": "压缩率", 'type': 2},
-        {"name": "client_max_body_size", "ps": "最大上传文件", 'type': 2},
-        {"name": "server_names_hash_bucket_size",
-            "ps": "服务器名字的hash表大小", 'type': 2},
-        {"name": "client_header_buffer_size", "ps": "客户端请求头buffer大小", 'type': 2},
-    ]
+    # 获取当前 MPM 模块
+    mpm_module = ""
+    mpm_match = re.search(r"mpm_(\w+)_module", content)
+    if mpm_match:
+        mpm_module = mpm_match.group(1)
 
-    # print(args)
+    # 验证参数值
     for k, v in args.items():
-        # print(k, v)
-        rep = r"%s\s+[^kKmMgG\;\n]+" % k
-        if k == "worker_processes" or k == "gzip":
-            if not re.search(r"auto|on|off|\d+", v):
-                return mw.returnJson(False, '参数值错误')
-        elif k == "zstd" or k == "brotli":
-            if not re.search(r"auto|on|off|\d+", v):
-                return mw.returnJson(False, '参数值错误')
-        else:
-            if not re.search(r"\d+", v):
-                return mw.returnJson(False, '参数值错误,请输入数字整数')
+        # 检查是否为数字参数
+        if not re.search(r"\d+", v):
+            return mw.returnJson(False, '参数值错误,请输入数字整数')
 
-        if k == "worker_processes" :
-            k_wca = "worker_cpu_affinity"
-            rep_wca = r"%s\s+[^\;\n]+" % k_wca
-            v_wca = makeWorkerCpuAffinity(v)
-            newconf = "%s %s" % (k_wca, v_wca)
-            content = re.sub(rep_wca, newconf, content)
-
-
+        # 替换 MPM 特定配置
+        if mpm_module:
+            rep = r"(<IfModule mpm_%s_module>.*?)%s\s+\d+(.*?</IfModule>)" % (mpm_module, k)
+            if re.search(rep, content, re.DOTALL):
+                newconf = "\1%s %s\2" % (k, v)
+                content = re.sub(rep, newconf, content, flags=re.DOTALL)
+        
+        # 替换通用配置
+        rep = r"%s\s+\d+" % k
         if re.search(rep, content):
-            newconf = "%s %s" % (k, v)
-            content = re.sub(rep, newconf, content)
-        elif re.search(rep, content):
             newconf = "%s %s" % (k, v)
             content = re.sub(rep, newconf, content)
 

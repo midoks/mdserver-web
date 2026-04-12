@@ -224,19 +224,16 @@ function setOpCfg(){
 }
 
 function submitConf() {
-    var data = {
-        worker_processes: $("input[name='worker_processes']").val(),
-        worker_connections: $("input[name='worker_connections']").val(),
-        keepalive_timeout: $("input[name='keepalive_timeout']").val(),
-        zstd: $("select[name='zstd']").val() || 'on',
-        brotli: $("select[name='brotli']").val() || 'on',
-        gzip: $("select[name='gzip']").val() || 'on',
-        gzip_min_length: $("input[name='gzip_min_length']").val(),
-        gzip_comp_level: $("input[name='gzip_comp_level']").val(),
-        client_max_body_size: $("input[name='client_max_body_size']").val(),
-        server_names_hash_bucket_size: $("input[name='server_names_hash_bucket_size']").val(),
-        client_header_buffer_size: $("input[name='client_header_buffer_size']").val(),
-    };
+    var data = {};
+    
+    // 收集所有配置参数
+    $("input[name]").each(function() {
+        data[$(this).attr('name')] = $(this).val();
+    });
+    
+    $("select[name]").each(function() {
+        data[$(this).attr('name')] = $(this).val() || 'on';
+    });
 
     // console.log(data);
     httpPost('set_cfg', data, function(rdata){
