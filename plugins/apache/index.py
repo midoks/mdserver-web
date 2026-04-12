@@ -71,7 +71,6 @@ def checkArgs(data, ck=[]):
 
 def clearTemp():
     path_bin = getServerDir() + "/httpd"
-    mw.execShell('rm -rf ' + path_bin + '/client_body_temp')
 
 
 def getConf():
@@ -481,8 +480,7 @@ def setCfg():
     args = getArgs()
     
     # 检查参数，允许动态参数
-    
-    cfg = getConf()
+    cfg = getConfMpm()
     mw.backFile(cfg)
     content = mw.readFile(cfg)
 
@@ -512,7 +510,7 @@ def setCfg():
             content = re.sub(rep, newconf, content)
 
     mw.writeFile(cfg, content)
-    isError = mw.checkWebConfig()
+    isError = mw.checkHttpdConfig()
     if (isError != True):
         mw.restoreFile(cfg)
         return mw.returnJson(False, 'ERROR: 配置出错<br><a style="color:red;">' + isError.replace("\n", '<br>') + '</a>')

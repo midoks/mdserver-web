@@ -1463,7 +1463,19 @@ def checkWebConfig():
     result = execShell(cmd)
     searchStr = 'test is successful'
     if result[1].find(searchStr) == -1:
-        msg = getInfo('配置文件错误: {1}', (result[1],))
+        msg = getInfo('配置文件错误[openresty]: {1}', (result[1],))
+        writeLog("软件管理", msg)
+        return result[1]
+    return True
+
+def checkHttpdConfig():
+    op_dir = getServerDir() + '/apache/httpd'
+    # "ulimit -n 10240 && " +
+    cmd = op_dir + "/bin/httpd -t"
+    result = execShell(cmd)
+    searchStr = 'Syntax OK'
+    if result[1].find(searchStr) == -1:
+        msg = getInfo('配置文件错误[httpd]: {1}', (result[1],))
         writeLog("软件管理", msg)
         return result[1]
     return True
