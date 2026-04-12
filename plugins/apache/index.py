@@ -476,8 +476,6 @@ def replaceChar(value, index, new_char):
     return value[:index] + new_char + value[index+1:]
 
 def setCfg():
-    # return mw.returnJson(False, '暂时不支持')
-
     args = getArgs()
     
     # 检查参数，允许动态参数
