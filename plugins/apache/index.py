@@ -79,6 +79,11 @@ def getConf():
     return path
 
 
+def getConfMpm():
+    path = getServerDir() + "/httpd/conf/extra/httpd-mpm.conf"
+    return path
+
+
 def getConfTpl():
     path = getPluginDir() + '/conf/httpd.conf'
     return path
@@ -369,7 +374,7 @@ def errorLogPath():
 
 
 def getCfg():
-    cfg = getConf()
+    cfg = getConfMpm()
     content = mw.readFile(cfg)
 
     unitrep = "[kmgKMG]"
