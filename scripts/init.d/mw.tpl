@@ -45,7 +45,7 @@ mw_start_panel()
     isStart=`ps -ef|grep 'gunicorn -c setting.py app:app' |grep -v grep|awk '{print $2}'`
     if [ "$isStart" == '' ];then
         echo -e "starting mw-panel... \c"
-        cd ${PANEL_DIR}/web &&  gunicorn -c setting.py app:app &
+        cd ${PANEL_DIR}/web &&  gunicorn -c setting.py app:app
         port=$(cat ${PANEL_DIR}/data/port.pl)
         isStart=""
         while [[ "$isStart" == "" ]];
@@ -190,7 +190,7 @@ mw_reload()
         do
                 kill -9 $p
         done
-        cd ${PANEL_DIR}/web && gunicorn -c setting.py app:app &
+        cd ${PANEL_DIR}/web && gunicorn -c setting.py app:app
         isStart=`ps aux|grep 'gunicorn -c setting.py app:app'|grep -v grep|awk '{print $2}'`
         if [ "$isStart" == '' ];then
             echo -e "\033[31mfailed\033[0m"
@@ -487,7 +487,7 @@ mw_debug(){
         cd ${PANEL_DIR}/web
     fi
     # gunicorn -b :$port -k geventwebsocket.gunicorn.workers.GeventWebSocketWorker -w 1  app:app
-    gunicorn -b :$port -k gevent -w 1  app:app &
+    gunicorn -b :$port -k gevent -w 1  app:app
 }
 
 mw_connect_mysql(){
