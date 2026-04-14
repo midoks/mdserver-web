@@ -760,16 +760,19 @@ case "$1" in
     'reload') mw_reload;;
     'restart') 
         (mw_stop && sleep 2 && mw_start) > /dev/null 2>&1 &
-        echo "Restarting mw service in background..."
-        echo "Please check service status later.";;
+        echo "restarting mw service in background..."
+        echo "please check service status later."
+        mw_default;;
     'restart_panel')
         (mw_stop_panel && sleep 2 && mw_start_panel) > /dev/null 2>&1 &
-        echo "Restarting mw-panel service in background..."
-        echo "Please check service status later.";;
+        echo "restarting mw-panel service in background..."
+        echo "please check service status later."
+        mw_default;;
     'restart_task')
         (mw_stop_task && sleep 2 && mw_start_task) > /dev/null 2>&1 &
-        echo "Restarting mw-task service in background..."
-        echo "Please check service status later.";;
+        echo "restarting mw-task service in background..."
+        echo "please check service status later."
+        mw_default;;
     'status') mw_status;;
     'logs') error_logs;;
     'close') mw_close;;
