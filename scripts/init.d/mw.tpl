@@ -759,6 +759,7 @@ case "$1" in
     'reload') mw_reload;;
     'restart') 
         mw_stop
+        sleep 2
         mw_start;;
     'restart_panel')
         mw_stop_panel
