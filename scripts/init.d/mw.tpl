@@ -132,7 +132,7 @@ mw_stop_task()
 mw_stop_panel()
 {
     echo -e "stopping mw-panel... \c";
-    pidfile=${PANEL_DIR}/logs/mw.pid
+    pidfile=${PANEL_DIR}/logs/panel.pid
     if [ -f $pidfile ];then
         pid=`cat $pidfile`
         kill -9 $pid > /dev/null 2>&1
@@ -763,9 +763,11 @@ case "$1" in
         mw_start;;
     'restart_panel')
         mw_stop_panel
+        sleep 2
         mw_start_panel;;
     'restart_task')
         mw_stop_task
+        sleep 2
         mw_start_task;;
     'status') mw_status;;
     'logs') error_logs;;
