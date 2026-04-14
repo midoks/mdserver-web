@@ -48,6 +48,7 @@ mw_start_panel()
         cd ${PANEL_DIR}/web &&  gunicorn -c setting.py app:app
         port=$(cat ${PANEL_DIR}/data/port.pl)
         isStart=""
+        n=0
         while [[ "$isStart" == "" ]];
         do
             echo -e ".\c"
