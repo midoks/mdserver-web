@@ -35,18 +35,21 @@ def list():
 
 # 计划任务日志
 @blueprint.route('/logs', endpoint='logs', methods=['POST'])
+@panel_login_required
 def logs():
     cron_id = request.form.get('id', '')
     return MwCrontab.instance().cronLog(cron_id)
 
 # 删除计划任务
 @blueprint.route('/del', endpoint='del', methods=['POST'])
+@panel_login_required
 def crontab_del():
     cron_id = request.form.get('id', '')   
     return MwCrontab.instance().delete(cron_id)
 
 # 删除计划任务日志
 @blueprint.route('/del_logs', endpoint='del_logs', methods=['POST'])
+@panel_login_required
 def del_logs():
     cron_id = request.form.get('id', '')   
     return MwCrontab.instance().delLogs(cron_id)
@@ -54,12 +57,14 @@ def del_logs():
 
 # 设置计划任务状态
 @blueprint.route('/set_cron_status', endpoint='set_cron_status', methods=['POST'])
+@panel_login_required
 def set_cron_status():
     cron_id = request.form.get('id', '')   
     return MwCrontab.instance().setCronStatus(cron_id)
 
 # 设置计划任务状态
 @blueprint.route('/get_data_list', endpoint='get_data_list', methods=['POST'])
+@panel_login_required
 def get_data_list():
     stype = request.form.get('type', '')
     return MwCrontab.instance().getDataList(stype)
@@ -67,6 +72,7 @@ def get_data_list():
 
 # 获取计划任务
 @blueprint.route('/get_crond_find', endpoint='get_crond_find', methods=['POST'])
+@panel_login_required
 def get_crond_find():
     cron_id = request.form.get('id', '')
     data = MwCrontab.instance().getCrondFind(cron_id)
@@ -74,6 +80,7 @@ def get_crond_find():
 
 # 修改计划任务
 @blueprint.route('/modify_crond', endpoint='modify_crond', methods=['POST'])
+@panel_login_required
 def modify_crond():
     request_data = {}
     
@@ -96,6 +103,7 @@ def modify_crond():
 
 # 执行计划任务
 @blueprint.route('/start_task', endpoint='start_task', methods=['POST'])
+@panel_login_required
 def start_task():
     cron_id = request.form.get('id', '')
     return MwCrontab.instance().startTask(cron_id)
