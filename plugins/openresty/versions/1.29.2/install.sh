@@ -132,11 +132,11 @@ Install_openresty()
 	fi
 
 	# br
-	if [ ! -d ${openrestyDir}/openresty-${VERSION}/ngx_brotli ];then
-		cd ${openrestyDir}/openresty-${VERSION} && git clone https://github.com/wxx9248/ngx_brotli.git
-		cd ${openrestyDir}/openresty-${VERSION}/ngx_brotli && git submodule update --init
+	if [ ! -d ${openrestyDir}/ngx_brotli ];then
+		cd ${openrestyDir} && git clone https://github.com/wxx9248/ngx_brotli.git
+		cd ${openrestyDir}/ngx_brotli && git submodule update --init
 
-		OPTIONS="${OPTIONS} --add-module=${openrestyDir}/openresty-${VERSION}/ngx_brotli"
+		OPTIONS="${OPTIONS} --add-module=${openrestyDir}/ngx_brotli"
 	fi
 
 	OPTIONS="${OPTIONS} --with-threads"
