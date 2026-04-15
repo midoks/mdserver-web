@@ -759,7 +759,9 @@ case "$1" in
     'stop') mw_stop;;
     'reload') mw_reload;;
     'restart') 
-        mw_stop && sleep 2 && mw_start
+        mw_stop
+        sleep 2
+        mw_start
         # (mw_stop && sleep 2 && mw_start) > /dev/null 2>&1 &
         # echo "restarting mw service in background..."
         # echo "please check service status later."
