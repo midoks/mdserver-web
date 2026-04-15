@@ -53,7 +53,8 @@ mw_start_panel()
         do
             echo -e ".\c"
             sleep 0.5
-            isStart=$(lsof -n -P -i:$port|grep LISTEN|grep -v grep|awk '{print $2}'|xargs)
+            # isStart=$(lsof -n -P -i:$port|grep LISTEN|grep -v grep|awk '{print $2}'|xargs)
+            isStart=$(ss -tulnp | grep ":$port" |grep LISTEN|grep -v grep|awk '{print $2}'|xargs)
             if [[ "$isStart" == "" ]];then
                 isStart=$(ps -ef|grep python3|grep mdserver-web|grep app:app|awk '{print $2}'|xargs)
             fi
