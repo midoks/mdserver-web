@@ -759,9 +759,10 @@ case "$1" in
     'stop') mw_stop;;
     'reload') mw_reload;;
     'restart') 
-        (mw_stop && sleep 2 && mw_start) > /dev/null 2>&1 &
-        echo "restarting mw service in background..."
-        echo "please check service status later."
+        mw_stop && sleep 2 && mw_start
+        # (mw_stop && sleep 2 && mw_start) > /dev/null 2>&1 &
+        # echo "restarting mw service in background..."
+        # echo "please check service status later."
         mw_default;;
     'restart_panel')
         (mw_stop_panel && sleep 2 && mw_start_panel) > /dev/null 2>&1 &
