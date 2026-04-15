@@ -45,7 +45,7 @@ mw_start_panel()
     isStart=`ps -ef|grep 'gunicorn -c setting.py app:app' |grep -v grep|awk '{print $2}'`
     if [ "$isStart" == '' ];then
         echo -e "starting mw-panel... \c"
-        cd ${PANEL_DIR}/web &&  gunicorn -c setting.py app:app &
+        cd ${PANEL_DIR}/web &&  gunicorn -c setting.py app:app
         port=$(cat ${PANEL_DIR}/data/port.pl)
         isStart=""
         n=0
