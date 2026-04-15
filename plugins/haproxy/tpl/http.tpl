@@ -7,9 +7,9 @@ global
 
 
 defaults
-	mode				http
-	log					global
-	option				httplog
+	mode				tcp
+	log					local local0
+	option				tcplog
 	timeout	connect		10s
 	timeout client		15s
 	timeout	server		15s
@@ -32,7 +32,6 @@ frontend tcp_frontend
 
 backend tcp_backend
     mode tcp
-    balance roundrobin
     server tcp1 192.168.1.100:8090 check
 
 
