@@ -30,6 +30,7 @@ yum install -y numactl
 yum install -y sshpass
 yum install -y libzstd-devel
 yum install -y postgresql-devel
+yum install -y brotli-devel
 
 if [ -f /usr/sbin/iptables ];then
 
