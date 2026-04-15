@@ -24,6 +24,7 @@ import thisdb
 from .site import blueprint
 
 @blueprint.route('/get_site_doc', endpoint='get_site_doc',methods=['POST'])
+@panel_login_required
 def get_site_doc():
     stype = request.form.get('type', '0').strip()
     vlist = []
