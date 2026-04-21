@@ -37,3 +37,5 @@ pytz
 pyTelegramBotAPI
 telebot
 pyyaml
+Flask-Compress
+croniter
