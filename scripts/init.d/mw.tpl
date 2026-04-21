@@ -762,18 +762,15 @@ case "$1" in
     'restart') 
         mw_stop
         sleep 2
-        mw_start
-        mw_default;;
+        mw_start;;
     'restart_panel')
         mw_stop_panel
         sleep 2
-        mw_start_panel
-        mw_default;;
+        mw_start_panel;;
     'restart_task')
         mw_stop_task 
         sleep 2
-        mw_start_task
-        mw_default;;
+        mw_start_task;;
     'status') mw_status;;
     'logs') error_logs;;
     'close') mw_close;;
