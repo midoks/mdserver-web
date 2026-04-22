@@ -59,10 +59,6 @@ def send_msg(bot, tag='ad', trigger_time=300):
         ],
         [
             types.InlineKeyboardButton(
-                text="代付-代实名-备案域名-国际云服务器", url='https://t.me/gjgzs2022')
-        ],
-        [
-            types.InlineKeyboardButton(
                 text="实名认证/过人脸🕵️‍♀️各种账号处理✅", url='https://t.me/niuniu234')
         ],
         [

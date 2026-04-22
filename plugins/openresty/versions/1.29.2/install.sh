@@ -140,14 +140,22 @@ Install_openresty()
 	fi
 
 	OPTIONS="${OPTIONS} --with-threads"
-	OPTIONS="${OPTIONS} --with-file-aio"
 	OPTIONS="${OPTIONS} --with-pcre-jit"
 	OPTIONS="${OPTIONS} --with-http_gzip_static_module"
 
+	if [ "$sysName" != "Darwin" ];then
+		OPTIONS="${OPTIONS} --with-file-aio"
+	fi
+
 	#zstd
-	if [ ! -d ${openrestyDir}/zstd-nginx-module ];then
+	if [ ! -d ${openrestyDir}/zstd-nginx-module-master ];then
 		cd ${openrestyDir} && wget -O $openrestyDir/zstd-nginx-module.tar.gz https://github.com/tokers/zstd-nginx-module/archive/refs/heads/master.tar.gz
 		cd ${openrestyDir} && tar -zxvf zstd-nginx-module.tar.gz
+
+		if [ "$sysName" == "Darwin" ];then
+			export ZSTD_INC=/opt/homebrew/include
+			export ZSTD_LIB=/opt/homebrew/lib
+		fi
 
 		pkg-config --exists --print-errors libzstd
 		if [ "$?" == "0" ];then
@@ -195,9 +203,9 @@ Install_openresty()
 		rm -rf $openrestyDir/openresty-${VERSION}
 	fi
 
-	if [ -d $openrestyDir/zstd-nginx-module-master ];then
-		rm -rf $openrestyDir/zstd-nginx-module-master
-	fi
+	# if [ -d $openrestyDir/zstd-nginx-module-master ];then
+	# 	rm -rf $openrestyDir/zstd-nginx-module-master
+	# fi
 
 	# if [ -d $openrestyDir/ngx_brotli ];then
 	# 	rm -rf $openrestyDir/ngx_brotli
