@@ -579,8 +579,8 @@ def setCfg():
 
         if k == "brotli":
             if v == "on":
-                # 批量替换所有以 #brotli 开头的指令为 brotli
-                rep_var = r"#brotli[\w_]*\s+[^\;\n]+"
+                # 批量替换所有以 #brotli 等开头的指令为 brotli
+                rep_var = r"#+brotli[\w_]*\s+[^\;\n]+"
                 newconf = lambda m: m.group(0).lstrip('#')
                 content = re.sub(rep_var, newconf, content)
             if v == "off":
@@ -593,7 +593,7 @@ def setCfg():
         if k == "zstd":
             if v == "on":
                 # 批量替换所有以 #zstd 开头的指令为 zstd
-                rep_var = r"#zstd[\w_]*\s+[^\;\n]+"
+                rep_var = r"#+zstd[\w_]*\s+[^\;\n]+"
                 newconf = lambda m: m.group(0).lstrip('#')
                 content = re.sub(rep_var, newconf, content)
             if v == "off":
