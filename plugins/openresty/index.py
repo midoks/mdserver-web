@@ -577,6 +577,31 @@ def setCfg():
             if not re.search(r"\d+", v):
                 return mw.returnJson(False, '参数值错误,请输入数字整数')
 
+        if k == "brotli":
+            if v == "on":
+                # 批量替换所有以 #brotli 开头的指令为 brotli
+                rep_var = r"#brotli[\w_]*\s+[^\;\n]+"
+                newconf = lambda m: m.group(0).lstrip('#')
+                content = re.sub(rep_var, newconf, content)
+            if v == "off":
+                # 批量替换所有以 brotli 开头且没有 # 前缀的指令为 #brotli
+                rep_var = r"(?<!#)brotli[\w_]*\s+[^\;\n]+"
+                newconf = lambda m: '#' + m.group(0)
+                content = re.sub(rep_var, newconf, content)
+
+
+        if k == "zstd":
+            if v == "on":
+                # 批量替换所有以 #zstd 开头的指令为 zstd
+                rep_var = r"#zstd[\w_]*\s+[^\;\n]+"
+                newconf = lambda m: m.group(0).lstrip('#')
+                content = re.sub(rep_var, newconf, content)
+            if v == "off":
+                # 批量替换所有以 zstd 开头且没有 # 前缀的指令为 #zstd
+                rep_var = r"(?<!#)zstd[\w_]*\s+[^\;\n]+"
+                newconf = lambda m: '#' + m.group(0)
+                content = re.sub(rep_var, newconf, content)
+
         if k == "worker_processes" :
             k_wca = "worker_cpu_affinity"
             rep_wca = r"%s\s+[^\;\n]+" % k_wca
