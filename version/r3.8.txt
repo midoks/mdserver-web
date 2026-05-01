@@ -39,3 +39,4 @@ telebot
 pyyaml
 Flask-Compress
 croniter
+geoip2

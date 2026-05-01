@@ -50,3 +50,4 @@ Flask-Compress
 brotli
 zstd
 zstandard
+geoip2
