@@ -591,6 +591,7 @@ mw_connect_pgdb(){
 
 
 mw_mongodb(){
+    # /www/server/mongodb/bin/mongo --version
     CONF="${ROOT_PATH}/mongodb/mongodb.conf"
     if [ ! -f "$CONF" ]; then
         echo -e "not install mongodb!"
@@ -606,7 +607,14 @@ mw_mongodb(){
         AUTH_STR="-u root -p ${pwd}"
     fi
 
-    CLIEXEC="${ROOT_PATH}/mongodb/bin/mongosh --port ${MGDB_PORT} ${AUTH_STR}"
+    mg_version=$(/${ROOT_PATH}/mongodb/bin/mongo --version)
+
+    # 根据 MongoDB 版本选择使用 mongo 还是 mongosh
+    if [[ "$mg_version" == *"3.0"* || "$mg_version" == *"3.2"* || "$mg_version" == *"3.4"* || "$mg_version" == *"3.6"* ]]; then
+        CLIEXEC="${ROOT_PATH}/mongodb/bin/mongo --port ${MGDB_PORT} ${AUTH_STR} --authenticationDatabase admin"
+    else
+        CLIEXEC="${ROOT_PATH}/mongodb/bin/mongosh --port ${MGDB_PORT} ${AUTH_STR}"
+    fi
     echo $CLIEXEC
     ${CLIEXEC}
 }
@@ -789,6 +797,7 @@ case "$1" in
     'pgdb') mw_connect_pgdb;;
     'redis') mw_redis;;
     'valkey')mw_valkey;;
+    'mgdb') mw_mongodb;;
     'mongodb') mw_mongodb;;
     'ssh') mw_ssh;;
     'venv') mw_update_venv;;

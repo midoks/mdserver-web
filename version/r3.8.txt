@@ -40,3 +40,4 @@ pyyaml
 Flask-Compress
 croniter
 geoip2
+docker

@@ -6,6 +6,7 @@ export PATH
 
 # cd /Users/midoks/Desktop/mwdev/server/mdserver-web/plugins/mongodb && /bin/bash install.sh install 7.0
 # cd /www/server/mdserver-web/plugins/mongodb && /bin/bash install.sh install 7.0
+# cd /www/server/mdserver-web/plugins/mongodb && /bin/bash install.sh install 3.0
 # cd /www/server/mdserver-web && python3 /www/server/mdserver-web/plugins/mongodb/index.py start
 
 
@@ -77,6 +78,13 @@ Install_app()
 		#初始化 
 		cd ${rootPath} && python3 ${rootPath}/plugins/mongodb/index.py start
 		cd ${rootPath} && python3 ${rootPath}/plugins/mongodb/index.py initd_install
+	fi
+
+	if [ "${VERSION}" == "3.0" ];then
+		# 降低版本
+		pip install pymongo==3.12.0
+	else
+		pip install pymongo
 	fi
 }
 

@@ -196,11 +196,37 @@ def mongdbClientS():
     mg_root = pSqliteDb('config').where('id=?', (1,)).getField('mg_root')
 
     if auth == 'disabled':
-        client = pymongo.MongoClient(host=ip, port=int(port), directConnection=True)
+        client = pymongo.MongoClient(host=ip, port=int(port))
     else:
         # print(auth,mg_root)
-        client = pymongo.MongoClient(host=ip, port=int(port), directConnection=True, username='root',password=mg_root)
+        # 使用 admin 数据库进行认证，兼容 MongoDB 3.0
+        client = pymongo.MongoClient(host=ip, port=int(port), username='root', password=mg_root, authSource='admin')
     return client
+
+def getMongoDBVersion():
+    '''获取MongoDB版本号'''
+    import pymongo
+    port = getConfPort()
+    ip = getConfLocalIp()
+    try:
+        # 先不使用认证连接
+        client = pymongo.MongoClient(host=ip, port=int(port), serverSelectionTimeoutMS=5000)
+        db = client.admin
+        serverStatus = db.command('serverStatus')
+        version = serverStatus.get('version', '4.0')
+        client.close()
+        return version
+    except Exception as e:
+        # 如果无法获取版本，默认返回 4.0（新版本兼容模式）
+        return '4.0'
+
+def isMongoDB3x():
+    '''判断是否为MongoDB 3.x版本'''
+    version = getMongoDBVersion()
+    # 匹配 3.x 版本
+    if version.startswith('3.'):
+        return True
+    return False
 
 def mongdbClient():
     import pymongo
@@ -208,13 +234,17 @@ def mongdbClient():
     auth = getConfAuth()
     ip = getConfLocalIp()
     mg_root = pSqliteDb('config').where('id=?', (1,)).getField('mg_root')
-    # print(ip,port,auth,mg_root)
+    
     if auth == 'disabled':
-        client = pymongo.MongoClient(host=ip, port=int(port), directConnection=True)
+        client = pymongo.MongoClient(host=ip, port=int(port))
     else:
-        # uri = "mongodb://root:"+mg_root+"@127.0.0.1:"+str(port)
-        # client = pymongo.MongoClient(uri)
-        client = pymongo.MongoClient(host=ip, port=int(port), directConnection=True, username='root',password=mg_root)
+        # 根据MongoDB版本选择认证方式
+        if isMongoDB3x():
+            # MongoDB 3.x 使用 authSource 指定认证数据库
+            client = pymongo.MongoClient(host=ip, port=int(port), username='root', password=mg_root, authSource='admin')
+        else:
+            # MongoDB 4.x+ 默认在 admin 数据库认证
+            client = pymongo.MongoClient(host=ip, port=int(port), username='root', password=mg_root)
     return client
 
 
@@ -711,7 +741,6 @@ def setRootPwd(version=''):
 def setUserPwd(version=''):
 
     client = mongdbClient()
-    db = client.admin
     sqlite_db = pSqliteDb('databases')
 
     args = getArgs()
@@ -724,6 +753,8 @@ def setUserPwd(version=''):
     uid = args['id']
     try:
         name = sqlite_db.where('id=?', (uid,)).getField('name')
+        # 将用户创建在目标数据库中，而不是 admin 数据库
+        db = client[name]
         user_roles = [{'role': 'dbOwner', 'db': name}, {'role': 'userAdmin', 'db': name}]
 
         try:
@@ -824,16 +855,16 @@ def getDbInfo():
 
 def toDbBase(find):
     client = mongdbClient()
-    db_admin = client.admin
     data_name = find['name']
     db = client[data_name]
 
     db.zchat.insert_one({})
     user_roles = [{'role': 'dbOwner', 'db': data_name}, {'role': 'userAdmin', 'db': data_name}]
+    # 将用户创建在目标数据库中，而不是 admin 数据库
     try:
-        db_admin.command("createUser", find['username'], pwd=find['password'], roles=user_roles)
+        db.command("createUser", find['username'], pwd=find['password'], roles=user_roles)
     except Exception as e:
-        db_admin.command("updateUser", find['username'], pwd=find['password'], roles=user_roles)
+        db.command("updateUser", find['username'], pwd=find['password'], roles=user_roles)
     return 1
 
 def syncToDatabases():
@@ -990,7 +1021,8 @@ def setDbAccess():
         user_roles.append(t)
 
     client = mongdbClient()
-    db = client.admin
+    # 在目标数据库中操作用户，而不是 admin 数据库
+    db = client[name]
 
     try:
         db.command("updateUser", username, pwd=mg_pass, roles=user_roles)
