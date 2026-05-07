@@ -713,7 +713,6 @@ def setRootPwd(version=''):
 def setUserPwd(version=''):
 
     client = mongdbClient()
-    db = client.admin
     sqlite_db = pSqliteDb('databases')
 
     args = getArgs()
@@ -726,6 +725,8 @@ def setUserPwd(version=''):
     uid = args['id']
     try:
         name = sqlite_db.where('id=?', (uid,)).getField('name')
+        # 将用户创建在目标数据库中，而不是 admin 数据库
+        db = client[name]
         user_roles = [{'role': 'dbOwner', 'db': name}, {'role': 'userAdmin', 'db': name}]
 
         try:
@@ -826,16 +827,16 @@ def getDbInfo():
 
 def toDbBase(find):
     client = mongdbClient()
-    db_admin = client.admin
     data_name = find['name']
     db = client[data_name]
 
     db.zchat.insert_one({})
     user_roles = [{'role': 'dbOwner', 'db': data_name}, {'role': 'userAdmin', 'db': data_name}]
+    # 将用户创建在目标数据库中，而不是 admin 数据库
     try:
-        db_admin.command("createUser", find['username'], pwd=find['password'], roles=user_roles)
+        db.command("createUser", find['username'], pwd=find['password'], roles=user_roles)
     except Exception as e:
-        db_admin.command("updateUser", find['username'], pwd=find['password'], roles=user_roles)
+        db.command("updateUser", find['username'], pwd=find['password'], roles=user_roles)
     return 1
 
 def syncToDatabases():
@@ -992,7 +993,8 @@ def setDbAccess():
         user_roles.append(t)
 
     client = mongdbClient()
-    db = client.admin
+    # 在目标数据库中操作用户，而不是 admin 数据库
+    db = client[name]
 
     try:
         db.command("updateUser", username, pwd=mg_pass, roles=user_roles)
