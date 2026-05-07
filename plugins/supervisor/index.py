@@ -74,11 +74,15 @@ def checkArgs(data, ck=[]):
 
 
 def status():
-    data = mw.execShell(
-        "ps -ef|grep supervisor | grep -v grep | grep -v index.py | awk '{print $2}'")
-    if data[0] == '':
-        return 'stop'
-    return 'start'
+    # data = mw.execShell(
+    #     "ps -ef|grep supervisor | grep -v grep | grep -v index.py | awk '{print $2}'")
+    # if data[0] == '':
+    #     return 'stop'
+
+    pid_file = getServerDir() + "/run/supervisor.pid"
+    if os.path.exists(pid_file):
+        return "start"
+    return 'stop'
 
 
 def initDreplace():
