@@ -45,7 +45,7 @@ def removeTask(task_id):
         status = mw.M('tasks').where('id=?', (task_id,)).getField('status')
         mw.M('tasks').delete(task_id)
         if str(status) == '-1':
-            cmd = "ps aux | grep 'panel_task.py' | grep -v grep |awk '{print $2}'"
+            cmd = "ps -ef | grep 'panel_task.py' | grep -v grep |awk '{print $2}'"
             task_pid = mw.execShell(cmd)
             task_list = task_pid[0].strip().split("\n")
             for i in range(len(task_list)):
