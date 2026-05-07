@@ -8,6 +8,7 @@ rootPath=$(dirname "$rootPath")
 rootPath=$(dirname "$rootPath")
 serverPath=$(dirname "$rootPath")
 
+# https://fastdl.mongodb.org/osx/mongodb-osx-x86_64-3.0.15.tgz
 VERSION=3.0.15
 
 MG_DIR=$serverPath/source/mongodb

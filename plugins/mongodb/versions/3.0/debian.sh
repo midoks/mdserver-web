@@ -8,6 +8,7 @@ rootPath=$(dirname "$rootPath")
 rootPath=$(dirname "$rootPath")
 serverPath=$(dirname "$rootPath")
 
+# https://fastdl.mongodb.org/linux/mongodb-linux-x86_64-3.0.15.tgz
 VERSION=3.0.15
 SYS_ARCH=`arch`
 SYS_VERSION_ID=`cat /etc/*-release | grep VERSION_ID | awk -F = '{print $2}' | awk -F "\"" '{print $2}'`
@@ -21,7 +22,8 @@ if [ "$SYS_NAME" -lt "10" ];then
 	SYS_NAME="10"
 fi
 
-FILE_NAME=mongodb-linux-${SYS_ARCH}-debian${SYS_NAME}-${VERSION}
+# FILE_NAME=mongodb-linux-${SYS_ARCH}-debian${SYS_NAME}-${VERSION}
+FILE_NAME=mongodb-linux-${SYS_ARCH}-${VERSION}
 FILE_NAME_TGZ=${FILE_NAME}.tgz
 
 
