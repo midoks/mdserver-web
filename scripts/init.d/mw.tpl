@@ -611,7 +611,7 @@ mw_mongodb(){
 
     # 根据 MongoDB 版本选择使用 mongo 还是 mongosh
     if [[ "$mg_version" == *"3.0"* || "$mg_version" == *"3.2"* || "$mg_version" == *"3.4"* || "$mg_version" == *"3.6"* ]]; then
-        CLIEXEC="${ROOT_PATH}/mongodb/bin/mongo --port ${MGDB_PORT} ${AUTH_STR}"
+        CLIEXEC="${ROOT_PATH}/mongodb/bin/mongo --port ${MGDB_PORT} ${AUTH_STR} --authenticationDatabase admin"
     else
         CLIEXEC="${ROOT_PATH}/mongodb/bin/mongosh --port ${MGDB_PORT} ${AUTH_STR}"
     fi
