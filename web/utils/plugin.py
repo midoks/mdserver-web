@@ -843,7 +843,7 @@ class plugin(object):
         source_bin_activate =  mw.getPanelDir() + "/bin/activate"
         py_cmd_dir = 'cd ' + mw.getPanelDir()
         if os.path.exists(source_bin_activate):
-            py_cmd_dir += " source "+source_bin_activate
+            py_cmd_dir += " && source "+source_bin_activate
         do_cmd = py_cmd_dir + " && "+ py_cmd
         data = mw.execShell(do_cmd)
 
