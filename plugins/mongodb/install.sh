@@ -83,6 +83,8 @@ Install_app()
 	if [ "${VERSION}" == "3.0" ];then
 		# 降低版本
 		pip install pymongo==3.12.0
+	else
+		pip install pymongo
 	fi
 }
 
