@@ -9,8 +9,12 @@ serverPath=$(dirname "$rootPath")
 
 VERSION=$2
 
+# cd /www/server/mdserver-web/plugins/supervisor && bash install.sh install 1.0
+# /www/server/mdserver-web/bin/supervisord -n -c /etc/supervisor/supervisord.conf
 # /www/server/mdserver-web/bin/supervisorctl  -c /www/server/supervisor/supervisor.conf
 # cmd | status
+# systemctl status supervisor
+# journalctl -u supervisor -f
 
 bash ${rootPath}/scripts/getos.sh
 OSNAME=`cat ${rootPath}/data/osname.pl`

@@ -839,12 +839,17 @@ class plugin(object):
 
         if not os.path.exists(path):
             return ('', '')
-        py_cmd = 'cd ' + mw.getPanelDir() + " && "+ py_cmd
-        data = mw.execShell(py_cmd)
+
+        source_bin_activate =  mw.getPanelDir() + "/bin/activate"
+        py_cmd_dir = 'cd ' + mw.getPanelDir()
+        if os.path.exists(source_bin_activate):
+            py_cmd_dir += " && source "+source_bin_activate
+        do_cmd = py_cmd_dir + " && "+ py_cmd
+        data = mw.execShell(do_cmd)
 
         # print(data)
         if mw.isDebugMode():
-            print('run:', py_cmd)
+            print('run:', do_cmd)
             print(data)
         # print os.path.exists(py_cmd)
         return (data[0].strip(), data[1].strip())
