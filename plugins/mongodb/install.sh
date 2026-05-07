@@ -17,6 +17,7 @@ export PATH
 # })
 
 # db.auth("demo", "123123");
+# import
 # /www/server/mongodb/bin/mongorestore -h localhost -d demo --dir /tmp/*.json
 
 
