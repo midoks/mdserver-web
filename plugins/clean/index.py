@@ -165,6 +165,7 @@ def initConf():
             "/www/server/alist/data/log",
             "/www/server/dztasks/logs",
             "/www/server/rsyncd/lsyncd.log",
+            "/www/server/mdserver-web/logs",
         ]
         for i in clogcom:
             if os.path.exists(i):
