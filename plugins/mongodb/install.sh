@@ -10,6 +10,15 @@ export PATH
 # cd /www/server/mdserver-web && python3 /www/server/mdserver-web/plugins/mongodb/index.py start
 
 
+# db.createUser({
+#     user: "demo", 
+#     pwd: "123123", 
+#     roles: [{role: "dbOwner", db: "demo"}]
+# })
+
+# db.auth("demo", "123123");
+# /www/server/mongodb/bin/mongorestore -h localhost -d demo --dir /tmp/*.json
+
 
 curPath=`pwd`
 rootPath=$(dirname "$curPath")
