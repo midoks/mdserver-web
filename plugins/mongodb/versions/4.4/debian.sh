@@ -75,7 +75,8 @@ if [ "arm64" == ${SYS_ARCH} ];then
 	TOOL_FILE_NAME=mongodb-database-tools-debian${SYS_NAME}-arm64-${TOOL_VERSION}
 fi
 
-TOOL_FILE_NAME_TGZ=${TOOL_FILE_NAME}.zip
+# https://fastdl.mongodb.org/tools/db/mongodb-database-tools-debian10-x86_64-100.16.1.tgz
+TOOL_FILE_NAME_TGZ=${TOOL_FILE_NAME}.tgz
 if [ ! -f $MG_DIR/${TOOL_FILE_NAME_TGZ} ]; then
 	wget --no-check-certificate -O $MG_DIR/${TOOL_FILE_NAME_TGZ} https://fastdl.mongodb.org/tools/db/${TOOL_FILE_NAME_TGZ}
 fi
