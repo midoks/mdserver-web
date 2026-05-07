@@ -51,3 +51,4 @@ brotli
 zstd
 zstandard
 geoip2
+docker
