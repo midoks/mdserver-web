@@ -81,8 +81,8 @@ def status(version):
     # if data[0] == '':
     #     return 'stop'
     # return 'start'
-    sock_file = "/run/php/php{}-fpm.sock".format(version)
-    if os.path.exists(sock_file):
+    pid_file = "/run/php/php{}-fpm.pid".format(version)
+    if os.path.exists(pid_file):
         return 'start'
     return 'stop'
 
