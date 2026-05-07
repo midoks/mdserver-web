@@ -122,7 +122,7 @@ def openPort():
     return True
 
 def status():
-    cmd = "ps aux|grep alist |grep -v grep | grep -v python | grep -v mdserver-web | awk '{print $2}'"
+    cmd = "ps -ef|grep alist |grep -v grep | grep -v python | grep -v mdserver-web | awk '{print $2}'"
     data = mw.execShell(cmd)
     if data[0] == '':
         return 'stop'

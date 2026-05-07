@@ -24,13 +24,13 @@ fi
 # cd /www/server/mdserver-web && python3 plugins/tamper_proof_py/tamper_proof_service.py start
 sys_start()
 {
-    isStart=$(ps aux |grep -E "(tamper_proof_service)"|grep -v grep |grep -v 'tamper_proof_py/tamper_proof_service.py start' | grep -v 'tamper_proof_py/tamper_proof_service.py reload' | grep -v 'tamper_proof_py/tamper_proof_service.py restart' | grep -v systemctl | grep -v '/bin/sh' | grep -v '/bin/bash' | awk '{print $2}'|xargs)
+    isStart=$(ps -ef |grep -E "(tamper_proof_service)"|grep -v grep |grep -v 'tamper_proof_py/tamper_proof_service.py start' | grep -v 'tamper_proof_py/tamper_proof_service.py reload' | grep -v 'tamper_proof_py/tamper_proof_service.py restart' | grep -v systemctl | grep -v '/bin/sh' | grep -v '/bin/bash' | awk '{print $2}'|xargs)
     if [ "$isStart" == '' ];then
         echo -e "Starting tamper_proof_service... \c"
         cd $rootPath/mdserver-web
         nohup python3 plugins/tamper_proof_py/tamper_proof_service.py start &> $mw_path/service.log &
         sleep 0.5
-        isStart=$(ps aux |grep -E "(tamper_proof_service)"|grep -v grep|awk '{print $2}'|xargs)
+        isStart=$(ps -ef |grep -E "(tamper_proof_service)"|grep -v grep|awk '{print $2}'|xargs)
         if [ "$isStart" == '' ];then
             echo -e "\033[31mfailed\033[0m"
             echo '------------------------------------------------------'
@@ -48,7 +48,7 @@ sys_start()
 sys_stop()
 {
     echo -e "Stopping tamper_proof_service... \c";
-    pids=$(ps aux |grep -E "(tamper_proof_service)"|grep -v grep|grep -v '/bin/bash'|grep -v systemctl | grep -v 'tamper_proof_py/tamper_proof_service.py stop' | grep -v 'tamper_proof_py/tamper_proof_service.py reload' | grep -v 'tamper_proof_py/tamper_proof_service.py restart' |awk '{print $2}'|xargs)
+    pids=$(ps -ef |grep -E "(tamper_proof_service)"|grep -v grep|grep -v '/bin/bash'|grep -v systemctl | grep -v 'tamper_proof_py/tamper_proof_service.py stop' | grep -v 'tamper_proof_py/tamper_proof_service.py reload' | grep -v 'tamper_proof_py/tamper_proof_service.py restart' |awk '{print $2}'|xargs)
     arr=($pids)
     for p in ${arr[@]}
     do
@@ -61,7 +61,7 @@ sys_stop()
 
 sys_status()
 {
-    isStart=$(ps aux |grep -E "(tamper_proof_service)"|grep -v grep|grep -v "init.d/tamper_proof_py"|grep -v systemctl|awk '{print $2}'|xargs)
+    isStart=$(ps -ef |grep -E "(tamper_proof_service)"|grep -v grep|grep -v "init.d/tamper_proof_py"|grep -v systemctl|awk '{print $2}'|xargs)
     if [ "$isStart" != '' ];then
         echo -e "\033[32mtamper_proof_service (pid $isStart) already running\033[0m"
     else

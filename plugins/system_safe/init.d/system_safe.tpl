@@ -23,13 +23,13 @@ fi
 
 sys_start()
 {
-    isStart=$(ps aux |grep -E "(system_safe)"|grep -v grep|grep -v '/bin/bash'|grep -v 'system_safe/system_safe.py start' | grep -v 'system_safe/system_safe.py reload' | grep -v 'system_safe/system_safe.py restart' | grep -v systemctl | grep -v '/bin/sh' | awk '{print $2}'|xargs)
+    isStart=$(ps -ef |grep -E "(system_safe)"|grep -v grep|grep -v '/bin/bash'|grep -v 'system_safe/system_safe.py start' | grep -v 'system_safe/system_safe.py reload' | grep -v 'system_safe/system_safe.py restart' | grep -v systemctl | grep -v '/bin/sh' | awk '{print $2}'|xargs)
     if [ "$isStart" == '' ];then
         echo -e "Starting system_safe service... \c"
         cd $rootPath/mdserver-web
         nohup python3 plugins/system_safe/system_safe.py bg_start &> $mw_path/service.log &
         sleep 0.5
-        isStart=$(ps aux |grep -E "(system_safe)"|grep -v grep|awk '{print $2}'|xargs)
+        isStart=$(ps -ef |grep -E "(system_safe)"|grep -v grep|awk '{print $2}'|xargs)
         if [ "$isStart" == '' ];then
             echo -e "\033[31mfailed\033[0m"
             echo '------------------------------------------------------'
@@ -47,7 +47,7 @@ sys_start()
 sys_stop()
 {
     echo -e "Stopping system_safe service... \c";
-    pids=$(ps aux |grep -E "(system_safe)"|grep -v grep|grep -v '/bin/bash'|grep -v systemctl | grep -v 'system_safe/system_safe.py bg_stop'|grep -v 'system_safe/system_safe.py stop' | grep -v 'system_safe/system_safe.py reload' | grep -v 'system_safe/system_safe.py restart' |awk '{print $2}'|xargs)
+    pids=$(ps -ef |grep -E "(system_safe)"|grep -v grep|grep -v '/bin/bash'|grep -v systemctl | grep -v 'system_safe/system_safe.py bg_stop'|grep -v 'system_safe/system_safe.py stop' | grep -v 'system_safe/system_safe.py reload' | grep -v 'system_safe/system_safe.py restart' |awk '{print $2}'|xargs)
     arr=($pids)
     for p in ${arr[@]}
     do
@@ -60,7 +60,7 @@ sys_stop()
 
 sys_status()
 {
-    isStart=$(ps aux |grep -E "(system_safe)"|grep -v grep|grep -v systemctl|awk '{print $2}'|xargs)
+    isStart=$(ps -ef |grep -E "(system_safe)"|grep -v grep|grep -v systemctl|awk '{print $2}'|xargs)
     if [ "$isStart" != '' ];then
         echo -e "\033[32msystem_safe service (pid $isStart) already running\033[0m"
     else

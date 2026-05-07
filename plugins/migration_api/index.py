@@ -230,7 +230,7 @@ class classApi:
     def close_sync(self, args):
         # 取消迁移
         mw.execShell("kill -9 {}".format(self.get_pid()))
-        mw.execShell("kill -9 $(ps aux|grep index.py|grep -v grep|awk '{print $2}')")
+        mw.execShell("kill -9 $(ps -ef|grep index.py|grep -v grep|awk '{print $2}')")
         # 删除迁移配置
         time.sleep(1)
         if os.path.exists(self._INFO_FILE):
@@ -1032,7 +1032,7 @@ def stepThree():
 
 
 def getPid():
-    cmd = "ps aux|grep 'plugins/migration_api/index.py bg_process' |grep -v grep|awk '{print $2}'|xargs"
+    cmd = "ps -ef|grep 'plugins/migration_api/index.py bg_process' |grep -v grep|awk '{print $2}'|xargs"
     result = mw.execShell(cmd)[0].strip()
     if not result:
         return None

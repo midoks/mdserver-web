@@ -84,7 +84,7 @@ def getPidFile():
     return tmp.groups()[0].strip()
 
 def status():
-    cmd = "ps aux|grep prometheus |grep -v grep | grep -v python | grep -v mdserver-web | awk '{print $2}'"
+    cmd = "ps -ef|grep prometheus |grep -v grep | grep -v python | grep -v mdserver-web | awk '{print $2}'"
     data = mw.execShell(cmd)
     if data[0] == '':
         return 'stop'

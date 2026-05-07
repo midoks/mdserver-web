@@ -38,7 +38,7 @@ pg_stop()
 
 pg_status()
 {
-    isStart=$(ps aux | grep 'postgres'| grep -v grep | grep -v 'postgresql status' | awk '{print $2}')
+    isStart=$(ps -ef | grep 'postgres'| grep -v grep | grep -v 'postgresql status' | awk '{print $2}')
     if [ "$isStart" != '' ];then
         echo -e "\033[32mPostgreSQL (pid $isStart) already running\033[0m"
     else

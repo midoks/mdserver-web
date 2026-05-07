@@ -59,7 +59,7 @@ tg_start(){
 
 tg_stop(){
 	echo -e "stopping tgclient ... \c";
-    arr=`ps aux|grep 'tgclient.py'|grep -v grep|awk '{print $2}'`
+    arr=`ps -ef|grep 'tgclient.py'|grep -v grep|awk '{print $2}'`
     for p in ${arr[@]}
     do
         kill -9 $p > /dev/null 2>&1

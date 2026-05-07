@@ -99,7 +99,7 @@ def readConfigTpl():
 
 def status():
     data = mw.execShell(
-        "ps aux|grep cloudreve |grep -v grep | grep -v python | grep -v mdserver-web | awk '{print $2}'")
+        "ps -ef|grep cloudreve |grep -v grep | grep -v python | grep -v mdserver-web | awk '{print $2}'")
 
     if data[0] == '':
         return 'stop'

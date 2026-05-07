@@ -106,7 +106,7 @@ def getPidFile():
     return tmp.groups()[0].strip()
 
 def status():
-    cmd = "ps aux|grep dztasks|grep -v grep|grep -v python|grep -v mdserver-web|awk '{print $2}'"
+    cmd = "ps -ef|grep dztasks|grep -v grep|grep -v python|grep -v mdserver-web|awk '{print $2}'"
     data = mw.execShell(cmd)
     if data[0] == '':
         return 'stop'
