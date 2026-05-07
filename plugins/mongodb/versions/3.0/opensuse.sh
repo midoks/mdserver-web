@@ -28,7 +28,7 @@ fi
 MG_DIR=$serverPath/source/mongodb
 mkdir -p $MG_DIR
 
-FILE_NAME=mongodb-linux-${SYS_ARCH}-suse${SYS_NAME}-${VERSION}
+FILE_NAME=mongodb-linux-${SYS_ARCH}-${VERSION}
 FILE_NAME_TGZ=${FILE_NAME}.tgz
 
 if [ ! -f $MG_DIR/${FILE_NAME_TGZ} ]; then
