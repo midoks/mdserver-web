@@ -118,7 +118,7 @@ def configScriptsTpl():
 
 def status():
     data = mw.execShell(
-        "ps aux|grep keepalived |grep -v grep | grep -v python| awk '{print $2}'")
+        "ps -ef|grep keepalived |grep -v grep | grep -v python| awk '{print $2}'")
 
     if data[0] == '':
         return 'stop'
