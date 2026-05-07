@@ -174,7 +174,7 @@ def initDreplace():
 
 
 def status():
-    cmd = "ps -ef|grep 'httpd/bin/httpd' |grep -v grep | grep -v python | awk '{print $2}'"
+    cmd = "ps -ef|grep 'httpd' |grep -v grep | grep -v python | awk '{print $2}'"
     data = mw.execShell(cmd)
     if data[0] == '':
         return 'stop'
