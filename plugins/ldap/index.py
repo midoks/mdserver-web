@@ -115,7 +115,7 @@ def status():
         return 'stop'
 
     # data = mw.execShell(
-    #     "ps aux|grep redis |grep -v grep | grep -v python | grep -v mdserver-web | awk '{print $2}'")
+    #     "ps -ef|grep redis |grep -v grep | grep -v python | grep -v mdserver-web | awk '{print $2}'")
 
     # if data[0] == '':
     #     return 'stop'

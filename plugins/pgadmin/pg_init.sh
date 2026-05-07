@@ -19,7 +19,7 @@ expect {
 expect eof
 EOF
 
-pids=$(ps aux | grep 'pgAdmin4:app' | grep -v grep | awk '{print $2}')
+pids=$(ps -ef | grep 'pgAdmin4:app' | grep -v grep | awk '{print $2}')
 arr=($pids)
 for p in ${arr[@]}
 do

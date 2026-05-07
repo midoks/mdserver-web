@@ -59,7 +59,7 @@ tg_start(){
 
 tg_stop(){
 	echo -e "stopping tgbot ... \c";
-    arr=`ps aux|grep 'tgbot.py'|grep -v grep|awk '{print $2}'`
+    arr=`ps -ef|grep 'tgbot.py'|grep -v grep|awk '{print $2}'`
     for p in ${arr[@]}
     do
         kill -9 $p > /dev/null 2>&1
@@ -68,7 +68,7 @@ tg_stop(){
 
 
     echo -e "stopping tgpush ... \c";
-    arr=`ps aux|grep 'tgpush.py'|grep -v grep|awk '{print $2}'`
+    arr=`ps -ef|grep 'tgpush.py'|grep -v grep|awk '{print $2}'`
     for p in ${arr[@]}
     do
         kill -9 $p > /dev/null 2>&1

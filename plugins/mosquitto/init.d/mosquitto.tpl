@@ -57,7 +57,7 @@ app_start(){
 
 app_stop(){
 	echo -e "stopping mosquitto ... \c";
-    arr=`ps aux | grep 'mosquitto' | grep -v grep | awk '{print $2}'`
+    arr=`ps -ef | grep 'mosquitto' | grep -v grep | awk '{print $2}'`
     for p in ${arr[@]}
     do
         kill -9 $p > /dev/null 2>&1

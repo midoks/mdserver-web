@@ -53,7 +53,7 @@ def getFpmConfFile(version):
 
 def status_progress(version):
     # ps -ef|grep 'php/81' |grep -v grep | grep -v python | awk '{print $2}
-    cmd = "ps aux|grep 'php/" + version + \
+    cmd = "ps -ef|grep 'php/" + version + \
         "' |grep -v grep | grep -v python | awk '{print $2}'"
     data = mw.execShell(cmd)
     if data[0] == '':

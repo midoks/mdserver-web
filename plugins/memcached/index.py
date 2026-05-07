@@ -96,7 +96,7 @@ def checkArgs(data, ck=[]):
 
 
 def status():
-    cmd = "ps aux|grep " + getPluginName() + " |grep -v grep | grep -v mdserver-web | awk '{print $2}'"
+    cmd = "ps -ef|grep " + getPluginName() + " |grep -v grep | grep -v mdserver-web | awk '{print $2}'"
     # print(cmd)
     data = mw.execShell(cmd)
     # print(data)

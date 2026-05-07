@@ -625,7 +625,7 @@ class mainClass(object):
         if pid == self.panel_pid: return True
         if not self.task_pid:
             try:
-                self.task_pid = int(mw.execShell("ps aux | grep 'python3 task.py' |grep -v grep|head -n1|awk '{print $2}'")[0])
+                self.task_pid = int(mw.execShell("ps -ef | grep 'python3 task.py' |grep -v grep|head -n1|awk '{print $2}'")[0])
             except:
                 self.task_pid = -1
         if pid == self.task_pid: return True

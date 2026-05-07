@@ -662,7 +662,7 @@ def setMyDbPos(version=''):
     mw.writeFile(myfile, mycnf)
     restart(version)
 
-    result = mw.execShell('ps aux|grep mysqld| grep -v grep|grep -v python')
+    result = mw.execShell('ps -ef|grep mysqld| grep -v grep|grep -v python')
     if len(result[0]) > 10:
         mw.writeFile('data/datadir.pl', t_datadir)
         return mw.returnJson(True, '存储目录迁移成功!')

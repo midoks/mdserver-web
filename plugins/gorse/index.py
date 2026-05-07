@@ -113,7 +113,7 @@ def status():
     # if not os.path.exists(pid_file):
     #     return 'stop'
 
-    cmd = "ps aux|grep gorse |grep -v grep | grep -v python | grep -v mdserver-web | awk '{print $2}'"
+    cmd = "ps -ef|grep gorse |grep -v grep | grep -v python | grep -v mdserver-web | awk '{print $2}'"
     data = mw.execShell(cmd)
 
     if data[0] == '':
