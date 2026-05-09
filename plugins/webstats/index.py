@@ -725,6 +725,7 @@ def getLogsList():
     query_date = args['query_date']
     search_uri = args['search_uri']
     referer = args['referer']
+    referer_url = args['referer_url']
     ip = args['ip']
     setDefaultSite(domain)
 
@@ -741,6 +742,9 @@ def getLogsList():
             conn = conn.andWhere("referer <> ? ", ('',))
         elif referer == '-1':
             conn = conn.andWhere("referer is null ", ())
+
+    if referer_url != '':
+        conn = conn.andWhere("referer_url like '%" + referer_url + "%'", ())
 
     if ip != '':
         conn = conn.andWhere("ip=?", (ip,))

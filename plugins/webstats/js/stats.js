@@ -2214,6 +2214,7 @@ function wsTableLogRequest(page){
     args['request_size'] = $('select[name="request_size"]').val();
     args['spider_type'] = $('select[name="spider_type"]').val();
     args['referer'] = $('select[name="referer"]').val();
+    args['referer_url'] = $('input[name="referer_url"]').val();
     args['ip'] = $('input[name="ip"]').val();
 
     var query_date = 'today';
@@ -2393,19 +2394,7 @@ var html = '<div>\
                     <select class="bt-input-text" name="site" style="margin-left:4px;width:100px;">\
                         <option value="unset">未设置</option>\
                     </select>\
-                    <span style="margin-left:10px">时间: </span>\
-                    <div class="input-group" style="margin-left:10px;width:550px;display: inline-table;vertical-align: top;">\
-                        <div id="search_time" class="input-group-btn btn-group-sm">\
-                            <button data-name="today" type="button" class="btn btn-default">今日</button>\
-                            <button data-name="yesterday" type="button" class="btn btn-default">昨日</button>\
-                            <button data-name="l7" type="button" class="btn btn-default">近7天</button>\
-                            <button data-name="l30" type="button" class="btn btn-default">近30天</button>\
-                        </div>\
-                        <span class="last-span"><input data-name="" type="text" id="time_choose" lay-key="1000001_'+randstr+'" class="form-control btn-group-sm" autocomplete="off" placeholder="自定义时间" style="display: inline-block;font-size: 12px;padding: 0 10px;height:30px;width: 300px;"></span>\
-                    </div>\
-                </div>\
-                <div style="padding-bottom:10px;">\
-                    <span>请求类型: </span>\
+                    <span style="margin-left:10px">请求类型: </span>\
                     <select class="bt-input-text" name="method" style="margin-left:4px">\
                         <option value="all">所有</option>\
                         <option value="GET">GET</option>\
@@ -2414,7 +2403,21 @@ var html = '<div>\
                         <option value="PUT">PUT</option>\
                         <option value="DELETE">DELETE</option>\
                     </select>\
-                    <span style="margin-left:10px;">状态码: </span>\
+                    <span style="margin-left:10px">时间: </span>\
+                    <div class="input-group" style="margin-left:10px;width:150px;display: inline-table;vertical-align: top;">\
+                        <div id="search_time" class="input-group-btn btn-group-sm">\
+                            <button data-name="today" type="button" class="btn btn-default">今日</button>\
+                            <button data-name="yesterday" type="button" class="btn btn-default">昨日</button>\
+                            <button data-name="l7" type="button" class="btn btn-default">近7天</button>\
+                            <button data-name="l30" type="button" class="btn btn-default">近30天</button>\
+                        </div>\
+                        <span class="last-span">\
+                            <input data-name="" type="text" id="time_choose" lay-key="1000001_'+randstr+'" class="form-control btn-group-sm" autocomplete="off" placeholder="自定义时间" style="display: inline-block;font-size: 12px;padding: 0 10px;height:30px;width: 200px;">\
+                        </span>\
+                    </div>\
+                </div>\
+                <div style="padding-bottom:10px;">\
+                    <span>状态码: </span>\
                     <select class="bt-input-text" name="status_code" style="margin-left:4px">\
                         <option value="all">所有</option>\
                         <option value="500">500</option>\
@@ -2429,11 +2432,23 @@ var html = '<div>\
                         <option value="206">206</option>\
                         <option value="200">200</option>\
                     </select>\
-                    <span style="margin-left:10px;">来源: </span>\
-                    <select class="bt-input-text" name="referer" style="margin-left:4px">\
+                    <span style="margin-left:10px;">耗时: </span>\
+                    <select class="bt-input-text" name="request_time" style="margin-left:5px;">\
                         <option value="all">所有</option>\
-                        <option value="-1">无</option>\
-                        <option value="1">有</option>\
+                        <option value="0-50">0-50(ms)</option>\
+                        <option value="50-200">50-200(ms)</option>\
+                        <option value="200-500">200-500(ms)</option>\
+                        <option value="500-1000">500ms-1s</option>\
+                        <option value="1000">大于1s</option>\
+                    </select>\
+                    <span style="margin-left:10px;">大小: </span>\
+                    <select class="bt-input-text" name="request_size" style="margin-left:5px;">\
+                        <option value="all">所有</option>\
+                        <option value="0-1">0-1(kb)</option>\
+                        <option value="1-20">1-20(kb)</option>\
+                        <option value="20-50">20-50(kb)</option>\
+                        <option value="50-100">50-100(kb)</option>\
+                        <option value="100">大于100kb</option>\
                     </select>\
                     <span style="margin-left:10px;">蜘蛛过滤: </span>\
                     <select class="bt-input-text" name="spider_type" style="margin-left:4px">\
@@ -2453,30 +2468,22 @@ var html = '<div>\
                         <option value="11">一搜</option>\
                         <option value="12">其他</option>\
                     </select>\
-                    <span>IP: </span>\
+                    <span style="margin-left:10px;">IP: </span>\
                     <div class="input-group" style="width:163px;display:inline-flex;">\
                         <input type="text" name="ip" class="form-control btn-group-sm" autocomplete="off" placeholder="IP地址" style="font-size: 12px;padding: 0 10px;height:30px;">\
                     </div>\
                 </div>\
                 <div style="padding-bottom:10px;">\
-                    <span>耗时: </span>\
-                    <select class="bt-input-text" name="request_time" style="margin-left:5px;">\
+                    <span style="margin-left:10px;">来源: </span>\
+                    <select class="bt-input-text" name="referer" style="margin-left:4px">\
                         <option value="all">所有</option>\
-                        <option value="0-50">0-50(ms)</option>\
-                        <option value="50-200">50-200(ms)</option>\
-                        <option value="200-500">200-500(ms)</option>\
-                        <option value="500-1000">500ms-1s</option>\
-                        <option value="1000">大于1s</option>\
+                        <option value="-1">无</option>\
+                        <option value="1">有</option>\
                     </select>\
-                    <span style="margin-left:10px;">大小: </span>\
-                    <select class="bt-input-text" name="request_size" style="margin-left:5px;">\
-                        <option value="all">所有</option>\
-                        <option value="0-1">0-1(kb)</option>\
-                        <option value="1-20">1-20(kb)</option>\
-                        <option value="20-50">20-50(kb)</option>\
-                        <option value="50-100">50-100(kb)</option>\
-                        <option value="100">大于100kb</option>\
-                    </select>\
+                    <span style="margin-left:10px;">URL过滤: </span>\
+                    <div class="input-group" style="width:210px;display:inline-flex;">\
+                        <input type="text" name="referer_url" class="form-control btn-group-sm" autocomplete="off" placeholder="具体来源" style="font-size: 12px;padding: 0 10px;height:30px;">\
+                    </div>\
                     <span style="margin-left:10px;">URL过滤: </span>\
                     <div class="input-group" style="width:210px;display:inline-flex;">\
                         <input type="text" name="search_uri" class="form-control btn-group-sm" autocomplete="off" placeholder="URI搜索" style="font-size: 12px;padding: 0 10px;height:30px;">\
