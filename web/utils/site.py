@@ -556,7 +556,7 @@ class sites(object):
             listen = re.search(rep, conf).group()
 
             quic_conf = "quic reuseport"
-            if mw.isVhostHasReuseport():
+            if mw.isVhostHasReuseport(version):
                 quic_conf = "quic"
 
             if mw.isSupportHttp3(version):

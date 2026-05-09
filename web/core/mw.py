@@ -923,17 +923,14 @@ def isSupportSystemctl():
     return True
 
 def isSupportHttp3(version):
-    if version.startswith('1.25'):
-        return True 
-    if version.startswith('1.27'):
-        return True
     if version.startswith('1.29'):
-        return True
-    if version.startswith('rtmp'):
         return True
     return False
 
-def isVhostHasReuseport():
+def isVhostHasReuseport(version):
+    if not version.startswith('1.29'):
+        return False
+
     vhost_dir = getServerDir() + '/web_conf/nginx/vhost'
     if not os.path.exists(vhost_dir):
         return False
