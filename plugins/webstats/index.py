@@ -738,7 +738,7 @@ def getLogsList():
     conn = conn.where("1=1", ())
 
     if referer_url != '':
-        conn = conn.andWhere("referer_url like '%" + referer_url + "%'", ())
+        conn = conn.andWhere("referer like '%" + referer_url + "%'", ())
     else:
         if referer != 'all':
             if referer == '1':
