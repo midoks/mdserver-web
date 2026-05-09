@@ -727,6 +727,7 @@ def get_logs_list(args):
     query_date = args['query_date']
     search_uri = args['search_uri']
     referer = args['referer']
+    referer_url = args['referer_url']
     ip = args['ip']
     setDefaultSite(domain)
 
@@ -783,11 +784,14 @@ def get_logs_list(args):
     elif int(spider_type) > 0:
         conn = conn.andWhere("is_spider=?", (spider_type,))
 
-    if referer != 'all':
-        if referer == '1':
-            conn = conn.andWhere("referer <> ? ", ('',))
-        elif referer == '-1':
-            conn = conn.andWhere("referer is null ", ())
+    if referer_url != '':
+        conn = conn.andWhere("referer like '%" + referer_url + "%'", ())
+    else:
+        if referer != 'all':
+            if referer == '1':
+                conn = conn.andWhere("referer <> ? ", ('',))
+            elif referer == '-1':
+                conn = conn.andWhere("referer is null ", ())
 
     if search_uri != "":
         conn = conn.andWhere("uri like '%" + search_uri + "%'", ())
