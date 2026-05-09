@@ -737,14 +737,14 @@ def getLogsList():
     conn = conn.field(field)
     conn = conn.where("1=1", ())
 
-    if referer != 'all':
-        if referer == '1':
-            conn = conn.andWhere("referer <> ? ", ('',))
-        elif referer == '-1':
-            conn = conn.andWhere("referer is null ", ())
-
     if referer_url != '':
         conn = conn.andWhere("referer_url like '%" + referer_url + "%'", ())
+    else:
+        if referer != 'all':
+            if referer == '1':
+                conn = conn.andWhere("referer <> ? ", ('',))
+            elif referer == '-1':
+                conn = conn.andWhere("referer is null ", ())
 
     if ip != '':
         conn = conn.andWhere("ip=?", (ip,))
