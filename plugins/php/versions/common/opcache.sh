@@ -51,7 +51,7 @@ Install_lib()
 	echo "[opcache]" >> $serverPath/php/$version/etc/php.ini
 
 	if [ "$version" == "85" ];then
-		echo "no zend_extension"
+		echo "Force enable opcache in PHP 8.5+"
 	else
 		echo "zend_extension=${LIBNAME}.so" >> $serverPath/php/$version/etc/php.ini
 	fi
