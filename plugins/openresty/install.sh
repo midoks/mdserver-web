@@ -15,6 +15,7 @@ export PATH
 # nc -u -v www.xx.com 443
 
 # /www/server/openresty/bin/openresty -v
+# service openresty restart
 
 # cd /www/server/mdserver-web && python3 plugins/openresty/index.py run_info
 
