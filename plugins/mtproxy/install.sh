@@ -25,14 +25,25 @@ sysName=$(uname | tr '[:upper:]' '[:lower:]')
 
 ARCH=amd64
 get_arch() {
-	echo "package main
-import (
-	\"fmt\"
-	\"runtime\"
-)
-func main() { fmt.Println(runtime.GOARCH) }" > /tmp/go_arch.go
-
-	ARCH=$(go run /tmp/go_arch.go)
+	# 使用 bash 来识别架构
+	local arch=$(uname -m)
+	case $arch in
+		x86_64|amd64)
+			ARCH=amd64
+			;;
+		aarch64|arm64)
+			ARCH=arm64
+			;;
+		armv7l|armv7)
+			ARCH=armv7
+			;;
+		i686|i386)
+			ARCH=386
+			;;
+		*)
+			ARCH=amd64
+			;;
+	esac
 	echo "ARCH:${ARCH}"
 }
 
