@@ -1456,25 +1456,3 @@ def addAreaLimit():
 
     setConfRestartWeb()
     return mw.returnJson(True, '添加成功!')
-
-
-def cleanDropIp():
-    url = "http://127.0.0.1/clean_waf_drop_ip"
-    data = mw.httpGet(url)
-    return mw.returnJson(True, 'ok!', data)
-
-
-def testRun():
-    # args = getArgs()
-    # data = checkArgs(args, ['siteName'])
-    # if not data[0]:
-    #     return data[1]
-
-    default_path = getServerDir() + "/waf/default.pl"
-    default_site = mw.readFile(default_path)
-    url = "http://" + default_site + '/?t=../etc/passwd'
-    returnData = mw.httpGet(url, 10)
-
-    # url = "https://" + default_site + '/?t=../etc/passwd'
-    # returnData = mw.httpGet(url, 3)
-    return mw.returnJson(True, '测试运行成功!', returnData)
