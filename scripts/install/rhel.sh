@@ -47,6 +47,7 @@ $PKGMGR install -y sshpass
 $PKGMGR install -y libzstd-devel
 $PKGMGR install -y postgresql-devel
 $PKGMGR install -y brotli-devel
+$PKGMGR install -y vim-common
 
 echo "install remi source"
 if [ "$VERSION_ID" == "9" ];then

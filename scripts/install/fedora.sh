@@ -21,6 +21,7 @@ yum install -y sshpass
 yum install -y libzstd-devel
 yum install -y postgresql-devel
 yum install -y brotli-devel
+yum install -y vim-common
 dnf install crontabs -y
 
 SSH_PORT=`netstat -ntpl|grep sshd|grep -v grep | sed -n "1,1p" | awk '{print $4}' | awk -F : '{print $2}'`
