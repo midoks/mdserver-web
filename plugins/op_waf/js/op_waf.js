@@ -27,6 +27,34 @@ function owPostN(method, args, callback){
     },'json'); 
 }
 
+function owPostCallback(method, version, args,callback){
+    var loadT = layer.msg('正在获取...', { icon: 16, time: 0, shade: 0.3 });
+
+    var req_data = {};
+    req_data['name'] = 'op_waf';
+    req_data['script']='op_waf_index';
+    req_data['func'] = method;
+    args['version'] = version;
+ 
+    if (typeof(args) == 'string'){
+        req_data['args'] = JSON.stringify(str2Obj(args));
+    } else {
+        req_data['args'] = JSON.stringify(args);
+    }
+
+    $.post('/plugins/callback', req_data, function(data) {
+        layer.close(loadT);
+        if (!data.status){
+            layer.msg(data.msg,{icon:0,time:2000,shade: [0.3, '#000']});
+            return;
+        }
+
+        if(typeof(callback) == 'function'){
+            callback(data);
+        }
+    },'json'); 
+}
+
 
 function getRuleByName(rule_name, callback){
     owPost('get_rule', {rule_name:rule_name}, function(data){
@@ -1593,7 +1621,7 @@ function siteWafConfig(siteName, type) {
 
 
 function wafSite(){
-    owPost('get_site_config', {}, function(data){
+    owPostCallback('get_site_config', "", {}, function(data){
         var tmp = $.parseJSON(data.data);
         var rdata = $.parseJSON(tmp.data);
         var tbody = '';

@@ -34,7 +34,6 @@ function wsOriginPost(method, version, args, callback){
 }
 
 
-
 function wsPost(method, version, args,callback){
     var loadT = layer.msg('正在获取...', { icon: 16, time: 0, shade: 0.3 });
     wsOriginPost(method, version, args,function(data){
@@ -44,8 +43,7 @@ function wsPost(method, version, args,callback){
 }
 
 
-
-function wsPostCallbak(method, version, args,callback){
+function wsPostCallback(method, version, args,callback){
     var loadT = layer.msg('正在获取...', { icon: 16, time: 0, shade: 0.3 });
 
     var req_data = {};
@@ -2258,7 +2256,7 @@ function wsTableLogRequest(page){
 
     $('#logs_search').attr('req','start');
     // wsPost('get_logs_list', '' ,args, function(rdata){
-    wsPostCallbak('get_logs_list', '' ,args, function(rdata){
+    wsPostCallback('get_logs_list', '' ,args, function(rdata){
         $('#logs_search').attr('req','end');
         var rdata = $.parseJSON(rdata.data);
         var list = '';
