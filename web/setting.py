@@ -77,7 +77,7 @@ if workers > 2:
     workers = 2
 
 threads = workers * 2
-backlog = 512
+backlog = 2048
 reload = False
 daemon = True
 max_requests = 1000
