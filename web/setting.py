@@ -77,9 +77,11 @@ if workers > 2:
     workers = 2
 
 threads = workers * 2
-backlog = 512
+backlog = 2048
 reload = False
 daemon = True
+max_requests = 1000
+max_requests_jitter = 100
 # # worker_class = 'geventwebsocket.gunicorn.workers.GeventWebSocketWorker'
 worker_class = 'gthread'
 timeout = 600
@@ -87,7 +89,7 @@ keepalive = 60
 preload_app = False
 capture_output = True
 access_log_format = '%(t)s %(p)s %(h)s "%(r)s" %(s)s %(L)s %(b)s %(f)s" "%(a)s"'
-loglevel = 'info'
+loglevel = 'warning'
 errorlog = log_dir + '/panel_error.log'
 accesslog = log_dir + '/panel.log'
 pidfile = log_dir + '/panel.pid'

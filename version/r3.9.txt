@@ -40,4 +40,5 @@ pyyaml
 Flask-Compress
 croniter
 geoip2
+psycopg2-binary
 docker

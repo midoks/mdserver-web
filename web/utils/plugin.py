@@ -141,7 +141,7 @@ class plugin(object):
 
     def init(self):
         plugin_names = {
-            'openresty': '1.27.1',
+            'openresty': '1.29.2',
             'php': '56',
             'swap': '1.1',
             'mysql': '5.7',
