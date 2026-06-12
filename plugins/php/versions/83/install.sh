@@ -11,7 +11,7 @@ sysName=`uname`
 
 version=8.3.31
 PHP_VER=83
-md5_file_ok=95eae411d594fe6f6e5678b76645dc13ae47d3c0a5325c1d969b58dea56ee45a
+md5_file_ok=66410cee07f4b2baeb0843140bb2a2b52ef930b5cf9b3d6e6d158b33aae8fa37
 Install_php()
 {
 #------------------------ install start ------------------------------------#
