@@ -145,9 +145,9 @@ if [ "${SYS_ARCH}" == "arm64" ];then
 	RELOAD_CODE
 fi
 
-# if [ "${OSNAME}" == "debian" ] && [ "${VERSION_ID}" == "13" ];then
-# 	RELOAD_CODE
-# fi
+if [ "${OSNAME}" == "debian" ] && [ "${VERSION_ID}" == "13" ];then
+	RELOAD_CODE
+fi
 
 if [ "$sysName" == "Darwin" ];then
 	BREW_DIR=`which brew`
