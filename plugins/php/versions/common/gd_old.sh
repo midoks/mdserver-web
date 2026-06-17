@@ -17,6 +17,9 @@ version=$2
 LIBNAME=gd
 LIBV=0
 
+bash ${rootPath}/scripts/getos.sh
+OSNAME=`cat ${rootPath}/data/osname.pl`
+OSNAME_ID=`cat /etc/*-release | grep VERSION_ID | awk -F = '{print $2}' | awk -F "\"" '{print $2}'`
 
 
 # if [ "$version" -lt "74" ];then
@@ -79,11 +82,24 @@ Install_lib()
 			OPTIONS="$OPTIONS --with-xpm-dir"
 		fi
 
+		# if [ "debian" == "$OSNAME" ]; then
+		# 	OPTIONS="$OPTIONS --with-freetype"
+		# else
+		# 	find_ft2=`pkg-config --list-all | grep freetype2`
+		# 	if [ "$find_ft2" != "" ];then
+		# 		OPTIONS="$OPTIONS --with-freetype-dir=${serverPath}/lib/freetype_old"
+		# 	fi
+		# fi
+
+		if [ ! -f ${serverPath}/lib/freetype_old ];then
+			echo "freetype_old not install , check!!"
+			return
+		fi
+
 		find_ft2=`pkg-config --list-all | grep freetype2`
-		if [ "$find_ft2" == "" ];then
+		if [ "$find_ft2" != "" ];then
 			OPTIONS="$OPTIONS --with-freetype-dir=${serverPath}/lib/freetype_old"
 		fi
-		
 
 		#--with-xpm
 		# =${serverPath}/lib/freetype_old
