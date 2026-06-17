@@ -91,6 +91,11 @@ Install_lib()
 		# 	fi
 		# fi
 
+		if [ ! -f ${serverPath}/lib/freetype_old ];then
+			echo "freetype_old not install , check!!"
+			return
+		fi
+
 		find_ft2=`pkg-config --list-all | grep freetype2`
 		if [ "$find_ft2" != "" ];then
 			OPTIONS="$OPTIONS --with-freetype-dir=${serverPath}/lib/freetype_old"
