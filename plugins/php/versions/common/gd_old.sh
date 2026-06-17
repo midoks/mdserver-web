@@ -82,13 +82,18 @@ Install_lib()
 			OPTIONS="$OPTIONS --with-xpm-dir"
 		fi
 
-		if [ "debian" == "$OSNAME" ]; then
-			OPTIONS="$OPTIONS --with-freetype"
-		else
-			find_ft2=`pkg-config --list-all | grep freetype2`
-			if [ "$find_ft2" == "" ];then
-				OPTIONS="$OPTIONS --with-freetype-dir=${serverPath}/lib/freetype_old"
-			fi
+		# if [ "debian" == "$OSNAME" ]; then
+		# 	OPTIONS="$OPTIONS --with-freetype"
+		# else
+		# 	find_ft2=`pkg-config --list-all | grep freetype2`
+		# 	if [ "$find_ft2" != "" ];then
+		# 		OPTIONS="$OPTIONS --with-freetype-dir=${serverPath}/lib/freetype_old"
+		# 	fi
+		# fi
+
+		find_ft2=`pkg-config --list-all | grep freetype2`
+		if [ "$find_ft2" != "" ];then
+			OPTIONS="$OPTIONS --with-freetype-dir=${serverPath}/lib/freetype_old"
 		fi
 
 		#--with-xpm
