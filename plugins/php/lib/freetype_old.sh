@@ -16,19 +16,19 @@ SOURCE_ROOT=$rootPath/source/lib
 if [ ! -d ${SERVER_ROOT}/freetype_old ];then
     cd $SOURCE_ROOT
 
-    if [ ! -f $SOURCE_ROOT/freetype-2.7.1.tar.gz ];then
-        wget -O freetype-2.7.1.tar.gz --no-check-certificate https://download.savannah.gnu.org/releases/freetype/freetype-2.7.1.tar.gz  -T 5
+    if [ ! -f $SOURCE_ROOT/freetype-2.8.1.tar.gz ];then
+        wget -O freetype-2.8.1.tar.gz --no-check-certificate https://download.savannah.gnu.org/releases/freetype/freetype-2.8.1.tar.gz  -T 5
     fi
 
-    if [ ! -d $SOURCE_ROOT/freetype-2.7.1 ];then
-        tar zxvf freetype-2.7.1.tar.gz
-        cd freetype-2.7.1
+    if [ ! -d $SOURCE_ROOT/freetype-2.8.1 ];then
+        tar zxvf freetype-2.8.1.tar.gz
+        cd freetype-2.8.1
     else
-        cd freetype-2.7.1
+        cd freetype-2.8.1
     fi
     
     ./configure --prefix=${SERVER_ROOT}/freetype_old && make && make install
-    cd $SOURCE_ROOT && rm -rf freetype-2.7.1
-    cd $SOURCE_ROOT && rm -rf $SOURCE_ROOT/freetype-2.7.1
+    cd $SOURCE_ROOT && rm -rf freetype-2.8.1
+    cd $SOURCE_ROOT && rm -rf $SOURCE_ROOT/freetype-2.8.1
     #rm -rf freetype-2.7.1.tar.gz
 fi
