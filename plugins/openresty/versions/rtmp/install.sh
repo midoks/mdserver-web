@@ -2,8 +2,8 @@
 PATH=/bin:/sbin:/usr/bin:/usr/sbin:/usr/local/bin:/usr/local/sbin:~/bin:/opt/homebrew/bin
 export PATH
 
-# cd /Users/midoks/Desktop/mwdev/server/mdserver-web/plugins/openresty && bash install.sh install 1.27.1.1
-# cd /www/server/mdserver-web/plugins/openresty && bash install.sh install 1.27.1.1
+# cd /Users/midoks/Desktop/mwdev/server/mdserver-web/plugins/openresty && bash install.sh install rtmp
+# cd /www/server/mdserver-web/plugins/openresty && bash install.sh install rtmp
 
 curPath=`pwd`
 rootPath=$(dirname "$curPath")
@@ -14,7 +14,7 @@ sysName=`uname`
 action=$1
 type=$2
 
-VERSION=1.27.1.2
+VERSION=1.29.2.5
 
 openrestyDir=${serverPath}/source/openresty
 
