@@ -185,7 +185,7 @@ function getOpStatusInterval(){
             var qbs = "";
             if (optmp_status){
                 var time_diff = rdata.time - optmp_status.time;
-                var requests_diff = rdata.requests - optmp_status.requests;
+                var requests_diff = rdata.accepts - optmp_status.accepts;
                 
                 // 检查除数是否有效
                 if (time_diff > 0) {
