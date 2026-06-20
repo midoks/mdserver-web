@@ -4,14 +4,14 @@
 	"name": "redis",
 	"title": "Redis",
 	"shell": "install.sh",
-	"versions":["4.0.14","5.0.14","6.0.20","6.2.22","7.0.15","7.2.14", "7.4.9", "8.0.6", "8.2.6", "8.4.3","8.6.3"],
+	"versions":["4.0.14","5.0.14","6.0.20","6.2.22","7.0.15","7.2.14", "7.4.9", "8.0.6", "8.2.7", "8.4.4","8.6.4","8.8.0"],
 	"tip": "soft",
 	"checks": "server/redis",
 	"path": "server/redis",
 	"display": 1,
 	"author": "redis",
 	"date": "2017-04-01",
-	"home": "https://redis.io",
+	"home": "https://download.redis.io/releases",
 	"type": 0,
 	"pid": "2"
 }
