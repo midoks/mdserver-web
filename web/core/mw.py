@@ -1689,10 +1689,79 @@ def strfDate(sdate):
 def getCertName(certPath):
     if not os.path.exists(certPath):
         return None
+    
+    result = {}
+    
+    # 优先使用 cryptography 库（更现代、更稳定）
+    try:
+        from cryptography import x509
+        from cryptography.hazmat.backends import default_backend
+        
+        cert_data = readFile(certPath)
+        if not cert_data:
+            return None
+            
+        cert = x509.load_pem_x509_certificate(cert_data.encode() if isinstance(cert_data, str) else cert_data, default_backend())
+        
+        # 取颁发者名称
+        issuer = cert.issuer
+        result['issuer'] = ''
+        # 尝试获取 CN (Common Name)
+        for attr in issuer:
+            if attr.oid == x509.oid.NameOID.COMMON_NAME:
+                result['issuer'] = attr.value
+                break
+        # 如果没有 CN，尝试获取 O (Organization)
+        if not result['issuer']:
+            for attr in issuer:
+                if attr.oid == x509.oid.NameOID.ORGANIZATION_NAME:
+                    result['issuer'] = attr.value
+                    break
+        
+        # 取到期时间
+        result['notAfter'] = strfDate(cert.not_valid_after.strftime('%Y%m%d%H%M%S'))
+        # 取申请时间
+        result['notBefore'] = strfDate(cert.not_valid_before.strftime('%Y%m%d%H%M%S'))
+        
+        # 取可选名称 (SAN)
+        result['dns'] = []
+        try:
+            san_ext = cert.extensions.get_extension_for_oid(x509.oid.ExtensionOID.SUBJECT_ALTERNATIVE_NAME)
+            san_names = san_ext.value.get_values_for_type(x509.DNSName)
+            result['dns'] = san_names
+        except:
+            pass
+        
+        # 取主要认证名称
+        subject = cert.subject
+        result['subject'] = ''
+        for attr in subject:
+            if attr.oid == x509.oid.NameOID.COMMON_NAME:
+                result['subject'] = attr.value
+                break
+        
+        if not result['subject']:
+            if result['dns']:
+                result['subject'] = result['dns'][0]
+        
+        if not result['dns']:
+            if result['subject']:
+                result['dns'].append(result['subject'])
+        
+        # 计算剩余天数
+        result['endtime'] = int(int(time.mktime(time.strptime(
+            result['notAfter'], "%Y-%m-%d")) - time.time()) / 86400)
+        
+        return result
+        
+    except Exception as e:
+        writeFileLog(f"getCertName cryptography error: {e}")
+    
+    # 如果 cryptography 失败，尝试使用旧的 OpenSSL 方式
     try:
         import OpenSSL
-        result = {}
         x509 = OpenSSL.crypto.load_certificate(OpenSSL.crypto.FILETYPE_PEM, readFile(certPath))
+        
         # 取产品名称
         issuer = x509.get_issuer()
         result['issuer'] = ''
@@ -1710,10 +1779,12 @@ def getCertName(certPath):
         if not result['issuer']:
             if hasattr(issuer, 'O'):
                 result['issuer'] = issuer.O
+        
         # 取到期时间
         result['notAfter'] = strfDate(bytes.decode(x509.get_notAfter())[:-1])
         # 取申请时间
         result['notBefore'] = strfDate(bytes.decode(x509.get_notBefore())[:-1])
+        
         # 取可选名称
         result['dns'] = []
         for i in range(x509.get_extension_count()):
@@ -1722,6 +1793,7 @@ def getCertName(certPath):
                 s_dns = str(s_name).split(',')
                 for d in s_dns:
                     result['dns'].append(d.split(':')[1])
+        
         subject = x509.get_subject().get_components()
         # 取主要认证名称
         if len(subject) == 1:
@@ -1736,9 +1808,13 @@ def getCertName(certPath):
                     result['dns'].append(result['subject'])
             else:
                 result['subject'] = result['dns'][0]
+        
+        # 计算剩余天数
         result['endtime'] = int(int(time.mktime(time.strptime(
             result['notAfter'], "%Y-%m-%d")) - time.time()) / 86400)
+        
         return result
+        
     except Exception as e:
         writeFileLog(getTracebackInfo())
         return None
