@@ -925,10 +925,15 @@ def isSupportSystemctl():
 def isSupportHttp3(version):
     if version.startswith('1.29'):
         return True
+    if version.startswith('1.31'):
+        return True
     return False
 
 def isVhostHasReuseport(version):
     if not version.startswith('1.29'):
+        return False
+
+    if not version.startswith('1.31'):
         return False
 
     vhost_dir = getServerDir() + '/web_conf/nginx/vhost'
