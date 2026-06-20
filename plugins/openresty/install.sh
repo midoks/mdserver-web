@@ -5,7 +5,7 @@ export PATH
 # cd /Users/midoks/Desktop/mwdev/server/mdserver-web/plugins/openresty && bash install.sh upgrade 1.29.2
 # cd /www/server/mdserver-web/plugins/openresty && bash install.sh install 1.21.4
 # cd /www/server/mdserver-web/plugins/openresty && bash install.sh install 1.29.2
-# cd /www/server/mdserver-web/plugins/openresty && bash install.sh upgrade 1.29.2
+# cd /www/server/mdserver-web/plugins/openresty && bash install.sh upgrade 1.31.1
 
 # curl -I -H "Accept-Encoding: br" http://localhost
 # curl -I -H "Accept-Encoding: zstd" http://localhost
