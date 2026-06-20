@@ -256,7 +256,18 @@ function getFormatTime(tm, format) {
 	return format;
 }
 
-
+// 格式化时间戳为 YYYY-MM-DD HH:ii:ss
+function formatTimestamp(timestamp) {
+    if (!timestamp || timestamp === '') return '';
+    var date = new Date(timestamp * 1000); // 假设是秒级时间戳
+    var year = date.getFullYear();
+    var month = String(date.getMonth() + 1).padStart(2, '0');
+    var day = String(date.getDate()).padStart(2, '0');
+    var hours = String(date.getHours()).padStart(2, '0');
+    var minutes = String(date.getMinutes()).padStart(2, '0');
+    var seconds = String(date.getSeconds()).padStart(2, '0');
+    return year + '-' + month + '-' + day + ' ' + hours + ':' + minutes + ':' + seconds;
+}
 
 function changePathCallback(default_dir, callback) {
 	var c = layer.open({

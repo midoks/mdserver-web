@@ -439,6 +439,7 @@ def runInfo():
         data['Reading'] = tmp[11]
         data['Writing'] = tmp[13]
         data['Waiting'] = tmp[15]
+        data["time"] = time.time()
         return mw.getJson(data)
     except Exception as e:
         try:
@@ -453,6 +454,7 @@ def runInfo():
             data['Reading'] = tmp[11]
             data['Writing'] = tmp[13]
             data['Waiting'] = tmp[15]
+            data["time"] = time.time()
             return mw.getJson(data)
         except Exception as e:
             return mw.returnJson(False, "oprenresty异常!")
