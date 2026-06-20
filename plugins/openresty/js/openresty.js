@@ -110,6 +110,7 @@ function orPluginOpServiceOp(a,b,c,d,a,v,request_callback){
 }
 
 var optmp_status = null;
+var optmp_timer = null;
 
 //查看Nginx负载状态
 function getOpStatus(){
@@ -125,7 +126,8 @@ function getOpStatus(){
     $(".soft-man-con").html(con);
 
     getOpStatusOne();
-    setInterval(function(){
+    clearInterval(optmp_timer);
+    optmp_timer = setInterval(function(){
         getOpStatusInterval();
     }, 5000);
 }
