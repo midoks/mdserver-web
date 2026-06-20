@@ -8,7 +8,7 @@ rootPath=$(dirname "$rootPath")
 serverPath=$(dirname "$rootPath")
 
 sys_os=`uname`
-VERSION=1.6.39
+VERSION=1.6.42
 
 echo $sys_os
 
