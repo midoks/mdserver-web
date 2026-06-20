@@ -122,6 +122,7 @@ function getOpStatus(){
         <tr><th>请求数(Reading)</th><td class='op_reading'>0</td></tr>\
         <tr><th>响应数(Writing)</th><td class='op_writing'>0</td></tr>\
         <tr><th>驻留进程(Waiting)</th><td class='op_waiting'>0</td></tr>\
+        <tr><th>请求时间(time)</th><td class='op_waiting'>0</td></tr>\
      </table></div>";
     $(".soft-man-con").html(con);
 
@@ -153,7 +154,8 @@ function getOpStatusOne(){
                 <tr><th>总请求数(requests)</th><td>" + rdata.requests + "</td></tr>\
                 <tr><th>请求数(Reading)</th><td>" + rdata.Reading + "</td></tr>\
                 <tr><th>响应数(Writing)</th><td>" + rdata.Writing + "</td></tr>\
-                <tr><th>驻留进程(Waiting)</th><td>" + rdata.Waiting + "</td></tr>";
+                <tr><th>驻留进程(Waiting)</th><td>" + rdata.Waiting + "</td></tr>\
+                <tr><th>请求时间(time)</th><td class='op_waiting'>"+rdata.time+"</td></tr>";
             $(".soft-man-con .op_status").html(con);
         } catch(err) {
              showMsg(data.data, function(){
@@ -201,7 +203,9 @@ function getOpStatusInterval(){
                 <tr><th>总请求数(requests)</th><td>" + rdata.requests + "</td></tr>\
                 <tr><th>请求数(Reading)</th><td>" + rdata.Reading + "</td></tr>\
                 <tr><th>响应数(Writing)</th><td>" + rdata.Writing + "</td></tr>\
-                <tr><th>驻留进程(Waiting)</th><td>" + rdata.Waiting + "</td></tr>" + qbs;
+                <tr><th>驻留进程(Waiting)</th><td>" + rdata.Waiting + "</td></tr>\
+                " + qbs +
+                "<tr><th>请求时间(time)</th><td class='op_waiting'>"+rdata.time+"</td></tr>";;
             $(".soft-man-con .op_status").html(con);
         } catch(err) {
              showMsg(data.data, function(){
