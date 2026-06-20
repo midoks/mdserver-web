@@ -116,7 +116,7 @@ Install_openresty()
 
 	fi
 
-	if [[ "$VERSION" =~ "1.29.2" ]];then
+	if [[ "$VERSION" =~ "1.31.1" ]];then
 		OPTIONS="${OPTIONS} --with-http_v3_module"
 
 		# if [ ! -f ${openrestyDir}/libressl-${libresslVersion}.tar.gz ];then
