@@ -109,34 +109,108 @@ function orPluginOpServiceOp(a,b,c,d,a,v,request_callback){
     });
 }
 
+var optmp_status = null;
 
 //查看Nginx负载状态
-function getOpStatus() {
+function getOpStatus(){
+    var con = "<div><table class='table table-hover table-bordered op_status'>\
+        <tr><th>活动连接(Active connections)</th><td class='op_active'>0</td></tr>\
+        <tr><th>总连接次数(accepts)</th><td class='op_accepts'>0</td></tr>\
+        <tr><th>总握手次数(handled)</th><td class='op_handled'>0</td></tr>\
+        <tr><th>总请求数(requests)</th><td class='op_requests'>0</td></tr>\
+        <tr><th>请求数(Reading)</th><td class='op_reading'>0</td></tr>\
+        <tr><th>响应数(Writing)</th><td class='op_writing'>0</td></tr>\
+        <tr><th>驻留进程(Waiting)</th><td class='op_waiting'>0</td></tr>\
+     </table></div>";
+    $(".soft-man-con").html(con);
+
+    getOpStatusOne();
+    setInterval(function(){
+        getOpStatusInterval();
+    }, 5000);
+}
+
+function getOpStatusOne(){
     var loadT = layer.msg('正在处理，请稍后...', { icon: 16, time: 0, shade: 0.3 });
     $.post('/plugins/run', {name:'openresty', func:'run_info'}, function(data) {
-        layer.close(loadT); 
+        layer.close(loadT);
         try {
             var rdata = $.parseJSON(data.data);
             if ('status' in rdata && !rdata.status){
-                showMsg(rdata.msg, function(){}, null,3000);
+                showMsg(rdata.msg, function(){
+                    var con = "<tr><th>Error</th><td>" + rdata.msg + "</td></tr>";
+                    $(".soft-man-con .op_status").html(con);
+                }, null,3000);
                 return;
             }
 
-            var con = "<div><table class='table table-hover table-bordered'>\
-                            <tr><th>活动连接(Active connections)</th><td>" + rdata.active + "</td></tr>\
-                            <tr><th>总连接次数(accepts)</th><td>" + rdata.accepts + "</td></tr>\
-                            <tr><th>总握手次数(handled)</th><td>" + rdata.handled + "</td></tr>\
-                            <tr><th>总请求数(requests)</th><td>" + rdata.requests + "</td></tr>\
-                            <tr><th>请求数(Reading)</th><td>" + rdata.Reading + "</td></tr>\
-                            <tr><th>响应数(Writing)</th><td>" + rdata.Writing + "</td></tr>\
-                            <tr><th>驻留进程(Waiting)</th><td>" + rdata.Waiting + "</td></tr>\
-                         </table></div>";
-            $(".soft-man-con").html(con);
-        }catch(err){
-             showMsg(data.data, function(){}, null,3000);
+            optmp_status = rdata;
+            var con = "<tr><th>活动连接(Active connections)</th><td>" + rdata.active + "</td></tr>\
+                <tr><th>总连接次数(accepts)</th><td>" + rdata.accepts + "</td></tr>\
+                <tr><th>总握手次数(handled)</th><td>" + rdata.handled + "</td></tr>\
+                <tr><th>总请求数(requests)</th><td>" + rdata.requests + "</td></tr>\
+                <tr><th>请求数(Reading)</th><td>" + rdata.Reading + "</td></tr>\
+                <tr><th>响应数(Writing)</th><td>" + rdata.Writing + "</td></tr>\
+                <tr><th>驻留进程(Waiting)</th><td>" + rdata.Waiting + "</td></tr>";
+            $(".soft-man-con .op_status").html(con);
+        } catch(err) {
+             showMsg(data.data, function(){
+                var con = "<tr><th>Error</th><td>" + err + "</td></tr>";
+                $(".soft-man-con .op_status").html(con);
+             }, null,3000);
         }
     },'json');
 }
+
+
+function getOpStatusInterval(){
+    $.post('/plugins/run', {name:'openresty', func:'run_info'}, function(data) {
+        try {
+            var rdata = $.parseJSON(data.data);
+            if ('status' in rdata && !rdata.status){
+                showMsg(rdata.msg, function(){
+                    var con = "<tr><th>Error</th><td>" + rdata.msg + "</td></tr>";
+                    $(".soft-man-con .op_status").html(con);
+                }, null,3000);
+                return;
+            }
+
+            var qbs = "";
+            if (optmp_status){
+                var time_diff = rdata.time - optmp_status.time;
+                var requests_diff = rdata.requests - optmp_status.requests;
+                
+                // 检查除数是否有效
+                if (time_diff > 0) {
+                    var qbs_nums = requests_diff / time_diff;
+                    // 保留两位小数，并处理 NaN 和 Infinity
+                    qbs_nums = isFinite(qbs_nums) ? qbs_nums.toFixed(2) : '0.00';
+                } else {
+                    qbs_nums = '0.00';
+                }
+                console.log('QPS:', qbs_nums);
+                qbs = "<tr><th>计算(QPS)</th><td>"+qbs_nums+"</td></tr>";
+            }
+
+            optmp_status = rdata;
+            var con = "<tr><th>活动连接(Active connections)</th><td>" + rdata.active + "</td></tr>\
+                <tr><th>总连接次数(accepts)</th><td>" + rdata.accepts + "</td></tr>\
+                <tr><th>总握手次数(handled)</th><td>" + rdata.handled + "</td></tr>\
+                <tr><th>总请求数(requests)</th><td>" + rdata.requests + "</td></tr>\
+                <tr><th>请求数(Reading)</th><td>" + rdata.Reading + "</td></tr>\
+                <tr><th>响应数(Writing)</th><td>" + rdata.Writing + "</td></tr>\
+                <tr><th>驻留进程(Waiting)</th><td>" + rdata.Waiting + "</td></tr>" + qbs;
+            $(".soft-man-con .op_status").html(con);
+        } catch(err) {
+             showMsg(data.data, function(){
+                var con = "<tr><th>Error</th><td>" + err + "</td></tr>";
+                $(".soft-man-con .op_status").html(con);
+             }, null,3000);
+        }
+    },'json');
+}
+
+
 
 
 function setOpCfg(){
