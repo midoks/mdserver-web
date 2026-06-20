@@ -129,6 +129,9 @@ function getOpStatus(){
     getOpStatusOne();
     clearInterval(optmp_timer);
     optmp_timer = setInterval(function(){
+        if ($(".soft-man-con").length == 0){
+            clearInterval(optmp_timer);
+        }
         getOpStatusInterval();
     }, 5000);
 }
