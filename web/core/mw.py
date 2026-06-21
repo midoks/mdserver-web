@@ -930,12 +930,6 @@ def isSupportHttp3(version):
     return False
 
 def isVhostHasReuseport(version):
-    if not version.startswith('1.29'):
-        return False
-
-    if not version.startswith('1.31'):
-        return False
-
     vhost_dir = getServerDir() + '/web_conf/nginx/vhost'
     if not os.path.exists(vhost_dir):
         return False
