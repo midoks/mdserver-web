@@ -94,7 +94,7 @@ var nezha  = {
         $(".soft-man-con").html(con);
     },
     cronAddCheck: function(){
-        nezha.postCallback({
+        nezha.send({
             method: "cron_add_check",
             success:function(data){
                 console.log(data);
