@@ -228,6 +228,17 @@ class App:
     def run_log(self):
         return self.getServerDir() + '/logs/nezha.log'
 
+    def cron_add_check(self):
+        try:
+            import tool_task
+            tool_task.createBgTask()
+            return mw.returnJson(True, '添加检查任务成功')
+        except Exception as e:
+            return mw.returnJson(False, '添加检查任务失败:'+str(e))
+
+    def cron_del_check(self):
+        return 'ok'
+
 
 if __name__ == "__main__":
     func = sys.argv[1]
