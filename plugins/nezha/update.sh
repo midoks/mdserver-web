@@ -89,11 +89,10 @@ if [ ! -d $TARGET_DIR ]; then
 	mkdir -p $TARGET_DIR
 fi
 
-unzip $DOWNLOAD_FILE -d $TARGET_DIR
-echo "TARGET_DIR:"$TARGET_DIR
-
 cd $TARGET_DIR && rm -rf app
 cd $TARGET_DIR && rm -rf dashboard-linux-${ARCH}
+unzip $DOWNLOAD_FILE -d $TARGET_DIR
+echo "TARGET_DIR:"$TARGET_DIR
 if [ ! -f $TARGET_DIR/app ];then
 	cd $TARGET_DIR && mv dashboard-linux-${ARCH} app && chmod +x app
 fi
