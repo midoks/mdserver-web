@@ -117,7 +117,6 @@ Install_App()
 Uninstall_App()
 {
 	cd ${rootPath} && python3 ${rootPath}/plugins/nezha/index.py initd_uninstall
-	cd ${rootPath} && python3 ${rootPath}/plugins/nezha/index.py initd_uninstall_agent
 	cd ${rootPath} && python3 ${rootPath}/plugins/nezha/index.py stop
 	cd ${rootPath} && python3 ${rootPath}/plugins/nezha/index.py stop_agent
 	rm -rf $serverPath/nezha
