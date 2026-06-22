@@ -1,4 +1,5 @@
-# coding:utf-8
+#!/usr/bin/env python
+# coding=utf-8
 
 import sys
 import io
@@ -64,7 +65,7 @@ class App:
             return "Release failed {}".format(e)
 
     def openPort(self):
-        for i in ["9527", "5555"]:
+        for i in ["8008"]:
             self.__release_port(i)
         return True
 
@@ -81,49 +82,36 @@ class App:
         path = self.getPluginDir() + "/init.d/nezha.tpl"
         return path
 
-    def getInitdAgentConfTpl(self):
-        path = self.getPluginDir() + "/init.d/nezha-agent.tpl"
-        return path
+    def getDataDir(self):
+        data = self.getServerDir()+"/dashboard/data/sqlite.db"
+        return data
 
     def getHomeDir(self):
         if mw.isAppleSystem():
-            user = mw.execShell(
-                "who | sed -n '2, 1p' |awk '{print $1}'")[0].strip()
+            user = mw.execShell("who | sed -n '2, 1p' |awk '{print $1}'")[0].strip()
             return '/Users/' + user
         else:
             return '/root'
 
     def getRunUser(self):
         if mw.isAppleSystem():
-            user = mw.execShell(
-                "who | sed -n '2, 1p' |awk '{print $1}'")[0].strip()
+            user = mw.execShell("who | sed -n '2, 1p' |awk '{print $1}'")[0].strip()
             return user
         else:
             return 'root'
 
     def status(self):
-        cmd = "ps -ef|grep " + self.getPluginName() + \
-            " |grep -v grep | grep -v nezha-agent | grep -v python | awk '{print $2}'"
+        cmd = "ps -ef|grep nezha/dashboard |grep -v grep | grep -v python | awk '{print $2}'"
         data = mw.execShell(cmd)
+        # mw.writeFileLog("data[0]:"+data[0])
         if data[0] == '':
             return "stop"
         return 'start'
 
-    def status_agent(self):
-        cmd = "ps -ef | grep nezha-agent | grep -v grep | grep -v python | awk '{print $2}'"
-        data = mw.execShell(cmd)
-        if data[0] == '':
-            return 'stop'
-        return 'start'
-
     def contentReplace(self, content):
-
         service_path = mw.getServerDir()
         content = content.replace('{$ROOT_PATH}', mw.getFatherDir())
         content = content.replace('{$SERVER_PATH}', service_path)
-        content = content.replace('{$RUN_USER}', self.getRunUser())
-        content = content.replace('{$HOME_DIR}', self.getHomeDir())
-
         return content
 
     def initDreplace(self):
@@ -146,8 +134,8 @@ class App:
 
         # systemd
         systemDir = mw.systemdCfgDir()
-        systemService = systemDir + '/nezha.service'
-        systemServiceTpl = self.getPluginDir() + '/init.d/nezha.service.tpl'
+        systemService = systemDir + '/nezha-dashboard.service'
+        systemServiceTpl = self.getPluginDir() + '/init.d/nezha-dashboard.service.tpl'
         if os.path.exists(systemDir) and not os.path.exists(systemService):
             service_path = mw.getServerDir()
             se_content = mw.readFile(systemServiceTpl)
@@ -157,53 +145,11 @@ class App:
 
         return file_bin
 
-    def contentAgentReplace(self, content):
-        path = self.__agent_cfg
-        if os.path.exists(path):
-            data = self.get_agent_cfg()
-            content = content.replace('{$APP_HOST}', data['host'])
-            content = content.replace('{$APP_SECRET}', data['secret'])
-
-        return content
-
-    def initDAgent(self):
-        file_tpl = self.getInitdAgentConfTpl()
-
-        initD_path = self.getServerDir() + '/init.d'
-        if not os.path.exists(initD_path):
-            os.mkdir(initD_path)
-
-        file_agent_bin = initD_path + '/nezha-agent'
-
-        content = mw.readFile(file_tpl)
-        content = self.contentReplace(content)
-        content = self.contentAgentReplace(content)
-        mw.writeFile(file_agent_bin, content)
-        mw.execShell('chmod +x ' + file_agent_bin)
-
-        # systemd
-        sysDir = mw.systemdCfgDir()
-        sysService = sysDir + '/nezha-agent.service'
-        sysServiceTpl = self.getPluginDir() + '/init.d/nezha-agent.service.tpl'
-        service_path = mw.getServerDir()
-        content = mw.readFile(sysServiceTpl)
-        content = self.contentReplace(content)
-        content = self.contentAgentReplace(content)
-        mw.writeFile(sysService, content)
-        mw.execShell('systemctl daemon-reload')
-
-        return file_agent_bin
-
-    def init_cfg(self):
-        self.initDreplace()
-        self.initDAgent()
-
     def imOp(self, method):
-
         file = self.initDreplace()
 
         if not mw.isAppleSystem():
-            cmd = 'systemctl {} {}'.format(method, self.getPluginName())
+            cmd = 'systemctl {} {}'.format(method, "nezha-dashboard")
             data = mw.execShell(cmd)
             if data[1] == '':
                 return 'ok'
@@ -227,19 +173,6 @@ class App:
         return self.imOp('reload')
 
     def agOp(self, method):
-        file = self.initDAgent()
-
-        path = self.__agent_cfg
-        if not os.path.exists(path):
-            return '请先设置Agent配置!'
-
-        if not mw.isAppleSystem():
-            cmd = 'systemctl {} {}'.format(method, 'nezha-agent')
-            data = mw.execShell(cmd)
-            if data[1] == '':
-                return 'ok'
-            return 'fail'
-
         data = mw.execShell(file + ' ' + method)
         if data[1] == '':
             return 'ok'
@@ -258,104 +191,58 @@ class App:
         return self.agentOp('reload')
 
     def initd_status(self):
-        cmd = 'systemctl status nezha | grep loaded | grep "enabled;"'
+        cmd = 'systemctl status nezha-dashboard | grep loaded | grep "enabled;"'
         data = mw.execShell(cmd)
         if data[0] == '':
             return 'fail'
         return 'ok'
 
     def initd_install(self):
-        mw.execShell('systemctl enable nezha')
+        mw.execShell('systemctl enable nezha-dashboard')
         return 'ok'
 
     def initd_uninstall(self):
-        mw.execShell('systemctl disable nezha')
+        mw.execShell('systemctl disable nezha-dashboard')
         return 'ok'
 
-    def initd_status_agent(self):
-        cmd = 'systemctl status nezha-agent | grep loaded | grep "enabled;"'
-        data = mw.execShell(cmd)
-        if data[0] == '':
-            return 'fail'
-        return 'ok'
+    def getVersion(self):
+        ver_file = self.getServerDir()+"/version.pl"
+        return mw.readFile(ver_file).strip()
 
-    def initd_install_agent(self):
-        mw.execShell('systemctl enable nezha-agent')
-        return 'ok'
+    def uninstall_pre_inspection(self):
+        version = self.getVersion()
+        data_dir = self.getDataDir()
+        if os.path.exists(data_dir):
+            self.stop()
+        if mw.isDebugMode():
+            return 'ok'
 
-    def initd_uninstall_agent(self):
-        mw.execShell('systemctl disable nezha-agent')
-        return 'ok'
+        from utils.plugin import plugin as MwPlugin
+        MwPlugin.instance().removeIndex(self.getPluginName(), version)
+
+        return "请手动删除NEZHA[{}]<br/> rm -rf {}".format(version, self.getServerDir())
 
     def conf(self):
         return self.getServerDir() + '/dashboard/data/config.yaml'
 
-    def nezha_cfg(self):
-        path = self.__cfg
-        if not os.path.exists(path):
-            d = {}
-            cmd_un = 'cd ' + self.getServerDir() + '/dashboard && ./nezha conf -u ""'
-            mw.execShell(cmd_un)
-            td = mw.execShell(cmd_un)
-            d['username'] = td[0].strip()
-
-            pwd = mw.getRandomString(16)
-            cmd_pwd = 'cd ' + self.getServerDir() + '/dashboard && ./nezha conf -u "" -p ' + pwd
-            td = mw.execShell(cmd_pwd)
-            d['password'] = pwd
-
-            mw.writeFile(path, mw.enDoubleCrypt('nezha', mw.getJson(d)))
-
-        info = mw.readFile(path)
-        info = mw.deDoubleCrypt('nezha', info)
-
-        info = json.loads(info)
-        return mw.returnJson(True, 'ok', info)
-
-    def nezha_save_cfg(self):
-        args = self.getArgs()
-        data = self.checkArgs(args, ['username', 'password'])
-        if not data[0]:
-            return data[1]
-        path = self.__cfg
-
-        cmd = 'cd ' + self.getServerDir() + '/dashboard && ./nezha conf -su "' + \
-            args['username'] + '" -p ' + args['password']
-        # print(cmd)
-        t = mw.execShell(cmd)
-        # print(t)
-        mw.writeFile(path, mw.enDoubleCrypt('nezha', mw.getJson(args)))
-        return mw.returnJson(True, '修改成功!')
-
-    def get_agent_cfg(self):
-        path = self.__agent_cfg
-        info = mw.readFile(path)
-        info = mw.deDoubleCrypt('agent', info)
-        info = json.loads(info)
-        return info
-
-    def agent_cfg(self):
-        path = self.__agent_cfg
-        if not os.path.exists(path):
-            d = {}
-            d['host'] = '127.0.0.1:5555'
-            d['secret'] = 'secret'
-            mw.writeFile(path, mw.enDoubleCrypt('agent', mw.getJson(d)))
-
-        info = self.get_agent_cfg()
-        return mw.returnJson(True, 'ok', info)
-
-    def agent_save_cfg(self):
-        args = self.getArgs()
-        data = self.checkArgs(args, ['host', 'secret'])
-        if not data[0]:
-            return data[1]
-        path = self.__agent_cfg
-        mw.writeFile(path, mw.enDoubleCrypt('agent', mw.getJson(args)))
-        return mw.returnJson(True, '修改成功!')
-
     def run_log(self):
         return self.getServerDir() + '/logs/nezha.log'
+
+    def cron_add_check(self):
+        try:
+            import tool_task
+            tool_task.createBgTask()
+            return mw.returnJson(True, '添加检查任务成功')
+        except Exception as e:
+            return mw.returnJson(False, '添加检查任务失败:'+str(e))
+
+    def cron_del_check(self):
+        try:
+            import tool_task
+            tool_task.removeBgTask()
+            return mw.returnJson(True, '删除检查任务成功')
+        except Exception as e:
+            return mw.returnJson(False, '删除检查任务失败:'+str(e))
 
 
 if __name__ == "__main__":

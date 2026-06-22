@@ -154,8 +154,8 @@ def checkArgs(data, ck=[]):
     return (True, mw.returnJson(True, 'ok'))
 
 def status():
-    data = mw.execShell(
-        "ps -ef|grep mongod |grep -v mongosh|grep -v grep | grep -v /Applications | grep -v python | grep -v mdserver-web | awk '{print $2}'")
+    cmd = "ps -ef|grep mongod |grep -v mongosh|grep -v grep | grep -v /Applications | grep -v python | grep -v mdserver-web | awk '{print $2}'"
+    data = mw.execShell(cmd)
     if data[0] == '':
         return 'stop'
     return 'start'
