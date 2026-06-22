@@ -141,7 +141,7 @@ Install_dashborad(){
 		echo "TARGET_DIR:"$TARGET_DIR
 
 		if [ ! -f $TARGET_DIR/app ];then
-			cd $TARGET_DIR && mv dashboard-linux-${ARCH} app
+			cd $TARGET_DIR && mv dashboard-linux-${ARCH} app && chmod +x app
 		fi
 
 		rm -rf $DOWNLOAD_FILE
@@ -160,6 +160,7 @@ Install_App()
 		echo "$VERSION" > $serverPath/nezha/version.pl
 		cd ${rootPath} && python3 ${rootPath}/plugins/nezha/index.py init_cfg
 	fi
+	cd ${rootPath} && python3 ${rootPath}/plugins/nezha/index.py start
 	echo 'install successful'
 }
 
