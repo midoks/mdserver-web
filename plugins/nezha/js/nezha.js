@@ -87,8 +87,7 @@ var nezha  = {
     },
     readme:function (){
         var readme = '<ul class="help-info-text c7">';
-        readme += '<li>默认用户和密码(admin:admin)</li>';
-        readme += '<li>安装后，立即修改</li>';
+        readme += '<li>默认用户和密码(admin:admin),务必在第一时间修改</li>';
         readme += '</ul>';
         $('.soft-man-con').html(readme);
     }
