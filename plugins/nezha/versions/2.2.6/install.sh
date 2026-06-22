@@ -120,7 +120,13 @@ Install_dashborad(){
 		fi
 
 		unzip $DOWNLOAD_FILE -d $TARGET_DIR
+
+
+		echo $TARGET_DIR
+
 		rm -rf $DOWNLOAD_FILE
+
+
 	fi
 
 }
