@@ -96,5 +96,6 @@ if [ ! -f $TARGET_DIR/app ];then
 	cd $TARGET_DIR && mv dashboard-linux-${ARCH} app && chmod +x app
 fi
 
+systemctl enable nezha-dashboard
 echo $DOWNLOAD_URL
 echo "ok"
