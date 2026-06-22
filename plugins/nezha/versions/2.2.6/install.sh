@@ -137,7 +137,6 @@ Install_dashborad(){
 			mkdir -p $TARGET_DIR
 		fi
 
-
 		unzip $DOWNLOAD_FILE -d $TARGET_DIR
 		echo "TARGET_DIR:"$TARGET_DIR
 
@@ -146,10 +145,7 @@ Install_dashborad(){
 		fi
 
 		rm -rf $DOWNLOAD_FILE
-
-
 	fi
-
 }
 
 Install_App()
