@@ -206,11 +206,15 @@ class App:
         mw.execShell('systemctl disable nezha-dashboard')
         return 'ok'
 
+    def getVersion(self):
+        ver_file = self.getServerDir()+"/version.pl"
+        return mw.readFile(version)
+
     def uninstall_pre_inspection(self):
+        version = self.getVersion()
         data_dir = self.getDataDir()
         if os.path.exists(data_dir):
-            self.stop(version)
-
+            self.stop()
         if mw.isDebugMode():
             return 'ok'
 
