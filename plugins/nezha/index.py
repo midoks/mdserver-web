@@ -237,7 +237,12 @@ class App:
             return mw.returnJson(False, '添加检查任务失败:'+str(e))
 
     def cron_del_check(self):
-        return 'ok'
+        try:
+            import tool_task
+            tool_task.removeBgTask()
+            return mw.returnJson(True, '删除检查任务成功')
+        except Exception as e:
+            return mw.returnJson(False, '删除检查任务失败:'+str(e))
 
 
 if __name__ == "__main__":
