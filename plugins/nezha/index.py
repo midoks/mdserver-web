@@ -139,15 +139,6 @@ class App:
 
         return file_bin
 
-    def contentAgentReplace(self, content):
-        path = self.__agent_cfg
-        if os.path.exists(path):
-            data = self.get_agent_cfg()
-            content = content.replace('{$APP_HOST}', data['host'])
-            content = content.replace('{$APP_SECRET}', data['secret'])
-
-        return content
-
     def init_cfg(self):
         self.initDreplace()
 
