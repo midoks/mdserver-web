@@ -668,7 +668,7 @@ class plugin(object):
             else:
                 self.__plugin_status_data[k] = False
         # print(self.__plugin_status_data)
-        mw.writeFileLog(json.dumps(self.__plugin_status_data))
+        # mw.writeFileLog(json.dumps(self.__plugin_status_data))
         thisdb.setOption(self.__plugin_status_cachekey, json.dumps(self.__plugin_status_data))
         # print(thisdb.getOption(self.__plugin_status_cachekey))
         return True
