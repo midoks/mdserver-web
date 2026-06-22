@@ -169,7 +169,7 @@ Uninstall_App()
 	cd ${rootPath} && python3 ${rootPath}/plugins/nezha/index.py initd_uninstall
 	cd ${rootPath} && python3 ${rootPath}/plugins/nezha/index.py stop
 	rm -rf $serverPath/nezha
-	echo "install fail"
+	echo "uninstall successful"
 }
 
 action=$1
