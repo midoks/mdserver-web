@@ -3,9 +3,11 @@ PATH=/bin:/sbin:/usr/bin:/usr/sbin:/usr/local/bin:/usr/local/sbin:~/bin
 export PATH
 
 # cd /www/server/mdserver-web && bash plugins/nezha/update.sh
-
 curPath=`pwd`
+serverPath=$(dirname "$curPath")
 echo $curPath
+
+nezhaDir=${serverPath}/source/nezha
 
 REPO="nezhahq/nezha"
 LATEST_VERSION=$(curl -sL "https://api.github.com/repos/$REPO/releases/latest" | jq -r '.tag_name')
