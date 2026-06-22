@@ -129,7 +129,7 @@ Install_dashborad(){
 	filename="dashboard-${OS}-${ARCH}.zip"
 
 	if [ ! -f $TARGET_DIR/nezha ];then
-		DOWNLOAD_URL="https://${GITHUB_URL}/nezhahq/nezha/releases/download/v${VERSION}/dashboard-${OS}-${ARCH}.zip"
+		DOWNLOAD_URL="https://${GITHUB_URL}/nezhahq/nezha/releases/download/v${VERSION}/${filename}"
 
 		DOWNLOAD_FILE="$nezhaDir/$filename"
 		download_file $DOWNLOAD_URL $DOWNLOAD_FILE
