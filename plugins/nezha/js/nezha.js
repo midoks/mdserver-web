@@ -85,6 +85,28 @@ var nezha  = {
     repeatPwd:function (a, id) {
         $("#"+id).val(randomStrPwd(a))
     },
+
+    otherFunc:function(){
+        var con = '<p class="conf_p" style="text-align:center;">\
+                <button class="btn btn-default btn-sm" onclick="nezha.cronAddCheck()">添加检查任务</button>  \
+                <button class="btn btn-default btn-sm" onclick="nezha.cronDelCheck()">删除检查任务</button>\
+            </p>';
+        $(".soft-man-con").html(con);
+    },
+    cronAddCheck: function(){
+        nezha.postCallback({
+            method: "cron_add_check",
+            success:function(data){
+                console.log(data);
+            }
+        });
+    },
+    cronDelCheck:function(){
+        orPost('cron_del_check', {}, function(data){
+            var rdata = $.parseJSON(data.data);
+            layer.msg(rdata.msg, { icon: rdata.status ? 1 : 2 });
+        });
+    },
     readme:function (){
         var readme = '<ul class="help-info-text c7">';
         readme += '<li>默认用户和密码(admin:admin),务必在第一时间修改</li>';
