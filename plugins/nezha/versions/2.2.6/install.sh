@@ -128,7 +128,10 @@ Install_dashborad(){
 		DOWNLOAD_URL="https://${GITHUB_URL}/nezhahq/nezha/releases/download/v${VERSION}/${filename}"
 
 		DOWNLOAD_FILE="$nezhaDir/$filename"
-		download_file $DOWNLOAD_URL $DOWNLOAD_FILE
+
+		if [ ! -f $DOWNLOAD_FILE ];then
+			download_file $DOWNLOAD_URL $DOWNLOAD_FILE
+		fi
 
 		if [ ! -d $TARGET_DIR ]; then
 			mkdir -p $TARGET_DIR
