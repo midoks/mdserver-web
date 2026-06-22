@@ -96,6 +96,10 @@ if [ ! -f $TARGET_DIR/app ];then
 	cd $TARGET_DIR && mv dashboard-linux-${ARCH} app && chmod +x app
 fi
 
-systemctl enable nezha-dashboard
+systemctl restart nezha-dashboard
 echo $DOWNLOAD_URL
+
+if [ -f /www/server/nezha ];then 
+	echo "$NUMBER_LATEST_VERSION" > /www/server/nezha/version.pl
+fi
 echo "ok"
