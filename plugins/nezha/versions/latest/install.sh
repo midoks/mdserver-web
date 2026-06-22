@@ -7,11 +7,11 @@ rootPath=$(dirname "$curPath")
 rootPath=$(dirname "$rootPath")
 serverPath=$(dirname "$rootPath")
 
-VERSION=0.15.2
+VERSION=2.2.6
 
-# bash install.sh install 0.15.2
-# cd /www/server/mdserver-web/plugins/nezha && bash install.sh install 0.15.2
-# cd /Users/midoks/Desktop/mwdev/server/mdserver-web/plugins/nezha && bash install.sh install 0.15.2
+# bash install.sh install 2.2.6
+# cd /www/server/mdserver-web/plugins/nezha && bash install.sh install 2.2.6
+# cd /Users/midoks/Desktop/mwdev/server/mdserver-web/plugins/nezha && bash install.sh install 2.2.6
 
 bash ${rootPath}/scripts/getos.sh
 OSNAME=`cat ${rootPath}/data/osname.pl`
@@ -35,24 +35,15 @@ load_vars() {
 	OS=$(uname | tr '[:upper:]' '[:lower:]')
 	TARGET_DIR="$serverPath/nezha/dashboard"
 
-
-	    ## China_IP
-    if [[ -z "${CN}" ]]; then
-        if [[ $(curl -m 10 -s https://ipapi.co/json | grep 'China') != "" ]]; then
-            CN=true
-        fi
-    fi
+	# China_IP
+    # if [[ -z "${CN}" ]]; then
+    #     if [[ $(curl -m 10 -s https://ipapi.co/json | grep 'China') != "" ]]; then
+    #         CN=true
+    #     fi
+    # fi
     
-    if [[ -z "${CN}" ]]; then
-        GITHUB_RAW_URL="raw.githubusercontent.com/midoks/nezha/main"
-        GITHUB_URL="github.com"
-    else
-        GITHUB_RAW_URL="cdn.jsdelivr.net/gh/midoks/nezha@main"
-        GITHUB_URL="dn-dao-github-mirror.daocloud.io"
-    fi
-
-    echo $GITHUB_RAW_URL
-    echo $GITHUB_URL
+    GITHUB_RAW_URL="raw.githubusercontent.com/nezhahq/nezha/main"
+    GITHUB_URL="github.com"
 }
 
 # download file
@@ -86,7 +77,7 @@ Install_dashborad(){
 
 	if [ ! -f $TARGET_DIR/nezha ];then
 
-		DOWNLOAD_URL="https://${GITHUB_URL}/midoks/nezha/releases/download/v${VERSION}/nezha-${OS}-${ARCH}.zip"
+		DOWNLOAD_URL="https://${GITHUB_URL}/nezhahq/nezha/releases/download/v${VERSION}/dashboard-${OS}-${ARCH}.zip"
 
 		DOWNLOAD_FILE="$(mktemp).zip"
 		download_file $DOWNLOAD_URL $DOWNLOAD_FILE
@@ -101,36 +92,12 @@ Install_dashborad(){
 
 }
 
-Install_agent(){
-	echo -e "正在下载监控端"
-	mkdir -p $serverPath/source
-
-	version=v0.15.1
-
-	AGENT_TARGET_DIR="$serverPath/nezha/agent"
-
-	DOWNLOAD_URL="https://${GITHUB_URL}/nezhahq/agent/releases/download/${version}/nezha-agent_${OS}_${ARCH}.zip"
-	DOWNLOAD_FILE="$(mktemp).zip"
-
-	if [ ! -f $AGENT_TARGET_DIR/nezha-agent ];then
-		download_file $DOWNLOAD_URL $DOWNLOAD_FILE
-
-		if [ ! -d $AGENT_TARGET_DIR ]; then
-			mkdir -p $AGENT_TARGET_DIR
-		fi
-	
-		unzip $DOWNLOAD_FILE -d $AGENT_TARGET_DIR
-		rm -rf $DOWNLOAD_FILE
-	fi
-}
-
 Install_App()
 {
 	load_vars
 	get_arch
 
 	Install_dashborad
-	Install_agent
 
 	if [ -d $serverPath/nezha ];then
 		echo "$VERSION" > $serverPath/nezha/version.pl
@@ -142,7 +109,6 @@ Install_App()
 Uninstall_App()
 {
 	cd ${rootPath} && python3 ${rootPath}/plugins/nezha/index.py initd_uninstall
-	cd ${rootPath} && python3 ${rootPath}/plugins/nezha/index.py initd_uninstall_agent
 	cd ${rootPath} && python3 ${rootPath}/plugins/nezha/index.py stop
 	cd ${rootPath} && python3 ${rootPath}/plugins/nezha/index.py stop_agent
 	rm -rf $serverPath/nezha

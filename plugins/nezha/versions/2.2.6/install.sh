@@ -20,15 +20,48 @@ OSNAME_ID=`cat /etc/*-release | grep VERSION_ID | awk -F = '{print $2}' | awk -F
 
 ARCH="amd64"
 
+geo_check() {
+    api_list="https://blog.cloudflare.com/cdn-cgi/trace https://developers.cloudflare.com/cdn-cgi/trace"
+    ua="Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101 Firefox/81.0"
+    set -- "$api_list"
+    for url in $api_list; do
+        text="$(curl -A "$ua" -m 10 -s "$url")"
+        endpoint="$(echo "$text" | sed -n 's/.*h=\([^ ]*\).*/\1/p')"
+        if echo "$text" | grep -qw 'CN'; then
+            isCN=true
+            break
+        elif echo "$url" | grep -q "$endpoint"; then
+            break
+        fi
+    done
+}
+
 get_arch() {
-	TMP_ARCH=`arch`
-	if [ "$TMP_ARCH" == "x86_64" ];then
-		ARCH="amd64"
-	elif [ "$TMP_ARCH" == "aarch64" ];then
-		ARCH="arm64"
-	else
-		echo $ARCH
-	fi
+    uname=$(uname -m)
+    case "$uname" in
+        amd64|x86_64)
+            ARCH="amd64"
+            ;;
+        i386|i686)
+            ARCH="386"
+            ;;
+        aarch64|arm64)
+            ARCH="arm64"
+            ;;
+        *arm*)
+            ARCH="arm"
+            ;;
+        s390x)
+            ARCH="s390x"
+            ;;
+        riscv64)
+            ARCH="riscv64"
+            ;;
+        *)
+            err "未知架构：$ARCH"
+            exit 1
+            ;;
+    esac
 }
 
 load_vars() {

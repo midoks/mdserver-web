@@ -4,7 +4,7 @@
 	"name": "nezha",
 	"title": "哪吒监控",
 	"shell": "install.sh",
-	"versions":["2.2.6"],
+	"versions":["2.2.6","latest"],
 	"tip": "soft",
 	"checks": "server/nezha",
 	"path": "server/nezha",
