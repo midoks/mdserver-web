@@ -667,7 +667,9 @@ class plugin(object):
                 self.__plugin_status_data[k] = True
             else:
                 self.__plugin_status_data[k] = False
+        # print(self.__plugin_status_data)
         thisdb.setOption(self.__plugin_status_cachekey, json.dumps(self.__plugin_status_data))
+        # print(thisdb.getOption(self.__plugin_status_cachekey))
         return True
 
     # 多线程检查插件状态
