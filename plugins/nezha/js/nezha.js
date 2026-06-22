@@ -31,14 +31,6 @@ var nezha  = {
             }
 
             var ret_data = $.parseJSON(res.data);
-            console.log("send:",ret_data);
-            // if (!ret_data.status){
-            //     layer.msg(ret_data.msg,{icon:2,time:2000});
-            //     return;
-            // }
-
-            // console.log("send2:",ret_data);
-
             if(typeof(callback) == 'function'){
                 callback(ret_data);
             }
@@ -97,15 +89,18 @@ var nezha  = {
         nezha.send({
             tips:"请求中...",
             method: "cron_add_check",
-            success:function(data){
-                console.log(data);
+            success:function(rdata){
+                layer.msg(rdata.msg, { icon: rdata.status ? 1 : 2 });
             }
         });
     },
     cronDelCheck:function(){
-        orPost('cron_del_check', {}, function(data){
-            var rdata = $.parseJSON(data.data);
-            layer.msg(rdata.msg, { icon: rdata.status ? 1 : 2 });
+        nezha.send({
+            tips:"请求中...",
+            method: "cron_del_check",
+            success:function(rdata){
+                layer.msg(rdata.msg, { icon: rdata.status ? 1 : 2 });
+            }
         });
     },
     readme:function (){
