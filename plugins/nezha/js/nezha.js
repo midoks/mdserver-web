@@ -82,52 +82,8 @@ var nezha  = {
             }
         },'json');
     },
-
     repeatPwd:function (a, id) {
         $("#"+id).val(randomStrPwd(a))
-    },
-
-    save_cfg:function(version){
-        var username = $("input[name='username']").val();
-        var password = $("input[name='password']").val();
-
-        this.send({
-            tips:'正在设置中...',
-            data:{'username':username,'password':password},
-            method:'nezha_save_cfg',
-            success:function(rdata){
-                layer.msg(rdata.msg, { icon: rdata.status ? 1 : 2 });
-            }
-        });
-    },
-
-    cfg:function(version){
-        this.send({
-            tips:'正在获取中...',
-            method:'nezha_cfg',
-            success:function(data){
-                var d = data.data;
-                var value = '<p>\
-                    <span>用户名</span>\
-                    <input id="nz_username" style="width: 160px;" class="bt-input-text mr5" name="username" value="'+d['username']+'" type="text">\
-                    ,<span title="随机用户名" class="glyphicon glyphicon-repeat cursor" onclick="nezha.repeatPwd(8,\'nz_username\')"></span>\
-                </p>';
-
-                value += '<p>\
-                    <span>密码</span>\
-                    <input id="nz_password" style="width: 160px;" class="bt-input-text mr5" name="password" value="'+d['password']+'" type="text">\
-                    ,<span title="随机密码" class="glyphicon glyphicon-repeat cursor" onclick="nezha.repeatPwd(16,\'nz_password\')"></span>\
-                </p>';
-                var conf = '<style>.conf_p p{margin-bottom: 2px;} .conf_p span {width: 50px;}</style><div class="conf_p" style="margin-bottom:0">\
-                                ' + value + '\
-                                <div style="margin-top:10px; padding-right:15px" class="text-right">\
-                                    <button class="btn btn-success btn-sm mr5" onclick="nezha.cfg(\'' + version + '\')">刷新</button>\
-                                    <button class="btn btn-success btn-sm" onclick="nezha.save_cfg(\'' + version + '\')">保存</button>\
-                                </div>\
-                            </div>'
-                $(".soft-man-con").html(conf);
-            }
-        });
     },
     readme:function (){
         var readme = '<ul class="help-info-text c7">';
