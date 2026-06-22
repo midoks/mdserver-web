@@ -8,6 +8,7 @@
 	"tip": "soft",
 	"checks": "server/nezha",
 	"path": "server/nezha",
+	"coexist": false,
 	"uninstall_pre_inspection":true,
 	"display": 1,
 	"author": "midoks",
