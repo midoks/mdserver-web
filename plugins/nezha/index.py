@@ -81,6 +81,10 @@ class App:
         path = self.getPluginDir() + "/init.d/nezha.tpl"
         return path
 
+    def getDataDir(self):
+        data = self.getServerDir()+"/dashboard/data/sqlite.db"
+        return data
+
     def getHomeDir(self):
         if mw.isAppleSystem():
             user = mw.execShell("who | sed -n '2, 1p' |awk '{print $1}'")[0].strip()
@@ -201,6 +205,19 @@ class App:
     def initd_uninstall(self):
         mw.execShell('systemctl disable nezha-dashboard')
         return 'ok'
+
+    def uninstall_pre_inspection(self):
+        data_dir = self.getDataDir()
+        if os.path.exists(data_dir):
+            self.stop(version)
+
+        if mw.isDebugMode():
+            return 'ok'
+
+        from utils.plugin import plugin as MwPlugin
+        MwPlugin.instance().removeIndex(self.getPluginName(), version)
+
+        return "请手动删除NEZHA[{}]<br/> rm -rf {}".format(version, self.getServerDir())
 
     def conf(self):
         return self.getServerDir() + '/dashboard/data/config.yaml'

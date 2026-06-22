@@ -8,6 +8,7 @@ export PATH
 # cd /www/server/mdserver-web/plugins/nezha && bash install.sh install 2.2.6
 
 # cd /www/server/mdserver-web && source bin/activate && python3 plugins/nezha/index.py start
+# cd /www/server/mdserver-web && source bin/activate && python3 plugins/nezha/index.py status
 
 curPath=`pwd`
 rootPath=$(dirname "$curPath")
