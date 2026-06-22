@@ -1,6 +1,6 @@
 {
 	"sort": 7,
-	"ps": "哪吒监控面板&&改造版",
+	"ps": "哪吒监控面板",
 	"name": "nezha",
 	"title": "哪吒监控",
 	"shell": "install.sh",
