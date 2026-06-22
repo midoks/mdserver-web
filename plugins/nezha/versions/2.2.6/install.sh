@@ -125,7 +125,7 @@ download_file() {
 
 Install_dashborad(){
 	echo '正在安装哪吒监控...'
-	mkdir -p $serverPath/source
+	mkdir -p $nezhaDir
 	filename="dashboard-${OS}-${ARCH}.zip"
 
 	if [ ! -f $TARGET_DIR/nezha ];then
