@@ -97,6 +97,4 @@ if [ ! -f $TARGET_DIR/app ];then
 fi
 
 echo $DOWNLOAD_URL
-
-rm -rf $DOWNLOAD_FILE
 echo "ok"
