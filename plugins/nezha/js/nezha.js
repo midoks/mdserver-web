@@ -88,7 +88,7 @@ var nezha  = {
 
     otherFunc:function(){
         var con = '<p class="conf_p" style="text-align:center;">\
-                <button class="btn btn-default btn-sm" onclick="nezha.cronAddCheck()">添加检查任务</button>  \
+                <button class="btn btn-default btn-sm" onclick="nezha.cronAddCheck()">添加检查任务</button>\
                 <button class="btn btn-default btn-sm" onclick="nezha.cronDelCheck()">删除检查任务</button>\
             </p>';
         $(".soft-man-con").html(con);
