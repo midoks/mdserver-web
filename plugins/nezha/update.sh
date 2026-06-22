@@ -99,7 +99,7 @@ fi
 systemctl restart nezha-dashboard
 echo $DOWNLOAD_URL
 
-if [ -f /www/server/nezha ];then 
+if [ -d /www/server/nezha ];then 
 	echo "$NUMBER_LATEST_VERSION" > /www/server/nezha/version.pl
 fi
 echo "ok"
