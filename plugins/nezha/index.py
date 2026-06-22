@@ -96,7 +96,7 @@ class App:
             return 'root'
 
     def status(self):
-        cmd = "ps -ef|grep nezha-dashboard |grep -v grep | grep -v python | awk '{print $2}'"
+        cmd = "ps -ef|grep dashboard/app |grep -v grep | grep -v python | awk '{print $2}'"
         data = mw.execShell(cmd)
         if data[0] == '':
             return "stop"
@@ -146,7 +146,7 @@ class App:
         file = self.initDreplace()
 
         if not mw.isAppleSystem():
-            cmd = 'systemctl {} {}'.format(method, self.getPluginName())
+            cmd = 'systemctl {} {}'.format(method, "nezha-dashboard")
             data = mw.execShell(cmd)
             if data[1] == '':
                 return 'ok'

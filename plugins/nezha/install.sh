@@ -2,8 +2,12 @@
 PATH=/bin:/sbin:/usr/bin:/usr/sbin:/usr/local/bin:/usr/local/sbin:~/bin
 export PATH
 
+# systemctl start nezha-dashboard
 # systemctl status nezha-dashboard
+
 # cd /www/server/mdserver-web/plugins/nezha && bash install.sh install 2.2.6
+
+# cd /www/server/mdserver-web && source bin/activate && python3 plugins/nezha/index.py start
 
 curPath=`pwd`
 rootPath=$(dirname "$curPath")
