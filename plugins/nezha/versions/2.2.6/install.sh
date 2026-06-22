@@ -158,7 +158,6 @@ Install_App()
 
 	if [ -d $serverPath/nezha ];then
 		echo "$VERSION" > $serverPath/nezha/version.pl
-		cd ${rootPath} && python3 ${rootPath}/plugins/nezha/index.py init_cfg
 	fi
 	cd ${rootPath} && python3 ${rootPath}/plugins/nezha/index.py start
 	cd ${rootPath} && python3 ${rootPath}/plugins/nezha/index.py initd_install

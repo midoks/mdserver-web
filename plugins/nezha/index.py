@@ -143,9 +143,6 @@ class App:
 
         return file_bin
 
-    def init_cfg(self):
-        self.initDreplace()
-
     def imOp(self, method):
         file = self.initDreplace()
 
