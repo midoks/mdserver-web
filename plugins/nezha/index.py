@@ -208,7 +208,7 @@ class App:
 
     def getVersion(self):
         ver_file = self.getServerDir()+"/version.pl"
-        return mw.readFile(version)
+        return mw.readFile(ver_file)
 
     def uninstall_pre_inspection(self):
         version = self.getVersion()
