@@ -2,6 +2,9 @@
 PATH=/bin:/sbin:/usr/bin:/usr/sbin:/usr/local/bin:/usr/local/sbin:~/bin
 export PATH
 
+# systemctl status nezha-dashboard
+# cd /www/server/mdserver-web/plugins/nezha && bash install.sh install 2.2.6
+
 curPath=`pwd`
 rootPath=$(dirname "$curPath")
 rootPath=$(dirname "$rootPath")
@@ -28,14 +31,6 @@ if [ "${action}" == "uninstall" ];then
 		systemctl disable nezha
 		rm -rf /usr/lib/systemd/system/nezha.service
 		rm -rf /lib/systemd/system/nezha.service
-		systemctl daemon-reload
-	fi
-
-	if [ -f /usr/lib/systemd/system/nezha-agent.service ] || [ -f /lib/systemd/system/nezha-agent.service ] ;then
-		systemctl stop nezha-agent
-		systemctl disable nezha-agent
-		rm -rf /usr/lib/systemd/system/nezha-agent.service
-		rm -rf /lib/systemd/system/nezha-agent.service
 		systemctl daemon-reload
 	fi
 fi
