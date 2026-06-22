@@ -106,8 +106,6 @@ class App:
         service_path = mw.getServerDir()
         content = content.replace('{$ROOT_PATH}', mw.getFatherDir())
         content = content.replace('{$SERVER_PATH}', service_path)
-        content = content.replace('{$RUN_USER}', self.getRunUser())
-        content = content.replace('{$HOME_DIR}', self.getHomeDir())
         return content
 
     def initDreplace(self):
