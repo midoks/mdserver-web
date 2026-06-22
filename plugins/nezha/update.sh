@@ -94,6 +94,7 @@ echo "TARGET_DIR:"$TARGET_DIR
 
 if [ ! -f $TARGET_DIR/app ];then
 	cd $TARGET_DIR && rm -rf app
+	cd $TARGET_DIR && rm -rf dashboard-linux-${ARCH}
 	cd $TARGET_DIR && mv dashboard-linux-${ARCH} app && chmod +x app
 fi
 
