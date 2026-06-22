@@ -158,7 +158,6 @@ Install_App()
 
 	if [ -d $serverPath/nezha ];then
 		echo "$VERSION" > $serverPath/nezha/version.pl
-		cd ${rootPath} && python3 ${rootPath}/plugins/nezha/index.py init_cfg
 	fi
 	cd ${rootPath} && python3 ${rootPath}/plugins/nezha/index.py start
 	cd ${rootPath} && python3 ${rootPath}/plugins/nezha/index.py initd_install
@@ -170,7 +169,7 @@ Uninstall_App()
 	cd ${rootPath} && python3 ${rootPath}/plugins/nezha/index.py initd_uninstall
 	cd ${rootPath} && python3 ${rootPath}/plugins/nezha/index.py stop
 	rm -rf $serverPath/nezha
-	echo "install fail"
+	echo "uninstall successful"
 }
 
 action=$1
