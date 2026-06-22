@@ -67,6 +67,22 @@ get_arch() {
     esac
 }
 
+check_init() {
+    init=$(readlink /sbin/init)
+    case "$init" in
+        *systemd*)
+            INIT=systemd
+            ;;
+        *openrc-init*|*busybox*)
+            INIT=openrc
+            ;;
+        *)
+            err "Unknown init"
+            exit 1
+            ;;
+    esac
+}
+
 load_vars() {
 	OS=$(uname | tr '[:upper:]' '[:lower:]')
 	TARGET_DIR="$serverPath/nezha/dashboard"
@@ -123,9 +139,9 @@ Install_dashborad(){
 		fi
 
 		unzip $DOWNLOAD_FILE -d $TARGET_DIR
-
-
 		echo "TARGET_DIR:"$TARGET_DIR
+
+		cd $TARGET_DIR && dashboard-linux-${ARCH} app
 
 		rm -rf $DOWNLOAD_FILE
 
@@ -138,6 +154,7 @@ Install_App()
 {
 	load_vars
 	get_arch
+	check_init
 
 	Install_dashborad
 
