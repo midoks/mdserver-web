@@ -95,6 +95,7 @@ var nezha  = {
     },
     cronAddCheck: function(){
         nezha.send({
+            tips:"请求中...",
             method: "cron_add_check",
             success:function(data){
                 console.log(data);
