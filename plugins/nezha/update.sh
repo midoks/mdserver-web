@@ -90,7 +90,6 @@ if [ ! -d $TARGET_DIR ]; then
 fi
 
 cd $TARGET_DIR && rm -rf app
-cd $TARGET_DIR && rm -rf dashboard-linux-${ARCH}
 unzip $DOWNLOAD_FILE -d $TARGET_DIR
 echo "TARGET_DIR:"$TARGET_DIR
 if [ ! -f $TARGET_DIR/app ];then
