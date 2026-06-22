@@ -8,8 +8,6 @@ rootPath=$(dirname "$rootPath")
 serverPath=$(dirname "$rootPath")
 
 nezhaDir=${serverPath}/source/nezha
-
-
 VERSION=2.2.6
 
 # bash install.sh install 2.2.6
@@ -19,8 +17,6 @@ VERSION=2.2.6
 bash ${rootPath}/scripts/getos.sh
 OSNAME=`cat ${rootPath}/data/osname.pl`
 OSNAME_ID=`cat /etc/*-release | grep VERSION_ID | awk -F = '{print $2}' | awk -F "\"" '{print $2}'`
-
-
 ARCH="amd64"
 
 geo_check() {
