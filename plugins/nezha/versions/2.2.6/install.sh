@@ -141,7 +141,7 @@ Install_dashborad(){
 		unzip $DOWNLOAD_FILE -d $TARGET_DIR
 		echo "TARGET_DIR:"$TARGET_DIR
 
-		cd $TARGET_DIR && dashboard-linux-${ARCH} app
+		cd $TARGET_DIR && mv dashboard-linux-${ARCH} app
 
 		rm -rf $DOWNLOAD_FILE
 
