@@ -7,6 +7,7 @@ rootPath=$(dirname "$curPath")
 rootPath=$(dirname "$rootPath")
 serverPath=$(dirname "$rootPath")
 
+nezhaDir=${serverPath}/source/nezha
 VERSION=2.2.6
 
 # bash install.sh install 2.2.6
@@ -16,19 +17,66 @@ VERSION=2.2.6
 bash ${rootPath}/scripts/getos.sh
 OSNAME=`cat ${rootPath}/data/osname.pl`
 OSNAME_ID=`cat /etc/*-release | grep VERSION_ID | awk -F = '{print $2}' | awk -F "\"" '{print $2}'`
-
-
 ARCH="amd64"
 
+geo_check() {
+    api_list="https://blog.cloudflare.com/cdn-cgi/trace https://developers.cloudflare.com/cdn-cgi/trace"
+    ua="Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101 Firefox/81.0"
+    set -- "$api_list"
+    for url in $api_list; do
+        text="$(curl -A "$ua" -m 10 -s "$url")"
+        endpoint="$(echo "$text" | sed -n 's/.*h=\([^ ]*\).*/\1/p')"
+        if echo "$text" | grep -qw 'CN'; then
+            isCN=true
+            break
+        elif echo "$url" | grep -q "$endpoint"; then
+            break
+        fi
+    done
+}
+
 get_arch() {
-	TMP_ARCH=`arch`
-	if [ "$TMP_ARCH" == "x86_64" ];then
-		ARCH="amd64"
-	elif [ "$TMP_ARCH" == "aarch64" ];then
-		ARCH="arm64"
-	else
-		echo $ARCH
-	fi
+    uname=$(uname -m)
+    case "$uname" in
+        amd64|x86_64)
+            ARCH="amd64"
+            ;;
+        i386|i686)
+            ARCH="386"
+            ;;
+        aarch64|arm64)
+            ARCH="arm64"
+            ;;
+        *arm*)
+            ARCH="arm"
+            ;;
+        s390x)
+            ARCH="s390x"
+            ;;
+        riscv64)
+            ARCH="riscv64"
+            ;;
+        *)
+            err "未知架构：$ARCH"
+            exit 1
+            ;;
+    esac
+}
+
+check_init() {
+    init=$(readlink /sbin/init)
+    case "$init" in
+        *systemd*)
+            INIT=systemd
+            ;;
+        *openrc-init*|*busybox*)
+            INIT=openrc
+            ;;
+        *)
+            err "Unknown init"
+            exit 1
+            ;;
+    esac
 }
 
 load_vars() {
@@ -73,29 +121,38 @@ download_file() {
 
 Install_dashborad(){
 	echo '正在安装哪吒监控...'
-	mkdir -p $serverPath/source
+	mkdir -p $nezhaDir
+	filename="dashboard-${OS}-${ARCH}.zip"
 
 	if [ ! -f $TARGET_DIR/nezha ];then
+		DOWNLOAD_URL="https://${GITHUB_URL}/nezhahq/nezha/releases/download/v${VERSION}/${filename}"
 
-		DOWNLOAD_URL="https://${GITHUB_URL}/nezhahq/nezha/releases/download/v${VERSION}/dashboard-${OS}-${ARCH}.zip"
+		DOWNLOAD_FILE="$nezhaDir/$filename"
 
-		DOWNLOAD_FILE="$(mktemp).zip"
-		download_file $DOWNLOAD_URL $DOWNLOAD_FILE
+		if [ ! -f $DOWNLOAD_FILE ];then
+			download_file $DOWNLOAD_URL $DOWNLOAD_FILE
+		fi
 
 		if [ ! -d $TARGET_DIR ]; then
 			mkdir -p $TARGET_DIR
 		fi
 
 		unzip $DOWNLOAD_FILE -d $TARGET_DIR
+		echo "TARGET_DIR:"$TARGET_DIR
+
+		if [ ! -f $TARGET_DIR/app ];then
+			cd $TARGET_DIR && mv dashboard-linux-${ARCH} app && chmod +x app
+		fi
+
 		rm -rf $DOWNLOAD_FILE
 	fi
-
 }
 
 Install_App()
 {
 	load_vars
 	get_arch
+	check_init
 
 	Install_dashborad
 
@@ -103,6 +160,8 @@ Install_App()
 		echo "$VERSION" > $serverPath/nezha/version.pl
 		cd ${rootPath} && python3 ${rootPath}/plugins/nezha/index.py init_cfg
 	fi
+	cd ${rootPath} && python3 ${rootPath}/plugins/nezha/index.py start
+	cd ${rootPath} && python3 ${rootPath}/plugins/nezha/index.py initd_install
 	echo 'install successful'
 }
 
@@ -110,7 +169,6 @@ Uninstall_App()
 {
 	cd ${rootPath} && python3 ${rootPath}/plugins/nezha/index.py initd_uninstall
 	cd ${rootPath} && python3 ${rootPath}/plugins/nezha/index.py stop
-	cd ${rootPath} && python3 ${rootPath}/plugins/nezha/index.py stop_agent
 	rm -rf $serverPath/nezha
 	echo "install fail"
 }
