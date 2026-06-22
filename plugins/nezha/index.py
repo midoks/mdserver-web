@@ -64,7 +64,7 @@ class App:
             return "Release failed {}".format(e)
 
     def openPort(self):
-        for i in ["9527", "5555"]:
+        for i in ["8008", "5555"]:
             self.__release_port(i)
         return True
 
@@ -96,21 +96,18 @@ class App:
             return 'root'
 
     def status(self):
-        cmd = "ps -ef|grep " + self.getPluginName() + \
-            " |grep -v grep | grep -v nezha-agent | grep -v python | awk '{print $2}'"
+        cmd = "ps -ef|grep nezha-dashboard |grep -v grep | grep -v python | awk '{print $2}'"
         data = mw.execShell(cmd)
         if data[0] == '':
             return "stop"
         return 'start'
 
     def contentReplace(self, content):
-
         service_path = mw.getServerDir()
         content = content.replace('{$ROOT_PATH}', mw.getFatherDir())
         content = content.replace('{$SERVER_PATH}', service_path)
         content = content.replace('{$RUN_USER}', self.getRunUser())
         content = content.replace('{$HOME_DIR}', self.getHomeDir())
-
         return content
 
     def initDreplace(self):
@@ -157,7 +154,6 @@ class App:
         self.initDreplace()
 
     def imOp(self, method):
-
         file = self.initDreplace()
 
         if not mw.isAppleSystem():
