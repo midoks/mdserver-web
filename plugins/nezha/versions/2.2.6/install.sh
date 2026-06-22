@@ -7,6 +7,9 @@ rootPath=$(dirname "$curPath")
 rootPath=$(dirname "$rootPath")
 serverPath=$(dirname "$rootPath")
 
+nezhaDir=${serverPath}/source/nezha
+
+
 VERSION=2.2.6
 
 # bash install.sh install 2.2.6
@@ -107,12 +110,12 @@ download_file() {
 Install_dashborad(){
 	echo '正在安装哪吒监控...'
 	mkdir -p $serverPath/source
+	filename="dashboard-${OS}-${ARCH}.zip"
 
 	if [ ! -f $TARGET_DIR/nezha ];then
-
 		DOWNLOAD_URL="https://${GITHUB_URL}/nezhahq/nezha/releases/download/v${VERSION}/dashboard-${OS}-${ARCH}.zip"
 
-		DOWNLOAD_FILE="$(mktemp).zip"
+		DOWNLOAD_FILE="$nezhaDir/$filename"
 		download_file $DOWNLOAD_URL $DOWNLOAD_FILE
 
 		if [ ! -d $TARGET_DIR ]; then
@@ -122,7 +125,7 @@ Install_dashborad(){
 		unzip $DOWNLOAD_FILE -d $TARGET_DIR
 
 
-		echo $TARGET_DIR
+		echo "TARGET_DIR:"$TARGET_DIR
 
 		rm -rf $DOWNLOAD_FILE
 
