@@ -88,6 +88,7 @@ var nezha  = {
     readme:function (){
         var readme = '<ul class="help-info-text c7">';
         readme += '<li>默认用户和密码(admin:admin),务必在第一时间修改</li>';
+        readme += '<li>经测试,修改(admin)密码后,需清空cookie,才能正常登录</li>';
         readme += '</ul>';
         $('.soft-man-con').html(readme);
     }
