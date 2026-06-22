@@ -35,23 +35,15 @@ load_vars() {
 	OS=$(uname | tr '[:upper:]' '[:lower:]')
 	TARGET_DIR="$serverPath/nezha/dashboard"
 
-	## China_IP
-    if [[ -z "${CN}" ]]; then
-        if [[ $(curl -m 10 -s https://ipapi.co/json | grep 'China') != "" ]]; then
-            CN=true
-        fi
-    fi
+	# China_IP
+    # if [[ -z "${CN}" ]]; then
+    #     if [[ $(curl -m 10 -s https://ipapi.co/json | grep 'China') != "" ]]; then
+    #         CN=true
+    #     fi
+    # fi
     
-    if [[ -z "${CN}" ]]; then
-        GITHUB_RAW_URL="raw.githubusercontent.com/midoks/nezha/main"
-        GITHUB_URL="github.com"
-    else
-        GITHUB_RAW_URL="cdn.jsdelivr.net/gh/midoks/nezha@main"
-        GITHUB_URL="dn-dao-github-mirror.daocloud.io"
-    fi
-
-    echo $GITHUB_RAW_URL
-    echo $GITHUB_URL
+    GITHUB_RAW_URL="raw.githubusercontent.com/nezhahq/nezha/main"
+    GITHUB_URL="github.com"
 }
 
 # download file
@@ -85,7 +77,7 @@ Install_dashborad(){
 
 	if [ ! -f $TARGET_DIR/nezha ];then
 
-		DOWNLOAD_URL="https://${GITHUB_URL}/nezhahq/nezha/releases/download/v${VERSION}/nezha-${OS}-${ARCH}.zip"
+		DOWNLOAD_URL="https://${GITHUB_URL}/nezhahq/nezha/releases/download/v${VERSION}/dashboard-${OS}-${ARCH}.zip"
 
 		DOWNLOAD_FILE="$(mktemp).zip"
 		download_file $DOWNLOAD_URL $DOWNLOAD_FILE
