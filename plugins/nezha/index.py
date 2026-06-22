@@ -65,7 +65,7 @@ class App:
             return "Release failed {}".format(e)
 
     def openPort(self):
-        for i in ["8008", "5555"]:
+        for i in ["8008"]:
             self.__release_port(i)
         return True
 
@@ -101,8 +101,9 @@ class App:
             return 'root'
 
     def status(self):
-        cmd = "ps -ef|grep dashboard/app |grep -v grep | grep -v python | awk '{print $2}'"
+        cmd = "ps -ef|grep nezha/dashboard |grep -v grep | grep -v python | awk '{print $2}'"
         data = mw.execShell(cmd)
+        # mw.writeFileLog("data[0]:"+data[0])
         if data[0] == '':
             return "stop"
         return 'start'
