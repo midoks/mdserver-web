@@ -31,11 +31,15 @@ def init():
         init_option()
         init_db_system()
 
+        # --------
+        init_cmd()
+        init_acme_cron()
+        init_auto_update()
+        # init_cron()
+
     thisdb.reinstallPanelData()
-    init_cmd()
-    init_acme_cron()
-    init_auto_update()
-    # init_cron()
+    
+    
     
 
     # 自动识别防火墙配置
