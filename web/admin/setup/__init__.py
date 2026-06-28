@@ -23,6 +23,8 @@ import config
 
 def init():
     
+    init_cmd()
+
     # 检查数据库是否存在。如果没有就创建它。
     if not os.path.isfile(config.SQLITE_PATH):
         # 初始化用户信息
@@ -32,14 +34,12 @@ def init():
         init_db_system()
 
         # --------
-        init_cmd()
+        
         init_acme_cron()
         init_auto_update()
         # init_cron()
 
     thisdb.reinstallPanelData()
-    
-
 
     # 自动识别防火墙配置
     firewall_port = thisdb.getOption('setpu_auto_identify_firewall_port', default='no')
