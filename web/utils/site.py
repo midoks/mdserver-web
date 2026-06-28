@@ -2189,12 +2189,12 @@ location ^~ {from} {\n\
             if status:
                 return mw.returnData(False, '使用中,先关闭再删除')
 
+            if os.path.exists(path):
+                mw.execShell('rm -rf ' + path)
+
             ssl_acme_dir = mw.getAcmeDomainDir(site_name)
             if os.path.exists(ssl_acme_dir):
                 mw.execShell('rm -rf ' + ssl_acme_dir)
-                
-            if os.path.exists(path):
-                mw.execShell('rm -rf ' + path)
             return mw.returnData(True, '删除成功')
         elif ssl_type == 'lets':
             ssl_lets_dir = self.sslLetsDir + '/' + site_name
