@@ -9,6 +9,7 @@
 # ---------------------------------------------------------------------------------
 
 import os
+import fcntl
 import core.mw as mw
 from utils.crontab import crontab
 from croniter import croniter
@@ -35,56 +36,112 @@ def cron_todb(data):
     # print("------")
 
 def init_acme_cron():
-    name = "[勿删]ACME定时强制更新"
-    res = mw.M("crontab").field("id, name").where("name=?", (name,)).find()
-    if res:
+    # 使用文件锁防止并发添加
+    lock_file = mw.getPanelDir() + '/logs/init_acme_cron.lock'
+    lock_fd = None
+    
+    try:
+        # 创建锁文件
+        lock_fd = open(lock_file, 'w')
+        # 获取非阻塞互斥锁
+        fcntl.flock(lock_fd.fileno(), fcntl.LOCK_EX | fcntl.LOCK_NB)
+        
+        name = "[勿删]ACME定时强制更新"
+        res = mw.M("crontab").field("id, name").where("name=?", (name,)).find()
+        if res:
+            return True
+
+        cmd = "/root/.acme.sh/acme.sh --cron --force --standalone"
+        params = {
+            'name': name,
+            'type': 'day-n',
+            'week': "",
+            'where1': "15",
+            'hour': 4,
+            'minute': 15,
+            'save': "",
+            'backup_to': "",
+            'stype': "toShell",
+            'sname': '',
+            'sbody': cmd,
+            'url_address': '',
+            'attr':'',
+        }
+
+        crontab.instance().add(params)
         return True
-
-    cmd = "/root/.acme.sh/acme.sh --cron --force --standalone"
-    params = {
-        'name': name,
-        'type': 'day-n',
-        'week': "",
-        'where1': "15",
-        'hour': 4,
-        'minute': 15,
-        'save': "",
-        'backup_to': "",
-        'stype': "toShell",
-        'sname': '',
-        'sbody': cmd,
-        'url_address': '',
-        'attr':'',
-    }
-
-    crontab.instance().add(params)
-    return True
+        
+    except BlockingIOError:
+        # 锁已被其他进程持有，跳过或等待
+        return True
+    except Exception as e:
+        mw.writeFileLog(f"init_acme_cron error: {e}")
+        return False
+    finally:
+        # 释放锁
+        if lock_fd:
+            try:
+                fcntl.flock(lock_fd.fileno(), fcntl.LOCK_UN)
+                lock_fd.close()
+                # 删除锁文件
+                if os.path.exists(lock_file):
+                    os.remove(lock_file)
+            except:
+                pass
 
 def init_auto_update():
-    name = "[可删]面板自动更新"
-    res = mw.M("crontab").field("id, name").where("name=?", (name,)).find()
-    if res:
+    # 使用文件锁防止并发添加
+    lock_file = mw.getPanelDir() + '/logs/init_auto_update.lock'
+    lock_fd = None
+    
+    try:
+        # 创建锁文件
+        lock_fd = open(lock_file, 'w')
+        # 获取非阻塞互斥锁
+        fcntl.flock(lock_fd.fileno(), fcntl.LOCK_EX | fcntl.LOCK_NB)
+        
+        name = "[可删]面板自动更新"
+        res = mw.M("crontab").field("id, name").where("name=?", (name,)).find()
+        if res:
+            return True
+
+        cmd = "mw update"
+        params = {
+            'name': name,
+            'type': 'month',
+            'week': "",
+            'where1': "1",
+            'hour': 4,
+            'minute': 15,
+            'save': "",
+            'backup_to': "",
+            'stype': "toShell",
+            'sname': '',
+            'sbody': cmd,
+            'url_address': '',
+            'attr':'',
+        }
+
+        crontab.instance().add(params)
         return True
-
-    cmd = "mw update"
-    params = {
-        'name': name,
-        'type': 'month',
-        'week': "",
-        'where1': "1",
-        'hour': 4,
-        'minute': 15,
-        'save': "",
-        'backup_to': "",
-        'stype': "toShell",
-        'sname': '',
-        'sbody': cmd,
-        'url_address': '',
-        'attr':'',
-    }
-
-    crontab.instance().add(params)
-    return True
+        
+    except BlockingIOError:
+        # 锁已被其他进程持有，跳过或等待
+        return True
+    except Exception as e:
+        mw.writeFileLog(f"init_auto_update error: {e}")
+        return False
+    finally:
+        # 释放锁
+        if lock_fd:
+            try:
+                fcntl.flock(lock_fd.fileno(), fcntl.LOCK_UN)
+                lock_fd.close()
+                # 删除锁文件
+                if os.path.exists(lock_file):
+                    os.remove(lock_file)
+            except:
+                pass
 
 # 识别linux计划任务
 def init_cron():
