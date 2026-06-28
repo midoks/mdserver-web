@@ -39,8 +39,7 @@ def init():
 
     thisdb.reinstallPanelData()
     
-    
-    
+
 
     # 自动识别防火墙配置
     firewall_port = thisdb.getOption('setpu_auto_identify_firewall_port', default='no')
