@@ -2197,7 +2197,9 @@ function renderDnsapiHtml(data){
 function renderDnsapi(){
 	$('#dnsapi_set').css('display', 'none');
 
-	$.post('/site/get_dnsapi', {}, function(data){
+	$.post('/site/get_dnsapi', {}, function(rdata){
+		var data = rdata.data;
+		
 		var dnsapi_option = '';
 		for (var i = 0; i < data.length; i++) {
 			dnsapi_option+='<option value="'+data[i]['name']+'" index="'+i+'">'+data[i]['title']+'</option>';

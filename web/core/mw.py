@@ -1720,10 +1720,16 @@ def getCertName(certPath):
                     result['issuer'] = attr.value
                     break
         
-        # 取到期时间
-        result['notAfter'] = strfDate(cert.not_valid_after.strftime('%Y%m%d%H%M%S'))
-        # 取申请时间
-        result['notBefore'] = strfDate(cert.not_valid_before.strftime('%Y%m%d%H%M%S'))
+        # 取到期时间（兼容新旧版本）
+        if hasattr(cert, 'not_valid_after_utc'):
+            result['notAfter'] = strfDate(cert.not_valid_after_utc.strftime('%Y%m%d%H%M%S'))
+        else:
+            result['notAfter'] = strfDate(cert.not_valid_after.strftime('%Y%m%d%H%M%S'))
+        # 取申请时间（兼容新旧版本）
+        if hasattr(cert, 'not_valid_before_utc'):
+            result['notBefore'] = strfDate(cert.not_valid_before_utc.strftime('%Y%m%d%H%M%S'))
+        else:
+            result['notBefore'] = strfDate(cert.not_valid_before.strftime('%Y%m%d%H%M%S'))
         
         # 取可选名称 (SAN)
         result['dns'] = []

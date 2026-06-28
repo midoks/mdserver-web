@@ -2098,7 +2098,7 @@ location ^~ {from} {\n\
                 for field in keys:
                     t[field] = ''
                 dnsapi_option[i]['data'] = t
-        return dnsapi_option
+        return mw.returnData(True, 'OK', dnsapi_option)
 
     def setDnsapi(self, type, data):
         dnsapi_data = thisdb.getOptionByJson('dnsapi', default={})

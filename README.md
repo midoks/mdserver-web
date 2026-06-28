@@ -108,7 +108,7 @@ docker run -itd --name mw-server --privileged=true -p 7200:7200 -p 80:80 -p 443:
 ```
 
 
-### 版本更新 0.18.5
+### 版本更新 0.18.6
 
 - 常规优化。
 
