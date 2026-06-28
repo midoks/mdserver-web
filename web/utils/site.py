@@ -2188,10 +2188,14 @@ location ^~ {from} {\n\
         if ssl_type == 'now':
             if status:
                 return mw.returnData(False, '使用中,先关闭再删除')
+
             if os.path.exists(path):
                 mw.execShell('rm -rf ' + path)
-            else:
-                return mw.returnData(False, '还未申请!')
+
+            ssl_acme_dir = mw.getAcmeDomainDir(site_name)
+            if os.path.exists(ssl_acme_dir):
+                mw.execShell('rm -rf ' + ssl_acme_dir)
+            return mw.returnData(True, '删除成功')
         elif ssl_type == 'lets':
             ssl_lets_dir = self.sslLetsDir + '/' + site_name
             csr_lets_path = ssl_lets_dir + '/fullchain.pem'  # 生成证书路径
