@@ -91,7 +91,7 @@ Install_lib()
 		# 	fi
 		# fi
 
-		if [ ! -f ${serverPath}/lib/freetype_old ];then
+		if [ ! -d ${serverPath}/lib/freetype_old ];then
 			echo "freetype_old not install , check!!"
 			return
 		fi
