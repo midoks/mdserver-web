@@ -62,6 +62,9 @@ local log_dir = "{$SERVER_APP}/logs"
 -- 当前站点的配置（模块级变量，供多个函数共享）
 local auto_config = nil
 
+-- 当前日期（用于更新日志文件）
+local today = ngx.re.gsub(ngx.today(), '-', '')
+
 --[[
     创建模块实例
     @return table 模块实例对象
