@@ -1,55 +1,106 @@
 
+--[[
+    webstats_common.lua - WebStats 统计系统核心模块
+    ==================================================
+    
+    本模块提供 WebStats 系统的核心功能，包括：
+    - 数据库连接管理
+    - 日志数据处理与存储
+    - 定时任务调度
+    - 爬虫/客户端识别
+    - IP/URL 统计
+    
+    架构说明：
+    1. 单例模式：通过 getInstance() 获取全局唯一实例
+    2. 共享内存：使用 ngx.shared.mw_total 作为日志缓存队列
+    3. SQLite 数据库：每个站点独立一个数据库文件
+    4. 定时任务：每 0.5 秒执行一次日志持久化
+    
+    主要数据流向：
+    webstats_log.lua (日志采集) -> ngx.shared.mw_total (缓存队列) -> cron() (定时处理) -> SQLite (持久化)
+    
+    依赖模块：
+    - cjson: JSON 编解码
+    - lsqlite3: SQLite 数据库操作
+    - webstats_config: 全局配置
+    - webstats_sites: 站点配置
+]]
+
 local setmetatable = setmetatable
 local _M = { _VERSION = '1.0' }
 local mt = { __index = _M }
 
+-- 依赖模块
 local json = require "cjson"
 local sqlite3 = require "lsqlite3"
 local config = require "webstats_config"
 local sites = require "webstats_sites"
 
+-- 调试模式开关
 local debug_mode = true
+-- 共享内存队列键名
 local total_key = "log_kv_total"
 
+-- 未匹配到站点时使用的默认名称
 local unset_server_name = "unset"
+-- 日志 ID 最大值，超过后重置
 local max_log_id = 99999999999999
+-- Nginx 共享内存字典实例
 local cache = ngx.shared.mw_total
 
-local today = ngx.re.gsub(ngx.today(),'-','')
-local request_header = ngx.req.get_headers()
-local method = ngx.req.get_method()
-
+-- 当前日期（日）
 local day = os.date("%d")
 local number_day = tonumber(day)
-local day_column = "day"..number_day
-local flow_column = "flow"..number_day
-local spider_column = "spider_flow"..number_day
+-- 数据库列名：day + 日期（如 day01）
+local day_column = "day" .. number_day
+-- 数据库列名：flow + 日期（如 flow01）
+local flow_column = "flow" .. number_day
 
-local auto_config = nil
-
+-- 日志文件存储目录
 local log_dir = "{$SERVER_APP}/logs"
 
+--[[
+    创建模块实例
+    @return table 模块实例对象
+]]
 function _M.new(self)
     local self = {
-        total_key = total_key,
-        params = nil,
-        site_config = nil,
-        config = nil,
+        total_key = total_key,  -- 共享内存队列键名
+        params = nil,           -- 请求参数
+        site_config = nil,      -- 站点配置
+        config = nil,           -- 全局配置
     }
     return setmetatable(self, mt)
 end
 
 
+--[[
+    获取单例实例（懒加载）
+    首次调用时创建实例并启动定时任务
+    @return table 全局唯一的模块实例
+]]
 function _M.getInstance(self)
     if self.instance == nil then
         self.instance = self:new()
-        self:cron()
+        self:cron()  -- 启动定时任务
     end
     assert(self.instance ~= nil)
     return self.instance
 end
 
 
+--[[
+    初始化 SQLite 数据库连接
+    @param input_sn string 站点名称
+    @return table|nil SQLite 数据库对象，失败返回 nil
+    
+    SQLite 优化配置：
+    - synchronous = 0: 关闭同步写入，提升性能（可能丢失数据）
+    - cache_size = 8000: 设置页缓存大小为 8000 页
+    - page_size = 32768: 设置页大小为 32KB
+    - journal_mode = wal: 使用 WAL 模式，支持并发读写
+    - journal_size_limit = 20GB: WAL 文件大小限制
+]]
 function _M.initDB(self, input_sn)
     local path = log_dir .. '/' .. input_sn .. "/logs.db"
     local db, err = sqlite3.open(path)
@@ -66,29 +117,54 @@ function _M.initDB(self, input_sn)
     return db
 end
 
+--[[
+    获取共享内存队列键名
+    @return string 队列键名
+]]
 function _M.getTotalKey(self)
     return self.total_key
 end
 
+--[[
+    JSON 编码
+    @param msg table 待编码的数据
+    @return string JSON 字符串
+]]
 function _M.to_json(self, msg)
     return json.encode(msg)
 end
 
-function _M.setConfData( self, config, site_config )
+--[[
+    设置配置数据
+    @param config table 全局配置
+    @param site_config table 站点配置
+]]
+function _M.setConfData(self, config, site_config)
     self.config = config
     self.site_config = site_config
 end
 
-function _M.setParams( self, params )
+--[[
+    设置请求参数
+    @param params table 请求参数
+]]
+function _M.setParams(self, params)
     self.params = params
 end
 
+--[[
+    设置输入站点名称并获取合并后的配置
+    将站点配置与全局配置合并，站点配置优先级更高
+    @param input_sn string 站点名称
+    @return table 合并后的配置
+]]
 function _M.setInputSn(self, input_sn)
     local global_config = config["global"]
     if config[input_sn] == nil then
         auto_config = global_config
     else
         auto_config = config[input_sn]
+        -- 合并全局配置到站点配置（站点配置优先）
         for k, v in pairs(global_config) do
             if auto_config[k] == nil then
                 auto_config[k] = v
@@ -98,96 +174,153 @@ function _M.setInputSn(self, input_sn)
     return auto_config
 end
 
+--[[
+    获取当前请求的域名
+    @return string 域名，失败返回 "unknown"
+]]
 function _M.get_domain(self)
     local domain = ngx.req.get_headers()['host']
-     -- domain = ngx.re.gsub(domain, "_", ".")
     if domain == nil then
         domain = "unknown"
     end
     return domain
 end
 
+--[[
+    字符串分割函数
+    @param str string|table 待分割的字符串或已分割的表
+    @param reps string 分隔符
+    @return table 分割后的数组
+    
+    注意：如果输入已经是 table 类型，直接返回原表（用于处理反向代理传递的数据）
+]]
 function _M.split(self, str, reps)
-    local arr = {}
-    -- 修复反向代理代过来的数据
     if "table" == type(str) then
         return str
     end
-    string.gsub(str,'[^'..reps..']+',function(w) table.insert(arr,w) end)
+    local arr = {}
+    local pattern = "[^" .. reps .. "]+"
+    for w in string.gmatch(str, pattern) do
+        arr[#arr + 1] = w
+    end
     return arr
 end
 
+--[[
+    获取数组长度
+    @param arr table 数组
+    @return number 数组长度，空或 nil 返回 0
+]]
 function _M.arrlen(self, arr)
     if not arr then return 0 end
-    local count = 0
-    for _,v in ipairs(arr) do
-        count = count + 1
-    end
-    return count
+    return #arr
 end
 
+--[[
+    验证 IPv4 地址格式
+    @param client_ip string IP 地址
+    @return boolean 是否为有效的 IPv4 地址
+]]
 function _M.is_ipaddr(self, client_ip)
-    local cipn = self:split(client_ip,'.')
-    if self:arrlen(cipn) < 4 then return false end
-    for _,v in ipairs({1,2,3,4})
-    do
-        local ipv = tonumber(cipn[v])
-        if ipv == nil then return false end
-        if ipv > 255 or ipv < 0 then return false end
+    if not client_ip then return false end
+    local parts = self:split(client_ip, '.')
+    if #parts ~= 4 then return false end
+    for i = 1, 4 do
+        local ipv = tonumber(parts[i])
+        if not ipv or ipv < 0 or ipv > 255 then return false end
     end
     return true
 end
 
 
+--[[
+    根据域名/服务器名获取站点名称（带缓存）
+    匹配规则：
+    1. 精确匹配站点名称
+    2. 精确匹配站点域名列表
+    3. 通配符匹配（支持 * 通配符）
+    @param input_sn string 输入的域名或服务器名
+    @return string 匹配到的站点名称，未匹配返回 "unset"
+    
+    缓存策略：匹配结果缓存 24 小时（86400 秒）
+]]
 function _M.get_sn(self, input_sn)
+    -- 优先从缓存获取
     local dst_name = cache:get(input_sn)
     if dst_name then return dst_name end
 
-    -- self:D(json.encode(sites))
-    for _,v in ipairs(sites)
-    do
+    -- 遍历所有站点进行匹配
+    for _, v in ipairs(sites) do
+        -- 精确匹配站点名称
         if input_sn == v["name"] then
             cache:set(input_sn, v['name'], 86400)
             return v["name"]
         end
-        -- self:D("get_sn:"..json.encode(v))
-        for _,dst_domain in ipairs(v['domains'])
-        do
+        
+        -- 遍历站点的域名列表
+        for _, dst_domain in ipairs(v['domains']) do
+            -- 精确匹配域名
             if input_sn == dst_domain then
                 cache:set(input_sn, v['name'], 86400)
                 return v['name']
-            elseif string.find(dst_domain, "*") then
-                local new_domain = string.gsub(dst_domain, '*', '.*')
-                if string.find(input_sn, new_domain) then
-                    dst_domain = v['name']
-                    cache:set(input_sn, dst_domain, 86400)
+            -- 通配符匹配（如 *.example.com）
+            elseif string.find(dst_domain, "*", 1, true) then
+                local pattern = "^" .. string.gsub(dst_domain, "*", ".*") .. "$"
+                if ngx.re.match(input_sn, pattern, "ijo") then
+                    cache:set(input_sn, v['name'], 86400)
+                    return v['name']
                 end
             end
         end
     end
 
+    -- 未匹配到任何站点
     cache:set(input_sn, unset_server_name, 86400)
     return unset_server_name
 end
 
 
+--[[
+    获取存储键（按小时分组）
+    格式：YYYYMMDDHH（如 2026070213）
+    @return string 存储键
+]]
 function _M.get_store_key(self)
     return os.date("%Y%m%d%H", ngx.time())
 end
 
+--[[
+    根据指定时间获取存储键
+    @param htime number 时间戳
+    @return string 存储键
+]]
 function _M.get_store_key_with_time(self, htime)
     return os.date("%Y%m%d%H", htime)
 end
 
+--[[
+    获取响应体大小
+    @return number 响应体字节数
+]]
 function _M.get_length(self)
-    local clen  = ngx.var.body_bytes_sent
+    local clen = ngx.var.body_bytes_sent
     if clen == nil then clen = 0 end
     return tonumber(clen)
 end
 
+--[[
+    获取日志唯一 ID（自动递增）
+    使用共享内存实现跨 Worker 进程的 ID 递增
+    @param input_sn string 站点名称
+    @return number 日志 ID
+    
+    溢出处理：ID 达到 max_log_id 后重置为 1
+]]
 function _M.get_last_id(self, input_sn)
     local last_insert_id_key = input_sn .. "_last_id"
+    -- 原子递增，初始值为 0
     local new_id, err = cache:incr(last_insert_id_key, 1, 0)
+    -- 溢出检查
     if new_id >= max_log_id then
         cache:set(last_insert_id_key, 1)
         new_id = cache:get(last_insert_id_key)
@@ -195,12 +328,18 @@ function _M.get_last_id(self, input_sn)
     return new_id
 end
 
+--[[
+    获取 HTTP 请求原始数据（请求头 + 请求体）
+    仅对非 GET 请求记录请求体
+    @return string JSON 格式的请求数据
+]]
 function _M.get_http_origin(self)
     local data = ""
     local headers = ngx.req.get_headers()
     if not headers then return data end
     
     local req_method = ngx.req.get_method()
+    -- 仅记录非 GET 请求的请求体
     if req_method ~= 'GET' then
         data = ngx.var.request_body
         if not data then
@@ -216,48 +355,101 @@ function _M.get_http_origin(self)
     return json.encode(headers)
 end
 
+--[[
+    定时任务前置准备（初始化统计记录）
+    为当前小时和下一小时预创建统计记录，避免 UPDATE 时记录不存在
+    
+    处理流程：
+    1. 获取锁防止并发执行
+    2. 遍历所有站点
+    3. 为每个站点初始化数据库连接
+    4. 在事务中预创建统计记录（request_stat, client_stat, spider_stat）
+    5. 提交事务并关闭数据库
+    
+    @return boolean 是否成功
+]]
 function _M.cronPre(self)
     self:lock_working('cron_init_stat')
 
+    -- 获取当前小时和下一小时的存储键
     local time_key = self:get_store_key()
-    local time_key_next = self:get_store_key_with_time(ngx.time()+3600)
+    local time_key_next = self:get_store_key_with_time(ngx.time() + 3600)
 
+    -- 需要预创建的统计表
+    local wc_stat = {'request_stat', 'client_stat', 'spider_stat'}
 
-    for site_k, site_v in ipairs(sites) do
+    -- 遍历所有站点
+    for _, site_v in ipairs(sites) do
         local input_sn = site_v["name"]
 
-        local db = self:initDB(input_sn)
-
-        local wc_stat = {
-            'request_stat',
-            'client_stat',
-            'spider_stat'
-        }
-
-        local v1 = true
-        local v2 = true
-        for _,ws_v in pairs(wc_stat) do
-            v1 = self:_update_stat_pre(db, ws_v, time_key)
-            v2 = self:_update_stat_pre(db, ws_v, time_key_next)
+        -- 安全地初始化数据库连接
+        local ok, db = pcall(function() return self:initDB(input_sn) end)
+        if not ok or not db then
+            self:D("cronPre initDB failed for " .. input_sn .. ": " .. tostring(db))
+            self:unlock_working('cron_init_stat')
+            return false
         end
 
-        if db and db:isopen() then
-            db:execute([[COMMIT]])
-            db:close()
+        -- 开启事务
+        db:exec([[BEGIN TRANSACTION]])
+
+        local success = true
+        -- 预创建当前小时和下一小时的统计记录
+        for _, ws_v in ipairs(wc_stat) do
+            if not self:_update_stat_pre(db, ws_v, time_key) then
+                success = false
+                break
+            end
+            if not self:_update_stat_pre(db, ws_v, time_key_next) then
+                success = false
+                break
+            end
         end
 
-        if  not v1 or not v2 then
+        -- 提交或回滚事务
+        if success then
+            pcall(function() db:execute([[COMMIT]]) end)
+        else
+            pcall(function() db:exec([[ROLLBACK]]) end)
+        end
+
+        -- 安全关闭数据库
+        pcall(function() db:close() end)
+
+        if not success then
+            self:unlock_working('cron_init_stat')
             return false
         end
     end
 
     self:unlock_working('cron_init_stat')
-
     return true
 end
 
+--[[
+    定时任务调度器
+    启动一个每 0.5 秒执行一次的定时器，负责：
+    1. 从共享内存队列中读取日志数据
+    2. 将日志写入 SQLite 数据库
+    3. 统计请求、客户端、爬虫数据
+    4. 更新 IP 和 URI 统计
+    5. 清理过期日志
+    
+    执行流程：
+    1. 检查队列是否有数据
+    2. 获取锁防止并发执行
+    3. 初始化所有站点的数据库连接
+    4. 批量处理队列中的日志数据
+    5. 更新统计信息
+    6. 清理过期日志
+    7. 提交事务并关闭连接
+]]
 function _M.cron(self)
 
+    --[[
+        定时任务核心处理函数
+        @param premature boolean 是否为定时器提前触发
+    ]]
     local timer_every_get_data = function (premature)
         
         local llen = ngx.shared.mw_total:llen(total_key)
