@@ -275,6 +275,12 @@ function _M.cron(self)
             return true
         end
 
+        for k, _ in pairs(stmt_caches) do
+            for key, _ in pairs(stmt_caches[k]) do
+                stmt_caches[k][key] = nil
+            end
+        end
+
         local dbs = {}
         local stmts = {}
         local stat_fields = {}
