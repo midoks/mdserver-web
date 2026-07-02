@@ -275,81 +275,100 @@ function _M.cron(self)
             return true
         end
 
-        for k, v in pairs(stmt_caches) do
-            if v then
-                for key, _ in pairs(v) do
-                    v[key] = nil
-                end
-            end
-        end
+        self:lock_working(cron_key)
 
         local dbs = {}
         local stmts = {}
         local stat_fields = {}
         local ip_stats = {}
         local url_stats = {}
+        local rollback_sites = {}
 
         local time_key = self:get_store_key()
 
         for _, site_v in ipairs(sites) do
             local input_sn = site_v["name"]
             if self:is_migrating(input_sn) then
+                self:unlock_working(cron_key)
                 return true
             end
 
             if self:is_working('cron_init_stat') then
+                self:unlock_working(cron_key)
                 return true
             end
 
-            local db = self:initDB(input_sn)
+            local ok, db = pcall(function() return self:initDB(input_sn) end)
+            if not ok or not db then
+                self:D("initDB failed for " .. input_sn .. ": " .. tostring(db))
+                self:unlock_working(cron_key)
+                return true
+            end
 
             stat_fields[input_sn] = {}
 
-            if db then
-                dbs[input_sn] = db
-                self:clean_stats(db, input_sn)
+            dbs[input_sn] = db
+            self:clean_stats(db, input_sn)
 
-                local stmt = db:prepare[[INSERT INTO web_logs(
+            local ok, stmt = pcall(function()
+                return db:prepare[[INSERT INTO web_logs(
                         time, ip, domain, server_name, method, status_code, uri, body_length,
                         referer, user_agent, protocol, request_time, is_spider, request_headers, ip_list, client_port)
                         VALUES(:time, :ip, :domain, :server_name, :method, :status_code, :uri,
                         :body_length, :referer, :user_agent, :protocol, :request_time, :is_spider,
                         :request_headers, :ip_list, :client_port)]]
+            end)
+            
+            if ok and stmt then
                 stmts[input_sn] = stmt
-
                 db:exec([[BEGIN TRANSACTION]])
+            else
+                self:D("prepare statement failed for " .. input_sn .. ": " .. tostring(stmt))
+                if db and db:isopen() then
+                    db:close()
+                end
+                dbs[input_sn] = nil
+                self:unlock_working(cron_key)
+                return true
             end
         end
 
-        self:lock_working(cron_key)
+        local has_error = false
         
         for i = 1, llen do
             local data = ngx.shared.mw_total:lpop(total_key)
             if not data then
-                self:unlock_working(cron_key)
                 break
             end
 
-            local info = json.decode(data)
+            local ok, info = pcall(function() return json.decode(data) end)
+            if not ok then
+                self:D("json decode failed: " .. tostring(info))
+                ngx.shared.mw_total:rpush(total_key, data)
+                has_error = true
+                break
+            end
+
             local input_sn = info['server_name']
             local db = dbs[input_sn]
             if not db then
                 ngx.shared.mw_total:rpush(total_key, data)
-                self:unlock_working(cron_key)
+                has_error = true
                 break
             end
 
             local stmt = stmts[input_sn]
             if not stmt then
                 ngx.shared.mw_total:rpush(total_key, data)
-                self:unlock_working(cron_key)
+                has_error = true
                 break
             end
 
             local insert_ok = self:store_logs_line(db, stmt, input_sn, info)
             if not insert_ok then
                 ngx.shared.mw_total:rpush(total_key, data)
-                self:unlock_working(cron_key)
+                rollback_sites[input_sn] = true
+                has_error = true
                 break
             end
 
@@ -422,54 +441,56 @@ function _M.cron(self)
 
             local stmt = stmts[input_sn]
             if stmt then
-                local res = stmt:finalize()
-                if tostring(res) == "5" then
-                    self:D("Finalize res:" .. tostring(res))
-                end
+                pcall(function() stmt:finalize() end)
             end
 
             local stat_fields_is = stat_fields[input_sn]
             local db = dbs[input_sn]
 
             if db then
-                for sti_k, sti_v in pairs(stat_fields_is) do
-                    local vkk = ""
-                    for sv_k, sv_v in pairs(sti_v) do
-                        vkk = vkk .. sv_k .. "=" .. sv_k .. "+" .. sv_v .. ","
-                    end
-                    if vkk ~= "" then
-                        vkk = string.sub(vkk, 1, string.len(vkk) - 1)
-                        
-                        if sti_k == 'request_stat_fields' then
-                            self:update_stat(db, "request_stat", time_key, vkk)
-                        elseif sti_k == 'client_stat_fields' then
-                            self:update_stat(db, "client_stat", time_key, vkk)
-                        elseif sti_k == 'spider_stat_fields' then
-                            self:update_stat(db, "spider_stat", time_key, vkk)
+                if rollback_sites[input_sn] then
+                    pcall(function() db:exec([[ROLLBACK]]) end)
+                else
+                    for sti_k, sti_v in pairs(stat_fields_is) do
+                        local vkk = ""
+                        for sv_k, sv_v in pairs(sti_v) do
+                            vkk = vkk .. sv_k .. "=" .. sv_k .. "+" .. sv_v .. ","
+                        end
+                        if vkk ~= "" then
+                            vkk = string.sub(vkk, 1, string.len(vkk) - 1)
+                            
+                            if sti_k == 'request_stat_fields' then
+                                self:update_stat(db, "request_stat", time_key, vkk)
+                            elseif sti_k == 'client_stat_fields' then
+                                self:update_stat(db, "client_stat", time_key, vkk)
+                            elseif sti_k == 'spider_stat_fields' then
+                                self:update_stat(db, "spider_stat", time_key, vkk)
+                            end
                         end
                     end
-                end
 
-                local local_ip_stats = ip_stats[input_sn]
-                if local_ip_stats then
-                    for ip_addr, ip_val in pairs(local_ip_stats) do
-                        self:update_statistics_ip(db, ip_addr, ip_val.ip_num, ip_val.body_length)
+                    local local_ip_stats = ip_stats[input_sn]
+                    if local_ip_stats then
+                        for ip_addr, ip_val in pairs(local_ip_stats) do
+                            self:update_statistics_ip(db, ip_addr, ip_val.ip_num, ip_val.body_length)
+                        end
                     end
-                end
 
-                local local_url_stats = url_stats[input_sn]
-                if local_url_stats then
-                    for url_md5, url_val in pairs(local_url_stats) do
-                        self:update_statistics_uri(db, url_val.uri, url_md5, url_val.url_num, url_val.body_length)
+                    local local_url_stats = url_stats[input_sn]
+                    if local_url_stats then
+                        for url_md5, url_val in pairs(local_url_stats) do
+                            self:update_statistics_uri(db, url_val.uri, url_md5, url_val.url_num, url_val.body_length)
+                        end
                     end
-                end
 
-                db:exec(delete_sql)
+                    db:exec(delete_sql)
+
+                    pcall(function() db:execute([[COMMIT]]) end)
+                end
             end
 
             if db and db:isopen() then
-                db:execute([[COMMIT]])
-                db:close()
+                pcall(function() db:close() end)
             end
         end
         
@@ -605,40 +626,17 @@ end
 ---------------------       db start   ---------------------------
 
 
-local stmt_caches = {
-    uri_insert = {},
-    uri_update = {},
-    ip_insert = {},
-    ip_update = {},
-    stat_insert = {},
-    stat_update = {}
-}
-
 function _M.update_statistics_uri(self, db, uri, uri_md5, day_num, body_length)
     local open_statistics_uri = config['global']["statistics_uri"]
     if not open_statistics_uri then return true end
 
-    local insert_stmt = stmt_caches.uri_insert[db]
-    if not insert_stmt then
-        insert_stmt = db:prepare("INSERT INTO uri_stat(uri_md5, uri) SELECT :uri_md5, :uri WHERE NOT EXISTS (SELECT uri_md5 FROM uri_stat WHERE uri_md5 = :uri_md5);")
-        stmt_caches.uri_insert[db] = insert_stmt
-    end
-    
+    local insert_stmt = db:prepare("INSERT INTO uri_stat(uri_md5, uri) SELECT :uri_md5, :uri WHERE NOT EXISTS (SELECT uri_md5 FROM uri_stat WHERE uri_md5 = :uri_md5);")
     insert_stmt:bind_names{uri_md5 = uri_md5, uri = uri}
     insert_stmt:step()
-    insert_stmt:reset()
+    insert_stmt:finalize()
 
-    local update_key = day_column .. "_" .. flow_column
-    local update_stmt = stmt_caches.uri_update[update_key]
-    if not update_stmt then
-        local update_sql = "UPDATE uri_stat SET " .. day_column .. "=" .. day_column .. "+:day_num, " .. flow_column .. "=" .. flow_column .. "+:body_length WHERE uri_md5=:uri_md5;"
-        update_stmt = db:prepare(update_sql)
-        stmt_caches.uri_update[update_key] = update_stmt
-    end
-    
-    update_stmt:bind_names{day_num = day_num, body_length = body_length, uri_md5 = uri_md5}
-    update_stmt:step()
-    update_stmt:reset()
+    local update_sql = "UPDATE uri_stat SET " .. day_column .. "=" .. day_column .. "+" .. day_num .. ", " .. flow_column .. "=" .. flow_column .. "+" .. body_length .. " WHERE uri_md5=\"" .. uri_md5 .. "\";"
+    db:exec(update_sql)
     
     return true
 end
@@ -662,27 +660,13 @@ function _M.update_statistics_ip(self, db, ip, day_num, body_length)
     local open_statistics_ip = config['global']["statistics_ip"]   
     if not open_statistics_ip then return true end
     
-    local insert_stmt = stmt_caches.ip_insert[db]
-    if not insert_stmt then
-        insert_stmt = db:prepare("INSERT INTO ip_stat(ip) SELECT :ip WHERE NOT EXISTS (SELECT ip FROM ip_stat WHERE ip = :ip);")
-        stmt_caches.ip_insert[db] = insert_stmt
-    end
-    
+    local insert_stmt = db:prepare("INSERT INTO ip_stat(ip) SELECT :ip WHERE NOT EXISTS (SELECT ip FROM ip_stat WHERE ip = :ip);")
     insert_stmt:bind_names{ip = ip}
     insert_stmt:step()
-    insert_stmt:reset()
+    insert_stmt:finalize()
 
-    local update_key = day_column .. "_" .. flow_column
-    local update_stmt = stmt_caches.ip_update[update_key]
-    if not update_stmt then
-        local update_sql = "UPDATE ip_stat SET " .. day_column .. "=" .. day_column .. "+:day_num, " .. flow_column .. "=" .. flow_column .. "+:body_length WHERE ip=:ip;"
-        update_stmt = db:prepare(update_sql)
-        stmt_caches.ip_update[update_key] = update_stmt
-    end
-    
-    update_stmt:bind_names{day_num = day_num, body_length = body_length, ip = ip}
-    update_stmt:step()
-    update_stmt:reset()
+    local update_sql = "UPDATE ip_stat SET " .. day_column .. "=" .. day_column .. "+" .. day_num .. ", " .. flow_column .. "=" .. flow_column .. "+" .. body_length .. " WHERE ip=\"" .. ip .. "\";"
+    db:exec(update_sql)
     
     return true
 end
@@ -715,17 +699,10 @@ end
 function _M.update_stat(self, db, stat_table, key, columns)
     if not columns then return end
     
-    local insert_key = stat_table .. "_insert"
-    local insert_stmt = stmt_caches.stat_insert[insert_key]
-    if not insert_stmt then
-        local local_sql = "INSERT INTO " .. stat_table .. "(time) SELECT :time WHERE NOT EXISTS(SELECT time FROM " .. stat_table .. " WHERE time=:time);"
-        insert_stmt = db:prepare(local_sql)
-        stmt_caches.stat_insert[insert_key] = insert_stmt
-    end
-    
+    local insert_stmt = db:prepare("INSERT INTO " .. stat_table .. "(time) SELECT :time WHERE NOT EXISTS(SELECT time FROM " .. stat_table .. " WHERE time=:time);")
     insert_stmt:bind_names{time = key}
     insert_stmt:step()
-    insert_stmt:reset()
+    insert_stmt:finalize()
     
     local update_sql = "UPDATE " .. stat_table .. " SET " .. columns .. " WHERE time=" .. key
     return db:exec(update_sql)
