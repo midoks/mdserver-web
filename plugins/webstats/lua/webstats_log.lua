@@ -1,26 +1,26 @@
---[[
-    webstats_log.lua - WebStats 日志采集模块
-    =========================================
-    
-    本模块在 Nginx 的 log_by_lua_block 阶段执行，负责：
-    - 采集请求日志数据
-    - 过滤不需要统计的请求
-    - 识别爬虫和客户端类型
-    - 计算 PV/UV/IP 等指标
-    - 将日志数据发送到共享内存队列
-    
-    执行时机：每次请求完成后（log_by_lua_block 阶段）
-    
-    主要数据流向：
-    请求完成 -> log_by_lua_block -> 数据采集 -> 过滤处理 -> 爬虫/客户端识别 -> 统计计算 -> 入队
-    
-    依赖模块：
-    - cjson: JSON 编解码
-    - webstats_common: 核心工具模块
-    - webstats_config: 全局配置
-    - webstats_sites: 站点配置
-]]
 log_by_lua_block {
+	--[[
+	    webstats_log.lua - WebStats 日志采集模块
+	    =========================================
+	    
+	    本模块在 Nginx 的 log_by_lua_block 阶段执行，负责：
+	    - 采集请求日志数据
+	    - 过滤不需要统计的请求
+	    - 识别爬虫和客户端类型
+	    - 计算 PV/UV/IP 等指标
+	    - 将日志数据发送到共享内存队列
+	    
+	    执行时机：每次请求完成后（log_by_lua_block 阶段）
+	    
+	    主要数据流向：
+	    请求完成 -> log_by_lua_block -> 数据采集 -> 过滤处理 -> 爬虫/客户端识别 -> 统计计算 -> 入队
+	    
+	    依赖模块：
+	    - cjson: JSON 编解码
+	    - webstats_common: 核心工具模块
+	    - webstats_config: 全局配置
+	    - webstats_sites: 站点配置
+	]]
 
 	-- 添加 Lua 模块搜索路径
 	local cpath = "{$SERVER_APP}/lua/"
