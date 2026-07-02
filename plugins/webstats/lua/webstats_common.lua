@@ -59,6 +59,9 @@ local flow_column = "flow" .. number_day
 -- 日志文件存储目录
 local log_dir = "{$SERVER_APP}/logs"
 
+-- 当前站点的配置（模块级变量，供多个函数共享）
+local auto_config = nil
+
 --[[
     创建模块实例
     @return table 模块实例对象
@@ -160,7 +163,6 @@ end
 ]]
 function _M.setInputSn(self, input_sn)
     local global_config = config["global"]
-    local auto_config
     if config[input_sn] == nil then
         auto_config = global_config
     else
@@ -1237,14 +1239,13 @@ end
 
 function _M.get_client_ip(self)
     local client_ip = "unknown"
-    local cdn = auto_config['cdn']
-    local request_header = ngx.req.get_headers()
-    if cdn == true then
-        for _,v in ipairs(auto_config['cdn_headers']) do
+    if auto_config and auto_config['cdn'] == true then
+        local request_header = ngx.req.get_headers()
+        for _, v in ipairs(auto_config['cdn_headers'] or {}) do
             if request_header[v] ~= nil and request_header[v] ~= "" then
                 local ip_list = request_header[v]
-                client_ip = self:split(ip_list,',')[1]
-                break;
+                client_ip = self:split(ip_list, ',')[1]
+                break
             end
         end
     end
