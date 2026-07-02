@@ -160,6 +160,7 @@ end
 ]]
 function _M.setInputSn(self, input_sn)
     local global_config = config["global"]
+    local auto_config
     if config[input_sn] == nil then
         auto_config = global_config
     else

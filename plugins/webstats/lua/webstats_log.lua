@@ -55,9 +55,35 @@ log_by_lua_block {
 	local request_header = ngx.req.get_headers()
 	local method = ngx.req.get_method()
 
+	-- 共享内存字典实例（必须在使用前定义）
+	local cache = ngx.shared.mw_total
+	-- 日志队列键名
+	local total_key = "log_kv_total"
+
+	--[[
+	    状态码过滤表
+	    需要记录详细信息的状态码（4xx 和 5xx 错误）
+	]]
+	local status_codes_to_log = {
+	["400"] = true, ["401"] = true, ["402"] = true, ["403"] = true, ["404"] = true,
+	["405"] = true, ["406"] = true, ["407"] = true, ["408"] = true, ["409"] = true,
+	["410"] = true, ["411"] = true, ["412"] = true, ["413"] = true, ["414"] = true,
+	["415"] = true, ["416"] = true, ["417"] = true, ["418"] = true, ["421"] = true,
+	["422"] = true, ["423"] = true, ["424"] = true, ["425"] = true, ["426"] = true,
+	["449"] = true, ["451"] = true, ["499"] = true, ["500"] = true, ["501"] = true,
+	["502"] = true, ["503"] = true, ["504"] = true, ["505"] = true, ["506"] = true,
+	["507"] = true, ["509"] = true, ["510"] = true
+	}
+
+	--[[
+	    HTTP 方法过滤表
+	    需要统计的 HTTP 方法
+	]]
+	local http_methods = {["get"] = true, ["post"] = true, ["put"] = true, ["patch"] = true, ["delete"] = true}
+
 	--[[
     排除函数模块
-    =============
+    ============
     
     以下函数用于判断请求是否应该被排除（不统计），包括：
     - IP 排除：全局和站点级别的排除 IP
@@ -214,17 +240,6 @@ log_by_lua_block {
 	["502"] = true, ["503"] = true, ["504"] = true, ["505"] = true, ["506"] = true,
 	["507"] = true, ["509"] = true, ["510"] = true
 	}
-
-	--[[
-	    HTTP 方法过滤表
-	    需要统计的 HTTP 方法
-	]]
-	local http_methods = {["get"] = true, ["post"] = true, ["put"] = true, ["patch"] = true, ["delete"] = true}
-
-	-- 共享内存字典实例
-	local cache = ngx.shared.mw_total
-	-- 日志队列键名
-	local total_key = "log_kv_total"
 
 	--[[
 	    日志采集函数
