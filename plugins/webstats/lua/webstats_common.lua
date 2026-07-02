@@ -323,7 +323,7 @@ function _M.cron(self)
                 stmts[input_sn] = stmt
                 db:exec([[BEGIN TRANSACTION]])
             else
-                self:D("prepare statement failed for " .. input_sn .. ": " .. tostring(stmt))
+                -- self:D("prepare statement failed for " .. input_sn .. ": " .. tostring(stmt))
                 if db and db:isopen() then
                     db:close()
                 end
