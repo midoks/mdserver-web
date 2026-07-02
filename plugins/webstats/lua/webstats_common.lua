@@ -275,9 +275,11 @@ function _M.cron(self)
             return true
         end
 
-        for k, _ in pairs(stmt_caches) do
-            for key, _ in pairs(stmt_caches[k]) do
-                stmt_caches[k][key] = nil
+        for k, v in pairs(stmt_caches) do
+            if v then
+                for key, _ in pairs(v) do
+                    v[key] = nil
+                end
             end
         end
 
