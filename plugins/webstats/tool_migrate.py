@@ -5,6 +5,7 @@ import io
 import os
 import time
 import json
+import fcntl
 
 web_dir = os.getcwd() + "/web"
 if os.path.exists(web_dir):
@@ -44,7 +45,6 @@ def getGlobalConf():
 
 
 def pSqliteDb(dbname='web_logs', site_name='unset', fn="logs"):
-
     db_dir = getServerDir() + '/logs/' + site_name
     if not os.path.exists(db_dir):
         mw.execShell('mkdir -p ' + db_dir)
@@ -67,143 +67,196 @@ def pSqliteDb(dbname='web_logs', site_name='unset', fn="logs"):
 
     conn.autoTextFactory()
 
-    # conn.text_factory = lambda x: str(x, encoding="utf-8", errors='ignore')
-    # conn.text_factory = lambda x: unicode(x, "utf-8", "ignore")
     return conn
 
 
 def migrateSiteHotLogs(site_name, query_date):
-    print(site_name, query_date)
+    start_time = time.time()
+    print(f"[{site_name}] 开始迁移日志...")
 
     migrating_flag = getServerDir() + "/logs/%s/migrating" % site_name
     hot_db = getServerDir() + "/logs/%s/logs.db" % site_name
     hot_db_tmp = getServerDir() + "/logs/%s/logs_tmp.db" % site_name
     history_logs_db = getServerDir() + "/logs/%s/history_logs.db" % site_name
-    # 1. copy to tmp file
+
+    if not os.path.exists(hot_db):
+        print(f"[{site_name}] 热日志数据库不存在，跳过")
+        return mw.returnMsg(True, f"{site_name} logs not exist, skip")
+
+    # 检查是否正在迁移
+    if os.path.exists(migrating_flag):
+        print(f"[{site_name}] 正在迁移中，跳过")
+        return mw.returnMsg(True, f"{site_name} is migrating, skip")
+
+    # 1. 备份到临时文件（使用文件直接拷贝）
     try:
         import shutil
-        print("coping {} to {} ...".format(hot_db, hot_db_tmp))
+        print(f"[{site_name}] 备份 {hot_db} -> {hot_db_tmp} ...")
         mw.writeFile(migrating_flag, "yes")
-        time.sleep(3)
+        time.sleep(0.5)
         shutil.copy(hot_db, hot_db_tmp)
         if not os.path.exists(hot_db_tmp):
-            return mw.returnMsg(False, "migrating fail, copy tmp file!")
-    except:
-        return mw.returnMsg(False, "{} migrating fail.".format(site_name))
-    finally:
+            return mw.returnMsg(False, f"{site_name} migrating fail, copy tmp file!")
+    except Exception as e:
         if os.path.exists(migrating_flag):
             os.remove(migrating_flag)
+        return mw.returnMsg(False, f"{site_name} migrating fail: {e}")
 
-     # 2. 从临时备份中迁移热日志数据到历史日志
-    print("begin tmp to hot log data ...")
+    # 2. 从临时备份中迁移热日志数据到历史日志（批量插入）
     try:
-        print("history file: {}".format(history_logs_db))
         logs_conn = pSqliteDb('web_log', site_name, 'logs_tmp')
         history_logs_conn = pSqliteDb('web_log', site_name, 'history_logs')
 
         hot_db_columns = logs_conn.originExecute(
             "PRAGMA table_info([web_logs])")
-        _columns = ",".join([c[1] for c in hot_db_columns if c[1] != "id"])
-        query_start = 0
+        _columns = [c[1] for c in hot_db_columns if c[1] != "id"]
+        columns_str = ",".join(_columns)
+        placeholders = ",".join(["?"] * len(_columns))
+
         todayTime = time.strftime('%Y-%m-%d 00:00:00', time.localtime())
         todayUt = int(time.mktime(time.strptime(
             todayTime, "%Y-%m-%d %H:%M:%S")))
 
-        logs_sql = "select {} from web_logs where time<{}".format(
-            _columns, todayUt)
+        logs_sql = f"select {columns_str} from web_logs where time<{todayUt}"
         selector = logs_conn.originExecute(logs_sql)
-        log = selector.fetchone()
-        while log:
-            params = ""
-            for field in log:
-                if params:
-                    params += ","
-                if field is None:
-                    field = "\'\'"
-                elif type(field) == str:
-                    field = "\'" + field.replace("\'", "\"") + "\'"
-                params += str(field)
-            insert_sql = "insert into web_logs(" + \
-                _columns + ") values(" + params + ")"
-            history_logs_conn.execute(insert_sql)
-            log = selector.fetchone()
 
-        print("sorting historical data, this action takes a long time...")
-        history_logs_conn.execute("VACUUM;")
+        # 批量插入配置
+        batch_size = 10000
+        batch_count = 0
+        total_count = 0
+        insert_sql = f"insert into web_logs({columns_str}) values({placeholders})"
 
+        while True:
+            logs = selector.fetchmany(batch_size)
+            if not logs:
+                break
+
+            batch_count += 1
+            total_count += len(logs)
+            # 使用原生 executemany 批量插入
+            history_logs_conn.executemany(insert_sql, logs)
+            history_logs_conn.commit()
+
+            if batch_count % 10 == 0:
+                elapsed = time.time() - start_time
+                print(f"[{site_name}] 已迁移 {total_count} 条记录, 耗时 {elapsed:.2f}s")
+
+        print(f"[{site_name}] 共迁移 {total_count} 条记录")
+
+        # 清理历史数据
         gcfg = getGlobalConf()
         save_day = gcfg['global']["save_day"]
-        print("delete historical data {} days ago...".format(save_day))
+        print(f"[{site_name}] 删除 {save_day} 天前的历史数据...")
+
         time_now = time.localtime()
         save_timestamp = time.mktime((time_now.tm_year, time_now.tm_mon, time_now.tm_mday - save_day, 0, 0, 0, 0, 0, 0))
-        delete_sql = "delete from web_logs where time <= {}".format(
-            save_timestamp)
-        print('delete history_logs')
-        print(delete_sql)
+        delete_sql = f"delete from web_logs where time <= {save_timestamp}"
         history_logs_conn.execute(delete_sql)
         history_logs_conn.commit()
 
-        # 3. delete merged data and clean up statistics
-        print("delete merged thermal data...")
+        history_logs_conn.execute("VACUUM;")
+        history_logs_conn.commit()
+
+    except Exception as e:
+        if site_name:
+            print(f"[{site_name}] logs to history error: {e}")
+        else:
+            print(f"logs to history error: {e}")
+        return mw.returnMsg(False, f"{site_name} logs migrate error: {e}")
+
+    # 3. 删除已迁移的数据并清理统计（批量删除）
+    try:
+        if os.path.exists(migrating_flag):
+            os.remove(migrating_flag)
+
         mw.writeFile(migrating_flag, "yes")
 
         hot_db_conn = pSqliteDb('web_logs', site_name)
-        del_hot_log = "delete from web_logs where time<{}".format(todayUt)
-        print(del_hot_log)
-        r = hot_db_conn.execute(del_hot_log)
-        print("delete:", r)
-        print("deleting statistics over 180 days...")
+
+        # 分批删除热日志
+        del_hot_log = f"delete from web_logs where time<{todayUt}"
+        print(f"[{site_name}] 删除已迁移的热日志...")
+        hot_db_conn.execute(del_hot_log)
+
+        # 删除过期统计数据
+        print(f"[{site_name}] 删除180天前的统计数据...")
         save_time_key = time.strftime(
             '%Y%m%d00', time.localtime(time.time() - 180 * 86400))
 
-        del_request_stat_sql = "delete from request_stat where time<={}".format(
-            save_time_key)
+        del_request_stat_sql = f"delete from request_stat where time<={save_time_key}"
         hot_db_conn.execute(del_request_stat_sql)
+        hot_db_conn.execute(f"delete from spider_stat where time<={save_time_key}")
+        hot_db_conn.execute(f"delete from client_stat where time<={save_time_key}")
+        hot_db_conn.execute(f"delete from referer_stat where time<={save_time_key}")
 
-        hot_db_conn.execute(
-            "delete from spider_stat where time<={}".format(save_time_key))
-        hot_db_conn.execute(
-            "delete from client_stat where time<={}".format(save_time_key))
-        hot_db_conn.execute(
-            "delete from referer_stat where time<={}".format(save_time_key))
         hot_db_conn.commit()
-        print("clean up the hot database...")
+        print(f"[{site_name}] 压缩热数据库...")
         hot_db_conn.execute("VACUUM;")
         hot_db_conn.commit()
 
+    except Exception as e:
+        print(f"[{site_name}] delete hot logs error: {e}")
+    finally:
         if os.path.exists(migrating_flag):
             os.remove(migrating_flag)
-    except Exception as e:
-        if site_name:
-            print("{} logs to history error:{}".format(site_name, e))
-        else:
-            print("logs to history error:{}".format(e))
-    finally:
         if os.path.exists(hot_db_tmp):
             os.remove(hot_db_tmp)
 
-    print("{} logs migrate ok.".format(site_name))
+    elapsed = time.time() - start_time
+    print(f"[{site_name}] 日志迁移完成，耗时 {elapsed:.2f}s")
 
     if not mw.isAppleSystem():
         mw.execShell("chown -R www:www " + getServerDir())
 
-    mw.opWeb('restart')
-    return mw.returnMsg(True, "{} logs migrate ok".format(site_name))
+    return mw.returnMsg(True, f"{site_name} logs migrate ok")
 
 
 def migrateHotLogs(query_date="today"):
-    print("begin migrate hot logs")
-    sites = mw.M('sites').field('name').order("add_time").select()
-    
-    unset_site = {"name": "unset"}
-    sites.append(unset_site)
+    # 使用文件锁防止并发迁移
+    lock_file = getServerDir() + "/logs/migrate_hot_logs.lock"
+    lock_fd = None
 
-    # migrateSiteHotLogs('t1.cn', query_date)
+    try:
+        lock_fd = open(lock_file, 'w')
+        fcntl.flock(lock_fd.fileno(), fcntl.LOCK_EX | fcntl.LOCK_NB)
 
-    for site_info in sites:
-        # print(site_info['name'])
-        site_name = site_info["name"]
-        migrate_res = migrateSiteHotLogs(site_name, query_date)
-        if not migrate_res["status"]:
-            print(migrate_res["msg"])
-    print("end migrate hot logs")
+        print("开始迁移热日志...")
+        sites = mw.M('sites').field('name').order("add_time").select()
+
+        unset_site = {"name": "unset"}
+        sites.append(unset_site)
+
+        total_sites = len(sites)
+        success_count = 0
+        fail_count = 0
+
+        for i, site_info in enumerate(sites):
+            site_name = site_info["name"]
+            print(f"\n[{i+1}/{total_sites}] 处理站点: {site_name}")
+            migrate_res = migrateSiteHotLogs(site_name, query_date)
+            if migrate_res["status"]:
+                success_count += 1
+            else:
+                fail_count += 1
+                print(f"[{site_name}] 迁移失败: {migrate_res['msg']}")
+
+        print(f"\n迁移完成! 成功: {success_count}, 失败: {fail_count}")
+
+        mw.opWeb('restart')
+        return mw.returnMsg(True, f"logs migrate ok, success: {success_count}, fail: {fail_count}")
+
+    except BlockingIOError:
+        print("正在迁移中，跳过")
+        return mw.returnMsg(True, "正在迁移中，跳过")
+    except Exception as e:
+        print(f"migrateHotLogs error: {e}")
+        return mw.returnMsg(False, f"migrateHotLogs error: {e}")
+    finally:
+        if lock_fd:
+            try:
+                fcntl.flock(lock_fd.fileno(), fcntl.LOCK_UN)
+                lock_fd.close()
+                if os.path.exists(lock_file):
+                    os.remove(lock_file)
+            except:
+                pass

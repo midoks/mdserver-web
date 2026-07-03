@@ -201,6 +201,10 @@ def getCommonFile():
     }
     return data
 
+def getSysTTL():
+    f = "/proc/sys/net/ipv4/ip_default_ttl"
+    return readFile(f).strip()
+
 def checkCert(certPath='ssl/certificate.pem'):
     # 验证证书
     openssl = '/usr/bin/openssl'

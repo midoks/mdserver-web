@@ -335,9 +335,13 @@ class Sql():
         except Exception as ex:
             return "error: " + str(ex)
 
-    def commit(self):
+    def executemany(self, sql, args):
+        self.__DB_CONN.executemany(sql, args)
         self.__close()
+
+    def commit(self):
         self.__DB_CONN.commit()
+        self.__close()
 
     def save(self, keys, param):
         # 更新数据
