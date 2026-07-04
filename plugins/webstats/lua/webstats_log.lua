@@ -233,8 +233,8 @@ local function run_app()
                 request_stat_fields["status_" .. status_code] = 1
             end
 
-            local lower_method = string.lower(method)
-            if http_methods[lower_method] then
+            local lower_method = method and string.lower(method) or ""
+            if lower_method ~= "" and http_methods[lower_method] then
                 request_stat_fields["http_" .. lower_method] = 1
             end
 
