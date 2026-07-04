@@ -283,7 +283,6 @@ def initDreplace():
 
 def luaRestart():
     mw.opWeb("stop")
-    makeOpDstRunLua()
     mw.opWeb("start")
 
 
@@ -293,6 +292,7 @@ def start():
     import tool_task
     tool_task.createBgTask()
 
+    makeOpDstRunLua()
     # issues:326
     luaRestart()
     return 'ok'
