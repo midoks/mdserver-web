@@ -92,6 +92,9 @@ function _M.getInstance(self)
 end
 
 function _M.start_cron(self)
+    if ngx.worker.id() ~= 0 then
+        return
+    end
     self:cron()
 end
 
@@ -468,10 +471,6 @@ end
     7. 提交事务并关闭连接
 ]]
 function _M.cron(self)
-    if ngx.worker.id() ~= 0 then
-        return
-    end
-
     --[[
         定时任务核心处理函数
         @param premature boolean 是否为定时器提前触发
