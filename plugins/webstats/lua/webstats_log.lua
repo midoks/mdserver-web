@@ -15,13 +15,13 @@
 ]]
 
 -- -- 添加 Lua 模块搜索路径
--- local cpath = "{$SERVER_APP}/lua/"
--- if not package.cpath:find(cpath) then
---     package.cpath = cpath .. "?.so;" .. package.cpath
--- end
--- if not package.path:find(cpath) then
---     package.path = cpath .. "?.lua;" .. package.path
--- end
+local cpath = "{$SERVER_APP}/lua/"
+if not package.cpath:find(cpath) then
+    package.cpath = cpath .. "?.so;" .. package.cpath
+end
+if not package.path:find(cpath) then
+    package.path = cpath .. "?.lua;" .. package.path
+end
 
 -- 调试模式开关
 local debug_mode = true
