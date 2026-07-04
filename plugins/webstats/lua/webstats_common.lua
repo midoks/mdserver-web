@@ -717,10 +717,32 @@ function _M.cron(self)
 
     
     function timer_every_get_data_try()
-       local presult, err = pcall( function() timer_every_get_data() end)
+        local presult, err = pcall(function() timer_every_get_data() end)
         if not presult then
-            self:D("debug cron error on :"..tostring(err))
+            self:D("debug cron error on :" .. tostring(err))
             return true
+        end
+        
+    end
+
+    function timer_every_get_data_try_debug()
+        local start_time = ngx.now()
+        local start_llen = ngx.shared.mw_total:llen(total_key)
+        
+        local presult, err = pcall(function() timer_every_get_data() end)
+        
+        local end_time = ngx.now()
+        local end_llen = ngx.shared.mw_total:llen(total_key)
+        local duration = (end_time - start_time) * 1000
+        
+        if not presult then
+            self:D("debug cron error on :" .. tostring(err))
+            return true
+        end
+        
+        if start_llen > 0 then
+            self:D(string.format("cron process: took %.2fms, processed %d records, remaining %d records", 
+                duration, start_llen - end_llen, end_llen))
         end
     end
 
