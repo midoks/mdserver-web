@@ -14,7 +14,7 @@
     1. 单例模式：通过 getInstance() 获取全局唯一实例
     2. 共享内存：使用 ngx.shared.mw_total 作为日志缓存队列
     3. SQLite 数据库：每个站点独立一个数据库文件
-    4. 定时任务：每 0.5 秒执行一次日志持久化
+    4. 定时任务：每 0.1 秒执行一次日志持久化
     
     主要数据流向：
     webstats_log.lua (日志采集) -> ngx.shared.mw_total (缓存队列) -> cron() (定时处理) -> SQLite (持久化)
