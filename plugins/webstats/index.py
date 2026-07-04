@@ -307,6 +307,7 @@ def stop():
     tool_task.removeBgTask()
 
     luaRestart()
+    makeOpDstStopLua()
     return 'ok'
 
 
@@ -345,6 +346,19 @@ def makeOpDstRunLua(conf_reload=False):
         content = mw.readFile(worker_dst_tpl)
         content = contentReplace(content)
         mw.writeFile(worker_dst, content)
+
+    mw.opLuaMakeAll()
+    return True
+
+
+def makeOpDstStopLua():
+    root_worker_dir = mw.getServerDir() + '/web_conf/nginx/lua/init_worker_by_lua_file'
+    path = getServerDir()
+    path_tpl = getPluginDir()
+
+    worker_dst = root_worker_dir + "/webstats_init_worker.lua"
+    if os.path.exists(worker_dst):
+        os.remove(worker_dst)
 
     mw.opLuaMakeAll()
     return True
