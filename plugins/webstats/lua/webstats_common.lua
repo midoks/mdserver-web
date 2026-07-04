@@ -131,6 +131,7 @@ function _M.initDB(self, input_sn)
     db:exec([[PRAGMA page_size = 32768]])
     db:exec([[PRAGMA journal_mode = wal]])
     db:exec([[PRAGMA journal_size_limit = 21474836480]])
+    db:exec([[PRAGMA busy_timeout = 5000]])
     return db
 end
 
@@ -467,6 +468,9 @@ end
     7. 提交事务并关闭连接
 ]]
 function _M.cron(self)
+    if ngx.worker.id() ~= 0 then
+        return
+    end
 
     --[[
         定时任务核心处理函数
