@@ -704,7 +704,7 @@ function _M.cron(self)
         end
     end
 
-    ngx.timer.every(0.5, timer_every_get_data_try)
+    ngx.timer.every(0.2, timer_every_get_data_try)
 end
 
 
