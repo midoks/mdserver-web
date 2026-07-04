@@ -27,7 +27,7 @@
 ]]
 
 local setmetatable = setmetatable
-local _M = { _VERSION = '1.0' }
+local _M = { _VERSION = '0.2.5' }
 local mt = { __index = _M }
 
 -- 依赖模块
@@ -56,9 +56,6 @@ local day_column = "day" .. number_day
 -- 数据库列名：flow + 日期（如 flow01）
 local flow_column = "flow" .. number_day
 
--- 日志文件存储目录
-local log_dir = "{$SERVER_APP}/logs"
-
 -- 当前站点的配置（模块级变量，供多个函数共享）
 local auto_config = nil
 
@@ -71,6 +68,7 @@ local today = ngx.re.gsub(ngx.today(), '-', '')
 ]]
 function _M.new(self)
     local self = {
+        app_dir = "", ---
         total_key = total_key,  -- 共享内存队列键名
         params = nil,           -- 请求参数
         site_config = nil,      -- 站点配置
@@ -88,10 +86,18 @@ end
 function _M.getInstance(self)
     if self.instance == nil then
         self.instance = self:new()
-        self:cron()  -- 启动定时任务
     end
     assert(self.instance ~= nil)
     return self.instance
+end
+
+function _M.start_cron(self)
+    self:cron()
+end
+
+
+function _M.setAppDir(self, dir)
+    self.app_dir = dir
 end
 
 
@@ -108,6 +114,11 @@ end
     - journal_size_limit = 20GB: WAL 文件大小限制
 ]]
 function _M.initDB(self, input_sn)
+    log_dir = self.app_dir .. "/logs"
+    if log_dir == "" then
+        return nil
+    end
+
     local path = log_dir .. '/' .. input_sn .. "/logs.db"
     local db, err = sqlite3.open(path)
 
@@ -185,7 +196,7 @@ end
     @return string 域名，失败返回 "unknown"
 ]]
 function _M.get_domain(self)
-    local domain = ngx.req.get_headers()['host']
+    local domain = ngx.var.host
     if domain == nil then
         domain = "unknown"
     end
@@ -341,21 +352,18 @@ end
 ]]
 function _M.get_http_origin(self)
     local data = ""
-    local headers = ngx.req.get_headers()
-    if not headers then return data end
+    local headers = {
+        user_agent = ngx.var.http_user_agent,
+        referer = ngx.var.http_referer,
+        host = ngx.var.host,
+        x_forwarded_for = ngx.var.http_x_forwarded_for
+    }
     
-    local req_method = ngx.req.get_method()
-    -- 仅记录非 GET 请求的请求体
+    local req_method = ngx.var.request_method
     if req_method ~= 'GET' then
         data = ngx.var.request_body
-        if not data then
-            data = ngx.req.get_body_data()
-        end
-
-        if "string" == type(data) then
+        if data and "string" == type(data) then
             headers["payload"] = data
-        elseif "table" == type(data) then
-            headers["payload"] = table.concat(data, "&")
         end
     end
     return json.encode(headers)
@@ -805,23 +813,14 @@ function _M.statistics_ipc(self, input_sn, ip)
 end
 
 function _M.statistics_request(self, ip, is_spider, body_length)
-    -- 计算pv uv
     local pvc = 0
     local uvc = 0
-    local request_header = ngx.req.get_headers()
     if not is_spider and ngx.status == 200 and body_length > 0 then
-        local ua = ''
-        if request_header['user-agent'] then
-            if "table" == type(request_header['user-agent']) then
-                ua = self:to_json(request_header['user-agent'])
-            else
-                ua = request_header['user-agent']
-            end
-            ua = string.lower(ua)
-        end
+        local ua = ngx.var.http_user_agent or ''
+        ua = string.lower(ua)
 
         pvc = 1
-        if ua then
+        if ua and ua ~= '' then
             local today = ngx.today()
             local uv_token = ngx.md5(ip .. ua .. today)
             if not cache:get(uv_token) then
@@ -833,31 +832,23 @@ function _M.statistics_request(self, ip, is_spider, body_length)
     return pvc, uvc
 end
 
--- 仅计算GET/HTML
 function _M.statistics_request_old(self, ip, is_spider, body_length)
-    -- 计算pv uv
     local pvc = 0
     local uvc = 0
-    local method = ngx.req.get_method()
+    local method = ngx.var.request_method
     if not is_spider and method == 'GET' and ngx.status == 200 and body_length > 512 then
-        local ua = ''
-        if request_header['user-agent'] then
-            ua = string.lower(request_header['user-agent'])
-        end
+        local ua = ngx.var.http_user_agent or ''
+        ua = string.lower(ua)
 
-        out_header = ngx.resp.get_headers()
-        if out_header['content-type'] then
-            if string.find(out_header['content-type'], 'text/html', 1, true) then
-                pvc = 1
-                if request_header['user-agent'] then
-                    if string.find(ua,'mozilla') then
-                        local today = ngx.today()
-                        local uv_token = ngx.md5(ip .. request_header['user-agent'] .. today)
-                        if not cache:get(uv_token) then
-                            uvc = 1
-                            cache:set(uv_token,1, self:get_end_time())
-                        end
-                    end
+        local content_type = ngx.var.content_type
+        if content_type and string.find(content_type, 'text/html', 1, true) then
+            pvc = 1
+            if ua and string.find(ua,'mozilla') then
+                local today = ngx.today()
+                local uv_token = ngx.md5(ip .. ua .. today)
+                if not cache:get(uv_token) then
+                    uvc = 1
+                    cache:set(uv_token,1, self:get_end_time())
                 end
             end
         end
@@ -951,28 +942,23 @@ function _M.update_stat(self, db, stat_table, key, columns)
 end
 ---------------------       db end   ---------------------------
 
--- debug func
 function _M.D(self,msg)
     if not debug_mode then return true end
-    local fp = io.open('{$SERVER_APP}/debug.log', 'ab')
+    local fp = io.open(self.app_dir..'/debug.log', 'ab')
     if fp == nil then
         return nil
     end
     local localtime = os.date("%Y-%m-%d %H:%M:%S")
-    if server_name then
-        fp:write(tostring(msg) .. "\n")
-    else
-        fp:write(localtime..":"..tostring(msg) .. "\n")
-    end
+    fp:write(localtime..":"..tostring(msg) .. "\n")
     fp:flush()
     fp:close()
     return true
 end
 
 function _M.is_migrating(self, input_sn)
-    local file = io.open("{$SERVER_APP}/migrating", "rb")
+    local file = io.open(self.app_dir.."/migrating", "rb")
     if file then return true end
-    local file = io.open("{$SERVER_APP}/logs/"..input_sn.."/migrating", "rb")
+    local file = io.open(self.app_dir.."/logs/"..input_sn.."/migrating", "rb")
     if file then return true end
     return false
 end
@@ -1020,12 +1006,12 @@ function _M.read_file_body(self, filename)
 end
 
 function _M.load_update_day(self, input_sn)
-    local _file = "{$SERVER_APP}/logs/"..input_sn.."/update_day.log"
+    local _file = self.app_dir.."/logs/"..input_sn.."/update_day.log"
     return self:read_file_body(_file)
 end
 
 function _M.write_update_day(self, input_sn)
-    local _file = "{$SERVER_APP}/logs/"..input_sn.."/update_day.log"
+    local _file = self.app_dir.."/logs/"..input_sn.."/update_day.log"
     return self:write_file(_file, today, "w")
 end
 
@@ -1059,7 +1045,7 @@ function _M.get_update_field(self, field, value)
 end
 
 function _M.get_request_time(self)
-    local request_time = math.floor((ngx.now() - ngx.req.start_time()) * 1000)
+    local request_time = math.floor(tonumber(ngx.var.request_time or 0) * 1000)
     if request_time == 0 then  request_time = 1 end
     return request_time
 end
@@ -1287,23 +1273,21 @@ end
 function _M.get_client_ip(self)
     local client_ip = "unknown"
     if auto_config and auto_config['cdn'] == true then
-        local request_header = ngx.req.get_headers()
         for _, v in ipairs(auto_config['cdn_headers'] or {}) do
-            if request_header[v] ~= nil and request_header[v] ~= "" then
-                local ip_list = request_header[v]
+            local header_var = "http_" .. string.gsub(string.lower(v), "-", "_")
+            local ip_list = ngx.var[header_var]
+            if ip_list ~= nil and ip_list ~= "" then
                 client_ip = self:split(ip_list, ',')[1]
                 break
             end
         end
     end
 
-    -- ipv6
     if type(client_ip) == 'table' then client_ip = "" end
     if client_ip ~= "unknown" and ngx.re.match(client_ip,"^([a-fA-F0-9]*):") then
         return client_ip
     end
 
-    -- ipv4
     if  not ngx.re.match(client_ip,"\\d+\\.\\d+\\.\\d+\\.\\d+") == nil or not self:is_ipaddr(client_ip) then
         client_ip = ngx.var.remote_addr
         if client_ip == nil then
