@@ -391,7 +391,7 @@ function _M.cronPre(self)
         -- 安全地初始化数据库连接
         local ok, db = pcall(function() return self:initDB(input_sn) end)
         if not ok or not db then
-            self:D("cronPre initDB failed for " .. input_sn .. ": " .. tostring(db))
+            self:D("cronPre initDB failed for " .. tostring(input_sn) .. ": " .. tostring(db))
             self:unlock_working('cron_init_stat')
             return false
         end
