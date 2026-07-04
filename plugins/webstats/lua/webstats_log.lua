@@ -268,6 +268,7 @@ local function run_app()
     end
 
     -- C:D("webstats_log run_app start, server_name=" .. tostring(server_name))
+    -- C:D(tostring(total_key) ..":" .. tostring(ngx.shared.mw_total:llen(total_key)))
     load_global_exclude_ip()
     load_exclude_ip(server_name)
     cache_logs(server_name)
