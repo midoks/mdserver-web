@@ -227,9 +227,10 @@ def makeSiteConfig():
 
 
 def contentReplace(content):
-    service_path = mw.getServerDir()
+    root_dir = mw.getServerDir()
+    service_path = root_dir + "/webstats"
     content = content.replace('{$SERVER_APP}', service_path)
-    content = content.replace('{$ROOT_PATH}', mw.getServerDir())
+    content = content.replace('{$ROOT_PATH}', root_dir)
     return content
 
 
