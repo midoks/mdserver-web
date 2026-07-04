@@ -49,10 +49,12 @@ case "$1" in
 			mPID=`cat $PIDFILE`
 			isStart=`ps ax | awk '{ print $1 }' | grep -e "^${mPID}$"`
 			if [ "$isStart" = '' ];then
+				ps -ef|grep nginx|grep -v grep |awk '{print $2}'| xargs kill
 				echo "$NAME is not running."
 				exit 1
 			fi
 		else
+			ps -ef|grep nginx|grep -v grep |awk '{print $2}'| xargs kill
 			echo "$NAME is not running."
 			exit 1
         fi
