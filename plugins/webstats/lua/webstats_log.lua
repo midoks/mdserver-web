@@ -276,13 +276,9 @@ local function run_app()
 end
 
 local function run_app_ok()
-    if not debug_mode then return run_app() end
-
+    -- if not debug_mode then return run_app() end
     local presult, err = pcall(function() run_app() end)
     if not presult then
-        local __C = require "webstats_common"
-        local C = __C:getInstance()
-        C:setAppDir(app_dir)
         C:D("debug error on :" .. tostring(err))
         return true
     end
