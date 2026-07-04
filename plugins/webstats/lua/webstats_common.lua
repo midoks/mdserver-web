@@ -434,7 +434,7 @@ end
 
 --[[
     定时任务调度器
-    启动一个每 0.2 秒执行一次的定时器，负责：
+    启动一个每 0.1 秒执行一次的定时器，负责：
     1. 从共享内存队列中读取日志数据
     2. 将日志写入 SQLite 数据库
     3. 统计请求、客户端、爬虫数据
@@ -704,7 +704,7 @@ function _M.cron(self)
         end
     end
 
-    ngx.timer.every(0.2, timer_every_get_data_try)
+    ngx.timer.every(0.1, timer_every_get_data_try)
 end
 
 
