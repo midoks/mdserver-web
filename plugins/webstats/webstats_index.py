@@ -711,7 +711,7 @@ def get_logs_list(args):
     start_time = time.time()
 
     check = checkArgs(args, ['page', 'page_size','site', 'method', 
-            'status_code', 'spider_type', 'request_time', "scheme",'request_size', 'query_date', 'search_uri'])
+            'status_code', 'spider_type', 'request_time','request_size', 'query_date', 'search_uri'])
     if not check[0]:
         return check[1]
 
@@ -729,7 +729,7 @@ def get_logs_list(args):
     referer = args['referer']
     referer_url = args['referer_url']
     ip = args['ip']
-    scheme = args['scheme']
+    # scheme = args['scheme']
     setDefaultSite(domain)
 
     limit = str(page_size) + ' offset ' + str(page_size * (page - 1))
