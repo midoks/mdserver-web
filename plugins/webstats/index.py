@@ -226,6 +226,14 @@ def makeSiteConfig():
     return data
 
 
+def contentReplace(content):
+    root_dir = mw.getServerDir()
+    service_path = root_dir + "/webstats"
+    content = content.replace('{$SERVER_APP}', service_path)
+    content = content.replace('{$ROOT_PATH}', root_dir)
+    return content
+
+
 def initDreplace():
 
     service_path = getServerDir()
@@ -236,8 +244,7 @@ def initDreplace():
     path_tpl = getPluginDir() + '/conf/webstats.conf'
     if not os.path.exists(path):
         content = mw.readFile(path_tpl)
-        content = content.replace('{$SERVER_APP}', service_path)
-        content = content.replace('{$ROOT_PATH}', mw.getServerDir())
+        content = contentReplace(content)
         mw.writeFile(path, content)
 
     # 已经安装的
@@ -285,6 +292,7 @@ def start():
     import tool_task
     tool_task.createBgTask()
 
+    makeOpDstRunLua()
     # issues:326
     luaRestart()
     return 'ok'
@@ -299,6 +307,7 @@ def stop():
     tool_task.removeBgTask()
 
     luaRestart()
+    makeOpDstStopLua()
     return 'ok'
 
 
@@ -320,10 +329,39 @@ def reload():
         loadLuaFileReload(fl)
 
     loadDebugLogFile()
+    makeOpDstRunLua()
 
     luaRestart()
     return 'ok'
 
+
+def makeOpDstRunLua(conf_reload=False):
+    root_worker_dir = mw.getServerDir() + '/web_conf/nginx/lua/init_worker_by_lua_file'
+    path = getServerDir()
+    path_tpl = getPluginDir()
+
+    worker_dst = root_worker_dir + "/webstats_init_worker.lua"
+    if not os.path.exists(worker_dst) or conf_reload:
+        worker_dst_tpl = path_tpl + "/lua/webstats_init_worker.lua"
+        content = mw.readFile(worker_dst_tpl)
+        content = contentReplace(content)
+        mw.writeFile(worker_dst, content)
+
+    mw.opLuaMakeAll()
+    return True
+
+
+def makeOpDstStopLua():
+    root_worker_dir = mw.getServerDir() + '/web_conf/nginx/lua/init_worker_by_lua_file'
+    path = getServerDir()
+    path_tpl = getPluginDir()
+
+    worker_dst = root_worker_dir + "/webstats_init_worker.lua"
+    if os.path.exists(worker_dst):
+        os.remove(worker_dst)
+
+    mw.opLuaMakeAll()
+    return True
 
 def getGlobalConf():
     conf = getConf()

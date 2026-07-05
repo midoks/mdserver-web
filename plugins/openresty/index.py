@@ -281,6 +281,7 @@ def status():
     return 'start'
 
 
+#  ps -ef|grep nginx|awk '{print $2}'|xargs kill 
 def restyOp(method):
     file = initDreplace()
 
@@ -292,6 +293,7 @@ def restyOp(method):
 
     current_os = mw.getOs()
     if current_os == "darwin":
+        # print(file + ' ' + method)
         data = mw.execShell(file + ' ' + method)
         if data[1] == '':
             return 'ok'

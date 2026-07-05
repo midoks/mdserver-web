@@ -90,9 +90,10 @@ Install_App()
 			BREW_DIR=`which brew`
 			BREW_DIR=${BREW_DIR/\/bin\/brew/}
 			echo "BREW_DIR:"${BREW_DIR}
+			LIB_SQLITE_DIR=/opt/homebrew/opt/sqlite
 			find_cfg=`cat Makefile | grep 'SQLITE_DIR'`
 			if [ "$find_cfg" == "" ];then
-				LIB_SQLITE_DIR=`brew info sqlite | grep ${BREW_DIR}/Cellar/sqlite | cut -d \  -f 1 | awk 'END {print}'`
+				# LIB_SQLITE_DIR=`brew info sqlite | grep /opt/homebrew/opt/sqlite | cut -d \  -f 1 | awk 'END {print}'`
 				echo "LIB_SQLITE_DIR:"${LIB_SQLITE_DIR}
 				sed -i $BAK "s#\$(ROCKSPEC)#\$(ROCKSPEC) SQLITE_DIR=${LIB_SQLITE_DIR}#g"  Makefile
 			fi
