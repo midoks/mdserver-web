@@ -39,9 +39,13 @@ local function run_app()
     local server_name = C:get_sn(ngx.var.server_name)
     
     local host = ngx.var.host
-    local http_port = ngx.var.http_port
-    if http_port ~= "80" and http_port ~= "443" then
-        host = host .. ":" .. http_port
+    local http_host = ngx.var.http_host
+    if http_host then
+        local port_start = string.find(http_host, ":", 1, true)
+        if port_start then
+            local port = string.sub(http_host, port_start + 1)
+            host = host .. ":" .. port
+        end
     end
 
     C:setConfData(config, sites)
