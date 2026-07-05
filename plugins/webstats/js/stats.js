@@ -2058,6 +2058,9 @@ function wsTableErrorLogRequest(page){
         $(".tablescroll .details").click(function(){
             var index = $(this).attr('data-id');
             var res = data[index];
+
+            var url = "http://"+res.domain+res.uri;
+            var url_html = "<a class='btlink' href='"+url+"' target='_blank'>"+url+"</a>";
             layer.open({
                 type: 1,
                 title: "【"+res.domain + "】详情信息",
@@ -2072,8 +2075,8 @@ function wsTableErrorLogRequest(page){
                     </tbody></table></div>\
                     <div><b style="margin-left:10px">协议</b></div>\
                     <div class="lib-con mt10"><div class="divpre">' + res.protocol + '</div></div>\
-                    <div><b style="margin-left:10px">URL</b></div>\
-                    <div class="lib-con mt10"><div class="divpre">' + $('<div ></div>').text(res.uri).html() + '</div></div>\
+                    <div><b style="margin-left:10px">URL地址</b></div>\
+                    <div class="lib-con mt10"><div class="divpre">' + url_html + '</div></div>\
                     <div><b style="margin-left:10px">完整IP列表</b></div>\
                     <div class="lib-con mt10"><div class="divpre" style="max-height: 66px;">' + $('<div ></div>').text(res.ip_list).html() + '</div></div>\
                     <div><b style="margin-left:10px">来路</b></div>\
@@ -2314,6 +2317,10 @@ function wsTableLogRequest(page){
         $(".tablescroll .details").click(function(){
             var index = $(this).attr('data-id');
             var res = data[index];
+            var url = "http://"+res.domain+res.uri;
+            var url_html = "<a class='btlink' href='"+url+"' target='_blank'>"+url+"</a>";
+            // console.log(url_html);
+            // console.log(res);
             layer.open({
                 type: 1,
                 title: "【"+res.domain + "】详情信息",
@@ -2328,10 +2335,10 @@ function wsTableLogRequest(page){
                     </tbody></table></div>\
                     <div><b style="margin-left:10px">协议</b></div>\
                     <div class="lib-con mt10"><div class="divpre">' + res.protocol + '</div></div>\
-                    <div><b style="margin-left:10px">URL</b></div>\
-                    <div class="lib-con mt10"><div class="divpre">' + $('<div></div>').text(res.uri).html() + '</div></div>\
+                    <div><b style="margin-left:10px">URL地址</b></div>\
+                    <div class="lib-con mt10"><div class="divpre">' + (url_html) + '</div></div>\
                     <div><b style="margin-left:10px">完整IP列表</b></div>\
-                    <div class="lib-con mt10"><div class="divpre" style="max-height: 66px;">' + $('<div ></div>').text(res.ip_list).html() + '</div></div>\
+                    <div class="lib-con mt10"><div class="divpre" style="max-height: 66px;">' + $('<div></div>').text(res.ip_list).html() + '</div></div>\
                     <div><b style="margin-left:10px">来路</b></div>\
                     <div class="lib-con mt10"><div class="divpre">' + $('<div></div>').text(res.referer == null ?'None':res.referer).html() + '</div></div>\
                     <div><b style="margin-left:10px">User-Agent</b></div>\
