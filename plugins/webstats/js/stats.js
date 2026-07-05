@@ -2059,7 +2059,7 @@ function wsTableErrorLogRequest(page){
             var index = $(this).attr('data-id');
             var res = data[index];
 
-            var url = "http://"+res.domain+res.uri;
+            var url = res.scheme+"://"+res.domain+res.uri;
             var url_html = "<a class='btlink' href='"+url+"' target='_blank'>"+url+"</a>";
             layer.open({
                 type: 1,
@@ -2317,7 +2317,7 @@ function wsTableLogRequest(page){
         $(".tablescroll .details").click(function(){
             var index = $(this).attr('data-id');
             var res = data[index];
-            var url = "http://"+res.domain+res.uri;
+            var url = res.scheme+"://"+res.domain+res.uri;
             var url_html = "<a class='btlink' href='"+url+"' target='_blank'>"+url+"</a>";
             // console.log(url_html);
             // console.log(res);
