@@ -200,12 +200,15 @@ local function run_app()
         local request_uri = ngx.var.request_uri
         local body_length = C:get_length()
         local domain = host or "unknown"
+        local forwarded_proto = ngx.var.http_x_forwarded_proto or ngx.var.http_x_forwarded_protocol or ngx.var.http_x_scheme or ""
+        local http_protocol = forwarded_proto ~= "" and string.lower(forwarded_proto) or (ngx.var.scheme or "http")
 
         local kv = {
             id = new_id,
             time_key = os.date("%Y%m%d%H", ngx.time()),
             time = ngx.time(),
             ip = ip,
+            scheme = http_protocol,
             domain = domain,
             server_name = input_sn,
             real_server_name = input_sn,

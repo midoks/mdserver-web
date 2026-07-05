@@ -542,9 +542,9 @@ function _M.cron(self)
 
                 local stmt_ok, stmt = pcall(function()
                     return db:prepare[[INSERT INTO web_logs(
-                            time, ip, scheme, domain, server_name, method, status_code, uri, body_length,
+                            time, ip, domain, server_name, method, status_code, uri, body_length,
                             referer, user_agent, protocol, request_time, is_spider, request_headers, ip_list, client_port)
-                            VALUES(:time, :ip, :scheme, :domain, :server_name, :method, :status_code, :uri,
+                            VALUES(:time, :ip, :domain, :server_name, :method, :status_code, :uri,
                             :body_length, :referer, :user_agent, :protocol, :request_time, :is_spider,
                             :request_headers, :ip_list, :client_port)]]
                 end)
@@ -779,7 +779,6 @@ function _M.store_logs_line(self, db, stmt, input_sn, info)
     stmt:bind_names {
         time = logline["time"],
         ip = logline["ip"],
-        scheme = logline["scheme"],
         domain = logline["domain"],
         server_name = logline["server_name"],
         method = logline["method"],
