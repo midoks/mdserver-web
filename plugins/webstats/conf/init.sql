@@ -7,6 +7,7 @@ PRAGMA journal_size_limit = 1073741824;
 CREATE TABLE IF NOT EXISTS `web_logs` (
     `time` INTEGER,
     `ip` TEXT,
+    `scheme` TEXT,
     `domain` TEXT,
     `server_name` TEXT,
     `method` TEXT,
