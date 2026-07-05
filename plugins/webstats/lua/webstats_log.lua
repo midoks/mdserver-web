@@ -37,6 +37,16 @@ local function run_app()
     local sites = require "webstats_sites"
 
     local server_name = C:get_sn(ngx.var.server_name)
+    
+    local host = ngx.var.host
+    local http_host = ngx.var.http_host
+    if http_host then
+        local port_start = string.find(http_host, ":", 1, true)
+        if port_start then
+            local port = string.sub(http_host, port_start + 1)
+            host = host .. ":" .. port
+        end
+    end
 
     C:setConfData(config, sites)
     local auto_config = C:setInputSn(server_name)
@@ -46,7 +56,6 @@ local function run_app()
     local user_agent = ngx.var.http_user_agent
     local x_forwarded_for = ngx.var.http_x_forwarded_for
     local referer = ngx.var.http_referer
-    local host = ngx.var.host
 
     local cache = ngx.shared.mw_total
     local total_key = "log_kv_total"
