@@ -747,7 +747,7 @@ def attacHistoryLogHack(conn, site_name, query_date='today'):
 def getLogsList():
     args = getArgs()
     check = checkArgs(args, ['page', 'page_size','site', 'method', 
-            'status_code', 'spider_type', 'request_time', 'query_date', 'search_uri'])
+            'status_code', 'spider_type', 'request_time', 'scheme','query_date', 'search_uri'])
     if not check[0]:
         return check[1]
 
@@ -765,12 +765,13 @@ def getLogsList():
     referer = args['referer']
     referer_url = args['referer_url']
     ip = args['ip']
+    scheme = args['scheme']
     setDefaultSite(domain)
 
     limit = str(page_size) + ' offset ' + str(page_size * (page - 1))
     conn = pSqliteDb('web_logs', domain)
 
-    field = 'time,ip,domain,server_name,method,is_spider,protocol,status_code,request_headers,ip_list,client_port,body_length,user_agent,referer,request_time,uri,body_length'
+    field = 'time,scheme,ip,domain,server_name,method,is_spider,protocol,status_code,request_headers,ip_list,client_port,body_length,user_agent,referer,request_time,uri,body_length'
     condition = ''
     conn = conn.field(field)
     conn = conn.where("1=1", ())
