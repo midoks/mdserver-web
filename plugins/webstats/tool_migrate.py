@@ -113,7 +113,7 @@ def migrateSiteHotLogs(site_name, query_date):
     try:
         print(f"[{site_name}] 备份 {hot_db} -> {hot_db_tmp} ...")
         mw.writeFile(migrating_flag, "yes")
-        time.sleep(1)
+        time.sleep(0.5)
         copy_start = time.time()
         # import shutil
         # shutil.copy(hot_db, hot_db_tmp)
