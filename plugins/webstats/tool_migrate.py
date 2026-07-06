@@ -44,11 +44,6 @@ def getGlobalConf():
     result = json.loads(content)
     return result
 
-def fastCopy(src, dst, buffer_size=128 * 1024 * 1024):  # 128MB 缓冲区
-    with open(src, 'rb') as fsrc:
-        with open(dst, 'wb') as fdst:
-            shutil.copyfileobj(fsrc, fdst, length=buffer_size)
-
 def pSqliteDb(dbname='web_logs', site_name='unset', fn="logs"):
     db_dir = getServerDir() + '/logs/' + site_name
     if not os.path.exists(db_dir):
@@ -121,7 +116,7 @@ def migrateSiteHotLogs(site_name, query_date):
         time.sleep(1)
         copy_start = time.time()
         # shutil.copy(hot_db, hot_db_tmp)
-        fastCopy(hot_db, hot_db_tmp, 512 * 1024 * 1024)
+        mw.fastCopy(hot_db, hot_db_tmp, 512 * 1024 * 1024)
         print(f"[{site_name}] 备份完成，耗时 {time.time() - copy_start:.2f}s")
         if not os.path.exists(hot_db_tmp):
             return mw.returnMsg(False, f"{site_name} migrating fail, copy tmp file!")
