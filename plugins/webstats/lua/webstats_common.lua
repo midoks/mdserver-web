@@ -121,7 +121,7 @@ function _M.initDB(self, input_sn)
     local path = log_dir .. '/' .. input_sn .. "/logs.db"
     local db, err = sqlite3.open(path)
     if err then
-        C:D("initDB failed for " .. input_sn .. ": " .. tostring(err))
+        self:D("initDB failed for " .. input_sn .. ": " .. tostring(err))
         return nil
     end
 
