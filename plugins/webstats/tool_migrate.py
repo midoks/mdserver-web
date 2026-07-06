@@ -6,6 +6,7 @@ import os
 import time
 import json
 import fcntl
+import shutil
 
 web_dir = os.getcwd() + "/web"
 if os.path.exists(web_dir):
@@ -43,6 +44,10 @@ def getGlobalConf():
     result = json.loads(content)
     return result
 
+def fastCopy(src, dst, buffer_size=128 * 1024 * 1024):  # 128MB 缓冲区
+    with open(src, 'rb') as fsrc:
+        with open(dst, 'wb') as fdst:
+            shutil.copyfileobj(fsrc, fdst, length=buffer_size)
 
 def pSqliteDb(dbname='web_logs', site_name='unset', fn="logs"):
     db_dir = getServerDir() + '/logs/' + site_name
@@ -111,12 +116,12 @@ def migrateSiteHotLogs(site_name, query_date):
 
     # 1. 备份到临时文件（copy 期间短暂互斥，完成后立即解除）
     try:
-        import shutil
         print(f"[{site_name}] 备份 {hot_db} -> {hot_db_tmp} ...")
         mw.writeFile(migrating_flag, "yes")
         time.sleep(1)
         copy_start = time.time()
-        shutil.copy(hot_db, hot_db_tmp)
+        # shutil.copy(hot_db, hot_db_tmp)
+        fastCopy(hot_db, hot_db_tmp, 512 * 1024 * 1024)
         print(f"[{site_name}] 备份完成，耗时 {time.time() - copy_start:.2f}s")
         if not os.path.exists(hot_db_tmp):
             return mw.returnMsg(False, f"{site_name} migrating fail, copy tmp file!")
