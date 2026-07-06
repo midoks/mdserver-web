@@ -12,12 +12,12 @@
     
     架构说明：
     1. 单例模式：通过 getInstance() 获取全局唯一实例
-    2. 共享内存：使用 ngx.shared.mw_total 作为日志缓存队列
+    2. 共享内存：webstats_queue 日志队列，webstats_cache UV/IP/域名等缓存
     3. SQLite 数据库：每个站点独立一个数据库文件
     4. 定时任务：每 0.5 秒执行一次日志持久化
     
     主要数据流向：
-    webstats_log.lua (日志采集) -> ngx.shared.mw_total (缓存队列) -> cron() (定时处理) -> SQLite (持久化)
+    webstats_log.lua (日志采集) -> webstats_queue (日志队列) -> cron() (定时处理) -> SQLite (持久化)
     
     依赖模块：
     - cjson: JSON 编解码
@@ -45,8 +45,9 @@ local total_key = "log_kv_total"
 local unset_server_name = "unset"
 -- 日志 ID 最大值，超过后重置
 local max_log_id = 99999999999999
--- Nginx 共享内存字典实例
-local cache = ngx.shared.mw_total
+-- Nginx 共享内存：队列与缓存分离
+local queue = ngx.shared.webstats_queue
+local cache = ngx.shared.webstats_cache
 
 -- 当前日期（日）
 local day = os.date("%d")
@@ -291,8 +292,7 @@ function _M.get_sn(self, input_sn)
         end
     end
 
-    -- 未匹配到任何站点
-    cache:set(input_sn, unset_server_name, 86400)
+    -- 未匹配站点不写入缓存，避免扫描流量占满 webstats_cache
     return unset_server_name
 end
 
@@ -475,7 +475,20 @@ function _M.cron(self)
     ]]
     local timer_every_get_data = function (premature)
         
-        local llen = ngx.shared.mw_total:llen(total_key)
+        local ok, llen = pcall(function() return queue:llen(total_key) end)
+        if not ok then
+            local queue_capacity = queue:capacity()
+            local queue_free = queue:free_space()
+            local queue_used = queue_capacity > 0 and (100 - math.floor(queue_free / queue_capacity * 100)) or 0
+            local cache_capacity = cache:capacity()
+            local cache_free = cache:free_space()
+            local cache_used = cache_capacity > 0 and (100 - math.floor(cache_free / cache_capacity * 100)) or 0
+            self:D("timer_every_get_data shared memory for " .. total_key .. ": " .. tostring(llen)
+                .. ", queue_used=" .. tostring(queue_used) .. "%, queue_free=" .. tostring(queue_free)
+                .. ", cache_used=" .. tostring(cache_used) .. "%, cache_free=" .. tostring(cache_free))
+            return true
+        end
+
         if llen == 0 then
             return true
         end
@@ -560,7 +573,7 @@ function _M.cron(self)
             end
 
             for i = 1, llen do
-                local data = ngx.shared.mw_total:lpop(total_key)
+                local data = queue:lpop(total_key)
                 if not data then
                     break
                 end
@@ -568,23 +581,23 @@ function _M.cron(self)
                 local decode_ok, info = pcall(function() return json.decode(data) end)
                 if not decode_ok then
                     self:D("json decode failed: " .. tostring(info))
-                    ngx.shared.mw_total:rpush(total_key, data)
+                    queue:rpush(total_key, data)
                     return
                 end
 
                 local input_sn = info['server_name']
                 if self:is_migrating(input_sn) then
-                    ngx.shared.mw_total:rpush(total_key, data)
+                    queue:rpush(total_key, data)
                 else
                     local db = dbs[input_sn]
                     local stmt = stmts[input_sn]
                     if not db or not stmt then
-                        ngx.shared.mw_total:rpush(total_key, data)
+                        queue:rpush(total_key, data)
                     else
                         local insert_ok = self:store_logs_line(db, stmt, input_sn, info)
                         if not insert_ok then
                             self:D("store_logs_line failed for " .. input_sn .. ": " .. tostring(insert_ok))
-                            ngx.shared.mw_total:rpush(total_key, data)
+                            queue:rpush(total_key, data)
                             rollback_sites[input_sn] = true
                         else
                             local log_kv = info["log_kv"]
@@ -734,13 +747,13 @@ function _M.cron(self)
     function timer_every_get_data_try_debug()
         ngx.update_time()
         local start_time = ngx.now()
-        local start_llen = ngx.shared.mw_total:llen(total_key)
+        local start_llen = queue:llen(total_key)
         
         local presult, err = pcall(function() timer_every_get_data() end)
         
         ngx.update_time()
         local end_time = ngx.now()
-        local end_llen = ngx.shared.mw_total:llen(total_key)
+        local end_llen = queue:llen(total_key)
         local duration = (end_time - start_time) * 1000
         local processed = start_llen - end_llen
         
@@ -1036,13 +1049,11 @@ function _M.clean_stats(self, db, input_sn)
 end
 
 function _M.lpop(self)
-    local cache = ngx.shared.mw_total
-    return cache:lpop(total_key)
+    return queue:lpop(total_key)
 end
 
 function _M.rpop(self)
-    local cache = ngx.shared.mw_total
-    return cache:rpop(total_key)
+    return queue:rpop(total_key)
 end
 
 

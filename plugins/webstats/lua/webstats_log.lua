@@ -57,7 +57,8 @@ local function run_app()
     local x_forwarded_for = ngx.var.http_x_forwarded_for
     local referer = ngx.var.http_referer
 
-    local cache = ngx.shared.mw_total
+    local cache = ngx.shared.webstats_cache
+    local queue = ngx.shared.webstats_queue
     local total_key = "log_kv_total"
 
     local status_codes_to_log = {
@@ -276,15 +277,17 @@ local function run_app()
             log_kv = kv,
         }
 
-        local len, err, forcible = cache:rpush(total_key, json.encode(data))
+        local len, err, forcible = queue:rpush(total_key, json.encode(data))
         if not len then
             C:D("webstats rpush failed: " .. tostring(err or "unknown")
-                .. ", forcible=" .. tostring(forcible) .. ", queue=" .. total_key)
+                .. ", forcible=" .. tostring(forcible) .. ", queue=" .. total_key
+                .. ", queue_free=" .. tostring(queue:free_space())
+                .. ", cache_free=" .. tostring(cache:free_space()))
         end
     end
 
     -- C:D("webstats_log run_app start, server_name=" .. tostring(server_name))
-    -- C:D(tostring(total_key) ..":" .. tostring(ngx.shared.mw_total:llen(total_key)))
+    -- C:D(tostring(total_key) ..":" .. tostring(ngx.shared.webstats_queue:llen(total_key)))
     load_global_exclude_ip()
     load_exclude_ip(server_name)
     cache_logs(server_name)
