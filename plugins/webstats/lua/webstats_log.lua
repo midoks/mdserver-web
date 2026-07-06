@@ -276,7 +276,11 @@ local function run_app()
             log_kv = kv,
         }
 
-        cache:rpush(total_key, json.encode(data))
+        local len, err, forcible = cache:rpush(total_key, json.encode(data))
+        if not len then
+            C:D("webstats rpush failed: " .. tostring(err or "unknown")
+                .. ", forcible=" .. tostring(forcible) .. ", queue=" .. total_key)
+        end
     end
 
     -- C:D("webstats_log run_app start, server_name=" .. tostring(server_name))
