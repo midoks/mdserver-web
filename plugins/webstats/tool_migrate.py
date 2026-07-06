@@ -167,7 +167,7 @@ def migrateSiteHotLogs(site_name, query_date):
     # 3. 删除已迁移的数据并清理统计（仅 DELETE/VACUUM 期间互斥）
     try:
         mw.writeFile(migrating_flag, "yes")
-        time.sleep(0.5)
+        time.sleep(1)
 
         hot_db_conn = pSqliteDb('web_logs', site_name)
 
