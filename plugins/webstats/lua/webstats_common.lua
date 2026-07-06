@@ -397,41 +397,43 @@ function _M.cronPre(self)
         for _, site_v in ipairs(sites) do
             local input_sn = site_v["name"]
 
-            -- 安全地初始化数据库连接
-            local db_ok, db = pcall(function() return self:initDB(input_sn) end)
-            if not db_ok or not db then
-                self:D("cronPre initDB failed for " .. tostring(input_sn) .. ": " .. tostring(db))
-                return false
-            end
-
-            -- 开启事务
-            db:exec([[BEGIN TRANSACTION]])
-
-            local success = true
-            -- 预创建当前小时和下一小时的统计记录
-            for _, ws_v in ipairs(wc_stat) do
-                if not self:_update_stat_pre(db, ws_v, time_key) then
-                    success = false
-                    break
+            if not self:is_migrating(input_sn) then
+                -- 安全地初始化数据库连接
+                local db_ok, db = pcall(function() return self:initDB(input_sn) end)
+                if not db_ok or not db then
+                    self:D("cronPre initDB failed for " .. tostring(input_sn) .. ": " .. tostring(db))
+                    return false
                 end
-                if not self:_update_stat_pre(db, ws_v, time_key_next) then
-                    success = false
-                    break
+
+                -- 开启事务
+                db:exec([[BEGIN TRANSACTION]])
+
+                local success = true
+                -- 预创建当前小时和下一小时的统计记录
+                for _, ws_v in ipairs(wc_stat) do
+                    if not self:_update_stat_pre(db, ws_v, time_key) then
+                        success = false
+                        break
+                    end
+                    if not self:_update_stat_pre(db, ws_v, time_key_next) then
+                        success = false
+                        break
+                    end
                 end
-            end
 
-            -- 提交或回滚事务
-            if success then
-                pcall(function() db:execute([[COMMIT]]) end)
-            else
-                pcall(function() db:exec([[ROLLBACK]]) end)
-            end
+                -- 提交或回滚事务
+                if success then
+                    pcall(function() db:execute([[COMMIT]]) end)
+                else
+                    pcall(function() db:exec([[ROLLBACK]]) end)
+                end
 
-            -- 安全关闭数据库
-            pcall(function() db:close() end)
+                -- 安全关闭数据库
+                pcall(function() db:close() end)
 
-            if not success then
-                return false
+                if not success then
+                    return false
+                end
             end
         end
 
@@ -515,45 +517,45 @@ function _M.cron(self)
         end
 
         local ok, err = pcall(function()
+            if self:is_working('cron_init_stat') then
+                return
+            end
+
             for _, site_v in ipairs(sites) do
                 local input_sn = site_v["name"]
                 if self:is_migrating(input_sn) then
-                    return
-                end
-
-                if self:is_working('cron_init_stat') then
-                    return
-                end
-
-                local db_ok, db = pcall(function() return self:initDB(input_sn) end)
-                if not db_ok or not db then
-                    self:D("initDB failed for " .. input_sn .. ": " .. tostring(db))
-                    return
-                end
-
-                stat_fields[input_sn] = {}
-
-                dbs[input_sn] = db
-                self:clean_stats(db, input_sn)
-
-                local stmt_ok, stmt = pcall(function()
-                    return db:prepare[[INSERT INTO web_logs(
-                            time, ip, scheme, domain, server_name, method, status_code, uri, body_length,
-                            referer, user_agent, protocol, request_time, is_spider, request_headers, ip_list, client_port)
-                            VALUES(:time, :ip, :scheme, :domain, :server_name, :method, :status_code, :uri,
-                            :body_length, :referer, :user_agent, :protocol, :request_time, :is_spider,
-                            :request_headers, :ip_list, :client_port)]]
-                end)
-                
-                if stmt_ok and stmt then
-                    stmts[input_sn] = stmt
-                    db:exec([[BEGIN TRANSACTION]])
+                    -- 该站点迁移中，跳过；其它站点继续写入
                 else
-                    if db and db:isopen() then
-                        db:close()
+                    local db_ok, db = pcall(function() return self:initDB(input_sn) end)
+                    if not db_ok or not db then
+                        self:D("initDB failed for " .. input_sn .. ": " .. tostring(db))
+                        return
                     end
-                    dbs[input_sn] = nil
-                    return
+
+                    stat_fields[input_sn] = {}
+
+                    dbs[input_sn] = db
+                    self:clean_stats(db, input_sn)
+
+                    local stmt_ok, stmt = pcall(function()
+                        return db:prepare[[INSERT INTO web_logs(
+                                time, ip, scheme, domain, server_name, method, status_code, uri, body_length,
+                                referer, user_agent, protocol, request_time, is_spider, request_headers, ip_list, client_port)
+                                VALUES(:time, :ip, :scheme, :domain, :server_name, :method, :status_code, :uri,
+                                :body_length, :referer, :user_agent, :protocol, :request_time, :is_spider,
+                                :request_headers, :ip_list, :client_port)]]
+                    end)
+
+                    if stmt_ok and stmt then
+                        stmts[input_sn] = stmt
+                        db:exec([[BEGIN TRANSACTION]])
+                    else
+                        if db and db:isopen() then
+                            db:close()
+                        end
+                        dbs[input_sn] = nil
+                        return
+                    end
                 end
             end
 
@@ -571,81 +573,78 @@ function _M.cron(self)
                 end
 
                 local input_sn = info['server_name']
-                local db = dbs[input_sn]
-                if not db then
+                if self:is_migrating(input_sn) then
                     ngx.shared.mw_total:rpush(total_key, data)
-                    return
-                end
+                else
+                    local db = dbs[input_sn]
+                    local stmt = stmts[input_sn]
+                    if not db or not stmt then
+                        ngx.shared.mw_total:rpush(total_key, data)
+                    else
+                        local insert_ok = self:store_logs_line(db, stmt, input_sn, info)
+                        if not insert_ok then
+                            self:D("store_logs_line failed for " .. input_sn .. ": " .. tostring(insert_ok))
+                            ngx.shared.mw_total:rpush(total_key, data)
+                            rollback_sites[input_sn] = true
+                        else
+                            local log_kv = info["log_kv"]
+                            local excluded = log_kv['excluded']
+                            local stat_tmp_fields = info['stat_fields']
 
-                local stmt = stmts[input_sn]
-                if not stmt then
-                    ngx.shared.mw_total:rpush(total_key, data)
-                    return
-                end
+                            local stat_fields_is = stat_fields[input_sn]
+                            for stf_k, stf_v in pairs(stat_tmp_fields) do
+                                if excluded then
+                                    if stf_k == "spider_stat_fields" or stf_k == "client_stat_fields" then
+                                        break
+                                    end
+                                end
 
-                local insert_ok = self:store_logs_line(db, stmt, input_sn, info)
-                if not insert_ok then
-                    self:D("store_logs_line failed for " .. input_sn .. ": " .. tostring(insert_ok))
-                    ngx.shared.mw_total:rpush(total_key, data)
-                    rollback_sites[input_sn] = true
-                    return
-                end
+                                local stf_is = stat_fields_is[stf_k]
+                                if not stf_is then
+                                    stf_is = {}
+                                    stat_fields_is[stf_k] = stf_is
+                                end
 
-                local log_kv = info["log_kv"]
-                local excluded = log_kv['excluded']
-                local stat_tmp_fields = info['stat_fields']
+                                for sv_k, sv_v in pairs(stf_v) do
+                                    stf_is[sv_k] = (stf_is[sv_k] or 0) + sv_v
+                                end
+                            end
 
-                local stat_fields_is = stat_fields[input_sn]
-                for stf_k, stf_v in pairs(stat_tmp_fields) do
-                    if excluded then
-                        if stf_k == "spider_stat_fields" or stf_k == "client_stat_fields" then
-                            break
+                            if not excluded then
+                                local ip = log_kv['ip']
+                                local body_length = log_kv["body_length"]
+
+                                local ip_stats_sn = ip_stats[input_sn]
+                                if not ip_stats_sn then
+                                    ip_stats_sn = {}
+                                    ip_stats[input_sn] = ip_stats_sn
+                                end
+
+                                local ip_stat = ip_stats_sn[ip]
+                                if not ip_stat then
+                                    ip_stats_sn[ip] = {ip_num = 1, body_length = body_length}
+                                else
+                                    ip_stat.ip_num = ip_stat.ip_num + 1
+                                    ip_stat.body_length = ip_stat.body_length + body_length
+                                end
+
+                                local url_stats_sn = url_stats[input_sn]
+                                if not url_stats_sn then
+                                    url_stats_sn = {}
+                                    url_stats[input_sn] = url_stats_sn
+                                end
+
+                                local request_uri = log_kv["request_uri"]
+                                local request_uri_md5 = ngx.md5(request_uri)
+                                local url_stat = url_stats_sn[request_uri_md5]
+                                if not url_stat then
+                                    url_stats_sn[request_uri_md5] = {url_num = 1, uri = request_uri, body_length = body_length}
+                                else
+                                    url_stat.url_num = url_stat.url_num + 1
+                                    url_stat.body_length = url_stat.body_length + body_length
+                                end
+                            end
                         end
-                    end
-
-                    local stf_is = stat_fields_is[stf_k]
-                    if not stf_is then
-                        stf_is = {}
-                        stat_fields_is[stf_k] = stf_is
-                    end
-                    
-                    for sv_k, sv_v in pairs(stf_v) do
-                        stf_is[sv_k] = (stf_is[sv_k] or 0) + sv_v
-                    end
-                end
-
-                if not excluded then
-                    local ip = log_kv['ip']
-                    local body_length = log_kv["body_length"]
-
-                    local ip_stats_sn = ip_stats[input_sn]
-                    if not ip_stats_sn then
-                        ip_stats_sn = {}
-                        ip_stats[input_sn] = ip_stats_sn
-                    end
-
-                    local ip_stat = ip_stats_sn[ip]
-                    if not ip_stat then
-                        ip_stats_sn[ip] = {ip_num = 1, body_length = body_length}
-                    else
-                        ip_stat.ip_num = ip_stat.ip_num + 1
-                        ip_stat.body_length = ip_stat.body_length + body_length
-                    end
-
-                    local url_stats_sn = url_stats[input_sn]
-                    if not url_stats_sn then
-                        url_stats_sn = {}
-                        url_stats[input_sn] = url_stats_sn
-                    end
-                    
-                    local request_uri = log_kv["request_uri"]
-                    local request_uri_md5 = ngx.md5(request_uri)
-                    local url_stat = url_stats_sn[request_uri_md5]
-                    if not url_stat then
-                        url_stats_sn[request_uri_md5] = {url_num = 1, uri = request_uri, body_length = body_length}
-                    else
-                        url_stat.url_num = url_stat.url_num + 1
-                        url_stat.body_length = url_stat.body_length + body_length
                     end
                 end
             end

@@ -88,7 +88,11 @@ def migrateSiteHotLogs(site_name, query_date):
         print(f"[{site_name}] 正在迁移中，跳过")
         return mw.returnMsg(True, f"{site_name} is migrating, skip")
 
-    # 1. 备份到临时文件（使用文件直接拷贝）
+    todayTime = time.strftime('%Y-%m-%d 00:00:00', time.localtime())
+    todayUt = int(time.mktime(time.strptime(
+        todayTime, "%Y-%m-%d %H:%M:%S")))
+
+    # 1. 备份到临时文件（copy 期间短暂互斥，完成后立即解除）
     try:
         import shutil
         print(f"[{site_name}] 备份 {hot_db} -> {hot_db_tmp} ...")
@@ -98,11 +102,12 @@ def migrateSiteHotLogs(site_name, query_date):
         if not os.path.exists(hot_db_tmp):
             return mw.returnMsg(False, f"{site_name} migrating fail, copy tmp file!")
     except Exception as e:
+        return mw.returnMsg(False, f"{site_name} migrating fail: {e}")
+    finally:
         if os.path.exists(migrating_flag):
             os.remove(migrating_flag)
-        return mw.returnMsg(False, f"{site_name} migrating fail: {e}")
 
-    # 2. 从临时备份中迁移热日志数据到历史日志（批量插入）
+    # 2. 从临时备份中迁移热日志数据到历史日志（读 logs_tmp，不阻塞 live 写入）
     try:
         logs_conn = pSqliteDb('web_log', site_name, 'logs_tmp')
         history_logs_conn = pSqliteDb('web_log', site_name, 'history_logs')
@@ -112,10 +117,6 @@ def migrateSiteHotLogs(site_name, query_date):
         _columns = [c[1] for c in hot_db_columns if c[1] != "id"]
         columns_str = ",".join(_columns)
         placeholders = ",".join(["?"] * len(_columns))
-
-        todayTime = time.strftime('%Y-%m-%d 00:00:00', time.localtime())
-        todayUt = int(time.mktime(time.strptime(
-            todayTime, "%Y-%m-%d %H:%M:%S")))
 
         logs_sql = f"select {columns_str} from web_logs where time<{todayUt}"
         selector = logs_conn.originExecute(logs_sql)
@@ -158,18 +159,15 @@ def migrateSiteHotLogs(site_name, query_date):
         history_logs_conn.commit()
 
     except Exception as e:
-        if site_name:
-            print(f"[{site_name}] logs to history error: {e}")
-        else:
-            print(f"logs to history error: {e}")
+        if os.path.exists(hot_db_tmp):
+            os.remove(hot_db_tmp)
+        print(f"[{site_name}] logs to history error: {e}")
         return mw.returnMsg(False, f"{site_name} logs migrate error: {e}")
 
-    # 3. 删除已迁移的数据并清理统计（批量删除）
+    # 3. 删除已迁移的数据并清理统计（仅 DELETE/VACUUM 期间互斥）
     try:
-        if os.path.exists(migrating_flag):
-            os.remove(migrating_flag)
-
         mw.writeFile(migrating_flag, "yes")
+        time.sleep(0.5)
 
         hot_db_conn = pSqliteDb('web_logs', site_name)
 
@@ -242,7 +240,6 @@ def migrateHotLogs(query_date="today"):
 
         print(f"\n迁移完成! 成功: {success_count}, 失败: {fail_count}")
 
-        mw.opWeb('restart')
         return mw.returnMsg(True, f"logs migrate ok, success: {success_count}, fail: {fail_count}")
 
     except BlockingIOError:
