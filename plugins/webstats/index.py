@@ -332,6 +332,14 @@ def reload():
     makeOpDstRunLua()
 
     luaRestart()
+
+
+    # 配置重写
+    path = luaConf()
+    path_tpl = getPluginDir() + '/conf/webstats.conf'    
+    content = mw.readFile(path_tpl)
+    content = contentReplace(content)
+    mw.writeFile(path, content)
     return 'ok'
 
 
