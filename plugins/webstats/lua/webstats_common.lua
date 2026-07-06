@@ -489,8 +489,6 @@ function _M.cron(self)
             return true
         end
 
-       
-
         if llen == 0 then
             return true
         end
