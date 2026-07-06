@@ -589,6 +589,7 @@ function _M.cron(self)
 
                 local insert_ok = self:store_logs_line(db, stmt, input_sn, info)
                 if not insert_ok then
+                    self:D("store_logs_line failed for " .. input_sn .. ": " .. tostring(insert_ok))
                     ngx.shared.mw_total:rpush(total_key, data)
                     rollback_sites[input_sn] = true
                     return
