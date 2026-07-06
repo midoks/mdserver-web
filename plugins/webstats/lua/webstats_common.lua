@@ -117,15 +117,11 @@ end
     - journal_size_limit = 20GB: WAL 文件大小限制
 ]]
 function _M.initDB(self, input_sn)
-    log_dir = self.app_dir .. "/logs"
-    if log_dir == "" then
-        return nil
-    end
-
+    local log_dir = self.app_dir .. "/logs"
     local path = log_dir .. '/' .. input_sn .. "/logs.db"
     local db, err = sqlite3.open(path)
-
     if err then
+        C:D("initDB failed for " .. input_sn .. ": " .. tostring(err))
         return nil
     end
 
