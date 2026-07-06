@@ -961,10 +961,16 @@ function _M.D(self,msg)
 end
 
 function _M.is_migrating(self, input_sn)
-    local file = io.open(self.app_dir.."/migrating", "rb")
-    if file then return true end
-    local file = io.open(self.app_dir.."/logs/"..input_sn.."/migrating", "rb")
-    if file then return true end
+    local fp = io.open(self.app_dir.."/migrating", "rb")
+    if fp then 
+        fp:close()
+        return true 
+    end
+    local fp = io.open(self.app_dir.."/logs/"..input_sn.."/migrating", "rb")
+    if fp then 
+        fp:close()
+        return true 
+    end
     return false
 end
 
