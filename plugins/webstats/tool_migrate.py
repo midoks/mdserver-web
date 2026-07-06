@@ -209,6 +209,10 @@ def migrateSiteHotLogs(site_name, query_date):
     finally:
         if os.path.exists(hot_db_tmp):
             os.remove(hot_db_tmp)
+        if os.path.exists(hot_db_tmp+"-shm"):
+            os.remove(hot_db_tmp+"-shm")
+        if os.path.exists(hot_db_tmp+"-wal"):
+            os.remove(hot_db_tmp+"-wal")
 
     elapsed = time.time() - start_time
     print(f"[{site_name}] 日志迁移完成，耗时 {elapsed:.2f}s")
