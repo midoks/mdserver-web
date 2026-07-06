@@ -6,7 +6,6 @@ import os
 import time
 import json
 import fcntl
-import shutil
 
 web_dir = os.getcwd() + "/web"
 if os.path.exists(web_dir):
@@ -44,6 +43,7 @@ def getGlobalConf():
     result = json.loads(content)
     return result
 
+
 def pSqliteDb(dbname='web_logs', site_name='unset', fn="logs"):
     db_dir = getServerDir() + '/logs/' + site_name
     if not os.path.exists(db_dir):
@@ -70,23 +70,6 @@ def pSqliteDb(dbname='web_logs', site_name='unset', fn="logs"):
     return conn
 
 
-def batch_delete(conn, table, where_clause, batch_size=5000, pause_sec=0.05):
-    """分批删除，缩短单次持锁时间，WAL 模式下可与 OpenResty 并发写入。"""
-    total = 0
-    while True:
-        sql = (
-            f"DELETE FROM {table} WHERE rowid IN "
-            f"(SELECT rowid FROM {table} WHERE {where_clause} LIMIT {batch_size})"
-        )
-        affected = conn.execute(sql)
-        if not isinstance(affected, int) or affected == 0:
-            break
-        total += affected
-        if pause_sec > 0:
-            time.sleep(pause_sec)
-    return total
-
-
 def migrateSiteHotLogs(site_name, query_date):
     start_time = time.time()
     print(f"[{site_name}] 开始迁移日志...")
@@ -111,14 +94,11 @@ def migrateSiteHotLogs(site_name, query_date):
 
     # 1. 备份到临时文件（copy 期间短暂互斥，完成后立即解除）
     try:
+        import shutil
         print(f"[{site_name}] 备份 {hot_db} -> {hot_db_tmp} ...")
         mw.writeFile(migrating_flag, "yes")
         time.sleep(0.5)
-        copy_start = time.time()
-        # import shutil
-        # shutil.copy(hot_db, hot_db_tmp)
-        mw.fastCopy(hot_db, hot_db_tmp, 256 * 1024)
-        print(f"[{site_name}] 备份完成，耗时 {time.time() - copy_start:.2f}s")
+        shutil.copy(hot_db, hot_db_tmp)
         if not os.path.exists(hot_db_tmp):
             return mw.returnMsg(False, f"{site_name} migrating fail, copy tmp file!")
     except Exception as e:
@@ -184,35 +164,41 @@ def migrateSiteHotLogs(site_name, query_date):
         print(f"[{site_name}] logs to history error: {e}")
         return mw.returnMsg(False, f"{site_name} logs migrate error: {e}")
 
-    # 3. 分批删除已迁移的热日志并清理统计（不设 migrating 锁，不阻塞 OpenResty 写入）
+    # 3. 删除已迁移的数据并清理统计（仅 DELETE/VACUUM 期间互斥）
     try:
+        mw.writeFile(migrating_flag, "yes")
+        time.sleep(0.5)
+
         hot_db_conn = pSqliteDb('web_logs', site_name)
-        hot_db_conn.execute("PRAGMA busy_timeout = 30000")
 
-        print(f"[{site_name}] 分批删除已迁移的热日志...")
-        deleted = batch_delete(hot_db_conn, 'web_logs', f"time<{todayUt}")
-        print(f"[{site_name}] 已删除 {deleted} 条热日志")
+        # 分批删除热日志
+        del_hot_log = f"delete from web_logs where time<{todayUt}"
+        print(f"[{site_name}] 删除已迁移的热日志...")
+        hot_db_conn.execute(del_hot_log)
 
-        print(f"[{site_name}] 分批删除180天前的统计数据...")
+        # 删除过期统计数据
+        print(f"[{site_name}] 删除180天前的统计数据...")
         save_time_key = time.strftime(
             '%Y%m%d00', time.localtime(time.time() - 180 * 86400))
-        stat_where = f"time<='{save_time_key}'"
-        for stat_table in ('request_stat', 'spider_stat', 'client_stat', 'referer_stat'):
-            stat_deleted = batch_delete(hot_db_conn, stat_table, stat_where)
-            print(f"[{site_name}] {stat_table} 已删除 {stat_deleted} 条")
 
-        print(f"[{site_name}] 执行 WAL checkpoint...")
-        hot_db_conn.execute("PRAGMA wal_checkpoint(TRUNCATE)")
+        del_request_stat_sql = f"delete from request_stat where time<={save_time_key}"
+        hot_db_conn.execute(del_request_stat_sql)
+        hot_db_conn.execute(f"delete from spider_stat where time<={save_time_key}")
+        hot_db_conn.execute(f"delete from client_stat where time<={save_time_key}")
+        hot_db_conn.execute(f"delete from referer_stat where time<={save_time_key}")
+
+        hot_db_conn.commit()
+        print(f"[{site_name}] 压缩热数据库...")
+        hot_db_conn.execute("VACUUM;")
+        hot_db_conn.commit()
 
     except Exception as e:
         print(f"[{site_name}] delete hot logs error: {e}")
     finally:
+        if os.path.exists(migrating_flag):
+            os.remove(migrating_flag)
         if os.path.exists(hot_db_tmp):
             os.remove(hot_db_tmp)
-        if os.path.exists(hot_db_tmp+"-shm"):
-            os.remove(hot_db_tmp+"-shm")
-        if os.path.exists(hot_db_tmp+"-wal"):
-            os.remove(hot_db_tmp+"-wal")
 
     elapsed = time.time() - start_time
     print(f"[{site_name}] 日志迁移完成，耗时 {elapsed:.2f}s")

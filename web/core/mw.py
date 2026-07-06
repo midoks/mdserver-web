@@ -25,6 +25,7 @@ import subprocess
 import glob
 import base64
 import re
+import shutil
 
 from random import Random
 
@@ -317,6 +318,11 @@ def toSize(size, middle='') -> str:
         size = float(size) / 1024.0
         s = u
     return str(round(size, 2)) + middle + u
+
+def fastCopy(src, dst, buffer_size=256 * 1024):  # 128MB 缓冲区
+    with open(src, 'rb') as fsrc:
+        with open(dst, 'wb') as fdst:
+            shutil.copyfileobj(fsrc, fdst, length=buffer_size)
 
 def returnData(status, msg, data=None):
     if data is None:
