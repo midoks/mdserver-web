@@ -319,7 +319,7 @@ def toSize(size, middle='') -> str:
         s = u
     return str(round(size, 2)) + middle + u
 
-def fastCopy(src, dst, buffer_size=128 * 1024 * 1024):  # 128MB 缓冲区
+def fastCopy(src, dst, buffer_size=256 * 1024):  # 128MB 缓冲区
     with open(src, 'rb') as fsrc:
         with open(dst, 'wb') as fdst:
             shutil.copyfileobj(fsrc, fdst, length=buffer_size)
