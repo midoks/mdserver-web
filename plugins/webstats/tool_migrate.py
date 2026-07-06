@@ -115,7 +115,9 @@ def migrateSiteHotLogs(site_name, query_date):
         print(f"[{site_name}] 备份 {hot_db} -> {hot_db_tmp} ...")
         mw.writeFile(migrating_flag, "yes")
         time.sleep(1)
+        copy_start = time.time()
         shutil.copy(hot_db, hot_db_tmp)
+        print(f"[{site_name}] 备份完成，耗时 {time.time() - copy_start:.2f}s")
         if not os.path.exists(hot_db_tmp):
             return mw.returnMsg(False, f"{site_name} migrating fail, copy tmp file!")
     except Exception as e:
