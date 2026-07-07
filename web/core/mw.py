@@ -324,7 +324,8 @@ def fastCopy(src, dst, buffer_size=256 * 1024):  # 128MB 缓冲区
         with open(dst, 'wb') as fdst:
             shutil.copyfileobj(fsrc, fdst, length=buffer_size)
 
-# linux高效复制
+
+# linux高效复制[未通过测试]
 def sendfile(src, dst):
     if isAppleSystem():
         try:
