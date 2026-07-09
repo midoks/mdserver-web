@@ -104,6 +104,6 @@ systemctl restart nezha-dashboard
 echo $DOWNLOAD_URL
 
 if [ -d /www/server/nezha ];then 
-	echo "$NUMBER_LATEST_VERSION" > /www/server/nezha/version.pl
+	echo "$INSTALL_VERSION" > /www/server/nezha/version.pl
 fi
 echo "ok"
