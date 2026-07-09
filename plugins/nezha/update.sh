@@ -90,7 +90,7 @@ if [ ! -d $TARGET_DIR ]; then
 fi
 
 cd $TARGET_DIR && rm -rf app.bak
-cd $TARGET_DIR && mw app app.bak
+cd $TARGET_DIR && mv app app.bak
 unzip $DOWNLOAD_FILE -d $TARGET_DIR
 echo "TARGET_DIR:"$TARGET_DIR
 if [ ! -f $TARGET_DIR/app ];then
