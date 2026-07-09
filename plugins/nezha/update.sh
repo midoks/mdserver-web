@@ -21,6 +21,10 @@ echo "最新[NUMBER]是: $NUMBER_LATEST_VERSION"
 INSTALL_VERSION=`/www/server/nezha/dashboard/app -v`
 echo "安装的版本: $INSTALL_VERSION"
 
+if [ -d /www/server/nezha ];then 
+    echo "$INSTALL_VERSION" > /www/server/nezha/version.pl
+fi
+
 if [ "$INSTALL_VERSION" == "$NUMBER_LATEST_VERSION" ];then
 	echo "已经是最新!!!"
 	exit
