@@ -41,12 +41,10 @@ function getLogs(id){
 		title:"任务执行日志",
 		area: ['60%','500px'], 
 		shadeClose:false,
-		btn:["清空","关闭"],
+		btn:['清空', "关闭", '刷新', '关闭自动刷新', '开启自动刷新'],
 		closeBtn:1,
 		end: function(){
-        	if (reqTimer){
-        		clearInterval(reqTimer);
-        	}
+        	
         },
 		content:'<div class="setchmod bt-form" style="padding:5px;">'
 			+'<pre id="crontab_log" style="overflow: auto; border: 0px none; line-height:23px;padding: 5px; margin: 0px; white-space: pre-wrap; height: 395px; background-color: rgb(51,51,51);color:#f1f1f1;border-radius:0px;font-family:"></pre>'
@@ -57,16 +55,26 @@ function getLogs(id){
 		+'</div>',
 		success:function(index,layer_index){
 	    	requestLogs(layer_index);
-	    	reqTimer = setInterval(function(){
-	    		requestLogs(layer_index);
-	    	},3000);
         },
-
-		yes:function(index){
+		yes:function(index,layer_index){
 			clearInterval(reqTimer);
 			closeLogs(id);
 			layer.close(index);
 		},
+		btn3:function(index,layer_index){
+			requestLogs(layer_index);
+			return false;
+		},
+		btn4:function(index,layer_index){
+			clearInterval(reqTimer);
+        	return false;
+		},
+		btn5:function(index,layer_index){
+	    	reqTimer = setInterval(function(){
+	    		requestLogs(layer_index);
+	    	},3000);
+	    	return false;
+		}
 	});
 }
 
