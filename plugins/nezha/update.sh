@@ -15,8 +15,15 @@ echo "最新版本是: $LATEST_VERSION"
 NUMBER_LATEST_VERSION=${LATEST_VERSION:1}
 echo "最新[NUMBER]是: $NUMBER_LATEST_VERSION"
 
-INSTALL_VERSION=`cat /www/server/nezha/version.pl`
+# INSTALL_VERSION=`cat /www/server/nezha/version.pl`
+# echo "安装的版本: $INSTALL_VERSION"
+
+INSTALL_VERSION=`/www/server/nezha/dashboard/app -v`
 echo "安装的版本: $INSTALL_VERSION"
+
+if [ -d /www/server/nezha ];then 
+    echo "$INSTALL_VERSION" > /www/server/nezha/version.pl
+fi
 
 if [ "$INSTALL_VERSION" == "$NUMBER_LATEST_VERSION" ];then
 	echo "已经是最新!!!"
@@ -89,7 +96,8 @@ if [ ! -d $TARGET_DIR ]; then
 	mkdir -p $TARGET_DIR
 fi
 
-cd $TARGET_DIR && rm -rf app
+cd $TARGET_DIR && rm -rf app.bak
+cd $TARGET_DIR && mv app app.bak
 unzip $DOWNLOAD_FILE -d $TARGET_DIR
 echo "TARGET_DIR:"$TARGET_DIR
 if [ ! -f $TARGET_DIR/app ];then
@@ -100,6 +108,6 @@ systemctl restart nezha-dashboard
 echo $DOWNLOAD_URL
 
 if [ -d /www/server/nezha ];then 
-	echo "$NUMBER_LATEST_VERSION" > /www/server/nezha/version.pl
+	echo "$INSTALL_VERSION" > /www/server/nezha/version.pl
 fi
 echo "ok"
