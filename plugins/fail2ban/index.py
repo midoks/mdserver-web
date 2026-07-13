@@ -328,7 +328,7 @@ def setBlackIp():
                 mw.execShell('fail2ban-client -vvv set {jail} unbanip {ip}'.format(jail=d, ip=ip))
 
         mw.writeFile(getBlackFile(), json.dumps([]))
-        return nw.returnJson(True, "禁止IP成功")
+        return mw.returnJson(True, "禁止IP成功")
 
     # 检查IP格式
     for ip in add_ip_list:
