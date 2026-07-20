@@ -15,6 +15,10 @@ SYS_VERSION_ID=`cat /etc/*-release | grep VERSION_ID | awk -F = '{print $2}' | a
 SYS_NAME=${SYS_VERSION_ID/./}
 # https://fastdl.mongodb.org/linux/mongodb-linux-x86_64-ubuntu2004-4.4.23.tgz
 
+if [ "$SYS_NAME" -gt "2404" ];then
+	SYS_NAME="2404"
+fi
+
 if [ "$SYS_NAME" -lt "2004" ];then
 	SYS_NAME="2004"
 fi
