@@ -90,14 +90,23 @@ if [[ "$OSNAME" == "ubuntu" ]] && [[ "$VERSION_ID" =~ ^(24|26)$ ]]; then
 			ln -s libaio.so.1t64.0.2 libaio.so.1
 		fi
 	fi
-	
+	cd $cur_dir
 fi
 
 if [[ "$OSNAME" == "debian" ]] && [[ "$VERSION_ID" =~ "13" ]]; then
 	cur_dir=`pwd`
-	cd /usr/lib/x86_64-linux-gnu
-	if [ ! -f libaio.so.1 ];then
-		ln -s libaio.so.1t64.0.2 libaio.so.1
+	if [ -d /usr/lib/x86_64-linux-gnu ];then
+		cd /usr/lib/x86_64-linux-gnu
+		if [ ! -f libaio.so.1 ];then
+			ln -s libaio.so.1t64.0.2 libaio.so.1
+		fi
+	fi
+
+	if [ -d /usr/lib/aarch64-linux-gnu ];then
+		cd /usr/lib/aarch64-linux-gnu
+		if [ ! -f libaio.so.1 ];then
+			ln -s libaio.so.1t64.0.2 libaio.so.1
+		fi
 	fi
 	cd $cur_dir
 fi
