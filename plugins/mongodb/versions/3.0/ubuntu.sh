@@ -26,6 +26,12 @@ fi
 MG_DIR=$serverPath/source/mongodb
 mkdir -p $MG_DIR
 
+if [ "$SYS_ARCH" != "x86_64" ];then
+	echo "no support"
+	exit 0
+fi
+
+
 FILE_NAME=mongodb-linux-${SYS_ARCH}-${VERSION}
 FILE_NAME_TGZ=${FILE_NAME}.tgz
 
