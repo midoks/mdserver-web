@@ -6,6 +6,7 @@ export PATH
 
 # cd /Users/midoks/Desktop/mwdev/server/mdserver-web/plugins/mongodb && /bin/bash install.sh install 7.0
 # cd /www/server/mdserver-web/plugins/mongodb && /bin/bash install.sh install 7.0
+# cd /www/server/mdserver-web/plugins/mongodb && /bin/bash install.sh install 8.0
 # cd /www/server/mdserver-web/plugins/mongodb && /bin/bash install.sh install 3.0
 # cd /www/server/mdserver-web && python3 /www/server/mdserver-web/plugins/mongodb/index.py start
 
