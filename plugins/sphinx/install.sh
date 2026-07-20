@@ -143,7 +143,7 @@ Install_sphinx()
 	
 	if [ "$?" == "0" ];then
 		mkdir -p $SPHINX_DIR
-		cp -rf ${SPHINX_DIR}/sphinx-${VERSION}/ $serverPath/sphinx/bin
+		cp -rf ${SPHINX_DIR}/sphinx-${VERSION}/* $serverPath/sphinx/bin
 	fi
 	
 	if [ -d $serverPath/sphinx ];then
