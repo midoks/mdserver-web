@@ -74,7 +74,12 @@ class monitor:
 
     def getMonitorDay(self):
         monitor_day = mw.M('option').field('name').where('name=?',('monitor_day',)).getField('value')
-        return int(monitor_day)
+        if monitor_day is None or monitor_day == '':
+            return 30
+        try:
+            return int(monitor_day)
+        except (ValueError, TypeError):
+            return 30
 
     def isOnlyNetIoStats(self):
         monitor_only_netio = mw.M('option').field('name').where('name=?',('monitor_only_netio',)).getField('value')
