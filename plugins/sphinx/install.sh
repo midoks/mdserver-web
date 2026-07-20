@@ -44,21 +44,47 @@ VERSION=$2
 # echo $VERSION
 
 if [ "$VERSION" == "3.1.1" ];then
+	if [ "$sysArch" != "x86_64" ];then
+		echo "no support"
+		exit 1
+	fi
 	VERSION_NUM=${VERSION}-612d99f
 elif [ "$VERSION" == "3.2.1" ]; then
+	if [ "$sysArch" != "x86_64" ];then
+		echo "no support"
+		exit 1
+	fi
 	VERSION_NUM=${VERSION}-f152e0b
 elif [ "$VERSION" == "3.3.1" ]; then
+	if [ "$sysArch" != "x86_64" ];then
+		echo "no support"
+		exit 1
+	fi
 	VERSION_NUM=${VERSION}-b72d67b
 elif [ "$VERSION" == "3.4.1" ]; then
+	if [ "$sysArch" != "x86_64" ];then
+		echo "no support"
+		exit 1
+	fi
 	VERSION_NUM=${VERSION}-efbcc65
 elif [ "$VERSION" == "3.5.1" ]; then
+	if [ "$sysArch" != "x86_64" ];then
+		echo "no support"
+		exit 1
+	fi
 	VERSION_NUM=${VERSION}-82c60cb
 elif [ "$VERSION" == "3.6.1" ]; then
+	if [ "$sysArch" != "x86_64" ];then
+		echo "no support"
+		exit 1
+	fi
 	VERSION_NUM=${VERSION}-c9dbeda
 elif [ "$VERSION" == "3.7.1" ]; then
 	VERSION_NUM=${VERSION}-da9f8a4
 elif [ "$VERSION" == "3.8.1" ]; then
 	VERSION_NUM=${VERSION}-d25e0bb
+elif [ "$VERSION" == "3.9.1" ]; then
+	VERSION_NUM=${VERSION}-141d2ea
 fi
 
 # echo $VERSION_NUM
