@@ -77,7 +77,7 @@ Install_app()
 	if [ -f $shell_file ];then
 		bash -x $shell_file
 
-		if [ "$?" == "0" ];then
+		if [ "$?" != "0" ];then
 			echo '不支持...'
 			exit 1
 		fi
