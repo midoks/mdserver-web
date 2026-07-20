@@ -80,6 +80,7 @@ def runPanelTask():
     # 站点过期检查
     siteEdateCheck()
 
+    # echo "True" > /www/server/mdserver-web/logs/panel_task.lock
     lock_file = mw.getTriggerTaskLockFile()
     try:
         if os.path.exists(lock_file):
