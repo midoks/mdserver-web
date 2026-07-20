@@ -76,7 +76,7 @@ cd ${MG_DIR} && rm -rf ${MG_DIR}/${TOOL_FILE_NAME}
 # https://fastdl.mongodb.org/tools/db/mongodb-database-tools-ubuntu2204-x86_64-100.9.4.tgz
 #--------------- mongodb database install ------------------ #
 TOOL_VERSION=100.9.4
-SYS_NAME="2204"
+SYS_NAME=2204
 TOOL_FILE_NAME=mongodb-database-tools-ubuntu${SYS_NAME}-x86_64-${TOOL_VERSION}
 if [ "aarch64" == ${SYS_ARCH} ];then
 	TOOL_FILE_NAME=mongodb-database-tools-ubuntu${SYS_NAME}-arm64-${TOOL_VERSION}
