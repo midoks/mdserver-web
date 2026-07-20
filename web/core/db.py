@@ -67,6 +67,19 @@ class Sql():
                 print(getTracebackInfo())
                 raise
 
+    def close(self):
+        # 关闭数据库连接
+        if self.__DB_CONN is not None:
+            try:
+                self.__DB_CONN.close()
+                self.__DB_CONN = None
+            except Exception as ex:
+                pass
+
+    def __del__(self):
+        # 对象销毁时自动关闭连接
+        self.close()
+
     def changeTextFactoryToBytes(self):
         self.__DB_CONN.text_factory = bytes
         return True
