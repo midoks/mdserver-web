@@ -1452,7 +1452,8 @@ def getTriggerTaskLockFile():
 
 def triggerTask():
     lock_file = getTriggerTaskLockFile()
-    writeFile(lock_file, 'True')
+    t = writeFile(lock_file, 'True')
+    return t
 
 def restartTask():
     initd = getPanelDir() + '/scripts/init.d/mw'
