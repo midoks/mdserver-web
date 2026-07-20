@@ -54,7 +54,7 @@ fi
 VERSION_ID=`cat /etc/*-release | grep VERSION_ID | awk -F = '{print $2}' | awk -F "\"" '{print $2}'`
 
 
-VERSION=8.0.37
+VERSION=8.0.46
 Install_mysql()
 {
 	mkdir -p ${mysqlDir}
