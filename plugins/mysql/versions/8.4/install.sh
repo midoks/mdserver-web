@@ -54,7 +54,7 @@ fi
 VERSION_ID=`cat /etc/*-release | grep VERSION_ID | awk -F = '{print $2}' | awk -F "\"" '{print $2}'`
 
 
-VERSION=8.4.2
+VERSION=8.4.10
 # https://dev.mysql.com/get/Downloads/MySQL-8.4/mysql-${VERSION}.tar.gz
 # https://cdn.mysql.com//Downloads/MySQL-8.4/mysql-boost-${VERSION}.tar.gz
 Install_mysql()
@@ -104,7 +104,7 @@ Install_mysql()
 	fi
 
 	#检测文件是否损坏.
-	md5_mysql_ok=a632063fdb1c7de2c5db47e1f66191cd
+	md5_mysql_ok=db1e11216dd83423a9374999367d77e4
 	if [ -f ${mysqlDir}/mysql-${VERSION}.tar.gz ];then
 		md5_mysql=`md5sum ${mysqlDir}/mysql-${VERSION}.tar.gz  | awk '{print $1}'`
 		if [ "${md5_mysql_ok}" == "${md5_mysql}" ]; then
