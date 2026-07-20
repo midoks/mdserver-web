@@ -142,7 +142,7 @@ Install_sphinx()
 	cd ${SPHINX_DIR} && tar -zxvf ${FILE_TGZ}
 	
 	if [ "$?" == "0" ];then
-		mkdir -p $SPHINX_DIR
+		mkdir -p $SPHINX_DIR/sphinx/bin
 		cp -rf ${SPHINX_DIR}/sphinx-${VERSION}/* $serverPath/sphinx/bin
 	fi
 	
