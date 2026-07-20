@@ -7,6 +7,7 @@ rootPath=$(dirname "$curPath")
 rootPath=$(dirname "$rootPath")
 serverPath=$(dirname "$rootPath")
 
+# cd /www/server/mdserver-web/plugins/pureftp && bash install.sh install 1.0.49
 
 if [ -f ${rootPath}/bin/activate ];then
 	source ${rootPath}/bin/activate
