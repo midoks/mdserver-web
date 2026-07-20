@@ -11,6 +11,11 @@ serverPath=$(dirname "$rootPath")
 VERSION=3.0.15
 SYS_ARCH=`arch`
 
+if [ "$SYS_ARCH" != "x86_64" ];then
+	echo "no support"
+	exit 0
+fi
+
 SYS_VERSION_ID=`cat /etc/*-release | grep VERSION_ID | awk -F = '{print $2}' | awk -F "\"" '{print $2}'`
 SYS_NAME=${SYS_VERSION_ID/./}
 SYS_NAME_LEN=`echo "$SYS_NAME" | wc -L`
