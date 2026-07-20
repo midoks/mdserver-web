@@ -13,7 +13,7 @@ SYS_ARCH=`arch`
 
 if [ "$SYS_ARCH" != "x86_64" ];then
 	echo "no support"
-	exit 0
+	exit 1
 fi
 
 SYS_VERSION_ID=`cat /etc/*-release | grep VERSION_ID | awk -F = '{print $2}' | awk -F "\"" '{print $2}'`
