@@ -42,7 +42,8 @@ class Sql():
     __debug = False
 
     def __init__(self):
-        self.__DB_FILE = mw.getPanelDataDir()+'/data/panel.db'
+        # self.__DB_FILE = mw.getPanelDir()+'/data/panel.db'
+        self.__DB_FILE = mw.getPanelDataDir()+'/panel.db'
 
     def __getConnBak(self):
         try:
