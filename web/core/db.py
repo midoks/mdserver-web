@@ -42,30 +42,17 @@ class Sql():
     __debug = False
 
     def __init__(self):
-        # self.__DB_FILE = mw.getPanelDir()+'/data/panel.db'
-        self.__DB_FILE = mw.getPanelDataDir()+'/panel.db'
+        self.__DB_FILE = mw.getPanelDir()+'/data/panel.db'
+        # self.__DB_FILE = mw.getPanelDataDir()+'/panel.db'
 
-    def __getConnBak(self):
+    def __getConn(self):
         try:
             if self.__DB_CONN == None:
                 self.__DB_CONN = sqlite3.connect(self.__DB_FILE)
                 self.__DB_CONN.text_factory = str
         except Exception as ex:
             print(getTracebackInfo())
-            return "error: " + str(ex)
-
-    def __getConn(self):
-        # 取数据库对象
-        if self.__DB_CONN is None:
-            db_dir = os.path.dirname(self.__DB_FILE)
-            if not os.path.exists(db_dir):
-                os.makedirs(db_dir, exist_ok=True)
-            try:
-                self.__DB_CONN = sqlite3.connect(self.__DB_FILE)
-                self.__DB_CONN.text_factory = str
-            except Exception as ex:
-                print(getTracebackInfo())
-                raise
+            raise
 
     def close(self):
         # 关闭数据库连接
