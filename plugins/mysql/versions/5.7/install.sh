@@ -131,6 +131,16 @@ Install_mysql()
 
 	cd ${rootPath}/plugins/mysql/lib && /bin/bash rpcgen.sh
 
+	INSTALL_CMD=cmake
+	# check cmake version
+	CMAKE_VERSION=`cmake -version | grep version | awk '{print $3}' | awk -F '.' '{print $1}'`
+	if [ "$CMAKE_VERSION" -eq "2" ];then
+		mkdir -p /var/log/mariadb
+		touch /var/log/mariadb/mariadb.log
+		INSTALL_CMD=cmake3
+	fi
+
+
 	if [ ! -f ${mysqlDir}/mysql-boost-${VERSION}.tar.gz ];then
 		wget --no-check-certificate -O ${mysqlDir}/mysql-boost-${VERSION}.tar.gz --tries=3 https://cdn.mysql.com/archives/mysql-5.7/mysql-boost-${VERSION}.tar.gz
 	fi
@@ -185,7 +195,7 @@ Install_mysql()
   	# -DCMAKE_CXX_FLAGS="-I/usr/include/tirpc" \
 
 	if [ ! -d $serverPath/mysql ];then
-		cd ${mysqlDir}/mysql-${VERSION} && cmake \
+		cd ${mysqlDir}/mysql-${VERSION} && ${INSTALL_CMD} \
 		-DCMAKE_INSTALL_PREFIX=$serverPath/mysql \
 		-DMYSQL_USER=mysql \
 		-DMYSQL_TCP_PORT=3306 \
