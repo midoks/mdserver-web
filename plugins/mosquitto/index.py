@@ -142,7 +142,7 @@ def mqttOp(method):
         return data[1]
 
     if current_os.startswith("freebsd"):
-        data = mw.execShell('service ' + getPluginName() + ' ' + method)
+        data = mw.execShell('systemctl ' + getPluginName() + ' ' + method)
         if data[1] == '':
             return 'ok'
         return data[1]
