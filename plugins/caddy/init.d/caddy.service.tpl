@@ -20,9 +20,9 @@ After=network.target network-online.target
 Requires=network-online.target
 
 [Service]
-Type=notify
-User=caddy
-Group=caddy
+Type=simple
+User=www
+Group=www
 ExecStart={$SERVER_PATH}/caddy/bin/caddy run --environ --config {$SERVER_PATH}/caddy/Caddyfile
 ExecReload={$SERVER_PATH}/caddy/bin/caddy reload --config {$SERVER_PATH}/caddy/Caddyfile --force
 TimeoutStopSec=5s
