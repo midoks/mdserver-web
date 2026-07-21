@@ -180,6 +180,10 @@ Install_mysql()
 		OPTIONS="-DWITH_SSL=${serverPath}/lib/openssl11"
 	fi
 
+	# -DCMAKE_EXE_LINKER_FLAGS="-ltirpc" \
+  	# -DCMAKE_C_FLAGS="-I/usr/include/tirpc" \
+  	# -DCMAKE_CXX_FLAGS="-I/usr/include/tirpc" \
+
 	if [ ! -d $serverPath/mysql ];then
 		cd ${mysqlDir}/mysql-${VERSION} && cmake \
 		-DCMAKE_INSTALL_PREFIX=$serverPath/mysql \
