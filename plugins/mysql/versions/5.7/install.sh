@@ -197,6 +197,8 @@ Install_mysql()
 		-DDOWNLOAD_BOOST=1 \
 		-DCMAKE_POLICY_VERSION_MINIMUM=3.5 \
 		-DWITH_CRYPT=system \
+		-DWITH_SSL=system \
+		-DWITH_ZLIB=system \
         -DWITH_EMBEDDED_SERVER=OFF \
         -DHAVE_GETHOSTBYNAME_R_6_ARG=1 \
         -DHAVE_GETHOSTBYNAME_R=1 \
@@ -205,7 +207,7 @@ Install_mysql()
 		$OPTIONS \
 		-DCMAKE_C_COMPILER=${WHERE_DIR_GCC} \
 		-DCMAKE_CXX_COMPILER=${WHERE_DIR_GPP} \
-		-DWITH_BOOST=${mysqlDir}/mysql-${VERSION}/boost/
+		-DWITH_BOOST=${mysqlDir}/mysql-${VERSION}/boost/boost_1_59_0
 		make -j${cpuCore} && make install && make clean
 
 		if [ -d $serverPath/mysql ];then
