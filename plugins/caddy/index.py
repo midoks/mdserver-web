@@ -109,7 +109,7 @@ def initDreplace():
     caddy_file = getConf()
     if not os.path.exists(caddy_file):
         caddy_file_tpl = getConfTpl()
-        content = mw.readFile(systemServiceTpl)
+        content = mw.readFile(caddy_file_tpl)
         content = content.replace('{$SERVER_PATH}', service_path)
         mw.writeFile(caddy_file, content)
 
