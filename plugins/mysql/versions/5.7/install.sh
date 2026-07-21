@@ -131,6 +131,16 @@ Install_mysql()
 
 	cd ${rootPath}/plugins/mysql/lib && /bin/bash rpcgen.sh
 
+	INSTALL_CMD=cmake
+	# check cmake version
+	CMAKE_VERSION=`cmake -version | grep version | awk '{print $3}' | awk -F '.' '{print $1}'`
+	if [ "$CMAKE_VERSION" -eq "2" ];then
+		mkdir -p /var/log/mariadb
+		touch /var/log/mariadb/mariadb.log
+		INSTALL_CMD=cmake3
+	fi
+
+
 	if [ ! -f ${mysqlDir}/mysql-boost-${VERSION}.tar.gz ];then
 		wget --no-check-certificate -O ${mysqlDir}/mysql-boost-${VERSION}.tar.gz --tries=3 https://cdn.mysql.com/archives/mysql-5.7/mysql-boost-${VERSION}.tar.gz
 	fi
@@ -180,8 +190,12 @@ Install_mysql()
 		OPTIONS="-DWITH_SSL=${serverPath}/lib/openssl11"
 	fi
 
+	# -DCMAKE_EXE_LINKER_FLAGS="-ltirpc" \
+  	# -DCMAKE_C_FLAGS="-I/usr/include/tirpc" \
+  	# -DCMAKE_CXX_FLAGS="-I/usr/include/tirpc" \
+
 	if [ ! -d $serverPath/mysql ];then
-		cd ${mysqlDir}/mysql-${VERSION} && cmake \
+		cd ${mysqlDir}/mysql-${VERSION} && ${INSTALL_CMD} \
 		-DCMAKE_INSTALL_PREFIX=$serverPath/mysql \
 		-DMYSQL_USER=mysql \
 		-DMYSQL_TCP_PORT=3306 \
@@ -195,10 +209,19 @@ Install_mysql()
 		-DDEFAULT_CHARSET=utf8mb4 \
 		-DDEFAULT_COLLATION=utf8mb4_general_ci \
 		-DDOWNLOAD_BOOST=1 \
+		-DCMAKE_POLICY_VERSION_MINIMUM=3.5 \
+		-DWITH_CRYPT=system \
+		-DWITH_SSL=system \
+		-DWITH_ZLIB=system \
+        -DWITH_EMBEDDED_SERVER=OFF \
+        -DHAVE_GETHOSTBYNAME_R_6_ARG=1 \
+        -DHAVE_GETHOSTBYNAME_R=1 \
+        -DWITHOUT_TOKUDB=1 \
+        -DWITHOUT_ROCKSDB=1 \
 		$OPTIONS \
 		-DCMAKE_C_COMPILER=${WHERE_DIR_GCC} \
 		-DCMAKE_CXX_COMPILER=${WHERE_DIR_GPP} \
-		-DWITH_BOOST=${mysqlDir}/mysql-${VERSION}/boost/
+		-DWITH_BOOST=${mysqlDir}/mysql-${VERSION}/boost/boost_1_59_0
 		make -j${cpuCore} && make install && make clean
 
 		if [ -d $serverPath/mysql ];then

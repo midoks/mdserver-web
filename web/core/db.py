@@ -42,17 +42,30 @@ class Sql():
     __debug = False
 
     def __init__(self):
-        self.__DB_FILE = getPanelDir()+'/data/panel.db'
+        self.__DB_FILE = mw.getPanelDir()+'/data/panel.db'
+        # self.__DB_FILE = mw.getPanelDataDir()+'/panel.db'
 
     def __getConn(self):
-        # 取数据库对象
         try:
             if self.__DB_CONN == None:
                 self.__DB_CONN = sqlite3.connect(self.__DB_FILE)
                 self.__DB_CONN.text_factory = str
         except Exception as ex:
             print(getTracebackInfo())
-            return "error: " + str(ex)
+            raise
+
+    def close(self):
+        # 关闭数据库连接
+        if self.__DB_CONN is not None:
+            try:
+                self.__DB_CONN.close()
+                self.__DB_CONN = None
+            except Exception as ex:
+                pass
+
+    def __del__(self):
+        # 对象销毁时自动关闭连接
+        self.close()
 
     def changeTextFactoryToBytes(self):
         self.__DB_CONN.text_factory = bytes

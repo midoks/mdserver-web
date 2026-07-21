@@ -14,7 +14,7 @@ sysName=`uname`
 action=$1
 type=$2
 
-VERSION=2.4.66
+VERSION=2.4.68
 apacheDir=${serverPath}/source/apache
 
 Install_App()

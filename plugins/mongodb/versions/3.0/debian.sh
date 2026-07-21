@@ -11,6 +11,12 @@ serverPath=$(dirname "$rootPath")
 # https://fastdl.mongodb.org/linux/mongodb-linux-x86_64-3.0.15.tgz
 VERSION=3.0.15
 SYS_ARCH=`arch`
+
+if [ "$SYS_ARCH" != "x86_64" ];then
+	echo "no support"
+	exit 0
+fi
+
 SYS_VERSION_ID=`cat /etc/*-release | grep VERSION_ID | awk -F = '{print $2}' | awk -F "\"" '{print $2}'`
 SYS_NAME=${SYS_VERSION_ID/./}
 
@@ -39,7 +45,7 @@ if [ ! -d $MG_DIR/${FILE_NAME_TGZ} ];then
 	cd $MG_DIR && tar -zxvf ${FILE_NAME_TGZ}
 fi
 
-if [ ! -d  $serverPath/mongodb/bin ];then
+if [ ! -f $serverPath/mongodb/bin/mongod ];then
 	mkdir -p $serverPath/mongodb
 	cd $MG_DIR/${FILE_NAME} && cp -rf ./bin $serverPath/mongodb
 fi

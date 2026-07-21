@@ -151,10 +151,15 @@ apt install -y libwebp-dev
 apt install -y lzma lzma-dev
 apt install -y libunwind-dev
 
-apt install -y libpcre3 libpcre3-dev 
+apt install -y libpcre2
+apt install -y libpcre2-dev
+apt install -y libpcre3
+apt install -y libpcre3-dev 
 apt install -y openssl
 apt install -y libssl-dev
 apt install -y libargon2-dev
+apt install -y libnuma-dev
+apt install -y libpam0g-dev
 
 apt install -y libmemcached-dev
 apt install -y libsasl2-dev

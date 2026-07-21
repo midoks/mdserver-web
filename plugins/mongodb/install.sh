@@ -6,6 +6,7 @@ export PATH
 
 # cd /Users/midoks/Desktop/mwdev/server/mdserver-web/plugins/mongodb && /bin/bash install.sh install 7.0
 # cd /www/server/mdserver-web/plugins/mongodb && /bin/bash install.sh install 7.0
+# cd /www/server/mdserver-web/plugins/mongodb && /bin/bash install.sh install 8.0
 # cd /www/server/mdserver-web/plugins/mongodb && /bin/bash install.sh install 3.0
 # cd /www/server/mdserver-web && python3 /www/server/mdserver-web/plugins/mongodb/index.py start
 
@@ -75,6 +76,11 @@ Install_app()
 
 	if [ -f $shell_file ];then
 		bash -x $shell_file
+
+		if [ "$?" != "0" ];then
+			echo '不支持...'
+			exit 1
+		fi
 	else
 		echo '不支持...'
 		exit 1

@@ -147,7 +147,7 @@ def uncompress(sfile, dfile, path):
     if suffix_gz == tar_gz:
         extension = suffix_gz
 
-    if not extension in ['tar.gz', 'gz', 'zip', 'rar', '7z', 'xz','bz2']:
+    if not extension in ['tar.gz', 'tgz', 'gz', 'zip', 'rar', '7z', 'xz','bz2']:
         return mw.returnData(False, '现在仅支持gz,zip,rar,7z,xz,bz2格式解压!')
 
     if extension == 'rar' and not mw.checkBinExist('rar'):
@@ -163,6 +163,9 @@ def uncompress(sfile, dfile, path):
             cmd += "&& unzip -o -d '" + dfile + "' '" + sfile + "' > " + tmps + " 2>&1 &"
             mw.execShell(cmd)
         elif extension == 'tar.gz':
+            cmd += "&& tar -zxvf " + sfile + " -C " + dfile + " > " + tmps + " 2>&1 &"
+            mw.execShell(cmd)
+        elif extension == 'tgz':
             cmd += "&& tar -zxvf " + sfile + " -C " + dfile + " > " + tmps + " 2>&1 &"
             mw.execShell(cmd)
         elif extension == 'gz':

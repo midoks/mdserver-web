@@ -52,3 +52,4 @@ zstandard
 geoip2
 psycopg2-binary
 docker
+telnetlib3

@@ -15,6 +15,10 @@ SYS_VERSION_ID=`cat /etc/*-release | grep VERSION_ID | awk -F = '{print $2}' | a
 SYS_NAME=${SYS_VERSION_ID/./}
 # https://fastdl.mongodb.org/linux/mongodb-linux-x86_64-ubuntu2004-4.4.23.tgz
 
+if [ "$SYS_NAME" -gt "2404" ];then
+	SYS_NAME="2404"
+fi
+
 if [ "$SYS_NAME" -lt "2004" ];then
 	SYS_NAME="2004"
 fi
@@ -42,7 +46,7 @@ if [ ! -d $MG_DIR/${FILE_NAME} ];then
 	cd $MG_DIR && tar -zxvf ${FILE_NAME_TGZ}
 fi
 
-if [ ! -d  $serverPath/mongodb/bin ];then
+if [ ! -f $serverPath/mongodb/bin/mongod ];then
 	mkdir -p $serverPath/mongodb
 	cd $MG_DIR/${FILE_NAME} && cp -rf ./bin $serverPath/mongodb
 fi
@@ -72,6 +76,7 @@ cd ${MG_DIR} && rm -rf ${MG_DIR}/${TOOL_FILE_NAME}
 # https://fastdl.mongodb.org/tools/db/mongodb-database-tools-ubuntu2204-x86_64-100.9.4.tgz
 #--------------- mongodb database install ------------------ #
 TOOL_VERSION=100.9.4
+SYS_NAME=2204
 TOOL_FILE_NAME=mongodb-database-tools-ubuntu${SYS_NAME}-x86_64-${TOOL_VERSION}
 if [ "aarch64" == ${SYS_ARCH} ];then
 	TOOL_FILE_NAME=mongodb-database-tools-ubuntu${SYS_NAME}-arm64-${TOOL_VERSION}

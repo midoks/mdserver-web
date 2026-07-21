@@ -55,17 +55,12 @@ def send_msg(bot, tag='ad', trigger_time=300):
     # 信号只在一个周期内执行一次|end
 
     # 实名认证/过人脸🕵️‍♀️各种账号处理✅ | 30/m| next,12/30 | @nngzs
-    # 18+资源采集| 4/m | next,7/14 | @liuxingyu123
     # 98影视采集| 21/m | next,11/21 | @liuxingyu123
 
     keyboard = [
         [
             types.InlineKeyboardButton(
                 text="高价收一切流量 @caifutong555", url='https://t.me/caifutong555')
-        ],
-        [
-            types.InlineKeyboardButton(
-                text="18+资源采集", url='https://ckzy1.com')
         ],
         [
             types.InlineKeyboardButton(
