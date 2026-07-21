@@ -3,7 +3,7 @@ PATH=/bin:/sbin:/usr/bin:/usr/sbin:/usr/local/bin:/usr/local/sbin:~/bin:/opt/hom
 export PATH
 
 # cd /Users/midoks/Desktop/mwdev/server/mdserver-web/plugins/caddy && bash install.sh install 1.21.4
-# cd /www/server/mdserver-web/plugins/caddy && bash install.sh install 1.21.4
+# cd /www/server/mdserver-web/plugins/caddy && bash install.sh install 2.11
 # cd /www/server/mdserver-web/plugins/caddy && bash install.sh install 1.29.2
 # cd /www/server/mdserver-web/plugins/caddy && bash install.sh upgrade 1.29.2
 
