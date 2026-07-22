@@ -3,6 +3,7 @@
 		<div class='plugin_version'></div>
 		<div class="bt-w-menu">
 			<p class="bgw" onclick="pluginService('ollama',$('.plugin_version').attr('version'));">服务</p>
+			<p onclick="ollama.ai_model_list();">模型列表</p>
 			<p onclick="pluginInitD('ollama',$('.plugin_version').attr('version'));">自启动</p>
 			<p onclick="ollama.readme();">说明</p>
 		</div>

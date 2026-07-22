@@ -208,6 +208,35 @@ class App:
         mw.execShell('systemctl disable '+self.getPluginName())
         return 'ok'
 
+    def get_ai_model_list(self):
+        cmd = 'ollama list'
+        data = mw.execShell(cmd)
+        result = []
+        
+        if data and data[0]:
+            lines = data[0].strip().split('\n')
+            for i, line in enumerate(lines):
+                if i < 2:
+                    continue
+                line = line.strip()
+                if not line:
+                    continue
+                parts = line.split()
+                if len(parts) >= 4:
+                    name = parts[0]
+                    model_id = parts[1]
+                    size = ' '.join(parts[2:-1])
+                    modified = parts[-1]
+                    result.append({
+                        'name': name,
+                        'id': model_id,
+                        'size': size,
+                        'modified': modified
+                    })
+        
+        import json
+        return json.dumps(result)
+
 
 
 if __name__ == "__main__":
