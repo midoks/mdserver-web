@@ -31,14 +31,6 @@ var ollama  = {
             }
 
             var ret_data = $.parseJSON(res.data);
-            console.log("send:",ret_data);
-            // if (!ret_data.status){
-            //     layer.msg(ret_data.msg,{icon:2,time:2000});
-            //     return;
-            // }
-
-            // console.log("send2:",ret_data);
-
             if(typeof(callback) == 'function'){
                 callback(ret_data);
             }
@@ -81,6 +73,36 @@ var ollama  = {
                 callback(res);
             }
         },'json');
+    },
+
+    ai_model_list:function(){
+        this.send({
+            "tips":"加载中...",
+            "method": 'get_ai_model_list',
+            "success": function(data){
+                var html = '<div class="divtable mtb15">';
+                html += '<table class="table table-hover">';
+                html += '<thead><tr><th>NAME</th><th>ID</th><th>SIZE</th><th>MODIFIED</th></tr></thead>';
+                html += '<tbody>';
+                
+                if (data && data.length > 0) {
+                    for (var i = 0; i < data.length; i++) {
+                        var item = data[i];
+                        html += '<tr>';
+                        html += '<td>' + (item.name || '') + '</td>';
+                        html += '<td>' + (item.id || '') + '</td>';
+                        html += '<td>' + (item.size || '') + '</td>';
+                        html += '<td>' + (item.modified || '') + '</td>';
+                        html += '</tr>';
+                    }
+                } else {
+                    html += '<tr><td colspan="4" class="text-center c7">暂无模型</td></tr>';
+                }
+                
+                html += '</tbody></table></div>';
+                $('.soft-man-con').html(html);
+            },
+        })
     },
 
     readme:function (){
