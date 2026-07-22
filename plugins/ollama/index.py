@@ -225,8 +225,8 @@ class App:
                 if len(parts) >= 4:
                     name = parts[0]
                     model_id = parts[1]
-                    size = ' '.join(parts[2:-1])
-                    modified = parts[-1]
+                    size = parts[2] + ' ' + parts[3]
+                    modified = ' '.join(parts[4:])
                     result.append({
                         'name': name,
                         'id': model_id,
