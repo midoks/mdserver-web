@@ -216,7 +216,7 @@ class App:
         if data and data[0]:
             lines = data[0].strip().split('\n')
             for i, line in enumerate(lines):
-                if i < 2:
+                if i < 1:
                     continue
                 line = line.strip()
                 if not line:

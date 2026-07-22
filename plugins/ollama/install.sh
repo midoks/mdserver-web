@@ -7,6 +7,8 @@ rootPath=$(dirname "$curPath")
 rootPath=$(dirname "$rootPath")
 serverPath=$(dirname "$rootPath")
 
+# cd /www/server/mdserver-web && source /www/server/mdserver-web/bin/activate && python3 /www/server/mdserver-web/plugins/ollama/index.py get_ai_model_list 1.0
+
 action=$1
 type=$2
 
