@@ -53,8 +53,8 @@ app.config["COMPRESS_MIN_SIZE"] = 500  # 最小压缩大小
 Compress(app)
 
 # 缓存配置
-cache = Cache(config={'CACHE_TYPE': 'simple'})
-cache.init_app(app, config={'CACHE_TYPE': 'simple'})
+cache = Cache(config={'CACHE_TYPE': 'SimpleCache'})
+cache.init_app(app, config={'CACHE_TYPE': 'SimpleCache'})
 
 # 静态文件配置
 app.static_folder = "../static"
