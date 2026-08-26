@@ -110,4 +110,7 @@ echo $DOWNLOAD_URL
 if [ -d /www/server/nezha ];then 
 	echo "$INSTALL_VERSION" > /www/server/nezha/version.pl
 fi
+
+# 删除下载
+rm -rf $DOWNLOAD_FILE
 echo "ok"
