@@ -140,6 +140,11 @@ function getDiskInfo() {
                     $("#messageError").append('<p><span class="glyphicon glyphicon-alert" style="color: #ff4040; margin-right: 10px;"></span> ' + lan.get('diskinfo_span_1', [rdata[i].path]) + '<a class="btlink" href="javascript:ClearSystem();">[清理垃圾]</a></p>');
                 } 
             }
+            disk_type = '';
+            if ( 'type' in  rdata[i]){
+                disk_type = '<sup>'+rdata[i]['type']+'</sup>';
+            }
+            // console.log(disk_type);
            
             dBody = '<li class="col-xs-6 col-sm-3 col-md-3 col-lg-2 mtb20 circle-box text-center diskbox">' +
                 '<h3 class="c5 f15">' + rdata[i].path + '</h3>' +
@@ -150,7 +155,7 @@ function getDiskInfo() {
                 '<div class="pie_right">' +
                 '<div class="right"></div>' +
                 '</div>'+ inodes +'</div>' +
-                '<h4 class="c5 f15">' + rdata[i].size[1] + '/' + rdata[i].size[0] + '</h4>' +
+                '<h4 class="c5 f15">' + rdata[i].size[1] + '/' + rdata[i].size[0] + disk_type +'</h4>' +
                 '</li>'
             $("#systemInfoList").append(dBody);
             setImg();
