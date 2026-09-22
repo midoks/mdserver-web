@@ -5209,3 +5209,13 @@ select[name="network-io"], select[name="disk-io"] {
 .bw-info ul li.bi-line {
   border-bottom: #ddd solid 1px;
 }
+
+h4 sup{
+    position: absolute;
+    top: 100px;
+    right: 87px;
+    font-size: 12px;
+    font-weight: 400;
+}
+
+

@@ -52,7 +52,9 @@ def getEnvInfo():
     if os.path.exists(sdir + '/openresty/nginx/sbin/nginx'):
         data['webserver'] = 'OpenResty'
     data['php'] = []
-    phpversions = ['52', '53', '54', '55', '56', '70', '71', '72', '73', '74', '80', '81', '82', '83', '84']
+    phpversions = ['52', '53', '54', '55', '56',
+        '70', '71', '72', '73', '74',
+        '80', '81', '82', '83', '84', '85']
     phpPath = sdir + '/php/'
     for pv in phpversions:
         if not os.path.exists(phpPath + pv + '/bin/php'):
@@ -68,6 +70,35 @@ def getEnvInfo():
     data['disk'] = diskInfo[2]
     return mw.returnData(True, 'ok', data)
 
+def getMacDiskType():
+    content = mw.execShell('diskutil info disk0 | grep "Solid State" | grep "Yes"')[0]
+    if content[0] != "":
+        return "SSD"
+    return 'HHD'
+
+def getDiskType(dev_path):
+    # 识别磁盘类型: hdd/ssd/ssd nvme
+    try:
+        if not dev_path.startswith('/dev/'):
+            return 'HDD'
+        name = dev_path.replace('/dev/', '')
+        # Linux: NVMe SSD
+        if name.startswith('nvme'):
+            return 'NVME'
+        # 去掉分区号得到基础设备名: vda1 -> vda; 已是基础名(dm-0/md0)则保留
+        base = name
+        if not os.path.exists('/sys/block/' + name):
+            base = re.sub(r'p?\d+$', '', name)
+        rotational_path = f"/sys/block/{base}/queue/rotational"
+        try:
+            with open(rotational_path, 'r') as f:
+                # 0 表示 SSD，1 表示 HDD
+                return "HDD" if f.read().strip() == '1' else "SSD"
+        except FileNotFoundError:
+            return "unknown"
+    except:
+        return 'unknown'
+
 def getDiskInfo():
     # 取磁盘分区信息
     temp = mw.execShell("df -h -P|grep '/'|grep -v tmpfs | grep -v devfs")[0]
@@ -78,6 +109,11 @@ def getDiskInfo():
     n = 0
     cuts = ['/mnt/cdrom', '/boot', '/boot/efi', '/dev',
             '/dev/shm', '/zroot', '/run/lock', '/run', '/run/shm', '/run/user']
+
+    current_os = mw.getOs()
+    tmp_disk_type = "none"
+    if current_os == 'darwin':
+        tmp_disk_type = getMacDiskType()
     for tmp in temp1:
         n += 1
         inodes = tempInodes1[n - 1].split()
@@ -97,9 +133,13 @@ def getDiskInfo():
         tmp1 = [disk[1], disk[2], disk[3], disk[4]]
         arr['size'] = tmp1
         arr['inodes'] = [inodes[1], inodes[2], inodes[3], inodes[4]]
+
+        if current_os == 'darwin':
+            arr['type'] = tmp_disk_type
+        else:
+            arr['type'] = getDiskType(disk[0])
         diskInfo.append(arr)
     return diskInfo
-
 
 def getLoadAverage():
     c = os.getloadavg()
