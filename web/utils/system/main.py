@@ -83,7 +83,11 @@ def getDiskType(dev_path):
         # Linux: NVMe SSD
         if name.startswith('nvme'):
             return 'ssd nvme'
-        rotational_path = f"/sys/block/{name}/queue/rotational"
+        # 去掉分区号得到基础设备名: vda1 -> vda; 已是基础名(dm-0/md0)则保留
+        base = name
+        if not os.path.exists('/sys/block/' + name):
+            base = re.sub(r'p?\d+$', '', name)
+        rotational_path = f"/sys/block/{base}/queue/rotational"
         try:
             with open(rotational_path, 'r') as f:
                 # 0 表示 SSD，1 表示 HDD
