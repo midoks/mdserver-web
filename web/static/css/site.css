@@ -5213,7 +5213,7 @@ select[name="network-io"], select[name="disk-io"] {
 h4 sup{
     position: absolute;
     top: 100px;
-    right: 87px;
+    right: 82px;
     font-size: 12px;
     font-weight: 400;
 }
