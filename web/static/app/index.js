@@ -142,7 +142,7 @@ function getDiskInfo() {
             }
             disk_type = '';
             if ( 'type' in  rdata[i]){
-                disk_type = '<sup>'+rdata[i]['type']+'</sup>';
+                disk_type = '<sup style="color: #20a53a;">'+rdata[i]['type']+'</sup>';
             }
             // console.log(disk_type);
            
