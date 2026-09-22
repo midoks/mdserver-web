@@ -52,7 +52,9 @@ def getEnvInfo():
     if os.path.exists(sdir + '/openresty/nginx/sbin/nginx'):
         data['webserver'] = 'OpenResty'
     data['php'] = []
-    phpversions = ['52', '53', '54', '55', '56', '70', '71', '72', '73', '74', '80', '81', '82', '83', '84']
+    phpversions = ['52', '53', '54', '55', '56',
+        '70', '71', '72', '73', '74',
+        '80', '81', '82', '83', '84', '85']
     phpPath = sdir + '/php/'
     for pv in phpversions:
         if not os.path.exists(phpPath + pv + '/bin/php'):
@@ -78,11 +80,11 @@ def getDiskType(dev_path):
     # 识别磁盘类型: hdd/ssd/ssd nvme
     try:
         if not dev_path.startswith('/dev/'):
-            return 'hdd'
+            return 'HDD'
         name = dev_path.replace('/dev/', '')
         # Linux: NVMe SSD
         if name.startswith('nvme'):
-            return 'ssd nvme'
+            return 'NVME'
         # 去掉分区号得到基础设备名: vda1 -> vda; 已是基础名(dm-0/md0)则保留
         base = name
         if not os.path.exists('/sys/block/' + name):
