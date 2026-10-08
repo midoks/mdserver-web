@@ -5210,12 +5210,19 @@ select[name="network-io"], select[name="disk-io"] {
   border-bottom: #ddd solid 1px;
 }
 
-h4 sup{
+/* 磁盘卡片作为定位基准,让磁盘类型标签相对卡片本身计算居中 */
+.diskbox {
+    position: relative;
+}
+
+.diskbox h4 sup {
     position: absolute;
+    /* h3 高30,标签落在圆环中心百分比数字下方(圆环 y: 30~130) */
     top: 100px;
-    right: 82px;
+    left: 50%;
+    /* 50% 中线再回退自身宽度的一半,任意文字宽度都水平居中 */
+    transform: translateX(-50%);
     font-size: 12px;
     font-weight: 400;
 }
-
 
