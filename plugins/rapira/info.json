@@ -1,0 +1,20 @@
+{
+	"sort": 7,
+	"ps": "PHP是世界上最好的编程语言",
+	"shell": "install.sh",
+	"name": "rapira",
+	"title": "Rapira",
+	"coexist": true,
+	"versions": ["84","85"],
+	"updates": ["8.4.2","8.5.0"],
+	"tip": "soft",
+	"install_pre_inspection":true,
+	"checks": "server/rapira/VERSION/bin/php",
+	"path": "server/rapira/VERSION",
+	"display": 1,
+	"author": "rapira",
+	"date": "2026-10-08",
+	"home": "https://rapira.rs",
+	"type": "PHP语言解释器",
+	"pid": "1"
+}
