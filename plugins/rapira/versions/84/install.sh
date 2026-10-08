@@ -16,29 +16,21 @@ Install_php()
 {
 #------------------------ install start ------------------------------------#
 echo "安装php-${version} ..."
-mkdir -p $sourcePath/php
-mkdir -p $serverPath/php
+mkdir -p $sourcePath/rapira
+mkdir -p $serverPath/rapira
 
-cd ${rootPath}/plugins/php/lib && /bin/bash freetype_new.sh
-cd ${rootPath}/plugins/php/lib && /bin/bash zlib.sh
 
-# redat ge 8
-which yum
-if [ "$?" = "0" ];then
-	cd ${rootPath}/plugins/php/lib && /bin/bash oniguruma.sh
-fi
+if [ ! -d $sourcePath/rapira/${PHP_VER} ];then
 
-if [ ! -d $sourcePath/rapira/php${PHP_VER} ];then
-
-	if [ ! -f $sourcePath/rapira/${rapira_version}.tar.gz ];then
-		wget --no-check-certificate -O $sourcePath/rapira/${rapira_version}.tar.xz https://github.com/rapira-rs/rapira/archive/refs/tags/v${rapira_version}.tar.gz
+	if [ ! -f $sourcePath/rapira/rapira-${rapira_version}.tar.gz ];then
+		wget --no-check-certificate -O $sourcePath/rapira/${rapira_version}.tar.gz https://github.com/rapira-rs/rapira/archive/refs/tags/v${rapira_version}.tar.gz
 	fi
 	
-	cd $sourcePath/rapira && tar -zxvf $sourcePath/rapira/${rapira_version}.tar.xz
-	mv $sourcePath/rapira/php-${version} $sourcePath/php/php${PHP_VER}
+	cd $sourcePath/rapira && tar -zxvf $sourcePath/rapira/rapira-${rapira_version}.tar.gz
+	mv $sourcePath/rapira/rapira-${rapira_version} $sourcePath/rapira/${PHP_VER}
 fi
 
-cd $sourcePath/php/php${PHP_VER}
+cd $sourcePath/rapira/${PHP_VER}
 
 OPTIONS='--without-iconv'
 
@@ -99,15 +91,15 @@ else
 	OPTIONS="$OPTIONS --with-openssl"
 fi
 
-echo "$sourcePath/php/php${PHP_VER}"
+echo "$sourcePath/rapira/${PHP_VER}"
 
-if [ ! -d $serverPath/php/${PHP_VER} ];then
-	cd $sourcePath/php/php${PHP_VER}
+if [ ! -d $serverPath/rapira/${PHP_VER} ];then
+	cd $sourcePath/rapira/${PHP_VER}
 	# ./buildconf --force
 	./configure \
-	--prefix=$serverPath/php/${PHP_VER} \
-	--exec-prefix=$serverPath/php/${PHP_VER} \
-	--with-config-file-path=$serverPath/php/${PHP_VER}/etc \
+	--prefix=$serverPath/rapira/${PHP_VER} \
+	--exec-prefix=$serverPath/rapira/${PHP_VER} \
+	--with-config-file-path=$serverPath/rapira/${PHP_VER}/etc \
 	--enable-mysqlnd \
 	--with-mysql=mysqlnd \
 	--with-mysqli=mysqlnd \

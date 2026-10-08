@@ -8,6 +8,9 @@ rootPath=$(dirname "$rootPath")
 serverPath=$(dirname "$rootPath")
 sysName=`uname`
 
+# cd /Users/midoks/Desktop/mwdev/server/mdserver-web && . /Users/midoks/Desktop/mwdev/server/mdserver-web/bin/activate && python3 /Users/midoks/Desktop/mwdev/server/mdserver-web/plugins/rapira/index.py install_pre_inspection 84
+# cd /Users/midoks/Desktop/mwdev/server/mdserver-web/plugins/rapira && bash install.sh install 84
+
 # cd /www/server/mdserver-web/plugins/rapira && bash install.sh install 73
 # cd /www/server/mdserver-web/plugins/rapira && bash install.sh install 84
 # https://www.php.net/releases
