@@ -9,9 +9,9 @@ serverPath=$(dirname "$rootPath")
 sourcePath=${serverPath}/source
 sysName=`uname`
 
-version=8.4.25
+rapira_version=0.9.1
+version=8.4
 PHP_VER=84
-md5_file_ok=dc1ad8b4109898d9db49744450403874858c23efc685b1032a50bd1e83906848
 Install_php()
 {
 #------------------------ install start ------------------------------------#
@@ -28,39 +28,14 @@ if [ "$?" = "0" ];then
 	cd ${rootPath}/plugins/php/lib && /bin/bash oniguruma.sh
 fi
 
-if [ ! -d $sourcePath/php/php${PHP_VER} ];then
+if [ ! -d $sourcePath/rapira/php${PHP_VER} ];then
 
-	# ----------------------------------------------------------------------- #
-	# 中国优化安装
-	cn=$(curl -fsSL -m 10 -s http://ipinfo.io/json | grep "\"country\": \"CN\"")
-	LOCAL_ADDR=common
-	if [ ! -z "$cn" ];then
-		LOCAL_ADDR=cn
-	fi
-
-	if [ "$LOCAL_ADDR" = "cn" ];then
-		if [ ! -f $sourcePath/php/php-${version}.tar.xz ];then
-			wget --no-check-certificate -O $sourcePath/php/php-${version}.tar.xz https://mirrors.nju.edu.cn/php/php-${version}.tar.xz
-		fi
-	fi
-	# ----------------------------------------------------------------------- #
-	
-
-	if [ ! -f $sourcePath/php/php-${version}.tar.xz ];then
-		wget --no-check-certificate -O $sourcePath/php/php-${version}.tar.xz https://www.php.net/distributions/php-${version}.tar.xz
-	fi
-
-	#检测文件是否损坏.
-	if [ -f $sourcePath/php/php-${version}.tar.xz ];then
-		md5_file=`sha256sum $sourcePath/php/php-${version}.tar.xz  | awk '{print $1}'`
-		if [ "${md5_file}" != "${md5_file_ok}" ]; then
-			echo "PHP${version} 下载文件不完整,重新安装"
-			rm -rf $sourcePath/php/php-${version}.tar.xz
-		fi
+	if [ ! -f $sourcePath/rapira/${rapira_version}.tar.gz ];then
+		wget --no-check-certificate -O $sourcePath/rapira/${rapira_version}.tar.xz https://github.com/rapira-rs/rapira/archive/refs/tags/v${rapira_version}.tar.gz
 	fi
 	
-	cd $sourcePath/php && tar -Jxf $sourcePath/php/php-${version}.tar.xz
-	mv $sourcePath/php/php-${version} $sourcePath/php/php${PHP_VER}
+	cd $sourcePath/rapira && tar -zxvf $sourcePath/rapira/${rapira_version}.tar.xz
+	mv $sourcePath/rapira/php-${version} $sourcePath/php/php${PHP_VER}
 fi
 
 cd $sourcePath/php/php${PHP_VER}

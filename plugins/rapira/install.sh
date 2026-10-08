@@ -8,8 +8,8 @@ rootPath=$(dirname "$rootPath")
 serverPath=$(dirname "$rootPath")
 sysName=`uname`
 
-# cd /www/server/mdserver-web/plugins/php && bash install.sh install 73
-# cd /www/server/mdserver-web/plugins/php && bash install.sh install 85
+# cd /www/server/mdserver-web/plugins/rapira && bash install.sh install 73
+# cd /www/server/mdserver-web/plugins/rapira && bash install.sh install 84
 # https://www.php.net/releases
 
 if id www &> /dev/null ;then 
@@ -25,27 +25,22 @@ action=$1
 type=$2
 
 if [ "${2}" = "" ];then
-	echo '缺少安装脚本...'
+	echo '缺少安装脚本.'
 	exit 0
 fi 
 
 if [ ! -d $curPath/versions/$2 ];then
-	echo '缺少安装脚本2...'
+	echo '缺少安装脚本..'
 	exit 0
 fi
 
-
-# if [ "${action}" = "install" ] && [ -d $serverPath/php/${type} ];then
-# 	exit 0
-# fi
-
 if [ "${action}" = "uninstall" ];then
 	
-	if [ -f /usr/lib/systemd/system/php${type}.service ] || [ -f /lib/systemd/system/php${type}.service ] ;then
-		systemctl stop php${type}
-		systemctl disable php${type}
-		rm -rf /usr/lib/systemd/system/php${type}.service
-		rm -rf /lib/systemd/system/php${type}.service
+	if [ -f /usr/lib/systemd/system/rapira${type}.service ] || [ -f /lib/systemd/system/rapira${type}.service ] ;then
+		systemctl stop rapira${type}
+		systemctl disable rapira${type}
+		rm -rf /usr/lib/systemd/system/rapira${type}.service
+		rm -rf /lib/systemd/system/rapira${type}.service
 		systemctl daemon-reload
 	fi
 fi
@@ -53,18 +48,11 @@ fi
 cd ${curPath} && sh -x $curPath/versions/$2/install.sh $1
 
 
-if [ "${action}" = "install" ] && [ -d ${serverPath}/php/${type} ];then
+if [ "${action}" = "install" ] && [ -d ${serverPath}/rapira/${type} ];then
 
 	#初始化 
-	cd ${rootPath} && python3 ${rootPath}/plugins/php/index.py start ${type}
-	cd ${rootPath} && python3 ${rootPath}/plugins/php/index.py initd_install ${type}
-
-	# 安装通用扩展
-	if [ ! -f /usr/local/bin/composer ] && [ "$sysName" != "Darwin" ] ;then
-		cd /tmp
-		curl -sS https://getcomposer.org/installer | /www/server/php/${type}/bin/php
-		mv composer.phar /usr/local/bin/composer
-	fi
+	cd ${rootPath} && python3 ${rootPath}/plugins/rapira/index.py start ${type}
+	cd ${rootPath} && python3 ${rootPath}/plugins/rapira/index.py initd_install ${type}
 fi
 
 
