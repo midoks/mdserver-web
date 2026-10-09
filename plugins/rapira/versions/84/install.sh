@@ -19,18 +19,42 @@ echo "安装php-${version} ..."
 mkdir -p $sourcePath/rapira
 mkdir -p $serverPath/rapira
 
+if [ ! -d $sourcePath/rapira/php${PHP_VER} ];then
+
+	# ----------------------------------------------------------------------- #
+	# 中国优化安装
+	cn=$(curl -fsSL -m 10 -s http://ipinfo.io/json | grep "\"country\": \"CN\"")
+	LOCAL_ADDR=common
+	if [ ! -z "$cn" ];then
+		LOCAL_ADDR=cn
+	fi
+
+	if [ "$LOCAL_ADDR" = "cn" ];then
+		if [ ! -f $sourcePath/rapira/php-${version}.tar.xz ];then
+			wget --no-check-certificate -O $sourcePath/php/php-${version}.tar.xz https://mirrors.nju.edu.cn/php/php-${version}.tar.xz
+		fi
+	fi
+	# ----------------------------------------------------------------------- #
+	
+
+	if [ ! -f $sourcePath/rapira/php-${version}.tar.xz ];then
+		wget --no-check-certificate -O $sourcePath/rapira/php-${version}.tar.xz https://www.php.net/distributions/php-${version}.tar.xz
+	fi
+
+	#检测文件是否损坏.
+	if [ -f $sourcePath/rapira/php-${version}.tar.xz ];then
+		md5_file=`sha256sum $sourcePath/rapira/php-${version}.tar.xz  | awk '{print $1}'`
+		if [ "${md5_file}" != "${md5_file_ok}" ]; then
+			echo "PHP${version} 下载文件不完整,重新安装"
+			rm -rf $sourcePath/rapira/php-${version}.tar.xz
+		fi
+	fi
+	
+	cd $sourcePath/rapira && tar -Jxf $sourcePath/rapira/php-${version}.tar.xz
+	mv $sourcePath/rapira/php-${version} $sourcePath/rapira/php${PHP_VER}
+fi
 
 if [ ! -d $sourcePath/rapira/rapira-${rapira_version} ];then
-
-	if [ ! -f $sourcePath/php/php-${version}.tar.xz ]; then
-		wget --no-check-certificate -O $sourcePath/php/php-${version}.tar.xz https://www.php.net/distributions/php-${version}.tar.xz
-	fi
-
-	if [ ! -f  $sourcePath/rapira/php${PHP_VER} ]; then
-		cd $sourcePath/rapira && tar -Jxf $sourcePath/rapira/php-${version}.tar.xz
-		mv $sourcePath/rapira/php-${version} $sourcePath/rapira/php${PHP_VER}
-	fi
-
 	if [ ! -f $sourcePath/rapira/rapira-${rapira_version}.tar.gz ];then
 		wget --no-check-certificate -O $sourcePath/rapira/rapira-${rapira_version}.tar.gz https://github.com/rapira-rs/rapira/archive/refs/tags/v${rapira_version}.tar.gz
 	fi
