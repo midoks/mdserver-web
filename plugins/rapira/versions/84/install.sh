@@ -10,8 +10,9 @@ sourcePath=${serverPath}/source
 sysName=`uname`
 
 rapira_version=0.9.1
-version=8.4
+version=8.4.26
 PHP_VER=84
+md5_file_ok=32a2de53862ad44ed4a5005244ce4f1b50c271e74dced215449a4443b40569f1
 Install_php()
 {
 #------------------------ install start ------------------------------------#
@@ -31,7 +32,7 @@ if [ ! -d $sourcePath/rapira/php${PHP_VER} ];then
 
 	if [ "$LOCAL_ADDR" = "cn" ];then
 		if [ ! -f $sourcePath/rapira/php-${version}.tar.xz ];then
-			wget --no-check-certificate -O $sourcePath/php/php-${version}.tar.xz https://mirrors.nju.edu.cn/php/php-${version}.tar.xz
+			wget --no-check-certificate -O $sourcePath/rapira/php-${version}.tar.xz https://mirrors.nju.edu.cn/php/php-${version}.tar.xz
 		fi
 	fi
 	# ----------------------------------------------------------------------- #
@@ -61,8 +62,6 @@ if [ ! -d $sourcePath/rapira/rapira-${rapira_version} ];then
 	
 	cd $sourcePath/rapira && tar -zxvf $sourcePath/rapira/rapira-${rapira_version}.tar.gz
 fi
-
-cd $sourcePath/rapira/${PHP_VER}
 
 OPTIONS='--without-iconv'
 
@@ -125,42 +124,23 @@ fi
 
 echo "$sourcePath/rapira/${PHP_VER}"
 
-if [ ! -d $serverPath/rapira/${PHP_VER} ];then
-	cd $sourcePath/rapira/${PHP_VER}
-	# ./buildconf --force
-	./configure \
-	--prefix=$serverPath/rapira/${PHP_VER} \
-	--exec-prefix=$serverPath/rapira/${PHP_VER} \
-	--with-config-file-path=$serverPath/rapira/${PHP_VER}/etc \
-	--enable-mysqlnd \
-	--with-mysql=mysqlnd \
-	--with-mysqli=mysqlnd \
-	--with-pdo-mysql=mysqlnd \
-	--with-mysqlnd-ssl \
-	--enable-mbstring \
-	--enable-ftp \
-	--enable-sockets \
-	--enable-simplexml \
-	--enable-soap \
-	--enable-posix \
-	--enable-sysvmsg \
-	--enable-sysvsem \
-	--enable-sysvshm \
-	--disable-intl \
-	--disable-fileinfo \
-	$OPTIONS \
-	--enable-fpm
-	make clean && make -j${cpuCore} && make install && make clean
+echo "set PHP_SRC=$sourcePath/rapira/php${PHP_VER}"
+set PHP_SRC=$sourcePath/rapira/php${PHP_VER}
 
-	# rm -rf $sourcePath/php/php${PHP_VER}
+# make php PHP_SRC=/www/server/source/rapira/php84
+if [ ! -d $serverPath/rapira/${rapira_version} ];then
+	cd $sourcePath/rapira/rapira-${rapira_version}
+	make php PHP_SRC=/www/server/source/rapira/php84 PHP_PREFIX="${serverPath}/rapira/${PHP_VER}"
+
+	# rm -rf $sourcePath/rapira/php${PHP_VER}
 fi 
 #------------------------ install end ------------------------------------#
 }
 
 Uninstall_php()
 {
-	$serverPath/php/init.d/php${PHP_VER} stop
-	rm -rf $serverPath/php/${PHP_VER}
+	# $serverPath/php/init.d/php${PHP_VER} stop
+	# rm -rf $serverPath/php/${PHP_VER}
 	echo "卸载php-${version}..."
 }
 
