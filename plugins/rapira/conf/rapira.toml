@@ -1,0 +1,79 @@
+# Example rapira.toml. Every key except http.pool.entrypoint is optional.
+# Commented keys show defaults or example values. Run it with: rapira serve examples/rapira.toml
+
+[http]
+listen = "127.0.0.1:8000"    # host:port, ":port" (all interfaces), or "unix:/path"
+# server_name = "localhost"
+# server_port = 8000         # what PHP sees as SERVER_PORT; defaults to the listen port
+# max_body_size_mb = 8       # larger request bodies answer 413
+# write_timeout_secs = 30    # closes the connection when a response write stalls this long
+# keepalive_timeout_secs = 60 # closes a keepalive connection idle past the limit; also caps one head or body-frame read
+# unsafe_field_names = "drop" # or "reject": 400 for header names aliasing a CGI variable
+# middleware = ["static"]    # applied in list order; each configured middleware must be listed
+
+# Multipart limits of the http plugin - dispatcher mode only (classic/worker parse in PHP,
+# where php.ini owns the limits); an explicit table under another mode refuses to boot.
+# [http.uploads]
+# dir = "/tmp"               # spool root for file parts; defaults to the system temp dir
+# max_file_size_mb = 2
+# max_files = 20
+
+# [http.sendfile]
+# root = "public"            # sendFile() containment; defaults to the entrypoint's directory
+
+# Serve files from a directory before PHP. A miss falls through to PHP. Dotfiles always fall through to PHP.
+# Requires "static" in http.middleware.
+# The server holds served files in memory. Each worker keeps up to 16MiB and stores no file
+# above 256KiB. The cost is therefore 16MiB for each process in http.pool.processes. An entry stays
+# fresh for one second, so a rewritten file reaches the client after that time.
+# [http.static]
+# root = "public"            # required; the directory must exist; relative paths resolve against this file's directory
+# forbid = [".php"]          # file-name suffixes the server never serves; an explicit list replaces this default
+
+# The worker pool behind the http listener. Each plugin owns its pool under [<plugin>.pool].
+[http.pool]
+entrypoint = "dispatcher-sync.php" # relative paths resolve against this file's directory
+mode = "dispatcher"           # "classic" | "worker" | "dispatcher" (the default)
+processes = 16                # a fixed worker count; defaults to the CPU count
+# max_requests = 0            # recycle a worker after ~N requests (jittered); 0 = unlimited
+# request_terminate_timeout_secs = 0  # kill + replace a worker whose request runs longer; 0 = off
+
+# The gRPC listener: unary calls over gRPC, gRPC-Web and Connect (crates/plugins/grpc/README.md).
+# With a [grpc] table, grpc.descriptor_set and grpc.pool.entrypoint are required.
+# [grpc]
+# listen = "127.0.0.1:50051"   # host:port, ":port" (all interfaces), or "unix:/path"
+# descriptor_set = "api.binpb" # relative to this file's directory; build it with its imports: buf build --as-file-descriptor-set -o api.binpb
+# services = ["billing.v1.InvoiceService"] # serve only these (fully qualified, each in descriptor_set); unset = the services of the files that no other file imports
+# reflection = false           # serve grpc.reflection.v1 and v1alpha
+# default_timeout_secs = 30    # deadline of a call without a client timeout; unset (the default) = no deadline
+# max_timeout_secs = 60        # upper limit for a client timeout; unset (the default) = no limit
+# keepalive_interval_secs = 10 # sends an HTTP/2 PING after this long without a request, request data or a PING answer
+# keepalive_timeout_secs = 10  # closes the connection when the PING has no answer within this time
+# interceptors = ["auth"]      # applied in list order; each listed interceptor needs its table
+
+# The worker pool behind the grpc listener. It takes the keys of [http.pool].
+# [grpc.pool]
+# entrypoint = "grpc.php"      # relative paths resolve against this file's directory
+# mode = "dispatcher"          # the only mode for a grpc pool
+# processes = 16               # defaults to the CPU count
+
+# The bearer-token check. Requires "auth" in grpc.interceptors. grpc.health.v1.Health needs no token.
+# [grpc.auth]
+# tokens_file = "grpc-tokens"  # relative to this file's directory; one token per line
+
+# The observability process: a process without PHP that serves GET /metrics and the livez and readyz probes from the worker scoreboard.
+# [observability]
+# listen = "127.0.0.1:9180"    # required; host:port, ":port" (all interfaces), or "unix:/path"
+# keepalive_timeout_secs = 60 # optional; closes a keep-alive connection idle past the limit
+# [observability.metrics]    # GET /metrics
+# [observability.probes]     # GET /livez, GET /readyz
+
+# [supervisor]
+# pidfile = "rapira.pid"      # relative to this file's directory
+# process_control_timeout_secs = 30   # graceful-stop budget before QUIT -> TERM -> KILL
+
+[log]
+# level = "error"             # error | warn | info | debug | trace
+# format = "plain"            # or "json"
+# [log.targets]               # per-target overrides; RUST_LOG replaces the whole filter
+# php = "warn"                # surfaces PHP diagnostics even under a quieter level

@@ -222,34 +222,6 @@ def phpPrependFile(version):
         mw.writeFile(app_start, content)
 
 
-def phpFpmReplace(version):
-    desc_php_fpm = getServerDir() + '/' + version + '/etc/php-fpm.conf'
-    if not os.path.exists(desc_php_fpm):
-        tpl_php_fpm = getPluginDir() + '/conf/php-fpm.conf'
-        content = mw.readFile(tpl_php_fpm)
-        content = contentReplace(content, version)
-        mw.writeFile(desc_php_fpm, content)
-    else:
-        if version == '52':
-            tpl_php_fpm = tpl_php_fpm = getPluginDir() + '/conf/php-fpm-52.conf'
-            content = mw.readFile(tpl_php_fpm)
-            mw.writeFile(desc_php_fpm, content)
-
-
-
-def phpFpmPoolReplace(version, pool = 'www'):
-    service_php_fpm_dir = getServerDir() + '/' + version + '/etc/php-fpm.d/'
-
-    if not os.path.exists(service_php_fpm_dir):
-        os.mkdir(service_php_fpm_dir)
-
-    service_php_fpmwww = service_php_fpm_dir + '/'+pool+'.conf'
-    if not os.path.exists(service_php_fpmwww):
-        tpl_php_fpmwww = getPluginDir() + '/conf/'+pool+'.conf'
-        content = mw.readFile(tpl_php_fpmwww)
-        content = contentReplace(content, version)
-        mw.writeFile(service_php_fpmwww, content)
-
 
 def makePhpIni(version):
     dst_ini = getConf(version)
@@ -275,20 +247,12 @@ def initReplace(version):
     file_bin = initD_path + '/php' + version
     if not os.path.exists(file_bin):
         file_tpl = getPluginDir() + '/init.d/php.tpl'
-
-        if version == '52':
-            file_tpl = getPluginDir() + '/init.d/php52.tpl'
-
         content = mw.readFile(file_tpl)
         content = contentReplace(content, version)
 
         mw.writeFile(file_bin, content)
         mw.execShell('chmod +x ' + file_bin)
 
-    phpPrependFile(version)
-    phpFpmPoolReplace(version, 'www')
-    phpFpmPoolReplace(version, 'backup')
-    phpFpmReplace(version)
 
     session_path = getServerDir() + '/tmp/session'
     if not os.path.exists(session_path):
@@ -302,12 +266,9 @@ def initReplace(version):
 
     # systemd
     systemDir = mw.systemdCfgDir()
-    systemService = systemDir + '/php' + version + '.service'
-
+    systemService = systemDir + '/rapira' + version + '.service'
     if os.path.exists(systemDir) and not os.path.exists(systemService):
-        systemServiceTpl = getPluginDir() + '/init.d/php.service.tpl'
-        if version == '52':
-            systemServiceTpl = getPluginDir() + '/init.d/php.service.52.tpl'
+        systemServiceTpl = getPluginDir() + '/init.d/rapira.service.tpl'
         service_path = mw.getServerDir()
         se_content = mw.readFile(systemServiceTpl)
         se_content = se_content.replace('{$VERSION}', version)
@@ -344,8 +305,6 @@ def phpOp(version, method):
 
 
 def start(version):
-    cmd = 'export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/www/server/lib/icu/lib:/usr/lib/x86_64-linux-gnu/:/opt/homebrew/lib'
-    mw.execShell(cmd)
     return phpOp(version, 'start')
 
 
