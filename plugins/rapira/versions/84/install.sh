@@ -20,14 +20,22 @@ mkdir -p $sourcePath/rapira
 mkdir -p $serverPath/rapira
 
 
-if [ ! -d $sourcePath/rapira/${PHP_VER} ];then
+if [ ! -d $sourcePath/rapira/rapira-${rapira_version} ];then
+
+	if [ ! -f $sourcePath/php/php-${version}.tar.xz ]; then
+		wget --no-check-certificate -O $sourcePath/php/php-${version}.tar.xz https://www.php.net/distributions/php-${version}.tar.xz
+	fi
+
+	if [ ! -f  $sourcePath/rapira/php${PHP_VER} ]; then
+		cd $sourcePath/rapira && tar -Jxf $sourcePath/rapira/php-${version}.tar.xz
+		mv $sourcePath/rapira/php-${version} $sourcePath/rapira/php${PHP_VER}
+	fi
 
 	if [ ! -f $sourcePath/rapira/rapira-${rapira_version}.tar.gz ];then
 		wget --no-check-certificate -O $sourcePath/rapira/rapira-${rapira_version}.tar.gz https://github.com/rapira-rs/rapira/archive/refs/tags/v${rapira_version}.tar.gz
 	fi
 	
 	cd $sourcePath/rapira && tar -zxvf $sourcePath/rapira/rapira-${rapira_version}.tar.gz
-	mv $sourcePath/rapira/rapira-${rapira_version} $sourcePath/rapira/${PHP_VER}
 fi
 
 cd $sourcePath/rapira/${PHP_VER}
