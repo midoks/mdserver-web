@@ -36,7 +36,6 @@ mkdir -p $serverPath/rapira
 
 if [ ! -d $sourcePath/rapira/rapira-${rapira_version} ];then
 	if [ ! -f $sourcePath/rapira/rapira-${rapira_version}.tar.gz ];then
-		
 		wget --no-check-certificate -O $sourcePath/rapira/rapira-${rapira_version}.tar.gz https://github.com/rapira-rs/rapira/releases/download/v${rapira_version}/rapira-v${rapira_version}-php${version_min}-${sys_name}-${sys_arch}.tar.gz
 	fi
 	
