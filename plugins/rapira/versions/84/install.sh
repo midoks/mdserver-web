@@ -23,7 +23,7 @@ mkdir -p $serverPath/rapira
 if [ ! -d $sourcePath/rapira/${PHP_VER} ];then
 
 	if [ ! -f $sourcePath/rapira/rapira-${rapira_version}.tar.gz ];then
-		wget --no-check-certificate -O $sourcePath/rapira/${rapira_version}.tar.gz https://github.com/rapira-rs/rapira/archive/refs/tags/v${rapira_version}.tar.gz
+		wget --no-check-certificate -O $sourcePath/rapira/rapira-${rapira_version}.tar.gz https://github.com/rapira-rs/rapira/archive/refs/tags/v${rapira_version}.tar.gz
 	fi
 	
 	cd $sourcePath/rapira && tar -zxvf $sourcePath/rapira/rapira-${rapira_version}.tar.gz
