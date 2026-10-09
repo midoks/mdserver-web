@@ -33,13 +33,19 @@ mkdir -p $sourcePath/rapira
 mkdir -p $serverPath/rapira
 
 
-
+repira_name=rapira-v${rapira_version}-php${version_min}-${sys_name}-${sys_arch}
 if [ ! -d $sourcePath/rapira/rapira-${rapira_version} ];then
 	if [ ! -f $sourcePath/rapira/rapira-${rapira_version}.tar.gz ];then
-		wget --no-check-certificate -O $sourcePath/rapira/rapira-${rapira_version}.tar.gz https://github.com/rapira-rs/rapira/releases/download/v${rapira_version}/rapira-v${rapira_version}-php${version_min}-${sys_name}-${sys_arch}.tar.gz
+		wget --no-check-certificate -O $sourcePath/rapira/rapira-${rapira_version}.tar.gz https://github.com/rapira-rs/rapira/releases/download/v${rapira_version}/${repira_name}.tar.gz
 	fi
 	
-	cd $sourcePath/rapira && tar -zxvf $sourcePath/rapira/rapira-${rapira_version}.tar.gz
+	if [ ! -d $sourcePath/rapira/${repira_name} ];then
+		cd $sourcePath/rapira && tar -zxvf $sourcePath/rapira/rapira-${rapira_version}.tar.gz
+	fi
+
+	if [ ! -d ${serverPath}/rapira/${PHP_VER} ]; then
+		cd $sourcePath/rapira && mv $sourcePath/rapira/$repira_name/ ${serverPath}/rapira/${PHP_VER}
+	fi
 fi
 
 #------------------------ install end ------------------------------------#
@@ -48,7 +54,7 @@ fi
 Uninstall_php()
 {
 	# $serverPath/php/init.d/php${PHP_VER} stop
-	# rm -rf $serverPath/php/${PHP_VER}
+	rm -rf ${serverPath}/rapira/${PHP_VER}
 	echo "卸载php-${version}..."
 }
 
