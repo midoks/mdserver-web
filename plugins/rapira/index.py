@@ -108,13 +108,13 @@ def status(version):
     '''
     sock文件判断是否启动
     '''
-    sock = getPhpSocket(version)
-    if sock.find(':')>-1:
-        return status_progress(version)
+    # sock = getPhpSocket(version)
+    # if sock.find(':')>-1:
+    #     return status_progress(version)
 
-    if not os.path.exists(sock):
-        return 'stop'
-    return 'start'
+    # if not os.path.exists(sock):
+    #     return 'stop'
+    return 'stop'
 
 
 def contentReplace(content, version):
@@ -237,22 +237,25 @@ def makePhpIni(version):
 
 
 def initReplace(version):
-    makeOpenrestyConf()
-    makePhpIni(version)
-
     initD_path = getServerDir() + '/init.d'
-    if not os.path.exists(initD_path):
-        os.mkdir(initD_path)
+    # if not os.path.exists(initD_path):
+    #     os.mkdir(initD_path)
 
-    file_bin = initD_path + '/php' + version
-    if not os.path.exists(file_bin):
-        file_tpl = getPluginDir() + '/init.d/php.tpl'
-        content = mw.readFile(file_tpl)
-        content = contentReplace(content, version)
+    file_bin = initD_path + '/rapira' + version
+    # if not os.path.exists(file_bin):
+    #     file_tpl = getPluginDir() + '/init.d/php.tpl'
+    #     content = mw.readFile(file_tpl)
+    #     content = contentReplace(content, version)
 
-        mw.writeFile(file_bin, content)
-        mw.execShell('chmod +x ' + file_bin)
+    #     mw.writeFile(file_bin, content)
+    #     mw.execShell('chmod +x ' + file_bin)
 
+    toml_file_tpl = getPluginDir()+"/conf/rapira.toml"
+    toml_file = getServerDir()+"/"+version+"/rapira.toml"
+
+    if not os.path.exists(toml_file):
+        content = mw.readFile(toml_file_tpl)
+        mw.writeFile(toml_file,content)
 
     session_path = getServerDir() + '/tmp/session'
     if not os.path.exists(session_path):
@@ -290,7 +293,7 @@ def phpOp(version, method):
         return data[1]
 
     if current_os.startswith("freebsd"):
-        data = mw.execShell('service php' + version + ' ' + method)
+        data = mw.execShell('service rapira' + version + ' ' + method)
         if data[1] == '':
             return 'ok'
         return data[1]
@@ -298,7 +301,7 @@ def phpOp(version, method):
     if method == 'stop' or method == 'restart':
         mw.execShell(file + ' ' + 'stop')
 
-    data = mw.execShell('systemctl ' + method + ' php' + version)
+    data = mw.execShell('systemctl ' + method + ' rapira' + version)
     if data[1] == '':
         return 'ok'
     return data[1]
@@ -310,12 +313,6 @@ def start(version):
 
 def stop(version):
     status = phpOp(version, 'stop')
-
-    if version == '52':
-        file = initReplace(version)
-        data = mw.execShell(file + ' ' + 'stop')
-        if data[1] == '':
-            return 'ok'
     return status
 
 
@@ -324,8 +321,6 @@ def restart(version):
 
 
 def reload(version):
-    if version == '52':
-        return phpOp(version, 'restart')
     return phpOp(version, 'reload')
 
 
@@ -339,7 +334,7 @@ def initdStatus(version):
         if os.path.exists(initd_bin):
             return 'ok'
 
-    shell_cmd = 'systemctl status php' + version + ' | grep loaded | grep "enabled;"'
+    shell_cmd = 'systemctl status rapira' + version + ' | grep loaded | grep "enabled;"'
     data = mw.execShell(shell_cmd)
     if data[0] == '':
         return 'fail'
@@ -359,7 +354,7 @@ def initdInstall(version):
         mw.execShell('chmod +x ' + initd_bin)
         return 'ok'
 
-    mw.execShell('systemctl enable php' + version)
+    mw.execShell('systemctl enable rapira' + version)
     return 'ok'
 
 
@@ -373,7 +368,7 @@ def initdUinstall(version):
         os.remove(initd_bin)
         return 'ok'
 
-    mw.execShell('systemctl disable php' + version)
+    mw.execShell('systemctl disable rapira' + version)
     return 'ok'
 
 

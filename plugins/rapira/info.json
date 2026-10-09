@@ -5,7 +5,7 @@
 	"name": "rapira",
 	"title": "Rapira",
 	"coexist": true,
-	"versions": ["84","85"],
+	"versions": ["84"],
 	"updates": ["8.4.2","8.5.0"],
 	"tip": "soft",
 	"install_pre_inspection":true,
