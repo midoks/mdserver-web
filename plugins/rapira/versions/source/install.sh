@@ -146,12 +146,18 @@ fi
 #install rapira
 # cd /www/server/source/rapira/rapira-0.9.1
 # export PHP_CONFIG=/www/server/rapira/84/link/bin/php-config
+rapira_bindir=${serverPath}/rapira/${PHP_VER}/bin
+rapira_srcdir=$sourcePath/rapira/rapira-${rapira_version}
+mkdir -p $rapira_bindir
 if [ ! -f ${serverPath}/rapira/${PHP_VER}/bin/rapira ];then
-	cd $sourcePath/rapira/rapira-${rapira_version}
+	cd $rapira_srcdir
 	export PHP_CONFIG=${serverPath}/rapira/${PHP_VER}/link/php/php-config
 	# cargo build --release
 	# cargo +1.98.1 build --release
 	cargo +1.98.1 build --release --locked --bin rapira
+	if [ "$?" == "0" ] && [ ! -f $rapira_srcdir/rapira ] ;then
+
+	fi
 fi
 
 #------------------------ install end ------------------------------------#
