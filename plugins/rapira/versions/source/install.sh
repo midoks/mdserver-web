@@ -126,18 +126,34 @@ echo "$sourcePath/rapira/${PHP_VER}"
 
 set PHP_SRC=$sourcePath/rapira/php${PHP_VER}
 # make php PHP_SRC=/www/server/source/rapira/php84 PHP_PREFIX="/www/server/rapira/84/link"
-if [ ! -d $serverPath/rapira/${rapira_version} ];then
-	# cd $sourcePath/rapira/rapira-${rapira_version}
+
+#install php
+# cd /www/server/rapira/84/link/bin/php-config
+if [ ! -d ${serverPath}/rapira/${PHP_VER}/link ];then
+	
 	cd $sourcePath/rapira/php${PHP_VER}
 	PHP_PREFIX="${serverPath}/rapira/${PHP_VER}/link"
 	./buildconf --force
 	./configure --prefix="${PHP_PREFIX}" \
+		--enable-embed \
 	    --enable-igbinary \
-	     --enable-redis --enable-redis-igbinary $EXTRA
+	    --enable-redis \
+	    --enable-redis-igbinary $EXTRA
 	make -j"$(getconf _NPROCESSORS_ONLN)"
 	make install
-	# rm -rf $sourcePath/rapira/php${PHP_VER}
-fi 
+fi
+
+#install rapira
+# cd /www/server/source/rapira/rapira-0.9.1
+# export PHP_CONFIG=/www/server/rapira/84/link/bin/php-config
+if [ ! -f ${serverPath}/rapira/${PHP_VER}/bin/rapira ];then
+	cd $sourcePath/rapira/rapira-${rapira_version}
+	export PHP_CONFIG=${serverPath}/rapira/${PHP_VER}/link/php/php-config
+	# cargo build --release
+	# cargo +1.98.1 build --release
+	cargo +1.98.1 build --release --locked --bin rapira
+fi
+
 #------------------------ install end ------------------------------------#
 }
 
