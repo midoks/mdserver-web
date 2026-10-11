@@ -72,7 +72,7 @@ def checkArgs(data, ck=[]):
 
 
 def getConf(version):
-    path = getServerDir() + '/' + version + '/etc/php.ini'
+    path = getServerDir() + '/' + version + '/rapira.toml'
     return path
 
 
