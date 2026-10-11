@@ -127,8 +127,8 @@ echo "$sourcePath/rapira/${PHP_VER}"
 set PHP_SRC=$sourcePath/rapira/php${PHP_VER}
 # make php PHP_SRC=/www/server/source/rapira/php84 PHP_PREFIX="/www/server/rapira/84/link"
 if [ ! -d $serverPath/rapira/${rapira_version} ];then
-	cd $sourcePath/rapira/rapira-${rapira_version}
-
+	# cd $sourcePath/rapira/rapira-${rapira_version}
+	cd $sourcePath/rapira/php${PHP_VER}
 	PHP_PREFIX="${serverPath}/rapira/${PHP_VER}/link"
 	./buildconf --force
 	./configure --prefix="${PHP_PREFIX}" \
