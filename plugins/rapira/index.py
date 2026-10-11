@@ -155,8 +155,7 @@ def contentReplace(content, version):
 
 
 def makeOpenrestyConf():
-    phpversions = ['00', '52', '53', '54', '55', '56',
-                   '70', '71', '72', '73', '74', '80', '81', '82', '83','84','85']
+    phpversions = ['84','85']
 
     sdir = mw.getServerDir()
 
@@ -253,10 +252,16 @@ def initReplace(version):
 
     toml_file_tpl = getPluginDir()+"/conf/rapira.toml"
     toml_file = getServerDir()+"/"+version+"/rapira.toml"
-
     if not os.path.exists(toml_file):
         content = mw.readFile(toml_file_tpl)
         mw.writeFile(toml_file,content)
+
+    # 模版例子
+    exp_ds_file_tpl = getPluginDir()+"/exp/dispatcher-sync.php"
+    exp_ds_file = getServerDir()+"/"+version+"/dispatcher-sync.php"
+    if not os.path.exists(exp_ds_file):
+        content = mw.readFile(exp_ds_file_tpl)
+        mw.writeFile(exp_ds_file,exp_ds_file_tpl)
 
     session_path = getServerDir() + '/tmp/session'
     if not os.path.exists(session_path):
