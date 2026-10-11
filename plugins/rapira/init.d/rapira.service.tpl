@@ -4,7 +4,7 @@
 # systemctl daemon-reload
 
 [Unit]
-Description=The PHP {$VERSION} FastCGI Process Manager
+Description=Rapira PHP {$VERSION} application server
 After=network.target
 
 [Service]
