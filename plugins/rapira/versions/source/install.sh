@@ -154,7 +154,7 @@ if [ ! -f ${serverPath}/rapira/${PHP_VER}/bin/rapira ];then
 	export PHP_CONFIG=${serverPath}/rapira/${PHP_VER}/link/bin/php-config
 	# cargo build --release
 	# cargo +1.98.1 build --release
-	cargo +1.98.1 build --release --locked --bin rapira
+	/root/.cargo/bin/cargo +1.98.1 build --release --locked --bin rapira
 	if [ "$?" == "0" ] && [ ! -f $rapira_srcdir//target/release/rapira ] ;then
 		mv $rapira_srcdir/target/release/rapira $rapira_bindir
 	fi
