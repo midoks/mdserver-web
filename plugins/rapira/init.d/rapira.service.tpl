@@ -8,6 +8,7 @@ Description=The PHP {$VERSION} FastCGI Process Manager
 After=network.target
 
 [Service]
+Environment="LD_LIBRARY_PATH=$LD_LIBRARY_PATH:{$SERVER_PATH}/rapira/{$VERSION}/link/lib"
 ExecStart={$SERVER_PATH}/rapira/{$VERSION}/bin/rapira serve {$SERVER_PATH}/rapira/{$VERSION}/rapira.toml
 ExecReload=/bin/kill -USR2 $MAINPID
 PrivateTmp=false
