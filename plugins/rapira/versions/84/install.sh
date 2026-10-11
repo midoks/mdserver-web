@@ -48,6 +48,8 @@ if [ ! -d $sourcePath/rapira/rapira-${rapira_version} ];then
 	fi
 fi
 
+# export LD_LIBRARY_PATH=/www/server/rapira/84/link/lib
+
 #------------------------ install end ------------------------------------#
 }
 
