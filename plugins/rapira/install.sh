@@ -16,6 +16,8 @@ sysName=`uname`
 # cd /www/server/mdserver-web/plugins/rapira && bash install.sh install source
 # https://www.php.net/releases
 
+# journalctl -u rapira84 -f
+
 if id www &> /dev/null ;then 
     echo "www uid is `id -u www`"
     echo "www shell is `grep "^www:" /etc/passwd |cut -d':' -f7 `"
