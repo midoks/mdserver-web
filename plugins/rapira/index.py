@@ -114,7 +114,8 @@ def status(version):
 
     # if not os.path.exists(sock):
     #     return 'stop'
-    return 'stop'
+    return status_progress(version)
+    # return 'stop'
 
 
 def contentReplace(content, version):
