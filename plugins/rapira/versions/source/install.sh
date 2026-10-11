@@ -155,7 +155,7 @@ if [ ! -f ${serverPath}/rapira/${PHP_VER}/bin/rapira ];then
 	# cargo build --release
 	# cargo +1.98.1 build --release
 	/root/.cargo/bin/cargo +1.98.1 build --release --locked --bin rapira
-	if [ "$?" == "0" ] && [ ! -f $rapira_srcdir/target/release/rapira ] ;then
+	if [ "$?" == "0" ] && [ -f $rapira_srcdir/target/release/rapira ] ;then
 		mv $rapira_srcdir/target/release/rapira $rapira_bindir
 	fi
 fi
