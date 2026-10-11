@@ -13,6 +13,7 @@ sysName=`uname`
 
 # cd /www/server/mdserver-web/plugins/rapira && bash install.sh install 73
 # cd /www/server/mdserver-web/plugins/rapira && bash install.sh install 84
+# cd /www/server/mdserver-web/plugins/rapira && bash install.sh install source
 # https://www.php.net/releases
 
 if id www &> /dev/null ;then 
