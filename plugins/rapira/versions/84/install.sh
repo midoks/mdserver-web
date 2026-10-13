@@ -149,12 +149,19 @@ fi
 rapira_bindir=${serverPath}/rapira/${PHP_VER}/bin
 rapira_srcdir=$sourcePath/rapira/rapira-${rapira_version}
 mkdir -p $rapira_bindir
+CARGO_BIN=/root/.cargo/bin/cargo
+if [ -f /opt/homebrew/bin/cargo ];then
+	CARGO_BIN=/opt/homebrew/bin/cargo
+fi
+
 if [ ! -f ${serverPath}/rapira/${PHP_VER}/bin/rapira ];then
 	cd $rapira_srcdir
 	export PHP_CONFIG=${serverPath}/rapira/${PHP_VER}/link/bin/php-config
 	# cargo build --release
 	# cargo +1.98.1 build --release
-	if [ ! -f /root/.cargo/bin/cargo ];then
+
+
+	if [ ! -f $CARGO_BIN ];then
 		curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y
 	fi
 
