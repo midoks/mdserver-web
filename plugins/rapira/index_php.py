@@ -21,7 +21,7 @@ if mw.isAppleSystem():
 
 
 def getPluginName():
-    return 'php'
+    return 'rapira'
 
 
 def getPluginDir():
