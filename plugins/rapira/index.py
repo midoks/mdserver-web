@@ -611,14 +611,10 @@ def getFpmAddress(version, pool='www'):
         return fpm_address
 
 
-def getFpmStatus(version):
-
-    if version == '52':
-        return mw.returnJson(False, 'PHP[' + version + ']不支持!!!')
-
+def getRapiraStatus(version):
     stat = status(version)
     if stat == 'stop':
-        return mw.returnJson(False, 'PHP[' + version + ']未启动!!!')
+        return mw.returnJson(False, 'rapira[' + version + ']未启动!!!')
 
     args = getArgs()
     pool = 'www'
@@ -1040,8 +1036,8 @@ if __name__ == "__main__":
         print(getFpmConfig(version))
     elif func == 'set_fpm_conf':
         print(setFpmConfig(version))
-    elif func == 'get_fpm_status':
-        print(getFpmStatus(version))
+    elif func == 'get_rapira_status':
+        print(getRapiraStatus(version))
     elif func == 'get_session_conf':
         print(getSessionConf(version))
     elif func == 'set_session_conf':
