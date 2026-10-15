@@ -2688,11 +2688,7 @@ function pluginLogsContent(_name, version, func, line){
                 return;
         	}
 		}catch(err){/*console.log(err);*/}
-
-
-        var loadT2 = layer.msg('文件内容获取中...',{icon:16,time:0,shade: [0.3, '#000']});
         var content = data.data;
-
         var h =  parseInt($('.bt-w-menu').css('height')) - 40;
             var ebody = '<textarea readonly="" style="margin: 0px;height: '+h+'px;width: 100%;background-color: #333;color:#fff; padding:0 5px" id="info_log">'+content+'</textarea>';
             $(".soft-man-con").html(ebody);
