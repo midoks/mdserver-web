@@ -304,9 +304,6 @@ def phpOp(version, method):
             return 'ok'
         return data[1]
 
-    if method == 'stop' or method == 'restart':
-        mw.execShell(file + ' ' + 'stop')
-
     data = mw.execShell('systemctl ' + method + ' rapira' + version)
     if data[1] == '':
         return 'ok'
