@@ -174,7 +174,7 @@ fi
 
 Uninstall_php()
 {
-	systemctl rapira stop
+	systemctl rapira${PHP_VER} stop
 	rm -rf $serverPath/rapira/${PHP_VER}
 	echo "卸载php-${version}..."
 }
