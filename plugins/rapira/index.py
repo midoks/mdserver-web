@@ -381,7 +381,7 @@ def initdUinstall(version):
 
 
 def rapiraLog(version):
-    cmd = "journalctl -u rapira${version} -n 10 --no-pager"
+    cmd = "journalctl -u rapira"+version+" -n 10 --no-pager"
     data = mw.execShell(cmd)
     return data[0]
 
