@@ -380,8 +380,10 @@ def initdUinstall(version):
     return 'ok'
 
 
-def fpmLog(version):
-    return getServerDir() + '/' + version + '/var/log/php-fpm.log'
+def rapiraLog(version):
+    cmd = "journalctl -u rapira${version} -n 10 --no-pager"
+    data = mw.execShell(cmd)
+    return data[0]
 
 
 def fpmSlowLog(version):
@@ -1008,8 +1010,8 @@ if __name__ == "__main__":
         print(initdInstall(version))
     elif func == 'initd_uninstall':
         print(initdUinstall(version))
-    elif func == 'fpm_log':
-        print(fpmLog(version))
+    elif func == 'rapira_log':
+        print(rapiraLog(version))
     elif func == 'fpm_slow_log':
         print(fpmSlowLog(version))
     elif func == 'conf':
