@@ -402,6 +402,9 @@ def getPhpConf(version):
         {'name': 'date.timezone', 'type': 3, 'ps': '时区'}
     ]
     phpini = mw.readFile(getConf(version))
+
+    data = tomllib.loads(phpini)
+    print(data)
     result = []
     for g in gets:
         rep = g['name'] + r'\s*=\s*([0-9A-Za-z_& ~]+)(\s*;?|\r?\n)'
