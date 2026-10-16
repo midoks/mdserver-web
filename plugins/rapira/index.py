@@ -924,7 +924,6 @@ def opcacheBlacklistFile():
 def installPreInspection(version):
     sys = mw.execShell(
         "cat /etc/*-release | grep PRETTY_NAME |awk -F = '{print $2}' | awk -F '\"' '{print $2}'| awk '{print $1}'")
-
     if sys[1] != '':
         return '不支持改系统'
 
@@ -938,7 +937,7 @@ def installPreInspection(version):
         return 'ubuntu已经安装不了'
 
     if sysName == 'debian' and int(sysId) > 10:
-        return 'debian10可以安装'
+        return 'ok'
 
     if sysName == 'centos' and int(sysId) > 8:
         return 'centos[{}]不可以安装'.format(sysId)
