@@ -36,8 +36,8 @@ listen = "unix:/tmp/rapira-cgi-{$PHP_VERSION}.sock"
 entrypoint = "dispatcher-sync.php" # relative paths resolve against this file's directory
 mode = "classic"           # "classic" | "worker" | "dispatcher" (the default)
 processes = 16                # a fixed worker count; defaults to the CPU count
-# max_requests = 0            # recycle a worker after ~N requests (jittered); 0 = unlimited
-# request_terminate_timeout_secs = 0  # kill + replace a worker whose request runs longer; 0 = off
+max_requests = 1000            # recycle a worker after ~N requests (jittered); 0 = unlimited
+request_terminate_timeout_secs = 10  # kill + replace a worker whose request runs longer; 0 = off
 
 # The gRPC listener: unary calls over gRPC, gRPC-Web and Connect (crates/plugins/grpc/README.md).
 # With a [grpc] table, grpc.descriptor_set and grpc.pool.entrypoint are required.
