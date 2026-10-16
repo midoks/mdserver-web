@@ -395,9 +395,13 @@ def fpmSlowLog(version):
     return getServerDir() + '/' + version + '/var/log/www-slow.log'
 
 
-def getPhpConf(version):
+def getPhpConfArgs(version):
     phpini = mw.readFile(getConf(version))
     data = tomllib.loads(phpini)
+    return data
+
+def getPhpConf(version):
+    data = getPhpConfArgs(version)
     return mw.getJson(data)
 
 
@@ -593,29 +597,9 @@ def setFpmConfig(version):
 #     return True
 
 
-def getFpmAddress(version, pool='www'):
-    fpm_address = '/tmp/php-cgi-{}.sock'.format(version)
-    if pool != 'www':
-        fpm_address = '/tmp/php-cgi-{}.{}.sock'.format(version,pool)
-    php_fpm_file = getFpmConfFile(version)
-    try:
-        content = readFile(php_fpm_file)
-        tmp = re.findall(r"listen\s*=\s*(.+)", content)
-        if not tmp:
-            return fpm_address
-        if tmp[0].find('sock') != -1:
-            return fpm_address
-        if tmp[0].find(':') != -1:
-            listen_tmp = tmp[0].split(':')
-            if bind:
-                fpm_address = (listen_tmp[0], int(listen_tmp[1]))
-            else:
-                fpm_address = ('127.0.0.1', int(listen_tmp[1]))
-        else:
-            fpm_address = ('127.0.0.1', int(tmp[0]))
-        return fpm_address
-    except:
-        return fpm_address
+def getRapiraAddress(version):
+    data = getPhpConfArgs(version)
+    return data["observability"]["listen"]
 
 
 def getRapiraStatus(version):
@@ -624,25 +608,9 @@ def getRapiraStatus(version):
         return mw.returnJson(False, 'rapira[' + version + ']未启动!!!')
 
     args = getArgs()
-    pool = 'www'
-    if 'pool' in args:
-        pool = args['pool']
-
-    sock_file = getFpmAddress(version, pool)
-    uri = '/phpfpm_status_' + version + '?json'
-    if pool != 'www':
-        uri = '/phpfpm_status_' + version + '_'+pool+'?json'
-    try:
-        sock_data = mw.requestFcgiPHP(sock_file, uri)
-    except Exception as e:
-        return mw.returnJson(False, str(e))
-
-    
-    result = str(sock_data, encoding='utf-8')
-    data = json.loads(result)
-    fTime = time.localtime(int(data['start time']))
-    data['start time'] = time.strftime('%Y-%m-%d %H:%M:%S', fTime)
-    return mw.returnJson(True, "OK", data)
+    addr = getRapiraAddress(version)
+    data = mw.httpGet("http://"+addr+"/metrics")
+    return data
 
 
 def getSessionConf(version):
