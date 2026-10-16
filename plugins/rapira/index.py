@@ -381,7 +381,7 @@ def initdUinstall(version):
 
 
 def rapiraLog(version):
-    cmd = "journalctl -u rapira"+version+" -n 10 --no-pager"
+    cmd = "journalctl -u rapira"+version+" -n 15 --no-pager"
     data = mw.execShell(cmd)
     return data[0]
 
@@ -949,10 +949,6 @@ def opcacheBlacklistFile():
 
 
 def installPreInspection(version):
-    # 仅对PHP52检查
-    if version != '52':
-        return 'ok'
-
     sys = mw.execShell(
         "cat /etc/*-release | grep PRETTY_NAME |awk -F = '{print $2}' | awk -F '\"' '{print $2}'| awk '{print $1}'")
 
