@@ -57,7 +57,7 @@ function phpPostCallback(method, version, args,callback){
 
 
 //配置修改
-function phpSetConfig(version) {
+function rapiraSetConfig(version) {
     phpPost('get_php_conf', version,'',function(data){
         // console.log(data);
         var rdata = $.parseJSON(data.data);
