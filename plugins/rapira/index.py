@@ -932,22 +932,6 @@ def installPreInspection(version):
 
     sysName = sys[0].strip().lower()
     sysId = sys_id[0].strip()
-
-    if sysName == 'ubuntu':
-        return 'ubuntu已经安装不了'
-
-    if sysName == 'debian' and int(sysId) > 10:
-        return 'ok'
-
-    if sysName == 'centos' and int(sysId) > 8:
-        return 'centos[{}]不可以安装'.format(sysId)
-
-    if sysName == 'fedora':
-        sys_id = mw.execShell(
-            "cat /etc/*-release | grep VERSION_ID | awk -F = '{print $2}'")
-        sysId = sys_id[0].strip()
-        if int(sysId) > 31:
-            return 'fedora[{}]不可安装'.format(sysId)
     return 'ok'
 
 
