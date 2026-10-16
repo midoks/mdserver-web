@@ -2,7 +2,8 @@
 # Commented keys show defaults or example values. Run it with: rapira serve examples/rapira.toml
 
 [http]
-listen = "127.0.0.1:8000"    # host:port, ":port" (all interfaces), or "unix:/path"
+
+listen = "unix:/tmp/rapira-cgi-{$PHP_VERSION}.sock"
 # server_name = "localhost"
 # server_port = 8000         # what PHP sees as SERVER_PORT; defaults to the listen port
 # max_body_size_mb = 8       # larger request bodies answer 413

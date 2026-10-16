@@ -241,6 +241,12 @@ def makePhpIni(version):
         mw.writeFile(dst_ini, content)
 
 
+def commonReplace(content,version):
+    service_path = mw.getServerDir()
+    content = content.replace('{$VERSION}', version)
+    content = content.replace('{$SERVER_PATH}', service_path)
+    return content
+
 def initReplace(version):
     initD_path = getServerDir() + '/init.d'
     # if not os.path.exists(initD_path):
@@ -259,6 +265,7 @@ def initReplace(version):
     toml_file = getServerDir()+"/"+version+"/rapira.toml"
     if not os.path.exists(toml_file):
         content = mw.readFile(toml_file_tpl)
+        content = commonReplace(content, version)
         mw.writeFile(toml_file,content)
 
     # 模版例子
@@ -283,10 +290,8 @@ def initReplace(version):
     systemService = systemDir + '/rapira' + version + '.service'
     if os.path.exists(systemDir) and not os.path.exists(systemService):
         systemServiceTpl = getPluginDir() + '/init.d/rapira.service.tpl'
-        service_path = mw.getServerDir()
         se_content = mw.readFile(systemServiceTpl)
-        se_content = se_content.replace('{$VERSION}', version)
-        se_content = se_content.replace('{$SERVER_PATH}', service_path)
+        se_content = commonReplace(se_content, version)
         mw.writeFile(systemService, se_content)
         mw.execShell('systemctl daemon-reload')
 
