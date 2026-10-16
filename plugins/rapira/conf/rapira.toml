@@ -3,7 +3,7 @@
 
 [http]
 
-listen = "unix:/tmp/rapira-cgi-{$PHP_VERSION}.sock"
+listen = "unix:/tmp/rapira-cgi-{$VERSION}.sock"
 # server_name = "localhost"
 # server_port = 8000         # what PHP sees as SERVER_PORT; defaults to the listen port
 # max_body_size_mb = 8       # larger request bodies answer 413
