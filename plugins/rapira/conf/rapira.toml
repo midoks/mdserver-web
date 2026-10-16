@@ -34,7 +34,7 @@ listen = "unix:/tmp/rapira-cgi-{$PHP_VERSION}.sock"
 # The worker pool behind the http listener. Each plugin owns its pool under [<plugin>.pool].
 [http.pool]
 entrypoint = "dispatcher-sync.php" # relative paths resolve against this file's directory
-mode = "dispatcher"           # "classic" | "worker" | "dispatcher" (the default)
+mode = "classic"           # "classic" | "worker" | "dispatcher" (the default)
 processes = 16                # a fixed worker count; defaults to the CPU count
 # max_requests = 0            # recycle a worker after ~N requests (jittered); 0 = unlimited
 # request_terminate_timeout_secs = 0  # kill + replace a worker whose request runs longer; 0 = off
