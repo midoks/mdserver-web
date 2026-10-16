@@ -63,10 +63,10 @@ processes = 16                # a fixed worker count; defaults to the CPU count
 # tokens_file = "grpc-tokens"  # relative to this file's directory; one token per line
 
 # The observability process: a process without PHP that serves GET /metrics and the livez and readyz probes from the worker scoreboard.
-# [observability]
-# listen = "127.0.0.1:9180"    # required; host:port, ":port" (all interfaces), or "unix:/path"
-# keepalive_timeout_secs = 60 # optional; closes a keep-alive connection idle past the limit
-# [observability.metrics]    # GET /metrics
+[observability]
+listen = "127.0.0.1:9180"    # required; host:port, ":port" (all interfaces), or "unix:/path"
+keepalive_timeout_secs = 60 # optional; closes a keep-alive connection idle past the limit
+[observability.metrics]    # GET /metrics
 # [observability.probes]     # GET /livez, GET /readyz
 
 # [supervisor]
