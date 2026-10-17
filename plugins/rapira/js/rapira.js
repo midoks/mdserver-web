@@ -85,6 +85,7 @@ function rapiraSetConfig(version) {
         }
 
         mlist += '<p><span>监听地址</span>' + '<input style="width: 250px;" class="bt-input-text mr5" name="listen" value="'+rdata.http.listen+'" type="text" >' + ', <font>监听地址</font></p>';
+        mlist += '<p><span>监听地址</span>' + '<input style="width: 250px;" class="bt-input-text mr5" name="listen" value="'+rdata.http.listen+'" type="text" >' + ', <font>监听地址</font></p>';
 
 
         var phpCon = '<style>.conf_p p{margin-bottom: 2px}</style><div class="conf_p" style="margin-bottom:0">\
