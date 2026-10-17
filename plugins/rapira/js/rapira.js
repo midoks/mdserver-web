@@ -59,7 +59,6 @@ function phpPostCallback(method, version, args,callback){
 //配置修改
 function rapiraSetConfig(version) {
     phpPost('get_php_conf', version,'',function(data){
-        // console.log(data);
         var rdata = $.parseJSON(data.data);
         console.log(rdata);
 
@@ -84,10 +83,14 @@ function rapiraSetConfig(version) {
             }
             mlist += '<p><span>' + rdata[i].name + '</span>' + ibody + ', <font>' + rdata[i].ps + '</font></p>';
         }
+
+        mlist += '<p><span>监听地址</span>' + '<input style="width: 250px;" class="bt-input-text mr5" name="listen" value="'+rdata.http.listen+'" type="text" >' + ', <font>监听地址</font></p>';
+
+
         var phpCon = '<style>.conf_p p{margin-bottom: 2px}</style><div class="conf_p" style="margin-bottom:0">\
                         ' + mlist + '\
                         <div style="margin-top:10px; padding-right:15px" class="text-right">\
-                            <button class="btn btn-success btn-sm mr5" onclick="phpSetConfig(' + version + ')">刷新</button>\
+                            <button class="btn btn-success btn-sm mr5" onclick="rapiraSetConfig(' + version + ')">刷新</button>\
                             <button class="btn btn-success btn-sm" onclick="submitConf(' + version + ')">保存</button>\
                         </div>\
                     </div>'
