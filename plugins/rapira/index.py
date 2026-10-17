@@ -188,7 +188,7 @@ def makeOpenrestyConf():
     tpl = getPluginDir() + '/conf/enable-rapira.conf'
     tpl_content = mw.readFile(tpl)
     for x in phpversions:
-        dfile = sdir + '/web_conf/php/conf/enable-rapira-' + x + '.conf'
+        dfile = sdir + '/web_conf/php/conf/enable-php-rapira' + x + '.conf'
         if not os.path.exists(dfile):
             if x == '00':
                 mw.writeFile(dfile, '')
