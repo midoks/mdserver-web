@@ -14,10 +14,10 @@ listen = "unix:/tmp/rapira-cgi-{$VERSION}.sock"
 
 # Multipart limits of the http plugin - dispatcher mode only (classic/worker parse in PHP,
 # where php.ini owns the limits); an explicit table under another mode refuses to boot.
-# [http.uploads]
-# dir = "/tmp"               # spool root for file parts; defaults to the system temp dir
-# max_file_size_mb = 2
-# max_files = 20
+[http.uploads]
+dir = "/tmp"               # spool root for file parts; defaults to the system temp dir
+max_file_size_mb = 2
+max_files = 20
 
 # [http.sendfile]
 # root = "public"            # sendFile() containment; defaults to the entrypoint's directory
