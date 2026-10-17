@@ -159,55 +159,6 @@ def contentReplace(content, version):
     return content
 
 
-def makeOpenrestyConf():
-    phpversions = ['84','85']
-
-    sdir = mw.getServerDir()
-
-    dst_dir = sdir + '/web_conf/php'
-    if not os.path.exists(dst_dir):
-        mw.execShell('mkdir -p ' + dst_dir)
-
-    dst_dir_conf = sdir + '/web_conf/php/conf'
-    if not os.path.exists(dst_dir_conf):
-        mw.execShell('mkdir -p ' + dst_dir_conf)
-
-    dst_dir_upstream = sdir + '/web_conf/php/upstream'
-    if not os.path.exists(dst_dir_upstream):
-        mw.execShell('mkdir -p ' + dst_dir_upstream)
-
-    dst_pathinfo = sdir + '/web_conf/php/pathinfo.conf'
-    if not os.path.exists(dst_pathinfo):
-        src_pathinfo = getPluginDir() + '/conf/pathinfo.conf'
-        shutil.copyfile(src_pathinfo, dst_pathinfo)
-
-    info = getPluginDir() + '/info.json'
-    content = mw.readFile(info)
-    content = json.loads(content)
-    versions = content['versions']
-    tpl = getPluginDir() + '/conf/enable-rapira.conf'
-    tpl_content = mw.readFile(tpl)
-    for x in phpversions:
-        dfile = sdir + '/web_conf/php/conf/enable-php-rapira' + x + '.conf'
-        if not os.path.exists(dfile):
-            if x == '00':
-                mw.writeFile(dfile, '')
-            else:
-                content = contentReplace(tpl_content, x)
-                mw.writeFile(dfile, content)
-
-    upstream_tpl = getPluginDir() + '/conf/enable-rapira-upstream.conf'
-    upstream_tpl_content = mw.readFile(upstream_tpl)
-    for x in phpversions:
-        dfile = sdir + '/web_conf/php/upstream/enable-php-rapira' + x + '.conf'
-        if not os.path.exists(dfile):
-            if x == '00':
-                mw.writeFile(dfile, '')
-            else:
-                content = contentReplace(upstream_tpl_content, x)
-                mw.writeFile(dfile, content)
-
-
 def phpPrependFile(version):
     app_start = getServerDir() + '/app_start.php'
     if not os.path.exists(app_start):
@@ -238,7 +189,6 @@ def commonReplace(content,version):
     return content
 
 def initReplace(version):
-    makeOpenrestyConf()
     initD_path = getServerDir() + '/init.d'
     # if not os.path.exists(initD_path):
     #     os.mkdir(initD_path)
