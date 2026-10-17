@@ -164,19 +164,19 @@ def makeOpenrestyConf():
 
     sdir = mw.getServerDir()
 
-    dst_dir = sdir + '/web_conf/rapira'
+    dst_dir = sdir + '/web_conf/php'
     if not os.path.exists(dst_dir):
         mw.execShell('mkdir -p ' + dst_dir)
 
-    dst_dir_conf = sdir + '/web_conf/rapira/conf'
+    dst_dir_conf = sdir + '/web_conf/php/conf'
     if not os.path.exists(dst_dir_conf):
         mw.execShell('mkdir -p ' + dst_dir_conf)
 
-    dst_dir_upstream = sdir + '/web_conf/rapira/upstream'
+    dst_dir_upstream = sdir + '/web_conf/php/upstream'
     if not os.path.exists(dst_dir_upstream):
         mw.execShell('mkdir -p ' + dst_dir_upstream)
 
-    dst_pathinfo = sdir + '/web_conf/rapira/pathinfo.conf'
+    dst_pathinfo = sdir + '/web_conf/php/pathinfo.conf'
     if not os.path.exists(dst_pathinfo):
         src_pathinfo = getPluginDir() + '/conf/pathinfo.conf'
         shutil.copyfile(src_pathinfo, dst_pathinfo)
