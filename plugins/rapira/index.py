@@ -248,6 +248,7 @@ def commonReplace(content,version):
     return content
 
 def initReplace(version):
+    makeOpenrestyConf()
     initD_path = getServerDir() + '/init.d'
     # if not os.path.exists(initD_path):
     #     os.mkdir(initD_path)

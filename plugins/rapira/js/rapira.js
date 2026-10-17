@@ -61,9 +61,12 @@ function rapiraSetConfig(version) {
     phpPost('get_php_conf', version,'',function(data){
         // console.log(data);
         var rdata = $.parseJSON(data.data);
-        // console.log(rdata);
+        console.log(rdata);
+
+        var data_http = rdata.http;
         var mlist = '';
-        for (var i = 0; i < rdata.length; i++) {
+        for (var i = 0; i < data_http.length; i++) {
+            console.log(data_http[i]);
             var w = '70'
             if (rdata[i].name == 'error_reporting') w = '250';
             var ibody = '<input style="width: ' + w + 'px;" class="bt-input-text mr5" name="' + rdata[i].name + '" value="' + rdata[i].value + '" type="text" >';
