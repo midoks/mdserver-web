@@ -50,6 +50,11 @@ if [ "${action}" = "uninstall" ];then
 	fi
 fi
 
+if [ "${action}" = "upgrade" ];then
+	cd ${curPath} && sh -x $curPath/versions/$2/install.sh upgrade
+	exit 0
+fi
+
 cd ${curPath} && sh -x $curPath/versions/$2/install.sh $1
 
 
