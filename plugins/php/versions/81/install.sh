@@ -119,6 +119,9 @@ else
 fi
 
 if [ ! -d $serverPath/php/${PHP_VER} ] || [ "$action" == "upgrade" ];then
+	# https://github.com/php/php-src/compare/php-8.1.33...PHP-8.1-CVE-2026-109618-109619.patch
+	cd $sourcePath/php/php${PHP_VER} && patch -p1 < ${rootPath}/plugins/php/versions/81/cve/8.1-CVE-2026-109618-109619.patch
+
 	cd $sourcePath/php/php${PHP_VER}
 	./configure \
 	--prefix=$serverPath/php/${PHP_VER} \
