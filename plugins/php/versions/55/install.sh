@@ -2,6 +2,8 @@
 PATH=/bin:/sbin:/usr/bin:/usr/sbin:/usr/local/bin:/usr/local/sbin:~/bin:/opt/homebrew/bin
 export PATH=$PATH:/opt/homebrew/bin
 
+action=${1}
+
 curPath=`pwd`
 rootPath=$(dirname "$curPath")
 rootPath=$(dirname "$rootPath")
@@ -107,7 +109,7 @@ if [ "${SYS_ARCH}" = "arm64" ] && [ "$sysName" = "Darwin" ] ;then
 	cat ${curPath}/versions/${PHP_VER}/src/reentrancy.c > $sourcePath/php/php${PHP_VER}/main/reentrancy.c
 fi
 
-if [ ! -d $serverPath/php/${PHP_VER}  ];then
+if [ ! -d $serverPath/php/${PHP_VER} ] || [ "$action" == "upgrade" ];then
 	cd $sourcePath/php/php${PHP_VER} && ./configure \
 	--prefix=$serverPath/php/${PHP_VER} \
 	--exec-prefix=$serverPath/php/${PHP_VER} \
@@ -146,9 +148,11 @@ Uninstall_php()
 	echo "卸载php-5.5.38 ..."
 }
 
-action=${1}
-if [ "${1}" = 'install' ];then
+
+if [ "${1}" = 'install' ] || [ "$action" = "upgrade" ];then
 	Install_php
-else
+elif [ "${1}" = 'uninstall' ];then
 	Uninstall_php
+else
+	echo "OPTIONS ERROR"
 fi

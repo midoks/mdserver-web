@@ -2,6 +2,8 @@
 PATH=/bin:/sbin:/usr/bin:/usr/sbin:/usr/local/bin:/usr/local/sbin:~/bin:/opt/homebrew/bin
 export PATH=$PATH:/opt/homebrew/bin
 
+action=${1}
+
 curPath=`pwd`
 rootPath=$(dirname "$curPath")
 rootPath=$(dirname "$rootPath")
@@ -96,7 +98,7 @@ if [ "${SYS_ARCH}" = "aarch64" ];then
 	OPTIONS="$OPTIONS --build=aarch64-unknown-linux-gnu --host=aarch64-unknown-linux-gnu"
 fi
 
-if [ ! -d $serverPath/php/${PHP_VER} ];then
+if [ ! -d $serverPath/php/${PHP_VER} ] || [ "$action" == "upgrade" ];then
 
 	export MYSQL_LIB_DIR=/usr/lib64/mysql
 	
@@ -155,9 +157,11 @@ Uninstall_php()
 	echo "uninstall php-${version} ..."
 }
 
-action=${1}
-if [ "${1}" = 'install' ];then
+
+if [ "${1}" = 'install' ] || [ "$action" = "upgrade" ];then
 	Install_php
-else
+elif [ "${1}" = 'uninstall' ];then
 	Uninstall_php
+else
+	echo "OPTIONS ERROR"
 fi

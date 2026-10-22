@@ -10,6 +10,7 @@ sysName=`uname`
 
 # cd /www/server/mdserver-web/plugins/php && bash install.sh install 73
 # cd /www/server/mdserver-web/plugins/php && bash install.sh install 85
+# cd /www/server/mdserver-web/plugins/php && bash install.sh upgrade 85
 # https://www.php.net/releases
 
 if id www &> /dev/null ;then 
@@ -48,6 +49,11 @@ if [ "${action}" = "uninstall" ];then
 		rm -rf /lib/systemd/system/php${type}.service
 		systemctl daemon-reload
 	fi
+fi
+
+if [ "${action}" = "upgrade" ];then
+	cd ${curPath} && sh -x $curPath/versions/$2/install.sh upgrade
+	exit 0
 fi
 
 cd ${curPath} && sh -x $curPath/versions/$2/install.sh $1
