@@ -172,6 +172,8 @@ Uninstall_php()
 
 if [ "${1}" = 'install' ] || [ "$action" = "upgrade" ];then
 	Install_php
-else
+elif [ "${1}" = 'uninstall' ];then
 	Uninstall_php
+else
+	echo "OPTIONS ERROR"
 fi
