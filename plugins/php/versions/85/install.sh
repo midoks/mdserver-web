@@ -170,7 +170,7 @@ Uninstall_php()
 }
 
 
-if [ "${1}" = 'install' ];then
+if [ "${1}" = 'install' ] && [ "$action" != "upgrade" ];then
 	Install_php
 else
 	Uninstall_php
