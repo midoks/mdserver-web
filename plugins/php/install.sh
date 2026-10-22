@@ -53,6 +53,7 @@ fi
 
 if [ "${action}" = "upgrade" ];then
 	cd ${curPath} && sh -x $curPath/versions/$2/install.sh upgrade
+	systemctl restart php${type}
 	exit 0
 fi
 
