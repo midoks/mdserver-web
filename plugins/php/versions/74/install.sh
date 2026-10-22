@@ -129,6 +129,7 @@ if [ ! -d $serverPath/php/${PHP_VER} ] || [ "$action" == "upgrade" ];then
 
 	# curl -L -o 7.4-CVE-2026-109618-109619.patch  "https://github.com/php/php-src/compare/php-7.4.33...PHP-7.4-CVE-2026-109618-109619.patch"
 
+	# cd /www/server/source/php/php74 && patch -p1 --dry-run < /www/server/mdserver-web/plugins/php/versions/74/cve/7.4-CVE-2026-109618-109619.patch
 
 	# cd $sourcePath/php/php${PHP_VER} && patch -p1 --dry-run < ${rootPath}/plugins/php/versions/74/cve/7.4-CVE-2026-109618-109619.patch
 	cd $sourcePath/php/php${PHP_VER} && patch -p1 < ${rootPath}/plugins/php/versions/74/cve/7.4-CVE-2026-109618-109619.patch
