@@ -2658,6 +2658,45 @@ function pluginOpInitD(a, _version, b, _suffix_name='') {
     })
 }
 
+
+function pluginLogsContent(_name, version, func, line){
+
+	var _this = this;
+    if ( typeof(version) == 'undefined' ){
+        version = '';
+    }
+
+    var func_name = 'error_log';
+    if ( typeof(func) != 'undefined' ){
+        func_name = func;
+    }
+
+    var file_line = 100;
+    if ( typeof(line) != 'undefined' ){
+        file_line = line;
+    }
+
+
+    var loadT = layer.msg('日志路径获取中...',{icon:16,time:0,shade: [0.3, '#000']});
+    $.post('/plugins/run', {name:_name, func:func_name, version:version},function (data) {
+        layer.close(loadT);
+
+        try{
+        	var jdata = $.parseJSON(data.data);
+        	if (!jdata['status']){
+        		layer.msg(jdata.msg,{icon:0,time:2000,shade: [0.3, '#000']});
+                return;
+        	}
+		}catch(err){/*console.log(err);*/}
+        var content = data.data;
+        var h =  parseInt($('.bt-w-menu').css('height')) - 40;
+            var ebody = '<textarea readonly="" style="margin: 0px;height: '+h+'px;width: 100%;background-color: #333;color:#fff; padding:0 5px" id="info_log">'+content+'</textarea>';
+            $(".soft-man-con").html(ebody);
+            var ob = document.getElementById('info_log');
+            ob.scrollTop = ob.scrollHeight; 
+    },'json');
+}
+
 function pluginLogs(_name, version, func, line){
 
 	var _this = this;
