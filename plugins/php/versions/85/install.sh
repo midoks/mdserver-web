@@ -130,7 +130,7 @@ fi
 
 echo "$sourcePath/php/php${PHP_VER}"
 
-if [ ! -d $serverPath/php/${PHP_VER} ] && [ "$action" != "upgrade" ];then
+if [ ! -d $serverPath/php/${PHP_VER} ] || [ "$action" == "upgrade" ];then
 	cd $sourcePath/php/php${PHP_VER}
 	# ./buildconf --force
 	./configure \
