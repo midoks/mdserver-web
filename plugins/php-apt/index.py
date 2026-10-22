@@ -308,7 +308,7 @@ def getPhpConf(version):
     phpini = mw.readFile(getConf(version))
     result = []
     for g in gets:
-        rep = g['name'] + r'\s*=\s*([0-9A-Za-z_& ~]+)(\s*;?|\r?\n)'
+        rep = g['name'] + r'\s*=\s*(-?[0-9A-Za-z_& ~]+)(\s*;?|\r?\n)'
         tmp = re.search(rep, phpini)
         if not tmp:
             continue
