@@ -294,7 +294,36 @@ def initdUinstall():
     mw.execShell('systemctl disable ' + getPluginName())
     return 'ok'
 
+def upgradeCheck(version):
+    version = version.strip()
+    info = getPluginDir() + '/info.json'
+    content = mw.readFile(info)
+    content = json.loads(content)
+    versions = content['versions']
+    updates = content['updates']
+
+    idx = versions.index(version)
+    full_verion = updates[idx]
+
+    # 找到本地版本信息对比
+    mem_path = getServerDir() +"/bin/memcached"
+    if not os.path.exists(mem_path):
+        return mw.returnJson(0,"pass")
+
+    cmd = mem_path + " -V 2>&1 | sed -E 's/.*memcached\\/([0-9.]+).*/\\1/'"
+    cmd_data = mw.execShell(cmd)
+    local_full_version = cmd_data[0].strip()
+    if local_full_version != full_verion:
+        return mw.returnJson(1, "有新版",full_verion)
+    return mw.returnJson(0,"pass")
+
 if __name__ == "__main__":
+
+    version = '1.6'
+    version_pl = getServerDir() + "/version.pl"
+    if os.path.exists(version_pl):
+        version = mw.readFile(version_pl)
+
     func = sys.argv[1]
     if func == 'status':
         print(status())
@@ -312,6 +341,8 @@ if __name__ == "__main__":
         print(initdInstall())
     elif func == 'initd_uninstall':
         print(initdUinstall())
+    elif func == "upgrade_check":
+        print(upgradeCheck(version))
     elif func == 'run_info':
         print(runInfo())
     elif func == 'conf_env':
