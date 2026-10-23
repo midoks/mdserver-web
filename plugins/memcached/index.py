@@ -310,7 +310,7 @@ def upgradeCheck(version):
     if not os.path.exists(mem_path):
         return mw.returnJson(0,"pass")
 
-    cmd = mem_path + " -V 2>&1 | sed -E 's/.*memcached\\/([0-9.]+).*/\\1/'"
+    cmd = mem_path + " -V 2>&1 | sed -E 's/.*memcached ([0-9.]+).*/\\1/'"
     cmd_data = mw.execShell(cmd)
     local_full_version = cmd_data[0].strip()
     if local_full_version != full_verion:
