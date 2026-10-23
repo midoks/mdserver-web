@@ -32,6 +32,9 @@ Install_mem(){
 		LIB_DEPEND_DIR=`brew --prefix libevent`
 		OPTIONS="${OPTIONS} --with-libevent=${LIB_DEPEND_DIR}"
 		OPTIONS="${OPTIONS} --disable-docs"
+
+		echo "cat ${rootPath}/plugins/memcached/hook/darwin_priv.c > $serverPath/source/memcached/memcached-${VERSION}/darwin_priv.c"
+		cat ${rootPath}/plugins/memcached/hook/darwin_priv.c > $serverPath/source/memcached/memcached-${VERSION}/darwin_priv.c
 	fi
 
 	echo "./configure --prefix=${serverPath}/memcached && make && make install"
