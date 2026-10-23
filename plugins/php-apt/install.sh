@@ -81,6 +81,9 @@ if [ "${action}" = "uninstall" ] && [ -d ${serverPath}/php-apt/${type} ];then
 		rm -rf /lib/systemd/system/php${apt_ver}-fpm.service
 	fi
 
+
+	rm -rf /etc/php/${apt_ver}/fpm/php-fpm.conf
+
 	systemctl daemon-reload
 fi
 
