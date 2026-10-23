@@ -134,7 +134,9 @@ function getSList(isdisplay) {
                     state = '<span style="color:red" class="glyphicon glyphicon-pause"></span>'
                 }
 
-                checkUpdate(plugin)
+                if (plugin.task == '1'){
+                    checkUpdate(plugin);
+                }
             }
 
             if (plugin.task == '-2') {
