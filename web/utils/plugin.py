@@ -456,6 +456,10 @@ class plugin(object):
         if 'coexist' in info and info['coexist']:
             coexist = True
 
+        app_upgrade = False
+        if 'upgrade' in info and info['upgrade']:
+            app_upgrade = True 
+
         pInfo = {
             "id": 10000,
             "sort": 10000,
@@ -470,6 +474,7 @@ class plugin(object):
             "path": path,
             "install_checks": checks,
             "uninsatll_checks": checks,
+            "upgrade": app_upgrade,
             "coexist": coexist,
             "versions": info['versions'],
             # "updates": info['updates'],
