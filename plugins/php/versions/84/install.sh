@@ -115,15 +115,24 @@ fi
 if [ "$sysName" = "Darwin" ];then
 	BREW_DIR=`which brew`
 	BREW_DIR=${BREW_DIR/\/bin\/brew/}
-
-	LIB_DEPEND_DIR=`brew info openssl | grep ${BREW_DIR}/Cellar/openssl | cut -d \  -f 1 | awk 'END {print}'`
-	OPTIONS="$OPTIONS --with-openssl=$(brew --prefix openssl)"
+	echo "brew info openssl@3 | grep ${BREW_DIR}/opt/openssl@3 | cut -d \  -f 1 | awk 'END {print}'"
+	# LIB_DEPEND_DIR=`brew info openssl@3 | grep ${BREW_DIR}/opt/openssl@3 | cut -d \  -f 1 | awk 'END {print}'`
+	LIB_DEPEND_DIR=`brew --prefix openssl@3`
+	
+	OPTIONS="$OPTIONS --with-openssl=$LIB_DEPEND_DIR"
 	export PKG_CONFIG_PATH=$LIB_DEPEND_DIR/lib/pkgconfig
 	export OPENSSL_CFLAGS="-I${LIB_DEPEND_DIR}/include"
 	export OPENSSL_LIBS="-L/${LIB_DEPEND_DIR}/lib -lssl -lcrypto -lz"
+
+	OPTIONS="$OPTIONS --disable-opcache-jit"
+	OPTIONS="$OPTIONS --disable-opcache"
+
+	export SDKROOT=$(xcrun --show-sdk-path)
+	export CFLAGS="-isysroot $SDKROOT"
+	export LDFLAGS="-isysroot $SDKROOT"
 else
-	# cd ${rootPath}/plugins/php/lib && /bin/bash openssl_35.sh
-	# export PKG_CONFIG_PATH=$PKG_CONFIG_PATH:$serverPath/lib/openssl35/lib/pkgconfig
+	cd ${rootPath}/plugins/php/lib && /bin/bash openssl_11.sh
+	export PKG_CONFIG_PATH=$PKG_CONFIG_PATH:$serverPath/lib/openssl11/lib/pkgconfig
 	OPTIONS="$OPTIONS --with-openssl"
 fi
 
