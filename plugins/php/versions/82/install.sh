@@ -136,6 +136,7 @@ if [ ! -d $serverPath/php/${PHP_VER} ] || [ "$action" == "upgrade" ];then
 	--enable-simplexml \
 	--enable-soap \
 	--enable-posix \
+	--enable-opcache \
 	--enable-sysvmsg \
 	--enable-sysvsem \
 	--enable-sysvshm \
