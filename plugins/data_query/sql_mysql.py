@@ -449,22 +449,27 @@ class nosqlMySQLCtr():
         my_instance.execute("SET sql_mode=(SELECT REPLACE(@@sql_mode,'ONLY_FULL_GROUP_BY',''))")
         data = my_instance.query(
             """
-            SELECT t.TABLE_SCHEMA as TABLE_SCHEMA, t.TABLE_NAME as TABLE_NAME, t.ENGINE as ENGINE,
-                IFNULL(t.DATA_LENGTH/1024/1024/1024, 0) as DATA_LENGTH,
-                IFNULL(t.INDEX_LENGTH/1024/1024/1024, 0) as INDEX_LENGTH,
-                IFNULL((DATA_LENGTH+INDEX_LENGTH)/1024/1024/1024, 0) AS TOTAL_LENGTH,
-                c.column_name AS COLUMN_NAME, c.data_type AS DATA_TYPE, c.COLUMN_TYPE AS COLUMN_TYPE,
-                t.AUTO_INCREMENT AS AUTO_INCREMENT, locate('unsigned', c.COLUMN_TYPE) = 0 AS IS_SIGNED 
+            SELECT t.TABLE_SCHEMA as TABLE_SCHEMA, t.TABLE_NAME as TABLE_NAME,
+                ANY_VALUE(t.ENGINE) as ENGINE,
+                ANY_VALUE(IFNULL(t.DATA_LENGTH/1024/1024/1024, 0)) as DATA_LENGTH,
+                ANY_VALUE(IFNULL(t.INDEX_LENGTH/1024/1024/1024, 0)) as INDEX_LENGTH,
+                ANY_VALUE(IFNULL((t.DATA_LENGTH+t.INDEX_LENGTH)/1024/1024/1024, 0)) AS TOTAL_LENGTH,
+                ANY_VALUE(c.column_name) AS COLUMN_NAME, ANY_VALUE(c.data_type) AS DATA_TYPE,
+                ANY_VALUE(c.COLUMN_TYPE) AS COLUMN_TYPE,
+                ANY_VALUE(t.AUTO_INCREMENT) AS AUTO_INCREMENT,
+                ANY_VALUE(locate('unsigned', c.COLUMN_TYPE) = 0) AS IS_SIGNED 
             FROM information_schema.TABLES t 
             JOIN information_schema.COLUMNS c ON t.TABLE_SCHEMA = c.TABLE_SCHEMA AND t.table_name=c.table_name 
             WHERE t.TABLE_SCHEMA NOT IN ('mysql', 'information_schema', 'performance_schema', 'sys') 
-            GROUP BY TABLE_NAME 
-            ORDER BY TOTAL_LENGTH DESC, AUTO_INCREMENT DESC;
+            GROUP BY t.TABLE_SCHEMA, t.TABLE_NAME 
+            ORDER BY TOTAL_LENGTH DESC, AUTO_INCREMENT DESC
             """
         )
 
         if data is None:
             return mw.returnData(True, 'ok', [])
+        if isinstance(data, Exception):
+            return mw.returnData(False, '查询失败: ' + str(data))
 
         for i in range(len(data)):
             row = data[i]
