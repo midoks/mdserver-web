@@ -7,6 +7,7 @@ import time
 import threading
 import subprocess
 import re
+import json
 
 
 web_dir = os.getcwd() + "/web"
@@ -654,6 +655,28 @@ def cronCheck():
 def installPreInspection():
     return 'ok'
 
+def upgradeCheck(version):
+    version = version.strip()
+    info = getPluginDir() + '/info.json'
+    content = mw.readFile(info)
+    content = json.loads(content)
+    versions = content['versions']
+    updates = content['updates']
+
+    idx = versions.index(version)
+    full_verion = updates[idx]
+
+    # 找到本地版本信息对比
+    ngx_path = getServerDir() +"/bin/openresty"
+    if not os.path.exists(ngx_path):
+        return mw.returnJson(0,"pass")
+
+    cmd = ngx_path + " -v 2>&1 | sed -E 's/.*openresty\\/([0-9.]+).*/\\1/'"
+    cmd_data = mw.execShell(cmd)
+    local_full_version = cmd_data[0].strip()
+    if local_full_version != full_verion:
+        return mw.returnJson(1, "有新版",full_verion)
+    return mw.returnJson(0,"pass")
 
 if __name__ == "__main__":
 
@@ -682,6 +705,8 @@ if __name__ == "__main__":
         print(initdUinstall())
     elif func == 'install_pre_inspection':
         print(installPreInspection())
+    elif func == "upgrade_check":
+        print(upgradeCheck(version))
     elif func == 'conf':
         print(getConf())
     elif func == 'get_os':
