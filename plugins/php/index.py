@@ -1062,7 +1062,7 @@ def upgradeCheck(version):
     if not os.path.exists(php_path):
         return mw.returnJson(0,"pass")
 
-    cmd = php_path + " -r 'echo PHP_VERSION;'"
+    cmd = php_path + " -d display_startup_errors=0 -r 'echo PHP_VERSION;' 2>/dev/null"
     cmd_data = mw.execShell(cmd)
     local_full_version = cmd_data[0]
     if local_full_version != full_verion:

@@ -5,6 +5,8 @@ export PATH=$PATH:/opt/homebrew/bin
 action=${1}
 
 # cd /www/server/mdserver-web/plugins/php && /bin/bash install.sh install 56
+# /www/server/php/56/bin/php  -r 'echo PHP_VERSION;'
+# /www/server/php/56/bin/php -d display_startup_errors=0 -r 'echo PHP_VERSION;' 2>/dev/null
 
 curPath=`pwd`
 rootPath=$(dirname "$curPath")
