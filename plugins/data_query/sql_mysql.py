@@ -643,25 +643,41 @@ class nosqlMySQLCtr():
         if my_instance is False:
             return mw.returnData(False,'无法链接')
 
-        slave_info = my_instance.find('SHOW SLAVE STATUS')
-        if slave_info is None:
+        # MySQL 8.0.22+ 使用 SHOW REPLICA STATUS，MySQL 9.0 已移除 SHOW SLAVE STATUS
+        slave_data = my_instance.query('SHOW REPLICA STATUS')
+        if isinstance(slave_data, Exception):
+            # 兼容 MySQL 8.0.22 以下及旧版 MariaDB
+            slave_data = my_instance.query('SHOW SLAVE STATUS')
+        if isinstance(slave_data, Exception):
+            return mw.returnData(False, '获取主从状态失败: ' + str(slave_data))
+        if slave_data is None or len(slave_data) == 0:
             return mw.returnData(True, 'ok', '未开启从库!')
 
+        slave_info = slave_data[0]
+        # 兼容新旧字段名: MySQL 8.0.22+ 将 Slave_*/Seconds_Behind_Master 重命名为 Replica_*/Seconds_Behind_Source
+        io_running = slave_info.get('Replica_IO_Running', slave_info.get('Slave_IO_Running'))
+        sql_running = slave_info.get('Replica_SQL_Running', slave_info.get('Slave_SQL_Running'))
+        seconds_behind = slave_info.get('Seconds_Behind_Source', slave_info.get('Seconds_Behind_Master'))
+
         msg = ''
-        if slave_info['Auto_Position'] != 1:
+        if slave_info.get('Auto_Position') != 1:
             msg += '你没有开启基于GTID全局事务ID复制，请确保CHANGE MASTER TO MASTER_AUTO_POSITION = 1.\n'
 
 
-        if slave_info['Slave_IO_Running'] == 'Yes' and slave_info['Slave_SQL_Running'] == 'Yes':
-            if slave_info['Seconds_Behind_Master'] == 0:
+        if io_running == 'Yes' and sql_running == 'Yes':
+            if seconds_behind == 0:
                 msg = "同步正常，无延迟"
                 return mw.returnData(True, 'ok', msg)
             else:
-                return mw.returnData(True, 'ok', '同步正常，但有延迟，延迟时间为：%s' % slave_info['Seconds_Behind_Master'])
+                return mw.returnData(True, 'ok', '同步正常，但有延迟，延迟时间为：%s' % seconds_behind)
         else:
             msg = '主从复制报错，请检查\nSlave_IO_Running状态值是：%s, |  Slave_SQL_Running状态值是：%s\nLast_Error错误信息是：%s\nLast_SQL_Error错误信息是：%s\n' \
-            % (slave_info['Slave_IO_Running'], slave_info['Slave_SQL_Running'], slave_info['Last_Error'], slave_info['Last_SQL_Error'])
-            error_dict = my_instance.find('select LAST_ERROR_NUMBER,LAST_ERROR_MESSAGE,LAST_ERROR_TIMESTAMP from performance_schema.replication_applier_status_by_worker ORDER BY LAST_ERROR_TIMESTAMP desc limit 1')
+            % (io_running, sql_running, slave_info.get('Last_Error'), slave_info.get('Last_SQL_Error'))
+            error_data = my_instance.query('select LAST_ERROR_NUMBER,LAST_ERROR_MESSAGE,LAST_ERROR_TIMESTAMP from performance_schema.replication_applier_status_by_worker ORDER BY LAST_ERROR_TIMESTAMP desc limit 1')
+            if isinstance(error_data, Exception) or not error_data:
+                msg += 'MySQL Replication Health is NOT OK!'
+                return mw.returnData(True, 'ok', msg)
+            error_dict = error_data[0]
             msg += '错误号是：%s \n' % error_dict['LAST_ERROR_NUMBER']
             msg += '错误信息是：%s \n' % error_dict['LAST_ERROR_MESSAGE']
             msg += '报错时间是：%s \n' % error_dict['LAST_ERROR_TIMESTAMP']
