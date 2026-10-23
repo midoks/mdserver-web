@@ -57,6 +57,7 @@ if [ ! -d $sourcePath/php/php${PHP_VER} ];then
 		if [ "${md5_file}" != "${md5_file_ok}" ]; then
 			echo "PHP${version} 下载文件不完整,重新安装"
 			rm -rf $sourcePath/php/php-${version}.tar.xz
+			exit
 		fi
 	fi
 	
