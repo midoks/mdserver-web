@@ -158,8 +158,11 @@ if [ ! -d $serverPath/php/${PHP_VER} ] || [ "$action" == "upgrade" ];then
 	make clean && make -j${cpuCore} && make install && make clean
 
 	# rm -rf $sourcePath/php/php${PHP_VER}
-
-	echo "安装php-${version}成功"
+	if [ "$?" == "0" ];then
+		echo "安装php-${version}成功"
+	else
+		echo "安装php-${version}异常"
+	fi
 fi 
 #------------------------ install end ------------------------------------#
 }
