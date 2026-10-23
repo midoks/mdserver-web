@@ -25,7 +25,12 @@ PHP_VER=71
 Install_php()
 {
 #------------------------ install start ------------------------------------#
-apt -y install php${version} php${version}-fpm php${version}-dev
+if [ "$action" == "upgrade" ];then
+	apt -y upgrade php${version} php${version}-fpm php${version}-dev
+else
+	apt -y install php${version} php${version}-fpm php${version}-dev
+fi
+
 if [ "$?" = "0" ];then
 	mkdir -p $serverPath/php-apt/${PHP_VER}
 fi
