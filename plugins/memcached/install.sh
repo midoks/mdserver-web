@@ -2,6 +2,8 @@
 PATH=/bin:/sbin:/usr/bin:/usr/sbin:/usr/local/bin:/usr/local/sbin:~/bin:/opt/homebrew/bin
 export PATH=$PATH:/opt/homebrew/bin
 
+# cd /www/server/mdserver-web && . ./bin/activate && python3 plugins/memcached/index.py upgrade_check 1.6
+
 action=$1
 
 curPath=`pwd`
@@ -10,7 +12,7 @@ rootPath=$(dirname "$rootPath")
 serverPath=$(dirname "$rootPath")
 
 sys_os=`uname`
-VERSION=1.6.42
+VERSION=1.6.45
 
 echo $sys_os
 

@@ -164,7 +164,7 @@ function getSList(isdisplay) {
                 '<td>' + softPath + '</td>' +
                 '<td>' + state + '</td>' +
                 '<td>' + indexshow + '</td>' +
-                '<td style="text-align: right;" id="op_'+plugin.name+"_"+plugin.setup_version+'">' + handle + '</td>' +
+                '<td style="text-align: right;" id="op_'+plugin.name+"_"+plugin.setup_version.replace(".", "_")+'">' + handle + '</td>' +
                 '</tr>';
         }
 
@@ -187,7 +187,7 @@ function checkUpdate(info){
         $.post("/plugins/run", {'name':info.name, 'version':info.setup_version,'func':'upgrade_check'}, function(rdata) {
             var data = $.parseJSON(rdata.data);
             if (data.status == 1){
-                var id_name = 'op_'+info.name+"_"+info.setup_version;
+                var id_name = 'op_'+info.name+"_"+info.setup_version.replace(".", "_");
                 var content = "<a class=\"btlink\" onclick=\"upgradeToNewVersion('"+info.name+"','"+info.setup_version+"', '"+data.data+"')\">有更新</a> | " ;
                 $("#"+id_name).prepend(content);
             }
