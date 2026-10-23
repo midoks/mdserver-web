@@ -33,6 +33,7 @@ Install_mem(){
 		OPTIONS="${OPTIONS} --with-libevent=${LIB_DEPEND_DIR}"
 		OPTIONS="${OPTIONS} --disable-docs"
 
+		#mac 新版问题，后续可能会解决
 		echo "cat ${rootPath}/plugins/memcached/hook/darwin_priv.c > $serverPath/source/memcached/memcached-${VERSION}/darwin_priv.c"
 		cat ${rootPath}/plugins/memcached/hook/darwin_priv.c > $serverPath/source/memcached/memcached-${VERSION}/darwin_priv.c
 	fi
