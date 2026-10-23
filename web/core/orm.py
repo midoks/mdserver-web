@@ -121,7 +121,7 @@ class ORM:
 
     def find(self, sql):
         d = self.query(sql)
-        if d is not None:
+        if d is not None and not isinstance(d, Exception):
             if len(d) > 0:
                 return d[0]
         return None
