@@ -851,13 +851,15 @@ def installPreInspection(version):
     return 'ok'
 
 def upgradeCheck(version):
+    version_big = version[0]+version[2]
+
     info = getPluginDir() + '/info.json'
     content = mw.readFile(info)
     content = json.loads(content)
     versions = content['versions']
     updates = content['updates']
 
-    idx = versions.index(version)
+    idx = versions.index(version_big)
     full_verion = updates[idx]
 
     # 找到本地版本信息对比

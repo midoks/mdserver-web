@@ -84,6 +84,12 @@ if [ "${action}" = "uninstall" ] && [ -d ${serverPath}/php-apt/${type} ];then
 	systemctl daemon-reload
 fi
 
+if [ "${action}" = "upgrade" ];then
+	cd ${curPath} && sh -x $curPath/versions/$2/install.sh upgrade
+	which systemctl && systemctl restart php${apt_ver}-fpm
+	exit 0
+fi
+
 cd ${curPath} && sh -x $curPath/versions/$2/install.sh $1
 
 if [ "${action}" = "install" ] && [ -d ${serverPath}/php-apt/${type} ];then
