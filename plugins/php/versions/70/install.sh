@@ -14,7 +14,7 @@ SYS_ARCH=`arch`
 
 version=7.0.33
 PHP_VER=70
-md5_file_ok=a6d7c355d023301a1a9ec8b4f32a4856
+md5_file_ok=ab8c5be6e32b1f8d032909dedaaaa4bbb1a209e519abb01a52ce3914f9a13d96
 Install_php()
 {
 #------------------------ install start ------------------------------------#
@@ -48,10 +48,11 @@ if [ ! -d $sourcePath/php/php${PHP_VER} ];then
 
 	#检测文件是否损坏.
 	if [ -f $sourcePath/php/php-${version}.tar.xz ];then
-		md5_file=`md5sum $sourcePath/php/php-${version}.tar.xz  | awk '{print $1}'`
+		md5_file=`sha256sum $sourcePath/php/php-${version}.tar.xz  | awk '{print $1}'`
 		if [ "${md5_file}" != "${md5_file_ok}" ]; then
 			echo "PHP${version} 下载文件不完整,重新安装"
 			rm -rf $sourcePath/php/php-${version}.tar.xz
+			exit
 		fi
 	fi
 	
@@ -144,7 +145,7 @@ if [ ! -d $serverPath/php/${PHP_VER} ] || [ "$action" == "upgrade" ];then
 	--enable-fpm
 	make clean && make -j${cpuCore} && make install && make clean
 
-	# rm -rf $sourcePath/php/php${PHP_VER}
+	rm -rf $sourcePath/php/php${PHP_VER}
 fi
 
 #------------------------ install end ------------------------------------#

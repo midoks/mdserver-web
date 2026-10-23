@@ -88,7 +88,8 @@ def install():
     version = request.form.get('version', '')
 
     upgrade = None
-    if hasattr(request.form, 'upgrade'):
+    # request.form 是 MultiDict，判断字段是否存在要用 in，hasattr 检查的是对象属性永远为 False
+    if 'upgrade' in request.form:
         upgrade = True
 
     pg = MwPlugin.instance()

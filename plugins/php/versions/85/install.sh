@@ -54,13 +54,14 @@ if [ ! -d $sourcePath/php/php${PHP_VER} ];then
 	fi
 
 	#检测文件是否损坏.
-	# if [ -f $sourcePath/php/php-${version}.tar.xz ];then
-	# 	md5_file=`sha256sum $sourcePath/php/php-${version}.tar.xz  | awk '{print $1}'`
-	# 	if [ "${md5_file}" != "${md5_file_ok}" ]; then
-	# 		echo "PHP${version} 下载文件不完整,重新安装"
-	# 		rm -rf $sourcePath/php/php-${version}.tar.xz
-	# 	fi
-	# fi
+	if [ -f $sourcePath/php/php-${version}.tar.xz ];then
+		md5_file=`sha256sum $sourcePath/php/php-${version}.tar.xz  | awk '{print $1}'`
+		if [ "${md5_file}" != "${md5_file_ok}" ]; then
+			echo "PHP${version} 下载文件不完整,重新安装"
+			rm -rf $sourcePath/php/php-${version}.tar.xz
+			exit
+		fi
+	fi
 	
 	cd $sourcePath/php && tar -Jxf $sourcePath/php/php-${version}.tar.xz
 	mv $sourcePath/php/php-${version} $sourcePath/php/php${PHP_VER}
@@ -116,8 +117,8 @@ if [ "$sysName" = "Darwin" ];then
 	BREW_DIR=`which brew`
 	BREW_DIR=${BREW_DIR/\/bin\/brew/}
 
-	LIB_DEPEND_DIR=`brew info openssl | grep ${BREW_DIR}/Cellar/openssl | cut -d \  -f 1 | awk 'END {print}'`
-	OPTIONS="$OPTIONS --with-openssl=$(brew --prefix openssl)"
+	LIB_DEPEND_DIR=`brew --prefix openssl@3`
+	OPTIONS="$OPTIONS --with-openssl=$LIB_DEPEND_DIR"
 	export PKG_CONFIG_PATH=$LIB_DEPEND_DIR/lib/pkgconfig
 	export OPENSSL_CFLAGS="-I${LIB_DEPEND_DIR}/include"
 	export OPENSSL_LIBS="-L/${LIB_DEPEND_DIR}/lib -lssl -lcrypto -lz"
@@ -157,7 +158,7 @@ if [ ! -d $serverPath/php/${PHP_VER} ] || [ "$action" == "upgrade" ];then
 	--enable-fpm
 	make clean && make -j${cpuCore} && make install && make clean
 
-	# rm -rf $sourcePath/php/php${PHP_VER}
+	rm -rf $sourcePath/php/php${PHP_VER}
 fi 
 #------------------------ install end ------------------------------------#
 }

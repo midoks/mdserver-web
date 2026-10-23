@@ -1072,17 +1072,19 @@ function installTips() {
 // };
 
 function flySlow(a) {
-	var b = $("#task").offset();
+	// fly 插件使用 position:fixed，必须用视口坐标(getBoundingClientRect)，
+	// 不能用文档坐标(offset)，否则页面滚动或窗口 resize 后位置会偏移
+	var taskRect = $("#task")[0].getBoundingClientRect();
+	var d = $("." + a)[0].getBoundingClientRect();
 	var c = $('<span class="yuandian"></span>');
-	var d = $("." + a);
 	c.fly({
 		start: {
-			left: d.offset().left,
-			top: d.offset().top,
+			left: d.left,
+			top: d.top,
 		},
 		end: {
-			left: b.left + 10,
-			top: b.top + 10,
+			left: taskRect.left + 10,
+			top: taskRect.top + 10,
 			width: 0,
 			height: 0
 		},
@@ -2220,7 +2222,7 @@ function pluginOpService(a, b, v, _suffix_name='') {
             layer.close(e);
             layer.msg('操作异常!', {icon: 1});
         });
-    })
+    });
 }
 
 //配置修改 --- start

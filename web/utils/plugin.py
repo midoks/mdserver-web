@@ -293,9 +293,10 @@ class plugin(object):
             return mw.returnData(False, '缺少版本信息!', ())
 
         msg_head = '安装'
+        op_cmd = "install"
         if upgrade is not None and upgrade is True:
-            mtype = 'update'
             msg_head = '更新'
+            op_cmd = "upgrade"
 
         info_file = self.__plugin_dir + '/' + name + '/' + 'info.json'
         if not os.path.exists(info_file):
@@ -303,9 +304,10 @@ class plugin(object):
 
         info_data = json.loads(mw.readFile(info_file))
 
-        exec_bash = 'cd {0} && bash {1} install {2}'.format(
+        exec_bash = 'cd {0} && bash {1} {2} {3}'.format(
             mw.getPluginDir() + '/'+name,
             info_data['shell'],
+            op_cmd,
             version
         )
 

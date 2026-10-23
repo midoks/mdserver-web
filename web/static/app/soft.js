@@ -133,6 +133,10 @@ function getSList(isdisplay) {
                 } else {
                     state = '<span style="color:red" class="glyphicon glyphicon-pause"></span>'
                 }
+
+                if (plugin.task == '1'){
+                    checkUpdate(plugin);
+                }
             }
 
             if (plugin.task == '-2') {
@@ -160,7 +164,7 @@ function getSList(isdisplay) {
                 '<td>' + softPath + '</td>' +
                 '<td>' + state + '</td>' +
                 '<td>' + indexshow + '</td>' +
-                '<td style="text-align: right;">' + handle + '</td>' +
+                '<td style="text-align: right;" id="op_'+plugin.name+"_"+plugin.setup_version+'">' + handle + '</td>' +
                 '</tr>';
         }
 
@@ -178,6 +182,36 @@ function getSList(isdisplay) {
     },'json');
 }
 
+function checkUpdate(info){
+    if (info.upgrade){
+        $.post("/plugins/run", {'name':info.name, 'version':info.setup_version,'func':'upgrade_check'}, function(rdata) {
+            var data = $.parseJSON(rdata.data);
+            if (data.status == 1){
+                var id_name = 'op_'+info.name+"_"+info.setup_version;
+                var content = "<a class=\"btlink\" onclick=\"upgradeToNewVersion('"+info.name+"','"+info.setup_version+"', '"+data.data+"')\">有更新</a> | " ;
+                $("#"+id_name).prepend(content);
+            }
+        },'json');
+    }
+}
+
+function runInstall(data){
+    var loadT = layer.msg('正在添加到安装器...', { icon: 16, time: 0, shade: [0.3, '#000'] });
+    $.post("/plugins/install", data, function(rdata) {
+        layer.closeAll();
+        layer.msg(rdata.msg, { icon: rdata.status ? 1 : 2 });
+        getSList();
+    },'json');
+}
+
+function upgradeToNewVersion(name, version, show_version){
+    layer.confirm(msgTpl('您真的要更新【{1}-{2}】到{3}吗?', [name, version, show_version]), { icon: 3, closeBtn: 1 }, function() {
+        var request_args = "name=" + name + "&version=" + version +"&upgrade=true";
+        runInstall(request_args);
+        flySlow('layui-layer-btn0');
+    });
+}
+
 function installPreInspection(name, ver, callback){
     var loading = layer.msg('正在检查安装环境...', { icon: 16, time: 0, shade: [0.3, '#000'] });
      $.post("/plugins/run", {'name':name,'version':ver,'func':'install_pre_inspection'}, function(rdata) {
@@ -191,15 +225,6 @@ function installPreInspection(name, ver, callback){
         } else {
             layer.msg(rdata.data, { icon: rdata.status ? 1 : 2 });
         }
-    },'json');
-}
-
-function runInstall(data){
-    var loadT = layer.msg('正在添加到安装器...', { icon: 16, time: 0, shade: [0.3, '#000'] });
-    $.post("/plugins/install", data, function(rdata) {
-        layer.closeAll();
-        layer.msg(rdata.msg, { icon: rdata.status ? 1 : 2 });
-        getSList();
     },'json');
 }
 

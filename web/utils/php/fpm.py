@@ -186,24 +186,30 @@ class fpm(object):
         fpm_sock = fcgi(env, content)
 
         _data = b''
-        while True:
-            fastcgi_header = fpm_sock.recv(8)
-            if not fastcgi_header:
-                break
-            if len(fastcgi_header) != 8:
-                _data += fastcgi_header
-                break
-            fast_pack = struct.unpack(FCGI_Header, fastcgi_header)
-            if fast_pack[1] == 3:
-                break
-            tlen = fast_pack[3]
-            while tlen > 0:
-                sd = fpm_sock.recv(tlen)
-                if not sd:
+        try:
+            while True:
+                fastcgi_header = fpm_sock.recv(8)
+                if not fastcgi_header:
                     break
-                tlen -= len(sd)
-                _data += sd
-            if fast_pack[4]:
-                fpm_sock.recv(fast_pack[4])
+                if len(fastcgi_header) != 8:
+                    _data += fastcgi_header
+                    break
+                fast_pack = struct.unpack(FCGI_Header, fastcgi_header)
+                if fast_pack[1] == 3:
+                    break
+                tlen = fast_pack[3]
+                while tlen > 0:
+                    sd = fpm_sock.recv(tlen)
+                    if not sd:
+                        break
+                    tlen -= len(sd)
+                    _data += sd
+                if fast_pack[4]:
+                    fpm_sock.recv(fast_pack[4])
+        except (ConnectionResetError, BrokenPipeError) as e:
+            # FPM 接收请求后主动断开(重启/worker 崩溃/socket 路径不对)
+            raise ConnectionError('PHP-FPM 连接中断(%s)，请确认 PHP-FPM 正在运行且 listen 地址正确' % e)
+        finally:
+            fpm_sock.close()
         status, headers, data = format_header_data(_data)
         return data

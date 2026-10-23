@@ -179,7 +179,7 @@ class Record(object):
             try:
                 data = sock.recv(length)
             except socket.error as e:
-                if e[0] == errno.EAGAIN:
+                if e.errno == errno.EAGAIN:
                     select.select([sock], [], [])
                     continue
                 else:
@@ -237,7 +237,7 @@ class Record(object):
             try:
                 sent = sock.send(data)
             except socket.error as e:
-                if e[0] == errno.EAGAIN:
+                if e.errno == errno.EAGAIN:
                     select.select([], [sock], [])
                     continue
                 else:

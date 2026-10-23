@@ -55,6 +55,7 @@ if [ ! -d $sourcePath/php/php${PHP_VER} ];then
 		if [ "${md5_file}" != "${md5_file_ok}" ]; then
 			echo "PHP${version} 下载文件不完整,重新安装"
 			rm -rf $sourcePath/php/php-${version}.tar.xz
+			exit
 		fi
 	fi
 	
@@ -151,8 +152,13 @@ if [ ! -d $serverPath/php/${PHP_VER} ] || [ "$action" == "upgrade" ];then
 	$OPTIONS \
 	--enable-fpm
 	make clean && make -j${cpuCore} && make install && make clean
-
-	# rm -rf $sourcePath/php/php${PHP_VER}
+	if [ "$?" == "0" ];then
+		echo "安装php-${version}成功"
+	else
+		echo "安装php-${version}异常"
+	fi
+	
+	rm -rf $sourcePath/php/php${PHP_VER}
 fi 
 #------------------------ install end ------------------------------------#
 }

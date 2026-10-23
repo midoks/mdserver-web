@@ -90,16 +90,15 @@ def getFpmAddress(version):
         tmp = re.findall(r"listen\s*=\s*(.+)", content)
         if not tmp:
             return fpm_address
-        if tmp[0].find('sock') != -1:
-            return fpm_address
-        if tmp[0].find(':') != -1:
-            listen_tmp = tmp[0].split(':')
-            if bind:
-                fpm_address = (listen_tmp[0], int(listen_tmp[1]))
-            else:
-                fpm_address = ('127.0.0.1', int(listen_tmp[1]))
+        listen = tmp[0].strip()
+        if listen.find('sock') != -1:
+            # 返回配置中的实际 socket 路径，避免自定义路径时连到错误的旧 socket
+            return listen
+        if listen.find(':') != -1:
+            listen_tmp = listen.split(':')
+            fpm_address = ('127.0.0.1', int(listen_tmp[1]))
         else:
-            fpm_address = ('127.0.0.1', int(tmp[0]))
+            fpm_address = ('127.0.0.1', int(listen))
         return fpm_address
     except:
         return fpm_address
@@ -113,13 +112,17 @@ def getPhpinfo(version):
     sock_file = getFpmAddress(version)
     root_dir = mw.getFatherDir() + '/phpinfo'
 
-    mw.execShell("rm -rf " + root_dir)
-    mw.execShell("mkdir -p " + root_dir)
-    mw.writeFile(root_dir + '/phpinfo.php', '<?php phpinfo(); ?>')
-    sock_data = mw.requestFcgiPHP(sock_file, '/phpinfo.php', root_dir)
-    os.system("rm -rf " + root_dir)
-    phpinfo = str(sock_data, encoding='utf-8')
-    return phpinfo
+    try:
+        mw.execShell("rm -rf " + root_dir)
+        mw.execShell("mkdir -p " + root_dir)
+        mw.writeFile(root_dir + '/phpinfo.php', '<?php phpinfo(); ?>')
+        sock_data = mw.requestFcgiPHP(sock_file, '/phpinfo.php', root_dir)
+        phpinfo = str(sock_data, encoding='utf-8')
+        return phpinfo
+    except Exception as e:
+        return 'PHP[' + version + '] phpinfo 获取失败: ' + str(e)
+    finally:
+        os.system("rm -rf " + root_dir)
 
 
 def libConfCommon(version):

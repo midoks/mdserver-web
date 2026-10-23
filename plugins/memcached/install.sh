@@ -2,6 +2,8 @@
 PATH=/bin:/sbin:/usr/bin:/usr/sbin:/usr/local/bin:/usr/local/sbin:~/bin:/opt/homebrew/bin
 export PATH=$PATH:/opt/homebrew/bin
 
+action=$1
+
 curPath=`pwd`
 rootPath=$(dirname "$curPath")
 rootPath=$(dirname "$rootPath")
@@ -25,8 +27,9 @@ Install_mem(){
 
 	OPTIONS=''
 	if [ ${sys_os} = "Darwin" ]; then
-		LIB_DEPEND_DIR=`brew info libevent | grep /opt/homebrew/Cellar/libevent | cut -d \  -f 1 | awk 'END {print}'`
+		LIB_DEPEND_DIR=`brew --prefix libevent`
 		OPTIONS="${OPTIONS} --with-libevent=${LIB_DEPEND_DIR}"
+		OPTIONS="${OPTIONS} --disable-docs"
 	fi
 
 	echo "./configure --prefix=${serverPath}/memcached && make && make install"
@@ -36,7 +39,7 @@ Install_mem(){
 
 	make && make install
 
-	if [ -d $serverPath/memcached ];then
+	if [ -d $serverPath/memcached ] || [ "$action" == "upgrade" ];then
 		echo '1.6' > $serverPath/memcached/version.pl
 		echo '安装memcached成功'
 
@@ -66,10 +69,10 @@ Uninstall_mem()
 
 
 # /www/server/memcached/bin/memcached -d -p 11211 -u root  -m 100 -c 100
-
-action=$1
-if [ "${1}" = 'install' ];then
+if [ "${1}" = 'install' ] || [ "$action" = "upgrade" ];then
 	Install_mem
-else
+elif [ "${1}" = 'uninstall' ];then
 	Uninstall_mem
+else
+	echo "OPTIONS ERROR"
 fi
