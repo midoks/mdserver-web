@@ -87,13 +87,11 @@ if [ ! -f /www/server/mdserver-web/bin/activate ];then
     else
         echo "python3 < 3.10"
         cd /www/server/mdserver-web && python3 -m venv .
-        cd /www/server/mdserver-web && . ./bin/activate && pip3 install -r /www/server/mdserver-web/requirements.txt -i $PIPSRC
-
-        cd /www/server/mdserver-web && . ./bin/activate
+        echo "cd /www/server/mdserver-web && pip3 install -r /www/server/mdserver-web/requirements.txt -i $PIPSRC"
         while IFS= read -r pkg || [ -n "$pkg" ]; do
             [ -z "$pkg" ] && continue
-            pip3 install "$pkg" || true
-        done < /www/server/mdserver-web/maybe.txt -i $PIPSRC
+            pip3 install "$pkg" -i $PIPSRC || true
+        done < /www/server/mdserver-web/requirements.txt 
     fi
     cd /www/server/mdserver-web && . ./bin/activate
 else
