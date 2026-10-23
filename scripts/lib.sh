@@ -108,21 +108,13 @@ pip3 install --upgrade setuptools -i $PIPSRC
 if [ "$LOCAL_ADDR" != "common" ];then
     cd /www/server/mdserver-web && pip3 install -r /www/server/mdserver-web/requirements.txt
 fi
-# cd /www/server/mdserver-web && pip3 install -r /www/server/mdserver-web/requirements.txt -i $PIPSRC
+
+echo "cd /www/server/mdserver-web && pip3 install -r /www/server/mdserver-web/requirements.txt -i $PIPSRC"
 # -i $PIPSRC
 while IFS= read -r pkg || [ -n "$pkg" ]; do
     [ -z "$pkg" ] && continue
     pip3 install "$pkg" -i $PIPSRC || true
 done < /www/server/mdserver-web/requirements.txt 
-
-
-
-cd /www/server/mdserver-web && pip3 install -r /www/server/mdserver-web/maybe.txt -i $PIPSRC
-cd /www/server/mdserver-web && . ./bin/activate
-while IFS= read -r pkg || [ -n "$pkg" ]; do
-    [ -z "$pkg" ] && continue
-    pip3 install "$pkg" || true
-done < /www/server/mdserver-web/maybe.txt -i $PIPSRC
 
 
 # Different versions use different python lib
