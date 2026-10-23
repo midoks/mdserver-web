@@ -108,8 +108,8 @@ if [ "$sysName" = "Darwin" ];then
 	BREW_DIR=`which brew`
 	BREW_DIR=${BREW_DIR/\/bin\/brew/}
 
-	LIB_DEPEND_DIR=`brew info openssl | grep ${BREW_DIR}/Cellar/openssl | cut -d \  -f 1 | awk 'END {print}'`
-	OPTIONS="$OPTIONS --with-openssl=$(brew --prefix openssl)"
+	LIB_DEPEND_DIR=`brew info openssl@3 | grep ${BREW_DIR}/Cellar/openssl@3 | cut -d \  -f 1 | awk 'END {print}'`
+	OPTIONS="$OPTIONS --with-openssl=$(brew --prefix openssl@3)"
 	export PKG_CONFIG_PATH=$LIB_DEPEND_DIR/lib/pkgconfig
 	export OPENSSL_CFLAGS="-I${LIB_DEPEND_DIR}/include"
 	export OPENSSL_LIBS="-L/${LIB_DEPEND_DIR}/lib -lssl -lcrypto -lz"
@@ -145,7 +145,7 @@ if [ ! -d $serverPath/php/${PHP_VER} ] || [ "$action" == "upgrade" ];then
 	--enable-fpm
 	make clean && make -j${cpuCore} && make install && make clean
 
-	# rm -rf $sourcePath/php/php${PHP_VER}
+	rm -rf $sourcePath/php/php${PHP_VER}
 fi 
 #------------------------ install end ------------------------------------#
 }

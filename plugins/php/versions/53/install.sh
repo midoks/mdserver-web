@@ -137,7 +137,7 @@ if [ ! -d $serverPath/php/${PHP_VER}/bin ] || [ "$action" == "upgrade" ];then
 	--enable-fpm
 	make clean && make -j${cpuCore} && make install && make clean
 
-	# rm -rf $sourcePath/php/php${PHP_VER}
+	rm -rf $sourcePath/php/php${PHP_VER}
 	echo "安装php-${version}成功"
 fi
 
