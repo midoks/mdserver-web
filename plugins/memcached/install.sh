@@ -2,6 +2,8 @@
 PATH=/bin:/sbin:/usr/bin:/usr/sbin:/usr/local/bin:/usr/local/sbin:~/bin:/opt/homebrew/bin
 export PATH=$PATH:/opt/homebrew/bin
 
+# cd /www/server/mdserver-web/plugins/memcached && bash install.sh upgrade_check 85
+
 action=$1
 
 curPath=`pwd`
