@@ -37,10 +37,9 @@ Install_App()
 	if [ ! -d $serverPath/redis/data ];then
 		mkdir -p $serverPath/redis/data
 		sed '/^ *#/d' redis.conf > $serverPath/redis/redis.conf
-
-		echo "${PLUGIN_VERSION}" > $serverPath/redis/version.pl
 		echo '安装完成'
 	fi
+	echo "${PLUGIN_VERSION}" > $serverPath/redis/version.pl
 
 	if [ -d ${REDIS_DIR}/redis-${VERSION} ];then
 		rm -rf ${REDIS_DIR}/redis-${VERSION}
