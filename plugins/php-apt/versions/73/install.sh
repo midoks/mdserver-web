@@ -2,6 +2,8 @@
 PATH=/bin:/sbin:/usr/bin:/usr/sbin:/usr/local/bin:/usr/local/sbin:~/bin
 export PATH
 
+action=${1}
+
 curPath=`pwd`
 rootPath=$(dirname "$curPath")
 rootPath=$(dirname "$rootPath")
@@ -23,10 +25,16 @@ PHP_VER=73
 Install_php()
 {
 #------------------------ install start ------------------------------------#
-apt -y install php${version} php${version}-fpm php${version}-dev
+if [ "$action" == "upgrade" ];then
+	apt -y upgrade php${version} php${version}-fpm php${version}-dev
+else
+	apt -y install php${version} php${version}-fpm php${version}-dev
+fi
+
 if [ "$?" = "0" ];then
 	mkdir -p $serverPath/php-apt/${PHP_VER}
 fi
+
 
 #------------------------ install end ------------------------------------#
 }
@@ -40,9 +48,10 @@ echo "卸载php-${version}..."
 #------------------------ uninstall start ------------------------------------#
 }
 
-action=${1}
-if [ "${1}" = 'install' ];then
+if [ "${action}" = 'install' ] || [ "$action" = "upgrade" ];then
 	Install_php
-else
+elif [ "${1}" = 'uninstall' ];then
 	Uninstall_php
+else
+	echo "OPTIONS ERROR"
 fi

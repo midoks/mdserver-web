@@ -10,7 +10,7 @@ sysName=`uname`
 
 # cd /www/server/mdserver-web/plugins/php && bash install.sh install 85
 # cd /www/server/mdserver-web/plugins/php && bash install.sh upgrade 85
-# cd /www/server/mdserver-web && . ./bin/activate && python3 plugins/php/index.py upgrade_check 1.6
+# cd /www/server/mdserver-web && . ./bin/activate && python3 plugins/php/index.py upgrade_check 56
 
 # https://www.php.net/releases
 
