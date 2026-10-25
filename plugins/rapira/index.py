@@ -187,19 +187,19 @@ def initReplace(version):
     exp_ds_file = getServerDir()+"/"+version+"/dispatcher.php"
     if not os.path.exists(exp_ds_file):
         content = mw.readFile(exp_ds_file_tpl)
-        mw.writeFile(exp_ds_file,exp_ds_file_tpl)
+        mw.writeFile(exp_ds_file,content)
 
     exp_ds_file_tpl = getPluginDir()+"/exp/classic.php"
     exp_ds_file = getServerDir()+"/"+version+"/classic.php"
     if not os.path.exists(exp_ds_file):
         content = mw.readFile(exp_ds_file_tpl)
-        mw.writeFile(exp_ds_file,exp_ds_file_tpl)
+        mw.writeFile(exp_ds_file,content)
 
     exp_ds_file_tpl = getPluginDir()+"/exp/worker.php"
     exp_ds_file = getServerDir()+"/"+version+"/worker.php"
     if not os.path.exists(exp_ds_file):
         content = mw.readFile(exp_ds_file_tpl)
-        mw.writeFile(exp_ds_file,exp_ds_file_tpl)
+        mw.writeFile(exp_ds_file,content)
     # 模版例子 end
 
     session_path = getServerDir() + '/tmp/session'
