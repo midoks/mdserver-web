@@ -9,7 +9,8 @@ rootPath=$(dirname "$rootPath")
 rootPath=$(dirname "$rootPath")
 rootPath=$(dirname "$rootPath")
 serverPath=$(dirname "$rootPath")
-sourcePath=${serverPath}/source/php
+sourcePath=${serverPath}/source/rapira
+
 SYS_ARCH=`arch`
 actionType=$1
 version=$2

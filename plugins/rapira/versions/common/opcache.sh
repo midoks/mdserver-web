@@ -9,7 +9,7 @@ rootPath=$(dirname "$rootPath")
 rootPath=$(dirname "$rootPath")
 rootPath=$(dirname "$rootPath")
 serverPath=$(dirname "$rootPath")
-sourcePath=${serverPath}/source/php
+sourcePath=${serverPath}/source/rapira
 
 LIBNAME=opcache
 sysName=`uname`

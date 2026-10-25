@@ -9,7 +9,7 @@ rootPath=$(dirname "$rootPath")
 rootPath=$(dirname "$rootPath")
 rootPath=$(dirname "$rootPath")
 serverPath=$(dirname "$rootPath")
-sourcePath=${serverPath}/source/php
+sourcePath=${serverPath}/source/rapira
 SYS_ARCH=`arch`
 actionType=$1
 version=$2
@@ -29,12 +29,12 @@ OSNAME_ID=`cat /etc/*-release | grep VERSION_ID | awk -F = '{print $2}' | awk -F
 
 
 LIB_PATH_NAME=lib/php
-if [ -d $serverPath/php/${version}/lib64 ];then
+if [ -d $serverPath/rapira/${version}/link/lib64 ];then
 	LIB_PATH_NAME=lib64
 fi
 
-NON_ZTS_FILENAME=`ls $serverPath/php/${version}/${LIB_PATH_NAME}/extensions | grep no-debug-non-zts`
-extFile=$serverPath/php/${version}/${LIB_PATH_NAME}/extensions/${NON_ZTS_FILENAME}/${LIBNAME}.so
+NON_ZTS_FILENAME=`ls $serverPath/rapira/${version}/link/${LIB_PATH_NAME}/extensions | grep no-debug-non-zts`
+extFile=$serverPath/rapira/${version}/link/${LIB_PATH_NAME}/extensions/${NON_ZTS_FILENAME}/${LIBNAME}.so
 
 sysName=`uname`
 if [ "$sysName" = "Darwin" ];then
@@ -54,7 +54,7 @@ phpini=$serverPath/rapira/$version/php.ini
 Install_lib()
 {
 
-	isInstall=`cat $serverPath/php/$version/etc/php.ini|grep "${LIBNAME}.so"`
+	isInstall=`cat ${phpini}|grep "${LIBNAME}.so"`
 	if [ "${isInstall}" != "" ];then
 		echo "php-$version 已安装${LIBNAME},请选择其它版本!"
 		return
