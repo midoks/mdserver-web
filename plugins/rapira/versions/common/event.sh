@@ -75,7 +75,7 @@ Install_lib()
 		if [ $sysName = 'Darwin' ]; then
 			LIB_DEPEND_DIR=`brew --prefix libevent`
 			OPTIONS="${OPTIONS} --with-event-libevent-dir=${LIB_DEPEND_DIR}"
-			OPTIONS="${OPTIONS} --disable-event-sockets"
+			# OPTIONS="${OPTIONS} --disable-event-sockets"
 		fi
 
 		$serverPath/rapira/$version/link/bin/phpize
