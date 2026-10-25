@@ -32,7 +32,7 @@ function phpPostCallback(method, version, args,callback){
     var req_data = {};
     req_data['name'] = 'rapira';
     req_data['func'] = method;
-    req_data['script']='index_php';
+    req_data['script']='index_rapira';
     args['version'] = version;
 
  
