@@ -33,7 +33,7 @@ max_files = 20
 
 # The worker pool behind the http listener. Each plugin owns its pool under [<plugin>.pool].
 [http.pool]
-entrypoint = "dispatcher-sync.php" # relative paths resolve against this file's directory
+entrypoint = "classic.php" # relative paths resolve against this file's directory
 mode = "classic"           # "classic" | "worker" | "dispatcher" (the default)
 processes = 16                # a fixed worker count; defaults to the CPU count
 max_requests = 1000            # recycle a worker after ~N requests (jittered); 0 = unlimited
