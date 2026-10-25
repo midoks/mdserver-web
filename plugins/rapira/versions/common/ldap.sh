@@ -56,6 +56,12 @@ Install_lib()
 			OPTIONS="$OPTIONS --build=aarch64-unknown-linux-gnu --host=aarch64-unknown-linux-gnu"
 		fi
 
+		if [ "$sysName" = "Darwin" ];then
+			LIB_DEPEND_DIR=`brew --prefix openldap`
+			export PKG_CONFIG_PATH="${LIB_DEPEND_DIR}/lib/pkgconfig"
+			OPTIONS="$OPTIONS --with-ldap=$LIB_DEPEND_DIR"
+		fi
+
 		$serverPath/rapira/$version/link/bin/phpize
 		./configure --with-php-config=$serverPath/rapira/$version/link/bin/php-config $OPTIONS
 		make clean && make && make install && make clean

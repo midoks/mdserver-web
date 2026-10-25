@@ -93,7 +93,7 @@ Install_lib()
 
 		if [ "$sysName" = "Darwin" ];then
 			LIB_DEPEND_DIR=`brew --prefix icu4c`
-			PKG_CONFIG_PATH="$(brew --prefix icu4c)/lib/pkgconfig"
+			export PKG_CONFIG_PATH="${LIB_DEPEND_DIR}/lib/pkgconfig"
 			OPTIONS="$OPTIONS --with-icu-dir=$LIB_DEPEND_DIR"
 			OPTIONS="$OPTIONS --enable-intl"
 		fi		

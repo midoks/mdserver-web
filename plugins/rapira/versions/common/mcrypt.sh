@@ -14,19 +14,12 @@ actionType=$1
 version=$2
 
 LIBNAME=mcrypt
-LIBV=1.0.7
+LIBV=1.0.9
 
 if [ "$version" -lt "72" ];then
 	echo "not need"
 	exit 1
-fi 
-
-if [ "$version" -ge "84" ];then
-	LIBV=1.0.7
-	echo "not need"
-	exit 1
-fi 
-
+fi
 
 LIB_PATH_NAME=lib/php
 if [ -d $serverPath/rapira/${version}/lib64 ];then
@@ -74,12 +67,9 @@ Install_lib()
 		fi
 
 		if [ "$sysName" = "Darwin" ];then
-
-			BREW_DIR=`which brew`
-			BREW_DIR=${BREW_DIR/\/bin\/brew/}
-			LIB_DEPEND_DIR=`brew info mcrypt | grep ${BREW_DIR}/Cellar/mcrypt | cut -d \  -f 1 | awk 'END {print}'`
-			OPTIONS="$OPTIONS --with-mcrypt=$(brew --prefix mcrypt)"
+			LIB_DEPEND_DIR=`brew --prefix mcrypt`
 			export PKG_CONFIG_PATH=$PKG_CONFIG_PATH:$LIB_DEPEND_DIR/lib/pkgconfig
+			OPTIONS="$OPTIONS --with-mcrypt=${LIB_DEPEND_DIR}"
 		fi
 
 		$serverPath/rapira/$version/link/bin/phpize
