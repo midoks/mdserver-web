@@ -67,12 +67,17 @@ Install_lib()
 		if [ "$sysName" = "Darwin" ];then
 			LIB_DEPEND_DIR=`brew --prefix libsodium`
 			OPTIONS="$OPTIONS --with-sodium=${LIB_DEPEND_DIR}"
+			OPTIONS="$OPTIONS -I$LIB_DEPEND_DIR/include"
+			OPTIONS="$OPTIONS -L$LIB_DEPEND_DIR/lib"
+			# CPPFLAGS="-I$LIB_DEPEND_DIR/include"
+	  		# LDFLAGS="-L$LIB_DEPEND_DIR/lib"
 		else
 			OPTIONS="$OPTIONS --with-sodium=$serverPath/lib/libsodium"
 		fi
 
 		$serverPath/rapira/$version/link/bin/phpize
 		./configure --with-php-config=$serverPath/rapira/$version/link/bin/php-config $OPTIONS
+				
 		make clean && make && make install && make clean
 
 		if [ -d $php_lib/lib${LIBNAME}-${LIBV} ];then
