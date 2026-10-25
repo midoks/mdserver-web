@@ -69,7 +69,7 @@ Install_lib()
 	echo "opcache.save_comments=0" >> $serverPath/php/$version/etc/php.ini
 	echo "opcache.blacklist_filename=${OP_BL}" >> $serverPath/php/$version/etc/php.ini
 
-	cd  ${curPath} && bash ${rootPath}/plugins/php/versions/lib.sh $version restart
+	cd  ${curPath} && bash ${rootPath}/plugins/rapira/versions/lib.sh $version restart
 	echo '==========================================================='
 	echo 'successful!'
 }
@@ -80,7 +80,7 @@ Uninstall_lib()
 	sed -i $BAK "/${LIBNAME}.so/d" $serverPath/php/$version/etc/php.ini
 	sed -i $BAK "/${LIBNAME}/d" $serverPath/php/$version/etc/php.ini
 		
-	cd  ${curPath} && bash ${rootPath}/plugins/php/versions/lib.sh $version restart
+	cd  ${curPath} && bash ${rootPath}/plugins/rapira/versions/lib.sh $version restart
 	echo '==============================================='
 	echo 'successful!'
 }
