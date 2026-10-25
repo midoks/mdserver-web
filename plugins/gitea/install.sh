@@ -100,6 +100,10 @@ Install_App()
 
 	echo $version > $serverPath/gitea/version.pl
 	echo 'install success'
+
+	if [ "$action" = "upgrade" ];then
+		which systemctl && systemctl restart gitea
+	fi
 }
 
 Uninstall_App()
