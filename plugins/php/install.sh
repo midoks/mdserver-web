@@ -100,6 +100,13 @@ if [ "${action}" = "install" ] && [ -d ${serverPath}/php/${type} ];then
 		curl -sS https://getcomposer.org/installer | /www/server/php/${type}/bin/php
 		mv composer.phar /usr/local/bin/composer
 	fi
+
+	if [ ! -f /usr/local/bin/pie ] && [ "$sysName" != "Darwin" ] ;then
+			curl -fL --output /tmp/pie.phar https://github.com/php/pie/releases/latest/download/pie.phar \
+				&& gh attestation verify --owner php /tmp/pie.phar \
+			 	&& mv /tmp/pie.phar /usr/local/bin/pie \
+			 	&& chmod +x /usr/local/bin/pie
+	fi
 fi
 
 
