@@ -79,15 +79,9 @@ def getConf(version):
     path = getServerDir() + '/' + version + '/rapira.toml'
     return path
 
-
-def getFpmConfFile(version, pool='www'):
-    args = getArgs()
-    if 'pool' in args:
-        pool = args['pool']
-    return getServerDir() + '/' + version + '/etc/php-fpm.d/'+pool+'.conf'
-
-def getFpmFile(version):
-    return getServerDir() + '/' + version + '/etc/php-fpm.conf'
+def getConfIni(version):
+    path = getServerDir() + '/' + version + '/php.ini'
+    return path
 
 
 def status_progress(version):
@@ -98,14 +92,6 @@ def status_progress(version):
     if data[0] == '':
         return 'stop'
     return 'start'
-
-
-def getPhpSocket(version):
-    path = getFpmConfFile(version)
-    content = mw.readFile(path)
-    rep = r'listen\s*=\s*(.*)'
-    tmp = re.search(rep, content)
-    return tmp.groups()[0].strip()
 
 
 def status(version):
@@ -143,14 +129,11 @@ def phpPrependFile(version):
 
 
 def makePhpIni(version):
-    dst_ini = getConf(version)
+    dst_ini = getConfIni(version)
     if not os.path.exists(dst_ini):
         src_ini = getPluginDir() + '/conf/php' + version[0:1] + '.ini'
         # shutil.copyfile(s_ini, d_ini)
         content = mw.readFile(src_ini)
-        if version == '52':
-            content = content + "auto_prepend_file=/www/server/php/app_start.php"
-
         content = contentReplace(content, version)
         mw.writeFile(dst_ini, content)
 
@@ -162,6 +145,8 @@ def commonReplace(content,version):
     return content
 
 def initReplace(version):
+    makePhpIni(version)
+
     initD_path = getServerDir() + '/init.d'
     if not os.path.exists(initD_path):
         os.mkdir(initD_path)
@@ -346,197 +331,6 @@ def getPhpConf(version):
     return mw.getJson(data)
 
 
-def submitPhpConf(version):
-    gets = ['display_errors', 'cgi.fix_pathinfo', 'date.timezone', 'short_open_tag',
-            'asp_tags', 'max_execution_time', 'max_input_time', 'max_input_vars', 'memory_limit',
-            'post_max_size', 'file_uploads', 'upload_max_filesize', 'max_file_uploads',
-            'default_socket_timeout', 'error_reporting']
-    args = getArgs()
-    filename = getServerDir() + '/' + version + '/etc/php.ini'
-    phpini = mw.readFile(filename)
-    for g in gets:
-        if g in args:
-            rep = g + r'\s*=\s*(.+)\r?\n'
-            val = g + ' = ' + args[g] + '\n'
-            phpini = re.sub(rep, val, phpini)
-    mw.writeFile(filename, phpini)
-    # mw.execShell(getServerDir() + '/init.d/php' + version + ' reload')
-    reload(version)
-    return mw.returnJson(True, '设置成功')
-
-
-def getLimitConf(version):
-    fileini = getConf(version)
-    phpini = mw.readFile(fileini)
-    filefpm = getFpmConfFile(version)
-    phpfpm = mw.readFile(filefpm)
-
-    # print fileini, filefpm
-    data = {}
-    try:
-        rep = r"upload_max_filesize\s*=\s*([0-9]+)M"
-        tmp = re.search(rep, phpini).groups()
-        data['max'] = tmp[0]
-    except:
-        data['max'] = '50'
-
-    try:
-        rep = r"request_terminate_timeout\s*=\s*([0-9]+)\n"
-        tmp = re.search(rep, phpfpm).groups()
-        data['maxTime'] = tmp[0]
-    except:
-        data['maxTime'] = 0
-
-    try:
-        rep = r"\n;*\s*cgi\.fix_pathinfo\s*=\s*([0-9]+)\s*\n"
-        tmp = re.search(rep, phpini).groups()
-
-        if tmp[0] == '1':
-            data['pathinfo'] = True
-        else:
-            data['pathinfo'] = False
-    except:
-        data['pathinfo'] = False
-
-    return mw.getJson(data)
-
-
-def setMaxTime(version):
-    args = getArgs()
-    data = checkArgs(args, ['time'])
-    if not data[0]:
-        return data[1]
-
-    time = args['time']
-    if int(time) < 30 or int(time) > 86400:
-        return mw.returnJson(False, '请填写30-86400间的值!')
-
-    filefpm = getFpmConfFile(version)
-    conf = mw.readFile(filefpm)
-    rep = r"request_terminate_timeout\s*=\s*([0-9]+)\n"
-    conf = re.sub(rep, "request_terminate_timeout = " + time + "\n", conf)
-    mw.writeFile(filefpm, conf)
-
-    fileini = getServerDir() + "/" + version + "/etc/php.ini"
-    phpini = mw.readFile(fileini)
-    rep = r"max_execution_time\s*=\s*([0-9]+)\r?\n"
-    phpini = re.sub(rep, "max_execution_time = " + time + "\n", phpini)
-    rep = r"max_input_time\s*=\s*([0-9]+)\r?\n"
-    phpini = re.sub(rep, "max_input_time = " + time + "\n", phpini)
-    mw.writeFile(fileini, phpini)
-    return mw.returnJson(True, '设置成功!')
-
-
-def setMaxSize(version):
-    args = getArgs()
-    data = checkArgs(args, ['max'])
-    if not data[0]:
-        return data[1]
-
-    maxVal = args['max']
-    if int(maxVal) < 2:
-        return mw.returnJson(False, '上传大小限制不能小于2MB!')
-
-    path = getConf(version)
-    conf = mw.readFile(path)
-    rep = r"\nupload_max_filesize\s*=\s*[0-9]+M"
-    conf = re.sub(rep, u'\nupload_max_filesize = ' + maxVal + 'M', conf)
-    rep = r"\npost_max_size\s*=\s*[0-9]+M"
-    conf = re.sub(rep, u'\npost_max_size = ' + maxVal + 'M', conf)
-    mw.writeFile(path, conf)
-
-    msg = mw.getInfo('设置PHP-{1}最大上传大小为[{2}MB]!', (version, maxVal,))
-    mw.writeLog('插件管理[PHP]', msg)
-    return mw.returnJson(True, '设置成功!')
-
-
-def getFpmConfig(version, pool = 'www'):
-    args = getArgs()
-    pool = 'www'
-    if 'pool' in args:
-        pool = args['pool']
-
-    filefpm = getServerDir() + '/' + version + '/etc/php-fpm.d/'+pool+'.conf'
-    conf = mw.readFile(filefpm)
-    data = {}
-    rep = r"\s*pm.max_children\s*=\s*([0-9]+)\s*"
-    tmp = re.search(rep, conf).groups()
-    data['max_children'] = tmp[0]
-
-    rep = r"\s*pm.start_servers\s*=\s*([0-9]+)\s*"
-    tmp = re.search(rep, conf).groups()
-    data['start_servers'] = tmp[0]
-
-    rep = r"\s*pm.min_spare_servers\s*=\s*([0-9]+)\s*"
-    tmp = re.search(rep, conf).groups()
-    data['min_spare_servers'] = tmp[0]
-
-    rep = r"\s*pm.max_spare_servers \s*=\s*([0-9]+)\s*"
-    tmp = re.search(rep, conf).groups()
-    data['max_spare_servers'] = tmp[0]
-
-    rep = r"\s*pm\s*=\s*(\w+)\s*"
-    tmp = re.search(rep, conf).groups()
-    data['pm'] = tmp[0]
-    return mw.getJson(data)
-
-
-def setFpmConfig(version):
-    args = getArgs()
-    # if not 'max' in args:
-    #     return 'missing time args!'
-
-    version = args['version']
-    max_children = args['max_children']
-    start_servers = args['start_servers']
-    min_spare_servers = args['min_spare_servers']
-    max_spare_servers = args['max_spare_servers']
-    pm = args['pm']
-    pool = args['pool']
-
-
-    file = getServerDir() + '/' + version + '/etc/php-fpm.d/'+pool+'.conf'
-    conf = mw.readFile(file)
-
-    rep = r"\s*pm.max_children\s*=\s*([0-9]+)\s*"
-    conf = re.sub(rep, "\npm.max_children = " + max_children, conf)
-
-    rep = r"\s*pm.start_servers\s*=\s*([0-9]+)\s*"
-    conf = re.sub(rep, "\npm.start_servers = " + start_servers, conf)
-
-    rep = r"\s*pm.min_spare_servers\s*=\s*([0-9]+)\s*"
-    conf = re.sub(rep, "\npm.min_spare_servers = " +
-                  min_spare_servers, conf)
-
-    rep = r"\s*pm.max_spare_servers \s*=\s*([0-9]+)\s*"
-    conf = re.sub(rep, "\npm.max_spare_servers = " +
-                  max_spare_servers + "\n", conf)
-
-    rep = r"\s*pm\s*=\s*(\w+)\s*"
-    conf = re.sub(rep, "\npm = " + pm + "\n", conf)
-
-    mw.writeFile(file, conf)
-    reload(version)
-
-    msg = mw.getInfo('设置PHP-{1}并发设置,max_children={2},start_servers={3},min_spare_servers={4},max_spare_servers={5}', (version, max_children,
-                                                                                                                      start_servers, min_spare_servers, max_spare_servers,))
-    mw.writeLog('插件管理[PHP]', msg)
-    return mw.returnJson(True, '设置成功!')
-
-
-# def checkFpmStatusFile(version):
-#     if not mw.isInstalledWeb():
-#         return False
-
-#     dfile = getServerDir() + '/nginx/conf/php_status/phpfpm_status_' + version + '.conf'
-#     if not os.path.exists(dfile):
-#         tpl = getPluginDir() + '/conf/phpfpm_status.conf'
-#         content = mw.readFile(tpl)
-#         content = contentReplace(content, version)
-#         mw.writeFile(dfile, content)
-#         mw.restartWeb()
-#     return True
-
 
 def getRapiraAddress(version):
     data = getPhpConfArgs(version)
@@ -553,6 +347,31 @@ def getRapiraStatus(version):
     data = mw.httpGet("http://"+addr+"/metrics")
     return data
 
+def getLimitConf(version):
+    fileini = getConfIni(version)
+    phpini = mw.readFile(fileini)
+
+    # print fileini, filefpm
+    data = {}
+    try:
+        rep = r"upload_max_filesize\s*=\s*([0-9]+)M"
+        tmp = re.search(rep, phpini).groups()
+        data['max'] = tmp[0]
+    except:
+        data['max'] = '50'
+
+    try:
+        rep = r"\n;*\s*cgi\.fix_pathinfo\s*=\s*([0-9]+)\s*\n"
+        tmp = re.search(rep, phpini).groups()
+
+        if tmp[0] == '1':
+            data['pathinfo'] = True
+        else:
+            data['pathinfo'] = False
+    except:
+        data['pathinfo'] = False
+
+    return mw.getJson(data)
 
 def getSessionConf(version):
     filename = getConf(version)
@@ -779,7 +598,7 @@ def get_php_info(args):
 
 
 def libConfCommon(version):
-    fname = getConf(version)
+    fname = getConfIni(version)
     if not os.path.exists(fname):
         return mw.returnJson(False, '指定PHP版本不存在!')
 
