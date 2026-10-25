@@ -44,11 +44,6 @@ else
 fi
 
 
-# cd ${rootPath}/plugins/php/lib && /bin/bash freetype_old.sh
-# OPTIONS="${OPTIONS} --with-freetype-dir=${serverPath}/lib/freetype_old"
-# OPTIONS="${OPTIONS} --with-gd --enable-gd-native-ttf"
-# OPTIONS="${OPTIONS} --with-jpeg --with-jpeg-dir=/usr/lib"
-
 phpini=$serverPath/rapira/$version/php.ini
 
 Install_lib()
@@ -65,7 +60,7 @@ Install_lib()
 	if [ ! -f "$extFile" ];then
 
 		if [ ! -d $sourcePath/php${version}/ext ];then
-			cd ${rootPath}/plugins/php && /bin/bash ${rootPath}/plugins/php/versions/${version}/install.sh install 
+			cd ${rootPath}/plugins/rapira && /bin/bash ${rootPath}/plugins/rapira/versions/${version}/install.sh install 
 		fi
 		
 		cd $sourcePath/php${version}/ext/${LIBNAME}
@@ -83,14 +78,6 @@ Install_lib()
 			OPTIONS="$OPTIONS --with-xpm-dir"
 		fi
 
-		# if [ "debian" = "$OSNAME" ]; then
-		# 	OPTIONS="$OPTIONS --with-freetype"
-		# else
-		# 	find_ft2=`pkg-config --list-all | grep freetype2`
-		# 	if [ "$find_ft2" != "" ];then
-		# 		OPTIONS="$OPTIONS --with-freetype-dir=${serverPath}/lib/freetype_old"
-		# 	fi
-		# fi
 
 		if [ ! -d ${serverPath}/lib/freetype_old ];then
 			echo "freetype_old not install , check!!"
