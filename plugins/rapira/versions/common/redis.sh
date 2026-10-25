@@ -29,8 +29,6 @@ else
 	echo 'ok'
 fi
 
-echo $serverPath
-
 
 LIB_PATH_NAME=lib/php
 if [ -d $serverPath/rapira/${version}/link/lib64 ];then
