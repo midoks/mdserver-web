@@ -11,10 +11,9 @@ import shutil
 try:
     import tomllib
 except ImportError:
+    print(str(ImportError.Error()))
     import tomli as tomllib
 
-# reload(sys)
-# sys.setdefaultencoding('utf8')
 
 web_dir = os.getcwd() + "/web"
 if os.path.exists(web_dir):
@@ -127,35 +126,9 @@ def contentReplace(content, version):
     service_path = mw.getServerDir()
     content = content.replace('{$ROOT_PATH}', mw.getFatherDir())
     content = content.replace('{$SERVER_PATH}', service_path)
-    content = content.replace('{$PHP_VERSION}', version)
+    content = content.replace('{$VERSION}', version)
     content = content.replace('{$LOCAL_IP}', mw.getLocalIp())
     content = content.replace('{$SSL_CRT}', mw.getSslCrt())
-
-    if mw.isAppleSystem():
-        # user = mw.execShell(
-        #     "who | sed -n '2, 1p' |awk '{print $1}'")[0].strip()
-        content = content.replace('{$PHP_USER}', 'nobody')
-        content = content.replace('{$PHP_GROUP}', 'nobody')
-
-        rep = r'listen.owner\s*=\s*(.+)\r?\n'
-        val = ';listen.owner = nobody\n'
-        content = re.sub(rep, val, content)
-
-        rep = r'listen.group\s*=\s*(.+)\r?\n'
-        val = ';listen.group = nobody\n'
-        content = re.sub(rep, val, content)
-
-        rep = r'user\s*=\s*(.+)\r?\n'
-        val = ';user = nobody\n'
-        content = re.sub(rep, val, content)
-
-        rep = r'[^\.]group\s*=\s*(.+)\r?\n'
-        val = ';group = nobody\n'
-        content = re.sub(rep, val, content)
-
-    else:
-        content = content.replace('{$PHP_USER}', 'www')
-        content = content.replace('{$PHP_GROUP}', 'www')
     return content
 
 
@@ -190,17 +163,17 @@ def commonReplace(content,version):
 
 def initReplace(version):
     initD_path = getServerDir() + '/init.d'
-    # if not os.path.exists(initD_path):
-    #     os.mkdir(initD_path)
+    if not os.path.exists(initD_path):
+        os.mkdir(initD_path)
 
     file_bin = initD_path + '/rapira' + version
-    # if not os.path.exists(file_bin):
-    #     file_tpl = getPluginDir() + '/init.d/php.tpl'
-    #     content = mw.readFile(file_tpl)
-    #     content = contentReplace(content, version)
+    if not os.path.exists(file_bin):
+        file_tpl = getPluginDir() + '/init.d/rapira.tpl'
+        content = mw.readFile(file_tpl)
+        content = contentReplace(content, version)
 
-    #     mw.writeFile(file_bin, content)
-    #     mw.execShell('chmod +x ' + file_bin)
+        mw.writeFile(file_bin, content)
+        mw.execShell('chmod +x ' + file_bin)
 
     toml_file_tpl = getPluginDir()+"/conf/rapira.toml"
     toml_file = getServerDir()+"/"+version+"/rapira.toml"
@@ -863,16 +836,6 @@ def opcacheBlacklistFile():
 
 
 def installPreInspection(version):
-    sys = mw.execShell(
-        "cat /etc/*-release | grep PRETTY_NAME |awk -F = '{print $2}' | awk -F '\"' '{print $2}'| awk '{print $1}'")
-    if sys[1] != '':
-        return '不支持改系统'
-
-    sys_id = mw.execShell(
-        "cat /etc/*-release | grep VERSION_ID | awk -F = '{print $2}' | awk -F '\"' '{print $2}'")
-
-    sysName = sys[0].strip().lower()
-    sysId = sys_id[0].strip()
     return 'ok'
 
 

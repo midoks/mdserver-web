@@ -57,8 +57,10 @@ cd ${curPath} && sh -x $curPath/versions/$2/install.sh $1
 if [ "${action}" = "install" ] && [ -d ${serverPath}/rapira/${type} ];then
 
 	#初始化
-	cd ${rootPath} && python3 ${rootPath}/plugins/rapira/index.py start ${type}
-	cd ${rootPath} && python3 ${rootPath}/plugins/rapira/index.py initd_install ${type}
+	echo "cd ${rootPath} && . bin/activate && python3 plugins/rapira/index.py start ${type}"
+	echo "cd ${rootPath} && . bin/activate && python3 plugins/rapira/index.py initd_install ${type}"
+	cd ${rootPath} && . bin/activate && python3 plugins/rapira/index.py start ${type}
+	cd ${rootPath} && . bin/activate && python3 plugins/rapira/index.py initd_install ${type}
 	
 fi
 
