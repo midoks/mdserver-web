@@ -65,7 +65,7 @@ Install_lib()
 		fi
 
 		$serverPath/php/$version/bin/phpize
-		./configure --with-php-config=$serverPath/php/$version/bin/php-config $OPTIONS
+		./configure --with-php-config=$serverPath/rapira/$version/link/bin/php-config $OPTIONS
 		make && make install && make clean
 
 		if [ -d $sourcePath/php${version} ];then

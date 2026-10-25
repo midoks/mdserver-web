@@ -119,8 +119,8 @@ Install_lib()
 		
 		$serverPath/php/$version/bin/phpize
 		# --with-openssl
-		echo "./configure --with-php-config=$serverPath/php/$version/bin/php-config $OPTIONS"
-		./configure --with-php-config=$serverPath/php/$version/bin/php-config $OPTIONS
+		echo "./configure --with-php-config=$serverPath/rapira/$version/link/bin/php-config $OPTIONS"
+		./configure --with-php-config=$serverPath/rapira/$version/link/bin/php-config $OPTIONS
 		make clean && make && make install && make clean
 
 		if [ -d $sourcePath/php${version} ];then

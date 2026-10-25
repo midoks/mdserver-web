@@ -63,7 +63,7 @@ Install_lib()
 
 		$serverPath/php/$version/bin/phpize
 		./configure --enable-xhprof \
-		--with-php-config=$serverPath/php/$version/bin/php-config $OPTIONS
+		--with-php-config=$serverPath/rapira/$version/link/bin/php-config $OPTIONS
 		make clean && make && make install && make clean
 
 		cd $php_lib && rm -rf $php_lib/${LIBNAME}-${LIBV}

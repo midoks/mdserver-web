@@ -92,7 +92,7 @@ Install_lib()
 		#--with-xpm
 		# =${serverPath}/lib/freetype_old
 		# =/usr/lib
-		./configure --with-php-config=$serverPath/php/$version/bin/php-config \
+		./configure --with-php-config=$serverPath/rapira/$version/link/bin/php-config \
 		$OPTIONS \
 		--with-gd \
 		--with-jpeg-dir \

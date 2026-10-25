@@ -85,7 +85,7 @@ Install_lib()
 		cd $php_lib/${LIBNAME}-${LIBV}
 		$serverPath/php/$version/bin/phpize
 	
-		./configure --with-php-config=$serverPath/php/$version/bin/php-config \
+		./configure --with-php-config=$serverPath/rapira/$version/link/bin/php-config \
 		$OPTIONS \
 		--enable-memcached \
 		--disable-memcached-sasl
