@@ -16,7 +16,7 @@ version=$2
 
 sysName=`uname`
 LIBNAME=yaml
-LIBV=2.2.4
+LIBV=2.3.0
 
 LIB_PATH_NAME=lib/php
 if [ -d $serverPath/rapira/${version}/lib64 ];then
@@ -61,9 +61,7 @@ Install_lib()
 		fi
 
 		if [ $sysName = 'Darwin' ]; then
-			BREW_DIR=`which brew`
-			BREW_DIR=${BREW_DIR/\/bin\/brew/}
-			LIB_DEPEND_DIR=`brew info libyaml | grep ${BREW_DIR}/Cellar/libyaml | cut -d \  -f 1 | awk 'END {print}'`
+			LIB_DEPEND_DIR=`brew --prefix libyaml`
 			OPTIONS="${OPTIONS} --with-yaml=${LIB_DEPEND_DIR}"
 		fi
 

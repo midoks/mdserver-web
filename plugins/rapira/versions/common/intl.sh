@@ -92,11 +92,9 @@ Install_lib()
 		fi
 
 		if [ "$sysName" = "Darwin" ];then
-			BREW_DIR=`which brew`
-			BREW_DIR=${BREW_DIR/\/bin\/brew/}
-			LIB_DEPEND_DIR=`brew info icu4c | grep ${BREW_DIR}/Cellar/icu4c | cut -d \  -f 1 | awk 'END {print}'`
-
-			OPTIONS="$OPTIONS --with-icu-dir=${serverPath}/lib/icu"
+			LIB_DEPEND_DIR=`brew --prefix icu4c`
+			PKG_CONFIG_PATH="$(brew --prefix icu4c)/lib/pkgconfig"
+			OPTIONS="$OPTIONS --with-icu-dir=$LIB_DEPEND_DIR"
 			OPTIONS="$OPTIONS --enable-intl"
 		fi		
 

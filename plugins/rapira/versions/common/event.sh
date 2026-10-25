@@ -15,7 +15,7 @@ actionType=$1
 version=$2
 
 LIBNAME=event
-LIBV=3.1.4
+LIBV=3.1.6
 
 
 if [ "$version" -lt "55" ];then
@@ -69,6 +69,13 @@ Install_lib()
 		OPTIONS=''
 		if [ "${SYS_ARCH}" = "aarch64" ] && [ "$version" -lt "56" ];then
 			OPTIONS="$OPTIONS --build=aarch64-unknown-linux-gnu --host=aarch64-unknown-linux-gnu"
+		fi
+
+
+		if [ $sysName = 'Darwin' ]; then
+			LIB_DEPEND_DIR=`brew --prefix libevent`
+			OPTIONS="${OPTIONS} --with-event-libevent-dir=${LIB_DEPEND_DIR}"
+			OPTIONS="${OPTIONS} --disable-event-sockets"
 		fi
 
 		$serverPath/rapira/$version/link/bin/phpize

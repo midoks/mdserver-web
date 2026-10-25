@@ -135,6 +135,7 @@ if [ ! -d ${serverPath}/rapira/${PHP_VER}/link ];then
 	echo "./configure --prefix="${PHP_PREFIX}" --enable-embed=shared \
 	    $OPTIONS"
 	./configure --prefix="${PHP_PREFIX}" --enable-embed \
+		--enable-sockets \
 	    $OPTIONS
 	make -j"$(getconf _NPROCESSORS_ONLN)"
 	make install
