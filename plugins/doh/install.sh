@@ -69,12 +69,11 @@ Install_App()
 
 
 	if [ -d $serverPath/doh ];then
-		echo $version > $serverPath/doh/version.pl
-
 		cd ${rootPath} && python3 plugins/doh/index.py start
 		cd ${rootPath} && python3 plugins/doh/index.py initd_install
 	fi
 
+	echo $version > $serverPath/doh/version.pl
 	echo 'install doh success'
 }
 
