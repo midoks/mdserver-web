@@ -98,14 +98,7 @@ def status(version):
     '''
     sock文件判断是否启动
     '''
-    # sock = getPhpSocket(version)
-    # if sock.find(':')>-1:
-    #     return status_progress(version)
-
-    # if not os.path.exists(sock):
-    #     return 'stop'
     return status_progress(version)
-    # return 'stop'
 
 
 def contentReplace(content, version):
