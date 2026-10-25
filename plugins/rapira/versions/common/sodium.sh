@@ -67,8 +67,8 @@ Install_lib()
 		if [ "$sysName" = "Darwin" ];then
 			LIB_DEPEND_DIR=`brew --prefix libsodium`
 			OPTIONS="$OPTIONS --with-sodium=${LIB_DEPEND_DIR}"
-			OPTIONS="$OPTIONS -I$LIB_DEPEND_DIR/include"
-			OPTIONS="$OPTIONS -L$LIB_DEPEND_DIR/lib"
+			OPTIONS="$OPTIONS CPPFLAGS=-I$LIB_DEPEND_DIR/include"
+			OPTIONS="$OPTIONS LDFLAGS=-L$LIB_DEPEND_DIR/lib"
 			# CPPFLAGS="-I$LIB_DEPEND_DIR/include"
 	  		# LDFLAGS="-L$LIB_DEPEND_DIR/lib"
 		else
