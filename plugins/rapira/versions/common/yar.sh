@@ -36,6 +36,8 @@ else
 	BAK=''
 fi
 
+phpini=$serverPath/rapira/$version/php.ini
+
 Install_lib()
 {
 	
@@ -89,24 +91,21 @@ Install_lib()
 
 Uninstall_lib()
 {
-	if [ ! -f "$serverPath/php/$version/bin/php-config" ];then
-		echo "php$version 未安装,请选择其它版本!"
-		return
-	fi
-
-	if [ ! -f "$extFile" ];then
-		echo "php-$version 未安装${LIBNAME},请选择其它版本!"
-		echo "php-$version not install ${LIBNAME}, Plese select other version!"
+	if [ ! -f "$serverPath/rapira/$version/link/bin/php-config" ];then
+		echo "php-$version 未安装,请选择其它版本!"
 		return
 	fi
 	
-	echo $serverPath/php/$version/etc/php.ini
-	sed -i $BAK "/${LIBNAME}.so/d" $serverPath/php/$version/etc/php.ini
-	sed -i $BAK "/${LIBNAME}.use_namespace/d" $serverPath/php/$version/etc/php.ini
-	sed -i $BAK "/\[${LIBNAME}\]/d"  $serverPath/php/$version/etc/php.ini
+	if [ ! -f "$extFile" ];then
+		echo "php-$version 未安装${LIBNAME},请选择其它版本!"
+		return
+	fi
+	
+	sed -i $BAK "/${LIBNAME}.so/d" $phpini
+	sed -i $BAK "/${LIBNAME}/d" $phpini
 		
 	rm -f $extFile
-	cd  ${curPath} && bash ${rootPath}/plugins/php/versions/lib.sh $version restart
+	cd  ${curPath} && bash ${rootPath}/plugins/rapira/versions/lib.sh $version restart
 	echo '==============================================='
 	echo 'successful!'
 }

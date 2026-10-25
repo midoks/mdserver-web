@@ -31,6 +31,8 @@ else
 	BAK=''
 fi
 
+phpini=$serverPath/rapira/$version/php.ini
+
 Install_lib()
 {
 	isInstall=`cat $serverPath/php/$version/etc/php.ini|grep "${LIBNAME}.so"`
