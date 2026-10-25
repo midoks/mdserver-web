@@ -14,18 +14,12 @@ actionType=$1
 version=$2
 
 LIBNAME=mcrypt
-LIBV=1.0.7
+LIBV=1.0.9
 
 if [ "$version" -lt "72" ];then
 	echo "not need"
 	exit 1
-fi 
-
-if [ "$version" -ge "84" ];then
-	LIBV=1.0.7
-	echo "not need"
-	exit 1
-fi 
+fi
 
 
 LIB_PATH_NAME=lib/php
