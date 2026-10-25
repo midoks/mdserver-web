@@ -44,8 +44,7 @@ cd $DIR
 PHP_VER_LIST=(84)
 # yar
 PHP_EXT_LIST=(ZendGuardLoader pdo mysqlnd sqlite3 openssl opcache mcrypt fileinfo \
-	exif gd intl pcntl memcache memcached redis imagemagick xdebug \
-	swoole yac apc mongo mongodb solr seaslog mbstring iconv)
+	exif gd intl pcntl memcache memcached redis imagemagick xdebug yac apc mongo mongodb mbstring iconv)
 
 for PHP_VER in ${PHP_VER_LIST[@]}; do
 	echo "php${PHP_VER} -- start"

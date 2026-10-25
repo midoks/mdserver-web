@@ -55,7 +55,7 @@ Install_lib()
 		fi
 		cd $php_lib/${LIBNAME}-${LIBV}
 
-		$serverPath/php/$version/bin/phpize
+		$serverPath/rapira/$version/link/bin/phpize
 		./configure --with-php-config=$serverPath/rapira/$version/link/bin/php-config
 		make && make install && make clean
 

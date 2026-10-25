@@ -61,7 +61,6 @@ Install_lib()
 		fi
 
 		$serverPath/rapira/$version/link/bin/phpize
-
 		if [ "$version" = "83" ];then
 			CFLAGS="-std=c99" ./configure --with-php-config=$serverPath/rapira/$version/link/bin/php-config $OPTIONS
 		else

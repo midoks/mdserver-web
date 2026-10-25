@@ -83,7 +83,7 @@ Install_lib()
 
 		# sed -i '_bak' "3237,3238s#ulong#zend_ulong#g" $php_lib/${LIBNAME}-${LIBV}/php_memcached.c
 		cd $php_lib/${LIBNAME}-${LIBV}
-		$serverPath/php/$version/bin/phpize
+		$serverPath/rapira/$version/link/bin/phpize
 	
 		./configure --with-php-config=$serverPath/rapira/$version/link/bin/php-config \
 		$OPTIONS \

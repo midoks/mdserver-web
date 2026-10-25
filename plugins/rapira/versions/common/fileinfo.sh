@@ -65,7 +65,7 @@ Install_lib()
 		fi
 
 		
-		$serverPath/php/$version/bin/phpize
+		$serverPath/rapira/$version/link/bin/phpize
 		./configure --with-php-config=$serverPath/rapira/$version/link/bin/php-config $OPTIONS
 
 

@@ -54,10 +54,7 @@ Install_lib()
 	fi
 
 	if [ "$sysName" = "Darwin" ] ;then 
-		BREW_DIR=`which brew`
-		BREW_DIR=${BREW_DIR/\/bin\/brew/}
-
-		LIB_DEPEND_DIR=`brew info openssl@1.0 | grep ${BREW_DIR}/Cellar/openssl | cut -d \  -f 1 | awk 'END {print}'`
+		LIB_DEPEND_DIR=`brew --prefix openssl@1.0`
 		export PKG_CONFIG_PATH=$LIB_DEPEND_DIR/lib/pkgconfig
 	fi
 
@@ -91,10 +88,8 @@ Install_lib()
 		# ldd /www/server/php/83/bin/php
 
 		if [ "$version" -lt "84" ] && [ "$sysName" = "Darwin" ];then
-			BREW_DIR=`which brew`
-			BREW_DIR=${BREW_DIR/\/bin\/brew/}
-			LIB_DEPEND_DIR=`brew info openssl@1.0 | grep ${BREW_DIR}/Cellar/openssl@1.0 | cut -d \  -f 1 | awk 'END {print}'`
-			OPTIONS="$OPTIONS --with-openssl=$(brew --prefix openssl@1.0)"
+			LIB_DEPEND_DIR=`brew --prefix openssl@1.0`
+			OPTIONS="$OPTIONS --with-openssl=${LIB_DEPEND_DIR}"
 			export PKG_CONFIG_PATH=$LIB_DEPEND_DIR/lib/pkgconfig
 			export OPENSSL_CFLAGS="-I${LIB_DEPEND_DIR}/include"
 			export OPENSSL_LIBS="-L/${LIB_DEPEND_DIR}/lib -lssl -lcrypto -lz"
@@ -103,10 +98,8 @@ Install_lib()
 		fi
 
 		if [ "$version" -ge "84" ] &&  [ "$sysName" = "Darwin" ];then
-			BREW_DIR=`which brew`
-			BREW_DIR=${BREW_DIR/\/bin\/brew/}
-			LIB_DEPEND_DIR=`brew info openssl | grep ${BREW_DIR}/Cellar/openssl | cut -d \  -f 1 | awk 'END {print}'`
-			OPTIONS="$OPTIONS --with-openssl=$(brew --prefix openssl)"
+			LIB_DEPEND_DIR=`brew --prefix openssl@1.0`
+			OPTIONS="$OPTIONS --with-openssl=${LIB_DEPEND_DIR}"
 			export PKG_CONFIG_PATH=$LIB_DEPEND_DIR/lib/pkgconfig
 			export OPENSSL_CFLAGS="-I${LIB_DEPEND_DIR}/include"
 			export OPENSSL_LIBS="-L/${LIB_DEPEND_DIR}/lib -lssl -lcrypto -lz"
@@ -117,7 +110,7 @@ Install_lib()
 		# fi
 
 		
-		$serverPath/php/$version/bin/phpize
+		$serverPath/rapira/$version/link/bin/phpize
 		# --with-openssl
 		echo "./configure --with-php-config=$serverPath/rapira/$version/link/bin/php-config $OPTIONS"
 		./configure --with-php-config=$serverPath/rapira/$version/link/bin/php-config $OPTIONS

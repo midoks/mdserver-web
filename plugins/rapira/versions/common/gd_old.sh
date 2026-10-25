@@ -65,7 +65,7 @@ Install_lib()
 		
 		cd $sourcePath/php${version}/ext/${LIBNAME}
 		
-		$serverPath/php/$version/bin/phpize
+		$serverPath/rapira/$version/link/bin/phpize
 
 		OPTIONS=""
 		if [ "${SYS_ARCH}" = "aarch64" ] && [ "$version" -lt "56" ];then

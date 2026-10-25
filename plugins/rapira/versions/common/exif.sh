@@ -65,7 +65,7 @@ Install_lib()
 			OPTIONS="$OPTIONS --build=aarch64-unknown-linux-gnu --host=aarch64-unknown-linux-gnu"
 		fi
 
-		$serverPath/php/$version/bin/phpize
+		$serverPath/rapira/$version/link/bin/phpize
 		./configure --with-php-config=$serverPath/rapira/$version/link/bin/php-config $OPTIONS
 
 		FIND_C99=`cat Makefile|grep c99`

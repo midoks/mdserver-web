@@ -12,7 +12,7 @@ serverPath=$(dirname "$rootPath")
 sourcePath=${serverPath}/source/rapira
 SYS_ARCH=`arch`
 LIBNAME=solr
-LIBV=2.8.1
+LIBV=2.9.3
 sysName=`uname`
 actionType=$1
 version=$2
@@ -73,7 +73,7 @@ Install_lib()
 		fi
 
 
-		$serverPath/php/$version/bin/phpize
+		$serverPath/rapira/$version/link/bin/phpize
 		./configure --with-php-config=$serverPath/rapira/$version/link/bin/php-config $OPTIONS
 		make clean && make && make install && make clean
 
