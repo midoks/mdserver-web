@@ -2,6 +2,8 @@
 PATH=/bin:/sbin:/usr/bin:/usr/sbin:/usr/local/bin:/usr/local/sbin:~/bin
 export PATH
 
+# cd /www/server/mdserver-web/plugins/gitea && bash install.sh upgrade 1.25.3
+
 action=$1
 version=$2
 
@@ -13,6 +15,7 @@ serverPath=$(dirname "$rootPath")
 if [ -f ${rootPath}/bin/activate ];then
 	. ${rootPath}/bin/activate
 fi
+
 
 
 URL_DOWNLOAD=https://dl.gitea.com
