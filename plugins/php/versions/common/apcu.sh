@@ -13,7 +13,7 @@ sourcePath=${serverPath}/source/php
 
 LIBNAME=apcu
 # _LIBNAME=$(echo $LIBNAME | tr '[a-z]' '[A-Z]')
-LIBV=5.1.22
+LIBV=5.1.28
 sysName=`uname`
 actionType=$1
 version=$2
