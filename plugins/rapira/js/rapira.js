@@ -753,7 +753,7 @@ function getPHPInfo(version) {
             area: ['70%', '90%'],
             closeBtn: 2,
             shadeClose: true,
-            content: data.data.replace('a:link {color: #009; text-decoration: none; background-color: #fff;}', '').replace('a:link {color: #000099; text-decoration: none; background-color: #ffffff;}', '')
+            content: "<pre>"+data.data+"<pre>"
         });
     })
 }

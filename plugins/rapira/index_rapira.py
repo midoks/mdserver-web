@@ -53,7 +53,7 @@ def getConfIni(version):
 
 def status_progress(version):
     # ps -ef|grep 'php/81' |grep -v grep | grep -v python | awk '{print $2}
-    cmd = "ps -ef|grep 'php/" + version + \
+    cmd = "ps -ef|grep 'rapira/" + version + \
         "' |grep -v grep | grep -v python | awk '{print $2}'"
     data = mw.execShell(cmd)
     if data[0] == '':
@@ -61,36 +61,23 @@ def status_progress(version):
     return 'start'
 
 
-
 def status(version):
     '''
     sock文件判断是否启动
     '''
-    sock = getPhpSocket(version)
-    if sock.find(':')>-1:
-        return status_progress(version)
-
-    if not os.path.exists(sock):
-        return 'stop'
-    return 'start'
-
-
+    return status_progress(version)
 
 def getPhpinfo(version):
     stat = status(version)
     if stat == 'stop':
         return 'PHP[' + version + ']未启动,不可访问!!!'
 
-    sock_file = getFpmAddress(version)
-    root_dir = mw.getFatherDir() + '/phpinfo'
-
-    mw.execShell("rm -rf " + root_dir)
-    mw.execShell("mkdir -p " + root_dir)
-    mw.writeFile(root_dir + '/phpinfo.php', '<?php phpinfo(); ?>')
-    sock_data = mw.requestFcgiPHP(sock_file, '/phpinfo.php', root_dir)
-    os.system("rm -rf " + root_dir)
-    phpinfo = str(sock_data, encoding='utf-8')
-    return phpinfo
+    php_path = getServerDir() + "/" + version + "/link/bin/php"
+    php_ini = getConfIni(version)
+    php_path = php_path + " -c " + php_ini
+    cmd = php_path + " -d display_startup_errors=0 -r 'phpinfo();' 2>/dev/null"
+    cmd_data = mw.execShell(cmd)
+    return cmd_data[0]
 
 
 def libConfCommon(version):
