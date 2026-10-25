@@ -79,7 +79,7 @@ Install_lib()
 	echo  "extension=${LIBNAME}.so" >> $serverPath/php/$version/etc/php.ini
 	echo  "${LIBNAME}.use_namespace=1" >> $serverPath/php/$version/etc/php.ini
 	
-	cd  ${curPath} && bash ${rootPath}/plugins/php/versions/lib.sh $version restart
+	cd  ${curPath} && bash ${rootPath}/plugins/rapira/versions/lib.sh $version restart
 	echo '==========================================================='
 	echo 'successful!'
 }
