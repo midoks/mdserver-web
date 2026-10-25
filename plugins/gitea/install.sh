@@ -93,14 +93,12 @@ Install_App()
 		chown -R www:www $serverPath/gitea
 	fi
 
-
 	if [ -d $serverPath/gitea ];then
-		echo $version > $serverPath/gitea/version.pl
-
 		cd ${rootPath} && python3 plugins/gitea/index.py start
 		cd ${rootPath} && python3 plugins/gitea/index.py initd_install
 	fi
 
+	echo $version > $serverPath/gitea/version.pl
 	echo 'install success'
 }
 
