@@ -78,10 +78,10 @@ Install_lib()
 		return
 	fi
 
-	sed -i $BAK "1i\[${LIBNAME}]" $serverPath/php/$version/etc/php.ini
-	sed -i $BAK "2i\zend_extension=${LIBNAME}.so" $serverPath/php/$version/etc/php.ini
-	# echo "[${LIBNAME}]" >> $serverPath/php/$version/etc/php.ini
-	# echo "zend_extension=${LIBNAME}.so" >> $serverPath/php/$version/etc/php.ini
+	sed -i $BAK "1i\[${LIBNAME}]" $phpini
+	sed -i $BAK "2i\zend_extension=${LIBNAME}.so" $phpini
+	# echo "[${LIBNAME}]" >> $phpini
+	# echo "zend_extension=${LIBNAME}.so" >> $phpini
 
 	cd  ${curPath} && bash ${rootPath}/plugins/rapira/versions/lib.sh $version restart
 	echo '==========================================================='

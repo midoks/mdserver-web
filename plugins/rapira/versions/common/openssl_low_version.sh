@@ -134,13 +134,13 @@ Install_lib()
 		return
 	fi
 
-    echo "" >> $serverPath/php/$version/etc/php.ini
-	echo "[${LIBNAME}]" >> $serverPath/php/$version/etc/php.ini
-	echo "extension=${LIBNAME}.so" >> $serverPath/php/$version/etc/php.ini
+    echo "" >> $phpini
+	echo "[${LIBNAME}]" >> $phpini
+	echo "extension=${LIBNAME}.so" >> $phpini
 	if [ -f "/etc/ssl/certs/ca-certificates.crt" ];then
-		echo "openssl.cafile=/etc/ssl/certs/ca-certificates.crt" >> $serverPath/php/$version/etc/php.ini
+		echo "openssl.cafile=/etc/ssl/certs/ca-certificates.crt" >> $phpini
 	elif [ -f "/etc/pki/tls/certs/ca-bundle.crt" ];then
-		echo "openssl.cafile=/etc/pki/tls/certs/ca-bundle.crt" >> $serverPath/php/$version/etc/php.ini
+		echo "openssl.cafile=/etc/pki/tls/certs/ca-bundle.crt" >> $phpini
 	fi
 	
 	cd  ${curPath} && bash ${rootPath}/plugins/rapira/versions/lib.sh $version restart

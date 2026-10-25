@@ -49,25 +49,25 @@ Install_lib()
 		touch $OP_BL
 	fi
 
-	echo "" >> $serverPath/php/$version/etc/php.ini
-	echo "[opcache]" >> $serverPath/php/$version/etc/php.ini
+	echo "" >> $phpini
+	echo "[opcache]" >> $phpini
 
 	if [ "$version" = "85" ];then
 		echo "Force enable opcache in PHP 8.5+"
 	else
-		echo "zend_extension=${LIBNAME}.so" >> $serverPath/php/$version/etc/php.ini
+		echo "zend_extension=${LIBNAME}.so" >> $phpini
 	fi
-	echo "opcache.enable=1" >> $serverPath/php/$version/etc/php.ini
-	echo "opcache.memory_consumption=128" >> $serverPath/php/$version/etc/php.ini
-	echo "opcache.interned_strings_buffer=8" >> $serverPath/php/$version/etc/php.ini
-	echo "opcache.max_accelerated_files=4000" >> $serverPath/php/$version/etc/php.ini
-	echo "opcache.revalidate_freq=60" >> $serverPath/php/$version/etc/php.ini
-	echo "opcache.fast_shutdown=1" >> $serverPath/php/$version/etc/php.ini
-	echo "opcache.enable_cli=1" >> $serverPath/php/$version/etc/php.ini
-	echo "opcache.jit=1205" >> $serverPath/php/$version/etc/php.ini
-	echo "opcache.jit_buffer_size=64M" >> $serverPath/php/$version/etc/php.ini
-	echo "opcache.save_comments=0" >> $serverPath/php/$version/etc/php.ini
-	echo "opcache.blacklist_filename=${OP_BL}" >> $serverPath/php/$version/etc/php.ini
+	echo "opcache.enable=1" >> $phpini
+	echo "opcache.memory_consumption=128" >> $phpini
+	echo "opcache.interned_strings_buffer=8" >> $phpini
+	echo "opcache.max_accelerated_files=4000" >> $phpini
+	echo "opcache.revalidate_freq=60" >> $phpini
+	echo "opcache.fast_shutdown=1" >> $phpini
+	echo "opcache.enable_cli=1" >> $phpini
+	echo "opcache.jit=1205" >> $phpini
+	echo "opcache.jit_buffer_size=64M" >> $phpini
+	echo "opcache.save_comments=0" >> $phpini
+	echo "opcache.blacklist_filename=${OP_BL}" >> $phpini
 
 	cd  ${curPath} && bash ${rootPath}/plugins/rapira/versions/lib.sh $version restart
 	echo '==========================================================='
@@ -77,8 +77,8 @@ Install_lib()
 
 Uninstall_lib()
 {	
-	sed -i $BAK "/${LIBNAME}.so/d" $serverPath/php/$version/etc/php.ini
-	sed -i $BAK "/${LIBNAME}/d" $serverPath/php/$version/etc/php.ini
+	sed -i $BAK "/${LIBNAME}.so/d" $phpini
+	sed -i $BAK "/${LIBNAME}/d" $phpini
 		
 	cd  ${curPath} && bash ${rootPath}/plugins/rapira/versions/lib.sh $version restart
 	echo '==============================================='

@@ -116,9 +116,9 @@ Install_lib()
 	fi
 
 
-    echo "" >> $serverPath/php/$version/etc/php.ini
-	echo "[${LIBNAME}]" >> $serverPath/php/$version/etc/php.ini
-	echo "extension=${LIBNAME}.so" >> $serverPath/php/$version/etc/php.ini
+    echo "" >> $phpini
+	echo "[${LIBNAME}]" >> $phpini
+	echo "extension=${LIBNAME}.so" >> $phpini
 	
 	cd  ${curPath} && bash ${rootPath}/plugins/rapira/versions/lib.sh $version restart
 	echo '==========================================================='

@@ -80,9 +80,9 @@ Install_lib()
 	fi
 
 	_LIBNAME=$(echo $LIBNAME | tr '[A-Z]' '[a-z]')
-	echo "" >> $serverPath/php/$version/etc/php.ini
-	echo "[${_LIBNAME}]" >> $serverPath/php/$version/etc/php.ini
-	echo "extension=${_LIBNAME}.so" >> $serverPath/php/$version/etc/php.ini
+	echo "" >> $phpini
+	echo "[${_LIBNAME}]" >> $phpini
+	echo "extension=${_LIBNAME}.so" >> $phpini
 
 	cd  ${curPath} && bash ${rootPath}/plugins/rapira/versions/lib.sh $version restart
 	echo '==========================================================='

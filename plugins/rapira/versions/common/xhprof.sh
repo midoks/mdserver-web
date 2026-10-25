@@ -79,10 +79,10 @@ Install_lib()
 		chown -R www:www /tmp/xhprof
 	fi
 
-	echo "" >> $serverPath/php/$version/etc/php.ini
-	echo "[${LIBNAME}]" >> $serverPath/php/$version/etc/php.ini
-	echo "extension=${LIBNAME}.so" >> $serverPath/php/$version/etc/php.ini
-	echo "${LIBNAME}.output_dir=/tmp/xhprof" >> $serverPath/php/$version/etc/php.ini
+	echo "" >> $phpini
+	echo "[${LIBNAME}]" >> $phpini
+	echo "extension=${LIBNAME}.so" >> $phpini
+	echo "${LIBNAME}.output_dir=/tmp/xhprof" >> $phpini
 
 	cd  ${curPath} && bash ${rootPath}/plugins/rapira/versions/lib.sh $version restart
 	echo '==========================================================='
