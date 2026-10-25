@@ -21,6 +21,7 @@ app_start(){
 	echo "Starting Rapira server..."
 	export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:{$SERVER_PATH}/rapira/{$VERSION}/link/lib
 	export DYLD_FALLBACK_LIBRARY_PATH={$SERVER_PATH}/rapira/{$VERSION}/link/lib
+	export PHPRC={$SERVER_PATH}/rapira/{$VERSION}
 	{$SERVER_PATH}/rapira/{$VERSION}/bin/rapira serve {$SERVER_PATH}/rapira/{$VERSION}/rapira.toml >> {$SERVER_PATH}/rapira/logs.pl 2>&1 &
 }
 app_stop(){

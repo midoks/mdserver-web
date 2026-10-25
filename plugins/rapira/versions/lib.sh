@@ -12,10 +12,10 @@ serverPath=$(dirname "$rootPath")
 version=$1
 action=$2
 
-if [ -f /lib/systemd/system/php${version}.service ];then
-	systemctl ${action} php${version}
-elif [ -f /usr/lib/systemd/system/php${version}.service ]; then
-	systemctl ${action} php${version}
+if [ -f /lib/systemd/system/rapira${version}.service ];then
+	systemctl ${action} rapira${version}
+elif [ -f /usr/lib/systemd/system/rapira${version}.service ]; then
+	systemctl ${action} rapira${version}
 else
-	$serverPath/php/init.d/php${version} ${action}
+	$serverPath/rapira/init.d/rapira${version} ${action}
 fi

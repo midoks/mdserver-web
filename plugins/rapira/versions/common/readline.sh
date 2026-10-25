@@ -18,6 +18,8 @@ SYS_ARCH=`arch`
 actionType=$1
 version=$2
 
+
+
 LIBNAME=readline
 LIBV=0
 

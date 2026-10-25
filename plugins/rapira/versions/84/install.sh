@@ -132,7 +132,7 @@ if [ ! -d ${serverPath}/rapira/${PHP_VER}/link ];then
 	cd $sourcePath/rapira/php${PHP_VER}
 	PHP_PREFIX="${serverPath}/rapira/${PHP_VER}/link"
 	./buildconf --force
-	echo "./configure --prefix="${PHP_PREFIX}" --enable-embed \
+	echo "./configure --prefix="${PHP_PREFIX}" --enable-embed=shared \
 	    $OPTIONS"
 	./configure --prefix="${PHP_PREFIX}" --enable-embed \
 	    $OPTIONS

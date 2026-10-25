@@ -29,14 +29,16 @@ else
 	echo 'ok'
 fi
 
+echo $serverPath
+
 
 LIB_PATH_NAME=lib/php
-if [ -d $serverPath/php/${version}/lib64 ];then
+if [ -d $serverPath/rapira/${version}/link/lib64 ];then
 	LIB_PATH_NAME=lib64
 fi
 
-NON_ZTS_FILENAME=`ls $serverPath/php/${version}/${LIB_PATH_NAME}/extensions | grep no-debug-non-zts`
-extFile=$serverPath/php/${version}/${LIB_PATH_NAME}/extensions/${NON_ZTS_FILENAME}/${LIBNAME}.so
+NON_ZTS_FILENAME=`ls $serverPath/rapira/${version}/link/${LIB_PATH_NAME}/extensions | grep no-debug-non-zts`
+extFile=$serverPath/rapira/${version}/link/${LIB_PATH_NAME}/extensions/${NON_ZTS_FILENAME}/${LIBNAME}.so
 
 if [ "$sysName" = "Darwin" ];then
 	BAK='_bak'
@@ -44,9 +46,11 @@ else
 	BAK=''
 fi
 
+phpini=$serverPath/rapira/$version/php.ini
+
 Install_lib()
 {
-	isInstall=`cat $serverPath/php/${version}/etc/php.ini|grep "${LIBNAME}.so"`
+	isInstall=`cat ${phpini}|grep "${LIBNAME}.so"`
 	if [ "${isInstall}" != "" ];then
 		echo "php-$version 已安装${LIBNAME},请选择其它版本!"
 		return
@@ -70,8 +74,8 @@ Install_lib()
 			OPTIONS="$OPTIONS --build=aarch64-unknown-linux-gnu --host=aarch64-unknown-linux-gnu"
 		fi
 		
-		$serverPath/php/$version/bin/phpize
-		./configure --with-php-config=$serverPath/php/$version/bin/php-config $OPTIONS
+		$serverPath/rapira/$version/link/bin/phpize
+		./configure --with-php-config=$serverPath/rapira/$version/link/bin/php-config $OPTIONS
 		make clean && make && make install && make clean
 
 		cd $php_lib && rm -rf $php_lib/${LIBNAME}-${LIBV}
@@ -82,10 +86,10 @@ Install_lib()
 		return
 	fi
 
-	echo "[${LIBNAME}]" >> $serverPath/php/$version/etc/php.ini
-	echo "extension=${LIBNAME}.so" >> $serverPath/php/$version/etc/php.ini
+	echo "[${LIBNAME}]" >> ${phpini}
+	echo "extension=${LIBNAME}.so" >> ${phpini}
 
-	cd  ${curPath} && bash ${rootPath}/plugins/php/versions/lib.sh $version restart
+	cd  ${curPath} && bash ${rootPath}/plugins/rapira/versions/lib.sh $version restart
 	echo '==========================================================='
 	echo 'successful!'
 }
@@ -93,7 +97,7 @@ Install_lib()
 
 Uninstall_lib()
 {
-	if [ ! -f "$serverPath/php/$version/bin/php-config" ];then
+	if [ ! -f "$serverPath/rapira/$version/link/bin/php-config" ];then
 		echo "php-$version 未安装,请选择其它版本!"
 		return
 	fi
@@ -104,11 +108,11 @@ Uninstall_lib()
 		return
 	fi
 	
-	sed -i $BAK "/${LIBNAME}.so/d" $serverPath/php/$version/etc/php.ini
-	sed -i $BAK "/${LIBNAME}/d" $serverPath/php/$version/etc/php.ini
+	sed -i $BAK "/${LIBNAME}.so/d" ${phpini}
+	sed -i $BAK "/${LIBNAME}/d" ${phpini}
 		
 	rm -f $extFile
-	cd  ${curPath} && bash ${rootPath}/plugins/php/versions/lib.sh $version restart
+	cd  ${curPath} && bash ${rootPath}/plugins/rapira/versions/lib.sh $version restart
 	echo '==============================================='
 	echo 'successful!'
 }

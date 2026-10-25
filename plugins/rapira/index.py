@@ -647,6 +647,7 @@ def installLib(version):
 
     name = args['name']
     cmd = "cd " + getPluginDir() + "/versions && /bin/bash  common.sh " + version + ' install ' + name
+    print(cmd)
     install_name = '安装[' + name + '-' + version + ']'
     import thisdb
     thisdb.addTask(name=install_name,cmd=cmd)
@@ -718,6 +719,8 @@ if __name__ == "__main__":
         print(configTpl())
     elif func == 'read_config_tpl':
         print(readConfigTpl(version))
+    elif func == 'php_conf':
+        print(getConfIni(version))
     elif func == 'conf':
         print(getConf(version))
     elif func == 'app_start':
