@@ -304,10 +304,24 @@ def rapiraLog(version):
     data = mw.execShell(cmd)
     return data[0]
 
+def configTpl():
+    path = getPluginDir() + '/tpl'
+    pathFile = os.listdir(path)
+    tmp = []
+    for one in pathFile:
+        file = path + '/' + one
+        tmp.append(file)
+    return mw.getJson(tmp)
 
-def fpmSlowLog(version):
-    return getServerDir() + '/' + version + '/var/log/www-slow.log'
+def readConfigTpl(version):
+    args = getArgs()
+    data = checkArgs(args, ['file'])
+    if not data[0]:
+        return data[1]
 
+    content = mw.readFile(args['file'])
+    content = contentReplace(content,version)
+    return mw.returnJson(True, 'ok', content)
 
 def getPhpConfArgs(version):
     phpini = mw.readFile(getConf(version))
@@ -868,8 +882,10 @@ if __name__ == "__main__":
         print(initdUinstall(version))
     elif func == 'rapira_log':
         print(rapiraLog(version))
-    elif func == 'fpm_slow_log':
-        print(fpmSlowLog(version))
+    elif func == 'config_tpl':
+        print(configTpl())
+    elif func == 'read_config_tpl':
+        print(readConfigTpl(version))
     elif func == 'conf':
         print(getConf(version))
     elif func == 'app_start':
