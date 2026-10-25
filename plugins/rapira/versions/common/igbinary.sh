@@ -22,12 +22,12 @@ if [ "$version" -lt "70" ];then
 fi 
 
 LIB_PATH_NAME=lib/php
-if [ -d $serverPath/php/${version}/lib64 ];then
+if [ -d $serverPath/rapira/${version}/lib64 ];then
 	LIB_PATH_NAME=lib64
 fi
 
-NON_ZTS_FILENAME=`ls $serverPath/php/${version}/${LIB_PATH_NAME}/extensions | grep no-debug-non-zts`
-extFile=$serverPath/php/${version}/${LIB_PATH_NAME}/extensions/${NON_ZTS_FILENAME}/${LIBNAME}.so
+NON_ZTS_FILENAME=`ls $serverPath/rapira/${version}/${LIB_PATH_NAME}/extensions | grep no-debug-non-zts`
+extFile=$serverPath/rapira/${version}/${LIB_PATH_NAME}/extensions/${NON_ZTS_FILENAME}/${LIBNAME}.so
 
 sysName=`uname`
 if [ "$sysName" = "Darwin" ];then
