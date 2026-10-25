@@ -54,7 +54,7 @@ Install_lib()
 		return
 	fi
 
-	cd ${rootPath}/plugins/php/lib && bash libmcrypt.sh
+	cd ${rootPath}/plugins/rapira/lib && bash libmcrypt.sh
 	
 	if [ ! -f "$extFile" ];then
 

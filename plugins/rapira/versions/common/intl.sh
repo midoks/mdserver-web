@@ -64,8 +64,8 @@ fi
 OPTIONS=''
 if [ "$version" -lt "74" ];then
 
-	# cd /www/server/mdserver-web/plugins/php/lib && /bin/bash icu.sh
-	cd ${rootPath}/plugins/php/lib && /bin/bash icu.sh
+	# cd /www/server/mdserver-web/plugins/rapira/lib && /bin/bash icu.sh
+	cd ${rootPath}/plugins/rapira/lib && /bin/bash icu.sh
 	OPTIONS="--with-icu-dir=${serverPath}/lib/icu"
 fi
 
@@ -83,7 +83,7 @@ Install_lib()
 	if [ ! -f "$extFile" ];then
 
 		if [ ! -d $sourcePath/php${version}/ext ];then
-			cd ${rootPath}/plugins/php && /bin/bash ${rootPath}/plugins/php/versions/${version}/install.sh install 
+			cd ${rootPath}/plugins/rapira && /bin/bash ${rootPath}/plugins/rapira/versions/${version}/install.sh install 
 		fi
 
 		cd $sourcePath/php${version}/ext/${LIBNAME}

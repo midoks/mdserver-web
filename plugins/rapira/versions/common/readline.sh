@@ -2,23 +2,18 @@
 PATH=/bin:/sbin:/usr/bin:/usr/sbin:/usr/local/bin:/usr/local/sbin:~/bin:/opt/homebrew/bin
 export PATH=$PATH:/opt/homebrew/bin
 
-# cd /www/server/mdserver-web/plugins/php/versions/common && bash readline.sh install 81
-
 curPath=`pwd`
-
 appPath=$(dirname "$curPath")
-
 rootPath=$(dirname "$curPath")
 rootPath=$(dirname "$rootPath")
 rootPath=$(dirname "$rootPath")
 rootPath=$(dirname "$rootPath")
 serverPath=$(dirname "$rootPath")
 sourcePath=${serverPath}/source/rapira
+
 SYS_ARCH=`arch`
 actionType=$1
 version=$2
-
-
 
 LIBNAME=readline
 LIBV=0
@@ -57,7 +52,7 @@ Install_lib()
 	if [ ! -f "$extFile" ];then
 
 		if [ ! -d $sourcePath/php${version}/ext ];then
-			cd ${rootPath}/plugins/php && /bin/bash ${rootPath}/plugins/php/versions/${version}/install.sh install 
+			cd ${rootPath}/plugins/rapira && /bin/bash ${rootPath}/plugins/rapira/versions/${version}/install.sh install 
 		fi
 
 		cd $sourcePath/php${version}/ext/${LIBNAME}
@@ -70,7 +65,7 @@ Install_lib()
 			OPTIONS="$OPTIONS --build=aarch64-unknown-linux-gnu --host=aarch64-unknown-linux-gnu"
 		fi
 
-		cd ${rootPath}/plugins/php/lib && /bin/bash libedit.sh
+		cd ${rootPath}/plugins/rapira/lib && /bin/bash libedit.sh
 		export PKG_CONFIG_PATH=$PKG_CONFIG_PATH:${serverPath}/lib/libedit/lib/pkgconfig
 		OPTIONS="$OPTIONS --with-libedit=${serverPath}/lib/libedit"
 

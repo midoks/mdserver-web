@@ -46,7 +46,7 @@ Install_lib()
 	fi
 
 	if [ "$sysName" != "Darwin" ];then
-		cd ${rootPath}/plugins/php/lib && bash libsodium.sh
+		cd ${rootPath}/plugins/rapira/lib && bash libsodium.sh
 	fi
 	
 	

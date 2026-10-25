@@ -47,12 +47,12 @@ Install_lib()
 		return
 	fi
 	
-	cd ${rootPath}/plugins/php/lib && /bin/bash libiconv.sh
+	cd ${rootPath}/plugins/rapira/lib && /bin/bash libiconv.sh
 	
 	if [ ! -f "$extFile" ];then
 
 		if [ ! -d $sourcePath/php${version}/ext ];then
-			cd ${rootPath}/plugins/php && /bin/bash ${rootPath}/plugins/php/versions/${version}/install.sh install 
+			cd ${rootPath}/plugins/rapira && /bin/bash ${rootPath}/plugins/rapira/versions/${version}/install.sh install 
 		fi
 
 		cd $sourcePath/php${version}/ext/${LIBNAME}

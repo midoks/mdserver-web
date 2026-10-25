@@ -47,7 +47,7 @@ export PKG_CONFIG_PATH=${serverPath}/lib/libzip/lib/pkgconfig
 # ZIP_OPTION='--with-zip'
 # libzip_version=`pkg-config libzip --modversion`
 # if version_lt "$libzip_version" "0.11.0" ;then
-# 	cd ${rootPath}/plugins/php/lib && /bin/bash libzip.sh
+# 	cd ${rootPath}/plugins/rapira/lib && /bin/bash libzip.sh
 # 	export PKG_CONFIG_PATH=$serverPath/lib/libzip/lib/pkgconfig
 # 	ZIP_OPTION="--with-zip=$serverPath/lib/libzip"
 # fi
@@ -67,7 +67,7 @@ Install_lib()
 	if [ ! -f "$extFile" ];then
 
 		if [ ! -d $sourcePath/php${version}/ext ];then
-			cd ${rootPath}/plugins/php && /bin/bash ${rootPath}/plugins/php/versions/${version}/install.sh install 
+			cd ${rootPath}/plugins/rapira && /bin/bash ${rootPath}/plugins/rapira/versions/${version}/install.sh install 
 		fi
 
 		cd $sourcePath/php${version}/ext/${LIBNAME}

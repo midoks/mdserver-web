@@ -76,7 +76,7 @@ Install_lib()
 		else
 			pkg-config --exists libmemcached
 			if [ "$?" != "0" ]; then
-				cd ${rootPath}/plugins/php/lib && /bin/bash libmemcached.sh
+				cd ${rootPath}/plugins/rapira/lib && /bin/bash libmemcached.sh
 				OPTIONS="$OPTIONS --with-libmemcached-dir=${serverPath}/lib/libmemcached"
 			fi
 		fi

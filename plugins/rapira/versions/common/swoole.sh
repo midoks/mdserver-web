@@ -72,7 +72,7 @@ Install_lib()
 		php_lib=$sourcePath/php_lib
 		mkdir -p $php_lib
 
-		cd ${rootPath}/plugins/php/lib && /bin/bash openssl_11.sh
+		cd ${rootPath}/plugins/rapira/lib && /bin/bash openssl_11.sh
 
 		if [ ! -d $php_lib/${LIBNAME}-${LIBV} ];then
 			if [ ! -f $php_lib/${LIBNAME}-${LIBV}.tgz ];then
