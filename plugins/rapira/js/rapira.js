@@ -134,13 +134,7 @@ function submitConf(version) {
 function phpCommonFunc(version){
     phpPost('get_limit_conf', version, '', function(ret_data){
         var rdata = $.parseJSON(ret_data.data);
-        var con = '<p class="conf_p">\
-            <span>超时限制</span>\
-            <input class="phpTimeLimit bt-input-text mr5" type="number" value="' + rdata['maxTime'] + '">, 秒\
-            <button class="btn btn-success btn-sm" onclick="setPHPMaxTime(\'' + version + '\')" style="margin-left:20px">保存</button>\
-            </p>';
-
-        con += '<p class="conf_p">\
+        con = '<p class="conf_p">\
             <span>上传限制</span>\
             <input class="phpUploadLimit bt-input-text mr5" type="number" value="' + rdata['max']+'" name="max">,MB\
             <button class="btn btn-success btn-sm" onclick="setPHPMaxSize(\''+ version+'\')" style="margin-left:20px">保存</button>\

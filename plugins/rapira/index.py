@@ -667,11 +667,11 @@ def uninstallLib(version):
 
 
 def getConfAppStart():
-    pstart = mw.getServerDir() + '/php/app_start.php'
+    pstart = mw.getServerDir() + '/rapira/app_start.php'
     return pstart
 
 def opcacheBlacklistFile():
-    op_bl = mw.getServerDir() + '/php/opcache-blacklist.txt'
+    op_bl = mw.getServerDir() + '/rapira/opcache-blacklist.txt'
     return op_bl
 
 
