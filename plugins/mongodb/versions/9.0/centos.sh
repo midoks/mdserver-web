@@ -8,7 +8,7 @@ rootPath=$(dirname "$rootPath")
 rootPath=$(dirname "$rootPath")
 serverPath=$(dirname "$rootPath")
 
-VERSION=8.2.3
+VERSION=9.0.0
 SYS_ARCH=`arch`
 
 SYS_VERSION_ID=`cat /etc/*-release | grep VERSION_ID | awk -F = '{print $2}' | awk -F "\"" '{print $2}'`
