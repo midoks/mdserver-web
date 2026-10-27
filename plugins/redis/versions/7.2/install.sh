@@ -9,7 +9,7 @@ rootPath=$(dirname "$curPath")
 rootPath=$(dirname "$rootPath")
 serverPath=$(dirname "$rootPath")
 
-VERSION=7.2.14
+VERSION=7.2.17
 PLUGIN_VERSION=7.2
 
 Install_App()
