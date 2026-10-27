@@ -33,7 +33,7 @@ mkdir -p $serverPath/mysql-community
 # https://cdn.mysql.com/Downloads/MySQL-9.3/mysql-${SUFFIX_NAME}.tar.xz
 if [ ! -f ${myDir}/mysql-${SUFFIX_NAME}.tar.xz ];then
 	# wget --no-check-certificate -O ${myDir}/mysql-${SUFFIX_NAME}.tar.xz https://cdn.mysql.com/Downloads/MySQL-9.7/mysql-${SUFFIX_NAME}.tar.xz
-	wget --no-check-certificate -O ${myDir}/mysql-${SUFFIX_NAME}.tar.xz https://cdn.mysql.com/Downloads/mysql-9.7/mysql-${SUFFIX_NAME}..tar.xz
+	wget --no-check-certificate -O ${myDir}/mysql-${SUFFIX_NAME}.tar.xz https://cdn.mysql.com/archives/mysql-9.7/mysql-${SUFFIX_NAME}..tar.xz
 fi
 
 if [ -d ${myDir} ];then
