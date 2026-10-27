@@ -54,7 +54,7 @@ fi
 VERSION_ID=`cat /etc/*-release | grep VERSION_ID | awk -F = '{print $2}' | awk -F "\"" '{print $2}'`
 
 
-VERSION=9.7.1
+VERSION=9.7.4
 # https://dev.mysql.com/get/Downloads/MySQL-9.4/mysql-${VERSION}.tar.gz
 # https://cdn.mysql.com/archives/mysql-9.4/mysql-9.4.0.tar.gz
 Install_mysql()
@@ -206,7 +206,7 @@ Install_mysql()
 
 		if [ -d $serverPath/mysql ];then
 			rm -rf ${mysqlDir}/mysql-${VERSION}
-			echo '9.4' > $serverPath/mysql/version.pl
+			echo '9.7' > $serverPath/mysql/version.pl
 			echo "${VERSION}安装完成"
 		else
 			# rm -rf ${mysqlDir}/mysql-${VERSION}
