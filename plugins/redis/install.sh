@@ -9,7 +9,7 @@ serverPath=$(dirname "$rootPath")
 
 # cd /www/server/mdserver-web && . ./bin/activate && python3 plugins/redis/index.py upgrade_check 8.8
 # cd /www/server/mdserver-web/plugins/redis && bash install.sh install 8.0
-# cd /www/server/mdserver-web/plugins/redis && bash install.sh upgrade 8.0
+# cd /www/server/mdserver-web/plugins/redis && bash install.sh upgrade 8.10
 # cd /www/server/mdserver-web/plugins/redis && bash install.sh upgrade 8.8
 
 # https://www.cnblogs.com/zlonger/p/16177595.html
