@@ -98,24 +98,25 @@ Install_mysql()
 	fi
 
 	if [ ! -f ${mysqlDir}/mysql-${VERSION}.tar.gz ];then
-         wget --no-check-certificate -O ${mysqlDir}/mysql-${VERSION}.tar.gz --tries=3 https://dev.mysql.com/get/Downloads/MySQL-9.4/mysql-${VERSION}.tar.gz
+         wget --no-check-certificate -O ${mysqlDir}/mysql-${VERSION}.tar.gz --tries=3 https://dev.mysql.com/get/Downloads/MySQL-9.7/mysql-${VERSION}.tar.gz
+         wget --no-check-certificate -O ${mysqlDir}/mysql-${VERSION}.tar.xz  --tries=3 https://cdn.mysql.com//Downloads/MySQL-9.7/mysql-${VERSION}.tar.xz
 	fi
 
 	#检测文件是否损坏.
 	md5_mysql_ok=5d2f4c9568a0e01d20dc5442c772de9f
-	if [ -f ${mysqlDir}/mysql-${VERSION}.tar.gz ];then
-		md5_mysql=`md5sum ${mysqlDir}/mysql-${VERSION}.tar.gz  | awk '{print $1}'`
+	if [ -f ${mysqlDir}/mysql-${VERSION}.tar.xz ];then
+		md5_mysql=`md5sum ${mysqlDir}/mysql-${VERSION}.tar.xz  | awk '{print $1}'`
 		if [ "${md5_mysql_ok}" = "${md5_mysql}" ]; then
-			echo "mysql9.4 file check ok"
+			echo "mysql9.7 file check ok"
 		else
 			# 重新下载
 			rm -rf ${mysqlDir}/mysql-${VERSION}
-			wget --no-check-certificate -O ${mysqlDir}/mysql-${VERSION}.tar.gz --tries=3 https://cdn.mysql.com/archives/mysql-9.4/mysql-${VERSION}.tar.gz
+			wget --no-check-certificate -O ${mysqlDir}/mysql-${VERSION}.tar.xz  --tries=3 https://cdn.mysql.com//Downloads/MySQL-9.7/mysql-${VERSION}.tar.xz
 		fi
 	fi
 
 	if [ ! -d ${mysqlDir}/mysql-${VERSION} ];then
-		 cd ${mysqlDir} && tar -zxvf  ${mysqlDir}/mysql-${VERSION}.tar.gz
+		 cd ${mysqlDir} && tar -Jxf ${mysqlDir}/mysql-${VERSION}.tar.xz
 	fi
 
 	OPTIONS=''
