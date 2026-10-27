@@ -16,7 +16,7 @@ sysName=`uname`
 myDir=${serverPath}/source/mysql-community
 
 OS_ARCH=`arch`
-MYSQL_VER=9.7.0
+MYSQL_VER=9.7.2
 SUFFIX_NAME=${MYSQL_VER}-linux-glibc2.28-${OS_ARCH}
 
 # cd /www/server/mdserver-web/plugins/mysql-community && bash install.sh install 9.3
