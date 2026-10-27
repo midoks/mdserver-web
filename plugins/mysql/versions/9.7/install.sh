@@ -55,8 +55,6 @@ VERSION_ID=`cat /etc/*-release | grep VERSION_ID | awk -F = '{print $2}' | awk -
 
 
 VERSION=9.7.2
-# https://dev.mysql.com/get/Downloads/MySQL-9.4/mysql-${VERSION}.tar.gz
-# https://cdn.mysql.com/archives/mysql-9.4/mysql-9.4.0.tar.gz
 Install_mysql()
 {
 	mkdir -p ${mysqlDir}
