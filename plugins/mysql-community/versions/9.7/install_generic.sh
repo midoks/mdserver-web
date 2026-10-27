@@ -19,8 +19,8 @@ OS_ARCH=`arch`
 MYSQL_VER=9.7.2
 SUFFIX_NAME=${MYSQL_VER}-linux-glibc2.28-${OS_ARCH}
 
-# cd /www/server/mdserver-web/plugins/mysql-community && bash install.sh install 9.3
-# cd /www/server/mdserver-web && python3 /www/server/mdserver-web/plugins/mysql-community/index.py start 9.3
+# cd /www/server/mdserver-web/plugins/mysql-community && bash install.sh install 9.7
+# cd /www/server/mdserver-web && python3 /www/server/mdserver-web/plugins/mysql-community/index.py start 9.7
 COMMUNITY_INSTALL()
 {
 
@@ -33,7 +33,7 @@ mkdir -p $serverPath/mysql-community
 # https://cdn.mysql.com/Downloads/MySQL-9.3/mysql-${SUFFIX_NAME}.tar.xz
 if [ ! -f ${myDir}/mysql-${SUFFIX_NAME}.tar.xz ];then
 	# wget --no-check-certificate -O ${myDir}/mysql-${SUFFIX_NAME}.tar.xz https://cdn.mysql.com/Downloads/MySQL-9.7/mysql-${SUFFIX_NAME}.tar.xz
-	wget --no-check-certificate -O ${myDir}/mysql-${SUFFIX_NAME}.tar.xz https://cdn.mysql.com/archives/mysql-9.7/mysql-${SUFFIX_NAME}..tar.xz
+	wget --no-check-certificate -O ${myDir}/mysql-${SUFFIX_NAME}.tar.xz https://cdn.mysql.com/archives/mysql-9.7/mysql-${SUFFIX_NAME}.tar.xz
 fi
 
 if [ -d ${myDir} ];then
