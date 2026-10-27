@@ -18,7 +18,7 @@ bash ${rootPath}/scripts/getos.sh
 echo "bash ${rootPath}/scripts/getos.sh"
 OSNAME=`cat ${rootPath}/data/osname.pl`
 
-VERSION_MIN=2.1.7
+VERSION_MIN=2.2.8
 VERSION=v${VERSION_MIN}
 
 sysName=$(uname | tr '[:upper:]' '[:lower:]')
