@@ -98,8 +98,7 @@ Install_mysql()
 	fi
 
 	if [ ! -f ${mysqlDir}/mysql-${VERSION}.tar.gz ];then
-         wget --no-check-certificate -O ${mysqlDir}/mysql-${VERSION}.tar.gz --tries=3 https://dev.mysql.com/get/Downloads/MySQL-9.7/mysql-${VERSION}.tar.gz
-         wget --no-check-certificate -O ${mysqlDir}/mysql-${VERSION}.tar.xz  --tries=3 https://cdn.mysql.com//Downloads/MySQL-9.7/mysql-${VERSION}.tar.xz
+         wget --no-check-certificate -O ${mysqlDir}/mysql-${VERSION}.tar.xz --tries=3 https://cdn.mysql.com//Downloads/MySQL-9.7/mysql-${VERSION}.tar.xz
 	fi
 
 	#检测文件是否损坏.
@@ -111,7 +110,7 @@ Install_mysql()
 		else
 			# 重新下载
 			rm -rf ${mysqlDir}/mysql-${VERSION}
-			wget --no-check-certificate -O ${mysqlDir}/mysql-${VERSION}.tar.xz  --tries=3 https://cdn.mysql.com//Downloads/MySQL-9.7/mysql-${VERSION}.tar.xz
+			wget --no-check-certificate -O ${mysqlDir}/mysql-${VERSION}.tar.xz --tries=3 https://cdn.mysql.com//Downloads/MySQL-9.7/mysql-${VERSION}.tar.xz
 		fi
 	fi
 
