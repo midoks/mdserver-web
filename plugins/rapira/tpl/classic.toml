@@ -1,0 +1,11 @@
+[http]
+listen = "127.0.0.1:8000"
+
+[http.pool]
+entrypoint = "classic.php"
+mode = "classic"
+
+[observability]
+listen = "127.0.0.1:9180" 
+keepalive_timeout_secs = 60
+[observability.metrics] 

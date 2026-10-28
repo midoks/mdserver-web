@@ -43,17 +43,17 @@ def getInitDFile(version):
 
 
 def getConf(version):
-    path = getServerDir() + '/' + version + '/etc/php.ini'
+    path = getServerDir() + '/' + version + '/rapira.toml'
     return path
 
-
-def getFpmConfFile(version):
-    return getServerDir() + '/' + version + '/etc/php-fpm.d/www.conf'
+def getConfIni(version):
+    path = getServerDir() + '/' + version + '/php.ini'
+    return path
 
 
 def status_progress(version):
     # ps -ef|grep 'php/81' |grep -v grep | grep -v python | awk '{print $2}
-    cmd = "ps -ef|grep 'php/" + version + \
+    cmd = "ps -ef|grep 'rapira/" + version + \
         "' |grep -v grep | grep -v python | awk '{print $2}'"
     data = mw.execShell(cmd)
     if data[0] == '':
@@ -61,69 +61,27 @@ def status_progress(version):
     return 'start'
 
 
-def getPhpSocket(version):
-    path = getFpmConfFile(version)
-    content = mw.readFile(path)
-    rep = r'listen\s*=\s*(.*)'
-    tmp = re.search(rep, content)
-    return tmp.groups()[0].strip()
-
-
 def status(version):
     '''
     sock文件判断是否启动
     '''
-    sock = getPhpSocket(version)
-    if sock.find(':')>-1:
-        return status_progress(version)
-
-    if not os.path.exists(sock):
-        return 'stop'
-    return 'start'
-
-
-def getFpmAddress(version):
-    fpm_address = '/tmp/php-cgi-{}.sock'.format(version)
-    php_fpm_file = getFpmConfFile(version)
-    try:
-        content = readFile(php_fpm_file)
-        tmp = re.findall(r"listen\s*=\s*(.+)", content)
-        if not tmp:
-            return fpm_address
-        if tmp[0].find('sock') != -1:
-            return fpm_address
-        if tmp[0].find(':') != -1:
-            listen_tmp = tmp[0].split(':')
-            if bind:
-                fpm_address = (listen_tmp[0], int(listen_tmp[1]))
-            else:
-                fpm_address = ('127.0.0.1', int(listen_tmp[1]))
-        else:
-            fpm_address = ('127.0.0.1', int(tmp[0]))
-        return fpm_address
-    except:
-        return fpm_address
-
+    return status_progress(version)
 
 def getPhpinfo(version):
     stat = status(version)
     if stat == 'stop':
         return 'PHP[' + version + ']未启动,不可访问!!!'
 
-    sock_file = getFpmAddress(version)
-    root_dir = mw.getFatherDir() + '/phpinfo'
-
-    mw.execShell("rm -rf " + root_dir)
-    mw.execShell("mkdir -p " + root_dir)
-    mw.writeFile(root_dir + '/phpinfo.php', '<?php phpinfo(); ?>')
-    sock_data = mw.requestFcgiPHP(sock_file, '/phpinfo.php', root_dir)
-    os.system("rm -rf " + root_dir)
-    phpinfo = str(sock_data, encoding='utf-8')
-    return phpinfo
+    php_path = getServerDir() + "/" + version + "/link/bin/php"
+    php_ini = getConfIni(version)
+    php_path = php_path + " -c " + php_ini
+    cmd = php_path + " -d display_startup_errors=0 -r 'phpinfo();' 2>/dev/null"
+    cmd_data = mw.execShell(cmd)
+    return cmd_data[0]
 
 
 def libConfCommon(version):
-    fname = getConf(version)
+    fname = getConfIni(version)
     if not os.path.exists(fname):
         return mw.returnJson(False, '指定PHP版本不存在!')
 
@@ -133,8 +91,8 @@ def libConfCommon(version):
     phplib = json.loads(mw.readFile(libpath))
 
     php_dir = getServerDir() + "/" + version
-    ext_dir = php_dir+"/lib/php/extensions"
-
+    ext_dir = php_dir+"/link/lib/php/extensions"
+    
     ext_list = os.listdir(ext_dir)
     for sodir in ext_list:
         if sodir.find("no-debug-non-zts") > -1:

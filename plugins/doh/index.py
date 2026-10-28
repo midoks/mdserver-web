@@ -135,9 +135,6 @@ def initDreplace():
 
     return ''
 
-
-
-
 def appOp(method):
     initDreplace()
     if not mw.isAppleSystem():

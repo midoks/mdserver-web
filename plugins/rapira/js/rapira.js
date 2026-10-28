@@ -32,7 +32,7 @@ function phpPostCallback(method, version, args,callback){
     var req_data = {};
     req_data['name'] = 'rapira';
     req_data['func'] = method;
-    req_data['script']='index_php';
+    req_data['script']='index_rapira';
     args['version'] = version;
 
  
@@ -134,13 +134,7 @@ function submitConf(version) {
 function phpCommonFunc(version){
     phpPost('get_limit_conf', version, '', function(ret_data){
         var rdata = $.parseJSON(ret_data.data);
-        var con = '<p class="conf_p">\
-            <span>超时限制</span>\
-            <input class="phpTimeLimit bt-input-text mr5" type="number" value="' + rdata['maxTime'] + '">, 秒\
-            <button class="btn btn-success btn-sm" onclick="setPHPMaxTime(\'' + version + '\')" style="margin-left:20px">保存</button>\
-            </p>';
-
-        con += '<p class="conf_p">\
+        con = '<p class="conf_p">\
             <span>上传限制</span>\
             <input class="phpUploadLimit bt-input-text mr5" type="number" value="' + rdata['max']+'" name="max">,MB\
             <button class="btn btn-success btn-sm" onclick="setPHPMaxSize(\''+ version+'\')" style="margin-left:20px">保存</button>\
@@ -148,9 +142,7 @@ function phpCommonFunc(version){
 
         con += '<hr/><p class="conf_p" style="text-align:center;">\
             <button class="btn btn-default btn-sm" onclick="getPHPInfo(\'' + version + '\')">查看phpinfo()</button>  \
-            <button class="btn btn-default btn-sm" onclick="phpPreload(\'' + version + '\')">预加载脚本</button>\
             <button class="btn btn-default btn-sm" onclick="phpOpcacheBlacklist(\'' + version + '\')">OPCACHE黑名单</button>\
-            <button class="btn btn-default btn-sm" onclick="phpFpmRoot(\'' + version + '\')">PHP-FPM(global)</button>\
         </p>';
 
         $(".soft-man-con").html(con);
@@ -755,7 +747,7 @@ function getPHPInfo(version) {
             area: ['70%', '90%'],
             closeBtn: 2,
             shadeClose: true,
-            content: data.data.replace('a:link {color: #009; text-decoration: none; background-color: #fff;}', '').replace('a:link {color: #000099; text-decoration: none; background-color: #ffffff;}', '')
+            content: "<pre>"+data.data+"<pre>"
         });
     })
 }

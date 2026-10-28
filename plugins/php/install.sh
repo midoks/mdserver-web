@@ -8,7 +8,7 @@ rootPath=$(dirname "$rootPath")
 serverPath=$(dirname "$rootPath")
 sysName=`uname`
 
-# cd /www/server/mdserver-web/plugins/php && bash install.sh install 85
+# cd /www/server/mdserver-web/plugins/php && bash install.sh install 56
 # cd /www/server/mdserver-web/plugins/php && bash install.sh upgrade 85
 # cd /www/server/mdserver-web && . ./bin/activate && python3 plugins/php/index.py upgrade_check 56
 
@@ -64,8 +64,8 @@ cd ${curPath} && sh -x $curPath/versions/$2/install.sh $1
 if [ "${action}" = "install" ] && [ -d ${serverPath}/php/${type} ];then
 
 	#初始化 
-	cd ${rootPath} && python3 ${rootPath}/plugins/php/index.py start ${type}
-	cd ${rootPath} && python3 ${rootPath}/plugins/php/index.py initd_install ${type}
+	cd ${rootPath} && python3 plugins/php/index.py start ${type}
+	cd ${rootPath} && python3 plugins/php/index.py initd_install ${type}
 
 	# 安装通用扩展
 	echo "install PHP${type} extend start"
@@ -99,6 +99,13 @@ if [ "${action}" = "install" ] && [ -d ${serverPath}/php/${type} ];then
 		cd /tmp
 		curl -sS https://getcomposer.org/installer | /www/server/php/${type}/bin/php
 		mv composer.phar /usr/local/bin/composer
+	fi
+
+	if [ ! -f /usr/local/bin/pie ] && [ "$sysName" != "Darwin" ] ;then
+			curl -fL --output /tmp/pie.phar https://github.com/php/pie/releases/latest/download/pie.phar \
+				&& gh attestation verify --owner php /tmp/pie.phar \
+			 	&& mv /tmp/pie.phar /usr/local/bin/pie \
+			 	&& chmod +x /usr/local/bin/pie
 	fi
 fi
 

@@ -2,6 +2,11 @@
 PATH=/bin:/sbin:/usr/bin:/usr/sbin:/usr/local/bin:/usr/local/sbin:~/bin
 export PATH
 
+# cd /www/server/mdserver-web/plugins/gitea && bash install.sh upgrade 1.25.3
+
+action=$1
+version=$2
+
 curPath=`pwd`
 rootPath=$(dirname "$curPath")
 rootPath=$(dirname "$rootPath")
@@ -10,6 +15,7 @@ serverPath=$(dirname "$rootPath")
 if [ -f ${rootPath}/bin/activate ];then
 	. ${rootPath}/bin/activate
 fi
+
 
 
 URL_DOWNLOAD=https://dl.gitea.com
@@ -87,20 +93,21 @@ Install_App()
 		chown -R www:www $serverPath/gitea
 	fi
 
-
-	if [ -d $serverPath/gitea ];then
-		echo $version > $serverPath/gitea/version.pl
-
+	if [ -d $serverPath/gitea ] && [ "${action}" = 'install' ] ;then
 		cd ${rootPath} && python3 plugins/gitea/index.py start
 		cd ${rootPath} && python3 plugins/gitea/index.py initd_install
 	fi
 
+	echo $version > $serverPath/gitea/version.pl
 	echo 'install success'
+
+	if [ "$action" = "upgrade" ];then
+		which systemctl && systemctl restart gitea
+	fi
 }
 
 Uninstall_App()
 {
-
 	if [ -f /usr/lib/systemd/system/gitea.service ];then
 		systemctl stop gitea
 		systemctl disable gitea
@@ -116,11 +123,10 @@ Uninstall_App()
 	echo 'uninstall success'
 }
 
-
-action=$1
-version=$2
-if [ "${1}" = 'install' ];then
+if [ "${action}" = 'install' ] || [ "$action" = "upgrade" ];then
 	Install_App $version
-else
+elif [ "${action}" = 'uninstall' ];then
 	Uninstall_App $version
+else
+	echo "OPTIONS ERROR"
 fi

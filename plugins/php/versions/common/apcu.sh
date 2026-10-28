@@ -13,12 +13,17 @@ sourcePath=${serverPath}/source/php
 
 LIBNAME=apcu
 # _LIBNAME=$(echo $LIBNAME | tr '[a-z]' '[A-Z]')
-LIBV=5.1.22
+LIBV=5.1.28
 sysName=`uname`
 actionType=$1
 version=$2
 
-NON_ZTS_FILENAME=`ls $serverPath/php/${version}/lib/php/extensions | grep no-debug-non-zts`
+LIB_PATH_NAME=lib/php
+if [ -d $serverPath/php/${version}/lib64 ];then
+	LIB_PATH_NAME=lib64
+fi
+
+NON_ZTS_FILENAME=`ls $serverPath/php/${version}/${LIB_PATH_NAME}/extensions | grep no-debug-non-zts`
 extFile=$serverPath/php/${version}/lib/php/extensions/${NON_ZTS_FILENAME}/${LIBNAME}.so
 
 if [ "$sysName" = "Darwin" ];then
