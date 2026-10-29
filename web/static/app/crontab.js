@@ -477,9 +477,9 @@ function toLogsHtml(type){
 		case 'database_mysql-yum':
 		case 'database':
 			sMsg = '备份数据库';
-			suffix = type.replace('database','')
+			suffix = type.replace('database','');
 			if (suffix != ''){
-				suffix = suffix.replace('_','')
+				suffix = suffix.replace('_','');
 				sMsg = '备份数据库['+suffix+']';
 			}
 			sType = type;
