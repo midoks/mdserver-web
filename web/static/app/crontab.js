@@ -592,10 +592,11 @@ function toBackup(type){
 	var data = 'type='+sType;
 
 	$.post('/crontab/get_data_list',data,function(rdata){
+		console.log(rdata);
 		$(".planname input[name='name']").css({"background-color":"#f6f6f6","color":"#666"});
 		var sOpt = "";
 		if(rdata.data.length == 0){
-			layer.msg(lan.public.list_empty,{icon:2})
+			layer.msg("列表为空!",{icon:2})
 			return;
 		}
 
@@ -606,21 +607,19 @@ function toBackup(type){
 			sOpt += '<li><a role="menuitem" tabindex="-1" href="javascript:;" value="'+rdata.data[i].name+'">'+rdata.data[i].name+'['+rdata.data[i].ps+']</a></li>';			
 		}
 
-		
-		if (sType != 'path'){
+
+		var changeDir = '';
+		if (sType == 'path'){
+			changeDir = '<span class="glyphicon glyphicon-folder-open cursor mr20 changePathDir" style="float:left;line-height: 30px;"></span>';
+		} else {
 			sOpt = '<li><a role="menuitem" tabindex="-1" href="javascript:;" value="ALL">所有</a></li>' + sOpt;
 		}
 		
 		var orderOpt = '';
 		for (var i=0;i<rdata.orderOpt.length;i++){
-			orderOpt += '<li><a role="menuitem" tabindex="-1" href="javascript:;" value="'+rdata.orderOpt[i].name+'">'+rdata.orderOpt[i].title+'</a></li>'
+			orderOpt += '<li><a role="menuitem" tabindex="-1" href="javascript:;" value="'+rdata.orderOpt[i].name+'">'+rdata.orderOpt[i].title+'</a></li>';
 		}
 		
-		
-		var changeDir = '';
-		if (sType == 'path'){
-			changeDir = '<span class="glyphicon glyphicon-folder-open cursor mr20 changePathDir" style="float:left;line-height: 30px;"></span>';
-		}
 
 		var sBody = '<div class="dropdown pull-left mr20 check">\
 		 	<button class="btn btn-default dropdown-toggle sname" type="button" id="backdata" data-toggle="dropdown" style="width:auto">\
