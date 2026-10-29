@@ -105,7 +105,7 @@ Install_mysql()
 	fi
 
 	#检测文件是否损坏.
-	md5_mysql_ok=5d2f4c9568a0e01d20dc5442c772de9f
+	md5_mysql_ok=3a5dcccd7671d86163922ce6ac705d6a
 	if [ -f ${mysqlDir}/mysql-${VERSION}.tar.gz ];then
 		md5_mysql=`md5sum ${mysqlDir}/mysql-${VERSION}.tar.gz  | awk '{print $1}'`
 		if [ "${md5_mysql_ok}" = "${md5_mysql}" ]; then
