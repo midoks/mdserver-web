@@ -100,7 +100,8 @@ Install_mysql()
 	fi
 
 	if [ ! -f ${mysqlDir}/mysql-${VERSION}.tar.gz ];then
-         wget --no-check-certificate -O ${mysqlDir}/mysql-${VERSION}.tar.gz --tries=3 https://dev.mysql.com/get/Downloads/MySQL-26.7/mysql-${VERSION}.tar.gz
+		# https://cdn.mysql.com//Downloads/MySQL-26.7/mysql-26.7.0.tar.gz
+        wget --no-check-certificate -O ${mysqlDir}/mysql-${VERSION}.tar.gz --tries=3 https://cdn.mysql.com/archives/mysql-26.7/mysql-${VERSION}.tar.gz
 	fi
 
 	#检测文件是否损坏.
@@ -108,7 +109,7 @@ Install_mysql()
 	if [ -f ${mysqlDir}/mysql-${VERSION}.tar.gz ];then
 		md5_mysql=`md5sum ${mysqlDir}/mysql-${VERSION}.tar.gz  | awk '{print $1}'`
 		if [ "${md5_mysql_ok}" = "${md5_mysql}" ]; then
-			echo "mysql9.4 file check ok"
+			echo "mysql26.7 file check ok"
 		else
 			# 重新下载
 			rm -rf ${mysqlDir}/mysql-${VERSION}

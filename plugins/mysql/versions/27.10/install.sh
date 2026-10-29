@@ -100,7 +100,7 @@ Install_mysql()
 	fi
 
 	if [ ! -f ${mysqlDir}/mysql-${VERSION}.tar.gz ];then
-         wget --no-check-certificate -O ${mysqlDir}/mysql-${VERSION}.tar.gz --tries=3 https://dev.mysql.com/get/Downloads/MySQL-26.10/mysql-${VERSION}.tar.gz
+         wget --no-check-certificate -O ${mysqlDir}/mysql-${VERSION}.tar.gz --tries=3 https://cdn.mysql.com/archives/mysql-26.10/mysql-${VERSION}.tar.gz
 	fi
 
 	#检测文件是否损坏.
