@@ -206,7 +206,7 @@ Install_mysql()
 
 		if [ -d $serverPath/mysql ];then
 			rm -rf ${mysqlDir}/mysql-${VERSION}
-			echo '27.10' > $serverPath/mysql/version.pl
+			echo '26.10' > $serverPath/mysql/version.pl
 			echo "${VERSION}安装完成"
 		else
 			# rm -rf ${mysqlDir}/mysql-${VERSION}
