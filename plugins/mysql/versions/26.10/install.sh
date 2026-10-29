@@ -100,24 +100,24 @@ Install_mysql()
 	fi
 
 	if [ ! -f ${mysqlDir}/mysql-${VERSION}.tar.gz ];then
-         wget --no-check-certificate -O ${mysqlDir}/mysql-${VERSION}.tar.gz --tries=3 https://dev.mysql.com/get/Downloads/MySQL-9.4/mysql-${VERSION}.tar.gz
+		wget --no-check-certificate -O ${mysqlDir}/mysql-${VERSION}.tar.gz --tries=3 https://cdn.mysql.com//Downloads/MySQL-26.10/mysql-${VERSION}.tar.gz
 	fi
 
 	#检测文件是否损坏.
-	md5_mysql_ok=5d2f4c9568a0e01d20dc5442c772de9f
+	md5_mysql_ok=99a17d98c0d6062155d2e9807e6f0efd
 	if [ -f ${mysqlDir}/mysql-${VERSION}.tar.gz ];then
 		md5_mysql=`md5sum ${mysqlDir}/mysql-${VERSION}.tar.gz  | awk '{print $1}'`
 		if [ "${md5_mysql_ok}" = "${md5_mysql}" ]; then
-			echo "mysql9.4 file check ok"
+			echo "mysql27.10 file check ok"
 		else
 			# 重新下载
 			rm -rf ${mysqlDir}/mysql-${VERSION}
-			wget --no-check-certificate -O ${mysqlDir}/mysql-${VERSION}.tar.gz --tries=3 https://cdn.mysql.com/archives/mysql-9.4/mysql-${VERSION}.tar.gz
+			wget --no-check-certificate -O ${mysqlDir}/mysql-${VERSION}.tar.gz --tries=3 https://cdn.mysql.com//Downloads/MySQL-26.10/mysql-${VERSION}.tar.gz
 		fi
 	fi
 
 	if [ ! -d ${mysqlDir}/mysql-${VERSION} ];then
-		 cd ${mysqlDir} && tar -zxvf  ${mysqlDir}/mysql-${VERSION}.tar.gz
+		 cd ${mysqlDir} && tar -zxvf ${mysqlDir}/mysql-${VERSION}.tar.gz
 	fi
 
 	OPTIONS=''
@@ -206,7 +206,7 @@ Install_mysql()
 
 		if [ -d $serverPath/mysql ];then
 			rm -rf ${mysqlDir}/mysql-${VERSION}
-			echo '27.10' > $serverPath/mysql/version.pl
+			echo '26.10' > $serverPath/mysql/version.pl
 			echo "${VERSION}安装完成"
 		else
 			# rm -rf ${mysqlDir}/mysql-${VERSION}
