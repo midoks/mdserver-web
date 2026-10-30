@@ -14,7 +14,7 @@ sysName=`uname`
 rapira_version=0.9.1
 version=8.5.12
 PHP_VER=85
-md5_file_ok=32a2de53862ad44ed4a5005244ce4f1b50c271e74dced215449a4443b40569f1
+md5_file_ok=08bc2eba2a588654ade1357174aa646b761556c862dda0678345ee29ed481209
 Install_php()
 {
 #------------------------ install start ------------------------------------#
