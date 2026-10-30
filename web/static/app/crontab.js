@@ -595,6 +595,9 @@ function toBackup(type){
 		console.log(rdata);
 		$(".planname input[name='name']").css({"background-color":"#f6f6f6","color":"#666"});
 		var sOpt = "";
+		var changeDir = '';
+		var orderOpt = '';
+
 		if(rdata.data.length == 0){
 			layer.msg("列表为空!",{icon:2})
 			return;
@@ -607,15 +610,12 @@ function toBackup(type){
 			sOpt += '<li><a role="menuitem" tabindex="-1" href="javascript:;" value="'+rdata.data[i].name+'">'+rdata.data[i].name+'['+rdata.data[i].ps+']</a></li>';			
 		}
 
-
-		var changeDir = '';
 		if (sType == 'path'){
 			changeDir = '<span class="glyphicon glyphicon-folder-open cursor mr20 changePathDir" style="float:left;line-height: 30px;"></span>';
 		} else {
 			sOpt = '<li><a role="menuitem" tabindex="-1" href="javascript:;" value="ALL">所有</a></li>' + sOpt;
 		}
 		
-		var orderOpt = '';
 		for (var i=0;i<rdata.orderOpt.length;i++){
 			orderOpt += '<li><a role="menuitem" tabindex="-1" href="javascript:;" value="'+rdata.orderOpt[i].name+'">'+rdata.orderOpt[i].title+'</a></li>';
 		}
