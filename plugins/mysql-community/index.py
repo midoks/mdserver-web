@@ -1182,7 +1182,10 @@ def getTableList():
 
     pdb = pMysqlDb()
     sql = 'show tables from `%s`' % db_name
-    data = pdb.query(sql)
+    try:
+        data = pdb.query(sql)
+    except Exception as e:
+        return mw.returnJson(-1, str(e))
 
     table_list = []
     key = "Tables_in_%s" % db_name
