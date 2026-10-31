@@ -490,7 +490,7 @@ fi''' % (mw.getPanelDir(),)
                 'rememory': head_scripts + " && /bin/bash " + 'scripts/rememory.sh'
             }
             if param['backup_to'] != 'localhost':
-                cfile = mw.getPluginDir() + "/" + param['backup_to'] + "/index.py"
+                cfile = param['backup_to'] + "/index.py"
                 wheres['path'] = head_scripts + " && python3 " + cfile + " path " + param['sname'] + " " + str(param['save']) + " " + str(param['echo'])
                 wheres['site'] = head_scripts + " && python3 " + cfile + " site " + param['sname'] + " " + str(param['save']) + " " + str(param['echo'])
                 wheres['database'] = head_scripts + " && python3 " + cfile + " " + param['sname'] + "@" + param["sbody"] + " " + str(param['save'])
