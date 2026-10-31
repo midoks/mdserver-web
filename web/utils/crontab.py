@@ -495,7 +495,7 @@ fi''' % (mw.getPanelDir(),)
                 wheres['site'] = head_scripts + " && python3 " + cfile + " site " + param['sname'] + " " + str(param['save']) + " " + str(param['echo'])
                 wheres['database'] = head_scripts + " && python3 " + cfile + " " + param['sname'] + "@" + param["sbody"] + " " + str(param['save'])
 
-            if param["stype"] == 'database':
+            if param["stype"] != 'database':
                 plugin_name = stype.replace('database_', '')
                 cfile = mw.getPluginDir() + "/" + plugin_name + "/index.py"
                 wheres['database'] = head_scripts + " && python3 " + cfile + " " + param['sname'] + "@" + param["sbody"] + " " + str(param['save'])
