@@ -1546,10 +1546,14 @@ def setDbAccess():
         password = psdb.where("username=?", (name,)).getField('password')
 
     users = pdb.query("select Host from mysql.user where User='" +
-                      name + "' AND Host!='localhost'")
+                      name + "'")
 
+    # 清理全部已有用户(含localhost),失败忽略,确保下方可完整重建
     for us in users:
-        pdb.execute("drop user '" + name + "'@'" + us["Host"] + "'")
+        try:
+            pdb.execute("drop user '" + name + "'@'" + us["Host"] + "'")
+        except Exception:
+            pass
 
     __createUser(dbname, name, password, access)
 
