@@ -486,18 +486,21 @@ fi''' % (mw.getPanelDir(),)
             if stype == 'path' and param['echo'] == '':
                 param['echo'] == "1"
 
+            root_dir = "cd " + mw.getPanelDir()
+            head_scripts = head + root_dir
+
             wheres = {
-                'path': head + "python3 " + script_dir + "/backup.py path " + param['sname'] + " " + str(param['save']) + " " + str(param['echo']), 
-                'site':   head + "python3 " + script_dir + "/backup.py site " + param['sname'] + " " + str(param['save']) + " " + str(param['echo']),
-                'database': head + "python3 " + script_dir + "/backup.py database " + param['sname'] + " " + str(param['save']),
-                'logs':   head + "python3 " + script_dir + "/logs_backup.py " + param['sname'] + log + " " + str(param['save']),
-                'rememory': head + "/bin/bash " + script_dir + '/rememory.sh'
+                'path': head_scripts + " && python3 " + "scripts/backup.py path " + param['sname'] + " " + str(param['save']) + " " + str(param['echo']), 
+                'site':   head_scripts + " && python3 " + "scripts/backup.py site " + param['sname'] + " " + str(param['save']) + " " + str(param['echo']),
+                'database': head_scripts + " && python3 " + "scripts/backup.py database " + param['sname'] + " " + str(param['save']),
+                'logs':   head_scripts + " && python3 " + "scripts/logs_backup.py " + param['sname'] + log + " " + str(param['save']),
+                'rememory': head_scripts + " && /bin/bash " + 'scripts/rememory.sh'
             }
             if param['backup_to'] != 'localhost':
                 cfile = mw.getPluginDir() + "/" + param['backup_to'] + "/index.py"
-                wheres['path'] = head + "python3 " + cfile + " path " + param['sname'] + " " + str(param['save']) + " " + str(param['echo'])
-                wheres['site'] = head + "python3 " + cfile + " site " + param['sname'] + " " + str(param['save']) + " " + str(param['echo'])
-                wheres['database'] = head + "python3 " + cfile + " " + source_stype + " " + param['sname'] + " " + str(param['save'])
+                wheres['path'] = head_scripts + " && python3 " + cfile + " path " + param['sname'] + " " + str(param['save']) + " " + str(param['echo'])
+                wheres['site'] = head_scripts + " && python3 " + cfile + " site " + param['sname'] + " " + str(param['save']) + " " + str(param['echo'])
+                wheres['database'] = head_scripts + " && python3 " + cfile + " " + source_stype + " " + param['sname'] + " " + str(param['save'])
             try:
                 shell = wheres[stype]
             except:
