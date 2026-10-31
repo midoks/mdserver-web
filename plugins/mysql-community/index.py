@@ -703,7 +703,10 @@ def runInfo(version):
         return mw.returnJson(False, 'MySQL未启动', [])
 
     db = pMysqlDb()
-    data = db.query('show global status')
+    try:
+        data = db.query('show global status')
+    except Exception as e:
+        data = e
     isError = isSqlError(data)
     if isError != None:
         return isError
@@ -723,8 +726,11 @@ def runInfo(version):
 
     # print(result, int(result['Uptime']))
     result['Run'] = int(time.time()) - int(result['Uptime'])
-    tmp = db.query('show master status')
+    cmd_status = 'show master status'
+    if pk_version.parse(version) > pk_version.parse("8.0"):
+        cmd_status = 'SHOW BINARY LOG STATUS'
     try:
+        tmp = db.query(cmd_status)
         result['File'] = tmp[0]["File"]
         result['Position'] = tmp[0]["Position"]
     except:
