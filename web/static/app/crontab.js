@@ -678,7 +678,6 @@ function toBackup(type){
 
 		$(".dropdown ul li a").click(function(){
 			var sname = $("#sname").attr("val");
-			console.log("sname:",sname);
 			if(!sname) return;
 
 			var plan_name = sMsg+'['+sname+']';
@@ -803,9 +802,7 @@ function editTaskInfo(id){
 			}
 		};
 		obj.create(function(){
-
 			var tableOpt = '';
-			console.log(obj.from.sbody);
 			var db_html_all_option = '<li><a role="menuitem" tabindex="-1" href="javascript:;" value="ALL">所有</a></li>';
 
 			if ( obj.from.stype == "database" || obj.from.stype.split("_")[0] == "database")  {
