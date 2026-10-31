@@ -822,6 +822,21 @@ def getInfo(msg, args=()):
         msg = msg.replace(rep, args[i])
     return msg
 
+
+def getMsg(key, args=()):
+    # 取通用字典消息
+    pjson = getStaticJson('public')
+    logMessage = json.loads(readFile(pjson))
+    keys = logMessage.keys()
+
+    msg = None
+    if key in keys:
+        msg = logMessage[key]
+        for i in range(len(args)):
+            rep = '{' + str(i + 1) + '}'
+            msg = msg.replace(rep, args[i])
+    return msg
+
 def getLastLine(path, num, p=1):
     pyVersion = sys.version_info[0]
     try:
