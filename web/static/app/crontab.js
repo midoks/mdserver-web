@@ -359,7 +359,8 @@ function planAdd(){
 	
 
 	layer.msg('正在添加,请稍候...!',{icon:16,time:0,shade: [0.3, '#000']});
-	var data = $("#cronConfig").serialize() + '&sbody='+sBody;
+	var data = $("#cronConfig").serialize();
+	// + '&sbody='+sBody;
 	// console.log(data);
 	$.post('/crontab/add',data,function(rdata){
 		if(!rdata.status) {
@@ -445,6 +446,7 @@ function initDropdownMenu(){
 			case 'database_postgresql':
 			case 'database_mysql-apt':
 			case 'database_mysql-yum':
+			case 'database_mysql-community':
 			case 'database':
 				toBackup(type);
 				$(".controls").html('备份数据库');
@@ -475,6 +477,7 @@ function toLogsHtml(type){
 		case 'database_postgresql':
 		case 'database_mysql-apt':
 		case 'database_mysql-yum':
+		case 'database_mysql-community':
 		case 'database':
 			sMsg = '备份数据库';
 			suffix = type.replace('database','');
@@ -505,7 +508,8 @@ function toLogsHtml(type){
 
 		for(var i=0;i<rdata.data.length;i++){
 			if(i==0){
-				$(".planname input[name='name']").val(sMsg+'['+rdata.data[i].name+']');
+				var plan_name = sMsg+'['+rdata.data[i].name+']'
+				$(".planname input[name='name']").attr("source_name",plan_name).val(plan_name);
 			}
 			sOpt += '<li><a role="menuitem" tabindex="-1" href="javascript:;" value="'+rdata.data[i].name+'">'+rdata.data[i].name+'['+rdata.data[i].ps+']</a></li>';			
 		}
@@ -552,7 +556,9 @@ function toLogsHtml(type){
 		$(".dropdown ul li a").click(function(){
 			var sname = $("#sname").attr("val");
 			if(!sname) return;
-			$(".planname input[name='name']").val(sMsg+'['+sname+']');
+
+			var plan_name = sMsg+'['+sname+']';
+			$(".planname input[name='name']").val(plan_name);
 		});
 	},'json');
 
@@ -571,6 +577,7 @@ function toBackup(type){
 		case 'database_postgresql':
 		case 'database_mysql-apt':
 		case 'database_mysql-yum':
+		case 'database_mysql-community':
 		case 'database':
 			sMsg = '备份数据库';
 			suffix = type.replace('database','')
@@ -592,8 +599,7 @@ function toBackup(type){
 	var data = 'type='+sType;
 
 	$.post('/crontab/get_data_list',data,function(rdata){
-		console.log(rdata);
-		console.log("type:"+sType);
+		// console.log(rdata);
 		$(".planname input[name='name']").css({"background-color":"#f6f6f6","color":"#666"});
 		var sOpt = "";
 		var tableOpt = '';
@@ -609,7 +615,7 @@ function toBackup(type){
 
 		for(var i=0;i<rdata.data.length;i++){
 			if(i==0){
-				$(".planname input[name='name']").val(sMsg+'['+rdata.data[i].name+']');
+				$(".planname input[name='name']").attr("source_name",sMsg+'['+rdata.data[i].name+']').val(sMsg+'['+rdata.data[i].name+']');
 			}
 			sOpt += '<li><a role="menuitem" tabindex="-1" href="javascript:;" value="'+rdata.data[i].name+'">'+rdata.data[i].name+'['+rdata.data[i].ps+']</a></li>';			
 		}
@@ -673,7 +679,9 @@ function toBackup(type){
 			var sname = $("#sname").attr("val");
 			console.log("sname:",sname);
 			if(!sname) return;
-			$(".planname input[name='name']").val(sMsg+'['+sname+']');
+
+			var plan_name = sMsg+'['+sname+']';
+			$(".planname input[name='name']").attr("source_name", plan_name).val(plan_name);
 			toBackupInitTable(sType, sname);
 		});
 
@@ -688,13 +696,21 @@ function toBackupInitTable(stype, db){
 		var db_html_all_option = '<li><a role="menuitem" tabindex="-1" href="javascript:;" value="ALL">所有</a></li>';
 		var table_html = "";
 		for(var i=0;i<rdata.length;i++){
-			// if(i==0){
-			// 	$(".planname input[name='name']").val(sMsg+'['+rdata.data[i].name+']');
-			// }
 			table_html += '<li><a role="menuitem" tabindex="-1" href="javascript:;" value="'+rdata[i]+'">'+rdata[i]+'</a></li>';			
 		}
 		var content = db_html_all_option + table_html;
 		$('#backdata_table_ul').html(content);
+
+		$("#backdata_table_ul li a").click(function(){
+			var txt = $(this).text();
+			var type = $(this).attr("value");
+			$(this).parents(".dropdown").find("button b").text(txt).attr("val",type);
+			$("#cronConfig textarea[name='sbody']").val(txt);
+
+			var source_name = $(".planname input[name='name']").attr("source_name");
+			var plan_name = source_name+'['+txt+']';
+			$(".planname input[name='name']").val(plan_name);
+		});
 
 	},'json');
 }
