@@ -1474,14 +1474,26 @@ def delDb():
         accept = find['accept']
         username = find['username']
 
-        # 删除MYSQL
-        result = pdb.execute("drop database `" + name + "`")
+        # 删除MYSQL(库或用户可能已不存在,失败忽略,保证面板记录可删除)
+        try:
+            pdb.execute("drop database `" + name + "`")
+        except Exception:
+            pass
 
-        users = pdb.query("select Host from mysql.user where User='" +
-                          username + "' AND Host!='localhost'")
-        pdb.execute("drop user '" + username + "'@'localhost'")
+        try:
+            users = pdb.query("select Host from mysql.user where User='" +
+                              username + "' AND Host!='localhost'")
+        except Exception:
+            users = []
+        try:
+            pdb.execute("drop user '" + username + "'@'localhost'")
+        except Exception:
+            pass
         for us in users:
-            pdb.execute("drop user '" + username + "'@'" + us["Host"] + "'")
+            try:
+                pdb.execute("drop user '" + username + "'@'" + us["Host"] + "'")
+            except Exception:
+                pass
         pdb.execute("flush privileges")
 
         # 删除SQLITE
