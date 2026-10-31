@@ -497,7 +497,7 @@ fi''' % (mw.getPanelDir(),)
 
             if param["stype"] != 'database':
                 plugin_name = stype.replace('database_', '')
-                cfile = plugin_name + "/index.py"
+                cfile = plugin_name + "/scripts/backup.py"
                 wheres['database'] = head_scripts + " && python3 " + cfile + " " + param['sname'] + "@" + param["sbody"] + " " + str(param['save'])
 
             try:
