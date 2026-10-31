@@ -1387,19 +1387,21 @@ def getDbList():
 
 def getTableList():
     args = getArgs()
-    dbname = ""
+    db_name = ""
     if 'dbname' in args:
-        dbname = args['dbname']
-    if dbname == "":
+        db_name = args['dbname']
+    if db_name == "":
         return mw.returnJson(-1,"table表不能为空")
 
     pdb = pMysqlDb()
-    sql = "SELECT table_name, table_type FROM information_schema.tables WHERE table_schema = '"+dbname+"';"
+    sql = 'show tables from `%s`' % db_name
     data = pdb.query(sql)
 
     table_list = []
-    for value in data:
-        table_list.append(value["table_name"])
+    key = "Tables_in_%s" % db_name
+    for i in data:
+        table_list.append(i[key])
+
     return mw.returnJson(0,"ok", table_list)
 
 
