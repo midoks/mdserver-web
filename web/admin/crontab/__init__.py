@@ -67,7 +67,8 @@ def set_cron_status():
 @panel_login_required
 def get_data_list():
     stype = request.form.get('type', '')
-    return MwCrontab.instance().getDataList(stype)
+    db = request.form.get('db', '')
+    return MwCrontab.instance().getDataList(stype,db)
 
 
 # 获取计划任务
