@@ -492,8 +492,8 @@ fi''' % (mw.getPanelDir(),)
                 'database': head_scripts + " && python3 " + "scripts/backup.py database " + param['sname'] + "@" + param["sbody"] + " " + str(param['save']),
                 'logs':   head_scripts + " && python3 " + "scripts/logs_backup.py " + param['sname'] + log + " " + str(param['save']),
                 'rememory': head_scripts + " && /bin/bash " + 'scripts/rememory.sh',
-                "toShell":head + param['sbody'].replace("\r\n", "\n"),
-
+                'toUrl': head + "curl -sS --connect-timeout 10 -m 60 '" + param['url_address'] + "'",
+                "toShell": head + param['sbody'].replace("\r\n", "\n")
             }
             if param['backup_to'] != 'localhost':
                 cfile = param['backup_to'] + "/index.py"
