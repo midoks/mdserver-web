@@ -500,13 +500,11 @@ fi''' % (mw.getPanelDir(),)
                 cfile = "plugins/"+plugin_name + "/scripts/backup.py"
                 wheres['database'] = head_scripts + " && python3 " + cfile + " " + param['sname'] + "@" + param["sbody"] + " " + str(param['save'])
 
-            try:
-                shell = wheres[stype]
-            except:
-                if stype == 'toUrl':
-                    shell = head + "curl -sS --connect-timeout 10 -m 60 '" + param['url_address'] + "'"
-                else:
-                    shell = head + param['sbody'].replace("\r\n", "\n")
+            if stype == 'toUrl':
+                shell = head + "curl -sS --connect-timeout 10 -m 60 '" + param['url_address'] + "'"
+            
+            if stype == 'toShell':
+                shell = head + param['sbody'].replace("\r\n", "\n")
 
             shell += '''
 echo "----------------------------------------------------------------------------"
