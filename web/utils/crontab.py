@@ -480,6 +480,9 @@ fi''' % (mw.getPanelDir(),)
             if stype == 'path' and param['echo'] == '':
                 param['echo'] == "1"
 
+            if stype.find('database_') > -1:
+                stype = 'database'
+
             root_dir = "cd " + mw.getPanelDir()
             head_scripts = head + root_dir + "&& source bin/activate "
 
@@ -503,7 +506,7 @@ fi''' % (mw.getPanelDir(),)
 
             if stype == 'toUrl':
                 shell = head + "curl -sS --connect-timeout 10 -m 60 '" + param['url_address'] + "'"
-            else if stype == 'toShell':
+            elif stype == 'toShell':
                 shell = head + param['sbody'].replace("\r\n", "\n")
             else:
                shell = wheres[stype] 
