@@ -282,6 +282,7 @@ function planAdd(){
 			layer.msg('脚本代码不能为空!',{icon:2});
 			return;
 		}
+		$("#cronConfig textarea[name='sbody']").val(decodeURIComponent(sBody));
 	}
 
 	if(cron_type == 'toFile'){
@@ -298,15 +299,17 @@ function planAdd(){
 			$("implement textarea[name='url_address']").focus();
 			return;
 		}
+		// url_address = encodeURIComponent(url_address);
+		$("#cronConfig input[name='url_address']").val(url_address);
 	}
-	// url_address = encodeURIComponent(url_address);
-	$("#cronConfig input[name='url_address']").val(url_address);
+	
 	$("#cronConfig input[name='stype']").val(cron_type);
-	$("#cronConfig textarea[name='sbody']").val(decodeURIComponent(sBody));
+	
 	
 	if(cron_type == 'site' || cron_type == 'database' || cron_type.indexOf('database_')>-1 || cron_type == 'path'){
 		var backupTo = $(".planBackupTo").find("b").attr("val");
 		$("#backup_to").val(backupTo);
+		// console.log("add",$("#cronConfig textarea[name='sbody']").val());
 	}
 
 	if (cron_type=='site' || cron_type=='path'){
@@ -356,11 +359,10 @@ function planAdd(){
 		var where1 = $("#ptime input[name='where1']").val();
 		$("#cronConfig input[name='where1']").val(where1);
 	}
-	
 
 	layer.msg('正在添加,请稍候...!',{icon:16,time:0,shade: [0.3, '#000']});
 	var data = $("#cronConfig").serialize();
-	// + '&sbody='+sBody;
+	// + '&sbody='+fsBody;
 	// console.log(data);
 	$.post('/crontab/add',data,function(rdata){
 		if(!rdata.status) {
@@ -552,7 +554,6 @@ function toLogsHtml(type){
 			});
 		});
 
-
 		$(".dropdown ul li a").click(function(){
 			var sname = $("#sname").attr("val");
 			if(!sname) return;
@@ -704,10 +705,16 @@ function toBackupInitTable(stype, db){
 		$("#backdata_table_ul li a").click(function(){
 			var txt = $(this).text();
 			var type = $(this).attr("value");
-			$(this).parents(".dropdown").find("button b").text(txt).attr("val",type);
-			$("#cronConfig textarea[name='sbody']").val(txt);
-
 			var source_name = $(".planname input[name='name']").attr("source_name");
+
+			$(this).parents(".dropdown").find("button b").text(txt).attr("val",type);
+			$("#cronConfig textarea[name='sbody']").val(type);
+
+			if (type == "ALL"){
+				$(".planname input[name='name']").val(source_name);
+				return;
+			}
+
 			var plan_name = source_name+'['+txt+']';
 			$(".planname input[name='name']").val(plan_name);
 		});
@@ -797,6 +804,27 @@ function editTaskInfo(id){
 		};
 		obj.create(function(){
 
+			var tableOpt = '';
+			console.log(obj.from.sbody);
+			var db_html_all_option = '<li><a role="menuitem" tabindex="-1" href="javascript:;" value="ALL">所有</a></li>';
+
+			if ( obj.from.stype == "database" || obj.from.stype.split("_")[0] == "database")  {
+				var table_val = "ALL";
+				var table_name = "所有";
+				if (obj.from.sbody){
+					table_val = obj.from.sbody;
+					table_name = obj.from.sbody;
+				}
+
+				//表
+				tableOpt += '<div class="textname pull-left mr20">数据表</div>';
+				tableOpt += '<div class="dropdown pull-left mr20 check">\
+				 	<button disabled="disabled" class="btn btn-default dropdown-toggle sname" type="button" id="backdata_table" data-toggle="dropdown" style="width:auto">\
+						<b id="tname" val="'+table_val+'">'+table_name+'</b><span class="caret"></span>\
+				  	</button>\
+				</div>';
+			}
+
 			var changeDir = '';
 			if (obj.from.stype == 'path'){
 				changeDir = '<span class="glyphicon glyphicon-folder-open cursor mr20 changePathDir" style="float:left;line-height: 30px;"></span>';
@@ -861,6 +889,7 @@ function editTaskInfo(id){
 						<div class="info-r" style="float: left;margin-right: 25px;display:'+ (obj.from.sType == "path"?'block;':'none') +'">\
 							<input id="inputPath" class="bt-input-text mr5 " type="text" name="path" value="'+ obj.from.sName +'" placeholder="备份目录" style="width:208px;height:33px;" disabled="disabled">\
 						</div>\
+						'+tableOpt+'\
 						'+changeDir+'\
 						<div class="textname pull-left mr20">备份到</div>\
 							<div class="dropdown  pull-left mr20">\
