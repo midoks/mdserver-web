@@ -196,11 +196,13 @@ def mongdbClientS():
     mg_root = pSqliteDb('config').where('id=?', (1,)).getField('mg_root')
 
     if auth == 'disabled':
-        client = pymongo.MongoClient(host=ip, port=int(port))
+        client = pymongo.MongoClient(host=ip, port=int(port), directConnection=True, serverSelectionTimeoutMS=5000)
     else:
         # print(auth,mg_root)
         # 使用 admin 数据库进行认证，兼容 MongoDB 3.0
-        client = pymongo.MongoClient(host=ip, port=int(port), username='root', password=mg_root, authSource='admin')
+        client = pymongo.MongoClient(host=ip, port=int(port), directConnection=True,
+                                     serverSelectionTimeoutMS=5000,
+                                     username='root', password=mg_root, authSource='admin')
     return client
 
 def getMongoDBVersion():
@@ -210,7 +212,7 @@ def getMongoDBVersion():
     ip = getConfLocalIp()
     try:
         # 先不使用认证连接
-        client = pymongo.MongoClient(host=ip, port=int(port), serverSelectionTimeoutMS=5000)
+        client = pymongo.MongoClient(host=ip, port=int(port), directConnection=True, serverSelectionTimeoutMS=5000)
         db = client.admin
         serverStatus = db.command('serverStatus')
         version = serverStatus.get('version', '4.0')
@@ -236,15 +238,19 @@ def mongdbClient():
     mg_root = pSqliteDb('config').where('id=?', (1,)).getField('mg_root')
     
     if auth == 'disabled':
-        client = pymongo.MongoClient(host=ip, port=int(port))
+        client = pymongo.MongoClient(host=ip, port=int(port), directConnection=True, serverSelectionTimeoutMS=5000)
     else:
         # 根据MongoDB版本选择认证方式
         if isMongoDB3x():
             # MongoDB 3.x 使用 authSource 指定认证数据库
-            client = pymongo.MongoClient(host=ip, port=int(port), username='root', password=mg_root, authSource='admin')
+            client = pymongo.MongoClient(host=ip, port=int(port), directConnection=True,
+                                         serverSelectionTimeoutMS=5000,
+                                         username='root', password=mg_root, authSource='admin')
         else:
             # MongoDB 4.x+ 默认在 admin 数据库认证
-            client = pymongo.MongoClient(host=ip, port=int(port), username='root', password=mg_root)
+            client = pymongo.MongoClient(host=ip, port=int(port), directConnection=True,
+                                         serverSelectionTimeoutMS=5000,
+                                         username='root', password=mg_root)
     return client
 
 
@@ -495,31 +501,25 @@ def runInfo():
 def runDocInfo():    
     client = mongdbClient()
     db = client.admin
-    # print(db)
-
     try:
-        serverStatus = db.command('serverStatus')
+        db.command('serverStatus')
+        listDbs = client.list_database_names()
+        showDbList = []
+        result = {}
+        for x in range(len(listDbs)):
+            mongd = client[listDbs[x]]
+            stats = mongd.command({"dbstats": 1})
+            if 'operationTime' in stats:
+                del stats['operationTime']
+
+            if '$clusterTime' in stats:
+                del stats['$clusterTime']
+            showDbList.append(stats)
+
+        result["dbs"] = showDbList
+        return mw.getJson(result)
     except Exception as e:
         return mw.returnJson(False, str(e))
-
-
-    serverStatus = db.command('serverStatus')
-
-    listDbs = client.list_database_names()
-    showDbList = []
-    result = {}
-    for x in range(len(listDbs)):
-        mongd = client[listDbs[x]]
-        stats = mongd.command({"dbstats": 1})
-        if 'operationTime' in stats:
-            del stats['operationTime']
-
-        if '$clusterTime' in stats:
-            del stats['$clusterTime']
-        showDbList.append(stats)
-
-    result["dbs"] = showDbList
-    return mw.getJson(result)
 
 def runReplInfo():
     client = mongdbClient()
