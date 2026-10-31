@@ -506,8 +506,7 @@ fi''' % (mw.getPanelDir(),)
                 cfile = "plugins/"+plugin_name + "/scripts/backup.py"
                 wheres['database'] = head_scripts + " && python3 " + cfile + " " + param['sname'] + "@" + param["sbody"] + " " + str(param['save'])
 
-            shell = wheres[stype] 
-
+            shell = wheres[stype]
             shell += '''
 echo "----------------------------------------------------------------------------"
 endDate=`date +"%Y-%m-%d %H:%M:%S"`
