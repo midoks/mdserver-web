@@ -1166,6 +1166,25 @@ def getDbList():
 
     return mw.getJson(data)
 
+def getTableList():
+    args = getArgs()
+    db_name = ""
+    if 'dbname' in args:
+        db_name = args['dbname']
+    if db_name == "":
+        return mw.returnJson(-1,"table表不能为空")
+
+    pdb = pMysqlDb()
+    sql = 'show tables from `%s`' % db_name
+    data = pdb.query(sql)
+
+    table_list = []
+    key = "Tables_in_%s" % db_name
+    for i in data:
+        table_list.append(i[key])
+
+    return mw.returnJson(0,"ok", table_list)
+
 
 def syncGetDatabases():
     pdb = pMysqlDb()
@@ -3588,6 +3607,8 @@ if __name__ == "__main__":
         print(rootPwd())
     elif func == 'get_db_list':
         print(getDbList())
+    elif func == 'get_table_list':
+        print(getTableList())
     elif func == 'set_db_backup':
         print(setDbBackup())
     elif func == 'import_db_backup':
