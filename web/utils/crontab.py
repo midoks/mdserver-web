@@ -501,7 +501,7 @@ fi''' % (mw.getPanelDir(),)
                 wheres['site'] = head_scripts + " && python3 " + cfile + " site " + param['sname'] + " " + str(param['save']) + " " + str(param['echo'])
                 wheres['database'] = head_scripts + " && python3 " + cfile + " " + param['sname'] + "@" + param["sbody"] + " " + str(param['save'])
 
-            if param["stype"] != 'database':
+            if param["stype"].find('database_') > -1:
                 plugin_name = param["stype"].replace('database_', '')
                 cfile = "plugins/"+plugin_name + "/scripts/backup.py"
                 wheres['database'] = head_scripts + " && python3 " + cfile + " " + param['sname'] + "@" + param["sbody"] + " " + str(param['save'])
