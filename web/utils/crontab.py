@@ -67,13 +67,13 @@ class crontab(object):
         return mw.returnData(True, msg)
 
     # 取数据列表
-    def getDataList(self,stype=''):
+    def getDataList(self,stype = '' ,db = ''):
     
         bak_data = []
         if stype == 'site' or stype == 'sites' or stype == 'database' or stype.find('database_') > -1 or stype == 'path':
             bak_data = thisdb.getOptionByJson('hook_backup',type='hook', default=[])
 
-        if stype == 'database' or stype.find('database_') > -1:
+        if stype == 'database' or stype.find('database_') > -1 and db == '':
             sqlite3_name = 'mysql'
             path = mw.getServerDir() + '/mysql'
             if stype != 'database':
@@ -93,6 +93,11 @@ class crontab(object):
                 db_list['data'] = []
             else:
                 db_list['data'] = mw.M('databases').dbPos(path, sqlite3_name).field('name,ps').select()
+            return db_list
+
+        # 数据表获取
+        if stype == 'database' or stype.find('database_') > -1 and db != '':
+            db_list = []
             return db_list
 
         if stype == 'path':
