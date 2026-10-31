@@ -1586,7 +1586,7 @@ def setRootPwd(version=''):
         if isError != None:
             return isError
 
-        if version.find('5.7') > -1 or version.find('8.0') > -1:
+        if version.find('5.7') > -1 or mw.inArray(getMdb8Ver(), version):
             pdb.execute(
                 "UPDATE mysql.user SET authentication_string='' WHERE user='root'")
             pdb.execute(
