@@ -1430,16 +1430,26 @@ def addDb():
     if psdb.where("name=? or username=?", (dbname, dbuser)).count():
         return mw.returnJson(False, '数据库已存在!')
 
-    result = pdb.execute("create database `" + dbname +
-                         "` DEFAULT CHARACTER SET " + codeing + " COLLATE " + codeStr)
+    try:
+        result = pdb.execute("create database `" + dbname +
+                             "` DEFAULT CHARACTER SET " + codeing + " COLLATE " + codeStr)
+    except Exception as e:
+        result = e
     # print result
     isError = isSqlError(result)
     if isError != None:
         return isError
 
-    pdb.execute("drop user '" + dbuser + "'@'localhost'")
+    # 清理同名残留用户,失败忽略(兼容DROP USER不支持IF EXISTS的旧版本)
+    try:
+        pdb.execute("drop user '" + dbuser + "'@'localhost'")
+    except Exception:
+        pass
     for a in address.split(','):
-        pdb.execute("drop user '" + dbuser + "'@'" + a + "'")
+        try:
+            pdb.execute("drop user '" + dbuser + "'@'" + a + "'")
+        except Exception:
+            pass
 
     __createUser(dbname, dbuser, password, address)
 
