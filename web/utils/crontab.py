@@ -18,6 +18,7 @@ import multiprocessing
 
 import core.mw as mw
 import thisdb
+from utils.plugin import plugin as MwPlugin
 
 
 class crontab(object):
@@ -98,6 +99,16 @@ class crontab(object):
         # 数据表获取
         if (stype == 'database' or stype.find('database_') > -1) and db != '':
             db_list = []
+            dbname = "mysql"
+            # print(dbname, "get_table_list", "", '{"dbname":"'+db+'"}')
+            data = MwPlugin.instance().run(dbname, "get_table_list", "", '{"dbname":"'+db+'"}')
+            if data[0] == "":
+                return db_list
+            rdata = data[0]
+
+            objdata = mw.getObjectByJson(rdata)
+            if objdata["status"] > -1:
+                db_list = objdata["data"]
             return db_list
 
         if stype == 'path':
