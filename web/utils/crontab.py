@@ -73,7 +73,7 @@ class crontab(object):
         if stype == 'site' or stype == 'sites' or stype == 'database' or stype.find('database_') > -1 or stype == 'path':
             bak_data = thisdb.getOptionByJson('hook_backup',type='hook', default=[])
 
-        if stype == 'database' or stype.find('database_') > -1 and db == '':
+        if (stype == 'database' or stype.find('database_') > -1) and db == '':
             sqlite3_name = 'mysql'
             path = mw.getServerDir() + '/mysql'
             if stype != 'database':
@@ -96,7 +96,7 @@ class crontab(object):
             return db_list
 
         # 数据表获取
-        if stype == 'database' or stype.find('database_') > -1 and db != '':
+        if (stype == 'database' or stype.find('database_') > -1) and db != '':
             db_list = []
             return db_list
 
