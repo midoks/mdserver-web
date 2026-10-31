@@ -620,10 +620,10 @@ function toBackup(type){
 			//表
 			tableOpt += '<div class="textname pull-left mr20">数据表</div>';
 			tableOpt += '<div class="dropdown pull-left mr20 check">\
-			 	<button class="btn btn-default dropdown-toggle sname" type="button" id="backdata" data-toggle="dropdown" style="width:auto">\
+			 	<button class="btn btn-default dropdown-toggle sname" type="button" id="backdata_table" data-toggle="dropdown" style="width:auto">\
 					<b id="tname" val="ALL">所有</b><span class="caret"></span>\
 			  	</button>\
-			 	<ul class="dropdown-menu" role="menu" aria-labelledby="backdata">\
+			 	<ul id="backdata_table_ul" class="dropdown-menu" role="menu" aria-labelledby="backdata_table">\
 			 		'+db_html_all_option+'\
 			 	</ul>\
 			</div>';
@@ -670,7 +670,6 @@ function toBackup(type){
 
 
 		$(".dropdown ul li a").click(function(){
-
 			var sname = $("#sname").attr("val");
 			console.log("sname:",sname);
 			if(!sname) return;
@@ -686,7 +685,17 @@ function toBackup(type){
 
 function toBackupInitTable(stype, db){
 	$.post('/crontab/get_data_list',{"type":stype,"db":db},function(rdata){
-		console.log("toBackupInitTable",rdata);
+		var db_html_all_option = '<li><a role="menuitem" tabindex="-1" href="javascript:;" value="ALL">所有</a></li>';
+		var table_html = "";
+		for(var i=0;i<rdata.length;i++){
+			// if(i==0){
+			// 	$(".planname input[name='name']").val(sMsg+'['+rdata.data[i].name+']');
+			// }
+			table_html += '<li><a role="menuitem" tabindex="-1" href="javascript:;" value="'+rdata[i]+'">'+rdata[i]+'</a></li>';			
+		}
+		var content = db_html_all_option + table_html;
+		$('#backdata_table_ul').html(content);
+
 	},'json');
 }
 
