@@ -593,10 +593,14 @@ function toBackup(type){
 
 	$.post('/crontab/get_data_list',data,function(rdata){
 		console.log(rdata);
+		console.log("type:"+sType);
 		$(".planname input[name='name']").css({"background-color":"#f6f6f6","color":"#666"});
 		var sOpt = "";
+		var tableOpt = '';
 		var changeDir = '';
 		var orderOpt = '';
+
+		var db_html_all_option = '<li><a role="menuitem" tabindex="-1" href="javascript:;" value="ALL">所有</a></li>';
 
 		if(rdata.data.length == 0){
 			layer.msg("列表为空!",{icon:2})
@@ -612,9 +616,20 @@ function toBackup(type){
 
 		if (sType == 'path'){
 			changeDir = '<span class="glyphicon glyphicon-folder-open cursor mr20 changePathDir" style="float:left;line-height: 30px;"></span>';
-		} else {
-			sOpt = '<li><a role="menuitem" tabindex="-1" href="javascript:;" value="ALL">所有</a></li>' + sOpt;
-		}
+		} else if ( sType == "database" || sType.split("_")[0] == "database")  {
+			//表
+			tableOpt += '<div class="textname pull-left mr20">数据表</div>';
+			tableOpt += '<div class="dropdown pull-left mr20 check">\
+			 	<button class="btn btn-default dropdown-toggle sname" type="button" id="backdata" data-toggle="dropdown" style="width:auto">\
+					<b id="tname" val="ALL">所有</b><span class="caret"></span>\
+			  	</button>\
+			 	<ul class="dropdown-menu" role="menu" aria-labelledby="backdata">\
+			 		'+db_html_all_option+'\
+			 	</ul>\
+			</div>';
+
+			sOpt = db_html_all_option + sOpt;
+		} else {}
 		
 		for (var i=0;i<rdata.orderOpt.length;i++){
 			orderOpt += '<li><a role="menuitem" tabindex="-1" href="javascript:;" value="'+rdata.orderOpt[i].name+'">'+rdata.orderOpt[i].title+'</a></li>';
@@ -627,6 +642,7 @@ function toBackup(type){
 		  	</button>\
 		 	<ul class="dropdown-menu" role="menu" aria-labelledby="backdata">'+sOpt+'</ul>\
 		</div>\
+		'+ tableOpt +'\
 		'+ changeDir +'\
 		<div class="textname pull-left mr20">备份到</div>\
 		<div class="dropdown planBackupTo pull-left mr20">\
@@ -654,12 +670,24 @@ function toBackup(type){
 
 
 		$(".dropdown ul li a").click(function(){
+
 			var sname = $("#sname").attr("val");
+			console.log("sname:",sname);
 			if(!sname) return;
 			$(".planname input[name='name']").val(sMsg+'['+sname+']');
+			toBackupInitTable(sType, sname);
 		});
-	},'json');
 
+		if ( sType == "database" || sType.split("_")[0] == "database")  {
+			toBackupInitTable(sType, rdata.data[0].name);
+		}
+	},'json');
+}
+
+function toBackupInitTable(stype, db){
+	$.post('/crontab/get_data_list',{"type":stype,"db":db},function(rdata){
+		console.log("toBackupInitTable",rdata);
+	},'json');
 }
 
 
