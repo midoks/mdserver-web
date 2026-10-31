@@ -100,6 +100,8 @@ class crontab(object):
         if (stype == 'database' or stype.find('database_') > -1) and db != '':
             db_list = []
             dbname = "mysql"
+            if stype != 'database':
+                dbname = stype.replace('database_', '')
             # print(dbname, "get_table_list", "", '{"dbname":"'+db+'"}')
             data = MwPlugin.instance().run(dbname, "get_table_list", "", '{"dbname":"'+db+'"}')
             if data[0] == "":
