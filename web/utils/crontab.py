@@ -484,7 +484,7 @@ fi''' % (mw.getPanelDir(),)
                 stype = 'database'
 
             root_dir = "cd " + mw.getPanelDir()
-            head_scripts = head + root_dir + "&& source bin/activate "
+            head_scripts = head + root_dir + " && source bin/activate "
 
             wheres = {
                 'path': head_scripts + " && python3 " + "scripts/backup.py path " + param['sname'] + " " + str(param['save']) + " " + str(param['echo']), 
