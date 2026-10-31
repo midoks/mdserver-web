@@ -494,7 +494,7 @@ fi''' % (mw.getPanelDir(),)
             wheres = {
                 'path': head_scripts + " && python3 " + "scripts/backup.py path " + param['sname'] + " " + str(param['save']) + " " + str(param['echo']), 
                 'site':   head_scripts + " && python3 " + "scripts/backup.py site " + param['sname'] + " " + str(param['save']) + " " + str(param['echo']),
-                'database': head_scripts + " && python3 " + "scripts/backup.py database " + param['sname'] + "@"+ param["sbody"] + " " + str(param['save']),
+                'database': head_scripts + " && python3 " + "scripts/backup.py database " + param['sname'] + "@" + param["sbody"] + " " + str(param['save']),
                 'logs':   head_scripts + " && python3 " + "scripts/logs_backup.py " + param['sname'] + log + " " + str(param['save']),
                 'rememory': head_scripts + " && /bin/bash " + 'scripts/rememory.sh'
             }
@@ -502,7 +502,13 @@ fi''' % (mw.getPanelDir(),)
                 cfile = mw.getPluginDir() + "/" + param['backup_to'] + "/index.py"
                 wheres['path'] = head_scripts + " && python3 " + cfile + " path " + param['sname'] + " " + str(param['save']) + " " + str(param['echo'])
                 wheres['site'] = head_scripts + " && python3 " + cfile + " site " + param['sname'] + " " + str(param['save']) + " " + str(param['echo'])
-                wheres['database'] = head_scripts + " && python3 " + cfile + " " + source_stype + " " + param['sname'] + " " + str(param['save'])
+                wheres['database'] = head_scripts + " && python3 " + cfile + " " + param['sname'] + "@" + param["sbody"] + " " + str(param['save'])
+
+            if params['stype'] != 'database':
+                plugin_name = stype.replace('database_', '')
+                cfile = mw.getPluginDir() + "/" + plugin_name + "/index.py"
+                wheres['database'] = head_scripts + " && python3 " + cfile + " " + param['sname'] + "@" + param["sbody"] + " " + str(param['save'])
+
             try:
                 shell = wheres[stype]
             except:
