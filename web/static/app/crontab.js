@@ -668,7 +668,7 @@ function toBackup(type){
 		$("#implement").html(sBody);
 		getselectname();
 
-		$('.changePathDir').click(function(){
+		$('.changePathDir').unbind('click').click(function(){
 			changePathCallback($('#sname').val(),function(select_dir){
 				$(".planname input[name='name']").val('备份目录['+select_dir+']');
 				$('#implement .sname b').attr('val',select_dir).text(select_dir);
