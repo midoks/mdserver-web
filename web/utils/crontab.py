@@ -476,15 +476,6 @@ fi''' % (mw.getPanelDir(),)
             if param['sname'] == 'ALL':
                 log = ''
 
-            script_dir = mw.getPanelDir() + "/scripts"
-            source_stype = 'database'
-            if stype.find('database_') > -1:
-                plugin_name = stype.replace('database_', '')
-                script_dir = mw.getPanelDir() + "/plugins/" + plugin_name + "/scripts"
-
-                source_stype = stype
-                stype = 'database'
-
             if stype == 'path' and param['echo'] == '':
                 param['echo'] == "1"
 
