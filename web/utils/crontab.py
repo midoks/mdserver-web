@@ -492,7 +492,7 @@ fi''' % (mw.getPanelDir(),)
             wheres = {
                 'path': head_scripts + " && python3 " + "scripts/backup.py path " + param['sname'] + " " + str(param['save']) + " " + str(param['echo']), 
                 'site':   head_scripts + " && python3 " + "scripts/backup.py site " + param['sname'] + " " + str(param['save']) + " " + str(param['echo']),
-                'database': head_scripts + " && python3 " + "scripts/backup.py database " + param['sname'] + " " + str(param['save']),
+                'database': head_scripts + " && python3 " + "scripts/backup.py database " + param['sname'] + "@"+ param["sbody"] + " " + str(param['save']),
                 'logs':   head_scripts + " && python3 " + "scripts/logs_backup.py " + param['sname'] + log + " " + str(param['save']),
                 'rememory': head_scripts + " && /bin/bash " + 'scripts/rememory.sh'
             }
