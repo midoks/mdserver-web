@@ -440,6 +440,7 @@ class crontab(object):
             cron_name = param['echo']
         param['echo'] = cron_name
 
+        shell = ""
         # try:
         stype = param['stype']
         if stype == 'toFile':
