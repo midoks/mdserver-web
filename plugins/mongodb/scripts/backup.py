@@ -138,6 +138,8 @@ class backupTools:
 
     def getDbBackupList(self,dbname=''):
         bkDir = mw.getFatherDir() + '/backup/database'
+        if not os.path.isdir(bkDir):
+            return []
         blist = os.listdir(bkDir)
         r = []
 
@@ -147,6 +149,8 @@ class backupTools:
             fbstr = x[0:blen]
             if fbstr == bname:
                 r.append(x)
+
+        r.sort()
         return r
 
     def backupDatabase(self, params, count):
