@@ -931,12 +931,56 @@ function importBackup(file,name){
     });
 }
 
-
-function importDbExternal(file,name){
-    myPost('import_db_external',{file:file,name:name}, function(data){
-        layer.msg('执行成功!');
+function importBackupProgress(file,name){
+    myPost('import_db_backup_progress',{file:file,name:name}, function(data){
+        var rdata = $.parseJSON(data.data);
+        layer.open({
+            title: "手动导入命令CMD【显示进度】",
+            area: ['600px', '180px'],
+            type:1,
+            closeBtn: 1,
+            shadeClose: false,
+            btn:["复制","取消"],
+            content: '<div class="pd15">\
+                        <div class="divtable">\
+                            <pre class="layui-code">'+rdata.data+'</pre>\
+                        </div>\
+                    </div>',
+            success:function(){
+                copyText(rdata.data);
+            },
+            yes:function(){
+                copyText(rdata.data);
+            }
+        });
     });
 }
+
+function importDbProgress(file,name){
+    myPost('import_db_progress',{file:file,name:name}, function(data){
+        var rdata = $.parseJSON(data.data);
+        layer.open({
+            title: "手动导入命令CMD【显示进度】",
+            area: ['600px', '180px'],
+            type:1,
+            closeBtn: 1,
+            shadeClose: false,
+            btn:["复制","取消"],
+            content: '<div class="pd15">\
+                        <div class="divtable">\
+                            <pre class="layui-code">'+rdata.data+'</pre>\
+                        </div>\
+                    </div>',
+            success:function(){
+                copyText(rdata.data);
+            },
+            yes:function(){
+                copyText(rdata.data);
+            }
+        });
+    });
+}
+
 
 function importDbExternalProgress(file,name){
     myPost('import_db_external_progress',{file:file,name:name}, function(data){
@@ -1086,7 +1130,7 @@ function setBackup(db_name){
     var layerIndex = layer.open({
         type: 1,
         title: "数据库备份详情",
-        area: ['600px', '280px'],
+        area: ['700px', '280px'],
         closeBtn: 1,
         shadeClose: false,
         content: '<div class="pd15">\
@@ -1140,6 +1184,7 @@ function setBackupReq(db_name, obj){
                     <td><span> ' + rdata.data[i]['time'] + '</span></td>\
                     <td style="text-align: right;">\
                         <a class="btlink" onclick="importBackup(\'' + rdata.data[i]['name'] + '\',\'' +db_name+ '\')">导入</a> | \
+                        <a class="btlink" onclick="importBackupProgress(\'' + rdata.data[i]['name'] + '\',\'' +db_name+ '\')">导入进度</a> | \
                         <a class="btlink" onclick="downloadBackup(\'' + rdata.data[i]['file'] + '\')">下载</a> | \
                         <a class="btlink" onclick="delBackup(\'' + rdata.data[i]['name'] + '\',\'' +db_name+ '\')">删除</a>\
                     </td>\

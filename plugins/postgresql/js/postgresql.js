@@ -584,7 +584,7 @@ function setBackup(db_name,obj){
         var s = layer.open({
             type: 1,
             title: "数据库备份详情",
-            area: ['600px', '280px'],
+            area: ['700px', '280px'],
             closeBtn: 2,
             shadeClose: false,
             content: '<div class="pd15">\
