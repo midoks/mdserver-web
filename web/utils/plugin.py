@@ -853,7 +853,7 @@ class plugin(object):
         source_bin_activate =  mw.getPanelDir() + "/bin/activate"
         py_cmd_dir = 'cd ' + mw.getPanelDir()
         if os.path.exists(source_bin_activate):
-            py_cmd_dir += " && . "+source_bin_activate
+            py_cmd_dir += " && . bin/activate"
         do_cmd = py_cmd_dir + " && "+ py_cmd
         data = mw.execShell(do_cmd)
 
@@ -872,8 +872,17 @@ class plugin(object):
         package = self.__plugin_dir + '/' + name
         if not os.path.exists(package):
             return (False, "插件不存在!")
-        if not package in sys.path:
-            sys.path.append(package)
+
+        # 各插件脚本同名(如 index.py),目标插件目录需置于 sys.path 最前
+        if package in sys.path:
+            sys.path.remove(package)
+        sys.path.insert(0, package)
+
+        # 清除其他插件的同名模块缓存,避免 __import__ 命中错误模块
+        if script in sys.modules:
+            mod_file = getattr(sys.modules[script], '__file__', '') or ''
+            if not mod_file.startswith(package):
+                del sys.modules[script]
 
         cmd = "__import__('" + script + "')." + func + '(' + args + ')'
         if mw.isDebugMode():

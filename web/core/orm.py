@@ -103,14 +103,20 @@ class ORM:
     def execute(self, sql):
         # 执行SQL语句返回受影响行
         if not self.__Conn():
-            return self.__DB_ERR
+            if self.__DB_ERR:
+                raise self.__DB_ERR
+            raise Exception('数据库连接失败')
         try:
             result = self.__DB_CUR.execute(sql)
             self.__DB_CONN.commit()
             self.__Close()
             return result
-        except Exception as ex:
-            return ex
+        except Exception:
+            try:
+                self.__Close()
+            except:
+                pass
+            raise
 
     def ping(self):
         try:
@@ -129,7 +135,9 @@ class ORM:
     def query(self, sql):
         # 执行SQL语句返回数据集
         if not self.__Conn():
-            return self.__DB_ERR
+            if self.__DB_ERR:
+                raise self.__DB_ERR
+            raise Exception('数据库连接失败')
         try:
             self.__DB_CUR.execute(sql)
             result = self.__DB_CUR.fetchall()
@@ -138,8 +146,12 @@ class ORM:
             # data = map(list, result)
             self.__Close()
             return result
-        except Exception as ex:
-            return ex
+        except Exception:
+            try:
+                self.__Close()
+            except:
+                pass
+            raise
 
     def __Close(self):
         # 关闭连接

@@ -282,6 +282,7 @@ function planAdd(){
 			layer.msg('脚本代码不能为空!',{icon:2});
 			return;
 		}
+		$("#cronConfig textarea[name='sbody']").val(decodeURIComponent(sBody));
 	}
 
 	if(cron_type == 'toFile'){
@@ -298,15 +299,17 @@ function planAdd(){
 			$("implement textarea[name='url_address']").focus();
 			return;
 		}
+		// url_address = encodeURIComponent(url_address);
+		$("#cronConfig input[name='url_address']").val(url_address);
 	}
-	// url_address = encodeURIComponent(url_address);
-	$("#cronConfig input[name='url_address']").val(url_address);
+	
 	$("#cronConfig input[name='stype']").val(cron_type);
-	$("#cronConfig textarea[name='sbody']").val(decodeURIComponent(sBody));
+	
 	
 	if(cron_type == 'site' || cron_type == 'database' || cron_type.indexOf('database_')>-1 || cron_type == 'path'){
 		var backupTo = $(".planBackupTo").find("b").attr("val");
 		$("#backup_to").val(backupTo);
+		// console.log("add",$("#cronConfig textarea[name='sbody']").val());
 	}
 
 	if (cron_type=='site' || cron_type=='path'){
@@ -356,10 +359,10 @@ function planAdd(){
 		var where1 = $("#ptime input[name='where1']").val();
 		$("#cronConfig input[name='where1']").val(where1);
 	}
-	
 
 	layer.msg('正在添加,请稍候...!',{icon:16,time:0,shade: [0.3, '#000']});
-	var data = $("#cronConfig").serialize() + '&sbody='+sBody;
+	var data = $("#cronConfig").serialize();
+	// + '&sbody='+fsBody;
 	// console.log(data);
 	$.post('/crontab/add',data,function(rdata){
 		if(!rdata.status) {
@@ -445,6 +448,7 @@ function initDropdownMenu(){
 			case 'database_postgresql':
 			case 'database_mysql-apt':
 			case 'database_mysql-yum':
+			case 'database_mysql-community':
 			case 'database':
 				toBackup(type);
 				$(".controls").html('备份数据库');
@@ -475,11 +479,12 @@ function toLogsHtml(type){
 		case 'database_postgresql':
 		case 'database_mysql-apt':
 		case 'database_mysql-yum':
+		case 'database_mysql-community':
 		case 'database':
 			sMsg = '备份数据库';
-			suffix = type.replace('database','')
+			suffix = type.replace('database','');
 			if (suffix != ''){
-				suffix = suffix.replace('_','')
+				suffix = suffix.replace('_','');
 				sMsg = '备份数据库['+suffix+']';
 			}
 			sType = type;
@@ -505,7 +510,8 @@ function toLogsHtml(type){
 
 		for(var i=0;i<rdata.data.length;i++){
 			if(i==0){
-				$(".planname input[name='name']").val(sMsg+'['+rdata.data[i].name+']');
+				var plan_name = sMsg+'['+rdata.data[i].name+']'
+				$(".planname input[name='name']").attr("source_name",plan_name).val(plan_name);
 			}
 			sOpt += '<li><a role="menuitem" tabindex="-1" href="javascript:;" value="'+rdata.data[i].name+'">'+rdata.data[i].name+'['+rdata.data[i].ps+']</a></li>';			
 		}
@@ -548,11 +554,12 @@ function toLogsHtml(type){
 			});
 		});
 
-
 		$(".dropdown ul li a").click(function(){
 			var sname = $("#sname").attr("val");
 			if(!sname) return;
-			$(".planname input[name='name']").val(sMsg+'['+sname+']');
+
+			var plan_name = sMsg+'['+sname+']';
+			$(".planname input[name='name']").val(plan_name);
 		});
 	},'json');
 
@@ -571,6 +578,7 @@ function toBackup(type){
 		case 'database_postgresql':
 		case 'database_mysql-apt':
 		case 'database_mysql-yum':
+		case 'database_mysql-community':
 		case 'database':
 			sMsg = '备份数据库';
 			suffix = type.replace('database','')
@@ -592,35 +600,48 @@ function toBackup(type){
 	var data = 'type='+sType;
 
 	$.post('/crontab/get_data_list',data,function(rdata){
+		// console.log(rdata);
 		$(".planname input[name='name']").css({"background-color":"#f6f6f6","color":"#666"});
 		var sOpt = "";
+		var tableOpt = '';
+		var changeDir = '';
+		var orderOpt = '';
+
+		var db_html_all_option = '<li><a role="menuitem" tabindex="-1" href="javascript:;" value="ALL">所有</a></li>';
+
 		if(rdata.data.length == 0){
-			layer.msg(lan.public.list_empty,{icon:2})
+			layer.msg("列表为空!",{icon:2})
 			return;
 		}
 
 		for(var i=0;i<rdata.data.length;i++){
 			if(i==0){
-				$(".planname input[name='name']").val(sMsg+'['+rdata.data[i].name+']');
+				$(".planname input[name='name']").attr("source_name",sMsg+'['+rdata.data[i].name+']').val(sMsg+'['+rdata.data[i].name+']');
 			}
 			sOpt += '<li><a role="menuitem" tabindex="-1" href="javascript:;" value="'+rdata.data[i].name+'">'+rdata.data[i].name+'['+rdata.data[i].ps+']</a></li>';			
 		}
 
-		
-		if (sType != 'path'){
-			sOpt = '<li><a role="menuitem" tabindex="-1" href="javascript:;" value="ALL">所有</a></li>' + sOpt;
-		}
-		
-		var orderOpt = '';
-		for (var i=0;i<rdata.orderOpt.length;i++){
-			orderOpt += '<li><a role="menuitem" tabindex="-1" href="javascript:;" value="'+rdata.orderOpt[i].name+'">'+rdata.orderOpt[i].title+'</a></li>'
-		}
-		
-		
-		var changeDir = '';
 		if (sType == 'path'){
 			changeDir = '<span class="glyphicon glyphicon-folder-open cursor mr20 changePathDir" style="float:left;line-height: 30px;"></span>';
+		} else if ( sType == "database" || sType.split("_")[0] == "database")  {
+			//表
+			tableOpt += '<div class="textname pull-left mr20">数据表</div>';
+			tableOpt += '<div class="dropdown pull-left mr20 check">\
+			 	<button class="btn btn-default dropdown-toggle sname" type="button" id="backdata_table" data-toggle="dropdown" style="width:auto">\
+					<b id="tname" val="ALL">所有</b><span class="caret"></span>\
+			  	</button>\
+			 	<ul id="backdata_table_ul" class="dropdown-menu" role="menu" aria-labelledby="backdata_table">\
+			 		'+db_html_all_option+'\
+			 	</ul>\
+			</div>';
+
+			sOpt = db_html_all_option + sOpt;
+		} else {}
+		
+		for (var i=0;i<rdata.orderOpt.length;i++){
+			orderOpt += '<li><a role="menuitem" tabindex="-1" href="javascript:;" value="'+rdata.orderOpt[i].name+'">'+rdata.orderOpt[i].title+'</a></li>';
 		}
+		
 
 		var sBody = '<div class="dropdown pull-left mr20 check">\
 		 	<button class="btn btn-default dropdown-toggle sname" type="button" id="backdata" data-toggle="dropdown" style="width:auto">\
@@ -628,6 +649,7 @@ function toBackup(type){
 		  	</button>\
 		 	<ul class="dropdown-menu" role="menu" aria-labelledby="backdata">'+sOpt+'</ul>\
 		</div>\
+		'+ tableOpt +'\
 		'+ changeDir +'\
 		<div class="textname pull-left mr20">备份到</div>\
 		<div class="dropdown planBackupTo pull-left mr20">\
@@ -646,7 +668,7 @@ function toBackup(type){
 		$("#implement").html(sBody);
 		getselectname();
 
-		$('.changePathDir').click(function(){
+		$('.changePathDir').unbind('click').click(function(){
 			changePathCallback($('#sname').val(),function(select_dir){
 				$(".planname input[name='name']").val('备份目录['+select_dir+']');
 				$('#implement .sname b').attr('val',select_dir).text(select_dir);
@@ -657,10 +679,46 @@ function toBackup(type){
 		$(".dropdown ul li a").click(function(){
 			var sname = $("#sname").attr("val");
 			if(!sname) return;
-			$(".planname input[name='name']").val(sMsg+'['+sname+']');
-		});
-	},'json');
 
+			var plan_name = sMsg+'['+sname+']';
+			$(".planname input[name='name']").attr("source_name", plan_name).val(plan_name);
+			toBackupInitTable(sType, sname);
+		});
+
+		if ( sType == "database" || sType.split("_")[0] == "database")  {
+			toBackupInitTable(sType, rdata.data[0].name);
+		}
+	},'json');
+}
+
+function toBackupInitTable(stype, db){
+	$.post('/crontab/get_data_list',{"type":stype,"db":db},function(rdata){
+		var db_html_all_option = '<li><a role="menuitem" tabindex="-1" href="javascript:;" value="ALL">所有</a></li>';
+		var table_html = "";
+		for(var i=0;i<rdata.length;i++){
+			table_html += '<li><a role="menuitem" tabindex="-1" href="javascript:;" value="'+rdata[i]+'">'+rdata[i]+'</a></li>';			
+		}
+		var content = db_html_all_option + table_html;
+		$('#backdata_table_ul').html(content);
+
+		$("#backdata_table_ul li a").click(function(){
+			var txt = $(this).text();
+			var type = $(this).attr("value");
+			var source_name = $(".planname input[name='name']").attr("source_name");
+
+			$(this).parents(".dropdown").find("button b").text(txt).attr("val",type);
+			$("#cronConfig textarea[name='sbody']").val(type);
+
+			if (type == "ALL"){
+				$(".planname input[name='name']").val(source_name);
+				return;
+			}
+
+			var plan_name = source_name+'['+txt+']';
+			$(".planname input[name='name']").val(plan_name);
+		});
+
+	},'json');
 }
 
 
@@ -744,6 +802,25 @@ function editTaskInfo(id){
 			}
 		};
 		obj.create(function(){
+			var tableOpt = '';
+			var db_html_all_option = '<li><a role="menuitem" tabindex="-1" href="javascript:;" value="ALL">所有</a></li>';
+
+			if ( obj.from.stype == "database" || obj.from.stype.split("_")[0] == "database")  {
+				var table_val = "ALL";
+				var table_name = "所有";
+				if (obj.from.sbody){
+					table_val = obj.from.sbody;
+					table_name = obj.from.sbody;
+				}
+
+				//表
+				tableOpt += '<div class="textname pull-left mr20">数据表</div>';
+				tableOpt += '<div class="dropdown pull-left mr20 check">\
+				 	<button disabled="disabled" class="btn btn-default dropdown-toggle sname" type="button" id="backdata_table" data-toggle="dropdown" style="width:auto">\
+						<b id="tname" val="'+table_val+'">'+table_name+'</b><span class="caret"></span>\
+				  	</button>\
+				</div>';
+			}
 
 			var changeDir = '';
 			if (obj.from.stype == 'path'){
@@ -809,6 +886,7 @@ function editTaskInfo(id){
 						<div class="info-r" style="float: left;margin-right: 25px;display:'+ (obj.from.sType == "path"?'block;':'none') +'">\
 							<input id="inputPath" class="bt-input-text mr5 " type="text" name="path" value="'+ obj.from.sName +'" placeholder="备份目录" style="width:208px;height:33px;" disabled="disabled">\
 						</div>\
+						'+tableOpt+'\
 						'+changeDir+'\
 						<div class="textname pull-left mr20">备份到</div>\
 							<div class="dropdown  pull-left mr20">\

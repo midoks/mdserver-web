@@ -13,6 +13,7 @@ export PATH
 # cd /www/server/mdserver-web && . bin/activate && python3 plugins/mysql/index.py install_pre_inspection
 # cd /www/server/mdserver-web && . bin/activate && python3 plugins/mysql/index.py set_slave_status {"close":"change"}
 # cd /www/server/mdserver-web && . bin/activate && python3 plugins/mysql/index.py set_root_pwd {"password":"root","force":"2"}
+# cd /www/server/mdserver-web && . bin/activate && python3 plugins/mysql/index.py get_table_list  {"dbname":"demo"}
 curPath=`pwd`
 rootPath=$(dirname "$curPath")
 rootPath=$(dirname "$rootPath")

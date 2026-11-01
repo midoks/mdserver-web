@@ -18,6 +18,7 @@ import multiprocessing
 
 import core.mw as mw
 import thisdb
+from utils.plugin import plugin as MwPlugin
 
 
 class crontab(object):
@@ -67,13 +68,13 @@ class crontab(object):
         return mw.returnData(True, msg)
 
     # 取数据列表
-    def getDataList(self,stype=''):
+    def getDataList(self,stype = '' ,db = ''):
     
         bak_data = []
         if stype == 'site' or stype == 'sites' or stype == 'database' or stype.find('database_') > -1 or stype == 'path':
             bak_data = thisdb.getOptionByJson('hook_backup',type='hook', default=[])
 
-        if stype == 'database' or stype.find('database_') > -1:
+        if (stype == 'database' or stype.find('database_') > -1) and db == '':
             sqlite3_name = 'mysql'
             path = mw.getServerDir() + '/mysql'
             if stype != 'database':
@@ -93,6 +94,23 @@ class crontab(object):
                 db_list['data'] = []
             else:
                 db_list['data'] = mw.M('databases').dbPos(path, sqlite3_name).field('name,ps').select()
+            return db_list
+
+        # 数据表获取
+        if (stype == 'database' or stype.find('database_') > -1) and db != '':
+            db_list = []
+            dbname = "mysql"
+            if stype != 'database':
+                dbname = stype.replace('database_', '')
+            # print(dbname, "get_table_list", "", '{"dbname":"'+db+'"}')
+            data = MwPlugin.instance().run(dbname, "get_table_list", "", '{"dbname":"'+db+'"}')
+            if data[0] == "":
+                return db_list
+            rdata = data[0]
+
+            objdata = mw.getObjectByJson(rdata)
+            if objdata["status"] > -1:
+                db_list = objdata["data"]
             return db_list
 
         if stype == 'path':
@@ -422,6 +440,7 @@ class crontab(object):
             cron_name = param['echo']
         param['echo'] = cron_name
 
+        shell = ""
         # try:
         stype = param['stype']
         if stype == 'toFile':
@@ -458,38 +477,36 @@ fi''' % (mw.getPanelDir(),)
             if param['sname'] == 'ALL':
                 log = ''
 
-            script_dir = mw.getPanelDir() + "/scripts"
-            source_stype = 'database'
-            if stype.find('database_') > -1:
-                plugin_name = stype.replace('database_', '')
-                script_dir = mw.getPanelDir() + "/plugins/" + plugin_name + "/scripts"
-
-                source_stype = stype
-                stype = 'database'
-
             if stype == 'path' and param['echo'] == '':
                 param['echo'] == "1"
 
+            if stype.find('database_') > -1:
+                stype = 'database'
+
+            root_dir = "cd " + mw.getPanelDir()
+            head_scripts = head + root_dir + " && source bin/activate "
+
             wheres = {
-                'path': head + "python3 " + script_dir + "/backup.py path " + param['sname'] + " " + str(param['save']) + " " + str(param['echo']), 
-                'site':   head + "python3 " + script_dir + "/backup.py site " + param['sname'] + " " + str(param['save']) + " " + str(param['echo']),
-                'database': head + "python3 " + script_dir + "/backup.py database " + param['sname'] + " " + str(param['save']),
-                'logs':   head + "python3 " + script_dir + "/logs_backup.py " + param['sname'] + log + " " + str(param['save']),
-                'rememory': head + "/bin/bash " + script_dir + '/rememory.sh'
+                'path': head_scripts + " && python3 " + "scripts/backup.py path " + param['sname'] + " " + str(param['save']) + " " + str(param['echo']), 
+                'site':   head_scripts + " && python3 " + "scripts/backup.py site " + param['sname'] + " " + str(param['save']) + " " + str(param['echo']),
+                'database': head_scripts + " && python3 " + "scripts/backup.py database " + param['sname'] + "@" + param["sbody"] + " " + str(param['save']),
+                'logs':   head_scripts + " && python3 " + "scripts/logs_backup.py " + param['sname'] + log + " " + str(param['save']),
+                'rememory': head_scripts + " && /bin/bash " + 'scripts/rememory.sh',
+                'toUrl': head + "curl -sS --connect-timeout 10 -m 60 '" + param['url_address'] + "'",
+                "toShell": head + param['sbody'].replace("\r\n", "\n")
             }
             if param['backup_to'] != 'localhost':
-                cfile = mw.getPluginDir() + "/" + param['backup_to'] + "/index.py"
-                wheres['path'] = head + "python3 " + cfile + " path " + param['sname'] + " " + str(param['save']) + " " + str(param['echo'])
-                wheres['site'] = head + "python3 " + cfile + " site " + param['sname'] + " " + str(param['save']) + " " + str(param['echo'])
-                wheres['database'] = head + "python3 " + cfile + " " + source_stype + " " + param['sname'] + " " + str(param['save'])
-            try:
-                shell = wheres[stype]
-            except:
-                if stype == 'toUrl':
-                    shell = head + "curl -sS --connect-timeout 10 -m 60 '" + param['url_address'] + "'"
-                else:
-                    shell = head + param['sbody'].replace("\r\n", "\n")
+                cfile = param['backup_to'] + "/index.py"
+                wheres['path'] = head_scripts + " && python3 " + cfile + " path " + param['sname'] + " " + str(param['save']) + " " + str(param['echo'])
+                wheres['site'] = head_scripts + " && python3 " + cfile + " site " + param['sname'] + " " + str(param['save']) + " " + str(param['echo'])
+                wheres['database'] = head_scripts + " && python3 " + cfile + " " + param['sname'] + "@" + param["sbody"] + " " + str(param['save'])
 
+            if param["stype"].find('database_') > -1:
+                plugin_name = param["stype"].replace('database_', '')
+                cfile = "plugins/"+plugin_name + "/scripts/backup.py"
+                wheres['database'] = head_scripts + " && python3 " + cfile + " database " + param['sname'] + "@" + param["sbody"] + " " + str(param['save'])
+
+            shell = wheres[stype]
             shell += '''
 echo "----------------------------------------------------------------------------"
 endDate=`date +"%Y-%m-%d %H:%M:%S"`

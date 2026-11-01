@@ -13,4 +13,6 @@ $cfg['Servers'][$i]['AllowNoPassword'] = false;
 $cfg['TempDir']                        = '{$SERVER_PATH}/phpmyadmin/{$PMA_PATH}/tmp';
 $cfg['UploadDir']                      = '';
 $cfg['SaveDir']                        = '';
+$cfg['CookieSameSite']                 = 'Lax'; // or 'None'
+$cfg['LoginCookieValidity']            = 1440;
 ?>

@@ -190,25 +190,27 @@ class ssh_terminal(object):
         try:
             self.__ps.connect(self.__host, self.__port, timeout=60)
         except Exception as e:
-            self.__ps.connect('127.0.0.1', self.__port)
-        except Exception as e:
-            self.__ps.connect('localhost', self.__port)
-        except Exception as e:
-            self.setSshdConfig(True)
+            self.__lock = False
             self.__ps.close()
-            e = str(e)
-            if e.find('websocket error!') != -1:
+            err = str(e)
+            # 本地 SSH 服务未启动(常见于 macOS 未开启远程登录)
+            if err.find('Unable to connect') != -1 or err.find('Connection refused') != -1:
+                self.debug('本地SSH服务不可用{}'.format(err))
+                return self.returnMsg(False, '连接失败，本地SSH服务未启动(端口{})，请先开启系统SSH服务'.format(self.__port))
+
+            self.setSshdConfig(True)
+            if err.find('websocket error!') != -1:
                 return self.returnMsg(True, '连接成功')
-            if e.find('Authentication timeout') != -1:
-                self.debug("认证超时{}".format(e))
-                return self.returnMsg(False, '认证超时,请按回车重试!{}'.format(e))
-            if e.find('Connection reset by peer') != -1:
+            if err.find('Authentication timeout') != -1:
+                self.debug("认证超时{}".format(err))
+                return self.returnMsg(False, '认证超时,请按回车重试!{}'.format(err))
+            if err.find('Connection reset by peer') != -1:
                 self.debug('目标服务器主动拒绝连接')
                 return self.returnMsg(False, '目标服务器主动拒绝连接')
-            if e.find('Error reading SSH protocol banner') != -1:
+            if err.find('Error reading SSH protocol banner') != -1:
                 self.debug('协议头响应超时')
-                return self.returnMsg(False, '协议头响应超时，与目标服务器之间的网络质量太糟糕：' + e)
-            if not e:
+                return self.returnMsg(False, '协议头响应超时，与目标服务器之间的网络质量太糟糕：' + err)
+            if not err:
                 self.debug('SSH协议握手超时')
                 return self.returnMsg(False, "SSH协议握手超时，与目标服务器之间的网络质量太糟糕")
             err = mw.getTracebackInfo()

@@ -415,7 +415,7 @@ def getShowLogFile():
     return tmp.groups()[0].strip()
 
 def getMdb8Ver():
-    return ['8.0','8.1','8.2','8.3','8.4','9.0','9.1', '9.2', '9.3', '9.4',"9.7","26.7","26.10"]
+    return ['8.0','8.1','8.2','8.3','8.4','9.0','9.1', '9.2', '9.3', '9.4','9.7','26.7','26.10']
 
 def getSlaveName():
     mdb8 = getMdb8Ver()
@@ -703,7 +703,10 @@ def runInfo(version):
         return mw.returnJson(False, 'MySQL未启动', [])
 
     db = pMysqlDb()
-    data = db.query('show global status')
+    try:
+        data = db.query('show global status')
+    except Exception as e:
+        data = e
     isError = isSqlError(data)
     if isError != None:
         return isError
@@ -723,8 +726,11 @@ def runInfo(version):
 
     # print(result, int(result['Uptime']))
     result['Run'] = int(time.time()) - int(result['Uptime'])
-    tmp = db.query('show master status')
+    cmd_status = 'show master status'
+    if pk_version.parse(version) > pk_version.parse("8.0"):
+        cmd_status = 'SHOW BINARY LOG STATUS'
     try:
+        tmp = db.query(cmd_status)
         result['File'] = tmp[0]["File"]
         result['Position'] = tmp[0]["Position"]
     except:
@@ -736,7 +742,10 @@ def runInfo(version):
 def myDbStatus(version):
     result = {}
     db = pMysqlDb()
-    data = db.query('show variables')
+    try:
+        data = db.query('show variables')
+    except Exception as e:
+        data = e
     isError = isSqlError(data)
     if isError != None:
         return isError
@@ -1166,16 +1175,44 @@ def getDbList():
 
     return mw.getJson(data)
 
+def getTableList():
+    args = getArgs()
+    db_name = ""
+    if 'dbname' in args:
+        db_name = args['dbname']
+    if db_name == "":
+        return mw.returnJson(-1,"table表不能为空")
+
+    pdb = pMysqlDb()
+    sql = 'show tables from `%s`' % db_name
+    try:
+        data = pdb.query(sql)
+    except Exception as e:
+        return mw.returnJson(-1, str(e))
+
+    table_list = []
+    key = "Tables_in_%s" % db_name
+    for i in data:
+        table_list.append(i[key])
+
+    return mw.returnJson(0,"ok", table_list)
+
 
 def syncGetDatabases():
     pdb = pMysqlDb()
     psdb = pSqliteDb('databases')
-    data = pdb.query('show databases')
+    try:
+        data = pdb.query('show databases')
+    except Exception as e:
+        return mw.returnJson(-1, str(e))
     isError = isSqlError(data)
     if isError != None:
         return isError
-    users = pdb.query(
-        "select User,Host from mysql.user where User!='root' AND Host!='localhost' AND Host!=''")
+    try:
+        users = pdb.query(
+            "select User,Host from mysql.user where User!='root' AND Host!='localhost' AND Host!=''")
+    except Exception:
+        users = []
     nameArr = ['information_schema', 'performance_schema', 'mysql', 'sys']
     n = 0
 
@@ -1217,7 +1254,10 @@ def toDbBase(find):
         psdb.where("id=?", (find['id'],)).save(
             'password,username', (find['password'], find['username']))
 
-    result = pdb.execute("create database `" + find['name'] + "`")
+    try:
+        result = pdb.execute("create database `" + find['name'] + "`")
+    except Exception as e:
+        result = e
     if "using password:" in str(result):
         return -1
     if "Connection refused" in str(result):
@@ -1235,7 +1275,10 @@ def syncToDatabases():
         return data[1]
 
     pdb = pMysqlDb()
-    result = pdb.execute("show databases")
+    try:
+        result = pdb.execute("show databases")
+    except Exception as e:
+        result = e
     isError = isSqlError(result)
     if isError:
         return isError
@@ -1285,7 +1328,7 @@ def setRootPwd(version=''):
                 return mw.returnJson(True, '【强制修改】数据库root密码修改成功(不意为成功连接数据)!')
             return isError
 
-        if version.find('5.7') > -1 or version.find('8.0') > -1:
+        if version.find('5.7') > -1 or mw.inArray(getMdb8Ver(), version):
             pdb.execute(
                 "UPDATE mysql.user SET authentication_string='' WHERE user='root'")
             pdb.execute(
@@ -1319,7 +1362,7 @@ def setUserPwd(version=''):
         psdb = pSqliteDb('databases')
         name = psdb.where('id=?', (uid,)).getField('name')
 
-        if version.find('5.7') > -1 or version.find('8.0') > -1:
+        if version.find('5.7') > -1 or mw.inArray(getMdb8Ver(), version):
             accept = pdb.query(
                 "select Host from mysql.user where User='" + name + "' AND Host!='localhost'")
             t1 = pdb.execute(
@@ -1405,16 +1448,26 @@ def addDb():
     if psdb.where("name=? or username=?", (dbname, dbuser)).count():
         return mw.returnJson(False, '数据库已存在!')
 
-    result = pdb.execute("create database `" + dbname +
-                         "` DEFAULT CHARACTER SET " + codeing + " COLLATE " + codeStr)
+    try:
+        result = pdb.execute("create database `" + dbname +
+                             "` DEFAULT CHARACTER SET " + codeing + " COLLATE " + codeStr)
+    except Exception as e:
+        result = e
     # print result
     isError = isSqlError(result)
     if isError != None:
         return isError
 
-    pdb.execute("drop user '" + dbuser + "'@'localhost'")
+    # 清理同名残留用户,失败忽略(兼容DROP USER不支持IF EXISTS的旧版本)
+    try:
+        pdb.execute("drop user '" + dbuser + "'@'localhost'")
+    except Exception:
+        pass
     for a in address.split(','):
-        pdb.execute("drop user '" + dbuser + "'@'" + a + "'")
+        try:
+            pdb.execute("drop user '" + dbuser + "'@'" + a + "'")
+        except Exception:
+            pass
 
     __createUser(dbname, dbuser, password, address)
 
@@ -1439,14 +1492,26 @@ def delDb():
         accept = find['accept']
         username = find['username']
 
-        # 删除MYSQL
-        result = pdb.execute("drop database `" + name + "`")
+        # 删除MYSQL(库或用户可能已不存在,失败忽略,保证面板记录可删除)
+        try:
+            pdb.execute("drop database `" + name + "`")
+        except Exception:
+            pass
 
-        users = pdb.query("select Host from mysql.user where User='" +
-                          username + "' AND Host!='localhost'")
-        pdb.execute("drop user '" + username + "'@'localhost'")
+        try:
+            users = pdb.query("select Host from mysql.user where User='" +
+                              username + "' AND Host!='localhost'")
+        except Exception:
+            users = []
+        try:
+            pdb.execute("drop user '" + username + "'@'localhost'")
+        except Exception:
+            pass
         for us in users:
-            pdb.execute("drop user '" + username + "'@'" + us["Host"] + "'")
+            try:
+                pdb.execute("drop user '" + username + "'@'" + us["Host"] + "'")
+            except Exception:
+                pass
         pdb.execute("flush privileges")
 
         # 删除SQLITE
@@ -1464,8 +1529,11 @@ def getDbAccess():
     username = args['username']
     pdb = pMysqlDb()
 
-    users = pdb.query("select Host from mysql.user where User='" +
-                      username + "' AND Host!='localhost'")
+    try:
+        users = pdb.query("select Host from mysql.user where User='" +
+                          username + "' AND Host!='localhost'")
+    except Exception as e:
+        return mw.returnJson(-1, str(e))
 
     isError = isSqlError(users)
     if isError != None:
@@ -1498,11 +1566,18 @@ def setDbAccess():
     else:
         password = psdb.where("username=?", (name,)).getField('password')
 
-    users = pdb.query("select Host from mysql.user where User='" +
-                      name + "' AND Host!='localhost'")
+    try:
+        users = pdb.query("select Host from mysql.user where User='" +
+                          name + "'")
+    except Exception as e:
+        return mw.returnJson(-1, str(e))
 
+    # 清理全部已有用户(含localhost),失败忽略,确保下方可完整重建
     for us in users:
-        pdb.execute("drop user '" + name + "'@'" + us["Host"] + "'")
+        try:
+            pdb.execute("drop user '" + name + "'@'" + us["Host"] + "'")
+        except Exception:
+            pass
 
     __createUser(dbname, name, password, access)
 
@@ -1618,8 +1693,11 @@ def setDbRw(version=''):
     pdb = pMysqlDb()
     psdb = pSqliteDb('databases')
     dbname = psdb.where("id=?", (uid,)).getField('name')
-    users = pdb.query(
-        "select Host from mysql.user where User='" + username + "'")
+    try:
+        users = pdb.query(
+            "select Host from mysql.user where User='" + username + "'")
+    except Exception as e:
+        return mw.returnJson(-1, str(e))
 
     # show grants for demo@"127.0.0.1";
     for x in users:
@@ -1627,7 +1705,10 @@ def setDbRw(version=''):
 
         sql = "REVOKE ALL PRIVILEGES ON `" + dbname + \
             "`.* FROM '" + username + "'@'" + x["Host"] + "';"
-        r = pdb.query(sql)
+        try:
+            pdb.query(sql)
+        except Exception:
+            pass
         # print(sql, r)
 
         if rw == 'rw':
@@ -1639,7 +1720,10 @@ def setDbRw(version=''):
         else:
             sql = "GRANT all privileges ON " + dbname + ".* TO " + \
                 username + "@'" + x["Host"] + "'"
-        pdb.execute(sql)
+        try:
+            pdb.execute(sql)
+        except Exception as e:
+            return mw.returnJson(False, '切换失败!' + str(e))
     pdb.execute("flush privileges")
     r = psdb.where("id=?", (uid,)).setField('rw', rw)
     # print(r)
@@ -1659,7 +1743,10 @@ def getDbInfo():
 
     ret = {}
     sql = "select sum(DATA_LENGTH)+sum(INDEX_LENGTH) as sum_size from information_schema.tables  where table_schema='%s'" % db_name
-    data_sum = pdb.query(sql)
+    try:
+        data_sum = pdb.query(sql)
+    except Exception as e:
+        return mw.returnJson(-1, str(e))
 
     data = 0
     if data_sum[0]['sum_size'] != None:
@@ -1673,7 +1760,12 @@ def getDbInfo():
     for i in tables:
         tb_sql = "show table status from `%s` where name = '%s'" % (db_name, i[
                                                                     table_key])
-        table = pdb.query(tb_sql)
+        try:
+            table = pdb.query(tb_sql)
+        except Exception:
+            continue
+        if len(table) < 1:
+            continue
 
         tmp = {}
         tmp['type'] = table[0]["Engine"]
@@ -1706,7 +1798,10 @@ def repairTable():
     db_name = args['db_name']
     tables = json.loads(args['tables'])
     pdb = pMysqlDb()
-    mtable = pdb.query('show tables from `%s`' % db_name)
+    try:
+        mtable = pdb.query('show tables from `%s`' % db_name)
+    except Exception as e:
+        return mw.returnJson(-1, str(e))
 
     ret = []
     key = "Tables_in_" + db_name
@@ -1731,7 +1826,10 @@ def optTable():
     db_name = args['db_name']
     tables = json.loads(args['tables'])
     pdb = pMysqlDb()
-    mtable = pdb.query('show tables from `%s`' % db_name)
+    try:
+        mtable = pdb.query('show tables from `%s`' % db_name)
+    except Exception as e:
+        return mw.returnJson(-1, str(e))
     ret = []
     key = "Tables_in_" + db_name
     for i in mtable:
@@ -1756,7 +1854,10 @@ def alterTable():
     tables = json.loads(args['tables'])
     table_type = args['table_type']
     pdb = pMysqlDb()
-    mtable = pdb.query('show tables from `%s`' % db_name)
+    try:
+        mtable = pdb.query('show tables from `%s`' % db_name)
+    except Exception as e:
+        return mw.returnJson(-1, str(e))
 
     ret = []
     key = "Tables_in_" + db_name
@@ -1884,10 +1985,16 @@ def setDbMasterAccess():
     pdb = pMysqlDb()
     psdb = pSqliteDb('master_replication_user')
     password = psdb.where("username=?", (username,)).getField('password')
-    users = pdb.query("select Host from mysql.user where User='" +
-                      username + "' AND Host!='localhost'")
+    try:
+        users = pdb.query("select Host from mysql.user where User='" +
+                          username + "' AND Host!='localhost'")
+    except Exception:
+        users = []
     for us in users:
-        pdb.execute("drop user '" + username + "'@'" + us["Host"] + "'")
+        try:
+            pdb.execute("drop user '" + username + "'@'" + us["Host"] + "'")
+        except Exception:
+            pass
 
     dbname = '*'
     for a in access.split(','):
@@ -2272,13 +2379,25 @@ def delMasterRepSlaveUser(version=''):
 
     pdb = pMysqlDb()
     psdb = pSqliteDb('master_replication_user')
-    pdb.execute("drop user '" + name + "'@'%'")
-    pdb.execute("drop user '" + name + "'@'localhost'")
+    try:
+        pdb.execute("drop user '" + name + "'@'%'")
+    except Exception:
+        pass
+    try:
+        pdb.execute("drop user '" + name + "'@'localhost'")
+    except Exception:
+        pass
 
-    users = pdb.query("select Host from mysql.user where User='" +
-                      name + "' AND Host!='localhost'")
+    try:
+        users = pdb.query("select Host from mysql.user where User='" +
+                          name + "' AND Host!='localhost'")
+    except Exception:
+        users = []
     for us in users:
-        pdb.execute("drop user '" + name + "'@'" + us["Host"] + "'")
+        try:
+            pdb.execute("drop user '" + name + "'@'" + us["Host"] + "'")
+        except Exception:
+            pass
 
     psdb.where("username=?", (args['username'],)).delete()
 
@@ -2293,7 +2412,10 @@ def updateMasterRepSlaveUser(version=''):
 
     pdb = pMysqlDb()
     psdb = pSqliteDb('master_replication_user')
-    pdb.execute("drop user '" + args['username'] + "'@'%'")
+    try:
+        pdb.execute("drop user '" + args['username'] + "'@'%'")
+    except Exception:
+        pass
 
     pdb.execute("GRANT REPLICATION SLAVE ON *.* TO  '" +
                 args['username'] + "'@'%' identified by '" + args['password'] + "'")
@@ -3588,6 +3710,8 @@ if __name__ == "__main__":
         print(rootPwd())
     elif func == 'get_db_list':
         print(getDbList())
+    elif func == 'get_table_list':
+        print(getTableList())
     elif func == 'set_db_backup':
         print(setDbBackup())
     elif func == 'import_db_backup':

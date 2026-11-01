@@ -10,7 +10,7 @@
 
 
 from flask import Blueprint, render_template
-from flask import request
+from flask import request, jsonify
 
 from admin.user_login_check import panel_login_required
 
@@ -67,7 +67,8 @@ def set_cron_status():
 @panel_login_required
 def get_data_list():
     stype = request.form.get('type', '')
-    return MwCrontab.instance().getDataList(stype)
+    db = request.form.get('db', '')
+    return jsonify(MwCrontab.instance().getDataList(stype,db))
 
 
 # 获取计划任务

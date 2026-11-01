@@ -65,9 +65,11 @@ class nosqlMySQL():
             if self.__DB_SOCKET != '':
                 db.setSocket(self.__DB_SOCKET)
 
+            # 实际连通性检查：服务未启动或账号错误时返回 False，调用方统一提示"无法链接"
+            db.query('select 1')
             return db
         except Exception:
-            self.__DB_ERR = mw.get_error_info()
+            self.__DB_ERR = mw.getTracebackInfo()
         return False
 
     def sqliteDb(self, db_pos_name, dbname='databases'):

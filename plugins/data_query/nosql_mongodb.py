@@ -146,13 +146,22 @@ class nosqlMongodb():
         auth = getConfAuth()
         port = getConfPort()
         mg_root = pSqliteDb('config').where('id=?', (1,)).getField('mg_root')
-        # print(auth,self.__DB_HOST,port, self.__DB_PASS)
+        print(auth,self.__DB_HOST,port, self.__DB_PASS)
         try:
             if auth == 'disabled':
                 self.__DB_CONN = pymongo.MongoClient(host=self.__DB_HOST, port=port, directConnection=True)
             else:
                 self.__DB_CONN = pymongo.MongoClient(host=self.__DB_HOST, port=port, directConnection=True, username='root',password=mg_root)
             self.__DB_CONN.admin.command('ping')
+            # 节点处于 recovering/startup 时 ping 仍会成功，但读写会抛 NotPrimaryError
+            try:
+                hello = self.__DB_CONN.admin.command('hello')
+            except Exception:
+                # MongoDB < 5.0 没有 hello 命令
+                hello = self.__DB_CONN.admin.command('isMaster')
+            if not (hello.get('isWritablePrimary') or hello.get('ismaster') or hello.get('secondary')):
+                self.__DB_ERR = 'MongoDB 节点当前不是 primary 或 secondary 状态'
+                return False
             return self.__DB_CONN
         except pymongo.errors.ConnectionFailure:
             return False

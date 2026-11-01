@@ -11,9 +11,13 @@ import yaml
 
 if sys.platform != 'darwin':
     os.chdir('/www/server/mdserver-web')
+    base_dir = os.getcwd()
+else:
+    # 开发环境按脚本位置向上定位项目根(scripts -> mongodb -> plugins -> 根目录)
+    script_dir = os.path.dirname(os.path.abspath(__file__))
+    base_dir = os.path.dirname(os.path.dirname(os.path.dirname(script_dir)))
 
-
-web_dir = os.getcwd() + "/web"
+web_dir = base_dir + "/web"
 if os.path.exists(web_dir):
     sys.path.append(web_dir)
     os.chdir(web_dir)
@@ -134,6 +138,8 @@ class backupTools:
 
     def getDbBackupList(self,dbname=''):
         bkDir = mw.getFatherDir() + '/backup/database'
+        if not os.path.isdir(bkDir):
+            return []
         blist = os.listdir(bkDir)
         r = []
 
@@ -143,9 +149,21 @@ class backupTools:
             fbstr = x[0:blen]
             if fbstr == bname:
                 r.append(x)
+
+        r.sort()
         return r
 
-    def backupDatabase(self, name, count):
+    def backupDatabase(self, params, count):
+        params_args = params.split("@")
+        name = params_args[0]
+        table_name = ''
+        if len(params_args) > 1:
+            table_name = params_args[1]
+
+        backup_bgname = name
+        if table_name != '':
+            backup_bgname = name+'@'+table_name
+
         db_path = mw.getServerDir() + '/mongodb'
         db_name = 'mongodb'
         name = mw.M('databases').dbPos(db_path, db_name).where('name=?', (name,)).getField('name')
@@ -155,8 +173,7 @@ class backupTools:
             endDate = time.strftime('%Y/%m/%d %X', time.localtime())
             log = "数据库[" + name + "]不存在!"
             print("★[" + endDate + "] " + log)
-            print(
-                "----------------------------------------------------------------------------")
+            print("----------------------------------------------------------------------------")
             return
 
         backup_path = mw.getBackupDir() + '/database'
@@ -164,7 +181,7 @@ class backupTools:
             mw.execShell("mkdir -p " + backup_path)
 
         time_now = time.strftime('%Y%m%d_%H%M%S', time.localtime())
-        backup_name = "mongodb_" + name + "_" + time_now + ".tar.gz"
+        backup_name = "mongodb_" + backup_bgname + "_" + time_now + ".tar.gz"
         filename = backup_path + "/"+backup_name
 
         port = getConfPort()
@@ -174,7 +191,15 @@ class backupTools:
         if auth != 'disabled':
             uoption =' --authenticationDatabase admin -u root -p '+mg_root
     
-        cmd = db_path + "/bin/mongodump "+uoption+" --port "+str(port)+" -d "+name+" -o "+backup_path 
+        # 4.4+ 的 mongodump 由 Database Tools 提供,不在 server/bin 目录
+        mongodump_bin = db_path + "/bin/mongodump"
+        if not os.path.exists(mongodump_bin):
+            import shutil
+            mongodump_bin = shutil.which('mongodump') or mongodump_bin
+
+        cmd = mongodump_bin + uoption+" --port "+str(port)+" -d "+name+" -o "+backup_path 
+        if table_name != "":
+            cmd += " -c " + table_name
         # print(cmd)
         mw.execShell(cmd)
         cmd_gz = "cd "+backup_path+"/"+name+" && tar -zcvf "+filename + " ./"
@@ -207,7 +232,7 @@ class backupTools:
             for backup in backups:
                 mw.execShell("rm -f " + backup_path + "/"+backup)
                 num -= 1
-                print("|---已清理过期备份文件：" + backup)
+                print("|---已清理过期文件：" + backup)
                 if num < 1:
                     break
 

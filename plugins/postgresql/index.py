@@ -815,6 +815,32 @@ def getDbList():
 
     return mw.getJson(data)
 
+def getTableList():
+    args = getArgs()
+    db_name = ""
+    if 'dbname' in args:
+        db_name = args['dbname']
+    elif 'name' in args:
+        db_name = args['name']
+    if db_name == "":
+        return mw.returnJson(-1, "table表不能为空")
+
+    pdb = pgDb()
+    pdb.setDatabase(db_name)
+    sql = "select tablename from pg_tables where schemaname not in ('pg_catalog','information_schema')"
+    try:
+        data = pdb.query(sql)
+    except Exception as e:
+        return mw.returnJson(-1, str(e))
+
+    if isinstance(data, Exception):
+        return mw.returnJson(-1, str(data))
+
+    table_list = []
+    for i in data:
+        table_list.append(i[0])
+
+    return mw.returnJson(0, "ok", table_list)
 
 def syncGetDatabases():
     pdb = pgDb()
@@ -899,11 +925,14 @@ def addDb():
     pdb.execute("alter user {} with password '{}'".format(dbuser, password,))
     pdb.execute(
         "GRANT ALL PRIVILEGES ON DATABASE {} TO {}".format(dbname, dbuser,))
+    # PostgreSQL 15+ 起 public schema 默认仅属主可写,需单独授权
+    pdb.setDatabase(dbname)
+    pdb.execute("GRANT ALL ON SCHEMA public TO {}".format(dbuser,))
 
     pg_hba = getServerDir() + "/data/pg_hba.conf"
 
     content = mw.readFile(pg_hba)
-    content += "\nhost    {}  {}    {}    md5".format(
+    content += "\nhost    {}  {}    {}    scram-sha-256".format(
         dbname, dbuser, listen_ip)
     mw.writeFile(pg_hba, content)
 
@@ -1005,7 +1034,7 @@ def setDbAccess():
     data = mw.readFile(conf)
     new_data = re.sub(r'host\s*{}.*'.format(name), '', data).strip()
 
-    new_data += "\nhost    {}  {}    {}    md5".format(
+    new_data += "\nhost    {}  {}    {}    scram-sha-256".format(
         name, name, access)
     mw.writeFile(conf, new_data)
 
@@ -1025,12 +1054,16 @@ def pgBack():
     database = args['name']
     port = getPgPort()
 
-    cmd = '''su - postgres -c "/www/server/pgsql/bin/pg_dump -c {} -p {} "| gzip > {}/{}_{}.gz '''.format(
-        database, port, bk_path_upload, database, time.strftime("%Y%m%d_%H%M%S"))
+    pg_dump = getServerDir() + '/bin/pg_dump'
+    if not os.path.exists(pg_dump):
+        pg_dump = 'pg_dump'
 
     if mw.isAppleSystem():
-        cmd = '''{}/bin/pg_dump -c {} -p {} | gzip > {}/{}_{}.gz '''.format(
-            getServerDir(), database, port, bk_path_upload, database, time.strftime("%Y%m%d_%H%M%S"))
+        cmd = '''{} -c {} -p {} | gzip > {}/{}_{}.gz '''.format(
+            pg_dump, database, port, bk_path_upload, database, time.strftime("%Y%m%d_%H%M%S"))
+    else:
+        cmd = '''su - postgres -c "{} -c {} -p {}" | gzip > {}/{}_{}.gz '''.format(
+            pg_dump, database, port, bk_path_upload, database, time.strftime("%Y%m%d_%H%M%S"))
     mw.execShell(cmd)
 
     return mw.returnJson(True, '备份成功!')
@@ -1074,17 +1107,21 @@ def importDbBackup():
 
     bk_path_upload = getBackupDir()
 
-    file_path = os.path.join(bk_path_upload, name)
+    file_path = os.path.join(bk_path_upload, file)
     if not os.path.exists(file_path):
         return mw.returnJson(False, '备份文件不存在')
 
     port = getPgPort()
-    cmd = '''gunzip -c {}|su - postgres -c " /www/server/pgsql/bin/psql  -d {}  -p {} " '''.format(
-        file, name, port)
+    psql = getServerDir() + '/bin/psql'
+    if not os.path.exists(psql):
+        psql = 'psql'
 
     if mw.isAppleSystem():
-        cmd = '''gunzip -c {} | {}/bin/psql  -d {}  -p {}'''.format(
-            name, getServerDir(), port)
+        cmd = '''gunzip -c {} | {} -d {} -p {}'''.format(
+            file_path, psql, name, port)
+    else:
+        cmd = '''gunzip -c {} | su - postgres -c "{} -d {} -p {}"'''.format(
+            file_path, psql, name, port)
 
     # print(cmd)
 
@@ -1363,7 +1400,7 @@ def addMasterRepSlaveUser(version=''):
     data = mw.readFile(pg_conf)
 
     data = data + "\nhost   replication  " + \
-        username + "   " + address + "     md5"
+        username + "   " + address + "     scram-sha-256"
 
     mw.writeFile(pg_conf, data)
 
@@ -1418,7 +1455,7 @@ def getMasterRepSlaveUserCmd(version=''):
         return mw.returnJson(False, '请添加同步账户!')
 
     cmd = 'echo "' + clist[0]['password'] + '" | ' + mdir + '/bin/pg_basebackup -Fp --progress -D ' + mdir + \
-        '/postgresql/data -h ' + localIp + ' -p ' + port + \
+        '/data -h ' + localIp + ' -p ' + port + \
         ' -U ' + clist[0]['username'] + ' --password'
 
     data = {}
@@ -1509,7 +1546,7 @@ def doFullSync(version=''):
     port = getPgPort()
 
     cmd = mdir + '/bin/pg_basebackup -Fp --progress -D ' + mdir + \
-        '/postgresql/data -h ' + ip + ' -p ' + port + \
+        '/data -h ' + ip + ' -p ' + port + \
         ' -U ' + username + ' --password'
     print(cmd)
 
@@ -1598,6 +1635,8 @@ if __name__ == "__main__":
         print(rootPwd())
     elif func == 'get_db_list':
         print(getDbList())
+    elif func == 'get_table_list':
+        print(getTableList())
     elif func == 'add_db':
         print(addDb())
     elif func == 'del_db':
