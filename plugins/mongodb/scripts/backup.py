@@ -187,7 +187,13 @@ class backupTools:
         if auth != 'disabled':
             uoption =' --authenticationDatabase admin -u root -p '+mg_root
     
-        cmd = db_path + "/bin/mongodump "+uoption+" --port "+str(port)+" -d "+name+" -o "+backup_path 
+        # 4.4+ 的 mongodump 由 Database Tools 提供,不在 server/bin 目录
+        mongodump_bin = db_path + "/bin/mongodump"
+        if not os.path.exists(mongodump_bin):
+            import shutil
+            mongodump_bin = shutil.which('mongodump') or mongodump_bin
+
+        cmd = mongodump_bin + uoption+" --port "+str(port)+" -d "+name+" -o "+backup_path 
         # print(cmd)
         mw.execShell(cmd)
         cmd_gz = "cd "+backup_path+"/"+name+" && tar -zcvf "+filename + " ./"
