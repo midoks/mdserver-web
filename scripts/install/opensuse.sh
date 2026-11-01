@@ -42,6 +42,7 @@ zypper install -y icu libicu-devel
 zypper install -y sqlite3 sqlite3-devel
 zypper install -y oniguruma-devel
 zypper install -y libzstd-devel
+zypper install -y libudev-devel
 
 # zypper install -y libmcrypt libmcrypt-devel
 # zypper install -y protobuf
