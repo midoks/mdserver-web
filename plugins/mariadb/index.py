@@ -1243,18 +1243,33 @@ def setUserPwd(version=''):
         psdb = pSqliteDb('databases')
         data = psdb.field('id,name,accept').where('id=?', (uid,)).find()
 
-        cmd = "SET PASSWORD FOR '" + username + \
-            "'@'localhost' = PASSWORD('" + newpassword + "')"
-        r = pdb.execute(cmd)
-        # print(cmd, r)
-
         accept = data['accept']
-        alist = accept.split(',')
-        for x in alist:
-            cmd = "SET PASSWORD FOR '" + username + \
-                "'@'" + x + "' = PASSWORD('" + newpassword + "')"
-            r = pdb.execute(cmd)
-            # print(cmd, r)
+        hosts = ['localhost']
+        if accept:
+            for x in accept.split(','):
+                x = x.strip()
+                if len(x) > 0 and x != 'localhost':
+                    hosts.append(x)
+
+        # 兼容所有 MariaDB 版本:
+        # 优先 ALTER USER(10.2+),用户不存在则 CREATE USER(10.0.2+),
+        # 旧版本不支持以上语法时回退 GRANT ... IDENTIFIED BY
+        for x in hosts:
+            sqls = [
+                "ALTER USER '%s'@'%s' IDENTIFIED BY '%s'" % (username, x, newpassword),
+                "CREATE USER '%s'@'%s' IDENTIFIED BY '%s'" % (username, x, newpassword),
+                "GRANT USAGE ON *.* TO '%s'@'%s' IDENTIFIED BY '%s'" % (username, x, newpassword),
+            ]
+            err = None
+            for sql in sqls:
+                try:
+                    pdb.execute(sql)
+                    err = None
+                    break
+                except Exception as e:
+                    err = e
+            if err != None:
+                raise err
 
         psdb.where("id=?", (uid,)).setField('password', newpassword)
 
