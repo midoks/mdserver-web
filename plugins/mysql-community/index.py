@@ -1073,11 +1073,11 @@ def importDbBackupProgressBar():
     file = args['file']
     name = args['name']
 
-    file_path = mw.getFatherDir() + '/backup/database/' + file
-    file_path_sql = mw.getFatherDir() + '/backup/database/' + file.replace('.gz', '')
+    file_path = mw.getFatherDir() + '/backup/database/mysql-community/' + file
+    file_path_sql = mw.getFatherDir() + '/backup/database/mysql-community/' + file.replace('.gz', '')
 
     if not os.path.exists(file_path_sql):
-        cmd = 'cd ' + mw.getFatherDir() + '/backup/database && gzip -d ' + file
+        cmd = 'cd ' + mw.getFatherDir() + '/backup/database/mysql-community && gzip -d ' + file
         mw.execShell(cmd)
 
     local_mode = recognizeDbMode()
