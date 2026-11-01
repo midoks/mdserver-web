@@ -1033,7 +1033,7 @@ function setBackup(db_name){
     var layerIndex = layer.open({
         type: 1,
         title: "数据库[MongoDB]备份详情",
-        area: ['600px', '280px'],
+        area: ['700px', '280px'],
         closeBtn: 1,
         shadeClose: false,
         content: '<div class="pd15">\
