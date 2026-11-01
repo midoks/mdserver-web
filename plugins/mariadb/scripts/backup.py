@@ -29,6 +29,23 @@ import core.db as db
 
 class backupTools:
 
+    def getDbBackupList(self,dbname=''):
+        bkDir = mw.getFatherDir() + '/backup/database/mariadb'
+        if not os.path.isdir(bkDir):
+            return []
+        blist = os.listdir(bkDir)
+        r = []
+
+        bname = 'db_' + dbname
+        blen = len(bname)
+        for x in blist:
+            fbstr = x[0:blen]
+            if fbstr == bname:
+                r.append(x)
+        # 文件名按时间戳命名,排序后即为时间顺序(旧->新)
+        r.sort()
+        return r
+
     def backupDatabase(self, params, count):
         params_args = params.split("@")
         name = params_args[0]
@@ -100,32 +117,21 @@ class backupTools:
 
         endDate = time.strftime('%Y/%m/%d %X', time.localtime())
         outTime = time.time() - startTime
-        pid = mw.M('databases').dbPos(db_path, db_name).where(
-            'name=?', (name,)).getField('id')
 
-        backup_pid = pid
-        if table_name != '':
-            backup_pid = str(pid) + "!mariadb@" + table_name
-
-        mw.M('backup').add('type,name,pid,filename,addtime,size', (3, os.path.basename(
-            filename), backup_pid, filename, endDate, os.path.getsize(filename)))
-        log = "数据库[" + name + "]备份成功,用时[" + str(round(outTime, 2)) + "]秒"
+        log = "数据库[" + backup_name + "]备份成功,用时[" + str(round(outTime, 2)) + "]秒"
         mw.writeLog('计划任务', log)
         print("★[" + endDate + "] " + log)
         print("|---保留最新的[" + count + "]份备份")
         print("|---文件名:" + filename)
 
+        backups = self.getDbBackupList(backup_name)
         # 清理多余备份
-        backups = mw.M('backup').where(
-            'type=? and pid=?', ('3', backup_pid)).field('id,filename').select()
-
         num = len(backups) - int(count)
         if num > 0:
             for backup in backups:
-                mw.execShell("rm -f " + backup['filename'])
-                mw.M('backup').where('id=?', (backup['id'],)).delete()
+                mw.execShell("rm -f " + backup_path + "/"+backup)
                 num -= 1
-                print("|---已清理过期备份文件：" + backup['filename'])
+                print("|---已清理过期文件：" + backup)
                 if num < 1:
                     break
 
