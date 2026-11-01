@@ -815,6 +815,32 @@ def getDbList():
 
     return mw.getJson(data)
 
+def getTableList():
+    args = getArgs()
+    db_name = ""
+    if 'dbname' in args:
+        db_name = args['dbname']
+    elif 'name' in args:
+        db_name = args['name']
+    if db_name == "":
+        return mw.returnJson(-1, "table表不能为空")
+
+    pdb = pgDb()
+    pdb.setDatabase(db_name)
+    sql = "select tablename from pg_tables where schemaname not in ('pg_catalog','information_schema')"
+    try:
+        data = pdb.query(sql)
+    except Exception as e:
+        return mw.returnJson(-1, str(e))
+
+    if isinstance(data, Exception):
+        return mw.returnJson(-1, str(data))
+
+    table_list = []
+    for i in data:
+        table_list.append(i[0])
+
+    return mw.returnJson(0, "ok", table_list)
 
 def syncGetDatabases():
     pdb = pgDb()
@@ -1598,6 +1624,8 @@ if __name__ == "__main__":
         print(rootPwd())
     elif func == 'get_db_list':
         print(getDbList())
+    elif func == 'get_table_list':
+        print(getTableList())
     elif func == 'add_db':
         print(addDb())
     elif func == 'del_db':
