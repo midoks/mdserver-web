@@ -11,9 +11,13 @@ import yaml
 
 if sys.platform != 'darwin':
     os.chdir('/www/server/mdserver-web')
+    base_dir = os.getcwd()
+else:
+    # 开发环境按脚本位置向上定位项目根(scripts -> mongodb -> plugins -> 根目录)
+    script_dir = os.path.dirname(os.path.abspath(__file__))
+    base_dir = os.path.dirname(os.path.dirname(os.path.dirname(script_dir)))
 
-
-web_dir = os.getcwd() + "/web"
+web_dir = base_dir + "/web"
 if os.path.exists(web_dir):
     sys.path.append(web_dir)
     os.chdir(web_dir)
@@ -216,7 +220,7 @@ class backupTools:
             for backup in backups:
                 mw.execShell("rm -f " + backup_path + "/"+backup)
                 num -= 1
-                print("|---已清理过期备份文件：" + backup)
+                print("|---已清理过期文件：" + backup)
                 if num < 1:
                     break
 
