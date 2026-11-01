@@ -1812,26 +1812,9 @@ def setDbrunMode(version=''):
     con = re.sub(rep, rep_after, con)
     mw.writeFile(path, con)
 
-    if version == '5.6':
-        dbreload = 'yes'
-    else:
-        db = pMysqlDb()
-        # The value of @@GLOBAL.GTID_MODE can only be changed one step at a
-        # time: OFF <-> OFF_PERMISSIVE <-> ON_PERMISSIVE <-> ON. Also note that
-        # this value must be stepped up or down simultaneously on all servers.
-        # See the Manual for instructions.
-        if mode == 'classic':
-            db.query('set global enforce_gtid_consistency=off')
-            db.query('set global gtid_mode=on')
-            db.query('set global gtid_mode=on_permissive')
-            db.query('set global gtid_mode=off_permissive')
-            db.query('set global gtid_mode=off')
-        elif mode == 'gtid':
-            db.query('set global enforce_gtid_consistency=on')
-            db.query('set global gtid_mode=off')
-            db.query('set global gtid_mode=off_permissive')
-            db.query('set global gtid_mode=on_permissive')
-            db.query('set global gtid_mode=on')
+    # MariaDB 无 gtid_mode/enforce_gtid_consistency 等全局变量,
+    # binlog 模式由 etc/mode 配置文件生效,统一重启
+    dbreload = 'yes'
 
     if dbreload == "yes":
         restart(version)
