@@ -88,6 +88,7 @@ apt install -y libaio1
 apt install -y libaio-dev
 apt install -y libmecab2
 apt install -y libmm-dev
+apt install -y libudev-dev
 
 apt install -y dnsutils
 apt install -y apache2-utils

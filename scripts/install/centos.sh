@@ -42,6 +42,7 @@ yum install -y libzstd-devel
 yum install -y postgresql-devel
 yum install -y brotli-devel
 yum install -y vim-common
+yum install -y libudev-devel
 
 # if [ -f /usr/sbin/iptables ];then
 
