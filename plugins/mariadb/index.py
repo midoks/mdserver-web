@@ -1540,7 +1540,10 @@ def getDbInfo():
     db_name = args['name']
     pdb = pMysqlDb()
     # print 'show tables from `%s`' % db_name
-    tables = pdb.query('show tables from `%s`' % db_name)
+    try:
+        tables = pdb.query('show tables from `%s`' % db_name)
+    except Exception as e:
+        return mw.returnJson(-1, str(e))
 
     ret = {}
     sql = "select sum(DATA_LENGTH)+sum(INDEX_LENGTH) as sum_size from information_schema.tables  where table_schema='%s'" % db_name
