@@ -108,7 +108,7 @@ class backupTools:
                 mw.execShell("rm -f " + backup['filename'])
                 mw.M('backup').where('id=?', (backup['id'],)).delete()
                 num -= 1
-                print("|---已清理过期备份文件：" + backup['filename'])
+                print("|---已清理过期文件：" + backup['filename'])
                 if num < 1:
                     break
 
