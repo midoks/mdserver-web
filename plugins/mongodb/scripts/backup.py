@@ -194,6 +194,8 @@ class backupTools:
             mongodump_bin = shutil.which('mongodump') or mongodump_bin
 
         cmd = mongodump_bin + uoption+" --port "+str(port)+" -d "+name+" -o "+backup_path 
+        if table_name != "":
+            cmd += " -c " + table_name
         # print(cmd)
         mw.execShell(cmd)
         cmd_gz = "cd "+backup_path+"/"+name+" && tar -zcvf "+filename + " ./"
