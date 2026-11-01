@@ -145,7 +145,17 @@ class backupTools:
                 r.append(x)
         return r
 
-    def backupDatabase(self, name, count):
+    def backupDatabase(self, params, count):
+        params_args = params.split("@")
+        name = params_args[0]
+        table_name = ''
+        if len(params_args) > 1:
+            table_name = params_args[1]
+
+        backup_bgname = name
+        if table_name != '':
+            backup_bgname = name+'@'+table_name
+
         db_path = mw.getServerDir() + '/mongodb'
         db_name = 'mongodb'
         name = mw.M('databases').dbPos(db_path, db_name).where('name=?', (name,)).getField('name')
@@ -155,8 +165,7 @@ class backupTools:
             endDate = time.strftime('%Y/%m/%d %X', time.localtime())
             log = "数据库[" + name + "]不存在!"
             print("★[" + endDate + "] " + log)
-            print(
-                "----------------------------------------------------------------------------")
+            print("----------------------------------------------------------------------------")
             return
 
         backup_path = mw.getBackupDir() + '/database'
@@ -164,7 +173,7 @@ class backupTools:
             mw.execShell("mkdir -p " + backup_path)
 
         time_now = time.strftime('%Y%m%d_%H%M%S', time.localtime())
-        backup_name = "mongodb_" + name + "_" + time_now + ".tar.gz"
+        backup_name = "mongodb_" + backup_bgname + "_" + time_now + ".tar.gz"
         filename = backup_path + "/"+backup_name
 
         port = getConfPort()
