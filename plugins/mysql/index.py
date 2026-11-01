@@ -1587,12 +1587,19 @@ def setRootPwd(version=''):
             return isError
 
         if version.find('5.7') > -1 or mw.inArray(getMdb8Ver(), version):
-            pdb.execute(
-                "UPDATE mysql.user SET authentication_string='' WHERE user='root'")
+            try:
+                pdb.execute(
+                    "UPDATE mysql.user SET authentication_string='' WHERE user='root'")
+            except Exception:
+                pass
             pdb.execute(
                 "ALTER USER 'root'@'localhost' IDENTIFIED BY '%s'" % password)
-            pdb.execute(
-                "ALTER USER 'root'@'127.0.0.1' IDENTIFIED BY '%s'" % password)
+            # 127.0.0.1 账号可能不存在,失败忽略
+            try:
+                pdb.execute(
+                    "ALTER USER 'root'@'127.0.0.1' IDENTIFIED BY '%s'" % password)
+            except Exception:
+                pass
         else:
             result = pdb.execute(
                 "update mysql.user set Password=password('" + password + "') where User='root'")
@@ -1617,27 +1624,41 @@ def setUserPwd(version=''):
     newpassword = args['password']
     username = args['name']
     uid = args['id']
+    name = username
     try:
         pdb = pMysqlDb()
         psdb = pSqliteDb('databases')
         name = psdb.where('id=?', (uid,)).getField('name')
 
-        if version.find('5.7') > -1 or mw.inArray(getMdb8Ver(), version):
-            accept = pdb.query(
-                "select Host from mysql.user where User='" + name + "' AND Host!='localhost'")
-            t1 = pdb.execute(
-                "update mysql.user set authentication_string='' where User='" + username + "'")
-            # print(t1)
-            result = pdb.execute(
-                "ALTER USER `%s`@`localhost` IDENTIFIED BY '%s'" % (username, newpassword))
-            # print(result)
-            for my_host in accept:
-                t2 = pdb.execute("ALTER USER `%s`@`%s` IDENTIFIED BY '%s'" % (
-                    username, my_host["Host"], newpassword))
-                # print(t2)
-        else:
-            result = pdb.execute("update mysql.user set Password=password('" +
-                                 newpassword + "') where User='" + username + "'")
+        hosts = ['localhost']
+        try:
+            users = pdb.query(
+                "select Host from mysql.user where User='" + username + "'")
+            for my_host in users:
+                if my_host["Host"] != 'localhost':
+                    hosts.append(my_host["Host"])
+        except Exception:
+            pass
+
+        # 兼容所有 MySQL 版本:
+        # 优先 ALTER USER(5.6+),用户不存在则 CREATE USER,
+        # 旧版本不支持以上语法时回退 GRANT ... IDENTIFIED BY
+        for my_host in hosts:
+            sqls = [
+                "ALTER USER '%s'@'%s' IDENTIFIED BY '%s'" % (username, my_host, newpassword),
+                "CREATE USER '%s'@'%s' IDENTIFIED BY '%s'" % (username, my_host, newpassword),
+                "GRANT USAGE ON *.* TO '%s'@'%s' IDENTIFIED BY '%s'" % (username, my_host, newpassword),
+            ]
+            err = None
+            for sql in sqls:
+                try:
+                    pdb.execute(sql)
+                    err = None
+                    break
+                except Exception as e:
+                    err = e
+            if err != None:
+                raise err
 
         pdb.execute("flush privileges")
         psdb.where("id=?", (uid,)).setField('password', newpassword)
@@ -1708,16 +1729,26 @@ def addDb():
     if psdb.where("name=? or username=?", (dbname, dbuser)).count():
         return mw.returnJson(False, '数据库已存在!')
 
-    result = pdb.execute("create database `" + dbname +
-                         "` DEFAULT CHARACTER SET " + codeing + " COLLATE " + codeStr)
+    try:
+        result = pdb.execute("create database `" + dbname +
+                             "` DEFAULT CHARACTER SET " + codeing + " COLLATE " + codeStr)
+    except Exception as e:
+        result = e
     # print result
     isError = isSqlError(result)
     if isError != None:
         return isError
 
-    pdb.execute("drop user '" + dbuser + "'@'localhost'")
+    # 清理同名残留用户,失败忽略(兼容DROP USER不支持IF EXISTS的旧版本)
+    try:
+        pdb.execute("drop user '" + dbuser + "'@'localhost'")
+    except Exception:
+        pass
     for a in address.split(','):
-        pdb.execute("drop user '" + dbuser + "'@'" + a + "'")
+        try:
+            pdb.execute("drop user '" + dbuser + "'@'" + a + "'")
+        except Exception:
+            pass
 
     __createUser(dbname, dbuser, password, address)
 
@@ -1742,14 +1773,26 @@ def delDb():
         accept = find['accept']
         username = find['username']
 
-        # 删除MYSQL
-        result = pdb.execute("drop database `" + name + "`")
+        # 删除MYSQL(库或用户可能已不存在,失败忽略,保证面板记录可删除)
+        try:
+            pdb.execute("drop database `" + name + "`")
+        except Exception:
+            pass
 
-        users = pdb.query("select Host from mysql.user where User='" +
-                          username + "' AND Host!='localhost'")
-        pdb.execute("drop user '" + username + "'@'localhost'")
+        try:
+            users = pdb.query("select Host from mysql.user where User='" +
+                              username + "' AND Host!='localhost'")
+        except Exception:
+            users = []
+        try:
+            pdb.execute("drop user '" + username + "'@'localhost'")
+        except Exception:
+            pass
         for us in users:
-            pdb.execute("drop user '" + username + "'@'" + us["Host"] + "'")
+            try:
+                pdb.execute("drop user '" + username + "'@'" + us["Host"] + "'")
+            except Exception:
+                pass
         pdb.execute("flush privileges")
 
         # 删除SQLITE
@@ -1943,7 +1986,10 @@ def getDbInfo():
     db_name = args['name']
     pdb = pMysqlDb()
     # print 'show tables from `%s`' % db_name
-    tables = pdb.query('show tables from `%s`' % db_name)
+    try:
+        tables = pdb.query('show tables from `%s`' % db_name)
+    except Exception as e:
+        return mw.returnJson(-1, str(e))
 
     ret = {}
     sql = "select sum(DATA_LENGTH)+sum(INDEX_LENGTH) as sum_size from information_schema.tables  where table_schema='%s'" % db_name
