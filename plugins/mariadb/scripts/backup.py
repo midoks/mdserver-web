@@ -29,7 +29,17 @@ import core.db as db
 
 class backupTools:
 
-    def backupDatabase(self, name, count):
+    def backupDatabase(self, params, count):
+        params_args = params.split("@")
+        name = params_args[0]
+        table_name = ''
+        if len(params_args) > 1:
+            table_name = params_args[1]
+
+        backup_name = name
+        if table_name != '':
+            backup_name = name+'@'+table_name
+
         db_path = mw.getServerDir() + '/mariadb'
         db_sock = mw.getServerDir() + '/mariadb/'
         db_name = 'mysql'
@@ -48,7 +58,7 @@ class backupTools:
         if not os.path.exists(backup_path):
             mw.execShell("mkdir -p " + backup_path)
 
-        filename = backup_path + "/db_" + name + "_" + \
+        filename = backup_path + "/db_" + backup_name + "_" + \
             time.strftime('%Y%m%d_%H%M%S', time.localtime()) + ".sql.gz"
 
         mysql_root = mw.M('config').dbPos(db_path, db_name).where(
@@ -71,14 +81,16 @@ class backupTools:
 
         cmd = db_path + "/bin/mariadb-dump --defaults-file=" + my_conf_path + "  --single-transaction --quick --default-character-set=utf8 " + \
             name + " | gzip > " + filename
+        if table_name != '':
+            cmd = db_path + "/bin/mariadb-dump --defaults-file=" + my_conf_path + "  --single-transaction --quick --default-character-set=utf8 " + \
+            name + " " + table_name + " | gzip > " + filename
         mw.execShell(cmd)
 
         if not os.path.exists(filename):
             endDate = time.strftime('%Y/%m/%d %X', time.localtime())
             log = "数据库[" + name + "]备份失败!"
             print("★[" + endDate + "] " + log)
-            print(
-                "----------------------------------------------------------------------------")
+            print("----------------------------------------------------------------------------")
             return
 
         mycnf = mw.readFile(db_path + '/etc/my.cnf')
@@ -91,8 +103,12 @@ class backupTools:
         pid = mw.M('databases').dbPos(db_path, db_name).where(
             'name=?', (name,)).getField('id')
 
+        backup_pid = pid
+        if table_name != '':
+            backup_pid = str(pid) + "!mariadb@" + table_name
+
         mw.M('backup').add('type,name,pid,filename,addtime,size', (3, os.path.basename(
-            filename), pid, filename, endDate, os.path.getsize(filename)))
+            filename), backup_pid, filename, endDate, os.path.getsize(filename)))
         log = "数据库[" + name + "]备份成功,用时[" + str(round(outTime, 2)) + "]秒"
         mw.writeLog('计划任务', log)
         print("★[" + endDate + "] " + log)
@@ -101,7 +117,7 @@ class backupTools:
 
         # 清理多余备份
         backups = mw.M('backup').where(
-            'type=? and pid=?', ('3', pid)).field('id,filename').select()
+            'type=? and pid=?', ('3', backup_pid)).field('id,filename').select()
 
         num = len(backups) - int(count)
         if num > 0:
