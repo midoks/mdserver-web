@@ -635,7 +635,26 @@ def getDbList():
     # return mw.returnJson(True,'ok',data)
 
 def getTableList():
-    pass
+    args = getArgs()
+    db_name = ""
+    if 'dbname' in args:
+        db_name = args['dbname']
+    elif 'name' in args:
+        db_name = args['name']
+    if db_name == "":
+        return mw.returnJson(-1, "table表不能为空")
+
+    try:
+        client = mongdbClient()
+        data = client[db_name].list_collection_names()
+    except Exception as e:
+        return mw.returnJson(-1, str(e))
+
+    table_list = []
+    for i in data:
+        table_list.append(i)
+
+    return mw.returnJson(0, "ok", table_list)
 
 def addDb():
     t = status()
