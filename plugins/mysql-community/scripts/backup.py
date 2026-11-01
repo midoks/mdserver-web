@@ -25,7 +25,17 @@ python3 /www/server/mdserver-web/plugins/mysql-community/scripts/backup.py  data
 '''
 class backupTools:
 
-    def backupDatabase(self, name, count):
+    def backupDatabase(self, params, count):
+        params_args = params.split("@")
+        name = params_args[0]
+        table_name = ''
+        if len(params_args) > 1:
+            table_name = params_args[1]
+
+        backup_name = name
+        if table_name != '':
+            backup_name = name+'@'+table_name
+
         db_path = mw.getServerDir() + '/mysql-community'
         db_name = 'mysql'
         find_name = mw.M('databases').dbPos(db_path, 'mysql').where(
@@ -35,19 +45,17 @@ class backupTools:
             endDate = time.strftime('%Y/%m/%d %X', time.localtime())
             log = "数据库[" + name + "]不存在!"
             print("★[" + endDate + "] " + log)
-            print(
-                "----------------------------------------------------------------------------")
+            print("----------------------------------------------------------------------------")
             return
 
         backup_path = mw.getFatherDir() + '/backup/database/mysql-community'
         if not os.path.exists(backup_path):
             mw.execShell("mkdir -p " + backup_path)
 
-        filename = backup_path + "/db_" + name + "_" + \
+        filename = backup_path + "/db_" + backup_name + "_" + \
             time.strftime('%Y%m%d_%H%M%S', time.localtime()) + ".sql.gz"
 
-        mysql_root = mw.M('config').dbPos(db_path, db_name).where(
-            "id=?", (1,)).getField('mysql_root')
+        mysql_root = mw.M('config').dbPos(db_path, db_name).where("id=?", (1,)).getField('mysql_root')
 
         my_conf_path = db_path + '/etc/my.cnf'
         mycnf = mw.readFile(my_conf_path)
@@ -59,14 +67,15 @@ class backupTools:
             mw.writeFile(db_path + '/etc/my.cnf', mycnf)
 
         cmd = db_path + "/bin/usr/bin/mysqldump --defaults-file=" + my_conf_path + "  --single-transaction -q --default-character-set=utf8mb4 " + name + " | gzip > " + filename
+        if table_name != '':
+            cmd = db_path + "/bin/usr/bin/mysqldump --defaults-file=" + my_conf_path + "  --single-transaction -q --default-character-set=utf8mb4 " + name + " " + table_name + " | gzip > " + filename
         mw.execShell(cmd)
 
         if not os.path.exists(filename):
             endDate = time.strftime('%Y/%m/%d %X', time.localtime())
             log = "数据库[" + name + "]备份失败!"
             print("★[" + endDate + "] " + log)
-            print(
-                "----------------------------------------------------------------------------")
+            print("----------------------------------------------------------------------------")
             return
 
         mycnf = mw.readFile(db_path + '/etc/my.cnf')
@@ -78,7 +87,12 @@ class backupTools:
         outTime = time.time() - startTime
         pid = mw.M('databases').dbPos(db_path, db_name).where('name=?', (name,)).getField('id')
 
-        mw.M('backup').add('type,name,pid,filename,add_time,size', (1, os.path.basename(filename), pid, filename, endDate, os.path.getsize(filename)))
+        backup_pid = pid
+        if table_name != '':
+            backup_pid = str(pid) + "!community@" + table_name
+
+
+        mw.M('backup').add('type,name,pid,filename,add_time,size', (1, os.path.basename(filename), backup_pid, filename, endDate, os.path.getsize(filename)))
         log = "数据库[" + name + "]备份成功,用时[" + str(round(outTime, 2)) + "]秒"
         mw.writeLog('计划任务', log)
         print("★[" + endDate + "] " + log)
@@ -86,7 +100,7 @@ class backupTools:
         print("|---文件名:" + filename)
 
         # 清理多余备份
-        backups = mw.M('backup').where('type=? and pid=?', ('1', pid)).field('id,filename').select()
+        backups = mw.M('backup').where('type=? and pid=?', ('1', backup_pid)).field('id,filename').select()
 
         num = len(backups) - int(count)
         if num > 0:

@@ -129,8 +129,7 @@ class backupTools:
         if table_name != '':
             backup_name = name+'@'+table_name
 
-        print("name:"+name,"table_name:"+table_name)
-
+        # print("name:"+name,"table_name:"+table_name)
         db_path = mw.getServerDir() + '/mysql'
         db_name = 'mysql'
         name = mw.M('databases').dbPos(db_path, 'mysql').where(
@@ -140,8 +139,7 @@ class backupTools:
             endDate = time.strftime('%Y/%m/%d %X', time.localtime())
             log = "数据库[" + name + "]不存在!"
             print("★[" + endDate + "] " + log)
-            print(
-                "----------------------------------------------------------------------------")
+            print("----------------------------------------------------------------------------")
             return
 
         backup_path = mw.getBackupDir() + '/database'
