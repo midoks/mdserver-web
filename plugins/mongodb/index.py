@@ -188,6 +188,23 @@ def pSqliteDb(dbname='users'):
     conn = mw.M(dbname).dbPos(getServerDir(), name)
     return conn
 
+def newMongoClient(**kwargs):
+    '''兼容 pymongo 3.x/4.x:directConnection 仅 pymongo 4.0+ 支持'''
+    import pymongo
+    if getattr(pymongo, 'version_tuple', (3, 0))[0] < 4:
+        kwargs.pop('directConnection', None)
+    return pymongo.MongoClient(**kwargs)
+
+
+def mongoToolsBin(tool):
+    '''获取 mongo 客户端工具路径,4.4+ 的 mongodump/mongorestore 由 Database Tools 提供'''
+    path = getServerDir() + "/bin/" + tool
+    if os.path.exists(path):
+        return path
+    import shutil
+    return shutil.which(tool) or path
+
+
 def mongdbClientS():
     import pymongo
     port = getConfPort()
@@ -196,11 +213,11 @@ def mongdbClientS():
     mg_root = pSqliteDb('config').where('id=?', (1,)).getField('mg_root')
 
     if auth == 'disabled':
-        client = pymongo.MongoClient(host=ip, port=int(port), directConnection=True, serverSelectionTimeoutMS=5000)
+        client = newMongoClient(host=ip, port=int(port), directConnection=True, serverSelectionTimeoutMS=5000)
     else:
         # print(auth,mg_root)
         # 使用 admin 数据库进行认证，兼容 MongoDB 3.0
-        client = pymongo.MongoClient(host=ip, port=int(port), directConnection=True,
+        client = newMongoClient(host=ip, port=int(port), directConnection=True,
                                      serverSelectionTimeoutMS=5000,
                                      username='root', password=mg_root, authSource='admin')
     return client
@@ -212,7 +229,7 @@ def getMongoDBVersion():
     ip = getConfLocalIp()
     try:
         # 先不使用认证连接
-        client = pymongo.MongoClient(host=ip, port=int(port), directConnection=True, serverSelectionTimeoutMS=5000)
+        client = newMongoClient(host=ip, port=int(port), directConnection=True, serverSelectionTimeoutMS=5000)
         db = client.admin
         serverStatus = db.command('serverStatus')
         version = serverStatus.get('version', '4.0')
@@ -238,17 +255,17 @@ def mongdbClient():
     mg_root = pSqliteDb('config').where('id=?', (1,)).getField('mg_root')
     
     if auth == 'disabled':
-        client = pymongo.MongoClient(host=ip, port=int(port), directConnection=True, serverSelectionTimeoutMS=5000)
+        client = newMongoClient(host=ip, port=int(port), directConnection=True, serverSelectionTimeoutMS=5000)
     else:
         # 根据MongoDB版本选择认证方式
         if isMongoDB3x():
             # MongoDB 3.x 使用 authSource 指定认证数据库
-            client = pymongo.MongoClient(host=ip, port=int(port), directConnection=True,
+            client = newMongoClient(host=ip, port=int(port), directConnection=True,
                                          serverSelectionTimeoutMS=5000,
                                          username='root', password=mg_root, authSource='admin')
         else:
             # MongoDB 4.x+ 默认在 admin 数据库认证
-            client = pymongo.MongoClient(host=ip, port=int(port), directConnection=True,
+            client = newMongoClient(host=ip, port=int(port), directConnection=True,
                                          serverSelectionTimeoutMS=5000,
                                          username='root', password=mg_root)
     return client
@@ -1660,6 +1677,8 @@ if __name__ == "__main__":
         print(rootPwd())
     elif func == 'get_db_list':
         print(getDbList())
+    elif func == 'get_table_list':
+        print(getTableList())
     elif func == 'add_db':
         print(addDb())
     elif func == 'del_db':
