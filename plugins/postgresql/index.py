@@ -1789,6 +1789,10 @@ if __name__ == "__main__":
         print(importDbBackupProgressBar())
     elif func == 'delete_db_backup':
         print(deleteDbBackup())
+    elif func == 'get_db_backup_list':
+        print(getDbBackupList())
+    elif func == 'get_db_backup_import_list':
+        print(getDbBackupImportList())
     elif func == 'sync_get_databases':
         print(syncGetDatabases())
     elif func == 'add_slave_ssh':
