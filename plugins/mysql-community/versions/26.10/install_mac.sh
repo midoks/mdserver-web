@@ -26,8 +26,10 @@ mkdir -p $myDir
 mkdir -p $serverPath/mysql-community
 
 # https://cdn.mysql.com/archives/mysql-26.10/mysql-26.10.0-macos15-arm64.tar.gz
+# https://cdn.mysql.com//Downloads/MySQL-26.10/mysql-26.10.0-macos15-arm64.tar.gz
 if [ ! -f ${myDir}/mysql-${SUFFIX_NAME}.tar.gz ];then
-	wget --no-check-certificate -O ${myDir}/mysql-${SUFFIX_NAME}.tar.gz https://cdn.mysql.com/archives/mysql-8.2/mysql-${SUFFIX_NAME}.tar.gz
+	# wget --no-check-certificate -O ${myDir}/mysql-${SUFFIX_NAME}.tar.gz https://cdn.mysql.com/archives/mysql-8.2/mysql-${SUFFIX_NAME}.tar.gz
+	wget --no-check-certificate -O ${myDir}/mysql-${SUFFIX_NAME}.tar.gz https://cdn.mysql.com//Downloads/MySQL-26.10/mysql-${SUFFIX_NAME}.tar.gz
 fi
 
 if [ -d ${myDir} ];then
