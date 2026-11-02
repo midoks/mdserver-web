@@ -1146,12 +1146,9 @@ function setLocalImport(db_name){
                 var upload_dir = $('input[name="upload_dir"]').val();
                 uploadDbFiles(upload_dir);
             });
-
             getList();
         },
     });
-
-    
 }
 
 function setBackup(db_name){
