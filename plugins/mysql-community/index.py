@@ -893,6 +893,7 @@ def setDbBackup():
     scDir = mw.getPanelDir() + '/scripts/backup.py'
     head = "cd "+mw.getPanelDir()
     cmd = head +' && . bin/activate &&  python3 plugins/mysql-community/scripts/backup.py database ' + args['name'] + ' 3'
+    # print(cmd)
     os.system(cmd)
     return mw.returnJson(True, 'ok')
 
