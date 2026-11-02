@@ -14,6 +14,7 @@ postgreDir=${serverPath}/source/postgresql
 
 VERSION=16.15
 OPTIONS=""
+action=$1
 # su - postgres -c "/www/server/postgresql/bin/pg_ctl start -D /www/server/postgresql/data"
 
 Install_App()
@@ -123,7 +124,6 @@ Uninstall_App()
 	echo '卸载[postgresql]完成'
 }
 
-action=$1
 if [ "${1}" = "install" ];then
 	Install_App
 else
