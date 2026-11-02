@@ -1136,6 +1136,7 @@ function setBackup(db_name){
         content: '<div class="pd15">\
                     <div class="db_list">\
                         <button id="btn_backup" class="btn btn-success btn-sm" type="button">备份</button>\
+                        <button id="btn_backup_reload" class="btn btn-success btn-sm" type="button">刷新</button>\
                         <button id="btn_local_import" class="btn btn-success btn-sm" type="button">外部导入</button>\
                     </div >\
                     <div class="divtable">\
@@ -1165,6 +1166,10 @@ function setBackup(db_name){
 
             $('#btn_local_import').click(function(){
                 setLocalImport(db_name);
+            });
+
+            $('#btn_backup_reload').click(function(){
+                setBackupReq(db_name);
             });
 
             setBackupReq(db_name);
