@@ -718,7 +718,7 @@ def importDbExternal():
     file = args['file']
     name = args['name']
 
-    import_dir = mw.getBackupDir() + '/import/'
+    import_dir = getImportDir() + '/'
 
     file_path = import_dir + file
     if not os.path.exists(file_path):
@@ -804,7 +804,7 @@ def importDbExternalProgressBar():
     file = args['file']
     name = args['name']
 
-    import_dir = mw.getBackupDir() + '/import/'
+    import_dir = getImportDir() + '/'
 
     file_path = import_dir + file
     if not os.path.exists(file_path):
@@ -952,12 +952,16 @@ def getDbBackupList():
 
     return mw.returnJson(True, 'ok', rr)
 
+def getImportDir():
+    import_dir = mw.getBackupDir() + '/postgresql_import'
+    if not os.path.exists(import_dir):
+        os.makedirs(import_dir)
+    return import_dir
+
+
 def getDbBackupImportList():
 
-    bkImportDir = mw.getFatherDir() + '/backup/postgresql_import'
-    if not os.path.exists(bkImportDir):
-        os.mkdir(bkImportDir)
-
+    bkImportDir = getImportDir()
     blist = os.listdir(bkImportDir)
 
     rr = []
