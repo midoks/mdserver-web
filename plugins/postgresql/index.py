@@ -709,29 +709,6 @@ def setDbBackup():
 def rootPwd():
     return pSqliteDb('config').where('id=?', (1,)).getField('pg_root')
 
-def importDbBackup():
-    args = getArgs()
-    data = checkArgs(args, ['file', 'name'])
-    if not data[0]:
-        return data[1]
-
-    file = args['file']
-    name = args['name']
-
-    file_path = getBackupDir() + '/' + file
-    file_path_sql = getBackupDir() + '/' + file.replace('.gz', '')
-
-    if not os.path.exists(file_path_sql):
-        cmd = 'cd ' + getBackupDir() + ' && gzip -d ' + file
-        mw.execShell(cmd)
-
-    pwd = pSqliteDb('config').where('id=?', (1,)).getField('pg_root')
-
-    mysql_cmd = mw.getFatherDir() + '/server/mysql/bin/mysql -uroot -p' + pwd + ' ' + name + ' < ' + file_path_sql
-    # print(mysql_cmd)
-    os.system(mysql_cmd)
-    return mw.returnJson(True, 'ok')
-
 def importDbBackupProgress():
     args = getArgs()
     data = checkArgs(args, ['file', 'name'])
@@ -741,10 +718,10 @@ def importDbBackupProgress():
     file = args['file']
     name = args['name']
 
-    cmd = 'cd '+mw.getServerDir()+'/mdserver-web && . bin/activate && '
-    cmd += 'python3 '+mw.getServerDir()+'/mdserver-web/plugins/mysql/index.py import_db_backup_progress_bar {"file":"'+file+'","name":"'+name+'"}'
-    return mw.returnJson(True, 'ok',cmd)
-    # return mw.returnJson(True, 'ok')
+    cmd = 'cd ' + mw.getPanelDir() + ' && . bin/activate && '
+    cmd += 'python3 ' + mw.getPanelDir() + '/plugins/postgresql/index.py import_db_backup_progress_bar {"file":"' + file + '","name":"' + name + '"}'
+    return mw.returnJson(True, 'ok', cmd)
+
 
 def importDbBackupProgressBar():
     args = getArgs()
@@ -755,26 +732,30 @@ def importDbBackupProgressBar():
     file = args['file']
     name = args['name']
 
-    file_path = mw.getFatherDir() + '/backup/database/' + file
-    file_path_sql = mw.getFatherDir() + '/backup/database/' + file.replace('.gz', '')
+    bk_path_upload = getBackupDir()
+    file_path = os.path.join(bk_path_upload, file)
+    if not os.path.exists(file_path):
+        return '备份文件不存在'
 
+    file_path_sql = file_path.replace('.gz', '')
     if not os.path.exists(file_path_sql):
-        cmd = 'cd ' + mw.getFatherDir() + '/backup/database && gzip -d ' + file
+        cmd = 'cd ' + bk_path_upload + ' && gzip -dk ' + file
         mw.execShell(cmd)
 
-    local_mode = recognizeDbMode()
-    if local_mode == 'gtid':
-        pdb = pMysqlDb()
-        pdb.execute('reset master')
+    port = getPgPort()
+    psql = getServerDir() + '/bin/psql'
+    if not os.path.exists(psql):
+        psql = 'psql'
 
-    pwd = pSqliteDb('config').where('id=?', (1,)).getField('mysql_root')
-    sock = getSocketFile()
+    cmd = 'pv -t -p {} | su - postgres -c "{} -d {} -p {}"'.format(file_path_sql, psql, name, port)
+    if mw.isAppleSystem():
+        cmd = 'pv -t -p {} | {} -d {} -p {}'.format(file_path_sql, psql, name, port)
+       
+    print(cmd)
+    os.system(cmd)
 
-    mysql_cmd = getServerDir() + '/bin/mysql -S ' + sock + ' -uroot -p"' + pwd + \
-        '" ' + name
-    mysql_cmd_progress_bar = "pv -t -p " + file_path_sql + '|'+ mysql_cmd
-    print(mysql_cmd_progress_bar)
-    rdata = os.system(mysql_cmd_progress_bar)
+    if os.path.exists(file_path_sql):
+        os.unlink(file_path_sql)
     return ''
 
 def deleteDbBackup():
@@ -815,6 +796,37 @@ def getDbBackupList():
 
     return mw.returnJson(True, 'ok', rr)
 
+def getDbBackupImportList():
+
+    bkImportDir = mw.getFatherDir() + '/backup/postgresql_import'
+    if not os.path.exists(bkImportDir):
+        os.mkdir(bkImportDir)
+
+    blist = os.listdir(bkImportDir)
+
+    rr = []
+    for x in range(0, len(blist)):
+        name = blist[x]
+        p = bkImportDir + '/' + name
+        data = {}
+        data['name'] = name
+
+        rsize = os.path.getsize(p)
+        data['size'] = mw.toSize(rsize)
+
+        t = os.path.getctime(p)
+        t = time.localtime(t)
+
+        data['time'] = time.strftime('%Y-%m-%d %H:%M:%S', t)
+        rr.append(data)
+
+        data['file'] = p
+
+    rdata = {
+        "list": rr,
+        "upload_dir": bkImportDir,
+    }
+    return mw.returnJson(True, 'ok', rdata)
 
 def getDbList():
     args = getArgs()

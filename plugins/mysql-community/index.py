@@ -1105,7 +1105,7 @@ def importDbBackupProgressBar():
     file_path_sql = mw.getFatherDir() + '/backup/database/mysql-community/' + file.replace('.gz', '')
 
     if not os.path.exists(file_path_sql):
-        cmd = 'cd ' + mw.getFatherDir() + '/backup/database/mysql-community && gzip -d ' + file
+        cmd = 'cd ' + mw.getFatherDir() + '/backup/database/mysql-community && gzip -dk ' + file
         mw.execShell(cmd)
 
     local_mode = recognizeDbMode()
