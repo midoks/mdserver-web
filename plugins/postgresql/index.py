@@ -1092,7 +1092,19 @@ def getDbInfo():
         tmp['schema'] = i[0]
         tmp['table_name'] = i[1]
         tmp['type'] = kinds.get(i[2], i[2])
-        tmp['rows_count'] = i[3]
+
+        # 优先取 count(*) 真实行数，统计失败时回退到 reltuples 估算值
+        rows_count = i[3]
+        count_sql = 'select count(*) from "{}"."{}"'.format(
+            i[0].replace('"', '""'), i[1].replace('"', '""'))
+        try:
+            count_data = pdb.query(count_sql)
+        except Exception:
+            count_data = None
+        if not isinstance(count_data, Exception) and count_data:
+            rows_count = count_data[0][0]
+
+        tmp['rows_count'] = rows_count
         tmp['data_byte'] = i[4]
         tmp['index_byte'] = i[5]
         tmp['total_byte'] = i[6]
