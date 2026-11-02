@@ -143,6 +143,60 @@ function myPostCBN(method, args, callback){
     },'json'); 
 }
 
+function pgPostCB(method, args, callback){
+    var loadT = layer.msg('正在获取...', { icon: 16, time: 0, shade: 0.3 });
+
+    var req_data = {};
+    req_data['name'] = 'data_query';
+    req_data['func'] = method;
+    req_data['script']='sql_postgresql';
+    args['version'] = '';
+ 
+    if (typeof(args) == 'string' && args == ''){
+        req_data['args'] = JSON.stringify(toArrayObject(args));
+    } else {
+        req_data['args'] = JSON.stringify(args);
+    }
+
+    $.post('/plugins/callback', req_data, function(data) {
+        layer.close(loadT);
+        if (!data.status){
+            layer.msg(data.msg,{icon:0,time:2000,shade: [0.3, '#000']});
+            return;
+        }
+
+        if(typeof(callback) == 'function'){
+            callback(data);
+        }
+    },'json'); 
+}
+
+
+function pgPostCBN(method, args, callback){
+    var req_data = {};
+    req_data['name'] = 'data_query';
+    req_data['func'] = method;
+    req_data['script']='sql_postgresql';
+    args['version'] = '';
+ 
+    if (typeof(args) == 'string' && args == ''){
+        req_data['args'] = JSON.stringify(toArrayObject(args));
+    } else {
+        req_data['args'] = JSON.stringify(args);
+    }
+
+    $.post('/plugins/callback', req_data, function(data) {
+        if (!data.status){
+            layer.msg(data.msg,{icon:0,time:2000,shade: [0.3, '#000']});
+            return;
+        }
+
+        if(typeof(callback) == 'function'){
+            callback(data);
+        }
+    },'json'); 
+}
+
 
 function selectTab(tab = 'redis'){
     $('.tab-view-box .tab-con').addClass('hide').removeClass('show').removeClass('w-full');
@@ -1951,4 +2005,7 @@ function redisBatchClear(){
     });
 }
 // ------------------------- redis end ---------------------------------
+
+// ------------------------- postgresql end ---------------------------------
+// ------------------------- postgresql end ---------------------------------
 
