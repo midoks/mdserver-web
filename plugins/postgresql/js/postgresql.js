@@ -608,8 +608,8 @@ function delBackup(filename,name){
     myPost('delete_db_backup',{filename:filename},function(){
         layer.msg('执行成功!');
         setTimeout(function(){
-            $('.layui-layer-close2').click();
-            setBackup(name);
+            // $('.layui-layer-close2').click();
+            setBackupReq(name);
         },2000);
     });
 }
