@@ -74,19 +74,28 @@ Install_App()
 		cd ${postgreDir} && tar -jxvf  ${postgreDir}/postgresql-${VERSION}.tar.bz2
 	fi
 	
+	if [ "$sysName" = "Darwin" ];then
+		OPENSSL_DEPEND_DIR=`brew --prefix openssl@3`
+		OPTIONS="$OPTIONS --with-includes="${OPENSSL_DEPEND_DIR}/include""
+		OPTIONS="$OPTIONS --with-libraries="${OPENSSL_DEPEND_DIR}/lib""
+
+		LIB_DEPEND_DIR=`brew --prefix icu4c`
+		export PKG_CONFIG_PATH="${LIB_DEPEND_DIR}/lib/pkgconfig:$PKG_CONFIG_PATH"
+		export PATH="${LIB_DEPEND_DIR}/bin:$PATH"
+		OPTIONS="$OPTIONS PKG_CONFIG_PATH="${LIB_DEPEND_DIR}/lib/pkgconfig""
+	fi
 
 	if [ ! -d $serverPath/postgresql ];then
 		cd ${postgreDir}/postgresql-${VERSION} && ./configure \
 		--prefix=$serverPath/postgresql \
 		--with-openssl \
 		$OPTIONS
-		# --with-pgport=33206
+		make -j${cpuCore} && make install && make clean
 
 		echo "cd ${postgreDir}/postgresql-${VERSION} && ./configure \
 		--prefix=$serverPath/postgresql \
-		--with-openssl"
-		# --with-pgport=33206
-		make -j${cpuCore} && make install && make clean
+		--with-openssl \
+		$OPTIONS"
 	fi
 
 	if [ -d $serverPath/postgresql ];then
