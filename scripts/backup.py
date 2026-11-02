@@ -8,10 +8,9 @@ import os
 import re
 import time
 
-if sys.platform != 'darwin':
-    os.chdir('/www/server/mdserver-web')
-
-web_dir = os.getcwd() + "/web"
+# 按脚本位置定位项目根目录:scripts -> 项目根，避免依赖调用方 cwd
+root_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+web_dir = os.path.join(root_dir, 'web')
 if os.path.exists(web_dir):
     sys.path.append(web_dir)
     os.chdir(web_dir)
