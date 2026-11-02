@@ -765,11 +765,9 @@ def importDbExternal():
         psql = 'psql'
     port = getPgPort()
 
-    if mw.isAppleSystem():
-        psql_cmd = '{} -d {} -p {}'.format(psql, name, port)
-    else:
-        psql_cmd = 'su - postgres -c "{} -d {} -p {}"'.format(
-            psql, name, port)
+    psql_cmd = '{} -U postgres -d {} -p {}'.format(psql, name, port)
+    if not mw.isAppleSystem():
+        psql_cmd = 'su - postgres -c "{}"'.format(psql_cmd)
 
     cmd = '{} < "{}"'.format(psql_cmd, import_sql)
     rdata = mw.execShell(cmd)
@@ -851,11 +849,9 @@ def importDbExternalProgressBar():
         psql = 'psql'
     port = getPgPort()
 
-    if mw.isAppleSystem():
-        psql_cmd = '{} -d {} -p {}'.format(psql, name, port)
-    else:
-        psql_cmd = 'su - postgres -c "{} -d {} -p {}"'.format(
-            psql, name, port)
+    psql_cmd = '{} -U postgres -d {} -p {}'.format(psql, name, port)
+    if not mw.isAppleSystem():
+        psql_cmd = 'su - postgres -c "{}"'.format(psql_cmd)
 
     cmd = 'pv -t -p "{}" | {}'.format(import_sql, psql_cmd)
     print(cmd)
