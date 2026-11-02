@@ -1,5 +1,5 @@
 
-function myPost(method,args,callback, title){
+function myPost(method, args,callback, title){
 
     var _args = null; 
     if (typeof(args) == 'string'){
