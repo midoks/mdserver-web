@@ -2007,6 +2007,636 @@ function redisBatchClear(){
 }
 // ------------------------- redis end ---------------------------------
 
-// ------------------------- postgresql end ---------------------------------
+// ------------------------- postgresql start -------------------------------
+var pg_timer = null;
+
+function pgHtml(v){
+    if (v === null || v === undefined){
+        return '';
+    }
+    return String(v).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+
+function pgGetSid(){
+    return $('#postgresql select[name=sid]').val();
+}
+
+function pgGetDbName(){
+    return $('#postgresql .postgresql_db_list select[name=postgresql_db]').val();
+}
+
+function pgGetTableName(){
+    var table = $('#postgresql .postgresql_table_list select[name=postgresql_table]').val();
+    if (!table || table == '0'){
+        return '';
+    }
+    return table;
+}
+
+function pgModalTable(title, list, width, height){
+    if (!list || list.length == 0){
+        layer.msg('暂无数据',{icon:7});
+        return;
+    }
+
+    var fields = mongodbGetDataFields(list);
+    var thead = '';
+    for (var i = 0; i < fields.length; i++){
+        thead += '<th>'+pgHtml(fields[i])+'</th>';
+    }
+
+    var tbody = '';
+    for (var i = 0; i < list.length; i++){
+        tbody += '<tr>';
+        for (var j = 0; j < fields.length; j++){
+            var f = fields[j];
+            var val = (f in list[i]) ? list[i][f] : '';
+            tbody += '<td title="'+pgHtml(val)+'">'+pgHtml(val)+'</td>';
+        }
+        tbody += '</tr>';
+    }
+
+    layer.open({
+        type: 1,
+        title: title,
+        area: [width || '900px', height || '420px'],
+        closeBtn: 1,
+        shadeClose: false,
+        content: '<div class="bt-form pd20 divtable taskdivtable" style="height:'+(parseInt(height || '420') - 80)+'px;overflow:auto;">\
+            <table class="table table-hover">\
+                <thead><tr>'+thead+'</tr></thead>\
+                <tbody>'+tbody+'</tbody>\
+            </table>\
+        </div>'
+    });
+}
+
+function pgInitField(f, data){
+    var option_html = '<option value="0">无字段</option>';
+    for (var i = 0; i < f.length; i++){
+        if (data['soso_field'] == f[i]){
+            option_html += '<option value="'+pgHtml(f[i])+'" selected>'+pgHtml(f[i])+'</option>';
+        } else {
+            option_html += '<option value="'+pgHtml(f[i])+'">'+pgHtml(f[i])+'</option>';
+        }
+    }
+    $('#postgresql select[name="postgresql_field_key"]').html(option_html);
+}
+
+function initTabPostgresql(){
+    pgGetServerList(function(){
+        pgGetDbList();
+        pgProcessList();
+    });
+
+    clearInterval(pg_timer);
+    pg_timer = setInterval(function(){
+        var name = $('#postgresql_list_tab .tab-nav span.on').data('name');
+        pgRunPgTab(name);
+
+        var fname = $('#cutTab .tab-list .active').data('name');
+        if (fname != 'postgresql'){
+            clearInterval(pg_timer);
+        }
+    }, 2000);
+
+    $('#postgresql_list_tab .tab-nav span').unbind('click').click(function(){
+        $('#postgresql_list_tab .tab-nav span').removeClass('on');
+        $(this).addClass('on');
+        var name = $(this).data('name');
+        pgRunPgTab(name);
+    });
+
+    $('#postgresql_find').unbind('click').click(function(){
+        var val = $('#postgresql input[name="postgresql_field_value"]').val();
+        if (val == ''){
+            layer.msg('搜索不能为空!',{icon:7});
+            return;
+        }
+        pgGetDataList(1);
+    });
+
+    pgCommonFunc();
+}
+
+function pgRunPgTab(name){
+    switch(name){
+        case 'proccess':pgProcessList();break;
+        case 'status':pgStatusList();break;
+        case 'stats':pgStatsList();break;
+    }
+}
+
+function pgGetServerList(call_func){
+    closeInstallLayer();
+    pgPostCBN('get_server_list', {}, function(rdata){
+        var data = rdata.data;
+        if (data.data && data.data.length != 0){
+            var items = data.data;
+            var content = '';
+            for (var i = 0; i < items.length; i++){
+                var t = items[i];
+                if (i == 0){
+                    content += '<option value="'+t['val']+'" selected>'+t['name']+'</option>';
+                } else {
+                    content += '<option value="'+t['val']+'">'+t['name']+'</option>';
+                }
+            }
+
+            $('#postgresql select[name=sid]').html(content);
+            $('#postgresql select[name=sid]').change(function(){
+                pgGetDbList();
+            });
+
+            if (typeof(call_func) == 'function'){
+                call_func();
+            }
+            closeInstallLayer();
+        } else {
+            layer.msg('当前未安装 PostgreSQL',{icon:7,time:2000,shade:0.3});
+            setTimeout(function(){
+                showInstallLayer();
+            },2050);
+        }
+    });
+}
+
+function pgGetDbList(){
+    var sid = pgGetSid();
+    pgPostCBN('get_db_list',{'sid':sid}, function(rdata){
+        var data = rdata.data;
+        if (!data.status){
+            layer.msg(data.msg,{icon:7,time:2500});
+            return;
+        }
+
+        var items = data.data['list'];
+        if (items.length == 0){
+            $('#postgresql .postgresql_db_list select[name=postgresql_db]').html('<option value="0">数据库空</option>');
+            $('#postgresql .postgresql_table_list select[name=postgresql_table]').html('<option value="0">数据表空</option>');
+            $('#postgresql_table thead tr').html('');
+            $('#postgresql_table tbody').html('');
+            $('.postgresql_list_page').html('<div><span class="Pcurrent">0</span><span class="Pcount">共0条</span></div>');
+            return;
+        }
+
+        var content = '';
+        for (var i = 0; i < items.length; i++){
+            var name = items[i];
+            if (i == 0){
+                content += '<option value="'+pgHtml(name)+'" selected>database['+pgHtml(name)+']</option>';
+            } else {
+                content += '<option value="'+pgHtml(name)+'">database['+pgHtml(name)+']</option>';
+            }
+        }
+
+        $('#postgresql .postgresql_db_list select[name=postgresql_db]').html(content);
+        $('#postgresql .postgresql_db_list select[name=postgresql_db]').change(function(){
+            pgGetTableList(1);
+        });
+
+        pgGetTableList(1);
+    });
+}
+
+function pgGetTableList(p){
+    var sid = pgGetSid();
+    var db = pgGetDbName();
+    if (!db || db == '0'){
+        return;
+    }
+
+    pgPostCBN('get_table_list',{'sid':sid,'db':db}, function(rdata){
+        var data = rdata.data;
+        if (!data.status){
+            layer.msg(data.msg,{icon:7,time:2500});
+            return;
+        }
+
+        var items = data.data['list'];
+        if (items.length == 0){
+            $('#postgresql .postgresql_table_list select[name=postgresql_table]').html('<option value="0">数据表空</option>');
+            $('#postgresql_table thead tr').html('');
+            $('#postgresql_table tbody').html('');
+            $('.postgresql_list_page').html('<div><span class="Pcurrent">0</span><span class="Pcount">共0条</span></div>');
+            return;
+        }
+
+        var content = '';
+        for (var i = 0; i < items.length; i++){
+            var name = items[i];
+            if (i == 0){
+                content += '<option value="'+pgHtml(name)+'" selected>table['+pgHtml(name)+']</option>';
+            } else {
+                content += '<option value="'+pgHtml(name)+'">table['+pgHtml(name)+']</option>';
+            }
+        }
+
+        $('#postgresql .postgresql_table_list select[name=postgresql_table]').html(content);
+        $('#postgresql .postgresql_table_list select[name=postgresql_table]').change(function(){
+            pgGetDataList(1);
+        });
+
+        pgGetDataList(1);
+    });
+}
+
+function pgGetDataList(p){
+    var sid = pgGetSid();
+    var db = pgGetDbName();
+    var table = pgGetTableName();
+
+    var pg_field = $('#postgresql select[name="postgresql_field_key"]').val();
+    var pg_value = $('#postgresql input[name="postgresql_field_value"]').val();
+
+    var request_data = {
+        'sid': sid,
+        'db': db,
+        'table': table,
+        'p': p,
+        'size': 10
+    };
+
+    if (pg_field != '0' && pg_field){
+        request_data['where'] = {field: pg_field, value: pg_value};
+    } else {
+        request_data['where'] = {};
+    }
+
+    pgPostCB('get_data_list', request_data, function(rdata){
+        var data = rdata.data;
+        if (!data.status){
+            layer.msg(data.msg,{icon:7,time:2500});
+            return;
+        }
+
+        var rdata2 = data.data;
+        var dlist = rdata2['list'];
+        var fields = mongodbGetDataFields(dlist);
+        if (fields.length != 0){
+            pgInitField(fields, rdata2);
+        }
+
+        var header_field = '';
+        for (var i = 0; i < fields.length; i++){
+            header_field += '<th>'+pgHtml(fields[i])+'</th>';
+        }
+        $('#postgresql_table thead tr').html(header_field);
+
+        var tbody = '';
+        for (var i = 0; i < dlist.length; i++){
+            tbody += '<tr>';
+            for (var j = 0; j < fields.length; j++){
+                var f = fields[j];
+                var val = (f in dlist[i]) ? dlist[i][f] : '';
+                tbody += '<td title="'+pgHtml(val)+'">'+pgHtml(val)+'</td>';
+            }
+            tbody += '</tr>';
+        }
+        $('#postgresql_table tbody').html(tbody);
+        $('#postgresql .postgresql_list_page').html(rdata2['page']);
+    });
+}
+
+function pgRenderOtTable(dlist){
+    var fields = mongodbGetDataFields(dlist);
+
+    var header_field = '';
+    for (var i = 0; i < fields.length; i++){
+        header_field += '<th>'+pgHtml(fields[i])+'</th>';
+    }
+    $('#postgresql_ot_table thead tr').html(header_field);
+
+    var tbody = '';
+    for (var i = 0; i < dlist.length; i++){
+        tbody += '<tr>';
+        for (var j = 0; j < fields.length; j++){
+            var f = fields[j];
+            var val = (f in dlist[i]) ? dlist[i][f] : '';
+            tbody += '<td title="'+pgHtml(val)+'">'+pgHtml(val)+'</td>';
+        }
+        tbody += '</tr>';
+    }
+    $('#postgresql_ot_table tbody').html(tbody);
+}
+
+function pgProcessList(){
+    pgPostCBN('get_proccess_list',{'sid':pgGetSid()}, function(rdata){
+        var data = rdata.data;
+        if (!data.status){
+            layer.msg(data.msg,{icon:7,time:2500});
+            return;
+        }
+        pgRenderOtTable(data.data['list']);
+    });
+}
+
+function pgStatusList(){
+    pgPostCBN('get_status_list',{'sid':pgGetSid()}, function(rdata){
+        var data = rdata.data;
+        if (!data.status){
+            layer.msg(data.msg,{icon:7,time:2500});
+            return;
+        }
+        pgRenderOtTable(data.data['list']);
+    });
+}
+
+function pgStatsList(){
+    pgPostCBN('get_stats_list',{'sid':pgGetSid()}, function(rdata){
+        var data = rdata.data;
+        if (!data.status){
+            layer.msg(data.msg,{icon:7,time:2500});
+            return;
+        }
+        pgRenderOtTable(data.data['list']);
+    });
+}
+
+function pgCommonFunc(){
+    $('#postgresql_common').unbind('click').click(function(){
+        layer.open({
+            type: 1,
+            title: "PostgreSQL常用功能",
+            area: ['600px', '200px'],
+            closeBtn: 1,
+            shadeClose: false,
+            content: '<div class="bt-form pd20">\
+                <button style="margin-bottom: 8px;" id="pg_top_nsql" type="button" class="btn btn-default btn-sm">查询执行次数最频繁的前N条SQL语句</button>\
+                <button style="margin-bottom: 8px;" id="pg_net_stat" type="button" class="btn btn-default btn-sm">PostgreSQL服务器的QPS/TPS指标</button>\
+                <button style="margin-bottom: 8px;" id="pg_redundant_indexes" type="button" class="btn btn-default btn-sm">查看重复或冗余的索引</button>\
+                <button style="margin-bottom: 8px;" id="pg_table_info" type="button" class="btn btn-default btn-sm">统计库里每个表的大小</button>\
+                <button style="margin-bottom: 8px;" id="pg_conn_count" type="button" class="btn btn-default btn-sm">查看应用端IP连接数总和</button>\
+                <button style="margin-bottom: 8px;" id="pg_fpk_info" type="button" class="btn btn-default btn-sm">快速找出没有主键的表</button>\
+                <button style="margin-bottom: 8px;" id="pg_lock_sql" type="button" class="btn btn-default btn-sm">查看当前锁阻塞的SQL</button>\
+                <button style="margin-bottom: 8px;" id="pg_deadlock_info" type="button" class="btn btn-default btn-sm">查看死锁信息</button>\
+                <button style="margin-bottom: 8px;" id="pg_slave_status" type="button" class="btn btn-default btn-sm">查看主从复制信息</button>\
+            </div>',
+            success:function(i,l){
+                $('#pg_top_nsql').click(function(){ pgCommonFuncTopN(); });
+                $('#pg_net_stat').click(function(){ pgCommonFuncNet(); });
+                $('#pg_redundant_indexes').click(function(){ pgCommonFuncRedundantIndexes(); });
+                $('#pg_table_info').click(function(){ pgCommonFuncTableInfo(); });
+                $('#pg_conn_count').click(function(){ pgCommonFuncConnCount(); });
+                $('#pg_fpk_info').click(function(){ pgCommonFuncFpkInfo(); });
+                $('#pg_lock_sql').click(function(){ pgCommonFuncLockSQL(); });
+                $('#pg_deadlock_info').click(function(){ pgCommonFuncDeadlockInfo(); });
+                $('#pg_slave_status').click(function(){ pgCommonFuncSlaveStatus(); });
+            }
+        });
+    });
+}
+
+function pgCommonFuncTopN(){
+    pgPostCBN('get_topn_list',{'sid':pgGetSid()}, function(rdata){
+        var data = rdata.data;
+        if (!data.status){
+            layer.msg(data.msg,{icon:7,time:4000});
+            return;
+        }
+        pgModalTable('查询执行次数最频繁的前N条SQL语句', data.data, '1000px', '450px');
+    });
+}
+
+function pgCommonFuncNet(){
+    pgPostCBN('get_net_list',{'sid':pgGetSid()}, function(rdata){
+        var data = rdata.data;
+        if (!data.status){
+            layer.msg(data.msg,{icon:7,time:2500});
+            return;
+        }
+        pgModalTable('PostgreSQL服务器的QPS/TPS指标（网络带宽需在系统层监控）', data.data, '1000px', '360px');
+    });
+}
+
+function pgCommonFuncRedundantIndexes(){
+    function renderList(){
+        pgPostCBN('get_redundant_indexes',{'sid':pgGetSid()}, function(rdata){
+            var data = rdata.data;
+            if (!data.status){
+                layer.msg(data.msg,{icon:7,time:2500});
+                return;
+            }
+
+            var items = data.data;
+            if (items.length == 0){
+                layer.msg('没有发现重复或冗余的索引',{icon:7});
+                return;
+            }
+
+            var tbody = '';
+            for (var i = 0; i < items.length; i++){
+                tbody += '<tr>\
+                    <td>'+pgHtml(items[i]['table_schema'])+'</td>\
+                    <td>'+pgHtml(items[i]['table_name'])+'</td>\
+                    <td>'+pgHtml(items[i]['redundant_index_name'])+'</td>\
+                    <td>'+pgHtml(items[i]['redundant_index_columns'])+'</td>\
+                    <td><a class="pg_drop_index btlink" index="'+i+'">删除</a></td>\
+                </tr>';
+            }
+
+            layer.open({
+                type: 1,
+                title: "查看重复或冗余的索引",
+                area: ['1000px', '420px'],
+                closeBtn: 1,
+                shadeClose: false,
+                content: '<div class="bt-form pd20 divtable taskdivtable">\
+                    <table class="table table-hover" id="pg_redundant_table">\
+                        <thead><tr>\
+                            <th>库名</th><th>表名</th><th>冗余索引</th><th>字段</th><th>操作</th>\
+                        </tr></thead>\
+                        <tbody>'+tbody+'</tbody>\
+                    </table>\
+                </div>',
+                success: function(){
+                    $('#pg_redundant_table .pg_drop_index').click(function(){
+                        var index = $(this).attr('index');
+                        layer.confirm('确定删除索引 '+pgHtml(items[index]['redundant_index_name'])+' ?', {btn:['确定','取消']}, function(li){
+                            pgPostCB('redundant_indexes_cmd', {'sid':pgGetSid(),'index':index}, function(r2){
+                                var d = r2.data;
+                                showMsg(d.msg,function(){
+                                    if (d.status){
+                                        layer.close(li);
+                                        renderList();
+                                    }
+                                },{icon: d.status ? 1 : 2}, 2000);
+                            });
+                        });
+                    });
+                }
+            });
+        });
+    }
+    renderList();
+}
+
+function pgCommonFuncTableInfo(){
+    pgPostCBN('get_table_info',{'sid':pgGetSid()}, function(rdata){
+        var data = rdata.data;
+        if (!data.status){
+            layer.msg(data.msg,{icon:7,time:2500});
+            return;
+        }
+        pgModalTable('统计库里每个表的大小（单位 GB）', data.data, '1200px', '460px');
+    });
+}
+
+function pgCommonFuncConnCount(){
+    pgPostCBN('get_conn_count',{'sid':pgGetSid()}, function(rdata){
+        var data = rdata.data;
+        if (!data.status){
+            layer.msg(data.msg,{icon:7,time:2500});
+            return;
+        }
+        pgModalTable('查看应用端IP连接数总和', data.data, '700px', '420px');
+    });
+}
+
+function pgCommonFuncFpkInfo(){
+    pgPostCBN('get_fpk_info',{'sid':pgGetSid()}, function(rdata){
+        var data = rdata.data;
+        if (!data.status){
+            layer.msg(data.msg,{icon:7,time:2500});
+            return;
+        }
+        pgModalTable('快速找出没有主键的表', data.data, '800px', '400px');
+    });
+}
+
+function pgCommonFuncLockSQL(){
+    function renderSQL(){
+        pgPostCBN('get_lock_sql',{'sid':pgGetSid()}, function(rdata){
+            var data = rdata.data;
+            if (!data.status){
+                layer.msg(data.msg,{icon:7,time:2500});
+                return;
+            }
+
+            var items = data.data;
+            var tbody = '';
+            for (var i = 0; i < items.length; i++){
+                var t = '<tr>';
+                t += '<td>'+pgHtml(items[i]['trx_id'])+'</td>';
+                t += '<td>'+pgHtml(items[i]['trx_state'])+'</td>';
+                t += '<td>'+pgHtml(items[i]['trx_started'])+'</td>';
+                t += '<td>'+pgHtml(items[i]['processlist_id'])+'</td>';
+                t += '<td title="'+pgHtml(items[i]['info'])+'">'+pgHtml(items[i]['info'])+'</td>';
+                t += '<td>'+pgHtml(items[i]['user'])+'</td>';
+                t += '<td>'+pgHtml(items[i]['host'])+'</td>';
+                t += '<td>'+pgHtml(items[i]['db'])+'</td>';
+                t += '<td>'+pgHtml(items[i]['command'])+'</td>';
+                t += '<td>'+pgHtml(items[i]['state'])+'</td>';
+                t += '<td>'+pgHtml(items[i]['sql_kill_blocking_query'])+'</td>';
+                t += '<td><a class="exec btlink" index="'+i+'">执行</a></td>';
+                t += '</tr>';
+                tbody += t;
+            }
+            $('#pg_lock_table tbody').html(tbody);
+
+            $('#pg_lock_table tbody .exec').click(function(){
+                var index = $(this).attr('index');
+                var pid = items[index]['processlist_id'];
+                pgPostCB('kill_lock_pid', {'sid':pgGetSid(),'pid':pid}, function(r2){
+                    var d = r2.data;
+                    showMsg(d.msg,function(){
+                        if (d.status){
+                            renderSQL();
+                        }
+                    },{icon: d.status ? 1 : 2}, 2000);
+                });
+            });
+        });
+    }
+
+    layer.open({
+        type: 1,
+        title: "查看当前锁阻塞的SQL",
+        area: ['1100px', '420px'],
+        closeBtn: 1,
+        shadeClose: false,
+        content: '<div class="bt-form pd20 divtable taskdivtable">\
+            <div class="mr20 pull-left" style="border-right: 1px solid #ccc; padding-right: 20px;">\
+                <button id="pg_kill_all" type="button" class="btn btn-default btn-sm">关闭所有阻塞</button>\
+            </div>\
+            <hr />\
+            <table class="table table-hover" id="pg_lock_table">\
+                <thead><tr>\
+                    <th>事务ID</th><th>事务状态</th><th>执行时间</th><th>线程ID</th>\
+                    <th>Info</th><th>user</th><th>host</th><th>db</th>\
+                    <th>command</th><th>state</th><th>kill</th><th>操作</th>\
+                </tr></thead>\
+                <tbody></tbody>\
+            </table>\
+        </div>',
+        success:function(){
+            renderSQL();
+            $('#pg_kill_all').unbind('click').click(function(){
+                pgPostCB('kill_all_lock', {'sid':pgGetSid()}, function(r2){
+                    var d = r2.data;
+                    showMsg(d.msg,function(){
+                        if (d.status){
+                            renderSQL();
+                        }
+                    },{icon: d.status ? 1 : 2}, 2000);
+                });
+            });
+        }
+    });
+}
+
+function pgCommonFuncDeadlockInfo(){
+    function renderText(){
+        pgPostCBN('get_deadlock_info',{'sid':pgGetSid()}, function(rdata){
+            var data = rdata.data;
+            if (!data.status){
+                layer.msg(data.msg,{icon:7,time:2500});
+                return;
+            }
+            $('#pg_info_log').val(data.data);
+        });
+    }
+
+    layer.open({
+        type: 1,
+        title: "查看死锁信息",
+        area: ['800px', '400px'],
+        closeBtn: 1,
+        shadeClose: false,
+        content: '<div class="bt-form pd15">\
+            <textarea readonly="" style="margin: 0px;height: 330px;width: 100%;background-color: #333;color:#fff; padding:0 5px" id="pg_info_log"></textarea>\
+        </div>',
+        success:function(){
+            renderText();
+        }
+    });
+}
+
+function pgCommonFuncSlaveStatus(){
+    function renderText(){
+        pgPostCBN('get_slave_status',{'sid':pgGetSid()}, function(rdata){
+            var data = rdata.data;
+            if (!data.status){
+                layer.msg(data.msg,{icon:7,time:2500});
+                return;
+            }
+            $('#pg_info_log').val(data.data);
+        });
+    }
+
+    layer.open({
+        type: 1,
+        title: "查看主从复制信息",
+        area: ['800px', '400px'],
+        closeBtn: 1,
+        shadeClose: false,
+        content: '<div class="bt-form pd15">\
+            <textarea readonly="" style="margin: 0px;height: 330px;width: 100%;background-color: #333;color:#fff; padding:0 5px" id="pg_info_log"></textarea>\
+        </div>',
+        success:function(){
+            renderText();
+        }
+    });
+}
 // ------------------------- postgresql end ---------------------------------
 
