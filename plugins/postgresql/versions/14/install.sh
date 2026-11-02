@@ -13,6 +13,7 @@ sysName=`uname`
 postgreDir=${serverPath}/source/postgresql
 
 VERSION=14.24
+OPTIONS=""
 
 # su - postgres -c "/www/server/postgresql/bin/pg_ctl start -D /www/server/postgresql/data"
 
@@ -74,7 +75,8 @@ Install_App()
 	if [ ! -d $serverPath/postgresql ];then
 		cd ${postgreDir}/postgresql-${VERSION} && ./configure \
 		--prefix=$serverPath/postgresql \
-		--with-openssl
+		--with-openssl \
+		$OPTIONS
 		# --with-pgport=33206
 
 		echo "cd ${postgreDir}/postgresql-${VERSION} && ./configure \

@@ -13,7 +13,7 @@ sysName=`uname`
 postgreDir=${serverPath}/source/postgresql
 
 VERSION=16.15
-
+OPTIONS=""
 # su - postgres -c "/www/server/postgresql/bin/pg_ctl start -D /www/server/postgresql/data"
 
 Install_App()
@@ -69,12 +69,15 @@ Install_App()
 	if [ ! -d ${postgreDir}/postgresql-${VERSION} ];then
 		cd ${postgreDir} && tar -jxvf  ${postgreDir}/postgresql-${VERSION}.tar.bz2
 	fi
+
+	
 	
 
 	if [ ! -d $serverPath/postgresql ];then
 		cd ${postgreDir}/postgresql-${VERSION} && ./configure \
 		--prefix=$serverPath/postgresql \
-		--with-openssl
+		--with-openssl \
+		$OPTIONS
 		# --with-pgport=33206
 
 		echo "cd ${postgreDir}/postgresql-${VERSION} && ./configure \
