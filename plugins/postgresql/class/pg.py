@@ -39,35 +39,21 @@ class ORM:
     def __Conn(self):
         '''连接数据库'''
         try:
-
-            if os.path.exists(self.__DB_SOCKET):
-                try:
-                    self.__DB_CONN = psycopg2.connect(database=self.__DB_NAME,
-                                                      user=self.__DB_USER,
-                                                      password=self.__DB_PASS,
-                                                      host=self.__DB_SOCKET,
-                                                      port=int(self.__DB_PORT))
-                except Exception as e:
-                    self.__DB_HOST = '127.0.0.1'
-                    self.__DB_CONN = psycopg2.connect(database=self.__DB_NAME,
-                                                      user=self.__DB_USER,
-                                                      password=self.__DB_PASS,
-                                                      host=self.__DB_SOCKET,
-                                                      port=int(self.__DB_PORT))
-            else:
-                try:
-                    self.__DB_CONN = psycopg2.connect(database=self.__DB_NAME,
-                                                      user=self.__DB_USER,
-                                                      password=self.__DB_PASS,
-                                                      host=self.__DB_HOST,
-                                                      port=int(self.__DB_PORT))
-                except Exception as e:
-                    self.__DB_HOST = '127.0.0.1'
-                    self.__DB_CONN = psycopg2.connect(database=self.__DB_NAME,
-                                                      user=self.__DB_USER,
-                                                      password=self.__DB_PASS,
-                                                      host=self.__DB_HOST,
-                                                      port=int(self.__DB_PORT))
+            # socket 存在时优先走本地 socket，失败后再回退到 TCP
+            host = self.__DB_SOCKET if os.path.exists(self.__DB_SOCKET) else self.__DB_HOST
+            try:
+                self.__DB_CONN = psycopg2.connect(database=self.__DB_NAME,
+                                                  user=self.__DB_USER,
+                                                  password=self.__DB_PASS,
+                                                  host=host,
+                                                  port=int(self.__DB_PORT))
+            except Exception as e:
+                self.__DB_HOST = '127.0.0.1'
+                self.__DB_CONN = psycopg2.connect(database=self.__DB_NAME,
+                                                  user=self.__DB_USER,
+                                                  password=self.__DB_PASS,
+                                                  host=self.__DB_HOST,
+                                                  port=int(self.__DB_PORT))
 
             self.__DB_CONN.autocommit = True
             self.__DB_CUR = self.__DB_CONN.cursor()

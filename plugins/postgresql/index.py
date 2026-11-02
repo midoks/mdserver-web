@@ -62,13 +62,21 @@ def getArgs():
     args_len = len(args)
 
     if args_len == 1:
-        t = args[0].strip('{').strip('}')
-        t = t.split(':')
-        tmp[t[0]] = t[1]
+        t = args[0].strip().strip('{}').strip()
+        if t == '':
+            return tmp
+        arg_t = t.split(',')
+        for i in range(len(arg_t)):
+            kv = arg_t[i].split(':', 1)
+            if len(kv) < 2:
+                continue
+            tmp[kv[0].strip().strip('"\'')] = kv[1].strip().strip('"\'')
     elif args_len > 1:
         for i in range(len(args)):
-            t = args[i].split(':')
-            tmp[t[0]] = t[1]
+            kv = args[i].strip().strip('{}').split(':', 1)
+            if len(kv) < 2:
+                continue
+            tmp[kv[0].strip().strip('"\'')] = kv[1].strip().strip('"\'')
 
     return tmp
 
@@ -126,16 +134,13 @@ def getDbPort():
 
 
 def getSocketFile():
-    # sock_name = '.s.PGSQL.' + getDbPort()
-    sock_name = ""
-    sock_tmp = '/tmp/' + sock_name
-    if os.path.exists(sock_tmp):
-        return sock_tmp
-
-    sock_app = getServerDir() + "/" + sock_name
-    if os.path.exists(sock_app):
-        return sock_app
-    return sock_app
+    # libpq 中 host 以 / 开头时按 socket 目录处理，会自动查找 .s.PGSQL.<port>
+    sock_name = '.s.PGSQL.' + getDbPort()
+    for sock_dir in ['/tmp', getServerDir()]:
+        if os.path.exists(sock_dir + '/' + sock_name):
+            return sock_dir
+    # 未找到 socket，返回空字符串让 ORM 走 TCP
+    return ""
 
 
 def getInitdTpl(version=''):
@@ -1086,25 +1091,28 @@ def getDbInfo():
     ret['database'] = db_name
 
     kinds = {'r': 'table', 'p': 'partitioned table'}
+
+    # 一次 union all 取所有表的真实行数，避免逐表新建连接
+    count_map = {}
+    count_sql_list = []
+    for i in tables:
+        count_sql_list.append(
+            "select '{}' as schema_name, '{}' as table_name, count(*) from \"{}\".\"{}\"".format(
+                i[0].replace("'", "''"), i[1].replace("'", "''"),
+                i[0].replace('"', '""'), i[1].replace('"', '""')))
+    if count_sql_list:
+        count_data = pdb.query(' union all '.join(count_sql_list))
+        if not isinstance(count_data, Exception):
+            for row in count_data:
+                count_map[(row[0], row[1])] = row[2]
+
     ret3 = []
     for i in tables:
         tmp = {}
         tmp['schema'] = i[0]
         tmp['table_name'] = i[1]
         tmp['type'] = kinds.get(i[2], i[2])
-
-        # 优先取 count(*) 真实行数，统计失败时回退到 reltuples 估算值
-        rows_count = i[3]
-        count_sql = 'select count(*) from "{}"."{}"'.format(
-            i[0].replace('"', '""'), i[1].replace('"', '""'))
-        try:
-            count_data = pdb.query(count_sql)
-        except Exception:
-            count_data = None
-        if not isinstance(count_data, Exception) and count_data:
-            rows_count = count_data[0][0]
-
-        tmp['rows_count'] = rows_count
+        tmp['rows_count'] = count_map.get((i[0], i[1]), i[3])
         tmp['data_byte'] = i[4]
         tmp['index_byte'] = i[5]
         tmp['total_byte'] = i[6]
