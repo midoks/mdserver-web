@@ -2429,7 +2429,7 @@ function pgCommonFuncNet(){
     pgPostCBN('get_net_list',{'sid':pgGetSid()}, function(rdata){
         var data = rdata.data;
         if (!data.status){
-            layer.msg(data.msg,{icon:7,time:2500});
+            pgShowNotice('PostgreSQL服务器的QPS/TPS指标', data.msg);
             return;
         }
         pgModalTable('PostgreSQL服务器的QPS/TPS指标（网络带宽需在系统层监控）', data.data, '1000px', '360px');
@@ -2502,7 +2502,7 @@ function pgCommonFuncTableInfo(){
     pgPostCBN('get_table_info',{'sid':pgGetSid()}, function(rdata){
         var data = rdata.data;
         if (!data.status){
-            layer.msg(data.msg,{icon:7,time:2500});
+            pgShowNotice('统计库里每个表的大小（单位 GB）', data.msg);
             return;
         }
         pgModalTable('统计库里每个表的大小（单位 GB）', data.data, '1200px', '460px');
@@ -2513,7 +2513,7 @@ function pgCommonFuncConnCount(){
     pgPostCBN('get_conn_count',{'sid':pgGetSid()}, function(rdata){
         var data = rdata.data;
         if (!data.status){
-            layer.msg(data.msg,{icon:7,time:2500});
+            pgShowNotice('查看应用端IP连接数总和', data.msg);
             return;
         }
         pgModalTable('查看应用端IP连接数总和', data.data, '700px', '420px');
