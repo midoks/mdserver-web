@@ -16,7 +16,7 @@ myDir=${serverPath}/source/mysql-community
 
 OS_ARCH=`arch`
 MYSQL_VER=26.7.0
-SUFFIX_NAME=${MYSQL_VER}-macos13-arm64
+SUFFIX_NAME=${MYSQL_VER}-macos15-arm64
 
 COMMUNITY_INSTALL()
 {
@@ -25,7 +25,7 @@ COMMUNITY_INSTALL()
 mkdir -p $myDir
 mkdir -p $serverPath/mysql-community
 
-# https://cdn.mysql.com/archives/mysql-26.7/mysql-26.7.0-macos13-arm64.tar.gz
+# https://cdn.mysql.com/archives/mysql-26.7/mysql-26.7.0-macos15-arm64.tar.gz
 if [ ! -f ${myDir}/mysql-${SUFFIX_NAME}.tar.gz ];then
 	wget --no-check-certificate -O ${myDir}/mysql-${SUFFIX_NAME}.tar.gz https://cdn.mysql.com/archives/mysql-8.2/mysql-${SUFFIX_NAME}.tar.gz
 fi
