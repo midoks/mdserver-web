@@ -6,6 +6,7 @@ curPath=`pwd`
 rootPath=$(dirname "$curPath")
 rootPath=$(dirname "$rootPath")
 serverPath=$(dirname "$rootPath")
+sysName=`uname`
 
 if [ -f ${rootPath}/bin/activate ];then
 	. ${rootPath}/bin/activate
@@ -136,8 +137,12 @@ if [ "${action}" = "uninstall" ];then
 	fi
 fi
 
+if [ "$sysName" = "Darwin" ];then
+	sh -x $curPath/versions/$2/install_mac.sh $1
+else
+	sh -x $curPath/versions/$2/install_generic.sh $1
+fi
 
-sh -x $curPath/versions/$2/install_generic.sh $1
 
 if [ "${action}" = "install" ];then
 	#初始化
