@@ -1640,10 +1640,10 @@ function redisGetList(){
             redisGetKeyList(1);
             closeInstallLayer();
         } else {
-            layer.msg(rdata.data.msg,{ icon: 7, time: 2000, shade: 0.3 });
+            layer.msg(rdata.data.msg,{ icon: 7, time: 1000, shade: 0.3 });
             setTimeout(function(){
                 showInstallLayer();
-            },2050);
+            },1050);
         }
     });
 }

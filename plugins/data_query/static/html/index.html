@@ -6,6 +6,7 @@
                 <div class="tabs-item" data-name="mongodb">Mongodb</div>
                 <div class="tabs-item" data-name="memcached">Memcached</div>
                 <div class="tabs-item" data-name="mysql">MySQL</div>
+                <!-- <div class="tabs-item" data-name="postgresql">PostgreSQL</div> -->
             </div>
         </div>
 
@@ -15,6 +16,71 @@
             <div class="mask_layer" style="display:none;">
                 <div class="prompt_description">当前未安装本地服务器,<a class="btlink install_server" href="/soft/index">点击安装</a></div>
             </div>
+
+            <!-- postgresql start -->
+            <div class="tab-con hide" id="postgresql" style="padding: 0px;">
+
+                <div class="col-md-12" style="padding: 0px;overflow: hidden;">
+                    <div class="tootls_group tootls_top">
+                        <div class="pull-left">
+                            <div class="pgserver_list" style="float:left;">
+                                <select name="sid" class="bt-input-text c5 mr5">
+                                    <option value="0">本地服务器</option>
+                                </select>
+                            </div>
+
+                            <div class="postgresql_db_list" style="float:left;">
+                                <select name="mysql_db" class="bt-input-text c5 mr5">
+                                    <option value="0">数据库空</option>
+                                </select>
+                            </div>
+
+                            <div class="postgresql_table_list" style="float:left;">
+                                <select name="postgresql_table" class="bt-input-text c5 mr5">
+                                    <option value="0">数据表空</option>
+                                </select>
+                            </div>
+
+                            <div class="field" style="float:left;">
+                                <select name="postgresql_field_key" class="bt-input-text c5 mr5" style="width:80px;">
+                                    <option value="0">无字段</option>
+                                </select>
+                            </div>
+
+                            <div class="value" style="float:left;">
+                                <input name="postgresql_field_value" type="text" class="bt-input-text" placeholder="请输入查找内容">
+                            </div>
+
+
+                            <div style="float:left;">
+                                <button id="postgresql_find" type="button" class="btn btn-success btn-sm mr5 ml5" >查找</button>
+                                <button id="postgresql_common" type="button" class="btn btn-success btn-sm mr5 ml5">常用功能</button>
+                            </div>
+                        </div>
+
+                    </div>
+
+                    <div style="position: relative;">
+                        <div id="postgresql_table" class="postgresql_table divtable mtb10">
+                            <table class="table table-hover">
+                                <thead style="position: relative;z-index: 1;">
+                                    <tr>
+                                        <th><span>编号</span></th>
+                                        <th><span>操作类型</span></th>
+                                        <th><span>详情</span></th>
+                                    </tr>
+                                </thead>
+                                <tbody></tbody>
+                            </table>
+                        </div>
+                    </div>
+              
+                    <div class="postgresql_list_page page">
+                        <div><span class="Pcurrent">0</span><span class="Pcount">共0条</span></div>
+                    </div>
+                </div>        
+            </div>
+            <!-- postgresql end -->
 
             <!-- mysql start -->
             <!-- show w-full -->
