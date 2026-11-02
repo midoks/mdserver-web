@@ -1018,8 +1018,13 @@ def setDbBackup():
 # 数据库密码处理
 def myPass(act, root):
     conf_file = getConf()
-    mw.execShell("sed -i '/user=root/d' {}".format(conf_file))
-    mw.execShell("sed -i '/password=/d' {}".format(conf_file))
+    mw.execShell("sed -i '_bak' '/user=root/d' {}".format(conf_file))
+    mw.execShell("sed -i '_bak' '/password=/d' {}".format(conf_file))
+
+    conf_file_bak = conf_file + '_bak'
+    if os.path.exists(conf_file_bak):
+        os.unlink(conf_file_bak)
+        
     if act:
         mycnf = mw.readFile(conf_file)
         src_dump = "[mysqldump]\n"
