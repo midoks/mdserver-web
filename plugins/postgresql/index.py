@@ -1041,6 +1041,69 @@ def setDbAccess():
     psdb.where("name=?", (name,)).setField('accept', access)
     return mw.returnJson(True, "设置成功")
 
+def getDbInfo():
+    args = getArgs()
+    data = checkArgs(args, ['name'])
+    if not data[0]:
+        return data[1]
+
+    db_name = args['name']
+    pdb = pgDb()
+    pdb.setDatabase(db_name)
+
+    sql = """select n.nspname, c.relname, c.relkind,
+                    greatest(c.reltuples, 0)::bigint,
+                    pg_relation_size(c.oid),
+                    pg_indexes_size(c.oid),
+                    pg_total_relation_size(c.oid)
+             from pg_class c
+             join pg_namespace n on n.oid = c.relnamespace
+             where c.relkind in ('r', 'p')
+               and n.nspname not in ('pg_catalog', 'information_schema')
+             order by n.nspname, c.relname"""
+    try:
+        tables = pdb.query(sql)
+    except Exception as e:
+        return mw.returnJson(-1, str(e))
+
+    if isinstance(tables, Exception):
+        return mw.returnJson(-1, str(tables))
+
+    try:
+        data_sum = pdb.query('select pg_database_size(current_database())')
+    except Exception as e:
+        return mw.returnJson(-1, str(e))
+
+    if isinstance(data_sum, Exception):
+        return mw.returnJson(-1, str(data_sum))
+
+    data_size = 0
+    if len(data_sum) > 0 and data_sum[0][0] is not None:
+        data_size = data_sum[0][0]
+
+    ret = {}
+    ret['data_size'] = mw.toSize(data_size)
+    ret['database'] = db_name
+
+    kinds = {'r': 'table', 'p': 'partitioned table'}
+    ret3 = []
+    for i in tables:
+        tmp = {}
+        tmp['schema'] = i[0]
+        tmp['table_name'] = i[1]
+        tmp['type'] = kinds.get(i[2], i[2])
+        tmp['rows_count'] = i[3]
+        tmp['data_byte'] = i[4]
+        tmp['index_byte'] = i[5]
+        tmp['total_byte'] = i[6]
+        tmp['data_size'] = mw.toSize(i[4])
+        tmp['index_size'] = mw.toSize(i[5])
+        tmp['total_size'] = mw.toSize(i[6])
+        ret3.append(tmp)
+
+    ret['tables'] = ret3
+
+    return mw.getJson(ret)
 
 def pgBack():
     # 备份数据库
@@ -1647,6 +1710,8 @@ if __name__ == "__main__":
         print(getDbAccess())
     elif func == 'set_db_access':
         print(setDbAccess())
+    elif func == 'get_db_info':
+        print(getDbInfo())
     elif func == 'pg_back':
         print(pgBack())
     elif func == 'pg_back_list':

@@ -285,6 +285,69 @@ function setDbRw(id,username,val){
     });
 }
 
+function repTools(db_name, res){
+    myPost('get_db_info', {name:db_name}, function(data){
+        var rdata = $.parseJSON(data.data);
+        var tbody = '';
+        for (var i = 0; i < rdata.tables.length; i++) {
+            var t = rdata.tables[i];
+            tbody += '<tr>\
+                    <td><span style="width:220px;">' + t.schema + '.' + t.table_name + '</span></td>\
+                    <td>' + t.type + '</td>\
+                    <td>' + t.rows_count + '</td>\
+                    <td>' + t.data_size + '</td>\
+                    <td>' + t.index_size + '</td>\
+                    <td>' + t.total_size + '</td>\
+                </tr>';
+        }
+        if (tbody == ''){
+            tbody = '<tr><td colspan="6" style="text-align:center;">暂无数据表</td></tr>';
+        }
+
+        if (res) {
+            $(".gztr").html(tbody);
+            $(".tools_size").html('大小：' + rdata.data_size);
+            return;
+        }
+
+        layer.open({
+            type: 1,
+            title: "PostgreSQL数据表【" + db_name + "】",
+            area: ['820px', '580px'],
+            closeBtn: 1,
+            shadeClose: false,
+            content: '<div class="pd15">\
+                            <div class="db_list">\
+                                <span><a>数据库名称：'+ db_name + '</a>\
+                                <a class="tools_size">大小：'+ rdata.data_size + '</a></span>\
+                                <span id="db_tools" style="float: right;"></span>\
+                            </div >\
+                            <div class="divtable">\
+                            <div  id="database_fix"  style="height:360px;overflow:auto;border:#ddd 1px solid">\
+                            <table class="table table-hover "style="border:none">\
+                                <thead>\
+                                    <tr>\
+                                        <th>表名(Schema.Table)</th>\
+                                        <th>类型</th>\
+                                        <th>估算行数</th>\
+                                        <th>数据大小</th>\
+                                        <th>索引大小</th>\
+                                        <th>合计</th>\
+                                    </tr>\
+                                </thead>\
+                                <tbody class="gztr">' + tbody + '</tbody>\
+                            </table>\
+                            </div>\
+                        </div>\
+                        <ul class="help-info-text c7">\
+                            <li>【估算行数】取自 pg_class.reltuples，执行 ANALYZE 后更准确</li>\
+                            <li>【数据/索引/合计】分别取自 pg_relation_size、pg_indexes_size、pg_total_relation_size</li>\
+                        </ul></div>'
+        });
+        tableFixed('database_fix');
+    });
+}
+
 function setDbAccess(name){
     myPost('get_db_access','name='+name, function(data){
         var rdata = $.parseJSON(data.data);
@@ -671,7 +734,7 @@ function dbList(page, search){
                 rw = '<a href="javascript:;" class="btlink" onclick="setDbRw(\''+rdata.data[i]['id']+'\',\''+rdata.data[i]['name']+'\',\''+rw_change+'\')" title="设置读写">'+rw_val+'</a> | ';
             }
 
-            list +=  '<a href="javascript:;" class="btlink" onclick="repTools(\''+rdata.data[i]['name']+'\')" title="MySQL优化修复工具">工具</a> | '
+            list +=  '<a href="javascript:;" class="btlink" onclick="repTools(\''+rdata.data[i]['name']+'\')" title="数据表信息">工具</a> | '
             list += '<a href="javascript:;" class="btlink" onclick="setDbAccess(\''+rdata.data[i]['name']+'\')" title="设置数据库权限">权限</a> | ' +
                         rw +
                         '<a href="javascript:;" class="btlink" onclick="setDbPass('+rdata.data[i]['id']+',\''+ rdata.data[i]['username'] +'\',\'' + rdata.data[i]['password'] + '\')">改密</a> | ' +
