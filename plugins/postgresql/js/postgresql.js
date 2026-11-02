@@ -329,7 +329,7 @@ function repTools(db_name, res){
                                     <tr>\
                                         <th>表名(Schema.Table)</th>\
                                         <th>类型</th>\
-                                        <th>估算行数</th>\
+                                        <th>行数</th>\
                                         <th>数据大小</th>\
                                         <th>索引大小</th>\
                                         <th>合计</th>\
@@ -340,8 +340,8 @@ function repTools(db_name, res){
                             </div>\
                         </div>\
                         <ul class="help-info-text c7">\
-                            <li>【估算行数】取自 pg_class.reltuples，执行 ANALYZE 后更准确</li>\
-                            <li>【数据/索引/合计】分别取自 pg_relation_size、pg_indexes_size、pg_total_relation_size</li>\
+                            <li>【行数】count(*) 实时统计，大表打开时可能稍慢</li>\
+                            <li>【数据/索引/合计】分别取自 pg_relation_size、pg_indexes_size、pg_total_relation_size，合计额外包含 TOAST/FSM</li>\
                         </ul></div>'
         });
         tableFixed('database_fix');
