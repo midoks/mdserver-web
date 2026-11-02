@@ -86,7 +86,13 @@ class backupTools:
         cmd = db_path + "/bin/usr/bin/mysqldump --defaults-file=" + my_conf_path + "  --single-transaction -q --default-character-set=utf8mb4 " + name + " | gzip > " + filename
         if table_name != '':
             cmd = db_path + "/bin/usr/bin/mysqldump --defaults-file=" + my_conf_path + "  --single-transaction -q --default-character-set=utf8mb4 " + name + " " + table_name + " | gzip > " + filename
+        
         mw.execShell(cmd)
+
+        mycnf = mw.readFile(db_path + '/etc/my.cnf')
+        mycnf = mycnf.replace(subStr, sea)
+        if len(mycnf) > 100:
+            mw.writeFile(db_path + '/etc/my.cnf', mycnf)
 
         if not os.path.exists(filename):
             endDate = time.strftime('%Y/%m/%d %X', time.localtime())
@@ -95,10 +101,6 @@ class backupTools:
             print("----------------------------------------------------------------------------")
             return
 
-        mycnf = mw.readFile(db_path + '/etc/my.cnf')
-        mycnf = mycnf.replace(subStr, sea)
-        if len(mycnf) > 100:
-            mw.writeFile(db_path + '/etc/my.cnf', mycnf)
 
         endDate = time.strftime('%Y/%m/%d %X', time.localtime())
         outTime = time.time() - startTime

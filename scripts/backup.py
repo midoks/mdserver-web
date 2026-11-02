@@ -215,8 +215,6 @@ class backupTools:
             print("----------------------------------------------------------------------------")
             return
 
-        
-
         endDate = time.strftime('%Y/%m/%d %X', time.localtime())
         outTime = time.time() - startTime
 
