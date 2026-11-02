@@ -25,9 +25,6 @@ COMMUNITY_INSTALL()
 mkdir -p $myDir
 mkdir -p $serverPath/mysql-community
 
-# Linux - Generic
-# https://cdn.mysql.com//Downloads/MySQL-9.7/mysql-9.7.4-linux-glibc2.28-x86_64.tar.xz
-# https://cdn.mysql.com//Downloads/MySQL-9.7/mysql-${SUFFIX_NAME}.tar.xz
 # https://cdn.mysql.com//Downloads/MySQL-9.7/mysql-9.7.4-macos15-arm64.tar.gz
 if [ ! -f ${myDir}/mysql-${SUFFIX_NAME}.tar.gz ];then
 	wget --no-check-certificate -O ${myDir}/mysql-${SUFFIX_NAME}.tar.gz https://cdn.mysql.com//Downloads/MySQL-9.7/mysql-${SUFFIX_NAME}.tar.gz
