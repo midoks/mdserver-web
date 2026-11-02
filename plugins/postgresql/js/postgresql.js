@@ -777,6 +777,7 @@ function setBackup(db_name,obj){
             $('#btn_backup').click(function(){
                 myPost('pg_back',{name:db_name}, function(data){
                     layer.msg('执行成功!');
+                    setBackupReq(db_name);
                 });
             });
 

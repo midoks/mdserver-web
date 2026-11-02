@@ -1135,7 +1135,7 @@ def pgBack():
         return data[1]
 
     bk_path_upload = getBackupDir()
-    database = args['name']
+    database = 'db_'+args['name']
     port = getPgPort()
 
     pg_dump = getServerDir() + '/bin/pg_dump'
@@ -1143,13 +1143,13 @@ def pgBack():
         pg_dump = 'pg_dump'
 
     if mw.isAppleSystem():
-        cmd = '''{} -c {} -p {} | gzip > {}/{}_{}.gz '''.format(
+        cmd = '''{} -c {} -p {} | gzip > {}/{}_{}.sql.gz '''.format(
             pg_dump, database, port, bk_path_upload, database, time.strftime("%Y%m%d_%H%M%S"))
     else:
-        cmd = '''su - postgres -c "{} -c {} -p {}" | gzip > {}/{}_{}.gz '''.format(
+        cmd = '''su - postgres -c "{} -c {} -p {}" | gzip > {}/{}_{}.sql.gz '''.format(
             pg_dump, database, port, bk_path_upload, database, time.strftime("%Y%m%d_%H%M%S"))
-    mw.execShell(cmd)
 
+    mw.execShell(cmd)
     return mw.returnJson(True, '备份成功!')
 
 
@@ -1160,13 +1160,14 @@ def pgBackList():
     if not data[0]:
         return data[1]
 
-    database = args['name']
+    database = "db_"+args['name']
 
     bk_path_upload = getBackupDir()
     file_list = os.listdir(bk_path_upload)
     data = []
     for i in file_list:
-        if i.split("_")[0].startswith(database):
+
+        if i.startswith(database):
             file_path = os.path.join(bk_path_upload, i)
             file_info = os.stat(file_path)
             create_time = file_info.st_ctime
@@ -1176,7 +1177,7 @@ def pgBackList():
             file_size = mw.toSize(file_size)
             data.append({"name": i, "time": create_time,
                          "size": file_size, "file": file_path})
-
+    data.sort(key=lambda x: x['name'], reverse=True)
     return mw.returnJson(True, 'ok', data)
 
 
