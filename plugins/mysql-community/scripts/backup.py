@@ -42,6 +42,22 @@ class backupTools:
         r.sort()
         return r
 
+    def getConf(self, mtype='mysql'):
+        path = mw.getServerDir() + '/' + mtype + '/etc/my.cnf'
+        return path
+
+    def recognizeDbMode(self, mtype='mysql'):
+        conf = self.getConf(mtype)
+        con = mw.readFile(conf)
+        rep = r"!include %s/(.*)?\.cnf" % (mw.getServerDir() +'/'+ mtype +"/etc/mode",)
+        mode = 'none'
+        try:
+            data = re.findall(rep, con, re.M)
+            mode = data[0]
+        except Exception as e:
+            pass
+        return mode
+
     def backupDatabase(self, params, count):
         params_args = params.split("@")
         name = params_args[0]
@@ -83,11 +99,17 @@ class backupTools:
         if len(mycnf) > 100:
             mw.writeFile(db_path + '/etc/my.cnf', mycnf)
 
-        cmd = db_path + "/bin/usr/bin/mysqldump --defaults-file=" + my_conf_path + "  --single-transaction -q --default-character-set=utf8mb4 " + name + " | gzip > " + filename
+        option = ''
+        mode = self.recognizeDbMode('mysql')
+        if mode == 'gtid':
+            option = ' --set-gtid-purged=off '
+
+        cmd = db_path + "/bin/mysqldump --defaults-file=" + my_conf_path + " " + option + "  --single-transaction -q --default-character-set=utf8mb4 " + name + " | gzip > " + filename
         if table_name != '':
-            cmd = db_path + "/bin/usr/bin/mysqldump --defaults-file=" + my_conf_path + "  --single-transaction -q --default-character-set=utf8mb4 " + name + " " + table_name + " | gzip > " + filename
+            cmd = db_path + "/bin/mysqldump --defaults-file=" + my_conf_path + " " + option + "  --single-transaction -q --default-character-set=utf8mb4 " + name + " " + table_name + " | gzip > " + filename
         
-        mw.execShell(cmd)
+        os.system(cmd)
+        # mw.execShell(cmd)
 
         mycnf = mw.readFile(db_path + '/etc/my.cnf')
         mycnf = mycnf.replace(subStr, sea)
