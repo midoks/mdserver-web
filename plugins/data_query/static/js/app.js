@@ -217,6 +217,7 @@ function initTabFunc(tab){
         case 'mongodb':initTabMongodb();break;
         case 'memcached':initTabMemcached();break;
         case 'mysql':initTabMySQL();break;
+        case 'postgresql':initTabPostgresql();break;
         case 'default:':initTabRedis();break;
     }
 }
