@@ -1346,21 +1346,31 @@ def pgBack():
         return data[1]
 
     bk_path_upload = getBackupDir()
-    database = 'db_'+args['name']
+    database = args['name']
     port = getPgPort()
 
     pg_dump = getServerDir() + '/bin/pg_dump'
     if not os.path.exists(pg_dump):
         pg_dump = 'pg_dump'
 
-    if mw.isAppleSystem():
-        cmd = '''{} -c {} -p {} | gzip > {}/{}_{}.sql.gz '''.format(
-            pg_dump, database, port, bk_path_upload, database, time.strftime("%Y%m%d_%H%M%S"))
-    else:
-        cmd = '''su - postgres -c "{} -c {} -p {}" | gzip > {}/{}_{}.sql.gz '''.format(
-            pg_dump, database, port, bk_path_upload, database, time.strftime("%Y%m%d_%H%M%S"))
+    file_name = 'db_{}_{}.sql.gz'.format(
+        database, time.strftime("%Y%m%d_%H%M%S"))
+    file_path = os.path.join(bk_path_upload, file_name)
 
-    mw.execShell(cmd)
+    # -c --if-exists: 导出带 DROP 语句便于覆盖恢复，且对象不存在时不报错
+    cmd = '''{} -c --if-exists -U postgres -d {} -p {} | gzip > "{}"'''.format(
+        pg_dump, database, port, file_path)
+    if not mw.isAppleSystem():
+        cmd = '''su - postgres -c "{} -c --if-exists -U postgres -d {} -p {}" | gzip > "{}"'''.format(
+            pg_dump, database, port, file_path)
+
+    # print(cmd)
+    rdata = mw.execShell(cmd)
+
+    # gzip 会掩盖 pg_dump 的失败，需检查错误输出和文件大小
+    if rdata[1].lower().find('error') > -1 or not os.path.exists(file_path) or os.path.getsize(file_path) < 100:
+        return mw.returnJson(False, rdata[1] or '备份失败，未导出数据')
+
     return mw.returnJson(True, '备份成功!')
 
 
@@ -1413,15 +1423,18 @@ def importDbBackup():
         psql = 'psql'
 
     if mw.isAppleSystem():
-        cmd = '''gunzip -c {} | {} -d {} -p {}'''.format(
+        cmd = '''gunzip -c "{}" | {} -U postgres -d {} -p {}'''.format(
             file_path, psql, name, port)
     else:
-        cmd = '''gunzip -c {} | su - postgres -c "{} -d {} -p {}"'''.format(
+        cmd = '''gunzip -c "{}" | su - postgres -c "{} -U postgres -d {} -p {}"'''.format(
             file_path, psql, name, port)
 
     # print(cmd)
 
-    mw.execShell(cmd)
+    rdata = mw.execShell(cmd)
+    if rdata[1].lower().find('error') > -1:
+        return mw.returnJson(False, rdata[1])
+
     return mw.returnJson(True, '恢复数据库成功')
 
 
