@@ -1,16 +1,18 @@
 #!/bin/bash
-PATH=/bin:/sbin:/usr/bin:/usr/sbin:/usr/local/bin:/usr/local/sbin:~/bin
+PATH=/bin:/sbin:/usr/bin:/usr/sbin:/usr/local/bin:/usr/local/sbin:~/bin:/opt/homebrew/bin
 export PATH
 
 curPath=`pwd`
 rootPath=$(dirname "$curPath")
 rootPath=$(dirname "$rootPath")
 serverPath=$(dirname "$rootPath")
+sysName=`uname`
 
 if [ -f ${rootPath}/bin/activate ];then
 	. ${rootPath}/bin/activate
 fi
 
+# cd /Users/midoks/Desktop/mwdev/server/mdserver-web/plugins/mysql-community && bash install.sh install 9。7
 
 # https://dev.mysql.com/downloads/mysql/
 # https://downloads.mysql.com/archives/community/
@@ -22,7 +24,6 @@ fi
 # /www/server/mysql-community/bin/mysqld --basedir=/www/server/mysql-community --datadir=/www/server/mysql-community/data --initialize-insecure --explicit_defaults_for_timestamp
 
 # . bin/activate
-# cd /www/server/mdserver-web/plugins/mysql-community && bash install.sh install 5.7
 # cd /www/server/mdserver-web/plugins/mysql-community && bash install.sh install 9.3
 # cd /www/server/mdserver-web/plugins/mysql-community && bash install.sh uninstall 9.0
 # cd /www/server/mdserver-web && python3 plugins/mysql-community/index.py start 8.0
@@ -136,8 +137,16 @@ if [ "${action}" = "uninstall" ];then
 	fi
 fi
 
+if [ "$sysName" = "Darwin" ];then
+	if [ ! -f $curPath/versions/$2/install_mac.sh ];then
+		echo "not supported for the time being"
+	else
+		sh -x $curPath/versions/$2/install_mac.sh $1
+	fi	
+else
+	sh -x $curPath/versions/$2/install_generic.sh $1
+fi
 
-sh -x $curPath/versions/$2/install_generic.sh $1
 
 if [ "${action}" = "install" ];then
 	#初始化

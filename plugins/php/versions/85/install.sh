@@ -114,9 +114,6 @@ fi
 # OPTIONS="${OPTIONS} --enable-dtrace"
 
 if [ "$sysName" = "Darwin" ];then
-	BREW_DIR=`which brew`
-	BREW_DIR=${BREW_DIR/\/bin\/brew/}
-
 	LIB_DEPEND_DIR=`brew --prefix openssl@3`
 	OPTIONS="$OPTIONS --with-openssl=$LIB_DEPEND_DIR"
 	export PKG_CONFIG_PATH=$LIB_DEPEND_DIR/lib/pkgconfig

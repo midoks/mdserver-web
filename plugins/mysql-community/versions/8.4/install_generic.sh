@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 #!/bin/bash
 
-PATH=/bin:/sbin:/usr/bin:/usr/sbin:/usr/local/bin:/usr/local/sbin:~/bin
+PATH=/bin:/sbin:/usr/bin:/usr/sbin:/usr/local/bin:/usr/local/sbin:~/bin:/opt/homebrew/bin
 export PATH
 export DEBIAN_FRONTEND=noninteractive
 
@@ -16,7 +16,7 @@ sysName=`uname`
 myDir=${serverPath}/source/mysql-community
 
 OS_ARCH=`arch`
-MYSQL_VER=8.4.2
+MYSQL_VER=8.4.11
 SUFFIX_NAME=${MYSQL_VER}-linux-glibc2.28-${OS_ARCH}
 
 # cd /www/server/mdserver-web/plugins/mysql-community && bash install.sh install 8.4

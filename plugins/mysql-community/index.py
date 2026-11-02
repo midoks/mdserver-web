@@ -139,6 +139,12 @@ def getAuthPolicy():
     # caching_sha2_password
     return 'mysql_native_password'
     
+def getInitdTpl(version=''):
+    path = getPluginDir() + '/init.d/mysql' + version + '.tpl'
+    if not os.path.exists(path):
+        path = getPluginDir() + '/init.d/mysql.tpl'
+    return path
+
 def contentReplace(content):
     service_path = mw.getServerDir()
     content = content.replace('{$ROOT_PATH}', mw.getFatherDir())
@@ -247,6 +253,19 @@ def initDreplace(version=''):
 
     if mw.getOs() != 'darwin':
         mw.execShell('chown -R mysql mysql ' + getServerDir())
+
+    if mw.isAppleSystem():
+        initd_path = getServerDir() + '/init.d'
+        if not os.path.exists(initd_path):
+            os.mkdir(initd_path)
+
+        file_bin = initd_path + '/' + getPluginName()
+        if not os.path.exists(file_bin):
+            initd_tpl = getInitdTpl(version)
+            content = mw.readFile(initd_tpl)
+            content = contentReplace(content)
+            mw.writeFile(file_bin, content)
+            mw.execShell('chmod +x ' + file_bin)
     return 'ok'
 
 def process_status():
@@ -532,7 +551,14 @@ def my8cmd(version, method):
     initDreplace(version)
     # mysql 8.0  and 5.7
     mdb8 = getMdb8Ver()
+
+    init_file = ""
+    if mw.isAppleSystem():
+        initd_path = getServerDir() + '/init.d'
+        init_file = initd_path + '/' + getPluginName()
+
     try:
+
         isInited = True
         if mw.inArray(mdb8, version):
             isInited = initMysql8Data()
@@ -565,6 +591,7 @@ def my8cmd(version, method):
                 mw.execShell('systemctl stop ' + getPluginName())
 
         if not mw.isSupportSystemctl():
+            cmd = init_file + ' ' + method
             sub = subprocess.Popen(cmd, stdout=subprocess.PIPE, shell=True,
                                    bufsize=4096, stderr=subprocess.PIPE)
             sub.wait(5)

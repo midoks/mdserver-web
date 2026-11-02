@@ -1,5 +1,5 @@
 
-function myPost(method,args,callback, title){
+function myPost(method, args,callback, title){
 
     var _args = null; 
     if (typeof(args) == 'string'){
@@ -1146,12 +1146,9 @@ function setLocalImport(db_name){
                 var upload_dir = $('input[name="upload_dir"]').val();
                 uploadDbFiles(upload_dir);
             });
-
             getList();
         },
     });
-
-    
 }
 
 function setBackup(db_name){

@@ -1,5 +1,5 @@
 #!/bin/bash
-PATH=/bin:/sbin:/usr/bin:/usr/sbin:/usr/local/bin:/usr/local/sbin:~/bin
+PATH=/bin:/sbin:/usr/bin:/usr/sbin:/usr/local/bin:/usr/local/sbin:~/bin:/opt/homebrew/bin
 export PATH
 
 #https://www.postgresql.org/ftp/source/
@@ -13,7 +13,8 @@ sysName=`uname`
 postgreDir=${serverPath}/source/postgresql
 
 VERSION=18.6
-
+OPTIONS=""
+action=$1
 # su - postgres -c "/www/server/postgresql/bin/pg_ctl start -D /www/server/postgresql/data"
 
 Install_App()
@@ -25,12 +26,14 @@ Install_App()
 	    echo "postgres uid is `id -u postgres`"
 	    echo "postgres shell is `grep "^postgres:" /etc/passwd |cut -d':' -f7 `"
 	else
-	    groupadd postgres
-		useradd -g postgres postgres
+	    which groupadd && groupadd postgres
+		which useradd && useradd -g postgres postgres
 	fi
 
-	if [ ! -d /home/postgres ];then
-		mkdir -p /home/postgres
+	if [ "$sysName" != "Darwin" ];then
+		if [ ! -d /home/postgres ];then
+			mkdir -p /home/postgres
+		fi
 	fi
 
 	# if [ "$sysName" != "Darwin" ];then
@@ -63,6 +66,7 @@ Install_App()
 	# ----- cpu end ------
 
 	if [ ! -f ${postgreDir}/postgresql-${VERSION}.tar.bz2 ];then
+		echo "wget --no-check-certificate -O ${postgreDir}/postgresql-${VERSION}.tar.bz2 --tries=3 https://ftp.postgresql.org/pub/source/v${VERSION}/postgresql-${VERSION}.tar.bz2"
 		wget --no-check-certificate -O ${postgreDir}/postgresql-${VERSION}.tar.bz2 --tries=3 https://ftp.postgresql.org/pub/source/v${VERSION}/postgresql-${VERSION}.tar.bz2
 	fi
 
@@ -70,18 +74,28 @@ Install_App()
 		cd ${postgreDir} && tar -jxvf  ${postgreDir}/postgresql-${VERSION}.tar.bz2
 	fi
 	
+	if [ "$sysName" = "Darwin" ];then
+		OPENSSL_DEPEND_DIR=`brew --prefix openssl@3`
+		OPTIONS="$OPTIONS --with-includes="${OPENSSL_DEPEND_DIR}/include""
+		OPTIONS="$OPTIONS --with-libraries="${OPENSSL_DEPEND_DIR}/lib""
+
+		LIB_DEPEND_DIR=`brew --prefix icu4c`
+		export PKG_CONFIG_PATH="${LIB_DEPEND_DIR}/lib/pkgconfig:$PKG_CONFIG_PATH"
+		export PATH="${LIB_DEPEND_DIR}/bin:$PATH"
+		OPTIONS="$OPTIONS PKG_CONFIG_PATH="${LIB_DEPEND_DIR}/lib/pkgconfig""
+	fi
 
 	if [ ! -d $serverPath/postgresql ];then
 		cd ${postgreDir}/postgresql-${VERSION} && ./configure \
 		--prefix=$serverPath/postgresql \
-		--with-openssl
-		# --with-pgport=33206
+		--with-openssl \
+		$OPTIONS
+		make -j${cpuCore} && make install && make clean
 
 		echo "cd ${postgreDir}/postgresql-${VERSION} && ./configure \
 		--prefix=$serverPath/postgresql \
-		--with-openssl"
-		# --with-pgport=33206
-		make -j${cpuCore} && make install && make clean
+		--with-openssl \
+		$OPTIONS"
 	fi
 
 	if [ -d $serverPath/postgresql ];then
@@ -89,8 +103,8 @@ Install_App()
 		echo '安装postgresql成功'
 	else
 		echo '安装postgresql失败'
-		rm -rf ${postgreDir}/postgresql-${VERSION}.tar.bz2
 	fi
+	# rm -rf ${postgreDir}/postgresql-${VERSION}.tar.bz2
 }
 
 Uninstall_App()
@@ -120,7 +134,7 @@ Uninstall_App()
 	echo '卸载[postgresql]完成'
 }
 
-action=$1
+
 if [ "${1}" = "install" ];then
 	Install_App
 else

@@ -1383,6 +1383,21 @@ def getListBson(dbname=''):
     for x in blist:
         if x.endswith(bname):
             r.append(x)
+        # if x.endswith('json'):
+        #     r.append(x)
+    return r
+
+
+def getListBsonByDatabase(dbname=''):
+    bkDir = mw.getBackupDir() + '/database/'+dbname
+    blist = os.listdir(bkDir)
+    r = []
+
+    bname = 'bson' 
+    blen = len(bname)
+    for x in blist:
+        if x.endswith(bname):
+            r.append(x)
     return r
 
 def rootPwd():
@@ -1399,7 +1414,6 @@ def importDbExternal():
     name = args['name']
 
     import_dir = mw.getBackupDir() + '/mongodb_import/'
-    mg_root = pSqliteDb('config').where('id=?', (1,)).getField('mg_root')
     port = getConfPort()
 
     file_path = import_dir + file
@@ -1446,6 +1460,69 @@ def importDbExternal():
 
     return mw.returnJson(True, 'ok')
 
+def importDbExternalProgress():
+    args = getArgs()
+    data = checkArgs(args, ['file', 'name'])
+    if not data[0]:
+        return data[1]
+
+    file = args['file']
+    name = args['name']
+
+    cmd = 'cd '+mw.getServerDir()+'/mdserver-web && . bin/activate && '
+    cmd += 'python3 '+mw.getServerDir()+'/mdserver-web/plugins/mongodb/index.py import_db_external_progress_bar  {"file":"'+file+'","name":"'+name+'"}'
+    return mw.returnJson(True, 'ok',cmd)
+
+def importDbExternalProgressBar():
+    args = getArgs()
+    data = checkArgs(args, ['file', 'name'])
+    if not data[0]:
+        return data[1]
+
+    file = args['file']
+    name = args['name']
+
+    import_dir = mw.getFatherDir() + '/backup/mongodb_import/'
+    port = getConfPort()
+
+    file_path = import_dir + file
+    if not os.path.exists(file_path):
+        return mw.returnJson(False, '文件突然消失?')
+
+    exts = ['sql', 'gz', 'zip']
+    ext = mw.getFileSuffix(file)
+    if ext not in exts:
+        return mw.returnJson(False, '导入数据库格式不对!')
+
+    file_dir = import_dir+name
+    if not os.path.exists(file_dir):
+        mw.execShell("mkdir -p "+file_dir)
+
+    auth = getConfAuth()
+    mg_root = pSqliteDb('config').where('id=?', (1,)).getField('mg_root')
+    uoption = ''
+    if auth != 'disabled':
+        uoption =' --authenticationDatabase admin -u root -p '+mg_root
+
+    file_tgz = import_dir+file
+    if os.path.exists(file_tgz):
+        cmd = 'cd ' + file_dir + ' && tar -xzvf ' + file_tgz + " -C "+file_dir
+        mw.execShell(cmd)
+        bson_list = getListBson(name)
+        for x in bson_list:
+            # mehotd 1
+            cmd = mongoToolsBin('mongorestore') + " "+uoption+" --port "+str(port)+" --dir "+file_dir+'/'+x
+            os.system(cmd)
+            # method2
+            # cmd = mongoToolsBin('mongorestore') + " "+uoption+" --port "+str(port) + " --archive  --db "+name + " --collection " + x.strip(".bson")
+            # cmd_progress_bar = "pv -t -p " + file_dir+"/"+x + '|'+ cmd
+            # print(cmd_progress_bar)
+            # os.system(mysql_cmd_progress_bar)
+
+    if os.path.exists(file_dir):
+        del_cmd = "rm -rf "+file_dir
+        mw.execShell(del_cmd)
+    return ""
 
 def importDbBackup():
     args = getArgs()
@@ -1457,7 +1534,6 @@ def importDbBackup():
     name = args['name']
 
     port = getConfPort()
-
     file_tgz = mw.getBackupDir() + '/database/' + file
     file_dir = mw.getBackupDir() + '/database/' + file.replace('.tar.gz','')
 
@@ -1479,14 +1555,72 @@ def importDbBackup():
     cmd = mongoToolsBin('mongorestore') + " "+uoption+" --port "+str(port)+" --dir "+file_dir
     # print(cmd)
     mw.execShell(cmd)
-
-
     # 删除文件
     if os.path.exists(file_dir):
         del_cmd = "rm -rf "+file_dir
         mw.execShell(del_cmd)
 
     return mw.returnJson(True, 'ok')
+
+def importDbBackupProgress():
+    args = getArgs()
+    data = checkArgs(args, ['file', 'name'])
+    if not data[0]:
+        return data[1]
+
+    file = args['file']
+    name = args['name']
+
+    cmd = 'cd '+mw.getServerDir()+'/mdserver-web && . bin/activate && '
+    cmd += 'python3 '+mw.getServerDir()+'/mdserver-web/plugins/mongodb/index.py import_db_backup_progress_bar {"file":"'+file+'","name":"'+name+'"}'
+    return mw.returnJson(True, 'ok',cmd)
+    # return mw.returnJson(True, 'ok')
+
+def importDbBackupProgressBar():
+    args = getArgs()
+    data = checkArgs(args, ['file', 'name'])
+    if not data[0]:
+        return data[1]
+
+    file = args['file']
+    name = args['name']
+
+    import_dir = mw.getFatherDir() + '/backup/database/'
+    port = getConfPort()
+
+    file_path = import_dir + file
+    if not os.path.exists(file_path):
+        return mw.returnJson(False, '文件突然消失?')
+
+    exts = ['sql', 'gz', 'zip']
+    ext = mw.getFileSuffix(file)
+    if ext not in exts:
+        return mw.returnJson(False, '导入数据库格式不对!')
+
+    file_dir = import_dir+name
+    if not os.path.exists(file_dir):
+        mw.execShell("mkdir -p "+file_dir)
+
+    auth = getConfAuth()
+    mg_root = pSqliteDb('config').where('id=?', (1,)).getField('mg_root')
+    uoption = ''
+    if auth != 'disabled':
+        uoption =' --authenticationDatabase admin -u root -p '+mg_root
+
+    file_tgz = import_dir+file
+    if os.path.exists(file_tgz):
+        cmd = 'cd ' + file_dir + ' && tar -xzvf ' + file_tgz + " -C "+file_dir
+        mw.execShell(cmd)
+        bson_list = getListBsonByDatabase(name)
+        for x in bson_list:
+            # mehotd 1
+            cmd = mongoToolsBin('mongorestore') + " "+uoption+" --port "+str(port)+" --dir "+file_dir+'/'+x
+            os.system(cmd)
+
+    if os.path.exists(file_dir):
+        del_cmd = "rm -rf "+file_dir
+        mw.execShell(del_cmd)
+    return ""
 
 def testData():
     '''
@@ -1747,8 +1881,16 @@ if __name__ == "__main__":
         print(setDbBackup())
     elif func == 'import_db_external':
         print(importDbExternal())
+    elif func == 'import_db_external_progress':
+        print(importDbExternalProgress())
+    elif func == 'import_db_external_progress_bar':
+        print(importDbExternalProgressBar())
     elif func == 'import_db_backup':
         print(importDbBackup())
+    elif func == 'import_db_backup_progress':
+        print(importDbBackupProgress())
+    elif func == 'import_db_backup_progress_bar':
+        print(importDbBackupProgressBar())
     elif func == 'run_log':
         print(runLog())
     elif func == 'test':
