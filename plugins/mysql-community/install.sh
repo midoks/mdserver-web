@@ -138,7 +138,11 @@ if [ "${action}" = "uninstall" ];then
 fi
 
 if [ "$sysName" = "Darwin" ];then
-	sh -x $curPath/versions/$2/install_mac.sh $1
+	if [ ! -f $curPath/versions/$2/install_mac.sh ];then
+		echo "not supported for the time being"
+	else
+		sh -x $curPath/versions/$2/install_mac.sh $1
+	fi	
 else
 	sh -x $curPath/versions/$2/install_generic.sh $1
 fi
