@@ -1,13 +1,18 @@
 #!/bin/bash
-PATH=/bin:/sbin:/usr/bin:/usr/sbin:/usr/local/bin:/usr/local/sbin:~/bin
+PATH=/bin:/sbin:/usr/bin:/usr/sbin:/usr/local/bin:/usr/local/sbin:~/bin:/opt/homebrew/bin
 export PATH
+
+# cd /Users/midoks/Desktop/mwdev/server/mdserver-web/plugins/postgresql && bash install.sh install 18
+# cd /www/server/mdserver-web/plugins/postgresql && bash install.sh install 16
 
 curPath=`pwd`
 rootPath=$(dirname "$curPath")
 rootPath=$(dirname "$rootPath")
 serverPath=$(dirname "$rootPath")
 
-# cd /www/server/mdserver-web/plugins/postgresql && bash install.sh install 16
+if [ -f ${rootPath}/bin/activate ];then
+	. ${rootPath}/bin/activate
+fi
 
 action=$1
 type=$2

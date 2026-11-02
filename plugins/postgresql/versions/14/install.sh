@@ -1,5 +1,5 @@
 #!/bin/bash
-PATH=/bin:/sbin:/usr/bin:/usr/sbin:/usr/local/bin:/usr/local/sbin:~/bin
+PATH=/bin:/sbin:/usr/bin:/usr/sbin:/usr/local/bin:/usr/local/sbin:~/bin:/opt/homebrew/bin
 export PATH
 
 #https://www.postgresql.org/ftp/source/
@@ -89,8 +89,8 @@ Install_App()
 		echo '安装postgresql成功'
 	else
 		echo '安装postgresql失败'
-		rm -rf ${postgreDir}/postgresql-${VERSION}.tar.bz2
 	fi
+	# rm -rf ${postgreDir}/postgresql-${VERSION}.tar.bz2
 }
 
 Uninstall_App()
