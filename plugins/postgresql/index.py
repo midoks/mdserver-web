@@ -718,7 +718,7 @@ def importDbExternal():
     file = args['file']
     name = args['name']
 
-    import_dir = mw.getFatherDir() + '/backup/import/'
+    import_dir = mw.getBackupDir() + '/import/'
 
     file_path = import_dir + file
     if not os.path.exists(file_path):
@@ -760,20 +760,21 @@ def importDbExternal():
     if import_sql == "":
         return mw.returnJson(False, '未找SQL文件')
 
-    pwd = pSqliteDb('config').where('id=?', (1,)).getField('mysql_root')
-    sock = getSocketFile()
+    psql = getServerDir() + '/bin/psql'
+    if not os.path.exists(psql):
+        psql = 'psql'
+    port = getPgPort()
 
-    my_cnf = getConf()
+    if mw.isAppleSystem():
+        psql_cmd = '{} -d {} -p {}'.format(psql, name, port)
+    else:
+        psql_cmd = 'su - postgres -c "{} -d {} -p {}"'.format(
+            psql, name, port)
 
-    myPass(True, pwd)
-    mysql_cmd = getServerDir() + '/bin/mysql --defaults-file=' + my_cnf + \
-        ' -uroot -p"' + pwd + '" -f ' + name + ' < ' + import_sql
+    cmd = '{} < "{}"'.format(psql_cmd, import_sql)
+    rdata = mw.execShell(cmd)
 
-    # print(mysql_cmd)
-    rdata = mw.execShell(mysql_cmd)
-    myPass(False, pwd)
-    # print(rdata)
-    if ext != 'sql':
+    if ext != 'sql' and os.path.exists(import_sql):
         os.remove(import_sql)
 
     if rdata[1].lower().find('error') > -1:
@@ -790,9 +791,9 @@ def importDbExternalProgress():
     file = args['file']
     name = args['name']
 
-    cmd = 'cd '+mw.getServerDir()+'/mdserver-web && . bin/activate && '
-    cmd += 'python3 '+mw.getServerDir()+'/mdserver-web/plugins/mysql/index.py import_db_external_progress_bar  {"file":"'+file+'","name":"'+name+'"}'
-    return mw.returnJson(True, 'ok',cmd)
+    cmd = 'cd ' + mw.getPanelDir() + ' && . bin/activate && '
+    cmd += 'python3 ' + mw.getPanelDir() + '/plugins/postgresql/index.py import_db_external_progress_bar {"file":"' + file + '","name":"' + name + '"}'
+    return mw.returnJson(True, 'ok', cmd)
 
 def importDbExternalProgressBar():
     args = getArgs()
@@ -803,7 +804,7 @@ def importDbExternalProgressBar():
     file = args['file']
     name = args['name']
 
-    import_dir = mw.getFatherDir() + '/backup/import/'
+    import_dir = mw.getBackupDir() + '/import/'
 
     file_path = import_dir + file
     if not os.path.exists(file_path):
@@ -845,15 +846,23 @@ def importDbExternalProgressBar():
     if import_sql == "":
         return mw.returnJson(False, '未找SQL文件')
 
-    pwd = pSqliteDb('config').where('id=?', (1,)).getField('mysql_root')
-    sock = getSocketFile()
+    psql = getServerDir() + '/bin/psql'
+    if not os.path.exists(psql):
+        psql = 'psql'
+    port = getPgPort()
 
-    my_cnf = getConf()
-    mysql_cmd = getServerDir() + '/bin/mysql --defaults-file=' + my_cnf + \
-        ' -uroot -p"' + pwd + '" -f ' + name
-    mysql_cmd_progress_bar = "pv -t -p " + import_sql + '|'+ mysql_cmd
-    print(mysql_cmd_progress_bar)
-    rdata = os.system(mysql_cmd_progress_bar)
+    if mw.isAppleSystem():
+        psql_cmd = '{} -d {} -p {}'.format(psql, name, port)
+    else:
+        psql_cmd = 'su - postgres -c "{} -d {} -p {}"'.format(
+            psql, name, port)
+
+    cmd = 'pv -t -p "{}" | {}'.format(import_sql, psql_cmd)
+    print(cmd)
+    os.system(cmd)
+
+    if ext != 'sql' and os.path.exists(import_sql):
+        os.remove(import_sql)
     return ""
 
 def importDbBackupProgress():
