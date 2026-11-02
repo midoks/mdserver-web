@@ -517,6 +517,14 @@ mw_connect_mysql(){
         DB_TYPE["mysql-community"]="mysql-community"
     fi
 
+    if [ -d "${ROOT_PATH}/postgresql" ];then
+        DB_TYPE["postgresql"]="postgresql"
+    fi
+
+    if [ -d "${ROOT_PATH}/mongodb" ];then
+        DB_TYPE["mongodb"]="mongodb"
+    fi
+
     SOURCE_LIST_KEY_SORT_TMP=$(echo ${!DB_TYPE[@]} | tr ' ' '\n' | sort -n)
     SOURCE_LIST_KEY=(${SOURCE_LIST_KEY_SORT_TMP//'\n'/})
     SOURCE_LIST_LEN=${#DB_TYPE[*]}
@@ -572,6 +580,18 @@ mw_connect_mysql(){
 
     if [ "$CHOICE_DB" == "mysql-yum" ];then
         ${ROOT_PATH}/mysql-yum/bin/usr/bin/mysql -S ${ROOT_PATH}/mysql-yum/mysql.sock -uroot -p"${pwd}"
+    fi
+
+    if [ "$CHOICE_DB" == "mysql-yum" ];then
+        ${ROOT_PATH}/mysql-yum/bin/usr/bin/mysql -S ${ROOT_PATH}/mysql-yum/mysql.sock -uroot -p"${pwd}"
+    fi
+
+    if [ "$CHOICE_DB" == "postgresql" ];then
+        mw_connect_pgdb
+    fi
+
+    if [ "$CHOICE_DB" == "mongodb" ];then
+        mw_mongodb
     fi
 }
 
