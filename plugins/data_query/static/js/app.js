@@ -2009,6 +2009,16 @@ function redisBatchClear(){
 
 // ------------------------- postgresql start -------------------------------
 var pg_timer = null;
+var pg_last_error = '';
+
+function pgToastError(msg){
+    // 轮询失败时避免每 2 秒重复弹出相同的提示
+    if (!msg || pg_last_error == msg){
+        return;
+    }
+    pg_last_error = msg;
+    layer.msg(msg,{icon:7,time:2500});
+}
 
 function pgHtml(v){
     if (v === null || v === undefined){
@@ -2031,6 +2041,17 @@ function pgGetTableName(){
         return '';
     }
     return table;
+}
+
+function pgShowNotice(title, msg){
+    layer.open({
+        type: 1,
+        title: title,
+        area: ['560px', '260px'],
+        closeBtn: 1,
+        shadeClose: false,
+        content: '<div class="bt-form pd20"><pre style="white-space:pre-wrap;word-break:break-all;margin:0;line-height:1.8;">'+pgHtml(msg)+'</pre></div>'
+    });
 }
 
 function pgModalTable(title, list, width, height){
@@ -2084,21 +2105,24 @@ function pgInitField(f, data){
 }
 
 function initTabPostgresql(){
+    clearInterval(pg_timer);
+    pg_last_error = '';
+
     pgGetServerList(function(){
         pgGetDbList();
         pgProcessList();
+
+        clearInterval(pg_timer);
+        pg_timer = setInterval(function(){
+            var name = $('#postgresql_list_tab .tab-nav span.on').data('name');
+            pgRunPgTab(name);
+
+            var fname = $('#cutTab .tabs-item.active').data('name');
+            if (fname != 'postgresql'){
+                clearInterval(pg_timer);
+            }
+        }, 2000);
     });
-
-    clearInterval(pg_timer);
-    pg_timer = setInterval(function(){
-        var name = $('#postgresql_list_tab .tab-nav span.on').data('name');
-        pgRunPgTab(name);
-
-        var fname = $('#cutTab .tab-list .active').data('name');
-        if (fname != 'postgresql'){
-            clearInterval(pg_timer);
-        }
-    }, 2000);
 
     $('#postgresql_list_tab .tab-nav span').unbind('click').click(function(){
         $('#postgresql_list_tab .tab-nav span').removeClass('on');
@@ -2324,9 +2348,10 @@ function pgProcessList(){
     pgPostCBN('get_proccess_list',{'sid':pgGetSid()}, function(rdata){
         var data = rdata.data;
         if (!data.status){
-            layer.msg(data.msg,{icon:7,time:2500});
+            pgToastError(data.msg);
             return;
         }
+        pg_last_error = '';
         pgRenderOtTable(data.data['list']);
     });
 }
@@ -2335,9 +2360,10 @@ function pgStatusList(){
     pgPostCBN('get_status_list',{'sid':pgGetSid()}, function(rdata){
         var data = rdata.data;
         if (!data.status){
-            layer.msg(data.msg,{icon:7,time:2500});
+            pgToastError(data.msg);
             return;
         }
+        pg_last_error = '';
         pgRenderOtTable(data.data['list']);
     });
 }
@@ -2346,9 +2372,10 @@ function pgStatsList(){
     pgPostCBN('get_stats_list',{'sid':pgGetSid()}, function(rdata){
         var data = rdata.data;
         if (!data.status){
-            layer.msg(data.msg,{icon:7,time:2500});
+            pgToastError(data.msg);
             return;
         }
+        pg_last_error = '';
         pgRenderOtTable(data.data['list']);
     });
 }
@@ -2391,7 +2418,7 @@ function pgCommonFuncTopN(){
     pgPostCBN('get_topn_list',{'sid':pgGetSid()}, function(rdata){
         var data = rdata.data;
         if (!data.status){
-            layer.msg(data.msg,{icon:7,time:4000});
+            pgShowNotice('查询执行次数最频繁的前N条SQL语句', data.msg);
             return;
         }
         pgModalTable('查询执行次数最频繁的前N条SQL语句', data.data, '1000px', '450px');

@@ -277,14 +277,21 @@ def get_data_list(args):
         return err
 
     try:
-        sql = 'select count(*) as num from ' + quoteTable(table) + where_sql
-        count_row = client.one(sql, tuple(where_params))
-        count = int(count_row['num'])
+        try:
+            sql = 'select count(*) as num from ' + quoteTable(table) + where_sql
+            count_row = client.one(sql, tuple(where_params))
+            count = int(count_row['num'])
 
-        sql = 'select * from ' + quoteTable(table) + where_sql + ' limit %s offset %s'
-        params = tuple(where_params) + (size, start_index)
-        rows = client.query(sql, params)
-        rows = fmtRows(rows)
+            sql = 'select * from ' + quoteTable(table) + where_sql + ' limit %s offset %s'
+            params = tuple(where_params) + (size, start_index)
+            rows = client.query(sql, params)
+            rows = fmtRows(rows)
+        except psycopg2.errors.UndefinedTable:
+            return mw.returnData(False, '数据表不存在：' + table)
+        except psycopg2.errors.UndefinedColumn:
+            return mw.returnData(False, '字段不存在，请刷新后重试')
+        except psycopg2.Error as e:
+            return mw.returnData(False, '查询失败：' + str(e).strip())
 
         page_args = {}
         page_args['count'] = count
@@ -437,12 +444,25 @@ def get_topn_list(args):
         return err
 
     try:
+        avail = client.one("""
+            select default_version, installed_version
+            from pg_available_extensions
+            where name = 'pg_stat_statements'
+        """)
+        if avail is None:
+            return mw.returnData(False, '当前 PostgreSQL 未提供 pg_stat_statements 扩展（缺少 contrib 模块），无法使用该功能。')
+
         ext = client.one("select to_regclass('pg_stat_statements') as v")
         if ext is None or ext['v'] is None:
-            msg = "pg_stat_statements 扩展未安装。\n"
-            msg += "1. 在 postgresql.conf 添加 shared_preload_libraries = 'pg_stat_statements'\n"
-            msg += "2. 重启 PostgreSQL 服务\n"
-            msg += "3. 执行 CREATE EXTENSION pg_stat_statements;"
+            preload = client.one("select setting from pg_settings where name = 'shared_preload_libraries'")
+            libs = (preload or {}).get('setting', '') or ''
+            msg = "pg_stat_statements 扩展已可用，但尚未启用。\n"
+            if 'pg_stat_statements' not in libs:
+                msg += "1. 在 postgresql.conf 添加 shared_preload_libraries = 'pg_stat_statements'\n"
+                msg += "2. 重启 PostgreSQL 服务\n"
+                msg += "3. 在当前数据库执行 CREATE EXTENSION pg_stat_statements;"
+            else:
+                msg += "在当前数据库执行 CREATE EXTENSION pg_stat_statements;"
             return mw.returnData(False, msg)
 
         version_num = int(client.one('show server_version_num')['server_version_num'])
