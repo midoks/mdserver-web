@@ -103,6 +103,11 @@ class backupTools:
             name + " " + table_name + " | gzip > " + filename
         mw.execShell(cmd)
 
+        mycnf = mw.readFile(db_path + '/etc/my.cnf')
+        mycnf = mycnf.replace(subStr, sea)
+        if len(mycnf) > 100:
+            mw.writeFile(db_path + '/etc/my.cnf', mycnf)
+
         if not os.path.exists(filename):
             endDate = time.strftime('%Y/%m/%d %X', time.localtime())
             log = "数据库[" + name + "]备份失败!"
@@ -110,10 +115,6 @@ class backupTools:
             print("----------------------------------------------------------------------------")
             return
 
-        mycnf = mw.readFile(db_path + '/etc/my.cnf')
-        mycnf = mycnf.replace(subStr, sea)
-        if len(mycnf) > 100:
-            mw.writeFile(db_path + '/etc/my.cnf', mycnf)
 
         endDate = time.strftime('%Y/%m/%d %X', time.localtime())
         outTime = time.time() - startTime

@@ -62,13 +62,21 @@ def getArgs():
     args_len = len(args)
 
     if args_len == 1:
-        t = args[0].strip('{').strip('}')
-        t = t.split(':')
-        tmp[t[0]] = t[1]
+        t = args[0].strip().strip('{}').strip()
+        if t == '':
+            return tmp
+        arg_t = t.split(',')
+        for i in range(len(arg_t)):
+            kv = arg_t[i].split(':', 1)
+            if len(kv) < 2:
+                continue
+            tmp[kv[0].strip().strip('"\'')] = kv[1].strip().strip('"\'')
     elif args_len > 1:
         for i in range(len(args)):
-            t = args[i].split(':')
-            tmp[t[0]] = t[1]
+            kv = args[i].strip().strip('{}').split(':', 1)
+            if len(kv) < 2:
+                continue
+            tmp[kv[0].strip().strip('"\'')] = kv[1].strip().strip('"\'')
 
     return tmp
 
@@ -126,16 +134,13 @@ def getDbPort():
 
 
 def getSocketFile():
-    # sock_name = '.s.PGSQL.' + getDbPort()
-    sock_name = ""
-    sock_tmp = '/tmp/' + sock_name
-    if os.path.exists(sock_tmp):
-        return sock_tmp
-
-    sock_app = getServerDir() + "/" + sock_name
-    if os.path.exists(sock_app):
-        return sock_app
-    return sock_app
+    # libpq 中 host 以 / 开头时按 socket 目录处理，会自动查找 .s.PGSQL.<port>
+    sock_name = '.s.PGSQL.' + getDbPort()
+    for sock_dir in ['/tmp', getServerDir()]:
+        if os.path.exists(sock_dir + '/' + sock_name):
+            return sock_dir
+    # 未找到 socket，返回空字符串让 ORM 走 TCP
+    return ""
 
 
 def getInitdTpl(version=''):
@@ -695,15 +700,16 @@ def setDbBackup():
     if not data[0]:
         return data[1]
 
-    scDir = getPluginDir() + '/scripts/backup.py'
-    cmd = 'python3 ' + scDir + ' database ' + args['name'] + ' 3'
+    scDir = mw.getPanelDir() + '/scripts/backup.py'
+    head = "cd "+mw.getPanelDir()
+    cmd = head +' && . bin/activate &&  python3 plugins/postgresql/scripts/backup.py database ' + args['name'] + ' 3'
     os.system(cmd)
     return mw.returnJson(True, 'ok')
 
 def rootPwd():
     return pSqliteDb('config').where('id=?', (1,)).getField('pg_root')
 
-def importDbBackup():
+def importDbExternal():
     args = getArgs()
     data = checkArgs(args, ['file', 'name'])
     if not data[0]:
@@ -712,21 +718,197 @@ def importDbBackup():
     file = args['file']
     name = args['name']
 
-    file_path = getBackupDir() + '/' + file
-    file_path_sql = getBackupDir() + '/' + file.replace('.gz', '')
+    import_dir = getImportDir() + '/'
 
-    if not os.path.exists(file_path_sql):
-        cmd = 'cd ' + getBackupDir() + ' && gzip -d ' + file
+    file_path = import_dir + file
+    if not os.path.exists(file_path):
+        return mw.returnJson(False, '文件突然消失?')
+
+    exts = ['sql', 'gz', 'zip']
+    ext = mw.getFileSuffix(file)
+    if ext not in exts:
+        return mw.returnJson(False, '导入数据库格式不对!')
+
+    tmp = file.split('/')
+    tmpFile = tmp[len(tmp) - 1]
+    tmpFile = tmpFile.replace('.sql.' + ext, '.sql')
+    tmpFile = tmpFile.replace('.' + ext, '.sql')
+    tmpFile = tmpFile.replace('tar.', '')
+
+    # print(tmpFile)
+    import_sql = ""
+    if file.find("sql.gz") > -1:
+        cmd = 'cd ' + import_dir + ' && gzip -dc ' + \
+            file + " > " + import_dir + tmpFile
+        info = mw.execShell(cmd)
+        if info[1] == "":
+            import_sql = import_dir + tmpFile
+
+    if file.find(".zip") > -1:
+        cmd = 'cd ' + import_dir + ' && unzip -o ' + file
         mw.execShell(cmd)
+        import_sql = import_dir + tmpFile
 
-    pwd = pSqliteDb('config').where('id=?', (1,)).getField('pg_root')
+    if file.find("tar.gz") > -1:
+        cmd = 'cd ' + import_dir + ' && tar -zxvf ' + file
+        mw.execShell(cmd)
+        import_sql = import_dir + tmpFile
 
-    mysql_cmd = mw.getFatherDir() + '/server/mysql/bin/mysql -uroot -p' + pwd + ' ' + name + ' < ' + file_path_sql
+    if file.find(".sql") > -1 and file.find(".sql.gz") == -1:
+        import_sql = import_dir + file
 
-    # print(mysql_cmd)
-    os.system(mysql_cmd)
+    if import_sql == "":
+        return mw.returnJson(False, '未找SQL文件')
+
+    psql = getServerDir() + '/bin/psql'
+    if not os.path.exists(psql):
+        psql = 'psql'
+    port = getPgPort()
+
+    psql_cmd = '{} -U postgres -d {} -p {}'.format(psql, name, port)
+    if not mw.isAppleSystem():
+        psql_cmd = 'su - postgres -c "{}"'.format(psql_cmd)
+
+    cmd = '{} < "{}"'.format(psql_cmd, import_sql)
+    rdata = mw.execShell(cmd)
+
+    if ext != 'sql' and os.path.exists(import_sql):
+        os.remove(import_sql)
+
+    if rdata[1].lower().find('error') > -1:
+        return mw.returnJson(False, rdata[1])
+
     return mw.returnJson(True, 'ok')
 
+def importDbExternalProgress():
+    args = getArgs()
+    data = checkArgs(args, ['file', 'name'])
+    if not data[0]:
+        return data[1]
+
+    file = args['file']
+    name = args['name']
+
+    cmd = 'cd ' + mw.getPanelDir() + ' && . bin/activate && '
+    cmd += 'python3 ' + mw.getPanelDir() + '/plugins/postgresql/index.py import_db_external_progress_bar {"file":"' + file + '","name":"' + name + '"}'
+    return mw.returnJson(True, 'ok', cmd)
+
+def importDbExternalProgressBar():
+    args = getArgs()
+    data = checkArgs(args, ['file', 'name'])
+    if not data[0]:
+        return data[1]
+
+    file = args['file']
+    name = args['name']
+
+    import_dir = getImportDir() + '/'
+
+    file_path = import_dir + file
+    if not os.path.exists(file_path):
+        return mw.returnJson(False, '文件突然消失?')
+
+    exts = ['sql', 'gz', 'zip']
+    ext = mw.getFileSuffix(file)
+    if ext not in exts:
+        return mw.returnJson(False, '导入数据库格式不对!')
+
+    tmp = file.split('/')
+    tmpFile = tmp[len(tmp) - 1]
+    tmpFile = tmpFile.replace('.sql.' + ext, '.sql')
+    tmpFile = tmpFile.replace('.' + ext, '.sql')
+    tmpFile = tmpFile.replace('tar.', '')
+
+    # print(tmpFile)
+    import_sql = ""
+    if file.find("sql.gz") > -1:
+        cmd = 'cd ' + import_dir + ' && gzip -dc ' + \
+            file + " > " + import_dir + tmpFile
+        info = mw.execShell(cmd)
+        if info[1] == "":
+            import_sql = import_dir + tmpFile
+
+    if file.find(".zip") > -1:
+        cmd = 'cd ' + import_dir + ' && unzip -o ' + file
+        mw.execShell(cmd)
+        import_sql = import_dir + tmpFile
+
+    if file.find("tar.gz") > -1:
+        cmd = 'cd ' + import_dir + ' && tar -zxvf ' + file
+        mw.execShell(cmd)
+        import_sql = import_dir + tmpFile
+
+    if file.find(".sql") > -1 and file.find(".sql.gz") == -1:
+        import_sql = import_dir + file
+
+    if import_sql == "":
+        return mw.returnJson(False, '未找SQL文件')
+
+    psql = getServerDir() + '/bin/psql'
+    if not os.path.exists(psql):
+        psql = 'psql'
+    port = getPgPort()
+
+    psql_cmd = '{} -U postgres -d {} -p {}'.format(psql, name, port)
+    if not mw.isAppleSystem():
+        psql_cmd = 'su - postgres -c "{}"'.format(psql_cmd)
+
+    cmd = 'pv -t -p "{}" | {}'.format(import_sql, psql_cmd)
+    print(cmd)
+    os.system(cmd)
+
+    if ext != 'sql' and os.path.exists(import_sql):
+        os.remove(import_sql)
+    return ""
+
+def importDbBackupProgress():
+    args = getArgs()
+    data = checkArgs(args, ['file', 'name'])
+    if not data[0]:
+        return data[1]
+
+    file = args['file']
+    name = args['name']
+
+    cmd = 'cd ' + mw.getPanelDir() + ' && . bin/activate && '
+    cmd += 'python3 ' + mw.getPanelDir() + '/plugins/postgresql/index.py import_db_backup_progress_bar {"file":"' + file + '","name":"' + name + '"}'
+    return mw.returnJson(True, 'ok', cmd)
+
+
+def importDbBackupProgressBar():
+    args = getArgs()
+    data = checkArgs(args, ['file', 'name'])
+    if not data[0]:
+        return data[1]
+
+    file = args['file']
+    name = args['name']
+
+    bk_path_upload = getBackupDir()
+    file_path = os.path.join(bk_path_upload, file)
+    if not os.path.exists(file_path):
+        return '备份文件不存在'
+
+    file_path_sql = file_path.replace('.gz', '')
+    if not os.path.exists(file_path_sql):
+        cmd = 'cd ' + bk_path_upload + ' && gzip -dk ' + file
+        mw.execShell(cmd)
+
+    port = getPgPort()
+    psql = getServerDir() + '/bin/psql'
+    if not os.path.exists(psql):
+        psql = 'psql'
+
+    cmd = 'pv -t -p {} | su - postgres -c "{} -d {} -p {}"'.format(file_path_sql, psql, name, port)
+    if mw.isAppleSystem():
+        cmd = 'pv -t -p {} | {} -d {} -p {}'.format(file_path_sql, psql, name, port)
+       
+    print(cmd)
+    os.system(cmd)
+
+    if os.path.exists(file_path_sql):
+        os.unlink(file_path_sql)
+    return ''
 
 def deleteDbBackup():
     args = getArgs()
@@ -766,6 +948,41 @@ def getDbBackupList():
 
     return mw.returnJson(True, 'ok', rr)
 
+def getImportDir():
+    import_dir = mw.getBackupDir() + '/postgresql_import'
+    if not os.path.exists(import_dir):
+        os.makedirs(import_dir)
+    return import_dir
+
+
+def getDbBackupImportList():
+
+    bkImportDir = getImportDir()
+    blist = os.listdir(bkImportDir)
+
+    rr = []
+    for x in range(0, len(blist)):
+        name = blist[x]
+        p = bkImportDir + '/' + name
+        data = {}
+        data['name'] = name
+
+        rsize = os.path.getsize(p)
+        data['size'] = mw.toSize(rsize)
+
+        t = os.path.getctime(p)
+        t = time.localtime(t)
+
+        data['time'] = time.strftime('%Y-%m-%d %H:%M:%S', t)
+        rr.append(data)
+
+        data['file'] = p
+
+    rdata = {
+        "list": rr,
+        "upload_dir": bkImportDir,
+    }
+    return mw.returnJson(True, 'ok', rdata)
 
 def getDbList():
     args = getArgs()
@@ -1041,6 +1258,84 @@ def setDbAccess():
     psdb.where("name=?", (name,)).setField('accept', access)
     return mw.returnJson(True, "设置成功")
 
+def getDbInfo():
+    args = getArgs()
+    data = checkArgs(args, ['name'])
+    if not data[0]:
+        return data[1]
+
+    db_name = args['name']
+    pdb = pgDb()
+    pdb.setDatabase(db_name)
+
+    sql = """select n.nspname, c.relname, c.relkind,
+                    greatest(c.reltuples, 0)::bigint,
+                    pg_relation_size(c.oid),
+                    pg_indexes_size(c.oid),
+                    pg_total_relation_size(c.oid)
+             from pg_class c
+             join pg_namespace n on n.oid = c.relnamespace
+             where c.relkind in ('r', 'p')
+               and n.nspname not in ('pg_catalog', 'information_schema')
+             order by n.nspname, c.relname"""
+    try:
+        tables = pdb.query(sql)
+    except Exception as e:
+        return mw.returnJson(-1, str(e))
+
+    if isinstance(tables, Exception):
+        return mw.returnJson(-1, str(tables))
+
+    try:
+        data_sum = pdb.query('select pg_database_size(current_database())')
+    except Exception as e:
+        return mw.returnJson(-1, str(e))
+
+    if isinstance(data_sum, Exception):
+        return mw.returnJson(-1, str(data_sum))
+
+    data_size = 0
+    if len(data_sum) > 0 and data_sum[0][0] is not None:
+        data_size = data_sum[0][0]
+
+    ret = {}
+    ret['data_size'] = mw.toSize(data_size)
+    ret['database'] = db_name
+
+    kinds = {'r': 'table', 'p': 'partitioned table'}
+
+    # 一次 union all 取所有表的真实行数，避免逐表新建连接
+    count_map = {}
+    count_sql_list = []
+    for i in tables:
+        count_sql_list.append(
+            "select '{}' as schema_name, '{}' as table_name, count(*) from \"{}\".\"{}\"".format(
+                i[0].replace("'", "''"), i[1].replace("'", "''"),
+                i[0].replace('"', '""'), i[1].replace('"', '""')))
+    if count_sql_list:
+        count_data = pdb.query(' union all '.join(count_sql_list))
+        if not isinstance(count_data, Exception):
+            for row in count_data:
+                count_map[(row[0], row[1])] = row[2]
+
+    ret3 = []
+    for i in tables:
+        tmp = {}
+        tmp['schema'] = i[0]
+        tmp['table_name'] = i[1]
+        tmp['type'] = kinds.get(i[2], i[2])
+        tmp['rows_count'] = count_map.get((i[0], i[1]), i[3])
+        tmp['data_byte'] = i[4]
+        tmp['index_byte'] = i[5]
+        tmp['total_byte'] = i[6]
+        tmp['data_size'] = mw.toSize(i[4])
+        tmp['index_size'] = mw.toSize(i[5])
+        tmp['total_size'] = mw.toSize(i[6])
+        ret3.append(tmp)
+
+    ret['tables'] = ret3
+
+    return mw.getJson(ret)
 
 def pgBack():
     # 备份数据库
@@ -1058,13 +1353,23 @@ def pgBack():
     if not os.path.exists(pg_dump):
         pg_dump = 'pg_dump'
 
-    if mw.isAppleSystem():
-        cmd = '''{} -c {} -p {} | gzip > {}/{}_{}.gz '''.format(
-            pg_dump, database, port, bk_path_upload, database, time.strftime("%Y%m%d_%H%M%S"))
-    else:
-        cmd = '''su - postgres -c "{} -c {} -p {}" | gzip > {}/{}_{}.gz '''.format(
-            pg_dump, database, port, bk_path_upload, database, time.strftime("%Y%m%d_%H%M%S"))
-    mw.execShell(cmd)
+    file_name = 'db_{}_{}.sql.gz'.format(
+        database, time.strftime("%Y%m%d_%H%M%S"))
+    file_path = os.path.join(bk_path_upload, file_name)
+
+    # -c --if-exists: 导出带 DROP 语句便于覆盖恢复，且对象不存在时不报错
+    cmd = '''{} -c --if-exists -U postgres -d {} -p {} | gzip > "{}"'''.format(
+        pg_dump, database, port, file_path)
+    if not mw.isAppleSystem():
+        cmd = '''su - postgres -c "{} -c --if-exists -U postgres -d {} -p {}" | gzip > "{}"'''.format(
+            pg_dump, database, port, file_path)
+
+    # print(cmd)
+    rdata = mw.execShell(cmd)
+
+    # gzip 会掩盖 pg_dump 的失败，需检查错误输出和文件大小
+    if rdata[1].lower().find('error') > -1 or not os.path.exists(file_path) or os.path.getsize(file_path) < 100:
+        return mw.returnJson(False, rdata[1] or '备份失败，未导出数据')
 
     return mw.returnJson(True, '备份成功!')
 
@@ -1076,13 +1381,14 @@ def pgBackList():
     if not data[0]:
         return data[1]
 
-    database = args['name']
+    database = "db_"+args['name']
 
     bk_path_upload = getBackupDir()
     file_list = os.listdir(bk_path_upload)
     data = []
     for i in file_list:
-        if i.split("_")[0].startswith(database):
+
+        if i.startswith(database):
             file_path = os.path.join(bk_path_upload, i)
             file_info = os.stat(file_path)
             create_time = file_info.st_ctime
@@ -1092,7 +1398,7 @@ def pgBackList():
             file_size = mw.toSize(file_size)
             data.append({"name": i, "time": create_time,
                          "size": file_size, "file": file_path})
-
+    data.sort(key=lambda x: x['name'], reverse=True)
     return mw.returnJson(True, 'ok', data)
 
 
@@ -1117,15 +1423,18 @@ def importDbBackup():
         psql = 'psql'
 
     if mw.isAppleSystem():
-        cmd = '''gunzip -c {} | {} -d {} -p {}'''.format(
+        cmd = '''gunzip -c "{}" | {} -U postgres -d {} -p {}'''.format(
             file_path, psql, name, port)
     else:
-        cmd = '''gunzip -c {} | su - postgres -c "{} -d {} -p {}"'''.format(
+        cmd = '''gunzip -c "{}" | su - postgres -c "{} -U postgres -d {} -p {}"'''.format(
             file_path, psql, name, port)
 
     # print(cmd)
 
-    mw.execShell(cmd)
+    rdata = mw.execShell(cmd)
+    if rdata[1].lower().find('error') > -1:
+        return mw.returnJson(False, rdata[1])
+
     return mw.returnJson(True, '恢复数据库成功')
 
 
@@ -1647,14 +1956,30 @@ if __name__ == "__main__":
         print(getDbAccess())
     elif func == 'set_db_access':
         print(setDbAccess())
+    elif func == 'get_db_info':
+        print(getDbInfo())
     elif func == 'pg_back':
         print(pgBack())
     elif func == 'pg_back_list':
         print(pgBackList())
     elif func == 'import_db_backup':
         print(importDbBackup())
+    elif func == 'import_db_backup_progress':
+        print(importDbBackupProgress())
+    elif func == 'import_db_backup_progress_bar':
+        print(importDbBackupProgressBar())
+    elif func == 'import_db_external':
+        print(importDbExternal())
+    elif func == 'import_db_external_progress':
+        print(importDbExternalProgress())
+    elif func == 'import_db_external_progress_bar':
+        print(importDbExternalProgressBar())
     elif func == 'delete_db_backup':
         print(deleteDbBackup())
+    elif func == 'get_db_backup_list':
+        print(getDbBackupList())
+    elif func == 'get_db_backup_import_list':
+        print(getDbBackupImportList())
     elif func == 'sync_get_databases':
         print(syncGetDatabases())
     elif func == 'add_slave_ssh':

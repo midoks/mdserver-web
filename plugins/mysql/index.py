@@ -867,11 +867,16 @@ def runInfo(version):
 
     # print(result, int(result['Uptime']))
     result['Run'] = int(time.time()) - int(result['Uptime'])
-    tmp = db.query('show master status')
+
+    # MySQL 8.2 起 SHOW MASTER STATUS 弃用，8.4 已移除，改用 SHOW BINARY LOG STATUS
+    master_cmd = 'show master status'
+    if pk_version.parse(version) >= pk_version.parse('8.2'):
+        master_cmd = 'show binary log status'
     try:
+        tmp = db.query(master_cmd)
         result['File'] = tmp[0]["File"]
         result['Position'] = tmp[0]["Position"]
-    except:
+    except Exception:
         result['File'] = 'OFF'
         result['Position'] = 'OFF'
     return mw.getJson(result)
@@ -981,7 +986,7 @@ def __createUser(dbname, username, password, address):
 
 
 def getDbBackupListFunc(dbname=''):
-    bkDir = mw.getBackupDir() + '/database'
+    bkDir = mw.getBackupDir() + '/database/mysql'
     if not os.path.exists(bkDir):
         mw.execShell('mkdir -p ' + bkDir)
 
@@ -1004,7 +1009,8 @@ def setDbBackup():
         return data[1]
 
     scDir = mw.getPanelDir() + '/scripts/backup.py'
-    cmd = 'python3 ' + scDir + ' database ' + args['name'] + ' 3'
+    head = "cd "+mw.getPanelDir()
+    cmd = head +' && . bin/activate &&  python3 scripts/backup.py database ' + args['name'] + ' 3'
     os.system(cmd)
     return mw.returnJson(True, 'ok')
 
@@ -1012,8 +1018,13 @@ def setDbBackup():
 # 数据库密码处理
 def myPass(act, root):
     conf_file = getConf()
-    mw.execShell("sed -i '/user=root/d' {}".format(conf_file))
-    mw.execShell("sed -i '/password=/d' {}".format(conf_file))
+    mw.execShell("sed -i '_bak' '/user=root/d' {}".format(conf_file))
+    mw.execShell("sed -i '_bak' '/password=/d' {}".format(conf_file))
+
+    conf_file_bak = conf_file + '_bak'
+    if os.path.exists(conf_file_bak):
+        os.unlink(conf_file_bak)
+
     if act:
         mycnf = mw.readFile(conf_file)
         src_dump = "[mysqldump]\n"
@@ -1243,7 +1254,7 @@ def importDbBackupProgressBar():
     file_path_sql = mw.getFatherDir() + '/backup/database/' + file.replace('.gz', '')
 
     if not os.path.exists(file_path_sql):
-        cmd = 'cd ' + mw.getFatherDir() + '/backup/database && gzip -d ' + file
+        cmd = 'cd ' + mw.getFatherDir() + '/backup/database && gzip -dk ' + file
         mw.execShell(cmd)
 
     local_mode = recognizeDbMode()
@@ -1270,7 +1281,7 @@ def deleteDbBackup():
 
     path = args['path']
     full_file = ""
-    bkDir = mw.getFatherDir() + '/backup/database'
+    bkDir = mw.getFatherDir() + '/backup/database/mysql'
     full_file = bkDir + '/' + args['filename']
     if path != "":
         full_file = path + "/" + args['filename']
@@ -1285,7 +1296,7 @@ def getDbBackupList():
         return data[1]
 
     r = getDbBackupListFunc(args['name'])
-    bkDir = mw.getFatherDir() + '/backup/database'
+    bkDir = mw.getFatherDir() + '/backup/database/mysql'
     rr = []
     for x in range(0, len(r)):
         p = bkDir + '/' + r[x]
@@ -2618,7 +2629,7 @@ def getMasterRepSlaveUserCmd(version):
     db = pMysqlDb()
 
     cmd_status = "show master status"
-    if pk_version.parse(version) > pk_version.parse("8.0"):
+    if pk_version.parse(version) >= pk_version.parse("8.2"):
         cmd_status = "SHOW BINARY LOG STATUS"
     mstatus = db.query(cmd_status)
     if len(mstatus) == 0:

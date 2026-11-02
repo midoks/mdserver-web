@@ -285,6 +285,69 @@ function setDbRw(id,username,val){
     });
 }
 
+function repTools(db_name, res){
+    myPost('get_db_info', {name:db_name}, function(data){
+        var rdata = $.parseJSON(data.data);
+        var tbody = '';
+        for (var i = 0; i < rdata.tables.length; i++) {
+            var t = rdata.tables[i];
+            tbody += '<tr>\
+                    <td><span style="width:220px;">' + t.schema + '.' + t.table_name + '</span></td>\
+                    <td>' + t.type + '</td>\
+                    <td>' + t.rows_count + '</td>\
+                    <td>' + t.data_size + '</td>\
+                    <td>' + t.index_size + '</td>\
+                    <td>' + t.total_size + '</td>\
+                </tr>';
+        }
+        if (tbody == ''){
+            tbody = '<tr><td colspan="6" style="text-align:center;">暂无数据表</td></tr>';
+        }
+
+        if (res) {
+            $(".gztr").html(tbody);
+            $(".tools_size").html('大小：' + rdata.data_size);
+            return;
+        }
+
+        layer.open({
+            type: 1,
+            title: "PostgreSQL数据表【" + db_name + "】",
+            area: ['820px', '580px'],
+            closeBtn: 1,
+            shadeClose: false,
+            content: '<div class="pd15">\
+                            <div class="db_list">\
+                                <span><a>数据库名称：'+ db_name + '</a>\
+                                <a class="tools_size">大小：'+ rdata.data_size + '</a></span>\
+                                <span id="db_tools" style="float: right;"></span>\
+                            </div >\
+                            <div class="divtable">\
+                            <div  id="database_fix"  style="height:360px;overflow:auto;border:#ddd 1px solid">\
+                            <table class="table table-hover "style="border:none">\
+                                <thead>\
+                                    <tr>\
+                                        <th>表名(Schema.Table)</th>\
+                                        <th>类型</th>\
+                                        <th>行数</th>\
+                                        <th>数据大小</th>\
+                                        <th>索引大小</th>\
+                                        <th>合计</th>\
+                                    </tr>\
+                                </thead>\
+                                <tbody class="gztr">' + tbody + '</tbody>\
+                            </table>\
+                            </div>\
+                        </div>\
+                        <ul class="help-info-text c7">\
+                            <li>【行数】count(*) 实时统计，大表打开时可能稍慢</li>\
+                            <li>【数据/索引/合计】分别取自 pg_relation_size、pg_indexes_size、pg_total_relation_size，合计额外包含 TOAST/FSM</li>\
+                        </ul></div>'
+        });
+        tableFixed('database_fix');
+    });
+}
+
 function setDbAccess(name){
     myPost('get_db_access','name='+name, function(data){
         var rdata = $.parseJSON(data.data);
@@ -545,8 +608,8 @@ function delBackup(filename,name){
     myPost('delete_db_backup',{filename:filename},function(){
         layer.msg('执行成功!');
         setTimeout(function(){
-            $('.layui-layer-close2').click();
-            setBackup(name);
+            // $('.layui-layer-close2').click();
+            setBackupReq(name);
         },2000);
     });
 }
@@ -557,16 +620,237 @@ function downloadBackup(file){
 
 function importBackup(file,name){
     myPost('import_db_backup',{file:file,name:name}, function(data){
-        // console.log(data);
         layer.msg('执行成功!');
     });
 }
 
-function setBackup(db_name,obj){
-     myPost('pg_back_list', {name:db_name}, function(data){
-
+function importBackupProgress(file,name){
+    myPost('import_db_backup_progress',{file:file,name:name}, function(data){
         var rdata = $.parseJSON(data.data);
-        console.log(rdata);
+        layer.open({
+            title: "手动导入命令CMD【显示进度】",
+            area: ['600px', '180px'],
+            type:1,
+            closeBtn: 1,
+            shadeClose: false,
+            btn:["复制","取消"],
+            content: '<div class="pd15">\
+                        <div class="divtable">\
+                            <pre class="layui-code">'+rdata.data+'</pre>\
+                        </div>\
+                    </div>',
+            success:function(){
+                copyText(rdata.data);
+            },
+            yes:function(){
+                copyText(rdata.data);
+            }
+        });
+    });
+}
+
+function importDbExternal(file,name){
+    myPost('import_db_external',{file:file,name:name}, function(data){
+        layer.msg('执行成功!');
+    });
+}
+
+function importDbExternalProgress(file,name){
+    myPost('import_db_external_progress',{file:file,name:name}, function(data){
+        var rdata = $.parseJSON(data.data);
+        layer.open({
+            title: "手动导入命令CMD【显示进度】",
+            area: ['600px', '180px'],
+            type:1,
+            closeBtn: 1,
+            shadeClose: false,
+            btn:["复制","取消"],
+            content: '<div class="pd15">\
+                        <div class="divtable">\
+                            <pre class="layui-code">'+rdata.data+'</pre>\
+                        </div>\
+                    </div>',
+            success:function(){
+                copyText(rdata.data);
+            },
+            yes:function(){
+                copyText(rdata.data);
+            }
+        });
+    });
+}
+
+function setLocalImport(db_name){
+
+    //上传文件
+    function uploadDbFiles(upload_dir){
+        var up_db = layer.open({
+            type:1,
+            closeBtn: 1,
+            title:"上传导入文件["+upload_dir+']',
+            area: ['500px','300px'],
+            shadeClose:false,
+            content:'<div class="fileUploadDiv">\
+                    <input type="hidden" id="input-val" value="'+upload_dir+'" />\
+                    <input type="file" id="file_input"  multiple="true" autocomplete="off" />\
+                    <button type="button"  id="opt" autocomplete="off">添加文件</button>\
+                    <button type="button" id="up" autocomplete="off" >开始上传</button>\
+                    <span id="totalProgress" style="position: absolute;top: 7px;right: 147px;"></span>\
+                    <span style="float:right;margin-top: 9px;">\
+                    <font>文件编码:</font>\
+                    <select id="fileCodeing" >\
+                        <option value="byte">二进制</option>\
+                        <option value="utf-8">UTF-8</option>\
+                        <option value="gb18030">GB2312</option>\
+                    </select>\
+                    </span>\
+                    <button type="button" id="filesClose" autocomplete="off">关闭</button>\
+                    <ul id="up_box"></ul>\
+                </div>',
+            success:function(){
+                $('#filesClose').click(function(){
+                    layer.close(up_db);
+                });
+            }
+
+        });
+        uploadStart(function(){
+            getList();
+            layer.close(up_db);
+        });
+    }
+
+    function getList(){
+        myPost('get_db_backup_import_list',{}, function(data){
+            var rdata = $.parseJSON(data.data);
+
+            var file_list = rdata.data.list;
+            var upload_dir = rdata.data.upload_dir;
+
+            var tbody = '';
+            for (var i = 0; i < file_list.length; i++) {
+                tbody += '<tr>\
+                        <td><span> ' + file_list[i]['name'] + '</span></td>\
+                        <td><span> ' + file_list[i]['size'] + '</span></td>\
+                        <td><span> ' + file_list[i]['time'] + '</span></td>\
+                        <td style="text-align: right;">\
+                            <a class="btlink" onclick="importDbExternal(\'' + file_list[i]['name'] + '\',\'' +db_name+ '\')">导入</a> | \
+                            <a class="btlink" onclick="importDbExternalProgress(\'' + file_list[i]['name'] + '\',\'' +db_name+ '\')">导入进度</a> | \
+                            <a class="btlink del" index="'+i+'">删除</a>\
+                        </td>\
+                    </tr>';
+            }
+
+            $('#import_db_file_list').html(tbody);
+            $('input[name="upload_dir"]').val(upload_dir);
+
+            $("#import_db_file_list .del").on('click',function(){
+                var index = $(this).attr('index');
+                var filename = file_list[index]["name"];
+                myPost('delete_db_backup',{filename:filename,path:upload_dir},function(){
+                    showMsg('执行成功!', function(){
+                        getList();
+                    },{icon:1},2000);
+                });
+            });
+        });
+    }
+
+    var layerIndex = layer.open({
+        type: 1,
+        title: "从文件导入数据",
+        area: ['700px', '380px'],
+        closeBtn: 1,
+        shadeClose: false,
+        content: '<div class="pd15">\
+                    <div class="db_list">\
+                        <button id="btn_file_upload" class="btn btn-success btn-sm" type="button">从本地上传</button>\
+                    </div >\
+                    <div class="divtable">\
+                    <input type="hidden" name="upload_dir" value=""> \
+                    <div id="database_fix"  style="height:150px;overflow:auto;border:#ddd 1px solid">\
+                    <table class="table table-hover "style="border:none">\
+                        <thead>\
+                            <tr>\
+                                <th>文件名称</th>\
+                                <th>文件大小</th>\
+                                <th>备份时间</th>\
+                                <th style="text-align: right;">操作</th>\
+                            </tr>\
+                        </thead>\
+                        <tbody  id="import_db_file_list" class="gztr"></tbody>\
+                    </table>\
+                    </div>\
+                    <ul class="help-info-text c7">\
+                        <li>仅支持sql、zip、sql.gz、(tar.gz|gz|tgz)</li>\
+                        <li>zip、tar.gz压缩包结构：test.zip或test.tar.gz压缩包内，必需包含test.sql</li>\
+                        <li>若文件过大，您还可以使用SFTP工具，将数据库文件上传到/www/backup/import</li>\
+                    </ul>\
+                </div>\
+        </div>',
+        success:function(index){
+            $('#btn_file_upload').click(function(){
+                var upload_dir = $('input[name="upload_dir"]').val();
+                uploadDbFiles(upload_dir);
+            });
+            getList();
+        },
+    });
+}
+
+function setBackup(db_name,obj){
+    layer.open({
+        type: 1,
+        title: "数据库备份详情",
+        area: ['700px', '280px'],
+        closeBtn: 2,
+        shadeClose: false,
+        content: '<div class="pd15">\
+                    <div class="db_list">\
+                        <button id="btn_backup" class="btn btn-success btn-sm" type="button">备份</button>\
+                        <button id="btn_backup_reload" class="btn btn-success btn-sm" type="button">刷新</button>\
+                        <button id="btn_local_import" class="btn btn-success btn-sm" type="button">外部导入</button>\
+                    </div >\
+                    <div class="divtable">\
+                    <div  id="database_fix"  style="height:150px;overflow:auto;border:#ddd 1px solid">\
+                    <table id="database_table" class="table table-hover "style="border:none">\
+                        <thead>\
+                            <tr>\
+                                <th>文件名称</th>\
+                                <th>文件大小</th>\
+                                <th>备份时间</th>\
+                                <th style="text-align: right;">操作</th>\
+                            </tr>\
+                        </thead>\
+                        <tbody class="gztr"></tbody>\
+                    </table>\
+                    </div>\
+                </div>\
+        </div>',
+        success:function(index){
+            $('#btn_backup').click(function(){
+                myPost('pg_back',{name:db_name}, function(data){
+                    layer.msg('执行成功!');
+                    setBackupReq(db_name);
+                });
+            });
+
+            $('#btn_local_import').click(function(){
+                setLocalImport(db_name);
+            });
+
+            $('#btn_backup_reload').click(function(){
+                setBackupReq(db_name);
+            });
+
+            setBackupReq(db_name);
+        },
+    });
+}
+
+function setBackupReq(db_name, obj){
+     myPost('pg_back_list', {name:db_name}, function(data){
+        var rdata = $.parseJSON(data.data);
         var tbody = '';
         for (var i = 0; i < rdata.data.length; i++) {
             tbody += '<tr>\
@@ -575,50 +859,13 @@ function setBackup(db_name,obj){
                     <td><span> ' + rdata.data[i]['time'] + '</span></td>\
                     <td style="text-align: right;">\
                         <a class="btlink" onclick="importBackup(\'' + rdata.data[i]['name'] + '\',\'' +db_name+ '\')">导入</a> | \
+                        <a class="btlink" onclick="importBackupProgress(\'' + rdata.data[i]['name'] + '\',\'' +db_name+ '\')">导入进度</a> | \
                         <a class="btlink" onclick="downloadBackup(\'' + rdata.data[i]['file'] + '\')">下载</a> | \
                         <a class="btlink" onclick="delBackup(\'' + rdata.data[i]['name'] + '\',\'' +db_name+ '\')">删除</a>\
                     </td>\
                 </tr> ';
         }
-
-        var s = layer.open({
-            type: 1,
-            title: "数据库备份详情",
-            area: ['700px', '280px'],
-            closeBtn: 2,
-            shadeClose: false,
-            content: '<div class="pd15">\
-                        <div class="db_list">\
-                            <button id="btn_backup" class="btn btn-success btn-sm" type="button">备份</button>\
-                        </div >\
-                        <div class="divtable">\
-                        <div  id="database_fix"  style="height:150px;overflow:auto;border:#ddd 1px solid">\
-                        <table class="table table-hover "style="border:none">\
-                            <thead>\
-                                <tr>\
-                                    <th>文件名称</th>\
-                                    <th>文件大小</th>\
-                                    <th>备份时间</th>\
-                                    <th style="text-align: right;">操作</th>\
-                                </tr>\
-                            </thead>\
-                            <tbody class="gztr">' + tbody + '</tbody>\
-                        </table>\
-                        </div>\
-                    </div>\
-            </div>'
-        });
-
-        $('#btn_backup').click(function(){
-            myPost('pg_back',{name:db_name}, function(data){
-                layer.msg('执行成功!');
-
-                setTimeout(function(){
-                    layer.close(s);
-                    setBackup(db_name,obj);
-                },2000);
-            });
-        });
+        $('#database_table tbody').html(tbody);
     });
 }
 
@@ -671,7 +918,7 @@ function dbList(page, search){
                 rw = '<a href="javascript:;" class="btlink" onclick="setDbRw(\''+rdata.data[i]['id']+'\',\''+rdata.data[i]['name']+'\',\''+rw_change+'\')" title="设置读写">'+rw_val+'</a> | ';
             }
 
-
+            list +=  '<a href="javascript:;" class="btlink" onclick="repTools(\''+rdata.data[i]['name']+'\')" title="数据表信息">工具</a> | '
             list += '<a href="javascript:;" class="btlink" onclick="setDbAccess(\''+rdata.data[i]['name']+'\')" title="设置数据库权限">权限</a> | ' +
                         rw +
                         '<a href="javascript:;" class="btlink" onclick="setDbPass('+rdata.data[i]['id']+',\''+ rdata.data[i]['username'] +'\',\'' + rdata.data[i]['password'] + '\')">改密</a> | ' +

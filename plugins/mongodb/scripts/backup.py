@@ -176,7 +176,7 @@ class backupTools:
             print("----------------------------------------------------------------------------")
             return
 
-        backup_path = mw.getBackupDir() + '/database'
+        backup_path = mw.getBackupDir() + '/database/mongodb'
         if not os.path.exists(backup_path):
             mw.execShell("mkdir -p " + backup_path)
 

@@ -769,8 +769,9 @@ def setDbBackup():
     if not data[0]:
         return data[1]
 
-    scDir = getPluginDir() + '/scripts/backup.py'
-    cmd = 'python3 ' + scDir + ' database ' + args['name'] + ' 3'
+    scDir = mw.getPanelDir() + '/scripts/backup.py'
+    head = "cd "+mw.getPanelDir()
+    cmd = head +' && . bin/activate &&  python3 plugins/mariadb/scripts/backup.py database ' + args['name'] + ' 3'
     os.system(cmd)
     return mw.returnJson(True, 'ok')
 
@@ -826,7 +827,7 @@ def importDbBackupProgressBar():
     file_path_sql = mw.getFatherDir() + '/backup/database/mariadb/' + file.replace('.gz', '')
 
     if not os.path.exists(file_path_sql):
-        cmd = 'cd ' + mw.getFatherDir() + '/backup/database/mariadb && gzip -d ' + file
+        cmd = 'cd ' + mw.getFatherDir() + '/backup/database/mariadb && gzip -dk ' + file
         mw.execShell(cmd)
 
     local_mode = recognizeDbMode()

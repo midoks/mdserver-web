@@ -8,10 +8,9 @@ import os
 import re
 import time
 
-if sys.platform != 'darwin':
-    os.chdir('/www/server/mdserver-web')
-
-web_dir = os.getcwd() + "/web"
+# 按脚本位置定位项目根目录:scripts -> 项目根，避免依赖调用方 cwd
+root_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+web_dir = os.path.join(root_dir, 'web')
 if os.path.exists(web_dir):
     sys.path.append(web_dir)
     os.chdir(web_dir)
@@ -100,8 +99,13 @@ class backupTools:
      # 数据库密码处理
     def mypass(self, act, root):
         conf_file = self.getConf('mysql')
-        mw.execShell("sed -i '/user=root/d' {}".format(conf_file))
-        mw.execShell("sed -i '/password=/d' {}".format(conf_file))
+        mw.execShell("sed -i '_bak' '/user=root/d' {}".format(conf_file))
+        mw.execShell("sed -i '_bak' '/password=/d' {}".format(conf_file))
+
+        conf_file_bak = conf_file+'_bak'
+        if os.path.exists(conf_file_bak):
+            os.unlink(conf_file_bak)
+
         if act:
             mycnf = mw.readFile(conf_file)
             src_dump = "[mysqldump]\n"
@@ -159,7 +163,7 @@ class backupTools:
             print("----------------------------------------------------------------------------")
             return
 
-        backup_path = mw.getBackupDir() + '/database'
+        backup_path = mw.getBackupDir() + '/database/mysql'
         if not os.path.exists(backup_path):
             mw.execShell("mkdir -p " + backup_path)
 
@@ -171,6 +175,9 @@ class backupTools:
 
         my_cnf = self.getConf('mysql')
         self.mypass(True, mysql_root)
+        # print("mysql_root:",mysql_root)
+        # cnf_content = mw.readFile(my_cnf)
+        # print(cnf_content)
 
         # mw.execShell(db_path + "/bin/mysqldump --opt --default-character-set=utf8 " +
         #              name + " | gzip > " + filename)
@@ -181,10 +188,12 @@ class backupTools:
         # 开启一致性事务 会lock表
         # cmd = db_path + "/bin/mysqldump --defaults-file=" + my_cnf + "  --force --opt --default-character-set=utf8 " + \
         #     name + " | gzip > " + filename
-        option = ''
-        mode = self.recognizeDbMode('mysql')
-        if mode == 'gtid':
-            option = ' --set-gtid-purged=off '
+
+        option = ' --set-gtid-purged=off '
+        # option = ''
+        # mode = self.recognizeDbMode('mysql')
+        # if mode == 'gtid':
+        #     option = ' --set-gtid-purged=off '
 
         # skip-opt 不会lock表
         # --skip-opt --create-options
@@ -194,7 +203,12 @@ class backupTools:
         if table_name != '':
             cmd = db_path + "/bin/mysqldump --defaults-file=" + my_cnf +" " + option +" --single-transaction -q --default-character-set=utf8mb4 " + \
             name +" "+ table_name +" | gzip > " + filename
-        mw.execShell(cmd)
+
+        # print(cmd)
+        os.system(cmd)
+        # mw.execShell(cmd)
+
+        self.mypass(False, mysql_root)
 
         if not os.path.exists(filename):
             endDate = time.strftime('%Y/%m/%d %X', time.localtime())
@@ -202,8 +216,6 @@ class backupTools:
             print("★[" + endDate + "] " + log)
             print("----------------------------------------------------------------------------")
             return
-
-        self.mypass(False, mysql_root)
 
         endDate = time.strftime('%Y/%m/%d %X', time.localtime())
         outTime = time.time() - startTime
