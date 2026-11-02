@@ -127,6 +127,7 @@ class nosqlMongodb():
     __DB_HOST = '127.0.0.1'
     __DB_CONN = None
     __DB_ERR = None
+    __DB_STATUS = None
 
     __DB_LOCAL = None
 
@@ -138,20 +139,24 @@ class nosqlMongodb():
 
         if self.__DB_HOST in ['127.0.0.1', 'localhost']:
             mgdb_path = "{}/mongodb".format(mw.getServerDir())
-            if not os.path.exists(mgdb_path): return False
+            if not os.path.exists(mgdb_path):
+                self.__DB_STATUS = 'not_installed'
+                return False
 
         if not self.__DB_LOCAL:
+            if not self.__config:
+                self.__DB_STATUS = 'not_installed'
+                return False
             self.__DB_PORT = int(self.__config['port'])
 
         auth = getConfAuth()
         port = getConfPort()
         mg_root = pSqliteDb('config').where('id=?', (1,)).getField('mg_root')
-        print(auth,self.__DB_HOST,port, self.__DB_PASS)
         try:
             if auth == 'disabled':
-                self.__DB_CONN = pymongo.MongoClient(host=self.__DB_HOST, port=port, directConnection=True)
+                self.__DB_CONN = pymongo.MongoClient(host=self.__DB_HOST, port=port, directConnection=True, serverSelectionTimeoutMS=3000)
             else:
-                self.__DB_CONN = pymongo.MongoClient(host=self.__DB_HOST, port=port, directConnection=True, username='root',password=mg_root)
+                self.__DB_CONN = pymongo.MongoClient(host=self.__DB_HOST, port=port, directConnection=True, username='root',password=mg_root, serverSelectionTimeoutMS=3000)
             self.__DB_CONN.admin.command('ping')
             # 节点处于 recovering/startup 时 ping 仍会成功，但读写会抛 NotPrimaryError
             try:
@@ -162,13 +167,22 @@ class nosqlMongodb():
             if not (hello.get('isWritablePrimary') or hello.get('ismaster') or hello.get('secondary')):
                 self.__DB_ERR = 'MongoDB 节点当前不是 primary 或 secondary 状态'
                 return False
+            self.__DB_STATUS = None
+            self.__DB_ERR = None
             return self.__DB_CONN
         except pymongo.errors.ConnectionFailure:
+            self.__DB_STATUS = 'not_running'
             return False
-        except Exception as e:
-            # print(e)
-            self.__DB_ERR = mw.getTracebackInfo()
+        except Exception:
+            self.__DB_STATUS = 'not_running'
         return False
+
+    # 连接状态：not_installed 未安装 / not_running 未启动 / None 正常
+    def get_status(self):
+        return self.__DB_STATUS
+
+    def get_err(self):
+        return self.__DB_ERR
 
     # 获取配置项
     def get_options(self, get=None):
@@ -211,11 +225,23 @@ class nosqlMongodbCtr():
         instance = nosqlMongodb()
         return instance
 
+    def _connect(self, sid):
+        obj = self.getInstanceBySid(sid)
+        conn = obj.mgdb_conn()
+        if conn is False:
+            if obj.get_status() == 'not_installed':
+                return None, mw.returnData(False, '未安装')
+            err = obj.get_err()
+            if err:
+                return None, mw.returnData(False, err)
+            return None, mw.returnData(False, '未启动')
+        return conn, None
+
     def getDbList(self, args):
         sid = args['sid']
-        mgdb_instance = self.getInstanceBySid(sid).mgdb_conn()
-        if mgdb_instance is False:
-            return mw.returnData(False,'无法链接')
+        mgdb_instance, err = self._connect(sid)
+        if err:
+            return err
 
         result = {}
         doc_list = mgdb_instance.list_database_names()
@@ -230,9 +256,9 @@ class nosqlMongodbCtr():
         sid = args['sid']
         name = args['name']
 
-        mgdb_instance = self.getInstanceBySid(sid).mgdb_conn()
-        if mgdb_instance is False:
-            return mw.returnData(False,'无法链接.')
+        mgdb_instance, err = self._connect(sid)
+        if err:
+            return err
 
         result = {}
         collections = mgdb_instance[name].list_collection_names()
@@ -251,9 +277,9 @@ class nosqlMongodbCtr():
         if 'size' in args:
             size = args['size']
 
-        mgdb_instance = self.getInstanceBySid(sid).mgdb_conn()
-        if mgdb_instance is False:
-            return mw.returnData(False,'无法链接')
+        mgdb_instance, err = self._connect(sid)
+        if err:
+            return err
 
         db_instance = mgdb_instance[db]
         collection_instance = db_instance[collection]
@@ -312,9 +338,9 @@ class nosqlMongodbCtr():
         db = args['db']
         collection = args['collection']
 
-        mgdb_instance = self.getInstanceBySid(sid).mgdb_conn()
-        if mgdb_instance is False:
-            return mw.returnData(False,'无法链接')
+        mgdb_instance, err = self._connect(sid)
+        if err:
+            return err
 
         db_instance = mgdb_instance[db]
         collection_instance = db_instance[collection]

@@ -32,6 +32,7 @@ class nosqlRedis():
     __DB_HOST = '127.0.0.1'
     __DB_CONN = None
     __DB_ERR = None
+    __DB_STATUS = None
 
     __DB_LOCAL = None
 
@@ -44,9 +45,13 @@ class nosqlRedis():
         if self.__DB_HOST in ['127.0.0.1', 'localhost']:
             redis_path = "{}/redis".format(mw.getServerDir())
             if not os.path.exists(redis_path):
+                self.__DB_STATUS = 'not_installed'
                 return False
 
         if not self.__DB_LOCAL:
+            if not self.__config:
+                self.__DB_STATUS = 'not_installed'
+                return False
             self.__DB_PASS = self.__config['requirepass']
             self.__DB_PORT = int(self.__config['port'])
 
@@ -55,12 +60,19 @@ class nosqlRedis():
             redis_pool = redis.ConnectionPool(host=self.__DB_HOST, port=self.__DB_PORT, password=self.__DB_PASS, db=db_idx, socket_timeout=3)
             self.__DB_CONN = redis.Redis(connection_pool=redis_pool)
             self.__DB_CONN.ping()
+            self.__DB_STATUS = None
             return self.__DB_CONN
         except redis.exceptions.ConnectionError:
+            self.__DB_STATUS = 'not_running'
             return False
         except Exception:
             self.__DB_ERR = mw.getTracebackInfo()
+        self.__DB_STATUS = 'not_running'
         return False
+
+    # 连接状态：not_installed 未安装 / not_running 未启动 / None 正常
+    def get_status(self):
+        return self.__DB_STATUS
 
     # 获取配置项
     def get_options(self, get=None):
@@ -112,12 +124,21 @@ class nosqlRedisCtr():
         instance = nosqlRedis()
         return instance
 
+    def _connect(self, sid, idx=0):
+        obj = self.getInstanceBySid(sid)
+        conn = obj.redis_conn(idx)
+        if conn is False:
+            if obj.get_status() == 'not_installed':
+                return None, mw.returnData(False, '未安装')
+            return None, mw.returnData(False, '未启动')
+        return conn, None
+
     def getList(self, args):
 
         sid = args['sid']
-        redis_instance = self.getInstanceBySid(sid).redis_conn(0)
-        if redis_instance is False:
-            return mw.returnData(False,'无法链接')
+        redis_instance, err = self._connect(sid, 0)
+        if err:
+            return err
 
 
         redis_info = redis_instance.info()
@@ -166,7 +187,9 @@ class nosqlRedisCtr():
         if 'search' in args and args['search'] != '':
             search = args['search']
 
-        redis_instance = self.getInstanceBySid(sid).redis_conn(idx)
+        redis_instance, err = self._connect(sid, idx)
+        if err:
+            return err
 
         total = redis_instance.dbsize()
 
@@ -251,7 +274,9 @@ class nosqlRedisCtr():
         val = args["val"]
         endtime = args["endtime"]
 
-        redis_instance = self.getInstanceBySid(sid).redis_conn(idx)
+        redis_instance, err = self._connect(sid, idx)
+        if err:
+            return err
 
         redis_info = redis_instance.info()
         if redis_info['role'] == 'slave':
@@ -268,7 +293,9 @@ class nosqlRedisCtr():
         sid = args['sid']
         idx = args['idx']
         name = args["name"]
-        redis_instance = self.getInstanceBySid(sid).redis_conn(idx)
+        redis_instance, err = self._connect(sid, idx)
+        if err:
+            return err
 
         redis_info = redis_instance.info()
         if redis_info['role'] == 'slave':
@@ -281,7 +308,9 @@ class nosqlRedisCtr():
         sid = args['sid']
         idx = args['idx']
         keys = args["keys"]
-        redis_instance = self.getInstanceBySid(sid).redis_conn(idx)
+        redis_instance, err = self._connect(sid, idx)
+        if err:
+            return err
 
         redis_info = redis_instance.info()
         if redis_info['role'] == 'slave':
@@ -297,7 +326,9 @@ class nosqlRedisCtr():
         idxs = args['idxs']
 
         for idx in idxs:
-            redis_instance = self.getInstanceBySid(sid).redis_conn(idx)
+            redis_instance, err = self._connect(sid, idx)
+            if err:
+                return err
 
             redis_info = redis_instance.info()
             if redis_info['role'] == 'slave':

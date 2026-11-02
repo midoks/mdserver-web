@@ -256,7 +256,7 @@ def initDreplace(version=''):
 
 def status(version=''):
     data = mw.execShell(
-        "ps -ef|grep postgres |grep -v grep | grep -v python | grep -v mdserver-web | awk '{print $2}'")
+        "ps -ef|grep bin/postgres |grep -v grep | grep -v python | grep -v mdserver-web | awk '{print $2}'")
     if data[0] == '':
         return 'stop'
     return 'start'
@@ -353,6 +353,7 @@ def pgOp(version, method):
         return 'ok'
     except Exception as e:
         # raise
+        # print(method + ":" + str(e))
         return method + ":" + str(e)
 
 

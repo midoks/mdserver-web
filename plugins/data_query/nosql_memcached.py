@@ -37,6 +37,7 @@ class nosqlMemcached():
     __DB_HOST = '127.0.0.1'
     __DB_CONN = None
     __DB_ERR = None
+    __DB_STATUS = None
 
     __DB_LOCAL = None
 
@@ -48,18 +49,35 @@ class nosqlMemcached():
 
         if self.__DB_HOST in ['127.0.0.1', 'localhost']:
             mem_path = "{}/memcached".format(mw.getServerDir())
-            if not os.path.exists(mem_path): return False
+            if not os.path.exists(mem_path):
+                self.__DB_STATUS = 'not_installed'
+                return False
 
         if not self.__DB_LOCAL:
+            if not self.__config:
+                self.__DB_STATUS = 'not_installed'
+                return False
             self.__DB_PORT = int(self.__config['port'])
         try:
             self.__DB_CONN = pymemcache.client.base.PooledClient((self.__DB_HOST,self.__DB_PORT), max_pool_size=4)
+            # PooledClient 是惰性连接，探测一次，服务未启动时及时返回 False
+            self.__DB_CONN.version()
+            self.__DB_STATUS = None
             return self.__DB_CONN
         except pymemcache.exceptions.MemcacheError:
+            self.__DB_STATUS = 'not_running'
+            return False
+        except (ConnectionRefusedError, OSError):
+            self.__DB_STATUS = 'not_running'
             return False
         except Exception:
             self.__DB_ERR = mw.getTracebackInfo()
+        self.__DB_STATUS = 'not_running'
         return False
+
+    # 连接状态：not_installed 未安装 / not_running 未启动 / None 正常
+    def get_status(self):
+        return self.__DB_STATUS
 
     # 获取配置项
     def get_options(self, get=None):
@@ -95,11 +113,20 @@ class nosqlMemcachedCtr():
         instance = nosqlMemcached()
         return instance
 
+    def _connect(self, sid):
+        obj = self.getInstanceBySid(sid)
+        conn = obj.conn()
+        if conn is False:
+            if obj.get_status() == 'not_installed':
+                return None, mw.returnData(False, '未安装')
+            return None, mw.returnData(False, '未启动')
+        return conn, None
+
     def getItems(self, args):
         sid = args['sid']
-        mem_instance = self.getInstanceBySid(sid).conn()
-        if mem_instance is False:
-            return mw.returnData(False,'无法链接')
+        mem_instance, err = self._connect(sid)
+        if err:
+            return err
 
         result = {}
         m_items = mem_instance.stats('items')
@@ -122,9 +149,9 @@ class nosqlMemcachedCtr():
 
     def getKeyList(self, args):
         sid = args['sid']
-        mem_instance = self.getInstanceBySid(sid).conn()
-        if mem_instance is False:
-            return mw.returnData(False,'无法链接')
+        mem_instance, err = self._connect(sid)
+        if err:
+            return err
 
 
         p = 1
@@ -194,9 +221,9 @@ class nosqlMemcachedCtr():
     def delVal(self, args):
 
         sid = args['sid']
-        mem_instance = self.getInstanceBySid(sid).conn()
-        if mem_instance is False:
-            return mw.returnData(False,'无法链接')
+        mem_instance, err = self._connect(sid)
+        if err:
+            return err
 
         key = args['key']
         mem_instance.delete(key)
@@ -205,9 +232,9 @@ class nosqlMemcachedCtr():
     def setKv(self, args):
 
         sid = args['sid']
-        mem_instance = self.getInstanceBySid(sid).conn()
-        if mem_instance is False:
-            return mw.returnData(False,'无法链接')
+        mem_instance, err = self._connect(sid)
+        if err:
+            return err
 
         key = args['key']
         val = args['val']
@@ -217,9 +244,9 @@ class nosqlMemcachedCtr():
 
     def clear(self, args):
         sid = args['sid']
-        mem_instance = self.getInstanceBySid(sid).conn()
-        if mem_instance is False:
-            return mw.returnData(False,'无法链接')
+        mem_instance, err = self._connect(sid)
+        if err:
+            return err
 
         mem_instance.flush_all()
         return mw.returnData(True,'清空成功!')
