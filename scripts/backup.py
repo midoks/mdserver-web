@@ -188,10 +188,12 @@ class backupTools:
         # 开启一致性事务 会lock表
         # cmd = db_path + "/bin/mysqldump --defaults-file=" + my_cnf + "  --force --opt --default-character-set=utf8 " + \
         #     name + " | gzip > " + filename
-        option = ''
-        mode = self.recognizeDbMode('mysql')
-        if mode == 'gtid':
-            option = ' --set-gtid-purged=off '
+
+        option = ' --set-gtid-purged=off '
+        # option = ''
+        # mode = self.recognizeDbMode('mysql')
+        # if mode == 'gtid':
+        #     option = ' --set-gtid-purged=off '
 
         # skip-opt 不会lock表
         # --skip-opt --create-options

@@ -1275,7 +1275,7 @@ def replClose():
     return mw.returnJson(True, '关闭副本同步成功!')
 
 def getDbBackupListFunc(dbname=''):
-    bkDir = mw.getBackupDir() + '/database'
+    bkDir = mw.getBackupDir() + '/database/mongodb'
     blist = os.listdir(bkDir)
     r = []
 
@@ -1294,7 +1294,7 @@ def getDbBackupList():
         return data[1]
 
     r = getDbBackupListFunc(args['name'])
-    bkDir = mw.getBackupDir() + '/database'
+    bkDir = mw.getBackupDir() + '/database/mongodb'
     rr = []
     for x in range(0, len(r)):
         p = bkDir + '/' + r[x]
@@ -1370,6 +1370,7 @@ def setDbBackup():
     scDir = mw.getPanelDir() + '/scripts/backup.py'
     head = "cd "+mw.getPanelDir()
     cmd = head +' && . bin/activate &&  python3 plugins/mongodb/scripts/backup.py database ' + args['name'] + ' 3'
+    # print(cmd)
     os.system(cmd)
     return mw.returnJson(True, 'ok')
 
@@ -1390,7 +1391,7 @@ def getListBson(dbname=''):
 
 
 def getListBsonByDatabase(dbname=''):
-    bkDir = mw.getBackupDir() + '/database/'+dbname
+    bkDir = mw.getBackupDir() + '/database/mongodb/'+dbname
     blist = os.listdir(bkDir)
     r = []
 
@@ -1586,7 +1587,7 @@ def importDbBackupProgressBar():
     file = args['file']
     name = args['name']
 
-    import_dir = mw.getFatherDir() + '/backup/database/'
+    import_dir = mw.getFatherDir() + '/backup/database/mongodb/'
     port = getConfPort()
 
     file_path = import_dir + file

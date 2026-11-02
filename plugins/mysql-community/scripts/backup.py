@@ -48,6 +48,7 @@ class backupTools:
 
     def recognizeDbMode(self, mtype='mysql'):
         conf = self.getConf(mtype)
+        # print(conf)
         con = mw.readFile(conf)
         rep = r"!include %s/(.*)?\.cnf" % (mw.getServerDir() +'/'+ mtype +"/etc/mode",)
         mode = 'none'
@@ -100,14 +101,16 @@ class backupTools:
             mw.writeFile(db_path + '/etc/my.cnf', mycnf)
 
         option = ''
-        mode = self.recognizeDbMode('mysql')
-        if mode == 'gtid':
-            option = ' --set-gtid-purged=off '
+        # mode = self.recognizeDbMode('mysql-community')
+        # print(mode)
+        # if mode == 'gtid':
+        option = ' --set-gtid-purged=off '
 
         cmd = db_path + "/bin/mysqldump --defaults-file=" + my_conf_path + " " + option + "  --single-transaction -q --default-character-set=utf8mb4 " + name + " | gzip > " + filename
         if table_name != '':
             cmd = db_path + "/bin/mysqldump --defaults-file=" + my_conf_path + " " + option + "  --single-transaction -q --default-character-set=utf8mb4 " + name + " " + table_name + " | gzip > " + filename
         
+        # print(cmd)
         os.system(cmd)
         # mw.execShell(cmd)
 
