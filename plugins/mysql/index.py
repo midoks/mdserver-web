@@ -986,7 +986,7 @@ def __createUser(dbname, username, password, address):
 
 
 def getDbBackupListFunc(dbname=''):
-    bkDir = mw.getBackupDir() + '/database'
+    bkDir = mw.getBackupDir() + '/database/mysql'
     if not os.path.exists(bkDir):
         mw.execShell('mkdir -p ' + bkDir)
 
@@ -1024,7 +1024,7 @@ def myPass(act, root):
     conf_file_bak = conf_file + '_bak'
     if os.path.exists(conf_file_bak):
         os.unlink(conf_file_bak)
-        
+
     if act:
         mycnf = mw.readFile(conf_file)
         src_dump = "[mysqldump]\n"
@@ -1281,7 +1281,7 @@ def deleteDbBackup():
 
     path = args['path']
     full_file = ""
-    bkDir = mw.getFatherDir() + '/backup/database'
+    bkDir = mw.getFatherDir() + '/backup/database/mysql'
     full_file = bkDir + '/' + args['filename']
     if path != "":
         full_file = path + "/" + args['filename']
@@ -1296,7 +1296,7 @@ def getDbBackupList():
         return data[1]
 
     r = getDbBackupListFunc(args['name'])
-    bkDir = mw.getFatherDir() + '/backup/database'
+    bkDir = mw.getFatherDir() + '/backup/database/mysql'
     rr = []
     for x in range(0, len(r)):
         p = bkDir + '/' + r[x]
