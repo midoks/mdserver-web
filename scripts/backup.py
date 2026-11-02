@@ -99,8 +99,13 @@ class backupTools:
      # 数据库密码处理
     def mypass(self, act, root):
         conf_file = self.getConf('mysql')
-        mw.execShell("sed -i '/user=root/d' {}".format(conf_file))
-        mw.execShell("sed -i '/password=/d' {}".format(conf_file))
+        mw.execShell("sed -i '_bak' '/user=root/d' {}".format(conf_file))
+        mw.execShell("sed -i '_bak' '/password=/d' {}".format(conf_file))
+
+        conf_file_bak = conf_file+'_bak'
+        if os.path.exists(conf_file_bak):
+            os.unlink(conf_file_bak)
+
         if act:
             mycnf = mw.readFile(conf_file)
             src_dump = "[mysqldump]\n"
@@ -170,6 +175,9 @@ class backupTools:
 
         my_cnf = self.getConf('mysql')
         self.mypass(True, mysql_root)
+        # print("mysql_root:",mysql_root)
+        # cnf_content = mw.readFile(my_cnf)
+        # print(cnf_content)
 
         # mw.execShell(db_path + "/bin/mysqldump --opt --default-character-set=utf8 " +
         #              name + " | gzip > " + filename)
@@ -193,7 +201,12 @@ class backupTools:
         if table_name != '':
             cmd = db_path + "/bin/mysqldump --defaults-file=" + my_cnf +" " + option +" --single-transaction -q --default-character-set=utf8mb4 " + \
             name +" "+ table_name +" | gzip > " + filename
-        mw.execShell(cmd)
+
+        # print(cmd)
+        os.system(cmd)
+        # mw.execShell(cmd)
+
+        self.mypass(False, mysql_root)
 
         if not os.path.exists(filename):
             endDate = time.strftime('%Y/%m/%d %X', time.localtime())
@@ -202,7 +215,7 @@ class backupTools:
             print("----------------------------------------------------------------------------")
             return
 
-        self.mypass(False, mysql_root)
+        
 
         endDate = time.strftime('%Y/%m/%d %X', time.localtime())
         outTime = time.time() - startTime
