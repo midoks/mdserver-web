@@ -867,11 +867,16 @@ def runInfo(version):
 
     # print(result, int(result['Uptime']))
     result['Run'] = int(time.time()) - int(result['Uptime'])
-    tmp = db.query('show master status')
+
+    # MySQL 8.2 起 SHOW MASTER STATUS 弃用，8.4 已移除，改用 SHOW BINARY LOG STATUS
+    master_cmd = 'show master status'
+    if pk_version.parse(version) >= pk_version.parse('8.2'):
+        master_cmd = 'show binary log status'
     try:
+        tmp = db.query(master_cmd)
         result['File'] = tmp[0]["File"]
         result['Position'] = tmp[0]["Position"]
-    except:
+    except Exception:
         result['File'] = 'OFF'
         result['Position'] = 'OFF'
     return mw.getJson(result)
@@ -2618,7 +2623,7 @@ def getMasterRepSlaveUserCmd(version):
     db = pMysqlDb()
 
     cmd_status = "show master status"
-    if pk_version.parse(version) > pk_version.parse("8.0"):
+    if pk_version.parse(version) >= pk_version.parse("8.2"):
         cmd_status = "SHOW BINARY LOG STATUS"
     mstatus = db.query(cmd_status)
     if len(mstatus) == 0:
