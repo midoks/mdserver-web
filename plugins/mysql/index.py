@@ -1009,7 +1009,8 @@ def setDbBackup():
         return data[1]
 
     scDir = mw.getPanelDir() + '/scripts/backup.py'
-    cmd = 'python3 ' + scDir + ' database ' + args['name'] + ' 3'
+    head = "cd "+mw.getPanelDir()
+    cmd = head +' && . bin/activate &&  python3 scripts/backup.py database ' + args['name'] + ' 3'
     os.system(cmd)
     return mw.returnJson(True, 'ok')
 
