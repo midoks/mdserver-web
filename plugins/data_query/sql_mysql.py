@@ -31,6 +31,7 @@ class nosqlMySQL():
     __DB_HOST = '127.0.0.1'
     __DB_CONN = None
     __DB_ERR = None
+    __DB_STATUS = None
     __DB_SOCKET = None
 
     __DB_LOCAL = None
@@ -45,12 +46,18 @@ class nosqlMySQL():
     def conn(self):
 
         if self.__sid is None:
+            self.__DB_STATUS = 'not_installed'
             return False
 
         if self.__sid is not None:
             mycnf_path = "{}/{}/etc/my.cnf".format(mw.getServerDir(),self.__sid)
             if not os.path.exists(mycnf_path):
+                self.__DB_STATUS = 'not_installed'
                 return False
+
+        if not self.__config:
+            self.__DB_STATUS = 'not_installed'
+            return False
 
         self.__DB_PORT = int(self.__config['port'])
         self.__DB_USER = self.__config['username']
@@ -65,12 +72,18 @@ class nosqlMySQL():
             if self.__DB_SOCKET != '':
                 db.setSocket(self.__DB_SOCKET)
 
-            # 实际连通性检查：服务未启动或账号错误时返回 False，调用方统一提示"无法链接"
+            # 实际连通性检查：服务未启动或账号错误时返回 False，调用方统一提示
             db.query('select 1')
+            self.__DB_STATUS = None
             return db
         except Exception:
             self.__DB_ERR = mw.getTracebackInfo()
+        self.__DB_STATUS = 'not_running'
         return False
+
+    # 连接状态：not_installed 未安装 / not_running 未启动 / None 正常
+    def get_status(self):
+        return self.__DB_STATUS
 
     def sqliteDb(self, db_pos_name, dbname='databases'):
         mydb_path = mw.getServerDir() +'/'+db_pos_name
@@ -155,11 +168,20 @@ class nosqlMySQLCtr():
         instance.setSid(sid)
         return instance
 
+    def _connect(self, sid):
+        obj = self.getInstanceBySid(sid)
+        conn = obj.conn()
+        if conn is False:
+            if obj.get_status() == 'not_installed':
+                return None, mw.returnData(False, '未安装')
+            return None, mw.returnData(False, '未启动')
+        return conn, None
+
     def getDbList(self, args):
         sid = args['sid']
-        my_instance = self.getInstanceBySid(sid).conn()
-        if my_instance is False:
-            return mw.returnData(False,'无法链接')
+        my_instance, err = self._connect(sid)
+        if err:
+            return err
 
         result = {}
         db_list = my_instance.query('show databases')
@@ -174,9 +196,9 @@ class nosqlMySQLCtr():
         sid = args['sid']
         db = args['db']
 
-        my_instance = self.getInstanceBySid(sid).conn()
-        if my_instance is False:
-            return mw.returnData(False,'无法链接')
+        my_instance, err = self._connect(sid)
+        if err:
+            return err
 
         sql = "select * from information_schema.tables where table_schema = '"+db+"'"
         table_list = my_instance.query(sql)
@@ -228,9 +250,9 @@ class nosqlMySQLCtr():
                 else:
                     where_sql = ' where '+args_where['field'] + " like '%"+args_where['value']+"%' "
 
-        my_instance = self.getInstanceBySid(sid).conn()
-        if my_instance is False:
-            return mw.returnData(False,'无法链接')
+        my_instance, err = self._connect(sid)
+        if err:
+            return err
 
         my_instance.setDbName(db)
         sql = 'select count(*) as num from ' + table + where_sql
@@ -270,9 +292,9 @@ class nosqlMySQLCtr():
         sql = 'show processlist';
         sid = args['sid']
 
-        my_instance = self.getInstanceBySid(sid).conn()
-        if my_instance is False:
-            return mw.returnData(False,'无法链接')
+        my_instance, err = self._connect(sid)
+        if err:
+            return err
 
         result = my_instance.query(sql)
         rdata = {}
@@ -283,9 +305,9 @@ class nosqlMySQLCtr():
         sql = 'show status';
         sid = args['sid']
 
-        my_instance = self.getInstanceBySid(sid).conn()
-        if my_instance is False:
-            return mw.returnData(False,'无法链接')
+        my_instance, err = self._connect(sid)
+        if err:
+            return err
 
         result = my_instance.query(sql)
         rdata = {}
@@ -296,9 +318,9 @@ class nosqlMySQLCtr():
         sql = "show status like 'Com_%'";
         sid = args['sid']
 
-        my_instance = self.getInstanceBySid(sid).conn()
-        if my_instance is False:
-            return mw.returnData(False,'无法链接')
+        my_instance, err = self._connect(sid)
+        if err:
+            return err
 
         result = my_instance.query(sql)
         rdata = {}
@@ -333,9 +355,9 @@ class nosqlMySQLCtr():
     def getNetList(self, args):
         from datetime import datetime
         sid = args['sid']
-        my_instance = self.getInstanceBySid(sid).conn()
-        if my_instance is False:
-            return mw.returnData(False,'无法链接')
+        my_instance, err = self._connect(sid)
+        if err:
+            return err
 
         rdata = []
         row = {}
@@ -371,9 +393,9 @@ class nosqlMySQLCtr():
 
     def getTopnList(self, args):
         sid = args['sid']
-        my_instance = self.getInstanceBySid(sid).conn()
-        if my_instance is False:
-            return mw.returnData(False,'无法链接')
+        my_instance, err = self._connect(sid)
+        if err:
+            return err
 
         is_performance_schema = my_instance.find("SELECT @@performance_schema")
         if is_performance_schema is None:
@@ -401,9 +423,9 @@ class nosqlMySQLCtr():
     # 查看重复或冗余的索引
     def getRedundantIndexes(self, args):
         sid = args['sid']
-        my_instance = self.getInstanceBySid(sid).conn()
-        if my_instance is False:
-            return mw.returnData(False,'无法链接')
+        my_instance, err = self._connect(sid)
+        if err:
+            return err
 
         is_performance_schema = my_instance.find("SELECT @@performance_schema")
         if is_performance_schema["@@performance_schema"] == 0:
@@ -419,9 +441,9 @@ class nosqlMySQLCtr():
 
     def redundantIndexesCmd(self, args):
         sid = args['sid']
-        my_instance = self.getInstanceBySid(sid).conn()
-        if my_instance is False:
-            return mw.returnData(False,'无法链接')
+        my_instance, err = self._connect(sid)
+        if err:
+            return err
 
         is_performance_schema = my_instance.find("SELECT @@performance_schema")
         if is_performance_schema["@@performance_schema"] == 0:
@@ -444,9 +466,9 @@ class nosqlMySQLCtr():
         from decimal import Decimal
 
         sid = args['sid']
-        my_instance = self.getInstanceBySid(sid).conn()
-        if my_instance is False:
-            return mw.returnData(False,'无法链接')
+        my_instance, err = self._connect(sid)
+        if err:
+            return err
 
         my_instance.execute("SET sql_mode=(SELECT REPLACE(@@sql_mode,'ONLY_FULL_GROUP_BY',''))")
         data = my_instance.query(
@@ -522,9 +544,9 @@ class nosqlMySQLCtr():
     # 查看应用端IP连接数总和
     def getConnCount(self, args):
         sid = args['sid']
-        my_instance = self.getInstanceBySid(sid).conn()
-        if my_instance is False:
-            return mw.returnData(False,'无法链接')
+        my_instance, err = self._connect(sid)
+        if err:
+            return err
 
         data = my_instance.query(
             "SELECT user,db,substring_index(HOST,':',1) AS Client_IP,count(1) AS count FROM information_schema.PROCESSLIST "
@@ -546,9 +568,9 @@ class nosqlMySQLCtr():
     # 快速找出没有主键的表
     def getFpkInfo(self, args):
         sid = args['sid']
-        my_instance = self.getInstanceBySid(sid).conn()
-        if my_instance is False:
-            return mw.returnData(False,'无法链接')
+        my_instance, err = self._connect(sid)
+        if err:
+            return err
 
         data = my_instance.query(
             """
@@ -568,9 +590,9 @@ class nosqlMySQLCtr():
 
     def getLockSql(self, args):
         sid = args['sid']
-        my_instance = self.getInstanceBySid(sid).conn()
-        if my_instance is False:
-            return mw.returnData(False,'无法链接')
+        my_instance, err = self._connect(sid)
+        if err:
+            return err
 
         data = my_instance.query(
             """
@@ -599,9 +621,9 @@ class nosqlMySQLCtr():
 
     def killLockPid(self, args):
         sid = args['sid']
-        my_instance = self.getInstanceBySid(sid).conn()
-        if my_instance is False:
-            return mw.returnData(False,'无法链接')
+        my_instance, err = self._connect(sid)
+        if err:
+            return err
 
         pid = args['pid']
         my_instance.execute('kill %s' % pid)
@@ -609,9 +631,9 @@ class nosqlMySQLCtr():
 
     def killAllLock(self, args):
         sid = args['sid']
-        my_instance = self.getInstanceBySid(sid).conn()
-        if my_instance is False:
-            return mw.returnData(False,'无法链接')
+        my_instance, err = self._connect(sid)
+        if err:
+            return err
 
         data = self.getLockSql(args)
         if data['status']:
@@ -626,9 +648,9 @@ class nosqlMySQLCtr():
 
     def getDeadlockInfo(self, args):
         sid = args['sid']
-        my_instance = self.getInstanceBySid(sid).conn()
-        if my_instance is False:
-            return mw.returnData(False,'无法链接')
+        my_instance, err = self._connect(sid)
+        if err:
+            return err
 
         data = my_instance.find("SHOW ENGINE INNODB STATUS")
         if data is not None:
@@ -641,9 +663,9 @@ class nosqlMySQLCtr():
 
     def getSlaveStatus(self, args):
         sid = args['sid']
-        my_instance = self.getInstanceBySid(sid).conn()
-        if my_instance is False:
-            return mw.returnData(False,'无法链接')
+        my_instance, err = self._connect(sid)
+        if err:
+            return err
 
         # MySQL 8.0.22+ 使用 SHOW REPLICA STATUS，MySQL 9.0 已移除 SHOW SLAVE STATUS
         slave_data = my_instance.query('SHOW REPLICA STATUS')

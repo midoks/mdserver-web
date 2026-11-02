@@ -237,7 +237,7 @@ function initTabMemcached(){
     $('#memcached_clear_all').unbind('click').click(function(){
         var sid = memcachedGetSid();
         memPostCB('clear',{'sid':sid} ,function(rdata){
-            // console.log(rdata);
+            console.log("xxx",rdata);
             showMsg(rdata.data.msg,function(){
                 if (rdata.data.status){
                     memcachedGetList();
@@ -927,6 +927,7 @@ function mysqlInitField(f, data){
 
 
 function mysqlGetServerList(call_func){
+    closeInstallLayer();
     myPostCBN('get_server_list', {}, function(rdata){
         var rdata = rdata.data;
         if (rdata.data.length != 0){
@@ -951,7 +952,10 @@ function mysqlGetServerList(call_func){
             }
             closeInstallLayer();
         } else {
-            showInstallLayer();
+            layer.msg(rdata.data.msg,{ icon: 7, time: 2000, shade: 0.3 });
+            setTimeout(function(){
+                showInstallLayer();
+            },2050);
         }
     });
 }
@@ -1201,9 +1205,9 @@ function memcachedGetItem(){
 
 function memcachedGetList(){
     var sid = memcachedGetSid();
+    closeInstallLayer();
     memPostCB('get_items',{'sid':sid} ,function(rdata){
         if (rdata.data.status){
-
             var items = rdata.data.data['items'];
             var content = '';
             for (var i = 0; i < items.length; i++) {
@@ -1219,10 +1223,14 @@ function memcachedGetList(){
                 memcachedGetKeyList(1);
             });
             closeInstallLayer();
+            memcachedGetKeyList(1);
         } else {
-            showInstallLayer();
+            layer.msg(rdata.data.msg,{ icon: 7, time: 2000, shade: 0.3 });
+            setTimeout(function(){
+                showInstallLayer();
+            },2050);
         }
-        memcachedGetKeyList(1);
+        
     });
 }
 
@@ -1386,7 +1394,6 @@ function mongodbInitField(f, data){
 
 var mogodb_db_list;
 function mongodbCollectionName(){
-    // console.log(mogodb_db_list);
     var v = mogodb_db_list.getValue('value');
     if (v.length == 0){
         // console.log($('#mongodb').data('collection'));
@@ -1397,6 +1404,7 @@ function mongodbCollectionName(){
 
 function mongodbGetList(){
     var sid = mongodbGetSid();
+    closeInstallLayer();
     mgdbPostCB('get_db_list',{'sid':sid} ,function(rdata){
         // console.log(rdata);
         if (rdata.data.status){
@@ -1423,7 +1431,11 @@ function mongodbGetList(){
 
             closeInstallLayer();
         } else {
-            showInstallLayer();
+            layer.msg(rdata.data.msg,{ icon: 7, time: 2000, shade: 0.3 });
+            setTimeout(function(){
+                showInstallLayer();
+            },2050);
+            
         }
     });
 }
@@ -1606,6 +1618,7 @@ function redisGetIdx(){
 
 function redisGetList(){
     var sid = redisGetSid();
+    closeInstallLayer();
     redisPostCB('get_list',{'sid':sid} ,function(rdata){
         if (rdata.data.status){
             var list = rdata.data.data;
@@ -1627,7 +1640,10 @@ function redisGetList(){
             redisGetKeyList(1);
             closeInstallLayer();
         } else {
-            showInstallLayer();
+            layer.msg(rdata.data.msg,{ icon: 7, time: 2000, shade: 0.3 });
+            setTimeout(function(){
+                showInstallLayer();
+            },2050);
         }
     });
 }
