@@ -1052,15 +1052,11 @@ def __createUser(dbname, username, password, address):
     if username == 'root':
         dbname = '*'
 
-    pdb.execute(
-        "CREATE USER `%s`@`localhost` IDENTIFIED BY '%s'" % (username, password))
-    pdb.execute(
-        "grant all privileges on %s.* to `%s`@`localhost`" % (dbname, username))
+    pdb.execute("CREATE USER `%s`@`localhost` IDENTIFIED BY '%s'" % (username, password))
+    pdb.execute("grant all privileges on %s.* to `%s`@`localhost`" % (dbname, username))
     for a in address.split(','):
-        pdb.execute(
-            "CREATE USER `%s`@`%s` IDENTIFIED BY '%s'" % (username, a, password))
-        pdb.execute(
-            "grant all privileges on %s.* to `%s`@`%s`" % (dbname, username, a))
+        pdb.execute("CREATE USER `%s`@`%s` IDENTIFIED BY '%s'" % (username, a, password))
+        pdb.execute("grant all privileges on %s.* to `%s`@`%s`" % (dbname, username, a))
     pdb.execute("flush privileges")
 
 
@@ -1630,8 +1626,8 @@ def setRootPwdForce(new_password, version=''):
         openSkipGrantTables()
         appCMD(version, 'start')
         time.sleep(3)
-        resetDbRootPwd(version, new_password)
-        changed = True
+
+        changed = resetDbRootPwd(version, new_password)
     except Exception:
         changed = False
     finally:
@@ -1870,8 +1866,7 @@ def delDb():
         name = args['name']
         psdb = pSqliteDb('databases')
         pdb = pMysqlDb()
-        find = psdb.where("id=?", (sid,)).field(
-            'id,pid,name,username,password,accept,ps,addtime').find()
+        find = psdb.where("id=?", (sid,)).field('id,pid,name,username,password,accept,ps,addtime').find()
         accept = find['accept']
         username = find['username']
 
@@ -1882,8 +1877,7 @@ def delDb():
             pass
 
         try:
-            users = pdb.query("select Host from mysql.user where User='" +
-                              username + "' AND Host!='localhost'")
+            users = pdb.query("select Host from mysql.user where User='" + username + "' AND Host!='localhost'")
         except Exception:
             users = []
         try:
@@ -1904,66 +1898,88 @@ def delDb():
         return mw.returnJson(False, '删除失败!' + str(ex))
 
 
+def getDbUserAccess(username):
+    pdb = pMysqlDb()
+    accs = []
+    try:
+        users = pdb.query("select Host from mysql.user where User='" + username + "'")
+    except Exception as e:
+        return accs
+    for c in users:
+        accs.append(c["Host"])
+    return accs
+
+def getDbUserAccessDiff(db_access, input_access):
+    add = []
+    delete = []
+
+    for ac in input_access:
+        if ac == "localhost":
+            continue
+        if mw.inArray(db_access,ac):
+            continue
+        add.append(ac)
+
+    for ac in db_access:
+        if ac == "localhost":
+            continue
+        if mw.inArray(input_access,ac):
+            continue
+        delete.append(ac)
+
+    return {"add":add,"delete":delete}
+
 def getDbAccess():
     args = getArgs()
     data = checkArgs(args, ['username'])
     if not data[0]:
         return data[1]
     username = args['username']
-    pdb = pMysqlDb()
 
-    try:
-        users = pdb.query("select Host from mysql.user where User='" +
-                          username + "' AND Host!='localhost'")
-    except Exception as e:
-        return mw.returnJson(-1, str(e))
+    users = getDbUserAccess(username)
+    if len(users) == 1:
+        return mw.returnJson(True, "localhost")
 
-    isError = isSqlError(users)
-    if isError != None:
-        return isError
-
-    if len(users) < 1:
-        return mw.returnJson(True, "127.0.0.1")
-    accs = []
-    for c in users:
-        accs.append(c["Host"])
-    userStr = ','.join(accs)
+    userStr = ','.join(users)
     return mw.returnJson(True, userStr)
-
 
 def setDbAccess():
     args = getArgs()
     data = checkArgs(args, ['username', 'access'])
     if not data[0]:
         return data[1]
-    name = args['username']
+    username = args['username']
     access = args['access']
     pdb = pMysqlDb()
     psdb = pSqliteDb('databases')
 
-    dbname = psdb.where('username=?', (name,)).getField('name')
+    dbname = psdb.where('username=?', (username,)).getField('name')
+    password = psdb.where("username=?", (username,)).getField('password')
+    if username == 'root':
+        dbname = '*'
+        password = pSqliteDb('config').where('id=?', (1,)).getField('mysql_root')
 
-    if name == 'root':
-        password = pSqliteDb('config').where(
-            'id=?', (1,)).getField('mysql_root')
-    else:
-        password = psdb.where("username=?", (name,)).getField('password')
+    db_users_access = getDbUserAccess(username)
+    diff_access = getDbUserAccessDiff(db_users_access,access.split(','))
+    # print(diff_access)
 
-    try:
-        users = pdb.query("select Host from mysql.user where User='" +
-                          name + "' AND Host!='localhost'")
-    except Exception as e:
-        return mw.returnJson(-1, str(e))
+    add_access_list = diff_access["add"]
 
-    for us in users:
+    pdb.execute("flush privileges")
+    for add_access in add_access_list:
+        pdb.execute("CREATE USER `%s`@`%s` IDENTIFIED BY '%s'" % (username, add_access, password))
+        pdb.execute("grant all privileges on %s.* to `%s`@`%s`" % (dbname, username, add_access))
+    pdb.execute("flush privileges")
+   
+
+    delete_access_list = diff_access["delete"]
+    for del_access in delete_access_list:
         try:
-            pdb.execute("drop user '" + name + "'@'" + us["Host"] + "'")
+            pdb.execute("drop user '" + username + "'@'" + del_access + "'")
         except Exception:
             pass
-
-    __createUser(dbname, name, password, access)
-
-    psdb.where('username=?', (name,)).save('accept,rw', (access, 'rw',))
+    
+    psdb.where('username=?', (username,)).save('accept,rw', (access, 'rw',))
     return mw.returnJson(True, '设置成功!')
 
 
@@ -2000,22 +2016,45 @@ def resetDbRootPwd(version, newpwd=''):
         cmd_pass = cmd_pass + '"UPDATE mysql.user SET password=PASSWORD(\'' + pwd + "') WHERE user='root';"
         cmd_pass = cmd_pass + 'flush privileges;"'
         data = mw.execShell(cmd_pass)
-        # print(data)
-    else:
-        reset_pwd = 'flush privileges;'
-        reset_pwd = reset_pwd + \
-            "UPDATE mysql.user SET authentication_string='' WHERE user='root';"
-        reset_pwd = reset_pwd + "flush privileges;"
-        reset_pwd = reset_pwd + "alter user 'root'@'localhost' IDENTIFIED by '" + pwd + "';"
+    elif major == 5:
+        # 5.7: 预清空 authentication_string 后再 ALTER USER 会报 ERROR 1396, 改为直接 UPDATE + PASSWORD()
+        reset_pwd = "UPDATE mysql.user SET plugin='mysql_native_password',authentication_string=PASSWORD('" + pwd + "') WHERE user='root';"
         reset_pwd = reset_pwd + "flush privileges;"
 
         tmp_file = "/tmp/mysql_init_tmp.log"
         mw.writeFile(tmp_file, reset_pwd)
-        cmd_pass = serverdir + '/bin/mysql --defaults-file=' + myconf + ' -uroot -proot < ' + tmp_file
-
+        cmd_pass = serverdir + '/bin/mysql --defaults-file=' + myconf + ' -uroot < ' + tmp_file
         data = mw.execShell(cmd_pass)
-        # print(data)
         os.remove(tmp_file)
+    else:
+        # 8.x+: skip-grant-tables 下 FLUSH 后 ALTER USER 即可, 不要预清空 authentication_string
+        # 遍历所有 root 账号的 host, 避免只改 localhost 导致其它 host 仍是旧密码
+        cmd_hosts = serverdir + '/bin/mysql --defaults-file=' + myconf + \
+            ' -uroot -N -s -e "select host from mysql.user where user=\'root\'"'
+        hosts_data = mw.execShell(cmd_hosts)
+        hosts = []
+        for h in hosts_data[0].split('\n'):
+            h = h.strip()
+            if h != '':
+                hosts.append(h)
+        if len(hosts) == 0:
+            hosts = ['localhost']
+
+        reset_pwd = 'flush privileges;'
+        for h in hosts:
+            reset_pwd = reset_pwd + \
+                "alter user 'root'@'" + h + "' IDENTIFIED by '" + pwd + "';"
+        reset_pwd = reset_pwd + "flush privileges;"
+
+        tmp_file = "/tmp/mysql_init_tmp.log"
+        mw.writeFile(tmp_file, reset_pwd)
+        cmd_pass = serverdir + '/bin/mysql --defaults-file=' + myconf + ' -uroot < ' + tmp_file
+        data = mw.execShell(cmd_pass)
+        os.remove(tmp_file)
+
+    # 重置语句执行出错时返回失败, 避免上层把失败误判为成功
+    if data[1].find('ERROR') != -1:
+        return False
     return True
 
 def fixDbAccess(version):

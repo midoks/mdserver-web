@@ -1526,66 +1526,88 @@ def delDb():
         return mw.returnJson(False, '删除失败!' + str(ex))
 
 
+def getDbUserAccess(username):
+    pdb = pMysqlDb()
+    accs = []
+    try:
+        users = pdb.query("select Host from mysql.user where User='" + username + "'")
+    except Exception as e:
+        return accs
+    for c in users:
+        accs.append(c["Host"])
+    return accs
+
+def getDbUserAccessDiff(db_access, input_access):
+    add = []
+    delete = []
+
+    for ac in input_access:
+        if ac == "localhost":
+            continue
+        if mw.inArray(db_access,ac):
+            continue
+        add.append(ac)
+
+    for ac in db_access:
+        if ac == "localhost":
+            continue
+        if mw.inArray(input_access,ac):
+            continue
+        delete.append(ac)
+
+    return {"add":add,"delete":delete}
+
 def getDbAccess():
     args = getArgs()
     data = checkArgs(args, ['username'])
     if not data[0]:
         return data[1]
     username = args['username']
-    pdb = pMysqlDb('mysql')
 
-    try:
-        users = pdb.query("select Host from user where User='" +
-                          username + "' AND Host!='localhost'")
-    except Exception as e:
-        return mw.returnJson(-1, str(e))
+    users = getDbUserAccess(username)
+    if len(users) == 1:
+        return mw.returnJson(True, "localhost")
 
-    isError = isSqlError(users)
-    if isError != None:
-        return isError
-
-    if len(users) < 1:
-        return mw.returnJson(True, "127.0.0.1")
-    accs = []
-    for c in users:
-        accs.append(c["Host"])
-    userStr = ','.join(accs)
+    userStr = ','.join(users)
     return mw.returnJson(True, userStr)
-
 
 def setDbAccess():
     args = getArgs()
     data = checkArgs(args, ['username', 'access'])
     if not data[0]:
         return data[1]
-    name = args['username']
+    username = args['username']
     access = args['access']
-    pdb = pMysqlDb('mysql')
+    pdb = pMysqlDb()
     psdb = pSqliteDb('databases')
 
-    dbname = psdb.where('username=?', (name,)).getField('name')
+    dbname = psdb.where('username=?', (username,)).getField('name')
+    password = psdb.where("username=?", (username,)).getField('password')
+    if username == 'root':
+        dbname = '*'
+        password = pSqliteDb('config').where('id=?', (1,)).getField('mysql_root')
 
-    if name == 'root':
-        password = pSqliteDb('config').where(
-            'id=?', (1,)).getField('mysql_root')
-    else:
-        password = psdb.where("username=?", (name,)).getField('password')
+    db_users_access = getDbUserAccess(username)
+    diff_access = getDbUserAccessDiff(db_users_access,access.split(','))
+    # print(diff_access)
 
-    try:
-        users = pdb.query("select Host from user where User='" +
-                          name + "' AND Host!='localhost'")
-    except Exception as e:
-        return mw.returnJson(-1, str(e))
+    add_access_list = diff_access["add"]
 
-    for us in users:
+    pdb.execute("flush privileges")
+    for add_access in add_access_list:
+        pdb.execute("CREATE USER `%s`@`%s` IDENTIFIED BY '%s'" % (username, add_access, password))
+        pdb.execute("grant all privileges on %s.* to `%s`@`%s`" % (dbname, username, add_access))
+    pdb.execute("flush privileges")
+   
+
+    delete_access_list = diff_access["delete"]
+    for del_access in delete_access_list:
         try:
-            pdb.execute("drop user '" + name + "'@'" + us["Host"] + "'")
+            pdb.execute("drop user '" + username + "'@'" + del_access + "'")
         except Exception:
             pass
-
-    __createUser(dbname, name, password, access)
-
-    psdb.where('username=?', (name,)).save('accept,rw', (access, 'rw',))
+    
+    psdb.where('username=?', (username,)).save('accept,rw', (access, 'rw',))
     return mw.returnJson(True, '设置成功!')
 
 def openSkipGrantTables():

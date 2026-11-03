@@ -630,7 +630,7 @@ function setDbAccess(username){
                             <span class='tname'>访问权限</span>\
                             <div class='info-r '>\
                                 <select class='bt-input-text mr5' name='dataAccess' style='width:100px'>\
-                                <option value='127.0.0.1'>本地服务器</option>\
+                                <option value='localhost'>本地服务器</option>\
                                 <option value=\"%\">所有人</option>\
                                 <option value='ip'>指定IP</option>\
                                 </select>\
@@ -638,9 +638,9 @@ function setDbAccess(username){
                         </div>\
                       </form>",
             success:function(){
-                if (rdata.msg == '127.0.0.1'){
-                    $('select[name="dataAccess"]').find("option[value='127.0.0.1']").attr("selected",true);
-                } else if (rdata.msg == '%'){
+                if (rdata.msg == 'localhost'){
+                    $('select[name="dataAccess"]').find("option[value='localhost']").attr("selected",true);
+                } else if (rdata.msg.indexOf("%") > -1){
                     $('select[name="dataAccess"]').find('option[value="%"]').attr("selected",true);
                 } else if ( rdata.msg == 'ip' ){
                     $('select[name="dataAccess"]').find('option[value="ip"]').attr("selected",true);
@@ -1822,7 +1822,7 @@ function setDbMasterAccess(username){
                             <span class='tname'>访问权限</span>\
                             <div class='info-r '>\
                                 <select class='bt-input-text mr5' name='dataAccess' style='width:100px'>\
-                                <option value='127.0.0.1'>本地服务器</option>\
+                                <option value='localhost'>本地服务器</option>\
                                 <option value=\"%\">所有人</option>\
                                 <option value='ip'>指定IP</option>\
                                 </select>\
@@ -1830,9 +1830,9 @@ function setDbMasterAccess(username){
                         </div>\
                       </form>",
             success:function(){
-                if (rdata.msg == '127.0.0.1'){
-                    $('select[name="dataAccess"]').find("option[value='127.0.0.1']").attr("selected",true);
-                } else if (rdata.msg == '%'){
+                if (rdata.msg == 'localhost'){
+                    $('select[name="dataAccess"]').find("option[value='localhost']").attr("selected",true);
+                } else if (rdata.msg.indexOf("%") > -1 ){
                     $('select[name="dataAccess"]').find('option[value="%"]').attr("selected",true);
                 } else if ( rdata.msg == 'ip' ){
                     $('select[name="dataAccess"]').find('option[value="ip"]').attr("selected",true);
