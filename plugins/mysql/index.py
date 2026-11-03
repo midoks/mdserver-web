@@ -2390,23 +2390,19 @@ def setDbMasterAccess():
     pdb = pMysqlDb()
     psdb = pSqliteDb('master_replication_user')
     password = psdb.where("username=?", (username,)).getField('password')
-    try:
-        users = pdb.query("select Host from mysql.user where User='" +
-                          username + "' AND Host!='localhost'")
-    except Exception:
-        users = []
-    for us in users:
+
+
+    db_users_access = getDbUserAccess(username)
+    for user_access in db_users_access:
         try:
-            pdb.execute("drop user '" + username + "'@'" + us["Host"] + "'")
+            pdb.execute("drop user '" + username + "'@'%s'" % (user_access,))
         except Exception:
             pass
 
     dbname = '*'
     for a in access.split(','):
-        pdb.execute(
-            "CREATE USER `%s`@`%s` IDENTIFIED BY '%s'" % (username, a, password))
-        pdb.execute(
-            "grant all privileges on %s.* to `%s`@`%s`" % (dbname, username, a))
+        pdb.execute("CREATE USER `%s`@`%s` IDENTIFIED BY '%s'" % (username, a, password))
+        pdb.execute("grant all privileges on %s.* to `%s`@'%s'" % (dbname, username, a))
 
     pdb.execute("flush privileges")
     psdb.where('username=?', (username,)).save('accept', (access,))
