@@ -2414,10 +2414,17 @@ def addMasterRepSlaveUser(version=''):
     if psdb.where("username=?", (username)).count() > 0:
         return mw.returnJson(False, '用户已存在!')
 
-    mdb8 = ['8.0','8.1','8.2','8.3','8.4']
+    mdb8 = getMdb8Ver()
     if mw.inArray(mdb8,version):
-        sql = "CREATE USER '" + username + \
-            "'  IDENTIFIED WITH mysql_native_password BY '" + password + "';"
+        m = re.search(r'(\d+)\.(\d+)', version)
+        major = int(m.group(1)) if m else 0
+        minor = int(m.group(2)) if m else 0
+        if major >= 9 or (major == 8 and minor >= 4):
+            # 8.4 起默认禁用 mysql_native_password, 9.x 已移除该插件, 用默认认证插件
+            sql = "CREATE USER '" + username + "'@'%' IDENTIFIED BY '" + password + "';"
+        else:
+            auth_policy = getAuthPolicy()
+            sql = "CREATE USER '" + username + "'@'%' IDENTIFIED WITH " + auth_policy + " BY '" + password + "';"
         pdb.execute(sql)
         sql = "grant replication slave on *.* to '" + username + "'@'%';"
         result = pdb.execute(sql)
@@ -2433,7 +2440,7 @@ def addMasterRepSlaveUser(version=''):
         if isError != None:
             return isError
 
-    sql_select = "grant select,reload,REPLICATION CLIENT,PROCESS on *.* to " + username + "@'%';"
+    sql_select = "grant select,reload,REPLICATION CLIENT,PROCESS on *.* to '" + username + "'@'%';"
     pdb.execute(sql_select)
     pdb.execute('FLUSH PRIVILEGES;')
 
