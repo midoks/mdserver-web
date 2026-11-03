@@ -2043,24 +2043,13 @@ def fixDbAccess(version):
             return mw.returnJson(True, '正常无需修复!')
 
         # 2) 密码错误 -> 跳过权限校验重置密码, 并用新密码验证连接
-        appCMD(version, 'stop')
-        openSkipGrantTables()
-        appCMD(version, 'start')
-        time.sleep(3)
-        resetDbRootPwd(version)
-        appCMD(version, 'stop')
-        closeSkipGrantTables()
-        appCMD(version, 'start')
-        time.sleep(2)
-
-        try:
-            ndb = pMysqlDb()
-            if isSqlError(ndb.query('show databases')) == None:
-                return mw.returnJson(True, '修复成功,root密码已重置!')
-        except Exception:
-            pass
-        return mw.returnJson(False, '密码重置失败,请检查数据库运行状态!')
+        if not setRootPwdForce(mw.getRandomString(16), version):
+            return mw.returnJson(False, '密码重置失败,请检查数据库运行状态!')
+        return mw.returnJson(True, '修复成功,root密码已重置!')
     except Exception as e:
+        # 连接阶段抛异常一般是密码不可用, 仍尝试重置
+        if setRootPwdForce(mw.getRandomString(16), version):
+            return mw.returnJson(True, '修复成功,root密码已重置!')
         return mw.returnJson(False, '修复失败:' + str(e))
 
 
