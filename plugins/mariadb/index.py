@@ -1253,6 +1253,44 @@ def syncToDatabases():
     return mw.returnJson(True, msg)
 
 
+def setRootPwdForce(new_password, version=''):
+    '''
+    当前root密码不可用(忘记密码/连接被拒)时, 通过跳过权限校验的方式真正重置密码
+    '''
+    changed = False
+    try:
+        appCMD(version, 'stop')
+        openSkipGrantTables()
+        appCMD(version, 'start')
+        time.sleep(3)
+        resetDbRootPwd(version, new_password)
+        changed = True
+    except Exception:
+        changed = False
+    finally:
+        # 无论成败都恢复密码校验, 避免数据库长期处于无校验状态
+        appCMD(version, 'stop')
+        closeSkipGrantTables()
+        appCMD(version, 'start')
+        time.sleep(2)
+
+    if not changed:
+        return False
+
+    # 用新密码验证是否真的可以连接(启动可能较慢, 重试几次)
+    for i in range(10):
+        try:
+            pdb = pMysqlDb()
+            result = pdb.query('show databases')
+            if isSqlError(result) == None:
+                return True
+        except Exception:
+            pass
+        time.sleep(2)
+
+    return False
+
+
 def setRootPwd(version=''):
     args = getArgs()
     data = checkArgs(args, ['password'])
@@ -1262,10 +1300,25 @@ def setRootPwd(version=''):
     password = args['password']
 
     #强制修改
+    force = 0
     if 'force' in args and args['force'] == '1':
         pSqliteDb('config').where('id=?', (1,)).save('mysql_root', (password,))
         return mw.returnJson(True, '【强制本地记录】数据库root密码修改成功(立马检查)!')
 
+    if 'force' in args and args['force'] == '2':
+        force = 2
+        ok = setRootPwdForce(password,version)
+        if not ok:
+            return mw.returnJson(False, '【强制】修改失败,请检查MySQL运行状态!')
+
+        pSqliteDb('config').where('id=?', (1,)).save('mysql_root', (password,))
+        if ok and version.startswith("8"):
+            pdb = pMysqlDb()
+            try:
+                pdb.query("SET GLOBAL validate_password.policy=MEDIUM;")
+            except Exception:
+                pass
+        return mw.returnJson(True, '【强制】数据库root密码修改成功!')
 
     try:
         pdb = pMysqlDb('mysql')
@@ -1550,10 +1603,11 @@ def closeSkipGrantTables():
     return True
 
 
-def resetDbRootPwd(version):
+def resetDbRootPwd(version, newpwd=''):
     serverdir = getServerDir()
     myconf = serverdir + "/etc/my.cnf"
-    pwd = mw.getRandomString(16)
+    # newpwd 为空时生成随机密码, 强制修改时传入用户指定的密码
+    pwd = newpwd if newpwd != '' else mw.getRandomString(16)
     pSqliteDb('config').where('id=?', (1,)).save('mysql_root', (pwd,))
 
     db_option = "-S " + serverdir + "/mysql.sock"
