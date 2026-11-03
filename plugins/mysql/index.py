@@ -1694,28 +1694,25 @@ def setRootPwd(version=''):
 
         if version.find('5.7') > -1 or mw.inArray(getMdb8Ver(), version):
             try:
-                pdb.execute(
-                    "UPDATE mysql.user SET authentication_string='' WHERE user='root'")
+                rows = pdb.query("select host from mysql.user where user='root'")
+                hosts = [str(r['host']) for r in rows if 'host' in r]
             except Exception:
-                pass
-            pdb.execute(
-                "ALTER USER 'root'@'localhost' IDENTIFIED BY '%s'" % password)
-            # 127.0.0.1 账号可能不存在,失败忽略
-            try:
-                pdb.execute(
-                    "ALTER USER 'root'@'127.0.0.1' IDENTIFIED BY '%s'" % password)
-            except Exception:
-                pass
+                hosts = []
+            if len(hosts) == 0:
+                hosts = ['localhost', '127.0.0.1']
+            for h in hosts:
+                try:
+                    pdb.execute("ALTER USER 'root'@'%s' IDENTIFIED BY '%s'" % (h, password))
+                except Exception as e:
+                    pass
         else:
-            result = pdb.execute("update mysql.user set Password=password('" + password + "') where User='root'")
-        pdb.execute("flush privileges")
+            try:
+                pdb.execute("update mysql.user set Password=password('" + password + "') where User='root'")
+            except Exception as e:
+                pass
+            
         pSqliteDb('config').where('id=?', (1,)).save('mysql_root', (password,))
-
-        msg = ''
-        if force == 1:
-            msg = ',无须强制!'
-
-        return mw.returnJson(True, '数据库root密码修改成功!'+msg)
+        return mw.returnJson(True, '数据库root密码修改成功!')
     except Exception as ex:
         return mw.returnJson(False, '修改错误:' + str(ex))
 
