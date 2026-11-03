@@ -533,7 +533,7 @@ function setRootPwd(type, pwd){
             return false;
         },
         btn4:function(layerIndex){
-            layer.confirm('强制修改,是为了在重建时使用,确定强制?', {
+            layer.confirm('强制修改会重启MySQL,并跳过权限校验真正重置root密码,确定强制?', {
                 btn: ['确定', '取消']
             }, function(index, layero){
                 layer.close(index);

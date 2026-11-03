@@ -1686,6 +1686,8 @@ def setRootPwd(version=''):
     if 'force' in args and args['force'] == '2':
         force = 2
         ok = setRootPwdForce(password,version)
+        if not ok:
+            return mw.returnJson(False, '【强制】修改失败,请检查MySQL运行状态!')
 
         pSqliteDb('config').where('id=?', (1,)).save('mysql_root', (password,))
         if ok and version.startswith("8"):
@@ -2012,16 +2014,20 @@ def resetDbRootPwd(version):
         data = mw.execShell(cmd_pass)
         # print(data)
     else:
-        auth_policy = getAuthPolicy()
+        # 8.4 起默认禁用 mysql_native_password, 9.x 已移除, 用默认认证插件
+        m = re.search(r'(\d+)\.(\d+)', version)
+        major = int(m.group(1)) if m else 0
+        minor = int(m.group(2)) if m else 0
+        if major >= 9 or (major == 8 and minor >= 4):
+            auth_sql = "alter user 'root'@'localhost' IDENTIFIED by '" + pwd + "';"
+        else:
+            auth_sql = "alter user 'root'@'localhost' IDENTIFIED WITH " + getAuthPolicy() + " by '" + pwd + "';"
 
         reset_pwd = 'flush privileges;'
         reset_pwd = reset_pwd + \
             "UPDATE mysql.user SET authentication_string='' WHERE user='root';"
         reset_pwd = reset_pwd + "flush privileges;"
-        reset_pwd = reset_pwd + \
-            "alter user 'root'@'localhost' IDENTIFIED by '" + pwd + "';"
-        reset_pwd = reset_pwd + \
-            "alter user 'root'@'localhost' IDENTIFIED WITH "+auth_policy+" by '" + pwd + "';"
+        reset_pwd = reset_pwd + auth_sql
         reset_pwd = reset_pwd + "flush privileges;"
 
         tmp_file = "/tmp/mysql_init_tmp.log"
@@ -2035,31 +2041,45 @@ def resetDbRootPwd(version):
 
 def fixDbAccess(version):
 
-    pdb = pMysqlDb()
     mdb_ddir = getDataDir()
-    if not os.path.exists(mdb_ddir):
-        return mw.returnJson(False, '数据目录不存在,尝试重启重建!')
+    # 1) 数据目录不存在或未初始化(缺少 mysql 系统库): 删除后重建, 启动时会自动 initialize-insecure
+    if not os.path.exists(mdb_ddir + '/mysql'):
+        try:
+            appCMD(version, 'stop')
+            if os.path.exists(mdb_ddir):
+                mw.execShell('rm -rf ' + mdb_ddir)
+            appCMD(version, 'start')
+            return mw.returnJson(True, '数据目录不存在,已重建并初始化!')
+        except Exception as e:
+            return mw.returnJson(False, '重建失败:' + str(e))
 
     try:
+        pdb = pMysqlDb()
         data = pdb.query('show databases')
         isError = isSqlError(data)
-        if isError != None:
-       
-            # 重置密码
-            appCMD(version, 'stop')
-            openSkipGrantTables()
-            appCMD(version, 'start')
-            time.sleep(3)
-            resetDbRootPwd(version)
+        if isError == None:
+            return mw.returnJson(True, '正常无需修复!')
 
-            appCMD(version, 'stop')
-            closeSkipGrantTables()
-            appCMD(version, 'start')
+        # 2) 密码错误 -> 跳过权限校验重置密码, 并用新密码验证连接
+        appCMD(version, 'stop')
+        openSkipGrantTables()
+        appCMD(version, 'start')
+        time.sleep(3)
+        resetDbRootPwd(version)
+        appCMD(version, 'stop')
+        closeSkipGrantTables()
+        appCMD(version, 'start')
+        time.sleep(2)
 
-            return mw.returnJson(True, '修复成功!')
-        return mw.returnJson(True, '正常无需修复!')
+        try:
+            ndb = pMysqlDb()
+            if isSqlError(ndb.query('show databases')) == None:
+                return mw.returnJson(True, '修复成功,root密码已重置!')
+        except Exception:
+            pass
+        return mw.returnJson(False, '密码重置失败,请检查数据库运行状态!')
     except Exception as e:
-        return mw.returnJson(False, '修复失败请重试!')
+        return mw.returnJson(False, '修复失败:' + str(e))
 
 
 def setDbRw(version=''):

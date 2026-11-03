@@ -1477,10 +1477,12 @@ def setRootPwd(version=''):
         result = pdb.query("show databases")
         isError = isSqlError(result)
         if isError != None:
-            if force == 1:
-                pSqliteDb('config').where('id=?', (1,)).save('mysql_root', (password,))
-                return mw.returnJson(True, '【强制修改】数据库root密码修改成功(不意为成功连接数据)!')
-            return isError
+            if force != 1:
+                return isError
+            # 强制模式: 当前密码不可用, 走跳过权限校验真正重置密码
+            if not setRootPwdForce(password, version):
+                return mw.returnJson(False, '强制修改失败,请检查MySQL运行状态!')
+            return mw.returnJson(True, '【强制修改】数据库root密码修改成功!')
 
         if version.find('5.7') > -1 or mw.inArray(getMdb8Ver(), version):
             pdb.execute(
@@ -1490,8 +1492,7 @@ def setRootPwd(version=''):
             pdb.execute(
                 "ALTER USER 'root'@'127.0.0.1' IDENTIFIED BY '%s'" % password)
         else:
-            result = pdb.execute(
-                "update mysql.user set Password=password('" + password + "') where User='root'")
+            result = pdb.execute("update mysql.user set Password=password('" + password + "') where User='root'")
         pdb.execute("flush privileges")
         pSqliteDb('config').where('id=?', (1,)).save('mysql_root', (password,))
 
@@ -1755,10 +1756,11 @@ def closeSkipGrantTables():
     return True
 
 
-def resetDbRootPwd(version):
+def resetDbRootPwd(version, newpwd=''):
     serverdir = getServerDir()
     myconf = serverdir + "/etc/my.cnf"
-    pwd = mw.getRandomString(16)
+    # newpwd 为空时生成随机密码, 强制修改时传入用户指定的密码
+    pwd = newpwd if newpwd != '' else mw.getRandomString(16)
 
     pSqliteDb('config').where('id=?', (1,)).save('mysql_root', (pwd,))
     mdb8 = getMdb8Ver()
@@ -1769,26 +1771,62 @@ def resetDbRootPwd(version):
         data = mw.execShell(cmd_pass)
         # print(data)
     else:
-        auth_policy = getAuthPolicy()
+        # 8.4 起默认禁用 mysql_native_password, 9.x 已移除, 用默认认证插件
+        m = re.search(r'(\d+)\.(\d+)', version)
+        major = int(m.group(1)) if m else 0
+        minor = int(m.group(2)) if m else 0
+        if major >= 9 or (major == 8 and minor >= 4):
+            auth_sql = "alter user 'root'@'localhost' IDENTIFIED by '" + pwd + "';"
+        else:
+            auth_sql = "alter user 'root'@'localhost' IDENTIFIED WITH " + getAuthPolicy() + " by '" + pwd + "';"
 
         reset_pwd = 'flush privileges;'
         reset_pwd = reset_pwd + \
             "UPDATE mysql.user SET authentication_string='' WHERE user='root';"
         reset_pwd = reset_pwd + "flush privileges;"
-        reset_pwd = reset_pwd + \
-            "alter user 'root'@'localhost' IDENTIFIED by '" + pwd + "';"
-        reset_pwd = reset_pwd + \
-            "alter user 'root'@'localhost' IDENTIFIED WITH "+auth_policy+" by '" + pwd + "';"
+        reset_pwd = reset_pwd + auth_sql
         reset_pwd = reset_pwd + "flush privileges;"
 
         tmp_file = "/tmp/mysql_init_tmp.log"
         mw.writeFile(tmp_file, reset_pwd)
         cmd_pass = serverdir + '/bin/mysql --defaults-file=' + myconf + ' -uroot -proot < ' + tmp_file
 
-        data = mw.execShell(cmd_pass)
-        # print(data)
-        os.remove(tmp_file)
     return True
+
+
+def setRootPwdForce(new_password, version=''):
+    '''
+    当前root密码不可用(忘记密码/连接被拒)时, 通过跳过权限校验的方式真正重置密码
+    '''
+    changed = False
+    try:
+        appCMD(version, 'stop')
+        openSkipGrantTables()
+        appCMD(version, 'start')
+        time.sleep(3)
+        resetDbRootPwd(version, new_password)
+        changed = True
+    except Exception:
+        changed = False
+    finally:
+        # 无论成败都恢复密码校验, 避免数据库长期处于无校验状态
+        appCMD(version, 'stop')
+        closeSkipGrantTables()
+        appCMD(version, 'start')
+        time.sleep(2)
+
+    if not changed:
+        return False
+
+    # 用新密码验证是否真的可以连接
+    try:
+        pdb = pMysqlDb()
+        result = pdb.query('show databases')
+        if isSqlError(result) != None:
+            return False
+        return True
+    except Exception:
+        return False
 
 def fixDbAccess2(version):
     try:
@@ -1806,31 +1844,34 @@ def fixDbAccess2(version):
         
 def fixDbAccess(version):
 
-    pdb = pMysqlDb()
     mdb_ddir = getDataDir()
-    if not os.path.exists(mdb_ddir):
-        return mw.returnJson(False, '数据目录不存在,尝试重启重建!')
+    # 1) 数据目录不存在或未初始化(缺少 mysql 系统库): 删除后重建, 启动时会自动 initialize-insecure
+    if not os.path.exists(mdb_ddir + '/mysql'):
+        try:
+            appCMD(version, 'stop')
+            if os.path.exists(mdb_ddir):
+                mw.execShell('rm -rf ' + mdb_ddir)
+            appCMD(version, 'start')
+            return mw.returnJson(True, '数据目录不存在,已重建并初始化!')
+        except Exception as e:
+            return mw.returnJson(False, '重建失败:' + str(e))
 
     try:
+        pdb = pMysqlDb()
         data = pdb.query('show databases')
         isError = isSqlError(data)
-        if isError != None:
-       
-            # 重置密码
-            appCMD(version, 'stop')
-            openSkipGrantTables()
-            appCMD(version, 'start')
-            time.sleep(3)
-            resetDbRootPwd(version)
+        if isError == None:
+            return mw.returnJson(True, '正常无需修复!')
 
-            appCMD(version, 'stop')
-            closeSkipGrantTables()
-            appCMD(version, 'start')
-
-            return mw.returnJson(True, '修复成功!')
-        return mw.returnJson(True, '正常无需修复!')
+        # 2) 密码错误 -> 跳过权限校验重置密码, 并用新密码验证连接
+        if not setRootPwdForce(mw.getRandomString(16), version):
+            return mw.returnJson(False, '密码重置失败,请检查数据库运行状态!')
+        return mw.returnJson(True, '修复成功,root密码已重置!')
     except Exception as e:
-        return mw.returnJson(False, '修复失败请重试!')
+        # 连接阶段抛异常一般是密码不可用, 仍尝试重置
+        if setRootPwdForce(mw.getRandomString(16), version):
+            return mw.returnJson(True, '修复成功,root密码已重置!')
+        return mw.returnJson(False, '修复失败:' + str(e))
 
 
 
