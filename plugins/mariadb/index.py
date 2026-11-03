@@ -1469,8 +1469,7 @@ def addDb():
         return mw.returnJson(False, '数据库已存在!')
 
     try:
-        result = pdb.execute("create database `" + dbname +
-                             "` DEFAULT CHARACTER SET " + codeing + " COLLATE " + codeStr)
+        result = pdb.execute("create database `" + dbname +"` DEFAULT CHARACTER SET " + codeing + " COLLATE " + codeStr)
     except Exception as e:
         result = e
     # print result
@@ -1478,14 +1477,10 @@ def addDb():
     if isError != None:
         return isError
 
-    # 清理同名残留用户,失败忽略(兼容DROP USER不支持IF EXISTS的旧版本)
-    try:
-        pdb.execute("drop user '" + dbuser + "'@'localhost'")
-    except Exception:
-        pass
-    for a in address.split(','):
+    db_users_access = getDbUserAccess(dbuser)
+    for user_access in db_users_access:
         try:
-            pdb.execute("drop user '" + dbuser + "'@'" + a + "'")
+            pdb.execute("drop user `%s`@'%s'" % (db_user, user_access))
         except Exception:
             pass
 
@@ -1518,18 +1513,10 @@ def delDb():
         except Exception:
             pass
 
-        try:
-            users = pdb.query("select Host from user where User='" +
-                              username + "' AND Host!='localhost'")
-        except Exception:
-            users = []
-        try:
-            pdb.execute("drop user '" + username + "'@'localhost'")
-        except Exception:
-            pass
-        for us in users:
+        db_users_access = getDbUserAccess(username)
+        for user_access in db_users_access:
             try:
-                pdb.execute("drop user '" + username + "'@'" + us["Host"] + "'")
+                pdb.execute("drop user '" + username + "'@'%s'" % (user_access,))
             except Exception:
                 pass
         pdb.execute("flush privileges")

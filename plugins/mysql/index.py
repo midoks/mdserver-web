@@ -1856,7 +1856,7 @@ def addDb():
     db_users_access = getDbUserAccess(dbuser)
     for user_access in db_users_access:
         try:
-            pdb.execute("drop user '" + dbuser + "'@'%s'" % (user_access,))
+            pdb.execute("drop user `%s`@'%s'" % (db_user, user_access))
         except Exception:
             pass
 
@@ -2107,17 +2107,14 @@ def setDbRw(version=''):
     psdb = pSqliteDb('databases')
     dbname = psdb.where("id=?", (uid,)).getField('name')
     try:
-        users = pdb.query(
-            "select Host from mysql.user where User='" + username + "'")
+        users = pdb.query("select Host from mysql.user where User='" + username + "'")
     except Exception as e:
         return mw.returnJson(-1, str(e))
 
     # show grants for demo@"127.0.0.1";
     for x in users:
         # REVOKE ALL PRIVILEGES ON `imail`.* FROM 'imail'@'127.0.0.1';
-
-        sql = "REVOKE ALL PRIVILEGES ON `" + dbname + \
-            "`.* FROM '" + username + "'@'" + x["Host"] + "';"
+        sql = "REVOKE ALL PRIVILEGES ON `" + dbname + "`.* FROM '" + username + "'@'" + x["Host"] + "';"
         try:
             pdb.query(sql)
         except Exception:
