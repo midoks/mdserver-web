@@ -558,6 +558,15 @@ def upgradeCheck(version):
         return mw.returnJson(1, "有新版",full_verion)
     return mw.returnJson(0,"pass")
 
+def uninstallPreInspection(version):
+    from utils.plugin import plugin as MwPlugin
+    MwPlugin.instance().removeIndex(getPluginName(), version)
+
+    stop()
+    # if mw.isDebugMode():
+    #     return 'ok'
+    return "请手动删除Redis[{}]<br/> rm -rf {}".format(version, getServerDir())
+
 if __name__ == "__main__":
 
     version = '8.8'
@@ -582,6 +591,8 @@ if __name__ == "__main__":
         print(initdInstall())
     elif func == 'initd_uninstall':
         print(initdUinstall())
+    elif func == 'uninstall_pre_inspection':
+        print(uninstallPreInspection(version))
     elif func == "upgrade_check":
         print(upgradeCheck(version))
     elif func == 'run_info':

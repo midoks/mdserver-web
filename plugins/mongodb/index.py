@@ -354,8 +354,7 @@ def mgOp(method):
 
 
 def start():
-    mw.execShell(
-        'export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/www/server/lib/openssl11/lib')
+    mw.execShell('export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/www/server/lib/openssl11/lib')
     return mgOp('start')
 
 
@@ -1846,7 +1845,7 @@ def uninstallPreInspection(version):
 
     # if mw.isDebugMode():
     #     return 'ok'
-    
+
     from utils.plugin import plugin as MwPlugin
     MwPlugin.instance().removeIndex(getPluginName(), version)
 

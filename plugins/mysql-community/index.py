@@ -3724,7 +3724,7 @@ def uninstallPreInspection(version):
     from utils.plugin import plugin as MwPlugin
     MwPlugin.instance().removeIndex(getPluginName(), version)
     
-    return "请手动删除MySQL[{}]<br/> rm -rf {}".format(version, getServerDir())
+    return "请手动删除MySQL-COMMUNITY[{}]<br/> rm -rf {}".format(version, getServerDir())
 
 if __name__ == "__main__":
     func = sys.argv[1]
