@@ -559,6 +559,7 @@ def upgradeCheck(version):
     return mw.returnJson(0,"pass")
 
 def uninstallPreInspection(version):
+    version = version.strip()
     from utils.plugin import plugin as MwPlugin
     MwPlugin.instance().removeIndex(getPluginName(), version)
 
