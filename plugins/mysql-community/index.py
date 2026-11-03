@@ -1810,6 +1810,9 @@ def resetDbRootPwd(version, newpwd=''):
         tmp_file = "/tmp/mysql_init_tmp.log"
         mw.writeFile(tmp_file, reset_pwd)
         cmd_pass = serverdir + '/bin/mysql --defaults-file=' + myconf + ' -uroot -proot < ' + tmp_file
+        data = mw.execShell(cmd_pass)
+        # print(data)
+        os.remove(tmp_file)
 
     return True
 
@@ -1838,15 +1841,19 @@ def setRootPwdForce(new_password, version=''):
     if not changed:
         return False
 
-    # 用新密码验证是否真的可以连接
-    try:
-        pdb = pMysqlDb()
-        result = pdb.query('show databases')
-        if isSqlError(result) != None:
-            return False
-        return True
-    except Exception:
-        return False
+    # 用新密码验证是否真的可以连接(启动可能较慢, 重试几次)
+    for i in range(10):
+        try:
+            pdb = pMysqlDb()
+            result = pdb.query('show databases')
+            if isSqlError(result) == None:
+                return True
+        except Exception:
+            pass
+        time.sleep(2)
+
+    return False
+
 
 def fixDbAccess2(version):
     try:
