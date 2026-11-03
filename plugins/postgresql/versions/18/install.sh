@@ -106,7 +106,7 @@ Install_App()
 	else
 		echo '安装postgresql失败'
 	fi
-	# rm -rf ${postgreDir}/postgresql-${VERSION}
+	rm -rf ${postgreDir}/postgresql-${VERSION}
 	# rm -rf ${postgreDir}/postgresql-${VERSION}.tar.bz2
 }
 
