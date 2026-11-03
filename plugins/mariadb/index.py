@@ -1622,30 +1622,34 @@ def resetDbRootPwd(version, newpwd=''):
 
 def fixDbAccess(version):
 
-    pdb = pMysqlDb()
     mdb_ddir = getDataDir()
-    if not os.path.exists(mdb_ddir):
-        return mw.returnJson(False, '数据目录不存在,尝试重启重建!')
+    # 1) 数据目录不存在或未初始化(缺少 mysql 系统库): 删除后重建, 启动时会自动 mariadb-install-db 初始化
+    if not os.path.exists(mdb_ddir + '/mysql'):
+        try:
+            appCMD(version, 'stop')
+            if os.path.exists(mdb_ddir):
+                mw.execShell('rm -rf ' + mdb_ddir)
+            appCMD(version, 'start')
+            return mw.returnJson(True, '数据目录不存在,已重建并初始化!')
+        except Exception as e:
+            return mw.returnJson(False, '重建失败:' + str(e))
 
     try:
-        psdb = pSqliteDb('databases')
+        pdb = pMysqlDb()
         data = pdb.query('show databases')
         isError = isSqlError(data)
-        if isError != None:
-            # 重置密码
-            appCMD(version, 'stop')
-            openSkipGrantTables()
-            appCMD(version, 'start')
-            time.sleep(3)
-            resetDbRootPwd(version)
+        if isError == None:
+            return mw.returnJson(True, '正常无需修复!')
 
-            appCMD(version, 'stop')
-            closeSkipGrantTables()
-            appCMD(version, 'start')
-            return mw.returnJson(True, '修复成功!')
-        return mw.returnJson(True, '正常无需修复!')
+        # 2) 密码错误 -> 跳过权限校验重置密码, 并用新密码验证连接
+        if not setRootPwdForce(mw.getRandomString(16), version):
+            return mw.returnJson(False, '密码重置失败,请检查数据库运行状态!')
+        return mw.returnJson(True, '修复成功,root密码已重置!')
     except Exception as e:
-        return mw.returnJson(False, '修复失败请重试!')
+        # 连接阶段抛异常一般是密码不可用, 仍尝试重置
+        if setRootPwdForce(mw.getRandomString(16), version):
+            return mw.returnJson(True, '修复成功,root密码已重置!')
+        return mw.returnJson(False, '修复失败:' + str(e))
 
 
 def setDbRw(version=''):
