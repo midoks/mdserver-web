@@ -92,7 +92,9 @@ Install_App()
 		--prefix=$serverPath/postgresql \
 		--with-openssl"
 		# --with-pgport=33206
-		make -j${cpuCore} && make install && make clean
+		make -j${cpuCore} && make install
+		cd contrib && make && make install && cd ..
+		make clean
 	fi
 
 	if [ -d $serverPath/postgresql ];then
@@ -101,6 +103,7 @@ Install_App()
 	else
 		echo '安装postgresql失败'
 	fi
+	rm -rf ${postgreDir}/postgresql-${VERSION}
 	# rm -rf ${postgreDir}/postgresql-${VERSION}.tar.bz2
 }
 
