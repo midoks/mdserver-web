@@ -442,6 +442,14 @@ def getSlaveName():
         return 'replica'
     return 'slave'
 
+
+def getSlaveNameByVer(version=''):
+    # 与 getSlaveName 相同, 但使用显式传入的版本, 避免依赖全局 version
+    # MySQL 8.4 起 SLAVE 相关语句已移除, 只能用 REPLICA
+    if mw.inArray(getMdb8Ver(), version):
+        return 'replica'
+    return 'slave'
+
 def pGetDbUser():
     if mw.isAppleSystem():
         user = mw.execShell("who | sed -n '2, 1p' |awk '{print $1}'")[0].strip()
@@ -2857,10 +2865,10 @@ def trySlaveSyncBugfix(version=''):
     gtid_purged = gtid_purged.strip(',')
     sql = "set @@global.gtid_purged='" + gtid_purged + "'"
 
-    sdb.query('stop slave')
+    sdb.query('stop ' + getSlaveNameByVer(version))
     # print(sql)
     sdb.query(sql)
-    sdb.query('start slave')
+    sdb.query('start ' + getSlaveNameByVer(version))
     return mw.returnJson(True, '修复成功!')
 
 def getSlaveSyncCmd(version=''):
@@ -3026,7 +3034,7 @@ def initSlaveStatusSSH(version=''):
             ps = u['username'] + "|" + u['password']
             print(ps)
             conn.where('ip=?', (ip,)).setField('ps', ps)
-            db.query('stop slave')
+            db.query('stop ' + getSlaveNameByVer(version))
 
             # 保证同步IP一致
             cmd = cmd_data['data']['cmd']
@@ -3063,7 +3071,7 @@ def setSlaveStatus(version=''):
 
     for v in dlist:
         connection_name = ''
-        cmd = "slave"
+        cmd = slave_name
         if 'Channel_Name' in v:
             ch_name = v['Channel_Name']
             cmd = slave_name + " for channel '{}'".format(ch_name)
@@ -3543,10 +3551,9 @@ def doFullSyncUser(version=''):
     writeDbSyncStatus({'code': 1, 'msg': '正在停止从库...', 'progress': 15})
 
     mdb8 = getMdb8Ver()
-    if mw.inArray(mdb8,version):
-        db.query("stop slave user='{}' password='{}';".format(user, apass))
-    else:
-        db.query("stop slave")
+    slave_name = getSlaveNameByVer(version)
+    # 8.x 起 STOP SLAVE 的 user/password 参数已移除, 凭据由 CHANGE REPLICATION SOURCE TO 保存
+    db.query("stop " + slave_name)
         
     time.sleep(1)
     writeDbSyncStatus({'code': 2, 'msg': '远程导出数据...', 'progress': 20})
@@ -3614,12 +3621,10 @@ def doFullSyncUser(version=''):
             ' ' + sync_db_import + ' < ' + bak_file
         mw.execShell(my_import_cmd)
 
-    if mw.inArray(mdb8, version):
-        db.query("start replica user='{}' password='{}';".format(user, apass))
-    else:
-        db.query("start slave")
-
-    db.query("start all slaves")
+    db.query("start " + slave_name)
+    if channel_name != '':
+        # 多通道用 FOR CHANNEL 启动(MySQL 不支持 START ALL SLAVES)
+        db.query("start " + slave_name + " for channel '" + channel_name + "'")
     time_all_e = time.time()
     cos = time_all_e - time_all_s
     writeDbSyncStatus({'code': 6, 'msg': '总耗时:'+str(int(cos))+'秒,从库重启完成...', 'progress': 100})
@@ -3722,7 +3727,7 @@ def doFullSyncSSH(version=''):
     result = result.decode('utf-8')
     cmd_data = json.loads(result)
 
-    db.query('stop slave')
+    db.query('stop ' + getSlaveNameByVer(version))
     writeDbSyncStatus({'code': 3, 'msg': '停止从库完成...', 'progress': 45})
 
     cmd = cmd_data['data']['cmd']
@@ -3760,7 +3765,7 @@ def doFullSyncSSH(version=''):
 
     # "start slave user='{}' password='{}';".format(uinfo['username'], uinfo['password'])
 
-    db.query("start slave")
+    db.query("start " + getSlaveNameByVer(version))
     writeDbSyncStatus({'code': 6, 'msg': '从库重启完成...', 'progress': 100})
 
     os.system("rm -rf " + SSH_PRIVATE_KEY)
