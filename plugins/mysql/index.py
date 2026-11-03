@@ -1286,7 +1286,7 @@ def deleteDbBackup():
     if path != "":
         full_file = path + "/" + args['filename']
     os.remove(full_file)
-    return mw.returnJson(True, 'ok')
+    return mw.returnJson(True, '删除成功!')
 
 
 def getDbBackupList():
