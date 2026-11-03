@@ -1347,7 +1347,10 @@ def getDbInfo():
     return mw.getJson(ret)
 
 def pgBack():
-    # 备份数据库
+    # 备份数据库 — 无锁 + 大库优化版本
+
+    import subprocess
+    import shutil
 
     args = getArgs()
     data = checkArgs(args, ['name'])
@@ -1362,23 +1365,83 @@ def pgBack():
     if not os.path.exists(pg_dump):
         pg_dump = 'pg_dump'
 
+    # 检测 pg_dump 主版本, 14+ 加 --no-sync
+    pg_major = 0
+    try:
+        out = subprocess.check_output([pg_dump, '--version'], stderr=subprocess.STDOUT)
+        m = re.search(r'(\d+)', out.decode())
+        if m:
+            pg_major = int(m.group(1))
+    except Exception:
+        pass
+
+    # 检测 pigz 并行压缩
+    pigz = shutil.which('pigz')
+    if pigz:
+        try:
+            cpus = int(subprocess.check_output(['sysctl', '-n', 'hw.ncpu']).strip())
+        except Exception:
+            cpus = 4
+        compressor = pigz + ' -p ' + str(max(2, cpus - 1)) + ' -6'
+    else:
+        compressor = 'gzip -6'
+
+    # 文件名按时间戳命名
     file_name = 'db_{}_{}.sql.gz'.format(
         database, time.strftime("%Y%m%d_%H%M%S"))
     file_path = os.path.join(bk_path_upload, file_name)
 
-    # -c --if-exists: 导出带 DROP 语句便于覆盖恢复，且对象不存在时不报错
-    cmd = '''{} -c --if-exists -U postgres -d {} -p {} | gzip > "{}"'''.format(
-        pg_dump, database, port, file_path)
-    if not mw.isAppleSystem():
-        cmd = '''su - postgres -c "{} -c --if-exists -U postgres -d {} -p {}" | gzip > "{}"'''.format(
-            pg_dump, database, port, file_path)
+    # pg_dump 参数:
+    #   -c --if-exists: DROP 语句便于覆盖恢复
+    #   --serializable-deferrable: MVCC 快照一致性, 与 DDL 快照冲突时自动重试
+    #   --lock-wait-timeout=30s: 等表锁最多 30 秒, 避免大 DDL 下一直阻塞
+    #   --no-sync (PG 14+):    dump 完不等 fsync, 减少 I/O 等待
+    dump_opts = '-c --if-exists --serializable-deferrable --lock-wait-timeout=30s'
+    if pg_major >= 14:
+        dump_opts += ' --no-sync'
 
-    # print(cmd)
+    # set -o pipefail: 管道任一命令失败都能被检测到
+    stderr_log = '/tmp/pg_dump_stderr.log'
+    exit_code_file = '/tmp/pg_dump_exit_code'
+    open(stderr_log, 'w').close()
+
+    if mw.isAppleSystem():
+        cmd = '''set -o pipefail && {} {} -U postgres -d {} -p {} 2>>{} | {} > "{}"; echo $? > {}'''.format(
+            pg_dump, dump_opts, database, port, stderr_log, compressor, file_path, exit_code_file)
+    else:
+        cmd = '''set -o pipefail && su - postgres -c "{} {} -U postgres -d {} -p {}" 2>>{} | {} > "{}"; echo $? > {}'''.format(
+            pg_dump, dump_opts, database, port, stderr_log, compressor, file_path, exit_code_file)
+
     rdata = mw.execShell(cmd)
 
-    # gzip 会掩盖 pg_dump 的失败，需检查错误输出和文件大小
-    if rdata[1].lower().find('error') > -1 or not os.path.exists(file_path) or os.path.getsize(file_path) < 100:
-        return mw.returnJson(False, rdata[1] or '备份失败，未导出数据')
+    # 读取 stderr, pg_dump 自己的错误信息会写这里
+    stderr_txt = ''
+    try:
+        with open(stderr_log) as f:
+            stderr_txt = f.read().strip()
+    except Exception:
+        pass
+
+    # 读取管道 exit code（通过 set -o pipefail, 管道任一命令失败即非零）
+    exit_code = 0
+    try:
+        with open(exit_code_file) as f:
+            exit_code = int(f.read().strip())
+    except Exception:
+        pass
+
+    # 备份失败: pipefail 非零 / 文件不存在 / 文件太小
+    err_hint = stderr_txt[-400:] if stderr_txt else ''
+    if exit_code != 0 \
+            or (not os.path.exists(file_path)) \
+            or (os.path.exists(file_path) and os.path.getsize(file_path) < 200):
+        if os.path.exists(file_path):
+            try:
+                os.remove(file_path)
+            except Exception:
+                pass
+        msg = err_hint or ('备份失败 (exit_code={})'.format(exit_code) if exit_code != 0 else '备份失败')
+        return mw.returnJson(False, msg)
 
     return mw.returnJson(True, '备份成功!')
 
@@ -1449,13 +1512,19 @@ def importDbBackup():
 
 def deleteDbBackup():
     args = getArgs()
-    data = checkArgs(args, ['filename'])
+    data = checkArgs(args, ['filename', 'path'])
     if not data[0]:
         return data[1]
 
+    path = args['path']
+
     bk_path_upload = getBackupDir()
-    os.remove(bk_path_upload + '/' + args['filename'])
-    return mw.returnJson(True, 'ok')
+    full_file = bk_path_upload + '/' + args['filename']
+    if path != "":
+        full_file = path + "/" + args['filename']
+    if os.path.exists(full_file):
+        os.remove(full_file)
+    return mw.returnJson(True, '删除成功!')
 
 
 ############ 主从功能 ######################
