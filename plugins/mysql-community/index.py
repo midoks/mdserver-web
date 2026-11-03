@@ -890,7 +890,6 @@ def setDbBackup():
     if not data[0]:
         return data[1]
 
-    scDir = mw.getPanelDir() + '/scripts/backup.py'
     head = "cd "+mw.getPanelDir()
     cmd = head +' && . bin/activate &&  python3 plugins/mysql-community/scripts/backup.py database ' + args['name'] + ' 3'
     # print(cmd)
@@ -1138,7 +1137,7 @@ def deleteDbBackup():
     if path != "":
         full_file = path + "/" + args['filename']
     os.remove(full_file)
-    return mw.returnJson(True, 'ok')
+    return mw.returnJson(True, '删除成功!')
 
 
 def getDbBackupList():

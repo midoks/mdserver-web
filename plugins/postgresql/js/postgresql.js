@@ -605,8 +605,8 @@ function setDbPs(id, name, obj) {
 }
 
 function delBackup(filename,name){
-    myPost('delete_db_backup',{filename:filename},function(){
-        layer.msg('执行成功!');
+    myPost('delete_db_backup',{filename:filename,path:""},function(rdata){
+        layer.msg(rdata.msg, { icon: rdata.status ? 1 : 2 });
         setTimeout(function(){
             // $('.layui-layer-close2').click();
             setBackupReq(name);
