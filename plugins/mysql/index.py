@@ -2698,8 +2698,7 @@ def addMasterRepSlaveUser(version=''):
         if isError != None:
             return isError
     else:
-        sql = "grant replication SLAVE ON *.* TO  '" + username + \
-            "'@'%' identified by '" + password + "';"
+        sql = "grant replication SLAVE ON *.* TO  '" + username + "'@'%' identified by '" + password + "';"
         result = pdb.execute(sql)
         isError = isSqlError(result)
         if isError != None:
