@@ -1010,6 +1010,34 @@ def executeResetMaster(pdb, version=''):
     return last_err
 
 
+def setGtidModeStepwise(db, target):
+    # GTID_MODE 只能逐级切换: OFF <-> OFF_PERMISSIVE <-> ON_PERMISSIVE <-> ON
+    # 先读当前实际值, 再从当前状态逐级走到目标值, 避免 1788 错误
+    order = ['OFF', 'OFF_PERMISSIVE', 'ON_PERMISSIVE', 'ON']
+    try:
+        rows = db.query('select @@global.gtid_mode as v')
+        cur = str(rows[0].get('v') or 'OFF').upper() if rows else 'OFF'
+    except Exception:
+        cur = 'OFF'
+    if cur not in order:
+        cur = 'OFF'
+
+    if target == 'ON':
+        # 开启前必须先打开 enforce_gtid_consistency
+        db.query('set global enforce_gtid_consistency=on')
+
+    i = order.index(cur)
+    t = order.index(target)
+    step = 1 if t > i else -1
+    while i != t:
+        i += step
+        db.query('set global gtid_mode=' + order[i].lower())
+
+    if target == 'OFF':
+        # 到达 OFF 后才能关闭 enforce_gtid_consistency
+        db.query('set global enforce_gtid_consistency=off')
+
+
 def __createUser(dbname, username, password, address):
     pdb = pMysqlDb()
 
@@ -2273,6 +2301,19 @@ def setDbrunMode(version=''):
     if not mode in ['classic', 'gtid']:
         return mw.returnJson(False, "mode的值无效:" + mode)
 
+    if version == '5.6':
+        dbreload = 'yes'
+    else:
+        db = pMysqlDb()
+        # GTID_MODE 需逐级切换, 先改运行时再写配置, 失败时不改配置文件
+        try:
+            if mode == 'classic':
+                setGtidModeStepwise(db, 'OFF')
+            elif mode == 'gtid':
+                setGtidModeStepwise(db, 'ON')
+        except Exception as e:
+            return mw.returnJson(False, 'GTID模式切换失败: ' + str(e))
+
     origin_mode = recognizeDbMode()
     path = getConf()
     con = mw.readFile(path)
@@ -2280,27 +2321,6 @@ def setDbrunMode(version=''):
     rep_after = "!include %s/%s.cnf" % (getServerDir() + "/etc/mode", mode)
     con = re.sub(rep, rep_after, con)
     mw.writeFile(path, con)
-
-    if version == '5.6':
-        dbreload = 'yes'
-    else:
-        db = pMysqlDb()
-        # The value of @@GLOBAL.GTID_MODE can only be changed one step at a
-        # time: OFF <-> OFF_PERMISSIVE <-> ON_PERMISSIVE <-> ON. Also note that
-        # this value must be stepped up or down simultaneously on all servers.
-        # See the Manual for instructions.
-        if mode == 'classic':
-            db.query('set global enforce_gtid_consistency=off')
-            db.query('set global gtid_mode=on')
-            db.query('set global gtid_mode=on_permissive')
-            db.query('set global gtid_mode=off_permissive')
-            db.query('set global gtid_mode=off')
-        elif mode == 'gtid':
-            db.query('set global enforce_gtid_consistency=on')
-            db.query('set global gtid_mode=off')
-            db.query('set global gtid_mode=off_permissive')
-            db.query('set global gtid_mode=on_permissive')
-            db.query('set global gtid_mode=on')
 
     if dbreload == "yes":
         restart(version)
