@@ -1106,7 +1106,7 @@ function delBackup(filename, name, path){
         path = "";
     }
     mgPost('delete_db_backup','',{filename:filename,path:path},function(){
-        layer.msg('执行成功!');
+        layer.msg(rdata.msg, { icon: rdata.status ? 1 : 2 });
         setTimeout(function(){
             setBackupReq(name);
         },2000);
