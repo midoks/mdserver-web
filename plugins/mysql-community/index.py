@@ -1710,19 +1710,32 @@ def getDbUserAccessDiff(db_access, input_access):
     add = []
     delete = []
 
+    host_var = 'localhost'
+    local_ipvar = '127.0.0.1'
+
     for ac in input_access:
-        if ac == "localhost":
+        if ac == host_var:
+            continue
+        if ac == local_ipvar:
             continue
         if mw.inArray(db_access,ac):
             continue
         add.append(ac)
 
+    if not mw.inArray(db_access, local_ipvar) and not mw.inArray(add, local_ipvar):
+        add.append(local_ipvar)
+
     for ac in db_access:
-        if ac == "localhost":
+        if ac == host_var:
+            continue
+        if ac == local_ipvar:
             continue
         if mw.inArray(input_access,ac):
             continue
         delete.append(ac)
+
+    if mw.inArray(delete, local_ipvar):
+        delete.remove(local_ipvar)
 
     return {"add":add,"delete":delete}
 
@@ -1736,8 +1749,10 @@ def getDbAccess():
     users = getDbUserAccess(username)
     if len(users) == 1:
         return mw.returnJson(True, "localhost")
-
     userStr = ','.join(users)
+    if userStr == '127.0.0.1,localhost':
+        return mw.returnJson(True, 'localhost')
+
     return mw.returnJson(True, userStr)
 
 def setDbAccess():
