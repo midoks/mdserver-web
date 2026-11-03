@@ -1469,28 +1469,45 @@ def setRootPwd(version=''):
     #强制修改
     force = 0
     if 'force' in args and args['force'] == '1':
-        force = 1
+        pSqliteDb('config').where('id=?', (1,)).save('mysql_root', (password,))
+        return mw.returnJson(True, '【强制本地记录】数据库root密码修改成功(立马检查)!')
 
-    password = args['password']
+    if 'force' in args and args['force'] == '2':
+        force = 2
+        ok = setRootPwdForce(password,version)
+        if not ok:
+            return mw.returnJson(False, '【强制】修改失败,请检查MySQL运行状态!')
+
+        pSqliteDb('config').where('id=?', (1,)).save('mysql_root', (password,))
+        if ok and version.startswith("8"):
+            pdb = pMysqlDb()
+            try:
+                pdb.query("SET GLOBAL validate_password.policy=MEDIUM;")
+            except Exception:
+                pass
+        return mw.returnJson(True, '【强制】数据库root密码修改成功!')
+
     try:
         pdb = pMysqlDb()
         result = pdb.query("show databases")
         isError = isSqlError(result)
         if isError != None:
-            if force != 1:
-                return isError
-            # 强制模式: 当前密码不可用, 走跳过权限校验真正重置密码
-            if not setRootPwdForce(password, version):
-                return mw.returnJson(False, '强制修改失败,请检查MySQL运行状态!')
-            return mw.returnJson(True, '【强制修改】数据库root密码修改成功!')
+            return isError
 
         if version.find('5.7') > -1 or mw.inArray(getMdb8Ver(), version):
-            pdb.execute(
-                "UPDATE mysql.user SET authentication_string='' WHERE user='root'")
+            try:
+                pdb.execute(
+                    "UPDATE mysql.user SET authentication_string='' WHERE user='root'")
+            except Exception:
+                pass
             pdb.execute(
                 "ALTER USER 'root'@'localhost' IDENTIFIED BY '%s'" % password)
-            pdb.execute(
-                "ALTER USER 'root'@'127.0.0.1' IDENTIFIED BY '%s'" % password)
+            # 127.0.0.1 账号可能不存在,失败忽略
+            try:
+                pdb.execute(
+                    "ALTER USER 'root'@'127.0.0.1' IDENTIFIED BY '%s'" % password)
+            except Exception:
+                pass
         else:
             result = pdb.execute("update mysql.user set Password=password('" + password + "') where User='root'")
         pdb.execute("flush privileges")
@@ -1499,6 +1516,7 @@ def setRootPwd(version=''):
         msg = ''
         if force == 1:
             msg = ',无须强制!'
+
         return mw.returnJson(True, '数据库root密码修改成功!'+msg)
     except Exception as ex:
         return mw.returnJson(False, '修改错误:' + str(ex))

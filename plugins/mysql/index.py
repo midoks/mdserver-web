@@ -1720,8 +1720,7 @@ def setRootPwd(version=''):
             except Exception:
                 pass
         else:
-            result = pdb.execute(
-                "update mysql.user set Password=password('" + password + "') where User='root'")
+            result = pdb.execute("update mysql.user set Password=password('" + password + "') where User='root'")
         pdb.execute("flush privileges")
         pSqliteDb('config').where('id=?', (1,)).save('mysql_root', (password,))
 
