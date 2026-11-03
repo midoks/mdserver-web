@@ -1849,20 +1849,19 @@ def setRootPwdForce(new_password, version=''):
 
     return False
 
-
-def fixDbAccess2(version):
-    try:
-        pdb = pMysqlDb()
-        data = pdb.query('show databases')
-        isError = isSqlError(data)
-        if isError != None:
-            appCMD(version, 'stop')
-            mw.execShell("rm -rf " + getServerDir() + "/data")
-            appCMD(version, 'start')
-            return mw.returnJson(True, '修复成功!')
-        return mw.returnJson(True, '正常无需修复!')
-    except Exception as e:
-        return mw.returnJson(False, '修复失败请重试!')
+# def fixDbAccess2(version):
+#     try:
+#         pdb = pMysqlDb()
+#         data = pdb.query('show databases')
+#         isError = isSqlError(data)
+#         if isError != None:
+#             appCMD(version, 'stop')
+#             mw.execShell("rm -rf " + getServerDir() + "/data")
+#             appCMD(version, 'start')
+#             return mw.returnJson(True, '修复成功!')
+#         return mw.returnJson(True, '正常无需修复!')
+#     except Exception as e:
+#         return mw.returnJson(False, '修复失败请重试!')
         
 def fixDbAccess(version):
 
