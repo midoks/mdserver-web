@@ -55,10 +55,10 @@ Install_mysql()
 	COMMUNITY_INSTALL
 	if [ "$?" = "0" ];then
 		mkdir -p $serverPath/mysql-community
-		echo '8.3' > $serverPath/mysql-community/version.pl
+		echo '8.4' > $serverPath/mysql-community/version.pl
 		echo '安装完成'
 	else
-		echo '8.3' > $serverPath/mysql-community/version.pl
+		echo '8.4' > $serverPath/mysql-community/version.pl
 		echo "暂时不支持该系统"
 	fi
 }
