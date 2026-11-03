@@ -1049,15 +1049,31 @@ def setGtidModeStepwise(db, target):
 def __createUser(dbname, username, password, address):
     pdb = pMysqlDb()
 
-    if username == 'root':
-        dbname = '*'
+    try:
+        pdb.execute("CREATE USER `%s`@`localhost` IDENTIFIED BY '%s'" % (username, password))
+    except Exception as e:
+        pass
 
-    pdb.execute("CREATE USER `%s`@`localhost` IDENTIFIED BY '%s'" % (username, password))
-    pdb.execute("grant all privileges on %s.* to `%s`@`localhost`" % (dbname, username))
+    try:
+        pdb.execute("grant all privileges on %s.* to `%s`@`localhost`" % (dbname, username))
+    except Exception as e:
+        pass
+    
     for a in address.split(','):
-        pdb.execute("CREATE USER `%s`@`%s` IDENTIFIED BY '%s'" % (username, a, password))
-        pdb.execute("grant all privileges on %s.* to `%s`@`%s`" % (dbname, username, a))
-    pdb.execute("flush privileges")
+
+        try:
+            pdb.execute("CREATE USER `%s`@`%s` IDENTIFIED BY '%s'" % (username, a, password))
+        except Exception as e:
+            pass
+
+        try:
+            pdb.execute("grant all privileges on %s.* to `%s`@`%s`" % (dbname, username, a))
+        except Exception as e:
+            pass
+    try:
+        pdb.execute("flush privileges")
+    except Exception as e:
+        pass
 
 
 def getDbBackupListFunc(dbname=''):
@@ -1556,21 +1572,24 @@ def toDbBase(find):
     if len(find['password']) < 3:
         find['username'] = find['name']
         find['password'] = mw.md5(str(time.time()) + find['name'])[0:10]
-        psdb.where("id=?", (find['id'],)).save(
-            'password,username', (find['password'], find['username']))
+        psdb.where("id=?", (find['id'],)).save('password,username', (find['password'], find['username']))
 
-    try:
-        result = pdb.execute("create database `" + find['name'] + "`")
-    except Exception as e:
-        result = e
-    if "using password:" in str(result):
-        return -1
-    if "Connection refused" in str(result):
-        return -1
+    result = pdb.query("show databases")
+    db_name = []
+    for db_info in result:
+        db_name.append(db_info['Database'])
 
-    password = find['password']
-    __createUser(find['name'], find['username'], password, find['accept'])
-    return 1
+    if not mw.inArray(db_name, find['name']):
+        try:
+            result = pdb.execute("create database `" + find['name'] + "`")
+        except Exception as e:
+            pass
+
+    access_list = getDbUserAccess(find['name'])
+    if len(access_list) < 1:
+        __createUser(find['name'], find['username'], find['password'], find['accept'])
+        return 1
+    return 0
 
 
 def syncToDatabases():
@@ -1601,8 +1620,7 @@ def syncToDatabases():
     else:
         data = json.loads(args['ids'])
         for value in data:
-            find = psdb.where("id=?", (value,)).field(
-                'id,name,username,password,accept').find()
+            find = psdb.where("id=?", (value,)).field('id,name,username,password,accept').find()
             # print find
             result = toDbBase(find)
             if result == 1:
@@ -1784,8 +1802,7 @@ def setDbPs():
 
 def addDb():
     args = getArgs()
-    data = checkArgs(args,
-                     ['password', 'name', 'codeing', 'db_user', 'dataAccess', 'ps'])
+    data = checkArgs(args,['password', 'name', 'codeing', 'db_user', 'dataAccess', 'ps'])
     if not data[0]:
         return data[1]
 
@@ -1828,8 +1845,7 @@ def addDb():
         return mw.returnJson(False, '数据库已存在!')
 
     try:
-        result = pdb.execute("create database `" + dbname +
-                             "` DEFAULT CHARACTER SET " + codeing + " COLLATE " + codeStr)
+        result = pdb.execute("create database `" + dbname +"` DEFAULT CHARACTER SET " + codeing + " COLLATE " + codeStr)
     except Exception as e:
         result = e
     # print result
@@ -1837,22 +1853,17 @@ def addDb():
     if isError != None:
         return isError
 
-    # 清理同名残留用户,失败忽略(兼容DROP USER不支持IF EXISTS的旧版本)
-    try:
-        pdb.execute("drop user '" + dbuser + "'@'localhost'")
-    except Exception:
-        pass
-    for a in address.split(','):
+    db_users_access = getDbUserAccess(dbuser)
+    for user_access in db_users_access:
         try:
-            pdb.execute("drop user '" + dbuser + "'@'" + a + "'")
+            pdb.execute("drop user '" + dbuser + "'@'%s'" % (user_access,))
         except Exception:
             pass
 
     __createUser(dbname, dbuser, password, address)
 
     addTime = time.strftime('%Y-%m-%d %X', time.localtime())
-    psdb.add('pid,name,username,password,accept,ps,addtime',
-             (0, dbname, dbuser, password, address, ps, addTime))
+    psdb.add('pid,name,username,password,accept,ps,addtime',(0, dbname, dbuser, password, address, ps, addTime))
     return mw.returnJson(True, '添加成功!')
 
 
@@ -1876,21 +1887,14 @@ def delDb():
         except Exception:
             pass
 
-        try:
-            users = pdb.query("select Host from mysql.user where User='" + username + "' AND Host!='localhost'")
-        except Exception:
-            users = []
-        try:
-            pdb.execute("drop user '" + username + "'@'localhost'")
-        except Exception:
-            pass
-        for us in users:
+        db_users_access = getDbUserAccess(username)
+        for user_access in db_users_access:
             try:
-                pdb.execute("drop user '" + username + "'@'" + us["Host"] + "'")
+                pdb.execute("drop user '" + username + "'@'%s'" % (user_access,))
             except Exception:
                 pass
-        pdb.execute("flush privileges")
 
+        pdb.execute("flush privileges")
         # 删除SQLITE
         psdb.where("id=?", (sid,)).delete()
         return mw.returnJson(True, '删除成功!')

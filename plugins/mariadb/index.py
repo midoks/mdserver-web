@@ -732,21 +732,33 @@ def isSqlError(mysqlMsg):
 
 
 def __createUser(dbname, username, password, address):
-    pdb = pMysqlDb('mysql')
+    pdb = pMysqlDb()
 
-    if username == 'root':
-        dbname = '*'
+    try:
+        pdb.execute("CREATE USER `%s`@`localhost` IDENTIFIED BY '%s'" % (username, password))
+    except Exception as e:
+        pass
 
-    pdb.execute(
-        "CREATE USER `%s`@`localhost` IDENTIFIED BY '%s'" % (username, password))
-    pdb.execute(
-        "grant all privileges on %s.* to `%s`@`localhost`" % (dbname, username))
+    try:
+        pdb.execute("grant all privileges on %s.* to `%s`@`localhost`" % (dbname, username))
+    except Exception as e:
+        pass
+    
     for a in address.split(','):
-        pdb.execute(
-            "CREATE USER `%s`@`%s` IDENTIFIED BY '%s'" % (username, a, password))
-        pdb.execute(
-            "grant all privileges on %s.* to `%s`@`%s`" % (dbname, username, a))
-    pdb.execute("flush privileges")
+
+        try:
+            pdb.execute("CREATE USER `%s`@`%s` IDENTIFIED BY '%s'" % (username, a, password))
+        except Exception as e:
+            pass
+
+        try:
+            pdb.execute("grant all privileges on %s.* to `%s`@`%s`" % (dbname, username, a))
+        except Exception as e:
+            pass
+    try:
+        pdb.execute("flush privileges")
+    except Exception as e:
+        pass
 
 
 def getDbBackupListFunc(dbname=''):
@@ -1198,21 +1210,24 @@ def toDbBase(find):
     if len(find['password']) < 3:
         find['username'] = find['name']
         find['password'] = mw.md5(str(time.time()) + find['name'])[0:10]
-        psdb.where("id=?", (find['id'],)).save(
-            'password,username', (find['password'], find['username']))
+        psdb.where("id=?", (find['id'],)).save('password,username', (find['password'], find['username']))
 
-    try:
-        result = pdb.execute("create database `" + find['name'] + "`")
-    except Exception as e:
-        result = e
-    if "using password:" in str(result):
-        return -1
-    if "Connection refused" in str(result):
-        return -1
+    result = pdb.query("show databases")
+    db_name = []
+    for db_info in result:
+        db_name.append(db_info['Database'])
 
-    password = find['password']
-    __createUser(find['name'], find['username'], password, find['accept'])
-    return 1
+    if not mw.inArray(db_name, find['name']):
+        try:
+            result = pdb.execute("create database `" + find['name'] + "`")
+        except Exception as e:
+            pass
+
+    access_list = getDbUserAccess(find['name'])
+    if len(access_list) < 1:
+        __createUser(find['name'], find['username'], find['password'], find['accept'])
+        return 1
+    return 0
 
 
 def syncToDatabases():
