@@ -1466,6 +1466,8 @@ def setRootPwd(version=''):
     if not data[0]:
         return data[1]
 
+    password = args['password']
+
     #强制修改
     force = 0
     if 'force' in args and args['force'] == '1':
