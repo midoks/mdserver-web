@@ -18,8 +18,7 @@ server-id	= {$SERVER_ID}
 sql-mode=STRICT_TRANS_TABLES,NO_ZERO_IN_DATE,NO_ZERO_DATE,ERROR_FOR_DIVISION_BY_ZERO,NO_AUTO_CREATE_USER,NO_ENGINE_SUBSTITUTION
 
 default_storage_engine = InnoDB
-language={$SERVER_APP_PATH}/share/english
-lc-messages-dir={$SERVER_APP_PATH}/share/english
+lc-messages-dir={$SERVER_APP_PATH}/share
 explicit_defaults_for_timestamp = ON
 
 
