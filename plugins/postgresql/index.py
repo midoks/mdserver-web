@@ -710,7 +710,6 @@ def setDbBackup():
     if not data[0]:
         return data[1]
 
-    scDir = mw.getPanelDir() + '/scripts/backup.py'
     head = "cd "+mw.getPanelDir()
     cmd = head +' && . bin/activate &&  python3 plugins/postgresql/scripts/backup.py database ' + args['name'] + ' 3'
     os.system(cmd)

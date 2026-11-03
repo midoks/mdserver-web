@@ -769,7 +769,6 @@ def setDbBackup():
     if not data[0]:
         return data[1]
 
-    scDir = mw.getPanelDir() + '/scripts/backup.py'
     head = "cd "+mw.getPanelDir()
     cmd = head +' && . bin/activate &&  python3 plugins/mariadb/scripts/backup.py database ' + args['name'] + ' 3'
     os.system(cmd)
@@ -3505,7 +3504,7 @@ def uninstallPreInspection(version):
     #     return 'ok'
     from utils.plugin import plugin as MwPlugin
     MwPlugin.instance().removeIndex(getPluginName(), version)
-    
+
     return "请手动删除MariaDB[{}]<br/> rm -rf {}".format(version, getServerDir())
 
 if __name__ == "__main__":
