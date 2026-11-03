@@ -452,18 +452,18 @@ def get_topn_list(args):
         if avail is None:
             return mw.returnData(False, '当前 PostgreSQL 未提供 pg_stat_statements 扩展（缺少 contrib 模块），无法使用该功能。')
 
+        # 先检查 shared_preload_libraries —— pg_stat_statements 必须预加载
+        preload = client.one("select setting from pg_settings where name = 'shared_preload_libraries'")
+        libs = (preload or {}).get('setting', '') or ''
+        if 'pg_stat_statements' not in libs:
+            return mw.returnData(False, "pg_stat_statements 扩展必须在启动时预加载。\n"
+                "请在 postgresql.conf 添加 shared_preload_libraries = 'pg_stat_statements' 后重启 PostgreSQL。")
+
+        # 再检查扩展是否已 CREATE
         ext = client.one("select to_regclass('pg_stat_statements') as v")
         if ext is None or ext['v'] is None:
-            preload = client.one("select setting from pg_settings where name = 'shared_preload_libraries'")
-            libs = (preload or {}).get('setting', '') or ''
-            msg = "pg_stat_statements 扩展已可用，但尚未启用。\n"
-            if 'pg_stat_statements' not in libs:
-                msg += "1. 在 postgresql.conf 添加 shared_preload_libraries = 'pg_stat_statements'\n"
-                msg += "2. 重启 PostgreSQL 服务\n"
-                msg += "3. 在当前数据库执行 CREATE EXTENSION pg_stat_statements;"
-            else:
-                msg += "在当前数据库执行 CREATE EXTENSION pg_stat_statements;"
-            return mw.returnData(False, msg)
+            return mw.returnData(False, "pg_stat_statements 扩展已预加载，但尚未启用。\n"
+                "请在当前数据库执行 CREATE EXTENSION pg_stat_statements;")
 
         version_num = int(client.one('show server_version_num')['server_version_num'])
         if version_num >= 130000:

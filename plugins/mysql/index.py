@@ -4035,17 +4035,15 @@ def installPreInspection(version):
 
 
 def uninstallPreInspection(version):
+    from utils.plugin import plugin as MwPlugin
+    MwPlugin.instance().removeIndex(getPluginName(), version)
+
     data_dir = getDataDir()
     if os.path.exists(data_dir):
         stop(version)
 
-    if mw.isDebugMode():
-        return 'ok'
-
-
-    from utils.plugin import plugin as MwPlugin
-    MwPlugin.instance().removeIndex(getPluginName(), version)
-
+    # if mw.isDebugMode():
+    #     return 'ok'
     return "请手动删除MySQL[{}]<br/> rm -rf {}".format(version, getServerDir())
 
 if __name__ == "__main__":

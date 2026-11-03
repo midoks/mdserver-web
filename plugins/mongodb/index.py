@@ -40,6 +40,20 @@ def getServerDir():
     return mw.getServerDir() + '/' + getPluginName()
 
 
+def getBackupDir():
+    bk_path = mw.getBackupDir() + "/database/mongodb"
+    if not os.path.isdir(bk_path):
+        mw.execShell("mkdir -p {}".format(bk_path))
+    return bk_path
+
+
+def getImportDir():
+    import_path = mw.getBackupDir() + "/mongodb_import"
+    if not os.path.isdir(import_path):
+        mw.execShell("mkdir -p {}".format(import_path))
+    return import_path
+
+
 def getInitDFile():
     if app_debug:
         return '/tmp/' + getPluginName()
@@ -340,8 +354,7 @@ def mgOp(method):
 
 
 def start():
-    mw.execShell(
-        'export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/www/server/lib/openssl11/lib')
+    mw.execShell('export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/www/server/lib/openssl11/lib')
     return mgOp('start')
 
 
@@ -409,7 +422,7 @@ def initMgRoot(password='',force=0):
     if password =='':
         mg_pass = mw.getRandomString(8)
     else:
-        mg_pass = password
+        mg_pass = _sanitize_str(password)
 
     try:
         db.command("createUser", "root", pwd=mg_pass, roles=db_all_rules)
@@ -685,8 +698,8 @@ def addDb():
     
     if auth_status:
         data_name = args['name']
-        username = args['db_user']
-        password = args['password']
+        username = _sanitize_str(args['db_user'])
+        password = _sanitize_str(args['password'])
     else:
         username = data_name
 
@@ -787,8 +800,8 @@ def setUserPwd(version=''):
     if not data[0]:
         return data[1]
 
-    newpassword = args['password']
-    username = args['name']
+    newpassword = _sanitize_str(args['password'])
+    username = _sanitize_str(args['name'])
     uid = args['id']
     try:
         name = sqlite_db.where('id=?', (uid,)).getField('name')
@@ -892,6 +905,24 @@ def getDbInfo():
     
     return mw.returnJson(True,'ok', result)
 
+def _sanitize_str(val, default=''):
+    """清洗 MongoDB 命令中使用的字符串，确保是合法的 UTF-8 且不含空字节。"""
+    if val is None:
+        return default
+    if isinstance(val, bytes):
+        try:
+            val = val.decode('utf-8', errors='ignore')
+        except Exception:
+            return default
+    elif not isinstance(val, str):
+        val = str(val)
+    # 去掉所有空字节（MongoDB BSON string 禁止 \x00 嵌入）
+    val = val.replace('\x00', '')
+    # strip 前后空白与换行
+    val = val.strip()
+    return val
+
+
 def toDbBase(find):
     client = mongdbClient()
     data_name = find['name']
@@ -899,11 +930,37 @@ def toDbBase(find):
 
     db.zchat.insert_one({})
     user_roles = [{'role': 'dbOwner', 'db': data_name}, {'role': 'userAdmin', 'db': data_name}]
+
+    username = _sanitize_str(find['username'])
+    password = _sanitize_str(find['password'])
+
+    # 用户名是必须的；密码可空（MongoDB 允许无密码用户）
+    if not username:
+        print("syncToDatabases: 跳过空用户名记录 name={}".format(data_name))
+        return -1
+
+    # 密码如果为空字符串，MongoDB 不允许 —— 生成一个临时随机密码
+    if not password:
+        password = mw.getRandomString(12)
+        # 回填到 SQLite
+        sqlite_db = pSqliteDb('databases')
+        sqlite_db.where("id=?", (find['id'],)).save('password', (password,))
+
     # 将用户创建在目标数据库中，而不是 admin 数据库
     try:
-        db.command("createUser", find['username'], pwd=find['password'], roles=user_roles)
+        db.command("createUser", username, pwd=password, roles=user_roles)
     except Exception as e:
-        db.command("updateUser", find['username'], pwd=find['password'], roles=user_roles)
+        # UserAlreadyExists (code 26) —— 尝试 updateUser
+        code = getattr(e, 'code', None)
+        if code == 26:
+            try:
+                db.command("updateUser", username, pwd=password, roles=user_roles)
+            except Exception as e2:
+                print("syncToDatabases updateUser {} failed: {}".format(username, e2))
+                return -1
+        else:
+            print("syncToDatabases createUser {} failed(code={}): {}".format(username, code, e))
+            return -1
     return 1
 
 def syncToDatabases():
@@ -1275,7 +1332,9 @@ def replClose():
     return mw.returnJson(True, '关闭副本同步成功!')
 
 def getDbBackupListFunc(dbname=''):
-    bkDir = mw.getBackupDir() + '/database/mongodb'
+    bkDir = getBackupDir()
+    if not os.path.isdir(bkDir):
+        return []
     blist = os.listdir(bkDir)
     r = []
 
@@ -1294,7 +1353,7 @@ def getDbBackupList():
         return data[1]
 
     r = getDbBackupListFunc(args['name'])
-    bkDir = mw.getBackupDir() + '/database/mongodb'
+    bkDir = getBackupDir()
     rr = []
     for x in range(0, len(r)):
         p = bkDir + '/' + r[x]
@@ -1316,10 +1375,7 @@ def getDbBackupList():
 
 def getDbBackupImportList():
 
-    bkImportDir = mw.getBackupDir() + '/mongodb_import'
-    if not os.path.exists(bkImportDir):
-        os.mkdir(bkImportDir)
-
+    bkImportDir = getImportDir()
     blist = os.listdir(bkImportDir)
 
     rr = []
@@ -1376,7 +1432,9 @@ def setDbBackup():
 
 
 def getListBson(dbname=''):
-    bkDir = mw.getBackupDir() + '/mongodb_import/'+dbname
+    bkDir = getImportDir() + '/' + dbname
+    if not os.path.isdir(bkDir):
+        return []
     blist = os.listdir(bkDir)
     r = []
 
@@ -1391,7 +1449,9 @@ def getListBson(dbname=''):
 
 
 def getListBsonByDatabase(dbname=''):
-    bkDir = mw.getBackupDir() + '/database/mongodb/'+dbname
+    bkDir = getBackupDir() + '/' + dbname
+    if not os.path.isdir(bkDir):
+        return []
     blist = os.listdir(bkDir)
     r = []
 
@@ -1415,7 +1475,7 @@ def importDbExternal():
     file = args['file']
     name = args['name']
 
-    import_dir = mw.getBackupDir() + '/mongodb_import/'
+    import_dir = getImportDir() + '/'
     port = getConfPort()
 
     file_path = import_dir + file
@@ -1782,6 +1842,9 @@ def installPreInspection(version):
 
 def uninstallPreInspection(version):
     stop()
+
+    # if mw.isDebugMode():
+    #     return 'ok'
 
     from utils.plugin import plugin as MwPlugin
     MwPlugin.instance().removeIndex(getPluginName(), version)

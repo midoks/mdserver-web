@@ -336,6 +336,15 @@ def pgOp(version, method):
 
             initPgPwd()
 
+            # 启用 pg_stat_statements 扩展
+            try:
+                db = pgDb()
+                r = db.execute("CREATE EXTENSION IF NOT EXISTS pg_stat_statements")
+                if isinstance(r, Exception):
+                    print("CREATE EXTENSION pg_stat_statements: {}".format(r))
+            except Exception as e:
+                print("init pg_stat_statements failed: {}".format(e))
+
             if mw.isAppleSystem():
                 cmd_init_stop = init_file + ' stop'
                 subprocess.Popen(cmd_init_stop, stdout=subprocess.PIPE, shell=True,
@@ -1887,7 +1896,13 @@ def installPreInspection(version):
 
 
 def uninstallPreInspection(version):
-    return 'ok'
+    # if mw.isDebugMode():
+    #     return 'ok'
+
+    stop(version)
+    from utils.plugin import plugin as MwPlugin
+    MwPlugin.instance().removeIndex(getPluginName(), version)
+    return "请手动删除PostgreSQL[{}]<br/> rm -rf {}".format(version, getServerDir())
 
 if __name__ == "__main__":
     func = sys.argv[1]
