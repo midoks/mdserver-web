@@ -3717,8 +3717,9 @@ def uninstallPreInspection(version):
     if not os.path.exists(data_dir):
         return 'ok'
     stop(version)
-    if mw.isDebugMode():
-        return 'ok'
+
+    # if mw.isDebugMode():
+    #     return 'ok'
 
     from utils.plugin import plugin as MwPlugin
     MwPlugin.instance().removeIndex(getPluginName(), version)
