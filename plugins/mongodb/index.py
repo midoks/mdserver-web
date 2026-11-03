@@ -40,6 +40,20 @@ def getServerDir():
     return mw.getServerDir() + '/' + getPluginName()
 
 
+def getBackupDir():
+    bk_path = mw.getBackupDir() + "/database/mongodb"
+    if not os.path.isdir(bk_path):
+        mw.execShell("mkdir -p {}".format(bk_path))
+    return bk_path
+
+
+def getImportDir():
+    import_path = mw.getBackupDir() + "/mongodb_import"
+    if not os.path.isdir(import_path):
+        mw.execShell("mkdir -p {}".format(import_path))
+    return import_path
+
+
 def getInitDFile():
     if app_debug:
         return '/tmp/' + getPluginName()
@@ -1275,7 +1289,9 @@ def replClose():
     return mw.returnJson(True, '关闭副本同步成功!')
 
 def getDbBackupListFunc(dbname=''):
-    bkDir = mw.getBackupDir() + '/database/mongodb'
+    bkDir = getBackupDir()
+    if not os.path.isdir(bkDir):
+        return []
     blist = os.listdir(bkDir)
     r = []
 
@@ -1294,7 +1310,7 @@ def getDbBackupList():
         return data[1]
 
     r = getDbBackupListFunc(args['name'])
-    bkDir = mw.getBackupDir() + '/database/mongodb'
+    bkDir = getBackupDir()
     rr = []
     for x in range(0, len(r)):
         p = bkDir + '/' + r[x]
@@ -1316,10 +1332,7 @@ def getDbBackupList():
 
 def getDbBackupImportList():
 
-    bkImportDir = mw.getBackupDir() + '/mongodb_import'
-    if not os.path.exists(bkImportDir):
-        os.mkdir(bkImportDir)
-
+    bkImportDir = getImportDir()
     blist = os.listdir(bkImportDir)
 
     rr = []
@@ -1376,7 +1389,9 @@ def setDbBackup():
 
 
 def getListBson(dbname=''):
-    bkDir = mw.getBackupDir() + '/mongodb_import/'+dbname
+    bkDir = getImportDir() + '/' + dbname
+    if not os.path.isdir(bkDir):
+        return []
     blist = os.listdir(bkDir)
     r = []
 
@@ -1391,7 +1406,9 @@ def getListBson(dbname=''):
 
 
 def getListBsonByDatabase(dbname=''):
-    bkDir = mw.getBackupDir() + '/database/mongodb/'+dbname
+    bkDir = getBackupDir() + '/' + dbname
+    if not os.path.isdir(bkDir):
+        return []
     blist = os.listdir(bkDir)
     r = []
 
@@ -1415,7 +1432,7 @@ def importDbExternal():
     file = args['file']
     name = args['name']
 
-    import_dir = mw.getBackupDir() + '/mongodb_import/'
+    import_dir = getImportDir() + '/'
     port = getConfPort()
 
     file_path = import_dir + file
