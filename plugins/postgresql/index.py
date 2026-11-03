@@ -1896,7 +1896,13 @@ def installPreInspection(version):
 
 
 def uninstallPreInspection(version):
-    return 'ok'
+    if mw.isDebugMode():
+        return 'ok'
+
+    stop(version)
+    from utils.plugin import plugin as MwPlugin
+    MwPlugin.instance().removeIndex(getPluginName(), version)
+    return "请手动删除PostgreSQL[{}]<br/> rm -rf {}".format(version, getServerDir())
 
 if __name__ == "__main__":
     func = sys.argv[1]
