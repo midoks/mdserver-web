@@ -1755,13 +1755,7 @@ def getDbAccess():
 
     return mw.returnJson(True, userStr)
 
-def setDbAccess():
-    args = getArgs()
-    data = checkArgs(args, ['username', 'access'])
-    if not data[0]:
-        return data[1]
-    username = args['username']
-    access = args['access']
+def setDbAccessByArgs(username,access):
     pdb = pMysqlDb()
     psdb = pSqliteDb('databases')
 
@@ -1792,6 +1786,18 @@ def setDbAccess():
             pass
     
     psdb.where('username=?', (username,)).save('accept,rw', (access, 'rw',))
+    return True
+
+
+def setDbAccess():
+    args = getArgs()
+    data = checkArgs(args, ['username', 'access'])
+    if not data[0]:
+        return data[1]
+    username = args['username']
+    access = args['access']
+    
+    setDbAccessByArgs(username, access)
     return mw.returnJson(True, '设置成功!')
 
 
