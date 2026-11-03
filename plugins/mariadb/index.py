@@ -3501,9 +3501,11 @@ def installPreInspection(version):
 
 def uninstallPreInspection(version):
     stop(version)
-    if mw.isDebugMode():
-        return 'ok'
-
+    # if mw.isDebugMode():
+    #     return 'ok'
+    from utils.plugin import plugin as MwPlugin
+    MwPlugin.instance().removeIndex(getPluginName(), version)
+    
     return "请手动删除MariaDB[{}]<br/> rm -rf {}".format(version, getServerDir())
 
 if __name__ == "__main__":
