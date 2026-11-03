@@ -967,6 +967,49 @@ def isSqlError(mysqlMsg):
     return None
 
 
+def getMysqlServerVersion(pdb):
+    # 获取服务端版本号, 如 8.0.36 / 8.4.2 / 10.6.16-MariaDB
+    try:
+        rows = pdb.query('select version() as v')
+        if rows:
+            return str(rows[0].get('v') or '')
+    except Exception:
+        pass
+    return ''
+
+
+def executeResetMaster(pdb, version=''):
+    # 重置 binlog 与 GTID
+    # MySQL 8.4 起移除了 RESET MASTER, 改用 RESET BINARY LOGS AND GTIDS
+    # 返回 None 表示成功, 否则返回错误信息字符串
+    ver = version or getMysqlServerVersion(pdb)
+    major = 0
+    minor = 0
+    m = re.search(r'(\d+)\.(\d+)', ver)
+    if m:
+        major, minor = int(m.group(1)), int(m.group(2))
+
+    is_mariadb = 'mariadb' in ver.lower()
+    if is_mariadb or major < 8 or (major == 8 and minor < 4):
+        # MySQL 5.x / 8.0 / MariaDB
+        sql_list = ['reset master', 'reset binary logs and gtids']
+    else:
+        # MySQL 8.4+ / 9.x
+        sql_list = ['reset binary logs and gtids', 'reset master']
+
+    last_err = ''
+    for sql in sql_list:
+        try:
+            pdb.execute(sql)
+            return None
+        except Exception as e:
+            last_err = str(e)
+            # 仅语法错误(1064)或未知语句(1065)时才尝试另一种写法
+            if '1064' not in last_err and '1065' not in last_err:
+                break
+    return last_err
+
+
 def __createUser(dbname, username, password, address):
     pdb = pMysqlDb()
 
@@ -1210,7 +1253,9 @@ def importDbBackup():
     local_mode = recognizeDbMode()
     if local_mode == 'gtid':
         pdb = pMysqlDb()
-        pdb.execute('reset master')
+        reset_err = executeResetMaster(pdb, '')
+        if reset_err:
+            return mw.returnJson(False, '重置master失败: ' + reset_err)
 
     pwd = pSqliteDb('config').where('id=?', (1,)).getField('mysql_root')
     sock = getSocketFile()
@@ -1260,7 +1305,9 @@ def importDbBackupProgressBar():
     local_mode = recognizeDbMode()
     if local_mode == 'gtid':
         pdb = pMysqlDb()
-        pdb.execute('reset master')
+        reset_err = executeResetMaster(pdb, '')
+        if reset_err:
+            return mw.returnJson(False, '重置master失败: ' + reset_err)
 
     pwd = pSqliteDb('config').where('id=?', (1,)).getField('mysql_root')
     sock = getSocketFile()
@@ -2312,10 +2359,15 @@ def setDbMasterAccess():
 
 def resetMaster(version=''):
     pdb = pMysqlDb()
-    r = pdb.execute('reset master')
-    isError = isSqlError(r)
-    if isError != None:
-        return isError
+    try:
+        err = executeResetMaster(pdb, version)
+    except Exception as e:
+        err = str(e)
+    if err:
+        isError = isSqlError(err)
+        if isError is not None:
+            return isError
+        return mw.returnJson(False, '重置失败: ' + err)
     return mw.returnJson(True, '重置成功!')
 
 
@@ -3791,7 +3843,9 @@ def doFullSyncUser(version=''):
     time_s = time.time()
     if os.path.exists(bak_file):
         # 重置 
-        db.execute('reset master')
+        reset_err = executeResetMaster(db, version)
+        if reset_err:
+            print("重置master失败: " + reset_err)
 
         # 加快导入 - 开始
         # db.execute('set global innodb_flush_log_at_trx_commit = 2')
