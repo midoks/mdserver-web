@@ -1620,54 +1620,41 @@ def adjust_password_policy(version):
         mw.execShell(serverdir+f"/bin/mysql -u root -e \"SET GLOBAL validate_password.policy=LOW;\"")
         mw.execShell(serverdir+f"/bin/mysql -u root -e \"SET GLOBAL validate_password.length=4;\"")
 
-def setRootPwdForce(new_password,version=''):
-    # stop(version)
-    # | awk '{print $2}'| xargs kill
-    data = mw.execShell("ps -ef|grep mysql|grep -v plugins |grep -v grep | awk '{print $2}'| xargs kill")
-    # print(data)
-    time.sleep(1)
+def setRootPwdForce(new_password, version=''):
+    '''
+    当前root密码不可用(忘记密码/连接被拒)时, 通过跳过权限校验的方式真正重置密码
+    '''
+    changed = False
+    try:
+        appCMD(version, 'stop')
+        openSkipGrantTables()
+        appCMD(version, 'start')
+        time.sleep(3)
+        resetDbRootPwd(version, new_password)
+        changed = True
+    except Exception:
+        changed = False
+    finally:
+        # 无论成败都恢复密码校验, 避免数据库长期处于无校验状态
+        appCMD(version, 'stop')
+        closeSkipGrantTables()
+        appCMD(version, 'start')
+        time.sleep(2)
 
-    serverdir = getServerDir()
+    if not changed:
+        return False
 
-    # 启动安全模式
-    cmd_msafe = serverdir+"/bin/mysqld_safe --skip-grant-tables --skip-networking"
-    # print("cmd_msafe",cmd_msafe)
-    subprocess.Popen(cmd_msafe, stdout=subprocess.PIPE, shell=True,bufsize=4096, stderr=subprocess.PIPE)
-    # 等待MySQL安全模式启动...
-    time.sleep(5)
+    # 用新密码验证是否真的可以连接(启动可能较慢, 重试几次)
+    for i in range(10):
+        try:
+            pdb = pMysqlDb()
+            result = pdb.query('show databases')
+            if isSqlError(result) == None:
+                return True
+        except Exception:
+            pass
+        time.sleep(2)
 
-    if version.startswith("5.5") or version.startswith("5.6"):
-        cmd_mod_root = serverdir+f"/bin/mysql -u root -e \"UPDATE mysql.user SET Password=PASSWORD('{new_password}') WHERE user='root'; FLUSH PRIVILEGES;\""
-        data = mw.execShell(cmd_mod_root)
-        # print("修改root密码", cmd_mod_root)
-        # print(data)
-    else:
-        cmd_clear_root = serverdir+"/bin/mysql -u root -e \"UPDATE mysql.user SET authentication_string = '' WHERE user = 'root'; FLUSH PRIVILEGES;\""
-        data = mw.execShell(cmd_clear_root)
-        # print(cmd_clear_root,"清空root密码",data)
-
-    data = mw.execShell("ps -ef|grep mysql|grep -v plugins |grep -v grep | awk '{print $2}'| xargs kill")
-    # print("停止安全模式",data)
-
-    # 正常启动MySQL
-    start(version)
-    time.sleep(5)
-    
-    if not version.startswith("5.5") and not version.startswith("5.6"):
-        # 针对MySQL 8.0+调整密码策略
-        if version.startswith("8."):
-            adjust_password_policy(version)
-        # 设置新密码
-        cmd_newpass = serverdir+f"/bin/mysql -u root -e \"ALTER USER 'root'@'localhost' IDENTIFIED BY '{new_password}'; FLUSH PRIVILEGES;\""
-        data = mw.execShell(cmd_newpass)
-        # print("新密码",cmd_newpass)
-        # print(data)
-    
-    # 验证密码
-    cmd = serverdir+f"/bin/mysql -u root -p'{new_password}' -e 'SHOW DATABASES;'"
-    data = mw.execShell(cmd)
-    if data[1] == '':
-        return True
     return False
 
 
@@ -1998,10 +1985,11 @@ def closeSkipGrantTables():
     return True
 
 
-def resetDbRootPwd(version):
+def resetDbRootPwd(version, newpwd=''):
     serverdir = getServerDir()
     myconf = serverdir + "/etc/my.cnf"
-    pwd = mw.getRandomString(16)
+    # newpwd 为空时生成随机密码, 强制修改时传入用户指定的密码
+    pwd = newpwd if newpwd != '' else mw.getRandomString(16)
 
     pSqliteDb('config').where('id=?', (1,)).save('mysql_root', (pwd,))
 
