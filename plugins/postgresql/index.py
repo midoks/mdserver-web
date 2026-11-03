@@ -1896,8 +1896,8 @@ def installPreInspection(version):
 
 
 def uninstallPreInspection(version):
-    if mw.isDebugMode():
-        return 'ok'
+    # if mw.isDebugMode():
+    #     return 'ok'
 
     stop(version)
     from utils.plugin import plugin as MwPlugin
