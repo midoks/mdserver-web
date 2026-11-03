@@ -3216,12 +3216,26 @@ def initSlaveStatusSyncUser(version=''):
         # pdb.query("start slave user='{}' password='{}';".format(
         #     u['user'], u['pass']))
 
-    pdb.query("start "+slave_name)
-    pdb.query("start all "+slave_name)
+    # msg 非空说明没有可用通道(模式不一致/命令为空), 此时不能 START, 否则报 1200
+    if msg != '':
+        return mw.returnJson(False, msg)
 
-    if msg == '':
-        msg = '初始化成功!'
-    return mw.returnJson(True, msg)
+    try:
+        pdb.query("start "+slave_name)
+    except Exception as e:
+        isError = isSqlError(str(e))
+        if isError:
+            return isError
+        return mw.returnJson(False, '启动同步失败: ' + str(e))
+
+    if len(slave_data) > 1:
+        # 多通道场景: 部分版本不支持 start all, 失败不影响已启动的通道
+        try:
+            pdb.query("start all "+slave_name)
+        except Exception:
+            pass
+
+    return mw.returnJson(True, '初始化成功!')
 
 
 def initSlaveStatusSSH(version=''):
