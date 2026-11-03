@@ -20,6 +20,9 @@ sql-mode=STRICT_TRANS_TABLES,NO_ZERO_IN_DATE,NO_ZERO_DATE,ERROR_FOR_DIVISION_BY_
 default_storage_engine = InnoDB
 language={$SERVER_APP_PATH}/share/english
 lc-messages-dir={$SERVER_APP_PATH}/share/english
+explicit_defaults_for_timestamp = ON
+
+
 key_buffer_size = 8M
 table_open_cache = 32
 sort_buffer_size = 256K
