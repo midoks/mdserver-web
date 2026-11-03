@@ -503,11 +503,11 @@ function setRootPwd(type, pwd){
 
     var index = layer.open({
         type: 1,
-        area: '500px',
+        area: '800px',
         title: '修改数据库密码',
         closeBtn: 1,
         shift: 5,
-        btn:["提交", "关闭", "复制ROOT密码", "强制修改"],
+        btn:["提交", "关闭", "复制ROOT密码", "修改本地ROOT记录", "强改ROOT密码"],
         shadeClose: true,
         content: "<form class='bt-form pd20' id='mod_pwd'>\
                     <div class='line'>\
@@ -533,12 +533,28 @@ function setRootPwd(type, pwd){
             return false;
         },
         btn4:function(layerIndex){
-            layer.confirm('强制修改,是为了在重建时使用,确定强制?', {
+            layer.confirm('修改本地ROOT记录,确定修改?', {
                 btn: ['确定', '取消']
             }, function(index, layero){
                 layer.close(index);
                 var password = $("#MyPassword").val();
                 myPost('set_root_pwd', {password:password,force:'1'}, function(data){
+                    var rdata = $.parseJSON(data.data);
+                    showMsg(rdata.msg,function(){
+                        layer.close(layerIndex);
+                        dbList();
+                    },{icon: rdata.status ? 1 : 2});   
+                });
+            });
+            return false;
+        },
+        btn5:function(layerIndex){
+            layer.confirm('强制修改会重启MySQL,并跳过权限校验真正重置root密码,确定强制?', {
+                btn: ['确定', '取消']
+            }, function(index, layero){
+                layer.close(index);
+                var password = $("#MyPassword").val();
+                myPost('set_root_pwd', {password:password,force:'2'}, function(data){
                     var rdata = $.parseJSON(data.data);
                     showMsg(rdata.msg,function(){
                         layer.close(layerIndex);
@@ -614,7 +630,7 @@ function setDbAccess(username){
                             <span class='tname'>访问权限</span>\
                             <div class='info-r '>\
                                 <select class='bt-input-text mr5' name='dataAccess' style='width:100px'>\
-                                <option value='127.0.0.1'>本地服务器</option>\
+                                <option value='localhost'>本地服务器</option>\
                                 <option value=\"%\">所有人</option>\
                                 <option value='ip'>指定IP</option>\
                                 </select>\
@@ -622,9 +638,9 @@ function setDbAccess(username){
                         </div>\
                       </form>",
             success:function(){
-                if (rdata.msg == '127.0.0.1'){
-                    $('select[name="dataAccess"]').find("option[value='127.0.0.1']").attr("selected",true);
-                } else if (rdata.msg == '%'){
+                if (rdata.msg == 'localhost'){
+                    $('select[name="dataAccess"]').find("option[value='localhost']").attr("selected",true);
+                } else if (rdata.msg.indexOf("%") > -1){
                     $('select[name="dataAccess"]').find('option[value="%"]').attr("selected",true);
                 } else if ( rdata.msg == 'ip' ){
                     $('select[name="dataAccess"]').find('option[value="ip"]').attr("selected",true);
@@ -1806,7 +1822,7 @@ function setDbMasterAccess(username){
                             <span class='tname'>访问权限</span>\
                             <div class='info-r '>\
                                 <select class='bt-input-text mr5' name='dataAccess' style='width:100px'>\
-                                <option value='127.0.0.1'>本地服务器</option>\
+                                <option value='localhost'>本地服务器</option>\
                                 <option value=\"%\">所有人</option>\
                                 <option value='ip'>指定IP</option>\
                                 </select>\
@@ -1814,9 +1830,9 @@ function setDbMasterAccess(username){
                         </div>\
                       </form>",
             success:function(){
-                if (rdata.msg == '127.0.0.1'){
-                    $('select[name="dataAccess"]').find("option[value='127.0.0.1']").attr("selected",true);
-                } else if (rdata.msg == '%'){
+                if (rdata.msg == 'localhost'){
+                    $('select[name="dataAccess"]').find("option[value='localhost']").attr("selected",true);
+                } else if (rdata.msg.indexOf("%") > -1 ){
                     $('select[name="dataAccess"]').find('option[value="%"]').attr("selected",true);
                 } else if ( rdata.msg == 'ip' ){
                     $('select[name="dataAccess"]').find('option[value="ip"]').attr("selected",true);
