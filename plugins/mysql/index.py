@@ -1993,28 +1993,23 @@ def resetDbRootPwd(version, newpwd=''):
 
     pSqliteDb('config').where('id=?', (1,)).save('mysql_root', (pwd,))
 
-    mdb8 = getMdb8Ver()
-    if not mw.inArray(mdb8, version):
+    # 5.5/5.6 的 mysql.user 使用 password 列; 5.7 起已改为 authentication_string
+    m = re.search(r'(\d+)\.(\d+)', version)
+    major = int(m.group(1)) if m else 0
+    minor = int(m.group(2)) if m else 0
+
+    if major < 5 or (major == 5 and minor < 7):
         cmd_pass = serverdir + '/bin/mysql --defaults-file=' + myconf + ' -uroot -e'
         cmd_pass = cmd_pass + '"UPDATE mysql.user SET password=PASSWORD(\'' + pwd + "') WHERE user='root';"
         cmd_pass = cmd_pass + 'flush privileges;"'
         data = mw.execShell(cmd_pass)
         # print(data)
     else:
-        # 8.4 起默认禁用 mysql_native_password, 9.x 已移除, 用默认认证插件
-        m = re.search(r'(\d+)\.(\d+)', version)
-        major = int(m.group(1)) if m else 0
-        minor = int(m.group(2)) if m else 0
-        if major >= 9 or (major == 8 and minor >= 4):
-            auth_sql = "alter user 'root'@'localhost' IDENTIFIED by '" + pwd + "';"
-        else:
-            auth_sql = "alter user 'root'@'localhost' IDENTIFIED WITH " + getAuthPolicy() + " by '" + pwd + "';"
-
         reset_pwd = 'flush privileges;'
         reset_pwd = reset_pwd + \
             "UPDATE mysql.user SET authentication_string='' WHERE user='root';"
         reset_pwd = reset_pwd + "flush privileges;"
-        reset_pwd = reset_pwd + auth_sql
+        reset_pwd = reset_pwd + "alter user 'root'@'localhost' IDENTIFIED by '" + pwd + "';"
         reset_pwd = reset_pwd + "flush privileges;"
 
         tmp_file = "/tmp/mysql_init_tmp.log"
