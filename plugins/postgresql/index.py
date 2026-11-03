@@ -1378,10 +1378,16 @@ def pgBack():
     # 检测 pigz 并行压缩
     pigz = shutil.which('pigz')
     if pigz:
-        try:
-            cpus = int(subprocess.check_output(['sysctl', '-n', 'hw.ncpu']).strip())
-        except Exception:
-            cpus = 4
+        # os.cpu_count() 跨平台, 兜底用 nproc (Linux) / sysctl (macOS)
+        cpus = os.cpu_count() or 0
+        if cpus <= 0:
+            try:
+                cpus = int(subprocess.check_output(['nproc']).strip())
+            except Exception:
+                try:
+                    cpus = int(subprocess.check_output(['sysctl', '-n', 'hw.ncpu']).strip())
+                except Exception:
+                    cpus = 4
         compressor = pigz + ' -p ' + str(max(2, cpus - 1)) + ' -6'
     else:
         compressor = 'gzip -6'

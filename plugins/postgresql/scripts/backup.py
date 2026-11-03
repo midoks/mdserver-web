@@ -56,14 +56,22 @@ def _pgDumpMajorVersion(pg_dump_bin):
 
 
 def _detectParallelCpus():
-    """检测可用 CPU 核数, 用于 pigz 并行度."""
+    """检测可用 CPU 核数, 用于 pigz 并行度 (跨平台)."""
+    # Python 3.4+ 内置, 跨 macOS / Linux / Windows
+    n = os.cpu_count()
+    if n and n > 0:
+        return n
+    # Linux 兜底
+    try:
+        return int(subprocess.check_output(['nproc']).strip())
+    except Exception:
+        pass
+    # macOS 兜底
     try:
         return int(subprocess.check_output(['sysctl', '-n', 'hw.ncpu']).strip())
     except Exception:
-        try:
-            return len(os.sched_getaffinity(0))
-        except Exception:
-            return 4
+        pass
+    return 4
 
 
 def _compressorCmd():
