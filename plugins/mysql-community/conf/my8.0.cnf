@@ -65,6 +65,11 @@ binlog-ignore-db = mysql
 binlog-ignore-db = information_schema
 binlog-ignore-db = performance_schema
 
+replicate-wild-ignore-table = mysql.%
+replicate-wild-ignore-table = information_schema.%
+replicate-wild-ignore-table = performance_schema.%
+replicate-wild-ignore-table = sys.%
+
 #slave
 log_replica_updates
 #replicate-do-db

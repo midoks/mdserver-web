@@ -300,6 +300,12 @@ html {
     vertical-align: 0
 }
 
+.ta_center{
+    text-align: center;
+    display: flex;
+    justify-content: center;
+}
+
 .ico-font-ask {
     border: 1px solid #999;
     border-radius: 8px;

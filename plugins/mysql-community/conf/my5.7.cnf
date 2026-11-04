@@ -15,10 +15,12 @@ socket		= {$SERVER_APP_PATH}/mysql.sock
 datadir = {$SERVER_APP_PATH}/data
 log-error =  {$SERVER_APP_PATH}/data/error.log
 server-id	= {$SERVER_ID}
-sql-mode=NO_ENGINE_SUBSTITUTION,STRICT_TRANS_TABLES
+sql-mode=STRICT_TRANS_TABLES,NO_ZERO_IN_DATE,NO_ZERO_DATE,ERROR_FOR_DIVISION_BY_ZERO,NO_AUTO_CREATE_USER,NO_ENGINE_SUBSTITUTION
 
 default_storage_engine = InnoDB
-language={$SERVER_APP_PATH}/share/english
+lc-messages-dir={$SERVER_APP_PATH}/share
+explicit_defaults_for_timestamp = ON
+
 
 key_buffer_size = 8M
 table_open_cache = 32
@@ -74,6 +76,11 @@ replicate-ignore-db = information_schema
 replicate-ignore-db = performance_schema
 replicate-ignore-db = mysql
 replicate-ignore-db = test
+
+replicate-wild-ignore-table = mysql.%
+replicate-wild-ignore-table = information_schema.%
+replicate-wild-ignore-table = performance_schema.%
+replicate-wild-ignore-table = sys.%
 
 master_info_repository = table
 relay_log_info_repository = table

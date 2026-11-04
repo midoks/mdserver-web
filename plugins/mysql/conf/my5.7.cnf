@@ -87,6 +87,11 @@ replicate-ignore-db = performance_schema
 replicate-ignore-db = mysql
 replicate-ignore-db = test
 
+replicate-wild-ignore-table = mysql.%
+replicate-wild-ignore-table = information_schema.%
+replicate-wild-ignore-table = performance_schema.%
+replicate-wild-ignore-table = sys.%
+
 master_info_repository = table
 relay_log_info_repository = table
 

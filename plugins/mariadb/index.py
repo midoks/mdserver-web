@@ -2378,10 +2378,10 @@ def getMasterRepSlaveUserCmd(version):
     base_sql = "CHANGE MASTER " + connection_name + "TO MASTER_HOST='" + ip + "', MASTER_PORT=" + port + ", MASTER_USER='" + \
             clist[0]['username']  + "', MASTER_PASSWORD='" + \
             clist[0]['password'];
-    sql = ''
+    sql = '<span class="set-info c7 ta_center">经典模式</span><hr style="margin-top: 5px;margin-bottom: 10px;"/>'
     sql += base_sql + "', MASTER_LOG_FILE='" + mstatus[0]["File"] + \
             "',MASTER_LOG_POS=" + str(mstatus[0]["Position"])
-    sql += "<br/><hr/>";
+    sql = '<br/><span class="set-info c7 ta_center">GTID模式</span><hr style="margin-top: 5px;margin-bottom: 10px;"/>'
     sql += base_sql + "',MASTER_USE_GTID=slave_pos,MASTER_CONNECT_RETRY=10;";    
     sql += "<br/>";
 
@@ -2679,7 +2679,8 @@ def getSlaveList(version=''):
 
     data = {}
     data['data'] = dlist
-    return mw.getJson(data)
+    # 状态字段中包含 datetime 等对象,需转成字符串后才能序列化
+    return json.dumps(data, default=str)
 
 def trySlaveSyncBugfix(version=''):
     if status(version) == 'stop':

@@ -64,6 +64,7 @@ binlog-ignore-db = mysql
 binlog-ignore-db = information_schema
 binlog-ignore-db = performance_schema
 
+
 #slave
 log_replica_updates
 #replicate-do-db
@@ -72,6 +73,11 @@ replicate-ignore-db = information_schema
 replicate-ignore-db = performance_schema
 replicate-ignore-db = mysql
 replicate-ignore-db = test
+
+replicate-wild-ignore-table = mysql.%
+replicate-wild-ignore-table = information_schema.%
+replicate-wild-ignore-table = performance_schema.%
+replicate-wild-ignore-table = sys.%
 
 default_storage_engine = InnoDB
 innodb_data_home_dir = {$SERVER_APP_PATH}/data
