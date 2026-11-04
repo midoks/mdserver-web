@@ -254,12 +254,18 @@ def initDreplace(version=''):
     return file_bin
 
 
-def status(version=''):
+def status_proccess(version=''):
     data = mw.execShell(
         "ps -ef|grep bin/postgres |grep -v grep | grep -v python | grep -v mdserver-web | awk '{print $2}'")
     if data[0] == '':
         return 'stop'
     return 'start'
+
+def status(version=''):
+    pid = getServerDir() + "/data/postmaster.pid"
+    if os.path.exists(pid):
+        return 'start'
+    return 'stop'
 
 
 def pgCmd(cmd):
