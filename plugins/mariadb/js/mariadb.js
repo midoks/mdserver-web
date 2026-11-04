@@ -1798,7 +1798,7 @@ function getMasterRepSlaveUserCmd(username, db=''){
         
         var loadOpen = layer.open({
             type: 1,
-            title: '同步命令',
+            title: '同步命令[ 1-经典模式,2-GTID ]',
             area: '500px',
             content:"<form class='bt-form pd20 pb70' id='add_master'>\
             <div class='line' style='word-wrap: break-word;word-break: normal;'>"+cmd+"</div>\
