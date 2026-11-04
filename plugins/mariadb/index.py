@@ -2679,7 +2679,8 @@ def getSlaveList(version=''):
 
     data = {}
     data['data'] = dlist
-    return mw.getJson(data)
+    # 状态字段中包含 datetime 等对象,需转成字符串后才能序列化
+    return json.dumps(data, default=str)
 
 def trySlaveSyncBugfix(version=''):
     if status(version) == 'stop':
