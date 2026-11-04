@@ -99,7 +99,7 @@ class nosqlMySQL():
         result['host'] = '127.0.0.1'
         result['username'] = 'root'
 
-        if sid in ['mysql', 'mysql-apt', 'mysql-yum', 'mysql-community']:
+        if sid in ['mysql', 'mysql-apt', 'mysql-yum', 'mysql-community','mariadb']:
             my_cnf_path = "{}/{}/etc/my.cnf".format(mw.getServerDir(),sid)
             if not os.path.exists(my_cnf_path):
                 return False
