@@ -35,9 +35,9 @@ Install_App()
 	cd ${rootPath} && python3 plugins/manticoresearch/index.py start ${VERSION}
 	cd ${rootPath} && python3 plugins/manticoresearch/index.py initd_install ${VERSION}
 
-	if [ -d ${MC_DIR} ];then
-		rm -rf ${MC_DIR}
-	fi
+	# if [ -d ${MC_DIR} ];then
+	# 	rm -rf ${MC_DIR}
+	# fi
 }
 
 Uninstall_App()

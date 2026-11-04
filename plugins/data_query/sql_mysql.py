@@ -151,6 +151,10 @@ class nosqlMySQL():
         local_mysql_yum = "{}/mysql-community/etc/my.cnf".format(mw.getServerDir())
         if os.path.exists(local_mysql_yum):
             data.append({'name':'本地服务器[Tar]', 'val':'mysql-community'})
+
+        local_mysql_yum = "{}/mariadb/etc/my.cnf".format(mw.getServerDir())
+        if os.path.exists(local_mysql_yum):
+            data.append({'name':'本地服务器[mariadb]', 'val':'mariadb'})
         return mw.returnData(True, 'ok', data)
 
 @singleton
