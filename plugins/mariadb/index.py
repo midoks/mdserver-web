@@ -1545,11 +1545,14 @@ def getDbUserAccessDiff(db_access, input_access):
 
     host_var = 'localhost'
     local_ipvar = '127.0.0.1'
+    local_ip6var = '::1'
 
     for ac in input_access:
         if ac == host_var:
             continue
         if ac == local_ipvar:
+            continue
+        if ac == local_ip6var:
             continue
         if mw.inArray(db_access,ac):
             continue
@@ -1558,10 +1561,15 @@ def getDbUserAccessDiff(db_access, input_access):
     if not mw.inArray(db_access, local_ipvar) and not mw.inArray(add, local_ipvar):
         add.append(local_ipvar)
 
+    if not mw.inArray(db_access, local_ip6var) and not mw.inArray(add, local_ip6var):
+        add.append(local_ip6var)
+
     for ac in db_access:
         if ac == host_var:
             continue
         if ac == local_ipvar:
+            continue
+        if ac == local_ip6var:
             continue
         if mw.inArray(input_access,ac):
             continue
@@ -1569,6 +1577,8 @@ def getDbUserAccessDiff(db_access, input_access):
 
     if mw.inArray(delete, local_ipvar):
         delete.remove(local_ipvar)
+    if mw.inArray(delete, local_ip6var):
+        delete.remove(local_ip6var)
 
     return {"add":add,"delete":delete}
 
