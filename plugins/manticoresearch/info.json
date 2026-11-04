@@ -4,7 +4,7 @@
 	"name": "manticoresearch",
 	"title": "manticoresearch",
 	"shell": "install.sh",
-	"versions":["7.4.6"],
+	"versions":["latest"],
 	"tip": "soft",
 	"install_pre_inspection":true,
 	"checks": "server/manticoresearch",

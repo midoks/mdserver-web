@@ -25,19 +25,19 @@ Install_App()
 
 	wget --no-check-certificate -O $MC_DIR/manticore-repo.noarch.deb https://repo.manticoresearch.com/manticore-repo.noarch.deb
 	dpkg -i $MC_DIR/manticore-repo.noarch.deb
-	apt update -y 
-	apt -y install manticore manticore-extra
 
+	apt -y install manticore manticore-extra
+	apt -y install manticore-extra
+	apt -y upgrade manticore
 
 	echo "${VERSION}" > $serverPath/manticoresearch/version.pl
-
 
 	cd ${rootPath} && python3 plugins/manticoresearch/index.py start ${VERSION}
 	cd ${rootPath} && python3 plugins/manticoresearch/index.py initd_install ${VERSION}
 
-	if [ -d ${MC_DIR} ];then
-		rm -rf ${MC_DIR}
-	fi
+	# if [ -d ${MC_DIR} ];then
+	# 	rm -rf ${MC_DIR}
+	# fi
 }
 
 Uninstall_App()

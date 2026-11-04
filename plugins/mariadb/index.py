@@ -2381,7 +2381,7 @@ def getMasterRepSlaveUserCmd(version):
     sql = '<span class="set-info c7 ta_center">经典模式</span><hr style="margin-top: 5px;margin-bottom: 10px;"/>'
     sql += base_sql + "', MASTER_LOG_FILE='" + mstatus[0]["File"] + \
             "',MASTER_LOG_POS=" + str(mstatus[0]["Position"])
-    sql = '<br/><span class="set-info c7 ta_center">GTID模式</span><hr style="margin-top: 5px;margin-bottom: 10px;"/>'
+    sql += '<br/><hr/><span class="set-info c7 ta_center">GTID模式</span><hr style="margin-top: 5px;margin-bottom: 10px;"/>'
     sql += base_sql + "',MASTER_USE_GTID=slave_pos,MASTER_CONNECT_RETRY=10;";    
     sql += "<br/>";
 
