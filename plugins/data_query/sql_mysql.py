@@ -475,23 +475,42 @@ class nosqlMySQLCtr():
             return err
 
         my_instance.execute("SET sql_mode=(SELECT REPLACE(@@sql_mode,'ONLY_FULL_GROUP_BY',''))")
+
+        # ANY_VALUE 是 MySQL 5.7+ 的函数,MariaDB 不支持(报 FUNCTION ANY_VALUE does not exist);
+        # 上面已去掉 ONLY_FULL_GROUP_BY,MariaDB 可直接取非聚合字段
+        ver = my_instance.find("SELECT @@version as db_version")
+        is_mariadb = ver is not None and 'MariaDB' in str(ver.get('db_version', ''))
+
+        def any_val(expr):
+            return expr if is_mariadb else 'ANY_VALUE(' + expr + ')'
+
         data = my_instance.query(
             """
             SELECT t.TABLE_SCHEMA as TABLE_SCHEMA, t.TABLE_NAME as TABLE_NAME,
-                ANY_VALUE(t.ENGINE) as ENGINE,
-                ANY_VALUE(IFNULL(t.DATA_LENGTH/1024/1024/1024, 0)) as DATA_LENGTH,
-                ANY_VALUE(IFNULL(t.INDEX_LENGTH/1024/1024/1024, 0)) as INDEX_LENGTH,
-                ANY_VALUE(IFNULL((t.DATA_LENGTH+t.INDEX_LENGTH)/1024/1024/1024, 0)) AS TOTAL_LENGTH,
-                ANY_VALUE(c.column_name) AS COLUMN_NAME, ANY_VALUE(c.data_type) AS DATA_TYPE,
-                ANY_VALUE(c.COLUMN_TYPE) AS COLUMN_TYPE,
-                ANY_VALUE(t.AUTO_INCREMENT) AS AUTO_INCREMENT,
-                ANY_VALUE(locate('unsigned', c.COLUMN_TYPE) = 0) AS IS_SIGNED 
-            FROM information_schema.TABLES t 
-            JOIN information_schema.COLUMNS c ON t.TABLE_SCHEMA = c.TABLE_SCHEMA AND t.table_name=c.table_name 
-            WHERE t.TABLE_SCHEMA NOT IN ('mysql', 'information_schema', 'performance_schema', 'sys') 
-            GROUP BY t.TABLE_SCHEMA, t.TABLE_NAME 
+                {engine} as ENGINE,
+                {data_length} as DATA_LENGTH,
+                {index_length} as INDEX_LENGTH,
+                {total_length} AS TOTAL_LENGTH,
+                {column_name} AS COLUMN_NAME, {data_type} AS DATA_TYPE,
+                {column_type} AS COLUMN_TYPE,
+                {auto_increment} AS AUTO_INCREMENT,
+                {is_signed} AS IS_SIGNED
+            FROM information_schema.TABLES t
+            JOIN information_schema.COLUMNS c ON t.TABLE_SCHEMA = c.TABLE_SCHEMA AND t.table_name=c.table_name
+            WHERE t.TABLE_SCHEMA NOT IN ('mysql', 'information_schema', 'performance_schema', 'sys')
+            GROUP BY t.TABLE_SCHEMA, t.TABLE_NAME
             ORDER BY TOTAL_LENGTH DESC, AUTO_INCREMENT DESC
-            """
+            """.format(
+                engine=any_val("t.ENGINE"),
+                data_length=any_val("IFNULL(t.DATA_LENGTH/1024/1024/1024, 0)"),
+                index_length=any_val("IFNULL(t.INDEX_LENGTH/1024/1024/1024, 0)"),
+                total_length=any_val("IFNULL((t.DATA_LENGTH+t.INDEX_LENGTH)/1024/1024/1024, 0)"),
+                column_name=any_val("c.column_name"),
+                data_type=any_val("c.data_type"),
+                column_type=any_val("c.COLUMN_TYPE"),
+                auto_increment=any_val("t.AUTO_INCREMENT"),
+                is_signed=any_val("locate('unsigned', c.COLUMN_TYPE) = 0"),
+            )
         )
 
         if data is None:
