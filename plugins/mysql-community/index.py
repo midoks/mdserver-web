@@ -1762,6 +1762,8 @@ def getDbAccess():
     userStr = ','.join(users)
     if userStr == '127.0.0.1,localhost':
         return mw.returnJson(True, 'localhost')
+    if userStr == '127.0.0.1,::1,localhost':
+        return mw.returnJson(True, 'localhost')
 
     return mw.returnJson(True, userStr)
 
