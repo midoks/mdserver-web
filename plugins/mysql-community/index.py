@@ -3005,10 +3005,18 @@ def initSlaveStatus(version=''):
         return mw.returnJson(False, '需要先设置同步配置')
 
     mode = mw.readFile(mode_file)
-    if mode == 'ssh':
-        return initSlaveStatusSSH(version)
-    if mode == 'sync-user':
-        return initSlaveStatusSyncUser(version)
+    try:
+        if mode == 'ssh':
+            return initSlaveStatusSSH(version)
+        if mode == 'sync-user':
+            return initSlaveStatusSyncUser(version)
+    except Exception as e:
+        estr = str(e)
+        if '1045' in estr or 'Access denied' in estr:
+            return mw.returnJson(False, 'root密码错误,请先在面板[修改root密码]或点[一键修复]重置密码!')
+        if '2003' in estr or 'Can\'t connect' in estr or '2006' in estr:
+            return mw.returnJson(False, 'MySQL连接失败: ' + estr)
+        return mw.returnJson(False, '初始化同步状态失败: ' + estr)
 
 
 def parseSlaveSyncCmd(cmd):
@@ -3040,11 +3048,21 @@ def initSlaveStatusSyncUser(version=''):
 
     slave_name = getSlaveName()
     # print(data)
-    pdb = pMysqlDb()
-    if len(slave_data) == 1:
-        dlist = pdb.query('show '+slave_name+' status')
-        if len(dlist) > 0:
-            return mw.returnJson(False, '已经初始化好了zz...')
+    try:
+        pdb = pMysqlDb()
+    except Exception as e:
+        return mw.returnJson(False, '数据库连接失败: ' + str(e))
+
+    try:
+        if len(slave_data) == 1:
+            dlist = pdb.query('show '+slave_name+' status')
+            if len(dlist) > 0:
+                return mw.returnJson(False, '已经初始化好了zz...')
+    except Exception as e:
+        estr = str(e)
+        if '1045' in estr or 'Access denied' in estr:
+            return mw.returnJson(False, 'root密码错误,请先在面板[修改root密码]或点[一键修复]重置密码!')
+        return mw.returnJson(False, '检查同步状态失败: ' + estr)
 
     msg = ''
     local_mode = recognizeDbMode()
@@ -3102,8 +3120,14 @@ def initSlaveStatusSyncUser(version=''):
 
 def initSlaveStatusSSH(version=''):
     slave_name = getSlaveName()
-    db = pMysqlDb()
-    dlist = db.query('show '+slave_name+' status')
+    try:
+        db = pMysqlDb()
+        dlist = db.query('show '+slave_name+' status')
+    except Exception as e:
+        estr = str(e)
+        if '1045' in estr or 'Access denied' in estr:
+            return mw.returnJson(False, 'root密码错误,请先在面板[修改root密码]或点[一键修复]重置密码!')
+        return mw.returnJson(False, '数据库连接失败: ' + estr)
 
     conn = pSqliteDb('slave_id_rsa')
     ssh_list = conn.field('ip,port,id_rsa,db_user').select()
