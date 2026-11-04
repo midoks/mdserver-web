@@ -2378,10 +2378,10 @@ def getMasterRepSlaveUserCmd(version):
     base_sql = "CHANGE MASTER " + connection_name + "TO MASTER_HOST='" + ip + "', MASTER_PORT=" + port + ", MASTER_USER='" + \
             clist[0]['username']  + "', MASTER_PASSWORD='" + \
             clist[0]['password'];
-    sql = '<span>经典模式</span><hr/>'
+    sql = '<span class="set-info c7 ta_center">经典模式</span><hr style="margin-top: 5px;margin-bottom: 10px;"/>'
     sql += base_sql + "', MASTER_LOG_FILE='" + mstatus[0]["File"] + \
             "',MASTER_LOG_POS=" + str(mstatus[0]["Position"])
-    sql += "<br/><hr/><span>GTID模式</span><hr/>";
+    sql = '<br/><span class="set-info c7 ta_center">GTID模式</span><hr style="margin-top: 5px;margin-bottom: 10px;"/>'
     sql += base_sql + "',MASTER_USE_GTID=slave_pos,MASTER_CONNECT_RETRY=10;";    
     sql += "<br/>";
 
