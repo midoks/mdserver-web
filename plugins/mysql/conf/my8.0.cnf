@@ -87,6 +87,11 @@ replicate-ignore-db = performance_schema
 replicate-ignore-db = mysql
 replicate-ignore-db = test
 
+replicate-wild-ignore-table = mysql.%
+replicate-wild-ignore-table = information_schema.%
+replicate-wild-ignore-table = performance_schema.%
+replicate-wild-ignore-table = sys.%
+
 
 innodb_data_home_dir = {$SERVER_APP_PATH}/data
 innodb_data_file_path = ibdata1:10M:autoextend
