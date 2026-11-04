@@ -273,6 +273,11 @@ def queryLog():
     tmp = re.search(rep, content)
     return tmp.groups()[0]
 
+def systemctlLog():
+    cmd = "journalctl -u manticore -n 15 --no-pager"
+    data = mw.execShell(cmd)
+    return data[0]
+
 
 def runStatus():
     s = status()
@@ -491,6 +496,8 @@ if __name__ == "__main__":
         print(runLog())
     elif func == 'query_log':
         print(queryLog())
+    elif func == 'systemctl_log':
+        print(systemctlLog())
     elif func == 'run_status':
         print(runStatus())
     elif func == 'run_status_test':
