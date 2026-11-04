@@ -253,7 +253,6 @@ def initDreplace(version=''):
         mw.execShell('chmod +x ' + file_bin)
     return file_bin
 
-
 def status_proccess(version=''):
     data = mw.execShell(
         "ps -ef|grep bin/postgres |grep -v grep | grep -v python | grep -v mdserver-web | awk '{print $2}'")
@@ -267,14 +266,11 @@ def status(version=''):
         return 'start'
     return 'stop'
 
-
 def pgCmd(cmd):
     return "su - postgres -c \"" + cmd + "\""
 
-
 def execShellPg(cmd):
     return mw.execShell(pgCmd(cmd))
-
 
 def pGetDbUser():
     if mw.isAppleSystem():
@@ -282,7 +278,6 @@ def pGetDbUser():
             "who | sed -n '2, 1p' |awk '{print $1}'")[0].strip()
         return user
     return 'postgresql'
-
 
 def initPgData():
     serverdir = getServerDir()
@@ -294,7 +289,6 @@ def initPgData():
         mw.execShell(cmd)
         return False
     return True
-
 
 def initPgPwd():
 
