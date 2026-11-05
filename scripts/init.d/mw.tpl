@@ -777,6 +777,15 @@ mw_default(){
     echo -e "$address"
     echo -e `cd ${PANEL_DIR} && python3 ${PANEL_DIR}/panel_tools.py username`
     echo -e `cd ${PANEL_DIR} && python3 ${PANEL_DIR}/panel_tools.py password`
+    echo -e "=================================================================="
+
+    isStart=$(ps aux|grep 'gunicorn -c setting.py app:app'|grep -v grep|awk '{print $2}')
+    if [ "$isStart" != '' ];then
+        echo -e "---------------------------[\033[32mPANEL RUNNING\033[0m]---------------------------"
+    else
+        echo -e "---------------------------[\033[31mPANEL STOP\033[0m]---------------------------"
+    fi
+    echo -e "=================================================================="
     echo -e "\033[33mWarning:\033[0m"
     echo -e "\033[33mIf you cannot access the panel. \033[0m"
     echo -e "\033[33mrelease the following port (${show_panel_ip}80|443|22) in the security group.\033[0m"
