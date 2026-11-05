@@ -209,7 +209,8 @@ def reload():
 
 def rebuild():
     cmd = 'indexer --all --rotate'
-    data = mw.execShell(cmd)
+    cmd_manticore = asManticore(cmd_index)
+    data = mw.execShell(cmd_manticore)
     if data[0].find('successfully')<0:
         return data[0].replace("\n","<br/>")
     return 'ok'
