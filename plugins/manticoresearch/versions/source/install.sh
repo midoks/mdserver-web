@@ -17,6 +17,22 @@ fi
 VERSION=$2
 action=$1
 VERSION=29.9.0
+
+# 下载文件，直连失败时走加速镜像
+download_file()
+{
+	src=$1
+	dst=$2
+	for url in "$src" "https://ghproxy.net/$src" "https://gh-proxy.com/$src" "https://ghfast.top/$src"
+	do
+		if curl -fsSL --retry 2 --connect-timeout 20 -o "$dst" "$url";then
+			return 0
+		fi
+		rm -f "$dst"
+	done
+	return 1
+}
+
 Install_App()
 {
 	echo '正在安装manticoresearch...'
@@ -53,6 +69,33 @@ Install_App()
 		exit 1
 	fi
 
+	# 预先下载 CRoaring，交给 cmake 的 FetchContent 直接使用本地源码
+	ROARING_VER=4.3.2
+	ROARING_SRC=$MC_DIR/deps/CRoaring-${ROARING_VER}
+	if [ ! -d $ROARING_SRC ];then
+		mkdir -p $MC_DIR/deps
+		ROARING_TGZ=$MC_DIR/deps/roaring-v${ROARING_VER}.tar.gz
+		if [ ! -s $ROARING_TGZ ];then
+			if ! download_file "https://github.com/RoaringBitmap/CRoaring/archive/refs/tags/v${ROARING_VER}.tar.gz" "$ROARING_TGZ";then
+				echo "roaring download failed!"
+				exit 1
+			fi
+		fi
+		tar -zxvf $ROARING_TGZ -C $MC_DIR/deps
+	fi
+
+	if [ ! -f $ROARING_SRC/CMakeLists.txt ];then
+		echo "roaring source is required at $ROARING_SRC."
+		exit 1
+	fi
+
+	# CRoaring 默认会下载 CPM.cmake 并拉取 cmocka（仅测试用），网络受限时会配置失败；
+	# 关闭 CPM 与测试，只编译 roaring 库本体
+	if ! grep -q 'MWSET_ROARING_PATCHED' $ROARING_SRC/CMakeLists.txt;then
+		sed -i "s/^option(ENABLE_ROARING_TESTS.*$/set(ENABLE_ROARING_TESTS OFF CACHE BOOL \"\" FORCE) # MWSET_ROARING_PATCHED/" $ROARING_SRC/CMakeLists.txt
+		sed -i "s/^option(ROARING_USE_CPM.*$/set(ROARING_USE_CPM OFF CACHE BOOL \"\" FORCE)/" $ROARING_SRC/CMakeLists.txt
+	fi
+
 	# 上次配置失败残留的 build 目录会保留 FetchContent/galera 的失败状态，先清理
 	if [ -d $MC_SRC/build ];then
 		if [ ! -f $MC_SRC/build/Makefile ] || grep -q 'WITH_GALERA:BOOL=ON' $MC_SRC/build/CMakeCache.txt 2>/dev/null;then
@@ -84,6 +127,7 @@ Install_App()
 	cmake .. -DCMAKE_BUILD_TYPE=Release \
 		-DWITH_GALERA=OFF \
 		$EMBEDDINGS_FLAG \
+		-DFETCHCONTENT_SOURCE_DIR_ROARING="$ROARING_SRC" \
 		-DCMAKE_INSTALL_PREFIX=/usr/local
 	if [ ! -f Makefile ];then
 		echo "manticoresearch cmake configure failed!"
