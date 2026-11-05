@@ -294,7 +294,7 @@ def runStatus():
 
     sh = sphinxapi.SphinxClient()
     port = getMainPort()
-    sh.SetServer('127.0.0.1', port)
+    sh.SetServer('127.0.0.1', int(port))
     info_status = sh.Status()
 
     if info_status is None:
