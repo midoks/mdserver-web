@@ -141,15 +141,18 @@ def initDreplace():
     dirs_list = [
         "/var/log/manticore",
         "/var/run/manticore",
-        "/var/lib/manticore"
+        "/var/lib/manticore",
     ]
+
+    index_dir = getServerDir() + '/index'
+    dirs_list.append(index_dir)
 
     for d in dirs_list:
         if not os.path.exists(d):
             mw.execShell('mkdir -p ' + d)
 
     mw.execShell("chown -R manticore:manticore /var/run/manticore")
-
+    mw.execShell("chown -R manticore:manticore "+index_dir)
 
     # config replace
     conf_bin = getConf()
