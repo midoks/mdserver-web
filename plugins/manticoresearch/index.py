@@ -431,12 +431,12 @@ def updateAll():
 
     for x in range(len(index)):
         cmd_index = cmd + ' ' + index[x]['index'] + ' --rotate'
+        if not mw.isAppleSystem():
+            # 直接以 manticore 用户重建，避免生成文件属主为 root
+            cmd_index = "su -s /bin/sh manticore -c \"" + cmd_index + "\""
         subprocess.run(cmd_index, shell=True)
         print(cmd_index)
 
-    index_dir = getServerDir() + '/index'
-    if os.path.exists(index_dir):
-        mw.execShell("chown -R manticore:manticore "+index_dir)
     return ''
 
 #增量更新
