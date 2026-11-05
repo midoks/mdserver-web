@@ -431,7 +431,7 @@ def updateAll():
 
     for x in range(len(index)):
         cmd_index = cmd + ' ' + index[x]['index'] + ' --rotate'
-        os.system(cmd_index)
+        subprocess.run(cmd_index, shell=True)
         print(cmd_index)
 
     index_dir = getServerDir() + '/index'
