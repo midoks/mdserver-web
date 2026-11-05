@@ -9,6 +9,7 @@ serverPath=$(dirname "$rootPath")
 sysName=`uname`
 sysArch=`arch`
 
+# cd /Users/midoks/Desktop/mwdev/server/mdserver-web/plugins/manticoresearch && bash install.sh install latest
 # cd /www/server/mdserver-web/plugins/manticoresearch && bash install.sh install latest
 # cd /www/server/mdserver-web && python3 plugins/manticoresearch/index.py run_status_test
 # cd /www/server/mdserver-web && python3 plugins/manticoresearch/index.py start
@@ -26,12 +27,13 @@ fi
 ACTION=$1
 VERSION=$2
 
-which apt
-if [ "$?" = "0" ];then
+if [ "$sysName" == "Darwin" ];then
+	sh -x $curPath/versions/mac/install.sh $1 $2
+elif command -v apt >/dev/null 2>&1;then
 	sh -x $curPath/versions/apt/install.sh $1 $2
-fi
-
-which yum
-if [ "$?" = "0" ];then
+elif command -v yum >/dev/null 2>&1;then
 	sh -x $curPath/versions/yum/install.sh $1 $2
+else
+	echo "unsupported system: ${sysName}"
+	exit 1
 fi
