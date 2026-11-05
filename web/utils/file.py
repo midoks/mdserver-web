@@ -241,7 +241,7 @@ def setBatchData(path, stype, access, user, data):
                         shutil.rmtree(filename)
                 else:
                     if key == '.user.ini':
-                        os.system('which chattr && chattr -i ' + filename)
+                        os.system('command -v chattr && chattr -i ' + filename)
                     if is_recycle:
                         mvRecycleBin(topath)
                     else:
@@ -794,7 +794,7 @@ def dirDelete(path):
 
     # 检查是否为.user.ini
     if path.find('.user.ini'):
-        os.system("which chattr && chattr -i '" + path + "'")
+        os.system("command -v chattr && chattr -i '" + path + "'")
     try:
         recycle_bin = thisdb.getOption('recycle_bin')
         if recycle_bin == 'open':
@@ -902,7 +902,7 @@ def reRecycleBin(path):
 
 def closeRecycleBin():
     rb_dir = mw.getRecycleBinDir()
-    mw.execShell('which chattr && chattr -R -i ' + rb_dir)
+    mw.execShell('command -v chattr && chattr -R -i ' + rb_dir)
     rlist = os.listdir(rb_dir)
     i = 0
     l = len(rlist)

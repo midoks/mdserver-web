@@ -71,7 +71,7 @@ def execShell(cmdstring, cwd=None, timeout=None, shell=True):
     return (success, error)
 
 def checkBinExist(name):
-    d = execShell('which ' + name)
+    d = execShell('command -v ' + name)
     if d[0] != '':
         return True
     return False

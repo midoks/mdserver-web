@@ -99,8 +99,8 @@ def initDreplace():
     systemService = systemDir + '/swap.service'
     systemServiceTpl = getPluginDir() + '/init.d/swap.service.tpl'
     if os.path.exists(systemDir) and not os.path.exists(systemService):
-        swapon_bin = mw.execShell('which swapon')[0].strip()
-        swapoff_bin = mw.execShell('which swapoff')[0].strip()
+        swapon_bin = mw.execShell('command -v swapon')[0].strip()
+        swapoff_bin = mw.execShell('command -v swapoff')[0].strip()
         content = mw.readFile(systemServiceTpl)
         content = content.replace('{$SERVER_PATH}', service_path)
         content = content.replace('{$SWAPON_BIN}', swapon_bin)
