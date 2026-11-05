@@ -325,8 +325,8 @@ def sphinxConfParse():
     file = getConf()
     bin_dir = getServerDir()
     content = mw.readFile(file)
-    rep = r'index\s(.*)'
-    sindex = re.findall(rep, content)
+    rep = r'index\s+(\w+)'
+    sindex = re.findall(rep, content,re.MULTILINE)
     indexlen = len(sindex)
     cmd = {}
     cmd['cmd'] = "indexer -c " + getConf()
