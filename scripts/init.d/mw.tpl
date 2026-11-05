@@ -779,9 +779,10 @@ mw_default(){
     echo -e `cd ${PANEL_DIR} && python3 ${PANEL_DIR}/panel_tools.py password`
     echo -e "=================================================================="
 
-    isStart=$(ps aux|grep 'gunicorn -c setting.py app:app'|grep -v grep|awk '{print $2}')
-    if [ "$isStart" != '' ];then
-        echo -e "---------------------------[\033[32mPANEL RUNNING\033[0m]---------------------------"
+    # isStart=$(ps aux|grep 'gunicorn -c setting.py app:app'|grep -v grep|awk '{print $2}')
+    pid_file=${PANEL_DIR}/logs/panel.pid
+    if [ -f $pid_file ];then
+        echo -e "-------------------------[\033[32mPANEL RUNNING\033[0m]--------------------------"
     else
         echo -e "---------------------------[\033[31mPANEL STOP\033[0m]---------------------------"
     fi
