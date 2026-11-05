@@ -81,7 +81,7 @@ Install_App()
 				exit 1
 			fi
 		fi
-		tar -zxvf $ROARING_TGZ -C $MC_DIR/deps
+		tar -zxvf $ROARING_TGZ -C $MC_DIR/source/manticoresearch/deps
 	fi
 
 	if [ ! -f $ROARING_SRC/CMakeLists.txt ];then
