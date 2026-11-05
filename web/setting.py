@@ -44,7 +44,8 @@ if not os.path.exists(data_dir):
 panel_port = '7200'
 from utils.firewall import Firewall as MwFirewall
 default_port_file = panel_dir+'/data/port.pl'
-if os.path.exists(default_port_file):
+panel_dbfile = data_dir + "/panel.db"
+if os.path.exists(default_port_file) && not os.path.exists(panel_dbfile:
     panel_port = mw.readFile(default_port_file)
     panel_port.strip()
     MwFirewall.instance().addAcceptPort(panel_port,'PANEL端口', 'port')
