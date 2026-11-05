@@ -29,6 +29,10 @@ VERSION=$2
 
 if [ "$sysName" == "Darwin" ];then
 	sh -x $curPath/versions/mac/install.sh $1 $2
+elif [ "$VERSION" == "code" ];then
+	sh -x $curPath/versions/source/install.sh $1 $2
+elif [ "$VERSION" == "debian" ];then
+	sh -x $curPath/versions/apt/install.sh $1 $2
 elif command -v apt >/dev/null 2>&1;then
 	sh -x $curPath/versions/apt/install.sh $1 $2
 elif command -v yum >/dev/null 2>&1;then
