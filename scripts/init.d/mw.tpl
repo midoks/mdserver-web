@@ -126,7 +126,7 @@ mw_stop_task()
         kill -9 $p  > /dev/null 2>&1
     done
 
-    zzpids=$(ps -A -o stat,ppid,pid,cmd | grep -e '^[Zz]' | awk '{print $2}')
+    zzpids=$(ps -A -o stat,ppid,pid | grep -e '^[Zz]' | awk '{print $2}')
     zzpids=($zzpids)
     for p in ${zzpids[@]}
     do
