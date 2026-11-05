@@ -23,10 +23,12 @@ Install_App()
 	MC_DIR=${serverPath}/source/manticoresearch
 	mkdir -p $MC_DIR
 
+	# wget --no-check-certificate -O /www/server/source/manticoresearch/manticore-repo.noarch.deb https://repo.manticoresearch.com/manticore-repo.noarch.deb
+	# cd /www/server/source/manticoresearch/ && dpkg -i manticore-repo.noarch.deb
 	wget --no-check-certificate -O $MC_DIR/manticore-repo.noarch.deb https://repo.manticoresearch.com/manticore-repo.noarch.deb
 	dpkg -i $MC_DIR/manticore-repo.noarch.deb
 
-	apt -y install manticore manticore-extra
+	apt -y install manticore
 	apt -y install manticore-extra
 	apt -y upgrade manticore
 
