@@ -13,8 +13,11 @@ VERSION_ID=`cat /etc/*-release | grep VERSION_ID | awk -F = '{print $2}' | awk -
 setenforce 0
 sed -i 's#SELINUX=enforcing#SELINUX=disabled#g' /etc/selinux/config
 
-yum install -y wget lsof crontabs
-yum install -y rar unrar
+yum install -y wget
+yum install -y lsof
+yum install -y crontabs
+yum install -y rar
+yum install -y unrar
 yum install -y python3-devel
 yum install -y python3-pip
 yum install -y python-devel
@@ -32,6 +35,7 @@ yum install -y libzstd-devel
 yum install -y brotli-devel
 yum install -y vim-common
 yum install -y libudev-devel
+yum install -y git
 
 SSH_PORT=`netstat -ntpl|grep sshd|grep -v grep | sed -n "1,1p" | awk '{print $4}' | awk -F : '{print $2}'`
 if [ "$SSH_PORT" = "" ];then

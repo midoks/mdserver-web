@@ -69,6 +69,7 @@ pkg install -y sshpass
 pkg install -y libzstd-devel
 pkg install -y brotli-devel
 pkg install -y libudev-devel
+pkg install -y git
 # curl https://sh.rustup.rs -sSf | sh
 pkg install -y rust
 
