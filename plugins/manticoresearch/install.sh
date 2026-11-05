@@ -10,6 +10,7 @@ sysName=`uname`
 sysArch=`arch`
 
 # cd /Users/midoks/Desktop/mwdev/server/mdserver-web/plugins/manticoresearch && bash install.sh install latest
+# cd /Users/midoks/Desktop/mwdev/server/mdserver-web/plugins/manticoresearch && bash install.sh install code
 # cd /www/server/mdserver-web/plugins/manticoresearch && bash install.sh install latest
 # cd /www/server/mdserver-web && python3 plugins/manticoresearch/index.py run_status_test
 # cd /www/server/mdserver-web && python3 plugins/manticoresearch/index.py start
