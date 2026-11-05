@@ -71,10 +71,10 @@ Install_App()
 
 	# 预先下载 CRoaring，交给 cmake 的 FetchContent 直接使用本地源码
 	ROARING_VER=4.3.2
-	ROARING_SRC=$MC_DIR/deps/CRoaring-${ROARING_VER}
+	ROARING_SRC=$MC_DIR/source/manticoresearch/deps/CRoaring-${ROARING_VER}
 	if [ ! -d $ROARING_SRC ];then
-		mkdir -p $MC_DIR/deps
-		ROARING_TGZ=$MC_DIR/deps/roaring-v${ROARING_VER}.tar.gz
+		mkdir -p $MC_DIR/source/manticoresearch/deps
+		ROARING_TGZ=$MC_DIR/source/manticoresearch/deps/roaring-v${ROARING_VER}.tar.gz
 		if [ ! -s $ROARING_TGZ ];then
 			if ! download_file "https://github.com/RoaringBitmap/CRoaring/archive/refs/tags/v${ROARING_VER}.tar.gz" "$ROARING_TGZ";then
 				echo "roaring download failed!"
