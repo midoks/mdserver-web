@@ -208,6 +208,7 @@ def reload():
 
 
 def rebuild():
+    fixIndexOwner()
     cmd = 'indexer --all --rotate'
     cmd_manticore = asManticore(cmd)
     data = mw.execShell(cmd_manticore)
