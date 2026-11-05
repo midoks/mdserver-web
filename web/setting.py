@@ -49,7 +49,8 @@ if os.path.exists(default_port_file) and not os.path.exists(panel_dbfile):
     panel_port = mw.readFile(default_port_file)
     panel_port.strip()
     MwFirewall.instance().addAcceptPort(panel_port,'PANEL端口', 'port')
-else:
+
+if not os.path.exists(default_port_file):
     panel_port = str(random.randint(10000, 65530))
     MwFirewall.instance().addPanelPort(panel_port)
     mw.writeFile(default_port_file, panel_port)
