@@ -124,8 +124,8 @@ Install_App()
 		EMBEDDINGS_FLAG="-DBUILD_EMBEDDINGS_LOCALLY=OFF"
 	fi
 	# 编译需要 Boost 的 context/filesystem 组件（静止库），缺 dev 包时 cmake 会报 boost_context 找不到
-	if command -v apt-get >/dev/null 2>&1;then
-		apt-get install -y --no-install-recommends libboost-context-dev libboost-filesystem-dev libboost-system-dev libboost-thread-dev >/dev/null 2>&1
+	if command -v apt >/dev/null 2>&1;then
+		apt install -y --no-install-recommends libboost-context-dev libboost-filesystem-dev libboost-system-dev libboost-thread-dev >/dev/null 2>&1
 	fi
 	# galera 依赖 boost_system 开发包，源码安装统一关闭；不需要 galera 复制功能
 	cmake .. -DCMAKE_BUILD_TYPE=Release \
