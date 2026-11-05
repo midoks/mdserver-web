@@ -114,9 +114,9 @@ def initDreplace():
         activate_file = mw.getPanelDir() + '/bin/activate'
         if os.path.exists(activate_file):
             supervisord_bin = mw.execShell(
-                'source ' + activate_file + '&& which supervisord')[0].strip()
+                'source ' + activate_file + '&& command -v supervisord')[0].strip()
         else:
-            supervisord_bin = mw.execShell('which supervisord')[0].strip()
+            supervisord_bin = mw.execShell('command -v supervisord')[0].strip()
 
         se_content = mw.readFile(systemServiceTpl)
         se_content = se_content.replace('{$SERVER_PATH}', service_path)

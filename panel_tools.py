@@ -223,14 +223,14 @@ def mwcli(mw_input=0):
         else:
             mw.echoInfo("二次验证已关闭!")
     elif mw_input == 27:
-        cmd = 'which ufw'
+        cmd = 'command -v ufw'
         run_cmd = False
         find_cmd =  mw.execShell(cmd)
         if find_cmd[0].strip() != '':
             run_cmd = True
             os.system('ufw status')
 
-        cmd = 'which firewall-cmd'
+        cmd = 'command -v firewall-cmd'
         find_cmd =  mw.execShell(cmd)
         if find_cmd[0].strip() != '':
             run_cmd = True
