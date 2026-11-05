@@ -141,15 +141,18 @@ def initDreplace():
     dirs_list = [
         "/var/log/manticore",
         "/var/run/manticore",
-        "/var/lib/manticore"
+        "/var/lib/manticore",
     ]
+
+    index_dir = getServerDir() + '/index'
+    dirs_list.append(index_dir)
 
     for d in dirs_list:
         if not os.path.exists(d):
             mw.execShell('mkdir -p ' + d)
 
     mw.execShell("chown -R manticore:manticore /var/run/manticore")
-
+    mw.execShell("chown -R manticore:manticore "+index_dir)
 
     # config replace
     conf_bin = getConf()
@@ -206,7 +209,8 @@ def reload():
 
 def rebuild():
     cmd = 'indexer --all --rotate'
-    data = mw.execShell(cmd)
+    cmd_manticore = asManticore(cmd)
+    data = mw.execShell(cmd_manticore)
     if data[0].find('successfully')<0:
         return data[0].replace("\n","<br/>")
     return 'ok'
@@ -325,8 +329,8 @@ def sphinxConfParse():
     file = getConf()
     bin_dir = getServerDir()
     content = mw.readFile(file)
-    rep = r'index\s(.*)'
-    sindex = re.findall(rep, content)
+    rep = r'^index\s+(\w+)'
+    sindex = re.findall(rep, content,re.MULTILINE)
     indexlen = len(sindex)
     cmd = {}
     cmd['cmd'] = "indexer -c " + getConf()
@@ -418,6 +422,21 @@ def makeDbToSphinx():
     return mw.returnJson(True,'测试中')
 
 
+# 以 manticore 用户执行，避免生成文件属主为 root
+def asManticore(cmd):
+    if mw.isAppleSystem():
+        return cmd
+    return 'su -s /bin/sh manticore -c "' + cmd + '"'
+
+
+# 重建前修正索引目录归属，保证 manticore 用户有写权限
+def fixIndexOwner():
+    index_dir = getServerDir() + '/index'
+    if not os.path.exists(index_dir):
+        return
+    mw.execShell("chown -R manticore:manticore " + index_dir)
+
+
 # 全量更新
 def updateAll():
     data = sphinxConfParse()
@@ -426,10 +445,12 @@ def updateAll():
         return '无更新'
     index = data['index']
 
+    fixIndexOwner()
     for x in range(len(index)):
         cmd_index = cmd + ' ' + index[x]['index'] + ' --rotate'
+        subprocess.run(asManticore(cmd_index), shell=True)
         print(cmd_index)
-        os.system(cmd_index)
+
     return ''
 
 #增量更新
@@ -440,15 +461,16 @@ def updateDelta():
         return '无更新'
     index = data['index']
 
+    fixIndexOwner()
     for x in range(len(index)):
         if 'delta' in index[x]:
             cmd_index = cmd + ' ' + index[x]['delta'] + ' --rotate'
+            subprocess.run(asManticore(cmd_index), shell=True)
             print(cmd_index)
-            os.system(cmd_index)
 
             cmd_index_merge = cmd + ' --merge ' + index[x]['index'] + ' ' + index[x]['delta'] + ' --rotate'
+            subprocess.run(asManticore(cmd_index_merge), shell=True)
             print(cmd_index_merge)
-            os.system(cmd_index_merge)
         else:
             print(index[x]['index'],'no delta')
 

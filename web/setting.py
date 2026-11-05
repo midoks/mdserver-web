@@ -43,18 +43,23 @@ if not os.path.exists(data_dir):
 # default port
 panel_port = '7200'
 from utils.firewall import Firewall as MwFirewall
-default_port_file = panel_dir+'/data/port.pl'
-if os.path.exists(default_port_file):
+default_port_file = data_dir+'/port.pl'
+if os.path.exists(default_port_file): 
     panel_port = mw.readFile(default_port_file)
     panel_port.strip()
-    MwFirewall.instance().addAcceptPort(panel_port,'PANEL端口', 'port')
-else:
+
+# panel_dbfile = data_dir + "/panel.db"
+# and not os.path.exists(panel_dbfile)
+# if os.path.exists(default_port_file):
+#     MwFirewall.instance().addPanelPort(panel_port)
+
+if not os.path.exists(default_port_file):
     panel_port = str(random.randint(10000, 65530))
     MwFirewall.instance().addPanelPort(panel_port)
     mw.writeFile(default_port_file, panel_port)
 
 bind = []
-default_ipv6_file = panel_dir+'/data/ipv6.pl'
+default_ipv6_file = data_dir+'/ipv6.pl'
 if os.path.exists(default_ipv6_file):
     bind.append('[0:0:0:0:0:0:0:0]:%s' % panel_port)
 else:

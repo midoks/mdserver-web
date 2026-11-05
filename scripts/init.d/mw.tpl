@@ -53,11 +53,15 @@ mw_start_panel()
         do
             echo -e ".\c"
             sleep 0.5
-            # isStart=$(lsof -n -P -i:$port|grep LISTEN|grep -v grep|awk '{print $2}'|xargs)
-            isStart=$(ss -tulnp | grep ":$port" |grep LISTEN|grep -v grep|awk '{print $2}'|xargs)
-            if [[ "$isStart" == "" ]];then
+
+            if command -v ss >/dev/null 2>&1;then
+                isStart=$(ss -tulnp | grep ":$port" |grep LISTEN|grep -v grep|awk '{print $2}'|xargs)
+            elif command -v lsof >/dev/null 2>&1;then
+                isStart=$(lsof -n -P -i:$port|grep LISTEN|grep -v grep|awk '{print $2}'|xargs)
+            else
                 isStart=$(ps -ef|grep python3|grep mdserver-web|grep app:app|awk '{print $2}'|xargs)
             fi
+            
             let n+=1
             if [ $n -gt 60 ];then
                 break;
@@ -122,7 +126,8 @@ mw_stop_task()
         kill -9 $p  > /dev/null 2>&1
     done
 
-    zzpids=$(ps -A -o stat,ppid,pid,cmd | grep -e '^[Zz]' | awk '{print $2}')
+    # linux  | ps -A -o stat,ppid,pid,cmd 
+    zzpids=$(ps -A -o stat,ppid,pid | grep -e '^[Zz]' | awk '{print $2}')
     zzpids=($zzpids)
     for p in ${zzpids[@]}
     do
@@ -777,6 +782,15 @@ mw_default(){
     echo -e "$address"
     echo -e `cd ${PANEL_DIR} && python3 ${PANEL_DIR}/panel_tools.py username`
     echo -e `cd ${PANEL_DIR} && python3 ${PANEL_DIR}/panel_tools.py password`
+    echo -e "=================================================================="
+
+    pid_file=${PANEL_DIR}/logs/panel.pid
+    if [ -f $pid_file ];then
+        echo -e "-------------------------[\033[32mPANEL RUNNING\033[0m]--------------------------"
+    else
+        echo -e "---------------------------[\033[31mPANEL STOP\033[0m]---------------------------"
+    fi
+    echo -e "=================================================================="
     echo -e "\033[33mWarning:\033[0m"
     echo -e "\033[33mIf you cannot access the panel. \033[0m"
     echo -e "\033[33mrelease the following port (${show_panel_ip}80|443|22) in the security group.\033[0m"

@@ -12,6 +12,10 @@ sysArch=`arch`
 # cd /www/server/mdserver-web/plugins/manticoresearch && bash install.sh install 7.4.6
 # cd /www/server/mdserver-web && python3 plugins/manticoresearch/index.py run_status_test
 # cd /www/server/mdserver-web && python3 plugins/manticoresearch/index.py start
+
+# su -s /bin/sh manticore -c "indexer -c /etc/manticoresearch/manticore.conf xx --rotate"
+# su -s /bin/sh manticore -c "indexer -c /etc/manticoresearch/manticore.conf xx_delta --rotate"
+
 # systemctl status manticore
 # systemctl restart manticore
 
