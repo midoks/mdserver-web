@@ -421,6 +421,13 @@ def makeDbToSphinx():
     return mw.returnJson(True,'测试中')
 
 
+# 以 manticore 用户执行，避免生成文件属主为 root
+def asManticore(cmd):
+    if mw.isAppleSystem():
+        return cmd
+    return 'su -s /bin/sh manticore -c "' + cmd + '"'
+
+
 # 全量更新
 def updateAll():
     data = sphinxConfParse()
@@ -431,10 +438,7 @@ def updateAll():
 
     for x in range(len(index)):
         cmd_index = cmd + ' ' + index[x]['index'] + ' --rotate'
-        if not mw.isAppleSystem():
-            # 直接以 manticore 用户重建，避免生成文件属主为 root
-            cmd_index = "su -s /bin/sh manticore -c \"" + cmd_index + "\""
-        subprocess.run(cmd_index, shell=True)
+        subprocess.run(asManticore(cmd_index), shell=True)
         print(cmd_index)
 
     return ''
@@ -450,18 +454,15 @@ def updateDelta():
     for x in range(len(index)):
         if 'delta' in index[x]:
             cmd_index = cmd + ' ' + index[x]['delta'] + ' --rotate'
+            subprocess.run(asManticore(cmd_index), shell=True)
             print(cmd_index)
-            os.system(cmd_index)
 
             cmd_index_merge = cmd + ' --merge ' + index[x]['index'] + ' ' + index[x]['delta'] + ' --rotate'
+            subprocess.run(asManticore(cmd_index_merge), shell=True)
             print(cmd_index_merge)
-            os.system(cmd_index_merge)
         else:
             print(index[x]['index'],'no delta')
 
-    index_dir = getServerDir() + '/index'
-    if os.path.exists(index_dir):
-        mw.execShell("chown -R manticore:manticore "+index_dir)
     return ''
 
 def installPreInspection(version):
