@@ -431,8 +431,12 @@ def updateAll():
 
     for x in range(len(index)):
         cmd_index = cmd + ' ' + index[x]['index'] + ' --rotate'
-        print(cmd_index)
         os.system(cmd_index)
+        print(cmd_index)
+
+    index_dir = getServerDir() + '/index'
+    if os.path.exists(index_dir):
+        mw.execShell("chown -R manticore:manticore "+index_dir)
     return ''
 
 #增量更新
@@ -455,6 +459,9 @@ def updateDelta():
         else:
             print(index[x]['index'],'no delta')
 
+    index_dir = getServerDir() + '/index'
+    if os.path.exists(index_dir):
+        mw.execShell("chown -R manticore:manticore "+index_dir)
     return ''
 
 def installPreInspection(version):
