@@ -429,6 +429,14 @@ def asManticore(cmd):
     return 'su -s /bin/sh manticore -c "' + cmd + '"'
 
 
+# 重建前修正索引目录归属，保证 manticore 用户有写权限
+def fixIndexOwner():
+    index_dir = getServerDir() + '/index'
+    if not os.path.exists(index_dir):
+        return
+    mw.execShell("chown -R manticore:manticore " + index_dir)
+
+
 # 全量更新
 def updateAll():
     data = sphinxConfParse()
@@ -437,6 +445,7 @@ def updateAll():
         return '无更新'
     index = data['index']
 
+    fixIndexOwner()
     for x in range(len(index)):
         cmd_index = cmd + ' ' + index[x]['index'] + ' --rotate'
         subprocess.run(asManticore(cmd_index), shell=True)
@@ -452,6 +461,7 @@ def updateDelta():
         return '无更新'
     index = data['index']
 
+    fixIndexOwner()
     for x in range(len(index)):
         if 'delta' in index[x]:
             cmd_index = cmd + ' ' + index[x]['delta'] + ' --rotate'
