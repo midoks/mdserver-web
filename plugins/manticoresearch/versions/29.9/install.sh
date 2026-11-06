@@ -38,7 +38,7 @@ Install_App()
 	# apt -y upgrade manticore
 
 	searchd_bin=`which searchd`
-	if [ ! -f $searchd_bin ];then
+	if [ "$searchd_bin" == "" ];then
 		echo "install manticoresearch fail!"
 		exit 0
 	fi
