@@ -56,6 +56,12 @@ def getConf():
             return x
     return "/etc/manticoresearch/manticore.conf"
 
+def getCmdIndexerPath():
+    cmd = 'indexer'
+    local_indexer = getServerDir() + '/bin/'+cmd
+    if os.path.exists(local_indexer):
+        return local_indexer
+    return cmd
 
 def getInitDTpl():
     path = getPluginDir() + "/init.d/" + getPluginName() + ".tpl"
@@ -239,7 +245,7 @@ def reload():
 
 def rebuild():
     fixIndexOwner()
-    cmd = 'indexer --all --rotate'
+    cmd = getCmdIndexerPath()+' --all --rotate'
     cmd_manticore = asManticore(cmd)
     data = mw.execShell(cmd_manticore)
     if data[0].find('successfully')<0:
@@ -364,7 +370,7 @@ def sphinxConfParse():
     sindex = re.findall(rep, content,re.MULTILINE)
     indexlen = len(sindex)
     cmd = {}
-    cmd['cmd'] = "indexer -c " + getConf()
+    cmd['cmd'] = getCmdIndexerPath() + " -c " + getConf()
 
     cmd['index'] = []
     cmd_index = []
