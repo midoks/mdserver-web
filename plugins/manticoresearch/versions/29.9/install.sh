@@ -28,8 +28,11 @@ Install_App()
 	    sh -x $curPath/versions/${VERSION}/ubuntu.sh $action $VERSION
 	fi
 
-	echo "${VERSION}" > $serverPath/manticoresearch/version.pl
+	apt -y install manticore
+	apt -y install manticore-extra
+	apt -y upgrade manticore
 
+	echo "${VERSION}" > $serverPath/manticoresearch/version.pl
 	cd ${rootPath} && python3 plugins/manticoresearch/index.py start ${VERSION}
 	cd ${rootPath} && python3 plugins/manticoresearch/index.py initd_install ${VERSION}
 
