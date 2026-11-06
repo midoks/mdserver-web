@@ -156,7 +156,8 @@ def isInitFile():
 
 def writeInitFile():
     path = getServerDir() + '/init.pl'
-    mw.writeFile(path, 'ok')
+    if not os.path.exists(path):
+        mw.writeFile(path, 'ok')
     return True
 
 def initDreplace():
@@ -186,11 +187,8 @@ def initDreplace():
     conf_bin = getConf()
     if not os.path.exists(conf_bin) or not isInitFile():
         content = mw.readFile(getConfTpl())
-        if not content:
-            return 'conf template not found'
         content = contentReplace(content)
-        if not mw.writeFile(conf_bin, content):
-            return 'conf write fail'
+        mw.writeFile(conf_bin, content)
         mkdirAll()
 
     file_bin = initD_path + '/manticore'
@@ -211,7 +209,7 @@ def initDreplace():
         content = contentReplace(content)
         mw.writeFile(systemService, content)
         mw.execShell('systemctl daemon-reload')
-        writeInitFile()
+    writeInitFile()
     return file_bin
 
 
