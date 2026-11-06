@@ -16,6 +16,7 @@ fi
 
 VERSION=$2
 action=$1
+VERSION=29.9
 manticore_name=29.0.2-26081409-2f9c226b6-osx11.6-arm64
 
 Install_App()
@@ -26,11 +27,10 @@ Install_App()
 
 	if grep -qi '^ID=ubuntu' /etc/os-release; then
 	    . /etc/os-release
-	    echo "Ubuntu 版本: $VERSION_ID"
-	    echo "完整版本: $PRETTY_NAME"
+	    # echo "Ubuntu 版本: $VERSION_ID"
+	    # echo "完整版本: $PRETTY_NAME"
+	    sh -x $curPath/versions/${VERSION}/install.sh $1 $2
 	fi
-
-
 	echo "install manticoresearch successful!"
 }
 
