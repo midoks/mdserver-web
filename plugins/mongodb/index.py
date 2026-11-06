@@ -1543,7 +1543,7 @@ def importDbExternalProgressBar():
     file = args['file']
     name = args['name']
 
-    import_dir = mw.getFatherDir() + '/backup/mongodb_import/'
+    import_dir = getImportDir() + '/'
     port = getConfPort()
 
     file_path = import_dir + file
