@@ -1,7 +1,8 @@
 #!/bin/bash
 PATH=/bin:/sbin:/usr/bin:/usr/sbin:/usr/local/bin:/usr/local/sbin:~/bin:/opt/homebrew/bin
 export PATH
-
+export LANG=en_US.UTF-8
+export DEBIAN_FRONTEND=noninteractive
 # https://manticoresearch.com/zh/install/
 
 curPath=`pwd`
