@@ -44,6 +44,12 @@ Install_App()
 		exit 0
 	fi
 
+	# 动态连接库的问题。
+	# ls -l /usr/lib/x86_64-linux-gnu/libmysqlclient*
+	# 建软链（假设你的是 .so.24）
+	# if [ -f /usr/lib/x86_64-linux-gnu/libmysqlclient.so.24 ];then
+	# 	ln -sf /usr/lib/x86_64-linux-gnu/libmysqlclient.so.24 /usr/lib/x86_64-linux-gnu/libmysqlclient.so.21
+	# fi
 
 	cd ${rootPath} && python3 plugins/manticoresearch/index.py start ${VERSION}
 	cd ${rootPath} && python3 plugins/manticoresearch/index.py initd_install ${VERSION}
