@@ -89,6 +89,12 @@ def getBackupDir():
         mw.execShell("mkdir -p {}".format(bk_path))
     return bk_path
 
+def getImportDir():
+    import_path = mw.getBackupDir() + "/import"
+    if not os.path.isdir(import_path):
+        mw.execShell("mkdir -p {}".format(import_path))
+    return import_path
+
 def getConf():
     path = getServerDir() + '/etc/my.cnf'
     return path
@@ -1148,7 +1154,7 @@ def importDbExternal():
     file = args['file']
     name = args['name']
 
-    import_dir = mw.getFatherDir() + '/backup/import/'
+    import_dir = getImportDir() + '/'
 
     file_path = import_dir + file
     if not os.path.exists(file_path):
@@ -1221,7 +1227,7 @@ def importDbExternalProgress():
     name = args['name']
 
     cmd = 'cd '+mw.getServerDir()+'/mdserver-web && . bin/activate && '
-    cmd += 'python3 '+mw.getServerDir()+'/mdserver-web/plugins/mysql/index.py import_db_external_progress_bar  {"file":"'+file+'","name":"'+name+'"}'
+    cmd += 'python3 plugins/mysql/index.py import_db_external_progress_bar  {"file":"'+file+'","name":"'+name+'"}'
     return mw.returnJson(True, 'ok',cmd)
 
 def importDbExternalProgressBar():
@@ -1233,8 +1239,7 @@ def importDbExternalProgressBar():
     file = args['file']
     name = args['name']
 
-    import_dir = mw.getFatherDir() + '/backup/import/'
-
+    import_dir = getImportDir() + '/'
     file_path = import_dir + file
     if not os.path.exists(file_path):
         return mw.returnJson(False, '文件突然消失?')
@@ -1296,11 +1301,11 @@ def importDbBackup():
     file = args['file']
     name = args['name']
 
-    file_path = mw.getFatherDir() + '/backup/database/mysql/' + file
-    file_path_sql = mw.getFatherDir() + '/backup/database/mysql/' + file.replace('.gz', '')
+    file_path = getBackupDir() + '/' + file
+    file_path_sql = getBackupDir() + '/' + file.replace('.gz', '')
 
     if not os.path.exists(file_path_sql):
-        cmd = 'cd ' + mw.getFatherDir() + '/backup/database/mysql && gzip -dk ' + file
+        cmd = 'cd ' + getBackupDir() + ' && gzip -dk ' + file
         mw.execShell(cmd)
 
     local_mode = recognizeDbMode()
@@ -1382,7 +1387,7 @@ def deleteDbBackup():
 
     path = args['path']
     full_file = ""
-    bkDir = mw.getFatherDir() + '/backup/database/mysql'
+    bkDir = getBackupDir()
     full_file = bkDir + '/' + args['filename']
     if path != "":
         full_file = path + "/" + args['filename']
@@ -1397,7 +1402,7 @@ def getDbBackupList():
         return data[1]
 
     r = getDbBackupListFunc(args['name'])
-    bkDir = mw.getFatherDir() + '/backup/database/mysql'
+    bkDir = getBackupDir()
     rr = []
     for x in range(0, len(r)):
         p = bkDir + '/' + r[x]
@@ -1422,7 +1427,7 @@ def getDbBackupList():
 
 def getDbBackupImportList():
 
-    bkImportDir = mw.getFatherDir() + '/backup/import'
+    bkImportDir = getImportDir()
     if not os.path.exists(bkImportDir):
         os.mkdir(bkImportDir)
 

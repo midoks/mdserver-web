@@ -80,6 +80,11 @@ def getBackupDir():
         mw.execShell("mkdir -p {}".format(bk_path))
     return bk_path
 
+def getImportDir():
+    import_path = mw.getBackupDir() + "/import"
+    if not os.path.isdir(import_path):
+        mw.execShell("mkdir -p {}".format(import_path))
+    return import_path
 
 def checkArgs(data, ck=[]):
     for i in range(len(ck)):
