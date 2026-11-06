@@ -32,20 +32,20 @@ VERSION=$2
 
 # 版本优先
 if [ -f $curPath/versions/${VERSION}/install.sh ];then
-	sh -x $curPath/versions/${VERSION}/install.sh $1 $2
+	sh -x $curPath/versions/${VERSION}/install.sh ${ACTION} ${VERSION}
 	exit 0
 fi
 
 if [ "$sysName" == "Darwin" ];then
-	sh -x $curPath/versions/mac/install.sh $1 $2
+	sh -x $curPath/versions/mac/install.sh ${ACTION} ${VERSION}
 elif [ "$VERSION" == "code" ];then
-	sh -x $curPath/versions/source/install.sh $1 $2
+	sh -x $curPath/versions/source/install.sh ${ACTION} ${VERSION}
 elif [ "$VERSION" == "debian" ];then
-	sh -x $curPath/versions/apt/install.sh $1 $2
+	sh -x $curPath/versions/apt/install.sh ${ACTION} ${VERSION}
 elif command -v apt >/dev/null 2>&1;then
-	sh -x $curPath/versions/apt/install.sh $1 $2
+	sh -x $curPath/versions/apt/install.sh ${ACTION} ${VERSION}
 elif command -v yum >/dev/null 2>&1;then
-	sh -x $curPath/versions/yum/install.sh $1 $2
+	sh -x $curPath/versions/yum/install.sh ${ACTION} ${VERSION}
 else
 	echo "unsupported system: ${sysName}"
 	exit 1

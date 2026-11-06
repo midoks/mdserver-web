@@ -17,7 +17,6 @@ fi
 VERSION=$2
 action=$1
 VERSION=29.9
-manticore_name=29.0.2-26081409-2f9c226b6-osx11.6-arm64
 
 Install_App()
 {
@@ -26,7 +25,7 @@ Install_App()
 	echo "${VERSION}" > $serverPath/manticoresearch/version.pl
 
 	if grep -qi '^ID=ubuntu' /etc/os-release; then
-	    sh -x $curPath/versions/${VERSION}/ubuntu.sh $1 $2
+	    sh -x $curPath/versions/${VERSION}/ubuntu.sh $action $VERSION
 	fi
 
 	echo "${VERSION}" > $serverPath/manticoresearch/version.pl
