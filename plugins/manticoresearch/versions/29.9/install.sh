@@ -23,6 +23,14 @@ Install_App()
 	echo '正在安装manticoresearch...'
 	mkdir -p $serverPath/manticoresearch
 	echo "${VERSION}" > $serverPath/manticoresearch/version.pl
+
+	if grep -qi '^ID=ubuntu' /etc/os-release; then
+	    . /etc/os-release
+	    echo "Ubuntu 版本: $VERSION_ID"
+	    echo "完整版本: $PRETTY_NAME"
+	fi
+
+
 	echo "install manticoresearch successful!"
 }
 
