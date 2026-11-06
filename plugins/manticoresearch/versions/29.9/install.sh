@@ -37,6 +37,13 @@ Install_App()
 	apt -y install manticore-extra
 	apt -y upgrade manticore
 
+	searchd_bin=`which searchd`
+	if [ ! -f $searchd_bin ];then
+		echo "install manticoresearch fail!"
+		exit 0
+	fi
+
+
 	cd ${rootPath} && python3 plugins/manticoresearch/index.py start ${VERSION}
 	cd ${rootPath} && python3 plugins/manticoresearch/index.py initd_install ${VERSION}
 
