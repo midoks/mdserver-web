@@ -211,8 +211,7 @@ def initDreplace():
         content = contentReplace(content)
         mw.writeFile(systemService, content)
         mw.execShell('systemctl daemon-reload')
-
-    writeInitFile()
+        writeInitFile()
     return file_bin
 
 
