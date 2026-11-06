@@ -800,7 +800,7 @@ def importDbBackup():
     file_path_sql = getBackupDir() + '/' + file.replace('.gz', '')
 
     if not os.path.exists(file_path_sql):
-        cmd = 'cd ' + mw.getBackupDir() + '/database/mariadb && gzip -d ' + file
+        cmd = 'cd ' + getBackupDir() + ' && gzip -d ' + file
         mw.execShell(cmd)
 
     pwd = pSqliteDb('config').where('id=?', (1,)).getField('mysql_root')
@@ -822,7 +822,7 @@ def importDbBackupProgress():
     name = args['name']
 
     cmd = 'cd '+mw.getServerDir()+'/mdserver-web && . bin/activate && '
-    cmd += 'python3 '+mw.getServerDir()+'/mdserver-web/plugins/mariadb/index.py import_db_backup_progress_bar {"file":"'+file+'","name":"'+name+'"}'
+    cmd += 'python3 plugins/mariadb/index.py import_db_backup_progress_bar {"file":"'+file+'","name":"'+name+'"}'
     return mw.returnJson(True, 'ok',cmd)
 
 def importDbBackupProgressBar():
@@ -834,11 +834,11 @@ def importDbBackupProgressBar():
     file = args['file']
     name = args['name']
 
-    file_path = mw.getFatherDir() + '/backup/database/mariadb/' + file
-    file_path_sql = mw.getFatherDir() + '/backup/database/mariadb/' + file.replace('.gz', '')
+    file_path = getBackupDir() + '/' + file
+    file_path_sql = getBackupDir() + '/' + file.replace('.gz', '')
 
     if not os.path.exists(file_path_sql):
-        cmd = 'cd ' + mw.getFatherDir() + '/backup/database/mariadb && gzip -dk ' + file
+        cmd = 'cd ' + getBackupDir() + ' && gzip -dk ' + file
         mw.execShell(cmd)
 
     local_mode = recognizeDbMode()
@@ -3677,6 +3677,10 @@ if __name__ == "__main__":
         print(setDbBackup())
     elif func == 'import_db_backup':
         print(importDbBackup())
+    elif func == 'import_db_backup_progress':
+        print(importDbBackupProgress())
+    elif func == 'import_db_backup_progress_bar':
+        print(importDbBackupProgressBar())
     elif func == 'import_db_external':
         print(importDbExternal())
     elif func == 'import_db_external_progress':

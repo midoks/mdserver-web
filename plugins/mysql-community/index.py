@@ -87,7 +87,6 @@ def checkArgs(data, ck=[]):
             return (False, mw.returnJson(False, '参数:(' + ck[i] + ')没有!'))
     return (True, mw.returnJson(True, 'ok'))
 
-
 def getConf():
     path = getServerDir() + '/etc/my.cnf'
     return path
@@ -958,7 +957,6 @@ def __createUser(dbname, username, password, address):
 
 
 def getDbBackupListFunc(dbname=''):
-
     bkDir = getBackupDir()
     if not os.path.exists(bkDir):
         os.mkdir(bkDir)
@@ -1070,7 +1068,7 @@ def importDbExternalProgress():
     name = args['name']
 
     cmd = 'cd '+mw.getServerDir()+'/mdserver-web && . bin/activate && '
-    cmd += 'python3 '+mw.getServerDir()+'/mdserver-web/plugins/mysql-community/index.py import_db_external_progress_bar  {"file":"'+file+'","name":"'+name+'"}'
+    cmd += 'python3 plugins/mysql-community/index.py import_db_external_progress_bar  {"file":"'+file+'","name":"'+name+'"}'
     return mw.returnJson(True, 'ok',cmd)
 
 def importDbExternalProgressBar():
@@ -1148,11 +1146,11 @@ def importDbBackup():
     file = args['file']
     name = args['name']
 
-    file_path = mw.getBackupDir() + '/database/' + file
-    file_path_sql = mw.getBackupDir() + '/database/' + file.replace('.gz', '')
+    file_path = getBackupDir() + '/' + file
+    file_path_sql = getBackupDir() + '/' + file.replace('.gz', '')
 
     if not os.path.exists(file_path_sql):
-        cmd = 'cd ' + mw.getBackupDir() + '/database && gzip -d ' + file
+        cmd = 'cd ' + getBackupDir() + '/ && gzip -d ' + file
         mw.execShell(cmd)
 
     pwd = pSqliteDb('config').where('id=?', (1,)).getField('mysql_root')
@@ -1178,8 +1176,8 @@ def importDbBackupProgress():
     file = args['file']
     name = args['name']
 
-    cmd = 'cd '+mw.getServerDir()+'/mdserver-web && . bin/activate && '
-    cmd += 'python3 '+mw.getServerDir()+'/mdserver-web/plugins/mysql-community/index.py import_db_backup_progress_bar {"file":"'+file+'","name":"'+name+'"}'
+    cmd = 'cd ' + mw.getServerDir() + '/mdserver-web && . bin/activate && '
+    cmd += 'python3 plugins/mysql-community/index.py import_db_backup_progress_bar {"file":"'+file+'","name":"'+name+'"}'
     return mw.returnJson(True, 'ok',cmd)
     # return mw.returnJson(True, 'ok')
 
@@ -1192,11 +1190,11 @@ def importDbBackupProgressBar():
     file = args['file']
     name = args['name']
 
-    file_path = mw.getFatherDir() + '/backup/database/mysql-community/' + file
-    file_path_sql = mw.getFatherDir() + '/backup/database/mysql-community/' + file.replace('.gz', '')
+    file_path = getBackupDir() + '/' + file
+    file_path_sql = getBackupDir() + '/' + file.replace('.gz', '')
 
     if not os.path.exists(file_path_sql):
-        cmd = 'cd ' + mw.getFatherDir() + '/backup/database/mysql-community && gzip -dk ' + file
+        cmd = 'cd ' + getBackupDir() + ' && gzip -dk ' + file
         mw.execShell(cmd)
 
     local_mode = recognizeDbMode()

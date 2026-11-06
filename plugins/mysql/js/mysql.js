@@ -972,8 +972,8 @@ function downloadBackup(file){
 
 function importBackup(file,name){
     myPost('import_db_backup',{file:file,name:name}, function(data){
-        // console.log(data);
-        layer.msg('执行成功!');
+        var rdata = $.parseJSON(data.data);
+        layer.msg(rdata.msg, { icon: rdata.status ? 1 : 2 });
     });
 }
 
