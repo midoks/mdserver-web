@@ -18,7 +18,7 @@
 app_start(){
 	echo "Starting manticore server..."
 	# /usr/bin/searchd --config /etc/manticoresearch/manticore.conf
-	{$SERVER_PATH}/manticoresearch/bin/searchd --config {$SERVER_PATH}/manticoresearch/etc/manticoresearch/manticore.conf >> {$SERVER_PATH}/manticoresearch/logs.pl 2>&1 &
+	{$SERVER_APP}/bin/searchd --config {$SERVER_APP}/etc/manticoresearch/manticore.conf >> {$SERVER_APP}/logs.pl 2>&1 &
 }
 app_stop(){
 	ps -ef | grep "manticoresearch/bin/searchd" | grep -v grep |awk '{print $2}'| xargs -r kill -9
