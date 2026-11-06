@@ -268,8 +268,6 @@ def rebuild():
     cmd = getCmdIndexerPath() + ' --config ' + conf_file + ' --all --rotate'
     # print(cmd)
     cmd_manticore = asManticore(cmd)
-
-
     try:
         data = mw.execShell(cmd)
         if data[0].find('successfully')<0:
