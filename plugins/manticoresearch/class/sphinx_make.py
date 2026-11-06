@@ -164,12 +164,12 @@ searchd
 	listen = 127.0.0.1:9322
     listen = 127.0.0.1:9326:mysql
     listen = 127.0.0.1:9328:http
-	log = /var/log/manticore/searchd.log
-    query_log = /var/log/manticore/query.log
-    pid_file = /var/run/manticore/searchd.pid
+	log = {$SERVER_APP}/searchd.log
+    query_log = {$SERVER_APP}/query.log
+    pid_file = {$SERVER_APP}/searchd.pid
 }
 		'''
-		conf = conf.replace("{$server_dir}", mw.getServerDir())
+		conf = conf.replace("{$SERVER_APP}", mw.getServerDir() + "/manticoresearch")
 		return conf
 
 	def makeSphinxDbSourceRangeSql(self, db, table):

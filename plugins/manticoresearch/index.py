@@ -64,7 +64,7 @@ def getCmdIndexerPath():
     return cmd
 
 def getInitDTpl():
-    path = getPluginDir() + "/init.d/" + getPluginName() + ".tpl"
+    path = getPluginDir() + "/init.d/" + getSeName() + ".tpl"
     return path
 
 
@@ -170,23 +170,24 @@ def initDreplace():
         if not os.path.exists(d):
             mw.execShell('mkdir -p ' + d)
 
-    mw.execShell("chown -R manticore:manticore /var/run/manticore")
-    mw.execShell("chown -R manticore:manticore "+index_dir)
+    if not mw.isAppleSystem():
+        mw.execShell("chown -R manticore:manticore /var/run/manticore")
+        mw.execShell("chown -R manticore:manticore "+index_dir)
 
     # config replace
     conf_bin = getConf()
     if not os.path.exists(conf_bin) or not isInitFile():
-        conf_content = mw.readFile(getConfTpl())
-        if not conf_content:
+        content = mw.readFile(getConfTpl())
+        if not content:
             return 'conf template not found'
-        conf_content = contentReplace(conf_content)
-        if not mw.writeFile(conf_bin, conf_content):
+        content = contentReplace(content)
+        if not mw.writeFile(conf_bin, content):
             return 'conf write fail'
         mkdirAll()
 
     file_bin = initD_path + '/manticore'
     if not os.path.exists(file_bin):
-        file_tpl = getPluginDir() + '/init.d/manticore.tpl'
+        file_tpl = getInitDTpl()
         content = mw.readFile(file_tpl)
         content = contentReplace(content)
         mw.writeFile(file_bin, content)
@@ -245,7 +246,8 @@ def reload():
 
 def rebuild():
     fixIndexOwner()
-    cmd = getCmdIndexerPath()+' --all --rotate'
+    conf_file = getConf()
+    cmd = getCmdIndexerPath() + ' --config ' + conf_file + ' --all --rotate'
     cmd_manticore = asManticore(cmd)
     data = mw.execShell(cmd_manticore)
     if data[0].find('successfully')<0:
@@ -315,7 +317,7 @@ def queryLog():
     return tmp.groups()[0]
 
 def systemctlLog():
-    cmd = "journalctl -u manticore -n 15 --no-pager"
+    cmd = "which journalctl && journalctl -u manticore -n 15 --no-pager"
     data = mw.execShell(cmd)
     return data[0]
 
@@ -471,7 +473,9 @@ def fixIndexOwner():
     index_dir = getServerDir() + '/index'
     if not os.path.exists(index_dir):
         return
-    mw.execShell("chown -R manticore:manticore " + index_dir)
+
+    if not mw.isAppleSystem():
+        mw.execShell("chown -R manticore:manticore " + index_dir)
 
 
 # 全量更新
