@@ -74,7 +74,7 @@ Install_App()
 	ROARING_SRC=$MC_DIR/deps/CRoaring-${ROARING_VER}
 	if [ ! -d $ROARING_SRC ];then
 		mkdir -p $MC_DIR/deps
-		ROARING_TGZ=$MC_DIR/source/manticoresearch/deps/roaring-v${ROARING_VER}.tar.gz
+		ROARING_TGZ=$MC_DIR/deps/roaring-v${ROARING_VER}.tar.gz
 		if [ ! -s $ROARING_TGZ ];then
 			if ! download_file "https://github.com/RoaringBitmap/CRoaring/archive/refs/tags/v${ROARING_VER}.tar.gz" "$ROARING_TGZ";then
 				echo "roaring download failed!"
