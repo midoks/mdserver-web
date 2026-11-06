@@ -28,6 +28,10 @@ Install_App()
 	    sh -x $curPath/versions/${VERSION}/ubuntu.sh $action $VERSION
 	fi
 
+	if grep -qi '^ID=debian' /etc/os-release; then
+	    sh -x $curPath/versions/${VERSION}/debian.sh $action $VERSION
+	fi
+
 	apt -y install manticore
 	apt -y install manticore-extra
 	apt -y upgrade manticore

@@ -55,8 +55,7 @@ Install_App()
 {
 	. /etc/os-release
     echo "Ubuntu 版本: $VERSION_ID"
-    echo "完整版本: $PRETTY_NAME"
-	
+    # echo "完整版本: $PRETTY_NAME"
 
 	case "$VERSION_ID" in
 		'18.04') Install_bionic;;
@@ -69,6 +68,7 @@ Install_App()
 
 	apt -y update 
 	cd $MC_DIR && apt -y install ./*.deb
+	cd $MC_DIR && rm -rf ./*.deb
 }
 
 if [ "${action}" = 'install' ] || [ "$action" = "upgrade" ];then
