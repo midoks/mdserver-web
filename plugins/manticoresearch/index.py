@@ -196,6 +196,17 @@ def initDreplace():
         content = contentReplace(content)
         mw.writeFile(file_bin, content)
         mw.execShell('chmod +x ' + file_bin)
+
+    # systemd
+    systemDir = mw.systemdCfgDir()
+    systemService = systemDir + '/manticore.service'
+    systemServiceTpl = getPluginDir() + '/init.d/manticore.service.tpl'
+    if os.path.exists(systemDir) and not os.path.exists(systemService) and not isInitFile():
+        content = mw.readFile(systemServiceTpl)
+        content = contentReplace(content)
+        mw.writeFile(systemService, content)
+        mw.execShell('systemctl daemon-reload')
+
     return file_bin
 
 
