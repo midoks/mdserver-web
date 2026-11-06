@@ -152,8 +152,12 @@ def isInitFile():
     path = getServerDir() + '/init.pl'
     if os.path.exists(path):
         return True
-    mw.writeFile(path, 'ok')
     return False
+
+def writeInitFile():
+    path = getServerDir() + '/init.pl'
+    mw.writeFile(path, 'ok')
+    return True
 
 def initDreplace():
 
@@ -201,12 +205,14 @@ def initDreplace():
     systemDir = mw.systemdCfgDir()
     systemService = systemDir + '/manticore.service'
     systemServiceTpl = getPluginDir() + '/init.d/manticore.service.tpl'
-    if os.path.exists(systemDir) and not os.path.exists(systemService) and not isInitFile():
+    # and not os.path.exists(systemService)
+    if os.path.exists(systemDir) and not isInitFile():
         content = mw.readFile(systemServiceTpl)
         content = contentReplace(content)
         mw.writeFile(systemService, content)
         mw.execShell('systemctl daemon-reload')
 
+    writeInitFile()
     return file_bin
 
 
