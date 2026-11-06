@@ -27,14 +27,14 @@ mkdir -p $MC_DIR
 Install_bullseye()
 {
 	if [ ! -f $MC_DIR/manticore_${manticore_name}_${arch}.deb ];then
-		wget --no-check-certificate -O $MC_DIR/manticore_${manticore_name}_${arch}.deb https://repo.manticoresearch.com/repository/manticoresearch_bullseye/dists/bullseye/main/binary-${arch}/manticore_${manticore_name}_${arch}.deb
+		wget --no-check-certificate -O $MC_DIR/manticore_${manticore_name}_${arch}.deb https://repo.manticoresearch.com/repository/manticoresearch_bullseye/dists/bullseye/main/binary-${sysArch}/manticore_${manticore_name}_${sysArch}.deb
 	fi
 }
 
 Install_bookworm()
 {
 	if [ ! -f $MC_DIR/manticore_${manticore_name}_${arch}.deb ];then
-		wget --no-check-certificate -O $MC_DIR/manticore_${manticore_name}_${arch}.deb https://repo.manticoresearch.com/repository/manticoresearch_bookworm/dists/bookworm/main/binary-${arch}/manticore_${manticore_name}_${arch}.deb
+		wget --no-check-certificate -O $MC_DIR/manticore_${manticore_name}_${arch}.deb https://repo.manticoresearch.com/repository/manticoresearch_bookworm/dists/bookworm/main/binary-${sysArch}/manticore_${manticore_name}_${sysArch}.deb
 	fi
 }
 

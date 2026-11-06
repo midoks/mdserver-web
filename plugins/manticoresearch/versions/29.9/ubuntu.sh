@@ -27,21 +27,21 @@ mkdir -p $MC_DIR
 Install_bionic()
 {
 	if [ ! -f $MC_DIR/manticore-repo.noarch.deb ];then
-		wget --no-check-certificate -O $MC_DIR/manticore-repo.noarch.deb https://repo.manticoresearch.com/repository/manticoresearch_bionic/dists/bionic/main/binary-${arch}/manticore_${manticore_name}_${arch}.deb
+		wget --no-check-certificate -O $MC_DIR/manticore-repo.noarch.deb https://repo.manticoresearch.com/repository/manticoresearch_bionic/dists/bionic/main/binary-${sysArch}/manticore_${manticore_name}_${sysArch}.deb
 	fi
 }
 
 Install_focal()
 {
 	if [ ! -f $MC_DIR/manticore-repo.noarch.deb ];then
-		wget --no-check-certificate -O $MC_DIR/manticore-repo.noarch.deb https://repo.manticoresearch.com/repository/manticoresearch_focal/dists/focal/main/binary-${arch}/manticore_${manticore_name}_${arch}.deb
+		wget --no-check-certificate -O $MC_DIR/manticore-repo.noarch.deb https://repo.manticoresearch.com/repository/manticoresearch_focal/dists/focal/main/binary-${sysArch}/manticore_${manticore_name}_${sysArch}.deb
 	fi
 }
 
 Install_jammy()
 {
 	if [ ! -f $MC_DIR/manticore-repo.noarch.deb ];then
-		wget --no-check-certificate -O $MC_DIR/manticore-repo.noarch.deb https://repo.manticoresearch.com/repository/manticoresearch_jammy/dists/jammy/main/binary-${arch}/manticore_${manticore_name}_${arch}.deb
+		wget --no-check-certificate -O $MC_DIR/manticore-repo.noarch.deb https://repo.manticoresearch.com/repository/manticoresearch_jammy/dists/jammy/main/binary-${sysArch}/manticore_${manticore_name}_${sysArch}.deb
 	fi
 }
 
