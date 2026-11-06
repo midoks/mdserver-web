@@ -35,7 +35,7 @@ Install_App()
 
 	apt -y install manticore
 	apt -y install manticore-extra
-	apt -y upgrade manticore
+	# apt -y upgrade manticore
 
 	searchd_bin=`which searchd`
 	if [ ! -f $searchd_bin ];then
