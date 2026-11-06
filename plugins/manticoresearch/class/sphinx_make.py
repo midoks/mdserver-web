@@ -161,7 +161,7 @@ indexer {
 
 searchd
 {
-	listen = 127.0.0.1:9322
+	listen = 127.0.0.1:9322:sphinx
     listen = 127.0.0.1:9326:mysql
     listen = 127.0.0.1:9328:http
 	log = {$SERVER_APP}/searchd.log
