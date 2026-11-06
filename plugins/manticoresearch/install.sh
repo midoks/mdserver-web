@@ -22,6 +22,8 @@ sysArch=`arch`
 # su -s /bin/sh manticore -c "indexer -c /etc/manticoresearch/manticore.conf xx --rotate"
 # su -s /bin/sh manticore -c "indexer -c /etc/manticoresearch/manticore.conf xx_delta --rotate"
 
+# cat /usr/lib/systemd/system/manticore.service
+
 # systemctl status manticore
 # systemctl restart manticore
 
