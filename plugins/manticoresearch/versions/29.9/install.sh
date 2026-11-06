@@ -39,6 +39,10 @@ Uninstall_App()
 	cd ${rootPath} && python3 plugins/manticoresearch/index.py stop ${VERSION}
 	cd ${rootPath} && python3 plugins/manticoresearch/index.py initd_uninstall ${VERSION}
 
+	apt -y remove manticore
+	apt -y remove manticore-extra
+	apt -y autoremove
+	
 	if [ -d $serverPath/manticoresearch ];then
 		rm -rf $serverPath/manticoresearch
 	fi
