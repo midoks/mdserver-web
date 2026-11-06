@@ -245,7 +245,7 @@ def mcsOp(method):
         data = mw.execShell('systemctl ' + method + ' ' + getSeName())
         if data[1] != '':
             return data[1]
-    return 'fail'
+    return 'ok'
 
 
 def start():
