@@ -12,6 +12,7 @@ sysArch=`arch`
 # cd /Users/midoks/Desktop/mwdev/server/mdserver-web/plugins/manticoresearch && bash install.sh install latest
 # cd /www/server/mdserver-web/plugins/manticoresearch && bash install.sh install code
 # cd /www/server/mdserver-web/plugins/manticoresearch && bash install.sh install latest
+# cd /www/server/mdserver-web/plugins/manticoresearch && bash install.sh install 29.9
 # cd /www/server/mdserver-web && python3 plugins/manticoresearch/index.py run_status_test
 # cd /www/server/mdserver-web && python3 plugins/manticoresearch/index.py start
 
@@ -27,6 +28,12 @@ fi
 
 ACTION=$1
 VERSION=$2
+
+# 版本优先
+if [ -f $curPath/versions/${VERSION}/install.sh ];then
+	sh -x $curPath/versions/${VERSION}/install.sh $1 $2
+	exit 0
+fi
 
 if [ "$sysName" == "Darwin" ];then
 	sh -x $curPath/versions/mac/install.sh $1 $2
