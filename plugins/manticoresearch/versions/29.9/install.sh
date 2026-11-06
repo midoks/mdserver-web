@@ -34,7 +34,7 @@ Install_App()
 	fi
 
 	apt -y install manticore
-	apt -y install manticore-extra
+	# apt -y install manticore-extra
 	# apt -y upgrade manticore
 
 	searchd_bin=`which searchd`
