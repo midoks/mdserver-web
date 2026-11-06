@@ -4,7 +4,7 @@
 	"name": "manticoresearch",
 	"title": "manticoresearch",
 	"shell": "install.sh",
-	"versions":["debian", "code", "latest", "29.9"],
+	"versions":["29.9","debian", "code", "latest"],
 	"tip": "soft",
 	"install_pre_inspection":true,
 	"checks": "server/manticoresearch",
