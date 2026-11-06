@@ -67,7 +67,6 @@ Install_App()
 		'*') Install_none;;
 	esac
 
-	apt -y update 
 	cd $MC_DIR && apt -y install ./*.deb
 	cd $MC_DIR && rm -rf ./*.deb
 }
