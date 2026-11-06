@@ -121,6 +121,10 @@ def contentReplace(content):
 
 
 def status():
+    pid_file = getServerDir() + '/searchd.pid'
+    if os.path.exists(pid_file):
+        return 'start'
+
     cmd = "ps -ef|grep manticore |grep -v grep | grep -v mdserver-web | awk '{print $2}'"
     data = mw.execShell(cmd)
     # print(data)
