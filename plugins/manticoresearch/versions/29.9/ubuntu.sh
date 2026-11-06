@@ -1,0 +1,96 @@
+#!/bin/bash
+PATH=/bin:/sbin:/usr/bin:/usr/sbin:/usr/local/bin:/usr/local/sbin:~/bin:/opt/homebrew/bin
+export PATH
+export LANG=en_US.UTF-8
+export DEBIAN_FRONTEND=noninteractive
+# https://manticoresearch.com/zh/install/
+
+curPath=`pwd`
+rootPath=$(dirname "$curPath")
+rootPath=$(dirname "$rootPath")
+serverPath=$(dirname "$rootPath")
+sysName=`uname`
+sysArch=`dpkg --print-architecture`
+
+if [ -f ${rootPath}/bin/activate ];then
+	. ${rootPath}/bin/activate
+fi
+
+VERSION=$2
+action=$1
+
+manticore_name=29.9.0-26091108-58e88d5ab
+
+mkdir -p $serverPath/manticoresearch
+MC_DIR=${serverPath}/source/manticoresearch
+mkdir -p $MC_DIR
+
+Install_bionic()
+{
+	if [ ! -f $MC_DIR/manticore-repo.noarch.deb ];then
+		wget --no-check-certificate -O $MC_DIR/manticore-repo.noarch.deb https://repo.manticoresearch.com/repository/manticoresearch_bionic/dists/bionic/main/binary-${sysArch}/manticore_${manticore_name}_${sysArch}.deb
+	fi
+}
+
+Install_focal()
+{
+	if [ ! -f $MC_DIR/manticore-repo.noarch.deb ];then
+		wget --no-check-certificate -O $MC_DIR/manticore-repo.noarch.deb https://repo.manticoresearch.com/repository/manticoresearch_focal/dists/focal/main/binary-${sysArch}/manticore_${manticore_name}_${sysArch}.deb
+	fi
+}
+
+Install_jammy()
+{
+	if [ ! -f $MC_DIR/manticore-repo.noarch.deb ];then
+		wget --no-check-certificate -O $MC_DIR/manticore-repo.noarch.deb https://repo.manticoresearch.com/repository/manticoresearch_jammy/dists/jammy/main/binary-${sysArch}/manticore_${manticore_name}_${sysArch}.deb
+	fi
+
+	Install_jammy_libmysqlclient
+}
+
+Install_jammy_libmysqlclient()
+{	
+	# /usr/lib/x86_64-linux-gnu/libmysqlclient.so.21
+	libmyname=libmysqlclient21_8.0.46-0ubuntu0.24.04.1_${sysArch}.deb
+	if [ ! -f $MC_DIR/${libmyname} ];then
+		wget --no-check-certificate -O $MC_DIR/${libmyname} http://archive.ubuntu.com/ubuntu/pool/main/m/mysql-8.0/${libmyname}
+	fi
+	# 版本号可能不同，去 http://archive.ubuntu.com/ubuntu/pool/main/m/mysql-8.0/ 找最新的
+	# wget http://archive.ubuntu.com/ubuntu/pool/main/m/mysql-8.0/libmysqlclient21_8.0.46-0ubuntu0.24.04.4_amd64.deb
+	
+
+	cd $MC_DIR && dpkg -x libmysqlclient21_*.deb /tmp/lmc
+ 	cp -a /tmp/lmc/usr/lib/x86_64-linux-gnu/libmysqlclient.so.21* /usr/lib/x86_64-linux-gnu/
+	ldconfig
+}
+
+Install_none()
+{
+	echo "none"
+	exit 0
+}
+
+Install_App()
+{
+	. /etc/os-release
+    echo "Ubuntu 版本: $VERSION_ID"
+    # echo "完整版本: $PRETTY_NAME"
+
+	case "$VERSION_ID" in
+		'18.04') Install_bionic;;
+		'20.04') Install_focal;;
+		'22.04') ;;
+	    '24.04') ;;
+	    '26.04') Install_jammy;;
+		'*') Install_none;;
+	esac
+
+	cd $MC_DIR && apt -y install ./*.deb
+	cd $MC_DIR && rm -rf ./*.deb
+}
+
+if [ "${action}" = 'install' ] || [ "$action" = "upgrade" ];then
+	Install_App
+else
+	echo "OPTIONS ERROR"
+fi

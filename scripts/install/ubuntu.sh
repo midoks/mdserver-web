@@ -138,6 +138,7 @@ if [ ! -f /usr/sbin/ufw ];then
 	# systemctl stop firewalld
 fi
 
+apt install -y git
 apt install -y devscripts
 apt install -y python3-dev
 apt install -y autoconf

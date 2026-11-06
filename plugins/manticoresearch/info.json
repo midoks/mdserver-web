@@ -4,7 +4,7 @@
 	"name": "manticoresearch",
 	"title": "manticoresearch",
 	"shell": "install.sh",
-	"versions":["latest"],
+	"versions":["29.9","debian", "code", "latest"],
 	"tip": "soft",
 	"install_pre_inspection":true,
 	"checks": "server/manticoresearch",
@@ -14,6 +14,7 @@
 	"date": "2025-07-21",
 	"home": "https://github.com/manticoresoftware/manticoresearch/",
 	"doc1": "https://manual.manticoresearch.com/Introduction",
+	"doc2": "https://repo.manticoresearch.com/repository/",
 	"type": 0,
 	"pid": "2"
 }

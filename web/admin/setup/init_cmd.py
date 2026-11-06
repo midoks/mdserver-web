@@ -40,7 +40,7 @@ def init_cmd():
             mw.writeFile(initd_bin, cmd_content)
             mw.execShell('chmod +x ' + initd_bin)
         # 加入自启动
-        mw.execShell('which chkconfig && chkconfig --add mw')
+        mw.execShell('command -v chkconfig && chkconfig --add mw')
 
 
     if os.path.exists('/etc/init.d'):
@@ -49,7 +49,7 @@ def init_cmd():
             mw.writeFile(initd_bin, cmd_content)
             mw.execShell('chmod +x ' + initd_bin)
         # 加入自启动
-        mw.execShell('which update-rc.d && update-rc.d -f mw defaults')
+        mw.execShell('command -v update-rc.d && update-rc.d -f mw defaults')
 
     # sys_name = mw.getOsName()
     # if sys_name == 'opensuse':

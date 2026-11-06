@@ -1,0 +1,27 @@
+[Unit]
+Description=Manticore Search Engine
+After=network.target remote-fs.target nss-lookup.target
+Documentation=https://manual.manticoresearch.com/, man:searchd(1)
+
+[Service]
+Type=notify
+User=manticore
+Group=manticore
+RuntimeDirectory=manticore
+# Run ExecStart with User=manticore / Group=manticore
+ExecStart=/usr/bin/searchd --config /etc/manticoresearch/manticore.conf --nodetach $_ADDITIONAL_SEARCHD_PARAMS
+ExecReload=/bin/kill -HUP $MAINPID
+KillMode=process
+KillSignal=SIGTERM
+LimitCORE=infinity
+LimitMEMLOCK=infinity
+Restart=on-failure
+TimeoutStartSec=infinity
+TimeoutStopSec=60
+WorkingDirectory=/var/lib/manticore
+NotifyAccess=all
+
+[Install]
+WantedBy=multi-user.target
+Alias=manticore.service
+Alias=searchd.service

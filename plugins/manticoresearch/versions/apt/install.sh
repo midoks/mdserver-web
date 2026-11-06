@@ -14,6 +14,7 @@ if [ -f ${rootPath}/bin/activate ];then
 fi
 
 VERSION=$2
+action=$1
 
 Install_App()
 {
@@ -66,9 +67,11 @@ Uninstall_App()
 	echo "卸载manticoresearch成功"
 }
 
-action=$1
-if [ "${1}" = 'install' ];then
+
+if [ "${1}" = 'install' ] || [ "$action" = "upgrade" ];then
 	Install_App
-else
+elif [ "${1}" = 'uninstall' ];then
 	Uninstall_App
+else
+	echo "OPTIONS ERROR"
 fi

@@ -70,7 +70,7 @@ def getConf():
 
 
 def status():
-    data = mw.execShell("which ipvsadm")
+    data = mw.execShell("command -v ipvsadm")
     if data[0] == '':
         return 'stop'
     return 'start'

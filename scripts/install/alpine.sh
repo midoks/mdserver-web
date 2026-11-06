@@ -58,6 +58,7 @@ apk add net-tools-deprecated --force-broken-world
 apk add numactl --force-broken-world
 apk add zstd-dev --force-broken-world
 apk add libudev-dev --force-broken-world
+apk add git --force-broken-world
 
 # apk add  php-config
 

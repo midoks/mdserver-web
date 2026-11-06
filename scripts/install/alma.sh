@@ -8,8 +8,10 @@ LANG=C.UTF-8
 setenforce 0
 sed -i 's#SELINUX=enforcing#SELINUX=disabled#g' /etc/selinux/config
 
-dnf install -y wget lsof
-dnf install -y rar unrar
+dnf install -y wget
+dnf install -y lsof
+dnf install -y rar
+dnf install -y unrar
 dnf install -y python3-devel
 dnf install -y python-devel
 dnf install -y crontabs
@@ -25,6 +27,7 @@ yum install -y postgresql-devel
 yum install -y brotli-devel
 yum install -y vim-common
 yum install -y libudev-devel
+yum install -y git
 
 SSH_PORT=`netstat -ntpl|grep sshd|grep -v grep | sed -n "1,1p" | awk '{print $4}' | awk -F : '{print $2}'`
 if [ "$SSH_PORT" = "" ];then

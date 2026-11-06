@@ -43,6 +43,7 @@ echo y | pacman -Sy which
 echo y | pacman -Sy expect
 echo y | pacman -Sy pv
 echo y | pacman -Sy bc
+echo y | pacman -Sy git
 
 
 ## gd start

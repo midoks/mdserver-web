@@ -13,8 +13,10 @@ fi
 setenforce 0
 sed -i 's#SELINUX=enforcing#SELINUX=disabled#g' /etc/selinux/config
 
-yum install -y wget lsof
-yum install -y unrar rar
+yum install -y wget
+yum install -y lsof
+yum install -y rar
+yum install -y unrar
 yum install -y pv
 yum install -y bc
 yum install -y python3-devel
@@ -33,6 +35,7 @@ yum install -y postgresql-devel
 yum install -y brotli-devel
 yum install -y vim-common
 yum install -y libudev-devel
+yum install -y git
 
 if [ -f /usr/sbin/iptables ];then
 

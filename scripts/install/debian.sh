@@ -198,6 +198,7 @@ if [ "$VERSION_ID" == "9" ];then
 	# pip3 install -r /www/server/mdserver-web/requirements.txt
 fi
 
+apt install -y git
 apt install -y build-essential
 apt install -y devscripts
 

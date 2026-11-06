@@ -46,12 +46,25 @@ def getConfTpl():
 
 
 def getConf():
-    path = "/etc/manticoresearch/manticore.conf"
-    return path
+    path_list = [
+        "/etc/manticoresearch/manticore.conf",
+        getServerDir()+"/etc/manticoresearch/manticore.conf",
+    ]
 
+    for x in path_list:
+        if os.path.exists(x):
+            return x
+    return "/etc/manticoresearch/manticore.conf"
+
+def getCmdIndexerPath():
+    cmd = 'indexer'
+    local_indexer = getServerDir() + '/bin/'+cmd
+    if os.path.exists(local_indexer):
+        return local_indexer
+    return cmd
 
 def getInitDTpl():
-    path = getPluginDir() + "/init.d/" + getPluginName() + ".tpl"
+    path = getPluginDir() + "/init.d/" + getSeName() + ".tpl"
     return path
 
 
@@ -108,6 +121,10 @@ def contentReplace(content):
 
 
 def status():
+    pid_file = getServerDir() + '/searchd.pid'
+    if os.path.exists(pid_file):
+        return 'start'
+
     cmd = "ps -ef|grep manticore |grep -v grep | grep -v mdserver-web | awk '{print $2}'"
     data = mw.execShell(cmd)
     # print(data)
@@ -118,6 +135,8 @@ def status():
 
 def mkdirAll():
     content = mw.readFile(getConf())
+    if not content:
+        return
     rep = r'path\s*=\s*(.*)'
     p = re.compile(rep)
     tmp = p.findall(content)
@@ -133,10 +152,25 @@ def isInitFile():
     path = getServerDir() + '/init.pl'
     if os.path.exists(path):
         return True
-    mw.writeFile(path, 'ok')
     return False
 
+def writeInitFile():
+    path = getServerDir() + '/init.pl'
+    if not os.path.exists(path):
+        mw.writeFile(path, 'ok')
+    return True
+
+def removeInitFile():
+    path = getServerDir() + '/init.pl'
+    if os.path.exists(path):
+        os.unlink(path)
+    return True
+
 def initDreplace():
+
+    initD_path = getServerDir() + '/init.d'
+    if not os.path.exists(initD_path):
+        os.mkdir(initD_path)
 
     dirs_list = [
         "/var/log/manticore",
@@ -151,22 +185,44 @@ def initDreplace():
         if not os.path.exists(d):
             mw.execShell('mkdir -p ' + d)
 
-    mw.execShell("chown -R manticore:manticore /var/run/manticore")
-    mw.execShell("chown -R manticore:manticore "+index_dir)
+    if not mw.isAppleSystem():
+        mw.execShell("chown -R manticore:manticore /var/run/manticore")
+        mw.execShell("chown -R manticore:manticore "+index_dir)
 
     # config replace
     conf_bin = getConf()
     if not os.path.exists(conf_bin) or not isInitFile():
-        conf_content = mw.readFile(getConfTpl())
-        conf_content = contentReplace(conf_content)
-        mw.writeFile(getConf(), conf_content)
+        content = mw.readFile(getConfTpl())
+        content = contentReplace(content)
+        mw.writeFile(conf_bin, content)
         mkdirAll()
 
-    return "ok"
+    file_bin = initD_path + '/manticore'
+    if not os.path.exists(file_bin):
+        file_tpl = getInitDTpl()
+        content = mw.readFile(file_tpl)
+        content = contentReplace(content)
+        mw.writeFile(file_bin, content)
+        mw.execShell('chmod +x ' + file_bin)
+
+    # systemd
+    systemDir = mw.systemdCfgDir()
+    systemService = systemDir + '/manticore.service'
+    systemServiceTpl = getPluginDir() + '/init.d/manticore.service.tpl'
+    # and not os.path.exists(systemService)
+    if os.path.exists(systemDir) and not isInitFile():
+        content = mw.readFile(systemServiceTpl)
+        content = contentReplace(content)
+        mw.writeFile(systemService, content)
+        mw.execShell('systemctl daemon-reload')
+    writeInitFile()
+    return file_bin
 
 
 def checkIndexSph():
     content = mw.readFile(getConf())
+    if not content:
+        return True
     rep = r'path\s*=\s*(.*)'
     p = re.compile(rep)
     tmp = p.findall(content)
@@ -180,11 +236,16 @@ def checkIndexSph():
     return True
 
 def mcsOp(method):
-    initDreplace()
-    data = mw.execShell('systemctl ' + method + ' ' + getSeName())
-    if data[1] == '':
-        return 'ok'
-    return 'fail'
+    inid_file = initDreplace()
+    if mw.isAppleSystem():
+        data = mw.execShell(inid_file + ' ' + method)
+        if data[1] == '':
+            return 'ok'
+    else:
+        data = mw.execShell('systemctl ' + method + ' ' + getSeName())
+        if data[1] != '':
+            return data[1]
+    return 'ok'
 
 
 def start():
@@ -204,15 +265,23 @@ def restart():
 
 
 def reload():
+    removeInitFile()
     return mcsOp('restart')
 
 
 def rebuild():
-    cmd = 'indexer --all --rotate'
-    cmd_manticore = asManticore(cmd)
-    data = mw.execShell(cmd_manticore)
-    if data[0].find('successfully')<0:
-        return data[0].replace("\n","<br/>")
+    fixIndexOwner()
+    conf_file = getConf()
+    cmd = getCmdIndexerPath() + ' --config ' + conf_file + ' --all --rotate'
+    try:
+        data = mw.execShell(cmd)
+        if data[0].find('successfully')<0:
+            raise
+    except Exception as e:
+        cmd_manticore = asManticore(cmd)
+        data = mw.execShell(cmd_manticore)
+        if data[0].find('successfully')<0:
+            return data[0].replace("\n","<br/>")
     return 'ok'
 
 
@@ -278,7 +347,7 @@ def queryLog():
     return tmp.groups()[0]
 
 def systemctlLog():
-    cmd = "journalctl -u manticore -n 15 --no-pager"
+    cmd = "which journalctl && journalctl -u manticore -n 15 --no-pager"
     data = mw.execShell(cmd)
     return data[0]
 
@@ -293,7 +362,7 @@ def runStatus():
 
     sh = sphinxapi.SphinxClient()
     port = getMainPort()
-    sh.SetServer('127.0.0.1', port)
+    sh.SetServer('127.0.0.1', int(port))
     info_status = sh.Status()
 
     if info_status is None:
@@ -328,12 +397,12 @@ def runStatusTest():
 def sphinxConfParse():
     file = getConf()
     bin_dir = getServerDir()
-    content = mw.readFile(file)
+    content = mw.readFile(file) or ''
     rep = r'^index\s+(\w+)'
     sindex = re.findall(rep, content,re.MULTILINE)
     indexlen = len(sindex)
     cmd = {}
-    cmd['cmd'] = "indexer -c " + getConf()
+    cmd['cmd'] = getCmdIndexerPath() + " -c " + getConf()
 
     cmd['index'] = []
     cmd_index = []
@@ -434,7 +503,9 @@ def fixIndexOwner():
     index_dir = getServerDir() + '/index'
     if not os.path.exists(index_dir):
         return
-    mw.execShell("chown -R manticore:manticore " + index_dir)
+
+    if not mw.isAppleSystem():
+        mw.execShell("chown -R manticore:manticore " + index_dir)
 
 
 # 全量更新
@@ -477,8 +548,8 @@ def updateDelta():
     return ''
 
 def installPreInspection(version):
-    if mw.isAppleSystem():
-        return '不支持mac系统'
+    # if mw.isAppleSystem():
+    #     return '不支持mac系统'
     return 'ok'
 
 if __name__ == "__main__":
