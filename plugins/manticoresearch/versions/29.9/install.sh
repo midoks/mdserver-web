@@ -36,7 +36,6 @@ Install_App()
 	apt -y install manticore-extra
 	apt -y upgrade manticore
 
-	echo "${VERSION}" > $serverPath/manticoresearch/version.pl
 	cd ${rootPath} && python3 plugins/manticoresearch/index.py start ${VERSION}
 	cd ${rootPath} && python3 plugins/manticoresearch/index.py initd_install ${VERSION}
 
