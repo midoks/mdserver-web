@@ -46,8 +46,15 @@ def getConfTpl():
 
 
 def getConf():
-    path = "/etc/manticoresearch/manticore.conf"
-    return path
+    path_list = [
+        "/etc/manticoresearch/manticore.conf",
+        getServerDir()+"/etc/manticoresearch/manticore.conf",
+    ]
+
+    for x in path_list:
+        if os.path.exists(x):
+            return x
+    return "/etc/manticoresearch/manticore.conf"
 
 
 def getInitDTpl():
@@ -118,6 +125,8 @@ def status():
 
 def mkdirAll():
     content = mw.readFile(getConf())
+    if not content:
+        return
     rep = r'path\s*=\s*(.*)'
     p = re.compile(rep)
     tmp = p.findall(content)
@@ -137,6 +146,10 @@ def isInitFile():
     return False
 
 def initDreplace():
+
+    initD_path = getServerDir() + '/init.d'
+    if not os.path.exists(initD_path):
+        os.mkdir(initD_path)
 
     dirs_list = [
         "/var/log/manticore",
@@ -158,15 +171,27 @@ def initDreplace():
     conf_bin = getConf()
     if not os.path.exists(conf_bin) or not isInitFile():
         conf_content = mw.readFile(getConfTpl())
+        if not conf_content:
+            return 'conf template not found'
         conf_content = contentReplace(conf_content)
-        mw.writeFile(getConf(), conf_content)
+        if not mw.writeFile(conf_bin, conf_content):
+            return 'conf write fail'
         mkdirAll()
 
-    return "ok"
+    file_bin = initD_path + '/manticore'
+    if not os.path.exists(file_bin):
+        file_tpl = getPluginDir() + '/init.d/manticore.tpl'
+        content = mw.readFile(file_tpl)
+        content = contentReplace(content)
+        mw.writeFile(file_bin, content)
+        mw.execShell('chmod +x ' + file_bin)
+    return file_bin
 
 
 def checkIndexSph():
     content = mw.readFile(getConf())
+    if not content:
+        return True
     rep = r'path\s*=\s*(.*)'
     p = re.compile(rep)
     tmp = p.findall(content)
@@ -180,10 +205,15 @@ def checkIndexSph():
     return True
 
 def mcsOp(method):
-    initDreplace()
-    data = mw.execShell('systemctl ' + method + ' ' + getSeName())
-    if data[1] == '':
-        return 'ok'
+    inid_file = initDreplace()
+    if mw.isAppleSystem():
+        data = mw.execShell(inid_file + ' ' + method)
+        if data[1] == '':
+            return 'ok'
+    else:
+        data = mw.execShell('systemctl ' + method + ' ' + getSeName())
+        if data[1] == '':
+            return 'ok'
     return 'fail'
 
 
@@ -329,7 +359,7 @@ def runStatusTest():
 def sphinxConfParse():
     file = getConf()
     bin_dir = getServerDir()
-    content = mw.readFile(file)
+    content = mw.readFile(file) or ''
     rep = r'^index\s+(\w+)'
     sindex = re.findall(rep, content,re.MULTILINE)
     indexlen = len(sindex)
@@ -478,8 +508,8 @@ def updateDelta():
     return ''
 
 def installPreInspection(version):
-    if mw.isAppleSystem():
-        return '不支持mac系统'
+    # if mw.isAppleSystem():
+    #     return '不支持mac系统'
     return 'ok'
 
 if __name__ == "__main__":
