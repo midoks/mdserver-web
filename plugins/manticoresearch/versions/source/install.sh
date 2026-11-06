@@ -37,6 +37,7 @@ Install_App()
 {
 	echo '正在安装manticoresearch...'
 	mkdir -p $serverPath/manticoresearch
+	echo "${VERSION}" > $serverPath/manticoresearch/version.pl
 
 	MC_DIR=${serverPath}/source/manticoresearch
 	mkdir -p $MC_DIR
@@ -182,8 +183,6 @@ EOF
 		systemctl daemon-reload
 	fi
 
-
-	echo "${VERSION}" > $serverPath/manticoresearch/version.pl
 	cd ${rootPath} && python3 plugins/manticoresearch/index.py start ${VERSION}
 	cd ${rootPath} && python3 plugins/manticoresearch/index.py initd_install ${VERSION}
 
