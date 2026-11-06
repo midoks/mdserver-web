@@ -29,6 +29,12 @@ Install_App()
 	    . /etc/os-release
 	    sh -x $curPath/versions/${VERSION}/ubuntu.sh $1 $2
 	fi
+
+	echo "${VERSION}" > $serverPath/manticoresearch/version.pl
+
+	cd ${rootPath} && python3 plugins/manticoresearch/index.py start ${VERSION}
+	cd ${rootPath} && python3 plugins/manticoresearch/index.py initd_install ${VERSION}
+	
 	echo "install manticoresearch successful!"
 }
 
