@@ -266,7 +266,9 @@ def rebuild():
     fixIndexOwner()
     conf_file = getConf()
     cmd = getCmdIndexerPath() + ' --config ' + conf_file + ' --all --rotate'
+    # print(cmd)
     cmd_manticore = asManticore(cmd)
+    # print(cmd_manticore)
     data = mw.execShell(cmd_manticore)
     if data[0].find('successfully')<0:
         return data[0].replace("\n","<br/>")
