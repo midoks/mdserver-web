@@ -160,6 +160,12 @@ def writeInitFile():
         mw.writeFile(path, 'ok')
     return True
 
+def removeInitFile():
+    path = getServerDir() + '/init.pl'
+    if os.path.exists(path):
+        os.unlink(path)
+    return True
+
 def initDreplace():
 
     initD_path = getServerDir() + '/init.d'
@@ -259,6 +265,7 @@ def restart():
 
 
 def reload():
+    removeInitFile()
     return mcsOp('restart')
 
 
