@@ -1340,7 +1340,7 @@ def importDbBackupProgress():
     file = args['file']
     name = args['name']
 
-    cmd = 'cd '+mw.getServerDir()+'/mdserver-web && . bin/activate && '
+    cmd = 'cd ' + mw.getPanelDir() + ' && . bin/activate && '
     cmd += 'python3 plugins/mysql/index.py import_db_backup_progress_bar {"file":"'+file+'","name":"'+name+'"}'
     return mw.returnJson(True, 'ok',cmd)
     # return mw.returnJson(True, 'ok')

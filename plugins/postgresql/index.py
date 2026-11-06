@@ -95,6 +95,12 @@ def checkArgs(data, ck=[]):
     return (True, mw.returnJson(True, 'ok'))
 
 
+def getImportDir():
+    import_dir = mw.getBackupDir() + '/postgresql_import'
+    if not os.path.exists(import_dir):
+        os.makedirs(import_dir)
+    return import_dir
+    
 def getConf():
     path = getServerDir() + '/data/postgresql.conf'
     return path
@@ -880,7 +886,7 @@ def importDbBackupProgress():
     name = args['name']
 
     cmd = 'cd ' + mw.getPanelDir() + ' && . bin/activate && '
-    cmd += 'python3 ' + mw.getPanelDir() + '/plugins/postgresql/index.py import_db_backup_progress_bar {"file":"' + file + '","name":"' + name + '"}'
+    cmd += 'python3 plugins/postgresql/index.py import_db_backup_progress_bar {"file":"' + file + '","name":"' + name + '"}'
     return mw.returnJson(True, 'ok', cmd)
 
 
@@ -956,12 +962,6 @@ def getDbBackupList():
         data['file'] = p
 
     return mw.returnJson(True, 'ok', rr)
-
-def getImportDir():
-    import_dir = mw.getBackupDir() + '/postgresql_import'
-    if not os.path.exists(import_dir):
-        os.makedirs(import_dir)
-    return import_dir
 
 
 def getDbBackupImportList():
