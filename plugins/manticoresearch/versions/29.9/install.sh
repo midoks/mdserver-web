@@ -27,9 +27,7 @@ Install_App()
 
 	if grep -qi '^ID=ubuntu' /etc/os-release; then
 	    . /etc/os-release
-	    # echo "Ubuntu 版本: $VERSION_ID"
-	    # echo "完整版本: $PRETTY_NAME"
-	    sh -x $curPath/versions/${VERSION}/install.sh $1 $2
+	    sh -x $curPath/versions/${VERSION}/ubuntu.sh $1 $2
 	fi
 	echo "install manticoresearch successful!"
 }
@@ -42,7 +40,7 @@ Uninstall_App()
 	apt -y remove manticore
 	apt -y remove manticore-extra
 	apt -y autoremove
-	
+
 	if [ -d $serverPath/manticoresearch ];then
 		rm -rf $serverPath/manticoresearch
 	fi
