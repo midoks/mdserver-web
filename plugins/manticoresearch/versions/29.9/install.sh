@@ -33,6 +33,7 @@ Install_App()
 	    sh -x $curPath/versions/${VERSION}/debian.sh $action $VERSION
 	fi
 
+	apt -y update
 	apt -y install manticore
 	# apt -y install manticore-extra
 	# apt -y upgrade manticore
