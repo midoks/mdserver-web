@@ -26,7 +26,6 @@ Install_App()
 	echo "${VERSION}" > $serverPath/manticoresearch/version.pl
 
 	if grep -qi '^ID=ubuntu' /etc/os-release; then
-	    . /etc/os-release
 	    sh -x $curPath/versions/${VERSION}/ubuntu.sh $1 $2
 	fi
 
@@ -34,7 +33,7 @@ Install_App()
 
 	cd ${rootPath} && python3 plugins/manticoresearch/index.py start ${VERSION}
 	cd ${rootPath} && python3 plugins/manticoresearch/index.py initd_install ${VERSION}
-	
+
 	echo "install manticoresearch successful!"
 }
 
