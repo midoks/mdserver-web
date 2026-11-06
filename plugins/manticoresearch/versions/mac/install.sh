@@ -16,23 +16,7 @@ fi
 
 VERSION=$2
 action=$1
-
-
 manticore_name=29.0.2-26081409-2f9c226b6-osx11.6-arm64
-# 下载文件，直连失败时走加速镜像
-download_file()
-{
-	src=$1
-	dst=$2
-	for url in "$src" "https://ghproxy.net/$src" "https://gh-proxy.com/$src" "https://ghfast.top/$src"
-	do
-		if curl -fsSL --retry 2 --connect-timeout 20 -o "$dst" "$url";then
-			return 0
-		fi
-		rm -f "$dst"
-	done
-	return 1
-}
 
 Install_App()
 {
