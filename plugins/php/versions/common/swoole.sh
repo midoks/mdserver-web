@@ -71,6 +71,7 @@ Install_lib()
 		mkdir -p $php_lib
 
 		cd ${rootPath}/plugins/php/lib && /bin/bash openssl_11.sh
+		export PKG_CONFIG_PATH=$PKG_CONFIG_PATH:$serverPath/lib/openssl11/lib/pkgconfig
 
 		if [ ! -d $php_lib/${LIBNAME}-${LIBV} ];then
 			if [ ! -f $php_lib/${LIBNAME}-${LIBV}.tgz ];then
