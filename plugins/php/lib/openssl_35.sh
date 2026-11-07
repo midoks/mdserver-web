@@ -33,7 +33,7 @@ if [ ! -d ${SERVER_ROOT}/openssl35 ];then
     #     echo "/www/server/lib/openssl35/lib64" >> /etc/ld.so.conf
     # fi
 
-    # ldconfig
+    ldconfig
     # ldconfig -p  | grep openssl
 
     cd $SOURCE_ROOT && rm -rf $SOURCE_ROOT/openssl-${opensslVersion}
