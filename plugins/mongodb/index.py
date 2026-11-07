@@ -992,7 +992,7 @@ def syncToDatabases():
     return mw.returnJson(True, msg)
 
 
-def getAllRole():
+def getAllRoleTpl():
     mongo_role = {
         # 数据库用户角色
         "read": "读取数据(read)",
@@ -1021,7 +1021,10 @@ def getAllRole():
         # "__system": "系统角色",
         # "enableSharding": "启用分片",
     }
+    return mongo_role
 
+def getAllRole():
+    mongo_role = getAllRoleTpl()
     client = mongdbClient()
     db = client.admin
 
@@ -1043,35 +1046,8 @@ def getDbAccess():
     client = mongdbClient()
     db = client.admin
     username = args['username']
-
-    mongo_role = {
-        # 数据库用户角色
-        "read": "读取数据(read)",
-        "readWrite": "读取和写入数据(readWrite)",
-        # 数据库管理角色
-        # "dbAdmin": "数据库管理员",
-        "dbOwner": "数据库所有者(dbOwner)",
-        "userAdmin": "用户管理员(userAdmin)",
-        # 集群管理角色
-        # "clusterAdmin": "集群管理员",
-        # "clusterManager": "集群管理器",
-        # "clusterMonitor": "集群监视器",
-        # "hostManager": "主机管理员",
-        # 备份和恢复角色
-        # "backup": "备份数据",
-        # "restore": "还原数据",
-        # 所有数据库角色
-        # "readAnyDatabase": "任意数据库读取",
-        # "readWriteAnyDatabase": "任意数据库读取和写入",
-        # "userAdminAnyDatabase": "任意数据库用户管理员",
-        # "dbAdminAnyDatabase": "任意数据库管理员",
-        # 超级用户角色
-        # "root": "超级管理员",
-        # 内部角色
-        # "__queryableBackup": "可查询备份",
-        # "__system": "系统角色",
-        # "enableSharding": "启用分片",
-    }
+    name = args.get('name', '')
+    mongo_role = getAllRoleTpl()
 
     role_data = db.command('rolesInfo', showBuiltinRoles=True)
     all_role_list = []
@@ -1082,18 +1058,23 @@ def getDbAccess():
 
     result = {
         "user": username,
-        "db": username,
+        "db": name if name else username,
         "roles": [],
         "all_roles":all_role_list,
     }
 
-    user_data = db.command('usersInfo', username)
-    if user_data:
-        if len(user_data["users"]) != 0:
-            user = user_data["users"][0]
-            result["user"] = user.get("user", username)
-            result["db"] = user.get("db", username)
-            result["roles"] = user.get("roles", [])
+    # 用户可能位于目标库(新版)或 admin 库(历史数据),需按顺序查找
+    user_data = {'users': []}
+    if name:
+        user_data = client[name].command('usersInfo', username)
+    if len(user_data.get("users", [])) == 0:
+        user_data = db.command('usersInfo', username)
+
+    if len(user_data.get("users", [])) != 0:
+        user = user_data["users"][0]
+        result["user"] = user.get("user", username)
+        result["db"] = user.get("db", result["db"])
+        result["roles"] = user.get("roles", [])
 
     return mw.returnJson(True, 'ok', result)
 
@@ -1106,11 +1087,11 @@ def setDbAccess():
     select = args['select']
     name = args['name']
 
-    mg_pass = pSqliteDb('config').where('id=?', (1,)).getField('mg_root')
-
     user_roles = []
     select_role = select.split(',')
     for role in select_role:
+        if not role:
+            continue
         t = {}
         t['role'] = role
         t['db'] = name
@@ -1120,10 +1101,25 @@ def setDbAccess():
     # 在目标数据库中操作用户，而不是 admin 数据库
     db = client[name]
 
+    # 兼容历史数据:用户可能创建在 admin 数据库中,需定位实际所在库
+    user_db = db
     try:
-        db.command("updateUser", username, pwd=mg_pass, roles=user_roles)
-    except Exception as e:
-        db.command('dropUser',username)
+        if len(db.command('usersInfo', username).get('users', [])) == 0:
+            admin = client.admin
+            if len(admin.command('usersInfo', username).get('users', [])) != 0:
+                user_db = admin
+    except Exception:
+        pass
+
+    try:
+        user_db.command("updateUser", username, roles=user_roles)
+    except Exception:
+        # 用户不存在时 dropUser 同样会报错,忽略后直接创建
+        try:
+            user_db.command('dropUser', username)
+        except Exception:
+            pass
+        mg_pass = pSqliteDb('config').where('id=?', (1,)).getField('mg_root')
         db.command("createUser", username, pwd=mg_pass, roles=user_roles)
 
     return mw.returnJson(True, '设置成功!')
