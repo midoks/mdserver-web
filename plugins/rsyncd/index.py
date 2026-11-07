@@ -212,6 +212,7 @@ def initDSend():
     systemDir = mw.systemdCfgDir()
     systemService = systemDir + '/lsyncd.service'
     systemServiceTpl = getPluginDir() + '/init.d/lsyncd.service.tpl'
+    if not os.path.exists(lock_file):
         lsyncd_bin = mw.execShell('command -v lsyncd')[0].strip()
         if lsyncd_bin == '':
             print('lsyncd missing!')
