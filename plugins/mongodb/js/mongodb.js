@@ -945,7 +945,7 @@ function syncToDatabase(type){
 }
 
 function setDbAccess(username,name){
-    mgPost('get_db_access','','username='+username, function(data){
+    mgPost('get_db_access','',{username:username,name:name}, function(data){
         var rdata = $.parseJSON(data.data);
         if (!rdata.status){
             layer.msg(rdata.msg,{icon:2,shade: [0.3, '#000']});
