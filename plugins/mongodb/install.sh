@@ -27,6 +27,7 @@ rootPath=$(dirname "$curPath")
 rootPath=$(dirname "$rootPath")
 serverPath=$(dirname "$rootPath")
 
+action=$1
 VERSION=$2
 
 sysName=`uname`
@@ -100,9 +101,10 @@ Uninstall_app()
 	echo 'mongodb卸载完成'
 }
 
-action=$1
-if [ "${1}" = 'install' ];then
+if [ "${action}" = 'install' ] || [ "$action" = "upgrade" ];then
 	Install_app
-else
+elif [ "${action}" = 'uninstall' ];then
 	Uninstall_app
+else
+	echo "OPTIONS ERROR"
 fi
