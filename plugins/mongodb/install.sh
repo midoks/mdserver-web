@@ -27,6 +27,7 @@ rootPath=$(dirname "$curPath")
 rootPath=$(dirname "$rootPath")
 serverPath=$(dirname "$rootPath")
 
+action=$1
 VERSION=$2
 
 sysName=`uname`
@@ -50,8 +51,7 @@ Install_app()
 	echo '正在安装脚本文件...'
 	mkdir -p $serverPath/source
 
-	cd ${rootPath}/plugins/php/lib && /bin/bash openssl_11.sh
-
+	cd ${rootPath}/plugins/php/lib && bash openssl_11.sh
 	shell_file=${curPath}/versions/${VERSION}/${OSNAME}.sh
 
 	if [ -f $shell_file ];then
@@ -101,9 +101,10 @@ Uninstall_app()
 	echo 'mongodb卸载完成'
 }
 
-action=$1
-if [ "${1}" = 'install' ];then
+if [ "${action}" = 'install' ] || [ "$action" = "upgrade" ];then
 	Install_app
-else
+elif [ "${action}" = 'uninstall' ];then
 	Uninstall_app
+else
+	echo "OPTIONS ERROR"
 fi

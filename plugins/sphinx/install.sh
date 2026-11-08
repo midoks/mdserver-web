@@ -15,7 +15,7 @@ if [ -f ${rootPath}/bin/activate ];then
 fi
 
 # cd /www/server/mdserver-web && . bin/activate && python3 plugins/sphinx/index.py rebuild
-# cd /www/server/mdserver-web/plugins/sphinx && bash install.sh install 3.6.1
+# cd /www/server/mdserver-web/plugins/sphinx && bash install.sh install 3.1.1
 # cd /www/server/mdserver-web && . bin/activate && python3 plugins/sphinx/index.py db_to_sphinx && /www/server/sphinx/bin/bin/indexer -c /www/server/sphinx/sphinx.conf --all --rotate
 # /Users/midoks/Desktop/mwdev/server/sphinx/bin/bin/indexer /Users/midoks/Desktop/mwdev/server/sphinx/sphinx.conf --all --rotate
 
@@ -137,6 +137,11 @@ Install_sphinx()
 	# curl -sSLo ${SPHINX_DIR}/${FILE_TGZ} http://sphinxsearch.com/files/${FILE_TGZ}
 	if [ ! -f ${SPHINX_DIR}/${FILE_TGZ} ];then
 		wget --no-check-certificate -O ${SPHINX_DIR}/${FILE_TGZ} http://sphinxsearch.com/files/${FILE_TGZ}
+	fi
+
+	if [ ! -f ${SPHINX_DIR}/${FILE_TGZ} ];then
+		echo "download file ${SPHINX_DIR}/${FILE_TGZ} fail!"
+		exit 1
 	fi
 
 	cd ${SPHINX_DIR} && tar -zxvf ${FILE_TGZ}

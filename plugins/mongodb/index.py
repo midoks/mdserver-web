@@ -1824,7 +1824,7 @@ def installPreInspection(version):
     sysName = sys[0].strip().lower()
     sysId = sys_id[0].strip()
 
-    supportOs = ['centos', 'ubuntu', 'debian', 'opensuse']
+    supportOs = ['centos', 'ubuntu', 'debian', 'opensuse', 'openeuler']
     if not sysName in supportOs:
         return '暂时仅支持{}'.format(','.join(supportOs))
 
