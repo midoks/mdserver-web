@@ -8,36 +8,13 @@ rootPath=$(dirname "$rootPath")
 rootPath=$(dirname "$rootPath")
 serverPath=$(dirname "$rootPath")
 
-VERSION=7.0.15
+VERSION=7.0.45
 SYS_ARCH=`arch`
 
 SYS_VERSION_ID=`cat /etc/*-release | grep VERSION_ID | awk -F = '{print $2}' | awk -F "\"" '{print $2}'`
 SYS_NAME=${SYS_VERSION_ID/./}
 SYS_NAME_LEN=`echo "$SYS_NAME" | wc -L`
-
-if [ "$SYS_NAME_LEN" = "1" ];then
-	SYS_NAME=${SYS_NAME}0	
-fi
-
-if [ "$SYS_ARCH" = "aarch64" ];then
-	if [ "$SYS_NAME" -gt "90" ];then
-		SYS_NAME="90"
-	fi
-
-	if [ "$SYS_NAME" -lt "82" ];then
-		SYS_NAME="82"
-	fi
-else
-
-	if [ "$SYS_NAME" -gt "90" ];then
-		SYS_NAME="90"
-	fi
-
-	if [ "$SYS_NAME" -lt "70" ];then
-		SYS_NAME="70"
-	fi
-fi
-
+SYS_NAME=90
 MG_DIR=$serverPath/source/mongodb
 mkdir -p $MG_DIR
 
