@@ -12,13 +12,9 @@ VERSION=6.0.19
 SYS_ARCH=`arch`
 
 SYS_VERSION_ID=`cat /etc/*-release | grep VERSION_ID | awk -F = '{print $2}' | awk -F "\"" '{print $2}' | awk -F . '{print $1}'`
-
+SYS_BID=${SYS_VERSION_ID/./}
 SYS_NAME="15"
-if [ "$SYS_VERSION_ID" -gt "15" ];then
-	SYS_NAME="15"
-fi
-
-if [ "$SYS_NAME" -lt "12" ];then
+if [ "$SYS_BID" -lt "12" ];then
 	SYS_NAME="12"
 fi
 

@@ -17,15 +17,12 @@ if [ "$SYS_ARCH" != "x86_64" ];then
 fi
 
 SYS_VERSION_ID=`cat /etc/*-release | grep VERSION_ID | awk -F = '{print $2}' | awk -F "\"" '{print $2}' | awk -F . '{print $1}'`
-
+SYS_BID=${SYS_VERSION_ID/./}
 SYS_NAME="15"
-if [ "$SYS_VERSION_ID" -gt "15" ];then
-	SYS_NAME="15"
-fi
-
-if [ "$SYS_NAME" -lt "12" ];then
+if [ "$SYS_BID" -lt "12" ];then
 	SYS_NAME="12"
 fi
+
 
 # https://fastdl.mongodb.org/linux/mongodb-linux-x86_64-suse15-4.4.23.tgz
 # https://fastdl.mongodb.org/linux/mongodb-linux-x86_64-suse12-4.4.23.tgz
