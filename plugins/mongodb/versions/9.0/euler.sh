@@ -23,8 +23,12 @@ FILE_NAME=mongodb-linux-${SYS_ARCH}-rhel${SYS_NAME}-${VERSION}
 FILE_NAME_TGZ=${FILE_NAME}.tgz
 
 if [ ! -f $MG_DIR/${FILE_NAME_TGZ} ]; then
-	wget --no-check-certificate -O $MG_DIR/${FILE_NAME_TGZ} https://fastdl.mongodb.org/linux/${FILE_NAME_TGZ}
-	echo "wget --no-check-certificate -O $MG_DIR/${FILE_NAME_TGZ} https://fastdl.mongodb.org/linux/${FILE_NAME_TGZ}"
+	if wget --no-check-certificate -O $MG_DIR/${FILE_NAME_TGZ} https://fastdl.mongodb.org/linux/${FILE_NAME_TGZ}; then
+	    echo "download $MG_DIR/${FILE_NAME_TGZ} successful!"
+	else
+	    rm -f $MG_DIR/${FILE_NAME_TGZ}   # 失败则删除
+	    echo "download $MG_DIR/${FILE_NAME_TGZ} failed: Incomplete file deleted"
+	fi
 fi
 
 if [ ! -d $MG_DIR/${FILE_NAME} ];then 
