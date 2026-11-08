@@ -21,7 +21,7 @@ fi
 echo "SSH PORT:${SSH_PORT}"
 
 yum install -y wget
-yum install -y lsof crontabs
+yum install -y lsof
 yum install -y crontabs
 yum install -y rar 
 yum install -y unrar
