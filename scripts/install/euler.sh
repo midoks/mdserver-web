@@ -20,8 +20,11 @@ if [ "$SSH_PORT" = "" ];then
 fi
 echo "SSH PORT:${SSH_PORT}"
 
-yum install -y wget lsof crontabs
-yum install -y rar unrar
+yum install -y wget
+yum install -y lsof crontabs
+yum install -y crontabs
+yum install -y rar 
+yum install -y unrar
 yum install -y python3-devel
 yum install -y python3-pip
 yum install -y python-devel
@@ -45,7 +48,7 @@ yum install -y vim-common
 yum install -y libudev-devel
 yum install -y git
 yum install -y libatomic
-yum install -y libatomic-devel
+yum install -y libatomic-dev
 
 
 # if [ -f /usr/sbin/iptables ];then
