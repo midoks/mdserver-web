@@ -44,6 +44,9 @@ yum install -y brotli-devel
 yum install -y vim-common
 yum install -y libudev-devel
 yum install -y git
+yum install -y libatomic
+yum install -y libatomic-devel
+
 
 # if [ -f /usr/sbin/iptables ];then
 
