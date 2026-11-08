@@ -2,6 +2,31 @@
 PATH=/bin:/sbin:/usr/bin:/usr/sbin:/usr/local/bin:/usr/local/sbin:~/bin:/opt/homebrew/bin
 export PATH
 
+# 安全下载:先写入临时文件,成功后原子重命名,避免下载失败残留不完整文件导致重试被跳过
+download() {
+    local url="$1"
+    local out="$2"
+    if [ -f "$out" ]; then
+        return 0
+    fi
+    local tmp="${out}.downloading"
+    rm -f "$tmp"
+    if command -v wget >/dev/null 2>&1; then
+        wget --no-check-certificate -O "$tmp" "$url"
+    else
+        curl -fLk -o "$tmp" "$url"
+    fi
+    if [ $? -ne 0 ] || [ ! -s "$tmp" ]; then
+        rm -f "$tmp"
+        echo "download failed: $url"
+        return 1
+    fi
+    mv -f "$tmp" "$out"
+    echo "download $out successful!"
+    return 0
+}
+
+
 curPath=`pwd`
 rootPath=$(dirname "$curPath")
 rootPath=$(dirname "$rootPath")
@@ -13,10 +38,7 @@ VERSION=4.4.23
 MG_DIR=$serverPath/source/mongodb
 mkdir -p $MG_DIR
 
-if [ ! -f $MG_DIR/mongodb-macos-x86_64-${VERSION}.tgz ]; then
-	wget --no-check-certificate -O $MG_DIR/mongodb-macos-x86_64-${VERSION}.tgz https://fastdl.mongodb.org/osx/mongodb-macos-x86_64-${VERSION}.tgz
-	echo "wget --no-check-certificate -O $MG_DIR/mongodb-macos-x86_64-${VERSION}.tgz https://fastdl.mongodb.org/osx/mongodb-macos-x86_64-${VERSION}.tgz"
-fi
+download "https://fastdl.mongodb.org/osx/mongodb-macos-x86_64-${VERSION}.tgz" "$MG_DIR/mongodb-macos-x86_64-${VERSION}.tgz"
 
 if [ ! -d $MG_DIR/mongodb-macos-x86_64-${VERSION} ];then 
 	cd $MG_DIR && tar -zxvf mongodb-macos-x86_64-${VERSION}.tgz
@@ -38,10 +60,7 @@ if [ "arm64" = ${SYS_ARCH} ];then
 	TOOL_FILE_NAME=mongosh-${TOOL_VERSION}-darwin-arm64
 fi
 TOOL_FILE_NAME_TGZ=${TOOL_FILE_NAME}.zip
-if [ ! -f $MG_DIR/${TOOL_FILE_NAME_TGZ} ]; then
-	wget --no-check-certificate -O $MG_DIR/${TOOL_FILE_NAME_TGZ} https://downloads.mongodb.com/compass/${TOOL_FILE_NAME_TGZ}
-	echo "wget --no-check-certificate -O $MG_DIR/${TOOL_FILE_NAME_TGZ} https://downloads.mongodb.com/compass/${TOOL_FILE_NAME_TGZ}"
-fi
+download "https://downloads.mongodb.com/compass/${TOOL_FILE_NAME_TGZ}" "$MG_DIR/${TOOL_FILE_NAME_TGZ}"
 
 if [ ! -d $MG_DIR/${TOOL_FILE_NAME_TGZ} ];then 
 	cd $MG_DIR && unzip ${TOOL_FILE_NAME_TGZ}
@@ -63,10 +82,7 @@ if [ "arm64" = ${SYS_ARCH} ];then
 fi
 
 TOOL_FILE_NAME_TGZ=${TOOL_FILE_NAME}.zip
-if [ ! -f $MG_DIR/${TOOL_FILE_NAME_TGZ} ]; then
-	wget --no-check-certificate -O $MG_DIR/${TOOL_FILE_NAME_TGZ} https://fastdl.mongodb.org/tools/db/${TOOL_FILE_NAME_TGZ}
-	echo "wget --no-check-certificate -O $MG_DIR/${TOOL_FILE_NAME_TGZ} https://fastdl.mongodb.org/tools/db/${TOOL_FILE_NAME_TGZ}"
-fi
+download "https://fastdl.mongodb.org/tools/db/${TOOL_FILE_NAME_TGZ}" "$MG_DIR/${TOOL_FILE_NAME_TGZ}"
 
 if [ ! -d $MG_DIR/${TOOL_FILE_NAME_TGZ} ];then 
 	cd $MG_DIR && unzip ${TOOL_FILE_NAME_TGZ}
