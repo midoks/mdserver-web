@@ -12,14 +12,24 @@ LANG=en_US.UTF-8
 zypper install -y htop
 # for debug end
 
-zypper install -y openssl openssl-devel
-zypper install -y bison re2c make cmake gcc
+zypper install -y openssl
+zypper install -y openssl-devel
+zypper install -y libopenssl-devel
+
+zypper install -y bison
+zypper install -y flex
+zypper install -y re2c
+zypper install -y make
+zypper install -y cmake
+zypper install -y gcc
 zypper install -y gcc-c++
 zypper install -y autoconf
+
 zypper install -y python3-pip
 zypper install -y pcre pcre-devel
 zypper install -y graphviz libxml2 libxml2-devel
-zypper install -y curl curl-devel
+zypper install -y curl
+zypper install -y curl-devel
 zypper install -y freetype freetype-devel
 zypper install -y mysql-devel
 zypper install -y ImageMagick ImageMagick-devel
@@ -34,9 +44,12 @@ zypper install -y bc
 zypper install -y bzip2
 
 
-zypper install -y libzip libzip-devel
-zypper install -y unrar rar
-zypper install -y libmemcached libmemcached-devel
+zypper install -y libzip
+zypper install -y libzip-devel
+zypper install -y rar
+zypper install -y unrar
+zypper install -y libmemcached
+zypper install -y libmemcached-devel
 
 zypper install -y icu libicu-devel
 zypper install -y sqlite3 sqlite3-devel
@@ -46,7 +59,8 @@ zypper install -y libudev-devel
 
 # zypper install -y libmcrypt libmcrypt-devel
 # zypper install -y protobuf
-# zypper install -y zlib-devel
+zypper install -y zlib-devel
+zypper install -y readline-devel
 
 zypper install -y python3-devel
 zypper install -y python-devel
@@ -68,14 +82,8 @@ zypper install -y git
 zypper install -y libcurl-devel
 zypper install -y libxml2-devel
 zypper install -y libxslt-devel
-
-zypper install -y flex
-zypper install -y bison
-zypper install -y libopenssl-devel
 zypper install -y perl
 zypper install -y perl-devel
-zypper install -y gcc gcc-c++ make \
-  readline-devel zlib-devel
 # zypper install -y  php-config
 
 SSH_PORT=`netstat -ntpl|grep sshd|grep -v grep | sed -n "1,1p" | awk '{print $4}' | awk -F : '{print $2}'`
