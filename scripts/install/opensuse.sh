@@ -68,6 +68,14 @@ zypper install -y git
 zypper install -y libcurl-devel
 zypper install -y libxml2-devel
 zypper install -y libxslt-devel
+
+zypper install -y flex
+zypper install -y bison
+zypper install -y libopenssl-devel
+zypper install -y perl
+zypper install -y perl-devel
+zypper install -y gcc gcc-c++ make \
+  readline-devel zlib-devel
 # zypper install -y  php-config
 
 SSH_PORT=`netstat -ntpl|grep sshd|grep -v grep | sed -n "1,1p" | awk '{print $4}' | awk -F : '{print $2}'`
