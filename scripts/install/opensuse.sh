@@ -65,6 +65,9 @@ zypper install -y sshpass
 zypper install -y brotli-devel
 zypper install -y git
 
+zypper install -y libcurl-devel
+zypper install -y libxml2-devel
+zypper install -y libxslt-devel
 # zypper install -y  php-config
 
 SSH_PORT=`netstat -ntpl|grep sshd|grep -v grep | sed -n "1,1p" | awk '{print $4}' | awk -F : '{print $2}'`
