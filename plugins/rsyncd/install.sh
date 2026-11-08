@@ -2,6 +2,7 @@
 PATH=/bin:/sbin:/usr/bin:/usr/sbin:/usr/local/bin:/usr/local/sbin:~/bin
 export PATH
 
+# cd /www/server/mdserver-web/plugins/rsyncd && bash install.sh install 2.0
 
 curPath=`pwd`
 rootPath=$(dirname "$curPath")
@@ -44,6 +45,10 @@ Install_rsyncd()
 	elif [[ "$OSNAME" = "macos" ]]; then
 		# brew install rsync
 		# brew install lsyncd
+		echo "ok"
+	elif [[ "$OSNAME" = "opensuse" ]]; then
+		zypper install -y rsync
+		zypper install -y rsync
 		echo "ok"
 	else
 		yum install -y rsync
