@@ -27,10 +27,11 @@ Install_App()
 
 	if grep -qi '^ID=ubuntu' /etc/os-release; then
 	    sh -x $curPath/versions/${VERSION}/ubuntu.sh $action $VERSION
-	fi
-
-	if grep -qi '^ID=debian' /etc/os-release; then
+	elif grep -qi '^ID=debian' /etc/os-release; then
 	    sh -x $curPath/versions/${VERSION}/debian.sh $action $VERSION
+	else
+		echo "not support!!"
+		exit 1
 	fi
 
 	# apt -y update
