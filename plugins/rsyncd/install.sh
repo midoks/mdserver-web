@@ -48,7 +48,7 @@ Install_rsyncd()
 		echo "ok"
 	elif [[ "$OSNAME" = "opensuse" ]]; then
 		zypper install -y rsync
-		zypper install -y rsync
+		zypper install -y lsyncd
 		echo "ok"
 	else
 		yum install -y rsync
