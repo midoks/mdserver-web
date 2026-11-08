@@ -50,8 +50,7 @@ Install_app()
 	echo '正在安装脚本文件...'
 	mkdir -p $serverPath/source
 
-	cd ${rootPath}/plugins/php/lib && /bin/bash openssl_11.sh
-
+	cd ${rootPath}/plugins/php/lib && bash openssl_11.sh
 	shell_file=${curPath}/versions/${VERSION}/${OSNAME}.sh
 
 	if [ -f $shell_file ];then
