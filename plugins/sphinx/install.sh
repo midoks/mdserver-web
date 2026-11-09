@@ -2,6 +2,30 @@
 PATH=/bin:/sbin:/usr/bin:/usr/sbin:/usr/local/bin:/usr/local/sbin:~/bin:/opt/homebrew/bin
 export PATH
 
+download() {
+    local url="$1"
+    local out="$2"
+    if [ -f "$out" ]; then
+        return 0
+    fi
+    local tmp="${out}.downloading"
+    rm -f "$tmp"
+    if command -v wget >/dev/null 2>&1; then
+        wget --no-check-certificate -O "$tmp" "$url"
+    else
+        curl -fLk -o "$tmp" "$url"
+    fi
+    if [ $? -ne 0 ] || [ ! -s "$tmp" ]; then
+        rm -f "$tmp"
+        echo "download failed: $url"
+        return 1
+    fi
+    mv -f "$tmp" "$out"
+    echo "download $out successful!"
+    return 0
+}
+
+
 curPath=`pwd`
 rootPath=$(dirname "$curPath")
 rootPath=$(dirname "$rootPath")
@@ -137,7 +161,8 @@ Install_sphinx()
 	# curl -sSLo ${SPHINX_DIR}/${FILE_TGZ} http://sphinxsearch.com/files/${FILE_TGZ}
 	if [ ! -f ${SPHINX_DIR}/${FILE_TGZ} ];then
 		# https://github.com/mw-plugin/sphinx/releases/download/init/sphinx-3.1.1-612d99f-darwin-amd64.tar.gz
-		wget --no-check-certificate -O ${SPHINX_DIR}/${FILE_TGZ} https://github.com/mw-plugin/sphinx/releases/download/init/${FILE_TGZ}
+		download "https://github.com/mw-plugin/sphinx/releases/download/init/${FILE_TGZ}" ${SPHINX_DIR}/${FILE_TGZ}
+		# wget --no-check-certificate -O ${SPHINX_DIR}/${FILE_TGZ} https://github.com/mw-plugin/sphinx/releases/download/init/${FILE_TGZ}
 		# wget --no-check-certificate -O ${SPHINX_DIR}/${FILE_TGZ} http://sphinxsearch.com/files/${FILE_TGZ}
 	fi
 
