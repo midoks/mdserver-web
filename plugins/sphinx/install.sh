@@ -61,8 +61,8 @@ if [ "${OSNAME}" = "centos" ] ||
 	yum install -y postgresql-libs unixODBC
 fi
 
-# http://sphinxsearch.com/files/sphinx-3.1.1-da9f8a4-linux-amd64.tar.gz
-
+# http://sphinxsearch.com/files/sphinx-3.1.1-612d99f-linux-amd64.tar.gz
+# https://github.com/mw-plugin/sphinx/releases/download/init/sphinx-3.1.1-612d99f-linux-amd64.tar.gz
 VERSION=$2
 
 # echo $VERSION
