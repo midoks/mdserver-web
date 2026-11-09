@@ -37,7 +37,7 @@ if [ "${OSNAME}" = "centos" ] ||
 	yum install -y postgresql-libs unixODBC
 fi
 
-# http://sphinxsearch.com/files/sphinx-3.7.1-da9f8a4-linux-amd64.tar.gz
+# http://sphinxsearch.com/files/sphinx-3.1.1-da9f8a4-linux-amd64.tar.gz
 
 VERSION=$2
 
@@ -136,7 +136,9 @@ Install_sphinx()
 	echo $FILE_TGZ
 	# curl -sSLo ${SPHINX_DIR}/${FILE_TGZ} http://sphinxsearch.com/files/${FILE_TGZ}
 	if [ ! -f ${SPHINX_DIR}/${FILE_TGZ} ];then
-		wget --no-check-certificate -O ${SPHINX_DIR}/${FILE_TGZ} http://sphinxsearch.com/files/${FILE_TGZ}
+		# https://github.com/mw-plugin/sphinx/releases/download/init/sphinx-3.1.1-612d99f-darwin-amd64.tar.gz
+		wget --no-check-certificate -O ${SPHINX_DIR}/${FILE_TGZ} https://github.com/mw-plugin/sphinx/releases/download/init/${FILE_TGZ}
+		# wget --no-check-certificate -O ${SPHINX_DIR}/${FILE_TGZ} http://sphinxsearch.com/files/${FILE_TGZ}
 	fi
 
 	if [ ! -f ${SPHINX_DIR}/${FILE_TGZ} ];then
