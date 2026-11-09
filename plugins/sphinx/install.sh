@@ -2,6 +2,7 @@
 PATH=/bin:/sbin:/usr/bin:/usr/sbin:/usr/local/bin:/usr/local/sbin:~/bin:/opt/homebrew/bin
 export PATH
 
+# "3.2.1","3.3.1","3.4.1","3.5.1","3.6.1","3.7.1","3.8.1"
 download() {
     local url="$1"
     local out="$2"
