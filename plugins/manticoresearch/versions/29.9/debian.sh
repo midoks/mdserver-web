@@ -52,7 +52,7 @@ Install_App()
 	case "$VERSION_ID" in
 		'11') Install_bullseye;;
 		'12') ;;
-	    '13') Install_jammy;;
+	    '13') Install_bookworm;;
 		'*') Install_none;;
 	esac
 
