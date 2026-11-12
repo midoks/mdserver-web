@@ -2695,34 +2695,34 @@ function masterOrSlaveConf(version=''){
                     sql_io_status = true;
                 }
 
-                if (mdb_ver >= 8){
-                    if (v['Replica_SQL_Running'] == 'Yes' && v['Replica_IO_Running'] == 'Yes'){
-                        status = "正常";
-                    }
+                if (v['Slave_SQL_Running'] == 'Yes' && v['Slave_IO_Running'] == 'Yes'){
+                    sql_io_status = true;
+                }
 
-                    list += '<tr>';
+                if (sql_io_status && rdata.data[i]['Seconds_Behind_Master'] < 5){
+                    status = "正常";
+                }
+
+
+                list += '<tr>';
+                if (mdb_ver >= 8){
                     list += '<td>' + rdata.data[i]['Source_Host'] +'</td>';
                     list += '<td>' + rdata.data[i]['Source_Port'] +'</td>';
                     list += '<td>' + rdata.data[i]['Source_User'] +'</td>';
                     list += '<td>' + rdata.data[i]['Relay_Source_Log_File'] +'</td>';
                     list += '<td>' + rdata.data[i]['Replica_IO_Running'] +'</td>';
                     list += '<td>' + rdata.data[i]['Replica_SQL_Running'] +'</td>';
-                    list += '<td>' + rdata.data[i]['Seconds_Behind_Master'] +'</td>';
 
-                } else {
-                    if (v['Slave_SQL_Running'] == 'Yes' && v['Slave_IO_Running'] == 'Yes'){
-                        status = "正常";
-                    }
-
-                    list += '<tr>';
+                } else {            
                     list += '<td>' + rdata.data[i]['Master_Host'] +'</td>';
                     list += '<td>' + rdata.data[i]['Master_Port'] +'</td>';
                     list += '<td>' + rdata.data[i]['Master_User'] +'</td>';
                     list += '<td>' + rdata.data[i]['Master_Log_File'] +'</td>';
                     list += '<td>' + rdata.data[i]['Slave_IO_Running'] +'</td>';
                     list += '<td>' + rdata.data[i]['Slave_SQL_Running'] +'</td>';
-                    list += '<td>' + rdata.data[i]['Seconds_Behind_Master'] +'</td>';
                 }
+                list += '<td>' + '<a href="javascript:;" class="btlink btn_delay_slave">' + rdata.data[i]['Seconds_Behind_Master'] +'</a></td>';
+
 
                 if (isHasSign){
                     list += '<td>' + v['Channel_Name'] +'</td>';
