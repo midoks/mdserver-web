@@ -726,6 +726,11 @@ def stop(version=''):
 
 
 def restart(version=''):
+
+    slow_log = getServerDir() + "/data/mysql-slow.log"
+    if os.path.exists(slow_log):
+        mw.writeFile(slow_log, '')
+
     return appCMD(version, 'restart')
 
 
