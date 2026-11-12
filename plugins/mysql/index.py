@@ -3415,6 +3415,7 @@ def setSlaveStatus(version=''):
     pdb = pMysqlDb()
 
     slave_name = getSlaveName()
+    cmd = 'show '+slave_name+' status'
     dlist = pdb.query(cmd)
     if len(dlist) == 0:
         return mw.returnJson(False, '需要手动添加同步账户或者执行初始化!')
