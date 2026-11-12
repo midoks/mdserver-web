@@ -2689,6 +2689,12 @@ function masterOrSlaveConf(version=''){
                 }
 
                 var status = "<a data-id="+i+"  class='btlink db_error'>异常</>";
+
+                var sql_io_status = false;
+                if (v['Replica_SQL_Running'] == 'Yes' && v['Replica_IO_Running'] == 'Yes'){
+                    sql_io_status = true;
+                }
+
                 if (mdb_ver >= 8){
                     if (v['Replica_SQL_Running'] == 'Yes' && v['Replica_IO_Running'] == 'Yes'){
                         status = "正常";
@@ -2701,6 +2707,7 @@ function masterOrSlaveConf(version=''){
                     list += '<td>' + rdata.data[i]['Relay_Source_Log_File'] +'</td>';
                     list += '<td>' + rdata.data[i]['Replica_IO_Running'] +'</td>';
                     list += '<td>' + rdata.data[i]['Replica_SQL_Running'] +'</td>';
+                    list += '<td>' + rdata.data[i]['Seconds_Behind_Master'] +'</td>';
 
                 } else {
                     if (v['Slave_SQL_Running'] == 'Yes' && v['Slave_IO_Running'] == 'Yes'){
@@ -2714,6 +2721,7 @@ function masterOrSlaveConf(version=''){
                     list += '<td>' + rdata.data[i]['Master_Log_File'] +'</td>';
                     list += '<td>' + rdata.data[i]['Slave_IO_Running'] +'</td>';
                     list += '<td>' + rdata.data[i]['Slave_SQL_Running'] +'</td>';
+                    list += '<td>' + rdata.data[i]['Seconds_Behind_Master'] +'</td>';
                 }
 
                 if (isHasSign){
@@ -2742,6 +2750,7 @@ function masterOrSlaveConf(version=''){
                         <th>日志</th>\
                         <th>IO</th>\
                         <th>SQL</th>\
+                        <th>延迟</th>\
                         '+signThead_th+'\
                         <th>状态</th>\
                         <th style="text-align:right;">操作</th></tr></thead>\
