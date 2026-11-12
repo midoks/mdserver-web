@@ -3653,7 +3653,22 @@ def syncDatabaseRepair(version=''):
             table_name_pos_file = tmp_dir+'/'+table_name+'.pos.txt'
             primary_key_sql = "SHOW INDEX FROM "+table_name+" WHERE Key_name = 'PRIMARY';";
             primary_key_data = local_db.query(primary_key_sql)
-            pkey_name = primary_key_data[0]['Column_name']
+            pkey_name = ''
+            if len(primary_key_data) == 1:
+                pkey_name = primary_key_data[0]['Column_name']
+            else:
+                # 没有单列主键时,退化为单列唯一索引
+                unique_key_sql = "SHOW INDEX FROM "+table_name+" WHERE Non_unique = 0"
+                unique_key_data = local_db.query(unique_key_sql)
+                if len(unique_key_data) == 1:
+                    pkey_name = unique_key_data[0]['Column_name']
+                    print(table_name+' use unique key: '+pkey_name)
+
+            if pkey_name == '':
+                # 没有可用主键/唯一索引,无法按主键分页同步,跳过后续处理
+                print(table_name+' no primary/unique key, skip repair.')
+                mw.writeFile(tmp_log, table_name+' no primary/unique key, skip repair.\n','a+')
+                break
 
             if os.path.exists(table_name_pos_file):
                 table_name_pos = mw.readFile(table_name_pos_file)
