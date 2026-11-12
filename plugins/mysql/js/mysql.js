@@ -2721,7 +2721,13 @@ function masterOrSlaveConf(version=''){
                     list += '<td>' + rdata.data[i]['Slave_IO_Running'] +'</td>';
                     list += '<td>' + rdata.data[i]['Slave_SQL_Running'] +'</td>';
                 }
-                list += '<td>' + '<a href="javascript:;" class="btlink btn_delay_slave">' + rdata.data[i]['Seconds_Behind_Master'] +'</a></td>';
+
+                if (rdata.data[i]['Seconds_Behind_Master'] == 0){
+                    list += '<td>' + rdata.data[i]['Seconds_Behind_Master'] + '</td>';
+                } else {
+                    list += '<td>' + '<a href="javascript:;" class="btlink btn_delay_slave">' + rdata.data[i]['Seconds_Behind_Master'] +'</a></td>';
+                }
+                
 
 
                 if (isHasSign){
@@ -2774,6 +2780,10 @@ function masterOrSlaveConf(version=''){
                 } else{
                     deleteSlave();
                 }
+            });
+
+            $(".btn_delay_slave").click(function(){
+                
             });
 
              $('.db_error').click(function(){
