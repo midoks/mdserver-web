@@ -727,7 +727,7 @@ def stop(version=''):
 
 def restart(version=''):
 
-    slow_log = getServerDir() + "/data/mysql-slow.log"
+    slow_log = getShowLogFile()
     if os.path.exists(slow_log):
         mw.writeFile(slow_log, '')
 
