@@ -442,6 +442,12 @@ def getMdb8Ver():
 
 def getSlaveName():
     mdb8 = getMdb8Ver()
+
+    version = "5.6"
+    version_pl = getServerDir() + "/version.pl"
+    if os.path.exists(version_pl):
+        version = mw.readFile(version_pl).strip()
+        
     if mw.inArray(mdb8, version):
         return 'replica'
     return 'slave'

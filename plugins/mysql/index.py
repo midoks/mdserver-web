@@ -463,6 +463,11 @@ def getMdb8Ver():
 
 def getSlaveName():
     mdb8 = getMdb8Ver()
+    version = "5.6"
+    version_pl = getServerDir() + "/version.pl"
+    if os.path.exists(version_pl):
+        version = mw.readFile(version_pl).strip()
+
     if mw.inArray(mdb8, version):
         return 'replica'
     return 'slave'
@@ -3107,14 +3112,11 @@ def updateSlaveSSH(version=''):
 
 
 def getSlaveList(version=''):
-
-    query_status_cmd = 'show slave status'
-    mdb8 = getMdb8Ver()
-    if mw.inArray(mdb8, version):
-        query_status_cmd = 'show replica status'
-
     if status(version) == 'stop':
         return mw.returnJson(False, 'MySQL未启动', [])
+
+    slave_name = getSlaveNameByVer(version)
+    query_status_cmd = 'show '+slave_name+' status'
 
     db = pMysqlDb()
     dlist = db.query(query_status_cmd)
@@ -3261,7 +3263,7 @@ def initSlaveStatusSyncUser(version=''):
     if len(slave_data) < 1:
         return mw.returnJson(False, '需要先添加同步用户配置!')
 
-    slave_name = getSlaveName()
+    slave_name = getSlaveNameByVer(version)
     # print(data)
     try:
         pdb = pMysqlDb()
@@ -3337,7 +3339,7 @@ def initSlaveStatusSyncUser(version=''):
 
 
 def initSlaveStatusSSH(version=''):
-    slave_name = getSlaveName()
+    slave_name = getSlaveNameByVer(version)
     db = pMysqlDb()
     dlist = db.query('show '+slave_name+' status')
 
@@ -3419,7 +3421,7 @@ def setSlaveStatus(version=''):
     mode = mw.readFile(mode_file)
     pdb = pMysqlDb()
 
-    slave_name = getSlaveName()
+    slave_name = getSlaveNameByVer(version)
     cmd = 'show '+slave_name+' status'
     dlist = pdb.query(cmd)
     if len(dlist) == 0:
