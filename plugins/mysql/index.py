@@ -3668,7 +3668,7 @@ def syncDatabaseRepair(version=''):
                 # 没有可用主键/唯一索引,无法按主键分页同步,跳过后续处理
                 print(table_name+' no primary/unique key, skip repair.')
                 mw.writeFile(tmp_log, table_name+' no primary/unique key, skip repair.\n','a+')
-                break
+                continue
 
             if os.path.exists(table_name_pos_file):
                 table_name_pos = mw.readFile(table_name_pos_file)
