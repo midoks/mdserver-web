@@ -3655,7 +3655,8 @@ def doFullSyncUserImportContentForChannel(file, channel_name):
 def doFullSyncUser(version=''):
     which_pv = mw.execShell('which pv')
     is_exist_pv = False
-    if os.path.exists(which_pv[0]):
+    pv_path = which_pv[0].strip()
+    if os.path.exists(pv_path):
         is_exist_pv = True
 
     time_all_s = time.time()
