@@ -3876,6 +3876,8 @@ def doFullSyncUser(version=''):
     if os.path.exists(which_pv[0]):
         is_exist_pv = True
 
+    print("is_exist_pv:",is_exist_pv)
+
     time_all_s = time.time()
     args = getArgs()
     data = checkArgs(args, ['db', 'sign'])
