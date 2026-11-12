@@ -3547,6 +3547,18 @@ def syncDatabaseRepair(version=''):
     tmp_log = syncDatabaseRepairTempFile()
 
     from pymysql.converters import escape_string
+
+    # 主键值格式化:字符串类型主键必须加引号并转义,否则拼出的SQL会语法错误
+    def format_pk_value(value):
+        if isinstance(value, (int, float)) and not isinstance(value, bool):
+            return str(value)
+        v = str(value)
+        try:
+            float(v)
+            return v
+        except ValueError:
+            return "'" + escape_string(v) + "'"
+
     args = getArgs()
     data = checkArgs(args, ['db','sign'])
     if not data[0]:
@@ -3590,7 +3602,7 @@ def syncDatabaseRepair(version=''):
             # print(cmd_local_newpk_data)
             if len(cmd_local_newpk_data) == 1:
                 # 比较总数
-                cmd_count_sql = 'select count('+pkey_name+') as num from '+table_name + ' where '+pkey_name + ' <= '+ str(cmd_local_newpk_data[0][pkey_name])
+                cmd_count_sql = 'select count('+pkey_name+') as num from '+table_name + ' where '+pkey_name + ' <= '+ format_pk_value(cmd_local_newpk_data[0][pkey_name])
                 local_count_data = local_db.query(cmd_count_sql)
                 sync_count_data = sync_db.query(cmd_count_sql)
 
@@ -3647,7 +3659,7 @@ def syncDatabaseRepair(version=''):
                 table_name_pos = mw.readFile(table_name_pos_file)
             
 
-            data_select_sql = 'select * from '+table_name + ' where '+pkey_name+' > '+str(table_name_pos)+' limit 10000'
+            data_select_sql = 'select * from '+table_name + ' where '+pkey_name+' > '+format_pk_value(table_name_pos)+' limit 10000'
             print(data_select_sql)
             local_select_data = local_db.query(data_select_sql)
 
@@ -3689,8 +3701,10 @@ def syncDatabaseRepair(version=''):
                 # print(table_name,data_count)
                 pos = local_select_data[data_count-1][pkey_name]
                 print('pos',pos)
-                progress = pos/sync_count_data[0]['num']
-                print('progress,%.2f' % progress+'%')
+                # 字符串主键无法计算进度百分比
+                if isinstance(pos, (int, float)) and not isinstance(pos, bool):
+                    progress = pos/sync_count_data[0]['num']
+                    print('progress,%.2f' % progress+'%')
                 mw.writeFile(table_name_pos_file, str(pos))
             else:
                 sync_select_data_len = len(sync_select_data)
@@ -3708,7 +3722,7 @@ def syncDatabaseRepair(version=''):
                             mw.writeFile(table_name_pos_file, str(pos))
 
                         # print(insert_data)
-                        local_inquery_sql = 'select * from ' + table_name+ ' where ' +pkey_name+' = '+ str(sync_idx_data[pkey_name])
+                        local_inquery_sql = 'select * from ' + table_name+ ' where ' +pkey_name+' = '+ format_pk_value(sync_idx_data[pkey_name])
                         # print(local_inquery_sql)
                         ldata = local_db.query(local_inquery_sql)
                         # print('ldata:',ldata)
@@ -3740,7 +3754,7 @@ def syncDatabaseRepair(version=''):
                                     continue
                                 field_str += '`'+field+'`=\''+escape_string(str(sync_idx_data[field]))+'\','
                             field_str = field_str.strip(',')
-                            update_sql = update_sql+' set '+field_str+' where '+pkey_name+'=\''+str(sync_idx_data[pkey_name])+'\';'
+                            update_sql = update_sql+' set '+field_str+' where '+pkey_name+'='+format_pk_value(sync_idx_data[pkey_name])+';'
                             print(update_sql)
                             r = local_db.execute(update_sql)
                             print(r)
