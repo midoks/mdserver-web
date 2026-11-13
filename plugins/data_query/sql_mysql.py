@@ -737,6 +737,31 @@ class nosqlMySQLCtr():
             msg += 'MySQL Replication Health is NOT OK!'
             return mw.returnData(True, 'ok', msg)
 
+    def getSlaveRuntime(self, args):
+        sid = args['sid']
+        my_instance, err = self._connect(sid)
+        if err:
+            return err
+
+        try:
+            slave_data = my_instance.query('SHOW REPLICA STATUS')
+        except Exception:
+            # 兼容 MySQL 8.0.22 以下及旧版 MariaDB
+            try:
+                slave_data = my_instance.query('SHOW SLAVE STATUS')
+            except Exception as e:
+                return mw.returnData(False, '获取主从状态失败: ' + str(e))
+        if slave_data is None or len(slave_data) == 0:
+            return mw.returnData(False, 'ok', '未开启从库!')
+        # print(slave_data)
+
+        time_unix = int(time.time())
+        data = {
+            'time':time_unix,
+            'data':slave_data[0],
+        }
+        return mw.returnData(True, 'ok', data)
+
 # ---------------------------------- run ----------------------------------
 
 def get_server_list(args):
@@ -828,6 +853,10 @@ def get_deadlock_info(args):
 def get_slave_status(args):
     t = nosqlMySQLCtr()
     return t.getSlaveStatus(args)
+
+def get_slave_runtime(args):
+    t = nosqlMySQLCtr()
+    return t.getSlaveRuntime(args)
 
 
 
