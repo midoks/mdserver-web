@@ -2794,7 +2794,7 @@ function masterOrSlaveConf(version=''){
                                 if (val[0] == "1"){
                                     continue;
                                 }
-                                vaild_exec_data = tmp;
+                                vaild_exec_data = t[i];
                             }
 
                             if (vaild_exec_data == ''){
