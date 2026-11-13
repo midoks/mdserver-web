@@ -1031,7 +1031,7 @@ function mysqlSlaveSyncProgress(){
                     }
 
                     gtid_diff = retrieved_gtid_backlog - executed_gtid_backlog;
-                    
+                    console.log('gtid_diff:',gtid_diff);
                     console.log('data:',data.data);
 
                     xData.push(real_data.time);
