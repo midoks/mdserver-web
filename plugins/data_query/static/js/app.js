@@ -874,6 +874,8 @@ function mysqlSlaveSyncProgress(){
     var html = '<div>';
     html += '<div class="slave_sync_progress" id="slave_sync_progress" style="height:150px;"></div>';
     html += '</div>';
+    var timer = null;
+    var statEc = null;
     layer.open({
         type: 1,
         title: "查看从库延迟进度",
@@ -882,73 +884,22 @@ function mysqlSlaveSyncProgress(){
         shadeClose: false,
         content:'<div class="bt-form pd20">' + html + '</div>',
         success:function(i,l){
-            console.log(i,l);
-            var statEc = echarts.init(document.getElementById('slave_sync_progress'));
+            // console.log(i,l);
+            statEc = echarts.init(document.getElementById('slave_sync_progress'));
 
             var chat = {};
-            var is_compare = false;
-
-            var tmpChatData = {
-                "key":[],
-                "value":[]
-            }
-
-            chat['yAxis'] = [{
-                type: 'value',
-                splitNumber: 5,
-                axisLabel: {
-                    textStyle: {
-                        color: '#a8aab0',
-                        fontStyle: 'normal',
-                        fontFamily: '微软雅黑',
-                        fontSize: 12,
-                    },
-                },
-                axisLine:{
-                    show: false
-                },
-                axisTick:{
-                    show: false
-                },
-                splitLine: {
-                    show: true,
-                    lineStyle: {
-                        color: '#E5E9ED'
-                    }
-                }
-            }];
-
             chat['tooltip'] = {
                 show:true,
                 trigger: 'axis',
                 backgroundColor: 'rgba(255,255,255,0.8)',
-                axisPointer: { // 坐标轴指示器，坐标轴触发有效
-                    type: 'line', // 默认为直线，可选为：'line' | 'shadow'
-                    lineStyle: {
-                        color: 'rgba(150,150,150,0.2)'
-                    }
+                axisPointer: { 
+                    type: 'line',
+                    lineStyle: { color: 'rgba(150,150,150,0.2)'}
                 },
                 textStyle: {
                     color: '#666',
                     fontSize: '14px',
                 },
-                extraCssText: 'width:200px;height:20%;padding:0;box-shadow: 0 0 3px rgba(0, 0, 0, 0.3);"',
-                formatter: function (params) {
-                    var htmlStr = "";
-                    for (var i = 0; i < params.length; i++) {
-                        var tem = params[i].name;
-                        var val = params[i].value;
-                        
-                        htmlStr += '<div style="height:40px;line-height:26px;overflow:hidden;padding:6px 8px;">' +
-                            '<span style="float:left;max-width:160px;overflow:hidden;text-overflow: ellipsis;white-space: nowrap;">' +
-                            '<span style="margin-right:5px;display:inline-block;width:10px;height:10px;border-radius:5px;background-color:' +
-                            params[i].color + ';"></span>' + params[i].seriesName + '</span>' +
-                            '<span style="float:right">' + val + '</span>' + '</div>'
-                    }
-                    var res ='<div><div style="height:40px;line-height:40px;padding:0 8px;background:rgba(237,233,233,0.4)">' +
-                        tem + '<span style="float:right;"></span>' + htmlStr + '</div></div>'
-                    return res;
-                }
             }
 
             var legendName = "xxxjijasdf";
@@ -962,27 +913,11 @@ function mysqlSlaveSyncProgress(){
                     left:'center',
                     top:'94%',
                 },
-                grid: {
-                    bottom: '9%',
-                    containLabel: true,
-                    x: 20,
-                    y: 20,
-                    x2: 20,
-                    y2: 20
-                },
-                xAxis: {
-                    type: 'category',
-                    boundaryGap: false,
-                    boundaryGap: false,
-                    axisTick: {
-                        alignWithLabel: true
-                    },
-                    data: tmpChatData["key"],
-                },
-                yAxis: chat['yAxis'],
+                grid: {x: 20,y: 20,x2: 20,y2: 20},
+                
                 graphic:[{
                     type: 'group',
-                    right: 150,
+                    right: 200,
                     top: 0,
                     z: 100,
                     children: [{
@@ -997,39 +932,47 @@ function mysqlSlaveSyncProgress(){
                         }
                     }]
                 }],
+                xAxis: { type: 'category', boundaryGap: false, data: [],},
+                yAxis: [
+                  { type: 'value', name: '请求量', position: 'left',  scale: true },
+                  { type: 'value', name: '成功率(%)', position: 'right', min: 0, max: 100 },
+                ],
                 series: [
-                {
-                    name:legendName,
-                    data: tmpChatData["value"],
-                    type: 'line',
-                    smooth: true, 
-                    itemStyle: {
-                        normal: {
-                            color:'#3A84FF',
-                            lineStyle: {
-                                color: "#3A84FF",
-                                width:1,
-                            },
-                            areaStyle: { 
-                                color: new echarts.graphic.LinearGradient(0, 1, 0, 0, [{
-                                    offset: 0,
-                                    color: 'rgba(58,132,255,0)'
-                                }, {
-                                    offset: 1,
-                                    color: 'rgba(58,132,255,0.35)'
-                                }]),
-                            }
-                        }
+                    {
+                        name:'同步延迟',
+                        yAxisIndex: 0,
+                        data: [],
+                        type: 'line',
+                        smooth: true,
+                        showSymbol: false,
+                        lineStyle: { color: '#ee6666' },
+                        itemStyle: { color: '#ee6666' },
                     },
-                    areaStyle: {}
-                }
-              ]
+                    {
+                        name:'同步延迟2',
+                        yAxisIndex: 1,
+                        data: [],
+                        type: 'line',
+                        smooth: true,
+                        showSymbol: false,
+                        lineStyle: { color: '#3A84FF' },
+                        itemStyle: { color: '#3A84FF' },
+                    },
+                ]
             };
+            var xData = [''];
+            var yData = ['0'];
             statEc.setOption(option);
-
-            var xData = [];
-            var yData = [];
-            setInterval(function(){
+            statEc.setOption({
+                xAxis: {
+                    data: xData
+                },
+                series: [
+                    { name: "延迟进度", data: yData},
+                    { name: "延迟进度2", data: yData}
+                ]
+            });
+            var timer = setInterval(function(){
                 var sid = mysqlGetSid();
                 myPostCBN('get_slave_runtime',{'sid':sid} ,function(rdata){
                     if (!rdata.status){
@@ -1055,13 +998,18 @@ function mysqlSlaveSyncProgress(){
                         xAxis: {
                             data: xData
                         },
-                        series: [{
-                            name: "延迟进度",
-                            data: yData
-                        }]
+                        series: [
+                            { name: "延迟进度", data: yData},
+                            { name: "延迟进度2", data: yData}
+                        ]
                     });
                 });
             },3000);
+        },
+        // 弹窗关闭后清理定时器与图表实例,避免重复打开产生多个定时器并访问已销毁实例
+        end:function(){
+            if (timer){ clearInterval(timer); timer = null; }
+            if (statEc){ statEc.dispose(); statEc = null; }
         }
     });
 
