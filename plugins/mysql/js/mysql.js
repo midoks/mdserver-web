@@ -2809,7 +2809,11 @@ function masterOrSlaveConf(version=''){
                             }
                         }
 
-                        gtid_diff = retrieved_gtid_backlog - executed_gtid_backlog;
+                        if(retrieved_gtid_backlog == 0){
+                            gtid_diff = 0;
+                        } else {
+                            gtid_diff = retrieved_gtid_backlog - executed_gtid_backlog;
+                        }
                         console.log('gtid_diff:',gtid_diff,retrieved_gtid_backlog,executed_gtid_backlog);
 
                         var last_time = parseTimeToSec(xData[xData.length - 1]);
