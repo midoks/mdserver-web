@@ -2825,6 +2825,7 @@ function masterOrSlaveConf(version=''){
 
                         // 估算多久同步完:时间字符串不能直接相减,先转秒级时间戳
                         var total_second = null;
+                        var exec_per_second = 0;
                         if (last_time !== null && now_time !== null
                             && last_gtid_diff !== null && now_time > last_time){
                             var exec_per_second = (last_gtid_diff - gtid_diff) / (now_time - last_time);
@@ -2862,6 +2863,7 @@ function masterOrSlaveConf(version=''){
                             'GTID积压: ' + gtid_diff
                             + ' | 回放延迟: ' + pd_data + ' bytes'
                             + ' | 秒级延迟: ' + seconds_behind_master
+                            + ' | 同步速度: ' + exec_per_second + '/s'
                             + ' | 预计同步完: ' + (gtid_diff <= 0 ? '已同步' : formatSecond(total_second))
                         );
                     });
