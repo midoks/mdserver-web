@@ -872,14 +872,14 @@ function mysqlCommonFuncSlaveStatus(){
 
 function mysqlSlaveSyncProgress(){
     var html = '<div>';
-    html += '<div class="slave_sync_progress" id="slave_sync_progress" style="width:450px;height:150px;"></div>';
+    html += '<div class="slave_sync_progress" id="slave_sync_progress" style="width:750px;height:400px;"></div>';
     html += '</div>';
     var timer = null;
     var statEc = null;
     layer.open({
         type: 1,
         title: "查看从库延迟进度",
-        area: ['500px', '300px'],
+        area: ['800px', '500px'],
         closeBtn: 1,
         shadeClose: false,
         content:'<div class="bt-form pd20">' + html + '</div>',
@@ -902,9 +902,7 @@ function mysqlSlaveSyncProgress(){
                 },
             }
 
-            var legendName = "xxxjijasdf";
-            chat['legendData'] = ["同步延迟", "回放延迟"];
-
+            chat['legendData'] = ["延迟进度", "回放延迟"];
             var option = {
                 tooltip:chat['tooltip'],
                 backgroundColor:'#fff',
@@ -913,11 +911,10 @@ function mysqlSlaveSyncProgress(){
                     left:'center',
                     top:'94%',
                 },
-                grid: {x: 20,y: 20,x2: 20,y2: 20},
-                
+                // grid: {left: 60, right: 60, top: 70, bottom: 50 },
                 graphic:[{
                     type: 'group',
-                    right: 200,
+                    right: 750,
                     top: 0,
                     z: 100,
                     children: [{
