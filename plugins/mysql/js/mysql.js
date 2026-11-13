@@ -2810,7 +2810,6 @@ function masterOrSlaveConf(version=''){
 
                         gtid_diff = retrieved_gtid_backlog - executed_gtid_backlog;
                         console.log('gtid_diff:',gtid_diff);
-                        console.log('data:',data.data);
 
                         var last_time = parseTimeToSec(xData[xData.length - 1]);
                         var last_gtid_diff = gtidData.length ? gtidData[gtidData.length - 1] : null;
