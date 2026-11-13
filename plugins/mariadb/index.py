@@ -390,6 +390,12 @@ def getShowLogFile():
     tmp = re.search(rep, content)
     return tmp.groups()[0].strip()
 
+def getErrorLogsFile():
+    file = getConf()
+    content = mw.readFile(file)
+    rep = r'log-error\s*=\s*(.*)'
+    tmp = re.search(rep, content)
+    return tmp.groups()[0].strip()
 
 def pGetDbUser():
     if mw.isAppleSystem():
