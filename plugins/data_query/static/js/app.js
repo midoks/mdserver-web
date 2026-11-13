@@ -928,7 +928,7 @@ function mysqlSlaveSyncProgress(){
                     },
                     {
                         name:legend_name[1],
-                        yAxisIndex: 1,
+                        yAxisIndex: 0,
                         data: [],
                         type: 'line',
                         smooth: true,
