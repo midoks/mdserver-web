@@ -487,7 +487,7 @@ def initMariaDbPwd():
         # );
         # FLUSH PRIVILEGES;
         # SQL
-        mw.execShell(drop_root_hostname)
+        mw.execShell(drop_priv_hostname)
     return True
 
 
