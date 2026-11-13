@@ -2788,7 +2788,7 @@ function masterOrSlaveConf(version=''){
                             t = t.split(",");
                             var vaild_exec_data = '';
                             for (var i = 0; i < t.length; i++) {
-                                console.log(t[i]);
+                                console.log("vaild_exec_data:"+i,t[i]);
                                 var tmp = t[i].split(":");
                                 var val = tmp[1].split("-");
                                 if (val[0] == "1"){
