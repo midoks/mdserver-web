@@ -903,37 +903,38 @@ function mysqlSlaveSyncProgress(){
                 },
             }
 
-            legend_name = ["延迟进度", "回放延迟", "GTID差值"];
+            var legend_name = ["延迟进度", "回放延迟", "GTID差值"];
             var option = {
-                tooltip:chat['tooltip'],
+                title: { text: '延迟进度观察', left: 'center', textStyle: { fontSize: 16 } },
+                tooltip: { trigger: 'axis', axisPointer: { type: 'cross' } },
                 backgroundColor:'#fff',
                 legend:{
                     data:legend_name,
-                    left:'center',
-                    top:'94%',
+                    top:30,
                 },
                 // grid: {left: 60, right: 60, top: 70, bottom: 50 },
-                graphic:[{
-                    type: 'group',
-                    right: 750,
-                    top: 0,
-                    z: 100,
-                    children: [{
-                        type: 'text',
-                        left: 'center',
-                        top: 'center',
-                        z: 100,
-                        style: {
-                            fill: '#ccc',
-                            text: "延迟进度",
-                            font: '16px Arial'
-                        }
-                    }]
-                }],
+                // graphic:[{
+                //     type: 'group',
+                //     right: 750,
+                //     top: 0,
+                //     z: 100,
+                //     children: [{
+                //         type: 'text',
+                //         left: 'center',
+                //         top: 'center',
+                //         z: 100,
+                //         style: {
+                //             fill: '#ccc',
+                //             text: "延迟进度",
+                //             font: '16px Arial'
+                //         }
+                //     }]
+                // }],
                 xAxis: { type: 'category', boundaryGap: false, data: [],},
                 yAxis: [
-                  { type: 'value', name: legend_name[0]},
-                  { type: 'value', name: legend_name[1]},
+                  { type: 'value', name: legend_name[0], position: 'left'},
+                  { type: 'value', name: legend_name[1], position: 'right'},
+                  { type: 'value', name: legend_name[2], position: 'right', offset: 60},
                 ],
                 series: [
                     {
@@ -943,8 +944,6 @@ function mysqlSlaveSyncProgress(){
                         type: 'line',
                         smooth: true,
                         showSymbol: false,
-                        lineStyle: { color: '#ee6666' },
-                        itemStyle: { color: '#ee6666' },
                     },
                     {
                         name:legend_name[1],
@@ -953,14 +952,21 @@ function mysqlSlaveSyncProgress(){
                         type: 'line',
                         smooth: true,
                         showSymbol: false,
-                        lineStyle: { color: '#3A84FF' },
-                        itemStyle: { color: '#3A84FF' },
+                    },
+                    {
+                        name:legend_name[2],
+                        yAxisIndex: 2,
+                        data: [],
+                        type: 'bar',
+                        smooth: true,
+                        showSymbol: false,
                     },
                 ]
             };
             var xData = [''];
             var yData = ['0'];
-            var pdData = ['0']
+            var pdData = ['0'];
+            var gtidData = ['0'];
             statEc.setOption(option);
             statEc.setOption({
                 xAxis: {
@@ -968,10 +974,11 @@ function mysqlSlaveSyncProgress(){
                 },
                 series: [
                     { name: legend_name[0], data: yData},
-                    { name: legend_name[1], data: pdData}
+                    { name: legend_name[1], data: pdData},
+                    { name: legend_name[2], data: gtidData},
                 ]
             });
-            var timer = setInterval(function(){
+            timer = setInterval(function(){
                 var sid = mysqlGetSid();
                 myPostCBN('get_slave_runtime',{'sid':sid} ,function(rdata){
                     if (!rdata.status){
@@ -987,6 +994,7 @@ function mysqlSlaveSyncProgress(){
                     var pd_data = my_status['Read_Master_Log_Pos'] - my_status['Exec_Master_Log_Pos'];
                     var retrieved_gtid_backlog = 0;
                     var executed_gtid_backlog = 0;
+                    var gtid_diff = 0;
 
                     var seconds_behind_master = 0;
                     if ('Seconds_Behind_Source' in my_status){
@@ -1002,7 +1010,7 @@ function mysqlSlaveSyncProgress(){
                         t = t.split(":");
                         t = t[1].split("-");
                         console.log("retrieved_gtid_backlog:",t);
-                        retrieved_gtid_backlog = parseInt(t[0]) - parseInt(t[1]);
+                        retrieved_gtid_backlog = parseInt(t[1]) - parseInt(t[0]);
                     }
 
                     // 已执行的GTID集合积压
@@ -1013,20 +1021,30 @@ function mysqlSlaveSyncProgress(){
                         t = t[0].split(":");
                         t = t[1].split("-");
                         console.log("executed_gtid_backlog:",t);
-                        executed_gtid_backlog = parseInt(t[0]) - parseInt(t[1]);
+
+                        if (t[0] == 1){
+                            executed_gtid_backlog = 0;
+                        } else {
+                            executed_gtid_backlog = parseInt(t[1]) - parseInt(t[0]);
+                        }
+                        
                     }
+
+                    gtid_diff = retrieved_gtid_backlog - executed_gtid_backlog;
                     
                     console.log('data:',data.data);
 
                     xData.push(real_data.time);
                     yData.push(seconds_behind_master);
                     pdData.push(pd_data);
+                    gtidData.push(gtid_diff);
                     
 
                     if (xData.length > 20){
                         xData.shift();
                         yData.shift();
                         pdData.shift();
+                        gtidData.shift();
                     }
 
                     statEc.setOption({
@@ -1035,7 +1053,8 @@ function mysqlSlaveSyncProgress(){
                         },
                         series: [
                             { name: legend_name[0], data: yData},
-                            { name: legend_name[1], data: pdData}
+                            { name: legend_name[1], data: pdData},
+                            { name: legend_name[2], data: gtidData},
                         ]
                     });
                 });
