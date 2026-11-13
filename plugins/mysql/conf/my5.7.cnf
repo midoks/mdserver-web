@@ -20,7 +20,7 @@ sql-mode=NO_ENGINE_SUBSTITUTION,STRICT_TRANS_TABLES
 
 explicit_defaults_for_timestamp=true
 default_storage_engine = InnoDB
-
+connect_retry = 10
 
 key_buffer_size = 8M
 table_open_cache = 32
@@ -102,6 +102,7 @@ innodb_log_group_home_dir = {$SERVER_APP_PATH}/data
 innodb_buffer_pool_size = 16M
 innodb_log_file_size = 5M
 innodb_log_buffer_size = 8M
+# slave可改为2,保性能
 innodb_flush_log_at_trx_commit = 1
 innodb_lock_wait_timeout = 120
 innodb_max_dirty_pages_pct = 90

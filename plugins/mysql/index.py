@@ -463,6 +463,11 @@ def getMdb8Ver():
 
 def getSlaveName():
     mdb8 = getMdb8Ver()
+    version = "5.6"
+    version_pl = getServerDir() + "/version.pl"
+    if os.path.exists(version_pl):
+        version = mw.readFile(version_pl).strip()
+
     if mw.inArray(mdb8, version):
         return 'replica'
     return 'slave'
@@ -726,6 +731,15 @@ def stop(version=''):
 
 
 def restart(version=''):
+
+    slow_log = getShowLogFile()
+    if os.path.exists(slow_log):
+        mw.writeFile(slow_log, '')
+
+    error_log = getErrorLog()
+    if os.path.exists(error_log):
+        mw.writeFile(error_log, '')
+
     return appCMD(version, 'restart')
 
 
@@ -3102,14 +3116,11 @@ def updateSlaveSSH(version=''):
 
 
 def getSlaveList(version=''):
-
-    query_status_cmd = 'show slave status'
-    mdb8 = getMdb8Ver()
-    if mw.inArray(mdb8, version):
-        query_status_cmd = 'show replica status'
-
     if status(version) == 'stop':
         return mw.returnJson(False, 'MySQL未启动', [])
+
+    slave_name = getSlaveNameByVer(version)
+    query_status_cmd = 'show '+slave_name+' status'
 
     db = pMysqlDb()
     dlist = db.query(query_status_cmd)
@@ -3117,6 +3128,7 @@ def getSlaveList(version=''):
     # print(dlist)
     data = {}
     data['data'] = dlist
+    data['time'] = mw.getDate()
     return mw.getJson(data)
 
 
@@ -3256,7 +3268,7 @@ def initSlaveStatusSyncUser(version=''):
     if len(slave_data) < 1:
         return mw.returnJson(False, '需要先添加同步用户配置!')
 
-    slave_name = getSlaveName()
+    slave_name = getSlaveNameByVer(version)
     # print(data)
     try:
         pdb = pMysqlDb()
@@ -3332,7 +3344,7 @@ def initSlaveStatusSyncUser(version=''):
 
 
 def initSlaveStatusSSH(version=''):
-    slave_name = getSlaveName()
+    slave_name = getSlaveNameByVer(version)
     db = pMysqlDb()
     dlist = db.query('show '+slave_name+' status')
 
@@ -3414,7 +3426,7 @@ def setSlaveStatus(version=''):
     mode = mw.readFile(mode_file)
     pdb = pMysqlDb()
 
-    slave_name = getSlaveName()
+    slave_name = getSlaveNameByVer(version)
     cmd = 'show '+slave_name+' status'
     dlist = pdb.query(cmd)
     if len(dlist) == 0:
@@ -3653,7 +3665,22 @@ def syncDatabaseRepair(version=''):
             table_name_pos_file = tmp_dir+'/'+table_name+'.pos.txt'
             primary_key_sql = "SHOW INDEX FROM "+table_name+" WHERE Key_name = 'PRIMARY';";
             primary_key_data = local_db.query(primary_key_sql)
-            pkey_name = primary_key_data[0]['Column_name']
+            pkey_name = ''
+            if len(primary_key_data) == 1:
+                pkey_name = primary_key_data[0]['Column_name']
+            else:
+                # 没有单列主键时,退化为单列唯一索引
+                unique_key_sql = "SHOW INDEX FROM "+table_name+" WHERE Non_unique = 0"
+                unique_key_data = local_db.query(unique_key_sql)
+                if len(unique_key_data) == 1:
+                    pkey_name = unique_key_data[0]['Column_name']
+                    print(table_name+' use unique key: '+pkey_name)
+
+            if pkey_name == '':
+                # 没有可用主键/唯一索引,无法按主键分页同步,跳过后续处理
+                print(table_name+' no primary/unique key, skip repair.')
+                mw.writeFile(tmp_log, table_name+' no primary/unique key, skip repair.\n','a+')
+                continue
 
             if os.path.exists(table_name_pos_file):
                 table_name_pos = mw.readFile(table_name_pos_file)

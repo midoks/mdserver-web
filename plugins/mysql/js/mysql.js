@@ -2666,6 +2666,218 @@ function masterOrSlaveConf(version=''){
         });
     }
 
+    function mysqlSlaveSyncProgress(){
+        var html = '<div>';
+        html += '<div class="slave_sync_progress" id="slave_sync_progress" style="width:750px;height:350px;"></div>';
+        html += '<hr/><div class="slave_sync_info"></div>';
+        html += '</div>';
+        var timer = null;
+        var statEc = null;
+        layer.open({
+            type: 1,
+            title: "查看从库延迟进度",
+            area: ['800px', '500px'],
+            closeBtn: 1,
+            shadeClose: false,
+            content:'<div class="bt-form pd20">' + html + '</div>',
+            success:function(i,l){
+                // console.log(i,l);
+                statEc = echarts.init(document.getElementById('slave_sync_progress'));
+
+                var chat = {};
+                chat['tooltip'] = {
+                    show:true,
+                    trigger: 'axis',
+                    backgroundColor: 'rgba(255,255,255,0.8)',
+                    axisPointer: { 
+                        type: 'line',
+                        lineStyle: { color: 'rgba(150,150,150,0.2)'}
+                    },
+                    textStyle: {
+                        color: '#666',
+                        fontSize: '14px',
+                    },
+                }
+
+                var legend_name = ["延迟时间", "回放延迟", "GTID差值"];
+                var option = {
+                    title: { text: '延迟进度观察', left: 'center', textStyle: { fontSize: 16 } },
+                    tooltip: { trigger: 'axis', axisPointer: { type: 'cross' } },
+                    backgroundColor:'#fff',
+                    legend:{
+                        data:legend_name,
+                        top:30,
+                    },
+                    xAxis: { type: 'category', boundaryGap: false, data: [],},
+                    yAxis: [
+                      { type: 'value', name: legend_name[0], position: 'left'},
+                      { type: 'value', name: legend_name[1], position: 'right'},
+                    ],
+                    series: [
+                        {
+                            name:legend_name[0],
+                            yAxisIndex: 0,
+                            data: [],
+                            type: 'line',
+                            smooth: true,
+                            showSymbol: false,
+                        },
+                        {
+                            name:legend_name[1],
+                            yAxisIndex: 0,
+                            data: [],
+                            type: 'line',
+                            smooth: true,
+                            showSymbol: false,
+                        },
+                        {
+                            name:legend_name[2],
+                            yAxisIndex: 1,
+                            data: [],
+                            type: 'bar',
+                            smooth: true,
+                            showSymbol: false,
+                        },
+                    ]
+                };
+                var xData = [];
+                var yData = [];
+                var pdData = [];
+                var gtidData = [];
+                statEc.setOption(option);
+
+                timer = setInterval(function(){
+                    myPostN('get_slave_list', {} ,function(rdata){
+                        if (!rdata.status){
+                            return;
+                        }
+                        var data = $.parseJSON(rdata.data);
+                        // console.log("dd:",data);
+                        // if (!data.status){
+                        //     return;
+                        // }
+                        // console.log("d2:",data.data);
+
+                        var real_data = data.data;
+                        var my_status = real_data[0];
+                        var req_time = data.time;
+                        var pd_data = my_status['Read_Master_Log_Pos'] - my_status['Exec_Master_Log_Pos'];
+                        var retrieved_gtid_backlog = 0;
+                        var executed_gtid_backlog = 0;
+                        var gtid_diff = 0;
+
+                        var seconds_behind_master = 0;
+                        if ('Seconds_Behind_Source' in my_status){
+                            seconds_behind_master = my_status["Seconds_Behind_Source"];
+                        } else {
+                            seconds_behind_master = my_status["Seconds_Behind_Master"];
+                        } 
+
+                        // 已拉取的GTID集合积压
+                        if (my_status['Retrieved_Gtid_Set'] != ''){
+                            var t = my_status['Retrieved_Gtid_Set'];
+                            t = t.split(":");
+                            t = t[1].split("-");
+                            console.log("retrieved_gtid_backlog:",t);
+                            retrieved_gtid_backlog = parseInt(t[1]) - parseInt(t[0]);
+                        }
+
+                        // 已执行的GTID集合积压
+                        if (my_status['Executed_Gtid_Set'] != ''){
+                            var t = my_status['Executed_Gtid_Set'];
+                            t = t.split(",");
+                            var vaild_exec_data = '';
+                            for (var i = 0; i < t.length; i++) {
+                                console.log("vaild_exec_data:"+i,t[i]);
+                                var tmp = t[i].split(":");
+                                var val = tmp[1].split("-");
+                                if (val[0] == "1"){
+                                    continue;
+                                }
+                                vaild_exec_data = t[i];
+                            }
+
+                            if (vaild_exec_data == ''){
+                                executed_gtid_backlog = 0;
+                            } else {
+                                var exec_data_list = vaild_exec_data.split(":");
+                                var start = exec_data_list[1].split("-")[0];
+                                var end = exec_data_list.at(-1).split("-")[1];
+                                if (!end){
+                                    end = exec_data_list[1].split("-")[1];
+                                }
+                                console.log("executed_gtid_backlog:",vaild_exec_data);
+                                console.log("executed_gtid_backlog:",start,end);
+                                executed_gtid_backlog = end - start;
+                            }
+                        }
+
+                        if(retrieved_gtid_backlog == 0){
+                            gtid_diff = 0;
+                        } else {
+                            gtid_diff = retrieved_gtid_backlog - executed_gtid_backlog;
+                        }
+                        console.log('gtid_diff:',gtid_diff,retrieved_gtid_backlog,executed_gtid_backlog);
+
+                        var last_time = parseTimeToSec(xData[xData.length - 1]);
+                        var last_gtid_diff = gtidData.length ? gtidData[gtidData.length - 1] : null;
+                        var now_time = parseTimeToSec(req_time);
+
+                        // 估算多久同步完:时间字符串不能直接相减,先转秒级时间戳
+                        var total_second = null;
+                        var exec_per_second = 0;
+                        if (last_time !== null && now_time !== null
+                            && last_gtid_diff !== null && now_time > last_time){
+                            var exec_per_second = (last_gtid_diff - gtid_diff) / (now_time - last_time);
+                            if (exec_per_second > 0){
+                                total_second = gtid_diff / exec_per_second;
+                            }
+                        }
+                        console.log("last_time:",last_time,"now_time:",now_time,"exec_per_second:",exec_per_second,"total_second:",total_second);
+
+                        xData.push(req_time);
+                        yData.push(seconds_behind_master);
+                        pdData.push(pd_data);
+                        gtidData.push(gtid_diff);
+                        
+
+                        if (xData.length > 20){
+                            xData.shift();
+                            yData.shift();
+                            pdData.shift();
+                            gtidData.shift();
+                        }
+
+                        statEc.setOption({
+                            xAxis: {
+                                data: xData
+                            },
+                            series: [
+                                { name: legend_name[0], data: yData},
+                                { name: legend_name[1], data: pdData},
+                                { name: legend_name[2], data: gtidData},
+                            ]
+                        });
+
+                        $('.slave_sync_info').text(
+                            'GTID积压: ' + gtid_diff
+                            + ' | 回放延迟: ' + pd_data + ' bytes'
+                            + ' | 秒级延迟: ' + seconds_behind_master
+                            + ' | GTID同步速度: ' + Math.floor(exec_per_second) + '/s'
+                            + ' | 预计同步完: ' + (gtid_diff <= 0 ? '已同步' : formatSecond(total_second))
+                        );
+                    });
+                },3000);
+            },
+            // 弹窗关闭后清理定时器与图表实例,避免重复打开产生多个定时器并访问已销毁实例
+            end:function(){
+                if (timer){ clearInterval(timer); timer = null; }
+                if (statEc){ statEc.dispose(); statEc = null; }
+            }
+        });
+
+    }
+
     function getAsyncMasterDbList(){
         var _data = {};
         if (typeof(page) =='undefined'){
@@ -2689,12 +2901,23 @@ function masterOrSlaveConf(version=''){
                 }
 
                 var status = "<a data-id="+i+"  class='btlink db_error'>异常</>";
-                if (mdb_ver >= 8){
-                    if (v['Replica_SQL_Running'] == 'Yes' && v['Replica_IO_Running'] == 'Yes'){
-                        status = "正常";
-                    }
 
-                    list += '<tr>';
+                var sql_io_status = false;
+                if (v['Replica_SQL_Running'] == 'Yes' && v['Replica_IO_Running'] == 'Yes'){
+                    sql_io_status = true;
+                }
+
+                if (v['Slave_SQL_Running'] == 'Yes' && v['Slave_IO_Running'] == 'Yes'){
+                    sql_io_status = true;
+                }
+
+                if (sql_io_status && rdata.data[i]['Seconds_Behind_Master'] < 5){
+                    status = "正常";
+                }
+
+
+                list += '<tr>';
+                if (mdb_ver >= 8){
                     list += '<td>' + rdata.data[i]['Source_Host'] +'</td>';
                     list += '<td>' + rdata.data[i]['Source_Port'] +'</td>';
                     list += '<td>' + rdata.data[i]['Source_User'] +'</td>';
@@ -2702,12 +2925,7 @@ function masterOrSlaveConf(version=''){
                     list += '<td>' + rdata.data[i]['Replica_IO_Running'] +'</td>';
                     list += '<td>' + rdata.data[i]['Replica_SQL_Running'] +'</td>';
 
-                } else {
-                    if (v['Slave_SQL_Running'] == 'Yes' && v['Slave_IO_Running'] == 'Yes'){
-                        status = "正常";
-                    }
-
-                    list += '<tr>';
+                } else {            
                     list += '<td>' + rdata.data[i]['Master_Host'] +'</td>';
                     list += '<td>' + rdata.data[i]['Master_Port'] +'</td>';
                     list += '<td>' + rdata.data[i]['Master_User'] +'</td>';
@@ -2715,6 +2933,18 @@ function masterOrSlaveConf(version=''){
                     list += '<td>' + rdata.data[i]['Slave_IO_Running'] +'</td>';
                     list += '<td>' + rdata.data[i]['Slave_SQL_Running'] +'</td>';
                 }
+
+                if (rdata.data[i]['Seconds_Behind_Master'] == 0 ){
+                    list += '<td>' + rdata.data[i]['Seconds_Behind_Master'] + '</td>';
+                }
+                else if (rdata.data[i]['Seconds_Behind_Source'] == 0){
+                    list += '<td>' + rdata.data[i]['Seconds_Behind_Source'] + '</td>';
+                } else {
+                    list += '<td>' + '<a href="javascript:;" class="btlink btn_delay_slave">' + rdata.data[i]['Seconds_Behind_Master'] +'</a></td>';
+                }
+                // list += '<td>' + '<a href="javascript:;" class="btlink btn_delay_slave">' + rdata.data[i]['Seconds_Behind_Master'] +'</a></td>';
+                
+
 
                 if (isHasSign){
                     list += '<td>' + v['Channel_Name'] +'</td>';
@@ -2742,6 +2972,7 @@ function masterOrSlaveConf(version=''){
                         <th>日志</th>\
                         <th>IO</th>\
                         <th>SQL</th>\
+                        <th>延迟</th>\
                         '+signThead_th+'\
                         <th>状态</th>\
                         <th style="text-align:right;">操作</th></tr></thead>\
@@ -2765,6 +2996,38 @@ function masterOrSlaveConf(version=''){
                 } else{
                     deleteSlave();
                 }
+            });
+
+            $(".btn_delay_slave").unbind('click').click(function(){
+
+                var html = '';
+                html += '<button class="btn btn-default btn-sm mysql_slave_sync_progress">查看从延迟进度</button>';
+                layer.open({
+                    type: 1,
+                    title: '延迟观察',
+                    area: '240px',
+                    content:'<div class="change-default pd20">'+html+'</div>',
+                    success:function(i,l){
+                        $('.mysql_slave_sync_progress').click(function(){
+                            mysqlSlaveSyncProgress();
+                        });
+                    }
+                });
+                // layer.open({
+                //     type: 1,
+                //     title: "观察",
+                //     area: ['150px', '150px'],
+                //     closeBtn: 1,
+                //     shadeClose: false,
+                //     content: '<div class="bt-form pd20">\
+                //         <button style="margin-bottom: 8px;" type="button" class="btn btn-default btn-sm mysql_slave_sync_progress">查看从延迟进度</button>\
+                //     </div>',
+                //     success:function(i,l){
+                //         $('.mysql_slave_sync_progress').click(function(){
+                //             mysqlSlaveSyncProgress();
+                //         });
+                //     }
+                // });
             });
 
              $('.db_error').click(function(){

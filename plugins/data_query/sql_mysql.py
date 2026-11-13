@@ -691,12 +691,15 @@ class nosqlMySQLCtr():
             return err
 
         # MySQL 8.0.22+ 使用 SHOW REPLICA STATUS，MySQL 9.0 已移除 SHOW SLAVE STATUS
-        slave_data = my_instance.query('SHOW REPLICA STATUS')
-        if isinstance(slave_data, Exception):
+        # 注意: ORM.query 失败会直接抛异常,不会返回 Exception 对象
+        try:
+            slave_data = my_instance.query('SHOW REPLICA STATUS')
+        except Exception:
             # 兼容 MySQL 8.0.22 以下及旧版 MariaDB
-            slave_data = my_instance.query('SHOW SLAVE STATUS')
-        if isinstance(slave_data, Exception):
-            return mw.returnData(False, '获取主从状态失败: ' + str(slave_data))
+            try:
+                slave_data = my_instance.query('SHOW SLAVE STATUS')
+            except Exception as e:
+                return mw.returnData(False, '获取主从状态失败: ' + str(e))
         if slave_data is None or len(slave_data) == 0:
             return mw.returnData(True, 'ok', '未开启从库!')
 
@@ -720,8 +723,11 @@ class nosqlMySQLCtr():
         else:
             msg = '主从复制报错，请检查\nSlave_IO_Running状态值是：%s, |  Slave_SQL_Running状态值是：%s\nLast_Error错误信息是：%s\nLast_SQL_Error错误信息是：%s\n' \
             % (io_running, sql_running, slave_info.get('Last_Error'), slave_info.get('Last_SQL_Error'))
-            error_data = my_instance.query('select LAST_ERROR_NUMBER,LAST_ERROR_MESSAGE,LAST_ERROR_TIMESTAMP from performance_schema.replication_applier_status_by_worker ORDER BY LAST_ERROR_TIMESTAMP desc limit 1')
-            if isinstance(error_data, Exception) or not error_data:
+            try:
+                error_data = my_instance.query('select LAST_ERROR_NUMBER,LAST_ERROR_MESSAGE,LAST_ERROR_TIMESTAMP from performance_schema.replication_applier_status_by_worker ORDER BY LAST_ERROR_TIMESTAMP desc limit 1')
+            except Exception:
+                error_data = None
+            if not error_data:
                 msg += 'MySQL Replication Health is NOT OK!'
                 return mw.returnData(True, 'ok', msg)
             error_dict = error_data[0]
@@ -730,6 +736,31 @@ class nosqlMySQLCtr():
             msg += '报错时间是：%s \n' % error_dict['LAST_ERROR_TIMESTAMP']
             msg += 'MySQL Replication Health is NOT OK!'
             return mw.returnData(True, 'ok', msg)
+
+    def getSlaveRuntime(self, args):
+        sid = args['sid']
+        my_instance, err = self._connect(sid)
+        if err:
+            return err
+
+        try:
+            slave_data = my_instance.query('SHOW REPLICA STATUS')
+        except Exception:
+            # 兼容 MySQL 8.0.22 以下及旧版 MariaDB
+            try:
+                slave_data = my_instance.query('SHOW SLAVE STATUS')
+            except Exception as e:
+                return mw.returnData(False, '获取主从状态失败: ' + str(e))
+        if slave_data is None or len(slave_data) == 0:
+            return mw.returnData(False, 'ok', '未开启从库!')
+        # print(slave_data)
+
+        time_unix = mw.getDate()
+        data = {
+            'time':time_unix,
+            'data':slave_data[0],
+        }
+        return mw.returnData(True, 'ok', data)
 
 # ---------------------------------- run ----------------------------------
 
@@ -822,6 +853,10 @@ def get_deadlock_info(args):
 def get_slave_status(args):
     t = nosqlMySQLCtr()
     return t.getSlaveStatus(args)
+
+def get_slave_runtime(args):
+    t = nosqlMySQLCtr()
+    return t.getSlaveRuntime(args)
 
 
 

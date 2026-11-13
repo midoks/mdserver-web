@@ -143,7 +143,7 @@ class backupTools:
         params_args = params.split("@")
         name = params_args[0]
         table_name = ''
-        if len(params_args) > 1:
+        if len(params_args) > 1 and params_args[1] != 'undefined':
             table_name = params_args[1]
 
         backup_name = name
