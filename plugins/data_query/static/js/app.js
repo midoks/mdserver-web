@@ -872,7 +872,7 @@ function mysqlCommonFuncSlaveStatus(){
 
 function mysqlSlaveSyncProgress(){
     var html = '<div>';
-    html += '<div class="slave_sync_progress" id="slave_sync_progress" style="width:750px;height:400px;"></div>';
+    html += '<div class="slave_sync_progress" id="slave_sync_progress" style="width:750px;height:350px;"></div>';
     html += '</div>';
     var timer = null;
     var statEc = null;
