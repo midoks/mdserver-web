@@ -482,7 +482,7 @@ def delRecBy(name):
         if is_end:
             reg = r'\[' + name + r'\]\s*(.*)'
         else:
-            reg = r'\\[' + name + r'\]\s*(.*)\s*\[' + next_name + r'\]'
+            reg = r'\[' + name + r'\]\s*(.*)\s*\[' + next_name + r'\]'
 
         conre = re.search(reg,  content, re.S)
         content = content.replace("[" + name + "]\n" + conre.groups()[0], '')
