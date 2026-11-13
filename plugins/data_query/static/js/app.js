@@ -1015,6 +1015,14 @@ function mysqlSlaveSyncProgress(){
                     console.log('gtid_diff:',gtid_diff);
                     console.log('data:',data.data);
 
+                    var last_time = xData.at(-1);
+                    var last_gtid_diff = gtidData.at(-1);
+
+                    // 估算多久同步完。
+                    var exec_per_second = (last_gtid_diff - gtid_diff)/(last_time - real_data.time);
+                    var total_second = gtid_diff / exec_per_second;
+                    console.log("total_second:",total_second);
+
                     xData.push(real_data.time);
                     yData.push(seconds_behind_master);
                     pdData.push(pd_data);
@@ -1038,6 +1046,8 @@ function mysqlSlaveSyncProgress(){
                             { name: legend_name[2], data: gtidData},
                         ]
                     });
+
+                    $('.slave_sync_info').text("xxx");
                 });
             },3000);
         },
