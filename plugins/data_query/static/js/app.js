@@ -870,12 +870,209 @@ function mysqlCommonFuncSlaveStatus(){
     });
 }
 
+function mysqlSlaveSyncProgress(){
+    var html = '<div>';
+    html += '<div class="slave_sync_progress" id="slave_sync_progress" style="height:150px;"></div>';
+    html += '</div>';
+    layer.open({
+        type: 1,
+        title: "查看从库延迟进度",
+        area: ['500px', '300px'],
+        closeBtn: 1,
+        shadeClose: false,
+        content:'<div class="bt-form pd20">' + html + '</div>',
+        success:function(i,l){
+            console.log(i,l);
+            var statEc = echarts.init(document.getElementById('slave_sync_progress'));
+
+            var chat = {};
+            var is_compare = false;
+
+            var tmpChatData = {
+                "key":[],
+                "value":[]
+            }
+
+            chat['yAxis'] = [{
+                type: 'value',
+                splitNumber: 5,
+                axisLabel: {
+                    textStyle: {
+                        color: '#a8aab0',
+                        fontStyle: 'normal',
+                        fontFamily: '微软雅黑',
+                        fontSize: 12,
+                    },
+                },
+                axisLine:{
+                    show: false
+                },
+                axisTick:{
+                    show: false
+                },
+                splitLine: {
+                    show: true,
+                    lineStyle: {
+                        color: '#E5E9ED'
+                    }
+                }
+            }];
+
+            chat['tooltip'] = {
+                show:true,
+                trigger: 'axis',
+                backgroundColor: 'rgba(255,255,255,0.8)',
+                axisPointer: { // 坐标轴指示器，坐标轴触发有效
+                    type: 'line', // 默认为直线，可选为：'line' | 'shadow'
+                    lineStyle: {
+                        color: 'rgba(150,150,150,0.2)'
+                    }
+                },
+                textStyle: {
+                    color: '#666',
+                    fontSize: '14px',
+                },
+                extraCssText: 'width:200px;height:20%;padding:0;box-shadow: 0 0 3px rgba(0, 0, 0, 0.3);"',
+                formatter: function (params) {
+                    var htmlStr = "";
+                    for (var i = 0; i < params.length; i++) {
+                        var tem = params[i].name;
+                        var val = params[i].value;
+                        
+                        htmlStr += '<div style="height:40px;line-height:26px;overflow:hidden;padding:6px 8px;">' +
+                            '<span style="float:left;max-width:160px;overflow:hidden;text-overflow: ellipsis;white-space: nowrap;">' +
+                            '<span style="margin-right:5px;display:inline-block;width:10px;height:10px;border-radius:5px;background-color:' +
+                            params[i].color + ';"></span>' + params[i].seriesName + '</span>' +
+                            '<span style="float:right">' + val + '</span>' + '</div>'
+                    }
+                    var res ='<div><div style="height:40px;line-height:40px;padding:0 8px;background:rgba(237,233,233,0.4)">' +
+                        tem + '<span style="float:right;"></span>' + htmlStr + '</div></div>'
+                    return res;
+                }
+            }
+
+            var legendName = "xxxjijasdf";
+            chat['legendData'] = [legendName];
+
+            var option = {
+                tooltip:chat['tooltip'],
+                backgroundColor:'#fff',
+                legend:{
+                    data:chat['legendData'],
+                    left:'center',
+                    top:'94%',
+                },
+                grid: {
+                    bottom: '9%',
+                    containLabel: true,
+                    x: 20,
+                    y: 20,
+                    x2: 20,
+                    y2: 20
+                },
+                xAxis: {
+                    type: 'category',
+                    boundaryGap: false,
+                    boundaryGap: false,
+                    axisTick: {
+                        alignWithLabel: true
+                    },
+                    data: tmpChatData["key"],
+                },
+                yAxis: chat['yAxis'],
+                graphic:[{
+                    type: 'group',
+                    right: 150,
+                    top: 0,
+                    z: 100,
+                    children: [{
+                        type: 'text',
+                        left: 'center',
+                        top: 'center',
+                        z: 100,
+                        style: {
+                            fill: '#ccc',
+                            text: "延迟进度",
+                            font: '16px Arial'
+                        }
+                    }]
+                }],
+                series: [
+                {
+                    name:legendName,
+                    data: tmpChatData["value"],
+                    type: 'line',
+                    smooth: true, 
+                    itemStyle: {
+                        normal: {
+                            color:'#3A84FF',
+                            lineStyle: {
+                                color: "#3A84FF",
+                                width:1,
+                            },
+                            areaStyle: { 
+                                color: new echarts.graphic.LinearGradient(0, 1, 0, 0, [{
+                                    offset: 0,
+                                    color: 'rgba(58,132,255,0)'
+                                }, {
+                                    offset: 1,
+                                    color: 'rgba(58,132,255,0.35)'
+                                }]),
+                            }
+                        }
+                    },
+                    areaStyle: {}
+                }
+              ]
+            };
+            statEc.setOption(option);
+
+            var xData = [];
+            var yData = [];
+            setInterval(function(){
+                var sid = mysqlGetSid();
+                myPostCBN('get_slave_runtime',{'sid':sid} ,function(rdata){
+                    if (!rdata.status){
+                        return;
+                    }
+                    var data = rdata.data;
+                    if (!data.status){
+                        return;
+                    }
+
+                    var real_data = data.data
+
+                    console.log('data:',data.data);
+                    xData.push(real_data.time);
+                    yData.push(real_data.data["Seconds_Behind_Master"]);
+
+                    if (xData.length > 20){
+                        xData.shift();
+                        yData.shift();
+                    }
+
+                    statEc.setOption({
+                        xAxis: {
+                            data: xData
+                        },
+                        series: [{
+                            name: "延迟进度",
+                            data: yData
+                        }]
+                    });
+                });
+            },3000);
+        }
+    });
+
+}
+
 function mysqlCommonFunc(){
     $('#mysql_common').unbind('click').click(function(){
         layer.open({
             type: 1,
             title: "MySQL常用功能",
-            area: ['600px', '200px'],
+            area: ['600px', '230px'],
             closeBtn: 1,
             shadeClose: false,
             content: '<div class="bt-form pd20">\
@@ -888,6 +1085,7 @@ function mysqlCommonFunc(){
                 <button style="margin-bottom: 8px;" id="mysql_lock_sql" type="button" class="btn btn-default btn-sm">查看当前锁阻塞的SQL</button>\
                 <button style="margin-bottom: 8px;" id="mysql_deadlock_info" type="button" class="btn btn-default btn-sm">查看死锁信息</button>\
                 <button style="margin-bottom: 8px;" id="mysql_slave_status" type="button" class="btn btn-default btn-sm">查看主从复制信息</button>\
+                <button style="margin-bottom: 8px;" id="mysql_slave_sync_progress" type="button" class="btn btn-default btn-sm">查看从延迟进度</button>\
             </div>',
             success:function(i,l){
                 $('#mysql_top_nsql').click(function(){
@@ -924,6 +1122,10 @@ function mysqlCommonFunc(){
 
                 $('#mysql_slave_status').click(function(){
                     mysqlCommonFuncSlaveStatus();
+                });
+
+                $('#mysql_slave_sync_progress').click(function(){
+                    mysqlSlaveSyncProgress();
                 });
             }
         });

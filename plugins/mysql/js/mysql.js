@@ -2666,6 +2666,10 @@ function masterOrSlaveConf(version=''){
         });
     }
 
+    function mysqlSlaveSyncProgress() {
+        // body...
+    }
+
     function getAsyncMasterDbList(){
         var _data = {};
         if (typeof(page) =='undefined'){
@@ -2722,11 +2726,13 @@ function masterOrSlaveConf(version=''){
                     list += '<td>' + rdata.data[i]['Slave_SQL_Running'] +'</td>';
                 }
 
-                if (rdata.data[i]['Seconds_Behind_Master'] == 0){
-                    list += '<td>' + rdata.data[i]['Seconds_Behind_Master'] + '</td>';
-                } else {
-                    list += '<td>' + '<a href="javascript:;" class="btlink btn_delay_slave">' + rdata.data[i]['Seconds_Behind_Master'] +'</a></td>';
-                }
+                // if (rdata.data[i]['Seconds_Behind_Master'] == 0){
+                //     list += '<td>' + rdata.data[i]['Seconds_Behind_Master'] + '</td>';
+                // } else {
+                //     list += '<td>' + '<a href="javascript:;" class="btlink btn_delay_slave">' + rdata.data[i]['Seconds_Behind_Master'] +'</a></td>';
+                // }
+
+                list += '<td>' + '<a href="javascript:;" class="btlink btn_delay_slave">' + rdata.data[i]['Seconds_Behind_Master'] +'</a></td>';
                 
 
 
@@ -2782,8 +2788,36 @@ function masterOrSlaveConf(version=''){
                 }
             });
 
-            $(".btn_delay_slave").click(function(){
-                
+            $(".btn_delay_slave").unbind('click').click(function(){
+
+                var html = '';
+                html += '<button class="btn btn-default btn-sm mysql_slave_sync_progress">查看从延迟进度</button>';
+                layer.open({
+                    type: 1,
+                    title: '延迟观察',
+                    area: '240px',
+                    content:'<div class="change-default pd20">'+html+'</div>',
+                    success:function(i,l){
+                        $('.mysql_slave_sync_progress').click(function(){
+                            mysqlSlaveSyncProgress();
+                        });
+                    }
+                });
+                // layer.open({
+                //     type: 1,
+                //     title: "观察",
+                //     area: ['150px', '150px'],
+                //     closeBtn: 1,
+                //     shadeClose: false,
+                //     content: '<div class="bt-form pd20">\
+                //         <button style="margin-bottom: 8px;" type="button" class="btn btn-default btn-sm mysql_slave_sync_progress">查看从延迟进度</button>\
+                //     </div>',
+                //     success:function(i,l){
+                //         $('.mysql_slave_sync_progress').click(function(){
+                //             mysqlSlaveSyncProgress();
+                //         });
+                //     }
+                // });
             });
 
              $('.db_error').click(function(){
