@@ -1068,7 +1068,7 @@ function mysqlSlaveSyncProgress(){
                         'GTID积压: ' + gtid_diff
                         + ' | 回放延迟: ' + pd_data + ' bytes'
                         + ' | 秒级延迟: ' + seconds_behind_master
-                        + ' | 同步速度: ' + exec_per_second + '/s'
+                        + ' | GTID同步速度: ' + Math.floor(exec_per_second) + '/s'
                         + ' | 预计同步完: ' + (gtid_diff <= 0 ? '已同步' : formatSecond(total_second))
                     );
                 });
