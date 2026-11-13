@@ -62,6 +62,39 @@ function inArray(f, arr){
 	return false;
 }
 
+// "2026-11-13 20:56:16" 转时间戳(秒),换成 / 分隔以兼容 Safari
+var parseTimeToSec = function(t){
+    if (!t){
+        return null;
+    }
+    var ms = Date.parse(String(t).replace(/-/g, '/'));
+    return isNaN(ms) ? null : ms / 1000;
+};
+
+// 秒数转可读时长
+var formatSecond = function(s){
+    if (s === null || !isFinite(s)){
+        return '--';
+    }
+    if (s <= 0){
+        return '已同步';
+    }
+    s = Math.round(s);
+    var d = Math.floor(s / 86400);
+    var h = Math.floor(s % 86400 / 3600);
+    var m = Math.floor(s % 3600 / 60);
+    if (d > 0){
+        return d + '天' + h + '小时';
+    }
+    if (h > 0){
+        return h + '小时' + m + '分';
+    }
+    if (m > 0){
+        return m + '分' + (s % 60) + '秒';
+    }
+    return s + '秒';
+};
+
 //表格头固定
 function tableFixed(name) {
     var tableName = document.querySelector('#' + name);
