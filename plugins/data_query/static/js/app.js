@@ -1007,9 +1007,10 @@ function mysqlSlaveSyncProgress(){
 
                     // 已执行的GTID集合积压
                     if (my_status['Executed_Gtid_Set'] != ''){
-                        // 639b3c89-1a74-11f0-8027-7cd30ab0ff74:7729919001-7735855943
+                        // 639b3c89-1a74-11f0-8027-7cd30ab0ff74:7729919001-7735931881,dd4515c3-7dc2-11f0-b6ec-f8f9dd000001:1-6794
                         var t = my_status['Executed_Gtid_Set'];
-                        t = t.split(":");
+                        t = t.split(",");
+                        t = t[0].split(":");
                         t = t[1].split("-");
                         console.log("executed_gtid_backlog:",t);
                         executed_gtid_backlog = parseInt(t[0]) - parseInt(t[1]);
