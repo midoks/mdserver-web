@@ -912,29 +912,10 @@ function mysqlSlaveSyncProgress(){
                     data:legend_name,
                     top:30,
                 },
-                // grid: {left: 60, right: 60, top: 70, bottom: 50 },
-                // graphic:[{
-                //     type: 'group',
-                //     right: 750,
-                //     top: 0,
-                //     z: 100,
-                //     children: [{
-                //         type: 'text',
-                //         left: 'center',
-                //         top: 'center',
-                //         z: 100,
-                //         style: {
-                //             fill: '#ccc',
-                //             text: "延迟进度",
-                //             font: '16px Arial'
-                //         }
-                //     }]
-                // }],
                 xAxis: { type: 'category', boundaryGap: false, data: [],},
                 yAxis: [
                   { type: 'value', name: legend_name[0], position: 'left'},
                   { type: 'value', name: legend_name[1], position: 'right'},
-                  { type: 'value', name: legend_name[2], position: 'right', offset: 60},
                 ],
                 series: [
                     {
@@ -955,7 +936,7 @@ function mysqlSlaveSyncProgress(){
                     },
                     {
                         name:legend_name[2],
-                        yAxisIndex: 2,
+                        yAxisIndex: 1,
                         data: [],
                         type: 'bar',
                         smooth: true,
