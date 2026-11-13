@@ -903,7 +903,7 @@ function mysqlSlaveSyncProgress(){
                 },
             }
 
-            var legend_name = ["延迟进度", "回放延迟", "GTID差值"];
+            var legend_name = ["延迟时间", "回放延迟", "GTID差值"];
             var option = {
                 title: { text: '延迟进度观察', left: 'center', textStyle: { fontSize: 16 } },
                 tooltip: { trigger: 'axis', axisPointer: { type: 'cross' } },
