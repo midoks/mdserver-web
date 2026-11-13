@@ -903,7 +903,7 @@ function mysqlSlaveSyncProgress(){
                 },
             }
 
-            legend_name = ["延迟进度", "回放延迟"];
+            legend_name = ["延迟进度", "回放延迟", '已拉取的GTID集合积压'];
             var option = {
                 tooltip:chat['tooltip'],
                 backgroundColor:'#fff',
@@ -985,18 +985,29 @@ function mysqlSlaveSyncProgress(){
                     var real_data = data.data;
                     var my_status = real_data.data;
                     var pd_data = my_status['Read_Master_Log_Pos'] - my_status['Exec_Master_Log_Pos'];
+                    var retrieved_gtid = 0;
 
+                    var seconds_behind_master = 0;
+                    if ('Seconds_Behind_Source' in my_status){
+                        seconds_behind_master = real_data.data["Seconds_Behind_Source"];
+                    } else {
+                        seconds_behind_master = real_data.data["Seconds_Behind_Master"];
+                    } 
+
+                    if (my_status['Retrieved_Gtid_Set'] != ''){
+                        // 639b3c89-1a74-11f0-8027-7cd30ab0ff74:7729919001-7735855943
+                        var t = my_status['Retrieved_Gtid_Set'];
+                        t = t.split(":");
+                        t = t[1].split("-");
+                        console.log(t);
+                    }
+                    
                     console.log('data:',data.data);
-                    console.log("xx:",my_status['Read_Master_Log_Pos'] - my_status['Exec_Master_Log_Pos']);
-
 
                     xData.push(real_data.time);
+                    yData.push(seconds_behind_master);
                     pdData.push(pd_data);
-                    if ('Seconds_Behind_Source' in my_status){
-                        yData.push(real_data.data["Seconds_Behind_Source"]);
-                    } else {
-                        yData.push(real_data.data["Seconds_Behind_Master"]);
-                    }
+                    
 
                     if (xData.length > 20){
                         xData.shift();
