@@ -466,16 +466,16 @@ def initMariaDbPwd():
             myconf + ' -uroot -p' + pwd + ' -e "drop user \'root\'@\'' + hostname + '\'";'
         mw.execShell(drop_root_hostname)
 
-        drop_priv_hostname = serverdir +"/bin/mariadb --defaults-file="+myconf+" -uroot -p"+pwd+" <<'SQL'\
-        DELETE FROM mysql.proxies_priv WHERE Host NOT IN ('localhost','127.0.0.1','::1') AND Host <> '';\
-        DELETE FROM mysql.proxies_priv\
-        WHERE NOT EXISTS (\
-          SELECT 1 FROM mysql.user u\
-          WHERE u.User = mysql.proxies_priv.User\
-            AND u.Host = mysql.proxies_priv.Host\
-        );\
-        FLUSH PRIVILEGES;\
-        SQL"
+        sql = "DELETE FROM mysql.proxies_priv WHERE Host NOT IN ('localhost','127.0.0.1','::1') AND Host <> '';" \
+              "DELETE FROM mysql.proxies_priv WHERE NOT EXISTS (" \
+              "SELECT 1 FROM mysql.user u " \
+              "WHERE u.User = mysql.proxies_priv.User " \
+              "AND u.Host = mysql.proxies_priv.Host" \
+              ");" \
+              "FLUSH PRIVILEGES;"
+        drop_priv_hostname = serverdir + '/bin/mariadb --defaults-file=' + \
+            myconf + ' -uroot -p' + pwd + ' -e "' + sql + '"'
+        # print(drop_priv_hostname)
 
         # /www/server/mariadb/bin/mariadb --defaults-file=/www/server/mariadb/etc/my.cnf -uroot -pO0DjQrunLiJ7R7go <<'SQL'
         # DELETE FROM mysql.proxies_priv WHERE Host NOT IN ('localhost','127.0.0.1','::1') AND Host <> '';
@@ -487,7 +487,8 @@ def initMariaDbPwd():
         # );
         # FLUSH PRIVILEGES;
         # SQL
-        mw.execShell(drop_priv_hostname)
+        t = mw.execShell(drop_priv_hostname)
+        # print(t)
     return True
 
 
