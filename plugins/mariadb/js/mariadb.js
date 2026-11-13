@@ -2965,8 +2965,10 @@ function masterOrSlaveConf(version=''){
                 getMasterDbList();
             }
             
-            getAsyncMasterDbList();
-            getAsyncDataList()
+            if (rdata.slave_status){
+                getAsyncMasterDbList();
+                getAsyncDataList()
+            }
         });
     }
     getMasterStatus();
