@@ -993,13 +993,13 @@ function mysqlSlaveSyncProgress(){
                         t = t.split(",");
                         var vaild_exec_data = '';
                         for (var i = 0; i < t.length; i++) {
-                            console.log(t[i]);
+                            // console.log(t[i]);
                             var tmp = t[i].split(":");
                             var val = tmp[1].split("-");
                             if (val[0] == "1"){
                                 continue;
                             }
-                            vaild_exec_data = tmp;
+                            vaild_exec_data = t[i];
                         }
 
                         if (vaild_exec_data == ''){
