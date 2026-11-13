@@ -2804,12 +2804,13 @@ function masterOrSlaveConf(version=''){
                                 var start = exec_data_list[1].split("-")[0];
                                 var end = exec_data_list.at(-1).split("-")[1];
                                 console.log("executed_gtid_backlog:",vaild_exec_data);
+                                console.log("executed_gtid_backlog:",start,end);
                                 executed_gtid_backlog = end - start;
                             }
                         }
 
                         gtid_diff = retrieved_gtid_backlog - executed_gtid_backlog;
-                        console.log('gtid_diff:',gtid_diff);
+                        console.log('gtid_diff:',gtid_diff,retrieved_gtid_backlog,executed_gtid_backlog);
 
                         var last_time = parseTimeToSec(xData[xData.length - 1]);
                         var last_gtid_diff = gtidData.length ? gtidData[gtidData.length - 1] : null;
