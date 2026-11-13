@@ -3128,6 +3128,7 @@ def getSlaveList(version=''):
     # print(dlist)
     data = {}
     data['data'] = dlist
+    data['time'] = mw.getDate()
     return mw.getJson(data)
 
 

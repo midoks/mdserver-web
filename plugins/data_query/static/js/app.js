@@ -970,9 +970,9 @@ function mysqlSlaveSyncProgress(){
 
                     var seconds_behind_master = 0;
                     if ('Seconds_Behind_Source' in my_status){
-                        seconds_behind_master = real_data.data["Seconds_Behind_Source"];
+                        seconds_behind_master = my_status["Seconds_Behind_Source"];
                     } else {
-                        seconds_behind_master = real_data.data["Seconds_Behind_Master"];
+                        seconds_behind_master = my_status["Seconds_Behind_Master"];
                     } 
 
                     // 已拉取的GTID集合积压
