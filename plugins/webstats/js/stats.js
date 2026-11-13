@@ -318,7 +318,6 @@ function wsOverviewRequest(page){
             xAxis: {
                 type: 'category',
                 boundaryGap: false,
-                boundaryGap: false,
                 axisTick: {
                     alignWithLabel: true
                 },
