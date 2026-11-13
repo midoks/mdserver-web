@@ -903,12 +903,12 @@ function mysqlSlaveSyncProgress(){
                 },
             }
 
-            chat['legendData'] = ["延迟进度", "回放延迟"];
+            legend_name = ["延迟进度", "回放延迟"];
             var option = {
                 tooltip:chat['tooltip'],
                 backgroundColor:'#fff',
                 legend:{
-                    data:chat['legendData'],
+                    data:legend_name,
                     left:'center',
                     top:'94%',
                 },
@@ -932,12 +932,12 @@ function mysqlSlaveSyncProgress(){
                 }],
                 xAxis: { type: 'category', boundaryGap: false, data: [],},
                 yAxis: [
-                  { type: 'value', name: '同步延迟'},
-                  { type: 'value', name: '回放延迟'},
+                  { type: 'value', name: legend_name[0]},
+                  { type: 'value', name: legend_name[1]},
                 ],
                 series: [
                     {
-                        name:'同步延迟',
+                        name:legend_name[0],
                         yAxisIndex: 0,
                         data: [],
                         type: 'line',
@@ -947,7 +947,7 @@ function mysqlSlaveSyncProgress(){
                         itemStyle: { color: '#ee6666' },
                     },
                     {
-                        name:'回放延迟',
+                        name:legend_name[1],
                         yAxisIndex: 1,
                         data: [],
                         type: 'line',
@@ -967,8 +967,8 @@ function mysqlSlaveSyncProgress(){
                     data: xData
                 },
                 series: [
-                    { name: "延迟进度", data: yData},
-                    { name: "回放延迟", data: pdData}
+                    { name: legend_name[0], data: yData},
+                    { name: legend_name[1], data: pdData}
                 ]
             });
             var timer = setInterval(function(){
@@ -1009,8 +1009,8 @@ function mysqlSlaveSyncProgress(){
                             data: xData
                         },
                         series: [
-                            { name: "延迟进度", data: yData},
-                            { name: "回放延迟", data: pdData}
+                            { name: legend_name[0], data: yData},
+                            { name: legend_name[1], data: pdData}
                         ]
                     });
                 });
