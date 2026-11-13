@@ -445,12 +445,12 @@ def initMariaDbPwd():
         exit(1)
 
     # 删除空账户
-    drop_empty_user = serverdir + '/bin/mysql ' + db_option + '-uroot -p' + \
+    drop_empty_user = serverdir + '/bin/mariadb ' + db_option + '-uroot -p' + \
         pwd + ' -e "use mysql;delete from user where USER=\'\'"'
     mw.execShell(drop_empty_user)
 
     # 删除测试数据库
-    drop_test_db = serverdir + '/bin/mysql ' + db_option + ' -uroot -p' + \
+    drop_test_db = serverdir + '/bin/mariadb ' + db_option + ' -uroot -p' + \
         pwd + ' -e "drop database test";'
     mw.execShell(drop_test_db)
 
@@ -459,12 +459,35 @@ def initMariaDbPwd():
     # 删除冗余账户
     hostname = mw.execShell('hostname')[0].strip()
     if hostname != 'localhost':
-        drop_hostname =  serverdir + '/bin/mysql  --defaults-file=' + \
+        drop_hostname =  serverdir + '/bin/mariadb  --defaults-file=' + \
             myconf + ' -uroot -p' + pwd + ' -e "drop user \'\'@\'' + hostname + '\'";'
         mw.execShell(drop_hostname)
 
-        drop_root_hostname =  serverdir + '/bin/mysql  --defaults-file=' + \
+        drop_root_hostname =  serverdir + '/bin/mariadb  --defaults-file=' + \
             myconf + ' -uroot -p' + pwd + ' -e "drop user \'root\'@\'' + hostname + '\'";'
+        mw.execShell(drop_root_hostname)
+
+        drop_priv_hostname = serverdir +"/bin/mariadb --defaults-file="+myconf+" -uroot -p"+pwd+" <<'SQL'\
+        DELETE FROM mysql.proxies_priv WHERE Host NOT IN ('localhost','127.0.0.1','::1') AND Host <> '';\
+        DELETE FROM mysql.proxies_priv\
+        WHERE NOT EXISTS (\
+          SELECT 1 FROM mysql.user u\
+          WHERE u.User = mysql.proxies_priv.User\
+            AND u.Host = mysql.proxies_priv.Host\
+        );\
+        FLUSH PRIVILEGES;\
+        SQL"
+
+        # /www/server/mariadb/bin/mariadb --defaults-file=/www/server/mariadb/etc/my.cnf -uroot -pO0DjQrunLiJ7R7go <<'SQL'
+        # DELETE FROM mysql.proxies_priv WHERE Host NOT IN ('localhost','127.0.0.1','::1') AND Host <> '';
+        # DELETE FROM mysql.proxies_priv
+        # WHERE NOT EXISTS (
+        #   SELECT 1 FROM mysql.user u
+        #   WHERE u.User = mysql.proxies_priv.User
+        #     AND u.Host = mysql.proxies_priv.Host
+        # );
+        # FLUSH PRIVILEGES;
+        # SQL
         mw.execShell(drop_root_hostname)
     return True
 
