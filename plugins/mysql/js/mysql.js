@@ -2917,12 +2917,14 @@ function masterOrSlaveConf(version=''){
                     list += '<td>' + rdata.data[i]['Slave_SQL_Running'] +'</td>';
                 }
 
-                if (rdata.data[i]['Seconds_Behind_Master'] == 0){
+                if (rdata.data[i]['Seconds_Behind_Master'] == 0 ){
                     list += '<td>' + rdata.data[i]['Seconds_Behind_Master'] + '</td>';
+                }
+                else if (rdata.data[i]['Seconds_Behind_Source'] == 0){
+                    list += '<td>' + rdata.data[i]['Seconds_Behind_Source'] + '</td>';
                 } else {
                     list += '<td>' + '<a href="javascript:;" class="btlink btn_delay_slave">' + rdata.data[i]['Seconds_Behind_Master'] +'</a></td>';
                 }
-
                 // list += '<td>' + '<a href="javascript:;" class="btlink btn_delay_slave">' + rdata.data[i]['Seconds_Behind_Master'] +'</a></td>';
                 
 
