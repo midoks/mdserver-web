@@ -295,7 +295,7 @@ function wsOverviewRequest(page){
             }
         }
 
-        var legendName = $('.indicators-container input:checked').parent().find('span').text()
+        var legendName = $('.indicators-container input:checked').parent().find('span').text();
         chat['legendData'] = [legendName];
 
         var statEc = echarts.init(document.getElementById('total_num_echart'));
