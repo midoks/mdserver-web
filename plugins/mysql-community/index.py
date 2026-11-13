@@ -633,6 +633,13 @@ def stop(version=''):
 
 
 def restart(version=''):
+    slow_log = getShowLogFile()
+    if os.path.exists(slow_log):
+        mw.writeFile(slow_log, '')
+
+    error_log = getErrorLog()
+    if os.path.exists(error_log):
+        mw.writeFile(error_log, '')
     return appCMD(version, 'restart')
 
 
