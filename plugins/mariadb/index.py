@@ -522,7 +522,7 @@ def restart(version=''):
     if os.path.exists(slow_log):
         mw.writeFile(slow_log, '')
 
-    error_log = getErrorLog()
+    error_log = getErrorLogsFile()
     if os.path.exists(error_log):
         mw.writeFile(error_log, '')
     return appCMD(version, 'restart')
