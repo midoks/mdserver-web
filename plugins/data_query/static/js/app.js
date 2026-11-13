@@ -962,6 +962,7 @@ function mysqlSlaveSyncProgress(){
                     }
 
                     var real_data = data.data;
+                    var req_time = real_data.time;
                     var my_status = real_data.data;
                     var pd_data = my_status['Read_Master_Log_Pos'] - my_status['Exec_Master_Log_Pos'];
                     var retrieved_gtid_backlog = 0;
@@ -990,25 +991,40 @@ function mysqlSlaveSyncProgress(){
                         // 639b3c89-1a74-11f0-8027-7cd30ab0ff74:7729919001-7735931881,dd4515c3-7dc2-11f0-b6ec-f8f9dd000001:1-6794
                         var t = my_status['Executed_Gtid_Set'];
                         t = t.split(",");
-                        t = t[0].split(":");
-                        t = t[1].split("-");
-                        console.log("executed_gtid_backlog:",t);
+                        var vaild_exec_data = '';
+                        for (var i = 0; i < t.length; i++) {
+                            console.log(t[i]);
+                            var tmp = t[i].split(":");
+                            var val = tmp[1].split("-");
+                            if (val[0] == "1"){
+                                continue;
+                            }
+                            vaild_exec_data = tmp;
+                        }
 
-                        if (t[0] == 1){
+                        if (vaild_exec_data == ''){
                             executed_gtid_backlog = 0;
                         } else {
-                            executed_gtid_backlog = parseInt(t[1]) - parseInt(t[0]);
+                            var exec_data_list = vaild_exec_data.split(":");
+                            var start = exec_data_list[1].split("-")[0];
+                            var end = exec_data_list.at(-1).split("-")[1];
+                            console.log("executed_gtid_backlog:",vaild_exec_data);
+                            executed_gtid_backlog = end - start;
                         }
-                        
                     }
 
-                    gtid_diff = retrieved_gtid_backlog - executed_gtid_backlog;
+                    if  (retrieved_gtid_backlog == 0){
+                        gtid_diff = 0;
+                    } else {
+                        gtid_diff = retrieved_gtid_backlog - executed_gtid_backlog;
+                    }
+                    
                     console.log('gtid_diff:',gtid_diff);
                     console.log('data:',data.data);
 
                     var last_time = parseTimeToSec(xData[xData.length - 1]);
                     var last_gtid_diff = gtidData.length ? gtidData[gtidData.length - 1] : null;
-                    var now_time = parseTimeToSec(real_data.time);
+                    var now_time = parseTimeToSec(req_time);
 
                     // 估算多久同步完:时间字符串不能直接相减,先转秒级时间戳
                     var total_second = null;
@@ -1021,7 +1037,7 @@ function mysqlSlaveSyncProgress(){
                     }
                     console.log("last_time:",last_time,"now_time:",now_time,"exec_per_second:",exec_per_second,"total_second:",total_second);
 
-                    xData.push(real_data.time);
+                    xData.push(req_time);
                     yData.push(seconds_behind_master);
                     pdData.push(pd_data);
                     gtidData.push(gtid_diff);
