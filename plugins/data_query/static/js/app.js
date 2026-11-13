@@ -873,6 +873,7 @@ function mysqlCommonFuncSlaveStatus(){
 function mysqlSlaveSyncProgress(){
     var html = '<div>';
     html += '<div class="slave_sync_progress" id="slave_sync_progress" style="width:750px;height:350px;"></div>';
+    html += '<hr/><div class="slave_sync_info"></div>';
     html += '</div>';
     var timer = null;
     var statEc = null;
@@ -931,8 +932,8 @@ function mysqlSlaveSyncProgress(){
                 }],
                 xAxis: { type: 'category', boundaryGap: false, data: [],},
                 yAxis: [
-                  { type: 'value', name: '请求量', position: 'left',  scale: true },
-                  { type: 'value', name: '成功率(%)', position: 'right', min: 0, max: 100 },
+                  { type: 'value', name: '同步延迟'},
+                  { type: 'value', name: '回放延迟'},
                 ],
                 series: [
                     {
@@ -946,7 +947,7 @@ function mysqlSlaveSyncProgress(){
                         itemStyle: { color: '#ee6666' },
                     },
                     {
-                        name:'同步延迟2',
+                        name:'回放延迟',
                         yAxisIndex: 1,
                         data: [],
                         type: 'line',
