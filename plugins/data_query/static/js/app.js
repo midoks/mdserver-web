@@ -872,7 +872,7 @@ function mysqlCommonFuncSlaveStatus(){
 
 function mysqlSlaveSyncProgress(){
     var html = '<div>';
-    html += '<div class="slave_sync_progress" id="slave_sync_progress" style="height:150px;"></div>';
+    html += '<div class="slave_sync_progress" id="slave_sync_progress" style="width:450px;height:150px;"></div>';
     html += '</div>';
     var timer = null;
     var statEc = null;
@@ -903,7 +903,7 @@ function mysqlSlaveSyncProgress(){
             }
 
             var legendName = "xxxjijasdf";
-            chat['legendData'] = [legendName];
+            chat['legendData'] = ["同步延迟", "回放延迟"];
 
             var option = {
                 tooltip:chat['tooltip'],
@@ -962,6 +962,7 @@ function mysqlSlaveSyncProgress(){
             };
             var xData = [''];
             var yData = ['0'];
+            var pdData = ['0']
             statEc.setOption(option);
             statEc.setOption({
                 xAxis: {
@@ -969,7 +970,7 @@ function mysqlSlaveSyncProgress(){
                 },
                 series: [
                     { name: "延迟进度", data: yData},
-                    { name: "延迟进度2", data: yData}
+                    { name: "回放延迟", data: pdData}
                 ]
             });
             var timer = setInterval(function(){
@@ -983,15 +984,21 @@ function mysqlSlaveSyncProgress(){
                         return;
                     }
 
-                    var real_data = data.data
+                    var real_data = data.data;
+                    var my_status = real_data.data;
+                    var pd_data = my_status['Read_Master_Log_Pos'] - my_status['Exec_Master_Log_Pos'];
 
                     console.log('data:',data.data);
+                    console.log("xx:",my_status['Read_Master_Log_Pos'] - my_status['Exec_Master_Log_Pos']);
+
                     xData.push(real_data.time);
                     yData.push(real_data.data["Seconds_Behind_Master"]);
+                    pdData.push(pd_data);
 
                     if (xData.length > 20){
                         xData.shift();
                         yData.shift();
+                        pdData.shift();
                     }
 
                     statEc.setOption({
@@ -1000,7 +1007,7 @@ function mysqlSlaveSyncProgress(){
                         },
                         series: [
                             { name: "延迟进度", data: yData},
-                            { name: "延迟进度2", data: yData}
+                            { name: "回放延迟", data: pdData}
                         ]
                     });
                 });
