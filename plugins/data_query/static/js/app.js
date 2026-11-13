@@ -989,9 +989,14 @@ function mysqlSlaveSyncProgress(){
                     console.log('data:',data.data);
                     console.log("xx:",my_status['Read_Master_Log_Pos'] - my_status['Exec_Master_Log_Pos']);
 
+
                     xData.push(real_data.time);
-                    yData.push(real_data.data["Seconds_Behind_Master"]);
                     pdData.push(pd_data);
+                    if ('Seconds_Behind_Source' in my_status){
+                        yData.push(real_data.data["Seconds_Behind_Source"]);
+                    } else {
+                        yData.push(real_data.data["Seconds_Behind_Master"]);
+                    }
 
                     if (xData.length > 20){
                         xData.shift();
