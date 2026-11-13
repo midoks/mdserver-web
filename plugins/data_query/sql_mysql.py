@@ -755,7 +755,7 @@ class nosqlMySQLCtr():
             return mw.returnData(False, 'ok', '未开启从库!')
         # print(slave_data)
 
-        time_unix = int(time.time())
+        time_unix = mw.getDate()
         data = {
             'time':time_unix,
             'data':slave_data[0],
