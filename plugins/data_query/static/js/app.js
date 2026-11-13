@@ -1009,6 +1009,9 @@ function mysqlSlaveSyncProgress(){
                             console.log("executed_gtid_backlog:",vaild_exec_data);
                             var start = exec_data_list[1].split("-")[0];
                             var end = exec_data_list.at(-1).split("-")[1];
+                            if (!end){
+                                end = exec_data_list[1].split("-")[1];
+                            }
                             console.log("executed_gtid_backlog:",start,end);
                             executed_gtid_backlog = end - start;
                         }
