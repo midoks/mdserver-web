@@ -944,21 +944,44 @@ function mysqlSlaveSyncProgress(){
                     },
                 ]
             };
-            var xData = [''];
-            var yData = ['0'];
-            var pdData = ['0'];
-            var gtidData = ['0'];
+            var xData = [];
+            var yData = [];
+            var pdData = [];
+            var gtidData = [];
             statEc.setOption(option);
-            statEc.setOption({
-                xAxis: {
-                    data: xData
-                },
-                series: [
-                    { name: legend_name[0], data: yData},
-                    { name: legend_name[1], data: pdData},
-                    { name: legend_name[2], data: gtidData},
-                ]
-            });
+
+            // "2026-11-13 20:56:16" 转时间戳(秒),换成 / 分隔以兼容 Safari
+            var parseTimeToSec = function(t){
+                if (!t){
+                    return null;
+                }
+                var ms = Date.parse(String(t).replace(/-/g, '/'));
+                return isNaN(ms) ? null : ms / 1000;
+            };
+
+            // 秒数转可读时长
+            var formatSecond = function(s){
+                if (s === null || !isFinite(s)){
+                    return '--';
+                }
+                if (s <= 0){
+                    return '已同步';
+                }
+                s = Math.round(s);
+                var d = Math.floor(s / 86400);
+                var h = Math.floor(s % 86400 / 3600);
+                var m = Math.floor(s % 3600 / 60);
+                if (d > 0){
+                    return d + '天' + h + '小时';
+                }
+                if (h > 0){
+                    return h + '小时' + m + '分';
+                }
+                if (m > 0){
+                    return m + '分' + (s % 60) + '秒';
+                }
+                return s + '秒';
+            };
             timer = setInterval(function(){
                 var sid = mysqlGetSid();
                 myPostCBN('get_slave_runtime',{'sid':sid} ,function(rdata){
@@ -1015,13 +1038,20 @@ function mysqlSlaveSyncProgress(){
                     console.log('gtid_diff:',gtid_diff);
                     console.log('data:',data.data);
 
-                    var last_time = xData.at(-1);
-                    var last_gtid_diff = gtidData.at(-1);
+                    var last_time = parseTimeToSec(xData[xData.length - 1]);
+                    var last_gtid_diff = gtidData.length ? gtidData[gtidData.length - 1] : null;
+                    var now_time = parseTimeToSec(real_data.time);
 
-                    // 估算多久同步完。
-                    var exec_per_second = (last_gtid_diff - gtid_diff)/(last_time - real_data.time);
-                    var total_second = gtid_diff / exec_per_second;
-                    console.log("total_second:",total_second);
+                    // 估算多久同步完:时间字符串不能直接相减,先转秒级时间戳
+                    var total_second = null;
+                    if (last_time !== null && now_time !== null
+                        && last_gtid_diff !== null && now_time > last_time){
+                        var exec_per_second = (last_gtid_diff - gtid_diff) / (now_time - last_time);
+                        if (exec_per_second > 0){
+                            total_second = gtid_diff / exec_per_second;
+                        }
+                    }
+                    console.log("last_time:",last_time,"now_time:",now_time,"exec_per_second:",exec_per_second,"total_second:",total_second);
 
                     xData.push(real_data.time);
                     yData.push(seconds_behind_master);
@@ -1047,7 +1077,12 @@ function mysqlSlaveSyncProgress(){
                         ]
                     });
 
-                    $('.slave_sync_info').text("xxx");
+                    $('.slave_sync_info').text(
+                        'GTID积压: ' + gtid_diff
+                        + ' | 回放延迟: ' + pd_data + ' bytes'
+                        + ' | 秒级延迟: ' + seconds_behind_master
+                        + ' | 预计同步完: ' + (gtid_diff <= 0 ? '已同步' : formatSecond(total_second))
+                    );
                 });
             },3000);
         },
