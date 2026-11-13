@@ -399,8 +399,7 @@ def getErrorLogsFile():
 
 def pGetDbUser():
     if mw.isAppleSystem():
-        user = mw.execShell(
-            "who | sed -n '2, 1p' |awk '{print $1}'")[0].strip()
+        user = mw.execShell("who | sed -n '2, 1p' |awk '{print $1}'")[0].strip()
         return user
     return 'mysql'
 
@@ -432,7 +431,7 @@ def initMariaDbPwd():
     pwd = mw.getRandomString(16)
 
     db_option = "-S " + serverdir + "/mysql.sock"
-    cmd_pass = serverdir + '/bin/mysql ' + db_option + ' -uroot -e'
+    cmd_pass = serverdir + '/bin/mariadb ' + db_option + ' -uroot -e'
     cmd_pass = cmd_pass + \
         "\"flush privileges;use mysql;grant all privileges on *.* to 'root'@'localhost' identified by '" + pwd + "';"
     cmd_pass = cmd_pass + "flush privileges;\""
