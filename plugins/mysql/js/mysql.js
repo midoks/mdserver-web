@@ -2775,7 +2775,6 @@ function masterOrSlaveConf(version=''){
 
                         // 已拉取的GTID集合积压
                         if (my_status['Retrieved_Gtid_Set'] != ''){
-                            // 639b3c89-1a74-11f0-8027-7cd30ab0ff74:7729919001-7735855943
                             var t = my_status['Retrieved_Gtid_Set'];
                             t = t.split(":");
                             t = t[1].split("-");
@@ -2785,19 +2784,28 @@ function masterOrSlaveConf(version=''){
 
                         // 已执行的GTID集合积压
                         if (my_status['Executed_Gtid_Set'] != ''){
-                            // 639b3c89-1a74-11f0-8027-7cd30ab0ff74:7729919001-7735931881,dd4515c3-7dc2-11f0-b6ec-f8f9dd000001:1-6794
                             var t = my_status['Executed_Gtid_Set'];
                             t = t.split(",");
-                            t = t[0].split(":");
-                            t = t[1].split("-");
-                            console.log("executed_gtid_backlog:",t);
+                            var vaild_exec_data = '';
+                            for (var i = 0; i < t.length; i++) {
+                                console.log(t[i]);
+                                var tmp = t[i].split(":");
+                                var val = tmp[1].split("-");
+                                if (val[0] == "1"){
+                                    continue;
+                                }
+                                vaild_exec_data = tmp;
+                            }
 
-                            if (t[0] == 1){
+                            if (vaild_exec_data == ''){
                                 executed_gtid_backlog = 0;
                             } else {
-                                executed_gtid_backlog = parseInt(t[1]) - parseInt(t[0]);
+                                var exec_data_list = vaild_exec_data.split(":");
+                                var start = exec_data_list[1].split("-")[0];
+                                var end = exec_data_list.at(-1).split("-")[1];
+                                console.log("executed_gtid_backlog:",vaild_exec_data);
+                                executed_gtid_backlog = end - start;
                             }
-                            
                         }
 
                         gtid_diff = retrieved_gtid_backlog - executed_gtid_backlog;
