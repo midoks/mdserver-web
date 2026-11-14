@@ -2036,7 +2036,7 @@ def doFullSyncUser(version=''):
         '/data -h ' + ip + ' -p ' + port + \
         ' -U ' + user + ' --password -S ' + slot_name
 
-    cmd_sync += "PGPASSWORD='"+slot_name+"' " + cmd_sync
+    cmd_sync += "PGPASSWORD='"+apass+"' " + cmd_sync
     print(cmd_sync)
     # 停用
     stop(version)
