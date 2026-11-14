@@ -7,6 +7,15 @@ export PATH
 # cd /www/server/mdserver-web && . bin/activate && python3 plugins/postgresql/index.py do_full_sync
 # cd /www/server/mdserver-web && . bin/activate && python3 plugins/postgresql/index.py run_info {}
 
+# ssh -vvv -i /tmp/pg_sync_id_rsa.txt -p 2022 -o IdentitiesOnly=yes root@1.1.1.1 "echo ok"
+# ssh root@1.1.1.1 -i /tmp/pg_sync_id_rsa.txt -p 2022
+
+# -- 主库
+# CREATE TABLE t_test(id int primary key, ts timestamptz default now());
+# INSERT INTO t_test VALUES (1);
+
+# -- 备库（只读查询应能看到）
+# SELECT * FROM t_test;
 
 curPath=`pwd`
 rootPath=$(dirname "$curPath")
