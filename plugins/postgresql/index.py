@@ -2069,15 +2069,14 @@ def doFullSyncUser(version=''):
     
     os.system(cmd_sync)
 
-
-
     # 同步成功后,开启从库配置
     openSlaveConf()
+    pg_conf = getConf()
+    content = mw.readFile(pg_conf)
+    mw.writeFile(pg_conf, content)
 
     start(version)
-
-    # print(data)
-
+    return True
 
 def doFullSyncSSH(version=''):
     db = pgDb()
