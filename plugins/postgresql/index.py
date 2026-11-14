@@ -1872,6 +1872,10 @@ def getMasterLink(version):
 def getSlaveLink(version):
     pdb = pgDb()
     data = pdb.query("SELECT * FROM pg_stat_wal_receiver")
+    fields = 'pid,status,receive_start_lsn,receive_start_tli,written_lsn,\
+        flushed_lsn,received_tli,last_msg_send_time,last_msg_receipt_time,\
+        latest_end_lsn,latest_end_time ,slot_name ,sender_host,sender_port,conninfo '
+    data = pdb.field(fields).table('pg_stat_wal_receiver').select()
     return mw.returnJson(True, 'ok', data)
 
 def getMasterRepSlaveList(version=''):
