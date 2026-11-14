@@ -76,8 +76,9 @@ Install_app()
 	WHERE_DIR_GPP=/usr/bin/g++
 
 	if [ "$sysName" == "Darwin" ];then
-		WHERE_DIR_GCC=/usr/bin/clang
-		WHERE_DIR_GPP=/usr/bin/clang++
+		LLVM_DIR=`brew --prefix llvm`
+		WHERE_DIR_GCC=${LLVM_DIR}/bin/clang
+		WHERE_DIR_GPP=${LLVM_DIR}/bin/clang++
 	fi
 	
 	if [ ! -d $serverPath/mariadb ];then

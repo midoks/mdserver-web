@@ -72,6 +72,15 @@ Install_app()
 		INSTALL_CMD=cmake3
 	fi
 
+	WHERE_DIR_GCC=/usr/bin/gcc
+	WHERE_DIR_GPP=/usr/bin/g++
+
+	if [ "$sysName" == "Darwin" ];then
+		LLVM_DIR=`brew --prefix llvm`
+		WHERE_DIR_GCC=${LLVM_DIR}/bin/clang
+		WHERE_DIR_GPP=${LLVM_DIR}/bin/clang++
+	fi
+
 	if [ ! -d $serverPath/mariadb ];then
 		cd ${mariadbDir}/mariadb-${MY_VER} && ${INSTALL_CMD} \
 		-DCMAKE_INSTALL_PREFIX=$serverPath/mariadb \
