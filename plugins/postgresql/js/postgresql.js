@@ -1814,7 +1814,7 @@ function masterOrSlaveConf(version=''){
                         <th>端口</th>\
                         <th>状态</th>\
                         <th>槽名</th>\
-                        <th>最后事务提交</th>\
+                        <th>距最后回放事务时间</th>\
                         <th>接收起始LSN</th>\
                         <th>最新结束LSN</th>\
                         <th>已写入LSN</th>\
