@@ -1729,7 +1729,7 @@ function masterOrSlaveConf(version=''){
                 }
             } else {
                 list += '<tr>';
-                list += '<td colspan="5">空</td>';
+                list += '<td colspan="6" style="text-align:center;">空</td>';
                 list += '</tr>';
             }
 
