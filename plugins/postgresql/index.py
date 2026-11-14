@@ -1891,16 +1891,22 @@ def addMasterRepSlaveUser(version=''):
     if psdb.where("username=?", (username)).count() > 0:
         return mw.returnJson(False, '用户已存在!')
 
+    # 创建同步用户+密码
     sql = "CREATE ROLE " + username + " login replication password '" + password + "'"
     pdb.execute(sql)
+
+    # 创建slot,从库使用
+    slot_sql = "SELECT pg_create_physical_replication_slot('"+username+"');"
+    pdb.execute(slot_sql);
 
     pg_conf = pgHbaConf()
     data = mw.readFile(pg_conf)
 
-    data = data + "\nhost   replication  " + \
-        username + "   " + address + "     scram-sha-256"
+    data = data + "\nhost   replication  " + username + "   " + address + "     scram-sha-256"
 
     mw.writeFile(pg_conf, data)
+
+
 
     addTime = time.strftime('%Y-%m-%d %X', time.localtime())
     psdb.add('username,password,accept,ps,addtime',
@@ -2036,7 +2042,7 @@ def doFullSyncUser(version=''):
         '/data -h ' + ip + ' -p ' + port + \
         ' -U ' + user + ' --password -S ' + slot_name
 
-    cmd_sync += "PGPASSWORD='"+apass+"' " + cmd_sync
+    cmd_sync = "PGPASSWORD='"+apass+"' " + cmd_sync
     print(cmd_sync)
     # 停用
     stop(version)
