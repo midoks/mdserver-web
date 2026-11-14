@@ -1550,7 +1550,7 @@ def getMasterStatus(version=''):
     data['mode'] = 'classic'
     data['status'] = False
     data['slave_status'] = False
-    pg_conf = getServerDir() + "/data/postgresql.conf"
+    pg_conf = getConf()
     pg_content = mw.readFile(pg_conf)
 
     if pg_content.find('#wal_level') > -1:

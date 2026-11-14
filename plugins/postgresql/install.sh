@@ -5,6 +5,7 @@ export PATH
 # cd /Users/midoks/Desktop/mwdev/server/mdserver-web/plugins/postgresql && bash install.sh install 18
 # cd /www/server/mdserver-web/plugins/postgresql && bash install.sh install 16
 # cd /www/server/mdserver-web && . bin/activate && python3 plugins/postgresql/index.py do_full_sync
+# cd /www/server/mdserver-web && . bin/activate && python3 plugins/postgresql/index.py get_master_status {}
 # cd /www/server/mdserver-web && . bin/activate && python3 plugins/postgresql/index.py run_info {}
 
 # ssh -vvv -i /tmp/pg_sync_id_rsa.txt -p 2022 -o IdentitiesOnly=yes root@1.1.1.1 "echo ok"
