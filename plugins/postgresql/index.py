@@ -1859,7 +1859,7 @@ def getMasterRepSlaveUserCmd(version=''):
 
 def slaveSyncCmd(version=''):
     data = {}
-    data['cmd'] = 'cd /www/server/mdserver-web && python3 plugins/postgresql/index.py do_full_sync'
+    data['cmd'] = 'cd /www/server/mdserver-web && . bin/activate && python3 plugins/postgresql/index.py do_full_sync'
     return mw.returnJson(True, 'ok!', data)
 
 
