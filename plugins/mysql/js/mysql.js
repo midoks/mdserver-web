@@ -1824,7 +1824,7 @@ function delMasterRepSlaveUser(username){
         var rdata = $.parseJSON(data.data);
         showMsg(rdata.msg, function(){
             getMasterRepSlaveList();
-        },{icon: rdata.status ? 1 : 2},1000)
+        },{icon: rdata.status ? 1 : 2},1000);
     });
 }
 

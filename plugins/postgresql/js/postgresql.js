@@ -1135,12 +1135,10 @@ function delMasterRepSlaveUser(username){
     myPost('del_master_rep_slave_user', {username:username}, function(data){
         var rdata = $.parseJSON(data.data);
         layer.msg(rdata.msg);
-
-        $('.layui-layer-close1').click();
-
-        setTimeout(function(){
+        
+        showMsg(rdata.msg, function(){
             getMasterRepSlaveList();
-        },1000);
+        },{icon: rdata.status ? 1 : 2},1000);
     });
 }
 
