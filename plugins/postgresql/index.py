@@ -486,8 +486,7 @@ def runInfo():
         "ps -ef |grep postgres |wc -l")[0].strip()
     result['pid'] = mw.execShell(
         '''cat {}/postmaster.pid |sed -n 1p '''.format(data_dir))[0].strip()
-    res = db.query(
-        "select count(*) from pg_stat_activity where not pid=pg_backend_pid()")
+    res = db.query("select count(*) from pg_stat_activity where not pid=pg_backend_pid()")
 
     # print(res)
     result['connections'] = res[0][0]
