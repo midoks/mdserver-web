@@ -1715,13 +1715,20 @@ function masterOrSlaveConf(version=''){
         myPostN('get_master_link', _data, function(data){
             var rdata = $.parseJSON(data.data);
             var list = '';
-            for(i in rdata.data){
+
+            if (rdata.data.length > 0){
+                for(i in rdata.data){
+                    list += '<tr>';
+                    list += '<td>' + rdata.data[i]['client_addr'] +'</td>';
+                    list += '<td>' + rdata.data[i]['client_port'] +'</td>';
+                    list += '<td>' + rdata.data[i]['usename'] +'</td>';
+                    list += '<td>' + rdata.data[i]['state'] +'</td>';
+                    list += '<td>' + rdata.data[i]['application_name'] +'</td>';
+                    list += '</tr>';
+                }
+            } else {
                 list += '<tr>';
-                list += '<td>' + rdata.data[i]['client_addr'] +'</td>';
-                list += '<td>' + rdata.data[i]['client_port'] +'</td>';
-                list += '<td>' + rdata.data[i]['usename'] +'</td>';
-                list += '<td>' + rdata.data[i]['state'] +'</td>';
-                list += '<td>' + rdata.data[i]['application_name'] +'</td>';
+                list += '<td colspan="5">空</td>';
                 list += '</tr>';
             }
 
