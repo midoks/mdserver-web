@@ -17,6 +17,10 @@ export PATH
 # -- 备库（只读查询应能看到）
 # SELECT * FROM t_test;
 
+# 常用操作--终端
+# \c ff
+
+
 curPath=`pwd`
 rootPath=$(dirname "$curPath")
 rootPath=$(dirname "$rootPath")
