@@ -1749,7 +1749,7 @@ function masterOrSlaveConf(version=''){
                     </div>\
                     <div id="databasePage" class="dataTables_paginate paging_bootstrap page"></div>\
                     <div class="table_toolbar" style="left:0px;">\
-                        <span class="sync btn btn-default btn-sm" title="">刷新</span>\
+                        <span class="sync btn btn-default btn-sm" onclick="getMasterDbList();" title="">刷新</span>\
                     </div>\
                 </div>';
 
