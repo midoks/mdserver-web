@@ -1615,25 +1615,10 @@ def setSlaveStatus(version):
     return mw.returnJson(True, '设置成功')
 
 def getSlaveList(version=''):
-
     db = pgDb()
-
     res = db.execute('select * from pg_stat_replication')
-    print(res)
-    # dlist = db.query('show slave status')
-    # ret = []
-    # for x in range(0, len(dlist)):
-    #     tmp = {}
-    #     tmp['Master_User'] = dlist[x]["Master_User"]
-    #     tmp['Master_Host'] = dlist[x]["Master_Host"]
-    #     tmp['Master_Port'] = dlist[x]["Master_Port"]
-    #     tmp['Master_Log_File'] = dlist[x]["Master_Log_File"]
-    #     tmp['Slave_IO_Running'] = dlist[x]["Slave_IO_Running"]
-    #     tmp['Slave_SQL_Running'] = dlist[x]["Slave_SQL_Running"]
-    #     ret.append(tmp)
     data = {}
     data['data'] = []
-
     return mw.getJson(data)
 
 
@@ -1870,8 +1855,9 @@ def getMasterLink(version):
 def getSlaveLink(version):
     pdb = pgDb()
     data = pdb.query("SELECT * FROM pg_stat_wal_receiver")
-    fields = 'pid,status,receive_start_lsn,receive_start_tli,written_lsn,flushed_lsn,received_tli,last_msg_send_time,last_msg_receipt_time,latest_end_lsn,latest_end_time,slot_name,sender_host,sender_port,conninfo '
+    fields = 'pid,status,receive_start_lsn,receive_start_tli,written_lsn,flushed_lsn,received_tli,latest_end_lsn,slot_name,sender_host,sender_port'
     data = pdb.field(fields).table('pg_stat_wal_receiver').select()
+    # print(data)
     return mw.returnJson(True, 'ok', data)
 
 def getMasterRepSlaveList(version=''):

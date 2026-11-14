@@ -1761,19 +1761,34 @@ function masterOrSlaveConf(version=''){
         });
     }
 
-
     function getAsyncMasterDbList(){
         var _data = {};
         if (typeof(page) =='undefined'){
             var page = 1;
         }
-        
         _data['page'] = page;
-        _data['page_size'] = 10;
-
-        myPost('get_slave_list', _data, function(data){
+        _data['page_size'] = 50;
+        myPost('get_slave_link', _data, function(data){
             var rdata = $.parseJSON(data.data);
             var list = '';
+
+            if (rdata.data.length > 0){
+                for(i in rdata.data){
+                    list += '<tr>';
+                    list += '<td>' + rdata.data[i]['client_addr'] +'</td>';
+                    list += '<td>' + rdata.data[i]['client_port'] +'</td>';
+                    list += '<td>' + rdata.data[i]['usename'] +'</td>';
+                    list += '<td>' + rdata.data[i]['state'] +'</td>';
+                    list += '<td>' + rdata.data[i]['sync_state'] +'</td>';
+                    list += '<td>' + rdata.data[i]['application_name'] +'</td>';
+                    list += '</tr>';
+                }
+            } else {
+                list += '<tr>';
+                list += '<td colspan="6" style="text-align:center;">空</td>';
+                list += '</tr>';
+            }
+            
             for(i in rdata.data){
 
                 var v = rdata.data[i];
@@ -1813,11 +1828,6 @@ function masterOrSlaveConf(version=''){
                         </tbody></table>\
                     </div>\
                 </div>';
-
-            // <div id="databasePage_slave" class="dataTables_paginate paging_bootstrap page"></div>\
-            // <div class="table_toolbar">\
-            //     <span class="sync btn btn-default btn-sm" onclick="getMasterRepSlaveList()" title="">添加</span>\
-            // </div>
             $(".table_slave_status_list").html(con);
         });
     }
