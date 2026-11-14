@@ -84,6 +84,9 @@ Install_app()
 		LLVM_DIR=`brew --prefix llvm`
 		WHERE_DIR_GCC=${LLVM_DIR}/bin/clang
 		WHERE_DIR_GPP=${LLVM_DIR}/bin/clang++
+
+		export CFLAGS="-Wno-nullability-completeness"
+		export CXXFLAGS="-Wno-nullability-completeness"
 	fi
 
 	if [ ! -d $serverPath/mariadb ];then
