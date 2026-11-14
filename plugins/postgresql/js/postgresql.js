@@ -1749,11 +1749,14 @@ function masterOrSlaveConf(version=''){
                     </div>\
                     <div id="databasePage" class="dataTables_paginate paging_bootstrap page"></div>\
                     <div class="table_toolbar" style="left:0px;">\
-                        <span class="sync btn btn-default btn-sm" onclick="getMasterDbList();" title="">刷新</span>\
+                        <span class="sync btn btn-default btn-sm btn-master-refresh" title="">刷新</span>\
                     </div>\
                 </div>';
 
             $(".table_master_list").html(con);
+            $(".table_master_list .btn-master-refresh").click(function(){
+                getMasterDbList();
+            });
             $('#databasePage').html(rdata.page);
         });
     }
