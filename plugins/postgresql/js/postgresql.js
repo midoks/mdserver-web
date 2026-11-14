@@ -1775,12 +1775,15 @@ function masterOrSlaveConf(version=''){
             if (rdata.data.length > 0){
                 for(i in rdata.data){
                     list += '<tr>';
-                    list += '<td>' + rdata.data[i]['client_addr'] +'</td>';
-                    list += '<td>' + rdata.data[i]['client_port'] +'</td>';
-                    list += '<td>' + rdata.data[i]['usename'] +'</td>';
-                    list += '<td>' + rdata.data[i]['state'] +'</td>';
-                    list += '<td>' + rdata.data[i]['sync_state'] +'</td>';
-                    list += '<td>' + rdata.data[i]['application_name'] +'</td>';
+                    list += '<td>' + rdata.data[i]['sender_host'] +'</td>';
+                    list += '<td>' + rdata.data[i]['sender_port'] +'</td>';
+                    list += '<td>' + rdata.data[i]['status'] +'</td>';
+                    list += '<td>' + rdata.data[i]['slot_name'] +'</td>';
+                    
+                    list += '<td>' + rdata.data[i]['receive_start_lsn'] +'</td>';
+                    list += '<td>' + rdata.data[i]['latest_end_lsn'] +'</td>';
+                    list += '<td>' + rdata.data[i]['written_lsn'] +'</td>';
+                    list += '<td>' + rdata.data[i]['flushed_lsn'] +'</td>';
                     list += '</tr>';
                 }
             } else {
@@ -1793,12 +1796,15 @@ function masterOrSlaveConf(version=''){
                     <div class="tablescroll">\
                         <table id="DataBody" class="table table-hover" width="100%" cellspacing="0" cellpadding="0" border="0" style="border: 0 none;">\
                         <thead><tr>\
-                        <th>从库IP</th>\
+                        <th>主库IP</th>\
                         <th>端口</th>\
-                        <th>用户</th>\
                         <th>状态</th>\
-                        <th>同步状态</th>\
-                        <th>应该名称</th></tr></thead>\
+                        <th>槽名</th>\
+                        <th>接收起始LSN</th>\
+                        <th>最新结束LSN</th>\
+                        <th>已写入LSN</th>\
+                        <th>已刷盘LSN </th>\
+                        </tr></thead>\
                         <tbody>\
                         '+ list +'\
                         </tbody></table>\
