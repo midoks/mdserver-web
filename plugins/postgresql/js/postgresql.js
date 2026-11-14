@@ -1018,11 +1018,11 @@ function addMasterRepSlaveUser(){
         shadeClose: true,
         btn:["提交","取消"],
         content: "<form class='bt-form pd20' id='add_master'>\
-            <div class='line'><span class='tname'>用户名</span><div class='info-r'><input name='username' class='bt-input-text mr5' placeholder='用户名' type='text' style='width:330px;' value='"+(randomStrPwd(6))+"'></div></div>\
+            <div class='line'><span class='tname'>用户名</span><div class='info-r'><input name='username' class='bt-input-text mr5' placeholder='用户名' type='text' style='width:330px;' value='"+(randomLowerStr(6))+"'></div></div>\
             <div class='line'>\
                 <span class='tname'>密码</span>\
                 <div class='info-r'>\
-                    <input class='bt-input-text mr5' type='text' name='password' id='MyPassword' style='width:330px' value='"+(randomLowerStr(6))+"' />\
+                    <input class='bt-input-text mr5' type='text' name='password' id='MyPassword' style='width:330px' value='"+(randomStr(16))+"' />\
                     <span title='随机密码' class='glyphicon glyphicon-repeat cursor' onclick='repeatMSPwd(16)'></span>\
                 </div>\
             </div>\
