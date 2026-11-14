@@ -35,7 +35,7 @@ Install_app()
 	fi
 
 	if [ "$sysName" == "Darwin" ];then
-		MEM_INFO=`sysctl -n hw.memsize | awk '{printf "%.f\n", $1/1024/1024/1024}'`
+		MEM_INFO=`sysctl -n hw.memsize | awk '{printf "%.f", $1/1024/1024/1024}'`
 	else
 		MEM_INFO=$(free -m|grep Mem|awk '{printf("%.f",($2)/1024)}')
 	fi
