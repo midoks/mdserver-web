@@ -2022,7 +2022,7 @@ def doFullSync(version=''):
 def doFullSyncUser(version=''):
     db = pgDb()
     mdir = getServerDir()
-
+    conn = pSqliteDb('slave_sync_user')
     data = conn.field('ip,port,user,pass,mode,cmd,slot_name').find()
     user = data['user']
     apass = data['pass']
