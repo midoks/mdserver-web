@@ -21,6 +21,9 @@ export PATH
 # -- 切换数据库
 # \c ff
 
+# -- 查看槽列表
+# SELECT slot_name, active, pg_wal_lsn_diff(pg_current_wal_lsn(), restart_lsn)/1024/1024 AS retained_mb FROM pg_replication_slots;
+
 
 curPath=`pwd`
 rootPath=$(dirname "$curPath")
