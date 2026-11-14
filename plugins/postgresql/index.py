@@ -1903,10 +1903,10 @@ def getMasterRepSlaveUserCmd(version=''):
     if len(clist) == 0:
         return mw.returnJson(False, '请添加同步账户!')
 
-    cmd = 'echo "' + clist[0]['password'] + '" | ' + mdir + '/bin/pg_basebackup -Fp --progress -D ' + mdir + \
+    sql = 'PGPASSWORD=\'' + clist[0]['password'] + '\'' + mdir + '/bin/pg_basebackup -Fp --progress -D ' + mdir + \
         '/data -h ' + localIp + ' -p ' + port + \
         ' -U ' + clist[0]['username'] + ' --password'
-
+        
     data = {}
     data['cmd'] = cmd
     data['info'] = clist
@@ -1934,7 +1934,7 @@ def getMasterRepSlaveUserFullCmd(version=''):
         return mw.returnJson(False, '请添加同步账户!')
 
     sql = '<span class="set-info c7 ta_center">手动测试</span><hr style="margin-top: 5px;margin-bottom: 10px;"/>'
-    sql += 'echo "' + clist[0]['password'] + '" | ' + mdir + '/bin/pg_basebackup -Fp --progress -D ' + mdir + \
+    sql += 'PGPASSWORD=\'' + clist[0]['password'] + '\'' + mdir + '/bin/pg_basebackup -Fp --progress -D ' + mdir + \
         '/data -h ' + localIp + ' -p ' + port + \
         ' -U ' + clist[0]['username'] + ' --password'
     sql += "<hr/>"
@@ -1942,7 +1942,7 @@ def getMasterRepSlaveUserFullCmd(version=''):
     sql +=  mdir + '/bin/pg_basebackup -D ' + mdir + '/data -h '\
             + localIp + ' -p ' + port + ' -U ' + clist[0]['username'] + ' --password ' + clist[0]['password']\
             + ' -S ' + clist[0]['username']
-            
+
     data = {}
     data['cmd'] = sql
     data['info'] = clist
