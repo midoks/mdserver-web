@@ -3192,8 +3192,8 @@ function masterOrSlaveConf(version=''){
                 <p class="conf_p">\
                     <span class="f14 c6 mr20">Slave[从]配置</span><span class="f14 c6 mr20"></span>\
                     <button class="btn '+(!rdata.slave_status ? 'btn-danger' : 'btn-success')+' btn-xs btn-slave">'+(!rdata.slave_status ? '未启动' : '已启动') +'</button>\
-                    <button class="btn btn-success btn-xs" onclick="getSlaveCfg()" >同步配置</button>\
-                    <button class="btn btn-success btn-xs" onclick="initSlaveStatus()" >初始化</button>\
+                    <button class="btn btn-success btn-xs" onclick="getSlaveCfg()">同步配置</button>\
+                    <button class="btn btn-success btn-xs" onclick="initSlaveStatus()">初始化</button>\
                 </p>\
                 <hr/>\
                 <!-- slave status list -->\

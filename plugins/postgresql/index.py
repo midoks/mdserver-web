@@ -1724,6 +1724,70 @@ def updateSlaveSSH(version=''):
     conn.where("ip=?", (ip,)).save('id_rsa', (id_rsa,))
     return mw.returnJson(True, 'ok')
 
+def getSlaveSyncUserByIp(version=''):
+    args = getArgs()
+    data = checkArgs(args, ['ip'])
+    if not data[0]:
+        return data[1]
+
+    ip = args['ip']
+
+    conn = pSqliteDb('slave_sync_user')
+    data = conn.field('ip,port,user,pass,mode,cmd').where(
+        "ip=?", (ip,)).select()
+    return mw.returnJson(True, 'ok', data)
+
+def getSlaveSyncUserList(version=''):
+    args = getArgs()
+    data = checkArgs(args, ['page', 'page_size'])
+    if not data[0]:
+        return data[1]
+
+    page = int(args['page'])
+    page_size = int(args['page_size'])
+
+    conn = pSqliteDb('slave_sync_user')
+    limit = str((page - 1) * page_size) + ',' + str(page_size)
+
+    field = 'id,ip,port,user,pass,cmd,addtime'
+    clist = conn.field(field).limit(limit).order('id desc').select()
+    count = conn.count()
+
+    data = {}
+    _page = {}
+    _page['count'] = count
+    _page['p'] = page
+    _page['row'] = page_size
+    _page['tojs'] = args['tojs']
+    data['page'] = mw.getPage(_page)
+    data['data'] = clist
+
+    return mw.getJson(data)
+
+def getSyncModeFile():
+    return getServerDir() + "/sync.mode"
+
+def getSlaveSyncMode(version):
+    sync_mode = getSyncModeFile()
+    if os.path.exists(sync_mode):
+        mode = mw.readFile(sync_mode).strip()
+        return mw.returnJson(True, 'ok', mode)
+    return mw.returnJson(False, 'fail')
+
+
+def setSlaveSyncMode(version):
+    args = getArgs()
+    data = checkArgs(args, ['mode'])
+    if not data[0]:
+        return data[1]
+    mode = args['mode']
+    sync_mode = getSyncModeFile()
+
+    if mode == 'none':
+        os.remove(sync_mode)
+    else:
+        mw.writeFile(sync_mode, mode)
+    return mw.returnJson(True, '设置成功', mode)
 
 def getMasterRepSlaveList(version=''):
     args = getArgs()
@@ -1819,8 +1883,36 @@ def delMasterRepSlaveUser(version=''):
     psdb.where("username=?", (args['username'],)).delete()
     return mw.returnJson(True, '删除成功!')
 
-
 def getMasterRepSlaveUserCmd(version=''):
+    args = getArgs()
+    data = checkArgs(args, ['username', 'db'])
+    if not data[0]:
+        return data[1]
+
+    psdb = pSqliteDb('master_replication_user')
+    mdir = getServerDir()
+    port = getPgPort()
+    localIp = mw.getLocalIp()
+    f = 'username,password'
+    username = args['username']
+    if username == '':
+        clist = psdb.field(f).limit('1').order('id desc').select()
+    else:
+        clist = psdb.field(f).where("username=?", (username,)).order('id desc').select()
+
+    if len(clist) == 0:
+        return mw.returnJson(False, '请添加同步账户!')
+
+    cmd = 'echo "' + clist[0]['password'] + '" | ' + mdir + '/bin/pg_basebackup -Fp --progress -D ' + mdir + \
+        '/data -h ' + localIp + ' -p ' + port + \
+        ' -U ' + clist[0]['username'] + ' --password'
+
+    data = {}
+    data['cmd'] = cmd
+    data['info'] = clist
+    return mw.returnJson(True, 'ok!', data)
+
+def getMasterRepSlaveUserFullCmd(version=''):
     args = getArgs()
     data = checkArgs(args, ['username', 'db'])
     if not data[0]:
@@ -1841,12 +1933,16 @@ def getMasterRepSlaveUserCmd(version=''):
     if len(clist) == 0:
         return mw.returnJson(False, '请添加同步账户!')
 
-    cmd = 'echo "' + clist[0]['password'] + '" | ' + mdir + '/bin/pg_basebackup -Fp --progress -D ' + mdir + \
+    sql = '<span class="set-info c7 ta_center">手动测试</span><hr style="margin-top: 5px;margin-bottom: 10px;"/>'
+    sql += 'echo "' + clist[0]['password'] + '" | ' + mdir + '/bin/pg_basebackup -Fp --progress -D ' + mdir + \
         '/data -h ' + localIp + ' -p ' + port + \
         ' -U ' + clist[0]['username'] + ' --password'
+    sql += "<hr/>"
+    sql += '<span class="set-info c7 ta_center">同步账户模式</span><hr style="margin-top: 5px;margin-bottom: 10px;"/>'
+    sql +=  mdir + '/bin/pg_basebackup -D ' + mdir + '/data -h ' + localIp + ' -p ' + port + ' -U ' + clist[0]['username'] + ' --password ' + clist[0]['password']
 
     data = {}
-    data['cmd'] = cmd
+    data['cmd'] = sql
     data['info'] = clist
     return mw.returnJson(True, 'ok!', data)
 
@@ -2087,6 +2183,18 @@ if __name__ == "__main__":
         print(delSlaveSSH(version))
     elif func == 'update_slave_ssh':
         print(updateSlaveSSH(version))
+    elif func == 'get_slave_sync_user_list':
+        print(getSlaveSyncUserList(version))
+    elif func == 'get_slave_sync_user_by_ip':
+        print(getSlaveSyncUserByIp(version))
+    elif func == 'add_slave_sync_user':
+        print(addSlaveSyncUser(version))
+    elif func == 'del_slave_sync_user':
+        print(delSlaveSyncUser(version))
+    elif func == 'get_slave_sync_mode':
+        print(getSlaveSyncMode(version))
+    elif func == 'set_slave_sync_mode':
+        print(setSlaveSyncMode(version))
     elif func == 'get_slave_ssh_list':
         print(getSlaveSSHList(version))
     elif func == 'get_slave_ssh_by_ip':
@@ -2105,6 +2213,8 @@ if __name__ == "__main__":
         print(delMasterRepSlaveUser(version))
     elif func == 'get_master_rep_slave_user_cmd':
         print(getMasterRepSlaveUserCmd(version))
+    elif func == 'get_master_rep_slave_user_full_cmd':
+        print(getMasterRepSlaveUserFullCmd(version))
     elif func == 'slave_sync_cmd':
         print(slaveSyncCmd(version))
     elif func == 'do_full_sync':
