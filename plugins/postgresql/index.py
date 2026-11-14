@@ -2093,7 +2093,7 @@ def doFullSyncUser(version=''):
         content,
         flags=re.MULTILINE
     )
-    print(content)
+    # print(content)
     mw.writeFile(pg_conf, content)
     start(version)
     return True
