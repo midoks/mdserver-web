@@ -1791,6 +1791,8 @@ function masterOrSlaveConf(version=''){
                     list += '<td>' + rdata.data[i]['sender_port'] +'</td>';
                     list += '<td>' + rdata.data[i]['status'] +'</td>';
                     list += '<td>' + rdata.data[i]['slot_name'] +'</td>';
+                    list += '<td>' + rdata.data[i]['last_lsn_commit_time'] +'</td>';
+
                     
                     list += '<td>' + rdata.data[i]['receive_start_lsn'] +'</td>';
                     list += '<td>' + rdata.data[i]['latest_end_lsn'] +'</td>';
@@ -1812,6 +1814,7 @@ function masterOrSlaveConf(version=''){
                         <th>端口</th>\
                         <th>状态</th>\
                         <th>槽名</th>\
+                        <th>距最后回放事务时间</th>\
                         <th>接收起始LSN</th>\
                         <th>最新结束LSN</th>\
                         <th>已写入LSN</th>\

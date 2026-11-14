@@ -1854,10 +1854,13 @@ def getMasterLink(version):
 
 def getSlaveLink(version):
     pdb = pgDb()
-    data = pdb.query("SELECT * FROM pg_stat_wal_receiver")
     fields = 'pid,status,receive_start_lsn,receive_start_tli,written_lsn,flushed_lsn,received_tli,latest_end_lsn,slot_name,sender_host,sender_port'
     data = pdb.field(fields).table('pg_stat_wal_receiver').select()
     # print(data)
+    lag = pdb.query('select coalesce(extract(epoch from (now() - pg_last_xact_replay_timestamp()))::int, 0) as lag')
+    if isinstance(data, list) and len(data) > 0:
+        data[0]["last_lsn_commit_time"] = lag[0][0] if isinstance(
+            lag, list) and len(lag) > 0 else 0
     return mw.returnJson(True, 'ok', data)
 
 def getMasterRepSlaveList(version=''):
