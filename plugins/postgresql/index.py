@@ -2028,6 +2028,7 @@ def doFullSyncUser(version=''):
     port = data['port']
     ip = data['ip']
     cmd = data['cmd']
+    slot_name = data['slot_name']
 
 
 def doFullSyncSSH(version=''):
