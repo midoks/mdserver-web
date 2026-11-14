@@ -2197,7 +2197,7 @@ interact
     mw.execShell("chmod -R 700 " + data_dir)
     os.system("expect " + cmd_tmp)
 
-
+    slot_name = username
     primary_conninfo = "host=%s port=%s user=%s password=%s application_name=standby1" % (ip,port,username,password)
 
     # 同步成功后,开启从库配置
