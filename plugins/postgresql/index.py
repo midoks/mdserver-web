@@ -2038,7 +2038,6 @@ def doFullSyncUser(version=''):
 
     cmd += "PGPASSWORD='"+slot_name+"' " + cmd
     print(cmd)
-
     # 停用
     stop(version)
 
