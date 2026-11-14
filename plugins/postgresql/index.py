@@ -1850,7 +1850,23 @@ def setSlaveSyncMode(version):
 
 def getMasterLink(version):
     pdb = pgDb()
-    data = pdb.query("SELECT * FROM pg_stat_replication")
+    sql = """
+    SELECT pid, usesysid, usename, application_name,
+           client_addr, client_hostname, client_port,
+           to_char(backend_start, 'YYYY-MM-DD HH24:MI:SS') AS backend_start,
+           backend_xmin, state,
+           sent_lsn, write_lsn, flush_lsn, replay_lsn,
+           write_lag, flush_lag, replay_lag,
+           sync_priority, sync_state,
+           to_char(reply_time, 'YYYY-MM-DD HH24:MI:SS') AS reply_time
+    FROM pg_stat_replication
+    """
+
+    fields = 'pid, usesysid, usename, application_name,client_addr, client_hostname, client_port,\
+           backend_xmin, state,sent_lsn, write_lsn, flush_lsn, replay_lsn,\
+           write_lag, flush_lag, replay_lag,sync_priority, sync_state'
+    data = pdb.field(fields).table('pg_stat_replication').select()
+    # print(data)
     return mw.returnJson(True, 'ok', data)
 
 def getSlaveLink(version):
@@ -1927,8 +1943,6 @@ def addMasterRepSlaveUser(version=''):
     data = data + "\nhost   replication  " + username + "   " + address + "     scram-sha-256"
 
     mw.writeFile(pg_conf, data)
-
-
 
     addTime = time.strftime('%Y-%m-%d %X', time.localtime())
     psdb.add('username,password,accept,ps,addtime',

@@ -1717,11 +1717,11 @@ function masterOrSlaveConf(version=''){
             var list = '';
             for(i in rdata.data){
                 list += '<tr>';
-                list += '<td>' + rdata.data[i]['name'] +'</td>';
-                list += '<td>' + (rdata.data[i]['master']?'是':'否') +'</td>';
+                list += '<td>' + rdata.data[i]['client_addr'] +'</td>';
+                list += '<td>' + rdata.data[i]['client_port'] +'</td>';
+                list += '<td>' + rdata.data[i]['state'] +'</td>';
                 list += '<td style="text-align:right">' + 
-                    '<a href="javascript:;" class="btlink" onclick="setDbMaster(\''+rdata.data[i]['name']+'\')" title="加入或退出">'+(rdata.data[i]['master']?'退出':'加入')+'</a> | ' +
-                    '<a href="javascript:;" class="btlink" onclick="getMasterRepSlaveUserCmd(\'\',\''+rdata.data[i]['name']+'\')" title="同步命令">同步命令</a>' +
+                    '<a href="javascript:;" class="btlink" title="OP">OP</a>' +
                 '</td>';
                 list += '</tr>';
             }
@@ -1730,8 +1730,9 @@ function masterOrSlaveConf(version=''){
                     <div class="tablescroll">\
                         <table id="DataBody" class="table table-hover" width="100%" cellspacing="0" cellpadding="0" border="0" style="border: 0 none;">\
                         <thead><tr>\
-                        <th>数据库名</th>\
-                        <th>同步</th>\
+                        <th>从库IP</th>\
+                        <th>端口</th>\
+                        <th>状态</th>\
                         <th style="text-align:right;">操作</th></tr></thead>\
                         <tbody>\
                         '+ list +'\
@@ -1739,7 +1740,7 @@ function masterOrSlaveConf(version=''){
                     </div>\
                     <div id="databasePage" class="dataTables_paginate paging_bootstrap page"></div>\
                     <div class="table_toolbar" style="left:0px;">\
-                        <span class="sync btn btn-default btn-sm" onclick="getMasterRepSlaveListPage()" title="">同步账户列表</span>\
+                        <span class="sync btn btn-default btn-sm" title="">刷新</span>\
                     </div>\
                 </div>';
 
