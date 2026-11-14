@@ -100,10 +100,22 @@ def getImportDir():
     if not os.path.exists(import_dir):
         os.makedirs(import_dir)
     return import_dir
-    
+
+def getDataDir():
+    path = getServerDir() + '/data'
+    return path
+
+def getBakInitConf():
+    path = getServerDir() + '/data.init/postgresql.conf'
+    if os.path.exists(path):
+        return path
+    return path
+
 def getConf():
     path = getServerDir() + '/data/postgresql.conf'
-    return path
+    if os.path.exists(path):
+        return path
+    return getBakInitConf()
 
 
 def configTpl():
@@ -1869,7 +1881,6 @@ def writeDbSyncStatus(data):
 
 
 def doFullSync(version=''):
-
     db = pgDb()
 
     id_rsa_conn = pSqliteDb('slave_id_rsa', 'pgsql_slave')
@@ -1955,8 +1966,22 @@ interact
 """ % (cmd, password)
 
     mw.writeFile(cmd_tmp, cmd_tmp_data)
+    # 停用
+    stop(version)
 
+    # 备份
+    data_dir = getDataDir()
+    init_data_dir = getDataDir()+'.init'
+    if not os.path.exists(init_data_dir):
+        mw.execShell("mv " + data_dir +" " + init_data_dir)
+    else:
+        mw.execShell("rm -rf " + data_dir)
+    mw.execShell("mkdir -p " + data_dir)
+    mw.execShell("chown -R postgres:postgres " + data_dir)
+    mw.execShell("chmod -R 700 " + data_dir)
     os.system("expect " + cmd_tmp)
+
+    start(version)
 
     writeDbSyncStatus({'code': 6, 'msg': '从库重启完成...', 'progress': 100})
 
