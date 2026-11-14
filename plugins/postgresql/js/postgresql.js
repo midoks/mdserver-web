@@ -1742,7 +1742,7 @@ function masterOrSlaveConf(version=''){
                         <th>用户</th>\
                         <th>状态</th>\
                         <th>同步状态</th>\
-                        <th>应该名称</th>\
+                        <th>应该名称</th></tr></thead>\
                         <tbody>\
                         '+ list +'\
                         </tbody></table>\
@@ -1788,41 +1788,16 @@ function masterOrSlaveConf(version=''){
                 list += '<td colspan="6" style="text-align:center;">空</td>';
                 list += '</tr>';
             }
-            
-            for(i in rdata.data){
-
-                var v = rdata.data[i];
-                var status = "异常";
-                if (v['Slave_SQL_Running'] == 'Yes' && v['Slave_IO_Running'] == 'Yes'){
-                    status = "正常";
-                }
-
-                list += '<tr>';
-                list += '<td>' + rdata.data[i]['Master_Host'] +'</td>';
-                list += '<td>' + rdata.data[i]['Master_Port'] +'</td>';
-                list += '<td>' + rdata.data[i]['Master_User'] +'</td>';
-                list += '<td>' + rdata.data[i]['Master_Log_File'] +'</td>';
-                list += '<td>' + rdata.data[i]['Slave_IO_Running'] +'</td>';
-                list += '<td>' + rdata.data[i]['Slave_SQL_Running'] +'</td>';
-                list += '<td>' + status +'</td>';
-                list += '<td style="text-align:right">' + 
-                    '<a href="javascript:;" class="btlink" onclick="deleteSlave()" title="删除">删除</a>' +
-                '</td>';
-                list += '</tr>';
-            }
 
             var con = '<div class="divtable mtb10">\
                     <div class="tablescroll">\
                         <table id="DataBody" class="table table-hover" width="100%" cellspacing="0" cellpadding="0" border="0" style="border: 0 none;">\
-                        <thead><tr>\
-                        <th>主[服务]</th>\
+                        <th>从库IP</th>\
                         <th>端口</th>\
                         <th>用户</th>\
-                        <th>日志</th>\
-                        <th>IO</th>\
-                        <th>SQL</th>\
                         <th>状态</th>\
-                        <th style="text-align:right;">操作</th></tr></thead>\
+                        <th>同步状态</th>\
+                        <th>应该名称</th></tr></thead>\
                         <tbody>\
                         '+ list +'\
                         </tbody></table>\
