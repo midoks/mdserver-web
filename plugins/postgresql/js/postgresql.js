@@ -1735,7 +1735,7 @@ function masterOrSlaveConf(version=''){
                 }
             } else {
                 list += '<tr>';
-                list += '<td colspan="6" style="text-align:center;">空</td>';
+                list += '<td colspan="10" style="text-align:center;">空</td>';
                 list += '</tr>';
             }
 
@@ -1750,9 +1750,9 @@ function masterOrSlaveConf(version=''){
                         <th>同步状态</th>\
                         <th>应该名称</th>\
                         <th>已发送LSN</th>\
-                        <th>已发送LSN</th>\
-                        <th>已发送LSN</th>\
-                        <th>已发送LSN</th>\
+                        <th>已写入LSN</th>\
+                        <th>已刷盘LSN</th>\
+                        <th>已回放LSN</th>\
                         </tr></thead>\
                         <tbody>\
                         '+ list +'\
@@ -1800,7 +1800,7 @@ function masterOrSlaveConf(version=''){
                 }
             } else {
                 list += '<tr>';
-                list += '<td colspan="6" style="text-align:center;">空</td>';
+                list += '<td colspan="8" style="text-align:center;">空</td>';
                 list += '</tr>';
             }
 
