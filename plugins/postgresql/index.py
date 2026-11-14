@@ -2080,8 +2080,7 @@ def doFullSyncSSH(version=''):
     print("同步文件", "start")
     t = ssh.get_transport()
     sftp = paramiko.SFTPClient.from_transport(t)
-    copy_status = sftp.get(
-        "/www/server/postgresql/pgsql.db", getServerDir() + "/pgsql.db")
+    copy_status = sftp.get("/www/server/postgresql/pgsql.db", getServerDir() + "/pgsql.db")
     print("同步信息:", copy_status)
     print("同步文件", "end")
     if copy_status == None:
@@ -2137,8 +2136,8 @@ interact
     start(version)
 
     writeDbSyncStatus({'code': 6, 'msg': '从库重启完成...', 'progress': 100})
-
-    os.system("rm -rf " + SSH_PRIVATE_KEY)
+    if os.path.exists(SSH_PRIVATE_KEY):
+        os.system("rm -rf " + SSH_PRIVATE_KEY)
     os.system("rm -rf " + cmd_tmp)
     return True
 
