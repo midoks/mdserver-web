@@ -1436,7 +1436,30 @@ function addSlaveSyncUser(ip=''){
                 $('textarea[name="cmd"]').html(cmd);
                 $('textarea[name="cmd"]').change(function(){
                     var val = $(this).val();
-                    
+                    if (val == '') {
+                        return;
+                    }
+                    // PGPASSWORD='xxx' /www/server/postgresql/bin/pg_basebackup -D /www/server/postgresql/data -h 1.1.1.1 -p 5432 -U user --password -S slot
+                    var pass = val.match(/PGPASSWORD=['"]?([^'"\s]+)['"]?/);
+                    var ip = val.match(/-h\s+([^\s]+)/);
+                    var port = val.match(/-p\s+(\d+)/);
+                    var user = val.match(/-U\s+([^\s]+)/);
+                    var slot = val.match(/-S\s+([^\s]+)/);
+                    if (pass) {
+                        $('input[name="pass"]').val(pass[1]);
+                    }
+                    if (ip) {
+                        $('input[name="ip"]').val(ip[1]);
+                    }
+                    if (port) {
+                        $('input[name="port"]').val(port[1]);
+                    }
+                    if (user) {
+                        $('input[name="user"]').val(user[1]);
+                    }
+                    if (slot) {
+                        $('input[name="slot_name"]').val(slot[1]);
+                    }
                 });
             },
             yes:function(index){

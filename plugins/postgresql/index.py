@@ -1737,6 +1737,53 @@ def getSlaveSyncUserByIp(version=''):
         "ip=?", (ip,)).select()
     return mw.returnJson(True, 'ok', data)
 
+def addSlaveSyncUser(version=''):
+    import base64
+
+    args = getArgs()
+    data = checkArgs(args, ['ip'])
+    if not data[0]:
+        return data[1]
+
+    ip = args['ip']
+    if ip == "":
+        return mw.returnJson(True, 'ok')
+
+    data = checkArgs(args, ['port', 'user', 'pass', 'mode'])
+    if not data[0]:
+        return data[1]
+
+    cmd = args['cmd']
+    port = args['port']
+    user = args['user']
+    apass = args['pass']
+    mode = args['mode']
+    slot_name = args['slot_name']
+    addTime = time.strftime('%Y-%m-%d %X', time.localtime())
+
+    conn = pSqliteDb('slave_sync_user')
+    data = conn.field('ip').where("ip=?", (ip,)).select()
+    if len(data) > 0:
+        res = conn.where("ip=?", (ip,)).save(
+            'port,user,pass,mode,cmd,slot_name', (port, user, apass, mode, cmd,slot_name))
+    else:
+        conn.add('ip,port,user,cmd,user,pass,mode,slot_name,addtime',
+                 (ip, port, user, cmd, user, apass, mode, slot_name,addTime))
+
+    return mw.returnJson(True, '设置成功!')
+
+def delSlaveSyncUser(version=''):
+    args = getArgs()
+    data = checkArgs(args, ['ip'])
+    if not data[0]:
+        return data[1]
+
+    ip = args['ip']
+
+    conn = pSqliteDb('slave_sync_user')
+    conn.where("ip=?", (ip,)).delete()
+    return mw.returnJson(True, '删除成功!')
+
 def getSlaveSyncUserList(version=''):
     args = getArgs()
     data = checkArgs(args, ['page', 'page_size'])
