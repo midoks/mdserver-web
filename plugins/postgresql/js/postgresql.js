@@ -1703,6 +1703,52 @@ function slaveSyncCmd(){
 
 function masterOrSlaveConf(version=''){
 
+    function getMasterDbList(){
+        var _data = {};
+        if (typeof(page) =='undefined'){
+            var page = 1;
+        }
+        
+        _data['page'] = page;
+        _data['page_size'] = 10;
+
+        myPostN('get_master_link', _data, function(data){
+            var rdata = $.parseJSON(data.data);
+            var list = '';
+            for(i in rdata.data){
+                list += '<tr>';
+                list += '<td>' + rdata.data[i]['name'] +'</td>';
+                list += '<td>' + (rdata.data[i]['master']?'是':'否') +'</td>';
+                list += '<td style="text-align:right">' + 
+                    '<a href="javascript:;" class="btlink" onclick="setDbMaster(\''+rdata.data[i]['name']+'\')" title="加入或退出">'+(rdata.data[i]['master']?'退出':'加入')+'</a> | ' +
+                    '<a href="javascript:;" class="btlink" onclick="getMasterRepSlaveUserCmd(\'\',\''+rdata.data[i]['name']+'\')" title="同步命令">同步命令</a>' +
+                '</td>';
+                list += '</tr>';
+            }
+
+            var con = '<div class="divtable mtb10">\
+                    <div class="tablescroll">\
+                        <table id="DataBody" class="table table-hover" width="100%" cellspacing="0" cellpadding="0" border="0" style="border: 0 none;">\
+                        <thead><tr>\
+                        <th>数据库名</th>\
+                        <th>同步</th>\
+                        <th style="text-align:right;">操作</th></tr></thead>\
+                        <tbody>\
+                        '+ list +'\
+                        </tbody></table>\
+                    </div>\
+                    <div id="databasePage" class="dataTables_paginate paging_bootstrap page"></div>\
+                    <div class="table_toolbar" style="left:0px;">\
+                        <span class="sync btn btn-default btn-sm" onclick="getMasterRepSlaveListPage()" title="">同步账户列表</span>\
+                    </div>\
+                </div>';
+
+            $(".table_master_list").html(con);
+            $('#databasePage').html(rdata.page);
+        });
+    }
+
+
     function getAsyncMasterDbList(){
         var _data = {};
         if (typeof(page) =='undefined'){
@@ -1777,13 +1823,16 @@ function masterOrSlaveConf(version=''){
                 <p class="conf_p">\
                     <span class="f14 c6 mr20">Master[主]配置</span><span class="f14 c6 mr20"></span>\
                     <button class="btn '+(!rdata.status ? 'btn-danger' : 'btn-success')+' btn-xs btn-master">'+(!rdata.status ? '未开启' : '已开启') +'</button>\
-                    <button class="btn btn-success btn-xs" onclick="getMasterRepSlaveListPage()" >同步账户</button>\
+                    <button class="btn btn-success btn-xs" onclick="getMasterRepSlaveListPage()">同步账户</button>\
                 </p>\
+                <hr/>\
+                <!-- master list -->\
+                <div class="safe bgw table_master_list"></div>\
                 <hr/>\
                 <!-- class="conf_p" -->\
                 <p class="conf_p">\
                     <span class="f14 c6 mr20">Slave[从]配置</span><span class="f14 c6 mr20"></span>\
-                    <button class="btn '+(!rdata.slave_status ? 'btn-danger' : 'btn-success')+' btn-xs btn-slave">'+(!rdata.slave_status ? '未启动' : '已启动') +'</button>\
+                    <button class="btn '+(!rdata.slave_status ? 'btn-danger' : 'btn-success')+' btn-xs btn-slave">'+(!rdata.slave_status ? '未开启' : '已开启') +'</button>\
                     <button class="btn btn-success btn-xs" onclick="getSlaveCfg()">同步配置</button>\
                     <button class="btn btn-success btn-xs" onclick="slaveSyncCmd()" >同步命令</button>\
                 </p>\
@@ -1815,6 +1864,10 @@ function masterOrSlaveConf(version=''){
                     }, 3000);
                 });
             });
+
+            if (rdata.status){
+                getMasterDbList();
+            }
             
             if (rdata.slave_status){
                 getAsyncMasterDbList();

@@ -1848,6 +1848,16 @@ def setSlaveSyncMode(version):
         mw.writeFile(sync_mode, mode)
     return mw.returnJson(True, '设置成功', mode)
 
+def getMasterLink(version):
+    pdb = pgDb()
+    data = pdb.query("SELECT * FROM pg_stat_replication")
+    return mw.returnJson(True, 'ok', data)
+
+def getSlaveLink(version):
+    pdb = pgDb()
+    data = pdb.query("SELECT * FROM pg_stat_wal_receiver")
+    return mw.returnJson(True, 'ok', data)
+
 def getMasterRepSlaveList(version=''):
     args = getArgs()
     data = checkArgs(args, ['page', 'page_size'])
@@ -2391,6 +2401,10 @@ if __name__ == "__main__":
         print(setMasterStatus(version))
     elif func == 'set_slave_status':
         print(setSlaveStatus(version))
+    elif func == 'get_master_link':
+        print(getMasterLink(version))
+    elif func == 'get_slave_link':
+        print(getSlaveLink(version))
     elif func == 'get_master_rep_slave_list':
         print(getMasterRepSlaveList(version))
     elif func == 'add_master_rep_slave_user':
