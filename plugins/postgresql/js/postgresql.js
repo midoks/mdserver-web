@@ -1714,6 +1714,7 @@ function masterOrSlaveConf(version=''){
 
         myPostN('get_master_link', _data, function(data){
             var rdata = $.parseJSON(data.data);
+            console.log('get_master_link:',rdata);
             var list = '';
 
             if (rdata.data.length > 0){
@@ -1725,6 +1726,11 @@ function masterOrSlaveConf(version=''){
                     list += '<td>' + rdata.data[i]['state'] +'</td>';
                     list += '<td>' + rdata.data[i]['sync_state'] +'</td>';
                     list += '<td>' + rdata.data[i]['application_name'] +'</td>';
+
+                    list += '<td>' + rdata.data[i]['sent_lsn'] +'</td>';
+                    list += '<td>' + rdata.data[i]['write_lsn'] +'</td>';
+                    list += '<td>' + rdata.data[i]['flush_lsn'] +'</td>';
+                    list += '<td>' + rdata.data[i]['replay_lsn'] +'</td>';
                     list += '</tr>';
                 }
             } else {
@@ -1742,7 +1748,12 @@ function masterOrSlaveConf(version=''){
                         <th>用户</th>\
                         <th>状态</th>\
                         <th>同步状态</th>\
-                        <th>应该名称</th></tr></thead>\
+                        <th>应该名称</th>\
+                        <th>已发送LSN</th>\
+                        <th>已发送LSN</th>\
+                        <th>已发送LSN</th>\
+                        <th>已发送LSN</th>\
+                        </tr></thead>\
                         <tbody>\
                         '+ list +'\
                         </tbody></table>\
@@ -1770,6 +1781,7 @@ function masterOrSlaveConf(version=''){
         _data['page_size'] = 50;
         myPost('get_slave_link', _data, function(data){
             var rdata = $.parseJSON(data.data);
+            console.log('get_slave_link:',rdata);
             var list = '';
 
             if (rdata.data.length > 0){
