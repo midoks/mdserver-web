@@ -48,6 +48,7 @@ CREATE TABLE IF NOT EXISTS `slave_sync_user` (
   `port` TEXT,
   `user` TEXT,
   `pass` TEXT,
+  `slot_name` TEXT,
   `mode` TEXT,
   `cmd` TEXT,
   `db` TEXT,

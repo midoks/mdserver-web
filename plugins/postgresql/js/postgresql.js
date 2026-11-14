@@ -1393,6 +1393,7 @@ function addSlaveSyncUser(ip=''){
         var user = 'input_sync_user';
         var pass = 'input_sync_pwd';
         var mode = '0';
+        var slot_name = '';
 
         if (rdata.data.length>0){
             ip = rdata.data[0]['ip'];
@@ -1416,6 +1417,7 @@ function addSlaveSyncUser(ip=''){
                 <div class='line'><span class='tname'>端口</span><div class='info-r'><input name='port' class='bt-input-text mr5' type='number' style='width:330px;' value='"+port+"'></div></div>\
                 <div class='line'><span class='tname'>同步账户</span><div class='info-r'><input name='user' class='bt-input-text mr5' type='text' style='width:330px;' value='"+user+"'></div></div>\
                 <div class='line'><span class='tname'>同步密码</span><div class='info-r'><input name='pass' class='bt-input-text mr5' type='text' style='width:330px;' value='"+pass+"'></div></div>\
+                <div class='line'><span class='tname'>槽名</span><div class='info-r'><input name='slot_name' class='bt-input-text mr5' type='text' style='width:330px;' value='"+slot_name+"'></div></div>\
                 <div class='line'>\
                     <span class='tname'>同步模式</span>\
                     <div class='info-r'>\
@@ -1434,40 +1436,7 @@ function addSlaveSyncUser(ip=''){
                 $('textarea[name="cmd"]').html(cmd);
                 $('textarea[name="cmd"]').change(function(){
                     var val = $(this).val();
-                    val = val.replace(';','');
-                    var a = {};
-                    if (val.toLowerCase().indexOf('for')>0){
-                        cmd_tmp = val.split('for');
-                        val = cmd_tmp[0].trim();
-
-                        const channel_str = cmd_tmp[1].trim();
-                        const ch_reg = /channel \'(.*)\';/;
-                        var match_val = channel_str.match(ch_reg);
-                        if (match_val.length>1){
-                            a['channel'] = match_val[1];
-                        }
-                    }
-
-                    var vlist = val.split(',');
-                    for (var i in vlist) {
-                        var tmp = toTrim(vlist[i]);
-                        var tmp_a = tmp.split(" ");
-                        var real_tmp = tmp_a[tmp_a.length-1];
-                        var kv = real_tmp.split("=");
-                        a[kv[0]] = kv[1].replace("'",'').replace("'",'');
-                    }
-
-                    if ('MASTER_HOST' in a){
-                        $('input[name="ip"]').val(a['MASTER_HOST']);
-                        $('input[name="port"]').val(a['MASTER_PORT']);
-                        $('input[name="user"]').val(a['MASTER_USER']);
-                        $('input[name="pass"]').val(a['MASTER_PASSWORD']);
-                    } else {
-                        $('input[name="ip"]').val(a['SOURCE_HOST']);
-                        $('input[name="port"]').val(a['SOURCE_PORT']);
-                        $('input[name="user"]').val(a['SOURCE_USER']);
-                        $('input[name="pass"]').val(a['SOURCE_PASSWORD']);
-                    }
+                    
                 });
             },
             yes:function(index){
@@ -1477,8 +1446,9 @@ function addSlaveSyncUser(ip=''){
                 var pass = $('input[name="pass"]').val();
                 var cmd = $('textarea[name="cmd"]').val();
                 var mode = $('select[name="mode"]').val();
+                var slot_name = $('input[name="slot_name"]').val();
 
-                var data = {ip:ip,port:port,cmd:cmd,user:user,pass:pass,mode:mode};
+                var data = {ip:ip,port:port,cmd:cmd,user:user,pass:pass,mode:mode,slot_name:slot_name};
                 myPost('add_slave_sync_user', data, function(ret_data){
                     layer.close(index);
                     var rdata = $.parseJSON(ret_data.data);
