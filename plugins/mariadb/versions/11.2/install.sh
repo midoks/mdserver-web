@@ -86,8 +86,8 @@ Install_app()
 		-DEXTRA_CHARSETS=all \
 		-DDEFAULT_CHARSET=utf8mb4 \
 		-DDEFAULT_COLLATION=utf8mb4_general_ci \
-		-DCMAKE_C_COMPILER=/usr/bin/gcc \
-		-DCMAKE_CXX_COMPILER=/usr/bin/g++
+		-DCMAKE_C_COMPILER=${WHERE_DIR_GCC} \
+		-DCMAKE_CXX_COMPILER=${WHERE_DIR_GPP}
 		make -j${cpuCore} && make install && make clean
 
 		if [ -d $serverPath/mariadb ];then
