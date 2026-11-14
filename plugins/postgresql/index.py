@@ -1965,10 +1965,9 @@ def getMasterRepSlaveUserCmd(version=''):
     if len(clist) == 0:
         return mw.returnJson(False, '请添加同步账户!')
 
-    sql = 'PGPASSWORD=\'' + clist[0]['password'] + '\' ' + mdir + '/bin/pg_basebackup -Fp --progress -D ' + mdir + \
+    cmd = 'PGPASSWORD=\'' + clist[0]['password'] + '\' ' + mdir + '/bin/pg_basebackup -Fp --progress -D ' + mdir + \
         '/data -h ' + localIp + ' -p ' + port + \
         ' -U ' + clist[0]['username'] + ' --password'
-
     data = {}
     data['cmd'] = cmd
     data['info'] = clist
@@ -2050,7 +2049,7 @@ def doFullSyncUser(version=''):
     cmd_sync = mdir + '/bin/pg_basebackup --progress -D ' + mdir + \
         '/data -h ' + ip + ' -p ' + port \
         + ' -Fp -Xs -P -R ' \
-        ' -U ' + user + ' --password -S ' + slot_name
+        '-U ' + user + ' --password -S ' + slot_name
 
     cmd_sync = "PGPASSWORD='"+apass+"' " + cmd_sync
     print(cmd_sync)
@@ -2167,9 +2166,10 @@ def doFullSyncSSH(version=''):
     mdir = getServerDir()
     port = getPgPort()
 
-    cmd = mdir + '/bin/pg_basebackup -Fp --progress -D ' + mdir + \
-        '/data -h ' + ip + ' -p ' + port + \
-        ' -U ' + username + ' --password'
+    cmd = mdir + '/bin/pg_basebackup --progress -D ' + mdir + \
+        '/data -h ' + ip + ' -p ' + port\
+        + ' -Fp -Xs -P -R ' \
+        '-U ' + username + ' --password'
     print(cmd)
 
     cmd_tmp = "/tmp/cmd_run.sh"
@@ -2177,9 +2177,7 @@ def doFullSyncSSH(version=''):
     cmd_tmp_data = """#!/bin/expect
 spawn %s
 expect "Password:"
- 
 send "%s\r"
-
 interact
 """ % (cmd, password)
 
@@ -2198,6 +2196,33 @@ interact
     mw.execShell("chown -R postgres:postgres " + data_dir)
     mw.execShell("chmod -R 700 " + data_dir)
     os.system("expect " + cmd_tmp)
+
+
+    primary_conninfo = "host=%s port=%s user=%s password=%s application_name=standby1" % (ip,port,username,password)
+
+    # 同步成功后,开启从库配置
+    pg_conf = getConf()
+    content = mw.readFile(pg_conf)
+    field_list = ['hot_standby','primary_conninfo','max_standby_streaming_delay',
+        'wal_receiver_status_interval','hot_standby_feedback','primary_slot_name']
+    for field in field_list:
+        content = content.replace('#'+field, field)
+
+    content = re.sub(
+        r"^(\s*primary_slot_name\s*=\s*)'standby_slot'",
+        rf"\g<1>'{slot_name}'",
+        content,
+        flags=re.MULTILINE
+    )
+
+    content = re.sub(
+        r"^(\s*primary_conninfo\s*=\s*)'.*'",
+        rf"\g<1>'{primary_conninfo}'",
+        content,
+        flags=re.MULTILINE
+    )
+    # print(content)
+    mw.writeFile(pg_conf, content)
 
     start(version)
 

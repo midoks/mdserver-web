@@ -7,7 +7,7 @@ export PATH
 # cd /www/server/mdserver-web && . bin/activate && python3 plugins/postgresql/index.py do_full_sync
 # cd /www/server/mdserver-web && . bin/activate && python3 plugins/postgresql/index.py get_master_status {}
 # cd /www/server/mdserver-web && . bin/activate && python3 plugins/postgresql/index.py run_info {}
-
+# cd /www/server/mdserver-web && . bin/activate && python3 plugins/postgresql/index.py get_master_rep_slave_user_cmd {"username":"","db":""}
 # ssh -vvv -i /tmp/pg_sync_id_rsa.txt -p 2022 -o IdentitiesOnly=yes root@1.1.1.1 "echo ok"
 # ssh root@1.1.1.1 -i /tmp/pg_sync_id_rsa.txt -p 2022
 
