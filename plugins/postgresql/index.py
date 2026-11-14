@@ -1733,7 +1733,7 @@ def getSlaveSyncUserByIp(version=''):
     ip = args['ip']
 
     conn = pSqliteDb('slave_sync_user')
-    data = conn.field('ip,port,user,pass,mode,cmd').where(
+    data = conn.field('ip,port,user,pass,mode,cmd,slot_name').where(
         "ip=?", (ip,)).select()
     return mw.returnJson(True, 'ok', data)
 
@@ -2034,9 +2034,11 @@ def doFullSyncUser(version=''):
 
     cmd = mdir + '/bin/pg_basebackup -Fp --progress -D ' + mdir + \
         '/data -h ' + ip + ' -p ' + port + \
-        ' -U ' + user + ' --password'
+        ' -U ' + user + ' --password -S ' + slot_name
+
+    cmd += "PGPASSWORD='"+slot_name+"' " + cmd
     print(cmd)
-    print(data)
+    # print(data)
 
 
 def doFullSyncSSH(version=''):

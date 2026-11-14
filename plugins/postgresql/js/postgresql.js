@@ -1402,6 +1402,7 @@ function addSlaveSyncUser(ip=''){
             user = rdata.data[0]['user'];
             pass = rdata.data[0]['pass'];
             mode = rdata.data[0]['mode'];
+            slot_name = rdata.data[0]['slot_name'];
         }
 
         var index = layer.open({
