@@ -5,6 +5,8 @@ export PATH
 # cd /Users/midoks/Desktop/mwdev/server/mdserver-web/plugins/postgresql && bash install.sh install 18
 # cd /www/server/mdserver-web/plugins/postgresql && bash install.sh install 16
 # cd /www/server/mdserver-web && . bin/activate && python3 plugins/postgresql/index.py do_full_sync
+# cd /www/server/mdserver-web && . bin/activate && python3 plugins/postgresql/index.py run_info {}
+
 
 curPath=`pwd`
 rootPath=$(dirname "$curPath")

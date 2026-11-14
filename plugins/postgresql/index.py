@@ -467,7 +467,6 @@ def setPgPort():
 
 
 def runInfo():
-
     if status(version) == 'stop':
         return mw.returnJson(False, 'PG未启动', [])
 
