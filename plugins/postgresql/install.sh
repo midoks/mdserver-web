@@ -4,6 +4,31 @@ export PATH
 
 # cd /Users/midoks/Desktop/mwdev/server/mdserver-web/plugins/postgresql && bash install.sh install 18
 # cd /www/server/mdserver-web/plugins/postgresql && bash install.sh install 16
+# cd /www/server/mdserver-web && . bin/activate && python3 plugins/postgresql/index.py do_full_sync
+# cd /www/server/mdserver-web && . bin/activate && python3 plugins/postgresql/index.py get_master_status {}
+# cd /www/server/mdserver-web && . bin/activate && python3 plugins/postgresql/index.py run_info {}
+# cd /www/server/mdserver-web && . bin/activate && python3 plugins/postgresql/index.py get_master_link {"page":1,"page_size":10}
+
+# cd /www/server/mdserver-web && . bin/activate && python3 plugins/postgresql/index.py get_master_rep_slave_user_cmd {"username":"","db":""}
+# ssh -vvv -i /tmp/pg_sync_id_rsa.txt -p 2022 -o IdentitiesOnly=yes root@1.1.1.1 "echo ok"
+# ssh root@1.1.1.1 -i /tmp/pg_sync_id_rsa.txt -p 2022
+
+# -- 主库
+# CREATE TABLE t_test(id int primary key, ts timestamptz default now());
+# INSERT INTO t_test VALUES (1);
+
+# -- 备库（只读查询应能看到）
+# SELECT * FROM t_test;
+
+# 常用操作--终端
+# -- 切换数据库
+# \c ff
+
+# -- 查看槽列表
+# SELECT slot_name, active, pg_wal_lsn_diff(pg_current_wal_lsn(), restart_lsn)/1024/1024 AS retained_mb FROM pg_replication_slots;
+
+# -- 查看主从状态列表 [主]
+# SELECT * FROM pg_stat_replication;
 
 curPath=`pwd`
 rootPath=$(dirname "$curPath")

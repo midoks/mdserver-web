@@ -7,6 +7,7 @@ rootPath=$(dirname "$curPath")
 rootPath=$(dirname "$rootPath")
 serverPath=$(dirname "$rootPath")
 
+# cd /Users/midoks/Desktop/mwdev/server/mdserver-web/plugins/mariadb && bash install.sh install 12.1
 # cd /www/server/mdserver-web/plugins/mariadb && bash install.sh install 8.2
 # cd /www/server/mdserver-web && . bin/activate && python3 plugins/mariadb/index.py try_slave_sync_bugfix {}
 # cd /www/server/mdserver-web && . bin/activate && python3 plugins/mariadb/index.py do_full_sync  {"db":"xxx","sign":"","begin":1}

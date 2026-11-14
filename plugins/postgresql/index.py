@@ -100,20 +100,28 @@ def getImportDir():
     if not os.path.exists(import_dir):
         os.makedirs(import_dir)
     return import_dir
-    
+
+def getDataDir():
+    path = getServerDir() + '/data'
+    return path
+
+def getBakInitConf():
+    path = getServerDir() + '/data.init/postgresql.conf'
+    if os.path.exists(path):
+        return path
+    return path
+
 def getConf():
     path = getServerDir() + '/data/postgresql.conf'
-    return path
+    if os.path.exists(path):
+        return path
+    return getBakInitConf()
 
 
 def configTpl():
-
     clist = []
-
     app_dir = getServerDir()
     clist.append(app_dir + "/data/postgresql.conf")
-    clist.append(app_dir + "/data/pg_hba.conf")
-
     return mw.getJson(clist)
 
 
@@ -219,6 +227,12 @@ def initConfig(version=''):
         if not os.path.exists(logfile):
             mw.writeFile(logfile, '')
 
+
+def isSlaveDb():
+    standby = getDataDir()+"/standby.signal"
+    if os.path.exists(standby):
+        return True
+    return False
 
 def initDreplace(version=''):
 
@@ -455,7 +469,6 @@ def setPgPort():
 
 
 def runInfo():
-
     if status(version) == 'stop':
         return mw.returnJson(False, 'PG未启动', [])
 
@@ -475,8 +488,7 @@ def runInfo():
         "ps -ef |grep postgres |wc -l")[0].strip()
     result['pid'] = mw.execShell(
         '''cat {}/postmaster.pid |sed -n 1p '''.format(data_dir))[0].strip()
-    res = db.query(
-        "select count(*) from pg_stat_activity where not pid=pg_backend_pid()")
+    res = db.query("select count(*) from pg_stat_activity where not pid=pg_backend_pid()")
 
     # print(res)
     result['connections'] = res[0][0]
@@ -1540,10 +1552,10 @@ def getMasterStatus(version=''):
     data['mode'] = 'classic'
     data['status'] = False
     data['slave_status'] = False
-    pg_conf = getServerDir() + "/data/postgresql.conf"
+    pg_conf = getConf()
     pg_content = mw.readFile(pg_conf)
 
-    if pg_content.find('#archive_mode') > -1:
+    if pg_content.find('#wal_level') > -1:
         data['status'] = False
     else:
         data['status'] = True
@@ -1560,74 +1572,53 @@ def setMasterStatus(version=''):
     pg_conf = getServerDir() + "/data/postgresql.conf"
     data = mw.readFile(pg_conf)
 
-    if data.find('#archive_mode') > -1:
-        data = data.replace('#archive_mode', 'archive_mode')
-        data = data.replace('#archive_command', 'archive_command')
-        data = data.replace('#wal_level', 'wal_level')
-        data = data.replace('#max_wal_senders', 'max_wal_senders')
-        data = data.replace('#wal_sender_timeout', 'wal_sender_timeout')
+    field_list = ['max_replication_slots','wal_keep_size','wal_level','wal_sender_timeout','max_wal_senders']
+
+    if data.find('#wal_level') > -1:
+        # data = data.replace('#max_replication_slots', 'max_replication_slots')
+        for field in field_list:
+            data = data.replace('#'+field, field)
     else:
-        data = data.replace('archive_mode', '#archive_mode')
-        data = data.replace('archive_command', '#archive_command')
-        data = data.replace('wal_level', '#wal_level')
-        data = data.replace('max_wal_senders', '#max_wal_senders')
-        data = data.replace('wal_sender_timeout', '#wal_sender_timeout')
+        for field in field_list:
+            data = data.replace(field, '#'+field)
 
     mw.writeFile(pg_conf, data)
     restart(version)
     return mw.returnJson(True, '设置成功')
 
+def openSlaveConf(version):
+    pg_conf = getConf()
+    data = mw.readFile(pg_conf)
+
+    field_list = ['hot_standby','primary_conninfo','max_standby_streaming_delay',
+        'wal_receiver_status_interval','hot_standby_feedback','primary_slot_name']
+
+    for field in field_list:
+        data = data.replace('#'+field, field)
+    return True
 
 def setSlaveStatus(version):
     pg_conf = getServerDir() + "/data/postgresql.conf"
     data = mw.readFile(pg_conf)
-    if data.find('#hot_standby') > -1:
-        data = data.replace('#hot_standby', 'hot_standby')
-        data = data.replace('#primary_conninfo', 'primary_conninfo')
-        data = data.replace('#max_standby_streaming_delay',
-                            'max_standby_streaming_delay')
-        data = data.replace('#wal_receiver_status_interval',
-                            'wal_receiver_status_interval')
-        data = data.replace('#hot_standby_feedback', 'hot_standby_feedback')
-        data = data.replace('#recovery_target_timeline',
-                            'recovery_target_timeline')
-    else:
-        data = data.replace('hot_standby', '#hot_standby')
-        data = data.replace('primary_conninfo', '#primary_conninfo')
-        data = data.replace('max_standby_streaming_delay',
-                            '#max_standby_streaming_delay')
-        data = data.replace('wal_receiver_status_interval',
-                            '#wal_receiver_status_interval')
-        data = data.replace('hot_standby_feedback', '#hot_standby_feedback')
-        data = data.replace('#recovery_target_timeline',
-                            'recovery_target_timeline')
 
+    field_list = ['hot_standby','primary_conninfo','max_standby_streaming_delay',
+            'wal_receiver_status_interval','hot_standby_feedback','primary_slot_name']
+    if data.find('#hot_standby') > -1:
+        for field in field_list:
+            data = data.replace('#'+field, field)
+    else:
+        for field in field_list:
+            data = data.replace(field, '#'+field)
     mw.writeFile(pg_conf, data)
 
     restart(version)
     return mw.returnJson(True, '设置成功')
 
-
 def getSlaveList(version=''):
-
     db = pgDb()
-
     res = db.execute('select * from pg_stat_replication')
-    print(res)
-    # dlist = db.query('show slave status')
-    # ret = []
-    # for x in range(0, len(dlist)):
-    #     tmp = {}
-    #     tmp['Master_User'] = dlist[x]["Master_User"]
-    #     tmp['Master_Host'] = dlist[x]["Master_Host"]
-    #     tmp['Master_Port'] = dlist[x]["Master_Port"]
-    #     tmp['Master_Log_File'] = dlist[x]["Master_Log_File"]
-    #     tmp['Slave_IO_Running'] = dlist[x]["Slave_IO_Running"]
-    #     tmp['Slave_SQL_Running'] = dlist[x]["Slave_SQL_Running"]
-    #     ret.append(tmp)
     data = {}
     data['data'] = []
-
     return mw.getJson(data)
 
 
@@ -1730,6 +1721,144 @@ def updateSlaveSSH(version=''):
     conn.where("ip=?", (ip,)).save('id_rsa', (id_rsa,))
     return mw.returnJson(True, 'ok')
 
+def getSlaveSyncUserByIp(version=''):
+    args = getArgs()
+    data = checkArgs(args, ['ip'])
+    if not data[0]:
+        return data[1]
+
+    ip = args['ip']
+
+    conn = pSqliteDb('slave_sync_user')
+    data = conn.field('ip,port,user,pass,mode,cmd,slot_name').where(
+        "ip=?", (ip,)).select()
+    return mw.returnJson(True, 'ok', data)
+
+def addSlaveSyncUser(version=''):
+    import base64
+
+    args = getArgs()
+    data = checkArgs(args, ['ip'])
+    if not data[0]:
+        return data[1]
+
+    ip = args['ip']
+    if ip == "":
+        return mw.returnJson(True, 'ok')
+
+    data = checkArgs(args, ['port', 'user', 'pass', 'mode'])
+    if not data[0]:
+        return data[1]
+
+    cmd = args['cmd']
+    port = args['port']
+    user = args['user']
+    apass = args['pass']
+    mode = args['mode']
+    slot_name = args['slot_name']
+    addTime = time.strftime('%Y-%m-%d %X', time.localtime())
+
+    conn = pSqliteDb('slave_sync_user')
+    data = conn.field('ip').where("ip=?", (ip,)).select()
+    if len(data) > 0:
+        res = conn.where("ip=?", (ip,)).save(
+            'port,user,pass,mode,cmd,slot_name', (port, user, apass, mode, cmd,slot_name))
+    else:
+        conn.add('ip,port,user,cmd,user,pass,mode,slot_name,addtime',
+                 (ip, port, user, cmd, user, apass, mode, slot_name,addTime))
+
+    return mw.returnJson(True, '设置成功!')
+
+def delSlaveSyncUser(version=''):
+    args = getArgs()
+    data = checkArgs(args, ['ip'])
+    if not data[0]:
+        return data[1]
+
+    ip = args['ip']
+
+    conn = pSqliteDb('slave_sync_user')
+    conn.where("ip=?", (ip,)).delete()
+    return mw.returnJson(True, '删除成功!')
+
+def getSlaveSyncUserList(version=''):
+    args = getArgs()
+    data = checkArgs(args, ['page', 'page_size'])
+    if not data[0]:
+        return data[1]
+
+    page = int(args['page'])
+    page_size = int(args['page_size'])
+
+    conn = pSqliteDb('slave_sync_user')
+    limit = str((page - 1) * page_size) + ',' + str(page_size)
+
+    field = 'id,ip,port,user,pass,cmd,addtime'
+    clist = conn.field(field).limit(limit).order('id desc').select()
+    count = conn.count()
+
+    data = {}
+    _page = {}
+    _page['count'] = count
+    _page['p'] = page
+    _page['row'] = page_size
+    _page['tojs'] = args['tojs']
+    data['page'] = mw.getPage(_page)
+    data['data'] = clist
+
+    return mw.getJson(data)
+
+def getSyncModeFile():
+    return getServerDir() + "/sync.mode"
+
+def getSlaveSyncMode(version):
+    sync_mode = getSyncModeFile()
+    if os.path.exists(sync_mode):
+        mode = mw.readFile(sync_mode).strip()
+        return mw.returnJson(True, 'ok', mode)
+    return mw.returnJson(False, 'fail')
+
+
+def setSlaveSyncMode(version):
+    args = getArgs()
+    data = checkArgs(args, ['mode'])
+    if not data[0]:
+        return data[1]
+    mode = args['mode']
+    sync_mode = getSyncModeFile()
+
+    if mode == 'none':
+        os.remove(sync_mode)
+    else:
+        mw.writeFile(sync_mode, mode)
+    return mw.returnJson(True, '设置成功', mode)
+
+def getMasterLink(version):
+    pdb = pgDb()
+    sql = """
+    SELECT pid, usesysid, usename, application_name,
+           client_addr, client_hostname, client_port,
+           to_char(backend_start, 'YYYY-MM-DD HH24:MI:SS') AS backend_start,
+           backend_xmin, state,
+           sent_lsn, write_lsn, flush_lsn, replay_lsn,
+           write_lag, flush_lag, replay_lag,
+           sync_priority, sync_state,
+           to_char(reply_time, 'YYYY-MM-DD HH24:MI:SS') AS reply_time
+    FROM pg_stat_replication
+    """
+
+    fields = 'pid, usesysid,usename,application_name,client_addr,client_hostname,client_port,backend_xmin,state,sent_lsn,write_lsn,flush_lsn,replay_lsn,write_lag,flush_lag,replay_lag,sync_priority,sync_state'
+    data = pdb.field(fields).table('pg_stat_replication').select()
+    # print(data)
+    return mw.returnJson(True, 'ok', data)
+
+def getSlaveLink(version):
+    pdb = pgDb()
+    data = pdb.query("SELECT * FROM pg_stat_wal_receiver")
+    fields = 'pid,status,receive_start_lsn,receive_start_tli,written_lsn,flushed_lsn,received_tli,latest_end_lsn,slot_name,sender_host,sender_port'
+    data = pdb.field(fields).table('pg_stat_wal_receiver').select()
+    # print(data)
+    return mw.returnJson(True, 'ok', data)
 
 def getMasterRepSlaveList(version=''):
     args = getArgs()
@@ -1786,14 +1915,18 @@ def addMasterRepSlaveUser(version=''):
     if psdb.where("username=?", (username)).count() > 0:
         return mw.returnJson(False, '用户已存在!')
 
+    # 创建同步用户+密码
     sql = "CREATE ROLE " + username + " login replication password '" + password + "'"
     pdb.execute(sql)
+
+    # 创建slot,从库使用
+    slot_sql = "SELECT pg_create_physical_replication_slot('"+username+"');"
+    pdb.execute(slot_sql);
 
     pg_conf = pgHbaConf()
     data = mw.readFile(pg_conf)
 
-    data = data + "\nhost   replication  " + \
-        username + "   " + address + "     scram-sha-256"
+    data = data + "\nhost   replication  " + username + "   " + address + "     scram-sha-256"
 
     mw.writeFile(pg_conf, data)
 
@@ -1816,6 +1949,9 @@ def delMasterRepSlaveUser(version=''):
 
     pdb.execute("drop user " + name)
 
+    slot_sql = "SELECT pg_drop_replication_slot('"+name+"');";
+    pdb.execute(slot_sql)
+
     pg_hba = pgHbaConf()
     old_config = mw.readFile(pg_hba)
     new_config = re.sub(
@@ -1825,8 +1961,35 @@ def delMasterRepSlaveUser(version=''):
     psdb.where("username=?", (args['username'],)).delete()
     return mw.returnJson(True, '删除成功!')
 
-
 def getMasterRepSlaveUserCmd(version=''):
+    args = getArgs()
+    data = checkArgs(args, ['username', 'db'])
+    if not data[0]:
+        return data[1]
+
+    psdb = pSqliteDb('master_replication_user')
+    mdir = getServerDir()
+    port = getPgPort()
+    localIp = mw.getLocalIp()
+    f = 'username,password'
+    username = args['username']
+    if username == '':
+        clist = psdb.field(f).limit('1').order('id desc').select()
+    else:
+        clist = psdb.field(f).where("username=?", (username,)).order('id desc').select()
+
+    if len(clist) == 0:
+        return mw.returnJson(False, '请添加同步账户!')
+
+    cmd = 'PGPASSWORD=\'' + clist[0]['password'] + '\' ' + mdir + '/bin/pg_basebackup -Fp --progress -D ' + mdir + \
+        '/data -h ' + localIp + ' -p ' + port + \
+        ' -U ' + clist[0]['username'] + ' --password'
+    data = {}
+    data['cmd'] = cmd
+    data['info'] = clist
+    return mw.returnJson(True, 'ok!', data)
+
+def getMasterRepSlaveUserFullCmd(version=''):
     args = getArgs()
     data = checkArgs(args, ['username', 'db'])
     if not data[0]:
@@ -1847,19 +2010,26 @@ def getMasterRepSlaveUserCmd(version=''):
     if len(clist) == 0:
         return mw.returnJson(False, '请添加同步账户!')
 
-    cmd = 'echo "' + clist[0]['password'] + '" | ' + mdir + '/bin/pg_basebackup -Fp --progress -D ' + mdir + \
+    sql = '<span class="set-info c7 ta_center">手动测试</span><hr style="margin-top: 5px;margin-bottom: 10px;"/>'
+    sql += 'PGPASSWORD=\'' + clist[0]['password'] + '\' ' + mdir + '/bin/pg_basebackup -Fp --progress -D ' + mdir + \
         '/data -h ' + localIp + ' -p ' + port + \
         ' -U ' + clist[0]['username'] + ' --password'
+    sql += "<hr/>"
+    sql += '<span class="set-info c7 ta_center">同步账户模式</span><hr style="margin-top: 5px;margin-bottom: 10px;"/>'
+    sql +=  'PGPASSWORD=\'' + clist[0]['password'] + '\' ' + mdir + '/bin/pg_basebackup -D ' + mdir + '/data -h '\
+            + localIp + ' -p ' + port + ' -U ' + clist[0]['username'] + ' --password '\
+            + ' -S ' + clist[0]['username']
 
     data = {}
-    data['cmd'] = cmd
+    data['cmd'] = sql
     data['info'] = clist
+    data['mode'] = 0
     return mw.returnJson(True, 'ok!', data)
 
 
 def slaveSyncCmd(version=''):
     data = {}
-    data['cmd'] = 'cd /www/server/mdserver-web && python3 plugins/postgresql/index.py do_full_sync'
+    data['cmd'] = 'cd /www/server/mdserver-web && . bin/activate && python3 plugins/postgresql/index.py do_full_sync'
     return mw.returnJson(True, 'ok!', data)
 
 
@@ -1869,7 +2039,97 @@ def writeDbSyncStatus(data):
 
 
 def doFullSync(version=''):
+    mode_file = getSyncModeFile()
+    if not os.path.exists(mode_file):
+        return mw.returnJson(False, '需要先设置同步配置')
 
+    mode = mw.readFile(mode_file)
+    if mode == 'ssh':
+        return doFullSyncSSH(version)
+    if mode == 'sync-user':
+        return doFullSyncUser(version)
+
+def doFullSyncUser(version=''):
+    db = pgDb()
+    mdir = getServerDir()
+    conn = pSqliteDb('slave_sync_user')
+    data = conn.field('ip,port,user,pass,mode,cmd,slot_name').find()
+    user = data['user']
+    apass = data['pass']
+    port = data['port']
+    ip = data['ip']
+    cmd = data['cmd']
+    slot_name = data['slot_name']
+
+
+    cmd_sync = mdir + '/bin/pg_basebackup --progress -D ' + mdir + \
+        '/data -h ' + ip + ' -p ' + port \
+        + ' -Fp -Xs -P -R ' \
+        '-U ' + user + ' --password -S ' + slot_name
+
+    cmd_sync_pwd = "PGPASSWORD='"+apass+"' " + cmd_sync
+    print(cmd_sync_pwd)
+
+
+    cmd_tmp = "/tmp/cmd_run.sh"
+    cmd_tmp_data = """#!/bin/expect
+spawn %s
+expect "Password:"
+send "%s\r"
+interact
+""" % (cmd_sync, apass)
+
+    mw.writeFile(cmd_tmp, cmd_tmp_data)
+
+    # 停用
+    stop(version)
+
+    # 备份
+    data_dir = getDataDir()
+    init_data_dir = getDataDir()+'.init'
+    if not os.path.exists(init_data_dir):
+        mw.execShell("mv " + data_dir +" " + init_data_dir)
+    else:
+        mw.execShell("rm -rf " + data_dir)
+    mw.execShell("mkdir -p " + data_dir)
+    mw.execShell("chown -R postgres:postgres " + data_dir)
+    mw.execShell("chmod -R 700 " + data_dir)
+    
+    os.system('expect '+ cmd_tmp)
+
+
+    primary_conninfo = "host=%s port=%s user=%s password=%s application_name=standby1" % (ip,port,user,apass)
+
+    # 同步成功后,开启从库配置
+    pg_conf = getConf()
+    content = mw.readFile(pg_conf)
+    field_list = ['hot_standby','primary_conninfo','max_standby_streaming_delay',
+        'wal_receiver_status_interval','hot_standby_feedback','primary_slot_name']
+    for field in field_list:
+        content = content.replace('#'+field, field)
+
+    content = re.sub(
+        r"^(\s*primary_slot_name\s*=\s*)'standby_slot'",
+        rf"\g<1>'{slot_name}'",
+        content,
+        flags=re.MULTILINE
+    )
+
+    content = re.sub(
+        r"^(\s*primary_conninfo\s*=\s*)'.*'",
+        rf"\g<1>'{primary_conninfo}'",
+        content,
+        flags=re.MULTILINE
+    )
+    # print(content)
+    mw.writeFile(pg_conf, content)
+    start(version)
+
+    if os.path.exists(cmd_tmp):
+        mw.execShell("rm -rf " + cmd_tmp)
+    return True
+
+def doFullSyncSSH(version=''):
     db = pgDb()
 
     id_rsa_conn = pSqliteDb('slave_id_rsa', 'pgsql_slave')
@@ -1916,8 +2176,7 @@ def doFullSync(version=''):
     print("同步文件", "start")
     t = ssh.get_transport()
     sftp = paramiko.SFTPClient.from_transport(t)
-    copy_status = sftp.get(
-        "/www/server/postgresql/pgsql.db", getServerDir() + "/pgsql.db")
+    copy_status = sftp.get("/www/server/postgresql/pgsql.db", getServerDir() + "/pgsql.db")
     print("同步信息:", copy_status)
     print("同步文件", "end")
     if copy_status == None:
@@ -1938,9 +2197,10 @@ def doFullSync(version=''):
     mdir = getServerDir()
     port = getPgPort()
 
-    cmd = mdir + '/bin/pg_basebackup -Fp --progress -D ' + mdir + \
-        '/data -h ' + ip + ' -p ' + port + \
-        ' -U ' + username + ' --password'
+    cmd = mdir + '/bin/pg_basebackup --progress -D ' + mdir + \
+        '/data -h ' + ip + ' -p ' + port\
+        + ' -Fp -Xs -P -R ' \
+        '-U ' + username + ' --password'
     print(cmd)
 
     cmd_tmp = "/tmp/cmd_run.sh"
@@ -1948,19 +2208,58 @@ def doFullSync(version=''):
     cmd_tmp_data = """#!/bin/expect
 spawn %s
 expect "Password:"
- 
 send "%s\r"
-
 interact
 """ % (cmd, password)
 
     mw.writeFile(cmd_tmp, cmd_tmp_data)
+    # 停用
+    stop(version)
 
+    # 备份
+    data_dir = getDataDir()
+    init_data_dir = getDataDir()+'.init'
+    if not os.path.exists(init_data_dir):
+        mw.execShell("mv " + data_dir +" " + init_data_dir)
+    else:
+        mw.execShell("rm -rf " + data_dir)
+    mw.execShell("mkdir -p " + data_dir)
+    mw.execShell("chown -R postgres:postgres " + data_dir)
+    mw.execShell("chmod -R 700 " + data_dir)
     os.system("expect " + cmd_tmp)
 
-    writeDbSyncStatus({'code': 6, 'msg': '从库重启完成...', 'progress': 100})
+    slot_name = username
+    primary_conninfo = "host=%s port=%s user=%s password=%s application_name=standby1" % (ip,port,username,password)
 
-    os.system("rm -rf " + SSH_PRIVATE_KEY)
+    # 同步成功后,开启从库配置
+    pg_conf = getConf()
+    content = mw.readFile(pg_conf)
+    field_list = ['hot_standby','primary_conninfo','max_standby_streaming_delay',
+        'wal_receiver_status_interval','hot_standby_feedback','primary_slot_name']
+    for field in field_list:
+        content = content.replace('#'+field, field)
+
+    content = re.sub(
+        r"^(\s*primary_slot_name\s*=\s*)'standby_slot'",
+        rf"\g<1>'{slot_name}'",
+        content,
+        flags=re.MULTILINE
+    )
+
+    content = re.sub(
+        r"^(\s*primary_conninfo\s*=\s*)'.*'",
+        rf"\g<1>'{primary_conninfo}'",
+        content,
+        flags=re.MULTILINE
+    )
+    # print(content)
+    mw.writeFile(pg_conf, content)
+
+    start(version)
+
+    writeDbSyncStatus({'code': 6, 'msg': '从库重启完成...', 'progress': 100})
+    if os.path.exists(SSH_PRIVATE_KEY):
+        os.system("rm -rf " + SSH_PRIVATE_KEY)
     os.system("rm -rf " + cmd_tmp)
     return True
 
@@ -2080,6 +2379,18 @@ if __name__ == "__main__":
         print(delSlaveSSH(version))
     elif func == 'update_slave_ssh':
         print(updateSlaveSSH(version))
+    elif func == 'get_slave_sync_user_list':
+        print(getSlaveSyncUserList(version))
+    elif func == 'get_slave_sync_user_by_ip':
+        print(getSlaveSyncUserByIp(version))
+    elif func == 'add_slave_sync_user':
+        print(addSlaveSyncUser(version))
+    elif func == 'del_slave_sync_user':
+        print(delSlaveSyncUser(version))
+    elif func == 'get_slave_sync_mode':
+        print(getSlaveSyncMode(version))
+    elif func == 'set_slave_sync_mode':
+        print(setSlaveSyncMode(version))
     elif func == 'get_slave_ssh_list':
         print(getSlaveSSHList(version))
     elif func == 'get_slave_ssh_by_ip':
@@ -2090,6 +2401,10 @@ if __name__ == "__main__":
         print(setMasterStatus(version))
     elif func == 'set_slave_status':
         print(setSlaveStatus(version))
+    elif func == 'get_master_link':
+        print(getMasterLink(version))
+    elif func == 'get_slave_link':
+        print(getSlaveLink(version))
     elif func == 'get_master_rep_slave_list':
         print(getMasterRepSlaveList(version))
     elif func == 'add_master_rep_slave_user':
@@ -2098,6 +2413,8 @@ if __name__ == "__main__":
         print(delMasterRepSlaveUser(version))
     elif func == 'get_master_rep_slave_user_cmd':
         print(getMasterRepSlaveUserCmd(version))
+    elif func == 'get_master_rep_slave_user_full_cmd':
+        print(getMasterRepSlaveUserFullCmd(version))
     elif func == 'slave_sync_cmd':
         print(slaveSyncCmd(version))
     elif func == 'do_full_sync':

@@ -150,7 +150,7 @@ class ORM:
             data = self.__DB_CUR.fetchall()
             ret = []
             if self.__OPT_FIELD != "*":
-                field = self.__OPT_FIELD.split(',')
+                field = [f.strip() for f in self.__OPT_FIELD.split(',')]
                 for row in data:
                     i = 0
                     field_k = {}

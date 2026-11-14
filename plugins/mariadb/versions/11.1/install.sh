@@ -71,6 +71,15 @@ Install_app()
 		touch /var/log/mariadb/mariadb.log
 		INSTALL_CMD=cmake3
 	fi
+	
+	WHERE_DIR_GCC=/usr/bin/gcc
+	WHERE_DIR_GPP=/usr/bin/g++
+
+	if [ "$sysName" == "Darwin" ];then
+		LLVM_DIR=`brew --prefix llvm`
+		WHERE_DIR_GCC=${LLVM_DIR}/bin/clang
+		WHERE_DIR_GPP=${LLVM_DIR}/bin/clang++
+	fi
 
 	if [ ! -d $serverPath/mariadb ];then
 		cd ${mariadbDir}/mariadb-${MY_VER} && ${INSTALL_CMD} \
@@ -86,8 +95,8 @@ Install_app()
 		-DEXTRA_CHARSETS=all \
 		-DDEFAULT_CHARSET=utf8mb4 \
 		-DDEFAULT_COLLATION=utf8mb4_general_ci \
-		-DCMAKE_C_COMPILER=/usr/bin/gcc \
-		-DCMAKE_CXX_COMPILER=/usr/bin/g++
+		-DCMAKE_C_COMPILER=${WHERE_DIR_GCC} \
+		-DCMAKE_CXX_COMPILER=${WHERE_DIR_GPP}
 		make -j${cpuCore} && make install && make clean
 
 		if [ -d $serverPath/mariadb ];then
