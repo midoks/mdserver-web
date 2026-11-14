@@ -228,6 +228,12 @@ def initConfig(version=''):
             mw.writeFile(logfile, '')
 
 
+def isSlaveDb():
+    standby = getDataDir()+"/standby.signal"
+    if os.path.exists(standby):
+        return True
+    return False
+
 def initDreplace(version=''):
 
     conf_dir = getServerDir()
