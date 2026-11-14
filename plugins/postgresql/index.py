@@ -2036,7 +2036,6 @@ def doFullSyncUser(version=''):
         '/data -h ' + ip + ' -p ' + port + \
         ' -U ' + user + ' --password'
     print(cmd)
-
     print(data)
 
 
