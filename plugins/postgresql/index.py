@@ -2038,6 +2038,25 @@ def doFullSyncUser(version=''):
 
     cmd += "PGPASSWORD='"+slot_name+"' " + cmd
     print(cmd)
+
+    # 停用
+    stop(version)
+
+    # 备份
+    data_dir = getDataDir()
+    init_data_dir = getDataDir()+'.init'
+    if not os.path.exists(init_data_dir):
+        mw.execShell("mv " + data_dir +" " + init_data_dir)
+    else:
+        mw.execShell("rm -rf " + data_dir)
+    mw.execShell("mkdir -p " + data_dir)
+    mw.execShell("chown -R postgres:postgres " + data_dir)
+    mw.execShell("chmod -R 700 " + data_dir)
+    
+    os.system(cmd)
+
+    start(version)
+
     # print(data)
 
 
