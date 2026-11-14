@@ -2032,12 +2032,12 @@ def doFullSyncUser(version=''):
     slot_name = data['slot_name']
 
 
-    cmd = mdir + '/bin/pg_basebackup -Fp --progress -D ' + mdir + \
+    cmd_sync = mdir + '/bin/pg_basebackup -Fp --progress -D ' + mdir + \
         '/data -h ' + ip + ' -p ' + port + \
         ' -U ' + user + ' --password -S ' + slot_name
 
-    cmd += "PGPASSWORD='"+slot_name+"' " + cmd
-    print(cmd)
+    cmd_sync += "PGPASSWORD='"+slot_name+"' " + cmd_sync
+    print(cmd_sync)
     # 停用
     stop(version)
 
@@ -2052,7 +2052,7 @@ def doFullSyncUser(version=''):
     mw.execShell("chown -R postgres:postgres " + data_dir)
     mw.execShell("chmod -R 700 " + data_dir)
     
-    os.system(cmd)
+    os.system(cmd_sync)
 
     start(version)
 
