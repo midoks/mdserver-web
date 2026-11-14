@@ -2061,7 +2061,7 @@ spawn %s
 expect "Password:"
 send "%s\r"
 interact
-""" % (cmd, apass)
+""" % (cmd_sync, apass)
 
     mw.writeFile(cmd_tmp, cmd_tmp_data)
 
