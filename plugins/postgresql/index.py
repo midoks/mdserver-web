@@ -2055,8 +2055,6 @@ def doFullSyncUser(version=''):
     print(cmd_sync_pwd)
 
 
-
-
     cmd_tmp = "/tmp/cmd_run.sh"
     cmd_tmp_data = """#!/bin/expect
 spawn %s
