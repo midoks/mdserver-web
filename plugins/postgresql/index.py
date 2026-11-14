@@ -1580,6 +1580,16 @@ def setMasterStatus(version=''):
     restart(version)
     return mw.returnJson(True, '设置成功')
 
+def openSlaveConf(version):
+    pg_conf = getConf()
+    data = mw.readFile(pg_conf)
+
+    field_list = ['hot_standby','primary_conninfo','max_standby_streaming_delay',
+        'wal_receiver_status_interval','hot_standby_feedback','primary_slot_name']
+
+    for field in field_list:
+        data = data.replace('#'+field, field)
+    return True
 
 def setSlaveStatus(version):
     pg_conf = getServerDir() + "/data/postgresql.conf"
@@ -2058,6 +2068,11 @@ def doFullSyncUser(version=''):
     mw.execShell("chmod -R 700 " + data_dir)
     
     os.system(cmd_sync)
+
+
+
+    # 同步成功后,开启从库配置
+    openSlaveConf()
 
     start(version)
 
