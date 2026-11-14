@@ -2030,6 +2030,8 @@ def doFullSyncUser(version=''):
     cmd = data['cmd']
     slot_name = data['slot_name']
 
+    print(data)
+
 
 def doFullSyncSSH(version=''):
     db = pgDb()
