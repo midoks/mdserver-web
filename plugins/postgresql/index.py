@@ -1946,6 +1946,7 @@ def getMasterRepSlaveUserFullCmd(version=''):
     data = {}
     data['cmd'] = sql
     data['info'] = clist
+    data['mode'] = 0
     return mw.returnJson(True, 'ok!', data)
 
 

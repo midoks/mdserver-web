@@ -1421,7 +1421,6 @@ function addSlaveSyncUser(ip=''){
                     <div class='info-r'>\
                         <select class='bt-input-text mr5' name='mode'>\
                             <option value='0' "+( mode == '0' ? 'selected="selected"' : '')+">经典</option>\
-                            <option value='1' "+( mode == '1' ? 'selected="selected"' : '')+">GTID</option>\
                         </select>\
                     </div>\
                 </div>\
