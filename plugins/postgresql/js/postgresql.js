@@ -1723,6 +1723,7 @@ function masterOrSlaveConf(version=''){
                     list += '<td>' + rdata.data[i]['client_port'] +'</td>';
                     list += '<td>' + rdata.data[i]['usename'] +'</td>';
                     list += '<td>' + rdata.data[i]['state'] +'</td>';
+                    list += '<td>' + rdata.data[i]['sync_state'] +'</td>';
                     list += '<td>' + rdata.data[i]['application_name'] +'</td>';
                     list += '</tr>';
                 }
@@ -1740,6 +1741,7 @@ function masterOrSlaveConf(version=''){
                         <th>端口</th>\
                         <th>用户</th>\
                         <th>状态</th>\
+                        <th>同步状态</th>\
                         <th>应该名称</th>\
                         <tbody>\
                         '+ list +'\
