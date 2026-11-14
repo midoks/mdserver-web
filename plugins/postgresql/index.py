@@ -1939,8 +1939,10 @@ def getMasterRepSlaveUserFullCmd(version=''):
         ' -U ' + clist[0]['username'] + ' --password'
     sql += "<hr/>"
     sql += '<span class="set-info c7 ta_center">同步账户模式</span><hr style="margin-top: 5px;margin-bottom: 10px;"/>'
-    sql +=  mdir + '/bin/pg_basebackup -D ' + mdir + '/data -h ' + localIp + ' -p ' + port + ' -U ' + clist[0]['username'] + ' --password ' + clist[0]['password']
-
+    sql +=  mdir + '/bin/pg_basebackup -D ' + mdir + '/data -h '\
+            + localIp + ' -p ' + port + ' -U ' + clist[0]['username'] + ' --password ' + clist[0]['password']\
+            + ' -S ' + clist[0]['username']
+            
     data = {}
     data['cmd'] = sql
     data['info'] = clist
