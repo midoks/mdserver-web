@@ -18,6 +18,7 @@ export PATH
 # SELECT * FROM t_test;
 
 # 常用操作--终端
+# -- 切换数据库
 # \c ff
 
 
