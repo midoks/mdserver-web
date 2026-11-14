@@ -2069,12 +2069,32 @@ def doFullSyncUser(version=''):
     
     os.system(cmd_sync)
 
+
+    primary_conninfo = "host=%s port=%s user=%s password=%s application_name=standby1" % (ip,port,user,apass)
+
     # 同步成功后,开启从库配置
-    openSlaveConf(version)
     pg_conf = getConf()
     content = mw.readFile(pg_conf)
-    mw.writeFile(pg_conf, content)
+    field_list = ['hot_standby','primary_conninfo','max_standby_streaming_delay',
+        'wal_receiver_status_interval','hot_standby_feedback','primary_slot_name']
+    for field in field_list:
+        content = content.replace('#'+field, field)
 
+    content = re.sub(
+        r"^(\s*primary_slot_name\s*=\s*)'standby_slot'",
+        rf"\g<1>'{slot_name}'",
+        content,
+        flags=re.MULTILINE
+    )
+
+    content = re.sub(
+        r"^(\s*primary_conninfo\s*=\s*)'.*'",
+        rf"\g<1>'{primary_conninfo}'",
+        content,
+        flags=re.MULTILINE
+    )
+    print(content)
+    mw.writeFile(pg_conf, content)
     start(version)
     return True
 
