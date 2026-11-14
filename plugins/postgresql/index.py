@@ -2047,8 +2047,9 @@ def doFullSyncUser(version=''):
     slot_name = data['slot_name']
 
 
-    cmd_sync = mdir + '/bin/pg_basebackup -Fp --progress -D ' + mdir + \
-        '/data -h ' + ip + ' -p ' + port + \
+    cmd_sync = mdir + '/bin/pg_basebackup --progress -D ' + mdir + \
+        '/data -h ' + ip + ' -p ' + port \
+        + ' -Fp -Xs -P -R ' \
         ' -U ' + user + ' --password -S ' + slot_name
 
     cmd_sync = "PGPASSWORD='"+apass+"' " + cmd_sync
