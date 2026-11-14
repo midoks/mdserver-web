@@ -119,13 +119,9 @@ def getConf():
 
 
 def configTpl():
-
     clist = []
-
     app_dir = getServerDir()
     clist.append(app_dir + "/data/postgresql.conf")
-    clist.append(app_dir + "/data/pg_hba.conf")
-
     return mw.getJson(clist)
 
 
