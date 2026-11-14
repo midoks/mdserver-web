@@ -1792,6 +1792,7 @@ function masterOrSlaveConf(version=''){
             var con = '<div class="divtable mtb10">\
                     <div class="tablescroll">\
                         <table id="DataBody" class="table table-hover" width="100%" cellspacing="0" cellpadding="0" border="0" style="border: 0 none;">\
+                        <thead><tr>\
                         <th>从库IP</th>\
                         <th>端口</th>\
                         <th>用户</th>\
