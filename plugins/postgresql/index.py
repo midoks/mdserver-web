@@ -2009,6 +2009,28 @@ def writeDbSyncStatus(data):
 
 
 def doFullSync(version=''):
+    mode_file = getSyncModeFile()
+    if not os.path.exists(mode_file):
+        return mw.returnJson(False, '需要先设置同步配置')
+
+    mode = mw.readFile(mode_file)
+    if mode == 'ssh':
+        return doFullSyncSSH(version)
+    if mode == 'sync-user':
+        return doFullSyncUser(version)
+
+def doFullSyncUser(version=''):
+    db = pgDb()
+
+    data = conn.field('ip,port,user,pass,mode,cmd,slot_name').find()
+    user = data['user']
+    apass = data['pass']
+    port = data['port']
+    ip = data['ip']
+    cmd = data['cmd']
+
+
+def doFullSyncSSH(version=''):
     db = pgDb()
 
     id_rsa_conn = pSqliteDb('slave_id_rsa', 'pgsql_slave')
