@@ -1927,6 +1927,9 @@ def delMasterRepSlaveUser(version=''):
 
     pdb.execute("drop user " + name)
 
+    slot_sql = "SELECT pg_drop_replication_slot('"+name+"');";
+    pdb.execute(slot_sql)
+
     pg_hba = pgHbaConf()
     old_config = mw.readFile(pg_hba)
     new_config = re.sub(
