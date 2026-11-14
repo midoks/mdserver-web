@@ -2070,7 +2070,7 @@ def doFullSyncUser(version=''):
     os.system(cmd_sync)
 
     # 同步成功后,开启从库配置
-    openSlaveConf()
+    openSlaveConf(version)
     pg_conf = getConf()
     content = mw.readFile(pg_conf)
     mw.writeFile(pg_conf, content)
