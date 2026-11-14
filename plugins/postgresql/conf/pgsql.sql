@@ -40,4 +40,18 @@ CREATE TABLE IF NOT EXISTS `slave_id_rsa` (
   `addtime` TEXT
 );
 
+-- 从库配置主库的[user]
+-- drop table `slave_user`;
+CREATE TABLE IF NOT EXISTS `slave_sync_user` (
+  `id` INTEGER PRIMARY KEY AUTOINCREMENT,
+  `ip` TEXT,
+  `port` TEXT,
+  `user` TEXT,
+  `pass` TEXT,
+  `mode` TEXT,
+  `cmd` TEXT,
+  `db` TEXT,
+  `addtime` TEXT
+);
+ALTER TABLE `slave_sync_user` ADD COLUMN `db` TEXT DEFAULT '';
 
