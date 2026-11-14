@@ -19,6 +19,17 @@ function randomStr(b) {
     return d
 }
 
+function randomLowerStr(b) {
+    b = b || 32;
+    var c = "abcdefhijkmnprstwxyz";
+    var a = c.length;
+    var d = "";
+    for(i = 0; i < b; i++) {
+        d += c.charAt(Math.floor(Math.random() * a))
+    }
+    return d
+}
+
 function myPost(method,args,callback, title){
 
     var _args = null; 
@@ -1011,7 +1022,7 @@ function addMasterRepSlaveUser(){
             <div class='line'>\
                 <span class='tname'>密码</span>\
                 <div class='info-r'>\
-                    <input class='bt-input-text mr5' type='text' name='password' id='MyPassword' style='width:330px' value='"+(randomStr(16))+"' />\
+                    <input class='bt-input-text mr5' type='text' name='password' id='MyPassword' style='width:330px' value='"+(randomLowerStr(6))+"' />\
                     <span title='随机密码' class='glyphicon glyphicon-repeat cursor' onclick='repeatMSPwd(16)'></span>\
                 </div>\
             </div>\
@@ -1135,7 +1146,7 @@ function delMasterRepSlaveUser(username){
     myPost('del_master_rep_slave_user', {username:username}, function(data){
         var rdata = $.parseJSON(data.data);
         layer.msg(rdata.msg);
-        
+
         showMsg(rdata.msg, function(){
             getMasterRepSlaveList();
         },{icon: rdata.status ? 1 : 2},1000);
