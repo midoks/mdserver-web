@@ -1570,18 +1570,15 @@ def setMasterStatus(version=''):
     pg_conf = getServerDir() + "/data/postgresql.conf"
     data = mw.readFile(pg_conf)
 
+    field_list = ['max_replication_slots','wal_keep_size','wal_level','wal_sender_timeout','max_wal_senders']
+
     if data.find('#wal_level') > -1:
-        data = data.replace('#max_replication_slots', 'max_replication_slots')
-        data = data.replace('#wal_keep_size', 'wal_keep_size')
-        data = data.replace('#wal_level', 'wal_level')
-        data = data.replace('#wal_sender_timeout', 'wal_sender_timeout')
-        data = data.replace('#max_wal_senders', 'max_wal_senders')
+        # data = data.replace('#max_replication_slots', 'max_replication_slots')
+        for field in field_list:
+            data = data.replace('#'+field, field)
     else:
-        data = data.replace('max_replication_slots', '#max_replication_slots')
-        data = data.replace('wal_keep_size', '#wal_keep_size')
-        data = data.replace('wal_level', '#wal_level')
-        data = data.replace('wal_sender_timeout', '#wal_sender_timeout')
-        data = data.replace('#max_wal_senders', 'max_wal_senders')
+        for field in field_list:
+            data = data.replace(field, '#'+field)
 
     mw.writeFile(pg_conf, data)
     restart(version)
@@ -1591,32 +1588,19 @@ def setMasterStatus(version=''):
 def setSlaveStatus(version):
     pg_conf = getServerDir() + "/data/postgresql.conf"
     data = mw.readFile(pg_conf)
-    if data.find('#hot_standby') > -1:
-        data = data.replace('#hot_standby', 'hot_standby')
-        data = data.replace('#primary_conninfo', 'primary_conninfo')
-        data = data.replace('#max_standby_streaming_delay',
-                            'max_standby_streaming_delay')
-        data = data.replace('#wal_receiver_status_interval',
-                            'wal_receiver_status_interval')
-        data = data.replace('#hot_standby_feedback', 'hot_standby_feedback')
-        data = data.replace('#recovery_target_timeline',
-                            'recovery_target_timeline')
-    else:
-        data = data.replace('hot_standby', '#hot_standby')
-        data = data.replace('primary_conninfo', '#primary_conninfo')
-        data = data.replace('max_standby_streaming_delay',
-                            '#max_standby_streaming_delay')
-        data = data.replace('wal_receiver_status_interval',
-                            '#wal_receiver_status_interval')
-        data = data.replace('hot_standby_feedback', '#hot_standby_feedback')
-        data = data.replace('#recovery_target_timeline',
-                            'recovery_target_timeline')
 
+    field_list = ['hot_standby','primary_conninfo','max_standby_streaming_delay',
+            'wal_receiver_status_interval','hot_standby_feedback']
+    if data.find('#hot_standby') > -1:
+        for field in field_list:
+            data = data.replace('#'+field, field)
+    else:
+        for field in field_list:
+            data = data.replace(field, '#'+field)
     mw.writeFile(pg_conf, data)
 
     restart(version)
     return mw.returnJson(True, '设置成功')
-
 
 def getSlaveList(version=''):
 
