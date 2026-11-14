@@ -1719,10 +1719,9 @@ function masterOrSlaveConf(version=''){
                 list += '<tr>';
                 list += '<td>' + rdata.data[i]['client_addr'] +'</td>';
                 list += '<td>' + rdata.data[i]['client_port'] +'</td>';
+                list += '<td>' + rdata.data[i]['usename'] +'</td>';
                 list += '<td>' + rdata.data[i]['state'] +'</td>';
-                list += '<td style="text-align:right">' + 
-                    '<a href="javascript:;" class="btlink" title="OP">OP</a>' +
-                '</td>';
+                list += '<td>' + rdata.data[i]['application_name'] +'</td>';
                 list += '</tr>';
             }
 
@@ -1732,8 +1731,9 @@ function masterOrSlaveConf(version=''){
                         <thead><tr>\
                         <th>从库IP</th>\
                         <th>端口</th>\
+                        <th>用户</th>\
                         <th>状态</th>\
-                        <th style="text-align:right;">操作</th></tr></thead>\
+                        <th>应该名称</th>\
                         <tbody>\
                         '+ list +'\
                         </tbody></table>\
