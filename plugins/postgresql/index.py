@@ -1862,7 +1862,7 @@ def getMasterLink(version):
     FROM pg_stat_replication
     """
 
-    fields = 'pid, usesysid, usename, application_name,client_addr, client_hostname, client_port,backend_xmin,state,sent_lsn, write_lsn, flush_lsn, replay_lsn,write_lag, flush_lag, replay_lag,sync_priority, sync_state'
+    fields = 'pid, usesysid,usename,application_name,client_addr,client_hostname,client_port,backend_xmin,state,sent_lsn,write_lsn,flush_lsn,replay_lsn,write_lag,flush_lag,replay_lag,sync_priority,sync_state'
     data = pdb.field(fields).table('pg_stat_replication').select()
     # print(data)
     return mw.returnJson(True, 'ok', data)
@@ -1870,7 +1870,7 @@ def getMasterLink(version):
 def getSlaveLink(version):
     pdb = pgDb()
     data = pdb.query("SELECT * FROM pg_stat_wal_receiver")
-    fields = 'pid,status,receive_start_lsn,receive_start_tli,written_lsn,flushed_lsn,received_tli,last_msg_send_time,last_msg_receipt_time,latest_end_lsn,latest_end_time ,slot_name ,sender_host,sender_port,conninfo '
+    fields = 'pid,status,receive_start_lsn,receive_start_tli,written_lsn,flushed_lsn,received_tli,last_msg_send_time,last_msg_receipt_time,latest_end_lsn,latest_end_time,slot_name,sender_host,sender_port,conninfo '
     data = pdb.field(fields).table('pg_stat_wal_receiver').select()
     return mw.returnJson(True, 'ok', data)
 
