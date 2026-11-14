@@ -2021,6 +2021,7 @@ def doFullSync(version=''):
 
 def doFullSyncUser(version=''):
     db = pgDb()
+    mdir = getServerDir()
 
     data = conn.field('ip,port,user,pass,mode,cmd,slot_name').find()
     user = data['user']
@@ -2029,6 +2030,12 @@ def doFullSyncUser(version=''):
     ip = data['ip']
     cmd = data['cmd']
     slot_name = data['slot_name']
+
+
+    cmd = mdir + '/bin/pg_basebackup -Fp --progress -D ' + mdir + \
+        '/data -h ' + ip + ' -p ' + port + \
+        ' -U ' + user + ' --password'
+    print(cmd)
 
     print(data)
 
