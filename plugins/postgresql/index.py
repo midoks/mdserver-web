@@ -1590,7 +1590,7 @@ def setSlaveStatus(version):
     data = mw.readFile(pg_conf)
 
     field_list = ['hot_standby','primary_conninfo','max_standby_streaming_delay',
-            'wal_receiver_status_interval','hot_standby_feedback']
+            'wal_receiver_status_interval','hot_standby_feedback','primary_slot_name']
     if data.find('#hot_standby') > -1:
         for field in field_list:
             data = data.replace('#'+field, field)
