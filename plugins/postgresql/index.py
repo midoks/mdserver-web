@@ -2051,8 +2051,22 @@ def doFullSyncUser(version=''):
         + ' -Fp -Xs -P -R ' \
         '-U ' + user + ' --password -S ' + slot_name
 
-    cmd_sync = "PGPASSWORD='"+apass+"' " + cmd_sync
-    print(cmd_sync)
+    cmd_sync_pwd = "PGPASSWORD='"+apass+"' " + cmd_sync
+    print(cmd_sync_pwd)
+
+
+
+
+    cmd_tmp = "/tmp/cmd_run.sh"
+    cmd_tmp_data = """#!/bin/expect
+spawn %s
+expect "Password:"
+send "%s\r"
+interact
+""" % (cmd, password)
+
+    mw.writeFile(cmd_tmp, cmd_tmp_data)
+
     # 停用
     stop(version)
 
@@ -2067,7 +2081,7 @@ def doFullSyncUser(version=''):
     mw.execShell("chown -R postgres:postgres " + data_dir)
     mw.execShell("chmod -R 700 " + data_dir)
     
-    os.system(cmd_sync)
+    os.system('expect '+ cmd_tmp)
 
 
     primary_conninfo = "host=%s port=%s user=%s password=%s application_name=standby1" % (ip,port,user,apass)
@@ -2096,6 +2110,9 @@ def doFullSyncUser(version=''):
     # print(content)
     mw.writeFile(pg_conf, content)
     start(version)
+
+    if os.path.exists(cmd_tmp):
+        mw.execShell("rm -rf " + cmd_tmp)
     return True
 
 def doFullSyncSSH(version=''):
