@@ -1553,7 +1553,7 @@ def getMasterStatus(version=''):
     pg_conf = getServerDir() + "/data/postgresql.conf"
     pg_content = mw.readFile(pg_conf)
 
-    if pg_content.find('#archive_mode') > -1:
+    if pg_content.find('#wal_level') > -1:
         data['status'] = False
     else:
         data['status'] = True
@@ -1570,18 +1570,18 @@ def setMasterStatus(version=''):
     pg_conf = getServerDir() + "/data/postgresql.conf"
     data = mw.readFile(pg_conf)
 
-    if data.find('#archive_mode') > -1:
-        data = data.replace('#archive_mode', 'archive_mode')
-        data = data.replace('#archive_command', 'archive_command')
+    if data.find('#wal_level') > -1:
+        data = data.replace('#max_replication_slots', 'max_replication_slots')
+        data = data.replace('#wal_keep_size', 'wal_keep_size')
         data = data.replace('#wal_level', 'wal_level')
-        data = data.replace('#max_wal_senders', 'max_wal_senders')
         data = data.replace('#wal_sender_timeout', 'wal_sender_timeout')
+        data = data.replace('#max_wal_senders', 'max_wal_senders')
     else:
-        data = data.replace('archive_mode', '#archive_mode')
-        data = data.replace('archive_command', '#archive_command')
+        data = data.replace('max_replication_slots', '#max_replication_slots')
+        data = data.replace('wal_keep_size', '#wal_keep_size')
         data = data.replace('wal_level', '#wal_level')
-        data = data.replace('max_wal_senders', '#max_wal_senders')
         data = data.replace('wal_sender_timeout', '#wal_sender_timeout')
+        data = data.replace('#max_wal_senders', 'max_wal_senders')
 
     mw.writeFile(pg_conf, data)
     restart(version)
