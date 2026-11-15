@@ -1694,7 +1694,7 @@ def setMasterStatus(version=''):
     pg_conf = getServerDir() + "/data/postgresql.conf"
     data = mw.readFile(pg_conf)
 
-    field_list = ['max_replication_slots','wal_keep_size','wal_level','wal_sender_timeout','max_wal_senders']
+    field_list = ['max_replication_slots','wal_level','wal_sender_timeout','max_wal_senders']
 
     if data.find('#wal_level') > -1:
         # data = data.replace('#max_replication_slots', 'max_replication_slots')
