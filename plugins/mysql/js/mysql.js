@@ -535,7 +535,7 @@ function setRootPwd(type, pwd){
 
     var index = layer.open({
         type: 1,
-        area: '800px',
+        area: '600px',
         title: '修改数据库密码',
         closeBtn: 1,
         shift: 5,
