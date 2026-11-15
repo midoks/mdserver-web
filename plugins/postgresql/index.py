@@ -1029,7 +1029,7 @@ def setUserPwd(version=''):
 
         psdb.where("id=?", (uid,)).setField('password', newpwd)
         if isSlaveDb():
-            return mw.returnJson(True, mw.getInfo('修改本地记录[{1}]密码成功!', (name,)))
+            return mw.returnJson(True, mw.getInfo('修改本地记录[{1}]成功，密码看主库!', (name,)))
         else:
             return mw.returnJson(True, mw.getInfo('修改数据库[{1}]密码成功!', (name,)))
     except Exception as ex:
