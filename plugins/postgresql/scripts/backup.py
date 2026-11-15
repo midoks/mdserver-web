@@ -91,6 +91,13 @@ class backupTools:
     def getServerDir(self):
         return mw.getServerDir() + '/postgresql'
 
+    def isSlaveDb(self):
+        standby = self.getServerDir()+"/data/standby.signal"
+        if os.path.exists(standby):
+            return True
+        return False
+
+
     def getPgPort(self):
         conf = self.getServerDir() + '/data/postgresql.conf'
         content = mw.readFile(conf)
@@ -164,9 +171,12 @@ class backupTools:
         # --serializable-deferrable: MVCC 快照导出, 与 DDL 快照冲突时自动重试
         # --lock-wait-timeout=30s: 等表锁最多 30 秒, 避免大 DDL 下一直阻塞
         # --no-sync (PG 14+): dump 完不等 fsync, 减少 I/O 等待
-        dump_opts = '-c --if-exists --serializable-deferrable --lock-wait-timeout=30s'
+        dump_opts = '-c --if-exists --lock-wait-timeout=30s'
         if pg_major >= 14:
             dump_opts += ' --no-sync'
+
+        if not self.isSlaveDb():
+            dump_opts += ' --serializable-deferrable'
 
         if table_name != '':
             dump_args = '{} -t {} {}'.format(dump_opts, table_name, name)

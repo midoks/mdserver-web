@@ -99,27 +99,130 @@ function runInfo(){
             return;
         }
 
-        var con = '<div class="divtable"><table class="table table-hover table-bordered" style="margin-bottom:10px;background-color:#fafafa">\
+        function numberValue(value) {
+            var number = Number(value);
+            return isFinite(number) ? number : 0;
+        }
+
+        function displayValue(value) {
+            return value === undefined || value === null || value === '' ? '-' : value;
+        }
+
+        function formatCount(value) {
+            if (value === undefined || value === null || value === '') return '-';
+            return numberValue(value).toLocaleString();
+        }
+
+        function formatDuration(value) {
+            var seconds = Math.floor(numberValue(value));
+            var days = Math.floor(seconds / 86400);
+            var hours = Math.floor(seconds % 86400 / 3600);
+            var minutes = Math.floor(seconds % 3600 / 60);
+            var remainingSeconds = seconds % 60;
+            if (days > 0) return days + '天 ' + hours + '小时';
+            if (hours > 0) return hours + '小时 ' + minutes + '分钟';
+            if (minutes > 0) return minutes + '分钟 ' + remainingSeconds + '秒';
+            return remainingSeconds + '秒';
+        }
+
+        var uptime = numberValue(rdata.uptime);
+        var commits = numberValue(rdata.com_commit);
+        var rollbacks = numberValue(rdata.com_rollback);
+        var tps = uptime > 0 ? ((commits + rollbacks) / uptime).toFixed(2) : '0.00';
+        var blocksRead = numberValue(rdata.blks_read);
+        var blocksHit = numberValue(rdata.blks_hit);
+        var blocksTotal = blocksRead + blocksHit;
+        var cacheHit = blocksTotal > 0 ? (blocksHit / blocksTotal * 100).toFixed(2) + '%' : '-';
+        var tempBytes = numberValue(rdata.temp_bytes);
+
+        function formatReplicationStatus(value) {
+            var status = displayValue(value);
+            var names = {
+                'streaming': '流复制中',
+                'catchup': '追赶中',
+                'backup': '备份中',
+                'stopping': '已停止',
+                'startup': '启动中'
+            };
+            return names[status] || status;
+        }
+
+        function formatSyncState(value) {
+            var names = {
+                'sync': '同步',
+                'async': '异步',
+                'potential': '潜在同步',
+                'quorum': '仲裁同步'
+            };
+            return names[value] || displayValue(value);
+        }
+
+        function formatDelay(value) {
+            if (value === undefined || value === null || value === '') return '-';
+            return formatDuration(value);
+        }
+
+        var replication = rdata.replication || {};
+        var role = replication.role || 'unknown';
+        var roleHtml = '<span class="label label-default">未知</span>';
+        if (role === 'primary') roleHtml = '<span class="label label-success">主库</span>';
+        if (role === 'standby') roleHtml = '<span class="label label-info">从库</span>';
+
+        var replicationSummaryLabel = role === 'primary' ? '从库连接' : '复制状态';
+        var replicationSummary = role === 'primary' ?
+            formatCount(replication.replica_count || 0) + ' 个' :
+            formatReplicationStatus(replication.status);
+        var replicas = replication.replicas || [];
+        var replicationCon = '';
+
+        if (role === 'primary' && replicas.length > 0) {
+            replicationCon = '<div style="font-weight:bold;margin:10px 0 6px">从库复制</div>\
+                <table class="table table-hover table-bordered" style="margin-bottom:10px">\
+                <thead><tr><th>从库</th><th>地址</th><th>状态</th><th>同步模式</th><th>发送/回放位置</th><th>延迟</th></tr></thead>\
+                <tbody>';
+            for (var i = 0; i < replicas.length; i++) {
+                var replica = replicas[i];
+                replicationCon += '<tr><td>' + displayValue(replica.name) + '</td><td>' + displayValue(replica.address) + '</td>\
+                    <td>' + formatReplicationStatus(replica.state) + '</td><td>' + formatSyncState(replica.sync_state) + '</td>\
+                    <td>' + displayValue(replica.sent_lsn) + '<br>' + displayValue(replica.replay_lsn) + '</td>\
+                    <td>' + formatDelay(replica.replay_lag) + '</td></tr>';
+            }
+            replicationCon += '</tbody></table>';
+        }
+
+        if (role === 'standby') {
+            var sender = displayValue(replication.sender_host);
+            if (replication.sender_port && replication.sender_port !== '-') {
+                sender += ':' + replication.sender_port;
+            }
+            replicationCon = '<div style="font-weight:bold;margin:10px 0 6px">主库复制</div>\
+                <table class="table table-hover table-bordered" style="margin-bottom:10px"><tbody>\
+                <tr><th>主库地址</th><td>' + sender + '</td><th>复制槽</th><td>' + displayValue(replication.slot_name) + '</td></tr>\
+                <tr><th>接收状态</th><td>' + formatReplicationStatus(replication.status) + '</td><th>回放延迟</th><td>' + formatDelay(replication.replay_lag) + '</td></tr>\
+                <tr><th>接收位置</th><td>' + displayValue(replication.receive_lsn) + '</td><th>回放位置</th><td>' + displayValue(replication.replay_lsn) + '</td></tr>\
+                </tbody></table>';
+        }
+
+        var con = '<div class="divtable">\
+                    <div style="font-weight:bold;margin-bottom:6px">运行概览</div>\
+                    <table class="table table-hover table-bordered" style="margin-bottom:10px;background-color:#fafafa">\
                     <tbody>\
-                        <tr><th>启动时间</th><td>' + rdata.uptime + '</td><th>进程数</th><td>' +rdata.progress_num+ '</td></tr>\
-                        <tr><th>总连接次数</th><td>' + rdata.connections + '</td><th>PID</th><td>' +rdata.pid+ '</td></tr>\
-                        <tr><th>占用空间</th><td>' + rdata.pg_size + '</td><th>占用内存</th><td>' +rdata.pg_mem+ '</td></tr>\
+                        <tr><th>数据库角色</th><td>' + roleHtml + '</td><th>' + replicationSummaryLabel + '</th><td>' + replicationSummary + '</td></tr>\
+                        <tr><th>启动时间</th><td>' + displayValue(rdata.run_time) + '</td><th>运行时长</th><td>' + formatDuration(uptime) + '</td></tr>\
+                        <tr><th>当前/活动连接</th><td>' + formatCount(rdata.connections) + ' / ' + formatCount(rdata.threads_running) + '</td><th>最大连接数</th><td>' + formatCount(rdata.max_connections) + '</td></tr>\
+                        <tr><th>数据库总大小</th><td>' + displayValue(rdata.pg_size) + '</td><th>主进程内存</th><td>' + displayValue(rdata.pg_mem) + '</td></tr>\
+                        <tr><th>进程数</th><td>' + formatCount(rdata.progress_num) + '</td><th>PID</th><td>' + displayValue(rdata.pid) + '</td></tr>\
+                        <tr><th>WAL文件</th><td>' + displayValue(rdata.file) + '</td><th>WAL位置</th><td>' + displayValue(rdata.position) + '</td></tr>\
                     </tbody>\
-                    </table>\
+                    </table>' + replicationCon + '<div style="font-weight:bold;margin:10px 0 6px">累计统计</div>\
                     <table class="table table-hover table-bordered">\
-                    <thead style="display:none;"><th></th><th></th><th></th><th></th></thead>\
                     <tbody>\
-                        <tr><th>表进程已经锁住的物理内存的大小</th><td>' + rdata.pg_vm_lock + '</td></tr>\
-                        <tr><th>数据库分配到物理内存的峰值</th><td>' + rdata.pg_vm_high + '</td></tr>\
-                        <tr><th>进程数据段的大小</th><td>' + rdata.pg_vm_data_size + '</td></tr>\
-                        <tr><th>进程堆栈段的大小</th><td>' + rdata.pg_vm_sk_size + '</td></tr>\
-                        <tr><th>进程代码的大小</th><td>' + rdata.pg_vm_code_size + '</td></tr>\
-                        <tr><th>进程所使用LIB库的大小</th><td>' + rdata.pg_vm_lib_size + '</td></tr>\
-                        <tr><th>进程占用Swap的大小</th><td>' + rdata.pg_vm_swap_size + '</td></tr>\
-                        <tr><th>占用的页表的大小</th><td>' + rdata.pg_vm_page_size + '</td></tr>\
-                        <tr><th>当前待处理信号的个数</th><td>' + rdata.pg_sigq + '</td></tr>\
-                    <tbody>\
-            </table></div>';
+                        <tr><th>平均TPS</th><td>' + tps + '</td><th>缓存命中率</th><td>' + cacheHit + '</td></tr>\
+                        <tr><th>提交/回滚事务</th><td>' + formatCount(commits) + ' / ' + formatCount(rollbacks) + '</td><th>死锁/恢复冲突</th><td>' + formatCount(rdata.deadlocks) + ' / ' + formatCount(rdata.conflicts) + '</td></tr>\
+                        <tr><th>返回/提取行数</th><td>' + formatCount(rdata.tup_returned) + ' / ' + formatCount(rdata.tup_fetched) + '</td><th>插入/更新/删除行数</th><td>' + formatCount(rdata.tup_inserted) + ' / ' + formatCount(rdata.tup_updated) + ' / ' + formatCount(rdata.tup_deleted) + '</td></tr>\
+                        <tr><th>临时文件数</th><td>' + formatCount(rdata.temp_files) + '</td><th>临时文件大小</th><td>' + toSize(tempBytes) + '</td></tr>\
+                    </tbody>\
+                    </table></div>';
         $(".soft-man-con").html(con);
     });
 }
@@ -151,42 +254,102 @@ function pgPort(){
 
 //数据库配置状态
 function pgPerfOpt() {
-    //获取MySQL配置
     myPost('db_status','',function(data){
         var rdata = $.parseJSON(data.data);
-        var html_p = '';
-        for (i in rdata){
-            if (i != 'status' ){
-                var v = rdata[i];
-                html_p += '<p><span>'+i+'</span><input style="width: 70px;" class="bt-input-text mr5" unit="'+v[1]+'" name="'+i+'" value="' + v[0] + '" type="number" >'+v[1] +', <font>' + v[2] + '</font></p>'
-            }
+        if (!rdata.status){
+            $(".soft-man-con").html('<div class="alert alert-warning" style="margin:15px 0">' + (rdata.msg || '获取配置失败') + '</div>');
+            return;
         }
 
-        var memCon = '<form class="bt-form" id="pg_conf"><div class="conf_p" style="margin-bottom:0">'+html_p
-            +'<div style="margin-top:10px; padding-right:15px" class="text-right">\
-            <div>\
-                <button class="btn btn-success btn-sm mr5" onclick="reBootMySqld()">重启数据库</button>\
-                <button class="btn btn-success btn-sm" onclick="setPgConf()">保存</button></div>\
-            </div>'
-            +'</div></form>'
+        var html_p = '';
+        for (var i = 0; i < rdata.params.length; i++){
+            var p = rdata.params[i];
+            var unitCon = p.type == 'memory' ?
+                '<span class="pg-unit" style="display:inline-block;width:20px;">' + p.unit + '</span>' :
+                '<span style="display:inline-block;width:0px"></span>';
+            html_p += '<div class="pg-param" style="display:flex;align-items:center;padding:6px 0;border-bottom:1px dashed #eee">\
+                <span style="width:150px;text-align:right;margin-right:12px">' + p.label + '</span>\
+                <input class="bt-input-text" data-type="' + p.type + '" name="' + p.name + '" value="' + p.value + '" type="number" step="any" min="0" style="width:90px;margin-right:8px">\
+                ' + unitCon + '\
+                <font class="text-muted" style="flex:1;font-size:10px;">' + p.desc + '</font>\
+            </div>';
+        }
+
+        var options = '<option value="0">请选择</option>';
+        for (var j = 0; j < rdata.profiles.length; j++){
+            options += '<option value="' + rdata.profiles[j].memory + '">' + rdata.profiles[j].memory + 'GB</option>';
+        }
+
+        var memoryHint = '';
+        if (rdata.total_memory > 0){
+            memoryHint = '<span class="text-muted" style="margin-left:10px;width:260px;">检测到物理内存 ' + Math.round(rdata.total_memory / 1024) + 'GB，选择后自动填入推荐值</span>';
+        }
+
+        var memCon = '<div class="conf_p" style="margin-bottom:0">\
+            <div style="border-bottom:#ccc 1px solid;padding-bottom:10px;margin-bottom:10px">\
+                <span><b>内存推荐配置: </b></span>\
+                <select class="bt-input-text" name="pg_set">' + options + '</select>' + memoryHint + '\
+            </div>\
+            <div id="pg_conf">' + html_p + '</div>\
+            <div style="margin-top:10px;padding-right:15px" class="text-right">\
+                <button class="btn btn-default btn-sm mr5" onclick="reBootPgSqld()">重启数据库</button>\
+                <button class="btn btn-success btn-sm pg_conf">保存</button>\
+            </div>\
+        </div>';
 
         $(".soft-man-con").html(memCon);
 
-        $("#pg_conf").change(function (e) {
-        　　e.preventDefault();
+        $(".conf_p select[name='pg_set']").change(function() {
+            pgSQLMemOpt($(this).val(), rdata.profiles);
+        });
+
+        $(".pg_conf").unbind('click').click(function (e) {
+            e.preventDefault();
             var data = {};
-            $('#pg_conf p input').each(function (index, element) {
-                data[$(this).attr('name')] = $(this).val() + ($(this).attr('unit') || '');
-            })
-            // console.log(data);
+            $('#pg_conf .pg-param').each(function () {
+                var input = $(this).find('input');
+                var value = $.trim(input.val());
+                if (value === '') return;
+                if (input.attr('data-type') == 'memory'){
+                    value += $(this).find('.pg-unit').text();
+                }
+                data[input.attr('name')] = value;
+            });
             myPost('set_db_status', data, function(data){
                 var rdata = $.parseJSON(data.data);
-                showMsg(rdata.msg,function(){
-                },{ icon: rdata.status ? 1 : 2 });
+                showMsg(rdata.msg, function(){
+                    if (rdata.status) pgPerfOpt();
+                }, { icon: rdata.status ? 1 : 2 });
             });
             return false;
         });
     });
+}
+
+function pgSQLMemOpt(memory, profiles){
+    if (!profiles) return;
+
+    var profile = null;
+    for (var i = 0; i < profiles.length; i++){
+        if (String(profiles[i].memory) === String(memory)){
+            profile = profiles[i];
+            break;
+        }
+    }
+    if (!profile) return;
+
+    var names = ['shared_buffers', 'effective_cache_size', 'maintenance_work_mem', 'work_mem', 'temp_buffers'];
+    for (var j = 0; j < names.length; j++){
+        var matched = /^(\d+(?:\.\d+)?)\s*(kB|MB|GB|TB)$/i.exec(profile[names[j]] || '');
+        if (!matched) continue;
+
+        var unit = matched[2].toUpperCase();
+        if (unit == 'KB') unit = 'kB';
+
+        var row = $('#pg_conf input[name="' + names[j] + '"]').closest('.pg-param');
+        row.find('input').val(matched[1]);
+        row.find('.pg-unit').text(unit);
+    }
 }
 
 function reBootPgSqld(){
@@ -230,28 +393,74 @@ function setRootPwd(type, pwd){
             // console.log(rdata);
             showMsg(rdata.msg,function(){
                 dbList();
-                $('.layui-layer-close1').click();
             },{icon: rdata.status ? 1 : 2});
         });
         return;
     }
 
-    var index = layer.open({
+    layer.open({
         type: 1,
-        area: '500px',
+        area: '600px',
         title: '修改数据库密码',
         closeBtn: 1,
         shift: 5,
         shadeClose: true,
-        btn:["取消","提交"],
+        btn:["提交", "关闭", "复制PG密码", "修改本地PG记录", "强改PG密码"],
         content: "<form class='bt-form pd20' id='mod_pwd'>\
                     <div class='line'>\
-                    <span class='tname'>postgres密码</span>\
-                    <div class='info-r'><input class='bt-input-text mr5' type='text' name='password' id='MyPassword' style='width:330px' value='"+pwd+"' /><span title='随机密码' class='glyphicon glyphicon-repeat cursor' onclick='repeatPwd(16)'></span></div>\
+                        <span class='tname'>postgres密码</span>\
+                        <div class='info-r'>\
+                            <input class='bt-input-text mr5' type='text' name='password' id='MyPassword' style='width:330px' value='"+pwd+"' />\
+                            <span title='随机密码' class='glyphicon glyphicon-repeat cursor' onclick='repeatPwd(16)'></span>\
+                        </div>\
                     </div>\
                 </form>",
-        yes:function(){
-            setRootPwd(1);
+        yes:function(layerIndex){
+            var password = $("#MyPassword").val();
+            myPost('set_postgres_pwd', {password:password}, function(data){
+                var rdata = $.parseJSON(data.data);
+                showMsg(rdata.msg,function(){
+                    layer.close(layerIndex);
+                    dbList();
+                },{icon: rdata.status ? 1 : 2});   
+            });
+        },
+        btn3:function(){
+            var password = $("#MyPassword").val();
+            copyText(password);
+            return false;
+        },
+        btn4:function(layerIndex){
+            layer.confirm('修改本地PG记录,确定修改?', {
+                btn: ['确定', '取消']
+            }, function(index, layero){
+                layer.close(index);
+                var password = $("#MyPassword").val();
+                myPost('set_postgres_pwd', {password:password,force:'1'}, function(data){
+                    var rdata = $.parseJSON(data.data);
+                    showMsg(rdata.msg,function(){
+                        layer.close(layerIndex);
+                        dbList();
+                    },{icon: rdata.status ? 1 : 2});   
+                });
+            });
+            return false;
+        },
+        btn5:function(layerIndex){
+            layer.confirm('强制修改PG密码,确定强制? (比较耗时)', {
+                btn: ['确定', '取消']
+            }, function(index, layero){
+                layer.close(index);
+                var password = $("#MyPassword").val();
+                myPost('set_postgres_pwd', {password:password,force:'2'}, function(data){
+                    var rdata = $.parseJSON(data.data);
+                    showMsg(rdata.msg,function(){
+                        layer.close(layerIndex);
+                        dbList();
+                    },{icon: rdata.status ? 1 : 2});   
+                });
+            });
+            return false;
         }
     });
 }
@@ -435,8 +644,16 @@ function setDbAccess(name){
     });
 }
 
-function setDbPass(id, username, password){
+function fixDbAccess(username){
+    myPost('fix_db_access', '', function(rdata){
+        var rdata = $.parseJSON(rdata.data);
+        showMsg(rdata.msg,function(){
+            dbList();
+        },{icon: rdata.status ? 1 : 2}); 
+    });
+}
 
+function setDbPass(id, username, password){
     var index = layer.open({
         type: 1,
         area: '500px',
@@ -558,7 +775,6 @@ function delDb(id, name){
             var rdata = $.parseJSON(data.data);
             showMsg(rdata.msg,function(){
                 dbList();
-                $('.layui-layer-close1').click();
             },{icon: rdata.status ? 1 : 2}, 600);
         });
     });
@@ -942,6 +1158,8 @@ function dbList(page, search){
         var con = '<div class="safe bgw">\
             <button onclick="addDatabase()" title="添加数据库" class="btn btn-success btn-sm" type="button" style="margin-right: 5px;">添加数据库</button>\
             <button onclick="setRootPwd(0,\''+rdata.info['root_pwd']+'\')" title="管理员密码" class="btn btn-default btn-sm" type="button" style="margin-right: 5px;">PG密码</button>\
+            <button onclick="setDbAccess(\'postgres\')" title="ROOT权限" class="btn btn-default btn-sm" type="button" style="margin-right: 5px;">ROOT权限</button>\
+            <button onclick="fixDbAccess(\'postgres\')" title="修复" class="btn btn-default btn-sm" type="button" style="margin-right: 5px;">修复</button>\
             <span style="float:right">              \
                 <button batch="true" style="float: right;display: none;margin-left:10px;" onclick="delDbBatch();" title="删除选中项" class="btn btn-default btn-sm">删除选中</button>\
             </span>\
@@ -1029,7 +1247,7 @@ function addMasterRepSlaveUser(){
             <div class='line'>\
                 <span class='tname'>网段</span>\
                 <div class='info-r'>\
-                    <input class='bt-input-text mr5' type='text' name='address' style='width:330px' value='127.0.0.1/32' />\
+                    <input class='bt-input-text mr5' type='text' name='address' style='width:330px' value='0.0.0.0/0' />\
                 </div>\
             </div>\
             <input type='hidden' name='ps' value='' />\
@@ -1105,9 +1323,85 @@ function updateMasterRepSlaveUser(username){
                 if (rdata.status){
                     getMasterRepSlaveList();
                 }
-                $('.layui-layer-close1').click();
             },{icon: rdata.status ? 1 : 2},600);
         });
+    });
+}
+
+
+function setMasterRepSlaveAccess(name){
+    myPost('get_master_rep_slave_access','name='+name, function(data){
+        var rdata = $.parseJSON(data.data);
+        if (!rdata.status){
+            layer.msg(rdata.msg,{icon:2,shade: [0.3, '#000']});
+            return;
+        }
+        
+        layer.open({
+            type: 1,
+            area: '500px',
+            title: '设置数据库权限',
+            closeBtn: 1,
+            shift: 5,
+            btn:["提交","取消"],
+            shadeClose: true,
+            content: "<form class='bt-form pd20' id='set_db_access'>\
+                        <div class='line'>\
+                            <span class='tname'>访问权限</span>\
+                            <div class='info-r '>\
+                                <select class='bt-input-text mr5' name='dataAccess' style='width:100px'>\
+                                <option value='127.0.0.1/32'>本地服务器</option>\
+                                <option value='0.0.0.0/0'>所有人</option>\
+                                <option value='ip'>指定网段</option>\
+                                </select>\
+                            </div>\
+                        </div>\
+                      </form>",
+            success:function(){
+                if (rdata.msg == '127.0.0.1/32'){
+                    $('select[name="dataAccess"]').find("option[value='127.0.0.1/32']").attr("selected",true);
+                } else if (rdata.msg == '0.0.0.0/0'){
+                    $('select[name="dataAccess"]').find('option[value="0.0.0.0/0"]').attr("selected",true);
+                } else {
+                    $('select[name="dataAccess"]').find('option[value="ip"]').attr("selected",true);
+                    $('select[name="dataAccess"]').after("<input value='"+rdata.msg+"' class='bt-input-text mr5' type='text' name='address' placeholder='如: 192.168.1.0/24' style='width: 230px; display: inline-block;'>");
+                }
+
+                $('select[name="dataAccess"]').change(function(){
+                    var v = $(this).val();
+                    if (v == 'ip'){
+                        $(this).after("<input class='bt-input-text mr5' type='text' name='address' placeholder='如: 192.168.1.0/24' style='width: 230px; display: inline-block;'>");
+                    } else {
+                        $('input[name="address"]').remove()
+                    }
+                });
+            },
+            yes:function(index){
+                var data = $("#set_db_access").serialize();
+                data = decodeURIComponent(data);
+                var dataObj = str2Obj(data);
+                if(!dataObj['access']){
+                    dataObj['access'] = dataObj['dataAccess'];
+                    if ( dataObj['dataAccess'] == 'ip'){
+                        if (dataObj['address']==''){
+                            layer.msg('IP地址不能空!',{icon:2,shade: [0.3, '#000']});
+                            return;
+                        }
+                        dataObj['access'] = dataObj['address'];
+                    }
+                }
+                dataObj['name'] = name;
+                // console.log(dataObj);
+                myPost('set_master_rep_slave_access', dataObj, function(data){
+                    var rdata = $.parseJSON(data.data);
+                    showMsg(rdata.msg,function(){
+                        layer.close(index);
+                        masterOrSlaveConf();
+                    },{icon: rdata.status ? 1 : 2});   
+                });
+            }
+        });
+
     });
 }
 
@@ -1167,12 +1461,13 @@ function getMasterRepSlaveList(){
         // console.log(rdata['data']);
         var user_list = rdata['data'];
         for (i in user_list) {
-            // console.log(i);
+            // console.log(i);/setDbMasterAccess
             var name = user_list[i]['username'];
             list += '<tr><td>'+name+'</td>\
                 <td>'+user_list[i]['password']+'</td>\
                 <td>\
                     <a class="btlink" onclick="delMasterRepSlaveUser(\''+name+'\');">删除</a> | \
+                    <a class="btlink" onclick="setMasterRepSlaveAccess(\''+name+'\');">权限</a> | \
                     <a class="btlink" onclick="getMasterRepSlaveUserCmd(\''+name+'\');">从库同步命令</a> \
                 </td>\
             </tr>';
@@ -1703,160 +1998,160 @@ function slaveSyncCmd(){
 
 function masterOrSlaveConf(version=''){
 
-    function getMasterDbList(){
-        var _data = {};
-        if (typeof(page) =='undefined'){
-            var page = 1;
+    function replicationValue(value) {
+        return value === undefined || value === null || value === '' ? '-' : value;
+    }
+
+    function replicationDelay(value) {
+        if (value === undefined || value === null || value === '') return '-';
+        if (typeof value === 'string' && value.indexOf(':') > -1) {
+            var parts = value.split(':');
+            if (parts.length === 3) {
+                value = parseInt(parts[0], 10) * 3600 + parseInt(parts[1], 10) * 60 + parseFloat(parts[2]);
+            }
         }
-        
-        _data['page'] = page;
-        _data['page_size'] = 10;
+        var seconds = Number(value);
+        if (!isFinite(seconds)) return replicationValue(value);
+        if (seconds < 0) return '-';
+        if (seconds > 0 && seconds < 1) return Math.round(seconds * 1000) + '毫秒';
+        seconds = Math.floor(seconds);
+        var days = Math.floor(seconds / 86400);
+        var hours = Math.floor(seconds % 86400 / 3600);
+        var minutes = Math.floor(seconds % 3600 / 60);
+        var remainingSeconds = seconds % 60;
+        if (days > 0) return days + '天 ' + hours + '小时';
+        if (hours > 0) return hours + '小时 ' + minutes + '分钟';
+        if (minutes > 0) return minutes + '分钟 ' + remainingSeconds + '秒';
+        return remainingSeconds + '秒';
+    }
 
-        myPostN('get_master_link', _data, function(data){
+    function replicationStatus(value) {
+        var status = replicationValue(value);
+        var names = {
+            'streaming': '流复制中',
+            'catchup': '追赶中',
+            'backup': '备份中',
+            'stopping': '已停止',
+            'startup': '启动中'
+        };
+        var labelClass = status === 'streaming' ? 'label-success' :
+            (status === 'catchup' || status === 'backup' ? 'label-warning' : 'label-default');
+        return '<span class="label ' + labelClass + '">' + (names[status] || status) + '</span>';
+    }
+
+    function replicationSync(value) {
+        var names = {'sync': '同步', 'async': '异步', 'potential': '潜在同步', 'quorum': '仲裁同步'};
+        return names[value] || replicationValue(value);
+    }
+
+    function replicationLsn(value) {
+        return '<span style="font-family:monospace;word-break:break-all">' + replicationValue(value) + '</span>';
+    }
+
+    function getMasterDbList(){
+        myPostN('get_master_link', {}, function(data){
             var rdata = $.parseJSON(data.data);
-            console.log('get_master_link:',rdata);
-            var list = '';
-
-            if (rdata.data.length > 0){
-                for(i in rdata.data){
-                    list += '<tr>';
-                    list += '<td>' + rdata.data[i]['client_addr'] +'</td>';
-                    list += '<td>' + rdata.data[i]['client_port'] +'</td>';
-                    list += '<td>' + rdata.data[i]['usename'] +'</td>';
-                    list += '<td>' + rdata.data[i]['state'] +'</td>';
-                    list += '<td>' + rdata.data[i]['sync_state'] +'</td>';
-                    list += '<td>' + rdata.data[i]['application_name'] +'</td>';
-
-                    list += '<td>' + rdata.data[i]['sent_lsn'] +'</td>';
-                    list += '<td>' + rdata.data[i]['write_lsn'] +'</td>';
-                    list += '<td>' + rdata.data[i]['flush_lsn'] +'</td>';
-                    list += '<td>' + rdata.data[i]['replay_lsn'] +'</td>';
-                    list += '</tr>';
-                }
-            } else {
-                list += '<tr>';
-                list += '<td colspan="10" style="text-align:center;">空</td>';
-                list += '</tr>';
+            if (rdata.status === false){
+                $('.table_master_list').html('<div class="alert alert-danger" style="margin:10px 0">' + rdata.msg + '</div>');
+                return;
             }
 
-            var con = '<div class="divtable mtb10">\
-                    <div class="tablescroll">\
-                        <table id="DataBody" class="table table-hover" width="100%" cellspacing="0" cellpadding="0" border="0" style="border: 0 none;">\
-                        <thead><tr>\
-                        <th>从库IP</th>\
-                        <th>端口</th>\
-                        <th>用户</th>\
-                        <th>状态</th>\
-                        <th>同步状态</th>\
-                        <th>应该名称</th>\
-                        <th>已发送LSN</th>\
-                        <th>已写入LSN</th>\
-                        <th>已刷盘LSN</th>\
-                        <th>已回放LSN</th>\
-                        </tr></thead>\
-                        <tbody>\
-                        '+ list +'\
-                        </tbody></table>\
+            var items = rdata.data || [];
+            var list = '';
+            for (var i = 0; i < items.length; i++){
+                var item = items[i];
+                var address = replicationValue(item.client_addr);
+                if (item.client_port) address += ':' + item.client_port;
+                list += '<div style="border:1px solid #ddd;border-radius:4px;margin-bottom:10px;overflow:hidden">\
+                    <div class="clearfix" style="padding:8px 12px;background:#f5f5f5;">\
+                        <strong>' + replicationValue(item.application_name) + '</strong><span class="pull-right">' + replicationStatus(item.state) + '</span>\
                     </div>\
-                    <div id="databasePage" class="dataTables_paginate paging_bootstrap page"></div>\
-                    <div class="table_toolbar" style="left:0px;">\
-                        <span class="sync btn btn-default btn-sm btn-master-refresh" title="">刷新</span>\
-                    </div>\
+                    <table class="table" style="margin:0;table-layout:fixed"><tbody>\
+                        <tr><th style="width:15%">从库地址</th><td style="width:35%">' + address + '</td><th style="width:15%">复制账户</th><td style="width:35%">' + replicationValue(item.usename) + '</td></tr>\
+                        <tr><th>同步模式</th><td>' + replicationSync(item.sync_state) + '</td><th>回放延迟</th><td>' + replicationDelay(item.replay_lag) + '</td></tr>\
+                        <tr><th>发送位置</th><td>' + replicationLsn(item.sent_lsn) + '</td><th>写入位置</th><td>' + replicationLsn(item.write_lsn) + '</td></tr>\
+                        <tr><th>刷盘位置</th><td>' + replicationLsn(item.flush_lsn) + '</td><th>回放位置</th><td>' + replicationLsn(item.replay_lsn) + '</td></tr>\
+                    </tbody></table>\
                 </div>';
+            }
 
-            $(".table_master_list").html(con);
-            $(".table_master_list .btn-master-refresh").click(function(){
-                getMasterDbList();
-            });
-            $('#databasePage').html(rdata.page);
+            if (items.length === 0){
+                list = '<div class="text-center text-muted" style="padding:20px;border:1px dashed #ddd;margin-bottom:10px">暂无已连接的从库</div>';
+            }
+            var con = '<div class="mtb10">' + list + '<div class="clearfix">\
+                <span class="sync btn btn-default btn-sm btn-master-refresh">刷新</span>\
+                <span class="text-muted pull-right" style="line-height:30px">共 ' + items.length + ' 个从库连接</span>\
+                </div></div>';
+            $('.table_master_list').html(con);
+            $('.table_master_list .btn-master-refresh').click(getMasterDbList);
         });
     }
 
     function getAsyncMasterDbList(){
-        var _data = {};
-        if (typeof(page) =='undefined'){
-            var page = 1;
-        }
-        _data['page'] = page;
-        _data['page_size'] = 50;
-        myPost('get_slave_link', _data, function(data){
+        myPost('get_slave_link', {}, function(data){
             var rdata = $.parseJSON(data.data);
-            console.log('get_slave_link:',rdata);
-            var list = '';
-
-            if (rdata.data.length > 0){
-                for(i in rdata.data){
-                    list += '<tr>';
-                    list += '<td>' + rdata.data[i]['sender_host'] +'</td>';
-                    list += '<td>' + rdata.data[i]['sender_port'] +'</td>';
-                    list += '<td>' + rdata.data[i]['status'] +'</td>';
-                    list += '<td>' + rdata.data[i]['slot_name'] +'</td>';
-                    list += '<td>' + rdata.data[i]['last_lsn_commit_time'] +'</td>';
-
-                    
-                    list += '<td>' + rdata.data[i]['receive_start_lsn'] +'</td>';
-                    list += '<td>' + rdata.data[i]['latest_end_lsn'] +'</td>';
-                    list += '<td>' + rdata.data[i]['written_lsn'] +'</td>';
-                    list += '<td>' + rdata.data[i]['flushed_lsn'] +'</td>';
-                    list += '</tr>';
-                }
-            } else {
-                list += '<tr>';
-                list += '<td colspan="8" style="text-align:center;">空</td>';
-                list += '</tr>';
+            if (rdata.status === false){
+                $('.table_slave_status_list').html('<div class="alert alert-danger" style="margin:10px 0">' + rdata.msg + '</div>');
+                return;
             }
 
-            var con = '<div class="divtable mtb10">\
-                    <div class="tablescroll">\
-                        <table id="DataBody" class="table table-hover" width="100%" cellspacing="0" cellpadding="0" border="0" style="border: 0 none;">\
-                        <thead><tr>\
-                        <th>主库IP</th>\
-                        <th>端口</th>\
-                        <th>状态</th>\
-                        <th>槽名</th>\
-                        <th>距最后回放事务时间</th>\
-                        <th>接收起始LSN</th>\
-                        <th>最新结束LSN</th>\
-                        <th>已写入LSN</th>\
-                        <th>已刷盘LSN </th>\
-                        </tr></thead>\
-                        <tbody>\
-                        '+ list +'\
-                        </tbody></table>\
+            var items = rdata.data || [];
+            var list = '';
+            for (var i = 0; i < items.length; i++){
+                var item = items[i];
+                var address = replicationValue(item.sender_host);
+                if (item.sender_port) address += ':' + item.sender_port;
+                list += '<div style="border:1px solid #ddd;border-radius:4px;margin-bottom:10px;overflow:hidden">\
+                    <div class="clearfix" style="padding:8px 12px;background:#f5f5f5;">\
+                        <strong>主库 ' + address + '</strong><span class="pull-right">' + replicationStatus(item.status) + '</span>\
                     </div>\
+                    <table class="table" style="margin:0;table-layout:fixed"><tbody>\
+                        <tr><th style="width:15%">复制槽</th><td style="width:35%">' + replicationValue(item.slot_name) + '</td><th style="width:15%">回放延迟</th><td style="width:35%">' + replicationDelay(item.last_lsn_commit_time) + '</td></tr>\
+                        <tr><th>接收位置</th><td>' + replicationLsn(item.receive_lsn) + '</td><th>回放位置</th><td>' + replicationLsn(item.replay_lsn) + '</td></tr>\
+                        <tr><th>写入位置</th><td>' + replicationLsn(item.written_lsn) + '</td><th>刷盘位置</th><td>' + replicationLsn(item.flushed_lsn) + '</td></tr>\
+                        <tr><th>接收起始</th><td>' + replicationLsn(item.receive_start_lsn) + '</td><th>最新结束</th><td>' + replicationLsn(item.latest_end_lsn) + '</td></tr>\
+                    </tbody></table>\
                 </div>';
-            $(".table_slave_status_list").html(con);
+            }
+
+            if (items.length === 0){
+                list = '<div class="text-center text-muted" style="padding:20px;border:1px dashed #ddd;margin-bottom:10px">暂无主库复制连接，请检查从库连接配置</div>';
+            }
+            var con = '<div class="mtb10">' + list + '<div>\
+                <span class="sync btn btn-default btn-sm btn-slave-refresh">刷新</span>\
+                </div></div>';
+            $('.table_slave_status_list').html(con);
+            $('.table_slave_status_list .btn-slave-refresh').click(getAsyncMasterDbList);
         });
     }
 
     function getMasterStatus(){
         myPost('get_master_status', '', function(data){
             var rdata = $.parseJSON(data.data);
-            // console.log('mode:',rdata.data);
-            var rdata = rdata.data;
+            rdata = rdata.data;
             var limitCon = '\
                 <p class="conf_p">\
-                    <span class="f14 c6 mr20">主从同步模式</span><span class="f14 c6 mr20"></span>\
-                    <button class="btn '+(!(rdata.mode == "classic") ? 'btn-danger' : 'btn-success')+' btn-xs db-mode btn-classic">经典</button>\
+                    <span class="f14 c6 mr20">复制模式</span><span class="f14 c6 mr20"></span>\
+                    <button class="btn btn-default btn-xs">'+(rdata.mode == "classic" ? '经典流复制' : rdata.mode)+'</button>\
                 </p>\
-                <hr/>\
+                <hr style="margin:12px 0"/>\
                 <p class="conf_p">\
-                    <span class="f14 c6 mr20">Master[主]配置</span><span class="f14 c6 mr20"></span>\
-                    <button class="btn '+(!rdata.status ? 'btn-danger' : 'btn-success')+' btn-xs btn-master">'+(!rdata.status ? '未开启' : '已开启') +'</button>\
-                    <button class="btn btn-success btn-xs" onclick="getMasterRepSlaveListPage()">同步账户</button>\
+                    <span class="f14 c6 mr20">主库配置</span><span class="f14 c6 mr20"></span>\
+                    <button title="'+(!rdata.status ? '开启主库复制' : '关闭主库复制')+'" class="btn '+(!rdata.status ? 'btn-danger' : 'btn-success')+' btn-xs btn-master">'+(!rdata.status ? '未开启' : '已开启') +'</button>\
+                    <button class="btn btn-default btn-xs" onclick="getMasterRepSlaveListPage()">复制账户</button>\
                 </p>\
-                <hr/>\
+                <hr style="margin:12px 0"/>\
                 <!-- master list -->\
                 <div class="safe bgw table_master_list"></div>\
-                <hr/>\
+                <hr style="margin:12px 0"/>\
                 <!-- class="conf_p" -->\
                 <p class="conf_p">\
-                    <span class="f14 c6 mr20">Slave[从]配置</span><span class="f14 c6 mr20"></span>\
-                    <button class="btn '+(!rdata.slave_status ? 'btn-danger' : 'btn-success')+' btn-xs btn-slave">'+(!rdata.slave_status ? '未开启' : '已开启') +'</button>\
-                    <button class="btn btn-success btn-xs" onclick="getSlaveCfg()">同步配置</button>\
-                    <button class="btn btn-success btn-xs" onclick="slaveSyncCmd()" >同步命令</button>\
+                    <span class="f14 c6 mr20">从库配置</span><span class="f14 c6 mr20"></span>\
+                    <button title="'+(!rdata.slave_status ? '开启从库复制' : '关闭从库复制')+'" class="btn '+(!rdata.slave_status ? 'btn-danger' : 'btn-success')+' btn-xs btn-slave">'+(!rdata.slave_status ? '未开启' : '已开启') +'</button>\
+                    <button class="btn btn-default btn-xs" onclick="getSlaveCfg()">连接配置</button>\
+                    <button class="btn btn-default btn-xs" onclick="slaveSyncCmd()">同步命令</button>\
                 </p>\
-                <hr/>\
+                <hr style="margin:12px 0"/>\
                 <!-- slave status list -->\
                 <div class="safe bgw table_slave_status_list"></div>\
                 <!-- slave list -->\
@@ -1887,12 +2182,37 @@ function masterOrSlaveConf(version=''){
 
             if (rdata.status){
                 getMasterDbList();
+            } else {
+                $('.table_master_list').html('<div class="text-center text-muted" style="padding:20px;border:1px dashed #ddd;margin-bottom:10px">开启主库复制后，可在此查看从库连接状态</div>');
             }
-            
+
             if (rdata.slave_status){
                 getAsyncMasterDbList();
+            } else {
+
+                $('.table_slave_status_list').html('<div class="text-center text-muted" style="padding:20px;border:1px dashed #ddd;margin-bottom:10px">开启从库复制后，可在此查看主库连接状态</div>');
             }
         });
     }
     getMasterStatus();
 }
+
+
+
+function readme(){
+    // console.log(rdata['data']);
+    var con = '<ul class="help-info-text c7">';
+
+    con += '<li style="color:red;">常规的维护任务</li>';
+    con += '<li style="color:blue;">archivelog 外部维护</li>';
+    con += '<li> - 按数量保留最近1000个</li>';
+    con += '<li>ls -t /www/server/postgresql/archivelog/0000* 2>/dev/null | tail -n +1001 | xargs -r rm -f</li>';
+    con += '<li> - 删除14天前的归档</li>';
+    con += '<li>find /www/server/postgresql/archivelog -name "0000*" -type f -mtime +14 -delete</li>';
+    con += '</ul>';
+
+    $(".soft-man-con").html(con);
+    
+    
+}
+

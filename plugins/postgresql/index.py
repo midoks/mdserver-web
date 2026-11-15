@@ -8,10 +8,6 @@ import subprocess
 import re
 import json
 
-
-# reload(sys)
-# sys.setdefaultencoding('utf-8')
-
 # python3 plugins/postgresql/index.py start 14.4
 # python3 plugins/postgresql/index.py run_info 14.4
 # ps -ef | grep -v grep| grep run_info | awk '{print $2}' | xargs kill -9
@@ -129,6 +125,51 @@ def pgHbaConf():
     return getServerDir() + "/data/pg_hba.conf"
 
 
+def hbaRule(conn_type, database, user, address, method):
+    '''
+    按 conf/pg_hba.conf 的列宽(8/16/16/24)输出一条认证规则, 便于观察
+    '''
+    if address == '':
+        return "{:<8}{:<16}{:<40}{}".format(conn_type, database, user, method)
+    return "{:<8}{:<16}{:<16}{:<24}{}".format(
+        conn_type, database, user, address, method)
+
+
+def getHbaAccess(name):
+    '''
+    从 pg_hba.conf 读取数据库或用户为 name 的规则的 ADDRESS, 后写入的优先
+    '''
+    accept = ''
+    content = mw.readFile(pgHbaConf()) or ''
+    for line in content.splitlines():
+        fields = line.split()
+        # TYPE  DATABASE  USER  ADDRESS  METHOD
+        if len(fields) < 5 or fields[0] != 'host':
+            continue
+        if name not in (fields[1], fields[2]):
+            continue
+        accept = fields[3]
+    return accept
+
+
+def setHbaAccess(name, access, user=''):
+    '''
+    删除数据库或用户为 name 的规则后写入新规则, 仅修改 pg_hba.conf
+    '''
+    lines = []
+    for line in mw.readFile(pgHbaConf()).splitlines():
+        fields = line.split()
+        if len(fields) >= 5 and fields[0] == 'host' and name in (fields[1], fields[2]):
+            continue
+        lines.append(line)
+
+    if user == '':
+        user = name
+    data = "\n".join(lines).strip()
+    data += "\n" + hbaRule('host', name, user, access, 'scram-sha-256')
+    mw.writeFile(pgHbaConf(), data)
+
+
 def readConfigTpl():
     args = getArgs()
     data = checkArgs(args, ['file'])
@@ -226,6 +267,81 @@ def initConfig(version=''):
         logfile = runLog()
         if not os.path.exists(logfile):
             mw.writeFile(logfile, '')
+
+
+def readActiveConf(path):
+    '''
+    读取 postgresql.conf 中已生效(非注释)的配置项, 同名以最后一项为准
+    '''
+    conf = {}
+    if not os.path.exists(path):
+        return conf
+    for line in mw.readFile(path).splitlines():
+        line = line.strip()
+        if line == '' or line.startswith('#') or '=' not in line:
+            continue
+        conf[line.split('=', 1)[0].strip()] = line
+    return conf
+
+
+def regenConfig():
+    '''
+    按模板重新生成配置, 已安装的实例在 restart 前同步一次:
+    postgresql.conf 保留当前已生效的配置值
+    pg_hba.conf 追加数据表中已有数据库、复制用户的访问规则
+    '''
+    # postgresql.conf
+    path = getServerDir() + '/data/postgresql.conf'
+    current = readActiveConf(path)
+    tpl = contentReplace(mw.readFile(getPluginDir() + '/conf/postgresql.conf'))
+    tpl_keys = set(re.findall(r'^\s*#?\s*([\w.]+)\s*=', tpl, re.M))
+
+    lines = []
+    used = set()
+    for line in tpl.splitlines():
+        match = re.match(r'^\s*#?\s*([\w.]+)\s*=', line)
+        key = match.group(1) if match else ''
+        if key == '' or key not in current or key in used:
+            lines.append(line)
+            continue
+        # 用当前生效值覆盖模板中的默认值/注释项
+        lines.append(current[key])
+        used.add(key)
+
+    for key in current:
+        if key not in tpl_keys and key not in used:
+            lines.append(current[key])
+    mw.writeFile(path, "\n".join(lines) + "\n")
+
+    # pg_hba.conf
+    pg_accept = getHbaAccess('postgres')
+    lines = []
+    for line in mw.readFile(getPluginDir() + '/conf/pg_hba.conf').splitlines():
+        fields = line.split()
+        # 管理员规则单独处理, 从当前配置中取值后统一追加
+        if len(fields) >= 5 and fields[0] == 'host' and 'postgres' in (fields[1], fields[2]):
+            continue
+        lines.append(line)
+
+    rules = []
+    for item in pSqliteDb('databases').field('name,username,accept').select():
+        if item['accept']:
+            rules.append(hbaRule('host', item['name'], item['username'],
+                                 item['accept'], 'scram-sha-256'))
+
+    for item in pSqliteDb('master_replication_user').field('username,accept').select():
+        if item['accept']:
+            rules.append(hbaRule('host', 'replication', item['username'],
+                                 item['accept'], 'scram-sha-256'))
+
+    if pg_accept == '':
+        pg_accept = '127.0.0.1/32'
+    rules.insert(0, hbaRule('host', 'postgres', 'postgres', pg_accept, 'scram-sha-256'))
+
+    lines.append('')
+    lines.extend(rules)
+    mw.writeFile(pgHbaConf(), "\n".join(lines) + "\n")
+    return True
 
 
 def isSlaveDb():
@@ -343,7 +459,7 @@ def pgOp(version, method):
     # print(cmd)
     try:
         isInited = initPgData()
-        initConfig(version)
+        initConfig(version)            
         if not isInited:
             if mw.isAppleSystem():
                 cmd_init_start = init_file + ' start'
@@ -406,7 +522,8 @@ def reload(version=''):
     logfile = runLog()
     if os.path.exists(logfile):
         mw.writeFile(logfile, '')
-    return appCMD(version, 'reload')
+    regenConfig()
+    return appCMD(version, 'restart')
 
 
 def initdStatus():
@@ -464,7 +581,7 @@ def setPgPort():
     rep = r"port\s*=\s*([0-9]+)\s*\n"
     content = re.sub(rep, 'port = ' + port + '\n', content)
     mw.writeFile(file, content)
-    restart()
+    appCMD("", 'restart')
     return mw.returnJson(True, '编辑成功!')
 
 
@@ -473,49 +590,167 @@ def runInfo():
         return mw.returnJson(False, 'PG未启动', [])
 
     db = pgDb()
-    data_dir = getServerDir() + "/data"
-    port = getPgPort()
-    result = {}
+    try:
+        data = db.query("""
+            SELECT
+                extract(epoch FROM pg_postmaster_start_time())::bigint,
+                extract(epoch FROM now() - pg_postmaster_start_time())::bigint,
+                (SELECT count(*) FROM pg_stat_activity
+                 WHERE backend_type = 'client backend' AND pid <> pg_backend_pid()),
+                (SELECT count(*) FROM pg_stat_activity
+                 WHERE backend_type = 'client backend' AND state = 'active'
+                   AND pid <> pg_backend_pid()),
+                (SELECT setting::int FROM pg_settings WHERE name = 'max_connections'),
+                (SELECT count(*) FROM pg_stat_activity),
+                coalesce(sum(xact_commit), 0)::bigint,
+                coalesce(sum(xact_rollback), 0)::bigint,
+                coalesce(sum(tup_returned), 0)::bigint,
+                coalesce(sum(tup_fetched), 0)::bigint,
+                coalesce(sum(tup_inserted), 0)::bigint,
+                coalesce(sum(tup_updated), 0)::bigint,
+                coalesce(sum(tup_deleted), 0)::bigint,
+                coalesce(sum(blks_read), 0)::bigint,
+                coalesce(sum(blks_hit), 0)::bigint,
+                coalesce(sum(temp_files), 0)::bigint,
+                coalesce(sum(temp_bytes), 0)::bigint,
+                coalesce(sum(deadlocks), 0)::bigint,
+                coalesce(sum(conflicts), 0)::bigint,
+                (SELECT pg_size_pretty(sum(pg_database_size(datname))::bigint)
+                 FROM pg_database WHERE datallowconn AND NOT datistemplate)
+            FROM pg_stat_database
+        """)
+    except Exception as e:
+        data = e
+    if isinstance(data, Exception):
+        return mw.returnJson(False, str(data), [])
+    if not data:
+        return mw.returnJson(False, '获取PG运行状态失败', [])
 
-    result['uptime'] = mw.execShell(
-        '''cat {}/postmaster.pid |sed -n 3p '''.format(data_dir))[0]
-    timestamp = result['uptime']
-    time_local = time.localtime(int(timestamp))
-    dt = time.strftime("%Y-%m-%d %H:%M:%S", time_local)
-    result['uptime'] = dt
+    row = data[0]
+    result = {
+        'run': row[0],
+        'run_time': time.strftime("%Y-%m-%d %H:%M:%S", time.localtime(row[0])),
+        'uptime': row[1],
+        'connections': row[2],
+        'threads_running': row[3],
+        'max_connections': row[4],
+        'progress_num': row[5],
+        'com_commit': row[6],
+        'com_rollback': row[7],
+        'tup_returned': row[8],
+        'tup_fetched': row[9],
+        'tup_inserted': row[10],
+        'tup_updated': row[11],
+        'tup_deleted': row[12],
+        'blks_read': row[13],
+        'blks_hit': row[14],
+        'temp_files': row[15],
+        'temp_bytes': row[16],
+        'deadlocks': row[17],
+        'conflicts': row[18],
+        'pg_size': row[19],
+        'file': 'OFF',
+        'position': 'OFF',
+        'pid': '-',
+        'pg_mem': '-',
+        'replication': {
+            'role': 'unknown',
+            'status': '-',
+            'replica_count': 0,
+            'replicas': [],
+        },
+    }
 
-    result['progress_num'] = mw.execShell(
-        "ps -ef |grep postgres |wc -l")[0].strip()
-    result['pid'] = mw.execShell(
-        '''cat {}/postmaster.pid |sed -n 1p '''.format(data_dir))[0].strip()
-    res = db.query("select count(*) from pg_stat_activity where not pid=pg_backend_pid()")
+    replication = result['replication']
+    in_recovery = None
+    try:
+        recovery = db.query('SELECT pg_is_in_recovery()')
+        if not isinstance(recovery, Exception) and recovery:
+            in_recovery = recovery[0][0]
+            replication['role'] = 'standby' if in_recovery else 'primary'
+    except Exception:
+        pass
 
-    # print(res)
-    result['connections'] = res[0][0]
+    if in_recovery is not None:
+        try:
+            if in_recovery:
+                wal = db.query("""
+                    SELECT '-', coalesce(pg_last_wal_replay_lsn()::text, '-')
+                """)
+            else:
+                wal = db.query("""
+                    SELECT coalesce(pg_walfile_name(lsn), 'OFF'), coalesce(lsn::text, 'OFF')
+                    FROM (SELECT pg_current_wal_lsn() AS lsn) AS wal
+                """)
+            if not isinstance(wal, Exception) and wal:
+                result['file'] = wal[0][0]
+                result['position'] = wal[0][1]
+        except Exception:
+            pass
 
-    res = db.query("select pg_size_pretty(pg_database_size('postgres'))")
-    result['pg_size'] = res[0][0]
-    result['pg_mem'] = mw.execShell(
-        '''cat /proc/%s/status|grep VmRSS|awk -F: '{print $2}' ''' % (result['pid']))[0]
+    if in_recovery:
+        try:
+            standby = db.query("""
+                SELECT
+                    (SELECT status FROM pg_stat_wal_receiver LIMIT 1),
+                    (SELECT sender_host::text FROM pg_stat_wal_receiver LIMIT 1),
+                    (SELECT sender_port FROM pg_stat_wal_receiver LIMIT 1),
+                    (SELECT slot_name FROM pg_stat_wal_receiver LIMIT 1),
+                    coalesce(pg_last_wal_receive_lsn()::text, '-'),
+                    coalesce(pg_last_wal_replay_lsn()::text, '-'),
+                    extract(epoch FROM now() - pg_last_xact_replay_timestamp())::bigint
+            """)
+            if not isinstance(standby, Exception) and standby:
+                info = standby[0]
+                replication.update({
+                    'status': info[0] or '-',
+                    'sender_host': info[1] or '-',
+                    'sender_port': info[2] or '-',
+                    'slot_name': info[3] or '-',
+                    'receive_lsn': info[4],
+                    'replay_lsn': info[5],
+                    'replay_lag': info[6],
+                })
+                result['position'] = info[5]
+        except Exception:
+            pass
+    elif in_recovery is False:
+        try:
+            replicas = db.query("""
+                SELECT coalesce(application_name, '-'),
+                       coalesce(host(client_addr), '本地'),
+                       coalesce(state, '-'), coalesce(sync_state, '-'),
+                       coalesce(sent_lsn::text, '-'),
+                       coalesce(replay_lsn::text, '-'),
+                       extract(epoch FROM replay_lag)::bigint
+                FROM pg_stat_replication
+                ORDER BY application_name, client_addr
+            """)
+            if not isinstance(replicas, Exception):
+                for replica in replicas:
+                    replication['replicas'].append({
+                        'name': replica[0],
+                        'address': replica[1],
+                        'state': replica[2],
+                        'sync_state': replica[3],
+                        'sent_lsn': replica[4],
+                        'replay_lsn': replica[5],
+                        'replay_lag': replica[6],
+                    })
+                replication['replica_count'] = len(replication['replicas'])
+        except Exception:
+            pass
 
-    result['pg_vm_lock'] = mw.execShell(
-        '''cat /proc/%s/status|grep VmLck|awk -F: '{print $2}'  ''' % (result['pid'].strip()))[0]
-    result['pg_vm_high'] = mw.execShell(
-        '''cat /proc/%s/status|grep VmHWM|awk -F: '{print $2}'  ''' % (result['pid'].strip()))[0]
-    result['pg_vm_data_size'] = mw.execShell(
-        '''cat /proc/%s/status|grep VmData|awk -F: '{print $2}'  ''' % (result['pid'].strip()))[0]
-    result['pg_vm_sk_size'] = mw.execShell(
-        '''cat /proc/%s/status|grep VmStk|awk -F: '{print $2}'  ''' % (result['pid'].strip()))[0]
-    result['pg_vm_code_size'] = mw.execShell(
-        '''cat /proc/%s/status|grep VmExe|awk -F: '{print $2}'  ''' % (result['pid'].strip()))[0]
-    result['pg_vm_lib_size'] = mw.execShell(
-        '''cat /proc/%s/status|grep VmLib|awk -F: '{print $2}'  ''' % (result['pid'].strip()))[0]
-    result['pg_vm_swap_size'] = mw.execShell(
-        '''cat /proc/%s/status|grep VmSwap|awk -F: '{print $2}'  ''' % (result['pid'].strip()))[0]
-    result['pg_vm_page_size'] = mw.execShell(
-        '''cat /proc/%s/status|grep VmPTE|awk -F: '{print $2}'  ''' % (result['pid'].strip()))[0]
-    result['pg_sigq'] = mw.execShell(
-        '''cat /proc/%s/status|grep SigQ|awk -F: '{print $2}'  ''' % (result['pid'].strip()))[0]
+    pid_content = mw.readFile(getDataDir() + '/postmaster.pid')
+    pid_lines = pid_content.splitlines() if pid_content else []
+    if pid_lines:
+        pid = pid_lines[0].strip()
+        result['pid'] = pid
+        process_status = mw.readFile('/proc/{}/status'.format(pid))
+        if process_status:
+            vm_rss = re.search(r'^VmRSS:\s*(.+?)\s*$', process_status, re.M)
+            if vm_rss:
+                result['pg_mem'] = vm_rss.group(1)
 
     return mw.getJson(result)
 
@@ -542,128 +777,200 @@ def getUnit(args):
     return unit
 
 
+# 物理内存(MB)与推荐配置对照
+PG_MEMORY_PROFILES = [
+    {'memory': 2, 'shared_buffers': '512MB', 'effective_cache_size': '1GB',
+     'maintenance_work_mem': '64MB', 'work_mem': '2MB', 'temp_buffers': '4MB'},
+    {'memory': 4, 'shared_buffers': '1GB', 'effective_cache_size': '3GB',
+     'maintenance_work_mem': '128MB', 'work_mem': '4MB', 'temp_buffers': '8MB'},
+    {'memory': 8, 'shared_buffers': '2GB', 'effective_cache_size': '6GB',
+     'maintenance_work_mem': '256MB', 'work_mem': '8MB', 'temp_buffers': '8MB'},
+    {'memory': 16, 'shared_buffers': '4GB', 'effective_cache_size': '12GB',
+     'maintenance_work_mem': '512MB', 'work_mem': '16MB', 'temp_buffers': '16MB'},
+    {'memory': 24, 'shared_buffers': '6GB', 'effective_cache_size': '18GB',
+     'maintenance_work_mem': '768MB', 'work_mem': '16MB', 'temp_buffers': '16MB'},
+    {'memory': 32, 'shared_buffers': '8GB', 'effective_cache_size': '24GB',
+     'maintenance_work_mem': '1GB', 'work_mem': '24MB', 'temp_buffers': '32MB'},
+    {'memory': 48, 'shared_buffers': '8GB', 'effective_cache_size': '36GB',
+     'maintenance_work_mem': '1536MB', 'work_mem': '32MB', 'temp_buffers': '32MB'},
+    {'memory': 64, 'shared_buffers': '8GB', 'effective_cache_size': '48GB',
+     'maintenance_work_mem': '2GB', 'work_mem': '32MB', 'temp_buffers': '32MB'},
+    {'memory': 96, 'shared_buffers': '8GB', 'effective_cache_size': '72GB',
+     'maintenance_work_mem': '3GB', 'work_mem': '48MB', 'temp_buffers': '64MB'},
+    {'memory': 128, 'shared_buffers': '8GB', 'effective_cache_size': '96GB',
+     'maintenance_work_mem': '4GB', 'work_mem': '64MB', 'temp_buffers': '64MB'},
+]
+
+PG_PERF_PARAMS = [
+    ('shared_buffers', '共享缓冲区', 'memory', 'MB',
+     'PG通过shared_buffers和内核和磁盘打交道，通常设置为实际内存的25%.'),
+    ('effective_cache_size', '系统缓存大小', 'memory', 'GB',
+     'PG能够使用的最大缓存,比如4G的内存，可以设置为3GB.'),
+    ('maintenance_work_mem', '维护工作内存', 'memory', 'MB',
+     'VACUUM、CREATE INDEX 等维护操作可用的最大内存.'),
+    ('work_mem', '工作内存', 'memory', 'MB',
+     '增加work_mem有助于提高排序的速度。通常设置为实际RAM的2%-4%.'),
+    ('temp_buffers', '临时缓冲区', 'memory', 'MB',
+     '设置每个数据库会话使用的临时缓冲区的最大数目，默认是8MB'),
+    ('max_connections', '最大连接数', 'number', '', '最大连接数'),
+    ('max_prepared_transactions', '最大预备事务数', 'number', '',
+     '设置可以同时处于 prepared 状态的事务的最大数目'),
+    ('max_stack_depth', '最大堆栈深度', 'memory', 'MB',
+     '指定服务器的执行堆栈的最大安全深度，默认是2MB'),
+    ('bgwriter_lru_maxpages', '后台写脏页上限', 'number', '',
+     '一个周期最多写多少脏页'),
+    ('max_worker_processes', '最大工作进程数', 'number', '',
+     '如果要使用worker process, 最多可以允许fork 多少个worker进程.'),
+]
+
+PG_MEMORY_UNITS = {
+    'KB': 1024,
+    'MB': 1024 * 1024,
+    'GB': 1024 * 1024 * 1024,
+    'TB': 1024 * 1024 * 1024 * 1024,
+}
+
+
+def getPgTotalMemory():
+    try:
+        if os.path.exists('/proc/meminfo'):
+            with open('/proc/meminfo') as f:
+                for line in f:
+                    if line.startswith('MemTotal:'):
+                        return int(line.split()[1]) // 1024
+    except Exception:
+        pass
+
+    try:
+        info = mw.execShell('sysctl -n hw.memsize')
+        if info and info[0].strip().isdigit():
+            return int(info[0].strip()) // (1024 * 1024)
+    except Exception:
+        pass
+    return 0
+
+
+def parsePgMemory(value):
+    '''
+    将 128MB、1GB、1.5GB 解析为 MB
+    '''
+    result = re.match(r'^(\d+(?:\.\d+)?)\s*([kKmMgGtT]?[bB])?$', str(value).strip())
+    if not result:
+        return None
+    unit = (result.group(2) or 'MB').upper()
+    byte_size = float(result.group(1)) * PG_MEMORY_UNITS[unit]
+    return int(byte_size // PG_MEMORY_UNITS['MB'])
+
+
+def formatPgMemory(mb):
+    if mb >= 1024:
+        gb = mb / 1024.0
+        if gb == int(gb):
+            gb = int(gb)
+        return str(gb), 'GB'
+    return str(int(mb)), 'MB'
+
+
+def readPgConf():
+    '''
+    读取 postgresql.conf，活动配置优先，未开启时取注释中的默认值
+    '''
+    path = getServerDir() + "/data/postgresql.conf"
+    if not os.path.exists(path):
+        return {}
+
+    active, commented = {}, {}
+    with open(path) as f:
+        for raw in f:
+            line = raw.strip()
+            if not line or '=' not in line:
+                continue
+
+            is_comment = line.startswith('#')
+            if is_comment:
+                line = line.lstrip('#').strip()
+
+            name, value = line.split('=', 1)
+            name = name.strip()
+            value = value.split('#', 1)[0].strip()
+            if not re.match(r'^[a-z_][a-z0-9_]*$', name) or not value:
+                continue
+
+            if is_comment:
+                commented.setdefault(name, value)
+            else:
+                active[name] = value
+
+    data = dict(commented)
+    data.update(active)
+    return data
+
+
 def pgDbStatus():
+    conf = readPgConf()
+    if not conf:
+        return mw.getJson({'status': False, 'msg': '未找到 postgresql.conf 配置文件'})
 
-    data_directory = getServerDir() + "/data"
-    data = {}
-    shared_buffers, work_mem, effective_cache_size, maintence_work_mem, max_connections, temp_buffers, max_prepared_transactions, max_stack_depth, bgwriter_lru_maxpages, max_worker_processes, listen_addresses = '', '', '', '', '', '', '', '', '', '', ''
-    with open("{}/postgresql.conf".format(data_directory)) as f:
-        for i in f:
-            if i.strip().startswith("shared_buffers"):
-                shared_buffers = i.split("=")[1]
-            elif i.strip().startswith("#shared_buffers"):
-                shared_buffers = i.split("=")[1]
+    params = []
+    for name, label, ptype, default_unit, desc in PG_PERF_PARAMS:
+        raw = conf.get(name, '')
+        value, unit = '', ''
+        if ptype == 'memory':
+            mb = parsePgMemory(raw)
+            if mb is None:
+                unit = default_unit
+            else:
+                value, unit = formatPgMemory(mb)
+        elif raw:
+            value = raw
 
-            shared_buffers_num = re.match(
-                r'\d+', shared_buffers.strip()).group() if re.match(r'\d+', shared_buffers.strip()) else ""
-            data['shared_buffers'] = [shared_buffers_num, "MB",
-                                      "PG通过shared_buffers和内核和磁盘打交道，通常设置为实际内存的10％."]
+        params.append({
+            'name': name,
+            'label': label,
+            'type': ptype,
+            'value': value,
+            'unit': unit,
+            'desc': desc,
+        })
 
-            if i.strip().startswith("work_mem"):
-                work_mem = i.split("=")[1]
-            elif i.strip().startswith("#work_mem"):
-                work_mem = i.split("=")[1]
-
-            work_mem_num = re.match(
-                r'\d+', work_mem.strip()).group() if re.match(r'\d+', work_mem.strip()) else ""
-            data['work_mem'] = [work_mem_num, "MB",
-                                "增加work_mem有助于提高排序的速度。通常设置为实际RAM的2% -4%."]
-
-            if i.strip().startswith("effective_cache_size"):
-                effective_cache_size = i.split("=")[1]
-            elif i.strip().startswith("#effective_cache_size"):
-                effective_cache_size = i.split("=")[1]
-
-            effective_cache_size_num = re.match(r'\d+', effective_cache_size.strip(
-            )).group() if re.match(r'\d+', effective_cache_size.strip()) else ""
-            data['effective_cache_size'] = [effective_cache_size_num,
-                                            "GB", "PG能够使用的最大缓存,比如4G的内存，可以设置为3GB."]
-
-            if i.strip().startswith("temp_buffers "):
-                temp_buffers = i.split("=")[1]
-            elif i.strip().startswith("#temp_buffers "):
-                temp_buffers = i.split("=")[1]
-
-            temp_buffers_num = re.match(
-                r'\d+', temp_buffers.strip()).group() if re.match(r'\d+', temp_buffers.strip()) else ""
-            data['temp_buffers'] = [temp_buffers_num, "MB",
-                                    "设置每个数据库会话使用的临时缓冲区的最大数目，默认是8MB"]
-
-            if i.strip().startswith("max_connections"):
-                max_connections = i.split("=")[1]
-            elif i.strip().startswith("#max_connections"):
-                max_connections = i.split("=")[1]
-
-            max_connections_num = re.match(
-                r'\d+', max_connections.strip()).group() if re.match(r'\d+', max_connections.strip()) else ""
-            data['max_connections'] = [max_connections_num,
-                                       getUnit(max_connections), "最大连接数"]
-
-            if i.strip().startswith("max_prepared_transactions"):
-                max_prepared_transactions = i.split("=")[1]
-            elif i.strip().startswith("#max_prepared_transactions"):
-                max_prepared_transactions = i.split("=")[1]
-
-            max_prepared_transactions_num = re.match(r'\d+', max_prepared_transactions.strip(
-            )).group() if re.match(r'\d+', max_prepared_transactions.strip()) else ""
-            data['max_prepared_transactions'] = [max_prepared_transactions_num, getUnit(
-                max_prepared_transactions), "设置可以同时处于 prepared 状态的事务的最大数目"]
-
-            if i.strip().startswith("max_stack_depth "):
-                max_stack_depth = i.split("=")[1]
-            elif i.strip().startswith("#max_stack_depth "):
-                max_stack_depth = i.split("=")[1]
-
-            max_stack_depth_num = re.match(
-                r'\d+', max_stack_depth.strip()).group() if re.match(r'\d+', max_stack_depth.strip()) else ""
-            data['max_stack_depth'] = [max_stack_depth_num,
-                                       "MB", "指定服务器的执行堆栈的最大安全深度，默认是2MB"]
-
-            if i.strip().startswith("bgwriter_lru_maxpages "):
-                bgwriter_lru_maxpages = i.split("=")[1]
-            elif i.strip().startswith("#bgwriter_lru_maxpages "):
-                bgwriter_lru_maxpages = i.split("=")[1]
-
-            bgwriter_lru_maxpages_num = re.match(r'\d+', bgwriter_lru_maxpages.strip(
-            )).group() if re.match(r'\d+', bgwriter_lru_maxpages.strip()) else ""
-            data['bgwriter_lru_maxpages'] = [
-                bgwriter_lru_maxpages_num, "", "一个周期最多写多少脏页"]
-
-            if i.strip().startswith("max_worker_processes "):
-                max_worker_processes = i.split("=")[1]
-            elif i.strip().startswith("#max_worker_processes "):
-                max_worker_processes = i.split("=")[1]
-
-            max_worker_processes_num = re.match(r'\d+', max_worker_processes.strip(
-            )).group() if re.match(r'\d+', max_worker_processes.strip()) else ""
-            data['max_worker_processes'] = [max_worker_processes_num,
-                                            "", "如果要使用worker process, 最多可以允许fork 多少个worker进程."]
-
-            # if i.strip().startswith("listen_addresses"):
-            #     listen_addresses = i.split("=")[1]
-            # elif i.strip().startswith("#listen_addresses"):
-            #     listen_addresses = i.split("=")[1]
-
-            # listen_addresses = re.match(r"\'.*?\'", listen_addresses.strip()).group(
-            # ) if re.match(r"\'.*?\'", listen_addresses.strip()) else ""
-            # data['listen_addresses'] = [listen_addresses.replace(
-            #     "'", '').replace("127.0.0.1", 'localhost'), "", "pgsql监听地址"]
-
-    # 返回数据到前端
-    data['status'] = True
+    data = {
+        'status': True,
+        'total_memory': getPgTotalMemory(),
+        'profiles': PG_MEMORY_PROFILES,
+        'params': params,
+    }
     return mw.getJson(data)
 
 
 def sedConf(name, val):
     path = getServerDir() + "/data/postgresql.conf"
-    content = ''
-    with open(path) as f:
-        for i in f:
-            if i.strip().startswith(name):
-                i = "{} = {} \n".format(name, val)
-            content += i
+    active_pattern = re.compile(r'^\s*' + re.escape(name) + r'\s*=')
+    item_pattern = re.compile(r'^\s*#?\s*' + re.escape(name) + r'\s*=')
 
-    mw.writeFile(path, content)
+    with open(path) as f:
+        lines = f.readlines()
+
+    active_indexes = [i for i, line in enumerate(lines) if active_pattern.match(line)]
+    commented_indexes = [i for i, line in enumerate(lines) if item_pattern.match(line) and i not in active_indexes]
+
+    # 优先替换已生效的配置，避免被后面的同名配置覆盖
+    target = None
+    if active_indexes:
+        target = active_indexes[0]
+    elif commented_indexes:
+        target = commented_indexes[0]
+
+    if target is not None:
+        lines[target] = "{} = {}\n".format(name, val)
+        # 去掉重复的生效配置，保证写入的值生效
+        for index in reversed(active_indexes[1:]):
+            del lines[index]
+    else:
+        if lines and not lines[-1].endswith('\n'):
+            lines[-1] += '\n'
+        lines.append("{} = {}\n".format(name, val))
+
+    mw.writeFile(path, ''.join(lines))
     return True
 
 
@@ -671,19 +978,36 @@ def pgSetDbStatus():
     '''
     保存pgsql性能调整信息
     '''
+    names = [p[0] for p in PG_PERF_PARAMS]
     args = getArgs()
-    data = checkArgs(args, ['shared_buffers', 'work_mem', 'effective_cache_size',
-                            'temp_buffers', 'max_connections', 'max_prepared_transactions',
-                            'max_stack_depth', 'bgwriter_lru_maxpages', 'max_worker_processes'])
-    if not data[0]:
-        return data[1]
+    provided = [name for name in names if name in args]
+    if not provided:
+        return mw.returnJson(False, '没有需要保存的配置参数!')
 
-    for k, v in args.items():
-        sedConf(k, v)
+    memory_names = set(p[0] for p in PG_PERF_PARAMS if p[2] == 'memory')
+    for name in provided:
+        value = args[name].strip()
+        if name in memory_names:
+            if not re.match(r'^\d+(?:\.\d+)?\s*(?:kB|MB|GB|TB)$', value, re.I):
+                return mw.returnJson(False, '参数({})的值不合法: {}'.format(name, value))
+        elif not re.match(r'^\d+$', value):
+            return mw.returnJson(False, '参数({})必须是整数: {}'.format(name, value))
 
-    restart()
-    return mw.returnJson(True, '设置成功!')
+    for name in provided:
+        sedConf(name, args[name].strip())
 
+    if status() == 'start':
+        restart()
+        return mw.returnJson(True, '设置成功，数据库已重启!')
+    return mw.returnJson(True, '设置成功，将在数据库下次启动时生效!')
+
+
+def isPgError(msg):
+    # 检测数据库执行错误
+    msg = str(msg)
+    if "failed" in msg:
+        return mw.returnJson(False, '数据库连接失败,请检查数据库服务是否启动!')
+    return None
 
 def setUserPwd(version=''):
     args = getArgs()
@@ -699,11 +1023,14 @@ def setUserPwd(version=''):
         psdb = pSqliteDb('databases')
         name = psdb.where('id=?', (uid,)).getField('name')
 
-        r = pdb.execute(
-            "alter user {} with password '{}'".format(username, newpwd))
+        if not isSlaveDb():
+            r = pdb.execute("alter user {} with password '{}'".format(username, newpwd))
 
         psdb.where("id=?", (uid,)).setField('password', newpwd)
-        return mw.returnJson(True, mw.getInfo('修改数据库[{1}]密码成功!', (name,)))
+        if isSlaveDb():
+            return mw.returnJson(True, mw.getInfo('修改本地记录[{1}]成功，密码看主库!', (name,)))
+        else:
+            return mw.returnJson(True, mw.getInfo('修改数据库[{1}]密码成功!', (name,)))
     except Exception as ex:
         return mw.returnJson(False, mw.getInfo('修改数据库[{1}]密码失败[{2}]!', (name, str(ex),)))
 
@@ -735,6 +1062,131 @@ def setDbBackup():
 
 def rootPwd():
     return pSqliteDb('config').where('id=?', (1,)).getField('pg_root')
+
+def openPgTrust():
+    '''
+    临时放开本地连接认证, 用于重置密码
+    '''
+    hba = pgHbaConf()
+    content = mw.readFile(hba) or ''
+    backup = hba + '.bak'
+    # 保留首次备份, 避免中途失败时丢失原始认证配置
+    if not os.path.exists(backup):
+        mw.writeFile(backup, content)
+
+    trust = hbaRule('local', 'all', 'all', '', 'trust') + "\n" \
+            + hbaRule('host', 'all', 'all', '127.0.0.1/32', 'trust') + "\n" \
+            + hbaRule('host', 'all', 'all', '::1/128', 'trust') + "\n"
+    mw.writeFile(hba, trust + content)
+    return True
+
+
+def closePgTrust():
+    '''
+    恢复 pg_hba.conf 本地认证
+    '''
+    hba = pgHbaConf()
+    backup = hba + '.bak'
+    if os.path.exists(backup):
+        mw.writeFile(hba, mw.readFile(backup))
+        os.remove(backup)
+    # pg_hba.conf 无需重启, 重新加载即可
+    return True
+
+
+def resetPgPwd(version, new_password=''):
+    '''
+    通过本地信任连接重置 postgres 用户密码
+    '''
+    pwd = new_password if new_password != '' else mw.getRandomString(16)
+
+    tmp_dir = getServerDir() + '/tmp'
+    if not os.path.exists(tmp_dir):
+        os.makedirs(tmp_dir)
+    sql_file = tmp_dir + '/reset_pwd.sql'
+    mw.writeFile(sql_file, "alter user postgres with password '{}';\n".format(
+        pwd.replace("'", "''")))
+    os.chmod(sql_file, 0o644)
+
+    cmd = getServerDir() + '/bin/psql -d postgres -f ' + sql_file
+    if not mw.isAppleSystem():
+        cmd = pgCmd(cmd)
+    data = mw.execShell(cmd)
+
+    try:
+        os.remove(sql_file)
+    except Exception:
+        pass
+
+    output = (data[0] or '') + (data[1] or '')
+    if 'ALTER ROLE' in output:
+        pSqliteDb('config').where('id=?', (1,)).save('pg_root', (pwd,))
+        return True
+    return False
+
+
+def setRootPwdForce(new_password, version=''):
+    '''
+    当前密码不可用(忘记密码/连接被拒)时, 通过临时放开本地认证的方式真正重置密码
+    '''
+    changed = False
+    try:
+        appCMD(version, 'stop')
+        openPgTrust()
+        appCMD(version, 'start')
+        time.sleep(3)
+
+        changed = resetPgPwd(version, new_password)
+    except Exception:
+        changed = False
+    finally:
+        # 无论成败都恢复本地认证, 避免数据库长期处于免密状态
+        closePgTrust()
+        appCMD(version, 'restart')
+
+    if not changed:
+        return False
+
+    # 用新密码验证是否真的可以连接(启动可能较慢, 重试几次)
+    for i in range(10):
+        try:
+            pdb = pgDb()
+            result = pdb.query('select 1')
+            if not isinstance(result, Exception) and not (isinstance(result, str) and result.startswith('error')):
+                return True
+        except Exception:
+            pass
+        time.sleep(2)
+
+    return False
+
+def setPostgresPwd(version=''):
+    args = getArgs()
+    data = checkArgs(args, ['password'])
+    if not data[0]:
+        return data[1]
+    password = args['password']
+
+    if 'force' in args and args['force'] == '1':
+        pSqliteDb('config').where('id=?', (1,)).save('pg_root', (password,))
+        return mw.returnJson(True, '【强制本地记录】PG密码修改成功!')
+
+    # 忘记密码/连接被拒时, 临时放开本地认证重置
+    if 'force' in args and args['force'] == '2':
+        if not setRootPwdForce(password, version):
+            return mw.returnJson(False, '【强制】修改失败,请检查PG运行状态!')
+        return mw.returnJson(True, '【强制】postgres密码修改成功!')
+
+    try:
+        pdb = pgDb()
+        result = pdb.execute("alter user postgres with password '{}'".format(password.replace("'", "''")))
+        if isinstance(result, Exception):
+            return mw.returnJson(False, '修改密码失败,请检查数据库连接状态!')
+    except Exception as ex:
+        return mw.returnJson(False, '修改密码失败[' + str(ex) + ']')
+
+    pSqliteDb('config').where('id=?', (1,)).save('pg_root', (password,))
+    return mw.returnJson(True, 'postgres密码修改成功!')
 
 def importDbExternal():
     args = getArgs()
@@ -1110,6 +1562,9 @@ def syncGetDatabases():
 
 
 def addDb():
+    if isSlaveDb():
+        return mw.returnJson(False, '从库不能添加数据库!')
+
     args = getArgs()
     data = checkArgs(args, ['password', 'name', 'db_user', 'dataAccess'])
     if not data[0]:
@@ -1167,11 +1622,9 @@ def addDb():
     pdb.setDatabase(dbname)
     pdb.execute("GRANT ALL ON SCHEMA public TO {}".format(dbuser,))
 
-    pg_hba = getServerDir() + "/data/pg_hba.conf"
-
+    pg_hba = pgHbaConf()
     content = mw.readFile(pg_hba)
-    content += "\nhost    {}  {}    {}    scram-sha-256".format(
-        dbname, dbuser, listen_ip)
+    content += "\n" + hbaRule('host', dbname, dbuser, listen_ip, 'scram-sha-256')
     mw.writeFile(pg_hba, content)
 
     addTime = time.strftime('%Y-%m-%d %X', time.localtime())
@@ -1194,19 +1647,20 @@ def delDb():
     pdb = pgDb()
     psdb = pSqliteDb('databases')
 
-    username = psdb.where('id=?', (did,)).getField('username')
-    # print(username, len(username))
-    if len(username) > 0:
-        r = pdb.execute("drop user " + str(username))
+    if not isSlaveDb():
+        username = psdb.where('id=?', (did,)).getField('username')
+        # print(username, len(username))
+        if len(username) > 0:
+            r = pdb.execute("drop user " + str(username))
+            # print(r)
+
+        sql = "SELECT pg_terminate_backend(pg_stat_activity.pid) FROM pg_stat_activity WHERE datname='" + \
+            name + "' AND pid<>pg_backend_pid();"
+
+        r = pdb.execute(sql)
         # print(r)
-
-    sql = "SELECT pg_terminate_backend(pg_stat_activity.pid) FROM pg_stat_activity WHERE datname='" + \
-        name + "' AND pid<>pg_backend_pid();"
-
-    r = pdb.execute(sql)
-    # print(r)
-    r = pdb.execute("drop database " + name)
-    # print(r)
+        r = pdb.execute("drop database " + name)
+        # print(r)
 
     pg_hba = pgHbaConf()
     old_config = mw.readFile(pg_hba)
@@ -1214,6 +1668,9 @@ def delDb():
     mw.writeFile(pg_hba, new_config)
 
     psdb.where("id=?", (did,)).delete()
+    restart()
+    if isSlaveDb():
+        return mw.returnJson(True, '删除本地记录成功!')
     return mw.returnJson(True, '删除成功!')
 
 
@@ -1229,20 +1686,23 @@ def setDbRw(version=''):
 
     pdb = pgDb()
     psdb = pSqliteDb('databases')
-    dbname = psdb.where("id=?", (uid,)).getField('name')
+    if not isSlaveDb():
+        dbname = psdb.where("id=?", (uid,)).getField('name')
 
-    sql = "REVOKE ALL ON database " + dbname + " FROM " + username
-    pdb.query(sql)
+        sql = "REVOKE ALL ON database " + dbname + " FROM " + username
+        pdb.query(sql)
+        if rw == 'rw':
+            sql = "GRANT SELECT, INSERT, UPDATE, DELETE ON database " + dbname + " TO " + username
+        elif rw == 'r':
+            sql = "GRANT SELECT ON database " + dbname + " TO " + username
+        else:
+            sql = "GRANT all ON database " + dbname + " TO " + username
 
-    if rw == 'rw':
-        sql = "GRANT SELECT, INSERT, UPDATE, DELETE ON database " + dbname + " TO " + username
-    elif rw == 'r':
-        sql = "GRANT SELECT ON database " + dbname + " TO " + username
-    else:
-        sql = "GRANT all ON database " + dbname + " TO " + username
+        r = pdb.execute(sql)
 
-    r = pdb.execute(sql)
     psdb.where("id=?", (uid,)).setField('rw', rw)
+    if isSlaveDb():
+        return mw.returnJson(True, '本地记录切换成功!')
     return mw.returnJson(True, '切换成功!')
 
 
@@ -1252,6 +1712,11 @@ def getDbAccess():
     if not data[0]:
         return data[1]
     name = args['name']
+
+    # postgres 为内置库, 不在数据表记录, 直接读配置文件
+    if name == 'postgres':
+        return mw.returnJson(True, getHbaAccess(name))
+
     psdb = pSqliteDb('databases')
     accept = psdb.where("name=?", (name,)).getField('accept')
     return mw.returnJson(True, accept)
@@ -1266,18 +1731,42 @@ def setDbAccess():
     name = args['name']
     access = args['access']
 
+    # postgres 为内置库, 不在数据表记录, 只改配置文件
+    if name == 'postgres':
+        setHbaAccess(name, access)
+        restart()
+        return mw.returnJson(True, "设置成功")
+
     psdb = pSqliteDb('databases')
 
     conf = pgHbaConf()
     data = mw.readFile(conf)
     new_data = re.sub(r'host\s*{}.*'.format(name), '', data).strip()
-
-    new_data += "\nhost    {}  {}    {}    scram-sha-256".format(
-        name, name, access)
+    new_data += "\n" + hbaRule('host', name, name, access, 'scram-sha-256')
     mw.writeFile(conf, new_data)
 
     psdb.where("name=?", (name,)).setField('accept', access)
+    restart()
+
+    if isSlaveDb():
+        return mw.returnJson(True, '从库修改权限成功!')
     return mw.returnJson(True, "设置成功")
+
+
+def fixDbAccess(version):
+    if isSlaveDb():
+        return mw.returnJson(True, '从库无需修复!')
+
+    pdb = pgDb()
+    data = pdb.query("select 1")
+    isError = isPgError(data)
+    if isError == None:
+        return mw.returnJson(True, '正常无需修复!')
+
+    if not setRootPwdForce(mw.getRandomString(16), version):
+        return mw.returnJson(False, '密码重置失败,请检查数据库运行状态!!')
+    return mw.returnJson(True, '修复成功,root密码已重置!')
+
 
 def getDbInfo():
     args = getArgs()
@@ -1414,9 +1903,13 @@ def pgBack():
     #   --serializable-deferrable: MVCC 快照一致性, 与 DDL 快照冲突时自动重试
     #   --lock-wait-timeout=30s: 等表锁最多 30 秒, 避免大 DDL 下一直阻塞
     #   --no-sync (PG 14+):    dump 完不等 fsync, 减少 I/O 等待
-    dump_opts = '-c --if-exists --serializable-deferrable --lock-wait-timeout=30s'
+    dump_opts = '-c --if-exists --lock-wait-timeout=30s'
     if pg_major >= 14:
         dump_opts += ' --no-sync'
+
+    #与从库冲突
+    if not isSlaveDb():
+        dump_opts += ' --serializable-deferrable'
 
     # set -o pipefail: 管道任一命令失败都能被检测到
     stderr_log = '/tmp/pg_dump_stderr.log'
@@ -1572,7 +2065,7 @@ def setMasterStatus(version=''):
     pg_conf = getServerDir() + "/data/postgresql.conf"
     data = mw.readFile(pg_conf)
 
-    field_list = ['max_replication_slots','wal_keep_size','wal_level','wal_sender_timeout','max_wal_senders']
+    field_list = ['max_replication_slots','wal_level','wal_sender_timeout','max_wal_senders']
 
     if data.find('#wal_level') > -1:
         # data = data.replace('#max_replication_slots', 'max_replication_slots')
@@ -1835,32 +2328,38 @@ def setSlaveSyncMode(version):
 
 def getMasterLink(version):
     pdb = pgDb()
-    sql = """
-    SELECT pid, usesysid, usename, application_name,
-           client_addr, client_hostname, client_port,
-           to_char(backend_start, 'YYYY-MM-DD HH24:MI:SS') AS backend_start,
-           backend_xmin, state,
-           sent_lsn, write_lsn, flush_lsn, replay_lsn,
-           write_lag, flush_lag, replay_lag,
-           sync_priority, sync_state,
-           to_char(reply_time, 'YYYY-MM-DD HH24:MI:SS') AS reply_time
-    FROM pg_stat_replication
-    """
-
     fields = 'pid, usesysid,usename,application_name,client_addr,client_hostname,client_port,backend_xmin,state,sent_lsn,write_lsn,flush_lsn,replay_lsn,write_lag,flush_lag,replay_lag,sync_priority,sync_state'
     data = pdb.field(fields).table('pg_stat_replication').select()
-    # print(data)
+    if isinstance(data, Exception):
+        return mw.returnJson(False, '获取主库复制状态失败: ' + str(data), [])
+
+    for item in data:
+        for field in ['write_lag', 'flush_lag', 'replay_lag']:
+            if item[field] is not None and hasattr(item[field], 'total_seconds'):
+                item[field] = item[field].total_seconds()
     return mw.returnJson(True, 'ok', data)
 
 def getSlaveLink(version):
     pdb = pgDb()
     fields = 'pid,status,receive_start_lsn,receive_start_tli,written_lsn,flushed_lsn,received_tli,latest_end_lsn,slot_name,sender_host,sender_port'
     data = pdb.field(fields).table('pg_stat_wal_receiver').select()
-    # print(data)
-    lag = pdb.query('select coalesce(extract(epoch from (now() - pg_last_xact_replay_timestamp()))::int, 0) as lag')
-    if isinstance(data, list) and len(data) > 0:
-        data[0]["last_lsn_commit_time"] = lag[0][0] if isinstance(
-            lag, list) and len(lag) > 0 else 0
+    if isinstance(data, Exception):
+        return mw.returnJson(False, '获取从库复制状态失败: ' + str(data), [])
+
+    if data:
+        replay = pdb.query("""
+            SELECT coalesce(pg_last_wal_receive_lsn()::text, '-'),
+                   coalesce(pg_last_wal_replay_lsn()::text, '-'),
+                   extract(epoch FROM now() - pg_last_xact_replay_timestamp())::bigint
+        """)
+        for item in data:
+            item['receive_lsn'] = '-'
+            item['replay_lsn'] = '-'
+            item['last_lsn_commit_time'] = None
+            if not isinstance(replay, Exception) and replay:
+                item['receive_lsn'] = replay[0][0]
+                item['replay_lsn'] = replay[0][1]
+                item['last_lsn_commit_time'] = replay[0][2]
     return mw.returnJson(True, 'ok', data)
 
 def getMasterRepSlaveList(version=''):
@@ -1890,6 +2389,39 @@ def getMasterRepSlaveList(version=''):
 
     return mw.getJson(data)
 
+def getMasterRepSlaveAccess(version=''):
+    args = getArgs()
+    data = checkArgs(args, ['name'])
+    if not data[0]:
+        return data[1]
+    name = args['name'].strip()
+
+    psdb = pSqliteDb('master_replication_user')
+    accept = psdb.where("username=?", (name,)).getField('accept')
+    return mw.returnJson(True, accept)
+
+
+
+def setMasterRepSlaveAccess(version=''):
+    args = getArgs()
+    data = checkArgs(args, ['name'])
+    if not data[0]:
+        return data[1]
+
+    name = args['name']
+    access = args['access']
+
+    psdb = pSqliteDb('master_replication_user')
+
+    conf = pgHbaConf()
+    data = mw.readFile(conf)
+    new_data = re.sub(r'host\s*{}\s*{}.*'.format('replication',name), '', data).strip()
+    new_data += "\n" + hbaRule('host', 'replication', name, access, 'scram-sha-256')
+    mw.writeFile(conf, new_data)
+
+    psdb.where("username=?", (name,)).setField('accept', access)
+    restart()
+    return mw.returnJson(True, "设置成功")
 
 def addMasterRepSlaveUser(version=''):
     args = getArgs()
@@ -1929,13 +2461,13 @@ def addMasterRepSlaveUser(version=''):
     pg_conf = pgHbaConf()
     data = mw.readFile(pg_conf)
 
-    data = data + "\nhost   replication  " + username + "   " + address + "     scram-sha-256"
+    data = data + "\n" + hbaRule('host', 'replication', username, address, 'scram-sha-256')
 
     mw.writeFile(pg_conf, data)
 
     addTime = time.strftime('%Y-%m-%d %X', time.localtime())
-    psdb.add('username,password,accept,ps,addtime',
-             (username, password, address, '', addTime))
+    psdb.add('username,password,accept,ps,addtime',(username, password, address, '', addTime))
+    restart()
     return mw.returnJson(True, '添加成功!')
 
 
@@ -2125,6 +2657,8 @@ interact
         flags=re.MULTILINE
     )
     # print(content)
+
+    content = content.replace('wal_level', '#wal_level')
     mw.writeFile(pg_conf, content)
     start(version)
 
@@ -2256,6 +2790,7 @@ interact
         flags=re.MULTILINE
     )
     # print(content)
+    content = content.replace('wal_level', '#wal_level')
     mw.writeFile(pg_conf, content)
 
     start(version)
@@ -2334,6 +2869,8 @@ if __name__ == "__main__":
         print(setPgPort())
     elif func == 'root_pwd':
         print(rootPwd())
+    elif func == 'set_postgres_pwd':
+        print(setPostgresPwd(version))
     elif func == 'get_db_list':
         print(getDbList())
     elif func == 'get_table_list':
@@ -2348,6 +2885,8 @@ if __name__ == "__main__":
         print(getDbAccess())
     elif func == 'set_db_access':
         print(setDbAccess())
+    elif func == 'fix_db_access':
+        print(fixDbAccess(version))
     elif func == 'get_db_info':
         print(getDbInfo())
     elif func == 'pg_back':
@@ -2414,6 +2953,10 @@ if __name__ == "__main__":
         print(addMasterRepSlaveUser(version))
     elif func == 'del_master_rep_slave_user':
         print(delMasterRepSlaveUser(version))
+    elif func == 'get_master_rep_slave_access':
+        print(getMasterRepSlaveAccess(version))
+    elif func == 'set_master_rep_slave_access':
+        print(setMasterRepSlaveAccess(version))
     elif func == 'get_master_rep_slave_user_cmd':
         print(getMasterRepSlaveUserCmd(version))
     elif func == 'get_master_rep_slave_user_full_cmd':

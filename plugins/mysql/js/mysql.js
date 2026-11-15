@@ -528,14 +528,14 @@ function setRootPwd(type, pwd){
             var rdata = $.parseJSON(data.data);
             showMsg(rdata.msg,function(){
                 dbList();
-            },{icon: rdata.status ? 1 : 2});   
+            },{icon: rdata.status ? 1 : 2});
         });
         return;
     }
 
     var index = layer.open({
         type: 1,
-        area: '800px',
+        area: '600px',
         title: '修改数据库密码',
         closeBtn: 1,
         shift: 5,
