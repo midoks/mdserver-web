@@ -8,10 +8,6 @@ import subprocess
 import re
 import json
 
-
-# reload(sys)
-# sys.setdefaultencoding('utf-8')
-
 # python3 plugins/postgresql/index.py start 14.4
 # python3 plugins/postgresql/index.py run_info 14.4
 # ps -ef | grep -v grep| grep run_info | awk '{print $2}' | xargs kill -9
@@ -297,25 +293,8 @@ def regenConfig():
     # postgresql.conf
     path = getServerDir() + '/data/postgresql.conf'
     current = readActiveConf(path)
-    tpl = contentReplace(mw.readFile(getPluginDir() + '/conf/postgresql.conf'))
-    tpl_keys = set(re.findall(r'^\s*#?\s*([\w.]+)\s*=', tpl, re.M))
-
-    lines = []
-    used = set()
-    for line in tpl.splitlines():
-        match = re.match(r'^\s*#?\s*([\w.]+)\s*=', line)
-        key = match.group(1) if match else ''
-        if key == '' or key not in current or key in used:
-            lines.append(line)
-            continue
-        # 用当前生效值覆盖模板中的默认值/注释项
-        lines.append(current[key])
-        used.add(key)
-
-    for key in current:
-        if key not in tpl_keys and key not in used:
-            lines.append(current[key])
-    mw.writeFile(path, "\n".join(lines) + "\n")
+    content = contentReplace(mw.readFile(getPluginDir() + '/conf/postgresql.conf'))
+    mw.writeFile(path, content)
 
     # pg_hba.conf
     pg_accept = getHbaAccess('postgres')
@@ -328,6 +307,8 @@ def regenConfig():
         lines.append(line)
 
     rules = []
+    rules.append(hbaRule('host', 'postgres', 'postgres', pg_accept, 'scram-sha-256'))
+
     for item in pSqliteDb('databases').field('name,username,accept').select():
         if item['accept']:
             rules.append(hbaRule('host', item['name'], item['username'],
@@ -340,7 +321,6 @@ def regenConfig():
 
     if pg_accept == '':
         pg_accept = '127.0.0.1/32'
-    rules.append(hbaRule('host', 'postgres', 'postgres', pg_accept, 'scram-sha-256'))
 
     lines.append('')
     lines.extend(rules)
@@ -463,10 +443,7 @@ def pgOp(version, method):
     # print(cmd)
     try:
         isInited = initPgData()
-        initConfig(version)
-        # start/restart 前按模板同步配置, reload 不做, 避免覆盖刚写入的参数
-        if method in ('restart'):
-            regenConfig()
+        initConfig(version)            
         if not isInited:
             if mw.isAppleSystem():
                 cmd_init_start = init_file + ' start'
@@ -529,6 +506,7 @@ def reload(version=''):
     logfile = runLog()
     if os.path.exists(logfile):
         mw.writeFile(logfile, '')
+    regenConfig()
     return appCMD(version, 'reload')
 
 
@@ -587,7 +565,7 @@ def setPgPort():
     rep = r"port\s*=\s*([0-9]+)\s*\n"
     content = re.sub(rep, 'port = ' + port + '\n', content)
     mw.writeFile(file, content)
-    reload()
+    appCMD("", 'restart')
     return mw.returnJson(True, '编辑成功!')
 
 
@@ -1003,7 +981,7 @@ def pgSetDbStatus():
         sedConf(name, args[name].strip())
 
     if status() == 'start':
-        reload()
+        restart()
         return mw.returnJson(True, '设置成功，数据库已重启!')
     return mw.returnJson(True, '设置成功，将在数据库下次启动时生效!')
 
@@ -1081,7 +1059,7 @@ def openPgTrust():
             + hbaRule('host', 'all', 'all', '127.0.0.1/32', 'trust') + "\n" \
             + hbaRule('host', 'all', 'all', '::1/128', 'trust') + "\n"
     mw.writeFile(hba, trust + content)
-    reload()
+    restart()
     return True
 
 
@@ -1095,7 +1073,7 @@ def closePgTrust():
         mw.writeFile(hba, mw.readFile(backup))
         os.remove(backup)
     # pg_hba.conf 无需重启, 重新加载即可
-    reload()
+    restart()
     return True
 
 
@@ -1147,7 +1125,7 @@ def setRootPwdForce(new_password, version=''):
     finally:
         # 无论成败都恢复本地认证, 避免数据库长期处于免密状态
         closePgTrust()
-        appCMD(version, 'reload')
+        appCMD(version, 'restart')
 
     if not changed:
         return False
@@ -1633,7 +1611,7 @@ def addDb():
     psdb.add('pid,name,username,password,accept,ps,addtime',
              (0, dbname, dbuser, password, listen_ip, dbname, addTime))
 
-    reload()
+    restart()
     return mw.returnJson(True, '添加成功!')
 
 
@@ -1729,7 +1707,7 @@ def setDbAccess():
     # postgres 为内置库, 不在数据表记录, 只改配置文件
     if name == 'postgres':
         setHbaAccess(name, access)
-        reload()
+        restart()
         return mw.returnJson(True, "设置成功")
 
     psdb = pSqliteDb('databases')
@@ -1742,7 +1720,7 @@ def setDbAccess():
     mw.writeFile(conf, new_data)
 
     psdb.where("name=?", (name,)).setField('accept', access)
-    reload()
+    restart()
     return mw.returnJson(True, "设置成功")
 
 
@@ -2066,7 +2044,7 @@ def setMasterStatus(version=''):
             data = data.replace(field, '#'+field)
 
     mw.writeFile(pg_conf, data)
-    reload(version)
+    restart(version)
     return mw.returnJson(True, '设置成功')
 
 def openSlaveConf(version):
@@ -2094,7 +2072,7 @@ def setSlaveStatus(version):
             data = data.replace(field, '#'+field)
     mw.writeFile(pg_conf, data)
 
-    reload(version)
+    restart(version)
     return mw.returnJson(True, '设置成功')
 
 def getSlaveList(version=''):
