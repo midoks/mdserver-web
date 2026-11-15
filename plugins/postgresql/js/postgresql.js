@@ -254,142 +254,101 @@ function pgPort(){
 
 //数据库配置状态
 function pgPerfOpt() {
-    //获取MySQL配置
     myPost('db_status','',function(data){
         var rdata = $.parseJSON(data.data);
-        var html_p = '';
-        for (i in rdata){
-            if (i != 'status' ){
-                var v = rdata[i];
-                html_p += '<p><span>'+i+'</span><input style="width: 70px;" class="bt-input-text mr5" unit="'+v[1]+'" name="'+i+'" value="' + v[0] + '" type="number" ><cbyte>'+v[1] +'</cbyte>, <font>' + v[2] + '</font></p>'
-            }
+        if (!rdata.status){
+            $(".soft-man-con").html('<div class="alert alert-warning" style="margin:15px 0">' + (rdata.msg || '获取配置失败') + '</div>');
+            return;
         }
 
-        var memCon = '<div class="conf_p" style="margin-bottom:0">'+
-            '<div style="border-bottom:#ccc 1px solid;padding-bottom:10px;margin-bottom:10px"><span><b>最大使用内存: </b></span>\
-            <select class="bt-input-text" name="pg_set" style="margin-left:-4px">\
-                <option value="0">请选择</option>\
-                <option value="1">2GB</option>\
-                <option value="2">4GB</option>\
-                <option value="3">8GB</option>\
-                <option value="4">16GB</option>\
-                <option value="5">32GB</option>\
-                <option value="6">64GB</option>\
-                <option value="6">96GB</option>\
-                <option value="7">128GB</option>\
-            </select></div>' +
-            '<div id="pg_conf">' + html_p +'</div><div style="margin-top:10px; padding-right:15px" class="text-right">\
-            <div>\
-                <button class="btn btn-success btn-sm mr5" onclick="reBootPgSqld()">重启数据库</button>\
-                <button class="btn btn-success btn-sm pg_conf">保存</button></div>\
-            </div>'
-            +'</div>'
+        var html_p = '';
+        for (var i = 0; i < rdata.params.length; i++){
+            var p = rdata.params[i];
+            var unitCon = p.type == 'memory' ?
+                '<span class="pg-unit" style="display:inline-block;width:20px;">' + p.unit + '</span>' :
+                '<span style="display:inline-block;width:0px"></span>';
+            html_p += '<div class="pg-param" style="display:flex;align-items:center;padding:6px 0;border-bottom:1px dashed #eee">\
+                <span style="width:150px;text-align:right;margin-right:12px">' + p.label + '</span>\
+                <input class="bt-input-text" data-type="' + p.type + '" name="' + p.name + '" value="' + p.value + '" type="number" step="any" min="0" style="width:90px;margin-right:8px">\
+                ' + unitCon + '\
+                <font class="text-muted" style="flex:1;font-size:10px;">' + p.desc + '</font>\
+            </div>';
+        }
+
+        var options = '<option value="0">请选择</option>';
+        for (var j = 0; j < rdata.profiles.length; j++){
+            options += '<option value="' + rdata.profiles[j].memory + '">' + rdata.profiles[j].memory + 'GB</option>';
+        }
+
+        var memoryHint = '';
+        if (rdata.total_memory > 0){
+            memoryHint = '<span class="text-muted" style="margin-left:10px;width:260px;">检测到物理内存 ' + Math.round(rdata.total_memory / 1024) + 'GB，选择后自动填入推荐值</span>';
+        }
+
+        var memCon = '<div class="conf_p" style="margin-bottom:0">\
+            <div style="border-bottom:#ccc 1px solid;padding-bottom:10px;margin-bottom:10px">\
+                <span><b>内存推荐配置: </b></span>\
+                <select class="bt-input-text" name="pg_set">' + options + '</select>' + memoryHint + '\
+            </div>\
+            <div id="pg_conf">' + html_p + '</div>\
+            <div style="margin-top:10px;padding-right:15px" class="text-right">\
+                <button class="btn btn-default btn-sm mr5" onclick="reBootPgSqld()">重启数据库</button>\
+                <button class="btn btn-success btn-sm pg_conf">保存</button>\
+            </div>\
+        </div>';
 
         $(".soft-man-con").html(memCon);
 
         $(".conf_p select[name='pg_set']").change(function() {
-            pgSQLMemOpt($(this).val());
+            pgSQLMemOpt($(this).val(), rdata.profiles);
         });
 
         $(".pg_conf").unbind('click').click(function (e) {
-        　　e.preventDefault();
+            e.preventDefault();
             var data = {};
-            $('#pg_conf p input').each(function (index, element) {
-                data[$(this).attr('name')] = $(this).val() + ($(this).attr('unit') || '');
-            })
-            // console.log(data);
+            $('#pg_conf .pg-param').each(function () {
+                var input = $(this).find('input');
+                var value = $.trim(input.val());
+                if (value === '') return;
+                if (input.attr('data-type') == 'memory'){
+                    value += $(this).find('.pg-unit').text();
+                }
+                data[input.attr('name')] = value;
+            });
             myPost('set_db_status', data, function(data){
                 var rdata = $.parseJSON(data.data);
-                showMsg(rdata.msg,function(){
-                },{ icon: rdata.status ? 1 : 2 });
+                showMsg(rdata.msg, function(){
+                    if (rdata.status) pgPerfOpt();
+                }, { icon: rdata.status ? 1 : 2 });
             });
             return false;
         });
     });
 }
 
-function pgSQLMemOpt(opt){
-    console.log(opt);
-    switch (opt) {
-        case '1':
-            $("input[name='shared_buffers']").val(512);
-            $("input[name='shared_buffers']").next().text("MB");
+function pgSQLMemOpt(memory, profiles){
+    if (!profiles) return;
 
-            $("input[name='effective_cache_size']").val(1);
-            $("input[name='maintenance_work_mem']").val(64);
-            $("input[name='work_mem']").val(2);
-            $("input[name='temp_buffers']").val(4);
+    var profile = null;
+    for (var i = 0; i < profiles.length; i++){
+        if (String(profiles[i].memory) === String(memory)){
+            profile = profiles[i];
             break;
-        case '2':
-            $("input[name='shared_buffers']").val(1);
-            $("input[name='shared_buffers']").next().text("GB");
+        }
+    }
+    if (!profile) return;
 
-            $("input[name='effective_cache_size']").val(3);
-            $("input[name='maintenance_work_mem']").val(128);
-            
-            $("input[name='work_mem']").val(4);
-            $("input[name='temp_buffers']").val(8);
-            break;
-        case '3':
-            $("input[name='shared_buffers']").val(2);
-            $("input[name='shared_buffers']").next().text("GB");
+    var names = ['shared_buffers', 'effective_cache_size', 'maintenance_work_mem', 'work_mem', 'temp_buffers'];
+    for (var j = 0; j < names.length; j++){
+        var matched = /^(\d+(?:\.\d+)?)\s*(kB|MB|GB|TB)$/i.exec(profile[names[j]] || '');
+        if (!matched) continue;
 
-            $("input[name='effective_cache_size']").val(24);
+        var unit = matched[2].toUpperCase();
+        if (unit == 'KB') unit = 'kB';
 
-            $("input[name='maintenance_work_mem']").val(1);
-            $("input[name='maintenance_work_mem']").next().text("GB");
-
-            $("input[name='work_mem']").val(24);
-            $("input[name='temp_buffers']").val(32);
-            break;
-        case '4':
-            $("input[name='shared_buffers']").val(8);
-            $("input[name='shared_buffers']").next().text("GB");
-
-            $("input[name='effective_cache_size']").val(36);
-
-            $("input[name='maintenance_work_mem']").val(1.5);
-            $("input[name='maintenance_work_mem']").next().text("GB");
-
-            $("input[name='work_mem']").val(32);
-            $("input[name='temp_buffers']").val(32);
-            break;
-        case '5':
-            $("input[name='shared_buffers']").val(8);
-            $("input[name='shared_buffers']").next().text("GB");
-            
-            $("input[name='effective_cache_size']").val(48);
-
-            $("input[name='maintenance_work_mem']").val(2);
-            $("input[name='maintenance_work_mem']").next().text("GB");
-
-            $("input[name='work_mem']").val(32);
-            $("input[name='temp_buffers']").val(32);
-            break;
-        case '6':
-            $("input[name='shared_buffers']").val(8);
-            $("input[name='shared_buffers']").next().text("GB");
-
-            $("input[name='effective_cache_size']").val(72);
-
-            $("input[name='maintenance_work_mem']").val(3);
-            $("input[name='maintenance_work_mem']").next().text("GB");
-
-            $("input[name='work_mem']").val(48);
-            $("input[name='temp_buffers']").val(64);
-            break;
-        case '7':
-            $("input[name='shared_buffers']").val(8);
-            $("input[name='shared_buffers']").next().text("GB");
-            
-            $("input[name='effective_cache_size']").val(96);
-
-            $("input[name='maintenance_work_mem']").val(4);
-            $("input[name='maintenance_work_mem']").next().text("GB");
-
-            $("input[name='work_mem']").val(64);
-            $("input[name='temp_buffers']").val(64);
-            break;
+        var row = $('#pg_conf input[name="' + names[j] + '"]').closest('.pg-param');
+        row.find('input').val(matched[1]);
+        row.find('.pg-unit').text(unit);
     }
 }
 

@@ -660,120 +660,200 @@ def getUnit(args):
     return unit
 
 
+# 物理内存(MB)与推荐配置对照
+PG_MEMORY_PROFILES = [
+    {'memory': 2, 'shared_buffers': '512MB', 'effective_cache_size': '1GB',
+     'maintenance_work_mem': '64MB', 'work_mem': '2MB', 'temp_buffers': '4MB'},
+    {'memory': 4, 'shared_buffers': '1GB', 'effective_cache_size': '3GB',
+     'maintenance_work_mem': '128MB', 'work_mem': '4MB', 'temp_buffers': '8MB'},
+    {'memory': 8, 'shared_buffers': '2GB', 'effective_cache_size': '6GB',
+     'maintenance_work_mem': '256MB', 'work_mem': '8MB', 'temp_buffers': '8MB'},
+    {'memory': 16, 'shared_buffers': '4GB', 'effective_cache_size': '12GB',
+     'maintenance_work_mem': '512MB', 'work_mem': '16MB', 'temp_buffers': '16MB'},
+    {'memory': 24, 'shared_buffers': '6GB', 'effective_cache_size': '18GB',
+     'maintenance_work_mem': '768MB', 'work_mem': '16MB', 'temp_buffers': '16MB'},
+    {'memory': 32, 'shared_buffers': '8GB', 'effective_cache_size': '24GB',
+     'maintenance_work_mem': '1GB', 'work_mem': '24MB', 'temp_buffers': '32MB'},
+    {'memory': 48, 'shared_buffers': '8GB', 'effective_cache_size': '36GB',
+     'maintenance_work_mem': '1536MB', 'work_mem': '32MB', 'temp_buffers': '32MB'},
+    {'memory': 64, 'shared_buffers': '8GB', 'effective_cache_size': '48GB',
+     'maintenance_work_mem': '2GB', 'work_mem': '32MB', 'temp_buffers': '32MB'},
+    {'memory': 96, 'shared_buffers': '8GB', 'effective_cache_size': '72GB',
+     'maintenance_work_mem': '3GB', 'work_mem': '48MB', 'temp_buffers': '64MB'},
+    {'memory': 128, 'shared_buffers': '8GB', 'effective_cache_size': '96GB',
+     'maintenance_work_mem': '4GB', 'work_mem': '64MB', 'temp_buffers': '64MB'},
+]
+
+PG_PERF_PARAMS = [
+    ('shared_buffers', '共享缓冲区', 'memory', 'MB',
+     'PG通过shared_buffers和内核和磁盘打交道，通常设置为实际内存的25%.'),
+    ('effective_cache_size', '系统缓存大小', 'memory', 'GB',
+     'PG能够使用的最大缓存,比如4G的内存，可以设置为3GB.'),
+    ('maintenance_work_mem', '维护工作内存', 'memory', 'MB',
+     'VACUUM、CREATE INDEX 等维护操作可用的最大内存.'),
+    ('work_mem', '工作内存', 'memory', 'MB',
+     '增加work_mem有助于提高排序的速度。通常设置为实际RAM的2%-4%.'),
+    ('temp_buffers', '临时缓冲区', 'memory', 'MB',
+     '设置每个数据库会话使用的临时缓冲区的最大数目，默认是8MB'),
+    ('max_connections', '最大连接数', 'number', '', '最大连接数'),
+    ('max_prepared_transactions', '最大预备事务数', 'number', '',
+     '设置可以同时处于 prepared 状态的事务的最大数目'),
+    ('max_stack_depth', '最大堆栈深度', 'memory', 'MB',
+     '指定服务器的执行堆栈的最大安全深度，默认是2MB'),
+    ('bgwriter_lru_maxpages', '后台写脏页上限', 'number', '',
+     '一个周期最多写多少脏页'),
+    ('max_worker_processes', '最大工作进程数', 'number', '',
+     '如果要使用worker process, 最多可以允许fork 多少个worker进程.'),
+]
+
+PG_MEMORY_UNITS = {
+    'KB': 1024,
+    'MB': 1024 * 1024,
+    'GB': 1024 * 1024 * 1024,
+    'TB': 1024 * 1024 * 1024 * 1024,
+}
+
+
+def getPgTotalMemory():
+    try:
+        if os.path.exists('/proc/meminfo'):
+            with open('/proc/meminfo') as f:
+                for line in f:
+                    if line.startswith('MemTotal:'):
+                        return int(line.split()[1]) // 1024
+    except Exception:
+        pass
+
+    try:
+        info = mw.execShell('sysctl -n hw.memsize')
+        if info and info[0].strip().isdigit():
+            return int(info[0].strip()) // (1024 * 1024)
+    except Exception:
+        pass
+    return 0
+
+
+def parsePgMemory(value):
+    '''
+    将 128MB、1GB、1.5GB 解析为 MB
+    '''
+    result = re.match(r'^(\d+(?:\.\d+)?)\s*([kKmMgGtT]?[bB])?$', str(value).strip())
+    if not result:
+        return None
+    unit = (result.group(2) or 'MB').upper()
+    byte_size = float(result.group(1)) * PG_MEMORY_UNITS[unit]
+    return int(byte_size // PG_MEMORY_UNITS['MB'])
+
+
+def formatPgMemory(mb):
+    if mb >= 1024:
+        gb = mb / 1024.0
+        if gb == int(gb):
+            gb = int(gb)
+        return str(gb), 'GB'
+    return str(int(mb)), 'MB'
+
+
+def readPgConf():
+    '''
+    读取 postgresql.conf，活动配置优先，未开启时取注释中的默认值
+    '''
+    path = getServerDir() + "/data/postgresql.conf"
+    if not os.path.exists(path):
+        return {}
+
+    active, commented = {}, {}
+    with open(path) as f:
+        for raw in f:
+            line = raw.strip()
+            if not line or '=' not in line:
+                continue
+
+            is_comment = line.startswith('#')
+            if is_comment:
+                line = line.lstrip('#').strip()
+
+            name, value = line.split('=', 1)
+            name = name.strip()
+            value = value.split('#', 1)[0].strip()
+            if not re.match(r'^[a-z_][a-z0-9_]*$', name) or not value:
+                continue
+
+            if is_comment:
+                commented.setdefault(name, value)
+            else:
+                active[name] = value
+
+    data = dict(commented)
+    data.update(active)
+    return data
+
+
 def pgDbStatus():
+    conf = readPgConf()
+    if not conf:
+        return mw.getJson({'status': False, 'msg': '未找到 postgresql.conf 配置文件'})
 
-    data_directory = getServerDir() + "/data"
-    data = {}
-    shared_buffers, work_mem, effective_cache_size, maintence_work_mem, max_connections, temp_buffers, max_prepared_transactions, max_stack_depth, bgwriter_lru_maxpages, max_worker_processes, listen_addresses = '', '', '', '', '', '', '', '', '', '', ''
-    with open("{}/postgresql.conf".format(data_directory)) as f:
-        for i in f:
-            if i.strip().startswith("shared_buffers"):
-                shared_buffers = i.split("=")[1]
-            elif i.strip().startswith("#shared_buffers"):
-                shared_buffers = i.split("=")[1]
+    params = []
+    for name, label, ptype, default_unit, desc in PG_PERF_PARAMS:
+        raw = conf.get(name, '')
+        value, unit = '', ''
+        if ptype == 'memory':
+            mb = parsePgMemory(raw)
+            if mb is None:
+                unit = default_unit
+            else:
+                value, unit = formatPgMemory(mb)
+        elif raw:
+            value = raw
 
-            shared_buffers_num = re.match(
-                r'\d+', shared_buffers.strip()).group() if re.match(r'\d+', shared_buffers.strip()) else ""
-            data['shared_buffers'] = [shared_buffers_num, "MB","PG通过shared_buffers和内核和磁盘打交道，通常设置为实际内存的10％."]
+        params.append({
+            'name': name,
+            'label': label,
+            'type': ptype,
+            'value': value,
+            'unit': unit,
+            'desc': desc,
+        })
 
-            if i.strip().startswith("work_mem"):
-                work_mem = i.split("=")[1]
-            elif i.strip().startswith("#work_mem"):
-                work_mem = i.split("=")[1]
-
-            work_mem_num = re.match(
-                r'\d+', work_mem.strip()).group() if re.match(r'\d+', work_mem.strip()) else ""
-            data['work_mem'] = [work_mem_num, "MB","增加work_mem有助于提高排序的速度。通常设置为实际RAM的2% -4%."]
-
-            if i.strip().startswith("effective_cache_size"):
-                effective_cache_size = i.split("=")[1]
-            elif i.strip().startswith("#effective_cache_size"):
-                effective_cache_size = i.split("=")[1]
-
-            effective_cache_size_num = re.match(r'\d+', effective_cache_size.strip(
-            )).group() if re.match(r'\d+', effective_cache_size.strip()) else ""
-            data['effective_cache_size'] = [effective_cache_size_num,"GB", "PG能够使用的最大缓存,比如4G的内存，可以设置为3GB."]
-
-            if i.strip().startswith("temp_buffers "):
-                temp_buffers = i.split("=")[1]
-            elif i.strip().startswith("#temp_buffers "):
-                temp_buffers = i.split("=")[1]
-
-            temp_buffers_num = re.match(
-                r'\d+', temp_buffers.strip()).group() if re.match(r'\d+', temp_buffers.strip()) else ""
-            data['temp_buffers'] = [temp_buffers_num, "MB","设置每个数据库会话使用的临时缓冲区的最大数目，默认是8MB"]
-
-            if i.strip().startswith("max_connections"):
-                max_connections = i.split("=")[1]
-            elif i.strip().startswith("#max_connections"):
-                max_connections = i.split("=")[1]
-
-            max_connections_num = re.match(
-                r'\d+', max_connections.strip()).group() if re.match(r'\d+', max_connections.strip()) else ""
-            data['max_connections'] = [max_connections_num, getUnit(max_connections), "最大连接数"]
-
-            if i.strip().startswith("max_prepared_transactions"):
-                max_prepared_transactions = i.split("=")[1]
-            elif i.strip().startswith("#max_prepared_transactions"):
-                max_prepared_transactions = i.split("=")[1]
-
-            max_prepared_transactions_num = re.match(r'\d+', max_prepared_transactions.strip(
-            )).group() if re.match(r'\d+', max_prepared_transactions.strip()) else ""
-            data['max_prepared_transactions'] = [max_prepared_transactions_num, getUnit(max_prepared_transactions), "设置可以同时处于 prepared 状态的事务的最大数目"]
-
-            if i.strip().startswith("max_stack_depth "):
-                max_stack_depth = i.split("=")[1]
-            elif i.strip().startswith("#max_stack_depth "):
-                max_stack_depth = i.split("=")[1]
-
-            max_stack_depth_num = re.match(
-                r'\d+', max_stack_depth.strip()).group() if re.match(r'\d+', max_stack_depth.strip()) else ""
-            data['max_stack_depth'] = [max_stack_depth_num,"MB", "指定服务器的执行堆栈的最大安全深度，默认是2MB"]
-
-            if i.strip().startswith("bgwriter_lru_maxpages "):
-                bgwriter_lru_maxpages = i.split("=")[1]
-            elif i.strip().startswith("#bgwriter_lru_maxpages "):
-                bgwriter_lru_maxpages = i.split("=")[1]
-
-            bgwriter_lru_maxpages_num = re.match(r'\d+', bgwriter_lru_maxpages.strip(
-            )).group() if re.match(r'\d+', bgwriter_lru_maxpages.strip()) else ""
-            data['bgwriter_lru_maxpages'] = [
-                bgwriter_lru_maxpages_num, "", "一个周期最多写多少脏页"]
-
-            if i.strip().startswith("max_worker_processes "):
-                max_worker_processes = i.split("=")[1]
-            elif i.strip().startswith("#max_worker_processes "):
-                max_worker_processes = i.split("=")[1]
-
-            max_worker_processes_num = re.match(r'\d+', max_worker_processes.strip(
-            )).group() if re.match(r'\d+', max_worker_processes.strip()) else ""
-            data['max_worker_processes'] = [max_worker_processes_num,"", "如果要使用worker process, 最多可以允许fork 多少个worker进程."]
-
-            # if i.strip().startswith("listen_addresses"):
-            #     listen_addresses = i.split("=")[1]
-            # elif i.strip().startswith("#listen_addresses"):
-            #     listen_addresses = i.split("=")[1]
-
-            # listen_addresses = re.match(r"\'.*?\'", listen_addresses.strip()).group(
-            # ) if re.match(r"\'.*?\'", listen_addresses.strip()) else ""
-            # data['listen_addresses'] = [listen_addresses.replace(
-            #     "'", '').replace("127.0.0.1", 'localhost'), "", "pgsql监听地址"]
-
-    # 返回数据到前端
-    data['status'] = True
+    data = {
+        'status': True,
+        'total_memory': getPgTotalMemory(),
+        'profiles': PG_MEMORY_PROFILES,
+        'params': params,
+    }
     return mw.getJson(data)
 
 
 def sedConf(name, val):
     path = getServerDir() + "/data/postgresql.conf"
-    content = ''
-    with open(path) as f:
-        for i in f:
-            if i.strip().startswith(name):
-                i = "{} = {} \n".format(name, val)
-            content += i
+    active_pattern = re.compile(r'^\s*' + re.escape(name) + r'\s*=')
+    item_pattern = re.compile(r'^\s*#?\s*' + re.escape(name) + r'\s*=')
 
-    mw.writeFile(path, content)
+    with open(path) as f:
+        lines = f.readlines()
+
+    active_indexes = [i for i, line in enumerate(lines) if active_pattern.match(line)]
+    commented_indexes = [i for i, line in enumerate(lines) if item_pattern.match(line) and i not in active_indexes]
+
+    # 优先替换已生效的配置，避免被后面的同名配置覆盖
+    target = None
+    if active_indexes:
+        target = active_indexes[0]
+    elif commented_indexes:
+        target = commented_indexes[0]
+
+    if target is not None:
+        lines[target] = "{} = {}\n".format(name, val)
+        # 去掉重复的生效配置，保证写入的值生效
+        for index in reversed(active_indexes[1:]):
+            del lines[index]
+    else:
+        if lines and not lines[-1].endswith('\n'):
+            lines[-1] += '\n'
+        lines.append("{} = {}\n".format(name, val))
+
+    mw.writeFile(path, ''.join(lines))
     return True
 
 
@@ -781,18 +861,28 @@ def pgSetDbStatus():
     '''
     保存pgsql性能调整信息
     '''
+    names = [p[0] for p in PG_PERF_PARAMS]
     args = getArgs()
-    data = checkArgs(args, ['shared_buffers', 'work_mem', 'effective_cache_size',
-                            'temp_buffers', 'max_connections', 'max_prepared_transactions',
-                            'max_stack_depth', 'bgwriter_lru_maxpages', 'max_worker_processes'])
-    if not data[0]:
-        return data[1]
+    provided = [name for name in names if name in args]
+    if not provided:
+        return mw.returnJson(False, '没有需要保存的配置参数!')
 
-    for k, v in args.items():
-        sedConf(k, v)
+    memory_names = set(p[0] for p in PG_PERF_PARAMS if p[2] == 'memory')
+    for name in provided:
+        value = args[name].strip()
+        if name in memory_names:
+            if not re.match(r'^\d+(?:\.\d+)?\s*(?:kB|MB|GB|TB)$', value, re.I):
+                return mw.returnJson(False, '参数({})的值不合法: {}'.format(name, value))
+        elif not re.match(r'^\d+$', value):
+            return mw.returnJson(False, '参数({})必须是整数: {}'.format(name, value))
 
-    restart()
-    return mw.returnJson(True, '设置成功!')
+    for name in provided:
+        sedConf(name, args[name].strip())
+
+    if status() == 'start':
+        restart()
+        return mw.returnJson(True, '设置成功，数据库已重启!')
+    return mw.returnJson(True, '设置成功，将在数据库下次启动时生效!')
 
 
 def setUserPwd(version=''):
