@@ -2196,3 +2196,23 @@ function masterOrSlaveConf(version=''){
     }
     getMasterStatus();
 }
+
+
+
+function readme(){
+    // console.log(rdata['data']);
+    var con = '<ul class="help-info-text c7">';
+
+    con += '<li style="color:red;">常规的维护任务</li>';
+    con += '<li style="color:blue;">archivelog 外部维护</li>';
+    con += '<li> - 按数量保留最近1000个</li>';
+    con += '<li>ls -t /www/server/postgresql/archivelog/0000* 2>/dev/null | tail -n +1001 | xargs -r rm -f</li>';
+    con += '<li> - 删除14天前的归档</li>';
+    con += '<li>find /www/server/postgresql/archivelog -name "0000*" -type f -mtime +14 -delete</li>';
+    con += '</ul>';
+
+    $(".soft-man-con").html(con);
+    
+    
+}
+
