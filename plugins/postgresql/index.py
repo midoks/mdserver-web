@@ -674,8 +674,7 @@ def pgDbStatus():
 
             shared_buffers_num = re.match(
                 r'\d+', shared_buffers.strip()).group() if re.match(r'\d+', shared_buffers.strip()) else ""
-            data['shared_buffers'] = [shared_buffers_num, "MB",
-                                      "PG通过shared_buffers和内核和磁盘打交道，通常设置为实际内存的10％."]
+            data['shared_buffers'] = [shared_buffers_num, "MB","PG通过shared_buffers和内核和磁盘打交道，通常设置为实际内存的10％."]
 
             if i.strip().startswith("work_mem"):
                 work_mem = i.split("=")[1]
@@ -684,8 +683,7 @@ def pgDbStatus():
 
             work_mem_num = re.match(
                 r'\d+', work_mem.strip()).group() if re.match(r'\d+', work_mem.strip()) else ""
-            data['work_mem'] = [work_mem_num, "MB",
-                                "增加work_mem有助于提高排序的速度。通常设置为实际RAM的2% -4%."]
+            data['work_mem'] = [work_mem_num, "MB","增加work_mem有助于提高排序的速度。通常设置为实际RAM的2% -4%."]
 
             if i.strip().startswith("effective_cache_size"):
                 effective_cache_size = i.split("=")[1]
@@ -694,8 +692,7 @@ def pgDbStatus():
 
             effective_cache_size_num = re.match(r'\d+', effective_cache_size.strip(
             )).group() if re.match(r'\d+', effective_cache_size.strip()) else ""
-            data['effective_cache_size'] = [effective_cache_size_num,
-                                            "GB", "PG能够使用的最大缓存,比如4G的内存，可以设置为3GB."]
+            data['effective_cache_size'] = [effective_cache_size_num,"GB", "PG能够使用的最大缓存,比如4G的内存，可以设置为3GB."]
 
             if i.strip().startswith("temp_buffers "):
                 temp_buffers = i.split("=")[1]
@@ -704,8 +701,7 @@ def pgDbStatus():
 
             temp_buffers_num = re.match(
                 r'\d+', temp_buffers.strip()).group() if re.match(r'\d+', temp_buffers.strip()) else ""
-            data['temp_buffers'] = [temp_buffers_num, "MB",
-                                    "设置每个数据库会话使用的临时缓冲区的最大数目，默认是8MB"]
+            data['temp_buffers'] = [temp_buffers_num, "MB","设置每个数据库会话使用的临时缓冲区的最大数目，默认是8MB"]
 
             if i.strip().startswith("max_connections"):
                 max_connections = i.split("=")[1]
@@ -714,8 +710,7 @@ def pgDbStatus():
 
             max_connections_num = re.match(
                 r'\d+', max_connections.strip()).group() if re.match(r'\d+', max_connections.strip()) else ""
-            data['max_connections'] = [max_connections_num,
-                                       getUnit(max_connections), "最大连接数"]
+            data['max_connections'] = [max_connections_num, getUnit(max_connections), "最大连接数"]
 
             if i.strip().startswith("max_prepared_transactions"):
                 max_prepared_transactions = i.split("=")[1]
@@ -724,8 +719,7 @@ def pgDbStatus():
 
             max_prepared_transactions_num = re.match(r'\d+', max_prepared_transactions.strip(
             )).group() if re.match(r'\d+', max_prepared_transactions.strip()) else ""
-            data['max_prepared_transactions'] = [max_prepared_transactions_num, getUnit(
-                max_prepared_transactions), "设置可以同时处于 prepared 状态的事务的最大数目"]
+            data['max_prepared_transactions'] = [max_prepared_transactions_num, getUnit(max_prepared_transactions), "设置可以同时处于 prepared 状态的事务的最大数目"]
 
             if i.strip().startswith("max_stack_depth "):
                 max_stack_depth = i.split("=")[1]
@@ -734,8 +728,7 @@ def pgDbStatus():
 
             max_stack_depth_num = re.match(
                 r'\d+', max_stack_depth.strip()).group() if re.match(r'\d+', max_stack_depth.strip()) else ""
-            data['max_stack_depth'] = [max_stack_depth_num,
-                                       "MB", "指定服务器的执行堆栈的最大安全深度，默认是2MB"]
+            data['max_stack_depth'] = [max_stack_depth_num,"MB", "指定服务器的执行堆栈的最大安全深度，默认是2MB"]
 
             if i.strip().startswith("bgwriter_lru_maxpages "):
                 bgwriter_lru_maxpages = i.split("=")[1]
@@ -754,8 +747,7 @@ def pgDbStatus():
 
             max_worker_processes_num = re.match(r'\d+', max_worker_processes.strip(
             )).group() if re.match(r'\d+', max_worker_processes.strip()) else ""
-            data['max_worker_processes'] = [max_worker_processes_num,
-                                            "", "如果要使用worker process, 最多可以允许fork 多少个worker进程."]
+            data['max_worker_processes'] = [max_worker_processes_num,"", "如果要使用worker process, 最多可以允许fork 多少个worker进程."]
 
             # if i.strip().startswith("listen_addresses"):
             #     listen_addresses = i.split("=")[1]
