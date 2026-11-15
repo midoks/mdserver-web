@@ -1808,160 +1808,160 @@ function slaveSyncCmd(){
 
 function masterOrSlaveConf(version=''){
 
-    function getMasterDbList(){
-        var _data = {};
-        if (typeof(page) =='undefined'){
-            var page = 1;
+    function replicationValue(value) {
+        return value === undefined || value === null || value === '' ? '-' : value;
+    }
+
+    function replicationDelay(value) {
+        if (value === undefined || value === null || value === '') return '-';
+        if (typeof value === 'string' && value.indexOf(':') > -1) {
+            var parts = value.split(':');
+            if (parts.length === 3) {
+                value = parseInt(parts[0], 10) * 3600 + parseInt(parts[1], 10) * 60 + parseFloat(parts[2]);
+            }
         }
-        
-        _data['page'] = page;
-        _data['page_size'] = 10;
+        var seconds = Number(value);
+        if (!isFinite(seconds)) return replicationValue(value);
+        if (seconds < 0) return '-';
+        if (seconds > 0 && seconds < 1) return Math.round(seconds * 1000) + '毫秒';
+        seconds = Math.floor(seconds);
+        var days = Math.floor(seconds / 86400);
+        var hours = Math.floor(seconds % 86400 / 3600);
+        var minutes = Math.floor(seconds % 3600 / 60);
+        var remainingSeconds = seconds % 60;
+        if (days > 0) return days + '天 ' + hours + '小时';
+        if (hours > 0) return hours + '小时 ' + minutes + '分钟';
+        if (minutes > 0) return minutes + '分钟 ' + remainingSeconds + '秒';
+        return remainingSeconds + '秒';
+    }
 
-        myPostN('get_master_link', _data, function(data){
+    function replicationStatus(value) {
+        var status = replicationValue(value);
+        var names = {
+            'streaming': '流复制中',
+            'catchup': '追赶中',
+            'backup': '备份中',
+            'stopping': '已停止',
+            'startup': '启动中'
+        };
+        var labelClass = status === 'streaming' ? 'label-success' :
+            (status === 'catchup' || status === 'backup' ? 'label-warning' : 'label-default');
+        return '<span class="label ' + labelClass + '">' + (names[status] || status) + '</span>';
+    }
+
+    function replicationSync(value) {
+        var names = {'sync': '同步', 'async': '异步', 'potential': '潜在同步', 'quorum': '仲裁同步'};
+        return names[value] || replicationValue(value);
+    }
+
+    function replicationLsn(value) {
+        return '<span style="font-family:monospace;word-break:break-all">' + replicationValue(value) + '</span>';
+    }
+
+    function getMasterDbList(){
+        myPostN('get_master_link', {}, function(data){
             var rdata = $.parseJSON(data.data);
-            console.log('get_master_link:',rdata);
-            var list = '';
-
-            if (rdata.data.length > 0){
-                for(i in rdata.data){
-                    list += '<tr>';
-                    list += '<td>' + rdata.data[i]['client_addr'] +'</td>';
-                    list += '<td>' + rdata.data[i]['client_port'] +'</td>';
-                    list += '<td>' + rdata.data[i]['usename'] +'</td>';
-                    list += '<td>' + rdata.data[i]['state'] +'</td>';
-                    list += '<td>' + rdata.data[i]['sync_state'] +'</td>';
-                    list += '<td>' + rdata.data[i]['application_name'] +'</td>';
-
-                    list += '<td>' + rdata.data[i]['sent_lsn'] +'</td>';
-                    list += '<td>' + rdata.data[i]['write_lsn'] +'</td>';
-                    list += '<td>' + rdata.data[i]['flush_lsn'] +'</td>';
-                    list += '<td>' + rdata.data[i]['replay_lsn'] +'</td>';
-                    list += '</tr>';
-                }
-            } else {
-                list += '<tr>';
-                list += '<td colspan="10" style="text-align:center;">空</td>';
-                list += '</tr>';
+            if (rdata.status === false){
+                $('.table_master_list').html('<div class="alert alert-danger" style="margin:10px 0">' + rdata.msg + '</div>');
+                return;
             }
 
-            var con = '<div class="divtable mtb10">\
-                    <div class="tablescroll">\
-                        <table id="DataBody" class="table table-hover" width="100%" cellspacing="0" cellpadding="0" border="0" style="border: 0 none;">\
-                        <thead><tr>\
-                        <th>从库IP</th>\
-                        <th>端口</th>\
-                        <th>用户</th>\
-                        <th>状态</th>\
-                        <th>同步状态</th>\
-                        <th>应该名称</th>\
-                        <th>已发送LSN</th>\
-                        <th>已写入LSN</th>\
-                        <th>已刷盘LSN</th>\
-                        <th>已回放LSN</th>\
-                        </tr></thead>\
-                        <tbody>\
-                        '+ list +'\
-                        </tbody></table>\
+            var items = rdata.data || [];
+            var list = '';
+            for (var i = 0; i < items.length; i++){
+                var item = items[i];
+                var address = replicationValue(item.client_addr);
+                if (item.client_port) address += ':' + item.client_port;
+                list += '<div style="border:1px solid #ddd;border-radius:4px;margin-bottom:10px;overflow:hidden">\
+                    <div class="clearfix" style="padding:8px 12px;background:#f5f5f5;border-bottom:1px solid #ddd">\
+                        <strong>' + replicationValue(item.application_name) + '</strong><span class="pull-right">' + replicationStatus(item.state) + '</span>\
                     </div>\
-                    <div id="databasePage" class="dataTables_paginate paging_bootstrap page"></div>\
-                    <div class="table_toolbar" style="left:0px;">\
-                        <span class="sync btn btn-default btn-sm btn-master-refresh" title="">刷新</span>\
-                    </div>\
+                    <table class="table" style="margin:0;table-layout:fixed"><tbody>\
+                        <tr><th style="width:15%">从库地址</th><td style="width:35%">' + address + '</td><th style="width:15%">复制账户</th><td style="width:35%">' + replicationValue(item.usename) + '</td></tr>\
+                        <tr><th>同步模式</th><td>' + replicationSync(item.sync_state) + '</td><th>回放延迟</th><td>' + replicationDelay(item.replay_lag) + '</td></tr>\
+                        <tr><th>发送位置</th><td>' + replicationLsn(item.sent_lsn) + '</td><th>写入位置</th><td>' + replicationLsn(item.write_lsn) + '</td></tr>\
+                        <tr><th>刷盘位置</th><td>' + replicationLsn(item.flush_lsn) + '</td><th>回放位置</th><td>' + replicationLsn(item.replay_lsn) + '</td></tr>\
+                    </tbody></table>\
                 </div>';
+            }
 
-            $(".table_master_list").html(con);
-            $(".table_master_list .btn-master-refresh").click(function(){
-                getMasterDbList();
-            });
-            $('#databasePage').html(rdata.page);
+            if (items.length === 0){
+                list = '<div class="text-center text-muted" style="padding:20px;border:1px dashed #ddd;margin-bottom:10px">暂无已连接的从库</div>';
+            }
+            var con = '<div class="mtb10">' + list + '<div class="clearfix">\
+                <span class="sync btn btn-default btn-sm btn-master-refresh">刷新</span>\
+                <span class="text-muted pull-right" style="line-height:30px">共 ' + items.length + ' 个从库连接</span>\
+                </div></div>';
+            $('.table_master_list').html(con);
+            $('.table_master_list .btn-master-refresh').click(getMasterDbList);
         });
     }
 
     function getAsyncMasterDbList(){
-        var _data = {};
-        if (typeof(page) =='undefined'){
-            var page = 1;
-        }
-        _data['page'] = page;
-        _data['page_size'] = 50;
-        myPost('get_slave_link', _data, function(data){
+        myPost('get_slave_link', {}, function(data){
             var rdata = $.parseJSON(data.data);
-            console.log('get_slave_link:',rdata);
-            var list = '';
-
-            if (rdata.data.length > 0){
-                for(i in rdata.data){
-                    list += '<tr>';
-                    list += '<td>' + rdata.data[i]['sender_host'] +'</td>';
-                    list += '<td>' + rdata.data[i]['sender_port'] +'</td>';
-                    list += '<td>' + rdata.data[i]['status'] +'</td>';
-                    list += '<td>' + rdata.data[i]['slot_name'] +'</td>';
-                    list += '<td>' + rdata.data[i]['last_lsn_commit_time'] +'</td>';
-
-                    
-                    list += '<td>' + rdata.data[i]['receive_start_lsn'] +'</td>';
-                    list += '<td>' + rdata.data[i]['latest_end_lsn'] +'</td>';
-                    list += '<td>' + rdata.data[i]['written_lsn'] +'</td>';
-                    list += '<td>' + rdata.data[i]['flushed_lsn'] +'</td>';
-                    list += '</tr>';
-                }
-            } else {
-                list += '<tr>';
-                list += '<td colspan="8" style="text-align:center;">空</td>';
-                list += '</tr>';
+            if (rdata.status === false){
+                $('.table_slave_status_list').html('<div class="alert alert-danger" style="margin:10px 0">' + rdata.msg + '</div>');
+                return;
             }
 
-            var con = '<div class="divtable mtb10">\
-                    <div class="tablescroll">\
-                        <table id="DataBody" class="table table-hover" width="100%" cellspacing="0" cellpadding="0" border="0" style="border: 0 none;">\
-                        <thead><tr>\
-                        <th>主库IP</th>\
-                        <th>端口</th>\
-                        <th>状态</th>\
-                        <th>槽名</th>\
-                        <th>距最后回放事务时间</th>\
-                        <th>接收起始LSN</th>\
-                        <th>最新结束LSN</th>\
-                        <th>已写入LSN</th>\
-                        <th>已刷盘LSN </th>\
-                        </tr></thead>\
-                        <tbody>\
-                        '+ list +'\
-                        </tbody></table>\
+            var items = rdata.data || [];
+            var list = '';
+            for (var i = 0; i < items.length; i++){
+                var item = items[i];
+                var address = replicationValue(item.sender_host);
+                if (item.sender_port) address += ':' + item.sender_port;
+                list += '<div style="border:1px solid #ddd;border-radius:4px;margin-bottom:10px;overflow:hidden">\
+                    <div class="clearfix" style="padding:8px 12px;background:#f5f5f5;border-bottom:1px solid #ddd">\
+                        <strong>主库 ' + address + '</strong><span class="pull-right">' + replicationStatus(item.status) + '</span>\
                     </div>\
+                    <table class="table" style="margin:0;table-layout:fixed"><tbody>\
+                        <tr><th style="width:15%">复制槽</th><td style="width:35%">' + replicationValue(item.slot_name) + '</td><th style="width:15%">回放延迟</th><td style="width:35%">' + replicationDelay(item.last_lsn_commit_time) + '</td></tr>\
+                        <tr><th>接收位置</th><td>' + replicationLsn(item.receive_lsn) + '</td><th>回放位置</th><td>' + replicationLsn(item.replay_lsn) + '</td></tr>\
+                        <tr><th>写入位置</th><td>' + replicationLsn(item.written_lsn) + '</td><th>刷盘位置</th><td>' + replicationLsn(item.flushed_lsn) + '</td></tr>\
+                        <tr><th>接收起始</th><td>' + replicationLsn(item.receive_start_lsn) + '</td><th>最新结束</th><td>' + replicationLsn(item.latest_end_lsn) + '</td></tr>\
+                    </tbody></table>\
                 </div>';
-            $(".table_slave_status_list").html(con);
+            }
+
+            if (items.length === 0){
+                list = '<div class="text-center text-muted" style="padding:20px;border:1px dashed #ddd;margin-bottom:10px">暂无主库复制连接，请检查从库连接配置</div>';
+            }
+            var con = '<div class="mtb10">' + list + '<div>\
+                <span class="sync btn btn-default btn-sm btn-slave-refresh">刷新</span>\
+                </div></div>';
+            $('.table_slave_status_list').html(con);
+            $('.table_slave_status_list .btn-slave-refresh').click(getAsyncMasterDbList);
         });
     }
 
     function getMasterStatus(){
         myPost('get_master_status', '', function(data){
             var rdata = $.parseJSON(data.data);
-            // console.log('mode:',rdata.data);
-            var rdata = rdata.data;
+            rdata = rdata.data;
             var limitCon = '\
-                <p class="conf_p">\
-                    <span class="f14 c6 mr20">主从同步模式</span><span class="f14 c6 mr20"></span>\
-                    <button class="btn '+(!(rdata.mode == "classic") ? 'btn-danger' : 'btn-success')+' btn-xs db-mode btn-classic">经典</button>\
+                <p class="conf_p" style="text-align:center">\
+                    <span class="f14 c6">复制模式</span>\
+                    <button class="btn btn-default btn-xs">'+(rdata.mode == "classic" ? '经典流复制' : rdata.mode)+'</button>\
                 </p>\
-                <hr/>\
-                <p class="conf_p">\
-                    <span class="f14 c6 mr20">Master[主]配置</span><span class="f14 c6 mr20"></span>\
-                    <button class="btn '+(!rdata.status ? 'btn-danger' : 'btn-success')+' btn-xs btn-master">'+(!rdata.status ? '未开启' : '已开启') +'</button>\
-                    <button class="btn btn-success btn-xs" onclick="getMasterRepSlaveListPage()">同步账户</button>\
+                <hr style="margin:12px 0"/>\
+                <p class="conf_p" style="text-align:center">\
+                    <span class="f14 c6 mr20">主库配置</span>\
+                    <button title="'+(!rdata.status ? '开启主库复制' : '关闭主库复制')+'" class="btn '+(!rdata.status ? 'btn-danger' : 'btn-success')+' btn-xs btn-master">'+(!rdata.status ? '未开启' : '已开启') +'</button>\
+                    <button class="btn btn-default btn-xs" onclick="getMasterRepSlaveListPage()">复制账户</button>\
                 </p>\
-                <hr/>\
+                <hr style="margin:12px 0"/>\
                 <!-- master list -->\
                 <div class="safe bgw table_master_list"></div>\
-                <hr/>\
+                <hr style="margin:12px 0"/>\
                 <!-- class="conf_p" -->\
-                <p class="conf_p">\
-                    <span class="f14 c6 mr20">Slave[从]配置</span><span class="f14 c6 mr20"></span>\
-                    <button class="btn '+(!rdata.slave_status ? 'btn-danger' : 'btn-success')+' btn-xs btn-slave">'+(!rdata.slave_status ? '未开启' : '已开启') +'</button>\
-                    <button class="btn btn-success btn-xs" onclick="getSlaveCfg()">同步配置</button>\
-                    <button class="btn btn-success btn-xs" onclick="slaveSyncCmd()" >同步命令</button>\
+                <p class="conf_p" style="text-align:center">\
+                    <span class="f14 c6 mr20">从库配置</span>\
+                    <button title="'+(!rdata.slave_status ? '开启从库复制' : '关闭从库复制')+'" class="btn '+(!rdata.slave_status ? 'btn-danger' : 'btn-success')+' btn-xs btn-slave">'+(!rdata.slave_status ? '未开启' : '已开启') +'</button>\
+                    <button class="btn btn-default btn-xs" onclick="getSlaveCfg()">连接配置</button>\
+                    <button class="btn btn-default btn-xs" onclick="slaveSyncCmd()">同步命令</button>\
                 </p>\
-                <hr/>\
+                <hr style="margin:12px 0"/>\
                 <!-- slave status list -->\
                 <div class="safe bgw table_slave_status_list"></div>\
                 <!-- slave list -->\
@@ -1992,10 +1992,14 @@ function masterOrSlaveConf(version=''){
 
             if (rdata.status){
                 getMasterDbList();
+            } else {
+                $('.table_master_list').html('<div class="text-muted" style="padding:10px 0">开启主库复制后，可在此查看从库连接状态</div>');
             }
-            
+
             if (rdata.slave_status){
                 getAsyncMasterDbList();
+            } else {
+                $('.table_slave_status_list').html('<div class="text-muted" style="padding:10px 0">开启从库复制后，可在此查看主库连接状态</div>');
             }
         });
     }

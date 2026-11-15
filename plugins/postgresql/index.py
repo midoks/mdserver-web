@@ -1957,32 +1957,38 @@ def setSlaveSyncMode(version):
 
 def getMasterLink(version):
     pdb = pgDb()
-    sql = """
-    SELECT pid, usesysid, usename, application_name,
-           client_addr, client_hostname, client_port,
-           to_char(backend_start, 'YYYY-MM-DD HH24:MI:SS') AS backend_start,
-           backend_xmin, state,
-           sent_lsn, write_lsn, flush_lsn, replay_lsn,
-           write_lag, flush_lag, replay_lag,
-           sync_priority, sync_state,
-           to_char(reply_time, 'YYYY-MM-DD HH24:MI:SS') AS reply_time
-    FROM pg_stat_replication
-    """
-
     fields = 'pid, usesysid,usename,application_name,client_addr,client_hostname,client_port,backend_xmin,state,sent_lsn,write_lsn,flush_lsn,replay_lsn,write_lag,flush_lag,replay_lag,sync_priority,sync_state'
     data = pdb.field(fields).table('pg_stat_replication').select()
-    # print(data)
+    if isinstance(data, Exception):
+        return mw.returnJson(False, '获取主库复制状态失败: ' + str(data), [])
+
+    for item in data:
+        for field in ['write_lag', 'flush_lag', 'replay_lag']:
+            if item[field] is not None and hasattr(item[field], 'total_seconds'):
+                item[field] = item[field].total_seconds()
     return mw.returnJson(True, 'ok', data)
 
 def getSlaveLink(version):
     pdb = pgDb()
     fields = 'pid,status,receive_start_lsn,receive_start_tli,written_lsn,flushed_lsn,received_tli,latest_end_lsn,slot_name,sender_host,sender_port'
     data = pdb.field(fields).table('pg_stat_wal_receiver').select()
-    # print(data)
-    lag = pdb.query('select coalesce(extract(epoch from (now() - pg_last_xact_replay_timestamp()))::int, 0) as lag')
-    if isinstance(data, list) and len(data) > 0:
-        data[0]["last_lsn_commit_time"] = lag[0][0] if isinstance(
-            lag, list) and len(lag) > 0 else 0
+    if isinstance(data, Exception):
+        return mw.returnJson(False, '获取从库复制状态失败: ' + str(data), [])
+
+    if data:
+        replay = pdb.query("""
+            SELECT coalesce(pg_last_wal_receive_lsn()::text, '-'),
+                   coalesce(pg_last_wal_replay_lsn()::text, '-'),
+                   extract(epoch FROM now() - pg_last_xact_replay_timestamp())::bigint
+        """)
+        for item in data:
+            item['receive_lsn'] = '-'
+            item['replay_lsn'] = '-'
+            item['last_lsn_commit_time'] = None
+            if not isinstance(replay, Exception) and replay:
+                item['receive_lsn'] = replay[0][0]
+                item['replay_lsn'] = replay[0][1]
+                item['last_lsn_commit_time'] = replay[0][2]
     return mw.returnJson(True, 'ok', data)
 
 def getMasterRepSlaveList(version=''):
