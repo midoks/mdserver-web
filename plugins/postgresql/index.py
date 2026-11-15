@@ -1724,8 +1724,6 @@ def getDbAccess():
 
 
 def setDbAccess():
-    if isSlaveDb():
-        return mw.returnJson(False, '从库不能修改权限!')
     args = getArgs()
     data = checkArgs(args, ['name'])
     if not data[0]:
@@ -1745,12 +1743,14 @@ def setDbAccess():
     conf = pgHbaConf()
     data = mw.readFile(conf)
     new_data = re.sub(r'host\s*{}.*'.format(name), '', data).strip()
-
     new_data += "\n" + hbaRule('host', name, name, access, 'scram-sha-256')
     mw.writeFile(conf, new_data)
 
     psdb.where("name=?", (name,)).setField('accept', access)
     restart()
+    
+    if isSlaveDb():
+        return mw.returnJson(True, '从库修改权限成功!')
     return mw.returnJson(True, "设置成功")
 
 
