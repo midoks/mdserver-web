@@ -1993,13 +1993,14 @@ function masterOrSlaveConf(version=''){
             if (rdata.status){
                 getMasterDbList();
             } else {
-                $('.table_master_list').html('<div class="text-muted" style="padding:10px 0">开启主库复制后，可在此查看从库连接状态</div>');
+                $('.table_master_list').html('<div class="text-center text-muted" style="padding:20px;border:1px dashed #ddd;margin-bottom:10px">开启主库复制后，可在此查看从库连接状态</div>');
             }
 
             if (rdata.slave_status){
                 getAsyncMasterDbList();
             } else {
-                $('.table_slave_status_list').html('<div class="text-muted" style="padding:10px 0">开启从库复制后，可在此查看主库连接状态</div>');
+
+                $('.table_slave_status_list').html('<div class="text-center text-muted" style="padding:20px;border:1px dashed #ddd;margin-bottom:10px">开启从库复制后，可在此查看主库连接状态</div>');
             }
         });
     }
