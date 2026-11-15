@@ -885,6 +885,13 @@ def pgSetDbStatus():
     return mw.returnJson(True, '设置成功，将在数据库下次启动时生效!')
 
 
+def isPgError(msg):
+    # 检测数据库执行错误
+    msg = str(msg)
+    if "failed" in msg:
+        return mw.returnJson(False, '数据库连接失败,请检查数据库服务是否启动!')
+    return None
+
 def setUserPwd(version=''):
     args = getArgs()
     data = checkArgs(args, ['password', 'name'])
@@ -936,6 +943,105 @@ def setDbBackup():
 def rootPwd():
     return pSqliteDb('config').where('id=?', (1,)).getField('pg_root')
 
+def openPgTrust():
+    '''
+    临时放开本地连接认证, 用于重置密码
+    '''
+    hba = pgHbaConf()
+    content = mw.readFile(hba) or ''
+    backup = hba + '.bak'
+    # 保留首次备份, 避免中途失败时丢失原始认证配置
+    if not os.path.exists(backup):
+        mw.writeFile(backup, content)
+
+    trust = "local   all             all                                     trust\n" \
+            "host    all             all             127.0.0.1/32            trust\n" \
+            "host    all             all             ::1/128                 trust\n"
+    mw.writeFile(hba, trust + content)
+    reload()
+    return True
+
+
+def closePgTrust():
+    '''
+    恢复 pg_hba.conf 本地认证
+    '''
+    hba = pgHbaConf()
+    backup = hba + '.bak'
+    if os.path.exists(backup):
+        mw.writeFile(hba, mw.readFile(backup))
+        os.remove(backup)
+    # pg_hba.conf 无需重启, 重新加载即可
+    reload()
+    return True
+
+
+def resetPgPwd(version, new_password=''):
+    '''
+    通过本地信任连接重置 postgres 用户密码
+    '''
+    pwd = new_password if new_password != '' else mw.getRandomString(16)
+
+    tmp_dir = getServerDir() + '/tmp'
+    if not os.path.exists(tmp_dir):
+        os.makedirs(tmp_dir)
+    sql_file = tmp_dir + '/reset_pwd.sql'
+    mw.writeFile(sql_file, "alter user postgres with password '{}';\n".format(
+        pwd.replace("'", "''")))
+    os.chmod(sql_file, 0o644)
+
+    cmd = getServerDir() + '/bin/psql -d postgres -f ' + sql_file
+    if not mw.isAppleSystem():
+        cmd = pgCmd(cmd)
+    data = mw.execShell(cmd)
+
+    try:
+        os.remove(sql_file)
+    except Exception:
+        pass
+
+    output = (data[0] or '') + (data[1] or '')
+    if 'ALTER ROLE' in output:
+        pSqliteDb('config').where('id=?', (1,)).save('pg_root', (pwd,))
+        return True
+    return False
+
+
+def setRootPwdForce(new_password, version=''):
+    '''
+    当前密码不可用(忘记密码/连接被拒)时, 通过临时放开本地认证的方式真正重置密码
+    '''
+    changed = False
+    try:
+        appCMD(version, 'stop')
+        openPgTrust()
+        appCMD(version, 'start')
+        time.sleep(3)
+
+        changed = resetPgPwd(version, new_password)
+    except Exception:
+        changed = False
+    finally:
+        # 无论成败都恢复本地认证, 避免数据库长期处于免密状态
+        closePgTrust()
+        appCMD(version, 'restart')
+
+    if not changed:
+        return False
+
+    # 用新密码验证是否真的可以连接(启动可能较慢, 重试几次)
+    for i in range(10):
+        try:
+            pdb = pgDb()
+            result = pdb.query('select 1')
+            if not isinstance(result, Exception) and not (isinstance(result, str) and result.startswith('error')):
+                return True
+        except Exception:
+            pass
+        time.sleep(2)
+
+    return False
+
 def setPostgresPwd(version=''):
     args = getArgs()
     data = checkArgs(args, ['password'])
@@ -947,7 +1053,22 @@ def setPostgresPwd(version=''):
         pSqliteDb('config').where('id=?', (1,)).save('pg_root', (password,))
         return mw.returnJson(True, '【强制本地记录】PG密码修改成功!')
 
-    return mw.returnJson(True, 'ok')
+    # 忘记密码/连接被拒时, 临时放开本地认证重置
+    if 'force' in args and args['force'] == '2':
+        if not setRootPwdForce(password, version):
+            return mw.returnJson(False, '【强制】修改失败,请检查PG运行状态!')
+        return mw.returnJson(True, '【强制】postgres密码修改成功!')
+
+    try:
+        pdb = pgDb()
+        result = pdb.execute("alter user postgres with password '{}'".format(password.replace("'", "''")))
+        if isinstance(result, Exception):
+            return mw.returnJson(False, '修改密码失败,请检查数据库连接状态!')
+    except Exception as ex:
+        return mw.returnJson(False, '修改密码失败[' + str(ex) + ']')
+
+    pSqliteDb('config').where('id=?', (1,)).save('pg_root', (password,))
+    return mw.returnJson(True, 'postgres密码修改成功!')
 
 def importDbExternal():
     args = getArgs()
@@ -1491,6 +1612,19 @@ def setDbAccess():
 
     psdb.where("name=?", (name,)).setField('accept', access)
     return mw.returnJson(True, "设置成功")
+
+
+def fixDbAccess(version):
+    pdb = pgDb()
+    data = pdb.query("select 1")
+    isError = isPgError(data)
+    if isError == None:
+        return mw.returnJson(True, '正常无需修复!')
+
+    if not setRootPwdForce(mw.getRandomString(16), version):
+        return mw.returnJson(False, '密码重置失败,请检查数据库运行状态!!')
+    return mw.returnJson(True, '修复成功,root密码已重置!')
+
 
 def getDbInfo():
     args = getArgs()
@@ -2576,6 +2710,8 @@ if __name__ == "__main__":
         print(getDbAccess())
     elif func == 'set_db_access':
         print(setDbAccess())
+    elif func == 'fix_db_access':
+        print(fixDbAccess(version))
     elif func == 'get_db_info':
         print(getDbInfo())
     elif func == 'pg_back':
