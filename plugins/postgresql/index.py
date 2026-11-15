@@ -1414,9 +1414,13 @@ def pgBack():
     #   --serializable-deferrable: MVCC 快照一致性, 与 DDL 快照冲突时自动重试
     #   --lock-wait-timeout=30s: 等表锁最多 30 秒, 避免大 DDL 下一直阻塞
     #   --no-sync (PG 14+):    dump 完不等 fsync, 减少 I/O 等待
-    dump_opts = '-c --if-exists --serializable-deferrable --lock-wait-timeout=30s'
+    dump_opts = '-c --if-exists --lock-wait-timeout=30s'
     if pg_major >= 14:
         dump_opts += ' --no-sync'
+
+    #与从库冲突
+    if not isSlaveDb():
+        dump_opts += ' --serializable-deferrable'
 
     # set -o pipefail: 管道任一命令失败都能被检测到
     stderr_log = '/tmp/pg_dump_stderr.log'
