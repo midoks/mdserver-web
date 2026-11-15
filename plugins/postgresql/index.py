@@ -1676,9 +1676,6 @@ def delDb():
 
 
 def setDbRw(version=''):
-    if isSlaveDb():
-        return mw.returnJson(False, '从库不能修改读写!')
-
     args = getArgs()
     data = checkArgs(args, ['username', 'id', 'rw'])
     if not data[0]:
