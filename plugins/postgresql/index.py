@@ -936,6 +936,19 @@ def setDbBackup():
 def rootPwd():
     return pSqliteDb('config').where('id=?', (1,)).getField('pg_root')
 
+def setPostgresPwd(version=''):
+    args = getArgs()
+    data = checkArgs(args, ['password'])
+    if not data[0]:
+        return data[1]
+    password = args['password']
+
+    if 'force' in args and args['force'] == '1':
+        pSqliteDb('config').where('id=?', (1,)).save('pg_root', (password,))
+        return mw.returnJson(True, '【强制本地记录】PG密码修改成功!')
+
+    return mw.returnJson(True, 'ok')
+
 def importDbExternal():
     args = getArgs()
     data = checkArgs(args, ['file', 'name'])
@@ -2547,6 +2560,8 @@ if __name__ == "__main__":
         print(setPgPort())
     elif func == 'root_pwd':
         print(rootPwd())
+    elif func == 'set_postgres_pwd':
+        print(setPostgresPwd(version))
     elif func == 'get_db_list':
         print(getDbList())
     elif func == 'get_table_list':
