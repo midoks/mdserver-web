@@ -405,11 +405,14 @@ function setRootPwd(type, pwd){
         closeBtn: 1,
         shift: 5,
         shadeClose: true,
-        btn:["提交", "关闭", "复制ROOT密码", "修改本地ROOT记录", "强改ROOT密码"],
+        btn:["提交", "关闭", "复制PG密码", "修改本地PG记录", "强改PG密码"],
         content: "<form class='bt-form pd20' id='mod_pwd'>\
                     <div class='line'>\
-                    <span class='tname'>postgres密码</span>\
-                    <div class='info-r'><input class='bt-input-text mr5' type='text' name='password' id='MyPassword' style='width:330px' value='"+pwd+"' /><span title='随机密码' class='glyphicon glyphicon-repeat cursor' onclick='repeatPwd(16)'></span></div>\
+                        <span class='tname'>postgres密码</span>\
+                        <div class='info-r'>\
+                            <input class='bt-input-text mr5' type='text' name='password' id='MyPassword' style='width:330px' value='"+pwd+"' />\
+                            <span title='随机密码' class='glyphicon glyphicon-repeat cursor' onclick='repeatPwd(16)'></span>\
+                        </div>\
                     </div>\
                 </form>",
         yes:function(layerIndex){
@@ -428,7 +431,7 @@ function setRootPwd(type, pwd){
             return false;
         },
         btn4:function(layerIndex){
-            layer.confirm('修改本地ROOT记录,确定修改?', {
+            layer.confirm('修改本地PG记录,确定修改?', {
                 btn: ['确定', '取消']
             }, function(index, layero){
                 layer.close(index);
@@ -444,7 +447,7 @@ function setRootPwd(type, pwd){
             return false;
         },
         btn5:function(layerIndex){
-            layer.confirm('强制修改PostgreSQL密码,确定强制? (比较耗时)', {
+            layer.confirm('强制修改PG密码,确定强制? (比较耗时)', {
                 btn: ['确定', '取消']
             }, function(index, layero){
                 layer.close(index);
