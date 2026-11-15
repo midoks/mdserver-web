@@ -524,7 +524,7 @@ def reload(version=''):
         mw.writeFile(logfile, '')
     if not isSlaveDb():
         regenConfig()
-    return appCMD(version, 'reload')
+    return appCMD(version, 'restart')
 
 
 def initdStatus():
