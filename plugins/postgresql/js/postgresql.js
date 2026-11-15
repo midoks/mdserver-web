@@ -1398,7 +1398,7 @@ function setMasterRepSlaveAccess(name){
                     var rdata = $.parseJSON(data.data);
                     showMsg(rdata.msg,function(){
                         layer.close(index);
-                        dbList();
+                        masterOrSlaveConf();
                     },{icon: rdata.status ? 1 : 2});   
                 });
             }

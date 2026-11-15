@@ -2402,7 +2402,7 @@ def setMasterRepSlaveAccess(version=''):
     new_data += "\n" + hbaRule('host', 'replication', name, access, 'scram-sha-256')
     mw.writeFile(conf, new_data)
 
-    psdb.where("name=?", (name,)).setField('accept', access)
+    psdb.where("username=?", (name,)).setField('accept', access)
     restart()
     return mw.returnJson(True, "设置成功")
 
