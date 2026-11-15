@@ -190,7 +190,7 @@ class ORM:
             self.__Close()
             return result
         except Exception as ex:
-            return ex
+            return "error: " + str(ex)
 
     def __Close(self):
         # 关闭连接
