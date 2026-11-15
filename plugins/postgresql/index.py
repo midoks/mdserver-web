@@ -1059,7 +1059,6 @@ def openPgTrust():
             + hbaRule('host', 'all', 'all', '127.0.0.1/32', 'trust') + "\n" \
             + hbaRule('host', 'all', 'all', '::1/128', 'trust') + "\n"
     mw.writeFile(hba, trust + content)
-    restart()
     return True
 
 
@@ -1073,7 +1072,6 @@ def closePgTrust():
         mw.writeFile(hba, mw.readFile(backup))
         os.remove(backup)
     # pg_hba.conf 无需重启, 重新加载即可
-    restart()
     return True
 
 
