@@ -544,72 +544,85 @@ def runInfo():
         },
     }
 
+    replication = result['replication']
+    in_recovery = None
     try:
-        wal = db.query("""
-            SELECT pg_is_in_recovery(), coalesce(pg_walfile_name(lsn), 'OFF'),
-                   coalesce(lsn::text, 'OFF')
-            FROM (
-                SELECT CASE WHEN pg_is_in_recovery()
-                            THEN pg_last_wal_replay_lsn()
-                            ELSE pg_current_wal_lsn()
-                       END AS lsn
-            ) AS wal
-        """)
-        if not isinstance(wal, Exception) and wal:
-            in_recovery = wal[0][0]
-            result['file'] = wal[0][1]
-            result['position'] = wal[0][2]
-            replication = result['replication']
-
-            if in_recovery:
-                replication['role'] = 'standby'
-                standby = db.query("""
-                    SELECT
-                        (SELECT status FROM pg_stat_wal_receiver LIMIT 1),
-                        (SELECT sender_host::text FROM pg_stat_wal_receiver LIMIT 1),
-                        (SELECT sender_port FROM pg_stat_wal_receiver LIMIT 1),
-                        (SELECT slot_name FROM pg_stat_wal_receiver LIMIT 1),
-                        coalesce(pg_last_wal_receive_lsn()::text, '-'),
-                        coalesce(pg_last_wal_replay_lsn()::text, '-'),
-                        extract(epoch FROM now() - pg_last_xact_replay_timestamp())::bigint
-                """)
-                if not isinstance(standby, Exception) and standby:
-                    info = standby[0]
-                    replication.update({
-                        'status': info[0] or '-',
-                        'sender_host': info[1] or '-',
-                        'sender_port': info[2] or '-',
-                        'slot_name': info[3] or '-',
-                        'receive_lsn': info[4],
-                        'replay_lsn': info[5],
-                        'replay_lag': info[6],
-                    })
-            else:
-                replication['role'] = 'primary'
-                replicas = db.query("""
-                    SELECT coalesce(application_name, '-'),
-                           coalesce(host(client_addr), '本地'),
-                           coalesce(state, '-'), coalesce(sync_state, '-'),
-                           coalesce(sent_lsn::text, '-'),
-                           coalesce(replay_lsn::text, '-'),
-                           extract(epoch FROM replay_lag)::bigint
-                    FROM pg_stat_replication
-                    ORDER BY application_name, client_addr
-                """)
-                if not isinstance(replicas, Exception):
-                    for replica in replicas:
-                        replication['replicas'].append({
-                            'name': replica[0],
-                            'address': replica[1],
-                            'state': replica[2],
-                            'sync_state': replica[3],
-                            'sent_lsn': replica[4],
-                            'replay_lsn': replica[5],
-                            'replay_lag': replica[6],
-                        })
-                    replication['replica_count'] = len(replication['replicas'])
+        recovery = db.query('SELECT pg_is_in_recovery()')
+        if not isinstance(recovery, Exception) and recovery:
+            in_recovery = recovery[0][0]
+            replication['role'] = 'standby' if in_recovery else 'primary'
     except Exception:
         pass
+
+    if in_recovery is not None:
+        try:
+            if in_recovery:
+                wal = db.query("""
+                    SELECT '-', coalesce(pg_last_wal_replay_lsn()::text, '-')
+                """)
+            else:
+                wal = db.query("""
+                    SELECT coalesce(pg_walfile_name(lsn), 'OFF'), coalesce(lsn::text, 'OFF')
+                    FROM (SELECT pg_current_wal_lsn() AS lsn) AS wal
+                """)
+            if not isinstance(wal, Exception) and wal:
+                result['file'] = wal[0][0]
+                result['position'] = wal[0][1]
+        except Exception:
+            pass
+
+    if in_recovery:
+        try:
+            standby = db.query("""
+                SELECT
+                    (SELECT status FROM pg_stat_wal_receiver LIMIT 1),
+                    (SELECT sender_host::text FROM pg_stat_wal_receiver LIMIT 1),
+                    (SELECT sender_port FROM pg_stat_wal_receiver LIMIT 1),
+                    (SELECT slot_name FROM pg_stat_wal_receiver LIMIT 1),
+                    coalesce(pg_last_wal_receive_lsn()::text, '-'),
+                    coalesce(pg_last_wal_replay_lsn()::text, '-'),
+                    extract(epoch FROM now() - pg_last_xact_replay_timestamp())::bigint
+            """)
+            if not isinstance(standby, Exception) and standby:
+                info = standby[0]
+                replication.update({
+                    'status': info[0] or '-',
+                    'sender_host': info[1] or '-',
+                    'sender_port': info[2] or '-',
+                    'slot_name': info[3] or '-',
+                    'receive_lsn': info[4],
+                    'replay_lsn': info[5],
+                    'replay_lag': info[6],
+                })
+                result['position'] = info[5]
+        except Exception:
+            pass
+    elif in_recovery is False:
+        try:
+            replicas = db.query("""
+                SELECT coalesce(application_name, '-'),
+                       coalesce(host(client_addr), '本地'),
+                       coalesce(state, '-'), coalesce(sync_state, '-'),
+                       coalesce(sent_lsn::text, '-'),
+                       coalesce(replay_lsn::text, '-'),
+                       extract(epoch FROM replay_lag)::bigint
+                FROM pg_stat_replication
+                ORDER BY application_name, client_addr
+            """)
+            if not isinstance(replicas, Exception):
+                for replica in replicas:
+                    replication['replicas'].append({
+                        'name': replica[0],
+                        'address': replica[1],
+                        'state': replica[2],
+                        'sync_state': replica[3],
+                        'sent_lsn': replica[4],
+                        'replay_lsn': replica[5],
+                        'replay_lag': replica[6],
+                    })
+                replication['replica_count'] = len(replication['replicas'])
+        except Exception:
+            pass
 
     pid_content = mw.readFile(getDataDir() + '/postmaster.pid')
     pid_lines = pid_content.splitlines() if pid_content else []
