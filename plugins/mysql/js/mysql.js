@@ -528,7 +528,7 @@ function setRootPwd(type, pwd){
             var rdata = $.parseJSON(data.data);
             showMsg(rdata.msg,function(){
                 dbList();
-            },{icon: rdata.status ? 1 : 2});   
+            },{icon: rdata.status ? 1 : 2});
         });
         return;
     }
