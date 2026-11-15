@@ -293,8 +293,25 @@ def regenConfig():
     # postgresql.conf
     path = getServerDir() + '/data/postgresql.conf'
     current = readActiveConf(path)
-    content = contentReplace(mw.readFile(getPluginDir() + '/conf/postgresql.conf'))
-    mw.writeFile(path, content)
+    tpl = contentReplace(mw.readFile(getPluginDir() + '/conf/postgresql.conf'))
+    tpl_keys = set(re.findall(r'^\s*#?\s*([\w.]+)\s*=', tpl, re.M))
+
+    lines = []
+    used = set()
+    for line in tpl.splitlines():
+        match = re.match(r'^\s*#?\s*([\w.]+)\s*=', line)
+        key = match.group(1) if match else ''
+        if key == '' or key not in current or key in used:
+            lines.append(line)
+            continue
+        # 用当前生效值覆盖模板中的默认值/注释项
+        lines.append(current[key])
+        used.add(key)
+
+    for key in current:
+        if key not in tpl_keys and key not in used:
+            lines.append(current[key])
+    mw.writeFile(path, "\n".join(lines) + "\n")
 
     # pg_hba.conf
     pg_accept = getHbaAccess('postgres')
@@ -506,7 +523,8 @@ def reload(version=''):
     logfile = runLog()
     if os.path.exists(logfile):
         mw.writeFile(logfile, '')
-    regenConfig()
+    if not isSlaveDb():
+        regenConfig()
     return appCMD(version, 'reload')
 
 
