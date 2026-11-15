@@ -1011,6 +1011,9 @@ def isPgError(msg):
     return None
 
 def setUserPwd(version=''):
+    if isSlaveDb():
+        return mw.returnJson(False, '从库不能改密,参照主库!')
+
     args = getArgs()
     data = checkArgs(args, ['password', 'name'])
     if not data[0]:
