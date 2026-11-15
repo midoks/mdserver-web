@@ -2372,6 +2372,39 @@ def getMasterRepSlaveList(version=''):
 
     return mw.getJson(data)
 
+def getMasterRepSlaveAccess(version=''):
+    args = getArgs()
+    data = checkArgs(args, ['name'])
+    if not data[0]:
+        return data[1]
+    name = args['name'].strip()
+
+    psdb = pSqliteDb('master_replication_user')
+    accept = psdb.where("username=?", (name,)).getField('accept')
+    return mw.returnJson(True, accept)
+
+
+
+def setMasterRepSlaveAccess(version=''):
+    args = getArgs()
+    data = checkArgs(args, ['name'])
+    if not data[0]:
+        return data[1]
+
+    name = args['name']
+    access = args['access']
+
+    psdb = pSqliteDb('master_replication_user')
+
+    conf = pgHbaConf()
+    data = mw.readFile(conf)
+    new_data = re.sub(r'host\s*{}\s*{}.*'.format('replication',name), '', data).strip()
+    new_data += "\n" + hbaRule('host', 'replication', name, access, 'scram-sha-256')
+    mw.writeFile(conf, new_data)
+
+    psdb.where("name=?", (name,)).setField('accept', access)
+    restart()
+    return mw.returnJson(True, "设置成功")
 
 def addMasterRepSlaveUser(version=''):
     args = getArgs()
@@ -2416,8 +2449,8 @@ def addMasterRepSlaveUser(version=''):
     mw.writeFile(pg_conf, data)
 
     addTime = time.strftime('%Y-%m-%d %X', time.localtime())
-    psdb.add('username,password,accept,ps,addtime',
-             (username, password, address, '', addTime))
+    psdb.add('username,password,accept,ps,addtime',(username, password, address, '', addTime))
+    restart()
     return mw.returnJson(True, '添加成功!')
 
 
@@ -2903,6 +2936,10 @@ if __name__ == "__main__":
         print(addMasterRepSlaveUser(version))
     elif func == 'del_master_rep_slave_user':
         print(delMasterRepSlaveUser(version))
+    elif func == 'get_master_rep_slave_access':
+        print(getMasterRepSlaveAccess(version))
+    elif func == 'set_master_rep_slave_access':
+        print(setMasterRepSlaveAccess(version))
     elif func == 'get_master_rep_slave_user_cmd':
         print(getMasterRepSlaveUserCmd(version))
     elif func == 'get_master_rep_slave_user_full_cmd':

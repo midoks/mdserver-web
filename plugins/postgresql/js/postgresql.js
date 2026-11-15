@@ -1330,6 +1330,83 @@ function updateMasterRepSlaveUser(username){
     });
 }
 
+
+function setMasterRepSlaveAccess(name){
+    myPost('get_master_rep_slave_access','name='+name, function(data){
+        var rdata = $.parseJSON(data.data);
+        if (!rdata.status){
+            layer.msg(rdata.msg,{icon:2,shade: [0.3, '#000']});
+            return;
+        }
+        
+        layer.open({
+            type: 1,
+            area: '500px',
+            title: '设置数据库权限',
+            closeBtn: 1,
+            shift: 5,
+            btn:["提交","取消"],
+            shadeClose: true,
+            content: "<form class='bt-form pd20' id='set_db_access'>\
+                        <div class='line'>\
+                            <span class='tname'>访问权限</span>\
+                            <div class='info-r '>\
+                                <select class='bt-input-text mr5' name='dataAccess' style='width:100px'>\
+                                <option value='127.0.0.1/32'>本地服务器</option>\
+                                <option value='0.0.0.0/0'>所有人</option>\
+                                <option value='ip'>指定网段</option>\
+                                </select>\
+                            </div>\
+                        </div>\
+                      </form>",
+            success:function(){
+                if (rdata.msg == '127.0.0.1/32'){
+                    $('select[name="dataAccess"]').find("option[value='127.0.0.1/32']").attr("selected",true);
+                } else if (rdata.msg == '0.0.0.0/0'){
+                    $('select[name="dataAccess"]').find('option[value="0.0.0.0/0"]').attr("selected",true);
+                } else {
+                    $('select[name="dataAccess"]').find('option[value="ip"]').attr("selected",true);
+                    $('select[name="dataAccess"]').after("<input value='"+rdata.msg+"' class='bt-input-text mr5' type='text' name='address' placeholder='如: 192.168.1.0/24' style='width: 230px; display: inline-block;'>");
+                }
+
+                $('select[name="dataAccess"]').change(function(){
+                    var v = $(this).val();
+                    if (v == 'ip'){
+                        $(this).after("<input class='bt-input-text mr5' type='text' name='address' placeholder='如: 192.168.1.0/24' style='width: 230px; display: inline-block;'>");
+                    } else {
+                        $('input[name="address"]').remove()
+                    }
+                });
+            },
+            yes:function(index){
+                var data = $("#set_db_access").serialize();
+                data = decodeURIComponent(data);
+                var dataObj = str2Obj(data);
+                if(!dataObj['access']){
+                    dataObj['access'] = dataObj['dataAccess'];
+                    if ( dataObj['dataAccess'] == 'ip'){
+                        if (dataObj['address']==''){
+                            layer.msg('IP地址不能空!',{icon:2,shade: [0.3, '#000']});
+                            return;
+                        }
+                        dataObj['access'] = dataObj['address'];
+                    }
+                }
+                dataObj['name'] = name;
+                // console.log(dataObj);
+                myPost('set_master_rep_slave_access', dataObj, function(data){
+                    var rdata = $.parseJSON(data.data);
+                    showMsg(rdata.msg,function(){
+                        layer.close(index);
+                        dbList();
+                    },{icon: rdata.status ? 1 : 2});   
+                });
+            }
+        });
+
+    });
+}
+
 function getMasterRepSlaveUserCmd(username, db=''){
     myPost('get_master_rep_slave_user_full_cmd', {username:username,db:db}, function(data){
         var rdata = $.parseJSON(data.data);
@@ -1386,12 +1463,13 @@ function getMasterRepSlaveList(){
         // console.log(rdata['data']);
         var user_list = rdata['data'];
         for (i in user_list) {
-            // console.log(i);
+            // console.log(i);/setDbMasterAccess
             var name = user_list[i]['username'];
             list += '<tr><td>'+name+'</td>\
                 <td>'+user_list[i]['password']+'</td>\
                 <td>\
                     <a class="btlink" onclick="delMasterRepSlaveUser(\''+name+'\');">删除</a> | \
+                    <a class="btlink" onclick="setMasterRepSlaveAccess(\''+name+'\');">权限</a> | \
                     <a class="btlink" onclick="getMasterRepSlaveUserCmd(\''+name+'\');">从库同步命令</a> \
                 </td>\
             </tr>';
