@@ -1011,9 +1011,6 @@ def isPgError(msg):
     return None
 
 def setUserPwd(version=''):
-    if isSlaveDb():
-        return mw.returnJson(False, '从库不能改密,参照主库!')
-
     args = getArgs()
     data = checkArgs(args, ['password', 'name'])
     if not data[0]:
@@ -1027,11 +1024,14 @@ def setUserPwd(version=''):
         psdb = pSqliteDb('databases')
         name = psdb.where('id=?', (uid,)).getField('name')
 
-        r = pdb.execute(
-            "alter user {} with password '{}'".format(username, newpwd))
+        if not isSlaveDb():
+            r = pdb.execute("alter user {} with password '{}'".format(username, newpwd))
 
         psdb.where("id=?", (uid,)).setField('password', newpwd)
-        return mw.returnJson(True, mw.getInfo('修改数据库[{1}]密码成功!', (name,)))
+        if isSlaveDb():
+            return mw.returnJson(True, mw.getInfo('修改本地记录[{1}]密码成功!', (name,)))
+        else:
+            return mw.returnJson(True, mw.getInfo('修改数据库[{1}]密码成功!', (name,)))
     except Exception as ex:
         return mw.returnJson(False, mw.getInfo('修改数据库[{1}]密码失败[{2}]!', (name, str(ex),)))
 

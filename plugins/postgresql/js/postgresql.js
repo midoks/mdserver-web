@@ -775,7 +775,6 @@ function delDb(id, name){
             var rdata = $.parseJSON(data.data);
             showMsg(rdata.msg,function(){
                 dbList();
-                $('.layui-layer-close1').click();
             },{icon: rdata.status ? 1 : 2}, 600);
         });
     });
@@ -1324,7 +1323,6 @@ function updateMasterRepSlaveUser(username){
                 if (rdata.status){
                     getMasterRepSlaveList();
                 }
-                $('.layui-layer-close1').click();
             },{icon: rdata.status ? 1 : 2},600);
         });
     });
