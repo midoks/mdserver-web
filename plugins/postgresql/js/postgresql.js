@@ -1873,7 +1873,7 @@ function masterOrSlaveConf(version=''){
                 var address = replicationValue(item.client_addr);
                 if (item.client_port) address += ':' + item.client_port;
                 list += '<div style="border:1px solid #ddd;border-radius:4px;margin-bottom:10px;overflow:hidden">\
-                    <div class="clearfix" style="padding:8px 12px;background:#f5f5f5;border-bottom:1px solid #ddd">\
+                    <div class="clearfix" style="padding:8px 12px;background:#f5f5f5;">\
                         <strong>' + replicationValue(item.application_name) + '</strong><span class="pull-right">' + replicationStatus(item.state) + '</span>\
                     </div>\
                     <table class="table" style="margin:0;table-layout:fixed"><tbody>\
@@ -1912,7 +1912,7 @@ function masterOrSlaveConf(version=''){
                 var address = replicationValue(item.sender_host);
                 if (item.sender_port) address += ':' + item.sender_port;
                 list += '<div style="border:1px solid #ddd;border-radius:4px;margin-bottom:10px;overflow:hidden">\
-                    <div class="clearfix" style="padding:8px 12px;background:#f5f5f5;border-bottom:1px solid #ddd">\
+                    <div class="clearfix" style="padding:8px 12px;background:#f5f5f5;">\
                         <strong>主库 ' + address + '</strong><span class="pull-right">' + replicationStatus(item.status) + '</span>\
                     </div>\
                     <table class="table" style="margin:0;table-layout:fixed"><tbody>\
