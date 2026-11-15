@@ -1940,13 +1940,13 @@ function masterOrSlaveConf(version=''){
             var rdata = $.parseJSON(data.data);
             rdata = rdata.data;
             var limitCon = '\
-                <p class="conf_p" style="text-align:center">\
-                    <span class="f14 c6">复制模式</span>\
+                <p class="conf_p">\
+                    <span class="f14 c6 mr20">复制模式</span><span class="f14 c6 mr20"></span>\
                     <button class="btn btn-default btn-xs">'+(rdata.mode == "classic" ? '经典流复制' : rdata.mode)+'</button>\
                 </p>\
                 <hr style="margin:12px 0"/>\
-                <p class="conf_p" style="text-align:center">\
-                    <span class="f14 c6 mr20">主库配置</span>\
+                <p class="conf_p">\
+                    <span class="f14 c6 mr20">主库配置</span><span class="f14 c6 mr20"></span>\
                     <button title="'+(!rdata.status ? '开启主库复制' : '关闭主库复制')+'" class="btn '+(!rdata.status ? 'btn-danger' : 'btn-success')+' btn-xs btn-master">'+(!rdata.status ? '未开启' : '已开启') +'</button>\
                     <button class="btn btn-default btn-xs" onclick="getMasterRepSlaveListPage()">复制账户</button>\
                 </p>\
@@ -1955,8 +1955,8 @@ function masterOrSlaveConf(version=''){
                 <div class="safe bgw table_master_list"></div>\
                 <hr style="margin:12px 0"/>\
                 <!-- class="conf_p" -->\
-                <p class="conf_p" style="text-align:center">\
-                    <span class="f14 c6 mr20">从库配置</span>\
+                <p class="conf_p">\
+                    <span class="f14 c6 mr20">从库配置</span><span class="f14 c6 mr20"></span>\
                     <button title="'+(!rdata.slave_status ? '开启从库复制' : '关闭从库复制')+'" class="btn '+(!rdata.slave_status ? 'btn-danger' : 'btn-success')+' btn-xs btn-slave">'+(!rdata.slave_status ? '未开启' : '已开启') +'</button>\
                     <button class="btn btn-default btn-xs" onclick="getSlaveCfg()">连接配置</button>\
                     <button class="btn btn-default btn-xs" onclick="slaveSyncCmd()">同步命令</button>\
