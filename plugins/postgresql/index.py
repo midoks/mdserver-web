@@ -1669,9 +1669,9 @@ def delDb():
     mw.writeFile(pg_hba, new_config)
 
     psdb.where("id=?", (did,)).delete()
+    restart()
     if isSlaveDb():
         return mw.returnJson(True, '删除本地记录成功!')
-    restart()
     return mw.returnJson(True, '删除成功!')
 
 
@@ -1748,7 +1748,7 @@ def setDbAccess():
 
     psdb.where("name=?", (name,)).setField('accept', access)
     restart()
-    
+
     if isSlaveDb():
         return mw.returnJson(True, '从库修改权限成功!')
     return mw.returnJson(True, "设置成功")
