@@ -522,8 +522,7 @@ def reload(version=''):
     logfile = runLog()
     if os.path.exists(logfile):
         mw.writeFile(logfile, '')
-    if not isSlaveDb():
-        regenConfig()
+    regenConfig()
     return appCMD(version, 'restart')
 
 
