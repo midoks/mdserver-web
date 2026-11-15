@@ -644,8 +644,16 @@ function setDbAccess(name){
     });
 }
 
-function setDbPass(id, username, password){
+function fixDbAccess(username){
+    myPost('fix_db_access', '', function(rdata){
+        var rdata = $.parseJSON(rdata.data);
+        showMsg(rdata.msg,function(){
+            dbList();
+        },{icon: rdata.status ? 1 : 2}); 
+    });
+}
 
+function setDbPass(id, username, password){
     var index = layer.open({
         type: 1,
         area: '500px',
