@@ -1560,6 +1560,9 @@ def syncGetDatabases():
 
 
 def addDb():
+    if isSlaveDb():
+        return mw.returnJson(False, '从库不能添加数据库!')
+
     args = getArgs()
     data = checkArgs(args, ['password', 'name', 'db_user', 'dataAccess'])
     if not data[0]:
@@ -1631,6 +1634,10 @@ def addDb():
 
 
 def delDb():
+    if isSlaveDb():
+        return mw.returnJson(False, '从库不能数据库!')
+
+
     args = getArgs()
     data = checkArgs(args, ['id', 'name'])
     if not data[0]:
@@ -1666,6 +1673,9 @@ def delDb():
 
 
 def setDbRw(version=''):
+    if isSlaveDb():
+        return mw.returnJson(False, '从库不能修改读写!')
+
     args = getArgs()
     data = checkArgs(args, ['username', 'id', 'rw'])
     if not data[0]:
@@ -1711,6 +1721,8 @@ def getDbAccess():
 
 
 def setDbAccess():
+    if isSlaveDb():
+        return mw.returnJson(False, '从库不能修改权限!')
     args = getArgs()
     data = checkArgs(args, ['name'])
     if not data[0]:
@@ -1740,6 +1752,9 @@ def setDbAccess():
 
 
 def fixDbAccess(version):
+    if isSlaveDb():
+        return mw.returnJson(True, '从库无需修复!')
+
     pdb = pgDb()
     data = pdb.query("select 1")
     isError = isPgError(data)
