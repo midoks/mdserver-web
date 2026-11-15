@@ -1247,7 +1247,7 @@ function addMasterRepSlaveUser(){
             <div class='line'>\
                 <span class='tname'>网段</span>\
                 <div class='info-r'>\
-                    <input class='bt-input-text mr5' type='text' name='address' style='width:330px' value='127.0.0.1/32' />\
+                    <input class='bt-input-text mr5' type='text' name='address' style='width:330px' value='0.0.0.0/0' />\
                 </div>\
             </div>\
             <input type='hidden' name='ps' value='' />\
