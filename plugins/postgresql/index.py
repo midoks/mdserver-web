@@ -1637,10 +1637,6 @@ def addDb():
 
 
 def delDb():
-    if isSlaveDb():
-        return mw.returnJson(False, '从库不能数据库!')
-
-
     args = getArgs()
     data = checkArgs(args, ['id', 'name'])
     if not data[0]:
@@ -1652,26 +1648,30 @@ def delDb():
     pdb = pgDb()
     psdb = pSqliteDb('databases')
 
-    username = psdb.where('id=?', (did,)).getField('username')
-    # print(username, len(username))
-    if len(username) > 0:
-        r = pdb.execute("drop user " + str(username))
+    if not isSlaveDb():
+        username = psdb.where('id=?', (did,)).getField('username')
+        # print(username, len(username))
+        if len(username) > 0:
+            r = pdb.execute("drop user " + str(username))
+            # print(r)
+
+        sql = "SELECT pg_terminate_backend(pg_stat_activity.pid) FROM pg_stat_activity WHERE datname='" + \
+            name + "' AND pid<>pg_backend_pid();"
+
+        r = pdb.execute(sql)
+        # print(r)
+        r = pdb.execute("drop database " + name)
         # print(r)
 
-    sql = "SELECT pg_terminate_backend(pg_stat_activity.pid) FROM pg_stat_activity WHERE datname='" + \
-        name + "' AND pid<>pg_backend_pid();"
-
-    r = pdb.execute(sql)
-    # print(r)
-    r = pdb.execute("drop database " + name)
-    # print(r)
-
-    pg_hba = pgHbaConf()
-    old_config = mw.readFile(pg_hba)
-    new_config = re.sub(r'host\s*{}.*'.format(name), '', old_config).strip()
-    mw.writeFile(pg_hba, new_config)
+        pg_hba = pgHbaConf()
+        old_config = mw.readFile(pg_hba)
+        new_config = re.sub(r'host\s*{}.*'.format(name), '', old_config).strip()
+        mw.writeFile(pg_hba, new_config)
 
     psdb.where("id=?", (did,)).delete()
+    if isSlaveDb():
+        return mw.returnJson(True, '删除本地记录成功!')
+    restart()
     return mw.returnJson(True, '删除成功!')
 
 
@@ -1688,22 +1688,26 @@ def setDbRw(version=''):
     uid = args['id']
     rw = args['rw']
 
-    pdb = pgDb()
-    psdb = pSqliteDb('databases')
-    dbname = psdb.where("id=?", (uid,)).getField('name')
+    if not isSlaveDb():
+        pdb = pgDb()
+        psdb = pSqliteDb('databases')
+        dbname = psdb.where("id=?", (uid,)).getField('name')
 
-    sql = "REVOKE ALL ON database " + dbname + " FROM " + username
-    pdb.query(sql)
+        sql = "REVOKE ALL ON database " + dbname + " FROM " + username
+        pdb.query(sql)
 
-    if rw == 'rw':
-        sql = "GRANT SELECT, INSERT, UPDATE, DELETE ON database " + dbname + " TO " + username
-    elif rw == 'r':
-        sql = "GRANT SELECT ON database " + dbname + " TO " + username
-    else:
-        sql = "GRANT all ON database " + dbname + " TO " + username
+        if rw == 'rw':
+            sql = "GRANT SELECT, INSERT, UPDATE, DELETE ON database " + dbname + " TO " + username
+        elif rw == 'r':
+            sql = "GRANT SELECT ON database " + dbname + " TO " + username
+        else:
+            sql = "GRANT all ON database " + dbname + " TO " + username
 
-    r = pdb.execute(sql)
+        r = pdb.execute(sql)
+
     psdb.where("id=?", (uid,)).setField('rw', rw)
+    if isSlaveDb():
+        return mw.returnJson(True, '本地记录切换成功!')    
     return mw.returnJson(True, '切换成功!')
 
 
