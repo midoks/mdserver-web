@@ -144,7 +144,7 @@ def getHbaAccess(name):
     从 pg_hba.conf 读取数据库或用户为 name 的规则的 ADDRESS, 后写入的优先
     '''
     accept = ''
-    content = mw.readFile(pgHbaConf())
+    content = mw.readFile(pgHbaConf()) or ''
     for line in content.splitlines():
         fields = line.split()
         # TYPE  DATABASE  USER  ADDRESS  METHOD
@@ -273,6 +273,81 @@ def initConfig(version=''):
             mw.writeFile(logfile, '')
 
 
+def readActiveConf(path):
+    '''
+    读取 postgresql.conf 中已生效(非注释)的配置项, 同名以最后一项为准
+    '''
+    conf = {}
+    if not os.path.exists(path):
+        return conf
+    for line in mw.readFile(path).splitlines():
+        line = line.strip()
+        if line == '' or line.startswith('#') or '=' not in line:
+            continue
+        conf[line.split('=', 1)[0].strip()] = line
+    return conf
+
+
+def regenConfig():
+    '''
+    按模板重新生成配置, 已安装的实例在 restart 前同步一次:
+    postgresql.conf 保留当前已生效的配置值
+    pg_hba.conf 追加数据表中已有数据库、复制用户的访问规则
+    '''
+    # postgresql.conf
+    path = getServerDir() + '/data/postgresql.conf'
+    current = readActiveConf(path)
+    tpl = contentReplace(mw.readFile(getPluginDir() + '/conf/postgresql.conf'))
+    tpl_keys = set(re.findall(r'^\s*#?\s*([\w.]+)\s*=', tpl, re.M))
+
+    lines = []
+    used = set()
+    for line in tpl.splitlines():
+        match = re.match(r'^\s*#?\s*([\w.]+)\s*=', line)
+        key = match.group(1) if match else ''
+        if key == '' or key not in current or key in used:
+            lines.append(line)
+            continue
+        # 用当前生效值覆盖模板中的默认值/注释项
+        lines.append(current[key])
+        used.add(key)
+
+    for key in current:
+        if key not in tpl_keys and key not in used:
+            lines.append(current[key])
+    mw.writeFile(path, "\n".join(lines) + "\n")
+
+    # pg_hba.conf
+    pg_accept = getHbaAccess('postgres')
+    lines = []
+    for line in mw.readFile(getPluginDir() + '/conf/pg_hba.conf').splitlines():
+        fields = line.split()
+        # 管理员规则单独处理, 从当前配置中取值后统一追加
+        if len(fields) >= 5 and fields[0] == 'host' and 'postgres' in (fields[1], fields[2]):
+            continue
+        lines.append(line)
+
+    rules = []
+    for item in pSqliteDb('databases').field('name,username,accept').select():
+        if item['accept']:
+            rules.append(hbaRule('host', item['name'], item['username'],
+                                 item['accept'], 'scram-sha-256'))
+
+    for item in pSqliteDb('master_replication_user').field('username,accept').select():
+        if item['accept']:
+            rules.append(hbaRule('host', 'replication', item['username'],
+                                 item['accept'], 'scram-sha-256'))
+
+    if pg_accept == '':
+        pg_accept = '127.0.0.1/32'
+    rules.append(hbaRule('host', 'postgres', 'postgres', pg_accept, 'scram-sha-256'))
+
+    lines.append('')
+    lines.extend(rules)
+    mw.writeFile(pgHbaConf(), "\n".join(lines) + "\n")
+    return True
+
+
 def isSlaveDb():
     standby = getDataDir()+"/standby.signal"
     if os.path.exists(standby):
@@ -389,6 +464,9 @@ def pgOp(version, method):
     try:
         isInited = initPgData()
         initConfig(version)
+        # start/restart 前按模板同步配置, reload 不做, 避免覆盖刚写入的参数
+        if method in ('restart'):
+            regenConfig()
         if not isInited:
             if mw.isAppleSystem():
                 cmd_init_start = init_file + ' start'
