@@ -129,6 +129,16 @@ def pgHbaConf():
     return getServerDir() + "/data/pg_hba.conf"
 
 
+def hbaRule(conn_type, database, user, address, method):
+    '''
+    按 conf/pg_hba.conf 的列宽(8/16/16/24)输出一条认证规则, 便于观察
+    '''
+    if address == '':
+        return "{:<8}{:<16}{:<40}{}".format(conn_type, database, user, method)
+    return "{:<8}{:<16}{:<16}{:<24}{}".format(
+        conn_type, database, user, address, method)
+
+
 def readConfigTpl():
     args = getArgs()
     data = checkArgs(args, ['file'])
@@ -954,9 +964,9 @@ def openPgTrust():
     if not os.path.exists(backup):
         mw.writeFile(backup, content)
 
-    trust = "local   all             all                                     trust\n" \
-            "host    all             all             127.0.0.1/32            trust\n" \
-            "host    all             all             ::1/128                 trust\n"
+    trust = hbaRule('local', 'all', 'all', '', 'trust') + "\n" \
+            + hbaRule('host', 'all', 'all', '127.0.0.1/32', 'trust') + "\n" \
+            + hbaRule('host', 'all', 'all', '::1/128', 'trust') + "\n"
     mw.writeFile(hba, trust + content)
     reload()
     return True
@@ -1501,11 +1511,9 @@ def addDb():
     pdb.setDatabase(dbname)
     pdb.execute("GRANT ALL ON SCHEMA public TO {}".format(dbuser,))
 
-    pg_hba = getServerDir() + "/data/pg_hba.conf"
-
+    pg_hba = pgHbaConf()
     content = mw.readFile(pg_hba)
-    content += "\nhost    {}  {}    {}    scram-sha-256".format(
-        dbname, dbuser, listen_ip)
+    content += "\n" + hbaRule('host', dbname, dbuser, listen_ip, 'scram-sha-256')
     mw.writeFile(pg_hba, content)
 
     addTime = time.strftime('%Y-%m-%d %X', time.localtime())
@@ -1606,8 +1614,7 @@ def setDbAccess():
     data = mw.readFile(conf)
     new_data = re.sub(r'host\s*{}.*'.format(name), '', data).strip()
 
-    new_data += "\nhost    {}  {}    {}    scram-sha-256".format(
-        name, name, access)
+    new_data += "\n" + hbaRule('host', name, name, access, 'scram-sha-256')
     mw.writeFile(conf, new_data)
 
     psdb.where("name=?", (name,)).setField('accept', access)
@@ -2286,7 +2293,7 @@ def addMasterRepSlaveUser(version=''):
     pg_conf = pgHbaConf()
     data = mw.readFile(pg_conf)
 
-    data = data + "\nhost   replication  " + username + "   " + address + "     scram-sha-256"
+    data = data + "\n" + hbaRule('host', 'replication', username, address, 'scram-sha-256')
 
     mw.writeFile(pg_conf, data)
 
