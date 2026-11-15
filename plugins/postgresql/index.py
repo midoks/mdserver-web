@@ -509,7 +509,7 @@ def setPgPort():
     rep = r"port\s*=\s*([0-9]+)\s*\n"
     content = re.sub(rep, 'port = ' + port + '\n', content)
     mw.writeFile(file, content)
-    restart()
+    reload()
     return mw.returnJson(True, '编辑成功!')
 
 
@@ -925,7 +925,7 @@ def pgSetDbStatus():
         sedConf(name, args[name].strip())
 
     if status() == 'start':
-        restart()
+        reload()
         return mw.returnJson(True, '设置成功，数据库已重启!')
     return mw.returnJson(True, '设置成功，将在数据库下次启动时生效!')
 
@@ -1069,7 +1069,7 @@ def setRootPwdForce(new_password, version=''):
     finally:
         # 无论成败都恢复本地认证, 避免数据库长期处于免密状态
         closePgTrust()
-        appCMD(version, 'restart')
+        appCMD(version, 'reload')
 
     if not changed:
         return False
@@ -1555,7 +1555,7 @@ def addDb():
     psdb.add('pid,name,username,password,accept,ps,addtime',
              (0, dbname, dbuser, password, listen_ip, dbname, addTime))
 
-    restart()
+    reload()
     return mw.returnJson(True, '添加成功!')
 
 
@@ -1988,7 +1988,7 @@ def setMasterStatus(version=''):
             data = data.replace(field, '#'+field)
 
     mw.writeFile(pg_conf, data)
-    restart(version)
+    reload(version)
     return mw.returnJson(True, '设置成功')
 
 def openSlaveConf(version):
@@ -2016,7 +2016,7 @@ def setSlaveStatus(version):
             data = data.replace(field, '#'+field)
     mw.writeFile(pg_conf, data)
 
-    restart(version)
+    reload(version)
     return mw.returnJson(True, '设置成功')
 
 def getSlaveList(version=''):
