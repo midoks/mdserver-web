@@ -1663,10 +1663,10 @@ def delDb():
         r = pdb.execute("drop database " + name)
         # print(r)
 
-        pg_hba = pgHbaConf()
-        old_config = mw.readFile(pg_hba)
-        new_config = re.sub(r'host\s*{}.*'.format(name), '', old_config).strip()
-        mw.writeFile(pg_hba, new_config)
+    pg_hba = pgHbaConf()
+    old_config = mw.readFile(pg_hba)
+    new_config = re.sub(r'host\s*{}.*'.format(name), '', old_config).strip()
+    mw.writeFile(pg_hba, new_config)
 
     psdb.where("id=?", (did,)).delete()
     if isSlaveDb():
