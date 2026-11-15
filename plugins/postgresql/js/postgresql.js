@@ -135,18 +135,86 @@ function runInfo(){
         var cacheHit = blocksTotal > 0 ? (blocksHit / blocksTotal * 100).toFixed(2) + '%' : '-';
         var tempBytes = numberValue(rdata.temp_bytes);
 
+        function formatReplicationStatus(value) {
+            var status = displayValue(value);
+            var names = {
+                'streaming': '流复制中',
+                'catchup': '追赶中',
+                'backup': '备份中',
+                'stopping': '已停止',
+                'startup': '启动中'
+            };
+            return names[status] || status;
+        }
+
+        function formatSyncState(value) {
+            var names = {
+                'sync': '同步',
+                'async': '异步',
+                'potential': '潜在同步',
+                'quorum': '仲裁同步'
+            };
+            return names[value] || displayValue(value);
+        }
+
+        function formatDelay(value) {
+            if (value === undefined || value === null || value === '') return '-';
+            return formatDuration(value);
+        }
+
+        var replication = rdata.replication || {};
+        var role = replication.role || 'unknown';
+        var roleHtml = '<span class="label label-default">未知</span>';
+        if (role === 'primary') roleHtml = '<span class="label label-success">主库</span>';
+        if (role === 'standby') roleHtml = '<span class="label label-info">从库</span>';
+
+        var replicationSummaryLabel = role === 'primary' ? '从库连接' : '复制状态';
+        var replicationSummary = role === 'primary' ?
+            formatCount(replication.replica_count || 0) + ' 个' :
+            formatReplicationStatus(replication.status);
+        var replicas = replication.replicas || [];
+        var replicationCon = '';
+
+        if (role === 'primary' && replicas.length > 0) {
+            replicationCon = '<div style="font-weight:bold;margin:10px 0 6px">从库复制</div>\
+                <table class="table table-hover table-bordered" style="margin-bottom:10px">\
+                <thead><tr><th>从库</th><th>地址</th><th>状态</th><th>同步模式</th><th>发送/回放位置</th><th>延迟</th></tr></thead>\
+                <tbody>';
+            for (var i = 0; i < replicas.length; i++) {
+                var replica = replicas[i];
+                replicationCon += '<tr><td>' + displayValue(replica.name) + '</td><td>' + displayValue(replica.address) + '</td>\
+                    <td>' + formatReplicationStatus(replica.state) + '</td><td>' + formatSyncState(replica.sync_state) + '</td>\
+                    <td>' + displayValue(replica.sent_lsn) + '<br>' + displayValue(replica.replay_lsn) + '</td>\
+                    <td>' + formatDelay(replica.replay_lag) + '</td></tr>';
+            }
+            replicationCon += '</tbody></table>';
+        }
+
+        if (role === 'standby') {
+            var sender = displayValue(replication.sender_host);
+            if (replication.sender_port && replication.sender_port !== '-') {
+                sender += ':' + replication.sender_port;
+            }
+            replicationCon = '<div style="font-weight:bold;margin:10px 0 6px">主库复制</div>\
+                <table class="table table-hover table-bordered" style="margin-bottom:10px"><tbody>\
+                <tr><th>主库地址</th><td>' + sender + '</td><th>复制槽</th><td>' + displayValue(replication.slot_name) + '</td></tr>\
+                <tr><th>接收状态</th><td>' + formatReplicationStatus(replication.status) + '</td><th>回放延迟</th><td>' + formatDelay(replication.replay_lag) + '</td></tr>\
+                <tr><th>接收位置</th><td>' + displayValue(replication.receive_lsn) + '</td><th>回放位置</th><td>' + displayValue(replication.replay_lsn) + '</td></tr>\
+                </tbody></table>';
+        }
+
         var con = '<div class="divtable">\
                     <div style="font-weight:bold;margin-bottom:6px">运行概览</div>\
                     <table class="table table-hover table-bordered" style="margin-bottom:10px;background-color:#fafafa">\
                     <tbody>\
+                        <tr><th>数据库角色</th><td>' + roleHtml + '</td><th>' + replicationSummaryLabel + '</th><td>' + replicationSummary + '</td></tr>\
                         <tr><th>启动时间</th><td>' + displayValue(rdata.run_time) + '</td><th>运行时长</th><td>' + formatDuration(uptime) + '</td></tr>\
                         <tr><th>当前/活动连接</th><td>' + formatCount(rdata.connections) + ' / ' + formatCount(rdata.threads_running) + '</td><th>最大连接数</th><td>' + formatCount(rdata.max_connections) + '</td></tr>\
                         <tr><th>数据库总大小</th><td>' + displayValue(rdata.pg_size) + '</td><th>主进程内存</th><td>' + displayValue(rdata.pg_mem) + '</td></tr>\
                         <tr><th>进程数</th><td>' + formatCount(rdata.progress_num) + '</td><th>PID</th><td>' + displayValue(rdata.pid) + '</td></tr>\
                         <tr><th>WAL文件</th><td>' + displayValue(rdata.file) + '</td><th>WAL位置</th><td>' + displayValue(rdata.position) + '</td></tr>\
                     </tbody>\
-                    </table>\
-                    <div style="font-weight:bold;margin:10px 0 6px">累计统计</div>\
+                    </table>' + replicationCon + '<div style="font-weight:bold;margin:10px 0 6px">累计统计</div>\
                     <table class="table table-hover table-bordered">\
                     <tbody>\
                         <tr><th>平均TPS</th><td>' + tps + '</td><th>缓存命中率</th><td>' + cacheHit + '</td></tr>\
