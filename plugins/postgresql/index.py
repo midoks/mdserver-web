@@ -2386,6 +2386,7 @@ interact
         flags=re.MULTILINE
     )
     # print(content)
+    content = content.replace('wal_level', '#wal_level')
     mw.writeFile(pg_conf, content)
 
     start(version)
