@@ -1685,14 +1685,13 @@ def setDbRw(version=''):
     uid = args['id']
     rw = args['rw']
 
+    pdb = pgDb()
+    psdb = pSqliteDb('databases')
     if not isSlaveDb():
-        pdb = pgDb()
-        psdb = pSqliteDb('databases')
         dbname = psdb.where("id=?", (uid,)).getField('name')
 
         sql = "REVOKE ALL ON database " + dbname + " FROM " + username
         pdb.query(sql)
-
         if rw == 'rw':
             sql = "GRANT SELECT, INSERT, UPDATE, DELETE ON database " + dbname + " TO " + username
         elif rw == 'r':
@@ -1704,7 +1703,7 @@ def setDbRw(version=''):
 
     psdb.where("id=?", (uid,)).setField('rw', rw)
     if isSlaveDb():
-        return mw.returnJson(True, '本地记录切换成功!')    
+        return mw.returnJson(True, '本地记录切换成功!')
     return mw.returnJson(True, '切换成功!')
 
 
