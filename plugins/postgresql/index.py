@@ -325,7 +325,6 @@ def regenConfig():
 
     rules = []
     rules.append(hbaRule('host', 'postgres', 'postgres', pg_accept, 'scram-sha-256'))
-
     for item in pSqliteDb('databases').field('name,username,accept').select():
         if item['accept']:
             rules.append(hbaRule('host', item['name'], item['username'],
