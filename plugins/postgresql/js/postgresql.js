@@ -414,7 +414,7 @@ function setRootPwd(type, pwd){
                 </form>",
         yes:function(layerIndex){
             var password = $("#MyPassword").val();
-            myPost('set_root_pwd', {password:password}, function(data){
+            myPost('set_postgres_pwd', {password:password}, function(data){
                 var rdata = $.parseJSON(data.data);
                 showMsg(rdata.msg,function(){
                     layer.close(layerIndex);
@@ -433,7 +433,7 @@ function setRootPwd(type, pwd){
             }, function(index, layero){
                 layer.close(index);
                 var password = $("#MyPassword").val();
-                myPost('set_root_pwd', {password:password,force:'1'}, function(data){
+                myPost('set_postgres_pwd', {password:password,force:'1'}, function(data){
                     var rdata = $.parseJSON(data.data);
                     showMsg(rdata.msg,function(){
                         layer.close(layerIndex);
@@ -444,12 +444,12 @@ function setRootPwd(type, pwd){
             return false;
         },
         btn5:function(layerIndex){
-            layer.confirm('强制修改MySQL密码,确定强制? (比较耗时)', {
+            layer.confirm('强制修改PostgreSQL密码,确定强制? (比较耗时)', {
                 btn: ['确定', '取消']
             }, function(index, layero){
                 layer.close(index);
                 var password = $("#MyPassword").val();
-                myPost('set_root_pwd', {password:password,force:'2'}, function(data){
+                myPost('set_postgres_pwd', {password:password,force:'2'}, function(data){
                     var rdata = $.parseJSON(data.data);
                     showMsg(rdata.msg,function(){
                         layer.close(layerIndex);
