@@ -139,6 +139,41 @@ def hbaRule(conn_type, database, user, address, method):
         conn_type, database, user, address, method)
 
 
+def getHbaAccess(name):
+    '''
+    从 pg_hba.conf 读取数据库或用户为 name 的规则的 ADDRESS, 后写入的优先
+    '''
+    accept = ''
+    content = mw.readFile(pgHbaConf())
+    for line in content.splitlines():
+        fields = line.split()
+        # TYPE  DATABASE  USER  ADDRESS  METHOD
+        if len(fields) < 5 or fields[0] != 'host':
+            continue
+        if name not in (fields[1], fields[2]):
+            continue
+        accept = fields[3]
+    return accept
+
+
+def setHbaAccess(name, access, user=''):
+    '''
+    删除数据库或用户为 name 的规则后写入新规则, 仅修改 pg_hba.conf
+    '''
+    lines = []
+    for line in mw.readFile(pgHbaConf()).splitlines():
+        fields = line.split()
+        if len(fields) >= 5 and fields[0] == 'host' and name in (fields[1], fields[2]):
+            continue
+        lines.append(line)
+
+    if user == '':
+        user = name
+    data = "\n".join(lines).strip()
+    data += "\n" + hbaRule('host', name, user, access, 'scram-sha-256')
+    mw.writeFile(pgHbaConf(), data)
+
+
 def readConfigTpl():
     args = getArgs()
     data = checkArgs(args, ['file'])
@@ -1594,6 +1629,11 @@ def getDbAccess():
     if not data[0]:
         return data[1]
     name = args['name']
+
+    # postgres 为内置库, 不在数据表记录, 直接读配置文件
+    if name == 'postgres':
+        return mw.returnJson(True, getHbaAccess(name))
+
     psdb = pSqliteDb('databases')
     accept = psdb.where("name=?", (name,)).getField('accept')
     return mw.returnJson(True, accept)
@@ -1608,6 +1648,12 @@ def setDbAccess():
     name = args['name']
     access = args['access']
 
+    # postgres 为内置库, 不在数据表记录, 只改配置文件
+    if name == 'postgres':
+        setHbaAccess(name, access)
+        reload()
+        return mw.returnJson(True, "设置成功")
+
     psdb = pSqliteDb('databases')
 
     conf = pgHbaConf()
@@ -1618,6 +1664,7 @@ def setDbAccess():
     mw.writeFile(conf, new_data)
 
     psdb.where("name=?", (name,)).setField('accept', access)
+    reload()
     return mw.returnJson(True, "设置成功")
 
 
