@@ -473,49 +473,97 @@ def runInfo():
         return mw.returnJson(False, 'PG未启动', [])
 
     db = pgDb()
-    data_dir = getServerDir() + "/data"
-    port = getPgPort()
-    result = {}
+    try:
+        data = db.query("""
+            SELECT
+                extract(epoch FROM pg_postmaster_start_time())::bigint,
+                extract(epoch FROM now() - pg_postmaster_start_time())::bigint,
+                (SELECT count(*) FROM pg_stat_activity
+                 WHERE backend_type = 'client backend' AND pid <> pg_backend_pid()),
+                (SELECT count(*) FROM pg_stat_activity
+                 WHERE backend_type = 'client backend' AND state = 'active'
+                   AND pid <> pg_backend_pid()),
+                (SELECT setting::int FROM pg_settings WHERE name = 'max_connections'),
+                (SELECT count(*) FROM pg_stat_activity),
+                coalesce(sum(xact_commit), 0)::bigint,
+                coalesce(sum(xact_rollback), 0)::bigint,
+                coalesce(sum(tup_returned), 0)::bigint,
+                coalesce(sum(tup_fetched), 0)::bigint,
+                coalesce(sum(tup_inserted), 0)::bigint,
+                coalesce(sum(tup_updated), 0)::bigint,
+                coalesce(sum(tup_deleted), 0)::bigint,
+                coalesce(sum(blks_read), 0)::bigint,
+                coalesce(sum(blks_hit), 0)::bigint,
+                coalesce(sum(temp_files), 0)::bigint,
+                coalesce(sum(temp_bytes), 0)::bigint,
+                coalesce(sum(deadlocks), 0)::bigint,
+                coalesce(sum(conflicts), 0)::bigint,
+                (SELECT pg_size_pretty(sum(pg_database_size(datname))::bigint)
+                 FROM pg_database WHERE datallowconn AND NOT datistemplate)
+            FROM pg_stat_database
+        """)
+    except Exception as e:
+        data = e
+    if isinstance(data, Exception):
+        return mw.returnJson(False, str(data), [])
+    if not data:
+        return mw.returnJson(False, '获取PG运行状态失败', [])
 
-    result['uptime'] = mw.execShell(
-        '''cat {}/postmaster.pid |sed -n 3p '''.format(data_dir))[0]
-    timestamp = result['uptime']
-    time_local = time.localtime(int(timestamp))
-    dt = time.strftime("%Y-%m-%d %H:%M:%S", time_local)
-    result['uptime'] = dt
+    row = data[0]
+    result = {
+        'run': row[0],
+        'run_time': time.strftime("%Y-%m-%d %H:%M:%S", time.localtime(row[0])),
+        'uptime': row[1],
+        'connections': row[2],
+        'threads_running': row[3],
+        'max_connections': row[4],
+        'progress_num': row[5],
+        'com_commit': row[6],
+        'com_rollback': row[7],
+        'tup_returned': row[8],
+        'tup_fetched': row[9],
+        'tup_inserted': row[10],
+        'tup_updated': row[11],
+        'tup_deleted': row[12],
+        'blks_read': row[13],
+        'blks_hit': row[14],
+        'temp_files': row[15],
+        'temp_bytes': row[16],
+        'deadlocks': row[17],
+        'conflicts': row[18],
+        'pg_size': row[19],
+        'file': 'OFF',
+        'position': 'OFF',
+        'pid': '-',
+        'pg_mem': '-',
+    }
 
-    result['progress_num'] = mw.execShell(
-        "ps -ef |grep postgres |wc -l")[0].strip()
-    result['pid'] = mw.execShell(
-        '''cat {}/postmaster.pid |sed -n 1p '''.format(data_dir))[0].strip()
-    res = db.query("select count(*) from pg_stat_activity where not pid=pg_backend_pid()")
+    try:
+        wal = db.query("""
+            SELECT coalesce(pg_walfile_name(lsn), 'OFF'), coalesce(lsn::text, 'OFF')
+            FROM (
+                SELECT CASE WHEN pg_is_in_recovery()
+                            THEN pg_last_wal_replay_lsn()
+                            ELSE pg_current_wal_lsn()
+                       END AS lsn
+            ) AS wal
+        """)
+        if not isinstance(wal, Exception) and wal:
+            result['file'] = wal[0][0]
+            result['position'] = wal[0][1]
+    except Exception:
+        pass
 
-    # print(res)
-    result['connections'] = res[0][0]
-
-    res = db.query("select pg_size_pretty(pg_database_size('postgres'))")
-    result['pg_size'] = res[0][0]
-    result['pg_mem'] = mw.execShell(
-        '''cat /proc/%s/status|grep VmRSS|awk -F: '{print $2}' ''' % (result['pid']))[0]
-
-    result['pg_vm_lock'] = mw.execShell(
-        '''cat /proc/%s/status|grep VmLck|awk -F: '{print $2}'  ''' % (result['pid'].strip()))[0]
-    result['pg_vm_high'] = mw.execShell(
-        '''cat /proc/%s/status|grep VmHWM|awk -F: '{print $2}'  ''' % (result['pid'].strip()))[0]
-    result['pg_vm_data_size'] = mw.execShell(
-        '''cat /proc/%s/status|grep VmData|awk -F: '{print $2}'  ''' % (result['pid'].strip()))[0]
-    result['pg_vm_sk_size'] = mw.execShell(
-        '''cat /proc/%s/status|grep VmStk|awk -F: '{print $2}'  ''' % (result['pid'].strip()))[0]
-    result['pg_vm_code_size'] = mw.execShell(
-        '''cat /proc/%s/status|grep VmExe|awk -F: '{print $2}'  ''' % (result['pid'].strip()))[0]
-    result['pg_vm_lib_size'] = mw.execShell(
-        '''cat /proc/%s/status|grep VmLib|awk -F: '{print $2}'  ''' % (result['pid'].strip()))[0]
-    result['pg_vm_swap_size'] = mw.execShell(
-        '''cat /proc/%s/status|grep VmSwap|awk -F: '{print $2}'  ''' % (result['pid'].strip()))[0]
-    result['pg_vm_page_size'] = mw.execShell(
-        '''cat /proc/%s/status|grep VmPTE|awk -F: '{print $2}'  ''' % (result['pid'].strip()))[0]
-    result['pg_sigq'] = mw.execShell(
-        '''cat /proc/%s/status|grep SigQ|awk -F: '{print $2}'  ''' % (result['pid'].strip()))[0]
+    pid_content = mw.readFile(getDataDir() + '/postmaster.pid')
+    pid_lines = pid_content.splitlines() if pid_content else []
+    if pid_lines:
+        pid = pid_lines[0].strip()
+        result['pid'] = pid
+        process_status = mw.readFile('/proc/{}/status'.format(pid))
+        if process_status:
+            vm_rss = re.search(r'^VmRSS:\s*(.+?)\s*$', process_status, re.M)
+            if vm_rss:
+                result['pg_mem'] = vm_rss.group(1)
 
     return mw.getJson(result)
 

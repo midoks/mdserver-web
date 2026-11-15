@@ -99,27 +99,62 @@ function runInfo(){
             return;
         }
 
-        var con = '<div class="divtable"><table class="table table-hover table-bordered" style="margin-bottom:10px;background-color:#fafafa">\
+        function numberValue(value) {
+            var number = Number(value);
+            return isFinite(number) ? number : 0;
+        }
+
+        function displayValue(value) {
+            return value === undefined || value === null || value === '' ? '-' : value;
+        }
+
+        function formatCount(value) {
+            if (value === undefined || value === null || value === '') return '-';
+            return numberValue(value).toLocaleString();
+        }
+
+        function formatDuration(value) {
+            var seconds = Math.floor(numberValue(value));
+            var days = Math.floor(seconds / 86400);
+            var hours = Math.floor(seconds % 86400 / 3600);
+            var minutes = Math.floor(seconds % 3600 / 60);
+            var remainingSeconds = seconds % 60;
+            if (days > 0) return days + '天 ' + hours + '小时';
+            if (hours > 0) return hours + '小时 ' + minutes + '分钟';
+            if (minutes > 0) return minutes + '分钟 ' + remainingSeconds + '秒';
+            return remainingSeconds + '秒';
+        }
+
+        var uptime = numberValue(rdata.uptime);
+        var commits = numberValue(rdata.com_commit);
+        var rollbacks = numberValue(rdata.com_rollback);
+        var tps = uptime > 0 ? ((commits + rollbacks) / uptime).toFixed(2) : '0.00';
+        var blocksRead = numberValue(rdata.blks_read);
+        var blocksHit = numberValue(rdata.blks_hit);
+        var blocksTotal = blocksRead + blocksHit;
+        var cacheHit = blocksTotal > 0 ? (blocksHit / blocksTotal * 100).toFixed(2) + '%' : '-';
+        var tempBytes = numberValue(rdata.temp_bytes);
+
+        var con = '<div class="divtable">\
+                    <div style="font-weight:bold;margin-bottom:6px">运行概览</div>\
+                    <table class="table table-hover table-bordered" style="margin-bottom:10px;background-color:#fafafa">\
                     <tbody>\
-                        <tr><th>启动时间</th><td>' + rdata.uptime + '</td><th>进程数</th><td>' +rdata.progress_num+ '</td></tr>\
-                        <tr><th>总连接次数</th><td>' + rdata.connections + '</td><th>PID</th><td>' +rdata.pid+ '</td></tr>\
-                        <tr><th>占用空间</th><td>' + rdata.pg_size + '</td><th>占用内存</th><td>' +rdata.pg_mem+ '</td></tr>\
+                        <tr><th>启动时间</th><td>' + displayValue(rdata.run_time) + '</td><th>运行时长</th><td>' + formatDuration(uptime) + '</td></tr>\
+                        <tr><th>当前/活动连接</th><td>' + formatCount(rdata.connections) + ' / ' + formatCount(rdata.threads_running) + '</td><th>最大连接数</th><td>' + formatCount(rdata.max_connections) + '</td></tr>\
+                        <tr><th>数据库总大小</th><td>' + displayValue(rdata.pg_size) + '</td><th>主进程内存</th><td>' + displayValue(rdata.pg_mem) + '</td></tr>\
+                        <tr><th>进程数</th><td>' + formatCount(rdata.progress_num) + '</td><th>PID</th><td>' + displayValue(rdata.pid) + '</td></tr>\
+                        <tr><th>WAL文件</th><td>' + displayValue(rdata.file) + '</td><th>WAL位置</th><td>' + displayValue(rdata.position) + '</td></tr>\
                     </tbody>\
                     </table>\
+                    <div style="font-weight:bold;margin:10px 0 6px">累计统计</div>\
                     <table class="table table-hover table-bordered">\
-                    <thead style="display:none;"><th></th><th></th><th></th><th></th></thead>\
                     <tbody>\
-                        <tr><th>表进程已经锁住的物理内存的大小</th><td>' + rdata.pg_vm_lock + '</td></tr>\
-                        <tr><th>数据库分配到物理内存的峰值</th><td>' + rdata.pg_vm_high + '</td></tr>\
-                        <tr><th>进程数据段的大小</th><td>' + rdata.pg_vm_data_size + '</td></tr>\
-                        <tr><th>进程堆栈段的大小</th><td>' + rdata.pg_vm_sk_size + '</td></tr>\
-                        <tr><th>进程代码的大小</th><td>' + rdata.pg_vm_code_size + '</td></tr>\
-                        <tr><th>进程所使用LIB库的大小</th><td>' + rdata.pg_vm_lib_size + '</td></tr>\
-                        <tr><th>进程占用Swap的大小</th><td>' + rdata.pg_vm_swap_size + '</td></tr>\
-                        <tr><th>占用的页表的大小</th><td>' + rdata.pg_vm_page_size + '</td></tr>\
-                        <tr><th>当前待处理信号的个数</th><td>' + rdata.pg_sigq + '</td></tr>\
-                    <tbody>\
-            </table></div>';
+                        <tr><th>平均TPS</th><td>' + tps + '</td><th>缓存命中率</th><td>' + cacheHit + '</td></tr>\
+                        <tr><th>提交/回滚事务</th><td>' + formatCount(commits) + ' / ' + formatCount(rollbacks) + '</td><th>死锁/恢复冲突</th><td>' + formatCount(rdata.deadlocks) + ' / ' + formatCount(rdata.conflicts) + '</td></tr>\
+                        <tr><th>返回/提取行数</th><td>' + formatCount(rdata.tup_returned) + ' / ' + formatCount(rdata.tup_fetched) + '</td><th>插入/更新/删除行数</th><td>' + formatCount(rdata.tup_inserted) + ' / ' + formatCount(rdata.tup_updated) + ' / ' + formatCount(rdata.tup_deleted) + '</td></tr>\
+                        <tr><th>临时文件数</th><td>' + formatCount(rdata.temp_files) + '</td><th>临时文件大小</th><td>' + toSize(tempBytes) + '</td></tr>\
+                    </tbody>\
+                    </table></div>';
         $(".soft-man-con").html(con);
     });
 }
@@ -942,6 +977,8 @@ function dbList(page, search){
         var con = '<div class="safe bgw">\
             <button onclick="addDatabase()" title="添加数据库" class="btn btn-success btn-sm" type="button" style="margin-right: 5px;">添加数据库</button>\
             <button onclick="setRootPwd(0,\''+rdata.info['root_pwd']+'\')" title="管理员密码" class="btn btn-default btn-sm" type="button" style="margin-right: 5px;">PG密码</button>\
+            <button onclick="setDbAccess(\'progress\')" title="ROOT权限" class="btn btn-default btn-sm" type="button" style="margin-right: 5px;">ROOT权限</button>\
+            <button onclick="fixDbAccess(\'progress\')" title="修复" class="btn btn-default btn-sm" type="button" style="margin-right: 5px;">修复</button>\
             <span style="float:right">              \
                 <button batch="true" style="float: right;display: none;margin-left:10px;" onclick="delDbBatch();" title="删除选中项" class="btn btn-default btn-sm">删除选中</button>\
             </span>\
