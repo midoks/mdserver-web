@@ -405,6 +405,22 @@ def status(version=''):
 def pgCmd(cmd):
     return "su - postgres -c \"" + cmd + "\""
 
+
+def _psqlBase(psql_path, database, port, pg_pwd=None):
+    """
+    构造带认证参数的 psql 基础命令 (不包含重定向/管道).
+    pg_hba.conf 全是 scram-sha-256, 必须带 PGPASSWORD + -h /tmp + -U postgres.
+    用 bash -c 包一层, 避免 zsh 内置命令吞 PGPASSWORD, 也避免 su - postgres 清环境变量.
+    """
+    if pg_pwd is None:
+        pg_pwd = pSqliteDb('config').where('id=?', (1,)).getField('pg_root') or ''
+    safe_pwd = pg_pwd.replace("'", "'\\''")
+    socket_dir = '/tmp'
+    # psql 常用选项: -q 安静模式, --no-password 立即失败不挂起
+    inner = "{} -U postgres -h {} -d {} -p {} -q --no-password".format(
+        psql_path, socket_dir, database, port)
+    return "bash -c \"PGPASSWORD='{}' {}\"".format(safe_pwd, inner)
+
 def execShellPg(cmd):
     return mw.execShell(pgCmd(cmd))
 
@@ -1252,11 +1268,8 @@ def importDbExternal():
         psql = 'psql'
     port = getPgPort()
 
-    psql_cmd = '{} -U postgres -d {} -p {}'.format(psql, name, port)
-    if not mw.isAppleSystem():
-        psql_cmd = 'su - postgres -c "{}"'.format(psql_cmd)
-
-    cmd = '{} < "{}"'.format(psql_cmd, import_sql)
+    # 统一用 _psqlBase 构造带 PGPASSWORD + Unix socket 的命令, macOS/Linux 不分
+    cmd = '{} < "{}"'.format(_psqlBase(psql, name, port), import_sql)
     rdata = mw.execShell(cmd)
 
     if ext != 'sql' and os.path.exists(import_sql):
@@ -1341,11 +1354,8 @@ def importDbExternalProgressBar():
         psql = 'psql'
     port = getPgPort()
 
-    psql_cmd = '{} -U postgres -d {} -p {}'.format(psql, name, port)
-    if not mw.isAppleSystem():
-        psql_cmd = 'su - postgres -c "{}"'.format(psql_cmd)
-
-    cmd = 'pv -t -p "{}" | {}'.format(import_sql, psql_cmd)
+    # 统一用 _psqlBase, macOS/Linux 不分; bash -c 会继承父进程管道 stdin 给 psql
+    cmd = 'pv -t -p "{}" | {}'.format(import_sql, _psqlBase(psql, name, port))
     print(cmd)
     os.system(cmd)
 
@@ -1397,10 +1407,9 @@ def importDbBackupProgressBar():
     if not os.path.exists(psql):
         psql = 'psql'
 
-    cmd = 'pv -t -p {} | su - postgres -c "{} -d {} -p {}"'.format(file_path_sql, psql, name, port)
-    if mw.isAppleSystem():
-        cmd = 'pv -t -p {} | {} -d {} -p {}'.format(file_path_sql, psql, name, port)
-       
+    # 统一用 _psqlBase, macOS 原分支连 -U postgres 都没带才会出现 "Password for user midoks:"
+    cmd = 'pv -t -p {} | {}'.format(file_path_sql, _psqlBase(psql, name, port))
+
     print(cmd)
     os.system(cmd)
 
@@ -2045,12 +2054,8 @@ def importDbBackup():
     if not os.path.exists(psql):
         psql = 'psql'
 
-    if mw.isAppleSystem():
-        cmd = '''gunzip -c "{}" | {} -U postgres -d {} -p {}'''.format(
-            file_path, psql, name, port)
-    else:
-        cmd = '''gunzip -c "{}" | su - postgres -c "{} -U postgres -d {} -p {}"'''.format(
-            file_path, psql, name, port)
+    # 统一用 _psqlBase, 不再分 macOS/Linux
+    cmd = '''gunzip -c "{}" | {}'''.format(file_path, _psqlBase(psql, name, port))
 
     # print(cmd)
 
