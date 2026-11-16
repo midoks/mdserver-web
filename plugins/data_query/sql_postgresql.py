@@ -266,25 +266,6 @@ class PgClient:
             self.conn = None
 
 
-def openClient(args, database='postgres'):
-    client = PgClient(database)
-    if client.connect():
-        return client, None
-
-    detail = (client.error or '').strip()
-    if client.status == 'not_installed':
-        msg = 'PostgreSQL 未安装'
-    elif client.status == 'not_running':
-        msg = 'PostgreSQL 未启动' + ('：' + detail if detail else '')
-    elif client.status == 'db_not_found':
-        msg = '数据库不存在' + ('：' + detail if detail else '')
-    elif client.status == 'auth_error':
-        msg = '连接失败，请检查数据库认证配置' + ('：' + detail if detail else '')
-    else:
-        msg = detail or '连接失败'
-    return None, mw.returnData(False, msg)
-
-
 # 服务器列表
 def get_server_list(args):
     data = []
