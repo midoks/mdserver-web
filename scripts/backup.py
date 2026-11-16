@@ -123,7 +123,7 @@ class backupTools:
         return total
 
     def getDbBackupList(self,dbname=''):
-        bkDir = mw.getFatherDir() + '/backup/database'
+        bkDir = mw.getFatherDir() + '/backup/database/mysql'
         if not os.path.isdir(bkDir):
             return []
         blist = os.listdir(bkDir)
