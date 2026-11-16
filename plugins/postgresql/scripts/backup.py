@@ -39,7 +39,7 @@ import core.db as db
 '''
 DEBUG:
 python3 plugins/postgresql/scripts/backup.py database admin 3
-python3 plugins/postgresql/scripts/backup.py database ALL 3
+python3 plugins/postgresql/scripts/backup.py database ALL@ 3
 '''
 
 
@@ -131,6 +131,11 @@ class backupTools:
         r.sort()
         return r
 
+    def _getPgRootPwd(self):
+        db_path = self.getServerDir()
+        db_name = 'pgsql'
+        return mw.M('config').dbPos(db_path, db_name).where('id=?', (1,)).getField('pg_root')
+
     def backupDatabase(self, params, count):
         params_args = params.split("@")
         name = params_args[0]
@@ -159,8 +164,7 @@ class backupTools:
             mw.execShell("mkdir -p " + backup_path)
 
         compressor_cmd, ext = _compressorCmd()
-        filename = backup_path + "/db_" + backup_name + "_" + \
-            time.strftime('%Y%m%d_%H%M%S', time.localtime()) + ext
+        filename = backup_path + "/db_" + backup_name + "_" + time.strftime('%Y%m%d_%H%M%S', time.localtime()) + ext
 
         port = self.getPgPort()
         pg_dump = self.getPgDump()
@@ -171,7 +175,7 @@ class backupTools:
         # --serializable-deferrable: MVCC 快照导出, 与 DDL 快照冲突时自动重试
         # --lock-wait-timeout=30s: 等表锁最多 30 秒, 避免大 DDL 下一直阻塞
         # --no-sync (PG 14+): dump 完不等 fsync, 减少 I/O 等待
-        dump_opts = '-c --if-exists --lock-wait-timeout=30s'
+        dump_opts = '-c --if-exists --lock-wait-timeout=30s --no-password'
         if pg_major >= 14:
             dump_opts += ' --no-sync'
 
@@ -184,15 +188,32 @@ class backupTools:
             dump_args = '{} {}'.format(dump_opts, name)
 
         # -------- 执行备份 --------
+        # pg_hba.conf 的 local/host 都是 scram-sha-256, 必须带 PGPASSWORD.
+        # 优先走 Unix socket (-h /tmp, 对应 unix_socket_directories=/tmp),
+        # 避免 fallback 到 TCP localhost 导致额外的 TCP 握手/密码交互.
+        socket_dir = '/tmp'
+        pg_pwd = self._getPgRootPwd()
+
         # set -o pipefail: 管道任一命令失败即返回非零 exit code
         # exit_code_file 保存管道最终 exit code, 便于 Python 侧检测
         exit_code_file = '/tmp/pg_dump_exit_code'
+        pg_dump_stderr = '/tmp/pg_dump_stderr.log'
+
+        # 构造 PGPASSWORD 环境变量: 空密码也显式传递, 让 pg_dump 立即失败而不是挂起等输入
+        # 密码里可能含特殊字符, 用单引号包起来再 escape 内部的单引号
+        safe_pwd = pg_pwd.replace("'", "'\\''")
+        pg_dump_inner = '{} {} -U postgres -h {} -p {} 2>>{}'.format(pg_dump, dump_args, socket_dir, port, pg_dump_stderr)
+
+        # set -o pipefail 必须和 pg_dump 在同一个 bash 进程里, 否则 PGPASSWORD 会被 shell 内置命令吞掉
+        # macOS 默认 shell 是 zsh, 对 PGPASSWORD='xxx' set -o pipefail && cmd 这种写法, set 是内置命令,
+        # 它会吃掉 PGPASSWORD 而不传给后续 cmd, 所以用 bash -c 把整个管道包起来
         if mw.isAppleSystem():
-            cmd = 'set -o pipefail && {} {} -p {} 2>>/tmp/pg_dump_stderr.log | {} > "{}"; echo $? > {}'.format(
-                pg_dump, dump_args, port, compressor_cmd, filename, exit_code_file)
+            cmd = "bash -c \"set -o pipefail && PGPASSWORD='{}' {} | {} > \\\"{}\\\"; echo \\$? > {}\"".format(
+                safe_pwd, pg_dump_inner, compressor_cmd, filename, exit_code_file)
         else:
-            cmd = 'set -o pipefail && su - postgres -c "{} {} -p {}" 2>>/tmp/pg_dump_stderr.log | {} > "{}"; echo $? > {}'.format(
-                pg_dump, dump_args, port, compressor_cmd, filename, exit_code_file)
+            # su 会清除环境变量, 所以 PGPASSWORD 要放在 su -c 的引号里面
+            cmd = "bash -c \"set -o pipefail && su - postgres -c \\\"PGPASSWORD='{}' {}\\\" | {} > \\\"{}\\\"; echo \\$? > {}\"".format(
+                safe_pwd, pg_dump_inner, compressor_cmd, filename, exit_code_file)
 
         # 清空上次的 stderr 日志, 便于定位
         try:
@@ -200,6 +221,7 @@ class backupTools:
         except Exception:
             pass
 
+        print(cmd)
         mw.execShell(cmd)
 
         # 从 exit_code_file 读取管道 exit code（set -o pipefail 保证准确）
@@ -214,7 +236,7 @@ class backupTools:
         # 从 stderr 日志读取 pg_dump 的错误输出
         stderr_txt = ''
         try:
-            stderr_txt = open('/tmp/pg_dump_stderr.log').read().strip()
+            stderr_txt = open(pg_dump_stderr).read().strip()
         except Exception:
             pass
 
@@ -270,7 +292,7 @@ if __name__ == "__main__":
     backup = backupTools()
     type = sys.argv[1]
     if type == 'database':
-        if sys.argv[2] == 'ALL@':
+        if sys.argv[2].startswith('ALL@'):
             backup.backupDatabaseAll(sys.argv[3])
         else:
             backup.backupDatabase(sys.argv[2], sys.argv[3])
