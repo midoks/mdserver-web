@@ -1355,7 +1355,7 @@ def importDbExternalProgressBar():
 
 def importDbBackupProgress():
     if isSlaveDb():
-        return mw.returnJson(False, 'PG从库不能导入')
+        return mw.returnJson(False, 'slave','PG从库不能导入')
 
     args = getArgs()
     data = checkArgs(args, ['file', 'name'])
