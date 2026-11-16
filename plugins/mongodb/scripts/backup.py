@@ -143,7 +143,7 @@ class backupTools:
         blist = os.listdir(bkDir)
         r = []
 
-        bname = 'mongodb_' + dbname
+        bname = 'mongodb_' + dbname + '_' + time.strftime('%Y', time.localtime())
         blen = len(bname)
         for x in blist:
             fbstr = x[0:blen]
@@ -257,5 +257,8 @@ if __name__ == "__main__":
     stype = sys.argv[1]
     if stype == 'all':
         backup.backupDatabaseAll(sys.argv[2])
-    if stype == 'database':
-        backup.backupDatabase(sys.argv[2], sys.argv[3])
+    if type == 'database':
+        if sys.argv[2] == 'ALL@':
+            backup.backupDatabaseAll(sys.argv[3])
+        else:
+            backup.backupDatabase(sys.argv[2], sys.argv[3])
