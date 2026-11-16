@@ -1195,6 +1195,8 @@ def setPostgresPwd(version=''):
     return mw.returnJson(True, 'postgres密码修改成功!')
 
 def importDbExternal():
+    if isSlaveDb():
+        return mw.returnJson(False, 'PG从库不能导入')
     args = getArgs()
     data = checkArgs(args, ['file', 'name'])
     if not data[0]:
@@ -1266,6 +1268,8 @@ def importDbExternal():
     return mw.returnJson(True, 'ok')
 
 def importDbExternalProgress():
+    if isSlaveDb():
+        return mw.returnJson(False, 'PG从库不能导入')
     args = getArgs()
     data = checkArgs(args, ['file', 'name'])
     if not data[0]:
@@ -1279,6 +1283,9 @@ def importDbExternalProgress():
     return mw.returnJson(True, 'ok', cmd)
 
 def importDbExternalProgressBar():
+    if isSlaveDb():
+        print("PG从库不能导入!")
+        return
     args = getArgs()
     data = checkArgs(args, ['file', 'name'])
     if not data[0]:
