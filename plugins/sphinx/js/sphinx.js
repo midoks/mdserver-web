@@ -248,24 +248,72 @@ function runStatus(){
         }
         var idata = rdata.data;
 
+        var sv = function(k){
+            if (typeof(idata[k]) == 'undefined' || idata[k] === ''){
+                return '-';
+            }
+            return idata[k];
+        };
+
+        var uptime = parseFloat(idata.uptime);
+        var queries = parseFloat(idata.queries);
+        var qps = (uptime > 0 && !isNaN(queries)) ? (queries / uptime).toFixed(2) : '-';
+
+        // searchd 状态字段的中文名称与说明, 便于直接观察
+        var statusInfo = {
+            uptime: ['运行时间', '服务启动至今的运行秒数'],
+            connections: ['总连接次数', '自启动以来建立的客户端连接总数'],
+            maxed_out: ['超出连接上限次数', '并发达到上限后被拒绝的请求次数'],
+            work_queue_length: ['等待队列长度', '当前排队等待处理的请求数, 长期大于 0 表示搜索压力偏大'],
+            work_queue_max: ['队列峰值', '等待队列出现过的最大长度'],
+            workers_active: ['活跃线程数', '正在处理请求的工作线程数'],
+            workers_total: ['线程总数', 'searchd 启动的工作线程总数'],
+            workers_avail: ['空闲线程数', '当前空闲可用的工作线程数'],
+            queries: ['查询总次数', '累计执行的搜索查询次数'],
+            dist_queries: ['分布式查询次数', '转发到远端 agent 的查询次数'],
+            command_search: ['搜索请求数', '客户端发起的搜索请求总数'],
+            command_excerpt: ['摘要请求数', '生成摘要(excerpt)的请求数'],
+            command_update: ['更新请求数', '文档全量更新请求数'],
+            command_delete: ['删除请求数', '文档删除请求数'],
+            command_keywords: ['关键词提取请求数', '关键词(keywords)提取请求数'],
+            command_persist: ['持久化请求数', '索引落盘持久化请求数'],
+            command_status: ['状态查询次数', '状态信息查询请求数'],
+            command_flushattrs: ['刷新属性请求数', '强制刷新属性的请求数'],
+            command_setfilter: ['设置过滤器请求数', '设置过滤条件的请求数'],
+            command_rtmerge: ['实时索引合并次数', '实时(RT)索引合并请求数'],
+            command_attr_update: ['属性更新请求数', '按文档批量更新属性的请求数'],
+            agent_connect: ['agent 连接次数', '与远端 agent 建立连接的次数'],
+            agent_retry: ['agent 重试次数', '连接远端 agent 失败后的重试次数']
+        };
+
         var tbody = '';
+        var used = {};
+        for (var key in statusInfo) {
+            used[key] = true;
+            var name = statusInfo[key][0];
+            tbody += '<tr><th>' + name + '<br><span class="c8" style="font-weight:normal;">' + key + '</span></th>\
+                <td>' + sv(key) + '</td><td class="c6">' + statusInfo[key][1] + '</td></tr>';
+        }
         for (var i in idata) {
-            tbody += '<tr><th>'+i+'</th><td>' + idata[i] + '</td><td colspan="2">'+i+'</td></tr>';
+            if (used[i]) {
+                continue;
+            }
+            tbody += '<tr><th>' + i + '</th><td>' + idata[i] + '</td><td class="c6">searchd 原始指标</td></tr>';
         }
 
         var con = '<div class="divtable"><table class="table table-hover table-bordered" style="margin-bottom:10px;background-color:#fafafa">\
                     <tbody>\
-                        <tr><th>运行时间</th><td>' + secToTime(idata.uptime) + '</td><th>每秒查询</th><td>' + parseInt(parseInt(idata.queries) / parseInt(idata.uptime)) + '</td></tr>\
-                        <tr><th>总连接次数</th><td>' + idata.connections + '</td><th>work_queue_length</th><td>' +idata.work_queue_length + '</td></tr>\
-                        <tr><th>agent_connect</th><td>' + idata.agent_connect+ '</td><th>workers_active</th><td>' + idata.workers_active + '</td></tr>\
-                        <tr><th>agent_retry</th><td>' + idata.agent_retry + '</td><th>workers_total</th><td>' + idata.workers_total + '</td></tr>\
+                        <tr><th>运行时间</th><td>' + secToTime(idata.uptime) + '</td><th>每秒查询(平均)</th><td>' + qps + '</td></tr>\
+                        <tr><th>总连接次数</th><td>' + sv('connections') + '</td><th>等待队列长度</th><td>' + sv('work_queue_length') + '</td></tr>\
+                        <tr><th>工作线程(活跃/总数)</th><td>' + sv('workers_active') + ' / ' + sv('workers_total') + '</td><th>超出连接上限次数</th><td>' + sv('maxed_out') + '</td></tr>\
+                        <tr><th>agent 连接次数</th><td>' + sv('agent_connect') + '</td><th>agent 重试次数</th><td>' + sv('agent_retry') + '</td></tr>\
                     </tbody>\
                     </table>\
                     <table class="table table-hover table-bordered">\
-                        <thead style="display:none;"><th></th><th></th><th></th><th></th></thead>\
+                        <thead><tr><th style="width:32%;">指标</th><th style="width:20%;">数值</th><th>中文说明</th></tr></thead>\
                         <tbody>\
                             '+tbody+'\
-                        <tbody>\
+                        </tbody>\
                     </table>\
                 </div>';
 
