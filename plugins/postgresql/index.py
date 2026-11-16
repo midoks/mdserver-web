@@ -1003,7 +1003,7 @@ def pgSetDbStatus():
         sedConf(name, args[name].strip())
 
     if status() == 'start':
-        restart()
+        appCMD('', 'restart')
         return mw.returnJson(True, '设置成功，数据库已重启!')
     return mw.returnJson(True, '设置成功，将在数据库下次启动时生效!')
 
@@ -2081,7 +2081,7 @@ def setMasterStatus(version=''):
             data = data.replace(field, '#'+field)
 
     mw.writeFile(pg_conf, data)
-    restart(version)
+    appCMD(version, 'restart')
     return mw.returnJson(True, '设置成功')
 
 def openSlaveConf(version):
@@ -2108,8 +2108,7 @@ def setSlaveStatus(version):
         for field in field_list:
             data = data.replace(field, '#'+field)
     mw.writeFile(pg_conf, data)
-
-    restart(version)
+    appCMD(version, 'restart')
     return mw.returnJson(True, '设置成功')
 
 def getSlaveList(version=''):
