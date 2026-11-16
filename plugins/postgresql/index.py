@@ -1347,6 +1347,9 @@ def importDbExternalProgressBar():
     return ""
 
 def importDbBackupProgress():
+    if isSlaveDb():
+        return mw.returnJson(False, 'PG从库不能导入')
+
     args = getArgs()
     data = checkArgs(args, ['file', 'name'])
     if not data[0]:
@@ -1994,6 +1997,8 @@ def pgBackList():
 
 
 def importDbBackup():
+    if isSlaveDb():
+        return mw.returnJson(False, 'PG从库不能导入')
     args = getArgs()
     data = checkArgs(args, ['file', 'name'])
     if not data[0]:
