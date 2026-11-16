@@ -36,7 +36,7 @@ class backupTools:
         blist = os.listdir(bkDir)
         r = []
 
-        bname = 'db_' + dbname
+        bname = 'db_' + dbname + '_' + time.strftime('%Y', time.localtime())
         blen = len(bname)
         for x in blist:
             fbstr = x[0:blen]
