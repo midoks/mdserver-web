@@ -82,6 +82,13 @@ def fmtRows(rows):
     return ret
 
 
+def getRootPwd():
+    """从 sqlite config 表读取 postgres root 密码, 与 backup.py 同源."""
+    db_path = getServerDir()
+    db_name = 'pgsql'
+    return mw.M('config').dbPos(db_path, db_name).where('id=?', (1,)).getField('pg_root')
+
+
 class PgClient:
 
     def __init__(self, database='postgres'):
@@ -93,6 +100,7 @@ class PgClient:
     def connect(self):
         if not isInstalled():
             self.status = 'not_installed'
+            self.error = 'PostgreSQL 未安装'
             return False
 
         try:
@@ -100,25 +108,38 @@ class PgClient:
             if host == '':
                 host = '127.0.0.1'
 
-            self.conn = psycopg2.connect(database=self.database,
-                                         user='postgres',
-                                         host=host,
-                                         port=getPort(),
-                                         connect_timeout=3)
+            pwd = getRootPwd()
+            if not pwd:
+                self.status = 'auth_error'
+                self.error = '未找到 postgres root 密码 (sqlite config 表 pg_root 为空)'
+                return False
+
+            self.conn = psycopg2.connect(
+                database=self.database,
+                user='postgres',
+                password=pwd,
+                host=host,
+                port=getPort(),
+                connect_timeout=3)
             self.conn.autocommit = True
             return True
         except psycopg2.OperationalError as e:
             msg = str(e).strip()
             if 'does not exist' in msg:
                 self.status = 'db_not_found'
+                self.error = '数据库不存在: ' + msg
             elif 'authentication' in msg or 'password' in msg:
                 self.status = 'auth_error'
+                self.error = '认证失败: ' + msg
+            elif 'could not connect' in msg or 'Connection refused' in msg or 'refused' in msg:
+                self.status = 'not_running'
+                self.error = 'PostgreSQL 未启动或端口不通: ' + msg
             else:
                 self.status = 'not_running'
-            self.error = msg
+                self.error = msg
         except Exception as e:
             self.status = 'not_running'
-            self.error = str(e)
+            self.error = '连接异常: ' + str(e)
         return False
 
     def query(self, sql, params=()):
@@ -162,16 +183,17 @@ def openClient(args, database='postgres'):
     if client.connect():
         return client, None
 
+    detail = (client.error or '').strip()
     if client.status == 'not_installed':
-        msg = '未安装'
+        msg = 'PostgreSQL 未安装'
     elif client.status == 'not_running':
-        msg = '未启动'
+        msg = 'PostgreSQL 未启动' + ('：' + detail if detail else '')
     elif client.status == 'db_not_found':
-        msg = '数据库不存在'
+        msg = '数据库不存在' + ('：' + detail if detail else '')
     elif client.status == 'auth_error':
-        msg = '连接失败，请检查数据库认证配置'
+        msg = '连接失败，请检查数据库认证配置' + ('：' + detail if detail else '')
     else:
-        msg = client.error or '连接失败'
+        msg = detail or '连接失败'
     return None, mw.returnData(False, msg)
 
 
