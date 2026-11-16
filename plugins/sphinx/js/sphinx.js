@@ -342,7 +342,7 @@ function runStatus(){
                     </tbody>\
                     </table>\
                     <table class="table table-hover table-bordered">\
-                        <thead><tr><th style="width:32%;">指标</th><th style="width:20%;">数值</th><th>中文说明</th></tr></thead>\
+                        <thead><tr><th style="width:25%;">指标</th><th style="width:15%;">数值</th><th>中文说明</th></tr></thead>\
                         <tbody>\
                             '+tbody+'\
                         </tbody>\
