@@ -1867,6 +1867,8 @@ def getDbInfo():
 
 def pgBack():
     # 备份数据库 — 无锁 + 大库优化版本
+    # 核心: pg_hba.conf 全是 scram-sha-256, 必须带 PGPASSWORD + -h /tmp 走 Unix socket
+    #       用 bash -c 包管道, 避免 zsh 内置 set 吞 PGPASSWORD
 
     import subprocess
     import shutil
@@ -1876,15 +1878,26 @@ def pgBack():
     if not data[0]:
         return data[1]
 
-    bk_path_upload = getBackupDir()
     database = args['name']
     port = getPgPort()
-
     pg_dump = getServerDir() + '/bin/pg_dump'
     if not os.path.exists(pg_dump):
         pg_dump = 'pg_dump'
 
-    # 检测 pg_dump 主版本, 14+ 加 --no-sync
+    # --- 读 postgres root 密码 ---
+    pg_pwd = pSqliteDb('config').where('id=?', (1,)).getField('pg_root') or ''
+    safe_pwd = pg_pwd.replace("'", "'\\''")
+
+    # --- Unix socket ---
+    socket_dir = '/tmp'
+    socket_path = os.path.join(socket_dir, '.s.PGSQL.' + port)
+
+    # --- 文件名 ---
+    bk_path_upload = getBackupDir()
+    file_name = 'db_{}_{}.sql.gz'.format(database, time.strftime("%Y%m%d_%H%M%S"))
+    file_path = os.path.join(bk_path_upload, file_name)
+
+    # --- pg_dump 版本检测 ---
     pg_major = 0
     try:
         out = subprocess.check_output([pg_dump, '--version'], stderr=subprocess.STDOUT)
@@ -1894,10 +1907,9 @@ def pgBack():
     except Exception:
         pass
 
-    # 检测 pigz 并行压缩
+    # --- 压缩工具 ---
     pigz = shutil.which('pigz')
     if pigz:
-        # os.cpu_count() 跨平台, 兜底用 nproc (Linux) / sysctl (macOS)
         cpus = os.cpu_count() or 0
         if cpus <= 0:
             try:
@@ -1911,68 +1923,76 @@ def pgBack():
     else:
         compressor = 'gzip -6'
 
-    # 文件名按时间戳命名
-    file_name = 'db_{}_{}.sql.gz'.format(
-        database, time.strftime("%Y%m%d_%H%M%S"))
-    file_path = os.path.join(bk_path_upload, file_name)
-
-    # pg_dump 参数:
-    #   -c --if-exists: DROP 语句便于覆盖恢复
-    #   --serializable-deferrable: MVCC 快照一致性, 与 DDL 快照冲突时自动重试
-    #   --lock-wait-timeout=30s: 等表锁最多 30 秒, 避免大 DDL 下一直阻塞
-    #   --no-sync (PG 14+):    dump 完不等 fsync, 减少 I/O 等待
-    dump_opts = '-c --if-exists --lock-wait-timeout=30s'
+    # --- pg_dump 参数 ---
+    dump_opts = '-c --if-exists --lock-wait-timeout=30s --no-password'
     if pg_major >= 14:
         dump_opts += ' --no-sync'
-
-    #与从库冲突
     if not isSlaveDb():
         dump_opts += ' --serializable-deferrable'
 
-    # set -o pipefail: 管道任一命令失败都能被检测到
-    stderr_log = '/tmp/pg_dump_stderr.log'
-    exit_code_file = '/tmp/pg_dump_exit_code'
+    # --- 临时文件 (唯一名, 并发不冲突) ---
+    tag = "%d_%d" % (os.getpid(), int(time.time()))
+    stderr_log = '/tmp/pg_dump_%s_stderr.log' % tag
+    exit_code_file = '/tmp/pg_dump_%s_exit_code' % tag
     open(stderr_log, 'w').close()
 
-    if mw.isAppleSystem():
-        cmd = '''set -o pipefail && {} {} -U postgres -d {} -p {} 2>>{} | {} > "{}"; echo $? > {}'''.format(
-            pg_dump, dump_opts, database, port, stderr_log, compressor, file_path, exit_code_file)
-    else:
-        cmd = '''set -o pipefail && su - postgres -c "{} {} -U postgres -d {} -p {}" 2>>{} | {} > "{}"; echo $? > {}'''.format(
-            pg_dump, dump_opts, database, port, stderr_log, compressor, file_path, exit_code_file)
+    # --- 组装命令: bash -c 把整个管道包在同一个 bash 进程里 ---
+    pg_dump_inner = '{} {} {} -U postgres -h {} -p {} 2>>{}'.format(
+        pg_dump, dump_opts, database, socket_dir, port, stderr_log)
+
+    cmd = "bash -c \"set -o pipefail && PGPASSWORD='{}' {} | {} > \\\"{}\\\"; echo \\$? > {}\"".format(
+        safe_pwd, pg_dump_inner, compressor, file_path, exit_code_file)
 
     rdata = mw.execShell(cmd)
 
-    # 读取 stderr, pg_dump 自己的错误信息会写这里
+    # --- 读取结果 ---
     stderr_txt = ''
     try:
-        with open(stderr_log) as f:
-            stderr_txt = f.read().strip()
+        stderr_txt = open(stderr_log).read().strip()
     except Exception:
         pass
 
-    # 读取管道 exit code（通过 set -o pipefail, 管道任一命令失败即非零）
-    exit_code = 0
+    exit_code = -1
     try:
         with open(exit_code_file) as f:
             exit_code = int(f.read().strip())
     except Exception:
         pass
 
-    # 备份失败: pipefail 非零 / 文件不存在 / 文件太小
-    err_hint = stderr_txt[-400:] if stderr_txt else ''
-    if exit_code != 0 \
-            or (not os.path.exists(file_path)) \
-            or (os.path.exists(file_path) and os.path.getsize(file_path) < 200):
-        if os.path.exists(file_path):
+    file_exists = os.path.exists(file_path)
+    file_size = os.path.getsize(file_path) if file_exists else 0
+
+    # 清理临时文件 (失败保留 stderr 便于事后排查)
+    try:
+        os.remove(exit_code_file)
+    except Exception:
+        pass
+
+    # --- 判定 ---
+    if exit_code != 0 or not file_exists or file_size < 200:
+        if file_exists:
             try:
                 os.remove(file_path)
             except Exception:
                 pass
-        msg = err_hint or ('备份失败 (exit_code={})'.format(exit_code) if exit_code != 0 else '备份失败')
-        return mw.returnJson(False, msg)
 
-    return mw.returnJson(True, '备份成功!')
+        reasons = []
+        if exit_code != 0:
+            reasons.append('exit_code=%d' % exit_code)
+        if not file_exists:
+            reasons.append('输出文件不存在')
+        elif file_size < 200:
+            reasons.append('文件太小(%d bytes)' % file_size)
+
+        hint = '; '.join(reasons)
+        if stderr_txt:
+            hint += '; stderr: ' + stderr_txt[-400:]
+        if not os.path.exists(socket_path):
+            hint += '; Unix socket 不存在(%s), PostgreSQL 可能没启动' % socket_path
+
+        return mw.returnJson(False, hint)
+
+    return mw.returnJson(True, '备份成功! 文件=%s, 大小=%.2f KB' % (file_name, file_size / 1024))
 
 
 def pgBackList():
