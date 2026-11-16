@@ -206,22 +206,18 @@ class backupTools:
 
         # set -o pipefail 必须和 pg_dump 在同一个 bash 进程里, 否则 PGPASSWORD 会被 shell 内置命令吞掉
         # macOS 默认 shell 是 zsh, 对 PGPASSWORD='xxx' set -o pipefail && cmd 这种写法, set 是内置命令,
-        # 它会吃掉 PGPASSWORD 而不传给后续 cmd, 所以用 bash -c 把整个管道包起来
-        if mw.isAppleSystem():
-            cmd = "bash -c \"set -o pipefail && PGPASSWORD='{}' {} | {} > \\\"{}\\\"; echo \\$? > {}\"".format(
-                safe_pwd, pg_dump_inner, compressor_cmd, filename, exit_code_file)
-        else:
-            # su 会清除环境变量, 所以 PGPASSWORD 要放在 su -c 的引号里面
-            cmd = "bash -c \"set -o pipefail && su - postgres -c \\\"PGPASSWORD='{}' {}\\\" | {} > \\\"{}\\\"; echo \\$? > {}\"".format(
-                safe_pwd, pg_dump_inner, compressor_cmd, filename, exit_code_file)
+        # 它会吃掉 PGPASSWORD 而不传给后续 cmd, 所以用 bash -c 把整个管道包起来.
+        # Linux 同样不走 su - postgres -c —— pg_dump 靠 PGPASSWORD 走网络认证,
+        # 不需要切换到 postgres 系统用户, 否则写备份目录会没权限.
+        cmd = "bash -c \"set -o pipefail && PGPASSWORD='{}' {} | {} > \\\"{}\\\"; echo \\$? > {}\"".format(
+            safe_pwd, pg_dump_inner, compressor_cmd, filename, exit_code_file)
 
         # 清空上次的 stderr 日志, 便于定位
         try:
             open('/tmp/pg_dump_stderr.log', 'w').close()
         except Exception:
             pass
-
-        print(cmd)
+        # print(cmd)
         mw.execShell(cmd)
 
         # 从 exit_code_file 读取管道 exit code（set -o pipefail 保证准确）
