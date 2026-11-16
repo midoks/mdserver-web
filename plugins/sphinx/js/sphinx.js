@@ -229,18 +229,16 @@ function secToTime(s) {
     var min = Math.floor(s / 60) % 60;
     var sec = s % 60;
 
-    var t = '';
     if (day > 0) {
-        t += day + ' 天 ';
+        return day + '天' + hour + '小时' + min + '分' + sec + '秒';
     }
-    if (day > 0 || hour > 0) {
-        t += hour + ' 小时 ';
+    if (hour > 0) {
+        return hour + '小时' + min + '分' + sec + '秒';
     }
-    if (day > 0 || hour > 0 || min > 0) {
-        t += min + ' 分 ';
+    if (min > 0) {
+        return min + '分' + sec + '秒';
     }
-    t += sec + ' 秒';
-    return t;
+    return sec + '秒';
 }
 
 
