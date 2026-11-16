@@ -160,7 +160,7 @@ if __name__ == "__main__":
     backup = backupTools()
     type = sys.argv[1]
     if type == 'database':
-        if sys.argv[2] == 'ALL@':
+        if sys.argv[2].startswith('ALL@'):
             backup.backupDatabaseAll(sys.argv[3])
         else:
             backup.backupDatabase(sys.argv[2], sys.argv[3])

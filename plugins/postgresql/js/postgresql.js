@@ -847,7 +847,8 @@ function downloadBackup(file){
 
 function importBackup(file,name){
     myPost('import_db_backup',{file:file,name:name}, function(data){
-        layer.msg('执行成功!');
+        var rdata = $.parseJSON(data.data);
+        layer.msg(rdata.msg, { icon: rdata.status ? 1 : 2 });
     });
 }
 
@@ -878,7 +879,8 @@ function importBackupProgress(file,name){
 
 function importDbExternal(file,name){
     myPost('import_db_external',{file:file,name:name}, function(data){
-        layer.msg('执行成功!');
+        var rdata = $.parseJSON(data.data);
+        layer.msg(rdata.msg, { icon: rdata.status ? 1 : 2 });
     });
 }
 
@@ -1057,8 +1059,14 @@ function setBackup(db_name,obj){
         success:function(index){
             $('#btn_backup').click(function(){
                 myPost('pg_back',{name:db_name}, function(data){
-                    layer.msg('执行成功!');
-                    setBackupReq(db_name);
+                    if (data.status){
+                        var rdata = $.parseJSON(data.data);
+                        showMsg(rdata.msg, function(){
+                            setBackupReq(db_name);
+                        }, {icon: rdata.status ? 1 : 2}, 2000);
+                    } else {
+                        layer.msg(data.msg, { icon: data.status ? 1 : 2 });
+                    }
                 });
             });
 

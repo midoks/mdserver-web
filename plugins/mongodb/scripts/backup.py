@@ -137,13 +137,13 @@ def mongdbClient():
 class backupTools:
 
     def getDbBackupList(self,dbname=''):
-        bkDir = mw.getFatherDir() + '/backup/database'
+        bkDir = mw.getFatherDir() + '/backup/database/mongodb'
         if not os.path.isdir(bkDir):
             return []
         blist = os.listdir(bkDir)
         r = []
 
-        bname = 'mongodb_' + dbname
+        bname = 'mongodb_' + dbname + '_' + time.strftime('%Y', time.localtime())
         blen = len(bname)
         for x in blist:
             fbstr = x[0:blen]
@@ -258,4 +258,7 @@ if __name__ == "__main__":
     if stype == 'all':
         backup.backupDatabaseAll(sys.argv[2])
     if stype == 'database':
-        backup.backupDatabase(sys.argv[2], sys.argv[3])
+        if sys.argv[2].startswith('ALL@'):
+            backup.backupDatabaseAll(sys.argv[3])
+        else:
+            backup.backupDatabase(sys.argv[2], sys.argv[3])
