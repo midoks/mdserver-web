@@ -526,6 +526,12 @@ def reload(version=''):
     return appCMD(version, 'restart')
 
 
+def pg_reload_conf(version=''):
+    pdb = pgDb()
+    t = pdb.query('SELECT pg_reload_conf()')
+    return True
+
+
 def initdStatus():
     if mw.isAppleSystem():
         return "Apple Computer does not support"
@@ -997,7 +1003,7 @@ def pgSetDbStatus():
         sedConf(name, args[name].strip())
 
     if status() == 'start':
-        restart()
+        appCMD('', 'restart')
         return mw.returnJson(True, '设置成功，数据库已重启!')
     return mw.returnJson(True, '设置成功，将在数据库下次启动时生效!')
 
@@ -1631,7 +1637,7 @@ def addDb():
     psdb.add('pid,name,username,password,accept,ps,addtime',
              (0, dbname, dbuser, password, listen_ip, dbname, addTime))
 
-    restart()
+    pg_reload_conf()
     return mw.returnJson(True, '添加成功!')
 
 
@@ -1668,7 +1674,7 @@ def delDb():
     mw.writeFile(pg_hba, new_config)
 
     psdb.where("id=?", (did,)).delete()
-    restart()
+    pg_reload_conf()
     if isSlaveDb():
         return mw.returnJson(True, '删除本地记录成功!')
     return mw.returnJson(True, '删除成功!')
@@ -1734,7 +1740,7 @@ def setDbAccess():
     # postgres 为内置库, 不在数据表记录, 只改配置文件
     if name == 'postgres':
         setHbaAccess(name, access)
-        restart()
+        pg_reload_conf()
         return mw.returnJson(True, "设置成功")
 
     psdb = pSqliteDb('databases')
@@ -1746,8 +1752,7 @@ def setDbAccess():
     mw.writeFile(conf, new_data)
 
     psdb.where("name=?", (name,)).setField('accept', access)
-    restart()
-
+    pg_reload_conf()
     if isSlaveDb():
         return mw.returnJson(True, '从库修改权限成功!')
     return mw.returnJson(True, "设置成功")
@@ -2076,7 +2081,7 @@ def setMasterStatus(version=''):
             data = data.replace(field, '#'+field)
 
     mw.writeFile(pg_conf, data)
-    restart(version)
+    appCMD(version, 'restart')
     return mw.returnJson(True, '设置成功')
 
 def openSlaveConf(version):
@@ -2103,8 +2108,7 @@ def setSlaveStatus(version):
         for field in field_list:
             data = data.replace(field, '#'+field)
     mw.writeFile(pg_conf, data)
-
-    restart(version)
+    appCMD(version, 'restart')
     return mw.returnJson(True, '设置成功')
 
 def getSlaveList(version=''):
@@ -2400,8 +2404,6 @@ def getMasterRepSlaveAccess(version=''):
     accept = psdb.where("username=?", (name,)).getField('accept')
     return mw.returnJson(True, accept)
 
-
-
 def setMasterRepSlaveAccess(version=''):
     args = getArgs()
     data = checkArgs(args, ['name'])
@@ -2420,7 +2422,7 @@ def setMasterRepSlaveAccess(version=''):
     mw.writeFile(conf, new_data)
 
     psdb.where("username=?", (name,)).setField('accept', access)
-    restart()
+    pg_reload_conf()
     return mw.returnJson(True, "设置成功")
 
 def addMasterRepSlaveUser(version=''):
@@ -2467,7 +2469,7 @@ def addMasterRepSlaveUser(version=''):
 
     addTime = time.strftime('%Y-%m-%d %X', time.localtime())
     psdb.add('username,password,accept,ps,addtime',(username, password, address, '', addTime))
-    restart()
+    pg_reload_conf()
     return mw.returnJson(True, '添加成功!')
 
 
@@ -2489,11 +2491,11 @@ def delMasterRepSlaveUser(version=''):
 
     pg_hba = pgHbaConf()
     old_config = mw.readFile(pg_hba)
-    new_config = re.sub(
-        r'host\s*replication\s*{}.*'.format(name), '', old_config).strip()
+    new_config = re.sub(r'host\s*replication\s*{}.*'.format(name), '', old_config).strip()
     mw.writeFile(pg_hba, new_config)
-
     psdb.where("username=?", (args['username'],)).delete()
+
+    pg_reload_conf()
     return mw.returnJson(True, '删除成功!')
 
 def getMasterRepSlaveUserCmd(version=''):

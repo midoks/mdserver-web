@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 # chkconfig: 2345 55 25
 # description: MW Cloud Service
 
@@ -600,20 +600,18 @@ mw_connect_mysql(){
     fi
 }
 
-
 mw_connect_pgdb(){
     if [ ! -d "${ROOT_PATH}/postgresql" ];then
         echo -e "postgresql not install!"
         exit 1
     fi
 
-
     pwd=$(cd ${PANEL_DIR} && python3 ${PANEL_DIR}/plugins/postgresql/index.py root_pwd)
     export PGPASSWORD=${pwd}
     echo "${ROOT_PATH}/postgresql/bin/psql -U postgres -W"
+    echo "${ROOT_PATH}/postgresql/bin/psql -h 127.0.0.1 -U postgres -W"
     ${ROOT_PATH}/postgresql/bin/psql -U postgres -W
 }
-
 
 mw_mongodb(){
     # /www/server/mongodb/bin/mongo --version
