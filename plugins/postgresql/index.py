@@ -1361,6 +1361,9 @@ def importDbBackupProgress():
 
 
 def importDbBackupProgressBar():
+    if isSlaveDb():
+        print("PG从库不能导入!")
+        return
     args = getArgs()
     data = checkArgs(args, ['file', 'name'])
     if not data[0]:
