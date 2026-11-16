@@ -879,7 +879,7 @@ function importBackupProgress(file,name){
 
 function importDbExternal(file,name){
     myPost('import_db_external',{file:file,name:name}, function(data){
-        layer.msg('执行成功!');
+        layer.msg(rdata.msg, { icon: rdata.status ? 1 : 2 });
     });
 }
 
