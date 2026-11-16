@@ -335,7 +335,7 @@ function runStatus(){
 
         var con = '<div class="divtable"><table class="table table-hover table-bordered" style="margin-bottom:10px;background-color:#fafafa">\
                     <tbody>\
-                        <tr><th>运行时间</th><td>' + secToTime(idata.uptime) + '</td><th>每秒查询(平均)</th><td>' + qps + '</td></tr>\
+                        <tr><th style="width:130px;">运行时间</th><td>' + secToTime(idata.uptime) + '</td><th>每秒查询(平均)</th><td>' + qps + '</td></tr>\
                         <tr><th>总连接次数</th><td>' + sv('connections') + '</td><th>等待队列长度</th><td>' + sv('work_queue_length') + '</td></tr>\
                         <tr><th>工作线程(活跃/总数)</th><td>' + sv('workers_active') + ' / ' + sv('workers_total') + '</td><th>超出连接上限次数</th><td>' + sv('maxed_out') + '</td></tr>\
                         <tr><th>agent 连接次数</th><td>' + sv('agent_connect') + '</td><th>agent 重试次数</th><td>' + sv('agent_retry') + '</td></tr>\
