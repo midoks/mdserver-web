@@ -213,17 +213,25 @@ class backupTools:
             safe_pwd, pg_dump_inner, compressor_cmd, filename, exit_code_file)
 
         # print(cmd)
-        os.system(cmd)
         mw.execShell(cmd)
 
-        endDate = time.strftime('%Y/%m/%d %X', time.localtime())
+        # 从 exit_code_file 读取管道 exit code（set -o pipefail 保证准确）
+        # 注意: mw.readFile 返回字符串, 必须转 int 才能跟 0 比较
+        exit_code = 0
+        try:
+            with open(exit_code_file) as f:
+                exit_code = int(f.read().strip())
+        except Exception:
+            pass
+
         # -------- 结果校验 --------
         # 从 stderr 日志读取 pg_dump 的错误输出
-        exit_code = mw.readFile(exit_code_file) or 1
-        stderr_txt = mw.readFile(pg_dump_stderr)
+        stderr_txt = ''
+        try:
+            stderr_txt = open(pg_dump_stderr).read().strip()
+        except Exception:
+            pass
 
-        print(exit_code)
-        print(stderr_txt)
         if exit_code != 0 \
                 or not os.path.exists(filename) \
                 or os.path.getsize(filename) < 200:
@@ -232,6 +240,7 @@ class backupTools:
                     os.remove(filename)
                 except Exception:
                     pass
+            endDate = time.strftime('%Y/%m/%d %X', time.localtime())
             log = "数据库[" + name + "]备份失败!"
             if stderr_txt:
                 log += "  pg_dump stderr: " + stderr_txt[-300:]
@@ -239,7 +248,7 @@ class backupTools:
             print("----------------------------------------------------------------------------")
             return
 
-        
+        endDate = time.strftime('%Y/%m/%d %X', time.localtime())
         outTime = time.time() - startTime
 
         log = "数据库[" + backup_name + "]备份成功,用时[" + str(round(outTime, 2)) + "]秒"
