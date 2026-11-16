@@ -260,45 +260,74 @@ function runStatus(){
         var qps = (uptime > 0 && !isNaN(queries)) ? (queries / uptime).toFixed(2) : '-';
 
         // searchd 状态字段的中文名称与说明, 便于直接观察
-        var statusInfo = {
-            uptime: ['运行时间', '服务启动至今的运行秒数'],
-            connections: ['总连接次数', '自启动以来建立的客户端连接总数'],
-            maxed_out: ['超出连接上限次数', '并发达到上限后被拒绝的请求次数'],
-            work_queue_length: ['等待队列长度', '当前排队等待处理的请求数, 长期大于 0 表示搜索压力偏大'],
-            work_queue_max: ['队列峰值', '等待队列出现过的最大长度'],
-            workers_active: ['活跃线程数', '正在处理请求的工作线程数'],
-            workers_total: ['线程总数', 'searchd 启动的工作线程总数'],
-            workers_avail: ['空闲线程数', '当前空闲可用的工作线程数'],
-            queries: ['查询总次数', '累计执行的搜索查询次数'],
-            dist_queries: ['分布式查询次数', '转发到远端 agent 的查询次数'],
-            command_search: ['搜索请求数', '客户端发起的搜索请求总数'],
-            command_excerpt: ['摘要请求数', '生成摘要(excerpt)的请求数'],
-            command_update: ['更新请求数', '文档全量更新请求数'],
-            command_delete: ['删除请求数', '文档删除请求数'],
-            command_keywords: ['关键词提取请求数', '关键词(keywords)提取请求数'],
-            command_persist: ['持久化请求数', '索引落盘持久化请求数'],
-            command_status: ['状态查询次数', '状态信息查询请求数'],
-            command_flushattrs: ['刷新属性请求数', '强制刷新属性的请求数'],
-            command_setfilter: ['设置过滤器请求数', '设置过滤条件的请求数'],
-            command_rtmerge: ['实时索引合并次数', '实时(RT)索引合并请求数'],
-            command_attr_update: ['属性更新请求数', '按文档批量更新属性的请求数'],
-            agent_connect: ['agent 连接次数', '与远端 agent 建立连接的次数'],
-            agent_retry: ['agent 重试次数', '连接远端 agent 失败后的重试次数']
-        };
+        var statusInfo = [
+            ['uptime', '运行时间', '服务启动至今的运行秒数'],
+            ['connections', '总连接次数', '自启动以来建立的客户端连接总数'],
+            ['maxed_out', '超出连接上限次数', '并发达到上限后被拒绝的请求次数'],
+            ['queries', '查询总次数', '累计执行的搜索查询次数'],
+            ['dist_queries', '分布式查询次数', '转发到远端 agent 的查询次数'],
+
+            ['command_search', '搜索请求数', '客户端发起的搜索请求总数'],
+            ['command_excerpt', '摘要请求数', '生成摘要(excerpt)的请求数'],
+            ['command_update', '更新请求数', '文档全量更新请求数'],
+            ['command_delete', '删除请求数', '文档删除请求数'],
+            ['command_keywords', '关键词提取请求数', '关键词(keywords)提取请求数'],
+            ['command_persist', '持久化请求数', '索引落盘持久化请求数'],
+            ['command_status', '状态查询次数', '状态信息查询请求数'],
+            ['command_flushattrs', '刷新属性请求数', '强制刷新属性的请求数'],
+            ['command_setfilter', '设置过滤器请求数', '设置过滤条件的请求数'],
+            ['command_rtmerge', '实时索引合并次数', '实时(RT)索引合并请求数'],
+            ['command_attr_update', '属性更新请求数', '按文档批量更新属性的请求数'],
+            ['agent_connect', 'agent 连接次数', '与远端 agent 建立连接的次数'],
+            ['agent_retry', 'agent 重试次数', '连接远端 agent 失败后的重试次数'],
+
+            ['work_queue_length', '等待队列长度', '当前排队等待处理的请求数, 长期大于 0 表示搜索压力偏大'],
+            ['work_queue_max', '队列峰值', '等待队列出现过的最大长度'],
+            ['workers_active', '活跃线程数', '正在处理请求的工作线程数'],
+            ['workers_total', '线程总数', 'searchd 启动的工作线程总数'],
+            ['workers_avail', '空闲线程数', '当前空闲可用的工作线程数'],
+
+            ['query_wall', '查询累计耗时(秒)', '所有查询累计的实际耗时, 含等待远端 agent 的时间'],
+            ['query_cpu', '查询累计 CPU(秒)', '所有查询累计消耗的 CPU 时间, OFF 表示未开启统计'],
+            ['dist_wall', '分布式查询累计耗时(秒)', '分布式查询累计的实际耗时'],
+            ['dist_local', '本地查询累计耗时(秒)', '由本地索引处理的查询累计耗时'],
+            ['dist_wait', '等待远端累计耗时(秒)', '等待远端 agent 返回结果的累计耗时'],
+            ['query_reads', '磁盘读取次数', '查询过程中读取磁盘的次数, OFF 表示未统计'],
+            ['query_readkb', '磁盘读取量(KB)', '查询过程中读取的数据总量, OFF 表示未统计'],
+            ['query_readtime', '磁盘读取累计耗时(秒)', '查询过程中磁盘读取的累计耗时, OFF 表示未统计'],
+
+            ['avg_query_wall', '平均查询耗时(秒)', '平均每个查询的实际耗时'],
+            ['avg_query_cpu', '平均查询 CPU(秒)', '平均每个查询消耗的 CPU 时间, OFF 表示未开启统计'],
+            ['avg_dist_wall', '平均分布式耗时(秒)', '分布式查询的平均实际耗时'],
+            ['avg_dist_local', '平均本地耗时(秒)', '本地索引处理查询的平均耗时'],
+            ['avg_dist_wait', '平均远端等待(秒)', '等待远端 agent 返回的平均耗时'],
+            ['avg_query_reads', '平均读取次数', '平均每个查询读取磁盘的次数, OFF 表示未统计'],
+            ['avg_query_readkb', '平均读取量(KB)', '平均每个查询读取的数据量, OFF 表示未统计'],
+            ['avg_query_readtime', '平均读取耗时(秒)', '平均每个查询的磁盘读取耗时, OFF 表示未统计'],
+
+            ['qcache_max_bytes', '查询缓存上限(字节)', '查询缓存可使用的最大内存, 为 0 表示缓存未开启'],
+            ['qcache_thresh_msec', '缓存触发阈值(毫秒)', '查询耗时超过该值才会写入缓存, 3000 即 3 秒'],
+            ['qcache_ttl_sec', '缓存有效期(秒)', '缓存条目的存活时间'],
+            ['qcache_cached_queries', '已缓存查询数', '当前缓存中的查询条数'],
+            ['qcache_used_bytes', '缓存已用内存(字节)', '查询缓存当前占用的内存'],
+            ['qcache_hits', '缓存命中次数', '命中查询缓存的累计次数'],
+
+            ['attrindex_thresh', '属性索引阈值', '属性索引的触发阈值, 由 searchd 返回']
+        ];
 
         var tbody = '';
         var used = {};
-        for (var key in statusInfo) {
-            used[key] = true;
-            var name = statusInfo[key][0];
-            tbody += '<tr><th>' + name + '<br><span class="c8" style="font-weight:normal;">' + key + '</span></th>\
-                <td>' + sv(key) + '</td><td class="c6">' + statusInfo[key][1] + '</td></tr>';
+        for (var idx = 0; idx < statusInfo.length; idx++) {
+            var item = statusInfo[idx];
+            used[item[0]] = true;
+            tbody += '<tr><th>' + item[1] + '<br><span class="c8" style="font-weight:normal;">' + item[0] + '</span></th>\
+                <td>' + sv(item[0]) + '</td><td class="c6">' + item[2] + '</td></tr>';
         }
         for (var i in idata) {
             if (used[i]) {
                 continue;
             }
-            tbody += '<tr><th>' + i + '</th><td>' + idata[i] + '</td><td class="c6">searchd 原始指标</td></tr>';
+            tbody += '<tr><th>' + i + '</th><td>' + idata[i] + '</td><td class="c6">searchd 原始指标, 暂未收录中文说明</td></tr>';
         }
 
         var con = '<div class="divtable"><table class="table table-hover table-bordered" style="margin-bottom:10px;background-color:#fafafa">\
