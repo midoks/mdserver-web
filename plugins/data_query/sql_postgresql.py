@@ -83,10 +83,90 @@ def fmtRows(rows):
 
 
 def getRootPwd():
-    """从 sqlite config 表读取 postgres root 密码, 与 backup.py 同源."""
+    """从 sqlite config 表读取 postgres root 密码, 与 backup.py / index.py 同源."""
     db_path = getServerDir()
     db_name = 'pgsql'
     return mw.M('config').dbPos(db_path, db_name).where('id=?', (1,)).getField('pg_root')
+
+
+# -------- 连接缓存: 同一 (host, port, database) 30 秒内复用 --------
+# 前端 2s 轮询 × 多接口 = 每秒 10+ 次新建连接, 每次都做 scram-sha-256 认证,
+# 用简单 TTL cache 把 90% 的连接开销吃掉.
+_conn_cache = {}          # key=(host, port, database), value=(PgClient, expire_ts)
+_conn_cache_ttl = 30      # 秒
+
+
+def _cacheGetClient(database='postgres'):
+    """从缓存取 (或新建) 一个 PgClient."""
+    port = getPort()
+    host = getSocketDir() or '127.0.0.1'
+    key = (host, port, database)
+    now = time.time()
+    item = _conn_cache.get(key)
+    if item and item[1] > now:
+        client = item[0]
+        # 快速探测: 发个 ping 确认还活着
+        try:
+            client.execute('select 1')
+            return client
+        except Exception:
+            # 连接死了, 扔掉重建
+            try:
+                client.conn.close()
+            except Exception:
+                pass
+            del _conn_cache[key]
+
+    client = PgClient(database)
+    if not client.connect():
+        return None
+    client._cached = True   # 标记为缓存连接, close() 时不真关
+    _conn_cache[key] = (client, now + _conn_cache_ttl)
+    return client
+
+
+def _cacheClear():
+    """进程退出前清所有连接."""
+    for key, item in list(_conn_cache.items()):
+        try:
+            item[0].close()
+        except Exception:
+            pass
+    _conn_cache.clear()
+
+
+def openClient(args, database='postgres'):
+    # 1) 缓存快速通道: 大部分情况下 30s 内直接复用, 零额外握手
+    try:
+        client = _cacheGetClient(database)
+        if client is not None:
+            return client, None
+    except Exception:
+        pass
+
+    # 2) 缓存 miss / connect 失败: 走原来的 error 分类逻辑
+    client = PgClient(database)
+    if not client.connect():
+        detail = (client.error or '').strip()
+        if client.status == 'not_installed':
+            msg = 'PostgreSQL 未安装'
+        elif client.status == 'not_running':
+            msg = 'PostgreSQL 未启动' + ('：' + detail if detail else '')
+        elif client.status == 'db_not_found':
+            msg = '数据库不存在' + ('：' + detail if detail else '')
+        elif client.status == 'auth_error':
+            msg = '连接失败，请检查数据库认证配置' + ('：' + detail if detail else '')
+        else:
+            msg = detail or '连接失败'
+        return None, mw.returnData(False, msg)
+
+    # 3) connect 成功但缓存里没有 —— 补进缓存 (理论上不会走到这里, 防御性代码)
+    client._cached = True
+    port = getPort()
+    host = getSocketDir() or '127.0.0.1'
+    key = (host, port, database)
+    _conn_cache[key] = (client, time.time() + _conn_cache_ttl)
+    return client, None
 
 
 class PgClient:
@@ -96,6 +176,7 @@ class PgClient:
         self.status = None
         self.error = None
         self.conn = None
+        self._cached = False   # True = 来自 _conn_cache, close() 时不真关连接
 
     def connect(self):
         if not isInstalled():
@@ -173,6 +254,13 @@ class PgClient:
             cur.close()
 
     def close(self):
+        if self._cached:
+            # 缓存连接: 不真关, 只重置 TTL (同一次轮询里下次还能复用)
+            port = getPort()
+            host = getSocketDir() or '127.0.0.1'
+            key = (host, port, self.database)
+            _conn_cache[key] = (self, time.time() + _conn_cache_ttl)
+            return
         if self.conn:
             self.conn.close()
             self.conn = None
@@ -424,7 +512,11 @@ def _dbStatSnapshot(client):
     }
 
 
-# QPS/TPS 指标
+# get_net_list 用的差分缓存: 存上一次快照, 本次调用 - 上次 = QPS/TPS, 不需要 sleep
+_net_last_snap = None  # (timestamp, dict snapshot)
+
+
+# QPS/TPS 指标 (无阻塞: 用上次快照做差分, 不 sleep)
 def get_net_list(args):
     from datetime import datetime
 
@@ -433,30 +525,44 @@ def get_net_list(args):
         return err
 
     try:
-        row1 = _dbStatSnapshot(client)
-        time.sleep(1)
-        row2 = _dbStatSnapshot(client)
+        global _net_last_snap
+        now = time.time()
+        curr = _dbStatSnapshot(client)
 
         max_conn = client.one("select setting from pg_settings where name = 'max_connections'")
         conn_row = client.one("select count(*) as num from pg_stat_activity where backend_type = 'client backend'")
 
+        if _net_last_snap is None or (now - _net_last_snap[0]) < 0.5:
+            # 第一次调用 / 间隔太短: 差分不可靠, 返回 0 并记录快照
+            diff_select = diff_insert = diff_update = diff_delete = diff_commit = 0
+        else:
+            prev_ts, prev = _net_last_snap
+            elapsed = now - prev_ts
+            diff_select = round((curr['fetched'] - prev['fetched']) / elapsed, 2)
+            diff_insert = round((curr['inserted'] - prev['inserted']) / elapsed, 2)
+            diff_update = round((curr['updated'] - prev['updated']) / elapsed, 2)
+            diff_delete = round((curr['deleted'] - prev['deleted']) / elapsed, 2)
+            diff_commit = round((curr['commits'] - prev['commits']) / elapsed, 2)
+
+        _net_last_snap = (now, curr)
+
         row = {}
         row['current_time'] = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-        row['select'] = row2['fetched'] - row1['fetched']
-        row['insert'] = row2['inserted'] - row1['inserted']
-        row['update'] = row2['updated'] - row1['updated']
-        row['delete'] = row2['deleted'] - row1['deleted']
+        row['select'] = diff_select
+        row['insert'] = diff_insert
+        row['update'] = diff_update
+        row['delete'] = diff_delete
+        row['commit'] = diff_commit
         row['conn'] = conn_row['num']
         row['max_conn'] = max_conn['setting']
-        # PostgreSQL 的 pg_stat 不提供网络字节计数器
         row['recv_mbps'] = '-'
         row['send_mbps'] = '-'
 
-        rdata = []
-        rdata.append(row)
+        rdata = [row]
         return mw.returnData(True, 'ok', rdata)
     finally:
-        client.close()
+        # client 在连接缓存里, 不 close
+        pass
 
 
 # 查询执行次数最频繁的前N条SQL语句
