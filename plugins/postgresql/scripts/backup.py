@@ -213,6 +213,7 @@ class backupTools:
             safe_pwd, pg_dump_inner, compressor_cmd, filename, exit_code_file)
 
         # print(cmd)
+        os.system(cmd)
         mw.execShell(cmd)
 
         endDate = time.strftime('%Y/%m/%d %X', time.localtime())
@@ -220,6 +221,9 @@ class backupTools:
         # 从 stderr 日志读取 pg_dump 的错误输出
         exit_code = mw.readFile(exit_code_file) or 1
         stderr_txt = mw.readFile(pg_dump_stderr)
+
+        print(exit_code)
+        print(stderr_txt)
         if exit_code != 0 \
                 or not os.path.exists(filename) \
                 or os.path.getsize(filename) < 200:
@@ -235,6 +239,7 @@ class backupTools:
             print("----------------------------------------------------------------------------")
             return
 
+        
         outTime = time.time() - startTime
 
         log = "数据库[" + backup_name + "]备份成功,用时[" + str(round(outTime, 2)) + "]秒"
