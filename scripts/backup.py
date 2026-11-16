@@ -359,7 +359,7 @@ if __name__ == "__main__":
         else:
             backup.backupSite(sys.argv[2], sys.argv[3], sys.argv[4])
     elif stype == 'database':
-        if sys.argv[2] == 'ALL':
+        if sys.argv[2] == 'ALL@':
             backup.backupDatabaseAll(sys.argv[3])
         else:
             backup.backupDatabase(sys.argv[2], sys.argv[3])
