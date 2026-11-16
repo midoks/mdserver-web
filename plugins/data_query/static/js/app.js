@@ -1834,9 +1834,14 @@ function mongodbDataList(p){
 
                     if (f in dlist[i]) {
                         if (f == '_id' ){
-                            tbody += '<td>'+dlist[i]['_id']['$oid']+'</td>';
+                            tbody += '<td>'+dlist[i]['_id']+'</td>';
                         } else {
-                            tbody += '<td>'+dlist[i][f]+'</td>';
+                            var val = dlist[i][f];
+                            // 展平函数: 避免任何剩余对象显示 [object Object]
+                            if (val !== null && typeof val === 'object') {
+                                val = JSON.stringify(val);
+                            }
+                            tbody += '<td>'+val+'</td>';
                         }
                     } else {
                         tbody += '<td>undefined</td>';
@@ -1858,7 +1863,7 @@ function mongodbDataList(p){
 
             $('#mongodb .del').click(function(){
                 var i = $(this).data('index');
-                mongodbDel(dlist[i]['_id']['$oid']);
+                mongodbDel(dlist[i]['_id']);
             });
         }
     });

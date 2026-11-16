@@ -357,42 +357,55 @@ class nosqlMySQLCtr():
 
 
     def getNetList(self, args):
+        """无阻塞 QPS/TPS/网络带宽指标: 用上次快照做差分, 不 sleep."""
         from datetime import datetime
         sid = args['sid']
         my_instance, err = self._connect(sid)
         if err:
             return err
 
-        rdata = []
-        row = {}
-        row1 = self.getNetRow(my_instance)
-        # 等待1秒
-        time.sleep(1)
-        row2 = self.getNetRow(my_instance)
+        # 初始化快照存储 (按 sid 区分, 支持多实例)
+        if not hasattr(self, '__net_snaps'):
+            self.__net_snaps = {}   # {sid: (timestamp, row_dict)}
+
+        curr = self.getNetRow(my_instance)
+        now = time.time()
+        snap = self.__net_snaps.get(sid)
+
+        if snap is None or (now - snap[0]) < 0.5:
+            # 第一次调用 / 间隔太短: 差分不可靠, 返回 0 并记录快照
+            diff_select = diff_insert = diff_update = diff_delete = 0.0
+            diff_recv = diff_send = 0.0
+        else:
+            prev_ts, prev = snap
+            elapsed = now - prev_ts
+            diff_select = round((int(curr['select']) - int(prev['select'])) / elapsed, 2)
+            diff_insert = round((int(curr['insert']) - int(prev['insert'])) / elapsed, 2)
+            diff_update = round((int(curr['update']) - int(prev['update'])) / elapsed, 2)
+            diff_delete = round((int(curr['delete']) - int(prev['delete'])) / elapsed, 2)
+            diff_recv = int(curr['recv_bytes']) - int(prev['recv_bytes'])
+            diff_send = int(curr['send_bytes']) - int(prev['send_bytes'])
+
+        self.__net_snaps[sid] = (now, curr)
 
         data = my_instance.find("SHOW GLOBAL VARIABLES LIKE 'max_connections'")
-        row['max_conn'] = data['Value']
+        max_conn = data['Value'] if data else '-'
 
         data = my_instance.find("SHOW GLOBAL STATUS LIKE 'Threads_connected'")
-        row['conn']  = data['Value']
+        conn = data['Value'] if data else '0'
 
-        current_time = datetime.now()
-        row['current_time'] = current_time.strftime("%Y-%m-%d %H:%M:%S")
+        row = {}
+        row['current_time'] = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+        row['select'] = diff_select
+        row['insert'] = diff_insert
+        row['update'] = diff_update
+        row['delete'] = diff_delete
+        row['conn'] = conn
+        row['max_conn'] = max_conn
+        row['recv_mbps'] = "{:.2f} MBit/s".format(diff_recv * 8 / 1000000)
+        row['send_mbps'] = "{:.2f} MBit/s".format(diff_send * 8 / 1000000)
 
-        row['select'] = int(row2['select']) - int(row1['select'])
-        row['insert'] = int(row2['insert']) - int(row1['insert'])
-        row['update'] = int(row2['update']) - int(row1['update'])
-        row['delete'] = int(row2['delete']) - int(row1['delete'])
-
-        recv_per_second = int(row2['recv_bytes']) - int(row1['recv_bytes'])
-        send_per_second = int(row2['send_bytes']) - int(row1['send_bytes'])
-
-        # 将每秒接收和发送数据量从字节转换为兆比特
-        row['recv_mbps'] = "{:.2f}".format(recv_per_second * 8 / 1000000) + " MBit/s" 
-        row['send_mbps'] = "{:.2f}".format(send_per_second * 8 / 1000000) + " MBit/s"
-
-        rdata.append(row)
-        return mw.returnData(True, 'ok', rdata)
+        return mw.returnData(True, 'ok', [row])
 
 
     def getTopnList(self, args):

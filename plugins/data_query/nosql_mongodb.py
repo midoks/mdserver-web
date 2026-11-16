@@ -12,6 +12,79 @@ import yaml
 from bson.objectid import ObjectId
 from bson.json_util import dumps
 
+
+# -------- MongoDB Extended JSON 展平: 把嵌套单键特殊类型转成可读值 --------
+# bson.json_util.dumps 输出的 Extended JSON 里日期/ObjectId/Decimal 等都是嵌套 dict,
+# 前端直接拼接字符串会显示 [object Object]. 这里递归展平成标准类型.
+_BSON_SPECIAL_KEYS = {
+    '$oid', '$date', '$numberLong', '$numberDecimal', '$numberInt',
+    '$numberDouble', '$binary', '$regex', '$minKey', '$maxKey',
+    '$timestamp', '$code', '$symbol', '$ref',
+}
+
+
+def _flatten_bson(obj):
+    """递归把 MongoDB Extended JSON 的特殊嵌套结构展平为可前端直接展示的值."""
+    if isinstance(obj, dict):
+        # 单键且是 BSON 特殊类型 → 提取其值
+        if len(obj) == 1:
+            key = next(iter(obj))
+            if key == '$oid':
+                return obj[key]
+            if key == '$date':
+                # 已是 ISO 字符串, 直接返回
+                return obj[key]
+            if key in ('$numberLong', '$numberInt'):
+                try:
+                    return int(obj[key])
+                except (ValueError, TypeError):
+                    return obj[key]
+            if key == '$numberDecimal':
+                try:
+                    return float(obj[key])
+                except (ValueError, TypeError):
+                    return obj[key]
+            if key == '$numberDouble':
+                try:
+                    return float(obj[key])
+                except (ValueError, TypeError):
+                    return obj[key]
+            if key == '$minKey':
+                return '<minKey>'
+            if key == '$maxKey':
+                return '<maxKey>'
+            if key == '$timestamp':
+                ts = obj[key]
+                if isinstance(ts, dict) and 't' in ts:
+                    import datetime
+                    try:
+                        return datetime.datetime.utcfromtimestamp(ts['t']).strftime('%Y-%m-%d %H:%M:%S')
+                    except Exception:
+                        return str(ts)
+                return str(obj[key])
+            if key == '$binary':
+                b = obj[key]
+                if isinstance(b, dict):
+                    return b.get('base64', '') + ' (base64)'
+                return str(b)
+            if key == '$regex':
+                pattern = obj[key]
+                opts = obj.get('$options', '')
+                return '/' + pattern + '/' + opts
+            if key == '$code':
+                return '<code> ' + str(obj[key])
+            if key == '$symbol':
+                return str(obj[key])
+            if key == '$ref':
+                return obj.get('$ref', '')
+            # 不是特殊键, 继续递归普通 dict
+            return {k: _flatten_bson(v) for k, v in obj.items()}
+        # 多键 dict: 全部递归
+        return {k: _flatten_bson(v) for k, v in obj.items()}
+    if isinstance(obj, list):
+        return [_flatten_bson(item) for item in obj]
+    return obj
+
 web_dir = os.getcwd() + "/web"
 if os.path.exists(web_dir):
     sys.path.append(web_dir)
@@ -312,7 +385,8 @@ class nosqlMongodbCtr():
             d.append(document)
 
         doc_str_json = dumps(d)
-        result = json.loads(doc_str_json)
+        raw_result = json.loads(doc_str_json)
+        result = _flatten_bson(raw_result)
 
 
         page_args = {}
