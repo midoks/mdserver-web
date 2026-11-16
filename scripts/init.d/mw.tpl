@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 # chkconfig: 2345 55 25
 # description: MW Cloud Service
 
