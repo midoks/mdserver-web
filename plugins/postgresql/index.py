@@ -526,6 +526,12 @@ def reload(version=''):
     return appCMD(version, 'restart')
 
 
+def pg_reload_conf(version=''):
+    pdb = pgDb()
+    t = pdb.query('SELECT pg_reload_conf()')
+    return True
+
+
 def initdStatus():
     if mw.isAppleSystem():
         return "Apple Computer does not support"
@@ -1734,7 +1740,7 @@ def setDbAccess():
     # postgres 为内置库, 不在数据表记录, 只改配置文件
     if name == 'postgres':
         setHbaAccess(name, access)
-        restart()
+        pg_reload_conf()
         return mw.returnJson(True, "设置成功")
 
     psdb = pSqliteDb('databases')
@@ -1746,8 +1752,7 @@ def setDbAccess():
     mw.writeFile(conf, new_data)
 
     psdb.where("name=?", (name,)).setField('accept', access)
-    restart()
-
+    pg_reload_conf()
     if isSlaveDb():
         return mw.returnJson(True, '从库修改权限成功!')
     return mw.returnJson(True, "设置成功")
