@@ -1090,7 +1090,8 @@ def getDbBackupList():
         rr.append(data)
 
         data['file'] = p
-
+        
+    rr.sort(key=lambda x: x['time'], reverse=True)
     return mw.returnJson(True, 'ok', rr)
 
 

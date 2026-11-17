@@ -1298,9 +1298,13 @@ function importDbExternalProgress(file,name){
 
 
 function otherFunc(){
-    var con = '<p class="conf_p" style="text-align:center;">\
-            <button class="btn btn-default btn-sm" onclick="cronAddCheck()">添加检查任务</button>  \
-            <button class="btn btn-default btn-sm" onclick="cronDelCheck()">删除检查任务</button>\
+    var con = '<p class="conf_p">\
+            <button class="btn btn-default btn-sm" onclick="cronAddCheck()">添加检查任务</button>\
+            <button class="btn btn-default btn-sm" onclick="cronDelCheck()">删除检查任务</button><hr/>\
+            <button class="btn btn-default btn-sm" onclick="cleanLog()">清空日志</button><hr/>\
+            <button class="btn btn-default btn-sm" onclick="openSlowlogCmd()">开启慢日志</button>\
+            <button class="btn btn-default btn-sm" onclick="closeSlowlogCmd()">关闭慢日志</button>\
+            <button class="btn btn-default btn-sm" onclick="findSlowlogCmd()">查看慢日志</button>\
         </p>';
     $(".soft-man-con").html(con);
 }
@@ -1316,6 +1320,52 @@ function cronDelCheck(){
     mgPost('cron_del_check', '', {}, function(data){
         var rdata = $.parseJSON(data.data);
         layer.msg(rdata.msg, { icon: rdata.status ? 1 : 2 });
+    });
+}
+
+function cleanLog(){
+	mgPost('clean_log', '', {}, function(data){
+        var rdata = $.parseJSON(data.data);
+        layer.msg(rdata.msg, { icon: rdata.status ? 1 : 2 });
+    });
+}
+
+function openSlowlogCmd(){
+    mgPost('open_slowlog', '', {}, function(data){
+        var rdata = $.parseJSON(data.data);
+        layer.msg(rdata.msg, { icon: rdata.status ? 1 : 2 });
+    });
+}
+
+function closeSlowlogCmd(){
+    mgPost('close_slowlog', '', {}, function(data){
+        var rdata = $.parseJSON(data.data);
+        layer.msg(rdata.msg, { icon: rdata.status ? 1 : 2 });
+    });
+}
+
+function findSlowlogCmd(file,name){
+    mgPost('find_slowlog_cmd','', {}, function(data){
+        var rdata = $.parseJSON(data.data);
+        layer.open({
+            title: "手动CMD",
+            area: ['600px', '180px'],
+            type:1,
+            closeBtn: 1,
+            shadeClose: false,
+            btn:["复制","取消"],
+            content: '<div class="pd15">\
+                        <div class="divtable">\
+                            <pre class="layui-code">'+rdata.data+'</pre>\
+                        </div>\
+                    </div>',
+            success:function(){
+                copyText(rdata.data);
+            },
+            yes:function(){
+                copyText(rdata.data);
+            }
+        });
     });
 }
 

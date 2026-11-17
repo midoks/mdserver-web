@@ -70,6 +70,11 @@ def getConfKey():
 
 def getConfTpl():
     path = getPluginDir() + "/config/mongodb.conf"
+
+    ver_pl = getServerDir()+"/version.pl"
+    ver = mw.readFile(ver_pl)
+    if ver.startswith('3.0'):
+        path = getPluginDir() + "/config/mongodb3.conf"
     return path
 
 def getConfigData():
@@ -148,16 +153,16 @@ def getConfAuth():
 def getArgs():
     args = sys.argv[2:]
     tmp = {}
-    args_len = len(args)
 
-    if args_len == 1:
-        t = args[0].strip('{').strip('}')
-        t = t.split(':', 1)
+    # 兼容前端传 {} / 空参数: 去掉花括号后为空的直接跳过, 避免 split 后越界
+    for arg in args:
+        arg = arg.strip().strip('{').strip('}').strip()
+        if arg == '':
+            continue
+        t = arg.split(':', 1)
+        if len(t) < 2:
+            continue
         tmp[t[0]] = t[1]
-    elif args_len > 1:
-        for i in range(len(args)):
-            t = args[i].split(':', 1)
-            tmp[t[0]] = t[1]
 
     return tmp
 
@@ -370,6 +375,10 @@ def restart():
     if os.path.exists("/tmp/mongodb-27017.sock"):
         mw.execShell('rm -rf ' + "/tmp/mongodb-27017.sock")
 
+    cfg = getConfigData()
+    log_file = cfg['systemLog']['path']
+    if os.path.exists(log_file):
+        mw.writeFile(log_file,'')
     return mgOp('restart')
 
 
@@ -764,7 +773,17 @@ def delDbTable():
 
     try:
         cur_db = client[name]
+
+        # system.profile 是开启 profiling 后自动生成的系统集合，
+        # MongoDB 要求先关闭 profiling 才能删除，否则报
+        # IllegalOperation(code 20): turn off profiling before dropping system.profile collection
+        if table_name == 'system.profile':
+            cur_db.command('profile', 0)
+
         cur_db[table_name].drop()
+
+        if table_name == 'system.profile':
+            return mw.returnJson(True, '删除成功!（已同时关闭该库的 profiling）')
         return mw.returnJson(True, '删除成功!')
     except Exception as ex:
         return mw.returnJson(False, '删除失败!' + str(ex))
@@ -1367,6 +1386,7 @@ def getDbBackupList():
 
         data['file'] = p
 
+    rr.sort(key=lambda x: x['time'], reverse=True)
     return mw.returnJson(True, 'ok', rr)
 
 def getDbBackupImportList():
@@ -1802,6 +1822,126 @@ def cronDelCheck():
     except Exception as e:
         return mw.returnJson(False, '删除检查任务失败:'+str(e))
 
+def cleanLog():
+    cfg = getConfigData()
+    log_file = cfg['systemLog']['path']
+
+    try:
+        if not os.path.isfile(log_file):
+            return mw.returnJson(False, '日志文件不存在:' + log_file)
+
+        size = os.path.getsize(log_file)
+        # O_TRUNC 截断: O(1) 操作, 不读写文件内容, 保留 inode/权限/属主,
+        # 日志再大也能瞬间清空; mongod 以追加方式写日志, 截断后可继续写入.
+        with open(log_file, 'w'):
+            pass
+
+        if size >= 1024 * 1024 * 1024:
+            size_txt = '%.2fGB' % (size / 1024.0 / 1024 / 1024)
+        elif size >= 1024 * 1024:
+            size_txt = '%.2fMB' % (size / 1024.0 / 1024)
+        elif size >= 1024:
+            size_txt = '%.2fKB' % (size / 1024.0)
+        else:
+            size_txt = '%dB' % size
+
+        return mw.returnJson(True, '清空成功!释放 %s' % size_txt)
+    except Exception as ex:
+        return mw.returnJson(False, '清空失败:' + str(ex))
+
+def _setProfiling(level):
+    '''统一设置 profiling: level=1 开启慢日志采集, level=0 关闭.
+    profiling 按数据库生效, 这里对所有业务库统一操作(跳过 local/config 系统库).
+    可选参数: slowms=慢查询阈值(毫秒, 默认100).'''
+    t = status()
+    if t == 'stop':
+        return mw.returnJson(False, 'MongoDB 未启动!')
+
+    args = getArgs()
+
+    slowms = 300
+    if 'slowms' in args:
+        try:
+            slowms = int(args['slowms'])
+        except (ValueError, TypeError):
+            slowms = 100
+
+    action = '开启' if level > 0 else '关闭'
+    try:
+        client = mongdbClient()
+        # profiling 按库生效, 对所有业务库统一设置; local/config 为系统内部库, 跳过
+        db_names = [x for x in client.list_database_names() if x not in ('local', 'config')]
+        if not db_names:
+            return mw.returnJson(False, '没有可操作的数据库!')
+
+        changed = []
+        already = []
+        cleaned = []
+        failed = []
+        for name in db_names:
+            try:
+                db = client[name]
+                # profile:-1 查询当前级别, 返回 {'was': 当前级别, 'slowms': 阈值}
+                cur_level = int(db.command('profile', -1).get('was', 0) or 0)
+
+                if level > 0:
+                    if cur_level > 0:
+                        already.append(name)
+                        continue
+                    db.command('profile', level, slowms=slowms)
+                    changed.append(name)
+                else:
+                    if cur_level > 0:
+                        db.command('profile', 0)
+                        changed.append(name)
+                    else:
+                        already.append(name)
+
+                    # 关闭后清理 profiler 采集表: MongoDB 要求先关 profiling 才能删除 system.profile
+                    if 'system.profile' in db.list_collection_names():
+                        db.drop_collection('system.profile')
+                        cleaned.append(name)
+            except Exception as ex:
+                failed.append('%s(%s)' % (name, str(ex)))
+
+        if level == 0:
+            if not changed and not cleaned and not failed:
+                return mw.returnJson(True, '慢日志已经关闭!(共%d个数据库)' % len(already))
+            msg = '关闭慢日志成功!(共%d个数据库' % len(changed)
+            msg += ')'
+            if cleaned:
+                msg += ', 已清理%d个system.profile' % len(cleaned)
+            if already:
+                msg += ', 其中%d个已关闭' % len(already)
+            if failed:
+                msg += '; 失败%d个:%s' % (len(failed), failed[0])
+            return mw.returnJson(len(failed) == 0, msg)
+
+        if not changed and not failed:
+            return mw.returnJson(True, '慢日志已经开启!(共%d个数据库)' % len(already))
+
+        msg = '开启慢日志成功!(共%d个数据库, 慢查询阈值:%sms' % (len(changed), slowms)
+        msg += ')'
+        if already:
+            msg += ', 其中%d个已开启' % len(already)
+        if failed:
+            msg += '; 失败%d个:%s' % (len(failed), failed[0])
+        return mw.returnJson(len(failed) == 0, msg)
+    except Exception as ex:
+        return mw.returnJson(False, '%s慢日志失败:%s' % (action, str(ex)))
+
+def openSlowlog():
+    return _setProfiling(1)
+
+def closeSlowlog():
+    return _setProfiling(0)
+
+def findSlowlogCmd():
+    cfg = getConfigData()
+    log_file = cfg['systemLog']['path']
+    cmd = "cat "+log_file + "|grep 'Slow query'"
+    return mw.returnJson(True, 'ok', cmd)
+
 
 def installPreInspectionDebainCheck(sysId,version):
     if version == '8.0':
@@ -1961,5 +2101,13 @@ if __name__ == "__main__":
         print(cronAddCheck())
     elif func == 'cron_del_check':
         print(cronDelCheck())
+    elif func == 'clean_log':
+        print(cleanLog())
+    elif func == 'open_slowlog':
+        print(openSlowlog())
+    elif func == 'close_slowlog':
+        print(closeSlowlog())
+    elif func == 'find_slowlog_cmd':
+        print(findSlowlogCmd())
     else:
         print('error')
