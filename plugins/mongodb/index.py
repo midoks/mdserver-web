@@ -153,16 +153,16 @@ def getConfAuth():
 def getArgs():
     args = sys.argv[2:]
     tmp = {}
-    args_len = len(args)
 
-    if args_len == 1:
-        t = args[0].strip('{').strip('}')
-        t = t.split(':', 1)
+    # 兼容前端传 {} / 空参数: 去掉花括号后为空的直接跳过, 避免 split 后越界
+    for arg in args:
+        arg = arg.strip().strip('{').strip('}').strip()
+        if arg == '':
+            continue
+        t = arg.split(':', 1)
+        if len(t) < 2:
+            continue
         tmp[t[0]] = t[1]
-    elif args_len > 1:
-        for i in range(len(args)):
-            t = args[i].split(':', 1)
-            tmp[t[0]] = t[1]
 
     return tmp
 
@@ -1822,6 +1822,75 @@ def cronDelCheck():
     except Exception as e:
         return mw.returnJson(False, '删除检查任务失败:'+str(e))
 
+def _setProfiling(level):
+    '''统一设置 profiling: level=1 开启慢日志采集, level=0 关闭.
+    profiling 按数据库生效, 这里对所有业务库统一操作(跳过 local/config 系统库).
+    可选参数: slowms=慢查询阈值(毫秒, 默认100).'''
+    t = status()
+    if t == 'stop':
+        return mw.returnJson(False, 'MongoDB 未启动!')
+
+    args = getArgs()
+
+    slowms = 100
+    if 'slowms' in args:
+        try:
+            slowms = int(args['slowms'])
+        except (ValueError, TypeError):
+            slowms = 100
+
+    action = '开启' if level > 0 else '关闭'
+    try:
+        client = mongdbClient()
+        # profiling 按库生效, 对所有业务库统一设置; local/config 为系统内部库, 跳过
+        db_names = [x for x in client.list_database_names() if x not in ('local', 'config')]
+        if not db_names:
+            return mw.returnJson(False, '没有可操作的数据库!')
+
+        changed = []
+        already = []
+        failed = []
+        for name in db_names:
+            try:
+                db = client[name]
+                # profile:-1 查询当前级别, 返回 {'was': 当前级别, 'slowms': 阈值}
+                cur_level = int(db.command('profile', -1).get('was', 0) or 0)
+
+                if level > 0:
+                    if cur_level > 0:
+                        already.append(name)
+                        continue
+                    db.command('profile', level, slowms=slowms)
+                    changed.append(name)
+                else:
+                    if cur_level == 0:
+                        already.append(name)
+                        continue
+                    db.command('profile', 0)
+                    changed.append(name)
+            except Exception as ex:
+                failed.append('%s(%s)' % (name, str(ex)))
+
+        if not changed and not failed:
+            return mw.returnJson(True, '慢日志已经%s!(共%d个数据库)' % (action, len(already)))
+
+        msg = '%s慢日志成功!(共%d个数据库' % (action, len(changed))
+        if level > 0:
+            msg += ', 慢查询阈值:%sms' % slowms
+        msg += ')'
+        if already:
+            msg += ', 其中%d个已%s' % (len(already), action)
+        if failed:
+            msg += '; 失败%d个:%s' % (len(failed), failed[0])
+        return mw.returnJson(len(failed) == 0, msg)
+    except Exception as ex:
+        return mw.returnJson(False, '%s慢日志失败:%s' % (action, str(ex)))
+
+def openSlowlog():
+    return _setProfiling(1)
+
+def closeSlowlog():
+    return _setProfiling(0)
 
 def findSlowlogCmd():
     cfg = getConfigData()
@@ -1988,6 +2057,10 @@ if __name__ == "__main__":
         print(cronAddCheck())
     elif func == 'cron_del_check':
         print(cronDelCheck())
+    elif func == 'open_slowlog':
+        print(openSlowlog())
+    elif func == 'close_slowlog':
+        print(closeSlowlog())
     elif func == 'find_slowlog_cmd':
         print(findSlowlogCmd())
     else:
