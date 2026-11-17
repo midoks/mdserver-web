@@ -1822,6 +1822,12 @@ def cronDelCheck():
     except Exception as e:
         return mw.returnJson(False, '删除检查任务失败:'+str(e))
 
+def cleanLog():
+    cfg = getConfigData()
+    log_file = cfg['systemLog']['path']
+    mw.writeFile(log_file, '')
+    return mw.returnJson(True, '清空成功!') 
+
 def _setProfiling(level):
     '''统一设置 profiling: level=1 开启慢日志采集, level=0 关闭.
     profiling 按数据库生效, 这里对所有业务库统一操作(跳过 local/config 系统库).
@@ -2074,6 +2080,8 @@ if __name__ == "__main__":
         print(cronAddCheck())
     elif func == 'cron_del_check':
         print(cronDelCheck())
+    elif func == 'clean_log':
+        print(cleanLog())
     elif func == 'open_slowlog':
         print(openSlowlog())
     elif func == 'close_slowlog':

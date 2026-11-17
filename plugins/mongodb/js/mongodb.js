@@ -1298,9 +1298,10 @@ function importDbExternalProgress(file,name){
 
 
 function otherFunc(){
-    var con = '<p class="conf_p" style="text-align:center;">\
+    var con = '<p class="conf_p">\
             <button class="btn btn-default btn-sm" onclick="cronAddCheck()">添加检查任务</button>\
-            <button class="btn btn-default btn-sm" onclick="cronDelCheck()">删除检查任务</button>\
+            <button class="btn btn-default btn-sm" onclick="cronDelCheck()">删除检查任务</button><hr/>\
+            <button class="btn btn-default btn-sm" onclick="cleanLog()">清空日志</button><hr/>\
             <button class="btn btn-default btn-sm" onclick="openSlowlogCmd()">开启慢日志</button>\
             <button class="btn btn-default btn-sm" onclick="closeSlowlogCmd()">关闭慢日志</button>\
             <button class="btn btn-default btn-sm" onclick="findSlowlogCmd()">查看慢日志</button>\
@@ -1317,6 +1318,13 @@ function cronAddCheck(){
 
 function cronDelCheck(){
     mgPost('cron_del_check', '', {}, function(data){
+        var rdata = $.parseJSON(data.data);
+        layer.msg(rdata.msg, { icon: rdata.status ? 1 : 2 });
+    });
+}
+
+function cleanLog(){
+	mgPost('clean_log', '', {}, function(data){
         var rdata = $.parseJSON(data.data);
         layer.msg(rdata.msg, { icon: rdata.status ? 1 : 2 });
     });
