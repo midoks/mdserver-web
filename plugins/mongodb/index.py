@@ -1816,7 +1816,7 @@ def findSlowlogCmd():
     cfg = getConfigData()
     log_file = cfg['systemLog']['path']
     cmd = "cat "+log_file + "|grep 'Slow query'"
-    return mw.returnJson(True, '删除检查任务成功')
+    return mw.returnJson(True, 'ok', cmd)
 
 
 def installPreInspectionDebainCheck(sysId,version):
