@@ -773,7 +773,17 @@ def delDbTable():
 
     try:
         cur_db = client[name]
+
+        # system.profile 是开启 profiling 后自动生成的系统集合，
+        # MongoDB 要求先关闭 profiling 才能删除，否则报
+        # IllegalOperation(code 20): turn off profiling before dropping system.profile collection
+        if table_name == 'system.profile':
+            cur_db.command('profile', 0)
+
         cur_db[table_name].drop()
+
+        if table_name == 'system.profile':
+            return mw.returnJson(True, '删除成功!（已同时关闭该库的 profiling）')
         return mw.returnJson(True, '删除成功!')
     except Exception as ex:
         return mw.returnJson(False, '删除失败!' + str(ex))
