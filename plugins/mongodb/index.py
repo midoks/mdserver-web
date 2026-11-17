@@ -375,6 +375,10 @@ def restart():
     if os.path.exists("/tmp/mongodb-27017.sock"):
         mw.execShell('rm -rf ' + "/tmp/mongodb-27017.sock")
 
+    cfg = getConfigData()
+    log_file = cfg['systemLog']['path']
+    if os.path.exists(log_file):
+        mw.writeFile(log_file,'')
     return mgOp('restart')
 
 
