@@ -70,6 +70,11 @@ def getConfKey():
 
 def getConfTpl():
     path = getPluginDir() + "/config/mongodb.conf"
+
+    ver_pl = getServerDir()+"/version.pl"
+    ver = mw.readFile(ver_pl)
+    if ver.startswith('3.0'):
+        path = getPluginDir() + "/config/mongodb3.conf"
     return path
 
 def getConfigData():
