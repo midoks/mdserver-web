@@ -1849,6 +1849,7 @@ def _setProfiling(level):
 
         changed = []
         already = []
+        cleaned = []
         failed = []
         for name in db_names:
             try:
@@ -1863,23 +1864,39 @@ def _setProfiling(level):
                     db.command('profile', level, slowms=slowms)
                     changed.append(name)
                 else:
-                    if cur_level == 0:
+                    if cur_level > 0:
+                        db.command('profile', 0)
+                        changed.append(name)
+                    else:
                         already.append(name)
-                        continue
-                    db.command('profile', 0)
-                    changed.append(name)
+
+                    # 关闭后清理 profiler 采集表: MongoDB 要求先关 profiling 才能删除 system.profile
+                    if 'system.profile' in db.list_collection_names():
+                        db.drop_collection('system.profile')
+                        cleaned.append(name)
             except Exception as ex:
                 failed.append('%s(%s)' % (name, str(ex)))
 
-        if not changed and not failed:
-            return mw.returnJson(True, '慢日志已经%s!(共%d个数据库)' % (action, len(already)))
+        if level == 0:
+            if not changed and not cleaned and not failed:
+                return mw.returnJson(True, '慢日志已经关闭!(共%d个数据库)' % len(already))
+            msg = '关闭慢日志成功!(共%d个数据库' % len(changed)
+            msg += ')'
+            if cleaned:
+                msg += ', 已清理%d个system.profile' % len(cleaned)
+            if already:
+                msg += ', 其中%d个已关闭' % len(already)
+            if failed:
+                msg += '; 失败%d个:%s' % (len(failed), failed[0])
+            return mw.returnJson(len(failed) == 0, msg)
 
-        msg = '%s慢日志成功!(共%d个数据库' % (action, len(changed))
-        if level > 0:
-            msg += ', 慢查询阈值:%sms' % slowms
+        if not changed and not failed:
+            return mw.returnJson(True, '慢日志已经开启!(共%d个数据库)' % len(already))
+
+        msg = '开启慢日志成功!(共%d个数据库, 慢查询阈值:%sms' % (len(changed), slowms)
         msg += ')'
         if already:
-            msg += ', 其中%d个已%s' % (len(already), action)
+            msg += ', 其中%d个已开启' % len(already)
         if failed:
             msg += '; 失败%d个:%s' % (len(failed), failed[0])
         return mw.returnJson(len(failed) == 0, msg)
