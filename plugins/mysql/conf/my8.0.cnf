@@ -92,6 +92,10 @@ replicate-wild-ignore-table = information_schema.%
 replicate-wild-ignore-table = performance_schema.%
 replicate-wild-ignore-table = sys.%
 
+master_info_repository = table
+relay_log_info_repository = table
+relay_log_recovery=ON
+
 
 innodb_data_home_dir = {$SERVER_APP_PATH}/data
 innodb_data_file_path = ibdata1:10M:autoextend
