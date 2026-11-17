@@ -1825,8 +1825,29 @@ def cronDelCheck():
 def cleanLog():
     cfg = getConfigData()
     log_file = cfg['systemLog']['path']
-    mw.writeFile(log_file, '')
-    return mw.returnJson(True, '清空成功!') 
+
+    try:
+        if not os.path.isfile(log_file):
+            return mw.returnJson(False, '日志文件不存在:' + log_file)
+
+        size = os.path.getsize(log_file)
+        # O_TRUNC 截断: O(1) 操作, 不读写文件内容, 保留 inode/权限/属主,
+        # 日志再大也能瞬间清空; mongod 以追加方式写日志, 截断后可继续写入.
+        with open(log_file, 'w'):
+            pass
+
+        if size >= 1024 * 1024 * 1024:
+            size_txt = '%.2fGB' % (size / 1024.0 / 1024 / 1024)
+        elif size >= 1024 * 1024:
+            size_txt = '%.2fMB' % (size / 1024.0 / 1024)
+        elif size >= 1024:
+            size_txt = '%.2fKB' % (size / 1024.0)
+        else:
+            size_txt = '%dB' % size
+
+        return mw.returnJson(True, '清空成功!释放 %s' % size_txt)
+    except Exception as ex:
+        return mw.returnJson(False, '清空失败:' + str(ex))
 
 def _setProfiling(level):
     '''统一设置 profiling: level=1 开启慢日志采集, level=0 关闭.
