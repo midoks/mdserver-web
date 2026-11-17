@@ -1299,8 +1299,9 @@ function importDbExternalProgress(file,name){
 
 function otherFunc(){
     var con = '<p class="conf_p" style="text-align:center;">\
-            <button class="btn btn-default btn-sm" onclick="cronAddCheck()">添加检查任务</button>  \
+            <button class="btn btn-default btn-sm" onclick="cronAddCheck()">添加检查任务</button> \
             <button class="btn btn-default btn-sm" onclick="cronDelCheck()">删除检查任务</button>\
+            <button class="btn btn-default btn-sm" onclick="findSlowlogCmd()">查看慢日志</button>\
         </p>';
     $(".soft-man-con").html(con);
 }
@@ -1317,6 +1318,10 @@ function cronDelCheck(){
         var rdata = $.parseJSON(data.data);
         layer.msg(rdata.msg, { icon: rdata.status ? 1 : 2 });
     });
+}
+
+function findSlowlogCmd(){
+	
 }
 
 function mgdbReadme(){

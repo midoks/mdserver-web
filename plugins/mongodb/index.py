@@ -1812,6 +1812,13 @@ def cronDelCheck():
         return mw.returnJson(False, '删除检查任务失败:'+str(e))
 
 
+def findSlowlogCmd():
+    cfg = getConfigData()
+    log_file = cfg['systemLog']['path']
+    cmd = "cat "+log_file + "|grep 'Slow query'"
+    return mw.returnJson(True, '删除检查任务成功')
+
+
 def installPreInspectionDebainCheck(sysId,version):
     if version == '8.0':
         if int(sysId) < 12:
@@ -1970,5 +1977,7 @@ if __name__ == "__main__":
         print(cronAddCheck())
     elif func == 'cron_del_check':
         print(cronDelCheck())
+    elif func == 'find_slowlog_cmd':
+        print(findSlowlogCmd())
     else:
         print('error')
