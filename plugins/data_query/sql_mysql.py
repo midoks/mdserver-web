@@ -1189,12 +1189,18 @@ class nosqlMySQLCtr():
             if non_utf8mb4 is None:
                 unknown('非 utf8mb4 业务表检查返回失败')
             elif non_utf8mb4:
-                warn('发现至少 %d 张业务表仍在用 utf8 (3 字节, 存不下 emoji, 最多显示 20 张)' % len(non_utf8mb4))
+                non_utf8mb4_total = len(non_utf8mb4)
+                if non_utf8mb4_total >= 20:
+                    count_rows = my_instance.query(
+                        "SELECT COUNT(*) AS total FROM information_schema.tables "
+                        "WHERE table_schema NOT IN ('mysql','information_schema','performance_schema','sys') "
+                        "AND table_collation LIKE 'utf8%' AND table_collation NOT LIKE 'utf8mb4%'"
+                    )
+                    non_utf8mb4_total = int(count_rows[0]['total'])
+                warn('发现 %d 张业务表仍在用 utf8 (3 字节, 存不下 emoji, 最多展示 5 个样本)' % non_utf8mb4_total)
                 for r in non_utf8mb4[:5]:
                     warn('  %s.%s  collation=%s' % (r['table_schema'], r['table_name'], r['table_collation']))
                 warn('升级方式: 评估兼容性并备份后, 在低峰执行 ALTER TABLE ... CONVERT TO CHARACTER SET utf8mb4')
-                if len(non_utf8mb4) >= 20:
-                    unknown('非 utf8mb4 业务表检查达到 LIMIT 20, 扫描结果不完整')
             else:
                 ok('未发现仍使用 utf8 的业务表')
         except Exception as ex:
@@ -1335,12 +1341,14 @@ class nosqlMySQLCtr():
                 if unused is None:
                     unknown('未使用索引检查返回失败')
                 elif unused:
-                    warn('发现至少 %d 个从未被查询命中的索引 (最多显示 50 个, 取前 3 个):' % len(unused))
+                    unused_total = len(unused)
+                    if unused_total >= 50:
+                        count_rows = my_instance.query("SELECT COUNT(*) AS total FROM sys.schema_unused_indexes")
+                        unused_total = int(count_rows[0]['total'])
+                    warn('发现 %d 个从未被查询命中的索引 (最多展示 3 个样本):' % unused_total)
                     for r in unused[:3]:
                         warn('  %s.%s → %s (核实业务周期后再考虑 DROP)' % (
                             r['object_schema'], r['object_name'], r['index_name']))
-                    if len(unused) >= 50:
-                        unknown('未使用索引检查达到 LIMIT 50, 扫描结果不完整')
                 else:
                     ok('当前采集范围内未发现未使用索引')
             except Exception as ex:
