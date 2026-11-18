@@ -525,7 +525,7 @@ def get_health(args):
         # ---------- 7. slowlog ----------
         section('slowlog')
         try:
-            sl = c.slowlog_get(-1)
+            sl = c.slowlog_get(10)
             if sl:
                 warn('最近 10 条慢日志 (取前 3):')
                 for x in sl[:3]:
