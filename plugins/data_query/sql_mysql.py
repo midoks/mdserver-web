@@ -775,6 +775,605 @@ class nosqlMySQLCtr():
         }
         return mw.returnData(True, 'ok', data)
 
+    def _get_var_or_status(self, my_instance, sql, default=0):
+        """执行一条 SHOW GLOBAL STATUS / VARIABLES LIKE 'xxx' 语句, 返回 Value 字段(int)."""
+        try:
+            row = my_instance.find(sql)
+            if row is None:
+                return default
+            v = list(row.values())[-1] if isinstance(row, dict) else row[1]
+            try:
+                return int(v)
+            except (ValueError, TypeError):
+                try:
+                    return float(v)
+                except (ValueError, TypeError):
+                    return default
+        except Exception:
+            return default
+
+    def _get_var_str(self, my_instance, sql, default=''):
+        try:
+            row = my_instance.find(sql)
+            if row is None:
+                return default
+            v = list(row.values())[-1] if isinstance(row, dict) else row[1]
+            return str(v) if v is not None else default
+        except Exception:
+            return default
+
+    def getHealth(self, args):
+        """综合 MySQL 健康检查 + 可操作优化建议.
+        返回结构化文本, 前端直接放到 textarea 展示."""
+        sid = args['sid']
+        my_instance, err = self._connect(sid)
+        if err:
+            return err
+
+        lines = []
+        # issues: [(level, section_label, text)]  level: 2=🚨严重 1=⚠️警告 0=💡提示
+        issues = []
+        current_section = ''
+
+        def section(title):
+            nonlocal current_section
+            current_section = title
+            lines.append('')
+            lines.append('━━━ %s ━━━' % title)
+
+        def ok(msg):
+            lines.append('  ✅ ' + msg)
+
+        def critical(msg):
+            issues.append((2, current_section, '🚨 ' + msg))
+            lines.append('  🚨 ' + msg)
+
+        def warn(msg):
+            issues.append((1, current_section, '⚠️  ' + msg))
+            lines.append('  ⚠️  ' + msg)
+
+        def tip(msg):
+            issues.append((0, current_section, '💡 ' + msg))
+            lines.append('  💡 ' + msg)
+
+        def info(msg):
+            lines.append('  ℹ️   ' + msg)
+
+        # ---------- 0. 基础信息 ----------
+        section('基础信息')
+        ver = self._get_var_str(my_instance, "SELECT @@version")
+        uptime = self._get_var_or_status(my_instance, "SHOW GLOBAL STATUS LIKE 'Uptime'")
+        pfs = self._get_var_or_status(my_instance, "SELECT @@performance_schema")
+        # 解析版本号: 5.7.39-log / 8.0.36-log / 8.4.2 / 11.4.4-MariaDB
+        _m = re.match(r'^(\d+)\.(\d+)', ver)
+        _major = int(_m.group(1)) if _m else 0
+        _minor = int(_m.group(2)) if _m else 0
+        _is_mariadb = 'mariadb' in ver.lower()
+        if uptime >= 86400:
+            uptime_txt = '%d天%02d:%02d:%02d' % (
+                uptime // 86400, (uptime % 86400) // 3600,
+                (uptime % 3600) // 60, uptime % 60)
+        elif uptime >= 3600:
+            uptime_txt = '%d小时%02d分钟' % (uptime // 3600, (uptime % 3600) // 60)
+        else:
+            uptime_txt = '%d分钟' % max(uptime // 60, 1)
+        info('版本: %s' % ver)
+        info('已运行: %s' % uptime_txt)
+        if pfs:
+            ok('performance_schema 已开启 (可识别热点 SQL / 冗余索引)')
+        else:
+            warn('performance_schema 未开启, 建议 my.cnf 里加 performance_schema=1 并重启')
+
+        # ---------- 1. 连接数水位 ----------
+        section('连接数 / 线程缓存')
+        tc = self._get_var_or_status(my_instance, "SHOW GLOBAL STATUS LIKE 'Threads_connected'")
+        mc = self._get_var_or_status(my_instance, "SHOW GLOBAL VARIABLES LIKE 'max_connections'")
+        tc_rate = (tc / mc * 100) if mc else 0
+        info('当前连接 %d / max_connections=%d (%.1f%%)' % (tc, mc, tc_rate))
+        if tc_rate >= 90:
+            critical('连接数已到 max_connections 的 %.0f%%, 随时可能出现 "too many connections" 拒绝' % tc_rate)
+            critical('建议: 1) 应用端检查连接泄露  2) max_connections 上调  3) 检查 wait_timeout')
+        elif tc_rate >= 80:
+            critical('连接数水位偏高 (%.1f%%), 建议排查' % tc_rate)
+        elif tc_rate >= 50:
+            warn('连接数水位偏高, 建议持续关注')
+        else:
+            ok('连接数水位正常')
+
+        tc_total = self._get_var_or_status(my_instance, "SHOW GLOBAL STATUS LIKE 'Threads_created'")
+        conn_total = self._get_var_or_status(my_instance, "SHOW GLOBAL STATUS LIKE 'Connections'")
+        t_created_rate = (tc_total / conn_total * 100) if conn_total else 0
+        info('Threads_created=%d / Connections=%d (%.2f%%)' % (tc_total, conn_total, t_created_rate))
+        if t_created_rate >= 10:
+            warn('Thread 创建比例偏高, thread_cache_size 可能过小 (每个新连接都创建新线程)')
+            warn('建议: my.cnf 里设置 thread_cache_size = %d (CPU 核数的 2~4 倍)' % (
+                os.cpu_count() * 3 if os.cpu_count() else 16))
+        else:
+            ok('线程缓存命中率正常')
+
+        ac = self._get_var_or_status(my_instance, "SHOW GLOBAL STATUS LIKE 'Aborted_connects'")
+        if ac > 0:
+            warn('Aborted_connects=%d (客户端认证失败 / 超时 / 连接被意外关闭)' % ac)
+            warn('建议: 排查应用端账号密码、wait_timeout 配置、网络抖动')
+
+        # ---------- 2. InnoDB Buffer Pool ----------
+        section('InnoDB Buffer Pool')
+        br = self._get_var_or_status(my_instance, "SHOW GLOBAL STATUS LIKE 'Innodb_buffer_pool_reads'")
+        brr = self._get_var_or_status(my_instance, "SHOW GLOBAL STATUS LIKE 'Innodb_buffer_pool_read_requests'")
+        hit = (1 - br / brr) * 100 if brr else 100
+        info('命中率: %.2f%% (物理读 %d / 总请求 %d)' % (hit, br, brr))
+
+        bpsize = self._get_var_or_status(my_instance, "SHOW GLOBAL VARIABLES LIKE 'innodb_buffer_pool_size'")
+        bpsize_mb = bpsize / 1024 / 1024
+
+        import psutil
+        try:
+            total_mem_mb = psutil.virtual_memory().total / 1024 / 1024
+            bpsize_pct = bpsize / (total_mem_mb * 1024 * 1024) * 100
+            info('innodb_buffer_pool_size=%.0fMB (%.1f%% of total memory %.0fMB)' % (bpsize_mb, bpsize_pct, total_mem_mb))
+        except Exception:
+            bpsize_pct = -1
+            info('innodb_buffer_pool_size=%.0fMB' % bpsize_mb)
+
+        if hit >= 99:
+            ok('命中率极佳')
+        elif hit >= 95:
+            ok('命中率良好, 可维持现状')
+        elif hit >= 85:
+            warn('命中率偏低 (%.2f%%), 磁盘读多会拖慢响应' % hit)
+        else:
+            critical('Buffer Pool 命中率严重偏低 (%.2f%%), 磁盘读成为瓶颈' % hit)
+            if bpsize_pct >= 0 and bpsize_pct < 50:
+                critical('建议立即调大 innodb_buffer_pool_size 到物理内存的 50~75%%')
+                critical('当前 %.0fMB, 可调到 %.0fMB~%.0fMB' % (
+                    bpsize_mb, total_mem_mb * 0.5, total_mem_mb * 0.75))
+
+        ilw = self._get_var_or_status(my_instance, "SHOW GLOBAL STATUS LIKE 'Innodb_log_waits'")
+        if ilw > 0:
+            warn('Innodb_log_waits=%d (Redo Log buffer 写满导致的等待)' % ilw)
+            warn('建议: 增大 innodb_log_buffer_size (默认 16MB, 可尝试 64MB), 或增大 innodb_redo_log_capacity (MySQL 8.0)')
+
+        rlw = self._get_var_or_status(my_instance, "SHOW GLOBAL STATUS LIKE 'Innodb_row_lock_waits'")
+        rla = self._get_var_or_status(my_instance, "SHOW GLOBAL STATUS LIKE 'Innodb_row_lock_time_avg'")
+        rlt = self._get_var_or_status(my_instance, "SHOW GLOBAL STATUS LIKE 'Innodb_row_lock_time'")
+        if rlw > 0:
+            warn('锁等待累计: Innodb_row_lock_waits=%d, 总等待=%.0fms, avg=%.0fms' % (rlw, rlt, rla))
+            warn('建议: 应用层排查热点行 (短事务、合理索引、避免长 SELECT ... FOR UPDATE)')
+        else:
+            ok('行锁等待为 0')
+
+        # 死锁: MySQL 8.0+ 有 Innodb_deadlocks, MariaDB 有 Innodb_deadlock_detect, MySQL 5.7 无全局计数
+        deadlocks = -1
+        if _is_mariadb:
+            deadlocks = self._get_var_or_status(my_instance, "SHOW GLOBAL STATUS LIKE 'Innodb_deadlock_detect'")
+        elif _major >= 8:
+            deadlocks = self._get_var_or_status(my_instance, "SHOW GLOBAL STATUS LIKE 'Innodb_deadlocks'")
+        if deadlocks < 0:
+            info('(MySQL %d.%d 无全局死锁计数器, 可用 SHOW ENGINE INNODB STATUS 查最近死锁)' % (_major, _minor))
+        elif deadlocks > 0:
+            warn('Innodb 死锁累计 %d 次, 应用层有事务并发冲突' % deadlocks)
+            warn('建议: SHOW ENGINE INNODB STATUS 查最近死锁, 应用按固定顺序获取锁、缩短事务、加 retry 逻辑')
+        else:
+            ok('未检测到死锁')
+
+        # ---------- 2.5 文件描述符 / 表缓存 ----------
+        section('文件与表缓存')
+        ofl = self._get_var_or_status(my_instance, "SHOW GLOBAL VARIABLES LIKE 'open_files_limit'")
+        of = self._get_var_or_status(my_instance, "SHOW GLOBAL STATUS LIKE 'Opened_files'")
+        opn = self._get_var_or_status(my_instance, "SHOW GLOBAL STATUS LIKE 'Open_files'")
+        opn_pct = (opn / ofl * 100) if ofl else 0
+        info('open_files_limit=%d, Open_files=%d, Opened_files(total)=%d' % (ofl, opn, of))
+        if opn_pct >= 80:
+            warn('当前打开文件数已达 open_files_limit 的 %.1f%%, 可能无法再打开新表 / 日志' % opn_pct)
+            warn('my.cnf: open_files_limit=65535 (需同时在 OS 层 ulimit -n 调大)')
+        else:
+            ok('文件描述符水位正常 (%.1f%%)' % opn_pct)
+
+        toc = self._get_var_or_status(my_instance, "SHOW GLOBAL VARIABLES LIKE 'table_open_cache'")
+        ot = self._get_var_or_status(my_instance, "SHOW GLOBAL STATUS LIKE 'Opened_tables'")
+        oft = self._get_var_or_status(my_instance, "SHOW GLOBAL STATUS LIKE 'Open_tables'")
+        table_hit = ((1 - ot / (ot + oft)) * 100) if (ot + oft) else 100
+        info('table_open_cache=%d, Open_tables=%d, Opened_tables(total)=%d (命中率 %.2f%%)' % (
+            toc, oft, ot, table_hit))
+        if ot > 0 and table_hit < 85:
+            warn('表缓存命中率 %.1f%% 偏低, 每次查询都重新打开 .frm 文件' % table_hit)
+            warn('my.cnf: table_open_cache = %d (CPU 核数 × 2048 或更大)' % toc)
+
+        # ---------- 2.6 字符集 ----------
+        section('字符集 / 排序规则')
+        cs = self._get_var_str(my_instance, "SHOW GLOBAL VARIABLES LIKE 'character_set_server'")
+        coll = self._get_var_str(my_instance, "SHOW GLOBAL VARIABLES LIKE 'collation_server'")
+        info('character_set_server=%s, collation_server=%s' % (cs, coll))
+        if cs.lower() == 'utf8mb4':
+            ok('server 字符集 utf8mb4 (完整 Unicode, 含 emoji)')
+        else:
+            warn('server 字符集是 %s, 建议 my.cnf 改为 utf8mb4 以支持完整 emoji 和 4 字节汉字' % cs)
+            warn('my.cnf: character-set-server=utf8mb4, collation-server=utf8mb4_unicode_ci')
+        # 业务表是否有非 utf8mb4
+        try:
+            non_utf8mb4 = my_instance.query(
+                "SELECT table_schema, table_name, table_collation FROM information_schema.tables "
+                "WHERE table_schema NOT IN ('mysql','information_schema','performance_schema','sys') "
+                "AND table_collation LIKE 'utf8%' AND table_collation NOT LIKE 'utf8mb4%' LIMIT 20"
+            )
+            if non_utf8mb4:
+                warn('发现 %d 张业务表仍在用 utf8 (3 字节, 存不下 emoji)' % len(non_utf8mb4))
+                for r in non_utf8mb4[:5]:
+                    warn('  %s.%s  collation=%s' % (r['table_schema'], r['table_name'], r['table_collation']))
+                warn('升级方式: ALTER TABLE t CONVERT TO CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci')
+        except Exception:
+            pass
+
+        # ---------- 2.7 Binlog / 持久化安全 ----------
+        section('Binlog / Durability')
+        sync_b = self._get_var_or_status(my_instance, "SHOW GLOBAL VARIABLES LIKE 'sync_binlog'")
+        flc = self._get_var_or_status(my_instance, "SHOW GLOBAL VARIABLES LIKE 'innodb_flush_log_at_trx_commit'")
+        bl_fmt = self._get_var_str(my_instance, "SHOW GLOBAL VARIABLES LIKE 'binlog_format'")
+        log_bin = self._get_var_str(my_instance, "SHOW GLOBAL VARIABLES LIKE 'log_bin'")
+        gtid = self._get_var_str(my_instance, "SHOW GLOBAL VARIABLES LIKE 'gtid_mode'")
+        info('sync_binlog=%d, innodb_flush_log_at_trx_commit=%d' % (sync_b, flc))
+        if sync_b == 1 and flc == 1:
+            ok('双 1 组合, ACID 安全 (每次事务都 fsync, 性能略低)')
+        elif sync_b == 0 and flc == 2:
+            warn('sync_binlog=0 + innodb_flush_log_at_trx_commit=2, 崩溃时可能丢最后 ~1s 的事务')
+            warn('单机开发环境可接受, 生产建议至少 innodb_flush_log_at_trx_commit=1 或 sync_binlog=1')
+        else:
+            info('sync_binlog=%d / innodb_flush_log_at_trx_commit=%d, 请按业务可接受的数据丢失窗口调整' % (sync_b, flc))
+
+        info('binlog_format=%s, log_bin=%s, gtid_mode=%s' % (bl_fmt, log_bin, gtid))
+        if log_bin.lower() != 'on':
+            warn('log_bin 未开启, 无法做 point-in-time recovery / 主从 / binlog 审计')
+            warn('my.cnf: log_bin=mysql-bin, binlog_format=ROW')
+        elif bl_fmt == 'STATEMENT':
+            warn('binlog_format=STATEMENT, 非确定性函数 (NOW/RAND/LIMIT) 可能导致主从不一致')
+            warn('my.cnf: binlog_format=ROW (或 MIXED)')
+        if gtid.lower() == 'off':
+            warn('gtid_mode=OFF, 主从切换 / 重建副本操作较繁琐, 建议开启 GTID')
+            warn('my.cnf: gtid_mode=ON, enforce_gtid_consistency=ON')
+        # Binlog 过期策略: MySQL 8.0+ / MariaDB 10.6+ 用 binlog_expire_logs_seconds, 否则 expire_logs_days
+        try:
+            use_seconds = (_major >= 8 and not _is_mariadb) or (_is_mariadb and _major >= 10 and _minor >= 6)
+            if use_seconds:
+                bex = self._get_var_str(my_instance, "SHOW GLOBAL VARIABLES LIKE 'binlog_expire_logs_seconds'")
+                info('binlog_expire_logs_seconds=%s' % bex)
+                if not bex or bex in ('0', ''):
+                    warn('binlog 未设置过期策略 (binlog_expire_logs_seconds=0), 长期运行会撑满磁盘')
+                    warn('my.cnf: binlog_expire_logs_seconds=604800 (保留 7 天)')
+                else:
+                    ok('binlog 过期策略: binlog_expire_logs_seconds=%s' % bex)
+            else:
+                eld = self._get_var_or_status(my_instance, "SHOW GLOBAL VARIABLES LIKE 'expire_logs_days'")
+                info('expire_logs_days=%d' % eld)
+                if eld == 0:
+                    warn('binlog 永不过期 (expire_logs_days=0), 长期运行会撑满磁盘')
+                    warn('my.cnf: expire_logs_days=7 (保留 7 天)')
+                else:
+                    ok('binlog 过期策略: expire_logs_days=%d' % eld)
+        except Exception as ex:
+            info('(binlog 过期策略检查异常: %s)' % str(ex))
+
+        # ---------- 3. 慢查询 ----------
+        section('慢查询 / SQL 健康')
+        slow_total = self._get_var_or_status(my_instance, "SHOW GLOBAL STATUS LIKE 'Slow_queries'")
+        sql_log = self._get_var_str(my_instance, "SHOW GLOBAL VARIABLES LIKE 'slow_query_log'")
+        lqt = self._get_var_or_status(my_instance, "SHOW GLOBAL VARIABLES LIKE 'long_query_time'")
+        info('Slow_queries=%d, slow_query_log=%s, long_query_time=%.1fs' % (slow_total, sql_log, lqt))
+
+        if sql_log.lower() == 'on' and lqt <= 2:
+            ok('慢查询已开启且阈值合理 (%.1fs)' % lqt)
+        elif sql_log.lower() == 'on':
+            warn('慢查询已开启但 long_query_time=%.1fs 偏高, 建议调低到 1~2s' % lqt)
+            warn('my.cnf: long_query_time=2, slow_query_log=1')
+        else:
+            warn('slow_query_log 未开启, 无法定位慢 SQL')
+            warn('my.cnf: slow_query_log=1, long_query_time=2, log_queries_not_using_indexes=1')
+
+        # 表级 SQL 健康: 冗余索引
+        try:
+            red = my_instance.query(
+                "select table_schema,table_name,redundant_index_name,sql_drop_index "
+                "from sys.schema_redundant_indexes limit 50"
+            )
+            if red and len(red) > 0:
+                warn('发现 %d 组冗余索引: (取前 3 组)' % len(red))
+                for r in red[:3]:
+                    warn('  %s.%s → %s' % (r['table_schema'], r['table_name'], r['redundant_index_name']))
+                    warn('  可执行: %s' % r['sql_drop_index'])
+            else:
+                ok('未发现冗余索引')
+        except Exception:
+            ok('(当前环境无法检测冗余索引, 需要 MySQL 5.7+ sys schema 或 MariaDB 10.1+)')
+
+        # 未使用索引 (performance_schema 必须开启, sys.schema_unused_indexes 才有数据)
+        if pfs:
+            try:
+                unused = my_instance.query(
+                    "SELECT object_schema, object_name, index_name "
+                    "FROM sys.schema_unused_indexes LIMIT 50"
+                )
+                if unused and len(unused) > 0:
+                    warn('发现 %d 个从未被查询命中的索引 (取前 3 个):' % len(unused))
+                    for r in unused[:3]:
+                        warn('  %s.%s → %s (可考虑 DROP, 节省写入开销)' % (
+                            r['object_schema'], r['object_name'], r['index_name']))
+                else:
+                    ok('索引都在被使用 (或 performance_schema 采集尚未覆盖足够查询)')
+            except Exception:
+                pass
+
+        # 无主键表
+        try:
+            nopk = my_instance.query(
+                "SELECT t.table_schema, t.table_name FROM information_schema.tables t "
+                "LEFT JOIN information_schema.key_column_usage k "
+                "ON t.table_schema=k.table_schema AND t.table_name=k.table_name AND k.constraint_name='PRIMARY' "
+                "WHERE t.table_schema NOT IN ('mysql','information_schema','sys','performance_schema') "
+                "AND k.constraint_name IS NULL AND t.table_type='BASE TABLE'"
+            )
+            if nopk and len(nopk) > 0:
+                critical('发现 %d 张无主键表 (会导致全表扫描 + Replication 无法高效定位行)' % len(nopk))
+                for r in nopk[:5]:
+                    critical('  %s.%s' % (r['table_schema'], r['table_name']))
+            else:
+                ok('所有业务表都有主键')
+        except Exception:
+            pass
+
+        # ---------- 4. 磁盘 / Tmp 表 ----------
+        section('磁盘与 Tmp 表')
+        ctd = self._get_var_or_status(my_instance, "SHOW GLOBAL STATUS LIKE 'Created_tmp_disk_tables'")
+        ctm = self._get_var_or_status(my_instance, "SHOW GLOBAL STATUS LIKE 'Created_tmp_tables'")
+        ctd_pct = (ctd / ctm * 100) if ctm else 0
+        info('Created_tmp_disk_tables=%d / Created_tmp_tables=%d (%.2f%%)' % (ctd, ctm, ctd_pct))
+        if ctd_pct >= 20:
+            warn('有 %.1f%% 的临时表落盘, 排序/分组查询性能会差' % ctd_pct)
+            warn('建议: tmp_table_size / max_heap_table_size 调大 (例如 64MB ~ 256MB)')
+            warn('my.cnf: tmp_table_size=128M, max_heap_table_size=128M')
+        else:
+            ok('Tmp 表几乎不落盘 (%.2f%%)' % ctd_pct)
+
+        bcd = self._get_var_or_status(my_instance, "SHOW GLOBAL STATUS LIKE 'Binlog_cache_disk_use'")
+        bcu = self._get_var_or_status(my_instance, "SHOW GLOBAL STATUS LIKE 'Binlog_cache_use'")
+        if bcu > 0:
+            bcd_pct = bcd / bcu * 100
+            info('Binlog_cache_disk_use=%d / Binlog_cache_use=%d (%.2f%%)' % (bcd, bcu, bcd_pct))
+            if bcd_pct >= 10:
+                warn('Binlog 缓存落盘比例 %.1f%% 偏高, 较大事务会写磁盘' % bcd_pct)
+                warn('建议: my.cnf 调大 binlog_cache_size=2M / max_binlog_size=512M')
+            else:
+                ok('Binlog 缓存几乎不落盘')
+        else:
+            info('Binlog 无事务压力 (Binlog_cache_use=0)')
+
+        # ---------- 4.5 InnoDB Redo / Undo 空间 ----------
+        section('InnoDB Redo / Undo')
+        # Redo Log 利用率 (MySQL 8.0+ 有 redo_log_stats, 5.7 靠 Innodb_log_waits 侧面观察)
+        try:
+            if _major >= 8 and not _is_mariadb:
+                # MySQL 8.0.30+ 有 performance_schema.innodb_redo_log 表
+                redo = my_instance.query(
+                    "SELECT name, n_files, capacity FROM performance_schema.innodb_redo_log "
+                    "WHERE name IN ('CURRENT','PREVIOUS') LIMIT 1"
+                )
+                if redo:
+                    cap_mb = int(redo[0]['capacity']) / 1024 / 1024
+                    info('Redo Log 总容量: %.0fMB' % cap_mb)
+                    if cap_mb < 512:
+                        tip('Redo Log 仅 %.0fMB, 高写入事务可能出现 checkpoint 瓶颈' % cap_mb)
+                        tip('my.cnf: innodb_redo_log_capacity=2G (MySQL 8.0+)')
+            else:
+                # MySQL 5.7 靠 Innodb_log_waits 判断 redo 空间是否够
+                ilw2 = self._get_var_or_status(my_instance, "SHOW GLOBAL STATUS LIKE 'Innodb_log_waits'")
+                info('Innodb_log_waits=%d (Redo 满时才会出现)' % ilw2)
+                if ilw2 > 0:
+                    warn('Redo Log 曾经写满, 出现 %d 次 Innodb_log_waits' % ilw2)
+                    warn('my.cnf: 增大 innodb_log_file_size (默认 48MB, 建议 ≥512MB)')
+        except Exception:
+            pass
+
+        # Undo 表空间膨胀 (MySQL 5.7+ / MariaDB)
+        try:
+            undo_pct = None
+            if _major >= 8 and not _is_mariadb:
+                # MySQL 8.0: information_schema.innodb_tablespaces
+                try:
+                    undo = my_instance.query(
+                        "SELECT tablespace_name, ROUND(extend_size*100/autoextend_size,1) AS pct_used "
+                        "FROM information_schema.innodb_tablespaces "
+                        "WHERE tablespace_name LIKE '%undo%' AND tablespace_name NOT LIKE '%temp%'"
+                    )
+                    if undo:
+                        undo_pct = max(int(r['pct_used'] or 0) for r in undo)
+                except Exception:
+                    pass
+            if undo_pct is None:
+                # 兜底: 看 Undo 历史长度
+                undo_hist = self._get_var_or_status(my_instance, "SHOW GLOBAL STATUS LIKE 'Innodb_history_list_length'")
+                info('Innodb_history_list_length=%d (Undo 历史链长度)' % undo_hist)
+                if undo_hist > 10000:
+                    warn('Undo 历史链很长 (%d), 可能有慢查询/大事务没提交, Undo 表空间膨胀' % undo_hist)
+                    warn('排查: SHOW FULL PROCESSLIST 找长时间运行的查询, 缩短事务')
+            else:
+                info('Undo 表空间使用 %.1f%%' % undo_pct)
+                if undo_pct >= 80:
+                    warn('Undo 表空间使用 %.1f%%, 快满了' % undo_pct)
+                    warn('排查长事务 / 慢查询导致的 purge 阻塞, 必要时手动 purge undo')
+        except Exception:
+            pass
+
+        # ---------- 4.6 表碎片化 ----------
+        section('表碎片化 (Fragmentation)')
+        try:
+            frag = my_instance.query(
+                """SELECT table_schema, table_name,
+                          ROUND(data_length/1024/1024, 2) AS data_mb,
+                          ROUND(data_free/1024/1024, 2) AS free_mb,
+                          ROUND(data_free*100/NULLIF(data_length+index_length,0), 1) AS frag_pct
+                   FROM information_schema.tables
+                   WHERE table_schema NOT IN ('mysql','information_schema','performance_schema','sys')
+                     AND table_type = 'BASE TABLE'
+                     AND data_length + data_free > 10*1024*1024
+                     AND data_free > 10*1024*1024
+                ORDER BY data_free DESC LIMIT 10"""
+            )
+            if frag:
+                warn('共 %d 张 ≥10MB 且 ≥10MB 碎片的表 (取前 5):' % len(frag))
+                for r in frag[:5]:
+                    warn('  %s.%s  data=%.1fMB free=%.1fMB 碎片率 %.1f%%' % (
+                        r['table_schema'], r['table_name'],
+                        r['data_mb'], r['free_mb'], r['frag_pct'] or 0))
+                    warn('  建议: OPTIMIZE TABLE `%s`.`%s`;' % (r['table_schema'], r['table_name']))
+            else:
+                ok('业务表无明显碎片化 (>10MB 碎片)')
+        except Exception:
+            pass
+
+        # ---------- 5. 大表 / AUTO_INCREMENT 余量 ----------
+        section('大表 / AUTO_INCREMENT 余量')
+        try:
+            big_tables = my_instance.query(
+                """SELECT t.table_schema, t.table_name, t.table_rows,
+                          ROUND((t.data_length + t.index_length)/1024/1024, 2) AS total_mb,
+                          t.auto_increment, c.data_type,
+                          LOCATE('unsigned', c.column_type) > 0 AS is_unsigned
+                   FROM information_schema.tables t
+                   LEFT JOIN information_schema.columns c
+                     ON t.table_schema=c.table_schema AND t.table_name=c.table_name AND c.extra='auto_increment'
+                   WHERE t.table_schema NOT IN ('mysql','information_schema','performance_schema','sys')
+                     AND t.table_type = 'BASE TABLE'
+                   ORDER BY t.data_length + t.index_length DESC
+                   LIMIT 500"""
+            )
+            if big_tables:
+                big = [r for r in big_tables if r['total_mb'] is not None and r['total_mb'] >= 100]
+                if big:
+                    warn('共 %d 张 ≥100MB 的大表 (最大 %.1fMB):' % (len(big), max(x['total_mb'] for x in big)))
+                    for r in big[:3]:
+                        warn('  %s.%s  [%.1fMB, rows=%s]' % (
+                            r['table_schema'], r['table_name'],
+                            r['total_mb'], r['table_rows'] or '-'))
+                    warn('建议: 大表定期 OPTIMIZE TABLE / 按日期分表 / 冷热分离')
+                else:
+                    ok('业务表都 <100MB, 无需要重点关注的大表')
+
+                # 全表 AUTO_INCREMENT 余量: 按 data_type + signed/unsigned 算真实上限
+                type_max = {
+                    'tinyint':    (127, 255),
+                    'smallint':   (32767, 65535),
+                    'mediumint':  (8388607, 16777215),
+                    'int':        (2147483647, 4294967295),
+                    'integer':    (2147483647, 4294967295),
+                    'bigint':     (9223372036854775807, 18446744073709551615),
+                }
+                ai_risks = []
+                for r in big_tables:
+                    if not r.get('auto_increment'):
+                        continue
+                    dt = (r.get('data_type') or '').lower()
+                    is_unsigned = bool(r.get('is_unsigned'))
+                    lim = type_max.get(dt)
+                    if lim is None:
+                        continue
+                    mx = lim[1] if is_unsigned else lim[0]
+                    ai = int(r['auto_increment'])
+                    pct_used = ai / mx * 100
+                    if pct_used >= 50:
+                        ai_risks.append((pct_used, r, mx))
+                if ai_risks:
+                    ai_risks.sort(reverse=True)
+                    warn('发现 %d 张表 AUTO_INCREMENT 已用 ≥50%%, 有耗尽风险 (取前 3 张):' % len(ai_risks))
+                    for pct, r, mx in ai_risks[:3]:
+                        warn('  %s.%s 当前 %d / max %s (%.1f%%)' % (
+                            r['table_schema'], r['table_name'],
+                            r['auto_increment'], mx, pct))
+                else:
+                    ok('AUTO_INCREMENT 余量都在 50% 以上, 无耗尽风险')
+        except Exception:
+            pass
+
+        # ---------- 6. 账户安全 ----------
+        section('账户安全')
+        try:
+            users = my_instance.query("SELECT user, host FROM mysql.user")
+            root_remote = [u for u in users if u['user'] == 'root' and u['host'] not in ('localhost', '127.0.0.1', '::1')]
+            anonymous = [u for u in users if u['user'] == '']
+            system_users = ('mysql.session', 'mysql.sys', 'root', 'localhost')
+            weak_host_users = [u for u in users if u['host'] == '%' and u['user'] not in system_users]
+            if root_remote:
+                critical('root 账号允许远程登录: %s (公网可被爆破!)' % ', '.join(u['host'] for u in root_remote))
+                critical('建议立即执行: DELETE FROM mysql.user WHERE user="root" AND host NOT IN ("localhost","127.0.0.1","::1"); FLUSH PRIVILEGES;')
+            else:
+                ok('root 账号仅限本机登录')
+            if anonymous:
+                warn('存在匿名账号 user="", 建议删除')
+            else:
+                ok('无匿名账号')
+            if weak_host_users:
+                info('以下账号 host="%%" (允许任意来源, 请确保密码强度):')
+                for u in weak_host_users[:5]:
+                    info('  user=%s host=%%' % u['user'])
+        except Exception as ex:
+            info('(账户安全检查异常: %s)' % str(ex))
+
+        # ---------- 7. 主从 ----------
+        section('主从复制')
+        try:
+            slave_data = None
+            try:
+                slave_data = my_instance.query('SHOW REPLICA STATUS')
+            except Exception:
+                try:
+                    slave_data = my_instance.query('SHOW SLAVE STATUS')
+                except Exception:
+                    pass
+            if slave_data and len(slave_data) > 0:
+                s = slave_data[0]
+                io_running = s.get('Replica_IO_Running', s.get('Slave_IO_Running'))
+                sql_running = s.get('Replica_SQL_Running', s.get('Slave_SQL_Running'))
+                sec_behind = s.get('Seconds_Behind_Source', s.get('Seconds_Behind_Master'))
+                if io_running == 'Yes' and sql_running == 'Yes':
+                    if sec_behind == 0:
+                        ok('主从复制正常, 无延迟')
+                    else:
+                        warn('主从复制正常但延迟 %s 秒' % sec_behind)
+                else:
+                    warn('主从异常! IO=%s, SQL=%s, Last_Error=%s' % (
+                        io_running, sql_running,
+                        s.get('Last_Error') or s.get('Last_IO_Error') or '无'))
+            else:
+                ok('当前实例不是从库, 未开启主从复制')
+        except Exception as ex:
+            info('(检查主从时出现异常: %s)' % str(ex))
+
+        # ---------- 总结 ----------
+        lines.append('')
+        lines.append('━━━ 总结 ━━━')
+        n_critical = sum(1 for x in issues if x[0] == 2)
+        n_warn = sum(1 for x in issues if x[0] == 1)
+        n_tip = sum(1 for x in issues if x[0] == 0)
+        if not issues:
+            lines.append('  🎉 本次检查共发现 0 个可优化点, MySQL 健康状况良好!')
+        else:
+            lines.append('  📊 严重 🚨 %d 个 / 警告 ⚠️  %d 个 / 建议 💡 %d 个 (共 %d)' % (
+                n_critical, n_warn, n_tip, len(issues)))
+            if n_critical > 0:
+                lines.append('')
+                lines.append('  ── 最严重问题 Top %d ──' % min(n_critical, 5))
+                for idx, (lv, sec, txt) in enumerate(
+                        sorted([x for x in issues if x[0] == 2], key=lambda x: x[1])):
+                    if idx >= 5: break
+                    # txt 本身已带 🚨 前缀, 这里显示所属 section
+                    lines.append('  %s  [%s]' % (txt, sec))
+            # 所有 issues 按 level 倒序打印完整清单 (追加在最后)
+            lines.append('')
+            lines.append('  ── 完整问题清单 (按严重度排序) ──')
+            for lv, sec, txt in sorted(issues, key=lambda x: (-x[0], x[1])):
+                lines.append('  %s  [%s]' % (txt, sec))
+        lines.append('')
+        lines.append('  ℹ️   my.cnf 修改后需重启 MySQL 或动态执行 SET GLOBAL, 具体参数请查阅官方文档')
+
+        return mw.returnData(True, 'ok', '\n'.join(lines))
+
 # ---------------------------------- run ----------------------------------
 
 def get_server_list(args):
@@ -870,6 +1469,11 @@ def get_slave_status(args):
 def get_slave_runtime(args):
     t = nosqlMySQLCtr()
     return t.getSlaveRuntime(args)
+
+# MySQL 健康检查
+def get_health(args):
+    t = nosqlMySQLCtr()
+    return t.getHealth(args)
 
 
 

@@ -38,7 +38,7 @@ Type=notify
 #ExecStartPre=+/usr/share/mysql-8.0/mysql-systemd-start pre
 ExecStart={$SERVER_PATH}/mysql-community/bin/mysqld --defaults-file={$SERVER_PATH}/mysql-community/etc/my.cnf
 TimeoutSec=600
-LimitNOFILE = 10000
+LimitNOFILE=65535
 Restart=on-failure
 RestartPreventExitStatus=1
 
