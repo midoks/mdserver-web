@@ -915,9 +915,10 @@ class nosqlMySQLCtr():
         pfs = self._get_var_or_status(my_instance, "SELECT @@performance_schema")
         # 解析版本号: 5.7.39-log / 8.0.36-log / 11.4.4-MariaDB；兼容 MariaDB 的 5.5.5- 前缀。
         _is_mariadb = ver is not None and 'mariadb' in ver.lower()
-        _m = re.match(r'^(?:5\.5\.5-)?(\d+)\.(\d+)', ver) if ver is not None else None
+        _m = re.match(r'^(?:5\.5\.5-)?(\d+)\.(\d+)(?:\.(\d+))?', ver) if ver is not None else None
         _major = int(_m.group(1)) if _m else 0
         _minor = int(_m.group(2)) if _m else 0
+        _patch = int(_m.group(3) or 0) if _m else 0
         _version_known = _m is not None
         if ver is None:
             unknown('版本查询失败或权限不足')
@@ -1182,7 +1183,7 @@ class nosqlMySQLCtr():
         # 业务表是否有非 utf8mb4
         try:
             non_utf8mb4 = my_instance.query(
-                "SELECT table_schema, table_name, table_collation FROM information_schema.tables "
+                "SELECT table_schema AS table_schema, table_name AS table_name, table_collation AS table_collation FROM information_schema.tables "
                 "WHERE table_schema NOT IN ('mysql','information_schema','performance_schema','sys') "
                 "AND table_collation LIKE 'utf8%' AND table_collation NOT LIKE 'utf8mb4%' LIMIT 20"
             )
@@ -1249,6 +1250,8 @@ class nosqlMySQLCtr():
         # MariaDB 从 10.6 起使用秒级参数；必须按 (major, minor) 比较以兼容 11.x。
         if not _version_known:
             unknown('版本未知, 无法确定 binlog 过期参数')
+        elif log_bin is not None and log_bin.lower() != 'on':
+            info('binlog 未开启, 过期策略暂不生效')
         else:
             use_seconds = (_major >= 8 and not _is_mariadb) or (_is_mariadb and (_major, _minor) >= (10, 6))
             if use_seconds:
@@ -1316,12 +1319,14 @@ class nosqlMySQLCtr():
             if red is None:
                 unknown('冗余索引检查返回失败')
             elif red:
-                warn('发现至少 %d 组冗余索引 (最多显示 50 组, 取前 3 组):' % len(red))
+                red_total = len(red)
+                if red_total >= 50:
+                    count_rows = my_instance.query("SELECT COUNT(*) AS total FROM sys.schema_redundant_indexes")
+                    red_total = int(count_rows[0]['total'])
+                warn('发现 %d 组冗余索引 (最多展示 3 组样本):' % red_total)
                 for r in red[:3]:
                     warn('  %s.%s → %s' % (r['table_schema'], r['table_name'], r['redundant_index_name']))
                     warn('  核实依赖和执行窗口后可执行: %s' % r['sql_drop_index'])
-                if len(red) >= 50:
-                    unknown('冗余索引检查达到 LIMIT 50, 扫描结果不完整')
             else:
                 ok('未发现冗余索引')
         except Exception as ex:
@@ -1357,7 +1362,7 @@ class nosqlMySQLCtr():
         # 无主键表
         try:
             nopk = my_instance.query(
-                "SELECT t.table_schema, t.table_name FROM information_schema.tables t "
+                "SELECT t.table_schema AS table_schema, t.table_name AS table_name FROM information_schema.tables t "
                 "LEFT JOIN information_schema.key_column_usage k "
                 "ON t.table_schema=k.table_schema AND t.table_name=k.table_name AND k.constraint_name='PRIMARY' "
                 "WHERE t.table_schema NOT IN ('mysql','information_schema','sys','performance_schema') "
@@ -1420,25 +1425,39 @@ class nosqlMySQLCtr():
 
         # ---------- 4.5 InnoDB Redo / Undo 空间 ----------
         section('InnoDB Redo / Undo')
-        # Redo Log 容量 (MySQL 8.0.30+)，其他版本仅通过增量 Innodb_log_waits 侧面观察。
+        # Redo Log 容量 (MySQL 8.0.30+)，系统变量可回退替代不存在的 performance_schema 表。
         if not _version_known:
             unknown('版本未知, 无法确定 Redo Log 检查方式')
-        elif _major >= 8 and not _is_mariadb:
+        elif (_major, _minor, _patch) >= (8, 0, 30) and not _is_mariadb:
+            redo = None
+            redo_error = None
             try:
                 redo = my_instance.query(
-                    "SELECT name, n_files, capacity FROM performance_schema.innodb_redo_log "
+                    "SELECT name AS name, n_files AS n_files, capacity AS capacity FROM performance_schema.innodb_redo_log "
                     "WHERE name IN ('CURRENT','PREVIOUS') LIMIT 1"
                 )
-                if not redo:
-                    unknown('Redo Log 容量查询无结果、当前版本不支持或权限不足')
-                else:
-                    cap_mb = int(redo[0]['capacity']) / 1024 / 1024
-                    info('Redo Log 总容量: %.0fMB' % cap_mb)
-                    if cap_mb < 512:
-                        tip('Redo Log 仅 %.0fMB, 高写入事务可能出现 checkpoint 瓶颈' % cap_mb)
-                        tip('my.cnf: innodb_redo_log_capacity=2G (MySQL 8.0.30+)')
             except Exception as ex:
-                unknown('Redo Log 容量检查失败、不支持或权限不足: %s' % str(ex))
+                redo_error = ex
+            cap_bytes = None
+            if redo:
+                try:
+                    cap_bytes = int(redo[0]['capacity'])
+                except (KeyError, TypeError, ValueError) as ex:
+                    redo_error = ex
+            redo_source = 'performance_schema.innodb_redo_log'
+            if cap_bytes is None:
+                cap_bytes = self._get_var_or_status(
+                    my_instance, "SHOW GLOBAL VARIABLES LIKE 'innodb_redo_log_capacity'")
+                redo_source = 'innodb_redo_log_capacity'
+            if cap_bytes is not None:
+                cap_mb = cap_bytes / 1024 / 1024
+                info('Redo Log 总容量: %.0fMB (%s)' % (cap_mb, redo_source))
+                if cap_mb < 512:
+                    tip('Redo Log 仅 %.0fMB, 高写入事务可能出现 checkpoint 瓶颈' % cap_mb)
+                    tip('my.cnf: innodb_redo_log_capacity=2G (MySQL 8.0.30+)')
+            else:
+                unknown('Redo Log 容量不可用: performance_schema 查询=%s; innodb_redo_log_capacity 不可用' % (
+                    str(redo_error) if redo_error else '无结果'))
         elif ilw_sample is None:
             unknown('当前版本通过 Innodb_log_waits 观察 Redo, 但该指标不可用')
         else:
@@ -1465,7 +1484,7 @@ class nosqlMySQLCtr():
         section('表碎片化 (Fragmentation)')
         try:
             frag = my_instance.query(
-                """SELECT table_schema, table_name,
+                """SELECT table_schema AS table_schema, table_name AS table_name,
                           ROUND(data_length/1024/1024, 2) AS data_mb,
                           ROUND(data_free/1024/1024, 2) AS free_mb,
                           ROUND(data_free*100/NULLIF(data_length+index_length,0), 1) AS frag_pct
@@ -1498,11 +1517,12 @@ class nosqlMySQLCtr():
         # 大表仅作为容量排查信息；LIMIT 500 的结果不完整时不下“无大表”结论。
         try:
             big_tables = my_instance.query(
-                """SELECT t.table_schema, t.table_name, t.table_rows,
+                """SELECT t.table_schema AS table_schema, t.table_name AS table_name, t.table_rows AS table_rows,
                           ROUND((t.data_length + t.index_length)/1024/1024, 2) AS total_mb
                    FROM information_schema.tables t
                    WHERE t.table_schema NOT IN ('mysql','information_schema','performance_schema','sys')
                      AND t.table_type = 'BASE TABLE'
+                     AND (t.data_length + t.index_length) >= 100*1024*1024
                    ORDER BY t.data_length + t.index_length DESC
                    LIMIT 500"""
             )
@@ -1540,9 +1560,10 @@ class nosqlMySQLCtr():
         }
         try:
             auto_columns = my_instance.query(
-                """SELECT c.table_schema, c.table_name, c.column_name, c.data_type,
-                          c.column_type, LOCATE('unsigned', c.column_type) > 0 AS is_unsigned,
-                          t.auto_increment
+                """SELECT c.table_schema AS table_schema, c.table_name AS table_name,
+                          c.column_name AS column_name, c.data_type AS data_type,
+                          c.column_type AS column_type, LOCATE('unsigned', c.column_type) > 0 AS is_unsigned,
+                          t.auto_increment AS auto_increment
                    FROM information_schema.columns c
                    JOIN information_schema.tables t
                      ON c.table_schema=t.table_schema AND c.table_name=t.table_name
@@ -1555,30 +1576,32 @@ class nosqlMySQLCtr():
                 ok('业务表无 AUTO_INCREMENT 列')
             else:
                 ai_risks = []
-                ai_complete = True
+                ai_errors = []
                 for r in auto_columns:
-                    label = '%s.%s.%s' % (r.get('table_schema'), r.get('table_name'), r.get('column_name'))
+                    if not all(r.get(k) is not None for k in ('table_schema', 'table_name', 'column_name')):
+                        ai_errors.append('自增元数据缺少表名或列名')
+                        continue
+                    label = '%s.%s.%s' % (r['table_schema'], r['table_name'], r['column_name'])
                     if r.get('auto_increment') is None:
-                        unknown('%s 的 AUTO_INCREMENT 当前值未知' % label)
-                        ai_complete = False
+                        ai_errors.append('%s 的 AUTO_INCREMENT 当前值未知' % label)
                         continue
                     dt = (r.get('data_type') or '').lower()
                     lim = type_max.get(dt)
                     if lim is None:
-                        unknown('%s 的自增类型 %s 无法确定上下限' % (label, dt or 'unknown'))
-                        ai_complete = False
+                        ai_errors.append('%s 的自增类型 %s 无法确定上下限' % (label, dt or 'unknown'))
                         continue
                     try:
                         ai = int(r['auto_increment'])
                     except (ValueError, TypeError):
-                        unknown('%s 的 AUTO_INCREMENT 值无法解析: %s' % (label, r.get('auto_increment')))
-                        ai_complete = False
+                        ai_errors.append('%s 的 AUTO_INCREMENT 值无法解析: %s' % (label, r.get('auto_increment')))
                         continue
                     is_unsigned = str(r.get('is_unsigned', '0')).lower() in ('1', 'true')
                     mx = lim[1] if is_unsigned else lim[0]
                     pct_used = ai / mx * 100
                     if pct_used >= 50:
                         ai_risks.append((pct_used, r, mx))
+                if ai_errors:
+                    unknown('%d 个 AUTO_INCREMENT 列无法完整评估 (首个: %s)' % (len(ai_errors), ai_errors[0]))
                 if ai_risks:
                     ai_risks.sort(key=lambda x: x[0], reverse=True)
                     warn('发现 %d 个 AUTO_INCREMENT 列已用 ≥50%%, 有耗尽风险 (取前 3 个):' % len(ai_risks))
@@ -1586,7 +1609,7 @@ class nosqlMySQLCtr():
                         warn('  %s.%s.%s 当前 %s / max %s (%.1f%%)' % (
                             r['table_schema'], r['table_name'], r['column_name'],
                             r['auto_increment'], mx, pct))
-                elif ai_complete:
+                elif not ai_errors:
                     ok('全部 AUTO_INCREMENT 列余量都在 50% 以上, 无耗尽风险')
         except Exception as ex:
             unknown('AUTO_INCREMENT 独立查询失败或权限不足: %s' % str(ex))
