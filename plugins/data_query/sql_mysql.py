@@ -775,6 +775,308 @@ class nosqlMySQLCtr():
         }
         return mw.returnData(True, 'ok', data)
 
+    def _get_var_or_status(self, my_instance, sql, default=0):
+        """执行一条 SHOW GLOBAL STATUS / VARIABLES LIKE 'xxx' 语句, 返回 Value 字段(int)."""
+        try:
+            row = my_instance.find(sql)
+            if row is None:
+                return default
+            v = list(row.values())[-1] if isinstance(row, dict) else row[1]
+            try:
+                return int(v)
+            except (ValueError, TypeError):
+                try:
+                    return float(v)
+                except (ValueError, TypeError):
+                    return default
+        except Exception:
+            return default
+
+    def _get_var_str(self, my_instance, sql, default=''):
+        try:
+            row = my_instance.find(sql)
+            if row is None:
+                return default
+            v = list(row.values())[-1] if isinstance(row, dict) else row[1]
+            return str(v) if v is not None else default
+        except Exception:
+            return default
+
+    def getHealth(self, args):
+        """综合 MySQL 健康检查 + 可操作优化建议.
+        返回结构化文本, 前端直接放到 textarea 展示."""
+        sid = args['sid']
+        my_instance, err = self._connect(sid)
+        if err:
+            return err
+
+        lines = []
+        issues = 0
+
+        def section(title):
+            lines.append('')
+            lines.append('━━━ %s ━━━' % title)
+
+        def ok(msg):
+            lines.append('  ✅ ' + msg)
+
+        def warn(msg):
+            nonlocal issues
+            issues += 1
+            lines.append('  ⚠️  ' + msg)
+
+        def info(msg):
+            lines.append('  ℹ️   ' + msg)
+
+        # ---------- 0. 基础信息 ----------
+        section('基础信息')
+        ver = self._get_var_str(my_instance, "SELECT @@version")
+        uptime = self._get_var_or_status(my_instance, "SHOW GLOBAL STATUS LIKE 'Uptime'")
+        pfs = self._get_var_or_status(my_instance, "SELECT @@performance_schema")
+        if uptime >= 86400:
+            uptime_txt = '%d天%02d:%02d:%02d' % (
+                uptime // 86400, (uptime % 86400) // 3600,
+                (uptime % 3600) // 60, uptime % 60)
+        elif uptime >= 3600:
+            uptime_txt = '%d小时%02d分钟' % (uptime // 3600, (uptime % 3600) // 60)
+        else:
+            uptime_txt = '%d分钟' % max(uptime // 60, 1)
+        info('版本: %s' % ver)
+        info('已运行: %s' % uptime_txt)
+        if pfs:
+            ok('performance_schema 已开启 (可识别热点 SQL / 冗余索引)')
+        else:
+            warn('performance_schema 未开启, 建议 my.cnf 里加 performance_schema=1 并重启')
+
+        # ---------- 1. 连接数水位 ----------
+        section('连接数 / 线程缓存')
+        tc = self._get_var_or_status(my_instance, "SHOW GLOBAL STATUS LIKE 'Threads_connected'")
+        mc = self._get_var_or_status(my_instance, "SHOW GLOBAL VARIABLES LIKE 'max_connections'")
+        tc_rate = (tc / mc * 100) if mc else 0
+        info('当前连接 %d / max_connections=%d (%.1f%%)' % (tc, mc, tc_rate))
+        if tc_rate >= 80:
+            warn('连接数已接近上限, 应用层可能出现 "too many connections" 拒绝')
+            warn('建议: 1) 应用端检查连接泄露  2) max_connections 适度上调  3) 检查 thread_cache_size')
+        elif tc_rate >= 50:
+            warn('连接数水位偏高, 建议持续关注')
+        else:
+            ok('连接数水位正常')
+
+        tc_total = self._get_var_or_status(my_instance, "SHOW GLOBAL STATUS LIKE 'Threads_created'")
+        conn_total = self._get_var_or_status(my_instance, "SHOW GLOBAL STATUS LIKE 'Connections'")
+        t_created_rate = (tc_total / conn_total * 100) if conn_total else 0
+        info('Threads_created=%d / Connections=%d (%.2f%%)' % (tc_total, conn_total, t_created_rate))
+        if t_created_rate >= 10:
+            warn('Thread 创建比例偏高, thread_cache_size 可能过小 (每个新连接都创建新线程)')
+            warn('建议: my.cnf 里设置 thread_cache_size = %d (CPU 核数的 2~4 倍)' % (
+                os.cpu_count() * 3 if os.cpu_count() else 16))
+        else:
+            ok('线程缓存命中率正常')
+
+        ac = self._get_var_or_status(my_instance, "SHOW GLOBAL STATUS LIKE 'Aborted_connects'")
+        if ac > 0:
+            warn('Aborted_connects=%d (客户端认证失败 / 超时 / 连接被意外关闭)' % ac)
+            warn('建议: 排查应用端账号密码、wait_timeout 配置、网络抖动')
+
+        # ---------- 2. InnoDB Buffer Pool ----------
+        section('InnoDB Buffer Pool')
+        br = self._get_var_or_status(my_instance, "SHOW GLOBAL STATUS LIKE 'Innodb_buffer_pool_reads'")
+        brr = self._get_var_or_status(my_instance, "SHOW GLOBAL STATUS LIKE 'Innodb_buffer_pool_read_requests'")
+        hit = (1 - br / brr) * 100 if brr else 100
+        info('命中率: %.2f%% (物理读 %d / 总请求 %d)' % (hit, br, brr))
+
+        bpsize = self._get_var_or_status(my_instance, "SHOW GLOBAL VARIABLES LIKE 'innodb_buffer_pool_size'")
+        bpsize_mb = bpsize / 1024 / 1024
+
+        import psutil
+        try:
+            total_mem_mb = psutil.virtual_memory().total / 1024 / 1024
+            bpsize_pct = bpsize / (total_mem_mb * 1024 * 1024) * 100
+            info('innodb_buffer_pool_size=%.0fMB (%.1f%% of total memory %.0fMB)' % (bpsize_mb, bpsize_pct, total_mem_mb))
+        except Exception:
+            bpsize_pct = -1
+            info('innodb_buffer_pool_size=%.0fMB' % bpsize_mb)
+
+        if hit >= 99:
+            ok('命中率极佳')
+        elif hit >= 95:
+            ok('命中率良好, 可维持现状')
+        else:
+            warn('命中率偏低 (%.2f%%), 磁盘读多会拖慢响应' % hit)
+            if bpsize_pct >= 0 and bpsize_pct < 50:
+                warn('建议调大 innodb_buffer_pool_size 到物理内存的 50~75%% (当前 %.0fMB, 可调到 %.0fMB~%.0fMB)' % (
+                    bpsize_mb, total_mem_mb * 0.5, total_mem_mb * 0.75))
+            else:
+                warn('建议调大 innodb_buffer_pool_size, 或检查是否有大量全表扫描')
+
+        ilw = self._get_var_or_status(my_instance, "SHOW GLOBAL STATUS LIKE 'Innodb_log_waits'")
+        if ilw > 0:
+            warn('Innodb_log_waits=%d (Redo Log buffer 写满导致的等待)' % ilw)
+            warn('建议: 增大 innodb_log_buffer_size (默认 16MB, 可尝试 64MB), 或增大 innodb_redo_log_capacity (MySQL 8.0)')
+
+        rlw = self._get_var_or_status(my_instance, "SHOW GLOBAL STATUS LIKE 'Innodb_row_lock_waits'")
+        rla = self._get_var_or_status(my_instance, "SHOW GLOBAL STATUS LIKE 'Innodb_row_lock_time_avg'")
+        if rlw > 0 and rla > 0:
+            warn('锁等待: Innodb_row_lock_waits=%d, avg_wait=%.0fms' % (rlw, rla))
+            warn('建议: 应用层排查热点行 (短事务、合理索引、避免长 SELECT ... FOR UPDATE)')
+
+        # ---------- 3. 慢查询 ----------
+        section('慢查询 / SQL 健康')
+        slow_total = self._get_var_or_status(my_instance, "SHOW GLOBAL STATUS LIKE 'Slow_queries'")
+        sql_log = self._get_var_str(my_instance, "SHOW GLOBAL VARIABLES LIKE 'slow_query_log'")
+        lqt = self._get_var_or_status(my_instance, "SHOW GLOBAL VARIABLES LIKE 'long_query_time'")
+        info('Slow_queries=%d, slow_query_log=%s, long_query_time=%.1fs' % (slow_total, sql_log, lqt))
+
+        if sql_log.lower() == 'on' and lqt <= 2:
+            ok('慢查询已开启且阈值合理 (%.1fs)' % lqt)
+        elif sql_log.lower() == 'on':
+            warn('慢查询已开启但 long_query_time=%.1fs 偏高, 建议调低到 1~2s' % lqt)
+            warn('my.cnf: long_query_time=2, slow_query_log=1')
+        else:
+            warn('slow_query_log 未开启, 无法定位慢 SQL')
+            warn('my.cnf: slow_query_log=1, long_query_time=2, log_queries_not_using_indexes=1')
+
+        # 表级 SQL 健康: 冗余索引
+        try:
+            red = my_instance.query(
+                "select table_schema,table_name,redundant_index_name,sql_drop_index "
+                "from sys.schema_redundant_indexes limit 50"
+            )
+            if red and len(red) > 0:
+                warn('发现 %d 组冗余索引: (取前 3 组)' % len(red))
+                for r in red[:3]:
+                    warn('  %s.%s → %s' % (r['table_schema'], r['table_name'], r['redundant_index_name']))
+                    warn('  可执行: %s' % r['sql_drop_index'])
+            else:
+                ok('未发现冗余索引')
+        except Exception:
+            # MariaDB / sys 库缺失
+            ok('(当前环境无法检测冗余索引, 需要 MySQL 5.7+ sys schema 或 MariaDB 10.1+)')
+
+        # 无主键表
+        try:
+            nopk = my_instance.query(
+                "SELECT t.table_schema, t.table_name FROM information_schema.tables t "
+                "LEFT JOIN information_schema.key_column_usage k "
+                "ON t.table_schema=k.table_schema AND t.table_name=k.table_name AND k.constraint_name='PRIMARY' "
+                "WHERE t.table_schema NOT IN ('mysql','information_schema','sys','performance_schema') "
+                "AND k.constraint_name IS NULL AND t.table_type='BASE TABLE'"
+            )
+            if nopk and len(nopk) > 0:
+                warn('发现 %d 张无主键表 (全表扫描 + Replication 都会有问题)' % len(nopk))
+                for r in nopk[:5]:
+                    warn('  %s.%s' % (r['table_schema'], r['table_name']))
+            else:
+                ok('所有业务表都有主键')
+        except Exception:
+            pass
+
+        # ---------- 4. 磁盘 / Tmp 表 ----------
+        section('磁盘与 Tmp 表')
+        ctd = self._get_var_or_status(my_instance, "SHOW GLOBAL STATUS LIKE 'Created_tmp_disk_tables'")
+        ctm = self._get_var_or_status(my_instance, "SHOW GLOBAL STATUS LIKE 'Created_tmp_tables'")
+        ctd_pct = (ctd / ctm * 100) if ctm else 0
+        info('Created_tmp_disk_tables=%d / Created_tmp_tables=%d (%.2f%%)' % (ctd, ctm, ctd_pct))
+        if ctd_pct >= 20:
+            warn('有 %.1f%% 的临时表落盘, 排序/分组查询性能会差' % ctd_pct)
+            warn('建议: tmp_table_size / max_heap_table_size 调大 (例如 64MB ~ 256MB)')
+            warn('my.cnf: tmp_table_size=128M, max_heap_table_size=128M')
+        else:
+            ok('Tmp 表几乎不落盘 (%.2f%%)' % ctd_pct)
+
+        bcd = self._get_var_or_status(my_instance, "SHOW GLOBAL STATUS LIKE 'Binlog_cache_disk_use'")
+        bcu = self._get_var_or_status(my_instance, "SHOW GLOBAL STATUS LIKE 'Binlog_cache_use'")
+        if bcu > 0:
+            bcd_pct = bcd / bcu * 100
+            info('Binlog_cache_disk_use=%d / Binlog_cache_use=%d (%.2f%%)' % (bcd, bcu, bcd_pct))
+            if bcd_pct >= 10:
+                warn('Binlog 缓存落盘比例 %.1f%% 偏高, 较大事务会写磁盘' % bcd_pct)
+                warn('建议: my.cnf 调大 binlog_cache_size=2M / max_binlog_size=512M')
+            else:
+                ok('Binlog 缓存几乎不落盘')
+        else:
+            info('Binlog 无事务压力 (Binlog_cache_use=0)')
+
+        # ---------- 5. 表级大 / 自增余量 ----------
+        section('大表 / AUTO_INCREMENT 余量')
+        try:
+            big_tables = my_instance.query(
+                """SELECT t.table_schema, t.table_name, t.table_rows,
+                          ROUND((t.data_length + t.index_length)/1024/1024, 2) AS total_mb,
+                          t.auto_increment
+                   FROM information_schema.tables t
+                   WHERE t.table_schema NOT IN ('mysql','information_schema','performance_schema','sys')
+                     AND t.table_type = 'BASE TABLE'
+                   ORDER BY t.data_length + t.index_length DESC
+                   LIMIT 10"""
+            )
+            if big_tables:
+                big = [r for r in big_tables if r['total_mb'] is not None and r['total_mb'] >= 100]
+                if big:
+                    warn('共 %d 张 ≥100MB 的大表 (最大 %.1fMB):' % (len(big), max(x['total_mb'] for x in big)))
+                    for r in big[:3]:
+                        warn('  %s.%s  [%.1fMB, rows=%s]' % (
+                            r['table_schema'], r['table_name'],
+                            r['total_mb'], r['table_rows'] or '-'))
+                    warn('建议: 大表定期 OPTIMIZE TABLE / 按日期分表 / 冷热分离')
+                else:
+                    ok('业务表都 <100MB, 无需要重点关注的大表')
+
+                # AUTO_INCREMENT 余量
+                for r in big_tables:
+                    if r.get('auto_increment'):
+                        ai = int(r['auto_increment'])
+                        # InnoDB 默认 id 是 bigint unsigned
+                        remain_pct = (1 - ai / 18446744073709551615) * 100
+                        if remain_pct < 50:
+                            warn('AUTO_INCREMENT 余量 <50%%: %s.%s (当前 %d)' % (
+                                r['table_schema'], r['table_name'], ai))
+        except Exception:
+            pass
+
+        # ---------- 6. 主从 ----------
+        section('主从复制')
+        try:
+            slave_data = None
+            try:
+                slave_data = my_instance.query('SHOW REPLICA STATUS')
+            except Exception:
+                try:
+                    slave_data = my_instance.query('SHOW SLAVE STATUS')
+                except Exception:
+                    pass
+            if slave_data and len(slave_data) > 0:
+                s = slave_data[0]
+                io_running = s.get('Replica_IO_Running', s.get('Slave_IO_Running'))
+                sql_running = s.get('Replica_SQL_Running', s.get('Slave_SQL_Running'))
+                sec_behind = s.get('Seconds_Behind_Source', s.get('Seconds_Behind_Master'))
+                if io_running == 'Yes' and sql_running == 'Yes':
+                    if sec_behind == 0:
+                        ok('主从复制正常, 无延迟')
+                    else:
+                        warn('主从复制正常但延迟 %s 秒' % sec_behind)
+                else:
+                    warn('主从异常! IO=%s, SQL=%s, Last_Error=%s' % (
+                        io_running, sql_running,
+                        s.get('Last_Error') or s.get('Last_IO_Error') or '无'))
+            else:
+                ok('当前实例不是从库, 未开启主从复制')
+        except Exception as ex:
+            info('(检查主从时出现异常: %s)' % str(ex))
+
+        # ---------- 总结 ----------
+        lines.append('')
+        lines.append('━━━ 总结 ━━━')
+        if issues == 0:
+            lines.append('  🎉 本次检查共发现 0 个可优化点, MySQL 健康状况良好!')
+        elif issues <= 3:
+            lines.append('  📌 本次检查共发现 %d 个可优化点 (建议逐项处理)' % issues)
+        else:
+            lines.append('  🚨 本次检查共发现 %d 个可优化点, 建议优先处理连接数/Buffer Pool/主从等核心项' % issues)
+        lines.append('  ℹ️   每项建议 my.cnf 修改后需重启 MySQL 或动态执行 SET GLOBAL, 具体参数请查阅官方文档')
+
+        return mw.returnData(True, 'ok', '\n'.join(lines))
+
 # ---------------------------------- run ----------------------------------
 
 def get_server_list(args):
@@ -870,6 +1172,11 @@ def get_slave_status(args):
 def get_slave_runtime(args):
     t = nosqlMySQLCtr()
     return t.getSlaveRuntime(args)
+
+# MySQL 健康检查
+def get_health(args):
+    t = nosqlMySQLCtr()
+    return t.getHealth(args)
 
 
 

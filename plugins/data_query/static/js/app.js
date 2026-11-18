@@ -870,6 +870,41 @@ function mysqlCommonFuncSlaveStatus(){
     });
 }
 
+function mysqlCommonFuncHealth(){
+    var loading = layer.msg('正在采集指标, 请稍候...', {icon: 16, time: 0, shade: 0.3});
+    var sid = mysqlGetSid();
+    myPostCBN('get_health', {'sid': sid}, function(rdata){
+        layer.close(loading);
+        text = rdata.data.data;
+        if (!text) text = '无数据';
+
+        layer.open({
+            type: 1,
+            title: "MySQL 综合健康检查与优化建议",
+            area: ['780px', '600px'],
+            closeBtn: 1,
+            shadeClose: false,
+            content: '<div class="bt-form pd15">' +
+                '<div style="margin-bottom:8px;color:#999;font-size:12px;">✅ 正常  ⚠️  建议优化  🚨 严重  ℹ️  信息</div>' +
+                '<textarea readonly="" style="margin: 0px;height: 500px;width: 100%;background-color:#1e1e1e;color:#d4d4d4;padding:8px;font-family:Menlo,Consolas,monospace;font-size:12px;line-height:1.5;resize:none;" id="health_log"></textarea>' +
+                '</div>',
+            success: function(i, l){
+                var $box = $('#health_log');
+                $box.val(text);
+                // 把「━━━ 总结」那行尽量放在首屏 —— textarea 内部 scrollTop 近似等于行号 × 行高
+                var idx = text.indexOf('━━━ 总结');
+                if (idx > -1) {
+                    var before = text.substring(0, idx);
+                    var line = before.split('\n').length;
+                    $box.scrollTop(Math.max(0, (line - 4) * 18));
+                } else {
+                    $box.scrollTop(0);
+                }
+            }
+        });
+    });
+}
+
 function mysqlSlaveSyncProgress(){
     var html = '<div>';
     html += '<div class="slave_sync_progress" id="slave_sync_progress" style="width:750px;height:350px;"></div>';
@@ -1102,6 +1137,7 @@ function mysqlCommonFunc(){
                 <button style="margin-bottom: 8px;" id="mysql_deadlock_info" type="button" class="btn btn-default btn-sm">查看死锁信息</button>\
                 <button style="margin-bottom: 8px;" id="mysql_slave_status" type="button" class="btn btn-default btn-sm">查看主从复制信息</button>\
                 <button style="margin-bottom: 8px;" id="mysql_slave_sync_progress" type="button" class="btn btn-default btn-sm">查看从延迟进度</button>\
+                <button style="margin-bottom: 8px;" id="mysql_health" type="button" class="btn btn-default btn-sm">查看健康</button>\
             </div>',
             success:function(i,l){
                 $('#mysql_top_nsql').click(function(){
@@ -1142,6 +1178,10 @@ function mysqlCommonFunc(){
 
                 $('#mysql_slave_sync_progress').click(function(){
                     mysqlSlaveSyncProgress();
+                });
+
+                $('#mysql_health').click(function(){
+                    mysqlCommonFuncHealth();
                 });
             }
         });
