@@ -2651,7 +2651,7 @@ function pgCommonFunc(){
         layer.open({
             type: 1,
             title: "PostgreSQL常用功能",
-            area: ['600px', '280px'],
+            area: ['600px', '230px'],
             closeBtn: 1,
             shadeClose: false,
             content: '<div class="bt-form pd20">\
