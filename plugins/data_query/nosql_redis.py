@@ -368,6 +368,186 @@ def clear_flushdb(args):
     t = nosqlRedisCtr()
     return t.clearFlushDB(args)
 
+
+# ---------------- Redis 健康检查 ----------------
+def get_health(args):
+    sid = args.get('sid', 0)
+    ctr = nosqlRedisCtr()
+    c, err = ctr._connect(sid)
+    if err: return err
+
+    lines = []
+    issues = []
+    cur_section = ''
+
+    def section(title):
+        nonlocal cur_section
+        cur_section = title
+        lines.append(''); lines.append('━━━ %s ━━━' % title)
+    def ok(msg):       lines.append('  ✅ ' + msg)
+    def critical(msg): issues.append((2, cur_section, '🚨 ' + msg)); lines.append('  🚨 ' + msg)
+    def warn(msg):     issues.append((1, cur_section, '⚠️  ' + msg)); lines.append('  ⚠️  ' + msg)
+    def tip(msg):      issues.append((0, cur_section, '💡 ' + msg)); lines.append('  💡 ' + msg)
+    def info(msg):   lines.append('  ℹ️   ' + msg)
+
+    try:
+        rinfo = c.info()
+
+        # ---------- 0. 基础信息 ----------
+        section('基础信息')
+        lines = lines  # keep ref; already set
+        info('Redis %s' % rinfo.get('redis_version'))
+        upt = int(rinfo.get('uptime_in_seconds', 0))
+        info('已运行: %s' % ('%d天%02d:%02d' % (upt//86400, (upt%86400)//3600, (upt%3600)//60)))
+        info('mode: %s, tcp_port: %s' % (rinfo.get('redis_mode', 'standalone'), rinfo.get('tcp_port')))
+
+        # ---------- 1. 连接 ----------
+        section('连接')
+        cc = int(rinfo.get('connected_clients', 0))
+        blocked = int(rinfo.get('blocked_clients', 0))
+        rejected = int(rinfo.get('rejected_connections', 0))
+        maxc = rinfo.get('maxclients')
+        info('connected_clients=%d, blocked_clients=%d, maxclients=%s, rejected=%d' % (
+            cc, blocked, maxc, rejected))
+        if rejected > 0:
+            critical('已拒绝 %d 次新连接! 客户端太多或 maxclients 太小' % rejected)
+            critical('redis.conf: maxclients=10000')
+        if blocked > 0:
+            warn('有 %d 个客户端在阻塞 (BRPOP/BLPOP/BZPOPMIN, 属正常; 太多要排查)' % blocked)
+        if maxc and cc / int(maxc) * 100 >= 80:
+            warn('连接数 %.0f%% 接近 maxclients' % (cc / int(maxc) * 100))
+        if rejected == 0 and cc / (int(maxc) if maxc else 1) * 100 < 80:
+            ok('连接数水位正常')
+
+        # ---------- 2. 内存 ----------
+        section('内存')
+        umb = float(rinfo.get('used_memory_human', '0').rstrip('M').rstrip('G')) * (
+            1024 if 'G' in rinfo.get('used_memory_human', '').upper() else 1)
+        up = rinfo.get('used_memory_peak_human', '?')
+        maxm = rinfo.get('maxmemory_human', '0B')
+        policy = rinfo.get('maxmemory_policy')
+        info('used_memory=%s, peak=%s, maxmemory=%s, policy=%s' % (
+            rinfo.get('used_memory_human'), up, maxm, policy))
+
+        if maxm != '0B':
+            try:
+                maxm_mb = float(maxm.replace('MB','').replace('GB','')) * (1024 if 'GB' in maxm.upper() else 1)
+                um_pct = umb / maxm_mb * 100 if maxm_mb else 0
+                if um_pct >= 90:
+                    critical('内存已用 %.0f%% 接近 maxmemory, 即将驱逐!' % um_pct)
+                    critical('当前策略: %s (volatile-lru 只驱逐带 TTL 的 key; noeviction 会拒写)' % policy)
+                elif um_pct >= 70:
+                    warn('内存已用 %.0f%%, 关注驱逐情况' % um_pct)
+            except Exception: pass
+            if policy == 'noeviction':
+                warn('maxmemory_policy=noeviction, 到达 maxmemory 后写请求会被拒绝!')
+                warn('生产建议: allkeys-lru 或 allkeys-lfu (Redis 4+)')
+            elif policy == 'volatile-lru':
+                tip('volatile-lru 只驱逐带过期的 key, 如果大部分 key 没 TTL, 还是会 OOM')
+        else:
+            warn('maxmemory 未设置! Redis 会无限制用物理内存, 可能 OOM 被系统 kill')
+            warn('redis.conf: maxmemory 4gb, maxmemory-policy allkeys-lru')
+
+        # ---------- 3. 持久化 ----------
+        section('持久化 (RDB / AOF)')
+        info('loading=%s, rdb_last_bgsave_status=%s, aof_enabled=%s' % (
+            rinfo.get('loading'), rinfo.get('rdb_last_bgsave_status'), rinfo.get('aof_enabled')))
+        if rinfo.get('rdb_last_bgsave_status') == 'err':
+            critical('RDB last bgsave 失败! 检查磁盘空间 / 权限')
+        if rinfo.get('aof_enabled') == '1':
+            aof_rewrite = rinfo.get('aof_rewrite_in_progress', '0')
+            info('AOF enabled, rewrite_in_progress=%s, aof_last_bgrewrite_status=%s' % (
+                aof_rewrite, rinfo.get('aof_last_bgrewrite_status')))
+            if rinfo.get('aof_last_bgrewrite_status') == 'err':
+                critical('AOF rewrite 失败! 磁盘空间可能不足')
+            if int(aof_rewrite or 0) > 0:
+                tip('AOF 正在 rewrite, 内存/IO 压力会增大, 避免大 RENAME/FLUSHALL')
+        else:
+            warn('AOF 未开启, 只有 RDB 快照, 断电可能丢最近几分钟数据')
+            warn('redis.conf: appendonly yes')
+
+        # ---------- 4. Fork / BGSAVE 延迟 ----------
+        section('Fork / BGSAVE')
+        lfu = rinfo.get('latest_fork_usec')
+        if lfu and int(lfu) > 100000:
+            warn('latest_fork_usec=%s > 100ms, fork 阻塞主线程时间长' % lfu)
+            warn('Redis fork 是 copy-on-write, 写入量大时 fork 慢属正常; 错开高峰')
+        elif lfu:
+            ok('fork 延迟正常 (%sus)' % lfu)
+
+        # ---------- 5. QPS / ops ----------
+        section('QPS / 操作')
+        total_cmds = int(rinfo.get('total_commands_processed', 0))
+        upt = max(upt, 1)
+        qps = total_cmds / upt
+        info('累计命令=%d, 估算平均 QPS=%.1f' % (total_cmds, qps))
+        inst_ops = rinfo.get('instantaneous_ops_per_sec')
+        if inst_ops: info('瞬时 ops_per_sec=%s' % inst_ops)
+
+        # ---------- 6. keyspace ----------
+        section('keyspace')
+        ks = {}
+        for k, v in rinfo.items():
+            if k.startswith('db'):
+                m = {}
+                for kv in v.split(','):
+                    if '=' in kv:
+                        a, b = kv.split('=', 1)
+                        m[a.strip()] = b.strip()
+                ks[k] = m
+        for db, d in ks.items():
+            keys = int(d.get('keys', 0))
+            expires = int(d.get('expires', 0))
+            avg_ttl = int(d.get('avg_ttl', 0)) / 1000
+            info('%s keys=%d, expires=%d, avg_ttl=%ds' % (db, keys, expires, avg_ttl))
+            if keys > 1000000:
+                warn('%s key 数超 100 万, 确认内存是否够用, 大 key 可能导致 RDB fork 变慢' % db)
+
+        # ---------- 7. slowlog ----------
+        section('slowlog')
+        try:
+            sl = c.slowlog_get(-1)
+            if sl:
+                warn('最近 10 条慢日志 (取前 3):')
+                for x in sl[:3]:
+                    cmd = ' '.join(x.get('command', []))[:80]
+                    warn('  id=%s dur=%sµs cmd=%s' % (
+                        x.get('id'), x.get('duration'), cmd))
+            else:
+                ok('暂无慢日志')
+            sl_len = c.config_get('slowlog-max-len')
+            sl_thr = c.config_get('slowlog-log-slower-than')
+            info('slowlog-max-len=%s, slowlog-log-slower-than=%s µs' % (sl_len, sl_thr))
+            try:
+                if sl_thr and int(sl_thr['slowlog-log-slower-than']) > 10000:
+                    tip('slowlog-log-slower-than=%s > 10ms, 建议调到 5000 µs 抓更多慢命令' % sl_thr)
+            except Exception: pass
+        except Exception as e:
+            info('slowlog 查询异常: %s' % str(e))
+
+        # ---------- 总结 ----------
+        lines.append(''); lines.append('━━━ 总结 ━━━')
+        nc = sum(1 for x in issues if x[0] == 2)
+        nw = sum(1 for x in issues if x[0] == 1)
+        nt = sum(1 for x in issues if x[0] == 0)
+        if not issues:
+            lines.append('  🎉 Redis 健康状况良好!')
+        else:
+            lines.append('  📊 严重 🚨 %d / 警告 ⚠️  %d / 建议 💡 %d (共 %d)' % (nc, nw, nt, len(issues)))
+            if nc > 0:
+                lines.append(''); lines.append('  ── 最严重 Top %d ──' % min(nc, 5))
+                for idx, (lv, sec, txt) in enumerate([x for x in issues if x[0] == 2]):
+                    if idx >= 5: break
+                    lines.append('  %s  [%s]' % (txt, sec))
+            lines.append(''); lines.append('  ── 完整清单 (按严重度排序) ──')
+            for lv, sec, txt in sorted(issues, key=lambda x: (-x[0], x[1])):
+                lines.append('  %s  [%s]' % (txt, sec))
+        lines.append('')
+        return mw.returnData(True, 'ok', '\n'.join(lines))
+    except Exception as ex:
+        return mw.returnData(False, 'Redis 健康检查异常: %s' % str(ex))
+
+
 # 测试
 def test(args):
     sid = args['sid']

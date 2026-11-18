@@ -932,3 +932,325 @@ def get_slave_status(args):
         return mw.returnData(True, 'ok', msg)
     finally:
         client.close()
+
+
+# ---------------- PostgreSQL 健康检查 ----------------
+
+def get_health(args):
+    client, err = openClient(args)
+    if err:
+        return err
+
+    lines = []
+    issues = []  # [(level, section, text)]  level: 2=critical 1=warn 0=tip
+    cur_section = ''
+
+    def section(title):
+        nonlocal cur_section
+        cur_section = title
+        lines.append('')
+        lines.append('━━━ %s ━━━' % title)
+
+    def ok(msg):   lines.append('  ✅ ' + msg)
+    def critical(msg): issues.append((2, cur_section, '🚨 ' + msg)); lines.append('  🚨 ' + msg)
+    def warn(msg):     issues.append((1, cur_section, '⚠️  ' + msg)); lines.append('  ⚠️  ' + msg)
+    def tip(msg):      issues.append((0, cur_section, '💡 ' + msg)); lines.append('  💡 ' + msg)
+    def info(msg):   lines.append('  ℹ️   ' + msg)
+
+    def one(sql, default=None):
+        try:
+            r = client.one(sql)
+            if not r: return default
+            return list(r.values())[0]
+        except Exception: return default
+
+    def find(sql, default=[]):
+        try: return client.find(sql)
+        except Exception: return default
+
+    try:
+        # ---------- 0. 基础信息 ----------
+        section('基础信息')
+        ver = one('SELECT version()') or ''
+        info('版本: %s' % ver.split(',')[0].strip()[:60])
+        uptime_sec = one("SELECT (EXTRACT(EPOCH FROM (now() - pg_postmaster_start_time()))::int)") or 0
+        if uptime_sec >= 86400:
+            info('已运行: %d天%02d:%02d:%02d' % (uptime_sec//86400, (uptime_sec%86400)//3600, (uptime_sec%3600)//60, uptime_sec%60))
+        else:
+            info('已运行: %d分钟' % max(uptime_sec//60, 1))
+
+        sp = one("SHOW shared_preload_libraries") or ''
+        pgss = 'pg_stat_statements' in sp.lower()
+        info('shared_preload_libraries: %s' % sp)
+        if pgss:
+            ok('pg_stat_statements 已预加载 (可识别热点 SQL)')
+        else:
+            warn('pg_stat_statements 未预加载, 无法识别热点 SQL')
+            warn('postgresql.conf: shared_preload_libraries = pg_stat_statements')
+
+        # ---------- 1. 连接 ----------
+        section('连接')
+        max_conn = int(one('SHOW max_connections') or 0)
+        super_res = int(one('SHOW superuser_reserved_connections') or 0)
+        total_conn = int(one('SELECT count(*) FROM pg_stat_activity') or 0)
+        active = int(one("SELECT count(*) FROM pg_stat_activity WHERE state='active'") or 0)
+        idle = int(one("SELECT count(*) FROM pg_stat_activity WHERE state='idle'") or 0)
+        conn_pct = total_conn / max_conn * 100 if max_conn else 0
+        info('连接数: active=%d, idle=%d, total=%d / max_connections=%d (%.1f%%)' % (active, idle, total_conn, max_conn, conn_pct))
+        if conn_pct >= 90:
+            critical('连接数 %d/%d (%.1f%%), 即将耗尽' % (total_conn, max_conn, conn_pct))
+        elif conn_pct >= 70:
+            warn('连接数水位 %.1f%%, 建议关注' % conn_pct)
+        else:
+            ok('连接数水位正常')
+
+        lock_wait = int(one("SELECT count(*) FROM pg_stat_activity WHERE wait_event_type='Lock'") or 0)
+        if lock_wait > 0:
+            warn('当前有 %d 个等待锁的连接 (可能有热点行/慢事务)' % lock_wait)
+        else:
+            ok('无连接等待锁')
+
+        # ---------- 2. XID 回卷风险 (关键!) ----------
+        section('事务 ID / 回卷风险')
+        xid_table = find("""
+            SELECT datname, age(datfrozenxid) AS age,
+                   pg_size_pretty(pg_database_size(datname)) AS size
+            FROM pg_database WHERE datistemplate=false ORDER BY age DESC LIMIT 10
+        """)
+        if xid_table:
+            for r in xid_table[:5]:
+                age = int(r['age']) if r.get('age') else 0
+                dbn = r['datname']
+                if age >= 1500000000:
+                    critical('XID 回卷临界! %s age=%d (≥ 2^31 - 500000000, 必须立刻 VACUUM FREEZE / autovacuum_max_workers 调大)' % (dbn, age))
+                elif age >= 1200000000:
+                    warn('XID 偏高: %s age=%d, autovacuum 可能太慢, 建议调大 autovacuum_max_workers / autovacuum_vacuum_scale_factor' % (dbn, age))
+                elif age >= 1000000000:
+                    tip('XID 中高: %s age=%d, 建议关注 autovacuum 运行情况' % (dbn, age))
+                else:
+                    ok('%s age=%d (正常)' % (dbn, age))
+        else:
+            ok('所有数据库 XID 年龄都正常')
+
+        # autovacuum 状态
+        av = one('SHOW autovacuum')
+        info('autovacuum: %s, max_workers: %s' % (av, one('SHOW autovacuum_max_workers')))
+
+        # ---------- 3. WAL / Checkpoint ----------
+        section('WAL / Checkpoint')
+        cp_timed = int(one("SELECT checkpoints_timed FROM pg_stat_bgwriter") or 0)
+        cp_req = int(one("SELECT checkpoints_req FROM pg_stat_bgwriter") or 0)
+        total_cp = cp_timed + cp_req
+        req_pct = cp_req / total_cp * 100 if total_cp else 0
+        info('checkpoints: timed=%d, requested=%d (requested %.1f%%)' % (cp_timed, cp_req, req_pct))
+        if req_pct >= 20 and total_cp >= 10:
+            warn('checkpoint 压力大, %d 次是请求触发 (可能 WAL max_wal_size 太小)' % cp_req)
+            warn('postgresql.conf: max_wal_size=8GB, min_wal_size=2GB, checkpoint_completion_target=0.9')
+        elif total_cp == 0:
+            ok('暂无 checkpoint 压力')
+        else:
+            ok('checkpoint 压力正常 (requested %.1f%%)' % req_pct)
+
+        wal_level = one('SHOW wal_level')
+        max_wal = one('SHOW max_wal_size')
+        cct = one('SHOW checkpoint_completion_target')
+        info('wal_level=%s, max_wal_size=%s, checkpoint_completion_target=%s' % (wal_level, max_wal, cct))
+        if wal_level in ('replica', 'logical'):
+            ok('WAL 级别 %s 支持 PITR / 主从' % wal_level)
+        else:
+            warn('wal_level=%s 过低, 不支持 Point-In-Time Recovery' % wal_level)
+            warn('postgresql.conf: wal_level=replica (或 logical 如需逻辑复制)')
+
+        # ---------- 4. Buffer Pool / BGWriter ----------
+        section('Buffer Pool / BGWriter')
+        sb = one('SHOW shared_buffers')
+        ecs = one('SHOW effective_cache_size')
+        info('shared_buffers=%s, effective_cache_size=%s' % (sb, ecs))
+        sb_mb = 0
+        try: sb_mb = int(float(sb.replace('GB','').replace('MB','')) * (1024 if 'GB' in sb else 1)) if sb else 0
+        except: pass
+        total_mem_mb = 16384  # 兜底; 真实环境可以 psutil
+        try:
+            import psutil; total_mem_mb = psutil.virtual_memory().total / 1024 / 1024
+        except Exception: pass
+        sb_pct = sb_mb / total_mem_mb * 100 if sb_mb else 0
+        info('shared_buffers=%.0fMB (%.1f%% of total memory %.0fMB)' % (sb_mb, sb_pct, total_mem_mb))
+        if sb_pct < 25:
+            warn('shared_buffers 偏低, 建议调到物理内存的 25~50%%')
+            warn('postgresql.conf: shared_buffers=%dMB' % int(total_mem_mb * 0.3))
+
+        # 命中率
+        db_hit = find("""
+            SELECT datname,
+                   blks_read, blks_hit,
+                   round((1 - blks_read::numeric / nullif(blks_read + blks_hit, 0)) * 100, 2) AS hit_rate
+            FROM pg_stat_database WHERE datname NOT IN ('template0','template1','postgres')
+            ORDER BY blks_read DESC LIMIT 5
+        """)
+        if db_hit:
+            for r in db_hit:
+                hr = float(r['hit_rate'] or 100)
+                if hr < 95:
+                    warn('%s Buffer Pool 命中率 %.2f%% 偏低, 建议调大 shared_buffers' % (r['datname'], hr))
+                else:
+                    ok('%s 命中率 %.2f%%' % (r['datname'], hr))
+
+        # ---------- 5. 死锁 ----------
+        section('死锁 / 锁等待')
+        deadlocks = int(one("SELECT deadlocks FROM pg_stat_database WHERE datname='postgres'") or 0)
+        total_deadlocks = 0
+        try:
+            for r in find("SELECT deadlocks FROM pg_stat_database"):
+                total_deadlocks += int(r['deadlocks'] or 0)
+        except Exception: pass
+        info('累计死锁: %d' % total_deadlocks)
+        if total_deadlocks > 0:
+            warn('累计出现 %d 次死锁, 应用层事务冲突' % total_deadlocks)
+            warn('排查: SELECT query, query_start, state FROM pg_stat_activity WHERE wait_event_type=%sLock%s' % ("'", "'"))
+            warn('建议应用端按固定顺序获取锁, 缩短事务, 加 retry')
+        else:
+            ok('未检测到死锁')
+
+        # ---------- 6. 慢查询 / 热点 SQL ----------
+        section('热点 SQL / 慢查询')
+        if pgss:
+            try:
+                topq = find("""
+                    SELECT query, calls, total_exec_time, mean_exec_time,
+                           rows, blk_read_time, blk_write_time
+                    FROM pg_stat_statements ORDER BY total_exec_time DESC LIMIT 5
+                """)
+                if topq:
+                    for r in topq[:3]:
+                        q = (r['query'] or '')[:120]
+                        warn('热点: calls=%d mean=%.1fms total=%.0fms rows=%s  %s' % (
+                            r['calls'] or 0, r['mean_exec_time'] or 0, r['total_exec_time'] or 0,
+                            r.get('rows'), q.replace('\n',' ')))
+                else:
+                    ok('pg_stat_statements 暂无数据 (刚开启或样本不足)')
+            except Exception as e:
+                info('pg_stat_statements 查询异常: %s' % str(e))
+        else:
+            info('(pg_stat_statements 未预加载, 无法识别热点 SQL)')
+
+        # 无主键表
+        nopk = find("""
+            SELECT tc.table_schema, tc.table_name
+            FROM information_schema.tables tc
+            WHERE tc.table_schema NOT IN ('pg_catalog','information_schema')
+              AND tc.table_type='BASE TABLE'
+              AND NOT EXISTS (
+                  SELECT 1 FROM information_schema.table_constraints tco
+                  WHERE tco.table_schema=tc.table_schema AND tco.table_name=tc.table_name AND tco.constraint_type='PRIMARY KEY')
+            LIMIT 10
+        """)
+        if nopk:
+            critical('发现 %d 张无主键表' % len(nopk))
+            for r in nopk[:5]: critical('  %s.%s' % (r['table_schema'], r['table_name']))
+        else:
+            ok('所有业务表都有主键')
+
+        # ---------- 7. 表扫描 / 未使用索引 ----------
+        section('表扫描 / 未使用索引')
+        seq_scan_tables = find("""
+            SELECT schemaname, relname, seq_scan, seq_tup_read, idx_scan
+            FROM pg_stat_user_tables WHERE seq_scan > 100
+            ORDER BY seq_scan DESC LIMIT 10
+        """)
+        if seq_scan_tables:
+            for r in seq_scan_tables[:5]:
+                warn('%s.%s seq_scan=%d, idx_scan=%d (考虑加索引)' % (
+                    r['schemaname'], r['relname'], r['seq_scan'], r['idx_scan']))
+        else:
+            ok('业务表无明显全表扫描热点')
+
+        unused_idx = find("""
+            SELECT schemaname, tablename, indexname, idx_scan
+            FROM pg_stat_user_indexes WHERE idx_scan=0
+              AND schemaname NOT IN ('pg_catalog','information_schema')
+            LIMIT 10
+        """)
+        if unused_idx:
+            tip('发现 %d 个从未命中的索引 (取前 3):' % len(unused_idx))
+            for r in unused_idx[:3]:
+                tip('  %s.%s.%s (可考虑 DROP)' % (r['schemaname'], r['tablename'], r['indexname']))
+
+        # ---------- 8. autovacuum ----------
+        section('autovacuum / 膨胀')
+        av = one('SHOW autovacuum')
+        av_workers = one('SHOW autovacuum_max_workers')
+        info('autovacuum=%s, max_workers=%s' % (av, av_workers))
+        if av.lower() == 'off':
+            critical('autovacuum 被关闭! 表会膨胀, XID 会耗尽')
+
+        # 大表 / 膨胀
+        big = find("""
+            SELECT schemaname, relname,
+                   pg_size_pretty(pg_total_relation_size(schemaname||'.'||relname)) AS total,
+                   n_live_tup, n_dead_tup,
+                   last_vacuum, last_autovacuum, last_analyze, last_autoanalyze
+            FROM pg_stat_user_tables
+            ORDER BY pg_total_relation_size(schemaname||'.'||relname) DESC LIMIT 10
+        """)
+        if big:
+            for r in big[:3]:
+                dead = int(r['n_dead_tup'] or 0)
+                live = int(r['n_live_tup'] or 1)
+                dead_pct = dead / live * 100 if live else 0
+                if dead_pct >= 200 and dead >= 1000:
+                    warn('%s.%s total=%s 死元组 n_dead_tup=%d (占 live %d%%, autovacuum 跟不上)' % (
+                        r['schemaname'], r['relname'], r['total'], dead, dead_pct))
+                elif dead >= 10000 and dead_pct >= 50:
+                    tip('%s.%s 死元组较多 n_dead_tup=%d (占 live %d%%)' % (
+                        r['schemaname'], r['relname'], dead, dead_pct))
+
+        # ---------- 9. 主从 ----------
+        section('主从复制')
+        recovery = one('SELECT pg_is_in_recovery()')
+        if recovery:
+            lag_sec = int(one("SELECT coalesce(extract(epoch from (now() - pg_last_xact_replay_timestamp()))::int, 0)") or 0)
+            info('当前为从库, 复制延迟: %d 秒' % lag_sec)
+            if lag_sec > 0:
+                warn('复制存在 %d 秒延迟' % lag_sec)
+            else:
+                ok('主从复制无延迟')
+        else:
+            # 主库复制槽
+            try:
+                slots = find("SELECT slot_name, slot_type, active, restart_lsn, pg_size_pretty(pg_wal_lsn_diff(pg_current_wal_lsn(), restart_lsn)) AS lag FROM pg_replication_slots")
+                if slots:
+                    for r in slots:
+                        if not r['active']:
+                            warn('复制槽 %s 非 active, 但还有 lag=%s' % (r['slot_name'], r['lag']))
+                        else:
+                            info('复制槽 %s active, lag=%s' % (r['slot_name'], r['lag']))
+                else:
+                    ok('当前为主库, 未配置复制槽')
+            except Exception:
+                ok('当前为主库')
+
+        # ---------- 总结 ----------
+        lines.append('')
+        lines.append('━━━ 总结 ━━━')
+        nc = sum(1 for x in issues if x[0] == 2)
+        nw = sum(1 for x in issues if x[0] == 1)
+        nt = sum(1 for x in issues if x[0] == 0)
+        if not issues:
+            lines.append('  🎉 PostgreSQL 健康状况良好!')
+        else:
+            lines.append('  📊 严重 🚨 %d / 警告 ⚠️  %d / 建议 💡 %d (共 %d)' % (nc, nw, nt, len(issues)))
+            if nc > 0:
+                lines.append(''); lines.append('  ── 最严重 Top %d ──' % min(nc, 5))
+                for idx, (lv, sec, txt) in enumerate([x for x in issues if x[0] == 2]):
+                    if idx >= 5: break
+                    lines.append('  %s  [%s]' % (txt, sec))
+            lines.append(''); lines.append('  ── 完整清单 (按严重度排序) ──')
+            for lv, sec, txt in sorted(issues, key=lambda x: (-x[0], x[1])):
+                lines.append('  %s  [%s]' % (txt, sec))
+        lines.append('')
+        lines.append('  ℹ️   postgresql.conf 修改后需重启, WAL/部分参数可用 pg_reload_conf()')
+
+        return mw.returnData(True, 'ok', '\n'.join(lines))
+    finally:
+        client.close()
+
