@@ -833,6 +833,11 @@ class nosqlMySQLCtr():
         ver = self._get_var_str(my_instance, "SELECT @@version")
         uptime = self._get_var_or_status(my_instance, "SHOW GLOBAL STATUS LIKE 'Uptime'")
         pfs = self._get_var_or_status(my_instance, "SELECT @@performance_schema")
+        # 解析版本号: 5.7.39-log / 8.0.36-log / 8.4.2 / 11.4.4-MariaDB
+        _m = re.match(r'^(\d+)\.(\d+)', ver)
+        _major = int(_m.group(1)) if _m else 0
+        _minor = int(_m.group(2)) if _m else 0
+        _is_mariadb = 'mariadb' in ver.lower()
         if uptime >= 86400:
             uptime_txt = '%d天%02d:%02d:%02d' % (
                 uptime // 86400, (uptime % 86400) // 3600,
@@ -923,11 +928,15 @@ class nosqlMySQLCtr():
         else:
             ok('行锁等待为 0')
 
-        # 死锁 (MySQL 8.0+ 提供 Innodb_deadlocks, MariaDB 用 Innodb_deadlock_detect)
-        deadlocks = self._get_var_or_status(my_instance, "SHOW GLOBAL STATUS LIKE 'Innodb_deadlocks'")
-        if deadlocks == 0:
+        # 死锁: MySQL 8.0+ 有 Innodb_deadlocks, MariaDB 有 Innodb_deadlock_detect, MySQL 5.7 无全局计数
+        deadlocks = -1
+        if _is_mariadb:
             deadlocks = self._get_var_or_status(my_instance, "SHOW GLOBAL STATUS LIKE 'Innodb_deadlock_detect'")
-        if deadlocks > 0:
+        elif _major >= 8:
+            deadlocks = self._get_var_or_status(my_instance, "SHOW GLOBAL STATUS LIKE 'Innodb_deadlocks'")
+        if deadlocks < 0:
+            info('(MySQL %d.%d 无全局死锁计数器, 可用 SHOW ENGINE INNODB STATUS 查最近死锁)' % (_major, _minor))
+        elif deadlocks > 0:
             warn('Innodb 死锁累计 %d 次, 应用层有事务并发冲突' % deadlocks)
             warn('建议: SHOW ENGINE INNODB STATUS 查最近死锁, 应用按固定顺序获取锁、缩短事务、加 retry 逻辑')
         else:
@@ -1007,24 +1016,27 @@ class nosqlMySQLCtr():
         if gtid.lower() == 'off':
             warn('gtid_mode=OFF, 主从切换 / 重建副本操作较繁琐, 建议开启 GTID')
             warn('my.cnf: gtid_mode=ON, enforce_gtid_consistency=ON')
-        # Binlog 过期策略 (MySQL 8.0+)
+        # Binlog 过期策略: MySQL 8.0+ / MariaDB 10.6+ 用 binlog_expire_logs_seconds, 否则 expire_logs_days
         try:
-            bex = self._get_var_str(my_instance, "SHOW GLOBAL VARIABLES LIKE 'binlog_expire_logs_seconds'")
-            if bex and bex != '0':
-                info('binlog_expire_logs_seconds=%s (有自动清理)' % bex)
+            use_seconds = (_major >= 8 and not _is_mariadb) or (_is_mariadb and _major >= 10 and _minor >= 6)
+            if use_seconds:
+                bex = self._get_var_str(my_instance, "SHOW GLOBAL VARIABLES LIKE 'binlog_expire_logs_seconds'")
+                info('binlog_expire_logs_seconds=%s' % bex)
+                if not bex or bex in ('0', ''):
+                    warn('binlog 未设置过期策略 (binlog_expire_logs_seconds=0), 长期运行会撑满磁盘')
+                    warn('my.cnf: binlog_expire_logs_seconds=604800 (保留 7 天)')
+                else:
+                    ok('binlog 过期策略: binlog_expire_logs_seconds=%s' % bex)
             else:
-                warn('binlog 未设置过期策略 (binlog_expire_logs_seconds=0), 长期运行会撑满磁盘')
-                warn('my.cnf: binlog_expire_logs_seconds=604800 (保留 7 天)')
-        except Exception:
-            # MySQL 5.7 用 expire_logs_days
-            try:
                 eld = self._get_var_or_status(my_instance, "SHOW GLOBAL VARIABLES LIKE 'expire_logs_days'")
                 info('expire_logs_days=%d' % eld)
                 if eld == 0:
-                    warn('expire_logs_days=0, binlog 永不过期, 长期运行会撑满磁盘')
+                    warn('binlog 永不过期 (expire_logs_days=0), 长期运行会撑满磁盘')
                     warn('my.cnf: expire_logs_days=7 (保留 7 天)')
-            except Exception:
-                pass
+                else:
+                    ok('binlog 过期策略: expire_logs_days=%d' % eld)
+        except Exception as ex:
+            info('(binlog 过期策略检查异常: %s)' % str(ex))
 
         # ---------- 3. 慢查询 ----------
         section('慢查询 / SQL 健康')
