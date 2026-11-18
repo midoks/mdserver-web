@@ -1336,7 +1336,12 @@ function mysqlGetServerList(call_func){
             }
             closeInstallLayer();
         } else {
-            layer.msg(rdata.data.msg,{ icon: 7, time: 2000, shade: 0.3 });
+
+            if (rdata.data.length != 0 ){
+                layer.msg(rdata.data.msg,{ icon: 7, time: 2000, shade: 0.3 });
+            } else {
+                layer.msg("当前未安装MySQL!",{ icon: 7, time: 2000, shade: 0.3 });
+            }
             setTimeout(function(){
                 showInstallLayer();
             },2050);
