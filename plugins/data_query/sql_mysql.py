@@ -811,6 +811,25 @@ class nosqlMySQLCtr():
         except Exception:
             return default
 
+    def _get_innodb_metric(self, my_instance, name):
+        """读取版本相关的 INNODB_METRICS 指标，返回 (数值, 状态)。"""
+        try:
+            rows = my_instance.query(
+                "SELECT COUNT AS metric_value, STATUS AS metric_status "
+                "FROM information_schema.INNODB_METRICS WHERE NAME='%s'" % name
+            )
+            if not rows:
+                return None, 'unsupported'
+            row = rows[0]
+            status = str(row.get('metric_status') or 'unknown').lower()
+            if status != 'enabled':
+                return None, status
+            return int(row['metric_value']), status
+        except (KeyError, TypeError, ValueError):
+            return None, 'invalid'
+        except Exception:
+            return None, 'query_failed'
+
     def _sample_health_counter(self, sid, name, value, now=None):
         """采样启动累计值，返回首轮、增量或回退状态，不在查询线程中 sleep。"""
         if value is None:
@@ -1071,14 +1090,15 @@ class nosqlMySQLCtr():
             else:
                 ok('采样间隔无新增行锁等待')
 
-        # 死锁是启动累计计数；不同发行版可能使用不同名称，均按间隔增量判断。
+        # MariaDB 10.5+ 提供 Innodb_deadlocks；MySQL 及旧版 MariaDB 使用 INNODB_METRICS。
         deadlocks = self._get_var_or_status(my_instance, "SHOW GLOBAL STATUS LIKE 'Innodb_deadlocks'")
         deadlock_name = 'Innodb_deadlocks'
+        deadlock_metric_status = None
         if deadlocks is None:
-            deadlock_name = 'Innodb_deadlock_detect'
-            deadlocks = self._get_var_or_status(my_instance, "SHOW GLOBAL STATUS LIKE 'Innodb_deadlock_detect'")
+            deadlock_name = 'INNODB_METRICS.lock_deadlocks'
+            deadlocks, deadlock_metric_status = self._get_innodb_metric(my_instance, 'lock_deadlocks')
         if deadlocks is None:
-            unknown('InnoDB 全局死锁计数器查询失败、不支持或权限不足')
+            unknown('InnoDB 全局死锁计数不可用 (lock_deadlocks: %s)' % deadlock_metric_status)
         else:
             deadlock_sample = self._sample_health_counter(sid, deadlock_name, deadlocks)
             counter_info(deadlock_name + ' ', deadlock_sample)
@@ -1416,12 +1436,17 @@ class nosqlMySQLCtr():
         else:
             info('当前版本通过上述 Innodb_log_waits 的采样间隔增量观察 Redo 压力')
 
-        # Undo 仅使用可靠的历史链长度，不用表空间扩展参数估算使用率。
+        # Undo 历史链优先读状态变量；MySQL 各版本通常使用 trx_rseg_history_len。
         undo_hist = self._get_var_or_status(my_instance, "SHOW GLOBAL STATUS LIKE 'Innodb_history_list_length'")
+        undo_source = 'Innodb_history_list_length'
+        undo_metric_status = None
         if undo_hist is None:
-            unknown('Innodb_history_list_length 查询失败、不支持或权限不足')
+            undo_source = 'INNODB_METRICS.trx_rseg_history_len'
+            undo_hist, undo_metric_status = self._get_innodb_metric(my_instance, 'trx_rseg_history_len')
+        if undo_hist is None:
+            unknown('Undo 历史链不可用 (trx_rseg_history_len: %s)' % undo_metric_status)
         else:
-            info('Innodb_history_list_length=%s (Undo 历史链长度)' % undo_hist)
+            info('%s=%s (Undo 历史链长度)' % (undo_source, undo_hist))
             if undo_hist > 10000:
                 warn('Undo 历史链很长 (%s), 可能有慢查询/大事务没提交, Undo 表空间膨胀' % undo_hist)
                 warn('排查: SHOW FULL PROCESSLIST 找长时间运行的查询, 缩短事务')
