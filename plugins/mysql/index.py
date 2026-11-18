@@ -968,7 +968,7 @@ def setDbStatus(ver):
         rep = r'\s*' + g + r'\s*=\s*\d+(M|K|k|m|G)?\n'
         c = g + ' = ' + args[g] + s + '\n'
         if content.find(g) != -1:
-            content = re.sub(rep, '\n' + c, content, 1)
+            content = re.sub(rep, '\n' + c, content, count=1)
         else:
             content = content.replace('[mysqld]\n', '[mysqld]\n' + c)
         n += 1

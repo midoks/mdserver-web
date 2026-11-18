@@ -1859,7 +1859,7 @@ def _setProfiling(level):
 
     args = getArgs()
 
-    slowms = 300
+    slowms = 500
     if 'slowms' in args:
         try:
             slowms = int(args['slowms'])

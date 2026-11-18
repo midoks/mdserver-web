@@ -444,14 +444,20 @@ def initMariaDbPwd():
         exit(1)
 
     # 删除空账户
-    drop_empty_user = serverdir + '/bin/mariadb ' + db_option + '-uroot -p' + \
-        pwd + ' -e "use mysql;delete from user where USER=\'\'"'
-    mw.execShell(drop_empty_user)
+    drop_empty_user = serverdir + '/bin/mariadb ' + db_option + ' -uroot -p' + \
+        pwd + ' -e "use mysql;delete from user where USER=\'\';flush privileges;"'
+    drop_empty_result = mw.execShell(drop_empty_user)
+    if drop_empty_result[1].find("ERROR") != -1:
+        print("drop mariadb anonymous user fail:" + drop_empty_result[1])
+        exit(1)
 
     # 删除测试数据库
     drop_test_db = serverdir + '/bin/mariadb ' + db_option + ' -uroot -p' + \
-        pwd + ' -e "drop database test";'
-    mw.execShell(drop_test_db)
+        pwd + ' -e "drop database test;flush privileges;"'
+    drop_test_result = mw.execShell(drop_test_db)
+    if drop_test_result[1].find("ERROR") != -1:
+        print("drop mariadb test database fail:" + drop_test_result[1])
+        exit(1)
 
     pSqliteDb('config').where('id=?', (1,)).save('mysql_root', (pwd,))
 
@@ -459,11 +465,14 @@ def initMariaDbPwd():
     hostname = mw.execShell('hostname')[0].strip()
     if hostname != 'localhost':
         drop_hostname =  serverdir + '/bin/mariadb  --defaults-file=' + \
-            myconf + ' -uroot -p' + pwd + ' -e "drop user \'\'@\'' + hostname + '\'";'
-        mw.execShell(drop_hostname)
+            myconf + ' -uroot -p' + pwd + ' -e "drop user if exists \'\'@\'' + hostname + '\';flush privileges;"'
+        drop_hostname_result = mw.execShell(drop_hostname)
+        if drop_hostname_result[1].find("ERROR") != -1:
+            print("drop mariadb hostname user fail:" + drop_hostname_result[1])
+            exit(1)
 
         drop_root_hostname =  serverdir + '/bin/mariadb  --defaults-file=' + \
-            myconf + ' -uroot -p' + pwd + ' -e "drop user \'root\'@\'' + hostname + '\'";'
+            myconf + ' -uroot -p' + pwd + ' -e "drop user if exists \'root\'@\'' + hostname + '\'";'
         mw.execShell(drop_root_hostname)
 
         sql = "DELETE FROM mysql.proxies_priv WHERE Host NOT IN ('localhost','127.0.0.1','::1') AND Host <> '';" \

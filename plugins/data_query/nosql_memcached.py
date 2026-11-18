@@ -18,13 +18,17 @@ if os.path.exists(web_dir):
 
 import core.mw as mw
     
+import threading
 
 def singleton(cls):
     _instance = {}
+    _lock = threading.RLock()
 
     def inner():
         if cls not in _instance:
-            _instance[cls] = cls()
+            with _lock:
+                if cls not in _instance:
+                    _instance[cls] = cls()
         return _instance[cls]
     return inner
 
