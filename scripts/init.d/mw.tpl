@@ -689,7 +689,7 @@ mw_ssh(){
         # echo "info:$SSS"
         # SSS="127.0.0.1|22|root|xx"
         IFS='|' read -r SERVER_IP SERVER_PORT SERVER_USER SERVER_PASS <<< "$SSS"
-        echo "Attempting SSH connection to $SERVER_USER@$SERVER_IP:$SERVER_PORT"
+        echo "Attempting SSH connection to $SERVER_USER@$SERVER_IP -p $SERVER_PORT"
         sshpass -p "$SERVER_PASS" ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -o ConnectTimeout=10 -p "$SERVER_PORT" "$SERVER_USER@$SERVER_IP"
     fi
 }
