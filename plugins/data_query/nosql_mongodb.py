@@ -764,16 +764,32 @@ def get_health(args):
 
     wt = ss.get('wiredTiger', {})
     wt_cache = wt.get('cache', {}) if isinstance(wt, dict) else {}
+    wt_transaction = wt.get('transaction', {}) if isinstance(wt, dict) else {}
     add_counter(wt_cache, 'pages requested from the cache', 'wt.pagesRequested')
     add_counter(wt_cache, 'pages read into cache', 'wt.pagesRead')
+    add_counter(wt_transaction, 'transaction checkpoint number', 'wt.checkpointNumber')
+    add_counter(wt_transaction, 'transaction checkpoint total time (msecs)', 'wt.checkpointTotalMs')
 
     lock_wait_total = None
+    current_lock_waits = None
     lock_error = None
     try:
         lock_wait_total = _lock_wait_count(ss)
         counters['locks.acquireWaitCount'] = lock_wait_total
     except Exception as exc:
         lock_error = str(exc)
+
+    # 新版实例可能不再提供累计 acquireWaitCount，改查当前等待锁的操作数。
+    if lock_wait_total is None:
+        try:
+            current_rows = list(client.admin.aggregate([
+                {'$currentOp': {'allUsers': True, 'idleConnections': False}},
+                {'$match': {'waitingForLock': True}},
+                {'$count': 'waiting'},
+            ]))
+            current_lock_waits = _counter_value(current_rows[0].get('waiting')) if current_rows else 0
+        except Exception as exc:
+            lock_error = '%s; $currentOp: %s' % (lock_error, exc)
 
     snapshot_key = '%s|%s' % (sid, instance.get_connection_id())
     snapshot = _update_health_snapshot(snapshot_key, counters)
@@ -893,9 +909,9 @@ def get_health(args):
         unknown('WiredTiger cache 指标不可用')
     else:
         try:
-            max_bytes = _counter_value(wt_cache.get('size max bytes configured'))
-            cur_bytes = _counter_value(wt_cache.get('size in bytes'))
-            dirty = _counter_value(wt_cache.get('size dirty in bytes'))
+            max_bytes = _counter_value(wt_cache.get('maximum bytes configured'))
+            cur_bytes = _counter_value(wt_cache.get('bytes currently in the cache'))
+            dirty = _counter_value(wt_cache.get('tracked dirty bytes in the cache'))
             info('WT cache max=%.0fMB, current=%.0fMB, dirty=%.0fMB (%.1f%%)' % (
                 max_bytes/1024/1024, cur_bytes/1024/1024, dirty/1024/1024,
                 dirty/cur_bytes*100 if cur_bytes else 0))
@@ -961,9 +977,7 @@ def get_health(args):
 
     # ---------- 4. 锁 / 死锁 ----------
     section('锁 / 死锁')
-    if lock_wait_total is None:
-        unknown('锁等待指标不可用: %s' % lock_error)
-    else:
+    if lock_wait_total is not None:
         info('累计锁等待次数(Global/Database/Collection 等): %d' % lock_wait_total)
         if not has_delta:
             info('锁等待为%s，本采样不以历史累计值告警' % sample_label)
@@ -978,17 +992,50 @@ def get_health(args):
                 tip('排查: db.currentOp({"waitingForLock": true})')
             else:
                 ok('采样间隔锁等待增量正常')
+    elif current_lock_waits is not None:
+        info('当前等待锁的操作数($currentOp): %d' % current_lock_waits)
+        if current_lock_waits > 0:
+            warn('当前有 %d 个操作等待锁, 请检查热点文档和长事务' % current_lock_waits)
+            tip('排查: db.currentOp({"waitingForLock": true})')
+        else:
+            ok('当前没有等待锁的操作')
+    else:
+        unknown('锁等待指标不可用: %s' % lock_error)
 
     # ---------- 5. 持久化 / journal ----------
     section('持久化 / Checkpoint')
-    if 'dur.journaledCommits' not in counters or 'dur.commitsInWriteLock' not in counters:
-        unknown('dur journal 指标在当前版本不可用或无效')
-    else:
+    # dur 是旧存储引擎指标；WiredTiger 使用自身 transaction checkpoint 计数。
+    dur_available = 'dur.journaledCommits' in counters and 'dur.commitsInWriteLock' in counters
+    checkpoint_count = counters.get('wt.checkpointNumber')
+    checkpoint_ms = counters.get('wt.checkpointTotalMs')
+    if dur_available:
         info('journal commits=%d, commitsInWriteLock=%d' % (
             counters['dur.journaledCommits'], counters['dur.commitsInWriteLock']))
         if has_delta and snapshot['delta'].get('dur.commitsInWriteLock', 0) > 0:
             tip('采样间隔有 commits 在 writeLock 中完成, journal 可能成为瓶颈')
             tip('mongod.conf: storage.journal.commitIntervalMs 可适当调大 (默认 300ms)')
+    elif checkpoint_count is not None and checkpoint_ms is not None:
+        info('WT checkpoint 累计: number=%d, totalTime=%dms' % (checkpoint_count, checkpoint_ms))
+        if not has_delta:
+            info('WT checkpoint 为%s，后续采样分析间隔次数和耗时' % sample_label)
+        elif 'wt.checkpointNumber' not in snapshot['delta'] or 'wt.checkpointTotalMs' not in snapshot['delta']:
+            unknown('WT checkpoint 缺少上一采样基线')
+        else:
+            count_delta = snapshot['delta']['wt.checkpointNumber']
+            ms_delta = snapshot['delta']['wt.checkpointTotalMs']
+            info('WT checkpoint 间隔: number=%d, totalTime=%dms' % (count_delta, ms_delta))
+            if count_delta > 0:
+                avg_ms = ms_delta / count_delta
+                if avg_ms >= 1000:
+                    warn('WT checkpoint 平均耗时 %.1fms, 请检查磁盘 IO、cache 压力和长事务' % avg_ms)
+                else:
+                    ok('WT checkpoint 平均耗时 %.1fms' % avg_ms)
+            else:
+                info('本采样间隔没有新增 WT checkpoint')
+    elif engine_name and str(engine_name).lower() == 'wiredtiger':
+        skipped('dur journal 为旧存储引擎指标, 当前版本未提供可用的 WT checkpoint 计数')
+    else:
+        unknown('dur journal 指标在当前版本不可用或无效')
     if isinstance(storage_engine, dict) and storage_engine.get('readOnly'):
         critical('storageEngine 是 readOnly! 磁盘可能只读 / fsync 锁')
 
