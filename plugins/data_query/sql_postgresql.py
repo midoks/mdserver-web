@@ -1266,12 +1266,17 @@ def get_health(args):
             total_col = 'total_exec_time' if version_num >= 130000 else 'total_time'
             mean_col = 'mean_exec_time' if version_num >= 130000 else 'mean_time'
             topq = find("""
-                SELECT query, calls, %s AS total_time, %s AS mean_time,
-                       rows, blk_read_time, blk_write_time
+                SELECT query, calls, %s AS total_time, %s AS mean_time, rows
                 FROM pg_stat_statements ORDER BY %s DESC LIMIT 5
             """ % (total_col, mean_col, total_col))
             if topq is _PG_QUERY_FAILED:
-                unknown('pg_stat_statements 查询失败、权限不足或扩展未在当前数据库安装')
+                pgss_relation = one("SELECT to_regclass('pg_stat_statements')")
+                if pgss_relation is None:
+                    skipped('pg_stat_statements 已预加载但未在当前数据库创建扩展; 如需热点 SQL, 请由 DBA 执行 CREATE EXTENSION pg_stat_statements')
+                elif pgss_relation is _PG_QUERY_FAILED:
+                    unknown('pg_stat_statements 查询失败, 且扩展状态查询失败或权限不足')
+                else:
+                    unknown('pg_stat_statements 查询失败或权限不足')
             elif not topq:
                 ok('pg_stat_statements 暂无数据 (刚开启或样本不足)')
             else:
@@ -1342,7 +1347,7 @@ def get_health(args):
                 ok('本间隔未发现明显全表扫描热点')
 
         unused_idx = find("""
-            SELECT schemaname, tablename, indexname, idx_scan
+            SELECT schemaname, relname AS tablename, indexrelname AS indexname, idx_scan
             FROM pg_stat_user_indexes WHERE idx_scan=0
               AND schemaname NOT IN ('pg_catalog','information_schema')
             LIMIT 10
