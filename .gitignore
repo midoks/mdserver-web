@@ -197,3 +197,4 @@ plugins/goedge-happy
 *.md5
 /bak
 *.tmp
+/.trae
