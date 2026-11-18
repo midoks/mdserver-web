@@ -465,14 +465,14 @@ def initMariaDbPwd():
     hostname = mw.execShell('hostname')[0].strip()
     if hostname != 'localhost':
         drop_hostname =  serverdir + '/bin/mariadb  --defaults-file=' + \
-            myconf + ' -uroot -p' + pwd + ' -e "drop user \'\'@\'' + hostname + '\';flush privileges;"'
+            myconf + ' -uroot -p' + pwd + ' -e "drop user if exists \'\'@\'' + hostname + '\';flush privileges;"'
         drop_hostname_result = mw.execShell(drop_hostname)
         if drop_hostname_result[1].find("ERROR") != -1:
             print("drop mariadb hostname user fail:" + drop_hostname_result[1])
             exit(1)
 
         drop_root_hostname =  serverdir + '/bin/mariadb  --defaults-file=' + \
-            myconf + ' -uroot -p' + pwd + ' -e "drop user \'root\'@\'' + hostname + '\'";'
+            myconf + ' -uroot -p' + pwd + ' -e "drop user if exists \'root\'@\'' + hostname + '\'";'
         mw.execShell(drop_root_hostname)
 
         sql = "DELETE FROM mysql.proxies_priv WHERE Host NOT IN ('localhost','127.0.0.1','::1') AND Host <> '';" \
