@@ -478,10 +478,12 @@ def get_health(args):
         # ---------- 4. Fork / BGSAVE 延迟 ----------
         section('Fork / BGSAVE')
         lfu = rinfo.get('latest_fork_usec')
-        if lfu and int(lfu) > 100000:
+        if lfu is None:
+            info('当前版本未上报 latest_fork_usec, 略过')
+        elif int(lfu) > 100000:
             warn('latest_fork_usec=%s > 100ms, fork 阻塞主线程时间长' % lfu)
             warn('Redis fork 是 copy-on-write, 写入量大时 fork 慢属正常; 错开高峰')
-        elif lfu:
+        else:
             ok('fork 延迟正常 (%sus)' % lfu)
 
         # ---------- 5. QPS / ops ----------
@@ -498,12 +500,19 @@ def get_health(args):
         ks = {}
         for k, v in rinfo.items():
             if k.startswith('db'):
+                # redis-py 对 decode_responses=True 会把 keyspace 解析成 dict
+                # 原始形式是 'keys=1,expires=0,avg_ttl=0' 字符串, 两种都兼容
+                if isinstance(v, dict):
+                    ks[k] = v
+                    continue
                 m = {}
-                for kv in v.split(','):
+                for kv in str(v).split(','):
                     if '=' in kv:
                         a, b = kv.split('=', 1)
                         m[a.strip()] = b.strip()
                 ks[k] = m
+        if not ks:
+            ok('当前实例所有 db 都是空的 (无 key)')
         for db, d in ks.items():
             keys = int(d.get('keys', 0))
             expires = int(d.get('expires', 0))
@@ -524,11 +533,11 @@ def get_health(args):
                         x.get('id'), x.get('duration'), cmd))
             else:
                 ok('暂无慢日志')
-            sl_len = c.config_get('slowlog-max-len')
-            sl_thr = c.config_get('slowlog-log-slower-than')
+            sl_len = c.config_get('slowlog-max-len').get('slowlog-max-len', '?')
+            sl_thr = c.config_get('slowlog-log-slower-than').get('slowlog-log-slower-than', '?')
             info('slowlog-max-len=%s, slowlog-log-slower-than=%s µs' % (sl_len, sl_thr))
             try:
-                if sl_thr and int(sl_thr['slowlog-log-slower-than']) > 10000:
+                if int(sl_thr) > 10000:
                     tip('slowlog-log-slower-than=%s > 10ms, 建议调到 5000 µs 抓更多慢命令' % sl_thr)
             except Exception: pass
         except Exception as e:
