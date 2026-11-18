@@ -273,6 +273,7 @@ function initTabRedis(){
         redisBatchClear();
     });
 
+    redisCommonFunc();
     readerTableChecked();
 }
 
@@ -1703,6 +1704,8 @@ function mongodbInitField(f, data){
     $('#mongodb .mongodb_refresh').unbind('click').click(function(){
         mongodbDataList(1);
     });
+
+    mgdbCommonFunc();
 }
 
 var mogodb_db_list;
@@ -2648,7 +2651,7 @@ function pgCommonFunc(){
         layer.open({
             type: 1,
             title: "PostgreSQL常用功能",
-            area: ['600px', '200px'],
+            area: ['600px', '230px'],
             closeBtn: 1,
             shadeClose: false,
             content: '<div class="bt-form pd20">\
@@ -2661,6 +2664,7 @@ function pgCommonFunc(){
                 <button style="margin-bottom: 8px;" id="pg_lock_sql" type="button" class="btn btn-default btn-sm">查看当前锁阻塞的SQL</button>\
                 <button style="margin-bottom: 8px;" id="pg_deadlock_info" type="button" class="btn btn-default btn-sm">查看死锁信息</button>\
                 <button style="margin-bottom: 8px;" id="pg_slave_status" type="button" class="btn btn-default btn-sm">查看主从复制信息</button>\
+                <button style="margin-bottom: 8px;" id="pg_health" type="button" class="btn btn-default btn-sm">查看健康</button>\
             </div>',
             success:function(i,l){
                 $('#pg_top_nsql').click(function(){ pgCommonFuncTopN(); });
@@ -2672,8 +2676,130 @@ function pgCommonFunc(){
                 $('#pg_lock_sql').click(function(){ pgCommonFuncLockSQL(); });
                 $('#pg_deadlock_info').click(function(){ pgCommonFuncDeadlockInfo(); });
                 $('#pg_slave_status').click(function(){ pgCommonFuncSlaveStatus(); });
+                $('#pg_health').click(function(){ pgCommonFuncHealth(); });
             }
         });
+    });
+}
+
+function pgCommonFuncHealth(){
+    layer.open({
+        type: 1,
+        title: "PostgreSQL 健康检查",
+        area: ['780px', '600px'],
+        closeBtn: 1,
+        shadeClose: true,
+        content: '<div style="padding:12px;"><pre style="white-space:pre-wrap;background:#1e1e1e;color:#d4d4d4;padding:14px;border-radius:6px;font-family:Menlo,Consolas,monospace;font-size:12px;line-height:1.6;margin:0;overflow-y:auto;height:540px;" id="pg_health_pre">加载中...</pre></div>',
+        success:function(idx){
+            var $pre = $('#pg_health_pre');
+            pgPostCBN('get_health',{'sid':pgGetSid()}, function(rdata){
+                var text = '';
+                if (typeof rdata.data === 'string') {
+                    text = rdata.data;
+                } else if (rdata.data && typeof rdata.data.data === 'string') {
+                    text = rdata.data.data;
+                } else if (rdata.data) {
+                    text = JSON.stringify(rdata.data);
+                }
+                if (!text) text = '(无输出)';
+                $pre.text(text);
+                var $e = $('#pg_health_pre');
+                var idx_sum = $e.html().indexOf('━━━ 总结');
+                if (idx_sum >= 0) {
+                    var before = $e.html().substring(0, idx_sum);
+                    var br_count = (before.match(/<br>/g) || []).length;
+                    $e.scrollTop(br_count * 14 * 1.6 * 8);
+                }
+            });
+        }
+    });
+}
+
+// ==================== MongoDB 常用功能 ====================
+function mgdbCommonFunc(){
+    $('#mongodb_common').unbind('click').click(function(){
+        layer.open({
+            type: 1,
+            title: "MongoDB常用功能",
+            area: ['600px', '120px'],
+            closeBtn: 1,
+            shadeClose: false,
+            content: '<div class="bt-form pd20">\
+                <button style="margin-bottom: 8px;" id="mgdb_health" type="button" class="btn btn-default btn-sm">查看健康</button>\
+            </div>',
+            success:function(i,l){
+                $('#mgdb_health').click(function(){ mgdbCommonFuncHealth(); });
+            }
+        });
+    });
+}
+
+function mgdbCommonFuncHealth(){
+    layer.open({
+        type: 1,
+        title: "MongoDB 健康检查",
+        area: ['780px', '600px'],
+        closeBtn: 1,
+        shadeClose: true,
+        content: '<div style="padding:12px;"><pre style="white-space:pre-wrap;background:#1e1e1e;color:#d4d4d4;padding:14px;border-radius:6px;font-family:Menlo,Consolas,monospace;font-size:12px;line-height:1.6;margin:0;overflow-y:auto;height:540px;" id="mgdb_health_pre">加载中...</pre></div>',
+        success:function(){
+            mgdbPostCB('get_health',{'sid':0}, function(rdata){
+                var text = '';
+                if (typeof rdata.data === 'string') {
+                    text = rdata.data;
+                } else if (rdata.data && typeof rdata.data.data === 'string') {
+                    text = rdata.data.data;
+                } else if (rdata.data) {
+                    text = JSON.stringify(rdata.data);
+                }
+                if (!text) text = '(无输出)';
+                $('#mgdb_health_pre').text(text);
+            });
+        }
+    });
+}
+
+// ==================== Redis 常用功能 ====================
+function redisCommonFunc(){
+    $('#redis_common').unbind('click').click(function(){
+        layer.open({
+            type: 1,
+            title: "Redis常用功能",
+            area: ['600px', '120px'],
+            closeBtn: 1,
+            shadeClose: false,
+            content: '<div class="bt-form pd20">\
+                <button style="margin-bottom: 8px;" id="redis_health" type="button" class="btn btn-default btn-sm">查看健康</button>\
+            </div>',
+            success:function(i,l){
+                $('#redis_health').click(function(){ redisCommonFuncHealth(); });
+            }
+        });
+    });
+}
+
+function redisCommonFuncHealth(){
+    layer.open({
+        type: 1,
+        title: "Redis 健康检查",
+        area: ['780px', '600px'],
+        closeBtn: 1,
+        shadeClose: true,
+        content: '<div style="padding:12px;"><pre style="white-space:pre-wrap;background:#1e1e1e;color:#d4d4d4;padding:14px;border-radius:6px;font-family:Menlo,Consolas,monospace;font-size:12px;line-height:1.6;margin:0;overflow-y:auto;height:540px;" id="redis_health_pre">加载中...</pre></div>',
+        success:function(){
+            redisPostCB('get_health',{'sid':0}, function(rdata){
+                var text = '';
+                if (typeof rdata.data === 'string') {
+                    text = rdata.data;
+                } else if (rdata.data && typeof rdata.data.data === 'string') {
+                    text = rdata.data.data;
+                } else if (rdata.data) {
+                    text = JSON.stringify(rdata.data);
+                }
+                if (!text) text = '(无输出)';
+                $('#redis_health_pre').text(text);
+            });
+        }
     });
 }
 
