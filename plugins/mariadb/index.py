@@ -444,9 +444,12 @@ def initMariaDbPwd():
         exit(1)
 
     # 删除空账户
-    drop_empty_user = serverdir + '/bin/mariadb ' + db_option + '-uroot -p' + \
-        pwd + ' -e "use mysql;delete from user where USER=\'\'"'
-    mw.execShell(drop_empty_user)
+    drop_empty_user = serverdir + '/bin/mariadb ' + db_option + ' -uroot -p' + \
+        pwd + ' -e "use mysql;delete from user where USER=\'\';flush privileges;"'
+    drop_empty_result = mw.execShell(drop_empty_user)
+    if drop_empty_result[1].find("ERROR") != -1:
+        print("drop mariadb anonymous user fail:" + drop_empty_result[1])
+        exit(1)
 
     # 删除测试数据库
     drop_test_db = serverdir + '/bin/mariadb ' + db_option + ' -uroot -p' + \
