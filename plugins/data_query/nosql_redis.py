@@ -463,7 +463,8 @@ def get_health(args):
             rinfo.get('loading'), rinfo.get('rdb_last_bgsave_status'), rinfo.get('aof_enabled')))
         if rinfo.get('rdb_last_bgsave_status') == 'err':
             critical('RDB last bgsave 失败! 检查磁盘空间 / 权限')
-        if rinfo.get('aof_enabled') == '1':
+        # redis-py 会把 info() 中的数字解析成 int, 这里统一转成字符串再比较
+        if str(rinfo.get('aof_enabled')) == '1':
             aof_rewrite = rinfo.get('aof_rewrite_in_progress', '0')
             info('AOF enabled, rewrite_in_progress=%s, aof_last_bgrewrite_status=%s' % (
                 aof_rewrite, rinfo.get('aof_last_bgrewrite_status')))
