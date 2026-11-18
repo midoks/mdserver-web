@@ -11,7 +11,7 @@ Type=simple
 ExecStart={$SERVER_PATH}/mariadb/bin/mysqld --defaults-file={$SERVER_PATH}/mariadb/etc/my.cnf
 ExecReload=/bin/kill -USR2 $MAINPID
 PermissionsStartOnly=true
-LimitNOFILE=5000
+LimitNOFILE=65535
 Restart=on-failure
 RestartSec=10
 RestartPreventExitStatus=1

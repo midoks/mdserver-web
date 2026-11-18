@@ -33,7 +33,7 @@ Type=simple
 PermissionsStartOnly=true
 ExecStart={$SERVER_PATH}/mysql-community/bin/mysqld --defaults-file={$SERVER_PATH}/mysql-community/etc/my.cnf
 TimeoutSec=600
-LimitNOFILE = 5000
+LimitNOFILE=65535
 Restart=on-failure
 RestartPreventExitStatus=1
 RuntimeDirectory=mysqld

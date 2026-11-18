@@ -13,7 +13,7 @@ ExecStart={$SERVER_PATH}/mysql/bin/mysqld --defaults-file={$SERVER_PATH}/mysql/e
 ExecReload=/bin/kill -USR2 $MAINPID
 TimeoutSec=0
 PermissionsStartOnly=true
-LimitNOFILE=5000
+LimitNOFILE=65535
 Restart=on-failure
 RestartSec=10
 RestartPreventExitStatus=1
