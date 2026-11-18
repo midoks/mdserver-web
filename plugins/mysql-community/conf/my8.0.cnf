@@ -22,7 +22,7 @@ server-id	= {$SERVER_ID}
 default_storage_engine = InnoDB
 
 key_buffer_size = 8M
-table_open_cache = 32
+table_open_cache = 5000
 sort_buffer_size = 256K
 net_buffer_length = 4K
 read_buffer_size = 128K
@@ -35,7 +35,7 @@ character-set-server = UTF8MB4
 
 max_connections = 500
 max_connect_errors = 100
-open_files_limit = 2560
+open_files_limit = 65535
 max_allowed_packet = 128M
 
 #skip-external-locking
