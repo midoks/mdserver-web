@@ -5,7 +5,22 @@ $(document).ready(function(){
     }
 });
 
-function redisPostCB(method, args, callback){
+function dataQueryRequest(request, loadT, errorCallback, completeCallback){
+    request.fail(function(xhr){
+        var msg = '网络请求失败, 请稍后重试';
+        if (xhr.responseJSON && xhr.responseJSON.msg) msg = xhr.responseJSON.msg;
+        layer.msg(msg, {icon: 0, time: 2000, shade: [0.3, '#000']});
+        if (typeof errorCallback === 'function') {
+            errorCallback({status: false, msg: msg, xhr: xhr});
+        }
+    }).always(function(){
+        if (loadT !== null && loadT !== undefined) layer.close(loadT);
+        if (typeof completeCallback === 'function') completeCallback();
+    });
+    return request;
+}
+
+function redisPostCB(method, args, callback, errorCallback, completeCallback){
     var loadT = layer.msg('正在获取...', { icon: 16, time: 0, shade: 0.3 });
 
     var req_data = {};
@@ -20,20 +35,21 @@ function redisPostCB(method, args, callback){
         req_data['args'] = JSON.stringify(args);
     }
 
-    $.post('/plugins/callback', req_data, function(data) {
-        layer.close(loadT);
+    var request = $.post('/plugins/callback', req_data, function(data) {
         if (!data.status){
             layer.msg(data.msg,{icon:0,time:2000,shade: [0.3, '#000']});
+            if (typeof errorCallback === 'function') errorCallback(data);
             return;
         }
 
         if(typeof(callback) == 'function'){
             callback(data);
         }
-    },'json'); 
+    },'json');
+    return dataQueryRequest(request, loadT, errorCallback, completeCallback);
 }
 
-function mgdbPostCB(method, args, callback){
+function mgdbPostCB(method, args, callback, errorCallback, completeCallback){
     var loadT = layer.msg('正在获取...', { icon: 16, time: 0, shade: 0.3 });
 
     var req_data = {};
@@ -48,17 +64,18 @@ function mgdbPostCB(method, args, callback){
         req_data['args'] = JSON.stringify(args);
     }
 
-    $.post('/plugins/callback', req_data, function(data) {
-        layer.close(loadT);
+    var request = $.post('/plugins/callback', req_data, function(data) {
         if (!data.status){
             layer.msg(data.msg,{icon:0,time:2000,shade: [0.3, '#000']});
+            if (typeof errorCallback === 'function') errorCallback(data);
             return;
         }
 
         if(typeof(callback) == 'function'){
             callback(data);
         }
-    },'json'); 
+    },'json');
+    return dataQueryRequest(request, loadT, errorCallback, completeCallback);
 }
 
 function memPostCB(method, args, callback){
@@ -118,7 +135,7 @@ function myPostCB(method, args, callback){
 }
 
 
-function myPostCBN(method, args, callback){
+function myPostCBN(method, args, callback, errorCallback, completeCallback){
     var req_data = {};
     req_data['name'] = 'data_query';
     req_data['func'] = method;
@@ -131,16 +148,18 @@ function myPostCBN(method, args, callback){
         req_data['args'] = JSON.stringify(args);
     }
 
-    $.post('/plugins/callback', req_data, function(data) {
+    var request = $.post('/plugins/callback', req_data, function(data) {
         if (!data.status){
             layer.msg(data.msg,{icon:0,time:2000,shade: [0.3, '#000']});
+            if (typeof errorCallback === 'function') errorCallback(data);
             return;
         }
 
         if(typeof(callback) == 'function'){
             callback(data);
         }
-    },'json'); 
+    },'json');
+    return dataQueryRequest(request, null, errorCallback, completeCallback);
 }
 
 function pgPostCB(method, args, callback){
@@ -172,7 +191,7 @@ function pgPostCB(method, args, callback){
 }
 
 
-function pgPostCBN(method, args, callback){
+function pgPostCBN(method, args, callback, errorCallback, completeCallback){
     var req_data = {};
     req_data['name'] = 'data_query';
     req_data['func'] = method;
@@ -185,16 +204,18 @@ function pgPostCBN(method, args, callback){
         req_data['args'] = JSON.stringify(args);
     }
 
-    $.post('/plugins/callback', req_data, function(data) {
+    var request = $.post('/plugins/callback', req_data, function(data) {
         if (!data.status){
             layer.msg(data.msg,{icon:0,time:2000,shade: [0.3, '#000']});
+            if (typeof errorCallback === 'function') errorCallback(data);
             return;
         }
 
         if(typeof(callback) == 'function'){
             callback(data);
         }
-    },'json'); 
+    },'json');
+    return dataQueryRequest(request, null, errorCallback, completeCallback);
 }
 
 
@@ -871,39 +892,88 @@ function mysqlCommonFuncSlaveStatus(){
     });
 }
 
-function mysqlCommonFuncHealth(){
-    var loading = layer.msg('正在采集指标, 请稍候...', {icon: 16, time: 0, shade: 0.3});
-    var sid = mysqlGetSid();
-    myPostCBN('get_health', {'sid': sid}, function(rdata){
-        layer.close(loading);
-        text = rdata.data.data;
-        if (!text) text = '无数据';
+var dataQueryHealthRequests = {};
 
-        layer.open({
-            type: 1,
-            title: "MySQL 综合健康检查与优化建议",
-            area: ['780px', '600px'],
-            closeBtn: 1,
-            shadeClose: false,
-            content: '<div class="bt-form pd15">' +
-                '<div style="margin-bottom:8px;color:#999;font-size:12px;">✅ 正常  ⚠️  建议优化  🚨 严重  ℹ️  信息</div>' +
-                '<textarea readonly="" style="margin: 0px;height: 500px;width: 100%;background-color:#1e1e1e;color:#d4d4d4;padding:8px;font-family:Menlo,Consolas,monospace;font-size:12px;line-height:1.5;resize:none;" id="health_log"></textarea>' +
-                '</div>',
-            success: function(i, l){
-                var $box = $('#health_log');
-                $box.val(text);
-                // 把「━━━ 总结」那行尽量放在首屏 —— textarea 内部 scrollTop 近似等于行号 × 行高
-                var idx = text.indexOf('━━━ 总结');
-                if (idx > -1) {
-                    var before = text.substring(0, idx);
-                    var line = before.split('\n').length;
-                    $box.scrollTop(Math.max(0, (line - 4) * 18));
-                } else {
-                    $box.scrollTop(0);
-                }
+function dataQueryHealthPayload(rdata){
+    var payload = rdata;
+    for (var depth = 0; depth < 4; depth++) {
+        if (typeof payload === 'string') {
+            return payload.trim() ? {ok: true, text: payload} : {ok: false, msg: '健康检查未返回报告'};
+        }
+        if (!payload || typeof payload !== 'object') {
+            return {ok: false, msg: '健康检查返回格式无法识别'};
+        }
+        if (payload.status === false) {
+            return {ok: false, msg: payload.msg || '健康检查失败'};
+        }
+        if (Object.prototype.hasOwnProperty.call(payload, 'data')) {
+            payload = payload.data;
+            continue;
+        }
+        return {ok: false, msg: payload.msg || '健康检查未返回报告'};
+    }
+    return {ok: false, msg: '健康检查返回层级异常'};
+}
+
+function dataQueryShowHealth(type, title, postFn, args){
+    var state = dataQueryHealthRequests[type] || {loading: false, token: 0, layer: null};
+    dataQueryHealthRequests[type] = state;
+    if (state.loading) {
+        layer.msg('健康指标正在采集中, 请勿重复点击', {icon: 0, time: 1500});
+        return;
+    }
+
+    state.loading = true;
+    state.token += 1;
+    var token = state.token;
+    var boxId = 'data_query_health_' + type;
+    var layerIndex = layer.open({
+        type: 1,
+        title: title,
+        area: ['780px', '600px'],
+        closeBtn: 1,
+        shadeClose: false,
+        content: '<div class="bt-form pd15">' +
+            '<div style="margin-bottom:8px;color:#999;font-size:12px;">✅ 正常  ⚠️ 警告  🚨 严重  💡 建议  ❓ 未知  ℹ️ 信息</div>' +
+            '<textarea readonly style="margin:0;height:500px;width:100%;background:#1e1e1e;color:#d4d4d4;padding:8px;font-family:Menlo,Consolas,monospace;font-size:12px;line-height:18px;resize:none;" id="' + boxId + '">正在采集指标, 请稍候...</textarea>' +
+            '</div>',
+        end: function(){
+            if (state.layer === layerIndex && state.token === token) {
+                state.token += 1;
+                state.loading = false;
+                state.layer = null;
             }
-        });
+        }
     });
+    state.layer = layerIndex;
+
+    function update(text, isError){
+        if (state.token !== token || state.layer !== layerIndex) return;
+        var $box = $('#' + boxId);
+        if (!$box.length) return;
+        $box.val(isError ? '健康检查失败: ' + text : text);
+        var summaryAt = isError ? -1 : text.indexOf('━━━ 总结');
+        if (summaryAt >= 0) {
+            var summaryLine = text.substring(0, summaryAt).split('\n').length;
+            var lineHeight = parseFloat($box.css('line-height')) || 18;
+            $box.scrollTop(Math.max(0, (summaryLine - 4) * lineHeight));
+        } else {
+            $box.scrollTop(0);
+        }
+    }
+
+    postFn('get_health', args, function(rdata){
+        var result = dataQueryHealthPayload(rdata);
+        update(result.ok ? result.text : result.msg, !result.ok);
+    }, function(error){
+        update((error && error.msg) || '请求失败', true);
+    }, function(){
+        if (state.token === token) state.loading = false;
+    });
+}
+
+function mysqlCommonFuncHealth(){
+    dataQueryShowHealth('mysql', 'MySQL 综合健康检查与优化建议', myPostCBN, {'sid': mysqlGetSid()});
 }
 
 function mysqlSlaveSyncProgress(){
@@ -2683,36 +2753,7 @@ function pgCommonFunc(){
 }
 
 function pgCommonFuncHealth(){
-    layer.open({
-        type: 1,
-        title: "PostgreSQL 健康检查",
-        area: ['780px', '600px'],
-        closeBtn: 1,
-        shadeClose: true,
-        content: '<div style="padding:12px;"><pre style="white-space:pre-wrap;background:#1e1e1e;color:#d4d4d4;padding:14px;border-radius:6px;font-family:Menlo,Consolas,monospace;font-size:12px;line-height:1.6;margin:0;overflow-y:auto;height:540px;" id="pg_health_pre">加载中...</pre></div>',
-        success:function(idx){
-            var $pre = $('#pg_health_pre');
-            pgPostCBN('get_health',{'sid':pgGetSid()}, function(rdata){
-                var text = '';
-                if (typeof rdata.data === 'string') {
-                    text = rdata.data;
-                } else if (rdata.data && typeof rdata.data.data === 'string') {
-                    text = rdata.data.data;
-                } else if (rdata.data) {
-                    text = JSON.stringify(rdata.data);
-                }
-                if (!text) text = '(无输出)';
-                $pre.text(text);
-                var $e = $('#pg_health_pre');
-                var idx_sum = $e.html().indexOf('━━━ 总结');
-                if (idx_sum >= 0) {
-                    var before = $e.html().substring(0, idx_sum);
-                    var br_count = (before.match(/<br>/g) || []).length;
-                    $e.scrollTop(br_count * 14 * 1.6 * 8);
-                }
-            });
-        }
-    });
+    dataQueryShowHealth('postgresql', 'PostgreSQL 健康检查', pgPostCBN, {'sid': pgGetSid()});
 }
 
 // ==================== MongoDB 常用功能 ====================
@@ -2735,28 +2776,7 @@ function mgdbCommonFunc(){
 }
 
 function mgdbCommonFuncHealth(){
-    layer.open({
-        type: 1,
-        title: "MongoDB 健康检查",
-        area: ['780px', '600px'],
-        closeBtn: 1,
-        shadeClose: true,
-        content: '<div style="padding:12px;"><pre style="white-space:pre-wrap;background:#1e1e1e;color:#d4d4d4;padding:14px;border-radius:6px;font-family:Menlo,Consolas,monospace;font-size:12px;line-height:1.6;margin:0;overflow-y:auto;height:540px;" id="mgdb_health_pre">加载中...</pre></div>',
-        success:function(){
-            mgdbPostCB('get_health',{'sid':0}, function(rdata){
-                var text = '';
-                if (typeof rdata.data === 'string') {
-                    text = rdata.data;
-                } else if (rdata.data && typeof rdata.data.data === 'string') {
-                    text = rdata.data.data;
-                } else if (rdata.data) {
-                    text = JSON.stringify(rdata.data);
-                }
-                if (!text) text = '(无输出)';
-                $('#mgdb_health_pre').text(text);
-            });
-        }
-    });
+    dataQueryShowHealth('mongodb', 'MongoDB 健康检查', mgdbPostCB, {'sid': mongodbGetSid()});
 }
 
 // ==================== Redis 常用功能 ====================
@@ -2779,28 +2799,7 @@ function redisCommonFunc(){
 }
 
 function redisCommonFuncHealth(){
-    layer.open({
-        type: 1,
-        title: "Redis 健康检查",
-        area: ['780px', '600px'],
-        closeBtn: 1,
-        shadeClose: true,
-        content: '<div style="padding:12px;"><pre style="white-space:pre-wrap;background:#1e1e1e;color:#d4d4d4;padding:14px;border-radius:6px;font-family:Menlo,Consolas,monospace;font-size:12px;line-height:1.6;margin:0;overflow-y:auto;height:540px;" id="redis_health_pre">加载中...</pre></div>',
-        success:function(){
-            redisPostCB('get_health',{'sid':0}, function(rdata){
-                var text = '';
-                if (typeof rdata.data === 'string') {
-                    text = rdata.data;
-                } else if (rdata.data && typeof rdata.data.data === 'string') {
-                    text = rdata.data.data;
-                } else if (rdata.data) {
-                    text = JSON.stringify(rdata.data);
-                }
-                if (!text) text = '(无输出)';
-                $('#redis_health_pre').text(text);
-            });
-        }
-    });
+    dataQueryShowHealth('redis', 'Redis 健康检查', redisPostCB, {'sid': 0});
 }
 
 function pgCommonFuncTopN(){
