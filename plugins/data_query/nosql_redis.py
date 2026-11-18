@@ -421,32 +421,41 @@ def get_health(args):
 
         # ---------- 2. 内存 ----------
         section('内存')
-        umb = float(rinfo.get('used_memory_human', '0').rstrip('M').rstrip('G')) * (
-            1024 if 'G' in rinfo.get('used_memory_human', '').upper() else 1)
-        up = rinfo.get('used_memory_peak_human', '?')
+        def _human_mb(s):
+            """Redis used_memory_human → float MB, 兼容 955.95K / 1.03M / 3.5G / 纯数字"""
+            if s is None: return 0
+            s = str(s).strip()
+            if s.endswith('K'): return float(s[:-1]) / 1024
+            if s.endswith('M'): return float(s[:-1])
+            if s.endswith('G'): return float(s[:-1]) * 1024
+            if s.endswith('T'): return float(s[:-1]) * 1024 * 1024
+            try: return float(s) / 1024 / 1024  # 纯字节数
+            except Exception: return 0
+
+        umb = _human_mb(rinfo.get('used_memory_human'))
+        peak_mb = _human_mb(rinfo.get('used_memory_peak_human'))
         maxm = rinfo.get('maxmemory_human', '0B')
+        maxm_mb = _human_mb(maxm)
         policy = rinfo.get('maxmemory_policy')
         info('used_memory=%s, peak=%s, maxmemory=%s, policy=%s' % (
-            rinfo.get('used_memory_human'), up, maxm, policy))
+            rinfo.get('used_memory_human'), rinfo.get('used_memory_peak_human'), maxm, policy))
 
-        if maxm != '0B':
-            try:
-                maxm_mb = float(maxm.replace('MB','').replace('GB','')) * (1024 if 'GB' in maxm.upper() else 1)
-                um_pct = umb / maxm_mb * 100 if maxm_mb else 0
-                if um_pct >= 90:
-                    critical('内存已用 %.0f%% 接近 maxmemory, 即将驱逐!' % um_pct)
-                    critical('当前策略: %s (volatile-lru 只驱逐带 TTL 的 key; noeviction 会拒写)' % policy)
-                elif um_pct >= 70:
-                    warn('内存已用 %.0f%%, 关注驱逐情况' % um_pct)
-            except Exception: pass
-            if policy == 'noeviction':
-                warn('maxmemory_policy=noeviction, 到达 maxmemory 后写请求会被拒绝!')
-                warn('生产建议: allkeys-lru 或 allkeys-lfu (Redis 4+)')
-            elif policy == 'volatile-lru':
-                tip('volatile-lru 只驱逐带过期的 key, 如果大部分 key 没 TTL, 还是会 OOM')
+        if maxm_mb > 0:
+            um_pct = umb / maxm_mb * 100
+            if um_pct >= 90:
+                critical('内存已用 %.0f%% 接近 maxmemory (%.1fMB / %.1fMB), 即将驱逐!' % (um_pct, umb, maxm_mb))
+                critical('当前策略: %s (volatile-lru 只驱逐带 TTL 的 key; noeviction 会拒写)' % policy)
+            elif um_pct >= 70:
+                warn('内存已用 %.0f%% (%.1fMB / %.1fMB), 关注驱逐情况' % (um_pct, umb, maxm_mb))
         else:
             warn('maxmemory 未设置! Redis 会无限制用物理内存, 可能 OOM 被系统 kill')
             warn('redis.conf: maxmemory 4gb, maxmemory-policy allkeys-lru')
+
+        if policy == 'noeviction':
+            warn('maxmemory_policy=noeviction, 到达 maxmemory 后写请求会被拒绝!')
+            warn('生产建议: allkeys-lru 或 allkeys-lfu (Redis 4+)')
+        elif policy == 'volatile-lru':
+            tip('volatile-lru 只驱逐带过期的 key, 如果大部分 key 没 TTL, 还是会 OOM')
 
         # ---------- 3. 持久化 ----------
         section('持久化 (RDB / AOF)')
