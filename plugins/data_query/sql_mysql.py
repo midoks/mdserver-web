@@ -916,9 +916,115 @@ class nosqlMySQLCtr():
 
         rlw = self._get_var_or_status(my_instance, "SHOW GLOBAL STATUS LIKE 'Innodb_row_lock_waits'")
         rla = self._get_var_or_status(my_instance, "SHOW GLOBAL STATUS LIKE 'Innodb_row_lock_time_avg'")
-        if rlw > 0 and rla > 0:
-            warn('锁等待: Innodb_row_lock_waits=%d, avg_wait=%.0fms' % (rlw, rla))
+        rlt = self._get_var_or_status(my_instance, "SHOW GLOBAL STATUS LIKE 'Innodb_row_lock_time'")
+        if rlw > 0:
+            warn('锁等待累计: Innodb_row_lock_waits=%d, 总等待=%.0fms, avg=%.0fms' % (rlw, rlt, rla))
             warn('建议: 应用层排查热点行 (短事务、合理索引、避免长 SELECT ... FOR UPDATE)')
+        else:
+            ok('行锁等待为 0')
+
+        # 死锁 (MySQL 8.0+ 提供 Innodb_deadlocks, MariaDB 用 Innodb_deadlock_detect)
+        deadlocks = self._get_var_or_status(my_instance, "SHOW GLOBAL STATUS LIKE 'Innodb_deadlocks'")
+        if deadlocks == 0:
+            deadlocks = self._get_var_or_status(my_instance, "SHOW GLOBAL STATUS LIKE 'Innodb_deadlock_detect'")
+        if deadlocks > 0:
+            warn('Innodb 死锁累计 %d 次, 应用层有事务并发冲突' % deadlocks)
+            warn('建议: SHOW ENGINE INNODB STATUS 查最近死锁, 应用按固定顺序获取锁、缩短事务、加 retry 逻辑')
+        else:
+            ok('未检测到死锁')
+
+        # ---------- 2.5 文件描述符 / 表缓存 ----------
+        section('文件与表缓存')
+        ofl = self._get_var_or_status(my_instance, "SHOW GLOBAL VARIABLES LIKE 'open_files_limit'")
+        of = self._get_var_or_status(my_instance, "SHOW GLOBAL STATUS LIKE 'Opened_files'")
+        opn = self._get_var_or_status(my_instance, "SHOW GLOBAL STATUS LIKE 'Open_files'")
+        opn_pct = (opn / ofl * 100) if ofl else 0
+        info('open_files_limit=%d, Open_files=%d, Opened_files(total)=%d' % (ofl, opn, of))
+        if opn_pct >= 80:
+            warn('当前打开文件数已达 open_files_limit 的 %.1f%%, 可能无法再打开新表 / 日志' % opn_pct)
+            warn('my.cnf: open_files_limit=65535 (需同时在 OS 层 ulimit -n 调大)')
+        else:
+            ok('文件描述符水位正常 (%.1f%%)' % opn_pct)
+
+        toc = self._get_var_or_status(my_instance, "SHOW GLOBAL VARIABLES LIKE 'table_open_cache'")
+        ot = self._get_var_or_status(my_instance, "SHOW GLOBAL STATUS LIKE 'Opened_tables'")
+        oft = self._get_var_or_status(my_instance, "SHOW GLOBAL STATUS LIKE 'Open_tables'")
+        table_hit = ((1 - ot / (ot + oft)) * 100) if (ot + oft) else 100
+        info('table_open_cache=%d, Open_tables=%d, Opened_tables(total)=%d (命中率 %.2f%%)' % (
+            toc, oft, ot, table_hit))
+        if ot > 0 and table_hit < 85:
+            warn('表缓存命中率 %.1f%% 偏低, 每次查询都重新打开 .frm 文件' % table_hit)
+            warn('my.cnf: table_open_cache = %d (CPU 核数 × 2048 或更大)' % toc)
+
+        # ---------- 2.6 字符集 ----------
+        section('字符集 / 排序规则')
+        cs = self._get_var_str(my_instance, "SHOW GLOBAL VARIABLES LIKE 'character_set_server'")
+        coll = self._get_var_str(my_instance, "SHOW GLOBAL VARIABLES LIKE 'collation_server'")
+        info('character_set_server=%s, collation_server=%s' % (cs, coll))
+        if cs.lower() == 'utf8mb4':
+            ok('server 字符集 utf8mb4 (完整 Unicode, 含 emoji)')
+        else:
+            warn('server 字符集是 %s, 建议 my.cnf 改为 utf8mb4 以支持完整 emoji 和 4 字节汉字' % cs)
+            warn('my.cnf: character-set-server=utf8mb4, collation-server=utf8mb4_unicode_ci')
+        # 业务表是否有非 utf8mb4
+        try:
+            non_utf8mb4 = my_instance.query(
+                "SELECT table_schema, table_name, table_collation FROM information_schema.tables "
+                "WHERE table_schema NOT IN ('mysql','information_schema','performance_schema','sys') "
+                "AND table_collation LIKE 'utf8%' AND table_collation NOT LIKE 'utf8mb4%' LIMIT 20"
+            )
+            if non_utf8mb4:
+                warn('发现 %d 张业务表仍在用 utf8 (3 字节, 存不下 emoji)' % len(non_utf8mb4))
+                for r in non_utf8mb4[:5]:
+                    warn('  %s.%s  collation=%s' % (r['table_schema'], r['table_name'], r['table_collation']))
+                warn('升级方式: ALTER TABLE t CONVERT TO CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci')
+        except Exception:
+            pass
+
+        # ---------- 2.7 Binlog / 持久化安全 ----------
+        section('Binlog / Durability')
+        sync_b = self._get_var_or_status(my_instance, "SHOW GLOBAL VARIABLES LIKE 'sync_binlog'")
+        flc = self._get_var_or_status(my_instance, "SHOW GLOBAL VARIABLES LIKE 'innodb_flush_log_at_trx_commit'")
+        bl_fmt = self._get_var_str(my_instance, "SHOW GLOBAL VARIABLES LIKE 'binlog_format'")
+        log_bin = self._get_var_str(my_instance, "SHOW GLOBAL VARIABLES LIKE 'log_bin'")
+        gtid = self._get_var_str(my_instance, "SHOW GLOBAL VARIABLES LIKE 'gtid_mode'")
+        info('sync_binlog=%d, innodb_flush_log_at_trx_commit=%d' % (sync_b, flc))
+        if sync_b == 1 and flc == 1:
+            ok('双 1 组合, ACID 安全 (每次事务都 fsync, 性能略低)')
+        elif sync_b == 0 and flc == 2:
+            warn('sync_binlog=0 + innodb_flush_log_at_trx_commit=2, 崩溃时可能丢最后 ~1s 的事务')
+            warn('单机开发环境可接受, 生产建议至少 innodb_flush_log_at_trx_commit=1 或 sync_binlog=1')
+        else:
+            info('sync_binlog=%d / innodb_flush_log_at_trx_commit=%d, 请按业务可接受的数据丢失窗口调整' % (sync_b, flc))
+
+        info('binlog_format=%s, log_bin=%s, gtid_mode=%s' % (bl_fmt, log_bin, gtid))
+        if log_bin.lower() != 'on':
+            warn('log_bin 未开启, 无法做 point-in-time recovery / 主从 / binlog 审计')
+            warn('my.cnf: log_bin=mysql-bin, binlog_format=ROW')
+        elif bl_fmt == 'STATEMENT':
+            warn('binlog_format=STATEMENT, 非确定性函数 (NOW/RAND/LIMIT) 可能导致主从不一致')
+            warn('my.cnf: binlog_format=ROW (或 MIXED)')
+        if gtid.lower() == 'off':
+            warn('gtid_mode=OFF, 主从切换 / 重建副本操作较繁琐, 建议开启 GTID')
+            warn('my.cnf: gtid_mode=ON, enforce_gtid_consistency=ON')
+        # Binlog 过期策略 (MySQL 8.0+)
+        try:
+            bex = self._get_var_str(my_instance, "SHOW GLOBAL VARIABLES LIKE 'binlog_expire_logs_seconds'")
+            if bex and bex != '0':
+                info('binlog_expire_logs_seconds=%s (有自动清理)' % bex)
+            else:
+                warn('binlog 未设置过期策略 (binlog_expire_logs_seconds=0), 长期运行会撑满磁盘')
+                warn('my.cnf: binlog_expire_logs_seconds=604800 (保留 7 天)')
+        except Exception:
+            # MySQL 5.7 用 expire_logs_days
+            try:
+                eld = self._get_var_or_status(my_instance, "SHOW GLOBAL VARIABLES LIKE 'expire_logs_days'")
+                info('expire_logs_days=%d' % eld)
+                if eld == 0:
+                    warn('expire_logs_days=0, binlog 永不过期, 长期运行会撑满磁盘')
+                    warn('my.cnf: expire_logs_days=7 (保留 7 天)')
+            except Exception:
+                pass
 
         # ---------- 3. 慢查询 ----------
         section('慢查询 / SQL 健康')
@@ -950,8 +1056,24 @@ class nosqlMySQLCtr():
             else:
                 ok('未发现冗余索引')
         except Exception:
-            # MariaDB / sys 库缺失
             ok('(当前环境无法检测冗余索引, 需要 MySQL 5.7+ sys schema 或 MariaDB 10.1+)')
+
+        # 未使用索引 (performance_schema 必须开启, sys.schema_unused_indexes 才有数据)
+        if pfs:
+            try:
+                unused = my_instance.query(
+                    "SELECT object_schema, object_name, index_name "
+                    "FROM sys.schema_unused_indexes LIMIT 50"
+                )
+                if unused and len(unused) > 0:
+                    warn('发现 %d 个从未被查询命中的索引 (取前 3 个):' % len(unused))
+                    for r in unused[:3]:
+                        warn('  %s.%s → %s (可考虑 DROP, 节省写入开销)' % (
+                            r['object_schema'], r['object_name'], r['index_name']))
+                else:
+                    ok('索引都在被使用 (或 performance_schema 采集尚未覆盖足够查询)')
+            except Exception:
+                pass
 
         # 无主键表
         try:
@@ -997,18 +1119,21 @@ class nosqlMySQLCtr():
         else:
             info('Binlog 无事务压力 (Binlog_cache_use=0)')
 
-        # ---------- 5. 表级大 / 自增余量 ----------
+        # ---------- 5. 大表 / AUTO_INCREMENT 余量 ----------
         section('大表 / AUTO_INCREMENT 余量')
         try:
             big_tables = my_instance.query(
                 """SELECT t.table_schema, t.table_name, t.table_rows,
                           ROUND((t.data_length + t.index_length)/1024/1024, 2) AS total_mb,
-                          t.auto_increment
+                          t.auto_increment, c.data_type,
+                          LOCATE('unsigned', c.column_type) > 0 AS is_unsigned
                    FROM information_schema.tables t
+                   LEFT JOIN information_schema.columns c
+                     ON t.table_schema=c.table_schema AND t.table_name=c.table_name AND c.extra='auto_increment'
                    WHERE t.table_schema NOT IN ('mysql','information_schema','performance_schema','sys')
                      AND t.table_type = 'BASE TABLE'
                    ORDER BY t.data_length + t.index_length DESC
-                   LIMIT 10"""
+                   LIMIT 500"""
             )
             if big_tables:
                 big = [r for r in big_tables if r['total_mb'] is not None and r['total_mb'] >= 100]
@@ -1022,19 +1147,66 @@ class nosqlMySQLCtr():
                 else:
                     ok('业务表都 <100MB, 无需要重点关注的大表')
 
-                # AUTO_INCREMENT 余量
+                # 全表 AUTO_INCREMENT 余量: 按 data_type + signed/unsigned 算真实上限
+                type_max = {
+                    'tinyint':    (127, 255),
+                    'smallint':   (32767, 65535),
+                    'mediumint':  (8388607, 16777215),
+                    'int':        (2147483647, 4294967295),
+                    'integer':    (2147483647, 4294967295),
+                    'bigint':     (9223372036854775807, 18446744073709551615),
+                }
+                ai_risks = []
                 for r in big_tables:
-                    if r.get('auto_increment'):
-                        ai = int(r['auto_increment'])
-                        # InnoDB 默认 id 是 bigint unsigned
-                        remain_pct = (1 - ai / 18446744073709551615) * 100
-                        if remain_pct < 50:
-                            warn('AUTO_INCREMENT 余量 <50%%: %s.%s (当前 %d)' % (
-                                r['table_schema'], r['table_name'], ai))
+                    if not r.get('auto_increment'):
+                        continue
+                    dt = (r.get('data_type') or '').lower()
+                    is_unsigned = bool(r.get('is_unsigned'))
+                    lim = type_max.get(dt)
+                    if lim is None:
+                        continue
+                    mx = lim[1] if is_unsigned else lim[0]
+                    ai = int(r['auto_increment'])
+                    pct_used = ai / mx * 100
+                    if pct_used >= 50:
+                        ai_risks.append((pct_used, r, mx))
+                if ai_risks:
+                    ai_risks.sort(reverse=True)
+                    warn('发现 %d 张表 AUTO_INCREMENT 已用 ≥50%%, 有耗尽风险 (取前 3 张):' % len(ai_risks))
+                    for pct, r, mx in ai_risks[:3]:
+                        warn('  %s.%s 当前 %d / max %s (%.1f%%)' % (
+                            r['table_schema'], r['table_name'],
+                            r['auto_increment'], mx, pct))
+                else:
+                    ok('AUTO_INCREMENT 余量都在 50% 以上, 无耗尽风险')
         except Exception:
             pass
 
-        # ---------- 6. 主从 ----------
+        # ---------- 6. 账户安全 ----------
+        section('账户安全')
+        try:
+            users = my_instance.query("SELECT user, host FROM mysql.user")
+            root_remote = [u for u in users if u['user'] == 'root' and u['host'] not in ('localhost', '127.0.0.1', '::1')]
+            anonymous = [u for u in users if u['user'] == '']
+            system_users = ('mysql.session', 'mysql.sys', 'root', 'localhost')
+            weak_host_users = [u for u in users if u['host'] == '%' and u['user'] not in system_users]
+            if root_remote:
+                warn('root 账号允许远程登录: %s (可被爆破)' % ', '.join(u['host'] for u in root_remote))
+                warn('建议: DELETE FROM mysql.user WHERE user="root" AND host NOT IN ("localhost","127.0.0.1","::1"); FLUSH PRIVILEGES;')
+            else:
+                ok('root 账号仅限本机登录')
+            if anonymous:
+                warn('存在匿名账号 user="", 建议删除')
+            else:
+                ok('无匿名账号')
+            if weak_host_users:
+                info('以下账号 host="%%" (允许任意来源, 请确保密码强度):')
+                for u in weak_host_users[:5]:
+                    info('  user=%s host=%%' % u['user'])
+        except Exception as ex:
+            info('(账户安全检查异常: %s)' % str(ex))
+
+        # ---------- 7. 主从 ----------
         section('主从复制')
         try:
             slave_data = None
