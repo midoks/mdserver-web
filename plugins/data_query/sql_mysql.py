@@ -811,19 +811,30 @@ class nosqlMySQLCtr():
             return err
 
         lines = []
-        issues = 0
+        # issues: [(level, section_label, text)]  level: 2=🚨严重 1=⚠️警告 0=💡提示
+        issues = []
+        current_section = ''
 
         def section(title):
+            nonlocal current_section
+            current_section = title
             lines.append('')
             lines.append('━━━ %s ━━━' % title)
 
         def ok(msg):
             lines.append('  ✅ ' + msg)
 
+        def critical(msg):
+            issues.append((2, current_section, '🚨 ' + msg))
+            lines.append('  🚨 ' + msg)
+
         def warn(msg):
-            nonlocal issues
-            issues += 1
+            issues.append((1, current_section, '⚠️  ' + msg))
             lines.append('  ⚠️  ' + msg)
+
+        def tip(msg):
+            issues.append((0, current_section, '💡 ' + msg))
+            lines.append('  💡 ' + msg)
 
         def info(msg):
             lines.append('  ℹ️   ' + msg)
@@ -859,9 +870,11 @@ class nosqlMySQLCtr():
         mc = self._get_var_or_status(my_instance, "SHOW GLOBAL VARIABLES LIKE 'max_connections'")
         tc_rate = (tc / mc * 100) if mc else 0
         info('当前连接 %d / max_connections=%d (%.1f%%)' % (tc, mc, tc_rate))
-        if tc_rate >= 80:
-            warn('连接数已接近上限, 应用层可能出现 "too many connections" 拒绝')
-            warn('建议: 1) 应用端检查连接泄露  2) max_connections 适度上调  3) 检查 thread_cache_size')
+        if tc_rate >= 90:
+            critical('连接数已到 max_connections 的 %.0f%%, 随时可能出现 "too many connections" 拒绝' % tc_rate)
+            critical('建议: 1) 应用端检查连接泄露  2) max_connections 上调  3) 检查 wait_timeout')
+        elif tc_rate >= 80:
+            critical('连接数水位偏高 (%.1f%%), 建议排查' % tc_rate)
         elif tc_rate >= 50:
             warn('连接数水位偏高, 建议持续关注')
         else:
@@ -906,13 +919,14 @@ class nosqlMySQLCtr():
             ok('命中率极佳')
         elif hit >= 95:
             ok('命中率良好, 可维持现状')
-        else:
+        elif hit >= 85:
             warn('命中率偏低 (%.2f%%), 磁盘读多会拖慢响应' % hit)
+        else:
+            critical('Buffer Pool 命中率严重偏低 (%.2f%%), 磁盘读成为瓶颈' % hit)
             if bpsize_pct >= 0 and bpsize_pct < 50:
-                warn('建议调大 innodb_buffer_pool_size 到物理内存的 50~75%% (当前 %.0fMB, 可调到 %.0fMB~%.0fMB)' % (
+                critical('建议立即调大 innodb_buffer_pool_size 到物理内存的 50~75%%')
+                critical('当前 %.0fMB, 可调到 %.0fMB~%.0fMB' % (
                     bpsize_mb, total_mem_mb * 0.5, total_mem_mb * 0.75))
-            else:
-                warn('建议调大 innodb_buffer_pool_size, 或检查是否有大量全表扫描')
 
         ilw = self._get_var_or_status(my_instance, "SHOW GLOBAL STATUS LIKE 'Innodb_log_waits'")
         if ilw > 0:
@@ -1097,9 +1111,9 @@ class nosqlMySQLCtr():
                 "AND k.constraint_name IS NULL AND t.table_type='BASE TABLE'"
             )
             if nopk and len(nopk) > 0:
-                warn('发现 %d 张无主键表 (全表扫描 + Replication 都会有问题)' % len(nopk))
+                critical('发现 %d 张无主键表 (会导致全表扫描 + Replication 无法高效定位行)' % len(nopk))
                 for r in nopk[:5]:
-                    warn('  %s.%s' % (r['table_schema'], r['table_name']))
+                    critical('  %s.%s' % (r['table_schema'], r['table_name']))
             else:
                 ok('所有业务表都有主键')
         except Exception:
@@ -1130,6 +1144,89 @@ class nosqlMySQLCtr():
                 ok('Binlog 缓存几乎不落盘')
         else:
             info('Binlog 无事务压力 (Binlog_cache_use=0)')
+
+        # ---------- 4.5 InnoDB Redo / Undo 空间 ----------
+        section('InnoDB Redo / Undo')
+        # Redo Log 利用率 (MySQL 8.0+ 有 redo_log_stats, 5.7 靠 Innodb_log_waits 侧面观察)
+        try:
+            if _major >= 8 and not _is_mariadb:
+                # MySQL 8.0.30+ 有 performance_schema.innodb_redo_log 表
+                redo = my_instance.query(
+                    "SELECT name, n_files, capacity FROM performance_schema.innodb_redo_log "
+                    "WHERE name IN ('CURRENT','PREVIOUS') LIMIT 1"
+                )
+                if redo:
+                    cap_mb = int(redo[0]['capacity']) / 1024 / 1024
+                    info('Redo Log 总容量: %.0fMB' % cap_mb)
+                    if cap_mb < 512:
+                        tip('Redo Log 仅 %.0fMB, 高写入事务可能出现 checkpoint 瓶颈' % cap_mb)
+                        tip('my.cnf: innodb_redo_log_capacity=2G (MySQL 8.0+)')
+            else:
+                # MySQL 5.7 靠 Innodb_log_waits 判断 redo 空间是否够
+                ilw2 = self._get_var_or_status(my_instance, "SHOW GLOBAL STATUS LIKE 'Innodb_log_waits'")
+                info('Innodb_log_waits=%d (Redo 满时才会出现)' % ilw2)
+                if ilw2 > 0:
+                    warn('Redo Log 曾经写满, 出现 %d 次 Innodb_log_waits' % ilw2)
+                    warn('my.cnf: 增大 innodb_log_file_size (默认 48MB, 建议 ≥512MB)')
+        except Exception:
+            pass
+
+        # Undo 表空间膨胀 (MySQL 5.7+ / MariaDB)
+        try:
+            undo_pct = None
+            if _major >= 8 and not _is_mariadb:
+                # MySQL 8.0: information_schema.innodb_tablespaces
+                try:
+                    undo = my_instance.query(
+                        "SELECT tablespace_name, ROUND(extend_size*100/autoextend_size,1) AS pct_used "
+                        "FROM information_schema.innodb_tablespaces "
+                        "WHERE tablespace_name LIKE '%undo%' AND tablespace_name NOT LIKE '%temp%'"
+                    )
+                    if undo:
+                        undo_pct = max(int(r['pct_used'] or 0) for r in undo)
+                except Exception:
+                    pass
+            if undo_pct is None:
+                # 兜底: 看 Undo 历史长度
+                undo_hist = self._get_var_or_status(my_instance, "SHOW GLOBAL STATUS LIKE 'Innodb_history_list_length'")
+                info('Innodb_history_list_length=%d (Undo 历史链长度)' % undo_hist)
+                if undo_hist > 10000:
+                    warn('Undo 历史链很长 (%d), 可能有慢查询/大事务没提交, Undo 表空间膨胀' % undo_hist)
+                    warn('排查: SHOW FULL PROCESSLIST 找长时间运行的查询, 缩短事务')
+            else:
+                info('Undo 表空间使用 %.1f%%' % undo_pct)
+                if undo_pct >= 80:
+                    warn('Undo 表空间使用 %.1f%%, 快满了' % undo_pct)
+                    warn('排查长事务 / 慢查询导致的 purge 阻塞, 必要时手动 purge undo')
+        except Exception:
+            pass
+
+        # ---------- 4.6 表碎片化 ----------
+        section('表碎片化 (Fragmentation)')
+        try:
+            frag = my_instance.query(
+                """SELECT table_schema, table_name,
+                          ROUND(data_length/1024/1024, 2) AS data_mb,
+                          ROUND(data_free/1024/1024, 2) AS free_mb,
+                          ROUND(data_free*100/NULLIF(data_length+index_length,0), 1) AS frag_pct
+                   FROM information_schema.tables
+                   WHERE table_schema NOT IN ('mysql','information_schema','performance_schema','sys')
+                     AND table_type = 'BASE TABLE'
+                     AND data_length + data_free > 10*1024*1024
+                     AND data_free > 10*1024*1024
+                ORDER BY data_free DESC LIMIT 10"""
+            )
+            if frag:
+                warn('共 %d 张 ≥10MB 且 ≥10MB 碎片的表 (取前 5):' % len(frag))
+                for r in frag[:5]:
+                    warn('  %s.%s  data=%.1fMB free=%.1fMB 碎片率 %.1f%%' % (
+                        r['table_schema'], r['table_name'],
+                        r['data_mb'], r['free_mb'], r['frag_pct'] or 0))
+                    warn('  建议: OPTIMIZE TABLE `%s`.`%s`;' % (r['table_schema'], r['table_name']))
+            else:
+                ok('业务表无明显碎片化 (>10MB 碎片)')
+        except Exception:
+            pass
 
         # ---------- 5. 大表 / AUTO_INCREMENT 余量 ----------
         section('大表 / AUTO_INCREMENT 余量')
@@ -1203,8 +1300,8 @@ class nosqlMySQLCtr():
             system_users = ('mysql.session', 'mysql.sys', 'root', 'localhost')
             weak_host_users = [u for u in users if u['host'] == '%' and u['user'] not in system_users]
             if root_remote:
-                warn('root 账号允许远程登录: %s (可被爆破)' % ', '.join(u['host'] for u in root_remote))
-                warn('建议: DELETE FROM mysql.user WHERE user="root" AND host NOT IN ("localhost","127.0.0.1","::1"); FLUSH PRIVILEGES;')
+                critical('root 账号允许远程登录: %s (公网可被爆破!)' % ', '.join(u['host'] for u in root_remote))
+                critical('建议立即执行: DELETE FROM mysql.user WHERE user="root" AND host NOT IN ("localhost","127.0.0.1","::1"); FLUSH PRIVILEGES;')
             else:
                 ok('root 账号仅限本机登录')
             if anonymous:
@@ -1251,13 +1348,29 @@ class nosqlMySQLCtr():
         # ---------- 总结 ----------
         lines.append('')
         lines.append('━━━ 总结 ━━━')
-        if issues == 0:
+        n_critical = sum(1 for x in issues if x[0] == 2)
+        n_warn = sum(1 for x in issues if x[0] == 1)
+        n_tip = sum(1 for x in issues if x[0] == 0)
+        if not issues:
             lines.append('  🎉 本次检查共发现 0 个可优化点, MySQL 健康状况良好!')
-        elif issues <= 3:
-            lines.append('  📌 本次检查共发现 %d 个可优化点 (建议逐项处理)' % issues)
         else:
-            lines.append('  🚨 本次检查共发现 %d 个可优化点, 建议优先处理连接数/Buffer Pool/主从等核心项' % issues)
-        lines.append('  ℹ️   每项建议 my.cnf 修改后需重启 MySQL 或动态执行 SET GLOBAL, 具体参数请查阅官方文档')
+            lines.append('  📊 严重 🚨 %d 个 / 警告 ⚠️  %d 个 / 建议 💡 %d 个 (共 %d)' % (
+                n_critical, n_warn, n_tip, len(issues)))
+            if n_critical > 0:
+                lines.append('')
+                lines.append('  ── 最严重问题 Top %d ──' % min(n_critical, 5))
+                for idx, (lv, sec, txt) in enumerate(
+                        sorted([x for x in issues if x[0] == 2], key=lambda x: x[1])):
+                    if idx >= 5: break
+                    # txt 本身已带 🚨 前缀, 这里显示所属 section
+                    lines.append('  %s  [%s]' % (txt, sec))
+            # 所有 issues 按 level 倒序打印完整清单 (追加在最后)
+            lines.append('')
+            lines.append('  ── 完整问题清单 (按严重度排序) ──')
+            for lv, sec, txt in sorted(issues, key=lambda x: (-x[0], x[1])):
+                lines.append('  %s  [%s]' % (txt, sec))
+        lines.append('')
+        lines.append('  ℹ️   my.cnf 修改后需重启 MySQL 或动态执行 SET GLOBAL, 具体参数请查阅官方文档')
 
         return mw.returnData(True, 'ok', '\n'.join(lines))
 
