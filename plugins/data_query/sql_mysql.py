@@ -1012,10 +1012,12 @@ class nosqlMySQLCtr():
             brr_sample = self._sample_health_counter(sid, 'Innodb_buffer_pool_read_requests', brr)
             counter_info('Innodb_buffer_pool_reads ', br_sample)
             counter_info('Innodb_buffer_pool_read_requests ', brr_sample)
-            if brr > 0:
-                info('启动以来累计命中率: %.2f%% (仅作历史参考)' % ((1 - br / brr) * 100))
-            else:
+            if brr <= 0:
                 info('Buffer Pool 总请求=0, 累计命中率暂不评估')
+            elif br < 0 or br > brr:
+                info('累计 Buffer Pool 计数器口径不一致 (reads=%d > read_requests=%d), 命中率不评估' % (br, brr))
+            else:
+                info('启动以来累计命中率: %.2f%% (仅作历史参考)' % ((1 - br / brr) * 100))
 
         bpsize = self._get_var_or_status(my_instance, "SHOW GLOBAL VARIABLES LIKE 'innodb_buffer_pool_size'")
         bpsize_pct = -1
@@ -1033,7 +1035,9 @@ class nosqlMySQLCtr():
                 info('innodb_buffer_pool_size=%.0fMB (物理内存占比未知)' % bpsize_mb)
 
         if br_sample is not None and brr_sample is not None and br_sample['state'] == 'normal' and brr_sample['state'] == 'normal':
-            if brr_sample['delta'] > 0:
+            if brr_sample['delta'] > 0 and br_sample['delta'] > brr_sample['delta']:
+                info('采样间隔 Buffer Pool 物理读计数大于逻辑请求, 命中率不评估')
+            elif brr_sample['delta'] > 0:
                 hit = (1 - br_sample['delta'] / brr_sample['delta']) * 100
                 info('采样间隔 Buffer Pool 命中率: %.2f%%' % hit)
                 if hit >= 99:
@@ -1157,7 +1161,7 @@ class nosqlMySQLCtr():
                     if ot_sample['delta'] > 0 and table_hit < 85:
                         warn('采样间隔表缓存命中率 %.1f%% 偏低, 可能频繁重新打开表' % table_hit)
                         if toc is not None:
-                            warn('my.cnf: table_open_cache = %d (CPU 核数 × 2048 或更大)' % toc)
+                            warn('建议将 table_open_cache 从 %d 逐步调整至 2048~5000, 并结合业务表数量、并发和 open_files_limit 评估' % toc)
                     else:
                         ok('采样间隔表缓存使用正常')
                 else:
@@ -1213,7 +1217,7 @@ class nosqlMySQLCtr():
         flc = self._get_var_or_status(my_instance, "SHOW GLOBAL VARIABLES LIKE 'innodb_flush_log_at_trx_commit'")
         bl_fmt = self._get_var_str(my_instance, "SHOW GLOBAL VARIABLES LIKE 'binlog_format'")
         log_bin = self._get_var_str(my_instance, "SHOW GLOBAL VARIABLES LIKE 'log_bin'")
-        gtid = self._get_var_str(my_instance, "SHOW GLOBAL VARIABLES LIKE 'gtid_mode'")
+        gtid = None if _is_mariadb else self._get_var_str(my_instance, "SHOW GLOBAL VARIABLES LIKE 'gtid_mode'")
         if sync_b is None or flc is None:
             unknown('sync_binlog 或 innodb_flush_log_at_trx_commit 查询失败、不支持或权限不足')
         else:
@@ -1240,7 +1244,22 @@ class nosqlMySQLCtr():
             elif bl_fmt is not None and bl_fmt.upper() == 'STATEMENT':
                 warn('binlog_format=STATEMENT, 非确定性函数 (NOW/RAND/LIMIT) 可能导致主从不一致')
                 warn('my.cnf: binlog_format=ROW (或 MIXED)')
-        if gtid is None:
+        if _is_mariadb:
+            gtid_pos = self._get_var_str(my_instance, "SHOW GLOBAL VARIABLES LIKE 'gtid_current_pos'")
+            gtid_strict = self._get_var_str(my_instance, "SHOW GLOBAL VARIABLES LIKE 'gtid_strict_mode'")
+            if gtid_pos is None:
+                unknown('MariaDB gtid_current_pos 查询失败、不支持或权限不足')
+            else:
+                info('gtid_current_pos=%s' % (gtid_pos or '<empty>'))
+            if gtid_strict is None:
+                unknown('MariaDB gtid_strict_mode 查询失败、不支持或权限不足')
+            else:
+                info('gtid_strict_mode=%s' % gtid_strict)
+                if gtid_strict.lower() == 'on':
+                    ok('MariaDB GTID 严格模式已开启')
+                else:
+                    info('MariaDB GTID 严格模式未开启, 可按复制一致性要求评估 gtid_strict_mode')
+        elif gtid is None:
             unknown('gtid_mode 查询失败、不支持或权限不足')
         else:
             info('gtid_mode=%s' % gtid)
@@ -1617,7 +1636,7 @@ class nosqlMySQLCtr():
         # ---------- 6. 账户安全 ----------
         section('账户安全')
         try:
-            users = my_instance.query("SELECT user, host FROM mysql.user")
+            users = my_instance.query("SELECT User AS user, Host AS host FROM mysql.user")
             if users is None:
                 unknown('账户安全查询返回失败或权限不足')
             else:
