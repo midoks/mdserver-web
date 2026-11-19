@@ -435,7 +435,7 @@ class crontab(object):
     # 取执行脚本
     def getShell(self, param):
         if not 'echo' in param:
-            cron_name = mw.md5(mw.md5(str(time.time()) + '_mw'))
+            cron_name = 'panel_t'+ str(time.time()) + '_' + mw.md5(str(time.time()) + '_mw')[0:5]
         else:
             cron_name = param['echo']
         param['echo'] = cron_name
