@@ -434,15 +434,16 @@ class crontab(object):
 
     # 取执行脚本
     def getShell(self, param):
+        stype = param['stype']
         if not 'echo' in param:
-            cron_name = 'panel_t'+ str(int(time.time())) + '_' + mw.md5(str(time.time()) + '_mw')[0:5]
+            cron_name = 'panel_'+stype.lower() +'_t'+ str(int(time.time())) + '_' + mw.md5(str(time.time()) + '_mw')[0:5]
         else:
             cron_name = param['echo']
         param['echo'] = cron_name
 
         shell = ""
         # try:
-        stype = param['stype']
+        
         if stype == 'toFile':
             shell = param.sFile
         else:
