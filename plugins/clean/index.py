@@ -136,7 +136,6 @@ def initConf():
             "/var/log/wtmp",
             "/var/log/secure",
             "/var/log/lastlog",
-            "/var/log/syslog",
             "/var/log/cron",
             "/www/wwwlogs",
             "/www/server/rsyncd",
@@ -261,7 +260,8 @@ def cleanSpecialFile(file):
     new_file = file.strip()
     sf_list = ['/var/log/syslog', '/var/log/btmp', '/var/log/messages','/var/log/wtmp']
     if mw.inArray(sf_list, new_file):
-        mw.writeFile(new_file, '')
+        if os.path.isfile(new_file):
+            mw.writeFile(new_file, '')
         return True
     return False
 
