@@ -2,8 +2,8 @@
 PATH=/bin:/sbin:/usr/bin:/usr/sbin:/usr/local/bin:/usr/local/sbin:~/bin
 export PATH
 
-# cd /Users/midoks/Desktop/mwdev/server/mdserver-web/plugins/mongodb && /bin/bash install.sh install 5.0.4
-# cd /www/server/mdserver-web/plugins/mongodb && /bin/bash install.sh install 5.0.4
+# cd /Users/midoks/Desktop/mwdev/server/mdserver-web/plugins/clean && /bin/bash install.sh install
+# cd /www/server/mdserver-web && . bin/activate && python3 plugins/clean/index.py clean
 
 curPath=`pwd`
 rootPath=$(dirname "$curPath")
@@ -11,6 +11,7 @@ rootPath=$(dirname "$rootPath")
 serverPath=$(dirname "$rootPath")
 
 VERSION=$2
+action=$1
 
 if [ -f ${rootPath}/bin/activate ];then
 	. ${rootPath}/bin/activate
@@ -34,9 +35,11 @@ Uninstall_app()
 	echo "Uninstall_clean"
 }
 
-action=$1
-if [ "${1}" = 'install' ];then
+
+if [ "${action}" = 'install' ] || [ "$action" = "upgrade" ];then
 	Install_app
-else
+elif [ "${action}" = 'uninstall' ];then
 	Uninstall_app
+else
+	echo "OPTIONS ERROR"
 fi
