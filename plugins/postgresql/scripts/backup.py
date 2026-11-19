@@ -41,27 +41,50 @@ import core.mw as mw
 DEBUG = int(os.environ.get('BACKUP_DEBUG', '0'))
 
 
+def _useColor():
+    """只有交互式终端才输出 ANSI 颜色.
+
+    面板 / 计划任务会重定向 stdout 到日志或管道, 此时注入颜色码只会
+    在页面上残留成 "[1;34m" 之类的乱码, 因此按 NO_COLOR 约定自动降级.
+    """
+    if os.environ.get('NO_COLOR'):
+        return False
+    try:
+        return sys.stdout.isatty()
+    except Exception:
+        return False
+
+
+COLOR = _useColor()
+
+
+def _paint(code, msg):
+    if not COLOR:
+        return msg
+    return "\033[%sm%s\033[0m" % (code, msg)
+
+
 def _step(idx, total, msg):
     """打印当前步骤, 如 [1/6] 检查数据库存在性"""
-    print("\033[1;34m[%d/%d]\033[0m %s" % (idx, total, msg), flush=True)
+    print("%s %s" % (_paint('1;34', '[%d/%d]' % (idx, total)), msg), flush=True)
 
 
 def _ok(msg='OK'):
-    print("  \033[1;32m✓\033[0m %s" % msg, flush=True)
+    print("  %s %s" % (_paint('1;32', '✓'), msg), flush=True)
 
 
 def _fail(msg):
-    print("  \033[1;31m✗\033[0m %s" % msg, flush=True)
+    print("  %s %s" % (_paint('1;31', '✗'), msg), flush=True)
 
 
 def _warn(msg):
-    print("  \033[1;33m!\033[0m %s" % msg, flush=True)
+    print("  %s %s" % (_paint('1;33', '!'), msg), flush=True)
 
 
 def _dbg(msg):
     """调试输出, BACKUP_DEBUG>=1 才显示"""
     if DEBUG >= 1:
-        print("  \033[1;36m[dbg]\033[0m %s" % msg, flush=True)
+        print("  %s %s" % (_paint('1;36', '[dbg]'), msg), flush=True)
 
 
 def _pgDumpMajorVersion(pg_dump_bin):
