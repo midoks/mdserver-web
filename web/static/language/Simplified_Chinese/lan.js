@@ -692,7 +692,7 @@ var lan = {
 		"mysql_set_thread_stack":"每个线程的堆栈大小",
 		"mysql_set_binlog_cache_size":"二进制日志缓存大小(4096的倍数)",
 		"mysql_set_thread_cache_size":"线程池大小",
-		"mysql_set_table_open_cache":"表缓存(最大不要超过2048)",
+		"mysql_set_table_open_cache":"表缓存",
 		"mysql_set_max_connections":"最大连接数",
 		"mysql_set_restart":"重启数据库",
 		"mysql_set_conn":"连接数",
