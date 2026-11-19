@@ -372,7 +372,6 @@ function mySQLMemOpt(opt) {
             $("input[name='thread_stack']").val(256);
             $("input[name='binlog_cache_size']").val(32);
             $("input[name='thread_cache_size']").val(4);
-            $("input[name='table_open_cache']").val(32);
             $("input[name='max_connections']").val(500);
             break;
         case '1':
@@ -387,7 +386,6 @@ function mySQLMemOpt(opt) {
             $("input[name='thread_stack']").val(256);
             $("input[name='binlog_cache_size']").val(64);
             $("input[name='thread_cache_size']").val(64);
-            $("input[name='table_open_cache']").val(128);
             $("input[name='max_connections']").val(100);
             break;
         case '2':
@@ -402,7 +400,6 @@ function mySQLMemOpt(opt) {
             $("input[name='thread_stack']").val(256);
             $("input[name='binlog_cache_size']").val(64);
             $("input[name='thread_cache_size']").val(96);
-            $("input[name='table_open_cache']").val(192);
             $("input[name='max_connections']").val(200);
             break;
         case '3':
@@ -417,7 +414,6 @@ function mySQLMemOpt(opt) {
             $("input[name='thread_stack']").val(256);
             $("input[name='binlog_cache_size']").val(128);
             $("input[name='thread_cache_size']").val(128);
-            $("input[name='table_open_cache']").val(384);
             $("input[name='max_connections']").val(300);
             break;
         case '4':
@@ -432,7 +428,6 @@ function mySQLMemOpt(opt) {
             $("input[name='thread_stack']").val(384);
             $("input[name='binlog_cache_size']").val(192);
             $("input[name='thread_cache_size']").val(192);
-            $("input[name='table_open_cache']").val(1024);
             $("input[name='max_connections']").val(400);
             break;
         case '5':
@@ -447,7 +442,6 @@ function mySQLMemOpt(opt) {
             $("input[name='thread_stack']").val(512);
             $("input[name='binlog_cache_size']").val(256);
             $("input[name='thread_cache_size']").val(256);
-            $("input[name='table_open_cache']").val(2048);
             $("input[name='max_connections']").val(500);
             break;
     }
