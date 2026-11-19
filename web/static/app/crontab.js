@@ -125,7 +125,7 @@ function getCronData(page){
 					<td>"+cron_backupto+"</td>\
 					<td>"+rdata.data[i].add_time+"</td>\
 					<td>\
-						<a href=\"javascript:startTask("+rdata.data[i].id+");\" class='btlink'>执行</a> | \
+						<a href=\"javascript:startTask("+rdata.data[i].id+");\" class='btlink start_task'>执行</a> | \
 						<a href=\"javascript:editTaskInfo('"+rdata.data[i].id+"');\" class='btlink'>编辑</a> | \
 						<a href=\"javascript:getLogs("+rdata.data[i].id+");\" class='btlink'>日志</a> | \
 						<a href=\"javascript:planDel("+rdata.data[i].id+" ,'"+rdata.data[i].name.replace('\\','\\\\').replace("'","\\'").replace('"','')+"');\" class='btlink'>删除</a>\
@@ -135,6 +135,9 @@ function getCronData(page){
 		}
 		$('#cronbody').html(cbody);
 		$('#softPage').html(rdata.page);
+
+		// $('.start_task').unbind('click').click(function(){});
+
 	},'json');
 }
 
