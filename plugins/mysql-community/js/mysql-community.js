@@ -503,7 +503,7 @@ function setRootPwd(type, pwd){
 
     var index = layer.open({
         type: 1,
-        area: '800px',
+        area: '600px',
         title: '修改数据库密码',
         closeBtn: 1,
         shift: 5,
@@ -512,7 +512,7 @@ function setRootPwd(type, pwd){
         content: "<form class='bt-form pd20' id='mod_pwd'>\
                     <div class='line'>\
                         <span class='tname'>root密码</span>\
-                        <div class='info-r'><input class='bt-input-text mr5' type='text' name='password' id='MyPassword' style='width:330px' value='"+pwd+"' />\
+                        <div class='info-r'><input class='bt-input-text mr5' type='text' name='password' id='MyPassword' style='width:430px' value='"+pwd+"' />\
                             <span title='随机密码' class='glyphicon glyphicon-repeat cursor' onclick='repeatPwd(16)'></span>\
                         </div>\
                     </div>\
