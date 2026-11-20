@@ -138,8 +138,10 @@ Uninstall_App()
 }
 
 
-if [ "${1}" = "install" ];then
+if [ "${action}" = 'install' ];then
 	Install_App
-else
+elif [ "${action}" = 'uninstall' ];then
 	Uninstall_App
+else
+	echo "OPTIONS ERROR"
 fi
