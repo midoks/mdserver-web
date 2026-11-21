@@ -26,6 +26,12 @@ if [ -f /www/server/mdserver-web/tools.py ];then
 	exit 0
 fi
 
+# panel 没有启动后,更新也不启动
+PANEL_IS_RUN=no
+if [ -f /www/server/mdserver-web/logs/panel.pid ];then
+    PANEL_IS_RUN=yes
+fi
+
 _os=`uname`
 echo "use system: ${_os}"
 
@@ -232,12 +238,6 @@ echo "update mdserver-web dev code end"
 #pip uninstall public
 echo "use system version: ${OSNAME}"
 cd /www/server/mdserver-web && bash scripts/update/${OSNAME}.sh
-
-# panel 没有启动后,更新也不启动
-PANEL_IS_RUN=no
-if [ -f /www/server/mdserver-web/logs/panel.pid ];then
-    PANEL_IS_RUN=yes
-fi
 
 bash /etc/rc.d/init.d/mw restart
 if [ "$PANEL_IS_RUN" == "no" ];then
