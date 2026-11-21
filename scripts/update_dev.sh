@@ -240,7 +240,7 @@ echo "use system version: ${OSNAME}"
 cd /www/server/mdserver-web && bash scripts/update/${OSNAME}.sh
 
 bash /etc/rc.d/init.d/mw restart
-if [ "$PANEL_IS_RUN" == "no" ];then
+if [ "$PANEL_IS_RUN" = "no" ];then
     cd /www/server/mdserver-web && bash /etc/rc.d/init.d/mw stop
 fi
 bash /etc/rc.d/init.d/mw default
