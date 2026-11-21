@@ -215,7 +215,16 @@ echo "update mdserver-web code end"
 echo "use system version: ${OSNAME}"
 cd /www/server/mdserver-web && bash scripts/update/${OSNAME}.sh
 
+# panel 没有启动后,更新也不启动
+PANEL_IS_RUN=no
+if [ -f /www/server/mdserver-web/logs/panel.pid ];then
+    PANEL_IS_RUN=yes
+fi
+
 bash /etc/rc.d/init.d/mw restart
+if [ "$PANEL_IS_RUN" == "no" ];then
+    cd /www/server/mdserver-web && bash /etc/rc.d/init.d/mw stop
+fi
 bash /etc/rc.d/init.d/mw default
 
 if [ -f /usr/bin/mw ];then
