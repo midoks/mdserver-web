@@ -174,6 +174,11 @@ function addHook(){
 
                     var title = $('#hook_title').val();
                     var loadT = layer.msg('配置模版获取中...',{icon:16,time:0,shade: [0.3, '#000']});
+
+                    if (title == ''){
+                        title = getRandomString(4);
+                    }
+
                     whPostNoMessage('read_config_tpl', {file:selected,title:title}, function(data){
                         layer.close(loadT);
                         var rdata = $.parseJSON(data.data);
