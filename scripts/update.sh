@@ -1,9 +1,21 @@
 #!/bin/bash
 PATH=/bin:/sbin:/usr/bin:/usr/sbin:/usr/local/bin:/usr/local/sbin:~/bin:/opt/homebrew/bin
 export PATH
+
+RED='\033[31m'
+GREEN='\033[32m'
+YELLOW='\033[33m'
+BLUE='\033[34m'
+PLAIN='\033[0m'
+BOLD='\033[1m'
+SUCCESS='[\033[32mOK\033[0m]'
+COMPLETE='[\033[32mDONE\033[0m]'
+WARN='[\033[33mWARN\033[0m]'
+ERROR='[\033[31mERROR\033[0m]'
+WORKING='[\033[34m*\033[0m]'
+
 # LANG=en_US.UTF-8
 is64bit=`getconf LONG_BIT`
-
 startTime=`date +%s`
 
 if [ -f /www/server/mdserver-web/tools.py ];then
@@ -13,6 +25,11 @@ if [ -f /www/server/mdserver-web/tools.py ];then
     exit 0
 fi
 
+# panel 没有启动后,更新也不启动
+PANEL_IS_RUN=no
+if [ -f /www/server/mdserver-web/logs/panel.pid ];then
+    PANEL_IS_RUN=yes
+fi
 
 _os=`uname`
 echo "use system: ${_os}"
@@ -215,11 +232,6 @@ echo "update mdserver-web code end"
 echo "use system version: ${OSNAME}"
 cd /www/server/mdserver-web && bash scripts/update/${OSNAME}.sh
 
-# panel 没有启动后,更新也不启动
-PANEL_IS_RUN=no
-if [ -f /www/server/mdserver-web/logs/panel.pid ];then
-    PANEL_IS_RUN=yes
-fi
 
 bash /etc/rc.d/init.d/mw restart
 if [ "$PANEL_IS_RUN" == "no" ];then

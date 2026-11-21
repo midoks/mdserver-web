@@ -16,7 +16,6 @@ WORKING='[\033[34m*\033[0m]'
 
 # LANG=en_US.UTF-8
 is64bit=`getconf LONG_BIT`
-
 startTime=`date +%s`
 
 if [ -f /www/server/mdserver-web/tools.py ];then
