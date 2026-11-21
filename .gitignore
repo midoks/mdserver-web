@@ -188,6 +188,7 @@ plugins/tidb
 plugins/goedge-admin
 plugins/goedge-node
 plugins/goedge-happy
+plugins/www
 
 /logs
 /data
@@ -198,3 +199,4 @@ plugins/goedge-happy
 /bak
 *.tmp
 /.trae
+

@@ -562,17 +562,57 @@ class plugin(object):
             return self.makeCoexistDataInstalled(data)
         return plugins_t
 
-    def getPluginInfo(self, name):
-        info = {}
-        path = self.__plugin_dir + '/' + name
-        info_path = path + '/info.json'
+    # info.json 必填字段, 缺失会导致插件列表接口直接报错
+    __plugin_required_fields = ('name', 'title', 'ps', 'versions', 'checks')
+
+    def checkPluginInfo(self, name):
+        """读取并校验插件 info.json, 返回 (data, error); 校验失败时 data 为 {}"""
+        info_path = self.__plugin_dir + '/' + name + '/info.json'
         if not os.path.exists(info_path):
-            return info
+            return {}, '缺少 info.json'
+
         try:
-            data = json.loads(mw.readFile(info_path))
-            return data
+            content = mw.readFile(info_path)
+            data = json.loads(content)
         except Exception as e:
-            return info
+            return {}, 'info.json 解析失败: %s' % str(e)
+
+        if not isinstance(data, dict):
+            return {}, 'info.json 内容必须是 JSON 对象'
+
+        missing_fields = [field for field in self.__plugin_required_fields if field not in data]
+        if missing_fields:
+            return {}, '缺少必填字段: %s' % ', '.join(missing_fields)
+
+        if not isinstance(data['versions'], (str, list)):
+            return {}, 'versions 必须为字符串或数组'
+        if not isinstance(data['checks'], str) or data['checks'] == '':
+            return {}, 'checks 必须为非空字符串'
+
+        # 旧插件未声明分类时归入“其他插件”
+        data.setdefault('pid', '5')
+        return data, None
+
+    def getPluginInfo(self, name):
+        data, error = self.checkPluginInfo(name)
+        if error:
+            print('getPluginInfo: %s %s' % (name, error))
+        return data
+
+    def getPluginInfoErrors(self):
+        """返回所有 info.json 不完整的插件, 供页面提示"""
+        errors = []
+        if not os.path.isdir(self.__plugin_dir):
+            return errors
+        for name in sorted(os.listdir(self.__plugin_dir)):
+            if name.startswith('.'):
+                continue
+            if not os.path.isdir(self.__plugin_dir + '/' + name):
+                continue
+            data, error = self.checkPluginInfo(name)
+            if error:
+                errors.append({'name': name, 'error': error})
+        return errors
 
     def getPluginList(self, name,
         keyword = None,
@@ -738,6 +778,7 @@ class plugin(object):
         '''
         rdata = {}
         rdata['type'] = self.def_plugin_type
+        rdata['info_errors'] = self.getPluginInfoErrors()
     
         data = self.getAllPluginList(type, keyword, page, size)
         rdata['data'] = data[0]
