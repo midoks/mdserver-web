@@ -551,7 +551,7 @@ class plugin(object):
     ):
         plugins_t = []
         # 返回指定类型
-        if plugin_type != None and data['pid'] == plugin_type:
+        if plugin_type != None and data.get('pid') == plugin_type:
             return self.makeCoexistData(data)
 
         # 全部
