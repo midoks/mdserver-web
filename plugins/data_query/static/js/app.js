@@ -1062,8 +1062,12 @@ function mysqlSlaveSyncProgress(){
                     if (!rdata.status){
                         return;
                     }
+
                     var data = rdata.data;
                     if (!data.status){
+                        $('.slave_sync_info').text(data.data);
+                        if (timer){ clearInterval(timer); timer = null; }
+                        // if (statEc){ statEc.dispose(); statEc = null; }
                         return;
                     }
 
