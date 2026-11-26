@@ -118,7 +118,7 @@ def getLogsDir():
 def getRecycleBinDir():
     rb_dir = getFatherDir() + '/recycle_bin'
     if not os.path.exists(rb_dir):
-        os.system('mkdir -p ' + rb_dir)
+        os.makedirs(rb_dir, exist_ok=True)
     return rb_dir
 
 def getPanelTaskLog():
