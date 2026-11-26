@@ -881,7 +881,8 @@ function delDbBatch(){
 
 function setDbPs(id, name, obj) {
     var _span = $(obj);
-    var _input = $("<input class='baktext' value=\""+_span.text()+"\" type='text' placeholder='备注信息' />");
+    var _input = $("<input class='baktext' type='text' placeholder='备注信息' />");
+    _input.val(_span.text());
     _span.hide().after(_input);
     _input.focus();
     _input.blur(function(){
