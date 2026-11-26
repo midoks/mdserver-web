@@ -27,7 +27,9 @@ blueprint = Blueprint('system', __name__, url_prefix='/system', template_folder=
 @panel_login_required
 def system_total():
     data = sys.getMemInfo()
-    cpu = sys.getCpuInfo(interval=1)
+    # interval=None 非阻塞: 返回自上次调用以来的 CPU 使用率(第一次返回 0)
+    # 原来 interval=1 会阻塞 1 秒采样, 在仪表盘轮询场景下大量请求堆积
+    cpu = sys.getCpuInfo(interval=None)
     data['cpuNum'] = cpu[1]
     data['cpuRealUsed'] = cpu[0]
     data['time'] = sys.getBootTime()
@@ -46,7 +48,8 @@ def get_env_info():
 @panel_login_required
 def network():
     stat = {}
-    stat['cpu'] = sys.getCpuInfo()
+    # interval=None 非阻塞, 避免 psutil.cpu_percent 默认阻塞 1 秒导致轮询堆积
+    stat['cpu'] = sys.getCpuInfo(interval=None)
     stat['load'] = sys.getLoadAverage()
     stat['mem'] = sys.getMemInfo()
     stat['iostat'] = sys.stats().disk()
