@@ -247,7 +247,10 @@ def setBatchData(path, stype, access, user, data):
                         shutil.rmtree(filename)
                 else:
                     if key == '.user.ini':
-                        os.system('command -v chattr && chattr -i ' + filename)
+                        chattr = shutil.which('chattr')
+                        if chattr:
+                            subprocess.run([chattr, '-i', '--', filename],
+                                           stdout=subprocess.PIPE, stderr=subprocess.PIPE)
                     if is_recycle:
                         mvRecycleBin(topath)
                     else:
@@ -419,8 +422,14 @@ def setFileAccept(filename):
     if mw.getOs() == 'darwin':
         user = mw.execShell("who | sed -n '2, 1p' |awk '{print $1}'")[0].strip()
         auth = user + ':staff'
-    os.system('chown -R ' + auth + ' ' + filename)
-    os.system('chmod -R 755 ' + filename)
+    # 参数列表执行, 不经过 shell
+    try:
+        subprocess.run(['chown', '-R', auth, '--', filename],
+                       stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+        subprocess.run(['chmod', '-R', '755', '--', filename],
+                       stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+    except Exception:
+        pass
 
 def createFile(file_path):
     try:
@@ -830,7 +839,10 @@ def dirDelete(path):
 
     # 检查是否为.user.ini
     if path.find('.user.ini'):
-        os.system("command -v chattr && chattr -i '" + path + "'")
+        chattr = shutil.which('chattr')
+        if chattr:
+            subprocess.run([chattr, '-i', '--', path],
+                           stdout=subprocess.PIPE, stderr=subprocess.PIPE)
     try:
         recycle_bin = thisdb.getOption('recycle_bin')
         if recycle_bin == 'open':
@@ -965,7 +977,17 @@ def setMode(path):
 
 def closeLogs():
     log_file = mw.getLogsDir()
-    os.system('rm -rf ' + log_file + '/*')
+    # 直接删除目录内容, 避免拼进 shell 命令
+    if os.path.isdir(log_file):
+        for name in os.listdir(log_file):
+            target = os.path.join(log_file, name)
+            try:
+                if os.path.isdir(target) and not os.path.islink(target):
+                    shutil.rmtree(target)
+                else:
+                    os.remove(target)
+            except Exception:
+                pass
     mw.opWeb('reload')
     # os.system('kill -USR1 `cat ' + mw.getServerDir() +'/openresty/nginx/logs/nginx.pid`')
     mw.writeLog('文件管理', '网站日志已被清空!')
