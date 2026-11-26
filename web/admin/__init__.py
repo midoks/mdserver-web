@@ -39,6 +39,7 @@ import core.mw as mw
 import config
 import utils.config as utils_config
 import thisdb
+import utils.csrf as csrf_mw
 
 # 初始化db
 from admin import setup
@@ -74,7 +75,11 @@ app.config['SESSION_PERMANENT'] = True
 app.config['SESSION_USE_SIGNER'] = True
 app.config['SESSION_KEY_PREFIX'] = 'MW_:'
 app.config['SESSION_COOKIE_NAME'] = "MW_VER_1"
-app.config['PERMANENT_SESSION_LIFETIME'] = timedelta(days=31)
+# 安全 Cookie: 防 XSS 偷 session, 防 CSRF 跨站携带
+app.config['SESSION_COOKIE_HTTPONLY'] = True
+app.config['SESSION_COOKIE_SAMESITE'] = 'Lax'
+# secure 根据面板 SSL 配置在 before_request 里动态补
+app.config['PERMANENT_SESSION_LIFETIME'] = timedelta(days=7)
 app.config['SEND_FILE_MAX_AGE_DEFAULT'] = 604800
 
 # db的配置
@@ -109,6 +114,14 @@ def sendAuthenticated():
 def requestCheck():
     request.start_time = time.time()
 
+    # 动态决定 session cookie 是否 secure (面板开了 SSL 就强制 secure)
+    try:
+        panel_ssl = thisdb.getOptionByJson('panel_ssl', default={'open':False})
+        if panel_ssl.get('open'):
+            app.config['SESSION_COOKIE_SECURE'] = True
+    except Exception:
+        pass
+
     admin_close = thisdb.getOption('admin_close')
     if admin_close == 'yes':
         if not request.path.startswith('/close'):
@@ -132,6 +145,11 @@ def requestCheck():
         if basic_user != basic_auth['basic_user'] or basic_pwd != basic_auth['basic_pwd']:
             return sendAuthenticated()
 
+    # CSRF 双提交校验 (POST/PUT/PATCH/DELETE 才校验)
+    csrf_resp = csrf_mw.apply_csrf_before_request()
+    if csrf_resp is not None:
+        return csrf_resp
+
     # domain_check = mw.checkDomainPanel()
     # if domain_check:
     #     return domain_check
@@ -143,6 +161,26 @@ def requestAfter(response):
     response.headers['soft'] = config.APP_NAME
     response.headers['mw-version'] = config.APP_VERSION
     response.headers['X-Response-Time'] = round(time.time() - request.start_time, 4) 
+
+    # 安全响应头
+    response.headers.setdefault('X-Frame-Options', 'SAMEORIGIN')
+    response.headers.setdefault('X-Content-Type-Options', 'nosniff')
+    response.headers.setdefault('Referrer-Policy', 'strict-origin-when-cross-origin')
+    response.headers.setdefault('Permissions-Policy', 'geolocation=(), microphone=(), camera=()')
+
+    # 首次响应时下发 csrf_token cookie (让前端后续 POST 能带上)
+    if csrf_mw.COOKIE_NAME not in request.cookies:
+        token = csrf_mw.generate_token()
+        try:
+            response.set_cookie(
+                csrf_mw.COOKIE_NAME, token,
+                httponly=False,
+                samesite='Lax',
+                path='/',
+            )
+        except Exception:
+            response.set_cookie(csrf_mw.COOKIE_NAME, token, httponly=False)
+
     return response
 
 

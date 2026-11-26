@@ -508,16 +508,43 @@ def md5(content):
 
 def hasPwd(password):
     '''
-    加密密码字符
+    bcrypt 哈希密码 (优先使用 bcrypt, 失败降级为 md5)
     '''
-    # python3 -c "import crypt"
-    # python3 -c 'import crypt; print(crypt.crypt(""))'
-    # import crypt
-    # return crypt.crypt(password, password)
-    import bcrypt
-    salt = bcrypt.gensalt()
-    hpw = bcrypt.hashpw(password.encode('utf-8'), salt)
-    return hpw.decode('utf-8')
+    try:
+        import bcrypt
+        salt = bcrypt.gensalt()
+        hpw = bcrypt.hashpw(password.encode('utf-8'), salt)
+        return hpw.decode('utf-8')
+    except Exception:
+        return md5(password)
+
+
+def verifyPassword(password, stored_hash):
+    '''
+    校验密码: 自动识别 bcrypt ($2b$/$2a$/...) 或 md5 (32位hex)
+    返回 (ok: bool, needs_upgrade: bool)
+    '''
+    if stored_hash is None or stored_hash == '':
+        return False, False
+
+    # bcrypt 前缀 $2b$ 或 $2a$ 或 $2y$
+    if stored_hash.startswith('$2'):
+        try:
+            import bcrypt
+            ok = bcrypt.checkpw(password.encode('utf-8'), stored_hash.encode('utf-8'))
+            return bool(ok), False
+        except Exception:
+            return False, False
+
+    # md5 兼容 (32 位十六进制)
+    if len(stored_hash) == 32 and all(c in '0123456789abcdef' for c in stored_hash.lower()):
+        import hmac as _hmac
+        computed = md5(password)
+        ok = _hmac.compare_digest(computed, stored_hash)
+        return bool(ok), ok   # ok=True 时说明是 md5 存的, 需要升级
+
+    # 未知格式
+    return False, False
 
     
 def getFileMd5(filename):

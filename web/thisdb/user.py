@@ -22,7 +22,7 @@ def initAdminUser():
         login_ip = '127.0.0.1'
         add_user = {
             'name':name, 
-            'password':mw.md5(password),
+            'password':mw.hasPwd(password),
             'login_ip':login_ip,
             'login_time':now_time,
             'phone':'',
@@ -90,7 +90,7 @@ def setUserByName(name, new_name):
     return mw.M('users').where("name=?", (name,)).setField('name', new_name.strip())
 
 def setUserPwdByName(name, password):
-    pwd = mw.md5(password)
+    pwd = mw.hasPwd(password)
     return mw.M('users').where("name=?", (name,)).setField('password', pwd)
 
 def setUserByRoot(name = None,password = None) -> bool:
@@ -105,7 +105,7 @@ def setUserByRoot(name = None,password = None) -> bool:
         mw.M('users').where('id=?', (1,)).setField('name', name)
 
     if password is not None:
-        pwd = mw.md5(password)
+        pwd = mw.hasPwd(password)
         mw.M('users').where('id=?', (1,)).setField('password', pwd)
 
     if not data:

@@ -76,6 +76,39 @@
             <script src="/static/js/socket.io.min.js"></script>
             <script src="/static/build/addons/winptyCompat/winptyCompat.js"></script>
             <script src="/static/js/term-websocketio.js"></script>
+            <script>
+            // CSRF 双提交: 从 cookie 读 csrf_token 放 X-CSRF-Token header
+            (function($){
+                function getCsrfToken(){
+                    var t = $.cookie('csrf_token');
+                    if(!t){
+                        var m = document.cookie.match(/(?:^|;\s*)csrf_token=([^;]+)/);
+                        t = m ? decodeURIComponent(m[1]) : '';
+                    }
+                    return t;
+                }
+                $.ajaxSetup({
+                    beforeSend: function(xhr, settings){
+                        if(settings && settings.type && /^(POST|PUT|PATCH|DELETE)$/i.test(settings.type)){
+                            var tk = getCsrfToken();
+                            if(tk){
+                                xhr.setRequestHeader('X-CSRF-Token', tk);
+                            }
+                        }
+                    },
+                    statusCode: {
+                        403: function(xhr){
+                            try{
+                                var j = JSON.parse(xhr.responseText);
+                                if(j && j.msg && j.msg.indexOf('CSRF')>-1){
+                                    layer.msg(j.msg, {icon: 2, time: 3000});
+                                }
+                            }catch(e){}
+                        }
+                    }
+                });
+            })(jQuery);
+            </script>
             <script src="/static/app/upload.js?v={{config.version}}"></script>
             <script src="/static/app/public.js?v={{config.version}}"></script>
             <script src="/static/js/echarts.min.js"></script>
