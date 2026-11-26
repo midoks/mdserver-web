@@ -62,12 +62,20 @@ function orPluginOpService(a, b, v,request_callback) {
         orPost('get_os',{},function(data){
             var rdata = $.parseJSON(data.data);
             if (!rdata['auth']){
-                layer.prompt({title: '检查到权限不足,需要输入密码!', formType: 1},function(pwd, index){
+                var promptIndex = layer.prompt({title: '检查到权限不足,需要输入密码!', formType: 1},function(pwd, index){
                 
                     layer.close(index);
                     var data = {'pwd':pwd};
                     c += '&args='+JSON.stringify(data);
                     orPluginOpServiceOp(a,b,c,d,a,v,request_callback);
+                });
+
+                // 回车直接执行(当前 layer 版本 prompt 未内置 Enter 监听)
+                $('#layui-layer' + promptIndex).on('keydown', '.layui-layer-input', function(ev){
+                    if (ev.keyCode === 13) {
+                        ev.preventDefault();
+                        $('#layui-layer' + promptIndex).find('.layui-layer-btn0').trigger('click');
+                    }
                 });
             } else {
                 orPluginOpServiceOp(a,b,c,d,a,v,request_callback);
