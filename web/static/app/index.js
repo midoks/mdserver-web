@@ -451,27 +451,31 @@ function netImg() {
     };
 
     var echartsNetImg = echarts.init(document.getElementById('netImg'));
-    setInterval(function() {
-        getNet();
-        addData(true);
-        echartsNetImg.setOption({
-            yAxis: {
-                name:  '单位 '+ default_unit,
-                splitLine: { lineStyle: { color: "#eee" } },
-                axisLine: { lineStyle: { color: "#666" } }
-            },
-            xAxis: {
-                data: xData
-            },
-            series: [{
-                name: lan.index.net_up,
-                data: yData
-            }, {
-                name: lan.index.net_down,
-                data: zData
-            }]
-        });
-    }, 3000);
+    // 图表渲染轮询: 数据由 index.task() 统一拉取, 这里只渲染 echarts, 避免重复请求 /system/network
+    // 页面隐藏(document.hidden)时跳过本轮, 节省服务器资源
+    (function netImgPoll(){
+        if (!document.hidden) {
+            addData(true);
+            echartsNetImg.setOption({
+                yAxis: {
+                    name:  '单位 '+ default_unit,
+                    splitLine: { lineStyle: { color: "#eee" } },
+                    axisLine: { lineStyle: { color: "#666" } }
+                },
+                xAxis: {
+                    data: xData
+                },
+                series: [{
+                    name: lan.index.net_up,
+                    data: yData
+                }, {
+                    name: lan.index.net_down,
+                    data: zData
+                }]
+            });
+        }
+        setTimeout(netImgPoll, 3000);
+    })();
 
     // 使用刚指定的配置项和数据显示图表。
     echartsNetImg.setOption(option);
@@ -1456,10 +1460,59 @@ var index = {
         },'json');
     },
     task:function(){
-        // index.getData();
-        setInterval(function() {
-            index.getData();
-        }, 3000);
+        // 用 setTimeout 链 + 请求完成回调替代 setInterval, 防止请求堆积
+        // 页面隐藏(document.hidden)时跳过本次拉取, 减少无效请求
+        (function poll(){
+            if (document.hidden) {
+                setTimeout(poll, 3000);
+                return;
+            }
+            $.get("/system/network", function(net) {
+                // 复用 index.getData 的数据处理逻辑
+                if (typeof index !== 'undefined' && index.getData) {
+                    // 手动触发数据处理(模拟 getData 内部回调)
+                    var network_io_key = getCookie('network_io_key');
+                    var network_data = net.network;
+                    var network_select = network_data['ALL'];
+                    if (network_io_key && network_io_key != ''){
+                        network_select = network_data[network_io_key];
+                    }
+                    index.net.add(network_select.up,network_select.down);
+                    index.net.render();
+                    index.net.renderSelect(net);
+                    $("#upSpeed").html(toSize(network_select.up));
+                    $("#downSpeed").html(toSize(network_select.down));
+                    $("#downAll").html(toSize(network_select.downTotal));
+                    $("#downAll").attr('title','数据包:' + network_select.downPackets);
+                    $("#upAll").html(toSize(network_select.upTotal));
+                    $("#upAll").attr('title','数据包:' + network_select.upPackets);
+
+                    var disk_io_key = getCookie('disk_io_key');
+                    var iostat_data = net.iostat;
+                    var iostat_select = iostat_data['ALL'];
+                    if (disk_io_key && disk_io_key != ''){
+                        iostat_select = iostat_data[disk_io_key];
+                    }
+                    index.iostat.add(iostat_select.read_bytes,iostat_select.write_bytes, iostat_select);
+                    index.iostat.render();
+                    index.iostat.renderSelect(net);
+                    $("#readBytes").html(toSize(iostat_select.read_bytes));
+                    $("#writeBytes").html(toSize(iostat_select.write_bytes));
+                    $("#diskIops").html(iostat_select.read_count+":"+iostat_select.write_count+ " 次");
+                    $("#diskTime").html(iostat_select.read_time+":"+iostat_select.write_time +" ms");
+
+                    $("#core").html(net.cpu[1] + " " + lan.index.cpu_core);
+                    $("#state").html(net.cpu[0]);
+                    setcolor(net.cpu[0], "#state", 30, 70, 90);
+                    getLoad(net.load);
+                    setMemImg(net.mem);
+                    setImg();
+                    showCpuTips(net);
+                }
+            },'json').always(function(){
+                setTimeout(poll, 3000);  // 完成后再计下一次, 防堆积
+            });
+        })();
     },
     init: function(){
         index.net.init();
