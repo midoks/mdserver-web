@@ -230,23 +230,30 @@ def startPHPVersion(version):
             return False
 
         # 尝试重载服务
-        os.system(fpm + ' reload')
+        subprocess.run([fpm, 'reload'],
+                       stdout=subprocess.PIPE, stderr=subprocess.PIPE)
         if checkPHPVersion(version):
             return True
         # 尝试重启服务
         cgi = '/tmp/php-cgi-' + version + '.sock'
         pid = server_dir + '/php/' + version + '/var/run/php-fpm.pid'
-        data = mw.execShell("ps -ef | grep php/" + version +" | grep -v grep|grep -v python |awk '{print $2}'")
+        data = mw.execShell("ps -ef | grep " + mw.quote("php/" + version) + " | grep -v grep|grep -v python |awk '{print $2}'")
         if data[0] != '':
-            subprocess.run(["ps", "-ef", "|", "grep", "php/" + version, "|", "grep", "-v", "grep|grep", "-v", "python", "|", "awk", "'{print $2}'", "|", "xargs", "kill"],
-                           stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+            for proc in psutil.process_iter(['pid', 'cmdline']):
+                try:
+                    cmdline = ' '.join(proc.info['cmdline'] or [])
+                    if ('php/' + version) in cmdline and 'grep' not in cmdline and 'python' not in cmdline:
+                        proc.kill()
+                except Exception:
+                    continue
         time.sleep(0.5)
         if not os.path.exists(cgi):
-            os.system('rm -f ' + cgi)
+            subprocess.run(['rm', '-f', cgi],
+                           stdout=subprocess.PIPE, stderr=subprocess.PIPE)
         if not os.path.exists(pid):
             subprocess.run(['rm', '-f', pid],
                            stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-        subprocess.run([fpm', 'start'],
+        subprocess.run([fpm, 'start'],
                            stdout=subprocess.PIPE, stderr=subprocess.PIPE)
         if checkPHPVersion(version):
             return True
