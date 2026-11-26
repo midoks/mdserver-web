@@ -28,17 +28,11 @@ function myPost(method, args,callback, title){
 }
 
 function myPostN(method,args,callback, title){
-
     var _args = null; 
     if (typeof(args) == 'string'){
         _args = JSON.stringify(toArrayObject(args));
     } else {
         _args = JSON.stringify(args);
-    }
-
-    var _title = '正在获取...';
-    if (typeof(title) != 'undefined'){
-        _title = title;
     }
     $.post('/plugins/run', {name:'mysql', func:method, args:_args}, function(data) {
         if(typeof(callback) == 'function'){
@@ -1524,7 +1518,7 @@ function myLogs(){
         });
     })
 
-    myPost('error_log', 'p=1', function(data){
+    myPostN('error_log', 'p=1', function(data){
         var rdata = $.parseJSON(data.data);
         var error_body = '';
         if (rdata.status){
