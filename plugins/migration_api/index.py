@@ -48,7 +48,8 @@ class classApi:
 
     def post(self, endpoint, request_data, timeout=60):
         url = self.__MW_PANEL + endpoint  
-        post_data = requests.post(url, data=request_data, headers={
+        # timeout 参数透传给 requests, 避免远端面板无响应时永久阻塞
+        post_data = requests.post(url, data=request_data, timeout=timeout, headers={
             'app-id':self.__MW_APP_ID,
             'app-secret':self.__MW_APP_SECRET
         })
