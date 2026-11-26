@@ -55,7 +55,7 @@ def set_timezone():
         return mw.returnData(False, '无效的时区: ' + timezone)
 
     # 白名单校验后仍做一次 shell 转义, 双重防护
-    data = mw.execShell('timedatectl set-timezone ' + shlex.quote(timezone))
+    data = mw.execShell('timedatectl set-timezone ' + mw.sqlIdent(timezone))
     if data[1].strip() != '':
         return mw.returnData(False, '设置失败:' + data[1].strip())
     return mw.returnData(True, '设置成功!')
