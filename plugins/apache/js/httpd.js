@@ -35,9 +35,9 @@ function orPluginSetService(_name ,status, version){
         '</span><span style="color: '+
         (status?'#20a53a;':'red;')+
         ' margin-left: 3px;" class="glyphicon ' + (status?'glyphicon glyphicon-play':'glyphicon-pause')+'"></span></p><div class="sfm-opt">\
-            <button class="btn btn-default btn-sm" onclick="orPluginOpService(\''+_name+'\',\''+(status?'stop':'start')+'\',\''+version+'\')">'+(status?'停止':'启动')+'</button>\
-            <button class="btn btn-default btn-sm" onclick="orPluginOpService(\''+_name+'\',\'restart\',\''+version+'\',\'yes\')">重启</button>\
-            <button class="btn btn-default btn-sm" onclick="orPluginOpService(\''+_name+'\',\'reload\',\''+version+'\')">重载配置</button>\
+            <button class="btn btn-default btn-sm" onclick="orPluginOpService(\''+jsEncode(_name)+'\',\''+(status?'stop':'start')+'\',\''+jsEncode(version)+'\')">'+(status?'停止':'启动')+'</button>\
+            <button class="btn btn-default btn-sm" onclick="orPluginOpService(\''+jsEncode(_name)+'\',\'restart\',\''+jsEncode(version)+'\',\'yes\')">重启</button>\
+            <button class="btn btn-default btn-sm" onclick="orPluginOpService(\''+jsEncode(_name)+'\',\'reload\',\''+jsEncode(version)+'\')">重载配置</button>\
         </div>'; 
     $(".soft-man-con").html(serviceCon);
 }
@@ -126,31 +126,31 @@ function getHttpdStatus() {
             }
 
             var con = "<div><table class='table table-hover table-bordered'>\
-                            <tr><th>服务器版本(ServerVersion)</th><td>" + (rdata.ServerVersion || '-') + "</td></tr>\
-                            <tr><th>服务器MPM(ServerMPM)</th><td>" + (rdata.ServerMPM || '-') + "</td></tr>\
-                            <tr><th>服务器构建时间(Server Built)</th><td>" + (rdata['Server Built'] || '-') + "</td></tr>\
-                            <tr><th>当前时间(CurrentTime)</th><td>" + (rdata.CurrentTime || '-') + "</td></tr>\
-                            <tr><th>重启时间(RestartTime)</th><td>" + (rdata.RestartTime || '-') + "</td></tr>\
-                            <tr><th>服务器运行时间(ServerUptime)</th><td>" + (rdata.ServerUptime || '-') + "</td></tr>\
-                            <tr><th>服务器运行秒数(ServerUptimeSeconds)</th><td>" + (rdata.ServerUptimeSeconds || '-') + "</td></tr>\
-                            <tr><th>1分钟负载(Load1)</th><td>" + (rdata.Load1 || '-') + "</td></tr>\
-                            <tr><th>5分钟负载(Load5)</th><td>" + (rdata.Load5 || '-') + "</td></tr>\
-                            <tr><th>15分钟负载(Load15)</th><td>" + (rdata.Load15 || '-') + "</td></tr>\
-                            <tr><th>总访问次数(Total Accesses)</th><td>" + (rdata['Total Accesses'] || '-') + "</td></tr>\
-                            <tr><th>总流量(Total kBytes)</th><td>" + (rdata['Total kBytes'] || '-') + " KB</td></tr>\
-                            <tr><th>总请求时间(Total Duration)</th><td>" + (rdata['Total Duration'] || '-') + "</td></tr>\
-                            <tr><th>CPU用户时间(CPUUser)</th><td>" + (rdata.CPUUser || '-') + "</td></tr>\
-                            <tr><th>CPU系统时间(CPUSystem)</th><td>" + (rdata.CPUSystem || '-') + "</td></tr>\
-                            <tr><th>CPU负载(CPULoad)</th><td>" + (rdata.CPULoad || '-') + "</td></tr>\
-                            <tr><th>每秒请求数(ReqPerSec)</th><td>" + (rdata.ReqPerSec || '-') + "</td></tr>\
-                            <tr><th>每秒流量(BytesPerSec)</th><td>" + (rdata.BytesPerSec || '-') + "</td></tr>\
-                            <tr><th>每请求流量(BytesPerReq)</th><td>" + (rdata.BytesPerReq || '-') + "</td></tr>\
-                            <tr><th>每请求时间(DurationPerReq)</th><td>" + (rdata.DurationPerReq || '-') + "</td></tr>\
-                            <tr><th>活动工作进程(BusyWorkers)</th><td>" + (rdata.BusyWorkers || '-') + "</td></tr>\
-                            <tr><th>优雅关闭进程(GracefulWorkers)</th><td>" + (rdata.GracefulWorkers || '-') + "</td></tr>\
-                            <tr><th>空闲工作进程(IdleWorkers)</th><td>" + (rdata.IdleWorkers || '-') + "</td></tr>\
-                            <tr><th>进程数(Processes)</th><td>" + (rdata.Processes || '-') + "</td></tr>\
-                            <tr><th>总连接数(ConnsTotal)</th><td>" + (rdata.ConnsTotal || '-') + "</td></tr>\
+                            <tr><th>服务器版本(ServerVersion)</th><td>" + htmlEncode(rdata.ServerVersion || '-') + "</td></tr>\
+                            <tr><th>服务器MPM(ServerMPM)</th><td>" + htmlEncode(rdata.ServerMPM || '-') + "</td></tr>\
+                            <tr><th>服务器构建时间(Server Built)</th><td>" + htmlEncode(rdata['Server Built'] || '-') + "</td></tr>\
+                            <tr><th>当前时间(CurrentTime)</th><td>" + htmlEncode(rdata.CurrentTime || '-') + "</td></tr>\
+                            <tr><th>重启时间(RestartTime)</th><td>" + htmlEncode(rdata.RestartTime || '-') + "</td></tr>\
+                            <tr><th>服务器运行时间(ServerUptime)</th><td>" + htmlEncode(rdata.ServerUptime || '-') + "</td></tr>\
+                            <tr><th>服务器运行秒数(ServerUptimeSeconds)</th><td>" + htmlEncode(rdata.ServerUptimeSeconds || '-') + "</td></tr>\
+                            <tr><th>1分钟负载(Load1)</th><td>" + htmlEncode(rdata.Load1 || '-') + "</td></tr>\
+                            <tr><th>5分钟负载(Load5)</th><td>" + htmlEncode(rdata.Load5 || '-') + "</td></tr>\
+                            <tr><th>15分钟负载(Load15)</th><td>" + htmlEncode(rdata.Load15 || '-') + "</td></tr>\
+                            <tr><th>总访问次数(Total Accesses)</th><td>" + htmlEncode(rdata['Total Accesses'] || '-') + "</td></tr>\
+                            <tr><th>总流量(Total kBytes)</th><td>" + htmlEncode(rdata['Total kBytes'] || '-') + " KB</td></tr>\
+                            <tr><th>总请求时间(Total Duration)</th><td>" + htmlEncode(rdata['Total Duration'] || '-') + "</td></tr>\
+                            <tr><th>CPU用户时间(CPUUser)</th><td>" + htmlEncode(rdata.CPUUser || '-') + "</td></tr>\
+                            <tr><th>CPU系统时间(CPUSystem)</th><td>" + htmlEncode(rdata.CPUSystem || '-') + "</td></tr>\
+                            <tr><th>CPU负载(CPULoad)</th><td>" + htmlEncode(rdata.CPULoad || '-') + "</td></tr>\
+                            <tr><th>每秒请求数(ReqPerSec)</th><td>" + htmlEncode(rdata.ReqPerSec || '-') + "</td></tr>\
+                            <tr><th>每秒流量(BytesPerSec)</th><td>" + htmlEncode(rdata.BytesPerSec || '-') + "</td></tr>\
+                            <tr><th>每请求流量(BytesPerReq)</th><td>" + htmlEncode(rdata.BytesPerReq || '-') + "</td></tr>\
+                            <tr><th>每请求时间(DurationPerReq)</th><td>" + htmlEncode(rdata.DurationPerReq || '-') + "</td></tr>\
+                            <tr><th>活动工作进程(BusyWorkers)</th><td>" + htmlEncode(rdata.BusyWorkers || '-') + "</td></tr>\
+                            <tr><th>优雅关闭进程(GracefulWorkers)</th><td>" + htmlEncode(rdata.GracefulWorkers || '-') + "</td></tr>\
+                            <tr><th>空闲工作进程(IdleWorkers)</th><td>" + htmlEncode(rdata.IdleWorkers || '-') + "</td></tr>\
+                            <tr><th>进程数(Processes)</th><td>" + htmlEncode(rdata.Processes || '-') + "</td></tr>\
+                            <tr><th>总连接数(ConnsTotal)</th><td>" + htmlEncode(rdata.ConnsTotal || '-') + "</td></tr>\
                          </table></div>";
             $(".soft-man-con").html(con);
         }catch(err){
@@ -191,12 +191,12 @@ function setOpCfg(){
         var mlist = '';
         for (var i = 0; i < rdata.length; i++) {
             var w = '70'
-            var ibody = '<input style="width: ' + w + 'px;" class="bt-input-text mr5" name="' + rdata[i].name + '" value="' + rdata[i].value + '" type="text" >';
+            var ibody = '<input style="width: ' + w + 'px;" class="bt-input-text mr5" name="' + htmlEncode(rdata[i].name) + '" value="' + htmlEncode(rdata[i].value) + '" type="text" >';
             switch (rdata[i].type) {
                 case 0:
                     var selected_1 = (rdata[i].value == 1) ? 'selected' : '';
                     var selected_0 = (rdata[i].value == 0) ? 'selected' : '';
-                    ibody = '<select class="bt-input-text mr5" name="' + rdata[i].name + '" style="width: ' + w + 'px;">\
+                    ibody = '<select class="bt-input-text mr5" name="' + htmlEncode(rdata[i].name) + '" style="width: ' + w + 'px;">\
                         <option value="1" ' + selected_1 + '>开启</option>\
                         <option value="0" ' + selected_0 + '>关闭</option>\
                     </select>';
@@ -204,13 +204,13 @@ function setOpCfg(){
                 case 1:
                     var selected_1 = (rdata[i].value == 'on') ? 'selected' : '';
                     var selected_0 = (rdata[i].value == 'off') ? 'selected' : '';
-                    ibody = '<select class="bt-input-text mr5" name="' + rdata[i].name + '" style="width: ' + w + 'px;">\
+                    ibody = '<select class="bt-input-text mr5" name="' + htmlEncode(rdata[i].name) + '" style="width: ' + w + 'px;">\
                         <option value="on" ' + selected_1 + '>开启</option>\
                         <option value="off" ' + selected_0 + '>关闭</option>\
                     </select>';
                     break;
             }
-            mlist += '<p style="margin-top:15px;"><span>' + rdata[i].name + '</span>' + ibody + "<b class='unit c9'>"+rdata[i].unit+"</b>" +', <font class="c9">' + rdata[i].ps + '</font></p>';
+            mlist += '<p style="margin-top:15px;"><span>' + htmlEncode(rdata[i].name) + '</span>' + ibody + "<b class='unit c9'>"+htmlEncode(rdata[i].unit)+"</b>" +', <font class="c9">' + htmlEncode(rdata[i].ps) + '</font></p>';
         }
         var con = '<style>.conf_p p{margin-bottom: 2px}</style><div class="conf_p" style="margin-bottom:0">\
                         ' + mlist + '\

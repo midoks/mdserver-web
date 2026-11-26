@@ -68,20 +68,20 @@ function redisStatus(version) {
                         <table class="table table-hover table-bordered" style="width: 490px;">\
                         <thead><th>字段</th><th>当前值</th><th>说明</th></thead>\
                         <tbody>\
-                            <tr><th>uptime_in_days</th><td>' + rdata.uptime_in_days + '</td><td>已运行天数</td></tr>\
-                            <tr><th>tcp_port</th><td>' + rdata.tcp_port + '</td><td>当前监听端口</td></tr>\
-                            <tr><th>connected_clients</th><td>' + rdata.connected_clients + '</td><td>连接的客户端数量</td></tr>\
+                            <tr><th>uptime_in_days</th><td>' + htmlEncode(rdata.uptime_in_days) + '</td><td>已运行天数</td></tr>\
+                            <tr><th>tcp_port</th><td>' + htmlEncode(rdata.tcp_port) + '</td><td>当前监听端口</td></tr>\
+                            <tr><th>connected_clients</th><td>' + htmlEncode(rdata.connected_clients) + '</td><td>连接的客户端数量</td></tr>\
                             <tr><th>used_memory_rss</th><td>' + toSize(rdata.used_memory_rss) + '</td><td>Redis当前占用的系统内存总量</td></tr>\
                             <tr><th>used_memory</th><td>' + toSize(rdata.used_memory) + '</td><td>Redis当前已分配的内存总量</td></tr>\
                             <tr><th>used_memory_peak</th><td>' + toSize(rdata.used_memory_peak) + '</td><td>Redis历史分配内存的峰值</td></tr>\
-                            <tr><th>mem_fragmentation_ratio</th><td>' + rdata.mem_fragmentation_ratio + '%</td><td>内存碎片比率</td></tr>\
-                            <tr><th>total_connections_received</th><td>' + rdata.total_connections_received + '</td><td>运行以来连接过的客户端的总数量</td></tr>\
-                            <tr><th>total_commands_processed</th><td>' + rdata.total_commands_processed + '</td><td>运行以来执行过的命令的总数量</td></tr>\
-                            <tr><th>instantaneous_ops_per_sec</th><td>' + rdata.instantaneous_ops_per_sec + '</td><td>服务器每秒钟执行的命令数量</td></tr>\
-                            <tr><th>keyspace_hits</th><td>' + rdata.keyspace_hits + '</td><td>查找数据库键成功的次数</td></tr>\
-                            <tr><th>keyspace_misses</th><td>' + rdata.keyspace_misses + '</td><td>查找数据库键失败的次数</td></tr>\
+                            <tr><th>mem_fragmentation_ratio</th><td>' + htmlEncode(rdata.mem_fragmentation_ratio) + '%</td><td>内存碎片比率</td></tr>\
+                            <tr><th>total_connections_received</th><td>' + htmlEncode(rdata.total_connections_received) + '</td><td>运行以来连接过的客户端的总数量</td></tr>\
+                            <tr><th>total_commands_processed</th><td>' + htmlEncode(rdata.total_commands_processed) + '</td><td>运行以来执行过的命令的总数量</td></tr>\
+                            <tr><th>instantaneous_ops_per_sec</th><td>' + htmlEncode(rdata.instantaneous_ops_per_sec) + '</td><td>服务器每秒钟执行的命令数量</td></tr>\
+                            <tr><th>keyspace_hits</th><td>' + htmlEncode(rdata.keyspace_hits) + '</td><td>查找数据库键成功的次数</td></tr>\
+                            <tr><th>keyspace_misses</th><td>' + htmlEncode(rdata.keyspace_misses) + '</td><td>查找数据库键失败的次数</td></tr>\
                             <tr><th>hit</th><td>' + hit + '%</td><td>查找数据库键命中率</td></tr>\
-                            <tr><th>latest_fork_usec</th><td>' + rdata.latest_fork_usec + '</td><td>最近一次 fork() 操作耗费的微秒数</td></tr>\
+                            <tr><th>latest_fork_usec</th><td>' + htmlEncode(rdata.latest_fork_usec) + '</td><td>最近一次 fork() 操作耗费的微秒数</td></tr>\
                         <tbody>\
                 </table></div>';
         $(".soft-man-con").html(con);
@@ -99,24 +99,24 @@ function getRedisConfig(version) {
         for (var i = 0; i < rdata.length; i++) {
             var w = '70'
             if (rdata[i].name == 'error_reporting') w = '250';
-            var ibody = '<input style="width: ' + w + 'px;" class="bt-input-text mr5" name="' + rdata[i].name + '" value="' + rdata[i].value + '" type="text" >';
+            var ibody = '<input style="width: ' + w + 'px;" class="bt-input-text mr5" name="' + htmlEncode(rdata[i].name) + '" value="' + htmlEncode(rdata[i].value) + '" type="text" >';
             switch (rdata[i].type) {
                 case 0:
                     var selected_1 = (rdata[i].value == 1) ? 'selected' : '';
                     var selected_0 = (rdata[i].value == 0) ? 'selected' : '';
-                    ibody = '<select class="bt-input-text mr5" name="' + rdata[i].name + '" style="width: ' + w + 'px;"><option value="1" ' + selected_1 + '>开启</option><option value="0" ' + selected_0 + '>关闭</option></select>'
+                    ibody = '<select class="bt-input-text mr5" name="' + htmlEncode(rdata[i].name) + '" style="width: ' + w + 'px;"><option value="1" ' + selected_1 + '>开启</option><option value="0" ' + selected_0 + '>关闭</option></select>'
                     break;
                 case 1:
                     var selected_1 = (rdata[i].value == 'On') ? 'selected' : '';
                     var selected_0 = (rdata[i].value == 'Off') ? 'selected' : '';
-                    ibody = '<select class="bt-input-text mr5" name="' + rdata[i].name + '" style="width: ' + w + 'px;"><option value="On" ' + selected_1 + '>开启</option><option value="Off" ' + selected_0 + '>关闭</option></select>'
+                    ibody = '<select class="bt-input-text mr5" name="' + htmlEncode(rdata[i].name) + '" style="width: ' + w + 'px;"><option value="On" ' + selected_1 + '>开启</option><option value="Off" ' + selected_0 + '>关闭</option></select>'
                     break;
             }
-            mlist += '<p><span>' + rdata[i].name + '</span>' + ibody + ', <font>' + rdata[i].ps + '</font></p>'
+            mlist += '<p><span>' + htmlEncode(rdata[i].name) + '</span>' + ibody + ', <font>' + htmlEncode(rdata[i].ps) + '</font></p>'
         }
         var con = '<style>.conf_p p{margin-bottom: 2px}</style><div class="conf_p" style="margin-bottom:0">' + mlist + '\
-                        <div style="margin-top:10px; padding-right:15px" class="text-right"><button class="btn btn-success btn-sm mr5" onclick="getRedisConfig(\'' + version + '\')">刷新</button>\
-                        <button class="btn btn-success btn-sm" onclick="submitConf(\'' + version + '\')">保存</button></div>\
+                        <div style="margin-top:10px; padding-right:15px" class="text-right"><button class="btn btn-success btn-sm mr5" onclick="getRedisConfig(\'' + jsEncode(version) + '\')">刷新</button>\
+                        <button class="btn btn-success btn-sm" onclick="submitConf(\'' + jsEncode(version) + '\')">保存</button></div>\
                     </div>'
         $(".soft-man-con").html(con);
     });

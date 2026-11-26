@@ -14,52 +14,52 @@ function recycleBin(type){
         switch(type){
             case 1:
                 for(var i=0;i<rdata.dirs.length;i++){
-                    var shortwebname = rdata.dirs[i].name.replace(/'/,"\\'");
+                    var shortwebname = rdata.dirs[i].name;
                     var shortpath = rdata.dirs[i].dname;
                     if(shortwebname.length > 20) shortwebname = shortwebname.substring(0, 20) + "...";
                     if(shortpath.length > 20) shortpath = shortpath.substring(0, 20) + "...";
                     body += '<tr>\
-                        <td><span class=\'ico ico-folder\'></span><span class="tname" title="'+rdata.dirs[i].name+'">'+shortwebname+'</span></td>\
-                        <td><span title="'+rdata.dirs[i].dname+'">'+shortpath+'</span></td>\
+                        <td><span class=\'ico ico-folder\'></span><span class="tname" title="'+htmlEncode(rdata.dirs[i].name)+'">'+htmlEncode(shortwebname)+'</span></td>\
+                        <td><span title="'+htmlEncode(rdata.dirs[i].dname)+'">'+htmlEncode(shortpath)+'</span></td>\
                         <td>'+toSize(rdata.dirs[i].size)+'</td>\
                         <td>'+getLocalTime(rdata.dirs[i].time)+'</td>\
                         <td style="text-align: right;">\
-                            <a class="btlink" href="javascript:;" onclick="reRecycleBin(\'' + rdata.dirs[i].rname.replace(/'/,"\\'") + '\',this)">'+lan.files.recycle_bin_re+'</a>\
-                             | <a class="btlink" href="javascript:;" onclick="delRecycleBin(\'' + rdata.dirs[i].rname.replace(/'/,"\\'") + '\',this)">'+lan.files.recycle_bin_del+'</a>\
+                            <a class="btlink" href="javascript:;" onclick="reRecycleBin(\''+jsEncode(rdata.dirs[i].rname)+'\',this)">'+lan.files.recycle_bin_re+'</a>\
+                             | <a class="btlink" href="javascript:;" onclick="delRecycleBin(\''+jsEncode(rdata.dirs[i].rname)+'\',this)">'+lan.files.recycle_bin_del+'</a>\
                         </td>\
                     </tr>';
                 }
                 for(var i=0;i<rdata.files.length;i++){
                     if(rdata.files[i].name.indexOf('BTDB_') != -1){
-                        var shortwebname = rdata.files[i].name.replace(/'/,"\\'");
+                        var shortwebname = rdata.files[i].name;
                         var shortpath = rdata.files[i].dname;
                         if(shortwebname.length > 20) shortwebname = shortwebname.substring(0, 20) + "...";
                         if(shortpath.length > 20) shortpath = shortpath.substring(0, 20) + "...";
                         body += '<tr>\
-                            <td><span class="ico ico-'+(getExtName(rdata.files[i].name))+'"></span><span class="tname" title="'+rdata.files[i].name+'">'+shortwebname.replace('BTDB_','')+'</span></td>\
-                            <td><span title="'+rdata.files[i].dname+'">mysql://'+shortpath.replace('BTDB_','')+'</span></td>\
+                            <td><span class="ico ico-'+(getExtName(rdata.files[i].name))+'"></span><span class="tname" title="'+htmlEncode(rdata.files[i].name)+'">'+htmlEncode(shortwebname.replace('BTDB_',''))+'</span></td>\
+                            <td><span title="'+htmlEncode(rdata.files[i].dname)+'">mysql://'+htmlEncode(shortpath.replace('BTDB_',''))+'</span></td>\
                             <td>-</td>\
                             <td>'+getLocalTime(rdata.files[i].time)+'</td>\
                             <td style="text-align: right;">\
-                                <a class="btlink" href="javascript:;" onclick="reRecycleBin(\'' + rdata.files[i].rname.replace(/'/,"\\'") + '\',this)">'+lan.files.recycle_bin_re+'</a>\
-                                 | <a class="btlink" href="javascript:;" onclick="delRecycleBin(\'' + rdata.files[i].rname.replace(/'/,"\\'") + '\',this)">'+lan.files.recycle_bin_del+'</a>\
+                                <a class="btlink" href="javascript:;" onclick="reRecycleBin(\''+jsEncode(rdata.files[i].rname)+'\',this)">'+lan.files.recycle_bin_re+'</a>\
+                                 | <a class="btlink" href="javascript:;" onclick="delRecycleBin(\''+jsEncode(rdata.files[i].rname)+'\',this)">'+lan.files.recycle_bin_del+'</a>\
                             </td>\
                         </tr>';
                             
                         continue;
                     }
-                    var shortwebname = rdata.files[i].name.replace(/'/,"\\'");
+                    var shortwebname = rdata.files[i].name;
                     var shortpath = rdata.files[i].dname;
                     if(shortwebname.length > 20) shortwebname = shortwebname.substring(0, 20) + "...";
                     if(shortpath.length > 20) shortpath = shortpath.substring(0, 20) + "...";
                     body += '<tr>\
-                                <td><span class="ico ico-'+(getExtName(rdata.files[i].name))+'"></span><span class="tname" title="'+rdata.files[i].name+'">'+shortwebname+'</span></td>\
-                                <td><span title="'+rdata.files[i].dname+'">'+shortpath+'</span></td>\
+                                <td><span class="ico ico-'+(getExtName(rdata.files[i].name))+'"></span><span class="tname" title="'+htmlEncode(rdata.files[i].name)+'">'+htmlEncode(shortwebname)+'</span></td>\
+                                <td><span title="'+htmlEncode(rdata.files[i].dname)+'">'+htmlEncode(shortpath)+'</span></td>\
                                 <td>'+toSize(rdata.files[i].size)+'</td>\
                                 <td>'+getLocalTime(rdata.files[i].time)+'</td>\
                                 <td style="text-align: right;">\
-                                    <a class="btlink" href="javascript:;" onclick="reRecycleBin(\'' + rdata.files[i].rname.replace(/'/,"\\'") + '\',this)">'+lan.files.recycle_bin_re+'</a>\
-                                     | <a class="btlink" href="javascript:;" onclick="delRecycleBin(\'' + rdata.files[i].rname.replace(/'/,"\\'") + '\',this)">'+lan.files.recycle_bin_del+'</a>\
+                                    <a class="btlink" href="javascript:;" onclick="reRecycleBin(\''+jsEncode(rdata.files[i].rname)+'\',this)">'+lan.files.recycle_bin_re+'</a>\
+                                     | <a class="btlink" href="javascript:;" onclick="delRecycleBin(\''+jsEncode(rdata.files[i].rname)+'\',this)">'+lan.files.recycle_bin_del+'</a>\
                                 </td>\
                             </tr>'
                 }
@@ -68,18 +68,18 @@ function recycleBin(type){
                 break;
             case 2:
                 for(var i=0;i<rdata.dirs.length;i++){
-                    var shortwebname = rdata.dirs[i].name.replace(/'/,"\\'");
+                    var shortwebname = rdata.dirs[i].name;
                     var shortpath = rdata.dirs[i].dname;
                     if(shortwebname.length > 20) shortwebname = shortwebname.substring(0, 20) + "...";
                     if(shortpath.length > 20) shortpath = shortpath.substring(0, 20) + "...";
                     body += '<tr>\
-                        <td><span class=\'ico ico-folder\'></span><span class="tname" title="'+rdata.dirs[i].name+'">'+shortwebname+'</span></td>\
-                        <td><span title="'+rdata.dirs[i].dname+'">'+shortpath+'</span></td>\
+                        <td><span class=\'ico ico-folder\'></span><span class="tname" title="'+htmlEncode(rdata.dirs[i].name)+'">'+htmlEncode(shortwebname)+'</span></td>\
+                        <td><span title="'+htmlEncode(rdata.dirs[i].dname)+'">'+htmlEncode(shortpath)+'</span></td>\
                         <td>'+toSize(rdata.dirs[i].size)+'</td>\
                         <td>'+getLocalTime(rdata.dirs[i].time)+'</td>\
                         <td style="text-align: right;">\
-                            <a class="btlink" href="javascript:;" onclick="reRecycleBin(\'' + rdata.dirs[i].rname.replace(/'/,"\\'") + '\',this)">'+lan.files.recycle_bin_re+'</a>\
-                             | <a class="btlink" href="javascript:;" onclick="delRecycleBin(\'' + rdata.dirs[i].rname.replace(/'/,"\\'") + '\',this)">'+lan.files.recycle_bin_del+'</a>\
+                            <a class="btlink" href="javascript:;" onclick="reRecycleBin(\''+jsEncode(rdata.dirs[i].rname)+'\',this)">'+lan.files.recycle_bin_re+'</a>\
+                             | <a class="btlink" href="javascript:;" onclick="delRecycleBin(\''+jsEncode(rdata.dirs[i].rname)+'\',this)">'+lan.files.recycle_bin_del+'</a>\
                         </td>\
                     </tr>'
                 }
@@ -89,18 +89,18 @@ function recycleBin(type){
             case 3:
                 for(var i=0;i<rdata.files.length;i++){
                     if(rdata.files[i].name.indexOf('BTDB_') != -1) continue;
-                    var shortwebname = rdata.files[i].name.replace(/'/,"\\'");
+                    var shortwebname = rdata.files[i].name;
                     var shortpath = rdata.files[i].dname;
                     if(shortwebname.length > 20) shortwebname = shortwebname.substring(0, 20) + "...";
                     if(shortpath.length > 20) shortpath = shortpath.substring(0, 20) + "...";
                     body += '<tr>\
-                        <td><span class="ico ico-'+(getExtName(rdata.files[i].name))+'"></span><span class="tname" title="'+rdata.files[i].name+'">'+shortwebname+'</span></td>\
-                        <td><span title="'+rdata.files[i].dname+'">'+shortpath+'</span></td>\
+                        <td><span class="ico ico-'+(getExtName(rdata.files[i].name))+'"></span><span class="tname" title="'+htmlEncode(rdata.files[i].name)+'">'+htmlEncode(shortwebname)+'</span></td>\
+                        <td><span title="'+htmlEncode(rdata.files[i].dname)+'">'+htmlEncode(shortpath)+'</span></td>\
                         <td>'+toSize(rdata.files[i].size)+'</td>\
                         <td>'+getLocalTime(rdata.files[i].time)+'</td>\
                         <td style="text-align: right;">\
-                            <a class="btlink" href="javascript:;" onclick="reRecycleBin(\'' + rdata.files[i].rname.replace(/'/,"\\'") + '\',this)">'+lan.files.recycle_bin_re+'</a>\
-                             | <a class="btlink" href="javascript:;" onclick="delRecycleBin(\'' + rdata.files[i].rname.replace(/'/,"\\'") + '\',this)">'+lan.files.recycle_bin_del+'</a>\
+                            <a class="btlink" href="javascript:;" onclick="reRecycleBin(\''+jsEncode(rdata.files[i].rname)+'\',this)">'+lan.files.recycle_bin_re+'</a>\
+                             | <a class="btlink" href="javascript:;" onclick="delRecycleBin(\''+jsEncode(rdata.files[i].rname)+'\',this)">'+lan.files.recycle_bin_del+'</a>\
                         </td>\
                     </tr>';
                 }
@@ -110,18 +110,18 @@ function recycleBin(type){
             case 4:
                 for(var i=0;i<rdata.files.length;i++){
                     if(reisImage(getFileName(rdata.files[i].name))){
-                        var shortwebname = rdata.files[i].name.replace(/'/,"\\'");
+                        var shortwebname = rdata.files[i].name;
                         var shortpath = rdata.files[i].dname;
                         if(shortwebname.length > 20) shortwebname = shortwebname.substring(0, 20) + "...";
                         if(shortpath.length > 20) shortpath = shortpath.substring(0, 20) + "...";
                         body += '<tr>\
-                            <td><span class="ico ico-'+(getExtName(rdata.files[i].name))+'"></span><span class="tname" title="'+rdata.files[i].name+'">'+shortwebname+'</span></td>\
-                            <td><span title="'+rdata.files[i].dname+'">'+shortpath+'</span></td>\
+                            <td><span class="ico ico-'+(getExtName(rdata.files[i].name))+'"></span><span class="tname" title="'+htmlEncode(rdata.files[i].name)+'">'+htmlEncode(shortwebname)+'</span></td>\
+                            <td><span title="'+htmlEncode(rdata.files[i].dname)+'">'+htmlEncode(shortpath)+'</span></td>\
                             <td>'+toSize(rdata.files[i].size)+'</td>\
                             <td>'+getLocalTime(rdata.files[i].time)+'</td>\
                             <td style="text-align: right;">\
-                                <a class="btlink" href="javascript:;" onclick="reRecycleBin(\'' + rdata.files[i].rname.replace(/'/,"\\'") + '\',this)">'+lan.files.recycle_bin_re+'</a>\
-                                 | <a class="btlink" href="javascript:;" onclick="delRecycleBin(\'' + rdata.files[i].rname.replace(/'/,"\\'") + '\',this)">'+lan.files.recycle_bin_del+'</a>\
+                                <a class="btlink" href="javascript:;" onclick="reRecycleBin(\''+jsEncode(rdata.files[i].rname)+'\',this)">'+lan.files.recycle_bin_re+'</a>\
+                                 | <a class="btlink" href="javascript:;" onclick="delRecycleBin(\''+jsEncode(rdata.files[i].rname)+'\',this)">'+lan.files.recycle_bin_del+'</a>\
                             </td>\
                         </tr>';
                     }
@@ -133,18 +133,18 @@ function recycleBin(type){
                 for(var i=0;i<rdata.files.length;i++){
                     if(rdata.files[i].name.indexOf('BTDB_') != -1) continue;
                     if(!(reisImage(getFileName(rdata.files[i].name)))){
-                        var shortwebname = rdata.files[i].name.replace(/'/,"\\'");
+                        var shortwebname = rdata.files[i].name;
                         var shortpath = rdata.files[i].dname;
                         if(shortwebname.length > 20) shortwebname = shortwebname.substring(0, 20) + "...";
                         if(shortpath.length > 20) shortpath = shortpath.substring(0, 20) + "...";
                         body += '<tr>\
-                                <td><span class="ico ico-'+(getExtName(rdata.files[i].name))+'"></span><span class="tname" title="'+rdata.files[i].name+'">'+shortwebname+'</span></td>\
-                                <td><span title="'+rdata.files[i].dname+'">'+shortpath+'</span></td>\
+                                <td><span class="ico ico-'+(getExtName(rdata.files[i].name))+'"></span><span class="tname" title="'+htmlEncode(rdata.files[i].name)+'">'+htmlEncode(shortwebname)+'</span></td>\
+                                <td><span title="'+htmlEncode(rdata.files[i].dname)+'">'+htmlEncode(shortpath)+'</span></td>\
                                 <td>'+toSize(rdata.files[i].size)+'</td>\
                                 <td>'+getLocalTime(rdata.files[i].time)+'</td>\
                                 <td style="text-align: right;">\
-                                    <a class="btlink" href="javascript:;" onclick="reRecycleBin(\'' + rdata.files[i].rname.replace(/'/,"\\'") + '\',this)">'+lan.files.recycle_bin_re+'</a>\
-                                     | <a class="btlink" href="javascript:;" onclick="delRecycleBin(\'' + rdata.files[i].rname.replace(/'/,"\\'") + '\',this)">'+lan.files.recycle_bin_del+'</a>\
+                                    <a class="btlink" href="javascript:;" onclick="reRecycleBin(\''+jsEncode(rdata.files[i].rname)+'\',this)">'+lan.files.recycle_bin_re+'</a>\
+                                     | <a class="btlink" href="javascript:;" onclick="delRecycleBin(\''+jsEncode(rdata.files[i].rname)+'\',this)">'+lan.files.recycle_bin_del+'</a>\
                                 </td>\
                             </tr>'
                     }
@@ -303,7 +303,7 @@ function openFilename(obj){
             maxmin:true,
             shadeClose: true,
             content: '<iframe width="100%" height="100%"\
-                src="'+url+'"\
+                src="'+htmlEncode(url)+'"\
                 frameborder="0"\
                 border="0"\
                 marginwidth="0"\
@@ -421,7 +421,6 @@ function getFiles(Path) {
             var fmp = rdata.dir[i].split(";");
             var cnametext =fmp[0] + fmp[5];
 
-            fmp[0] = fmp[0].replace(/'/, "\\'");
             if(cnametext.length>20){
                 cnametext = cnametext.substring(0,20) + '...';
             }
@@ -437,33 +436,33 @@ function getFiles(Path) {
                 //列表展示
                 $("#set_list").addClass("active");
                 $("#set_icon").removeClass("active");
-                body += "<tr class='folderBoxTr' data-path='" + rdata.path + "/" + fmp[0] + "' filetype='dir'>\
-                    <td><input type='checkbox' name='id' value='"+fmp[0]+"'></td>\
-                    <td class='column-name'><span class='cursor' onclick=\"getFiles('" + rdata.path + "/" + fmp[0] + "')\">\
-                    <span class='ico ico-folder'></span><a class='text' title='" + fmp[0] + fmp[5] + "'>" + cnametext + "</a></span></td>\
+                body += "<tr class='folderBoxTr' data-path='" + htmlEncode(rdata.path + "/" + fmp[0]) + "' filetype='dir'>\
+                    <td><input type='checkbox' name='id' value='"+htmlEncode(fmp[0])+"'></td>\
+                    <td class='column-name'><span class='cursor' onclick=\"getFiles('" + jsEncode(rdata.path + "/" + fmp[0]) + "')\">\
+                    <span class='ico ico-folder'></span><a class='text' title='" + htmlEncode(fmp[0] + fmp[5]) + "'>" + htmlEncode(cnametext) + "</a></span></td>\
                     <td>"+toSize(fmp[1])+"</td>\
                     <td>"+getLocalTime(fmp[2])+"</td>\
-                    <td>"+fmp[3]+"</td>\
-                    <td>"+fmp[4]+"</td>\
+                    <td>"+htmlEncode(fmp[3])+"</td>\
+                    <td>"+htmlEncode(fmp[4])+"</td>\
                     <td class='editmenu'><span>\
-                        <a class='btlink' href='javascript:;' onclick=\"copyFile('" + rdata.path +"/"+ fmp[0] + "')\">复制</a> | \
-                        <a class='btlink' href='javascript:;' onclick=\"cutFile('" + rdata.path +"/"+ fmp[0]+ "')\">剪切</a> | \
-                        <a class='btlink' href='javascript:;' onclick=\"reName(0,'" + fmp[0] + "');\">重命名</a> | \
-                        <a class='btlink' href='javascript:;' onclick=\"setChmod(0,'" + rdata.path + "/"+fmp[0] + "');\">权限</a> | \
-                        <a class='btlink' href='javascript:;' onclick=\"zip('" + rdata.path +"/" +fmp[0] + "');\">压缩</a> | \
-                        <a class='btlink' href='javascript:;' onclick=\"deleteDir('" + rdata.path +"/"+ fmp[0] + "')\">删除</a></span>\
+                        <a class='btlink' href='javascript:;' onclick=\"copyFile('" + jsEncode(rdata.path +"/"+ fmp[0]) + "')\">复制</a> | \
+                        <a class='btlink' href='javascript:;' onclick=\"cutFile('" + jsEncode(rdata.path +"/"+ fmp[0]) + "')\">剪切</a> | \
+                        <a class='btlink' href='javascript:;' onclick=\"reName(0,'" + jsEncode(fmp[0]) + "');\">重命名</a> | \
+                        <a class='btlink' href='javascript:;' onclick=\"setChmod(0,'" + jsEncode(rdata.path + "/"+fmp[0]) + "');\">权限</a> | \
+                        <a class='btlink' href='javascript:;' onclick=\"zip('" + jsEncode(rdata.path +"/" +fmp[0]) + "');\">压缩</a> | \
+                        <a class='btlink' href='javascript:;' onclick=\"deleteDir('" + jsEncode(rdata.path +"/"+ fmp[0]) + "')\">删除</a></span>\
                     </td>\
                 </tr>";
             } else {
                 //图标展示
                 $("#set_icon").addClass("active");
                 $("#set_list").removeClass("active");
-                body += "<div class='file folderBox menufolder' data-path='" + rdata.path + "/" + fmp[0] + "' filetype='dir' title='"+lan.files.file_name+"：" + fmp[0]+"&#13;"+lan.files.file_size+"：" 
-                        + toSize(fmp[1])+"&#13;"+lan.files.file_etime+"："+getLocalTime(fmp[2])+"&#13;"+lan.files.file_auth+"："+fmp[3]+"&#13;"+lan.files.file_own+"："+fmp[4]+"'>\
-                        <input type='checkbox' name='id' value='"+fmp[0]+"'>\
-                        <div class='ico ico-folder' ondblclick=\"getFiles('" + rdata.path + "/" + fmp[0] + "')\"></div>\
-                        <div class='titleBox' onclick=\"getFiles('" + rdata.path + "/" + fmp[0] + "')\">\
-                            <span class='tname'>" + fmp[0] + "</span>\
+                body += "<div class='file folderBox menufolder' data-path='" + htmlEncode(rdata.path + "/" + fmp[0]) + "' filetype='dir' title='"+lan.files.file_name+"：" + htmlEncode(fmp[0])+"&#13;"+lan.files.file_size+"：" 
+                        + toSize(fmp[1])+"&#13;"+lan.files.file_etime+"："+getLocalTime(fmp[2])+"&#13;"+lan.files.file_auth+"："+htmlEncode(fmp[3])+"&#13;"+lan.files.file_own+"："+htmlEncode(fmp[4])+"'>\
+                        <input type='checkbox' name='id' value='"+htmlEncode(fmp[0])+"'>\
+                        <div class='ico ico-folder' ondblclick=\"getFiles('" + jsEncode(rdata.path + "/" + fmp[0]) + "')\"></div>\
+                        <div class='titleBox' onclick=\"getFiles('" + jsEncode(rdata.path + "/" + fmp[0]) + "')\">\
+                            <span class='tname'>" + htmlEncode(fmp[0]) + "</span>\
                         </div>\
                     </div>";
             }
@@ -475,7 +474,6 @@ function getFiles(Path) {
             var bodyZip = '';
             var download = '';
             var cnametext =fmp[0] + fmp[5];
-            fmp[0] = fmp[0].replace(/'/,"\\'");
 
             if(isChineseChar(cnametext)){
                 if(cnametext.length>16){
@@ -489,48 +487,48 @@ function getFiles(Path) {
 
             var displayCompress = 1;
             if(isCompressFile(fmp[0])){
-                bodyZip = "<a class='btlink' href='javascript:;' onclick=\"unCompressFile('" + rdata.path +"/" +fmp[0] + "')\">解压</a> | ";
+                bodyZip = "<a class='btlink' href='javascript:;' onclick=\"unCompressFile('" + jsEncode(rdata.path +"/" +fmp[0]) + "')\">解压</a> | ";
             } else {
-                bodyZip = "<a class='btlink' href='javascript:;' onclick=\"zip('" + rdata.path +"/" +fmp[0] + "');\">压缩</a> | ";
+                bodyZip = "<a class='btlink' href='javascript:;' onclick=\"zip('" + jsEncode(rdata.path +"/" +fmp[0]) + "');\">压缩</a> | ";
             }
             
             if(isText(fmp[0])){
-                bodyZip += "<a class='btlink' href='javascript:;' onclick=\"onlineEditFile(0,'" + rdata.path +"/"+ fmp[0] + "')\">编辑</a> | ";
+                bodyZip += "<a class='btlink' href='javascript:;' onclick=\"onlineEditFile(0,'" + jsEncode(rdata.path +"/"+ fmp[0]) + "')\">编辑</a> | ";
             }
 
             if(isImage(fmp[0])){
-                download = "<a class='btlink' href='javascript:;' onclick=\"getImage('" + rdata.path +"/"+ fmp[0] + "')\">预览</a> | ";
+                download = "<a class='btlink' href='javascript:;' onclick=\"getImage('" + jsEncode(rdata.path +"/"+ fmp[0]) + "')\">预览</a> | ";
             } else {
-                download = "<a class='btlink' href='javascript:;' onclick=\"getFileBytes('" + rdata.path +"/"+ fmp[0] + "',"+fmp[1]+")\">下载</a> | ";
+                download = "<a class='btlink' href='javascript:;' onclick=\"getFileBytes('" + jsEncode(rdata.path +"/"+ fmp[0]) + "',"+fmp[1]+")\">下载</a> | ";
             }
             
             totalSize +=  parseInt(fmp[1]);
             if(getCookie("rank")=="a"){
-                body += "<tr style='cursor:pointer;' class='folderBoxTr' data-path='" + rdata.path +"/"+ fmp[0] + "' filetype='" + fmp[0] + "' ondblclick='openFilename(this)'>\
-                    <td><input type='checkbox' name='id' value='"+fmp[0]+"'></td>\
-                    <td class='column-name'><span class='ico ico-"+(getExtName(fmp[0]))+"'></span><a class='text' title='" + fmp[0] + fmp[5] + "'>" + cnametext + "</a></td>\
+                body += "<tr style='cursor:pointer;' class='folderBoxTr' data-path='" + htmlEncode(rdata.path +"/"+ fmp[0]) + "' filetype='" + htmlEncode(fmp[0]) + "' ondblclick='openFilename(this)'>\
+                    <td><input type='checkbox' name='id' value='"+htmlEncode(fmp[0])+"'></td>\
+                    <td class='column-name'><span class='ico ico-"+(getExtName(fmp[0]))+"'></span><a class='text' title='" + htmlEncode(fmp[0] + fmp[5]) + "'>" + htmlEncode(cnametext) + "</a></td>\
                     <td>" + (toSize(fmp[1])) + "</td>\
-                    <td>" + ((fmp[2].length > 11)?fmp[2]:getLocalTime(fmp[2])) + "</td>\
-                    <td>"+fmp[3]+"</td>\
-                    <td>"+fmp[4]+"</td>\
+                    <td>" + htmlEncode((fmp[2].length > 11)?fmp[2]:getLocalTime(fmp[2])) + "</td>\
+                    <td>"+htmlEncode(fmp[3])+"</td>\
+                    <td>"+htmlEncode(fmp[4])+"</td>\
                     <td class='editmenu'>\
-                    <span><a class='btlink' href='javascript:;' onclick=\"copyFile('" + rdata.path +"/"+ fmp[0] + "')\">复制</a> | \
-                    <a class='btlink' href='javascript:;' onclick=\"cutFile('" + rdata.path +"/"+ fmp[0] + "')\">剪切</a> | \
-                    <a class='btlink' href='javascript:;' onclick=\"reName(0,'" + fmp[0] + "')\">重命名</a> | \
-                    <a class='btlink' href=\"javascript:setChmod(0,'" + rdata.path +"/"+ fmp[0] + "');\">权限</a> | "
+                    <span><a class='btlink' href='javascript:;' onclick=\"copyFile('" + jsEncode(rdata.path +"/"+ fmp[0]) + "')\">复制</a> | \
+                    <a class='btlink' href='javascript:;' onclick=\"cutFile('" + jsEncode(rdata.path +"/"+ fmp[0]) + "')\">剪切</a> | \
+                    <a class='btlink' href='javascript:;' onclick=\"reName(0,'" + jsEncode(fmp[0]) + "')\">重命名</a> | \
+                    <a class='btlink' href=\"javascript:setChmod(0,'" + jsEncode(rdata.path +"/"+ fmp[0]) + "');\">权限</a> | "
                     + bodyZip
                     + download
-                    + "<a class='btlink' href='javascript:;' onclick=\"deleteFile('" + rdata.path +"/"+ fmp[0] + "')\">删除</a>\
+                    + "<a class='btlink' href='javascript:;' onclick=\"deleteFile('" + jsEncode(rdata.path +"/"+ fmp[0]) + "')\">删除</a>\
                     </span></td>\
                 </tr>";
             }
             else{
-                body += "<div class='file folderBox menufile' data-path='" + rdata.path +"/"+ fmp[0] + "' filetype='"+fmp[0]+"' title='文件名：" + fmp[0]+"&#13;大小："
-                    + toSize(fmp[1])+"&#13;修改时间："+getLocalTime(fmp[2])+"&#13;权限："+fmp[3]+"&#13;所有者："+fmp[4]+"' >\
-                    <input type='checkbox' name='id' value='"+fmp[0]+"' />\
-                    <div data-path='" + rdata.path +"/"+ fmp[0] + "' filetype='"+fmp[0]+"' class='ico ico-"+(getExtName(fmp[0]))+"' ondblclick='javascript;openFilename(this);'></div>\
+                body += "<div class='file folderBox menufile' data-path='" + htmlEncode(rdata.path +"/"+ fmp[0]) + "' filetype='"+htmlEncode(fmp[0])+"' title='文件名：" + htmlEncode(fmp[0])+"&#13;大小："
+                    + toSize(fmp[1])+"&#13;修改时间："+getLocalTime(fmp[2])+"&#13;权限："+htmlEncode(fmp[3])+"&#13;所有者："+htmlEncode(fmp[4])+"' >\
+                    <input type='checkbox' name='id' value='"+htmlEncode(fmp[0])+"' />\
+                    <div data-path='" + htmlEncode(rdata.path +"/"+ fmp[0]) + "' filetype='"+htmlEncode(fmp[0])+"' class='ico ico-"+(getExtName(fmp[0]))+"' ondblclick='javascript;openFilename(this);'></div>\
                     <div class='titleBox'>\
-                        <span class='tname'>" + fmp[0] + "</span>\
+                        <span class='tname'>" + htmlEncode(fmp[0]) + "</span>\
                     </div>\
                 </div>";
             }
@@ -594,15 +592,15 @@ function getFiles(Path) {
                 新建<span class="caret"></span>\
             </button>\
             <ul class="dropdown-menu">\
-                <li><a href="javascript:createFile(0,\'' + Path + '\');">新建空白文件</a></li>\
-                <li><a href="javascript:createDir(0,\'' + Path + '\');">新建目录</a></li>\
+                <li><a href="javascript:createFile(0,\''+jsEncode(Path)+'\');">新建空白文件</a></li>\
+                <li><a href="javascript:createDir(0,\''+jsEncode(Path)+'\');">新建目录</a></li>\
             </ul>\
         </div>';
         if (rdata.path != '/') {
             BarTools += ' <button onclick="javascript:backDir();" class="btn btn-default btn-sm glyphicon glyphicon-arrow-left" title="返回上一级"></button>';
         }
         setCookie('open_dir_path',rdata.path);
-        BarTools += ' <button onclick="javascript:getFiles(\'' + rdata.path + '\');" class="btn btn-default btn-sm glyphicon glyphicon-refresh" title="刷新"></button>\
+        BarTools += ' <button onclick="javascript:getFiles(\'' + jsEncode(rdata.path) + '\');" class="btn btn-default btn-sm glyphicon glyphicon-refresh" title="刷新"></button>\
             <button onclick="webShell()" title="终端" type="button" class="btn btn-default btn-sm"><em class="ico-cmd"></em></button>';
         var copyName = getCookie('copyFileName');
         var cutName = getCookie('cutFileName');
@@ -610,7 +608,7 @@ function getFiles(Path) {
         // console.log('isPaste:',isPaste);
         //---
         if (isPaste != 'null' && isPaste != undefined) {
-            BarTools += ' <button onclick="javascript:pasteFile(\'' + (getFileName(isPaste)) + '\');" class="btn btn-Warning btn-sm">粘贴</button>';
+            BarTools += ' <button onclick="javascript:pasteFile(\'' + jsEncode(getFileName(isPaste)) + '\');" class="btn btn-Warning btn-sm">粘贴</button>';
         }
         
         $("#Batch").html('');
@@ -849,7 +847,7 @@ function batchPaste(){
         if(result.length > 0){
             var tbody = '';
             for(var i=0;i<result.length;i++){
-                tbody += '<tr><td>'+result[i].filename+'</td><td>'+toSize(result[i].size)+'</td><td>'+getLocalTime(result[i].mtime)+'</td></tr>';
+                tbody += '<tr><td>'+htmlEncode(result[i].filename)+'</td><td>'+toSize(result[i].size)+'</td><td>'+getLocalTime(result[i].mtime)+'</td></tr>';
             }
             var mbody = '<div class="divtable"><table class="table table-hover" width="100%" border="0" cellpadding="0" cellspacing="0"><thead><th>文件名</th><th>大小</th><th>最后修改时间</th></thead>\
                         <tbody>'+tbody+'</tbody>\
@@ -934,8 +932,8 @@ function getDisk() {
     $.get('/system/disk_info', function(rdata) {
         var rdata = rdata.data;
         for (var i = 0; i < rdata.length; i++) {
-            LBody += "<span onclick=\"getFiles('" + rdata[i].path + "')\">\
-                <span class='glyphicon glyphicon-hdd'></span>&nbsp;" + (rdata[i].path=='/'?lan.files.path_root:rdata[i].path) + "(" + rdata[i].size[2] + ")</span>";
+            LBody += "<span onclick=\"getFiles('" + jsEncode(rdata[i].path) + "')\">\
+                <span class='glyphicon glyphicon-hdd'></span>&nbsp;" + htmlEncode(rdata[i].path=='/'?lan.files.path_root:rdata[i].path) + "(" + rdata[i].size[2] + ")</span>";
         }
         var trash = '<span id="recycle_bin" onclick="recycleBin(\'open\')" title="回收站" style="position: absolute; border-color: #ccc; right: 77px;">\
             <span class="glyphicon glyphicon-trash"></span>&nbsp;回收站</span>';
@@ -999,7 +997,7 @@ function createFile(type, path) {
                     </div>\
                     <div class="bt-form-submit-btn">\
                     <button type="button" class="btn btn-danger btn-sm" onclick="layer.closeAll()">关闭</button>\
-                    <button id="createFileBtn" type="button" class="btn btn-success btn-sm" onclick="createFile(1,\'' + path + '\')">新建</button>\
+                    <button id="createFileBtn" type="button" class="btn btn-success btn-sm" onclick="createFile(1,\'' + jsEncode(path) + '\')">新建</button>\
                     </div>\
                 </div>',
         success:function(){
@@ -1039,7 +1037,7 @@ function createDir(type, path) {
                     </div>\
                     <div class="bt-form-submit-btn">\
                     <button type="button" class="btn btn-danger btn-sm btn-title" onclick="layer.closeAll()">关闭</button>\
-                    <button type="button" id="createDirBtn" class="btn btn-success btn-sm btn-title" onclick="createDir(1,\'' + path + '\')">新建</button>\
+                    <button type="button" id="createDirBtn" class="btn btn-success btn-sm btn-title" onclick="createDir(1,\'' + jsEncode(path) + '\')">新建</button>\
                     </div>\
                 </div>',
         success:function(){
@@ -1166,7 +1164,7 @@ function downloadFile(action){
                     </div>\
                     <div class="line">\
                         <span class="tname ">下载到:</span>\
-                        <input type="text" class="bt-input-text" name="path" id="dpath" value="'+path+'" placeholder="下载到" style="width:330px" />\
+                        <input type="text" class="bt-input-text" name="path" id="dpath" value="'+htmlEncode(path)+'" placeholder="下载到" style="width:330px" />\
                     </div>\
                     <div class="line">\
                         <span class="tname">文件名:</span>\
@@ -1214,7 +1212,7 @@ function reName(type, fileName) {
         btn:["确定","取消"],
         content: '<div class="bt-form pd20">\
                     <div class="line">\
-                    <input type="text" class="bt-input-text" name="Name" id="newFileName" value="' + fileName + '" placeholder="文件名" style="width:100%" />\
+                    <input type="text" class="bt-input-text" name="Name" id="newFileName" value="' + htmlEncode(fileName) + '" placeholder="文件名" style="width:100%" />\
                     </div>\
                 </div>',
         success:function(){
@@ -1267,7 +1265,7 @@ function pasteFile(fileName) {
         if(result.length > 0){
             var tbody = '';
             for(var i=0;i<result.length;i++){
-                tbody += '<tr><td>'+result[i].filename+'</td><td>'+toSize(result[i].size)+'</td><td>'+getLocalTime(result[i].mtime)+'</td></tr>';
+                tbody += '<tr><td>'+htmlEncode(result[i].filename)+'</td><td>'+toSize(result[i].size)+'</td><td>'+getLocalTime(result[i].mtime)+'</td></tr>';
             }
             var mbody = '<div class="divtable"><table class="table table-hover" width="100%" border="0" cellpadding="0" cellspacing="0"><thead><th>文件名</th><th>大小</th><th>最后修改时间</th></thead>\
                         <tbody>'+tbody+'</tbody>\
@@ -1371,7 +1369,7 @@ function zip(dirName,submits) {
         shift: 5,
         closeBtn: 1,
         area: '650px',
-        title: '压缩文件['+fileName+']',
+        title: '压缩文件['+htmlEncode(fileName)+']',
         btn: ['确定','取消'],
         content: '<div class="bt-form pd20">'
                     + '<div class="line noborder">'
@@ -1389,10 +1387,10 @@ function zip(dirName,submits) {
                     </div>'
                     //
                     + '<div class="line noborder">'
-                    + '<input type="text" id="sfile" value="' + sfile + '" style="display:none" />'
-                    + '<input type="text" id="path" value="' + pathName + '" style="display:none" />'
+                    + '<input type="text" id="sfile" value="' + htmlEncode(sfile) + '" style="display:none" />'
+                    + '<input type="text" id="path" value="' + htmlEncode(pathName) + '" style="display:none" />'
                     + '<span class="tname">压缩路径</span>\
-                    <input type="text" class="bt-input-text" id="dfile" value="' + defaultDfile + '" placeholder="压缩到" style="width: 75%; display: inline-block; margin: 0px 10px 0px 0px;" />\
+                    <input type="text" class="bt-input-text" id="dfile" value="' + htmlEncode(defaultDfile) + '" placeholder="压缩到" style="width: 75%; display: inline-block; margin: 0px 10px 0px 0px;" />\
                     <span  id="change_dir" class="glyphicon glyphicon-folder-open cursor"></span>'
                     + '</div>'
                 +'</div>',
@@ -1472,8 +1470,8 @@ function unZip(fileName, type) {
         title: '解压文件',
         content: '<div class="bt-form pd20 pb70">'
             +'<div class="line unzipdiv">'
-            +'<span class="tname">'+lan.files.unzip_name+'</span><input type="text" class="bt-input-text" id="sfile" value="' +fileName + '" placeholder="'+lan.files.unzip_name_title+'" style="width:330px" /></div>'
-            +'<div class="line"><span class="tname">'+lan.files.unzip_to+'</span><input type="text" class="bt-input-text" id="dfile" value="'+path + '" placeholder="'+lan.files.unzip_to+'" style="width:330px" /></div>' 
+            +'<span class="tname">'+lan.files.unzip_name+'</span><input type="text" class="bt-input-text" id="sfile" value="'+htmlEncode(fileName)+'" placeholder="'+lan.files.unzip_name_title+'" style="width:330px" /></div>'
+            +'<div class="line"><span class="tname">'+lan.files.unzip_to+'</span><input type="text" class="bt-input-text" id="dfile" value="'+htmlEncode(path)+'" placeholder="'+lan.files.unzip_to+'" style="width:330px" /></div>' 
             + umpass +'<div class="line"><span class="tname">'+lan.files.unzip_coding+'</span><select class="bt-input-text" name="coding">'
                 +'<option value="UTF-8">UTF-8</option>'
                 +'<option value="gb18030">GBK</option>'
@@ -1481,7 +1479,7 @@ function unZip(fileName, type) {
             +'</div>'
             +'<div class="bt-form-submit-btn">'
             +'<button type="button" class="btn btn-danger btn-sm btn-title" onclick="layer.closeAll()">'+lan.public.close+'</button>'
-            +'<button type="button" id="ReNameBtn" class="btn btn-success btn-sm btn-title" onclick="unZip(\'' + fileName + '\',\''+type+'\')">'+lan.files.file_menu_unzip+'</button>'
+            +'<button type="button" id="ReNameBtn" class="btn btn-success btn-sm btn-title" onclick="unZip(\'' + jsEncode(fileName) + '\',\''+type+'\')">'+lan.files.file_menu_unzip+'</button>'
             +'</div>'
         +'</div>'
     });
@@ -1530,11 +1528,11 @@ function unCompressFile(fileName, type = 0){
         content: '<div class="bt-form pd20 pb70">\
             <div class="line unzipdiv">\
                 <span class="tname">文件名</span>\
-                <input type="text" class="bt-input-text" id="sfile" value="' +fileName + '" placeholder="压缩文件名" style="width:330px" />\
+                <input type="text" class="bt-input-text" id="sfile" value="'+htmlEncode(fileName)+'" placeholder="压缩文件名" style="width:330px" />\
             </div>\
             <div class="line">\
                 <span class="tname">解压到</span>\
-                <input type="text" class="bt-input-text" id="dfile" value="'+path + '" placeholder="解压到" style="width:330px" />\
+                <input type="text" class="bt-input-text" id="dfile" value="'+htmlEncode(path)+'" placeholder="解压到" style="width:330px" />\
             </div>\
             <div class="line">\
                 <span class="tname">编码</span>\
@@ -1545,7 +1543,7 @@ function unCompressFile(fileName, type = 0){
             </div>\
             <div class="bt-form-submit-btn">\
                 <button type="button" class="btn btn-danger btn-sm btn-title" onclick="layer.closeAll()">关闭</button>\
-                <button type="button" id="ReNameBtn" class="btn btn-success btn-sm btn-title" onclick="unCompressFile(\'' + fileName + '\',\'3\')">解压</button>\
+                <button type="button" id="ReNameBtn" class="btn btn-success btn-sm btn-title" onclick="unCompressFile(\'' + jsEncode(fileName) + '\',\'3\')">解压</button>\
             </div>\
         </div>'
     });
@@ -1594,7 +1592,7 @@ function getImage(fileName){
         title:"图片预览",
         area: '400px',
         shadeClose: true,
-        content: '<div class="showpicdiv"><img style="max-width:400px;" src="'+imgUrl+'"></div>'
+        content: '<div class="showpicdiv"><img style="max-width:400px;" src="'+htmlEncode(imgUrl)+'"></div>'
     });
 }
 
@@ -1614,7 +1612,7 @@ function uploadFiles(){
         area: ['500px','300px'], 
         shadeClose:false,
         content:'<div class="fileUploadDiv">\
-                <input type="hidden" id="input-val" value="'+path+'" />\
+                <input type="hidden" id="input-val" value="'+htmlEncode(path)+'" />\
                 <input type="file" id="file_input"  multiple="true" autocomplete="off" />\
                 <button type="button"  id="opt" autocomplete="off">添加文件</button>\
                 <button type="button" id="up" autocomplete="off" >开始上传</button>\
@@ -1651,7 +1649,7 @@ function setChmod(action,fileName){
         return;
     }
     
-    var toExec = fileName == lan.files.all?'batch(3,1)':'setChmod(1,\''+fileName+'\')';
+    var toExec = fileName == lan.files.all?'batch(3,1)':'setChmod(1,\''+jsEncode(fileName)+'\')';
     $.post('/files/file_access','filename='+encodeURIComponent(fileName),function(rdata){
         // console.log(rdata);
         var sys_users = rdata.sys_users;
@@ -1661,19 +1659,19 @@ function setChmod(action,fileName){
             var own = sys_users[i];
             if (rdata.chown==own){
                 is_find_own_option = true;
-                own_html += '<option value="'+own+'" selected="selected">'+own+'</option>';
+                own_html += '<option value="'+htmlEncode(own)+'" selected="selected">'+htmlEncode(own)+'</option>';
             } else {
-                own_html += '<option value="'+own+'">'+own+'</option>';
+                own_html += '<option value="'+htmlEncode(own)+'">'+htmlEncode(own)+'</option>';
             }
         }
         if (!is_find_own_option){
-            own_html += '<option value="'+rdata.chown+'" selected="selected">'+rdata.chown+'</option>';
+            own_html += '<option value="'+htmlEncode(rdata.chown)+'" selected="selected">'+htmlEncode(rdata.chown)+'</option>';
         }
 
         layer.open({
             type:1,
             closeBtn: 1,
-            title: '设置权限['+fileName+']',
+            title: '设置权限['+htmlEncode(fileName)+']',
             area: '400px', 
             shadeClose:false,
             content:'<div class="setchmod bt-form ptb15 pb70">\
@@ -1695,7 +1693,7 @@ function setChmod(action,fileName){
                             <p><input type="checkbox" id="public_w" />写入</p>\
                             <p><input type="checkbox" id="public_x" />执行</p>\
                         </fieldset>\
-                        <div class="setchmodnum"><input class="bt-input-text" type="text" id="access" maxlength="3" value="'+rdata.chmod+'">权限，\
+                        <div class="setchmodnum"><input class="bt-input-text" type="text" id="access" maxlength="3" value="'+htmlEncode(rdata.chmod)+'">权限，\
                         <span>所有者\
                         <select id="chown" class="bt-input-text" style="width:100px;">\
                             '+own_html+'\
@@ -1877,7 +1875,7 @@ function pathPlaceBtn(path){
         for(var i = 0; i<dst_path.length; i++ ){
             title += dst_path[i]+'/';
             dst_path[0] = lan.files.path_root;
-            html += '<li><a title="'+title+'">'+dst_path[i]+'</a></li>';
+            html += '<li><a title="'+htmlEncode(title)+'">'+htmlEncode(dst_path[i])+'</a></li>';
         }
     }
     

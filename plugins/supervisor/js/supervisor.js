@@ -47,12 +47,12 @@ function supList(page, search){
         var list = '';
         for(i in rdata.data){
             list += '<tr>';
-            list += '<td>' + rdata.data[i]['program'] +'</td>';
-            list += '<td>' + rdata.data[i]['command'] +'</td>';
-            list += '<td>' + rdata.data[i]['user'] +'</td>';
-            list += '<td>' + rdata.data[i]['pid'] +'</td>';
-            list += '<td>' + rdata.data[i]['numprocs'] +'</td>';
-            list += '<td>' + rdata.data[i]['priority'] +'</td>';
+            list += '<td>' + htmlEncode(rdata.data[i]['program']) +'</td>';
+            list += '<td>' + htmlEncode(rdata.data[i]['command']) +'</td>';
+            list += '<td>' + htmlEncode(rdata.data[i]['user']) +'</td>';
+            list += '<td>' + htmlEncode(rdata.data[i]['pid']) +'</td>';
+            list += '<td>' + htmlEncode(rdata.data[i]['numprocs']) +'</td>';
+            list += '<td>' + htmlEncode(rdata.data[i]['priority']) +'</td>';
 			
 			sup_status = 'start'
 			sup_status_desc = 'start'
@@ -66,7 +66,7 @@ function supList(page, search){
 
             list += '<td>'+sup_status_desc+'</td>';
 
-			list += '<td>' + rdata.data[i]['runStatus'] +'</td>';
+			list += '<td>' + htmlEncode(rdata.data[i]['runStatus']) +'</td>';
 
             list += '<td style="text-align:right">\
             			<a href="javascript:;" class="btlink" onclick="startOrStop(\''+rdata.data[i]['program']+'\',\''+sup_status+'\')" title="启动|停止">'+sup_status_desc+'</a> | ' +
@@ -382,7 +382,7 @@ function supConfigTpl(_name, version, func, config_tpl_func, read_config_tpl_fun
     $.post('/plugins/run',{name:_name, func:_config_tpl_func,version:version}, function(data){
     	var rdata = $.parseJSON(data.data);
     	for (var i = 0; i < rdata.length; i++) {
-    		$('#config_tpl').append('<option value="'+rdata[i]+'"">'+getFileName(rdata[i])+'</option>');
+    		$('#config_tpl').append('<option value="'+htmlEncode(rdata[i])+'"">'+getFileName(rdata[i])+'</option>');
     	}
 
 
@@ -521,7 +521,7 @@ function supLogs(_name, config_tpl_func, read_config_tpl_func,line){
 
         var rdata = $.parseJSON(data.data);
     	for (var i = 0; i < rdata.length; i++) {
-    		$('#config_tpl').append('<option value="'+rdata[i]+'"">'+getFileName(rdata[i])+'</option>');
+    		$('#config_tpl').append('<option value="'+htmlEncode(rdata[i])+'"">'+getFileName(rdata[i])+'</option>');
     	}
 
     	$('#config_tpl').change(function(){
@@ -585,11 +585,11 @@ function confdList(page, search){
         var list = '';
         for(i in rdata.data){
             list += '<tr>';
-            list += '<td>' + rdata.data[i]['name'] +'</td>';
+            list += '<td>' + htmlEncode(rdata.data[i]['name']) +'</td>';
 
             list += '<td style="text-align:right">\
-                        <a class="btlink" onclick="confdListTraceLog(\''+rdata.data[i]['name']+'\')">日志跟踪</a> | ' +
-                        '<a class="btlink" onclick="confdListErrLog(\''+rdata.data[i]['name']+'\')">查看错误日志</a>' +
+                        <a class="btlink" onclick="confdListTraceLog(\''+jsEncode(rdata.data[i]['name'])+'\')">日志跟踪</a> | ' +
+                        '<a class="btlink" onclick="confdListErrLog(\''+jsEncode(rdata.data[i]['name'])+'\')">查看错误日志</a>' +
                     '</td>';
 
             list += '</tr>';

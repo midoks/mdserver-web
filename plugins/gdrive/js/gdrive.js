@@ -198,15 +198,15 @@ function gdList(file_id){
         var listFiles = '';
         for(var i=0;i<mlist.length;i++){
             if(mlist[i].size == null){
-                listFiles += '<tr><td class="cursor" onclick="gdList(\''+(mlist[i].id).replace('//','/')+'\')"><span class="ico ico-folder"></span>\<span>'+mlist[i].name+'</span></td>\
+                listFiles += '<tr><td class="cursor" onclick="gdList(\''+jsEncode((mlist[i].id).replace('//','/'))+'\')"><span class="ico ico-folder"></span>\<span>'+htmlEncode(mlist[i].name)+'</span></td>\
                 <td>-</td>\
                 <td>-</td>\
-                <td class="text-right"><a class="btlink" onclick="deleteFile(\''+mlist[i].id+'\', true)">删除</a></td></tr>'
+                <td class="text-right"><a class="btlink" onclick="deleteFile(\''+jsEncode(mlist[i].id)+'\', true)">删除</a></td></tr>'
             }else{
-                listFiles += '<tr><td class="cursor"><span class="ico ico-file"></span><span>'+mlist[i].name+'</span></td>\
+                listFiles += '<tr><td class="cursor"><span class="ico ico-file"></span><span>'+htmlEncode(mlist[i].name)+'</span></td>\
                 <td>'+toSize(mlist[i].size)+'</td>\
                 <td>'+getGDTime(mlist[i].createdTime)+'</td>\
-                <td class="text-right"><a target="_blank" href="'+mlist[i].webViewLink+'" class="btlink">下载</a> | <a class="btlink" onclick="deleteFile(\''+mlist[i].name+'\', false)">删除</a></td></tr>'
+                <td class="text-right"><a target="_blank" href="'+htmlEncode(mlist[i].webViewLink)+'" class="btlink">下载</a> | <a class="btlink" onclick="deleteFile(\''+jsEncode(mlist[i].name)+'\', false)">删除</a></td></tr>'
             }
         }
         listBody += listFiles;

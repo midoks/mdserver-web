@@ -182,9 +182,9 @@ function runInfo(){
                 <tbody>';
             for (var i = 0; i < replicas.length; i++) {
                 var replica = replicas[i];
-                replicationCon += '<tr><td>' + displayValue(replica.name) + '</td><td>' + displayValue(replica.address) + '</td>\
+                replicationCon += '<tr><td>' + htmlEncode(displayValue(replica.name)) + '</td><td>' + htmlEncode(displayValue(replica.address)) + '</td>\
                     <td>' + formatReplicationStatus(replica.state) + '</td><td>' + formatSyncState(replica.sync_state) + '</td>\
-                    <td>' + displayValue(replica.sent_lsn) + '<br>' + displayValue(replica.replay_lsn) + '</td>\
+                    <td>' + htmlEncode(displayValue(replica.sent_lsn)) + '<br>' + htmlEncode(displayValue(replica.replay_lsn)) + '</td>\
                     <td>' + formatDelay(replica.replay_lag) + '</td></tr>';
             }
             replicationCon += '</tbody></table>';
@@ -197,9 +197,9 @@ function runInfo(){
             }
             replicationCon = '<div style="font-weight:bold;margin:10px 0 6px">主库复制</div>\
                 <table class="table table-hover table-bordered" style="margin-bottom:10px"><tbody>\
-                <tr><th>主库地址</th><td>' + sender + '</td><th>复制槽</th><td>' + displayValue(replication.slot_name) + '</td></tr>\
+                <tr><th>主库地址</th><td>' + htmlEncode(sender) + '</td><th>复制槽</th><td>' + htmlEncode(displayValue(replication.slot_name)) + '</td></tr>\
                 <tr><th>接收状态</th><td>' + formatReplicationStatus(replication.status) + '</td><th>回放延迟</th><td>' + formatDelay(replication.replay_lag) + '</td></tr>\
-                <tr><th>接收位置</th><td>' + displayValue(replication.receive_lsn) + '</td><th>回放位置</th><td>' + displayValue(replication.replay_lsn) + '</td></tr>\
+                <tr><th>接收位置</th><td>' + htmlEncode(displayValue(replication.receive_lsn)) + '</td><th>回放位置</th><td>' + htmlEncode(displayValue(replication.replay_lsn)) + '</td></tr>\
                 </tbody></table>';
         }
 
@@ -208,11 +208,11 @@ function runInfo(){
                     <table class="table table-hover table-bordered" style="margin-bottom:10px;background-color:#fafafa">\
                     <tbody>\
                         <tr><th>数据库角色</th><td>' + roleHtml + '</td><th>' + replicationSummaryLabel + '</th><td>' + replicationSummary + '</td></tr>\
-                        <tr><th>启动时间</th><td>' + displayValue(rdata.run_time) + '</td><th>运行时长</th><td>' + formatDuration(uptime) + '</td></tr>\
+                        <tr><th>启动时间</th><td>' + htmlEncode(displayValue(rdata.run_time)) + '</td><th>运行时长</th><td>' + formatDuration(uptime) + '</td></tr>\
                         <tr><th>当前/活动连接</th><td>' + formatCount(rdata.connections) + ' / ' + formatCount(rdata.threads_running) + '</td><th>最大连接数</th><td>' + formatCount(rdata.max_connections) + '</td></tr>\
-                        <tr><th>数据库总大小</th><td>' + displayValue(rdata.pg_size) + '</td><th>主进程内存</th><td>' + displayValue(rdata.pg_mem) + '</td></tr>\
-                        <tr><th>进程数</th><td>' + formatCount(rdata.progress_num) + '</td><th>PID</th><td>' + displayValue(rdata.pid) + '</td></tr>\
-                        <tr><th>WAL文件</th><td>' + displayValue(rdata.file) + '</td><th>WAL位置</th><td>' + displayValue(rdata.position) + '</td></tr>\
+                        <tr><th>数据库总大小</th><td>' + htmlEncode(displayValue(rdata.pg_size)) + '</td><th>主进程内存</th><td>' + htmlEncode(displayValue(rdata.pg_mem)) + '</td></tr>\
+                        <tr><th>进程数</th><td>' + formatCount(rdata.progress_num) + '</td><th>PID</th><td>' + htmlEncode(displayValue(rdata.pid)) + '</td></tr>\
+                        <tr><th>WAL文件</th><td>' + htmlEncode(displayValue(rdata.file)) + '</td><th>WAL位置</th><td>' + htmlEncode(displayValue(rdata.position)) + '</td></tr>\
                     </tbody>\
                     </table>' + replicationCon + '<div style="font-weight:bold;margin:10px 0 6px">累计统计</div>\
                     <table class="table table-hover table-bordered">\
@@ -232,7 +232,7 @@ function pgPort(){
     myPost('pg_port','',function(data){
         var con = '<div class="line ">\
             <div class="info-r  ml0">\
-            <input name="port" class="bt-input-text mr5 port" type="text" style="width:100px" value="'+data.data+'">\
+            <input name="port" class="bt-input-text mr5 port" type="text" style="width:100px" value="'+htmlEncode(data.data)+'">\
             <button id="btn_change_port" name="btn_change_port" class="btn btn-success btn-sm mr5 ml5 btn_change_port">修改</button>\
             </div></div>';
         $(".soft-man-con").html(con);
@@ -257,7 +257,7 @@ function pgPerfOpt() {
     myPost('db_status','',function(data){
         var rdata = $.parseJSON(data.data);
         if (!rdata.status){
-            $(".soft-man-con").html('<div class="alert alert-warning" style="margin:15px 0">' + (rdata.msg || '获取配置失败') + '</div>');
+            $(".soft-man-con").html('<div class="alert alert-warning" style="margin:15px 0">' + htmlEncode(rdata.msg || '获取配置失败') + '</div>');
             return;
         }
 
@@ -265,19 +265,19 @@ function pgPerfOpt() {
         for (var i = 0; i < rdata.params.length; i++){
             var p = rdata.params[i];
             var unitCon = p.type == 'memory' ?
-                '<span class="pg-unit" style="display:inline-block;width:20px;">' + p.unit + '</span>' :
+                '<span class="pg-unit" style="display:inline-block;width:20px;">' + htmlEncode(p.unit) + '</span>' :
                 '<span style="display:inline-block;width:0px"></span>';
             html_p += '<div class="pg-param" style="display:flex;align-items:center;padding:6px 0;border-bottom:1px dashed #eee">\
-                <span style="width:150px;text-align:right;margin-right:12px">' + p.label + '</span>\
-                <input class="bt-input-text" data-type="' + p.type + '" name="' + p.name + '" value="' + p.value + '" type="number" step="any" min="0" style="width:90px;margin-right:8px">\
+                <span style="width:150px;text-align:right;margin-right:12px">' + htmlEncode(p.label) + '</span>\
+                <input class="bt-input-text" data-type="' + htmlEncode(p.type) + '" name="' + htmlEncode(p.name) + '" value="' + htmlEncode(p.value) + '" type="number" step="any" min="0" style="width:90px;margin-right:8px">\
                 ' + unitCon + '\
-                <font class="text-muted" style="flex:1;font-size:10px;">' + p.desc + '</font>\
+                <font class="text-muted" style="flex:1;font-size:10px;">' + htmlEncode(p.desc) + '</font>\
             </div>';
         }
 
         var options = '<option value="0">请选择</option>';
         for (var j = 0; j < rdata.profiles.length; j++){
-            options += '<option value="' + rdata.profiles[j].memory + '">' + rdata.profiles[j].memory + 'GB</option>';
+            options += '<option value="' + htmlEncode(rdata.profiles[j].memory) + '">' + htmlEncode(rdata.profiles[j].memory) + 'GB</option>';
         }
 
         var memoryHint = '';
@@ -410,7 +410,7 @@ function setRootPwd(type, pwd){
                     <div class='line'>\
                         <span class='tname'>postgres密码</span>\
                         <div class='info-r'>\
-                            <input class='bt-input-text mr5' type='text' name='password' id='MyPassword' style='width:330px' value='"+pwd+"' />\
+                            <input class='bt-input-text mr5' type='text' name='password' id='MyPassword' style='width:330px' value='"+htmlEncode(pwd)+"' />\
                             <span title='随机密码' class='glyphicon glyphicon-repeat cursor' onclick='repeatPwd(16)'></span>\
                         </div>\
                     </div>\
@@ -512,12 +512,12 @@ function repTools(db_name, res){
         for (var i = 0; i < rdata.tables.length; i++) {
             var t = rdata.tables[i];
             tbody += '<tr>\
-                    <td><span style="width:220px;">' + t.schema + '.' + t.table_name + '</span></td>\
-                    <td>' + t.type + '</td>\
-                    <td>' + t.rows_count + '</td>\
-                    <td>' + t.data_size + '</td>\
-                    <td>' + t.index_size + '</td>\
-                    <td>' + t.total_size + '</td>\
+                    <td><span style="width:220px;">' + htmlEncode(t.schema) + '.' + htmlEncode(t.table_name) + '</span></td>\
+                    <td>' + htmlEncode(t.type) + '</td>\
+                    <td>' + htmlEncode(t.rows_count) + '</td>\
+                    <td>' + htmlEncode(t.data_size) + '</td>\
+                    <td>' + htmlEncode(t.index_size) + '</td>\
+                    <td>' + htmlEncode(t.total_size) + '</td>\
                 </tr>';
         }
         if (tbody == ''){
@@ -526,20 +526,20 @@ function repTools(db_name, res){
 
         if (res) {
             $(".gztr").html(tbody);
-            $(".tools_size").html('大小：' + rdata.data_size);
+            $(".tools_size").html('大小：' + htmlEncode(rdata.data_size));
             return;
         }
 
         layer.open({
             type: 1,
-            title: "PostgreSQL数据表【" + db_name + "】",
+            title: "PostgreSQL数据表【" + htmlEncode(db_name) + "】",
             area: ['820px', '580px'],
             closeBtn: 1,
             shadeClose: false,
             content: '<div class="pd15">\
                             <div class="db_list">\
-                                <span><a>数据库名称：'+ db_name + '</a>\
-                                <a class="tools_size">大小：'+ rdata.data_size + '</a></span>\
+                                <span><a>数据库名称：'+ htmlEncode(db_name) + '</a>\
+                                <a class="tools_size">大小：'+ htmlEncode(rdata.data_size) + '</a></span>\
                                 <span id="db_tools" style="float: right;"></span>\
                             </div >\
                             <div class="divtable">\
@@ -603,7 +603,7 @@ function setDbAccess(name){
                     $('select[name="dataAccess"]').find('option[value="0.0.0.0/0"]').attr("selected",true);
                 } else {
                     $('select[name="dataAccess"]').find('option[value="ip"]').attr("selected",true);
-                    $('select[name="dataAccess"]').after("<input value='"+rdata.msg+"' class='bt-input-text mr5' type='text' name='address' placeholder='如: 192.168.1.0/24' style='width: 230px; display: inline-block;'>");
+                    $('select[name="dataAccess"]').after("<input value='"+htmlEncode(rdata.msg)+"' class='bt-input-text mr5' type='text' name='address' placeholder='如: 192.168.1.0/24' style='width: 230px; display: inline-block;'>");
                 }
 
                 $('select[name="dataAccess"]').change(function(){
@@ -665,13 +665,13 @@ function setDbPass(id, username, password){
         content: "<form class='bt-form pd20' id='mod_pwd'>\
                     <div class='line'>\
                         <span class='tname'>用户名</span>\
-                        <div class='info-r'><input readonly='readonly' name=\"name\" class='bt-input-text mr5' type='text' style='width:330px;outline:none;' value='"+username+"' /></div>\
+                        <div class='info-r'><input readonly='readonly' name=\"name\" class='bt-input-text mr5' type='text' style='width:330px;outline:none;' value='"+htmlEncode(username)+"' /></div>\
                     </div>\
                     <div class='line'>\
                     <span class='tname'>密码</span>\
-                    <div class='info-r'><input class='bt-input-text mr5' type='text' name='password' id='MyPassword' style='width:330px' value='"+password+"' /><span title='随机密码' class='glyphicon glyphicon-repeat cursor' onclick='repeatPwd(16)'></span></div>\
+                    <div class='info-r'><input class='bt-input-text mr5' type='text' name='password' id='MyPassword' style='width:330px' value='"+htmlEncode(password)+"' /><span title='随机密码' class='glyphicon glyphicon-repeat cursor' onclick='repeatPwd(16)'></span></div>\
                     </div>\
-                    <input type='hidden' name='id' value='"+id+"'>\
+                    <input type='hidden' name='id' value='"+htmlEncode(id)+"'>\
                   </form>",
         yes:function(index){
             var data = $("#mod_pwd").serialize();
@@ -769,7 +769,7 @@ function addDatabase(type,layer_index){
 }
 
 function delDb(id, name){
-    safeMessage('删除['+name+']','您真的要删除['+name+']吗？',function(){
+    safeMessage('删除['+htmlEncode(name)+']','您真的要删除['+htmlEncode(name)+']吗？',function(){
         var data='id='+id+'&name='+name
         myPost('del_db', data, function(data){
             var rdata = $.parseJSON(data.data);
@@ -811,7 +811,7 @@ function delDbBatch(){
 
 function setDbPs(id, name, obj) {
     var _span = $(obj);
-    var _input = $("<input class='baktext' value=\""+_span.text()+"\" type='text' placeholder='备注信息' />");
+    var _input = $("<input class='baktext' value=\""+htmlEncode(_span.text())+"\" type='text' placeholder='备注信息' />");
     _span.hide().after(_input);
     _input.focus();
     _input.blur(function(){
@@ -864,7 +864,7 @@ function importBackupProgress(file,name){
             btn:["复制","取消"],
             content: '<div class="pd15">\
                         <div class="divtable">\
-                            <pre class="layui-code">'+rdata.data+'</pre>\
+                            <pre class="layui-code">'+htmlEncode(rdata.data)+'</pre>\
                         </div>\
                     </div>',
             success:function(){
@@ -896,7 +896,7 @@ function importDbExternalProgress(file,name){
             btn:["复制","取消"],
             content: '<div class="pd15">\
                         <div class="divtable">\
-                            <pre class="layui-code">'+rdata.data+'</pre>\
+                            <pre class="layui-code">'+htmlEncode(rdata.data)+'</pre>\
                         </div>\
                     </div>',
             success:function(){
@@ -916,11 +916,11 @@ function setLocalImport(db_name){
         var up_db = layer.open({
             type:1,
             closeBtn: 1,
-            title:"上传导入文件["+upload_dir+']',
+            title:"上传导入文件["+htmlEncode(upload_dir)+']',
             area: ['500px','300px'],
             shadeClose:false,
             content:'<div class="fileUploadDiv">\
-                    <input type="hidden" id="input-val" value="'+upload_dir+'" />\
+                    <input type="hidden" id="input-val" value="'+htmlEncode(upload_dir)+'" />\
                     <input type="file" id="file_input"  multiple="true" autocomplete="off" />\
                     <button type="button"  id="opt" autocomplete="off">添加文件</button>\
                     <button type="button" id="up" autocomplete="off" >开始上传</button>\
@@ -959,12 +959,12 @@ function setLocalImport(db_name){
             var tbody = '';
             for (var i = 0; i < file_list.length; i++) {
                 tbody += '<tr>\
-                        <td><span> ' + file_list[i]['name'] + '</span></td>\
-                        <td><span> ' + file_list[i]['size'] + '</span></td>\
-                        <td><span> ' + file_list[i]['time'] + '</span></td>\
+                        <td><span> ' + htmlEncode(file_list[i]['name']) + '</span></td>\
+                        <td><span> ' + htmlEncode(file_list[i]['size']) + '</span></td>\
+                        <td><span> ' + htmlEncode(file_list[i]['time']) + '</span></td>\
                         <td style="text-align: right;">\
-                            <a class="btlink" onclick="importDbExternal(\'' + file_list[i]['name'] + '\',\'' +db_name+ '\')">导入</a> | \
-                            <a class="btlink" onclick="importDbExternalProgress(\'' + file_list[i]['name'] + '\',\'' +db_name+ '\')">导入进度</a> | \
+                            <a class="btlink" onclick="importDbExternal(\'' + jsEncode(file_list[i]['name']) + '\',\'' +jsEncode(db_name)+ '\')">导入</a> | \
+                            <a class="btlink" onclick="importDbExternalProgress(\'' + jsEncode(file_list[i]['name']) + '\',\'' +jsEncode(db_name)+ '\')">导入进度</a> | \
                             <a class="btlink del" index="'+i+'">删除</a>\
                         </td>\
                     </tr>';
@@ -1089,14 +1089,14 @@ function setBackupReq(db_name, obj){
         var tbody = '';
         for (var i = 0; i < rdata.data.length; i++) {
             tbody += '<tr>\
-                    <td><span> ' + rdata.data[i]['name'] + '</span></td>\
-                    <td><span> ' + rdata.data[i]['size'] + '</span></td>\
-                    <td><span> ' + rdata.data[i]['time'] + '</span></td>\
+                    <td><span> ' + htmlEncode(rdata.data[i]['name']) + '</span></td>\
+                    <td><span> ' + htmlEncode(rdata.data[i]['size']) + '</span></td>\
+                    <td><span> ' + htmlEncode(rdata.data[i]['time']) + '</span></td>\
                     <td style="text-align: right;">\
-                        <a class="btlink" onclick="importBackup(\'' + rdata.data[i]['name'] + '\',\'' +db_name+ '\')">导入</a> | \
-                        <a class="btlink" onclick="importBackupProgress(\'' + rdata.data[i]['name'] + '\',\'' +db_name+ '\')">导入进度</a> | \
-                        <a class="btlink" onclick="downloadBackup(\'' + rdata.data[i]['file'] + '\')">下载</a> | \
-                        <a class="btlink" onclick="delBackup(\'' + rdata.data[i]['name'] + '\',\'' +db_name+ '\')">删除</a>\
+                        <a class="btlink" onclick="importBackup(\'' + jsEncode(rdata.data[i]['name']) + '\',\'' +jsEncode(db_name)+ '\')">导入</a> | \
+                        <a class="btlink" onclick="importBackupProgress(\'' + jsEncode(rdata.data[i]['name']) + '\',\'' +jsEncode(db_name)+ '\')">导入进度</a> | \
+                        <a class="btlink" onclick="downloadBackup(\'' + jsEncode(rdata.data[i]['file']) + '\')">下载</a> | \
+                        <a class="btlink" onclick="delBackup(\'' + jsEncode(rdata.data[i]['name']) + '\',\'' +jsEncode(db_name)+ '\')">删除</a>\
                     </td>\
                 </tr> ';
         }
@@ -1121,20 +1121,20 @@ function dbList(page, search){
         var list = '';
         for(i in rdata.data){
             list += '<tr>';
-            list +='<td><input value="'+rdata.data[i]['id']+'" class="check" onclick="checkSelect();" type="checkbox"></td>';
-            list += '<td>' + rdata.data[i]['name'] +'</td>';
-            list += '<td>' + rdata.data[i]['username'] +'</td>';
+            list +='<td><input value="'+htmlEncode(rdata.data[i]['id'])+'" class="check" onclick="checkSelect();" type="checkbox"></td>';
+            list += '<td>' + htmlEncode(rdata.data[i]['name']) +'</td>';
+            list += '<td>' + htmlEncode(rdata.data[i]['username']) +'</td>';
             list += '<td>' + 
-                        '<span class="password" data-pw="'+rdata.data[i]['password']+'">***</span>' +
+                        '<span class="password" data-pw="'+htmlEncode(rdata.data[i]['password'])+'">***</span>' +
                         '<span onclick="showHidePass(this)" class="glyphicon glyphicon-eye-open cursor pw-ico" style="margin-left:10px"></span>'+
-                        '<span class="ico-copy cursor btcopy" style="margin-left:10px" title="复制密码" onclick="copyPass(\''+rdata.data[i]['password']+'\')"></span>'+
+                        '<span class="ico-copy cursor btcopy" style="margin-left:10px" title="复制密码" onclick="copyPass(\''+jsEncode(rdata.data[i]['password'])+'\')"></span>'+
                     '</td>';
         
 
-            list += '<td><span class="c9 input-edit" onclick="setDbPs(\''+rdata.data[i]['id']+'\',\''+rdata.data[i]['name']+'\',this)" style="display: inline-block;">'+rdata.data[i]['ps']+'</span></td>';
+            list += '<td><span class="c9 input-edit" onclick="setDbPs(\''+jsEncode(rdata.data[i]['id'])+'\',\''+jsEncode(rdata.data[i]['name'])+'\',this)" style="display: inline-block;">'+htmlEncode(rdata.data[i]['ps'])+'</span></td>';
             list += '<td style="text-align:right">';
 
-            list += '<a href="javascript:;" class="btlink" class="btlink" onclick="setBackup(\''+rdata.data[i]['name']+'\',this)" title="数据库备份">'+(rdata.data[i]['is_backup']?'备份':'未备份') +'</a> | ';
+            list += '<a href="javascript:;" class="btlink" class="btlink" onclick="setBackup(\''+jsEncode(rdata.data[i]['name'])+'\',this)" title="数据库备份">'+(rdata.data[i]['is_backup']?'备份':'未备份') +'</a> | ';
 
             var rw = '';
             var rw_change = 'all';
@@ -1150,14 +1150,14 @@ function dbList(page, search){
                     rw_val = "只读";
                     rw_change = 'all';
                 }
-                rw = '<a href="javascript:;" class="btlink" onclick="setDbRw(\''+rdata.data[i]['id']+'\',\''+rdata.data[i]['name']+'\',\''+rw_change+'\')" title="设置读写">'+rw_val+'</a> | ';
+                rw = '<a href="javascript:;" class="btlink" onclick="setDbRw(\''+jsEncode(rdata.data[i]['id'])+'\',\''+jsEncode(rdata.data[i]['name'])+'\',\''+rw_change+'\')" title="设置读写">'+rw_val+'</a> | ';
             }
 
-            list +=  '<a href="javascript:;" class="btlink" onclick="repTools(\''+rdata.data[i]['name']+'\')" title="数据表信息">工具</a> | '
-            list += '<a href="javascript:;" class="btlink" onclick="setDbAccess(\''+rdata.data[i]['name']+'\')" title="设置数据库权限">权限</a> | ' +
+            list +=  '<a href="javascript:;" class="btlink" onclick="repTools(\''+jsEncode(rdata.data[i]['name'])+'\')" title="数据表信息">工具</a> | '
+            list += '<a href="javascript:;" class="btlink" onclick="setDbAccess(\''+jsEncode(rdata.data[i]['name'])+'\')" title="设置数据库权限">权限</a> | ' +
                         rw +
-                        '<a href="javascript:;" class="btlink" onclick="setDbPass('+rdata.data[i]['id']+',\''+ rdata.data[i]['username'] +'\',\'' + rdata.data[i]['password'] + '\')">改密</a> | ' +
-                        '<a href="javascript:;" class="btlink" onclick="delDb(\''+rdata.data[i]['id']+'\',\''+rdata.data[i]['name']+'\')" title="删除数据库">删除</a>' +
+                        '<a href="javascript:;" class="btlink" onclick="setDbPass('+rdata.data[i]['id']+',\''+ jsEncode(rdata.data[i]['username']) +'\',\'' + jsEncode(rdata.data[i]['password']) + '\')">改密</a> | ' +
+                        '<a href="javascript:;" class="btlink" onclick="delDb(\''+jsEncode(rdata.data[i]['id'])+'\',\''+jsEncode(rdata.data[i]['name'])+'\')" title="删除数据库">删除</a>' +
                     '</td>';
             list += '</tr>';
         }
@@ -1165,7 +1165,7 @@ function dbList(page, search){
         //<button onclick="" id="dataRecycle" title="删除选中项" class="btn btn-default btn-sm" style="margin-left: 5px;"><span class="glyphicon glyphicon-trash" style="margin-right: 5px;"></span>回收站</button>
         var con = '<div class="safe bgw">\
             <button onclick="addDatabase()" title="添加数据库" class="btn btn-success btn-sm" type="button" style="margin-right: 5px;">添加数据库</button>\
-            <button onclick="setRootPwd(0,\''+rdata.info['root_pwd']+'\')" title="管理员密码" class="btn btn-default btn-sm" type="button" style="margin-right: 5px;">PG密码</button>\
+            <button onclick="setRootPwd(0,\''+jsEncode(rdata.info['root_pwd'])+'\')" title="管理员密码" class="btn btn-default btn-sm" type="button" style="margin-right: 5px;">PG密码</button>\
             <button onclick="setDbAccess(\'postgres\')" title="ROOT权限" class="btn btn-default btn-sm" type="button" style="margin-right: 5px;">ROOT权限</button>\
             <button onclick="fixDbAccess(\'postgres\')" title="修复" class="btn btn-default btn-sm" type="button" style="margin-right: 5px;">修复</button>\
             <span style="float:right">              \
@@ -1309,7 +1309,7 @@ function updateMasterRepSlaveUser(username){
         shift: 5,
         shadeClose: true,
         content: "<form class='bt-form pd20 pb70' id='update_master'>\
-            <div class='line'><span class='tname'>用户名</span><div class='info-r'><input name='username' readonly='readonly' class='bt-input-text mr5' placeholder='用户名' type='text' style='width:330px;' value='"+username+"'></div></div>\
+            <div class='line'><span class='tname'>用户名</span><div class='info-r'><input name='username' readonly='readonly' class='bt-input-text mr5' placeholder='用户名' type='text' style='width:330px;' value='"+htmlEncode(username)+"'></div></div>\
             <div class='line'>\
             <span class='tname'>密码</span>\
             <div class='info-r'><input class='bt-input-text mr5' type='text' name='password' id='MyPassword' style='width:330px' value='"+(randomStrPwd(16))+"' /><span title='随机密码' class='glyphicon glyphicon-repeat cursor' onclick='repeatPwd(16)'></span></div>\
@@ -1372,7 +1372,7 @@ function setMasterRepSlaveAccess(name){
                     $('select[name="dataAccess"]').find('option[value="0.0.0.0/0"]').attr("selected",true);
                 } else {
                     $('select[name="dataAccess"]').find('option[value="ip"]').attr("selected",true);
-                    $('select[name="dataAccess"]').after("<input value='"+rdata.msg+"' class='bt-input-text mr5' type='text' name='address' placeholder='如: 192.168.1.0/24' style='width: 230px; display: inline-block;'>");
+                    $('select[name="dataAccess"]').after("<input value='"+htmlEncode(rdata.msg)+"' class='bt-input-text mr5' type='text' name='address' placeholder='如: 192.168.1.0/24' style='width: 230px; display: inline-block;'>");
                 }
 
                 $('select[name="dataAccess"]').change(function(){
@@ -1429,7 +1429,7 @@ function getMasterRepSlaveUserCmd(username, db=''){
             title: '同步命令',
             area: '500px',
             content:"<form class='bt-form pd20 pb70' id='add_master'>\
-            <div class='line'>"+cmd+"</div>\
+            <div class='line'>"+htmlEncode(cmd)+"</div>\
             <div class='bt-form-submit-btn' style='text-align:center;'>\
                 <button type='button' class='btn btn-success btn-sm btn-title'>选择其中一个复制</button>\
             </div>\
@@ -1471,12 +1471,12 @@ function getMasterRepSlaveList(){
         for (i in user_list) {
             // console.log(i);/setDbMasterAccess
             var name = user_list[i]['username'];
-            list += '<tr><td>'+name+'</td>\
-                <td>'+user_list[i]['password']+'</td>\
+            list += '<tr><td>'+htmlEncode(name)+'</td>\
+                <td>'+htmlEncode(user_list[i]['password'])+'</td>\
                 <td>\
-                    <a class="btlink" onclick="delMasterRepSlaveUser(\''+name+'\');">删除</a> | \
-                    <a class="btlink" onclick="setMasterRepSlaveAccess(\''+name+'\');">权限</a> | \
-                    <a class="btlink" onclick="getMasterRepSlaveUserCmd(\''+name+'\');">从库同步命令</a> \
+                    <a class="btlink" onclick="delMasterRepSlaveUser(\''+jsEncode(name)+'\');">删除</a> | \
+                    <a class="btlink" onclick="setMasterRepSlaveAccess(\''+jsEncode(name)+'\');">权限</a> | \
+                    <a class="btlink" onclick="getMasterRepSlaveUserCmd(\''+jsEncode(name)+'\');">从库同步命令</a> \
                 </td>\
             </tr>';
         }
@@ -1526,7 +1526,7 @@ function getFullSyncStatus(db){
     var btn = '<div class="table_toolbar" style="left:0px;"><span data-status="init" class="sync btn btn-default btn-sm" id="begin_full_sync" title="">开始</span></div>';
     var loadOpen = layer.open({
         type: 1,
-        title: '全量同步['+db+']',
+        title: '全量同步['+htmlEncode(db)+']',
         area: '500px',
         content:"<div class='bt-form pd20 c6'>\
                  <div class='divtable mtb10'>\
@@ -1599,8 +1599,8 @@ function addSlaveSSH(ip=''){
             shadeClose: true,
             btn:["确认","取消"],
             content: "<form class='bt-form pd20'>\
-                <div class='line'><span class='tname'>IP</span><div class='info-r'><input name='ip' class='bt-input-text mr5' type='text' style='width:330px;' value='"+ip+"'></div></div>\
-                <div class='line'><span class='tname'>端口</span><div class='info-r'><input name='port' class='bt-input-text mr5' type='number' style='width:330px;' value='"+port+"'></div></div>\
+                <div class='line'><span class='tname'>IP</span><div class='info-r'><input name='ip' class='bt-input-text mr5' type='text' style='width:330px;' value='"+htmlEncode(ip)+"'></div></div>\
+                <div class='line'><span class='tname'>端口</span><div class='info-r'><input name='port' class='bt-input-text mr5' type='number' style='width:330px;' value='"+htmlEncode(port)+"'></div></div>\
                 <div class='line'>\
                 <span class='tname'>ID_RSA</span>\
                 <div class='info-r'><textarea class='bt-input-text mr5' row='20' cols='50' name='id_rsa' style='width:330px;height:200px;'></textarea></div>\
@@ -1669,12 +1669,12 @@ function getSlaveSSHPage(page=1){
                 db_user = ssh_list[i]['db_user'];
             }
 
-            list += '<tr><td>'+ip+'</td>\
-                <td>'+port+'</td>\
+            list += '<tr><td>'+htmlEncode(ip)+'</td>\
+                <td>'+htmlEncode(port)+'</td>\
                 <td>'+id_rsa+'</td>\
                 <td>\
-                    <a class="btlink" onclick="addSlaveSSH(\''+ip+'\');">修改</a> | \
-                    <a class="btlink" onclick="delSlaveSSH(\''+ip+'\');">删除</a>\
+                    <a class="btlink" onclick="addSlaveSSH(\''+jsEncode(ip)+'\');">修改</a> | \
+                    <a class="btlink" onclick="delSlaveSSH(\''+jsEncode(ip)+'\');">删除</a>\
                 </td>\
             </tr>';
         }
@@ -1717,11 +1717,11 @@ function addSlaveSyncUser(ip=''){
             shadeClose: true,
             btn:["确认","取消"],
             content: "<form class='bt-form pd20'>\
-                <div class='line'><span class='tname'>IP</span><div class='info-r'><input name='ip' class='bt-input-text mr5' type='text' style='width:330px;' value='"+ip+"'></div></div>\
-                <div class='line'><span class='tname'>端口</span><div class='info-r'><input name='port' class='bt-input-text mr5' type='number' style='width:330px;' value='"+port+"'></div></div>\
-                <div class='line'><span class='tname'>同步账户</span><div class='info-r'><input name='user' class='bt-input-text mr5' type='text' style='width:330px;' value='"+user+"'></div></div>\
-                <div class='line'><span class='tname'>同步密码</span><div class='info-r'><input name='pass' class='bt-input-text mr5' type='text' style='width:330px;' value='"+pass+"'></div></div>\
-                <div class='line'><span class='tname'>槽名</span><div class='info-r'><input name='slot_name' class='bt-input-text mr5' type='text' style='width:330px;' value='"+slot_name+"'></div></div>\
+                <div class='line'><span class='tname'>IP</span><div class='info-r'><input name='ip' class='bt-input-text mr5' type='text' style='width:330px;' value='"+htmlEncode(ip)+"'></div></div>\
+                <div class='line'><span class='tname'>端口</span><div class='info-r'><input name='port' class='bt-input-text mr5' type='number' style='width:330px;' value='"+htmlEncode(port)+"'></div></div>\
+                <div class='line'><span class='tname'>同步账户</span><div class='info-r'><input name='user' class='bt-input-text mr5' type='text' style='width:330px;' value='"+htmlEncode(user)+"'></div></div>\
+                <div class='line'><span class='tname'>同步密码</span><div class='info-r'><input name='pass' class='bt-input-text mr5' type='text' style='width:330px;' value='"+htmlEncode(pass)+"'></div></div>\
+                <div class='line'><span class='tname'>槽名</span><div class='info-r'><input name='slot_name' class='bt-input-text mr5' type='text' style='width:330px;' value='"+htmlEncode(slot_name)+"'></div></div>\
                 <div class='line'>\
                     <span class='tname'>同步模式</span>\
                     <div class='info-r'>\
@@ -1734,10 +1734,10 @@ function addSlaveSyncUser(ip=''){
                 <span class='tname'>CMD[必填]</span>\
                 <div class='info-r'><textarea class='bt-input-text mr5' row='20' cols='30' name='cmd' style='width:330px;height:150px;'></textarea></div>\
                 </div>\
-                <input type='hidden' name='mode' value='"+mode+"' />\
+                <input type='hidden' name='mode' value='"+htmlEncode(mode)+"' />\
               </form>",
             success:function(){
-                $('textarea[name="cmd"]').html(cmd);
+                $('textarea[name="cmd"]').html(htmlEncode(cmd));
                 $('textarea[name="cmd"]').change(function(){
                     var val = $(this).val();
                     if (val == '') {
@@ -1817,14 +1817,14 @@ function getSlaveSyncUserPage(page=1){
                 cmd = '已设置';
             }
 
-            list += '<tr><td>'+ip+'</td>\
-                <td>'+port+'</td>\
-                <td>'+user+'</td>\
-                <td>'+apass+'</td>\
+            list += '<tr><td>'+htmlEncode(ip)+'</td>\
+                <td>'+htmlEncode(port)+'</td>\
+                <td>'+htmlEncode(user)+'</td>\
+                <td>'+htmlEncode(apass)+'</td>\
                 <td>'+cmd+'</td>\
                 <td>\
-                    <a class="btlink" onclick="addSlaveSyncUser(\''+ip+'\');">修改</a> | \
-                    <a class="btlink" onclick="delSlaveSyncUser(\''+ip+'\');">删除</a>\
+                    <a class="btlink" onclick="addSlaveSyncUser(\''+jsEncode(ip)+'\');">修改</a> | \
+                    <a class="btlink" onclick="delSlaveSyncUser(\''+jsEncode(ip)+'\');">删除</a>\
                 </td>\
             </tr>';
         }
@@ -1961,7 +1961,7 @@ function handlerRun(){
             title: '手动执行',
             area: '500px',
             content:"<form class='bt-form pd20 pb70' id='add_master'>\
-            <div class='line'>"+cmd+"</div>\
+            <div class='line'>"+htmlEncode(cmd)+"</div>\
             <div class='bt-form-submit-btn'>\
                 <button type='button' class='btn btn-success btn-sm btn-title class-copy-cmd'>复制</button>\
             </div>\
@@ -1990,7 +1990,7 @@ function slaveSyncCmd(){
             title: '同步命令',
             area: '500px',
             content:"<form class='bt-form pd20 pb70' id='add_master'>\
-            <div class='line'>"+cmd+"</div>\
+            <div class='line'>"+htmlEncode(cmd)+"</div>\
             <div class='bt-form-submit-btn'>\
                 <button type='button' class='btn btn-success btn-sm btn-title class-copy-cmd'>复制</button>\
             </div>\
@@ -2060,7 +2060,7 @@ function masterOrSlaveConf(version=''){
         myPostN('get_master_link', {}, function(data){
             var rdata = $.parseJSON(data.data);
             if (rdata.status === false){
-                $('.table_master_list').html('<div class="alert alert-danger" style="margin:10px 0">' + rdata.msg + '</div>');
+                $('.table_master_list').html('<div class="alert alert-danger" style="margin:10px 0">' + htmlEncode(rdata.msg) + '</div>');
                 return;
             }
 
@@ -2072,10 +2072,10 @@ function masterOrSlaveConf(version=''){
                 if (item.client_port) address += ':' + item.client_port;
                 list += '<div style="border:1px solid #ddd;border-radius:4px;margin-bottom:10px;overflow:hidden">\
                     <div class="clearfix" style="padding:8px 12px;background:#f5f5f5;">\
-                        <strong>' + replicationValue(item.application_name) + '</strong><span class="pull-right">' + replicationStatus(item.state) + '</span>\
+                        <strong>' + htmlEncode(replicationValue(item.application_name)) + '</strong><span class="pull-right">' + replicationStatus(item.state) + '</span>\
                     </div>\
                     <table class="table" style="margin:0;table-layout:fixed"><tbody>\
-                        <tr><th style="width:15%">从库地址</th><td style="width:35%">' + address + '</td><th style="width:15%">复制账户</th><td style="width:35%">' + replicationValue(item.usename) + '</td></tr>\
+                        <tr><th style="width:15%">从库地址</th><td style="width:35%">' + htmlEncode(address) + '</td><th style="width:15%">复制账户</th><td style="width:35%">' + htmlEncode(replicationValue(item.usename)) + '</td></tr>\
                         <tr><th>同步模式</th><td>' + replicationSync(item.sync_state) + '</td><th>回放延迟</th><td>' + replicationDelay(item.replay_lag) + '</td></tr>\
                         <tr><th>发送位置</th><td>' + replicationLsn(item.sent_lsn) + '</td><th>写入位置</th><td>' + replicationLsn(item.write_lsn) + '</td></tr>\
                         <tr><th>刷盘位置</th><td>' + replicationLsn(item.flush_lsn) + '</td><th>回放位置</th><td>' + replicationLsn(item.replay_lsn) + '</td></tr>\
@@ -2099,7 +2099,7 @@ function masterOrSlaveConf(version=''){
         myPost('get_slave_link', {}, function(data){
             var rdata = $.parseJSON(data.data);
             if (rdata.status === false){
-                $('.table_slave_status_list').html('<div class="alert alert-danger" style="margin:10px 0">' + rdata.msg + '</div>');
+                $('.table_slave_status_list').html('<div class="alert alert-danger" style="margin:10px 0">' + htmlEncode(rdata.msg) + '</div>');
                 return;
             }
 
@@ -2111,10 +2111,10 @@ function masterOrSlaveConf(version=''){
                 if (item.sender_port) address += ':' + item.sender_port;
                 list += '<div style="border:1px solid #ddd;border-radius:4px;margin-bottom:10px;overflow:hidden">\
                     <div class="clearfix" style="padding:8px 12px;background:#f5f5f5;">\
-                        <strong>主库 ' + address + '</strong><span class="pull-right">' + replicationStatus(item.status) + '</span>\
+                        <strong>主库 ' + htmlEncode(address) + '</strong><span class="pull-right">' + replicationStatus(item.status) + '</span>\
                     </div>\
                     <table class="table" style="margin:0;table-layout:fixed"><tbody>\
-                        <tr><th style="width:15%">复制槽</th><td style="width:35%">' + replicationValue(item.slot_name) + '</td><th style="width:15%">回放延迟</th><td style="width:35%">' + replicationDelay(item.last_lsn_commit_time) + '</td></tr>\
+                        <tr><th style="width:15%">复制槽</th><td style="width:35%">' + htmlEncode(replicationValue(item.slot_name)) + '</td><th style="width:15%">回放延迟</th><td style="width:35%">' + replicationDelay(item.last_lsn_commit_time) + '</td></tr>\
                         <tr><th>接收位置</th><td>' + replicationLsn(item.receive_lsn) + '</td><th>回放位置</th><td>' + replicationLsn(item.replay_lsn) + '</td></tr>\
                         <tr><th>写入位置</th><td>' + replicationLsn(item.written_lsn) + '</td><th>刷盘位置</th><td>' + replicationLsn(item.flushed_lsn) + '</td></tr>\
                         <tr><th>接收起始</th><td>' + replicationLsn(item.receive_start_lsn) + '</td><th>最新结束</th><td>' + replicationLsn(item.latest_end_lsn) + '</td></tr>\
@@ -2140,7 +2140,7 @@ function masterOrSlaveConf(version=''){
             var limitCon = '\
                 <p class="conf_p">\
                     <span class="f14 c6 mr20">复制模式</span><span class="f14 c6 mr20"></span>\
-                    <button class="btn btn-default btn-xs">'+(rdata.mode == "classic" ? '经典流复制' : rdata.mode)+'</button>\
+                    <button class="btn btn-default btn-xs">'+(rdata.mode == "classic" ? '经典流复制' : htmlEncode(rdata.mode))+'</button>\
                 </p>\
                 <hr style="margin:12px 0"/>\
                 <p class="conf_p">\

@@ -113,16 +113,16 @@ function dtFileList(){
         var tli = '';
         for (var i = 0; i < alist.length; i++) {
             if (i==0){
-                tli +='<li title="双击打开浏览"  class="data-file-list active" data-index="'+i+'" data-file="'+alist[i]['name']+'">\
-                    <span class="file">'+alist[i]['name']+'</span>\
+                tli +='<li title="双击打开浏览"  class="data-file-list active" data-index="'+i+'" data-file="'+htmlEncode(alist[i]['name'])+'">\
+                    <span class="file">'+htmlEncode(alist[i]['name'])+'</span>\
                     <span class="tootls">\
                         <span class="glyphicon glyphicon-link" aria-hidden="true" title="外部连接"></span>\
                         <span class="glyphicon glyphicon-trash" aria-hidden="true" title="删除"></span>\
                     </span>\
                 </li>';
             } else{
-                tli +='<li class="data-file-list" data-index="'+i+'" data-file="'+alist[i]['name']+'">\
-                    <span class="file">'+alist[i]['name']+'</span>\
+                tli +='<li class="data-file-list" data-index="'+i+'" data-file="'+htmlEncode(alist[i]['name'])+'">\
+                    <span class="file">'+htmlEncode(alist[i]['name'])+'</span>\
                     <span class="tootls">\
                         <span class="glyphicon glyphicon-link" aria-hidden="true" title="外部连接"></span>\
                         <span class="glyphicon glyphicon-trash" aria-hidden="true" title="删除"></span>\

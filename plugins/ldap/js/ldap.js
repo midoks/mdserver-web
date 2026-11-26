@@ -63,24 +63,24 @@ function getLadpConfig(version) {
         for (var i = 0; i < rdata.length; i++) {
             var w = '70'
             if (rdata[i].name == 'error_reporting') w = '250';
-            var ibody = '<input style="width: ' + w + 'px;" class="bt-input-text mr5" name="' + rdata[i].name + '" value="' + rdata[i].value + '" type="text" >';
+            var ibody = '<input style="width: ' + w + 'px;" class="bt-input-text mr5" name="' + htmlEncode(rdata[i].name) + '" value="' + htmlEncode(rdata[i].value) + '" type="text" >';
             switch (rdata[i].type) {
                 case 0:
                     var selected_1 = (rdata[i].value == 1) ? 'selected' : '';
                     var selected_0 = (rdata[i].value == 0) ? 'selected' : '';
-                    ibody = '<select class="bt-input-text mr5" name="' + rdata[i].name + '" style="width: ' + w + 'px;"><option value="1" ' + selected_1 + '>开启</option><option value="0" ' + selected_0 + '>关闭</option></select>'
+                    ibody = '<select class="bt-input-text mr5" name="' + htmlEncode(rdata[i].name) + '" style="width: ' + w + 'px;"><option value="1" ' + selected_1 + '>开启</option><option value="0" ' + selected_0 + '>关闭</option></select>'
                     break;
                 case 1:
                     var selected_1 = (rdata[i].value == 'On') ? 'selected' : '';
                     var selected_0 = (rdata[i].value == 'Off') ? 'selected' : '';
-                    ibody = '<select class="bt-input-text mr5" name="' + rdata[i].name + '" style="width: ' + w + 'px;"><option value="On" ' + selected_1 + '>开启</option><option value="Off" ' + selected_0 + '>关闭</option></select>'
+                    ibody = '<select class="bt-input-text mr5" name="' + htmlEncode(rdata[i].name) + '" style="width: ' + w + 'px;"><option value="On" ' + selected_1 + '>开启</option><option value="Off" ' + selected_0 + '>关闭</option></select>'
                     break;
             }
-            mlist += '<p><span>' + rdata[i].name + '</span>' + ibody + ', <font>' + rdata[i].ps + '</font></p>'
+            mlist += '<p><span>' + htmlEncode(rdata[i].name) + '</span>' + ibody + ', <font>' + htmlEncode(rdata[i].ps) + '</font></p>'
         }
         var con = '<style>.conf_p p{margin-bottom: 2px}</style><div class="conf_p" style="margin-bottom:0">' + mlist + '\
-                        <div style="margin-top:10px; padding-right:15px" class="text-right"><button class="btn btn-success btn-sm mr5" onclick="getRedisConfig(\'' + version + '\')">刷新</button>\
-                        <button class="btn btn-success btn-sm" onclick="submitConf(\'' + version + '\')">保存</button></div>\
+                        <div style="margin-top:10px; padding-right:15px" class="text-right"><button class="btn btn-success btn-sm mr5" onclick="getRedisConfig(\'' + jsEncode(version) + '\')">刷新</button>\
+                        <button class="btn btn-success btn-sm" onclick="submitConf(\'' + jsEncode(version) + '\')">保存</button></div>\
                     </div>'
         $(".soft-man-con").html(con);
     });

@@ -40,7 +40,7 @@ function homePage(){
             layer.msg(rdata.msg,{icon:0,time:2000,shade: [0.3, '#000']});
             return;
         }
-        var con = '<button class="btn btn-default btn-sm" onclick="window.open(\'' + rdata.data + '\')">主页</button>';
+        var con = '<button class="btn btn-default btn-sm" onclick="window.open(\'' + jsEncode(rdata.data) + '\')">主页</button>';
         $(".soft-man-con").html(con);
     });
 }
@@ -58,29 +58,29 @@ function safeConf() {
         var cfg = rdata.data;
         var con = '<div class="ver line">\
                     <span class="tname">访问端口</span>\
-                    <input style="width:110px" class="bt-input-text phpmyadmindk mr20" name="Name" id="pmport" value="' + cfg['port'] + '" placeholder="pgadmin访问端口" maxlength="5" type="number">\
+                    <input style="width:110px" class="bt-input-text phpmyadmindk mr20" name="Name" id="pmport" value="' + htmlEncode(cfg['port']) + '" placeholder="pgadmin访问端口" maxlength="5" type="number">\
                     <button class="btn btn-success btn-sm" onclick="setPgPort()">保存</button>\
                 </div>\
                 <div class="ver line">\
                     <span class="tname">用户名</span>\
-                    <input style="width:110px" class="bt-input-text mr20" name="username" id="pmport" value="' + cfg['username'] + '" placeholder="认证用户名" type="text">\
+                    <input style="width:110px" class="bt-input-text mr20" name="username" id="pmport" value="' + htmlEncode(cfg['username']) + '" placeholder="认证用户名" type="text">\
                     <button class="btn btn-success btn-sm" onclick="setPgUsername()">保存</button>\
                 </div>\
                 <div class="ver line">\
                     <span class="tname">密码</span>\
-                    <input style="width:110px" class="bt-input-text mr20" name="password" id="pmport" value="' + cfg['password'] + '" placeholder="密码" type="text">\
+                    <input style="width:110px" class="bt-input-text mr20" name="password" id="pmport" value="' + htmlEncode(cfg['password']) + '" placeholder="密码" type="text">\
                     <button class="btn btn-success btn-sm" onclick="setPgPassword()">保存</button>\
                 </div>\
                 <hr/>\
                 <div class="ver line">pgadmin登录信息</div>\
                 <div class="ver line">\
                     <span class="tname">PG登录用户名</span>\
-                    <input style="width:110px" class="bt-input-text mr20" name="username" id="pmport" value="' + cfg['web_pg_username'] + '" placeholder="PG登录用户名" type="text">\
+                    <input style="width:110px" class="bt-input-text mr20" name="username" id="pmport" value="' + htmlEncode(cfg['web_pg_username']) + '" placeholder="PG登录用户名" type="text">\
                     <button class="btn btn-success btn-sm" onclick="setPgUsername()">保存</button>\
                 </div>\
                 <div class="ver line">\
                     <span class="tname">PG登录密码</span>\
-                    <input style="width:110px" class="bt-input-text mr20" name="password" id="pmport" value="' + cfg['web_pg_password'] + '" placeholder="PG登录密码" type="text">\
+                    <input style="width:110px" class="bt-input-text mr20" name="password" id="pmport" value="' + htmlEncode(cfg['web_pg_password']) + '" placeholder="PG登录密码" type="text">\
                     <button class="btn btn-success btn-sm" onclick="setPgPassword()">保存</button>\
                 </div>';
         $(".soft-man-con").html(con);

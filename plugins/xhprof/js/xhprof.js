@@ -38,7 +38,7 @@ function homePage(){
             layer.msg(rdata.msg,{icon:0,time:2000,shade: [0.3, '#000']});
             return;
         }
-        var con = '<button class="btn btn-default btn-sm" onclick="window.open(\'' + rdata.data + '\')">主页</button>';
+        var con = '<button class="btn btn-default btn-sm" onclick="window.open(\'' + jsEncode(rdata.data) + '\')">主页</button>';
         $(".soft-man-con").html(con);
     });
 }
@@ -86,7 +86,7 @@ function safeConf() {
     }
     var con = '<div class="ver line">\
                     <span style="margin-right:10px">访问端口</span>\
-                    <input class="bt-input-text mr20" name="Name" id="pmport" value="' + rdata['data'] + '" placeholder="phpmyadmin访问端口" maxlength="5" type="number">\
+                    <input class="bt-input-text mr20" name="Name" id="pmport" value="' + htmlEncode(rdata['data']) + '" placeholder="phpmyadmin访问端口" maxlength="5" type="number">\
                     <button class="btn btn-success btn-sm" onclick="xhprofPort()">保存</button>\
                 </div>';
     $(".soft-man-con").html(con);

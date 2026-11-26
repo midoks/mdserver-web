@@ -255,7 +255,7 @@ function runStatus(){
             if (typeof(idata[k]) == 'undefined' || idata[k] === ''){
                 return '-';
             }
-            return idata[k];
+            return htmlEncode(idata[k]);
         };
 
         var uptime = parseFloat(idata.uptime);
@@ -330,7 +330,7 @@ function runStatus(){
             if (used[i]) {
                 continue;
             }
-            tbody += '<tr><th>' + i + '</th><td>' + idata[i] + '</td><td class="c6">searchd 原始指标, 暂未收录中文说明</td></tr>';
+            tbody += '<tr><th>' + htmlEncode(i) + '</th><td>' + htmlEncode(idata[i]) + '</td><td class="c6">searchd 原始指标, 暂未收录中文说明</td></tr>';
         }
 
         var con = '<div class="divtable"><table class="table table-hover table-bordered" style="margin-bottom:10px;background-color:#fafafa">\
@@ -368,18 +368,18 @@ function readme(){
         con += '<li style="color:red;">如果数据量比较大,第一次启动会失败!(可通过手动建立索引)</li>';
         con += '<li style="color:red;">以下内容,需手动加入计划任务。</li>';
 
-        con += '<li>全量:' + rdata['data']['cmd'] + ' --all --rotate</li>';
+        con += '<li>全量:' + htmlEncode(rdata['data']['cmd']) + ' --all --rotate</li>';
 
         //主索引
         for (var i = 0; i < rdata['data']['index'].length; i++) {
             var index_kv = rdata['data']['index'][i];
             var index = index_kv['index'];
             // console.log(index);
-            con += '<li>主索引 :' + rdata['data']['cmd'] + ' '+ index +' --rotate</li>';
+            con += '<li>主索引 :' + htmlEncode(rdata['data']['cmd']) + ' '+ htmlEncode(index) +' --rotate</li>';
             if (typeof(index_kv['delta']) != 'undefined'){
                 var delta = index_kv['delta'];
-                con += '<li>增量索引 :' + rdata['data']['cmd'] + ' '+ delta +' --rotate</li>';
-                con += '<li>合并索引 :' + rdata['data']['cmd'] + ' --merge '+ index  + ' ' + delta +' --rotate</li>';
+                con += '<li>增量索引 :' + htmlEncode(rdata['data']['cmd']) + ' '+ htmlEncode(delta) +' --rotate</li>';
+                con += '<li>合并索引 :' + htmlEncode(rdata['data']['cmd']) + ' --merge '+ htmlEncode(index)  + ' ' + htmlEncode(delta) +' --rotate</li>';
             }
         }
         con += '</ul>';

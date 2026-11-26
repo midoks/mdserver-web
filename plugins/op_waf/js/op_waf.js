@@ -66,7 +66,7 @@ function getRuleByName(rule_name, callback){
 function setRequestCode(ruleName, statusCode){
     layer.open({
         type: 1,
-        title: "设置响应代码【" + ruleName + "】",
+        title: "设置响应代码【" + htmlEncode(ruleName) + "】",
         area: '300px',
         shift: 5,
         closeBtn: 1,
@@ -87,7 +87,7 @@ function setRequestCode(ruleName, statusCode){
                         </div>\
                     </div>\
                     <div class="bt-form-submit-btn">\
-                        <button type="button" class="btn btn-success btn-sm btn-title" onclick="setState(\''+ ruleName + '\')">确定</button>\
+                        <button type="button" class="btn btn-success btn-sm btn-title" onclick="setState(\''+ jsEncode(ruleName) + '\')">确定</button>\
                     </div>\
                 </div>'
     });
@@ -192,18 +192,18 @@ function setCcRule(cycle, limit, endtime, siteName, increase){
         content: '<form class="bt-form pd20 pb70">\
                 <div class="line">\
                     <span class="tname">周期</span>\
-                    <div class="info-r"><input class="bt-input-text" name="cc_cycle" type="number" value="'+ cycle + '" /> 秒</div>\
+                    <div class="info-r"><input class="bt-input-text" name="cc_cycle" type="number" value="'+ htmlEncode(cycle) + '" /> 秒</div>\
                 </div>\
                 <div class="line">\
                     <span class="tname">频率</span>\
-                    <div class="info-r"><input class="bt-input-text" name="cc_limit" type="number" value="'+ limit + '" /> 次</div>\
+                    <div class="info-r"><input class="bt-input-text" name="cc_limit" type="number" value="'+ htmlEncode(limit) + '" /> 次</div>\
                 </div>\
                 <div class="line">\
                     <span class="tname">封锁时间</span>\
-                    <div class="info-r"><input class="bt-input-text" name="cc_endtime" type="number" value="'+ endtime + '" /> 秒</div>\
+                    <div class="info-r"><input class="bt-input-text" name="cc_endtime" type="number" value="'+ htmlEncode(endtime) + '" /> 秒</div>\
                 </div>\
                 <ul class="help-info-text c7 ptb10">'+ incstr + '\
-                    <li><font style="color:red;">'+ cycle + '</font> 秒内累计请求同一URL超过  <font style="color:red;">' + limit + '</font> 次,触发CC防御,封锁此IP <font style="color:red;">' + endtime + '</font> 秒</li>\
+                    <li><font style="color:red;">'+ htmlEncode(cycle) + '</font> 秒内累计请求同一URL超过  <font style="color:red;">' + htmlEncode(limit) + '</font> 次,触发CC防御,封锁此IP <font style="color:red;">' + htmlEncode(endtime) + '</font> 秒</li>\
                     <li>请不要设置过于严格的CC规则,以免影响正常用户体验</li>\
                     <li><font style="color:red;display:'+ (siteName == 'undefined'?'display: inline-block;':'none') +';">全局应用:全局设置当前CC规则，且覆盖当前全部站点的CC规则</font></li>\
                 </ul>\
@@ -235,18 +235,18 @@ function setRetry(retry_cycle, retry, retry_time, siteName) {
         content: '<form class="bt-form pd20 pb70">\
                 <div class="line">\
                     <span class="tname">周期</span>\
-                    <div class="info-r"><input class="bt-input-text" name="retry_cycle" type="number" value="'+ retry_cycle + '" /> 秒</div>\
+                    <div class="info-r"><input class="bt-input-text" name="retry_cycle" type="number" value="'+ htmlEncode(retry_cycle) + '" /> 秒</div>\
                 </div>\
                 <div class="line">\
                     <span class="tname">频率</span>\
-                    <div class="info-r"><input class="bt-input-text" name="retry" type="number" value="'+ retry + '" /> 次</div>\
+                    <div class="info-r"><input class="bt-input-text" name="retry" type="number" value="'+ htmlEncode(retry) + '" /> 次</div>\
                 </div>\
                 <div class="line">\
                     <span class="tname">封锁时间</span>\
-                    <div class="info-r"><input class="bt-input-text" name="retry_time" type="number" value="'+ retry_time + '" /> 秒</div>\
+                    <div class="info-r"><input class="bt-input-text" name="retry_time" type="number" value="'+ htmlEncode(retry_time) + '" /> 秒</div>\
                 </div>\
                 <ul class="help-info-text c7 ptb10">\
-                    <li><font style="color:red;">'+ retry_cycle + '</font> 秒内累计恶意请求超过  <font style="color:red;">' + retry + '</font> 次,封锁 <font style="color:red;">' + retry_time + '</font> 秒</li>\
+                    <li><font style="color:red;">'+ htmlEncode(retry_cycle) + '</font> 秒内累计恶意请求超过  <font style="color:red;">' + htmlEncode(retry) + '</font> 次,封锁 <font style="color:red;">' + htmlEncode(retry_time) + '</font> 秒</li>\
                     <li><font style="color:red;">全局应用:全局设置当前恶意容忍规则，且覆盖当前全部站点的恶意容忍规则</font></li>\
                 </ul>\
                 <div class="bt-form-submit-btn">\
@@ -278,12 +278,12 @@ function setSafeVerify(auto, cpu, time, mode,siteName) {
         content: '<form class="bt-form pd20 pb70">\
                 <div class="line">\
                     <span class="tname">CPU</span>\
-                    <div class="info-r"><input class="bt-input-text" name="cpu" type="number" max-number="100" value="'+ cpu + '" /> %</div>\
+                    <div class="info-r"><input class="bt-input-text" name="cpu" type="number" max-number="100" value="'+ htmlEncode(cpu) + '" /> %</div>\
                 </div>\
                 <div class="line">\
                     <span class="tname">通行时间</span>\
                     <div class="info-r">\
-                        <input class="bt-input-text" name="time" type="number" value="'+ time + '" /> 秒\
+                        <input class="bt-input-text" name="time" type="number" value="'+ htmlEncode(time) + '" /> 秒\
                     </div>\
                 </div>\
                 <div class="line">\
@@ -377,14 +377,14 @@ function addRule(ruleName) {
 
 function modifyRule(index, ruleName) {
     var ruleValue = $('.rule_body_' + index).text();
-    $('.rule_body_' + index).html('<textarea class="bt-input-text" name="rule_body_' + index + '" style="margin: 0px; height: 70px; width: 99%;line-height:20px">' + ruleValue + '</textarea>');
+    $('.rule_body_' + index).html('<textarea class="bt-input-text" name="rule_body_' + index + '" style="margin: 0px; height: 70px; width: 99%;line-height:20px">' + htmlEncode(ruleValue) + '</textarea>');
     var rulePs = $('.rule_ps_' + index).text();
-    $('.rule_ps_' + index).html('<input class="bt-input-text" type="text" name="rule_ps_' + index + '" value="' + rulePs + '" />');
-    $('.rule_modify_' + index).html('<a class="btlink" onclick="modifyRuleSave(' + index + ',\'' + ruleName + '\')">保存</a> | <a class="btlink modr_cancel_' + index + '">取消</a>');
+    $('.rule_ps_' + index).html('<input class="bt-input-text" type="text" name="rule_ps_' + index + '" value="' + htmlEncode(rulePs) + '" />');
+    $('.rule_modify_' + index).html('<a class="btlink" onclick="modifyRuleSave(' + index + ',\'' + jsEncode(ruleName) + '\')">保存</a> | <a class="btlink modr_cancel_' + index + '">取消</a>');
     $(".modr_cancel_" + index).click(function () {
-        $('.rule_body_' + index).html(ruleValue);
-        $('.rule_ps_' + index).html(rulePs);
-        $('.rule_modify_' + index).html('<a class="btlink" onclick="modifyRule(' + index + ',\'' + ruleName + '\')">编辑</a>');
+        $('.rule_body_' + index).html(htmlEncode(ruleValue));
+        $('.rule_ps_' + index).html(htmlEncode(rulePs));
+        $('.rule_modify_' + index).html('<a class="btlink" onclick="modifyRule(' + index + ',\'' + jsEncode(ruleName) + '\')">编辑</a>');
     })
 }
 
@@ -448,7 +448,7 @@ function setObjConf(ruleName, type) {
     if (type == undefined) {
         create_l = layer.open({
             type: 1,
-            title: "编辑规则【" + ruleName + "】",
+            title: "编辑规则【" + htmlEncode(ruleName) + "】",
             area: ['700px', '530px'],
             closeBtn: 1,
             shadeClose: false,
@@ -456,7 +456,7 @@ function setObjConf(ruleName, type) {
                 <div style="border-bottom:#ccc 1px solid;margin-bottom:10px;padding-bottom:10px">\
                 <input class="bt-input-text" name="ruleValue" type="text" value="" style="width:470px;margin-right:12px;" placeholder="规则内容,请使用正则表达式">\
                 <input class="bt-input-text mr5" name="rulePs" type="text" style="width:120px;" placeholder="描述">\
-                <button class="btn btn-success btn-sm va0 pull-right" onclick="addRule(\''+ ruleName + '\');">添加</button>\</div>\
+                <button class="btn btn-success btn-sm va0 pull-right" onclick="addRule(\''+ jsEncode(ruleName) + '\');">添加</button>\</div>\
                 <div class="divtable">\
                 <div id="jc-file-table" class="table_head_fix" style="max-height:300px;overflow:auto;border:#ddd 1px solid">\
                 <table class="table table-hover" style="border:none">\
@@ -487,15 +487,15 @@ function setObjConf(ruleName, type) {
         var tbody = ''
         for (var i = 0; i < rdata.length; i++) {
             var removeRule = ''
-            if (rdata[i][3] != 0) removeRule = ' | <a class="btlink" onclick="removeRule(\'' + ruleName + '\',' + i + ')">删除</a>';
+            if (rdata[i][3] != 0) removeRule = ' | <a class="btlink" onclick="removeRule(\'' + jsEncode(ruleName) + '\',' + i + ')">删除</a>';
             tbody += '<tr>\
-                    <td class="rule_body_'+ i + '">' + rdata[i][1] + '</td>\
-                    <td class="rule_ps_'+ i + '">' + rdata[i][2] + '</td>\
-                    <td class="rule_modify_'+ i + '"><a class="btlink" onclick="modifyRule(' + i + ',\'' + ruleName + '\')">编辑</a>' + removeRule + '</td>\
+                    <td class="rule_body_'+ i + '">' + htmlEncode(rdata[i][1]) + '</td>\
+                    <td class="rule_ps_'+ i + '">' + htmlEncode(rdata[i][2]) + '</td>\
+                    <td class="rule_modify_'+ i + '"><a class="btlink" onclick="modifyRule(' + i + ',\'' + jsEncode(ruleName) + '\')">编辑</a>' + removeRule + '</td>\
                     <td class="text-right">\
                         <div class="pull-right">\
                         <input class="btswitch btswitch-ios" id="closeua_'+ i + '" type="checkbox" ' + (rdata[i][0] ? 'checked' : '') + '>\
-                        <label class="btswitch-btn" style="width:2.0em;height:1.2em;margin-bottom: 0" for="closeua_'+ i + '" onclick="setRuleState(\'' + ruleName + '\',' + i + ')"></label>\
+                        <label class="btswitch-btn" style="width:2.0em;height:1.2em;margin-bottom: 0" for="closeua_'+ i + '" onclick="setRuleState(\'' + jsEncode(ruleName) + '\',' + i + ')"></label>\
                         </div>\
                     </td>\
                 </tr>'
@@ -521,15 +521,15 @@ function scanRule() {
             content: '<form class="bt-form pd20 pb70">\
                     <div class="line">\
                         <span class="tname">Header</span>\
-                        <div class="info-r"><textarea style="margin: 0px;width:475px;height: 75px;line-height:20px" class="bt-input-text" name="scan_header" >'+ rdata.header + '</textarea></div>\
+                        <div class="info-r"><textarea style="margin: 0px;width:475px;height: 75px;line-height:20px" class="bt-input-text" name="scan_header" >'+ htmlEncode(rdata.header) + '</textarea></div>\
                     </div>\
                     <div class="line">\
                         <span class="tname">Cookie</span>\
-                        <div class="info-r"><textarea style="margin: 0px;width:475px;height: 75px;line-height:20px" class="bt-input-text" name="scan_cookie" >'+ rdata.cookie + '</textarea></div>\
+                        <div class="info-r"><textarea style="margin: 0px;width:475px;height: 75px;line-height:20px" class="bt-input-text" name="scan_cookie" >'+ htmlEncode(rdata.cookie) + '</textarea></div>\
                     </div>\
                     <div class="line">\
                         <span class="tname">Args</span>\
-                        <div class="info-r"><textarea style="margin: 0px;width:475px;height: 75px;line-height:20px" class="bt-input-text" name="scan_args" >'+ rdata.args + '</textarea></div>\
+                        <div class="info-r"><textarea style="margin: 0px;width:475px;height: 75px;line-height:20px" class="bt-input-text" name="scan_args" >'+ htmlEncode(rdata.args) + '</textarea></div>\
                     </div>\
                     <ul class="help-info-text c7 ptb10">\
                         <li>会同时过滤key和value,请谨慎设置</li>\
@@ -686,8 +686,8 @@ function ipWhiteLoadList(){
         var tbody = ''
         for (var i = 0; i < rdata.length; i++) {
             tbody += '<tr>\
-                    <td>'+ rdata[i][0].join('.') + '</td>\
-                    <td>'+ rdata[i][1].join('.') + '</td>\
+                    <td>'+ htmlEncode(rdata[i][0].join('.')) + '</td>\
+                    <td>'+ htmlEncode(rdata[i][1].join('.')) + '</td>\
                     <td class="text-right"><a class="btlink" onclick="removeIpWhite('+ i + ')">删除</a></td>\
                 </tr>'
         }
@@ -766,7 +766,7 @@ function urlWhite(type) {
                 <div style="border-bottom:#ccc 1px solid;margin-bottom:10px;padding-bottom:10px">\
                 <input class="bt-input-text" name="ruleValue" type="text" value="" style="width:470px;margin-right:12px;" placeholder="规则内容,请使用正则表达式">\
                 <input class="bt-input-text mr5" name="rulePs" type="text" style="width:120px;" placeholder="描述">\
-                <button class="btn btn-success btn-sm va0 pull-right" onclick="addRule(\''+ ruleName + '\');">添加</button>\</div>\
+                <button class="btn btn-success btn-sm va0 pull-right" onclick="addRule(\''+ jsEncode(ruleName) + '\');">添加</button>\</div>\
                 <div class="divtable">\
                 <div id="jc-file-table" class="table_head_fix" style="max-height:300px;overflow:auto;border:#ddd 1px solid">\
                 <table class="table table-hover" style="border:none">\
@@ -798,15 +798,15 @@ function urlWhite(type) {
         var tbody = ''
         for (var i = 0; i < rdata.length; i++) {
             var removeRule = ''
-            if (rdata[i][3] != 0) removeRule = ' | <a class="btlink" onclick="removeRule(\'' + ruleName + '\',' + i + ')">删除</a>';
+            if (rdata[i][3] != 0) removeRule = ' | <a class="btlink" onclick="removeRule(\'' + jsEncode(ruleName) + '\',' + i + ')">删除</a>';
             tbody += '<tr>\
-                    <td class="rule_body_'+ i + '">' + rdata[i][1] + '</td>\
-                    <td class="rule_ps_'+ i + '">' + rdata[i][2] + '</td>\
-                    <td class="rule_modify_'+ i + '"><a class="btlink" onclick="modifyRule(' + i + ',\'' + ruleName + '\')">编辑</a>' + removeRule + '</td>\
+                    <td class="rule_body_'+ i + '">' + htmlEncode(rdata[i][1]) + '</td>\
+                    <td class="rule_ps_'+ i + '">' + htmlEncode(rdata[i][2]) + '</td>\
+                    <td class="rule_modify_'+ i + '"><a class="btlink" onclick="modifyRule(' + i + ',\'' + jsEncode(ruleName) + '\')">编辑</a>' + removeRule + '</td>\
                     <td class="text-right">\
                         <div class="pull-right">\
                         <input class="btswitch btswitch-ios" id="closeua_'+ i + '" type="checkbox" ' + (rdata[i][0] ? 'checked' : '') + '>\
-                        <label class="btswitch-btn" style="width:2.0em;height:1.2em;margin-bottom: 0" for="closeua_'+ i + '" onclick="setRuleState(\'' + ruleName + '\',' + i + ')"></label>\
+                        <label class="btswitch-btn" style="width:2.0em;height:1.2em;margin-bottom: 0" for="closeua_'+ i + '" onclick="setRuleState(\'' + jsEncode(ruleName) + '\',' + i + ')"></label>\
                         </div>\
                     </td>\
                 </tr>'
@@ -969,8 +969,8 @@ function ipBlack(type) {
                             var tbody = ''
                             for (var i = 0; i < rdata.length; i++) {
                                 tbody += '<tr>\
-                                        <td>'+ rdata[i][0].join('.') + '</td>\
-                                        <td>'+ rdata[i][1].join('.') + '</td>\
+                                        <td>'+ htmlEncode(rdata[i][0].join('.')) + '</td>\
+                                        <td>'+ htmlEncode(rdata[i][1].join('.')) + '</td>\
                                         <td class="text-right"><a class="btlink" onclick="removeIpBlack('+ i + ')">删除</a></td>\
                                     </tr>'
                             }
@@ -982,8 +982,8 @@ function ipBlack(type) {
                             var tbody = '',rdata = res;
                             for (var i = 0; i < rdata.length; i++) {
                                 tbody += '<tr>\
-                                    <td>'+ rdata[i] + '</td>\
-                                    <td class="text-right"><a class="btlink" onclick="removeIpv6Black(\''+ rdata[i] + '\')">删除</a></td>\
+                                    <td>'+ htmlEncode(rdata[i]) + '</td>\
+                                    <td class="text-right"><a class="btlink" onclick="removeIpv6Black(\''+ jsEncode(rdata[i]) + '\')">删除</a></td>\
                                 </tr>'
                             }
                             $("#ipv6_black_con").html(tbody);
@@ -1083,50 +1083,50 @@ function wafGloabl(){
                     </tr>\
                     <tr>\
                         <td>强制安全验证</td>\
-                        <td>'+rdata.safe_verify.ps+'</td>\
+                        <td>'+htmlEncode(rdata.safe_verify.ps)+'</td>\
                         <td>--</td>\
                         <td style="text-align: center;"><div class="ssh-item">\
                             <input class="btswitch btswitch-ios" id="close_safe_verify" type="checkbox" '+(rdata.safe_verify.open ? 'checked' : '')+'>\
                             <label class="btswitch-btn" for="close_safe_verify" onclick="setObjOpen(\'safe_verify\')"></label></div>\
                         </td>\
-                        <td class="text-right"><a class="btlink" onclick="setSafeVerify('+ rdata.safe_verify.auto + ',' + rdata.safe_verify.cpu + ',' + rdata.safe_verify.time + ',\'' + rdata.safe_verify.mode + '\')">设置</a> | <a class="btlink" href="javascript:;" onclick="onlineEditFile(0,\''+rdata['reqfile_path']+'/safe_js.html\')">响应内容</a></td>\
+                        <td class="text-right"><a class="btlink" onclick="setSafeVerify('+ rdata.safe_verify.auto + ',' + rdata.safe_verify.cpu + ',' + rdata.safe_verify.time + ',\'' + rdata.safe_verify.mode + '\')">设置</a> | <a class="btlink" href="javascript:;" onclick="onlineEditFile(0,\''+jsEncode(rdata['reqfile_path'])+'/safe_js.html\')">响应内容</a></td>\
                     </tr>\
                     <tr>\
                         <td>GET-URI过滤</td>\
-                        <td>'+ rdata.get.ps + '</td>\
+                        <td>'+ htmlEncode(rdata.get.ps) + '</td>\
                         <td><a class="btlink" onclick="setRequestCode(\'get\',' + rdata.get.status + ')">' + rdata.get.status + '</a></td>\
                         <td><div class="ssh-item">\
                             <input class="btswitch btswitch-ios" id="closeget" type="checkbox" '+ (rdata.get.open ? 'checked' : '') + '>\
                             <label class="btswitch-btn" for="closeget" onclick="setObjOpen(\'get\')"></label>\
                         </div></td>\
-                        <td class="text-right"><a class="btlink" onclick="setObjConf(\'url\')">规则</a> | <a class="btlink" href="javascript:;" onclick="onlineEditFile(0,\''+rdata['reqfile_path']+'/get.html\')">响应内容</a></td>\
+                        <td class="text-right"><a class="btlink" onclick="setObjConf(\'url\')">规则</a> | <a class="btlink" href="javascript:;" onclick="onlineEditFile(0,\''+jsEncode(rdata['reqfile_path'])+'/get.html\')">响应内容</a></td>\
                     </tr>\
                     <tr>\
-                        <td>GET-参数过滤</td><td>'+ rdata.get.ps + '</td><td><a class="btlink" onclick="setRequestCode(\'get\',' + rdata.get.status + ')">' + rdata.get.status + '</a></td><td><div class="ssh-item">\
+                        <td>GET-参数过滤</td><td>'+ htmlEncode(rdata.get.ps) + '</td><td><a class="btlink" onclick="setRequestCode(\'get\',' + rdata.get.status + ')">' + rdata.get.status + '</a></td><td><div class="ssh-item">\
                             <input class="btswitch btswitch-ios" id="closeget" type="checkbox" '+ (rdata.get.open ? 'checked' : '') + '>\
                             <label class="btswitch-btn" for="closeget" onclick="setObjOpen(\'get\')"></label>\
-                        </div></td><td class="text-right"><a class="btlink" onclick="setObjConf(\'args\')">规则</a> | <a class="btlink" href="javascript:;" onclick="onlineEditFile(0,\''+rdata['reqfile_path']+'/get.html\')">响应内容</a></td>\
+                        </div></td><td class="text-right"><a class="btlink" onclick="setObjConf(\'args\')">规则</a> | <a class="btlink" href="javascript:;" onclick="onlineEditFile(0,\''+jsEncode(rdata['reqfile_path'])+'/get.html\')">响应内容</a></td>\
                     </tr>\
                     <tr>\
-                        <td>POST过滤</td><td>'+ rdata.post.ps + '</td><td><a class="btlink" onclick="setRequestCode(\'post\',' + rdata.post.status + ')">' + rdata.post.status + '</a></td><td><div class="ssh-item">\
+                        <td>POST过滤</td><td>'+ htmlEncode(rdata.post.ps) + '</td><td><a class="btlink" onclick="setRequestCode(\'post\',' + rdata.post.status + ')">' + rdata.post.status + '</a></td><td><div class="ssh-item">\
                             <input class="btswitch btswitch-ios" id="closepost" type="checkbox" '+ (rdata.post.open ? 'checked' : '') + '>\
                             <label class="btswitch-btn" for="closepost" onclick="setObjOpen(\'post\')"></label>\
-                        </div></td><td class="text-right"><a class="btlink" onclick="setObjConf(\'post\')">规则</a> | <a class="btlink" href="javascript:;" onclick="onlineEditFile(0,\''+rdata['reqfile_path']+'/post.html\')">响应内容</a></td>\
+                        </div></td><td class="text-right"><a class="btlink" onclick="setObjConf(\'post\')">规则</a> | <a class="btlink" href="javascript:;" onclick="onlineEditFile(0,\''+jsEncode(rdata['reqfile_path'])+'/post.html\')">响应内容</a></td>\
                     </tr>\
                     <tr>\
-                        <td>User-Agent过滤</td><td>'+ rdata['user-agent'].ps + '</td><td><a class="btlink" onclick="setRequestCode(\'user-agent\',' + rdata['user-agent'].status + ')">' + rdata['user-agent'].status + '</a></td><td><div class="ssh-item">\
+                        <td>User-Agent过滤</td><td>'+ htmlEncode(rdata['user-agent'].ps) + '</td><td><a class="btlink" onclick="setRequestCode(\'user-agent\',' + rdata['user-agent'].status + ')">' + rdata['user-agent'].status + '</a></td><td><div class="ssh-item">\
                             <input class="btswitch btswitch-ios" id="closeua" type="checkbox" '+ (rdata['user-agent'].open ? 'checked' : '') + '>\
                             <label class="btswitch-btn" for="closeua" onclick="setObjOpen(\'user-agent\')"></label>\
-                        </div></td><td class="text-right"><a class="btlink" onclick="setObjConf(\'user_agent\')">规则</a> | <a class="btlink" href="javascript:;" onclick="onlineEditFile(0,\''+rdata['reqfile_path']+'/user_agent.html\')">响应内容</a></td>\
+                        </div></td><td class="text-right"><a class="btlink" onclick="setObjConf(\'user_agent\')">规则</a> | <a class="btlink" href="javascript:;" onclick="onlineEditFile(0,\''+jsEncode(rdata['reqfile_path'])+'/user_agent.html\')">响应内容</a></td>\
                     </tr>\
                     <tr>\
-                        <td>Cookie过滤</td><td>'+ rdata.cookie.ps + '</td><td><a class="btlink" onclick="setRequestCode(\'cookie\',' + rdata.cookie.status + ')">' + rdata.cookie.status + '</a></td><td><div class="ssh-item">\
+                        <td>Cookie过滤</td><td>'+ htmlEncode(rdata.cookie.ps) + '</td><td><a class="btlink" onclick="setRequestCode(\'cookie\',' + rdata.cookie.status + ')">' + rdata.cookie.status + '</a></td><td><div class="ssh-item">\
                             <input class="btswitch btswitch-ios" id="closecookie" type="checkbox" '+ (rdata.cookie.open ? 'checked' : '') + '>\
                             <label class="btswitch-btn" for="closecookie" onclick="setObjOpen(\'cookie\')"></label>\
-                        </div></td><td class="text-right"><a class="btlink" onclick="setObjConf(\'cookie\')">规则</a> | <a class="btlink" href="javascript:;" onclick="onlineEditFile(0,\''+rdata['reqfile_path']+'/cookie.html\')">响应内容</a></td>\
+                        </div></td><td class="text-right"><a class="btlink" onclick="setObjConf(\'cookie\')">规则</a> | <a class="btlink" href="javascript:;" onclick="onlineEditFile(0,\''+jsEncode(rdata['reqfile_path'])+'/cookie.html\')">响应内容</a></td>\
                     </tr>\
                     <tr>\
-                        <td>常见扫描器</td><td>'+ rdata.scan.ps + '</td><td><a class="btlink" onclick="setRequestCode(\'scan\',' + rdata.scan.status + ')">' + rdata.scan.status + '</a></td><td><div class="ssh-item">\
+                        <td>常见扫描器</td><td>'+ htmlEncode(rdata.scan.ps) + '</td><td><a class="btlink" onclick="setRequestCode(\'scan\',' + rdata.scan.status + ')">' + rdata.scan.status + '</a></td><td><div class="ssh-item">\
                             <input class="btswitch btswitch-ios" id="closescan" type="checkbox" '+ (rdata.scan.open ? 'checked' : '') + '>\
                             <label class="btswitch-btn" for="closescan" onclick="setObjOpen(\'scan\')"></label>\
                         </div></td><td class="text-right"><a class="btlink" onclick="scanRule()">设置</a></td>\
@@ -1147,9 +1147,9 @@ function wafGloabl(){
                         <td class="text-right"><a class="btlink" onclick="ipBlack()">设置</a></td>\
                     </tr>\
                     <tr>\
-                        <td>其它</td><td>'+ rdata.other.ps + '</td><td>--</td>\
+                        <td>其它</td><td>'+ htmlEncode(rdata.other.ps) + '</td><td>--</td>\
                         <td style="text-align: center;">--</td>\
-                        <td class="text-right"><a class="btlink" href="javascript:;" onclick="onlineEditFile(0,\''+rdata['reqfile_path']+'/other.html\')">响应内容</a></td>\
+                        <td class="text-right"><a class="btlink" href="javascript:;" onclick="onlineEditFile(0,\''+jsEncode(rdata['reqfile_path'])+'/other.html\')">响应内容</a></td>\
                     </tr>\
                 </tbody>\
             </table>\
@@ -1273,7 +1273,7 @@ function siteRuleAdmin(siteName, ruleName, type) {
             content: '<div class="pd15">\
                 <div style="border-bottom:#ccc 1px solid;margin-bottom:10px;padding-bottom:10px">\
                     <input class="bt-input-text" name="site_rule_value" type="text" value="" style="width:400px;margin-right:15px;margin-left:5px" placeholder="'+ placeho + '">\
-                    <button class="btn btn-success btn-sm va0 pull-right" onclick="addSiteRule(\''+ siteName + '\',\'' + ruleName + '\');">添加</button>\</div>\
+                    <button class="btn btn-success btn-sm va0 pull-right" onclick="addSiteRule(\''+ jsEncode(siteName) + '\',\'' + jsEncode(ruleName) + '\');">添加</button>\</div>\
                 <div class="divtable">\
                 <div id="siteRuleAdmin" class="siteRuleAdmin" style="max-height:273px;overflow:auto;border:#ddd 1px solid">\
                 <table class="table table-hover" style="border:none">\
@@ -1300,8 +1300,8 @@ function siteRuleAdmin(siteName, ruleName, type) {
         var tbody = ''
         for (var i = 0; i < rdata.length; i++) {
             tbody += '<tr>\
-                    <td>'+ rdata[i] + '</td>\
-                    <td class="text-right"><a class="btlink" onclick="removeSiteRule(\''+ siteName + '\',\'' + ruleName + '\',' + i + ')">删除</a></td>\
+                    <td>'+ htmlEncode(rdata[i]) + '</td>\
+                    <td class="text-right"><a class="btlink" onclick="removeSiteRule(\''+ jsEncode(siteName) + '\',\'' + jsEncode(ruleName) + '\',' + i + ')">删除</a></td>\
                 </tr>'
         }
         $("#site_rule_admin_con").html(tbody);
@@ -1313,14 +1313,14 @@ function cdnHeader(siteName, type) {
     if (type == undefined) {
         create_l = layer.open({
             type: 1,
-            title: "管理网站【" + siteName + "】CDN-Headers",
+            title: "管理网站【" + htmlEncode(siteName) + "】CDN-Headers",
             area: ['500px', '500px'],
             closeBtn: 1,
             shadeClose: false,
             content: '<div class="pd15">\
                 <div style="border-bottom:#ccc 1px solid;margin-bottom:10px;padding-bottom:10px">\
                     <input class="bt-input-text" name="cdn_header_key" type="text" value="" style="width:400px;margin-right:15px;margin-left:5px" placeholder="header名称">\
-                    <button class="btn btn-success btn-sm va0 pull-right" onclick="addCdnHeader(\''+ siteName + '\');">添加</button>\</div>\
+                    <button class="btn btn-success btn-sm va0 pull-right" onclick="addCdnHeader(\''+ jsEncode(siteName) + '\');">添加</button>\</div>\
                 <div class="divtable">\
                 <div id="cdnHeader" style="max-height:300px;overflow:auto;border:#ddd 1px solid">\
                 <table class="table table-hover" style="border:none">\
@@ -1348,8 +1348,8 @@ function cdnHeader(siteName, type) {
         var tbody = ''
         for (var i = 0; i < rdata.length; i++) {
             tbody += '<tr>\
-                    <td>'+ rdata[i] + '</td>\
-                    <td class="text-right"><a class="btlink" onclick="removeCdnHeader(\''+ siteName + '\',\'' + rdata[i] + '\')">删除</a></td>\
+                    <td>'+ htmlEncode(rdata[i]) + '</td>\
+                    <td class="text-right"><a class="btlink" onclick="removeCdnHeader(\''+ jsEncode(siteName) + '\',\'' + jsEncode(rdata[i]) + '\')">删除</a></td>\
                 </tr>'
         }
         $("#cdn_header_con").html(tbody);
@@ -1418,7 +1418,7 @@ function setSiteObjConf(siteName, ruleName, type) {
     if (type == undefined) {
         create_l = layer.open({ 
             type: 1,
-            title: "编辑网站【" + siteName + "】规则【" + ruleName + "】",
+            title: "编辑网站【" + htmlEncode(siteName) + "】规则【" + htmlEncode(ruleName) + "】",
             area: ['700px', '530px'],
             closeBtn: 1,
             shadeClose: false,
@@ -1453,11 +1453,11 @@ function setSiteObjConf(siteName, ruleName, type) {
         for (var i = 0; i < rdata.length; i++) {
             if (rdata[i][0] == -1) continue;
             tbody += '<tr>\
-                    <td>'+ rdata[i][1] + '</td>\
-                    <td>'+ rdata[i][2] + '</td>\
+                    <td>'+ htmlEncode(rdata[i][1]) + '</td>\
+                    <td>'+ htmlEncode(rdata[i][2]) + '</td>\
                     <td style="text-align: right;">\
                         <div class="pull-right"><input class="btswitch btswitch-ios" id="close_'+ i + '" type="checkbox" ' + (rdata[i][0] ? 'checked' : '') + '>\
-                        <label class="btswitch-btn" for="close_'+ i + '" style="width:2em;height:1.2em;margin-bottom: 0" for="closeua_' + i + '" onclick="set_site_rule_state(\'' + siteName + '\',\'' + ruleName + '\',' + i + ')"></label></div>\
+                        <label class="btswitch-btn" for="close_'+ i + '" style="width:2em;height:1.2em;margin-bottom: 0" for="closeua_' + i + '" onclick="set_site_rule_state(\'' + jsEncode(siteName) + '\',\'' + jsEncode(ruleName) + '\',' + i + ')"></label></div>\
                     </td>\
                 </tr>'
         }
@@ -1470,7 +1470,7 @@ function siteWafConfig(siteName, type) {
     if (type == undefined) {
         create_2 = layer.open({
             type: 1,
-            title: "网站配置【" + siteName + "】",
+            title: "网站配置【" + htmlEncode(siteName) + "】",
             area: ['700px', '500px'],
             closeBtn: 1,
             shadeClose: false,
@@ -1487,7 +1487,7 @@ function siteWafConfig(siteName, type) {
                     <span>网站防火墙开关</span>\
                     <div class="ssh-item" style="margin-right:20px;">\
                         <input class="btswitch btswitch-ios" id="closewaf_open" type="checkbox" '+ (rdata.open ? 'checked' : '') + '>\
-                        <label class="btswitch-btn" for="closewaf_open" onclick="setSiteObjState(\''+ siteName + '\',\'open\')" style="width:2.4em;height:1.4em;margin-bottom: 0"></label>\
+                        <label class="btswitch-btn" for="closewaf_open" onclick="setSiteObjState(\''+ jsEncode(siteName) + '\',\'open\')" style="width:2.4em;height:1.4em;margin-bottom: 0"></label>\
                     </div>\
                 </div>\
                 <div class="lib-con">\
@@ -1504,81 +1504,81 @@ function siteWafConfig(siteName, type) {
                             <tbody>\
                                 <tr>\
                                     <td>CC防御</td>\
-                                    <td><font style="color:red;">'+ rdata.cc.cycle + '</font> 秒内,请求同一URI累计超过 <font style="color:red;">' + rdata.cc.limit + '</font> 次,封锁IP <font style="color:red;">' + rdata.cc.endtime + '</font> 秒</td>\
+                                    <td><font style="color:red;">'+ htmlEncode(rdata.cc.cycle) + '</font> 秒内,请求同一URI累计超过 <font style="color:red;">' + htmlEncode(rdata.cc.limit) + '</font> 次,封锁IP <font style="color:red;">' + htmlEncode(rdata.cc.endtime) + '</font> 秒</td>\
                                     <td>\
                                         <div class="ssh-item" style="margin-left:0">\
                                             <input class="btswitch btswitch-ios" id="closecc" type="checkbox" '+ (rdata.cc.open ? 'checked' : '') + '>\
-                                            <label class="btswitch-btn" for="closecc" onclick="setSiteObjState(\''+ siteName + '\',\'cc\')"></label>\
+                                            <label class="btswitch-btn" for="closecc" onclick="setSiteObjState(\''+ jsEncode(siteName) + '\',\'cc\')"></label>\
                                         </div>\
                                     </td>\
-                                    <td class="text-right"><a class="btlink" onclick="setCcRule('+ rdata.cc.cycle + ',' + rdata.cc.limit + ',' + rdata.cc.endtime + ',\'' + siteName + '\',' + rdata.cc.increase + ')">设置</a></td>\
+                                    <td class="text-right"><a class="btlink" onclick="setCcRule('+ htmlEncode(rdata.cc.cycle) + ',' + htmlEncode(rdata.cc.limit) + ',' + htmlEncode(rdata.cc.endtime) + ',\'' + jsEncode(siteName) + '\',' + htmlEncode(rdata.cc.increase) + ')">设置</a></td>\
                                 </tr>\
                                 <tr>\
                                     <td>恶意容忍设置</td>\
-                                    <td><font style="color:red;">'+ rdata.retry.retry_cycle + '</font> 秒内,累计超过 <font style="color:red;">' + rdata.retry.retry + '</font> 次恶意请求,封锁IP <font style="color:red;">' + rdata.retry.retry_time + '</font> 秒</td>\
+                                    <td><font style="color:red;">'+ htmlEncode(rdata.retry.retry_cycle) + '</font> 秒内,累计超过 <font style="color:red;">' + htmlEncode(rdata.retry.retry) + '</font> 次恶意请求,封锁IP <font style="color:red;">' + htmlEncode(rdata.retry.retry_time) + '</font> 秒</td>\
                                     <td style="text-align: left;">&nbsp;&nbsp;--</td>\
-                                    <td class="text-right"><a class="btlink" onclick="setRetry('+ rdata.retry.retry_cycle + ',' + rdata.retry.retry + ',' + rdata.retry.retry_time + ',\'' + siteName + '\')">设置</a></td>\
+                                    <td class="text-right"><a class="btlink" onclick="setRetry('+ htmlEncode(rdata.retry.retry_cycle) + ',' + htmlEncode(rdata.retry.retry) + ',' + htmlEncode(rdata.retry.retry_time) + ',\'' + jsEncode(siteName) + '\')">设置</a></td>\
                                 </tr>\
                                 <tr>\
                                     <td>GET-URI过滤</td>\
-                                    <td>'+ rdata.get.ps + '</td>\
+                                    <td>'+ htmlEncode(rdata.get.ps) + '</td>\
                                     <td>\
                                         <div class="ssh-item" style="margin-left:0">\
                                             <input class="btswitch btswitch-ios" id="closeget" type="checkbox" '+ (rdata.get ? 'checked' : '') + '>\
-                                            <label class="btswitch-btn" for="closeget" onclick="setSiteObjState(\''+ siteName + '\',\'get\')"></label>\
+                                            <label class="btswitch-btn" for="closeget" onclick="setSiteObjState(\''+ jsEncode(siteName) + '\',\'get\')"></label>\
                                         </div>\
                                     </td>\
-                                    <td class="text-right"><a class="btlink" onclick="setSiteObjConf(\''+ siteName + '\',\'url\')">规则</a></td>\
+                                    <td class="text-right"><a class="btlink" onclick="setSiteObjConf(\''+ jsEncode(siteName) + '\',\'url\')">规则</a></td>\
                                 </tr>\
                                 <td>GET-参数过滤</td>\
-                                    <td>'+ rdata.get.ps + '</td>\
+                                    <td>'+ htmlEncode(rdata.get.ps) + '</td>\
                                     <td>\
                                         <div class="ssh-item" style="margin-left:0">\
                                             <input class="btswitch btswitch-ios" id="closeargs" type="checkbox" '+ (rdata.get ? 'checked' : '') + '>\
-                                            <label class="btswitch-btn" for="closeargs" onclick="setSiteObjState(\''+ siteName + '\',\'get\')"></label>\
+                                            <label class="btswitch-btn" for="closeargs" onclick="setSiteObjState(\''+ jsEncode(siteName) + '\',\'get\')"></label>\
                                         </div>\
                                     </td>\
-                                    <td class="text-right"><a class="btlink" onclick="setSiteObjConf(\''+ siteName + '\',\'args\')">规则</a></td>\
+                                    <td class="text-right"><a class="btlink" onclick="setSiteObjConf(\''+ jsEncode(siteName) + '\',\'args\')">规则</a></td>\
                                 </tr>\
                                 <tr>\
                                     <td>POST过滤</td>\
-                                    <td>'+ rdata.post.ps + '</td>\
+                                    <td>'+ htmlEncode(rdata.post.ps) + '</td>\
                                     <td>\
                                         <div class="ssh-item" style="margin-left:0">\
                                             <input class="btswitch btswitch-ios" id="closepost" type="checkbox" '+ (rdata.post ? 'checked' : '') + '>\
-                                            <label class="btswitch-btn" for="closepost" onclick="setSiteObjState(\''+ siteName + '\',\'post\')"></label>\
+                                            <label class="btswitch-btn" for="closepost" onclick="setSiteObjState(\''+ jsEncode(siteName) + '\',\'post\')"></label>\
                                         </div>\
                                     </td>\
-                                    <td class="text-right"><a class="btlink" onclick="setSiteObjConf(\''+ siteName + '\',\'post\')">规则</a></td>\
+                                    <td class="text-right"><a class="btlink" onclick="setSiteObjConf(\''+ jsEncode(siteName) + '\',\'post\')">规则</a></td>\
                                 </tr>\
                                 <tr>\
                                     <td>User-Agent过滤</td>\
-                                    <td>'+ rdata['user-agent'].ps + '</td>\
+                                    <td>'+ htmlEncode(rdata['user-agent'].ps) + '</td>\
                                     <td>\
                                         <div class="ssh-item" style="margin-left:0">\
                                             <input class="btswitch btswitch-ios" id="closeua" type="checkbox" '+ (rdata['user-agent'] ? 'checked' : '') + '>\
-                                            <label class="btswitch-btn" for="closeua" onclick="setSiteObjState(\''+ siteName + '\',\'user-agent\')"></label>\
+                                            <label class="btswitch-btn" for="closeua" onclick="setSiteObjState(\''+ jsEncode(siteName) + '\',\'user-agent\')"></label>\
                                         </div>\
                                     </td>\
-                                    <td class="text-right"><a class="btlink" onclick="setSiteObjConf(\''+ siteName + '\',\'user_agent\')">规则</a></td>\
+                                    <td class="text-right"><a class="btlink" onclick="setSiteObjConf(\''+ jsEncode(siteName) + '\',\'user_agent\')">规则</a></td>\
                                 </tr>\
                                  <tr>\
                                     <td>Cookie过滤</td>\
-                                    <td>'+ rdata.cookie.ps + '</td>\
+                                    <td>'+ htmlEncode(rdata.cookie.ps) + '</td>\
                                     <td>\
                                     <div class="ssh-item" style="margin-left:0">\
                                         <input class="btswitch btswitch-ios" id="closecookie" type="checkbox" '+ (rdata.cookie ? 'checked' : '') + '>\
-                                        <label class="btswitch-btn" for="closecookie" onclick="setSiteObjState(\''+ siteName + '\',\'cookie\')"></label>\
+                                        <label class="btswitch-btn" for="closecookie" onclick="setSiteObjState(\''+ jsEncode(siteName) + '\',\'cookie\')"></label>\
                                     </div>\
                                     </td>\
-                                    <td class="text-right"><a class="btlink" onclick="setSiteObjConf(\''+ siteName + '\',\'cookie\')">规则</a></td>\
+                                    <td class="text-right"><a class="btlink" onclick="setSiteObjConf(\''+ jsEncode(siteName) + '\',\'cookie\')">规则</a></td>\
                                 </tr>\
                                 <tr>\
-                                    <td>常见扫描器</td><td>'+ rdata.scan.ps + '</td>\
+                                    <td>常见扫描器</td><td>'+ htmlEncode(rdata.scan.ps) + '</td>\
                                     <td>\
                                         <div class="ssh-item" style="margin-left:0">\
                                             <input class="btswitch btswitch-ios" id="closescan" type="checkbox" '+ (rdata.scan ? 'checked' : '') + '>\
-                                            <label class="btswitch-btn" for="closescan" onclick="setSiteObjState(\''+ siteName + '\',\'scan\')"></label>\
+                                            <label class="btswitch-btn" for="closescan" onclick="setSiteObjState(\''+ jsEncode(siteName) + '\',\'scan\')"></label>\
                                         </div>\
                                     </td>\
                                     <td class="text-right"><a class="btlink" onclick="scanRule()">设置</a></td>\
@@ -1589,22 +1589,22 @@ function siteWafConfig(siteName, type) {
                                     <td>\
                                         <div class="ssh-item" style="margin-left:0">\
                                             <input class="btswitch btswitch-ios" id="closecdn" type="checkbox" '+ (rdata.cdn ? 'checked' : '') + '>\
-                                            <label class="btswitch-btn" for="closecdn" onclick="setSiteObjState(\''+ siteName + '\',\'cdn\')"></label>\
+                                            <label class="btswitch-btn" for="closecdn" onclick="setSiteObjState(\''+ jsEncode(siteName) + '\',\'cdn\')"></label>\
                                         </div>\
                                     </td>\
-                                    <td class="text-right"><a class="btlink" onclick="cdnHeader(\''+ siteName + '\')">设置</a></td>\
+                                    <td class="text-right"><a class="btlink" onclick="cdnHeader(\''+ jsEncode(siteName) + '\')">设置</a></td>\
                                 </tr>\
                                 <tr>\
                                     <td>禁止扩展名</td>\
                                     <td>禁止访问指定扩展名</td>\
                                     <td style="text-align: left;">&nbsp;&nbsp;--</td>\
-                                    <td class="text-right"><a class="btlink" onclick="siteRuleAdmin(\''+ siteName + '\',\'disable_ext\')">设置</a></td>\
+                                    <td class="text-right"><a class="btlink" onclick="siteRuleAdmin(\''+ jsEncode(siteName) + '\',\'disable_ext\')">设置</a></td>\
                                 </tr>\
                                 <tr>\
                                     <td>禁止上传的文件类型</td>\
                                     <td>禁止上传指定的文件类型</td>\
                                     <td style="text-align: left;">&nbsp;&nbsp;--</td>\
-                                    <td class="text-right"><a class="btlink" onclick="siteRuleAdmin(\''+ siteName + '\',\'disable_upload_ext\')">设置</a></td>\
+                                    <td class="text-right"><a class="btlink" onclick="siteRuleAdmin(\''+ jsEncode(siteName) + '\',\'disable_upload_ext\')">设置</a></td>\
                                 </tr>\
                             </tbody>\
                         </table>\
@@ -1629,20 +1629,20 @@ function wafSite(){
         $.each(rdata, function (k, v) {
             i += 1;
             tbody += '<tr>\
-                    <td><a onclick="siteWafConfig(\''+ k + '\')" class="sitename btlink" title="' + k + '">' + k + '</a></td>\
-                    <td><input onclick="setSiteObjState(\''+ k + '\',\'get\')" type="checkbox" ' + (v.get ? 'checked' : '') + '><span class="' + back_css(v.total[1].value) + '" title="拦截GET渗透次数:' + v.total[1].value + '">' + v.total[1].value + '</span></td>\
-                    <td><input onclick="setSiteObjState(\''+ k + '\',\'post\')"  type="checkbox" ' + (v.post ? 'checked' : '') + '><span class="' + back_css(v.total[0].value) + '"  title="拦截POST渗透次数:' + v.total[0].value + '">' + v.total[0].value + '</span></td>\
-                    <td><input onclick="setSiteObjState(\''+ k + '\',\'user-agent\')"  type="checkbox" ' + (v['user-agent'] ? 'checked' : '') + '><span class="' + back_css(v.total[3].value) + '" title="拦截恶意User-Agent次数:' + v.total[3].value + '">' + v.total[3].value + '</span></td>\
-                    <td><input onclick="setSiteObjState(\''+ k + '\',\'cookie\')"  type="checkbox" ' + (v.cookie ? 'checked' : '') + '><span class="' + back_css(v.total[4].value) + '" title="拦截Cookie渗透次数:' + v.total[4].value + '">' + v.total[4].value + '</span></td>\
-                    <td><input onclick="setSiteObjState(\''+ k + '\',\'cdn\')"  type="checkbox" ' + (v.cdn ? 'checked' : '') + '></td>\
-                    <td><input onclick="setSiteObjState(\''+ k + '\',\'cc\')"  type="checkbox" ' + (v.cc.open ? 'checked' : '') + '><span class="' + back_css(v.total[2].value) + '" title="拦截CC攻击次数:' + v.total[2].value + '">' + v.total[2].value + '</span></td>\
+                    <td><a onclick="siteWafConfig(\''+ jsEncode(k) + '\')" class="sitename btlink" title="' + htmlEncode(k) + '">' + htmlEncode(k) + '</a></td>\
+                    <td><input onclick="setSiteObjState(\''+ jsEncode(k) + '\',\'get\')" type="checkbox" ' + (v.get ? 'checked' : '') + '><span class="' + back_css(v.total[1].value) + '" title="拦截GET渗透次数:' + htmlEncode(v.total[1].value) + '">' + htmlEncode(v.total[1].value) + '</span></td>\
+                    <td><input onclick="setSiteObjState(\''+ jsEncode(k) + '\',\'post\')"  type="checkbox" ' + (v.post ? 'checked' : '') + '><span class="' + back_css(v.total[0].value) + '"  title="拦截POST渗透次数:' + htmlEncode(v.total[0].value) + '">' + htmlEncode(v.total[0].value) + '</span></td>\
+                    <td><input onclick="setSiteObjState(\''+ jsEncode(k) + '\',\'user-agent\')"  type="checkbox" ' + (v['user-agent'] ? 'checked' : '') + '><span class="' + back_css(v.total[3].value) + '" title="拦截恶意User-Agent次数:' + htmlEncode(v.total[3].value) + '">' + htmlEncode(v.total[3].value) + '</span></td>\
+                    <td><input onclick="setSiteObjState(\''+ jsEncode(k) + '\',\'cookie\')"  type="checkbox" ' + (v.cookie ? 'checked' : '') + '><span class="' + back_css(v.total[4].value) + '" title="拦截Cookie渗透次数:' + htmlEncode(v.total[4].value) + '">' + htmlEncode(v.total[4].value) + '</span></td>\
+                    <td><input onclick="setSiteObjState(\''+ jsEncode(k) + '\',\'cdn\')"  type="checkbox" ' + (v.cdn ? 'checked' : '') + '></td>\
+                    <td><input onclick="setSiteObjState(\''+ jsEncode(k) + '\',\'cc\')"  type="checkbox" ' + (v.cc.open ? 'checked' : '') + '><span class="' + back_css(v.total[2].value) + '" title="拦截CC攻击次数:' + htmlEncode(v.total[2].value) + '">' + htmlEncode(v.total[2].value) + '</span></td>\
                     <td>\
                         <div class="ssh-item" style="margin-left:0">\
                             <input class="btswitch btswitch-ios" id="closeget_'+ i + '" type="checkbox" ' + (v.open ? 'checked' : '') + '>\
-                            <label class="btswitch-btn" for="closeget_'+ i + '" onclick="setSiteObjState(\'' + k + '\',\'open\')"></label>\
+                            <label class="btswitch-btn" for="closeget_'+ i + '" onclick="setSiteObjState(\'' + jsEncode(k) + '\',\'open\')"></label>\
                         </div>\
                     </td>\
-                    <td class="text-right"><a onclick="wafLogs(\''+ k + '\')" class="btlink ' + (v.log_size > 0 ? 'dot' : '') + '">日志</a> </td>\
+                    <td class="text-right"><a onclick="wafLogs(\''+ jsEncode(k) + '\')" class="btlink ' + (v.log_size > 0 ? 'dot' : '') + '">日志</a> </td>\
                 </tr>';
             //| <a onclick="siteWafConfig(\'' + k + '\')" class="btlink">设置</a>
         });
@@ -1709,9 +1709,9 @@ function wafAreaLimitRender(){
             op += '<a  data-id="'+i+'" href="javascript:;" class="area_limit_del btlink">删除</a>';
 
             list += '<tr>';
-            list += '<td><span class="overflow_hide" style="width: 303px;" title="'+region_str+'"">' + region_str + '</span></td>';
-            list += '<td>' + site_str + '</td>';
-            list += '<td>' + type + '</td>';
+            list += '<td><span class="overflow_hide" style="width: 303px;" title="'+htmlEncode(region_str)+'"">' + htmlEncode(region_str) + '</span></td>';
+            list += '<td>' + htmlEncode(site_str) + '</td>';
+            list += '<td>' + htmlEncode(type) + '</td>';
         
             list += '<td class="text-right">' + op + '</td>';
             list += '</tr>';
@@ -1942,10 +1942,10 @@ function wafLogRequest(page){
             for(i in data){
                 list += '<tr>';
                 list += '<td><span class="overflow_hide" style="width:112px;">' + getLocalTime(data[i]['time'])+'</span></td>';
-                list += '<td><span class="overflow_hide" style="width:50px;">' + data[i]['domain'] +'</span></td>';
-                list += '<td><span class="overflow_hide" style="width:60px;">' + data[i]['ip'] +'</span></td>';
-                list += '<td><span class="overflow_hide" style="width:50px;">' + data[i]['uri'] +'</span></td>';// data[i]['uri']
-                list += '<td><span class="overflow_hide" style="width:50px;">' + data[i]['rule_name'] +'</span></td>';
+                list += '<td><span class="overflow_hide" style="width:50px;">' + htmlEncode(data[i]['domain']) +'</span></td>';
+                list += '<td><span class="overflow_hide" style="width:60px;">' + htmlEncode(data[i]['ip']) +'</span></td>';
+                list += '<td><span class="overflow_hide" style="width:50px;">' + htmlEncode(data[i]['uri']) +'</span></td>';// data[i]['uri']
+                list += '<td><span class="overflow_hide" style="width:50px;">' + htmlEncode(data[i]['rule_name']) +'</span></td>';
                 list += '<td><span class="overflow_hide" style="width:200px;">' + entitiesEncode(data[i]['reason']) +'</span></td>';//data[i]['reason']
                 list += '<td><a data-id="'+i+'" href="javascript:;" class="btlink details" title="详情">详情</a></td>';
                 list += '</tr>';
@@ -1979,7 +1979,7 @@ function wafLogRequest(page){
             var time = getLocalTime(res.time);
             layer.open({
                 type: 1,
-                title: "【"+res.domain + "】详情",
+                title: "【"+htmlEncode(res.domain) + "】详情",
                 area: '600px',
                 closeBtn: 1,
                 shadeClose: false,
@@ -2102,9 +2102,9 @@ function wafLogs(){
         var select = '';
         for (var i = 0; i < rdata["list"].length; i++) {
             if (default_site ==  rdata["list"][i]){
-                select += '<option value="'+rdata["list"][i]+'" selected>'+rdata["list"][i]+'</option>';
+                select += '<option value="'+htmlEncode(rdata["list"][i])+'" selected>'+htmlEncode(rdata["list"][i])+'</option>';
             } else{
-                select += '<option value="'+rdata["list"][i]+'">'+rdata["list"][i]+'</option>';
+                select += '<option value="'+htmlEncode(rdata["list"][i])+'">'+htmlEncode(rdata["list"][i])+'</option>';
             }
         }
         $('select[name="site"]').html(select);

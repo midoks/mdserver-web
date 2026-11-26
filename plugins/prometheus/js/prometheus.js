@@ -71,7 +71,7 @@ function gCommonFunc(){
                 btn:["复制","取消"],
                 content: '<div class="pd15">\
                             <div class="divtable">\
-                                <pre class="layui-code">'+rdata.data+'</pre>\
+                                <pre class="layui-code">'+htmlEncode(rdata.data)+'</pre>\
                             </div>\
                         </div>',
                 success:function(){

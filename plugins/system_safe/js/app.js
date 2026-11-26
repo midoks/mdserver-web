@@ -75,7 +75,7 @@ function getSafeConfigPathList(tag){
         var body = '';
         for (var i = 0; i < slist.length; i++) {
             body += "<tr>";
-            body += "<td>"+slist[i]['path']+"</td>";
+            body += "<td>"+htmlEncode(slist[i]['path'])+"</td>";
 
             if (slist[i]['chattr'] == 'i'){
                 body += "<td>只读</td>";
@@ -86,10 +86,10 @@ function getSafeConfigPathList(tag){
             }
 
             if (rdata.msg['open']){
-                body += "<td>"+slist[i]['d_mode']+"</td>";
+                body += "<td>"+htmlEncode(slist[i]['d_mode'])+"</td>";
                 body += "<td><a class='btlink'>已保护</a></td>";
             } else {
-                body += "<td>"+slist[i]['s_mode']+"</td>";
+                body += "<td>"+htmlEncode(slist[i]['s_mode'])+"</td>";
                 body += "<td><a style='color:red;'>未保护</a></td>";
             }
             body += "<td style='text-align: right;'><a class='btlink safe_path_delete' row='"+i+"'>删除</a></td>";
@@ -114,7 +114,7 @@ function setSafeConfigPath(tag, alist){
     layer.open({
         type: 1,
         area: ['700px','535px'],
-        title: '配置【'+alist['name']+'】',
+        title: '配置【'+htmlEncode(alist['name'])+'】',
         content: "<form class='bt-form pd20'>\
                     <div style='border-bottom:#ccc 1px solid;margin-bottom:10px;padding-bottom:10px'>\
                         <input class='bt-input-text' name='s_path' id='s_path' type='text' value='' style='width:370px;margin-right:5px;' placeholder='被保护的文件或目录完整路径'>\
@@ -185,7 +185,7 @@ function setSafeConfigSsh(tag, alist){
     layer.open({
         type: 1,
         area: ['700px','210px'],
-        title: '配置【'+alist['name']+'】',
+        title: '配置【'+htmlEncode(alist['name'])+'】',
         content: "<form class='bt-form pd20'>\
                     <div style='border-bottom:#ccc 1px solid;margin-bottom:10px;padding-bottom:10px'>\
                         在(检测周期)\
@@ -229,7 +229,7 @@ function setSafeConfigProcessList(tag){
         var body = '';
         for (var i = 0; i < slist.length; i++) {
             body += "<tr>\
-                    <td>"+slist[i]+"</td>\
+                    <td>"+htmlEncode(slist[i])+"</td>\
                     <td style='text-align: right;'><a class='btlink safe_path_delete' row='"+i+"'>删除</a></td>\
                 </tr>";
         }
@@ -343,8 +343,8 @@ function ssConfigList(){
             }
 
             body += '<tr>' +
-                '<td>' + libs[i].name + '</td>' +
-                '<td>' + libs[i].ps + '</td>' +
+                '<td>' + htmlEncode(libs[i].name) + '</td>' +
+                '<td>' + htmlEncode(libs[i].ps) + '</td>' +
                 '<td>\
                     <div class="ssh-item">\
                         <input class="btswitch btswitch-ios" id="sys_service_'+i +'" type="checkbox" '+checked+'>\
@@ -402,8 +402,8 @@ function ssOpLogList(p){
         var body = '';
         for (var i = 0; i < plist.length; i++) {
             body += "<tr>\
-                <td><em class='dlt-num'>" + plist[i].addtime + "</em></td>\
-                <td>" + plist[i].log + "</td>\
+                <td><em class='dlt-num'>" + htmlEncode(plist[i].addtime) + "</em></td>\
+                <td>" + htmlEncode(plist[i].log) + "</td>\
             </tr>";
         }
 
@@ -432,7 +432,7 @@ function ssLogAuditList(){
         var option = '';
         // console.log(plist);
         for (var i = 0; i < plist.length; i++) {
-            option += '<option value="'+plist[i]['name']+'">'+plist[i]['name'] +' - '+plist[i]['title']+'</option>';
+            option += '<option value="'+htmlEncode(plist[i]['name'])+'">'+htmlEncode(plist[i]['name']) +' - '+htmlEncode(plist[i]['title'])+'</option>';
         }
 
         $("#system_safe_log_audit").html(option);
@@ -470,7 +470,7 @@ function ssLogAuditFileRenderObject(plist){
         var thead = '';
         tbody += '<tr>'
         for (var i in tmp) {
-            tbody+='<th>'+ i + '</th>';
+            tbody+='<th>'+ htmlEncode(i) + '</th>';
         }
         tbody += '</tr>';
         $("#system_safe_log_audit_list thead").html(tbody);
@@ -481,7 +481,7 @@ function ssLogAuditFileRenderObject(plist){
     for (var i = 0; i < plist.length; i++) {
         tbody += '<tr>';
         for (var vv in plist[i]) {
-            tbody+= '<td>'+ plist[i][vv] + '</td>'
+            tbody+= '<td>'+ htmlEncode(plist[i][vv]) + '</td>'
         }
         tbody += '</tr>';
     }
@@ -549,9 +549,9 @@ function ssLockAddressList(){
                 time_title = '自动解封时间:'+end_time;
             }
             tbody += '<tr>' +
-                '<td style="width:100px;">' + libs[i].address + '</td>' +
-                '<td style="width:100px;">'+time_title+'</td>' +
-                '<td style="text-align: right;"><a ip="'+libs[i].address+'" class="btlink remove_ssh_limit">立即解封</a></td>' +
+                '<td style="width:100px;">' + htmlEncode(libs[i].address) + '</td>' +
+                '<td style="width:100px;">'+htmlEncode(time_title)+'</td>' +
+                '<td style="text-align: right;"><a ip="'+htmlEncode(libs[i].address)+'" class="btlink remove_ssh_limit">立即解封</a></td>' +
                 '</tr>';
         }
 

@@ -125,12 +125,12 @@ function getDiskInfo() {
             //判断inode信息是否存在
             var inodes = '';
             if ( typeof(rdata[i]['inodes']) !=='undefined' ){
-                inodes = '<div class="mask" style="color:' + LoadColor + '" data="Inode信息<br>总数：' + rdata[i].inodes[0] + '<br>已使用：' + rdata[i].inodes[1] + '<br>可用：' + rdata[i].inodes[2] + '<br>Inode使用率：' + rdata[i].inodes[3] + '"><span>' + rdata[i].size[3].replace('%', '') + '</span>%</div>';
+                inodes = '<div class="mask" style="color:' + LoadColor + '" data="Inode信息<br>总数：' + htmlEncode(rdata[i].inodes[0]) + '<br>已使用：' + htmlEncode(rdata[i].inodes[1]) + '<br>可用：' + htmlEncode(rdata[i].inodes[2]) + '<br>Inode使用率：' + htmlEncode(rdata[i].inodes[3]) + '"><span>' + rdata[i].size[3].replace('%', '') + '</span>%</div>';
 
                 var ipre = parseInt(rdata[i].inodes[3].replace('%', ''));
                 if (ipre > 95) {
                     $("#messageError").show();
-                    $("#messageError").append('<p><span class="glyphicon glyphicon-alert" style="color: #ff4040; margin-right: 10px;"></span>分区[' + rdata[i].path + ']当前Inode使用率超过' + ipre + '%，当使用率满100%时将无法在此分区创建文件，请及时清理!<a class="btlink" href="javascript:ClearSystem();">[清理垃圾]</a></p>');
+                    $("#messageError").append('<p><span class="glyphicon glyphicon-alert" style="color: #ff4040; margin-right: 10px;"></span>分区[' + htmlEncode(rdata[i].path) + ']当前Inode使用率超过' + ipre + '%，当使用率满100%时将无法在此分区创建文件，请及时清理!<a class="btlink" href="javascript:ClearSystem();">[清理垃圾]</a></p>');
                 }
             }
 
@@ -142,12 +142,12 @@ function getDiskInfo() {
             }
             disk_type = '';
             if ( 'type' in  rdata[i]){
-                disk_type = '<sup style="color: #20a53a;" title="'+rdata[i]['type']+'">'+rdata[i]['type']+'</sup>';
+                disk_type = '<sup style="color: #20a53a;" title="'+htmlEncode(rdata[i]['type'])+'">'+htmlEncode(rdata[i]['type'])+'</sup>';
             }
             // console.log(disk_type);
            
             dBody = '<li class="col-xs-6 col-sm-3 col-md-3 col-lg-2 mtb20 circle-box text-center diskbox">' +
-                '<h3 class="c5 f15">' + rdata[i].path + '</h3>' +
+                '<h3 class="c5 f15">' + htmlEncode(rdata[i].path) + '</h3>' +
                 '<div class="circle" style="background:' + LoadColor + '">' +
                 '<div class="pie_left">' +
                 '<div class="left"></div>' +
@@ -155,7 +155,7 @@ function getDiskInfo() {
                 '<div class="pie_right">' +
                 '<div class="right"></div>' +
                 '</div>'+ inodes +'</div>' +
-                '<h4 class="c5 f15">' + rdata[i].size[1] + '/' + rdata[i].size[0] + disk_type +'</h4>' +
+                '<h4 class="c5 f15">' + htmlEncode(rdata[i].size[1]) + '/' + htmlEncode(rdata[i].size[0]) + disk_type +'</h4>' +
                 '</li>'
             $("#systemInfoList").append(dBody);
             setImg();
@@ -558,7 +558,7 @@ function updateMsg(){
 
         layer.open({
             type:1,
-            title:v_info + '<span class="badge badge-inverse">升级到['+rdata.data.version+']</span>',
+            title:v_info + '<span class="badge badge-inverse">升级到['+htmlEncode(rdata.data.version)+']</span>',
             area: '400px', 
             shadeClose:false,
             closeBtn:2,
@@ -566,7 +566,7 @@ function updateMsg(){
                     +'<p style="padding: 0 0 10px;line-height: 24px;">'+rdata.data.content+'</p>'
                     +'<div class="bt-form-submit-btn">'
                     +'<button type="button" class="btn btn-danger btn-sm btn-title" onclick="layer.closeAll()">取消</button>'
-                    +'<button type="button" class="btn btn-success btn-sm btn-title" onclick="updateVersion(\''+rdata.data.version+'\')" >立即更新</button>'
+                    +'<button type="button" class="btn btn-success btn-sm btn-title" onclick="updateVersion(\''+jsEncode(rdata.data.version)+'\')" >立即更新</button>'
                     +'</div>'
                     +'</div>'
         });
@@ -722,12 +722,12 @@ function getWarning() {
             var btns = '';
             for (var n = 0; n < wlist.data[i].btns.length; n++) {
                 if (wlist.data[i].btns[n].type == 'javascript') {
-                    btns += '<a href="javascript:WarningTo(\'' + wlist.data[i].btns[n].url + '\',' + wlist.data[i].btns[n].reload + ');" class="' + wlist.data[i].btns[n].class + '"> ' + wlist.data[i].btns[n].title + '</a>'
+                    btns += '<a href="javascript:WarningTo(\'' + jsEncode(wlist.data[i].btns[n].url) + '\',' + wlist.data[i].btns[n].reload + ');" class="' + htmlEncode(wlist.data[i].btns[n].class) + '"> ' + htmlEncode(wlist.data[i].btns[n].title) + '</a>'
                 } else {
-                    btns += '<a href="' + wlist.data[i].btns[n].url + '" class="' + wlist.data[i].btns[n].class + '" target="' + wlist.data[i].btns[n].target + '"> ' + wlist.data[i].btns[n].title + '</a>'
+                    btns += '<a href="' + htmlEncode(wlist.data[i].btns[n].url) + '" class="' + htmlEncode(wlist.data[i].btns[n].class) + '" target="' + htmlEncode(wlist.data[i].btns[n].target) + '"> ' + htmlEncode(wlist.data[i].btns[n].title) + '</a>'
                 }
             }
-            $("#messageError").append('<p><img src="' + wlist.icon[wlist.data[i].icon] + '" style="margin-right:14px;vertical-align:-3px">' + wlist.data[i].body + btns + '</p>');
+            $("#messageError").append('<p><img src="' + htmlEncode(wlist.icon[wlist.data[i].icon]) + '" style="margin-right:14px;vertical-align:-3px">' + wlist.data[i].body + btns + '</p>');
             num++;
         }
         if (num > 0) $("#messageError").show();
@@ -789,26 +789,26 @@ function pluginInit(){
             var ver = rdata[i]['versions'];
             var select_list = '';
             if (typeof(ver)=='string'){
-                select_list = '<option value="' + ver +'">' + rdata[i]['title'] + ' - ' + ver + '</option>';
+                select_list = '<option value="' + htmlEncode(ver) +'">' + htmlEncode(rdata[i]['title']) + ' - ' + htmlEncode(ver) + '</option>';
             } else {
                 for (var vi = 0; vi < ver.length; vi++) {
 
                     if (ver[vi] == rdata[i]['default_ver']){
-                        select_list += '<option value="'+ver[vi]+'" selected="selected">'+ rdata[i]['title'] + ' - '+ ver[vi] + '</option>';
+                        select_list += '<option value="'+htmlEncode(ver[vi])+'" selected="selected">'+ htmlEncode(rdata[i]['title']) + ' - '+ htmlEncode(ver[vi]) + '</option>';
                     } else {
-                        select_list += '<option value="'+ver[vi]+'">'+ rdata[i]['title'] + ' - '+ ver[vi] + '</option>';
+                        select_list += '<option value="'+htmlEncode(ver[vi])+'">'+ htmlEncode(rdata[i]['title']) + ' - '+ htmlEncode(ver[vi]) + '</option>';
                     }
                 }
             }
 
-            var pn_checked = '<input id="data_'+rdata[i]['name']+'" type="checkbox" checked>';
+            var pn_checked = '<input id="data_'+htmlEncode(rdata[i]['name'])+'" type="checkbox" checked>';
             if (rdata[i]['name'] == 'swap'){
-                var pn_checked = '<input id="data_'+rdata[i]['name']+'" type="checkbox" disabled="disabled" checked>';
+                var pn_checked = '<input id="data_'+htmlEncode(rdata[i]['name'])+'" type="checkbox" disabled="disabled" checked>';
             }
             
-            plugin_list += '<li><span class="ico"><img src="/plugins/file?name='+rdata[i]['name']+'&f=ico.png"></span>\
+            plugin_list += '<li><span class="ico"><img src="/plugins/file?name='+htmlEncode(rdata[i]['name'])+'&f=ico.png"></span>\
             <span class="name">\
-                <select id="select_'+rdata[i]['name']+'" class="sl-s-info">'+select_list+'</select>\
+                <select id="select_'+htmlEncode(rdata[i]['name'])+'" class="sl-s-info">'+select_list+'</select>\
             </span>\
             <span class="pull-right">'+pn_checked+'</span></li>';
         }
@@ -888,8 +888,8 @@ function loadKeyDataCount(){
                     return;
                 }
                 var html = '<li class="sys-li-box col-xs-3 col-sm-3 col-md-3 col-lg-3">\
-                        <p class="name f15 c9">'+pname+'</p>\
-                        <div class="val"><a class="btlink" onclick="softMain(\''+pname+'\',\''+pname+'\',\''+rdata['data']['ver']+'\')">'+rdata['data']['count']+'</a></div>\
+                        <p class="name f15 c9">'+htmlEncode(pname)+'</p>\
+                        <div class="val"><a class="btlink" onclick="softMain(\''+jsEncode(pname)+'\',\''+jsEncode(pname)+'\',\''+jsEncode(rdata['data']['ver'])+'\')">'+htmlEncode(rdata['data']['count'])+'</a></div>\
                     </li>';
                 $('#index_overview').append(html);
             },'json');
@@ -1188,9 +1188,9 @@ var index = {
                     if (name == 'ALL'){
                         option += '<option value="'+name+'">全部</option>';
                     } else if (network_io_key == name){
-                        option += '<option value="'+name+'" selected>'+name+'</option>';
+                        option += '<option value="'+htmlEncode(name)+'" selected>'+htmlEncode(name)+'</option>';
                     } else {
-                        option += '<option value="'+name+'">'+name+'</option>';
+                        option += '<option value="'+htmlEncode(name)+'">'+htmlEncode(name)+'</option>';
                     }
                 }
                 $('select[name="network-io"]').html(option);
@@ -1373,9 +1373,9 @@ var index = {
                     if (name == 'ALL'){
                         option += '<option value="'+name+'">全部</option>';
                     } else if (disk_io_key == name){
-                        option += '<option value="'+name+'" selected>'+name+'</option>';
+                        option += '<option value="'+htmlEncode(name)+'" selected>'+htmlEncode(name)+'</option>';
                     } else {
-                        option += '<option value="'+name+'">'+name+'</option>';
+                        option += '<option value="'+htmlEncode(name)+'">'+htmlEncode(name)+'</option>';
                     }
                 }
                 $('select[name="disk-io"]').html(option);

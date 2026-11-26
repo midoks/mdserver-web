@@ -21,17 +21,17 @@ function memcachedStatus() {
 						<table class="table table-hover table-bordered" style="width: 490px;">\
 						<thead><th>字段</th><th>当前值</th><th>说明</th></thead>\
 						<tbody>\
-							<tr><th>BindIP</th><td>' + rdata.bind + '</td><td>监听IP</td></tr>\
-							<tr><th>PORT</th><td>' + rdata.port + '</td><td>监听端口</td></tr>\
-							<tr><th>CACHESIZE</th><td>' + rdata.cachesize + ' MB</td><td>最大缓存容量</td></tr>\
-							<tr><th>MAXCONN</th><td>' + rdata.maxconn + '</td><td>最大连接数限制</td></tr>\
-							<tr><th>curr_connections</th><td>' + rdata.curr_connections + '</td><td>当前打开的连接数</td></tr>\
-							<tr><th>cmd_get</th><td>' + rdata.cmd_get + '</td><td>GET请求数</td></tr>\
-							<tr><th>get_hits</th><td>' + rdata.get_hits + '</td><td>GET命中次数</td></tr>\
-							<tr><th>get_misses</th><td>' + rdata.get_misses + '</td><td>GET失败次数</td></tr>\
+							<tr><th>BindIP</th><td>' + htmlEncode(rdata.bind) + '</td><td>监听IP</td></tr>\
+							<tr><th>PORT</th><td>' + htmlEncode(rdata.port) + '</td><td>监听端口</td></tr>\
+							<tr><th>CACHESIZE</th><td>' + htmlEncode(rdata.cachesize) + ' MB</td><td>最大缓存容量</td></tr>\
+							<tr><th>MAXCONN</th><td>' + htmlEncode(rdata.maxconn) + '</td><td>最大连接数限制</td></tr>\
+							<tr><th>curr_connections</th><td>' + htmlEncode(rdata.curr_connections) + '</td><td>当前打开的连接数</td></tr>\
+							<tr><th>cmd_get</th><td>' + htmlEncode(rdata.cmd_get) + '</td><td>GET请求数</td></tr>\
+							<tr><th>get_hits</th><td>' + htmlEncode(rdata.get_hits) + '</td><td>GET命中次数</td></tr>\
+							<tr><th>get_misses</th><td>' + htmlEncode(rdata.get_misses) + '</td><td>GET失败次数</td></tr>\
 							<tr><th>hit</th><td>' + rdata.hit.toFixed(2) + '%</td><td>GET命中率</td></tr>\
-							<tr><th>curr_items</th><td>' + rdata.curr_items + '</td><td>当前被缓存的数据行数</td></tr>\
-							<tr><th>evictions</th><td>' + rdata.evictions + '</td><td>因内存不足而被清理的缓存行数</td></tr>\
+							<tr><th>curr_items</th><td>' + htmlEncode(rdata.curr_items) + '</td><td>当前被缓存的数据行数</td></tr>\
+							<tr><th>evictions</th><td>' + htmlEncode(rdata.evictions) + '</td><td>因内存不足而被清理的缓存行数</td></tr>\
 							<tr><th>bytes</th><td>' + toSize(rdata.bytes) + '</td><td>当前已使用内存</td></tr>\
 							<tr><th>bytes_read</th><td>' + toSize(rdata.bytes_read) + '</td><td>请求总大小</td></tr>\
 							<tr><th>bytes_written</th><td>' + toSize(rdata.bytes_written) + '</td><td>发送总大小</td></tr>\
@@ -59,10 +59,10 @@ function memcachedCache() {
         }
 
         var memCon = '<div class="conf_p" style="margin-bottom:0">\
-						<p><span>BindIP</span><input style="width: 120px;" class="bt-input-text mr5" name="membind" value="' + rdata.bind + '" type="text" ><font>监听IP,请勿随意修改</font></p>\
-						<p><span>PORT</span><input style="width: 120px;" class="bt-input-text mr5" max="65535" name="memport" value="' + rdata.port + '" type="number" ><font>监听端口,一般无需修改</font></p>\
-						<p><span>CACHESIZE</span><input style="width: 120px;" class="bt-input-text mr5" name="memcachesize" value="' + rdata.cachesize + '" type="number" >MB,<font>缓存大小,建议不要大于512M</font></p>\
-						<p><span>MAXCONN</span><input style="width: 120px;" class="bt-input-text mr5" name="memmaxconn" value="' + rdata.maxconn + '" type="number" ><font>最大连接数,建议不要大于40960</font></p>\
+						<p><span>BindIP</span><input style="width: 120px;" class="bt-input-text mr5" name="membind" value="' + htmlEncode(rdata.bind) + '" type="text" ><font>监听IP,请勿随意修改</font></p>\
+						<p><span>PORT</span><input style="width: 120px;" class="bt-input-text mr5" max="65535" name="memport" value="' + htmlEncode(rdata.port) + '" type="number" ><font>监听端口,一般无需修改</font></p>\
+						<p><span>CACHESIZE</span><input style="width: 120px;" class="bt-input-text mr5" name="memcachesize" value="' + htmlEncode(rdata.cachesize) + '" type="number" >MB,<font>缓存大小,建议不要大于512M</font></p>\
+						<p><span>MAXCONN</span><input style="width: 120px;" class="bt-input-text mr5" name="memmaxconn" value="' + htmlEncode(rdata.maxconn) + '" type="number" ><font>最大连接数,建议不要大于40960</font></p>\
 						<div style="margin-top:10px; padding-right:230px" class="text-right"><button class="btn btn-success btn-sm" onclick="setMemcachedConf()">保存</button></div>\
 					</div>'
         $(".soft-man-con").html(memCon);

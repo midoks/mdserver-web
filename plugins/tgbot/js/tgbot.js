@@ -56,7 +56,7 @@ function botConf(){
         }
 
         var mlist = '';
-        mlist += '<p><span>app_token</span><input style="width: 250px;" class="bt-input-text mr5" name="app_token" value="'+app_token+'" type="text"><font>必填写</font></p>'
+        mlist += '<p><span>app_token</span><input style="width: 250px;" class="bt-input-text mr5" name="app_token" value="'+htmlEncode(app_token)+'" type="text"><font>必填写</font></p>'
         var option = '<style>.conf_p p{margin-bottom: 2px}</style>\
             <div class="conf_p" style="margin-bottom:0">\
                 ' + mlist + '\

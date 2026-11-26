@@ -35,9 +35,9 @@ function orPluginSetService(_name ,status, version){
         '</span><span style="color: '+
         (status?'#20a53a;':'red;')+
         ' margin-left: 3px;" class="glyphicon ' + (status?'glyphicon glyphicon-play':'glyphicon-pause')+'"></span></p><div class="sfm-opt">\
-            <button class="btn btn-default btn-sm" onclick="orPluginOpService(\''+_name+'\',\''+(status?'stop':'start')+'\',\''+version+'\')">'+(status?'停止':'启动')+'</button>\
-            <button class="btn btn-default btn-sm" onclick="orPluginOpService(\''+_name+'\',\'restart\',\''+version+'\',\'yes\')">重启</button>\
-            <button class="btn btn-default btn-sm" onclick="orPluginOpService(\''+_name+'\',\'reload\',\''+version+'\')">重载配置</button>\
+            <button class="btn btn-default btn-sm" onclick="orPluginOpService(\''+jsEncode(_name)+'\',\''+(status?'stop':'start')+'\',\''+jsEncode(version)+'\')">'+(status?'停止':'启动')+'</button>\
+            <button class="btn btn-default btn-sm" onclick="orPluginOpService(\''+jsEncode(_name)+'\',\'restart\',\''+jsEncode(version)+'\',\'yes\')">重启</button>\
+            <button class="btn btn-default btn-sm" onclick="orPluginOpService(\''+jsEncode(_name)+'\',\'reload\',\''+jsEncode(version)+'\')">重载配置</button>\
         </div>'; 
     $(".soft-man-con").html(serviceCon);
 }
@@ -123,13 +123,13 @@ function getOpStatus() {
             }
 
             var con = "<div><table class='table table-hover table-bordered'>\
-                            <tr><th>活动连接(Active connections)</th><td>" + rdata.active + "</td></tr>\
-                            <tr><th>总连接次数(accepts)</th><td>" + rdata.accepts + "</td></tr>\
-                            <tr><th>总握手次数(handled)</th><td>" + rdata.handled + "</td></tr>\
-                            <tr><th>总请求数(requests)</th><td>" + rdata.requests + "</td></tr>\
-                            <tr><th>请求数(Reading)</th><td>" + rdata.Reading + "</td></tr>\
-                            <tr><th>响应数(Writing)</th><td>" + rdata.Writing + "</td></tr>\
-                            <tr><th>驻留进程(Waiting)</th><td>" + rdata.Waiting + "</td></tr>\
+                            <tr><th>活动连接(Active connections)</th><td>" + htmlEncode(rdata.active) + "</td></tr>\
+                            <tr><th>总连接次数(accepts)</th><td>" + htmlEncode(rdata.accepts) + "</td></tr>\
+                            <tr><th>总握手次数(handled)</th><td>" + htmlEncode(rdata.handled) + "</td></tr>\
+                            <tr><th>总请求数(requests)</th><td>" + htmlEncode(rdata.requests) + "</td></tr>\
+                            <tr><th>请求数(Reading)</th><td>" + htmlEncode(rdata.Reading) + "</td></tr>\
+                            <tr><th>响应数(Writing)</th><td>" + htmlEncode(rdata.Writing) + "</td></tr>\
+                            <tr><th>驻留进程(Waiting)</th><td>" + htmlEncode(rdata.Waiting) + "</td></tr>\
                          </table></div>";
             $(".soft-man-con").html(con);
         }catch(err){
@@ -148,12 +148,12 @@ function setOpCfg(){
         var mlist = '';
         for (var i = 0; i < rdata.length; i++) {
             var w = '70'
-            var ibody = '<input style="width: ' + w + 'px;" class="bt-input-text mr5" name="' + rdata[i].name + '" value="' + rdata[i].value + '" type="text" >';
+            var ibody = '<input style="width: ' + w + 'px;" class="bt-input-text mr5" name="' + htmlEncode(rdata[i].name) + '" value="' + htmlEncode(rdata[i].value) + '" type="text" >';
             switch (rdata[i].type) {
                 case 0:
                     var selected_1 = (rdata[i].value == 1) ? 'selected' : '';
                     var selected_0 = (rdata[i].value == 0) ? 'selected' : '';
-                    ibody = '<select class="bt-input-text mr5" name="' + rdata[i].name + '" style="width: ' + w + 'px;">\
+                    ibody = '<select class="bt-input-text mr5" name="' + htmlEncode(rdata[i].name) + '" style="width: ' + w + 'px;">\
                         <option value="1" ' + selected_1 + '>开启</option>\
                         <option value="0" ' + selected_0 + '>关闭</option>\
                     </select>';
@@ -161,13 +161,13 @@ function setOpCfg(){
                 case 1:
                     var selected_1 = (rdata[i].value == 'on') ? 'selected' : '';
                     var selected_0 = (rdata[i].value == 'off') ? 'selected' : '';
-                    ibody = '<select class="bt-input-text mr5" name="' + rdata[i].name + '" style="width: ' + w + 'px;">\
+                    ibody = '<select class="bt-input-text mr5" name="' + htmlEncode(rdata[i].name) + '" style="width: ' + w + 'px;">\
                         <option value="on" ' + selected_1 + '>开启</option>\
                         <option value="off" ' + selected_0 + '>关闭</option>\
                     </select>';
                     break;
             }
-            mlist += '<p style="margin-top:15px;"><span>' + rdata[i].name + '</span>' + ibody + "<b class='unit c9'>"+rdata[i].unit+"</b>" +', <font class="c9">' + rdata[i].ps + '</font></p>';
+            mlist += '<p style="margin-top:15px;"><span>' + htmlEncode(rdata[i].name) + '</span>' + ibody + "<b class='unit c9'>"+htmlEncode(rdata[i].unit)+"</b>" +', <font class="c9">' + htmlEncode(rdata[i].ps) + '</font></p>';
         }
         var con = '<style>.conf_p p{margin-bottom: 2px}</style><div class="conf_p" style="margin-bottom:0">\
                         ' + mlist + '\

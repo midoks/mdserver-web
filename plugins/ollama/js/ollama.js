@@ -89,10 +89,10 @@ var ollama  = {
                     for (var i = 0; i < data.length; i++) {
                         var item = data[i];
                         html += '<tr>';
-                        html += '<td>' + (item.name || '') + '</td>';
-                        html += '<td>' + (item.id || '') + '</td>';
-                        html += '<td>' + (item.size || '') + '</td>';
-                        html += '<td>' + (item.modified || '') + '</td>';
+                        html += '<td>' + htmlEncode(item.name || '') + '</td>';
+                        html += '<td>' + htmlEncode(item.id || '') + '</td>';
+                        html += '<td>' + htmlEncode(item.size || '') + '</td>';
+                        html += '<td>' + htmlEncode(item.modified || '') + '</td>';
                         html += '</tr>';
                     }
                 } else {

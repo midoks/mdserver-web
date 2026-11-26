@@ -38,12 +38,12 @@ function gogsSetConfig(){
         for (var i = 0; i < rdata.length; i++) {
             var w = '140';
             if (rdata[i].name == 'error_reporting') w = '250';
-            var ibody = '<input style="width: ' + w + 'px;" class="bt-input-text mr5" name="' + rdata[i].name + '" value="' + rdata[i].value + '" type="text" >';
+            var ibody = '<input style="width: ' + w + 'px;" class="bt-input-text mr5" name="' + htmlEncode(rdata[i].name) + '" value="' + htmlEncode(rdata[i].value) + '" type="text" >';
             switch (rdata[i].type) {
                 case 0:
                     var selected_1 = (rdata[i].value == 1) ? 'selected' : '';
                     var selected_0 = (rdata[i].value == 0) ? 'selected' : '';
-                    ibody = '<select class="bt-input-text mr5" name="' + rdata[i].name + '" style="width: ' + w + 'px;">\
+                    ibody = '<select class="bt-input-text mr5" name="' + htmlEncode(rdata[i].name) + '" style="width: ' + w + 'px;">\
                         <option value="1" ' + selected_1 + '>开启</option>\
                         <option value="0" ' + selected_0 + '>关闭</option>\
                         </select>';
@@ -51,19 +51,19 @@ function gogsSetConfig(){
                 case 1:
                     var selected_1 = (rdata[i].value == 'On') ? 'selected' : '';
                     var selected_0 = (rdata[i].value == 'Off') ? 'selected' : '';
-                    ibody = '<select class="bt-input-text mr5" name="' + rdata[i].name + '" style="width: ' + w + 'px;">\
+                    ibody = '<select class="bt-input-text mr5" name="' + htmlEncode(rdata[i].name) + '" style="width: ' + w + 'px;">\
                         <option value="On" ' + selected_1 + '>开启</option>\
                         <option value="Off" ' + selected_0 + '>关闭</option></select>'
                     break;
                 case 2:
                     var selected_1 = (rdata[i].value == 'true') ? 'selected' : '';
                     var selected_0 = (rdata[i].value == 'false') ? 'selected' : '';
-                    ibody = '<select class="bt-input-text mr5" name="' + rdata[i].name + '" style="width: ' + w + 'px;">\
+                    ibody = '<select class="bt-input-text mr5" name="' + htmlEncode(rdata[i].name) + '" style="width: ' + w + 'px;">\
                         <option value="true" ' + selected_1 + '>开启</option>\
                         <option value="false" ' + selected_0 + '>关闭</option></select>'
                     break;
             }
-            mlist += '<p><span>' + rdata[i].name + '</span>' + ibody + ', <font>' + rdata[i].ps + '</font></p>'
+            mlist += '<p><span>' + htmlEncode(rdata[i].name) + '</span>' + ibody + ', <font>' + htmlEncode(rdata[i].ps) + '</font></p>'
         }
         var html = '<style>.conf_p p{margin-bottom: 2px}</style><div class="conf_p" style="margin-bottom:0">\
                         ' + mlist + '\
@@ -310,17 +310,17 @@ function gogsRepoListPage(page, search){
                 option += '<a class="btlink edit" data-index="'+i+'">编辑</a>' + ' | ';
                 option += '<a class="btlink debug" data-index="'+i+'">日志</a>' + ' | ';
                 option += '<a class="btlink run" data-index="'+i+'">手动</a>' + ' | ';
-                option += '<a class="btlink scripts" data-index="'+i+'" onclick="projectScriptSelf(\''+ulist[i]["name"]+'\',\''+ulist[i]["repo"]+'\')" >自定义</a>';
+                option += '<a class="btlink scripts" data-index="'+i+'" onclick="projectScriptSelf(\''+jsEncode(ulist[i]["name"])+'\',\''+jsEncode(ulist[i]["repo"])+'\')" >自定义</a>';
             } else{
                 option += '<a data-index="'+i+'" class="btlink load">加载脚本</a>';
             }
 
 
-            body += '<tr><td>'+ulist[i]["id"]+'</td>'+
-                '<td class="overflow_hide" style="width:70px;">' + ulist[i]["name"]+'</td>'+
-                '<td class="overflow_hide" style="width:70px;display: inline-block;">' + ulist[i]["repo"]+'</td>'+
+            body += '<tr><td>'+htmlEncode(ulist[i]["id"])+'</td>'+
+                '<td class="overflow_hide" style="width:70px;">' + htmlEncode(ulist[i]["name"])+'</td>'+
+                '<td class="overflow_hide" style="width:70px;display: inline-block;">' + htmlEncode(ulist[i]["repo"])+'</td>'+
                 '<td>' +
-                    '<a class="btlink" target="_blank" href="'+rdata['data']['root_url']+ulist[i]["name"]+'/'+ulist[i]["repo"]+'">源码</a>' + ' | ' +
+                    '<a class="btlink" target="_blank" href="'+htmlEncode(rdata['data']['root_url'])+htmlEncode(ulist[i]["name"])+'/'+htmlEncode(ulist[i]["repo"])+'">源码</a>' + ' | ' +
                     option + 
                 '</td>' +
                 '</tr>';
@@ -543,7 +543,7 @@ function projectScriptSelfRender(user, name){
                 }
 
                 body += '<tr>'+
-                '<td>' + data[i]["name"]+'</td>'+
+                '<td>' + htmlEncode(data[i]["name"])+'</td>'+
                 '<td>' + b_status + '</td>'+
                 '<td>' +
                     '<a class="btlink del" data-index="'+i+'" target="_blank">删除</a>' + ' | ' +
@@ -639,7 +639,7 @@ function projectScriptSelfRender(user, name){
                 btn:['设置','关闭'],
                 content: '<div class="bt-form pd20">\
                             <div class="line">\
-                                <input type="text" class="bt-input-text" name="Name" id="newFileName" value="'+file+'" placeholder="文件名" style="width:100%" />\
+                                <input type="text" class="bt-input-text" name="Name" id="newFileName" value="'+htmlEncode(file)+'" placeholder="文件名" style="width:100%" />\
                             </div>\
                         </div>',
                 success:function(){

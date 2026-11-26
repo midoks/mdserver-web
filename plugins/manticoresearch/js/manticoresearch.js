@@ -250,15 +250,15 @@ function mcsRunStatus(){
 
         var tbody = '';
         for (var i in idata) {
-            tbody += '<tr><th>'+i+'</th><td>' + idata[i] + '</td><td colspan="2">'+i+'</td></tr>';
+            tbody += '<tr><th>'+htmlEncode(i)+'</th><td>' + htmlEncode(idata[i]) + '</td><td colspan="2">'+htmlEncode(i)+'</td></tr>';
         }
 
         var con = '<div class="divtable"><table class="table table-hover table-bordered" style="margin-bottom:10px;background-color:#fafafa">\
                     <tbody>\
                         <tr><th>运行时间</th><td>' + secToTime(idata.uptime) + '</td><th>每秒查询</th><td>' + parseInt(parseInt(idata.queries) / parseInt(idata.uptime)) + '</td></tr>\
-                        <tr><th>总连接次数</th><td>' + idata.connections + '</td><th>work_queue_length</th><td>' +idata.work_queue_length + '</td></tr>\
-                        <tr><th>agent_connect</th><td>' + idata.agent_connect+ '</td><th>workers_active</th><td>' + idata.workers_active + '</td></tr>\
-                        <tr><th>agent_retry</th><td>' + idata.agent_retry + '</td><th>workers_total</th><td>' + idata.workers_total + '</td></tr>\
+                        <tr><th>总连接次数</th><td>' + htmlEncode(idata.connections) + '</td><th>work_queue_length</th><td>' +htmlEncode(idata.work_queue_length) + '</td></tr>\
+                        <tr><th>agent_connect</th><td>' + htmlEncode(idata.agent_connect)+ '</td><th>workers_active</th><td>' + htmlEncode(idata.workers_active) + '</td></tr>\
+                        <tr><th>agent_retry</th><td>' + htmlEncode(idata.agent_retry) + '</td><th>workers_total</th><td>' + htmlEncode(idata.workers_total) + '</td></tr>\
                     </tbody>\
                     </table>\
                     <table class="table table-hover table-bordered">\
@@ -287,18 +287,18 @@ function mcsReadme(){
         con += '<li style="color:red;">如果数据量比较大,第一次启动会失败!(可通过手动建立索引)</li>';
         con += '<li style="color:red;">以下内容,需手动加入计划任务。</li>';
 
-        con += '<li>全量:' + rdata['data']['cmd'] + ' --all --rotate</li>';
+        con += '<li>全量:' + htmlEncode(rdata['data']['cmd']) + ' --all --rotate</li>';
 
         //主索引
         for (var i = 0; i < rdata['data']['index'].length; i++) {
             var index_kv = rdata['data']['index'][i];
             var index = index_kv['index'];
             // console.log(index);
-            con += '<li>主索引 :' + rdata['data']['cmd'] + ' '+ index +' --rotate</li>';
+            con += '<li>主索引 :' + htmlEncode(rdata['data']['cmd']) + ' '+ htmlEncode(index) +' --rotate</li>';
             if (typeof(index_kv['delta']) != 'undefined'){
                 var delta = index_kv['delta'];
-                con += '<li>增量索引 :' + rdata['data']['cmd'] + ' '+ delta +' --rotate</li>';
-                con += '<li>合并索引 :' + rdata['data']['cmd'] + ' --merge '+ index  + ' ' + delta +' --rotate</li>';
+                con += '<li>增量索引 :' + htmlEncode(rdata['data']['cmd']) + ' '+ htmlEncode(delta) +' --rotate</li>';
+                con += '<li>合并索引 :' + htmlEncode(rdata['data']['cmd']) + ' --merge '+ htmlEncode(index)  + ' ' + htmlEncode(delta) +' --rotate</li>';
             }
         }
         con += '</ul>';

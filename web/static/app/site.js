@@ -57,9 +57,9 @@ function getDate(a) {
 		for (var i = 0; i < list.length; i++) {
 			//当前站点状态
 			if (list[i].status == '正在运行' || list[i].status == '1') {
-				var status = "<a href='javascript:;' title='停用这个站点' onclick=\"webStop(" + list[i].id + ",'" + list[i].name + "')\" class='btn-defsult'><span style='color:rgb(92, 184, 92)'>运行中</span><span style='color:rgb(92, 184, 92)' class='glyphicon glyphicon-play'></span></a>";
+				var status = "<a href='javascript:;' title='停用这个站点' onclick=\"webStop(" + list[i].id + ",'" + jsEncode(list[i].name) + "')\" class='btn-defsult'><span style='color:rgb(92, 184, 92)'>运行中</span><span style='color:rgb(92, 184, 92)' class='glyphicon glyphicon-play'></span></a>";
 			} else {
-				var status = "<a href='javascript:;' title='启用这个站点' onclick=\"webStart(" + list[i].id + ",'" + list[i].name + "')\" class='btn-defsult'><span style='color:red'>已停止</span><span style='color:rgb(255, 0, 0);' class='glyphicon glyphicon-pause'></span></a>";
+				var status = "<a href='javascript:;' title='启用这个站点' onclick=\"webStart(" + list[i].id + ",'" + jsEncode(list[i].name) + "')\" class='btn-defsult'><span style='color:red'>已停止</span><span style='color:rgb(255, 0, 0);' class='glyphicon glyphicon-pause'></span></a>";
 			}
 
 			//是否有备份
@@ -81,16 +81,16 @@ function getDate(a) {
 			}
 			var idname = list[i].name.replace(/\./g,'_');
 			
-			body = "<tr><td><input type='checkbox' name='id' title='"+list[i].name+"' onclick='checkSelect();' value='" + list[i].id + "'></td>\
-					<td><a class='btlink webtips' href='javascript:;' onclick=\"webEdit(" + list[i].id + ",'" + list[i].name + "','" + list[i].edate + "','" + list[i].add_time + "')\" title='"+list[i].name+"'>" + shortwebname + "</td>\
+			body = "<tr><td><input type='checkbox' name='id' title='"+htmlEncode(list[i].name)+"' onclick='checkSelect();' value='" + list[i].id + "'></td>\
+					<td><a class='btlink webtips' href='javascript:;' onclick=\"webEdit(" + list[i].id + ",'" + jsEncode(list[i].name) + "','" + jsEncode(list[i].edate) + "','" + jsEncode(list[i].add_time) + "')\" title='"+htmlEncode(list[i].name)+"'>" + htmlEncode(shortwebname) + "</td>\
 					<td>" + status + "</td>\
 					<td>" + backup + "</td>\
-					<td><a class='btlink' title='打开目录"+list[i].path+"' href=\"javascript:openPath('"+data.data[i].path+"');\">" + shortpath + "</a></td>\
-					<td><a class='btlink setTimes' id='site_"+list[i].id+"' data-ids='"+list[i].id+"'>" + web_end_time + "</a></td>\
-					<td><a class='btlinkbed' href='javascript:;' data-id='"+list[i].id+"'>" + list[i].ps + "</a></td>\
+					<td><a class='btlink' title='打开目录"+htmlEncode(list[i].path)+"' href=\"javascript:openPath('"+jsEncode(data.data[i].path)+"');\">" + htmlEncode(shortpath) + "</a></td>\
+					<td><a class='btlink setTimes' id='site_"+list[i].id+"' data-ids='"+list[i].id+"'>" + htmlEncode(web_end_time) + "</a></td>\
+					<td><a class='btlinkbed' href='javascript:;' data-id='"+list[i].id+"'>" + htmlEncode(list[i].ps) + "</a></td>\
 					<td style='text-align:right; color:#bbb'>\
-					<a href='javascript:;' class='btlink' onclick=\"webEdit(" + list[i].id + ",'" + list[i].name + "','" +list[i].edate + "','" + list[i].add_time + "')\">设置</a>\
-                        | <a href='javascript:;' class='btlink' onclick=\"webDelete('" + list[i].id + "','" + list[i].name + "')\" title='删除站点'>删除</a>\
+					<a href='javascript:;' class='btlink' onclick=\"webEdit(" + list[i].id + ",'" + jsEncode(list[i].name) + "','" +jsEncode(list[i].edate) + "','" + jsEncode(list[i].add_time) + "')\">设置</a>\
+                        | <a href='javascript:;' class='btlink' onclick=\"webDelete('" + list[i].id + "','" + jsEncode(list[i].name) + "')\" title='删除站点'>删除</a>\
 					</td></tr>"
 			
 			$("#webBody").append(body);
@@ -141,7 +141,7 @@ function getDate(a) {
 			if(databak == null){
 				databak = '';
 			}
-			$(this).hide().after("<input class='baktext' type='text' data-id='"+dataid+"' data-page='"+page+"' name='bak' value='" + databak + "' placeholder='备注信息' onblur='getBakPost(\"sites\")' />");
+			$(this).hide().after("<input class='baktext' type='text' data-id='"+dataid+"' data-page='"+page+"' name='bak' value='" + htmlEncode(databak) + "' placeholder='备注信息' onblur='getBakPost(\"sites\")' />");
 			$(".baktext").focus();
 		});
 
@@ -238,7 +238,7 @@ function webAddPage(type) {
 		var defaultPath = $("#defaultPath").html();
 		var php_version = "<div class='line'><span class='tname'>"+lan.site.php_ver+"</span><select class='bt-input-text' name='version' id='c_k3' style='width:100px'>";
 		for (var i=rdata.length-1;i>=0;i--) {
-            php_version += "<option value='"+rdata[i].version+"'>"+rdata[i].name+"</option>";
+            php_version += "<option value='"+htmlEncode(rdata[i].version)+"'>"+htmlEncode(rdata[i].name)+"</option>";
         }
 
         var www = syncPost('/site/get_root_dir');
@@ -268,7 +268,7 @@ function webAddPage(type) {
                 <div class='line'>\
                 <span class='tname'>根目录</span>\
                 <div class='info-r c4'>\
-                	<input id='inputPath' class='bt-input-text mr5' type='text' name='path' value='"+www['dir']+"/' placeholder='"+www['dir']+"' style='width:458px' />\
+                	<input id='inputPath' class='bt-input-text mr5' type='text' name='path' value='"+htmlEncode(www['dir'])+"/' placeholder='"+htmlEncode(www['dir'])+"' style='width:458px' />\
                 	<span class='glyphicon glyphicon-folder-open cursor' onclick='changePath(\"inputPath\")'></span>\
                 </div>\
                 </div>\
@@ -362,7 +362,7 @@ function webPathEdit(id){
 			if(data.run_path.dirs[i] == data.run_path.path){ 
 				selected = 'selected';
 			}
-			opt += '<option value="'+ data.run_path.dirs[i] +'" '+selected+'>'+ data.run_path.dirs[i] +'</option>';
+			opt += '<option value="'+ htmlEncode(data.run_path.dirs[i]) +'" '+selected+'>'+ htmlEncode(data.run_path.dirs[i]) +'</option>';
 		}
 		var content = "<div class='webedit-box soft-man-con'>\
 					<div class='label-input-group ptb10'>\
@@ -371,7 +371,7 @@ function webPathEdit(id){
 					</div>\
 					<div class='line mt10'>\
 						<span class='mr5'>网站目录</span>\
-						<input class='bt-input-text mr5' type='text' style='width:50%' placeholder='网站根目录' value='"+site_path+"' name='webdir' id='inputPath'>\
+						<input class='bt-input-text mr5' type='text' style='width:50%' placeholder='网站根目录' value='"+htmlEncode(site_path)+"' name='webdir' id='inputPath'>\
 						<span onclick='changePath(&quot;inputPath&quot;)' class='glyphicon glyphicon-folder-open cursor mr20'></span>\
 						<button class='btn btn-success btn-sm' onclick='setSitePath("+id+")'>保存</button>\
 					</div>\
@@ -548,7 +548,7 @@ function webDelete(wid, wname){
 	    	<label><input type='checkbox' id='delpath' name='path'><span>根目录</span></label>\
 	    	</div>";
 	var info = '是否要删除同名根目录';
-	safeMessage('删除站点'+"["+wname+"]",info, function(){
+	safeMessage('删除站点'+"["+htmlEncode(wname)+"]",info, function(){
 		var path='';
 		if($("#delpath").is(":checked")){
 			path='&path=1';
@@ -606,7 +606,7 @@ function syncDeleteSite(dataList,successCount,errorMsg,path){
 			if(!errorMsg){
 				errorMsg = '<br><p>'+lan.site.del_err+':</p>';
 			}
-			errorMsg += '<li>'+dataList[0].name+' -> '+rdata.msg+'</li>'
+			errorMsg += '<li>'+htmlEncode(dataList[0].name)+' -> '+htmlEncode(rdata.msg)+'</li>'
 		}
 		dataList.splice(0,1);
 		syncDeleteSite(dataList,successCount,errorMsg,path);
@@ -625,14 +625,14 @@ function domainEdit(id, name, msg, status) {
 		var echoHtml = "";
 		for (var i = 0; i < domain.length; i++) {
 			echoHtml += "<tr>\
-				<td><a title='"+lan.site.click_access+"' target='_blank' href='http://" + domain[i].name + ":" + domain[i].port + "' class='btlinkbed'>" + domain[i].name + "</a></td>\
-				<td><a class='btlinkbed'>" + domain[i].port + "</a></td>\
-				<td class='text-center'><a class='table-btn-del' href='javascript:;' onclick=\"delDomain(" + id + ",'" + name + "','" + domain[i].name + "','" + domain[i].port + "',1)\"><span class='glyphicon glyphicon-trash'></span></a></td>\
+				<td><a title='"+lan.site.click_access+"' target='_blank' href='http://" + htmlEncode(domain[i].name) + ":" + htmlEncode(domain[i].port) + "' class='btlinkbed'>" + htmlEncode(domain[i].name) + "</a></td>\
+				<td><a class='btlinkbed'>" + htmlEncode(domain[i].port) + "</a></td>\
+				<td class='text-center'><a class='table-btn-del' href='javascript:;' onclick=\"delDomain(" + id + ",'" + jsEncode(name) + "','" + jsEncode(domain[i].name) + "','" + jsEncode(domain[i].port) + "',1)\"><span class='glyphicon glyphicon-trash'></span></a></td>\
 				</tr>";
 		}
 		var bodyHtml = "<textarea id='newdomain' class='bt-input-text' style='height: 100px; width: 340px;padding:5px 10px;line-height:20px'></textarea>\
 								<input type='hidden' id='newport' value='80' />\
-								<button type='button' class='btn btn-success btn-sm pull-right' style='margin:30px 35px 0 0' onclick=\"domainAdd(" + id + ",'" + name + "',1)\">添加</button>\
+								<button type='button' class='btn btn-success btn-sm pull-right' style='margin:30px 35px 0 0' onclick=\"domainAdd(" + id + ",'" + jsEncode(name) + "',1)\">添加</button>\
 							<div class='divtable mtb15' style='height:350px;overflow:auto'>\
 								<table class='table table-hover' width='100%'>\
 								<thead><tr><th>"+lan.site.domain+"</th><th width='70px'>端口</th><th width='50px' class='text-center'>操作</th></tr></thead>\
@@ -802,10 +802,10 @@ function getBackup(id,name,page) {
 				continue;
 			}
 			
-			var ftpdown = "<a class='btlink' href='/files/download?filename="+frdata.data[i].filename+"&name="+frdata.data[i].name+"' target='_blank'>下载</a> | ";
-			body += "<tr><td><span class='glyphicon glyphicon-file'></span>"+frdata.data[i].name+"</td>\
+			var ftpdown = "<a class='btlink' href='/files/download?filename="+htmlEncode(frdata.data[i].filename)+"&name="+htmlEncode(frdata.data[i].name)+"' target='_blank'>下载</a> | ";
+			body += "<tr><td><span class='glyphicon glyphicon-file'></span>"+htmlEncode(frdata.data[i].name)+"</td>\
 					<td>" + (toSize(frdata.data[i].size)) + "</td>\
-					<td>" + frdata.data[i].add_time + "</td>\
+					<td>" + htmlEncode(frdata.data[i].add_time) + "</td>\
 					<td class='text-right' style='color:#ccc'>"+ ftpdown + "<a class='btlink' href='javascript:;' onclick=\"webBackupDelete('" + frdata.data[i].id + "',"+id+")\">删除</a></td>\
 				</tr>"
 		}
@@ -832,7 +832,7 @@ function getBackup(id,name,page) {
 			shift: 0,
 			shadeClose: false,
 			content: "<div class='bt-form ptb15 mlr15' id='webBackup'>\
-				<button class='btn btn-default btn-sm' style='margin-right:10px' type='button' onclick=\"webBackup('" + frdata['site']['id'] + "','" +  frdata['site']['name'] + "')\">打包备份</button>\
+				<button class='btn btn-default btn-sm' style='margin-right:10px' type='button' onclick=\"webBackup('" + frdata['site']['id'] + "','" +  jsEncode(frdata['site']['name']) + "')\">打包备份</button>\
 				<div class='divtable mtb15' style='margin-bottom:0'>\
 					<table width='100%' id='webBackupList' class='table table-hover'>\
 					<thead>\
@@ -921,7 +921,7 @@ function getDefaultSite(){
 		for(var i=0;i<rdata.sites.length;i++){
 			selected = '';
 			if(rdata.default_site == rdata.sites[i].name) selected = 'selected';
-			opt += '<option value="' + rdata.sites[i].name + '" ' + selected + '>' + rdata.sites[i].name + '</option>';
+			opt += '<option value="' + htmlEncode(rdata.sites[i].name) + '" ' + selected + '>' + htmlEncode(rdata.sites[i].name) + '</option>';
 		}
 		
 		layer.open({
@@ -970,7 +970,7 @@ function setPHPVer(){
 				continue;
 			}
 
-			opt += '<option value="' + rdata.versions[i].version + '" ' + selected + '>' + rdata.versions[i].name + '</option>';
+			opt += '<option value="' + htmlEncode(rdata.versions[i].version) + '" ' + selected + '>' + htmlEncode(rdata.versions[i].name) + '</option>';
 		}
 		
 		var phpver_layer = layer.open({
@@ -1030,25 +1030,25 @@ function webEdit(id,website,endTime,addtime){
 	layer.open({
 		type: 1,
 		area: ['700px','603px'],
-		title: '站点修改['+website+']  --  添加时间['+addtime+']',
+		title: '站点修改['+htmlEncode(website)+']  --  添加时间['+htmlEncode(addtime)+']',
 		closeBtn: 1,
 		shift: 0,
 		content: "<div class='bt-form'>\
 			<div class='bt-w-menu pull-left'>\
-				<p class='bgw' onclick=\"domainEdit(" + id + ",'" + website + "')\">域名管理</p>\
+				<p class='bgw' onclick=\"domainEdit(" + id + ",'" + jsEncode(website) + "')\">域名管理</p>\
 				<p onclick='dirBinding("+id+")'>子目录绑定</p>\
 				<p onclick='webPathEdit("+id+")'>网站目录</p>\
 				<p onclick='limitNet("+id+")'>流量限制</p>\
-				<p onclick=\"rewrite('"+website+"')\">伪静态</p>\
+				<p onclick=\"rewrite('"+jsEncode(website)+"')\">伪静态</p>\
 				<p onclick='setIndexEdit("+id+")'>默认文档</p>\
-				<p onclick=\"configFile('"+website+"')\">配置文件</p>\
-				<p onclick=\"setSSL("+id+",'"+website+"')\">SSL</p>\
-				<p onclick=\"phpVersion('"+website+"')\">PHP版本</p>\
-				<p onclick=\"to301('"+website+"')\">重定向</p>\
-				<p onclick=\"toProxy('"+website+"')\">反向代理</p>\
-				<p id='site_"+id+"' onclick=\"security('"+id+"','"+website+"')\">防盗链</p>\
-				<p id='site_"+id+"' onclick=\"getSiteLogs('"+website+"')\">响应日志</p>\
-				<p id='site_"+id+"' onclick=\"getSiteErrorLogs('"+website+"')\">错误日志</p>\
+				<p onclick=\"configFile('"+jsEncode(website)+"')\">配置文件</p>\
+				<p onclick=\"setSSL("+id+",'"+jsEncode(website)+"')\">SSL</p>\
+				<p onclick=\"phpVersion('"+jsEncode(website)+"')\">PHP版本</p>\
+				<p onclick=\"to301('"+jsEncode(website)+"')\">重定向</p>\
+				<p onclick=\"toProxy('"+jsEncode(website)+"')\">反向代理</p>\
+				<p id='site_"+id+"' onclick=\"security('"+id+"','"+jsEncode(website)+"')\">防盗链</p>\
+				<p id='site_"+id+"' onclick=\"getSiteLogs('"+jsEncode(website)+"')\">响应日志</p>\
+				<p id='site_"+id+"' onclick=\"getSiteErrorLogs('"+jsEncode(website)+"')\">错误日志</p>\
 			</div>\
 			<div id='webedit-con' class='bt-w-con webedit-con pd15' style='height: 100%;overflow: scroll;'></div>\
 		</div>",
@@ -1122,10 +1122,10 @@ function security(id,name){
 	$.post('/site/get_security',{id:id,name:name},function(rdata){
 		layer.close(loadT);
 		var mbody = '<div>'
-					+'<p style="margin-bottom:8px"><span style="display: inline-block; width: 60px;">URL后缀</span><input class="bt-input-text" type="text" name="sec_fix" value="'+rdata.fix+'" style="margin-left: 5px;width: 425px;height: 30px;margin-right:10px;'+(rdata.status?'background-color: #eee;':'')+'" placeholder="多个请用逗号隔开,例：png,jpeg,jpg,gif,zip" '+(rdata.status?'readonly':'')+'></p>'
-					+'<p style="margin-bottom:8px"><span style="display: inline-block; width: 60px;">许可域名</span><input class="bt-input-text" type="text" name="sec_domains" value="'+rdata.domains+'" style="margin-left: 5px;width: 425px;height: 30px;margin-right:10px;'+(rdata.status?'background-color: #eee;':'')+'" placeholder="支持通配符,多个域名请用逗号隔开,例：*.test.com,test.com" '+(rdata.status?'readonly':'')+'></p>'
-					+'<div class="label-input-group ptb10"><label style="font-weight:normal"><input type="checkbox" name="sec_status" onclick="setSecurity(\''+name+'\','+id+')" '+(rdata.status?'checked':'')+'>启用防盗链</label></div>'
-					+'<div class="label-input-group ptb10"><label style="font-weight:normal"><input type="checkbox" name="sec_none_status" onclick="setSecurity(\''+name+'\','+id+')" '+(rdata.none?'checked':'')+'>允许空HTTP_REFERER请求</label></div>'
+					+'<p style="margin-bottom:8px"><span style="display: inline-block; width: 60px;">URL后缀</span><input class="bt-input-text" type="text" name="sec_fix" value="'+htmlEncode(rdata.fix)+'" style="margin-left: 5px;width: 425px;height: 30px;margin-right:10px;'+(rdata.status?'background-color: #eee;':'')+'" placeholder="多个请用逗号隔开,例：png,jpeg,jpg,gif,zip" '+(rdata.status?'readonly':'')+'></p>'
+					+'<p style="margin-bottom:8px"><span style="display: inline-block; width: 60px;">许可域名</span><input class="bt-input-text" type="text" name="sec_domains" value="'+htmlEncode(rdata.domains)+'" style="margin-left: 5px;width: 425px;height: 30px;margin-right:10px;'+(rdata.status?'background-color: #eee;':'')+'" placeholder="支持通配符,多个域名请用逗号隔开,例：*.test.com,test.com" '+(rdata.status?'readonly':'')+'></p>'
+					+'<div class="label-input-group ptb10"><label style="font-weight:normal"><input type="checkbox" name="sec_status" onclick="setSecurity(\''+jsEncode(name)+'\','+id+')" '+(rdata.status?'checked':'')+'>启用防盗链</label></div>'
+					+'<div class="label-input-group ptb10"><label style="font-weight:normal"><input type="checkbox" name="sec_none_status" onclick="setSecurity(\''+jsEncode(name)+'\','+id+')" '+(rdata.none?'checked':'')+'>允许空HTTP_REFERER请求</label></div>'
 					+'<ul class="help-info-text c7 ptb10">'
 						+'<li>默认允许资源被直接访问,即不限制HTTP_REFERER为空的请求</li>'
 						+'<li>多个URL后缀与域名请使用逗号(,)隔开,如: png,jpeg,zip,js</li>'
@@ -1263,12 +1263,12 @@ function dirBinding(id){
 		var rdata = data['data'];
 		var echoHtml = '';
 		for(var i=0;i<rdata.binding.length;i++){
-			echoHtml += "<tr><td>"+rdata.binding[i].domain+"</td><td>"+rdata.binding[i].port+"</td><td>"+rdata.binding[i].path+"</td><td class='text-right'><a class='btlink' href='javascript:setDirRewrite("+rdata.binding[i].id+");'>伪静态</a> | <a class='btlink' href='javascript:delDirBind("+rdata.binding[i].id+","+id+");'>删除</a></td></tr>";
+			echoHtml += "<tr><td>"+htmlEncode(rdata.binding[i].domain)+"</td><td>"+htmlEncode(rdata.binding[i].port)+"</td><td>"+htmlEncode(rdata.binding[i].path)+"</td><td class='text-right'><a class='btlink' href='javascript:setDirRewrite("+rdata.binding[i].id+");'>伪静态</a> | <a class='btlink' href='javascript:delDirBind("+rdata.binding[i].id+","+id+");'>删除</a></td></tr>";
 		}
 		
 		var dirList = '';
 		for(var n=0;n<rdata.dirs.length;n++){
-			dirList += "<option value='"+rdata.dirs[n]+"'>"+rdata.dirs[n]+"</option>";
+			dirList += "<option value='"+htmlEncode(rdata.dirs[n])+"'>"+htmlEncode(rdata.dirs[n])+"</option>";
 		}
 		
 		var body = "<div class='dirBinding c5'>"
@@ -1305,12 +1305,12 @@ function setDirRewrite(id){
 function showRewrite(rdata){
 	var rList = ''; 
 	for(var i=0;i<rdata.rlist.length;i++){
-		rList += "<option value='"+rdata.rlist[i]+"'>"+rdata.rlist[i]+"</option>";
+		rList += "<option value='"+htmlEncode(rdata.rlist[i])+"'>"+htmlEncode(rdata.rlist[i])+"</option>";
 	}
 	var webBakHtml = "<div class='c5 plr15'>\
 				<div class='line'>\
 					<select class='bt-input-text mr20' id='myRewrite' name='rewrite' style='width:30%;'>"+rList+"</select>\
-					<textarea class='bt-input-text mtb15' style='height: 260px; width: 470px; line-height:18px;padding:5px;' id='rewriteBody'>"+rdata.data+"</textarea>\
+					<textarea class='bt-input-text mtb15' style='height: 260px; width: 470px; line-height:18px;padding:5px;' id='rewriteBody'>"+htmlEncode(rdata.data)+"</textarea>\
 				</div>\
 				<button id='setRewriteBtn' class='btn btn-success btn-sm'>保存</button>\
 				<ul class='help-info-text c7 ptb10'>\
@@ -1467,7 +1467,7 @@ function to301(siteName, type, obj){
 			layer.close(laoding);
 			if (res.status == true) {
 				var mBody = "<div class='webEdit-box' style='padding: 20px'>\
-				<textarea style='height: 320px; width: 445px; margin-left: 20px; line-height:18px' id='configRedirectBody'>"+res.data.result+"</textarea>\
+				<textarea style='height: 320px; width: 445px; margin-left: 20px; line-height:18px' id='configRedirectBody'>"+htmlEncode(res.data.result)+"</textarea>\
 					<div class='info-r'>\
 						<ul class='help-info-text c7 ptb10'>\
 							<li>此处为重定向配置文件,若您不了解配置规则,请勿随意修改.</li>\
@@ -1523,7 +1523,7 @@ function to301(siteName, type, obj){
 
 	var body = '<div id="redirect_list" class="bt_table">\
 		<div style="padding-bottom: 10px">\
-			<button type="button" title="添加重定向" class="btn btn-success btn-sm mr5" onclick="to301(\''+siteName+'\',1)" >\
+			<button type="button" title="添加重定向" class="btn btn-success btn-sm mr5" onclick="to301(\''+jsEncode(siteName)+'\',1)" >\
 			<span>添加重定向</span>\
 		</button>\
 		</div>\
@@ -1555,19 +1555,19 @@ function to301(siteName, type, obj){
 				var lan_r_type = item.r_type == 0 ? "临时重定向" : "永久重定向";
 				var keep_path = item.keep_path == 0 ? "不保留" : "保留";
 
-				var switchProxy  = '<span onclick="toRedirect(\''+siteName+'\',\''+ item.id +'\',10)" style="color:rgb(92, 184, 92);" class="btlink glyphicon glyphicon-play"></span>';
+				var switchProxy  = '<span onclick="toRedirect(\''+jsEncode(siteName)+'\',\''+ item.id +'\',10)" style="color:rgb(92, 184, 92);" class="btlink glyphicon glyphicon-play"></span>';
 				if (!item['status']){
-					switchProxy = '<span onclick="toRedirect(\''+siteName+'\',\''+ item.id +'\',11)" style="color:rgb(255, 0, 0);" class="btlink glyphicon glyphicon-pause"></span>';
+					switchProxy = '<span onclick="toRedirect(\''+jsEncode(siteName)+'\',\''+ item.id +'\',11)" style="color:rgb(255, 0, 0);" class="btlink glyphicon glyphicon-pause"></span>';
 				}
 
 				let tmp = '<tr>\
-					<td><span data-index="1"><span>'+item.r_from+'</span></span></td>\
+					<td><span data-index="1"><span>'+htmlEncode(item.r_from)+'</span></span></td>\
 					<td><span data-index="2"><span>'+lan_r_type+'</span></span></td>\
 					<td><span data-index="3"><span>'+keep_path+'</span></span></td>\
 					<td><span data-index="4"><span>'+switchProxy+'</span></span></td>\
 					<td>\
-						<span data-index="5" onclick="to301(\''+siteName+'\', 3, \''+ item.id +'\')"  class="btlink">详细</span> | \
-						<span data-index="5" onclick="to301(\''+siteName+'\', 2, \''+ item.id +'\')" class="btlink">删除</span>\
+						<span data-index="5" onclick="to301(\''+jsEncode(siteName)+'\', 3, \''+ item.id +'\')"  class="btlink">详细</span> | \
+						<span data-index="5" onclick="to301(\''+jsEncode(siteName)+'\', 2, \''+ item.id +'\')" class="btlink">删除</span>\
 					</td>\
 				</tr>';
 				$("#md-301-body").append(tmp);
@@ -1818,7 +1818,7 @@ function toProxy(siteName, type, obj) {
 			}
 
 			var mBody = "<div class='webEdit-box' style='padding: 20px'>\
-			<textarea style='height: 320px; width: 445px; margin-left: 20px; line-height:18px' id='configProxyBody'>"+res.data.result+"</textarea>\
+			<textarea style='height: 320px; width: 445px; margin-left: 20px; line-height:18px' id='configProxyBody'>"+htmlEncode(res.data.result)+"</textarea>\
 				<div class='info-r'>\
 					<ul class='help-info-text c7 ptb10'>\
 						<li>此处为反向代理配置文件,若您不了解配置规则,请勿随意修改.</li>\
@@ -1923,7 +1923,7 @@ function toProxy(siteName, type, obj) {
 
 	var body = '<div id="proxy_list" class="bt_table">\
 		<div style="padding-bottom: 10px">\
-			<button type="button" title="添加反向代理" class="btn btn-success btn-sm mr5" onclick="toProxy(\''+siteName+'\',1)" >\
+			<button type="button" title="添加反向代理" class="btn btn-success btn-sm mr5" onclick="toProxy(\''+jsEncode(siteName)+'\',1)" >\
 				<span>添加反向代理</span>\
 			</button>\
 		</div>\
@@ -1957,9 +1957,9 @@ function toProxy(siteName, type, obj) {
 		for (var i = 0; i < data.length; i++) {
 			var item = data[i];
 		
-			var switchProxy  = '<span onclick="toProxy(\''+siteName+'\', 10, \''+ item.id +'\')" style="color:rgb(92, 184, 92);" class="btlink glyphicon glyphicon-play"></span>';
+			var switchProxy  = '<span onclick="toProxy(\''+jsEncode(siteName)+'\', 10, \''+ item.id +'\')" style="color:rgb(92, 184, 92);" class="btlink glyphicon glyphicon-play"></span>';
 			if (!item['status']){
-				switchProxy = '<span onclick="toProxy(\''+siteName+'\', 11, \''+ item.id +'\')" style="color:rgb(255, 0, 0);" class="btlink glyphicon glyphicon-pause"></span>';
+				switchProxy = '<span onclick="toProxy(\''+jsEncode(siteName)+'\', 11, \''+ item.id +'\')" style="color:rgb(255, 0, 0);" class="btlink glyphicon glyphicon-pause"></span>';
 			}
 
 			var openCache = '<span  data-index="'+i+'" class="btlink cache off">未开启</span>';
@@ -1968,9 +1968,9 @@ function toProxy(siteName, type, obj) {
 			}
 
 			let tmp = '<tr>\
-				<td>'+item.name+'</td>\
-				<td>'+item.from+'</td>\
-				<td>'+item.to+'</td>\
+				<td>'+htmlEncode(item.name)+'</td>\
+				<td>'+htmlEncode(item.from)+'</td>\
+				<td>'+htmlEncode(item.to)+'</td>\
 				<td>'+openCache+'</td>\
 				<td>'+switchProxy+'</td>\
 				<td>\
@@ -2019,11 +2019,11 @@ function sslAdmin(siteName){
 		var tbody = '';
 		for(var i=0;i<rdata.length;i++){
 			tbody += '<tr>\
-				<td>'+rdata[i].subject+'</td>\
-				<td>'+rdata[i].dns.join('<br>')+'</td>\
-				<td>'+rdata[i].notAfter+'</td>\
-				<td>'+rdata[i].issuer.split(' ')[0]+'</td>\
-				<td style="text-align: right;"><a onclick="setCertSsl(\''+rdata[i].subject+'\',\''+siteName+'\')" class="btlink">部署</a> | <a onclick="removeSsl(\''+rdata[i].subject+'\')" class="btlink">删除</a></td>\
+				<td>'+htmlEncode(rdata[i].subject)+'</td>\
+				<td>'+rdata[i].dns.map(htmlEncode).join('<br>')+'</td>\
+				<td>'+htmlEncode(rdata[i].notAfter)+'</td>\
+				<td>'+htmlEncode(rdata[i].issuer.split(' ')[0])+'</td>\
+				<td style="text-align: right;"><a onclick="setCertSsl(\''+jsEncode(rdata[i].subject)+'\',\''+jsEncode(siteName)+'\')" class="btlink">部署</a> | <a onclick="removeSsl(\''+jsEncode(rdata[i].subject)+'\')" class="btlink">删除</a></td>\
 			</tr>'
 		}
 		var txt = '<div class="mtb15" style="line-height:30px">\
@@ -2066,10 +2066,10 @@ function setSSL(id,siteName){
 					<p>温馨提示：当前站点未开启SSL证书访问，站点访问可能存在风险。<button class="btn btn-success btn-xs ml10 cutTabView">申请证书</button></p>\
 				</div>\
 				<div class="tab-nav" style="margin-top: 10px;">\
-					<span class="on" id="now_ssl" onclick="opSSL(\'now\','+id+',\''+siteName+'\')">当前证书 - <i class="error">[未部署SSL]</i></span>\
+					<span class="on" id="now_ssl" onclick="opSSL(\'now\','+id+',\''+jsEncode(siteName)+'\')">当前证书 - <i class="error">[未部署SSL]</i></span>\
 					\
-					<span onclick="opSSL(\'acme\','+id+',\''+siteName+'\')">ACME</span>\
-					<span id="ssl_admin" onclick="sslAdmin(\''+siteName+'\')">证书夹</span>'
+					<span onclick="opSSL(\'acme\','+id+',\''+jsEncode(siteName)+'\')">ACME</span>\
+					<span id="ssl_admin" onclick="sslAdmin(\''+jsEncode(siteName)+'\')">证书夹</span>'
 					+ '<div class="ss-text pull-right mr30" style="position: relative;top:-4px">\
 	                </div></div>'
 			  + '<div class="tab-con" style="padding: 0px;"></div>';
@@ -2137,16 +2137,16 @@ function renderDnsapiHtml(data){
 	var fields_html = '';
 
 	for (var d in fields) {
-		fields_html += "<span class='tname tips' data-toggle='tooltip' data-original-title='"+d+"'>"+d+"</span>\
+		fields_html += "<span class='tname tips' data-toggle='tooltip' data-original-title='"+htmlEncode(d)+"'>"+htmlEncode(d)+"</span>\
 	    <div class='info-r'>\
-	        <input name='"+d+"' class='bt-input-text mr5' style='width:100%;' value='"+fields[d]+"' type='text'>\
+	        <input name='"+htmlEncode(d)+"' class='bt-input-text mr5' style='width:100%;' value='"+htmlEncode(fields[d])+"' type='text'>\
 	    </div>";
 	}
 
 	layer.open({
         type: 1,
         area: '500px',
-        title: '设置'+data['title']+'接口',
+        title: '设置'+htmlEncode(data['title'])+'接口',
         closeBtn: 1,
         shift: 5,
         shadeClose: true,
@@ -2156,7 +2156,7 @@ function renderDnsapiHtml(data){
 			    <span class='tname'>DNSAPI类型</span>\
 			    <div class='info-r'>\
 			        <select class='bt-input-text mr5' name='type_name' style='width:100%;'>\
-			            <option name='cf'>"+data['name']+"</option>\
+			            <option name='cf'>"+htmlEncode(data['name'])+"</option>\
 			        </select>\
 			    </div>\
 			</div>\
@@ -2166,7 +2166,7 @@ function renderDnsapiHtml(data){
 			<div class='line'>\
 				<div>\
 					<ul class='help-info-text c7' style='margin-top:0px;'>\
-						<li>使用【"+data['title']+"】的API接口自动解析申请SSL</li>\
+						<li>使用【"+htmlEncode(data['title'])+"】的API接口自动解析申请SSL</li>\
 					</ul>\
 				</div>\
 			</div>\
@@ -2202,7 +2202,7 @@ function renderDnsapi(){
 		
 		var dnsapi_option = '';
 		for (var i = 0; i < data.length; i++) {
-			dnsapi_option+='<option value="'+data[i]['name']+'" index="'+i+'">'+data[i]['title']+'</option>';
+			dnsapi_option+='<option value="'+htmlEncode(data[i]['name'])+'" index="'+i+'">'+htmlEncode(data[i]['title'])+'</option>';
 		}
 
 		$('#dnsapi_option select').html(dnsapi_option);
@@ -2234,7 +2234,7 @@ function opSSLNow(type, id, siteName, callback){
 			<div class="ssl-con-key pull-left">证书(PEM格式)<br><textarea id="csr" class="bt-input-text"></textarea></div>\
 		</div>\
 		<div class="ssl-btn pull-left mtb15" style="width:100%">\
-			<button class="btn btn-success btn-sm" onclick="saveSSL(\''+siteName+'\')">保存</button>\
+			<button class="btn btn-success btn-sm" onclick="saveSSL(\''+jsEncode(siteName)+'\')">保存</button>\
 		</div>\
 	</div>\
 	<ul class="help-info-text c7 pull-left">\
@@ -2256,14 +2256,14 @@ function opSSLNow(type, id, siteName, callback){
 			var domains = rdata['cert_data']['dns'].join("、");
 
 			var cert_data = "<div class='state_info_flex'>\
-				<div class='state_item'><span>证书品牌：</span><span class='ellipsis_text'>"+issuer[0]+"</span></div>\
-				<div class='state_item'><span>到期时间：</span><span class='btlink'>剩余"+rdata['cert_data']['endtime']+"天到期</span></div>\
+				<div class='state_item'><span>证书品牌：</span><span class='ellipsis_text'>"+htmlEncode(issuer[0])+"</span></div>\
+				<div class='state_item'><span>到期时间：</span><span class='btlink'>剩余"+htmlEncode(rdata['cert_data']['endtime'])+"天到期</span></div>\
 			</div>\
 			<div class='state_info_flex'>\
-				<div class='state_item'><span>认证域名：</span><span class='ellipsis_text'>"+domains+"</span></div>\
+				<div class='state_item'><span>认证域名：</span><span class='ellipsis_text'>"+htmlEncode(domains)+"</span></div>\
 				<div class='state_item'><span>强制HTTPS：</span><span class='switch'>\
 					<input class='btswitch btswitch-ios' id='toHttps' type='checkbox'>\
-                    <label class='btswitch-btn' for='toHttps' onclick=\"httpToHttps('" + siteName + "')\">\
+                    <label class='btswitch-btn' for='toHttps' onclick=\"httpToHttps('" + jsEncode(siteName) + "')\">\
 				</span></div>\
 			</div>";
 			$(".ssl_state_info").html(cert_data);
@@ -2273,7 +2273,7 @@ function opSSLNow(type, id, siteName, callback){
 		if(rdata.key == false){
 			rdata.key = '';
 		} else {
-			$(".ssl-btn").append('<button style=\'margin-left:3px;\' class="btn btn-success btn-sm" onclick="deleteSSL(\'now\','+id+',\''+siteName+'\')">删除</button>');
+			$(".ssl-btn").append('<button style=\'margin-left:3px;\' class="btn btn-success btn-sm" onclick="deleteSSL(\'now\','+id+',\''+jsEncode(siteName)+'\')">删除</button>');
 		}
 
 		if(rdata.csr == false){
@@ -2286,7 +2286,7 @@ function opSSLNow(type, id, siteName, callback){
 		if(rdata.status){
 			$('.warning_info').css('display','none');
 			
-			$(".ssl-btn").append("<button class='btn btn-success btn-sm' onclick=\"ocSSL('close_ssl_conf','"+siteName+"')\" style='margin-left:3px;'>关闭SSL</button>");
+			$(".ssl-btn").append("<button class='btn btn-success btn-sm' onclick=\"ocSSL('close_ssl_conf','"+jsEncode(siteName)+"')\" style='margin-left:3px;'>关闭SSL</button>");
 			$('#now_ssl').html('当前证书 - <i style="color:#20a53a;">[已部署SSL]</i>');
 		} else{
 			$('.warning_info').css('display','block');
@@ -2401,7 +2401,7 @@ function opSSLAcme(type, id, siteName, callback){
 					var x = isContains(data.domains[i].name, '*');
 					if(!isIP && !x){
 						opt += '<li style="line-height:26px">\
-							<input type="checkbox" style="margin-right:5px; vertical-align:-2px" value="'+data.domains[i].name+'">'+data.domains[i].name
+							<input type="checkbox" style="margin-right:5px; vertical-align:-2px" value="'+htmlEncode(data.domains[i].name)+'">'+htmlEncode(data.domains[i].name)
 						+'</li>';
 					}
 				}
@@ -2441,12 +2441,12 @@ function opSSLAcme(type, id, siteName, callback){
 		var acme = '<div class="myKeyCon ptb15">\
 				<div class="ssl_state_info" style="display:none;"></div>\
 				<div class="custom_certificate_info">\
-					<div class="ssl-con-key pull-left mr20" readonly>密钥(KEY)<br><textarea id="key" class="bt-input-text">'+rdata.key+'</textarea></div>\
-					<div class="ssl-con-key pull-left" readonly>证书(PEM格式)<br><textarea id="csr" class="bt-input-text">'+rdata.csr+'</textarea></div>\
+					<div class="ssl-con-key pull-left mr20" readonly>密钥(KEY)<br><textarea id="key" class="bt-input-text">'+htmlEncode(rdata.key)+'</textarea></div>\
+					<div class="ssl-con-key pull-left" readonly>证书(PEM格式)<br><textarea id="csr" class="bt-input-text">'+htmlEncode(rdata.csr)+'</textarea></div>\
 				</div>\
 				<div class="ssl-btn pull-left mtb15" style="width:100%">\
-					<button class="btn btn-success btn-sm" onclick="deploySSL(\'acme\','+id+',\''+siteName+'\')">部署</button>\
-					<button class="btn btn-success btn-sm" onclick="deleteSSL(\'acme\','+id+',\''+siteName+'\')">删除</button>\
+					<button class="btn btn-success btn-sm" onclick="deploySSL(\'acme\','+id+',\''+jsEncode(siteName)+'\')">部署</button>\
+					<button class="btn btn-success btn-sm" onclick="deleteSSL(\'acme\','+id+',\''+jsEncode(siteName)+'\')">删除</button>\
 				</div>\
 			</div>\
 			<ul class="help-info-text c7 pull-left">\
@@ -2461,11 +2461,11 @@ function opSSLAcme(type, id, siteName, callback){
 			var domains = rdata['cert_data']['dns'].join("、");
 
 			var cert_data = "<div class='state_info_flex'>\
-				<div class='state_item'><span>证书品牌：</span><span class='ellipsis_text'>"+issuer[0]+"</span></div>\
-				<div class='state_item'><span>到期时间：</span><span class='btlink'>剩余"+rdata['cert_data']['endtime']+"天到期</span></div>\
+				<div class='state_item'><span>证书品牌：</span><span class='ellipsis_text'>"+htmlEncode(issuer[0])+"</span></div>\
+				<div class='state_item'><span>到期时间：</span><span class='btlink'>剩余"+htmlEncode(rdata['cert_data']['endtime'])+"天到期</span></div>\
 			</div>\
 			<div class='state_info_flex'>\
-				<div class='state_item'><span>认证域名：</span><span class='ellipsis_text'>"+domains+"</span></div>\
+				<div class='state_item'><span>认证域名：</span><span class='ellipsis_text'>"+htmlEncode(domains)+"</span></div>\
 			</div>";
 			$(".ssl_state_info").html(cert_data);
 			$(".ssl_state_info").css('display','block');
@@ -2551,7 +2551,7 @@ function opSSLLet(type, id, siteName, callback){
 					var isIP = isValidIP(data.domains[i].name);
 					var x = isContains(data.domains[i].name, '*');
 					if(!isIP && !x){
-						opt+='<li style="line-height:26px"><input type="checkbox" style="margin-right:5px; vertical-align:-2px" value="'+data.domains[i].name+'">'+data.domains[i].name+'</li>'
+						opt+='<li style="line-height:26px"><input type="checkbox" style="margin-right:5px; vertical-align:-2px" value="'+htmlEncode(data.domains[i].name)+'">'+htmlEncode(data.domains[i].name)+'</li>'
 					}
 				}
 				$("input[name='admin_email']").val(data.email);
@@ -2590,13 +2590,13 @@ function opSSLLet(type, id, siteName, callback){
 		var lets = '<div class="myKeyCon ptb15">\
 				<div class="ssl_state_info" style="display:none;"></div>\
 				<div class="custom_certificate_info">\
-					<div class="ssl-con-key pull-left mr20" readonly>密钥(KEY)<br><textarea id="key" class="bt-input-text">'+rdata.key+'</textarea></div>\
-					<div class="ssl-con-key pull-left" readonly>证书(PEM格式)<br><textarea id="csr" class="bt-input-text">'+rdata.csr+'</textarea></div>\
+					<div class="ssl-con-key pull-left mr20" readonly>密钥(KEY)<br><textarea id="key" class="bt-input-text">'+htmlEncode(rdata.key)+'</textarea></div>\
+					<div class="ssl-con-key pull-left" readonly>证书(PEM格式)<br><textarea id="csr" class="bt-input-text">'+htmlEncode(rdata.csr)+'</textarea></div>\
 				</div>\
 				<div class="ssl-btn pull-left mtb15" style="width:100%">\
-					<button class="btn btn-success btn-sm" onclick="deploySSL(\'lets\','+id+',\''+siteName+'\')">部署</button>\
-					<button class="btn btn-success btn-sm" onclick="renewSSL(\'lets\','+id+',\''+siteName+'\')">续期</button>\
-					<button class="btn btn-success btn-sm" onclick="deleteSSL(\'lets\','+id+',\''+siteName+'\')">删除</button>\
+					<button class="btn btn-success btn-sm" onclick="deploySSL(\'lets\','+id+',\''+jsEncode(siteName)+'\')">部署</button>\
+					<button class="btn btn-success btn-sm" onclick="renewSSL(\'lets\','+id+',\''+jsEncode(siteName)+'\')">续期</button>\
+					<button class="btn btn-success btn-sm" onclick="deleteSSL(\'lets\','+id+',\''+jsEncode(siteName)+'\')">删除</button>\
 				</div>\
 			</div>\
 			<ul class="help-info-text c7 pull-left">\
@@ -2611,11 +2611,11 @@ function opSSLLet(type, id, siteName, callback){
 			var domains = rdata['cert_data']['dns'].join("、");
 
 			var cert_data = "<div class='state_info_flex'>\
-				<div class='state_item'><span>证书品牌：</span><span class='ellipsis_text'>"+issuer[0]+"</span></div>\
-				<div class='state_item'><span>到期时间：</span><span class='btlink'>剩余"+rdata['cert_data']['endtime']+"天到期</span></div>\
+				<div class='state_item'><span>证书品牌：</span><span class='ellipsis_text'>"+htmlEncode(issuer[0])+"</span></div>\
+				<div class='state_item'><span>到期时间：</span><span class='btlink'>剩余"+htmlEncode(rdata['cert_data']['endtime'])+"天到期</span></div>\
 			</div>\
 			<div class='state_info_flex'>\
-				<div class='state_item'><span>认证域名：</span><span class='ellipsis_text'>"+domains+"</span></div>\
+				<div class='state_item'><span>认证域名：</span><span class='ellipsis_text'>"+htmlEncode(domains)+"</span></div>\
 			</div>";
 			$(".ssl_state_info").html(cert_data);
 			$(".ssl_state_info").css('display','block');
@@ -2648,9 +2648,9 @@ function ocSSL(action,siteName){
 			}
 			data = "<p>证书获取失败：</p><hr />"
 			for(var i=0;i<rdata.out.length;i++){
-				data += "<p>域名: "+rdata.out[i].Domain+"</p>"
-					  + "<p>错误类型: "+rdata.out[i].Type+"</p>"
-					  + "<p>详情: "+rdata.out[i].Detail+"</p>"
+				data += "<p>域名: "+htmlEncode(rdata.out[i].Domain)+"</p>"
+					  + "<p>错误类型: "+htmlEncode(rdata.out[i].Type)+"</p>"
+					  + "<p>详情: "+htmlEncode(rdata.out[i].Detail)+"</p>"
 					  + "<hr />";
 			}
 			layer.msg(data,{icon:2,time:0,shade:0.3,shadeClose:true});
@@ -2728,9 +2728,9 @@ function newAcmeHandApplyNotice(siteName, id, domains, data){
 			var list = '';
 			for (var i = 0; i < data.length; i++) {
 				list += '<tr>';
-				list += '<td>'+data[i]['domain']+'</td>';
-				list += '<td>'+data[i]['val']+'</td>';
-				list += '<td>'+data[i]['type']+'</td>';
+				list += '<td>'+htmlEncode(data[i]['domain'])+'</td>';
+				list += '<td>'+htmlEncode(data[i]['val'])+'</td>';
+				list += '<td>'+htmlEncode(data[i]['type'])+'</td>';
 
 				if (data[i]['must']){
 					list += '<td>必需</td>';
@@ -2837,7 +2837,7 @@ function saveSSL(siteName){
 		if(rdata.status){
 			layer.msg(rdata.msg,{icon:1});
 			$(".ssl-btn").find(".btn-default").remove();
-			$(".ssl-btn").append("<button class='btn btn-default btn-sm' onclick=\"ocSSL('close_ssl_conf','"+siteName+"')\" style='margin-left:10px'>"+lan.site.ssl_close+"</button>");
+			$(".ssl-btn").append("<button class='btn btn-default btn-sm' onclick=\"ocSSL('close_ssl_conf','"+jsEncode(siteName)+"')\" style='margin-left:10px'>"+lan.site.ssl_close+"</button>");
 		} else {
 			layer.msg(rdata.msg,{icon:2,time:0,shade:0.3,shadeClose:true});
 		}
@@ -2862,10 +2862,10 @@ function phpVersion(siteName){
 			var optionSelect = '';
 			for(var i=0;i<rdata.length;i++){
 				optionSelect = version.phpversion == rdata[i].version?'selected':'';
-				versionSelect += "<option value='"+ rdata[i].version +"' "+ optionSelect +">"+ rdata[i].name +"</option>"
+				versionSelect += "<option value='"+ htmlEncode(rdata[i].version) +"' "+ optionSelect +">"+ htmlEncode(rdata[i].name) +"</option>"
 			}
 			versionSelect += "</select>\
-							<button class='btn btn-success btn-sm' onclick=\"setPHPVersion('"+siteName+"')\">"+lan.site.switch+"</button>\
+							<button class='btn btn-success btn-sm' onclick=\"setPHPVersion('"+jsEncode(siteName)+"')\">"+lan.site.switch+"</button>\
 							</div>\
 							<span id='php_w' style='color:red;margin-left: 32px;'></span>\
 						</div>\
@@ -2906,7 +2906,7 @@ function configFile(webSite){
 	var info = syncPost('/site/get_host_conf', {siteName:webSite});
 	$.post('/files/get_body','path='+info['host'],function(rdata){
 		var mBody = "<div class='webEdit-box padding-10'>\
-		<textarea style='height: 320px; width: 445px; margin-left: 20px;line-height:18px' id='configBody'>"+rdata.data.data+"</textarea>\
+		<textarea style='height: 320px; width: 445px; margin-left: 20px;line-height:18px' id='configBody'>"+htmlEncode(rdata.data.data)+"</textarea>\
 			<div class='info-r'>\
 				<button id='SaveConfigFileBtn' class='btn btn-success btn-sm' style='margin-top:15px;'>保存</button>\
 				<ul class='help-info-text c7 ptb10'>\
@@ -2953,15 +2953,15 @@ function rewrite(siteName){
 			var rList = ''; 
 			for(var i=0;i<rdata.rewrite.length;i++){
 				if (i==0){
-					rList += "<option value='0'>"+rdata.rewrite[i]+"</option>";	
+					rList += "<option value='0'>"+htmlEncode(rdata.rewrite[i])+"</option>";	
 				} else {
-					rList += "<option value='"+rdata.rewrite[i]+"'>"+rdata.rewrite[i]+"</option>";		
+					rList += "<option value='"+htmlEncode(rdata.rewrite[i])+"'>"+htmlEncode(rdata.rewrite[i])+"</option>";		
 				}
 			}
 			var webBakHtml = "<div class='bt-form'>\
 						<div class='line'>\
 						<select id='myRewrite' class='bt-input-text mr20' name='rewrite' style='width:30%;'>"+rList+"</select>\
-						<textarea class='bt-input-text' style='height: 260px; width: 480px; line-height:18px;margin-top:10px;padding:5px;' id='rewriteBody'>"+centent+"</textarea></div>\
+						<textarea class='bt-input-text' style='height: 260px; width: 480px; line-height:18px;margin-top:10px;padding:5px;' id='rewriteBody'>"+htmlEncode(centent)+"</textarea></div>\
 						<button id='SetRewriteBtn' class='btn btn-success btn-sm'>保存</button>\
 						<button id='SetRewriteBtnTel' class='btn btn-success btn-sm'>另存为模板</button>\
 						<ul class='help-info-text c7 ptb15'>\
@@ -3115,7 +3115,7 @@ function getClassType(){
 		$(select).html('');
 		$(select).append('<option value="-1">全部分类</option>');
 		for (var i = 0; i<rdata.length; i++) {
-			$(select).append('<option value="'+rdata[i]['id']+'">'+rdata[i]['name']+'</option>');
+			$(select).append('<option value="'+htmlEncode(rdata[i]['id'])+'">'+htmlEncode(rdata[i]['name'])+'</option>');
 		}
 
 		$(select).bind('change',function(){
@@ -3132,8 +3132,8 @@ function setClassType(){
 		
 		var list = '';
 		for (var i = 0; i<rdata.length; i++) {
-			list +='<tr><td>' + rdata[i]['name'] + '</td>\
-				<td><a class="btlink edit_type" onclick="editClassType(\''+rdata[i]['id']+'\',\''+rdata[i]['name']+'\')">编辑</a> | <a class="btlink del_type" onclick="removeClassType(\''+rdata[i]['id']+'\',\''+rdata[i]['name']+'\')">删除</a>\
+			list +='<tr><td>' + htmlEncode(rdata[i]['name']) + '</td>\
+				<td><a class="btlink edit_type" onclick="editClassType(\''+jsEncode(rdata[i]['id'])+'\',\''+jsEncode(rdata[i]['name'])+'\')">编辑</a> | <a class="btlink del_type" onclick="removeClassType(\''+jsEncode(rdata[i]['id'])+'\',\''+jsEncode(rdata[i]['name'])+'\')">删除</a>\
 				</td></tr>';
 		}
 
@@ -3176,7 +3176,7 @@ function removeClassType(id,name){
 		layer.msg('默认分类不可删除/不可编辑!',{icon:2});
 		return;
 	}
-	layer.confirm('是否确定删除分类？',{title: '删除分类【'+ name +'】' }, function(){
+	layer.confirm('是否确定删除分类？',{title: '删除分类【'+ htmlEncode(name) +'】' }, function(){
 		$.post('/site/remove_site_type','id='+id, function(rdata){
 			showMsg(rdata.msg,function(){
 				if (rdata.status){
@@ -3198,13 +3198,13 @@ function editClassType(id,name){
 	layer.open({
 		type: 1,
 		area: '350px',
-		title: '修改分类管理【' + name + '】',
+		title: '修改分类管理【' + htmlEncode(name) + '】',
 		closeBtn: 1,
 		shift: 0,
 		content: "<form class='bt-form bt-form pd20 pb70' id='mod_pwd'>\
                     <div class='line'>\
                         <span class='tname'>分类名称</span>\
-                        <div class='info-r'><input name=\"site_type_mod\" class='bt-input-text mr5' type='text' value='"+name+"' /></div>\
+                        <div class='info-r'><input name=\"site_type_mod\" class='bt-input-text mr5' type='text' value='"+htmlEncode(name)+"' /></div>\
                     </div>\
                     <div class='bt-form-submit-btn'>\
                         <button id='site_type_mod' type='button' class='btn btn-success btn-sm btn-title'>提交</button>\
@@ -3232,7 +3232,7 @@ function moveClassTYpe(){
 	$.post('/site/get_site_types',function(rdata){
 		var option = '';
 		for (var i = 0; i<rdata.length; i++) {
-			option +='<option value="'+rdata[i]['id']+'">'+rdata[i]['name']+'</option>';
+			option +='<option value="'+htmlEncode(rdata[i]['id'])+'">'+htmlEncode(rdata[i]['name'])+'</option>';
 		}
 
 		layer.open({

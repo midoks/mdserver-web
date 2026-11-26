@@ -380,12 +380,12 @@ function mysqlCommonFuncMysqlNSQL(){
                 var tbody = '';
                 for (var i = 0; i < items.length; i++) {
                     var t = '<tr>';
-                    t += '<td>'+items[i].query+'</td>';
-                    t += '<td>'+items[i].db+'</td>';
-                    t += '<td>'+items[i].last_seen+'</td>';
-                    t += '<td>'+items[i].exec_count+'</td>';
-                    t += '<td>'+items[i].max_latency+'</td>';
-                    t += '<td>'+items[i].avg_latency+'</td>';
+                    t += '<td>'+htmlEncode(items[i].query)+'</td>';
+                    t += '<td>'+htmlEncode(items[i].db)+'</td>';
+                    t += '<td>'+htmlEncode(items[i].last_seen)+'</td>';
+                    t += '<td>'+htmlEncode(items[i].exec_count)+'</td>';
+                    t += '<td>'+htmlEncode(items[i].max_latency)+'</td>';
+                    t += '<td>'+htmlEncode(items[i].avg_latency)+'</td>';
                     t += '</tr>';
                     tbody += t;
                 }
@@ -460,15 +460,15 @@ function mysqlCommonFuncMysqlNet(){
                 var tbody = '';
                 for (var i = 0; i < items.length; i++) {
                     var t = '<tr>';
-                    t += '<td>'+items[i]['current_time']+'</td>';
-                    t += '<td>'+items[i]['select']+'</td>';
-                    t += '<td>'+items[i]['insert']+'</td>';
-                    t += '<td>'+items[i]['update']+'</td>';
-                    t += '<td>'+items[i]['delete']+'</td>';
-                    t += '<td>'+items[i]['conn']+'</td>';
-                    t += '<td>'+items[i]['max_conn']+'</td>';
-                    t += '<td>'+items[i]['recv_mbps']+'</td>';
-                    t += '<td>'+items[i]['send_mbps']+'</td>';
+                    t += '<td>'+htmlEncode(items[i]['current_time'])+'</td>';
+                    t += '<td>'+htmlEncode(items[i]['select'])+'</td>';
+                    t += '<td>'+htmlEncode(items[i]['insert'])+'</td>';
+                    t += '<td>'+htmlEncode(items[i]['update'])+'</td>';
+                    t += '<td>'+htmlEncode(items[i]['delete'])+'</td>';
+                    t += '<td>'+htmlEncode(items[i]['conn'])+'</td>';
+                    t += '<td>'+htmlEncode(items[i]['max_conn'])+'</td>';
+                    t += '<td>'+htmlEncode(items[i]['recv_mbps'])+'</td>';
+                    t += '<td>'+htmlEncode(items[i]['send_mbps'])+'</td>';
                     t += '</tr>';
                     tbody += t;
                 }
@@ -539,11 +539,11 @@ function mysqlCommonFuncRedundantIndexes(){
                 var tbody = '';
                 for (var i = 0; i < items.length; i++) {
                     var t = '<tr>';
-                    t += '<td>'+items[i]['table_schema']+'</td>';
-                    t += '<td>'+items[i]['table_name']+'</td>';
-                    t += '<td>'+items[i]['redundant_index_name']+'</td>';
-                    t += '<td>'+items[i]['redundant_index_columns']+'</td>';
-                    t += '<td>'+items[i]['sql_drop_index']+'</td>';
+                    t += '<td>'+htmlEncode(items[i]['table_schema'])+'</td>';
+                    t += '<td>'+htmlEncode(items[i]['table_name'])+'</td>';
+                    t += '<td>'+htmlEncode(items[i]['redundant_index_name'])+'</td>';
+                    t += '<td>'+htmlEncode(items[i]['redundant_index_columns'])+'</td>';
+                    t += '<td>'+htmlEncode(items[i]['sql_drop_index'])+'</td>';
                     t += '<td><a class="exec btlink" index="'+i+'">执行</a></td>';
                     t += '</tr>';
                     tbody += t;
@@ -601,16 +601,16 @@ function mysqlCommonFuncTableInfo(){
                 var tbody = '';
                 for (var i = 0; i < items.length; i++) {
                     var t = '<tr>';
-                    t += '<td>'+items[i]['TABLE_SCHEMA']+'</td>';
-                    t += '<td>'+items[i]['TABLE_NAME']+'</td>';
-                    t += '<td>'+items[i]['ENGINE']+'</td>';
-                    t += '<td>'+items[i]['DATA_LENGTH']+'</td>';
-                    t += '<td>'+items[i]['INDEX_LENGTH']+'</td>';
-                    t += '<td>'+items[i]['TOTAL_LENGTH']+'</td>';
-                    t += '<td>'+items[i]['COLUMN_NAME']+'</td>';
-                    t += '<td>'+items[i]['COLUMN_TYPE']+'</td>';
-                    t += '<td>'+items[i]['AUTO_INCREMENT']+'</td>';
-                    t += '<td>'+items[i]['RESIDUAL_AUTO_INCREMENT']+'</td>';
+                    t += '<td>'+htmlEncode(items[i]['TABLE_SCHEMA'])+'</td>';
+                    t += '<td>'+htmlEncode(items[i]['TABLE_NAME'])+'</td>';
+                    t += '<td>'+htmlEncode(items[i]['ENGINE'])+'</td>';
+                    t += '<td>'+htmlEncode(items[i]['DATA_LENGTH'])+'</td>';
+                    t += '<td>'+htmlEncode(items[i]['INDEX_LENGTH'])+'</td>';
+                    t += '<td>'+htmlEncode(items[i]['TOTAL_LENGTH'])+'</td>';
+                    t += '<td>'+htmlEncode(items[i]['COLUMN_NAME'])+'</td>';
+                    t += '<td>'+htmlEncode(items[i]['COLUMN_TYPE'])+'</td>';
+                    t += '<td>'+htmlEncode(items[i]['AUTO_INCREMENT'])+'</td>';
+                    t += '<td>'+htmlEncode(items[i]['RESIDUAL_AUTO_INCREMENT'])+'</td>';
                     t += '</tr>';
                     tbody += t;
                 }
@@ -660,10 +660,10 @@ function mysqlCommonFuncConnCount(){
                 var tbody = '';
                 for (var i = 0; i < items.length; i++) {
                     var t = '<tr>';
-                    t += '<td>'+items[i]['user']+'</td>';
-                    t += '<td>'+items[i]['db']+'</td>';
-                    t += '<td>'+items[i]['Client_IP']+'</td>';
-                    t += '<td>'+items[i]['count']+'</td>';
+                    t += '<td>'+htmlEncode(items[i]['user'])+'</td>';
+                    t += '<td>'+htmlEncode(items[i]['db'])+'</td>';
+                    t += '<td>'+htmlEncode(items[i]['Client_IP'])+'</td>';
+                    t += '<td>'+htmlEncode(items[i]['count'])+'</td>';
                     t += '</tr>';
                     tbody += t;
                 }
@@ -729,8 +729,8 @@ function mysqlCommonFuncFpkInfo(){
                 var tbody = '';
                 for (var i = 0; i < items.length; i++) {
                     var t = '<tr>';
-                    t += '<td>'+items[i]['table_schema']+'</td>';
-                    t += '<td>'+items[i]['table_name']+'</td>';
+                    t += '<td>'+htmlEncode(items[i]['table_schema'])+'</td>';
+                    t += '<td>'+htmlEncode(items[i]['table_name'])+'</td>';
                     t += '</tr>';
                     tbody += t;
                 }
@@ -772,17 +772,17 @@ function mysqlCommonFuncLockSQL(){
                 var tbody = '';
                 for (var i = 0; i < items.length; i++) {
                     var t = '<tr>';
-                    t += '<td>'+items[i]['trx_id']+'</td>';
-                    t += '<td>'+items[i]['trx_state']+'</td>';
-                    t += '<td>'+items[i]['trx_started']+'</td>';
-                    t += '<td>'+items[i]['processlist_id']+'</td>';
-                    t += '<td>'+items[i]['info']+'</td>';
-                    t += '<td>'+items[i]['user']+'</td>';
-                    t += '<td>'+items[i]['host']+'</td>';
-                    t += '<td>'+items[i]['db']+'</td>';
-                    t += '<td>'+items[i]['command']+'</td>';
-                    t += '<td>'+items[i]['state']+'</td>';
-                    t += '<td>'+items[i]['sql_kill_blocking_query']+'</td>';
+                    t += '<td>'+htmlEncode(items[i]['trx_id'])+'</td>';
+                    t += '<td>'+htmlEncode(items[i]['trx_state'])+'</td>';
+                    t += '<td>'+htmlEncode(items[i]['trx_started'])+'</td>';
+                    t += '<td>'+htmlEncode(items[i]['processlist_id'])+'</td>';
+                    t += '<td>'+htmlEncode(items[i]['info'])+'</td>';
+                    t += '<td>'+htmlEncode(items[i]['user'])+'</td>';
+                    t += '<td>'+htmlEncode(items[i]['host'])+'</td>';
+                    t += '<td>'+htmlEncode(items[i]['db'])+'</td>';
+                    t += '<td>'+htmlEncode(items[i]['command'])+'</td>';
+                    t += '<td>'+htmlEncode(items[i]['state'])+'</td>';
+                    t += '<td>'+htmlEncode(items[i]['sql_kill_blocking_query'])+'</td>';
                     t += '<td><a class="exec btlink" index="'+i+'">执行</a></td>';
                     t += '</tr>';
                     tbody += t;
@@ -1309,9 +1309,9 @@ function mysqlInitField(f, data){
     var option_html = '<option value="0">无字段</option>';
     for (var i = 0; i < f.length; i++) {
         if (data['soso_field'] == f[i]){
-            option_html+= '<option value="'+f[i]+'" selected>'+f[i]+'</option>';
+            option_html+= '<option value="'+htmlEncode(f[i])+'" selected>'+htmlEncode(f[i])+'</option>';
         } else {
-            option_html+= '<option value="'+f[i]+'">'+f[i]+'</option>';
+            option_html+= '<option value="'+htmlEncode(f[i])+'">'+htmlEncode(f[i])+'</option>';
         }
 
         
@@ -1340,9 +1340,9 @@ function mysqlGetServerList(call_func){
             for (var i = 0; i < items.length; i++) {
                 var t = items[i];
                 if (i == 0){
-                    content += '<option value="'+t['val']+'" selected>'+t['name']+'</option>';
+                    content += '<option value="'+htmlEncode(t['val'])+'" selected>'+htmlEncode(t['name'])+'</option>';
                 } else {
-                    content += '<option value="'+t['val']+'">'+t['name']+'</option>';
+                    content += '<option value="'+htmlEncode(t['val'])+'">'+htmlEncode(t['name'])+'</option>';
                 }
             }
 
@@ -1378,9 +1378,9 @@ function mysqlGetDbList(){
             for (var i = 0; i < items.length; i++) {
                 var name = items[i];
                 if (i == 0){
-                    content += '<option value="'+name+'" selected>database['+name+']</option>';
+                    content += '<option value="'+htmlEncode(name)+'" selected>database['+htmlEncode(name)+']</option>';
                 } else {
-                    content += '<option value="'+name+'">database['+name+']</option>';
+                    content += '<option value="'+htmlEncode(name)+'">database['+htmlEncode(name)+']</option>';
                 }
             }
             // console.log(content);
@@ -1411,9 +1411,9 @@ function mysqlGetTableList(p){
             for (var i = 0; i < items.length; i++) {
                 var name = items[i];
                 if (i == 0){
-                    content += '<option value="'+name+'" selected>table['+name+']</option>';
+                    content += '<option value="'+htmlEncode(name)+'" selected>table['+htmlEncode(name)+']</option>';
                 } else {
-                    content += '<option value="'+name+'">table['+name+']</option>';
+                    content += '<option value="'+htmlEncode(name)+'">table['+htmlEncode(name)+']</option>';
                 }
             }
             // console.log(content);
@@ -1474,7 +1474,7 @@ function mysqlGetDataList(p){
                 for (var j = 0; j < fields.length; j++) {
                     var f = fields[j];
                     if (f in dlist[i]) {
-                        tbody += '<td title="'+dlist[i][f]+'">'+dlist[i][f]+'</td>';
+                        tbody += '<td title="'+htmlEncode(dlist[i][f])+'">'+htmlEncode(dlist[i][f])+'</td>';
                     } else {
                         tbody += '<td>undefined</td>';
                     }
@@ -1513,7 +1513,7 @@ function mysqlProcessList(){
                 for (var j = 0; j < fields.length; j++) {
                     var f = fields[j];
                     if (f in dlist[i]) {
-                        tbody += '<td title="'+dlist[i][f]+'">'+dlist[i][f]+'</td>';
+                        tbody += '<td title="'+htmlEncode(dlist[i][f])+'">'+htmlEncode(dlist[i][f])+'</td>';
                     } else {
                         tbody += '<td>undefined</td>';
                     }
@@ -1550,7 +1550,7 @@ function mysqlStatusList(){
                 for (var j = 0; j < fields.length; j++) {
                     var f = fields[j];
                     if (f in dlist[i]) {
-                        tbody += '<td title="'+dlist[i][f]+'">'+dlist[i][f]+'</td>';
+                        tbody += '<td title="'+htmlEncode(dlist[i][f])+'">'+htmlEncode(dlist[i][f])+'</td>';
                     } else {
                         tbody += '<td>undefined</td>';
                     }
@@ -1587,7 +1587,7 @@ function mysqlStatsList(){
                 for (var j = 0; j < fields.length; j++) {
                     var f = fields[j];
                     if (f in dlist[i]) {
-                        tbody += '<td title="'+dlist[i][f]+'">'+dlist[i][f]+'</td>';
+                        tbody += '<td title="'+htmlEncode(dlist[i][f])+'">'+htmlEncode(dlist[i][f])+'</td>';
                     } else {
                         tbody += '<td>undefined</td>';
                     }
@@ -1622,9 +1622,9 @@ function memcachedGetList(){
             for (var i = 0; i < items.length; i++) {
                 var name = items[i];
                 if (i == 0){
-                    content += '<option value="'+name+'" selected>items['+name+']</option>';
+                    content += '<option value="'+htmlEncode(name)+'" selected>items['+htmlEncode(name)+']</option>';
                 } else {
-                    content += '<option value="'+name+'">items['+name+']</option>';
+                    content += '<option value="'+htmlEncode(name)+'">items['+htmlEncode(name)+']</option>';
                 }
             }
             $('#memcached .item_list select').html(content);
@@ -1657,14 +1657,14 @@ function memcachedGetKeyList(p){
 
                 tbody += "<td><input type='checkbox' class='check' name='id' onclick='checkSelect();'></td>";
 
-                tbody += '<td>'+ dlist[i]['k'] +'</td>';
-                tbody += '<td><span style="width:100px;" class="size_ellipsis">'+dlist[i]['v']+'</span><span data-index="'+i+'" class="ico-copy cursor copy ml5" title="复制值"></span></td>';
-                tbody += '<td>'+ dlist[i]['s'] +'</td>';
+                tbody += '<td>'+ htmlEncode(dlist[i]['k']) +'</td>';
+                tbody += '<td><span style="width:100px;" class="size_ellipsis">'+htmlEncode(dlist[i]['v'])+'</span><span data-index="'+i+'" class="ico-copy cursor copy ml5" title="复制值"></span></td>';
+                tbody += '<td>'+ htmlEncode(dlist[i]['s']) +'</td>';
 
                 if (dlist[i]['t'] == '0'){
                     tbody += '<td>永久</td>';
                 } else {
-                    tbody += '<td>'+ dlist[i]['t'] +'</td>';
+                    tbody += '<td>'+ htmlEncode(dlist[i]['t']) +'</td>';
                 }
 
                 tbody += '<td style="text-align:right;">\
@@ -1777,9 +1777,9 @@ function mongodbInitField(f, data){
     var option_html = '<option value="0">无字段</option>';
     for (var i = 0; i < f.length; i++) {
         if (data['soso_field'] == f[i]){
-            option_html+= '<option value="'+f[i]+'" selected>'+f[i]+'</option>';
+            option_html+= '<option value="'+htmlEncode(f[i])+'" selected>'+htmlEncode(f[i])+'</option>';
         } else {
-            option_html+= '<option value="'+f[i]+'">'+f[i]+'</option>';
+            option_html+= '<option value="'+htmlEncode(f[i])+'">'+htmlEncode(f[i])+'</option>';
         }
 
         
@@ -1824,9 +1824,9 @@ function mongodbGetList(){
             for (var i = 0; i < list.length; i++) {
                 var name = list[i];
                 if (i == 0){
-                    content += '<option value="'+name+'" selected>'+name+'</option>';
+                    content += '<option value="'+htmlEncode(name)+'" selected>'+htmlEncode(name)+'</option>';
                 } else {
-                    content += '<option value="'+name+'">'+name+'</option>';
+                    content += '<option value="'+htmlEncode(name)+'">'+htmlEncode(name)+'</option>';
                 }
             }
             $('.db_list select').html(content);
@@ -1972,14 +1972,14 @@ function mongodbDataList(p){
 
                     if (f in dlist[i]) {
                         if (f == '_id' ){
-                            tbody += '<td>'+dlist[i]['_id']+'</td>';
+                            tbody += '<td>'+htmlEncode(dlist[i]['_id'])+'</td>';
                         } else {
                             var val = dlist[i][f];
                             // 展平函数: 避免任何剩余对象显示 [object Object]
                             if (val !== null && typeof val === 'object') {
                                 val = JSON.stringify(val);
                             }
-                            tbody += '<td>'+val+'</td>';
+                            tbody += '<td>'+htmlEncode(val)+'</td>';
                         }
                     } else {
                         tbody += '<td>undefined</td>';
@@ -2041,9 +2041,9 @@ function redisGetList(){
             var content = '';
             for (var i = 0; i < list.length; i++) {
                 if (i == 0){
-                    content += '<span data-id="'+i+'" class="on">'+list[i]['name'] + '('+ list[i]['keynum'] +')</span>'; 
+                    content += '<span data-id="'+i+'" class="on">'+htmlEncode(list[i]['name']) + '('+ htmlEncode(list[i]['keynum']) +')</span>'; 
                 } else {
-                    content += '<span data-id="'+i+'">'+list[i]['name'] + '('+ list[i]['keynum'] +')</span>'; 
+                    content += '<span data-id="'+i+'">'+htmlEncode(list[i]['name']) + '('+ htmlEncode(list[i]['keynum']) +')</span>'; 
                 }
             }
             $('#redis_list_tab .tab-nav').html(content);
@@ -2085,21 +2085,21 @@ function redisGetKeyList(page,search = ''){
 
 
                 tbody += '<tr>';
-                tbody += "<td><input type='checkbox' class='check' name='id' title='"+data[i].name+"' onclick='checkSelect();' value='"+data[i].name+"'></td>";
-                tbody += '<td style="width:100px;">'+data[i].name+'</td>';
-                tbody += '<td><span style="width:100px;" class="size_ellipsis">'+data[i].val+'</span><span data-index="'+i+'" class="ico-copy cursor copy ml5" title="复制值"></span></td>';
-                tbody += '<td>'+data[i].type+'</td>';
-                tbody += '<td>'+data[i].len+'</td>';
+                tbody += "<td><input type='checkbox' class='check' name='id' title='"+htmlEncode(data[i].name)+"' onclick='checkSelect();' value='"+htmlEncode(data[i].name)+"'></td>";
+                tbody += '<td style="width:100px;">'+htmlEncode(data[i].name)+'</td>';
+                tbody += '<td><span style="width:100px;" class="size_ellipsis">'+htmlEncode(data[i].val)+'</span><span data-index="'+i+'" class="ico-copy cursor copy ml5" title="复制值"></span></td>';
+                tbody += '<td>'+htmlEncode(data[i].type)+'</td>';
+                tbody += '<td>'+htmlEncode(data[i].len)+'</td>';
 
                 if (data[i].endtime == -1){
                     tbody += '<td>永久</td>';
                 } else {
-                    tbody += '<td>'+data[i].endtime+'</td>';
+                    tbody += '<td>'+htmlEncode(data[i].endtime)+'</td>';
                 }
 
                 tbody += '<td style="width:200px;text-align:right; color:#bbb">\
                         <a href="javascript:;" data-index="'+i+'" class="btlink edit" title="编辑">编辑</a> | \
-                        <a href="javascript:;" class="btlink" onclick="redisDeleteKey(\''+data[i].name+'\')">删除</a>\
+                        <a href="javascript:;" class="btlink" onclick="redisDeleteKey(\''+jsEncode(data[i].name)+'\')">删除</a>\
                         </td>';
 
                 tbody += '</tr>';
@@ -2522,9 +2522,9 @@ function pgGetServerList(call_func){
             for (var i = 0; i < items.length; i++){
                 var t = items[i];
                 if (i == 0){
-                    content += '<option value="'+t['val']+'" selected>'+t['name']+'</option>';
+                    content += '<option value="'+htmlEncode(t['val'])+'" selected>'+htmlEncode(t['name'])+'</option>';
                 } else {
-                    content += '<option value="'+t['val']+'">'+t['name']+'</option>';
+                    content += '<option value="'+htmlEncode(t['val'])+'">'+htmlEncode(t['name'])+'</option>';
                 }
             }
 

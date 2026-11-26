@@ -26,9 +26,9 @@ function varnishStatus() {
         for (let i in rdata) {
             // console.log(i,rdata[i]);
             if (i == 'timestamp'){
-                tmp += "<tr><th>"+i+"</th><td colspan='2'>"+rdata[i]+"</td></tr>"
+                tmp += "<tr><th>"+htmlEncode(i)+"</th><td colspan='2'>"+htmlEncode(rdata[i])+"</td></tr>"
             } else{
-                tmp += "<tr><th>"+i+"</th><td>"+rdata[i]['value']+"</td><td>"+rdata[i]['description']+"</td></tr>"
+                tmp += "<tr><th>"+htmlEncode(i)+"</th><td>"+htmlEncode(rdata[i]['value'])+"</td><td>"+htmlEncode(rdata[i]['description'])+"</td></tr>"
             }
         }
 

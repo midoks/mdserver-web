@@ -80,18 +80,18 @@ function mongoStatus() {
 						<table class="table table-hover table-bordered" style="width: 660px;">\
 						<thead><th>字段</th><th>当前值</th><th>说明</th></thead>\
 						<tbody>\
-							<tr><th>host</th><td>' + rdata.host + '</td><td>服务器</td></tr>\
-							<tr><th>version</th><td>' + rdata.version + '</td><td>版本</td></tr>\
-							<tr><th>db_path</th><td>' + rdata.db_path + '</td><td>数据路径</td></tr>\
-							<tr><th>uptime</th><td>' + rdata.uptime + '</td><td>已运行秒</td></tr>\
-							<tr><th>connections</th><td>' + rdata.connections + '</td><td>当前链接数</td></tr>\
-							<tr><th>collections</th><td>' + rdata.collections + '</td><td>文档数</td></tr>\
-							<tr><th>insert</th><td>' + rdata.pf['insert'] + '</td><td>插入命令数</td></tr>\
-							<tr><th>query</th><td>' + rdata.pf['query'] + '</td><td>查询命令数</td></tr>\
-							<tr><th>update</th><td>' + rdata.pf['update'] + '</td><td>更新命令数</td></tr>\
-							<tr><th>delete</th><td>' + rdata.pf['delete'] + '</td><td>删除命令数</td></tr>\
-							<tr><th>getmore</th><td>' + rdata.pf['getmore'] + '</td><td>getmore命令数</td></tr>\
-							<tr><th>command</th><td>' + rdata.pf['command'] + '</td><td>执行命令数</td></tr>\
+							<tr><th>host</th><td>' + htmlEncode(rdata.host) + '</td><td>服务器</td></tr>\
+							<tr><th>version</th><td>' + htmlEncode(rdata.version) + '</td><td>版本</td></tr>\
+							<tr><th>db_path</th><td>' + htmlEncode(rdata.db_path) + '</td><td>数据路径</td></tr>\
+							<tr><th>uptime</th><td>' + htmlEncode(rdata.uptime) + '</td><td>已运行秒</td></tr>\
+							<tr><th>connections</th><td>' + htmlEncode(rdata.connections) + '</td><td>当前链接数</td></tr>\
+							<tr><th>collections</th><td>' + htmlEncode(rdata.collections) + '</td><td>文档数</td></tr>\
+							<tr><th>insert</th><td>' + htmlEncode(rdata.pf['insert']) + '</td><td>插入命令数</td></tr>\
+							<tr><th>query</th><td>' + htmlEncode(rdata.pf['query']) + '</td><td>查询命令数</td></tr>\
+							<tr><th>update</th><td>' + htmlEncode(rdata.pf['update']) + '</td><td>更新命令数</td></tr>\
+							<tr><th>delete</th><td>' + htmlEncode(rdata.pf['delete']) + '</td><td>删除命令数</td></tr>\
+							<tr><th>getmore</th><td>' + htmlEncode(rdata.pf['getmore']) + '</td><td>getmore命令数</td></tr>\
+							<tr><th>command</th><td>' + htmlEncode(rdata.pf['command']) + '</td><td>执行命令数</td></tr>\
 						<tbody>\
 				</table></div>';
 
@@ -114,7 +114,7 @@ function mongoDocStatus() {
 		var t = '';
 		for(var i=0; i<rdata.dbs.length;i++){
 			t += '<tr>';
-			t += '<th>'+rdata.dbs[i]["db"]+'</th>';
+			t += '<th>'+htmlEncode(rdata.dbs[i]["db"])+'</th>';
 			t += '<th>'+toSize(rdata.dbs[i]["totalSize"])+'</th>';
 			t += '<th>'+toSize(rdata.dbs[i]["storageSize"])+'</th>';
 			t += '<th>'+toSize(rdata.dbs[i]["dataSize"])+'</th>';
@@ -152,17 +152,17 @@ function mongoReplStatus() {
 		if (rdata.status == '无'){
 			tbody += '<tr><td colspan="3" style="text-align:center;">无数据</td></tr>';
 		} else{
-			tbody += '<tr><th>状态</th><td>' + rdata.status + '</td><td>主/从</td></tr>\
-					<tr><th>同步文档</th><td>' + rdata.setName + '</td><td>文档名</td></tr>\
-					<tr><th>hosts</th><td><span class="overflow_hide" style="width:300px;word-wrap: break-word;white-space:pre-wrap;" title="'+rdata.hosts+'">' + rdata.hosts + '</span></td><td>服务器所有节点</td></tr>\
-					<tr><th>primary</th><td>' + rdata.primary + '</td><td>主节点</td></tr>\
-					<tr><th>me</th><td>' + rdata.me + '</td><td>本机</td></tr>';
+			tbody += '<tr><th>状态</th><td>' + htmlEncode(rdata.status) + '</td><td>主/从</td></tr>\
+					<tr><th>同步文档</th><td>' + htmlEncode(rdata.setName) + '</td><td>文档名</td></tr>\
+					<tr><th>hosts</th><td><span class="overflow_hide" style="width:300px;word-wrap: break-word;white-space:pre-wrap;" title="'+htmlEncode(rdata.hosts)+'">' + htmlEncode(rdata.hosts) + '</span></td><td>服务器所有节点</td></tr>\
+					<tr><th>primary</th><td>' + htmlEncode(rdata.primary) + '</td><td>主节点</td></tr>\
+					<tr><th>me</th><td>' + htmlEncode(rdata.me) + '</td><td>本机</td></tr>';
 		}
 
 		var tbody_members = '';
 		var member_list = rdata['members'];
 		for (var i = 0; i < member_list.length; i++) {
-			tbody_members += '<tr><th>'+member_list[i]['name']+'</th><td>' + member_list[i]['stateStr'] + '</td><td>'+member_list[i]['uptime']+'</td></tr>';
+			tbody_members += '<tr><th>'+htmlEncode(member_list[i]['name'])+'</th><td>' + htmlEncode(member_list[i]['stateStr']) + '</td><td>'+member_list[i]['uptime']+'</td></tr>';
 		}
 
 		// console.log(rdata);
@@ -297,20 +297,20 @@ function mongoReplCfgNodes(idx,host, priority, votes, arbiterOnly){
                     <div class='line'>\
 	                    <span class='tname'>节点服务:</span>\
 	                    <div class='info-r'>\
-	                        <input class='bt-input-text mr5' type='text' name='node' style='width:330px' value='"+host+"'/>\
+	                        <input class='bt-input-text mr5' type='text' name='node' style='width:330px' value='"+htmlEncode(host)+"'/>\
 	                    </div>\
                     </div>\
                     <div class='line'>\
 	                    <span class='tname'>priority:</span>\
 	                    <div class='info-r'>\
-	                        <input class='bt-input-text mr5' type='number' name='priority' style='width:220px' value='"+priority+"'/>\
+	                        <input class='bt-input-text mr5' type='number' name='priority' style='width:220px' value='"+htmlEncode(priority)+"'/>\
 	                        <span class='c9'>值越大，优先权越高</span>\
 	                    </div>\
                     </div>\
                     <div class='line'>\
 	                    <span class='tname'>votes:</span>\
 	                    <div class='info-r'>\
-	                        <input class='bt-input-text mr5' type='number' name='votes' style='width:220px' value='"+votes+"'/>\
+	                        <input class='bt-input-text mr5' type='number' name='votes' style='width:220px' value='"+htmlEncode(votes)+"'/>\
 	                        <span class='c9'>一般是0或者1</span>\
 	                    </div>\
                     </div>\
@@ -360,7 +360,7 @@ function mongoReplCfgDelNode(host){
 function mongoReplCfgInit(){
 	mgPostN('get_repl_config', '', '', function(data){
 		var rdata = $.parseJSON(data.data);
-		$('#repl_name').html("同步副本："+rdata.data['name']);
+		$('#repl_name').html("同步副本："+htmlEncode(rdata.data['name']));
 
 		var node = '';
 		for (var i = 0; i < rdata.data['nodes'].length; i++) {
@@ -371,9 +371,9 @@ function mongoReplCfgInit(){
 				arbiterOnly = '是';
 			}
 
-			var op = '<a href="javascript:;" class="btlink" onclick="mongoReplCfgDelNode(\''+t['host']+'\');" title="删除">删除</a>';
-			op += ' | <a href="javascript:;" class="btlink" onclick="mongoReplCfgNodes(\''+i+'\',\''+t['host']+'\',\''+t['priority']+'\',\''+t['votes']+'\',\''+t['arbiterOnly']+'\');" title="编辑">编辑</a>';
-			node += '<tr><td>'+t['host']+'</td><td>'+t['priority']+'</td><td>'+t['votes']+'</td><td>'+arbiterOnly+'</td><td>'+op+'</td></tr>';
+			var op = '<a href="javascript:;" class="btlink" onclick="mongoReplCfgDelNode(\''+jsEncode(t['host'])+'\');" title="删除">删除</a>';
+			op += ' | <a href="javascript:;" class="btlink" onclick="mongoReplCfgNodes(\''+i+'\',\''+jsEncode(t['host'])+'\',\''+jsEncode(t['priority'])+'\',\''+jsEncode(t['votes'])+'\',\''+jsEncode(t['arbiterOnly'])+'\');" title="编辑">编辑</a>';
+			node += '<tr><td>'+htmlEncode(t['host'])+'</td><td>'+htmlEncode(t['priority'])+'</td><td>'+htmlEncode(t['votes'])+'</td><td>'+arbiterOnly+'</td><td>'+op+'</td></tr>';
 		}
 		$('#repl_node tbody').html(node);
 	});
@@ -460,11 +460,11 @@ function mongoSetConfig() {
         }
 
         var body = "<div class='bingfa'>" +
-            "<p class='line'><span class='span_tit'>IP：</span><input class='bt-input-text' type='text' name='bind_ip' value='" + rdata['net']['bindIp'] + "' />，<font>监听IP请勿随意修改</font></p>" +
-            "<p class='line'><span class='span_tit'>port： </span><input class='bt-input-text' type='number' name='port' value='" + rdata['net']['port'] + "' />，<font>监听端口,一般无需修改</font></p>" +
-            "<p class='line'><span class='span_tit'>dbPath：</span><input class='bt-input-text' type='text' name='data_path' value='" + rdata['storage']['dbPath'] + "' />，<font>数据存储位置</font></p>" +
-            "<p class='line'><span class='span_tit'>path：</span><input class='bt-input-text' type='text' name='log' value='" + rdata['systemLog']['path'] + "' />，<font>日志文件位置</font></p>" +
-            "<p class='line'><span class='span_tit'>pidFilePath：</span><input class='bt-input-text' type='text' name='pid_file_path' value='" + rdata['processManagement']['pidFilePath'] + "' />，<font>PID保存路径</font></p>" +
+            "<p class='line'><span class='span_tit'>IP：</span><input class='bt-input-text' type='text' name='bind_ip' value='" + htmlEncode(rdata['net']['bindIp']) + "' />，<font>监听IP请勿随意修改</font></p>" +
+            "<p class='line'><span class='span_tit'>port： </span><input class='bt-input-text' type='number' name='port' value='" + htmlEncode(rdata['net']['port']) + "' />，<font>监听端口,一般无需修改</font></p>" +
+            "<p class='line'><span class='span_tit'>dbPath：</span><input class='bt-input-text' type='text' name='data_path' value='" + htmlEncode(rdata['storage']['dbPath']) + "' />，<font>数据存储位置</font></p>" +
+            "<p class='line'><span class='span_tit'>path：</span><input class='bt-input-text' type='text' name='log' value='" + htmlEncode(rdata['systemLog']['path']) + "' />，<font>日志文件位置</font></p>" +
+            "<p class='line'><span class='span_tit'>pidFilePath：</span><input class='bt-input-text' type='text' name='pid_file_path' value='" + htmlEncode(rdata['processManagement']['pidFilePath']) + "' />，<font>PID保存路径</font></p>" +
             "<p class='line'><span class='span_tit' style='float:left;'>安全认证：</span>"+body_auth+"</p>" +
             "<div class='mtb15' style='padding-top: 10px;text-align: center;'>\
             	<button class='btn btn-success btn-sm mr5' onclick='mongoSetConfig();'>刷新</button>\
@@ -518,25 +518,25 @@ function dbList(page, search){
         var list = '';
         for(i in rdata.data){
             list += '<tr>';
-            list +='<td><input value="'+rdata.data[i]['id']+'" class="check" onclick="checkSelect();" type="checkbox"></td>';
-            list += '<td>' + rdata.data[i]['name'] +'</td>';
-            list += '<td>' + rdata.data[i]['username'] +'</td>';
+            list +='<td><input value="'+htmlEncode(rdata.data[i]['id'])+'" class="check" onclick="checkSelect();" type="checkbox"></td>';
+            list += '<td>' + htmlEncode(rdata.data[i]['name']) +'</td>';
+            list += '<td>' + htmlEncode(rdata.data[i]['username']) +'</td>';
             list += '<td>' + 
-                        '<span class="password" data-pw="'+rdata.data[i]['password']+'">***</span>' +
+                        '<span class="password" data-pw="'+htmlEncode(rdata.data[i]['password'])+'">***</span>' +
                         '<span onclick="showHidePass(this)" class="glyphicon glyphicon-eye-open cursor pw-ico" style="margin-left:10px"></span>'+
-                        '<span class="ico-copy cursor btcopy" style="margin-left:10px" title="复制密码" onclick="copyPass(\''+rdata.data[i]['password']+'\')"></span>'+
+                        '<span class="ico-copy cursor btcopy" style="margin-left:10px" title="复制密码" onclick="copyPass(\''+jsEncode(rdata.data[i]['password'])+'\')"></span>'+
                     '</td>';
         
 
-            list += '<td><span class="c9 input-edit" onclick="setDbPs(\''+rdata.data[i]['id']+'\',\''+rdata.data[i]['name']+'\',this)" style="display: inline-block;">'+rdata.data[i]['ps']+'</span></td>';
+            list += '<td><span class="c9 input-edit" onclick="setDbPs(\''+jsEncode(rdata.data[i]['id'])+'\',\''+jsEncode(rdata.data[i]['name'])+'\',this)" style="display: inline-block;">'+htmlEncode(rdata.data[i]['ps'])+'</span></td>';
             list += '<td style="text-align:right">';
 
-            list += '<a href="javascript:;" class="btlink" class="btlink" onclick="setBackup(\''+rdata.data[i]['name']+'\',this)" title="数据库备份">'+(rdata.data[i]['is_backup']?'已备份':'未备份') +'</a> | ';
+            list += '<a href="javascript:;" class="btlink" class="btlink" onclick="setBackup(\''+jsEncode(rdata.data[i]['name'])+'\',this)" title="数据库备份">'+(rdata.data[i]['is_backup']?'已备份':'未备份') +'</a> | ';
 
-            list += '<a href="javascript:;" class="btlink" onclick="repTools(\''+rdata.data[i]['name']+'\')" title="MongoDB优化修复工具">工具</a> | ' +
-                        '<a href="javascript:;" class="btlink" onclick="setDbAccess(\''+rdata.data[i]['username']+'\',\''+rdata.data[i]['name']+'\')" title="设置数据库权限">权限</a> | ' +
-                        '<a href="javascript:;" class="btlink" onclick="setDbPass('+rdata.data[i]['id']+',\''+ rdata.data[i]['username'] +'\',\'' + rdata.data[i]['password'] + '\')">改密</a> | ' +
-                        '<a href="javascript:;" class="btlink" onclick="delDb(\''+rdata.data[i]['id']+'\',\''+rdata.data[i]['name']+'\')" title="删除数据库">删除</a>' +
+            list += '<a href="javascript:;" class="btlink" onclick="repTools(\''+jsEncode(rdata.data[i]['name'])+'\')" title="MongoDB优化修复工具">工具</a> | ' +
+                        '<a href="javascript:;" class="btlink" onclick="setDbAccess(\''+jsEncode(rdata.data[i]['username'])+'\',\''+jsEncode(rdata.data[i]['name'])+'\')" title="设置数据库权限">权限</a> | ' +
+                        '<a href="javascript:;" class="btlink" onclick="setDbPass('+rdata.data[i]['id']+',\''+ jsEncode(rdata.data[i]['username']) +'\',\'' + jsEncode(rdata.data[i]['password']) + '\')">改密</a> | ' +
+                        '<a href="javascript:;" class="btlink" onclick="delDb(\''+jsEncode(rdata.data[i]['id'])+'\',\''+jsEncode(rdata.data[i]['name'])+'\')" title="删除数据库">删除</a>' +
                     '</td>';
             list += '</tr>';
         }
@@ -545,7 +545,7 @@ function dbList(page, search){
         // <button onclick="setDbAccess(\'root\')" title="ROOT权限" class="btn btn-default btn-sm" type="button" style="margin-right: 5px;">ROOT权限</button>\
         var con = '<div class="safe bgw">\
             <button onclick="addDatabase()" title="添加数据库" class="btn btn-success btn-sm" type="button" style="margin-right: 5px;">添加数据库</button>\
-            <button onclick="setRootPwd(0,\''+rdata.info['root_pwd']+'\')" title="设置Mongodb管理员密码" class="btn btn-default btn-sm" type="button" style="margin-right: 5px;">root密码</button>\
+            <button onclick="setRootPwd(0,\''+jsEncode(rdata.info['root_pwd'])+'\')" title="设置Mongodb管理员密码" class="btn btn-default btn-sm" type="button" style="margin-right: 5px;">root密码</button>\
             <span style="float:right">              \
                 <button batch="true" style="float: right;display: none;margin-left:10px;" onclick="delDbBatch();" title="删除选中项" class="btn btn-default btn-sm">删除选中</button>\
             </span>\
@@ -671,7 +671,7 @@ function setRootPwd(type, pwd){
         content: "<form class='bt-form pd20' id='mod_pwd'>\
                     <div class='line'>\
                         <span class='tname'>root密码</span>\
-                        <div class='info-r'><input class='bt-input-text mr5' type='text' name='password' id='MyPassword' style='width:330px' value='"+pwd+"' />\
+                        <div class='info-r'><input class='bt-input-text mr5' type='text' name='password' id='MyPassword' style='width:330px' value='"+htmlEncode(pwd)+"' />\
                             <span title='随机密码' class='glyphicon glyphicon-repeat cursor' onclick='repeatPwd(16)'></span>\
                         </div>\
                     </div>\
@@ -735,7 +735,7 @@ function showHidePass(obj){
 
 function setDbPs(id, name, obj) {
     var _span = $(obj);
-    var _input = $("<input class='baktext' value=\""+_span.text()+"\" type='text' placeholder='备注信息' />");
+    var _input = $("<input class='baktext' value=\""+htmlEncode(_span.text())+"\" type='text' placeholder='备注信息' />");
     _span.hide().after(_input);
     _input.focus();
     _input.blur(function(){
@@ -756,7 +756,7 @@ function setDbPs(id, name, obj) {
 }
 
 function delDb(id, name){
-    safeMessage('删除['+name+']','您真的要删除['+name+']吗？',function(){
+    safeMessage('删除['+htmlEncode(name)+']','您真的要删除['+htmlEncode(name)+']吗？',function(){
         var data='id='+id+'&name='+name;
         mgPost('del_db', '', data, function(data){
             var rdata = $.parseJSON(data.data);
@@ -768,7 +768,7 @@ function delDb(id, name){
 }
 
 function delDbTable( name, table_name){
-    safeMessage('删除['+name+']','您真的要删除['+table_name+']吗？',function(){
+    safeMessage('删除['+htmlEncode(name)+']','您真的要删除['+htmlEncode(table_name)+']吗？',function(){
         var data='name='+name+'&table_name='+table_name;
         mgPost('del_db_table', '', data, function(data){
             var rdata = $.parseJSON(data.data);
@@ -819,15 +819,15 @@ function setDbPass(id, username, password){
         content: "<form class='bt-form pd20' id='mod_pwd'>\
                     <div class='line'>\
                         <span class='tname'>用户名</span>\
-                        <div class='info-r'><input readonly='readonly' name=\"name\" class='bt-input-text mr5' type='text' style='width:330px;outline:none;' value='"+username+"' /></div>\
+                        <div class='info-r'><input readonly='readonly' name=\"name\" class='bt-input-text mr5' type='text' style='width:330px;outline:none;' value='"+htmlEncode(username)+"' /></div>\
                     </div>\
                     <div class='line'>\
                     <span class='tname'>密码</span>\
                     <div class='info-r'>\
-                        <input class='bt-input-text mr5' type='text' name='password' id='MyPassword' style='width:330px' value='"+password+"' />\
+                        <input class='bt-input-text mr5' type='text' name='password' id='MyPassword' style='width:330px' value='"+htmlEncode(password)+"' />\
                         <span title='随机密码' class='glyphicon glyphicon-repeat cursor' onclick='repeatPwd(16)'></span></div>\
                     </div>\
-                    <input type='hidden' name='id' value='"+id+"'>\
+                    <input type='hidden' name='id' value='"+htmlEncode(id)+"'>\
                 </form>",
         yes:function(index){
             // var data = $("#mod_pwd").serialize();
@@ -854,13 +854,13 @@ function repTools(db_name, res){
 
         layer.open({
             type: 1,
-            title: "MongoDB工具箱【" + db_name + "】",
+            title: "MongoDB工具箱【" + htmlEncode(db_name) + "】",
             area: ['780px', '480px'],
             closeBtn: 1,
             shadeClose: false,
             content: '<div class="pd15" id="mongodb_list">\
                             <div class="db_list">\
-                                <span><a>数据库名称：'+ db_name + '</a>\
+                                <span><a>数据库名称：'+ htmlEncode(db_name) + '</a>\
                                 <a>集合：'+ rdata.collections + '</a>\
                                 <a class="tools_size">存储大小：'+ toSize(rdata.storageSize) + '</a>\
                                 <a class="tools_size">索引大小：'+ toSize(rdata.indexSize) + '</a>\
@@ -892,7 +892,7 @@ function repTools(db_name, res){
 		        var tbody = '';
 		        for (var i = 0; i < rdata.collection_list.length; i++) {
 		            tbody += '<tr>\
-		                    <td><span style="width:220px;"> ' + rdata.collection_list[i].collection_name + '</span></td>\
+		                    <td><span style="width:220px;"> ' + htmlEncode(rdata.collection_list[i].collection_name) + '</span></td>\
 		                    <td><span style="width:220px;"> ' + rdata.collection_list[i].count + '</span></td>\
 		                    <td>' + toSize(rdata.collection_list[i].size) + '</td>\
 		                    <td><span style="width:90px;"> ' + toSize(rdata.collection_list[i].avg_obj_size) + '</span></td>\
@@ -911,7 +911,7 @@ function repTools(db_name, res){
 		        	var name = db_name;
 		        	var table_name = rdata.collection_list[index].collection_name;
 
-		        	safeMessage('删除['+name+']','您真的要删除['+table_name+']吗？',function(){
+		        	safeMessage('删除['+htmlEncode(name)+']','您真的要删除['+htmlEncode(table_name)+']吗？',function(){
 				        var data='name='+name+'&table_name='+table_name;
 				        mgPost('del_db_table', '', data, function(data){
 				            var rdata = $.parseJSON(data.data);
@@ -1086,14 +1086,14 @@ function setBackupReq(db_name, obj){
         var tbody = '';
         for (var i = 0; i < rdata.data.length; i++) {
             tbody += '<tr>\
-                    <td><span> ' + rdata.data[i]['name'] + '</span></td>\
-                    <td><span> ' + rdata.data[i]['size'] + '</span></td>\
-                    <td><span> ' + rdata.data[i]['time'] + '</span></td>\
+                    <td><span> ' + htmlEncode(rdata.data[i]['name']) + '</span></td>\
+                    <td><span> ' + htmlEncode(rdata.data[i]['size']) + '</span></td>\
+                    <td><span> ' + htmlEncode(rdata.data[i]['time']) + '</span></td>\
                     <td style="text-align: right;">\
-                        <a class="btlink" onclick="importBackup(\'' + rdata.data[i]['name'] + '\',\'' +db_name+ '\')">导入</a> | \
-                        <a class="btlink" onclick="importBackupProgress(\'' + rdata.data[i]['name'] + '\',\'' +db_name+ '\')">导入进度</a> | \
-                        <a class="btlink" onclick="downloadBackup(\'' + rdata.data[i]['file'] + '\')">下载</a> | \
-                        <a class="btlink" onclick="delBackup(\'' + rdata.data[i]['name'] + '\',\'' +db_name+ '\')">删除</a>\
+                        <a class="btlink" onclick="importBackup(\'' + jsEncode(rdata.data[i]['name']) + '\',\'' +jsEncode(db_name)+ '\')">导入</a> | \
+                        <a class="btlink" onclick="importBackupProgress(\'' + jsEncode(rdata.data[i]['name']) + '\',\'' +jsEncode(db_name)+ '\')">导入进度</a> | \
+                        <a class="btlink" onclick="downloadBackup(\'' + jsEncode(rdata.data[i]['file']) + '\')">下载</a> | \
+                        <a class="btlink" onclick="delBackup(\'' + jsEncode(rdata.data[i]['name']) + '\',\'' +jsEncode(db_name)+ '\')">删除</a>\
                     </td>\
                 </tr> ';
         }
@@ -1135,7 +1135,7 @@ function importBackupProgress(file,name){
             btn:["复制","取消"],
             content: '<div class="pd15">\
                         <div class="divtable">\
-                            <pre class="layui-code">'+rdata.data+'</pre>\
+                            <pre class="layui-code">'+htmlEncode(rdata.data)+'</pre>\
                         </div>\
                     </div>',
             success:function(){
@@ -1154,11 +1154,11 @@ function setLocalImport(db_name){
         var up_db = layer.open({
             type:1,
             closeBtn: 1,
-            title:"上传导入文件["+upload_dir+']',
+            title:"上传导入文件["+htmlEncode(upload_dir)+']',
             area: ['500px','300px'],
             shadeClose:false,
             content:'<div class="fileUploadDiv">\
-                    <input type="hidden" id="input-val" value="'+upload_dir+'" />\
+                    <input type="hidden" id="input-val" value="'+htmlEncode(upload_dir)+'" />\
                     <input type="file" id="file_input"  multiple="true" autocomplete="off" />\
                     <button type="button"  id="opt" autocomplete="off">添加文件</button>\
                     <button type="button" id="up" autocomplete="off" >开始上传</button>\
@@ -1197,12 +1197,12 @@ function setLocalImport(db_name){
             var tbody = '';
             for (var i = 0; i < file_list.length; i++) {
                 tbody += '<tr>\
-                        <td><span> ' + file_list[i]['name'] + '</span></td>\
-                        <td><span> ' + file_list[i]['size'] + '</span></td>\
-                        <td><span> ' + file_list[i]['time'] + '</span></td>\
+                        <td><span> ' + htmlEncode(file_list[i]['name']) + '</span></td>\
+                        <td><span> ' + htmlEncode(file_list[i]['size']) + '</span></td>\
+                        <td><span> ' + htmlEncode(file_list[i]['time']) + '</span></td>\
                         <td style="text-align: right;">\
-                            <a class="btlink" onclick="importDbExternal(\'' + file_list[i]['name'] + '\',\'' +db_name+ '\')">导入</a> | \
-                            <a class="btlink" onclick="importDbExternalProgress(\'' + file_list[i]['name'] + '\',\'' +db_name+ '\')">导入进度</a> | \
+                            <a class="btlink" onclick="importDbExternal(\'' + jsEncode(file_list[i]['name']) + '\',\'' +jsEncode(db_name)+ '\')">导入</a> | \
+                            <a class="btlink" onclick="importDbExternalProgress(\'' + jsEncode(file_list[i]['name']) + '\',\'' +jsEncode(db_name)+ '\')">导入进度</a> | \
                             <a class="btlink del" index="'+i+'">删除</a>\
                         </td>\
                     </tr>';
@@ -1283,7 +1283,7 @@ function importDbExternalProgress(file,name){
             btn:["复制","取消"],
             content: '<div class="pd15">\
                         <div class="divtable">\
-                            <pre class="layui-code">'+rdata.data+'</pre>\
+                            <pre class="layui-code">'+htmlEncode(rdata.data)+'</pre>\
                         </div>\
                     </div>',
             success:function(){
@@ -1356,7 +1356,7 @@ function findSlowlogCmd(file,name){
             btn:["复制","取消"],
             content: '<div class="pd15">\
                         <div class="divtable">\
-                            <pre class="layui-code">'+rdata.data+'</pre>\
+                            <pre class="layui-code">'+htmlEncode(rdata.data)+'</pre>\
                         </div>\
                     </div>',
             success:function(){

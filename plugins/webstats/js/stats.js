@@ -285,7 +285,7 @@ function wsOverviewRequest(page){
                         '<div style="height:26px;line-height:26px;overflow:hidden;padding:6px 8px;">' +
                         '<span style="float:left;max-width:160px;overflow:hidden;text-overflow: ellipsis;white-space: nowrap;">' +
                         '<span style="margin-right:5px;display:inline-block;width:10px;height:10px;border-radius:5px;background-color:' +
-                        params[i].color + ';"></span>' + params[i].seriesName + '</span>' +
+                        params[i].color + ';"></span>' + htmlEncode(params[i].seriesName) + '</span>' +
                         '<span style="float:right">' + val + '</span>' + '</div>'
                 }
                 var res ='<div><div style="height:40px;line-height:40px;padding:0 8px;background:rgba(237,233,233,0.4)">' +
@@ -639,9 +639,9 @@ wsPost('get_default_site','',{},function(rdata){
     var select = '';
     for (var i = 0; i < rdata["list"].length; i++) {
         if (default_site ==  rdata["list"][i]){
-            select += '<option value="'+rdata["list"][i]+'" selected>'+rdata["list"][i]+'</option>';
+            select += '<option value="'+htmlEncode(rdata["list"][i])+'" selected>'+htmlEncode(rdata["list"][i])+'</option>';
         } else{
-            select += '<option value="'+rdata["list"][i]+'">'+rdata["list"][i]+'</option>';
+            select += '<option value="'+htmlEncode(rdata["list"][i])+'">'+htmlEncode(rdata["list"][i])+'</option>';
         }
     }
     $('select[name="site"]').html(select);
@@ -717,11 +717,11 @@ function wsSitesListRequest(page){
                 }
 
                 list += '<tr>';
-                list += '<td>' + data[i]['site']+'</td>';
-                list += '<td>' + tmp_pv +'</td>';
-                list += '<td>' + tmp_uv +'</td>';
-                list += '<td>' + tmp_ip +'</td>';
-                list += '<td>' + tmp_req +'</td>';
+                list += '<td>' + htmlEncode(data[i]['site'])+'</td>';
+                list += '<td>' + htmlEncode(tmp_pv) +'</td>';
+                list += '<td>' + htmlEncode(tmp_uv) +'</td>';
+                list += '<td>' + htmlEncode(tmp_ip) +'</td>';
+                list += '<td>' + htmlEncode(tmp_req) +'</td>';
                 list += '<td>' + toSize(tmp_length) +'</td>';
                 list += '<td><a data-id="'+i+'" href="javascript:;" class="btlink web_set" title="设置">设置</a></td>';
                 list += '</tr>';
@@ -764,7 +764,7 @@ function wsSitesListRequest(page){
                 console.log(rdata);
                 layer.open({
                     type: 1,
-                    title: "【"+domain + "】监控配置",
+                    title: "【"+htmlEncode(domain) + "】监控配置",
                     btn: ['保存','取消'], 
                     area: ['600px',"380px"],
                     closeBtn: 1,
@@ -865,7 +865,7 @@ function wsSitesListRequest(page){
                                                 <option value="regular" '+(_tmp[i].mode == 'regular'?'selected':'')+'>模糊匹配</option>\
                                             </select>\
                                         </td>\
-                                        <td><input name="url_val_'+i+'" style="width:290px" placeholder="'+(_tmp[i].mode == 'normal'?'例：需排除a.com/test.html请求，请填写 test.html':'包含此内容的URL请求将不会被统计，请谨慎填写')+'" type="text" value="'+_tmp[i].url+'"></td>\
+                                        <td><input name="url_val_'+i+'" style="width:290px" placeholder="'+(_tmp[i].mode == 'normal'?'例：需排除a.com/test.html请求，请填写 test.html':'包含此内容的URL请求将不会被统计，请谨慎填写')+'" type="text" value="'+htmlEncode(_tmp[i].url)+'"></td>\
                                     </tr>';
                                 }
 
@@ -1073,20 +1073,20 @@ function wsSpiderStatLogRequest(page){
         if (data.length > 0){
             for(i in data){
                 list += '<tr>';
-                list += '<td>' + data[i]['time']+'</td>';
-                list += '<td>' + data[i]['baidu'] +'</td>';
-                list += '<td>' + data[i]['bing'] +'</td>';
-                list += '<td>' + data[i]['qh360'] +'</td>';
-                list += '<td>' + data[i]['google'] +'</td>';
-                list += '<td>' + data[i]['bytes'] +'</td>';
-                list += '<td>' + data[i]['sogou'] +'</td>';
-                list += '<td>' + data[i]['soso'] +'</td>';
-                list += '<td>' + data[i]['youdao'] +'</td>';
-                list += '<td>' + data[i]['youdao'] +'</td>';
-                list += '<td>' + data[i]['dnspod'] +'</td>';
-                list += '<td>' + data[i]['yandex'] +'</td>';
-                list += '<td>' + data[i]['other'] +'</td>';
-                list += '<td>' + data[i]['other'] +'</td>';
+                list += '<td>' + htmlEncode(data[i]['time'])+'</td>';
+                list += '<td>' + htmlEncode(data[i]['baidu']) +'</td>';
+                list += '<td>' + htmlEncode(data[i]['bing']) +'</td>';
+                list += '<td>' + htmlEncode(data[i]['qh360']) +'</td>';
+                list += '<td>' + htmlEncode(data[i]['google']) +'</td>';
+                list += '<td>' + htmlEncode(data[i]['bytes']) +'</td>';
+                list += '<td>' + htmlEncode(data[i]['sogou']) +'</td>';
+                list += '<td>' + htmlEncode(data[i]['soso']) +'</td>';
+                list += '<td>' + htmlEncode(data[i]['youdao']) +'</td>';
+                list += '<td>' + htmlEncode(data[i]['youdao']) +'</td>';
+                list += '<td>' + htmlEncode(data[i]['dnspod']) +'</td>';
+                list += '<td>' + htmlEncode(data[i]['yandex']) +'</td>';
+                list += '<td>' + htmlEncode(data[i]['other']) +'</td>';
+                list += '<td>' + htmlEncode(data[i]['other']) +'</td>';
                 list += '</tr>';
             }
         } else{
@@ -1349,9 +1349,9 @@ wsPost('get_default_site','',{},function(rdata){
     var select = '';
     for (var i = 0; i < rdata["list"].length; i++) {
         if (default_site ==  rdata["list"][i]){
-            select += '<option value="'+rdata["list"][i]+'" selected>'+rdata["list"][i]+'</option>';
+            select += '<option value="'+htmlEncode(rdata["list"][i])+'" selected>'+htmlEncode(rdata["list"][i])+'</option>';
         } else{
-            select += '<option value="'+rdata["list"][i]+'">'+rdata["list"][i]+'</option>';
+            select += '<option value="'+htmlEncode(rdata["list"][i])+'">'+htmlEncode(rdata["list"][i])+'</option>';
         }
     }
     $('select[name="site"]').html(select);
@@ -1391,20 +1391,20 @@ function wsClientStatLogRequest(page){
         if (data.length > 0){
             for(i in data){
                 list += '<tr>';
-                list += '<td>' + data[i]['time']+'</td>';
-                list += '<td>' + data[i]['android'] +'</td>';
-                list += '<td>' + data[i]['iphone'] +'</td>';
-                list += '<td>' + data[i]['windows'] +'</td>';
-                list += '<td>' + data[i]['chrome'] +'</td>';
-                list += '<td>' + data[i]['weixin'] +'</td>';
-                list += '<td>' + data[i]['qh360'] +'</td>';
-                list += '<td>' + data[i]['edeg'] +'</td>';
-                list += '<td>' + data[i]['firefox'] +'</td>';
-                list += '<td>' + data[i]['safari'] +'</td>';
-                list += '<td>' + data[i]['mac'] +'</td>';
-                list += '<td>' + data[i]['msie'] +'</td>';
-                list += '<td>' + data[i]['machine'] +'</td>';
-                list += '<td>' + data[i]['other'] +'</td>';
+                list += '<td>' + htmlEncode(data[i]['time'])+'</td>';
+                list += '<td>' + htmlEncode(data[i]['android']) +'</td>';
+                list += '<td>' + htmlEncode(data[i]['iphone']) +'</td>';
+                list += '<td>' + htmlEncode(data[i]['windows']) +'</td>';
+                list += '<td>' + htmlEncode(data[i]['chrome']) +'</td>';
+                list += '<td>' + htmlEncode(data[i]['weixin']) +'</td>';
+                list += '<td>' + htmlEncode(data[i]['qh360']) +'</td>';
+                list += '<td>' + htmlEncode(data[i]['edeg']) +'</td>';
+                list += '<td>' + htmlEncode(data[i]['firefox']) +'</td>';
+                list += '<td>' + htmlEncode(data[i]['safari']) +'</td>';
+                list += '<td>' + htmlEncode(data[i]['mac']) +'</td>';
+                list += '<td>' + htmlEncode(data[i]['msie']) +'</td>';
+                list += '<td>' + htmlEncode(data[i]['machine']) +'</td>';
+                list += '<td>' + htmlEncode(data[i]['other']) +'</td>';
                 list += '</tr>';
             }
         } else{
@@ -1742,9 +1742,9 @@ wsPost('get_default_site','',{},function(rdata){
     var select = '';
     for (var i = 0; i < rdata["list"].length; i++) {
         if (default_site ==  rdata["list"][i]){
-            select += '<option value="'+rdata["list"][i]+'" selected>'+rdata["list"][i]+'</option>';
+            select += '<option value="'+htmlEncode(rdata["list"][i])+'" selected>'+htmlEncode(rdata["list"][i])+'</option>';
         } else{
-            select += '<option value="'+rdata["list"][i]+'">'+rdata["list"][i]+'</option>';
+            select += '<option value="'+htmlEncode(rdata["list"][i])+'">'+htmlEncode(rdata["list"][i])+'</option>';
         }
     }
     $('select[name="site"]').html(select);
@@ -1778,11 +1778,11 @@ function wsIpStatLogRequest(page){
             for(i in data){
                 list += '<tr>';
                 list += '<td>' + (parseInt(i)+1)+'</td>';
-                list += '<td><span class="overflow_hide" style="width:100px;">' + data[i]['ip']+'</span></td>';
-                list += '<td>' + data[i]['area'] +'</td>';
-                list += '<td>' + data[i]['day'] +'('+data[i]['day_rate']+'%)</td>';
-                list += '<td>' + toSize(data[i]['flow']) +'('+data[i]['flow_rate']+'%)</td>';
-                list += '<td><span><div class="share_num" style="width:'+data[i]['flow_rate']+'%"></div></span>' +'</td>';
+                list += '<td><span class="overflow_hide" style="width:100px;">' + htmlEncode(data[i]['ip'])+'</span></td>';
+                list += '<td>' + htmlEncode(data[i]['area']) +'</td>';
+                list += '<td>' + htmlEncode(data[i]['day']) +'('+htmlEncode(data[i]['day_rate'])+'%)</td>';
+                list += '<td>' + toSize(data[i]['flow']) +'('+htmlEncode(data[i]['flow_rate'])+'%)</td>';
+                list += '<td><span><div class="share_num" style="width:'+htmlEncode(data[i]['flow_rate'])+'%"></div></span>' +'</td>';
                 list += '</tr>';
             }
 
@@ -1860,9 +1860,9 @@ wsPost('get_default_site','',{},function(rdata){
     var select = '';
     for (var i = 0; i < rdata["list"].length; i++) {
         if (default_site ==  rdata["list"][i]){
-            select += '<option value="'+rdata["list"][i]+'" selected>'+rdata["list"][i]+'</option>';
+            select += '<option value="'+htmlEncode(rdata["list"][i])+'" selected>'+htmlEncode(rdata["list"][i])+'</option>';
         } else{
-            select += '<option value="'+rdata["list"][i]+'">'+rdata["list"][i]+'</option>';
+            select += '<option value="'+htmlEncode(rdata["list"][i])+'">'+htmlEncode(rdata["list"][i])+'</option>';
         }
     }
     $('select[name="site"]').html(select);
@@ -1895,10 +1895,10 @@ function wsUriStatLogRequest(page){
             for(i in data){
                 list += '<tr>';
                 list += '<td>' + (parseInt(i)+1)+'</td>';
-                list += '<td><span class="overflow_hide" style="width:100px;">' + data[i]['uri']+'</span></td>';
-                list += '<td>' + data[i]['day'] +'('+data[i]['day_rate']+'%)</td>';
-                list += '<td>' + toSize(data[i]['flow']) +'('+data[i]['flow_rate']+'%)</td>';
-                list += '<td><span><div class="share_num" style="width:'+data[i]['flow_rate']+'%"></div></span>' +'</td>';
+                list += '<td><span class="overflow_hide" style="width:100px;">' + htmlEncode(data[i]['uri'])+'</span></td>';
+                list += '<td>' + htmlEncode(data[i]['day']) +'('+htmlEncode(data[i]['day_rate'])+'%)</td>';
+                list += '<td>' + toSize(data[i]['flow']) +'('+htmlEncode(data[i]['flow_rate'])+'%)</td>';
+                list += '<td><span><div class="share_num" style="width:'+htmlEncode(data[i]['flow_rate'])+'%"></div></span>' +'</td>';
                 list += '</tr>';
             }
 
@@ -1975,9 +1975,9 @@ wsPost('get_default_site','',{},function(rdata){
     var select = '';
     for (var i = 0; i < rdata["list"].length; i++) {
         if (default_site ==  rdata["list"][i]){
-            select += '<option value="'+rdata["list"][i]+'" selected>'+rdata["list"][i]+'</option>';
+            select += '<option value="'+htmlEncode(rdata["list"][i])+'" selected>'+htmlEncode(rdata["list"][i])+'</option>';
         } else{
-            select += '<option value="'+rdata["list"][i]+'">'+rdata["list"][i]+'</option>';
+            select += '<option value="'+htmlEncode(rdata["list"][i])+'">'+htmlEncode(rdata["list"][i])+'</option>';
         }
     }
     $('select[name="site"]').html(select);
@@ -2021,12 +2021,12 @@ function wsTableErrorLogRequest(page){
             for(i in data){
                 list += '<tr>';
                 list += '<td>' + getLocalTime(data[i]['time'])+'</td>';
-                list += '<td><span class="overflow_hide" style="width:100px;">' + data[i]['domain'] +'</span></td>';
-                list += '<td><span class="overflow_hide" style="width:100px;">' + data[i]['ip'] +'</span></td>';
+                list += '<td><span class="overflow_hide" style="width:100px;">' + htmlEncode(data[i]['domain']) +'</span></td>';
+                list += '<td><span class="overflow_hide" style="width:100px;">' + htmlEncode(data[i]['ip']) +'</span></td>';
                 list += '<td>' + toSize(data[i]['body_length']) +'</td>';
                 list += '<td>' + toSecond(data[i]['request_time']) +'</td>';
-                list += '<td><span class="overflow_hide" style="width:130px;">' + data[i]['uri'] +'</span></td>';
-                list += '<td><span class="overflow_hide" style="width:60px;">' + data[i]['status_code']+'/' + data[i]['method'] +'</span></td>';
+                list += '<td><span class="overflow_hide" style="width:130px;">' + htmlEncode(data[i]['uri']) +'</span></td>';
+                list += '<td><span class="overflow_hide" style="width:60px;">' + htmlEncode(data[i]['status_code'])+'/' + htmlEncode(data[i]['method']) +'</span></td>';
                 list += '<td><a data-id="'+i+'" href="javascript:;" class="btlink details" title="详情">详情</a></td>';
                 list += '</tr>';
             }
@@ -2059,21 +2059,21 @@ function wsTableErrorLogRequest(page){
             var res = data[index];
 
             var url = res.scheme+"://"+res.domain+res.uri;
-            var url_html = "<a class='btlink' href='"+url+"' target='_blank'>"+url+"</a>";
+            var url_html = "<a class='btlink' href='"+htmlEncode(url)+"' target='_blank'>"+htmlEncode(url)+"</a>";
             layer.open({
                 type: 1,
-                title: "【"+res.domain + "】详情信息",
+                title: "【"+htmlEncode(res.domain) + "】详情信息",
                 area: '600px',
                 closeBtn: 1,
                 shadeClose: false,
                 content: '<div class="pd15 lib-box">\
                     <div style="height:80px;"><table class="table" style="border:#ddd 1px solid; margin-bottom:10px">\
                     <tbody class="site_details_tbody">\
-                        <tr><th>时间</th><td>' + getLocalTime(res.time) + '</td><th>真实IP</th><td><span class="overflow_hide detail_ip" style="width:100px;">' + res.ip + '</span></td><th>客户端端口</th><td>'+(res.client_port>0 && res.client_port != ''?res.client_port:'')+'</td></tr>\
-                        <tr><th>类型</th><td>' + res.method + '</td><th>状态</th><td>' + res.status_code + '</td><th>响应大小</th><td>' + toSize(res.body_length) + '</td>\</tr>\
+                        <tr><th>时间</th><td>' + getLocalTime(res.time) + '</td><th>真实IP</th><td><span class="overflow_hide detail_ip" style="width:100px;">' + htmlEncode(res.ip) + '</span></td><th>客户端端口</th><td>'+(res.client_port>0 && res.client_port != ''?res.client_port:'')+'</td></tr>\
+                        <tr><th>类型</th><td>' + htmlEncode(res.method) + '</td><th>状态</th><td>' + htmlEncode(res.status_code) + '</td><th>响应大小</th><td>' + toSize(res.body_length) + '</td>\</tr>\
                     </tbody></table></div>\
                     <div><b style="margin-left:10px">协议</b></div>\
-                    <div class="lib-con mt10"><div class="divpre">' + res.protocol + '</div></div>\
+                    <div class="lib-con mt10"><div class="divpre">' + htmlEncode(res.protocol) + '</div></div>\
                     <div><b style="margin-left:10px">URL地址</b></div>\
                     <div class="lib-con mt10"><div class="divpre">' + url_html + '</div></div>\
                     <div><b style="margin-left:10px">完整IP列表</b></div>\
@@ -2083,7 +2083,7 @@ function wsTableErrorLogRequest(page){
                     <div><b style="margin-left:10px">User-Agent</b></div>\
                     <div class="lib-con mt10"><div class="divpre">' + $('<div ></div>').text(res.user_agent).html() + '</div></div>\
                     <div><b style="margin-left:10px">处理耗时</b></div>\
-                    <div class="lib-con mt10"><div class="divpre">' +res.request_time + ' ms</div></div>\
+                    <div class="lib-con mt10"><div class="divpre">' +htmlEncode(res.request_time) + ' ms</div></div>\
                 </div>',
             });
         });
@@ -2184,9 +2184,9 @@ wsPost('get_default_site','',{},function(rdata){
     var select = '';
     for (var i = 0; i < rdata["list"].length; i++) {
         if (default_site ==  rdata["list"][i]){
-            select += '<option value="'+rdata["list"][i]+'" selected>'+rdata["list"][i]+'</option>';
+            select += '<option value="'+htmlEncode(rdata["list"][i])+'" selected>'+htmlEncode(rdata["list"][i])+'</option>';
         } else{
-            select += '<option value="'+rdata["list"][i]+'">'+rdata["list"][i]+'</option>';
+            select += '<option value="'+htmlEncode(rdata["list"][i])+'">'+htmlEncode(rdata["list"][i])+'</option>';
         }
     }
     $('select[name="site"]').html(select);
@@ -2271,17 +2271,17 @@ function wsTableLogRequest(page){
                 var spider_tip = '';
                 if (data[i]['is_spider']>0){
                     spider_tip_name = spider_table[data[i]['is_spider']]
-                    spider_tip = '<div data-toggle="tooltip" title="'+spider_tip_name+'爬虫" style="cursor:pointer;margin:3px;float:left;width:8px;height:8px;line-height:40px;border-radius:50%;background-color:#ccc;"></div>';
+                    spider_tip = '<div data-toggle="tooltip" title="'+htmlEncode(spider_tip_name)+'爬虫" style="cursor:pointer;margin:3px;float:left;width:8px;height:8px;line-height:40px;border-radius:50%;background-color:#ccc;"></div>';
                 }
 
                 list += '<tr>';
                 list += '<td>' + getLocalTime(data[i]['time'])+'</td>';
-                list += '<td><span class="overflow_hide" style="width:100px;">' + data[i]['domain'] +'</span></td>';
-                list += '<td><span class="overflow_hide" style="width:100px;">' + data[i]['ip'] +'</span></td>';
+                list += '<td><span class="overflow_hide" style="width:100px;">' + htmlEncode(data[i]['domain']) +'</span></td>';
+                list += '<td><span class="overflow_hide" style="width:100px;">' + htmlEncode(data[i]['ip']) +'</span></td>';
                 list += '<td>' + toSize(data[i]['body_length']) +'</td>';
                 list += '<td>' + toSecond(data[i]['request_time']) +'</td>';
-                list += '<td><span class="overflow_hide" style="width:130px;">' + data[i]['uri'] +'</span></td>';
-                list += '<td>'+spider_tip+'<span class="overflow_hide" style="width:60px;">' + data[i]['status_code']+'/' + data[i]['method'] +'</span></td>';
+                list += '<td><span class="overflow_hide" style="width:130px;">' + htmlEncode(data[i]['uri']) +'</span></td>';
+                list += '<td>'+spider_tip+'<span class="overflow_hide" style="width:60px;">' + htmlEncode(data[i]['status_code'])+'/' + htmlEncode(data[i]['method']) +'</span></td>';
 
                 var http_data = '&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;';
                 if (data[i]['request_headers']!=''){
@@ -2317,23 +2317,23 @@ function wsTableLogRequest(page){
             var index = $(this).attr('data-id');
             var res = data[index];
             var url = res.scheme+"://"+res.domain+res.uri;
-            var url_html = "<a class='btlink' href='"+url+"' target='_blank'>"+url+"</a>";
+            var url_html = "<a class='btlink' href='"+htmlEncode(url)+"' target='_blank'>"+htmlEncode(url)+"</a>";
             // console.log(url_html);
             // console.log(res);
             layer.open({
                 type: 1,
-                title: "【"+res.domain + "】详情信息",
+                title: "【"+htmlEncode(res.domain) + "】详情信息",
                 area: '600px',
                 closeBtn: 1,
                 shadeClose: false,
                 content: '<div class="pd15 lib-box">\
                     <div style="height:80px;"><table class="table" style="border:#ddd 1px solid; margin-bottom:10px">\
                     <tbody class="site_details_tbody">\
-                        <tr><th>时间</th><td>' + getLocalTime(res.time) + '</td><th>真实IP</th><td><span class="overflow_hide detail_ip" style="width:100px;">' + res.ip + '</span></td><th>客户端端口</th><td>'+(res.client_port>0 && res.client_port != ''?res.client_port:'')+'</td></tr>\
-                        <tr><th>类型</th><td>' + res.method + '</td><th>状态</th><td>' + res.status_code + '</td><th>响应大小</th><td>' + toSize(res.body_length) + '</td>\</tr>\
+                        <tr><th>时间</th><td>' + getLocalTime(res.time) + '</td><th>真实IP</th><td><span class="overflow_hide detail_ip" style="width:100px;">' + htmlEncode(res.ip) + '</span></td><th>客户端端口</th><td>'+(res.client_port>0 && res.client_port != ''?res.client_port:'')+'</td></tr>\
+                        <tr><th>类型</th><td>' + htmlEncode(res.method) + '</td><th>状态</th><td>' + htmlEncode(res.status_code) + '</td><th>响应大小</th><td>' + toSize(res.body_length) + '</td>\</tr>\
                     </tbody></table></div>\
                     <div><b style="margin-left:10px">协议</b></div>\
-                    <div class="lib-con mt10"><div class="divpre">' + res.protocol + '</div></div>\
+                    <div class="lib-con mt10"><div class="divpre">' + htmlEncode(res.protocol) + '</div></div>\
                     <div><b style="margin-left:10px">URL地址</b></div>\
                     <div class="lib-con mt10"><div class="divpre">' + (url_html) + '</div></div>\
                     <div><b style="margin-left:10px">完整IP列表</b></div>\
@@ -2343,7 +2343,7 @@ function wsTableLogRequest(page){
                     <div><b style="margin-left:10px">User-Agent</b></div>\
                     <div class="lib-con mt10"><div class="divpre">' + $('<div></div>').text(res.user_agent).html() + '</div></div>\
                     <div><b style="margin-left:10px">处理耗时</b></div>\
-                    <div class="lib-con mt10"><div class="divpre">' +res.request_time + ' ms</div></div>\
+                    <div class="lib-con mt10"><div class="divpre">' +htmlEncode(res.request_time) + ' ms</div></div>\
                 </div>',
             });
         });
@@ -2353,25 +2353,25 @@ function wsTableLogRequest(page){
             var res = data[index];
             var request_headers = res.request_headers;
 
-            var req_data_html = res.method +' ' + res.uri + '<br/>';
+            var req_data_html = htmlEncode(res.method) +' ' + htmlEncode(res.uri) + '<br/>';
 
             try {
                 var req_data = $.parseJSON(request_headers);
                 for (var d in req_data) {
                     if (d == 'payload'){
-                        req_data_html += '<b style="color:red;">'+d +"</b>:"+req_data[d]+"<br/>";
+                        req_data_html += '<b style="color:red;">'+htmlEncode(d) +"</b>:"+htmlEncode(req_data[d])+"<br/>";
                     } else{
-                        req_data_html += d+":"+req_data[d]+"<br/>";
+                        req_data_html += htmlEncode(d)+":"+htmlEncode(req_data[d])+"<br/>";
                     }
                 }
             } catch (error) {
-                req_data_html += request_headers;
+                req_data_html += htmlEncode(request_headers);
             }
 
 
             layer.open({
                 type: 1,
-                title: "【"+res.domain + "】HTTP详情",
+                title: "【"+htmlEncode(res.domain) + "】HTTP详情",
                 area: ['600px','375px'],
                 closeBtn: 1,
                 shadeClose: false,
@@ -2596,9 +2596,9 @@ wsPost('get_default_site','',{},function(rdata){
     var select = '';
     for (var i = 0; i < rdata["list"].length; i++) {
         if (default_site ==  rdata["list"][i]){
-            select += '<option value="'+rdata["list"][i]+'" selected>'+rdata["list"][i]+'</option>';
+            select += '<option value="'+htmlEncode(rdata["list"][i])+'" selected>'+htmlEncode(rdata["list"][i])+'</option>';
         } else{
-            select += '<option value="'+rdata["list"][i]+'">'+rdata["list"][i]+'</option>';
+            select += '<option value="'+htmlEncode(rdata["list"][i])+'">'+htmlEncode(rdata["list"][i])+'</option>';
         }
     }
     $('select[name="site"]').html(select);

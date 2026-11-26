@@ -122,8 +122,8 @@ function initStep2(){
                     <tbody>\
                         <tr>\
                             <td style="border-right:1px solid #ddd">网站服务</td>\
-                            <td>'+info['local']['webserver']+'</td>\
-                            <td>'+info['remote']['webserver']+'</td>\
+                            <td>'+htmlEncode(info['local']['webserver'])+'</td>\
+                            <td>'+htmlEncode(info['remote']['webserver'])+'</td>\
                         </tr>\
                         <tr>\
                             <td style="border-right:1px solid #ddd">安装MySQL</td>\
@@ -132,13 +132,13 @@ function initStep2(){
                         </tr>\
                         <tr>\
                             <td style="border-right:1px solid #ddd">安装PHP</td>\
-                            <td>'+(info['local']['php'].join('/'))+'</td>\
-                            <td>'+(info['remote']['php'].join('/')) +'</td>\
+                            <td>'+htmlEncode(info['local']['php'].join('/'))+'</td>\
+                            <td>'+htmlEncode(info['remote']['php'].join('/')) +'</td>\
                         </tr>\
                         <tr>\
                             <td style="border-right:1px solid #ddd">可用磁盘</td>\
-                            <td>'+info['local']['disk']+'</td>\
-                            <td>'+info['remote']['disk'][0]['size'][0]+'</td>\
+                            <td>'+htmlEncode(info['local']['disk'])+'</td>\
+                            <td>'+htmlEncode(info['remote']['disk'][0]['size'][0])+'</td>\
                         </tr>\
                     </tbody>\
                     </table>\
@@ -167,8 +167,8 @@ function initStep3(){
                 for (var i = 0; i < pdata.sites.length; i++) {
                     site_li+='<li>\
                         <label>\
-                        <input type="checkbox" data-id="'+i+'" id="sites_'+pdata.sites[i]['name']+'" value="'+pdata.sites[i]['name']+'" name="sites" checked="">\
-                        <span title="'+pdata.sites[i]['name']+'">'+pdata.sites[i]['name']+'</span>\
+                        <input type="checkbox" data-id="'+i+'" id="sites_'+htmlEncode(pdata.sites[i]['name'])+'" value="'+htmlEncode(pdata.sites[i]['name'])+'" name="sites" checked="">\
+                        <span title="'+htmlEncode(pdata.sites[i]['name'])+'">'+htmlEncode(pdata.sites[i]['name'])+'</span>\
                         </label>\
                     </li>';
                 }
@@ -180,8 +180,8 @@ function initStep3(){
                 for (var i = 0; i < pdata.databases.length; i++) {
                     db_li+='<li>\
                         <label>\
-                        <input type="checkbox" data-id="'+i+'" id="sites_'+pdata.databases[i]['name']+'" value="'+pdata.databases[i]['name']+'" name="databases" checked="">\
-                        <span title="'+pdata.databases[i]['name']+'">'+pdata.databases[i]['name']+'</span>\
+                        <input type="checkbox" data-id="'+i+'" id="sites_'+htmlEncode(pdata.databases[i]['name'])+'" value="'+htmlEncode(pdata.databases[i]['name'])+'" name="databases" checked="">\
+                        <span title="'+htmlEncode(pdata.databases[i]['name'])+'">'+htmlEncode(pdata.databases[i]['name'])+'</span>\
                         </label>\
                     </li>';
                 }
@@ -192,8 +192,8 @@ function initStep3(){
                 for (var i = 0; i < pdata.plugin.length; i++) {
                     plugin_li+='<li>\
                         <label>\
-                        <input type="checkbox" data-id="'+i+'" id="plugin_'+pdata.plugin[i]+'" value="'+pdata.plugin[i]+'" name="plugin" checked="">\
-                        <span title="'+pdata.plugin[i]+'">'+pdata.plugin[i]+'</span>\
+                        <input type="checkbox" data-id="'+i+'" id="plugin_'+htmlEncode(pdata.plugin[i])+'" value="'+htmlEncode(pdata.plugin[i])+'" name="plugin" checked="">\
+                        <span title="'+htmlEncode(pdata.plugin[i])+'">'+htmlEncode(pdata.plugin[i])+'</span>\
                         </label>\
                     </li>';
                 }
@@ -215,10 +215,10 @@ function renderMigrationProgress(){
                 var end = '<div class="line">\
                         <div class="success text-center" style="padding: 10px 0 15px;">\
                         <p>数据迁移完成,请务必检查数据完整性!</p>\
-                        <p style="font-size: 14px;margin-top:2px;color: #939292;">传输大小: '+toSize(rdata['data']['total_size'])+',耗时: '+rdata['data']['total_time']+',平均速度: '+toSize(rdata['data']['speed'])+'/s</p>\
+                        <p style="font-size: 14px;margin-top:2px;color: #939292;">传输大小: '+toSize(rdata['data']['total_size'])+',耗时: '+htmlEncode(rdata['data']['total_time'])+',平均速度: '+toSize(rdata['data']['speed'])+'/s</p>\
                         <p class="mtb15">\
                             <button class="btn btn-success btn-sm mr5 okBtn">确定完成</button>\
-                            <a class="btn btn-default btn-sm" style="margin-left: 10px;" target="_blank" href="/files/download?filename='+rdata['data']['log_file']+'">迁移日志</a>\
+                            <a class="btn btn-default btn-sm" style="margin-left: 10px;" target="_blank" href="/files/download?filename='+htmlEncode(rdata['data']['log_file'])+'">迁移日志</a>\
                         </p>\
                         </div>\
                     </div>';
