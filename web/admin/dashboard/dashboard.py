@@ -8,10 +8,6 @@
 # Author: midoks <midoks@163.com>
 # ---------------------------------------------------------------------------------
 
-import io
-import time
-import base64
-import json
 import os
 import sys
 
@@ -23,7 +19,6 @@ from flask import request,g
 
 from admin.common import isLogined
 from admin.user_login_check import panel_login_required
-from admin import cache,session
 
 import core.mw as mw
 import thisdb
@@ -39,38 +34,8 @@ def index():
 # 安全路径
 @blueprint.route('/<path>',endpoint='admin_safe_path',methods=['GET'])
 def admin_safe_path(path):
-    login = request.args.get('login', '')
-    if login != '':
-        try:
-            # print(login)
-            login_str = base64.b64decode(login)
-            login_str = login_str.decode('utf-8')
-            data = json.loads(login_str)
-
-            time_now = time.time() * 1000
-            time_diff = time_now - data['time']
-
-            if time_diff > 2000:
-                return redirect('/')
-
-
-            info = thisdb.getUserByName(data['username'])
-            if info is None:
-                return redirect('/')
-
-            if info['password'] != mw.md5(data['password']):
-                return redirect('/')
-
-            session['login'] = True
-            session['username'] = info['name']
-            session['overdue'] = int(time.time()) + 7 * 24 * 60 * 60
-
-            thisdb.updateUserLoginTime()
-            return redirect('/')
-        except Exception as e:
-            pass
-        
-
+    # 已移除 ?login= 免登录入口: 它绕过二次验证、验证码与失败锁定,
+    # 且密码会出现在 URL 中。请统一使用 /do_login 登录。
     db_path = thisdb.getOption('admin_path')
     name = thisdb.getOption('template', default='default')
     if isLogined():

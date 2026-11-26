@@ -12,6 +12,7 @@ import re
 import json
 import os
 import time
+import urllib.parse
 
 from flask import Blueprint, render_template
 from flask import request
@@ -52,6 +53,63 @@ def add_panel_info():
 def get_panel_list():
     data = mw.M('panel').field('id,title,url,username,password,click,add_time').order('click desc').select()
     return mw.returnData(True, 'ok!', data)
+
+
+# 取本面板快捷登录密钥(用于填写到其它面板的关联面板配置)
+@blueprint.route('/get_quick_login_key', endpoint='get_quick_login_key', methods=['GET','POST'])
+@panel_login_required
+def get_quick_login_key():
+    from admin.dashboard.login import getQuickLoginKey
+    return mw.returnData(True, 'ok', getQuickLoginKey())
+
+
+# 重置本面板快捷登录密钥
+@blueprint.route('/reset_quick_login_key', endpoint='reset_quick_login_key', methods=['POST'])
+@panel_login_required
+def reset_quick_login_key():
+    from admin.dashboard.login import resetQuickLoginKey
+    return mw.returnData(True, '重置成功!', resetQuickLoginKey())
+
+
+# 一键登录: 用登录密钥向目标面板换取一次性票据, 再让浏览器跳转
+@blueprint.route('/panel_quick_login', endpoint='panel_quick_login', methods=['POST'])
+@panel_login_required
+def panel_quick_login():
+    panel_id = request.form.get('id', '').strip()
+    info = mw.M('panel').field('id,url,password').where('id=?', (panel_id,)).find()
+    if info is None:
+        return mw.returnData(False, '指定面板资料不存在!')
+
+    url = (info.get('url') or '').strip().rstrip('/')
+    key = (info.get('password') or '').strip()
+
+    if not re.match(r'^https?://', url):
+        return mw.returnData(False, '面板地址格式不正确!')
+    if key == '':
+        return mw.returnData(False, '登录密钥不能为空!')
+
+    try:
+        import requests
+        import urllib3
+        urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
+        r = requests.post(url + '/quick_login/ticket',
+                          data={'key': key}, timeout=5, verify=False)
+        ret = r.json()
+    except Exception as e:
+        return mw.returnData(False, '连接目标面板失败: ' + str(e))
+
+    if not isinstance(ret, dict) or not ret.get('status'):
+        msg = '获取登录票据失败!'
+        if isinstance(ret, dict) and ret.get('msg'):
+            msg = ret['msg']
+        return mw.returnData(False, msg)
+
+    ticket = (ret.get('data') or {}).get('ticket', '')
+    if ticket == '':
+        return mw.returnData(False, '获取登录票据失败!')
+
+    entry = url + '/quick_login/entry?ticket=' + urllib.parse.quote(ticket)
+    return mw.returnData(True, 'ok', {'url': entry})
 
 
 # 删除面板书签

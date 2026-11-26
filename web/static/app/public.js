@@ -1196,7 +1196,7 @@ function getPanelList(){
 		var rdata = rdata.data;
 
 		for(var i=0; i<rdata.length; i++){
-			con +='<h3 class="mypcip mypcipnew" style="opacity:.6;cursor: pointer;" data-url="'+rdata[i].url+'" data-user="'+rdata[i].username+'" data-pw="'+rdata[i].password+'">\
+			con +='<h3 class="mypcip mypcipnew" style="opacity:.6;cursor: pointer;" data-id="'+rdata[i].id+'" data-url="'+rdata[i].url+'">\
 				<span class="f14 cw">'+rdata[i].title+'</span>\
 				<em class="btedit" onclick="bindPanel(0,\'c\',\''+rdata[i].title+'\',\''+rdata[i].id+'\',\''+rdata[i].url+'\',\''+rdata[i].username+'\',\''+rdata[i].password+'\')"></em>\
 				</h3>';
@@ -1208,27 +1208,21 @@ function getPanelList(){
 		},function(){
 			$(this).css("opacity",".6");
 		}).click(function(){
-			// $("#panel_form").remove();
+			// 通过登录密钥向目标面板换取一次性票据后跳转,
+			// 密码/密钥不会出现在浏览器 URL 中
+			var pid = $(this).attr("data-id");
 			var murl = $(this).attr("data-url");
-			var user = $(this).attr("data-user");
-			var pw = $(this).attr("data-pw");
-
-			var random_str = getRandomString(8);
-
-			var timestamp = Date.parse(new Date());
-			var data = {
-				'rand':random_str,
-				'username':user,
-				'password':pw,
-				'time':timestamp
-			};
-
-
-			data_json =JSON.stringify(data);
-			login_args = base64_encode(data_json);
-
-			endpoint_url = murl + '?login='+login_args;
-			window.open(endpoint_url);
+			$.post("/setting/panel_quick_login", "id=" + encodeURIComponent(pid), function(rdata) {
+				if (rdata.status && rdata.data && rdata.data.url) {
+					window.open(rdata.data.url);
+					return;
+				}
+				layer.msg(rdata.msg || '快捷登录失败', {icon: 2});
+				if (murl) {
+					window.open(murl);
+				}
+			}, 'json');
+			return;
 			// layer.open({
 			// 	type: 2,
 			// 	title: false,
@@ -1285,11 +1279,10 @@ function bindPanel(a,type,ip,btid,url,user,pw){
 			layer.msg('面板地址格式不正确，示例：<p>http://192.168.0.1:8888</p>',{icon:5,time:5000});
 			return;
 		}
-		var btuser = encodeURIComponent($("#btuser").val());
 		var btpassword = encodeURIComponent($("#btpassword").val());
 		var bttitle = $("#bttitle").val();
-		var data = "title="+bttitle+"&url="+encodeURIComponent(btaddress)+"&username="+btuser+"&password="+btpassword;
-		if(btaddress =="" || btuser=="" || btpassword=="" || bttitle==""){
+		var data = "title="+bttitle+"&url="+encodeURIComponent(btaddress)+"&username=&password="+btpassword;
+		if(btaddress =="" || btpassword=="" || bttitle==""){
 			layer.msg(lan.bt.panel_err_empty,{icon:8});
 			return;
 		}
@@ -1319,18 +1312,16 @@ function bindPanel(a,type,ip,btid,url,user,pw){
 				<div class='line'><span class='tname'>面板地址</span>\
 				<div class='info-r'><input class='bt-input-text' type='text' name='btaddress' id='btaddress' value='"+url+"' placeholder='面板地址' style='width:100%'/></div>\
 				</div>\
-				<div class='line'><span class='tname'>用户名</span>\
-				<div class='info-r'><input class='bt-input-text' type='text' name='btuser' id='btuser' value='"+user+"' placeholder='用户名' style='width:100%'/></div>\
-				</div>\
-				<div class='line'><span class='tname'>密码</span>\
-				<div class='info-r'><input class='bt-input-text' type='password' name='btpassword' id='btpassword' value='"+pw+"' placeholder='密码' style='width:100%'/></div>\
+				<div class='line'><span class='tname'>登录密钥</span>\
+				<div class='info-r'><input class='bt-input-text' type='text' name='btpassword' id='btpassword' value='"+pw+"' placeholder='目标面板的快捷登录密钥' style='width:100%'/></div>\
 				</div>\
 				<div class='line'><span class='tname'>备注</span>\
 				<div class='info-r'><input class='bt-input-text' type='text' name='bttitle' id='bttitle' value='"+ip+"' placeholder='备注' style='width:100%'/></div>\
 				</div>\
 				<div class='line'><ul class='help-info-text c7'>\
 					<li>收藏其它服务器面板资料，实现一键登录面板功能</li><li>面板备注不可重复</li>\
-					<li><font style='color:red'>注意，开启广告拦截会导致无法快捷登录。</font></li></ul>\
+					<li>登录密钥请在目标面板『面板设置 - 快捷登录密钥』中复制</li>\
+					<li><font style='color:red'>目标面板开启二次验证时无法快捷登录。</font></li></ul>\
 				</div>\
 				<div class='bt-form-submit-btn'><button type='button' class='btn btn-danger btn-sm' onclick=\"layer.closeAll()\">关闭</button> "+btn+"</div>\
 			</div>",
@@ -1367,6 +1358,47 @@ function bindPaneldel(id){
 		layer.msg(rdata.msg,{icon:rdata.status?1:2});
 		getPanelList();
 	},'json');
+}
+
+// 快捷登录密钥: 显示/复制/重置
+var quickLoginKey = '';
+function getQuickLoginKeyInfo(){
+	$.post('/setting/get_quick_login_key', {}, function(rdata){
+		if(!rdata.status){
+			layer.msg(rdata.msg || '获取失败', {icon: 2});
+			return;
+		}
+		quickLoginKey = rdata.data || '';
+		$('#quick_login_key').val(quickLoginKey);
+	}, 'json');
+}
+function copyQuickLoginKey(){
+	if(quickLoginKey == ''){
+		layer.msg('请先点击显示', {icon: 8});
+		return;
+	}
+	var input = document.getElementById('quick_login_key');
+	input.select();
+	try {
+		document.execCommand('copy');
+		layer.msg('已复制', {icon: 1});
+	} catch(e) {
+		layer.msg('复制失败, 请手动复制', {icon: 2});
+	}
+}
+function resetQuickLoginKey(){
+	layer.confirm('重置后, 其它面板中已配置的登录密钥将失效, 确定继续?', function(idx){
+		layer.close(idx);
+		$.post('/setting/reset_quick_login_key', {}, function(rdata){
+			if(!rdata.status){
+				layer.msg(rdata.msg || '重置失败', {icon: 2});
+				return;
+			}
+			quickLoginKey = rdata.data || '';
+			$('#quick_login_key').val(quickLoginKey);
+			layer.msg('重置成功', {icon: 1});
+		}, 'json');
+	});
 }
 
 function getSpeed(sele){

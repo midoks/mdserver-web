@@ -120,7 +120,8 @@ def requestCheck():
             return
 
         auth = request.authorization
-        if request.path in ['/download', '/hook', '/down']:
+        if request.path in ['/download', '/hook', '/down',
+                            '/quick_login/ticket', '/quick_login/entry']:
             return
         if not auth:
             return sendAuthenticated()

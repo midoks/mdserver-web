@@ -10,6 +10,11 @@
 
 import io
 import time
+import base64
+import hashlib
+import hmac
+import json
+import secrets
 
 from flask import Blueprint, render_template
 from flask import make_response
@@ -25,6 +30,126 @@ import core.mw as mw
 import thisdb
 
 from .dashboard import blueprint
+
+
+def getLoginPageUrl():
+    admin_path = thisdb.getOption('admin_path')
+    if admin_path:
+        return '/' + admin_path
+    return '/login'
+
+
+QUICK_LOGIN_KEY_OPTION = 'quick_login_key'
+QUICK_LOGIN_TICKET_TTL = 60
+
+
+def getQuickLoginKey():
+    """获取/初始化本面板的快捷登录密钥"""
+    key = thisdb.getOption(QUICK_LOGIN_KEY_OPTION, default='')
+    if not key:
+        key = secrets.token_hex(32)
+        thisdb.setOption(QUICK_LOGIN_KEY_OPTION, key)
+    return key
+
+
+def resetQuickLoginKey():
+    key = secrets.token_hex(32)
+    thisdb.setOption(QUICK_LOGIN_KEY_OPTION, key)
+    return key
+
+
+def isQuickLoginEnabled():
+    # 开启二次验证时不签发快捷登录票据, 避免绕过 TOTP
+    two_step_verification = thisdb.getOptionByJson('two_step_verification', default={'open':False})
+    return not (two_step_verification and two_step_verification.get('open'))
+
+
+def makeQuickLoginTicket(username):
+    """生成一次性登录票据: base64(payload).hmac, 默认 60 秒有效"""
+    payload = {
+        'u': username,
+        'e': int(time.time()) + QUICK_LOGIN_TICKET_TTL,
+        'n': secrets.token_hex(16),
+    }
+    body = base64.urlsafe_b64encode(
+        json.dumps(payload, separators=(',', ':')).encode('utf-8')
+    ).decode('utf-8').rstrip('=')
+    sig = hmac.new(getQuickLoginKey().encode('utf-8'),
+                   body.encode('utf-8'), hashlib.sha256).hexdigest()
+    return body + '.' + sig
+
+
+def parseQuickLoginTicket(ticket):
+    """校验票据签名与有效期, 通过后返回用户名, 否则返回 None"""
+    try:
+        body, sig = (ticket or '').split('.', 1)
+        expect = hmac.new(getQuickLoginKey().encode('utf-8'),
+                          body.encode('utf-8'), hashlib.sha256).hexdigest()
+        if not hmac.compare_digest(expect, sig):
+            return None
+
+        padding = '=' * (-len(body) % 4)
+        payload = json.loads(base64.urlsafe_b64decode(body + padding).decode('utf-8'))
+        if int(payload.get('e', 0)) < int(time.time()):
+            return None
+        return payload
+    except Exception:
+        return None
+
+
+# 关联面板(A)服务端调用: 用密钥换取一次性登录票据
+@blueprint.route('/quick_login/ticket', methods=['POST'])
+def quickLoginTicket():
+    if thisdb.getOption('admin_close') == 'yes':
+        return mw.returnJson(False, '面板已经关闭!')
+
+    if not isQuickLoginEnabled():
+        return mw.returnJson(False, '目标面板已开启二次验证, 请手动登录!')
+
+    key = request.form.get('key', '').strip()
+    if key == '':
+        key = request.headers.get('X-Quick-Login-Key', '').strip()
+
+    if key == '' or not hmac.compare_digest(key, getQuickLoginKey()):
+        mw.writeLog('用户登录', mw.getInfo('快捷登录密钥错误, 登录IP:{1}', (request.remote_addr,)))
+        return mw.returnJson(False, '登录密钥错误!')
+
+    info = thisdb.getUserByRoot()
+    if info is None:
+        return mw.returnJson(False, '用户不存在!')
+
+    return mw.returnJson(True, 'ok', {'ticket': makeQuickLoginTicket(info['name'])})
+
+
+# 浏览器访问: 消费一次性票据并建立登录会话
+@blueprint.route('/quick_login/entry', methods=['GET'])
+def quickLoginEntry():
+    payload = parseQuickLoginTicket(request.args.get('ticket', ''))
+    if payload is None:
+        return redirect(getLoginPageUrl())
+
+    if not isQuickLoginEnabled():
+        return redirect(getLoginPageUrl())
+
+    # 票据一次性使用, 用完立即失效
+    used = thisdb.getOptionByJson('quick_login_used', default={})
+    now = int(time.time())
+    used = {k: v for k, v in used.items() if v > now}
+    nonce = payload.get('n', '')
+    if nonce == '' or nonce in used:
+        return redirect(getLoginPageUrl())
+    used[nonce] = int(payload.get('e', 0))
+    thisdb.setOption('quick_login_used', json.dumps(used))
+
+    info = thisdb.getUserByRoot()
+    if info is None or info['name'] != payload.get('u', ''):
+        return redirect(getLoginPageUrl())
+
+    session['login'] = True
+    session['username'] = info['name']
+    session['overdue'] = int(time.time()) + 7 * 24 * 60 * 60
+    thisdb.updateUserLoginTime()
+    return redirect('/')
 
 
 def getErrorNum(key, limit=None):
@@ -149,7 +274,20 @@ def verifyLogin():
     password = mw.md5(password)
 
     info = thisdb.getUserByRoot()
-    if info['name'] != username or info['password'] != password:
+    if info is None or info['name'] != username or info['password'] != password:
+        login_cache_count = 5
+        login_cache_limit = cache.get('login_cache_limit')
+        if login_cache_limit is None:
+            login_cache_limit = 1
+        else:
+            login_cache_limit = int(login_cache_limit) + 1
+
+        if login_cache_limit >= login_cache_count:
+            thisdb.setOption('admin_close', 'yes')
+            return mw.returnJson(-1, '面板已经关闭!')
+
+        cache.set('login_cache_limit', login_cache_limit, timeout=10000)
+        mw.writeLog('用户登录', mw.getInfo("<a style='color: red'>二次验证密码错误</a>,帐号:{1},登录IP:{2}", (username, request.remote_addr)))
         return mw.returnJson(-1, "密码错误?")
 
     auth = request.form.get('auth', '').strip()    
@@ -164,6 +302,18 @@ def verifyLogin():
 
             thisdb.updateUserLoginTime()
             return mw.returnData(1, '二次验证成功!')
+
+    # 失败次数限制, 避免验证码被无限爆破
+    login_cache_count = 5
+    login_cache_limit = cache.get('login_cache_limit')
+    if login_cache_limit is None:
+        login_cache_limit = 1
+    else:
+        login_cache_limit = int(login_cache_limit) + 1
+    if login_cache_limit >= login_cache_count:
+        thisdb.setOption('admin_close', 'yes')
+        return mw.returnJson(-1, '面板已经关闭!')
+    cache.set('login_cache_limit', login_cache_limit, timeout=10000)
     return mw.returnData(-1, '二次验证失败!')
 
 # 执行登录操作
@@ -180,7 +330,9 @@ def do_login():
     login_cache_count = 5
     login_cache_limit = cache.get('login_cache_limit')
 
-    if 'code' in session:
+    # 书签/一键跳转使用后台表单提交(redirect=1), 无法携带验证码,
+    # 此处跳过验证码; 失败锁定与二次验证仍然生效
+    if 'code' in session and request.form.get('redirect', '') == '':
         if session['code'] != mw.md5(code):
             if login_cache_limit == None:
                 login_cache_limit = 1
@@ -238,6 +390,9 @@ def do_login():
     # 二步验证密钥
     two_step_verification = thisdb.getOptionByJson('two_step_verification', default={'open':False})
     if two_step_verification['open']:
+        # 书签跳转等表单登录: 跳回登录页, 由登录页完成二次验证
+        if request.form.get('redirect', '') != '':
+            return redirect(getLoginPageUrl())
         return mw.returnData(2, '需要两步验证!')
 
     session['login'] = True
@@ -245,4 +400,7 @@ def do_login():
     session['overdue'] = int(time.time()) + 7 * 24 * 60 * 60
     
     thisdb.updateUserLoginTime()
+    # 书签跳转等表单登录: 登录成功后直接回到首页
+    if request.form.get('redirect', '') != '':
+        return redirect('/')
     return mw.returnData(1, '登录成功,正在跳转...')
