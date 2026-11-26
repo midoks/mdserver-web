@@ -10,8 +10,10 @@
 
 import os
 import sys
+import re
 import json
 import threading
+import subprocess
 import multiprocessing
 
 import core.mw as mw
@@ -176,14 +178,17 @@ class plugin(object):
             for pn in pn_list:
                 name = pn['name']
                 version = pn['version']
+                # 防止目录穿越/命令注入
+                if not re.fullmatch(r'[A-Za-z0-9_.-]+', name) or '..' in name:
+                    continue
                 info_file = self.__plugin_dir + '/' + name + '/' + 'info.json'
                 pluginInfo = json.loads(mw.readFile(info_file))
                 self.hookInstall(pluginInfo)
 
                 cmd = 'cd {0} && bash {1} install {2}'.format(
-                    mw.getPluginDir() + '/'+name,
-                    pluginInfo['shell'],
-                    version
+                    mw.quote(mw.getPluginDir() + '/' + name),
+                    mw.quote(pluginInfo['shell']),
+                    mw.quote(version)
                 )
                 title = '安装[' + name + '-' + version + ']'
                 thisdb.addTask(name=title,cmd=cmd)
@@ -298,6 +303,10 @@ class plugin(object):
             msg_head = '更新'
             op_cmd = "upgrade"
 
+        # 防止目录穿越/命令注入
+        if not re.fullmatch(r'[A-Za-z0-9_.-]+', name) or '..' in name:
+            return mw.returnData(False, '非法的插件名称!', ())
+
         info_file = self.__plugin_dir + '/' + name + '/' + 'info.json'
         if not os.path.exists(info_file):
             return mw.returnData(False, "配置文件不存在!", ())
@@ -305,10 +314,10 @@ class plugin(object):
         info_data = json.loads(mw.readFile(info_file))
 
         exec_bash = 'cd {0} && bash {1} {2} {3}'.format(
-            mw.getPluginDir() + '/'+name,
-            info_data['shell'],
+            mw.quote(mw.getPluginDir() + '/' + name),
+            mw.quote(info_data['shell']),
             op_cmd,
-            version
+            mw.quote(version)
         )
 
         self.hookInstall(info_data)
@@ -327,6 +336,10 @@ class plugin(object):
         if version.strip() == '':
             return mw.returnData(False, "缺少版本信息!", ())
 
+        # 防止目录穿越/命令注入
+        if not re.fullmatch(r'[A-Za-z0-9_.-]+', name) or '..' in name:
+            return mw.returnData(False, '非法的插件名称!', ())
+
         info_file = self.__plugin_dir + '/' + name + '/' + 'info.json'
         if not os.path.exists(info_file):
             return mw.returnData(False, "配置文件不存在!", ())
@@ -334,9 +347,9 @@ class plugin(object):
         info_data = json.loads(mw.readFile(info_file))
 
         exec_bash = "cd {0} && /bin/bash {1} uninstall {2}".format(
-            mw.getPluginDir() + '/'+name,
-            info_data['shell'],
-            version
+            mw.quote(mw.getPluginDir() + '/' + name),
+            mw.quote(info_data['shell']),
+            mw.quote(version)
         )
         self.hookUninstall(info_data)
         data = mw.execShell(exec_bash)
@@ -841,18 +854,25 @@ class plugin(object):
         return data
 
     def inputZipApi(self, plugin_name,tmp_path):
+        # 防止目录穿越与命令注入: 插件名只允许安全字符, 临时目录必须位于面板 temp 下
+        if not re.fullmatch(r'[A-Za-z0-9_.-]+', plugin_name or '') or '..' in plugin_name:
+            return mw.returnData(False, '非法的插件名称!')
+        temp_dir = os.path.realpath(mw.getPanelDir() + '/temp')
+        tmp_path = os.path.realpath(tmp_path or '')
+        if not (tmp_path == temp_dir or tmp_path.startswith(temp_dir + os.sep)):
+            return mw.returnData(False, '非法的临时目录!')
         if not os.path.exists(tmp_path):
             return mw.returnData(False, '临时文件不存在,请重新上传!')
         plugin_path = mw.getPluginDir() + '/' + plugin_name
         if not os.path.exists(plugin_path):
-            print(mw.execShell('mkdir -p ' + plugin_path))
-        mw.execShell("cp -rf " + tmp_path + '/* ' + plugin_path + '/')
-        mw.execShell('chmod -R 755 ' + plugin_path)
+            print(mw.execShell('mkdir -p ' + mw.quote(plugin_path)))
+        mw.execShell("cp -rf " + mw.quote(tmp_path) + '/* ' + mw.quote(plugin_path) + '/')
+        mw.execShell('chmod -R 755 ' + mw.quote(plugin_path))
         p_info = mw.readFile(plugin_path + '/info.json')
         if p_info:
             mw.writeLog('软件管理', '安装第三方插件[%s]' %json.loads(p_info)['title'])
             return mw.returnData(True, '安装成功!')
-        mw.execShell("rm -rf " + plugin_path)
+        mw.execShell("rm -rf " + mw.quote(plugin_path))
         return mw.returnData(False, '安装失败!')
 
     # [start|stop]操作,删除缓存!
@@ -875,6 +895,12 @@ class plugin(object):
         script  = 'index',
     ):
 
+        # 防止目录穿越与命令注入: 插件名/脚本名只允许安全字符
+        if not re.fullmatch(r'[A-Za-z0-9_.-]+', name or '') or '..' in name:
+            return ('', '非法的插件名称!')
+        if not re.fullmatch(r'[A-Za-z0-9_.-]+', script or '') or '..' in script:
+            return ('', '非法的脚本名称!')
+
         if mw.inArray(['start','stop','restart','reload','uninstall_pre_inspection','install','uninstall'], func):
             self.runByCache(name, func, version)
 
@@ -882,25 +908,42 @@ class plugin(object):
         if not os.path.exists(path):
             path = self.__plugin_dir + '/' + name + '/' + name + '.py'
 
-        py = 'python3 ' + path
-        if args == '':
-            py_cmd = py + ' ' + func + ' ' + version
-        else:
-            py_cmd = py + ' ' + func + ' ' + version + ' ' + args
-
         if not os.path.exists(path):
             return ('', '')
 
-        source_bin_activate =  mw.getPanelDir() + "/bin/activate"
-        py_cmd_dir = 'cd ' + mw.getPanelDir()
-        if os.path.exists(source_bin_activate):
-            py_cmd_dir += " && . bin/activate"
-        do_cmd = py_cmd_dir + " && "+ py_cmd
-        data = mw.execShell(do_cmd)
+        # 使用参数列表直接调用, 不经过 shell, 避免 func/version/args 被解释执行
+        panel_dir = mw.getPanelDir()
+        python_bin = 'python3'
+        if os.path.exists(panel_dir + "/bin/python3"):
+            python_bin = panel_dir + "/bin/python3"
+        elif os.path.exists(panel_dir + "/bin/python"):
+            python_bin = panel_dir + "/bin/python"
+
+        cmd = [python_bin, path, func]
+        if version != '':
+            cmd.append(version)
+        if args != '':
+            cmd.append(args)
+
+        env = os.environ.copy()
+        if os.path.exists(panel_dir + "/bin/activate"):
+            env['VIRTUAL_ENV'] = panel_dir
+            env['PATH'] = panel_dir + "/bin:" + env.get('PATH', '')
+
+        try:
+            p = subprocess.Popen(cmd, cwd=panel_dir,
+                                 stdout=subprocess.PIPE,
+                                 stderr=subprocess.PIPE,
+                                 env=env)
+            stdout, stderr = p.communicate()
+            data = (stdout.decode('utf-8', 'ignore'),
+                    stderr.decode('utf-8', 'ignore'))
+        except Exception as e:
+            data = ('', str(e))
 
         # print(data)
         if mw.isDebugMode():
-            print('run:', do_cmd)
+            print('run:', cmd)
             print(data)
         # print os.path.exists(py_cmd)
         return (data[0].strip(), data[1].strip())

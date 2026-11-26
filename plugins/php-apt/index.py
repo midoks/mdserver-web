@@ -799,10 +799,10 @@ def installLib(version):
         return data[1]
 
     name = args['name']
-    cmd = "cd " + getPluginDir() + "/versions && /bin/bash  common.sh " + version + ' install ' + name
+    cmd = "cd " + mw.quote(getPluginDir() + "/versions") + " && /bin/bash  common.sh " + mw.quote(version) + ' install ' + mw.quote(name)
     install_name = '安装PHPAPT[' + name + '-' + version + ']'
     import thisdb
-    thisdb.addTask(name=install_name,cmd=cmd)
+    thisdb.addTask(name=install_name,cmd=mw.quote(cmd))
 
     mw.triggerTask()
     return mw.returnJson(True, '已将下载任务添加到队列!')
@@ -815,7 +815,7 @@ def uninstallLib(version):
         return data[1]
 
     name = args['name']
-    execstr = "cd " + getPluginDir() + "/versions && /bin/bash common.sh " + version + ' uninstall ' + name
+    execstr = "cd " + mw.quote(getPluginDir() + "/versions") + " && /bin/bash common.sh " + mw.quote(version) + ' uninstall ' + mw.quote(name)
 
     data = mw.execShell(execstr)
     # data[0] == '' and
