@@ -89,11 +89,13 @@
                 }
                 $.ajaxSetup({
                     beforeSend: function(xhr, settings){
-                        if(settings && settings.type && /^(POST|PUT|PATCH|DELETE)$/i.test(settings.type)){
-                            var tk = getCsrfToken();
-                            if(tk){
-                                xhr.setRequestHeader('X-CSRF-Token', tk);
-                            }
+                        // 所有同源请求都带 csrf_token, 跨域请求跳过避免触发 CORS preflight
+                        if(settings && settings.crossDomain){
+                            return;
+                        }
+                        var tk = getCsrfToken();
+                        if(tk){
+                            xhr.setRequestHeader('X-CSRF-Token', tk);
                         }
                     },
                     statusCode: {

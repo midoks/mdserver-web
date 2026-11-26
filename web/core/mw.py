@@ -1051,8 +1051,8 @@ def isVhostHasReuseport(version):
     return False
 
 def isDebugMode():
-    if isAppleSystem():
-        return True
+    # if isAppleSystem():
+    #     return True
 
     debug = M('option').field('name').where('name=?',('debug',)).getField('value')
     if debug == 'open':

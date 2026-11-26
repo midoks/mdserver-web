@@ -166,7 +166,8 @@ def requestCheck():
 def requestAfter(response):
     response.headers['soft'] = config.APP_NAME
     response.headers['mw-version'] = config.APP_VERSION
-    response.headers['X-Response-Time'] = round(time.time() - request.start_time, 4) 
+    if mw.isDebugMode():
+        response.headers['X-Response-Time'] = round(time.time() - request.start_time, 4) 
 
     # 安全响应头
     response.headers.setdefault('X-Frame-Options', 'SAMEORIGIN')
