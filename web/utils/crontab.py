@@ -13,6 +13,7 @@ import sys
 import re
 import time
 import json
+import subprocess
 import threading
 import multiprocessing
 
@@ -156,9 +157,20 @@ class crontab(object):
 
     def startTask(self, cron_id):
         data = thisdb.getCrond(cron_id)
-        cmd_file = mw.getServerDir() + '/cron/' + data['echo']
-        os.system('chmod +x ' + cmd_file)
-        os.system('nohup ' + cmd_file + ' >> ' + cmd_file + '.log 2>&1 &')
+        # 只取文件名, 避免任务名中的路径或 shell 元字符进入命令
+        cmd_file = mw.getServerDir() + '/cron/' + os.path.basename(str(data['echo']))
+        if not os.path.isfile(cmd_file):
+            return mw.returnData(False, '任务脚本不存在!')
+
+        subprocess.run(['chmod', '+x', '--', cmd_file],
+                       stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+        log_file = cmd_file + '.log'
+        try:
+            with open(log_file, 'ab') as fp:
+                subprocess.Popen([cmd_file], stdout=fp, stderr=subprocess.STDOUT,
+                                 start_new_session=True)
+        except Exception as e:
+            return mw.returnData(False, '执行失败:' + str(e))
         return mw.returnData(True, '计划任务【%s】已执行!' % data['name'])
 
 
