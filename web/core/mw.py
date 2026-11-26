@@ -247,7 +247,7 @@ def checkCert(certPath='ssl/certificate.pem'):
             tmp1 = s + tmp1
         writeFile(certPath, tmp1)
         result = execShell(openssl + " x509 -in " +
-                           certPath + " -noout -subject")
+                           quote(certPath) + " -noout -subject")
         if result[1].find('-bash:') != -1:
             return True
         if len(result[1]) > 2:

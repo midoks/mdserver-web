@@ -537,7 +537,7 @@ echo "--------------------------------------------------------------------------
         file = cron_path + '/' + cron_name
         # print(shell)
         mw.writeFile(file, self.checkScript(shell))
-        mw.execShell('chmod 750 ' + file)
+        mw.execShell('chmod 750 ' + mw.quote(file))
         return cron_name
 
     # 检查脚本
@@ -576,9 +576,9 @@ echo "--------------------------------------------------------------------------
         content += str(bash_script) + "\n"
         if mw.writeFile(file, content):
             if not os.path.exists(file):
-                mw.execShell("chmod 600 '" + file +"' && chown root.root " + file)
+                mw.execShell("chmod 600 " + mw.quote(file) + " && chown root.root " + mw.quote(file))
             else:
-                mw.execShell("chmod 600 '" + file +"' && chown root.crontab " + file)
+                mw.execShell("chmod 600 " + mw.quote(file) + " && chown root.crontab " + mw.quote(file))
             return mw.returnData(True, 'ok')
         return mw.returnData(False, '文件写入失败,是否开启系统加固功能!')
 
