@@ -61,22 +61,18 @@ def execShell(cmdstring, cwd=None, timeout=None, shell=True):
         cmdstring_list = cmdstring
     else:
         cmdstring_list = shlex.split(cmdstring)
-    if timeout:
-        end_time = datetime.datetime.now() + datetime.timedelta(seconds=timeout)
 
     sub = subprocess.Popen(cmdstring_list, cwd=cwd, stdin=subprocess.PIPE,
                            shell=shell, bufsize=4096, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
 
-    while sub.poll() is None:
-        time.sleep(0.1)
-        if timeout:
-            if end_time <= datetime.datetime.now():
-                raise Exception("Timeout：%s" % cmdstring)
-
-    if sys.version_info[0] == 2:
-        return sub.communicate()
-
-    data = sub.communicate()
+    # 用 communicate(timeout) 替代 poll+sleep 忙等:
+    # 子进程一结束 OS 立即唤醒, 去掉最多 100ms 的轮询延迟; 超时由 OS 精确控制
+    try:
+        data = sub.communicate(timeout=timeout)
+    except subprocess.TimeoutExpired:
+        sub.kill()
+        sub.communicate()  # 收割子进程, 避免僵尸
+        raise Exception("Timeout：%s" % cmdstring)
 
     success = data[0]
     error = data[1]
