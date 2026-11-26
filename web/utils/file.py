@@ -530,9 +530,58 @@ def getFileBody(path):
         return mw.returnData(False, '文件未正常打开!')
     return mw.returnData(True, 'OK', data)
 
+def isSafeSavePath(path):
+    """限制在线编辑的写入范围, 防止任意文件写入(如 /root/.ssh、/etc 等)"""
+    try:
+        real = os.path.realpath(path)
+    except Exception:
+        return False
+
+    # 禁止覆盖面板自身代码
+    panel_dir = os.path.realpath(mw.getPanelDir())
+    if real == panel_dir or real.startswith(panel_dir + os.sep):
+        return False
+
+    # 系统敏感目录一律禁止写入
+    deny_roots = (
+        '/etc', '/root', '/boot', '/bin', '/sbin', '/usr',
+        '/lib', '/lib32', '/lib64', '/proc', '/sys', '/dev',
+        '/run', '/var/spool', '/var/lib',
+    )
+    for d in deny_roots:
+        if real == d or real.startswith(d + os.sep):
+            return False
+
+    allow_roots = [
+        mw.getWwwDir(),
+        mw.getServerDir(),
+        mw.getBackupDir(),
+        mw.getLogsDir(),
+    ]
+    # 站点自定义目录
+    try:
+        for s in mw.M('sites').field('path').select():
+            if s.get('path'):
+                allow_roots.append(s['path'])
+    except Exception:
+        pass
+
+    for root in allow_roots:
+        if not root:
+            continue
+        r = os.path.realpath(root)
+        if real == r or real.startswith(r + os.sep):
+            return True
+    return False
+
+
 def saveBody(path, data, encoding):
     if not os.path.exists(path):
         return mw.returnData(False, '文件不存在')
+    if os.path.isdir(path):
+        return mw.returnData(False, '不能写入目录')
+    if not isSafeSavePath(path):
+        return mw.returnData(False, '该路径不允许写入!')
     try:
         if encoding == 'ascii':
             encoding = 'utf-8'

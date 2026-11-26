@@ -8,6 +8,8 @@
 # Author: midoks <midoks@163.com>
 # ---------------------------------------------------------------------------------
 
+import re
+
 import core.mw as mw
 
 from .option  import getOption
@@ -78,23 +80,33 @@ def getSitesList(
     order = None,
 ):
     sql_where = ''
+    params = []
     if search != '' :
-        sql_where = " name like '%" + search + "%' or ps like '%" + search + "%' "
+        sql_where = " name like ? or ps like ? "
+        like = '%' + search + '%'
+        params.extend([like, like])
     if type_id != '' and int(type_id) >= 0 and search != '' :
-        sql_where = sql_where + " and type_id=" + str(type_id) + ""
+        sql_where = sql_where + " and type_id=" + str(int(type_id))
     if type_id != '' and int(type_id) >= 0:
-        sql_where = " type_id=" + str(type_id)
+        sql_where = " type_id=" + str(int(type_id))
+        params = []
 
     dbM = dbC = mw.M('sites').field(__FIELD)
 
     if sql_where != '':
-        count = dbC.where(sql_where).count()
-        dbM.where(sql_where)
+        count = dbC.where(sql_where, tuple(params)).count()
+        dbM.where(sql_where, tuple(params))
     else:
         count = dbC.count()
 
     start = (int(page) - 1) * (int(size))
     limit = str(start) + ',' +str(size)
+
+    # 排序字段只允许安全字符, 防止 SQL 注入
+    if not isinstance(order, str):
+        order = ''
+    if not re.fullmatch(r'[A-Za-z0-9_,. ]+', order or ''):
+        order = ''
 
     if order.find("none") > -1:
         site_list = dbM.limit(limit).order('').select()
