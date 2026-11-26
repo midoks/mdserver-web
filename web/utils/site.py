@@ -13,6 +13,7 @@ import sys
 import re
 import json
 import time
+import shutil
 import threading
 import multiprocessing
 
@@ -801,9 +802,12 @@ class sites(object):
                 data['dirs'] = []
                 data['binding'] = []
                 return mw.returnData(True, 'OK', data)
-            os.system('mkdir -p ' + path)
-            os.system('chmod 755 ' + path)
-            os.system('chown www:www ' + path)
+            os.makedirs(path, exist_ok=True)
+            os.chmod(path, 0o755)
+            try:
+                shutil.chown(path, 'www', 'www')
+            except Exception:
+                pass
             siteName = info['name']
             mw.writeLog('网站管理', '站点[' + siteName + '],根目录[' + path + ']不存在,已重新创建!')
 
@@ -1890,7 +1894,7 @@ location ^~ {from} {\n\
                 return mw.returnData(False, '证书解析失败!')
             vpath = self.sslDir + '/' + site_name
             if not os.path.exists(vpath):
-                os.system('mkdir -p ' + vpath)
+                os.makedirs(vpath, exist_ok=True)
             mw.writeFile(vpath + '/privkey.pem', mw.readFile(keyPath))
             mw.writeFile(vpath + '/fullchain.pem', mw.readFile(certPath))
             mw.writeFile(vpath + '/info.json', json.dumps(certInfo))
@@ -1902,7 +1906,7 @@ location ^~ {from} {\n\
         try:
             vpath = self.sslDir
             if not os.path.exists(vpath):
-                os.system('mkdir -p ' + vpath)
+                os.makedirs(vpath, exist_ok=True)
             data = []
             for d in os.listdir(vpath):
 
@@ -2651,10 +2655,21 @@ export PATH
 
     def removeCert(self, cert_name):
         try:
-            path = self.sslDir + '/' + cert_name
+            # 证书名只允许单层目录名, 防止路径穿越和命令拼接
+            if cert_name == '' or '/' in cert_name or '\\' in cert_name or '..' in cert_name:
+                return mw.returnData(False, '证书名称不合法!')
+
+            base = os.path.realpath(self.sslDir)
+            path = os.path.realpath(self.sslDir + '/' + cert_name)
+            if not path.startswith(base + os.sep):
+                return mw.returnData(False, '证书名称不合法!')
+
             if not os.path.exists(path):
                 return mw.returnData(False, '证书已不存在!')
-            os.system("rm -rf " + path)
+            if os.path.isdir(path) and not os.path.islink(path):
+                shutil.rmtree(path)
+            else:
+                os.remove(path)
             return mw.returnData(True, '证书已删除!')
         except Exception as ex:
             return mw.returnData(False, '证书删除失败:'+str(ex))
