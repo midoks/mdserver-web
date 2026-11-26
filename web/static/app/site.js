@@ -2915,17 +2915,39 @@ function configFile(webSite){
 			</div>\
 		</div>";
 		$("#webedit-con").html(mBody);
+
+		// 保存逻辑抽出来, 按钮点击 + Cmd/Ctrl+S 共用
+		function doSaveConfig(){
+			$("#configBody").empty();
+			$("#configBody").text(editor.getValue());
+			saveConfigFile(webSite, rdata.data.encoding, info['host']);
+		}
+
 		var editor = CodeMirror.fromTextArea(document.getElementById("configBody"), {
-			extraKeys: {"Ctrl-Space": "autocomplete"},
+			extraKeys: {
+				"Ctrl-Space": "autocomplete",
+				// 编辑器聚焦时: CodeMirror 拦截 Ctrl+S / Cmd+S, 自动 preventDefault
+				"Ctrl-S": function(cm){ doSaveConfig(); },
+				"Cmd-S":  function(cm){ doSaveConfig(); }
+			},
 			lineNumbers: true,
 			matchBrackets:true,
 		});
 		$(".CodeMirror-scroll").css({"height":"300px","margin":0,"padding":0});
-		$("#SaveConfigFileBtn").click(function(){
-			$("#configBody").empty();
-			$("#configBody").text(editor.getValue());
-			saveConfigFile(webSite,rdata.data.encoding, info['host']);
-		})
+		$("#SaveConfigFileBtn").click(doSaveConfig);
+
+		// 兜底: 编辑器外聚焦(按钮/页面空白)也能 Cmd/Ctrl+S 保存
+		// 用命名空间 siteSave 自动覆盖旧绑定, 避免多次绑定累积
+		$(document).off('keydown.siteSave').on('keydown.siteSave', function(e){
+			if (!(e.ctrlKey || e.metaKey)) return;
+			if (!(e.key === 's' || e.keyCode === 83)) return;
+			// 配置弹窗未打开时不处理
+			if ($("#configBody").length === 0) return;
+			// CodeMirror 内部聚焦时由 extraKeys 处理, 避免重复触发
+			if ($(e.target).closest('.CodeMirror').length > 0) return;
+			e.preventDefault();
+			doSaveConfig();
+		});
 	},'json');
 }
 
