@@ -120,13 +120,22 @@ def sendAuthenticated():
 def requestCheck():
     request.start_time = time.time()
 
+    # 静态文件直接放行, 不做任何 DB 查询和 CSRF 处理 (性能优化)
+    if request.path.startswith('/static/'):
+        return
+
     # 动态决定 session cookie 是否 secure (面板开了 SSL 就强制 secure)
-    try:
-        panel_ssl = thisdb.getOptionByJson('panel_ssl', default={'open':False})
-        if panel_ssl.get('open'):
-            app.config['SESSION_COOKIE_SECURE'] = True
-    except Exception:
-        pass
+    # 用 cache 缓存 5 分钟, 避免每个请求查 DB
+    ssl_open = cache.get('panel_ssl_open')
+    if ssl_open is None:
+        try:
+            panel_ssl = thisdb.getOptionByJson('panel_ssl', default={'open':False})
+            ssl_open = bool(panel_ssl.get('open'))
+            cache.set('panel_ssl_open', ssl_open, timeout=300)
+        except Exception:
+            ssl_open = False
+    if ssl_open:
+        app.config['SESSION_COOKIE_SECURE'] = True
 
     admin_close = thisdb.getOption('admin_close')
     if admin_close == 'yes':
@@ -167,7 +176,12 @@ def requestAfter(response):
     response.headers['soft'] = config.APP_NAME
     response.headers['mw-version'] = config.APP_VERSION
     if mw.isDebugMode():
-        response.headers['X-Response-Time'] = round(time.time() - request.start_time, 4) 
+        response.headers['X-Response-Time'] = round(time.time() - request.start_time, 4)
+
+    # 静态文件: 只加最基本的安全头, 跳过 CSRF cookie 处理 (性能优化)
+    if request.path.startswith('/static/'):
+        response.headers.setdefault('X-Content-Type-Options', 'nosniff')
+        return response
 
     # 安全响应头
     response.headers.setdefault('X-Frame-Options', 'SAMEORIGIN')
@@ -176,16 +190,24 @@ def requestAfter(response):
     response.headers.setdefault('Permissions-Policy', 'geolocation=(), microphone=(), camera=()')
 
     # csrf_token cookie 金融级策略:
-    #   危险方法(POST/PUT/PATCH/DELETE)成功后轮换 token, 防止 token 被长期复用
+    #   危险方法(POST/PUT/PATCH/DELETE)成功后轮换 token
     #   安全方法(GET 等)复用现有 token + 滑动续期
     #   session 里保留最近 N 个 token, 容忍并发 AJAX 的轮换竞态
+    #   只在必要时设置 cookie (cookie 不存在或 token 变化时), 避免静态资源重复写
     method = (request.method or 'GET').upper()
+    existing_token = request.cookies.get(csrf_mw.COOKIE_NAME)
+
     if method in ('POST', 'PUT', 'PATCH', 'DELETE'):
         token = csrf_mw.generate_token()  # 危险请求后轮换
+        csrf_mw.push_token(token)
+        csrf_mw.set_csrf_cookie(response, token)
+    elif not existing_token:
+        token = csrf_mw.generate_token()  # 首次请求
+        csrf_mw.push_token(token)
+        csrf_mw.set_csrf_cookie(response, token)
     else:
-        token = request.cookies.get(csrf_mw.COOKIE_NAME) or csrf_mw.generate_token()
-    csrf_mw.push_token(token)
-    csrf_mw.set_csrf_cookie(response, token)
+        # 安全请求且 cookie 已存在: 复用 token, 不重新设置 cookie (减少响应头)
+        csrf_mw.push_token(existing_token)
 
     return response
 

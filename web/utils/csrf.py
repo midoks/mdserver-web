@@ -58,14 +58,12 @@ def get_valid_tokens():
 
 
 def push_token(token):
-    """把新 token 加入 session 历史, 保留最近 N 个. 重复 token 不重复 push."""
+    """把新 token 加入 session 历史, 保留最近 N 个. 已在历史里则不写 session(性能优化)."""
     from flask import session
     try:
         tokens = get_valid_tokens()
-        if tokens and tokens[0] == token:
-            return  # 最新 token 未变, 无需操作
         if token in tokens:
-            tokens.remove(token)
+            return  # 已在历史里, 不写 session (GET 请求复用 token 时零开销)
         tokens.insert(0, token)
         session['_csrf_tokens'] = tokens[:CSRF_HISTORY_SIZE]
     except Exception:
