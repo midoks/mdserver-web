@@ -285,7 +285,7 @@ def confDlistErrorLog():
 def getUserListData():
     user = getServerDir() + "/user.txt"
     if not os.path.isfile(user):
-        os.system(r"touch {}".format(user))
+        open(user, 'a').close()
     res = mw.execShell("cat /etc/passwd > " + user)
     with open(user, "r") as fr:
         users = fr.readlines()
