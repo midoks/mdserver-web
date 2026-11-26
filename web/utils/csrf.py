@@ -15,6 +15,12 @@ from flask import request, make_response
 COOKIE_NAME = 'csrf_token'
 HEADER_NAME = 'X-CSRF-Token'
 
+# Cookie 过期时间(秒), 滑动续期: 每次响应刷新, 闲置超过此时间才失效
+CSRF_COOKIE_MAX_AGE = 1800  # 30 分钟(金融级)
+
+# 服务端在 session 里保留最近 N 个 token, 容忍并发 AJAX 的轮换竞态
+CSRF_HISTORY_SIZE = 3
+
 # 自动豁免的路径前缀 (GET/HEAD/OPTIONS 天然豁免, 这里处理 POST 豁免)
 EXEMPT_PREFIXES = (
     '/static/', '/favicon.ico', '/code', '/login',
@@ -41,26 +47,52 @@ def generate_token():
     return secrets.token_urlsafe(32)
 
 
+def get_valid_tokens():
+    """从 session 获取最近的有效 token 列表(金融级: 服务端历史窗口)"""
+    from flask import session
+    try:
+        tokens = session.get('_csrf_tokens', [])
+        return tokens if isinstance(tokens, list) else []
+    except Exception:
+        return []
+
+
+def push_token(token):
+    """把新 token 加入 session 历史, 保留最近 N 个. 重复 token 不重复 push."""
+    from flask import session
+    try:
+        tokens = get_valid_tokens()
+        if tokens and tokens[0] == token:
+            return  # 最新 token 未变, 无需操作
+        if token in tokens:
+            tokens.remove(token)
+        tokens.insert(0, token)
+        session['_csrf_tokens'] = tokens[:CSRF_HISTORY_SIZE]
+    except Exception:
+        pass
+
+
 def set_csrf_cookie(response, token=None):
-    """把 token 写入 cookie (httponly=False 让 JS 可读)"""
+    """把 token 写入 cookie (httponly=False 让 JS 可读), 带 max_age 滑动续期"""
     if token is None:
         token = generate_token()
     # secure 交给 __init__.py before_request 根据 SSL 配置决定
     try:
         response.set_cookie(
             COOKIE_NAME, token,
+            max_age=CSRF_COOKIE_MAX_AGE,
             httponly=False,       # 必须让 JS 能读, 才能放 header
             samesite='Lax',
             path='/',
         )
     except Exception:
         # 部分旧版 Werkzeug 参数不同, 降级
-        response.set_cookie(COOKIE_NAME, token, httponly=False)
+        response.set_cookie(COOKIE_NAME, token, max_age=CSRF_COOKIE_MAX_AGE, httponly=False)
     return token
 
 
 def verify_csrf(request_obj=None):
-    """校验请求的 CSRF token: cookie 与 header 必须相等. 相等返回 True, 否则 False"""
+    """金融级校验: 1) cookie == header  2) token 必须在服务端 session 历史里"""
     req = request_obj or request
     cookie_token = req.cookies.get(COOKIE_NAME, '')
     header_token = req.headers.get(HEADER_NAME, '')
@@ -72,9 +104,21 @@ def verify_csrf(request_obj=None):
     if not cookie_token or not header_token:
         return False
     try:
-        return secrets.compare_digest(cookie_token, header_token)
+        if not secrets.compare_digest(cookie_token, header_token):
+            return False
     except Exception:
         return False
+
+    # 金融级增强: token 必须在服务端有效历史里 (防伪造 + 防重放)
+    valid_tokens = get_valid_tokens()
+    if not valid_tokens:
+        # 首次请求 session 还没历史, 双提交模式兜底 (SameSite=Lax 已能挡跨站)
+        return True
+
+    for vt in valid_tokens:
+        if secrets.compare_digest(cookie_token, vt):
+            return True
+    return False
 
 
 def apply_csrf_before_request():

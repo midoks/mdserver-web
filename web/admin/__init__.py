@@ -175,18 +175,17 @@ def requestAfter(response):
     response.headers.setdefault('Referrer-Policy', 'strict-origin-when-cross-origin')
     response.headers.setdefault('Permissions-Policy', 'geolocation=(), microphone=(), camera=()')
 
-    # 首次响应时下发 csrf_token cookie (让前端后续 POST 能带上)
-    if csrf_mw.COOKIE_NAME not in request.cookies:
-        token = csrf_mw.generate_token()
-        try:
-            response.set_cookie(
-                csrf_mw.COOKIE_NAME, token,
-                httponly=False,
-                samesite='Lax',
-                path='/',
-            )
-        except Exception:
-            response.set_cookie(csrf_mw.COOKIE_NAME, token, httponly=False)
+    # csrf_token cookie 金融级策略:
+    #   危险方法(POST/PUT/PATCH/DELETE)成功后轮换 token, 防止 token 被长期复用
+    #   安全方法(GET 等)复用现有 token + 滑动续期
+    #   session 里保留最近 N 个 token, 容忍并发 AJAX 的轮换竞态
+    method = (request.method or 'GET').upper()
+    if method in ('POST', 'PUT', 'PATCH', 'DELETE'):
+        token = csrf_mw.generate_token()  # 危险请求后轮换
+    else:
+        token = request.cookies.get(csrf_mw.COOKIE_NAME) or csrf_mw.generate_token()
+    csrf_mw.push_token(token)
+    csrf_mw.set_csrf_cookie(response, token)
 
     return response
 
