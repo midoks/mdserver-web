@@ -221,7 +221,8 @@ def backupAllFunc(stype):
         args = "database " + name + " " + num
         cmd = 'python3 ' + mw.getPanelDir() + '/plugins/' + plugin_name + '/scripts/backup.py ' + args
 
-    os.system(cmd)
+    subprocess.run(cmd.split(),
+                   stdout=subprocess.PIPE, stderr=subprocess.PIPE)
 
     # 开始执行上传信息.
 

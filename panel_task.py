@@ -16,7 +16,9 @@ import sys
 import os
 import json
 import time
+import shutil
 import threading
+import subprocess
 import psutil
 
 
@@ -32,7 +34,7 @@ setup.init()
 
 g_log_file = mw.getPanelTaskExecLog()
 if not os.path.exists(g_log_file):
-    os.system("touch " + g_log_file)
+    open(g_log_file, 'a').close()
 
 def execShell(cmdstring, cwd=None, timeout=None, shell=True):
     cmd = cmdstring + ' > ' + g_log_file + ' 2>&1'
@@ -62,7 +64,11 @@ def downloadFile(url, filename):
         urllib.request.urlretrieve(url, filename=filename, reporthook=downloadHook)
 
         if not mw.isAppleSystem():
-            os.system('chown www.www ' + filename)
+            # 参数列表调用 chown, 避免文件名中的特殊字符被 shell 解释
+            chown = shutil.which('chown')
+            if chown:
+                subprocess.run([chown, 'www.www', '--', filename],
+                               stdout=subprocess.PIPE, stderr=subprocess.PIPE)
 
         writeLogs(filename + ' download success!')
     except Exception as e:
@@ -232,13 +238,16 @@ def startPHPVersion(version):
         pid = server_dir + '/php/' + version + '/var/run/php-fpm.pid'
         data = mw.execShell("ps -ef | grep php/" + version +" | grep -v grep|grep -v python |awk '{print $2}'")
         if data[0] != '':
-            os.system("ps -ef | grep php/" + version + " | grep -v grep|grep -v python |awk '{print $2}' | xargs kill ")
+            subprocess.run(["ps", "-ef", "|", "grep", "php/" + version, "|", "grep", "-v", "grep|grep", "-v", "python", "|", "awk", "'{print $2}'", "|", "xargs", "kill"],
+                           stdout=subprocess.PIPE, stderr=subprocess.PIPE)
         time.sleep(0.5)
         if not os.path.exists(cgi):
             os.system('rm -f ' + cgi)
         if not os.path.exists(pid):
-            os.system('rm -f ' + pid)
-        os.system(fpm + ' start')
+            subprocess.run(['rm', '-f', pid],
+                           stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+        subprocess.run([fpm', 'start'],
+                           stdout=subprocess.PIPE, stderr=subprocess.PIPE)
         if checkPHPVersion(version):
             return True
 

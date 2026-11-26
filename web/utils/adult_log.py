@@ -137,7 +137,7 @@ def parseAuditFile(log_name, result):
 def getAuditLast(log_name):
     # 获取日志
     cmd = '''LANG=en_US.UTF-8 last -n 200 -x -f {} |grep -v 127.0.0.1|grep -v " begins"'''.format(
-        '/var/log/' + log_name)
+        mw.quote('/var/log/' + log_name))
     result = mw.execShell(cmd)
     lastlog_list = []
     for _line in result[0].split("\n"):
@@ -271,7 +271,7 @@ def getAuditLogsName(log_name):
 
     if log_name.find('sa/sa') == 0:
         if log_name.find('sa/sar') == -1:
-            return mw.execShell("sar -f /var/log/{}".format(log_name))[0]
+            return mw.execShell("sar -f " + mw.quote('/var/log/' + log_name))[0]
     log_dir = '/var/log'
     log_file = log_dir + '/' + log_name
     if not os.path.exists(log_file):

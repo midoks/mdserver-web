@@ -408,10 +408,13 @@ def getPhpinfo(version):
     root_dir = mw.getFatherDir() + '/phpinfo'
 
     mw.execShell("rm -rf " + root_dir)
+    subprocess.run(['rm', '-rf', root_dir],
+                   stdout=subprocess.PIPE, stderr=subprocess.PIPE)
     mw.execShell("mkdir -p " + root_dir)
     mw.writeFile(root_dir + '/phpinfo.php', '<?php phpinfo(); ?>')
     sock_data = mw.requestFcgiPHP(sock_file, '/phpinfo.php', root_dir)
-    os.system("rm -rf " + root_dir)
+    subprocess.run(['rm', '-rf', root_dir],
+                   stdout=subprocess.PIPE, stderr=subprocess.PIPE)
     phpinfo = str(sock_data, encoding='utf-8')
     return phpinfo
 
@@ -469,11 +472,11 @@ def installLib(version):
         return data[1]
 
     name = args['name']
-    cmd = "cd " + getPluginDir() + "/versions && /bin/bash  common.sh " + version + ' install ' + name
+    cmd = "cd " + mw.quote(getPluginDir() + "/versions") + " && /bin/bash  common.sh " + mw.quote(version) + ' install ' + mw.quote(name)
     print(cmd)
     install_name = '安装[' + name + '-' + version + ']'
     import thisdb
-    thisdb.addTask(name=install_name,cmd=cmd)
+    thisdb.addTask(name=install_name,cmd=mw.quote(cmd))
 
     mw.triggerTask()
     return mw.returnJson(True, '已将下载任务添加到队列!')
@@ -486,9 +489,9 @@ def uninstallLib(version):
         return data[1]
 
     name = args['name']
-    execstr = "cd " + getPluginDir() + "/versions && /bin/bash  common.sh " + version + ' uninstall ' + name
-
-    data = mw.execShell(execstr)
+    execstr = "cd " + mw.quote(getPluginDir() + "/versions") + " && /bin/bash  common.sh " + mw.quote(version) + ' uninstall ' + mw.quote(name)
+    subprocess.run(execstr.split(),
+                   subprocess.PIPE, stderr=subprocess.PIPE)
     # data[0] == '' and
     if data[1] == '':
         return mw.returnJson(True, '已经卸载成功!')

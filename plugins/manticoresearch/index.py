@@ -519,7 +519,8 @@ def updateAll():
     fixIndexOwner()
     for x in range(len(index)):
         cmd_index = cmd + ' ' + index[x]['index'] + ' --rotate'
-        subprocess.run(asManticore(cmd_index), shell=True)
+        subprocess.run(asManticore(cmd_index).split(),
+                       stdout=subprocess.PIPE, stderr=subprocess.PIPE)
         print(cmd_index)
 
     return ''

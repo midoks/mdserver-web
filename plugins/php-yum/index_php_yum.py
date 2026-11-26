@@ -100,10 +100,13 @@ def getPhpinfo(version):
     root_dir = mw.getFatherDir() + '/phpinfo'
 
     mw.execShell("rm -rf " + root_dir)
+    subprocess.run(['rm', '-rf', root_dir],
+                   stdout=subprocess.PIPE, stderr=subprocess.PIPE)
     mw.execShell("mkdir -p " + root_dir)
     mw.writeFile(root_dir + '/phpinfo.php', '<?php phpinfo(); ?>')
     sock_data = mw.requestFcgiPHP(sock_file, '/phpinfo.php', root_dir)
-    os.system("rm -rf " + root_dir)
+    subprocess.run(['rm', '-rf', root_dir],
+                   stdout=subprocess.PIPE, stderr=subprocess.PIPE)
     phpinfo = str(sock_data, encoding='utf-8')
     return phpinfo
 

@@ -148,7 +148,8 @@ def initDreplace():
         se_content = mw.readFile(systemServiceTpl)
         se_content = se_content.replace('{$SERVER_PATH}', service_path)
         mw.writeFile(systemService, se_content)
-        mw.execShell('systemctl daemon-reload')
+        subprocess.run(["systemctl", "daemon-reload"],
+                       stdout=subprocess.PIPE, stderr=subprocess.PIPE)
 
     return file_bin
 
@@ -159,20 +160,22 @@ def haOp(method):
     # check config
     sdir = getServerDir()
     cmd_check = sdir+'/sbin/haproxy -c -f ' + sdir + '/haproxy.conf'
-    chk_data = mw.execShell(cmd_check)
-    if chk_data[1]!= '':
-        return chk_data[1]
+    chk_data = subprocess.run(cmd_check.split(),
+                              stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+    if chk_data.stderr.decode('utf-8').strip() != '':
+        return chk_data.stderr.decode('utf-8').strip()
 
     if not mw.isAppleSystem():
-        data = mw.execShell('systemctl ' + method + ' haproxy')
-        if data[1] == '':
+        data = subprocess.run(["systemctl", method, "haproxy"],
+                              stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+        if data.stdout.decode('utf-8').strip() == '':
             return 'ok'
         return 'fail'
-
-    data = mw.execShell(file + ' ' + method)
-    if data[1] == '':
+    data = subprocess.run([file, method],
+                          stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+    if data.stdout == b'':
         return 'ok'
-    return data[1]
+    return data.stderr.decode('utf-8').strip()
 
 
 def start():
@@ -194,10 +197,10 @@ def reload():
 def initdStatus():
     if mw.isAppleSystem():
         return "Apple Computer does not support"
-
     shell_cmd = 'systemctl status haproxy | grep loaded | grep "enabled;"'
-    data = mw.execShell(shell_cmd)
-    if data[0] == '':
+    data = subprocess.run(shell_cmd.split(),
+                          stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+    if data.stdout == b'':
         return 'fail'
     return 'ok'
 
@@ -206,7 +209,8 @@ def initdInstall():
     if mw.isAppleSystem():
         return "Apple Computer does not support"
 
-    mw.execShell('systemctl enable haproxy')
+    subprocess.run(["systemctl", "enable", "haproxy"],
+                   stdout=subprocess.PIPE, stderr=subprocess.PIPE)
     return 'ok'
 
 
@@ -214,7 +218,8 @@ def initdUinstall():
     if mw.isAppleSystem():
         return "Apple Computer does not support"
 
-    mw.execShell('systemctl disable haproxy')
+    subprocess.run(["systemctl", "disable", "haproxy"],
+                   stdout=subprocess.PIPE, stderr=subprocess.PIPE)
     return 'ok'
 
 

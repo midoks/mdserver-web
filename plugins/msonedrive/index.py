@@ -272,7 +272,8 @@ def backupAllFunc(stype):
         name = os.path.basename(name)
 
     # print("cmd:", cmd)
-    os.system(cmd)
+    subprocess.run(cmd.split(),
+                   stdout=subprocess.PIPE, stderr=subprocess.PIPE)
 
     # 开始执行上传信息.
     if stype.find('database_') > -1:

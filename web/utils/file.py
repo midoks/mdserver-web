@@ -59,11 +59,14 @@ def uploadSegment(path,name,size,start,dir_mode,file_mode,b64_data,upload_files)
     new_name = os.path.join(path, name)
     if os.path.exists(new_name):
         if new_name.find('.user.ini') != -1:
-            mw.execShell("chattr -i " + new_name)
+            chattr = shutil.which('chattr')
+            if chattr:
+                subprocess.run([chattr, '-i', '--', new_name],
+                               stdout=subprocess.PIPE, stderr=subprocess.PIPE)
         try:
             os.remove(new_name)
         except:
-            mw.execShell("rm -f %s" % new_name)
+            mw.execShell("rm -f " + mw.quote(new_name))
 
     os.renames(save_path, new_name)
 
@@ -115,14 +118,14 @@ def unzip(sfile, dfile, stype, path):
     try:
         tmps = mw.getPanelDir() + '/logs/panel_exec.log'
         if stype == 'zip':
-            mw.execShell("cd " + path + " && unzip -o -d '" + dfile +"' '" + sfile + "' > " + tmps + " 2>&1 &")
+            mw.execShell("cd " + mw.quote(path) + " && unzip -o -d " + mw.quote(dfile) + " " + mw.quote(sfile) + " > " + mw.quote(tmps) + " 2>&1 &")
         else:
             sfiles = ''
             for sfile in sfile.split(','):
                 if not sfile:
                     continue
-                sfiles += " '" + sfile + "'"
-            mw.execShell("cd " + path + " && tar -zxvf " + sfiles +" -C " + dfile + " > " + tmps + " 2>&1 &")
+                sfiles += " " + mw.quote(sfile)
+            mw.execShell("cd " + mw.quote(path) + " && tar -zxvf " + sfiles + " -C " + mw.quote(dfile) + " > " + mw.quote(tmps) + " 2>&1 &")
 
         if os.path.exists(dfile):
             if dfile.startswith("/www/wwwroot"):
@@ -158,32 +161,32 @@ def uncompress(sfile, dfile, path):
         return mw.returnData(False, '7z解压命令不存在，请安装!')
 
 
-    cmd = "cd " + path + " "
+    cmd = "cd " + mw.quote(path) + " "
     try:
         tmps = mw.getPanelDir() + '/logs/panel_exec.log'
         if extension == 'zip':
-            cmd += "&& unzip -o -d '" + dfile + "' '" + sfile + "' > " + tmps + " 2>&1 &"
+            cmd += "&& unzip -o -d " + mw.quote(dfile) + " " + mw.quote(sfile) + " > " + mw.quote(tmps) + " 2>&1 &"
             mw.execShell(cmd)
         elif extension == 'tar.gz':
-            cmd += "&& tar -zxvf " + sfile + " -C " + dfile + " > " + tmps + " 2>&1 &"
+            cmd += "&& tar -zxvf " + mw.quote(sfile) + " -C " + mw.quote(dfile) + " > " + mw.quote(tmps) + " 2>&1 &"
             mw.execShell(cmd)
         elif extension == 'tgz':
-            cmd += "&& tar -zxvf " + sfile + " -C " + dfile + " > " + tmps + " 2>&1 &"
+            cmd += "&& tar -zxvf " + mw.quote(sfile) + " -C " + mw.quote(dfile) + " > " + mw.quote(tmps) + " 2>&1 &"
             mw.execShell(cmd)
         elif extension == 'gz':
-            cmd += "&& gunzip -k " + sfile + " > " + tmps + " 2>&1 &"
+            cmd += "&& gunzip -k " + mw.quote(sfile) + " > " + mw.quote(tmps) + " 2>&1 &"
             mw.execShell(cmd)
         elif extension == 'rar':
-            cmd += "&& unrar x " + sfile + " " + dfile + " > " + tmps + " 2>&1 &"
+            cmd += "&& unrar x " + mw.quote(sfile) + " " + mw.quote(dfile) + " > " + mw.quote(tmps) + " 2>&1 &"
             mw.execShell(cmd)
         elif extension == '7z':
-            cmd += "&& 7z x " + sfile + " -r -o" + dfile + " > " + tmps + " 2>&1 &"
+            cmd += "&& 7z x " + mw.quote(sfile) + " -r -o" + mw.quote(dfile) + " > " + mw.quote(tmps) + " 2>&1 &"
             mw.execShell(cmd)
         elif extension == 'xz':
-            cmd += "&& tar -Jxvf " + sfile + " -C " + dfile + " > " + tmps + " 2>&1 &"
+            cmd += "&& tar -Jxvf " + mw.quote(sfile) + " -C " + mw.quote(dfile) + " > " + mw.quote(tmps) + " 2>&1 &"
             mw.execShell(cmd)
         elif extension == 'bz2':
-            cmd += "&& tar -xjvf " + sfile + " -C " + dfile + " > " + tmps + " 2>&1 &"
+            cmd += "&& tar -xjvf " + mw.quote(sfile) + " -C " + mw.quote(dfile) + " > " + mw.quote(tmps) + " 2>&1 &"
             mw.execShell(cmd)
 
         if os.path.exists(dfile):
@@ -314,27 +317,27 @@ def zip(sfile, dfile, stype, path):
     tmps = mw.getPanelDir() + '/logs/panel_exec.log'
     if sfile.find(',') == -1:
         if stype == 'zip':
-            mw.execShell("cd '" + path + "' && zip '" + dfile + "' -r '" + sfile + "' > " + tmps + " 2>&1")
+            mw.execShell("cd " + mw.quote(path) + " && zip " + mw.quote(dfile) + " -r " + mw.quote(sfile) + " > " + mw.quote(tmps) + " 2>&1")
         elif stype == '7z':
             if not mw.checkBinExist('7z'):
                 return mw.returnData(False, '7z压缩命令不存在，请安装!')
-            mw.execShell("cd '" + path + "' && 7z a '" + dfile + "' -r '" + sfile + "' > " + tmps + " 2>&1")
+            mw.execShell("cd " + mw.quote(path) + " && 7z a " + mw.quote(dfile) + " -r " + mw.quote(sfile) + " > " + mw.quote(tmps) + " 2>&1")
         elif stype == 'tar_gz':
-            mw.execShell("cd '" + path + "' && tar -zcvf '" + dfile + "' " + sfile + " > " + tmps + " 2>&1")
+            mw.execShell("cd " + mw.quote(path) + " && tar -zcvf " + mw.quote(dfile) + " " + mw.quote(sfile) + " > " + mw.quote(tmps) + " 2>&1")
         elif stype == 'xz':
             # if not mw.checkBinExist('xz'):
             #     return mw.returnData(False, 'xz压缩命令不存在，请安装!')
             # dfile = dfile.strip(".xz")
             # cmd = "cd '" + path + "' && tar -cvf '" + dfile + ".tar' " + sfile + " && xz -z '" + dfile + ".tar' > " + tmps + " 2>&1 &"
-            cmd = "cd '" + path + "' && tar -cJf '" + dfile + "' " + sfile + " > " + tmps + " 2>&1"
+            cmd = "cd " + mw.quote(path) + " && tar -cJf " + mw.quote(dfile) + " " + mw.quote(sfile) + " > " + mw.quote(tmps) + " 2>&1"
             # print(cmd)
             mw.execShell(cmd)
         elif stype == 'rar':
             if not mw.checkBinExist('rar'):
                 return mw.returnData(False, 'rar压缩命令不存在，请安装!')
-            mw.execShell("cd '" + path + "' && rar a '" + dfile + "' '" + sfile + "' > " + tmps + " 2>&1")
+            mw.execShell("cd " + mw.quote(path) + " && rar a " + mw.quote(dfile) + " " + mw.quote(sfile) + " > " + mw.quote(tmps) + " 2>&1")
         elif stype == 'bz2':
-            mw.execShell("cd '" + path + "' && tar -cjvf '" + dfile + "' " + sfile + " > " + tmps + " 2>&1")
+            mw.execShell("cd " + mw.quote(path) + " && tar -cjvf " + mw.quote(dfile) + " " + mw.quote(sfile) + " > " + mw.quote(tmps) + " 2>&1")
         else:
             return mw.returnData(False, '未知压缩格式')
         mw.writeLog("文件管理", '文件[{1}]压缩[{2}]成功!', (sfile, dfile))
@@ -345,23 +348,23 @@ def zip(sfile, dfile, stype, path):
                 continue
             if not os.path.exists(sfile):
                 return mw.returnData(False, '指定文件不存在!')
-            
-            sfiles += " '" + sfile.replace(path+'/','') + "'"
+
+            sfiles += " " + mw.quote(sfile.replace(path+'/',''))
 
         if stype == 'zip':
-            mw.execShell("cd '" + path + "' && zip '" + dfile + "' -r " + sfiles + " > " + tmps + " 2>&1")
+            mw.execShell("cd " + mw.quote(path) + " && zip " + mw.quote(dfile) + " -r " + sfiles + " > " + mw.quote(tmps) + " 2>&1")
         elif stype == '7z':
             if not mw.checkBinExist('7z'):
                 return mw.returnData(False, '7z压缩命令不存在，请安装!')
-            mw.execShell("cd '" + path + "' && 7z a '" + dfile + "' -r " + sfiles + " > " + tmps + " 2>&1")
+            mw.execShell("cd " + mw.quote(path) + " && 7z a " + mw.quote(dfile) + " -r " + sfiles + " > " + mw.quote(tmps) + " 2>&1")
         elif stype == 'tar_gz':
-            mw.execShell("cd '" + path + "' && tar -zcvf '" + dfile + "' " + sfiles + " > " + tmps + " 2>&1")
+            mw.execShell("cd " + mw.quote(path) + " && tar -zcvf " + mw.quote(dfile) + " " + sfiles + " > " + mw.quote(tmps) + " 2>&1")
         elif stype == 'rar':
             if not mw.checkBinExist('rar'):
                 return mw.returnData(False, 'rar压缩命令不存在，请安装!')
-            mw.execShell("cd '" + path + "' && rar a '" + dfile + "' " + sfiles + " > " + tmps + " 2>&1")
+            mw.execShell("cd " + mw.quote(path) + " && rar a " + mw.quote(dfile) + " " + sfiles + " > " + mw.quote(tmps) + " 2>&1")
         elif stype == 'bz2':
-            mw.execShell("cd '" + path + "' && tar -cjvf '" + dfile + "' " + sfiles + " > " + tmps + " 2>&1")
+            mw.execShell("cd " + mw.quote(path) + " && tar -cjvf " + mw.quote(dfile) + " " + sfiles + " > " + mw.quote(tmps) + " 2>&1")
         else:
             return mw.returnData(False, '未知压缩格式')
 
@@ -725,7 +728,7 @@ def getDirSize(filePath, size=0):
 
 # 获取目录大小(bash)
 def getDirSizeByBash(path):
-    tmp = mw.execShell('du -sh ' + path)
+    tmp = mw.execShell('du -sh ' + mw.quote(path))
     return tmp[0].split()[0].lower()
 
 # 计算文件数量
@@ -811,8 +814,10 @@ def fileDelete(path):
 
     # 检查是否为.user.ini
     if path.find('.user.ini') >= 0:
-        cmd = "which chattr && chattr -i {0}".format(path)
-        mw.execShell(cmd)
+        chattr = shutil.which('chattr')
+        if chattr:
+            subprocess.run([chattr, '-i', '--', path],
+                           stdout=subprocess.PIPE, stderr=subprocess.PIPE)
 
     try:
         recycle_bin = thisdb.getOption('recycle_bin')
@@ -841,7 +846,7 @@ def dirDelete(path):
         if recycle_bin == 'open':
             if mvRecycleBin(path):
                 return mw.returnData(True, '已将文件移动到回收站!')
-        mw.execShell('rm -rf ' + path)
+        mw.execShell('rm -rf ' + mw.quote(path))
         mw.writeLog('文件管理', '删除{1}成功！', (path,))
         return mw.returnData(True, '删除文件成功!')
     except:
