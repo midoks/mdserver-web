@@ -68,7 +68,13 @@ app.jinja_env.trim_blocks = True
 
 # session配置
 # app.secret_key = uuid.UUID(int=uuid.getnode()).hex[-12:]
-app.config['SECRET_KEY'] = secrets.token_hex(24)
+secrets_token = thisdb.getOption('secret_key')
+if secrets_token and secrets_token != '':
+    app.config['SECRET_KEY'] = secrets_token
+else:
+    token_hex = secrets.token_hex(24)
+    app.config['SECRET_KEY'] = token_hex
+    thisdb.setOption('secret_key', token_hex)
 
 # app.config['sessions'] = dict()
 app.config['SESSION_PERMANENT'] = True

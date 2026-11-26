@@ -9,9 +9,11 @@
 # ---------------------------------------------------------------------------------
 
 import json
+import secrets
 
 import core.mw as mw
 import thisdb
+
 
 def init_option():
     thisdb.setOption('title', '夸父面板')
@@ -62,6 +64,8 @@ def init_option():
     # 默认站点目录
     thisdb.setOption('site_path', mw.getFatherDir()+'/wwwroot')
 
+    # SECRET_KEY
+    thisdb.setOption('secret_key', secrets.token_hex(24))
 
     # 异步邮件通知
     thisdb.setOption('notify_email', json.dumps({'open':False}), type='notify')

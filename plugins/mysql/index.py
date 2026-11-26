@@ -375,6 +375,7 @@ def setBinlog(version = ''):
         mw.execShell('sync')
         restart(version)
     else:
+        path = getDataDir()
         con = con.replace('log-bin=mysql-bin', '#log-bin=mysql-bin')
         con = con.replace('binlog_format=mixed', '#binlog_format=mixed')
 
