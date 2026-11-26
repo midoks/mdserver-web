@@ -206,9 +206,9 @@ def setBatchData(path, stype, access, user, data):
         }
         return mw.returnData(True, '标记成功,请在目标目录点击粘贴所有按钮!')
     elif stype == '3':
-        if not isValidAccessMode(access):
+        if not mw.isValidAccessMode(access):
             return mw.returnData(False, '权限值不合法, 仅支持 3~4 位八进制数字!')
-        if not isValidUserName(user):
+        if not mw.isValidUserName(user):
             return mw.returnData(False, '用户名不合法!')
 
         for key in json.loads(data):
@@ -753,14 +753,7 @@ def getAccess(fname):
         data['chown'] = 'www'
     return data
 
-# 权限位与属主参数校验: 只允许合法值, 防止参数被拼进 shell 命令
-def isValidAccessMode(access):
-    return re.fullmatch(r'[0-7]{3,4}', access or '') is not None
-
-def isValidUserName(user):
-    # 允许 Debian-exim、user.name 等真实系统用户名, 但禁止空白与 shell 元字符
-    return re.fullmatch(r'[A-Za-z0-9_][A-Za-z0-9_.-]{0,63}', user or '') is not None
-
+# 权限位与属主参数校验已统一放在 core.mw, 这里只保留执行封装
 def setFileModeOwner(filename, access, user, recursive=True):
     """用参数列表执行 chmod/chown, 不经过 shell, 返回 (是否成功, 错误信息)"""
     args = ['-R'] if recursive else []
@@ -781,9 +774,9 @@ def setFileAccess(filename,user,access):
         if not checkDir(filename):
             return mw.returnData(False, '请不要花样作死')
 
-        if not isValidAccessMode(access):
+        if not mw.isValidAccessMode(access):
             return mw.returnData(False, '权限值不合法, 仅支持 3~4 位八进制数字!')
-        if not isValidUserName(user):
+        if not mw.isValidUserName(user):
             return mw.returnData(False, '用户名不合法!')
 
         if not os.path.exists(filename):
