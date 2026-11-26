@@ -49,8 +49,11 @@ app = Flask(__name__, template_folder='templates/default')
 
 
 # curl --compressed -I "http://127.0.0.1:44010/" -H "Accept-Encoding: br" --write-out "%{json}"
-app.config["COMPRESS_ALGORITHM"] = ["br", "zstd", "gzip", "deflate"]
-app.config["COMPRESS_LEVEL"] = 9  # 最高压缩级别
+# 压缩算法优先级: gzip 最快, br 压缩率最高但慢, 大数据场景速度比压缩率更重要
+app.config["COMPRESS_ALGORITHM"] = ["gzip", "zstd", "br", "deflate"]
+# 压缩级别 4: brotli 默认推荐档, gzip 中档, 兼顾压缩率和速度
+# 之前设为 9 (最高级别), 1MB JSON 需要 500-700ms 压缩时间, 严重拖慢动态接口
+app.config["COMPRESS_LEVEL"] = 4
 app.config["COMPRESS_MIN_SIZE"] = 500  # 最小压缩大小
 Compress(app)
 
