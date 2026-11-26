@@ -121,7 +121,8 @@ def requestCheck():
     request.start_time = time.time()
 
     # 静态文件直接放行, 不做任何 DB 查询和 CSRF 处理 (性能优化)
-    if request.path.startswith('/static/'):
+    # /plugins/file 是插件静态资源服务, 同样跳过
+    if request.path.startswith('/static/') or request.path == '/plugins/file':
         return
 
     # 动态决定 session cookie 是否 secure (面板开了 SSL 就强制 secure)
@@ -179,7 +180,8 @@ def requestAfter(response):
         response.headers['X-Response-Time'] = round(time.time() - request.start_time, 4)
 
     # 静态文件: 只加最基本的安全头, 跳过 CSRF cookie 处理 (性能优化)
-    if request.path.startswith('/static/'):
+    # /plugins/file 是插件静态资源, 同样跳过
+    if request.path.startswith('/static/') or request.path == '/plugins/file':
         response.headers.setdefault('X-Content-Type-Options', 'nosniff')
         return response
 
