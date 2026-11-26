@@ -923,7 +923,20 @@ class plugin(object):
         if version != '':
             cmd.append(version)
         if args != '':
-            cmd.append(args)
+            # 插件的老式 getArgs() 只认 'key:value' argv 列表, 不认整个 JSON 字符串
+            # 把 JSON dict 拆成 key:value 列表, 让插件无需修改即可继续工作
+            parsed_args = None
+            try:
+                obj = json.loads(args)
+                if isinstance(obj, dict):
+                    parsed_args = ['%s:%s' % (k, v) for k, v in obj.items()]
+            except (ValueError, TypeError):
+                pass
+            if parsed_args is not None:
+                cmd.extend(parsed_args)
+            else:
+                # 非 JSON 字符串(老格式或简单字符串)原样传
+                cmd.append(args)
 
         env = os.environ.copy()
         if os.path.exists(panel_dir + "/bin/activate"):

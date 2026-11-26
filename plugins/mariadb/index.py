@@ -47,31 +47,6 @@ def getInitDFile():
     return '/etc/init.d/' + getPluginName()
 
 
-def getArgs():
-    args = sys.argv[2:]
-    tmp = {}
-    args_len = len(args)
-
-    if args_len == 1:
-        t = args[0].strip('{').strip('}').strip()
-        if (t == ''):
-            return tmp
-        t = t.split(':')
-        tmp[t[0]] = t[1]
-    elif args_len > 1:
-        for i in range(len(args)):
-            t = args[i].split(':')
-            tmp[t[0]] = t[1]
-    return tmp
-
-
-def checkArgs(data, ck=[]):
-    for i in range(len(ck)):
-        if not ck[i] in data:
-            return (False, mw.returnJson(False, '参数:(' + ck[i] + ')没有!'))
-    return (True, mw.returnJson(True, 'ok'))
-
-
 def getBackupDir():
     bk_path = mw.getBackupDir() + "/database/mariadb"
     if not os.path.isdir(bk_path):
@@ -276,7 +251,7 @@ def status(version=''):
 
 
 def binLog():
-    args = getArgs()
+    args = mw.getPluginArgs()
     conf = getConf()
     con = mw.readFile(conf)
 
@@ -309,8 +284,8 @@ def binLog():
     return mw.returnJson(True, '设置成功!')
 
 def binLogList():
-    args = getArgs()
-    data = checkArgs(args, ['page', 'page_size', 'tojs'])
+    args = mw.getPluginArgs()
+    data = mw.checkPluginArgs(args, ['page', 'page_size', 'tojs'])
     if not data[0]:
         return data[1]
 
@@ -364,7 +339,7 @@ def cleanBinLog():
 
 
 def getErrorLog():
-    args = getArgs()
+    args = mw.getPluginArgs()
     path = getDataDir()
     filename = ''
     for n in os.listdir(path):
@@ -606,8 +581,8 @@ def getMyDbPos():
 
 
 def setMyDbPos():
-    args = getArgs()
-    data = checkArgs(args, ['datadir'])
+    args = mw.getPluginArgs()
+    data = mw.checkPluginArgs(args, ['datadir'])
     if not data[0]:
         return data[1]
 
@@ -655,8 +630,8 @@ def getMyPort():
 
 
 def setMyPort():
-    args = getArgs()
-    data = checkArgs(args, ['port'])
+    args = mw.getPluginArgs()
+    data = mw.checkPluginArgs(args, ['port'])
     if not data[0]:
         return data[1]
 
@@ -736,7 +711,7 @@ def setDbStatus():
     gets = ['key_buffer_size', 'tmp_table_size', 'max_heap_table_size', 'innodb_buffer_pool_size', 'innodb_log_buffer_size', 'max_connections',
             'table_open_cache', 'thread_cache_size', 'sort_buffer_size', 'read_buffer_size', 'read_rnd_buffer_size', 'join_buffer_size', 'thread_stack', 'binlog_cache_size']
     emptys = ['max_connections', 'thread_cache_size', 'table_open_cache']
-    args = getArgs()
+    args = mw.getPluginArgs()
     conFile = getConf()
     content = mw.readFile(conFile)
     n = 0
@@ -827,8 +802,8 @@ def getDbBackupListFunc(dbname=''):
 
 
 def setDbBackup():
-    args = getArgs()
-    data = checkArgs(args, ['name'])
+    args = mw.getPluginArgs()
+    data = mw.checkPluginArgs(args, ['name'])
     if not data[0]:
         return data[1]
 
@@ -839,8 +814,8 @@ def setDbBackup():
 
 
 def importDbBackup():
-    args = getArgs()
-    data = checkArgs(args, ['file', 'name'])
+    args = mw.getPluginArgs()
+    data = mw.checkPluginArgs(args, ['file', 'name'])
     if not data[0]:
         return data[1]
 
@@ -864,8 +839,8 @@ def importDbBackup():
     return mw.returnJson(True, 'ok')
 
 def importDbBackupProgress():
-    args = getArgs()
-    data = checkArgs(args, ['file', 'name'])
+    args = mw.getPluginArgs()
+    data = mw.checkPluginArgs(args, ['file', 'name'])
     if not data[0]:
         return data[1]
 
@@ -877,8 +852,8 @@ def importDbBackupProgress():
     return mw.returnJson(True, 'ok',cmd)
 
 def importDbBackupProgressBar():
-    args = getArgs()
-    data = checkArgs(args, ['file', 'name'])
+    args = mw.getPluginArgs()
+    data = mw.checkPluginArgs(args, ['file', 'name'])
     if not data[0]:
         return data[1]
 
@@ -915,8 +890,8 @@ def rootPwd():
 # python3 plugins/mariadb/index.py import_db_external {"file":"xx.sql","name":"demo1"}
 # python3 plugins/mariadb/index.py import_db_external {"file":"db_demo1_20231221_203614 2.sql","name":"demo1"}
 def importDbExternal():
-    args = getArgs()
-    data = checkArgs(args, ['file', 'name'])
+    args = mw.getPluginArgs()
+    data = mw.checkPluginArgs(args, ['file', 'name'])
     if not data[0]:
         return data[1]
 
@@ -982,8 +957,8 @@ def importDbExternal():
     return mw.returnJson(True, 'ok')
 
 def importDbExternalProgress():
-    args = getArgs()
-    data = checkArgs(args, ['file', 'name'])
+    args = mw.getPluginArgs()
+    data = mw.checkPluginArgs(args, ['file', 'name'])
     if not data[0]:
         return data[1]
 
@@ -995,8 +970,8 @@ def importDbExternalProgress():
     return mw.returnJson(True, 'ok',cmd)
 
 def importDbExternalProgressBar():
-    args = getArgs()
-    data = checkArgs(args, ['file', 'name'])
+    args = mw.getPluginArgs()
+    data = mw.checkPluginArgs(args, ['file', 'name'])
     if not data[0]:
         return data[1]
 
@@ -1058,8 +1033,8 @@ def importDbExternalProgressBar():
 
 
 def deleteDbBackup():
-    args = getArgs()
-    data = checkArgs(args, ['filename', 'path'])
+    args = mw.getPluginArgs()
+    data = mw.checkPluginArgs(args, ['filename', 'path'])
     if not data[0]:
         return data[1]
 
@@ -1074,8 +1049,8 @@ def deleteDbBackup():
 
 
 def getDbBackupList():
-    args = getArgs()
-    data = checkArgs(args, ['name'])
+    args = mw.getPluginArgs()
+    data = mw.checkPluginArgs(args, ['name'])
     if not data[0]:
         return data[1]
 
@@ -1139,7 +1114,7 @@ def getDbBackupImportList():
 
 
 def getDbList():
-    args = getArgs()
+    args = mw.getPluginArgs()
     page = 1
     page_size = 10
     search = ''
@@ -1187,7 +1162,7 @@ def getDbList():
     return mw.getJson(data)
 
 def getTableList():
-    args = getArgs()
+    args = mw.getPluginArgs()
     db_name = ""
     if 'dbname' in args:
         db_name = args['dbname']
@@ -1283,8 +1258,8 @@ def toDbBase(find):
 
 
 def syncToDatabases():
-    args = getArgs()
-    data = checkArgs(args, ['type', 'ids'])
+    args = mw.getPluginArgs()
+    data = mw.checkPluginArgs(args, ['type', 'ids'])
     if not data[0]:
         return data[1]
 
@@ -1359,8 +1334,8 @@ def setRootPwdForce(new_password, version=''):
 
 
 def setRootPwd(version=''):
-    args = getArgs()
-    data = checkArgs(args, ['password'])
+    args = mw.getPluginArgs()
+    data = mw.checkPluginArgs(args, ['password'])
     if not data[0]:
         return data[1]
 
@@ -1407,8 +1382,8 @@ def setRootPwd(version=''):
 
 
 def setUserPwd(version=''):
-    args = getArgs()
-    data = checkArgs(args, ['password', 'name', 'id'])
+    args = mw.getPluginArgs()
+    data = mw.checkPluginArgs(args, ['password', 'name', 'id'])
     if not data[0]:
         return data[1]
 
@@ -1458,8 +1433,8 @@ def setUserPwd(version=''):
 
 
 def setDbPs():
-    args = getArgs()
-    data = checkArgs(args, ['id', 'name', 'ps'])
+    args = mw.getPluginArgs()
+    data = mw.checkPluginArgs(args, ['id', 'name', 'ps'])
     if not data[0]:
         return data[1]
 
@@ -1475,8 +1450,8 @@ def setDbPs():
 
 
 def addDb():
-    args = getArgs()
-    data = checkArgs(args,
+    args = mw.getPluginArgs()
+    data = mw.checkPluginArgs(args,
                      ['password', 'name', 'codeing', 'db_user', 'dataAccess', 'ps'])
     if not data[0]:
         return data[1]
@@ -1544,8 +1519,8 @@ def addDb():
 
 
 def delDb():
-    args = getArgs()
-    data = checkArgs(args, ['id', 'name'])
+    args = mw.getPluginArgs()
+    data = mw.checkPluginArgs(args, ['id', 'name'])
     if not data[0]:
         return data[1]
     try:
@@ -1634,8 +1609,8 @@ def getDbUserAccessDiff(db_access, input_access):
     return {"add":add,"delete":delete}
 
 def getDbAccess():
-    args = getArgs()
-    data = checkArgs(args, ['username'])
+    args = mw.getPluginArgs()
+    data = mw.checkPluginArgs(args, ['username'])
     if not data[0]:
         return data[1]
     username = args['username']
@@ -1686,8 +1661,8 @@ def setDbAccessByArgs(username,access):
     return True
 
 def setDbAccess():
-    args = getArgs()
-    data = checkArgs(args, ['username', 'access'])
+    args = mw.getPluginArgs()
+    data = mw.checkPluginArgs(args, ['username', 'access'])
     if not data[0]:
         return data[1]
     username = args['username']
@@ -1760,8 +1735,8 @@ def fixDbAccess(version):
 
 
 def setDbRw(version=''):
-    args = getArgs()
-    data = checkArgs(args, ['username', 'id', 'rw'])
+    args = mw.getPluginArgs()
+    data = mw.checkPluginArgs(args, ['username', 'id', 'rw'])
     if not data[0]:
         return data[1]
 
@@ -1807,8 +1782,8 @@ def setDbRw(version=''):
 
 
 def getDbInfo():
-    args = getArgs()
-    data = checkArgs(args, ['name'])
+    args = mw.getPluginArgs()
+    data = mw.checkPluginArgs(args, ['name'])
     if not data[0]:
         return data[1]
 
@@ -1869,8 +1844,8 @@ def getDbInfo():
 
 
 def repairTable():
-    args = getArgs()
-    data = checkArgs(args, ['db_name', 'tables'])
+    args = mw.getPluginArgs()
+    data = mw.checkPluginArgs(args, ['db_name', 'tables'])
     if not data[0]:
         return data[1]
 
@@ -1897,8 +1872,8 @@ def repairTable():
 
 
 def optTable():
-    args = getArgs()
-    data = checkArgs(args, ['db_name', 'tables'])
+    args = mw.getPluginArgs()
+    data = mw.checkPluginArgs(args, ['db_name', 'tables'])
     if not data[0]:
         return data[1]
 
@@ -1924,8 +1899,8 @@ def optTable():
 
 
 def alterTable():
-    args = getArgs()
-    data = checkArgs(args, ['db_name', 'tables'])
+    args = mw.getPluginArgs()
+    data = mw.checkPluginArgs(args, ['db_name', 'tables'])
     if not data[0]:
         return data[1]
 
@@ -1992,8 +1967,8 @@ def setDbrunMode(version=''):
     if version == '5.5':
         return mw.returnJson(False, "不支持切换")
 
-    args = getArgs()
-    data = checkArgs(args, ['mode', 'reload'])
+    args = mw.getPluginArgs()
+    data = mw.checkPluginArgs(args, ['mode', 'reload'])
     if not data[0]:
         return data[1]
 
@@ -2038,8 +2013,8 @@ def findBinlogSlaveDoDb():
 
 
 def setDbMasterAccess():
-    args = getArgs()
-    data = checkArgs(args, ['username', 'access'])
+    args = mw.getPluginArgs()
+    data = mw.checkPluginArgs(args, ['username', 'access'])
     if not data[0]:
         return data[1]
     username = args['username']
@@ -2072,7 +2047,7 @@ def resetMaster(version=''):
     return mw.returnJson(True, '重置成功!')
 
 def getMasterDbList(version=''):
-    args = getArgs()
+    args = mw.getPluginArgs()
     page = 1
     page_size = 10
     search = ''
@@ -2124,8 +2099,8 @@ def getMasterDbList(version=''):
 
 
 def setDbMaster(version):
-    args = getArgs()
-    data = checkArgs(args, ['name'])
+    args = mw.getPluginArgs()
+    data = mw.checkPluginArgs(args, ['name'])
     if not data[0]:
         return data[1]
 
@@ -2154,8 +2129,8 @@ def setDbMaster(version):
 
 
 def setDbSlave(version):
-    args = getArgs()
-    data = checkArgs(args, ['name'])
+    args = mw.getPluginArgs()
+    data = mw.checkPluginArgs(args, ['name'])
     if not data[0]:
         return data[1]
 
@@ -2241,7 +2216,7 @@ def setMasterStatus(version=''):
 
 
 def getMasterRepSlaveList(version=''):
-    args = getArgs()
+    args = mw.getPluginArgs()
     page = 1
     page_size = 10
     search = ''
@@ -2278,8 +2253,8 @@ def getMasterRepSlaveList(version=''):
 
 
 def addMasterRepSlaveUser(version=''):
-    args = getArgs()
-    data = checkArgs(args, ['username', 'password'])
+    args = mw.getPluginArgs()
+    data = mw.checkPluginArgs(args, ['username', 'password'])
     if not data[0]:
         return data[1]
 
@@ -2331,8 +2306,8 @@ def addMasterRepSlaveUser(version=''):
 
 def getMasterRepSlaveUserCmdSsh(version):
 
-    args = getArgs()
-    data = checkArgs(args, ['username', 'db'])
+    args = mw.getPluginArgs()
+    data = mw.checkPluginArgs(args, ['username', 'db'])
     if not data[0]:
         return data[1]
 
@@ -2389,8 +2364,8 @@ def getMasterRepSlaveUserCmdSsh(version):
 
 def getMasterRepSlaveUserCmd(version):
 
-    args = getArgs()
-    data = checkArgs(args, ['username', 'db'])
+    args = mw.getPluginArgs()
+    data = mw.checkPluginArgs(args, ['username', 'db'])
     if not data[0]:
         return data[1]
 
@@ -2452,8 +2427,8 @@ def getMasterRepSlaveUserCmd(version):
 
 
 def delMasterRepSlaveUser(version=''):
-    args = getArgs()
-    data = checkArgs(args, ['username'])
+    args = mw.getPluginArgs()
+    data = mw.checkPluginArgs(args, ['username'])
     if not data[0]:
         return data[1]
 
@@ -2487,8 +2462,8 @@ def delMasterRepSlaveUser(version=''):
 
 
 def updateMasterRepSlaveUser(version=''):
-    args = getArgs()
-    data = checkArgs(args, ['username', 'password'])
+    args = mw.getPluginArgs()
+    data = mw.checkPluginArgs(args, ['username', 'password'])
     if not data[0]:
         return data[1]
 
@@ -2509,8 +2484,8 @@ def updateMasterRepSlaveUser(version=''):
 
 
 def getSlaveSSHList(version=''):
-    args = getArgs()
-    data = checkArgs(args, ['page', 'page_size'])
+    args = mw.getPluginArgs()
+    data = mw.checkPluginArgs(args, ['page', 'page_size'])
     if not data[0]:
         return data[1]
 
@@ -2537,8 +2512,8 @@ def getSlaveSSHList(version=''):
 
 
 def getSlaveSyncUserByIp(version=''):
-    args = getArgs()
-    data = checkArgs(args, ['ip'])
+    args = mw.getPluginArgs()
+    data = mw.checkPluginArgs(args, ['ip'])
     if not data[0]:
         return data[1]
 
@@ -2553,8 +2528,8 @@ def getSlaveSyncUserByIp(version=''):
 def addSlaveSyncUser(version=''):
     import base64
 
-    args = getArgs()
-    data = checkArgs(args, ['ip'])
+    args = mw.getPluginArgs()
+    data = mw.checkPluginArgs(args, ['ip'])
     if not data[0]:
         return data[1]
 
@@ -2562,7 +2537,7 @@ def addSlaveSyncUser(version=''):
     if ip == "":
         return mw.returnJson(True, 'ok')
 
-    data = checkArgs(args, ['port', 'user', 'pass', 'mode'])
+    data = mw.checkPluginArgs(args, ['port', 'user', 'pass', 'mode'])
     if not data[0]:
         return data[1]
 
@@ -2586,8 +2561,8 @@ def addSlaveSyncUser(version=''):
 
 
 def delSlaveSyncUser(version=''):
-    args = getArgs()
-    data = checkArgs(args, ['ip'])
+    args = mw.getPluginArgs()
+    data = mw.checkPluginArgs(args, ['ip'])
     if not data[0]:
         return data[1]
 
@@ -2599,8 +2574,8 @@ def delSlaveSyncUser(version=''):
 
 
 def getSlaveSyncUserList(version=''):
-    args = getArgs()
-    data = checkArgs(args, ['page', 'page_size'])
+    args = mw.getPluginArgs()
+    data = mw.checkPluginArgs(args, ['page', 'page_size'])
     if not data[0]:
         return data[1]
 
@@ -2639,8 +2614,8 @@ def getSlaveSyncMode(version):
 
 
 def setSlaveSyncMode(version):
-    args = getArgs()
-    data = checkArgs(args, ['mode'])
+    args = mw.getPluginArgs()
+    data = mw.checkPluginArgs(args, ['mode'])
     if not data[0]:
         return data[1]
     mode = args['mode']
@@ -2654,8 +2629,8 @@ def setSlaveSyncMode(version):
 
 
 def getSlaveSSHByIp(version=''):
-    args = getArgs()
-    data = checkArgs(args, ['ip'])
+    args = mw.getPluginArgs()
+    data = mw.checkPluginArgs(args, ['ip'])
     if not data[0]:
         return data[1]
 
@@ -2669,8 +2644,8 @@ def getSlaveSSHByIp(version=''):
 def addSlaveSSH(version=''):
     import base64
 
-    args = getArgs()
-    data = checkArgs(args, ['ip'])
+    args = mw.getPluginArgs()
+    data = mw.checkPluginArgs(args, ['ip'])
     if not data[0]:
         return data[1]
 
@@ -2678,7 +2653,7 @@ def addSlaveSSH(version=''):
     if ip == "":
         return mw.returnJson(True, 'ok')
 
-    data = checkArgs(args, ['port', 'id_rsa', 'db_user'])
+    data = mw.checkPluginArgs(args, ['port', 'id_rsa', 'db_user'])
     if not data[0]:
         return data[1]
 
@@ -2701,8 +2676,8 @@ def addSlaveSSH(version=''):
 
 
 def delSlaveSSH(version=''):
-    args = getArgs()
-    data = checkArgs(args, ['ip'])
+    args = mw.getPluginArgs()
+    data = mw.checkPluginArgs(args, ['ip'])
     if not data[0]:
         return data[1]
 
@@ -2714,8 +2689,8 @@ def delSlaveSSH(version=''):
 
 
 def updateSlaveSSH(version=''):
-    args = getArgs()
-    data = checkArgs(args, ['ip', 'id_rsa'])
+    args = mw.getPluginArgs()
+    data = mw.checkPluginArgs(args, ['ip', 'id_rsa'])
     if not data[0]:
         return data[1]
 
@@ -2995,7 +2970,7 @@ def setSlaveStatus(version=''):
 
 
 def deleteSlave(version=''):
-    args = getArgs()
+    args = mw.getPluginArgs()
     db = pMysqlDb()
     if 'sign' in args:
         sign = args['sign']
@@ -3008,8 +2983,8 @@ def deleteSlave(version=''):
 
 
 def dumpMysqlData(version=''):
-    args = getArgs()
-    data = checkArgs(args, ['db'])
+    args = mw.getPluginArgs()
+    data = mw.checkPluginArgs(args, ['db'])
     if not data[0]:
         return data[1]
 
@@ -3065,8 +3040,8 @@ def syncDatabaseRepairTempFile():
 
 def syncDatabaseRepairLog(version=''):
     import subprocess
-    args = getArgs()
-    data = checkArgs(args, ['db','sign','op'])
+    args = mw.getPluginArgs()
+    data = mw.checkPluginArgs(args, ['db','sign','op'])
     if not data[0]:
         return data[1]
 
@@ -3099,8 +3074,8 @@ def syncDatabaseRepair(version=''):
     tmp_log = syncDatabaseRepairTempFile()
 
     from pymysql.converters import escape_string
-    args = getArgs()
-    data = checkArgs(args, ['db','sign'])
+    args = mw.getPluginArgs()
+    data = mw.checkPluginArgs(args, ['db','sign'])
     if not data[0]:
         return data[1]
 
@@ -3338,8 +3313,8 @@ def writeDbSyncStatus(data):
 
 
 def fullSync(version=''):
-    args = getArgs()
-    data = checkArgs(args, ['db', 'begin'])
+    args = mw.getPluginArgs()
+    data = mw.checkPluginArgs(args, ['db', 'begin'])
     if not data[0]:
         return data[1]
 
@@ -3375,8 +3350,8 @@ def fullSync(version=''):
 
 def fullSyncCmd():
     time_all_s = time.time()
-    args = getArgs()
-    data = checkArgs(args, ['db', 'sign'])
+    args = mw.getPluginArgs()
+    data = mw.checkPluginArgs(args, ['db', 'sign'])
     if not data[0]:
         return data[1]
 
@@ -3406,8 +3381,8 @@ def doFullSyncUser(version=''):
     if os.path.exists(pv_path):
         is_exist_pv = True
 
-    args = getArgs()
-    data = checkArgs(args, ['db', 'sign'])
+    args = mw.getPluginArgs()
+    data = mw.checkPluginArgs(args, ['db', 'sign'])
     if not data[0]:
         return data[1]
 
@@ -3519,8 +3494,8 @@ def doFullSyncUser(version=''):
 
 def doFullSyncSSH(version=''):
 
-    args = getArgs()
-    data = checkArgs(args, ['db', 'sign'])
+    args = mw.getPluginArgs()
+    data = mw.checkPluginArgs(args, ['db', 'sign'])
     if not data[0]:
         return data[1]
 

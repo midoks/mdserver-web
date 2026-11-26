@@ -42,33 +42,6 @@ def contentReplace(content):
     return content
 
 
-def getArgs():
-    args = sys.argv[2:]
-    tmp = {}
-    args_len = len(args)
-    if args_len == 1:
-        t = args[0].strip('{').strip('}')
-        if t.strip() == '':
-            tmp = []
-        else:
-            t = t.split(':', 1)
-            tmp[t[0]] = t[1]
-        tmp[t[0]] = t[1]
-    elif args_len > 1:
-
-        for i in range(len(args)):
-            t = args[i].split(':', 1)
-            tmp[t[0]] = t[1]
-    return tmp
-
-
-def checkArgs(data, ck=[]):
-    for i in range(len(ck)):
-        if not ck[i] in data:
-            return (False, mw.returnJson(False, '参数:(' + ck[i] + ')没有!'))
-    return (True, mw.returnJson(True, 'ok'))
-
-
 def isSqlError(mysqlMsg):
     # 检测数据库执行错误
     mysqlMsg = str(mysqlMsg)
@@ -146,8 +119,8 @@ def getDbConf():
 
 
 def setDbConf():
-    args = getArgs()
-    data_args = checkArgs(args, ['db_host', 'db_port',
+    args = mw.getPluginArgs()
+    data_args = mw.checkPluginArgs(args, ['db_host', 'db_port',
                                  'db_name', 'db_user', 'db_pass'])
     if not data_args[0]:
         return data_args[1]
@@ -192,8 +165,8 @@ def getUserConf():
 
 
 def setUserConf():
-    args = getArgs()
-    data_args = checkArgs(args, ['app_key', 'secret',
+    args = mw.getPluginArgs()
+    data_args = mw.checkPluginArgs(args, ['app_key', 'secret',
                                  'password', 'uid', 'exchange'])
     if not data_args[0]:
         return data_args[1]
@@ -224,8 +197,8 @@ def syncDataList():
 
 
 def syncDataAdd():
-    args = getArgs()
-    data_args = checkArgs(args, ['token'])
+    args = mw.getPluginArgs()
+    data_args = mw.checkPluginArgs(args, ['token'])
     if not data_args[0]:
         return data_args[1]
 
@@ -289,8 +262,8 @@ def syncDataAddTaskInstall():
 
 
 def syncDataAddTask():
-    args = getArgs()
-    data_args = checkArgs(args, ['check'])
+    args = mw.getPluginArgs()
+    data_args = mw.checkPluginArgs(args, ['check'])
     if not data_args[0]:
         return data_args[1]
 
@@ -300,8 +273,8 @@ def syncDataAddTask():
 
 
 def syncDataDelete():
-    args = getArgs()
-    data_args = checkArgs(args, ['token'])
+    args = mw.getPluginArgs()
+    data_args = mw.checkPluginArgs(args, ['token'])
     if not data_args[0]:
         return data_args[1]
 

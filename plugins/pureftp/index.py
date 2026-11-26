@@ -48,30 +48,6 @@ def getInitDTpl():
     return path
 
 
-def getArgs():
-    args = sys.argv[2:]
-    tmp = {}
-    args_len = len(args)
-
-    if args_len == 1:
-        t = args[0].strip('{').strip('}')
-        t = t.split(':')
-        tmp[t[0]] = t[1]
-    elif args_len > 1:
-        for i in range(len(args)):
-            t = args[i].split(':')
-            tmp[t[0]] = t[1]
-
-    return tmp
-
-
-def checkArgs(data, ck=[]):
-    for i in range(len(ck)):
-        if not ck[i] in data:
-            return (False, mw.returnJson(False, '参数:(' + ck[i] + ')没有!'))
-    return (True, mw.returnJson(True, 'ok'))
-
-
 def status():
     cmd = "ps -ef|grep pure-ftpd |grep -v grep | grep -v python | awk '{print $2}'"
     data = mw.execShell(cmd)
@@ -295,7 +271,7 @@ def getFtpPort():
 
 
 def getFtpList():
-    args = getArgs()
+    args = mw.getPluginArgs()
     page = 1
     page_size = 10
     search = ''
@@ -338,8 +314,8 @@ def getFtpList():
 
 def addFtp():
     import urllib.parse
-    args = getArgs()
-    data = checkArgs(args, ['ftp_username', 'ftp_password', 'path', 'ps'])
+    args = mw.getPluginArgs()
+    data = mw.checkPluginArgs(args, ['ftp_username', 'ftp_password', 'path', 'ps'])
     if not data[0]:
         return data[1]
 
@@ -361,8 +337,8 @@ def addFtp():
 
 
 def delFtp():
-    args = getArgs()
-    data = checkArgs(args, ['id', 'username'])
+    args = mw.getPluginArgs()
+    data = mw.checkPluginArgs(args, ['id', 'username'])
     if not data[0]:
         return data[1]
 
@@ -376,8 +352,8 @@ def delFtp():
 
 
 def modFtp():
-    args = getArgs()
-    data = checkArgs(args, ['id', 'name', 'password'])
+    args = mw.getPluginArgs()
+    data = mw.checkPluginArgs(args, ['id', 'name', 'password'])
     if not data[0]:
         return data[1]
 
@@ -395,7 +371,7 @@ def modFtp():
 
 def modFtpPort():
     import re
-    args = getArgs()
+    args = mw.getPluginArgs()
     if not 'port' in args:
         return 'port missing'
     try:
@@ -415,7 +391,7 @@ def modFtpPort():
 
 
 def stopPort():
-    args = getArgs()
+    args = mw.getPluginArgs()
     if not 'id' in args:
         return 'id missing'
 
@@ -437,7 +413,7 @@ def stopPort():
 
 
 def startPort():
-    args = getArgs()
+    args = mw.getPluginArgs()
     if not 'id' in args:
         return 'id missing'
 

@@ -37,30 +37,6 @@ def getServerDir():
     return mw.getServerDir() + '/' + getPluginName()
 
 
-def getArgs():
-    args = sys.argv[2:]
-    tmp = {}
-    args_len = len(args)
-
-    if args_len == 1:
-        t = args[0].strip('{').strip('}')
-        t = t.split(':', 1)
-        tmp[t[0]] = t[1]
-    elif args_len > 1:
-        for i in range(len(args)):
-            t = args[i].split(':', 1)
-            tmp[t[0]] = t[1]
-
-    return tmp
-
-
-def checkArgs(data, ck=[]):
-    for i in range(len(ck)):
-        if not ck[i] in data:
-            return (False, mw.returnJson(False, '参数:(' + ck[i] + ')没有!'))
-    return (True, mw.returnJson(True, 'ok'))
-
-
 sys.path.append(getPluginDir() + "/class")
 from luamaker import luamaker
 
@@ -601,8 +577,8 @@ def getRuleJsonPath(name):
 
 
 def getRule():
-    args = getArgs()
-    data = checkArgs(args, ['rule_name'])
+    args = mw.getPluginArgs()
+    data = mw.checkPluginArgs(args, ['rule_name'])
     if not data[0]:
         return data[1]
 
@@ -613,8 +589,8 @@ def getRule():
 
 
 def addRule():
-    args = getArgs()
-    data = checkArgs(args, ['ruleName', 'ruleValue', 'ps'])
+    args = mw.getPluginArgs()
+    data = mw.checkPluginArgs(args, ['ruleName', 'ruleValue', 'ps'])
     if not data[0]:
         return data[1]
 
@@ -642,8 +618,8 @@ def addRule():
 
 
 def removeRule():
-    args = getArgs()
-    data = checkArgs(args, ['ruleName', 'index'])
+    args = mw.getPluginArgs()
+    data = mw.checkPluginArgs(args, ['ruleName', 'index'])
     if not data[0]:
         return data[1]
 
@@ -665,8 +641,8 @@ def removeRule():
 
 
 def setRuleState():
-    args = getArgs()
-    data = checkArgs(args, ['ruleName', 'index'])
+    args = mw.getPluginArgs()
+    data = mw.checkPluginArgs(args, ['ruleName', 'index'])
     if not data[0]:
         return data[1]
 
@@ -691,8 +667,8 @@ def setRuleState():
 
 
 def modifyRule():
-    args = getArgs()
-    data = checkArgs(args, ['index', 'ruleName', 'ruleBody', 'rulePs'])
+    args = mw.getPluginArgs()
+    data = mw.checkPluginArgs(args, ['index', 'ruleName', 'ruleBody', 'rulePs'])
     if not data[0]:
         return data[1]
 
@@ -723,8 +699,8 @@ def modifyRule():
 
 
 def getSiteRule():
-    args = getArgs()
-    data = checkArgs(args, ['siteName', 'ruleName'])
+    args = mw.getPluginArgs()
+    data = mw.checkPluginArgs(args, ['siteName', 'ruleName'])
     if not data[0]:
         return data[1]
 
@@ -742,8 +718,8 @@ def getSiteRule():
 
 
 def addSiteRule():
-    args = getArgs()
-    data = checkArgs(args, ['siteName', 'ruleName', 'ruleValue'])
+    args = mw.getPluginArgs()
+    data = mw.checkPluginArgs(args, ['siteName', 'ruleName', 'ruleValue'])
     if not data[0]:
         return data[1]
 
@@ -765,8 +741,8 @@ def addSiteRule():
 
 
 def addIpWhite():
-    args = getArgs()
-    data = checkArgs(args, ['start_ip', 'end_ip'])
+    args = mw.getPluginArgs()
+    data = mw.checkPluginArgs(args, ['start_ip', 'end_ip'])
     if not data[0]:
         return data[1]
 
@@ -801,8 +777,8 @@ def addIpWhite():
 
 
 def removeIpWhite():
-    args = getArgs()
-    data = checkArgs(args, ['index'])
+    args = mw.getPluginArgs()
+    data = mw.checkPluginArgs(args, ['index'])
     if not data[0]:
         return data[1]
 
@@ -823,8 +799,8 @@ def removeIpWhite():
 
 
 def addIpBlack():
-    args = getArgs()
-    data = checkArgs(args, ['start_ip', 'end_ip'])
+    args = mw.getPluginArgs()
+    data = mw.checkPluginArgs(args, ['start_ip', 'end_ip'])
     if not data[0]:
         return data[1]
 
@@ -860,8 +836,8 @@ def addIpBlack():
 
 
 def removeIpBlack():
-    args = getArgs()
-    data = checkArgs(args, ['index'])
+    args = mw.getPluginArgs()
+    data = mw.checkPluginArgs(args, ['index'])
     if not data[0]:
         return data[1]
 
@@ -882,8 +858,8 @@ def removeIpBlack():
 
 
 def setIpv6Black():
-    args = getArgs()
-    data = checkArgs(args, ['addr'])
+    args = mw.getPluginArgs()
+    data = mw.checkPluginArgs(args, ['addr'])
     if not data[0]:
         return data[1]
 
@@ -901,8 +877,8 @@ def setIpv6Black():
 
 
 def delIpv6Black():
-    args = getArgs()
-    data = checkArgs(args, ['addr'])
+    args = mw.getPluginArgs()
+    data = mw.checkPluginArgs(args, ['addr'])
     if not data[0]:
         return data[1]
 
@@ -921,8 +897,8 @@ def delIpv6Black():
 
 
 def removeSiteRule():
-    args = getArgs()
-    data = checkArgs(args, ['siteName', 'ruleName', 'index'])
+    args = mw.getPluginArgs()
+    data = mw.checkPluginArgs(args, ['siteName', 'ruleName', 'index'])
     if not data[0]:
         return data[1]
 
@@ -945,8 +921,8 @@ def removeSiteRule():
 
 
 def setObjStatus():
-    args = getArgs()
-    data = checkArgs(args, ['obj', 'statusCode'])
+    args = mw.getPluginArgs()
+    data = mw.checkPluginArgs(args, ['obj', 'statusCode'])
     if not data[0]:
         return data[1]
 
@@ -966,8 +942,8 @@ def setObjStatus():
 
 
 def setRetry():
-    args = getArgs()
-    data = checkArgs(args, ['retry', 'retry_time',
+    args = mw.getPluginArgs()
+    data = mw.checkPluginArgs(args, ['retry', 'retry_time',
                             'retry_cycle', 'is_open_global'])
     if not data[0]:
         return data[1]
@@ -991,8 +967,8 @@ def setRetry():
 
 
 def setSafeVerify():
-    args = getArgs()
-    data = checkArgs(args, ['auto', 'time', 'cpu', 'mode'])
+    args = mw.getPluginArgs()
+    data = mw.checkPluginArgs(args, ['auto', 'time', 'cpu', 'mode'])
     if not data[0]:
         return data[1]
 
@@ -1021,8 +997,8 @@ def setSiteRetry():
 
 
 def setCcConf():
-    args = getArgs()
-    data = checkArgs(args, ['siteName', 'cycle', 'limit',
+    args = mw.getPluginArgs()
+    data = mw.checkPluginArgs(args, ['siteName', 'cycle', 'limit',
                             'endtime', 'is_open_global'])
     if not data[0]:
         return data[1]
@@ -1052,8 +1028,8 @@ def setSiteCcConf():
 
 
 def saveScanRule():
-    args = getArgs()
-    data = checkArgs(args, ['header', 'cookie', 'args'])
+    args = mw.getPluginArgs()
+    data = mw.checkPluginArgs(args, ['header', 'cookie', 'args'])
     if not data[0]:
         return data[1]
 
@@ -1102,8 +1078,8 @@ def getSiteConfig():
 
 
 def getSiteConfigByName():
-    args = getArgs()
-    data = checkArgs(args, ['siteName'])
+    args = mw.getPluginArgs()
+    data = mw.checkPluginArgs(args, ['siteName'])
     if not data[0]:
         return data[1]
     path = getJsonPath('site')
@@ -1119,8 +1095,8 @@ def getSiteConfigByName():
 
 
 def addSiteCdnHeader():
-    args = getArgs()
-    data = checkArgs(args, ['siteName', 'cdn_header'])
+    args = mw.getPluginArgs()
+    data = mw.checkPluginArgs(args, ['siteName', 'cdn_header'])
     if not data[0]:
         return data[1]
     path = getJsonPath('site')
@@ -1140,8 +1116,8 @@ def addSiteCdnHeader():
 
 
 def removeSiteCdnHeader():
-    args = getArgs()
-    data = checkArgs(args, ['siteName', 'cdn_header'])
+    args = mw.getPluginArgs()
+    data = mw.checkPluginArgs(args, ['siteName', 'cdn_header'])
     if not data[0]:
         return data[1]
     path = getJsonPath('site')
@@ -1161,8 +1137,8 @@ def removeSiteCdnHeader():
 
 
 def outputData():
-    args = getArgs()
-    data = checkArgs(args, ['sname'])
+    args = mw.getPluginArgs()
+    data = mw.checkPluginArgs(args, ['sname'])
     if not data[0]:
         return data[1]
 
@@ -1172,8 +1148,8 @@ def outputData():
 
 
 def importData():
-    args = getArgs()
-    data = checkArgs(args, ['sname', 'pdata'])
+    args = mw.getPluginArgs()
+    data = mw.checkPluginArgs(args, ['sname', 'pdata'])
     if not data[0]:
         return data[1]
 
@@ -1201,8 +1177,8 @@ def importData():
 
 
 def getLogsList():
-    args = getArgs()
-    data = checkArgs(args, ['site', 'page', 'page_size', 'tojs'])
+    args = mw.getPluginArgs()
+    data = mw.checkPluginArgs(args, ['site', 'page', 'page_size', 'tojs'])
     if not data[0]:
         return data[1]
 
@@ -1241,8 +1217,8 @@ def getLogsList():
 
 
 def getSafeLogs():
-    args = getArgs()
-    data = checkArgs(args, ['siteName', 'toDate', 'p'])
+    args = mw.getPluginArgs()
+    data = mw.checkPluginArgs(args, ['siteName', 'toDate', 'p'])
     if not data[0]:
         return data[1]
 
@@ -1265,8 +1241,8 @@ def getSafeLogs():
 
 
 def setObjOpen():
-    args = getArgs()
-    data = checkArgs(args, ['obj'])
+    args = mw.getPluginArgs()
+    data = mw.checkPluginArgs(args, ['obj'])
     if not data[0]:
         return data[1]
 
@@ -1287,8 +1263,8 @@ def setObjOpen():
 
 
 def setSiteObjOpen():
-    args = getArgs()
-    data = checkArgs(args, ['siteName', 'obj'])
+    args = mw.getPluginArgs()
+    data = mw.checkPluginArgs(args, ['siteName', 'obj'])
     if not data[0]:
         return data[1]
 
@@ -1327,8 +1303,8 @@ def getWafConf():
 
 
 def areaLimitSwitch():
-    args = getArgs()
-    data = checkArgs(args, ['area_limit'])
+    args = mw.getPluginArgs()
+    data = mw.checkPluginArgs(args, ['area_limit'])
     if not data[0]:
         return data[1]
 
@@ -1362,8 +1338,8 @@ def getAreaLimit():
 
 
 def delAreaLimit():
-    args = getArgs()
-    data = checkArgs(args, ['site', 'types', 'region'])
+    args = mw.getPluginArgs()
+    data = mw.checkPluginArgs(args, ['site', 'types', 'region'])
     if not data[0]:
         return data[1]
 
@@ -1411,8 +1387,8 @@ def delAreaLimit():
 
 
 def addAreaLimit():
-    args = getArgs()
-    data = checkArgs(args, ['site', 'types', 'region'])
+    args = mw.getPluginArgs()
+    data = mw.checkPluginArgs(args, ['site', 'types', 'region'])
     if not data[0]:
         return data[1]
 
@@ -1469,8 +1445,8 @@ def cleanDropIp():
 
 
 def testRun():
-    # args = getArgs()
-    # data = checkArgs(args, ['siteName'])
+    # args = mw.getPluginArgs()
+    # data = mw.checkPluginArgs(args, ['siteName'])
     # if not data[0]:
     #     return data[1]
 

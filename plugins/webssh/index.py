@@ -40,31 +40,6 @@ class App():
     def getServerDir(self):
         return mw.getServerDir() + '/' + self.getPluginName()
 
-    def getArgs(self):
-        args = sys.argv[2:]
-        tmp = {}
-        args_len = len(args)
-
-        if args_len == 1:
-            t = args[0].strip('{').strip('}')
-            if t.strip() == '':
-                tmp = []
-            else:
-                t = t.split(':')
-                tmp[t[0]] = t[1]
-            tmp[t[0]] = t[1]
-        elif args_len > 1:
-            for i in range(len(args)):
-                t = args[i].split(':')
-                tmp[t[0]] = t[1]
-        return tmp
-
-    def checkArgs(self, data, ck=[]):
-        for i in range(len(ck)):
-            if not ck[i] in data:
-                return (False, mw.returnJson(False, '参数:(' + ck[i] + ')没有!'))
-        return (True, mw.returnJson(True, 'ok'))
-
     def status(self):
         return 'start'
 
@@ -80,8 +55,8 @@ class App():
         mw.writeFile(self.__cmd_path, json.dumps(data_tmp))
 
     def add_cmd(self):
-        args = self.getArgs()
-        check = self.checkArgs(args, ['title', 'cmd'])
+        args = mw.getPluginArgs()
+        check = mw.checkPluginArgs(args, ['title', 'cmd'])
         if not check[0]:
             return check[1]
 
@@ -97,8 +72,8 @@ class App():
         return mw.returnJson(True, '添加成功!')
 
     def del_cmd(self):
-        args = self.getArgs()
-        check = self.checkArgs(args, ['title'])
+        args = mw.getPluginArgs()
+        check = mw.checkPluginArgs(args, ['title'])
         if not check[0]:
             return check[1]
 
@@ -126,8 +101,8 @@ class App():
         return info_data
 
     def get_server_by_host(self):
-        args = self.getArgs()
-        check = self.checkArgs(args, ['host'])
+        args = mw.getPluginArgs()
+        check = mw.checkPluginArgs(args, ['host'])
         if not check[0]:
             return check[1]
 
@@ -184,8 +159,8 @@ class App():
         return mw.returnJson(True, 'ok!', host_list)
 
     def del_server(self):
-        args = self.getArgs()
-        check = self.checkArgs(args, ['host'])
+        args = mw.getPluginArgs()
+        check = mw.checkPluginArgs(args, ['host'])
         if not check[0]:
             return check[1]
         host = args['host']
@@ -194,8 +169,8 @@ class App():
         return mw.returnJson(True, '删除成功!')
 
     def add_server(self):
-        args = self.getArgs()
-        check = self.checkArgs(
+        args = mw.getPluginArgs()
+        check = mw.checkPluginArgs(
             args, ['host', 'port', 'type', 'username', 'ps'])
         if not check[0]:
             return check[1]

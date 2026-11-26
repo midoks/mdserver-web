@@ -34,33 +34,6 @@ def getServerDir():
     return mw.getServerDir() + '/' + getPluginName()
 
 
-def getArgs():
-    args = sys.argv[2:]
-    tmp = {}
-    args_len = len(args)
-
-    if args_len == 1:
-        t = args[0].strip('{').strip('}')
-        if t.strip() == '':
-            tmp = []
-        else:
-            t = t.split(':')
-            tmp[t[0]] = t[1]
-        tmp[t[0]] = t[1]
-    elif args_len > 1:
-        for i in range(len(args)):
-            t = args[i].split(':')
-            tmp[t[0]] = t[1]
-    return tmp
-
-
-def checkArgs(data, ck=[]):
-    for i in range(len(ck)):
-        if not ck[i] in data:
-            return (False, mw.returnJson(False, '参数:(' + ck[i] + ')没有!'))
-    return (True, mw.returnJson(True, 'ok'))
-
-
 def getCfgFilePath():
     return getServerDir() + "/cfg.json"
 
@@ -130,8 +103,8 @@ def status():
 
 
 def addHook():
-    args = getArgs()
-    data = checkArgs(args, ['title', "shell"])
+    args = mw.getPluginArgs()
+    data = mw.checkPluginArgs(args, ['title', "shell"])
     if not data[0]:
         return data[1]
 
@@ -185,8 +158,8 @@ def getList():
 
 
 def getLog():
-    args = getArgs()
-    check_arg = checkArgs(args, ['path'])
+    args = mw.getPluginArgs()
+    check_arg = mw.checkPluginArgs(args, ['path'])
     if not check_arg[0]:
         return check_arg[1]
 
@@ -226,8 +199,8 @@ def runShellArgs(args):
     return mw.returnJson(False, '指定Hook不存在!')
 
 def getRunShellCmd():
-    args = getArgs()
-    check_arg = checkArgs(args, ['access_key'])
+    args = mw.getPluginArgs()
+    check_arg = mw.checkPluginArgs(args, ['access_key'])
     if not check_arg[0]:
         return check_arg[1]
 
@@ -251,8 +224,8 @@ def getRunShellCmd():
 
 
 def runShell():
-    args = getArgs()
-    check_arg = checkArgs(args, ['access_key'])
+    args = mw.getPluginArgs()
+    check_arg = mw.checkPluginArgs(args, ['access_key'])
     if not check_arg[0]:
         return check_arg[1]
 
@@ -261,8 +234,8 @@ def runShell():
 
 
 def delHook():
-    args = getArgs()
-    check_arg = checkArgs(args, ['access_key'])
+    args = mw.getPluginArgs()
+    check_arg = mw.checkPluginArgs(args, ['access_key'])
     if not check_arg[0]:
         return check_arg[1]
 
@@ -306,8 +279,8 @@ def configTpl():
     return mw.getJson(tmp)
 
 def readConfigTpl():
-    args = getArgs()
-    data = checkArgs(args, ['file', 'title'])
+    args = mw.getPluginArgs()
+    data = mw.checkPluginArgs(args, ['file', 'title'])
     if not data[0]:
         return data[1]
 

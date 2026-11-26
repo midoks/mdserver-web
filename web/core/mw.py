@@ -380,6 +380,66 @@ def returnJson(status, msg, data=None):
         return getJson({'status': status, 'msg': msg})
     return getJson({'status': status, 'msg': msg, 'data': data})
 
+# -------------------------------- 插件参数解析(统一) --------------------------------
+# 替代各插件里的老式 getArgs/checkArgs, 由 mw 统一维护
+# 优势:
+#   1. 自动识别 JSON dict (新版 plugin.py 会把 JSON 拆成 key:value argv 列表)
+#   2. 兼容老式 key:value 列表
+#   3. 自动跳过 version 占位 (sys.argv[2] 无冒号且非 JSON 时视为 version)
+#   4. split(':', 1) 防止 value 含冒号被切坏
+
+def getPluginArgs():
+    """
+    统一插件参数解析入口, 替换插件本地 getArgs()
+    返回 dict: {key: value, ...}
+    """
+    import sys
+    argv = sys.argv[2:]
+
+    # 自动跳过 version 占位:
+    # 插件约定 sys.argv[1]=func, sys.argv[2]=version (可能为空) 或 args 起点
+    # 若 argv[0] 没有冒号且不是 JSON 对象开头, 视为 version, 跳过
+    if argv and ':' not in argv[0] and not argv[0].lstrip().startswith('{'):
+        argv = argv[1:]
+
+    if not argv:
+        return {}
+
+    # 场景 1: 整个 JSON dict 作为单个 argv 传入 (老 plugin.py 行为)
+    if len(argv) == 1:
+        s = argv[0].strip()
+        if s.startswith('{'):
+            try:
+                obj = json.loads(s)
+                if isinstance(obj, dict):
+                    return obj
+            except (ValueError, TypeError):
+                pass
+        # 老格式 'key:value' 单参数, 或空对象 '{}' (strip 后为空则视为无参)
+        stripped = s.strip('{').strip('}')
+        if stripped == '':
+            return {}
+
+    # 场景 2: key:value argv 列表 (新 plugin.py 拆开后的形态, 或老插件直接传)
+    tmp = {}
+    for arg in argv:
+        if ':' not in arg:
+            continue
+        k, v = arg.split(':', 1)  # maxsplit=1 保留 value 内的冒号
+        tmp[k] = v
+    return tmp
+
+
+def checkPluginArgs(data, ck=[]):
+    """
+    统一插件参数必填校验, 替换插件本地 checkArgs()
+    返回 (True, ok_json) 或 (False, missing_msg_json)
+    """
+    for i in range(len(ck)):
+        if ck[i] not in data:
+            return (False, returnJson(False, '参数:(' + ck[i] + ')没有!'))
+    return (True, returnJson(True, 'ok'))
+
 def readFile(filename):
     # 读文件内容
     try:

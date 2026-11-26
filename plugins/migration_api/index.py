@@ -880,35 +880,6 @@ def writeConf(data):
     return True
 
 
-def getArgs():
-    args = sys.argv[2:]
-    tmp = {}
-    # print(args)
-    args_len = len(args)
-    if args_len == 1:
-        t = args[0].strip('{').strip('}')
-        if t.strip() == '':
-            tmp = []
-        else:
-            t = t.split(':', 1)
-            tmp[t[0]] = t[1]
-        tmp[t[0]] = t[1]
-    elif args_len > 1:
-
-        for i in range(len(args)):
-            # print(args[i])
-            t = args[i].split(':', 1)
-            tmp[t[0]] = t[1]
-    return tmp
-
-
-def checkArgs(data, ck=[]):
-    for i in range(len(ck)):
-        if not ck[i] in data:
-            return (False, mw.returnJson(False, '参数:(' + ck[i] + ')没有!'))
-    return (True, mw.returnJson(True, 'ok'))
-
-
 def status():
     path = getServerDir() + '/config'
     if not os.path.exists(path):
@@ -926,8 +897,8 @@ def getStepOneData():
 
 
 def stepOne():
-    args = getArgs()
-    data = checkArgs(args, ['url', 'app_id','app_secret'])
+    args = mw.getPluginArgs()
+    data = mw.checkPluginArgs(args, ['url', 'app_id','app_secret'])
     if not data[0]:
         return data[1]
 
@@ -1065,8 +1036,8 @@ def bgProcessRun():
 def stepFour():
     if getPid():
         return mw.returnJson(True, '正在运行中..')
-    args = getArgs()
-    data = checkArgs(args, ['sites', 'databases'])
+    args = mw.getPluginArgs()
+    data = mw.checkPluginArgs(args, ['sites', 'databases'])
     if not data[0]:
         return data[1]
 

@@ -49,32 +49,6 @@ def getInitDFile(version):
     return '/etc/init.d/' + getPluginName() + version
 
 
-def getArgs():
-    args = sys.argv[3:]
-    tmp = {}
-    args_len = len(args)
-
-    if args_len == 1:
-        t = args[0].strip('{').strip('}')
-        if t.strip() == '':
-            tmp = []
-        else:
-            t = t.split(':', 1)
-            tmp[t[0]] = t[1]
-    elif args_len > 1:
-        for i in range(len(args)):
-            t = args[i].split(':')
-            tmp[t[0]] = t[1]
-    return tmp
-
-
-def checkArgs(data, ck=[]):
-    for i in range(len(ck)):
-        if not ck[i] in data:
-            return (False, mw.returnJson(False, '参数:(' + ck[i] + ')没有!'))
-    return (True, mw.returnJson(True, 'ok'))
-
-
 def getConf(version):
     path = getServerDir() + '/' + version + '/rapira.toml'
     return path
@@ -305,8 +279,8 @@ def configTpl():
     return mw.getJson(tmp)
 
 def readConfigTpl(version):
-    args = getArgs()
-    data = checkArgs(args, ['file'])
+    args = mw.getPluginArgs()
+    data = mw.checkPluginArgs(args, ['file'])
     if not data[0]:
         return data[1]
 
@@ -334,7 +308,7 @@ def getRapiraStatus(version):
     if stat == 'stop':
         return mw.returnJson(False, 'rapira[' + version + ']未启动!!!')
 
-    args = getArgs()
+    args = mw.getPluginArgs()
     addr = getRapiraAddress(version)
     data = mw.httpGet("http://"+addr+"/metrics")
     return data
@@ -384,7 +358,7 @@ def setDisableFunc(version):
     if not os.path.exists(filename):
         return mw.returnJson(False, '指定PHP版本不存在!')
 
-    args = getArgs()
+    args = mw.getPluginArgs()
     disable_functions = args['disable_functions']
 
     phpini = mw.readFile(filename)
@@ -466,8 +440,8 @@ def getLibConf(version):
 
 
 def installLib(version):
-    args = getArgs()
-    data = checkArgs(args, ['name'])
+    args = mw.getPluginArgs()
+    data = mw.checkPluginArgs(args, ['name'])
     if not data[0]:
         return data[1]
 
@@ -483,8 +457,8 @@ def installLib(version):
 
 
 def uninstallLib(version):
-    args = getArgs()
-    data = checkArgs(args, ['name'])
+    args = mw.getPluginArgs()
+    data = mw.checkPluginArgs(args, ['name'])
     if not data[0]:
         return data[1]
 

@@ -33,33 +33,6 @@ def getServerDir():
     return mw.getServerDir() + '/' + getPluginName()
 
 
-def getArgs():
-    args = sys.argv[2:]
-    tmp = {}
-    args_len = len(args)
-
-    if args_len == 1:
-        t = args[0].strip('{').strip('}')
-        if t.strip() == '':
-            tmp = []
-        else:
-            t = t.split(':')
-            tmp[t[0]] = t[1]
-        tmp[t[0]] = t[1]
-    elif args_len > 1:
-        for i in range(len(args)):
-            t = args[i].split(':')
-            tmp[t[0]] = t[1]
-    return tmp
-
-
-def checkArgs(data, ck=[]):
-    for i in range(len(ck)):
-        if not ck[i] in data:
-            return (False, mw.returnJson(False, '参数:(' + ck[i] + ')没有!'))
-    return (True, mw.returnJson(True, 'ok'))
-
-
 def getConf():
     path = getServerDir() + "/cfg.json"
 
@@ -267,7 +240,7 @@ def makeLoadBalanceAllCfg(row):
 
 def add_load_balance(args):
 
-    data = checkArgs(
+    data = mw.checkPluginArgs(
         args, ['domain', 'upstream_name', 'node_algo', 'node_list', 'node_health_check'])
     if not data[0]:
         return data[1]
@@ -302,7 +275,7 @@ def add_load_balance(args):
 
 
 def edit_load_balance(args):
-    data = checkArgs(
+    data = mw.checkPluginArgs(
         args, ['row', 'node_algo', 'node_list', 'node_health_check'])
     if not data[0]:
         return data[1]
@@ -328,8 +301,8 @@ def loadBalanceList():
 
 
 def loadBalanceDelete():
-    args = getArgs()
-    data = checkArgs(args, ['row'])
+    args = mw.getPluginArgs()
+    data = mw.checkPluginArgs(args, ['row'])
     if not data[0]:
         return data[1]
 
@@ -401,8 +374,8 @@ def http_get(url):
 
 
 def checkUrl():
-    args = getArgs()
-    data = checkArgs(args, ['ip', 'port', 'path'])
+    args = mw.getPluginArgs()
+    data = mw.checkPluginArgs(args, ['ip', 'port', 'path'])
     if not data[0]:
         return data[1]
 
@@ -421,8 +394,8 @@ def checkUrl():
 
 
 def getHealthStatus():
-    args = getArgs()
-    data = checkArgs(args, ['row'])
+    args = mw.getPluginArgs()
+    data = mw.checkPluginArgs(args, ['row'])
     if not data[0]:
         return data[1]
 
@@ -439,8 +412,8 @@ def getHealthStatus():
 
 
 def getLogs():
-    args = getArgs()
-    data = checkArgs(args, ['domain'])
+    args = mw.getPluginArgs()
+    data = mw.checkPluginArgs(args, ['domain'])
     if not data[0]:
         return data[1]
 

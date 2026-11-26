@@ -151,28 +151,6 @@ def getConfAuth():
     # tmp = re.search(rep, content)
     # return tmp.groups()[0].strip()
 
-def getArgs():
-    args = sys.argv[2:]
-    tmp = {}
-
-    # 兼容前端传 {} / 空参数: 去掉花括号后为空的直接跳过, 避免 split 后越界
-    for arg in args:
-        arg = arg.strip().strip('{').strip('}').strip()
-        if arg == '':
-            continue
-        t = arg.split(':', 1)
-        if len(t) < 2:
-            continue
-        tmp[t[0]] = t[1]
-
-    return tmp
-
-def checkArgs(data, ck=[]):
-    for i in range(len(ck)):
-        if not ck[i] in data:
-            return (False, mw.returnJson(False, '参数:(' + ck[i] + ')没有!'))
-    return (True, mw.returnJson(True, 'ok'))
-
 def status():
     cmd = "ps -ef|grep mongod |grep -v mongosh|grep -v grep | grep -v /Applications | grep -v python | grep -v mdserver-web | awk '{print $2}'"
     data = mw.execShell(cmd)
@@ -392,8 +370,8 @@ def getConfig():
 
 def saveConfig():
     d = getConfigData()
-    args = getArgs()
-    data = checkArgs(args, ['bind_ip','port','data_path','log','pid_file_path'])
+    args = mw.getPluginArgs()
+    data = mw.checkPluginArgs(args, ['bind_ip','port','data_path','log','pid_file_path'])
     if not data[0]:
         return data[1]
 
@@ -612,7 +590,7 @@ def runReplInfo():
     return mw.returnJson(True, 'OK', result)
 
 def getDbList():
-    args = getArgs()
+    args = mw.getPluginArgs()
     page = 1
     page_size = 10
     search = ''
@@ -658,7 +636,7 @@ def getDbList():
     # return mw.returnJson(True,'ok',data)
 
 def getTableList():
-    args = getArgs()
+    args = mw.getPluginArgs()
     db_name = ""
     if 'dbname' in args:
         db_name = args['dbname']
@@ -687,8 +665,8 @@ def addDb():
     client = mongdbClient()
     db = client.admin
 
-    args = getArgs()
-    data = checkArgs(args, ['ps','name','db_user','password'])
+    args = mw.getPluginArgs()
+    data = mw.checkPluginArgs(args, ['ps','name','db_user','password'])
     if not data[0]:
         return data[1]
 
@@ -734,8 +712,8 @@ def delDb():
     db = client.admin
     sqlite_db = pSqliteDb('databases')
 
-    args = getArgs()
-    data = checkArgs(args, ['id', 'name'])
+    args = mw.getPluginArgs()
+    data = mw.checkPluginArgs(args, ['id', 'name'])
     if not data[0]:
         return data[1]
     try:
@@ -764,8 +742,8 @@ def delDbTable():
     db = client.admin
     sqlite_db = pSqliteDb('databases')
 
-    args = getArgs()
-    data = checkArgs(args, ['table_name', 'name'])
+    args = mw.getPluginArgs()
+    data = mw.checkPluginArgs(args, ['table_name', 'name'])
     if not data[0]:
         return data[1]
 
@@ -790,8 +768,8 @@ def delDbTable():
         return mw.returnJson(False, '删除失败!' + str(ex))
 
 def setRootPwd(version=''):
-    args = getArgs()
-    data = checkArgs(args, ['password'])
+    args = mw.getPluginArgs()
+    data = mw.checkPluginArgs(args, ['password'])
     if not data[0]:
         return data[1]
 
@@ -815,8 +793,8 @@ def setUserPwd(version=''):
     client = mongdbClient()
     sqlite_db = pSqliteDb('databases')
 
-    args = getArgs()
-    data = checkArgs(args, ['password', 'name'])
+    args = mw.getPluginArgs()
+    data = mw.checkPluginArgs(args, ['password', 'name'])
     if not data[0]:
         return data[1]
 
@@ -870,8 +848,8 @@ def syncGetDatabases():
     return mw.returnJson(True, msg)
 
 def setDbPs():
-    args = getArgs()
-    data = checkArgs(args, ['id', 'name', 'ps'])
+    args = mw.getPluginArgs()
+    data = mw.checkPluginArgs(args, ['id', 'name', 'ps'])
     if not data[0]:
         return data[1]
 
@@ -887,8 +865,8 @@ def setDbPs():
 
 
 def getDbInfo():
-    args = getArgs()
-    data = checkArgs(args, ['name'])
+    args = mw.getPluginArgs()
+    data = mw.checkPluginArgs(args, ['name'])
     if not data[0]:
         return data[1]
 
@@ -984,8 +962,8 @@ def toDbBase(find):
     return 1
 
 def syncToDatabases():
-    args = getArgs()
-    data = checkArgs(args, ['type', 'ids'])
+    args = mw.getPluginArgs()
+    data = mw.checkPluginArgs(args, ['type', 'ids'])
     if not data[0]:
         return data[1]
 
@@ -1058,8 +1036,8 @@ def getAllRole():
     return mw.returnJson(True, 'ok', result)
 
 def getDbAccess():
-    args = getArgs()
-    data = checkArgs(args, ['username'])
+    args = mw.getPluginArgs()
+    data = mw.checkPluginArgs(args, ['username'])
     if not data[0]:
         return data[1]
 
@@ -1099,8 +1077,8 @@ def getDbAccess():
     return mw.returnJson(True, 'ok', result)
 
 def setDbAccess():
-    args = getArgs()
-    data = checkArgs(args, ['username', 'select','name'])
+    args = mw.getPluginArgs()
+    data = mw.checkPluginArgs(args, ['username', 'select','name'])
     if not data[0]:
         return data[1]
     username = args['username']
@@ -1168,8 +1146,8 @@ def getReplConfig():
     return mw.returnJson(True, 'ok!', c)
 
 def replSetName():
-    args = getArgs()
-    data = checkArgs(args, ['name'])
+    args = mw.getPluginArgs()
+    data = mw.checkPluginArgs(args, ['name'])
     if not data[0]:
         return data[1]
 
@@ -1186,8 +1164,8 @@ def replSetName():
     return mw.returnJson(True, '设置成功!')
 
 def replSetNode():
-    args = getArgs()
-    data = checkArgs(args, ['node','priority','arbiterOnly','votes','idx'])
+    args = mw.getPluginArgs()
+    data = mw.checkPluginArgs(args, ['node','priority','arbiterOnly','votes','idx'])
     if not data[0]:
         return data[1]
 
@@ -1247,8 +1225,8 @@ def replSetNode():
 
 
 def delReplNode():
-    args = getArgs()
-    data = checkArgs(args, ['node'])
+    args = mw.getPluginArgs()
+    data = mw.checkPluginArgs(args, ['node'])
     if not data[0]:
         return data[1]
 
@@ -1363,8 +1341,8 @@ def getDbBackupListFunc(dbname=''):
     return r
 
 def getDbBackupList():
-    args = getArgs()
-    data = checkArgs(args, ['name'])
+    args = mw.getPluginArgs()
+    data = mw.checkPluginArgs(args, ['name'])
     if not data[0]:
         return data[1]
 
@@ -1420,8 +1398,8 @@ def getDbBackupImportList():
     return mw.returnJson(True, 'ok', rdata)
 
 def deleteDbBackup():
-    args = getArgs()
-    data = checkArgs(args, ['filename', 'path'])
+    args = mw.getPluginArgs()
+    data = mw.checkPluginArgs(args, ['filename', 'path'])
     if not data[0]:
         return data[1]
 
@@ -1435,8 +1413,8 @@ def deleteDbBackup():
     return mw.returnJson(True, '删除成功!')
 
 def setDbBackup():
-    args = getArgs()
-    data = checkArgs(args, ['name'])
+    args = mw.getPluginArgs()
+    data = mw.checkPluginArgs(args, ['name'])
     if not data[0]:
         return data[1]
 
@@ -1483,8 +1461,8 @@ def rootPwd():
         'id=?', (1,)).getField('mg_root')
 
 def importDbExternal():
-    args = getArgs()
-    data = checkArgs(args, ['file', 'name'])
+    args = mw.getPluginArgs()
+    data = mw.checkPluginArgs(args, ['file', 'name'])
     if not data[0]:
         return data[1]
 
@@ -1538,8 +1516,8 @@ def importDbExternal():
     return mw.returnJson(True, 'ok')
 
 def importDbExternalProgress():
-    args = getArgs()
-    data = checkArgs(args, ['file', 'name'])
+    args = mw.getPluginArgs()
+    data = mw.checkPluginArgs(args, ['file', 'name'])
     if not data[0]:
         return data[1]
 
@@ -1551,8 +1529,8 @@ def importDbExternalProgress():
     return mw.returnJson(True, 'ok',cmd)
 
 def importDbExternalProgressBar():
-    args = getArgs()
-    data = checkArgs(args, ['file', 'name'])
+    args = mw.getPluginArgs()
+    data = mw.checkPluginArgs(args, ['file', 'name'])
     if not data[0]:
         return data[1]
 
@@ -1601,8 +1579,8 @@ def importDbExternalProgressBar():
     return ""
 
 def importDbBackup():
-    args = getArgs()
-    data = checkArgs(args, ['file', 'name'])
+    args = mw.getPluginArgs()
+    data = mw.checkPluginArgs(args, ['file', 'name'])
     if not data[0]:
         return data[1]
 
@@ -1638,8 +1616,8 @@ def importDbBackup():
     return mw.returnJson(True, 'ok')
 
 def importDbBackupProgress():
-    args = getArgs()
-    data = checkArgs(args, ['file', 'name'])
+    args = mw.getPluginArgs()
+    data = mw.checkPluginArgs(args, ['file', 'name'])
     if not data[0]:
         return data[1]
 
@@ -1652,8 +1630,8 @@ def importDbBackupProgress():
     # return mw.returnJson(True, 'ok')
 
 def importDbBackupProgressBar():
-    args = getArgs()
-    data = checkArgs(args, ['file', 'name'])
+    args = mw.getPluginArgs()
+    data = mw.checkPluginArgs(args, ['file', 'name'])
     if not data[0]:
         return data[1]
 
@@ -1854,7 +1832,7 @@ def _setProfiling(level):
     if t == 'stop':
         return mw.returnJson(False, 'MongoDB 未启动!')
 
-    args = getArgs()
+    args = mw.getPluginArgs()
 
     slowms = 500
     if 'slowms' in args:

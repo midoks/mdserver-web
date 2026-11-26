@@ -69,33 +69,6 @@ def getMemPort():
     return tmp.groups()[0]
 
 
-def getArgs():
-    args = sys.argv[2:]
-    tmp = {}
-    args_len = len(args)
-
-    if args_len == 1:
-        t = args[0].strip('{').strip('}')
-        if t.strip() == '':
-            tmp = []
-        else:
-            t = t.split(':')
-            tmp[t[0]] = t[1]
-        tmp[t[0]] = t[1]
-    elif args_len > 1:
-        for i in range(len(args)):
-            t = args[i].split(':')
-            tmp[t[0]] = t[1]
-    return tmp
-
-
-def checkArgs(data, ck=[]):
-    for i in range(len(ck)):
-        if not ck[i] in data:
-            return (False, mw.returnJson(False, '参数:(' + ck[i] + ')没有!'))
-    return (True, mw.returnJson(True, 'ok'))
-
-
 def status():
     cmd = "ps -ef|grep " + getPluginName() + " |grep -v grep | grep -v mdserver-web | awk '{print $2}'"
     # print(cmd)
@@ -225,8 +198,8 @@ def runInfo():
 
 def saveConf():
 
-    args = getArgs()
-    data = checkArgs(args, ['ip', 'port', 'maxconn', 'maxsize'])
+    args = mw.getPluginArgs()
+    data = mw.checkPluginArgs(args, ['ip', 'port', 'maxconn', 'maxsize'])
     if not data[0]:
         return data[1]
 

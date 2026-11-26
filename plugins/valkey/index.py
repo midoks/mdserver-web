@@ -56,31 +56,6 @@ def getInitDTpl():
     return path
 
 
-def getArgs():
-    args = sys.argv[3:]
-    tmp = {}
-    args_len = len(args)
-
-    if args_len == 1:
-        t = args[0].strip('{').strip('}')
-        if t.strip() == '':
-            tmp = []
-        else:
-            t = t.split(':')
-            tmp[t[0]] = t[1]
-        tmp[t[0]] = t[1]
-    elif args_len > 1:
-        for i in range(len(args)):
-            t = args[i].split(':')
-            tmp[t[0]] = t[1]
-    return tmp
-
-def checkArgs(data, ck=[]):
-    for i in range(len(ck)):
-        if not ck[i] in data:
-            return (False, mw.returnJson(False, '参数:(' + ck[i] + ')没有!'))
-    return (True, mw.returnJson(True, 'ok'))
-
 def configTpl():
     path = getPluginDir() + '/tpl'
     pathFile = os.listdir(path)
@@ -92,8 +67,8 @@ def configTpl():
 
 
 def readConfigTpl():
-    args = getArgs()
-    data = checkArgs(args, ['file'])
+    args = mw.getPluginArgs()
+    data = mw.checkPluginArgs(args, ['file'])
     if not data[0]:
         return data[1]
 
@@ -505,7 +480,7 @@ def getRedisConf():
 def submitRedisConf():
     gets = ['bind', 'port', 'timeout', 'maxclients',
             'databases', 'requirepass', 'maxmemory','slaveof','masterauth']
-    args = getArgs()
+    args = mw.getPluginArgs()
     conf = getConf()
     content = mw.readFile(conf)
     for g in gets:

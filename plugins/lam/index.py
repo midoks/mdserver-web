@@ -33,30 +33,6 @@ def getServerDir():
     return mw.getServerDir() + '/' + getPluginName()
 
 
-def getArgs():
-    args = sys.argv[2:]
-    tmp = {}
-    args_len = len(args)
-
-    if args_len == 1:
-        t = args[0].strip('{').strip('}')
-        t = t.split(':')
-        tmp[t[0]] = t[1]
-    elif args_len > 1:
-        for i in range(len(args)):
-            t = args[i].split(':')
-            tmp[t[0]] = t[1]
-
-    return tmp
-
-
-def checkArgs(data, ck=[]):
-    for i in range(len(ck)):
-        if not ck[i] in data:
-            return (False, mw.returnJson(False, '参数:(' + ck[i] + ')没有!'))
-    return (True, mw.returnJson(True, 'ok'))
-
-
 def getConf():
     return mw.getServerDir() + '/web_conf/nginx/vhost/lam.conf'
 
@@ -299,7 +275,7 @@ def reload():
 
 
 def setPhpVer():
-    args = getArgs()
+    args = mw.getPluginArgs()
 
     if not 'phpver' in args:
         return 'phpver missing'
@@ -340,8 +316,8 @@ def getPmaPort():
 
 
 def setPmaPort():
-    args = getArgs()
-    data = checkArgs(args, ['port'])
+    args = mw.getPluginArgs()
+    data = mw.checkPluginArgs(args, ['port'])
     if not data[0]:
         return data[1]
 
@@ -363,8 +339,8 @@ def setPmaPort():
 
 
 def setPmaUsername():
-    args = getArgs()
-    data = checkArgs(args, ['username'])
+    args = mw.getPluginArgs()
+    data = mw.checkPluginArgs(args, ['username'])
     if not data[0]:
         return data[1]
 
@@ -382,8 +358,8 @@ def setPmaUsername():
 
 
 def setPmaPassword():
-    args = getArgs()
-    data = checkArgs(args, ['password'])
+    args = mw.getPluginArgs()
+    data = mw.checkPluginArgs(args, ['password'])
     if not data[0]:
         return data[1]
 
@@ -401,8 +377,8 @@ def setPmaPassword():
 
 
 def setPmaPath():
-    args = getArgs()
-    data = checkArgs(args, ['path'])
+    args = mw.getPluginArgs()
+    data = mw.checkPluginArgs(args, ['path'])
     if not data[0]:
         return data[1]
 
