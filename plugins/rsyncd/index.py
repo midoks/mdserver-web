@@ -6,6 +6,7 @@ import os
 import json
 import re
 import sys
+import shutil
 
 web_dir = os.getcwd() + "/web"
 if os.path.exists(web_dir):
@@ -405,9 +406,12 @@ def addRec():
             if file_chown != 'www':
                 return mw.returnJson(False, '建议手动执行命令: chown -R www:www '+ args_path)
         else:
-            os.system("mkdir -p " + args_path + " &")
-            os.system("chown -R  www:www " + args_path + " &")
-            os.system("chmod -R 755 " + args_path + " &")
+            os.makedirs(args_path, exist_ok=True)
+            try:
+                shutil.chown(args_path, 'www', 'www')
+            except Exception:
+                pass
+            os.chmod(args_path, 0o755)
 
     delRecBy(args_name)
 
@@ -749,9 +753,12 @@ def lsyncdAdd():
             if file_chown != 'www':
                 return mw.returnJson(False, '建议手动执行命令: chown -R www:www '+ args_path)
         else:
-            os.system("mkdir -p " + path + " &")
-            os.system("chown -R  www:www " + path + " &")
-            os.system("chmod -R 755 " + path + " &")
+            os.makedirs(path, exist_ok=True)
+            try:
+                shutil.chown(path, 'www', 'www')
+            except Exception:
+                pass
+            os.chmod(path, 0o755)
 
     conn_type = args['conn_type']
 
