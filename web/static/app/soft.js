@@ -556,6 +556,11 @@ function importPluginInstall(plugin_name, tmp_path) {
 
 $(function() {
     if (window.document.location.pathname == '/soft/') {
-        setInterval(function() { getSList(); }, 8000);
+        // 页面隐藏(document.hidden)时跳过本次轮询, 减少后台标签页无效请求
+        setInterval(function() {
+            if (!document.hidden) {
+                getSList();
+            }
+        }, 8000);
     }
 });
