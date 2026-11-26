@@ -55,7 +55,6 @@ fi
 
 if [ "$LOCAL_ADDR" != "common" ];then
     declare -A PROXY_URL
-    PROXY_URL["github_do"]="https://github.do/"
     PROXY_URL["gh_llkk_cc"]="https://gh.llkk.cc/https://"
     PROXY_URL["gh_felicity_ac_cn"]="https://gh.felicity.ac.cn/https://"
     PROXY_URL["ghfast_top"]="https://ghfast.top/"
