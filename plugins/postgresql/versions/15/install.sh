@@ -134,8 +134,10 @@ Uninstall_App()
 	echo '卸载[postgresql]完成'
 }
 
-if [ "${1}" = "install" ];then
+if [ "${action}" = 'install' ];then
 	Install_App
-else
+elif [ "${action}" = 'uninstall' ];then
 	Uninstall_App
+else
+	echo "OPTIONS ERROR"
 fi

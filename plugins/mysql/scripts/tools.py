@@ -4,6 +4,7 @@ import sys
 import os
 import json
 import time
+import subprocess
 
 sys.path.append(os.getcwd() + "/class/core")
 import mw
@@ -53,8 +54,12 @@ echo "The root password set ${pwd}  successuful"'''
     server = mw.getServerDir() + '/mysql'
     root_mysql = root_mysql.replace('${server}', server)
     mw.writeFile('mysql_root.sh', root_mysql)
-    os.system("/bin/bash mysql_root.sh " + password)
-    os.system("rm -f mysql_root.sh")
+    subprocess.run(['/bin/bash', 'mysql_root.sh', password],
+                   stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+    try:
+        os.remove('mysql_root.sh')
+    except OSError:
+        pass
 
     pos = mw.getServerDir() + '/mysql'
     result = sql.table('config').dbPos(pos, 'mysql').where(

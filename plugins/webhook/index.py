@@ -5,7 +5,10 @@ import io
 import os
 import time
 import re
+import hmac
 import json
+import secrets
+import subprocess
 
 web_dir = os.getcwd() + "/web"
 if os.path.exists(web_dir):
@@ -31,35 +34,45 @@ def getServerDir():
     return mw.getServerDir() + '/' + getPluginName()
 
 
-def getArgs():
-    args = sys.argv[2:]
-    tmp = {}
-    args_len = len(args)
-
-    if args_len == 1:
-        t = args[0].strip('{').strip('}')
-        if t.strip() == '':
-            tmp = []
-        else:
-            t = t.split(':')
-            tmp[t[0]] = t[1]
-        tmp[t[0]] = t[1]
-    elif args_len > 1:
-        for i in range(len(args)):
-            t = args[i].split(':')
-            tmp[t[0]] = t[1]
-    return tmp
-
-
-def checkArgs(data, ck=[]):
-    for i in range(len(ck)):
-        if not ck[i] in data:
-            return (False, mw.returnJson(False, '参数:(' + ck[i] + ')没有!'))
-    return (True, mw.returnJson(True, 'ok'))
-
-
 def getCfgFilePath():
     return getServerDir() + "/cfg.json"
+
+
+ACCESS_KEY_RE = re.compile(r'^[a-f0-9]{64}$')
+
+
+def genAccessKey():
+    # 使用 CSPRNG 生成不可猜测的密钥
+    return secrets.token_hex(32)
+
+
+def migrateCfg(data):
+    # 兼容旧版本: 旧 access_key 为 md5(title), 可被猜测, 自动迁移为随机密钥
+    changed = False
+    script_dir = getServerDir() + '/scripts'
+    for hook in data:
+        if not isinstance(hook, dict):
+            continue
+        key = hook.get('access_key', '')
+        if ACCESS_KEY_RE.fullmatch(key or ''):
+            continue
+        if not hook.get('title'):
+            continue
+        new_key = genAccessKey()
+        try:
+            old_script = script_dir + '/' + key
+            new_script = script_dir + '/' + new_key
+            if key and os.path.exists(old_script):
+                os.rename(old_script, new_script)
+            if key and os.path.exists(old_script + '.log'):
+                os.rename(old_script + '.log', new_script + '.log')
+        except Exception:
+            pass
+        hook['access_key'] = new_key
+        changed = True
+    if changed:
+        mw.writeFile(getCfgFilePath(), json.dumps(data))
+    return data
 
 
 def initCfg():
@@ -75,7 +88,7 @@ def getCfg():
 
     data = mw.readFile(cfg)
     data = json.loads(data)
-    return data
+    return migrateCfg(data)
 
 
 def addCfg(val):
@@ -90,8 +103,8 @@ def status():
 
 
 def addHook():
-    args = getArgs()
-    data = checkArgs(args, ['title', "shell"])
+    args = mw.getPluginArgs()
+    data = mw.checkPluginArgs(args, ['title', "shell"])
     if not data[0]:
         return data[1]
 
@@ -100,7 +113,7 @@ def addHook():
     if hook['title'] == '':
         return mw.returnJson(False, '名称不能为空!')
 
-    hook['access_key'] = mw.md5(hook['title'])
+    hook['access_key'] = genAccessKey()
     hook['count'] = 0
     hook['addtime'] = int(time.time())
     hook['uptime'] = 0
@@ -120,7 +133,7 @@ def addHookShell(args):
 
     hook = {}
     hook['title'] = args['title']
-    hook['access_key'] = mw.md5(hook['title'])
+    hook['access_key'] = genAccessKey()
     hook['count'] = 0
     hook['addtime'] = int(time.time())
     hook['uptime'] = 0
@@ -145,8 +158,8 @@ def getList():
 
 
 def getLog():
-    args = getArgs()
-    check_arg = checkArgs(args, ['path'])
+    args = mw.getPluginArgs()
+    check_arg = mw.checkPluginArgs(args, ['path'])
     if not check_arg[0]:
         return check_arg[1]
 
@@ -165,19 +178,20 @@ def getLogCb(args):
 def runShellArgs(args):
     data = getCfg()
     for i in range(len(data)):
-        if data[i]['access_key'] == args['access_key']:
+        key = data[i].get('access_key', '')
+        if key and hmac.compare_digest(str(key), str(args.get('access_key', ''))):
             script_dir = getServerDir() + "/scripts"
-            shellFile = script_dir + '/' + args['access_key']
-            param = args['params']
+            shellFile = script_dir + '/' + key
+            param = args.get('params', '')
             if param == '':
                 param = 'no-parameters'
 
-            param = re.sub("\"", '', param)
-
-            cmd = "bash {} {} >> {}.log 2>&1 &".format(
-                shellFile, param, shellFile)
-            # print(cmd)
-            os.system(cmd)
+            # 参数作为单个 argv 传给 bash, 不经过 shell, 避免命令注入
+            log_file = shellFile + '.log'
+            with open(log_file, 'ab') as logf:
+                subprocess.Popen(['bash', shellFile, param],
+                                 stdout=logf, stderr=subprocess.STDOUT,
+                                 start_new_session=True)
             data[i]['count'] += 1
             data[i]['uptime'] = int(time.time())
             mw.writeFile(getCfgFilePath(), json.dumps(data))
@@ -185,28 +199,33 @@ def runShellArgs(args):
     return mw.returnJson(False, '指定Hook不存在!')
 
 def getRunShellCmd():
-    args = getArgs()
-    check_arg = checkArgs(args, ['access_key'])
+    args = mw.getPluginArgs()
+    check_arg = mw.checkPluginArgs(args, ['access_key'])
     if not check_arg[0]:
         return check_arg[1]
 
+    access_key = args['access_key']
+    if not ACCESS_KEY_RE.fullmatch(access_key or ''):
+        return mw.returnJson(False, '非法的Hook密钥!')
+
     script_dir = getServerDir() + "/scripts"
-    shellFile = script_dir + '/' + args['access_key']
+    shellFile = script_dir + '/' + access_key
     param = ''
     if 'params' in args:
         param = args['params']
-    param = re.sub("\"", '', param)
-    
+
     cmd = ""
     cmd += "git config --global credential.helper store\n"
     cmd += "git config --global pull.rebase false\n"
-    cmd += "bash {} {}".format(shellFile, param)
+    cmd += "bash " + mw.quote(shellFile)
+    if param != '':
+        cmd += " " + mw.quote(param)
     return mw.returnJson(True, 'ok', cmd)
 
 
 def runShell():
-    args = getArgs()
-    check_arg = checkArgs(args, ['access_key'])
+    args = mw.getPluginArgs()
+    check_arg = mw.checkPluginArgs(args, ['access_key'])
     if not check_arg[0]:
         return check_arg[1]
 
@@ -215,20 +234,24 @@ def runShell():
 
 
 def delHook():
-    args = getArgs()
-    check_arg = checkArgs(args, ['access_key'])
+    args = mw.getPluginArgs()
+    check_arg = mw.checkPluginArgs(args, ['access_key'])
     if not check_arg[0]:
         return check_arg[1]
+
+    access_key = args['access_key']
+    if not ACCESS_KEY_RE.fullmatch(access_key or ''):
+        return mw.returnJson(False, '非法的Hook密钥!')
 
     data = getCfg()
     newdata = []
     for hook in data:
-        if hook['access_key'] == args['access_key']:
+        if hook['access_key'] == access_key:
             continue
         newdata.append(hook)
 
     jsonFile = getCfgFilePath()
-    shellFile = getServerDir() + "/scripts/" + args['access_key']
+    shellFile = getServerDir() + "/scripts/" + access_key
     if not os.path.exists(shellFile):
         return mw.returnJson(False, '删除失败!')
     os.remove(shellFile)
@@ -256,8 +279,8 @@ def configTpl():
     return mw.getJson(tmp)
 
 def readConfigTpl():
-    args = getArgs()
-    data = checkArgs(args, ['file', 'title'])
+    args = mw.getPluginArgs()
+    data = mw.checkPluginArgs(args, ['file', 'title'])
     if not data[0]:
         return data[1]
 

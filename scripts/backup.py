@@ -46,7 +46,8 @@ class backupTools:
             filename + "' " + exclude_dir_cmd + " '" + os.path.basename(path) + "' > /dev/null"
 
         # print(cmd)
-        mw.execShell(cmd)
+        subprocess.run(cmd.split(),
+                       stdout=subprocess.PIPE, stderr=subprocess.PIPE)
 
         endDate = time.strftime('%Y/%m/%d %X', time.localtime())
         # print(filename)
@@ -73,7 +74,8 @@ class backupTools:
         num = len(backups) - int(count)
         if num > 0:
             for backup in backups:
-                mw.execShell("rm -f " + backup['filename'])
+                subprocess.run(["rm", "-f", backup['filename']],
+                               stdout=subprocess.PIPE, stderr=subprocess.PIPE)
                 sql.table('backup').where('id=?', (backup['id'],)).delete()
                 num -= 1
                 print("|---已清理过期备份文件：" + backup['filename'])
@@ -97,10 +99,12 @@ class backupTools:
         return mode
 
      # 数据库密码处理
-    def mypass(self, act, root):
-        conf_file = self.getConf('mysql')
-        mw.execShell("sed -i '_bak' '/user=root/d' {}".format(conf_file))
-        mw.execShell("sed -i '_bak' '/password=/d' {}".format(conf_file))
+        def mypass(self, act, root):
+            conf_file = self.getConf('mysql')
+            subprocess.run(["sed", "-i", "_bak", "/user=root/d", conf_file],
+                           stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+            subprocess.run(["sed", "-i", "_bak", "/password=/d", conf_file],
+                           stdout=subprocess.PIPE, stderr=subprocess.PIPE)
 
         conf_file_bak = conf_file+'_bak'
         if os.path.exists(conf_file_bak):
@@ -165,7 +169,8 @@ class backupTools:
 
         backup_path = mw.getBackupDir() + '/database/mysql'
         if not os.path.exists(backup_path):
-            mw.execShell("mkdir -p " + backup_path)
+            subprocess.run(["mkdir", "-p", backup_path],
+                           stdout=subprocess.PIPE, stderr=subprocess.PIPE)
 
         filename = backup_path + "/db_" + backup_name + "_" + \
             time.strftime('%Y%m%d_%H%M%S', time.localtime()) + ".sql.gz"
@@ -231,7 +236,8 @@ class backupTools:
         num = len(backups) - int(count)
         if num > 0:
             for backup in backups:
-                mw.execShell("rm -f " + backup_path + "/"+backup)
+                subprocess.run(["rm", "-f", backup_path + "/"+backup],
+                               stdout=subprocess.PIPE, stderr=subprocess.PIPE)
                 num -= 1
                 print("|---已清理过期文件：" + backup)
                 if num < 1:
@@ -311,7 +317,8 @@ class backupTools:
 
         backup_path = mw.getBackupDir() + '/path'
         if not os.path.exists(backup_path):
-            mw.execShell("mkdir -p " + backup_path)
+            subprocess.run(["mkdir", "-p", backup_path],
+                           stdout=subprocess.PIPE, stderr=subprocess.PIPE)
 
         dirname = os.path.basename(path)
         fname = 'path_{}_{}.tar.gz'.format(
@@ -324,7 +331,8 @@ class backupTools:
         cmd = "cd " + os.path.dirname(path) + " && tar zcvf '" + dfile + "' " + exclude_dir_cmd + " '" + dirname + "' 2>{err_log} 1> /dev/null".format(
             err_log='/tmp/backup_err.log')
         # print(cmd)
-        mw.execShell(cmd)
+        subprocess.run(cmd.split(),
+                       stdout=subprocess.PIPE, stderr=subprocess.PIPE)
 
         tar_size = os.path.getsize(dfile)
 
@@ -342,7 +350,8 @@ class backupTools:
         if num > 0:
             for backup in backups:
                 abspath_bk = backup_path + "/" + backup
-                mw.execShell("rm -f " + abspath_bk)
+                subprocess.run(["rm", "-f", abspath_bk],
+                               stdout=subprocess.PIPE, stderr=subprocess.PIPE)
                 mw.echoInfo("已清理过期备份文件：" + abspath_bk)
                 num -= 1
                 if num < 1:

@@ -97,10 +97,10 @@ class backupTools:
         #              name + " | gzip > " + filename)
 
         cmd = db_path + "/bin/mariadb-dump --defaults-file=" + my_conf_path + "  --single-transaction --quick --default-character-set=utf8 " + \
-            name + " | gzip > " + filename
+            mw.quote(name) + " | gzip > " + mw.quote(filename)
         if table_name != '':
             cmd = db_path + "/bin/mariadb-dump --defaults-file=" + my_conf_path + "  --single-transaction --quick --default-character-set=utf8 " + \
-            name + " " + table_name + " | gzip > " + filename
+            mw.quote(name) + " " + mw.quote(table_name) + " | gzip > " + mw.quote(filename)
         mw.execShell(cmd)
 
         mycnf = mw.readFile(db_path + '/etc/my.cnf')
@@ -130,7 +130,10 @@ class backupTools:
         num = len(backups) - int(count)
         if num > 0:
             for backup in backups:
-                mw.execShell("rm -f " + backup_path + "/"+backup)
+                try:
+                    os.remove(backup_path + "/" + backup)
+                except OSError:
+                    pass
                 num -= 1
                 print("|---已清理过期文件：" + backup)
                 if num < 1:

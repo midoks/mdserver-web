@@ -44,31 +44,6 @@ def getInitDFile():
     return '/etc/init.d/' + getPluginName()
 
 
-def getArgs():
-    args = sys.argv[2:]
-    # print(args)
-    tmp = {}
-    args_len = len(args)
-
-    if args_len == 1:
-        t = args[0].strip('{').strip('}')
-        t = t.split(':',2)
-        tmp[t[0]] = t[1]
-    elif args_len > 1:
-        for i in range(len(args)):
-            t = args[i].split(':',2)
-            tmp[t[0]] = t[1]
-    # print(tmp)
-    return tmp
-
-
-def checkArgs(data, ck=[]):
-    for i in range(len(ck)):
-        if not ck[i] in data:
-            return (False, mw.returnJson(False, '参数:(' + ck[i] + ')没有!'))
-    return (True, mw.returnJson(True, 'ok'))
-
-
 def clearTemp():
     path_bin = getServerDir() + "/httpd"
 
@@ -476,7 +451,7 @@ def replaceChar(value, index, new_char):
     return value[:index] + new_char + value[index+1:]
 
 def setCfg():
-    args = getArgs()
+    args = mw.getPluginArgs()
     
     # 检查参数，允许动态参数
     cfg = getConfMpm()

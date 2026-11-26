@@ -36,30 +36,6 @@ def getPluginDir():
     return mw.getPluginDir() + '/' + getPluginName()
 
 
-def getArgs():
-    args = sys.argv[3:]
-    tmp = {}
-    args_len = len(args)
-
-    if args_len == 1:
-        t = args[0].strip('{').strip('}')
-        t = t.split(':')
-        tmp[t[0]] = t[1]
-    elif args_len > 1:
-        for i in range(len(args)):
-            t = args[i].split(':')
-            tmp[t[0]] = t[1]
-
-    return tmp
-
-
-def checkArgs(data, ck=[]):
-    for i in range(len(ck)):
-        if not ck[i] in data:
-            return (False, mw.returnJson(False, '参数:(' + ck[i] + ')没有!'))
-    return (True, mw.returnJson(True, 'ok'))
-
-
 def getConf(version):
     path = getServerDir() + '/php' + version + '/php.ini'
     return path
@@ -321,7 +297,7 @@ def submitPhpConf(version):
             'asp_tags', 'max_execution_time', 'max_input_time', 'max_input_vars', 'memory_limit',
             'post_max_size', 'file_uploads', 'upload_max_filesize', 'max_file_uploads',
             'default_socket_timeout', 'error_reporting']
-    args = getArgs()
+    args = mw.getPluginArgs()
     filename = getConf(version)
     phpini = mw.readFile(filename)
     for g in gets:
@@ -371,8 +347,8 @@ def getLimitConf(version):
 
 
 def setMaxTime(version):
-    args = getArgs()
-    data = checkArgs(args, ['time'])
+    args = mw.getPluginArgs()
+    data = mw.checkPluginArgs(args, ['time'])
     if not data[0]:
         return data[1]
 
@@ -397,8 +373,8 @@ def setMaxTime(version):
 
 
 def setMaxSize(version):
-    args = getArgs()
-    data = checkArgs(args, ['max'])
+    args = mw.getPluginArgs()
+    data = mw.checkPluginArgs(args, ['max'])
     if not data[0]:
         return data[1]
 
@@ -447,7 +423,7 @@ def getFpmConfig(version):
 
 
 def setFpmConfig(version):
-    args = getArgs()
+    args = mw.getPluginArgs()
     # if not 'max' in args:
     #     return 'missing time args!'
 
@@ -570,7 +546,7 @@ def getSessionConf(version):
 
 def setSessionConf(version):
 
-    args = getArgs()
+    args = mw.getPluginArgs()
 
     ip = args['ip']
     port = args['port']
@@ -722,7 +698,7 @@ def setDisableFunc(version):
     if not os.path.exists(filename):
         return mw.returnJson(False, '指定PHP版本不存在!')
 
-    args = getArgs()
+    args = mw.getPluginArgs()
     disable_functions = args['disable_functions']
 
     phpini = mw.readFile(filename)
@@ -792,29 +768,29 @@ def getLibConf(version):
 
 
 def installLib(version):
-    args = getArgs()
-    data = checkArgs(args, ['name'])
+    args = mw.getPluginArgs()
+    data = mw.checkPluginArgs(args, ['name'])
     if not data[0]:
         return data[1]
 
     name = args['name']
-    cmd = "cd " + getPluginDir() + "/versions && /bin/bash  common.sh " + version + ' install ' + name
+    cmd = "cd " + mw.quote(getPluginDir() + "/versions") + " && /bin/bash  common.sh " + mw.quote(version) + ' install ' + mw.quote(name)
     install_name = '安装PHPYUM[' + name + '-' + version + ']'
     import thisdb
-    thisdb.addTask(name=install_name,cmd=cmd)
+    thisdb.addTask(name=install_name,cmd=mw.quote(cmd))
 
     mw.triggerTask()
     return mw.returnJson(True, '已将下载任务添加到队列!')
 
 
 def uninstallLib(version):
-    args = getArgs()
-    data = checkArgs(args, ['name'])
+    args = mw.getPluginArgs()
+    data = mw.checkPluginArgs(args, ['name'])
     if not data[0]:
         return data[1]
 
     name = args['name']
-    execstr = "cd " + getPluginDir() + '/versions/' + " && /bin/bash common.sh " + version + ' uninstall ' + name
+    execstr = "cd " + mw.quote(getPluginDir() + '/versions/') + " && /bin/bash common.sh " + mw.quote(version) + ' uninstall ' + mw.quote(name)
 
     data = mw.execShell(execstr)
     # data[0] == '' and

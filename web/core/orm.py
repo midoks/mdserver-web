@@ -100,14 +100,17 @@ class ORM:
     def setDbName(self, name):
         self.__DB_NAME = name
 
-    def execute(self, sql):
-        # 执行SQL语句返回受影响行
+    def execute(self, sql, param=None):
+        # 执行SQL语句返回受影响行, param 用于参数化查询
         if not self.__Conn():
             if self.__DB_ERR:
                 raise self.__DB_ERR
             raise Exception('数据库连接失败')
         try:
-            result = self.__DB_CUR.execute(sql)
+            if param is None:
+                result = self.__DB_CUR.execute(sql)
+            else:
+                result = self.__DB_CUR.execute(sql, param)
             self.__DB_CONN.commit()
             self.__Close()
             return result

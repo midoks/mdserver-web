@@ -161,6 +161,36 @@
 <script type="text/javascript" src="/static/layer/layer.js?v={{config.version}}"></script>
 <script type="text/javascript" src="/static/js/Validform_v5.3.2_min.js?v={{config.version}}"></script>
 <script type="text/javascript">
+// CSRF 双提交: 原生 cookie 读取 (login 页未引 jquery.cookie)
+(function($){
+    function getCsrfToken(){
+        var m = document.cookie.match(/(?:^|;\s*)csrf_token=([^;]+)/);
+        return m ? decodeURIComponent(m[1]) : '';
+    }
+    $.ajaxSetup({
+        beforeSend: function(xhr, settings){
+            // 所有同源请求都带 csrf_token, 跨域请求跳过避免触发 CORS preflight
+            if(settings && settings.crossDomain){
+                return;
+            }
+            var tk = getCsrfToken();
+            if(tk){
+                xhr.setRequestHeader('X-CSRF-Token', tk);
+            }
+        },
+        statusCode: {
+            403: function(xhr){
+                try{
+                    var j = JSON.parse(xhr.responseText);
+                    if(j && j.msg && j.msg.indexOf('CSRF')>-1){
+                        layer.msg(j.msg, {icon: 2, time: 3000});
+                    }
+                }catch(e){}
+            }
+        }
+    });
+})(jQuery);
+
 $(function(){
 	wreset();
 })

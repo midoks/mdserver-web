@@ -47,30 +47,6 @@ def getConf():
     return conf
 
 
-def getArgs():
-    args = sys.argv[2:]
-    tmp = {}
-    args_len = len(args)
-
-    if args_len == 1:
-        t = args[0].strip('{').strip('}')
-        t = t.split(':')
-        tmp[t[0]] = t[1]
-    elif args_len > 1:
-        for i in range(len(args)):
-            t = args[i].split(':')
-            tmp[t[0]] = t[1]
-
-    return tmp
-
-
-def checkArgs(data, ck=[]):
-    for i in range(len(ck)):
-        if not ck[i] in data:
-            return (False, mw.returnJson(False, '参数:(' + ck[i] + ')没有!'))
-    return (True, mw.returnJson(True, 'ok'))
-
-
 def luaConf():
     return mw.getServerDir() + '/web_conf/nginx/vhost/webstats.conf'
 
@@ -395,7 +371,7 @@ def closeLuaNeedRequestBody():
 
 
 def setGlobalConf():
-    args = getArgs()
+    args = mw.getPluginArgs()
 
     conf = getConf()
     content = mw.readFile(conf)
@@ -403,7 +379,7 @@ def setGlobalConf():
 
     open_force_get_request_body = False
     for v in ['record_post_args', 'record_get_403_args']:
-        data = checkArgs(args, [v])
+        data = mw.checkPluginArgs(args, [v])
         if data[0]:
             rval = False
             if args[v] == "true":
@@ -419,16 +395,16 @@ def setGlobalConf():
         closeLuaNeedRequestBody()
 
     for v in ['ip_top_num', 'uri_top_num', 'save_day']:
-        data = checkArgs(args, [v])
+        data = mw.checkPluginArgs(args, [v])
         if data[0]:
             content['global'][v] = int(args[v])
 
     for v in ['cdn_headers', 'exclude_extension', 'exclude_status', 'exclude_ip']:
-        data = checkArgs(args, [v])
+        data = mw.checkPluginArgs(args, [v])
         if data[0]:
             content['global'][v] = args[v].split("\\n")
 
-    data = checkArgs(args, ['exclude_url'])
+    data = mw.checkPluginArgs(args, ['exclude_url'])
     if data[0]:
         exclude_url = args['exclude_url'].strip(";")
         exclude_url_val = []
@@ -450,9 +426,9 @@ def setGlobalConf():
 
 
 def getSiteConf():
-    args = getArgs()
+    args = mw.getPluginArgs()
 
-    check = checkArgs(args, ['site'])
+    check = mw.checkPluginArgs(args, ['site'])
     if not check[0]:
         return check[1]
 
@@ -478,8 +454,8 @@ def getSiteConf():
 
 
 def setSiteConf():
-    args = getArgs()
-    check = checkArgs(args, ['site'])
+    args = mw.getPluginArgs()
+    check = mw.checkPluginArgs(args, ['site'])
     if not check[0]:
         return check[1]
 
@@ -502,7 +478,7 @@ def setSiteConf():
             'global']['record_get_403_args']
 
     for v in ['record_post_args', 'record_get_403_args']:
-        data = checkArgs(args, [v])
+        data = mw.checkPluginArgs(args, [v])
         if data[0]:
             rval = False
             if args[v] == "true":
@@ -510,16 +486,16 @@ def setSiteConf():
             site_conf[v] = rval
 
     for v in ['ip_top_num', 'uri_top_num', 'save_day']:
-        data = checkArgs(args, [v])
+        data = mw.checkPluginArgs(args, [v])
         if data[0]:
             site_conf[v] = int(args[v])
 
     for v in ['cdn_headers', 'exclude_extension', 'exclude_status', 'exclude_ip']:
-        data = checkArgs(args, [v])
+        data = mw.checkPluginArgs(args, [v])
         if data[0]:
             site_conf[v] = args[v].strip().split("\\n")
 
-    data = checkArgs(args, ['exclude_url'])
+    data = mw.checkPluginArgs(args, ['exclude_url'])
     if data[0]:
         exclude_url = args['exclude_url'].strip(";")
         exclude_url_val = []
@@ -617,8 +593,8 @@ def getSiteStatInfo(domain, query_date):
 
 
 def getOverviewList():
-    args = getArgs()
-    check = checkArgs(args, ['site', 'query_date', 'order'])
+    args = mw.getPluginArgs()
+    check = mw.checkPluginArgs(args, ['site', 'query_date', 'order'])
     if not check[0]:
         return check[1]
 
@@ -680,8 +656,8 @@ def getOverviewList():
 
 
 def getSiteList():
-    args = getArgs()
-    check = checkArgs(args, ['query_date'])
+    args = mw.getPluginArgs()
+    check = mw.checkPluginArgs(args, ['query_date'])
     if not check[0]:
         return check[1]
 
@@ -703,8 +679,8 @@ def getLogsRealtimeInfo():
     实时信息
     '''
     import datetime
-    args = getArgs()
-    check = checkArgs(args, ['site', 'type','second'])
+    args = mw.getPluginArgs()
+    check = mw.checkPluginArgs(args, ['site', 'type','second'])
     if not check[0]:
         return check[1]
 
@@ -753,8 +729,8 @@ def attacHistoryLogHack(conn, site_name, query_date='today'):
 
 
 def getLogsList():
-    args = getArgs()
-    check = checkArgs(args, ['page', 'page_size','site', 'method', 
+    args = mw.getPluginArgs()
+    check = mw.checkPluginArgs(args, ['page', 'page_size','site', 'method',
             'status_code', 'spider_type', 'request_time','query_date', 'search_uri'])
     if not check[0]:
         return check[1]
@@ -882,8 +858,8 @@ def getLogsList():
 
 
 def getLogsErrorList():
-    args = getArgs()
-    check = checkArgs(args, ['page', 'page_size',
+    args = mw.getPluginArgs()
+    check = mw.checkPluginArgs(args, ['page', 'page_size',
                              'site', 'status_code', 'query_date'])
     if not check[0]:
         return check[1]
@@ -947,8 +923,8 @@ def getLogsErrorList():
 
 
 def getClientStatList():
-    args = getArgs()
-    check = checkArgs(args, ['page', 'page_size',
+    args = mw.getPluginArgs()
+    check = mw.checkPluginArgs(args, ['page', 'page_size',
                              'site', 'query_date'])
     if not check[0]:
         return check[1]
@@ -1080,8 +1056,8 @@ def getDateRangeList(start, end):
 
 
 def getIpStatList():
-    args = getArgs()
-    check = checkArgs(args, ['site', 'query_date'])
+    args = mw.getPluginArgs()
+    check = mw.checkPluginArgs(args, ['site', 'query_date'])
     if not check[0]:
         return check[1]
 
@@ -1221,8 +1197,8 @@ def getIpStatList():
 
 
 def getUriStatList():
-    args = getArgs()
-    check = checkArgs(args, ['site', 'query_date'])
+    args = mw.getPluginArgs()
+    check = mw.checkPluginArgs(args, ['site', 'query_date'])
     if not check[0]:
         return check[1]
 
@@ -1342,8 +1318,8 @@ def getWebLogCount(domain, query_date):
 
 
 def getSpiderStatList():
-    args = getArgs()
-    check = checkArgs(args, ['page', 'page_size',
+    args = mw.getPluginArgs()
+    check = mw.checkPluginArgs(args, ['page', 'page_size',
                              'site', 'query_date'])
     if not check[0]:
         return check[1]

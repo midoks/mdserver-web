@@ -42,33 +42,6 @@ def getInitDTpl():
     return path
 
 
-def getArgs():
-    args = sys.argv[2:]
-    tmp = {}
-    args_len = len(args)
-
-    if args_len == 1:
-        t = args[0].strip('{').strip('}')
-        if t.strip() == '':
-            tmp = []
-        else:
-            t = t.split(':')
-            tmp[t[0]] = t[1]
-        tmp[t[0]] = t[1]
-    elif args_len > 1:
-        for i in range(len(args)):
-            t = args[i].split(':')
-            tmp[t[0]] = t[1]
-    return tmp
-
-
-def checkArgs(data, ck=[]):
-    for i in range(len(ck)):
-        if not ck[i] in data:
-            return (False, mw.returnJson(False, '参数:(' + ck[i] + ')没有!'))
-    return (True, mw.returnJson(True, 'ok'))
-
-
 def status():
     dir_path = getServerDir() + '/trace'
     if not os.path.exists(dir_path):
@@ -131,8 +104,8 @@ def get_file_path(args):
 
 
 def dtGetFilePath():
-    args = getArgs()
-    data = checkArgs(args, ['file'])
+    args = mw.getPluginArgs()
+    data = mw.checkPluginArgs(args, ['file'])
     if not data[0]:
         return data[1]
 
@@ -145,8 +118,8 @@ def dtGetFilePath():
 
 
 def dtRemoveFilePath():
-    args = getArgs()
-    data = checkArgs(args, ['file'])
+    args = mw.getPluginArgs()
+    data = mw.checkPluginArgs(args, ['file'])
     if not data[0]:
         return data[1]
 
@@ -185,8 +158,8 @@ def dtSimpleTrace():
     if mw.isAppleSystem():
         return mw.returnJson(False, 'macosx只能手动执行!')
 
-    args = getArgs()
-    data = checkArgs(args, ['pid'])
+    args = mw.getPluginArgs()
+    data = mw.checkPluginArgs(args, ['pid'])
     if not data[0]:
         return data[1]
 

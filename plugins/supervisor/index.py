@@ -49,30 +49,6 @@ def getInitDTpl():
     return path
 
 
-def getArgs():
-    args = sys.argv[2:]
-    tmp = {}
-    args_len = len(args)
-
-    if args_len == 1:
-        t = args[0].strip('{').strip('}')
-        t = t.split(':')
-        tmp[t[0]] = t[1]
-    elif args_len > 1:
-        for i in range(len(args)):
-            t = args[i].split(':', 1)
-            tmp[t[0]] = t[1]
-
-    return tmp
-
-
-def checkArgs(data, ck=[]):
-    for i in range(len(ck)):
-        if not ck[i] in data:
-            return (False, mw.returnJson(False, '参数:(' + ck[i] + ')没有!'))
-    return (True, mw.returnJson(True, 'ok'))
-
-
 def status():
     # data = mw.execShell(
     #     "ps -ef|grep supervisor | grep -v grep | grep -v index.py | awk '{print $2}'")
@@ -258,8 +234,8 @@ def confDList():
 
 
 def confDlistTraceLog():
-    args = getArgs()
-    data = checkArgs(args, ['name'])
+    args = mw.getPluginArgs()
+    data = mw.checkPluginArgs(args, ['name'])
     if not data[0]:
         return data[1]
 
@@ -271,8 +247,8 @@ def confDlistTraceLog():
 
 
 def confDlistErrorLog():
-    args = getArgs()
-    data = checkArgs(args, ['name'])
+    args = mw.getPluginArgs()
+    data = mw.checkPluginArgs(args, ['name'])
     if not data[0]:
         return data[1]
 
@@ -285,7 +261,7 @@ def confDlistErrorLog():
 def getUserListData():
     user = getServerDir() + "/user.txt"
     if not os.path.isfile(user):
-        os.system(r"touch {}".format(user))
+        open(user, 'a').close()
     res = mw.execShell("cat /etc/passwd > " + user)
     with open(user, "r") as fr:
         users = fr.readlines()
@@ -316,8 +292,8 @@ def getUserList():
 
 
 def addJob():
-    args = getArgs()
-    data = checkArgs(args, ['name', 'user', 'path', 'command', 'numprocs'])
+    args = mw.getPluginArgs()
+    data = mw.checkPluginArgs(args, ['name', 'user', 'path', 'command', 'numprocs'])
     if not data[0]:
         return data[1]
 
@@ -354,8 +330,8 @@ def addJob():
 
 
 def startJob():
-    args = getArgs()
-    data = checkArgs(args, ['name', 'status'])
+    args = mw.getPluginArgs()
+    data = mw.checkPluginArgs(args, ['name', 'status'])
     if not data[0]:
         return data[1]
 
@@ -379,8 +355,8 @@ def startJob():
 
 
 def restartJob():
-    args = getArgs()
-    data = checkArgs(args, ['name', 'status'])
+    args = mw.getPluginArgs()
+    data = mw.checkPluginArgs(args, ['name', 'status'])
     if not data[0]:
         return data[1]
 
@@ -400,8 +376,8 @@ def restartJob():
 
 
 def delJob():
-    args = getArgs()
-    data = checkArgs(args, ['name'])
+    args = mw.getPluginArgs()
+    data = mw.checkPluginArgs(args, ['name'])
     if not data[0]:
         return data[1]
     name = args['name']
@@ -433,8 +409,8 @@ def delJob():
 
 
 def updateJob():
-    args = getArgs()
-    data = checkArgs(args, ["name", 'user', 'numprocs', 'priority'])
+    args = mw.getPluginArgs()
+    data = mw.checkPluginArgs(args, ["name", 'user', 'numprocs', 'priority'])
     if not data[0]:
         return data[1]
     user = args['user']
@@ -479,8 +455,8 @@ def updateJob():
 
 
 def getJobInfo():
-    args = getArgs()
-    data = checkArgs(args, ['name'])
+    args = mw.getPluginArgs()
+    data = mw.checkPluginArgs(args, ['name'])
     if not data[0]:
         return data[1]
     name = args['name']
@@ -517,8 +493,8 @@ def configTpl():
 
 
 def readConfigTpl():
-    args = getArgs()
-    data = checkArgs(args, ['file'])
+    args = mw.getPluginArgs()
+    data = mw.checkPluginArgs(args, ['file'])
     if not data[0]:
         return data[1]
 
@@ -527,8 +503,8 @@ def readConfigTpl():
 
 
 def readConfigLogTpl():
-    args = getArgs()
-    data = checkArgs(args, ['file'])
+    args = mw.getPluginArgs()
+    data = mw.checkPluginArgs(args, ['file'])
     if not data[0]:
         return data[1]
     file_log = args['file']
@@ -549,8 +525,8 @@ def readConfigLogTpl():
 
 
 def readConfigLogErrorTpl():
-    args = getArgs()
-    data = checkArgs(args, ['file'])
+    args = mw.getPluginArgs()
+    data = mw.checkPluginArgs(args, ['file'])
     if not data[0]:
         return data[1]
     file_log = args['file']
@@ -571,8 +547,8 @@ def readConfigLogErrorTpl():
 
 
 def supClearLog():
-    args = getArgs()
-    data = checkArgs(args, ['file'])
+    args = mw.getPluginArgs()
+    data = mw.checkPluginArgs(args, ['file'])
     if not data[0]:
         return data[1]
     file_log = args['file']

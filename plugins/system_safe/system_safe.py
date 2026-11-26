@@ -61,28 +61,6 @@ class App:
         path = self.getPluginDir() + "/init.d/" + self.getPluginName() + ".tpl"
         return path
 
-    def getArgs(self):
-        args = sys.argv[2:]
-        tmp = {}
-        args_len = len(args)
-
-        if args_len == 1:
-            t = args[0].strip('{').strip('}')
-            t = t.split(':')
-            tmp[t[0]] = t[1]
-        elif args_len > 1:
-            for i in range(len(args)):
-                t = args[i].split(':')
-                tmp[t[0]] = t[1]
-
-        return tmp
-
-    def checkArgs(self, data, ck=[]):
-        for i in range(len(ck)):
-            if not ck[i] in data:
-                return (False, mw.returnJson(False, '参数:(' + ck[i] + ')没有!'))
-        return (True, mw.returnJson(True, 'ok'))
-
     def getServerConfPath(self):
         return self.getServerDir() + "/config.json"
 
@@ -215,8 +193,8 @@ class App:
         return data
 
     def add_ssh_limit(self):
-        args = self.getArgs()
-        check = self.checkArgs(args, ['ip'])
+        args = mw.getPluginArgs()
+        check = mw.checkPluginArgs(args, ['ip'])
         if not check[0]:
             return check[1]
         ip = args['ip']
@@ -245,8 +223,8 @@ class App:
         return mw.returnJson(False, '添加失败!')
 
     def remove_ssh_limit(self):
-        args = self.getArgs()
-        check = self.checkArgs(args, ['ip'])
+        args = mw.getPluginArgs()
+        check = mw.checkPluginArgs(args, ['ip'])
         if not check[0]:
             return check[1]
         ip = args['ip']
@@ -615,8 +593,8 @@ class App:
         self.writeConf(data)
 
     def set_safe_status(self):
-        args = self.getArgs()
-        data = self.checkArgs(args, ['tag', 'status'])
+        args = mw.getPluginArgs()
+        data = mw.checkPluginArgs(args, ['tag', 'status'])
         if not data[0]:
             return data[1]
 
@@ -670,8 +648,8 @@ class App:
 
     def get_safe_data(self):
 
-        args = self.getArgs()
-        check = self.checkArgs(args, ['tag'])
+        args = mw.getPluginArgs()
+        check = mw.checkPluginArgs(args, ['tag'])
         if not check[0]:
             return check[1]
 
@@ -697,8 +675,8 @@ class App:
 
      # 添加防护对象
     def add_safe_path(self):
-        args = self.getArgs()
-        check = self.checkArgs(args, ['tag', 'path', 'chattr', 'd_mode'])
+        args = mw.getPluginArgs()
+        check = mw.checkPluginArgs(args, ['tag', 'path', 'chattr', 'd_mode'])
         if not check[0]:
             return check[1]
 
@@ -738,8 +716,8 @@ class App:
 
     def save_safe_ssh(self):
 
-        args = self.getArgs()
-        check = self.checkArgs(args, ['cycle', 'limit', 'limit_count'])
+        args = mw.getPluginArgs()
+        check = mw.checkPluginArgs(args, ['cycle', 'limit', 'limit_count'])
         if not check[0]:
             return check[1]
 
@@ -768,8 +746,8 @@ class App:
 
     # 添加进程白名单
     def add_process_white(self):
-        args = self.getArgs()
-        check = self.checkArgs(args, ['process_name'])
+        args = mw.getPluginArgs()
+        check = mw.checkPluginArgs(args, ['process_name'])
         if not check[0]:
             return check[1]
 
@@ -785,8 +763,8 @@ class App:
         return mw.returnJson(True, msg)
 
     def del_safe_proccess_name(self):
-        args = self.getArgs()
-        check = self.checkArgs(args, ['tag', 'index'])
+        args = mw.getPluginArgs()
+        check = mw.checkPluginArgs(args, ['tag', 'index'])
         if not check[0]:
             return check[1]
 
@@ -802,8 +780,8 @@ class App:
         return mw.returnJson(True, '删除成功')
 
     def del_safe_path(self):
-        args = self.getArgs()
-        check = self.checkArgs(args, ['tag', 'index'])
+        args = mw.getPluginArgs()
+        check = mw.checkPluginArgs(args, ['tag', 'index'])
         if not check[0]:
             return check[1]
 
@@ -1081,8 +1059,8 @@ class App:
             return mw.returnJson(True, 'ok!', data)
 
     def get_sys_log(self):
-        args = self.getArgs()
-        check = self.checkArgs(args, ['log_name'])
+        args = mw.getPluginArgs()
+        check = mw.checkPluginArgs(args, ['log_name'])
         if not check[0]:
             return check[1]
 
@@ -1108,8 +1086,8 @@ class App:
         return s_date
 
     def op_log(self):
-        args = self.getArgs()
-        check = self.checkArgs(args, ['p'])
+        args = mw.getPluginArgs()
+        check = mw.checkPluginArgs(args, ['p'])
         if not check[0]:
             return check[1]
 

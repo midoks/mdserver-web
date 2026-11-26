@@ -44,31 +44,6 @@ def getInitDFile():
     return '/etc/init.d/' + getPluginName()
 
 
-def getArgs():
-    args = sys.argv[2:]
-    # print(args)
-    tmp = {}
-    args_len = len(args)
-
-    if args_len == 1:
-        t = args[0].strip('{').strip('}')
-        t = t.split(':',2)
-        tmp[t[0]] = t[1]
-    elif args_len > 1:
-        for i in range(len(args)):
-            t = args[i].split(':',2)
-            tmp[t[0]] = t[1]
-    # print(tmp)
-    return tmp
-
-
-def checkArgs(data, ck=[]):
-    for i in range(len(ck)):
-        if not ck[i] in data:
-            return (False, mw.returnJson(False, '参数:(' + ck[i] + ')没有!'))
-    return (True, mw.returnJson(True, 'ok'))
-
-
 def getOs():
     data = {}
     data['os'] = mw.getOs()
@@ -304,8 +279,8 @@ def makeWorkerCpuAffinity(val):
 
 def setCfg():
 
-    args = getArgs()
-    data = checkArgs(args, [
+    args = mw.getPluginArgs()
+    data = mw.checkPluginArgs(args, [
         'worker_processes', 'worker_connections', 'keepalive_timeout','zstd','brotli',
         'gzip', 'gzip_min_length', 'gzip_comp_level', 'client_max_body_size',
         'server_names_hash_bucket_size', 'client_header_buffer_size'

@@ -16,7 +16,6 @@ WORKING='[\033[34m*\033[0m]'
 
 # LANG=en_US.UTF-8
 is64bit=`getconf LONG_BIT`
-
 startTime=`date +%s`
 
 if [ -f /www/server/mdserver-web/tools.py ];then
@@ -24,6 +23,12 @@ if [ -f /www/server/mdserver-web/tools.py ];then
 	echo -e "rm -rf /www/server/mdserver-web"
 	echo -e "可安装!" 
 	exit 0
+fi
+
+# panel 没有启动后,更新也不启动
+PANEL_IS_RUN=no
+if [ -f /www/server/mdserver-web/logs/panel.pid ];then
+    PANEL_IS_RUN=yes
 fi
 
 _os=`uname`
@@ -51,7 +56,6 @@ fi
 
 if [ "$LOCAL_ADDR" != "common" ];then
 	declare -A PROXY_URL
-    PROXY_URL["github_do"]="https://github.do/"
     PROXY_URL["gh_llkk_cc"]="https://gh.llkk.cc/https://"
     PROXY_URL["gh_felicity_ac_cn"]="https://gh.felicity.ac.cn/https://"
     PROXY_URL["ghfast_top"]="https://ghfast.top/"
@@ -234,6 +238,9 @@ echo "use system version: ${OSNAME}"
 cd /www/server/mdserver-web && bash scripts/update/${OSNAME}.sh
 
 bash /etc/rc.d/init.d/mw restart
+if [ "$PANEL_IS_RUN" = "no" ];then
+    cd /www/server/mdserver-web && bash /etc/rc.d/init.d/mw stop
+fi
 bash /etc/rc.d/init.d/mw default
 
 if [ -f /usr/bin/mw ];then

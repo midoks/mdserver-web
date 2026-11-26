@@ -10,8 +10,10 @@
 
 import os
 import sys
+import re
 import json
 import threading
+import subprocess
 import multiprocessing
 
 import core.mw as mw
@@ -176,14 +178,17 @@ class plugin(object):
             for pn in pn_list:
                 name = pn['name']
                 version = pn['version']
+                # 防止目录穿越/命令注入
+                if not re.fullmatch(r'[A-Za-z0-9_.-]+', name) or '..' in name:
+                    continue
                 info_file = self.__plugin_dir + '/' + name + '/' + 'info.json'
                 pluginInfo = json.loads(mw.readFile(info_file))
                 self.hookInstall(pluginInfo)
 
                 cmd = 'cd {0} && bash {1} install {2}'.format(
-                    mw.getPluginDir() + '/'+name,
-                    pluginInfo['shell'],
-                    version
+                    mw.quote(mw.getPluginDir() + '/' + name),
+                    mw.quote(pluginInfo['shell']),
+                    mw.quote(version)
                 )
                 title = '安装[' + name + '-' + version + ']'
                 thisdb.addTask(name=title,cmd=cmd)
@@ -298,6 +303,10 @@ class plugin(object):
             msg_head = '更新'
             op_cmd = "upgrade"
 
+        # 防止目录穿越/命令注入
+        if not re.fullmatch(r'[A-Za-z0-9_.-]+', name) or '..' in name:
+            return mw.returnData(False, '非法的插件名称!', ())
+
         info_file = self.__plugin_dir + '/' + name + '/' + 'info.json'
         if not os.path.exists(info_file):
             return mw.returnData(False, "配置文件不存在!", ())
@@ -305,10 +314,10 @@ class plugin(object):
         info_data = json.loads(mw.readFile(info_file))
 
         exec_bash = 'cd {0} && bash {1} {2} {3}'.format(
-            mw.getPluginDir() + '/'+name,
-            info_data['shell'],
+            mw.quote(mw.getPluginDir() + '/' + name),
+            mw.quote(info_data['shell']),
             op_cmd,
-            version
+            mw.quote(version)
         )
 
         self.hookInstall(info_data)
@@ -327,6 +336,10 @@ class plugin(object):
         if version.strip() == '':
             return mw.returnData(False, "缺少版本信息!", ())
 
+        # 防止目录穿越/命令注入
+        if not re.fullmatch(r'[A-Za-z0-9_.-]+', name) or '..' in name:
+            return mw.returnData(False, '非法的插件名称!', ())
+
         info_file = self.__plugin_dir + '/' + name + '/' + 'info.json'
         if not os.path.exists(info_file):
             return mw.returnData(False, "配置文件不存在!", ())
@@ -334,9 +347,9 @@ class plugin(object):
         info_data = json.loads(mw.readFile(info_file))
 
         exec_bash = "cd {0} && /bin/bash {1} uninstall {2}".format(
-            mw.getPluginDir() + '/'+name,
-            info_data['shell'],
-            version
+            mw.quote(mw.getPluginDir() + '/' + name),
+            mw.quote(info_data['shell']),
+            mw.quote(version)
         )
         self.hookUninstall(info_data)
         data = mw.execShell(exec_bash)
@@ -551,7 +564,7 @@ class plugin(object):
     ):
         plugins_t = []
         # 返回指定类型
-        if plugin_type != None and data['pid'] == plugin_type:
+        if plugin_type != None and data.get('pid') == plugin_type:
             return self.makeCoexistData(data)
 
         # 全部
@@ -562,17 +575,57 @@ class plugin(object):
             return self.makeCoexistDataInstalled(data)
         return plugins_t
 
-    def getPluginInfo(self, name):
-        info = {}
-        path = self.__plugin_dir + '/' + name
-        info_path = path + '/info.json'
+    # info.json 必填字段, 缺失会导致插件列表接口直接报错
+    __plugin_required_fields = ('name', 'title', 'ps', 'versions', 'checks')
+
+    def checkPluginInfo(self, name):
+        """读取并校验插件 info.json, 返回 (data, error); 校验失败时 data 为 {}"""
+        info_path = self.__plugin_dir + '/' + name + '/info.json'
         if not os.path.exists(info_path):
-            return info
+            return {}, '缺少 info.json'
+
         try:
-            data = json.loads(mw.readFile(info_path))
-            return data
+            content = mw.readFile(info_path)
+            data = json.loads(content)
         except Exception as e:
-            return info
+            return {}, 'info.json 解析失败: %s' % str(e)
+
+        if not isinstance(data, dict):
+            return {}, 'info.json 内容必须是 JSON 对象'
+
+        missing_fields = [field for field in self.__plugin_required_fields if field not in data]
+        if missing_fields:
+            return {}, '缺少必填字段: %s' % ', '.join(missing_fields)
+
+        if not isinstance(data['versions'], (str, list)):
+            return {}, 'versions 必须为字符串或数组'
+        if not isinstance(data['checks'], str) or data['checks'] == '':
+            return {}, 'checks 必须为非空字符串'
+
+        # 旧插件未声明分类时归入“其他插件”
+        data.setdefault('pid', '5')
+        return data, None
+
+    def getPluginInfo(self, name):
+        data, error = self.checkPluginInfo(name)
+        if error:
+            print('getPluginInfo: %s %s' % (name, error))
+        return data
+
+    def getPluginInfoErrors(self):
+        """返回所有 info.json 不完整的插件, 供页面提示"""
+        errors = []
+        if not os.path.isdir(self.__plugin_dir):
+            return errors
+        for name in sorted(os.listdir(self.__plugin_dir)):
+            if name.startswith('.'):
+                continue
+            if not os.path.isdir(self.__plugin_dir + '/' + name):
+                continue
+            data, error = self.checkPluginInfo(name)
+            if error:
+                errors.append({'name': name, 'error': error})
+        return errors
 
     def getPluginList(self, name,
         keyword = None,
@@ -738,6 +791,7 @@ class plugin(object):
         '''
         rdata = {}
         rdata['type'] = self.def_plugin_type
+        rdata['info_errors'] = self.getPluginInfoErrors()
     
         data = self.getAllPluginList(type, keyword, page, size)
         rdata['data'] = data[0]
@@ -800,18 +854,25 @@ class plugin(object):
         return data
 
     def inputZipApi(self, plugin_name,tmp_path):
+        # 防止目录穿越与命令注入: 插件名只允许安全字符, 临时目录必须位于面板 temp 下
+        if not re.fullmatch(r'[A-Za-z0-9_.-]+', plugin_name or '') or '..' in plugin_name:
+            return mw.returnData(False, '非法的插件名称!')
+        temp_dir = os.path.realpath(mw.getPanelDir() + '/temp')
+        tmp_path = os.path.realpath(tmp_path or '')
+        if not (tmp_path == temp_dir or tmp_path.startswith(temp_dir + os.sep)):
+            return mw.returnData(False, '非法的临时目录!')
         if not os.path.exists(tmp_path):
             return mw.returnData(False, '临时文件不存在,请重新上传!')
         plugin_path = mw.getPluginDir() + '/' + plugin_name
         if not os.path.exists(plugin_path):
-            print(mw.execShell('mkdir -p ' + plugin_path))
-        mw.execShell("cp -rf " + tmp_path + '/* ' + plugin_path + '/')
-        mw.execShell('chmod -R 755 ' + plugin_path)
+            print(mw.execShell('mkdir -p ' + mw.quote(plugin_path)))
+        mw.execShell("cp -rf " + mw.quote(tmp_path) + '/* ' + mw.quote(plugin_path) + '/')
+        mw.execShell('chmod -R 755 ' + mw.quote(plugin_path))
         p_info = mw.readFile(plugin_path + '/info.json')
         if p_info:
             mw.writeLog('软件管理', '安装第三方插件[%s]' %json.loads(p_info)['title'])
             return mw.returnData(True, '安装成功!')
-        mw.execShell("rm -rf " + plugin_path)
+        mw.execShell("rm -rf " + mw.quote(plugin_path))
         return mw.returnData(False, '安装失败!')
 
     # [start|stop]操作,删除缓存!
@@ -834,6 +895,12 @@ class plugin(object):
         script  = 'index',
     ):
 
+        # 防止目录穿越与命令注入: 插件名/脚本名只允许安全字符
+        if not re.fullmatch(r'[A-Za-z0-9_.-]+', name or '') or '..' in name:
+            return ('', '非法的插件名称!')
+        if not re.fullmatch(r'[A-Za-z0-9_.-]+', script or '') or '..' in script:
+            return ('', '非法的脚本名称!')
+
         if mw.inArray(['start','stop','restart','reload','uninstall_pre_inspection','install','uninstall'], func):
             self.runByCache(name, func, version)
 
@@ -841,25 +908,55 @@ class plugin(object):
         if not os.path.exists(path):
             path = self.__plugin_dir + '/' + name + '/' + name + '.py'
 
-        py = 'python3 ' + path
-        if args == '':
-            py_cmd = py + ' ' + func + ' ' + version
-        else:
-            py_cmd = py + ' ' + func + ' ' + version + ' ' + args
-
         if not os.path.exists(path):
             return ('', '')
 
-        source_bin_activate =  mw.getPanelDir() + "/bin/activate"
-        py_cmd_dir = 'cd ' + mw.getPanelDir()
-        if os.path.exists(source_bin_activate):
-            py_cmd_dir += " && . bin/activate"
-        do_cmd = py_cmd_dir + " && "+ py_cmd
-        data = mw.execShell(do_cmd)
+        # 使用参数列表直接调用, 不经过 shell, 避免 func/version/args 被解释执行
+        panel_dir = mw.getPanelDir()
+        python_bin = 'python3'
+        if os.path.exists(panel_dir + "/bin/python3"):
+            python_bin = panel_dir + "/bin/python3"
+        elif os.path.exists(panel_dir + "/bin/python"):
+            python_bin = panel_dir + "/bin/python"
+
+        cmd = [python_bin, path, func]
+        if version != '':
+            cmd.append(version)
+        if args != '':
+            # 插件的老式 getArgs() 只认 'key:value' argv 列表, 不认整个 JSON 字符串
+            # 把 JSON dict 拆成 key:value 列表, 让插件无需修改即可继续工作
+            parsed_args = None
+            try:
+                obj = json.loads(args)
+                if isinstance(obj, dict):
+                    parsed_args = ['%s:%s' % (k, v) for k, v in obj.items()]
+            except (ValueError, TypeError):
+                pass
+            if parsed_args is not None:
+                cmd.extend(parsed_args)
+            else:
+                # 非 JSON 字符串(老格式或简单字符串)原样传
+                cmd.append(args)
+
+        env = os.environ.copy()
+        if os.path.exists(panel_dir + "/bin/activate"):
+            env['VIRTUAL_ENV'] = panel_dir
+            env['PATH'] = panel_dir + "/bin:" + env.get('PATH', '')
+
+        try:
+            p = subprocess.Popen(cmd, cwd=panel_dir,
+                                 stdout=subprocess.PIPE,
+                                 stderr=subprocess.PIPE,
+                                 env=env)
+            stdout, stderr = p.communicate()
+            data = (stdout.decode('utf-8', 'ignore'),
+                    stderr.decode('utf-8', 'ignore'))
+        except Exception as e:
+            data = ('', str(e))
 
         # print(data)
         if mw.isDebugMode():
-            print('run:', do_cmd)
+            print('run:', ' '.join(cmd))
             print(data)
         # print os.path.exists(py_cmd)
         return (data[0].strip(), data[1].strip())

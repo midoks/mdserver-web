@@ -29,28 +29,50 @@ import shutil
 
 from random import Random
 
+
+def quote(value):
+    """shell 参数转义, 插件统一使用, 避免拼接命令时被注入"""
+    return shlex.quote(str(value))
+
+
+# 权限位与属主参数校验: 只允许合法值, 防止参数被拼进 shell 命令
+def isValidAccessMode(access):
+    return re.fullmatch(r'[0-7]{3,4}', access or '') is not None
+
+
+def isValidUserName(user):
+    # 允许 Debian-exim、user.name 等真实系统用户名, 但禁止空白与 shell 元字符
+    return re.fullmatch(r'[A-Za-z0-9_][A-Za-z0-9_.-]{0,63}', user or '') is not None
+
+
+def sqlValue(value):
+    """生成 SQL 字符串字面量(含单引号), 用于无法参数化的标识符/账号等位置"""
+    return "'" + str(value).replace('\\', '\\\\').replace("'", "''") + "'"
+
+
+def sqlIdent(value):
+    """生成 MySQL 反引号标识符, 内部反引号加倍转义"""
+    return "`" + str(value).replace("`", "``") + "`"
+
+
 def execShell(cmdstring, cwd=None, timeout=None, shell=True):
 
     if shell:
         cmdstring_list = cmdstring
     else:
         cmdstring_list = shlex.split(cmdstring)
-    if timeout:
-        end_time = datetime.datetime.now() + datetime.timedelta(seconds=timeout)
 
     sub = subprocess.Popen(cmdstring_list, cwd=cwd, stdin=subprocess.PIPE,
                            shell=shell, bufsize=4096, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
 
-    while sub.poll() is None:
-        time.sleep(0.1)
-        if timeout:
-            if end_time <= datetime.datetime.now():
-                raise Exception("Timeout：%s" % cmdstring)
-
-    if sys.version_info[0] == 2:
-        return sub.communicate()
-
-    data = sub.communicate()
+    # 用 communicate(timeout) 替代 poll+sleep 忙等:
+    # 子进程一结束 OS 立即唤醒, 去掉最多 100ms 的轮询延迟; 超时由 OS 精确控制
+    try:
+        data = sub.communicate(timeout=timeout)
+    except subprocess.TimeoutExpired:
+        sub.kill()
+        sub.communicate()  # 收割子进程, 避免僵尸
+        raise Exception("Timeout：%s" % cmdstring)
 
     success = data[0]
     error = data[1]
@@ -118,7 +140,7 @@ def getLogsDir():
 def getRecycleBinDir():
     rb_dir = getFatherDir() + '/recycle_bin'
     if not os.path.exists(rb_dir):
-        os.system('mkdir -p ' + rb_dir)
+        os.makedirs(rb_dir, exist_ok=True)
     return rb_dir
 
 def getPanelTaskLog():
@@ -221,7 +243,7 @@ def checkCert(certPath='ssl/certificate.pem'):
             tmp1 = s + tmp1
         writeFile(certPath, tmp1)
         result = execShell(openssl + " x509 -in " +
-                           certPath + " -noout -subject")
+                           quote(certPath) + " -noout -subject")
         if result[1].find('-bash:') != -1:
             return True
         if len(result[1]) > 2:
@@ -358,6 +380,66 @@ def returnJson(status, msg, data=None):
         return getJson({'status': status, 'msg': msg})
     return getJson({'status': status, 'msg': msg, 'data': data})
 
+# -------------------------------- 插件参数解析(统一) --------------------------------
+# 替代各插件里的老式 getArgs/checkArgs, 由 mw 统一维护
+# 优势:
+#   1. 自动识别 JSON dict (新版 plugin.py 会把 JSON 拆成 key:value argv 列表)
+#   2. 兼容老式 key:value 列表
+#   3. 自动跳过 version 占位 (sys.argv[2] 无冒号且非 JSON 时视为 version)
+#   4. split(':', 1) 防止 value 含冒号被切坏
+
+def getPluginArgs():
+    """
+    统一插件参数解析入口, 替换插件本地 getArgs()
+    返回 dict: {key: value, ...}
+    """
+    import sys
+    argv = sys.argv[2:]
+
+    # 自动跳过 version 占位:
+    # 插件约定 sys.argv[1]=func, sys.argv[2]=version (可能为空) 或 args 起点
+    # 若 argv[0] 没有冒号且不是 JSON 对象开头, 视为 version, 跳过
+    if argv and ':' not in argv[0] and not argv[0].lstrip().startswith('{'):
+        argv = argv[1:]
+
+    if not argv:
+        return {}
+
+    # 场景 1: 整个 JSON dict 作为单个 argv 传入 (老 plugin.py 行为)
+    if len(argv) == 1:
+        s = argv[0].strip()
+        if s.startswith('{'):
+            try:
+                obj = json.loads(s)
+                if isinstance(obj, dict):
+                    return obj
+            except (ValueError, TypeError):
+                pass
+        # 老格式 'key:value' 单参数, 或空对象 '{}' (strip 后为空则视为无参)
+        stripped = s.strip('{').strip('}')
+        if stripped == '':
+            return {}
+
+    # 场景 2: key:value argv 列表 (新 plugin.py 拆开后的形态, 或老插件直接传)
+    tmp = {}
+    for arg in argv:
+        if ':' not in arg:
+            continue
+        k, v = arg.split(':', 1)  # maxsplit=1 保留 value 内的冒号
+        tmp[k] = v
+    return tmp
+
+
+def checkPluginArgs(data, ck=[]):
+    """
+    统一插件参数必填校验, 替换插件本地 checkArgs()
+    返回 (True, ok_json) 或 (False, missing_msg_json)
+    """
+    for i in range(len(ck)):
+        if ck[i] not in data:
+            return (False, returnJson(False, '参数:(' + ck[i] + ')没有!'))
+    return (True, returnJson(True, 'ok'))
+
 def readFile(filename):
     # 读文件内容
     try:
@@ -482,16 +564,43 @@ def md5(content):
 
 def hasPwd(password):
     '''
-    加密密码字符
+    bcrypt 哈希密码 (优先使用 bcrypt, 失败降级为 md5)
     '''
-    # python3 -c "import crypt"
-    # python3 -c 'import crypt; print(crypt.crypt(""))'
-    # import crypt
-    # return crypt.crypt(password, password)
-    import bcrypt
-    salt = bcrypt.gensalt()
-    hpw = bcrypt.hashpw(password.encode('utf-8'), salt)
-    return hpw.decode('utf-8')
+    try:
+        import bcrypt
+        salt = bcrypt.gensalt()
+        hpw = bcrypt.hashpw(password.encode('utf-8'), salt)
+        return hpw.decode('utf-8')
+    except Exception:
+        return md5(password)
+
+
+def verifyPassword(password, stored_hash):
+    '''
+    校验密码: 自动识别 bcrypt ($2b$/$2a$/...) 或 md5 (32位hex)
+    返回 (ok: bool, needs_upgrade: bool)
+    '''
+    if stored_hash is None or stored_hash == '':
+        return False, False
+
+    # bcrypt 前缀 $2b$ 或 $2a$ 或 $2y$
+    if stored_hash.startswith('$2'):
+        try:
+            import bcrypt
+            ok = bcrypt.checkpw(password.encode('utf-8'), stored_hash.encode('utf-8'))
+            return bool(ok), False
+        except Exception:
+            return False, False
+
+    # md5 兼容 (32 位十六进制)
+    if len(stored_hash) == 32 and all(c in '0123456789abcdef' for c in stored_hash.lower()):
+        import hmac as _hmac
+        computed = md5(password)
+        ok = _hmac.compare_digest(computed, stored_hash)
+        return bool(ok), ok   # ok=True 时说明是 md5 存的, 需要升级
+
+    # 未知格式
+    return False, False
 
     
 def getFileMd5(filename):
@@ -998,8 +1107,8 @@ def isVhostHasReuseport(version):
     return False
 
 def isDebugMode():
-    if isAppleSystem():
-        return True
+    # if isAppleSystem():
+    #     return True
 
     debug = M('option').field('name').where('name=?',('debug',)).getField('value')
     if debug == 'open':

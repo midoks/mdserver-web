@@ -8,6 +8,7 @@ import time
 import subprocess
 import re
 import json
+import shutil
 
 from packaging import version as pk_version
 
@@ -76,12 +77,6 @@ def getArgs():
             tmp[t[0]] = t[1]
     return tmp
 
-
-def checkArgs(data, ck=[]):
-    for i in range(len(ck)):
-        if not ck[i] in data:
-            return (False, mw.returnJson(False, '参数:(' + ck[i] + ')没有!'))
-    return (True, mw.returnJson(True, 'ok'))
 
 def getBackupDir():
     bk_path = mw.getBackupDir() + "/database/mysql"
@@ -338,14 +333,31 @@ def getPidFile():
     return tmp.groups()[0].strip()
 
 
-def binLog(version = ''):
+def getBinlogSize(version=''):
+    args = getArgs()
+    conf = getConf()
+    path = getDataDir()
+    dsize = 0
+
+    con = mw.readFile(conf)
+    binlog_status = False
+    if con.find('#log-bin=mysql-bin') == -1:
+        binlog_status = True
+
+    for n in os.listdir(path):
+        if len(n) < 9:
+            continue
+        if n[0:9] == 'mysql-bin':
+            dsize += os.path.getsize(path + '/' + n)
+    return mw.returnJson(binlog_status, dsize)
+
+
+
+def setBinlog(version = ''):
     args = getArgs()
     conf = getConf()
     con = mw.readFile(conf)
-
     if con.find('#log-bin=mysql-bin') != -1:
-        if 'status' in args:
-            return mw.returnJson(False, '0')
         con = con.replace('#log-bin=mysql-bin', 'log-bin=mysql-bin')
         con = con.replace('#binlog_format=mixed', 'binlog_format=mixed')
 
@@ -358,14 +370,6 @@ def binLog(version = ''):
         restart(version)
     else:
         path = getDataDir()
-        if 'status' in args:
-            dsize = 0
-            for n in os.listdir(path):
-                if len(n) < 9:
-                    continue
-                if n[0:9] == 'mysql-bin':
-                    dsize += os.path.getsize(path + '/' + n)
-            return mw.returnJson(True, dsize)
         con = con.replace('log-bin=mysql-bin', '#log-bin=mysql-bin')
         con = con.replace('binlog_format=mixed', '#binlog_format=mixed')
 
@@ -378,14 +382,13 @@ def binLog(version = ''):
         restart(version)
         mw.execShell('rm -f ' + path + '/mysql-bin.*')
         mw.execShell('rm -f ' + path + '/binlog.*')
-
     
     return mw.returnJson(True, '设置成功!')
 
 
 def binLogList():
     args = getArgs()
-    data = checkArgs(args, ['page', 'page_size', 'tojs'])
+    data = mw.checkPluginArgs(args, ['page', 'page_size', 'tojs'])
     if not data[0]:
         return data[1]
 
@@ -807,7 +810,7 @@ def getMyDbPos():
 
 def setMyDbPos(version):
     args = getArgs()
-    data = checkArgs(args, ['datadir'])
+    data = mw.checkPluginArgs(args, ['datadir'])
     if not data[0]:
         return data[1]
 
@@ -817,15 +820,15 @@ def setMyDbPos(version):
         return mw.returnJson(False, '与当前存储目录相同，无法迁移文件!')
 
     if not os.path.exists(t_datadir):
-        mw.execShell('mkdir -p ' + t_datadir)
+        mw.execShell('mkdir -p ' + mw.quote(t_datadir))
 
     # mw.execShell('/etc/init.d/mysqld stop')
     stop(version)
-    mw.execShell('cp -rf ' + s_datadir + '/* ' + t_datadir + '/')
-    mw.execShell('chown -R mysql mysql ' + t_datadir)
-    mw.execShell('chmod -R 755 ' + t_datadir)
-    mw.execShell('rm -f ' + t_datadir + '/*.pid')
-    mw.execShell('rm -f ' + t_datadir + '/*.err')
+    mw.execShell('cp -rf ' + mw.quote(s_datadir) + '/* ' + mw.quote(t_datadir) + '/')
+    mw.execShell('chown -R mysql mysql ' + mw.quote(t_datadir))
+    mw.execShell('chmod -R 755 ' + mw.quote(t_datadir))
+    mw.execShell('rm -f ' + mw.quote(t_datadir) + '/*.pid')
+    mw.execShell('rm -f ' + mw.quote(t_datadir) + '/*.err')
 
     path = getServerDir()
     myfile = path + '/etc/my.cnf'
@@ -857,7 +860,7 @@ def getMyPort():
 
 def setMyPort(version):
     args = getArgs()
-    data = checkArgs(args, ['port'])
+    data = mw.checkPluginArgs(args, ['port'])
     if not data[0]:
         return data[1]
 
@@ -1075,24 +1078,24 @@ def __createUser(dbname, username, password, address):
     pdb = pMysqlDb()
 
     try:
-        pdb.execute("CREATE USER `%s`@`localhost` IDENTIFIED BY '%s'" % (username, password))
+        pdb.execute("CREATE USER %s@%s IDENTIFIED BY %s", (username, 'localhost', password))
     except Exception as e:
         pass
 
     try:
-        pdb.execute("grant all privileges on %s.* to `%s`@`localhost`" % (dbname, username))
+        pdb.execute("grant all privileges on " + mw.sqlIdent(dbname) + ".* to %s@%s", (username, 'localhost'))
     except Exception as e:
         pass
     
     for a in address.split(','):
 
         try:
-            pdb.execute("CREATE USER `%s`@`%s` IDENTIFIED BY '%s'" % (username, a, password))
+            pdb.execute("CREATE USER %s@%s IDENTIFIED BY %s", (username, a, password))
         except Exception as e:
             pass
 
         try:
-            pdb.execute("grant all privileges on %s.* to `%s`@`%s`" % (dbname, username, a))
+            pdb.execute("grant all privileges on " + mw.sqlIdent(dbname) + ".* to %s@%s", (username, a))
         except Exception as e:
             pass
     try:
@@ -1120,13 +1123,13 @@ def getDbBackupListFunc(dbname=''):
 
 def setDbBackup():
     args = getArgs()
-    data = checkArgs(args, ['name'])
+    data = mw.checkPluginArgs(args, ['name'])
     if not data[0]:
         return data[1]
 
     # scDir = mw.getPanelDir() + '/scripts/backup.py'
     head = "cd "+mw.getPanelDir()
-    cmd = head +' && . bin/activate &&  python3 scripts/backup.py database ' + args['name'] + ' 3'
+    cmd = head +' && . bin/activate &&  python3 scripts/backup.py database ' + mw.quote(args['name']) + ' 3'
     os.system(cmd)
     return mw.returnJson(True, 'ok')
 
@@ -1161,7 +1164,7 @@ def rootPwd():
 
 def importDbExternal():
     args = getArgs()
-    data = checkArgs(args, ['file', 'name'])
+    data = mw.checkPluginArgs(args, ['file', 'name'])
     if not data[0]:
         return data[1]
 
@@ -1189,18 +1192,18 @@ def importDbExternal():
     import_sql = ""
     if file.find("sql.gz") > -1:
         cmd = 'cd ' + import_dir + ' && gzip -dc ' + \
-            file + " > " + import_dir + tmpFile
+            mw.quote(file) + " > " + mw.quote(import_dir + tmpFile)
         info = mw.execShell(cmd)
         if info[1] == "":
             import_sql = import_dir + tmpFile
 
     if file.find(".zip") > -1:
-        cmd = 'cd ' + import_dir + ' && unzip -o ' + file
+        cmd = 'cd ' + import_dir + ' && unzip -o ' + mw.quote(file)
         mw.execShell(cmd)
         import_sql = import_dir + tmpFile
 
     if file.find("tar.gz") > -1:
-        cmd = 'cd ' + import_dir + ' && tar -zxvf ' + file
+        cmd = 'cd ' + import_dir + ' && tar -zxvf ' + mw.quote(file)
         mw.execShell(cmd)
         import_sql = import_dir + tmpFile
 
@@ -1217,7 +1220,7 @@ def importDbExternal():
 
     myPass(True, pwd)
     mysql_cmd = getServerDir() + '/bin/mysql --defaults-file=' + my_cnf + \
-        ' -uroot -p"' + pwd + '" -f ' + name + ' < ' + import_sql
+        ' -uroot -p' + mw.quote(pwd) + ' -f ' + mw.quote(name) + ' < ' + mw.quote(import_sql)
 
     # print(mysql_cmd)
     rdata = mw.execShell(mysql_cmd)
@@ -1233,7 +1236,7 @@ def importDbExternal():
 
 def importDbExternalProgress():
     args = getArgs()
-    data = checkArgs(args, ['file', 'name'])
+    data = mw.checkPluginArgs(args, ['file', 'name'])
     if not data[0]:
         return data[1]
 
@@ -1241,12 +1244,13 @@ def importDbExternalProgress():
     name = args['name']
 
     cmd = 'cd '+mw.getServerDir()+'/mdserver-web && . bin/activate && '
-    cmd += 'python3 plugins/mysql/index.py import_db_external_progress_bar  {"file":"'+file+'","name":"'+name+'"}'
+    payload = json.dumps({"file": file, "name": name}, separators=(',', ':'))
+    cmd += 'python3 plugins/mysql/index.py import_db_external_progress_bar  ' + mw.quote(payload)
     return mw.returnJson(True, 'ok',cmd)
 
 def importDbExternalProgressBar():
     args = getArgs()
-    data = checkArgs(args, ['file', 'name'])
+    data = mw.checkPluginArgs(args, ['file', 'name'])
     if not data[0]:
         return data[1]
 
@@ -1273,18 +1277,18 @@ def importDbExternalProgressBar():
     import_sql = ""
     if file.find("sql.gz") > -1:
         cmd = 'cd ' + import_dir + ' && gzip -dc ' + \
-            file + " > " + import_dir + tmpFile
+            mw.quote(file) + " > " + mw.quote(import_dir + tmpFile)
         info = mw.execShell(cmd)
         if info[1] == "":
             import_sql = import_dir + tmpFile
 
     if file.find(".zip") > -1:
-        cmd = 'cd ' + import_dir + ' && unzip -o ' + file
+        cmd = 'cd ' + import_dir + ' && unzip -o ' + mw.quote(file)
         mw.execShell(cmd)
         import_sql = import_dir + tmpFile
 
     if file.find("tar.gz") > -1:
-        cmd = 'cd ' + import_dir + ' && tar -zxvf ' + file
+        cmd = 'cd ' + import_dir + ' && tar -zxvf ' + mw.quote(file)
         mw.execShell(cmd)
         import_sql = import_dir + tmpFile
 
@@ -1299,8 +1303,8 @@ def importDbExternalProgressBar():
 
     my_cnf = getConf()
     mysql_cmd = getServerDir() + '/bin/mysql --defaults-file=' + my_cnf + \
-        ' -uroot -p"' + pwd + '" -f ' + name
-    mysql_cmd_progress_bar = "pv -t -p " + import_sql + '|'+ mysql_cmd
+        ' -uroot -p' + mw.quote(pwd) + ' -f ' + mw.quote(name)
+    mysql_cmd_progress_bar = "pv -t -p " + mw.quote(import_sql) + '|'+ mysql_cmd
     print(mysql_cmd_progress_bar)
     rdata = os.system(mysql_cmd_progress_bar)
     return ""
@@ -1308,7 +1312,7 @@ def importDbExternalProgressBar():
 
 def importDbBackup():
     args = getArgs()
-    data = checkArgs(args, ['file', 'name'])
+    data = mw.checkPluginArgs(args, ['file', 'name'])
     if not data[0]:
         return data[1]
 
@@ -1319,7 +1323,7 @@ def importDbBackup():
     file_path_sql = getBackupDir() + '/' + file.replace('.gz', '')
 
     if not os.path.exists(file_path_sql):
-        cmd = 'cd ' + getBackupDir() + ' && gzip -dk ' + file
+        cmd = 'cd ' + getBackupDir() + ' && gzip -dk ' + mw.quote(file)
         mw.execShell(cmd)
 
     local_mode = recognizeDbMode()
@@ -1331,8 +1335,8 @@ def importDbBackup():
 
     pwd = pSqliteDb('config').where('id=?', (1,)).getField('mysql_root')
     sock = getSocketFile()
-    mysql_cmd = getServerDir() + '/bin/mysql -S ' + sock + ' -uroot -p"' + pwd + \
-        '" ' + name + ' < ' + file_path_sql
+    mysql_cmd = getServerDir() + '/bin/mysql -S ' + sock + ' -uroot -p' + mw.quote(pwd) + \
+        ' ' + mw.quote(name) + ' < ' + mw.quote(file_path_sql)
 
     if not os.path.exists(file_path_sql):
         return mw.returnJson(False, "导入文件不存在:"+file_path_sql)
@@ -1347,7 +1351,7 @@ def importDbBackup():
 
 def importDbBackupProgress():
     args = getArgs()
-    data = checkArgs(args, ['file', 'name'])
+    data = mw.checkPluginArgs(args, ['file', 'name'])
     if not data[0]:
         return data[1]
 
@@ -1355,13 +1359,14 @@ def importDbBackupProgress():
     name = args['name']
 
     cmd = 'cd ' + mw.getPanelDir() + ' && . bin/activate && '
-    cmd += 'python3 plugins/mysql/index.py import_db_backup_progress_bar {"file":"'+file+'","name":"'+name+'"}'
+    payload = json.dumps({"file": file, "name": name}, separators=(',', ':'))
+    cmd += 'python3 plugins/mysql/index.py import_db_backup_progress_bar ' + mw.quote(payload)
     return mw.returnJson(True, 'ok',cmd)
     # return mw.returnJson(True, 'ok')
 
 def importDbBackupProgressBar():
     args = getArgs()
-    data = checkArgs(args, ['file', 'name'])
+    data = mw.checkPluginArgs(args, ['file', 'name'])
     if not data[0]:
         return data[1]
 
@@ -1372,7 +1377,7 @@ def importDbBackupProgressBar():
     file_path_sql = getBackupDir() + '/' + file.replace('.gz', '')
 
     if not os.path.exists(file_path_sql):
-        cmd = 'cd ' + getBackupDir() + ' && gzip -dk ' + file
+        cmd = 'cd ' + getBackupDir() + ' && gzip -dk ' + mw.quote(file)
         r = mw.execShell(cmd)
 
     local_mode = recognizeDbMode()
@@ -1385,9 +1390,9 @@ def importDbBackupProgressBar():
     pwd = pSqliteDb('config').where('id=?', (1,)).getField('mysql_root')
     sock = getSocketFile()
 
-    mysql_cmd = getServerDir() + '/bin/mysql -S ' + sock + ' -uroot -p"' + pwd + \
-        '" ' + name
-    mysql_cmd_progress_bar = "pv -t -p " + file_path_sql + '|'+ mysql_cmd
+    mysql_cmd = getServerDir() + '/bin/mysql -S ' + sock + ' -uroot -p' + mw.quote(pwd) + \
+        ' ' + mw.quote(name)
+    mysql_cmd_progress_bar = "pv -t -p " + mw.quote(file_path_sql) + '|'+ mysql_cmd
     print(mysql_cmd_progress_bar)
     rdata = os.system(mysql_cmd_progress_bar)
     return ''
@@ -1395,7 +1400,7 @@ def importDbBackupProgressBar():
 
 def deleteDbBackup():
     args = getArgs()
-    data = checkArgs(args, ['filename', 'path'])
+    data = mw.checkPluginArgs(args, ['filename', 'path'])
     if not data[0]:
         return data[1]
 
@@ -1411,7 +1416,7 @@ def deleteDbBackup():
 
 def getDbBackupList():
     args = getArgs()
-    data = checkArgs(args, ['name'])
+    data = mw.checkPluginArgs(args, ['name'])
     if not data[0]:
         return data[1]
 
@@ -1607,7 +1612,7 @@ def toDbBase(find):
 
     if not mw.inArray(db_name, find['name']):
         try:
-            result = pdb.execute("create database `" + find['name'] + "`")
+            result = pdb.execute("create database " + mw.sqlIdent(find['name']))
         except Exception as e:
             pass
 
@@ -1620,7 +1625,7 @@ def toDbBase(find):
 
 def syncToDatabases():
     args = getArgs()
-    data = checkArgs(args, ['type', 'ids'])
+    data = mw.checkPluginArgs(args, ['type', 'ids'])
     if not data[0]:
         return data[1]
 
@@ -1700,7 +1705,7 @@ def setRootPwdForce(new_password, version=''):
 
 def setRootPwd(version=''):
     args = getArgs()
-    data = checkArgs(args, ['password'])
+    data = mw.checkPluginArgs(args, ['password'])
     if not data[0]:
         return data[1]
     password = args['password']
@@ -1742,12 +1747,12 @@ def setRootPwd(version=''):
                 hosts = ['localhost', '127.0.0.1']
             for h in hosts:
                 try:
-                    pdb.execute("ALTER USER 'root'@'%s' IDENTIFIED BY '%s'" % (h, password))
+                    pdb.execute("ALTER USER %s@%s IDENTIFIED BY %s", ('root', h, password))
                 except Exception as e:
                     pass
         else:
             try:
-                pdb.execute("update mysql.user set Password=password('" + password + "') where User='root'")
+                pdb.execute("update mysql.user set Password=password(%s) where User='root'", (password,))
             except Exception as e:
                 pass
             
@@ -1759,7 +1764,7 @@ def setRootPwd(version=''):
 
 def setUserPwd(version=''):
     args = getArgs()
-    data = checkArgs(args, ['password', 'name'])
+    data = mw.checkPluginArgs(args, ['password', 'name'])
     if not data[0]:
         return data[1]
 
@@ -1775,7 +1780,7 @@ def setUserPwd(version=''):
         hosts = ['localhost']
         try:
             users = pdb.query(
-                "select Host from mysql.user where User='" + username + "'")
+                "select Host from mysql.user where User=" + mw.sqlValue(username))
             for my_host in users:
                 if my_host["Host"] != 'localhost':
                     hosts.append(my_host["Host"])
@@ -1787,14 +1792,14 @@ def setUserPwd(version=''):
         # 旧版本不支持以上语法时回退 GRANT ... IDENTIFIED BY
         for my_host in hosts:
             sqls = [
-                "ALTER USER '%s'@'%s' IDENTIFIED BY '%s'" % (username, my_host, newpassword),
-                "CREATE USER '%s'@'%s' IDENTIFIED BY '%s'" % (username, my_host, newpassword),
-                "GRANT USAGE ON *.* TO '%s'@'%s' IDENTIFIED BY '%s'" % (username, my_host, newpassword),
+                "ALTER USER %s@%s IDENTIFIED BY %s",
+                "CREATE USER %s@%s IDENTIFIED BY %s",
+                "GRANT USAGE ON *.* TO %s@%s IDENTIFIED BY %s",
             ]
             err = None
             for sql in sqls:
                 try:
-                    pdb.execute(sql)
+                    pdb.execute(sql, (username, my_host, newpassword))
                     err = None
                     break
                 except Exception as e:
@@ -1811,7 +1816,7 @@ def setUserPwd(version=''):
 
 def setDbPs():
     args = getArgs()
-    data = checkArgs(args, ['id', 'name', 'ps'])
+    data = mw.checkPluginArgs(args, ['id', 'name', 'ps'])
     if not data[0]:
         return data[1]
 
@@ -1828,7 +1833,7 @@ def setDbPs():
 
 def addDb():
     args = getArgs()
-    data = checkArgs(args,['password', 'name', 'codeing', 'db_user', 'dataAccess', 'ps'])
+    data = mw.checkPluginArgs(args,['password', 'name', 'codeing', 'db_user', 'dataAccess', 'ps'])
     if not data[0]:
         return data[1]
 
@@ -1871,7 +1876,7 @@ def addDb():
         return mw.returnJson(False, '数据库已存在!')
 
     try:
-        result = pdb.execute("create database `" + dbname +"` DEFAULT CHARACTER SET " + codeing + " COLLATE " + codeStr)
+        result = pdb.execute("create database " + mw.sqlIdent(dbname) + " DEFAULT CHARACTER SET " + mw.sqlIdent(codeing) + " COLLATE " + mw.sqlIdent(codeStr))
     except Exception as e:
         result = e
     # print result
@@ -1895,7 +1900,7 @@ def addDb():
 
 def delDb():
     args = getArgs()
-    data = checkArgs(args, ['id', 'name'])
+    data = mw.checkPluginArgs(args, ['id', 'name'])
     if not data[0]:
         return data[1]
     try:
@@ -1909,14 +1914,14 @@ def delDb():
 
         # 删除MYSQL(库或用户可能已不存在,失败忽略,保证面板记录可删除)
         try:
-            pdb.execute("drop database `" + name + "`")
+            pdb.execute("drop database " + mw.sqlIdent(name))
         except Exception:
             pass
 
         db_users_access = getDbUserAccess(username)
         for user_access in db_users_access:
             try:
-                pdb.execute("drop user '" + username + "'@'%s'" % (user_access,))
+                pdb.execute("drop user %s@%s", (username, user_access))
             except Exception:
                 pass
 
@@ -1932,7 +1937,7 @@ def getDbUserAccess(username):
     pdb = pMysqlDb()
     accs = []
     try:
-        users = pdb.query("select Host from mysql.user where User='" + username + "'")
+        users = pdb.query("select Host from mysql.user where User=" + mw.sqlValue(username))
     except Exception as e:
         return accs
     for c in users:
@@ -1984,7 +1989,7 @@ def getDbUserAccessDiff(db_access, input_access):
 
 def getDbAccess():
     args = getArgs()
-    data = checkArgs(args, ['username'])
+    data = mw.checkPluginArgs(args, ['username'])
     if not data[0]:
         return data[1]
     username = args['username']
@@ -2017,16 +2022,17 @@ def setDbAccessByArgs(username,access):
     add_access_list = diff_access["add"]
 
     pdb.execute("flush privileges")
+    db_scope = '*.*' if dbname == '*' else mw.sqlIdent(dbname) + '.*'
     for add_access in add_access_list:
-        pdb.execute("CREATE USER `%s`@`%s` IDENTIFIED BY '%s'" % (username, add_access, password))
-        pdb.execute("grant all privileges on %s.* to `%s`@`%s`" % (dbname, username, add_access))
+        pdb.execute("CREATE USER %s@%s IDENTIFIED BY %s", (username, add_access, password))
+        pdb.execute("grant all privileges on " + db_scope + " to %s@%s", (username, add_access))
     pdb.execute("flush privileges")
    
 
     delete_access_list = diff_access["delete"]
     for del_access in delete_access_list:
         try:
-            pdb.execute("drop user '" + username + "'@'" + del_access + "'")
+            pdb.execute("drop user %s@%s", (username, del_access))
         except Exception:
             pass
     
@@ -2035,7 +2041,7 @@ def setDbAccessByArgs(username,access):
 
 def setDbAccess():
     args = getArgs()
-    data = checkArgs(args, ['username', 'access'])
+    data = mw.checkPluginArgs(args, ['username', 'access'])
     if not data[0]:
         return data[1]
     username = args['username']
@@ -2074,13 +2080,13 @@ def resetDbRootPwd(version, newpwd=''):
     minor = int(m.group(2)) if m else 0
 
     if major < 5 or (major == 5 and minor < 7):
-        cmd_pass = serverdir + '/bin/mysql --defaults-file=' + myconf + ' -uroot -e'
-        cmd_pass = cmd_pass + '"UPDATE mysql.user SET password=PASSWORD(\'' + pwd + "') WHERE user='root';"
-        cmd_pass = cmd_pass + 'flush privileges;"'
+        reset_sql = "UPDATE mysql.user SET password=PASSWORD('" + pwd.replace("'", "''") + "') WHERE user='root';"
+        reset_sql = reset_sql + 'flush privileges;'
+        cmd_pass = serverdir + '/bin/mysql --defaults-file=' + myconf + ' -uroot -e' + mw.quote(reset_sql)
         data = mw.execShell(cmd_pass)
     elif major == 5:
         # 5.7: 预清空 authentication_string 后再 ALTER USER 会报 ERROR 1396, 改为直接 UPDATE + PASSWORD()
-        reset_pwd = "UPDATE mysql.user SET plugin='mysql_native_password',authentication_string=PASSWORD('" + pwd + "') WHERE user='root';"
+        reset_pwd = "UPDATE mysql.user SET plugin='mysql_native_password',authentication_string=PASSWORD('" + pwd.replace("'", "''") + "') WHERE user='root';"
         reset_pwd = reset_pwd + "flush privileges;"
 
         tmp_file = "/tmp/mysql_init_tmp.log"
@@ -2127,7 +2133,7 @@ def fixDbAccess(version):
         try:
             appCMD(version, 'stop')
             if os.path.exists(mdb_ddir):
-                mw.execShell('rm -rf ' + mdb_ddir)
+                shutil.rmtree(mdb_ddir, ignore_errors=True)
             appCMD(version, 'start')
             return mw.returnJson(True, '数据目录不存在,已重建并初始化!')
         except Exception as e:
@@ -2153,7 +2159,7 @@ def fixDbAccess(version):
 
 def setDbRw(version=''):
     args = getArgs()
-    data = checkArgs(args, ['username', 'id', 'rw'])
+    data = mw.checkPluginArgs(args, ['username', 'id', 'rw'])
     if not data[0]:
         return data[1]
 
@@ -2165,31 +2171,31 @@ def setDbRw(version=''):
     psdb = pSqliteDb('databases')
     dbname = psdb.where("id=?", (uid,)).getField('name')
     try:
-        users = pdb.query("select Host from mysql.user where User='" + username + "'")
+        users = pdb.query("select Host from mysql.user where User=" + mw.sqlValue(username))
     except Exception as e:
         return mw.returnJson(-1, str(e))
 
     # show grants for demo@"127.0.0.1";
     for x in users:
         # REVOKE ALL PRIVILEGES ON `imail`.* FROM 'imail'@'127.0.0.1';
-        sql = "REVOKE ALL PRIVILEGES ON `" + dbname + "`.* FROM '" + username + "'@'" + x["Host"] + "';"
+        sql = "REVOKE ALL PRIVILEGES ON " + mw.sqlIdent(dbname) + ".* FROM %s@%s"
         try:
-            pdb.query(sql)
+            pdb.execute(sql, (username, x["Host"]))
         except Exception:
             pass
         # print(sql, r)
 
         if rw == 'rw':
-            sql = "GRANT SELECT, INSERT, UPDATE, DELETE ON " + dbname + ".* TO " + \
-                username + "@'" + x["Host"] + "'"
+            sql = "GRANT SELECT, INSERT, UPDATE, DELETE ON " + mw.sqlIdent(dbname) + ".* TO %s@%s"
+            sql_params = (username, x["Host"])
         elif rw == 'r':
-            sql = "GRANT SELECT ON " + dbname + ".* TO " + \
-                username + "@'" + x["Host"] + "'"
+            sql = "GRANT SELECT ON " + mw.sqlIdent(dbname) + ".* TO %s@%s"
+            sql_params = (username, x["Host"])
         else:
-            sql = "GRANT all privileges ON " + dbname + ".* TO " + \
-                username + "@'" + x["Host"] + "'"
+            sql = "GRANT all privileges ON " + mw.sqlIdent(dbname) + ".* TO %s@%s"
+            sql_params = (username, x["Host"])
         try:
-            pdb.execute(sql)
+            pdb.execute(sql, sql_params)
         except Exception as e:
             return mw.returnJson(False, '切换失败!' + str(e))
     pdb.execute("flush privileges")
@@ -2200,7 +2206,7 @@ def setDbRw(version=''):
 
 def getDbInfo():
     args = getArgs()
-    data = checkArgs(args, ['name'])
+    data = mw.checkPluginArgs(args, ['name'])
     if not data[0]:
         return data[1]
 
@@ -2262,7 +2268,7 @@ def getDbInfo():
 
 def repairTable():
     args = getArgs()
-    data = checkArgs(args, ['db_name', 'tables'])
+    data = mw.checkPluginArgs(args, ['db_name', 'tables'])
     if not data[0]:
         return data[1]
 
@@ -2290,7 +2296,7 @@ def repairTable():
 
 def optTable():
     args = getArgs()
-    data = checkArgs(args, ['db_name', 'tables'])
+    data = mw.checkPluginArgs(args, ['db_name', 'tables'])
     if not data[0]:
         return data[1]
 
@@ -2317,7 +2323,7 @@ def optTable():
 
 def alterTable():
     args = getArgs()
-    data = checkArgs(args, ['db_name', 'tables'])
+    data = mw.checkPluginArgs(args, ['db_name', 'tables'])
     if not data[0]:
         return data[1]
 
@@ -2385,7 +2391,7 @@ def setDbrunMode(version=''):
         return mw.returnJson(False, "不支持切换")
 
     args = getArgs()
-    data = checkArgs(args, ['mode', 'reload'])
+    data = mw.checkPluginArgs(args, ['mode', 'reload'])
     if not data[0]:
         return data[1]
 
@@ -2440,7 +2446,7 @@ def findBinlogSlaveDoDb():
 
 def setDbMasterAccess():
     args = getArgs()
-    data = checkArgs(args, ['username', 'access'])
+    data = mw.checkPluginArgs(args, ['username', 'access'])
     if not data[0]:
         return data[1]
     username = args['username']
@@ -2453,14 +2459,13 @@ def setDbMasterAccess():
     db_users_access = getDbUserAccess(username)
     for user_access in db_users_access:
         try:
-            pdb.execute("drop user '" + username + "'@'%s'" % (user_access,))
+            pdb.execute("drop user %s@%s", (username, user_access))
         except Exception:
             pass
 
-    dbname = '*'
     for a in access.split(','):
-        pdb.execute("CREATE USER `%s`@`%s` IDENTIFIED BY '%s'" % (username, a, password))
-        pdb.execute("grant all privileges on %s.* to `%s`@'%s'" % (dbname, username, a))
+        pdb.execute("CREATE USER %s@%s IDENTIFIED BY %s", (username, a, password))
+        pdb.execute("grant all privileges on *.* to %s@%s", (username, a))
 
     pdb.execute("flush privileges")
     psdb.where('username=?', (username,)).save('accept', (access,))
@@ -2537,7 +2542,7 @@ def getMasterDbList(version=''):
 
 def setDbMaster(version):
     args = getArgs()
-    data = checkArgs(args, ['name'])
+    data = mw.checkPluginArgs(args, ['name'])
     if not data[0]:
         return data[1]
 
@@ -2567,7 +2572,7 @@ def setDbMaster(version):
 
 def setDbSlave(version):
     args = getArgs()
-    data = checkArgs(args, ['name'])
+    data = mw.checkPluginArgs(args, ['name'])
     if not data[0]:
         return data[1]
 
@@ -2704,7 +2709,7 @@ def getMasterRepSlaveList(version=''):
 
 def addMasterRepSlaveUser(version=''):
     args = getArgs()
-    data = checkArgs(args, ['username', 'password'])
+    data = mw.checkPluginArgs(args, ['username', 'password'])
     if not data[0]:
         return data[1]
 
@@ -2746,24 +2751,26 @@ def addMasterRepSlaveUser(version=''):
         minor = int(m.group(2)) if m else 0
         if major >= 9 or (major == 8 and minor >= 4):
             # 8.4 起默认禁用 mysql_native_password, 9.x 已移除该插件, 用默认认证插件
-            sql = "CREATE USER '" + username + "'@'%' IDENTIFIED BY '" + password + "';"
+            sql = "CREATE USER %s@%s IDENTIFIED BY %s;"
+            sql_params = (username, '%', password)
         else:
-            sql = "CREATE USER '" + username + "'@'%' IDENTIFIED WITH " + auth_policy + " BY '" + password + "';"
-        pdb.execute(sql)
-        sql = "grant replication slave on *.* to '" + username + "'@'%';"
-        result = pdb.execute(sql)
+            sql = "CREATE USER %s@%s IDENTIFIED WITH %s BY %s;"
+            sql_params = (username, '%', auth_policy, password)
+        pdb.execute(sql, sql_params)
+        sql = "grant replication slave on *.* to %s@%s;"
+        result = pdb.execute(sql, (username, '%'))
         isError = isSqlError(result)
         if isError != None:
             return isError
     else:
-        sql = "grant replication SLAVE ON *.* TO  '" + username + "'@'%' identified by '" + password + "';"
-        result = pdb.execute(sql)
+        sql = "grant replication SLAVE ON *.* TO  %s@%s identified by %s;"
+        result = pdb.execute(sql, (username, '%', password))
         isError = isSqlError(result)
         if isError != None:
             return isError
 
-    sql_select = "grant select,reload,REPLICATION CLIENT,PROCESS on *.* to '" + username + "'@'%';"
-    pdb.execute(sql_select)
+    sql_select = "grant select,reload,REPLICATION CLIENT,PROCESS on *.* to %s@%s;"
+    pdb.execute(sql_select, (username, '%'))
     pdb.execute('FLUSH PRIVILEGES;')
 
     addTime = time.strftime('%Y-%m-%d %X', time.localtime())
@@ -2774,7 +2781,7 @@ def addMasterRepSlaveUser(version=''):
 
 def getMasterRepSlaveUserCmd(version):
     args = getArgs()
-    data = checkArgs(args, ['username', 'db'])
+    data = mw.checkPluginArgs(args, ['username', 'db'])
     if not data[0]:
         return data[1]
 
@@ -2812,8 +2819,8 @@ def getMasterRepSlaveUserCmd(version):
     mdb8 = getMdb8Ver()
     sql = ''
     if not mw.inArray(mdb8,version):
-        base_sql = "CHANGE MASTER TO MASTER_HOST='" + ip + "', MASTER_PORT=" + port + ", MASTER_USER='" + \
-                clist[0]['username'] + "', MASTER_PASSWORD='" + clist[0]['password'] + "'"
+        base_sql = "CHANGE MASTER TO MASTER_HOST=" + mw.sqlValue(ip) + ", MASTER_PORT=" + re.sub(r'\D', '', str(port)) + ", MASTER_USER=" + \
+                mw.sqlValue(clist[0]['username']) + ", MASTER_PASSWORD=" + mw.sqlValue(clist[0]['password'])
 
         sql += base_sql;
         sql += "<br/><hr/>";
@@ -2843,7 +2850,7 @@ def getMasterRepSlaveUserCmd(version):
 
 def delMasterRepSlaveUser(version=''):
     args = getArgs()
-    data = checkArgs(args, ['username'])
+    data = mw.checkPluginArgs(args, ['username'])
     if not data[0]:
         return data[1]
 
@@ -2852,22 +2859,22 @@ def delMasterRepSlaveUser(version=''):
     pdb = pMysqlDb()
     psdb = pSqliteDb('master_replication_user')
     try:
-        pdb.execute("drop user '" + name + "'@'%'")
+        pdb.execute("drop user %s@%s", (name, '%'))
     except Exception:
         pass
     try:
-        pdb.execute("drop user '" + name + "'@'localhost'")
+        pdb.execute("drop user %s@%s", (name, 'localhost'))
     except Exception:
         pass
 
     try:
-        users = pdb.query("select Host from mysql.user where User='" +
-                          name + "' AND Host!='localhost'")
+        users = pdb.query("select Host from mysql.user where User=" +
+                          mw.sqlValue(name) + " AND Host!='localhost'")
     except Exception:
         users = []
     for us in users:
         try:
-            pdb.execute("drop user '" + name + "'@'" + us["Host"] + "'")
+            pdb.execute("drop user %s@%s", (name, us["Host"]))
         except Exception:
             pass
 
@@ -2878,19 +2885,19 @@ def delMasterRepSlaveUser(version=''):
 
 def updateMasterRepSlaveUser(version=''):
     args = getArgs()
-    data = checkArgs(args, ['username', 'password'])
+    data = mw.checkPluginArgs(args, ['username', 'password'])
     if not data[0]:
         return data[1]
 
     pdb = pMysqlDb()
     psdb = pSqliteDb('master_replication_user')
     try:
-        pdb.execute("drop user '" + args['username'] + "'@'%'")
+        pdb.execute("drop user %s@%s", (args['username'], '%'))
     except Exception:
         pass
 
-    pdb.execute("GRANT REPLICATION SLAVE ON *.* TO  '" +
-                args['username'] + "'@'%' identified by '" + args['password'] + "'")
+    pdb.execute("GRANT REPLICATION SLAVE ON *.* TO  %s@%s identified by %s",
+                (args['username'], '%', args['password']))
 
     psdb.where("username=?", (args['username'],)).save(
         'password', args['password'])
@@ -2900,7 +2907,7 @@ def updateMasterRepSlaveUser(version=''):
 
 def getSlaveSSHList(version=''):
     args = getArgs()
-    data = checkArgs(args, ['page', 'page_size'])
+    data = mw.checkPluginArgs(args, ['page', 'page_size'])
     if not data[0]:
         return data[1]
 
@@ -2928,7 +2935,7 @@ def getSlaveSSHList(version=''):
 
 def getSlaveSyncUserByIp(version=''):
     args = getArgs()
-    data = checkArgs(args, ['ip'])
+    data = mw.checkPluginArgs(args, ['ip'])
     if not data[0]:
         return data[1]
 
@@ -2944,7 +2951,7 @@ def addSlaveSyncUser(version=''):
     import base64
 
     args = getArgs()
-    data = checkArgs(args, ['ip'])
+    data = mw.checkPluginArgs(args, ['ip'])
     if not data[0]:
         return data[1]
 
@@ -2952,7 +2959,7 @@ def addSlaveSyncUser(version=''):
     if ip == "":
         return mw.returnJson(True, 'ok')
 
-    data = checkArgs(args, ['port', 'user', 'pass', 'mode'])
+    data = mw.checkPluginArgs(args, ['port', 'user', 'pass', 'mode'])
     if not data[0]:
         return data[1]
 
@@ -2977,7 +2984,7 @@ def addSlaveSyncUser(version=''):
 
 def delSlaveSyncUser(version=''):
     args = getArgs()
-    data = checkArgs(args, ['ip'])
+    data = mw.checkPluginArgs(args, ['ip'])
     if not data[0]:
         return data[1]
 
@@ -2990,7 +2997,7 @@ def delSlaveSyncUser(version=''):
 
 def getSlaveSyncUserList(version=''):
     args = getArgs()
-    data = checkArgs(args, ['page', 'page_size'])
+    data = mw.checkPluginArgs(args, ['page', 'page_size'])
     if not data[0]:
         return data[1]
 
@@ -3030,7 +3037,7 @@ def getSlaveSyncMode(version):
 
 def setSlaveSyncMode(version):
     args = getArgs()
-    data = checkArgs(args, ['mode'])
+    data = mw.checkPluginArgs(args, ['mode'])
     if not data[0]:
         return data[1]
     mode = args['mode']
@@ -3045,7 +3052,7 @@ def setSlaveSyncMode(version):
 
 def getSlaveSSHByIp(version=''):
     args = getArgs()
-    data = checkArgs(args, ['ip'])
+    data = mw.checkPluginArgs(args, ['ip'])
     if not data[0]:
         return data[1]
 
@@ -3060,7 +3067,7 @@ def addSlaveSSH(version=''):
     import base64
 
     args = getArgs()
-    data = checkArgs(args, ['ip'])
+    data = mw.checkPluginArgs(args, ['ip'])
     if not data[0]:
         return data[1]
 
@@ -3068,7 +3075,7 @@ def addSlaveSSH(version=''):
     if ip == "":
         return mw.returnJson(True, 'ok')
 
-    data = checkArgs(args, ['port', 'id_rsa', 'db_user'])
+    data = mw.checkPluginArgs(args, ['port', 'id_rsa', 'db_user'])
     if not data[0]:
         return data[1]
 
@@ -3092,7 +3099,7 @@ def addSlaveSSH(version=''):
 
 def delSlaveSSH(version=''):
     args = getArgs()
-    data = checkArgs(args, ['ip'])
+    data = mw.checkPluginArgs(args, ['ip'])
     if not data[0]:
         return data[1]
 
@@ -3105,7 +3112,7 @@ def delSlaveSSH(version=''):
 
 def updateSlaveSSH(version=''):
     args = getArgs()
-    data = checkArgs(args, ['ip', 'id_rsa'])
+    data = mw.checkPluginArgs(args, ['ip', 'id_rsa'])
     if not data[0]:
         return data[1]
 
@@ -3232,13 +3239,13 @@ def makeSyncUsercmd(u, version=''):
     username = u['user']
     password = u['pass']
     if mode == "gtid":
-        sql = "CHANGE MASTER TO MASTER_HOST='" + ip + "', MASTER_PORT=" + port + ", MASTER_USER='" + \
-            username + "', MASTER_PASSWORD='" + \
-            password + "', MASTER_AUTO_POSITION=1"
+        sql = "CHANGE MASTER TO MASTER_HOST=" + mw.sqlValue(ip) + ", MASTER_PORT=" + re.sub(r'\D', '', str(port)) + ", MASTER_USER=" + \
+            mw.sqlValue(username) + ", MASTER_PASSWORD=" + \
+            mw.sqlValue(password) + ", MASTER_AUTO_POSITION=1"
         if version == '8.0':
-            sql = "CHANGE REPLICATION SOURCE TO SOURCE_HOST='" + ip  + "', SOURCE_PORT=" + port + ", SOURCE_USER='" + \
-                username  + "', SOURCE_PASSWORD='" + \
-                password + "', MASTER_AUTO_POSITION=1"
+            sql = "CHANGE REPLICATION SOURCE TO SOURCE_HOST=" + mw.sqlValue(ip) + ", SOURCE_PORT=" + re.sub(r'\D', '', str(port)) + ", SOURCE_USER=" + \
+                mw.sqlValue(username) + ", SOURCE_PASSWORD=" + \
+                mw.sqlValue(password) + ", MASTER_AUTO_POSITION=1"
     return sql
 
 
@@ -3368,7 +3375,7 @@ def initSlaveStatusSSH(version=''):
         SSH_PRIVATE_KEY = "/tmp/t_ssh_" + ip + ".txt"
         master_port = data['port']
         mw.writeFile(SSH_PRIVATE_KEY, data['id_rsa'].replace('\\n', '\n'))
-        mw.execShell("chmod 600 " + SSH_PRIVATE_KEY)
+        mw.execShell("chmod 600 " + mw.quote(SSH_PRIVATE_KEY))
         try:
             key = paramiko.RSAKey.from_private_key_file(SSH_PRIVATE_KEY)
             ssh.set_missing_host_key_policy(paramiko.AutoAddPolicy())
@@ -3378,8 +3385,8 @@ def initSlaveStatusSSH(version=''):
             db_user = data['db_user']
             cmd = 'cd /www/server/mdserver-web && . bin/activate && python3 ' + \
                 getSPluginDir() + \
-                '/index.py get_master_rep_slave_user_cmd {"username":"' + \
-                db_user + '","db":""}'
+                '/index.py get_master_rep_slave_user_cmd ' + \
+                mw.quote('{"username":"' + db_user + '","db":""}')
             stdin, stdout, stderr = ssh.exec_command(cmd)
             result = stdout.read()
             result = result.decode('utf-8')
@@ -3412,7 +3419,10 @@ def initSlaveStatusSSH(version=''):
             db.query(cmd)
             ssh.close()
             if os.path.exists(SSH_PRIVATE_KEY):
-                os.system("rm -rf " + SSH_PRIVATE_KEY)
+                try:
+                    os.remove(SSH_PRIVATE_KEY)
+                except OSError:
+                    pass
         except Exception as e:
             return mw.returnJson(False, '[主][' + ip + ']:SSH认证配置连接失败!' + str(e))
     db.query('start '+slave_name)
@@ -3470,7 +3480,7 @@ def deleteSlave(version=''):
 
 def dumpMysqlData(version=''):
     args = getArgs()
-    data = checkArgs(args, ['db'])
+    data = mw.checkPluginArgs(args, ['db'])
     if not data[0]:
         return data[1]
 
@@ -3486,12 +3496,12 @@ def dumpMysqlData(version=''):
     if args['db'].lower() == 'all':
         dlist = findBinlogDoDb()
         cmd = mysql_dir + "/bin/mysqldump --defaults-file=" + myconf + " " + option + " -uroot -p" + \
-            pwd + " --force --databases " + \
-            ' '.join(dlist) + " | gzip > /tmp/dump.sql.gz"
+            mw.quote(pwd) + " --force --databases " + \
+            ' '.join([mw.quote(x) for x in dlist]) + " | gzip > /tmp/dump.sql.gz"
     else:
         cmd = mysql_dir + "/bin/mysqldump --defaults-file=" + myconf + " " + option + " -uroot -p" + \
-            pwd + " --force --databases " + \
-            args['db'] + " | gzip > /tmp/dump.sql.gz"
+            mw.quote(pwd) + " --force --databases " + \
+            mw.quote(args['db']) + " | gzip > /tmp/dump.sql.gz"
 
     ret = mw.execShell(cmd)
     if ret[0] == '':
@@ -3529,7 +3539,7 @@ def syncDatabaseRepairTempFile():
 def syncDatabaseRepairLog(version=''):
     import subprocess
     args = getArgs()
-    data = checkArgs(args, ['db','sign','op'])
+    data = mw.checkPluginArgs(args, ['db','sign','op'])
     if not data[0]:
         return data[1]
 
@@ -3537,7 +3547,8 @@ def syncDatabaseRepairLog(version=''):
     sync_args_sign = args['sign']
     op = args['op']
     tmp_log = syncDatabaseRepairTempFile()
-    cmd = 'cd '+mw.getServerDir()+'/mdserver-web && . bin/activate && python3 plugins/mysql/index.py sync_database_repair  {"db":"'+sync_args_db+'","sign":"'+sync_args_sign+'"}'
+    payload = json.dumps({"db": sync_args_db, "sign": sync_args_sign}, separators=(',', ':'))
+    cmd = 'cd '+mw.getServerDir()+'/mdserver-web && . bin/activate && python3 plugins/mysql/index.py sync_database_repair  ' + mw.quote(payload)
     # print(cmd)
 
     if op == 'get':
@@ -3548,8 +3559,8 @@ def syncDatabaseRepairLog(version=''):
         return mw.returnJson(True, 'ok', cmd)
 
     if op == 'do':
-        os.system(' echo "开始执行" > '+ tmp_log)
-        os.system(cmd +' >> '+ tmp_log +' &')
+        os.system(' echo "开始执行" > '+ mw.quote(tmp_log))
+        os.system(cmd +' >> '+ mw.quote(tmp_log) +' &')
         return mw.returnJson(True, 'ok')
 
     return mw.returnJson(False, '无效请求!')
@@ -3573,7 +3584,7 @@ def syncDatabaseRepair(version=''):
             return "'" + escape_string(v) + "'"
 
     args = getArgs()
-    data = checkArgs(args, ['db','sign'])
+    data = mw.checkPluginArgs(args, ['db','sign'])
     if not data[0]:
         return data[1]
 
@@ -3625,7 +3636,7 @@ def syncDatabaseRepair(version=''):
                 else:
                     print(table_name+' smart compare check ok.')
                     mw.writeFile(tmp_log, table_name+' smart compare check ok.\n','a+')
-                    mw.execShell("echo 'ok' > "+table_check_file)
+                    mw.execShell("echo 'ok' > "+mw.quote(table_check_file))
                     continue
 
 
@@ -3648,7 +3659,7 @@ def syncDatabaseRepair(version=''):
         else:
             print(table_name+' check ok.')
             mw.writeFile(tmp_log, table_name+' check ok.\n','a+')
-            mw.execShell("echo 'ok' > "+table_check_file)
+            mw.execShell("echo 'ok' > "+mw.quote(table_check_file))
 
 
     # inconsistent_table = ['xx.xx']
@@ -3832,14 +3843,15 @@ def writeDbSyncStatus(data):
 def fullSyncCmd():
     time_all_s = time.time()
     args = getArgs()
-    data = checkArgs(args, ['db', 'sign'])
+    data = mw.checkPluginArgs(args, ['db', 'sign'])
     if not data[0]:
         return data[1]
 
     db = args['db']
     sign = args['sign']
 
-    cmd = 'cd '+mw.getServerDir()+'/mdserver-web && . bin/activate && python3 plugins/mysql/index.py do_full_sync  {"db":"'+db+'","sign":"'+sign+'"}'
+    payload = json.dumps({"db": db, "sign": sign}, separators=(',', ':'))
+    cmd = 'cd '+mw.getServerDir()+'/mdserver-web && . bin/activate && python3 plugins/mysql/index.py do_full_sync  ' + mw.quote(payload)
     return mw.returnJson(True,'ok',cmd)
 
 def doFullSync(version=''):
@@ -3907,7 +3919,7 @@ def doFullSyncUser(version=''):
 
     time_all_s = time.time()
     args = getArgs()
-    data = checkArgs(args, ['db', 'sign'])
+    data = mw.checkPluginArgs(args, ['db', 'sign'])
     if not data[0]:
         return data[1]
 
@@ -3919,10 +3931,15 @@ def doFullSyncUser(version=''):
         dbs = findBinlogSlaveDoDb()
         dbs_str = ''
         for x in dbs:
-            dbs_str += ' ' + x
+            dbs_str += ' ' + mw.quote(x)
         sync_db = "--databases " + dbs_str.strip()
 
     sync_sign = args['sign']
+    if sync_db.startswith('--databases '):
+        db_arg = sync_db
+    else:
+        db_arg = mw.quote(sync_db)
+    db_import_arg = mw.quote(sync_db_import) if sync_db_import else ''
 
     db = pMysqlDb()
 
@@ -3948,7 +3965,10 @@ def doFullSyncUser(version=''):
 
     bak_file = '/tmp/tmp.sql'
     if os.path.exists(bak_file):
-        os.system("rm -rf " + bak_file)
+        try:
+            os.remove(bak_file)
+        except OSError:
+            pass
 
     writeDbSyncStatus({'code': 0, 'msg': '开始同步...', 'progress': 0})
     dmp_option = ''
@@ -3997,8 +4017,8 @@ def doFullSyncUser(version=''):
         else:
             dmp_option += " --master-data=1 --apply-slave-statements --include-master-host-port --compress "
 
-        dump_sql_data = getServerDir() + "/bin/mysqldump --single-transaction --default-character-set=utf8mb4 -q " + dmp_option + " -h" + ip + " -P" + \
-            port + " -u" + user + " -p'" + apass + "' " + ssl_mode + " " + sync_db + " > " + bak_file
+        dump_sql_data = getServerDir() + "/bin/mysqldump --single-transaction --default-character-set=utf8mb4 -q " + dmp_option + " -h" + mw.quote(ip) + " -P" + \
+            mw.quote(port) + " -u" + mw.quote(user) + " -p" + mw.quote(apass) + " " + ssl_mode + " " + db_arg + " > " + mw.quote(bak_file)
         print(dump_sql_data)
         time_s = time.time()
         r = mw.execShell(dump_sql_data)
@@ -4009,7 +4029,7 @@ def doFullSyncUser(version=''):
     
     writeDbSyncStatus({'code': 3, 'msg': '导出耗时:'+str(int(export_cos))+'秒,正在到本地导入数据中...', 'progress': 40})
 
-    find_run_import = mw.execShell('ps -ef | grep mysql| grep '+ bak_file +' | grep -v grep')
+    find_run_import = mw.execShell('ps -ef | grep mysql| grep '+ mw.quote(bak_file) +' | grep -v grep')
     if find_run_import[0] != "":
         print("正在导入数据中,别着急...")
         writeDbSyncStatus({'code': 4.1, 'msg': '正在导入数据中,别着急...', 'progress': 39})
@@ -4033,12 +4053,12 @@ def doFullSyncUser(version=''):
         sock = getSocketFile()
 
         if is_exist_pv:
-            my_import_cmd = getServerDir() + '/bin/mysql -S ' + sock + " -uroot -p'" + pwd + "' " + sync_db_import
-            my_import_cmd = "pv -t -p " + bak_file + '|' + my_import_cmd
+            my_import_cmd = getServerDir() + '/bin/mysql -S ' + sock + " -uroot -p" + mw.quote(pwd) + " " + db_import_arg
+            my_import_cmd = "pv -t -p " + mw.quote(bak_file) + '|' + my_import_cmd
             print(my_import_cmd)
             os.system(my_import_cmd)
         else:
-            my_import_cmd = getServerDir() + '/bin/mysql -S ' + sock + " -uroot -p'" + pwd + "' " + sync_db_import + ' < ' + bak_file
+            my_import_cmd = getServerDir() + '/bin/mysql -S ' + sock + " -uroot -p" + mw.quote(pwd) + " " + db_import_arg + ' < ' + mw.quote(bak_file)
             print(my_import_cmd)
             mw.execShell(my_import_cmd)
 
@@ -4060,13 +4080,16 @@ def doFullSyncUser(version=''):
     db.query("start "+slave_name)
     if channel_name != '':
         # 多通道用 FOR CHANNEL 启动(MySQL 不支持 START ALL SLAVES)
-        db.query("start "+slave_name+" for channel '"+channel_name+"'")
+        db.query("start "+slave_name+" for channel "+mw.sqlValue(channel_name))
     time_all_e = time.time()
     cos = time_all_e - time_all_s
     writeDbSyncStatus({'code': 6, 'msg': '总耗时:'+str(int(cos))+'秒,从库重启完成...', 'progress': 100})
 
     if os.path.exists(bak_file):
-        os.system("rm -rf " + bak_file)
+        try:
+            os.remove(bak_file)
+        except OSError:
+            pass
 
     return True
 
@@ -4074,7 +4097,7 @@ def doFullSyncUser(version=''):
 def doFullSyncSSH(version=''):
 
     args = getArgs()
-    data = checkArgs(args, ['db', 'sign'])
+    data = mw.checkPluginArgs(args, ['db', 'sign'])
     if not data[0]:
         return data[1]
 
@@ -4130,8 +4153,9 @@ def doFullSyncSSH(version=''):
     writeDbSyncStatus({'code': 0, 'msg': '登录Master成功...', 'progress': 5})
 
     dbname = args['db']
+    payload = json.dumps({'db': dbname})
     cmd = "cd /www/server/mdserver-web && . bin/activate && python3 " + \
-        getSPluginDir() + "/index.py dump_mysql_data {\"db\":'" + dbname + "'}"
+        getSPluginDir() + "/index.py dump_mysql_data " + mw.quote(payload)
     print(cmd)
     stdin, stdout, stderr = ssh.exec_command(cmd)
     result = stdout.read()
@@ -4156,8 +4180,8 @@ def doFullSyncSSH(version=''):
 
     cmd = 'cd /www/server/mdserver-web && . bin/activate && python3 ' + \
         getSPluginDir() + \
-        '/index.py get_master_rep_slave_user_cmd {"username":"' + \
-        db_user + '","db":""}'
+        '/index.py get_master_rep_slave_user_cmd ' + \
+        mw.quote('{"username":"' + db_user + '","db":""}')
     stdin, stdout, stderr = ssh.exec_command(cmd)
     result = stdout.read()
     result = result.decode('utf-8')
@@ -4187,7 +4211,7 @@ def doFullSyncSSH(version=''):
     msock = root_dir + "/mysql.sock"
     mw.execShell("cd /tmp && gzip -d dump.sql.gz")
     cmd = root_dir + "/bin/mysql -S " + msock + \
-        " -uroot -p" + pwd + " < /tmp/dump.sql"
+        " -uroot -p" + mw.quote(pwd) + " < /tmp/dump.sql"
 
     print(cmd)
     import_data = mw.execShell(cmd)
@@ -4205,14 +4229,17 @@ def doFullSyncSSH(version=''):
     
     writeDbSyncStatus({'code': 6, 'msg': '从库重启完成...', 'progress': 100})
 
-    os.system("rm -rf " + SSH_PRIVATE_KEY)
+    try:
+        os.remove(SSH_PRIVATE_KEY)
+    except OSError:
+        pass
     os.system("rm -rf /tmp/dump.sql")
     return True
 
 
 def fullSync(version=''):
     args = getArgs()
-    data = checkArgs(args, ['db', 'begin'])
+    data = mw.checkPluginArgs(args, ['db', 'begin'])
     if not data[0]:
         return data[1]
 
@@ -4222,9 +4249,9 @@ def fullSync(version=''):
 
     status_file = asyncTmpfile()
     if args['begin'] == '1':
+        payload = json.dumps({"db": args['db'], "sign": sign}, separators=(',', ':'))
         cmd = 'cd ' + mw.getPanelDir() + ' && python3 ' + getPluginDir() + \
-            '/index.py do_full_sync {"db":"' + \
-            args['db'] + '","sign":"' + sign + '"} &'
+            '/index.py do_full_sync ' + mw.quote(payload) + ' &'
         # print(cmd)
         mw.execShell(cmd)
         return json.dumps({'code': 0, 'msg': '同步数据中!', 'progress': 0})
@@ -4308,11 +4335,13 @@ if __name__ == "__main__":
         print(setDbStatus(version))
     elif func == 'conf':
         print(getConf())
-    elif func == 'bin_log':
-        print(binLog(version))
+    elif func == 'set_binlog':
+        print(setBinlog(version))
+    elif func == 'get_binlog_size':
+        print(getBinlogSize(version))
     elif func == 'binlog_list':
         print(binLogList())
-    elif func == 'clean_bin_log':
+    elif func == 'clean_binlog':
         print(cleanBinLog())
     elif func == 'error_log':
         print(getErrorLog())

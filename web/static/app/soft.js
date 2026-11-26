@@ -37,6 +37,23 @@ function softMain(name, title, version) {
 }
 
 //取软件列表
+function softEscapeHtml(text) {
+    return String(text).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+}
+
+function renderPluginInfoErrors(errors) {
+    var box = $("#plugin_info_error");
+    if (!errors || errors.length == 0) {
+        box.hide().html('');
+        return;
+    }
+    var html = '<b>以下插件 info.json 不完整，已跳过加载：</b><br>';
+    for (var i = 0; i < errors.length; i++) {
+        html += '· ' + softEscapeHtml(errors[i].name) + '：' + softEscapeHtml(errors[i].error) + '<br>';
+    }
+    box.html(html).show();
+}
+
 function getSList(isdisplay) {
     if (isdisplay !== true) {
         var loadT = layer.msg('正在获取列表...', { icon: 16, time: 0, shade: [0.3, '#000'] })
@@ -78,6 +95,7 @@ function getSList(isdisplay) {
         }
 
         $(".softtype").html(tBody);
+        renderPluginInfoErrors(rdata.info_errors);
         $("#softPage").html(rdata.list);
         $("#softPage .Pcount").css({ "position": "absolute", "left": "0" })
 
@@ -538,6 +556,11 @@ function importPluginInstall(plugin_name, tmp_path) {
 
 $(function() {
     if (window.document.location.pathname == '/soft/') {
-        setInterval(function() { getSList(); }, 8000);
+        // 页面隐藏(document.hidden)时跳过本次轮询, 减少后台标签页无效请求
+        setInterval(function() {
+            if (!document.hidden) {
+                getSList();
+            }
+        }, 8000);
     }
 });

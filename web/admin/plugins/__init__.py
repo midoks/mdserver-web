@@ -127,27 +127,29 @@ def menu():
 @blueprint.route('/file', endpoint='file', methods=['GET'])
 @panel_login_required
 def file():
-    name = request.args.get('name', '')
-    if name.strip() == '':
+    from flask import send_file, abort
+    name = request.args.get('name', '').strip()
+    f = request.args.get('f', '').strip()
+    if name == '' or f == '':
         return ''
 
-    f = request.args.get('f', '')
-    if f.strip() == '':
+    # 路径穿越防护: 禁止 .. 和绝对路径
+    if '..' in name or '..' in f or name.startswith('/') or f.startswith('/'):
+        abort(403)
+
+    file_path = mw.getPluginDir() + '/' + name + '/' + f
+    if not os.path.isfile(file_path):
         return ''
 
-    file = mw.getPluginDir() + '/' + name + '/' + f
-    if not os.path.exists(file):
-        return ''
-
-    suffix = mw.getPathSuffix(file)
-    if suffix == '.css':
-        content = mw.readFile(file)
-        from flask import Response
-        from flask import make_response
-        v = Response(content, headers={'Content-Type': 'text/css; charset="utf-8"'})
-        return make_response(v)
-    content = open(file, 'rb').read()
-    return content
+    # send_file 自动处理 ETag/Last-Modified/Range/条件请求, 浏览器 304 直接命中缓存
+    # max_age=3600 让 CSS/JS/图片在浏览器端缓存 1 小时, 大幅减少重复请求
+    response = send_file(file_path, conditional=True, max_age=3600)
+    # 兼容某些插件 css 里嵌套引用的情况: 显式 Content-Type
+    if file_path.endswith('.css'):
+        response.headers['Content-Type'] = 'text/css; charset=utf-8'
+    elif file_path.endswith('.js'):
+        response.headers['Content-Type'] = 'application/javascript; charset=utf-8'
+    return response
 
 
 # 插件上传

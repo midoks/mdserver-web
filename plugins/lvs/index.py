@@ -41,37 +41,15 @@ def getInitDFile():
     return '/etc/init.d/' + getPluginName()
 
 
-def getArgs():
-    args = sys.argv[2:]
-    tmp = {}
-    args_len = len(args)
-
-    if args_len == 1:
-        t = args[0].strip('{').strip('}')
-        t = t.split(':')
-        tmp[t[0]] = t[1]
-    elif args_len > 1:
-        for i in range(len(args)):
-            t = args[i].split(':')
-            tmp[t[0]] = t[1]
-    return tmp
-
-
-def checkArgs(data, ck=[]):
-    for i in range(len(ck)):
-        if not ck[i] in data:
-            return (False, mw.returnJson(False, '参数:(' + ck[i] + ')没有!'))
-    return (True, mw.returnJson(True, 'ok'))
-
-
 def getConf():
     path = '/etc/default/ipvsadm'
     return path
 
 
 def status():
-    data = mw.execShell("command -v ipvsadm")
-    if data[0] == '':
+    data = subprocess.run(["command", "-v", getIpvsadm()],
+                           stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+    if data.stdout.decode('utf-8').strip() == '':
         return 'stop'
     return 'start'
 
@@ -90,8 +68,10 @@ def initDreplace():
     if not os.path.exists(file_bin):
         content = mw.readFile(file_tpl)
         content = contentReplace(content)
+        subprocess.run(["chmod", "+x", file_bin],
+                       stdout=subprocess.PIPE, stderr=subprocess.PIPE)
         mw.writeFile(file_bin, content)
-        mw.execShell('chmod +x ' + file_bin)
+        # mw.execShell('chmod +x ' + file_bin)
 
 
     return file_bin
@@ -128,8 +108,9 @@ def initdStatus():
 
     shell_cmd = 'systemctl status ' + \
         getPluginName() + ' | grep loaded | grep "enabled;"'
-    data = mw.execShell(shell_cmd)
-    if data[0] == '':
+    data = subprocess.run(shell_cmd.split(),
+                          stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+    if data.stdout == b'':
         return 'fail'
     return 'ok'
 
@@ -138,8 +119,8 @@ def initdInstall():
     current_os = mw.getOs()
     if current_os == 'darwin':
         return "Apple Computer does not support"
-
-    mw.execShell('systemctl enable ' + getIpvsadm())
+    subprocess.run(["systemctl", "enable", getIpvsadm()],
+                   stdout=subprocess.PIPE, stderr=subprocess.PIPE)
     return 'ok'
 
 
@@ -148,7 +129,8 @@ def initdUinstall():
     if current_os == 'darwin':
         return "Apple Computer does not support"
 
-    mw.execShell('systemctl disable ' + getIpvsadm())
+    subprocess.run(["systemctl", "disable", getIpvsadm()],
+                   stdout=subprocess.PIPE, stderr=subprocess.PIPE)
     return 'ok'
 
 def runLog():

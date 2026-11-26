@@ -6,6 +6,7 @@ import os
 import json
 import re
 import sys
+import shutil
 
 web_dir = os.getcwd() + "/web"
 if os.path.exists(web_dir):
@@ -41,30 +42,6 @@ def getInitDFile():
     if app_debug:
         return '/tmp/' + getPluginName()
     return '/etc/init.d/' + getPluginName()
-
-
-def getArgs():
-    args = sys.argv[2:]
-    tmp = {}
-    args_len = len(args)
-
-    if args_len == 1:
-        t = args[0].strip('{').strip('}')
-        t = t.split(':')
-        tmp[t[0]] = t[1]
-    elif args_len > 1:
-        for i in range(len(args)):
-            t = args[i].split(':')
-            tmp[t[0]] = t[1]
-
-    return tmp
-
-
-def checkArgs(data, ck=[]):
-    for i in range(len(ck)):
-        if not ck[i] in data:
-            return (False, mw.returnJson(False, '参数:(' + ck[i] + ')没有!'))
-    return (True, mw.returnJson(True, 'ok'))
 
 
 def contentReplace(content):
@@ -387,8 +364,8 @@ def getRecList():
 
 
 def addRec():
-    args = getArgs()
-    data = checkArgs(args, ['name', 'path', 'pwd', 'ps'])
+    args = mw.getPluginArgs()
+    data = mw.checkPluginArgs(args, ['name', 'path', 'pwd', 'ps'])
     if not data[0]:
         return data[1]
 
@@ -405,9 +382,12 @@ def addRec():
             if file_chown != 'www':
                 return mw.returnJson(False, '建议手动执行命令: chown -R www:www '+ args_path)
         else:
-            os.system("mkdir -p " + args_path + " &")
-            os.system("chown -R  www:www " + args_path + " &")
-            os.system("chmod -R 755 " + args_path + " &")
+            os.makedirs(args_path, exist_ok=True)
+            try:
+                shutil.chown(args_path, 'www', 'www')
+            except Exception:
+                pass
+            os.chmod(args_path, 0o755)
 
     delRecBy(args_name)
 
@@ -433,8 +413,8 @@ def addRec():
 
 
 def getRec():
-    args = getArgs()
-    data = checkArgs(args, ['name'])
+    args = mw.getPluginArgs()
+    data = mw.checkPluginArgs(args, ['name'])
     if not data[0]:
         return data[1]
 
@@ -493,8 +473,8 @@ def delRecBy(name):
 
 
 def delRec():
-    args = getArgs()
-    data = checkArgs(args, ['name'])
+    args = mw.getPluginArgs()
+    data = mw.checkPluginArgs(args, ['name'])
     if not data[0]:
         return data[1]
     name = args['name']
@@ -507,8 +487,8 @@ def delRec():
 def cmdRecSecretKey():
     import base64
 
-    args = getArgs()
-    data = checkArgs(args, ['name'])
+    args = mw.getPluginArgs()
+    data = mw.checkPluginArgs(args, ['name'])
     if not data[0]:
         return data[1]
 
@@ -528,8 +508,8 @@ def cmdRecSecretKey():
 
 
 def cmdRecCmd():
-    args = getArgs()
-    data = checkArgs(args, ['name'])
+    args = mw.getPluginArgs()
+    data = mw.checkPluginArgs(args, ['name'])
     if not data[0]:
         return data[1]
 
@@ -672,8 +652,8 @@ def lsyncdList():
 
 def lsyncdGet():
     import base64
-    args = getArgs()
-    data = checkArgs(args, ['name'])
+    args = mw.getPluginArgs()
+    data = mw.checkPluginArgs(args, ['name'])
     if not data[0]:
         return data[1]
 
@@ -710,8 +690,8 @@ def lsyncdGet():
 
 
 def lsyncdDelete():
-    args = getArgs()
-    data = checkArgs(args, ['name'])
+    args = mw.getPluginArgs()
+    data = mw.checkPluginArgs(args, ['name'])
     if not data[0]:
         return data[1]
 
@@ -733,8 +713,8 @@ def lsyncdDelete():
 def lsyncdAdd():
     import base64
 
-    args = getArgs()
-    data = checkArgs(args, ['ip', 'conn_type', 'path', 'delay', 'period', 'bwlimit'])
+    args = mw.getPluginArgs()
+    data = mw.checkPluginArgs(args, ['ip', 'conn_type', 'path', 'delay', 'period', 'bwlimit'])
     if not data[0]:
         return data[1]
 
@@ -749,9 +729,12 @@ def lsyncdAdd():
             if file_chown != 'www':
                 return mw.returnJson(False, '建议手动执行命令: chown -R www:www '+ args_path)
         else:
-            os.system("mkdir -p " + path + " &")
-            os.system("chown -R  www:www " + path + " &")
-            os.system("chmod -R 755 " + path + " &")
+            os.makedirs(path, exist_ok=True)
+            try:
+                shutil.chown(path, 'www', 'www')
+            except Exception:
+                pass
+            os.chmod(path, 0o755)
 
     conn_type = args['conn_type']
 
@@ -781,7 +764,7 @@ def lsyncdAdd():
 
     if conn_type == "key":
 
-        secret_key_check = checkArgs(args, ['secret_key'])
+        secret_key_check = mw.checkPluginArgs(args, ['secret_key'])
         if not secret_key_check[0]:
             return secret_key_check[1]
 
@@ -795,7 +778,7 @@ def lsyncdAdd():
         except Exception as e:
             return mw.returnJson(False, "接收密钥格式错误!")
     else:
-        data = checkArgs(args, ['sname', 'password'])
+        data = mw.checkPluginArgs(args, ['sname', 'password'])
         if not data[0]:
             return data[1]
 
@@ -841,8 +824,8 @@ def lsyncdAdd():
 
 
 def lsyncdRun():
-    args = getArgs()
-    data = checkArgs(args, ['name'])
+    args = mw.getPluginArgs()
+    data = mw.checkPluginArgs(args, ['name'])
     if not data[0]:
         return data[1]
 
@@ -861,8 +844,8 @@ def lsyncdConfLog():
 
 
 def lsyncdLog():
-    args = getArgs()
-    data = checkArgs(args, ['name'])
+    args = mw.getPluginArgs()
+    data = mw.checkPluginArgs(args, ['name'])
     if not data[0]:
         return data[1]
 
@@ -873,8 +856,8 @@ def lsyncdLog():
 
 
 def lsyncdGetExclude():
-    args = getArgs()
-    data = checkArgs(args, ['name'])
+    args = mw.getPluginArgs()
+    data = mw.checkPluginArgs(args, ['name'])
     if not data[0]:
         return data[1]
 
@@ -887,8 +870,8 @@ def lsyncdGetExclude():
 
 
 def lsyncdRemoveExclude():
-    args = getArgs()
-    data = checkArgs(args, ['name', 'exclude'])
+    args = mw.getPluginArgs()
+    data = mw.checkPluginArgs(args, ['name', 'exclude'])
     if not data[0]:
         return data[1]
 
@@ -916,8 +899,8 @@ def lsyncdRemoveExclude():
 
 
 def lsyncdAddExclude():
-    args = getArgs()
-    data = checkArgs(args, ['name', 'exclude'])
+    args = mw.getPluginArgs()
+    data = mw.checkPluginArgs(args, ['name', 'exclude'])
     if not data[0]:
         return data[1]
 

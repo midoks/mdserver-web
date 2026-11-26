@@ -168,7 +168,7 @@ class msodclient:
             headers = self.get_authorized_header()
             user_api_base = self.credential["api_uri"] + "/me"
             # select_user_info_uri = self.build_uri(base=user_api_base)
-            response = requests.get(user_api_base, headers=headers)
+            response = requests.get(user_api_base, headers=headers, timeout=30)
             if DEBUG:
                 print("Debug get user:")
                 print(response.status_code)
@@ -270,7 +270,7 @@ class msodclient:
             print(list_uri)
 
         data = []
-        response = requests.get(list_uri, headers=self.get_authorized_header())
+        response = requests.get(list_uri, headers=self.get_authorized_header(), timeout=30)
         status_code = response.status_code
         if status_code == 200:
             if DEBUG:
@@ -320,7 +320,8 @@ class msodclient:
                 print("Get uri:")
                 print(get_uri)
             response = requests.get(get_uri,
-                                    headers=self.get_authorized_header())
+                                    headers=self.get_authorized_header(),
+                                    timeout=30)
             if response.status_code in [200]:
                 response_data = response.json()
                 if DEBUG:
@@ -366,7 +367,7 @@ class msodclient:
 
         headers = self.get_authorized_header()
         delete_uri = self.build_uri(object_name)
-        response = requests.delete(delete_uri, headers=headers)
+        response = requests.delete(delete_uri, headers=headers, timeout=30)
         if response.status_code == 204:
             if DEBUG:
                 print("对象: {} 已被删除。".format(object_name))
@@ -461,7 +462,7 @@ class msodclient:
 
         headers = self.get_authorized_header()
         headers.update({"Content-type": "application/json"})
-        response = requests.post(create_uri, headers=headers, json=post_data)
+        response = requests.post(create_uri, headers=headers, json=post_data, timeout=30)
         if response.status_code in [201, 409]:
             if DEBUG:
                 if response.status_code == 409:
@@ -597,7 +598,8 @@ class msodclient:
                 file_data = open(local_file_name, "rb")
                 response = requests.put(upload_uri,
                                         headers=headers,
-                                        data=file_data)
+                                        data=file_data,
+                                        timeout=300)
                 if DEBUG:
                     print("status code:")
                     print(response.status_code)
@@ -614,7 +616,7 @@ class msodclient:
                     path=object_name,
                     operate="createUploadSession")
                 headers = self.get_authorized_header()
-                response = requests.post(create_session_uri, headers=headers)
+                response = requests.post(create_session_uri, headers=headers, timeout=60)
                 if response.status_code == 200:
                     response_data = response.json()
                     upload_url = response_data["uploadUrl"]

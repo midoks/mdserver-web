@@ -244,15 +244,31 @@ function initTabFunc(tab){
 }
 
 function initDataQuery(){
-    var tab = $('#cutTab .tabs-item.active').data('name');
-    initTabFunc(tab);
+    // 记住上次选中的数据库 tab, 下次打开自动恢复
+    var STORAGE_KEY = 'data_query_last_tab';
+    // 从 DOM 动态读取所有合法 tab 名, 将来加新 tab 不用改这里
+    var validTabs = $('#cutTab .tabs-item').map(function(){ return $(this).data('name'); }).get();
+    var lastTab = '';
+    try { lastTab = localStorage.getItem(STORAGE_KEY) || ''; } catch(e){}
+    if (!lastTab || validTabs.indexOf(lastTab) === -1) {
+        lastTab = validTabs[0];  // 不存在或不合法时选第一个
+    }
+
+    // 自动选中上次 tab: 移除所有 active, 给目标加 active, 切换内容区并初始化
+    $('#cutTab .tabs-item').removeClass('active');
+    $('#cutTab .tabs-item[data-name="' + lastTab + '"]').addClass('active');
+    selectTab(lastTab);
+    initTabFunc(lastTab);
+
     $('#cutTab .tabs-item').click(function(){
         var tab = $(this).data('name');
         $('#cutTab .tabs-item').removeClass('active');
         $(this).addClass('active');
         selectTab(tab);
         initTabFunc(tab);
-    });    
+        // 记录选择, 下次打开时恢复
+        try { localStorage.setItem(STORAGE_KEY, tab); } catch(e){}
+    });
 }
 
 function initTabRedis(){
@@ -1062,8 +1078,12 @@ function mysqlSlaveSyncProgress(){
                     if (!rdata.status){
                         return;
                     }
+
                     var data = rdata.data;
                     if (!data.status){
+                        $('.slave_sync_info').text(data.data);
+                        if (timer){ clearInterval(timer); timer = null; }
+                        // if (statEc){ statEc.dispose(); statEc = null; }
                         return;
                     }
 

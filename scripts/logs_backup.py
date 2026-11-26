@@ -73,5 +73,6 @@ if __name__ == '__main__':
         split_logs(oldFileName, num)
         if os.path.exists(errOldFileName):
             split_logs(errOldFileName, num)
-    path = mw.getServerDir()
-    os.system("kill -USR1 `cat " + path + "/openresty/nginx/logs/nginx.pid`")
+        path = mw.getServerDir()
+        subprocess.run(["kill", "-USR1", "`cat", path + "/openresty/nginx/logs/nginx.pid`"],
+                       stdout=subprocess.PIPE, stderr=subprocess.PIPE)

@@ -28,17 +28,11 @@ function myPost(method, args,callback, title){
 }
 
 function myPostN(method,args,callback, title){
-
     var _args = null; 
     if (typeof(args) == 'string'){
         _args = JSON.stringify(toArrayObject(args));
     } else {
         _args = JSON.stringify(args);
-    }
-
-    var _title = '正在获取...';
-    if (typeof(title) != 'undefined'){
-        _title = title;
     }
     $.post('/plugins/run', {name:'mysql', func:method, args:_args}, function(data) {
         if(typeof(callback) == 'function'){
@@ -1478,29 +1472,28 @@ function myBinLogs(){
 }
 
 function myLogs(){
-    
-    myPost('bin_log', {status:1}, function(data){
-        var rdata = $.parseJSON(data.data);
+    var limitCon = '<p class="conf_p">\
+                    <span class="f14 c6 mr20">二进制日志</span><span class="f14 c6 mr20 binlog_size">0</span>\
+                    <p class="f14 c6 mtb10" style="border-top:#ddd 1px solid; padding:10px 0">错误日志<button class="btn btn-default btn-clear btn-xs" style="float:right;" >清理日志</button></p>\
+                    <textarea readonly style="margin: 0px;width: 100%;height: 438px;background-color: #333;color:#fff; padding:0 5px" id="error_log"></textarea>\
+                </p>';
+    $(".soft-man-con").html(limitCon);
 
-        var line_status = ""
+    myPost('get_binlog_size', {}, function(data){
+        var rdata = $.parseJSON(data.data);
+        $('.binlog_size').text(toSize(rdata.msg));
+        var line_status = '';
         if (rdata.status){
             line_status = '<button class="btn btn-success btn-xs btn-bin va0">关闭</button>\
                         <button class="btn btn-success btn-xs clean-btn-bin va0">清理BINLOG日志</button>';
         } else {
             line_status = '<button class="btn btn-success btn-xs btn-bin va0">开启</button>';
         }
-
-        var limitCon = '<p class="conf_p">\
-                        <span class="f14 c6 mr20">二进制日志 </span><span class="f14 c6 mr20">' + toSize(rdata.msg) + '</span>\
-                        '+line_status+'\
-                        <p class="f14 c6 mtb10" style="border-top:#ddd 1px solid; padding:10px 0">错误日志<button class="btn btn-default btn-clear btn-xs" style="float:right;" >清理日志</button></p>\
-                        <textarea readonly style="margin: 0px;width: 100%;height: 438px;background-color: #333;color:#fff; padding:0 5px" id="error_log"></textarea>\
-                    </p>';
-        $(".soft-man-con").html(limitCon);
+        $('.binlog_size').after(line_status);
 
         //设置二进制日志
         $(".btn-bin").click(function () {
-            myPost('bin_log', 'close=change', function(data){
+            myPost('set_binlog', '', function(data){
                 var rdata = $.parseJSON(data.data);
                 layer.msg(rdata.msg, { icon: rdata.status ? 1 : 5 });
                 setTimeout(function(){myLogs();}, 2000);
@@ -1508,34 +1501,34 @@ function myLogs(){
         });
 
         $(".clean-btn-bin").click(function () {
-            myPost('clean_bin_log', '', function(data){
+            myPost('clean_binlog', '', function(data){
                 var rdata = $.parseJSON(data.data);
                 layer.msg(rdata.msg, { icon: rdata.status ? 1 : 5 });
                 setTimeout(function(){myLogs();}, 2000);
             });
         });
+    });
 
-         //清空日志
-        $(".btn-clear").click(function () {
-            myPost('error_log', 'close=1', function(data){
-                var rdata = $.parseJSON(data.data);
-                layer.msg(rdata.msg, { icon: rdata.status ? 1 : 5 });
-                setTimeout(function(){myLogs();}, 2000);
-            });
-        })
-
-        myPost('error_log', 'p=1', function(data){
+     //清空日志
+    $(".btn-clear").click(function () {
+        myPost('error_log', 'close=1', function(data){
             var rdata = $.parseJSON(data.data);
-            var error_body = '';
-            if (rdata.status){
-                error_body = rdata.data;
-            } else {
-                error_body = rdata.msg;
-            }
-            $("#error_log").html(error_body);
-            var ob = document.getElementById('error_log');
-            ob.scrollTop = ob.scrollHeight;
+            layer.msg(rdata.msg, { icon: rdata.status ? 1 : 5 });
+            setTimeout(function(){myLogs();}, 2000);
         });
+    })
+
+    myPostN('error_log', 'p=1', function(data){
+        var rdata = $.parseJSON(data.data);
+        var error_body = '';
+        if (rdata.status){
+            error_body = rdata.data;
+        } else {
+            error_body = rdata.msg;
+        }
+        $("#error_log").html(error_body);
+        var ob = document.getElementById('error_log');
+        ob.scrollTop = ob.scrollHeight;
     });
 }
 
@@ -3269,10 +3262,10 @@ function masterOrSlaveConf(version=''){
                 getMasterDbList();
             }
             
-            if (rdata.slave_status){
+            // if (rdata.slave_status){
                 getAsyncMasterDbList();
                 getAsyncDataList()
-            }
+            // }
         });
     }
     getMasterStatus();

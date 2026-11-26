@@ -11,6 +11,7 @@
 import re
 import json
 import os
+import shlex
 
 from flask import Blueprint, render_template
 from flask import request
@@ -47,8 +48,16 @@ def sync_date():
 def set_timezone():
     # 设置时区列表
     timezone = request.form.get('timezone', '').strip()
-    cmd = 'timedatectl set-timezone "'+timezone+'"'
-    mw.execShell(cmd)
+
+    # 只接受 pytz 已知时区, 防止拼接进 shell 命令造成命令注入
+    import pytz
+    if timezone not in pytz.all_timezones:
+        return mw.returnData(False, '无效的时区: ' + timezone)
+
+    # 白名单校验后仍做一次 shell 转义, 双重防护
+    data = mw.execShell('timedatectl set-timezone ' + mw.sqlIdent(timezone))
+    if data[1].strip() != '':
+        return mw.returnData(False, '设置失败:' + data[1].strip())
     return mw.returnData(True, '设置成功!')
         
 

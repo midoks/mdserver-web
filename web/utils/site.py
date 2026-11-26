@@ -13,6 +13,7 @@ import sys
 import re
 import json
 import time
+import shutil
 import threading
 import multiprocessing
 
@@ -174,11 +175,11 @@ class sites(object):
             autoInit = True
             os.makedirs(path)
         if not mw.isAppleSystem():
-            mw.execShell('chown -R www:www ' + path)
+            mw.execShell('chown -R www:www ' + mw.quote(path))
 
         if autoInit:
             mw.writeFile(path + '/index.html', 'Work has started!!!')
-            mw.execShell('chmod -R 755 ' + path)
+            mw.execShell('chmod -R 755 ' + mw.quote(path))
 
     def add(self, site_info, port, ps, path, version):
         site_root_dir = mw.getWwwDir()
@@ -226,8 +227,8 @@ class sites(object):
         for b in binding:
             bpath = path + '/' + b['path']
             if not os.path.exists(bpath):
-                mw.execShell('mkdir -p ' + bpath)
-                mw.execShell('ln -sf ' + path +'/index.html ' + bpath + '/index.html')
+                mw.execShell('mkdir -p ' + mw.quote(bpath))
+                mw.execShell('ln -sf ' + mw.quote(path + '/index.html') + ' ' + mw.quote(bpath + '/index.html'))
 
 
         # nginx
@@ -380,11 +381,11 @@ class sites(object):
         # 重定向目录
         redirectDir = self.setupPath + '/nginx/redirect/' + webname
         if os.path.exists(redirectDir):
-            mw.execShell('rm -rf ' + redirectDir)
+            mw.execShell('rm -rf ' + mw.quote(redirectDir))
         # 代理目录
         proxyDir = self.setupPath + '/nginx/proxy/' + webname
         if os.path.exists(proxyDir):
-            mw.execShell('rm -rf ' + proxyDir)
+            mw.execShell('rm -rf ' + mw.quote(proxyDir))
 
     def delete(self, site_id, path):
         info = thisdb.getSitesById(site_id)
@@ -393,20 +394,20 @@ class sites(object):
 
         if path == '1':
             web_root_path = mw.getWwwDir() + '/' + webname
-            mw.execShell('rm -rf ' + web_root_path)
+            mw.execShell('rm -rf ' + mw.quote(web_root_path))
 
         # ssl
         ssl_dir = self.sslDir + '/' + webname
         if os.path.exists(ssl_dir):
-            mw.execShell('rm -rf ' + ssl_dir)
+            mw.execShell('rm -rf ' + mw.quote(ssl_dir))
 
         ssl_lets_dir = self.sslLetsDir + '/' + webname
         if os.path.exists(ssl_lets_dir):
-            mw.execShell('rm -rf ' + ssl_lets_dir)
+            mw.execShell('rm -rf ' + mw.quote(ssl_lets_dir))
 
         ssl_acme_dir = mw.getAcmeDir() + '/' + webname
         if os.path.exists(ssl_acme_dir):
-            mw.execShell('rm -rf ' + ssl_acme_dir)
+            mw.execShell('rm -rf ' + mw.quote(ssl_acme_dir))
 
         thisdb.deleteSitesById(site_id)
         thisdb.deleteDomainBySiteId(site_id)
@@ -418,9 +419,9 @@ class sites(object):
             site_error = tag + ".error.log"
 
             if os.path.exists(site_log):
-                mw.execShell('rm -rf ' + site_log)
+                mw.execShell('rm -rf ' + mw.quote(site_log))
             if os.path.exists(site_error):
-                mw.execShell('rm -rf ' + site_error)
+                mw.execShell('rm -rf ' + mw.quote(site_error))
 
         thisdb.deleteBindingBySiteId(site_id)
         mw.restartWeb()
@@ -473,7 +474,7 @@ class sites(object):
     def setSsl(self, site_name, key, csr):
         path = self.sslDir + '/' + site_name
         if not os.path.exists(path):
-            mw.execShell('mkdir -p ' + path)
+            mw.execShell('mkdir -p ' + mw.quote(path))
 
         csrpath = path + "/fullchain.pem"  # 生成证书路径
         keypath = path + "/privkey.pem"    # 密钥文件路径
@@ -747,7 +748,7 @@ class sites(object):
     def delUserInI(self, path, up=0):
         filename = path + '/.user.ini'
         if os.path.exists(filename):
-            mw.execShell("which chattr && chattr -i " + filename)
+            mw.execShell("which chattr && chattr -i " + mw.quote(filename))
             os.remove(filename)
         
         for f in os.listdir(path):
@@ -761,7 +762,7 @@ class sites(object):
                 print('ff:',user_ini)
                 if not os.path.exists(user_ini):
                     continue
-                mw.execShell('which chattr && chattr -i ' + user_ini)
+                mw.execShell('which chattr && chattr -i ' + mw.quote(user_ini))
                 os.remove(user_ini)
             except:
                 continue
@@ -780,7 +781,7 @@ class sites(object):
             open_path = 'open_basedir={}/'.format(site_path)
 
         mw.writeFile(filename, open_path + ':/www/server/php:/tmp/:/proc/')
-        mw.execShell("which chattr && chattr +i " + filename)
+        mw.execShell("which chattr && chattr +i " + mw.quote(filename))
 
     def setDirUserIni(self, site_path, run_path):
         filename = site_path + '/.user.ini'
@@ -801,9 +802,12 @@ class sites(object):
                 data['dirs'] = []
                 data['binding'] = []
                 return mw.returnData(True, 'OK', data)
-            os.system('mkdir -p ' + path)
-            os.system('chmod 755 ' + path)
-            os.system('chown www:www ' + path)
+            os.makedirs(path, exist_ok=True)
+            os.chmod(path, 0o755)
+            try:
+                shutil.chown(path, 'www', 'www')
+            except Exception:
+                pass
             siteName = info['name']
             mw.writeLog('网站管理', '站点[' + siteName + '],根目录[' + path + ']不存在,已重新创建!')
 
@@ -1025,7 +1029,7 @@ class sites(object):
         # 写密码配置
         passDir = self.passPath
         if not os.path.exists(passDir):
-            mw.execShell('mkdir -p ' + passDir)
+            mw.execShell('mkdir -p ' + mw.quote(passDir))
         mw.writeFile(filename, passconf)
 
         msg = mw.getInfo('设置网站[{1}]为需要密码认证!', (siteName,))
@@ -1295,7 +1299,7 @@ class sites(object):
     def getRedirect(self, site_name):
         redirect_file = self.getRedirectDataPath(site_name)
         if not os.path.exists(redirect_file):
-            mw.execShell("mkdir " + self.getRedirectPath(site_name))
+            mw.execShell("mkdir " + mw.quote(self.getRedirectPath(site_name)))
             return mw.returnData(True, "no exists!", {"result": [], "count": 0})
 
         content = mw.readFile(redirect_file)
@@ -1318,9 +1322,9 @@ class sites(object):
         conf_txt = "{}/{}/{}.conf.txt".format(self.redirectPath, site_name, redirect_id)
 
         if status == '1':
-            mw.execShell('mv ' + conf_txt + ' ' + conf_file)
+            mw.execShell('mv ' + mw.quote(conf_txt) + ' ' + mw.quote(conf_file))
         else:
-            mw.execShell('mv ' + conf_file + ' ' + conf_txt)
+            mw.execShell('mv ' + mw.quote(conf_file) + ' ' + mw.quote(conf_txt))
 
         mw.restartWeb()
         return mw.returnData(True, "OK")
@@ -1441,7 +1445,7 @@ class sites(object):
             if len(data) == 0:
                 self.operateRedirectConf(siteName, 'stop')
             # remove conf file
-            mw.execShell("rm -rf {}/{}.conf".format(self.getRedirectPath(siteName), rid))
+            mw.execShell("rm -rf " + mw.quote(self.getRedirectPath(siteName) + '/' + str(rid) + '.conf'))
         except Exception as e:
             return mw.returnData(False, "删除失败:"+str(e))
         return mw.returnData(True, "删除成功!")
@@ -1451,7 +1455,7 @@ class sites(object):
         data_path = self.getProxyDataPath(site_name)
 
         if not os.path.exists(data_path):
-            mw.execShell("mkdir {}/{}".format(self.proxyPath, site_name))
+            mw.execShell("mkdir " + mw.quote("{}/{}".format(self.proxyPath, site_name)))
             return mw.returnData(True, "", {"result": [], "count": 0})
 
         content = mw.readFile(data_path)
@@ -1679,9 +1683,9 @@ location ^~ {from} {\n\
         conf_txt = "{}/{}/{}.conf.txt".format(self.proxyPath, site_name, proxy_id)
 
         if status == '1':
-            mw.execShell('mv ' + conf_txt + ' ' + conf_file)
+            mw.execShell('mv ' + mw.quote(conf_txt) + ' ' + mw.quote(conf_file))
         else:
-            mw.execShell('mv ' + conf_file + ' ' + conf_txt)
+            mw.execShell('mv ' + mw.quote(conf_file) + ' ' + mw.quote(conf_txt))
 
         mw.restartWeb()
         return mw.returnData(True, "OK")
@@ -1699,7 +1703,7 @@ location ^~ {from} {\n\
                 proxy_txt = "{}/{}/{}.conf.txt".format(self.proxyPath, site_name, proxy['id'])
                 if os.path.exists(proxy_conf):
                     self.close_proxy.append(proxy['id'])
-                    mw.execShell('mv ' + proxy_conf + ' ' + proxy_txt)
+                    mw.execShell('mv ' + mw.quote(proxy_conf) + ' ' + mw.quote(proxy_txt))
             mw.restartWeb()
         return True
 
@@ -1709,7 +1713,7 @@ location ^~ {from} {\n\
             proxy_conf = proxy_dir + '/' + proxy_id + '.conf'
             proxy_txt = "{}/{}/{}.conf.txt".format(self.proxyPath, site_name, proxy_id)
             if os.path.exists(proxy_txt):
-                mw.execShell('mv ' + proxy_txt + ' ' + proxy_conf)
+                mw.execShell('mv ' + mw.quote(proxy_txt) + ' ' + mw.quote(proxy_conf))
 
         if len(self.close_proxy) > 0:
             mw.restartWeb()
@@ -1728,7 +1732,7 @@ location ^~ {from} {\n\
                 redirect_txt = "{}/{}/{}.conf.txt".format(self.redirectPath, site_name, redirect_data['id'])
                 if os.path.exists(redirect_conf):
                     self.close_redirect.append(redirect_data['id'])
-                    mw.execShell('mv ' + redirect_conf + ' ' + redirect_txt)
+                    mw.execShell('mv ' + mw.quote(redirect_conf) + ' ' + mw.quote(redirect_txt))
             mw.restartWeb()
 
     def openRedirectByOpen(self, site_name):
@@ -1737,7 +1741,7 @@ location ^~ {from} {\n\
             redirect_conf = redirect_dir + '/' + redirect_id + '.conf'
             redirect_txt = "{}/{}/{}.conf.txt".format(self.redirectPath, site_name, redirect_id)
             if os.path.exists(redirect_txt):
-                mw.execShell('mv ' + redirect_txt + ' ' + redirect_conf)
+                mw.execShell('mv ' + mw.quote(redirect_txt) + ' ' + mw.quote(redirect_conf))
 
         if len(self.close_redirect) > 0:
             mw.restartWeb()
@@ -1815,7 +1819,7 @@ location ^~ {from} {\n\
             if len(data) == 0:
                 self.operateProxyConf(site_name, 'stop')
             # remove conf file
-            cmd = "rm -rf {}/{}.conf*".format(self.getProxyPath(site_name), proxy_id)
+            cmd = "rm -rf " + mw.quote(self.getProxyPath(site_name) + '/' + proxy_id) + ".conf*"
             mw.execShell(cmd)
         except:
             return mw.returnData(False, "删除反代失败!")
@@ -1890,7 +1894,7 @@ location ^~ {from} {\n\
                 return mw.returnData(False, '证书解析失败!')
             vpath = self.sslDir + '/' + site_name
             if not os.path.exists(vpath):
-                os.system('mkdir -p ' + vpath)
+                os.makedirs(vpath, exist_ok=True)
             mw.writeFile(vpath + '/privkey.pem', mw.readFile(keyPath))
             mw.writeFile(vpath + '/fullchain.pem', mw.readFile(certPath))
             mw.writeFile(vpath + '/info.json', json.dumps(certInfo))
@@ -1902,7 +1906,7 @@ location ^~ {from} {\n\
         try:
             vpath = self.sslDir
             if not os.path.exists(vpath):
-                os.system('mkdir -p ' + vpath)
+                os.makedirs(vpath, exist_ok=True)
             data = []
             for d in os.listdir(vpath):
 
@@ -2014,12 +2018,12 @@ location ^~ {from} {\n\
         is_chattr = mw.execShell('lsattr /usr|grep /usr/bin')[0].find('-i-')
         if is_chattr != -1:
             mw.execShell('chattr -i /usr/bin')
-        mw.execShell("rm -f " + php_bin + ' ' + php_ize + ' ' + php_fpm + ' ' + php_pecl + ' ' + php_pear)
-        mw.execShell("ln -sf %s %s" % (php_bin_src, php_bin))
-        mw.execShell("ln -sf %s %s" % (php_ize_src, php_ize))
-        mw.execShell("ln -sf %s %s" % (php_fpm_src, php_fpm))
-        mw.execShell("ln -sf %s %s" % (php_pecl_src, php_pecl))
-        mw.execShell("ln -sf %s %s" % (php_pear_src, php_pear))
+        mw.execShell("rm -f " + mw.quote(php_bin) + ' ' + mw.quote(php_ize) + ' ' + mw.quote(php_fpm) + ' ' + mw.quote(php_pecl) + ' ' + mw.quote(php_pear))
+        mw.execShell("ln -sf " + mw.quote(php_bin_src) + " " + mw.quote(php_bin))
+        mw.execShell("ln -sf " + mw.quote(php_ize_src) + " " + mw.quote(php_ize))
+        mw.execShell("ln -sf " + mw.quote(php_fpm_src) + " " + mw.quote(php_fpm))
+        mw.execShell("ln -sf " + mw.quote(php_pecl_src) + " " + mw.quote(php_pecl))
+        mw.execShell("ln -sf " + mw.quote(php_pear_src) + " " + mw.quote(php_pear))
         if is_chattr != -1:
             mw.execShell('chattr +i /usr/bin')
         mw.writeLog('面板设置', '设置PHP-CLI版本为: %s' % version)
@@ -2190,24 +2194,24 @@ location ^~ {from} {\n\
                 return mw.returnData(False, '使用中,先关闭再删除')
 
             if os.path.exists(path):
-                mw.execShell('rm -rf ' + path)
+                mw.execShell('rm -rf ' + mw.quote(path))
 
             ssl_acme_dir = mw.getAcmeDomainDir(site_name)
             if os.path.exists(ssl_acme_dir):
-                mw.execShell('rm -rf ' + ssl_acme_dir)
+                mw.execShell('rm -rf ' + mw.quote(ssl_acme_dir))
             return mw.returnData(True, '删除成功')
         elif ssl_type == 'lets':
             ssl_lets_dir = self.sslLetsDir + '/' + site_name
             csr_lets_path = ssl_lets_dir + '/fullchain.pem'  # 生成证书路径
             if mw.md5(mw.readFile(csr_lets_path)) == mw.md5(mw.readFile(csr_path)):
                 return mw.returnData(False, '使用中,先关闭再删除')
-            mw.execShell('rm -rf ' + ssl_lets_dir)
+            mw.execShell('rm -rf ' + mw.quote(ssl_lets_dir))
         elif ssl_type == 'acme':
             ssl_acme_dir = mw.getAcmeDomainDir(site_name)
             csr_acme_path = ssl_acme_dir + '/fullchain.cer'  # 生成证书路径
             if mw.md5(mw.readFile(csr_acme_path)) == mw.md5(mw.readFile(csr_path)):
                 return mw.returnData(False, '使用中,先关闭再删除')
-            mw.execShell('rm -rf ' + ssl_acme_dir)
+            mw.execShell('rm -rf ' + mw.quote(ssl_acme_dir))
 
         mw.restartWeb()
         return mw.returnData(True, '删除成功')
@@ -2254,8 +2258,8 @@ location ^~ {from} {\n\
                 continue
             if d.find('*.') != -1:
                 return mw.returnData(False, '泛域名不能使用【文件验证】的方式申请证书!')
-            cmd += ' -w ' + path
-            cmd += ' -d ' + d
+            cmd += ' -w ' + mw.quote(path)
+            cmd += ' -d ' + mw.quote(d)
             domain_nums += 1
         if domain_nums == 0:
             return mw.returnData(False, '请选择域名(不包括IP地址与泛域名)!')
@@ -2270,7 +2274,7 @@ location ^~ {from} {\n\
         elif apply_ca == "buypass":
             cmd = cmd + " --server buypass "
 
-        cmd = 'export ACCOUNT_EMAIL=' + email + ' && ' + cmd + ' >> ' + log_file
+        cmd = 'export ACCOUNT_EMAIL=' + mw.quote(email) + ' && ' + cmd + ' >> ' + mw.quote(log_file)
         # print(cmd)
         result = mw.execShell(cmd)
 
@@ -2307,11 +2311,11 @@ location ^~ {from} {\n\
         dst_key = dst_path + "/privkey.pem"  # 密钥文件路径
 
         if not os.path.exists(dst_path):
-            mw.execShell("mkdir -p " + dst_path)
+            mw.execShell("mkdir -p " + mw.quote(dst_path))
 
         mw.buildSoftLink(src_cert, dst_cert, True)
         mw.buildSoftLink(src_key, dst_key, True)
-        mw.execShell('echo "acme" > "' + dst_path + '/README"')
+        mw.execShell('echo "acme" > ' + mw.quote(dst_path + '/README'))
 
         # 写入配置文件
         result = self.setSslConf(site_name)
@@ -2326,7 +2330,7 @@ location ^~ {from} {\n\
     def getDnsapiExportVar(self, data):
         def_var = ''
         for k in data:
-            def_var += 'export '+k+'="'+data[k]+'"\n'
+            def_var += 'export ' + mw.quote(k) + '=' + mw.quote(data[k]) + '\n'
         return def_var
 
     # def getDomainRootName(self, domain):
@@ -2378,20 +2382,20 @@ location ^~ {from} {\n\
 PATH=/bin:/sbin:/usr/bin:/usr/sbin:/usr/local/bin:/usr/local/sbin:~/bin:/opt/homebrew/bin:%s
 export PATH
 ''' % (acme_dir,)
-            cmd += "acme.sh --register-account -m " + email + " \n"
+            cmd += "acme.sh --register-account -m " + mw.quote(email) + " \n"
             if wildcard_domain == 'true':
-                cmd += 'acme.sh --issue -d '+top_domain+' -d "*.'+top_domain+'"'
+                cmd += 'acme.sh --issue -d ' + mw.quote(top_domain) + ' -d ' + mw.quote('*.' + top_domain)
                 d = top_domain
             else:
-                cmd += "acme.sh --issue -d " + d + " "
+                cmd += "acme.sh --issue -d " + mw.quote(d) + " "
             cmd += " --dns --yes-I-know-dns-manual-mode-enough-go-ahead-please"
 
             if dns_alias != '':
-                cmd += ' --domain-alias '+str(dns_alias)
+                cmd += ' --domain-alias ' + mw.quote(str(dns_alias))
 
             if renew == 'true':
                 cmd += " --renew"
-            cmd +=  ' > ' + log_file
+            cmd +=  ' > ' + mw.quote(log_file)
             # print(cmd)
             result = mw.execShell(cmd)
             # print(result)
@@ -2412,11 +2416,11 @@ export PATH
             dst_key = dst_path + "/privkey.pem"  # 密钥文件路径
 
             if not os.path.exists(dst_path):
-                mw.execShell("mkdir -p " + dst_path)
+                mw.execShell("mkdir -p " + mw.quote(dst_path))
 
             mw.buildSoftLink(src_cert, dst_cert, True)
             mw.buildSoftLink(src_key, dst_key, True)
-            mw.execShell('echo "acme" > "' + dst_path + '/README"')
+            mw.execShell('echo "acme" > ' + mw.quote(dst_path + '/README'))
 
             # 写入配置文件
             result = self.setSslConf(site_name)
@@ -2431,7 +2435,7 @@ export PATH
     def createAcmeDns(self, site_name, apply_ca, domains, email, dnspai, wildcard_domain, force, renew, dns_alias):
         dnsapi_option = thisdb.getOptionByJson('dnsapi', default={})
         log_file = self.acmeLogFile()
-        cmd = 'echo "..." > '+ log_file
+        cmd = 'echo "..." > ' + mw.quote(log_file)
         mw.execShell(cmd)
 
         # 手动方式申请
@@ -2454,17 +2458,17 @@ export PATH
 PATH=/bin:/sbin:/usr/bin:/usr/sbin:/usr/local/bin:/usr/local/sbin:~/bin:/opt/homebrew/bin:%s
 export PATH
 ''' % (acme_dir,)
-            cmd += "acme.sh --register-account -m "+email+" \n"
+            cmd += "acme.sh --register-account -m " + mw.quote(email) + " \n"
             cmd += self.getDnsapiExportVar(dnsapi_data)
             if wildcard_domain == 'true':
                 top_domain = self.getDomainRootName(d)
-                cmd += 'acme.sh --issue --dns '+str(dnspai)+' -d '+top_domain+' -d "*.'+top_domain+'"'
+                cmd += 'acme.sh --issue --dns ' + mw.quote(str(dnspai)) + ' -d ' + mw.quote(top_domain) + ' -d ' + mw.quote('*.' + top_domain)
                 d = top_domain
             else:
-                cmd += 'acme.sh --issue --dns '+str(dnspai)+' -d '+d
+                cmd += 'acme.sh --issue --dns ' + mw.quote(str(dnspai)) + ' -d ' + mw.quote(d)
 
             if dns_alias != '':
-                cmd += ' --domain-alias '+str(dns_alias)
+                cmd += ' --domain-alias ' + mw.quote(str(dns_alias))
 
 
             if apply_ca == "let": 
@@ -2474,7 +2478,7 @@ export PATH
             elif apply_ca == "buypass":
                 cmd = cmd + " --server buypass "
                 
-            cmd +=  ' > ' + log_file
+            cmd +=  ' > ' + mw.quote(log_file)
             # print(cmd)
             result = mw.execShell(cmd)
             # print(result)
@@ -2506,11 +2510,11 @@ export PATH
             dst_key = dst_path + "/privkey.pem"  # 密钥文件路径
 
             if not os.path.exists(dst_path):
-                mw.execShell("mkdir -p " + dst_path)
+                mw.execShell("mkdir -p " + mw.quote(dst_path))
 
             mw.buildSoftLink(src_cert, dst_cert, True)
             mw.buildSoftLink(src_key, dst_key, True)
-            mw.execShell('echo "acme" > "' + dst_path + '/README"')
+            mw.execShell('echo "acme" > ' + mw.quote(dst_path + '/README'))
 
             # 写入配置文件
             result = self.setSslConf(site_name)
@@ -2617,10 +2621,10 @@ export PATH
                         'type'] + '</p><p><span>错误代码:</span>' + emsg['detail'] + '</p>'
                 return mw.returnData(data['status'], msg, data['msg'])
 
-        mw.execShell('mkdir -p ' + dst_letpath)
+        mw.execShell('mkdir -p ' + mw.quote(dst_letpath))
         mw.buildSoftLink(src_csrpath, dst_csrpath, True)
         mw.buildSoftLink(src_keypath, dst_keypath, True)
-        mw.execShell('echo "lets" > "' + dst_letpath + '/README"')
+        mw.execShell('echo "lets" > ' + mw.quote(dst_letpath + '/README'))
 
         # 写入配置文件
         result = self.setSslConf(site_name)
@@ -2651,10 +2655,21 @@ export PATH
 
     def removeCert(self, cert_name):
         try:
-            path = self.sslDir + '/' + cert_name
+            # 证书名只允许单层目录名, 防止路径穿越和命令拼接
+            if cert_name == '' or '/' in cert_name or '\\' in cert_name or '..' in cert_name:
+                return mw.returnData(False, '证书名称不合法!')
+
+            base = os.path.realpath(self.sslDir)
+            path = os.path.realpath(self.sslDir + '/' + cert_name)
+            if not path.startswith(base + os.sep):
+                return mw.returnData(False, '证书名称不合法!')
+
             if not os.path.exists(path):
                 return mw.returnData(False, '证书已不存在!')
-            os.system("rm -rf " + path)
+            if os.path.isdir(path) and not os.path.islink(path):
+                shutil.rmtree(path)
+            else:
+                os.remove(path)
             return mw.returnData(True, '证书已删除!')
         except Exception as ex:
             return mw.returnData(False, '证书删除失败:'+str(ex))
@@ -2678,7 +2693,7 @@ export PATH
         if not (os.path.exists(backup_path)):
             os.makedirs(backup_path)
         exec_log = mw.getPanelDir() + '/logs/panel_exec.log'
-        cmd = "cd '" + site_info['path'] + "' && zip '" + zip_name + "' -r ./* > " + exec_log + " 2>&1"
+        cmd = "cd " + mw.quote(site_info['path']) + " && zip " + mw.quote(zip_name) + " -r ./* > " + mw.quote(exec_log) + " 2>&1"
         mw.execShell(cmd)
 
         fsize = 0

@@ -62,34 +62,6 @@ def getInitDTpl():
     return path
 
 
-def getArgs():
-    args = sys.argv[2:]
-    tmp = {}
-    args_len = len(args)
-
-    if args_len == 1:
-        t = args[0].strip('{').strip('}')
-        if t.strip() == '':
-            tmp = []
-        else:
-            t = t.split(':', 1)
-            tmp[t[0]] = t[1]
-        tmp[t[0]] = t[1]
-    elif args_len > 1:
-        for i in range(len(args)):
-            t = args[i].split(':', 1)
-            tmp[t[0]] = t[1]
-    return tmp
-
-
-def checkArgs(self, data, ck=[]):
-    for i in range(len(ck)):
-        print(data[i])
-        if not ck[i] in data:
-            return (False, mw.returnJson(False, '参数:(' + ck[i] + ')没有!'))
-    return (True, mw.returnJson(True, 'ok'))
-
-
 def status():
     data = mw.execShell(
         "ps -ef|grep docker |grep -v grep | grep -v python | grep -v mdserver-web | awk '{print $2}'")
@@ -196,8 +168,8 @@ def conListData():
 
 
 def dockerRemoveCon():
-    args = getArgs()
-    data = checkArgs(args, ['Hostname'])
+    args = mw.getPluginArgs()
+    data = mw.checkPluginArgs(args, ['Hostname'])
     if not data[0]:
         return data[1]
 
@@ -221,8 +193,8 @@ def dockerRemoveCon():
 
 def dockerLogCon():
 
-    args = getArgs()
-    data = checkArgs(args, ['Hostname'])
+    args = mw.getPluginArgs()
+    data = mw.checkPluginArgs(args, ['Hostname'])
     if not data[0]:
         return data[1]
 
@@ -243,8 +215,8 @@ def dockerLogCon():
 
 def dockerRunCon():
     # 启动容器
-    args = getArgs()
-    data = checkArgs(args, ['Hostname'])
+    args = mw.getPluginArgs()
+    data = mw.checkPluginArgs(args, ['Hostname'])
     if not data[0]:
         return data[1]
 
@@ -262,8 +234,8 @@ def dockerRunCon():
 
 def dockerStopCon():
     # 停止容器
-    args = getArgs()
-    data = checkArgs(args, ['Hostname'])
+    args = mw.getPluginArgs()
+    data = mw.checkPluginArgs(args, ['Hostname'])
     if not data[0]:
         return data[1]
 
@@ -281,8 +253,8 @@ def dockerStopCon():
 
 def dockerExec():
     # 容器执行命令
-    args = getArgs()
-    data = checkArgs(args, ['Hostname'])
+    args = mw.getPluginArgs()
+    data = mw.checkPluginArgs(args, ['Hostname'])
     if not data[0]:
         return data[1]
 
@@ -334,8 +306,8 @@ def imageList():
 
 def dockerPull():
     # pull Dockr 官方镜像
-    args = getArgs()
-    data = checkArgs(args, ['images'])
+    args = mw.getPluginArgs()
+    data = mw.checkPluginArgs(args, ['images'])
     if not data[0]:
         return data[1]
 
@@ -373,8 +345,8 @@ def dockerPlulPath(path):
 
 def dockerPullReg():
     # pull Dockr 官方镜像
-    args = getArgs()
-    data = checkArgs(args, ['path'])
+    args = mw.getPluginArgs()
+    data = mw.checkPluginArgs(args, ['path'])
     if not data[0]:
         return data[1]
 
@@ -392,8 +364,8 @@ def checkImage(path):
 
 def dockerPullPrivateNew():
     # pull Dockr 官方镜像
-    args = getArgs()
-    data = checkArgs(args, ['path'])
+    args = mw.getPluginArgs()
+    data = mw.checkPluginArgs(args, ['path'])
     if not data[0]:
         return data[1]
 
@@ -417,8 +389,8 @@ def imageListData():
 
 
 def dockerRemoveImage():
-    args = getArgs()
-    data = checkArgs(args, ['imageId', 'repoTags'])
+    args = mw.getPluginArgs()
+    data = mw.checkPluginArgs(args, ['imageId', 'repoTags'])
     if not data[0]:
         return data[1]
 
@@ -485,8 +457,8 @@ def dockerImagePickList():
 
 def dockerImagePickSave():
     # image 导出
-    args = getArgs()
-    data = checkArgs(args, ['images'])
+    args = mw.getPluginArgs()
+    data = mw.checkPluginArgs(args, ['images'])
     if not data[0]:
         return data[1]
 
@@ -504,8 +476,8 @@ def dockerImagePickSave():
 
 def dockerImagePickLoad():
     # 镜像文件导入
-    args = getArgs()
-    data = checkArgs(args, ['file'])
+    args = mw.getPluginArgs()
+    data = mw.checkPluginArgs(args, ['file'])
     if not data[0]:
         return data[1]
     try:
@@ -554,8 +526,8 @@ def getDockerIpList():
 
 def dockerAddIP():
     # 添加IP
-    args = getArgs()
-    data = checkArgs(args, ['address', 'netmask', 'gateway'])
+    args = mw.getPluginArgs()
+    data = mw.checkPluginArgs(args, ['address', 'netmask', 'gateway'])
     if not data[0]:
         return data[1]
 
@@ -578,8 +550,8 @@ def dockerAddIP():
 
 def dockerDelIP():
     # 删除IP
-    args = getArgs()
-    data = checkArgs(args, ['address'])
+    args = mw.getPluginArgs()
+    data = mw.checkPluginArgs(args, ['address'])
     if not data[0]:
         return data[1]
 
@@ -618,8 +590,8 @@ def __release_port(port):
 
 
 def dockerPortCheck():
-    args = getArgs()
-    data = checkArgs(args, ['port'])
+    args = mw.getPluginArgs()
+    data = mw.checkPluginArgs(args, ['port'])
     if not data[0]:
         return data[1]
 
@@ -657,8 +629,8 @@ def __check_dst_port(ip, port, timeout=3):
 
 
 def dockerCreateCon():
-    args = getArgs()
-    data = checkArgs(args, ['environments', 'command',
+    args = mw.getPluginArgs()
+    data = mw.checkPluginArgs(args, ['environments', 'command',
                             'entrypoint', 'image', 'mem_limit', 'ports', 'volumes'])
     if not data[0]:
         return data[1]
@@ -704,10 +676,10 @@ def dockerCreateCon():
 
 
 def dockerLogin():
-    args = getArgs()
+    args = mw.getPluginArgs()
 
     # print(args)
-    data = checkArgs(args, ['user', 'passwd', 'hub_name',
+    data = mw.checkPluginArgs(args, ['user', 'passwd', 'hub_name',
                             'namespace', 'registry', 'repository_name'])
     if not data[0]:
         return data[1]
@@ -759,8 +731,8 @@ def delete_user_info(registry):
 
 
 def dockerLogout():
-    args = getArgs()
-    data = checkArgs(args, ['registry'])
+    args = mw.getPluginArgs()
+    data = mw.checkPluginArgs(args, ['registry'])
     if not data[0]:
         return data[1]
 

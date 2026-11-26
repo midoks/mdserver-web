@@ -40,30 +40,6 @@ def getInitDFile():
     return '/etc/init.d/' + getPluginName()
 
 
-def getArgs():
-    args = sys.argv[2:]
-    tmp = {}
-    args_len = len(args)
-
-    if args_len == 1:
-        t = args[0].strip('{').strip('}')
-        t = t.split(':', 1)
-        tmp[t[0]] = t[1]
-    elif args_len > 1:
-        for i in range(len(args)):
-            t = args[i].split(':', 1)
-            tmp[t[0]] = t[1]
-
-    return tmp
-
-
-def checkArgs(data, ck=[]):
-    for i in range(len(ck)):
-        if not ck[i] in data:
-            return (False, mw.returnJson(False, '参数:(' + ck[i] + ')没有!'))
-    return (True, mw.returnJson(True, 'ok'))
-
-
 def getInitdConfTpl():
     path = getPluginDir() + "/init.d/gogs.tpl"
     return path
@@ -440,7 +416,7 @@ def submitGogsConf():
             'SHOW_FOOTER_BRANDING',
             'SHOW_FOOTER_VERSION',
             'SHOW_FOOTER_TEMPLATE_LOAD_TIME']
-    args = getArgs()
+    args = mw.getPluginArgs()
     filename = getConf()
     conf = mw.readFile(filename)
     for g in gets:
@@ -472,9 +448,9 @@ def userList():
         return mw.returnJson(False, "仅支持mysql数据操作!")
 
     import math
-    args = getArgs()
+    args = mw.getPluginArgs()
 
-    data = checkArgs(args, ['page', 'page_size'])
+    data = mw.checkPluginArgs(args, ['page', 'page_size'])
     if not data[0]:
         return data[1]
 
@@ -532,9 +508,9 @@ def repoList():
         return mw.returnJson(False, "仅支持mysql数据操作!")
 
     import math
-    args = getArgs()
+    args = mw.getPluginArgs()
 
-    data = checkArgs(args, ['page', 'page_size'])
+    data = mw.checkPluginArgs(args, ['page', 'page_size'])
     if not data[0]:
         return data[1]
 
@@ -605,7 +581,7 @@ def checkProjectListIsHasScript(user, data):
 
 def userProjectList():
     import math
-    args = getArgs()
+    args = mw.getPluginArgs()
     # print args
 
     page = 1
@@ -642,7 +618,7 @@ def userProjectList():
 
 
 def projectScriptEdit():
-    args = getArgs()
+    args = mw.getPluginArgs()
 
     if not 'user' in args:
         return mw.returnJson(True, 'username missing')
@@ -661,7 +637,7 @@ def projectScriptEdit():
 
 
 def projectScriptLoad():
-    args = getArgs()
+    args = mw.getPluginArgs()
     if not 'user' in args:
         return mw.returnJson(True, 'username missing')
 
@@ -703,8 +679,8 @@ def projectScriptLoad():
 
 
 def projectScriptUnload():
-    args = getArgs()
-    data = checkArgs(args, ['user', 'name'])
+    args = mw.getPluginArgs()
+    data = mw.checkPluginArgs(args, ['user', 'name'])
     if not data[0]:
         return data[1]
 
@@ -722,8 +698,8 @@ def projectScriptUnload():
 
 
 def projectScriptDebug():
-    args = getArgs()
-    data = checkArgs(args, ['user', 'name'])
+    args = mw.getPluginArgs()
+    data = mw.checkPluginArgs(args, ['user', 'name'])
     if not data[0]:
         return data[1]
 
@@ -744,8 +720,8 @@ def projectScriptDebug():
 
 
 def projectScriptRun():
-    args = getArgs()
-    data = checkArgs(args, ['user', 'name'])
+    args = mw.getPluginArgs()
+    data = mw.checkPluginArgs(args, ['user', 'name'])
     if not data[0]:
         return data[1]
 
@@ -765,8 +741,8 @@ def projectScriptRun():
 
 
 def projectScriptSelf():
-    args = getArgs()
-    data = checkArgs(args, ['user', 'name'])
+    args = mw.getPluginArgs()
+    data = mw.checkPluginArgs(args, ['user', 'name'])
     if not data[0]:
         return data[1]
 
@@ -815,8 +791,8 @@ def projectScriptSelf():
 
 
 def projectScriptSelf_Create():
-    args = getArgs()
-    data = checkArgs(args, ['user', 'name', 'file'])
+    args = mw.getPluginArgs()
+    data = mw.checkPluginArgs(args, ['user', 'name', 'file'])
     if not data[0]:
         return data[1]
 
@@ -841,8 +817,8 @@ def projectScriptSelf_Create():
 
 
 def projectScriptSelf_Del():
-    args = getArgs()
-    data = checkArgs(args, ['user', 'name', 'file'])
+    args = mw.getPluginArgs()
+    data = mw.checkPluginArgs(args, ['user', 'name', 'file'])
     if not data[0]:
         return data[1]
 
@@ -873,8 +849,8 @@ def projectScriptSelf_Del():
 
 
 def projectScriptSelf_Logs():
-    args = getArgs()
-    data = checkArgs(args, ['user', 'name', 'file'])
+    args = mw.getPluginArgs()
+    data = mw.checkPluginArgs(args, ['user', 'name', 'file'])
     if not data[0]:
         return data[1]
 
@@ -898,8 +874,8 @@ def projectScriptSelf_Logs():
 
 
 def projectScriptSelf_Run():
-    args = getArgs()
-    data = checkArgs(args, ['user', 'name', 'file'])
+    args = mw.getPluginArgs()
+    data = mw.checkPluginArgs(args, ['user', 'name', 'file'])
     if not data[0]:
         return data[1]
 
@@ -918,8 +894,8 @@ def projectScriptSelf_Run():
 
 
 def projectScriptSelf_Rename():
-    args = getArgs()
-    data = checkArgs(args, ['user', 'name', 'o_file', 'n_file'])
+    args = mw.getPluginArgs()
+    data = mw.checkPluginArgs(args, ['user', 'name', 'o_file', 'n_file'])
     if not data[0]:
         return data[1]
 
@@ -952,8 +928,8 @@ def projectScriptSelf_Rename():
 
 
 def projectScriptSelf_Enable():
-    args = getArgs()
-    data = checkArgs(args, ['user', 'name', 'enable'])
+    args = mw.getPluginArgs()
+    data = mw.checkPluginArgs(args, ['user', 'name', 'enable'])
     if not data[0]:
         return data[1]
 
@@ -996,8 +972,8 @@ def projectScriptSelf_Enable():
 
 
 def projectScriptSelf_Status():
-    args = getArgs()
-    data = checkArgs(args, ['user', 'name', 'file', 'status'])
+    args = mw.getPluginArgs()
+    data = mw.checkPluginArgs(args, ['user', 'name', 'file', 'status'])
     if not data[0]:
         return data[1]
 

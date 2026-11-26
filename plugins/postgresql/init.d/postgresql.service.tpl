@@ -11,6 +11,7 @@ ExecStart={$APP_PATH}/bin/pg_ctl start -D {$APP_PATH}/data
 ExecReload={$APP_PATH}/bin/pg_ctl restart -D {$APP_PATH}/data
 ExecStop={$APP_PATH}/bin/pg_ctl stop -D {$APP_PATH}/data
 PrivateTmp=false
+LimitNOFILE=65535
 
 [Install]
 WantedBy=multi-user.target

@@ -3,6 +3,7 @@
 import sys
 import io
 import os
+import shutil
 import time
 import re
 import json
@@ -149,28 +150,6 @@ def getConfAuth():
     # rep = 'auth\s*=\s*(.*)'
     # tmp = re.search(rep, content)
     # return tmp.groups()[0].strip()
-
-def getArgs():
-    args = sys.argv[2:]
-    tmp = {}
-
-    # 兼容前端传 {} / 空参数: 去掉花括号后为空的直接跳过, 避免 split 后越界
-    for arg in args:
-        arg = arg.strip().strip('{').strip('}').strip()
-        if arg == '':
-            continue
-        t = arg.split(':', 1)
-        if len(t) < 2:
-            continue
-        tmp[t[0]] = t[1]
-
-    return tmp
-
-def checkArgs(data, ck=[]):
-    for i in range(len(ck)):
-        if not ck[i] in data:
-            return (False, mw.returnJson(False, '参数:(' + ck[i] + ')没有!'))
-    return (True, mw.returnJson(True, 'ok'))
 
 def status():
     cmd = "ps -ef|grep mongod |grep -v mongosh|grep -v grep | grep -v /Applications | grep -v python | grep -v mdserver-web | awk '{print $2}'"
@@ -391,8 +370,8 @@ def getConfig():
 
 def saveConfig():
     d = getConfigData()
-    args = getArgs()
-    data = checkArgs(args, ['bind_ip','port','data_path','log','pid_file_path'])
+    args = mw.getPluginArgs()
+    data = mw.checkPluginArgs(args, ['bind_ip','port','data_path','log','pid_file_path'])
     if not data[0]:
         return data[1]
 
@@ -611,7 +590,7 @@ def runReplInfo():
     return mw.returnJson(True, 'OK', result)
 
 def getDbList():
-    args = getArgs()
+    args = mw.getPluginArgs()
     page = 1
     page_size = 10
     search = ''
@@ -657,7 +636,7 @@ def getDbList():
     # return mw.returnJson(True,'ok',data)
 
 def getTableList():
-    args = getArgs()
+    args = mw.getPluginArgs()
     db_name = ""
     if 'dbname' in args:
         db_name = args['dbname']
@@ -686,8 +665,8 @@ def addDb():
     client = mongdbClient()
     db = client.admin
 
-    args = getArgs()
-    data = checkArgs(args, ['ps','name','db_user','password'])
+    args = mw.getPluginArgs()
+    data = mw.checkPluginArgs(args, ['ps','name','db_user','password'])
     if not data[0]:
         return data[1]
 
@@ -733,8 +712,8 @@ def delDb():
     db = client.admin
     sqlite_db = pSqliteDb('databases')
 
-    args = getArgs()
-    data = checkArgs(args, ['id', 'name'])
+    args = mw.getPluginArgs()
+    data = mw.checkPluginArgs(args, ['id', 'name'])
     if not data[0]:
         return data[1]
     try:
@@ -763,8 +742,8 @@ def delDbTable():
     db = client.admin
     sqlite_db = pSqliteDb('databases')
 
-    args = getArgs()
-    data = checkArgs(args, ['table_name', 'name'])
+    args = mw.getPluginArgs()
+    data = mw.checkPluginArgs(args, ['table_name', 'name'])
     if not data[0]:
         return data[1]
 
@@ -789,8 +768,8 @@ def delDbTable():
         return mw.returnJson(False, '删除失败!' + str(ex))
 
 def setRootPwd(version=''):
-    args = getArgs()
-    data = checkArgs(args, ['password'])
+    args = mw.getPluginArgs()
+    data = mw.checkPluginArgs(args, ['password'])
     if not data[0]:
         return data[1]
 
@@ -814,8 +793,8 @@ def setUserPwd(version=''):
     client = mongdbClient()
     sqlite_db = pSqliteDb('databases')
 
-    args = getArgs()
-    data = checkArgs(args, ['password', 'name'])
+    args = mw.getPluginArgs()
+    data = mw.checkPluginArgs(args, ['password', 'name'])
     if not data[0]:
         return data[1]
 
@@ -869,8 +848,8 @@ def syncGetDatabases():
     return mw.returnJson(True, msg)
 
 def setDbPs():
-    args = getArgs()
-    data = checkArgs(args, ['id', 'name', 'ps'])
+    args = mw.getPluginArgs()
+    data = mw.checkPluginArgs(args, ['id', 'name', 'ps'])
     if not data[0]:
         return data[1]
 
@@ -886,8 +865,8 @@ def setDbPs():
 
 
 def getDbInfo():
-    args = getArgs()
-    data = checkArgs(args, ['name'])
+    args = mw.getPluginArgs()
+    data = mw.checkPluginArgs(args, ['name'])
     if not data[0]:
         return data[1]
 
@@ -983,8 +962,8 @@ def toDbBase(find):
     return 1
 
 def syncToDatabases():
-    args = getArgs()
-    data = checkArgs(args, ['type', 'ids'])
+    args = mw.getPluginArgs()
+    data = mw.checkPluginArgs(args, ['type', 'ids'])
     if not data[0]:
         return data[1]
 
@@ -1057,8 +1036,8 @@ def getAllRole():
     return mw.returnJson(True, 'ok', result)
 
 def getDbAccess():
-    args = getArgs()
-    data = checkArgs(args, ['username'])
+    args = mw.getPluginArgs()
+    data = mw.checkPluginArgs(args, ['username'])
     if not data[0]:
         return data[1]
 
@@ -1098,8 +1077,8 @@ def getDbAccess():
     return mw.returnJson(True, 'ok', result)
 
 def setDbAccess():
-    args = getArgs()
-    data = checkArgs(args, ['username', 'select','name'])
+    args = mw.getPluginArgs()
+    data = mw.checkPluginArgs(args, ['username', 'select','name'])
     if not data[0]:
         return data[1]
     username = args['username']
@@ -1167,8 +1146,8 @@ def getReplConfig():
     return mw.returnJson(True, 'ok!', c)
 
 def replSetName():
-    args = getArgs()
-    data = checkArgs(args, ['name'])
+    args = mw.getPluginArgs()
+    data = mw.checkPluginArgs(args, ['name'])
     if not data[0]:
         return data[1]
 
@@ -1185,8 +1164,8 @@ def replSetName():
     return mw.returnJson(True, '设置成功!')
 
 def replSetNode():
-    args = getArgs()
-    data = checkArgs(args, ['node','priority','arbiterOnly','votes','idx'])
+    args = mw.getPluginArgs()
+    data = mw.checkPluginArgs(args, ['node','priority','arbiterOnly','votes','idx'])
     if not data[0]:
         return data[1]
 
@@ -1246,8 +1225,8 @@ def replSetNode():
 
 
 def delReplNode():
-    args = getArgs()
-    data = checkArgs(args, ['node'])
+    args = mw.getPluginArgs()
+    data = mw.checkPluginArgs(args, ['node'])
     if not data[0]:
         return data[1]
 
@@ -1362,8 +1341,8 @@ def getDbBackupListFunc(dbname=''):
     return r
 
 def getDbBackupList():
-    args = getArgs()
-    data = checkArgs(args, ['name'])
+    args = mw.getPluginArgs()
+    data = mw.checkPluginArgs(args, ['name'])
     if not data[0]:
         return data[1]
 
@@ -1419,8 +1398,8 @@ def getDbBackupImportList():
     return mw.returnJson(True, 'ok', rdata)
 
 def deleteDbBackup():
-    args = getArgs()
-    data = checkArgs(args, ['filename', 'path'])
+    args = mw.getPluginArgs()
+    data = mw.checkPluginArgs(args, ['filename', 'path'])
     if not data[0]:
         return data[1]
 
@@ -1434,13 +1413,13 @@ def deleteDbBackup():
     return mw.returnJson(True, '删除成功!')
 
 def setDbBackup():
-    args = getArgs()
-    data = checkArgs(args, ['name'])
+    args = mw.getPluginArgs()
+    data = mw.checkPluginArgs(args, ['name'])
     if not data[0]:
         return data[1]
 
     head = "cd "+mw.getPanelDir()
-    cmd = head +' && . bin/activate &&  python3 plugins/mongodb/scripts/backup.py database ' + args['name'] + ' 3'
+    cmd = head +' && . bin/activate &&  python3 plugins/mongodb/scripts/backup.py database ' + mw.quote(args['name']) + ' 3'
     # print(cmd)
     os.system(cmd)
     return mw.returnJson(True, 'ok')
@@ -1482,8 +1461,8 @@ def rootPwd():
         'id=?', (1,)).getField('mg_root')
 
 def importDbExternal():
-    args = getArgs()
-    data = checkArgs(args, ['file', 'name'])
+    args = mw.getPluginArgs()
+    data = mw.checkPluginArgs(args, ['file', 'name'])
     if not data[0]:
         return data[1]
 
@@ -1508,22 +1487,22 @@ def importDbExternal():
     mg_root = pSqliteDb('config').where('id=?', (1,)).getField('mg_root')
     uoption = ''
     if auth != 'disabled':
-        uoption =' --authenticationDatabase admin -u root -p '+mg_root
+        uoption =' --authenticationDatabase admin -u root -p '+mw.quote(mg_root)
 
     file_dir = import_dir+name
     if not os.path.exists(file_dir):
-        mw.execShell("mkdir -p "+file_dir)
+        mw.execShell("mkdir -p "+mw.quote(file_dir))
 
     file_tgz = import_dir+file
     if os.path.exists(file_tgz):
-        cmd = 'cd ' + file_dir + ' && tar -xzvf ' + file_tgz + " -C "+file_dir
+        cmd = 'cd ' + mw.quote(file_dir) + ' && tar -xzvf ' + mw.quote(file_tgz) + " -C " + mw.quote(file_dir)
         # print(cmd)
         r = mw.execShell(cmd)
         # print(r)
         bson_list = getListBson(name)
         # print(bson_list)
         for x in bson_list:
-            cmd = mongoToolsBin('mongorestore') + " "+uoption+" --port "+str(port)+" --dir "+file_dir+'/'+x
+            cmd = mongoToolsBin('mongorestore') + " "+uoption+" --port "+str(port)+" --dir "+mw.quote(file_dir + '/' + x)
             # print(cmd)
             rdata = mw.execShell(cmd)
             # print(data)
@@ -1532,14 +1511,13 @@ def importDbExternal():
 
     # 删除文件
     if os.path.exists(file_dir):
-        del_cmd = "rm -rf "+file_dir
-        mw.execShell(del_cmd)
+        shutil.rmtree(file_dir, ignore_errors=True)
 
     return mw.returnJson(True, 'ok')
 
 def importDbExternalProgress():
-    args = getArgs()
-    data = checkArgs(args, ['file', 'name'])
+    args = mw.getPluginArgs()
+    data = mw.checkPluginArgs(args, ['file', 'name'])
     if not data[0]:
         return data[1]
 
@@ -1547,12 +1525,12 @@ def importDbExternalProgress():
     name = args['name']
 
     cmd = 'cd '+mw.getServerDir()+'/mdserver-web && . bin/activate && '
-    cmd += 'python3 '+mw.getServerDir()+'/mdserver-web/plugins/mongodb/index.py import_db_external_progress_bar  {"file":"'+file+'","name":"'+name+'"}'
+    cmd += 'python3 '+mw.getServerDir()+'/mdserver-web/plugins/mongodb/index.py import_db_external_progress_bar  ' + mw.quote('{"file":"'+file+'","name":"'+name+'"}')
     return mw.returnJson(True, 'ok',cmd)
 
 def importDbExternalProgressBar():
-    args = getArgs()
-    data = checkArgs(args, ['file', 'name'])
+    args = mw.getPluginArgs()
+    data = mw.checkPluginArgs(args, ['file', 'name'])
     if not data[0]:
         return data[1]
 
@@ -1573,22 +1551,22 @@ def importDbExternalProgressBar():
 
     file_dir = import_dir+name
     if not os.path.exists(file_dir):
-        mw.execShell("mkdir -p "+file_dir)
+        mw.execShell("mkdir -p "+mw.quote(file_dir))
 
     auth = getConfAuth()
     mg_root = pSqliteDb('config').where('id=?', (1,)).getField('mg_root')
     uoption = ''
     if auth != 'disabled':
-        uoption =' --authenticationDatabase admin -u root -p '+mg_root
+        uoption =' --authenticationDatabase admin -u root -p '+mw.quote(mg_root)
 
     file_tgz = import_dir+file
     if os.path.exists(file_tgz):
-        cmd = 'cd ' + file_dir + ' && tar -xzvf ' + file_tgz + " -C "+file_dir
+        cmd = 'cd ' + mw.quote(file_dir) + ' && tar -xzvf ' + mw.quote(file_tgz) + " -C " + mw.quote(file_dir)
         mw.execShell(cmd)
         bson_list = getListBson(name)
         for x in bson_list:
             # mehotd 1
-            cmd = mongoToolsBin('mongorestore') + " "+uoption+" --port "+str(port)+" --dir "+file_dir+'/'+x
+            cmd = mongoToolsBin('mongorestore') + " "+uoption+" --port "+str(port)+" --dir "+mw.quote(file_dir + '/' + x)
             os.system(cmd)
             # method2
             # cmd = mongoToolsBin('mongorestore') + " "+uoption+" --port "+str(port) + " --archive  --db "+name + " --collection " + x.strip(".bson")
@@ -1597,13 +1575,12 @@ def importDbExternalProgressBar():
             # os.system(mysql_cmd_progress_bar)
 
     if os.path.exists(file_dir):
-        del_cmd = "rm -rf "+file_dir
-        mw.execShell(del_cmd)
+        shutil.rmtree(file_dir, ignore_errors=True)
     return ""
 
 def importDbBackup():
-    args = getArgs()
-    data = checkArgs(args, ['file', 'name'])
+    args = mw.getPluginArgs()
+    data = mw.checkPluginArgs(args, ['file', 'name'])
     if not data[0]:
         return data[1]
 
@@ -1615,11 +1592,11 @@ def importDbBackup():
     file_dir = mw.getBackupDir() + '/database/' + file.replace('.tar.gz','')
 
     if not os.path.exists(file_dir):
-        mw.execShell("mkdir -p "+file_dir)
+        mw.execShell("mkdir -p "+mw.quote(file_dir))
 
     # print(os.path.exists(file_tgz))
     if os.path.exists(file_tgz):
-        cmd = 'cd ' + mw.getBackupDir() + '/database && tar -xzvf ' + file + " -C "+file_dir
+        cmd = 'cd ' + mw.getBackupDir() + '/database && tar -xzvf ' + mw.quote(file) + " -C " + mw.quote(file_dir)
         # print(cmd)
         mw.execShell(cmd)
 
@@ -1627,21 +1604,20 @@ def importDbBackup():
     mg_root = pSqliteDb('config').where('id=?', (1,)).getField('mg_root')
     uoption = ''
     if auth != 'disabled':
-        uoption =' -u root -p '+mg_root
+        uoption =' -u root -p '+mw.quote(mg_root)
 
-    cmd = mongoToolsBin('mongorestore') + " "+uoption+" --port "+str(port)+" --dir "+file_dir
+    cmd = mongoToolsBin('mongorestore') + " "+uoption+" --port "+str(port)+" --dir "+mw.quote(file_dir)
     # print(cmd)
     mw.execShell(cmd)
     # 删除文件
     if os.path.exists(file_dir):
-        del_cmd = "rm -rf "+file_dir
-        mw.execShell(del_cmd)
+        shutil.rmtree(file_dir, ignore_errors=True)
 
     return mw.returnJson(True, 'ok')
 
 def importDbBackupProgress():
-    args = getArgs()
-    data = checkArgs(args, ['file', 'name'])
+    args = mw.getPluginArgs()
+    data = mw.checkPluginArgs(args, ['file', 'name'])
     if not data[0]:
         return data[1]
 
@@ -1649,13 +1625,13 @@ def importDbBackupProgress():
     name = args['name']
 
     cmd = 'cd '+mw.getServerDir()+'/mdserver-web && . bin/activate && '
-    cmd += 'python3 '+mw.getServerDir()+'/mdserver-web/plugins/mongodb/index.py import_db_backup_progress_bar {"file":"'+file+'","name":"'+name+'"}'
+    cmd += 'python3 '+mw.getServerDir()+'/mdserver-web/plugins/mongodb/index.py import_db_backup_progress_bar ' + mw.quote('{"file":"'+file+'","name":"'+name+'"}')
     return mw.returnJson(True, 'ok',cmd)
     # return mw.returnJson(True, 'ok')
 
 def importDbBackupProgressBar():
-    args = getArgs()
-    data = checkArgs(args, ['file', 'name'])
+    args = mw.getPluginArgs()
+    data = mw.checkPluginArgs(args, ['file', 'name'])
     if not data[0]:
         return data[1]
 
@@ -1676,27 +1652,26 @@ def importDbBackupProgressBar():
 
     file_dir = import_dir+name
     if not os.path.exists(file_dir):
-        mw.execShell("mkdir -p "+file_dir)
+        mw.execShell("mkdir -p "+mw.quote(file_dir))
 
     auth = getConfAuth()
     mg_root = pSqliteDb('config').where('id=?', (1,)).getField('mg_root')
     uoption = ''
     if auth != 'disabled':
-        uoption =' --authenticationDatabase admin -u root -p '+mg_root
+        uoption =' --authenticationDatabase admin -u root -p '+mw.quote(mg_root)
 
     file_tgz = import_dir+file
     if os.path.exists(file_tgz):
-        cmd = 'cd ' + file_dir + ' && tar -xzvf ' + file_tgz + " -C "+file_dir
+        cmd = 'cd ' + mw.quote(file_dir) + ' && tar -xzvf ' + mw.quote(file_tgz) + " -C " + mw.quote(file_dir)
         mw.execShell(cmd)
         bson_list = getListBsonByDatabase(name)
         for x in bson_list:
             # mehotd 1
-            cmd = mongoToolsBin('mongorestore') + " "+uoption+" --port "+str(port)+" --dir "+file_dir+'/'+x
+            cmd = mongoToolsBin('mongorestore') + " "+uoption+" --port "+str(port)+" --dir "+mw.quote(file_dir + '/' + x)
             os.system(cmd)
 
     if os.path.exists(file_dir):
-        del_cmd = "rm -rf "+file_dir
-        mw.execShell(del_cmd)
+        shutil.rmtree(file_dir, ignore_errors=True)
     return ""
 
 def testData():
@@ -1857,7 +1832,7 @@ def _setProfiling(level):
     if t == 'stop':
         return mw.returnJson(False, 'MongoDB 未启动!')
 
-    args = getArgs()
+    args = mw.getPluginArgs()
 
     slowms = 500
     if 'slowms' in args:
@@ -1939,7 +1914,7 @@ def closeSlowlog():
 def findSlowlogCmd():
     cfg = getConfigData()
     log_file = cfg['systemLog']['path']
-    cmd = "cat "+log_file + "|grep 'Slow query'"
+    cmd = "cat "+mw.quote(log_file) + "|grep 'Slow query'"
     return mw.returnJson(True, 'ok', cmd)
 
 

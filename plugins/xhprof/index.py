@@ -32,23 +32,6 @@ def getServerDir():
     return mw.getServerDir() + '/' + getPluginName()
 
 
-def getArgs():
-    args = sys.argv[2:]
-    tmp = {}
-    args_len = len(args)
-
-    if args_len == 1:
-        t = args[0].strip('{').strip('}')
-        t = t.split(':')
-        tmp[t[0]] = t[1]
-    elif args_len > 1:
-        for i in range(len(args)):
-            t = args[i].split(':')
-            tmp[t[0]] = t[1]
-
-    return tmp
-
-
 def getConf():
     return mw.getServerDir() + '/web_conf/nginx/vhost/xhprof.conf'
 
@@ -165,7 +148,7 @@ def reload():
 
 
 def setPhpVer():
-    args = getArgs()
+    args = mw.getPluginArgs()
 
     if not 'phpver' in args:
         return 'phpver missing'
@@ -200,7 +183,7 @@ def getXhPort():
 
 
 def setXhPort():
-    args = getArgs()
+    args = mw.getPluginArgs()
     if not 'port' in args:
         return mw.returnJson(False, 'port missing!')
 

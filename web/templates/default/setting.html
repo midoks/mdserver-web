@@ -136,6 +136,15 @@
 				</p>
 
 				<p class="mtb15">
+					<span class="set-tit text-right" title="快捷登录密钥">快捷登录密钥</span>
+					<input id="quick_login_key" class="inputtxt bt-input-text" type="text" value="" placeholder="点击显示" readonly style="width:260px;">
+					<button type="button" class="btn btn-default btn-xs" onclick="getQuickLoginKeyInfo()">显示</button>
+					<button type="button" class="btn btn-default btn-xs" onclick="copyQuickLoginKey()">复制</button>
+					<button type="button" class="btn btn-danger btn-xs" onclick="resetQuickLoginKey()">重置</button>
+					<span class="set-info c7">用于「关联面板」一键登录，请只填写到其它面板的关联配置中，不要泄露</span>
+				</p>
+
+				<p class="mtb15">
 					<span class="set-tit text-right" title="未认证响应状态">未认证响应状态</span>
 					<input name="status_code" class="inputtxt bt-input-text disable" type="text" value="{{data['unauthorized_status']['text']}}" disabled>
 					<button type="button" class="btn btn-success btn-sm ml5" data-code="{{data['unauthorized_status']['code']}}" onclick="setStatusCode(this)">设置</button>
@@ -149,11 +158,11 @@
 				</p>
 
 				<p class="mtb15">
-					<span class="set-tit text-right" title="二步验证" style="float: left;">二步验证</span>
+					<span class="set-tit text-right" title="二步验证" style="float: left;">二次验证(TOTP)</span>
 					<input class="btswitch btswitch-ios" id="cfg_panel_auth" type="checkbox" {% if data['two_step_verification']['open'] %}checked{% endif %}/>
 	                <label class="btswitch-btn ml5" for="cfg_panel_auth" style="float: left;margin-top:4px;" onclick="setAuthSecretApi()"></label>
 					<button type="button" class="btn btn-default btn-xs" style="vertical-align: middle; margin-left: 10px" onclick="setAuthBind();">绑定设置</button>
-					<span class="set-info c7">二步验证，加强安全登录</span>
+					<span class="set-info c7">二次验证，为当前账号绑定 Authenticator、1Password 等支持 TOTP 的验证器。动态码每 30 秒更新，请确保服务器与验证设备时间准确。</span>
 				</p>
 			</div>
 

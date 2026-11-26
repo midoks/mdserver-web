@@ -9,9 +9,21 @@
 # ---------------------------------------------------------------------------------
 
 import os
+import time
 
 import core.mw as mw
 import thisdb
+
+# 全局变量缓存 (5 秒): 模板每次渲染都会调 getGlobalVar, 内部涉及 15+ DB 查询和 execShell
+# 5 秒 TTL 足够新鲜, 又能省掉高频模板渲染时的重复开销
+_GLOBAL_VAR_CACHE = {'data': None, 'expire': 0}
+_GLOBAL_VAR_TTL = 5
+
+
+def invalidateGlobalVar():
+    """配置改动后主动调用清缓存"""
+    _GLOBAL_VAR_CACHE['data'] = None
+    _GLOBAL_VAR_CACHE['expire'] = 0
 
 def getUnauthStatus(
     code= '0'
@@ -40,7 +52,21 @@ def getUnauthStatus(
 
 def getGlobalVar():
     '''
-    获取全局变量
+    获取全局变量(带 5 秒缓存)
+    '''
+    now = time.time()
+    if _GLOBAL_VAR_CACHE['data'] is not None and now < _GLOBAL_VAR_CACHE['expire']:
+        return _GLOBAL_VAR_CACHE['data']
+
+    data = _buildGlobalVar()
+    _GLOBAL_VAR_CACHE['data'] = data
+    _GLOBAL_VAR_CACHE['expire'] = now + _GLOBAL_VAR_TTL
+    return data
+
+
+def _buildGlobalVar():
+    '''
+    实际从 DB/系统读取全局变量
     '''
     data = {}
     data['title'] = thisdb.getOption('title', default='后羿面板')

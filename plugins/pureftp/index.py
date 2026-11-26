@@ -3,8 +3,10 @@
 import sys
 import io
 import os
+import re
 import time
 import shutil
+import subprocess
 
 web_dir = os.getcwd() + "/web"
 if os.path.exists(web_dir):
@@ -44,30 +46,6 @@ def getConf():
 def getInitDTpl():
     path = getPluginDir() + "/init.d/pure-ftpd.tpl"
     return path
-
-
-def getArgs():
-    args = sys.argv[2:]
-    tmp = {}
-    args_len = len(args)
-
-    if args_len == 1:
-        t = args[0].strip('{').strip('}')
-        t = t.split(':')
-        tmp[t[0]] = t[1]
-    elif args_len > 1:
-        for i in range(len(args)):
-            t = args[i].split(':')
-            tmp[t[0]] = t[1]
-
-    return tmp
-
-
-def checkArgs(data, ck=[]):
-    for i in range(len(ck)):
-        if not ck[i] in data:
-            return (False, mw.returnJson(False, '参数:(' + ck[i] + ')没有!'))
-    return (True, mw.returnJson(True, 'ok'))
 
 
 def status():
@@ -231,27 +209,32 @@ def pftpUser():
     return 'www'
 
 
+def _runPw(args, password):
+    """用参数列表 + stdin 调用 pure-pw, 密码不经过 shell"""
+    cmd = [getServerDir() + '/bin/pure-pw'] + args
+    p = subprocess.Popen(cmd, stdin=subprocess.PIPE,
+                         stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+    out, err = p.communicate((password + '\n' + password + '\n').encode('utf-8'))
+    return out.decode('utf-8', 'replace'), err.decode('utf-8', 'replace')
+
 def pftpAdd(username, password, path):
     user = pftpUser()
 
     if not os.path.exists(path):
-        os.makedirs(path)
-        if mw.isAppleSystem():
-            # pass
-            os.system('chown ' + user + '.staff ' + path)
-        else:
-            os.system('chown www.www ' + path)
+        os.makedirs(path, exist_ok=True)
+        try:
+            if mw.isAppleSystem():
+                shutil.chown(path, user, 'staff')
+            else:
+                shutil.chown(path, 'www', 'www')
+        except Exception:
+            pass
 
-    cmd = getServerDir() + '/bin/pure-pw useradd ' + username + ' -u ' + user + ' -d ' + \
-        path + '<<EOF \n' + password + '\n' + password + '\nEOF'
-    return mw.execShell(cmd)
+    return _runPw(['useradd', username, '-u', user, '-d', path], password)
 
 
 def pftpMod(username, password):
-    user = pftpUser()
-    cmd = getServerDir() + '/bin/pure-pw passwd ' + username + \
-        '<<EOF \n' + password + '\n' + password + '\nEOF'
-    return mw.execShell(cmd)
+    return _runPw(['passwd', username], password)
 
 
 def pftpStop(username):
@@ -288,7 +271,7 @@ def getFtpPort():
 
 
 def getFtpList():
-    args = getArgs()
+    args = mw.getPluginArgs()
     page = 1
     page_size = 10
     search = ''
@@ -331,8 +314,8 @@ def getFtpList():
 
 def addFtp():
     import urllib.parse
-    args = getArgs()
-    data = checkArgs(args, ['ftp_username', 'ftp_password', 'path', 'ps'])
+    args = mw.getPluginArgs()
+    data = mw.checkPluginArgs(args, ['ftp_username', 'ftp_password', 'path', 'ps'])
     if not data[0]:
         return data[1]
 
@@ -354,13 +337,13 @@ def addFtp():
 
 
 def delFtp():
-    args = getArgs()
-    data = checkArgs(args, ['id', 'username'])
+    args = mw.getPluginArgs()
+    data = mw.checkPluginArgs(args, ['id', 'username'])
     if not data[0]:
         return data[1]
 
-    mw.execShell(getServerDir() +
-                 '/bin/pure-pw userdel ' + args['username'])
+    subprocess.run([getServerDir() + '/bin/pure-pw', 'userdel', args['username']],
+                   stdout=subprocess.PIPE, stderr=subprocess.PIPE)
     pftpReload()
     conn = pftpDB()
     conn.where("id=?", (args['id'],)).delete()
@@ -369,8 +352,8 @@ def delFtp():
 
 
 def modFtp():
-    args = getArgs()
-    data = checkArgs(args, ['id', 'name', 'password'])
+    args = mw.getPluginArgs()
+    data = mw.checkPluginArgs(args, ['id', 'name', 'password'])
     if not data[0]:
         return data[1]
 
@@ -388,7 +371,7 @@ def modFtp():
 
 def modFtpPort():
     import re
-    args = getArgs()
+    args = mw.getPluginArgs()
     if not 'port' in args:
         return 'port missing'
     try:
@@ -408,7 +391,7 @@ def modFtpPort():
 
 
 def stopPort():
-    args = getArgs()
+    args = mw.getPluginArgs()
     if not 'id' in args:
         return 'id missing'
 
@@ -430,7 +413,7 @@ def stopPort():
 
 
 def startPort():
-    args = getArgs()
+    args = mw.getPluginArgs()
     if not 'id' in args:
         return 'id missing'
 

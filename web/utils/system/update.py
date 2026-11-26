@@ -99,7 +99,8 @@ def updateServer(stype, version=''):
 
             dist_to = toPath + "/mdserver-web-" + version
             if not os.path.exists(dist_to):
-                os.system('unzip -o ' + toPath + '/mw.zip' + ' -d ' + toPath)
+                subprocess.run(['unzip', '-o', dist_mw, '-d', toPath],
+                               stdout=subprocess.PIPE, stderr=subprocess.PIPE)
 
             cmd_cp = 'cp -rf ' + toPath + '/mdserver-web-' + version + '/* ' + mw.getServerDir() + '/mdserver-web'
             mw.execShell(cmd_cp)
@@ -136,7 +137,8 @@ if [ -f /www/server/mdserver-web/version/r${NEW_P_VER}.txt ];then
 cd /www/server/mdserver-web && pip3 install -r /www/server/mdserver-web/version/r${NEW_P_VER}.txt -i $PIPSRC
 fi
 '''
-            os.system(update_env)
+            subprocess.run(update_env.split(),
+                           stdout=subprocess.PIPE, stderr=subprocess.PIPE)
             mw.restartMw()
             return mw.returnData(True, '安装更新成功!')
 

@@ -114,13 +114,17 @@ def mwcli(mw_input=0):
         exit()
 
     if mw_input == 1:
-        os.system(INIT_CMD + " restart")
+        subprocess.run([INIT_CMD, 'restart'],
+                       stdout=subprocess.PIPE, stderr=subprocess.PIPE)
     elif mw_input == 2:
-        os.system(INIT_CMD + " stop")
+        subprocess.run([INIT_CMD, 'stop'],
+                       stdout=subprocess.PIPE, stderr=subprocess.PIPE)
     elif mw_input == 3:
-        os.system(INIT_CMD + " start")
+        subprocess.run([INIT_CMD, 'start'],
+                       stdout=subprocess.PIPE, stderr=subprocess.PIPE)
     elif mw_input == 4:
-        os.system(INIT_CMD + " reload")
+        subprocess.run([INIT_CMD, 'reload'],
+                       stdout=subprocess.PIPE, stderr=subprocess.PIPE)
     elif mw_input == 5:
         in_ip = mw_input_cmd("请输入设置的面板IP：")
         in_ip = in_ip.strip()
@@ -137,9 +141,15 @@ def mwcli(mw_input=0):
         if in_port_int < 65536 and in_port_int > 0:
             MwFirewall.instance().addAcceptPort(in_port, 'WEB面板[TOOLS修改]', 'port')
             panel_port = panel_dir + '/data/port.pl'
-            mw.writeFile(panel_port, in_port)
-            os.system(INIT_CMD + " restart_panel")
-            os.system(INIT_CMD + " default")
+            # 参数列表调用 writeFile, 避免文件名中的特殊字符被 shell 解释
+            writeFile = shutil.which('writeFile')
+            if writeFile:
+                subprocess.run([writeFile, panel_port, in_port],
+                               stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+            subprocess.run([INIT_CMD, 'restart_panel'],
+                           stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+            subprocess.run([INIT_CMD, 'default'],
+                           stdout=subprocess.PIPE, stderr=subprocess.PIPE)
         else:
             mw.echoInfo("端口范围在0-65536之间")
         return
@@ -147,7 +157,8 @@ def mwcli(mw_input=0):
         thisdb.setOption('admin_path', '')
         mw.echoInfo("关闭安全入口成功!")
     elif mw_input == 10:
-        os.system(INIT_CMD + " default")
+        subprocess.run([INIT_CMD, 'default'],
+                       stdout=subprocess.PIPE, stderr=subprocess.PIPE)
     elif mw_input == 11:
         input_pwd = mw_input_cmd("请输入新的面板密码：")
         if len(input_pwd.strip()) < 5:
@@ -158,7 +169,10 @@ def mwcli(mw_input=0):
         input_user = mw_input_cmd("请输入新的面板用户名(>=5位)：")
         set_panel_username(input_user.strip())
     elif mw_input == 13:
-        os.system('tail -100 ' + panel_dir + '/logs/panel_error.log')
+        tail = shutil.which('tail')
+        if tail:
+            subprocess.run([tail, '-100', '--', panel_dir + '/logs/panel_error.log'],
+                           stdout=subprocess.PIPE, stderr=subprocess.PIPE)
     elif mw_input == 14:
         admin_close = thisdb.getOption('admin_close')
         if admin_close == 'no':
@@ -184,7 +198,11 @@ def mwcli(mw_input=0):
         panel_domain = thisdb.getOption('panel_domain', default='')
         if panel_domain != '':
             thisdb.setOption('panel_domain', '')
-            os.system(INIT_CMD + " unbind_domain")
+            # 参数列表调用 unbind_domain, 避免域名中的特殊字符被 shell 解释
+            unbind_domain = shutil.which('unbind_domain')
+            if unbind_domain:
+                subprocess.run([unbind_domain, '--', panel_domain],
+                               stdout=subprocess.PIPE, stderr=subprocess.PIPE)
             mw.echoInfo("解除域名绑定成功")
         else:
             mw.echoInfo("面板未绑定域名!")
@@ -193,7 +211,8 @@ def mwcli(mw_input=0):
         if panel_ssl['open']:
             panel_ssl['open'] = False
             thisdb.setOption('panel_ssl', json.dumps(panel_ssl))
-            os.system(INIT_CMD + " unbind_ssl")
+            subprocess.run([INIT_CMD, 'unbind_ssl'],
+                           stdout=subprocess.PIPE, stderr=subprocess.PIPE)
             mw.echoInfo("解除面板SSL绑定成功")
     elif mw_input == 23:
         listen_ipv6 = panel_dir + '/data/ipv6.pl'
@@ -208,7 +227,11 @@ def mwcli(mw_input=0):
         if not os.path.exists(listen_ipv6):
             mw.echoInfo("已关闭IPv6支持!")
         else:
-            os.remove(listen_ipv6)
+            # 参数列表调用 rm, 避免文件名中的特殊字符被 shell 解释
+            rm = shutil.which('rm')
+            if rm:
+                subprocess.run([rm, '--', listen_ipv6],
+                               stdout=subprocess.PIPE, stderr=subprocess.PIPE)
             os.system(INIT_CMD + " restart")
             mw.echoInfo("关闭IPv6支持了")
     elif mw_input == 25:

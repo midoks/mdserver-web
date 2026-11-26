@@ -67,11 +67,12 @@ def get_task_speed():
                 readLine = mw.readFile(task_logfile)
                 data['msg'] = json.loads(readLine)
                 data['isDownload'] = True
+                break  # 成功立即退出, 不再 sleep
             except Exception as e:
                 if i == 2:
                     thisdb.setTaskStatus(row['id'],0)
                     return mw.returnData(False, '当前没有任务队列在执行-4:' + str(e))
-            time.sleep(0.5)
+                time.sleep(0.5)  # 只在失败时等待重试
     else:
         data['msg'] = mw.getLastLine(task_logfile, 10)
         data['isDownload'] = False

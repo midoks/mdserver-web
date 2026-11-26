@@ -55,33 +55,6 @@ def getInitDTpl():
 def runLog():
     return getServerDir() + '/hook.log'
 
-def getArgs():
-    args = sys.argv[3:]
-    # print(args)
-    tmp = {}
-    args_len = len(args)
-
-    if args_len == 1:
-        t = args[0].strip('{').strip('}')
-        if t.strip() == '':
-            tmp = []
-        else:
-            t = t.split(':')
-            tmp[t[0]] = t[1]
-        tmp[t[0]] = t[1]
-    elif args_len > 1:
-        for i in range(len(args)):
-            t = args[i].split(':')
-            tmp[t[0]] = t[1]
-    return tmp
-
-def checkArgs(data, ck=[]):
-    for i in range(len(ck)):
-        if not ck[i] in data:
-            return (False, mw.returnJson(False, '参数:(' + ck[i] + ')没有!'))
-    return (True, mw.returnJson(True, 'ok'))
-
-
 def getHomeDir():
     if mw.isAppleSystem():
         user = mw.execShell(
@@ -110,8 +83,8 @@ def configTpl():
 
 
 def readConfigTpl():
-    args = getArgs()
-    data = checkArgs(args, ['file'])
+    args = mw.getPluginArgs()
+    data = mw.checkPluginArgs(args, ['file'])
     if not data[0]:
         return data[1]
 
@@ -231,8 +204,8 @@ def reload():
 
 def dnsapiAdd():
     conn = pSqliteDb('dnsapi')
-    args = getArgs()
-    data = checkArgs(args,['id','name', 'type', 'remark'])
+    args = mw.getPluginArgs()
+    data = mw.checkPluginArgs(args,['id','name', 'type', 'remark'])
     if not data[0]:
         return data[1]
 
@@ -263,8 +236,8 @@ def dnsapiAdd():
     return mw.returnJson(True, '添加成功!')
 
 def dnsapiDel():
-    args = getArgs()
-    data = checkArgs(args, ['id', 'name'])
+    args = mw.getPluginArgs()
+    data = mw.checkPluginArgs(args, ['id', 'name'])
     if not data[0]:
         return data[1]
 
@@ -278,7 +251,7 @@ def dnsapiDel():
         return mw.returnJson(False, '删除失败!' + str(ex))
 
 def dnsapiList():
-    args = getArgs()
+    args = mw.getPluginArgs()
     page = 1
     page_size = 10
     search = ''
@@ -319,7 +292,7 @@ def dnsapiListAll():
     return mw.getJson(data)
 
 def emailList():
-    args = getArgs()
+    args = mw.getPluginArgs()
     page = 1
     page_size = 10
     search = ''
@@ -354,8 +327,8 @@ def emailList():
     return mw.getJson(data)
 
 def emailAdd():
-    args = getArgs()
-    data = checkArgs(args,['addr', 'remark'])
+    args = mw.getPluginArgs()
+    data = mw.checkPluginArgs(args,['addr', 'remark'])
     if not data[0]:
         return data[1]
 
@@ -372,8 +345,8 @@ def emailAdd():
     return mw.returnJson(True, '添加成功!')
 
 def emailDel():
-    args = getArgs()
-    data = checkArgs(args, ['id', 'name'])
+    args = mw.getPluginArgs()
+    data = mw.checkPluginArgs(args, ['id', 'name'])
     if not data[0]:
         return data[1]
 
@@ -387,8 +360,8 @@ def emailDel():
         return mw.returnJson(False, '删除失败!' + str(ex))
 
 def domainAdd():
-    args = getArgs()
-    data = checkArgs(args,['id','domain', 'dnsapi_id','email','remark'])
+    args = mw.getPluginArgs()
+    data = mw.checkPluginArgs(args,['id','domain', 'dnsapi_id','email','remark'])
     if not data[0]:
         return data[1]
 
@@ -424,8 +397,8 @@ def domainAdd():
     return mw.returnJson(True, '添加成功!')
 
 def domainDel():
-    args = getArgs()
-    data = checkArgs(args, ['id', 'name'])
+    args = mw.getPluginArgs()
+    data = mw.checkPluginArgs(args, ['id', 'name'])
     if not data[0]:
         return data[1]
 
@@ -439,8 +412,8 @@ def domainDel():
         return mw.returnJson(False, '删除失败!' + str(ex))
 
 def domainStatusToggle():
-    args = getArgs()
-    data = checkArgs(args, ['id'])
+    args = mw.getPluginArgs()
+    data = mw.checkPluginArgs(args, ['id'])
     if not data[0]:
         return data[1]
 
@@ -461,7 +434,7 @@ def domainStatusToggle():
     return mw.returnJson(True, '切换成功!')
 
 def domainList():
-    args = getArgs()
+    args = mw.getPluginArgs()
     page = 1
     page_size = 10
     search = ''
@@ -642,8 +615,8 @@ def runHookDstDomain(row):
         hookWriteLog('结束执行【'+domain+'】Hook脚本')
 
 def getHookIdCmd():
-    args = getArgs()
-    data = checkArgs(args, ['id'])
+    args = mw.getPluginArgs()
+    data = mw.checkPluginArgs(args, ['id'])
     if not data[0]:
         return data[1]
 
@@ -652,8 +625,8 @@ def getHookIdCmd():
     return mw.returnJson(True, 'ok',cmd)
 
 def runHookId():
-    args = getArgs()
-    data = checkArgs(args, ['id'])
+    args = mw.getPluginArgs()
+    data = mw.checkPluginArgs(args, ['id'])
     if not data[0]:
         return data[1]
 

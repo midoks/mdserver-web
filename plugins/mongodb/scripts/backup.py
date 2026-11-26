@@ -7,6 +7,7 @@ import sys
 import os
 import re
 import time
+import shutil
 import yaml
 
 if sys.platform != 'darwin':
@@ -189,23 +190,23 @@ class backupTools:
         mg_root = pSqliteDb('config').where('id=?', (1,)).getField('mg_root')
         uoption = ''
         if auth != 'disabled':
-            uoption =' --authenticationDatabase admin -u root -p '+mg_root
-    
+            uoption =' --authenticationDatabase admin -u root -p '+mw.quote(mg_root)
+
         # 4.4+ 的 mongodump 由 Database Tools 提供,不在 server/bin 目录
         mongodump_bin = db_path + "/bin/mongodump"
         if not os.path.exists(mongodump_bin):
             import shutil
             mongodump_bin = shutil.which('mongodump') or mongodump_bin
 
-        cmd = mongodump_bin + uoption+" --port "+str(port)+" -d "+name+" -o "+backup_path 
+        cmd = mongodump_bin + uoption+" --port "+str(port)+" -d "+mw.quote(name)+" -o "+backup_path
         if table_name != "":
-            cmd += " -c " + table_name
+            cmd += " -c " + mw.quote(table_name)
         # print(cmd)
         mw.execShell(cmd)
-        cmd_gz = "cd "+backup_path+"/"+name+" && tar -zcvf "+filename + " ./"
+        cmd_gz = "cd "+mw.quote(backup_path+"/"+name)+" && tar -zcvf "+mw.quote(filename) + " ./"
         mw.execShell(cmd_gz)
-        mw.execShell("rm -rf "+ backup_path+"/"+name)
-        
+        shutil.rmtree(backup_path+"/"+name, ignore_errors=True)
+
         if not os.path.exists(filename):
             endDate = time.strftime('%Y/%m/%d %X', time.localtime())
             log = "数据库[" + name + "]备份失败!"
@@ -230,7 +231,10 @@ class backupTools:
         num = len(backups) - int(count)
         if num > 0:
             for backup in backups:
-                mw.execShell("rm -f " + backup_path + "/"+backup)
+                try:
+                    os.remove(backup_path + "/" + backup)
+                except OSError:
+                    pass
                 num -= 1
                 print("|---已清理过期文件：" + backup)
                 if num < 1:

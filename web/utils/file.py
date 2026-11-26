@@ -10,10 +10,12 @@
 
 import os
 import pwd
+import re
 import time
 import shutil
 import json
 import base64
+import subprocess
 
 import core.mw as mw
 import thisdb
@@ -57,11 +59,14 @@ def uploadSegment(path,name,size,start,dir_mode,file_mode,b64_data,upload_files)
     new_name = os.path.join(path, name)
     if os.path.exists(new_name):
         if new_name.find('.user.ini') != -1:
-            mw.execShell("chattr -i " + new_name)
+            chattr = shutil.which('chattr')
+            if chattr:
+                subprocess.run([chattr, '-i', '--', new_name],
+                               stdout=subprocess.PIPE, stderr=subprocess.PIPE)
         try:
             os.remove(new_name)
         except:
-            mw.execShell("rm -f %s" % new_name)
+            mw.execShell("rm -f " + mw.quote(new_name))
 
     os.renames(save_path, new_name)
 
@@ -113,14 +118,14 @@ def unzip(sfile, dfile, stype, path):
     try:
         tmps = mw.getPanelDir() + '/logs/panel_exec.log'
         if stype == 'zip':
-            mw.execShell("cd " + path + " && unzip -o -d '" + dfile +"' '" + sfile + "' > " + tmps + " 2>&1 &")
+            mw.execShell("cd " + mw.quote(path) + " && unzip -o -d " + mw.quote(dfile) + " " + mw.quote(sfile) + " > " + mw.quote(tmps) + " 2>&1 &")
         else:
             sfiles = ''
             for sfile in sfile.split(','):
                 if not sfile:
                     continue
-                sfiles += " '" + sfile + "'"
-            mw.execShell("cd " + path + " && tar -zxvf " + sfiles +" -C " + dfile + " > " + tmps + " 2>&1 &")
+                sfiles += " " + mw.quote(sfile)
+            mw.execShell("cd " + mw.quote(path) + " && tar -zxvf " + sfiles + " -C " + mw.quote(dfile) + " > " + mw.quote(tmps) + " 2>&1 &")
 
         if os.path.exists(dfile):
             if dfile.startswith("/www/wwwroot"):
@@ -156,32 +161,32 @@ def uncompress(sfile, dfile, path):
         return mw.returnData(False, '7z解压命令不存在，请安装!')
 
 
-    cmd = "cd " + path + " "
+    cmd = "cd " + mw.quote(path) + " "
     try:
         tmps = mw.getPanelDir() + '/logs/panel_exec.log'
         if extension == 'zip':
-            cmd += "&& unzip -o -d '" + dfile + "' '" + sfile + "' > " + tmps + " 2>&1 &"
+            cmd += "&& unzip -o -d " + mw.quote(dfile) + " " + mw.quote(sfile) + " > " + mw.quote(tmps) + " 2>&1 &"
             mw.execShell(cmd)
         elif extension == 'tar.gz':
-            cmd += "&& tar -zxvf " + sfile + " -C " + dfile + " > " + tmps + " 2>&1 &"
+            cmd += "&& tar -zxvf " + mw.quote(sfile) + " -C " + mw.quote(dfile) + " > " + mw.quote(tmps) + " 2>&1 &"
             mw.execShell(cmd)
         elif extension == 'tgz':
-            cmd += "&& tar -zxvf " + sfile + " -C " + dfile + " > " + tmps + " 2>&1 &"
+            cmd += "&& tar -zxvf " + mw.quote(sfile) + " -C " + mw.quote(dfile) + " > " + mw.quote(tmps) + " 2>&1 &"
             mw.execShell(cmd)
         elif extension == 'gz':
-            cmd += "&& gunzip -k " + sfile + " > " + tmps + " 2>&1 &"
+            cmd += "&& gunzip -k " + mw.quote(sfile) + " > " + mw.quote(tmps) + " 2>&1 &"
             mw.execShell(cmd)
         elif extension == 'rar':
-            cmd += "&& unrar x " + sfile + " " + dfile + " > " + tmps + " 2>&1 &"
+            cmd += "&& unrar x " + mw.quote(sfile) + " " + mw.quote(dfile) + " > " + mw.quote(tmps) + " 2>&1 &"
             mw.execShell(cmd)
         elif extension == '7z':
-            cmd += "&& 7z x " + sfile + " -r -o" + dfile + " > " + tmps + " 2>&1 &"
+            cmd += "&& 7z x " + mw.quote(sfile) + " -r -o" + mw.quote(dfile) + " > " + mw.quote(tmps) + " 2>&1 &"
             mw.execShell(cmd)
         elif extension == 'xz':
-            cmd += "&& tar -Jxvf " + sfile + " -C " + dfile + " > " + tmps + " 2>&1 &"
+            cmd += "&& tar -Jxvf " + mw.quote(sfile) + " -C " + mw.quote(dfile) + " > " + mw.quote(tmps) + " 2>&1 &"
             mw.execShell(cmd)
         elif extension == 'bz2':
-            cmd += "&& tar -xjvf " + sfile + " -C " + dfile + " > " + tmps + " 2>&1 &"
+            cmd += "&& tar -xjvf " + mw.quote(sfile) + " -C " + mw.quote(dfile) + " > " + mw.quote(tmps) + " 2>&1 &"
             mw.execShell(cmd)
 
         if os.path.exists(dfile):
@@ -204,13 +209,17 @@ def setBatchData(path, stype, access, user, data):
         }
         return mw.returnData(True, '标记成功,请在目标目录点击粘贴所有按钮!')
     elif stype == '3':
+        if not mw.isValidAccessMode(access):
+            return mw.returnData(False, '权限值不合法, 仅支持 3~4 位八进制数字!')
+        if not mw.isValidUserName(user):
+            return mw.returnData(False, '用户名不合法!')
+
         for key in json.loads(data):
             try:
                 filename = path + '/' + key
                 if not checkDir(filename):
                     return mw.returnData(False, 'FILE_DANGER')
-                os.system('chmod -R ' + access + " '" + filename + "'")
-                os.system('chown -R ' + user + ':' + user + " '" + filename + "'")
+                setFileModeOwner(filename, access, user)
             except:
                 continue
         mw.writeLog('文件管理', '批量设置权限成功!')
@@ -241,7 +250,10 @@ def setBatchData(path, stype, access, user, data):
                         shutil.rmtree(filename)
                 else:
                     if key == '.user.ini':
-                        os.system('command -v chattr && chattr -i ' + filename)
+                        chattr = shutil.which('chattr')
+                        if chattr:
+                            subprocess.run([chattr, '-i', '--', filename],
+                                           stdout=subprocess.PIPE, stderr=subprocess.PIPE)
                     if is_recycle:
                         mvRecycleBin(topath)
                     else:
@@ -305,27 +317,27 @@ def zip(sfile, dfile, stype, path):
     tmps = mw.getPanelDir() + '/logs/panel_exec.log'
     if sfile.find(',') == -1:
         if stype == 'zip':
-            mw.execShell("cd '" + path + "' && zip '" + dfile + "' -r '" + sfile + "' > " + tmps + " 2>&1")
+            mw.execShell("cd " + mw.quote(path) + " && zip " + mw.quote(dfile) + " -r " + mw.quote(sfile) + " > " + mw.quote(tmps) + " 2>&1")
         elif stype == '7z':
             if not mw.checkBinExist('7z'):
                 return mw.returnData(False, '7z压缩命令不存在，请安装!')
-            mw.execShell("cd '" + path + "' && 7z a '" + dfile + "' -r '" + sfile + "' > " + tmps + " 2>&1")
+            mw.execShell("cd " + mw.quote(path) + " && 7z a " + mw.quote(dfile) + " -r " + mw.quote(sfile) + " > " + mw.quote(tmps) + " 2>&1")
         elif stype == 'tar_gz':
-            mw.execShell("cd '" + path + "' && tar -zcvf '" + dfile + "' " + sfile + " > " + tmps + " 2>&1")
+            mw.execShell("cd " + mw.quote(path) + " && tar -zcvf " + mw.quote(dfile) + " " + mw.quote(sfile) + " > " + mw.quote(tmps) + " 2>&1")
         elif stype == 'xz':
             # if not mw.checkBinExist('xz'):
             #     return mw.returnData(False, 'xz压缩命令不存在，请安装!')
             # dfile = dfile.strip(".xz")
             # cmd = "cd '" + path + "' && tar -cvf '" + dfile + ".tar' " + sfile + " && xz -z '" + dfile + ".tar' > " + tmps + " 2>&1 &"
-            cmd = "cd '" + path + "' && tar -cJf '" + dfile + "' " + sfile + " > " + tmps + " 2>&1"
+            cmd = "cd " + mw.quote(path) + " && tar -cJf " + mw.quote(dfile) + " " + mw.quote(sfile) + " > " + mw.quote(tmps) + " 2>&1"
             # print(cmd)
             mw.execShell(cmd)
         elif stype == 'rar':
             if not mw.checkBinExist('rar'):
                 return mw.returnData(False, 'rar压缩命令不存在，请安装!')
-            mw.execShell("cd '" + path + "' && rar a '" + dfile + "' '" + sfile + "' > " + tmps + " 2>&1")
+            mw.execShell("cd " + mw.quote(path) + " && rar a " + mw.quote(dfile) + " " + mw.quote(sfile) + " > " + mw.quote(tmps) + " 2>&1")
         elif stype == 'bz2':
-            mw.execShell("cd '" + path + "' && tar -cjvf '" + dfile + "' " + sfile + " > " + tmps + " 2>&1")
+            mw.execShell("cd " + mw.quote(path) + " && tar -cjvf " + mw.quote(dfile) + " " + mw.quote(sfile) + " > " + mw.quote(tmps) + " 2>&1")
         else:
             return mw.returnData(False, '未知压缩格式')
         mw.writeLog("文件管理", '文件[{1}]压缩[{2}]成功!', (sfile, dfile))
@@ -336,23 +348,23 @@ def zip(sfile, dfile, stype, path):
                 continue
             if not os.path.exists(sfile):
                 return mw.returnData(False, '指定文件不存在!')
-            
-            sfiles += " '" + sfile.replace(path+'/','') + "'"
+
+            sfiles += " " + mw.quote(sfile.replace(path+'/',''))
 
         if stype == 'zip':
-            mw.execShell("cd '" + path + "' && zip '" + dfile + "' -r " + sfiles + " > " + tmps + " 2>&1")
+            mw.execShell("cd " + mw.quote(path) + " && zip " + mw.quote(dfile) + " -r " + sfiles + " > " + mw.quote(tmps) + " 2>&1")
         elif stype == '7z':
             if not mw.checkBinExist('7z'):
                 return mw.returnData(False, '7z压缩命令不存在，请安装!')
-            mw.execShell("cd '" + path + "' && 7z a '" + dfile + "' -r " + sfiles + " > " + tmps + " 2>&1")
+            mw.execShell("cd " + mw.quote(path) + " && 7z a " + mw.quote(dfile) + " -r " + sfiles + " > " + mw.quote(tmps) + " 2>&1")
         elif stype == 'tar_gz':
-            mw.execShell("cd '" + path + "' && tar -zcvf '" + dfile + "' " + sfiles + " > " + tmps + " 2>&1")
+            mw.execShell("cd " + mw.quote(path) + " && tar -zcvf " + mw.quote(dfile) + " " + sfiles + " > " + mw.quote(tmps) + " 2>&1")
         elif stype == 'rar':
             if not mw.checkBinExist('rar'):
                 return mw.returnData(False, 'rar压缩命令不存在，请安装!')
-            mw.execShell("cd '" + path + "' && rar a '" + dfile + "' " + sfiles + " > " + tmps + " 2>&1")
+            mw.execShell("cd " + mw.quote(path) + " && rar a " + mw.quote(dfile) + " " + sfiles + " > " + mw.quote(tmps) + " 2>&1")
         elif stype == 'bz2':
-            mw.execShell("cd '" + path + "' && tar -cjvf '" + dfile + "' " + sfiles + " > " + tmps + " 2>&1")
+            mw.execShell("cd " + mw.quote(path) + " && tar -cjvf " + mw.quote(dfile) + " " + sfiles + " > " + mw.quote(tmps) + " 2>&1")
         else:
             return mw.returnData(False, '未知压缩格式')
 
@@ -413,8 +425,14 @@ def setFileAccept(filename):
     if mw.getOs() == 'darwin':
         user = mw.execShell("who | sed -n '2, 1p' |awk '{print $1}'")[0].strip()
         auth = user + ':staff'
-    os.system('chown -R ' + auth + ' ' + filename)
-    os.system('chmod -R 755 ' + filename)
+    # 参数列表执行, 不经过 shell
+    try:
+        subprocess.run(['chown', '-R', auth, '--', filename],
+                       stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+        subprocess.run(['chmod', '-R', '755', '--', filename],
+                       stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+    except Exception:
+        pass
 
 def createFile(file_path):
     try:
@@ -512,9 +530,58 @@ def getFileBody(path):
         return mw.returnData(False, '文件未正常打开!')
     return mw.returnData(True, 'OK', data)
 
+def isSafeSavePath(path):
+    """限制在线编辑的写入范围, 防止任意文件写入(如 /root/.ssh、/etc 等)"""
+    try:
+        real = os.path.realpath(path)
+    except Exception:
+        return False
+
+    # 禁止覆盖面板自身代码
+    panel_dir = os.path.realpath(mw.getPanelDir())
+    if real == panel_dir or real.startswith(panel_dir + os.sep):
+        return False
+
+    # 系统敏感目录一律禁止写入
+    deny_roots = (
+        '/etc', '/root', '/boot', '/bin', '/sbin', '/usr',
+        '/lib', '/lib32', '/lib64', '/proc', '/sys', '/dev',
+        '/run', '/var/spool', '/var/lib',
+    )
+    for d in deny_roots:
+        if real == d or real.startswith(d + os.sep):
+            return False
+
+    allow_roots = [
+        mw.getWwwDir(),
+        mw.getServerDir(),
+        mw.getBackupDir(),
+        mw.getLogsDir(),
+    ]
+    # 站点自定义目录
+    try:
+        for s in mw.M('sites').field('path').select():
+            if s.get('path'):
+                allow_roots.append(s['path'])
+    except Exception:
+        pass
+
+    for root in allow_roots:
+        if not root:
+            continue
+        r = os.path.realpath(root)
+        if real == r or real.startswith(r + os.sep):
+            return True
+    return False
+
+
 def saveBody(path, data, encoding):
     if not os.path.exists(path):
         return mw.returnData(False, '文件不存在')
+    if os.path.isdir(path):
+        return mw.returnData(False, '不能写入目录')
+    if not isSafeSavePath(path):
+        return mw.returnData(False, '该路径不允许写入!')
     try:
         if encoding == 'ascii':
             encoding = 'utf-8'
@@ -710,7 +777,7 @@ def getDirSize(filePath, size=0):
 
 # 获取目录大小(bash)
 def getDirSizeByBash(path):
-    tmp = mw.execShell('du -sh ' + path)
+    tmp = mw.execShell('du -sh ' + mw.quote(path))
     return tmp[0].split()[0].lower()
 
 # 计算文件数量
@@ -738,17 +805,38 @@ def getAccess(fname):
         data['chown'] = 'www'
     return data
 
+# 权限位与属主参数校验已统一放在 core.mw, 这里只保留执行封装
+def setFileModeOwner(filename, access, user, recursive=True):
+    """用参数列表执行 chmod/chown, 不经过 shell, 返回 (是否成功, 错误信息)"""
+    args = ['-R'] if recursive else []
+    # '--' 之后的参数即使以 '-' 开头也只会被当作普通参数
+    ret = subprocess.run(['chmod'] + args + ['--', access, filename],
+                         stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+    if ret.returncode != 0:
+        return False, ret.stderr.decode('utf-8', 'replace').strip()
+    ret = subprocess.run(['chown'] + args + ['--', user + ':' + user, filename],
+                         stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+    if ret.returncode != 0:
+        return False, ret.stderr.decode('utf-8', 'replace').strip()
+    return True, ''
+
 def setFileAccess(filename,user,access):
     sall = '-R'
     try:
         if not checkDir(filename):
             return mw.returnData(False, '请不要花样作死')
 
+        if not mw.isValidAccessMode(access):
+            return mw.returnData(False, '权限值不合法, 仅支持 3~4 位八进制数字!')
+        if not mw.isValidUserName(user):
+            return mw.returnData(False, '用户名不合法!')
+
         if not os.path.exists(filename):
             return mw.returnData(False, '指定文件不存在!')
 
-        os.system('chmod ' + sall + ' ' + access + " '" + filename + "'")
-        os.system('chown ' + sall + ' ' + user + ':' + user + " '" + filename + "'")
+        ok, error = setFileModeOwner(filename, access, user)
+        if not ok:
+            return mw.returnData(False, '设置失败!' + error)
         msg = mw.getInfo('设置[{1}]权限为[{2}]所有者为[{3}]', (filename, access, user,))
         mw.writeLog('文件管理', msg)
         return mw.returnData(True, '设置成功!')
@@ -775,8 +863,10 @@ def fileDelete(path):
 
     # 检查是否为.user.ini
     if path.find('.user.ini') >= 0:
-        cmd = "which chattr && chattr -i {0}".format(path)
-        mw.execShell(cmd)
+        chattr = shutil.which('chattr')
+        if chattr:
+            subprocess.run([chattr, '-i', '--', path],
+                           stdout=subprocess.PIPE, stderr=subprocess.PIPE)
 
     try:
         recycle_bin = thisdb.getOption('recycle_bin')
@@ -796,13 +886,16 @@ def dirDelete(path):
 
     # 检查是否为.user.ini
     if path.find('.user.ini'):
-        os.system("command -v chattr && chattr -i '" + path + "'")
+        chattr = shutil.which('chattr')
+        if chattr:
+            subprocess.run([chattr, '-i', '--', path],
+                           stdout=subprocess.PIPE, stderr=subprocess.PIPE)
     try:
         recycle_bin = thisdb.getOption('recycle_bin')
         if recycle_bin == 'open':
             if mvRecycleBin(path):
                 return mw.returnData(True, '已将文件移动到回收站!')
-        mw.execShell('rm -rf ' + path)
+        mw.execShell('rm -rf ' + mw.quote(path))
         mw.writeLog('文件管理', '删除{1}成功！', (path,))
         return mw.returnData(True, '删除文件成功!')
     except:
@@ -931,7 +1024,17 @@ def setMode(path):
 
 def closeLogs():
     log_file = mw.getLogsDir()
-    os.system('rm -rf ' + log_file + '/*')
+    # 直接删除目录内容, 避免拼进 shell 命令
+    if os.path.isdir(log_file):
+        for name in os.listdir(log_file):
+            target = os.path.join(log_file, name)
+            try:
+                if os.path.isdir(target) and not os.path.islink(target):
+                    shutil.rmtree(target)
+                else:
+                    os.remove(target)
+            except Exception:
+                pass
     mw.opWeb('reload')
     # os.system('kill -USR1 `cat ' + mw.getServerDir() +'/openresty/nginx/logs/nginx.pid`')
     mw.writeLog('文件管理', '网站日志已被清空!')

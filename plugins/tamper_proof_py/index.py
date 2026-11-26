@@ -49,30 +49,6 @@ class App:
         path = self.getPluginDir() + "/init.d/" + self.getPluginName() + ".tpl"
         return path
 
-    def getArgs(self):
-        args = sys.argv[2:]
-        tmp = {}
-        args_len = len(args)
-
-        if args_len == 1:
-            t = args[0].strip('{').strip('}')
-            if t.strip() == '':
-                tmp = []
-            else:
-                t = t.split(':')
-                tmp[t[0]] = t[1]
-        elif args_len > 1:
-            for i in range(len(args)):
-                t = args[i].split(':')
-                tmp[t[0]] = t[1]
-        return tmp
-
-    def checkArgs(self, data, ck=[]):
-        for i in range(len(ck)):
-            if not ck[i] in data:
-                return (False, mw.returnJson(False, '参数:(' + ck[i] + ')没有!'))
-        return (True, mw.returnJson(True, 'ok'))
-
     def getTotal(self, siteName=None, day=None):
         defaultTotal = {"total": 0, "delete": 0,
                         "create": 0, "modify": 0, "move": 0}
@@ -276,8 +252,8 @@ class App:
         if mw.isAppleSystem():
             return mw.returnJson(False, '仅支持Linux!')
 
-        args = self.getArgs()
-        check = self.checkArgs(args, ['serviceStatus'])
+        args = mw.getPluginArgs()
+        check = mw.checkPluginArgs(args, ['serviceStatus'])
         if not check[0]:
             return check[1]
 
@@ -309,8 +285,8 @@ class App:
         return 'ok'
 
     def set_site_status(self):
-        args = self.getArgs()
-        check = self.checkArgs(args, ['siteName'])
+        args = mw.getPluginArgs()
+        check = mw.checkPluginArgs(args, ['siteName'])
         if not check[0]:
             return check[1]
 
@@ -393,8 +369,8 @@ class App:
 
     def get_safe_logs(self):
 
-        args = self.getArgs()
-        check = self.checkArgs(args, ['siteName'])
+        args = mw.getPluginArgs()
+        check = mw.checkPluginArgs(args, ['siteName'])
         if not check[0]:
             return check[1]
 
@@ -420,8 +396,8 @@ class App:
         return mw.returnJson(True, 'ok', data)
 
     def get_site_find(self):
-        args = self.getArgs()
-        check = self.checkArgs(args, ['siteName'])
+        args = mw.getPluginArgs()
+        check = mw.checkPluginArgs(args, ['siteName'])
         if not check[0]:
             return check[1]
 
@@ -438,8 +414,8 @@ class App:
             os.remove(tip_file)
 
     def remove_protect_ext(self):
-        args = self.getArgs()
-        check = self.checkArgs(args, ['siteName', 'protectExt'])
+        args = mw.getPluginArgs()
+        check = mw.checkPluginArgs(args, ['siteName', 'protectExt'])
         if not check[0]:
             return check[1]
 
@@ -463,8 +439,8 @@ class App:
         return mw.returnJson(True, '删除成功!')
 
     def add_protect_ext(self):
-        args = self.getArgs()
-        check = self.checkArgs(args, ['siteName', 'protectExt'])
+        args = mw.getPluginArgs()
+        check = mw.checkPluginArgs(args, ['siteName', 'protectExt'])
         if not check[0]:
             return check[1]
 
@@ -489,8 +465,8 @@ class App:
         return mw.returnJson(True, '添加成功!')
 
     def add_excloud(self):
-        args = self.getArgs()
-        check = self.checkArgs(args, ['siteName', 'excludePath'])
+        args = mw.getPluginArgs()
+        check = mw.checkPluginArgs(args, ['siteName', 'excludePath'])
         if not check[0]:
             return check[1]
 
@@ -523,8 +499,8 @@ class App:
         return mw.returnJson(True, '添加成功!')
 
     def remove_excloud(self):
-        args = self.getArgs()
-        check = self.checkArgs(args, ['siteName', 'excludePath'])
+        args = mw.getPluginArgs()
+        check = mw.checkPluginArgs(args, ['siteName', 'excludePath'])
         if not check[0]:
             return check[1]
 
@@ -549,8 +525,8 @@ class App:
         return mw.returnJson(True, '删除成功!')
 
     def sim_test(self):
-        args = self.getArgs()
-        check = self.checkArgs(args, ['path'])
+        args = mw.getPluginArgs()
+        check = mw.checkPluginArgs(args, ['path'])
         if not check[0]:
             return check[1]
 
@@ -579,8 +555,8 @@ class App:
         return mw.returnJson(True, "拦截成功")
 
     def set_site_status_all(self):
-        args = self.getArgs()
-        check = self.checkArgs(args, ['siteNames', 'siteState'])
+        args = mw.getPluginArgs()
+        check = mw.checkPluginArgs(args, ['siteNames', 'siteState'])
         if not check[0]:
             return check[1]
 
@@ -597,7 +573,7 @@ class App:
 
     def get_index(self):
         self.syncSites()
-        args = self.getArgs()
+        args = mw.getPluginArgs()
         day = None
         if 'day' in args:
             day = args['day']

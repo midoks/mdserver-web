@@ -13,6 +13,7 @@ import sys
 import json
 import time
 import uuid
+import secrets
 import logging
 
 from datetime import timedelta
@@ -38,6 +39,7 @@ import core.mw as mw
 import config
 import utils.config as utils_config
 import thisdb
+import utils.csrf as csrf_mw
 
 # 初始化db
 from admin import setup
@@ -47,8 +49,11 @@ app = Flask(__name__, template_folder='templates/default')
 
 
 # curl --compressed -I "http://127.0.0.1:44010/" -H "Accept-Encoding: br" --write-out "%{json}"
-app.config["COMPRESS_ALGORITHM"] = ["br", "zstd", "gzip", "deflate"]
-app.config["COMPRESS_LEVEL"] = 9  # 最高压缩级别
+# 压缩算法优先级: gzip 最快, br 压缩率最高但慢, 大数据场景速度比压缩率更重要
+app.config["COMPRESS_ALGORITHM"] = ["gzip", "zstd", "br", "deflate"]
+# 压缩级别 4: brotli 默认推荐档, gzip 中档, 兼顾压缩率和速度
+# 之前设为 9 (最高级别), 1MB JSON 需要 500-700ms 压缩时间, 严重拖慢动态接口
+app.config["COMPRESS_LEVEL"] = 4
 app.config["COMPRESS_MIN_SIZE"] = 500  # 最小压缩大小
 Compress(app)
 
@@ -66,14 +71,24 @@ app.jinja_env.trim_blocks = True
 
 # session配置
 # app.secret_key = uuid.UUID(int=uuid.getnode()).hex[-12:]
-app.config['SECRET_KEY'] = uuid.UUID(int=uuid.getnode()).hex[-12:]
+secrets_token = thisdb.getOption('secret_key')
+if secrets_token and secrets_token != '':
+    app.config['SECRET_KEY'] = secrets_token
+else:
+    token_hex = secrets.token_hex(24)
+    app.config['SECRET_KEY'] = token_hex
+    thisdb.setOption('secret_key', token_hex)
 
 # app.config['sessions'] = dict()
 app.config['SESSION_PERMANENT'] = True
 app.config['SESSION_USE_SIGNER'] = True
 app.config['SESSION_KEY_PREFIX'] = 'MW_:'
 app.config['SESSION_COOKIE_NAME'] = "MW_VER_1"
-app.config['PERMANENT_SESSION_LIFETIME'] = timedelta(days=31)
+# 安全 Cookie: 防 XSS 偷 session, 防 CSRF 跨站携带
+app.config['SESSION_COOKIE_HTTPONLY'] = True
+app.config['SESSION_COOKIE_SAMESITE'] = 'Lax'
+# secure 根据面板 SSL 配置在 before_request 里动态补
+app.config['PERMANENT_SESSION_LIFETIME'] = timedelta(days=7)
 app.config['SEND_FILE_MAX_AGE_DEFAULT'] = 604800
 
 # db的配置
@@ -108,6 +123,24 @@ def sendAuthenticated():
 def requestCheck():
     request.start_time = time.time()
 
+    # 静态文件直接放行, 不做任何 DB 查询和 CSRF 处理 (性能优化)
+    # /plugins/file 是插件静态资源服务, 同样跳过
+    if request.path.startswith('/static/') or request.path == '/plugins/file':
+        return
+
+    # 动态决定 session cookie 是否 secure (面板开了 SSL 就强制 secure)
+    # 用 cache 缓存 5 分钟, 避免每个请求查 DB
+    ssl_open = cache.get('panel_ssl_open')
+    if ssl_open is None:
+        try:
+            panel_ssl = thisdb.getOptionByJson('panel_ssl', default={'open':False})
+            ssl_open = bool(panel_ssl.get('open'))
+            cache.set('panel_ssl_open', ssl_open, timeout=300)
+        except Exception:
+            ssl_open = False
+    if ssl_open:
+        app.config['SESSION_COOKIE_SECURE'] = True
+
     admin_close = thisdb.getOption('admin_close')
     if admin_close == 'yes':
         if not request.path.startswith('/close'):
@@ -119,7 +152,8 @@ def requestCheck():
             return
 
         auth = request.authorization
-        if request.path in ['/download', '/hook', '/down']:
+        if request.path in ['/download', '/hook', '/down',
+                            '/quick_login/ticket', '/quick_login/entry']:
             return
         if not auth:
             return sendAuthenticated()
@@ -129,6 +163,11 @@ def requestCheck():
         basic_pwd = mw.md5(auth.password.strip() + salt)
         if basic_user != basic_auth['basic_user'] or basic_pwd != basic_auth['basic_pwd']:
             return sendAuthenticated()
+
+    # CSRF 双提交校验 (POST/PUT/PATCH/DELETE 才校验)
+    csrf_resp = csrf_mw.apply_csrf_before_request()
+    if csrf_resp is not None:
+        return csrf_resp
 
     # domain_check = mw.checkDomainPanel()
     # if domain_check:
@@ -140,7 +179,41 @@ def requestCheck():
 def requestAfter(response):
     response.headers['soft'] = config.APP_NAME
     response.headers['mw-version'] = config.APP_VERSION
-    response.headers['X-Response-Time'] = round(time.time() - request.start_time, 4) 
+    if mw.isDebugMode():
+        response.headers['X-Response-Time'] = round(time.time() - request.start_time, 4)
+
+    # 静态文件: 只加最基本的安全头, 跳过 CSRF cookie 处理 (性能优化)
+    # /plugins/file 是插件静态资源, 同样跳过
+    if request.path.startswith('/static/') or request.path == '/plugins/file':
+        response.headers.setdefault('X-Content-Type-Options', 'nosniff')
+        return response
+
+    # 安全响应头
+    response.headers.setdefault('X-Frame-Options', 'SAMEORIGIN')
+    response.headers.setdefault('X-Content-Type-Options', 'nosniff')
+    response.headers.setdefault('Referrer-Policy', 'strict-origin-when-cross-origin')
+    response.headers.setdefault('Permissions-Policy', 'geolocation=(), microphone=(), camera=()')
+
+    # csrf_token cookie 金融级策略:
+    #   危险方法(POST/PUT/PATCH/DELETE)成功后轮换 token
+    #   安全方法(GET 等)复用现有 token + 滑动续期
+    #   session 里保留最近 N 个 token, 容忍并发 AJAX 的轮换竞态
+    #   只在必要时设置 cookie (cookie 不存在或 token 变化时), 避免静态资源重复写
+    method = (request.method or 'GET').upper()
+    existing_token = request.cookies.get(csrf_mw.COOKIE_NAME)
+
+    if method in ('POST', 'PUT', 'PATCH', 'DELETE'):
+        token = csrf_mw.generate_token()  # 危险请求后轮换
+        csrf_mw.push_token(token)
+        csrf_mw.set_csrf_cookie(response, token)
+    elif not existing_token:
+        token = csrf_mw.generate_token()  # 首次请求
+        csrf_mw.push_token(token)
+        csrf_mw.set_csrf_cookie(response, token)
+    else:
+        # 安全请求且 cookie 已存在: 复用 token, 不重新设置 cookie (减少响应头)
+        csrf_mw.push_token(existing_token)
+
     return response
 
 

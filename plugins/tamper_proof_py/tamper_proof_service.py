@@ -201,9 +201,9 @@ class MyEventHandler(pyinotify.ProcessEvent):
             if os.path.exists(event.pathname):
                 try:
                     src_path = os.path.dirname(event.pathname)
-                    os.system("chattr -a {}".format(src_path))
+                    os.system("chattr -a " + mw.quote(src_path))
                     os.remove(event.pathname)
-                    os.system("chattr +a {}".format(src_path))
+                    os.system("chattr +a " + mw.quote(src_path))
                     self.write_LOG('create', siteInfo[
                                    'siteName'], event.pathname, datetime.datetime.now())
                 except:
@@ -402,7 +402,7 @@ class MyEventHandler(pyinotify.ProcessEvent):
         os.chdir(path)
         useriniPath = path + '/.user.ini'
         if os.path.exists(useriniPath):
-            os.system('chattr +i ' + useriniPath)
+            os.system('chattr +i ' + mw.quote(useriniPath))
         for p1 in os.listdir(path):
             try:
                 npath = path + '/' + p1
@@ -410,7 +410,7 @@ class MyEventHandler(pyinotify.ProcessEvent):
                     continue
                 useriniPath = npath + '/.user.ini'
                 if os.path.exists(useriniPath):
-                    os.system('chattr +i ' + useriniPath)
+                    os.system('chattr +i ' + mw.quote(useriniPath))
                 if up < 3:
                     self.set_user_ini(npath, up + 1)
             except:
@@ -418,8 +418,8 @@ class MyEventHandler(pyinotify.ProcessEvent):
         return True
 
     def unlock(self, path):
-        os.system('chattr -R -i {} &> /dev/null'.format(path))
-        os.system('chattr -R -a {} &> /dev/null'.format(path))
+        os.system('chattr -R -i ' + mw.quote(path) + ' &> /dev/null')
+        os.system('chattr -R -a ' + mw.quote(path) + ' &> /dev/null')
         self.set_user_ini(path)
 
     def close(self, close_reload=False):
@@ -438,7 +438,7 @@ class MyEventHandler(pyinotify.ProcessEvent):
             if sys.version_info[0] == 2:
                 print("【{}】|-Unlock website[{}]".format(mw.formatDate(), siteInfo['siteName'])),
             else:
-                os.system("echo -e '{}|-Unlock website[{}]\c'".format(mw.formatDate(), siteInfo['siteName']))
+                print("{}|-Unlock website[{}]".format(mw.formatDate(), siteInfo['siteName']), end='')
                 #print("【{}】|-解锁网站[{}]".format(mw.format_date(),siteInfo['siteName']),end=" ")
             self.unlock(siteInfo['path'])
             if os.path.exists(tip):
@@ -506,7 +506,7 @@ def run():
         if sys.version_info[0] == 2:
             print("{}|-website[{}]".format(mw.formatDate(),siteInfo['siteName'])),
         else:
-            os.system("echo -e '{}|-website[{}]\c'".format(mw.formatDate(), siteInfo['siteName']))
+            print("{}|-website[{}]".format(mw.formatDate(), siteInfo['siteName']), end='')
             # print("【{}】|-网站[{}]".format(public.format_date(),siteInfo['siteName']),end=" ")
         mw.writeFile(speed_file, "Processing website[{}]please wait a moment...".format(
             siteInfo['siteName']))

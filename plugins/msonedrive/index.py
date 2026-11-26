@@ -63,32 +63,6 @@ msodc = msodclient(getPluginDir(), getServerDir())
 msodc.setDebug(False)
 
 
-def getArgs():
-    args = sys.argv[2:]
-    tmp = {}
-    args_len = len(args)
-    if args_len == 1:
-        t = args[0].strip('{').strip('}')
-        if t.strip() == '':
-            tmp = []
-        else:
-            t = t.split(':', 1)
-            tmp[t[0]] = t[1]
-        tmp[t[0]] = t[1]
-    elif args_len > 1:
-        for i in range(len(args)):
-            t = args[i].split(':', 1)
-            tmp[t[0]] = t[1]
-    return tmp
-
-
-def checkArgs(data, ck=[]):
-    for i in range(len(ck)):
-        if not ck[i] in data:
-            return (False, mw.returnJson(False, '参数:(' + ck[i] + ')没有!'))
-    return (True, mw.returnJson(True, 'ok'))
-
-
 def status():
     return 'start'
 
@@ -108,8 +82,8 @@ def getConf():
 
 
 def setAuthUrl():
-    args = getArgs()
-    data = checkArgs(args, ['url'])
+    args = mw.getPluginArgs()
+    data = mw.checkPluginArgs(args, ['url'])
     if not data[0]:
         return data[1]
 
@@ -144,8 +118,8 @@ def getList():
     if not os.path.exists(cfg):
         return mw.returnJson(False, "未配置,请点击`授权`", [])
 
-    args = getArgs()
-    data = checkArgs(args, ['path'])
+    args = mw.getPluginArgs()
+    data = mw.checkPluginArgs(args, ['path'])
     if not data[0]:
         return data[1]
 
@@ -161,8 +135,8 @@ def createDir():
     if not os.path.exists(cfg):
         return mw.returnJson(False, "未配置OneDrive,请点击`授权`", [])
 
-    args = getArgs()
-    data = checkArgs(args, ['path', 'name'])
+    args = mw.getPluginArgs()
+    data = mw.checkPluginArgs(args, ['path', 'name'])
     if not data[0]:
         return data[1]
 
@@ -174,8 +148,8 @@ def createDir():
 
 
 def deleteDir():
-    args = getArgs()
-    data = checkArgs(args, ['dir_name', 'path'])
+    args = mw.getPluginArgs()
+    data = mw.checkPluginArgs(args, ['dir_name', 'path'])
     if not data[0]:
         return data[1]
 
@@ -188,8 +162,8 @@ def deleteDir():
 
 
 def deleteFile():
-    args = getArgs()
-    data = checkArgs(args, ['path', 'filename'])
+    args = mw.getPluginArgs()
+    data = mw.checkPluginArgs(args, ['path', 'filename'])
     if not data[0]:
         return data[1]
 
@@ -272,7 +246,8 @@ def backupAllFunc(stype):
         name = os.path.basename(name)
 
     # print("cmd:", cmd)
-    os.system(cmd)
+    subprocess.run(cmd.split(),
+                   stdout=subprocess.PIPE, stderr=subprocess.PIPE)
 
     # 开始执行上传信息.
     if stype.find('database_') > -1:
