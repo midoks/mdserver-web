@@ -29,6 +29,32 @@ import shutil
 
 from random import Random
 
+
+def quote(value):
+    """shell 参数转义, 插件统一使用, 避免拼接命令时被注入"""
+    return shlex.quote(str(value))
+
+
+# 权限位与属主参数校验: 只允许合法值, 防止参数被拼进 shell 命令
+def isValidAccessMode(access):
+    return re.fullmatch(r'[0-7]{3,4}', access or '') is not None
+
+
+def isValidUserName(user):
+    # 允许 Debian-exim、user.name 等真实系统用户名, 但禁止空白与 shell 元字符
+    return re.fullmatch(r'[A-Za-z0-9_][A-Za-z0-9_.-]{0,63}', user or '') is not None
+
+
+def sqlValue(value):
+    """生成 SQL 字符串字面量(含单引号), 用于无法参数化的标识符/账号等位置"""
+    return "'" + str(value).replace('\\', '\\\\').replace("'", "''") + "'"
+
+
+def sqlIdent(value):
+    """生成 MySQL 反引号标识符, 内部反引号加倍转义"""
+    return "`" + str(value).replace("`", "``") + "`"
+
+
 def execShell(cmdstring, cwd=None, timeout=None, shell=True):
 
     if shell:
