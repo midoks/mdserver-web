@@ -37,6 +37,16 @@ if os.path.exists(web_dir):
 
 import core.mw as mw
 
+
+def _dq(value):
+    """在 bash -c "..." 双引号上下文内安全嵌入动态值."""
+    return mw.quote(value).replace('\\', '\\\\').replace('"', '\\"').replace('$', '\\$').replace('`', '\\`')
+
+
+def _pwdq(value):
+    """PGPASSWORD='...' 位于 bash -c "..." 内, 同时适配外层双引号与内层单引号."""
+    return str(value).replace('\\', '\\\\').replace('"', '\\"').replace('$', '\\$').replace('`', '\\`').replace("'", "'\\''")
+
 # 全局调试开关: 0=简洁 (默认), 1=详细 (脱敏密码), 2=详细 + 明文密码
 DEBUG = int(os.environ.get('BACKUP_DEBUG', '0'))
 
@@ -125,7 +135,7 @@ def _maskPwd(cmd, pwd):
     """把命令里的 PGPASSWORD='xxx' 换成 PGPASSWORD='***', 避免日志泄露"""
     if DEBUG >= 2:
         return cmd
-    safe = pwd.replace("'", "'\\''")
+    safe = _pwdq(pwd)
     return cmd.replace("PGPASSWORD='%s'" % safe, "PGPASSWORD='***'")
 
 
@@ -182,19 +192,19 @@ class backupTools:
             dump_opts += ' --serializable-deferrable'
 
         if table_name:
-            dump_args = '{} -t {} {}'.format(dump_opts, table_name, name)
+            dump_args = '{} -t {} {}'.format(dump_opts, _dq(table_name), _dq(name))
         else:
-            dump_args = '{} {}'.format(dump_opts, name)
+            dump_args = '{} {}'.format(dump_opts, _dq(name))
 
         # --- shell 命令 ---
-        safe_pwd = pg_pwd.replace("'", "'\\''")
+        safe_pwd = _pwdq(pg_pwd)
         pg_dump_inner = '{} {} -U postgres -h {} -p {} 2>>{}'.format(
-            pg_dump, dump_args, socket_dir, port, pg_dump_stderr)
+            pg_dump, dump_args, _dq(socket_dir), _dq(port), _dq(pg_dump_stderr))
 
-        cmd = "bash -c \"set -o pipefail && PGPASSWORD='{}' {} | {} > \\\"{}\\\"; echo \\$? > {}\"".format(
-            safe_pwd, pg_dump_inner, compressor_cmd, filename, exit_code_file)
+        cmd = "bash -c \"set -o pipefail && PGPASSWORD='{}' {} | {} > {}; echo \\$? > {}\"".format(
+            safe_pwd, pg_dump_inner, compressor_cmd, _dq(filename), _dq(exit_code_file))
 
-        return cmd, safe_pwd, dump_opts
+        return cmd, pg_pwd, dump_opts
 
     def backupDatabase(self, params, count):
         params_args = params.split("@")
@@ -367,7 +377,10 @@ class backupTools:
             print("  保留最新 %s 份, 清理 %d 份过期:" % (count, num_to_del))
             for backup in backups:
                 full = backup_path + "/" + backup
-                mw.execShell("rm -f " + full)
+                try:
+                    os.remove(full)
+                except OSError:
+                    pass
                 print("    - %s" % backup)
                 num_to_del -= 1
                 if num_to_del < 1:

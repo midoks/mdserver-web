@@ -3,6 +3,7 @@
 import sys
 import io
 import os
+import shutil
 import time
 import re
 import json
@@ -1440,7 +1441,7 @@ def setDbBackup():
         return data[1]
 
     head = "cd "+mw.getPanelDir()
-    cmd = head +' && . bin/activate &&  python3 plugins/mongodb/scripts/backup.py database ' + args['name'] + ' 3'
+    cmd = head +' && . bin/activate &&  python3 plugins/mongodb/scripts/backup.py database ' + mw.quote(args['name']) + ' 3'
     # print(cmd)
     os.system(cmd)
     return mw.returnJson(True, 'ok')
@@ -1508,22 +1509,22 @@ def importDbExternal():
     mg_root = pSqliteDb('config').where('id=?', (1,)).getField('mg_root')
     uoption = ''
     if auth != 'disabled':
-        uoption =' --authenticationDatabase admin -u root -p '+mg_root
+        uoption =' --authenticationDatabase admin -u root -p '+mw.quote(mg_root)
 
     file_dir = import_dir+name
     if not os.path.exists(file_dir):
-        mw.execShell("mkdir -p "+file_dir)
+        mw.execShell("mkdir -p "+mw.quote(file_dir))
 
     file_tgz = import_dir+file
     if os.path.exists(file_tgz):
-        cmd = 'cd ' + file_dir + ' && tar -xzvf ' + file_tgz + " -C "+file_dir
+        cmd = 'cd ' + mw.quote(file_dir) + ' && tar -xzvf ' + mw.quote(file_tgz) + " -C " + mw.quote(file_dir)
         # print(cmd)
         r = mw.execShell(cmd)
         # print(r)
         bson_list = getListBson(name)
         # print(bson_list)
         for x in bson_list:
-            cmd = mongoToolsBin('mongorestore') + " "+uoption+" --port "+str(port)+" --dir "+file_dir+'/'+x
+            cmd = mongoToolsBin('mongorestore') + " "+uoption+" --port "+str(port)+" --dir "+mw.quote(file_dir + '/' + x)
             # print(cmd)
             rdata = mw.execShell(cmd)
             # print(data)
@@ -1532,8 +1533,7 @@ def importDbExternal():
 
     # 删除文件
     if os.path.exists(file_dir):
-        del_cmd = "rm -rf "+file_dir
-        mw.execShell(del_cmd)
+        shutil.rmtree(file_dir, ignore_errors=True)
 
     return mw.returnJson(True, 'ok')
 
@@ -1547,7 +1547,7 @@ def importDbExternalProgress():
     name = args['name']
 
     cmd = 'cd '+mw.getServerDir()+'/mdserver-web && . bin/activate && '
-    cmd += 'python3 '+mw.getServerDir()+'/mdserver-web/plugins/mongodb/index.py import_db_external_progress_bar  {"file":"'+file+'","name":"'+name+'"}'
+    cmd += 'python3 '+mw.getServerDir()+'/mdserver-web/plugins/mongodb/index.py import_db_external_progress_bar  ' + mw.quote('{"file":"'+file+'","name":"'+name+'"}')
     return mw.returnJson(True, 'ok',cmd)
 
 def importDbExternalProgressBar():
@@ -1573,22 +1573,22 @@ def importDbExternalProgressBar():
 
     file_dir = import_dir+name
     if not os.path.exists(file_dir):
-        mw.execShell("mkdir -p "+file_dir)
+        mw.execShell("mkdir -p "+mw.quote(file_dir))
 
     auth = getConfAuth()
     mg_root = pSqliteDb('config').where('id=?', (1,)).getField('mg_root')
     uoption = ''
     if auth != 'disabled':
-        uoption =' --authenticationDatabase admin -u root -p '+mg_root
+        uoption =' --authenticationDatabase admin -u root -p '+mw.quote(mg_root)
 
     file_tgz = import_dir+file
     if os.path.exists(file_tgz):
-        cmd = 'cd ' + file_dir + ' && tar -xzvf ' + file_tgz + " -C "+file_dir
+        cmd = 'cd ' + mw.quote(file_dir) + ' && tar -xzvf ' + mw.quote(file_tgz) + " -C " + mw.quote(file_dir)
         mw.execShell(cmd)
         bson_list = getListBson(name)
         for x in bson_list:
             # mehotd 1
-            cmd = mongoToolsBin('mongorestore') + " "+uoption+" --port "+str(port)+" --dir "+file_dir+'/'+x
+            cmd = mongoToolsBin('mongorestore') + " "+uoption+" --port "+str(port)+" --dir "+mw.quote(file_dir + '/' + x)
             os.system(cmd)
             # method2
             # cmd = mongoToolsBin('mongorestore') + " "+uoption+" --port "+str(port) + " --archive  --db "+name + " --collection " + x.strip(".bson")
@@ -1597,8 +1597,7 @@ def importDbExternalProgressBar():
             # os.system(mysql_cmd_progress_bar)
 
     if os.path.exists(file_dir):
-        del_cmd = "rm -rf "+file_dir
-        mw.execShell(del_cmd)
+        shutil.rmtree(file_dir, ignore_errors=True)
     return ""
 
 def importDbBackup():
@@ -1615,11 +1614,11 @@ def importDbBackup():
     file_dir = mw.getBackupDir() + '/database/' + file.replace('.tar.gz','')
 
     if not os.path.exists(file_dir):
-        mw.execShell("mkdir -p "+file_dir)
+        mw.execShell("mkdir -p "+mw.quote(file_dir))
 
     # print(os.path.exists(file_tgz))
     if os.path.exists(file_tgz):
-        cmd = 'cd ' + mw.getBackupDir() + '/database && tar -xzvf ' + file + " -C "+file_dir
+        cmd = 'cd ' + mw.getBackupDir() + '/database && tar -xzvf ' + mw.quote(file) + " -C " + mw.quote(file_dir)
         # print(cmd)
         mw.execShell(cmd)
 
@@ -1627,15 +1626,14 @@ def importDbBackup():
     mg_root = pSqliteDb('config').where('id=?', (1,)).getField('mg_root')
     uoption = ''
     if auth != 'disabled':
-        uoption =' -u root -p '+mg_root
+        uoption =' -u root -p '+mw.quote(mg_root)
 
-    cmd = mongoToolsBin('mongorestore') + " "+uoption+" --port "+str(port)+" --dir "+file_dir
+    cmd = mongoToolsBin('mongorestore') + " "+uoption+" --port "+str(port)+" --dir "+mw.quote(file_dir)
     # print(cmd)
     mw.execShell(cmd)
     # 删除文件
     if os.path.exists(file_dir):
-        del_cmd = "rm -rf "+file_dir
-        mw.execShell(del_cmd)
+        shutil.rmtree(file_dir, ignore_errors=True)
 
     return mw.returnJson(True, 'ok')
 
@@ -1649,7 +1647,7 @@ def importDbBackupProgress():
     name = args['name']
 
     cmd = 'cd '+mw.getServerDir()+'/mdserver-web && . bin/activate && '
-    cmd += 'python3 '+mw.getServerDir()+'/mdserver-web/plugins/mongodb/index.py import_db_backup_progress_bar {"file":"'+file+'","name":"'+name+'"}'
+    cmd += 'python3 '+mw.getServerDir()+'/mdserver-web/plugins/mongodb/index.py import_db_backup_progress_bar ' + mw.quote('{"file":"'+file+'","name":"'+name+'"}')
     return mw.returnJson(True, 'ok',cmd)
     # return mw.returnJson(True, 'ok')
 
@@ -1676,27 +1674,26 @@ def importDbBackupProgressBar():
 
     file_dir = import_dir+name
     if not os.path.exists(file_dir):
-        mw.execShell("mkdir -p "+file_dir)
+        mw.execShell("mkdir -p "+mw.quote(file_dir))
 
     auth = getConfAuth()
     mg_root = pSqliteDb('config').where('id=?', (1,)).getField('mg_root')
     uoption = ''
     if auth != 'disabled':
-        uoption =' --authenticationDatabase admin -u root -p '+mg_root
+        uoption =' --authenticationDatabase admin -u root -p '+mw.quote(mg_root)
 
     file_tgz = import_dir+file
     if os.path.exists(file_tgz):
-        cmd = 'cd ' + file_dir + ' && tar -xzvf ' + file_tgz + " -C "+file_dir
+        cmd = 'cd ' + mw.quote(file_dir) + ' && tar -xzvf ' + mw.quote(file_tgz) + " -C " + mw.quote(file_dir)
         mw.execShell(cmd)
         bson_list = getListBsonByDatabase(name)
         for x in bson_list:
             # mehotd 1
-            cmd = mongoToolsBin('mongorestore') + " "+uoption+" --port "+str(port)+" --dir "+file_dir+'/'+x
+            cmd = mongoToolsBin('mongorestore') + " "+uoption+" --port "+str(port)+" --dir "+mw.quote(file_dir + '/' + x)
             os.system(cmd)
 
     if os.path.exists(file_dir):
-        del_cmd = "rm -rf "+file_dir
-        mw.execShell(del_cmd)
+        shutil.rmtree(file_dir, ignore_errors=True)
     return ""
 
 def testData():
@@ -1939,7 +1936,7 @@ def closeSlowlog():
 def findSlowlogCmd():
     cfg = getConfigData()
     log_file = cfg['systemLog']['path']
-    cmd = "cat "+log_file + "|grep 'Slow query'"
+    cmd = "cat "+mw.quote(log_file) + "|grep 'Slow query'"
     return mw.returnJson(True, 'ok', cmd)
 
 
