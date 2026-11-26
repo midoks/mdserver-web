@@ -3,8 +3,10 @@
 import sys
 import io
 import os
+import re
 import time
 import shutil
+import subprocess
 
 web_dir = os.getcwd() + "/web"
 if os.path.exists(web_dir):
@@ -231,27 +233,32 @@ def pftpUser():
     return 'www'
 
 
+def _runPw(args, password):
+    """用参数列表 + stdin 调用 pure-pw, 密码不经过 shell"""
+    cmd = [getServerDir() + '/bin/pure-pw'] + args
+    p = subprocess.Popen(cmd, stdin=subprocess.PIPE,
+                         stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+    out, err = p.communicate((password + '\n' + password + '\n').encode('utf-8'))
+    return out.decode('utf-8', 'replace'), err.decode('utf-8', 'replace')
+
 def pftpAdd(username, password, path):
     user = pftpUser()
 
     if not os.path.exists(path):
-        os.makedirs(path)
-        if mw.isAppleSystem():
-            # pass
-            os.system('chown ' + user + '.staff ' + path)
-        else:
-            os.system('chown www.www ' + path)
+        os.makedirs(path, exist_ok=True)
+        try:
+            if mw.isAppleSystem():
+                shutil.chown(path, user, 'staff')
+            else:
+                shutil.chown(path, 'www', 'www')
+        except Exception:
+            pass
 
-    cmd = getServerDir() + '/bin/pure-pw useradd ' + username + ' -u ' + user + ' -d ' + \
-        path + '<<EOF \n' + password + '\n' + password + '\nEOF'
-    return mw.execShell(cmd)
+    return _runPw(['useradd', username, '-u', user, '-d', path], password)
 
 
 def pftpMod(username, password):
-    user = pftpUser()
-    cmd = getServerDir() + '/bin/pure-pw passwd ' + username + \
-        '<<EOF \n' + password + '\n' + password + '\nEOF'
-    return mw.execShell(cmd)
+    return _runPw(['passwd', username], password)
 
 
 def pftpStop(username):
@@ -359,8 +366,8 @@ def delFtp():
     if not data[0]:
         return data[1]
 
-    mw.execShell(getServerDir() +
-                 '/bin/pure-pw userdel ' + args['username'])
+    subprocess.run([getServerDir() + '/bin/pure-pw', 'userdel', args['username']],
+                   stdout=subprocess.PIPE, stderr=subprocess.PIPE)
     pftpReload()
     conn = pftpDB()
     conn.where("id=?", (args['id'],)).delete()
