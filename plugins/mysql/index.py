@@ -339,14 +339,31 @@ def getPidFile():
     return tmp.groups()[0].strip()
 
 
-def binLog(version = ''):
+def getBinlogSize(version=''):
+    args = getArgs()
+    conf = getConf()
+    path = getDataDir()
+    dsize = 0
+
+    con = mw.readFile(conf)
+    binlog_status = False
+    if con.find('#log-bin=mysql-bin') == -1:
+        binlog_status = True
+
+    for n in os.listdir(path):
+        if len(n) < 9:
+            continue
+        if n[0:9] == 'mysql-bin':
+            dsize += os.path.getsize(path + '/' + n)
+    return mw.returnJson(binlog_status, dsize)
+
+
+
+def setBinlog(version = ''):
     args = getArgs()
     conf = getConf()
     con = mw.readFile(conf)
-
     if con.find('#log-bin=mysql-bin') != -1:
-        if 'status' in args:
-            return mw.returnJson(False, '0')
         con = con.replace('#log-bin=mysql-bin', 'log-bin=mysql-bin')
         con = con.replace('#binlog_format=mixed', 'binlog_format=mixed')
 
@@ -358,15 +375,6 @@ def binLog(version = ''):
         mw.execShell('sync')
         restart(version)
     else:
-        path = getDataDir()
-        if 'status' in args:
-            dsize = 0
-            for n in os.listdir(path):
-                if len(n) < 9:
-                    continue
-                if n[0:9] == 'mysql-bin':
-                    dsize += os.path.getsize(path + '/' + n)
-            return mw.returnJson(True, dsize)
         con = con.replace('log-bin=mysql-bin', '#log-bin=mysql-bin')
         con = con.replace('binlog_format=mixed', '#binlog_format=mixed')
 
@@ -379,7 +387,6 @@ def binLog(version = ''):
         restart(version)
         mw.execShell('rm -f ' + path + '/mysql-bin.*')
         mw.execShell('rm -f ' + path + '/binlog.*')
-
     
     return mw.returnJson(True, '设置成功!')
 
@@ -4333,11 +4340,13 @@ if __name__ == "__main__":
         print(setDbStatus(version))
     elif func == 'conf':
         print(getConf())
-    elif func == 'bin_log':
-        print(binLog(version))
+    elif func == 'set_binlog':
+        print(setBinlog(version))
+    elif func == 'get_binlog_size':
+        print(getBinlogSize(version))
     elif func == 'binlog_list':
         print(binLogList())
-    elif func == 'clean_bin_log':
+    elif func == 'clean_binlog':
         print(cleanBinLog())
     elif func == 'error_log':
         print(getErrorLog())
