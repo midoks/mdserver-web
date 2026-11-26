@@ -66,6 +66,7 @@ def toUseAddtime(data):
 # 监控图表最多返回点数, 超过则按比例采样
 # 既减少 Python 字典构造开销, 也避免前端 echarts 渲染上万点卡顿
 _MONITOR_MAX_ROWS = 2000
+_MONITOR_MAX_ROWS_OPEN = False
 
 def _queryMonitorTable(table, fields, start, end):
     """
@@ -86,15 +87,16 @@ def _queryMonitorTable(table, fields, start, end):
         # 用 cursor.description 构造列名, 兼容 fields 里任意字段
         cols = [d[0] for d in cursor.description]
         rows = cursor.fetchall()
-        return [dict(zip(cols, row)) for row in rows]
+        if not _MONITOR_MAX_ROWS_OPEN:
+            return [dict(zip(cols, row)) for row in rows]
         # 采样: 超过上限时按比例抽稀, 保证首末点不丢
-        # if len(rows) > _MONITOR_MAX_ROWS:
-        #     step = len(rows) // _MONITOR_MAX_ROWS + 1
-        #     sampled = rows[::step]
-        #     if rows[-1] is not sampled[-1]:
-        #         sampled.append(rows[-1])
-        #     rows = sampled
-        # return [dict(zip(cols, row)) for row in rows]
+        if len(rows) > _MONITOR_MAX_ROWS:
+            step = len(rows) // _MONITOR_MAX_ROWS + 1
+            sampled = rows[::step]
+            if rows[-1] is not sampled[-1]:
+                sampled.append(rows[-1])
+            rows = sampled
+        return [dict(zip(cols, row)) for row in rows]
     finally:
         conn.close()
 
