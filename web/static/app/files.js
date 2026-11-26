@@ -1093,12 +1093,35 @@ function allDeleteFileSub(data,path){
     });
 }
 
-//重载文件列表
+//重载文件列表(压缩/解压后台任务时使用)
+//单例模式: 避免多次调用启动多个定时器; 页面隐藏时跳过; 没有进行中的任务时自动停止
+var _reloadFilesTimer = null;
 function reloadFiles(){
-    setInterval(function(){
-        var path = $("#DirPathPlace input").val();
-        getFiles(path);
-    },3000);
+    if (_reloadFilesTimer) {
+        return;  // 已在轮询中, 不重复启动
+    }
+    var maxRounds = 60;  // 最多轮询 3 分钟, 防止永不停止
+    var rounds = 0;
+    (function poll(){
+        rounds++;
+        if (rounds > maxRounds) {
+            _reloadFilesTimer = null;
+            return;
+        }
+        if (!document.hidden) {
+            var path = $("#DirPathPlace input").val();
+            getFiles(path);
+        }
+        _reloadFilesTimer = setTimeout(poll, 3000);
+    })();
+}
+
+//停止文件列表轮询(供外部调用, 比如压缩完成检测)
+function stopReloadFiles(){
+    if (_reloadFilesTimer) {
+        clearTimeout(_reloadFilesTimer);
+        _reloadFilesTimer = null;
+    }
 }
             
 //下载文件
