@@ -1050,9 +1050,18 @@ function getTaskCount() {
 	},'json');
 }
 getTaskCount();
-setInterval(function(){
-	getTaskCount();
-},6000);
+// 用 setTimeout 链 + 完成回调替代 setInterval, 防止请求堆积; 页面隐藏时跳过
+(function taskCountPoll(){
+	if (!document.hidden) {
+		$.get("/task/count", '', function(data) {
+			$(".task").text(data.data);
+		},'json').always(function(){
+			setTimeout(taskCountPoll, 6000);
+		});
+	} else {
+		setTimeout(taskCountPoll, 6000);
+	}
+})();
 
 function setSelectChecked(c, d) {
 	var a = document.getElementById(c);
@@ -2923,7 +2932,20 @@ function pluginStandAloneLogs(_name, version, func, _args, line){
 /*** 其中功能,针对插件通过库使用 end ***/
 
 $(function() {
-	setInterval(function(){check_login();},6000);
+	// 登录态轮询: 用 setTimeout 链 + 完成回调替代 setInterval, 防堆积; 页面隐藏时跳过
+	(function checkLoginPoll(){
+		if (!document.hidden) {
+			$.post('/check_login', {}, function(rdata){
+				if(!rdata.status){
+					location.reload();
+				}
+			},'json').always(function(){
+				setTimeout(checkLoginPoll, 6000);
+			});
+		} else {
+			setTimeout(checkLoginPoll, 6000);
+		}
+	})();
 	autoHeight();
 });
 $(window).resize(function() {
