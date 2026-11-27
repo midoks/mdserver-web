@@ -178,7 +178,7 @@ function getSList(isdisplay) {
             sBody += '<tr>' +
                 '<td><span ' + titleClick + '>'+
                 '<img data-src="'+htmlEncode(icon_link)+'" src="/static/img/loading.gif">' + htmlEncode(plugin_title) + '</span></td>' +
-                '<td>' + htmlEncode(plugin.ps) + '</td>' +
+                '<td>' + plugin.ps + '</td>' +
                 '<td>' + softPath + '</td>' +
                 '<td>' + state + '</td>' +
                 '<td>' + indexshow + '</td>' +
