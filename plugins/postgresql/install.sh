@@ -62,6 +62,14 @@ if [ ! -d $curPath/versions/$VERSION ];then
 	exit 0
 fi
 
+if id postgres &> /dev/null ;then 
+    echo "postgres uid is `id -u postgres`"
+    echo "postgres shell is `grep "^postgres:" /etc/passwd |cut -d':' -f7 `"
+else
+    which groupadd && groupadd postgres
+	which useradd && useradd -g postgres postgres
+fi
+
 if [ "${action}" = "uninstall" ];then
 	if [ -f /usr/lib/systemd/system/postgresql.service ] || [ -f /lib/systemd/system/postgresql.service ];then
 		systemctl stop postgresql
