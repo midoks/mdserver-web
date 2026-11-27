@@ -537,10 +537,11 @@ def isSafeSavePath(path):
     except Exception:
         return False
 
-    # 禁止覆盖面板自身代码
-    panel_dir = os.path.realpath(mw.getPanelDir())
-    if real == panel_dir or real.startswith(panel_dir + os.sep):
-        return False
+    # 禁止覆盖面板自身代码，除开发模式
+    if not mw.isDebugMode():
+        panel_dir = os.path.realpath(mw.getPanelDir())
+        if real == panel_dir or real.startswith(panel_dir + os.sep):
+            return False
 
     # 系统敏感目录一律禁止写入
     deny_roots = (
