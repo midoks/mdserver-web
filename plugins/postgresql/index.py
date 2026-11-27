@@ -74,33 +74,6 @@ def getInitDFile():
         return '/tmp/' + getPluginName()
     return '/etc/init.d/' + getPluginName()
 
-
-def getArgs():
-    args = sys.argv[2:]
-
-    tmp = {}
-    args_len = len(args)
-
-    if args_len == 1:
-        t = args[0].strip().strip('{}').strip()
-        if t == '':
-            return tmp
-        arg_t = t.split(',')
-        for i in range(len(arg_t)):
-            kv = arg_t[i].split(':', 1)
-            if len(kv) < 2:
-                continue
-            tmp[kv[0].strip().strip('"\'')] = kv[1].strip().strip('"\'')
-    elif args_len > 1:
-        for i in range(len(args)):
-            kv = args[i].strip().strip('{}').split(':', 1)
-            if len(kv) < 2:
-                continue
-            tmp[kv[0].strip().strip('"\'')] = kv[1].strip().strip('"\'')
-
-    return tmp
-
-
 def getBackupDir():
     bk_path = mw.getBackupDir() + "/database/postgresql"
     if not os.path.isdir(bk_path):
@@ -188,7 +161,7 @@ def setHbaAccess(name, access, user=''):
 
 
 def readConfigTpl():
-    args = getArgs()
+    args = mw.getPluginArgs()
     data = mw.checkPluginArgs(args, ['file'])
     if not data[0]:
         return data[1]
@@ -609,7 +582,7 @@ def getPgPort():
 
 
 def setPgPort():
-    args = getArgs()
+    args = mw.getPluginArgs()
     data = mw.checkPluginArgs(args, ['port'])
     if not data[0]:
         return data[1]
@@ -1018,7 +991,8 @@ def pgSetDbStatus():
     保存pgsql性能调整信息
     '''
     names = [p[0] for p in PG_PERF_PARAMS]
-    args = getArgs()
+    args = mw.getPluginArgs()
+
     provided = [name for name in names if name in args]
     if not provided:
         return mw.returnJson(False, '没有需要保存的配置参数!')
@@ -1049,7 +1023,7 @@ def isPgError(msg):
     return None
 
 def setUserPwd(version=''):
-    args = getArgs()
+    args = mw.getPluginArgs()
     data = mw.checkPluginArgs(args, ['password', 'name'])
     if not data[0]:
         return data[1]
@@ -1089,7 +1063,7 @@ def getDbBackupListFunc(dbname=''):
 
 
 def setDbBackup():
-    args = getArgs()
+    args = mw.getPluginArgs()
     data = mw.checkPluginArgs(args, ['name'])
     if not data[0]:
         return data[1]
@@ -1200,7 +1174,7 @@ def setRootPwdForce(new_password, version=''):
     return False
 
 def setPostgresPwd(version=''):
-    args = getArgs()
+    args = mw.getPluginArgs()
     data = mw.checkPluginArgs(args, ['password'])
     if not data[0]:
         return data[1]
@@ -1230,7 +1204,7 @@ def setPostgresPwd(version=''):
 def importDbExternal():
     if isSlaveDb():
         return mw.returnJson(False, 'PG从库不能导入')
-    args = getArgs()
+    args = mw.getPluginArgs()
     data = mw.checkPluginArgs(args, ['file', 'name'])
     if not data[0]:
         return data[1]
@@ -1300,7 +1274,7 @@ def importDbExternal():
 def importDbExternalProgress():
     if isSlaveDb():
         return mw.returnJson(False, 'slave', 'PG从库不能导入')
-    args = getArgs()
+    args = mw.getPluginArgs()
     data = mw.checkPluginArgs(args, ['file', 'name'])
     if not data[0]:
         return data[1]
@@ -1316,7 +1290,7 @@ def importDbExternalProgressBar():
     if isSlaveDb():
         print("PG从库不能导入!")
         return
-    args = getArgs()
+    args = mw.getPluginArgs()
     data = mw.checkPluginArgs(args, ['file', 'name'])
     if not data[0]:
         return data[1]
@@ -1384,7 +1358,7 @@ def importDbBackupProgress():
     if isSlaveDb():
         return mw.returnJson(False, 'slave','PG从库不能导入')
 
-    args = getArgs()
+    args = mw.getPluginArgs()
     data = mw.checkPluginArgs(args, ['file', 'name'])
     if not data[0]:
         return data[1]
@@ -1401,7 +1375,7 @@ def importDbBackupProgressBar():
     if isSlaveDb():
         print("PG从库不能导入!")
         return
-    args = getArgs()
+    args = mw.getPluginArgs()
     data = mw.checkPluginArgs(args, ['file', 'name'])
     if not data[0]:
         return data[1]
@@ -1435,7 +1409,7 @@ def importDbBackupProgressBar():
     return ''
 
 def deleteDbBackup():
-    args = getArgs()
+    args = mw.getPluginArgs()
     data = mw.checkPluginArgs(args, ['filename'])
     if not data[0]:
         return data[1]
@@ -1446,7 +1420,7 @@ def deleteDbBackup():
 
 
 def getDbBackupList():
-    args = getArgs()
+    args = mw.getPluginArgs()
     data = mw.checkPluginArgs(args, ['name'])
     if not data[0]:
         return data[1]
@@ -1504,7 +1478,7 @@ def getDbBackupImportList():
     return mw.returnJson(True, 'ok', rdata)
 
 def getDbList():
-    args = getArgs()
+    args = mw.getPluginArgs()
     page = 1
     page_size = 10
     search = ''
@@ -1552,7 +1526,7 @@ def getDbList():
     return mw.getJson(data)
 
 def getTableList():
-    args = getArgs()
+    args = mw.getPluginArgs()
     db_name = ""
     if 'dbname' in args:
         db_name = args['dbname']
@@ -1611,7 +1585,7 @@ def addDb():
     if isSlaveDb():
         return mw.returnJson(False, '从库不能添加数据库!')
 
-    args = getArgs()
+    args = mw.getPluginArgs()
     data = mw.checkPluginArgs(args, ['password', 'name', 'db_user', 'dataAccess'])
     if not data[0]:
         return data[1]
@@ -1682,7 +1656,7 @@ def addDb():
 
 
 def delDb():
-    args = getArgs()
+    args = mw.getPluginArgs()
     data = mw.checkPluginArgs(args, ['id', 'name'])
     if not data[0]:
         return data[1]
@@ -1721,7 +1695,7 @@ def delDb():
 
 
 def setDbRw(version=''):
-    args = getArgs()
+    args = mw.getPluginArgs()
     data = mw.checkPluginArgs(args, ['username', 'id', 'rw'])
     if not data[0]:
         return data[1]
@@ -1753,7 +1727,7 @@ def setDbRw(version=''):
 
 
 def getDbAccess():
-    args = getArgs()
+    args = mw.getPluginArgs()
     data = mw.checkPluginArgs(args, ['name'])
     if not data[0]:
         return data[1]
@@ -1769,7 +1743,7 @@ def getDbAccess():
 
 
 def setDbAccess():
-    args = getArgs()
+    args = mw.getPluginArgs()
     data = mw.checkPluginArgs(args, ['name'])
     if not data[0]:
         return data[1]
@@ -1814,7 +1788,7 @@ def fixDbAccess(version):
 
 
 def getDbInfo():
-    args = getArgs()
+    args = mw.getPluginArgs()
     data = mw.checkPluginArgs(args, ['name'])
     if not data[0]:
         return data[1]
@@ -1900,7 +1874,7 @@ def pgBack():
     import subprocess
     import shutil
 
-    args = getArgs()
+    args = mw.getPluginArgs()
     data = mw.checkPluginArgs(args, ['name'])
     if not data[0]:
         return data[1]
@@ -2023,8 +1997,7 @@ def pgBack():
 
 
 def pgBackList():
-
-    args = getArgs()
+    args = mw.getPluginArgs()
     data = mw.checkPluginArgs(args, ['name'])
     if not data[0]:
         return data[1]
@@ -2053,7 +2026,7 @@ def pgBackList():
 def importDbBackup():
     if isSlaveDb():
         return mw.returnJson(False, 'PG从库不能导入')
-    args = getArgs()
+    args = mw.getPluginArgs()
     data = mw.checkPluginArgs(args, ['file', 'name'])
     if not data[0]:
         return data[1]
@@ -2085,7 +2058,7 @@ def importDbBackup():
 
 
 def deleteDbBackup():
-    args = getArgs()
+    args = mw.getPluginArgs()
     data = mw.checkPluginArgs(args, ['filename', 'path'])
     if not data[0]:
         return data[1]
@@ -2178,7 +2151,7 @@ def getSlaveList(version=''):
 
 
 def getSlaveSSHByIp(version=''):
-    args = getArgs()
+    args = mw.getPluginArgs()
     data = mw.checkPluginArgs(args, ['ip'])
     if not data[0]:
         return data[1]
@@ -2191,7 +2164,7 @@ def getSlaveSSHByIp(version=''):
 
 
 def getSlaveSSHList(version=''):
-    args = getArgs()
+    args = mw.getPluginArgs()
     data = mw.checkPluginArgs(args, ['page', 'page_size'])
     if not data[0]:
         return data[1]
@@ -2221,7 +2194,7 @@ def getSlaveSSHList(version=''):
 def addSlaveSSH(version=''):
     import base64
 
-    args = getArgs()
+    args = mw.getPluginArgs()
     data = mw.checkPluginArgs(args, ['ip'])
     if not data[0]:
         return data[1]
@@ -2252,7 +2225,7 @@ def addSlaveSSH(version=''):
 
 
 def delSlaveSSH(version=''):
-    args = getArgs()
+    args = mw.getPluginArgs()
     data = mw.checkPluginArgs(args, ['ip'])
     if not data[0]:
         return data[1]
@@ -2265,7 +2238,7 @@ def delSlaveSSH(version=''):
 
 
 def updateSlaveSSH(version=''):
-    args = getArgs()
+    args = mw.getPluginArgs()
     data = mw.checkPluginArgs(args, ['ip', 'id_rsa'])
     if not data[0]:
         return data[1]
@@ -2277,7 +2250,7 @@ def updateSlaveSSH(version=''):
     return mw.returnJson(True, 'ok')
 
 def getSlaveSyncUserByIp(version=''):
-    args = getArgs()
+    args = mw.getPluginArgs()
     data = mw.checkPluginArgs(args, ['ip'])
     if not data[0]:
         return data[1]
@@ -2292,7 +2265,7 @@ def getSlaveSyncUserByIp(version=''):
 def addSlaveSyncUser(version=''):
     import base64
 
-    args = getArgs()
+    args = mw.getPluginArgs()
     data = mw.checkPluginArgs(args, ['ip'])
     if not data[0]:
         return data[1]
@@ -2325,7 +2298,7 @@ def addSlaveSyncUser(version=''):
     return mw.returnJson(True, '设置成功!')
 
 def delSlaveSyncUser(version=''):
-    args = getArgs()
+    args = mw.getPluginArgs()
     data = mw.checkPluginArgs(args, ['ip'])
     if not data[0]:
         return data[1]
@@ -2337,7 +2310,7 @@ def delSlaveSyncUser(version=''):
     return mw.returnJson(True, '删除成功!')
 
 def getSlaveSyncUserList(version=''):
-    args = getArgs()
+    args = mw.getPluginArgs()
     data = mw.checkPluginArgs(args, ['page', 'page_size'])
     if not data[0]:
         return data[1]
@@ -2375,7 +2348,7 @@ def getSlaveSyncMode(version):
 
 
 def setSlaveSyncMode(version):
-    args = getArgs()
+    args = mw.getPluginArgs()
     data = mw.checkPluginArgs(args, ['mode'])
     if not data[0]:
         return data[1]
@@ -2425,7 +2398,7 @@ def getSlaveLink(version):
     return mw.returnJson(True, 'ok', data)
 
 def getMasterRepSlaveList(version=''):
-    args = getArgs()
+    args = mw.getPluginArgs()
     data = mw.checkPluginArgs(args, ['page', 'page_size'])
     if not data[0]:
         return data[1]
@@ -2452,7 +2425,7 @@ def getMasterRepSlaveList(version=''):
     return mw.getJson(data)
 
 def getMasterRepSlaveAccess(version=''):
-    args = getArgs()
+    args = mw.getPluginArgs()
     data = mw.checkPluginArgs(args, ['name'])
     if not data[0]:
         return data[1]
@@ -2463,7 +2436,7 @@ def getMasterRepSlaveAccess(version=''):
     return mw.returnJson(True, accept)
 
 def setMasterRepSlaveAccess(version=''):
-    args = getArgs()
+    args = mw.getPluginArgs()
     data = mw.checkPluginArgs(args, ['name'])
     if not data[0]:
         return data[1]
@@ -2484,7 +2457,7 @@ def setMasterRepSlaveAccess(version=''):
     return mw.returnJson(True, "设置成功")
 
 def addMasterRepSlaveUser(version=''):
-    args = getArgs()
+    args = mw.getPluginArgs()
     data = mw.checkPluginArgs(args, ['username', 'password', 'address'])
     if not data[0]:
         return data[1]
@@ -2532,7 +2505,7 @@ def addMasterRepSlaveUser(version=''):
 
 
 def delMasterRepSlaveUser(version=''):
-    args = getArgs()
+    args = mw.getPluginArgs()
     data = mw.checkPluginArgs(args, ['username'])
     if not data[0]:
         return data[1]
@@ -2557,7 +2530,7 @@ def delMasterRepSlaveUser(version=''):
     return mw.returnJson(True, '删除成功!')
 
 def getMasterRepSlaveUserCmd(version=''):
-    args = getArgs()
+    args = mw.getPluginArgs()
     data = mw.checkPluginArgs(args, ['username', 'db'])
     if not data[0]:
         return data[1]
@@ -2585,7 +2558,7 @@ def getMasterRepSlaveUserCmd(version=''):
     return mw.returnJson(True, 'ok!', data)
 
 def getMasterRepSlaveUserFullCmd(version=''):
-    args = getArgs()
+    args = mw.getPluginArgs()
     data = mw.checkPluginArgs(args, ['username', 'db'])
     if not data[0]:
         return data[1]

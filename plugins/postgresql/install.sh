@@ -3,7 +3,7 @@ PATH=/bin:/sbin:/usr/bin:/usr/sbin:/usr/local/bin:/usr/local/sbin:~/bin:/opt/hom
 export PATH
 
 # cd /Users/midoks/Desktop/mwdev/server/mdserver-web/plugins/postgresql && bash install.sh install 18
-# cd /www/server/mdserver-web/plugins/postgresql && bash install.sh install 16
+# cd /www/server/mdserver-web/plugins/postgresql && bash install.sh install 19
 # cd /www/server/mdserver-web && . bin/activate && python3 plugins/postgresql/index.py do_full_sync
 # cd /www/server/mdserver-web && . bin/activate && python3 plugins/postgresql/index.py reload
 # cd /www/server/mdserver-web && . bin/activate && python3 plugins/postgresql/index.py get_master_status {}
