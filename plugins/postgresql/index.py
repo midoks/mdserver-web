@@ -433,7 +433,7 @@ def initPgData():
     return True
 
 def initPgPwd():
-
+    openPgTrust()
     serverdir = getServerDir()
     pwd = mw.getRandomString(16)
 
@@ -455,6 +455,7 @@ def initPgPwd():
     # print(data)
 
     pSqliteDb('config').where('id=?', (1,)).save('pg_root', (pwd,))
+    closePgTrust()
     return True
 
 
