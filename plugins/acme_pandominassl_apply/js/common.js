@@ -167,9 +167,9 @@ function emailList(page, search){
         var list = '';
         for(i in rdata.data){
             list += '<tr>';
-            list +='<td><input value="'+rdata.data[i]['id']+'" class="check" onclick="checkSelect();" type="checkbox"></td>';
-            list += '<td>' + rdata.data[i]['addr'] +'</td>';
-            list += '<td>' + rdata.data[i]['remark'] +'</td>';
+            list +='<td><input value="'+htmlEncode(rdata.data[i]['id'])+'" class="check" onclick="checkSelect();" type="checkbox"></td>';
+            list += '<td>' + htmlEncode(rdata.data[i]['addr']) +'</td>';
+            list += '<td>' + htmlEncode(rdata.data[i]['remark']) +'</td>';
             list += '<td style="text-align:right">';
             list += '<a href="javascript:;" class="btlink" onclick="emailDel(\''+rdata.data[i]['id']+'\',\''+rdata.data[i]['addr']+'\')" title="删除">删除</a>' +
                     '</td>';
@@ -434,11 +434,11 @@ function dnsapiList(page, search){
         var list = '';
         for(i in rdata.data){
             list += '<tr>';
-            list +='<td><input value="'+rdata.data[i]['id']+'" class="check" onclick="checkSelect();" type="checkbox"></td>';
-            list += '<td>' + rdata.data[i]['name'] +'</td>';
-            list += '<td>' + getDnsapiTitle(rdata.data[i]['type']) +'</td>';
-            list += '<td>' + rdata.data[i]['val'].split('~').join("<br/>") +'</td>';
-            list += '<td>' + rdata.data[i]['remark'] +'</td>';
+            list +='<td><input value="'+htmlEncode(rdata.data[i]['id'])+'" class="check" onclick="checkSelect();" type="checkbox"></td>';
+            list += '<td>' + htmlEncode(rdata.data[i]['name']) +'</td>';
+            list += '<td>' + htmlEncode(getDnsapiTitle(rdata.data[i]['type'])) +'</td>';
+            list += '<td>' + rdata.data[i]['val'].split('~').map(function(v){return htmlEncode(v);}).join("<br/>") +'</td>';
+            list += '<td>' + htmlEncode(rdata.data[i]['remark']) +'</td>';
 
             list += '<td style="text-align:right">';
             list += '<a href="javascript:;" index="'+i+'" class="btlink edit" title="编辑">编辑</a> | ';
@@ -718,11 +718,11 @@ function domainList(page, search){
         var list = '';
         for(i in rdata.data){
             list += '<tr>';
-            list +='<td><input value="'+rdata.data[i]['id']+'" class="check" onclick="checkSelect();" type="checkbox"></td>';
-            list += '<td>' + rdata.data[i]['domain'] +'</td>';
-            list += '<td>' + rdata.data[i]['dnsapi_id_alias'] +'</td>';
-            list += '<td>' + rdata.data[i]['email'] +'</td>';
-            list += '<td>' + rdata.data[i]['remark'] +'</td>';
+            list +='<td><input value="'+htmlEncode(rdata.data[i]['id'])+'" class="check" onclick="checkSelect();" type="checkbox"></td>';
+            list += '<td>' + htmlEncode(rdata.data[i]['domain']) +'</td>';
+            list += '<td>' + htmlEncode(rdata.data[i]['dnsapi_id_alias']) +'</td>';
+            list += '<td>' + htmlEncode(rdata.data[i]['email']) +'</td>';
+            list += '<td>' + htmlEncode(rdata.data[i]['remark']) +'</td>';
 
             
 

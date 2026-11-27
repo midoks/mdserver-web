@@ -2,7 +2,7 @@
 PATH=/bin:/sbin:/usr/bin:/usr/sbin:/usr/local/bin:/usr/local/sbin:~/bin
 export PATH
 
-# cd /www/server/mdserver-web/plugins/gitea && bash install.sh upgrade 1.25.3
+# cd /www/server/mdserver-web/plugins/gitea && bash install.sh upgrade 28.4.0
 
 action=$1
 version=$2

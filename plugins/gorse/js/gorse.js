@@ -60,16 +60,16 @@ function gorseCommonFunc(){
         var info = rdata['data'];
         var con = '<p class="conf_p">\
             <span>用户名</span>\
-            <input class="bt-input-text mr5" type="text" value="' + info.dashboard_user_name + '">\
+            <input class="bt-input-text mr5" type="text" value="' + htmlEncode(info.dashboard_user_name) + '">\
         </p>';
 
         con += '<p class="conf_p">\
             <span>密码</span>\
-            <input class="bt-input-text mr5" type="text" value="' + info.dashboard_password  +'">\
+            <input class="bt-input-text mr5" type="text" value="' + htmlEncode(info.dashboard_password)  +'">\
         </p>';
         con += '<p class="conf_p">\
             <span>端口</span>\
-            <input class="bt-input-text mr5" type="text" value="' + info.http_port  +'">\
+            <input class="bt-input-text mr5" type="text" value="' + htmlEncode(info.http_port)  +'">\
         </p>';
 
         con += '<hr/><p class="conf_p" style="text-align:center;">\

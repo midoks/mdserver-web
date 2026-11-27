@@ -3,7 +3,7 @@ PATH=/bin:/sbin:/usr/bin:/usr/sbin:/usr/local/bin:/usr/local/sbin:~/bin:/opt/hom
 export PATH
 
 # cd /Users/midoks/Desktop/mwdev/server/mdserver-web/plugins/postgresql && bash install.sh install 18
-# cd /www/server/mdserver-web/plugins/postgresql && bash install.sh install 16
+# cd /www/server/mdserver-web/plugins/postgresql && bash install.sh install 19
 # cd /www/server/mdserver-web && . bin/activate && python3 plugins/postgresql/index.py do_full_sync
 # cd /www/server/mdserver-web && . bin/activate && python3 plugins/postgresql/index.py reload
 # cd /www/server/mdserver-web && . bin/activate && python3 plugins/postgresql/index.py get_master_status {}
@@ -45,13 +45,6 @@ type=$2
 
 VERSION=(${type//./ })
 
-pip install psycopg2-binary
-if [ -f ${rootPath}/bin/activate ];then
-	. ${rootPath}/bin/activate
-	pip install psycopg2-binary
-fi
-
-
 if [ "${2}" = "" ];then
 	echo '缺少安装脚本...'
 	exit 0
@@ -60,6 +53,14 @@ fi
 if [ ! -d $curPath/versions/$VERSION ];then
 	echo '缺少安装脚本2...'
 	exit 0
+fi
+
+if id postgres &> /dev/null ;then 
+    echo "postgres uid is `id -u postgres`"
+    echo "postgres shell is `grep "^postgres:" /etc/passwd |cut -d':' -f7 `"
+else
+    which groupadd && groupadd postgres
+	which useradd && useradd -g postgres postgres
 fi
 
 if [ "${action}" = "uninstall" ];then

@@ -116,19 +116,19 @@ function getCronData(page){
 					}
 				}
 
-				cbody += "<tr><td><input type='checkbox' onclick='checkSelect();' title='"+rdata.data[i].name+"' name='id' value='"+rdata.data[i].id+"'></td>\
-					<td>"+rdata.data[i].name+"</td>\
+				cbody += "<tr><td><input type='checkbox' onclick='checkSelect();' title='"+htmlEncode(rdata.data[i].name)+"' name='id' value='"+rdata.data[i].id+"'></td>\
+					<td>"+htmlEncode(rdata.data[i].name)+"</td>\
 					<td>"+status+"</td>\
-					<td>"+rdata.data[i].type+"</td>\
-					<td>"+rdata.data[i].cycle+"</td>\
+					<td>"+htmlEncode(rdata.data[i].type)+"</td>\
+					<td>"+htmlEncode(rdata.data[i].cycle)+"</td>\
 					<td>"+cron_save +"</td>\
-					<td>"+cron_backupto+"</td>\
-					<td>"+rdata.data[i].add_time+"</td>\
+					<td>"+htmlEncode(cron_backupto)+"</td>\
+					<td>"+htmlEncode(rdata.data[i].add_time)+"</td>\
 					<td>\
 						<a href=\"javascript:startTask("+rdata.data[i].id+");\" class='btlink start_task'>执行</a> | \
 						<a href=\"javascript:editTaskInfo('"+rdata.data[i].id+"');\" class='btlink'>编辑</a> | \
 						<a href=\"javascript:getLogs("+rdata.data[i].id+");\" class='btlink'>日志</a> | \
-						<a href=\"javascript:planDel("+rdata.data[i].id+" ,'"+rdata.data[i].name.replace('\\','\\\\').replace("'","\\'").replace('"','')+"');\" class='btlink'>删除</a>\
+						<a href=\"javascript:planDel("+rdata.data[i].id+" ,'"+jsEncode(rdata.data[i].name)+"');\" class='btlink'>删除</a>\
 					</td>\
 				</tr>";
 			}
@@ -757,25 +757,25 @@ function editTaskInfo(id){
 			create:function(callback){
 				if (obj.from['stype'].indexOf('database_')>-1){
 					name = obj.from['stype'].replace('database_','');
-					sTypeName = '备份数据库['+name+']';
-					sTypeDom += '<li><a role="menuitem"  href="javascript:;" value="'+ obj.from['stype'] +'">'+ sTypeName +'</a></li>';
+					sTypeName = '备份数据库['+htmlEncode(name)+']';
+					sTypeDom += '<li><a role="menuitem"  href="javascript:;" value="'+ htmlEncode(obj.from['stype']) +'">'+ sTypeName +'</a></li>';
 				} else {
 					for(var i = 0; i <obj['sTypeArray'].length; i++){
 						if(obj.from['stype'] == obj['sTypeArray'][i][0]){
 							sTypeName  = obj['sTypeArray'][i][1];
 						}
-						sTypeDom += '<li><a role="menuitem"  href="javascript:;" value="'+ obj['sTypeArray'][i][0] +'">'+ obj['sTypeArray'][i][1] +'</a></li>';
+						sTypeDom += '<li><a role="menuitem"  href="javascript:;" value="'+ htmlEncode(obj['sTypeArray'][i][0]) +'">'+ htmlEncode(obj['sTypeArray'][i][1]) +'</a></li>';
 					}
 				}
 
 				for(var i = 0; i <obj['cycleArray'].length; i++){
 					if(obj.from['type'] == obj['cycleArray'][i][0])  cycleName  = obj['cycleArray'][i][1];
-					cycleDom += '<li><a role="menuitem"  href="javascript:;" value="'+ obj['cycleArray'][i][0] +'">'+ obj['cycleArray'][i][1] +'</a></li>';
+					cycleDom += '<li><a role="menuitem"  href="javascript:;" value="'+ htmlEncode(obj['cycleArray'][i][0]) +'">'+ htmlEncode(obj['cycleArray'][i][1]) +'</a></li>';
 				}
 
 				for(var i = 0; i <obj['weekArray'].length; i++){
 					if(obj.from['week'] == obj['weekArray'][i][0])  weekName  = obj['weekArray'][i][1];
-					weekDom += '<li><a role="menuitem"  href="javascript:;" value="'+ obj['weekArray'][i][0] +'">'+ obj['weekArray'][i][1] +'</a></li>';
+					weekDom += '<li><a role="menuitem"  href="javascript:;" value="'+ htmlEncode(obj['weekArray'][i][0]) +'">'+ htmlEncode(obj['weekArray'][i][1]) +'</a></li>';
 				}
 
 				if(obj.from.stype == 'site' || obj.from.stype == 'database' || obj.from.stype == 'path' || obj.from.stype == 'logs' || obj.from['stype'].indexOf('database_')>-1){
@@ -789,13 +789,13 @@ function editTaskInfo(id){
 							if(obj.from['sname'] == obj['sNameArray'][i]['name']){
 								sNameName  = obj['sNameArray'][i]['ps'];
 							}
-							sNameDom += '<li><a role="menuitem"  href="javascript:;" value="'+ obj['sNameArray'][i]['name'] +'">'+ obj['sNameArray'][i]['ps'] +'</a></li>';
+							sNameDom += '<li><a role="menuitem"  href="javascript:;" value="'+ htmlEncode(obj['sNameArray'][i]['name']) +'">'+ htmlEncode(obj['sNameArray'][i]['ps']) +'</a></li>';
 						}
 						for(var i = 0; i <obj['backupsArray'].length; i++){
 							if(obj.from['backup_to'] == obj['backupsArray'][i]['name'])  {
 								backupsName  = obj['backupsArray'][i]['title'];
 							}
-							backupsDom += '<li><a role="menuitem"  href="javascript:;" value="'+ obj['backupsArray'][i]['name'] +'">'+ obj['backupsArray'][i]['title'] +'</a></li>';
+							backupsDom += '<li><a role="menuitem"  href="javascript:;" value="'+ htmlEncode(obj['backupsArray'][i]['name']) +'">'+ htmlEncode(obj['backupsArray'][i]['title']) +'</a></li>';
 						}
 						callback();
 					},'json');
@@ -820,7 +820,7 @@ function editTaskInfo(id){
 				tableOpt += '<div class="textname pull-left mr20">数据表</div>';
 				tableOpt += '<div class="dropdown pull-left mr20 check">\
 				 	<button disabled="disabled" class="btn btn-default dropdown-toggle sname" type="button" id="backdata_table" data-toggle="dropdown" style="width:auto">\
-						<b id="tname" val="'+table_val+'">'+table_name+'</b><span class="caret"></span>\
+						<b id="tname" val="'+htmlEncode(table_val)+'">'+htmlEncode(table_name)+'</b><span class="caret"></span>\
 				  	</button>\
 				</div>';
 			}
@@ -835,7 +835,7 @@ function editTaskInfo(id){
 \r\n*.log";
 			layer.open({
 				type:1,
-				title:'编辑计划任务-['+rdata.name+']',
+				title:'编辑计划任务-['+htmlEncode(rdata.name)+']',
 				area: ['900px','440px'], 
 				skin:'layer-create-content',
 				shadeClose:false,
@@ -845,7 +845,7 @@ function editTaskInfo(id){
 						<span class="typename c4 pull-left f14 text-right mr20">任务类型</span>\
 						<div class="dropdown stype_list pull-left mr20">\
 							<button class="btn btn-default dropdown-toggle" type="button" id="excode" data-toggle="dropdown" style="width:auto" disabled="disabled">\
-								<b val="'+ obj.from.type +'">'+ sTypeName +'</b>\
+								<b val="'+ htmlEncode(obj.from.type) +'">'+ sTypeName +'</b>\
 								<span class="caret"></span>\
 							</button>\
 							<ul class="dropdown-menu" role="menu" aria-labelledby="sType">'+ sTypeDom +'</ul>\
@@ -853,13 +853,13 @@ function editTaskInfo(id){
 					</div>\
 					<div class="clearfix plan ptb10">\
 						<span class="typename c4 pull-left f14 text-right mr20">任务名称</span>\
-						<div class="planname pull-left"><input type="text" name="name" class="bt-input-text sname_create" value="'+ obj.from.name +'"></div>\
+						<div class="planname pull-left"><input type="text" name="name" class="bt-input-text sname_create" value="'+ htmlEncode(obj.from.name) +'"></div>\
 					</div>\
 					<div class="clearfix plan ptb10">\
 						<span class="typename c4 pull-left f14 text-right mr20">执行周期</span>\
 						<div class="dropdown  pull-left mr20">\
 							<button class="btn btn-default dropdown-toggle cycle_btn" type="button" data-toggle="dropdown" style="width:94px">\
-								<b val="'+ obj.from.stype +'">'+ cycleName +'</b>\
+								<b val="'+ htmlEncode(obj.from.stype) +'">'+ cycleName +'</b>\
 								<span class="caret"></span>\
 							</button>\
 							<ul class="dropdown-menu" role="menu" aria-labelledby="cycle">'+ cycleDom +'</ul>\
@@ -867,51 +867,51 @@ function editTaskInfo(id){
 						<div class="pull-left optional_week">\
 							<div class="dropdown week_btn pull-left mr20" style="display:'+ (obj.from.type == "week"  ?'block;':'none') +'">\
 								<button class="btn btn-default dropdown-toggle" type="button" data-toggle="dropdown" >\
-									<b val="'+ obj.from.week +'">'+ weekName +'</b> \
+									<b val="'+ htmlEncode(obj.from.week) +'">'+ weekName +'</b> \
 									<span class="caret"></span>\
 								</button>\
 								<ul class="dropdown-menu" role="menu" aria-labelledby="week">'+ weekDom +'</ul>\
 							</div>\
-							<div class="plan_hms pull-left mr20 bt-input-text where1_input" style="display:'+ (obj.from.type == "day-n" || obj.from.type == 'month' ?'block;':'none') +'"><span><input type="number" name="where1" class="where1_create" value="'+obj.from.where1 +'" maxlength="2" max="23" min="0"></span> <span class="name">日</span> </div>\
-							<div class="plan_hms pull-left mr20 bt-input-text hour_input" style="display:'+ (obj.from.type == "day" || obj.from.type == 'day-n' || obj.from.type == 'hour-n' || obj.from.type == 'week' || obj.from.type == 'month'?'block;':'none') +'"><span><input type="number" name="hour" class="hour_create" value="'+ ( obj.from.type == 'hour-n' ? obj.from.where1 : obj.from.hour ) +'" maxlength="2" max="23" min="0"></span> <span class="name">时</span> </div>\
-							<div class="plan_hms pull-left mr20 bt-input-text minute_input"><span><input type="number" name="minute" class="minute_create" value="'+ (obj.from.type == 'minute-n' ? obj.from.where1 : obj.from.minute)+'" maxlength="2" max="59" min="0"></span> <span class="name">分</span> </div>\
+							<div class="plan_hms pull-left mr20 bt-input-text where1_input" style="display:'+ (obj.from.type == "day-n" || obj.from.type == 'month' ?'block;':'none') +'"><span><input type="number" name="where1" class="where1_create" value="'+htmlEncode(obj.from.where1) +'" maxlength="2" max="23" min="0"></span> <span class="name">日</span> </div>\
+							<div class="plan_hms pull-left mr20 bt-input-text hour_input" style="display:'+ (obj.from.type == "day" || obj.from.type == 'day-n' || obj.from.type == 'hour-n' || obj.from.type == 'week' || obj.from.type == 'month'?'block;':'none') +'"><span><input type="number" name="hour" class="hour_create" value="'+ htmlEncode( obj.from.type == 'hour-n' ? obj.from.where1 : obj.from.hour ) +'" maxlength="2" max="23" min="0"></span> <span class="name">时</span> </div>\
+							<div class="plan_hms pull-left mr20 bt-input-text minute_input"><span><input type="number" name="minute" class="minute_create" value="'+ htmlEncode(obj.from.type == 'minute-n' ? obj.from.where1 : obj.from.minute)+'" maxlength="2" max="59" min="0"></span> <span class="name">分</span> </div>\
 						</div>\
 					</div>\
 					<div class="clearfix plan ptb10 site_list" style="display:none">\
 						<span class="typename controls c4 pull-left f14 text-right mr20">'+ sTypeName  +'</span>\
 						<div style="line-height:34px"><div class="dropdown pull-left mr20 sName_btn" style="display:'+ (obj.from.sType != "path"?'block;':'none') +'">\
 							<button class="btn btn-default dropdown-toggle sname" type="button"  data-toggle="dropdown" style="width:auto" disabled="disabled">\
-								<b id="sName" val="'+ obj.from.sname +'">'+ obj.from.sname +'</b>\
+								<b id="sName" val="'+ htmlEncode(obj.from.sname) +'">'+ htmlEncode(obj.from.sname) +'</b>\
 								<span class="caret"></span>\
 							</button>\
 							<ul class="dropdown-menu" role="menu" aria-labelledby="sName">'+ sNameDom +'</ul>\
 						</div>\
 						<div class="info-r" style="float: left;margin-right: 25px;display:'+ (obj.from.sType == "path"?'block;':'none') +'">\
-							<input id="inputPath" class="bt-input-text mr5 " type="text" name="path" value="'+ obj.from.sName +'" placeholder="备份目录" style="width:208px;height:33px;" disabled="disabled">\
+							<input id="inputPath" class="bt-input-text mr5 " type="text" name="path" value="'+ htmlEncode(obj.from.sName) +'" placeholder="备份目录" style="width:208px;height:33px;" disabled="disabled">\
 						</div>\
 						'+tableOpt+'\
 						'+changeDir+'\
 						<div class="textname pull-left mr20">备份到</div>\
 							<div class="dropdown  pull-left mr20">\
 								<button class="btn btn-default dropdown-toggle backup_btn" type="button"  data-toggle="dropdown" style="width:auto;">\
-									<b val="'+ obj.from.backup_to +'">'+ backupsName +'</b>\
+									<b val="'+ htmlEncode(obj.from.backup_to) +'">'+ htmlEncode(backupsName) +'</b>\
 									<span class="caret"></span>\
 								</button>\
 								<ul class="dropdown-menu" role="menu" aria-labelledby="backupTo">'+ backupsDom +'</ul>\
 							</div>\
 							<div class="textname pull-left mr20">保留最新</div>\
 							<div class="plan_hms pull-left mr20 bt-input-text">\
-								<span><input type="number" name="save" class="save_create" value="'+ obj.from.save +'" maxlength="4" max="100" min="1"></span><span class="name">份</span>\
+								<span><input type="number" name="save" class="save_create" value="'+ htmlEncode(obj.from.save) +'" maxlength="4" max="100" min="1"></span><span class="name">份</span>\
 							</div>\
 						</div>\
 					</div>\
 					<div class="clearfix plan ptb10"  style="display:'+ (obj.from.stype == "toShell"?'block;':'none') +'">\
 						<span class="typename controls c4 pull-left f14 text-right mr20">脚本内容</span>\
-						<div style="line-height:34px"><textarea class="txtsjs bt-input-text sbody_create" name="sbody">'+ obj.from.sbody +'</textarea></div>\
+						<div style="line-height:34px"><textarea class="txtsjs bt-input-text sbody_create" name="sbody">'+ htmlEncode(obj.from.sbody) +'</textarea></div>\
 					</div>\
 					<div class="clearfix plan ptb10"  style="display:'+ ((obj.from.stype == "path"||obj.from.stype == "site")?'block;':'none') +'">\
 						<span class="typename exclude_dir c4 pull-left f14 text-right mr20">排除目录</span>\
-						<div style="line-height:34px"><textarea class="txtsjs bt-input-text attr_create" name="exclude_dir" placeholder="'+exclude_dirs_placeholder+'">'+ obj.from.attr +'</textarea></div>\
+						<div style="line-height:34px"><textarea class="txtsjs bt-input-text attr_create" name="exclude_dir" placeholder="'+exclude_dirs_placeholder+'">'+ htmlEncode(obj.from.attr) +'</textarea></div>\
 					</div>\
 					<div class="clearfix plan ptb10" style="display:'+ (obj.from.stype == "rememory"?'block;':'none') +'">\
 						<span class="typename controls c4 pull-left f14 text-right mr20">提示</span>\
@@ -919,7 +919,7 @@ function editTaskInfo(id){
 					</div>\
 					<div class="clearfix plan ptb10" style="display:'+ (obj.from.stype == "toUrl"?'block;':'none') +'">\
 						<span class="typename controls c4 pull-left f14 text-right mr20">URL地址</span>\
-						<div style="line-height:34px"><input type="text" style="width:400px; height:34px" class="bt-input-text url_create" name="url_address"  placeholder="URL地址" value="'+ obj.from.url_address +'"></div>\
+						<div style="line-height:34px"><input type="text" style="width:400px; height:34px" class="bt-input-text url_create" name="url_address"  placeholder="URL地址" value="'+ htmlEncode(obj.from.url_address) +'"></div>\
 					</div>\
 					<div class="clearfix plan ptb10">\
 						<div class="bt-submit plan-submits " style="margin-left: 141px;">保存编辑</div>\

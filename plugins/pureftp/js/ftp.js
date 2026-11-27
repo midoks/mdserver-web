@@ -52,7 +52,7 @@ function ftpList(page, search){
 
         var rdata = $.parseJSON(data.data);
         // console.log(rdata);
-        content = '<div class="info-title-tips"><p><span class="glyphicon glyphicon-alert" style="color: #f39c12; margin-right: 10px;"></span>当前FTP地址为：ftp://'+rdata['info']['ip']+':'+rdata['info']['port']+'</p></div>';
+        content = '<div class="info-title-tips"><p><span class="glyphicon glyphicon-alert" style="color: #f39c12; margin-right: 10px;"></span>当前FTP地址为：ftp://'+htmlEncode(rdata['info']['ip'])+':'+htmlEncode(rdata['info']['port'])+'</p></div>';
         content += '<div class="finduser"><input class="bt-input-text mr5 outline_no" type="text" placeholder="查找用户名" id="ftp_find_user" style="height: 28px; border-radius: 3px;width: 605px;">';
         content += '<button class="btn btn-success btn-sm" onclick="ftpListFind();">查找</button></div>';
 
@@ -63,7 +63,7 @@ function ftpList(page, search){
         content += '<th style="width:10%;">状态</th>';
         content += '<th>根目录</th>';
         content += '<th>备注</th>';
-        content += '<th>操作(<a class="btlink" onclick="addFtp();">添加</a>|<a class="btlink" onclick="modFtpPort(0,\''+rdata['info']['port']+'\')">端口</a>)</th>';
+        content += '<th>操作(<a class="btlink" onclick="addFtp();">添加</a>|<a class="btlink" onclick="modFtpPort(0,\''+jsEncode(rdata['info']['port'])+'\')">端口</a>)</th>';
         content += '</tr></thead>';
 
         content += '<tbody>';
@@ -71,17 +71,17 @@ function ftpList(page, search){
         ulist = rdata.data;
         for (i in ulist){
         	// console.log(ulist[i]);
-        	status = '<a href="javascript:;" onclick="ftpStart(\''+ulist[i]['id']+'\',\''+ulist[i]['name']+'\')" <span="" style="color:red">已停用<span style="color:red" class="glyphicon glyphicon-pause"></span></a>';
+        	status = '<a href="javascript:;" onclick="ftpStart(\''+jsEncode(ulist[i]['id'])+'\',\''+jsEncode(ulist[i]['name'])+'\')" <span="" style="color:red">已停用<span style="color:red" class="glyphicon glyphicon-pause"></span></a>';
         	if (ulist[i]['status'] == '1'){
-        		status = '<a href="javascript:;" title="FTP帐户" onclick="ftpStop(\''+ulist[i]['id']+'\',\''+ulist[i]['name']+'\')"><span style="color:#5CB85C">已启用</span><span style="color:#5CB85C" class="glyphicon glyphicon-play"></span></a>';
+        		status = '<a href="javascript:;" title="FTP帐户" onclick="ftpStop(\''+jsEncode(ulist[i]['id'])+'\',\''+jsEncode(ulist[i]['name'])+'\')"><span style="color:#5CB85C">已启用</span><span style="color:#5CB85C" class="glyphicon glyphicon-play"></span></a>';
         	}
-            content += '<tr><td>'+ulist[i]['name']+'</td>'+
-        		'<td>'+ulist[i]['password']+'</td>'+
+            content += '<tr><td>'+htmlEncode(ulist[i]['name'])+'</td>'+
+        		'<td>'+htmlEncode(ulist[i]['password'])+'</td>'+
         		'<td>'+status+'</td>' +
-        		'<td>'+ulist[i]['path']+'</td>' +
-        		'<td>'+ulist[i]['ps']+'</td>' +
-            	'<td><a class="btlink" onclick="ftpModPwd(\''+ulist[i]['id']+'\',\''+ulist[i]['name']+'\',\''+ulist[i]['password']+'\')">改密</a> | ' +
-            	'<a class="btlink" onclick="ftpDelete(\''+ulist[i]['id']+'\',\''+ulist[i]['name']+'\')">删除</a></td></tr>';
+        		'<td>'+htmlEncode(ulist[i]['path'])+'</td>' +
+        		'<td>'+htmlEncode(ulist[i]['ps'])+'</td>' +
+            	'<td><a class="btlink" onclick="ftpModPwd(\''+jsEncode(ulist[i]['id'])+'\',\''+jsEncode(ulist[i]['name'])+'\',\''+jsEncode(ulist[i]['password'])+'\')">改密</a> | ' +
+            	'<a class="btlink" onclick="ftpDelete(\''+jsEncode(ulist[i]['id'])+'\',\''+jsEncode(ulist[i]['name'])+'\')">删除</a></td></tr>';
         }
 
         content += '</tbody>';
@@ -124,7 +124,7 @@ function addFtp() {
 					</div>\
 					<div class='line'>\
 					<span class='tname'>根目录</span>\
-					<div class='info-r'><input id='inputPath' class='bt-input-text mr5' type='text' name='path' value='"+defaultPath+"/' placeholder='"+lan.ftp.add_path_title+"'  style='width:330px' /><span class='glyphicon glyphicon-folder-open cursor' onclick='changePath(\"inputPath\")'></span><p class='c9 mt10'>"+lan.ftp.add_path_ps+"</p></div>\
+					<div class='info-r'><input id='inputPath' class='bt-input-text mr5' type='text' name='path' value='"+htmlEncode(defaultPath)+"/' placeholder='"+lan.ftp.add_path_title+"'  style='width:330px' /><span class='glyphicon glyphicon-folder-open cursor' onclick='changePath(\"inputPath\")'></span><p class='c9 mt10'>"+lan.ftp.add_path_ps+"</p></div>\
 					</div>\
                     <div class='line' style='display:none'>\
 					<span class='tname'>备注</span>\
@@ -185,7 +185,7 @@ function modFtpPort(type, port){
 		content: "<form class='bt-form pd20 pb70'>\
 					<div class='line'>\
 					<span class='tname'>默认端口</span>\
-					<div class='info-r'><input class='bt-input-text mr5' type='text' id='ftpPort' name='ftp_port' style='width:330px' value='"+port+"'/></div>\
+					<div class='info-r'><input class='bt-input-text mr5' type='text' id='ftpPort' name='ftp_port' style='width:330px' value='"+htmlEncode(port)+"'/></div>\
 					</div>\
 					<div class='bt-form-submit-btn'>\
 						<button id='ftp_port_close' type='button' class='btn btn-danger btn-sm btn-title'>关闭</button>\
@@ -224,12 +224,12 @@ function ftpModPwd(id,name,password){
 		content: "<form class='bt-form pd20 pb70'>\
 					<div class='line'>\
 					<span class='tname'>用户名</span>\
-					<div class='info-r'><input disabled class='bt-input-text mr5' type='text' id='ftpUser' name='ftp_username' style='width:330px' value='"+name+"'/></div>\
+					<div class='info-r'><input disabled class='bt-input-text mr5' type='text' id='ftpUser' name='ftp_username' style='width:330px' value='"+htmlEncode(name)+"'/></div>\
 					</div>\
 					\
 					<div class='line'>\
 					<span class='tname'>密码</span>\
-					<div class='info-r'><input class='bt-input-text mr5' type='text' name='ftp_password' id='MyPassword' style='width:330px' value='"+password+"' /><span title='随机密码' class='glyphicon glyphicon-repeat cursor' onclick='repeatPwd(16)'></span></div>\
+					<div class='info-r'><input class='bt-input-text mr5' type='text' name='ftp_password' id='MyPassword' style='width:330px' value='"+htmlEncode(password)+"' /><span title='随机密码' class='glyphicon glyphicon-repeat cursor' onclick='repeatPwd(16)'></span></div>\
 					</div>\
 					<div class='bt-form-submit-btn'>\
 						<button id='ftp_mod_close' type='button' class='btn btn-danger btn-sm btn-title'>关闭</button>\

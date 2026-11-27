@@ -421,7 +421,7 @@ function lsyncdExclude(name){
 
             var list=''
             for (var i = 0; i < res.length; i++) {
-                list += '<tr><td>'+ res[i] +'</td><td><a href="javascript:;" data-type='+ mName +' class="delList">删除</a></td></tr>';
+                list += '<tr><td>'+ htmlEncode(res[i]) +'</td><td><a href="javascript:;" data-type=\''+ htmlEncode(mName) +'\' class="delList">删除</a></td></tr>';
             }
             $('.lsyncd_exclude .BlockList tbody').empty().append(list);
         });
@@ -477,7 +477,7 @@ function lsyncdExclude(name){
 
             var list=''
             for (var i = 0; i < res.length; i++) {
-                list += '<tr><td>'+ res[i] +'</td><td><a href="javascript:;" data-type='+ name +' class="delList">删除</a></td></tr>';
+                list += '<tr><td>'+ htmlEncode(res[i]) +'</td><td><a href="javascript:;" data-type=\''+ htmlEncode(name) +'\' class="delList">删除</a></td></tr>';
             }
             $('.lsyncd_exclude .BlockList tbody').empty().append(list);
         });
@@ -534,17 +534,17 @@ function lsyncdSend(){
             }
 
             con += '<tr>'+
-                '<td>' + list[i]['name']+'</td>' +
-                '<td><a class="btlink overflow_hide" style="width:40px;" onclick="openPath(\''+list[i]['path']+'\')">' + list[i]['path']+'</a></td>' +
-                '<td>' + list[i]['ip']+":"+list[i]['name']+'</td>' +
+                '<td>' + htmlEncode(list[i]['name'])+'</td>' +
+                '<td><a class="btlink overflow_hide" style="width:40px;" onclick="openPath(\''+jsEncode(list[i]['path'])+'\')">' + htmlEncode(list[i]['path'])+'</a></td>' +
+                '<td>' + htmlEncode(list[i]['ip'])+":"+htmlEncode(list[i]['name'])+'</td>' +
                 '<td>' + mode+'</td>' +
                 '<td>' + period +'</td>' +
                 '<td>\
-                    <a class="btlink" onclick="lsyncdRun(\''+list[i]['name']+'\')">同步</a>\
-                    | <a class="btlink" onclick="lsyncdLog(\''+list[i]['name']+'\')">手动日志</a>\
-                    | <a class="btlink" onclick="lsyncdExclude(\''+list[i]['name']+'\')">过滤器</a>\
-                    | <a class="btlink" onclick="createSendTask(\''+list[i]['name']+'\')">编辑</a>\
-                    | <a class="btlink" onclick="lsyncdDelete(\''+list[i]['name']+'\')">删除</a>\
+                    <a class="btlink" onclick="lsyncdRun(\''+jsEncode(list[i]['name'])+'\')">同步</a>\
+                    | <a class="btlink" onclick="lsyncdLog(\''+jsEncode(list[i]['name'])+'\')">手动日志</a>\
+                    | <a class="btlink" onclick="lsyncdExclude(\''+jsEncode(list[i]['name'])+'\')">过滤器</a>\
+                    | <a class="btlink" onclick="createSendTask(\''+jsEncode(list[i]['name'])+'\')">编辑</a>\
+                    | <a class="btlink" onclick="lsyncdDelete(\''+jsEncode(list[i]['name'])+'\')">删除</a>\
                 </td>\
                 </tr>';
         }
@@ -604,14 +604,14 @@ function rsyncdReceive(){
         //<a class="btlink" onclick="modReceive(\''+list[i]['name']+'\')">编辑</a>
         for (var i = 0; i < list.length; i++) {
             con += '<tr>'+
-                '<td>' + list[i]['name']+'</td>' +
-                '<td><a class="btlink overflow_hide" onclick="openPath(\''+list[i]['path']+'\')">' + list[i]['path']+'</a></td>' +
-                '<td>' + list[i]['comment']+'</td>' +
+                '<td>' + htmlEncode(list[i]['name'])+'</td>' +
+                '<td><a class="btlink overflow_hide" onclick="openPath(\''+jsEncode(list[i]['path'])+'\')">' + htmlEncode(list[i]['path'])+'</a></td>' +
+                '<td>' + htmlEncode(list[i]['comment'])+'</td>' +
                 '<td>\
-                    <a class="btlink" onclick="cmdRecCmd(\''+list[i]['name']+'\')">命令</a>\
-                	| <a class="btlink" onclick="cmdRecSecretKey(\''+list[i]['name']+'\')">密钥</a>\
-                    | <a class="btlink" onclick="addReceive(\''+list[i]['name']+'\')">编辑</a>\
-                	| <a class="btlink" onclick="delReceive(\''+list[i]['name']+'\')">删除</a></td>\
+                    <a class="btlink" onclick="cmdRecCmd(\''+jsEncode(list[i]['name'])+'\')">命令</a>\
+                	| <a class="btlink" onclick="cmdRecSecretKey(\''+jsEncode(list[i]['name'])+'\')">密钥</a>\
+                    | <a class="btlink" onclick="addReceive(\''+jsEncode(list[i]['name'])+'\')">编辑</a>\
+                	| <a class="btlink" onclick="delReceive(\''+jsEncode(list[i]['name'])+'\')">删除</a></td>\
                 </tr>';
         }
 

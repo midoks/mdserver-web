@@ -155,25 +155,25 @@ function runInfo(){
         var Con = '<div class="divtable"><table class="table table-hover table-bordered" style="margin-bottom:10px;background-color:#fafafa">\
                     <tbody>\
                         <tr><th>启动时间</th><td>' + getLocalTime(rdata.Run) + '</td><th>每秒查询</th><td>' + parseInt(rdata.Questions / rdata.Uptime) + '</td></tr>\
-                        <tr><th>总连接次数</th><td>' + rdata.Connections + '</td><th>每秒事务</th><td>' + parseInt((parseInt(rdata.Com_commit) + parseInt(rdata.Com_rollback)) / rdata.Uptime) + '</td></tr>\
-                        <tr><th>发送</th><td>' + toSize(rdata.Bytes_sent) + '</td><th>File</th><td>' + rdata.File + '</td></tr>\
-                        <tr><th>接收</th><td>' + toSize(rdata.Bytes_received) + '</td><th>Position</th><td>' + rdata.Position + '</td></tr>\
+                        <tr><th>总连接次数</th><td>' + htmlEncode(rdata.Connections) + '</td><th>每秒事务</th><td>' + parseInt((parseInt(rdata.Com_commit) + parseInt(rdata.Com_rollback)) / rdata.Uptime) + '</td></tr>\
+                        <tr><th>发送</th><td>' + toSize(rdata.Bytes_sent) + '</td><th>File</th><td>' + htmlEncode(rdata.File) + '</td></tr>\
+                        <tr><th>接收</th><td>' + toSize(rdata.Bytes_received) + '</td><th>Position</th><td>' + htmlEncode(rdata.Position) + '</td></tr>\
                     </tbody>\
                     </table>\
                     <table class="table table-hover table-bordered">\
                     <thead style="display:none;"><th></th><th></th><th></th><th></th></thead>\
                     <tbody>\
-                        <tr><th>活动/峰值连接数</th><td>' + rdata.Threads_running + '/' + rdata.Max_used_connections + '</td><td colspan="2">若值过大,增加max_connections</td></tr>\
+                        <tr><th>活动/峰值连接数</th><td>' + htmlEncode(rdata.Threads_running) + '/' + htmlEncode(rdata.Max_used_connections) + '</td><td colspan="2">若值过大,增加max_connections</td></tr>\
                         <tr><th>线程缓存命中率</th><td>' + ((1 - rdata.Threads_created / rdata.Connections) * 100).toFixed(2) + '%</td><td colspan="2">若过低,增加thread_cache_size</td></tr>\
                         <tr><th>索引命中率</th><td>' + ((1 - rdata.Key_reads / rdata.Key_read_requests) * 100).toFixed(2) + '%</td><td colspan="2">若过低,增加key_buffer_size</td></tr>\
                         <tr><th>Innodb索引命中率</th><td>' + innodbHitRate(rdata.Innodb_buffer_pool_reads, rdata.Innodb_buffer_pool_read_requests) + '</td><td colspan="2">若过低,增加innodb_buffer_pool_size</td></tr>\
                         <tr><th>查询缓存命中率</th><td>' + cache_size + '</td><td colspan="2">' + lan.soft.mysql_status_ps5 + '</td></tr>\
                         <tr><th>创建临时表到磁盘</th><td>' + ((rdata.Created_tmp_disk_tables / rdata.Created_tmp_tables) * 100).toFixed(2) + '%</td><td colspan="2">若过大,尝试增加tmp_table_size</td></tr>\
-                        <tr><th>已打开的表</th><td>' + rdata.Open_tables + '</td><td colspan="2">若过大,增加table_cache_size</td></tr>\
-                        <tr><th>没有使用索引的量</th><td>' + rdata.Select_full_join + '</td><td colspan="2">若不为0,请检查数据表的索引是否合理</td></tr>\
-                        <tr><th>没有索引的JOIN量</th><td>' + rdata.Select_range_check + '</td><td colspan="2">若不为0,请检查数据表的索引是否合理</td></tr>\
-                        <tr><th>排序后的合并次数</th><td>' + rdata.Sort_merge_passes + '</td><td colspan="2">若值过大,增加sort_buffer_size</td></tr>\
-                        <tr><th>锁表次数</th><td>' + rdata.Table_locks_waited + '</td><td colspan="2">若值过大,请考虑增加您的数据库性能</td></tr>\
+                        <tr><th>已打开的表</th><td>' + htmlEncode(rdata.Open_tables) + '</td><td colspan="2">若过大,增加table_cache_size</td></tr>\
+                        <tr><th>没有使用索引的量</th><td>' + htmlEncode(rdata.Select_full_join) + '</td><td colspan="2">若不为0,请检查数据表的索引是否合理</td></tr>\
+                        <tr><th>没有索引的JOIN量</th><td>' + htmlEncode(rdata.Select_range_check) + '</td><td colspan="2">若不为0,请检查数据表的索引是否合理</td></tr>\
+                        <tr><th>排序后的合并次数</th><td>' + htmlEncode(rdata.Sort_merge_passes) + '</td><td colspan="2">若值过大,增加sort_buffer_size</td></tr>\
+                        <tr><th>锁表次数</th><td>' + htmlEncode(rdata.Table_locks_waited) + '</td><td colspan="2">若值过大,请考虑增加您的数据库性能</td></tr>\
                     <tbody>\
             </table></div>';
         $(".soft-man-con").html(Con);
@@ -185,7 +185,7 @@ function myDbPos(){
     myPost('my_db_pos','',function(data){
         var con = '<div class="line ">\
             <div class="info-r  ml0">\
-            <input id="datadir" name="datadir" class="bt-input-text mr5 port" type="text" style="width:330px" value="'+data.data+'">\
+            <input id="datadir" name="datadir" class="bt-input-text mr5 port" type="text" style="width:330px" value="'+htmlEncode(data.data)+'">\
             <span class="glyphicon cursor mr5 glyphicon-folder-open icon_datadir" onclick="changePath(\'datadir\')"></span>\
             <button id="btn_change_path" name="btn_change_path" class="btn btn-success btn-sm mr5 ml5 btn_change_port">迁移</button>\
             </div></div>';
@@ -205,7 +205,7 @@ function myPort(){
     myPost('my_port','',function(data){
         var con = '<div class="line ">\
             <div class="info-r  ml0">\
-            <input name="port" class="bt-input-text mr5 port" type="number" style="width:100px" value="'+data.data+'">\
+            <input name="port" class="bt-input-text mr5 port" type="number" style="width:100px" value="'+htmlEncode(data.data)+'">\
             <button id="btn_change_port" name="btn_change_port" class="btn btn-success btn-sm mr5 ml5 btn_change_port">修改</button>\
             </div></div>';
         $(".soft-man-con").html(con);
@@ -269,21 +269,21 @@ function myPerfOpt() {
                         </select>\
                         <span>' + lan.soft.mysql_set_maxmem + ': </span><input style="width:70px;background-color:#eee;" class="bt-input-text mr5" name="memSize" type="text" value="' + memSize.toFixed(2) + '" readonly>MB\
                         </div>\
-                        <p><span>key_buffer_size</span><input style="width: 70px;" class="bt-input-text mr5" name="key_buffer_size" value="' + key_buffer_size + '" type="number" >MB, <font>' + lan.soft.mysql_set_key_buffer_size + '</font></p>\
-                        <p><span>query_cache_size</span><input style="width: 70px;" class="bt-input-text mr5" name="query_cache_size" value="' + query_cache_size + '" type="number" >MB, <font>' + lan.soft.mysql_set_query_cache_size + '</font></p>\
-                        <p><span>tmp_table_size</span><input style="width: 70px;" class="bt-input-text mr5" name="tmp_table_size" value="' + tmp_table_size + '" type="number" >MB, <font>' + lan.soft.mysql_set_tmp_table_size + '</font></p>\
-                        <p><span>innodb_buffer_pool_size</span><input style="width: 70px;" class="bt-input-text mr5" name="innodb_buffer_pool_size" value="' + innodb_buffer_pool_size + '" type="number" >MB, <font>' + lan.soft.mysql_set_innodb_buffer_pool_size + '</font></p>\
-                        <p><span>innodb_log_buffer_size</span><input style="width: 70px;" class="bt-input-text mr5" name="innodb_log_buffer_size" value="' + innodb_log_buffer_size + '" type="number">MB, <font>' + lan.soft.mysql_set_innodb_log_buffer_size + '</font></p>\
-                        <p style="display:none;"><span>innodb_additional_mem_pool_size</span><input style="width: 70px;" class="bt-input-text mr5" name="innodb_additional_mem_pool_size" value="' + innodb_additional_mem_pool_size + '" type="number" >MB</p>\
+                        <p><span>key_buffer_size</span><input style="width: 70px;" class="bt-input-text mr5" name="key_buffer_size" value="' + htmlEncode(key_buffer_size) + '" type="number" >MB, <font>' + lan.soft.mysql_set_key_buffer_size + '</font></p>\
+                        <p><span>query_cache_size</span><input style="width: 70px;" class="bt-input-text mr5" name="query_cache_size" value="' + htmlEncode(query_cache_size) + '" type="number" >MB, <font>' + lan.soft.mysql_set_query_cache_size + '</font></p>\
+                        <p><span>tmp_table_size</span><input style="width: 70px;" class="bt-input-text mr5" name="tmp_table_size" value="' + htmlEncode(tmp_table_size) + '" type="number" >MB, <font>' + lan.soft.mysql_set_tmp_table_size + '</font></p>\
+                        <p><span>innodb_buffer_pool_size</span><input style="width: 70px;" class="bt-input-text mr5" name="innodb_buffer_pool_size" value="' + htmlEncode(innodb_buffer_pool_size) + '" type="number" >MB, <font>' + lan.soft.mysql_set_innodb_buffer_pool_size + '</font></p>\
+                        <p><span>innodb_log_buffer_size</span><input style="width: 70px;" class="bt-input-text mr5" name="innodb_log_buffer_size" value="' + htmlEncode(innodb_log_buffer_size) + '" type="number">MB, <font>' + lan.soft.mysql_set_innodb_log_buffer_size + '</font></p>\
+                        <p style="display:none;"><span>innodb_additional_mem_pool_size</span><input style="width: 70px;" class="bt-input-text mr5" name="innodb_additional_mem_pool_size" value="' + htmlEncode(innodb_additional_mem_pool_size) + '" type="number" >MB</p>\
                         <p><span>sort_buffer_size</span><input style="width: 70px;" class="bt-input-text mr5" name="sort_buffer_size" value="' + (sort_buffer_size * 1024) + '" type="number" >KB * ' + lan.soft.mysql_set_conn + ', <font>' + lan.soft.mysql_set_sort_buffer_size + '</font></p>\
                         <p><span>read_buffer_size</span><input style="width: 70px;" class="bt-input-text mr5" name="read_buffer_size" value="' + (read_buffer_size * 1024) + '" type="number" >KB * ' + lan.soft.mysql_set_conn + ', <font>' + lan.soft.mysql_set_read_buffer_size + ' </font></p>\
                         <p><span>read_rnd_buffer_size</span><input style="width: 70px;" class="bt-input-text mr5" name="read_rnd_buffer_size" value="' + (read_rnd_buffer_size * 1024) + '" type="number" >KB * ' + lan.soft.mysql_set_conn + ', <font>' + lan.soft.mysql_set_read_rnd_buffer_size + ' </font></p>\
                         <p><span>join_buffer_size</span><input style="width: 70px;" class="bt-input-text mr5" name="join_buffer_size" value="' + (join_buffer_size * 1024) + '" type="number" >KB * ' + lan.soft.mysql_set_conn + ', <font>' + lan.soft.mysql_set_join_buffer_size + '</font></p>\
                         <p><span>thread_stack</span><input style="width: 70px;" class="bt-input-text mr5" name="thread_stack" value="' + (thread_stack * 1024) + '" type="number" >KB * ' + lan.soft.mysql_set_conn + ', <font>' + lan.soft.mysql_set_thread_stack + '</font></p>\
                         <p><span>binlog_cache_size</span><input style="width: 70px;" class="bt-input-text mr5" name="binlog_cache_size" value="' + (binlog_cache_size * 1024) + '" type="number" >KB * ' + lan.soft.mysql_set_conn + ', <font>' + lan.soft.mysql_set_binlog_cache_size + '</font></p>\
-                        <p><span>thread_cache_size</span><input style="width: 70px;" class="bt-input-text mr5" name="thread_cache_size" value="' + rdata.mem.thread_cache_size + '" type="number" ><font> ' + lan.soft.mysql_set_thread_cache_size + '</font></p>\
-                        <p><span>table_open_cache</span><input style="width: 70px;" class="bt-input-text mr5" name="table_open_cache" value="' + rdata.mem.table_open_cache + '" type="number" > <font>' + lan.soft.mysql_set_table_open_cache + '</font></p>\
-                        <p><span>max_connections</span><input style="width: 70px;" class="bt-input-text mr5" name="max_connections" value="' + rdata.mem.max_connections + '" type="number" ><font> ' + lan.soft.mysql_set_max_connections + '</font></p>\
+                        <p><span>thread_cache_size</span><input style="width: 70px;" class="bt-input-text mr5" name="thread_cache_size" value="' + htmlEncode(rdata.mem.thread_cache_size) + '" type="number" ><font> ' + lan.soft.mysql_set_thread_cache_size + '</font></p>\
+                        <p><span>table_open_cache</span><input style="width: 70px;" class="bt-input-text mr5" name="table_open_cache" value="' + htmlEncode(rdata.mem.table_open_cache) + '" type="number" > <font>' + lan.soft.mysql_set_table_open_cache + '</font></p>\
+                        <p><span>max_connections</span><input style="width: 70px;" class="bt-input-text mr5" name="max_connections" value="' + htmlEncode(rdata.mem.max_connections) + '" type="number" ><font> ' + lan.soft.mysql_set_max_connections + '</font></p>\
                         <div style="margin-top:10px; padding-right:15px" class="text-right"><button class="btn btn-success btn-sm mr5" onclick="reBootMySqld()">重启数据库</button><button class="btn btn-success btn-sm" onclick="setMySQLConf()">保存</button></div>\
                     </div>'
 
@@ -541,7 +541,7 @@ function setRootPwd(type, pwd){
         content: "<form class='bt-form pd20' id='mod_pwd'>\
                     <div class='line'>\
                         <span class='tname'>root密码</span>\
-                        <div class='info-r'><input class='bt-input-text mr5' type='text' name='password' id='MyPassword' style='width:430px' value='"+pwd+"' />\
+                        <div class='info-r'><input class='bt-input-text mr5' type='text' name='password' id='MyPassword' style='width:430px' value='"+htmlEncode(pwd)+"' />\
                             <span title='随机密码' class='glyphicon glyphicon-repeat cursor' onclick='repeatPwd(16)'></span>\
                         </div>\
                     </div>\
@@ -676,7 +676,7 @@ function setDbAccess(username){
                     $('select[name="dataAccess"]').after("<input id='dataAccess_subid' class='bt-input-text mr5' type='text' name='address' placeholder='多个IP使用逗号(,)分隔' style='width: 230px; display: inline-block;'>");
                 } else {
                     $('select[name="dataAccess"]').find('option[value="ip"]').attr("selected",true);
-                    $('select[name="dataAccess"]').after("<input value='"+rdata.msg+"' id='dataAccess_subid' class='bt-input-text mr5' type='text' name='address' placeholder='多个IP使用逗号(,)分隔' style='width: 230px; display: inline-block;'>");
+                    $('select[name="dataAccess"]').after("<input value='"+htmlEncode(rdata.msg)+"' id='dataAccess_subid' class='bt-input-text mr5' type='text' name='address' placeholder='多个IP使用逗号(,)分隔' style='width: 230px; display: inline-block;'>");
                 }
 
                  $('select[name="dataAccess"]').change(function(){
@@ -737,15 +737,15 @@ function setDbPass(id, username, password){
         content: "<form class='bt-form pd20' id='mod_pwd'>\
                     <div class='line'>\
                         <span class='tname'>用户名</span>\
-                        <div class='info-r'><input readonly='readonly' name=\"name\" class='bt-input-text mr5' type='text' style='width:330px;outline:none;' value='"+username+"' /></div>\
+                        <div class='info-r'><input readonly='readonly' name=\"name\" class='bt-input-text mr5' type='text' style='width:330px;outline:none;' value='"+htmlEncode(username)+"' /></div>\
                     </div>\
                     <div class='line'>\
                     <span class='tname'>密码</span>\
                     <div class='info-r'>\
-                        <input class='bt-input-text mr5' type='text' name='password' id='MyPassword' style='width:330px' value='"+password+"' />\
+                        <input class='bt-input-text mr5' type='text' name='password' id='MyPassword' style='width:330px' value='"+htmlEncode(password)+"' />\
                         <span title='随机密码' class='glyphicon glyphicon-repeat cursor' onclick='repeatPwd(16)'></span></div>\
                     </div>\
-                    <input type='hidden' name='id' value='"+id+"'>\
+                    <input type='hidden' name='id' value='"+htmlEncode(id)+"'>\
                 </form>",
         yes:function(index){
             // var data = $("#mod_pwd").serialize();
@@ -987,7 +987,7 @@ function importBackupProgress(file,name){
             btn:["复制","取消"],
             content: '<div class="pd15">\
                         <div class="divtable">\
-                            <pre class="layui-code">'+rdata.data+'</pre>\
+                            <pre class="layui-code">'+htmlEncode(rdata.data)+'</pre>\
                         </div>\
                     </div>',
             success:function(){
@@ -1018,7 +1018,7 @@ function importDbExternalProgress(file,name){
             btn:["复制","取消"],
             content: '<div class="pd15">\
                         <div class="divtable">\
-                            <pre class="layui-code">'+rdata.data+'</pre>\
+                            <pre class="layui-code">'+htmlEncode(rdata.data)+'</pre>\
                         </div>\
                     </div>',
             success:function(){
@@ -1042,7 +1042,7 @@ function setLocalImport(db_name){
             area: ['500px','300px'],
             shadeClose:false,
             content:'<div class="fileUploadDiv">\
-                    <input type="hidden" id="input-val" value="'+upload_dir+'" />\
+                    <input type="hidden" id="input-val" value="'+htmlEncode(upload_dir)+'" />\
                     <input type="file" id="file_input"  multiple="true" autocomplete="off" />\
                     <button type="button"  id="opt" autocomplete="off">添加文件</button>\
                     <button type="button" id="up" autocomplete="off" >开始上传</button>\
@@ -1081,12 +1081,12 @@ function setLocalImport(db_name){
             var tbody = '';
             for (var i = 0; i < file_list.length; i++) {
                 tbody += '<tr>\
-                        <td><span> ' + file_list[i]['name'] + '</span></td>\
-                        <td><span> ' + file_list[i]['size'] + '</span></td>\
-                        <td><span> ' + file_list[i]['time'] + '</span></td>\
+                        <td><span> ' + htmlEncode(file_list[i]['name']) + '</span></td>\
+                        <td><span> ' + htmlEncode(file_list[i]['size']) + '</span></td>\
+                        <td><span> ' + htmlEncode(file_list[i]['time']) + '</span></td>\
                         <td style="text-align: right;">\
-                            <a class="btlink" onclick="importDbExternal(\'' + file_list[i]['name'] + '\',\'' +db_name+ '\')">导入</a> | \
-                            <a class="btlink" onclick="importDbExternalProgress(\'' + file_list[i]['name'] + '\',\'' +db_name+ '\')">导入进度</a> | \
+                            <a class="btlink" onclick="importDbExternal(\'' + jsEncode(file_list[i]['name']) + '\',\'' +jsEncode(db_name)+ '\')">导入</a> | \
+                            <a class="btlink" onclick="importDbExternalProgress(\'' + jsEncode(file_list[i]['name']) + '\',\'' +jsEncode(db_name)+ '\')">导入进度</a> | \
                             <a class="btlink del" index="'+i+'">删除</a>\
                         </td>\
                     </tr>';
@@ -1207,14 +1207,14 @@ function setBackupReq(db_name, obj){
         var tbody = '';
         for (var i = 0; i < rdata.data.length; i++) {
             tbody += '<tr>\
-                    <td><span> ' + rdata.data[i]['name'] + '</span></td>\
-                    <td><span> ' + rdata.data[i]['size'] + '</span></td>\
-                    <td><span> ' + rdata.data[i]['time'] + '</span></td>\
+                    <td><span> ' + htmlEncode(rdata.data[i]['name']) + '</span></td>\
+                    <td><span> ' + htmlEncode(rdata.data[i]['size']) + '</span></td>\
+                    <td><span> ' + htmlEncode(rdata.data[i]['time']) + '</span></td>\
                     <td style="text-align: right;">\
-                        <a class="btlink" onclick="importBackup(\'' + rdata.data[i]['name'] + '\',\'' +db_name+ '\')">导入</a> | \
-                        <a class="btlink" onclick="importBackupProgress(\'' + rdata.data[i]['name'] + '\',\'' +db_name+ '\')">导入进度</a> | \
-                        <a class="btlink" onclick="downloadBackup(\'' + rdata.data[i]['file'] + '\')">下载</a> | \
-                        <a class="btlink" onclick="delBackup(\'' + rdata.data[i]['name'] + '\',\'' +db_name+ '\')">删除</a>\
+                        <a class="btlink" onclick="importBackup(\'' + jsEncode(rdata.data[i]['name']) + '\',\'' +jsEncode(db_name)+ '\')">导入</a> | \
+                        <a class="btlink" onclick="importBackupProgress(\'' + jsEncode(rdata.data[i]['name']) + '\',\'' +jsEncode(db_name)+ '\')">导入进度</a> | \
+                        <a class="btlink" onclick="downloadBackup(\'' + jsEncode(rdata.data[i]['file']) + '\')">下载</a> | \
+                        <a class="btlink" onclick="delBackup(\'' + jsEncode(rdata.data[i]['name']) + '\',\'' +jsEncode(db_name)+ '\')">删除</a>\
                     </td>\
                 </tr> ';
         }
@@ -1238,20 +1238,20 @@ function dbList(page, search){
         var list = '';
         for(i in rdata.data){
             list += '<tr>';
-            list +='<td><input value="'+rdata.data[i]['id']+'" class="check" onclick="checkSelect();" type="checkbox"></td>';
-            list += '<td>' + rdata.data[i]['name'] +'</td>';
-            list += '<td>' + rdata.data[i]['username'] +'</td>';
+            list +='<td><input value="'+htmlEncode(rdata.data[i]['id'])+'" class="check" onclick="checkSelect();" type="checkbox"></td>';
+            list += '<td>' + htmlEncode(rdata.data[i]['name']) +'</td>';
+            list += '<td>' + htmlEncode(rdata.data[i]['username']) +'</td>';
             list += '<td>' + 
-                        '<span class="password" data-pw="'+rdata.data[i]['password']+'">***</span>' +
+                        '<span class="password" data-pw="'+htmlEncode(rdata.data[i]['password'])+'">***</span>' +
                         '<span onclick="showHidePass(this)" class="glyphicon glyphicon-eye-open cursor pw-ico" style="margin-left:10px"></span>'+
-                        '<span class="ico-copy cursor btcopy" style="margin-left:10px" title="复制密码" onclick="copyPass(\''+rdata.data[i]['password']+'\')"></span>'+
+                        '<span class="ico-copy cursor btcopy" style="margin-left:10px" title="复制密码" onclick="copyPass(\''+jsEncode(rdata.data[i]['password'])+'\')"></span>'+
                     '</td>';
         
 
-            list += '<td><span class="c9 input-edit" onclick="setDbPs(\''+rdata.data[i]['id']+'\',\''+rdata.data[i]['name']+'\',this)" style="display: inline-block;">'+rdata.data[i]['ps']+'</span></td>';
+            list += '<td><span class="c9 input-edit" onclick="setDbPs(\''+jsEncode(rdata.data[i]['id'])+'\',\''+jsEncode(rdata.data[i]['name'])+'\',this)" style="display: inline-block;">'+htmlEncode(rdata.data[i]['ps'])+'</span></td>';
             list += '<td style="text-align:right">';
 
-            list += '<a href="javascript:;" class="btlink" class="btlink" onclick="setBackup(\''+rdata.data[i]['name']+'\',this)" title="数据库备份">'+(rdata.data[i]['is_backup']?'已备份':'未备份') +'</a> | ';
+            list += '<a href="javascript:;" class="btlink" class="btlink" onclick="setBackup(\''+jsEncode(rdata.data[i]['name'])+'\',this)" title="数据库备份">'+(rdata.data[i]['is_backup']?'已备份':'未备份') +'</a> | ';
 
             var rw = '';
             var rw_change = 'all';
@@ -1267,16 +1267,16 @@ function dbList(page, search){
                     rw_val = "只读";
                     rw_change = 'all';
                 }
-                rw = '<a href="javascript:;" class="btlink" onclick="setDbRw(\''+rdata.data[i]['id']+'\',\''+rdata.data[i]['name']+'\',\''+rw_change+'\')" title="设置读写">'+rw_val+'</a> | ';
+                rw = '<a href="javascript:;" class="btlink" onclick="setDbRw(\''+jsEncode(rdata.data[i]['id'])+'\',\''+jsEncode(rdata.data[i]['name'])+'\',\''+rw_change+'\')" title="设置读写">'+rw_val+'</a> | ';
             }
 
 
-            list += '<a href="javascript:;" class="btlink" onclick="openPhpmyadmin(\''+rdata.data[i]['name']+'\',\''+rdata.data[i]['username']+'\',\''+rdata.data[i]['password']+'\')" title="数据库管理">管理</a> | ' +
-                        '<a href="javascript:;" class="btlink" onclick="repTools(\''+rdata.data[i]['name']+'\')" title="MySQL优化修复工具">工具</a> | ' +
-                        '<a href="javascript:;" class="btlink" onclick="setDbAccess(\''+rdata.data[i]['username']+'\')" title="设置数据库权限">权限</a> | ' +
+            list += '<a href="javascript:;" class="btlink" onclick="openPhpmyadmin(\''+jsEncode(rdata.data[i]['name'])+'\',\''+jsEncode(rdata.data[i]['username'])+'\',\''+jsEncode(rdata.data[i]['password'])+'\')" title="数据库管理">管理</a> | ' +
+                        '<a href="javascript:;" class="btlink" onclick="repTools(\''+jsEncode(rdata.data[i]['name'])+'\')" title="MySQL优化修复工具">工具</a> | ' +
+                        '<a href="javascript:;" class="btlink" onclick="setDbAccess(\''+jsEncode(rdata.data[i]['username'])+'\')" title="设置数据库权限">权限</a> | ' +
                         rw +
-                        '<a href="javascript:;" class="btlink" onclick="setDbPass('+rdata.data[i]['id']+',\''+ rdata.data[i]['username'] +'\',\'' + rdata.data[i]['password'] + '\')">改密</a> | ' +
-                        '<a href="javascript:;" class="btlink" onclick="delDb(\''+rdata.data[i]['id']+'\',\''+rdata.data[i]['name']+'\')" title="删除数据库">删除</a>' +
+                        '<a href="javascript:;" class="btlink" onclick="setDbPass('+jsEncode(rdata.data[i]['id'])+',\''+ jsEncode(rdata.data[i]['username']) +'\',\'' + jsEncode(rdata.data[i]['password']) + '\')">改密</a> | ' +
+                        '<a href="javascript:;" class="btlink" onclick="delDb(\''+jsEncode(rdata.data[i]['id'])+'\',\''+jsEncode(rdata.data[i]['name'])+'\')" title="删除数据库">删除</a>' +
                     '</td>';
             list += '</tr>';
         }
@@ -1284,8 +1284,8 @@ function dbList(page, search){
         //<button onclick="" id="dataRecycle" title="删除选中项" class="btn btn-default btn-sm" style="margin-left: 5px;"><span class="glyphicon glyphicon-trash" style="margin-right: 5px;"></span>回收站</button>
         var con = '<div class="safe bgw">\
             <button onclick="addDatabase()" title="添加数据库" class="btn btn-success btn-sm" type="button" style="margin-right: 5px;">添加数据库</button>\
-            <button onclick="setRootPwd(0,\''+rdata.info['root_pwd']+'\')" title="设置MySQL管理员密码" class="btn btn-default btn-sm" type="button" style="margin-right: 5px;">root密码</button>\
-            <button onclick="openPhpmyadmin(\'\',\'root\',\''+rdata.info['root_pwd']+'\')" title="打开phpMyadmin" class="btn btn-default btn-sm" type="button" style="margin-right: 5px;">phpMyAdmin</button>\
+            <button onclick="setRootPwd(0,\''+jsEncode(rdata.info['root_pwd'])+'\')" title="设置MySQL管理员密码" class="btn btn-default btn-sm" type="button" style="margin-right: 5px;">root密码</button>\
+            <button onclick="openPhpmyadmin(\'\',\'root\',\''+jsEncode(rdata.info['root_pwd'])+'\')" title="打开phpMyadmin" class="btn btn-default btn-sm" type="button" style="margin-right: 5px;">phpMyAdmin</button>\
             <button onclick="setDbAccess(\'root\')" title="ROOT权限" class="btn btn-default btn-sm" type="button" style="margin-right: 5px;">ROOT权限</button>\
             <button onclick="fixDbAccess(\'root\')" title="修复" class="btn btn-default btn-sm" type="button" style="margin-right: 5px;">修复</button>\
             <span style="float:right">              \
@@ -1348,13 +1348,13 @@ function myBinRollingLogs(_name, func, _args, line){
                 data = '当前没有日志!';
             }
 
-            $('#my_rolling_cmd').html(cmd);
+            $('#my_rolling_cmd').html(htmlEncode(cmd));
 
             $('#my_rolling_copy').click(function(){
                 copyText(cmd);
             });
 
-            var ebody = '<textarea readonly="readonly" style="margin: 0px;width: 100%;height: 570px;background-color: #333;color:#fff; padding:0 5px" id="roll_info_log">'+data+'</textarea>';
+            var ebody = '<textarea readonly="readonly" style="margin: 0px;width: 100%;height: 570px;background-color: #333;color:#fff; padding:0 5px" id="roll_info_log">'+htmlEncode(data)+'</textarea>';
             $("#my_rolling_logs").html(ebody);
             var ob = document.getElementById('roll_info_log');
             ob.scrollTop = ob.scrollHeight;
@@ -1409,9 +1409,9 @@ function myBinLogsRender(page){
         for(i in rdata.data){
             list += '<tr>';
 
-            list += '<td>' + rdata.data[i]['name'] +'</td>';
+            list += '<td>' + htmlEncode(rdata.data[i]['name']) +'</td>';
             list += '<td>' + toSize(rdata.data[i]['size'])+'</td>';
-            list += '<td>' + rdata.data[i]['time'] +'</td>';
+            list += '<td>' + htmlEncode(rdata.data[i]['time']) +'</td>';
             
 
             list += '<td style="text-align:right">';
@@ -1594,10 +1594,10 @@ function selectedTools(my_obj, db_name) {
         if (db_tools[i].checked) n++;
     }
     if (n > 0) {
-        var my_btns = '<button class="btn btn-default btn-sm" onclick="repDatabase(\'' + db_name + '\',null)">修复</button>\
-            <button class="btn btn-default btn-sm" onclick="optDatabase(\'' + db_name + '\',null)">优化</button>\
-            <button class="btn btn-default btn-sm" onclick="toDatabaseType(\'' + db_name + '\',null,\'InnoDB\')">转为InnoDB</button></button>\
-            <button class="btn btn-default btn-sm" onclick="toDatabaseType(\'' + db_name + '\',null,\'MyISAM\')">转为MyISAM</button>'
+        var my_btns = '<button class="btn btn-default btn-sm" onclick="repDatabase(\'' + jsEncode(db_name) + '\',null)">修复</button>\
+            <button class="btn btn-default btn-sm" onclick="optDatabase(\'' + jsEncode(db_name) + '\',null)">优化</button>\
+            <button class="btn btn-default btn-sm" onclick="toDatabaseType(\'' + jsEncode(db_name) + '\',null,\'InnoDB\')">转为InnoDB</button></button>\
+            <button class="btn btn-default btn-sm" onclick="toDatabaseType(\'' + jsEncode(db_name) + '\',null,\'MyISAM\')">转为MyISAM</button>'
         $("#db_tools").html(my_btns);
     } else {
         $("#db_tools").html('');
@@ -1612,16 +1612,16 @@ function repTools(db_name, res){
         for (var i = 0; i < rdata.tables.length; i++) {
             if (!types[rdata.tables[i].type]) continue;
             tbody += '<tr>\
-                    <td><input value="dbtools_' + rdata.tables[i].table_name + '" class="check" onclick="selectedTools(null,\'' + db_name + '\');" type="checkbox"></td>\
-                    <td><span style="width:220px;"> ' + rdata.tables[i].table_name + '</span></td>\
-                    <td>' + rdata.tables[i].type + '</td>\
-                    <td><span style="width:90px;"> ' + rdata.tables[i].collation + '</span></td>\
-                    <td>' + rdata.tables[i].rows_count + '</td>\
-                    <td>' + rdata.tables[i].data_size + '</td>\
+                    <td><input value="dbtools_' + htmlEncode(rdata.tables[i].table_name) + '" class="check" onclick="selectedTools(null,\'' + jsEncode(db_name) + '\');" type="checkbox"></td>\
+                    <td><span style="width:220px;"> ' + htmlEncode(rdata.tables[i].table_name) + '</span></td>\
+                    <td>' + htmlEncode(rdata.tables[i].type) + '</td>\
+                    <td><span style="width:90px;"> ' + htmlEncode(rdata.tables[i].collation) + '</span></td>\
+                    <td>' + htmlEncode(rdata.tables[i].rows_count) + '</td>\
+                    <td>' + htmlEncode(rdata.tables[i].data_size) + '</td>\
                     <td style="text-align: right;">\
-                        <a class="btlink" onclick="repDatabase(\''+ db_name + '\',\'' + rdata.tables[i].table_name + '\')">修复</a> |\
-                        <a class="btlink" onclick="optDatabase(\''+ db_name + '\',\'' + rdata.tables[i].table_name + '\')">优化</a> |\
-                        <a class="btlink" onclick="toDatabaseType(\''+ db_name + '\',\'' + rdata.tables[i].table_name + '\',\'' + types[rdata.tables[i].type] + '\')">转为' + types[rdata.tables[i].type] + '</a>\
+                        <a class="btlink" onclick="repDatabase(\''+ jsEncode(db_name) + '\',\'' + jsEncode(rdata.tables[i].table_name) + '\')">修复</a> |\
+                        <a class="btlink" onclick="optDatabase(\''+ jsEncode(db_name) + '\',\'' + jsEncode(rdata.tables[i].table_name) + '\')">优化</a> |\
+                        <a class="btlink" onclick="toDatabaseType(\''+ jsEncode(db_name) + '\',\'' + jsEncode(rdata.tables[i].table_name) + '\',\'' + types[rdata.tables[i].type] + '\')">转为' + types[rdata.tables[i].type] + '</a>\
                     </td>\
                 </tr> '
         }
@@ -1630,7 +1630,7 @@ function repTools(db_name, res){
             $(".gztr").html(tbody);
             $("#db_tools").html('');
             $("input[type='checkbox']").attr("checked", false);
-            $(".tools_size").html('大小：' + rdata.data_size);
+            $(".tools_size").html('大小：' + htmlEncode(rdata.data_size));
             return;
         }
 
@@ -1642,8 +1642,8 @@ function repTools(db_name, res){
             shadeClose: false,
             content: '<div class="pd15">\
                             <div class="db_list">\
-                                <span><a>数据库名称：'+ db_name + '</a>\
-                                <a class="tools_size">大小：'+ rdata.data_size + '</a></span>\
+                                <span><a>数据库名称：'+ htmlEncode(db_name) + '</a>\
+                                <a class="tools_size">大小：'+ htmlEncode(rdata.data_size) + '</a></span>\
                                 <span id="db_tools" style="float: right;"></span>\
                             </div >\
                             <div class="divtable">\
@@ -1651,7 +1651,7 @@ function repTools(db_name, res){
                             <table class="table table-hover "style="border:none">\
                                 <thead>\
                                     <tr>\
-                                        <th><input class="check" onclick="selectedTools(this,\''+ db_name + '\');" type="checkbox"></th>\
+                                        <th><input class="check" onclick="selectedTools(this,\''+ jsEncode(db_name) + '\');" type="checkbox"></th>\
                                         <th>表名</th>\
                                         <th>引擎</th>\
                                         <th>字符集</th>\
@@ -1763,10 +1763,10 @@ function updateMasterRepSlaveUser(username, password){
         shift: 5,
         shadeClose: true,
         content: "<form class='bt-form pd20 pb70' id='update_master'>\
-            <div class='line'><span class='tname'>用户名</span><div class='info-r'><input name='username' readonly='readonly' class='bt-input-text mr5' placeholder='用户名' type='text' style='width:330px;' value='"+username+"'></div></div>\
+            <div class='line'><span class='tname'>用户名</span><div class='info-r'><input name='username' readonly='readonly' class='bt-input-text mr5' placeholder='用户名' type='text' style='width:330px;' value='"+htmlEncode(username)+"'></div></div>\
             <div class='line'>\
             <span class='tname'>密码</span>\
-            <div class='info-r'><input class='bt-input-text mr5' type='text' name='password' id='MyPassword' style='width:330px' value='"+password+"' /><span title='随机密码' class='glyphicon glyphicon-repeat cursor' onclick='repeatPwd(16)'></span></div>\
+            <div class='info-r'><input class='bt-input-text mr5' type='text' name='password' id='MyPassword' style='width:330px' value='"+htmlEncode(password)+"' /><span title='随机密码' class='glyphicon glyphicon-repeat cursor' onclick='repeatPwd(16)'></span></div>\
             </div>\
             <input type='hidden' name='ps' value='' />\
             <div class='bt-form-submit-btn'>\
@@ -1807,7 +1807,7 @@ function getMasterRepSlaveUserCmd(username, db=''){
             title: '同步命令',
             area: '500px',
             content:"<form class='bt-form pd20 pb70' id='add_master'>\
-            <div class='line'>"+cmd+"</div>\
+            <div class='line'>"+htmlEncode(cmd)+"</div>\
             <div class='bt-form-submit-btn' style='text-align:center;'>\
                 <button type='button' class='btn btn-success btn-sm btn-title'>选择其中一个复制</button>\
             </div>\
@@ -1864,7 +1864,7 @@ function setDbMasterAccess(username){
                     $('select[name="dataAccess"]').after("<input id='dataAccess_subid' class='bt-input-text mr5' type='text' name='address' placeholder='多个IP使用逗号(,)分隔' style='width: 230px; display: inline-block;'>");
                 } else {
                     $('select[name="dataAccess"]').find('option[value="ip"]').attr("selected",true);
-                    $('select[name="dataAccess"]').after("<input value='"+rdata.msg+"' id='dataAccess_subid' class='bt-input-text mr5' type='text' name='address' placeholder='多个IP使用逗号(,)分隔' style='width: 230px; display: inline-block;'>");
+                    $('select[name="dataAccess"]').after("<input value='"+htmlEncode(rdata.msg)+"' id='dataAccess_subid' class='bt-input-text mr5' type='text' name='address' placeholder='多个IP使用逗号(,)分隔' style='width: 230px; display: inline-block;'>");
                 }
 
                  $('select[name="dataAccess"]').change(function(){
@@ -1935,13 +1935,13 @@ function getMasterRepSlaveList(){
             // console.log(i);
             var name = user_list[i]['username'];
             var password = user_list[i]['password'];
-            list += '<tr><td>'+name+'</td>\
-                <td>'+password+'</td>\
+            list += '<tr><td>'+htmlEncode(name)+'</td>\
+                <td>'+htmlEncode(password)+'</td>\
                 <td>\
-                    <a class="btlink" onclick="updateMasterRepSlaveUser(\''+name+'\',\''+password+'\');">修改</a> | \
-                    <a class="btlink" onclick="delMasterRepSlaveUser(\''+name+'\');">删除</a> | \
-                    <a class="btlink" onclick="setDbMasterAccess(\''+name+'\');">权限</a> | \
-                    <a class="btlink" onclick="getMasterRepSlaveUserCmd(\''+name+'\');">从库同步命令</a>\
+                    <a class="btlink" onclick="updateMasterRepSlaveUser(\''+jsEncode(name)+'\',\''+jsEncode(password)+'\');">修改</a> | \
+                    <a class="btlink" onclick="delMasterRepSlaveUser(\''+jsEncode(name)+'\');">删除</a> | \
+                    <a class="btlink" onclick="setDbMasterAccess(\''+jsEncode(name)+'\');">权限</a> | \
+                    <a class="btlink" onclick="getMasterRepSlaveUserCmd(\''+jsEncode(name)+'\');">从库同步命令</a>\
                 </td>\
             </tr>';
         }
@@ -2002,7 +2002,7 @@ function getFullSyncStatus(db){
             var sourceList = '';
             for (var i = 0; i < rsource.length; i++) {
                 if ('Channel_Name' in rsource[i]){
-                    sourceList += '<option val="'+rsource[i]['Master_Host']+'">'+rsource[i]['Master_Host']+'</option>';
+                    sourceList += '<option val="'+htmlEncode(rsource[i]['Master_Host'])+'">'+htmlEncode(rsource[i]['Master_Host'])+'</option>';
                 }
             }
 
@@ -2063,7 +2063,7 @@ function getFullSyncStatus(db){
                             btn:["复制","取消"],
                             content: '<div class="pd15">\
                                         <div class="divtable">\
-                                            <pre class="layui-code">'+rdata.data+'</pre>\
+                                            <pre class="layui-code">'+htmlEncode(rdata.data)+'</pre>\
                                         </div>\
                                     </div>',
                             success:function(){
@@ -2158,7 +2158,7 @@ function dataSyncVerify(db){
                     btn:["复制","取消"],
                     content: '<div class="pd15">\
                                 <div class="divtable">\
-                                    <pre class="layui-code">'+rdata.data+'</pre>\
+                                    <pre class="layui-code">'+htmlEncode(rdata.data)+'</pre>\
                                 </div>\
                             </div>',
                     success:function(){
@@ -2202,9 +2202,9 @@ function addSlaveSSH(ip=''){
             shadeClose: true,
             btn:["确认","取消"],
             content: "<form class='bt-form pd20'>\
-                <div class='line'><span class='tname'>IP</span><div class='info-r'><input name='ip' class='bt-input-text mr5' type='text' style='width:330px;' value='"+ip+"'></div></div>\
-                <div class='line'><span class='tname'>端口</span><div class='info-r'><input name='port' class='bt-input-text mr5' type='number' style='width:330px;' value='"+port+"'></div></div>\
-                <div class='line'><span class='tname'>同步账户[DB]</span><div class='info-r'><input name='db_user'  placeholder='为空则取第一个!' class='bt-input-text mr5' type='text' style='width:330px;' value='"+db_user+"'></div></div>\
+                <div class='line'><span class='tname'>IP</span><div class='info-r'><input name='ip' class='bt-input-text mr5' type='text' style='width:330px;' value='"+htmlEncode(ip)+"'></div></div>\
+                <div class='line'><span class='tname'>端口</span><div class='info-r'><input name='port' class='bt-input-text mr5' type='number' style='width:330px;' value='"+htmlEncode(port)+"'></div></div>\
+                <div class='line'><span class='tname'>同步账户[DB]</span><div class='info-r'><input name='db_user'  placeholder='为空则取第一个!' class='bt-input-text mr5' type='text' style='width:330px;' value='"+htmlEncode(db_user)+"'></div></div>\
                 <div class='line'>\
                 <span class='tname'>ID_RSA</span>\
                 <div class='info-r'><textarea class='bt-input-text mr5' row='20' cols='50' name='id_rsa' style='width:330px;height:200px;'></textarea></div>\
@@ -2212,7 +2212,7 @@ function addSlaveSSH(ip=''){
                 <input type='hidden' name='ps' value='' />\
               </form>",
             success:function(){
-                $('textarea[name="id_rsa"]').html(id_rsa);
+                $('textarea[name="id_rsa"]').html(htmlEncode(id_rsa));
             },
             yes:function(index){
                 var ip = $('input[name="ip"]').val();
@@ -2288,13 +2288,13 @@ function getSlaveSSHPage(page=1){
                 db_user = ssh_list[i]['db_user'];
             }
 
-            list += '<tr><td>'+ip+'</td>\
-                <td>'+port+'</td>\
-                <td>'+db_user+'</td>\
-                <td>'+id_rsa+'</td>\
+            list += '<tr><td>'+htmlEncode(ip)+'</td>\
+                <td>'+htmlEncode(port)+'</td>\
+                <td>'+htmlEncode(db_user)+'</td>\
+                <td>'+htmlEncode(id_rsa)+'</td>\
                 <td>\
-                    <a class="btlink" onclick="addSlaveSSH(\''+ip+'\');">修改</a> | \
-                    <a class="btlink" onclick="delSlaveSSH(\''+ip+'\');">删除</a>\
+                    <a class="btlink" onclick="addSlaveSSH(\''+jsEncode(ip)+'\');">修改</a> | \
+                    <a class="btlink" onclick="delSlaveSSH(\''+jsEncode(ip)+'\');">删除</a>\
                 </td>\
             </tr>';
         }
@@ -2337,10 +2337,10 @@ function addSlaveSyncUser(ip=''){
             shadeClose: true,
             btn:["确认","取消"],
             content: "<form class='bt-form pd20'>\
-                <div class='line'><span class='tname'>IP</span><div class='info-r'><input name='ip' class='bt-input-text mr5' type='text' style='width:330px;' value='"+ip+"'></div></div>\
-                <div class='line'><span class='tname'>端口</span><div class='info-r'><input name='port' class='bt-input-text mr5' type='number' style='width:330px;' value='"+port+"'></div></div>\
-                <div class='line'><span class='tname'>同步账户</span><div class='info-r'><input name='user' class='bt-input-text mr5' type='text' style='width:330px;' value='"+user+"'></div></div>\
-                <div class='line'><span class='tname'>同步密码</span><div class='info-r'><input name='pass' class='bt-input-text mr5' type='text' style='width:330px;' value='"+pass+"'></div></div>\
+                <div class='line'><span class='tname'>IP</span><div class='info-r'><input name='ip' class='bt-input-text mr5' type='text' style='width:330px;' value='"+htmlEncode(ip)+"'></div></div>\
+                <div class='line'><span class='tname'>端口</span><div class='info-r'><input name='port' class='bt-input-text mr5' type='number' style='width:330px;' value='"+htmlEncode(port)+"'></div></div>\
+                <div class='line'><span class='tname'>同步账户</span><div class='info-r'><input name='user' class='bt-input-text mr5' type='text' style='width:330px;' value='"+htmlEncode(user)+"'></div></div>\
+                <div class='line'><span class='tname'>同步密码</span><div class='info-r'><input name='pass' class='bt-input-text mr5' type='text' style='width:330px;' value='"+htmlEncode(pass)+"'></div></div>\
                 <div class='line'>\
                     <span class='tname'>同步模式</span>\
                     <div class='info-r'>\
@@ -2354,10 +2354,10 @@ function addSlaveSyncUser(ip=''){
                 <span class='tname'>CMD[必填]</span>\
                 <div class='info-r'><textarea class='bt-input-text mr5' row='20' cols='30' name='cmd' style='width:330px;height:150px;'></textarea></div>\
                 </div>\
-                <input type='hidden' name='mode' value='"+mode+"' />\
+                <input type='hidden' name='mode' value='"+htmlEncode(mode)+"' />\
               </form>",
             success:function(){
-                $('textarea[name="cmd"]').html(cmd);
+                $('textarea[name="cmd"]').html(htmlEncode(cmd));
                 $('textarea[name="cmd"]').change(function(){
                     var val = $(this).val();
                     val = val.replace(';','');
@@ -2446,14 +2446,14 @@ function getSlaveSyncUserPage(page=1){
                 cmd = '已设置';
             }
 
-            list += '<tr><td>'+ip+'</td>\
-                <td>'+port+'</td>\
-                <td>'+user+'</td>\
-                <td>'+apass+'</td>\
+            list += '<tr><td>'+htmlEncode(ip)+'</td>\
+                <td>'+htmlEncode(port)+'</td>\
+                <td>'+htmlEncode(user)+'</td>\
+                <td>'+htmlEncode(apass)+'</td>\
                 <td>'+cmd+'</td>\
                 <td>\
-                    <a class="btlink" onclick="addSlaveSyncUser(\''+ip+'\');">修改</a> | \
-                    <a class="btlink" onclick="delSlaveSyncUser(\''+ip+'\');">删除</a>\
+                    <a class="btlink" onclick="addSlaveSyncUser(\''+jsEncode(ip)+'\');">修改</a> | \
+                    <a class="btlink" onclick="delSlaveSyncUser(\''+jsEncode(ip)+'\');">删除</a>\
                 </td>\
             </tr>';
         }
@@ -2592,7 +2592,7 @@ function handlerRun(){
             title: '手动执行',
             area: '500px',
             content:"<form class='bt-form pd20 pb70' id='add_master'>\
-            <div class='line'>"+cmd+"</div>\
+            <div class='line'>"+htmlEncode(cmd)+"</div>\
             <div class='bt-form-submit-btn'>\
                 <button type='button' class='btn btn-success btn-sm btn-title class-copy-cmd'>复制</button>\
             </div>\
@@ -2632,11 +2632,11 @@ function masterOrSlaveConf(version=''){
             var list = '';
             for(i in rdata.data){
                 list += '<tr>';
-                list += '<td>' + rdata.data[i]['name'] +'</td>';
+                list += '<td>' + htmlEncode(rdata.data[i]['name']) +'</td>';
                 list += '<td>' + (rdata.data[i]['master']?'是':'否') +'</td>';
                 list += '<td style="text-align:right">' + 
-                    '<a href="javascript:;" class="btlink" onclick="setDbMaster(\''+rdata.data[i]['name']+'\')" title="加入或退出">'+(rdata.data[i]['master']?'退出':'加入')+'</a> | ' +
-                    '<a href="javascript:;" class="btlink" onclick="getMasterRepSlaveUserCmd(\'\',\''+rdata.data[i]['name']+'\')" title="同步命令">同步命令</a>' +
+                    '<a href="javascript:;" class="btlink" onclick="setDbMaster(\''+jsEncode(rdata.data[i]['name'])+'\')" title="加入或退出">'+(rdata.data[i]['master']?'退出':'加入')+'</a> | ' +
+                    '<a href="javascript:;" class="btlink" onclick="getMasterRepSlaveUserCmd(\'\',\''+jsEncode(rdata.data[i]['name'])+'\')" title="同步命令">同步命令</a>' +
                 '</td>';
                 list += '</tr>';
             }
@@ -2915,36 +2915,36 @@ function masterOrSlaveConf(version=''){
 
                 list += '<tr>';
                 if (mdb_ver >= 8){
-                    list += '<td>' + rdata.data[i]['Source_Host'] +'</td>';
-                    list += '<td>' + rdata.data[i]['Source_Port'] +'</td>';
-                    list += '<td>' + rdata.data[i]['Source_User'] +'</td>';
-                    list += '<td>' + rdata.data[i]['Relay_Source_Log_File'] +'</td>';
-                    list += '<td>' + rdata.data[i]['Replica_IO_Running'] +'</td>';
-                    list += '<td>' + rdata.data[i]['Replica_SQL_Running'] +'</td>';
+                    list += '<td>' + htmlEncode(rdata.data[i]['Source_Host']) +'</td>';
+                    list += '<td>' + htmlEncode(rdata.data[i]['Source_Port']) +'</td>';
+                    list += '<td>' + htmlEncode(rdata.data[i]['Source_User']) +'</td>';
+                    list += '<td>' + htmlEncode(rdata.data[i]['Relay_Source_Log_File']) +'</td>';
+                    list += '<td>' + htmlEncode(rdata.data[i]['Replica_IO_Running']) +'</td>';
+                    list += '<td>' + htmlEncode(rdata.data[i]['Replica_SQL_Running']) +'</td>';
 
                 } else {            
-                    list += '<td>' + rdata.data[i]['Master_Host'] +'</td>';
-                    list += '<td>' + rdata.data[i]['Master_Port'] +'</td>';
-                    list += '<td>' + rdata.data[i]['Master_User'] +'</td>';
-                    list += '<td>' + rdata.data[i]['Master_Log_File'] +'</td>';
-                    list += '<td>' + rdata.data[i]['Slave_IO_Running'] +'</td>';
-                    list += '<td>' + rdata.data[i]['Slave_SQL_Running'] +'</td>';
+                    list += '<td>' + htmlEncode(rdata.data[i]['Master_Host']) +'</td>';
+                    list += '<td>' + htmlEncode(rdata.data[i]['Master_Port']) +'</td>';
+                    list += '<td>' + htmlEncode(rdata.data[i]['Master_User']) +'</td>';
+                    list += '<td>' + htmlEncode(rdata.data[i]['Master_Log_File']) +'</td>';
+                    list += '<td>' + htmlEncode(rdata.data[i]['Slave_IO_Running']) +'</td>';
+                    list += '<td>' + htmlEncode(rdata.data[i]['Slave_SQL_Running']) +'</td>';
                 }
 
                 if (rdata.data[i]['Seconds_Behind_Master'] == 0 ){
-                    list += '<td>' + rdata.data[i]['Seconds_Behind_Master'] + '</td>';
+                    list += '<td>' + htmlEncode(rdata.data[i]['Seconds_Behind_Master']) + '</td>';
                 }
                 else if (rdata.data[i]['Seconds_Behind_Source'] == 0){
-                    list += '<td>' + rdata.data[i]['Seconds_Behind_Source'] + '</td>';
+                    list += '<td>' + htmlEncode(rdata.data[i]['Seconds_Behind_Source']) + '</td>';
                 } else {
-                    list += '<td>' + '<a href="javascript:;" class="btlink btn_delay_slave">' + rdata.data[i]['Seconds_Behind_Master'] +'</a></td>';
+                    list += '<td>' + '<a href="javascript:;" class="btlink btn_delay_slave">' + htmlEncode(rdata.data[i]['Seconds_Behind_Master']) +'</a></td>';
                 }
                 // list += '<td>' + '<a href="javascript:;" class="btlink btn_delay_slave">' + rdata.data[i]['Seconds_Behind_Master'] +'</a></td>';
                 
 
 
                 if (isHasSign){
-                    list += '<td>' + v['Channel_Name'] +'</td>';
+                    list += '<td>' + htmlEncode(v['Channel_Name']) +'</td>';
                 }
 
                 list += '<td>' + status +'</td>';
@@ -3127,11 +3127,11 @@ function masterOrSlaveConf(version=''){
             var list = '';
             for(i in rdata.data){
                 list += '<tr>';
-                list += '<td>' + rdata.data[i]['name'] +'</td>';
+                list += '<td>' + htmlEncode(rdata.data[i]['name']) +'</td>';
                 list += '<td style="text-align:right">' + 
-                    '<a href="javascript:;" class="btlink" onclick="setDbSlave(\''+rdata.data[i]['name']+'\')"  title="加入|退出">'+(rdata.data[i]['slave']?'退出':'加入')+'</a> | ' +
-                    '<a href="javascript:;" class="btlink" onclick="getFullSyncStatus(\''+rdata.data[i]['name']+'\')" title="同步">同步</a> | ' +
-                    '<a href="javascript:;" class="btlink" onclick="dataSyncVerify(\''+rdata.data[i]['name']+'\')" title="数据校验">数据校验</a>' +
+                    '<a href="javascript:;" class="btlink" onclick="setDbSlave(\''+jsEncode(rdata.data[i]['name'])+'\')"  title="加入|退出">'+(rdata.data[i]['slave']?'退出':'加入')+'</a> | ' +
+                    '<a href="javascript:;" class="btlink" onclick="getFullSyncStatus(\''+jsEncode(rdata.data[i]['name'])+'\')" title="同步">同步</a> | ' +
+                    '<a href="javascript:;" class="btlink" onclick="dataSyncVerify(\''+jsEncode(rdata.data[i]['name'])+'\')" title="数据校验">数据校验</a>' +
                 '</td>';
                 list += '</tr>';
             }

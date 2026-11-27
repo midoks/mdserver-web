@@ -46,7 +46,7 @@ function mtCommonFunc(){
                 btn:["复制","取消"],
                 content: '<div class="pd15">\
                             <div class="divtable">\
-                                <pre class="layui-code">'+data.data+'</pre>\
+                                <pre class="layui-code">'+htmlEncode(data.data)+'</pre>\
                             </div>\
                         </div>',
                 success:function(){

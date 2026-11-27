@@ -43,9 +43,9 @@ function swapStatus() {
                             <option value="2GB">2GB</option>\
                             <option value="4GB">4GB</option>\
                         </select>\
-                        <span>当前: </span><input style="width:70px;background-color:#eee;" class="bt-input-text mr5" name="cur_size" type="text" value="' + size + '" readonly>MB\
+                        <span>当前: </span><input style="width:70px;background-color:#eee;" class="bt-input-text mr5" name="cur_size" type="text" value="' + htmlEncode(size) + '" readonly>MB\
                         </div>\
-                        <p><span>修改</span><input style="width: 70px;" class="bt-input-text mr5" name="size" value="' + size + '" type="number" >MB</p>\
+                        <p><span>修改</span><input style="width: 70px;" class="bt-input-text mr5" name="size" value="' + htmlEncode(size) + '" type="number" >MB</p>\
                         <div style="margin-top:10px; padding-right:15px" class="text-right"><button class="btn btn-success btn-sm" onclick="submitSwap()">提交</button></div>\
                     </div>';
 

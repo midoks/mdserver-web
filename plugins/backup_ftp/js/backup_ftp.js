@@ -61,19 +61,19 @@ function upyunApi(){
             </p>\
             <p>\
                 <span class="span_tit">Host：</span>\
-                <input placeholder="请输入主机地址" style="width: 200px;" type="text" name="upyun_service" value="'+token.ftp_host+'">  *服务器地址,FTP默认端口21, SFTP默认端口22\
+                <input placeholder="请输入主机地址" style="width: 200px;" type="text" name="upyun_service" value="'+htmlEncode(token.ftp_host)+'">  *服务器地址,FTP默认端口21, SFTP默认端口22\
             </p>\
             <p>\
                 <span class="span_tit">用户名：</span>\
-                <input style="width: 200px;" type="text" name="ftp_username" value="'+token.ftp_user+'">  *指定用户名\
+                <input style="width: 200px;" type="text" name="ftp_username" value="'+htmlEncode(token.ftp_user)+'">  *指定用户名\
             </p>\
             <p>\
                 <span class="span_tit">密码：</span>\
-                <input style="width: 200px;" type="password" name="ftp_password" value="'+token.ftp_pass+'">  *登录密码\
+                <input style="width: 200px;" type="password" name="ftp_password" value="'+htmlEncode(token.ftp_pass)+'">  *登录密码\
             </p>\
             <p>\
                 <span class="span_tit">存储位置：</span>\
-                <input placeholder="请输入存储位置" style="width: 200px;" type="text" name="backup_path" value="'+token.backup_path+'"> *相对于根目录的路径，默认是/backup\
+                <input placeholder="请输入存储位置" style="width: 200px;" type="text" name="backup_path" value="'+htmlEncode(token.backup_path)+'"> *相对于根目录的路径，默认是/backup\
             </p>\
         </div>';
         layer.open({
@@ -196,15 +196,15 @@ function osList(path){
         var listFiles = ''
         for(var i=0;i<mlist.list.length;i++){
             if(mlist.list[i].type == null){
-                listBody += '<tr><td class="cursor" onclick="osList(\''+(path+'/'+mlist.list[i].name).replace('//','/')+'\')"><span class="ico ico-folder"></span>\<span>'+mlist.list[i].name+'</span></td>\
+                listBody += '<tr><td class="cursor" onclick="osList(\''+jsEncode((path+'/'+mlist.list[i].name).replace('//','/'))+'\')"><span class="ico ico-folder"></span>\<span>'+htmlEncode(mlist.list[i].name)+'</span></td>\
                 <td>-</td>\
                 <td>-</td>\
-                <td class="text-right"><a class="btlink" onclick="deleteFile(\''+mlist.list[i].name+'\', true)">删除</a></td></tr>'
+                <td class="text-right"><a class="btlink" onclick="deleteFile(\''+jsEncode(mlist.list[i].name)+'\', true)">删除</a></td></tr>'
             }else{
-                listFiles += '<tr><td class="cursor"><span class="ico ico-file"></span>\<span>'+mlist.list[i].name+'</span></td>\
+                listFiles += '<tr><td class="cursor"><span class="ico ico-file"></span>\<span>'+htmlEncode(mlist.list[i].name)+'</span></td>\
                 <td>'+toSize(mlist.list[i].size)+'</td>\
                 <td>'+getFtpLocalTime(mlist.list[i].time)+'</td>\
-                <td class="text-right"><a target="_blank" href="'+mlist.list[i].download+'" class="btlink">下载</a> | <a class="btlink" onclick="deleteFile(\''+mlist.list[i].name+'\', false)">删除</a></td></tr>'
+                <td class="text-right"><a target="_blank" href="'+htmlEncode(mlist.list[i].download)+'" class="btlink">下载</a> | <a class="btlink" onclick="deleteFile(\''+jsEncode(mlist.list[i].name)+'\', false)">删除</a></td></tr>'
             }
         }
         listBody += listFiles;
@@ -222,7 +222,7 @@ function osList(path){
             }
             pathname += '/' + tmp[i];
             pathname = pathname.replace('//','/');
-            pathLi += '<li><a title="'+pathname+'" onclick="osList(\''+pathname+'\')">'+dirname+'</a></li>';
+            pathLi += '<li><a title="'+htmlEncode(pathname)+'" onclick="osList(\''+jsEncode(pathname)+'\')">'+htmlEncode(dirname)+'</a></li>';
         }
         var um = 1;
         if(tmp[tmp.length-1] == '') um = 2;

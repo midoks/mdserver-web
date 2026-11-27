@@ -142,11 +142,11 @@ function dbConf(){
         }
 
         var mlist = '';
-        mlist += '<p><span>数据库地址</span><input style="width: 250px;" class="bt-input-text mr5" name="db_host" value="'+db_host+'" type="text"></p>'
-        mlist += '<p><span>数据库端口</span><input style="width: 250px;" class="bt-input-text mr5" name="db_port" value="'+db_port+'" type="text"></p>'
-        mlist += '<p><span>数据库名称</span><input style="width: 250px;" class="bt-input-text mr5" name="db_name" value="'+db_name+'" type="text"></p>'
-        mlist += '<p><span>用户名</span><input style="width: 250px;" class="bt-input-text mr5" name="db_user" value="'+db_user+'" type="text"></p>'
-        mlist += '<p><span>密码</span><input style="width: 250px;" class="bt-input-text mr5" name="db_pass" value="'+db_pass+'" type="text"></p>'
+        mlist += '<p><span>数据库地址</span><input style="width: 250px;" class="bt-input-text mr5" name="db_host" value="'+htmlEncode(db_host)+'" type="text"></p>'
+        mlist += '<p><span>数据库端口</span><input style="width: 250px;" class="bt-input-text mr5" name="db_port" value="'+htmlEncode(db_port)+'" type="text"></p>'
+        mlist += '<p><span>数据库名称</span><input style="width: 250px;" class="bt-input-text mr5" name="db_name" value="'+htmlEncode(db_name)+'" type="text"></p>'
+        mlist += '<p><span>用户名</span><input style="width: 250px;" class="bt-input-text mr5" name="db_user" value="'+htmlEncode(db_user)+'" type="text"></p>'
+        mlist += '<p><span>密码</span><input style="width: 250px;" class="bt-input-text mr5" name="db_pass" value="'+htmlEncode(db_pass)+'" type="text"></p>'
 
         var option = '<style>.conf_p p{margin-bottom: 2px}</style>\
 			<div class="conf_p" style="margin-bottom:0">\
@@ -194,11 +194,11 @@ function userConf(){
         }
 
         var mlist = '';
-        mlist += '<p><span>交易所</span><input style="width: 250px;" class="bt-input-text mr5" name="exchange" value="'+exchange+'" type="text"><font>必填写[okex, binance]</font></p>'
-        mlist += '<p><span>apiKey</span><input style="width: 250px;" class="bt-input-text mr5" name="app_key" value="'+app_key+'" type="text"><font>必填写</font></p>'
-        mlist += '<p><span>secret</span><input style="width: 250px;" class="bt-input-text mr5" name="secret" value="'+secret+'" type="text"><font>必填写</font></p>'
-        mlist += '<p><span>password</span><input style="width: 250px;" class="bt-input-text mr5" name="password" value="'+password+'" type="text"><font>根据情况填写</font></p>'
-        mlist += '<p><span>uid</span><input style="width: 250px;" class="bt-input-text mr5" name="uid" value="'+uid+'" type="text"><font>根据情况填写</font></p>'
+        mlist += '<p><span>交易所</span><input style="width: 250px;" class="bt-input-text mr5" name="exchange" value="'+htmlEncode(exchange)+'" type="text"><font>必填写[okex, binance]</font></p>'
+        mlist += '<p><span>apiKey</span><input style="width: 250px;" class="bt-input-text mr5" name="app_key" value="'+htmlEncode(app_key)+'" type="text"><font>必填写</font></p>'
+        mlist += '<p><span>secret</span><input style="width: 250px;" class="bt-input-text mr5" name="secret" value="'+htmlEncode(secret)+'" type="text"><font>必填写</font></p>'
+        mlist += '<p><span>password</span><input style="width: 250px;" class="bt-input-text mr5" name="password" value="'+htmlEncode(password)+'" type="text"><font>根据情况填写</font></p>'
+        mlist += '<p><span>uid</span><input style="width: 250px;" class="bt-input-text mr5" name="uid" value="'+htmlEncode(uid)+'" type="text"><font>根据情况填写</font></p>'
 
         var option = '<style>.conf_p p{margin-bottom: 2px}</style>\
 			<div class="conf_p" style="margin-bottom:0">\
@@ -238,9 +238,9 @@ function syncDataList(){
             for(i in dlist){
 
                 list += '<tr>';
-                list += '<td>' + dlist[i] +'</td>';
+                list += '<td>' + htmlEncode(dlist[i]) +'</td>';
                 list += '<td style="text-align:right">' +
-                            '<a href="javascript:;" class="btlink" onclick="syncDataDelete(\''+dlist[i]+'\')" title="删除">删除</a>' +
+                            '<a href="javascript:;" class="btlink" onclick="syncDataDelete(\''+jsEncode(dlist[i])+'\')" title="删除">删除</a>' +
                         '</td>';
                 list += '</tr>';
             } 
@@ -451,7 +451,7 @@ function onlineEditStrategyFile(k, f, tag) {
         var o = "";
         for(var p = 0; p < u.length; p++) {
             m = s.data.encoding == u[p] ? "selected" : "";
-            n += '<option value="' + u[p] + '" ' + m + ">" + u[p] + "</option>";
+            n += '<option value="' + htmlEncode(u[p]) + '" ' + m + ">" + htmlEncode(u[p]) + "</option>";
         }
         var code_mirror = null; 
         var r = layer.open({
@@ -841,7 +841,7 @@ function calcKLineChats(){
             ],
             tooltip: {
               formatter: function (param) {
-                return param.name + '<br>' + (param.data.coord || '');
+                return htmlEncode(param.name) + '<br>' + htmlEncode(param.data.coord || '');
               }
             }
           },

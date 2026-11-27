@@ -33,21 +33,21 @@ function xuiCommonFunc(){
         var info = rdata['data'];
         var con = '<p class="conf_p">\
             <span>用户名</span>\
-            <input class="bt-input-text mr5" type="text" value="' + info.username + '">\
+            <input class="bt-input-text mr5" type="text" value="' + htmlEncode(info.username) + '">\
         </p>';
 
         con += '<p class="conf_p">\
             <span>密码</span>\
-            <input class="bt-input-text mr5" type="text" value="' + info.password  +'">\
+            <input class="bt-input-text mr5" type="text" value="' + htmlEncode(info.password)  +'">\
         </p>';
         con += '<p class="conf_p">\
             <span>端口</span>\
-            <input class="bt-input-text mr5" type="text" value="' + info.port  +'">\
+            <input class="bt-input-text mr5" type="text" value="' + htmlEncode(info.port)  +'">\
         </p>';
 
         con += '<p class="conf_p">\
             <span>路径</span>\
-            <input class="bt-input-text mr5" type="text" value="' + info.path  +'">\
+            <input class="bt-input-text mr5" type="text" value="' + htmlEncode(info.path)  +'">\
         </p>';
 
         con += '<hr/><p class="conf_p" style="text-align:center;">\

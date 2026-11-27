@@ -236,7 +236,7 @@ function pingIpList(){
         option += '<option value="all">所有</option>';
 
         for (var i = 0; i < ips.length; i++) {
-            option += '<option value="'+ips[i]+'">'+ips[i]+'</option>';
+            option += '<option value="'+htmlEncode(ips[i])+'">'+htmlEncode(ips[i])+'</option>';
         }
         $('select[name="ip_list"]').html(option);
 

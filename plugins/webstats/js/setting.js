@@ -10,13 +10,13 @@ wsPost('get_global_conf', '' ,{}, function(rdata){
 			<div class="ws_content">\
 				<div class="item-line">\
 					<div class="choose_title">IP统计</div>\
-					<input type="number" class="bt-input-text" name="ip_top_num" value="'+rdata['global']['ip_top_num']+'" style="width:55px;">\
+					<input type="number" class="bt-input-text" name="ip_top_num" value="'+htmlEncode(rdata['global']['ip_top_num'])+'" style="width:55px;">\
 					<button type="button" id="ip_top_num" class="btn btn-default btn-sm" style="margin-left: 62px;"><span>保存</span></button>\
 					<span class="tips" data-toggle="tooltip" data-placement="top" title="设置IP统计页面的TOP数量">?</span>\
 				</div>\
 				<div class="item-line">\
 					<div class="choose_title">URI统计</div>\
-					<input type="number" class="bt-input-text" name="uri_top_num" value="'+rdata['global']['uri_top_num']+'" style="width:55px;">\
+					<input type="number" class="bt-input-text" name="uri_top_num" value="'+htmlEncode(rdata['global']['uri_top_num'])+'" style="width:55px;">\
 					<button type="button" id="uri_top_num" class="btn btn-default btn-sm" style="margin-left: 62px;"><span>保存</span></button>\
 					<span class="tips" data-toggle="tooltip" data-placement="top" title="设置URI统计页面的TOP数量">?</span>\
 				</div>\
@@ -28,7 +28,7 @@ wsPost('get_global_conf', '' ,{}, function(rdata){
 			<div class="ws_content">\
 				<div class="item-line">\
 					<div class="choose_title">日志保存天数</div>\
-					<input type="number" class="bt-input-text" name="save_day" value="'+rdata['global']['save_day']+'" style="width:55px;">/天 \
+					<input type="number" class="bt-input-text" name="save_day" value="'+htmlEncode(rdata['global']['save_day'])+'" style="width:55px;">/天 \
 					<button type="button" id="save_day" class="btn btn-default btn-sm" style="margin-left: 48px;"><span>保存</span></button>\
 					<span class="tips" data-toggle="tooltip" data-placement="top" title="缩短日志保存天数原有记录的日志将被删除，请谨慎操作">?</span>\
 				</div>\
@@ -139,7 +139,7 @@ wsPost('get_global_conf', '' ,{}, function(rdata){
 	                        <option value="regular" '+(_tmp[i].mode == 'regular'?'selected':'')+'>模糊匹配</option>\
 	                    </select>\
 	                </td>\
-	                <td><input name="url_val_'+i+'" style="width:290px" placeholder="'+(_tmp[i].mode == 'normal'?'例：需排除a.com/test.html请求，请填写 test.html':'包含此内容的URL请求将不会被统计，请谨慎填写')+'" type="text" value="'+_tmp[i].url+'"></td>\
+	                <td><input name="url_val_'+i+'" style="width:290px" placeholder="'+(_tmp[i].mode == 'normal'?'例：需排除a.com/test.html请求，请填写 test.html':'包含此内容的URL请求将不会被统计，请谨慎填写')+'" type="text" value="'+htmlEncode(_tmp[i].url)+'"></td>\
 	            </tr>';
             }
 

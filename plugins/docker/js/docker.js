@@ -77,7 +77,7 @@ function logsCon(id) {
                     border: 0px none; line-height:23px;padding: 15px; \
                     margin: 0px; white-space: pre-wrap; height: 405px; \
                     background-color: rgb(51,51,51);color:#f1f1f1;\
-                    border-radius:0px;">' + (rdata.msg == '' ? 'No logs' : rdata.msg) + '</pre>' +
+                    border-radius:0px;">' + htmlEncode(rdata.msg == '' ? 'No logs' : rdata.msg) + '</pre>' +
                 '</div>',
             success: function(index, layers) {
                 $(".crontab-log").scrollTop(1000000);
@@ -170,20 +170,20 @@ function dockerConListRender() {
             }
 
             var op = '';
-            op += '<a href="javascript:;" onclick="execCon(\'' + rlist[i]['Config']['Hostname'] + '\')" class="btlink">终端</a> | ';
-            op += '<a href="javascript:;" onclick="logsCon(\'' + rlist[i]['Id'] + '\')" class="btlink">日志</a> | ';
-            op += '<a href="javascript:;" onclick="deleteCon(\'' + rlist[i]['Config']['Hostname'] + '\')" class="btlink">删除</a>';
+            op += '<a href="javascript:;" onclick="execCon(\'' + jsEncode(rlist[i]['Config']['Hostname']) + '\')" class="btlink">终端</a> | ';
+            op += '<a href="javascript:;" onclick="logsCon(\'' + jsEncode(rlist[i]['Id']) + '\')" class="btlink">日志</a> | ';
+            op += '<a href="javascript:;" onclick="deleteCon(\'' + jsEncode(rlist[i]['Config']['Hostname']) + '\')" class="btlink">删除</a>';
 
             list += '<tr>';
-            list += '<td>' + rlist[i]['Name'].substring(1) + '</td>';
-            list += '<td>' + rlist[i]['Config']['Image'] + '</td>';
+            list += '<td>' + htmlEncode(rlist[i]['Name'].substring(1)) + '</td>';
+            list += '<td>' + htmlEncode(rlist[i]['Config']['Image']) + '</td>';
             list += '<td>' + getFormatTime(rlist[i]['Created']) + '</td>';
 
 
             if (docker_status == 'start') {
-                list += '<td style="cursor:pointer;" align="center" onclick="stopCon(\'' + rlist[i]['Config']['Hostname'] + '\')">' + status + '</td>';
+                list += '<td style="cursor:pointer;" align="center" onclick="stopCon(\'' + jsEncode(rlist[i]['Config']['Hostname']) + '\')">' + status + '</td>';
             } else {
-                list += '<td style="cursor:pointer;" align="center" onclick="startCon(\'' + rlist[i]['Config']['Hostname'] + '\')">' + status + '</td>';
+                list += '<td style="cursor:pointer;" align="center" onclick="startCon(\'' + jsEncode(rlist[i]['Config']['Hostname']) + '\')">' + status + '</td>';
             }
             list += '<td class="text-right">' + op + '</td>';
             list += '</tr>';
@@ -202,11 +202,11 @@ function createConTemplate() {
         var imageOpt = '';
         for (var i = 0; i < rdata.images.length; i++) {
             var imageName = rdata.images[i].RepoTags.indexOf('panel') == -1 ? rdata.images[i].RepoTags : 'aaPanel:' + rdata.images[i].RepoTags.split(':')[1];
-            imageOpt += '<option value="' + rdata.images[i].RepoTags + '">' + imageName + '</option>';
+            imageOpt += '<option value="' + htmlEncode(rdata.images[i].RepoTags) + '">' + htmlEncode(imageName) + '</option>';
         }
         var iplistOpt = '';
         for (var i = 0; i < rdata.iplist.length; i++) {
-            iplistOpt += '<option value="' + rdata.iplist[i].address + '">' + rdata.iplist[i].address + '</option>';
+            iplistOpt += '<option value="' + htmlEncode(rdata.iplist[i].address) + '">' + htmlEncode(rdata.iplist[i].address) + '</option>';
         }
 
         var layer_index = layer.open({
@@ -268,7 +268,7 @@ function createConTemplate() {
                         <div class="line">\
                             <span class="tname">内存配额</span>\
                             <div class="info-r c4"><input class="bt-input-text mr5 docker-mem" type="number" style="width:100px" value="' + parseInt(rdata.memSize / 2) + '">\
-                            <span class="dc-un">MB</span><i class="help">不超过， ' + rdata.memSize + 'MB</i></div>\
+                            <span class="dc-un">MB</span><i class="help">不超过， ' + htmlEncode(rdata.memSize) + 'MB</i></div>\
                         </div>\
                         <div class="line">\
                             <span class="tname">CPU配额</span>\
@@ -320,9 +320,9 @@ function createConTemplate() {
                 
                         var selecttype = $(".type-port select").val();
                         var portable = '<tr>\
-                            <td>' + name1 + '</td>\
-                            <td>' + selecttype + '</td>\
-                            <td>' + name2 + '</td>\
+                            <td>' + htmlEncode(name1) + '</td>\
+                            <td>' + htmlEncode(selecttype) + '</td>\
+                            <td>' + htmlEncode(name2) + '</td>\
                             <td class="text-right" width="60"><a href="javascript:;" class="btlink minus">删除</a></td>\
                         </tr>';
                         $("#portabletr").append(portable);
@@ -353,8 +353,8 @@ function createConTemplate() {
                     }
                     var selecttype = $(".type-volumes select").val();
                     var portable = '<tr>\
-                        <td class="td_width_1" title="' + path1 + '">' + path1 + '</td>\
-                        <td>' + selecttype + '</td><td title="' + path2 + '" class="td_width_1" style="max-width: 138px;">' + path2 + '</td>\
+                        <td class="td_width_1" title="' + htmlEncode(path1) + '">' + htmlEncode(path1) + '</td>\
+                        <td>' + htmlEncode(selecttype) + '</td><td title="' + htmlEncode(path2) + '" class="td_width_1" style="max-width: 138px;">' + htmlEncode(path2) + '</td>\
                         <td class="text-right" width="50"><a href="javascript:;" class="btlink minus2">删除</a></td>\
                     </tr>';
                     $("#portabletr2").append(portable);
@@ -509,15 +509,15 @@ function dockerImageListRender() {
             }
 
             var op = '';
-            op += '<a href="javascript:;" onclick="pullImages(\'' + rlist[i]['RepoTags'] + '\',\'' + rlist[i]['Id'] + '\')" class="btlink">拉取</a> | ';
-            op += '<a href="javascript:;" onclick="deleteImages(\'' + rlist[i]['RepoTags'] + '\',\'' + rlist[i]['Id'] + '\')" class="btlink">删除</a>';
+            op += '<a href="javascript:;" onclick="pullImages(\'' + jsEncode(rlist[i]['RepoTags']) + '\',\'' + jsEncode(rlist[i]['Id']) + '\')" class="btlink">拉取</a> | ';
+            op += '<a href="javascript:;" onclick="deleteImages(\'' + jsEncode(rlist[i]['RepoTags']) + '\',\'' + jsEncode(rlist[i]['Id']) + '\')" class="btlink">删除</a>';
 
             list += '<tr>';
-            list += '<td>' + rlist[i]['RepoTags'] + '</td>';
-            list += '<td>' + tag + '</td>';
+            list += '<td>' + htmlEncode(rlist[i]['RepoTags']) + '</td>';
+            list += '<td>' + htmlEncode(tag) + '</td>';
             list += '<td>' + toSize(rlist[i]['Size']) + '</td>';
-            list += '<td>' + license + '</td>';
-            list += '<td>' + desc + '</td>';
+            list += '<td>' + htmlEncode(license) + '</td>';
+            list += '<td>' + htmlEncode(desc) + '</td>';
             list += '<td class="text-right">' + op + '</td>';
             list += '</tr>';
         }
@@ -695,14 +695,14 @@ function dockerImageOutputRender() {
         for (var i = 0; i < rlist.length; i++) {
 
             var op = '';
-            op += '<a href="javascript:;" onclick="dockerGetFileBytes(\'' + rlist[i]['file'] + '\')" class="btlink">下载</a> | ';
-            op += '<a href="javascript:;" onclick="dockerLoadFile(\'' + rlist[i]['file'] + '\')" class="btlink">导入</a> | ';
-            op += '<a href="javascript:;" onclick="dockerDeleteFile(\'' + rlist[i]['file'] + '\')" class="btlink">删除</a>';
+            op += '<a href="javascript:;" onclick="dockerGetFileBytes(\'' + jsEncode(rlist[i]['file']) + '\')" class="btlink">下载</a> | ';
+            op += '<a href="javascript:;" onclick="dockerLoadFile(\'' + jsEncode(rlist[i]['file']) + '\')" class="btlink">导入</a> | ';
+            op += '<a href="javascript:;" onclick="dockerDeleteFile(\'' + jsEncode(rlist[i]['file']) + '\')" class="btlink">删除</a>';
 
             list += '<tr>';
-            list += '<td>' + rlist[i]['name'] + '</td>';
-            list += '<td>' + rlist[i]['size'] + '</td>';
-            list += '<td>' + rlist[i]['time'] + '</td>';
+            list += '<td>' + htmlEncode(rlist[i]['name']) + '</td>';
+            list += '<td>' + htmlEncode(rlist[i]['size']) + '</td>';
+            list += '<td>' + htmlEncode(rlist[i]['time']) + '</td>';
             list += '<td class="text-right">' + op + '</td>';
             list += '</tr>';
         }
@@ -716,11 +716,11 @@ function uploadImageFiles(upload_dir) {
     var image_layer = layer.open({
         type: 1,
         closeBtn: 1,
-        title: "上传导入文件[" + upload_dir + ']',
+        title: "上传导入文件[" + htmlEncode(upload_dir) + ']',
         area: ['500px', '300px'],
         shadeClose: false,
         content: '<div class="fileUploadDiv">\
-                <input type="hidden" id="input-val" value="' + upload_dir + '" />\
+                <input type="hidden" id="input-val" value="' + htmlEncode(upload_dir) + '" />\
                 <input type="file" id="file_input"  multiple="true" autocomplete="off" />\
                 <button type="button"  id="opt" autocomplete="off">添加文件</button>\
                 <button type="button" id="up" autocomplete="off" >开始上传</button>\
@@ -766,9 +766,9 @@ function dockerImagePick() {
             var versionData = imageList[i].RepoTags,
                 version, reg = new RegExp('((?<=:)[0-9A-z/.-]*)$');
             version = versionData.match(reg);
-            _tbody += "<tr><td><input data-name='" + imageList[i].RepoTags + "' type='checkbox' name='images'></td>\
-                    <td><span class='max_span' title='" + imageList[i].RepoTags + "'>" + imageList[i].RepoTags + "</span></td>\
-                    <td>" + version[0] + "</td>\
+            _tbody += "<tr><td><input data-name='" + htmlEncode(imageList[i].RepoTags) + "' type='checkbox' name='images'></td>\
+                    <td><span class='max_span' title='" + htmlEncode(imageList[i].RepoTags) + "'>" + htmlEncode(imageList[i].RepoTags) + "</span></td>\
+                    <td>" + htmlEncode(version[0]) + "</td>\
                     <td>" + toSize(imageList[i].Size) + "</td></tr>";
         }
 
@@ -884,12 +884,12 @@ function dockerIpListRender() {
         for (var i = 0; i < rlist.length; i++) {
 
             var op = '';
-            op += '<a href="javascript:;" onclick="deleteIpList(\'' + rlist[i]['address'] + '\')" class="btlink">删除</a>';
+            op += '<a href="javascript:;" onclick="deleteIpList(\'' + jsEncode(rlist[i]['address']) + '\')" class="btlink">删除</a>';
 
             list += '<tr>';
-            list += '<td>' + rlist[i]['address'] + '</td>';
-            list += '<td>' + rlist[i]['netmask'] + '</td>';
-            list += '<td>' + rlist[i]['gateway'] + '</td>';
+            list += '<td>' + htmlEncode(rlist[i]['address']) + '</td>';
+            list += '<td>' + htmlEncode(rlist[i]['netmask']) + '</td>';
+            list += '<td>' + htmlEncode(rlist[i]['gateway']) + '</td>';
             list += '<td class="text-right">' + op + '</td>';
             list += '</tr>';
         }
@@ -1041,11 +1041,11 @@ function repoListRender() {
         for (var i = 0; i < rlist.length; i++) {
 
             list += '<tr>';
-            list += '<td>' + rlist[i]['hub_name'] + '</td>';
-            list += '<td>' + rlist[i]['repository_name'] + '</td>';
-            list += '<td>' + rlist[i]['namespace'] + '</td>';
-            list += '<td>' + rlist[i]['registry'] + '</td>';
-            list += '<td class="text-right"><a href="javascript:;" onclick="delRepo(\'' + rlist[i]['registry'] + '\')" class="btlink">删除</a></td>';
+            list += '<td>' + htmlEncode(rlist[i]['hub_name']) + '</td>';
+            list += '<td>' + htmlEncode(rlist[i]['repository_name']) + '</td>';
+            list += '<td>' + htmlEncode(rlist[i]['namespace']) + '</td>';
+            list += '<td>' + htmlEncode(rlist[i]['registry']) + '</td>';
+            list += '<td class="text-right"><a href="javascript:;" onclick="delRepo(\'' + jsEncode(rlist[i]['registry']) + '\')" class="btlink">删除</a></td>';
             list += '</tr>';
         }
 

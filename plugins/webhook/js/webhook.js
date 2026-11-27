@@ -163,7 +163,7 @@ function addHook(){
             whPostNoMessage('config_tpl','', function(data){
                 var rdata = $.parseJSON(data.data);
                 for (var i = 0; i < rdata.length; i++) {
-                    $('#hook_tpl').append('<option value="'+rdata[i]+'"">'+getFileName(rdata[i])+'</option>');
+                    $('#hook_tpl').append('<option value="'+htmlEncode(rdata[i])+'"">'+getFileName(rdata[i])+'</option>');
                 }
 
                 $('#hook_tpl').change(function(){
@@ -250,16 +250,16 @@ function getHookList(){
         var script_dir = rdata.data.script_dir;
         for(var i=0;i<mlist.length;i++){
             zbody += '<tr>'
-                +'<td>'+mlist[i].title+'</td>'
+                +'<td>'+htmlEncode(mlist[i].title)+'</td>'
                 +'<td>'+getLocalTime(mlist[i].addtime)+'</td>'
                 +'<td>'+getLocalTime(mlist[i].uptime)+'</td>'
-                +'<td>'+mlist[i].count+'</td>'
-                +'<td><a href="javascript:showWebHookCode(\''+mlist[i].url+'\',\''+mlist[i].access_key+'\')" class="btlink">查看密钥</a></td>'
-                +'<td><a href="javascript:runHook(\''+mlist[i].access_key+'\');" class="btlink">测试</a> | '
-                +'<a href="javascript:getRunHookCmd(\''+mlist[i].access_key+'\');" class="btlink">命令</a> | '
-                +'<a href="javascript:onlineEditFile(0,\''+ script_dir + '/'+ mlist[i].access_key+'\',\'sh\');" class="btlink">编辑</a> | '
-                +'<a href="javascript:getLogs(\''+ script_dir + '/' + mlist[i].access_key+'.log\');" class="btlink">日志</a> | '
-                +'<a href="javascript:deleteHook(\''+mlist[i].access_key+'\',\''+ mlist[i].title +'\');" class="btlink">删除</a></td>'
+                +'<td>'+htmlEncode(mlist[i].count)+'</td>'
+                +'<td><a href="javascript:showWebHookCode(\''+jsEncode(mlist[i].url)+'\',\''+jsEncode(mlist[i].access_key)+'\')" class="btlink">查看密钥</a></td>'
+                +'<td><a href="javascript:runHook(\''+jsEncode(mlist[i].access_key)+'\');" class="btlink">测试</a> | '
+                +'<a href="javascript:getRunHookCmd(\''+jsEncode(mlist[i].access_key)+'\');" class="btlink">命令</a> | '
+                +'<a href="javascript:onlineEditFile(0,\''+ jsEncode(script_dir + '/'+ mlist[i].access_key)+'\',\'sh\');" class="btlink">编辑</a> | '
+                +'<a href="javascript:getLogs(\''+ jsEncode(script_dir + '/' + mlist[i].access_key+'.log')+'\');" class="btlink">日志</a> | '
+                +'<a href="javascript:deleteHook(\''+jsEncode(mlist[i].access_key)+'\',\''+ jsEncode(mlist[i].title) +'\');" class="btlink">删除</a></td>'
             +'</tr>'
         }
         $("#zipBody").html(zbody);
@@ -275,11 +275,11 @@ function showWebHookCode(url,code){
         shadeClose:false,
         closeBtn:2,
         content:'<div class="bt-form pd20">\
-            <div class="line"><span class="tname" style="width:50px">密钥</span><input class="bt-input-text mr5" disabled="disabled" value="'+ code +'" style="width:420px" /><button class="btn btn-success btn-sm" onclick="bt.pub.copy_pass(\''+ code +'\')">复制密钥</button></div>\
+            <div class="line"><span class="tname" style="width:50px">密钥</span><input class="bt-input-text mr5" disabled="disabled" value="'+ htmlEncode(code) +'" style="width:420px" /><button class="btn btn-success btn-sm" onclick="bt.pub.copy_pass(\''+ jsEncode(code) +'\')">复制密钥</button></div>\
             <div class="line help">\
                 <b>WebHook使用方法:</b><br>\
                 GET/POST:<br>\
-                '+window.location.protocol + "//" + window.location.hostname + (window.location.port ? ':' + window.location.port: '')+'/hook?access_key='+code+'&amp;params=aaa<br>\
+                '+window.location.protocol + "//" + window.location.hostname + (window.location.port ? ':' + window.location.port: '')+'/hook?access_key='+htmlEncode(code)+'&amp;params=aaa<br>\
                 @param access_key  string  HOOK密钥<br>\
                 @param params string 自定义参数（在hook脚本中使用$1接收）| 多个参数 "1 2" -> $1为1, $2为2<br>\
             </div>\
@@ -297,7 +297,7 @@ function getLogsTimer(path,success,error){
             return;   
         }
 
-        $('[name="site_logs"]').text(rdata.data);
+        $('[name="site_logs"]').html(rdata.data);
         if (typeof(success) == 'function'){
             success();
         }
@@ -314,7 +314,7 @@ function getLogsTimerCb(path,success,error){
             return;   
         }
 
-        $('[name="site_logs"]').text(rdata.data);
+        $('[name="site_logs"]').html(rdata.data);
         if (typeof(success) == 'function'){
             success();
         }

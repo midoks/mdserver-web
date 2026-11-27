@@ -456,9 +456,9 @@ function setTimezone(){
 		        for (var i = 0; i < rdata.length; i++) {
 
 		        	if (rdata[i] == 'Asia/Shanghai'){
-		        		tbody += '<option value="'+rdata[i]+'" selected="selected">'+rdata[i]+'</option>';
+		        		tbody += '<option value="'+	rdata[i]+'" selected="selected">'+rdata[i]+'</option>';
 		        	} else {
-		        		tbody += '<option value="'+rdata[i]+'">'+rdata[i]+'</option>';
+		        		tbody += '<option value="'+	rdata[i]+'">'+rdata[i]+'</option>';
 		        	}
 		        	
 		        }
@@ -685,7 +685,7 @@ function getEmailCfg(){
 			content: "<div class='bt-form pd20'>\
 					<div class='line'>\
 						<span class='tname'>SMTP服务器</span>\
-						<div class='info-r'><input class='bt-input-text' type='text' name='smtp_host' value='"+smtp_host+"' style='width:100%'/></div>\
+						<div class='info-r'><input class='bt-input-text' type='text' name='smtp_host' value='"+htmlEncode(smtp_host)+"' style='width:100%'/></div>\
 					</div>\
 					<div class='line'>\
 						<span class='tname'>SMTP安全</span>\
@@ -861,10 +861,10 @@ function getPanelSSL(){
 				'+cert_data+'\
 				<div class="custom_certificate_info">\
 					<div class="ssl-con-key pull-left mr20">密钥(KEY)<br>\
-						<textarea id="key" class="bt-input-text">'+cert.privateKey+'</textarea>\
+						<textarea id="key" class="bt-input-text">'+htmlEncode(cert.privateKey)+'</textarea>\
 					</div>\
 					<div class="ssl-con-key pull-left">证书(PEM格式)<br>\
-						<textarea id="csr" class="bt-input-text">'+cert.certPem+'</textarea>\
+						<textarea id="csr" class="bt-input-text">'+htmlEncode(cert.certPem)+'</textarea>\
 					</div>\
 				</div>\
 				<div class="ssl-btn pull-left mtb15" style="width:100%">\
@@ -1024,7 +1024,7 @@ function getTempAccessLogsReq(id){
 		for (var i = 0; i < rdata.data.length; i++) {
 
 			tbody += '<tr>';
-			tbody += '<td>' + (rdata.data[i]['type']) +'</td>';
+			tbody += '<td>' + rdata.data[i]['type'] +'</td>';
 			tbody += '<td>' + rdata.data[i]['addtime'] +'</td>';
 			tbody += '<td>'+ rdata.data[i]['log'] +'</td>';
 			tbody += '</tr>';
@@ -1080,7 +1080,7 @@ function setTempAccessReq(page){
 		for (var i = 0; i < rdata.data.length; i++) {
 
 			tbody += '<tr>';
-			tbody += '<td>' + (rdata.data[i]['login_addr']||'未登陆') +'</td>';
+			tbody += '<td>' + htmlEncode(rdata.data[i]['login_addr']||'未登陆') +'</td>';
 
 			tbody += '<td>';
 			switch (parseInt(rdata.data[i]['state'])) {
@@ -1102,9 +1102,9 @@ function setTempAccessReq(page){
 			tbody += '<td>';
 
 			if (rdata.data[i]['state'] == '1' ){
-				tbody += '<a class="btlink" onclick="getTempAccessLogs(\''+rdata.data[i]['id']+'\')">操作日志</a>';
+				tbody += '<a class="btlink" onclick="getTempAccessLogs(\''+jsEncode(rdata.data[i]['id'])+'\')">操作日志</a>';
 			} else{
-				tbody += '<a class="btlink" onclick="removeTempAccess(\''+rdata.data[i]['id']+'\')">删除</a>';
+				tbody += '<a class="btlink" onclick="removeTempAccess(\''+jsEncode(rdata.data[i]['id'])+'\')">删除</a>';
 			}
 			
 			tbody += '</td>';
@@ -1509,9 +1509,9 @@ function getAppList(page) {
 
 			tbody += '<tr>';
 
-			tbody += '<td>' + row['app_id'] +'</td>';
-			tbody += '<td>' + row['app_secret'] +'</td>';
-			tbody += '<td>' + row['white_list'] +'</td>';
+			tbody += '<td>' + htmlEncode(row['app_id']) +'</td>';
+			tbody += '<td>' + htmlEncode(row['app_secret']) +'</td>';
+			tbody += '<td>' + htmlEncode(row['white_list']) +'</td>';
 
 			if (row['status'] == 1){
 				tbody += '<td><a class="btlink" onclick="toggleAppstatus('+row['id']+');">已开启</a></td>';
@@ -1519,10 +1519,10 @@ function getAppList(page) {
 				tbody += '<td><a style="color:red;" onclick="toggleAppstatus('+row['id']+');">已关闭</a></td>';
 			}
 			
-			tbody += '<td>' + row['add_time'] +'</td>';
+			tbody += '<td>' + htmlEncode(row['add_time']) +'</td>';
 
 			tbody += '<td>';
-			tbody += '<a class="btlink" onclick="deleteApp(\''+row['id']+'\')" style="float:right;">删除</a>';
+			tbody += '<a class="btlink" onclick="deleteApp(\''+jsEncode(row['id'])+'\')" style="float:right;">删除</a>';
 			tbody += '</td>';
 
 			tbody += '</tr>';

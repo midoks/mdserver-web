@@ -183,15 +183,15 @@ function odList(path){
         var listFiles = ''
         for(var i=0;i<mlist.list.length;i++){
             if(mlist.list[i].type == null){
-                listBody += '<tr><td class="cursor" onclick="odList(\''+(path+'/'+mlist.list[i].name).replace('//','/')+'\')"><span class="ico ico-folder"></span>\<span>'+mlist.list[i].name+'</span></td>\
+                listBody += '<tr><td class="cursor" onclick="odList(\''+jsEncode((path+'/'+mlist.list[i].name).replace('//','/'))+'\')"><span class="ico ico-folder"></span>\<span>'+htmlEncode(mlist.list[i].name)+'</span></td>\
                 <td>-</td>\
                 <td>-</td>\
-                <td class="text-right"><a class="btlink" onclick="deleteFile(\''+mlist.list[i].name+'\', true)">删除</a></td></tr>'
+                <td class="text-right"><a class="btlink" onclick="deleteFile(\''+jsEncode(mlist.list[i].name)+'\', true)">删除</a></td></tr>'
             }else{
-                listFiles += '<tr><td class="cursor"><span class="ico ico-file"></span>\<span>'+mlist.list[i].name+'</span></td>\
+                listFiles += '<tr><td class="cursor"><span class="ico ico-file"></span>\<span>'+htmlEncode(mlist.list[i].name)+'</span></td>\
                 <td>'+toSize(mlist.list[i].size)+'</td>\
                 <td>'+getLocalTime(mlist.list[i].time)+'</td>\
-                <td class="text-right"><a target="_blank" href="'+mlist.list[i].download+'" class="btlink">下载</a> | <a class="btlink" onclick="deleteFile(\''+mlist.list[i].name+'\', false)">删除</a></td></tr>'
+                <td class="text-right"><a target="_blank" href="'+htmlEncode(mlist.list[i].download)+'" class="btlink">下载</a> | <a class="btlink" onclick="deleteFile(\''+jsEncode(mlist.list[i].name)+'\', false)">删除</a></td></tr>'
             }
         }
         listBody += listFiles;
@@ -209,7 +209,7 @@ function odList(path){
             }
             pathname += '/' + tmp[i];
             pathname = pathname.replace('//','/');
-            pathLi += '<li><a title="'+pathname+'" onclick="odList(\''+pathname+'\')">'+dirname+'</a></li>';
+            pathLi += '<li><a title="'+htmlEncode(pathname)+'" onclick="odList(\''+jsEncode(pathname)+'\')">'+htmlEncode(dirname)+'</a></li>';
         }
         var um = 1;
         if(tmp[tmp.length-1] == '') um = 2;

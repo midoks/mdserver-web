@@ -438,7 +438,7 @@ function createProcessTable(getboday, data) {
         if (realProcess[i].haschild) {
             namewidth = "max-width:100px;"
         }
-        var processName = '<span class="size_ellipsis" style="' + (namewidth) + 'float:none;vertical-align:middle;">' + realProcess[i].ps + '</span>';
+        var processName = '<span class="size_ellipsis" style="' + (namewidth) + 'float:none;vertical-align:middle;">' + htmlEncode(realProcess[i].ps) + '</span>';
         var isProcessChild = realProcess[i].ischild ? 'process-child' : '';
         var childStyle = realProcess[i].ischild ? 'width:100px' : '';
         var selected = realProcess[i].pid + '' === select_pid || realProcess[i].isselect ? 'class="process-select"' : '';
@@ -457,18 +457,18 @@ function createProcessTable(getboday, data) {
         tbody_tr += '<tr ' + selected + selected_one + ' onclick="click_process_tr(event,' + realProcess[i].pid + ',' + realProcess[i].fpid + ')" >\
 			<td class="td-pid" style="' + (data?(data.meter_head.ps ? '' : 'display:none;'):'') + '">\
 				' + colp + '\
-				<a style="display:block; position:relative; width:120px;' + childStyle + '" title="名称：' + realProcess[i].ps + '\nname: ' + realProcess[i].name + '\nexe: ' + realProcess[i].exe + '"\
+				<a style="display:block; position:relative; width:120px;' + childStyle + '" title="名称：' + htmlEncode(realProcess[i].ps) + '\nname: ' + htmlEncode(realProcess[i].name) + '\nexe: ' + htmlEncode(realProcess[i].exe) + '"\
 				class="btlink ' + isProcessChild + '" onclick="get_process_info(' + realProcess[i].pid + ')">\
 					' + processName + '\
 					' + childNums + '\
 			</td>\
-			<td style="' + (data?(data.meter_head.pid ? '' : 'display:none;'):'') + '">' + realProcess[i].pid + '</td>\
-			<td style="' + (data?(data.meter_head.threads ? '' : 'display:none;'):'') + '">' + realProcess[i].threads + '</td>\
-			<td style="' + (data?(data.meter_head.user ? '' : 'display:none;'):'') + '" title="' + realProcess[i].user + '"><span style="width:80px;" class="size_ellipsis">' + realProcess[i].user + '</span></td>\
-			<td style="' + (data?(data.meter_head.cpu_percent ? '' : 'display:none;'):'') + '">' + realProcess[i].cpu_percent + '%</td>\
+			<td style="' + (data?(data.meter_head.pid ? '' : 'display:none;'):'') + '">' + htmlEncode(realProcess[i].pid) + '</td>\
+			<td style="' + (data?(data.meter_head.threads ? '' : 'display:none;'):'') + '">' + htmlEncode(realProcess[i].threads) + '</td>\
+			<td style="' + (data?(data.meter_head.user ? '' : 'display:none;'):'') + '" title="' + htmlEncode(realProcess[i].user) + '"><span style="width:80px;" class="size_ellipsis">' + htmlEncode(realProcess[i].user) + '</span></td>\
+			<td style="' + (data?(data.meter_head.cpu_percent ? '' : 'display:none;'):'') + '">' + htmlEncode(realProcess[i].cpu_percent) + '%</td>\
             <td style="' + (data?(data.meter_head.memory_used ? '' : 'display:none;'):'') + '">' + toSize(realProcess[i].memory_used).replace(' ', '') + '</td>\
             '+tbody_td+'\
-			<td style="' + (data?(data.meter_head.connects ? '' : 'display:none;'):'') + '">' + realProcess[i].connects + '</td>\
+			<td style="' + (data?(data.meter_head.connects ? '' : 'display:none;'):'') + '">' + htmlEncode(realProcess[i].connects) + '</td>\
 			<td style="' + (data?(data.meter_head.status ? '' : 'display:none;'):'') + '">' + realProcess[i].status + '</td>\
 			<td><a class="btlink" onclick="' + kill_process + '(' + realProcess[i].pid + ',' + realProcess[i].fpid + ')">结束</a></td>\
 		</tr>';
@@ -539,10 +539,10 @@ function get_cron_list() {
         var rdata = rdata.data;
         var tbody_tr = '';
         for (var i = 0; i < rdata.length; i++) {
-            tbody_tr += '<tr title=\'' + rdata[i].command + '\'>\
-						<td>' + rdata[i].cycle + '</td>\
-						<td><a class="btlink" onclick="online_edit_file(\'' + rdata[i].exe + '\')">' + rdata[i].exe + '</a></td>\
-						<td style="text-wrap:wrap;">' + rdata[i].ps + '</td>\
+            tbody_tr += '<tr title=\'' + htmlEncode(rdata[i].command) + '\'>\
+						<td>' + htmlEncode(rdata[i].cycle) + '</td>\
+						<td><a class="btlink" onclick="online_edit_file(\'' + jsEncode(rdata[i].exe) + '\')">' + htmlEncode(rdata[i].exe) + '</a></td>\
+						<td style="text-wrap:wrap;">' + htmlEncode(rdata[i].ps) + '</td>\
 						<td><a class="btlink" onclick="remove_cron(' + i + ')">删除</a></td>\
 					</tr>';
         }
@@ -592,12 +592,12 @@ function get_network_list(rflush) {
         var tbody_tr = "";
         for (var i = 0; i < rdata.list.length; i++) {
             tbody_tr += "<tr>"
-              + "<td>" + rdata.list[i].type + "</td>"
-              + "<td>" + rdata.list[i].laddr[0] + ":" + rdata.list[i].laddr[1] + "</td>"
-              + "<td>" + (rdata.list[i].raddr.length > 1 ? "<a style='color:blue;' title='" + lan.index.net_dorp_ip + "' href=\"javascript:dropAddress('" + rdata.list[i].raddr[0] + "');\">" + rdata.list[i].raddr[0] + "</a>:" + rdata.list[i].raddr[1] : 'NONE') + "</td>"
-              + "<td>" + rdata.list[i].status + "</td>"
-              + "<td>" + rdata.list[i].process + "</td>"
-              + "<td>" + rdata.list[i].pid + "</td>"
+              + "<td>" + htmlEncode(rdata.list[i].type) + "</td>"
+              + "<td>" + htmlEncode(rdata.list[i].laddr[0]) + ":" + htmlEncode(rdata.list[i].laddr[1]) + "</td>"
+              + "<td>" + (rdata.list[i].raddr.length > 1 ? "<a style='color:blue;' title='" + htmlEncode(lan.index.net_dorp_ip) + "' href=\"javascript:dropAddress('" + jsEncode(rdata.list[i].raddr[0]) + "');\">" + htmlEncode(rdata.list[i].raddr[0]) + "</a>:" + htmlEncode(rdata.list[i].raddr[1]) : 'NONE') + "</td>"
+              + "<td>" + htmlEncode(rdata.list[i].status) + "</td>"
+              + "<td>" + htmlEncode(rdata.list[i].process) + "</td>"
+              + "<td>" + htmlEncode(rdata.list[i].pid) + "</td>"
               + "</tr>";
         }
 
@@ -659,11 +659,11 @@ function get_who_list() {
         var tbody_tr = '';
         for (var i = 0; i < rdata.length; i++) {
             tbody_tr += '<tr>\
-				<td>' + rdata[i].user + '</td>\
-				<td>' + rdata[i].pts + '</td>\
-				<td>' + rdata[i].ip + '</td>\
-				<td>' + rdata[i].date + '</td>\
-				<td><a class="btlink" onclick="pkill_session(\'' + rdata[i].pts + '\')">强制断开</a></td>\
+				<td>' + htmlEncode(rdata[i].user) + '</td>\
+				<td>' + htmlEncode(rdata[i].pts) + '</td>\
+				<td>' + htmlEncode(rdata[i].ip) + '</td>\
+				<td>' + htmlEncode(rdata[i].date) + '</td>\
+				<td><a class="btlink" onclick="pkill_session(\'' + jsEncode(rdata[i].pts) + '\')">强制断开</a></td>\
 			</tr>';
         }
         var tbody = '<thead>\
@@ -710,12 +710,12 @@ function get_run_list() {
         var tbody_tr = '';
         for (var i = 0; i < rdata.run_list.length; i++) {
             tbody_tr += '<tr>\
-				<td>' + rdata.run_list[i].name + '</td>\
-				<td>' + rdata.run_list[i].srcfile + '</td>\
+				<td>' + htmlEncode(rdata.run_list[i].name) + '</td>\
+				<td>' + htmlEncode(rdata.run_list[i].srcfile) + '</td>\
 				<td>' + toSize(rdata.run_list[i].size) + '</td>\
-				<td>' + rdata.run_list[i].access + '</td>\
-				<td style="text-wrap:wrap;">' + rdata.run_list[i].ps + '</td>\
-				<td><a class="btlink" onclick="online_edit_file(\'' + rdata.run_list[i].srcfile + '\')">编辑</a></td>\
+				<td>' + htmlEncode(rdata.run_list[i].access) + '</td>\
+				<td style="text-wrap:wrap;">' + htmlEncode(rdata.run_list[i].ps) + '</td>\
+				<td><a class="btlink" onclick="online_edit_file(\'' + jsEncode(rdata.run_list[i].srcfile) + '\')">编辑</a></td>\
 			</tr>';
         }
         var tbody = '<thead>\
@@ -730,7 +730,7 @@ function get_run_list() {
 				</thead>\
 				<tbody>' + tbody_tr + '</tbody>';
         $("#TaskManagement").html(tbody);
-        var topMsg = '<div class="mini-level">当前运行级别： level-' + rdata.run_level + '</div>';
+        var topMsg = '<div class="mini-level">当前运行级别： level-' + htmlEncode(rdata.run_level) + '</div>';
         $("#load_average").html(topMsg).show();
         $(".table-cont").css("height", "500px");
         show_task();
@@ -768,16 +768,16 @@ function get_service_list() {
         var tbody_tr = '';
         for (var i = 0; i < rdata.serviceList.length; i++) {
         tbody_tr += '<tr>\
-				<td>' + rdata.serviceList[i].name + '</td>\
-				<td><a style="cursor:pointer" onclick="set_runlevel_state(0,\'' + rdata.serviceList[i].name + '\')">' + rdata.serviceList[i].runlevel_0 + '</a></td>\
-				<td><a style="cursor:pointer" onclick="set_runlevel_state(1,\'' + rdata.serviceList[i].name + '\')">' + rdata.serviceList[i].runlevel_1 + '</a></td>\
-				<td><a style="cursor:pointer" onclick="set_runlevel_state(2,\'' + rdata.serviceList[i].name + '\')">' + rdata.serviceList[i].runlevel_2 + '</a></td>\
-				<td><a style="cursor:pointer" onclick="set_runlevel_state(3,\'' + rdata.serviceList[i].name + '\')">' + rdata.serviceList[i].runlevel_3 + '</a></td>\
-				<td><a style="cursor:pointer" onclick="set_runlevel_state(4,\'' + rdata.serviceList[i].name + '\')">' + rdata.serviceList[i].runlevel_4 + '</a></td>\
-				<td><a style="cursor:pointer" onclick="set_runlevel_state(5,\'' + rdata.serviceList[i].name + '\')">' + rdata.serviceList[i].runlevel_5 + '</a></td>\
-				<td><a style="cursor:pointer" onclick="set_runlevel_state(6,\'' + rdata.serviceList[i].name + '\')">' + rdata.serviceList[i].runlevel_6 + '</a></td>\
-				<td style="text-wrap:wrap;">' + rdata.serviceList[i].ps + '</td>\
-				<td><a class="btlink" onclick="remove_service(\'' + rdata.serviceList[i].name + '\')">删除</a></td>\
+				<td>' + htmlEncode(rdata.serviceList[i].name) + '</td>\
+				<td><a style="cursor:pointer" onclick="set_runlevel_state(0,\'' + jsEncode(rdata.serviceList[i].name) + '\')">' + htmlEncode(rdata.serviceList[i].runlevel_0) + '</a></td>\
+				<td><a style="cursor:pointer" onclick="set_runlevel_state(1,\'' + jsEncode(rdata.serviceList[i].name) + '\')">' + htmlEncode(rdata.serviceList[i].runlevel_1) + '</a></td>\
+				<td><a style="cursor:pointer" onclick="set_runlevel_state(2,\'' + jsEncode(rdata.serviceList[i].name) + '\')">' + htmlEncode(rdata.serviceList[i].runlevel_2) + '</a></td>\
+				<td><a style="cursor:pointer" onclick="set_runlevel_state(3,\'' + jsEncode(rdata.serviceList[i].name) + '\')">' + htmlEncode(rdata.serviceList[i].runlevel_3) + '</a></td>\
+				<td><a style="cursor:pointer" onclick="set_runlevel_state(4,\'' + jsEncode(rdata.serviceList[i].name) + '\')">' + htmlEncode(rdata.serviceList[i].runlevel_4) + '</a></td>\
+				<td><a style="cursor:pointer" onclick="set_runlevel_state(5,\'' + jsEncode(rdata.serviceList[i].name) + '\')">' + htmlEncode(rdata.serviceList[i].runlevel_5) + '</a></td>\
+				<td><a style="cursor:pointer" onclick="set_runlevel_state(6,\'' + jsEncode(rdata.serviceList[i].name) + '\')">' + htmlEncode(rdata.serviceList[i].runlevel_6) + '</a></td>\
+				<td style="text-wrap:wrap;">' + htmlEncode(rdata.serviceList[i].ps) + '</td>\
+				<td><a class="btlink" onclick="remove_service(\'' + jsEncode(rdata.serviceList[i].name) + '\')">删除</a></td>\
 			</tr>';
         }
         var tbody = '<thead>\
@@ -796,7 +796,7 @@ function get_service_list() {
 				</thead>\
 				<tbody>' + tbody_tr + '</tbody>';
         $("#TaskManagement").html(tbody);
-        var topMsg = '<div class="mini-level">当前运行级别： level-' + rdata.runlevel + '</div>';
+        var topMsg = '<div class="mini-level">当前运行级别： level-' + htmlEncode(rdata.runlevel) + '</div>';
         $("#load_average").html(topMsg).show();
         $(".table-cont").css("height", "500px");
         show_task();
@@ -812,14 +812,14 @@ function get_user_list() {
         var tbody_tr = '';
         for (var i = 0; i < rdata.length; i++) {
             tbody_tr += '<tr>\
-					<td>' + rdata[i].username + '</td>\
-					<td>' + rdata[i].home + '</td>\
-					<td>' + rdata[i].group + '</td>\
-					<td>' + rdata[i].uid + '</td>\
-					<td>' + rdata[i].gid + '</td>\
-					<td>' + rdata[i].login_shell + '</td>\
-					<td style="text-wrap:wrap;">' + rdata[i].ps + '</td>\
-					<td><a class="btlink" onclick="userdel(\'' + rdata[i].username + '\')">删除</a></td>\
+					<td>' + htmlEncode(rdata[i].username) + '</td>\
+					<td>' + htmlEncode(rdata[i].home) + '</td>\
+					<td>' + htmlEncode(rdata[i].group) + '</td>\
+					<td>' + htmlEncode(rdata[i].uid) + '</td>\
+					<td>' + htmlEncode(rdata[i].gid) + '</td>\
+					<td>' + htmlEncode(rdata[i].login_shell) + '</td>\
+					<td style="text-wrap:wrap;">' + htmlEncode(rdata[i].ps) + '</td>\
+					<td><a class="btlink" onclick="userdel(\'' + jsEncode(rdata[i].username) + '\')">删除</a></td>\
 				</tr>';
         }
         var tbody = '<thead>\
@@ -988,11 +988,11 @@ function get_process_info(pid) {
         var rdata = data.data;
         fileBody = '';
         for (var i = 0; i < rdata.open_files.length; i++) {
-            fileBody += '<tr><td>' + rdata.open_files[i].path + '</td>\
-                <td>' + rdata.open_files[i].mode + '</td>\
-                <td>' + rdata.open_files[i].position + '</td>\
-                <td>' + rdata.open_files[i].flags + '</td>\
-                <td>' + rdata.open_files[i].fd + '</td>\
+            fileBody += '<tr><td>' + htmlEncode(rdata.open_files[i].path) + '</td>\
+                <td>' + htmlEncode(rdata.open_files[i].mode) + '</td>\
+                <td>' + htmlEncode(rdata.open_files[i].position) + '</td>\
+                <td>' + htmlEncode(rdata.open_files[i].flags) + '</td>\
+                <td>' + htmlEncode(rdata.open_files[i].fd) + '</td>\
             </tr>';
         }
         var cbody = '<div class="pd15 jc-detail">\
@@ -1000,26 +1000,26 @@ function get_process_info(pid) {
 				<table class="table">\
 					<tbody>\
 						<tr>\
-							<th width="70">名称</th><td  width="180">' + rdata.name + '</td>\
-							<th width="50">PID</th><td  width="180">' + rdata.pid + '</td>\
-							<th width="50">状态</th><td  width="180">' + rdata.status + '</td>\
+							<th width="70">名称</th><td  width="180">' + htmlEncode(rdata.name) + '</td>\
+							<th width="50">PID</th><td  width="180">' + htmlEncode(rdata.pid) + '</td>\
+							<th width="50">状态</th><td  width="180">' + htmlEncode(rdata.status) + '</td>\
 						</tr>\
 						<tr>\
-							<th>父进程</th><td>' + rdata.pname + '(' + rdata.ppid + ')</td>\
-							<th>用户</th><td>' + rdata.user + '</td>\
-							<th>线程</th><td>' + rdata.threads + '</td>\
+							<th>父进程</th><td>' + htmlEncode(rdata.pname) + '(' + htmlEncode(rdata.ppid) + ')</td>\
+							<th>用户</th><td>' + htmlEncode(rdata.user) + '</td>\
+							<th>线程</th><td>' + htmlEncode(rdata.threads) + '</td>\
 						</tr>\
 						<tr>\
-							<th>Socket</th><td>' + rdata.connects + '</td>\
+							<th>Socket</th><td>' + htmlEncode(rdata.connects) + '</td>\
 							<th>io读</th><td>' + toSize(rdata.io_read_bytes) + '</td>\
 							<th>io写</th><td>' + toSize(rdata.io_write_bytes) + '</td>\
 						</tr>\
 						<tr>\
 							<th>启动时间</th><td>' + getLocalTime(rdata.create_time) + '</td>\
-							<th>描述</th><td colspan="3">' + rdata.ps + '</td>\
+							<th>描述</th><td colspan="3">' + htmlEncode(rdata.ps) + '</td>\
 						</tr>\
 						<tr>\
-							<th>启动命令</th><td colspan="5">' + rdata.comline.join(" ") + '</td>\
+							<th>启动命令</th><td colspan="5">' + htmlEncode(rdata.comline.join(" ")) + '</td>\
 						</tr>\
 					</tbody>\
 				</table>\
@@ -1065,13 +1065,13 @@ function get_process_info(pid) {
 			</div>\
 		</div>\
 		<div class="mini-info">\
-			<button class="btn btn-sm btn-default mr5" onclick="open_path(\'' + rdata.exe + '\')">打开文件位置</button>\
+			<button class="btn btn-sm btn-default mr5" onclick="open_path(\'' + jsEncode(rdata.exe) + '\')">打开文件位置</button>\
 			<button class="btn btn-sm btn-default" onclick="kill_process_all(' + rdata.pid + ')">结束进程树</button>\
 		</div>';
 
         TaskProcessLayerIndex = layer.open({
             type: 1,
-            title: '进程属性[' + rdata.name + '] -- ' + rdata.exe,
+            title: '进程属性[' + htmlEncode(rdata.name) + '] -- ' + htmlEncode(rdata.exe),
             area: '750px',
             closeBtn: 2,
             shadeClose: false,

@@ -141,9 +141,9 @@ function addNode(){
                         $('#nodecon .nulltr').hide();
 
                         var tbody = '<tr>';
-                        tbody +='<td>'+ip+'</td>';
-                        tbody +='<td>'+port+'</td>';
-                        tbody +='<td>'+path+'</td>';
+                        tbody +='<td>'+htmlEncode(ip)+'</td>';
+                        tbody +='<td>'+htmlEncode(port)+'</td>';
+                        tbody +='<td>'+htmlEncode(path)+'</td>';
 
                         tbody +="<td><select name='state'>";
                         var state_option_list = {
@@ -160,9 +160,9 @@ function addNode(){
                         }
                         tbody +="</select></td>";
 
-                        tbody +='<td><input type="number" name="weight" value="'+weight+'" style="width:50px"></td>';
-                        tbody +='<td><input type="number" name="max_fails" value="'+max_fails+'" style="width:50px"></td>';
-                        tbody +='<td><input type="number" name="fail_timeout" value="'+fail_timeout+'" style="width:50px"></td>';
+                        tbody +='<td><input type="number" name="weight" value="'+htmlEncode(weight)+'" style="width:50px"></td>';
+                        tbody +='<td><input type="number" name="max_fails" value="'+htmlEncode(max_fails)+'" style="width:50px"></td>';
+                        tbody +='<td><input type="number" name="fail_timeout" value="'+htmlEncode(fail_timeout)+'" style="width:50px"></td>';
                         tbody +='<td class="text-right" width="50"><a class="btlink minus delete">删除</a></td>';
                         tbody += '</tr>';
                         $('#nodecon').append(tbody);
@@ -405,9 +405,9 @@ function editBalance(data, row){
             for (var n in  node_list) {
 
                 var tbody = '<tr>';
-                tbody +='<td>'+node_list[n]['ip']+'</td>';
-                tbody +='<td>'+node_list[n]['port']+'</td>';
-                tbody +='<td>'+node_list[n]['path']+'</td>';
+                tbody +='<td>'+htmlEncode(node_list[n]['ip'])+'</td>';
+                tbody +='<td>'+htmlEncode(node_list[n]['port'])+'</td>';
+                tbody +='<td>'+htmlEncode(node_list[n]['path'])+'</td>';
 
                 tbody +="<td><select name='state'>";
                 
@@ -420,9 +420,9 @@ function editBalance(data, row){
                 }
                 tbody +="</select></td>";
 
-                tbody +='<td><input type="number" name="weight" value="'+node_list[n]['weight']+'" style="width:50px"></td>';
-                tbody +='<td><input type="number" name="max_fails" value="'+node_list[n]['max_fails']+'" style="width:50px"></td>';
-                tbody +='<td><input type="number" name="fail_timeout" value="'+node_list[n]['fail_timeout']+'" style="width:50px"></td>';
+                tbody +='<td><input type="number" name="weight" value="'+htmlEncode(node_list[n]['weight'])+'" style="width:50px"></td>';
+                tbody +='<td><input type="number" name="max_fails" value="'+htmlEncode(node_list[n]['max_fails'])+'" style="width:50px"></td>';
+                tbody +='<td><input type="number" name="fail_timeout" value="'+htmlEncode(node_list[n]['fail_timeout'])+'" style="width:50px"></td>';
                 tbody +='<td class="text-right" width="50"><a class="btlink minus delete">删除</a></td>';
                 tbody += '</tr>';
                 $('#nodecon').append(tbody);
@@ -494,8 +494,8 @@ function loadBalanceListRender(){
         var tbody = '';
         for (var i = 0; i < alist.length; i++) {
             tbody += '<tr>';
-            tbody += '<td>'+alist[i]['domain']+'</td>';
-            tbody += '<td>'+alist[i]['upstream_name']+'</td>';
+            tbody += '<td>'+htmlEncode(alist[i]['domain'])+'</td>';
+            tbody += '<td>'+htmlEncode(alist[i]['upstream_name'])+'</td>';
             tbody += '<td>'+alist[i]['node_list'].length+'</td>';
             tbody += '<td><a class="btlink log_look" data-row="'+i+'">查看</a></td>';
             tbody += '<td><a class="btlink health_status" data-row="'+i+'">查看</a></td>';
@@ -524,7 +524,7 @@ function loadBalanceListRender(){
                 var tval = '';
                 for (var i = 0; i < rdata.data.length; i++) {
                     tval += '<tr>';
-                    tval += '<td>'+rdata.data[i]['name']+'</td>';
+                    tval += '<td>'+htmlEncode(rdata.data[i]['name'])+'</td>';
 
                     if (typeof(rdata.data[i]['down']) != 'undefined' && rdata.data[i]['down']){
                         tval += '<td><span style="color:red;">不正常</span></td>';

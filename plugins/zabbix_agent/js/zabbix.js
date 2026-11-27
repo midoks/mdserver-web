@@ -103,7 +103,7 @@ function zagentDConfigTpl(_name, version, func, config_tpl_func, read_config_tpl
     $.post('/plugins/run',{name:_name, func:_config_tpl_func,version:version}, function(data){
         var rdata = $.parseJSON(data.data);
         for (var i = 0; i < rdata.length; i++) {
-            $('#config_tpl').append('<option value="'+rdata[i]+'"">'+getFileName(rdata[i])+'</option>');
+            $('#config_tpl').append('<option value="'+htmlEncode(rdata[i])+'"">'+htmlEncode(getFileName(rdata[i]))+'</option>');
         }
 
         $('#config_tpl').change(function(){
