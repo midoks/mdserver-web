@@ -65,9 +65,9 @@ function getAuditLogsFiles(){
         for (var i = 0; i < data.length; i++) {
         	var tip = data[i]['name'] +' - '+data[i]['title'] + '(' + toSize(data[i]['size']) + ')';
         	if (i==0){
-        		option += '<div class="logAuditItem active" title="'+htmlEncode(tip)+'" data-file="'+htmlEncode(data[i]['name'])+'">'+htmlEncode(tip)+'</div>';
+        		option += '<div class="logAuditItem active" title="'+tip+'" data-file="'+data[i]['name']+'">'+tip+'</div>';
         	} else {
-        		option += '<div class="logAuditItem" title="'+htmlEncode(tip)+'" data-file="'+htmlEncode(data[i]['name'])+'">'+htmlEncode(tip)+'</div>';
+        		option += '<div class="logAuditItem" title="'+tip+'" data-file="'+data[i]['name']+'">'+tip+'</div>';
         	}
         }
         $("#logAudit .logAuditTab").html(option);
@@ -184,9 +184,9 @@ function getLogs(page,search) {
 		for (var i = 0; i < data.data.length; i++) {
 			body += "<tr>\
 						<td><em class='dlt-num'>" + data.data[i].id + "</em></td>\
-						<td>" + htmlEncode(data.data[i].type) + "</td>\
-						<td>" + htmlEncode(data.data[i].log) + "</td>\
-						<td>" + htmlEncode(data.data[i].add_time) + "</td>\
+						<td>" + data.data[i].type + "</td>\
+						<td>" + data.data[i].log + "</td>\
+						<td>" + data.data[i].add_time + "</td>\
 					</tr>";
 		}
 		$("#operationLog tbody").html(body);

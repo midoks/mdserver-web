@@ -271,7 +271,7 @@ function modifyAuthPath() {
             <div class="line ">\
                 <span class="tname">入口地址</span>\
                 <div class="info-r">\
-                    <input name="auth_path_set" class="bt-input-text mr5" type="text" style="width: 311px" value="' + htmlEncode(auth_path) + '">\
+                    <input name="auth_path_set" class="bt-input-text mr5" type="text" style="width: 311px" value="' + auth_path + '">\
                 </div>\
             </div>\
         </div>',
@@ -585,11 +585,11 @@ function getTgbot(){
 			content: "<div class='bt-form pd20'>\
 					<div class='line'>\
 						<span class='tname'>APP_TOKEN</span>\
-						<div class='info-r'><input class='bt-input-text' type='text' name='app_token' value='"+htmlEncode(app_token)+"' style='width:100%'/></div>\
+						<div class='info-r'><input class='bt-input-text' type='text' name='app_token' value='"+app_token+"' style='width:100%'/></div>\
 					</div>\
 					<div class='line'>\
 						<span class='tname'>CHAT_ID</span>\
-						<div class='info-r'><input class='bt-input-text' type='text' name='chat_id' value='"+htmlEncode(chat_id)+"' style='width:100%' /></div>\
+						<div class='info-r'><input class='bt-input-text' type='text' name='chat_id' value='"+chat_id+"' style='width:100%' /></div>\
 					</div>\
 				</div>",
 			yes:function(index){
