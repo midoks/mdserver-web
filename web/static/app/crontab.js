@@ -105,7 +105,7 @@ function getCronData(page){
 
 				var cron_save = '--';
 				if (rdata.data[i]['save'] != ''){
-					cron_save = htmlEncode(rdata.data[i]['save'])+'份';
+					cron_save = rdata.data[i]['save']+'份';
 				}
 
 				var cron_backupto = '-';
@@ -516,7 +516,7 @@ function toLogsHtml(type){
 				var plan_name = sMsg+'['+rdata.data[i].name+']'
 				$(".planname input[name='name']").attr("source_name",plan_name).val(plan_name);
 			}
-			sOpt += '<li><a role="menuitem" tabindex="-1" href="javascript:;" value="'+htmlEncode(rdata.data[i].name)+'">'+htmlEncode(rdata.data[i].name)+'['+htmlEncode(rdata.data[i].ps)+']</a></li>';			
+			sOpt += '<li><a role="menuitem" tabindex="-1" href="javascript:;" value="'+rdata.data[i].name+'">'+rdata.data[i].name+'['+rdata.data[i].ps+']</a></li>';			
 		}
 
 		
@@ -526,7 +526,7 @@ function toLogsHtml(type){
 		
 		var orderOpt = '';
 		for (var i=0;i<rdata.orderOpt.length;i++){
-			orderOpt += '<li><a role="menuitem" tabindex="-1" href="javascript:;" value="'+htmlEncode(rdata.orderOpt[i].name)+'">'+htmlEncode(rdata.orderOpt[i].title)+'</a></li>'
+			orderOpt += '<li><a role="menuitem" tabindex="-1" href="javascript:;" value="'+rdata.orderOpt[i].name+'">'+rdata.orderOpt[i].title+'</a></li>'
 		}
 		
 		
@@ -537,7 +537,7 @@ function toLogsHtml(type){
 
 		var sBody = '<div class="dropdown pull-left mr20 check">\
 					  <button class="btn btn-default dropdown-toggle sname" type="button" id="backdata" data-toggle="dropdown" style="width:auto">\
-						<b id="sname" val="'+htmlEncode(rdata.data[0].name)+'">'+htmlEncode(rdata.data[0].name)+'['+htmlEncode(rdata.data[0].ps)+']</b> <span class="caret"></span>\
+						<b id="sname" val="'+rdata.data[0].name+'">'+rdata.data[0].name+'['+rdata.data[0].ps+']</b> <span class="caret"></span>\
 					  </button>\
 					  <ul class="dropdown-menu" role="menu" aria-labelledby="backdata">'+sOpt+'</ul>\
 					</div>\
@@ -621,7 +621,7 @@ function toBackup(type){
 			if(i==0){
 				$(".planname input[name='name']").attr("source_name",sMsg+'['+rdata.data[i].name+']').val(sMsg+'['+rdata.data[i].name+']');
 			}
-			sOpt += '<li><a role="menuitem" tabindex="-1" href="javascript:;" value="'+htmlEncode(rdata.data[i].name)+'">'+htmlEncode(rdata.data[i].name)+'['+htmlEncode(rdata.data[i].ps)+']</a></li>';			
+			sOpt += '<li><a role="menuitem" tabindex="-1" href="javascript:;" value="'+rdata.data[i].name+'">'+rdata.data[i].name+'['+rdata.data[i].ps+']</a></li>';			
 		}
 
 		if (sType == 'path'){
@@ -642,7 +642,7 @@ function toBackup(type){
 		} else {}
 		
 		for (var i=0;i<rdata.orderOpt.length;i++){
-			orderOpt += '<li><a role="menuitem" tabindex="-1" href="javascript:;" value="'+htmlEncode(rdata.orderOpt[i].name)+'">'+htmlEncode(rdata.orderOpt[i].title)+'</a></li>';
+			orderOpt += '<li><a role="menuitem" tabindex="-1" href="javascript:;" value="'+rdata.orderOpt[i].name+'">'+rdata.orderOpt[i].title+'</a></li>';
 		}
 		
 

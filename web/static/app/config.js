@@ -456,9 +456,9 @@ function setTimezone(){
 		        for (var i = 0; i < rdata.length; i++) {
 
 		        	if (rdata[i] == 'Asia/Shanghai'){
-		        		tbody += '<option value="'+htmlEncode(rdata[i])+'" selected="selected">'+htmlEncode(rdata[i])+'</option>';
+		        		tbody += '<option value="'+	rdata[i]+'" selected="selected">'+rdata[i]+'</option>';
 		        	} else {
-		        		tbody += '<option value="'+htmlEncode(rdata[i])+'">'+htmlEncode(rdata[i])+'</option>';
+		        		tbody += '<option value="'+	rdata[i]+'">'+rdata[i]+'</option>';
 		        	}
 		        	
 		        }
@@ -696,19 +696,19 @@ function getEmailCfg(){
 					</div>\
 					<div class='line'>\
 						<span class='tname'>SMTP端口</span>\
-						<div class='info-r'><input class='bt-input-text' type='text' name='smtp_port' value='"+htmlEncode(smtp_port)+"' style='width:100%' /></div>\
+						<div class='info-r'><input class='bt-input-text' type='text' name='smtp_port' value='"+smtp_port+"' style='width:100%' /></div>\
 					</div>\
 					<div class='line'>\
 						<span class='tname'>用户名</span>\
-						<div class='info-r'><input class='bt-input-text' type='text' name='username' value='"+htmlEncode(username)+"' style='width:100%' autocomplete='off'/></div>\
+						<div class='info-r'><input class='bt-input-text' type='text' name='username' value='"+username+"' style='width:100%' autocomplete='off'/></div>\
 					</div>\
 					<div class='line'>\
 						<span class='tname'>授权码</span>\
-						<div class='info-r'><input class='bt-input-text' type='password' name='password' value='"+htmlEncode(password)+"' style='width:100%' autocomplete='off'/></div>\
+						<div class='info-r'><input class='bt-input-text' type='password' name='password' value='"+password+"' style='width:100%' autocomplete='off'/></div>\
 					</div>\
 					<div class='line'>\
 						<span class='tname'>发送地址</span>\
-						<div class='info-r'><input class='bt-input-text' type='text' name='to_mail_addr' value='"+htmlEncode(to_mail_addr)+"' style='width:100%' autocomplete='off'/></div>\
+						<div class='info-r'><input class='bt-input-text' type='text' name='to_mail_addr' value='"+to_mail_addr+"' style='width:100%' autocomplete='off'/></div>\
 					</div>\
 					<div class='line'>\
 						<span class='tname'>验证测试</span>\
@@ -844,13 +844,13 @@ function getPanelSSL(){
 		if (cert['info']){
 			cert_data = "<div class='ssl_state_info'><div class='state_info_flex'>\
 				<div class='state_item'><span>证书品牌：</span>\
-				<span class='ellipsis_text ssl_issue'>"+htmlEncode(cert['info']['issuer'])+"</span></div>\
+				<span class='ellipsis_text ssl_issue'>"+cert['info']['issuer']+"</span></div>\
 				<div class='state_item'><span>到期时间：</span>\
-				<span class='btlink ssl_endtime'>剩余"+htmlEncode(cert['info']['endtime'])+"天到期</span></div>\
+				<span class='btlink ssl_endtime'>剩余"+cert['info']['endtime']+"天到期</span></div>\
 			</div>\
 			<div class='state_info_flex'>\
 				<div class='state_item'><span>认证域名：</span>\
-				<span class='ellipsis_text ssl_subject'>"+htmlEncode(cert['info']['subject'])+"</span></div>\
+				<span class='ellipsis_text ssl_subject'>"+cert['info']['subject']+"</span></div>\
 			</div></div>";
 		}
 
@@ -1024,9 +1024,9 @@ function getTempAccessLogsReq(id){
 		for (var i = 0; i < rdata.data.length; i++) {
 
 			tbody += '<tr>';
-			tbody += '<td>' + htmlEncode(rdata.data[i]['type']) +'</td>';
-			tbody += '<td>' + htmlEncode(rdata.data[i]['addtime']) +'</td>';
-			tbody += '<td>'+ htmlEncode(rdata.data[i]['log']) +'</td>';
+			tbody += '<td>' + rdata.data[i]['type'] +'</td>';
+			tbody += '<td>' + rdata.data[i]['addtime'] +'</td>';
+			tbody += '<td>'+ rdata.data[i]['log'] +'</td>';
 			tbody += '</tr>';
 		}
 		$('#logs_list').html(tbody);
@@ -1150,9 +1150,9 @@ function setStatusCode(o){
         	var tbody = '';
         	for(i in msg_list){
         		if (msg_list[i]['code'] == code){
-        			tbody += '<option value="'+htmlEncode(msg_list[i]['code'])+'" selected>'+htmlEncode(msg_list[i]['msg'])+'</option>';
+        			tbody += '<option value="'+msg_list[i]['code']+'" selected>'+msg_list[i]['msg']+'</option>';
         		} else{
-        			tbody += '<option value="'+htmlEncode(msg_list[i]['code'])+'">'+htmlEncode(msg_list[i]['msg'])+'</option>';
+        			tbody += '<option value="'+msg_list[i]['code']+'">'+msg_list[i]['msg']+'</option>';
         		}
         		
         	}
