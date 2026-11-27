@@ -133,16 +133,16 @@ function getSList(isdisplay) {
                 handle = mupdate + '<a class="btlink" onclick="softMain(\'' + jsEncode(plugin.name) + '\',\'' + jsEncode(plugin.title) + '\',\'' + jsEncode(plugin.setup_version) + '\')">设置</a> | <a class="btlink" onclick="uninstallVersion(\'' + jsEncode(plugin.name) + '\',\'' + jsEncode(plugin.title) +'\',\'' + jsEncode(plugin.setup_version) + '\',' + plugin.uninstall_pre_inspection +')">卸载</a>';
                 titleClick = 'onclick="softMain(\'' + jsEncode(plugin.name) + '\',\'' + jsEncode(plugin.title) + '\',\'' + jsEncode(plugin.setup_version) + '\')" style="cursor:pointer"';
             
-            softPath = '<span class="glyphicon glyphicon-folder-open" title="' + plugin.path + '" onclick="openPath(\'' + jsEncode(plugin.path) + '\')"></span>';
+                softPath = '<span class="glyphicon glyphicon-folder-open" title="' + plugin.path + '" onclick="openPath(\'' + jsEncode(plugin.path) + '\')"></span>';
                 if (plugin.coexist){
                     indexshow = '<div class="index-item">\
-                        <input class="btswitch btswitch-ios" id="index_' + htmlEncode(plugin.name)  + htmlEncode(plugin.versions) + '" type="checkbox" ' + checked + '>\
-                        <label class="btswitch-btn" for="index_' + htmlEncode(plugin.name) + htmlEncode(plugin.versions) + '" onclick="toIndexDisplay(\'' + jsEncode(plugin.name) + '\',\'' + jsEncode(plugin.versions) + '\',\'' + jsEncode(plugin.coexist) +'\')"></label>\
+                        <input class="btswitch btswitch-ios" id="index_' + jsEncode(plugin.name)  + jsEncode(plugin.versions) + '" type="checkbox" ' + checked + '>\
+                        <label class="btswitch-btn" for="index_' + jsEncode(plugin.name) + jsEncode(plugin.versions) + '" onclick="toIndexDisplay(\'' + jsEncode(plugin.name) + '\',\'' + jsEncode(plugin.versions) + '\',\'' + jsEncode(plugin.coexist) +'\')"></label>\
                     </div>';
                 } else {
                     indexshow = '<div class="index-item">\
-                        <input class="btswitch btswitch-ios" id="index_' + htmlEncode(plugin.name) + '" type="checkbox" ' + checked + '>\
-                        <label class="btswitch-btn" for="index_' + htmlEncode(plugin.name) + '" onclick="toIndexDisplay(\'' + jsEncode(plugin.name) + '\',\'' + jsEncode(plugin.setup_version) + '\')"></label>\
+                        <input class="btswitch btswitch-ios" id="index_' + jsEncode(plugin.name) + '" type="checkbox" ' + checked + '>\
+                        <label class="btswitch-btn" for="index_' + jsEncode(plugin.name) + '" onclick="toIndexDisplay(\'' + jsEncode(plugin.name) + '\',\'' + jsEncode(plugin.setup_version) + '\')"></label>\
                     </div>';
                 }
                 
@@ -177,12 +177,12 @@ function getSList(isdisplay) {
 
             sBody += '<tr>' +
                 '<td><span ' + titleClick + '>'+
-                '<img data-src="'+htmlEncode(icon_link)+'" src="/static/img/loading.gif">' + htmlEncode(plugin_title) + '</span></td>' +
+                '<img data-src="'+icon_link+'" src="/static/img/loading.gif">' + plugin_title + '</span></td>' +
                 '<td>' + plugin.ps + '</td>' +
                 '<td>' + softPath + '</td>' +
                 '<td>' + state + '</td>' +
                 '<td>' + indexshow + '</td>' +
-                '<td style="text-align: right;" id="op_'+htmlEncode(plugin.name)+"_"+htmlEncode(plugin.setup_version.replace(".", "_"))+'">' + handle + '</td>' +
+                '<td style="text-align: right;" id="op_'+plugin.name+"_"+plugin.setup_version.replace(".", "_")+'">' + handle + '</td>' +
                 '</tr>';
         }
 
@@ -262,7 +262,7 @@ function addVersion(name, ver, type, obj, title, install_pre_inspection) {
 
     layer.open({
         type: 1,
-        title: "【"+htmlEncode(titlename) + "】软件安装",
+        title: "【"+titlename + "】软件安装",
         area: '350px',
         closeBtn: 1,
         shadeClose: true,

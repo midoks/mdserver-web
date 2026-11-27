@@ -648,7 +648,7 @@ function toBackup(type){
 
 		var sBody = '<div class="dropdown pull-left mr20 check">\
 		 	<button class="btn btn-default dropdown-toggle sname" type="button" id="backdata" data-toggle="dropdown" style="width:auto">\
-				<b id="sname" val="'+htmlEncode(rdata.data[0].name)+'">'+htmlEncode(rdata.data[0].name)+'['+htmlEncode(rdata.data[0].ps)+']</b> <span class="caret"></span>\
+				<b id="sname" val="'+rdata.data[0].name+'">'+rdata.data[0].name+'['+rdata.data[0].ps+']</b> <span class="caret"></span>\
 		  	</button>\
 		 	<ul class="dropdown-menu" role="menu" aria-labelledby="backdata">'+sOpt+'</ul>\
 		</div>\
@@ -699,7 +699,7 @@ function toBackupInitTable(stype, db){
 		var db_html_all_option = '<li><a role="menuitem" tabindex="-1" href="javascript:;" value="ALL">所有</a></li>';
 		var table_html = "";
 		for(var i=0;i<rdata.length;i++){
-			table_html += '<li><a role="menuitem" tabindex="-1" href="javascript:;" value="'+htmlEncode(rdata[i])+'">'+htmlEncode(rdata[i])+'</a></li>';			
+			table_html += '<li><a role="menuitem" tabindex="-1" href="javascript:;" value="'+rdata[i]+'">'+rdata[i]+'</a></li>';			
 		}
 		var content = db_html_all_option + table_html;
 		$('#backdata_table_ul').html(content);
