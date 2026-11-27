@@ -45,12 +45,9 @@ type=$2
 
 VERSION=(${type//./ })
 
-pip install psycopg2-binary
 if [ -f ${rootPath}/bin/activate ];then
 	. ${rootPath}/bin/activate
-	pip install psycopg2-binary
 fi
-
 
 if [ "${2}" = "" ];then
 	echo '缺少安装脚本...'
