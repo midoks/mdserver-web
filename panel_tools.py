@@ -366,7 +366,9 @@ def show_panel_pwd():
     if os.path.exists(defailt_pwd_file):
         pwd = mw.readFile(defailt_pwd_file).strip()
 
-    if mw.md5(pwd) == info['password']:
+    # 密码存储已升级为 bcrypt(兼容旧 md5), 用 verifyPassword 统一校验
+    ok, _needs_upgrade = mw.verifyPassword(pwd, info['password'])
+    if ok:
         mw.echoInfo('password: ' + pwd)
         return
     print("*-password has been changed!")
