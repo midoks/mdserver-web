@@ -54,8 +54,8 @@ def set_timezone():
     if timezone not in pytz.all_timezones:
         return mw.returnData(False, '无效的时区: ' + timezone)
 
-    # 白名单校验后仍做一次 shell 转义, 双重防护
-    data = mw.execShell('timedatectl set-timezone ' + mw.sqlIdent(timezone))
+    # 白名单校验后仍做一次 shell 转义(shlex.quote), 双重防护
+    data = mw.execShell('timedatectl set-timezone ' + mw.quote(timezone))
     if data[1].strip() != '':
         return mw.returnData(False, '设置失败:' + data[1].strip())
     return mw.returnData(True, '设置成功!')
