@@ -465,7 +465,7 @@ def pgOp(version, method):
     # print(cmd)
     try:
         isInited = initPgData()
-        initConfig(version)            
+        initConfig(version)
         if not isInited:
             if mw.isAppleSystem():
                 cmd_init_start = init_file + ' start'
