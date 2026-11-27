@@ -141,7 +141,7 @@ function getAuditFile(log_name){
 			        var thead = '';
 			        tbody += '<tr>'
 			        for (var i in tmp) {
-			            tbody+='<th>'+ htmlEncode(i) + '</th>';
+			            tbody+='<th>'+ i + '</th>';
 			        }
 			        tbody += '</tr>';
 			        $('#logAudit .logAuditContent thead').html(tbody);

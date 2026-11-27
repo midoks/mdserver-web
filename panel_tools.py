@@ -18,6 +18,7 @@ import os
 import json
 import time
 import re
+import subprocess
 
 web_dir = os.getcwd() + "/web"
 os.chdir(web_dir)
@@ -114,17 +115,20 @@ def mwcli(mw_input=0):
         exit()
 
     if mw_input == 1:
+        # 注意: 不要用 stdout/stderr=subprocess.PIPE。
+        # 面板重启会拉起守护进程, 该进程继承管道且不退出, communicate() 等不到 EOF 会永久挂起。
+        # 改为继承终端输出, 仅等待直接子进程退出; start_new_session 让服务脱离当前会话, 避免 Ctrl+C 误杀。
         subprocess.run([INIT_CMD, 'restart'],
-                       stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+                       stdin=subprocess.DEVNULL, start_new_session=True)
     elif mw_input == 2:
         subprocess.run([INIT_CMD, 'stop'],
-                       stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+                       stdin=subprocess.DEVNULL, start_new_session=True)
     elif mw_input == 3:
         subprocess.run([INIT_CMD, 'start'],
-                       stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+                       stdin=subprocess.DEVNULL, start_new_session=True)
     elif mw_input == 4:
         subprocess.run([INIT_CMD, 'reload'],
-                       stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+                       stdin=subprocess.DEVNULL, start_new_session=True)
     elif mw_input == 5:
         in_ip = mw_input_cmd("请输入设置的面板IP：")
         in_ip = in_ip.strip()
@@ -145,11 +149,11 @@ def mwcli(mw_input=0):
             writeFile = shutil.which('writeFile')
             if writeFile:
                 subprocess.run([writeFile, panel_port, in_port],
-                               stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+                               stdin=subprocess.DEVNULL, start_new_session=True)
             subprocess.run([INIT_CMD, 'restart_panel'],
-                           stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+                           stdin=subprocess.DEVNULL, start_new_session=True)
             subprocess.run([INIT_CMD, 'default'],
-                           stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+                           stdin=subprocess.DEVNULL, start_new_session=True)
         else:
             mw.echoInfo("端口范围在0-65536之间")
         return
@@ -158,7 +162,7 @@ def mwcli(mw_input=0):
         mw.echoInfo("关闭安全入口成功!")
     elif mw_input == 10:
         subprocess.run([INIT_CMD, 'default'],
-                       stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+                       stdin=subprocess.DEVNULL, start_new_session=True)
     elif mw_input == 11:
         input_pwd = mw_input_cmd("请输入新的面板密码：")
         if len(input_pwd.strip()) < 5:
@@ -172,7 +176,7 @@ def mwcli(mw_input=0):
         tail = shutil.which('tail')
         if tail:
             subprocess.run([tail, '-100', '--', panel_dir + '/logs/panel_error.log'],
-                           stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+                           stdin=subprocess.DEVNULL, start_new_session=True)
     elif mw_input == 14:
         admin_close = thisdb.getOption('admin_close')
         if admin_close == 'no':
@@ -192,7 +196,7 @@ def mwcli(mw_input=0):
         if basic_auth['open']:
             basic_auth['open'] = False
             thisdb.setOption('basic_auth', json.dumps(basic_auth))
-            os.system(INIT_CMD + " restart")
+            subprocess.run([INIT_CMD, 'restart'], stdin=subprocess.DEVNULL, start_new_session=True)
             mw.echoInfo("关闭basic_auth成功")
     elif mw_input == 21:
         panel_domain = thisdb.getOption('panel_domain', default='')
@@ -202,7 +206,7 @@ def mwcli(mw_input=0):
             unbind_domain = shutil.which('unbind_domain')
             if unbind_domain:
                 subprocess.run([unbind_domain, '--', panel_domain],
-                               stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+                               stdin=subprocess.DEVNULL, start_new_session=True)
             mw.echoInfo("解除域名绑定成功")
         else:
             mw.echoInfo("面板未绑定域名!")
@@ -212,13 +216,13 @@ def mwcli(mw_input=0):
             panel_ssl['open'] = False
             thisdb.setOption('panel_ssl', json.dumps(panel_ssl))
             subprocess.run([INIT_CMD, 'unbind_ssl'],
-                           stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+                           stdin=subprocess.DEVNULL, start_new_session=True)
             mw.echoInfo("解除面板SSL绑定成功")
     elif mw_input == 23:
         listen_ipv6 = panel_dir + '/data/ipv6.pl'
         if not os.path.exists(listen_ipv6):
             mw.writeFile(listen_ipv6, 'True')
-            os.system(INIT_CMD + " restart")
+            subprocess.run([INIT_CMD, 'restart'], stdin=subprocess.DEVNULL, start_new_session=True)
             mw.echoInfo("开启IPv6支持了")
         else:
             mw.echoInfo("已开启IPv6支持!")
@@ -231,8 +235,8 @@ def mwcli(mw_input=0):
             rm = shutil.which('rm')
             if rm:
                 subprocess.run([rm, '--', listen_ipv6],
-                               stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-            os.system(INIT_CMD + " restart")
+                               stdin=subprocess.DEVNULL, start_new_session=True)
+            subprocess.run([INIT_CMD, 'restart'], stdin=subprocess.DEVNULL, start_new_session=True)
             mw.echoInfo("关闭IPv6支持了")
     elif mw_input == 25:
         open_ssh_port()
@@ -362,7 +366,9 @@ def show_panel_pwd():
     if os.path.exists(defailt_pwd_file):
         pwd = mw.readFile(defailt_pwd_file).strip()
 
-    if mw.md5(pwd) == info['password']:
+    # 密码存储已升级为 bcrypt(兼容旧 md5), 用 verifyPassword 统一校验
+    ok, _needs_upgrade = mw.verifyPassword(pwd, info['password'])
+    if ok:
         mw.echoInfo('password: ' + pwd)
         return
     print("*-password has been changed!")
