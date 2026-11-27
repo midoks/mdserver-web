@@ -433,7 +433,6 @@ def initPgData():
     return True
 
 def initPgPwd():
-    openPgTrust()
     serverdir = getServerDir()
     pwd = mw.getRandomString(16)
 
@@ -468,6 +467,7 @@ def pgOp(version, method):
         isInited = initPgData()
         initConfig(version)
         if not isInited:
+            openPgTrust()
             if mw.isAppleSystem():
                 cmd_init_start = init_file + ' start'
                 subprocess.Popen(cmd_init_start, stdout=subprocess.PIPE, shell=True,
@@ -475,9 +475,11 @@ def pgOp(version, method):
 
                 time.sleep(6)
             else:
+
                 mw.execShell('systemctl start postgresql')
 
             initPgPwd()
+            closePgTrust()
 
             # 启用 pg_stat_statements 扩展
             try:
