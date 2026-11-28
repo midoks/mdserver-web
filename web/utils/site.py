@@ -2002,16 +2002,25 @@ location ^~ {from} {\n\
         return mw.returnData(True, '设置成功!')
 
     def setCliPhpVersion(self, version):
+        version = (version or '').strip()
+        if not re.match(r'^(php)?\d+(?:\.\d+)*$', version):
+            return mw.returnData(False, '指定PHP版本未安装!')
+
+        php_base = os.path.realpath('/www/server/php')
+        php_version_dir = os.path.realpath(os.path.join(php_base, version))
+        if not (php_version_dir == php_base or php_version_dir.startswith(php_base + os.sep)):
+            return mw.returnData(False, '指定PHP版本未安装!')
+
         php_bin = '/usr/bin/php'
-        php_bin_src = "/www/server/php/%s/bin/php" % version
+        php_bin_src = os.path.join(php_version_dir, 'bin/php')
         php_ize = '/usr/bin/phpize'
-        php_ize_src = "/www/server/php/%s/bin/phpize" % version
+        php_ize_src = os.path.join(php_version_dir, 'bin/phpize')
         php_fpm = '/usr/bin/php-fpm'
-        php_fpm_src = "/www/server/php/%s/sbin/php-fpm" % version
+        php_fpm_src = os.path.join(php_version_dir, 'sbin/php-fpm')
         php_pecl = '/usr/bin/pecl'
-        php_pecl_src = "/www/server/php/%s/bin/pecl" % version
+        php_pecl_src = os.path.join(php_version_dir, 'bin/pecl')
         php_pear = '/usr/bin/pear'
-        php_pear_src = "/www/server/php/%s/bin/pear" % version
+        php_pear_src = os.path.join(php_version_dir, 'bin/pear')
         if not os.path.exists(php_bin_src):
             return mw.returnData(False, '指定PHP版本未安装!')
 
