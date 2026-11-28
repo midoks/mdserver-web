@@ -932,14 +932,13 @@ class plugin(object):
             try:
                 obj = json.loads(args)
                 if isinstance(obj, dict):
-                    # parsed_args = ['%s:%s' % (k, v) for k, v in obj.items()]
-                    post_args = []
+                    tmp_args = []
                     for k, v in obj.items():
                         arg_item = '%s:%s' % (k, v)
                         if not re.fullmatch(r'[A-Za-z0-9_.:/@=,+-]+', arg_item):
                             return ('', '非法的参数内容!')
-                        post_args.append(arg_item)
-                    parsed_args = post_args
+                        tmp_args.append(arg_item)
+                    parsed_args = tmp_args
             except (ValueError, TypeError):
                 pass
             if parsed_args is not None:
