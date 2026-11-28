@@ -900,6 +900,10 @@ class plugin(object):
             return ('', '非法的插件名称!')
         if not re.fullmatch(r'[A-Za-z0-9_.-]+', script or '') or '..' in script:
             return ('', '非法的脚本名称!')
+        if not re.fullmatch(r'[A-Za-z0-9_.-]+', func or ''):
+            return ('', '非法的函数名称!')
+        if version != '' and not re.fullmatch(r'[A-Za-z0-9_.:-]+', version):
+            return ('', '非法的版本参数!')
 
         if mw.inArray(['start','stop','restart','reload','uninstall_pre_inspection','install','uninstall'], func):
             self.runByCache(name, func, version)
@@ -929,13 +933,21 @@ class plugin(object):
             try:
                 obj = json.loads(args)
                 if isinstance(obj, dict):
-                    parsed_args = ['%s:%s' % (k, v) for k, v in obj.items()]
+                    tmp_args = []
+                    for k, v in obj.items():
+                        arg_item = '%s:%s' % (k, v)
+                        if not re.fullmatch(r'[A-Za-z0-9_.:/@=,+-]+', arg_item):
+                            return ('', '非法的参数内容!')
+                        tmp_args.append(arg_item)
+                    parsed_args = tmp_args
             except (ValueError, TypeError):
                 pass
             if parsed_args is not None:
                 cmd.extend(parsed_args)
             else:
                 # 非 JSON 字符串(老格式或简单字符串)原样传
+                if not re.fullmatch(r'[A-Za-z0-9_.:/@=,+-]+', args):
+                    return ('', '非法的参数内容!')
                 cmd.append(args)
 
         env = os.environ.copy()
