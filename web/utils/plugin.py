@@ -969,7 +969,7 @@ class plugin(object):
         # print(data)
         if mw.isDebugMode():
             print('run:', ' '.join(cmd))
-            print(data)
+            print('return:',data)
         # print os.path.exists(py_cmd)
         return (data[0].strip(), data[1].strip())
 
