@@ -995,7 +995,7 @@ class plugin(object):
 
         cmd = "__import__('" + script + "')." + func + '(' + args + ')'
         if mw.isDebugMode():
-            print('callback', cmd)
+            print('callback:', cmd)
 
         data = None
         try:
