@@ -1222,6 +1222,11 @@ function setBackupReq(db_name, obj){
     });
 }
 
+
+function setBackupPanel(){
+
+}
+
 function dbList(page, search){
     var _data = {};
     if (typeof(page) =='undefined'){
